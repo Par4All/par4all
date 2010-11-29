@@ -1505,7 +1505,7 @@ invariant_code_motion(string module_name)
 	dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
     }
     else {
-	pips_internal_error("dg should be undefined\n");
+	pips_internal_error("dg should be undefined");
     }
 
     enclosing = 0;

@@ -166,10 +166,10 @@ char            *mod_name;
   set_current_stco_map(STS);
 
   if (stco == static_control_undefined) 
-    pips_error("distribution", "This is an undefined static control !\n");
+    pips_internal_error("This is an undefined static control !");
   
   if (!static_control_yes(stco)) 
-    pips_error("distribution", "This is not a static control program !\n");
+    pips_internal_error("This is not a static control program !");
   
   /* Read the DFG */
   dfg = (graph)db_get_memory_resource(DBR_ADFG, mod_name, TRUE);

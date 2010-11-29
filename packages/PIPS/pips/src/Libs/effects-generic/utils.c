@@ -915,7 +915,7 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 	      }
 	    else
 	      {
-		pips_internal_error("unexpected typedef basic\n");
+		pips_internal_error("unexpected typedef basic");
 	      }
 
 	    break;
@@ -929,7 +929,7 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 	  }
 	default:
 	  {
-	    pips_internal_error("case not handled yet\n");
+	    pips_internal_error("case not handled yet");
 	  }
 	} /*switch */
 
@@ -1081,7 +1081,7 @@ static bool r_effect_pointer_type_p(effect eff, list l_ind, type ct)
 	  }
 	default:
 	  {
-	    pips_internal_error("case not handled yet\n");
+	    pips_internal_error("case not handled yet");
 	  }
 	} /*switch */
 
@@ -1205,10 +1205,10 @@ type simple_effect_reference_type(reference ref)
 	    case is_basic_string:
 	    case is_basic_bit:
 	    case is_basic_overloaded:
-	      pips_internal_error("fundamental basic not expected here \n");
+	      pips_internal_error("fundamental basic not expected here ");
 	      break;
 	    case is_basic_typedef:
-	      pips_internal_error("typedef not expected here \n");
+	      pips_internal_error("typedef not expected here ");
 	    } /* switch (basic_tag(cb)) */
 	}
 

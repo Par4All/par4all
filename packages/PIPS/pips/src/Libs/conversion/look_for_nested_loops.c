@@ -156,11 +156,9 @@ void look_for_nested_loop_statements(statement s,
 	break;
 
     case is_instruction_goto:
-	pips_error("look_for_nested_loop_statements",
-		   "unexpected goto in code");
+	pips_internal_error("unexpected goto in code");
     default:
-	pips_error("look_for_nested_loop_statements",
-		   "unexpected tag %d\n",instruction_tag(i));
+	pips_internal_error("unexpected tag %d",instruction_tag(i));
     }
 }
 
@@ -285,7 +283,7 @@ retry:
 	break;
 
     default:
-	pips_internal_error("unexpected tag %d\n",instruction_tag(i));
+	pips_internal_error("unexpected tag %d",instruction_tag(i));
     }
 
     return new_s;

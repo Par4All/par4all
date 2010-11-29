@@ -216,7 +216,7 @@ static expression entity_to_expr(e)
     return call_to_expression(make_call(e,NIL));
     break;
   default:
-    pips_internal_error("unexpected entity tag: %d\n", type_tag(entity_type(e)));
+    pips_internal_error("unexpected entity tag: %d", type_tag(entity_type(e)));
     return expression_undefined; 
   }
 }

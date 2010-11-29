@@ -130,7 +130,7 @@ entity module;
     if (module==host_module) return(HOST_NAME);
     /* else
      */
-    pips_internal_error("unexpected module\n");
+    pips_internal_error("unexpected module");
     return string_undefined; /* to avoid a gcc warning */
 }
   
@@ -295,7 +295,7 @@ entity NewVariableForModule(
 	    return load_new_node(e);
     }
 
-    pips_internal_error("unexpected entity %s\n", entity_name(e));
+    pips_internal_error("unexpected entity %s", entity_name(e));
 
     return entity_undefined;
 }

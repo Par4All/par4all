@@ -158,7 +158,7 @@ transformer tf;
        should be called tf_plus by I do not use the one_trip flag */
     transformer tf_star = transformer_undefined;
 
-    pips_error("transformer_halbwachs_fix_point","not implemented\n");
+    pips_internal_error("not implemented");
 
     /* preserve transformer of loop body s */
     /* temporarily commented out */
@@ -516,7 +516,7 @@ Pbase * pb_new;
     }
 
     if(!sub_basis_p(b_old, b_new)) {
-	pips_error("build_transfer_equations", "Old basis is too large\n");
+	pips_internal_error("Old basis is too large");
     }
     base_rm(b_old);
     b_old = BASE_UNDEFINED;
@@ -841,7 +841,7 @@ look_for_the_best_counter(Pcontrainte egs)
 			failed = TRUE;
 		}
 		else {
-		    pips_error("look_for_the_best_counter", "Unexpected value entity %s",
+		    pips_internal_error("Unexpected value entity %s",
 			       entity_local_name((entity) vecteur_var(lv)));
 		}
 	    }
@@ -968,8 +968,7 @@ invariant_vector_p(Pvecteur v)
 	    /* OK, you could argue for invariant = FALSE,
 	     * but this would not help my debugging!
 	     */
-	    pips_error("invariant_vector_p",
-		       "Constant term in a potential invariant vector!\n");
+	    pips_internal_error("Constant term in a potential invariant vector!");
 	}
 	else {
 	    entity e = (entity) vecteur_var(cv);
@@ -983,8 +982,7 @@ invariant_vector_p(Pvecteur v)
 		vect_add_elem(&v_new, (Variable) var, vecteur_val(cv));
 	    }
 	    else {
-		pips_error("invariant_vector_p",
-			   "Non value entity %s in invariant vector\n",
+		pips_internal_error("Non value entity %s in invariant vector",
 			   entity_name(e));
 	    }
 	}

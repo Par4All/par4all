@@ -536,7 +536,7 @@ static void compute_cumulated_reductions(instruction i)
             pips_debug(5, "stat %s %p\n", note_for_statement(parent), parent);
             return ; /* it is important to return here */
         default:
-            pips_internal_error("should not happen\n");
+            pips_internal_error("should not happen");
     };
     build_creductions_of_statement(parent,l);
     if(tofree) gen_free_list(l);
@@ -626,7 +626,7 @@ entity reduction_operator_entity(reduction_operator op)
         case is_reduction_operator_prod:
             opname=MULTIPLY_OPERATOR_NAME;break;
         default:
-            pips_internal_error("unhandled case\n");
+            pips_internal_error("unhandled case");
     }
     return entity_intrinsic(opname);
 }

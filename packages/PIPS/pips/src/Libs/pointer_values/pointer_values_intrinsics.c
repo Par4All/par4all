@@ -38,9 +38,7 @@
 #include "text-util.h"
 #include "effects-simple.h"
 #include "effects-generic.h"
-#include "pipsdbm.h"
 #include "misc.h"
-#include "properties.h"
 
 #include "pointer_values.h"
 
@@ -53,6 +51,7 @@ static void unary_arithmetic_operator_to_post_pv(entity func, list func_args, li
 static void update_operator_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void logical_operator_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void conditional_operator_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
+
 
 static void dereferencing_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 static void field_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
@@ -72,6 +71,8 @@ static void safe_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv
 static void intrinsic_to_identical_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 
 static void unknown_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
+
+static void default_intrinsic_to_post_pv(entity func, list func_args, list l_in, pv_results * pv_res, pv_context *ctxt);
 
 /**************** YET ANOTHER INTRINSICS TABLE */
 
@@ -337,7 +338,7 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {BITWISE_OR_UPDATE_OPERATOR_NAME,        update_operator_to_post_pv},
 
   /* ISO 6.5.17 comma operator */
-  {COMMA_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
+  {COMMA_OPERATOR_NAME,                    default_intrinsic_to_post_pv},
   
   {BREAK_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
   {CASE_FUNCTION_NAME,                     intrinsic_to_identical_post_pv},
@@ -607,9 +608,9 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {LROUND_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {LROUNDF_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
   {LROUNDL_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
-  {LLROUND_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
-  {LLROUNDF_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
-  {LLROUNDL_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
+  {LLROUND_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
+  {LLROUNDF_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
+  {LLROUNDL_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {TRUNC_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
   {TRUNCF_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {TRUNCL_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
@@ -992,15 +993,22 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   /* SG: concerning the err* family of functions, they also exit() from the program
    * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
    * but it seems an error to me */
-  {ERR_FUNCTION_NAME,                              c_io_function_to_post_pv},
-  {ERRX_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {WARN_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {WARNX_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VERR_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {VERRX_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VWARN_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VWARNX_FUNCTION_NAME,                           c_io_function_to_post_pv},
-  
+  {ERR_FUNCTION_NAME,                      c_io_function_to_post_pv},
+  {ERRX_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {WARN_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {WARNX_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VERR_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {VERRX_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VWARN_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VWARNX_FUNCTION_NAME,                   c_io_function_to_post_pv},
+
+  /*Conforming to 4.3BSD, POSIX.1-2001.*/
+  /* POSIX.1-2001 declares this function obsolete; use nanosleep(2) instead.*/
+  /*POSIX.1-2008 removes the specification of usleep()*/
+  {USLEEP_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+
+  /* _POSIX_C_SOURCE >= 199309L */
+  {NANOSLEEP_FUNCTION_NAME,                intrinsic_to_identical_post_pv},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
@@ -1192,7 +1200,7 @@ static void binary_arithmetic_operator_to_post_pv(entity func, list func_args,
   pv_res->l_out = pv_res2.l_out;
   free_pv_results_paths(&pv_res1);
   free_pv_results_paths(&pv_res2);
-  pips_debug_pv_results(1, "end with pv_res = \n", *pv_res);
+  pips_debug_pv_results(1, "end with pv_res =\n", *pv_res);
 }
 
 static void unary_arithmetic_operator_to_post_pv(entity __attribute__ ((unused))func,
@@ -1252,7 +1260,7 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
 	      new_dim = int_to_expression(-1);
 	    }
 	  else
-	    pips_internal_error("unexpected update operator on pointers\n");
+	    pips_internal_error("unexpected update operator on pointers");
 
 	  (*effect_add_expression_dimension_func)(rhs_eff, new_dim);
 	  l_lhs_kind = CONS(CELL_INTERPRETATION, make_cell_interpretation_address_of(),
@@ -1262,7 +1270,7 @@ static void update_operator_to_post_pv(entity func, list func_args, list l_in,
       single_pointer_assignment_to_post_pv(lhs_eff, l_rhs_eff, l_rhs_kind, false,
 					   l_in_cur, pv_res, ctxt);
     }
-  pips_debug_pv_results(1, "end with pv_res : \n", *pv_res);
+  pips_debug_pv_results(1, "end with pv_res:\n", *pv_res);
 }
 
 static void logical_operator_to_post_pv(entity __attribute__ ((unused))func,
@@ -1502,9 +1510,9 @@ static void free_to_post_pv(list l_free_eff, list l_in,
       l_values = effect_find_equivalent_pointer_values(eff, l_in,
 						       &exact_eff_pv,
 						       &l_remnants);
-      pips_debug_pvs(3, "l_values: \n", l_values);
-      pips_debug_pvs(3, "l_remnants: \n", l_remnants);
-      pips_debug_pv(3, "exact_eff_pv: \n", exact_eff_pv);
+      pips_debug_pvs(3, "l_values:\n", l_values);
+      pips_debug_pvs(3, "l_remnants:\n", l_remnants);
+      pips_debug_pv(3, "exact_eff_pv:\n", exact_eff_pv);
 
       list l_heap_eff = NIL;
 
@@ -1591,7 +1599,7 @@ static void free_to_post_pv(list l_free_eff, list l_in,
 	    CONS(EFFECT,
 		 make_effect( make_undefined_pointer_value_cell(),
 			      make_action_write_memory(),
-			      make_approximation_must(),
+			      make_approximation_exact(),
 			      make_descriptor_none()),
 		 NIL);
 	  list l_kind = CONS(CELL_INTERPRETATION,
@@ -1627,15 +1635,33 @@ static void free_to_post_pv(list l_free_eff, list l_in,
 	}
       else /* no flow or context sensitive variable found */
 	{
-	  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-	  if (same_string_p(opt, "unique"))
-	    pips_user_error("trying to free a non-heap pointer\n");
-	  else
-	    pips_internal_error("case not handled yet");
+	  list l_rhs =
+	    CONS(EFFECT,
+		 make_effect( make_undefined_pointer_value_cell(),
+			      make_action_write_memory(),
+			      make_approximation_exact(),
+			      make_descriptor_none()),
+		 NIL);
+	  list l_kind = CONS(CELL_INTERPRETATION,
+			     make_cell_interpretation_value_of(),
+			     NIL);
+	  single_pointer_assignment_to_post_pv(eff, l_rhs, l_kind,
+					       false, l_in, pv_res, ctxt);
+	  gen_full_free_list(l_rhs);
+	  gen_full_free_list(l_kind);
+	  free_pv_results_paths(pv_res);
+	  if (l_in != pv_res->l_out)
+	    {
+	      gen_full_free_list(l_in);
+	      l_in = pv_res->l_out;
+	    }
+	  pips_debug_pvs(5, "l_in after assigning "
+			 "undefined value to freed pointer:\n",
+			 l_in);
 	}
 
     } /* FOREACH */
-  pips_debug_pvs(5, "end with pv_res->l_out: \n", pv_res->l_out);
+  pips_debug_pvs(5, "end with pv_res->l_out:", pv_res->l_out);
 }
 
 static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
@@ -1703,7 +1729,7 @@ static void heap_intrinsic_to_post_pv(entity func, list func_args, list l_in,
 
       effect eff = make_effect(make_cell_reference(make_reference(e, NIL)),
 			       make_action_write_memory(),
-			       make_approximation_must(),
+			       make_approximation_exact(),
 			       make_descriptor_none());
 
       if (!entity_heap_location_p(e))
@@ -1813,7 +1839,7 @@ static void safe_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
   pv_res->result_paths = l_anywhere_eff;
   pv_res->result_paths_interpretations = l_rhs_kind;
 
-  pips_debug_pv_results(1, "ending with pv_res: \n", *pv_res);
+  pips_debug_pv_results(1, "ending with pv_res:", *pv_res);
 
 }
 
@@ -1830,8 +1856,23 @@ static void unknown_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
 					 pv_results __attribute__ ((unused)) *pv_res,
 					 pv_context __attribute__ ((unused)) *ctxt)
 {
-  pips_internal_error("not a C intrinsic\n");
+  pips_internal_error("not a C intrinsic");
 }
+
+static void default_intrinsic_to_post_pv(entity __attribute__ ((unused)) func,
+					 list func_args, list l_in,
+					 pv_results * pv_res, pv_context *ctxt)
+{
+  list l_in_cur = l_in;
+  FOREACH(EXPRESSION, arg, func_args)
+    {
+      /* free the result paths of the previous expression evaluation */
+      free_pv_results_paths(pv_res);
+      expression_to_post_pv(arg, l_in_cur, pv_res, ctxt);
+      l_in_cur = pv_res->l_out;
+    }
+}
+
 
 void intrinsic_to_post_pv(entity func, list func_args, list l_in,
 			  pv_results * pv_res, pv_context *ctxt)
@@ -1846,14 +1887,14 @@ void intrinsic_to_post_pv(entity func, list func_args, list l_in,
       if (strcmp(pid->name, func_name) == 0)
 	{
 	  (*(pid->to_post_pv_function))(func, func_args, l_in, pv_res, ctxt);
-	  pips_debug_pv_results(2, "resulting pv_res: ", *pv_res);
+	  pips_debug_pv_results(2, "resulting pv_res:", *pv_res);
 	  pips_debug(1, "end\n");
 	  return;
 	}
       pid += 1;
   }
 
-  pips_internal_error("unknown intrinsic %s\n", func_name);
+  pips_internal_error("unknown intrinsic %s", func_name);
   pips_debug(1, "end\n");
   return;
 }

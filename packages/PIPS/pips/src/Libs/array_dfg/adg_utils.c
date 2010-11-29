@@ -676,12 +676,12 @@ boolean take_last;
     if (take_last) {
       if(after1) ret_q = copy_quast( *tsou );
       else if(after2) ret_q = copy_quast( tsou2 );
-      else pips_error("adg_max_of_leaves",  "Bad cutting space !\n");
+      else pips_internal_error("Bad cutting space !");
     }
     else {
       if(after2) ret_q = copy_quast( *tsou );
       else if(after1) ret_q = copy_quast( tsou2 );
-      else pips_error("adg_max_of_leaves",  "Bad cutting space !\n");
+      else pips_internal_error("Bad cutting space !");
     }
   }
   /* Both quast could be a source: look at a deeper stage. */
@@ -848,7 +848,7 @@ boolean	    take_last;
     quast_quast_value( *tsou ) = quast_quast_value( q2 );
     ret_tsou = *tsou;
   }
-  else pips_error("adg_path_max_source", "Anormal quast \n");
+  else pips_internal_error("Anormal quast ");
   
   debug(9, "adg_path_max_source", "end \n");
   return( ret_tsou );
@@ -901,8 +901,7 @@ list		in_list;
 
   debug(9, "adg_build_Psysteme", "begin \n");
   if ((in_list == NIL) && (in_pred != predicate_undefined)) {
-    pips_error("adg_build_Psysteme",
-     "Error : there is no correspondance between input Psysteme and input entity list");
+    pips_internal_error("Error : there is no correspondance between input Psysteme and input entity list");
   }
 
   ret_ps = (Psysteme) predicate_system( in_pred );

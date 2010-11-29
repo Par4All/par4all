@@ -299,7 +299,7 @@ static void initial_code_abc_statement_rwt(statement s,abc_instrumentation_conte
   case is_instruction_unstructured:
     break;
   default:
-    pips_error("", "Unexpected instruction tag %d \n", t );
+    pips_internal_error("Unexpected instruction tag %d ", t );
     break; 
   }
 }
@@ -404,7 +404,7 @@ static void pips_code_abc_statement_rwt(statement s, abc_instrumentation_context
   case is_instruction_unstructured:
     break;
   default:
-    pips_error("", "Unexpected instruction tag %d \n", t );
+    pips_internal_error("Unexpected instruction tag %d ", t );
     break;    
   }
 }

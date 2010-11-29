@@ -1488,7 +1488,7 @@ get_cast_function_for_basic(basic cast, basic from)
       case 8:
         return CreateIntrinsic(INT_GENERIC_CONVERSION_NAME) ;
       default:
-        pips_internal_error("Unexpected integer size %d\n", basic_int(cast));
+        pips_internal_error("Unexpected integer size %d", basic_int(cast));
       }
     }
     break;
@@ -1500,7 +1500,7 @@ get_cast_function_for_basic(basic cast, basic from)
     case 8:
       return CreateIntrinsic(DBLE_GENERIC_CONVERSION_NAME) ;
     default:
-      pips_internal_error("Unexpected float size %d\n", basic_float(cast));
+      pips_internal_error("Unexpected float size %d", basic_float(cast));
     }
     break;
   case is_basic_logical:
@@ -1512,7 +1512,7 @@ get_cast_function_for_basic(basic cast, basic from)
     case 8:
       return entity_undefined;
     default:
-      pips_internal_error("Unexpected logical size %d\n", basic_logical(cast));
+      pips_internal_error("Unexpected logical size %d", basic_logical(cast));
     }
     break;
   case is_basic_complex:
@@ -1523,7 +1523,7 @@ get_cast_function_for_basic(basic cast, basic from)
     case 16:
       return CreateIntrinsic(DCMPLX_GENERIC_CONVERSION_NAME) ;
     default:
-      pips_internal_error("Unexpected complex size %d\n", basic_complex(cast));
+      pips_internal_error("Unexpected complex size %d", basic_complex(cast));
     }
     break;
   case is_basic_string:
@@ -1563,11 +1563,11 @@ insert_cast(basic cast, basic from, expression exp, type_context_p context)
   cast_function = get_cast_function_for_basic(cast, from);
   if (cast_function == NULL)
   {
-    pips_internal_error("Cast function is not verified!\n");
+    pips_internal_error("Cast function is not verified!");
   }
   if (cast_function == entity_undefined)
   {
-    pips_internal_error("Can not convert to LOGICAL!\n");
+    pips_internal_error("Can not convert to LOGICAL!");
   }
   c = make_call(cast_function, CONS(EXPRESSION, exp, NIL));
   s = make_syntax(is_syntax_call, c);
@@ -2175,7 +2175,7 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   /* UNEXPECTED */
   else
   {
-    pips_internal_error("Unexpected basic: %s \n",
+    pips_internal_error("Unexpected basic: %s ",
                         basic_to_string(from_type));
   }
 
@@ -2950,7 +2950,7 @@ static basic no_typing(call __attribute__ ((unused)) c,
                        type_context_p __attribute__ ((unused)) context)
 {
   basic bt = basic_undefined;
-  pips_internal_error("This should not be type-checked because it is not Fortran function\n");
+  pips_internal_error("This should not be type-checked because it is not Fortran function");
   return bt; /* To please the compiler */
 }
 
@@ -5158,6 +5158,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {C_CLOSE_FUNCTION_NAME,   1,         integer_to_integer_type,    0, 0},
   {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
   {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
+  {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
   /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
   {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
   {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
@@ -5291,6 +5292,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
   {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
   {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},

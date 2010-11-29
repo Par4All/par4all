@@ -153,8 +153,7 @@ statement s;
 	break;
 
       default:
-	pips_error("contexts_mapping_of_statement", 
-		   "unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 }
 

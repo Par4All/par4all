@@ -429,7 +429,7 @@ static bool atomizable_sub_expression_p(expression e)
       return !entity_constant_p(called) && !ENTITY_IMPLIEDDO_P(called);
     }
   default:
-    pips_internal_error("unexpected syntax tag: %d\n", syntax_tag(s));
+    pips_internal_error("unexpected syntax tag: %d", syntax_tag(s));
     return FALSE;
   }
 }
@@ -788,7 +788,7 @@ static statement update_number_of_use(entity ent, list lst_stat, int up_down)
           {
               if (up_down == -1)
               {
-                  pips_internal_error("Number of use of '%s' < 0 !!!\n",
+                  pips_internal_error("Number of use of '%s' < 0 !!!",
                           entity_name(ent));
               }
               set_comment_of_statement(s, strdup("1"));
@@ -836,7 +836,7 @@ static void increase_number_of_use_by_1(entity ent, statement container)
 
         if (!(updated = update_number_of_use(ent, sequence_statements(seq), step)))
         {
-            pips_internal_error("No statement defines '%s'\n", entity_name(ent));
+            pips_internal_error("No statement defines '%s'", entity_name(ent));
         }
 
         /* Reduce by 1 number of use of variables contained by statement Updated */

@@ -9,6 +9,7 @@ libeffects_util_la_SOURCES=effects.c \
         points_to.c \
         cell_relations.c \
         pointer_values.c \
+	compare.c \
         prettyprint.c \
         type.c \
         conflicts.c

@@ -667,7 +667,7 @@ reget:
                         goto reget;
 
                     default:
-                        pips_internal_error("unhandled tag %d\n", syntax_tag(expression_syntax(from)) );
+                        pips_internal_error("unhandled tag %d", syntax_tag(expression_syntax(from)) );
                 };
 
                 /* check wether the substitution will cause naming clashes

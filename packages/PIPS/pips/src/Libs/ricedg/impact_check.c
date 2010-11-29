@@ -718,9 +718,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_write_of_statement_on_variable(sw2, alias_ent2);
 		  if (!effect_undefined_p(eff_tmp))
-		    impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		    impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sw2, s, impact_must_p, DEP_FLOW);
 		  break;
 		case MAY_APPROXIMATION:
@@ -750,9 +750,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_read_of_statement_on_variable(sr2, alias_ent2);
 		  if (!effect_undefined_p(eff_tmp))
-		    impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		    impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sr2, s, impact_must_p, DEP_ANTI);
 		  break;
 		case MAY_APPROXIMATION:
@@ -778,9 +778,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_write_of_statement_on_variable(sw2, alias_ent2);
 		  if (!effect_undefined_p(eff_tmp))
-		    impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		    impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sw2, s, impact_must_p, DEP_OUTP);
 		  break;
 		case MAY_APPROXIMATION:
@@ -813,9 +813,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_write_of_statement_on_variable(sw1, alias_ent1);
 		  if (!effect_undefined_p(eff_tmp))
-		    impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		    impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sw1, s, impact_must_p, DEP_FLOW);
 		  break;
 		case MAY_APPROXIMATION:
@@ -845,9 +845,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_read_of_statement_on_variable(sr1, alias_ent1);
 		  if (!effect_undefined_p(eff_tmp))
-		  impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		  impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sr1, s, impact_must_p, DEP_ANTI);
 		  break;
 		case MAY_APPROXIMATION:
@@ -873,9 +873,9 @@ static void check_for_effected_statement(statement s, list le)
 		case MUST_APPROXIMATION:
 		  eff_tmp = get_effect_write_of_statement_on_variable(sw1, alias_ent1);
 		  if (!effect_undefined_p(eff_tmp))
-		    impact_must_p = approximation_must_p(effect_approximation(eff_tmp));
+		    impact_must_p = approximation_exact_p(effect_approximation(eff_tmp));
 		  impact_must_p = impact_must_p &&
-		    approximation_must_p(effect_approximation(eff));
+		    approximation_exact_p(effect_approximation(eff));
 		  insert_impact_description_as_comment(sw1, s, impact_must_p, DEP_OUTP);
 		  break;
 		case MAY_APPROXIMATION:
@@ -1017,7 +1017,7 @@ static void check_new_arc_for_structured_statement(statement s)
         check_for_effected_statement(s, statement_to_effects(s));
 	break;
     default:
-	pips_error("check_new_arc_statement", "case default reached\n");
+	pips_internal_error("case default reached");
         break;
     }
 }

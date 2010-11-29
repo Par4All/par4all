@@ -163,8 +163,7 @@ range r;
 			  int_to_expression(dup),
 			  int_to_expression(1)));
 
-    pips_error("complementary_range",
-	       "well, there is a problem here around\n");
+    pips_internal_error("well, there is a problem here around");
 
     return(range_undefined); /* just to avoid a gcc warning */
 }
@@ -557,12 +556,10 @@ list lrt;
 	    break;
 	}
 	case is_style_none:
-	    pips_error("template_ranges_to_processors_ranges",
-		       "unexpected none style distribution\n");
+	    pips_internal_error("unexpected none style distribution");
 	    break;
 	default:
-	    pips_error("template_ranges_to_processors_ranges",
-		       "unexpected style tag (%d)\n",
+	    pips_internal_error("unexpected style tag (%d)",
 		       style_tag(s));
 	}
     }
@@ -670,8 +667,7 @@ list lkref, lvref;
 	    break;
 	}
 	default:
-	    pips_error("array_access_to_array_range",
-		       "unexpected but maybe legal access\n");
+	    pips_internal_error("unexpected but maybe legal access");
 	    break;
 	}
     }

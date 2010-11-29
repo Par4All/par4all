@@ -293,8 +293,7 @@ static void call_flt(call c)
       MERGE_TEXTS(r,get_text_out_regions(callee_name));
       break;
     default:
-      pips_error("module_to_icfg",
-		 "unknown ICFG decoration for module %s\n",
+      pips_internal_error("unknown ICFG decoration for module %s",
 		 callee_name);
     }
     /* retrieve the caller entity */

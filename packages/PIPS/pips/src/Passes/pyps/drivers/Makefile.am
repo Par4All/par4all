@@ -1,5 +1,5 @@
-SUBDIRS = sac workspace_gettime memalign sacexplore p3
+SUBDIRS = sac workspace_gettime memalign sacexplore p3 terapyps
 if WITH_PYPS_EXTRA
 SUBDIRS+= pypsearch
 endif
-DIST_SUBDIRS = sac workspace_gettime memalign pypsearch sacexplore p3
+DIST_SUBDIRS = sac workspace_gettime memalign pypsearch sacexplore p3 terapyps

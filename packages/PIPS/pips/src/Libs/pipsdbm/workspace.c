@@ -60,7 +60,7 @@ static string current_workspace_name = NULL;
 static void db_set_current_workspace_name(const char* name)
 {
     if (current_workspace_name)
-	pips_internal_error("current workspace %s not closed\n", 
+	pips_internal_error("current workspace %s not closed", 
 			    current_workspace_name);
     pips_assert("valid workspace name", workspace_name_p(name));
     current_workspace_name = strdup(name);
@@ -224,7 +224,7 @@ static bool load_meta_data(void)
     file = check_fopen(file_name, "r");
     ONERROR(!file,/* nope */)
     ONERROR(fscanf(file, "%d\n", &time)!=1,
-	    pips_internal_error("fscanf failed\n"))
+	    pips_internal_error("fscanf failed"))
     db_set_logical_time(time);
     ws_name = safe_readline(file);
     if (!same_string_p(ws_name, db_get_current_workspace_name()))

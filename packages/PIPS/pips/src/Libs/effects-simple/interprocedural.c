@@ -249,10 +249,10 @@ list effects_dynamic_elim(list l_eff)
 	if(!entity_special_area_p(eff_ent) && !anywhere_effect_p(eff))
 	  ignore_this_effect = TRUE;
 	break;
-	/*  pips_internal_error("bad tag for %s (rom)\n",
+	/*  pips_internal_error("bad tag for %s (rom)",
 	    entity_name(eff_ent));*/
       default:
-	pips_internal_error("case default reached\n");
+	pips_internal_error("case default reached");
       }
     }
 
@@ -945,7 +945,7 @@ fortran_summary_to_proper_effects(entity func,
 				term = "th";
 			    }
 
-			    if (effect_must_p(formal_effect))
+			    if (effect_exact_p(formal_effect))
 				pips_user_warning
 				    ("\nmodule %s called by module %s:\n\twrite"
 				     " effect on non-variable actual"
@@ -1302,12 +1302,12 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	  }
 	case is_syntax_va_arg :
 	  {
-	    pips_internal_error("va_arg() : should have been treated before\n");
+	    pips_internal_error("va_arg() : should have been treated before");
 	    break;
 	  }
 	case is_syntax_application :
 	  {
-	    pips_internal_error("Application not supported yet\n");
+	    pips_internal_error("Application not supported yet");
 	    break;
 	  }
 	case is_syntax_range :
@@ -1316,7 +1316,7 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    break;
 	  }
 	default:
-	  pips_internal_error("Illegal kind of syntax\n");
+	  pips_internal_error("Illegal kind of syntax");
 	} /* switch */
 
       free_type(real_arg_t);
@@ -1625,12 +1625,12 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	  }
 	case is_syntax_va_arg :
 	  {
-	    pips_internal_error("va_arg() : should have been treated before\n");
+	    pips_internal_error("va_arg() : should have been treated before");
 	    break;
 	  }
 	case is_syntax_application :
 	  {
-	    pips_internal_error("Application not supported yet\n");
+	    pips_internal_error("Application not supported yet");
 	    break;
 	  }
 	case is_syntax_range :
@@ -1639,7 +1639,7 @@ list c_summary_effect_to_proper_effects(effect eff, expression real_arg)
 	    break;
 	  }
 	default:
-	  pips_internal_error("Illegal kind of syntax\n");
+	  pips_internal_error("Illegal kind of syntax");
 	} /* switch */
 
       free_type(real_arg_t);
@@ -1955,6 +1955,6 @@ simple_effects_forward_translation(
 list c_simple_effects_on_actual_parameter_forward_translation
 (entity  __attribute__ ((unused)) callee, expression  __attribute__ ((unused)) real_exp, entity  __attribute__ ((unused)) formal_ent, list  __attribute__ ((unused)) l_eff, transformer  __attribute__ ((unused)) context)
 {
-  pips_internal_error("not yet implemented\n");
+  pips_internal_error("not yet implemented");
   return NIL;
 }

@@ -499,7 +499,7 @@ loop l;
 	    
 	    region reg = EFFECT(CAR(l_out_priv_tmp));
 	    l_out_priv_tmp = CDR(l_out_priv_tmp);
-	    if (!region_must_p(reg)) 
+	    if (!region_exact_p(reg)) 
 	    { 
 		l_cand_tmp = l_cand;
 		found = FALSE;

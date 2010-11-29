@@ -54,7 +54,7 @@ close_log_file(void)
 {
    if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
       if (fclose(log_file) != 0) {
-	  pips_error("close_log_file", "Could not close\n");
+	  pips_internal_error("Could not close");
          perror("close_log_file");
          abort();
       }

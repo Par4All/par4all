@@ -184,7 +184,7 @@ relation_to_transformer(entity op, entity e1, entity e2, bool veracity)
     }
   }
   else {
-    pips_internal_error("Unexpected relational operator %s\n", entity_name(op));
+    pips_internal_error("Unexpected relational operator %s", entity_name(op));
   }
 
   ceq = VECTEUR_NUL_P(eq)? CONTRAINTE_UNDEFINED : contrainte_make(eq);
@@ -869,7 +869,7 @@ transformer transformer_normalize(transformer t, int level)
 	  break;
 
 	default:
-	  pips_internal_error("unknown level %d\n", level);
+	  pips_internal_error("unknown level %d", level);
 	}
 
 	sc_rm(r2), r2 = NULL;
@@ -1268,7 +1268,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
 	    fprintf(stderr, "Value %s should have been eliminated earlier\n",
 		    entity_name(old_e));
 	    fprint_transformer(stderr, t, (get_variable_name_t) entity_global_name);
-	    pips_internal_error("Wrong set of projected variables\n");
+	    pips_internal_error("Wrong set of projected variables");
 	  }
 	}
       }
@@ -1709,7 +1709,7 @@ transformer transformer_value_substitute(transformer t, entity e1, entity e2)
 	   a);
     }
     else {
-      pips_internal_error("cannot substitute e1=%s by e2=%s: e2 already in basis\n",
+      pips_internal_error("cannot substitute e1=%s by e2=%s: e2 already in basis",
 			  entity_name(e1), entity_name(e2));
     }
   }
@@ -1770,7 +1770,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
       case is_basic_int:
       case is_basic_logical:
 	/* Logical are represented by integer values*/
-	pips_internal_error("Unexpected integer or logical type for constant %s\n",
+	pips_internal_error("Unexpected integer or logical type for constant %s",
 			    entity_name(e));
 	break;
       case is_basic_float:
@@ -1781,7 +1781,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 	}
 	else {
 	  if(is_string) {
-	    pips_internal_error("String constant mixed up with float constant %s\n",
+	    pips_internal_error("String constant mixed up with float constant %s",
 				entity_name(e));
 	  }
 	}
@@ -1794,7 +1794,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 	}
 	else {
 	  if(is_float) {
-	    pips_internal_error("Float constant mixed up with string constant %s\n",
+	    pips_internal_error("Float constant mixed up with string constant %s",
 				entity_name(e));
 	  }
 	}
@@ -1809,21 +1809,21 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 	  i2 = (int) val;
 	}
 	else
-	  pips_internal_error("Too many strings in a string constraint\n");
+	  pips_internal_error("Too many strings in a string constraint");
 
 	number_of_strings++;
 	break;
       case is_basic_complex:
 	/* PIPS does not represent complex constants: call to CMPLX */
-	pips_internal_error("Unexpected complex type for constant %s\n",
+	pips_internal_error("Unexpected complex type for constant %s",
 			    entity_name(e));
 	break;
       case is_basic_overloaded:
-	pips_internal_error("Unexpected overloaded type for constant %s\n",
+	pips_internal_error("Unexpected overloaded type for constant %s",
 			    entity_name(e));
 	break;
       default:
-	pips_internal_error("unknown basic b=%d\n", basic_tag(b));
+	pips_internal_error("unknown basic b=%d", basic_tag(b));
       }
     }
     else {
@@ -1843,12 +1843,12 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 
   if(is_string) {
     if(number_of_strings!=2)
-      pips_internal_error("Illegal number of strings in string constraint\n");
+      pips_internal_error("Illegal number of strings in string constraint");
     if(is_equation_p) {
       if(i1+i2==0)
 	is_checked = (fortran_string_compare(s1, s2)==0);
       else
-	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for equality\n",
+	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for equality",
 			    i1, i2);
     }
     else {
@@ -1857,7 +1857,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
       else if(i1<0 && i1+i2==0)
 	is_checked = (fortran_string_compare(s1, s2) >= 0);
       else
-	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for inequality\n",
+	pips_internal_error("Unexpected string coefficients i1=%d, i2=%d for inequality",
 			    i1, i2);
     }
   }

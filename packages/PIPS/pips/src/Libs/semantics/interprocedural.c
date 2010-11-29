@@ -650,7 +650,7 @@ entity v;
 
 
   if(v == NULL) {
-    pips_internal_error("Trying to translate TCST\n");
+    pips_internal_error("Trying to translate TCST");
     return;
   }
 
@@ -714,7 +714,7 @@ entity v;
       return;
     }
     else
-      pips_internal_error("%s is not translatable: store tag %d\n",
+      pips_internal_error("%s is not translatable: store tag %d",
 			  entity_name(v), storage_tag(store));
   }
 
@@ -902,8 +902,7 @@ entity v;
 	  (Psysteme) predicate_system(transformer_relation(tf));
 
 	if(base_contains_variable_p(sc_base(r), (Variable) v_init))
-	  pips_error("translate_global_value",
-		     "Cannot find value %s\n",
+	  pips_internal_error("Cannot find value %s",
 		     strdup(
 			    concatenate(
 					module_local_name(m),
@@ -1008,12 +1007,12 @@ call c;
 		 entity_name(e));
 
   case is_value_unknown:
-    pips_error("call_to_summary_precondition", "unknown function %s\n",
+    pips_internal_error("unknown function %s",
 	       entity_name(e));
     break;
 
   default:
-    pips_error("call_to_summary_precondition", "unknown tag %d\n", tt);
+    pips_internal_error("unknown tag %d", tt);
   }
 
   pips_debug(8, "end\n");
@@ -1308,7 +1307,7 @@ static bool process_call_for_summary_precondition(call c)
 static bool process_statement_for_summary_precondition(statement s)
 {
   bool ret_p = TRUE;
-  pips_internal_error("Not implemented. Should not be called.\n");
+  pips_internal_error("Not implemented. Should not be called.");
   if(declaration_statement_p(s)) {
     /* Look for call sites in the declarations, but see functions below... */
     //list dl = statement_declarations(s);

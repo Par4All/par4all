@@ -461,7 +461,7 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
       break;
     }
   default:
-    pips_error("", "Abnormal cases \n");
+    pips_internal_error("Abnormal cases ");
     break;
   }}
   return expression_undefined;

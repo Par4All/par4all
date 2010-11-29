@@ -307,7 +307,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
        aliasing between formal parameters */
     ;
   else
-    pips_internal_error("unproper storage = %d\n", storage_tag(s));
+    pips_internal_error("unproper storage = %d", storage_tag(s));
 
   pips_debug(8,	"End for %s\n", entity_name(e));
 }
@@ -398,7 +398,7 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
 	 && entities_may_conflict_p(al, v)
 	 && type_equal_p(alt, vt)) {
 	if(dummy_parameter_entity_p(v))
-	  pips_internal_error("Effects cannot be related to dummy parameters.\n");
+	  pips_internal_error("Effects cannot be related to dummy parameters.");
 	add_interprocedural_value_entities(v);
       }
     }

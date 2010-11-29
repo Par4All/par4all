@@ -232,7 +232,7 @@ static bool init_one_statement( statement st ) {
  */
 static void kill_effect( set kill, effect e ) {
   if ( action_write_p(effect_action(e))
-      && approximation_must_p(effect_approximation(e)) ) {
+      && approximation_exact_p(effect_approximation(e)) ) {
     HASH_MAP(theEffect,theStatement, {
           /* We only kill store effect */
           if(!store_effect_p(theEffect)) continue;
@@ -591,7 +591,7 @@ static void genkill_instruction( instruction i, statement st ) {
       /* no recursion for these kind of instruction */
       break;
     default:
-      pips_internal_error("unexpected tag %d\n", instruction_tag(i));
+      pips_internal_error("unexpected tag %d", instruction_tag(i));
   }
 }
 
@@ -919,13 +919,13 @@ static void inout_statement( statement st ) {
       inout_call( st, (call) instruction_expression( i ) );
       break;
     case is_instruction_goto:
-      pips_error( "inout_statement", "Unexpected tag %d\n", i );
+      pips_internal_error("Unexpected tag %d", i );
       break;
     case is_instruction_unstructured:
       inout_unstructured( st, instruction_unstructured( i ) );
       break;
     default:
-      pips_internal_error("Unknown tag %d\n", instruction_tag(i) );
+      pips_internal_error("Unknown tag %d", instruction_tag(i) );
   }
   ifdebug(2) {
     fprintf( stderr,
@@ -1145,10 +1145,10 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
   ifdebug(1) {
     cons *effect_ins = load_statement_effects( stin );
     if ( !gen_once_p( effect_ins ) ) {
-      pips_internal_error("effect_ins are redundant\n");
+      pips_internal_error("effect_ins are redundant");
     }
     if ( !gen_once_p( effect_outs ) ) {
-      pips_internal_error("effect_outs are redundant\n");
+      pips_internal_error("effect_outs are redundant");
     }
   }
   FOREACH(EFFECT, fout, effect_outs) {
@@ -1294,7 +1294,7 @@ static void usedef_statement( st )
       usedef_control( unstructured_control( instruction_unstructured( i )) );
       break;
     default:
-      pips_error( "usedef_statement", "Unknown tag %d\n", t );
+      pips_internal_error("Unknown tag %d", t );
   }
 }
 
@@ -1438,10 +1438,10 @@ static list load_statement_effects( statement s ) {
       le = load_proper_rw_effects_list( s );
       break;
     case is_instruction_goto:
-      pips_internal_error( "Go to statement in CODE data structure %d\n", t );
+      pips_internal_error("Go to statement in CODE data structure %d", t );
       break;
     default:
-      pips_internal_error( "Unknown tag %d\n", t );
+      pips_internal_error("Unknown tag %d", t );
   }
 
   return le;
@@ -1496,7 +1496,7 @@ static void set_effects( char *module_name, enum chain_type use ) {
       break;
 
     default:
-      pips_error( "set_effects", "ill. parameter use = %d\n", use );
+      pips_internal_error("ill. parameter use = %d", use );
   }
 
 }

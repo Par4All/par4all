@@ -704,7 +704,7 @@ hpfc_compute_entity_to_new_declaration(
 	     break;
 	 }
 	 default:
-	     pips_internal_error("unexpected new declaration tag\n");
+	     pips_internal_error("unexpected new declaration tag");
 	 }
      }
     

@@ -116,7 +116,7 @@ bool summary_rw_effects_engine(string module_name)
       {
 	/* Check that summary effects are not corrupted */
 	if(!check_sdfi_effects_p(get_current_module_entity(), l_glob))
-	  pips_internal_error("SDFI effects for \"%s\" are corrupted \n",
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted ",
 			      entity_name(get_current_module_entity()));
       }
 
@@ -135,7 +135,7 @@ bool summary_rw_effects_engine(string module_name)
       {
 	/* Check that summary effects are not corrupted */
 	if(!check_sdfi_effects_p(get_current_module_entity(), l_glob))
-	  pips_internal_error("SDFI effects for \"%s\" are corrupted\n",
+	  pips_internal_error("SDFI effects for \"%s\" are corrupted",
 			      entity_name(get_current_module_entity()));
       }
 
@@ -536,7 +536,7 @@ static void rw_effects_of_expression_instruction(instruction i)
 	store_rw_effects_list(current_stat, NIL);
       }
       else {
-	pips_internal_error("Cast case not implemented\n");
+	pips_internal_error("Cast case not implemented");
       }
     }
     else if(syntax_call_p(is)) {
@@ -560,7 +560,7 @@ static void rw_effects_of_expression_instruction(instruction i)
       store_rw_effects_list(current_stat, NIL);
     }
     else {
-      pips_internal_error("Instruction expression case not implemented\n");
+      pips_internal_error("Instruction expression case not implemented");
     }
 
     pips_debug(2, "Effects for expression instruction in statement%03zd\n",

@@ -231,7 +231,7 @@ static list compute_regions_union(list l_in, list l_out)
 
 	                if (gen_length(new_regions) > 1) 
                         {
-	                  pips_internal_error("Regions union must refer to only ONE region !\n");
+	                  pips_internal_error("Regions union must refer to only ONE region !");
 	                }
 	                else 
                         {
@@ -391,7 +391,7 @@ static boolean compute_distribution_context(list l_stats, statement module_stat,
                       }
                       else 
                       {
-                        pips_internal_error("Strange externalized code!\n");
+                        pips_internal_error("Strange externalized code!");
                       }
 
                       /* Register new externalized function */
@@ -437,7 +437,7 @@ static entity create_parameter_variable_for_new_module(entity a_variable, string
   }
   else 
   {
-    pips_error("Entity already exist: %s\n", new_name);
+    pips_internal_error("Entity already exist: %s", new_name);
   
     return NULL;
   }
@@ -468,7 +468,7 @@ static entity create_private_variable_for_new_module(entity a_variable, string n
   }
   else 
   {
-    pips_error("Entity already exist: %s\n", new_name);
+    pips_internal_error("Entity already exist: %s", new_name);
 
     return NULL;
   }
@@ -527,8 +527,8 @@ static void add_parameter_variable_to_module(reference ref, entity module, state
   code_declarations(value_code(entity_initial(module))) = CONS(ENTITY, new_variable, module_declarations);
   
   new_parameter = make_parameter(entity_type(new_variable), make_mode(is_mode_reference, UU), make_dummy_unknown()); //FI: could be make_dummy_identifier(new_variable)
-  module_parameters = functional_parameters(type_functional(entity_type(module)));
-  functional_parameters(type_functional(entity_type(module))) = CONS(PARAMETER, new_parameter, module_parameters);
+  module_parameters = module_functional_parameters(module);
+  module_functional_parameters(module) = CONS(PARAMETER, new_parameter, module_parameters);
 }
 
 

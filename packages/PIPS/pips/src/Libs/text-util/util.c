@@ -220,7 +220,7 @@ add_to_current_line(
 	    
 	}
 	else 
-	    pips_internal_error("line code too large...\n");
+	    pips_internal_error("line code too large...");
     }
     else if (! same_string_p(append, " ") 
 	     || ! same_string_p(buffer, continuation))
@@ -271,12 +271,12 @@ void add_words_to_text(text t,list wl)
   list sl = text_sentences(t);
 
   if(ENDP(sl)) {
-    pips_internal_error("what kind of sentence to make?\n");
+    pips_internal_error("what kind of sentence to make?");
   }
   else {
     sentence s = SENTENCE(CAR(gen_last(sl)));
     if(sentence_formatted_p(s)) {
-      pips_internal_error("Not implemented\n");
+      pips_internal_error("Not implemented");
     }
     else {
       unformatted u = sentence_unformatted(s);

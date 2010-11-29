@@ -95,8 +95,7 @@ entity e;
 	  effect_to_string(sink_eff));
 
     if(! same_entity_p(source_ent, sink_ent))
-	pips_error("true_dependence_with_entity_p",
-		   "Source and sink entities must be equal");
+	pips_internal_error("Source and sink entities must be equal");
 
     return( same_entity_p(e, source_ent)                               &&
 	    (action_tag(effect_action(source_eff)) == is_action_write) &&
@@ -147,18 +146,18 @@ graph dg;
     bool true_dep_found = FALSE;
 
     if(instruction_tag(statement_instruction(assign_stmt)) != is_instruction_call)
-	pips_error("defs_elim_of_assign_call", "Statement must be a CALL");
+	pips_internal_error("Statement must be a CALL");
 
     assign_call = instruction_call(statement_instruction(assign_stmt));
     if(! ENTITY_ASSIGN_P(call_function(assign_call)))
-	pips_error("defs_elim_of_assign_call", "Call must be an ASSIGN");
+	pips_internal_error("Call must be an ASSIGN");
 
     pips_debug(5, "begin ASSIGN : %s\n",
 	       words_to_string(words_call(assign_call, 0, TRUE, TRUE, NIL)));
 
     lhs_exp = EXPRESSION(CAR(call_arguments(assign_call)));
     if(syntax_tag(expression_syntax(lhs_exp)) != is_syntax_reference)
-	pips_error("defs_elim_of_assign_call", "Lhs must be a REFERENCE");
+	pips_internal_error("Lhs must be a REFERENCE");
 
     lhs_ent = reference_variable(syntax_reference(expression_syntax(lhs_exp)));
 
@@ -270,7 +269,7 @@ graph dg;
 	defs_elim_of_unstructured(instruction_unstructured(inst), dg);
 	break;
     }
-    default : pips_error("defs_elim_of_statement", "Bad instruction tag");
+    default : pips_internal_error("Bad instruction tag");
     }
     debug(4, "defs_elim_of_statement", "end STATEMENT\n");
 

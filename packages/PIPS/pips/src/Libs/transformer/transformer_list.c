@@ -150,7 +150,7 @@ bool check_transformer_list(list tl)
     if(transformer_identity_p(tf)) {
       if(identity_p) {
 	one_p = FALSE;
-	pips_internal_error("Two identity transformers in one list.\n");
+	pips_internal_error("Two identity transformers in one list.");
       }
       else {
 	identity_p = TRUE;
@@ -161,12 +161,12 @@ bool check_transformer_list(list tl)
   if(identity_p) {
     /* It must be the first one */
     if(!transformer_identity_p(TRANSFORMER(CAR(tl))))
-      pips_internal_error("The identity transformer is not the list header.\n");
+      pips_internal_error("The identity transformer is not the list header.");
   }
 
   FOREACH(TRANSFORMER, tf, tl) {
     if(transformer_empty_p(tf))
-      pips_internal_error("An empty transformer has been found.\n");
+      pips_internal_error("An empty transformer has been found.");
   }
 
   return TRUE;

@@ -631,7 +631,7 @@ sentence sentence_head(entity e, list pdl)
        */
       break;
     default:
-      pips_internal_error("unexpected type for result\n");
+      pips_internal_error("unexpected type for result");
   }
 
   pc = CHAIN_SWORD(pc, entity_user_name(e));
@@ -1829,7 +1829,7 @@ static text text_entity_declaration(entity module,
             attach_declaration_type_to_words(chars, "CHARACTER*(*)");
             ADD_WORD_LIST_TO_TEXT(t_chars, chars);
           } else
-            pips_internal_error("unexpected value\n");
+            pips_internal_error("unexpected value");
           break;
         }
         case is_basic_derived: {
@@ -1842,7 +1842,7 @@ static text text_entity_declaration(entity module,
           break;
         }
         default:
-          pips_internal_error("unexpected basic tag (%d)\n",
+          pips_internal_error("unexpected basic tag (%d)",
               basic_tag(b));
       }
     }
@@ -1973,7 +1973,7 @@ static list words_qualifier(list obj)
       pc = CHAIN_SWORD(pc,"auto ");
       break;
     default :
-      pips_internal_error("unexpected tag %d\n", qualifier_tag(q));
+      pips_internal_error("unexpected tag %d", qualifier_tag(q));
     }
   },obj);
   return pc;
@@ -2033,7 +2033,7 @@ list words_type(type obj, list pdl)
 	break;
       }
     default:
-      pips_internal_error("unexpected tag\n");
+      pips_internal_error("unexpected tag");
     }
   pips_debug(8, "End: \"\%s\"\n", list_to_string(pc));
   return pc;
@@ -2484,7 +2484,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pc = CHAIN_SWORD(pc,"}");
       return pc;
     }
-  pips_internal_error("unexpected case\n");
+  pips_internal_error("unexpected case");
   return NIL;
 }
 
@@ -2629,7 +2629,7 @@ static list words_enum(const char * name1, list l, bool space_p, list pc, list p
     // returns 0!
     //
     //if(!constant_int_p(emc))
-    //  pips_internal_error("constant expression not evaluated by parser\n");
+    //  pips_internal_error("constant expression not evaluated by parser");
 
     if (!first)
       pc = CHAIN_SWORD(pc, space_p? ", " : ",");
@@ -2973,7 +2973,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   case is_type_statement:
   case is_type_area:
   default:
-    pips_internal_error("unexpected type tag\n");
+    pips_internal_error("unexpected type tag");
   }
 
   /* the word list pc must have been inserted in text r*/
@@ -3087,8 +3087,7 @@ void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 	}
 	else {
 	  // The non-empty area can have size zero if the entity is extern
-	  //pips_error("print_common_layout",
-	  //     "Non-empty area %s should have a size greater than 0\n",
+	  //pips_internal_error(//     "Non-empty area %s should have a size greater than 0",
 	  //     entity_module_name(c));
 	}
       }
@@ -3219,7 +3218,7 @@ void fprint_functional(FILE * fd, functional f)
   }
   else
     /* An argument can be functional, but not (yet) a result. */
-    pips_error("fprint_functional", "Ill. type %d\n", type_tag(tr));
+    pips_internal_error("Ill. type %d", type_tag(tr));
 }
 
 void fprint_environment(FILE *fd, entity m)

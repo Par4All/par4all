@@ -1679,7 +1679,7 @@ directory to be under \texttt{\$PIPS\_ROOT}.
 \subsection{Validations}
 \label{sec:validation}
 
-Several validations run at CRI:
+Several compilations and validations run at CRI:
 
 \begin{description}
 \item[CHECK] on every commit (down to the few minute scale) compilation and
@@ -1694,15 +1694,18 @@ Several validations run at CRI:
   Note that this should never happen because the validation be run before
   committing anything to the \texttt{trunk}.
 
-\item[AUTOC] compilation and validation with the \texttt{autoconf}
+  The whole compilation and validation runs in about 7 minutes.
+
+\item[AUTOC] on every hour, compilation and validation with the \texttt{autoconf}
   infrastructure, including python and fortran95, on Debian Lenny (compiegne).
+
+  This compilation and validation requires about 13 minutes.
 
 \item[CROSS] 32-bit cross-compilation, on Debian Lenny (compiegne).
 
 \item[NIGHT] compilation and validation on Ubuntu Karmic (canapville).
 
-\item[PRIVE] compilation and validation on Ubuntu Karmic, including
-  private/restricted stuff (hendaye).
+\item[PRIVE] compilation and private validation on Debian Lenny (compiegne).
 \end{description}
 
 \subsection{Validation Makefile}

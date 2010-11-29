@@ -62,7 +62,8 @@ list cell_relations_generic_binary_op(
     bool (*cr1_cr2_combinable_p)(cell_relation,cell_relation),
     list (*cr1_cr2_binary_op)(cell_relation,cell_relation),
     list (*cr1_unary_op)(cell_relation),
-    list (*cr2_unary_op)(cell_relation))
+    list (*cr2_unary_op)(cell_relation),
+    list (*union_op)(list, list))
 {
   list l_res = NIL;
   list l_cr1 = list_undefined;
@@ -75,71 +76,74 @@ list cell_relations_generic_binary_op(
 
   /* we first deal with the elements of l1 : those that are combinable with
    * the elements of l2, and the others, which we call the remnants of l1 */
-  for(l_cr1 = l1; !ENDP(l_cr1); POP(l_cr1)) 
+  for(l_cr1 = l1; !ENDP(l_cr1); POP(l_cr1))
     {
       cell_relation cr1 = CELL_RELATION(CAR(l_cr1));
       list prec_l_cr2 = NIL;
       bool combinable = FALSE;
-	
-      pips_debug_pv(2, "dealing with cr1: %s\n", cr1);
-	
+
+      pips_debug_pv(2, "dealing with cr1:\n", cr1);
+
       l_cr2 = l2;
-      while(!combinable && !ENDP(l_cr2)) 
+      while(!ENDP(l_cr2))
 	{
-	  
 	  cell_relation cr2 = CELL_RELATION(CAR(l_cr2));
-        
-	  pips_debug_pv(2, "considering cr2: %s\n", cr2);
-  
-	  if ( (*cr1_cr2_combinable_p)(cr1,cr2) ) 
+
+	  pips_debug_pv(2, "considering cr2:\n", cr2);
+
+	  if ( (*cr1_cr2_combinable_p)(cr1,cr2) )
 	    {
 	      pips_debug(2, "combinable\n");
 	      combinable = TRUE;
-	      l_res = gen_nconc((*cr1_cr2_binary_op)(cr1,cr2), l_res);
-	    
+	      list l_res_tmp = (*cr1_cr2_binary_op)(cr1,cr2);
+	      l_res = (*union_op)(l_res, l_res_tmp);
+
 	      /* gen_remove(&l2, EFFECT(CAR(l_cr2))); */
 	      if (prec_l_cr2 != NIL)
 		CDR(prec_l_cr2) = CDR(l_cr2);
 	      else
 		l2 = CDR(l_cr2);
-	    
+
 	      free(l_cr2); l_cr2 = NIL;
 	      /* */
-	      free_cell_relation(cr1); cr1=cell_relation_undefined;
+	      //free_cell_relation(cr1); cr1=cell_relation_undefined;
 	      free_cell_relation(cr2); cr2=cell_relation_undefined;
 	    }
-	  else 
+	  else
 	    {
 	      pips_debug(2, "not combinable\n");
 	      prec_l_cr2 = l_cr2;
 	      l_cr2 = CDR(l_cr2);
 	    }
 	}
-	
+
       pips_debug_pvs(2, "intermediate l_res 1:\n", l_res);
 
-      if(!combinable) 
+      if(!combinable)
 	{
 	  /* cr1 belongs to the remnants of l1 : it is combinable
 	   * with no effects of l2 */
 	  if ( (*cr1_cr2_combinable_p)(cr1,cell_relation_undefined) )
 	    l_res = gen_nconc(l_res, (*cr1_unary_op)(cr1));
 	}
+      else
+	{
+	  free_cell_relation(cr1); cr1=cell_relation_undefined;
+	}
     }
 
   pips_debug_pvs(2, "intermediate l_res 2:\n", l_res);
 
   /* we must then deal with the remnants of l2 */
-  for(l_cr2 = l2; !ENDP(l_cr2); POP(l_cr2)) 
+  for(l_cr2 = l2; !ENDP(l_cr2); POP(l_cr2))
     {
       cell_relation cr2 = CELL_RELATION(CAR(l_cr2));
-        
+
       if ( (*cr1_cr2_combinable_p)(cell_relation_undefined,cr2) )
 	l_res = gen_nconc(l_res, (*cr2_unary_op)(cr2));
     }
 
   pips_debug_pvs(1, "final pvs:\n", l_res);
-
 
   /* no memory leaks: l1 and l2 won't be used anymore */
   gen_free_list(l1);

@@ -374,7 +374,7 @@ int *templdimp, *procsdimp;
 		    int_to_expression(iceil(szoftempldim, szofprocsdim));
 		break;
 	    default:
-		pips_internal_error("undefined style tag\n");
+		pips_internal_error("undefined style tag");
 		break;
 	    }
 	}

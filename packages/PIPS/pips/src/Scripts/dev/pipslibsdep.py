@@ -171,11 +171,11 @@ class library:
 		return err
 
 
-	def dotstr(self,full=True):
+	def dotstr(self,only=None):
 		fmt=dotname(self.name)
 		fmt+= ' [label="'+self.name+'"]'
 		fmt+='\n'
-		if full:
+		if not only or only == self.name:
 			for d in reduce(lambda x,y:x.union(y) ,self.used_libraries.values(),set()):
 				fmt+=dotname(d)
 				fmt+=" -> "

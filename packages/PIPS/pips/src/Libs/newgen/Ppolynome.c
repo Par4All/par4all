@@ -55,12 +55,12 @@ int (*f)();
     int c, ibuffer = 0;
 
     if ( (c = f()) != '{' ) {
-	pips_internal_error("initial '{' missing!\n");
+	pips_internal_error("initial '{' missing!");
     }
 
     while ( (c = f()) != '<' ) { 
 	if ( ibuffer >= 127 )
-	    pips_internal_error("vecteur '<' missing!\n");
+	    pips_internal_error("vecteur '<' missing!");
 	buffer[ibuffer++] = c;
     }
     buffer[ibuffer] = '\0';
@@ -72,11 +72,11 @@ int (*f)();
     }
 
     if ( (c = f()) != '>' ) {
-	pips_internal_error("closing '>' missing!\n");
+	pips_internal_error("closing '>' missing!");
     }
 
     if ( (c = f()) != '}' ) {
-	pips_internal_error("closing '}' missing!\n");
+	pips_internal_error("closing '}' missing!");
     }
 
     return pm;
@@ -122,11 +122,11 @@ int (*f)();
     int c;
 
     if ( (c = f()) != '\n' ) {
-	pips_internal_error("initial newline missing!\n");
+	pips_internal_error("initial newline missing!");
     }
 
     if ( (c = f()) != '[' ) {
-	pips_internal_error("initial '[' missing!\n");
+	pips_internal_error("initial '[' missing!");
     }
 
     while ( (c = f()) != ']' ) {
@@ -139,7 +139,7 @@ int (*f)();
     }
 
     if ( (c = f()) != '\n' ) {
-	pips_internal_error("closing newline missing!\n");
+	pips_internal_error("closing newline missing!");
     }
 
     return pp;

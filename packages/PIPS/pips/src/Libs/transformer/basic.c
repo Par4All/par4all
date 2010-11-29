@@ -411,7 +411,7 @@ bool transformer_argument_general_consistency_p(transformer t, bool is_weak)
       if(!base_contains_variable_p(b, (Variable) v)) {
 	/* pips_user_warning("No value for argument %s in relation basis\n",
 	   entity_name(e)); */
-	pips_internal_error("No value for argument %s in relation basis\n",
+	pips_internal_error("No value for argument %s in relation basis",
 			    entity_name(e));
 	consistent = FALSE;
       }
@@ -526,7 +526,7 @@ bool transformer_general_consistency_p(transformer tf, bool is_weak)
 		    pips_user_warning("different global variable names in "
 				      "arguments and basis (%s) \n", eln);
 		if (aliasing)
-		    pips_internal_error("aliasing between  arguments and basis (%s) \n",
+		    pips_internal_error("aliasing between  arguments and basis (%s) ",
 					entity_name(val));
 	    }
 
@@ -724,7 +724,7 @@ transformer transformer_add_modified_variable_entity(transformer tf,
       sc_dimension(sc) = base_dimension(sc_base(sc));
     }
     else
-      pips_internal_error("Entity \"%s\" has no values.\n", entity_name(var));
+      pips_internal_error("Entity \"%s\" has no values.", entity_name(var));
   }
 
   return tf;

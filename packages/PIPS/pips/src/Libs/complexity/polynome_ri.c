@@ -83,7 +83,7 @@ Variable var;
 	s = strdup(UNKNOWN_RANGE_NAME);
 	*/
     else if (var == (Variable) chunk_undefined) 
-	pips_error("variable_name", "unexpected var == chunk_undefined.\n");
+	pips_internal_error("unexpected var == chunk_undefined.");
     else 
 	s = strdup(entity_name((entity) var));
 
@@ -104,8 +104,7 @@ Variable var;
 	s = strdup(UNKNOWN_RANGE_NAME);
 	*/
     else if (var == (Variable) chunk_undefined) 
-	pips_error("variable_local_name",
-		   "unexpected var == chunk_undefined.\n");
+	pips_internal_error("unexpected var == chunk_undefined.");
     else {
       // s = strdup(entity_local_name((entity) var));
 	s = strdup(entity_minimal_name((entity) var));

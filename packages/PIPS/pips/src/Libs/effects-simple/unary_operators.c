@@ -79,7 +79,7 @@ effect reference_to_simple_effect(reference ref, action act,
 	     words_to_string(words_reference(ref,NIL)));
 
   if (dummy_parameter_entity_p(ent))
-    pips_internal_error("the input reference entity is a dummy parameter (%s)\n",
+    pips_internal_error("the input reference entity is a dummy parameter (%s)",
 			entity_name(ent));
 
   if (entity_all_locations_p(ent))
@@ -114,7 +114,7 @@ effect reference_to_simple_effect(reference ref, action act,
 		    cell_ref = make_cell_preference(make_preference(ref));
 		  else
 		    cell_ref = make_cell_reference(ref);
-		  approximation ap = make_approximation_must();
+		  approximation ap = make_approximation_exact();
 		  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 		}
 	      else
@@ -128,7 +128,7 @@ effect reference_to_simple_effect(reference ref, action act,
 			cell_ref = make_cell_preference(make_preference(ref));
 		      else
 			cell_ref = make_cell_reference(ref);
-		      approximation ap = make_approximation_must();
+		      approximation ap = make_approximation_exact();
 		      eff = make_effect(cell_ref, ac, ap,
 					make_descriptor_none());
 		    }
@@ -151,7 +151,7 @@ effect reference_to_simple_effect(reference ref, action act,
 		      */
 		      eff = make_effect
 			(make_cell_reference(copy_reference(ref)),
-			 ac, make_approximation_must(), make_descriptor_none());
+			 ac, make_approximation_exact(), make_descriptor_none());
 
 		      FOREACH(DIMENSION, c_t_dim,
 			      gen_nthcdr((int) gen_length(ind),
@@ -172,7 +172,7 @@ effect reference_to_simple_effect(reference ref, action act,
 		cell_ref = make_cell_preference(make_preference(ref));
 	      else
 		cell_ref = make_cell_reference(ref);
-	      approximation ap = make_approximation_must();
+	      approximation ap = make_approximation_exact();
 	      eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	    }
 	}
@@ -185,7 +185,7 @@ effect reference_to_simple_effect(reference ref, action act,
 	    cell_ref = make_cell_preference(make_preference(ref));
 	  else
 	    cell_ref = make_cell_reference(ref);
-	  approximation ap = make_approximation_must();
+	  approximation ap = make_approximation_exact();
 	  eff = make_effect(cell_ref, ac, ap, make_descriptor_none());
 	}
       free_type(ut);
@@ -406,7 +406,7 @@ simple_effect_dup(effect eff)
 			       bool __attribute__((unused)) use_preference_p)
  {
    cell cell_ref = make_cell(is_cell_preference, make_preference(ref));
-   approximation ap = make_approximation(is_approximation_must, UU);
+   approximation ap = make_approximation(is_approximation_exact, UU);
    action ac = copy_action(act);
    effect eff;
 
@@ -428,7 +428,7 @@ list simple_effects_union_over_range(list l_eff,
     reference ref = make_reference(i, NIL);
     cell c = make_cell_reference(ref);
     effect i_eff = make_effect(c, make_action_write_memory(),
-			       make_approximation_must(), make_descriptor_none());
+			       make_approximation_exact(), make_descriptor_none());
 
     list r_eff_l = proper_effects_of_range(r);
     list h_eff_l = CONS(EFFECT, i_eff, r_eff_l);

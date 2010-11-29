@@ -38,6 +38,7 @@
 #include "pipsmake.h"
 #include "resources.h"
 #include "properties.h"
+#include "callgraph.h"
 #include "misc.h"
 #include "control.h"
 #include "expressions.h"
@@ -70,38 +71,6 @@ size_t type_dereferencement_depth(type t) {
 
 
 
-static void gather_call_sites(call c, list * sites)
-{
-    if(same_entity_p(call_function(c),get_current_module_entity()))
-        *sites=CONS(CALL,c,*sites);
-}
-static void gather_call_sites_in_block(statement s, list * sites) {
-    if(declaration_statement_p(s)) {
-        FOREACH(ENTITY,e,statement_declarations(s)) {
-            gen_context_recurse(entity_initial(e),sites,call_domain,gen_true,gather_call_sites);
-        }
-    }
-}
-
-static list callers_to_call_sites(list callers_statement)
-{
-    list call_sites = NIL;
-    FOREACH(STATEMENT,caller_statement,callers_statement)
-        gen_context_multi_recurse(caller_statement,&call_sites,
-                statement_domain,gen_true,gather_call_sites_in_block,
-                call_domain,gen_true,gather_call_sites,0);
-    return call_sites;
-}
-static list callers_to_statements(list callers)
-{
-    list statements = NIL;
-    FOREACH(STRING,caller_name,callers)
-    {
-        statement caller_statement=(statement) db_get_memory_resource(DBR_CODE,caller_name,true);
-        statements=CONS(STATEMENT,caller_statement,statements);
-    }
-    return statements;
-}
 
 static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
@@ -217,12 +186,12 @@ static bool do_array_to_pointer_type(type *t) {
 static void do_linearize_array_manage_callers(entity m,set linearized_param) {
     list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(m), true));
     list callers_statement = callers_to_statements(callers);
-    list call_sites = callers_to_call_sites(callers_statement);
+    list call_sites = callers_to_call_sites(callers_statement,m);
 
     /* we may have to change the call sites, prepare iterators over call sites arguments here */
     FOREACH(CALL,c,call_sites) {
         list args = call_arguments(c);
-        FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+        FOREACH(PARAMETER,p,module_functional_parameters(m)) {
             if(set_belong_p(linearized_param,p)) {
                 expression * arg = (expression*)REFCAR(args);
                 type type_at_call_site = expression_to_type(*arg);
@@ -443,7 +412,7 @@ static void do_linearize_prepatch(entity m,statement s) {
     FOREACH(ENTITY,e,entity_declarations(m))
         if(entity_variable_p(e)&&formal_parameter_p(e))
             do_linearize_prepatch_type(entity_type(e));
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {
@@ -479,7 +448,7 @@ static void do_linearize_array(entity m, statement s) {
 
     /* pips bonus step: the consistency */
     set linearized_param = set_make(set_pointer);
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {
@@ -611,23 +580,25 @@ list initialization_list_to_statements(entity e) {
                 }
             }
         }
-        /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
-        free_value(entity_initial(e));
-        entity_initial(e) = make_value_expression(
-                MakeUnaryCall(
-                    entity_intrinsic(ALLOCA_FUNCTION_NAME),
-                    make_expression(
-                        make_syntax_sizeofexpression(
-                            make_sizeofexpression_type(
-                                copy_type(entity_type(e))
-                                )
-                            ),
-                        normalized_undefined
+        if(!formal_parameter_p(e)) {
+            /* use alloca when converting array to pointers, to make sure everything is initialized correctly */
+            free_value(entity_initial(e));
+            entity_initial(e) = make_value_expression(
+                    MakeUnaryCall(
+                        entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                        make_expression(
+                            make_syntax_sizeofexpression(
+                                make_sizeofexpression_type(
+                                    copy_type(entity_type(e))
+                                    )
+                                ),
+                            normalized_undefined
+                            )
                         )
-                    )
-                );
-        AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
-               get_current_module_entity());
+                    );
+            AddEntityToModuleCompilationUnit(entity_intrinsic(ALLOCA_FUNCTION_NAME),
+                    get_current_module_entity());
+        }
     }
     return gen_nreverse(stats);
 }
@@ -672,7 +643,7 @@ static void do_array_to_pointer(entity m, statement s) {
     insert_statements_after_declarations(get_current_module_statement(),inits);
 
     /* pips bonus step: the consistency */
-    FOREACH(PARAMETER,p,functional_parameters(type_functional(entity_type(m)))) {
+    FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {

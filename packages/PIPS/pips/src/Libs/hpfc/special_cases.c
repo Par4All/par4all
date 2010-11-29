@@ -302,7 +302,7 @@ static string new_reduction_name(reduction_operator op)
     else if (reduction_operator_or_p(op))
 	return "OR";
     else
-	pips_internal_error("unexpected reduction_operator tag (%d)\n",
+	pips_internal_error("unexpected reduction_operator tag (%d)",
 			    reduction_operator_tag(op));
 
     return "unknown";
@@ -426,7 +426,7 @@ statement s;
      {
 	 if (reference_variable(effect_any_reference(e)) == var)
 	 {
-	     if (!approximation_must_p(effect_approximation(e)) ||
+	     if (!approximation_exact_p(effect_approximation(e)) ||
 		 !rectangular_region_p(effect_system(e)))
 	     {
 		 pips_debug(6, "FALSE\n"); return FALSE;

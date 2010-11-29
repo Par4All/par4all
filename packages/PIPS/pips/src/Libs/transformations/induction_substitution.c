@@ -559,3 +559,204 @@ bool induction_substitution( char * module_name ) {
     return ( good_result_p );
 
 }
+
+/* strength reduction context */
+typedef struct {
+    hash_table entity_to_coeff; ///< mapping between an entity and the value of the involved induction variable
+    hash_table entity_to_entity; ///< mapping between an entity and its strength_reduced value
+    entity index;               ///< induction variable
+    expression increment;       ///< original loop increment
+    list header_statements;     ///< assignments from external to internal var
+    list incr_statements;       ///< the internal vars increments
+} strength_reduction_context_t;
+
+/* the big stuff is there
+ * for each candidate expression, we examine its linear field and look for something
+ * link a0.{variable}+a1.TCST+a2.{induction variable}+a3.{other symbolic constant}
+ * we normalize this, and if it's ok, we can transform this into
+ * a0'.{variable}+a1'.TCST+a3'.{other symbolic constant}
+ * and increment by @p ctxt->increment * a2'
+ * a new variable is created for each different increment
+ */
+static bool do_strength_reduction_gather(expression exp, strength_reduction_context_t *ctxt) {
+    /* ensure the normalized field is filled */
+    NORMALIZE_EXPRESSION(exp);
+    normalized n = expression_normalized(exp);
+    /* focus on the linear problem */
+    if(normalized_linear_p(n) && VALUE_ZERO != vect_coeff(ctxt->index,normalized_linear(n)) ) {
+        /* we look for a linear form involving constants and our index */
+        entity other = entity_undefined;
+        for(Pvecteur iter=normalized_linear(n);
+                !VECTEUR_NUL_P(iter);iter=vecteur_succ(iter)) {
+            entity var = (entity)vecteur_var(iter);
+            /* constant terms and the index are ignored  */
+            if(term_cst(iter) ||
+                same_entity_p(ctxt->index,var) ||
+                entity_constant_p(var)) {
+                continue;
+            }
+            /* the others are stored, but only one per expression
+             * eg: what to do with a + b +i ?
+             * we also have to pay attention to 2a-6i: this one is ok,
+             * it will lead to 2a; a-=3;
+             * but not 3a-4i
+             */
+            else if(entity_undefined_p(other)) {
+                Pvecteur pv = vect_copy(normalized_linear(n));
+                vect_normalize(pv);
+                Value v = vect_coeff(var,pv);
+                if(value_one_p(v))
+                    other= var;
+                else break;//do not manage this case as of now
+            }
+            else {
+                other=entity_undefined;// cannot decide between two not constant entities
+                break;
+            }
+        }
+        /* we only take care of scalar variables */
+        if(!entity_undefined_p(other) && entity_scalar_p(other) ) {
+            /* look for an entity that olds the same increment as ours */
+            entity already_there = entity_undefined;
+            HASH_FOREACH(entity,e,intptr_t,v,ctxt->entity_to_coeff) {
+                if(((intptr_t)vect_coeff(ctxt->index,normalized_linear(n))==v) &&
+                        same_entity_p(other,(entity)hash_get(ctxt->entity_to_entity,e)))
+                {
+                    already_there=e;
+                    break;
+                }
+            }
+            Pvecteur pv = vect_copy(normalized_linear(n));
+            if(entity_undefined_p(already_there)) {
+                /* create a new induction variable */
+                already_there=make_new_scalar_variable_with_prefix(
+                        entity_user_name(other),get_current_module_entity(),
+                        copy_basic(entity_basic(other))
+                        );
+                /* memorize it for further use:
+                 * *(a+i)=(*a+1)+1;
+                 * should lead to *a0=*a0+1; a0++;
+                 * and not *a1=*a1+1; a1++;
+                 */
+                Value coeff = vect_coeff(ctxt->index,pv);
+                hash_put(ctxt->entity_to_coeff,already_there,(void*)(intptr_t)coeff);
+                hash_put(ctxt->entity_to_entity,already_there,other);
+                AddEntityToCurrentModule(already_there);
+                /* and fill the header / footer / increment */
+                ctxt->header_statements=CONS(
+                        STATEMENT,
+                        make_assign_statement(
+                            entity_to_expression(already_there),
+                            entity_to_expression(other)
+                            ),
+                        ctxt->header_statements);
+                /* compute the value of the new increment */
+                expression new_increment=int_to_expression((int)coeff);
+                ctxt->incr_statements=CONS(
+                        STATEMENT,
+                        call_to_statement(
+                            make_call(
+                                entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME),
+                                make_expression_list(
+                                    entity_to_expression(already_there),
+                                    make_op_exp(MULTIPLY_OPERATOR_NAME,
+                                        copy_expression(ctxt->increment),
+                                        new_increment)
+                                    )
+                                )
+                            ),
+                        ctxt->incr_statements);
+
+            }
+            /* either way regenerate the expression from the patched linear field*/
+            vect_erase_var(&pv,ctxt->index);
+            vect_chg_var(&pv,other,already_there);
+            expression p = Pvecteur_to_expression(pv);
+            update_expression_syntax(exp,
+                    expression_syntax(p)
+                    );
+            expression_syntax(p)=syntax_undefined;
+            free_expression(p);
+            return false;
+        }
+    }
+    return true;
+}
+
+/* looks for expression in @p l's body that are linear combination of @p l's index
+ * those expressions are strength reduced
+ */
+static void do_strength_reduction_in_loop(loop l) {
+    // parent statement
+    statement s = (statement) gen_get_ancestor(statement_domain,l);
+    // context
+    strength_reduction_context_t ctxt = {
+        hash_table_make(hash_pointer,HASH_DEFAULT_SIZE),
+        hash_table_make(hash_pointer,HASH_DEFAULT_SIZE),
+        loop_index(l),
+        range_increment(loop_range(l)),
+        NIL,NIL
+    };
+    // find all possible & relevant cases and fill the context
+    gen_context_recurse(loop_body(l),&ctxt,
+            expression_domain,do_strength_reduction_gather,gen_null);
+    // insert prelude and postlude that take care of the assignment to the iterator
+    // plus the increments
+    insert_statement(s,
+            make_block_statement(ctxt.header_statements),
+            true);
+    insert_statement(loop_body(l),
+            make_block_statement(ctxt.incr_statements),
+            false);
+
+    hash_table_free(ctxt.entity_to_coeff);
+    hash_table_free(ctxt.entity_to_entity);
+}
+
+/* dispatch over all loops */
+static
+void do_strength_reduction(entity module, statement module_statement) {
+    gen_recurse(module_statement,loop_domain,
+            gen_true,do_strength_reduction_in_loop);
+}
+
+/* this phase is the opposite of induction substitution:
+ * it generates induction variables
+ * It is a lame implementation without much smart things in it:
+ * works only for loops, generates a lot of copy ...
+ * But it does the job for the simple case I (SG) need in Terapix
+ *
+ *
+ * after a talk with FI, it appears that transformers should be used
+ * to detect induction variable
+ *
+ * deriving the preconditions with respect to induction variable should
+ * also give insightful informations about the strength reduction pattern
+ *
+ * see paper from Robert Paije
+*/
+bool strength_reduction(const char *module_name) {
+    /* prelude */
+    set_current_module_entity(module_name_to_entity(module_name));
+    set_current_module_statement(
+            (statement) db_get_memory_resource(DBR_CODE, module_name, true)
+            );
+    /* To set up the hash table to translate value into value names */
+    set_cumulated_rw_effects((statement_effects)
+            db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
+            );
+    /* do the job */
+    do_strength_reduction(get_current_module_entity(),get_current_module_statement());
+    // we may have done bad things, such has inserting empty statements
+    clean_up_sequences(get_current_module_statement());
+
+    /* some declaration statements may have been added */
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+    reset_semantic_map();
+    reset_cumulated_rw_effects();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    return true;
+}

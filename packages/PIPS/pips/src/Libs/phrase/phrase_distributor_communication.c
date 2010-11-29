@@ -46,13 +46,6 @@
 
 #include "text-util.h"
 
-#include "dg.h"
-
-typedef dg_arc_label arc_label;
-typedef dg_vertex_label vertex_label;
-
-#include "graph.h"
-
 #include "ray_dte.h"
 #include "sommet.h"
 #include "sg.h"
@@ -815,7 +808,7 @@ entity create_private_integer_variable_for_new_module (string new_name,
     }
   else
     {
-      pips_error("Entity already exist: %s\n", new_name);
+      pips_internal_error("Entity already exist: %s", new_name);
       return NULL;
     }
 }

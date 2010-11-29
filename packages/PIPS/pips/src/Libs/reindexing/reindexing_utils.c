@@ -153,7 +153,7 @@ expression psystem_to_expression(ps)
 
     if( (and_ent == entity_undefined) || (leq_ent == entity_undefined) ||
        (equ_ent == entity_undefined) ) {
-      pips_error("psystem_to_expression", "There is no entity for operators\n");
+      pips_internal_error("There is no entity for operators");
     }
 
     for(pc = ps->inegalites; pc!=NULL; pc = pc->succ) {
@@ -227,7 +227,7 @@ reference my_build_new_ref(kind, n, subscripts, old_r)
     name = strdup(concatenate(SA_MODULE_NAME, MODULE_SEP_STRING,
 			      SAI, num, (char *) NULL));
   else
-    pips_error("build_new_ref", "Bad value for kind\n");
+    pips_internal_error("Bad value for kind");
 
   ent = gen_find_tabulated(name, entity_domain);
   if(ent == entity_undefined) {
@@ -236,7 +236,7 @@ reference my_build_new_ref(kind, n, subscripts, old_r)
     if(kind == IS_NEW_ARRAY)
       dims = dims_of_nest(n);
     else
-      pips_error("build_new_ref", "Bad value for kind\n");
+      pips_internal_error("Bad value for kind");
 
     ent = create_entity(name, make_variable(basic_of_reference(old_r), dims));
 
@@ -289,10 +289,9 @@ void my_lhs_subs_in_ins(ins, SA, n, subscripts)
 						  exp_subs, lhs);
 
 	}
-	else pips_error("lhs_subs_in_ins", "Lhs is not a reference");
+	else pips_internal_error("Lhs is not a reference");
       }
-      else pips_error("lhs_subs_in_ins",
-        	      "Instruction is not an assign call\n");
+      else pips_internal_error("Instruction is not an assign call");
       break;
     }
     case is_instruction_block :
@@ -300,8 +299,7 @@ void my_lhs_subs_in_ins(ins, SA, n, subscripts)
     case is_instruction_loop :
     case is_instruction_goto :
     case is_instruction_unstructured :
-    default : pips_error("lhs_subs_in_ins",
-			 "Instruction is not an assign call\n");
+    default : pips_internal_error("Instruction is not an assign call");
   }
 }
 
@@ -1348,12 +1346,11 @@ list le;
 	if(ENTITY_MIN_OR_MAX_P(call_function(ca)))
 	  res_l = remove_minmax(call_arguments(ca));
 	else
-	  pips_error("remove_minmax",
-		     "A complex exp is not a call to MIN or MAX: %s\n",
+	  pips_internal_error("A complex exp is not a call to MIN or MAX: %s",
 		     words_to_string(words_expression(exp)));
       }
       else
-	pips_error("remove_minmax", "A complex exp is not a call : %s\n",
+	pips_internal_error("A complex exp is not a call : %s",
 		   words_to_string(words_expression(exp)));
     }
     else
@@ -1382,7 +1379,7 @@ expression   e;
     return(reference_indices(r) != NIL);
   }
   else
-    pips_error("array_ref_exp_p","expression syntax is not no reference !\n");
+    pips_internal_error("expression syntax is not no reference !");
 
   /* Never reached. */
   return(b);

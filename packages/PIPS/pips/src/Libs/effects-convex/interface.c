@@ -306,7 +306,7 @@ print_code_any_regions(
 	init_convex_inout_prettyprint(module_name);
 	break;
     default:
-	pips_internal_error("unexpected tag %d\n", what_tag);
+	pips_internal_error("unexpected tag %d", what_tag);
     }
 
     set_is_user_view_p(is_user_view);

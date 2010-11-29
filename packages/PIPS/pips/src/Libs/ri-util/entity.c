@@ -58,6 +58,33 @@ void print_entity_set(set s)
   }
 }
 
+
+static void print_dimension(dimension d)
+{
+    fprintf(stderr,"dimension :\n");
+    print_expression(dimension_lower(d));
+    print_expression(dimension_upper(d));
+}
+/* print_entity_variable(e)
+ * 
+ * if it is just a variable, the type is printed,
+ * otherwise just the entity name is printed
+ */
+void print_entity_variable(entity e)
+{
+    variable v;
+
+    (void) fprintf(stderr,"name: %s\n",entity_name(e));
+    
+    if (!type_variable_p(entity_type(e)))
+	return;
+
+    v = type_variable(entity_type(e));
+
+    fprintf(stderr,"basic %s\n",basic_to_string(variable_basic(v)));
+    gen_map((gen_iter_func_t)print_dimension, variable_dimensions(v));
+}
+
 bool unbounded_expression_p(expression e)
 {
   syntax s = expression_syntax(e);
@@ -758,7 +785,7 @@ int entity_field_rank(entity f)
   else if(type_union_p(st))
     fl = type_union(st);
   else
-    pips_internal_error("Unexpected type tag %d\n", type_tag(st));
+    pips_internal_error("Unexpected type tag %d", type_tag(st));
 
   pips_assert("st is a struct or union type",
 	      type_struct_p(st) || type_union_p(st));
@@ -767,7 +794,7 @@ int entity_field_rank(entity f)
   rank = gen_position((void *) f, fl);
 
   if(rank==0) {
-    pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"\n",
+    pips_internal_error("Field \"\%s\" is not part of its %s \"\%s\"",
 			entity_name(f), type_struct_p(st)?"structure":"union" , entity_name(su));
   }
 
@@ -1141,6 +1168,21 @@ entity local_name_to_top_level_entity(const char *n)
 entity module_name_to_entity(const char* mn) {
   return local_name_to_top_level_entity(mn);
 }
+/* similar to module_name_to_entity
+ * but generates a warning and a stub if the entity is not found
+ */
+entity module_name_to_runtime_entity(string name)
+{
+    entity e = module_name_to_entity(name); 
+    if ( entity_undefined_p( e ) )
+    {
+        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
+                "Please feed pips with its definition and source\n",name);
+        e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
+    }
+
+    return e;
+}
 
 
 /**
@@ -1331,8 +1373,7 @@ list /* of entity */ common_members_of_module(entity common,
 	  }
 	  else {
 	    if(!SizeOfArray(v, &size)) {
-	      pips_error("common_members_of_module",
-			 "Varying size array \"%s\"\n", entity_name(v));
+	      pips_internal_error("Varying size array \"%s\"", entity_name(v));
 	    }
 	  }
 
@@ -1516,7 +1557,7 @@ entity find_ith_formal_parameter(entity the_fnct, int rank)
 	return current;
     }
 
-  pips_internal_error("cannot find the %d dummy argument of %s\n",
+  pips_internal_error("cannot find the %d dummy argument of %s",
 		      rank, entity_name(the_fnct));
 
   return entity_undefined;
@@ -1700,7 +1741,7 @@ string storage_to_string(storage s)
   else if(storage_rom_p(s))
     desc = "rom";
   else
-    pips_internal_error("Unknown storage tag\n");
+    pips_internal_error("Unknown storage tag");
 
   return desc;
 }
@@ -2114,7 +2155,7 @@ void add_thread_safe_variable(entity v)
   if(gen_in_list_p(v, thread_safe_entities)) {
     /* This might happen when a workspace is closed and another one
        open or created within one session. */
-    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared", entity_name(v));
     ;
   }
   else {
@@ -2147,7 +2188,7 @@ void add_abstract_state_variable(entity v)
   if(gen_in_list_p(v, abstract_state_entities)) {
     /* This might happen when a workspace is closed and another one
        open or created within one session. */
-    //pips_internal_error("Thread-safe entity \"%s\" redeclared\n", entity_name(v));
+    //pips_internal_error("Thread-safe entity \"%s\" redeclared", entity_name(v));
     ;
   }
   else {
@@ -2265,7 +2306,7 @@ commutative_call_p(call c)
             case is_basic_pointer:
                 break;
             default:
-                pips_internal_error("unhandled case\n");
+                pips_internal_error("unhandled case");
         }
         free_basic(b);
     }
@@ -2464,160 +2505,188 @@ list l;
  * @name declarations updater
  * @{ */
 
+typedef struct {
+    set entities;
+    bool (*chunk_filter)(void*);
+    bool (*entity_filter)(entity);
+} get_referenced_entities_t;
+
+// helper storing an entity according to filter @p p->entity_filter
+static void do_get_referenced_entities_on_entity(
+        entity e, get_referenced_entities_t *p) {
+    if(p->entity_filter(e))
+        set_add_element(p->entities,p->entities,e);
+}
+
 /**
- * helper looking in a reference for referenced entities
- *
- * @param r reference to check
- * @param re set to fill
+ * helper looking in a reference @p r for referenced entities
  */
-static void statement_clean_declarations_reference_walker(reference r, set re)
+static void do_get_referenced_entities_on_reference(reference r, get_referenced_entities_t *p)
 {
-  entity e = reference_variable(r);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
+    if(p->chunk_filter(r)) {
+        entity e = reference_variable(r);
+        do_get_referenced_entities_on_entity(e,p);
+    }
 }
 
 /**
  * helper looking in a call for referenced entities
- *
- * @param c call to check
- * @param re set to fill
  */
-static void statement_clean_declarations_call_walker(call c, set re)
+static void do_get_referenced_entities_on_call(call c, get_referenced_entities_t* p)
 {
-  entity e = call_function(c);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
+    if(p->chunk_filter(c)) {
+        entity e = call_function(c);
+        do_get_referenced_entities_on_entity(e,p);
+    }
 }
 
 /**
  * helper looking in a loop for referenced entities
- *
- * @param l loop to check
- * @param re set to fill
  */
-static void statement_clean_declarations_loop_walker(loop l, set re)
+static void do_get_referenced_entities_on_loop(loop l, get_referenced_entities_t* p)
 {
-  entity e = loop_index(l);
-  if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-    set_add_element(re,re,e);
+    if(p->chunk_filter(l)) {
+        entity e = loop_index(l);
+        do_get_referenced_entities_on_entity(e,p);
+    }
 }
 
 
 /**
  * helper looking in a list for referenced entities
- *
- * @param l list to check
- * @param re set to fill
  */
 static
-void statement_clean_declarations_list_walker(list l, set re)
+void do_get_referenced_entities_on_list(list l, get_referenced_entities_t *p)
 {
-  FOREACH(ENTITY,e,l)
-    if( !entity_constant_p(e) && ! intrinsic_entity_p(e) )
-      set_add_element(re,re,e);
+    FOREACH(ENTITY,e,l)
+        do_get_referenced_entities_on_entity(e,p);
 }
 
 /**
  * helper looking in a ram for referenced entities
- *
- * @param r ram to check
- * @param re set to fill
  */
-static void statement_clean_declarations_ram_walker(ram r, set re)
+static void do_get_referenced_entities_on_ram(ram r, get_referenced_entities_t *p)
 {
-  statement_clean_declarations_list_walker(ram_shared(r),re);
+    if(p->chunk_filter(r))
+        do_get_referenced_entities_on_list(ram_shared(r),p);
 }
 
 /**
  * helper looking in an area for referenced entities
- *
- * @param a area to check
- * @param re set to fill
  */
-static void statement_clean_declarations_area_walker(area a, set re)
+static void do_get_referenced_entities_on_area(area a, get_referenced_entities_t *p)
 {
-    statement_clean_declarations_list_walker(area_layout(a),re);
+    if(p->chunk_filter(a))
+        do_get_referenced_entities_on_list(area_layout(a),p);
 }
-
 /**
- * helper diving into an entity to find referenced entities
- *
- * @param e entity to dive into
- * @param re set to fill
- *
+ * helper looking in a statement declaration for referenced entities
  */
-void entity_get_referenced_entities(entity e, set re)
+static void do_get_referenced_entities_on_statement(statement s, get_referenced_entities_t *p)
 {
-  /*if(entity_variable_p(e))*/ {
-    gen_context_multi_recurse(entity_type(e),re,
-			      reference_domain,gen_true,statement_clean_declarations_reference_walker,
-			      call_domain,gen_true,statement_clean_declarations_call_walker,
-			      NULL
-			      );
-    /* SG: I am unsure wether it is valid or not to find an entity with undefined initial ... */
-    if( !value_undefined_p(entity_initial(e) ) ) {
-      gen_context_multi_recurse(entity_initial(e),re,
-				call_domain,gen_true,statement_clean_declarations_call_walker,
-				reference_domain,gen_true,statement_clean_declarations_reference_walker,
-				area_domain,gen_true,statement_clean_declarations_area_walker,
-				ram_domain,gen_true,statement_clean_declarations_ram_walker,
-				NULL);
+    if(p->chunk_filter(s))
+        do_get_referenced_entities_on_list(statement_declarations(s),p);
+    else {
+      /* you skip the declarations, but not the value / type inside */
+      FOREACH(ENTITY,e,statement_declarations(s)) {
+        set tmp = get_referenced_entities_filtered(entity_initial(e),p->chunk_filter,p->entity_filter);
+        set_union(p->entities,p->entities,tmp);
+        set_free(tmp);
+      }
+      FOREACH(ENTITY,e,statement_declarations(s)) {
+        set tmp = get_referenced_entities_filtered(entity_type(e),p->chunk_filter,p->entity_filter);
+        set_union(p->entities,p->entities,tmp);
+        set_free(tmp);
+      }
     }
-  }
 }
 
-/**
- * helper iterating over statement declaration to find referenced entities
- *
- * @param s statement to check
- * @param re set to fill
+/* Same as get_referenced_entities,
+ * but will only consider entities that
+ * fulfills @p entity_filter
+ * and will only enter consider entities **directly** involved in object
+ * matching @p chunk_filter
+ * \/!\ if you strip out statements, it will not consider declared entities, but it will consider their initial value
  */
-static void statement_clean_declarations_statement_walker(statement s, set re)
+set get_referenced_entities_filtered(void *elem,
+        bool (*chunk_filter)(void*), bool (*entity_filter)(entity))
 {
-  FOREACH(ENTITY,e,statement_declarations(s))
-    entity_get_referenced_entities(e,re);
+    set referenced_entities = set_make(set_pointer);
+    if(!gen_chunk_undefined_p(elem)) {
+      get_referenced_entities_t p = {
+        referenced_entities,
+        chunk_filter,
+        entity_filter
+      };
+
+      /* if elem is an entity it self, add it */
+      if(INSTANCE_OF(entity,(gen_chunkp)elem)) {
+        entity e = (entity)elem;
+        if(chunk_filter(entity_type(e)))
+          gen_context_multi_recurse(entity_type(e),&p,
+              reference_domain,gen_true,do_get_referenced_entities_on_reference,
+              call_domain,gen_true,do_get_referenced_entities_on_call,
+              NULL
+              );
+        if(!value_undefined_p(entity_initial(e)) && // struct fields ave undefined initial
+            chunk_filter(entity_initial(e)))
+          gen_context_multi_recurse(entity_initial(e),&p,
+              call_domain,gen_true,do_get_referenced_entities_on_call,
+              reference_domain,gen_true,do_get_referenced_entities_on_reference,
+              area_domain,gen_true,do_get_referenced_entities_on_area,
+              ram_domain,gen_true,do_get_referenced_entities_on_ram,
+              NULL);
+      }
+      else {
+        /* gather entities from elem */
+        gen_context_multi_recurse(elem,&p,
+            loop_domain,gen_true,do_get_referenced_entities_on_loop,
+            reference_domain,gen_true,do_get_referenced_entities_on_reference,
+            call_domain,gen_true,do_get_referenced_entities_on_call,
+            statement_domain,gen_true,do_get_referenced_entities_on_statement,
+            ram_domain,gen_true,do_get_referenced_entities_on_ram,
+            NULL);
+      }
+
+      /* gather all entities referenced by referenced entities */
+      list ltmp = set_to_list(referenced_entities);
+      FOREACH(ENTITY,e,ltmp) {
+        set tmp = get_referenced_entities_filtered(e,chunk_filter,entity_filter);
+        set_union(referenced_entities,referenced_entities,tmp);
+        set_free(tmp);
+      }
+      gen_free_list(ltmp);
+
+      /* not merged with earlier test to avoid infinite recursion */
+      if(INSTANCE_OF(entity,(gen_chunkp)elem)) {
+        entity e = (entity)elem;
+        set_add_element(referenced_entities,referenced_entities,e);
+      }
+    }
+
+    return referenced_entities;
 }
 
-
+/* default entity filter for get_referenced_entities
+ * filters out constants and intrinsics
+ */
+bool entity_not_constant_or_intrinsic_p(entity e) {
+    return !entity_constant_p(e) && ! intrinsic_entity_p(e);
+}
 /**
- * retrieves the set of entites used in elem
- * beware that this entites may be formal parameters, functions etc
- * so please filter this set depending on your need
+ * retrieves the set of entities used in  @p elem
+ * beware that this entities may be formal parameters, functions etc
+ * so consider filter this set depending on your need,
+ * using get_referenced_entities_filtered 
  *
  * @param elem  element to check (any gen_recursifiable type is allowded)
  *
  * @return set of referenced entities
- *
- * FI: should be moved into ri-util?
  */
 set get_referenced_entities(void* elem)
 {
-  set referenced_entities = set_make(set_pointer);
+    return get_referenced_entities_filtered(elem,(bool (*)(void*))gen_true,
+            entity_not_constant_or_intrinsic_p);
 
-  /* if s is an entity it self, add it */
-  if(INSTANCE_OF(entity,(gen_chunkp)elem))
-      set_add_element(referenced_entities,referenced_entities,elem);
-
-  /* gather entities from s*/
-  gen_context_multi_recurse(elem,referenced_entities,
-			    loop_domain,gen_true,statement_clean_declarations_loop_walker,
-			    reference_domain,gen_true,statement_clean_declarations_reference_walker,
-			    call_domain,gen_true,statement_clean_declarations_call_walker,
-			    statement_domain,gen_true,statement_clean_declarations_statement_walker,
-			    ram_domain,gen_true,statement_clean_declarations_ram_walker,
-			    NULL);
-
-  /* gather all entities referenced by referenced entities */
-  set other_referenced_entities = set_make(set_pointer);
-  SET_FOREACH(entity,e,referenced_entities)
-    {
-      entity_get_referenced_entities(e,other_referenced_entities);
-    }
-
-  /* merge results */
-  set_union(referenced_entities,other_referenced_entities,referenced_entities);
-  set_free(other_referenced_entities);
-
-  return referenced_entities;
 }
+

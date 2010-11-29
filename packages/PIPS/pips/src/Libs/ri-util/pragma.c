@@ -30,7 +30,7 @@
 
   A middle term, extensions method could go in another file.
 
-  It is a trivial inplementation based on strings for a proof of concept.
+  It is a trivial implementation based on strings for a proof of concept.
 
   Pierre.Villalon@hpc-project.com
   Ronan.Keryell@hpc-project.com
@@ -412,7 +412,7 @@ pragma_to_string (pragma p) {
     return directive_to_string(load_global_directives(pragma_entity(p)),false);
     break;
   default:
-    pips_internal_error("Unknown pragama type\n");
+    pips_internal_error("Unknown pragama type");
     break;
   }
   if (s != string_undefined) {

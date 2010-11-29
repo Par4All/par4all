@@ -60,7 +60,7 @@ typedef struct {
 static void no_free(void * p) { pips_debug(2, "memory leak (%p)\n", p); }
 static void writeln_string(FILE * f, void * p) {fprintf(f, "%s\n", (char*)p);}
 static void unexpected(void)
-{ pips_internal_error("unexpected pipsdbm method\n");}
+{ pips_internal_error("unexpected pipsdbm method");}
 
 /* all methods are stored in this separate file. as an array.
  */
@@ -206,7 +206,7 @@ void dbll_unlink_resource_file(const char* rname, const char* oname, bool errori
     string full_name = get_resource_file_name(rname, oname);
     if (unlink(full_name) && erroriffailed) {
 	perror(full_name);
-	pips_internal_error("cannot unlink resource %s of %s\n", rname, oname);
+	pips_internal_error("cannot unlink resource %s of %s", rname, oname);
     }
     free(full_name);
 }
@@ -224,7 +224,7 @@ static int dbll_stat_file(const char* file_name, bool okifnotthere)
 	    pips_user_warning("error in stat for %s\n", file_name);
 	}
 	if (!okifnotthere) {
-	    pips_internal_error("stat error not permitted here\n");
+	    pips_internal_error("stat error not permitted here");
 	}
     } else time = (int) buf.st_mtime; /* humm... unsigned... */
     return time;
@@ -286,7 +286,7 @@ void * dbll_load_resource(const char* rname, const char* oname)
     dbll_current_module = oname;
     m = get_methods(rname);
     if (m->read_function==no_read)
-	pips_internal_error("cannot load %s of %s, no load function\n",
+	pips_internal_error("cannot load %s of %s, no load function",
 			    rname, oname);
     f = open_resource_file(rname, oname, "r");
     p = m->read_function(f);

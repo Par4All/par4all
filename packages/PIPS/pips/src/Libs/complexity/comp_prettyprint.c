@@ -113,7 +113,7 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 	else if ( instruction_expression_p(ins) )
 	  it = "(EXPR)";
 	else
-	    pips_error("text_complexity", "Never occur!");
+	    pips_internal_error("Never occur!");
 
 	asprintf(&s, "%s    %*s%s %s\n", get_comment_sentinel(), nblanks, "", r, it);
 

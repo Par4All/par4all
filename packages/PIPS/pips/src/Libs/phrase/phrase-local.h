@@ -25,6 +25,9 @@
 #ifndef __PHRASEC_LOCAL_H__
 #define __PHRASEC_LOCAL_H__
 
-//#include "phrase_private.h"
+#include "dg.h"
+typedef dg_arc_label arc_label;
+typedef dg_vertex_label vertex_label;
 
+#include "graph.h"
 #endif 

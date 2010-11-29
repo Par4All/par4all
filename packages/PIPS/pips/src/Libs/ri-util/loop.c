@@ -124,7 +124,7 @@ rloops_mapping_of_statement(statement_mapping m,
       case is_instruction_expression:
 	break;
       case is_instruction_goto:
-	pips_internal_error("Go to instruction in CODE internal representation\n");
+	pips_internal_error("Go to instruction in CODE internal representation");
 	break;
 
       case is_instruction_unstructured: {
@@ -141,7 +141,7 @@ rloops_mapping_of_statement(statement_mapping m,
 	break ;
       }
       default:
-	pips_internal_error("unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 }
 
@@ -198,8 +198,7 @@ distributable_statement_p(statement stat, set region)
     case is_instruction_test:
 	return(FALSE);
     default:
-	pips_error("distributable_statement_p",
-		   "unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 
     return((bool) NULL); /* just to avoid a gcc warning */
@@ -236,7 +235,7 @@ bool index_private_p(lo)
 loop lo;
 {
     if( lo == loop_undefined ) {
-	pips_error("index_private_p", "Loop undefined\n");
+	pips_internal_error("Loop undefined");
     }
 
     return((entity) gen_find_eq(loop_index(lo), loop_locals(lo)) !=
@@ -309,8 +308,7 @@ set region;
   }
 
   default:
-      pips_error("region_of_statement",
-		 "unexpected tag %d\n", instruction_tag(i));
+      pips_internal_error("unexpected tag %d", instruction_tag(i));
   }
 }
 
@@ -539,7 +537,7 @@ perfectly_nested_loop_to_body(statement loop_nest) {
     break;
   }
   default:
-    pips_error("perfectly_nested_loop_to_body","illegal tag\n");
+    pips_internal_error("illegal tag");
     break;
   }
   return(statement_undefined); /* just to avoid a warning */

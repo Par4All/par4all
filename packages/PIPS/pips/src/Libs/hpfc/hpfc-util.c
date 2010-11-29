@@ -494,7 +494,7 @@ int dim, *tdim;
     },
 	ldi);
 
-    pips_internal_error("dimension %d not found\n", dim);
+    pips_internal_error("dimension %d not found", dim);
 
     return(distribution_undefined);
 }    
@@ -647,7 +647,7 @@ expression e;
     if(expression_integer_value(e, &val))
 	return val;
     else
-	pips_internal_error("can't return anything, sorry\n");
+	pips_internal_error("can't return anything, sorry");
 
     return -1; /* just to avoid a gcc warning */
 }

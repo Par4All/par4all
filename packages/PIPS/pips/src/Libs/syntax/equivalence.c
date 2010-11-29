@@ -739,7 +739,7 @@ ComputeAddresses()
 	    }
 	  }
 	  else {
-	    pips_internal_error("Unexpected storage for entity %s\n",
+	    pips_internal_error("Unexpected storage for entity %s",
 				entity_local_name(a));
 	  }
 	}

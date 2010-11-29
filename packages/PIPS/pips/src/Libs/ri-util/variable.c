@@ -518,13 +518,13 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 		    unique_string_number++);
 	}
 	else {
-	  pips_internal_error("Not implemented for type tag: %d\n",
+	  pips_internal_error("Not implemented for type tag: %d",
 			      type_tag(dt));
 	}
 	break;
       }
       default:
-	pips_internal_error("unknown basic tag: %d\n",
+	pips_internal_error("unknown basic tag: %d",
 			    basic_tag(ub));
 	break;
       }
@@ -1118,7 +1118,7 @@ void remove_variable_entity(entity v)
     f = entity_undefined;
   }
   else {
-    pips_error("remove_variable_entity", "unexpected storage %d\n", storage_tag(s));
+    pips_internal_error("unexpected storage %d", storage_tag(s));
   }
 
   if(!entity_undefined_p(f)) {
@@ -1182,7 +1182,7 @@ int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
 
   if(top_level_entity_p(a) && is_fortran_p ) {
     /* COMMONs are supposed to havethe same layout in each routine */
-    pips_error("add_variable_to_area", "COMMONs should not be modified\n");
+    pips_internal_error("COMMONs should not be modified");
   }
   else {
     /* the local areas are StaticArea and DynamicArea in fortran */
@@ -1216,7 +1216,7 @@ int new_add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
 
   if(top_level_entity_p(a) && is_fortran_p ) {
     /* COMMONs are supposed to havethe same layout in each routine */
-    pips_internal_error("COMMONs should not be modified.\n");
+    pips_internal_error("COMMONs should not be modified.");
   }
   else if(static_area_p(a) || dynamic_area_p(a)) {
     /* the local areas are StaticArea and DynamicArea in fortran */
@@ -1255,7 +1255,7 @@ int new_add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
       area_layout(aa) = gen_nconc(area_layout(aa), CONS(ENTITY, v, NIL));
   }
   else {
-    pips_internal_error("Unexpected area kind: \"%s\".\n",
+    pips_internal_error("Unexpected area kind: \"%s\".",
 			entity_name(a));
   }
   return(OldOffset);
@@ -1589,7 +1589,7 @@ expression variable_initial_expression(entity v)
       exp = int_to_expression(constant_int(c));
     }
     else {
-      pips_internal_error("Not Yet Implemented.\n");
+      pips_internal_error("Not Yet Implemented.");
     }
   }
   else if(value_code_p(val)) {
@@ -1620,7 +1620,7 @@ expression variable_initial_expression(entity v)
     exp = copy_expression(symbolic_expression(s));
   }
   else {
-    pips_internal_error("Unexpected value tag %d.\n", value_tag(val));
+    pips_internal_error("Unexpected value tag %d.", value_tag(val));
   }
 
   return exp;

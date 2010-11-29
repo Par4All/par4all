@@ -481,7 +481,7 @@ void debug_sentence(sentence s)
 	debug_unformatted(sentence_unformatted(s));
 	break;
     default:
-	pips_internal_error("unexpected sentence tag %d\n", sentence_tag(s));
+	pips_internal_error("unexpected sentence tag %d", sentence_tag(s));
     }
 
     fprintf(stderr,"# end sentence\n");

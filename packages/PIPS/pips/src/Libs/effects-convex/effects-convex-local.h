@@ -73,7 +73,7 @@
 #define region_must_p(reg) \
         (approximation_tag(effect_approximation(reg)) == is_approximation_must)
 #define region_exact_p(reg) \
-        (approximation_tag(effect_approximation(reg)) == is_approximation_must)
+        (approximation_tag(effect_approximation(reg)) == is_approximation_exact)
 #define region_empty_p(reg) sc_empty_p(region_system(reg))
 #define region_rn_p(reg) sc_rn_p(region_system(reg))
 #define region_scalar_p(reg) (anywhere_effect_p(reg) || entity_scalar_p(region_entity(reg)))

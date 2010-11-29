@@ -84,8 +84,7 @@ entity find_final_statement_label(statement s)
     else {
       /* If empty blocks are allowed, we've recursed one statement too
          far. */
-      pips_error("find_final_statement_label",
-		 "Useless empty sequence. Unexpected in controlized code.\n");
+      pips_internal_error("Useless empty sequence. Unexpected in controlized code.");
     }
     break;
 
@@ -100,8 +99,7 @@ entity find_final_statement_label(statement s)
     break;
 
   case is_instruction_goto:
-    pips_error("find_final_statement_label",
-	       "Controlized code should not contain GO TO statements\n");
+    pips_internal_error("Controlized code should not contain GO TO statements");
     break;
 
   case is_instruction_call:
@@ -115,15 +113,13 @@ entity find_final_statement_label(statement s)
     break;
 
   default:
-    pips_error("find_final_statement_label",
-	       "Unknown instruction tag: %d\n",
+    pips_internal_error("Unknown instruction tag: %d",
 	       instruction_tag(i));
   }
 
   /* fsl should be either a meaningful label or the empty label */
   if(entity_undefined_p(fsl)) {
-    pips_error("find_final_statement_label",
-	       "Undefined final label\n");
+    pips_internal_error("Undefined final label");
   }
 
   return fsl;
@@ -166,7 +162,7 @@ static basic basic_int_to_signed_basic(basic b)
  * The upper and lower loop bound expressions are assumed side-effects
  * free.
  */
-void do_loop_unroll_with_epilogue(statement loop_statement,
+static void do_loop_unroll_with_epilogue(statement loop_statement,
 				  int rate,
 				  void (*statement_post_processor)(statement))
 {
@@ -414,7 +410,7 @@ void do_loop_unroll_with_epilogue(statement loop_statement,
    to unaligned accesses in the unrolled loop when the arrays accessed
    are aligned and accessed from the first element to the last.
  */
-void do_loop_unroll_with_prologue(statement loop_statement,
+static void do_loop_unroll_with_prologue(statement loop_statement,
 				  int rate,
 				  void (*statement_post_processor)(statement))
 {

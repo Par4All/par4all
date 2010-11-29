@@ -249,7 +249,7 @@ char * (*variable_name)();
   if (!CONTRAINTE_UNDEFINED_P(c)) v = contrainte_vecteur(c);
   else v = VECTEUR_NUL;
 
-  if(!vect_check(v)) pips_error("adg_contrainte_fprint", "Non coherent vector");
+  if(!vect_check(v)) pips_internal_error("Non coherent vector");
 
   while (!VECTEUR_NUL_P(v)) {
     if (v->var!=TCST) {

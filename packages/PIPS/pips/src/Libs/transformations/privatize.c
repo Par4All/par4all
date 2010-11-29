@@ -169,7 +169,7 @@ static void scan_statement(statement s, list loops)
     case is_instruction_goto:
 	break ;
     default:
-	pips_error("scan_statement", "unexpected tag %d\n", instruction_tag(i));
+	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
 }
 
@@ -473,7 +473,7 @@ bool privatize_module(char *mod_name)
 
     /*
     if (! instruction_unstructured_p(mod_inst))
-	pips_error("privatize_module", "unstructured expected\n");
+	pips_internal_error("unstructured expected");
 	*/
 
     set_proper_rw_effects((statement_effects)

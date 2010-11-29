@@ -447,7 +447,7 @@ static void rdg_statement(statement stat)
 	break;
 
       default:
-	pips_internal_error("case default reached with tag %d\n",
+	pips_internal_error("case default reached with tag %d",
 			    instruction_tag(istat));
 	break;
     }
@@ -724,8 +724,7 @@ static void rice_update_dependence_graph(
 			}
 
 			/* if (!Finds2s1)
-			   pips_error("rice_update_dependence_graph",
-			   "Expected opposite dependence are not found"); */
+			   pips_internal_error("Expected opposite dependence are not found"); */
 
 			if (Finds2s1)
 			{
@@ -2076,7 +2075,7 @@ gcd_and_constant_dependence_test(
     if (pc1 != NIL || pc2 != NIL) {
       /* Part of preprocessor.h, unfortunately */
       if(fortran_module_p(get_current_module_entity())) {
-	pips_internal_error("numbers of subscript expressions differ\n");
+	pips_internal_error("numbers of subscript expressions differ");
       }
       else {
 	/* C assumed */
@@ -2617,7 +2616,7 @@ void writeresult(char *mod_name)
     case DG_SEMANTICS:
 	filename = "resulttestseman"; break;
     default:
-	pips_error("writeresult", "erroneous dg type.\n");
+	pips_internal_error("erroneous dg type.");
 	return; /* to avoid warnings from compiler */
     }
 

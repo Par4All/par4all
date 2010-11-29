@@ -48,67 +48,67 @@ typedef struct IoElementDescriptor {
 static IoElementDescriptor IoElementDescriptorUndefined;
 
 static IoElementDescriptor IoElementDescriptorTable[] = {
-    {"OPEN",      "UNIT=",        is_action_read, is_approximation_must},
+    {"OPEN",      "UNIT=",        is_action_read, is_approximation_exact},
     {"OPEN",      "ERR=",         is_action_read, is_approximation_may},
-    {"OPEN",      "FILE=",        is_action_read, is_approximation_must},
+    {"OPEN",      "FILE=",        is_action_read, is_approximation_exact},
     {"OPEN",      "STATUS=",      is_action_read, is_approximation_may},
-    {"OPEN",      "ACCESS=",      is_action_read, is_approximation_must},
-    {"OPEN",      "FORM=",        is_action_read, is_approximation_must},
-    {"OPEN",      "RECL=",        is_action_read, is_approximation_must},
+    {"OPEN",      "ACCESS=",      is_action_read, is_approximation_exact},
+    {"OPEN",      "FORM=",        is_action_read, is_approximation_exact},
+    {"OPEN",      "RECL=",        is_action_read, is_approximation_exact},
     {"OPEN",      "BLANK=",       is_action_read, is_approximation_may},
     {"OPEN",      "IOSTAT=",      is_action_write, is_approximation_may},
 
-    {"CLOSE",     "UNIT=",        is_action_read, is_approximation_must},
+    {"CLOSE",     "UNIT=",        is_action_read, is_approximation_exact},
     {"CLOSE",     "ERR=",         is_action_read, is_approximation_may},
     {"CLOSE",     "STATUS=",      is_action_read, is_approximation_may},
     {"CLOSE",     "IOSTAT=",      is_action_write, is_approximation_may},
 
-    {"INQUIRE",   "UNIT=",        is_action_read, is_approximation_must},
+    {"INQUIRE",   "UNIT=",        is_action_read, is_approximation_exact},
     {"INQUIRE",   "ERR=",         is_action_read, is_approximation_may},
-    {"INQUIRE",   "FILE=",        is_action_read, is_approximation_must},
-    {"INQUIRE",   "IOSTAT=",      is_action_write, is_approximation_must},
-    {"INQUIRE",   "EXIST=",       is_action_write, is_approximation_must},
-    {"INQUIRE",   "OPENED=",      is_action_write, is_approximation_must},
-    {"INQUIRE",   "NUMBER=",      is_action_write, is_approximation_must},
-    {"INQUIRE",   "NAMED=",       is_action_write, is_approximation_must},
-    {"INQUIRE",   "NAME=",        is_action_write, is_approximation_must},
-    {"INQUIRE",   "ACCESS=",      is_action_write, is_approximation_must},
-    {"INQUIRE",   "SEQUENTIAL=",  is_action_write, is_approximation_must},
-    {"INQUIRE",   "DIRECT=",      is_action_write, is_approximation_must},
-    {"INQUIRE",   "FORM=",        is_action_write, is_approximation_must},
-    {"INQUIRE",   "FORMATTED=",   is_action_write, is_approximation_must},
-    {"INQUIRE",   "UNFORMATTED=", is_action_write, is_approximation_must},
-    {"INQUIRE",   "RECL=",        is_action_write, is_approximation_must},
-    {"INQUIRE",   "NEXTREC=",     is_action_write, is_approximation_must},
-    {"INQUIRE",   "BLANK=",       is_action_write, is_approximation_must},
+    {"INQUIRE",   "FILE=",        is_action_read, is_approximation_exact},
+    {"INQUIRE",   "IOSTAT=",      is_action_write, is_approximation_exact},
+    {"INQUIRE",   "EXIST=",       is_action_write, is_approximation_exact},
+    {"INQUIRE",   "OPENED=",      is_action_write, is_approximation_exact},
+    {"INQUIRE",   "NUMBER=",      is_action_write, is_approximation_exact},
+    {"INQUIRE",   "NAMED=",       is_action_write, is_approximation_exact},
+    {"INQUIRE",   "NAME=",        is_action_write, is_approximation_exact},
+    {"INQUIRE",   "ACCESS=",      is_action_write, is_approximation_exact},
+    {"INQUIRE",   "SEQUENTIAL=",  is_action_write, is_approximation_exact},
+    {"INQUIRE",   "DIRECT=",      is_action_write, is_approximation_exact},
+    {"INQUIRE",   "FORM=",        is_action_write, is_approximation_exact},
+    {"INQUIRE",   "FORMATTED=",   is_action_write, is_approximation_exact},
+    {"INQUIRE",   "UNFORMATTED=", is_action_write, is_approximation_exact},
+    {"INQUIRE",   "RECL=",        is_action_write, is_approximation_exact},
+    {"INQUIRE",   "NEXTREC=",     is_action_write, is_approximation_exact},
+    {"INQUIRE",   "BLANK=",       is_action_write, is_approximation_exact},
 
-    {"BACKSPACE", "UNIT=",        is_action_read, is_approximation_must},
+    {"BACKSPACE", "UNIT=",        is_action_read, is_approximation_exact},
     {"BACKSPACE", "ERR=",         is_action_read, is_approximation_may},
     {"BACKSPACE", "IOSTAT=",      is_action_write, is_approximation_may},
 
-    {"ENDFILE",   "UNIT=",        is_action_read, is_approximation_must},
+    {"ENDFILE",   "UNIT=",        is_action_read, is_approximation_exact},
     {"ENDFILE",   "ERR=",         is_action_read, is_approximation_may},
     {"ENDFILE",   "IOSTAT=",      is_action_write, is_approximation_may},
 
-    {"REWIND",    "UNIT=",        is_action_read, is_approximation_must},
+    {"REWIND",    "UNIT=",        is_action_read, is_approximation_exact},
     {"REWIND",    "ERR=",         is_action_read, is_approximation_may},
     {"REWIND",    "IOSTAT=",      is_action_write, is_approximation_may},
 
-    {"READ",      "FMT=",         is_action_read, is_approximation_must},
-    {"READ",      "UNIT=",        is_action_read, is_approximation_must},
-    {"READ",      "REC=",         is_action_read, is_approximation_must},
+    {"READ",      "FMT=",         is_action_read, is_approximation_exact},
+    {"READ",      "UNIT=",        is_action_read, is_approximation_exact},
+    {"READ",      "REC=",         is_action_read, is_approximation_exact},
     {"READ",      "ERR=",         is_action_read, is_approximation_may},
-    {"READ",      "END=",         is_action_read, is_approximation_must},
+    {"READ",      "END=",         is_action_read, is_approximation_exact},
     {"READ",      "IOSTAT=",      is_action_write, is_approximation_may},
-    {"READ",      "IOLIST=",      is_action_write, is_approximation_must},
+    {"READ",      "IOLIST=",      is_action_write, is_approximation_exact},
 
-    {"WRITE",     "FMT=",         is_action_read, is_approximation_must},
-    {"WRITE",     "UNIT=",        is_action_read, is_approximation_must},
-    {"WRITE",     "REC=",         is_action_read, is_approximation_must},
+    {"WRITE",     "FMT=",         is_action_read, is_approximation_exact},
+    {"WRITE",     "UNIT=",        is_action_read, is_approximation_exact},
+    {"WRITE",     "REC=",         is_action_read, is_approximation_exact},
     {"WRITE",     "ERR=",         is_action_read, is_approximation_may},
-    {"WRITE",     "END=",         is_action_read, is_approximation_must},
+    {"WRITE",     "END=",         is_action_read, is_approximation_exact},
     {"WRITE",     "IOSTAT=",      is_action_write, is_approximation_may},
-    {"WRITE",     "IOLIST=",      is_action_read, is_approximation_must},
+    {"WRITE",     "IOLIST=",      is_action_read, is_approximation_exact},
     {0,           0,              0,              0}
 };
 
@@ -304,7 +304,7 @@ transformer context;
         pid += 1;
     }
 
-    pips_error("proper_comp_regions_of_intrinsic", "unknown intrinsic %s\n", s);
+    pips_internal_error("unknown intrinsic %s", s);
 
     return(NIL);
 }
@@ -343,7 +343,7 @@ affect_comp_regions(entity __attribute__ ((unused)) e,
     debug(5, "affect_comp_regions", "begin\n");
 
     if (! syntax_reference_p(s))
-            pips_error("affect_comp_regions", "not a reference\n");
+            pips_internal_error("not a reference");
 
 
     le = comp_regions_of_write(syntax_reference(s), context);
@@ -369,7 +369,7 @@ char *s, *i;
         p += 1;
     }
 
-    pips_error("SearchIoElement", "unknown io element %s %s\n", s, i);
+    pips_internal_error("unknown io element %s %s", s, i);
     /* Never reaches this point. Only to avoid a warning at compile time. BC. */
     return(&IoElementDescriptorUndefined);
 }

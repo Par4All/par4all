@@ -701,13 +701,13 @@ expression make_array_ref(list l)
   list array_inds;
 
   if(l == NIL)
-    pips_error("make_array_ref","No args for array ref\n");
+    pips_internal_error("No args for array ref");
 
   new_exp = EXPRESSION(CAR(l));
   array_inds = CDR(l);
 
   if(! syntax_reference_p(expression_syntax(new_exp)))
-    pips_error("make_array_ref","Array ref is not a reference\n");
+    pips_internal_error("Array ref is not a reference");
 
   reference_indices(syntax_reference(expression_syntax(new_exp))) = array_inds;
 
@@ -728,7 +728,7 @@ list args;
                                                     func_name), entity_domain);
 
  if(func_ent == entity_undefined)
-    pips_error("make_func_op","Function unknown : %s\n", func_name);
+    pips_internal_error("Function unknown : %s", func_name);
 
  return(make_expression(make_syntax(is_syntax_call,
                                     make_call(func_ent, args)),
@@ -765,8 +765,7 @@ lisp_expression le;
  exp_args = CDR(exp_args);
 
  if(exp_args == NIL)
-    pips_error("lisp_exp_to_ri_exp",
-		 "Only 1 argument for a binary (or more) operation\n");
+    pips_internal_error("Only 1 argument for a binary (or more) operation");
 
  for(; exp_args != NIL; exp_args = CDR(exp_args))
    {
@@ -1068,9 +1067,9 @@ Pvecteur polynome_to_vecteur(Ppolynome pp)
     Pvecteur pv = (ppp->monome)->term;
 
     if(VECTEUR_NUL_P(pv))
-      pips_error("new_polynome_to_vecteur", "A null vector in a monome\n");
+      pips_internal_error("A null vector in a monome");
     else if(pv->succ != NULL)
-      pips_error("new_polynome_to_vecteur", "Polynome is not of degree one\n");
+      pips_internal_error("Polynome is not of degree one");
 
     var = (entity) pv->var;
     val = float_to_value((ppp->monome)->coeff);
@@ -1561,7 +1560,7 @@ fprintf(stderr, "\n");
  }
 
       if(!egalite_normalize(eq))
-	pips_internal_error("Strange equality\n");
+	pips_internal_error("Strange equality");
 
       sc_nbre_egalites(ps)--;
       if (eq == (ps->egalites)) ps->egalites = eq->succ;
@@ -2020,7 +2019,7 @@ Ppolynome ppsubst;
 	first = (entity) pv->var;
       }
       if(pv != NULL)
-	pips_internal_error("Vecteur should contains 2 var\n");
+	pips_internal_error("Vecteur should contains 2 var");
       else if( same_entity_p(first,  (entity) var) ||
 	       same_entity_p(second, (entity) var)) {
 	if(POLYNOME_UNDEFINED_P(p)) {
@@ -2118,7 +2117,7 @@ Pvecteur prototype_factorize(Ppolynome pp, Variable var)
 	first = (entity) vec->var;
       }
       if(vec != NULL)
-	pips_internal_error("Vecteur should contains 2 var\n");
+	pips_internal_error("Vecteur should contains 2 var");
       else if(same_entity_p(first,  (entity) var))
 	if(second == entity_undefined)
 	  newvar = TCST;
@@ -2294,7 +2293,7 @@ list lexp;
 
     cnor = NORMALIZE_EXPRESSION(cexp);
     if(normalized_tag(cnor) == is_normalized_complex)
-      pips_error("expressions_to_vectors", "Expressions MUST be linear\n");
+      pips_internal_error("Expressions MUST be linear");
 
     pv = (Pvecteur) normalized_linear(cnor);
 
