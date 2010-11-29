@@ -528,6 +528,7 @@ saxpy (float sx[1000], float sy[1000])
   sa0 = 3;
   if (sa0 == 0.0)
     {
+      ;
     }
   else
     {

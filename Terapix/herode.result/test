@@ -706,13 +706,13 @@ l99998:
                img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <argv-R-MAY-{}>
 //  <argv[PHI1]-R-MAY-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char **argv)
 {
@@ -759,11 +759,11 @@ int main(int argc, char **argv)
 
          check += out[i][j];
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("%d\n", check);
    return 0;
@@ -1156,8 +1156,6 @@ l99997:
       img000 += 1;
       img_out000 += 1;
    }
-
-
 }
 **** check ok ******
 void launcher_0_microcode(int I_3, int *img00, int *img_out00)
@@ -1202,8 +1200,6 @@ l99997:
       img000 = img000+1;
       img_out000 = img_out000+1;
    }
-
-
 }
 void launcher_0_microcode(int I_3, int *img00, int *img_out00)
 {
@@ -1252,10 +1248,8 @@ l99997:
 I_3 belongs to a loop bound
 img00 seems an image
 img_out00 seems an image
-void launcher_0_microcode(int *FIFO0, int *img00, int N0)
+void launcher_0_microcode(int *FIFO1, int *FIFO0, int N0)
 {
-   //PIPS generated variable
-   int *img000;
    //PIPS generated variable
    int *im0;
    //PIPS generated variable
@@ -1269,31 +1263,32 @@ void launcher_0_microcode(int *FIFO0, int *img00, int N0)
    //PIPS generated variable
    int re2;
    //PIPS generated variable
-   int *im3, *im4, *im5;
+   int *im3, *im4, *im5, *im6, *im7;
    //PIPS generated variable
    int re3;
-   im5 = FIFO0;
-   img000 = img00;
-   im4 = im5;
+   im7 = FIFO1;
+   im6 = FIFO0;
+   im4 = im6;
+   im5 = im7;
    for(re3 = 0; re3 <= N0; re3 += 1) {
-      im3 = img000;
+      im3 = im4;
       im3 = im3+1;
-      re2 = *img000;
+      re2 = *im4;
       re2 = MIN(re2, *im3);
-      im2 = img000;
+      im2 = im4;
       im2 = im2+2;
       re1 = re2;
       re1 = MIN(re1, *im2);
-      im1 = img000;
+      im1 = im4;
       im1 = im1+3;
       re0 = re1;
       re0 = MIN(re0, *im1);
-      im0 = img000;
+      im0 = im4;
       im0 = im0+4;
-      *im4 = re0;
-      *im4 = MIN(*im4, *im0);
-      img000 = img000+1;
+      *im5 = re0;
+      *im5 = MIN(*im5, *im0);
       im4 = im4+1;
+      im5 = im5+1;
    }
 }
 void launcher_0(int I_3, int img0[128][258], int img_out0[128][254])
@@ -1306,10 +1301,8 @@ l99996:
 l99997:      launcher_0_microcode(*&img_out0[y], *&img0[y], I_3);
 }
 **** check ok ******
-void launcher_0_microcode(int *FIFO0, int *img00, int N0)
+void launcher_0_microcode(int *FIFO1, int *FIFO0, int N0)
 {
-   //PIPS generated variable
-   int *img000;
    //PIPS generated variable
    int *im0;
    //PIPS generated variable
@@ -1323,56 +1316,57 @@ void launcher_0_microcode(int *FIFO0, int *img00, int N0)
    //PIPS generated variable
    int re2;
    //PIPS generated variable
-   int *im3, *im4, *im5;
+   int *im3, *im4, *im5, *im6, *im7;
    //PIPS generated variable
    int re3;
-   im5 = FIFO0;
-   img000 = img00;
-   im4 = im5;
+   im7 = FIFO1;
+   im6 = FIFO0;
+   im4 = im6;
+   im5 = im7;
    for(re3 = 0; re3 <= N0; re3 += 1) {
-      im3 = img000;
+      im3 = im4;
       im3 = im3+1;
-      re2 = *img000;
+      re2 = *im4;
       re2 = MIN(re2, *im3);
-      im2 = img000;
+      im2 = im4;
       im2 = im2+2;
       re1 = re2;
       re1 = MIN(re1, *im2);
-      im1 = img000;
+      im1 = im4;
       im1 = im1+3;
       re0 = re1;
       re0 = MIN(re0, *im1);
-      im0 = img000;
+      im0 = im4;
       im0 = im0+4;
-      *im4 = re0;
-      *im4 = MIN(*im4, *im0);
-      img000 = img000+1;
+      *im5 = re0;
+      *im5 = MIN(*im5, *im0);
       im4 = im4+1;
+      im5 = im5+1;
    }
 }
 sub launcher_0_microcode
-int *img000
-im5 = FIFO0
-img000 = img00
-im4 = im5
+im7 = FIFO1
+im6 = FIFO0
+im4 = im6
+im5 = im7
                         ||                        ||                        ||         do_N0          ||                        
-im3 = img000
+im3 = im4
 im3 = im3+1
-re2 = *img000
+re2 = *im4
 re2 = MIN(re2, *im3)
-im2 = img000
+im2 = im4
 im2 = im2+2
 re1 = re2
 re1 = MIN(re1, *im2)
-im1 = img000
+im1 = im4
 im1 = im1+3
 re0 = re1
 re0 = MIN(re0, *im1)
-im0 = img000
+im0 = im4
 im0 = im0+4
-*im4 = re0
-*im4 = MIN(*im4, *im0)
-img000 = img000+1
+*im5 = re0
+*im5 = MIN(*im5, *im0)
 im4 = im4+1
+im5 = im5+1
                         ||                        ||                        ||          loop          ||                        
 endsub

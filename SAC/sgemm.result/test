@@ -3718,6 +3718,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       if (((m == 0) || (n == 0))
 	  || (((pdata3[0] == zero0) || (k == 0)) && (pdata0[0] == one0)))
 	{
+	  ;
 	}
       else
 	{
@@ -3835,6 +3836,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				      continue;
 				    }
 				}
+			      else
+				{
+				  ;
+				}
 			    }
 			  for (l = 1; l <= k; l++)
 			    {
@@ -3875,6 +3880,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							    1]);
 				      continue;
 				    }
+				}
+			      else
+				{
+				  ;
 				}
 			      continue;
 			    }
@@ -3961,6 +3970,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				      continue;
 				    }
 				}
+			      else
+				{
+				  ;
+				}
 			    }
 			  for (l = 1; l <= k; l++)
 			    {
@@ -4001,6 +4014,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							    1]);
 				      continue;
 				    }
+				}
+			      else
+				{
+				  ;
 				}
 			      continue;
 			    }

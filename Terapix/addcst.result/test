@@ -700,13 +700,13 @@ l99998:
                out[i][j] = in[i][j]+2;
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <argv-R-MAY-{}>
 //  <argv[PHI1]-R-MAY-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
 int main(int argc, char **argv)
 {
@@ -753,11 +753,11 @@ int main(int argc, char **argv)
 
          check += out[i][j];
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("%d\n", check);
    return 0;
@@ -1206,8 +1206,6 @@ l99997:
       in000 += 1;
       out000 += 1;
    }
-
-
 }
 **** check ok ******
 void launcher_0_microcode(int I_3, int *in00, int *out00, int caillou0)
@@ -1226,8 +1224,6 @@ l99997:
       in000 = in000+1;
       out000 = out000+1;
    }
-
-
 }
 void launcher_0_microcode(int I_3, int *in00, int *out00, int caillou0)
 {
@@ -1298,15 +1294,15 @@ void launcher_0_microcode(int *FIFO2, int *FIFO1, int *FIFO0, int N0)
    }
 }
 sub launcher_0_microcode
-seti(ma4, FIFO2)
-      P,im3=FIFO1       ||                        ||                        ||                        ||                        
-      P,im2=FIFO0       ||                        ||                        ||                        ||                        
-        im0=im2         ||                        ||                        ||                        ||                        
-        im1=im3         ||                        ||                        ||                        ||                        
+                        ||       ma4=FIFO2        ||                        ||                        ||                        
+      im,im3=FIFO1      ||                        ||                        ||                        ||                        
+      im,im2=FIFO0      ||                        ||                        ||                        ||                        
+       im,im0=im2       ||                        ||                        ||                        ||                        
+       im,im1=im3       ||                        ||                        ||                        ||                        
                         ||                        ||                        ||         do_N0          ||                        
-psetpi(im1, im0)
+                        ||                        ||       P,im1=im0        ||                        ||                        
 addi(*im1, *ma4)
-        P,im0=E         ||                        ||                        ||                        ||                        
-        P,im1=E         ||                        ||                        ||                        ||                        
+paddi(im0, 1)
+paddi(im1, 1)
                         ||                        ||                        ||          loop          ||                        
 endsub
