@@ -1,6 +1,6 @@
 /*
 
-  $Id: newgen_generic_stack.h 1155 2010-01-07 14:57:47Z coelho $
+  $Id$
 
   Copyright 1989-2010 MINES ParisTech
 
