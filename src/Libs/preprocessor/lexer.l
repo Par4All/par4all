@@ -342,6 +342,10 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 "_Pragma" 	        {
                                 return(TK_PRAGMA);
                         }
+"__va_list" 	        {
+								yylval.string=strdup("__builtin_va_list");
+                                return(TK_IDENT);
+                        }
 
 \'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {
   /* Have a look to Flex A.4.3 too... */
