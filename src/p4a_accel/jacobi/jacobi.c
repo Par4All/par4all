@@ -89,6 +89,7 @@ void compute() {
       save[i][j] = 0.25*(space[i - 1][j] + space[i + 1][j]
 			  + space[i][j - 1] + space[i][j + 1]);
     }
+  
  kernel2:
   for(i = 1;i < SIZE - 1; i++)
     for(j = 1;j < SIZE - 1; j++) {

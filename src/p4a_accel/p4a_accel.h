@@ -57,7 +57,6 @@ void P4A_accel_malloc(void **address, size_t size);
 */
 void P4A_accel_free(void *address);
 
-
 /** Prototype for copying a scalar from the host to a memory zone in the
     hardware accelerator.
 */

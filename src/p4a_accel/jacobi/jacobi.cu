@@ -1,7 +1,5 @@
 /* Adapted from Terapix PIPS output */
 
-#define P4A_DEBUG
-#define P4A_ACCEL_CUDA
 #include <p4a_accel.h>
 
 #include <stdio.h>
@@ -13,6 +11,7 @@ typedef float float_t;
 float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
+
 
 void get_data(char filename[]) {
   int i, j, nx, ny;
@@ -46,8 +45,10 @@ void get_data(char filename[]) {
 
   /* Erase the memory, in case the image is not big enough: */
   for(i = 0; i < SIZE; i++)
-    for(j = 0; j < SIZE; j++)
+    for(j = 0; j < SIZE; j++) {
       space[i][j] = 0;
+      save[i][j] = 0;
+    }
 
   /* Read the pixel grey value: */
   for(j = 0; j < ny; j++)
@@ -89,32 +90,24 @@ void write_data(char filename[]) {
  * file for kernel1.c
  */
 
-P4A_accel_kernel void kernel1(float_t space[SIZE][SIZE],
-			      float_t save[SIZE][SIZE],
-			      int i,
-			      int j) {
-   //int j;
-   {
-      //int i_1;
-      // No need of strip mining in CUDA
-      // for(i_1 = i; i_1 <= MIN(i+9, 62); i_1 += 1)
-      // Already 2D
-      //   for(j = 1; j <= 62; j += 1)
-     save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
-   }
+P4A_accel_kernel kernel1(float_t space[SIZE][SIZE],
+			 float_t save[SIZE][SIZE],
+			 int i,
+			 int j) {
+  save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
 
 
 /*
  * file for launch_kernel1.c
  */
-P4A_accel_kernel_wrapper void kernel1_wrapper(float_t space[SIZE][SIZE],
-					      float_t save[SIZE][SIZE]) {
+P4A_accel_kernel_wrapper kernel1_wrapper(float_t space[SIZE][SIZE],
+					 float_t save[SIZE][SIZE]) {
   int j;
   int i;
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
            could use also a flip-flop dimension instead... */
-kernel1:
+  kernel1:
    //for(i = 1; i <= 62; i += 10)
   /* We need this wrapper to get the virtual processor coordinates
 
@@ -124,7 +117,7 @@ kernel1:
   j = P4A_vp_1;
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
   /* We need a phase to generate this clamping too: */
-  if (i >= 1 && i <= SIZE - 1 && j >= 1 && j <= SIZE - 1)
+  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
     kernel1(space, save, i, j);
 }
 
@@ -132,34 +125,24 @@ kernel1:
  * file for launch_kernel1.c
  */
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
-  // int j;
-  // int i;
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-kernel1:
-   //for(i = 1; i <= 62; i += 10)
-  // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
+  kernel1:
   P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
 }
 
-P4A_accel_kernel void kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE], int i, int j)
+P4A_accel_kernel kernel2(float_t space[SIZE][SIZE], 
+			 float_t save[SIZE][SIZE], 
+			 int i, 
+			 int j)
 {
-   //int j;
-   {
-      //int i_1;
-      // No need of strip mining in CUDA
-      // for(i_1 = i; i_1 <= MIN(i+9, 62); i_1 += 1)
-      // Already 2D
-      //   for(j = 1; j <= 62; j += 1)
-     space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
-   }
+   space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
 
 
 /*
  * file for launch_kernel2.c
  */
-P4A_accel_kernel_wrapper void kernel2_wrapper(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
+P4A_accel_kernel_wrapper kernel2_wrapper(float_t space[SIZE][SIZE], 
+					 float_t save[SIZE][SIZE])
 {
   int j;
   int i;
@@ -175,7 +158,7 @@ kernel2:
   j = P4A_vp_1;
   // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
   /* We need a phase to generate this clamping too: */
-  if (i >= 1 && i <= SIZE - 1 && j >= 1 && j <= SIZE - 1)
+  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
     kernel2(space, save, i, j);
 }
 
@@ -184,11 +167,8 @@ kernel2:
  */
 void launch_kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 {
-  // int j;
-  // int i;
+  printf("On passe bien dans launch_kernel2\n");
 kernel2:
-   //for(i = 1; i <= 62; i += 10)
-  // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
   P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
 }
 
@@ -197,8 +177,8 @@ void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 
   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
      could use also a flip-flop dimension instead... */
-kernel1:   launch_kernel1(space, save);
-kernel2:   launch_kernel2(space, save);
+ kernel1:   launch_kernel1(space, save);
+ kernel2:   launch_kernel2(space, save);
 }
 
 
@@ -215,33 +195,36 @@ int main(int argc, char *argv[]) {
   }
   get_data(argv[1]);
 
-  /* Initialize the border of the destination image, since it is used but
-     never written to: */
+
+  // Initialize the border of the destination image, since it is used but
+  // never written to: 
   for(i = 0; i < SIZE; i++)
     save[i][0] = save[0][i] = save[i][SIZE - 1] = save[SIZE - 1][i] = 0;
 
-  /* Useless to transfer and allocate data everytime... So this should be
-     put at the highest level. It needs the interprocedural PIPS region
-     analysis... :-) */
+  // Useless to transfer and allocate data everytime... So this should be
+  //  put at the highest level. It needs the interprocedural PIPS region
+  //  analysis... :-) 
   float_t (*p4a_var_space)[SIZE][SIZE];
-  P4A_accel_malloc(&p4a_var_space, sizeof(space));
-  P4A_copy_to_accel(space, p4a_var_space, sizeof(space));
+  P4A_accel_malloc((void **) &p4a_var_space, sizeof(space));
+  P4A_copy_to_accel(sizeof(space), space, p4a_var_space);
 
   float_t (*p4a_var_save)[SIZE][SIZE];
-  P4A_accel_malloc(&p4a_var_save, sizeof(save));
-  P4A_copy_to_accel(save, p4a_var_save, sizeof(save));
+  P4A_accel_malloc((void **) &p4a_var_save, sizeof(save));
+  P4A_copy_to_accel(sizeof(space), save, p4a_var_save);
 
   P4A_accel_timer_start;
 
+  
   for(t = 0; t < T; t++)
     compute(*p4a_var_space, *p4a_var_save);
+  
 
   double execution_time = P4A_accel_timer_stop_and_float_measure();
   fprintf(stderr, "Temps d'exécution : %f s\n", execution_time);
   fprintf(stderr, "GFLOPS : %f\n",
 	  4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
-
-  P4A_copy_from_accel(space, p4a_var_space, sizeof(space));
+  
+  P4A_copy_from_accel((size_t)sizeof(space), (void *)space, (void *)p4a_var_space);
 
   P4A_accel_free(p4a_var_space);
   P4A_accel_free(p4a_var_save);
