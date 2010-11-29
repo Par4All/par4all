@@ -2,7 +2,7 @@ void foo()
 {
    int i, tab[4][4];
    for(i = 0; i <= 3; i += 1)
-      if (tab[i][i]>i) 
+      if (tab[i][i]>i)
          tab[i] = i;
 }
 void foo()
@@ -13,7 +13,7 @@ void foo()
    for(i = 0; i <= 3; i += 1) {
       I_0 = tab[i][i]>i;
 #pragma PIPS IF_TO_CONVERT
-      if (I_0) 
+      if (I_0)
          tab[i] = i;
       ;
    }

@@ -29,7 +29,7 @@ int main()
    //  while(1) {
    
    // The train is ON TIME
-ontime:   if (alea()>0.) 
+ontime:   if (alea()>0.)
 
 //  T(b) {b==b#init+1}
 
@@ -37,7 +37,7 @@ ontime:   if (alea()>0.)
 
 //  T(s) {s#init<=s, s<=s#init+1}
 
-   if (alea()>0.) 
+   if (alea()>0.)
 
 //  T(s) {s==s#init+1}
 
@@ -78,7 +78,7 @@ brake:   if (alea()>0.) {
 
 //  T(s) {s#init<=s, s<=s#init+1}
 
-   if (alea()>0.) 
+   if (alea()>0.)
 
 //  T(s) {s==s#init+1}
 
@@ -100,7 +100,7 @@ brake:   if (alea()>0.) {
 
    
    // It stops and waits after 10 beacons
-stopped:   if (alea()>0.) 
+stopped:   if (alea()>0.)
 
 //  T(s) {d==10, s==s#init+1}
 
@@ -119,7 +119,7 @@ stopped:   if (alea()>0.)
 
    
    // the train is LATE
-late:   if (alea()>0.) 
+late:   if (alea()>0.)
 
 //  T(b) {b==b#init+1}
 
@@ -165,7 +165,7 @@ int main()
    //  while(1) {
    
    // The train is ON TIME
-ontime:   if (alea()>0.) 
+ontime:   if (alea()>0.)
 
 //  P(b,d,s) {0<=b, s<=b+9, b<=s+9, 0<=s}
 
@@ -173,7 +173,7 @@ ontime:   if (alea()>0.)
 
 //  P(b,d,s) {0<=b, s<=b+9, b<=s+10, 0<=s}
 
-   if (alea()>0.) 
+   if (alea()>0.)
 
 //  P(b,d,s) {0<=b, s<=b+9, b<=s+10, 0<=s}
 
@@ -214,7 +214,7 @@ brake:   if (alea()>0.) {
 
 //  P(b,d,s) {d+s==b-10, 0<=d, d<=1, 0<=s}
 
-   if (alea()>0.) 
+   if (alea()>0.)
 
 //  P(b,d,s) {d+s==b-10, 0<=d, d<=1, 0<=s}
 
@@ -236,7 +236,7 @@ brake:   if (alea()>0.) {
 
    
    // It stops and waits after 10 beacons
-stopped:   if (alea()>0.) 
+stopped:   if (alea()>0.)
 
 //  P(b,d,s) {d==10, 20<=b, b<=s+20}
 
@@ -255,7 +255,7 @@ stopped:   if (alea()>0.)
 
    
    // the train is LATE
-late:   if (alea()>0.) 
+late:   if (alea()>0.)
 
 //  P(b,d,s) {b==s-10, 0<=b}
 

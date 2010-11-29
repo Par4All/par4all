@@ -1,0 +1,162 @@
+original code
+void P4A_accel_free(void *ptr)
+{
+   free(ptr);
+}
+void P4A_accel_malloc(void **ptr, size_t n)
+{
+   if (n)
+      *ptr = malloc(n);
+   else
+      *ptr = (void *) 0;
+}
+void P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
+void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = host_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
+}
+void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
+{
+   unsigned int i, j;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         if (j%2)
+            result[i][j] = (10*src0[i][j]+90*src1[i][j])/100;
+}
+int main(int argc, char *argv[])
+{
+   int n = atoi(argv[1]);
+   // yes this is unreliable
+   short a[n][n], b[n][n], c[n][n];
+   int i, j;
+   for(i = 0; i <= n-1; i += 1)
+      for(j = 0; j <= n-1; j += 1)
+         c[i][j] = a[i][j] = b[i][j] = i*j;
+   alphablending(n, a, b, c);
+   for(i = 0; i <= n-1; i += 1) {
+      for(j = 0; j <= n-1; j += 1)
+         printf("%hd ", c[i][j]);
+      puts("\n");
+   }
+   return 0;
+}
+with r-w regions
+
+//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2,
+//    PHI2+1<=n}>
+//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+
+void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
+{
+   unsigned int i, j;
+
+//  <result[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2,
+//    PHI2+1<=n}>
+//  <src0[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <src1[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+
+   for(i = 0; i <= n-1; i += 1)
+
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=n, 0<=i,
+//    i+1<=n}>
+//  <src0[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=n, 0<=i,
+//    i+1<=n}>
+//  <src1[PHI1][PHI2]-R-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=n, 0<=i,
+//    i+1<=n}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <result[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+//  <src0[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+//  <src1[PHI1][PHI2]-R-MAY-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+
+         if (j%2)
+
+//  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=n, 0<=j,
+//    j+1<=n}>
+
+            result[i][j] = (10*src0[i][j]+90*src1[i][j])/100;
+}
+isolated code
+void alphablending(int n, short src0[n][n], short src1[n][n], short result[n][n])
+{
+   unsigned int i, j;
+   {
+      //PIPS generated variable
+      short (*src00)[n][n] = (short (*)[n][n]) 0, (*src10)[n][n] = (short (*)[n][n]) 0, (*result0)[n][n] = (short (*)[n][n]) 0;
+      if (n-1>0&&n-1>0&&n-1>0&&n-1>0&&n-1>0&&n-1>0) {
+         P4A_accel_malloc((void **) &result0, sizeof(short)*n*n);
+         P4A_accel_malloc((void **) &src10, sizeof(short)*n*n);
+         P4A_accel_malloc((void **) &src00, sizeof(short)*n*n);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src1[0][0], *src10);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &src0[0][0], *src00);
+         P4A_copy_to_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *result0);
+
+l99998:
+         for(i = 0; i <= n-1; i += 1)
+l99999:
+            for(j = 0; j <= n-1; j += 1)
+               if (j%2)
+                  (*result0)[i-0][j-0] = (10*(*src00)[i-0][j-0]+90*(*src10)[i-0][j-0])/100;
+         P4A_copy_from_accel_2d(sizeof(short), n, n, n, n, 0, 0, &result[0][0], *result0);
+         P4A_accel_free(result0);
+         P4A_accel_free(src10);
+         P4A_accel_free(src00);
+      }
+   }
+}
+

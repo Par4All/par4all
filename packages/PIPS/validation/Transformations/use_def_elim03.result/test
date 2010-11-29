@@ -12,20 +12,20 @@ Code for "USE_DEF_ELIM03"
 
 Code with cumulated effects for "use_def_elim03"
 
-C               <must be read   >: I
-C               <must be written>: I
+C             <    is read   >: I
+C             <    is written>: I
       INTEGER FUNCTION USE_DEF_ELIM03( I)
       INTEGER I, J, K
-C               <must be read   >: I
-C               <must be written>: J
+C             <    is read   >: I
+C             <    is written>: J
 
       J = I+1                                                           0004
-C               <must be written>: I
+C             <    is written>: I
       I = 2                                                             0005
-C               <must be written>: K
+C             <    is written>: K
       K = 3                                                             0006
-C               <must be read   >: J
-C               <must be written>: USE_DEF_ELIM03
+C             <    is read   >: J
+C             <    is written>: USE_DEF_ELIM03
       USE_DEF_ELIM03 = J                                                0007
       END
 

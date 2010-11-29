@@ -116,7 +116,7 @@ void fixrts(float d[], int npoles)
    polish = 1;
    zroots(a, npoles, roots, polish);
    for (j = 1;j<=npoles;j++)
-      if (Cabs(roots[j])>1.0) 
+      if (Cabs(roots[j])>1.0)
          roots[j] = Cdiv(Complex(1.0, 0.0), Conjg(roots[j]));
    a[0] = Csub(Complex(0.0, 0.0), roots[1]);
    a[1] = Complex(1.0, 0.0);

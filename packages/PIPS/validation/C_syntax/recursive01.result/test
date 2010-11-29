@@ -62,7 +62,7 @@ Parsed printed file
 
 int recursive01(int i)
 {
-   if (i>0) 
+   if (i>0)
       i = recursive01(i-1);
    return i;
 }
@@ -71,7 +71,7 @@ Printed file
 
 int recursive01(int i)
 {
-   if (i>0) 
+   if (i>0)
       i = recursive01(i-1);
    return i;
 }

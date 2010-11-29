@@ -18,46 +18,46 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
    float x;
    int i, j;
-//               <must be read   >: n
-//               <must be written>: i
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 1; i <= n; i += 1)
-//               <must be read   >: m n
-//               <must be written>: j
+//             <    is read   >: m n
+//             <    is written>: j
       for(j = 1; j <= m; j += 1) {
-//               <must be read   >: h i j m n
-//               <must be written>: x
+//             <    is read   >: h i j m n
+//             <    is written>: x
          x = i*h+j;
-//               <must be read   >: b[i][j] i j m n x
-//               <must be written>: a[i][j]
+//             <    is read   >: b[i][j] i j m n x
+//             <    is written>: a[i][j]
          a[i][j] = b[i][j]*x;
       }
 }
 
 Cumulated effetcs for "func1"
 
-//               <may be read    >: b[*][*] h
-//               <may be written >: a[*][*]
-//               <must be read   >: m n
+//             <may be read   >: b[*][*] h
+//             <may be written>: a[*][*]
+//             <    is read   >: m n
 void func1(int n, int m, float a[n][m], float b[n][m], float h)
 {
    float x;
    int i, j;
-//               <may be read    >: b[*][*] h i j m x
-//               <may be written >: a[*][*] j x
-//               <must be read   >: n
-//               <must be written>: i
+//             <may be read   >: b[*][*] h i j m x
+//             <may be written>: a[*][*] j x
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 1; i <= n; i += 1)
-//               <may be read    >: b[*][*] h i j x
-//               <may be written >: a[*][*] x
-//               <must be read   >: m n
-//               <must be written>: j
+//             <may be read   >: b[*][*] h i j x
+//             <may be written>: a[*][*] x
+//             <    is read   >: m n
+//             <    is written>: j
       for(j = 1; j <= m; j += 1) {
-//               <must be read   >: h i j m n
-//               <must be written>: x
+//             <    is read   >: h i j m n
+//             <    is written>: x
          x = i*h+j;
-//               <may be read    >: b[*][*]
-//               <may be written >: a[*][*]
-//               <must be read   >: i j m n x
+//             <may be read   >: b[*][*]
+//             <may be written>: a[*][*]
+//             <    is read   >: i j m n x
          a[i][j] = b[i][j]*x;
       }
 }
@@ -68,71 +68,70 @@ int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
-//               <must be written>: i
+//             <    is written>: i
    for(i = 1; i <= 10; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 1; j <= 10; j += 1)
-//               <must be read   >: i j
-//               <must be written>: b[i][j]
+//             <    is read   >: i j
+//             <    is written>: b[i][j]
          b[i][j] = 1.0;
-//               <must be written>: h
+//             <    is written>: h
    h = 2.0;
-//               <may be read    >: b[*][*]
-//               <may be written >: a[*][*]
-//               <must be read   >: h
+//             <may be read   >: b[*][*]
+//             <may be written>: a[*][*]
+//             <    is read   >: h
    func1(10, 10, a, b, h);
-//               <must be written>: i
+//             <    is written>: i
    for(i = 1; i <= 10; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 1; j <= 10; j += 1)
-//               <may be read    >: stderr[0]
-//               <may be written >: stderr[0]
-//               <must be read   >: stderr __IO_EFFECTS:LUNS[2] 
-//                                  a[i][j] i j
-//               <must be written>: __IO_EFFECTS:LUNS[2]
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: a[i][j] i j stderr 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
 Cumulated effetcs for "main"
 
-//               <may be read    >: stderr stderr[0] 
-//                                  __IO_EFFECTS:LUNS[2]
-//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2]
+//             <may be read   >: stderr stderr[0] __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
 int main()
 {
    float a[10][10], b[10][10], h;
    int i, j;
-//               <may be read    >: i j
-//               <may be written >: b[*][*] j
-//               <must be written>: i
+//             <may be read   >: i j
+//             <may be written>: b[*][*] j
+//             <    is written>: i
    for(i = 1; i <= 10; i += 1)
-//               <may be read    >: i j
-//               <may be written >: b[*][*]
-//               <must be written>: j
+//             <may be read   >: i j
+//             <may be written>: b[*][*]
+//             <    is written>: j
       for(j = 1; j <= 10; j += 1)
-//               <may be written >: b[*][*]
-//               <must be read   >: i j
+//             <may be written>: b[*][*]
+//             <    is read   >: i j
          b[i][j] = 1.0;
-//               <must be written>: h
+//             <    is written>: h
    h = 2.0;
-//               <may be read    >: b[*][*]
-//               <may be written >: a[*][*]
-//               <must be read   >: h
+//             <may be read   >: b[*][*]
+//             <may be written>: a[*][*]
+//             <    is read   >: h
    func1(10, 10, a, b, h);
-//               <may be read    >: stderr stderr[0] 
-//                                  __IO_EFFECTS:LUNS[2] a[*][*] i j
-//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2] j
-//               <must be written>: i
+//             <may be read   >: a[*][*] i j stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: j stderr[0] __IO_EFFECTS:LUNS[2]
+//             <    is written>: i
    for(i = 1; i <= 10; i += 1)
-//               <may be read    >: stderr stderr[0] 
-//                                  __IO_EFFECTS:LUNS[2] a[*][*] i j
-//               <may be written >: stderr[0] __IO_EFFECTS:LUNS[2]
-//               <must be written>: j
+//             <may be read   >: a[*][*] i j stderr stderr[0] 
+//                               __IO_EFFECTS:LUNS[2]
+//             <may be written>: stderr[0] __IO_EFFECTS:LUNS[2]
+//             <    is written>: j
       for(j = 1; j <= 10; j += 1)
-//               <may be read    >: stderr[0] a[*][*]
-//               <may be written >: stderr[0]
-//               <must be read   >: stderr __IO_EFFECTS:LUNS[2] i j
-//               <must be written>: __IO_EFFECTS:LUNS[2]
+//             <may be read   >: a[*][*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: i j stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
 
@@ -287,9 +286,9 @@ void func1(int n, int m, float a[n][m], float b[n][m], float h)
       }
 }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
 
 int main()
 {
@@ -305,27 +304,27 @@ int main()
 
    func1(10, 10, a, b, h);
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, 2.0==h, j==11}>
 //  <a[PHI1][PHI2]-IN-EXACT-{1<=PHI1, PHI1<=10, 1<=PHI2, PHI2<=10,
 //    2.0==h, j==11}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0, 2.0==h, j==11}>
 //  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0, 2.0==h, j==11}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2, 2.0==h, j==11}>
 
    for(i = 1; i <= 10; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 1<=PHI2, PHI2<=10, 2.0==h, 1<=i,
 //    i<=10}>
-//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-EXACT-{}>
+//  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==2}>
 
       for(j = 1; j <= 10; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, 2.0==h, 1<=i, i<=10,
 //    1<=j, j<=10}>
 //  <stderr-IN-EXACT-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==2}>
 
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }
@@ -381,13 +380,13 @@ int main()
    func1(10, 10, a, b, h);
    for(i = 1; i <= 10; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=i, i<=10}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0, 1<=i, i<=10}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=i, i<=10}>
 
       for(j = 1; j <= 10; j += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=j, j<=10}>
 //  <stderr[PHI1]-OUT-MAY-{PHI1==0, 1<=j, j<=10}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, 1<=j, j<=10}>
 
          fprintf(stderr, "a[%d] = %f \n", i, a[i][j]);
 }

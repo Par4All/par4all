@@ -33,13 +33,6 @@ apply PARTIAL_EVAL
 display PRINTED_FILE
 
 echo
-echo Code after dead code elimination
-echo
-
-apply SUPPRESS_DEAD_CODE
-display PRINTED_FILE
-
-echo
 echo Code after second  index set splitting
 echo
 

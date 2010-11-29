@@ -32,43 +32,43 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
    int j;                                                               /*0004*/
    int ki;                                                              /*0005*/
    int kj;                                                              /*0006*/
-//               <must be read   >: isi
-//               <must be written>: i
+//             <    is read   >: isi
+//             <    is written>: i
 
    for(i = 0; i <= isi-1; i += 1)
-//               <must be read   >: isi isj
-//               <must be written>: j
+//             <    is read   >: isi isj
+//             <    is written>: j
       for(j = 0; j <= isj-1; j += 1)
-//               <must be read   >: i image[i][j] isi isj j
-//               <must be written>: new_image[i][j]
+//             <    is read   >: i image[i][j] isi isj j
+//             <    is written>: new_image[i][j]
          new_image[i][j] = image[i][j];                                 /*0010*/
 }
 
 Cumulated effects for "convol"
 
-//               <may be read    >: image[*][*]
-//               <may be written >: new_image[*][*]
-//               <must be read   >: isi isj ksi ksj
+//             <may be read   >: image[*][*]
+//             <may be written>: new_image[*][*]
+//             <    is read   >: isi isj ksi ksj
 void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], int ksi, int ksj, float kernel[ksi][ksj])
 {
    int i;                                                               /*0003*/
    int j;                                                               /*0004*/
    int ki;                                                              /*0005*/
    int kj;                                                              /*0006*/
-//               <may be read    >: i image[*][*] isj j
-//               <may be written >: j new_image[*][*]
-//               <must be read   >: isi
-//               <must be written>: i
+//             <may be read   >: i image[*][*] isj j
+//             <may be written>: j new_image[*][*]
+//             <    is read   >: isi
+//             <    is written>: i
 
    for(i = 0; i <= isi-1; i += 1)
-//               <may be read    >: i image[*][*] j
-//               <may be written >: new_image[*][*]
-//               <must be read   >: isi isj
-//               <must be written>: j
+//             <may be read   >: i image[*][*] j
+//             <may be written>: new_image[*][*]
+//             <    is read   >: isi isj
+//             <    is written>: j
       for(j = 0; j <= isj-1; j += 1)
-//               <may be read    >: image[*][*]
-//               <may be written >: new_image[*][*]
-//               <must be read   >: i isi isj j
+//             <may be read   >: image[*][*]
+//             <may be written>: new_image[*][*]
+//             <    is read   >: i isi isj j
          new_image[i][j] = image[i][j];                                 /*0010*/
 }
 

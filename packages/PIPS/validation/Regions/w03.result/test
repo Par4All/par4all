@@ -28,78 +28,78 @@
       INTEGER I, N
       PARAMETER (N=10)
       REAL A(N)
-C               <must be written>: I
+C             <    is written>: I
 
       I = 1                                                             0007
-C               <must be read   >: I
+C             <    is read   >: I
 
       DO WHILE (I.LE.10)                                                0009
-C               <must be read   >: I
-C               <must be written>: A(I)
+C             <    is read   >: I
+C             <    is written>: A(I)
          A(I) = I*1.23                                                  0010
-C               <must be read   >: I
-C               <must be written>: I
+C             <    is read   >: I
+C             <    is written>: I
          I = I+1                                                        0011
       ENDDO
-C               <must be written>: I
+C             <    is written>: I
 
       I = 2                                                             0014
-C               <must be read   >: I
+C             <    is read   >: I
 
       DO WHILE (I.LT.N)                                                 0016
-C               <must be read   >: A(I-1) I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: A(I-1) I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
          PRINT *, A(I-1)                                                0017
-C               <must be read   >: I
-C               <must be written>: I
+C             <    is read   >: I
+C             <    is written>: I
          I = I+1                                                        0018
       ENDDO
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, 'bye'                                                    0021
 
       END
 # cumulated effects
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PROGRAM W03
 
       INTEGER I, N
       PARAMETER (N=10)
       REAL A(N)
-C               <must be written>: I
+C             <    is written>: I
 
       I = 1                                                             0007
-C               <may be written >: A(*) I
-C               <must be read   >: I
+C             <may be written>: A(*) I
+C             <    is read   >: I
 
       DO WHILE (I.LE.10)                                                0009
-C               <may be written >: A(*)
-C               <must be read   >: I
+C             <may be written>: A(*)
+C             <    is read   >: I
          A(I) = I*1.23                                                  0010
-C               <must be read   >: I
-C               <must be written>: I
+C             <    is read   >: I
+C             <    is written>: I
          I = I+1                                                        0011
       ENDDO
-C               <must be written>: I
+C             <    is written>: I
 
       I = 2                                                             0014
-C               <may be read    >: A(*) __IO_EFFECTS:LUNS(6)
-C               <may be written >: I __IO_EFFECTS:LUNS(6)
-C               <must be read   >: I
+C             <may be read   >: A(*) __IO_EFFECTS:LUNS(6)
+C             <may be written>: I __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I
 
       DO WHILE (I.LT.N)                                                 0016
-C               <may be read    >: A(*)
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <may be read   >: A(*)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
          PRINT *, A(I-1)                                                0017
-C               <must be read   >: I
-C               <must be written>: I
+C             <    is read   >: I
+C             <    is written>: I
          I = I+1                                                        0018
       ENDDO
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, 'bye'                                                    0021
 

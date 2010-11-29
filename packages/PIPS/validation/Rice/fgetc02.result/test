@@ -17,27 +17,27 @@ void getimage(void)
    int i, j;
    unsigned char c;
    FILE *fp;
-//               <must be written>: fp
+//             <    is written>: fp
    
    /* To try to avoid fp privatization */
    fp = (void *) 0;
-//               <must be written>: i
+//             <    is written>: i
    
    /* This loops should not be distributed.  On 2009/05/26, if the main()
         is removed, this bug too... */
    for(i = 0; i <= 63; i += 1)
-//               <must be written>: j
+//             <    is written>: j
       for(j = 0; j <= 63; j += 1) {
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
          c = fgetc(fp);
-//               <must be read   >: c i j
-//               <must be written>: imagein_re[i][j]
+//             <    is read   >: c i j
+//             <    is written>: imagein_re[i][j]
          imagein_re[i][j] = c==0?0.0:1.0;
-//               <must be read   >: i j
-//               <must be written>: imagein_im[i][j]
+//             <    is read   >: i j
+//             <    is written>: imagein_im[i][j]
          imagein_im[i][j] = 0.0;
       }
 }
@@ -48,18 +48,18 @@ Check the chains of "getimage"
  *********************** Use-Def Chains *********************
 
 	30 --> 30 with conflicts
-		from <imagein_im[i][j]-W-MUST> to <imagein_im[i][j]-W-MUST>
+		from <imagein_im[i][j]-W-EXACT> to <imagein_im[i][j]-W-EXACT>
 	30 --> 28 with conflicts
-		from <imagein_im[i][j]-W-MUST> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <imagein_im[i][j]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	30 --> -1 with conflicts
-		from <j-R-MUST> to <j-W-MUST>
+		from <j-R-EXACT> to <j-W-EXACT>
 	29 --> 29 with conflicts
-		from <imagein_re[i][j]-W-MUST> to <imagein_re[i][j]-W-MUST>
+		from <imagein_re[i][j]-W-EXACT> to <imagein_re[i][j]-W-EXACT>
 	29 --> 28 with conflicts
-		from <imagein_re[i][j]-W-MUST> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <c-R-MUST> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <imagein_re[i][j]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	29 --> -1 with conflicts
-		from <j-R-MUST> to <j-W-MUST>
+		from <j-R-EXACT> to <j-W-EXACT>
 	28 --> 28 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
@@ -67,9 +67,9 @@ Check the chains of "getimage"
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	-1 --> -1 with conflicts
-		from <j-W-MUST> to <j-W-MUST>
+		from <j-W-EXACT> to <j-W-EXACT>
 	22 --> 28 with conflicts
-		from <fp-W-MUST> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-		from <fp-W-MUST> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <fp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <fp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 
 ****************** End of Dependence Graph ******************

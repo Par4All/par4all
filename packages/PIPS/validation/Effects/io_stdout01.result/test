@@ -3,15 +3,15 @@ proper pointer effects
 
 int main()
 {
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    (void) printf("coucou\n");
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    (void) fprintf(stdout, "coucou\n");
    return 0;
 }
@@ -20,15 +20,15 @@ proper effects
 
 int main()
 {
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    (void) printf("coucou\n");
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    (void) fprintf(stdout, "coucou\n");
    return 0;
 }
@@ -37,13 +37,13 @@ proper pointer effects with USER_EFFECTS_ON_STD_FILES TRUE
 
 int main()
 {
-//               <may be read    >: stdout[0] __IO_EFFECTS:LUNS[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[*]
-//               <must be read   >: stdout
+//             <may be read   >: stdout[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stdout
    (void) printf("coucou\n");
-//               <may be read    >: stdout[0] __IO_EFFECTS:LUNS[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[*]
-//               <must be read   >: stdout
+//             <may be read   >: stdout[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: stdout
    (void) fprintf(stdout, "coucou\n");
    return 0;
 }
@@ -52,15 +52,15 @@ proper effects with USER_EFFECTS_ON_STD_FILES TRUE
 
 int main()
 {
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
    (void) printf("coucou\n");
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE* 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
    (void) fprintf(stdout, "coucou\n");
    return 0;
 }

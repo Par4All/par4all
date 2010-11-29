@@ -1,6 +1,16 @@
 #! /bin/sh
 
-# NOT PORTABLE AT ALL, DEPENDS ON THE FORTRAN COMPILER
+# The purpose was to make sure that the precompilation mecanism works
+# for Fortran code and that errors are detected as expected. Because
+# the workspace creation fails, the key user warning "Fortran syntax
+# errors in file ./syntax_errors.f!" is lost because it is stored in
+# file Warnings within a directory that is instantly destroyed.
+
+# So the only way to get the useful message is to search the string
+# "Fortran syntax errors in file" in the process output
+
+# NOT PORTABLE AT ALL, DEPENDS ON THE FORTRAN COMPILER, if the
+# compiler error message are checked too
 
 {
 echo "-- test with the property"
@@ -15,6 +25,6 @@ export PIPS_CHECK_FORTRAN
 ${pips_version:-pips} \
 	-f syntax_errors.f \
  	syntax_error 
-} 2>&1 | sed -e 's/.*Aborted.*/Aborted/'
+} 2>&1 | grep 'Fortran syntax errors in file'
 
 Delete syntax_error

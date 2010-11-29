@@ -416,30 +416,30 @@ C    NTTMP==4000}>
 
       IF (NPTMP.NE.NP) STOP                                             0272
 
+C  <V(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=800,
+C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000}>
-C  <V(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=800, 1<=PHI2, PHI2<=800,
-C    KM==1, KP==2, NPTMP==800, NTTMP==4000}>
 
       DO I = 1, NP                                                      0273
 
+C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, 1<=PHI2, PHI2<=800, KM==1, KP==2,
+C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
-C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
-C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, 1<=PHI2, PHI2<=800, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800}>
 
          DO J = 1, NP                                                   0274
 
+C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, KM==1, KP==2, NPTMP==800,
+C    NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==3, KM==1, KP==2,
 C    NPTMP==800, NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
-C  <V(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, KM==1, KP==2, NPTMP==800,
-C    NTTMP==4000, 1<=I, I<=800, 1<=J, J<=800}>
 
             READ (3, *) V(I,J)                                          0275
          ENDDO
@@ -1544,29 +1544,29 @@ C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
       WRITE (2, *) NT                                                   0676
 
+C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=4000,
+C    I==51, KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000}>
-C  <SISMO(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=50, 1<=PHI2, PHI2<=4000,
-C    I==51, KM+KP==3, N==4001, NPTMP==800, NTTMP==4000}>
 
       DO K = 1, NBTRAC                                                  0677
 
+C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, 1<=PHI2, PHI2<=4000, I==51,
+C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
-C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, 1<=PHI2, PHI2<=4000, I==51,
-C    KM+KP==3, N==4001, NPTMP==800, NTTMP==4000, 1<=K, K<=50}>
 
          DO J = 1, NT                                                   0678
 
+C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, I==51, KM+KP==3,
+C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==2, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==2, I==51, KM+KP==3,
-C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
-C  <SISMO(PHI1,PHI2)-R-EXACT-{PHI1==K, PHI2==J, I==51, KM+KP==3,
 C    N==4001, NPTMP==800, NTTMP==4000, 1<=J, J<=4000, 1<=K, K<=50}>
 
             WRITE (2, *) SISMO(K,J)                                     0679

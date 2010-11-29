@@ -1,6 +1,6 @@
 from pyps import *
 
-w = workspace(['jacobi.c','p4a_stubs.c'])
+w = workspace('jacobi.c','p4a_stubs.c',deleteOnClose=True)
 
 w.set_property(loop_normalize_one_increment = True,
                loop_normalize_lower_bound=0,

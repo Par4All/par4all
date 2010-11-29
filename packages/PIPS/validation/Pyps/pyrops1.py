@@ -7,7 +7,7 @@ import shutil,os,pyrops
 
 #launcher = pyrops.getWorkspaceLauncher(["properties.c"])
 #w = launcher.getObj()
-with pworkspace("properties.c") as w:
+with pworkspace("properties.c",deleteOnClose=True) as w:
 	#Get foo function
 	foo = w.fun.foo
 	

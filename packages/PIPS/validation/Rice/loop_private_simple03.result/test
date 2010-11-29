@@ -5,14 +5,14 @@ int main()
 {
    float a[10];
    int i;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1) {
       float z;
-//               <must be written>: z
+//             <    is written>: z
       z = 0.0;
-//               <must be read   >: i z
-//               <must be written>: a[i]
+//             <    is read   >: i z
+//             <    is written>: a[i]
       a[i] = z;
    }
    return 0;

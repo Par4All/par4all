@@ -1,6 +1,6 @@
 --- Without interprocedural transformers and preconditions
 --- An unknown upper bound variable appears because of N
-C                                                          2*U_N_0 - 8 (SUMMARY)
+C                                   2*COMPLEXITY:UNKNOWN_VARIABLE0 - 8 (SUMMARY)
       PROGRAM EM
 C                                                                    1 (STMT)
       N1 = 10                                                           0002

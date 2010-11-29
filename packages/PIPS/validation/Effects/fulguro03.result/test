@@ -1,84 +1,83 @@
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//               <must be read   >: vct vct[0][.array]
-//               <must be written>: array_s
+//             <    is read   >: vct vct[0].array
+//             <    is written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
-//               <must be read   >: dat dat[0][.array] 
-//                                  dat[0][.array][row] row
-//               <must be written>: array_d
+//             <    is read   >: dat dat[0].array dat[0].array[row] 
+//                               row
+//             <    is written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
-//               <must be read   >: vct vct[0][.spp]
-//               <must be written>: I_0
+//             <    is read   >: vct vct[0].spp
+//             <    is written>: I_0
    int I_0 = vct->spp;                                                  /*0017*/
    {
       register fgUINT16 val;                                            /*0019*/
       register int i;                                                   /*0020*/
       register int k;                                                   /*0021*/
       unsigned short _return0;                                          /*0022*/
-//               <must be read   >: I_0 col
-//               <must be written>: i
+//             <    is read   >: I_0 col
+//             <    is written>: i
       i = col*I_0;
-//               <must be read   >: I_0
-//               <must be written>: k
+//             <    is read   >: I_0
+//             <    is written>: k
       for(k = 0; k <= I_0-1; k += 1) {
-//               <must be read   >: I_0 array_s array_s[k] k
-//               <must be written>: _return0
+//             <    is read   >: I_0 array_s array_s[k] k
+//             <    is written>: _return0
          _return0 = array_s[k];                                         /*0024*/
-//               <must be read   >: I_0 _return0
-//               <must be written>: val
+//             <    is read   >: I_0 _return0
+//             <    is written>: val
          val = _return0;                                                /*0025*/
-//               <must be read   >: I_0 array_d i val
-//               <must be written>: array_d[i]
+//             <    is read   >: I_0 array_d i val
+//             <    is written>: array_d[i]
          array_d[i] = val;                                              /*0026*/
-//               <must be read   >: I_0 i
-//               <must be written>: i
+//             <    is read   >: I_0 i
+//             <    is written>: i
          i++;
       }
    }
 }
-//               <may be read    >: dat[0][.array][*] 
-//                                  vct[0][.array][*]
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: col dat dat[0][.array] row vct 
-//                                  vct[0][.array] vct[0][.spp]
+//             <may be read   >: dat[0].array[*] vct[0].array[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: col dat dat[0].array row vct 
+//                               vct[0].array vct[0].spp
 void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
 {
-//               <must be read   >: vct vct[0][.array]
-//               <must be written>: array_s
+//             <    is read   >: vct vct[0].array
+//             <    is written>: array_s
    fgUINT16 *array_s = (fgUINT16 *) vct->array;                         /*0015*/
-//               <may be read    >: dat[0][.array][*]
-//               <must be read   >: dat dat[0][.array] row
-//               <must be written>: array_d
+//             <may be read   >: dat[0].array[*]
+//             <    is read   >: dat dat[0].array row
+//             <    is written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];                  /*0016*/
-//               <must be read   >: vct vct[0][.spp]
-//               <must be written>: I_0
+//             <    is read   >: vct vct[0].spp
+//             <    is written>: I_0
    int I_0 = vct->spp;                                                  /*0017*/
    {
       register fgUINT16 val;                                            /*0019*/
       register int i;                                                   /*0020*/
       register int k;                                                   /*0021*/
       unsigned short _return0;                                          /*0022*/
-//               <must be read   >: I_0 col
-//               <must be written>: i
+//             <    is read   >: I_0 col
+//             <    is written>: i
       i = col*I_0;
-//               <may be read    >: _return0 array_d array_s 
-//                                  array_s[*] i k val
-//               <may be written >: _return0 array_d[*] i val
-//               <must be read   >: I_0
-//               <must be written>: k
+//             <may be read   >: _return0 array_d array_s array_s[*] i
+//                               k val
+//             <may be written>: _return0 array_d[*] i val
+//             <    is read   >: I_0
+//             <    is written>: k
       for(k = 0; k <= I_0-1; k += 1) {
-//               <may be read    >: array_s[*]
-//               <must be read   >: I_0 array_s k
-//               <must be written>: _return0
+//             <may be read   >: array_s[*]
+//             <    is read   >: I_0 array_s k
+//             <    is written>: _return0
          _return0 = array_s[k];                                         /*0024*/
-//               <must be read   >: I_0 _return0
-//               <must be written>: val
+//             <    is read   >: I_0 _return0
+//             <    is written>: val
          val = _return0;                                                /*0025*/
-//               <may be written >: array_d[*]
-//               <must be read   >: I_0 array_d i val
+//             <may be written>: array_d[*]
+//             <    is read   >: I_0 array_d i val
          array_d[i] = val;                                              /*0026*/
-//               <must be read   >: I_0 i
-//               <must be written>: i
+//             <    is read   >: I_0 i
+//             <    is written>: i
          i++;
       }
    }

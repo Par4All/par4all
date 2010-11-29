@@ -24,9 +24,9 @@ C     in declarations.
 
       REAL X(1234567890)
 
+C  <X(PHI1)-R-EXACT-{PHI1==1}>
 C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
 C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
-C  <X(PHI1)-R-EXACT-{PHI1==1}>
 
       PRINT *, X(1)                                                     0007
 

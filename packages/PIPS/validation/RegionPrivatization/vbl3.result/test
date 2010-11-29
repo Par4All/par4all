@@ -150,12 +150,12 @@ C    V6==128, V7==128, T8<=N, 0<=T8}>
             CALL INTNL(OUTPUT, T8, V8, VSTAB, N)                        0052
          ENDDO
 
-C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, F3==200, H2==512,
-C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
-C    V6==128, V7==128, V8==128, T8<=N, 0<=T8}>
 C  <OUTPUT(PHI1,PHI2)-IN-EXACT-{PHI1==T8, 0<=PHI2, PHI2<=127, F3==200,
 C    H2==512, T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128,
 C    V5==128, V6==128, V7==128, V8==128, T8<=N, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, F3==200, H2==512,
+C    T1==32768T8+32768, T5==64T8+64, T7==8T8+8, V3==128, V5==128,
+C    V6==128, V7==128, V8==128, T8<=N, 0<=T8}>
 
          WRITE (*, 6) (OUTPUT(T8,I), I = 0, 127)                        0054
       ENDDO
@@ -185,9 +185,9 @@ c     integer h2
 
       DO T8 = 0, N                                                      0023
 
-C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T8+6<=PHI1+N, 0<=T8}>
 C  <VSTAB(PHI1,PHI2)-OUT-EXACT-{0<=PHI1, PHI1<=N, 8T8<=PHI1,
 C    PHI1<=8T8+7, 0<=PHI2, PHI2<=127, T8<=N, 0<=T8}>
+C  <__IO_EFFECTS:LUNS(PHI1)-OUT-EXACT-{PHI1==5, T8+6<=PHI1+N, 0<=T8}>
 
          DO T7 = 8*T8, 8*T8+7                                           0024
 

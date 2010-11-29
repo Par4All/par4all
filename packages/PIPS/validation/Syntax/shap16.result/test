@@ -22,7 +22,7 @@ C$PIPS STATEMENT FUNCTION DF3 SUBSTITUTED
 ! declarations
 !
       REAL DFXI(4), XI
-C               <must be written>: DFXI(3)
+C             <    is written>: DFXI(3)
 !
 ! macros
 !

@@ -3,28 +3,28 @@ Source code with proper effects
 
 double call11(void)
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 3.;                                                       /*0007*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0008*/
-//               <must be read   >: x
+//             <    is read   >: x
 
    return x;                                                            /*0010*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
 double call11(void)
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 3.;                                                       /*0007*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0008*/
-//               <must be read   >: x
+//             <    is read   >: x
 
    return x;                                                            /*0010*/
 }

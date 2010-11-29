@@ -18,7 +18,7 @@ void main(int n)
 //  T(d,s,t) {d#init==0, s#init==0, t#init==0, 0<=d, s<=3d, s<=2d+2t,
 //    d<=s+2t, 0<=n, t<=n, s<=2, 0<=t}
 
-   while (s<=2&&t<=n) 
+   while (s<=2&&t<=n)
 
 //  T(d,s,t) {d+t==d#init+t#init+1, 0<=n, t#init<=n,
 //    s#init+3t#init+1<=s+3t, s+3t<=3t#init+3, t#init<=t, t<=t#init+1}
@@ -69,7 +69,7 @@ void main(int n)
 
 //  P(d,s,t) {d==0, s==0, t==0, 0<=n}
 
-   while (s<=2&&t<=n) 
+   while (s<=2&&t<=n)
 
 //  P(d,s,t) {0<=d, s<=3d, s<=2d+2t, d<=s+2t, t<=n, s<=2, 0<=t}
 
@@ -107,7 +107,7 @@ void main(int n)
 {
    int s = 0, t = 0, d = 0;
    n>=0?(void) 0:__assert_fail("n>=0", "./car-safety-2.c", 18, (const char *) 0);
-   while (s<=2&&t<=n) 
+   while (s<=2&&t<=n)
       if (alea())
          t++, s = 0;
       else

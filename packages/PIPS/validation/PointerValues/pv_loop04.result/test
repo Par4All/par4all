@@ -1,0 +1,34 @@
+int main()
+{
+
+// Pointer values: none
+
+   int i;
+
+// Pointer values: none
+
+   int *p[10];
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int a[10];
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+      p[i] = &a[i];
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+   return 0;
+}

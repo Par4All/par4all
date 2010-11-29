@@ -14,17 +14,17 @@ Proper effetcs for "memmove02"
 
 int main()
 {
-//               <may be written >: str[*]
+//             <may be written>: str[*]
    char str[] = "can be very useful......";
    char str2[40];
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: _MEMMOVE_EFFECTS:_MEMMOVE_ 
-//                                  str2[0:11-1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: str2[0:11-1] 
+//                               _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(str2, str+15, 11);
-//               <may be read    >: stdout[0] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(str2);
    return 0;
 }

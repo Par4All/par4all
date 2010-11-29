@@ -14,9 +14,9 @@ char isme(int elligent)
    int rovertit;
 #pragma omp parallel for 
 donne:
-   for(rovertit = 0; rovertit <= elligent-1; rovertit += N)
+   for(rovertit = 0; rovertit <= elligent-1-(N-1); rovertit += N)
 #pragma omp parallel for 
-      for(roverti = rovertit; roverti <= MIN(rovertit+N, elligent-1); roverti += 2)
+      for(roverti = rovertit; roverti <= MIN(rovertit+N, elligent-1+2)-1; roverti += 2)
          repide[roverti] = 1;
 }
 

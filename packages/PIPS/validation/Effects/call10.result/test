@@ -28,43 +28,43 @@ Proper effects for "call10"
 void call10(int i, int x[10], int j, int y[10])
 {
    int k, l;
-//               <must be read   >: i
-//               <must be written>: k
+//             <    is read   >: i
+//             <    is written>: k
 
    for(k = 0; k <= i-1; k += 1)
-//               <must be read   >: i
-//               <must be written>: x[i]
+//             <    is read   >: i
+//             <    is written>: x[i]
       x[i] = 0;
-//               <must be read   >: j
-//               <must be written>: l
+//             <    is read   >: j
+//             <    is written>: l
    for(l = 0; l <= j-1; l += 1)
-//               <must be read   >: i j
-//               <must be written>: y[i]
+//             <    is read   >: i j
+//             <    is written>: y[i]
       y[i] = 0;
 }
 
 Cumulated effects for "call10"
 
-//               <may be written >: x[*] y[*]
-//               <must be read   >: i j
+//             <may be written>: x[*] y[*]
+//             <    is read   >: i j
 void call10(int i, int x[10], int j, int y[10])
 {
    int k, l;
-//               <may be written >: x[*]
-//               <must be read   >: i
-//               <must be written>: k
+//             <may be written>: x[*]
+//             <    is read   >: i
+//             <    is written>: k
 
    for(k = 0; k <= i-1; k += 1)
-//               <may be written >: x[*]
-//               <must be read   >: i
+//             <may be written>: x[*]
+//             <    is read   >: i
       x[i] = 0;
-//               <may be read    >: i
-//               <may be written >: y[*]
-//               <must be read   >: j
-//               <must be written>: l
+//             <may be read   >: i
+//             <may be written>: y[*]
+//             <    is read   >: j
+//             <    is written>: l
    for(l = 0; l <= j-1; l += 1)
-//               <may be written >: y[*]
-//               <must be read   >: i j
+//             <may be written>: y[*]
+//             <    is read   >: i j
       y[i] = 0;
 }
 
@@ -73,10 +73,10 @@ Proper effects for "main"
 int main()
 {
    tf_t s;
-//               <must be written>: sp
+//             <    is written>: sp
    tf_t *sp = &s;
-//               <may be written >: s[.two][*] sp[0][.two][*]
-//               <must be read   >: s[.one] sp sp[0][.one]
+//             <may be written>: s.two[*] sp[0].two[*]
+//             <    is read   >: s.one sp sp[0].one
 
    call10(s.one, s.two, sp->one, sp->two);
 }
@@ -86,10 +86,10 @@ Cumulated effects for "main"
 int main()
 {
    tf_t s;
-//               <must be written>: sp
+//             <    is written>: sp
    tf_t *sp = &s;
-//               <may be written >: s[.two][*] sp[0][.two][*]
-//               <must be read   >: s[.one] sp sp[0][.one]
+//             <may be written>: s.two[*] sp[0].two[*]
+//             <    is read   >: s.one sp sp[0].one
 
    call10(s.one, s.two, sp->one, sp->two);
 }
@@ -132,11 +132,11 @@ int main()
 
    tf_t *sp = &s;
 
-//  <s[.one]-R-EXACT-{}>
-//  <s[.two][PHI2]-W-MAY-{1<=PHI2}>
-//  <sp[PHI1][.one]-R-EXACT-{PHI1==0}>
+//  <s.one-R-EXACT-{}>
+//  <s.two[PHI2]-W-MAY-{1<=PHI2}>
 //  <sp-R-EXACT-{}>
-//  <sp[PHI1][.two][PHI3]-W-MAY-{PHI1==0}>
+//  <sp[PHI1].one-R-EXACT-{PHI1==0}>
+//  <sp[PHI1].two[PHI3]-W-MAY-{PHI1==0}>
 
 
    call10(s.one, s.two, sp->one, sp->two);

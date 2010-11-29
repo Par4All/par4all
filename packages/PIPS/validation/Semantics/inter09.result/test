@@ -10,16 +10,16 @@ Proper effects for "inter09"
 
 int inter09(int i)
 {
-//               <must be read   >: i
+//             <    is read   >: i
    return i+1;
 }
 
 Cumulated effects for "inter09"
 
-//               <must be read   >: i
+//             <    is read   >: i
 int inter09(int i)
 {
-//               <must be read   >: i
+//             <    is read   >: i
    return i+1;
 }
 

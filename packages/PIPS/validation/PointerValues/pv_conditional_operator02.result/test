@@ -6,71 +6,71 @@ int main()
    mystruct s1, s2, s3;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    int b = 1, c = 2;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
 
    s2.a = &b;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == &b (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == &b (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    s3.a = &c;
 
 // Pointer values:
-// s1[.a] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s1[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.a] == &b (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.a] == &c (exact);
-// s3[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.a == &b (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.a == &c (exact);
+// s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    s1 = c==d?s2:s3;
 
 // Pointer values:
-// s1[.a] == s2[.a] (may);
-// s1[.a] == s3[.a] (may);
-// s1[.b][*] == s2[.b][*] (may);
-// s1[.b][*] == s3[.b][*] (may);
-// s1[.c] == s2[.c] (may);
-// s1[.c] == s3[.c] (may);
-// s2[.a] == &b (exact);
-// s2[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s2[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.a] == &c (exact);
-// s3[.b][*] == *ANY_MODULE*:*UNDEFINED* (exact);
-// s3[.c] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s1.a == s2.a (may);
+// s1.a == s3.a (may);
+// s1.b[*] == s2.b[*] (may);
+// s1.b[*] == s3.b[*] (may);
+// s1.c == s2.c (may);
+// s1.c == s3.c (may);
+// s2.a == &b (exact);
+// s2.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s2.c == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.a == &c (exact);
+// s3.b[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+// s3.c == *ANY_MODULE*:*UNDEFINED* (exact);
 
    return 0;
 }

@@ -1,0 +1,24 @@
+int main()
+{
+
+// Pointer values: none
+
+   int i;
+
+// Pointer values: none
+
+   int a[10];
+
+// Pointer values: none
+
+
+   for(i = 0; i <= 9; i += 1)
+
+// Pointer values: none
+
+      a[i] = i;
+
+// Pointer values: none
+
+   return 0;
+}

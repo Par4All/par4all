@@ -4,6 +4,7 @@ delete $WS
 create $WS $WS.c include/par4all.c
 
 module lonesome_cowboy
+activate MUST_REGIONS
 
 echo original code
 display PRINTED_FILE[%ALLFUNC]

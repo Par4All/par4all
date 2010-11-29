@@ -41,24 +41,24 @@ Userview with proper effects
       IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, I                                                        0005
 
 100   CONTINUE                                                          0007
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0008
 
 200   CONTINUE                                                          0010
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0011
 
 300   CONTINUE                                                          0013
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0014
 
 400   CONTINUE                                                          0016
@@ -67,8 +67,8 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
 
 Userview with cumulated effects
 
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       SUBROUTINE GOTOC(I)
 
       IF (I.EQ.1) THEN                                                  0003
@@ -80,24 +80,24 @@ C               <must be written>: __IO_EFFECTS:LUNS(6)
       IF (I.EQ.3) THEN                                                  0003
          GOTO 300
       ENDIF
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, I                                                        0005
 
 100   CONTINUE                                                          0007
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0008
 
 200   CONTINUE                                                          0010
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0011
 
 300   CONTINUE                                                          0013
-C               <must be read   >: I __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: I __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, I                                                        0014
 
 400   CONTINUE                                                          0016

@@ -10,7 +10,7 @@ Proper effects for "inter08"
 
 void inter08(int i)
 {
-//               <must be written>: i
+//             <    is written>: i
    i = 1;
 }
 
@@ -18,7 +18,7 @@ Cumulated effects for "inter08"
 
 void inter08(int i)
 {
-//               <must be written>: i
+//             <    is written>: i
    i = 1;
 }
 

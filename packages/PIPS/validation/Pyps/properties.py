@@ -4,7 +4,7 @@ from __future__ import with_statement # this is to work with python2.5
 # import everything so that a session looks like tpips one
 from pyps import workspace
 
-with workspace("properties.c") as w:
+with workspace("properties.c",deleteOnClose=True) as w:
 	#Get foo function
 	foo = w.fun.foo
 	

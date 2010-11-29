@@ -24,7 +24,7 @@ int main()
 //  T(x,y) {x#init==0, y#init==50, x<=99, y<=x+50, x+2450<=50y, 50<=y}
 
 
-   while (x<100) 
+   while (x<100)
 
 //  T(x,y) {x==x#init+1, x+50y#init<=50y+50, y#init<=y, y<=y#init+1}
 
@@ -47,7 +47,7 @@ int main()
 //  T() {x==100, 52<=y, y<=150}
 
 
-   if (y==100) 
+   if (y==100)
 
 //  T() {x==100, y==100}
 
@@ -79,7 +79,7 @@ int main()
 //  P(x,y,z) {x==0, y==50}
 
 
-   while (x<100) 
+   while (x<100)
 
 //  P(x,y,z) {x<=99, y<=x+50, x+1200<=25y, 50<=y}
 
@@ -102,7 +102,7 @@ int main()
 //  P(x,y,z) {x==100, 53<=y, y<=150}
 
 
-   if (y==100) 
+   if (y==100)
 
 //  P(x,y,z) {x==100, y==100}
 
@@ -119,7 +119,7 @@ int main()
    x = 0;
    y = 50;
 
-   while (x<100) 
+   while (x<100)
       if (x<50)
          x++;
       else {
@@ -127,7 +127,7 @@ int main()
          y++;
       }
 
-   if (y==100) 
+   if (y==100)
       printf("property  verified\n");
    ;
 }

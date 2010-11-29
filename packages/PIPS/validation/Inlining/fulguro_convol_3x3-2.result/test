@@ -71,7 +71,7 @@ void flgr1d_import_raw_fgUINT16(FLGR_Data1D *datdest, void *raw)
    datsrc->spp = datdest->spp;
    datsrc->length = datdest->length;
    datsrc->array = (fgUINT16 *) raw;
-   if (raw!=(void *) 0) 
+   if (raw!=(void *) 0)
       memcpy(datdest->array, datsrc->array, datdest->bps*datdest->length*datdest->spp/8);
 }
 void flgr2d_apply_raster_scan_method_fgUINT16(FLGR_Data2D *nhb)
@@ -119,7 +119,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
-   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK) 
+   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK)
       return ret;
 
    if (datdest->type==FLGR_UINT16)
@@ -179,7 +179,7 @@ FLGR_Data2D * flgr2d_create(int size_y, int size_x, int spp, FLGR_Type type, FLG
 {
    
    
-   if (type==FLGR_UINT16) 
+   if (type==FLGR_UINT16)
       return flgr2d_create_fgUINT16(size_y, size_x, spp, shape, connexity);
    fprintf(stderr, "Type unknown!\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 1615, __FUNCTION__);
    flgr_backtrace_print();
@@ -272,9 +272,9 @@ FLGR_NhbBox2D * flgr2d_create_neighbor_box(FLGR_Data2D *data)
    typeSize = flgr_get_sizeof(data->type);
    sizeMax = data->size_x*data->size_y;
 
-   if (typeSize<1) 
+   if (typeSize<1)
       return (void *) 0;
-   if (data->spp<1) 
+   if (data->spp<1)
       return (void *) 0;
    
    
@@ -335,7 +335,7 @@ FLGR_Data2D * flgr2d_create_neighborhood(int size_y, int size_x, int spp, FLGR_T
       flgr_backtrace_print();
       return (void *) 0;
    }
-   if ((nhb = flgr2d_create(size_y, size_x, spp, type, shape, connexity))==(void *) 0) 
+   if ((nhb = flgr2d_create(size_y, size_x, spp, type, shape, connexity))==(void *) 0)
       return (void *) 0;
 
    if (flgr2d_fill_neighborhood(nhb, shape, size_x, size_y)!=FLGR_RET_OK) {
@@ -530,26 +530,26 @@ void flgr2d_draw_filled_ellipse_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int a
    long int t = -(a2*y);
    long int dxt = 2*b2*x, dyt = -(2*a2*y);
    long int d2xt = 2*b2, d2yt = 2*a2;
-   while (y>=0&&x<=a) 
+   while (y>=0&&x<=a)
       if (t+b2*x<=crit1||t+a2*y<=crit3) {
          x++, dxt += d2xt, t += dxt;
          width += 2;
       }
       else if (t-a2*y>crit2) {
          flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy-y, width, color);
-         if (y!=0) 
+         if (y!=0)
             flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy+y, width, color);
          y--, dyt += d2yt, t += dyt;
       }
       else {
          flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy-y, width, color);
-         if (y!=0) 
+         if (y!=0)
             flgr2d_draw_horizontal_line_fgUINT16(dat, cx-x, cy+y, width, color);
          x++, dxt += d2xt, t += dxt;
          y--, dyt += d2yt, t += dyt;
          width += 2;
       }
-   if (b==0) 
+   if (b==0)
       flgr2d_draw_horizontal_line_fgUINT16(dat, cx-a, cy, 2*a+1, color);
    return;
 }
@@ -622,13 +622,13 @@ void flgr2d_draw_line_fgUINT16(FLGR_Data2D *dat, int x1, int y1, int x2, int y2,
 }
 void flgr2d_draw_point_fgUINT16(FLGR_Data2D *dat, int x, int y, FLGR_Vector *color)
 {
-   if (y<0) 
+   if (y<0)
       return;
-   if (x<0) 
+   if (x<0)
       return;
-   if (y>=dat->size_y) 
+   if (y>=dat->size_y)
       return;
-   if (x>=dat->size_x) 
+   if (x>=dat->size_x)
       return;
    flgr2d_set_data_vector_fgUINT16(dat, y, x, color);
    return;
@@ -665,7 +665,7 @@ FLGR_Ret flgr2d_fill_neighborhood(FLGR_Data2D *nhb, FLGR_Shape shape, int width,
       width = 0;
    }
 
-   if (width%2==0) 
+   if (width%2==0)
       width++;
 
    if (height>nhb->size_y) {
@@ -680,7 +680,7 @@ FLGR_Ret flgr2d_fill_neighborhood(FLGR_Data2D *nhb, FLGR_Shape shape, int width,
       height = 0;
    }
 
-   if (height%2==0) 
+   if (height%2==0)
       height++;
    
    
@@ -753,7 +753,7 @@ FLGR_Ret flgr2d_fill_nhb_even_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
    }
 
    ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
-   if (ret!=FLGR_RET_OK) 
+   if (ret!=FLGR_RET_OK)
       return ret;
 
    flgr2d_fill_nhb_even_rows_fgUINT16(datdest, datsrc);
@@ -804,7 +804,7 @@ FLGR_Ret flgr2d_fill_nhb_odd_rows(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
    }
 
    ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
-   if (ret!=FLGR_RET_OK) 
+   if (ret!=FLGR_RET_OK)
       return ret;
 
    flgr2d_fill_nhb_odd_rows_fgUINT16(datdest, datsrc);
@@ -853,9 +853,9 @@ FLGR_Ret flgr2d_fill_nhbs_for_6_connexity(FLGR_Data2D *nhbEven, FLGR_Data2D *nhb
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
-   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhbOdd, __FUNCTION__))!=FLGR_RET_OK) 
+   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhbOdd, __FUNCTION__))!=FLGR_RET_OK)
       return ret;
-   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhb, __FUNCTION__))!=FLGR_RET_OK) 
+   if ((ret = flgr2d_is_data_same_attributes(nhbEven, nhb, __FUNCTION__))!=FLGR_RET_OK)
       return ret;
 
    if (SYM==FLGR_NHB_SYM)
@@ -1003,7 +1003,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
          tmp = tmp+a*b;
          sum = sum+fabs(b);
       }
-      if (sum!=0) 
+      if (sum!=0)
          flgr_set_array_fgUINT16(presult, k, (fgUINT16) (tmp/sum));
    }
    return;
@@ -1076,7 +1076,7 @@ FLGR_Ret flgr2d_is_data_same_size(FLGR_Data2D *data1, FLGR_Data2D *data2)
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
-   if (data1->size_y!=data2->size_y||data1->size_x!=data2->size_x) 
+   if (data1->size_y!=data2->size_y||data1->size_x!=data2->size_x)
       return FLGR_RET_SIZE_ERROR;
 
    return FLGR_RET_OK;
@@ -1090,12 +1090,12 @@ FLGR_Ret flgr2d_is_data_same_spp(FLGR_Data2D *dat1, FLGR_Data2D *dat2)
    }
    
    
-   if (dat1->spp<0) 
+   if (dat1->spp<0)
       return FLGR_RET_VECTOR_SIZE_DIFFERENT;
-   if (dat2->spp<0) 
+   if (dat2->spp<0)
       return FLGR_RET_VECTOR_SIZE_DIFFERENT;
 
-   if (dat1->spp!=dat2->spp) 
+   if (dat1->spp!=dat2->spp)
       return FLGR_RET_VECTOR_SIZE_DIFFERENT;
 
    return FLGR_RET_OK;
@@ -1108,12 +1108,12 @@ FLGR_Ret flgr2d_is_data_same_type(FLGR_Data2D *data1, FLGR_Data2D *data2)
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
-   if ((ret = flgr_is_data_type_valid(data1->type))!=FLGR_RET_OK) 
+   if ((ret = flgr_is_data_type_valid(data1->type))!=FLGR_RET_OK)
       return ret;
-   if ((ret = flgr_is_data_type_valid(data2->type))!=FLGR_RET_OK) 
+   if ((ret = flgr_is_data_type_valid(data2->type))!=FLGR_RET_OK)
       return ret;
 
-   if (data1->type!=data2->type) 
+   if (data1->type!=data2->type)
       return FLGR_RET_TYPE_DIFFERENT;
 
    return FLGR_RET_OK;
@@ -1128,7 +1128,7 @@ FLGR_Ret flgr2d_mirror_horizontal(FLGR_Data2D *datdest, FLGR_Data2D *datsrc)
    }
 
    ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__);
-   if (ret!=FLGR_RET_OK) 
+   if (ret!=FLGR_RET_OK)
       return ret;
 
    flgr2d_mirror_horizontal_fgUINT16(datdest, datsrc);
@@ -1580,27 +1580,27 @@ FLGR_Type flgr_get_type_from_string(char *type)
 {
    
    
-   if (strcmp(type, "fgBIT")==0) 
+   if (strcmp(type, "fgBIT")==0)
       return FLGR_BIT;
-   if (strcmp(type, "fgUINT8")==0) 
+   if (strcmp(type, "fgUINT8")==0)
       return FLGR_UINT8;
-   if (strcmp(type, "fgUINT16")==0) 
+   if (strcmp(type, "fgUINT16")==0)
       return FLGR_UINT16;
-   if (strcmp(type, "fgUINT32")==0) 
+   if (strcmp(type, "fgUINT32")==0)
       return FLGR_UINT32;
-   if (strcmp(type, "fgUINT64")==0) 
+   if (strcmp(type, "fgUINT64")==0)
       return FLGR_UINT64;
-   if (strcmp(type, "fgINT8")==0) 
+   if (strcmp(type, "fgINT8")==0)
       return FLGR_INT8;
-   if (strcmp(type, "fgINT16")==0) 
+   if (strcmp(type, "fgINT16")==0)
       return FLGR_INT16;
-   if (strcmp(type, "fgINT32")==0) 
+   if (strcmp(type, "fgINT32")==0)
       return FLGR_INT32;
-   if (strcmp(type, "fgINT64")==0) 
+   if (strcmp(type, "fgINT64")==0)
       return FLGR_INT64;
-   if (strcmp(type, "fgFLOAT32")==0) 
+   if (strcmp(type, "fgFLOAT32")==0)
       return FLGR_FLOAT32;
-   if (strcmp(type, "fgFLOAT64")==0) 
+   if (strcmp(type, "fgFLOAT64")==0)
       return FLGR_FLOAT64;
 
    fprintf(stderr, "Unknown type %s\n""ERROR: File %s, Line %d, Function %s: ", "include/fulguro/fulguro-included.h", 977, __FUNCTION__, type);
@@ -2357,7 +2357,7 @@ FLGR_Ret flgr2d_convolution(FLGR_Data2D *datdest, FLGR_Data2D *datsrc, FLGR_Data
       flgr_backtrace_print();
       return FLGR_RET_NULL_OBJECT;
    }
-   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK) 
+   if ((ret = flgr2d_is_data_same_attributes(datdest, datsrc, __FUNCTION__))!=FLGR_RET_OK)
       return ret;
 
    if (datdest->type==FLGR_UINT16) {

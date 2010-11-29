@@ -28,7 +28,7 @@ void p4a_kernel_wrapper_0(int N, double array[N], int k)
 }
 [after unsplit and recovering]
 /*
- * file for kernel_load_store02.c
+ * file for kernel_load_store02.tmp.c
  */
 /* Test kernel_load_store on a scalar modification.
 */

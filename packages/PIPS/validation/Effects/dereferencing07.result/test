@@ -3,8 +3,8 @@ Proper pointer effects for "foo"
 
 void foo(int *col)
 {
-//               <must be read   >: col col[0]
-//               <must be written>: col
+//             <    is read   >: col col[0]
+//             <    is written>: col
    *col++;                                                              /*0009*/
 
    return;                                                              /*0011*/
@@ -15,14 +15,14 @@ Proper pointer effects for "main"
 int main()
 {
    int x, tab1[10], tab2[10], *p;                                       /*0016*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x++;                                                                 /*0017*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x += 3;                                                              /*0018*/
-//               <must be read   >: p tab1[tab2[x]] tab2[x] x
-//               <must be written>: p[tab1[tab2[x]]]
+//             <    is read   >: p tab1[tab2[x]] tab2[x] x
+//             <    is written>: p[tab1[tab2[x]]]
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
    return 1;                                                            /*0020*/
 }
@@ -57,8 +57,8 @@ Proper effects for "foo"
 
 void foo(int *col)
 {
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: col
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: col
    *col++;                                                              /*0009*/
 
    return;                                                              /*0011*/
@@ -69,14 +69,14 @@ Proper effects for "main"
 int main()
 {
    int x, tab1[10], tab2[10], *p;                                       /*0016*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x++;                                                                 /*0017*/
-//               <must be read   >: x
-//               <must be written>: x
+//             <    is read   >: x
+//             <    is written>: x
    x += 3;                                                              /*0018*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p tab1[tab2[x]] tab2[x] x
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p tab1[tab2[x]] tab2[x] x
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
    return 1;                                                            /*0020*/
 }
@@ -97,11 +97,11 @@ int main()
 
    x += 3;                                                              /*0018*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <p-R-EXACT-{}>
 //  <tab1[PHI1]-R-MAY-{}>
 //  <tab2[PHI1]-R-EXACT-{PHI1==x}>
 //  <x-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
    return 1;                                                            /*0020*/

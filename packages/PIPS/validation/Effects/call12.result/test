@@ -26,38 +26,38 @@ Proper effects for "call12"
 void call12(int n, int m, int x[n][m])
 {
    int i, j;
-//               <must be read   >: n
-//               <must be written>: i
+//             <    is read   >: n
+//             <    is written>: i
 
    for(i = 0; i <= n-1; i += 1)
-//               <must be read   >: m n
-//               <must be written>: j
+//             <    is read   >: m n
+//             <    is written>: j
       for(j = 0; j <= m-1; j += 1)
-//               <must be read   >: i j m n
-//               <must be written>: x[i][j]
+//             <    is read   >: i j m n
+//             <    is written>: x[i][j]
          x[i][j] = 0;
 }
 
 Cumulated effects for "call12"
 
-//               <may be written >: x[*][*]
-//               <must be read   >: m n
+//             <may be written>: x[*][*]
+//             <    is read   >: m n
 void call12(int n, int m, int x[n][m])
 {
    int i, j;
-//               <may be read    >: i j m
-//               <may be written >: j x[*][*]
-//               <must be read   >: n
-//               <must be written>: i
+//             <may be read   >: i j m
+//             <may be written>: j x[*][*]
+//             <    is read   >: n
+//             <    is written>: i
 
    for(i = 0; i <= n-1; i += 1)
-//               <may be read    >: i j
-//               <may be written >: x[*][*]
-//               <must be read   >: m n
-//               <must be written>: j
+//             <may be read   >: i j
+//             <may be written>: x[*][*]
+//             <    is read   >: m n
+//             <    is written>: j
       for(j = 0; j <= m-1; j += 1)
-//               <may be written >: x[*][*]
-//               <must be read   >: i j m n
+//             <may be written>: x[*][*]
+//             <    is read   >: i j m n
          x[i][j] = 0;
 }
 
@@ -65,25 +65,25 @@ Proper effects for "main"
 
 int main()
 {
-//               <must be written>: d1
+//             <    is written>: d1
    int d1 = 10;
-//               <must be written>: d2
+//             <    is written>: d2
    int d2 = 10;
-//               <must be written>: d3
+//             <    is written>: d3
    int d3 = 10;
-//               <must be written>: d4
+//             <    is written>: d4
    int d4 = 10;
    int y[d1][d2][d3][d4];
    int i, j;
-//               <must be read   >: d1
-//               <must be written>: i
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <must be read   >: d1 d2
-//               <must be written>: j
+//             <    is read   >: d1 d2
+//             <    is written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <may be written >: y[i][j][*][*]
-//               <must be read   >: d1 d2 d3 d4 i j
+//             <may be written>: y[i][j][*][*]
+//             <    is read   >: d1 d2 d3 d4 i j
          call12(d3, d4, y[i][j]);
 }
 
@@ -91,29 +91,29 @@ Cumulated effects for "main"
 
 int main()
 {
-//               <must be written>: d1
+//             <    is written>: d1
    int d1 = 10;
-//               <must be written>: d2
+//             <    is written>: d2
    int d2 = 10;
-//               <must be written>: d3
+//             <    is written>: d3
    int d3 = 10;
-//               <must be written>: d4
+//             <    is written>: d4
    int d4 = 10;
    int y[d1][d2][d3][d4];
    int i, j;
-//               <may be read    >: d2 d3 d4 i j
-//               <may be written >: j y[*][*][*][*]
-//               <must be read   >: d1
-//               <must be written>: i
+//             <may be read   >: d2 d3 d4 i j
+//             <may be written>: j y[*][*][*][*]
+//             <    is read   >: d1
+//             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
-//               <may be read    >: d3 d4 i j
-//               <may be written >: y[*][*][*][*]
-//               <must be read   >: d1 d2
-//               <must be written>: j
+//             <may be read   >: d3 d4 i j
+//             <may be written>: y[*][*][*][*]
+//             <    is read   >: d1 d2
+//             <    is written>: j
       for(j = 0; j <= d2-1; j += 1)
-//               <may be written >: y[*][*][*][*]
-//               <must be read   >: d1 d2 d3 d4 i j
+//             <may be written>: y[*][*][*][*]
+//             <    is read   >: d1 d2 d3 d4 i j
          call12(d3, d4, y[i][j]);
 }
 

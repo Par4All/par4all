@@ -19,7 +19,7 @@ int control02(int *in, int *val)
    if (!1) {
    }
 break_1:   ;
-   if (val) 
+   if (val)
       *val = *in;
    return 0;
 }

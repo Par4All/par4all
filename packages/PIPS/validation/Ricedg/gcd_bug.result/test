@@ -8,35 +8,35 @@ Privatize scalar variables
  **************** Effective Dependence Graph ****************
 
 	18 --> -1 with conflicts
-		from <Matrix[i][j]-W-MUST> to <j-W-MUST> at levels  1
+		from <Matrix[i][j]-W-EXACT> to <j-W-EXACT> at levels  1
 	18 --> -1 with conflicts
-		from <Matrix[i]-R-MUST> to <j-W-MUST> at levels  1
+		from <Matrix[i]-R-EXACT> to <j-W-EXACT> at levels  1
 	18 --> 15 with conflicts
-		from <Matrix[i][j]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <Matrix[i][j]-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 	18 --> 15 with conflicts
-		from <Matrix[i]-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <Matrix[i]-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 	-1 --> 15 with conflicts
-		from <j-W-MUST> to <Matrix[i]-W-MUST> at levels  1
+		from <j-W-EXACT> to <Matrix[i]-W-EXACT> at levels  1
 	15 --> 18 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i][j]-W-MUST> at levels  1 2
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <Matrix[i][j]-W-EXACT> at levels  1 2
 	15 --> 18 with conflicts
-		from <Matrix[i]-W-MUST> to <Matrix[i][j]-W-MUST> at levels  2
+		from <Matrix[i]-W-EXACT> to <Matrix[i][j]-W-EXACT> at levels  2
 	15 --> 18 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i]-R-MUST> at levels  1 2
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <Matrix[i]-R-EXACT> at levels  1 2
 	15 --> 18 with conflicts
-		from <Matrix[i]-W-MUST> to <Matrix[i]-R-MUST> at levels  2
+		from <Matrix[i]-W-EXACT> to <Matrix[i]-R-EXACT> at levels  2
 	15 --> -1 with conflicts
-		from <Matrix[i]-W-MUST> to <j-W-MUST> at levels  1 2
+		from <Matrix[i]-W-EXACT> to <j-W-EXACT> at levels  1 2
 	15 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 	15 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <Matrix[i]-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <Matrix[i]-W-EXACT> at levels  1
 	15 --> 15 with conflicts
-		from <Matrix[i]-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <Matrix[i]-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 	15 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-W-MUST> to <_MALLOC_EFFECTS:_MALLOC_-R-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> at levels  1
 	15 --> 15 with conflicts
-		from <_MALLOC_EFFECTS:_MALLOC_-R-MUST> to <_MALLOC_EFFECTS:_MALLOC_-W-MUST> at levels  1
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 
 ****************** End of Dependence Graph ******************
 

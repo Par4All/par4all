@@ -9,7 +9,7 @@ void P4A_sesam_task_0()
    P_0 = sesam_map_data(0);
    sesam_wait_dispo(0, 0, 1, 0);
    for(i = 1; i <= 100; i += 1)
-      P_0[-1+i] = -1+i;
+      P_0[i-1] = i-1;
    sesam_send_dispo(0, 0, 0);
    sesam_unmap_data(P_0);
    sesam_chown_data(0, 1);
@@ -28,7 +28,7 @@ void P4A_sesam_task_1()
    sesam_wait_dispo(0, 0, 0, 0);
 
    for(i = 1; i <= 100; i += 1)
-      P_1[-1+i] = P_2[-1+i]*2+1;
+      P_1[i-1] = P_2[i-1]*2+1;
    sesam_send_dispo(1, 0, 0);
    sesam_send_dispo(0, 0, 1);
    sesam_unmap_data(P_1);

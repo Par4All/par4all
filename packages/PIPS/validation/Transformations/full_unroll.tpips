@@ -15,9 +15,10 @@ echo
 
 setproperty INLINING_PURGE_LABELS FALSE
 apply UNFOLDING[foo]
-setproperty LOOP_LABEL "l1"
+apply FLAG_LOOPS
+setproperty LOOP_LABEL "l99998"
 apply FULL_UNROLL[foo]
-setproperty LOOP_LABEL "l0"
+setproperty LOOP_LABEL "l99997"
 apply FULL_UNROLL[foo]
 display PRINTED_FILE[foo]
 

@@ -6,21 +6,21 @@ int main()
    float a[10];                                                         /*0005*/
    // comments 1
    int i, j;                                                            /*0007*/
-//               <must be written>: x
+//             <    is written>: x
    float x = 2.12;                                                      /*0008*/
    {
-//               <must be written>: z
+//             <    is written>: z
       float z = 3.0;                                                    /*0011*/
-//               <must be read   >: x z
-//               <must be written>: x
+//             <    is read   >: x z
+//             <    is written>: x
       x += z;                                                           /*0012*/
    }
-//               <must be written>: i
+//             <    is written>: i
    for(i = 0; i <= 9; i += 1) {
-//               <must be written>: y
+//             <    is written>: y
       float y = 2.0;                                                    /*0015*/
-//               <must be read   >: i x y
-//               <must be written>: a[i]
+//             <    is read   >: i x y
+//             <    is written>: a[i]
       a[i] = x*y;                                                       /*0016*/
    }
 }
@@ -79,7 +79,7 @@ Dependence graph for "main"
  **************** Effective Dependence Graph ****************
 
 	15 --> 16 with conflicts
-		from <y-W-MUST> to <y-R-MUST> at levels  2
+		from <y-W-EXACT> to <y-R-EXACT> at levels  2
 
 ****************** End of Dependence Graph ******************
 

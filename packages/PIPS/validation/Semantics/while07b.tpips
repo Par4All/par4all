@@ -1,5 +1,5 @@
-delete while07
-create while07 while07.c
+delete while07b
+create while07b while07.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
@@ -47,8 +47,6 @@ display PRINTED_FILE[main]
 apply UNSPLIT[%PROGRAM]
 
 close
-
+delete while07b
 quit
-
-
 

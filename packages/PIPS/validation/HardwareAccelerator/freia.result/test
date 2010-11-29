@@ -273,562 +273,532 @@ freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_absdiff(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_absdiff_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_add(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_add_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_addsat(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_addsat_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_and(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_and_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_cast(freia_data2d *o, const freia_data2d *i)
 {
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c0 c1 i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c0 c1 i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_convolution(freia_data2d *o, const freia_data2d *i, const int32_t *k, uint32_t c0, uint32_t c1)
 {
-//               <must be read   >: c0 c1 i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c0 c1 i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|*k|c0&c1;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_copy(freia_data2d *o, const freia_data2d *i)
 {
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_dilate_6c(freia_data2d *o, const freia_data2d *i, const int32_t *k)
 {
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|*k;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_dilate_8c(freia_data2d *o, const freia_data2d *i, const int32_t *k)
 {
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|*k;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_div(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_div_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_erode_6c(freia_data2d *o, const freia_data2d *i, const int32_t *k)
 {
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|*k;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_erode_8c(freia_data2d *o, const freia_data2d *i, const int32_t *k)
 {
-//               <must be read   >: i i[0][.stuff] k k[0] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff k k[0] o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|*k;
    return FREIA_OK;
 }
-//               <must be read   >: c i0 i0[0][.stuff] i1 
-//                                  i1[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_fast_correlation(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1, uint32_t c)
 {
-//               <must be read   >: c i0 i0[0][.stuff] i1 
-//                                  i1[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff|(int32_t) c;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
 freia_status freia_aipo_global_max(const freia_data2d *i, int32_t *r)
 {
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
    *r = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] r0 r1 r2
-//               <must be written>: r0[0] r1[0] r2[0]
+//             <    is read   >: i i[0].stuff r0 r1 r2
+//             <    is written>: r0[0] r1[0] r2[0]
 freia_status freia_aipo_global_max_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
 {
-//               <must be read   >: i i[0][.stuff] r0
-//               <must be written>: r0[0]
+//             <    is read   >: i i[0].stuff r0
+//             <    is written>: r0[0]
    *r0 = i->stuff;
-//               <must be read   >: i i[0][.stuff] r1
-//               <must be written>: r1[0]
+//             <    is read   >: i i[0].stuff r1
+//             <    is written>: r1[0]
    *r1 = i->stuff;
-//               <must be read   >: i i[0][.stuff] r2
-//               <must be written>: r2[0]
+//             <    is read   >: i i[0].stuff r2
+//             <    is written>: r2[0]
    *r2 = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
 freia_status freia_aipo_global_min(const freia_data2d *i, int32_t *r)
 {
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
    *r = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] r0 r1 r2
-//               <must be written>: r0[0] r1[0] r2[0]
+//             <    is read   >: i i[0].stuff r0 r1 r2
+//             <    is written>: r0[0] r1[0] r2[0]
 freia_status freia_aipo_global_min_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
 {
-//               <must be read   >: i i[0][.stuff] r0
-//               <must be written>: r0[0]
+//             <    is read   >: i i[0].stuff r0
+//             <    is written>: r0[0]
    *r0 = i->stuff;
-//               <must be read   >: i i[0][.stuff] r1
-//               <must be written>: r1[0]
+//             <    is read   >: i i[0].stuff r1
+//             <    is written>: r1[0]
    *r1 = i->stuff;
-//               <must be read   >: i i[0][.stuff] r2
-//               <must be written>: r2[0]
+//             <    is read   >: i i[0].stuff r2
+//             <    is written>: r2[0]
    *r2 = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
 freia_status freia_aipo_global_vol(const freia_data2d *i, int32_t *r)
 {
-//               <must be read   >: i i[0][.stuff] r
-//               <must be written>: r[0]
+//             <    is read   >: i i[0].stuff r
+//             <    is written>: r[0]
    *r = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_inf(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_inf_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_mul(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_mul_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_not(freia_data2d *o, const freia_data2d *i)
 {
-//               <must be read   >: i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_or(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_or_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: c o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_set_constant(freia_data2d *o, int32_t c)
 {
-//               <must be read   >: c o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c o
+//             <    is written>: o[0].stuff
    o->stuff = c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_sub(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_sub_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_subsat(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_subsat_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_sup(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_sup_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <may be read    >: c1 c2
-//               <must be read   >: b i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <may be read   >: c1 c2
+//             <    is read   >: b i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_threshold(freia_data2d *o, const freia_data2d *i, int32_t c1, int32_t c2, bool b)
 {
-//               <may be read    >: c1 c2
-//               <must be read   >: b i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <may be read   >: c1 c2
+//             <    is read   >: b i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|b?c1:c2;
    return FREIA_OK;
 }
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_xor(freia_data2d *o, const freia_data2d *i0, const freia_data2d *i1)
 {
-//               <must be read   >: i0 i0[0][.stuff] i1 i1[0][.stuff] 
-//                                  o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: i0 i0[0].stuff i1 i1[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i0->stuff|i1->stuff;
    return FREIA_OK;
 }
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_aipo_xor_const(freia_data2d *o, const freia_data2d *i, int32_t c)
 {
-//               <must be read   >: c i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c;
    return FREIA_OK;
 }
-//               <must be read   >: c1 c2 i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_cipo_gradient(freia_data2d *o, const freia_data2d *i, int32_t c1, uint32_t c2)
 {
-//               <must be read   >: c1 c2 i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c1+c2;
    return FREIA_OK;
 }
-//               <must be read   >: c1 c2 i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
 freia_status freia_cipo_inner_gradient(freia_data2d *o, const freia_data2d *i, int32_t c1, uint32_t c2)
 {
-//               <must be read   >: c1 c2 i i[0][.stuff] o
-//               <must be written>: o[0][.stuff]
+//             <    is read   >: c1 c2 i i[0].stuff o
+//             <    is written>: o[0].stuff
    o->stuff = i->stuff|c1+c2;
    return FREIA_OK;
 }
-//               <must be read   >: global_io_effect n
-//               <must be written>: global_io_effect n[0][.stuff]
+//             <    is read   >: n global_io_effect
+//             <    is written>: n[0].stuff global_io_effect
 freia_status freia_common_close_input(freia_dataio *n)
 {
-//               <must be read   >: n
-//               <must be written>: n[0][.stuff]
+//             <    is read   >: n
+//             <    is written>: n[0].stuff
    n->stuff = 0;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: global_io_effect n
-//               <must be written>: global_io_effect n[0][.stuff]
+//             <    is read   >: n global_io_effect
+//             <    is written>: n[0].stuff global_io_effect
 freia_status freia_common_close_output(freia_dataio *n)
 {
-//               <must be read   >: n
-//               <must be written>: n[0][.stuff]
+//             <    is read   >: n
+//             <    is written>: n[0].stuff
    n->stuff = 0;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ x y z
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: x y z _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 freia_data2d * freia_common_create_data(uint32_t x, uint32_t y, uint32_t z)
 {
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ img
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: img _MALLOC_EFFECTS:_MALLOC_
    freia_data2d *img = (freia_data2d *) malloc(sizeof(freia_data2d));
-//               <must be read   >: img x y z
-//               <must be written>: img[0][.stuff]
+//             <    is read   >: img x y z
+//             <    is written>: img[0].stuff
    img->stuff = (int32_t) (x&y&z);
-//               <must be read   >: img
+//             <    is read   >: img
    return img;
 }
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ img
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: img _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 freia_status freia_common_destruct_data(freia_data2d *img)
 {
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ img
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: img _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(img);
    return FREIA_OK;
 }
-//               <must be read   >: color image image[0][.stuff] x1 x2
-//                                  y1 y2
-//               <must be written>: image[0][.stuff]
+//             <    is read   >: color image image[0].stuff x1 x2 y1 
+//                               y2
+//             <    is written>: image[0].stuff
 freia_status freia_common_draw_line(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
-//               <must be read   >: color image image[0][.stuff] x1 x2
-//                                  y1 y2
-//               <must be written>: image[0][.stuff]
+//             <    is read   >: color image image[0].stuff x1 x2 y1 
+//                               y2
+//             <    is written>: image[0].stuff
    image->stuff += color+x1+y1+x2+y2;
 }
-//               <must be read   >: color image image[0][.stuff] x1 x2
-//                                  y1 y2
-//               <must be written>: image[0][.stuff]
+//             <    is read   >: color image image[0].stuff x1 x2 y1 
+//                               y2
+//             <    is written>: image[0].stuff
 freia_status freia_common_draw_rect(freia_data2d *image, int32_t x1, int32_t y1, int32_t x2, int32_t y2, int32_t color)
 {
-//               <must be read   >: color image image[0][.stuff] x1 x2
-//                                  y1 y2
-//               <must be written>: image[0][.stuff]
+//             <    is read   >: color image image[0].stuff x1 x2 y1 
+//                               y2
+//             <    is written>: image[0].stuff
    image->stuff += color+x1+y1+x2+y2;
 }
-//               <must be read   >: global_io_effect in n
-//               <must be written>: global_io_effect in[0][.stuff] 
-//                                  in[0][.framewidth] 
-//                                  in[0][.frameheight] 
-//                                  in[0][.framebpp]
+//             <    is read   >: in n global_io_effect
+//             <    is written>: in[0].framebpp in[0].frameheight 
+//                               in[0].framewidth in[0].stuff 
+//                               global_io_effect
 freia_status freia_common_open_input(freia_dataio *in, uint32_t n)
 {
-//               <must be read   >: in
-//               <must be written>: in[0][.framebpp]
+//             <    is read   >: in
+//             <    is written>: in[0].framebpp
    in->framebpp = 16;
-//               <must be read   >: in
-//               <must be written>: in[0][.frameheight]
+//             <    is read   >: in
+//             <    is written>: in[0].frameheight
    in->frameheight = 256;
-//               <must be read   >: in
-//               <must be written>: in[0][.framewidth]
+//             <    is read   >: in
+//             <    is written>: in[0].framewidth
    in->framewidth = 512;
-//               <must be read   >: in n
-//               <must be written>: in[0][.stuff]
+//             <    is read   >: in n
+//             <    is written>: in[0].stuff
    in->stuff = n;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: global_io_effect b h n out w
-//               <must be written>: global_io_effect out[0][.stuff] 
-//                                  out[0][.framewidth] 
-//                                  out[0][.frameheight] 
-//                                  out[0][.framebpp]
+//             <    is read   >: b h n out w global_io_effect
+//             <    is written>: out[0].framebpp out[0].frameheight 
+//                               out[0].framewidth out[0].stuff 
+//                               global_io_effect
 freia_status freia_common_open_output(freia_dataio *out, uint32_t n, uint32_t w, uint32_t h, uint32_t b)
 {
-//               <must be read   >: b out
-//               <must be written>: out[0][.framebpp]
+//             <    is read   >: b out
+//             <    is written>: out[0].framebpp
    out->framebpp = b;
-//               <must be read   >: h out
-//               <must be written>: out[0][.frameheight]
+//             <    is read   >: h out
+//             <    is written>: out[0].frameheight
    out->frameheight = h;
-//               <must be read   >: out w
-//               <must be written>: out[0][.framewidth]
+//             <    is read   >: out w
+//             <    is written>: out[0].framewidth
    out->framewidth = w;
-//               <must be read   >: n out
-//               <must be written>: out[0][.stuff]
+//             <    is read   >: n out
+//             <    is written>: out[0].stuff
    out->stuff = n;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: global_io_effect img in 
-//                                  in[0][.stuff]
-//               <must be written>: global_io_effect img[0][.stuff]
+//             <    is read   >: img in in[0].stuff global_io_effect
+//             <    is written>: img[0].stuff global_io_effect
 freia_status freia_common_rx_image(freia_data2d *img, freia_dataio *in)
 {
-//               <must be read   >: img in in[0][.stuff]
-//               <must be written>: img[0][.stuff]
+//             <    is read   >: img in in[0].stuff
+//             <    is written>: img[0].stuff
    img->stuff = in->stuff;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }
-//               <must be read   >: global_io_effect img 
-//                                  img[0][.stuff] out out[0][.stuff]
-//               <must be written>: global_io_effect out[0][.stuff]
+//             <    is read   >: img img[0].stuff out out[0].stuff 
+//                               global_io_effect
+//             <    is written>: out[0].stuff global_io_effect
 freia_status freia_common_tx_image(const freia_data2d *img, freia_dataio *out)
 {
-//               <must be read   >: img img[0][.stuff] out 
-//                                  out[0][.stuff]
-//               <must be written>: out[0][.stuff]
+//             <    is read   >: img img[0].stuff out out[0].stuff
+//             <    is written>: out[0].stuff
    out->stuff += img->stuff;
-//               <must be read   >: global_io_effect
-//               <must be written>: global_io_effect
+//             <    is read   >: global_io_effect
+//             <    is written>: global_io_effect
    global_io_effect++;
    return FREIA_OK;
 }

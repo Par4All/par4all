@@ -21,39 +21,39 @@ Proper effects
       INTEGER I
       INTEGER J
       INTEGER K
-C               <must be written>: I
+C             <    is written>: I
 
       I = 2                                                             0007
-C               <must be written>: J
+C             <    is written>: J
       J = 3                                                             0008
-C               <must be read   >: I J
-C               <must be written>: K
+C             <    is read   >: I J
+C             <    is written>: K
       K = IAND(I, J)                                                    0009
-C               <must be read   >: K __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: K __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, 'K = ', K                                                0010
 
       END
 
 Cumulated effetcs
 
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PROGRAM IAND01
 
       INTEGER I
       INTEGER J
       INTEGER K
-C               <must be written>: I
+C             <    is written>: I
 
       I = 2                                                             0007
-C               <must be written>: J
+C             <    is written>: J
       J = 3                                                             0008
-C               <must be read   >: I J
-C               <must be written>: K
+C             <    is read   >: I J
+C             <    is written>: K
       K = IAND(I, J)                                                    0009
-C               <must be read   >: K __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: K __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, 'K = ', K                                                0010
 
       END

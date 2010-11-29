@@ -1,17 +1,17 @@
 void foo()
 {
    int i = 0;
-   if (i) 
+   if (i)
       printf("yes");
-   if (i) 
+   if (i)
       i++;
 }
 void foo()
 {
    int i = 0;
-   if (i) 
+   if (i)
       printf("yes");
-   if (i) 
+   if (i)
       i++;
 }
 

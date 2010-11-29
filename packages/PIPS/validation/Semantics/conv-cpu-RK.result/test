@@ -58,46 +58,44 @@ Check preconditions for "conv_cpu"
 
 Cumulated effects for "conv_cpu"
 
-//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
-//                                  a21 a22 c
-//               <may be written >: c[*]
-//               <must be read   >: n
+//             <may be read   >: a a[*] a00 a01 a02 a10 a11 a12 a20 
+//                               a21 a22 c
+//             <may be written>: c[*]
+//             <    is read   >: n
 void conv_cpu(float *a, float *c, int n, float a00, float a10, float a20, float a01, float a11, float a21, float a02, float a12, float a22)
 {
    int i, j;
-//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
-//                                  a21 a22 c i j
-//               <may be written >: c[*] j
-//               <must be read   >: n
-//               <must be written>: i
+//             <may be read   >: a a[*] a00 a01 a02 a10 a11 a12 a20 
+//                               a21 a22 c i j
+//             <may be written>: c[*] j
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 0; i <= n-1; i += 1)
-//               <may be read    >: a a[*] a00 a01 a02 a10 a11 a12 a20
-//                                  a21 a22 c i j
-//               <may be written >: c[*]
-//               <must be read   >: n
-//               <must be written>: j
+//             <may be read   >: a a[*] a00 a01 a02 a10 a11 a12 a20 
+//                               a21 a22 c i j
+//             <may be written>: c[*]
+//             <    is read   >: n
+//             <    is written>: j
       for(j = 0; j <= n-1; j += 1) {
-//               <must be read   >: i j n
-//               <must be written>: idx
+//             <    is read   >: i j n
+//             <    is written>: idx
          int idx = i*n+j;
 
-//               <must be read   >: i
-//               <must be written>: right
+//             <    is read   >: i
+//             <    is written>: right
          _Bool right = i>0;
-//               <must be read   >: i n
-//               <must be written>: left
+//             <    is read   >: i n
+//             <    is written>: left
          _Bool left = i<n-1;
-//               <must be read   >: j
-//               <must be written>: top
+//             <    is read   >: j
+//             <    is written>: top
          _Bool top = j>0;
-//               <must be read   >: j n
-//               <must be written>: bottom
+//             <    is read   >: j n
+//             <    is written>: bottom
          _Bool bottom = j<n-1;
-//               <may be read    >: a[*] a00 a01 a02 a10 a12 a20 a21 
-//                                  a22
-//               <may be written >: c[*]
-//               <must be read   >: a a11 bottom c idx left n right 
-//                                  top
+//             <may be read   >: a[*] a00 a01 a02 a10 a12 a20 a21 a22
+//             <may be written>: c[*]
+//             <    is read   >: a a11 bottom c idx left n right top
          c[idx] = (right&top?a00*a[idx-n-1]:0)+(right?a10*a[idx-1]:0)+(right&bottom?a20*a[idx+n-1]:0)+(top?a01*a[idx-n]:0)+a11*a[idx]+(bottom?a21*a[idx+n]:0)+(left&top?a02*a[idx-n+1]:0)+(left?a12*a[idx+1]:0)+(left&bottom?a22*a[idx+n+1]:0);
       }
 }

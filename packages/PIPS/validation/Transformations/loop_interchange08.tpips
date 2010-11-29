@@ -1,0 +1,37 @@
+delete loop_interchange08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_interchange08 loop_interchange08.f
+
+# We use the winning combination, except TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+display PARALLELPRINTED_FILE
+
+apply INTERNALIZE_PARALLEL_CODE
+apply FLAG_LOOPS
+
+echo
+echo Source code before loop interchange
+echo
+
+display PRINTED_FILE
+
+apply LOOP_INTERCHANGE
+99998
+
+echo
+echo Source code after loop interchange
+echo
+
+display PRINTED_FILE
+
+#apply UNSPLIT[%PROGRAM]
+#shell $PIPS_F77 loop_interchange08.database/Src/loop_interchange08.f -o loop_interchange08.database/out
+
+close
+quit

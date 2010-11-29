@@ -10,7 +10,7 @@ Proper pointer effects for "main"
 int main()
 {
    Cplfloat b[10][10];
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(&b[3][5].re);
    return 0;
 }

@@ -52,29 +52,29 @@ PRINTED FILE with effects for keryell01
 int keryell01(void)
 {
    static int i, state = 0;
-//               <must be read   >: state
+//             <    is read   >: state
    if (state==0) goto switch_1_case_0;
-//               <must be read   >: state
+//             <    is read   >: state
    if (state==1) {
    }
    else {
       goto break_1;
    }
 switch_2_case_1:   ;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;
 l99999:   ;
-//               <must be read   >: i
+//             <    is read   >: i
 /* start of function */
    if (!(i<10)) goto break_1;
-//               <must be written>: state
+//             <    is written>: state
    state = 1;
-//               <must be read   >: i
+//             <    is read   >: i
    /* so we will come back to "case 1" */
    return i;
 switch_1_case_0:   ;
-//               <must be written>: i
+//             <    is written>: i
    i = 0;
    goto l99999;
 break_1:   ;

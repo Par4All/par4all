@@ -13,23 +13,23 @@ C     Implicit variables such as __IO_EFFECTS:LUNS are a special case
 C     that is not dealt with. And effects on LUNS are not well defined
 
       PROGRAM INITIALIZATION01
-C               <must be read   >: I
-C               <must be written>: J
+C             <    is read   >: I
+C             <    is written>: J
 
       J = I                                                             0014
-C               <must be written>: I
+C             <    is written>: I
       I = 1                                                             0015
-C               <must be read   >: I
-C               <must be written>: J
+C             <    is read   >: I
+C             <    is written>: J
       J = I                                                             0016
-C               <must be read   >: J K L __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: J K L __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, J, K, L                                                  0017
-C               <must be read   >: __IO_EFFECTS:LUNS(5)
-C               <must be written>: I J K L __IO_EFFECTS:LUNS(5)
+C             <    is read   >: __IO_EFFECTS:LUNS(5)
+C             <    is written>: I J K L __IO_EFFECTS:LUNS(5)
       READ *, I, J, K, L                                                0018
-C               <must be read   >: J K L __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: J K L __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, J, K, L                                                  0019
       END
 
@@ -39,32 +39,32 @@ Use-def chains for "INITIALIZATION01"
  *********************** Use-Def Chains *********************
 
 	18 --> 19 with conflicts
-		from <L-W-MUST> to <L-R-MUST>
-		from <K-W-MUST> to <K-R-MUST>
-		from <J-W-MUST> to <J-R-MUST>
+		from <L-W-EXACT> to <L-R-EXACT>
+		from <K-W-EXACT> to <K-R-EXACT>
+		from <J-W-EXACT> to <J-R-EXACT>
 	17 --> 19 with conflicts
-		from <__IO_EFFECTS:LUNS(6)-W-MUST> to <__IO_EFFECTS:LUNS(6)-W-MUST>
-		from <__IO_EFFECTS:LUNS(6)-W-MUST> to <__IO_EFFECTS:LUNS(6)-R-MUST>
-		from <__IO_EFFECTS:LUNS(6)-R-MUST> to <__IO_EFFECTS:LUNS(6)-W-MUST>
+		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
+		from <__IO_EFFECTS:LUNS(6)-W-EXACT> to <__IO_EFFECTS:LUNS(6)-R-EXACT>
+		from <__IO_EFFECTS:LUNS(6)-R-EXACT> to <__IO_EFFECTS:LUNS(6)-W-EXACT>
 	17 --> 18 with conflicts
-		from <L-R-MUST> to <L-W-MUST>
-		from <K-R-MUST> to <K-W-MUST>
-		from <J-R-MUST> to <J-W-MUST>
+		from <L-R-EXACT> to <L-W-EXACT>
+		from <K-R-EXACT> to <K-W-EXACT>
+		from <J-R-EXACT> to <J-W-EXACT>
 	16 --> 18 with conflicts
-		from <J-W-MUST> to <J-W-MUST>
-		from <I-R-MUST> to <I-W-MUST>
+		from <J-W-EXACT> to <J-W-EXACT>
+		from <I-R-EXACT> to <I-W-EXACT>
 	16 --> 17 with conflicts
-		from <J-W-MUST> to <J-R-MUST>
+		from <J-W-EXACT> to <J-R-EXACT>
 	15 --> 18 with conflicts
-		from <I-W-MUST> to <I-W-MUST>
+		from <I-W-EXACT> to <I-W-EXACT>
 	15 --> 16 with conflicts
-		from <I-W-MUST> to <I-R-MUST>
+		from <I-W-EXACT> to <I-R-EXACT>
 	14 --> 18 with conflicts
-		from <I-R-MUST> to <I-W-MUST>
+		from <I-R-EXACT> to <I-W-EXACT>
 	14 --> 16 with conflicts
-		from <J-W-MUST> to <J-W-MUST>
+		from <J-W-EXACT> to <J-W-EXACT>
 	14 --> 15 with conflicts
-		from <I-R-MUST> to <I-W-MUST>
+		from <I-R-EXACT> to <I-W-EXACT>
 
 ****************** End of Dependence Graph ******************
 

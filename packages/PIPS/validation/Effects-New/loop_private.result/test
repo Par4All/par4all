@@ -30,57 +30,57 @@ int main()
 }
 int main()
 {
-//               <must be declared>: a
+//             <    is declared>: a
    float a[10][10][10][10][10];
-//               <must be declared>: i j k l m
+//             <    is declared>: i j k l m
    int i, j, k, l, m;
-//               <must be declared>: x
+//             <    is declared>: x
    float x;
-//               <must be written>: x
-//               <must be referenced>: x
+//             <    is written>: x
+//             <    is referenced>: x
    x = 2.12;
-//               <must be written>: i
-//               <must be referenced>: i
+//             <    is written>: i
+//             <    is referenced>: i
 
    for(i = 0; i <= 9; i += 1)
-//               <must be written>: j
-//               <must be referenced>: j
+//             <    is written>: j
+//             <    is referenced>: j
       for(j = 0; j <= 9; j += 1) {
          // comments 2
-//               <must be written>: z
-//               <must be referenced>: z
-//               <must be declared>: z
+//             <    is written>: z
+//             <    is referenced>: z
+//             <    is declared>: z
          float z = 0.0;
-//               <must be written>: z
-//               <must be referenced>: z
+//             <    is written>: z
+//             <    is referenced>: z
          z = 0.0;
-//               <must be written>: k
-//               <must be referenced>: k
+//             <    is written>: k
+//             <    is referenced>: k
          for(k = 0; k <= 9; k += 1) {
-//               <must be read   >: k
-//               <must be written>: z
-//               <must be referenced>: k z
+//             <    is read   >: k
+//             <    is written>: z
+//             <    is referenced>: k z
             z = k*2.0;
-//               <must be written>: l
-//               <must be referenced>: l
+//             <    is written>: l
+//             <    is referenced>: l
             for(l = 0; l <= 9; l += 1)
-//               <must be written>: m
-//               <must be referenced>: m
+//             <    is written>: m
+//             <    is referenced>: m
                for(m = 0; m <= 9; m += 1) {
                   //comments 3
-//               <must be declared>: y
+//             <    is declared>: y
                   float y;
-//               <must be written>: y
-//               <must be referenced>: y
+//             <    is written>: y
+//             <    is referenced>: y
                   y = 2.0;
-//               <must be read   >: x z
-//               <must be written>: y
-//               <must be referenced>: x y z
+//             <    is read   >: x z
+//             <    is written>: y
+//             <    is referenced>: x y z
                   // comments 4
                   y = 3.5+x+z;
-//               <must be read   >: i j k l m x y
-//               <must be written>: a[i][j][k][l][m]
-//               <must be referenced>: a i j k l m x y
+//             <    is read   >: i j k l m x y
+//             <    is written>: a[i][j][k][l][m]
+//             <    is referenced>: a i j k l m x y
                   a[i][j][k][l][m] = x*y;
                }
          }
@@ -94,101 +94,99 @@ Use-def chains
  *********************** Use-Def Chains *********************
 
 	24 --> 24 with conflicts
-		from <a[i][j][k][l][m]-W-MUST> to <a[i][j][k][l][m]-W-MUST>
+		from <a[i][j][k][l][m]-W-EXACT> to <a[i][j][k][l][m]-W-EXACT>
 	24 --> 23 with conflicts
-		from <y-R-MUST> to <y-W-MUST>
+		from <y-R-EXACT> to <y-W-EXACT>
 	24 --> 21 with conflicts
-		from <y-R-MUST> to <y-W-MUST>
+		from <y-R-EXACT> to <y-W-EXACT>
 	24 --> 20 with conflicts
-		from <y-RE-MUST> to <y-WE-MUST>
+		from <y-RE-EXACT> to <y-WE-EXACT>
 	24 --> -1 with conflicts
-		from <m-R-MUST> to <m-W-MUST>
+		from <m-R-EXACT> to <m-W-EXACT>
 	24 --> -1 with conflicts
-		from <l-R-MUST> to <l-W-MUST>
+		from <l-R-EXACT> to <l-W-EXACT>
 	24 --> -1 with conflicts
-		from <k-R-MUST> to <k-W-MUST>
+		from <k-R-EXACT> to <k-W-EXACT>
 	24 --> -1 with conflicts
-		from <j-R-MUST> to <j-W-MUST>
+		from <j-R-EXACT> to <j-W-EXACT>
 	23 --> 24 with conflicts
-		from <y-W-MUST> to <y-R-MUST>
-	23 --> 21 with conflicts
-		from <y-W-MUST> to <y-W-MUST>
+		from <y-W-EXACT> to <y-R-EXACT>
 	23 --> 20 with conflicts
-		from <y-RE-MUST> to <y-WE-MUST>
+		from <y-RE-EXACT> to <y-WE-EXACT>
 	23 --> 16 with conflicts
-		from <z-R-MUST> to <z-W-MUST>
+		from <z-R-EXACT> to <z-W-EXACT>
 	23 --> 14 with conflicts
-		from <z-R-MUST> to <z-W-MUST>
+		from <z-R-EXACT> to <z-W-EXACT>
 	23 --> 13 with conflicts
-		from <z-R-MUST> to <z-W-MUST>
-		from <z-RE-MUST> to <z-WE-MUST>
+		from <z-R-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
 	21 --> 23 with conflicts
-		from <y-W-MUST> to <y-W-MUST>
+		from <y-W-EXACT> to <y-W-EXACT>
 	21 --> 20 with conflicts
-		from <y-RE-MUST> to <y-WE-MUST>
+		from <y-RE-EXACT> to <y-WE-EXACT>
 	20 --> 24 with conflicts
-		from <y-WE-MUST> to <y-RE-MUST>
+		from <y-WE-EXACT> to <y-RE-EXACT>
 	20 --> 23 with conflicts
-		from <y-WE-MUST> to <y-RE-MUST>
+		from <y-WE-EXACT> to <y-RE-EXACT>
 	20 --> 21 with conflicts
-		from <y-WE-MUST> to <y-RE-MUST>
+		from <y-WE-EXACT> to <y-RE-EXACT>
 	20 --> 20 with conflicts
-		from <y-WE-MUST> to <y-WE-MUST>
+		from <y-WE-EXACT> to <y-WE-EXACT>
 	-1 --> -1 with conflicts
-		from <m-W-MUST> to <m-W-MUST>
+		from <m-W-EXACT> to <m-W-EXACT>
 	-1 --> -1 with conflicts
-		from <l-W-MUST> to <l-W-MUST>
+		from <l-W-EXACT> to <l-W-EXACT>
 	16 --> 23 with conflicts
-		from <z-W-MUST> to <z-R-MUST>
+		from <z-W-EXACT> to <z-R-EXACT>
 	16 --> 16 with conflicts
-		from <z-W-MUST> to <z-W-MUST>
+		from <z-W-EXACT> to <z-W-EXACT>
 	16 --> -1 with conflicts
-		from <k-R-MUST> to <k-W-MUST>
+		from <k-R-EXACT> to <k-W-EXACT>
 	16 --> 13 with conflicts
-		from <z-W-MUST> to <z-W-MUST>
-		from <z-RE-MUST> to <z-WE-MUST>
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
 	-1 --> -1 with conflicts
-		from <k-W-MUST> to <k-W-MUST>
+		from <k-W-EXACT> to <k-W-EXACT>
 	14 --> 16 with conflicts
-		from <z-W-MUST> to <z-W-MUST>
+		from <z-W-EXACT> to <z-W-EXACT>
 	14 --> 13 with conflicts
-		from <z-W-MUST> to <z-W-MUST>
-		from <z-RE-MUST> to <z-WE-MUST>
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
 	13 --> 23 with conflicts
-		from <z-WE-MUST> to <z-RE-MUST>
+		from <z-WE-EXACT> to <z-RE-EXACT>
 	13 --> 16 with conflicts
-		from <z-WE-MUST> to <z-RE-MUST>
+		from <z-WE-EXACT> to <z-RE-EXACT>
 	13 --> 14 with conflicts
-		from <z-W-MUST> to <z-W-MUST>
-		from <z-WE-MUST> to <z-RE-MUST>
+		from <z-W-EXACT> to <z-W-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
 	13 --> 13 with conflicts
-		from <z-WE-MUST> to <z-WE-MUST>
-		from <z-WE-MUST> to <z-RE-MUST>
-		from <z-RE-MUST> to <z-WE-MUST>
+		from <z-WE-EXACT> to <z-WE-EXACT>
+		from <z-WE-EXACT> to <z-RE-EXACT>
+		from <z-RE-EXACT> to <z-WE-EXACT>
 	-1 --> -1 with conflicts
-		from <j-W-MUST> to <j-W-MUST>
+		from <j-W-EXACT> to <j-W-EXACT>
 	08 --> 24 with conflicts
-		from <x-W-MUST> to <x-R-MUST>
+		from <x-W-EXACT> to <x-R-EXACT>
 	08 --> 23 with conflicts
-		from <x-W-MUST> to <x-R-MUST>
+		from <x-W-EXACT> to <x-R-EXACT>
 	07 --> 24 with conflicts
-		from <x-WE-MUST> to <x-RE-MUST>
+		from <x-WE-EXACT> to <x-RE-EXACT>
 	07 --> 23 with conflicts
-		from <x-WE-MUST> to <x-RE-MUST>
+		from <x-WE-EXACT> to <x-RE-EXACT>
 	07 --> 08 with conflicts
-		from <x-WE-MUST> to <x-RE-MUST>
+		from <x-WE-EXACT> to <x-RE-EXACT>
 	06 --> -1 with conflicts
-		from <m-WE-MUST> to <m-RE-MUST>
+		from <m-WE-EXACT> to <m-RE-EXACT>
 	06 --> -1 with conflicts
-		from <l-WE-MUST> to <l-RE-MUST>
+		from <l-WE-EXACT> to <l-RE-EXACT>
 	06 --> -1 with conflicts
-		from <k-WE-MUST> to <k-RE-MUST>
+		from <k-WE-EXACT> to <k-RE-EXACT>
 	06 --> -1 with conflicts
-		from <j-WE-MUST> to <j-RE-MUST>
+		from <j-WE-EXACT> to <j-RE-EXACT>
 	06 --> -1 with conflicts
-		from <i-WE-MUST> to <i-RE-MUST>
+		from <i-WE-EXACT> to <i-RE-EXACT>
 	05 --> 24 with conflicts
-		from <a-WE-MUST> to <a-RE-MUST>
+		from <a-WE-EXACT> to <a-RE-EXACT>
 
 ****************** End of Dependence Graph ******************
 // OMP style

@@ -3,7 +3,7 @@ from pyps import workspace
 from sac import workspace as sac_workspace
 from os import remove
 filename="average_power"
-with workspace(filename+".c", parents=[sac_workspace], driver="sse") as w:
+with workspace(filename+".c", parents=[sac_workspace], driver="sse", deleteOnClose=True) as w:
 	m=w[filename]
 	m.display()
 	m.sac()

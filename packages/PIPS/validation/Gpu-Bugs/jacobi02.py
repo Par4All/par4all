@@ -6,7 +6,7 @@ program = "jacobi02"
 # Just in case it existed before:
 workspace.delete(program)
 
-with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program) as w:
+with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program, deleteOnClose=True) as w:
 	w.activate(module.transformers_inter_full)
 	w.activate(module.interprocedural_summary_precondition)
 	w.activate(module.preconditions_inter_full)

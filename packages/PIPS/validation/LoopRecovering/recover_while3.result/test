@@ -69,12 +69,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0017*/
    i++;                                                                 /*0014*/
 
@@ -82,12 +82,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0017*/
    i++;                                                                 /*0014*/
 
@@ -95,12 +95,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
    
    // Just verify it works with 2 consecutive labels:
 end2:   ;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0017*/
    i++;                                                                 /*0014*/
 

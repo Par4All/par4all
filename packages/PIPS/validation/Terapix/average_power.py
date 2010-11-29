@@ -19,7 +19,7 @@ def vconv(tiling_vector):
 
 
 if __name__ == "__main__":
-	w = workspace(["average_power.c","include/par4all.c"], cppflags="-I.")
+	w = workspace(["average_power.c","include/terapix_runtime.c"], cppflags="-I.",deleteOnClose=True)
 	w.props.constant_path_effects=False
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 		for l1 in l0.loops():
 			for l2 in l1.loops():
 				m.display(activate="PRINT_CODE_REGIONS")
-				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=2**14)
+				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=2**14,type="VOLUME")
 				m.display()
 				m.run(["psolve"])
 				m.display(activate="PRINT_CODE_REGIONS")

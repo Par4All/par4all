@@ -3,28 +3,28 @@ static int count;
 void foo();
 
 int main(void);
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
 void foo()
 {
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
    count++;
 }
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
 int main(void)
 {
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
    foo();
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
    foo(1);
-//               <must be read   >: count
-//               <must be written>: count
+//             <    is read   >: count
+//             <    is written>: count
    foo(1, 2);
-//               <must be read   >: count
+//             <    is read   >: count
    return count;
 }
 

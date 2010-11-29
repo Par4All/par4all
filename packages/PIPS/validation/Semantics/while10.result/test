@@ -19,7 +19,7 @@ void while10()
 //  T() {}
 
 
-   while (1) 
+   while (1)
 
 //  T() {}
 
@@ -51,7 +51,7 @@ void while10()
 //  P(i) {i==2}
 
 
-   while (1) 
+   while (1)
 
 //  P(i) {i==2}
 

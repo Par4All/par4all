@@ -3,6 +3,7 @@ delete kernelize01
 create kernelize01 kernelize01.c include/par4all.c
 
 module foo
+activate MUST_REGIONS
 
 echo
 echo Initial code
@@ -20,9 +21,11 @@ setproperty KERNELIZE_KERNEL_NAME "kernel"
 setproperty KERNELIZE_HOST_CALL_NAME "run_kernel"
 apply KERNELIZE
 
+activate PRINT_CODE_REGIONS
 display PRINTED_FILE[foo]
 display PRINTED_FILE[run_kernel]
 display PRINTED_FILE[kernel]
+activate PRINT_CODE
 
 apply KERNEL_LOAD_STORE[run_kernel]
 display PRINTED_FILE

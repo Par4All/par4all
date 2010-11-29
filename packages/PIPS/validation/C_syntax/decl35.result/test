@@ -25,8 +25,8 @@ Effects for "decl35"
 
 void decl35(int i)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;
 }
 
@@ -36,9 +36,9 @@ int main()
 {
    // But it is not handled nicely here although the declaration statement is identical
    void decl35(int);
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be read   >: i
+//             <    is read   >: i
 
    decl35(i);
 }

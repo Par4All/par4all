@@ -1,27 +1,27 @@
 MAIN
     A
-    C               <must be written>: KMAX
+    C             <    is written>: KMAX
     KMAX = KMAX+2
         B
-        C               <must be written>: KT
+        C             <    is written>: KT
         KT = KT+3
             C1
-            C               <must be written>: KMAX
+            C             <    is written>: KMAX
             CALL INC(KMAX)
             C2
-            C               <must be written>: KT
+            C             <    is written>: KT
             CALL INC(KT)
         C3
-        C               <must be written>: TT
+        C             <    is written>: TT
         CALL INC(TT)
-    C               <must be written>: KMAX KT
+    C             <    is written>: KMAX KT
     CALL B(KMAX)
         B
-        C               <must be written>: KT
+        C             <    is written>: KT
         KT = KT+3
             C1
-            C               <must be written>: KMAX
+            C             <    is written>: KMAX
             CALL INC(KMAX)
             C2
-            C               <must be written>: KT
+            C             <    is written>: KT
             CALL INC(KT)

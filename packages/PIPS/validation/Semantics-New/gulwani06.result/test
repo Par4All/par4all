@@ -72,7 +72,7 @@ int main()
 
    
    
-   if (lock==1) 
+   if (lock==1)
 
 //  T() {lock==1, x==y, 0<=x}
 
@@ -151,7 +151,7 @@ int main()
 
    
    
-   if (lock==1) 
+   if (lock==1)
 
 //  P(lock,x,y,z) {lock==1, x==y, 0<=x}
 
