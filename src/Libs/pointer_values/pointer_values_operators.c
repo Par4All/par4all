@@ -550,7 +550,7 @@ cell_relation simple_pv_translate(cell_relation pv_in, bool in_first_p, cell_rel
       cell c1 =  in_first_p ? copy_cell(cell_relation_second_cell(pv_in)) :
 	copy_cell(cell_relation_first_cell(pv_in));
       cell c2 = copy_cell(cell_relation_second_cell(pv_old));
-      pv_new = make_value_of_pointer_value(c1, c2,
+      pv_new = make_address_of_pointer_value(c1, c2,
 					     is_approximation_may, make_descriptor_none());
     }
   else
