@@ -5158,6 +5158,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {C_CLOSE_FUNCTION_NAME,   1,         integer_to_integer_type,    0, 0},
   {C_WRITE_FUNCTION_NAME,   2,         default_intrinsic_type, 0, 0}, /* returns ssize_t */
   {C_READ_FUNCTION_NAME,    2,         default_intrinsic_type, 0, 0},
+  {USLEEP_FUNCTION_NAME,    1,         default_intrinsic_type, 0, 0},
   /* {FCNTL_FUNCTION_NAME,     (INT_MAX), overloaded_to_integer_type, 0, 0},*/ /* 2 or 3 arguments of various types*/ /* located with fcntl.h */
   {FSYNC_FUNCTION_NAME,     2,         integer_to_integer_type, 0, 0},
   {FDATASYNC_FUNCTION_NAME, 2,         integer_to_integer_type, 0, 0},
@@ -5291,6 +5292,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   /*#include <time.h>*/
   {TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DIFFTIME_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
+  {NANOSLEEP_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},
   {GETTIMEOFDAY_FUNCTION_NAME, 2, overloaded_to_void_type, 0, 0}, // BSD-GNU
   {CLOCK_GETTIME_FUNCTION_NAME, 2, overloaded_to_integer_type, 0, 0}, // BSD-GNU
   {CLOCK_FUNCTION_NAME, 0, void_to_overloaded_type, 0, 0},

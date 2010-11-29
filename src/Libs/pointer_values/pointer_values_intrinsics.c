@@ -608,9 +608,9 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {LROUND_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {LROUNDF_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
   {LROUNDL_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
-  {LLROUND_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
-  {LLROUNDF_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
-  {LLROUNDL_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
+  {LLROUND_OPERATOR_NAME,                  intrinsic_to_identical_post_pv},
+  {LLROUNDF_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
+  {LLROUNDL_OPERATOR_NAME,                 intrinsic_to_identical_post_pv},
   {TRUNC_OPERATOR_NAME,                    intrinsic_to_identical_post_pv},
   {TRUNCF_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
   {TRUNCL_OPERATOR_NAME,                   intrinsic_to_identical_post_pv},
@@ -993,15 +993,22 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   /* SG: concerning the err* family of functions, they also exit() from the program
    * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
    * but it seems an error to me */
-  {ERR_FUNCTION_NAME,                              c_io_function_to_post_pv},
-  {ERRX_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {WARN_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {WARNX_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VERR_FUNCTION_NAME,                             c_io_function_to_post_pv},
-  {VERRX_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VWARN_FUNCTION_NAME,                            c_io_function_to_post_pv},
-  {VWARNX_FUNCTION_NAME,                           c_io_function_to_post_pv},
-  
+  {ERR_FUNCTION_NAME,                      c_io_function_to_post_pv},
+  {ERRX_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {WARN_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {WARNX_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VERR_FUNCTION_NAME,                     c_io_function_to_post_pv},
+  {VERRX_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VWARN_FUNCTION_NAME,                    c_io_function_to_post_pv},
+  {VWARNX_FUNCTION_NAME,                   c_io_function_to_post_pv},
+
+  /*Conforming to 4.3BSD, POSIX.1-2001.*/
+  /* POSIX.1-2001 declares this function obsolete; use nanosleep(2) instead.*/
+  /*POSIX.1-2008 removes the specification of usleep()*/
+  {USLEEP_FUNCTION_NAME,                   intrinsic_to_identical_post_pv},
+
+  /* _POSIX_C_SOURCE >= 199309L */
+  {NANOSLEEP_FUNCTION_NAME,                intrinsic_to_identical_post_pv},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},

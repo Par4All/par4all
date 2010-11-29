@@ -786,6 +786,7 @@
 #define C_CLOSE_FUNCTION_NAME           "close"
 #define C_READ_FUNCTION_NAME            "read"
 #define C_WRITE_FUNCTION_NAME           "write"
+#define USLEEP_FUNCTION_NAME            "usleep"
 
 /*#include<stdio.h> */
 
@@ -949,6 +950,7 @@
 /*#include<time.h> */
 #define TIME_FUNCTION_NAME              "time"
 #define DIFFTIME_FUNCTION_NAME          "difftime"
+#define NANOSLEEP_FUNCTION_NAME         "nanosleep"
 
 
 /* #include <wchar.h> */

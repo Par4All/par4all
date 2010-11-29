@@ -1212,15 +1212,22 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* SG: concerning the err* family of functions, they also exit() from the program
    * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
    * but it seems an error to me */
-  {ERR_FUNCTION_NAME,                              c_io_effects},
-  {ERRX_FUNCTION_NAME,                             c_io_effects},
-  {WARN_FUNCTION_NAME,                             c_io_effects},
-  {WARNX_FUNCTION_NAME,                            c_io_effects},
-  {VERR_FUNCTION_NAME,                             c_io_effects},
-  {VERRX_FUNCTION_NAME,                            c_io_effects},
-  {VWARN_FUNCTION_NAME,                            c_io_effects},
-  {VWARNX_FUNCTION_NAME,                           c_io_effects},
-  
+  {ERR_FUNCTION_NAME,                      c_io_effects},
+  {ERRX_FUNCTION_NAME,                     c_io_effects},
+  {WARN_FUNCTION_NAME,                     c_io_effects},
+  {WARNX_FUNCTION_NAME,                    c_io_effects},
+  {VERR_FUNCTION_NAME,                     c_io_effects},
+  {VERRX_FUNCTION_NAME,                    c_io_effects},
+  {VWARN_FUNCTION_NAME,                    c_io_effects},
+  {VWARNX_FUNCTION_NAME,                   c_io_effects},
+
+  /*Conforming to 4.3BSD, POSIX.1-2001.*/
+  /* POSIX.1-2001 declares this function obsolete; use nanosleep(2) instead.*/
+  /*POSIX.1-2008 removes the specification of usleep()*/
+  {USLEEP_FUNCTION_NAME,                    no_write_effects},
+
+  /* _POSIX_C_SOURCE >= 199309L */
+  {NANOSLEEP_FUNCTION_NAME,                 safe_c_effects},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
