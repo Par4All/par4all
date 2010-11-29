@@ -49,9 +49,9 @@ AX_ARG_ENABLE([doc],
 			   AX_CHECK_PROG([pdflatex])
 			   AX_CHECK_PROG([kpsepath])
 			   AX_CHECK_PROG([epstopdf])
-			   AX_LATEX_PACKAGE([pstricks])
+			   AX_LATEX_PACKAGE([svninfo])
 			   AX_LATEX_PACKAGE([hyperref])
-			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf pstricks hyperref])
+			   AX_DEPENDS([doc],[pdflatex kpsepath epstopdf svninfo hyperref])
 			  ]
 )
 AM_CONDITIONAL([WITH_DOC],[AX_HAS([doc])])
