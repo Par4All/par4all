@@ -1,0 +1,6 @@
+setenv WS="varargs03"
+delete $WS
+create $WS $WS.c
+display PRINTED_FILE[%ALL]
+close
+delete $WS
