@@ -33,7 +33,7 @@ static void simplify_subscript(subscript ss)
 {
     statement parent_statement = (statement)gen_get_ancestor(statement_domain,ss);
     expression ss_array = subscript_array(ss);
-    /* do nothing if an adress-of is involved - over cautious indeed */
+    /* do nothing if an address-of is involved - over cautious indeed */
     if( !has_address_of_operator_p(ss_array) )
     {
         /* create atomized_expression */
@@ -46,9 +46,8 @@ static void simplify_subscript(subscript ss)
         reference new_ref= make_reference(new_entity,subscript_indices(ss));
         /* do the replacement */
         expression parent_expression = (expression) gen_get_ancestor(expression_domain,ss);
-        /*free stuffs carefully*/
-        subscript_array(ss)=expression_undefined;
-        subscript_indices(ss)=NIL;
+        /*free stuffs a bit less carefully than I should*/
+        expression_syntax(parent_expression)=syntax_undefined;
         update_expression_syntax(parent_expression,make_syntax_reference(new_ref));
         /* we must do this now and not before */
         insert_statement(parent_statement,new_statement,true);
