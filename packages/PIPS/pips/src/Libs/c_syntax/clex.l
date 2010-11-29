@@ -749,6 +749,12 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				pips_debug(9,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			}
+"__va_list" 			{
+	/* convert __va_list from bsd into __builtin_va_list */
+	pips_debug(9,"__va_list replaced by __builtin_va_list\n");
+	c_lval.string=strdup("__builtin_va_list");
+	return TK_IDENT;
+	}
 "__extension__"         {
                                 pips_user_warning("gcc extension keyword \"__extension__\" is ignored\n");
                         }

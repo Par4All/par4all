@@ -35,23 +35,13 @@
 #include "ri-util.h"
 #include "effects.h"
 #include "effects-util.h"
-//#include "text.h"
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
 #include "misc.h"
-//#include "conversion.h"
 #include "control.h"
-//#include "callgraph.h"
 #include "effects-generic.h"
-//#include "effects-simple.h"
 #include "effects-convex.h"
-//#include "preprocessor.h"
-//#include "text-util.h"
-#include "transformations.h"
-//#include "parser_private.h"
-//#include "semantics.h"
-//#include "transformer.h"
 #include "accel-util.h"
 
 static void do_group_constant_entity(expression exp, set constants)
@@ -64,6 +54,28 @@ static void do_group_constant_entity(expression exp, set constants)
     }
 }
 
+/* remove entities involved in a range from the set of constants */
+static bool do_group_statement_constant_filter(range r,set constants) {
+    set ref = get_referenced_entities(r);
+    set_difference(constants,constants,ref);
+    set_free(ref);
+    return false;
+}
+
+static bool not_type_chunk_p(void* obj) {
+    return !INSTANCE_OF(type,(gen_chunkp)obj);
+}
+
+/* remove entities that are never referenced by @p st from @p s */
+static void do_group_statement_constant_prune(statement st, set s)
+{
+    set ref = get_referenced_entities_filtered(st,not_type_chunk_p,entity_not_constant_or_intrinsic_p);
+    set_intersection(s,s,ref);
+    set_free(ref);
+}
+
+/* gather all entities that are read and constant in statement @p s in 
+ * the set @p of constant entities */
 static void do_group_statement_constant(statement st, set constants)
 {
     list regions = load_rw_effects_list(st);
@@ -71,12 +83,19 @@ static void do_group_statement_constant(statement st, set constants)
     list write_regions = regions_write_regions(regions);
     set written_entities = set_make(set_pointer);
 
+    /* first gather all written entities */
     FOREACH(REGION,reg,write_regions)
     {
         reference ref = region_any_reference(reg);
         entity var = reference_variable(ref);
         set_add_element(written_entities,written_entities,var);
     }
+    gen_free_list(write_regions);
+
+
+    /* then search among all read and not written variables
+     * thoses who have constant phis
+     */
     FOREACH(REGION,reg,read_regions)
     {
         reference ref = region_any_reference(reg);
@@ -106,6 +125,13 @@ static void do_group_statement_constant(statement st, set constants)
                 set_add_element(constants,constants,var);
         }
     }
+    /* then prune this set, because it contains the preconditions too */
+    do_group_statement_constant_prune(st,constants);
+
+    /* eventually filter out some entities involved in range computation */
+    if(get_bool_property("GROUP_CONSTANTS_SKIP_LOOP_RANGE"))
+        gen_context_recurse(st,constants,range_domain,do_group_statement_constant_filter,gen_null);
+    gen_free_list(read_regions);
     set_free(written_entities);
 }
 
@@ -262,7 +288,7 @@ static void do_group_constants_terapix(statement in,set constants)
 static void do_group_constants(statement in,set constants)
 {
     /* as of now, put everything in an array, no matter of the real type, yes it is horrible,
-     * but it matches my needs for terapix, where everythin as the same type
+     * but it matches my needs for terapix, where everything as the same type
      * later on, you may want to use a structure to pass parameters*/
     switch(get_grouping_layout()) {
         case TERAPIX_GROUPING:

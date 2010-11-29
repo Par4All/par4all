@@ -68,25 +68,25 @@ static void db_put_simple_pv(char * module_name, statement_cell_relations scr)
    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_POINTER_VALUES, module_name, (char*) scr);
 }
 
-static statement_cell_relations db_get_simple_gen_pv(char * module_name)
-{
-  return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, TRUE);
-}
+/* static statement_cell_relations db_get_simple_gen_pv(char * module_name) */
+/* { */
+/*   return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, TRUE); */
+/* } */
 
-static void db_put_simple_gen_pv(char * module_name, statement_cell_relations scr)
-{
-   DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, (char*) scr);
-}
+/* static void db_put_simple_gen_pv(char * module_name, statement_cell_relations scr) */
+/* { */
+/*    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_GEN_POINTER_VALUES, module_name, (char*) scr); */
+/* } */
 
-static statement_effects db_get_simple_kill_pv(char * module_name)
-{
-  return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, TRUE);
-}
+/* static statement_effects db_get_simple_kill_pv(char * module_name) */
+/* { */
+/*   return (statement_effects) db_get_memory_resource(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, TRUE); */
+/* } */
 
-static void db_put_simple_kill_pv(char * module_name, statement_effects se)
-{
-   DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, (char*) se);
-}
+/* static void db_put_simple_kill_pv(char * module_name, statement_effects se) */
+/* { */
+/*    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_KILL_POINTER_VALUES, module_name, (char*) se); */
+/* } */
 
 
 /******************** ANALYSIS CONTEXT */
@@ -98,10 +98,10 @@ pv_context make_simple_pv_context()
 
   ctxt.db_get_pv_func = db_get_simple_pv;
   ctxt.db_put_pv_func = db_put_simple_pv;
-  ctxt.db_get_gen_pv_func = db_get_simple_gen_pv;
-  ctxt.db_put_gen_pv_func = db_put_simple_gen_pv;
-  ctxt.db_get_kill_pv_func = db_get_simple_kill_pv;
-  ctxt.db_put_kill_pv_func = db_put_simple_kill_pv;
+/*   ctxt.db_get_gen_pv_func = db_get_simple_gen_pv; */
+/*   ctxt.db_put_gen_pv_func = db_put_simple_gen_pv; */
+/*   ctxt.db_get_kill_pv_func = db_get_simple_kill_pv; */
+/*   ctxt.db_put_kill_pv_func = db_put_simple_kill_pv; */
   ctxt.make_pv_from_effects_func = make_simple_pv_from_simple_effects;
   ctxt.cell_reference_with_value_of_cell_reference_translation_func =
     simple_cell_reference_with_value_of_cell_reference_translation;
@@ -110,6 +110,7 @@ pv_context make_simple_pv_context()
   ctxt.pv_composition_with_transformer_func = simple_pv_composition_with_transformer;
   ctxt.pvs_must_union_func = simple_pvs_must_union;
   ctxt.pvs_may_union_func = simple_pvs_may_union;
+  ctxt.pvs_equal_p_func = simple_pvs_syntactically_equal_p;
   ctxt.stmt_stack = stack_make(statement_domain, 0, 0);
   return ctxt;
 }
@@ -129,14 +130,15 @@ void reset_pv_context(pv_context *p_ctxt)
 {
   p_ctxt->db_get_pv_func = (statement_cell_relations_function) UNDEF;
   p_ctxt->db_put_pv_func = (void_function) UNDEF;
-  p_ctxt->db_get_gen_pv_func =(statement_cell_relations_function) UNDEF ;
-  p_ctxt->db_put_gen_pv_func = (void_function) UNDEF;
-  p_ctxt->db_get_kill_pv_func = (statement_effects_function) UNDEF;
-  p_ctxt->db_put_kill_pv_func = (void_function) UNDEF;
+/*   p_ctxt->db_get_gen_pv_func =(statement_cell_relations_function) UNDEF ; */
+/*   p_ctxt->db_put_gen_pv_func = (void_function) UNDEF; */
+/*   p_ctxt->db_get_kill_pv_func = (statement_effects_function) UNDEF; */
+/*   p_ctxt->db_put_kill_pv_func = (void_function) UNDEF; */
   p_ctxt->make_pv_from_effects_func = (list_function) UNDEF;
   p_ctxt->pv_composition_with_transformer_func = (cell_relation_function) UNDEF;
   p_ctxt->pvs_must_union_func = (list_function) UNDEF;
   p_ctxt->pvs_may_union_func = (list_function) UNDEF;
+  p_ctxt->pvs_equal_p_func = (bool_function) UNDEF;
 }
 
 void pv_context_statement_push(statement s, pv_context * ctxt)
@@ -175,19 +177,19 @@ void free_pv_results_paths(pv_results *pv_res)
 
 void print_pv_results(pv_results pv_res)
 {
-  fprintf(stderr, "l_out = \n");
+  fprintf(stderr, "l_out =");
   print_pointer_values(pv_res.l_out);
   list l_rp = pv_res.result_paths;
   list l_rpi = pv_res.result_paths_interpretations;
 
   if (!ENDP(l_rp))
     {
-      fprintf(stderr, "result_paths are: \n");
+      fprintf(stderr, "result_paths are:\n");
       for(; !ENDP(l_rp); POP(l_rp), POP(l_rpi))
 	{
 	  effect eff = EFFECT(CAR(l_rp));
 	  cell_interpretation ci = CELL_INTERPRETATION(CAR(l_rpi));
-	  fprintf(stderr, "%s: \n",
+	  fprintf(stderr, "%s:",
 		  cell_interpretation_value_of_p(ci)
 		  ? "value of" : "address of");
 	  (*effect_prettyprint_func)(eff);
@@ -251,23 +253,31 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
     {
       ifdebug(2){
 
-	pips_debug(2, "dealing with statement ");
+	pips_debug(2, "dealing with statement");
 	print_statement(stmt);
-	pips_debug_pvs(2, "l_cur = \n", l_cur);
+	pips_debug_pvs(2, "l_cur =", l_cur);
       }
       /* keep local variables in declaration reverse order */
       if (declaration_statement_p(stmt))
 	{
 	  pv_context_statement_push(stmt, ctxt);
-	  store_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
+	  if(bound_pv_p(stmt))
+	    update_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
+	  else
+	    store_pv(stmt, make_cell_relations(gen_full_copy_list(l_cur)));
 	  FOREACH(ENTITY, e, statement_declarations(stmt))
 	    {
-	      /* beware don't push static variables */
-	      l_locals = CONS(ENTITY, e, l_locals);
+	      type e_type = basic_concrete_type(entity_type(e));
+	      /* beware don't push static variables and non pointer variables. */
+	      if (! static_area_p(ram_section(storage_ram(entity_storage(e))))
+		  &&!type_fundamental_basic_p(e_type)
+		  && type_leads_to_pointer_p(e_type))
+		l_locals = CONS(ENTITY, e, l_locals);
 	      l_cur = declaration_to_post_pv(e, l_cur, ctxt);
+	      free_type(e_type);
 	    }
-	  store_gen_pv(stmt, make_cell_relations(NIL));
-	  store_kill_pv(stmt, make_effects(NIL));
+	  //store_gen_pv(stmt, make_cell_relations(NIL));
+	  //store_kill_pv(stmt, make_effects(NIL));
 	  pv_context_statement_pop(ctxt);
 	}
       else
@@ -277,7 +287,24 @@ list sequence_to_post_pv(sequence seq, list l_in, pv_context *ctxt)
 
   /* don't forget to eliminate local declarations on exit */
   /* ... */
-  pips_debug_pvs(2, "returning: ", l_cur);
+  if (!ENDP(l_locals))
+    {
+      pips_debug(5, "eliminating local variables\n");
+      expression rhs_exp =
+	entity_to_expression(undefined_pointer_value_entity());
+
+      FOREACH(ENTITY, e, l_locals)
+	{
+	  pips_debug(5, "dealing with %s\n", entity_name(e));
+	  pv_results pv_res = make_pv_results();
+	  pointer_values_remove_var(e, false, l_cur, &pv_res, ctxt);
+	  l_cur= pv_res.l_out;
+	  free_pv_results_paths(&pv_res);
+	}
+      free_expression(rhs_exp);
+    }
+
+  pips_debug_pvs(2, "returning:", l_cur);
   pips_debug(1, "end\n");
   return (l_cur);
 }
@@ -288,9 +315,12 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
   list l_out = NIL;
   pips_debug(1, "begin\n");
   pv_context_statement_push(stmt, ctxt);
-  pips_debug_pvs(2, "input pvs: ", l_in);
+  pips_debug_pvs(2, "input pvs:", l_in);
 
-  store_pv(stmt, make_cell_relations(gen_full_copy_list(l_in)));
+  if(bound_pv_p(stmt))
+    update_pv(stmt, make_cell_relations(gen_full_copy_list(l_in)));
+  else
+    store_pv(stmt, make_cell_relations(gen_full_copy_list(l_in)));
 
   if (declaration_statement_p(stmt))
     {
@@ -302,12 +332,12 @@ list statement_to_post_pv(statement stmt, list l_in, pv_context *ctxt)
       l_out = instruction_to_post_pv(statement_instruction(stmt), l_in, ctxt);
     }
 
-  pips_debug_pvs(2, "before composition_with_transformer: ", l_out);
+  pips_debug_pvs(2, "before composition_with_transformer:", l_out);
   l_out = pvs_composition_with_transformer(l_out, transformer_undefined, ctxt);
 
-  store_gen_pv(stmt, make_cell_relations(NIL));
-  store_kill_pv(stmt, make_effects(NIL));
-  pips_debug_pvs(2, "returning: ", l_out);
+  //store_gen_pv(stmt, make_cell_relations(NIL));
+  //store_kill_pv(stmt, make_effects(NIL));
+  pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
   pv_context_statement_pop(ctxt);
 
@@ -335,17 +365,32 @@ static
 list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
+  type e_type = basic_concrete_type(entity_type(e));
+  bool static_p = static_area_p(ram_section(storage_ram(entity_storage(e))));
+
   pips_debug(1, "begin\n");
 
   expression lhs_exp = entity_to_expression(e);
   expression rhs_exp = expression_undefined;
-  bool free_rhs_exp = false;
+  bool free_rhs_exp = false; /* turned to true if rhs_exp is built and
+				must be freed */
 
   value v_init = entity_initial(e);
   if (v_init == value_undefined)
     {
       pips_debug(2, "undefined inital value\n");
-      rhs_exp = entity_to_expression(undefined_pointer_value_entity());
+
+      if (static_p
+	  && !type_fundamental_basic_p(e_type)
+	  && type_leads_to_pointer_p(e_type))
+	/* when no initialization is provided for pointer static variables,
+	   or aggregate variables which recursively have pointer fields,
+	   then all pointers are initialized to NULL previous to program
+	   execution.
+	*/
+	rhs_exp = entity_to_expression(null_pointer_value_entity());
+      else
+	rhs_exp = entity_to_expression(undefined_pointer_value_entity());
       free_rhs_exp = true;
     }
   else
@@ -364,20 +409,21 @@ list declaration_to_post_pv(entity e, list l_in, pv_context *ctxt)
 	case is_value_constant:
 	case is_value_intrinsic:
 	default:
-	  pips_internal_error("unexpected tag\n");
+	  pips_internal_error("unexpected tag");
 	}
     }
 
   pv_results pv_res = make_pv_results();
-  assignment_to_post_pv(lhs_exp, false, rhs_exp, true, l_in, &pv_res, ctxt);
+  assignment_to_post_pv(lhs_exp, static_p, rhs_exp, true, l_in, &pv_res, ctxt);
   l_out = pv_res.l_out;
   free_pv_results_paths(&pv_res);
 
   free_expression(lhs_exp);
   if (free_rhs_exp) free_expression(rhs_exp);
 
-  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
+  free_type(e_type);
   return (l_out);
 }
 
@@ -424,15 +470,15 @@ list instruction_to_post_pv(instruction inst, list l_in, pv_context *ctxt)
       }
       break;
     case is_instruction_goto:
-      pips_internal_error("unexpected goto in pointer values analyses\n");
+      pips_internal_error("unexpected goto in pointer values analyses");
       break;
     case is_instruction_multitest:
-      pips_internal_error("unexpected multitest in pointer values analyses\n");
+      pips_internal_error("unexpected multitest in pointer values analyses");
       break;
     default:
-      pips_internal_error("unknown instruction tag\n");
+      pips_internal_error("unknown instruction tag");
     }
-  pips_debug_pvs(2, "returning: ", l_out);
+  pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
   return (l_out);
 }
@@ -464,34 +510,263 @@ list test_to_post_pv(test t, list l_in, pv_context *ctxt)
   return (l_out);
 }
 
+#define PV_NB_MAX_ITER_FIX_POINT 3
+
 static
-list loop_to_post_pv(loop __attribute__ ((unused))l, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused))*ctxt)
+list loop_to_post_pv(loop l, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
+  range r = loop_range(l);
+  list l_in_cur = l_in;
+  statement body = loop_body(l);
   pips_debug(1, "begin\n");
-  pips_internal_error("not yet implemented\n");
+
+  /* first loop range is evaluated */
+  pv_results pv_res = make_pv_results();
+  range_to_post_pv(r, l_in_cur, &pv_res, ctxt);
+  free_pv_results_paths(&pv_res);
+  l_in_cur = pv_res.l_out;
+  list l_saved = gen_full_copy_list(l_in_cur);
+
+  /* then, the loop body is executed if and only if the upper bound
+     is greater than the lower bound, else the loop body is only possibly
+     executed.
+  */
+
+  /* as a first approximation, we perform no test on the loop bounds,
+     and thus assume that the loop body is only possibly executed
+  */
+  int i = 0;
+  bool fix_point_reached = false;
+  l_out = pv_res.l_out;
+  do
+    {
+      pips_debug(3, "fix point iteration number %d.\n", i+1);
+      list l_iter_in = gen_full_copy_list(l_out);
+      l_out = statement_to_post_pv(body, l_out, ctxt);
+
+      /* this iteration may never be executed :*/
+      l_out = (*ctxt->pvs_may_union_func)(l_out, gen_full_copy_list(l_iter_in));
+      i++;
+      fix_point_reached = (l_out == l_iter_in)
+	|| (*ctxt->pvs_equal_p_func)(l_iter_in, l_out);
+      pips_debug(3, "fix point %s reached\n", fix_point_reached? "":"not");
+      gen_full_free_list(l_iter_in);
+    }
+  while(i<PV_NB_MAX_ITER_FIX_POINT && !fix_point_reached);
+
+  if (!fix_point_reached)
+    {
+      pv_results pv_res_failed = make_pv_results();
+      effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
+      list l_anywhere = CONS(EFFECT, anywhere_eff, NIL);
+      list l_kind = CONS(CELL_INTERPRETATION,
+			 make_cell_interpretation_address_of(), NIL);
+      single_pointer_assignment_to_post_pv(anywhere_eff, l_anywhere, l_kind,
+					   false, l_saved,
+					   &pv_res_failed, ctxt);
+      l_out =  pv_res_failed.l_out;
+      free_pv_results_paths(&pv_res_failed);
+      free_effect(anywhere_eff);
+      gen_free_list(l_anywhere);
+      gen_full_free_list(l_kind);
+
+      /* now update input pointer values of inner loop statements */
+      l_in_cur = gen_full_copy_list(l_out);
+      list l_tmp = statement_to_post_pv(body, l_in_cur, ctxt);
+      gen_full_free_list(l_tmp);
+    }
+  else
+    gen_full_free_list(l_saved);
+
+  pips_debug_pvs(1, "end with l_out =\n", l_out);
+  return (l_out);
+}
+
+static
+list whileloop_to_post_pv(whileloop l, list l_in, pv_context *ctxt)
+{
+  list l_out = NIL;
+  list l_in_cur = NIL;
+  list l_saved = gen_full_copy_list(l_in); /* in case fix point is not reached */
+  expression cond = whileloop_condition(l);
+  bool before_p = evaluation_before_p(whileloop_evaluation(l));
+  statement body = whileloop_body(l);
+  pips_debug(1, "begin\n");
+
+  int i = 1;
+  bool fix_point_reached = false;
+  l_out = l_in;
+  do
+    {
+      pips_debug(3, "fix point iteration number %d.\n", i);
+      list l_iter_in = gen_full_copy_list(l_out);
+      l_in_cur = l_out;
+
+      if(before_p)
+	{
+	  pv_results pv_res_cond = make_pv_results();
+	  expression_to_post_pv(cond, l_in_cur, &pv_res_cond, ctxt);
+	  l_in_cur = pv_res_cond.l_out;
+	  free_pv_results_paths(&pv_res_cond);
+	}
+
+      l_out = statement_to_post_pv(body, l_in_cur, ctxt);
+
+      if(!before_p)
+	{
+	  pv_results pv_res_cond = make_pv_results();
+	  expression_to_post_pv(cond, l_out, &pv_res_cond, ctxt);
+	  l_out = pv_res_cond.l_out;
+	  free_pv_results_paths(&pv_res_cond);
+	}
+
+      /* this iteration may never be executed :*/
+      if (i!=1 || before_p)
+	  l_out = (*ctxt->pvs_may_union_func)(l_out,
+					      gen_full_copy_list(l_iter_in));
+      else
+	{
+	  l_in = gen_full_copy_list(l_out);
+	}
+
+      i++;
+      fix_point_reached = (l_out == l_iter_in)
+	|| (*ctxt->pvs_equal_p_func)(l_iter_in, l_out);
+      pips_debug(3, "fix point %s reached\n", fix_point_reached? "":"not");
+      gen_full_free_list(l_iter_in);
+    }
+  while(i<=PV_NB_MAX_ITER_FIX_POINT && !fix_point_reached);
+
+  if (!fix_point_reached)
+    {
+      pv_results pv_res_failed = make_pv_results();
+      effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
+      list l_anywhere = CONS(EFFECT, anywhere_eff, NIL);
+      list l_kind = CONS(CELL_INTERPRETATION,
+			 make_cell_interpretation_address_of(), NIL);
+      single_pointer_assignment_to_post_pv(anywhere_eff, l_anywhere, l_kind,
+					   false, l_saved,
+					   &pv_res_failed, ctxt);
+      l_out =  pv_res_failed.l_out;
+      free_pv_results_paths(&pv_res_failed);
+      free_effect(anywhere_eff);
+      gen_free_list(l_anywhere);
+      gen_full_free_list(l_kind);
+
+      /* now update input pointer values of inner loop statements */
+      l_in_cur = gen_full_copy_list(l_out);
+      if(before_p)
+	{
+	  pv_results pv_res_cond = make_pv_results();
+	  expression_to_post_pv(cond, l_in_cur, &pv_res_cond, ctxt);
+	  l_in_cur = pv_res_cond.l_out;
+	  free_pv_results_paths(&pv_res_cond);
+	}
+
+      list l_tmp = statement_to_post_pv(body, l_in_cur, ctxt);
+
+      if(!before_p)
+	{
+	  pv_results pv_res_cond = make_pv_results();
+	  expression_to_post_pv(cond, l_tmp, &pv_res_cond, ctxt);
+	  free_pv_results_paths(&pv_res_cond);
+	  gen_full_free_list(pv_res_cond.l_out);
+	}
+      else
+	gen_full_free_list(l_tmp);
+    }
+  else
+    gen_full_free_list(l_saved);
+
+  pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
   return (l_out);
 }
 
 static
-list whileloop_to_post_pv(whileloop __attribute__ ((unused))l, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused))*ctxt)
+list forloop_to_post_pv(forloop l, list l_in, pv_context *ctxt)
 {
   list l_out = NIL;
+  list l_in_cur = NIL;
   pips_debug(1, "begin\n");
-  pips_internal_error("not yet implemented\n");
-  pips_debug_pvs(2, "returning: ", l_out);
-  pips_debug(1, "end\n");
-  return (l_out);
-}
 
-static
-list forloop_to_post_pv(forloop __attribute__ ((unused))l, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused)) *ctxt)
-{
-  list l_out = NIL;
-  pips_debug(1, "begin\n");
-  pips_internal_error("not yet implemented\n");
-  pips_debug_pvs(2, "returning: ", l_out);
+  expression init = forloop_initialization(l);
+  expression cond = forloop_condition(l);
+  expression incr = forloop_increment(l);
+  statement body = forloop_body(l);
+
+  /* First, the initialization is always evaluatated */
+  pv_results pv_res_init = make_pv_results();
+  expression_to_post_pv(init, l_in, &pv_res_init, ctxt);
+  l_in_cur = pv_res_init.l_out;
+  l_in = gen_full_copy_list(l_in_cur); /* saved in case fix point is not reached */
+  free_pv_results_paths(&pv_res_init);
+
+  int i = 1;
+  bool fix_point_reached = false;
+  l_out = l_in_cur;
+  do
+    {
+      pips_debug(3, "fix point iteration number %d.\n", i);
+      list l_iter_in = gen_full_copy_list(l_out);
+      l_in_cur = l_out;
+
+      /* condition is evaluated before each iteration */
+      pv_results pv_res_cond = make_pv_results();
+      expression_to_post_pv(cond, l_in_cur, &pv_res_cond, ctxt);
+      l_in_cur = pv_res_cond.l_out;
+      free_pv_results_paths(&pv_res_cond);
+
+      l_in_cur = statement_to_post_pv(body, l_in_cur, ctxt);
+
+      /* increment expression is evaluated at the end of each iteration */
+      pv_results pv_res_incr = make_pv_results();
+      expression_to_post_pv(incr, l_in_cur, &pv_res_incr, ctxt);
+      l_in_cur = pv_res_incr.l_out;
+      free_pv_results_paths(&pv_res_incr);
+
+      /* this iteration may never be executed :*/
+      l_out = (*ctxt->pvs_may_union_func)(l_in_cur,
+					  gen_full_copy_list(l_iter_in));
+      i++;
+      fix_point_reached = (l_out == l_iter_in)
+	|| (*ctxt->pvs_equal_p_func)(l_iter_in, l_out);
+      pips_debug(3, "fix point %s reached\n", fix_point_reached? "":"not");
+      gen_full_free_list(l_iter_in);
+    }
+  while(i<=PV_NB_MAX_ITER_FIX_POINT && !fix_point_reached);
+
+  if (!fix_point_reached)
+    {
+      pv_results pv_res_failed = make_pv_results();
+      effect anywhere_eff = make_anywhere_effect(make_action_write_memory());
+      list l_anywhere = CONS(EFFECT, anywhere_eff, NIL);
+      list l_kind = CONS(CELL_INTERPRETATION,
+			 make_cell_interpretation_address_of(), NIL);
+      single_pointer_assignment_to_post_pv(anywhere_eff, l_anywhere, l_kind,
+					   false, l_in,
+					   &pv_res_failed, ctxt);
+      l_out =  pv_res_failed.l_out;
+      free_pv_results_paths(&pv_res_failed);
+      free_effect(anywhere_eff);
+      gen_free_list(l_anywhere);
+      gen_full_free_list(l_kind);
+
+      /* now update input pointer values of inner loop statements */
+      l_in_cur = gen_full_copy_list(l_out);
+      pv_results pv_res_cond = make_pv_results();
+      expression_to_post_pv(cond, l_in_cur, &pv_res_cond, ctxt);
+      l_in_cur = pv_res_cond.l_out;
+      free_pv_results_paths(&pv_res_cond);
+
+      list l_tmp = statement_to_post_pv(body, l_in_cur, ctxt);
+
+      gen_full_free_list(l_tmp);
+    }
+
+
+  pips_debug_pvs(2, "returning:", l_out);
   pips_debug(1, "end\n");
   return (l_out);
 }
@@ -501,10 +776,28 @@ static
 list unstructured_to_post_pv(unstructured __attribute__ ((unused))u, list __attribute__ ((unused))l_in, pv_context __attribute__ ((unused)) *ctxt)
 {
   list l_out = NIL;
-  pips_internal_error("not yet implemented\n");
+  pips_internal_error("not yet implemented");
    pips_debug_pvs(2, "returning: ", l_out);
  pips_debug(1, "end\n");
   return (l_out);
+}
+
+
+void range_to_post_pv(range r, list l_in, pv_results * pv_res, pv_context *ctxt)
+{
+    expression el = range_lower(r);
+    expression eu = range_upper(r);
+    expression ei = range_increment(r);
+
+    pips_debug(1, "begin\n");
+
+    expression_to_post_pv(el, l_in, pv_res, ctxt);
+    expression_to_post_pv(eu, pv_res->l_out, pv_res, ctxt);
+    expression_to_post_pv(ei, pv_res->l_out, pv_res, ctxt);
+
+    free_pv_results_paths(pv_res);
+
+    pips_debug_pvs(1, "end with pv_res->l_out:\n", pv_res->l_out);
 }
 
 void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_context *ctxt)
@@ -515,7 +808,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
       pv_res->l_out = l_in;
       pv_res->result_paths = CONS(EFFECT, make_effect(make_undefined_pointer_value_cell(),
 						      make_action_write_memory(),
-						      make_approximation_must(),
+						      make_approximation_exact(),
 						      make_descriptor_none()),NIL);
       pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 						  make_cell_interpretation_value_of(), NIL);
@@ -536,7 +829,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	    {
 	      pv_res->result_paths = CONS(EFFECT, make_effect(make_null_pointer_value_cell(),
 							     make_action_read_memory(),
-							     make_approximation_must(),
+							     make_approximation_exact(),
 							     make_descriptor_none()), NIL);
 	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
 							  make_cell_interpretation_value_of(),
@@ -557,7 +850,7 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	  pv_res->l_out = l_in;
 	  break;
 	case is_syntax_range:
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	  break;
 	case is_syntax_call:
 	  {
@@ -594,15 +887,15 @@ void expression_to_post_pv(expression exp, list l_in, pv_results * pv_res, pv_co
 	    break;
 	  }
 	case is_syntax_application:
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	  break;
 	case is_syntax_va_arg:
 	  {
-	    pips_internal_error("not yet implemented\n");
+	    pips_internal_error("not yet implemented");
 	    break;
 	  }
 	default:
-	  pips_internal_error("unexpected tag %d\n", syntax_tag(exp_syntax));
+	  pips_internal_error("unexpected tag %d", syntax_tag(exp_syntax));
 	}
     }
 
@@ -659,12 +952,12 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 	  /* We should be here only in case of a pointer value rhs, and the value should be 0 */
 	  if (constant_int_p(func_const) && (constant_int(func_const) == 0))
 	    {
-	      /* use approximation_must to be consistent with effects,
+	      /* use approximation_exact to be consistent with effects,
 		 should be approximation_exact */
 	      pv_res->result_paths = CONS(EFFECT,
 					  make_effect(make_null_pointer_value_cell(),
 						      make_action_read_memory(),
-						      make_approximation_must(),
+						      make_approximation_exact(),
 						      make_descriptor_none()),
 					  NIL);
 	      pv_res->result_paths_interpretations = CONS(CELL_INTERPRETATION,
@@ -683,7 +976,7 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 		      /* not generic here */
 		      effect eff = make_effect(make_cell_reference(make_reference(func, NIL)),
 					       make_action_read_memory(),
-					       make_approximation_must(),
+					       make_approximation_exact(),
 					       make_descriptor_none());
 		      effect_add_dereferencing_dimension(eff);
 		      pv_res->result_paths = CONS(EFFECT, eff, NIL);
@@ -697,28 +990,28 @@ void call_to_post_pv(call c, list l_in, pv_results *pv_res, pv_context *ctxt)
 	  break;
 
 	case is_value_unknown:
-	  pips_internal_error("unknown function \n");
+	  pips_internal_error("unknown function ");
 	  break;
 
 	default:
-	  pips_internal_error("unknown tag %d\n", t);
+	  pips_internal_error("unknown tag %d", t);
 	  break;
 	}
     }
   else if(type_variable_p(func_type))
     {
-      pips_internal_error("not yet implemented\n");
+      pips_internal_error("not yet implemented");
     }
   else if(type_statement_p(func_type))
     {
-      pips_internal_error("not yet implemented\n");
+      pips_internal_error("not yet implemented");
     }
   else
     {
-      pips_internal_error("Unexpected case\n");
+      pips_internal_error("Unexpected case");
     }
 
-  pips_debug_pvs(2, "returning pv_res->l_out: ", pv_res->l_out);
+  pips_debug_pvs(2, "returning pv_res->l_out:", pv_res->l_out);
   pips_debug(1, "end\n");
   return;
 }
@@ -745,8 +1038,20 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
   list l_kill = NIL;
   list l_gen = NIL;
 
-  pips_debug(1, "begin\n");
-
+  pips_debug_effect(1, "begin for lhs_eff =", lhs_eff);
+  pips_debug(1, "and l_rhs_eff:\n");
+  ifdebug(1)
+    {
+      list l_tmp = l_rhs_kind;
+      FOREACH(EFFECT, rhs_eff, l_rhs_eff)
+	{
+	  cell_interpretation ci = CELL_INTERPRETATION(CAR(l_tmp));
+	  pips_debug(1, "%s of:\n", cell_interpretation_value_of_p(ci)?"value": "address");
+	  pips_debug_effect(1, "\t", rhs_eff);
+	  POP(l_tmp);
+	}
+    }
+  pips_debug_pvs(1, "and l_in =", l_in);
   bool anywhere_lhs_p = false;
 
   /* First search for all killed paths */
@@ -757,6 +1062,7 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
       pips_debug(3, "anywhere lhs\n");
       anywhere_lhs_p = true;
       l_kill = CONS(EFFECT, copy_effect(lhs_eff), NIL);
+      l_aliased = l_kill;
     }
   else
     {
@@ -787,7 +1093,7 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
 	}
     }
 
-  pips_debug_effects(2, "l_kill = ", l_kill);
+  pips_debug_effects(2, "l_kill =", l_kill);
 
   if (anywhere_lhs_p)
     {
@@ -803,19 +1109,31 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
       cell_interpretation rhs_kind = make_cell_interpretation_address_of();
       FOREACH(CELL_RELATION, pv_in, l_in)
 	{
-	  if (cell_relation_second_address_of_p(pv_in)
-	      || undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
-	      || null_pointer_value_cell_p(cell_relation_second_cell(pv_in)) )
+	  /* dealing with first cell */
+	  /* not generic */
+	  effect eff_alias = make_effect(copy_cell(cell_relation_first_cell(pv_in)),
+					 make_action_write_memory(),
+					 make_approximation_may(),
+					 make_descriptor_none());
+
+	  list l_gen_pv = (* ctxt->make_pv_from_effects_func)
+	    (eff_alias, anywhere_eff, rhs_kind, l_in);
+	  l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
+	  free_effect(eff_alias);
+
+	  if (cell_relation_second_value_of_p(pv_in)
+	      && !undefined_pointer_value_cell_p(cell_relation_second_cell(pv_in))
+	      && !null_pointer_value_cell_p(cell_relation_second_cell(pv_in)) )
 	    {
 	      /* not generic */
-	      effect eff_alias = make_effect(copy_cell(cell_relation_first_cell(pv_in)),
+	      effect eff_alias = make_effect(copy_cell(cell_relation_second_cell(pv_in)),
 					     make_action_write_memory(),
 					     make_approximation_may(),
 					     make_descriptor_none());
 
 	      list l_gen_pv = (* ctxt->make_pv_from_effects_func)
 		(eff_alias, anywhere_eff, rhs_kind, l_in);
-	      l_gen = gen_nconc(l_gen_pv, l_gen);
+	      l_gen = (*ctxt->pvs_must_union_func)(l_gen_pv, l_gen);
 	      free_effect(eff_alias);
 	    }
 	}
@@ -844,12 +1162,12 @@ void single_pointer_assignment_to_post_pv(effect lhs_eff,
 	  gen_full_free_list(l_kill);
 	  l_kill = NIL;
 	}
-      pips_debug_pvs(2, "l_gen = ", l_gen);
+      pips_debug_pvs(2, "l_gen =", l_gen);
     }
 
   /* now take kills into account */
   l_out = kill_pointer_values(l_in, l_kill, ctxt);
-  pips_debug_pvs(2, "l_out_after kill: ", l_out);
+  pips_debug_pvs(2, "l_out_after kill:", l_out);
 
   /* and add gen */
   l_out = (*ctxt->pvs_must_union_func)(l_out, l_gen);
@@ -909,7 +1227,7 @@ void multiple_pointer_assignment_to_post_pv(effect lhs_base_eff, type lhs_type,
       /* First, search for all accessible pointers */
       list l_lhs = generic_effect_generate_all_accessible_paths_effects_with_level
 	(lhs_base_eff, lhs_type, is_action_write, false, 0, true);
-      if(effect_must_p(lhs_base_eff))
+      if(effect_exact_p(lhs_base_eff))
 	effects_to_must_effects(l_lhs); /* to work around the fact that exact effects are must effects */
       pips_debug_effects(2, "l_lhs = ", l_lhs);
 
@@ -1026,10 +1344,9 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
   list l_rhs_eff = rhs_pv_res.result_paths;
   list l_rhs_kind = rhs_pv_res.result_paths_interpretations;
   l_in_cur = rhs_pv_res.l_out;
-  //if (l_in != l_in_cur) gen_full_free_list(l_in); should have been freed in expression_to_post_pv
-
 
   expression_to_post_pv(lhs, l_in_cur, &lhs_pv_res, ctxt);
+  l_in_cur = lhs_pv_res.l_out;
   /* we should test here that lhs_pv_res.result_paths has only one element.
      well is it correct? can a relational operator expression be a lhs ?
   */
@@ -1041,7 +1358,7 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
 
   if (type_fundamental_basic_p(lhs_type) || !type_leads_to_pointer_p(lhs_type))
     {
-      pips_debug(2, "non-pointer assignment \n");
+      pips_debug(2, "non-pointer assignment\n");
       /* l_gen = NIL; l_kill = NIL; */
       pv_res->l_out = l_in_cur;
     }
@@ -1066,17 +1383,17 @@ void assignment_to_post_pv(expression lhs, bool may_lhs_p,
 	} /* if (type_variable_p(lhs_type) */
       else if(type_functional_p(lhs_type))
 	{
-	  pips_internal_error("not yet implemented\n");
+	  pips_internal_error("not yet implemented");
 	}
       else
-	pips_internal_error("unexpected_type\n");
+	pips_internal_error("unexpected_type");
     }
 
 
   free_pv_results_paths(&lhs_pv_res);
   free_pv_results_paths(&rhs_pv_res);
 
-  pips_debug_pv_results(1, "end with pv_res = \n", *pv_res);
+  pips_debug_pv_results(1, "end with pv_res =\n", *pv_res);
   return;
 }
 
@@ -1098,8 +1415,8 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
 				db_get_memory_resource(DBR_CODE, module_name, TRUE));
   set_current_module_entity(module_name_to_entity(module_name));
   init_pv();
-  init_gen_pv();
-  init_kill_pv();
+  //  init_gen_pv();
+  //  init_kill_pv();
 
   debug_on("POINTER_VALUES_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
@@ -1107,8 +1424,8 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   l_out = statement_to_post_pv(get_current_module_statement(), NIL, ctxt);
 
   (*ctxt->db_put_pv_func)(module_name, get_pv());
-  (*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());
-  (*ctxt->db_put_kill_pv_func)(module_name, get_kill_pv());
+  //(*ctxt->db_put_gen_pv_func)(module_name, get_gen_pv());
+  //(*ctxt->db_put_kill_pv_func)(module_name, get_kill_pv());
 
   pips_debug(1, "end\n");
   debug_off();
@@ -1116,8 +1433,8 @@ static void generic_module_pointer_values(char * module_name, pv_context *ctxt)
   reset_current_module_statement();
 
   reset_pv();
-  reset_gen_pv();
-  reset_kill_pv();
+  //  reset_gen_pv();
+  //  reset_kill_pv();
 
   return;
 }

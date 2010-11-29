@@ -161,7 +161,8 @@ statement interchange_inner_outermost_loops(list lls,
   return s;
 }
 
-statement old_interchange_inner_outermost_loops(list lls,
+#if 0
+static statement old_interchange_inner_outermost_loops(list lls,
                                 __attribute__((unused)) bool (*unused)(statement))
 {
   Psysteme sci;			/* sc initial */
@@ -272,6 +273,7 @@ statement old_interchange_inner_outermost_loops(list lls,
 
   return s_lhyp;
 }
+#endif
 
 /* See comments for interchange_inner_outermost_loops(). Continue
    statements for loop labels are not fixed. */

@@ -54,7 +54,7 @@
 /* The following define may be replaced by #define ... (TRUE) */
 #define effect_may_or_must_p(my_effect) \
   ((approximation_may_p(effect_approximation(my_effect))) || \
-   (approximation_must_p(effect_approximation(my_effect))) )
+   (approximation_exact_p(effect_approximation(my_effect))) )
 
 #define effect_to_name(the_effect)\
   entity_name(reference_variable(effect_any_reference(the_effect)))
@@ -613,7 +613,7 @@ bool position_in_the_area(entity the_var, intptr_t *inf, intptr_t *sup)
 	    break;
 	}
     default:
-	pips_error("position_in_the_area", "unknown basic tag %d\n", basic_tag(base));
+	pips_internal_error("unknown basic tag %d", basic_tag(base));
     }
 
     *inf = ram_offset(storage_ram(entity_storage(the_var)));

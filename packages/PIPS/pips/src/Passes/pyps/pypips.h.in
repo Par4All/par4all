@@ -22,3 +22,5 @@ extern int get_int_property(const char* /*name*/);
 extern char *activate(char *);
 extern char *module_loops(const char*,const char*);
 extern void user_log(char *, ...);
+
+extern string compilation_unit_of_module(const char*);

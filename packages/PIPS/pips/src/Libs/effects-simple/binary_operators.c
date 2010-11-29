@@ -202,7 +202,7 @@ static list
 effect_sup_difference(/* const */ effect eff1, /* const */ effect eff2)
 {
     list l_res = NIL;
-    if (effect_must_p(eff2))
+    if (effect_exact_p(eff2))
 	l_res = NIL;
     else
       l_res = effect_to_may_effect_list((*effect_dup_func)(eff1));

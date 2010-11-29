@@ -46,7 +46,6 @@ The HRE code if we want to have only one process on the HRE
 #include "text-util.h"
 #include "properties.h"
 
-#include "sac.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -227,7 +226,7 @@ statement make_toggle_inc_statement(entity toggleEnt, int val)
 			      NULL);
 
   expression modExp =
-    call_to_expression(make_call(get_function_entity(C_MODULO_OPERATOR_NAME),
+    call_to_expression(make_call(entity_intrinsic(C_MODULO_OPERATOR_NAME),
 				 modArg));
 
   return make_assign_statement(entity_to_expression(toggleEnt),
@@ -965,7 +964,7 @@ static statement add_exec_mmcd(statement stat)
 				     NULL);
 
 	  expression neExp = 
-	    call_to_expression(make_call(get_function_entity(C_EQUAL_OPERATOR_NAME),
+	    call_to_expression(make_call(entity_intrinsic(C_EQUAL_OPERATOR_NAME),
 					 neArg));
 
 	  test t = make_test(neExp, mmcdStat, make_empty_statement());

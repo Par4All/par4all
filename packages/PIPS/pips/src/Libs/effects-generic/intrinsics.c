@@ -121,67 +121,67 @@ typedef struct IoElementDescriptor {
 static IoElementDescriptor IoElementDescriptorUndefined;
 
 static IoElementDescriptor IoElementDescriptorTable[] = {
-  {"OPEN",      "UNIT=",        is_action_read,  is_approximation_must},
+  {"OPEN",      "UNIT=",        is_action_read,  is_approximation_exact},
   {"OPEN",      "ERR=",         is_action_read,  is_approximation_may},
-  {"OPEN",      "FILE=",        is_action_read,  is_approximation_must},
+  {"OPEN",      "FILE=",        is_action_read,  is_approximation_exact},
   {"OPEN",      "STATUS=",      is_action_read,  is_approximation_may},
-  {"OPEN",      "ACCESS=",      is_action_read,  is_approximation_must},
-  {"OPEN",      "FORM=",        is_action_read,  is_approximation_must},
-  {"OPEN",      "RECL=",        is_action_read,  is_approximation_must},
+  {"OPEN",      "ACCESS=",      is_action_read,  is_approximation_exact},
+  {"OPEN",      "FORM=",        is_action_read,  is_approximation_exact},
+  {"OPEN",      "RECL=",        is_action_read,  is_approximation_exact},
   {"OPEN",      "BLANK=",       is_action_read,  is_approximation_may},
   {"OPEN",      "IOSTAT=",      is_action_write, is_approximation_may},
 
-  {"CLOSE",     "UNIT=",        is_action_read,  is_approximation_must},
+  {"CLOSE",     "UNIT=",        is_action_read,  is_approximation_exact},
   {"CLOSE",     "ERR=",         is_action_read,  is_approximation_may},
   {"CLOSE",     "STATUS=",      is_action_read,  is_approximation_may},
   {"CLOSE",     "IOSTAT=",      is_action_write, is_approximation_may},
 
-  {"INQUIRE",   "UNIT=",        is_action_read,  is_approximation_must},
+  {"INQUIRE",   "UNIT=",        is_action_read,  is_approximation_exact},
   {"INQUIRE",   "ERR=",         is_action_read,  is_approximation_may},
-  {"INQUIRE",   "FILE=",        is_action_read,  is_approximation_must},
-  {"INQUIRE",   "IOSTAT=",      is_action_write, is_approximation_must},
-  {"INQUIRE",   "EXIST=",       is_action_write, is_approximation_must},
-  {"INQUIRE",   "OPENED=",      is_action_write, is_approximation_must},
-  {"INQUIRE",   "NUMBER=",      is_action_write, is_approximation_must},
-  {"INQUIRE",   "NAMED=",       is_action_write, is_approximation_must},
-  {"INQUIRE",   "NAME=",        is_action_write, is_approximation_must},
-  {"INQUIRE",   "ACCESS=",      is_action_write, is_approximation_must},
-  {"INQUIRE",   "SEQUENTIAL=",  is_action_write, is_approximation_must},
-  {"INQUIRE",   "DIRECT=",      is_action_write, is_approximation_must},
-  {"INQUIRE",   "FORM=",        is_action_write, is_approximation_must},
-  {"INQUIRE",   "FORMATTED=",   is_action_write, is_approximation_must},
-  {"INQUIRE",   "UNFORMATTED=", is_action_write, is_approximation_must},
-  {"INQUIRE",   "RECL=",        is_action_write, is_approximation_must},
-  {"INQUIRE",   "NEXTREC=",     is_action_write, is_approximation_must},
-  {"INQUIRE",   "BLANK=",       is_action_write, is_approximation_must},
+  {"INQUIRE",   "FILE=",        is_action_read,  is_approximation_exact},
+  {"INQUIRE",   "IOSTAT=",      is_action_write, is_approximation_exact},
+  {"INQUIRE",   "EXIST=",       is_action_write, is_approximation_exact},
+  {"INQUIRE",   "OPENED=",      is_action_write, is_approximation_exact},
+  {"INQUIRE",   "NUMBER=",      is_action_write, is_approximation_exact},
+  {"INQUIRE",   "NAMED=",       is_action_write, is_approximation_exact},
+  {"INQUIRE",   "NAME=",        is_action_write, is_approximation_exact},
+  {"INQUIRE",   "ACCESS=",      is_action_write, is_approximation_exact},
+  {"INQUIRE",   "SEQUENTIAL=",  is_action_write, is_approximation_exact},
+  {"INQUIRE",   "DIRECT=",      is_action_write, is_approximation_exact},
+  {"INQUIRE",   "FORM=",        is_action_write, is_approximation_exact},
+  {"INQUIRE",   "FORMATTED=",   is_action_write, is_approximation_exact},
+  {"INQUIRE",   "UNFORMATTED=", is_action_write, is_approximation_exact},
+  {"INQUIRE",   "RECL=",        is_action_write, is_approximation_exact},
+  {"INQUIRE",   "NEXTREC=",     is_action_write, is_approximation_exact},
+  {"INQUIRE",   "BLANK=",       is_action_write, is_approximation_exact},
 
-  {"BACKSPACE", "UNIT=",        is_action_read,  is_approximation_must},
+  {"BACKSPACE", "UNIT=",        is_action_read,  is_approximation_exact},
   {"BACKSPACE", "ERR=",         is_action_read,  is_approximation_may},
   {"BACKSPACE", "IOSTAT=",      is_action_write, is_approximation_may},
 
-  {"ENDFILE",   "UNIT=",        is_action_read,  is_approximation_must},
+  {"ENDFILE",   "UNIT=",        is_action_read,  is_approximation_exact},
   {"ENDFILE",   "ERR=",         is_action_read,  is_approximation_may},
   {"ENDFILE",   "IOSTAT=",      is_action_write, is_approximation_may},
 
-  {"REWIND",    "UNIT=",        is_action_read,  is_approximation_must},
+  {"REWIND",    "UNIT=",        is_action_read,  is_approximation_exact},
   {"REWIND",    "ERR=",         is_action_read,  is_approximation_may},
   {"REWIND",    "IOSTAT=",      is_action_write, is_approximation_may},
 
-  {"READ",      "FMT=",         is_action_read,  is_approximation_must},
-  {"READ",      "UNIT=",        is_action_read,  is_approximation_must},
-  {"READ",      "REC=",         is_action_read,  is_approximation_must},
+  {"READ",      "FMT=",         is_action_read,  is_approximation_exact},
+  {"READ",      "UNIT=",        is_action_read,  is_approximation_exact},
+  {"READ",      "REC=",         is_action_read,  is_approximation_exact},
   {"READ",      "ERR=",         is_action_read,  is_approximation_may},
-  {"READ",      "END=",         is_action_read,  is_approximation_must},
+  {"READ",      "END=",         is_action_read,  is_approximation_exact},
   {"READ",      "IOSTAT=",      is_action_write, is_approximation_may},
-  {"READ",      "IOLIST=",      is_action_write, is_approximation_must},
+  {"READ",      "IOLIST=",      is_action_write, is_approximation_exact},
 
-  {"WRITE",     "FMT=",         is_action_read,  is_approximation_must},
-  {"WRITE",     "UNIT=",        is_action_read,  is_approximation_must},
-  {"WRITE",     "REC=",         is_action_read,  is_approximation_must},
+  {"WRITE",     "FMT=",         is_action_read,  is_approximation_exact},
+  {"WRITE",     "UNIT=",        is_action_read,  is_approximation_exact},
+  {"WRITE",     "REC=",         is_action_read,  is_approximation_exact},
   {"WRITE",     "ERR=",         is_action_read,  is_approximation_may},
-  {"WRITE",     "END=",         is_action_read,  is_approximation_must},
+  {"WRITE",     "END=",         is_action_read,  is_approximation_exact},
   {"WRITE",     "IOSTAT=",      is_action_write, is_approximation_may},
-  {"WRITE",     "IOLIST=",      is_action_read,  is_approximation_must},
+  {"WRITE",     "IOLIST=",      is_action_read,  is_approximation_exact},
 
   /* C IO intrinsics arranged in the order of the standard ISO/IEC 9899:TC2. MB */
 
@@ -206,90 +206,90 @@ static IoElementDescriptor IoElementDescriptorTable[] = {
 
   /* Input/Output <stdio.h> */
 
-  {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
-  {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_must},
-  {FPRINTF_FUNCTION_NAME,       "srR*",    is_action_read, is_approximation_must},
-  {FSCANF_FUNCTION_NAME,        "srW*",    is_action_read, is_approximation_must},
-  {ISOC99_FSCANF_FUNCTION_NAME, "srW*",    is_action_read, is_approximation_must},
-  {PRINTF_FUNCTION_NAME,        "rR*",     is_action_read, is_approximation_must},
-  {SCANF_FUNCTION_NAME,         "rW*",     is_action_read, is_approximation_must},
-  {ISOC99_SCANF_FUNCTION_NAME,   "rW*",    is_action_read, is_approximation_must},
-  {SNPRINTF_FUNCTION_NAME,      "wnrR*",   is_action_read, is_approximation_must},
-  {SPRINTF_FUNCTION_NAME,       "wrR*",    is_action_read, is_approximation_must},
-  {SSCANF_FUNCTION_NAME,        "rrW*",    is_action_read, is_approximation_must},
-  {ISOC99_SSCANF_FUNCTION_NAME, "rrW*",    is_action_read, is_approximation_must},
-  {VFPRINTF_FUNCTION_NAME,      "srv",     is_action_read, is_approximation_must},
-  {VFSCANF_FUNCTION_NAME,       "srv",     is_action_read, is_approximation_must},
-  {ISOC99_VFSCANF_FUNCTION_NAME,"srv",     is_action_read, is_approximation_must},
-  {VPRINTF_FUNCTION_NAME,       "rv",      is_action_read, is_approximation_must},
-  {VSCANF_FUNCTION_NAME,        "rv",      is_action_read, is_approximation_must},
-  {ISOC99_VSCANF_FUNCTION_NAME, "rv",      is_action_read, is_approximation_must},
-  {VSNPRINTF_FUNCTION_NAME,     "wnrv",    is_action_read, is_approximation_must},
-  {VSPRINTF_FUNCTION_NAME,      "wrv",     is_action_read, is_approximation_must},
-  {VSSCANF_FUNCTION_NAME,       "rrv",     is_action_read, is_approximation_must},
-  {ISOC99_VSSCANF_FUNCTION_NAME,"rrv",     is_action_read, is_approximation_must},
-  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
-  {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_must},
-  {FPUTC_FUNCTION_NAME,         "ns",      is_action_read, is_approximation_must},
-  {FPUTS_FUNCTION_NAME,         "rs",      is_action_read, is_approximation_must},
-  {GETC_FUNCTION_NAME,          "s",       is_action_read, is_approximation_must},
-  {_IO_GETC_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
-  {GETCHAR_FUNCTION_NAME,       "",        is_action_read, is_approximation_must},
-  {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_must},
-  {PUTC_FUNCTION_NAME,          "ns",      is_action_read, is_approximation_must},
-  {_IO_PUTC_FUNCTION_NAME,      "ns",      is_action_read, is_approximation_must},
-  {PUTCHAR_FUNCTION_NAME,       "n",       is_action_read, is_approximation_must},
-  {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_must},
-  {UNGETC_FUNCTION_NAME,        "ns",      is_action_read, is_approximation_must},
-  {FREAD_FUNCTION_NAME,         "wnns",    is_action_read, is_approximation_must},
-  {FWRITE_FUNCTION_NAME,        "rnns",    is_action_read, is_approximation_must},
-  {FGETPOS_FUNCTION_NAME,       "sw",      is_action_read, is_approximation_must},
-  {FSEEK_FUNCTION_NAME,         "snn",     is_action_read, is_approximation_must},
-  {FSETPOS_FUNCTION_NAME,       "sr",      is_action_read, is_approximation_must},
-  {FTELL_FUNCTION_NAME,         "s",       is_action_read, is_approximation_must},
-  {C_REWIND_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
-  {CLEARERR_FUNCTION_NAME,      "s",       is_action_read, is_approximation_must},
-  {FEOF_FUNCTION_NAME,          "s",       is_action_read, is_approximation_must},
-  {FERROR_FUNCTION_NAME,        "s",       is_action_read, is_approximation_must},
-  {PERROR_FUNCTION_NAME,        "r",       is_action_read, is_approximation_must},
+  {FCLOSE_FUNCTION_NAME,        "s",       is_action_read, is_approximation_exact},
+  {FOPEN_FUNCTION_NAME,         "rr",      is_action_read, is_approximation_exact},
+  {FPRINTF_FUNCTION_NAME,       "srR*",    is_action_read, is_approximation_exact},
+  {FSCANF_FUNCTION_NAME,        "srW*",    is_action_read, is_approximation_exact},
+  {ISOC99_FSCANF_FUNCTION_NAME, "srW*",    is_action_read, is_approximation_exact},
+  {PRINTF_FUNCTION_NAME,        "rR*",     is_action_read, is_approximation_exact},
+  {SCANF_FUNCTION_NAME,         "rW*",     is_action_read, is_approximation_exact},
+  {ISOC99_SCANF_FUNCTION_NAME,   "rW*",    is_action_read, is_approximation_exact},
+  {SNPRINTF_FUNCTION_NAME,      "wnrR*",   is_action_read, is_approximation_exact},
+  {SPRINTF_FUNCTION_NAME,       "wrR*",    is_action_read, is_approximation_exact},
+  {SSCANF_FUNCTION_NAME,        "rrW*",    is_action_read, is_approximation_exact},
+  {ISOC99_SSCANF_FUNCTION_NAME, "rrW*",    is_action_read, is_approximation_exact},
+  {VFPRINTF_FUNCTION_NAME,      "srv",     is_action_read, is_approximation_exact},
+  {VFSCANF_FUNCTION_NAME,       "srv",     is_action_read, is_approximation_exact},
+  {ISOC99_VFSCANF_FUNCTION_NAME,"srv",     is_action_read, is_approximation_exact},
+  {VPRINTF_FUNCTION_NAME,       "rv",      is_action_read, is_approximation_exact},
+  {VSCANF_FUNCTION_NAME,        "rv",      is_action_read, is_approximation_exact},
+  {ISOC99_VSCANF_FUNCTION_NAME, "rv",      is_action_read, is_approximation_exact},
+  {VSNPRINTF_FUNCTION_NAME,     "wnrv",    is_action_read, is_approximation_exact},
+  {VSPRINTF_FUNCTION_NAME,      "wrv",     is_action_read, is_approximation_exact},
+  {VSSCANF_FUNCTION_NAME,       "rrv",     is_action_read, is_approximation_exact},
+  {ISOC99_VSSCANF_FUNCTION_NAME,"rrv",     is_action_read, is_approximation_exact},
+  {FGETC_FUNCTION_NAME,         "s",       is_action_read, is_approximation_exact},
+  {FGETS_FUNCTION_NAME,         "wns",     is_action_read, is_approximation_exact},
+  {FPUTC_FUNCTION_NAME,         "ns",      is_action_read, is_approximation_exact},
+  {FPUTS_FUNCTION_NAME,         "rs",      is_action_read, is_approximation_exact},
+  {GETC_FUNCTION_NAME,          "s",       is_action_read, is_approximation_exact},
+  {_IO_GETC_FUNCTION_NAME,      "s",       is_action_read, is_approximation_exact},
+  {GETCHAR_FUNCTION_NAME,       "",        is_action_read, is_approximation_exact},
+  {GETS_FUNCTION_NAME,          "w",       is_action_read, is_approximation_exact},
+  {PUTC_FUNCTION_NAME,          "ns",      is_action_read, is_approximation_exact},
+  {_IO_PUTC_FUNCTION_NAME,      "ns",      is_action_read, is_approximation_exact},
+  {PUTCHAR_FUNCTION_NAME,       "n",       is_action_read, is_approximation_exact},
+  {PUTS_FUNCTION_NAME,          "r",       is_action_read, is_approximation_exact},
+  {UNGETC_FUNCTION_NAME,        "ns",      is_action_read, is_approximation_exact},
+  {FREAD_FUNCTION_NAME,         "wnns",    is_action_read, is_approximation_exact},
+  {FWRITE_FUNCTION_NAME,        "rnns",    is_action_read, is_approximation_exact},
+  {FGETPOS_FUNCTION_NAME,       "sw",      is_action_read, is_approximation_exact},
+  {FSEEK_FUNCTION_NAME,         "snn",     is_action_read, is_approximation_exact},
+  {FSETPOS_FUNCTION_NAME,       "sr",      is_action_read, is_approximation_exact},
+  {FTELL_FUNCTION_NAME,         "s",       is_action_read, is_approximation_exact},
+  {C_REWIND_FUNCTION_NAME,      "s",       is_action_read, is_approximation_exact},
+  {CLEARERR_FUNCTION_NAME,      "s",       is_action_read, is_approximation_exact},
+  {FEOF_FUNCTION_NAME,          "s",       is_action_read, is_approximation_exact},
+  {FERROR_FUNCTION_NAME,        "s",       is_action_read, is_approximation_exact},
+  {PERROR_FUNCTION_NAME,        "r",       is_action_read, is_approximation_exact},
 
 
   /* UNIX IO system calls */
 
-  {C_OPEN_FUNCTION_NAME,        "nn",      is_action_read, is_approximation_must},
-  {CREAT_FUNCTION_NAME,         "nn",      is_action_read, is_approximation_must},
-  {C_CLOSE_FUNCTION_NAME,       "f",       is_action_read, is_approximation_must},
-  {C_WRITE_FUNCTION_NAME,       "frr",     is_action_read, is_approximation_must},
-  {C_READ_FUNCTION_NAME,        "fwn",     is_action_read, is_approximation_must},
-  {FCNTL_FUNCTION_NAME,         "fnn*",    is_action_read, is_approximation_must},
-  {FSYNC_FUNCTION_NAME,         "f",       is_action_read, is_approximation_must},
-  {FDATASYNC_FUNCTION_NAME,     "f",       is_action_read, is_approximation_must},
-  {IOCTL_FUNCTION_NAME,         "fn*",     is_action_read, is_approximation_must},
-  {SELECT_FUNCTION_NAME,        "nrrrr",   is_action_read, is_approximation_must},
-  {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_must},
-  {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_must},
+  {C_OPEN_FUNCTION_NAME,        "nn",      is_action_read, is_approximation_exact},
+  {CREAT_FUNCTION_NAME,         "nn",      is_action_read, is_approximation_exact},
+  {C_CLOSE_FUNCTION_NAME,       "f",       is_action_read, is_approximation_exact},
+  {C_WRITE_FUNCTION_NAME,       "frr",     is_action_read, is_approximation_exact},
+  {C_READ_FUNCTION_NAME,        "fwn",     is_action_read, is_approximation_exact},
+  {FCNTL_FUNCTION_NAME,         "fnn*",    is_action_read, is_approximation_exact},
+  {FSYNC_FUNCTION_NAME,         "f",       is_action_read, is_approximation_exact},
+  {FDATASYNC_FUNCTION_NAME,     "f",       is_action_read, is_approximation_exact},
+  {IOCTL_FUNCTION_NAME,         "fn*",     is_action_read, is_approximation_exact},
+  {SELECT_FUNCTION_NAME,        "nrrrr",   is_action_read, is_approximation_exact},
+  {PSELECT_FUNCTION_NAME,       "nrrrrw",  is_action_read, is_approximation_exact},
+  {FSTAT_FUNCTION_NAME,         "nw",      is_action_read, is_approximation_exact},
 
 
   /* wchar.h */
 
-  {FWSCANF_FUNCTION_NAME,       "srW*",    is_action_read, is_approximation_must},
-  {SWSCANF_FUNCTION_NAME,       "rrW*",    is_action_read, is_approximation_must},
-  {WSCANF_FUNCTION_NAME,        "rW*",     is_action_read, is_approximation_must},
+  {FWSCANF_FUNCTION_NAME,       "srW*",    is_action_read, is_approximation_exact},
+  {SWSCANF_FUNCTION_NAME,       "rrW*",    is_action_read, is_approximation_exact},
+  {WSCANF_FUNCTION_NAME,        "rW*",     is_action_read, is_approximation_exact},
 
   /* BSD err.h */
-  {ERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
-  {ERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
-  {WARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
-  {WARNX_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
-  {VERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
-  {VERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_must},
-  {VWARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_must},
-  {VWARNX_FUNCTION_NAME,	"rR*",	   is_action_read, is_approximation_must},
+  {ERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_exact},
+  {ERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_exact},
+  {WARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_exact},
+  {WARNX_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_exact},
+  {VERR_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_exact},
+  {VERRX_FUNCTION_NAME,		"rrR*",	   is_action_read, is_approximation_exact},
+  {VWARN_FUNCTION_NAME,		"rR*",	   is_action_read, is_approximation_exact},
+  {VWARNX_FUNCTION_NAME,	"rR*",	   is_action_read, is_approximation_exact},
 
   /* Fortran extensions for asynchronous IO's */
 
-  {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_must},
-  {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_must},
+  {BUFFERIN_FUNCTION_NAME,      "xrwr",    is_action_read, is_approximation_exact},
+  {BUFFEROUT_FUNCTION_NAME,     "xrrr",    is_action_read, is_approximation_exact},
 
 
   {0,                            0,        0,              0}
@@ -387,6 +387,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {DMIN1_OPERATOR_NAME,                    no_write_effects},
   {AMIN0_OPERATOR_NAME,                    no_write_effects},
   {MIN1_OPERATOR_NAME,                     no_write_effects},
+  {PIPS_C_MIN_OPERATOR_NAME,               no_write_effects},
   {LENGTH_OPERATOR_NAME,                   no_write_effects},
   {INDEX_OPERATOR_NAME,                    no_write_effects},
   {AIMAG_CONVERSION_NAME,                  no_write_effects},
@@ -1211,15 +1212,22 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   /* SG: concerning the err* family of functions, they also exit() from the program
    * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here
    * but it seems an error to me */
-  {ERR_FUNCTION_NAME,                              c_io_effects},
-  {ERRX_FUNCTION_NAME,                             c_io_effects},
-  {WARN_FUNCTION_NAME,                             c_io_effects},
-  {WARNX_FUNCTION_NAME,                            c_io_effects},
-  {VERR_FUNCTION_NAME,                             c_io_effects},
-  {VERRX_FUNCTION_NAME,                            c_io_effects},
-  {VWARN_FUNCTION_NAME,                            c_io_effects},
-  {VWARNX_FUNCTION_NAME,                           c_io_effects},
-  
+  {ERR_FUNCTION_NAME,                      c_io_effects},
+  {ERRX_FUNCTION_NAME,                     c_io_effects},
+  {WARN_FUNCTION_NAME,                     c_io_effects},
+  {WARNX_FUNCTION_NAME,                    c_io_effects},
+  {VERR_FUNCTION_NAME,                     c_io_effects},
+  {VERRX_FUNCTION_NAME,                    c_io_effects},
+  {VWARN_FUNCTION_NAME,                    c_io_effects},
+  {VWARNX_FUNCTION_NAME,                   c_io_effects},
+
+  /*Conforming to 4.3BSD, POSIX.1-2001.*/
+  /* POSIX.1-2001 declares this function obsolete; use nanosleep(2) instead.*/
+  /*POSIX.1-2008 removes the specification of usleep()*/
+  {USLEEP_FUNCTION_NAME,                    no_write_effects},
+
+  /* _POSIX_C_SOURCE >= 199309L */
+  {NANOSLEEP_FUNCTION_NAME,                 safe_c_effects},
 
   /* {int mblen(const char *, size_t, 0, 0},
      {size_t mbstowcs(wchar_t *, const char *, size_t, 0, 0},
@@ -1321,7 +1329,7 @@ generic_proper_effects_of_intrinsic(entity e, list args)
         pid += 1;
     }
 
-    pips_error("generic_proper_effects_of_intrinsic", "unknown intrinsic %s\n", s);
+    pips_internal_error("unknown intrinsic %s", s);
 
     return(NIL);
 }
@@ -1501,7 +1509,7 @@ assign_substring_effects(entity e __attribute__ ((__unused__)), list args)
     pips_debug(5, "begin\n");
 
     if (! syntax_reference_p(s))
-            pips_error("assign_substring_effects", "not a reference\n");
+            pips_internal_error("not a reference");
 
 
     le = generic_proper_effects_of_written_reference(syntax_reference(s));
@@ -1525,7 +1533,7 @@ substring_effect(entity e __attribute__ ((__unused__)), list args)
     pips_debug(5, "begin\n");
 
     if (! syntax_reference_p(expression_syntax(expr)))
-            pips_error("substring_effect", "not a reference\n");
+            pips_internal_error("not a reference");
 
     le = generic_proper_effects_of_expression(expr);
     le = gen_nconc(le, generic_proper_effects_of_expression(l));
@@ -1548,7 +1556,7 @@ SearchIoElement(char *s, char *i)
         p += 1;
     }
 
-    pips_error("SearchIoElement", "unknown io element %s %s\n", s, i);
+    pips_internal_error("unknown io element %s %s", s, i);
     /* Never reaches this point. Only to avoid a warning at compile time. BC. */
     return(&IoElementDescriptorUndefined);
 }
@@ -1566,7 +1574,7 @@ SearchCIoElement(char *s)
         p += 1;
     }
 
-    pips_error("SearchCIoElement", "unknown io element %s\n", s);
+    pips_internal_error("unknown io element %s", s);
 
     return(&IoElementDescriptorUndefined);
 }
@@ -1696,7 +1704,7 @@ static list io_effects(entity e, list args)
                 else if(same_string_p(entity_local_name(e), WRITE_FUNCTION_NAME))
                     unit = int_to_expression(STDOUT_LUN);
                 else
-                    pips_error("io_effects", "Which logical unit?\n");
+                    pips_internal_error("Which logical unit?");
             }
 
             indices = gen_nconc(indices, CONS(EXPRESSION, unit, NIL));
@@ -2237,7 +2245,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
     if(is_fortran)
       le = generic_proper_effects_of_any_lhs(exp);
     else {
-      pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose\n");
+      pips_internal_error("we should never get here: there is effects_of_c_ioelem for that purpose");
       /* C language */
       /* FI: we lack information about the number of elements written */
       /* This is not generic! */
@@ -2307,7 +2315,7 @@ static list effects_of_any_ioelem(expression exp, tag act, bool is_fortran)
 	    le = generic_proper_effects_of_any_lhs(e);
 	  }
 	  else {
-	    pips_internal_error("Operator \"\%s\" not handled\n", entity_name(op));
+	    pips_internal_error("Operator \"\%s\" not handled", entity_name(op));
 	  }
 	}
       }
@@ -2498,7 +2506,7 @@ static list effects_of_C_ioelem(expression arg, tag act)
       pips_debug(5, "only effects on actual argument evaluation\n");
       break;
     default :
-      pips_internal_error("unknown tag\n");
+      pips_internal_error("unknown tag");
     }
 
   return le;

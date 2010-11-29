@@ -85,7 +85,7 @@ get_new_user_file(string dir_name, string preprocessed_user_file)
       fprintf(tmp, "/*\n * file for %s\n */\n", name);
     }
     else {
-      pips_internal_error("unexpected user file suffix: \"%s\"\n", user_file);
+      pips_internal_error("unexpected user file suffix: \"%s\"", user_file);
     }
     safe_fclose(tmp, s);
     free(name);

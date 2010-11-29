@@ -278,7 +278,7 @@ static bool the_actual_parser(string module,
     }
     else {
 	if(!EmptyEntryListsP()) {
-	    pips_internal_error("Unexpected entry handling in parser recursive call\n");
+	    pips_internal_error("Unexpected entry handling in parser recursive call");
 	}
     }
 

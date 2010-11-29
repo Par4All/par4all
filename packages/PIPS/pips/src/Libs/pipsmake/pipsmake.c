@@ -110,7 +110,7 @@ static bool (*get_builder(const char* name))(const char *)
     for (pbm = builder_maps; pbm->builder_name; pbm++)
 	if (same_string_p(pbm->builder_name, name))
 	    return pbm->builder_func;
-    pips_internal_error("no builder for %s\n", name);
+    pips_internal_error("no builder for %s", name);
     return NULL;
 }
 
@@ -265,7 +265,7 @@ static list build_real_resources(const char* oname, list lvr)
 		    (local_name_to_top_level_entity(on)) == TRUE)
 		{
 		    if (number_of_main)
-			pips_internal_error("More than one main\n");
+			pips_internal_error("More than one main");
 
 		    number_of_main++;
 		    pips_debug(8, "Main is %s\n", (string) on);
@@ -388,7 +388,7 @@ static list build_real_resources(const char* oname, list lvr)
 	  }
 
 	default:
-	    pips_internal_error("unknown tag : %d\n", vrt);
+	    pips_internal_error("unknown tag : %d", vrt);
 	}
     }
 
@@ -604,7 +604,7 @@ static rule safe_find_rule_by_resource(const char* rname)
 
   if ((ru = find_rule_by_resource(rname)) == rule_undefined) {
     /* else */
-    pips_internal_error("could not find a rule for %s\n", rname);
+    pips_internal_error("could not find a rule for %s", rname);
   }
 
   return ru;
@@ -776,7 +776,7 @@ bool rmake(const char* rname, const char* oname)
     
     /* we look for the active rule to produce this resource */
     if ((ru = find_rule_by_resource(rname)) == rule_undefined)
-	pips_internal_error("could not find a rule for %s\n", rname);
+	pips_internal_error("could not find a rule for %s", rname);
 
     /* we recursively make the pre transformations. */
     if (!make_pre_transformation(oname, ru))
@@ -822,7 +822,7 @@ bool rmake(const char* rname, const char* oname)
 			  up_to_date_resources, res);
 	}
 	else {
-	  pips_internal_error("resource %s[%s] just built not found!\n",
+	  pips_internal_error("resource %s[%s] just built not found!",
 			      rrrn, rron);
 	}
       }, 
@@ -1141,7 +1141,7 @@ void delete_some_resources(void)
 	db_delete_all_resources();
 	user_log("done.\n");
     } else
-	pips_internal_error("unexpected delete request %s\n", what);
+	pips_internal_error("unexpected delete request %s", what);
 }
 
 /* To be used in a rule. use and update the up_to_dat list

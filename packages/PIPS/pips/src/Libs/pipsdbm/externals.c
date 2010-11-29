@@ -58,9 +58,9 @@ lire_int(FILE * fd)
     else if (isdigit(c))
 	i = c-'0';
     else if(c==EOF)
-	pips_internal_error("Unexpected EOF, corrupted resource file\n");
+	pips_internal_error("Unexpected EOF, corrupted resource file");
     else
-	pips_internal_error("digit or '-' expected : %c %x\n", c, c);
+	pips_internal_error("digit or '-' expected : %c %x", c, c);
 
     while (isdigit(c = genread_input())) 
 	i = 10*i + (c-'0');

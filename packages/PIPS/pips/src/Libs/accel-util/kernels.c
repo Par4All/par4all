@@ -47,6 +47,7 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
+#include "expressions.h"
 #include "text-util.h"
 #include "transformations.h"
 #include "transformer.h"
@@ -54,7 +55,6 @@
 #include "parser_private.h"
 #include "preprocessor.h"
 #include "accel-util.h"
-#include "c_syntax.h"
 
 struct dma_pair {
   entity new_ent;
@@ -92,12 +92,6 @@ static string get_dma_name(enum region_to_dma_switch m, size_t d) {
     return dmaname;
 }
 
-static list simple_effect_to_dimensions(effect eff)
-{
-    entity re = reference_variable(effect_any_reference(eff));
-    type te= ultimate_type(entity_type(re));
-    return gen_full_copy_list(variable_dimensions(type_variable(te)));
-}
 static bool region_to_dimensions(region reg, transformer tr, list *dimensions, list * offsets, expression* condition) {
     if(region_to_minimal_dimensions(reg,tr,dimensions,offsets,true,condition)) {
         return true;
@@ -110,14 +104,22 @@ static bool region_to_dimensions(region reg, transformer tr, list *dimensions, l
 }
 
 static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, list * offsets, expression *condition) {
-    if(effect_region_p(eff) && region_to_dimensions(eff,tr,dimensions,offsets,condition)) {
-        /* ok */
+  pips_assert("effects are regions\n",effect_region_p(eff));
+  if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) {
+    /* let's try with the definition region instead */
+    descriptor d = effect_descriptor(eff);
+    if(descriptor_convex_p(d)) {
+      sc_free(descriptor_convex(d));
+      entity e = reference_variable(region_any_reference(eff));
+      /* create dummy empty effects */
+      effects dumbo = make_effects(NIL);
+      partial_eval_declaration(e,predicate_system(transformer_relation(tr)),dumbo);
+      free_effects(dumbo);
+      descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
     }
-    else {
-        *dimensions= simple_effect_to_dimensions(eff);
-        FOREACH(DIMENSION,d,*dimensions)
-            *offsets = CONS(EXPRESSION,int_to_expression(0),*offsets);
-    }
+    if( ! region_to_dimensions(eff,tr,dimensions,offsets,condition) ) 
+      pips_internal_error("failed to compute dma from regions appropriately\n");
+  }
 }
 
 static expression entity_to_address(entity e) {
@@ -335,7 +337,9 @@ static bool effects_on_non_local_variable_p(list effects) {
 static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
-			 hash_table e2e, expression * condition) {
+			 hash_table e2e, expression * condition,
+             bool fine_grain_analysis)
+{
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
   if(empty_string_p(get_dma_name(s,dma1D)))
@@ -348,24 +352,66 @@ statement effects_to_dma(statement stat,
 
   /* filter out relevant effects depending on operation mode */
   FOREACH(EFFECT,e,rw_effects) {
-
-
     if ((dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s))
 	&& action_read_p(effect_action(e)))
       effects=CONS(EFFECT,e,effects);
     else if ((dma_store_p(s)  || dma_allocate_p(s) || dma_deallocate_p(s))
 	     && action_write_p(effect_action(e)))
-      effects=CONS(EFFECT,e,effects);
-
-    /*Little hack to avoid effects weaknesses*/
-    if(get_bool_property("KERNEL_LOAD_STORE_FORCE_LOAD")
-       &&(dma_load_p(s) && action_write_p(effect_action(e)))){
-	effect hack = copy_effect(e);
-	effect_action(hack) = make_action_read_memory();
-	effects=CONS(EFFECT,hack,effects);
-      }
+        effects=CONS(EFFECT,e,effects);
   }
 
+  /* handle the may approximations here: if the approximation is may,
+   * we have to load the data, otherwise the store may store
+   * irrelevant data
+   */
+  if (dma_load_p(s) || dma_allocate_p(s) || dma_deallocate_p(s)) {
+      /* first step is to check for may-write effects */
+      list may_write_effects = NIL;
+      FOREACH(EFFECT,e,rw_effects) {
+          if(approximation_may_p(effect_approximation(e)) &&
+                      action_write_p(effect_action(e)) ) {
+              effect fake = copy_effect(e);
+              action_tag(effect_action(fake))=is_action_read;
+              may_write_effects=CONS(EFFECT,fake,may_write_effects);
+          }
+      }
+      /* then we will merge these effects with those 
+       * that were already gathered
+       * because we are manipulating sets, it is not very efficient
+       * but there should not be that many effects anyway
+       */
+      FOREACH(EFFECT,e_new,may_write_effects) {
+        bool merged = false; // if we failed to merge e_new in effects, we just add it to the list */
+        for(list iter=effects;!ENDP(iter);POP(iter)){
+          effect * e_origin = (effect*)REFCAR(iter); // get a reference to change it in place if needed
+          if(same_entity_p(
+                effect_any_entity(*e_origin),
+                effect_any_entity(e_new))) {
+            merged=true;
+            region tmp = regions_must_convex_hull(*e_origin,e_new);
+            // there should be a free there, but it fails
+            *e_origin=tmp;
+          }
+        }
+        /* no data was copy-in, add this effect */
+        if(!merged) {
+          effects=CONS(EFFECT,copy_effect(e_new),effects);
+        }
+      }
+      gen_full_free_list(may_write_effects);
+  }
+
+  /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
+   */
+  if(!fine_grain_analysis) {
+    FOREACH(EFFECT,eff,effects) {
+      descriptor d = effect_descriptor(eff);
+      if(descriptor_convex_p(d)) {
+        sc_free(descriptor_convex(d));
+        descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
+      }
+    }
+  }
 
   if(effects_on_non_local_variable_p(effects)){
       pips_user_warning("Cannot handle non local variables in isolated statement\n");
@@ -431,21 +477,25 @@ static bool do_isolate_statement_preconditions(statement s)
     return true;
 }
 
+/* perform statement isolation on statement @p s
+ * that is make sure that all access to variables in @p s 
+ * are made either on private variables or on new entities declared on a new memory space
+ */
 void do_isolate_statement(statement s) {
+    bool fine_grain_analysis = true;
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
     hash_table e2e ;
     if(!do_isolate_statement_preconditions(s)) {
-        pips_user_warning("isolated statement has callees, falling back to effect engines\n");
-        reset_cumulated_rw_effects();
-        set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, get_current_module_name(), true));
+        pips_user_warning("isolated statement has callees, transfers will be approximated\n");
+        fine_grain_analysis = false;
     }
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
-    allocates = effects_to_dma(s,dma_allocate,e2e,&condition);
-    loads = effects_to_dma(s,dma_load,e2e,NULL);
-    stores = effects_to_dma(s,dma_store,e2e,NULL);
-    deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL);
+    allocates = effects_to_dma(s,dma_allocate,e2e,&condition,fine_grain_analysis);
+    loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis);
+    stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis);
+    deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL,fine_grain_analysis);
     HASH_MAP(k,v,free(v),e2e);
     hash_table_free(e2e);
 
@@ -544,12 +594,9 @@ static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
 
 
 /** Generate malloc/copy-in/copy-out on the call sites of this module.
- * existe for region or effect engine
- */
+  * based on convex array regions
+  */
 bool kernel_load_store(char *module_name) {
-    return kernel_load_store_engine(module_name,DBR_CUMULATED_EFFECTS);
-}
-bool kernel_load_store_fine_grain(char *module_name) {
     return kernel_load_store_engine(module_name,DBR_REGIONS);
 }
 

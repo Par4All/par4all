@@ -127,7 +127,7 @@ void csplit_open_compilation_unit(string input_file_name)
   /* This does not work because this file is later moved in the proper directory. */
   /*
   if(fopen(unambiguous_file_name, "r")!=NULL) {
-    pips_internal_error("Two source files (at least) with same name: \"%s\"\n",
+    pips_internal_error("Two source files (at least) with same name: \"%s\"",
 			simpler_file_name);
   }
   */

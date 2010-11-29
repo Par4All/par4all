@@ -40,7 +40,7 @@ void safe_system(string command) /* the command to be executed */
     int status = system(command);
     
     if (status)
-	pips_internal_error("Failed (ret: %d, sig: %d) for %s\n", 
+	pips_internal_error("Failed (ret: %d, sig: %d) for %s", 
 			    (status/0x100) & 0xff, status & 0xff, command);
 }
 
@@ -49,7 +49,7 @@ int safe_system_no_abort(string command) /* the command to be executed */
     int status = system(command);
     
     if (status == 127)
-	pips_internal_error("Could not execute : '%s'\n", command);
+	pips_internal_error("Could not execute : '%s'", command);
 
     if (status) {
 	/* For portability reasons, do not use pips_user_warning() here */
@@ -65,7 +65,7 @@ int safe_system_no_abort_no_warning(string command) /* the command to be execute
     int status = system(command);
     
     if (status == 127)
-	pips_internal_error("Could not execute : '%s'\n", command);
+	pips_internal_error("Could not execute : '%s'", command);
 
     return (status / 256) & 255;
 }

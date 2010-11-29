@@ -354,7 +354,7 @@ int HasParenthesis;
 		  else {
 		    /* Probably an extension we would have liked to have
                        for the DREAM-UP project. */
-		    pips_internal_error("Not implemented yet\n");
+		    pips_internal_error("Not implemented yet");
 		  }
 		}
 

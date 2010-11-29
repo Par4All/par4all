@@ -613,8 +613,7 @@ bool number_it;
 			 statement_comments(cs));
 		user_log("Block comment to be carried by first statement: \"%s\"\n",
 			 PrevComm);
-		pips_error("LinkInstToCurrentBlock", 
-			   "The first statement of the block should have no comments\n");
+		pips_internal_error("The first statement of the block should have no comments");
 	    }
 
 	    pips_assert("The chosen statement is not a block",
@@ -947,7 +946,7 @@ update_functional_type_result(entity f, type nt)
 		  "Formal functional parameters are not yet supported\n");
     }
     else {
-      pips_internal_error("Unexpected case\n");
+      pips_internal_error("Unexpected case");
     }
   }
   else {

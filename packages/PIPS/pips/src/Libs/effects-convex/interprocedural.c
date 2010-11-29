@@ -237,7 +237,7 @@ transformer context;
 
     if (! entity_module_p(func))
     {
-	pips_error("in_region_of_external", "%s: bad function\n", func_name);
+	pips_internal_error("%s: bad function", func_name);
     }
     else
     {
@@ -274,7 +274,7 @@ list regions_of_external(entity func,list real_args,transformer context,
 
     if (! entity_module_p(func))
     {
-	pips_error("region_of_external", "%s: bad function\n", func_name);
+	pips_internal_error("%s: bad function", func_name);
     }
     else
     {
@@ -612,7 +612,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       } /* case is_syntax_reference */
     case is_syntax_subscript:
       {
-	pips_internal_error("Subscript not supported yet\n");
+	pips_internal_error("Subscript not supported yet");
 	break;
       }
     case is_syntax_call:
@@ -789,12 +789,12 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       }
     case is_syntax_va_arg :
       {
-	pips_internal_error("va_arg() : should have been treated before\n");
+	pips_internal_error("va_arg() : should have been treated before");
 	break;
       }
     case is_syntax_application :
       {
-	pips_internal_error("Application not supported yet\n");
+	pips_internal_error("Application not supported yet");
 	break;
       }
     case is_syntax_range :
@@ -803,7 +803,7 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	break;
       }
     default:
-      pips_internal_error("Illegal kind of syntax\n");
+      pips_internal_error("Illegal kind of syntax");
     } /* switch */
 
   free_type(real_arg_t);
@@ -1126,7 +1126,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			free_reference(ref_tmp);
 
 			if (type_undefined_p(t))
-			  pips_internal_error("undefined type not expected \n");
+			  pips_internal_error("undefined type not expected ");
 
 			if(type_variable_p(t) && !ENDP(variable_dimensions(type_variable(t))))
 			  {
@@ -1449,7 +1449,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
       }
     case is_syntax_application:
       {
-	pips_internal_error("Application not supported yet\n");
+	pips_internal_error("Application not supported yet");
 	break;
       }
 
@@ -1476,11 +1476,11 @@ list c_convex_effects_on_actual_parameter_forward_translation
       }
     case is_syntax_va_arg:
       {
-	pips_internal_error("va_arg not supported yet\n");
+	pips_internal_error("va_arg not supported yet");
 	break;
       }
     default:
-      pips_internal_error("Illegal kind of syntax\n");
+      pips_internal_error("Illegal kind of syntax");
 
     } /* switch */
 

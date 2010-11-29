@@ -105,7 +105,7 @@ int perfect_nested_level;
 	    /*	    vect_chg_coeff(&porigin,var,min);*/
 	    vect_chg_coeff(&porigin,var,VALUE_ONE);
 	else
-	    pips_error("loop_nest_to_tile","illegal empty iteration domain\n");
+	    pips_internal_error("illegal empty iteration domain");
 
     }
   

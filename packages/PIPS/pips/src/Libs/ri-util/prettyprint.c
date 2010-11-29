@@ -251,7 +251,7 @@ string get_comment_sentinel() {
     case is_language_c: return "//";
     case is_language_fortran: return "C";
     case is_language_fortran95: return "!";
-    default: pips_internal_error("language unknown not handled\n"); return NULL ;
+    default: pips_internal_error("language unknown not handled"); return NULL ;
   }
 }
 
@@ -264,7 +264,7 @@ string get_comment_continuation() {
     case is_language_c: return "//    ";
     case is_language_fortran: return "C    ";
     case is_language_fortran95: return "!    ";
-    default: pips_internal_error("language unknown not handled\n"); return NULL ;
+    default: pips_internal_error("language unknown not handled"); return NULL ;
   }
 }
 
@@ -1418,7 +1418,7 @@ words_io_control(list *iol,
 	call c;
 
 	if (! syntax_call_p(s)) {
-	    pips_error("words_io_control", "call expected");
+	    pips_internal_error("call expected");
 	}
 
 	c = syntax_call(s);
@@ -1438,7 +1438,7 @@ words_io_control(list *iol,
     }
 
     if (pio != NIL)
-	    pips_error("words_io_control", "bad format");
+	    pips_internal_error("bad format");
 
     *iol = NIL;
 
@@ -1464,7 +1464,7 @@ words_implied_do(call obj,
     pcc = CDR(pcc);
     s = expression_syntax(EXPRESSION(CAR(pcc)));
     if (! syntax_range_p(s)) {
-	pips_error("words_implied_do", "range expected");
+	pips_internal_error("range expected");
     }
     r = syntax_range(s);
 
@@ -2469,7 +2469,7 @@ words_syntax(syntax obj, list pdl)
       pc = words_va_arg(syntax_va_arg(obj), pdl);
       break;
     default:
-      pips_internal_error("unexpected tag\n");
+      pips_internal_error("unexpected tag");
     }
 
     return(pc);
@@ -2563,7 +2563,7 @@ sentence_tail(entity e)
            */
           break;
         default:
-          pips_internal_error("unexpected type for result\n");
+          pips_internal_error("unexpected type for result");
       }
 
       pc = CHAIN_SWORD(pc, entity_user_name(e));
@@ -3129,7 +3129,7 @@ text text_loop(
     }
     break ;
   default:
-    pips_internal_error("Unknown tag\n") ;
+    pips_internal_error("Unknown tag") ;
   }
   return r;
 }
@@ -3193,7 +3193,7 @@ static text text_whileloop(entity module,
         if(one_liner_p(body)) {
           pc = CHAIN_SWORD(NIL,"while (");
           pc = gen_nconc(pc, words_expression(whileloop_condition(obj), pdl));
-          pc = CHAIN_SWORD(pc,") ");
+          pc = CHAIN_SWORD(pc,")");
           u = make_unformatted(strdup(label), n, margin, pc);
           ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted, u));
           MERGE_TEXTS(r, text_statement_enclosed(module,
@@ -3309,13 +3309,13 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
   }
 
   pc = gen_nconc(pc, words_expression(test_condition(obj), pdl));
-  pc = CHAIN_SWORD(pc, ") ");
   instruction ti = instruction_undefined;
   call c = call_undefined;
   text t = text_undefined;
   switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, ") ");
       ti = statement_instruction(tb);
       c = instruction_call(ti);
       pc = gen_nconc(pc, words_call(c, 0, TRUE, TRUE, pdl));
@@ -3325,6 +3325,7 @@ static text text_logical_if(entity __attribute__ ((unused)) module,
                   margin, pc)));
       break;
     case is_language_c:
+      pc = CHAIN_SWORD(pc, ")"); // Do not add a useless SPACE
       t = text_statement(module, margin + INDENTATION, tb, pdl);
       ADD_SENTENCE_TO_TEXT(r,
           make_sentence(is_sentence_unformatted,
@@ -3394,7 +3395,7 @@ static text text_block_if(entity module,
 
   test_false_obj = test_false(obj);
   if(statement_undefined_p(test_false_obj)) {
-    pips_error("text_test", "undefined statement\n");
+    pips_internal_error("undefined statement");
   }
   if(!statement_with_empty_comment_p(test_false_obj)
       || (!empty_statement_p(test_false_obj)
@@ -4080,7 +4081,7 @@ text text_statement_enclosed(entity module,
   // To ease breakpoint setting
   //pips_assert("Blocks have no comments", !instruction_block_p(i)||empty_comments_p(comments));
   if(instruction_block_p(i) && !empty_comments_p(i_comments)) {
-    pips_internal_error("Blocks should have no comments\n");
+    pips_internal_error("Blocks should have no comments");
   }
 
   /* Special handling of comments linked to declarations and to the

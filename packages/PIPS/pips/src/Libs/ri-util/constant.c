@@ -67,7 +67,7 @@ int DefaultLengthOfBasic(tag t)
 		e = DEFAULT_CHARACTER_TYPE_SIZE;
 		break;
 	    default:
-		pips_error("DefaultLengthOfBasic", "case default\n");
+		pips_internal_error("case default");
 		break;
 	}
 
@@ -115,12 +115,12 @@ _int TK_CHARCON_to__int(string name)
     r = strtol(&name[2], &error_string, 8);
     if(errno!=0) {
       pips_user_warning("character constant %s not recognized\n",name);
-      pips_internal_error("Illegal octal constant\n");
+      pips_internal_error("Illegal octal constant");
     }
   }
   else { // Unrecognized format
     pips_user_warning("character constant %s not recognized\n",name);
-    // pips_internal_error("not implemented yet\n");
+    // pips_internal_error("not implemented yet");
     r=0;//just temporary
   }
 
@@ -232,7 +232,7 @@ Character constants are typed as int.
 	pips_assert("pointers have the right size", sizeof(void *)==8);
       }
       else
-	pips_internal_error("Unexpected number of bytes for an integer variable\n");
+	pips_internal_error("Unexpected number of bytes for an integer variable");
 
       pips_assert("Integer constants are internally stored on 4 or 8 bytes",
 		  size==4 || size==8);
@@ -256,13 +256,13 @@ Character constants are typed as int.
 	  CParserError("Integer constant too large for internal representation\n");
       }
       else if(error_number!=0 && (l == LONG_MAX || l == LONG_MIN)) {
-	pips_internal_error("Conversion error for integer constant string\n");
+	pips_internal_error("Conversion error for integer constant string");
       }
       else if(*error_string!='\0' && strspn(error_string, "LlUu")!=strlen(error_string)) {
-	pips_internal_error("Illegal characters found in integer constant string\n");
+	pips_internal_error("Illegal characters found in integer constant string");
       }
       else if(name==error_string) {
-	pips_internal_error("No digit found in integer constant string\n");
+	pips_internal_error("No digit found in integer constant string");
       }
 
       /* SG :this ensure everything is ok on 32 bits */
@@ -460,7 +460,7 @@ value MakeValueSymbolic(expression e)
   value v;
 
   if (value_unknown_p(v = EvalExpression(e))) {
-    /* pips_internal_error("value of parameter must be constant\n"); */
+    /* pips_internal_error("value of parameter must be constant"); */
     free_value(v);
     s = make_symbolic(e, make_constant_unknown());
     /* s = make_symbolic(e, make_constant(is_constant_unknown, UU)); */

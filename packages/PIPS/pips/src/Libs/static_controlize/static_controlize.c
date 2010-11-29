@@ -235,7 +235,7 @@ switch(instruction_tag(inst))
 			static_controlize_unstructured( local_un ));
     break;
     }
-  default : pips_error("static_controlize_statement", "Bad instruction tag");
+  default : pips_internal_error("Bad instruction tag");
   }
 
     sc = make_static_control(is_static,

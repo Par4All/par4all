@@ -631,9 +631,9 @@ static void directive_statement_filter(statement stmt)
     {
       if (directive_none_p(new_directive) &&  // an unknown directive
 	  directive_statement_p(STATEMENT(CAR(directive_body(new_directive)))))
-	pips_error("directive_statement_filter","directive unknown.\n");
+	pips_internal_error("directive unknown.");
       else
-	pips_error("directive_statement_filter","begin/end directive out of block.\n");
+	pips_internal_error("begin/end directive out of block.");
       free_directive(new_directive); 
     }
 
@@ -818,7 +818,7 @@ static void directive_block_filter(statement stmt)
   if (!type_directive_none_p(directive_type(new_directive)))
     {
       free_directive(new_directive);
-      pips_error("directive_block_filter", "directive not well formed.\n");
+      pips_internal_error("directive not well formed.");
     }
   else // convert the fake directive into instruction
     {

@@ -172,11 +172,9 @@ instruction *inst;
 	 return;
 	
     case is_instruction_goto:
-	pips_error("search_array_from_statement",
-		   "unexpected goto in code");
+	pips_internal_error("unexpected goto in code");
     default:
-	pips_error("search_array_from_statement",
-		   "unexpected tag");
+	pips_internal_error("unexpected tag");
     }
     
     debug(8, "search_array_from_statement", "end\n");

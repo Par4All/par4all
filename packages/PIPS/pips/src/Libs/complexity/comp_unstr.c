@@ -183,7 +183,7 @@ list effects_list;
 	}
     }
     else
-	pips_error("unstructured_to_complexity", "Too large to compute\n");
+	pips_internal_error("Too large to compute");
 
     if (get_debug_level() >= 5) {
 	fprintf(stderr, "cumulated complexity=");
@@ -260,8 +260,7 @@ int n_controls;
     for (i=1; i<=n_controls; i++)
 	if (cont == control_array[i]) 
 	    return (i);
-    pips_error("control_element_position_in_control_array", 
-	       "this control isn't in control_array[]!\n");
+    pips_internal_error("this control isn't in control_array[]!");
 
     /* In order to satisfy compiler. LZ 3 Feb. 93 */
     return (i);
@@ -279,8 +278,7 @@ control control_array[];
     matrice P = matrice_new(n_controls, n_controls);
 
     if ( n_controls > MAX_CONTROLS_IN_UNSTRUCTURED ) {
-	pips_error("average_probability_matrix", 
-		   "control number is larger than %d\n", 
+	pips_internal_error("control number is larger than %d", 
 		   MAX_CONTROLS_IN_UNSTRUCTURED );
     }
 

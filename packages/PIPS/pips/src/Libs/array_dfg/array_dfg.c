@@ -317,8 +317,7 @@ graph                   dup_dg;
                                       EXPRESSION(CAR(call_arguments(instruction_call(
 					    statement_instruction(sou_s) ))))  )));
 	if(gen_length(sou_args) != gen_length(dest_args)) {
-	  pips_error( "adg_dataflowgraph",
-	    "No coherence between the source array and destination array !\n");
+	  pips_internal_error("No coherence between the source array and destination array !");
 	}
 
 			

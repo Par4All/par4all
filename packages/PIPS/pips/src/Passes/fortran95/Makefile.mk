@@ -102,7 +102,7 @@ $(SRC.d)/.md5-check-core: $(DL.d)/$(GCC_CORE_ARCHIVE) $(DL.d)/$(GCC_MD5) $(SRC.d
 	@echo "**** Check md5 checksum for gcc-core ****"
 	grep `basename $(DL.d)/$(GCC_CORE_ARCHIVE)` $(DL.d)/$(GCC_MD5) > $(SRC.d)/.md5-check-core.list
 	sed -ie 's#$(GCC_CORE_ARCHIVE)#$(DL.d)/$(GCC_CORE_ARCHIVE)#' $(SRC.d)/.md5-check-core.list
-	md5sum -c $(SRC.d)/.md5-check-core.list
+	$(MD5SUM) -c $(SRC.d)/.md5-check-core.list
 	$(RM) $(SRC.d)/.md5-check-core.list
 	@touch $(SRC.d)/.md5-check-core
 
@@ -112,7 +112,7 @@ $(SRC.d)/.md5-check-fortran : $(DL.d)/$(GCC_FORTRAN_ARCHIVE) $(DL.d)/$(GCC_MD5) 
 	@echo "**** Check md5 checksum for gcc-fortran ****"
 	grep `basename $(DL.d)/$(GCC_FORTRAN_ARCHIVE)` $(DL.d)/$(GCC_MD5) > $(SRC.d)/.md5-check-fortran.list
 	sed -ie 's#$(GCC_FORTRAN_ARCHIVE)#$(DL.d)/$(GCC_FORTRAN_ARCHIVE)#' $(SRC.d)/.md5-check-fortran.list
-	md5sum -c $(SRC.d)/.md5-check-fortran.list
+	$(MD5SUM) -c $(SRC.d)/.md5-check-fortran.list
 	$(RM) $(SRC.d)/.md5-check-fortran.list
 	@touch $(SRC.d)/.md5-check-fortran
 

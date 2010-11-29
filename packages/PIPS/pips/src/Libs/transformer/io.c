@@ -78,7 +78,7 @@ fprint_transformer(FILE * fd,
 
 	/* print relation */
 	if(SC_UNDEFINED_P(sc))
-	    pips_error("fprint_transformer", "undefined relation\n");
+	    pips_internal_error("undefined relation");
 	(void) fprintf(fd,"relation:");
 	sc_fprint(fd,
 		  sc,
@@ -96,7 +96,7 @@ list fprint_transformers(FILE * fd,
   if(ENDP(tl)) {
     // FI: I changed my mind; this is a way to represent a non
     //feasible transformer
-    //pips_internal_error("transformer lists should never be empty.\n");
+    //pips_internal_error("transformer lists should never be empty.");
     fprintf(fd, "Empty transformer list\n");
   }
   else {

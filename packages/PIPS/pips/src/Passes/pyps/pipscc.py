@@ -127,7 +127,7 @@ class pipscc:
 		return WDIR
 
 	def get_workspace(self,c_files):
-		return pyps.workspace(c_files)
+		return pyps.workspace(c_files,deleteOnClose=True)
 
 	def compile(self,wdir,o_files):
 		CC=os.getenv("CC","gcc")
@@ -169,6 +169,7 @@ class pipscc:
 			
 			# now run the compiler
 			self.compile(WDIR,O_FILES)
+		shutil.rmtree(WDIR)
 
 #
 ##

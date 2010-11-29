@@ -633,7 +633,7 @@ statement IsolatedStatement(scc s,
     /*FI: But they should not be isolated statements if the contain
        declarations... */
     //if(declaration_statement_p(st))
-    //pips_internal_error("Declaration statement is junked.\n");
+    //pips_internal_error("Declaration statement is junked.");
 
     if (!instruction_call_p(sbody)
 	|| (continue_statement_p(st) && !declaration_statement_p(st)))

@@ -136,8 +136,7 @@ int un, sn;
 	unstructured_reorder(instruction_unstructured(i));
 	break;
       default:
-	pips_error("statement_reorder", "Unknown tag %d\n",
-		   instruction_tag(i));
+	pips_internal_error("Unknown tag %d", instruction_tag(i));
     }
 
     debug(5, "statement_reorder", "exiting %d\n", sn);

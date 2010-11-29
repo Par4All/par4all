@@ -209,8 +209,7 @@ bool program_precondition(string name)
 	/* tm = transformer_normalize(tm, 2); */
 	if(!transformer_consistency_p(tm)) {
 	    (void) print_transformer(tm);
-	    pips_error("program_precondition",
-		       "Non-consistent filtered initial precondition\n");
+	    pips_internal_error("Non-consistent filtered initial precondition");
 	}
 	pred_debug(3, "to be added after filtering:\n", tm);
 

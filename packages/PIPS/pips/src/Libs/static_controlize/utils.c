@@ -203,8 +203,7 @@ stco_renumber_code(statement in_st,
         		gen_free_list(blocs);
     			break;
     		}
-  		default : pips_error("stco_renumber_code",
-						"Bad instruction tag");
+  		default : pips_internal_error("Bad instruction tag");
   	}
 
         pips_debug(7, "return count : %d\n", count);

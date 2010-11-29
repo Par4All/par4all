@@ -28,6 +28,7 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "misc.h"
 #include "control.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -88,4 +89,50 @@ dowhile_to_while(char *module_name)
 	reset_current_module_entity();
 
 	return true;
+}
+
+/* converts a doloop to a while loop, in place */
+void do_loop_to_while_loop(statement sl) {
+    pips_assert("statement is a loop",statement_loop_p(sl));
+    loop l =statement_loop(sl);
+    range r = loop_range(l);
+
+    /* convert the loop to a while loop :
+     * fst the body
+     */
+    list statements = make_statement_list(
+            copy_statement(loop_body(l)),
+            make_assign_statement(
+                entity_to_expression(loop_index(l)),
+                MakeBinaryCall(
+                    entity_intrinsic(PLUS_OPERATOR_NAME),
+                    entity_to_expression(loop_index(l)),
+                    range_increment(r)
+                    )
+                )
+            );
+    /* then the whileloop */
+    whileloop wl = make_whileloop(
+            MakeBinaryCall(
+                entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                entity_to_expression(loop_index(l)),
+                range_upper(r)
+                ),
+            make_block_statement(statements),
+            entity_empty_label(),
+            make_evaluation_before());
+
+    /* and the prelude */
+    sequence seq = make_sequence(
+            make_statement_list(
+                make_assign_statement(entity_to_expression(loop_index(l)),
+                    range_lower(r)),
+                instruction_to_statement(make_instruction_whileloop(wl))
+                )
+            );
+    range_upper(r)=expression_undefined;
+    range_lower(r)=expression_undefined;
+    range_increment(r)=expression_undefined;
+
+    update_statement_instruction(sl,make_instruction_sequence(seq));
 }

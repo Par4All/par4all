@@ -425,8 +425,10 @@ static void outliner_extract_loop_bound(statement sloop, hash_table entity_to_ef
         basic b = basic_of_expression(upper);
         if(basic_overloaded_p(b)) { free_basic(b); b = make_basic_int(DEFAULT_INTEGER_TYPE_SIZE); }
         entity holder = make_new_scalar_variable(get_current_module_entity(),b);
-        hash_put(entity_to_effective_parameter,holder,upper);
-        range_upper(r)=entity_to_expression(holder);
+        hash_put(entity_to_effective_parameter,holder,
+                MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),upper,int_to_expression(1)));
+        range_upper(r)=
+                MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),entity_to_expression(holder),int_to_expression(1));
     }
 }
 static void convert_pointer_to_array_aux(expression exp,entity e) {
@@ -698,19 +700,28 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
 
     /* prepare parameters and body*/
-    functional_parameters(type_functional(entity_type(new_fun)))=formal_parameters;
+    module_functional_parameters(new_fun)=formal_parameters;
 	FOREACH(PARAMETER,p,formal_parameters) {
 		code_declarations(value_code(entity_initial(new_fun))) =
 			gen_nconc(
 					code_declarations(value_code(entity_initial(new_fun))),
 					CONS(ENTITY,dummy_identifier(parameter_dummy(p)),NIL));
 	}
+    /* either use origin's compilation unit or a new one */
+    char * cu_name = string_undefined;
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+    }
+    else {
+        cu_name = compilation_unit_of_module(get_current_module_name());
+    }
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, new_body);
-    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), compilation_unit_of_module(get_current_module_name()) );
+
+
+    add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
     set_bool_property(STAT_ORDER,saved);
 	/* horrible hack to prevent declaration duplication
 	 * signed : Serge Guelton
@@ -747,6 +758,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
             statement_instruction(old_statement)=make_continue_instruction();
         gen_free_list(statement_declarations(old_statement));
         statement_declarations(old_statement)=NIL;
+        /* trash any extensions, they may not be valid now */
+        free_extensions(statement_extensions(old_statement));
+        statement_extensions(old_statement)=empty_extensions();
+
     }
     free_text(t);
     return new_stmt;
@@ -759,7 +774,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
  * outlining will be performed using either comment recognition
  * or interactively
  *
- * @param module_name name of the module containg the statements to outline
+ * @param module_name name of the module containing the statements to outline
  */
 bool
 outline(char* module_name)
@@ -782,6 +797,8 @@ outline(char* module_name)
         }
         else  {
             statement statement_to_outline = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),label_name);
+            if(statement_undefined_p(statement_to_outline))
+                pips_user_error("Could not find loop labeled %s\n",label_name);
             if(statement_loop_p(statement_to_outline) && get_bool_property("OUTLINE_LOOP_STATEMENT"))
                 statement_to_outline=loop_body(statement_loop(statement_to_outline));
             statements_to_outline=make_statement_list(statement_to_outline);

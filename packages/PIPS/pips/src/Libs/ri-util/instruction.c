@@ -304,8 +304,7 @@ string instruction_identification(instruction i)
     case is_instruction_expression:
       instrstring="EXPRESSION";
       break;
-    default: pips_error("instruction_identification",
-			"ill. instruction tag %d\n",
+    default: pips_internal_error("ill. instruction tag %d",
 			instruction_tag(i));
     }
 

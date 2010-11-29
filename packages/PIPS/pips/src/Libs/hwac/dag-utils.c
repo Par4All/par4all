@@ -1139,7 +1139,7 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
   FOREACH(dagvtx, v, dag_vertices(d))
     if (dagvtx_number(target)==dagvtx_number(v))
       return v;
-  pips_internal_error("twin vertex not found for %" _intFMT "\n",
+  pips_internal_error("twin vertex not found for %" _intFMT "",
                       dagvtx_number(target));
   return NULL;
 }

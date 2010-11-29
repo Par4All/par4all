@@ -1866,7 +1866,7 @@ entity val;
 
     if(val == NULL)
     {
-	pips_internal_error("Trying to translate TCST\n");
+	pips_internal_error("Trying to translate TCST");
 	return;
     }
 
@@ -1919,7 +1919,7 @@ entity val;
 	}
 	else
 	{
-	  pips_internal_error("%s is not translatable: store tag %d\n",
+	  pips_internal_error("%s is not translatable: store tag %d",
 				entity_name(val), storage_tag(store));
 	}
     }
@@ -2026,7 +2026,7 @@ entity val;
 		Psysteme r = region_system(reg);
 
 		if(base_contains_variable_p(sc_base(r), (Variable) v_init))
-		    pips_internal_error("Cannot find value %s\n",
+		    pips_internal_error("Cannot find value %s",
 			       strdup(
 				      concatenate(
 						  module_local_name(module),

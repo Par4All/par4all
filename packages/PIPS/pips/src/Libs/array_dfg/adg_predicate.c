@@ -209,8 +209,7 @@ expression ndf_exp;
     ADD_ELEMENT_TO_LIST(ps_list,PREDICATE,make_predicate(new_sc));
   }
   else
-    pips_error( "adg_get_conjonctions",
-	       "Expression : %s is not in a normal disjunctive form !", 
+    pips_internal_error("Expression : %s is not in a normal disjunctive form !", 
 	       words_to_string(words_expression( ndf_exp )) );
   
   debug(9, "adg_get_conjonctions", "end \n");

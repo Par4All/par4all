@@ -508,8 +508,7 @@ update_indices_for_local_computation(
 	    }
 	    case aligned_affine:
 	    case aligned_star:
-		pips_error("update_indices_for_local_computation",
-			   "part of that function not implemented yet\n");
+		pips_internal_error("part of that function not implemented yet");
 		break;
 	    default: /* ??? nothing is changed */
 		li2 = gen_nconc(li2, CONS(EXPRESSION, indice, NIL));
@@ -969,7 +968,7 @@ statement stat, *pstat;
 
     if (!align_check(the_computer_reference,
 		     the_computer_reference, &lvect, &lkind))
-	pips_error("Overlap_Analysis","no self alignment!\n");
+	pips_internal_error("no self alignment!");
 
     if (computer_is_written)
       lWa = CONS(LIST, CONS(LIST, lkind, CONS(LIST, lvect, NIL)), NIL);

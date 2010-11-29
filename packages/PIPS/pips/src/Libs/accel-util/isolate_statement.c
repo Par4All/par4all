@@ -78,7 +78,7 @@ static void isolate_patch_reference(reference r, isolate_param * p)
         {
             if(!ENDP(offsets)) {
                 expression offset = EXPRESSION(CAR(offsets));
-                if(!entity_field_p(reference_variable(expression_reference(offset)))){
+                if(!expression_reference_p(offset) || !entity_field_p(reference_variable(expression_reference(offset)))){
                     update_expression_syntax(index,
                             make_syntax_call(
                                 make_call(
@@ -94,14 +94,22 @@ static void isolate_patch_reference(reference r, isolate_param * p)
                 POP(offsets);
             }
         }
-        syntax snew = make_syntax_subscript(
-                make_subscript(
-                    MakeUnaryCall(
-                        entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
-                        entity_to_expression(p->new)
-                        ),
-                    indices)
-                );
+        /* build up the replacement */
+        syntax syn = 
+          make_syntax_call(
+              make_call(
+                entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
+                CONS(EXPRESSION,entity_to_expression(p->new),NIL)
+                )
+              );
+
+        /* it is illegal to create a subscript without indices
+         * quoting RK, at the airport back from SC 2010 */
+        syntax snew = ENDP(indices) ?
+          syn:
+          make_syntax_subscript(
+              make_subscript(syntax_to_expression(syn),indices)
+              );
         expression parent = (expression)gen_get_ancestor(expression_domain,r);
         expression_syntax(parent)=syntax_undefined;
         update_expression_syntax(parent,snew);
@@ -133,35 +141,17 @@ void isolate_patch_entities(void * where,entity old, entity new,list offsets)
             0);
 }
 
-static
-bool expression_minmax_p(expression e)
-{
-    if(expression_call_p(e))
-    {
-        entity op = call_function(expression_call(e));
-        return ENTITY_MIN_P(op) || ENTITY_MAX_P(op);
-    }
-    return false;
-}
 
-/* replace caller by field , where field is conatianed by caller */
-static void local_assign_expression(expression caller, expression field)
-{
-     syntax s = expression_syntax(field) ;
-     expression_syntax(field)=syntax_undefined;
-     free_syntax(expression_syntax(caller));
-     expression_syntax(caller)=s;
-     free_normalized(expression_normalized(caller));
-}
-
-static void bounds_of_expression(expression e, transformer tr,bool is_max)
+/* replaces expression @p e by its upper or lower bound under preconditions @p tr
+ * @p is_upper is used to choose among lower and upperbound*/
+static void bounds_of_expression(expression e, transformer tr,bool is_upper)
 {
     intptr_t lbound, ubound;
     if(precondition_minmax_of_expression(e,tr,&lbound,&ubound))
     {
         free_syntax(expression_syntax(e));
         free_normalized(expression_normalized(e));
-        expression new = int_to_expression(is_max ? ubound : lbound);
+        expression new = int_to_expression(is_upper ? ubound : lbound);
         expression_syntax(e)=expression_syntax(new);
         expression_normalized(e)=expression_normalized(new);
         expression_syntax(new)=syntax_undefined;
@@ -169,47 +159,29 @@ static void bounds_of_expression(expression e, transformer tr,bool is_max)
         free_expression(new);
     }
 }
+
+/* replaces expression @p e by its upperbound under preconditions @p tr*/
 static void upperbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,true);
 }
+
+/* replaces expression @p e by its lowerbound under preconditions @p tr*/
 static void lowerbound_of_expression(expression e, transformer tr)
 {
     bounds_of_expression(e,tr,false);
 }
 
-void simplify_minmax_expression(expression e,transformer tr)
-{
-    call c =expression_call(e);
-    bool is_max = ENTITY_MAX_P(call_function(c));
 
-    expression lhs = binary_call_lhs(c);
-    expression rhs = binary_call_rhs(c);
-    intptr_t lhs_lbound,lhs_ubound,rhs_lbound,rhs_ubound;
-    if(precondition_minmax_of_expression(lhs,tr,&lhs_lbound,&lhs_ubound) &&
-            precondition_minmax_of_expression(rhs,tr,&rhs_lbound,&rhs_ubound))
-    {
-        if(is_max)
-        {
-            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,lhs);
-            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,rhs);
-        }
-        else
-        {
-            if(lhs_lbound >=rhs_ubound) local_assign_expression(e,rhs);
-            else if(rhs_lbound >= lhs_ubound) local_assign_expression(e,lhs);
-        }
-    }
-}
 
 /** 
  * generate a list of dimensions @p dims and of offsets @p from a region @p r
  * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
  * we get dims = ( (0,3), (0,4) )
  * and offsets = ( 0 , 1 )
- * if @p exact is set to false, we are allowed to give an upperbound to the dimensions
+ * if @p exact is set to false, we are allowed to give an upper bound to the dimensions
  *
- * if at least one of the resulting dimension can be 0 (accroding to preconditions)
+ * if at least one of the resulting dimension can be 0 (according to preconditions)
  * @p dimension_may_be_null is set to true
  * 
  * @return false if we were enable to gather enough informations
@@ -242,10 +214,8 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
 
                     expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
                     expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
-                    if(expression_minmax_p(elower))
-                        simplify_minmax_expression(elower,tr);
-                    if(expression_minmax_p(eupper))
-                        simplify_minmax_expression(eupper,tr);
+                    simplify_minmax_expression(elower,tr);
+                    simplify_minmax_expression(eupper,tr);
                     expression offset = copy_expression(elower);
 
                     bool compute_upperbound_p = 
@@ -331,14 +301,6 @@ range dimension_to_range(dimension d)
             int_to_expression(1));
 }
 
-typedef enum {
-    transfer_in,
-    transfer_out
-} isolate_transfer;
-#define transfer_in_p(e) ( (e) == transfer_in )
-#define transfer_out_p(e) ( (e) == transfer_out )
-
-
 /* because of the way we build offsets list, it may contains struct field
  * so we cannot rely on make_reference only
  * fixes entity type as well ...
@@ -380,15 +342,22 @@ expression region_reference_to_expression(reference r)
 bool
 isolate_statement(const char* module_name)
 {
+    /* init stuff */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true));
     module_to_value_mappings(get_current_module_entity());
     set_precondition_map( (statement_mapping) db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
+
+    /* get user input */
     string stmt_label=get_string_property("ISOLATE_STATEMENT_LABEL");
     statement statement_to_isolate = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),stmt_label);
-    do_isolate_statement(statement_to_isolate);
+    /* and proceed */
+    if(statement_undefined_p(statement_to_isolate))
+        pips_user_error("statement labeled '%s' not found\n",stmt_label);
+    else 
+        do_isolate_statement(statement_to_isolate);
 
 
 

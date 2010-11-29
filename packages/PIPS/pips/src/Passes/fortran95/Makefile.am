@@ -24,6 +24,8 @@ bin_PROGRAMS=gfc2pips
 gfc2pips_SOURCES = 
 dist_noinst_DATA = patch-4.4.5.diff patch-4.4.3.diff patch-4.4.2.diff patch-4.4.1.diff src gfc2pips-autotools.mk gfc2pips-common.mk
 
+# this is not defined with non-gnu make
+RM = rm -f
 
 include Makefile.mk
 

@@ -243,8 +243,7 @@ instruction_to_wp65_code(entity module, list l, graph dg,int pn,int bn,int ls,in
 		break;
 	    } 
 	    case is_instruction_unstructured: {
-		pips_error("instruction_to_wp65_code-", 
-			   "Sorry: unstructured not implemented\n");
+		pips_internal_error("Sorry: unstructured not implemented");
 		break;}
 	    default: 
 		(void) fprintf(stderr, 
@@ -1038,8 +1037,7 @@ int first_parallel_level,last_parallel_level;
 				      last_parallel_level);
 		    break;
 		default:
-		    pips_error("make_all_movement_blocks",
-			       "unexpected use-def = %d\n", use_def);
+		    pips_internal_error("unexpected use-def = %d", use_def);
 		}
 
 		ifdebug(9) {

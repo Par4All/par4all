@@ -322,7 +322,7 @@ static string get_new_tmp_file_name(void)
     dir_name = db_get_directory_name_for_module(WORKSPACE_TMP_SPACE);
     len = strlen(dir_name)+20;
     file_name = (char*) malloc(sizeof(char)*len);
-    if (!file_name) pips_internal_error("malloc failed\n");
+    if (!file_name) pips_internal_error("malloc failed");
     sprintf(file_name, "%s/cached.%d", dir_name, unique++);
     pips_assert("not too long", strlen(file_name)<len);
     free(dir_name);
@@ -477,7 +477,7 @@ static void init_rx(void)
 	regcomp(&complex_cst2_rx, CMPLX2_RX, REG_ICASE)         ||
 	regcomp(&dcomplex_cst_rx, DCMPLX_RX, REG_ICASE)         ||
 	regcomp(&dcomplex_cst2_rx, DCMPLX2_RX, REG_ICASE))
-	pips_internal_error("invalid regular expression\n");
+	pips_internal_error("invalid regular expression");
 }
 
 static bool pips_process_file(string file_name, string new_name)
@@ -1083,7 +1083,7 @@ bool process_user_file(string file)
 	    if (rename(file_name, abs_res))
 	      {
 		perror("process_user_file");
-		pips_internal_error("mv %s %s failed\n",
+		pips_internal_error("mv %s %s failed",
 				    file_name, res_name);
 	      }
 	    renamed = TRUE;

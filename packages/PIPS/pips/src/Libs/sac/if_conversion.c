@@ -63,7 +63,7 @@ static instruction
 make_phi_assign_instruction(reference lRef, expression cond,
         expression ref1, expression ref2)
 {
-    entity phiEntity = get_function_entity(get_string_property("IF_CONVERSION_PHI"));
+    entity phiEntity = module_name_to_runtime_entity(get_string_property("IF_CONVERSION_PHI"));
     expression phiExp = MakeTernaryCall(
             phiEntity,
             copy_expression(cond),

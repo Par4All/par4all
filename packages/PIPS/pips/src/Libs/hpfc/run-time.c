@@ -94,7 +94,7 @@ basic b;
 	case 2: return(PVM_INTEGER2);
 	case 4: return(PVM_INTEGER4);
 	default:
-	    pips_internal_error("unexpected integer*%d\n", basic_int(b));
+	    pips_internal_error("unexpected integer*%d", basic_int(b));
 	}
     case is_basic_float:
 	switch (basic_float(b))
@@ -102,7 +102,7 @@ basic b;
 	case 4: return(PVM_REAL4);
 	case 8: return(PVM_REAL8);
 	default:
-	    pips_internal_error("unexpected real*%d\n", basic_float(b));
+	    pips_internal_error("unexpected real*%d", basic_float(b));
 	}
     case is_basic_logical:
 	switch (basic_logical(b))
@@ -110,22 +110,22 @@ basic b;
 	case 2: return(PVM_INTEGER2);
 	case 4: return(PVM_INTEGER4);
 	default:
-	    pips_internal_error("unexpected logical*%d\n", basic_logical(b));
+	    pips_internal_error("unexpected logical*%d", basic_logical(b));
 	}
     case is_basic_overloaded:
-	pips_internal_error("overloaded not welcomed\n");
+	pips_internal_error("overloaded not welcomed");
     case is_basic_complex:
 	switch (basic_complex(b))
 	{
 	case  8: return(PVM_COMPLEX8);
 	case 16: return(PVM_COMPLEX16);
 	default:
-	    pips_internal_error("unexpected complex*%d\n", basic_complex(b));
+	    pips_internal_error("unexpected complex*%d", basic_complex(b));
 	}
     case is_basic_string:
 	return(PVM_STRING);
     default:
-	pips_internal_error("unexpected basic tag\n");
+	pips_internal_error("unexpected basic tag");
     }
     return("ERROR");
 }
@@ -291,7 +291,7 @@ expr_compute_local_index(
 				       expr1, expr2, expr));
 	}
 	default:
-	    pips_internal_error("unexpected new declaration tag\n");
+	    pips_internal_error("unexpected new declaration tag");
 	}
 	
     }
@@ -797,7 +797,7 @@ void hpfc_init_run_time_entities()
 		(type_variable(entity_type(current->object))) =	l;
 	    break;
 	default:
-	    pips_internal_error("unexpected what field in Descriptor\n");
+	    pips_internal_error("unexpected what field in Descriptor");
 	}    
     }
 }
@@ -821,7 +821,7 @@ string name;
 
     if (entry) return entry->object;
 
-    pips_internal_error("%s not found\n", name);
+    pips_internal_error("%s not found", name);
     
     return entity_undefined; /* just to avoid a gcc warning */
 }

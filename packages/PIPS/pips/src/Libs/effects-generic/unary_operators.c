@@ -168,7 +168,7 @@ effects_to_may_effects(list l_eff)
 void
 effect_to_must_effect(effect eff)
 {
-    effect_approximation_tag(eff) = is_approximation_must;
+    effect_approximation_tag(eff) = is_approximation_exact;
 }
 
 void

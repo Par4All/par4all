@@ -169,7 +169,7 @@ bool SizeOfArray(entity e, int * s)
 	}
       }
       else if(value_constant_p(ev)) {
-	pips_internal_error("Not implemented yet\n");
+	pips_internal_error("Not implemented yet");
       }
     }
   }
@@ -200,8 +200,7 @@ array_size(entity a)
     int s = 0;
 
     if(!SizeOfArray(a, &s)) {
-	pips_error("array_size",
-		   "Array \"%s\" with illegal varying array size\n",
+	pips_internal_error("Array \"%s\" with illegal varying array size",
 		   entity_name(a));
     }
     return s;
@@ -261,7 +260,7 @@ int type_memory_size(type t)
   case is_type_varargs:
   case is_type_unknown:
   case is_type_void:
-    pips_internal_error("arg. with ill. tag %d\n", type_tag(t));
+    pips_internal_error("arg. with ill. tag %d", type_tag(t));
     break;
   case is_type_variable:
     {
@@ -282,7 +281,7 @@ int type_memory_size(type t)
     s = 4; /* How is it implemented? 32 bit integer? */
     break;
   default:
-    pips_internal_error("arg. with unknown tag %d\n", type_tag(t));
+    pips_internal_error("arg. with unknown tag %d", type_tag(t));
     break;
   }
   /* A struct (or a union) may be hidden, with its declaration
@@ -377,7 +376,7 @@ _int SizeOfElements(basic b)
     e = CSafeSizeOfArray(basic_typedef(b));
     break;
   default:
-    pips_error("SizeOfElements", "Ill. tag %d for basic", basic_tag(b));
+    pips_internal_error("Ill. tag %d for basic", basic_tag(b));
   }
 
   /* Size can be zero, i.e. unknown, for an external variable */
@@ -398,7 +397,7 @@ element_number(basic b, list ld)
     int en = 0;
 
     if(!NumberOfElements(b, ld, &en)) {
-	pips_error("element_number", "Probably varying size array\n");
+	pips_internal_error("Probably varying size array");
     }
 
     return en;
@@ -632,8 +631,7 @@ static hash_table entity_to_size = hash_table_undefined;
 void set_entity_to_size()
 {
     if (entity_to_size != hash_table_undefined) {
-	pips_error("set_entity_to_size",
-		   "hash table should have been deallocated\n");
+	pips_internal_error("hash table should have been deallocated");
 	/* hash_table_clear(entity_to_size); */
     }
 
@@ -643,8 +641,7 @@ void set_entity_to_size()
 void reset_entity_to_size()
 {
     if (entity_to_size == hash_table_undefined) {
-	pips_error("reset_entity_to_size",
-		   "hash table should have been allocated\n");
+	pips_internal_error("hash table should have been allocated");
     }
     else {
 	hash_table_free(entity_to_size);

@@ -535,7 +535,7 @@ entity variable_to_abstract_location(entity v)
       else if(heap_area_p(a))
 	ln = HEAP_AREA_LOCAL_NAME;
       else
-	pips_internal_error("unexpected area\n");
+	pips_internal_error("unexpected area");
 
       if(typed_p) {
 	string fn = entity_local_name(f);
@@ -546,7 +546,7 @@ entity variable_to_abstract_location(entity v)
     }
   }
   else
-    pips_internal_error("arg. not in definition domain\n");
+    pips_internal_error("arg. not in definition domain");
 
   pips_assert("al is an abstract location entity",
 	      entity_abstract_location_p(al));
@@ -585,7 +585,7 @@ entity abstract_locations_max(entity al1, entity al2)
   string mn;
 
   if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
-    //pips_internal_error("Option not implemented yet.\n");
+    //pips_internal_error("Option not implemented yet.");
     pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
 		      " for abstract locations.\n");
   }
@@ -675,7 +675,7 @@ entity entity_locations_max(entity al1, entity al2)
 	  e = FindOrCreateEntity(mn, ln);
 	}
 	else
-	  pips_internal_error("not implemented\n");
+	  pips_internal_error("not implemented");
       }
   }
   free(mn1);

@@ -149,7 +149,7 @@ tag t;
     case is_hpf_newdecl_gamma: return 3;
     case is_hpf_newdecl_delta: return 4;
     default: 
-	pips_internal_error("unexpected hpf_newdecl tag %d\n", t);
+	pips_internal_error("unexpected hpf_newdecl tag %d", t);
     }
     
     return -1; /* just to avoid a gcc warning */
@@ -350,7 +350,7 @@ entity module;
 		 break;
 	     }
 	     default:
-		 pips_internal_error("unexpected decl. tag (%d)\n", decl);
+		 pips_internal_error("unexpected decl. tag (%d)", decl);
 	     }
 	 }
 
@@ -455,7 +455,7 @@ FILE* file;
 		  procdim++;
 		  break;
 	      default:
-		  pips_internal_error("unexpected style tag\n");
+		  pips_internal_error("unexpected style tag");
 		  break;
 	      }
 

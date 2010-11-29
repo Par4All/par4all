@@ -755,8 +755,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     set_current_module_statement(
 	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
     if( get_current_module_statement() == (statement) database_undefined )
-	pips_error("module_name_to_transformers",
-		   "no statement for module %s\n", module_name);
+	pips_internal_error("no statement for module %s", module_name);
 
     set_proper_rw_effects((statement_effects)
 	db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
@@ -836,8 +835,7 @@ bool generic_module_name_to_transformers(char *module_name, bool in_context)
     }
     if(!transformer_consistency_p(t_inter)) {
 	(void) print_transformer(t_inter);
-	pips_error("module_name_to_transformers",
-		   "Non-consistent summary transformer\n");
+	pips_internal_error("Non-consistent summary transformer");
     }
     DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TRANSFORMER,
 			   module_local_name(get_current_module_entity()),
@@ -905,8 +903,7 @@ bool module_name_to_preconditions(char *module_name)
     set_current_module_statement(
 	(statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
     if(get_current_module_statement() == (statement) database_undefined)
-	pips_error("module_name_to_preconditions",
-		   "no statement for module %s\n", module_name);
+	pips_internal_error("no statement for module %s", module_name);
 
     /* Used to add reference information when it is trusted... which
        should always be, at least for automatic parallelization. */
@@ -1016,8 +1013,7 @@ bool module_name_to_total_preconditions(char *module_name)
   set_current_module_statement(
 			       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
   if(get_current_module_statement() == (statement) database_undefined)
-    pips_error("module_name_to_preconditions",
-	       "no statement for module %s\n", module_name);
+    pips_internal_error("no statement for module %s", module_name);
 
   set_proper_rw_effects((statement_effects)
 			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
@@ -1098,7 +1094,7 @@ bool module_name_to_total_preconditions(char *module_name)
   t_pre_inter = transformer_normalize(t_pre_inter, 2);
   if(!transformer_consistency_p(t_pre_inter)) {
     (void) print_transformer(t_pre_inter);
-    pips_internal_error("Non-consistent summary transformer\n");
+    pips_internal_error("Non-consistent summary transformer");
   }
   DB_PUT_MEMORY_RESOURCE(DBR_SUMMARY_TOTAL_PRECONDITION,
 			 module_local_name(get_current_module_entity()),

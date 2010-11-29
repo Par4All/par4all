@@ -134,7 +134,7 @@ char * (*variable_name)();
         v = VECTEUR_NUL;
 
     if(!vect_check(v))
-       pips_error("pu_contrainte_fprint", "Non coherent vector");
+       pips_internal_error("Non coherent vector");
 
     while (!VECTEUR_NUL_P(v)) {
         if (v->var!=TCST) {

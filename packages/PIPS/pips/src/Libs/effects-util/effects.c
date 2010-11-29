@@ -49,10 +49,25 @@
 /* functions for entity */
 entity effect_entity(effect e)
 {
-  return(reference_variable(effect_any_reference(e)));
+  return(cell_entity(effect_cell(e)));
+}
+
+entity cell_entity(cell c)
+{
+  if (cell_gap_p(c)) return entity_undefined;
+
+  else return(reference_variable(cell_any_reference(c)));
 }
 
 /* API for reference */
+
+reference cell_any_reference(cell c)
+{
+  if (cell_gap_p(c)) return reference_undefined;
+
+  return (cell_reference_p(c)) ? cell_reference(c) :
+    preference_reference(cell_preference(c));
+}
 
 /* Does the set of locations referenced by r depend on a pointer
    dereferencing?
@@ -76,7 +91,7 @@ bool memory_dereferencing_p(reference r)
     /* cycle with alias-classes library: import explictly */
     bool entity_abstract_location_p(entity);
     if(entity_abstract_location_p(v)) {
-      pips_internal_error("Do we want to subscript abstract locations?\n");
+      pips_internal_error("Do we want to subscript abstract locations?");
     }
     else if(FALSE /* entity_heap_variable_p(v)*/) {
       /* Heap modelization is behind*/
@@ -238,7 +253,7 @@ effect heap_effect(entity m, action ac)
   effect any = effect_undefined;
 
   if(entity_undefined_p(heap)) {
-    pips_internal_error("Heap for module \"%s\" not found\n", entity_name(m));
+    pips_internal_error("Heap for module \"%s\" not found", entity_name(m));
   }
 
   any = make_effect(make_cell_reference(make_reference(heap, NIL)),
@@ -694,7 +709,7 @@ string action_kind_to_string(action_kind ak)
   else if(action_kind_type_declaration_p(ak))
     s = "T";
   else
-    pips_internal_error("Unknown action kind.\n");
+    pips_internal_error("Unknown action kind.");
   return s;
 }
 
@@ -741,7 +756,7 @@ action_kind action_to_action_kind(action a)
   action_kind ak = action_read_p(a) ? action_read(a): action_write(a);
 
   if(!action_read_p(a) && !action_write_p(a))
-    pips_internal_error("Inconsistent action kind.\n");
+    pips_internal_error("Inconsistent action kind.");
 
   return ak;
 }
@@ -861,8 +876,8 @@ bool effect_list_can_be_safely_full_freed_p(list el)
  */
 tag approximation_and(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) && (t2 == is_approximation_must))
-	return(is_approximation_must);
+    if ((t1 == is_approximation_exact) && (t2 == is_approximation_exact))
+	return(is_approximation_exact);
     else
 	return(is_approximation_may);
 }
@@ -876,8 +891,8 @@ tag approximation_and(tag t1, tag t2)
  */
 tag approximation_or(tag t1, tag t2)
 {
-    if ((t1 == is_approximation_must) || (t2 == is_approximation_must))
-	return(is_approximation_must);
+    if ((t1 == is_approximation_exact) || (t2 == is_approximation_exact))
+	return(is_approximation_exact);
     else
 	return(is_approximation_may);
 }
@@ -907,7 +922,7 @@ reference cell_to_reference(cell c) {
   else if (cell_preference_p(c))
     r = preference_reference(cell_preference(c));
   else
-    pips_internal_error("unexpected cell tag\n");
+    pips_internal_error("unexpected cell tag");
 
   return r;
 }

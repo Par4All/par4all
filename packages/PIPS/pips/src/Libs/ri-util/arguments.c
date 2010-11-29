@@ -106,7 +106,7 @@ entity e;
 	gen_remove(&a, e);
     }
     else {
-	pips_error("arguments_rm_entity", "entity %s is not in a\n",
+	pips_internal_error("entity %s is not in a",
 		   entity_name(e));
     }
 

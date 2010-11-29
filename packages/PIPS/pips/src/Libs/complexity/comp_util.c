@@ -95,7 +95,7 @@ boolean complexity_check(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) )
-	pips_error("complexity_check", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( !complexity_zero_p(comp) ) {
 	return (polynome_check(complexity_polynome(comp)));
@@ -104,11 +104,11 @@ complexity comp;
 }
 
 void complexity_check_and_warn(s,comp)
-char *s;
+const char *s;
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) )
-	pips_error("complexity_check_and_warn", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(comp) ) {
 	if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
@@ -122,7 +122,7 @@ complexity comp;
 void good_complexity_assert(char * function, complexity comp)
 {
     if (!complexity_check(comp))
-	pips_error(function, "bad internal complexity representation\n");
+	pips_internal_error("bad internal complexity representation");
 }
 
 /* duplicates complexity comp */
@@ -130,7 +130,7 @@ complexity complexity_dup(comp)
 complexity comp;
 {
     if ( COMPLEXITY_UNDEFINED_P(comp) ) 
-	pips_error("complexity_dup", "complexity undefined");
+	pips_internal_error("complexity undefined");
 
     if ( complexity_zero_p(comp) ) 
 	return (make_zero_complexity());
@@ -163,7 +163,7 @@ void complexity_rm(pcomp)
 complexity *pcomp;
 {
     if ( COMPLEXITY_UNDEFINED_P(*pcomp) )
-	pips_error("complexity_rm", "undefined complexity\n");
+	pips_internal_error("undefined complexity");
 
     if ( !complexity_zero_p(*pcomp) ) 
 	free_complexity(*pcomp);
@@ -178,7 +178,7 @@ boolean print_stats_p, print_local_names_p;
     char *s=NULL;
 
     if ( COMPLEXITY_UNDEFINED_P(comp) )
-	pips_error("complexity_sprint", "complexity undefined\n");
+	pips_internal_error("complexity undefined");
     else {
         varcount vc   = complexity_varcount(comp);
         rangecount rc = complexity_rangecount(comp);
@@ -258,7 +258,7 @@ hash_table hash_statement_to_complexity;
 
     comp = ((complexity) hash_get(hash_statement_to_complexity,(char *)stat));
     if (COMPLEXITY_UNDEFINED_P(comp))
-	pips_error("fprint_statement_complexity","undefined complexity\n");
+	pips_internal_error("undefined complexity");
     else {
 	fprintf(stderr, "C -- ");
 	complexity_fprint(stderr, comp, DO_PRINT_STATS, PRINT_LOCAL_NAMES);
@@ -615,8 +615,7 @@ basic *pargsbasic;
 	case is_basic_logical:
 	  return (LOGICAL_INTRINSICS_COST);
 	default:
-	  pips_error("intrinsic_cost",
-		     "basic tag is %d\n", basic_tag(*pargsbasic));
+	  pips_internal_error("basic tag is %d", basic_tag(*pargsbasic));
 	}
     }
   }
@@ -712,8 +711,7 @@ unstructured unstr;
 	list succs = control_successors(current);
 
 	if (succs == NIL)
-	    pips_error("is_linear_unstructured",
-		       "control != exit one,it has no successor\n");
+	    pips_internal_error("control != exit one,it has no successor");
 	if (CDR(succs) != NIL) 
 	    return (FALSE);
 	current = CONTROL(CAR(succs));
@@ -941,7 +939,7 @@ hash_table hash_complexity_params;
 	storage s = entity_storage(e);
 
 	if ( !storage_formal_p(s) &&
-	    action_read_p(ac) && approximation_must_p(ap) ) {
+	    action_read_p(ac) && approximation_exact_p(ap) ) {
 	    debug(5,"add_common_variables_to_hash_table",
 		  "%s added\n", module_local_name(e));
 	    hash_put(hash_complexity_params, (char *) module_local_name(e),
@@ -970,7 +968,7 @@ hash_table hash_complexity_params;
 	approximation ap = effect_approximation(obj);
 	entity e = reference_variable(r);
 
-	if ( action_read_p(ac) && approximation_must_p(ap) ) {
+	if ( action_read_p(ac) && approximation_exact_p(ap) ) {
 	    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 		fprintf(stderr, "%s deleted\n", module_local_name(e));
 	    }
@@ -987,10 +985,10 @@ char *var_name;
 	effect eff = EFFECT(CAR(ce));
 
 	if(eff == effect_undefined)
-	    pips_error("is_must_be_written_var", "unexpected effect undefined");
+	    pips_internal_error("unexpected effect undefined");
 
 	if ( action_write_p(effect_action(eff)) 
-	    && approximation_must_p(effect_approximation(eff)) ) {
+	    && approximation_exact_p(effect_approximation(eff)) ) {
 	    reference r = effect_any_reference(eff);
 	    entity e = reference_variable(r);
 /*	    

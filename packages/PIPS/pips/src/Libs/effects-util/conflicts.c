@@ -60,7 +60,7 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
   bool conflict_p = FALSE;
 
   /* We enforce must approximation for the two effects */
-  if ( approximation_must_p(ap1) && approximation_must_p(ap2) ) {
+  if ( approximation_exact_p(ap1) && approximation_exact_p(ap2) ) {
     /* We enforce that at least one effect is a write */
     if ( action_write_p(ac1) || action_write_p(ac2) ) {
       cell cell1 = effect_cell(eff1);
@@ -193,7 +193,7 @@ bool effects_conflict_p( effect eff1, effect eff2 ) {
   /* In general, there is no reason to have the same results... This
    is only a first debugging step. */
   if ( conflict_p != old_conflict_p )
-    pips_internal_error("Inconsistent conflict detection.\n");
+    pips_internal_error("Inconsistent conflict detection.");
 
   return conflict_p;
 }
@@ -574,7 +574,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	conflict_p = abstract_locations_conflict_p( e1, al2 );
       }
     } else {
-      pips_internal_error("Unexpected case.\n");
+      pips_internal_error("Unexpected case.");
       ;
     }
   else {
@@ -591,7 +591,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	  conflict_p = abstract_locations_conflict_p( al1, e2 );
 	}
       } else {
-	pips_internal_error("Unexpected case.\n");
+	pips_internal_error("Unexpected case.");
 	;
       }
     } else { /* No abstract location is involved */

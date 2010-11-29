@@ -705,7 +705,7 @@ static void interprocedural_abc_statement_rwt(statement s, interprocedural_abc_c
        * we don't have to check unstructured  instruction here*/
       break;
     default:
-      pips_error("", "Unexpected instruction tag %d \n", t );
+      pips_internal_error("Unexpected instruction tag %d ", t );
       break; 
     }  
 }

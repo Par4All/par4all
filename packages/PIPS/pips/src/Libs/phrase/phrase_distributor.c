@@ -573,7 +573,7 @@ static entity create_parameter_variable_for_new_module (entity a_variable,
     }
   else 
     {
-      pips_error("Entity already exist: %s\n", new_name);
+      pips_internal_error("Entity already exist: %s", new_name);
       return NULL;
     }
 }
@@ -617,7 +617,7 @@ entity create_private_variable_for_new_module (entity a_variable,
     }
   else 
     {
-      pips_error("Entity already exist: %s\n", new_name);
+      pips_internal_error("Entity already exist: %s", new_name);
       return NULL;
     }
 }

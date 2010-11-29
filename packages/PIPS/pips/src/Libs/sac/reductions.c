@@ -264,7 +264,7 @@ static expression make_0val_expression(basic b)
             return complex_to_expression(0,0);
 
         default:
-            pips_internal_error("function not implemented for this basic \n");
+            pips_internal_error("function not implemented for this basic ");
     }
     return expression_undefined;
 }

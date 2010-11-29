@@ -394,8 +394,7 @@ static int look_for_references_in_call(call c, reference (*reference_transformat
             /* nothing to replace */
             break;
         case is_value_symbolic:
-            pips_error(__func__, 
-                    "case is_value_symbolic: not implemented\n");
+            pips_internal_error("case is_value_symbolic: not implemented");
             break;
         case is_value_intrinsic:
         case is_value_unknown:
@@ -412,7 +411,7 @@ static int look_for_references_in_call(call c, reference (*reference_transformat
                 }
             } break;
         default:
-            pips_error(__func__, "unknown tag: %d\n", 
+            pips_internal_error("unknown tag: %d", 
                     (int) value_tag(vin));
 
     }
@@ -456,7 +455,7 @@ static int look_for_references_in_expression(expression e, reference (*reference
 					   reference_predicate);
 	break;
     default: 
-	pips_error("look_for_references_in_expression", "unknown tag: %d\n", 
+	pips_internal_error("unknown tag: %d", 
 		   (int) syntax_tag(expression_syntax(e)));
     }
 
@@ -511,12 +510,11 @@ static int look_for_references_in_statement(statement s, reference (*reference_t
 					    reference_predicate);
 	break;
     case is_instruction_goto :
-	pips_error("look_for_references_in_statement", "case is_instruction_goto");
+	pips_internal_error("case is_instruction_goto");
 	break;
     case is_instruction_unstructured :
 	/* FI: there is no reason not to do something here! */
-	pips_error("look_for_references_in_statement", 
-		   "case is_instruction_unstructured");
+	pips_internal_error("case is_instruction_unstructured");
 	break;
     default:
       pips_internal_error("Bad instruction tag");

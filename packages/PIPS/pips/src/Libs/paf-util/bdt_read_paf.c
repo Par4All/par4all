@@ -130,7 +130,7 @@ char *s;
 
 #else
 
- pips_internal_error("not bdtyy{in,parse} compiled in (HAS_BDTYY undef)\n");
+ pips_internal_error("not bdtyy{in,parse} compiled in (HAS_BDTYY undef)");
 
 #endif
 
@@ -289,7 +289,7 @@ int option;
  if(option == POSITIVE)
    {
     if(crt_exp == expression_undefined)
-       pips_error("bdt_save_pred", "current expression is undefined");
+       pips_internal_error("current expression is undefined");
 
     pred_l = CONS(EXPRESSION, negate_expression(crt_exp), pred_l);
     crt_exp = expression_undefined;

@@ -244,7 +244,7 @@ static enum basic_utype get_basic_from_opcode(opcode oc, int argNum)
         case DC_REF_TOK:
             return is_basic_complex;
         default:
-            pips_internal_error("subword size unknown.\n");
+            pips_internal_error("subword size unknown.");
     }
 
     return is_basic_int;
@@ -274,7 +274,7 @@ int get_subwordSize_from_opcode(opcode oc, int argNum)
         case DC_REF_TOK:
             return 128;
         default:
-            pips_internal_error("subword size unknown.\n");
+            pips_internal_error("subword size unknown.");
     }
 
     return 8;
@@ -359,19 +359,6 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
     }
 
     return best;
-}
-
-entity get_function_entity(string name)
-{
-    entity e = local_name_to_top_level_entity(name); 
-    if ( entity_undefined_p( e ) )
-    {
-        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
-                "Please feed pips with its definition and source\n",name);
-        e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
-    }
-
-    return e;
 }
 
 
@@ -611,7 +598,7 @@ void replace_subscript(expression e)
 static statement make_exec_statement_from_name(string ename, list args)
 {
     /* SG: ugly patch to make sure fortran's parameter passing and c's are respected */
-    entity exec_function = get_function_entity(ename);
+    entity exec_function = module_name_to_runtime_entity(ename);
     if( c_module_p(exec_function) )
     {
         string pattern0;
@@ -623,11 +610,27 @@ static statement make_exec_statement_from_name(string ename, list args)
         }
         free(pattern0);
     }
-    return call_to_statement(make_call(get_function_entity(ename), args));
+    return call_to_statement(make_call(module_name_to_runtime_entity(ename), args));
 }
 static statement make_exec_statement_from_opcode(opcode oc, list args)
 {
     return make_exec_statement_from_name( opcode_name(oc) , args );
+}
+
+static basic get_typedefed_array(const char * type_name, basic b, list dims) {
+    entity e = FindEntity(TOP_LEVEL_MODULE_NAME,type_name);
+    if(entity_undefined_p(e)) {
+        e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,type_name);
+        entity_type(e)=make_type_variable(
+                make_variable(
+                    b,
+                    dims,NIL
+                    )
+                );
+        entity_storage(e)=make_storage_rom();
+        entity_initial(e)=make_value_unknown();
+    }
+    return make_basic_typedef(e);
 }
 
 #define SAC_ALIGNED_VECTOR_NAME "pdata"
@@ -926,21 +929,6 @@ static statement make_save_statement(int argc, list args, list padded)
     return make_loadsave_statement(argc, args, FALSE, padded);
 }
 
-basic get_typedefed_array(const char * type_name, basic b, list dims) {
-    entity e = FindEntity(TOP_LEVEL_MODULE_NAME,type_name);
-    if(entity_undefined_p(e)) {
-        e = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,type_name);
-        entity_type(e)=make_type_variable(
-                make_variable(
-                    b,
-                    dims,NIL
-                    )
-                );
-        entity_storage(e)=make_storage_rom();
-        entity_initial(e)=make_value_unknown();
-    }
-    return make_basic_typedef(e);
-}
 
 
 /*

@@ -630,8 +630,7 @@ GetChar(FILE * fp)
 	     * previous_fp == NULL, perform a buffer reset
 	     */
 	    i_getchar = l_getchar;
-	    pips_error("GetChar", 
-		       "Unexpected buffer reset.\n"
+	    pips_internal_error("Unexpected buffer reset."
 		       "A parser error must have occured previously.\n");
 	}
 	previous_fp = fp;
