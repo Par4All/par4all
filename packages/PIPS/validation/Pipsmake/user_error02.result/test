@@ -36,12 +36,12 @@ Module B selected
 Request: build resource PRINTED_FILE for module B.
   PRINT_CODE_CUMULATED_EFFECTS   building   PRINTED_FILE(B)
 PRINTED_FILE made for B.
-C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: X Y __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       SUBROUTINE B(X, Y)
-C               <must be read   >: X Y __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: X Y __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
 
       PRINT *, X+Y                                                      0004
 

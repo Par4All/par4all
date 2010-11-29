@@ -23,7 +23,7 @@ void main(int n)
 //  T(s,t) {0<=n, t<=n, t#init<=n, s<=2, s#init+2t#init<=s+2t,
 //    s#init<=2, t#init<=t}
 
-      while (s<=2&&t<=n&&alea()>0.) 
+      while (s<=2&&t<=n&&alea()>0.)
 
 //  T(s,t) {s==0, t==t#init+1, 0<=n, t<=n+1, s#init<=2}
 
@@ -33,7 +33,7 @@ void main(int n)
 //    s#init<=2}
 
 
-      while (s<=2&&t<=n&&alea()<=0.) 
+      while (s<=2&&t<=n&&alea()<=0.)
 
 //  T(d,s) {d==d#init+1, s==s#init+1, 0<=n, t<=n, s<=3}
 
@@ -78,7 +78,7 @@ void main(int n)
 
 //  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
 
-      while (s<=2&&t<=n&&alea()>0.) 
+      while (s<=2&&t<=n&&alea()>0.)
 
 //  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
 
@@ -88,7 +88,7 @@ void main(int n)
 //    0<=t}
 
 
-      while (s<=2&&t<=n&&alea()<=0.) 
+      while (s<=2&&t<=n&&alea()<=0.)
 
 //  P(d,s,t) {0<=d, d<=s+2t, t<=n, s<=2, 0<=t}
 
@@ -118,10 +118,10 @@ void main(int n)
    int s = 0, t = 0, d = 0;
    n>=0?(void) 0:__assert_fail("n>=0", "./car-safety-3.c", 17, (const char *) 0);
    while (s<=2&&t<=n) {
-      while (s<=2&&t<=n&&alea()>0.) 
+      while (s<=2&&t<=n&&alea()>0.)
          t++, s = 0;
 
-      while (s<=2&&t<=n&&alea()<=0.) 
+      while (s<=2&&t<=n&&alea()<=0.)
          d++, s++;
    }
    printf("healthy");

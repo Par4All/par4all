@@ -176,10 +176,10 @@ l99998:      ;
       line[i] = fgetc(fp);
       chara = (int) line[i];
       if (chara<0) goto l99999;
-      if (line[i]=='=') 
+      if (line[i]=='=')
          HasEqual = 1;
       if (line[i]=='\n') goto break_2;
-      if (line[i]!=' ') 
+      if (line[i]!=' ')
          i++;
       goto l99998;
 l99999:      ;
@@ -395,7 +395,7 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
    
    
    for(raf = 0; raf <= Nraf-1; raf += 1)
-      if (pTr[raf]<Trmin) 
+      if (pTr[raf]<Trmin)
          Trmin = pTr[raf];
    {
       float Vmax0 = lambda/(4.*Trmin);
@@ -444,7 +444,7 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
                            if ((a!=0||b!=0||c!=0)&&h!=0) {
                               nb_hits += h;
                               add_pow += pow_a;
-                              if (pow_a>pow) 
+                              if (pow_a>pow)
                                  isMax = 0;
                            }
                         }
@@ -474,9 +474,9 @@ int THfloat2thint(float TH, int Nth, float Beamwidth)
    float Thgate = Beamwidth_rad/((float) Nth);
    int th;
    th = (int) (.5+(TH+Beamwidth_rad/2.)/Thgate);
-   if (th<0) 
+   if (th<0)
       th = 0;
-   if (th>Nth) 
+   if (th>Nth)
       th = Nth;
    return th;
 }
@@ -489,9 +489,9 @@ int Vfloat2vint(float V, int Nv, float lambda, float Tr)
       v = (int) (1.E-5+V/Vgate);
    else
       v = (int) (1.E-5+(V+2*Vmax)/Vgate);
-   if (v<0) 
+   if (v<0)
       v = 0;
-   if (v>Nv) 
+   if (v>Nv)
       v = Nv;
    return v;
 }
@@ -624,7 +624,7 @@ void init_tab_coh(int nv, int dim, float Tr, Cplfloat tab_coh[nv][dim])
 
    for(iv = 0; iv <= nv-1; iv += 1) {
       V = Vmax*(2.*iv+1.)/(1.*nv);
-      if (iv>=nv/2) 
+      if (iv>=nv/2)
          V = V-2*Vmax;
       for(idop = 0; idop <= dim-1; idop += 1) {
          time = 2*3.141592653589793238*idop*2*V*Tr*1./0.03;
@@ -671,7 +671,7 @@ int main()
    {
       float Trmin = Tr[0];
       for(i = 0; i <= Nraf-1; i += 1)
-         if (Tr[i]<Trmin) 
+         if (Tr[i]<Trmin)
             Trmin = Tr[i];
 
       RecordPlots("PlotsOut.txt", 100*4, amb_out, 15, 2*20, 0.03/(2.*Trmin), 20, 5);
@@ -709,7 +709,7 @@ void tfac(int Nth, int Nrg, int Nv, Cplfloat In[Nth][Nrg][Nv], int tfac_L_V, int
                for(xrg = 0; xrg <= 2*midRg+1-1; xrg += 1)
                   if (xrg!=midRg||xv!=midV) {
                      T = ModSquare(In[th][rg+xrg][v+xv]);
-                     if (Sc<T) 
+                     if (Sc<T)
                         IsMax = 0;
                      S += T;
                   }
@@ -843,7 +843,7 @@ float vint2Vfloat(int v, int Nv, float lambda, float Tr)
    float Vmax = lambda/(4.*Tr);
    float V;
    V = Vmax*(2.*v+1.)/(1.*Nv);
-   if (v>=Nv/2) 
+   if (v>=Nv/2)
       V = V-2.*Vmax;
    return V;
 }
@@ -851,7 +851,7 @@ float vint2Vfloat_1(int v, int Nv, float Vmax)
 {
    float V;
    V = Vmax*(2.*v+1.)/(1.*Nv);
-   if (v>=Nv/2) 
+   if (v>=Nv/2)
       V = V-2.*Vmax;
    return V;
 }

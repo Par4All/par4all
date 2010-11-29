@@ -98,7 +98,6 @@ l100:
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
-   ;
 }
 
 After double unrolling
@@ -134,7 +133,6 @@ l200:            ;
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
-   ;
 }
 void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj], float kernel[ksi][ksj], float new_image[isi][isj])
 {
@@ -144,7 +142,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l300:
          for(j = 1; j <= 510; j += 1) {
             new_image[i_1][j] = 0.;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j-1]*kernel[0][0];
@@ -178,7 +175,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l300:
          for(j = 1; j <= 510; j += 1) {
             new_image[i_1][j] = 0.;
             F_0 = image[i_1-1][j-1]*kernel[0][0];
@@ -240,7 +236,7 @@ int main()
       P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kernel[0][0], *kernel0);
 
 
-      convol(512, 512, (*new_image0), (*image0), 3, 3, (*kernel0));
+      convol(512, 512, *new_image0, *image0, 3, 3, *kernel0);
       P4A_copy_from_accel_2d(sizeof(float), 512, 512, 512, 512, 0, 0, &new_image[0][0], *new_image0);
       P4A_accel_free(new_image0);
       P4A_accel_free(image0);
@@ -265,7 +261,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
       //PIPS generated variable
       int i_1;
       for(i_1 = i; i_1 <= MIN(i+127, 510); i_1 += 1)
-l300:
          for(j = 1; j <= 510; j += 1) {
             *(new_image+j+i_1*isj) = 0.;
             F_0 = *(image+j-1+(i_1-1)*isj)**(kernel+0);
@@ -324,7 +319,7 @@ int main()
       P4A_copy_to_accel_2d(sizeof(float), 3, 3, 3, 3, 0, 0, &kernel[0][0], *kernel0);
 
 
-      convol(512, 512, (*new_image0), (*image0), 3, 3, (*kernel0));
+      convol(512, 512, *new_image0, *image0, 3, 3, *kernel0);
       P4A_copy_from_accel_2d(sizeof(float), 512, 512, 512, 512, 0, 0, &new_image[0][0], *new_image0);
       P4A_accel_free(new_image0);
       P4A_accel_free(image0);
@@ -480,7 +475,7 @@ int main()
 //  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
 
 
-      convol(512, 512, (*new_image0), (*image0), 3, 3, (*kernel0));
+      convol(512, 512, *new_image0, *image0, 3, 3, *kernel0);
 
 //  P(i,j,n) {i==512, j==512, 0<=n, n<=19}
 
@@ -550,7 +545,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
 
 //  P() {}
 
-l300:
          for(j = 1; j <= 510; j += 1) {
 
 //  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {1<=j, j<=510}

@@ -1,0 +1,55 @@
+int main()
+{
+
+// Pointer values: none
+
+   float *a, *p;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i;
+
+// Pointer values:
+// a == *ANY_MODULE*:*UNDEFINED* (exact);
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   a = (float *) malloc(10*sizeof(float));
+
+// Pointer values:
+// a == &*HEAP*_l_8[0] (exact);
+// p == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   p = a, i = 0;
+
+// Pointer values:
+// a == &*HEAP*_l_8[0] (exact);
+// p == a (exact);
+
+   while (i<10) {
+
+// Pointer values:
+// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == a (may);
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+
+      *p = 1.0;
+
+// Pointer values:
+// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == a (may);
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+
+      p++;
+   }
+
+// Pointer values:
+// a == &*ANY_MODULE*:*ANYWHERE* (may);
+// p == a (may);
+// p == &*ANY_MODULE*:*ANYWHERE* (may);
+
+   return 0;
+}

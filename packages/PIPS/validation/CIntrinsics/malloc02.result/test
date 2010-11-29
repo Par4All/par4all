@@ -10,7 +10,7 @@ int main()
    scanf("%d", &i);
 
    buffer = (char *) malloc(i+1);
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
 
    for (n = 0;n<i;n++)
@@ -31,45 +31,45 @@ int main()
 {
    int i, n;
    char buffer[50];
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("How long do you want the string? ");
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0] i
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: i __IO_EFFECTS:LUNS[0]
    scanf("%d", &i);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_ i
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    buffer = (char *) malloc(i+1);
-   if (buffer==(void *) 0) 
+   if (buffer==(void *) 0)
       exit(1);
-//               <must be read   >: i
-//               <must be written>: n
+//             <    is read   >: i
+//             <    is written>: n
 
    for(n = 0; n <= i-1; n += 1)
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED i n
-//               <must be written>: _RANDOM_EFFECTS:GEN_SEED buffer[n]
+//             <    is read   >: i n _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: buffer[n] _RANDOM_EFFECTS:GEN_SEED
       buffer[n] = rand()%26+'a';
-//               <must be read   >: i
-//               <must be written>: buffer[i]
+//             <    is read   >: i
+//             <    is written>: buffer[i]
    buffer[i] = '\0';
-//               <may be read    >: stdout[0] buffer[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: buffer[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("Random string: %s\n", buffer);
-//               <must be read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
-//               <must be written>: _MEMMOVE_EFFECTS:_MEMMOVE_ 
-//                                  buffer[0:7-1]
+//             <    is read   >: _MEMMOVE_EFFECTS:_MEMMOVE_
+//             <    is written>: buffer[0:7-1] 
+//                               _MEMMOVE_EFFECTS:_MEMMOVE_
    memmove(buffer, "bonjour", 7);
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
    free(buffer);
    
    

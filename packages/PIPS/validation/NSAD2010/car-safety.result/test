@@ -16,7 +16,7 @@ int main()
 //    d<=s+2t, s<=2, 0<=t, t<=3}
 
 
-   while (s<=2&&t<=3) 
+   while (s<=2&&t<=3)
 
 //  T(d,s,t) {d+t==d#init+t#init+1, s#init+3t#init+1<=s+3t,
 //    s+3t<=3t#init+3, t#init<=t, t<=t#init+1, t#init<=3}
@@ -66,7 +66,7 @@ int main()
 //  P(d,s,t) {d==0, s==0, t==0}
 
 
-   while (s<=2&&t<=3) 
+   while (s<=2&&t<=3)
 
 //  P(d,s,t) {0<=d, s<=3d, s<=2d+2t, d<=s+2t, s<=2, 0<=t, t<=3}
 
@@ -106,7 +106,7 @@ int main()
 
    int s = 0, t = 0, d = 0;
 
-   while (s<=2&&t<=3) 
+   while (s<=2&&t<=3)
       if (alea())
          t++, s = 0;
       else

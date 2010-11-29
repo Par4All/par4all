@@ -1,0 +1,33 @@
+int main()
+{
+
+// Pointer values: none
+
+   float t;
+
+// Pointer values: none
+
+   float a;
+
+// Pointer values: none
+
+
+   t = 1.0;
+
+// Pointer values: none
+
+   while (t<2.0) {
+
+// Pointer values: none
+
+      a = a+t*0, 5;
+
+// Pointer values: none
+
+      t += 0, 01;
+   }
+
+// Pointer values: none
+
+   return 0;
+}

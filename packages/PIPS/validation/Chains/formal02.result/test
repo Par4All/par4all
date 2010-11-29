@@ -5,11 +5,11 @@ void formal02(int *a, float *b)
 {
    int *pi;                                                             /*0009*/
    float *px;                                                           /*0010*/
-//               <must be read   >: a
-//               <must be written>: a[0]
+//             <    is read   >: a
+//             <    is written>: a[0]
    *a = 1;                                                              /*0011*/
-//               <must be read   >: b
-//               <must be written>: b[0]
+//             <    is read   >: b
+//             <    is written>: b[0]
    *b = 1.;                                                             /*0012*/
 }
 

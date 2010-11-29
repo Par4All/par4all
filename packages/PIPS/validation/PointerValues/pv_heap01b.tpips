@@ -1,5 +1,5 @@
-delete wspace
-create wspace pv_heap01.c
+delete pv_heap01b
+create pv_heap01b pv_heap01.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
@@ -16,5 +16,5 @@ activate PRINT_CODE_SIMPLE_POINTER_VALUES
 display PRINTED_FILE
 
 close
-delete wspace
+delete pv_heap01b
 quit

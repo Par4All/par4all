@@ -276,13 +276,13 @@
 void
 dotprod (short a[1], short b[10000], short c[10000])
 {
+  static const short size = 10000;
   v8hi vec30;
   v8hi vec20;
   v8hi vec10;
   v8hi vec00;
   int lu_ind00;
   short red0[8];
-  static const short size = 10000;
 
   a[0] = 0;
   ;

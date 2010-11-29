@@ -27,7 +27,7 @@ int while04(int n)
 //  T() {i==0, j==1, 2<=n}
 
 
-   if (n<=1) 
+   if (n<=1)
 
 //  T() {0==-1}
 
@@ -97,7 +97,7 @@ int while04(int n)
 //  P(i,j) {i==0, j==1}
 
 
-   if (n<=1) 
+   if (n<=1)
 
 //  P(i,j) {i==0, j==1, n<=1}
 
@@ -150,7 +150,7 @@ int while04(int n)
    i = 0;
    j = 1;
 
-   if (n<=1) 
+   if (n<=1)
       exit(1);
    {
       // BEGIN BLOCK

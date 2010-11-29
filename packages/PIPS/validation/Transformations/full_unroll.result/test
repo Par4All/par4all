@@ -18,7 +18,7 @@ void foo(double A[10], double B[10][10])
    int i, j;
    //PIPS generated variable
    double _return0;
-l0:   ;
+l99997:   ;
    _return0 = A[0];
    A[0] = B[0][0]+_return0;
    _return0 = A[0];

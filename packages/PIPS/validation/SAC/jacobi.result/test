@@ -80,7 +80,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(j = 1; j <= 60; j += 4) {
          F_0 = space[i-1][j]+space[i+1][j];
@@ -143,7 +142,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i = 1; i <= 62; i += 1) {
       for(j = 1; j <= 60; j += 4) {
          F_0 = space[i-1][j]+space[i+1][j];
@@ -208,7 +206,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i0 = 1; i0 <= 62; i0 += 1) {
       for(j0 = 1; j0 <= 60; j0 += 4) {
          F_00 = space[i0-1][j0]+space[i0+1][j0];
@@ -275,7 +272,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i0 = 1; i0 <= 62; i0 += 1) {
       for(j0 = 1; j0 <= 60; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
@@ -340,7 +336,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i0 = 1; i0 <= 62; i0 += 1) {
       {
          //PIPS:SAC generated v4sf vector(s)
@@ -413,7 +408,6 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:
    for(i0 = 1; i0 <= 62; i0 += 1) {
       {
          //PIPS:SAC generated v4sf vector(s)

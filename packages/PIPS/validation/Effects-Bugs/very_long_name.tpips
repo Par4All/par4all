@@ -1,0 +1,14 @@
+#
+delete very_long_name
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create very_long_name very_long_name.c
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE(main)
+
+close
+delete very_long_name
+quit
+# EOF

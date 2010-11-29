@@ -1,12 +1,12 @@
 C --- Complexity with early evaluation
-C      -14*U_J_0.U_N_2 + 7*U_N_0.U_N_2 + 14*U_N_1.U_N_2 + 26*U_N_2 + 2 (SUMMARY)
+C     7*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE3 - 14*COMPLEXITY:UNKNOWN_VARIABLE1.COMPLEXITY:UNKNOWN_VARIABLE3 + 14*COMPLEXITY:UNKNOWN_VARIABLE2.COMPLEXITY:UNKNOWN_VARIABLE3 + 26*COMPLEXITY:UNKNOWN_VARIABLE3 + 2 (SUMMARY)
        PROGRAM CH
        REAL A(1:100,1:100)
        REAL B(1:100)
        INTEGER N
-C      -14*U_J_0.U_N_2 + 7*U_N_0.U_N_2 + 14*U_N_1.U_N_2 + 26*U_N_2 + 2 (DO)
+C     7*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE3 - 14*COMPLEXITY:UNKNOWN_VARIABLE1.COMPLEXITY:UNKNOWN_VARIABLE3 + 14*COMPLEXITY:UNKNOWN_VARIABLE2.COMPLEXITY:UNKNOWN_VARIABLE3 + 26*COMPLEXITY:UNKNOWN_VARIABLE3 + 2 (DO)
       DO 10 J = 1, N                                                    0005
-C                                                         7*U_N_0 + 12 (DO)
+C                                  7*COMPLEXITY:UNKNOWN_VARIABLE0 + 12 (DO)
 cvd$    concur
          DO 20 I = MAX(1+1, J), N                                       0007
 C                                                                    6 (DO)
@@ -19,7 +19,7 @@ C                                                                    0 (STMT)
 20          CONTINUE                                                    0011
 C                                                                    9 (STMT)
          A(J,J) = SQRT(A(J,J))                                          0012
-C                                             -14*U_J_0 + 14*U_N_1 + 4 (DO)
+C     -14*COMPLEXITY:UNKNOWN_VARIABLE1 + 14*COMPLEXITY:UNKNOWN_VARIABLE2 + 4 (DO)
 cvd$    concur
          DO 40 I = J+1, N                                               0014
 C                                                                   13 (STMT)

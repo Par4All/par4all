@@ -43,15 +43,15 @@ l99998:
          for(i = 1; i <= 4; i += 1) {
 l99999:
             for(j = 1; j <= 4; j += 1) {
-               c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)] = 0;
+               c[i+4*(i_t-1)-1][j+4*(j_t-1)-1] = 0;
 loop2:
                for(k = 1; k <= 16; k += 1)
-                  c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)] = c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)]+a[-1+i+4*(-1+i_t)][-1+k]*b[-1+k][-1+j+4*(-1+j_t)];
+                  c[i+4*(i_t-1)-1][j+4*(j_t-1)-1] = c[i+4*(i_t-1)-1][j+4*(j_t-1)-1]+a[i+4*(i_t-1)-1][k-1]*b[k-1][j+4*(j_t-1)-1];
                k = 16;
             }
-            j = 4*(-1+j_t)+4;
+            j = 4*(j_t-1)+4;
          }
-         i = 4*(-1+i_t)+4;
+         i = 4*(i_t-1)+4;
       }
       j_t = 4;
    }
@@ -70,15 +70,15 @@ l99998:
          for(i = 1; i <= 4; i += 1) {
 l99999:
             for(j = 1; j <= 4; j += 1) {
-               c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)] = 0;
+               c[i+4*(i_t-1)-1][j+4*(j_t-1)-1] = 0;
 loop2:
                for(k = 1; k <= 16; k += 1)
-                  c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)] = c[-1+i+4*(-1+i_t)][-1+j+4*(-1+j_t)]+a[-1+i+4*(-1+i_t)][-1+k]*b[-1+k][-1+j+4*(-1+j_t)];
+                  c[i+4*(i_t-1)-1][j+4*(j_t-1)-1] = c[i+4*(i_t-1)-1][j+4*(j_t-1)-1]+a[i+4*(i_t-1)-1][k-1]*b[k-1][j+4*(j_t-1)-1];
                k = 16;
             }
-            j = 4*(-1+j_t)+4;
+            j = 4*(j_t-1)+4;
          }
-         i = 4*(-1+i_t)+4;
+         i = 4*(i_t-1)+4;
       }
       j_t = 4;
    }
@@ -89,13 +89,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    int i, j, k;
    //PIPS generated variable
    int i_t, j_t;
-loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
-l99997:
       for(j_t = 1; j_t <= 4; j_t += 1) {
-l99998:
          for(i = 1; i <= 4; i += 1) {
-l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
                for(k = 1; k <= 16; k += 4) {
@@ -121,13 +117,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    int i, j, k;
    //PIPS generated variable
    int i_t, j_t;
-loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
-l99997:
       for(j_t = 1; j_t <= 4; j_t += 1) {
-l99998:
          for(i = 1; i <= 4; i += 1) {
-l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
                for(k = 1; k <= 16; k += 4) {
@@ -155,13 +147,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    int i_t, j_t;
    //PIPS generated variable
    float F_0, F_1, F_2, F_3;
-loop0:
    for(i_t = 1; i_t <= 4; i_t += 1) {
-l99997:
       for(j_t = 1; j_t <= 4; j_t += 1) {
-l99998:
          for(i = 1; i <= 4; i += 1) {
-l99999:
             for(j = 1; j <= 4; j += 1) {
                c[i+4*i_t-5][j+4*j_t-5] = 0;
                for(k = 1; k <= 16; k += 4) {
@@ -195,13 +183,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    float F_0, F_1, F_2, F_3;
    //PIPS generated variable
    int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
-loop0:
    for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
-l99997:
       for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
-l99998:
          for(i0 = 1; i0 <= 4; i0 += 1) {
-l99999:
             for(j0 = 1; j0 <= 4; j0 += 1) {
                c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
                for(k0 = 1; k0 <= 16; k0 += 4) {
@@ -240,13 +224,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-loop0:
    for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
-l99997:
       for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
-l99998:
          for(i0 = 1; i0 <= 4; i0 += 1) {
-l99999:
             for(j0 = 1; j0 <= 4; j0 += 1) {
                c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
                for(k0 = 1; k0 <= 16; k0 += 4) {
@@ -284,13 +264,9 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
    int j_t0, i_t0, i_t1, i0, j0, k0, k1, k2;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0};
-loop0:
    for(i_t0 = 1; i_t0 <= 4; i_t0 += 1) {
-l99997:
       for(j_t0 = 1; j_t0 <= 4; j_t0 += 1) {
-l99998:
          for(i0 = 1; i0 <= 4; i0 += 1) {
-l99999:
             for(j0 = 1; j0 <= 4; j0 += 1) {
                c[i0+4*i_t0-5][j0+4*j_t0-5] = 0;
                for(k0 = 1; k0 <= 16; k0 += 4) {

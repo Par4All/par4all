@@ -3,7 +3,7 @@ Initial code
 
 static void pmax(int a, int b)
 {
-   if (a>b) 
+   if (a>b)
       return;
    printf("%d\n", a>b?a:b);
 }

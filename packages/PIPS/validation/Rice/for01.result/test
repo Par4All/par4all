@@ -13,15 +13,15 @@ void for01(int n)
 {
    int i, j;
    float x[100];
-//               <must be read   >: i n
-//               <must be written>: i
+//             <    is read   >: i n
+//             <    is written>: i
 
    for(i = i; i <= n-1; i += 1)
-//               <must be read   >: i n
-//               <must be written>: j
+//             <    is read   >: i n
+//             <    is written>: j
       for(j = 0; j <= 99; j += 1)
-//               <must be read   >: i j n
-//               <must be written>: x[j]
+//             <    is read   >: i j n
+//             <    is written>: x[j]
          x[j] = 0.;
 }
 Privatize scalar variables

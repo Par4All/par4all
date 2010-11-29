@@ -40,43 +40,43 @@ void inter01()
    static int l;
    int m;
    int n;
-//               <must be written>: n
+//             <    is written>: n
 
    for(n = 0; n <= 9; n += 1) {
-//               <must be written>: i
+//             <    is written>: i
       i = 1;
-//               <must be written>: j
+//             <    is written>: j
       j = 2;
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be written>: l
+//             <    is written>: l
       l = 4;
-//               <must be written>: m
+//             <    is written>: m
       m = 5;
    }
 }
 
 Cumulated effects for "inter01"
 
-//               <may be written >: i j k l
+//             <may be written>: i j l k
 void inter01()
 {
    static int l;
    int m;
    int n;
-//               <may be written >: i j k l m
-//               <must be written>: n
+//             <may be written>: i j l m k
+//             <    is written>: n
 
    for(n = 0; n <= 9; n += 1) {
-//               <must be written>: i
+//             <    is written>: i
       i = 1;
-//               <must be written>: j
+//             <    is written>: j
       j = 2;
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be written>: l
+//             <    is written>: l
       l = 4;
-//               <must be written>: m
+//             <    is written>: m
       m = 5;
    }
 }
@@ -85,6 +85,6 @@ Proper effects for "main"
 
 int main()
 {
-//               <may be written >: i j k inter01:0`l
+//             <may be written>: i j inter01:0`l k
    inter01();
 }

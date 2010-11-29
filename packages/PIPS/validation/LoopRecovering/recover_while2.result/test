@@ -19,12 +19,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
 
 end2:   ;
    i++;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0016*/
    i++;                                                                 /*0013*/
 
@@ -32,12 +32,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
 
 end2:   ;
    i++;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0016*/
    i++;                                                                 /*0013*/
 
@@ -45,12 +45,12 @@ the_end:   return i;
 }
 int find_while(int i)
 {
-   while (!(i++<9)) 
+   while (!(i++<9))
       ;
 
 end2:   ;
    i++;
-   while (!(i<9)) 
+   while (!(i<9))
       i = 8*i;                                                          /*0016*/
    i++;                                                                 /*0013*/
 

@@ -8,23 +8,23 @@ void complete05()
    int n;                                                               /*0011*/
    {
       // BEGIN BLOCK
-//               <must be written>: j
+//             <    is written>: j
       int j = 0;                                                        /*0015*/
-//               <must be read   >: i n
-//               <must be written>: i
+//             <    is read   >: i n
+//             <    is written>: i
       for (i = 0;i<n;i++) {                                             /*0016*/
          // BEGIN BLOCK
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
          j++;                                                           /*0017*/
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
          i--;                                                           /*0018*/
          // END BLOCK
       }
       // END BLOCK
    }
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0022*/
    // END BLOCK
@@ -38,30 +38,30 @@ void complete05()
    int i;                                                               /*0010*/
    int n;                                                               /*0011*/
    {
-//               <must be read   >: i n
-//               <must be written>: i
+//             <    is read   >: i n
+//             <    is written>: i
       // BEGIN BLOCK
-//               <must be written>: j
+//             <    is written>: j
       int j = 0;                                                        /*0015*/
-//               <may be read    >: j
-//               <may be written >: j
-//               <must be read   >: i n
-//               <must be written>: i
+//             <may be read   >: j
+//             <may be written>: j
+//             <    is read   >: i n
+//             <    is written>: i
       for (i = 0;i<n;i++) {                                             /*0016*/
-//               <must be read   >: i j
-//               <must be written>: i j
+//             <    is read   >: i j
+//             <    is written>: i j
          // BEGIN BLOCK
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
          j++;                                                           /*0017*/
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
          i--;                                                           /*0018*/
          // END BLOCK
       }
       // END BLOCK
    }
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0022*/
    // END BLOCK

@@ -1,4 +1,4 @@
-C                                 6*M.N.U_L_0 + 3*M.N + 3*L + 3*M + 78 (SUMMARY)
+C          6*COMPLEXITY:UNKNOWN_VARIABLE0.M.N + 3*M.N + 3*L + 3*M + 78 (SUMMARY)
       PROGRAM UNKNOWN
 
 c     See how unknown variable names are generated

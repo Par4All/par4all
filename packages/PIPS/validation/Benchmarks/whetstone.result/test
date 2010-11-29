@@ -172,63 +172,63 @@ int main()
 
 int main()
 {
-//               <must be written>: t
+//             <    is written>: t
    
    /* initialize constants */
    
    t = 0.499975;
-//               <must be written>: t1
+//             <    is written>: t1
    t1 = 0.50025;
-//               <must be written>: t2
+//             <    is written>: t2
    t2 = 2.0;
-//               <must be written>: n1
+//             <    is written>: n1
    
    /* set values of module weights */
    
    n1 = 0*100000;
-//               <must be written>: n2
+//             <    is written>: n2
    n2 = 12*100000;
-//               <must be written>: n3
+//             <    is written>: n3
    n3 = 14*100000;
-//               <must be written>: n4
+//             <    is written>: n4
    n4 = 345*100000;
-//               <must be written>: n6
+//             <    is written>: n6
    n6 = 210*100000;
-//               <must be written>: n7
+//             <    is written>: n7
    n7 = 32*100000;
-//               <must be written>: n8
+//             <    is written>: n8
    n8 = 899*100000;
-//               <must be written>: n9
+//             <    is written>: n9
    n9 = 616*100000;
-//               <must be written>: n10
+//             <    is written>: n10
    n10 = 0*100000;
-//               <must be written>: n11
+//             <    is written>: n11
    n11 = 93*100000;
-//               <must be written>: x1
+//             <    is written>: x1
    
    /* MODULE 1:  simple identifiers */
    
    x1 = 1.0;
-//               <must be written>: x2 x3 x4
+//             <    is written>: x2 x3 x4
    x2 = x3 = x4 = -1.0;
-//               <must be read   >: n1
-//               <must be written>: i
+//             <    is read   >: n1
+//             <    is written>: i
 
    for(i = 1; i <= n1; i += 1) {
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x1
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x1
       x1 = (x1+x2+x3-x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x2
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x2
       x2 = (x1+x2-x3-x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x3
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x3
       x3 = (x1-x2+x3+x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x4
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x4
       x4 = (-x1+x2+x3+x4)*t;
    }
-//               <must be written>: e1[0]
+//             <    is written>: e1[0]
    
    
    
@@ -237,27 +237,27 @@ int main()
    /* MODULE 2:  array elements */
    
    e1[0] = 1.0;
-//               <must be written>: e1[1] e1[2] e1[3]
+//             <    is written>: e1[1] e1[2] e1[3]
    e1[1] = e1[2] = e1[3] = -1.0;
-//               <must be read   >: n2
-//               <must be written>: i
+//             <    is read   >: n2
+//             <    is written>: i
 
    for(i = 1; i <= n2; i += 1) {
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[0]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[0]
       e1[0] = (e1[0]+e1[1]+e1[2]-e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[1]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[1]
       e1[1] = (e1[0]+e1[1]-e1[2]+e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[2]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[2]
       e1[2] = (e1[0]-e1[1]+e1[2]+e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[3]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[3]
       e1[3] = (-e1[0]+e1[1]+e1[2]+e1[3])*t;
    }
-//               <must be read   >: n3
-//               <must be written>: i
+//             <    is read   >: n3
+//             <    is written>: i
    
    
    
@@ -265,11 +265,11 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t t2
-//               <may be written >: e1[0] e1[1] e1[2] e1[3]
-//               <must be read   >: n3
+//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
+//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <    is read   >: n3
       pa(e1);
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -277,40 +277,40 @@ int main()
    /* MODULE 4:  conditional jumps */
    
    j = 1;
-//               <must be read   >: n4
-//               <must be written>: i
+//             <    is read   >: n4
+//             <    is written>: i
    for(i = 1; i <= n4; i += 1) {
-//               <must be read   >: j n4
+//             <    is read   >: j n4
       if (j==1)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 2;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 3;
-//               <must be read   >: j n4
+//             <    is read   >: j n4
 
       if (j>2)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 0;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 1;
-//               <must be read   >: j n4
+//             <    is read   >: j n4
 
       if (j<1)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 1;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 0;
    }
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -320,33 +320,33 @@ int main()
    /* MODULE 6:  integer arithmetic */
    
    j = 1;
-//               <must be written>: k
+//             <    is written>: k
    k = 2;
-//               <must be written>: l
+//             <    is written>: l
    l = 3;
-//               <must be read   >: n6
-//               <must be written>: i
+//             <    is read   >: n6
+//             <    is written>: i
 
    for(i = 1; i <= n6; i += 1) {
-//               <must be read   >: j k l n6
-//               <must be written>: j
+//             <    is read   >: j k l n6
+//             <    is written>: j
       j = j*(k-j)*(l-k);
-//               <must be read   >: j k l n6
-//               <must be written>: k
+//             <    is read   >: j k l n6
+//             <    is written>: k
       k = l*k-(l-j)*k;
-//               <must be read   >: j k l n6
-//               <must be written>: l
+//             <    is read   >: j k l n6
+//             <    is written>: l
       l = (l-k)*(k+j);
-//               <must be read   >: j k l n6
-//               <must be written>: e1[l-2]
+//             <    is read   >: j k l n6
+//             <    is written>: e1[l-2]
 
       e1[l-2] = j+k+l;
-//               <must be read   >: j k l n6
-//               <must be written>: e1[k-2]
+//             <    is read   >: j k l n6
+//             <    is written>: e1[k-2]
       /* C arrays are zero based */
       e1[k-2] = j*k*l;
    }
-//               <must be written>: x y
+//             <    is written>: x y
    
    
    
@@ -354,18 +354,18 @@ int main()
    /* MODULE 7:  trig. functions */
    
    x = y = 0.5;
-//               <must be read   >: n7
-//               <must be written>: i
+//             <    is read   >: n7
+//             <    is written>: i
 
    for(i = 1; i <= n7; i += 1) {
-//               <must be read   >: n7 t t2 x y
-//               <must be written>: x
+//             <    is read   >: n7 t t2 x y
+//             <    is written>: x
       x = t*atan(t2*sin(x)*cos(x)/(cos(x+y)+cos(x-y)-1.0));
-//               <must be read   >: n7 t t2 x y
-//               <must be written>: y
+//             <    is read   >: n7 t t2 x y
+//             <    is written>: y
       y = t*atan(t2*sin(y)*cos(y)/(cos(x+y)+cos(x-y)-1.0));
    }
-//               <must be written>: x y z
+//             <    is written>: x y z
    
    
    
@@ -373,16 +373,16 @@ int main()
    /* MODULE 8:  procedure calls */
    
    x = y = z = 1.0;
-//               <must be read   >: n8
-//               <must be written>: i
+//             <    is read   >: n8
+//             <    is written>: i
 
    for(i = 1; i <= n8; i += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: n8 t t2 x y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: n8 t t2 x y
       // FI: to avoid problemes raised by an *anywhere* effect
       //created by this call site, comment it out
       p3(x, y, &z);
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -390,26 +390,26 @@ int main()
    /* MODULE9:  array references */
    
    j = 1;
-//               <must be written>: k
+//             <    is written>: k
    k = 2;
-//               <must be written>: l
+//             <    is written>: l
    l = 3;
-//               <must be written>: e1[0]
+//             <    is written>: e1[0]
 
    e1[0] = 1.0;
-//               <must be written>: e1[1]
+//             <    is written>: e1[1]
    e1[1] = 2.0;
-//               <must be written>: e1[2]
+//             <    is written>: e1[2]
    e1[2] = 3.0;
-//               <must be read   >: n9
-//               <must be written>: i
+//             <    is read   >: n9
+//             <    is written>: i
 
    for(i = 1; i <= n9; i += 1)
-//               <may be read    >: e1[*]
-//               <may be written >: e1[*]
-//               <must be read   >: j k l n9
+//             <may be read   >: e1[*]
+//             <may be written>: e1[*]
+//             <    is read   >: j k l n9
       p0();
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -417,26 +417,26 @@ int main()
    /* MODULE10:  integer arithmetic */
    
    j = 2;
-//               <must be written>: k
+//             <    is written>: k
    k = 3;
-//               <must be read   >: n10
-//               <must be written>: i
+//             <    is read   >: n10
+//             <    is written>: i
 
    for(i = 1; i <= n10; i += 1) {
-//               <must be read   >: j k n10
-//               <must be written>: j
+//             <    is read   >: j k n10
+//             <    is written>: j
       j = j+k;
-//               <must be read   >: j k n10
-//               <must be written>: k
+//             <    is read   >: j k n10
+//             <    is written>: k
       k = j+k;
-//               <must be read   >: j k n10
-//               <must be written>: j
+//             <    is read   >: j k n10
+//             <    is written>: j
       j = k-j;
-//               <must be read   >: j k n10
-//               <must be written>: k
+//             <    is read   >: j k n10
+//             <    is written>: k
       k = k-j-j;
    }
-//               <must be written>: x
+//             <    is written>: x
    
    
    
@@ -444,81 +444,81 @@ int main()
    /* MODULE11:  standard functions */
    
    x = 0.75;
-//               <must be read   >: n11
-//               <must be written>: i
+//             <    is read   >: n11
+//             <    is written>: i
    for(i = 1; i <= n11; i += 1)
-//               <must be read   >: n11 t1 x
-//               <must be written>: x
+//             <    is read   >: n11 t1 x
+//             <    is written>: x
       x = sqrt(exp(log(x)/t1));
 }
 
 "main" file with cumulated effects
 
-//               <may be read    >: e1[0] e1[1] e1[2] e1[3] e1[*] j k 
-//                                  l t t1 t2 x x1 x2 x3 x4 y
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: n1 n10 n11 n2 n3 n4 n6 n7 n8 n9
+//             <may be read   >: e1[0] e1[1] e1[2] e1[3] e1[*] j k l t
+//                               t1 t2 x x1 x2 x3 x4 y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: n1 n10 n11 n2 n3 n4 n6 n7 n8 n9
 int main()
 {
-//               <must be written>: t
+//             <    is written>: t
    
    /* initialize constants */
    
    t = 0.499975;
-//               <must be written>: t1
+//             <    is written>: t1
    t1 = 0.50025;
-//               <must be written>: t2
+//             <    is written>: t2
    t2 = 2.0;
-//               <must be written>: n1
+//             <    is written>: n1
    
    /* set values of module weights */
    
    n1 = 0*100000;
-//               <must be written>: n2
+//             <    is written>: n2
    n2 = 12*100000;
-//               <must be written>: n3
+//             <    is written>: n3
    n3 = 14*100000;
-//               <must be written>: n4
+//             <    is written>: n4
    n4 = 345*100000;
-//               <must be written>: n6
+//             <    is written>: n6
    n6 = 210*100000;
-//               <must be written>: n7
+//             <    is written>: n7
    n7 = 32*100000;
-//               <must be written>: n8
+//             <    is written>: n8
    n8 = 899*100000;
-//               <must be written>: n9
+//             <    is written>: n9
    n9 = 616*100000;
-//               <must be written>: n10
+//             <    is written>: n10
    n10 = 0*100000;
-//               <must be written>: n11
+//             <    is written>: n11
    n11 = 93*100000;
-//               <must be written>: x1
+//             <    is written>: x1
    
    /* MODULE 1:  simple identifiers */
    
    x1 = 1.0;
-//               <must be written>: x2 x3 x4
+//             <    is written>: x2 x3 x4
    x2 = x3 = x4 = -1.0;
-//               <may be read    >: t x1 x2 x3 x4
-//               <may be written >: x1 x2 x3 x4
-//               <must be read   >: n1
-//               <must be written>: i
+//             <may be read   >: t x1 x2 x3 x4
+//             <may be written>: x1 x2 x3 x4
+//             <    is read   >: n1
+//             <    is written>: i
 
    for(i = 1; i <= n1; i += 1) {
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x1
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x1
       x1 = (x1+x2+x3-x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x2
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x2
       x2 = (x1+x2-x3-x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x3
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x3
       x3 = (x1-x2+x3+x4)*t;
-//               <must be read   >: n1 t x1 x2 x3 x4
-//               <must be written>: x4
+//             <    is read   >: n1 t x1 x2 x3 x4
+//             <    is written>: x4
       x4 = (-x1+x2+x3+x4)*t;
    }
-//               <must be written>: e1[0]
+//             <    is written>: e1[0]
    
    
    
@@ -527,31 +527,31 @@ int main()
    /* MODULE 2:  array elements */
    
    e1[0] = 1.0;
-//               <must be written>: e1[1] e1[2] e1[3]
+//             <    is written>: e1[1] e1[2] e1[3]
    e1[1] = e1[2] = e1[3] = -1.0;
-//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t
-//               <may be written >: e1[0] e1[1] e1[2] e1[3]
-//               <must be read   >: n2
-//               <must be written>: i
+//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t
+//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <    is read   >: n2
+//             <    is written>: i
 
    for(i = 1; i <= n2; i += 1) {
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[0]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[0]
       e1[0] = (e1[0]+e1[1]+e1[2]-e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[1]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[1]
       e1[1] = (e1[0]+e1[1]-e1[2]+e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[2]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[2]
       e1[2] = (e1[0]-e1[1]+e1[2]+e1[3])*t;
-//               <must be read   >: e1[0] e1[1] e1[2] e1[3] n2 t
-//               <must be written>: e1[3]
+//             <    is read   >: e1[0] e1[1] e1[2] e1[3] n2 t
+//             <    is written>: e1[3]
       e1[3] = (-e1[0]+e1[1]+e1[2]+e1[3])*t;
    }
-//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t t2
-//               <may be written >: e1[0] e1[1] e1[2] e1[3]
-//               <must be read   >: n3
-//               <must be written>: i
+//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
+//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <    is read   >: n3
+//             <    is written>: i
    
    
    
@@ -559,11 +559,11 @@ int main()
    /* MODULE 3:  array as parameter */
    
    for(i = 1; i <= n3; i += 1)
-//               <may be read    >: e1[0] e1[1] e1[2] e1[3] t t2
-//               <may be written >: e1[0] e1[1] e1[2] e1[3]
-//               <must be read   >: n3
+//             <may be read   >: e1[0] e1[1] e1[2] e1[3] t t2
+//             <may be written>: e1[0] e1[1] e1[2] e1[3]
+//             <    is read   >: n3
       pa(e1);
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -571,45 +571,45 @@ int main()
    /* MODULE 4:  conditional jumps */
    
    j = 1;
-//               <may be read    >: j
-//               <may be written >: j
-//               <must be read   >: n4
-//               <must be written>: i
+//             <may be read   >: j
+//             <may be written>: j
+//             <    is read   >: n4
+//             <    is written>: i
    for(i = 1; i <= n4; i += 1) {
-//               <must be read   >: j n4
-//               <must be written>: j
+//             <    is read   >: j n4
+//             <    is written>: j
       if (j==1)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 2;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 3;
-//               <must be read   >: j n4
-//               <must be written>: j
+//             <    is read   >: j n4
+//             <    is written>: j
 
       if (j>2)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 0;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 1;
-//               <must be read   >: j n4
-//               <must be written>: j
+//             <    is read   >: j n4
+//             <    is written>: j
 
       if (j<1)
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 1;
       else
-//               <must be read   >: n4
-//               <must be written>: j
+//             <    is read   >: n4
+//             <    is written>: j
          j = 0;
    }
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -619,35 +619,35 @@ int main()
    /* MODULE 6:  integer arithmetic */
    
    j = 1;
-//               <must be written>: k
+//             <    is written>: k
    k = 2;
-//               <must be written>: l
+//             <    is written>: l
    l = 3;
-//               <may be read    >: j k l
-//               <may be written >: e1[*] j k l
-//               <must be read   >: n6
-//               <must be written>: i
+//             <may be read   >: j k l
+//             <may be written>: e1[*] j k l
+//             <    is read   >: n6
+//             <    is written>: i
 
    for(i = 1; i <= n6; i += 1) {
-//               <must be read   >: j k l n6
-//               <must be written>: j
+//             <    is read   >: j k l n6
+//             <    is written>: j
       j = j*(k-j)*(l-k);
-//               <must be read   >: j k l n6
-//               <must be written>: k
+//             <    is read   >: j k l n6
+//             <    is written>: k
       k = l*k-(l-j)*k;
-//               <must be read   >: j k l n6
-//               <must be written>: l
+//             <    is read   >: j k l n6
+//             <    is written>: l
       l = (l-k)*(k+j);
-//               <may be written >: e1[*]
-//               <must be read   >: j k l n6
+//             <may be written>: e1[*]
+//             <    is read   >: j k l n6
 
       e1[l-2] = j+k+l;
-//               <may be written >: e1[*]
-//               <must be read   >: j k l n6
+//             <may be written>: e1[*]
+//             <    is read   >: j k l n6
       /* C arrays are zero based */
       e1[k-2] = j*k*l;
    }
-//               <must be written>: x y
+//             <    is written>: x y
    
    
    
@@ -655,20 +655,20 @@ int main()
    /* MODULE 7:  trig. functions */
    
    x = y = 0.5;
-//               <may be read    >: t t2 x y
-//               <may be written >: x y
-//               <must be read   >: n7
-//               <must be written>: i
+//             <may be read   >: t t2 x y
+//             <may be written>: x y
+//             <    is read   >: n7
+//             <    is written>: i
 
    for(i = 1; i <= n7; i += 1) {
-//               <must be read   >: n7 t t2 x y
-//               <must be written>: x
+//             <    is read   >: n7 t t2 x y
+//             <    is written>: x
       x = t*atan(t2*sin(x)*cos(x)/(cos(x+y)+cos(x-y)-1.0));
-//               <must be read   >: n7 t t2 x y
-//               <must be written>: y
+//             <    is read   >: n7 t t2 x y
+//             <    is written>: y
       y = t*atan(t2*sin(y)*cos(y)/(cos(x+y)+cos(x-y)-1.0));
    }
-//               <must be written>: x y z
+//             <    is written>: x y z
    
    
    
@@ -676,17 +676,17 @@ int main()
    /* MODULE 8:  procedure calls */
    
    x = y = z = 1.0;
-//               <may be read    >: t t2 x y
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: n8
+//             <may be read   >: t t2 x y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: n8
 
    for(i = 1; i <= n8; i += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: n8 t t2 x y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: n8 t t2 x y
       // FI: to avoid problemes raised by an *anywhere* effect
       //created by this call site, comment it out
       p3(x, y, &z);
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -694,28 +694,28 @@ int main()
    /* MODULE9:  array references */
    
    j = 1;
-//               <must be written>: k
+//             <    is written>: k
    k = 2;
-//               <must be written>: l
+//             <    is written>: l
    l = 3;
-//               <must be written>: e1[0]
+//             <    is written>: e1[0]
 
    e1[0] = 1.0;
-//               <must be written>: e1[1]
+//             <    is written>: e1[1]
    e1[1] = 2.0;
-//               <must be written>: e1[2]
+//             <    is written>: e1[2]
    e1[2] = 3.0;
-//               <may be read    >: e1[*] j k l
-//               <may be written >: e1[*]
-//               <must be read   >: n9
-//               <must be written>: i
+//             <may be read   >: e1[*] j k l
+//             <may be written>: e1[*]
+//             <    is read   >: n9
+//             <    is written>: i
 
    for(i = 1; i <= n9; i += 1)
-//               <may be read    >: e1[*]
-//               <may be written >: e1[*]
-//               <must be read   >: j k l n9
+//             <may be read   >: e1[*]
+//             <may be written>: e1[*]
+//             <    is read   >: j k l n9
       p0();
-//               <must be written>: j
+//             <    is written>: j
    
    
    
@@ -723,28 +723,28 @@ int main()
    /* MODULE10:  integer arithmetic */
    
    j = 2;
-//               <must be written>: k
+//             <    is written>: k
    k = 3;
-//               <may be read    >: j k
-//               <may be written >: j k
-//               <must be read   >: n10
-//               <must be written>: i
+//             <may be read   >: j k
+//             <may be written>: j k
+//             <    is read   >: n10
+//             <    is written>: i
 
    for(i = 1; i <= n10; i += 1) {
-//               <must be read   >: j k n10
-//               <must be written>: j
+//             <    is read   >: j k n10
+//             <    is written>: j
       j = j+k;
-//               <must be read   >: j k n10
-//               <must be written>: k
+//             <    is read   >: j k n10
+//             <    is written>: k
       k = j+k;
-//               <must be read   >: j k n10
-//               <must be written>: j
+//             <    is read   >: j k n10
+//             <    is written>: j
       j = k-j;
-//               <must be read   >: j k n10
-//               <must be written>: k
+//             <    is read   >: j k n10
+//             <    is written>: k
       k = k-j-j;
    }
-//               <must be written>: x
+//             <    is written>: x
    
    
    
@@ -752,13 +752,13 @@ int main()
    /* MODULE11:  standard functions */
    
    x = 0.75;
-//               <may be read    >: t1 x
-//               <may be written >: x
-//               <must be read   >: n11
-//               <must be written>: i
+//             <may be read   >: t1 x
+//             <may be written>: x
+//             <    is read   >: n11
+//             <    is written>: i
    for(i = 1; i <= n11; i += 1)
-//               <must be read   >: n11 t1 x
-//               <must be written>: x
+//             <    is read   >: n11 t1 x
+//             <    is written>: x
       x = sqrt(exp(log(x)/t1));
 }
 

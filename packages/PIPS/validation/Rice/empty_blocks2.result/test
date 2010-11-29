@@ -3,16 +3,16 @@ Code with cumulated effects
 
 int main(int argc, char **argv)
 {
-//               <must be written>: j
+//             <    is written>: j
    int i, j = 100;
-//               <must be written>: i
+//             <    is written>: i
    for(i = 0; i <= 99; i += 1)
       ;
-//               <must be written>: i
+//             <    is written>: i
    for(i = 0; i <= 99; i += 1)
       ;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    //on attends qqch différent de "inconnu"
    j = i;
    return 0;
@@ -32,10 +32,10 @@ Parallelized code seen as sequential
 
 int main(int argc, char **argv)
 {
-//               <must be written>: j
+//             <    is written>: j
    int i, j = 100;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    //on attends qqch différent de "inconnu"
    j = i;
    return 0;

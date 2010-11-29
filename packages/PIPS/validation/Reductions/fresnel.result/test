@@ -15,7 +15,7 @@ void output()
          sum += z;
 //  call sum[squares],
          squares += z*z;
-         if (z>max) 
+         if (z>max)
             max = z;
       }
 

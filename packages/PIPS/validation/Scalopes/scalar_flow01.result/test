@@ -63,7 +63,7 @@ void P4A_scmp_kernel_1(int *a, int *b)
 void P4A_scmp_malloc(void **dest, size_t n)
 {
 
-   if (*dest==(void *) 0) 
+   if (*dest==(void *) 0)
       *dest = malloc(n);
 }
 void P4A_scmp_read(size_t element_size, const void *host_address, void *accel_address)
@@ -96,7 +96,7 @@ int main()
       P4A_copy_to_accel_1d(sizeof(int), 10, 10, 0, &c[0], *c0);
 
 
-      P4A_scmp_kernel_0(&(*a0), &(*b0), (*c0));
+      P4A_scmp_kernel_0(&*a0, &*b0, *c0);
       P4A_scmp_write(sizeof(int), &a, a0);
       P4A_scmp_write(sizeof(int), &b, b0);
       P4A_copy_from_accel_1d(sizeof(int), 10, 10, 0, &c[0], *c0);
@@ -110,7 +110,7 @@ int main()
       P4A_scmp_read(sizeof(int), &b, b1);
 
 
-      P4A_scmp_kernel_1(&(*a1), &(*b1));
+      P4A_scmp_kernel_1(&*a1, &*b1);
       P4A_scmp_write(sizeof(int), &a, a1);
       P4A_scmp_write(sizeof(int), &b, b1);
    }

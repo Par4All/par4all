@@ -517,17 +517,18 @@ nsucc = 0
 void
 saxpy (float sx[1000], float sy[1000])
 {
+  static const float size = 1000;
   v4sf vec30;
   v4sf vec20;
   v4sf vec10;
   v4sf vec00;
   float sa0;
   int lu_ind00;
-  static const float size = 1000;
 
   sa0 = 3;
   if (sa0 == 0.0)
     {
+      ;
     }
   else
     {

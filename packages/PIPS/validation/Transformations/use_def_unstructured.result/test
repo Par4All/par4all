@@ -50,6 +50,10 @@ C  P() {}
 
 C  P() {}
 
+      CONTINUE                                                          0004
+
+C  P() {}
+
       IF (I.EQ.2) GOTO 1                                                0005
 
 C  P() {}

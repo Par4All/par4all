@@ -18,18 +18,18 @@ void dereferencing05()
 {
    double *p;
    int i;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
 
    *p++ = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
    *p-- = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[1]
+//             <    is read   >: p
+//             <    is written>: p p[1]
    *++p = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[-1]
+//             <    is read   >: p
+//             <    is written>: p p[-1]
    *--p = 0.;
 }
 
@@ -39,18 +39,18 @@ void dereferencing05()
 {
    double *p;
    int i;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
 
    *p++ = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
    *p-- = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[1]
+//             <    is read   >: p
+//             <    is written>: p p[1]
    *++p = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[-1]
+//             <    is read   >: p
+//             <    is written>: p p[-1]
    *--p = 0.;
 }
 
@@ -60,39 +60,39 @@ void dereferencing05()
 {
    double *p;
    int i;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
 
    *p++ = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p-- = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *++p = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *--p = 0.;
 }
 
 Cumulated effects for "dereferencing05"
 
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void dereferencing05()
 {
    double *p;
    int i;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
 
    *p++ = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p-- = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *++p = 0.;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *--p = 0.;
 }

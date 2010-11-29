@@ -18,8 +18,6 @@ int main(int argc, char *argv[])
 int get_mat_size(int argc, char **argv);
 
 int main(int argc, char **argv);
-//PIPS generated variable
-void *alloca(unsigned int);
 int get_mat_size(int argc, char **argv)
 {
    int result = 0;

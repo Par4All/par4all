@@ -3,29 +3,29 @@
  **************** Effective Dependence Graph ****************
 
 	39 --> 38 with conflicts
-		from <n-R-MUST> to <n-W-MUST> at levels  1
+		from <n-R-EXACT> to <n-W-EXACT> at levels  1
 	38 --> 39 with conflicts
-		from <n-W-MUST> to <n-R-MUST> at levels  1 2
+		from <n-W-EXACT> to <n-R-EXACT> at levels  1 2
 	38 --> 38 with conflicts
-		from <n-W-MUST> to <n-W-MUST> at levels  1
+		from <n-W-EXACT> to <n-W-EXACT> at levels  1
 	33 --> 32 with conflicts
-		from <m-R-MUST> to <m-W-MUST> at levels  1
+		from <m-R-EXACT> to <m-W-EXACT> at levels  1
 	32 --> 33 with conflicts
-		from <m-W-MUST> to <m-R-MUST> at levels  1 2
+		from <m-W-EXACT> to <m-R-EXACT> at levels  1 2
 	32 --> 32 with conflicts
-		from <m-W-MUST> to <m-W-MUST> at levels  1
+		from <m-W-EXACT> to <m-W-EXACT> at levels  1
 	26 --> 25 with conflicts
-		from <l-R-MUST> to <l-W-MUST> at levels  1
+		from <l-R-EXACT> to <l-W-EXACT> at levels  1
 	25 --> 26 with conflicts
-		from <l-W-MUST> to <l-R-MUST> at levels  1 2
+		from <l-W-EXACT> to <l-R-EXACT> at levels  1 2
 	25 --> 25 with conflicts
-		from <l-W-MUST> to <l-W-MUST> at levels  1
+		from <l-W-EXACT> to <l-W-EXACT> at levels  1
 	19 --> 18 with conflicts
-		from <k-R-MUST> to <k-W-MUST> at levels  1
+		from <k-R-EXACT> to <k-W-EXACT> at levels  1
 	18 --> 19 with conflicts
-		from <k-W-MUST> to <k-R-MUST> at levels  1 2
+		from <k-W-EXACT> to <k-R-EXACT> at levels  1 2
 	18 --> 18 with conflicts
-		from <k-W-MUST> to <k-W-MUST> at levels  1
+		from <k-W-EXACT> to <k-W-EXACT> at levels  1
 
 ****************** End of Dependence Graph ******************
 // DG after privatization
@@ -33,13 +33,13 @@
  **************** Effective Dependence Graph ****************
 
 	38 --> 39 with conflicts
-		from <n-W-MUST> to <n-R-MUST> at levels  2
+		from <n-W-EXACT> to <n-R-EXACT> at levels  2
 	32 --> 33 with conflicts
-		from <m-W-MUST> to <m-R-MUST> at levels  2
+		from <m-W-EXACT> to <m-R-EXACT> at levels  2
 	25 --> 26 with conflicts
-		from <l-W-MUST> to <l-R-MUST> at levels  2
+		from <l-W-EXACT> to <l-R-EXACT> at levels  2
 	18 --> 19 with conflicts
-		from <k-W-MUST> to <k-R-MUST> at levels  2
+		from <k-W-EXACT> to <k-R-EXACT> at levels  2
 
 ****************** End of Dependence Graph ******************
 //  COARSE_GRAIN_PARALLELIZATION

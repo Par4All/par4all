@@ -141,7 +141,6 @@ l99996:
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;
       }
-   ;
 }
 
 After double unrolling and partial evaluation
@@ -159,13 +158,10 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
       for(j = 0; j <= 511; j += 1)
          new_image[i][j] = image[i][j];
 
-l400:
    for(i_1 = 1; i_1 <= 3; i_1 += 1)
       for(i = 128*i_1-127; i <= 128*i_1; i += 1)
-l300:
          for(j = 1; j <= 510; j += 1) {
             new_image[i][j] = 0.;
-l200:            ;
             new_image[i][j] = new_image[i][j]+image[i-1][j-1]*kernel[0][0];
             new_image[i][j] = new_image[i][j]+image[i-1][j]*kernel[0][1];
             new_image[i][j] = new_image[i][j]+image[i-1][j+1]*kernel[0][2];
@@ -182,14 +178,10 @@ l200:            ;
             new_image[i][j] = new_image[i][j]/9;
          }
    i_1 = 385;
-l99999:
    for(i = 385; i <= 510; i += 1)
-l99998:
       for(j = 1; j <= 510; j += 1) {
          new_image[i][j] = 0.;
-l99997:
          for(ki = 0; ki <= 2; ki += 1)
-l99996:
             for(kj = 0; kj <= 2; kj += 1)
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;

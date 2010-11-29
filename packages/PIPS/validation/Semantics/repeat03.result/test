@@ -19,7 +19,7 @@ void getimage(char *filename)
 
    fp = fopen(filename, "r");
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');
@@ -34,7 +34,7 @@ void getimage(char *filename)
 
    fp = fopen(filename, "r");
    do {
-      while ((c = fgetc(fp))!='\n') 
+      while ((c = fgetc(fp))!='\n')
          ;
    }
    while ((c = fgetc(fp))=='#');

@@ -1,13 +1,15 @@
 setenv WKS kernel_load_store02
+setenv TMP $WKS.tmp
 delete $WKS
 
-shell cp $WKS.c /tmp/$WKS.c
+shell cp $WKS.c $TMP.c
 # Instrument the source for include tracking:
-shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' /tmp/$WKS.c
+shell sed -i -r -e 's,#include\s+<([^>]+)>,//pips_begin <\1>\n#include<\1>\n//pips_end <\1>,g' $TMP.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create $WKS /tmp/$WKS.c
+create $WKS $TMP.c
+shell rm $TMP.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 
@@ -27,10 +29,10 @@ display PRINTED_FILE[%ALLFUNC]
 apply UNSPLIT[%ALL]
 
 # Recover crudely the headers:
-shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WKS.database/Src/$WKS.c
-shell grep '//pips_begin' $WKS.database/Src/$WKS.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/$WKS.c ; done
+shell sed -i -r -e 's,//pips_begin <([^>]+)>,#include <\1>\n//pips_begin <\1>,g' $WKS.database/Src/$TMP.c
+shell grep '//pips_begin' $WKS.database/Src/$TMP.c | sed -e 's,//pips_begin ,,g' | while read include ; do sed -i -r -e "/\/\/pips_begin $include/,/\/\/pips_end $include/ d" $WKS.database/Src/$TMP.c ; done
 echo [after unsplit and recovering]
-shell cat $WKS.database/Src/$WKS.c
+shell cat $WKS.database/Src/$TMP.c
 close
-#delete $WKS
+delete $WKS
 quit

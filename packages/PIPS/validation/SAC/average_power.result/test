@@ -459,4 +459,3 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 }
 seq-ok
 sse-ok
-

@@ -1,0 +1,53 @@
+int main()
+{
+
+// Pointer values: none
+
+   float *p[10];
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   float a[10], t;
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   int i;
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+
+   t = 1.0;
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (exact);
+
+   while (t<2.0) {
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+      for(i = 0; i <= 9; i += 1)
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+         p[i] = &a[i];
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+      t += 0, 01;
+   }
+
+// Pointer values:
+// p[*] == *ANY_MODULE*:*UNDEFINED* (may);
+// p[*] == &a[*] (may);
+
+   return 0;
+}

@@ -33,34 +33,34 @@ int main(int argc, char **argv)
    int i, n = 100;
    int *x, *y, *t;
 
+//  <x-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <x-W-EXACT-{}>
 
 
    x = (int *) malloc(sizeof(int));
 
+//  <y-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <y-W-EXACT-{}>
 
    y = (int *) malloc(sizeof(int));
 
+//  <t-W-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
-//  <t-W-EXACT-{}>
 
    t = (int *) malloc(sizeof(int));
 
    for(i = 0; i <= n-1; i += 1)
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==0}>
 //  <stdin-R-EXACT-{}>
 //  <stdin[PHI1]-R-MAY-{PHI1==0}>
 //  <stdin[PHI1]-W-MAY-{PHI1==0}>
 //  <x[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
 //  <y[PHI1]-W-MAY-{n==100, 0<=i, i<=99}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==0}>
 
       scanf("%d %d", &x[i], &y[i]);
 
@@ -90,8 +90,6 @@ int main(int argc, char **argv)
       // END BLOCK
    }
 
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
@@ -99,6 +97,8 @@ int main(int argc, char **argv)
 //  <x[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
 //  <y-R-EXACT-{}>
 //  <y[PHI1]-R-EXACT-{PHI1==n, i==100, n==100}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
 
    printf("%d %d", x[n], y[n]);
    // END BLOCK

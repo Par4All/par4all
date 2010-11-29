@@ -131,7 +131,7 @@ int main()
 #pragma omp parallel for 
       for(j = 0; j <= 498; j += 1)
          // Loop nest P4A end
-         if (i<=498&&j<=498) 
+         if (i<=498&&j<=498)
             b[i][j] = (float) i*j;
    // Loop nest P4A begin,3D(499,499,499)
 #pragma omp parallel for private(j,k)
@@ -141,7 +141,7 @@ int main()
 #pragma omp parallel for 
          for(k = 0; k <= 498; k += 1)
             // Loop nest P4A end
-            if (i<=498&&j<=498&&k<=498) 
+            if (i<=498&&j<=498&&k<=498)
                c[i][j][k] = (float) i*j;
    // Loop nest P4A begin,2D(499,499)
 #pragma omp parallel for private(j)
@@ -149,7 +149,7 @@ int main()
 #pragma omp parallel for 
       for(j = 20; j <= 518; j += 1)
          // Loop nest P4A end
-         if (i<=508&&j<=518) 
+         if (i<=508&&j<=518)
             b[i-10][j-20] = (float) i*j;
    
    

@@ -5,7 +5,7 @@ int main(int argc, char *argv[])
 {
    int j, n;
    char *str = 0;
-   if (argc==1) 
+   if (argc==1)
       return 1;
 l0:
    for(j = 0; j <= 0; j += 1) {
@@ -17,7 +17,7 @@ l0:
          str[n-1] = 0;
       }
    }
-   if (str) 
+   if (str)
       printf("%s\n", str);
    return 0;
 }
@@ -28,10 +28,10 @@ int main(int argc, char *argv[])
 {
    int j, n;
    char *str = 0;
-   if (argc==1) 
+   if (argc==1)
       return 1;
 l0:   outlined(str, argv);
-   if (str) 
+   if (str)
       printf("%s\n", str);
    return 0;
 }

@@ -14,11 +14,11 @@ Proper effetcs for "ARRAY01"
 
       SUBROUTINE ARRAY01
       REAL X(10)
-C               <must be written>: I
+C             <    is written>: I
 
       DO I = 1, 10                                                      0004
-C               <must be read   >: I
-C               <must be written>: X(I)
+C             <    is read   >: I
+C             <    is written>: X(I)
          X(I) = 0.                                                      0005
       ENDDO
 
@@ -28,13 +28,13 @@ Cumulated effetcs for "ARRAY01"
 
       SUBROUTINE ARRAY01
       REAL X(10)
-C               <may be read    >: I
-C               <may be written >: X(*)
-C               <must be written>: I
+C             <may be read   >: I
+C             <may be written>: X(*)
+C             <    is written>: I
 
       DO I = 1, 10                                                      0004
-C               <may be written >: X(*)
-C               <must be read   >: I
+C             <may be written>: X(*)
+C             <    is read   >: I
          X(I) = 0.                                                      0005
       ENDDO
 

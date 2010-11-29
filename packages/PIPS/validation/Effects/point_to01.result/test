@@ -31,25 +31,25 @@ void point_to01()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
 
    if (1) {
-//               <must be read   >: p
-//               <must be written>: p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a
       p->a = 1;
-//               <must be read   >: p
-//               <must be written>: p[0][.b]
+//             <    is read   >: p
+//             <    is written>: p[0].b
       p->b = 2;
-//               <must be read   >: p
-//               <must be written>: p[0][.c]
+//             <    is read   >: p
+//             <    is written>: p[0].c
       p->c = 3;
-//               <must be read   >: p p[0][.a]
-//               <must be written>: p[0][.d]
+//             <    is read   >: p p[0].a
+//             <    is written>: p[0].d
       p->d = p->a;
-//               <must be read   >: p
-//               <must be written>: p[0][.d] p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a p[0].d
       p->d = p->a = 4;
    }
 }
@@ -64,28 +64,27 @@ void point_to01()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <may be read    >: p p[0][.a]
-//               <may be written >: p[0][.a] p[0][.d] p[0][.c] 
-//                                  p[0][.b]
+//             <may be read   >: p p[0].a
+//             <may be written>: p[0].a p[0].b p[0].c p[0].d
 
    if (1) {
-//               <must be read   >: p
-//               <must be written>: p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a
       p->a = 1;
-//               <must be read   >: p
-//               <must be written>: p[0][.b]
+//             <    is read   >: p
+//             <    is written>: p[0].b
       p->b = 2;
-//               <must be read   >: p
-//               <must be written>: p[0][.c]
+//             <    is read   >: p
+//             <    is written>: p[0].c
       p->c = 3;
-//               <must be read   >: p p[0][.a]
-//               <must be written>: p[0][.d]
+//             <    is read   >: p p[0].a
+//             <    is written>: p[0].d
       p->d = p->a;
-//               <must be read   >: p
-//               <must be written>: p[0][.d] p[0][.a]
+//             <    is read   >: p
+//             <    is written>: p[0].a p[0].d
       p->d = p->a = 4;
    }
 }
@@ -100,33 +99,33 @@ void point_to01()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
 
    if (1) {
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->a = 1;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->b = 2;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->c = 3;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       p->d = p->a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->d = p->a = 4;
    }
 }
 
 Cumulated effects for "point_to01"
 
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void point_to01()
 {
    struct s {
@@ -135,27 +134,27 @@ void point_to01()
       int c;
       int d;
    } c, *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &c;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    if (1) {
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->a = 1;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->b = 2;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->c = 3;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       p->d = p->a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
       p->d = p->a = 4;
    }
 }

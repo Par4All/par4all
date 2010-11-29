@@ -23,7 +23,7 @@ int find_while(int i)
    while (i++)                                                          /*0005*/
       i = 8*i;                                                          /*0005*/
    i--;                                                                 /*0009*/
-   while (i++<9) 
+   while (i++<9)
       ;
    while (i<9)                                                          /*0017*/
       i = 8*i;                                                          /*0017*/
@@ -34,7 +34,7 @@ int find_while(int i)
    while (i++)                                                          /*0005*/
       i = 8*i;                                                          /*0005*/
    i--;                                                                 /*0009*/
-   while (i++<9) 
+   while (i++<9)
       ;
    while (i<9)                                                          /*0017*/
       i = 8*i;                                                          /*0017*/
@@ -45,7 +45,7 @@ int find_while(int i)
    while (i++)                                                          /*0005*/
       i = 8*i;                                                          /*0005*/
    i--;                                                                 /*0009*/
-   while (i++<9) 
+   while (i++<9)
       ;
    while (i<9)                                                          /*0017*/
       i = 8*i;                                                          /*0017*/

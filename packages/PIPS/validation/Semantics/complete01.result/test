@@ -7,17 +7,17 @@ void complete01()
    int i;                                                               /*0010*/
    {
       // BEGIN BLOCK
-//               <must be written>: j
+//             <    is written>: j
       int j = 0;                                                        /*0014*/
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
       for (i = 0;i<10;i++)                                              /*0015*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
          j++;                                                           /*0016*/
       // END BLOCK
    }
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0021*/
    // END BLOCK
@@ -30,22 +30,22 @@ void complete01()
    // BEGIN BLOCK
    int i;                                                               /*0010*/
    {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
       // BEGIN BLOCK
-//               <must be written>: j
+//             <    is written>: j
       int j = 0;                                                        /*0014*/
-//               <may be read    >: j
-//               <may be written >: j
-//               <must be read   >: i
-//               <must be written>: i
+//             <may be read   >: j
+//             <may be written>: j
+//             <    is read   >: i
+//             <    is written>: i
       for (i = 0;i<10;i++)                                              /*0015*/
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
          j++;                                                           /*0016*/
       // END BLOCK
    }
-//               <must be read   >: i
+//             <    is read   >: i
 
    foo(i);                                                              /*0021*/
    // END BLOCK

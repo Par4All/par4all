@@ -9,10 +9,10 @@ int main()
 {
    int i, j;
    int a[5];
-//               <must be written>: i
+//             <    is written>: i
    for(i = 1; i <= 4; i += 1)
-//               <must be read   >: i
-//               <must be written>: a[i]
+//             <    is read   >: i
+//             <    is written>: a[i]
       a[i] = i;
 }
 

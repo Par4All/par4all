@@ -18,17 +18,17 @@ int main()
 {
    char str1[20];
    char str2[20];
-//               <may be written >: str1[*]
+//             <may be written>: str1[*]
    strcpy(str1, "To be ");
-//               <may be written >: str2[*]
+//             <may be written>: str2[*]
    strcpy(str2, "or not to be");
-//               <must be read   >: str2[0:6-1]
-//               <must be written>: str1[0:6-1]
+//             <    is read   >: str2[0:6-1]
+//             <    is written>: str1[0:6-1]
    strncat(str1, str2, 6);
-//               <may be read    >: stdout[0] str1[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str1[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(str1);
    return 0;
 }

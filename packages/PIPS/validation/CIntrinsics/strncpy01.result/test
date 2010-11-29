@@ -15,18 +15,18 @@ Proper effetcs for "strncpy01"
 
 int main()
 {
-//               <may be written >: str1[*]
+//             <may be written>: str1[*]
    char str1[] = "To be or not to be";
    char str2[6];
-//               <must be read   >: str1[0:5-1]
-//               <must be written>: str2[0:5-1]
+//             <    is read   >: str1[0:5-1]
+//             <    is written>: str2[0:5-1]
    strncpy(str2, str1, 5);
-//               <must be written>: str2[5]
+//             <    is written>: str2[5]
    str2[5] = '\0';
-//               <may be read    >: stdout[0] str2[*]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0] str2[*]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(str2);
    return 0;
 }

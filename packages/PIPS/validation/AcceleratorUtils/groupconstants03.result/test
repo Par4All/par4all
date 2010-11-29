@@ -15,7 +15,7 @@ int main()
       caillou[0] = "%d";
       for(z1 = 0; z1 <= 2-1; z1 += 1)
          for(z0 = 0; z0 <= 4-1; z0 += 1)
-            caillou[4*z1+z0+1] = a[z1][z0];
+            caillou[z0+4*z1+1] = a[z1][z0];
       caillou[9] = b;
 
 ou_est_charlie:      printf(caillou[0], caillou[8]+caillou[9]);

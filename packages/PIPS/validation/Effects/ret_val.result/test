@@ -1,40 +1,40 @@
 long long int get_result(int argc, char **argv)
 {
-//               <must be written>: result
+//             <    is written>: result
    long long int result = 0;
-//               <must be read   >: argv argv[1]
-//               <must be written>: result
+//             <    is read   >: argv argv[1]
+//             <    is written>: result
    result = atoll(argv[1]);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] result
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("return value will be %lld\n", result);
-//               <must be read   >: result
+//             <    is read   >: result
    return result;
 }
 int main(int argc, char **argv)
 {
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: stdout[0]
-//               <must be read   >: __IO_EFFECTS:LUNS[1] argc argv
-//               <must be written>: __IO_EFFECTS:LUNS[1] size
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: argc argv __IO_EFFECTS:LUNS[1]
+//             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
-//               <must be read   >: size
+//             <    is read   >: size
    return size;
 }
 long long int get_result(int argc, char **argv)
 {
-//               <must be written>: result
+//             <    is written>: result
    long long int result = 0;
-//               <must be read   >: argv argv[1]
-//               <must be written>: result
+//             <    is read   >: argv argv[1]
+//             <    is written>: result
    result = atoll(argv[1]);
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] result
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("return value will be %lld\n", result);
-//               <must be read   >: result
+//             <    is read   >: result
    return result;
 }

@@ -14,7 +14,7 @@ int main()
 //  T(j,k) {j#init==2, k<=k#init}
 
 
-   while (i*i>1) 
+   while (i*i>1)
 
 //  T(j,k) {3<=k, k<=k#init, 3<=k#init}
 
@@ -49,7 +49,7 @@ int main()
 //  P(i,j,k) {j==2}
 
 
-   while (i*i>1) 
+   while (i*i>1)
 
 //  P(i,j,k) {2<=j, j<=3}
 

@@ -1,0 +1,61 @@
+int main()
+{
+
+// Pointer values: none
+
+
+   if (a>1) {
+
+// Pointer values: none
+
+      static int *p = &a;
+
+// Pointer values:
+// p == &a (may);
+
+      static int *q;
+
+// Pointer values:
+// p == &a (may);
+// q == *ANY_MODULE*:*UNDEFINED* (may);
+
+      q = &b;
+
+// Pointer values:
+// p == &a (may);
+// q == &b (exact);
+
+      a = a-1;
+   }
+   else {
+
+// Pointer values: none
+
+      static int *r = &a;
+
+// Pointer values:
+// r == &a (may);
+
+      static int *s;
+
+// Pointer values:
+// r == &a (may);
+// s == *ANY_MODULE*:*UNDEFINED* (may);
+
+      s = &b;
+
+// Pointer values:
+// r == &a (may);
+// s == &b (exact);
+
+      a = a+2;
+   }
+
+// Pointer values:
+// p == &a (may);
+// q == &b (may);
+// r == &a (may);
+// s == &b (may);
+
+   return 0;
+}

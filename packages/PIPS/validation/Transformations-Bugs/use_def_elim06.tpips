@@ -1,21 +1,56 @@
-setproperty ABORT_ON_USER_ERROR TRUE
 delete use_def_elim06
-create use_def_elim06 use_def_elim06.f
+create use_def_elim06 use_def_elim06.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 echo
-echo Code for "COUNT"
+echo TRANSFORMERS
 echo
 
-display PRINTED_FILE[COUNT]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 echo
-echo Code for "COUNT" after use-def elimination
+echo PRECONDITIONS
 echo
 
-apply USE_DEF_ELIMINATION[COUNT]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
 
+echo
+echo Code after partial evaluation
+echo
+
+apply PARTIAL_EVAL[main]
 activate PRINT_CODE
-display PRINTED_FILE[COUNT]
+display PRINTED_FILE[main]
+
+echo
+echo Code after dead_code_elimination
+echo
+
+setproperty ALIASING_ACROSS_TYPES FALSE
+
+apply DEAD_CODE_ELIMINATION[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after code flattening
+echo
+
+apply FLATTEN_CODE[main]
+display PRINTED_FILE[main]
+
+echo
+echo Code after suppress_dead_code [this last step should be useless]
+echo
+
+apply SUPPRESS_DEAD_CODE[main]
+display PRINTED_FILE[main]
 
 close
 delete use_def_elim06

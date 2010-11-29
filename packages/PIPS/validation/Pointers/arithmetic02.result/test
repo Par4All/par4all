@@ -1,0 +1,81 @@
+int main()
+{
+   // BEGIN BLOCK
+   int *pdeb, *pfin, *p;
+//               <must be written>: pdeb
+
+   pdeb = &t[0];
+//               <must be written>: pfin
+   /*   repère le premier élément de t   */
+   pfin = &t[10-1];
+//               <must be read   >: pdeb
+//               <must be written>: p
+   /*   repère le dernier élément de t   */
+   
+   p = pdeb;
+//               <must be read   >: p pfin
+   while (p<=pfin) {
+      // BEGIN BLOCK
+//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
+      if (*p==0) 
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] p pdeb
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+         printf("%d ", p-pdeb);
+//               <must be read   >: p
+//               <must be written>: p
+      p++;
+      // END BLOCK
+   }
+//               <may be read    >: stdout[0]
+//               <may be written >: stdout[0]
+//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
+//               <must be written>: __IO_EFFECTS:LUNS[1]
+   printf("\n");
+   return 0;
+   // END BLOCK
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pfin,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *pdeb, *pfin, *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pfin,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   pdeb = &t[0];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   /*   repère le premier élément de t   */
+   pfin = &t[10-1];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//   t[10-1],-Exact-)}
+   /*   repère le dernier élément de t   */
+   
+   p = pdeb;
+//  {(p,t[0],-Exact-);(pdeb,t[0],-Exact-);(pfin,t[10-1],-Exact-)}
+   while (p<=pfin) {
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+      // BEGIN BLOCK
+//  points to = {}
+      if (*p==0) 
+//  points to = {}
+         printf("%d ", p-pdeb);
+//  points to = {}
+      p++;
+      // END BLOCK
+   }
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+   printf("\n");
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+   return 0;
+   // END BLOCK
+}

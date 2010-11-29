@@ -3,24 +3,24 @@ Source code with proper effects
 
 int call12(void)
 {
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0007*/
-//               <must be read   >: j
+//             <    is read   >: j
 
    return j;                                                            /*0009*/
 }
 
 Source code with cumulated effects
 
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
 int call12(void)
 {
-//               <must be read   >: j
-//               <must be written>: j
+//             <    is read   >: j
+//             <    is written>: j
    j++;                                                                 /*0007*/
-//               <must be read   >: j
+//             <    is read   >: j
 
    return j;                                                            /*0009*/
 }

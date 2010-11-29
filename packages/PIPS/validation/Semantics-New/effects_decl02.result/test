@@ -4,61 +4,61 @@ Proper effects
 int main()
 {
    int i;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be read   >: i
-//               <must be written>: k
+//             <    is read   >: i
+//             <    is written>: k
    int k = i;
-//               <must be read   >: j
-//               <must be written>: j l
+//             <    is read   >: j
+//             <    is written>: j l
    int l = j++;
-//               <must be written>: m
+//             <    is written>: m
    int m = 4;
-//               <must be read   >: m
-//               <must be written>: n
+//             <    is read   >: m
+//             <    is written>: n
    int n = m;
-//               <must be written>: i
+//             <    is written>: i
 
    i = 5;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i j k 
-//                                  l m n
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j k l m n stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
    return 0;
 }
 
 Cumulated effects 
 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
    int i;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be read   >: i
-//               <must be written>: k
+//             <    is read   >: i
+//             <    is written>: k
    int k = i;
-//               <must be read   >: j
-//               <must be written>: j l
+//             <    is read   >: j
+//             <    is written>: j l
    int l = j++;
-//               <must be written>: m
+//             <    is written>: m
    int m = 4;
-//               <must be read   >: m
-//               <must be written>: n
+//             <    is read   >: m
+//             <    is written>: n
    int n = m;
-//               <must be written>: i
+//             <    is written>: i
 
    i = 5;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] i j k 
-//                                  l m n
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i j k l m n stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i = %d, j = %d, k = %d, l = %d, m = %d, n = %d \n", i, j, k, l, m, n);
    return 0;
 }

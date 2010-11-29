@@ -24,44 +24,44 @@ Proper effects
       INTEGER J
       INTEGER K
       INTEGER H
-C               <must be written>: I
+C             <    is written>: I
 
       I = 1.0                                                           0008
-C               <must be written>: J
+C             <    is written>: J
       J = 3.0                                                           0009
-C               <must be written>: K
+C             <    is written>: K
       K = 14.0                                                          0010
-C               <must be read   >: I J K
-C               <must be written>: H
+C             <    is read   >: I J K
+C             <    is written>: H
       H = IBITS(K, I, J)                                                0011
-C               <must be read   >: H __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: H __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, 'H = ', H                                                0012
 
       END
 
 Cumulated effetcs
 
-C               <must be read   >: __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PROGRAM IBITS01
 
       INTEGER I
       INTEGER J
       INTEGER K
       INTEGER H
-C               <must be written>: I
+C             <    is written>: I
 
       I = 1.0                                                           0008
-C               <must be written>: J
+C             <    is written>: J
       J = 3.0                                                           0009
-C               <must be written>: K
+C             <    is written>: K
       K = 14.0                                                          0010
-C               <must be read   >: I J K
-C               <must be written>: H
+C             <    is read   >: I J K
+C             <    is written>: H
       H = IBITS(K, I, J)                                                0011
-C               <must be read   >: H __IO_EFFECTS:LUNS(6)
-C               <must be written>: __IO_EFFECTS:LUNS(6)
+C             <    is read   >: H __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, 'H = ', H                                                0012
 
       END

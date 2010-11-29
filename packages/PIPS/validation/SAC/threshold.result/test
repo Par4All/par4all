@@ -5,7 +5,7 @@ void threshold(float data[128], float val)
 {
    int i;
    for(i = 0; i <= 127; i += 1)
-      if (data[i]>val) 
+      if (data[i]>val)
          data[i] = val;
 }
 void threshold(float data[128], float val)

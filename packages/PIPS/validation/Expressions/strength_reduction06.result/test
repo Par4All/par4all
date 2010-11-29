@@ -1,0 +1,75 @@
+
+//  T(main) {main==0}
+
+int main()
+{
+
+//  T(i) {i==0}
+
+   int i = 0, *a = malloc(10*sizeof(int)), *b;
+
+//  T(main) {i==0}
+
+   if (!a)
+
+//  T(main) {i==0, main==1}
+
+      return 1;
+
+//  T() {i==0}
+
+   b = a;
+
+//  T(i) {i#init==0, i<=8}
+
+   for(i = 8; i >= 1; i += -2)
+
+//  T(i) {1<=i#init, i#init<=8}
+
+      *(a+i) = *(b+i+1);
+
+//  T() {0<=i+1, i<=0}
+
+   printf("%d", *(a+2));
+
+//  T(main) {main==0, 0<=i+1, i<=0}
+
+   return 0;
+}
+int main()
+{
+   int i = 0, *a = malloc(10*sizeof(int)), *b;
+   //PIPS generated variable
+   int *a0, *b0;
+   if (!a)
+      return 1;
+   b = a;
+   b0 = b;
+   a0 = a;
+   for(i = 8; i >= 1; i += -2) {
+      *a0 = *(b0+1);
+      b0 += -2;
+      a0 += -2;
+   }
+   printf("%d", *(a+2));
+   return 0;
+}
+int main()
+{
+   int i = 0, *a = malloc(10*sizeof(int)), *b;
+   //PIPS generated variable
+   int *a0, *b0;
+   if (!a)
+      return 1;
+   b = a;
+   b0 = a;
+   a0 = a;
+   for(i = 8; i >= 1; i += -2) {
+      *a0 = *(b0+1);
+      b0 += -2;
+      a0 += -2;
+   }
+   printf("%d", *(a+2));
+   return 0;
+}
+
