@@ -342,10 +342,6 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
 "_Pragma" 	        {
                                 return(TK_PRAGMA);
                         }
-"__va_list" 	        {
-								yylval.string=strdup("__builtin_va_list");
-                                return(TK_IDENT);
-                        }
 
 \'([^\\]|{char_escape}|{oct_escape}|{hex_escape}|{universal-character-name})\'           {
   /* Have a look to Flex A.4.3 too... */
@@ -595,6 +591,17 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				pips_debug(5,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			}
+"__va_list" 	        {
+	/* convert __va_list from bsd into __builtin_va_list */
+	pips_debug(5,"TK_VA_LIST %s\n",yytext);
+	yytext = strdup("__builtin_va_list");
+	int t = is_c_keyword_typedef(yytext);
+	update_csplit_current_beginning();
+	pips_assert("builtin valist found\n",t>0);
+	pips_debug(5,"Keyword or typedef name: %s\n",yytext);
+	yylval.string = strdup(yytext);
+	return (t);
+}
 "__attribute__"                 {
 				pips_debug(5,"TK_ATTRIBUTE %s\n",yytext);
 				return(TK_ATTRIBUTE);
