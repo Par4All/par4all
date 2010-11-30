@@ -15,26 +15,18 @@ int flip() {
 	return rand() % 2;
 }
 
-#define guard(c) if (!(c)) return;
-
 #define G1 (x6 >= 1)
 #define C1 {x1++; x6--;}
-#define T1 {guard(G1); C1;}
 #define G2 (x1 >= 1 && x7 >= 1)
 #define C2 {x2++; x1--; x7--;}
-#define T2 {guard(G2); C2;}
 #define G3 (x2 >= 1)
 #define C3 {x6++; x3++; x2--;}
-#define T3 {guard(G3); C3;}
 #define G4 (x3 >= 1 && x6 >= 1)
 #define C4 {x4++; x3--; x6--;}
-#define T4 {guard(G4); C4;}
 #define G5 (x4 >= 1)
 #define C5 {x5++; x7++; x4--;}
-#define T5 {guard(G5); C5;}
 #define G6 (x6 >= 1)
 #define C6 {x6++; x5--;}
-#define T6 {guard(G6); C6;}
 
 /*#define chk_ok {if (x1 + x2 + x4 + x5 + x6 == 0) error();}*/
 #define chk_ok {if (x1 == 0 && x2 == 0 && x4 == 0 && 5 == 0 && x6 == 0) error();}
