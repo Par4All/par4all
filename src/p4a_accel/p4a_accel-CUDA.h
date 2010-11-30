@@ -215,8 +215,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
  and not some address in some memory space.
  */
 void P4A_copy_from_accel(size_t element_size,
-    void *host_address,
-    const void *accel_address);
+			 void *host_address,
+			 const void *accel_address);
 
 /** Copy a scalar from the host to the hardware accelerator
 

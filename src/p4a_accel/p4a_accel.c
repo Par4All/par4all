@@ -94,8 +94,8 @@ void P4A_accel_free(void *address) {
  and not some address in some memory space.
  */
 void P4A_copy_from_accel(size_t element_size,
-    void *host_address,
-    const void *accel_address) {
+			 void *host_address,
+			 const void *accel_address) {
   /* We can use memcpy() since we are sure there is no overlap */
   memcpy(host_address, accel_address, element_size);
 }
@@ -120,8 +120,8 @@ void P4A_copy_from_accel(size_t element_size,
  and not some address in some memory space.
  */
 void P4A_copy_to_accel(size_t element_size,
-    const void *host_address,
-    void *accel_address) {
+		       const void *host_address,
+		       void *accel_address) {
   /* We can use memcpy() since we are sure there is no overlap */
   memcpy(accel_address, host_address, element_size);
 }
@@ -149,11 +149,11 @@ void P4A_copy_to_accel(size_t element_size,
  and not some address in some memory space.
  */
 void P4A_copy_from_accel_1d(size_t element_size,
-    size_t d1_size,
-    size_t d1_block_size,
-    size_t d1_offset,
-    void *host_address,
-    const void *accel_address) {
+			    size_t d1_size,
+			    size_t d1_block_size,
+			    size_t d1_offset,
+			    void *host_address,
+			    const void *accel_address) {
 
   // Compute the destination address on host side
   char * cdest = d1_offset*element_size + (char *)host_address;
@@ -204,11 +204,11 @@ void P4A_copy_to_accel_1d(size_t element_size,
  the host.
  */
 void P4A_copy_from_accel_2d(size_t element_size,
-    size_t d1_size, size_t d2_size,
-    size_t d1_block_size, size_t d2_block_size,
-    size_t d1_offset, size_t d2_offset,
-    void *host_address,
-    const void *accel_address) {
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address) {
   // Compute the destination address for the first rown on dim1 on host side
   char * cdest = d2_offset*element_size + (char*)host_address;
   const char * csrc = (char*)accel_address;
@@ -241,8 +241,10 @@ void P4A_copy_to_accel_2d(size_t element_size,
 */
 void P4A_copy_from_accel_3d(size_t element_size,
 			    size_t d1_size, size_t d2_size, size_t d3_size,
-			    size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-			    size_t d1_offset, size_t d2_offset, size_t d3_offset,
+			    size_t d1_block_size, 
+			    size_t d2_block_size, size_t d3_block_size,
+			    size_t d1_offset, 
+			    size_t d2_offset, size_t d3_offset,
 			    void *host_address,
 			    const void *accel_address) {
   char * cdest = d3_offset*element_size + (char*)host_address;
@@ -439,11 +441,11 @@ void P4A_copy_to_accel_1d(size_t element_size,
  the host.
  */
 void P4A_copy_from_accel_2d(size_t element_size,
-    size_t d1_size, size_t d2_size,
-    size_t d1_block_size, size_t d2_block_size,
-    size_t d1_offset, size_t d2_offset,
-    void *host_address,
-    const void *accel_address) {
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address) {
 
   if(d2_size==d2_block_size ) { // d2 is fully transfered ? We can optimize :-)
     // We transfer all in one shot !
@@ -517,11 +519,13 @@ void P4A_copy_to_accel_2d(size_t element_size,
     the host.
 */
 void P4A_copy_from_accel_3d(size_t element_size,
-          size_t d1_size, size_t d2_size, size_t d3_size,
-          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-          size_t d1_offset, size_t d2_offset, size_t d3_offset,
-          void *host_address,
-          const void *accel_address) {
+			    size_t d1_size, size_t d2_size, size_t d3_size,
+			    size_t d1_block_size, 
+			    size_t d2_block_size, size_t d3_block_size,
+			    size_t d1_offset, 
+			    size_t d2_offset, size_t d3_offset,
+			    void *host_address,
+			    const void *accel_address) {
 
 
   if(d3_size==d3_block_size ) { // d3 is fully transfered ? We can optimize :-)
@@ -597,11 +601,14 @@ void P4A_copy_to_accel_3d(size_t element_size,
     the host.
 */
 void P4A_copy_from_accel_4d(size_t element_size,
-          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
-          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
-          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
-          void *host_address,
-          const void *accel_address) {
+			    size_t d1_size, size_t d2_size, 
+			    size_t d3_size, size_t d4_size,
+			    size_t d1_block_size, size_t d2_block_size, 
+			    size_t d3_block_size, size_t d4_block_size,
+			    size_t d1_offset, size_t d2_offset, 
+			    size_t d3_offset, size_t d4_offset,
+			    void *host_address,
+			    const void *accel_address) {
 
   if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
     // We transfer all in one shot !
@@ -673,67 +680,11 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 #endif //P4A_ACCEL_CUDA
 
-#ifdef P4A_iACCEL
-#include <stdio.h>
-typedef struct memory_mapping {
-  void *host;
-  void *accel;
-  struct memory_mapping *next;
-}memory_mapping;
-
-static memory_mapping *mappings=NULL;
-
-static memory_mapping *get_mapping( void *host_ptr ) {
-  memory_mapping *mapping = mappings;
-  while(mapping!=NULL && mapping->host!=host_ptr) {
-    mapping=mapping->next;
-  }
-  return mapping;
-}
-
-static void put_memory_mapping(memory_mapping *mapping) {
-  mapping->next = mappings;
-  mappings = mapping;
-}
-
-void iP4A_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
-  memory_mapping *mapping = get_mapping(host_ptr);
-  if(mapping==NULL) {
-    mapping=(memory_mapping *)malloc(sizeof(memory_mapping));
-    put_memory_mapping(mapping);
-    mapping->accel = NULL;
-  }
-
-  if(mapping->accel == NULL) {
-    P4A_accel_malloc(&(mapping->accel), size);
-    // FIXME error check
-  }
-
-  P4A_copy_to_accel(size,host_ptr,mapping->accel);
-}
-
-void iP4A_copy_from_accel(void *host_ptr, size_t size /* in bytes */) {
-  memory_mapping *mapping = get_mapping(host_ptr);
-  if(mapping==NULL) {
-    fprintf(stderr,"[%s@%s:%d] Error : copy from unknown ptr !\n",__FUNCTION__,__FILE__,__LINE__);
-    exit(-1);
-  }
-
-  if(mapping->accel == NULL) {
-    fprintf(stderr,"[%s@%s:%d] Error : copy from NULL accel ptr !\n",__FUNCTION__,__FILE__,__LINE__);
-    exit(-1);
-  }
-
-  P4A_copy_from_accel(size,host_ptr,mapping->accel);
-}
-
-#endif //P4A_ACCEL_CUDA
-
 #ifdef P4A_ACCEL_CL
 
 cl_event p4a_event;
 cl_int p4a_global_error;
-cl_device  p4a_device = NULL;
+cl_device_id  p4a_device = NULL;
 cl_context p4a_context = NULL;
 cl_command_queue p4a_queue = NULL;
 cl_device_id p4a_device_id = NULL;  
@@ -788,6 +739,7 @@ void P4A_accel_malloc(void **address, size_t size) {
     p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,0,&err);
     toolTestExec(err);
     
+    /*
     size_t kernelLength;
     const char* cSourceCL = oclLoadProgSource(p4a_kernel_source,"// This kernel was generated by P4A\n",&kernelLength);
     // Create and compile the program
@@ -797,9 +749,10 @@ void P4A_accel_malloc(void **address, size_t size) {
     toolTestExec(clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL));
     p4a_kernel=clCreateKernel(p4a_program,kernel,&err);
     toolTestExec(err);
+    */
   }
 
-  *adresse = (void *)clCreateBuffer(p4a_context,CL_MEM_READ_ONLY,size,NULL,&err);
+  *address = (void *)clCreateBuffer(p4a_context,CL_MEM_READ_ONLY,size,NULL,&err);
   toolTestExec(err);
 }
 
@@ -826,7 +779,7 @@ void P4A_accel_free(void *address) {
  */
 void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
-			 void *accel_address) 
+			 const void *accel_address) 
 {
   // CL_TRUE : synchronous read
   toolTestExec(clEnqueueReadBuffer(p4a_queue,(cl_mem)accel_address,CL_TRUE,0,element_size,host_address,0,NULL,NULL));
@@ -845,7 +798,7 @@ void P4A_copy_from_accel(size_t element_size,
  and not some address in some memory space.
  */
 void P4A_copy_to_accel(size_t element_size,
-		       void *host_address,
+		       const void *host_address,
 		       void *accel_address) 
 {
   toolTestExec(clSetKernelArg(p4a_kernel,count,element_size,accel_address));
@@ -1014,11 +967,13 @@ void P4A_copy_to_accel_2d(size_t element_size,
     the host.
 */
 void P4A_copy_from_accel_3d(size_t element_size,
-          size_t d1_size, size_t d2_size, size_t d3_size,
-          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-          size_t d1_offset, size_t d2_offset, size_t d3_offset,
-          void *host_address,
-          const void *accel_address) {
+			    size_t d1_size, size_t d2_size, size_t d3_size,
+			    size_t d1_block_size, 
+			    size_t d2_block_size, size_t d3_block_size,
+			    size_t d1_offset, 
+			    size_t d2_offset, size_t d3_offset,
+			    void *host_address,
+			    const void *accel_address) {
 
 
   if(d3_size==d3_block_size ) { // d3 is fully transfered ? We can optimize :-)
@@ -1100,9 +1055,12 @@ void P4A_copy_to_accel_3d(size_t element_size,
     the host.
 */
 void P4A_copy_from_accel_4d(size_t element_size,
-     size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
-     size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
-     size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+			    size_t d1_size, size_t d2_size, 
+			    size_t d3_size, size_t d4_size,
+			    size_t d1_block_size, size_t d2_block_size, 
+			    size_t d3_block_size, size_t d4_block_size,
+			    size_t d1_offset, size_t d2_offset, 
+			    size_t d3_offset, size_t d4_offset,
 			    void *host_address,
 			    const void *accel_address) {
 
