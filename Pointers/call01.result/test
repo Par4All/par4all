@@ -27,41 +27,41 @@ Proper effects for "call01"
 
 void call01(int *pi, tf_t *q)
 {
-//               <must be read   >: pi
-//               <must be written>: pi[0]
+//             <    is read   >: pi
+//             <    is written>: pi[0]
    *pi = 1;
-//               <must be read   >: pi
-//               <must be written>: pi
+//             <    is read   >: pi
+//             <    is written>: pi
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//               <must be read   >: q
-//               <must be written>: q[0][.one]
+//             <    is read   >: q
+//             <    is written>: q[0].one
    q->one = 1;
-//               <must be read   >: q
-//               <must be written>: q[0][.two][4]
+//             <    is read   >: q
+//             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
 }
 
 Cumulated effects for "call01"
 
-//               <must be read   >: pi q
-//               <must be written>: pi[0] q[0][.one] q[0][.two][4]
+//             <    is read   >: pi q
+//             <    is written>: pi[0] q[0].one q[0].two[4]
 void call01(int *pi, tf_t *q)
 {
-//               <must be read   >: pi
-//               <must be written>: pi[0]
+//             <    is read   >: pi
+//             <    is written>: pi[0]
    *pi = 1;
-//               <must be read   >: pi
-//               <must be written>: pi
+//             <    is read   >: pi
+//             <    is written>: pi
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//               <must be read   >: q
-//               <must be written>: q[0][.one]
+//             <    is read   >: q
+//             <    is written>: q[0].one
    q->one = 1;
-//               <must be read   >: q
-//               <must be written>: q[0][.two][4]
+//             <    is read   >: q
+//             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
 }
 
@@ -71,25 +71,25 @@ int main()
 {
    int i;
    tf_t s;
-//               <must be written>: i s[.one] s[.two][4]
+//             <    is written>: i s.one s.two[4]
 
    call01(&i, &s);
 }
 
 POINTS TO
 
-//  {(pi,_pi_1,-Exact-)}
+//  {(pi,_pi_1,-Exact-);(q,_q_2,-Exact-)}
 void call01(int *pi, tf_t *q)
 {
-//  {(pi,_pi_1,-Exact-)}
+//  {(pi,_pi_1,-Exact-);(q,_q_2,-Exact-)}
    *pi = 1;
-//  {(pi,_pi_1,-Exact-)}
+//  {(pi,_pi_1,-Exact-);(q,_q_2,-Exact-)}
    /* pi is passed by value: pi++ does not generate a summary effect
         for call01 */
    pi++;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,_q_2,-Exact-)}
    q->one = 1;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,_q_2,-Exact-)}
    (q->two)[4] = 2;
 }
 

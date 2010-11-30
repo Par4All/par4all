@@ -5,7 +5,7 @@ int main()
 {
    int t[100][10][3];                                                   /*0006*/
    int *pu;                                                             /*0007*/
-//               <must be written>: pu
+//             <    is written>: pu
 
    pu = t[1][2];                                                        /*0009*/
    return 0;                                                            /*0010*/
@@ -18,9 +18,9 @@ int main()
 {
 //  points to = {}
    int t[100][10][3];                                                   /*0006*/
-//  points to = {}
+//  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *pu;                                                             /*0007*/
-//  points to = {}
+//  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pu = t[1][2];                                                        /*0009*/
 //  {(pu,t[1][2][0],-Exact-)}
@@ -33,7 +33,7 @@ int main()
 {
    int t[100][10][3];                                                   /*0006*/
    int *pu;                                                             /*0007*/
-//               <must be written>: pu
+//             <    is written>: pu
 
    pu = t[1][2];                                                        /*0009*/
    return 0;                                                            /*0010*/

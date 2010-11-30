@@ -2,36 +2,36 @@ int main()
 {
    // BEGIN BLOCK
    int *pdeb, *pfin, *p;
-//               <must be written>: pdeb
+//             <    is written>: pdeb
 
    pdeb = &t[0];
-//               <must be written>: pfin
+//             <    is written>: pfin
    /*   repère le premier élément de t   */
    pfin = &t[10-1];
-//               <must be read   >: pdeb
-//               <must be written>: p
+//             <    is read   >: pdeb
+//             <    is written>: p
    /*   repère le dernier élément de t   */
    
    p = pdeb;
-//               <must be read   >: p pfin
+//             <    is read   >: p pfin
    while (p<=pfin) {
       // BEGIN BLOCK
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-      if (*p==0) 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] p pdeb
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (*p==0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p pdeb stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
          printf("%d ", p-pdeb);
-//               <must be read   >: p
-//               <must be written>: p
+//             <    is read   >: p
+//             <    is written>: p
       p++;
       // END BLOCK
    }
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("\n");
    return 0;
    // END BLOCK
@@ -64,7 +64,7 @@ int main()
 //   -Exact-);(pfin,t[10-1],-Exact-)}
       // BEGIN BLOCK
 //  points to = {}
-      if (*p==0) 
+      if (*p==0)
 //  points to = {}
          printf("%d ", p-pdeb);
 //  points to = {}
