@@ -765,7 +765,7 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 	int t = is_c_keyword_typedef(yytext);
 	pips_assert("builtin valist found\n",t>0);
 	pips_debug(9,"Keyword or typedef name: %s\n",yytext);
-	yylval.string = strdup(yytext);
+	c_lval.string = strdup(yytext);
 	return (t);
 }
 
