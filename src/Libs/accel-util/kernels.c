@@ -130,6 +130,18 @@ static expression entity_to_address(entity e) {
     return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
 }
 
+/* generate an expression of the form
+ * sizeof(typeof(variable[indices]))
+ *
+ * It also handles the fields:
+ * fields reference are converted to proper expression
+ * then an approximation is made to ensure there is no stride
+ * e.g
+ * struct { int x,y; } a [10];
+ * a[1][x] -> sizeof(a[1])
+ * struct { int x[10], y[10] } a;
+ * a[x][1] -> sizeof(a.x)
+ */
 
 static expression get_sizeofexpression_for_reference(entity variable, list indices) {
   expression sizeof_exp;
@@ -142,8 +154,8 @@ static expression get_sizeofexpression_for_reference(entity variable, list indic
                                                        NIL));
 
   if(type_struct_variable_p(element_type)) {
-    expression r_exp = reference_to_expression(r);
-    sizeof_exp = MakeSizeofExpression(r_exp);
+    expression exp = region_reference_to_expression(r);
+    sizeof_exp = MakeSizeofExpression(exp);
     free_type(element_type);
   } else {
     sizeof_exp = MakeSizeofType(element_type);
@@ -345,8 +357,28 @@ statement effects_to_dma(statement stat,
   if(empty_string_p(get_dma_name(s,dma1D)))
     return statement_undefined;
 
-  list rw_effects= load_cumulated_rw_effects_list(stat);
+  /* work on a copy because we compute the rectangular hull in place */
+  list rw_effects= gen_full_copy_list(load_cumulated_rw_effects_list(stat));
   transformer tr = transformer_range(load_statement_precondition(stat));
+
+  /* SG: to do: merge convex hulls when they refer to *all* fields of a region
+   * to do this, according to BC, I should iterate over all regions,
+   * detect fields and then iterate again over regions to find combinable regions
+   * that way I would not generate needless read effects when all fields are accessed using the same pattern
+   *
+   * some more dev I am not willing to do right now :)
+   */
+
+  /* ensure we only have a rectangular region
+   * as a side effect, strided accesses are handled by region_rectangular_hull
+   */
+  for(list iter = rw_effects;!ENDP(iter);POP(iter)) {
+      region *tmp = (region*)REFCAR(iter);
+      region new = region_rectangular_hull(*tmp,true);
+      //    free_effect(*tmp); SG: why does this lead to a segfault ?
+      //    I find no sharing in region_rectangular_hull
+      *tmp=new;
+  }
 
   list effects = NIL;
 
@@ -359,6 +391,7 @@ statement effects_to_dma(statement stat,
 	     && action_write_p(effect_action(e)))
         effects=CONS(EFFECT,e,effects);
   }
+
 
   /* handle the may approximations here: if the approximation is may,
    * we have to load the data, otherwise the store may store
@@ -459,6 +492,7 @@ statement effects_to_dma(statement stat,
     }
   }
   gen_free_list(effects);
+  gen_full_free_list(rw_effects);
   if (statements == NIL)
     return statement_undefined;
   else
