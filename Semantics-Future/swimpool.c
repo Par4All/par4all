@@ -49,17 +49,17 @@ void run(void) {
 
 	if (x6 >= 1 && x7 >= 0) {
 		while (1) {
-			while (flip()) T1;
+			while (flip() && G1) C1;
 			chk_ok;
-			while (flip()) T2;
+			while (flip() && G2) C2;
 			chk_ok;
-			while (flip()) T3;
+			while (flip() && G3) C3;
 			chk_ok;
-			while (flip()) T4;
+			while (flip() && G4) C4;
 			chk_ok;
-			while (flip()) T5;
+			while (flip() && G5) C5;
 			chk_ok;
-			while (flip()) T6;
+			while (flip() && G6) C6;
 			chk_ok;
 		}
 	}
