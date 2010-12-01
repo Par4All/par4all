@@ -54,12 +54,7 @@ extern cl_program p4a_program;
 /** The module selected in the program
  */
 extern cl_kernel p4a_kernel;  
-/** The sources of the modules composing the program
- */
-extern const char* p4a_kernel_source;  
 
-extern int p4a_args_count;
-extern int *p4a_args_size;
 
 #ifdef P4A_DEBUG
 #define PRINT_LOG(...)               fprintf(stderr,__VA_ARGS__)
