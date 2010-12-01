@@ -7,6 +7,8 @@ create array03 array03.c
 
 setproperty ALIASING_ACROSS_TYPES TRUE
 
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
 
 
 activate PRINT_CODE_POINTS_TO_LIST
