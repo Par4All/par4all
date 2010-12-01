@@ -259,6 +259,9 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
             else {
                 pips_user_warning("failed to analyse region\n");
                 sc_free(sc);
+                /* reset state */
+                gen_full_free_list(*dims); *dims=NIL;
+                gen_full_free_list(*offsets); *offsets=NIL;
                 return false;
             }
             sc_free(sc);
