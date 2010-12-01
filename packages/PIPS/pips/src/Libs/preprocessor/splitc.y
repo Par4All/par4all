@@ -485,6 +485,9 @@ static string new_ellipsis()
 %token TK_AT_TRANSFORM TK_AT_TRANSFORMEXPR TK_AT_SPECIFIER TK_AT_EXPR
 %token TK_AT_NAME
 
+/* Added here because the token numbering seems to be fragile */
+%token <string> TK_COMPLEXCON
+
 /* operator precedence */
 %nonassoc TK_IF
 %nonassoc TK_ELSE
@@ -1010,6 +1013,10 @@ constant:
 			  $$ = new_signature($1);
 			}
 |   TK_FLOATCON
+                        {
+			  $$ = string_undefined;
+			}
+|   TK_COMPLEXCON
                         {
 			  $$ = string_undefined;
 			}

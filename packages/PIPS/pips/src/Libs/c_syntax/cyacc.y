@@ -528,6 +528,9 @@ static void ResetDerivedEntityDeclarations()
 %token TK_AT_TRANSFORM TK_AT_TRANSFORMEXPR TK_AT_SPECIFIER TK_AT_EXPR
 %token TK_AT_NAME
 
+/* Added here because the token numbering seems to be fragile */
+%token <string> TK_COMPLEXCON
+
 /* operator precedence */
 %nonassoc TK_IF
 %nonassoc TK_ELSE
@@ -1142,6 +1145,13 @@ constant:
 			}
 |   TK_FLOATCON
                         {
+			  $$ = MakeConstant($1, is_basic_float);
+			  free($1);
+			}
+|   TK_COMPLEXCON
+                        {
+			  /* some work left to accomodate imaginary
+			     constants */
 			  $$ = MakeConstant($1, is_basic_float);
 			  free($1);
 			}

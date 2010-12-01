@@ -525,6 +525,7 @@
 #define CARGF_OPERATOR_NAME             "cargf"
 #define CARGL_OPERATOR_NAME             "cargl"
 #define CIMAG_OPERATOR_NAME             "cimag"
+#define GCC_CIMAG_OPERATOR_NAME         "__imag__"
 #define CIMAGF_OPERATOR_NAME            "cimagf"
 #define CIMAGL_OPERATOR_NAME            "cimagl"
 #define CONJ_OPERATOR_NAME              "conj"
@@ -534,6 +535,7 @@
 #define CPROJF_OPERATOR_NAME            "cprojf"
 #define CPROJL_OPERATOR_NAME            "cprojl"
 #define CREAL_OPERATOR_NAME             "creal"
+#define GCC_CREAL_OPERATOR_NAME         "__real__"
 #define CREALF_OPERATOR_NAME            "crealf"
 #define CREALL_OPERATOR_NAME            "creall"
 
@@ -1853,8 +1855,9 @@ the variable is unsigned, signed or not */
 #define STDERR_NAME "stderr"
 #define STDIN_LUN (5)
 #define STDOUT_LUN (6)
+
 /*Symbolic constants for the file descriptors belonging to the standard streams: unistd.h */
-#ifndef HAVE_UNISTD_H
+#if !defined(HAVE_UNISTD_H) && !defined(_UNISTD_H)
 #define STDIN_FILENO (0)
 #define STDOUT_FILENO (1)
 #define STDERR_FILENO (2)

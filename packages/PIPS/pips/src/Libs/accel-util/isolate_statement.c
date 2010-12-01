@@ -259,6 +259,9 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
             else {
                 pips_user_warning("failed to analyse region\n");
                 sc_free(sc);
+                /* reset state */
+                gen_full_free_list(*dims); *dims=NIL;
+                gen_full_free_list(*offsets); *offsets=NIL;
                 return false;
             }
             sc_free(sc);
@@ -299,39 +302,6 @@ range dimension_to_range(dimension d)
             copy_expression(dimension_lower(d)),
             copy_expression(dimension_upper(d)),
             int_to_expression(1));
-}
-
-/* because of the way we build offsets list, it may contains struct field
- * so we cannot rely on make_reference only
- * fixes entity type as well ...
- * fix it here
- */
-expression region_reference_to_expression(reference r)
-{
-    entity e = reference_variable(r);
-    list indices = gen_full_copy_list(reference_indices(r));
-    entity f = entity_undefined;
-    size_t where = 0;
-    FOREACH(EXPRESSION,exp,indices) {
-        if(entity_field_p(f=reference_variable(expression_reference(exp))))
-            break;
-        where++;
-    }
-    list tail = gen_nthcdr(where,indices);
-    if(where) {
-        CDR(gen_nthcdr(where-1,indices))=NIL;
-    }
-    if(ENDP(tail))
-        return reference_to_expression(make_reference(e,indices));
-    else {
-        reference fake = make_reference(f,CDR(tail));
-        expression res =  binary_intrinsic_expression(
-                FIELD_OPERATOR_NAME,
-                reference_to_expression(make_reference(e,indices)),
-                region_reference_to_expression(fake));
-        free_reference(fake);
-        return res;
-    }
 }
 
 /** 
