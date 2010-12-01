@@ -1,18 +1,24 @@
-delete complex03
-create complex03 complex03.c
+delete complex04
+create complex04 complex04.c
 
 echo
 echo parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[main]
-quit
+
 echo
 echo printed file
 echo
 
 display PRINTED_FILE[main]
 
+echo
+echo try a transforamtion
+echo
+
+apply PRIVATIZE_MODULE[main]
+
 close
-delete complex03
+delete complex04
 quit
