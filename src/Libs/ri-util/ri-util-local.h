@@ -525,6 +525,7 @@
 #define CARGF_OPERATOR_NAME             "cargf"
 #define CARGL_OPERATOR_NAME             "cargl"
 #define CIMAG_OPERATOR_NAME             "cimag"
+#define GCC_CIMAG_OPERATOR_NAME         "__imag__"
 #define CIMAGF_OPERATOR_NAME            "cimagf"
 #define CIMAGL_OPERATOR_NAME            "cimagl"
 #define CONJ_OPERATOR_NAME              "conj"
@@ -534,6 +535,7 @@
 #define CPROJF_OPERATOR_NAME            "cprojf"
 #define CPROJL_OPERATOR_NAME            "cprojl"
 #define CREAL_OPERATOR_NAME             "creal"
+#define GCC_CREAL_OPERATOR_NAME         "__real__"
 #define CREALF_OPERATOR_NAME            "crealf"
 #define CREALL_OPERATOR_NAME            "creall"
 
