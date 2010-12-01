@@ -17,5 +17,3 @@ as the main program but in a string form ?
 The kernel file (.cl) as the same name as the kernel_wrapper but with
 the extension .cl.
 
-l154 de p4a_accel_OpenCL.h : soucis à venir sans doute avec le type
-des arguments à envoyer au kernel. Rest à voir et à améliorer ...

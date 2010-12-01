@@ -132,47 +132,12 @@ void write_data(char filename[]) {
 
 #define MIN(a,b) (a < b ? a : b )
 /*
- * file for kernel1.c
- */
-/*
-P4A_accel_kernel kernel1(float_t space[SIZE][SIZE],
-			 float_t save[SIZE][SIZE],
-			 int i,
-			 int j) {
-  save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
-}
-*/
-
-/*
- * file for launch_kernel1.c
- */
-/*
-P4A_accel_kernel_wrapper kernel1_wrapper(float_t space[SIZE][SIZE],
-					 float_t save[SIZE][SIZE]) {
-  int j;
-  int i;
-  // Use 2 array in flip-flop to have dataparallel forall semantics. I
-  //        could use also a flip-flop dimension instead... 
-  kernel1:
-   //for(i = 1; i <= 62; i += 10)
-  // We need this wrapper to get the virtual processor coordinates
-  //  The Cuda compiler inline P4A_accel_kernel functions by default, so
-  //  there is no overhead 
-  i = P4A_vp_0;
-  j = P4A_vp_1;
-  // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
-  // We need a phase to generate this clamping too: 
-  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
-    kernel1(space, save, i, j);
-}
-*/
-
-/*
  * file for launch_kernel1.c
  */
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
-  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
+  //printf("adresses %p %p\n",&space,&save);
+  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, 2,sizeof(cl_mem),&space,sizeof(cl_mem),&save);
 }
 
 /*

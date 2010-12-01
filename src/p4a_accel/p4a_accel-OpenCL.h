@@ -150,10 +150,13 @@ inline void checkArgsInline(const char *kernel,...)
   }
   va_list ap;
   va_start(ap, kernel);
-  for (int i = 0;i < p4a_args_count;i++) {
-    cl_mem m = va_arg(ap, cl_mem);
-    p4a_global_error=clSetKernelArg(p4a_kernel,i,sizeof(cl_mem),(void *)&m);
-    toolTestExecMessage("clSetKernelArg %d",i);
+  int n = va_arg(ap, int);
+  for (int i = 0;i < n;i++) {
+    PRINT_LOG("Argument %d\n",i);
+    size_t size = va_arg(ap, size_t);
+    cl_mem arg_address = va_arg(ap, cl_mem);
+    p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
+    toolTestExecMessage("clSetKernelArg");
   }
   va_end(ap);
 }
@@ -337,8 +340,8 @@ inline void checkArgsInline(const char *kernel,...)
  and not some address in some memory space.
  */
 void P4A_copy_from_accel(size_t element_size,
-    void *host_address,
-    const void *accel_address);
+			 void *host_address,
+			 const void *accel_address);
 
 /** Copy a scalar from the host to the hardware accelerator
 
@@ -495,7 +498,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 				    #context,				\
 				    #parameters));                      \
     P4A_call_accel_kernel_parameters parameters;			\
-    toolTestExecMessage("P4A OpenCL kernel execution");		\
+    toolTestExecMessage("P4A OpenCL kernel execution");		        \
   } while (0)
 
 /* @} */
@@ -525,9 +528,9 @@ void P4A_copy_to_accel_3d(size_t element_size,
   /* Define the number of thread per block: */				\
   cl_uint work_dim = 1;                                                 \
   size_t block_descriptor_name[] = {P4A_min((int) size,			\
-					    (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
+					    (int) P4A_CL_ITEM_PER_GROUP_IN_1D)};                                                                        \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name[] = {(int)size)};                         \
+  size_t grid_descriptor_name[] = {(int)size};                         \
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
@@ -601,7 +604,10 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0);			\
-    P4A_call_accel_kernel(clEnqueueNDRangeKernel,(p4a_queue,p4a_kernel,work_dim,NULL,&P4A_block_descriptor,&P4A_grid_descriptor,0,NULL,&p4a_event)); \
+    P4A_call_accel_kernel(clEnqueueNDRangeKernel,                       \
+			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
+			   &P4A_block_descriptor,&P4A_grid_descriptor,  \
+			   0,NULL,&p4a_event));				\
   } while (0)
 
 
@@ -627,6 +633,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0, P4A_n_iter_1);	\
+    printf("work_dim = %d\n",work_dim);                                 \
     P4A_call_accel_kernel(clEnqueueNDRangeKernel,                       \
                           (p4a_queue,p4a_kernel,work_dim,NULL,          \
 			   &P4A_block_descriptor,&P4A_grid_descriptor,  \
