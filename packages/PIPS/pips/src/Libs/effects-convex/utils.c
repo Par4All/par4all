@@ -3011,13 +3011,133 @@ string region_to_string(effect reg __attribute__ ((unused)))
     return strdup("[region_to_string] no longer implemented\n");
 }
 
-/* computes the rectangular hull of a region */
-region region_rectangular_hull(region reg)
+/********************************************************************
+ * SG awful contributions to BC wonderful work
+ */
+
+
+/* computes the rectangular hull of a region 
+ * if the region indices contain fields and @p nofield is set to true
+ * they are removed to ensure a non strided access
+ * that is if the field is at the head, it is kept (struct of array)
+ * if it is in the tail, it is ignored
+ * if it is in the middle, we are in great trouble
+ * and perform an over-approximation of ignoring all remaining accesses
+ *
+ */
+region region_rectangular_hull(region reg, bool nofield)
 {
     region hyper = copy_effect(reg);
-    list phis = region_phi_cfc_variables(reg);
-    region_exact_projection_along_parameters(hyper,phis);
-    sc_fix(region_system(hyper));
+    if(nofield) {
+        /* this is the stride fix */
+        list iter = reference_indices(region_any_reference(hyper));
+        list prev = iter;
+        while(!ENDP(iter)) {
+            expression e = EXPRESSION(CAR(iter));
+            if(!expression_reference_p(e) ||
+                    !entity_field_p(reference_variable(expression_reference(e)))) {
+                break;
+            }
+            prev=iter;
+            POP(iter);
+        }
+        /* body keep all reference indices */
+        while(!ENDP(iter)) {
+            expression e = EXPRESSION(CAR(iter));
+            if(expression_reference_p(e) &&
+                    entity_field_p(reference_variable(expression_reference(e)))) {
+                break;
+            }
+            prev=iter;
+            POP(iter);
+        }
+        /* tail : once a field is met , we cannot go on */
+        if(!ENDP(prev)) CDR(prev)=NIL;
+        /* if we cut the tail , approximation is may */
+        if(!ENDP(iter)) region_approximation_tag(hyper)=is_approximation_may;
+        gen_full_free_list(iter);
+    }
+
+    /* the real rectangular hull begins now */
+
+    /* fist gather all phis */
+    list phis = NIL;
+    FOREACH(EXPRESSION,exp,reference_indices(region_any_reference(hyper)))
+        if(expression_reference_p(exp) && 
+                variable_phi_p(reference_variable(expression_reference(exp))))
+            phis = CONS(ENTITY,reference_variable(expression_reference(exp)),phis);
+    phis=gen_nreverse(phis);
+
+    /* then for each of the phis, generate a list of all other phis
+     * and project the system along this variables */
+    region nr = effect_undefined;
+    FOREACH(ENTITY, phi_i, phis) {
+        list other_phis = gen_copy_seq(phis);
+        gen_remove_once(&other_phis,phi_i);
+        region partial = copy_effect(hyper);
+        region_exact_projection_along_parameters(partial,other_phis);
+        if(effect_undefined_p(nr)) nr=partial;
+        else {
+            region_sc_append(nr,region_system(partial),1);
+            free_effect(partial);
+        }
+        gen_free_list(other_phis);
+    }
     gen_free_list(phis);
+    if(!effect_undefined_p(nr)) {
+        sc_fix(region_system(nr));
+        region_system(hyper)=sc_dup(region_system(nr));
+        free_effect(nr);
+    }
     return hyper;
+}
+
+/* translates a reference form a region into a valid expression
+ * it handles fields accesses conversion, but does not changes phi variables
+ * it is up to the user to use replace_entity on the generated expression according to its needs 
+ * no sharing introduced between returned expression and @p r
+ */
+expression region_reference_to_expression(reference r) {
+    expression p = reference_to_expression(
+            make_reference(reference_variable(r),NIL)
+            );
+    FOREACH(EXPRESSION,index,reference_indices(r)) {
+        if(expression_reference_p(index) &&
+                entity_field_p(reference_variable(expression_reference(index)))) {
+            p = MakeBinaryCall(
+                    entity_intrinsic(FIELD_OPERATOR_NAME),
+                    p,
+                    copy_expression(index)
+                    );
+        }
+        else {
+            if(expression_reference_p(p)) {
+                reference pr = expression_reference(p);
+                reference_indices(pr)=
+                    gen_append(reference_indices(pr),
+                            CONS(EXPRESSION,copy_expression(index),NIL)
+                            );
+            }
+            else if(expression_subscript_p(p)) {
+                subscript ps = expression_subscript(p);
+                subscript_indices(ps)=
+                    gen_append(subscript_indices(ps),
+                            CONS(EXPRESSION,copy_expression(index),NIL)
+                            );
+            }
+            else {
+                pips_assert("is a field",expression_field_p(p));
+                p = syntax_to_expression(
+                        make_syntax_subscript(
+                            make_subscript(
+                                p,
+                                CONS(EXPRESSION,copy_expression(index),NIL)
+                                )
+                            )
+                        );
+            }
+
+        }
+    }
+    return p;
 }

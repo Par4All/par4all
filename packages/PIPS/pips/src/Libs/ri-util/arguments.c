@@ -203,3 +203,19 @@ cons * a2;
 	 a1);
     return a;
 }
+
+/* generate a Newgen list with all entities refered in vector b */
+list base_to_entities(Pvecteur b)
+{
+  list el = NIL;
+  Pvecteur ev;
+
+  for(ev = b; ev!=NULL; ev = ev->succ) {
+    entity e = (entity) vecteur_var(ev);
+    el = CONS(ENTITY, e, el);
+  }
+
+  gen_nreverse(el);
+
+  return el;
+}

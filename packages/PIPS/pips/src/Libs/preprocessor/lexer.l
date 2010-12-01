@@ -238,7 +238,9 @@ hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
 floatsuffix [fFlL]
+complexsuffix [ij]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
+complexnum (({decfloat}|{hexfloat})({complexsuffix}{floatsuffix}?|{floatsuffix}{complexsuffix}))
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 escape \\
@@ -379,6 +381,11 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(5,"TK_FLOATCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_FLOATCON);
+                        }
+{complexnum}		{
+                                pips_debug(5,"TK_COMPLEXCON %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_COMPLEXCON);
                         }
 {hexnum}		{
                                 pips_debug(5,"Hexnum TK_INTCON %s\n",yytext);
@@ -591,6 +598,17 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				pips_debug(5,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			}
+"__va_list" 	        {
+	/* convert __va_list from bsd into __builtin_va_list */
+	pips_debug(5,"TK_VA_LIST %s\n",yytext);
+	yytext = strdup("__builtin_va_list");
+	int t = is_c_keyword_typedef(yytext);
+	update_csplit_current_beginning();
+	pips_assert("builtin valist found\n",t>0);
+	pips_debug(5,"Keyword or typedef name: %s\n",yytext);
+	yylval.string = strdup(yytext);
+	return (t);
+}
 "__attribute__"                 {
 				pips_debug(5,"TK_ATTRIBUTE %s\n",yytext);
 				return(TK_ATTRIBUTE);

@@ -1585,6 +1585,16 @@ reference expression_reference(expression e)
     pips_assert("e is a reference\n",expression_reference_p(e));
     return syntax_reference(expression_syntax(e));
 }
+
+bool expression_subscript_p(expression e) {
+    return syntax_subscript_p(expression_syntax(e));
+}
+
+subscript expression_subscript(expression e)
+{
+    pips_assert("is a subscript\n",expression_subscript_p(e));
+    return syntax_subscript(expression_syntax(e));
+}
 
 /* predicates on references */
 
