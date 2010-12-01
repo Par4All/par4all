@@ -236,7 +236,7 @@ void P4A_copy_from_accel(size_t element_size,
  and not some address in some memory space.
  */
 void P4A_copy_to_accel(size_t element_size,
-    const void *host_address,
+    void const*host_address,
     void *accel_address);
 
 /** Function for copying memory from the hardware accelerator to a 1D array in

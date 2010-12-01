@@ -134,153 +134,6 @@ void P4A_copy_to_accel(size_t element_size,
   memcpy(accel_address, host_address, element_size);
 }
 
-/** Function for copying memory from the hardware accelerator to a 1D array in
- the host.
-
- This function could be quite simpler but is designed by symmetry with
- other functions.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from  (host side)
-
- @param[out] host_address point to the array on the host to write into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
- */
-void P4A_copy_from_accel_1d(size_t element_size,
-    size_t d1_size,
-    size_t d1_block_size,
-    size_t d1_offset,
-    void *host_address,
-    const void *accel_address) {
-
-  // Compute the destination address on host side
-  char * cdest = d1_offset*element_size + (char *)host_address;
-  const char * csrc = (char*)accel_address;
-  // Copy element by element
-  for(size_t i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
-}
-
-/** Function for copying a 1D memory zone from the host to a compact memory
- zone in the hardware accelerator.
-
- This function could be quite simpler but is designed by symmetry with
- other functions.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from
-
- @param[in] host_address point to the array on the host to read
-
- @param[out] accel_address refer to the compact memory area to write
- data. In the general case, accel_address may be seen as a unique idea
- (FIFO) and not some address in some memory space.
- */
-void P4A_copy_to_accel_1d(size_t element_size,
-    size_t d1_size,
-    size_t d1_block_size,
-    size_t d1_offset,
-    const void *host_address,
-    void *accel_address) {
-  // Compute the destination address on host side
-  const char * csrc = d1_offset*element_size + (char *)host_address;
-  char * cdest = (char*)accel_address;
-
-  // Copy element by element
-  for(size_t i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
-}
-
-/** Function for copying memory from the hardware accelerator to a 2D array in
- the host.
- */
-void P4A_copy_from_accel_2d(size_t element_size,
-    size_t d1_size, size_t d2_size,
-    size_t d1_block_size, size_t d2_block_size,
-    size_t d1_offset, size_t d2_offset,
-    void *host_address,
-    const void *accel_address) {
-  // Compute the destination address for the first rown on dim1 on host side
-  char * cdest = d2_offset*element_size + (char*)host_address;
-  const char * csrc = (char*)accel_address;
-
-  // Copy element by element
-  for(size_t i = 0; i < d1_block_size; i++)
-    for(size_t j = 0; j < d2_block_size*element_size; j++)
-      cdest[(i + d1_offset)*element_size*d2_size + j] =
-          csrc[i*element_size*d2_block_size + j];
-}
-
-/** Function for copying a 2D memory zone from the host to a compact memory
- zone in the hardware accelerator.
- */
-void P4A_copy_to_accel_2d(size_t element_size,
-    size_t d1_size, size_t d2_size,
-    size_t d1_block_size, size_t d2_block_size,
-    size_t d1_offset, size_t d2_offset,
-    const void *host_address,
-    void *accel_address) {
-  char * cdest = (char *)accel_address;
-  const char * csrc = d2_offset*element_size + (char *)host_address;
-  for(size_t i = 0; i < d1_block_size; i++)
-    for(size_t j = 0; j < d2_block_size*element_size; j++)
-      cdest[i*element_size*d2_block_size + j] = csrc[(i + d1_offset)*element_size*d2_size + j];
-}
-
-/** Function for copying memory from the hardware accelerator to a 3D array in
-    the host.
-*/
-void P4A_copy_from_accel_3d(size_t element_size,
-			    size_t d1_size, size_t d2_size, size_t d3_size,
-			    size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-			    size_t d1_offset, size_t d2_offset, size_t d3_offset,
-			    void *host_address,
-			    const void *accel_address) {
-  char * cdest = d3_offset*element_size + (char*)host_address;
-  const char * csrc = (char*)accel_address;
-  for(size_t i = 0; i < d1_block_size; i++)
-    for(size_t j = 0; j < d2_block_size; j++)
-      for(size_t k = 0; k < d3_block_size*element_size; k++)
-	cdest[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k] =
-	      csrc[(i*d2_block_size + j)*d3_block_size*element_size + k];
-}
-
-
-/** Function for copying a 3D memory zone from the host to a compact memory
-    zone in the hardware accelerator.
-*/
-void P4A_copy_to_accel_3d(size_t element_size,
-			  size_t d1_size, size_t d2_size, size_t d3_size,
-			  size_t d1_block_size, size_t d2_block_size, size_t d3_block_size,
-			  size_t d1_offset,   size_t d2_offset, size_t d3_offset,
-			  const void *host_address,
-			  void *accel_address) {
-  char * cdest = (char *)accel_address;
-  const char * csrc = d3_offset*element_size + (char *)host_address;
-  for(size_t i = 0; i < d1_block_size; i++)
-    for(size_t j = 0; j < d2_block_size; j++)
-      for(size_t k = 0; k < d3_block_size*element_size; k++)
-	cdest[(i*d2_block_size + j)*d3_block_size*element_size + k] =
-	  csrc[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k];
-}
-
 /* @} */
 #endif // P4A_ACCEL_OPENMP
 
@@ -352,7 +205,7 @@ void P4A_accel_free(void *address) {
  */
 void P4A_copy_from_accel(size_t element_size,
     void *host_address,
-    void *accel_address) {
+    void const*accel_address) {
   cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
 }
 
@@ -374,10 +227,16 @@ void P4A_copy_from_accel(size_t element_size,
  and not some address in some memory space.
  */
 void P4A_copy_to_accel(size_t element_size,
-    void *host_address,
+    void const*host_address,
     void *accel_address) {
   cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
 }
+
+
+
+
+#endif //P4A_ACCEL_CUDA
+
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
  the host.
@@ -408,8 +267,8 @@ void P4A_copy_from_accel_1d(size_t element_size,
     size_t d1_offset,
     void *host_address,
     const void *accel_address) {
-  char * cdest = d1_offset*element_size + (char *)host_address;
-  cudaMemcpy(cdest,accel_address,d1_block_size*element_size,cudaMemcpyDeviceToHost);
+  const char * cdest = d1_offset*element_size + (char *)host_address;
+  P4A_copy_from_accel(d1_block_size * element_size, (void *)cdest, accel_address);
 }
 
 /** Function for copying a 1D memory zone from the host to a compact memory
@@ -441,7 +300,7 @@ void P4A_copy_to_accel_1d(size_t element_size,
     const void *host_address,
     void *accel_address) {
   const char * csrc = d1_offset*element_size + (char *)host_address;
-  cudaMemcpy(accel_address,csrc,d1_block_size*element_size,cudaMemcpyHostToDevice);
+  P4A_copy_to_accel(d1_block_size * element_size, csrc, accel_address);
 }
 
 /** Function for copying memory from the hardware accelerator to a 2D array in
@@ -680,7 +539,6 @@ void P4A_copy_to_accel_4d(size_t element_size,
 }
 
 
-#endif //P4A_ACCEL_CUDA
 
 #ifdef P4A_iACCEL
 #include <stdio.h>

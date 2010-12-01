@@ -86,4 +86,4 @@ run-%: $(TARGET)_%
 
 %_cuda : $(SOURCES) $(GRAPHICS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
+	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.cu) $(LDLIBS)
