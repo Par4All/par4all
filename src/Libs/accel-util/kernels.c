@@ -153,6 +153,10 @@ static expression get_sizeofexpression_for_reference(entity variable, list indic
                                                        NIL,
                                                        NIL));
 
+  /* Here we make a special case for struct because of nvcc/C++ doesn't like construct like :
+   *  sizeof(struct {data_t latitude; data_t longitude; data_t stock;})
+   * so we produce a sizeof(var); instead
+   */
   if(type_struct_variable_p(element_type)) {
     expression exp = region_reference_to_expression(r);
     sizeof_exp = MakeSizeofExpression(exp);
