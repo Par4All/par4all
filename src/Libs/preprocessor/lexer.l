@@ -238,7 +238,9 @@ hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
 floatsuffix [fFlL]
+complexsuffix [ij]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
+complexnum (({decfloat}|{hexfloat}){complexsuffix}{floatsuffix}?)
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 escape \\
@@ -379,6 +381,11 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(5,"TK_FLOATCON %s\n",yytext);
                                 yylval.string = strdup(yytext);
 				return(TK_FLOATCON);
+                        }
+{complexnum}		{
+                                pips_debug(5,"TK_COMPLEXCON %s\n",yytext);
+                                yylval.string = strdup(yytext);
+				return(TK_COMPLEXCON);
                         }
 {hexnum}		{
                                 pips_debug(5,"Hexnum TK_INTCON %s\n",yytext);
