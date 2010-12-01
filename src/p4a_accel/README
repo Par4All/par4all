@@ -1,0 +1,21 @@
+date : 1/12/2010
+Author : Stéphanie Even
+
+For OpenCL, it would be nice to add some variable descriptor for the argument
+in the kernel like __global. We will need __local to.
+What about the __shared__ in Cuda ?
+
+Many forms are possible for the kernel argument to
+P4A_call_accel_kernel_2d: kernel file name, kernel name or kernel
+source. They all are char *. Any problème of interface with PIPS ? It
+was not the case with CUDA and OpenMP, as it was the function name
+that was passed as argument.
+
+Is it better to have the kernel in a separate file or in the same file
+as the main program but in a string form ?
+
+The kernel file (.cl) as the same name as the kernel_wrapper but with
+the extension .cl.
+
+l154 de p4a_accel_OpenCL.h : soucis à venir sans doute avec le type
+des arguments à envoyer au kernel. Rest à voir et à améliorer ...
