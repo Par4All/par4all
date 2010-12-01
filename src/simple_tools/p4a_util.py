@@ -472,7 +472,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
 
 def which(cmd, silent = True):
     '''Calls the "which" UNIX utility for the given program.'''
-    return run([ "which", cmd ], can_fail = True, silent = silent)[0].rstrip("\n")
+    return run([ "which", cmd ], can_fail = True, silent = silent, force_locale = None)[0].rstrip("\n")
 
 def whoami(silent = True):
     '''Calls the whoami UNIX utility.'''
