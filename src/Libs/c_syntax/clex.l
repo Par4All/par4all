@@ -417,7 +417,7 @@ hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexp
 floatsuffix [fFlL]
 complexsuffix [ij]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
-complexnum (({decfloat}|{hexfloat}){complexsuffix}{floatsuffix}?)
+complexnum (({decfloat}|{hexfloat})({complexsuffix}{floatsuffix}?|{floatsuffix}{complexsuffix}))
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 escape \\
