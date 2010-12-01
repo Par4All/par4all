@@ -632,6 +632,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {CARGF_OPERATOR_NAME,                    no_write_effects},
   {CARGL_OPERATOR_NAME,                    no_write_effects},
   {CIMAG_OPERATOR_NAME,                    no_write_effects},
+  {GCC_CIMAG_OPERATOR_NAME,                no_write_effects},
   {CIMAGF_OPERATOR_NAME,                   no_write_effects},
   {CIMAGL_OPERATOR_NAME,                   no_write_effects},
   {CONJ_OPERATOR_NAME,                     no_write_effects},
@@ -641,6 +642,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {CPROJF_OPERATOR_NAME,                   no_write_effects},
   {CPROJL_OPERATOR_NAME,                   no_write_effects},
   {CREAL_OPERATOR_NAME,                    no_write_effects},
+  {GCC_CREAL_OPERATOR_NAME,                no_write_effects},
   {CREALF_OPERATOR_NAME,                   no_write_effects},
   {CREALL_OPERATOR_NAME,                   no_write_effects},
 
