@@ -7,13 +7,16 @@
 typedef float float_t;
 #define SIZE 501
 #define T 400
-#include <oclUtils.h>
+//#include <oclUtils.h>
 
 float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
 
 
+const char *kernel1_wrapper = "kernel1_wrapper";
+
+/*
 const char *kernel1_wrapper = "\n" \
 
 "#define SIZE 501                                                       \n" \
@@ -53,7 +56,7 @@ const char *kernel1_wrapper = "\n" \
 "}                                                                      \n" \
 
 "\n";
-
+*/
 
 void get_data(char filename[]) {
   int i, j, nx, ny;
@@ -170,16 +173,6 @@ P4A_accel_kernel_wrapper kernel1_wrapper(float_t space[SIZE][SIZE],
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
   P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
-  /*
-  do {									\
-    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
-                   P4A_n_iter_0, P4A_n_iter_1));			\
-    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
-				     P4A_block_descriptor,		\
-				     P4A_n_iter_0, P4A_n_iter_1);	\
-    P4A_call_accel_kernel(clEnqueueNDRangeKernel,(p4a_queue,p4a_kernel,work_dim,NULL,&P4A_block_descriptor,&P4A_grid_descriptor,0,NULL,&p4a_event)); \
-  } while (0);
-  */
 }
 
 /*
@@ -243,7 +236,7 @@ int main(int argc, char *argv[]) {
   int t, i;
 
   P4A_init_accel;
-  exit(0);
+  
   if (argc != 2) {
     fprintf(stderr,
 	    "%s needs only one argument that is the PGM image input file\n",
@@ -265,8 +258,6 @@ int main(int argc, char *argv[]) {
   P4A_accel_malloc((void **) &p4a_var_space, sizeof(space));
   P4A_copy_to_accel(sizeof(space), space, p4a_var_space);
 
-  exit(0);
-
 
   float_t (*p4a_var_save)[SIZE][SIZE];
   P4A_accel_malloc((void **) &p4a_var_save, sizeof(save));
@@ -274,10 +265,11 @@ int main(int argc, char *argv[]) {
 
   P4A_accel_timer_start;
 
-  /*  
-  for(t = 0; t < T; t++)
-    compute(*p4a_var_space, *p4a_var_save);
-  */
+  //for(t = 0; t < T; t++)
+  for(t = 0; t < 1; t++)
+   compute(*p4a_var_space, *p4a_var_save);
+
+  exit(0);
 
   double execution_time = P4A_accel_timer_stop_and_float_measure();
   fprintf(stderr, "Temps d'exécution : %f s\n", execution_time);

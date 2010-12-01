@@ -20,20 +20,70 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <oclUtils.h>
+#include <string.h>
+#include <stdarg.h>
+#include <oclUtils.h>
 #include <opencl.h>
-#include <cl.h>
+//#include <cl.h>
 
+
+/** Global error in absence of a getLastError equivalent in OpenCL */
 extern cl_int p4a_global_error;
+/** Events for timing in CL: */
+extern cl_event p4a_event;
+/** The OpenCL context ~ a CPU process 
+- a module
+- data
+- specific memory address 
+*/
+extern cl_context p4a_context;
+/** The OpenCL command queue, that allows delayed execution
+ */
+extern cl_command_queue p4a_queue;
+/** The selected device */
+extern cl_device_id p4a_device_id;  
+/** The OpenCL platform : a set of devices 
+    The device_id is the selected device from his type
+    CL_DEVICE_TYPE_GPU
+    CL_DEVICE_TYPE_CPU
+*/
+extern cl_platform_id p4a_platform_id;  
+/** The OpenCL programm composed of a set of modules
+ */
+extern cl_program p4a_program;  
+/** The module selected in the program
+ */
+extern cl_kernel p4a_kernel;  
+/** The sources of the modules composing the program
+ */
+extern const char* p4a_kernel_source;  
 
-#define toolTestExec(error)	     checkErrorInline(error, __FILE__, __LINE__)
+extern int p4a_args_count;
+extern int *p4a_args_size;
+
+#ifdef P4A_DEBUG
+#define PRINT_LOG(...)               fprintf(stderr,__VA_ARGS__)
+#else
+#define PRINT_LOG(...)   
+#endif
+
+
+#define toolTestExec(error)          checkErrorInline(error, __FILE__, __LINE__)
 #define toolTestExecMessage(message) checkErrorMessageInline(message, __FILE__, __LINE__)
 
 inline void checkErrorInline(cl_int error, 
 			     const char *currentFile, 
 			     const int currentLine)
 {
-    if(CL_SUCCESS != error){
+#ifndef P4A_DEBUG
+    if(CL_SUCCESS != error) {
+      //fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, oclErrorString(error));
+      fprintf(stderr, "File %s - Line %i - The runtime error is %d\n",
+	      currentFile,currentLine,error);
+      exit(-1);
+    }
+#else
+    if(CL_SUCCESS != error) {
       //fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, oclErrorString(error));
       fprintf(stderr, "File %s - Line %i - The runtime error is %d\n",
 	      currentFile,currentLine,error);
@@ -42,29 +92,71 @@ inline void checkErrorInline(cl_int error,
     else
       fprintf(stdout, "File %s - Line %i - The runtime is successful\n",
 	      currentFile,currentLine);
+#endif
 }
 
 // S. Even : I didn't find an equivalent for cudaGetLastError() at once
 // To see later
 inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
 {
+#ifndef P4A_DEBUG
   //cudaError_t error = cudaGetLastError();
-    if(CL_SUCCESS != p4a_global_error){
-      //fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(p4a_global_error));
-      fprintf(stderr, "File %s - Line %i - %s : %d\n", currentFile, currentLine, errorMessage, p4a_global_error);
-      exit(-1);
-    }
-    /*
-#ifdef P4A_DEBUG
-    cl_int error = cudaThreadSynchronize();
-    if(CL_SUCCESS != error){
-	fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(error));
-        exit(-1);
-    }
-#endif
-    */
+  if(CL_SUCCESS != p4a_global_error){
+    //fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(p4a_global_error));
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %d\n", currentFile, currentLine, errorMessage, p4a_global_error);
+    exit(-1);
+  }
+#else
+  //cl_int error = cudaThreadSynchronize();
+  clWaitForEvents(1, &p4a_event);
+  if(CL_SUCCESS != p4a_global_error){
+    //fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(error));
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %d\n", 
+	    currentFile, currentLine, errorMessage, p4a_global_error);
+    exit(-1);
+  }
+  else {
+    fprintf(stdout, "File %s - Line %i - Success - %s : %d\n", 
+	    currentFile, currentLine, errorMessage, p4a_global_error);
+  }
+#endif 
 }
 
+inline void checkArgsInline(const char *kernel,...)
+{
+  if (!p4a_program) {
+    // Length of <<kernel>> + 2*'.' + '/' 'c' + 'l' + '\0' (= +4 char)
+    int size = strlen(kernel)+6;
+    char* kernelFile = (char *)malloc(size);
+    sprintf(kernelFile,"./%s.cl",kernel);
+    PRINT_LOG("Program and Kernel creation from %s\n",kernelFile);
+    
+    size_t kernelLength;
+    const char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
+    if (cSourceCL == NULL)
+      PRINT_LOG("source du program null\n");
+    else
+      PRINT_LOG("%s\n",cSourceCL);
+    /*Create and compile the program : 1 for 1 kernel */
+    p4a_program=clCreateProgramWithSource(p4a_context,1,
+					  (const char **)&cSourceCL,
+					  &kernelLength,
+					  &p4a_global_error);
+    toolTestExecMessage("clCreateProgramWithSource");
+    p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
+    toolTestExecMessage("clBuildProgram");
+    p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
+    toolTestExecMessage("clCreateKernel");
+  }
+  va_list ap;
+  va_start(ap, kernel);
+  for (int i = 0;i < p4a_args_count;i++) {
+    cl_mem m = va_arg(ap, cl_mem);
+    p4a_global_error=clSetKernelArg(p4a_kernel,i,sizeof(cl_mem),(void *)&m);
+    toolTestExecMessage("clSetKernelArg %d",i);
+  }
+  va_end(ap);
+}
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
 
@@ -138,23 +230,13 @@ inline void checkErrorMessageInline(const char *errorMessage, const char *curren
 
 /** @} */
 
-/** Events for timing in CL: */
-extern cl_event p4a_event;
-extern cl_device_id  p4a_device;
-extern cl_context p4a_context;
-extern cl_command_queue p4a_queue;
-extern cl_device_id p4a_device_id;  
-extern cl_platform_id p4a_platform_id;  
-extern cl_program p4a_program;  
-extern cl_kernel p4a_kernel;  
-extern const char* p4a_kernel_source;  
-  
 /** @defgroup P4A_init_CL Initialization of P4A C to CL
 
     @{
 */
 
 /** Associate the program to the accelerator in CL
+    Could be placed in a inlined function ...
 
     Initialized the use of the hardware accelerator
 
@@ -162,22 +244,24 @@ extern const char* p4a_kernel_source;
 */
 #define P4A_init_accel	                                                  \
   /* Get an OpenCL platform */						  \
-  toolTestExec(clGetPlatformIDs(1, &p4a_platform_id, NULL));              \
-  /* Get the devices,could be a collection of device */                   \
-  toolTestExec(clGetDeviceIDs(p4a_platform_id,                            \
+  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);           \
+  toolTestExecMessage("clGetPlatformIDs");                                \
+/* Get the devices,could be a collection of device */                     \
+  p4a_global_error=clGetDeviceIDs(p4a_platform_id,                        \
 			      CL_DEVICE_TYPE_GPU,                         \
 			      1,                                          \
 			      &p4a_device_id,                             \
-			      NULL));                                     \
-  /* Create the context */                                                \ 
+			      NULL);                                      \
+  toolTestExecMessage("clGetDeviceIDs");                                  \
+  /* Create the context */                                                \
   p4a_context=clCreateContext(0, 1,&p4a_device_id, NULL, NULL,            \
 			      &p4a_global_error);			  \
-  toolTestExec(p4a_global_error);                                         \
+  toolTestExecMessage("clCreateContext");                                 \
   /* ... could query many device, we retain only the first one ... */     \
   /* Create a file allocated to the first device ...   */		  \
   p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,0,             \
 				 &p4a_global_error);			  \
-  toolTestExec(p4a_global_error);
+  toolTestExecMessage("clCreateCommandQueue");
 
 
 /** Release the hardware accelerator in CL
@@ -407,11 +491,11 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
     P4A_skip_debug(P4A_dump_location());				\
-    P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
+    P4A_skip_debug(P4A_dump_message("Invoking %s with %s\n",	        \
 				    #context,				\
 				    #parameters));                      \
     P4A_call_accel_kernel_parameters parameters;			\
-    toolTestExecMessage("P4A OpenCL kernel execution failed");		\
+    toolTestExecMessage("P4A OpenCL kernel execution");		\
   } while (0)
 
 /* @} */
@@ -419,8 +503,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
 /** CL kernel invocation.
 */
-#define P4A_call_accel_kernel_context(kernel, ...)	\
-  kernel
+#define P4A_call_accel_kernel_context(kernel, ...)
 
 
 /** Add CL kernel parameters for invocation.
@@ -537,22 +620,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
     @param ... following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
-  do {									\
-    if (!p4a_program) {                                                 \
-      size_t kernelLength = strlen(kernel);				\
-      /*const char* cSourceCL = oclLoadProgSource(kernel,"// This kernel was generated by P4A\n",&kernelLength);*/                                      \
-    /*Create and compile the program : 1 for 1 kernel */                \
-      /*p4a_program=clCreateProgramWithSource(p4a_context,1,(const char **)&cSourceCL,&kernelLength,&p4a_global_error);*/                               \
-      p4a_program=clCreateProgramWithSource(p4a_context,1,              \
-					    (const char **)&kernel,     \
-					    &kernelLength,              \
-					    &p4a_global_error);		\
-      toolTestExec(p4a_global_error);					\
-      /*Instanciate the fonction that will be used*/			\
-      toolTestExec(clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL));	\
-      p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);	\
-      toolTestExec(p4a_global_error);					\
-    }                                                                   \
+  do {	                                                                \
+    checkArgsInline(kernel,__VA_ARGS__);				\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
                    "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\

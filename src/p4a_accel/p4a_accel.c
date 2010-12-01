@@ -692,9 +692,10 @@ cl_platform_id p4a_platform_id = NULL;
 cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
 const char* p4a_kernel_source;  
-int count=0;
 cl_uint work_dim=1;
-
+int p4a_args_count=0;
+int count=0;
+int *p4a_args_size=NULL;
 
 /** Stop a timer on the accelerator and get float time in second
 
@@ -723,9 +724,26 @@ double P4A_accel_timer_stop_and_float_measure() {
     @param[in] size is the size to allocate in bytes
 */
 void P4A_accel_malloc(void **address, size_t size) {
-  cl_int err;
-  *address=(void *)clCreateBuffer(p4a_context,CL_MEM_READ_ONLY,size,NULL,&err);
-  toolTestExec(err);
+  *address=(void *)clCreateBuffer(p4a_context,
+				  CL_MEM_READ_ONLY,
+				  size,NULL,
+				  &p4a_global_error);
+  toolTestExecMessage("Memory allocation via clCreateBuffer");
+  p4a_args_count++;
+
+  // Here preferentially to the prvious version in copy_to.
+  // In copy_to it was supposed that the definitive p4a_args_count
+  // is known, but thats not true, as the malloc and copy_to*
+  // can be done one after
+  // Thus we have to ad a test to analyse the situation
+  // Here, we know exactly what is the situation and we do some
+  // re-allocation
+  /*
+  if (!p4a_args_size)
+    p4a_args_size = (int *)malloc(sizeof(int));
+  else
+    p4a_args_size = (int *)realloc(p4a_args_size, p4a_args_count*sizeof(int));
+  */
 }
 
 /** Free memory on the hardware accelerator in OpenCL mode
@@ -773,9 +791,18 @@ void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
 		       void *accel_address) 
 {
-  toolTestExec(clSetKernelArg(p4a_kernel,count,element_size,accel_address));
+  // The arguments are sent to the kernel when it is known (compute)
+  // But in the p4a_call_... function, the argument list is variable
+  // We initialize here the number of arguments and their size 
+  // for this later call to
+  //clSetKernelArg(p4a_kernel,count,element_size,accel_address);
+
+  PRINT_LOG("Argument %d from %d\n",count+1,p4a_args_count);
+  
   // CL_FALSE : asynchronous write
-  toolTestExec(clEnqueueWriteBuffer(p4a_queue,(cl_mem)accel_address,CL_FALSE,0,element_size,host_address,0,NULL,NULL));
+  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,(cl_mem)accel_address,CL_FALSE,0,element_size,host_address,0,NULL,NULL);
+  toolTestExecMessage("clEnqueueWriteBuffer");
+  //p4a_args_size[count] = element_size;
   count++;
 }
 
