@@ -4,12 +4,12 @@ PROPER EFFECTS
 int main()
 {
    int *i, j, k;
-//               <must be written>: k
+//             <    is written>: k
    k = 0;
-//               <must be read   >: k
-//               <must be written>: j
+//             <    is read   >: k
+//             <    is written>: j
    j = k;
-//               <must be written>: i
+//             <    is written>: i
    i = &j;
 
    return 0;

@@ -1,0 +1,18 @@
+delete complex05
+create complex05 complex05.c
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[main]
+quit
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[main]
+
+close
+delete complex05
+quit

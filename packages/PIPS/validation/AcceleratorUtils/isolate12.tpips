@@ -1,4 +1,4 @@
-setenv WS="isolate10"
+setenv WS="isolate12"
 setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
 create $WS $WS.c include/par4all.c
@@ -6,7 +6,7 @@ create $WS $WS.c include/par4all.c
 activate MUST_REGIONS
 setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 
-module alphablending
+module test
 
 echo original code
 apply PARTIAL_EVAL
@@ -19,7 +19,7 @@ activate PRINT_CODE
 
 echo isolated code
 apply FLAG_LOOPS
-setproperty ISOLATE_STATEMENT_LABEL "l99998"
+setproperty ISOLATE_STATEMENT_LABEL "l99999"
 apply ISOLATE_STATEMENT
 display PRINTED_FILE
 
