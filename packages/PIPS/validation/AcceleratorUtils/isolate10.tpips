@@ -4,6 +4,7 @@ delete $WS
 create $WS $WS.c include/par4all.c
 
 activate MUST_REGIONS
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 
 module alphablending
 

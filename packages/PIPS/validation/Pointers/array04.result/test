@@ -13,47 +13,47 @@ int main()
 
    int (*r)[100][10][3];                                                /*0015*/
    int (*ru)[10][3];                                                    /*0016*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
-//               <must be written>: p
+//             <    is written>: p
 
    p = &t[1][2];                                                        /*0023*/
-//               <must be written>: pu
+//             <    is written>: pu
    pu = t[1][2];                                                        /*0024*/
-//               <must be written>: pu
+//             <    is written>: pu
    pu = &t[1][2][0];                                                    /*0025*/
-//               <must be written>: q
+//             <    is written>: q
 
    q = &t[1];                                                           /*0027*/
-//               <must be written>: qu
+//             <    is written>: qu
    qu = t[1];                                                           /*0028*/
-//               <must be written>: qu
+//             <    is written>: qu
    qu = &t[1][0];                                                       /*0029*/
-//               <must be written>: r
+//             <    is written>: r
 
    r = &t;                                                              /*0031*/
-//               <must be written>: ru
+//             <    is written>: ru
    ru = t;                                                              /*0032*/
-//               <must be written>: ru
+//             <    is written>: ru
    ru = &t[0];                                                          /*0033*/
    return 0;                                                            /*0034*/
 }
@@ -66,50 +66,89 @@ int main()
 //  points to = {}
    int t[100][10][3];                                                   /*0007*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*p)[3];                                                         /*0009*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *pu;                                                             /*0010*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*q)[10][3];                                                     /*0012*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*qu)[3];                                                        /*0013*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int (*r)[100][10][3];                                                /*0015*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*ru)[10][3];                                                    /*0016*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    printf("sizeof(t) = %zd\n", sizeof(t));                              /*0018*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));                        /*0019*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));                  /*0020*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));            /*0021*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = &t[1][2];                                                        /*0023*/
-//  {(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    pu = t[1][2];                                                        /*0024*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    pu = &t[1][2][0];                                                    /*0025*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    q = &t[1];                                                           /*0027*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    qu = t[1];                                                           /*0028*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-)}
+//   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    qu = &t[1][0];                                                       /*0029*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-)}
+//   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    r = &t;                                                              /*0031*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-);(r,t,-Exact-)}
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    ru = t;                                                              /*0032*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}

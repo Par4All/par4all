@@ -295,8 +295,7 @@ list effects_list;
 	comp = loop_to_complexity(instruction_loop(instr), precond, effects_list);
 	break;
     case is_instruction_whileloop:
-      pips_user_warning("Try to convert your code to use do loops only\n");
-      pips_internal_error("Complexity for while loops not implemented yet.");
+    comp= whileloop_to_complexity(instruction_whileloop(instr), precond, effects_list);
 	break;
     case is_instruction_goto:
 	comp = goto_to_complexity(instruction_goto(instr), precond, effects_list);

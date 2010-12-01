@@ -13,63 +13,63 @@ int main()
 
    int (*r)[100][10][3];                                                /*0013*/
    int (*ru)[10][3];                                                    /*0014*/
-//               <must be written>: p
+//             <    is written>: p
    
    
    p = &t[1][2];                                                        /*0017*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    (*p)[1] = 0;                                                         /*0018*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    p[1][1] = 0;                                                         /*0019*/
-//               <must be written>: pu
+//             <    is written>: pu
 
    pu = &t[1][2][0];                                                    /*0021*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: pu
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pu
    *pu = 0;                                                             /*0022*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: pu
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pu
    pu[2] = 0;                                                           /*0023*/
-//               <must be written>: q
+//             <    is written>: q
 
    q = &t[1];                                                           /*0025*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: q
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
    ((*q)[2])[3] = 0;                                                    /*0026*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: q
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
    q[1][2][3] = 0;                                                      /*0027*/
-//               <must be written>: qu
+//             <    is written>: qu
 
    qu = &t[1][0];                                                       /*0029*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: qu
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: qu
    (*qu)[1] = 0;                                                        /*0030*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: qu
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: qu
    qu[1][1] = 0;                                                        /*0031*/
-//               <must be written>: r
+//             <    is written>: r
 
    r = &t;                                                              /*0033*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: r
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: r
    (((*r)[0])[0])[0] = 0;                                               /*0034*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: r
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: r
    (((*r)[1])[2])[3] = 0;                                               /*0035*/
-//               <must be written>: ru
+//             <    is written>: ru
 
    ru = &t[0];                                                          /*0037*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ru
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ru
    ((*ru)[0])[0] = 0;                                                   /*0038*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ru
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ru
    ru[0][0][0] = 0;                                                     /*0039*/
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ru
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ru
    ru[1][2][1] = 0;                                                     /*0040*/
 
    return 0;                                                            /*0042*/
@@ -83,63 +83,106 @@ int main()
 //  points to = {}
    int t[100][10][3];                                                   /*0005*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*p)[3];                                                         /*0007*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *pu;                                                             /*0008*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*q)[10][3];                                                     /*0010*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*qu)[3];                                                        /*0011*/
 
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int (*r)[100][10][3];                                                /*0013*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*ru)[10][3];                                                    /*0014*/
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    
    
    p = &t[1][2];                                                        /*0017*/
-//  {(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    (*p)[1] = 0;                                                         /*0018*/
-//  {(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    p[1][1] = 0;                                                         /*0019*/
-//  {(p,t[1][2],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pu = &t[1][2][0];                                                    /*0021*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    *pu = 0;                                                             /*0022*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    pu[2] = 0;                                                           /*0023*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    q = &t[1];                                                           /*0025*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    ((*q)[2])[3] = 0;                                                    /*0026*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    q[1][2][3] = 0;                                                      /*0027*/
-//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-)}
+//  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    qu = &t[1][0];                                                       /*0029*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-)}
+//   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    (*qu)[1] = 0;                                                        /*0030*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-)}
+//   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    qu[1][1] = 0;                                                        /*0031*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-)}
+//   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    r = &t;                                                              /*0033*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-);(r,t,-Exact-)}
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    (((*r)[0])[0])[0] = 0;                                               /*0034*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-);(r,t,-Exact-)}
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    (((*r)[1])[2])[3] = 0;                                               /*0035*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
-//   t[1][0],-Exact-);(r,t,-Exact-)}
+//   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
 
    ru = &t[0];                                                          /*0037*/
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
@@ -171,63 +214,63 @@ int main()
 
    int (*r)[100][10][3];                                                /*0013*/
    int (*ru)[10][3];                                                    /*0014*/
-//               <must be written>: p
+//             <    is written>: p
    
    
    p = &t[1][2];                                                        /*0017*/
-//               <must be read   >: p
-//               <must be written>: t[1][2][1]
+//             <    is read   >: p
+//             <    is written>: t[1][2][1]
    (*p)[1] = 0;                                                         /*0018*/
-//               <must be read   >: p
-//               <must be written>: t[1][3][1]
+//             <    is read   >: p
+//             <    is written>: t[1][3][1]
    p[1][1] = 0;                                                         /*0019*/
-//               <must be written>: pu
+//             <    is written>: pu
 
    pu = &t[1][2][0];                                                    /*0021*/
-//               <must be read   >: pu
-//               <must be written>: t[1][2][0]
+//             <    is read   >: pu
+//             <    is written>: t[1][2][0]
    *pu = 0;                                                             /*0022*/
-//               <must be read   >: pu
-//               <must be written>: t[1][2][2]
+//             <    is read   >: pu
+//             <    is written>: t[1][2][2]
    pu[2] = 0;                                                           /*0023*/
-//               <must be written>: q
+//             <    is written>: q
 
    q = &t[1];                                                           /*0025*/
-//               <must be read   >: q
-//               <must be written>: t[1][2][3]
+//             <    is read   >: q
+//             <    is written>: t[1][2][3]
    ((*q)[2])[3] = 0;                                                    /*0026*/
-//               <must be read   >: q
-//               <must be written>: t[2][2][3]
+//             <    is read   >: q
+//             <    is written>: t[2][2][3]
    q[1][2][3] = 0;                                                      /*0027*/
-//               <must be written>: qu
+//             <    is written>: qu
 
    qu = &t[1][0];                                                       /*0029*/
-//               <must be read   >: qu
-//               <must be written>: t[1][0][1]
+//             <    is read   >: qu
+//             <    is written>: t[1][0][1]
    (*qu)[1] = 0;                                                        /*0030*/
-//               <must be read   >: qu
-//               <must be written>: t[1][1][1]
+//             <    is read   >: qu
+//             <    is written>: t[1][1][1]
    qu[1][1] = 0;                                                        /*0031*/
-//               <must be written>: r
+//             <    is written>: r
 
    r = &t;                                                              /*0033*/
-//               <must be read   >: r
-//               <must be written>: t[0][0][0]
+//             <    is read   >: r
+//             <    is written>: t[0][0][0]
    (((*r)[0])[0])[0] = 0;                                               /*0034*/
-//               <must be read   >: r
-//               <must be written>: t[1][2][3]
+//             <    is read   >: r
+//             <    is written>: t[1][2][3]
    (((*r)[1])[2])[3] = 0;                                               /*0035*/
-//               <must be written>: ru
+//             <    is written>: ru
 
    ru = &t[0];                                                          /*0037*/
-//               <must be read   >: ru
-//               <must be written>: t[0][0][0]
+//             <    is read   >: ru
+//             <    is written>: t[0][0][0]
    ((*ru)[0])[0] = 0;                                                   /*0038*/
-//               <must be read   >: ru
-//               <must be written>: t[0][0][0]
+//             <    is read   >: ru
+//             <    is written>: t[0][0][0]
    ru[0][0][0] = 0;                                                     /*0039*/
-//               <must be read   >: ru
-//               <must be written>: t[1][2][1]
+//             <    is read   >: ru
+//             <    is written>: t[1][2][1]
    ru[1][2][1] = 0;                                                     /*0040*/
 
    return 0;                                                            /*0042*/

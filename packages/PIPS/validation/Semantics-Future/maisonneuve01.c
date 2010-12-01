@@ -1,5 +1,5 @@
-// this example comes from bakery.c
-// it worked with pips r18437
+// This example is derived from bakery.c
+// It is properly analyzed by PIPS r18437
 
 #include <stdlib.h>
 
@@ -15,7 +15,7 @@ void run() {
 	// two variables: a is never known, b is always 0
 	int a;
 	int b = 0;
-	
+
 	while (1) {
 
 		a = rand();
@@ -25,7 +25,7 @@ void run() {
 			if (alea() && b != 0) error();
 			b = 0;
 		}
-		
+
 	}
 }
 

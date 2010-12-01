@@ -373,6 +373,15 @@ void init_C_comment()
   }
   make_comments_stack();
 }
+/* compatibility layer for bsd */
+static void bsd_rewrite(char ** pyytext) {
+	if(same_string_p(*pyytext,"__stdinp"))
+		*pyytext="stdin";
+	else if(same_string_p(*pyytext,"__stdoutp"))
+		*pyytext="stdout";
+	else if(same_string_p(*pyytext,"__stderrp"))
+		*pyytext="stderr";
+}
 
 %}
 
@@ -406,7 +415,9 @@ hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
 binexponent ([pP]["+""-"]?{decdigit}+)
 hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
 floatsuffix [fFlL]
+complexsuffix [ij]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)
+complexnum (({decfloat}|{hexfloat})({complexsuffix}{floatsuffix}?|{floatsuffix}{complexsuffix}))
 ident ({letter}|"_")({letter}|{decdigit}|"_")*
 attribident (({letter}|"_")({letter}|{decdigit}|"_"|":"))
 escape \\
@@ -531,6 +542,11 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_debug(9,"TK_FLOATCON %s\n",yytext);
                                 c_lval.string = strdup(yytext);
 				return(TK_FLOATCON);
+                        }
+{complexnum}		{
+                                pips_debug(5,"TK_COMPLEXCON %s\n",yytext);
+                                c_lval.string = strdup(yytext);
+				return(TK_COMPLEXCON);
                         }
 {hexnum}		{
                                 pips_debug(9,"Hexnum TK_INTCON %s\n",yytext);
@@ -749,12 +765,17 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
 				pips_debug(9,"TK_ASM %s\n",yytext);
 				return(TK_ASM);
 			}
-"__va_list" 			{
+"__va_list" 	        {
 	/* convert __va_list from bsd into __builtin_va_list */
-	pips_debug(9,"__va_list replaced by __builtin_va_list\n");
-	c_lval.string=strdup("__builtin_va_list");
-	return TK_IDENT;
-	}
+	pips_debug(5,"TK_VA_LIST %s\n",yytext);
+	yytext = strdup("__builtin_va_list");
+	int t = is_c_keyword_typedef(yytext);
+	pips_assert("builtin valist found\n",t>0);
+	pips_debug(9,"Keyword or typedef name: %s\n",yytext);
+	c_lval.string = strdup(yytext);
+	return (t);
+}
+
 "__extension__"         {
                                 pips_user_warning("gcc extension keyword \"__extension__\" is ignored\n");
                         }
@@ -768,7 +789,8 @@ L\"(\\\"|[^\"\\]|\\[^\"])*\"	{
                                 pips_user_warning("gcc extension keyword \"__signed__\" is ignored\n");
                         }
 {ident}			{
-                                /* C keywords or identifiers */
+				bsd_rewrite(&yytext);
+                /* C keywords or identifiers */
 				int t = is_c_keyword_typedef(yytext);
                                 if (t>0)
 				   {

@@ -1,0 +1,37 @@
+setenv WS="isolate11"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS $WS.c include/par4all.c
+
+activate MUST_REGIONS
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+
+module test
+
+echo original code
+apply PARTIAL_EVAL
+display PRINTED_FILE[%ALLFUNC]
+
+echo with r-w regions
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+activate PRINT_CODE
+
+echo isolated code
+apply FLAG_LOOPS
+setproperty ISOLATE_STATEMENT_LABEL "l99999"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+
+
+apply UNSPLIT
+close
+
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell sed -i -e '1 i #define MIN(a,b) ((a)>(b)?(a):(b))' $WS.database/Src/*.c
+shell cc $WS.database/Src/*.c -o $WS.database/Tmp/test
+shell ./$WS.database/Tmp/ref 100 10 > $WS.database/Tmp/ref-out
+shell ./$WS.database/Tmp/test 100 10 > $WS.database/Tmp/test-out
+shell cmp $WS.database/Tmp/ref-out $WS.database/Tmp/test-out
+
+delete $WS

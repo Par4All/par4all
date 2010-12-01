@@ -5,10 +5,10 @@ void assignment01()
    int *p;
    int *q;
    int *r;
-//               <must be written>: p q r
+//             <    is written>: p q r
 
    p = q = r = &i;
-//               <must be written>: i
+//             <    is written>: i
    i = 2;
    // END BLOCK
 }
@@ -20,16 +20,19 @@ void assignment01()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *q;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *r;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = q = r = &i;
-//  {(r,i,-Exact-)}
+//  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
    i = 2;
    // END BLOCK
 }

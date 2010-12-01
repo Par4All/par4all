@@ -4744,6 +4744,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {CARGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
   {CARGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
   {CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {GCC_CIMAG_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
   {CIMAGF_OPERATOR_NAME, 1, complex_to_real_type, typing_function_complex_to_real, 0},
   {CIMAGL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
   {CONJ_OPERATOR_NAME, 1, doublecomplex_to_doublecomplex_type, typing_function_dcomplex_to_dcomplex, 0},
@@ -4753,6 +4754,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {CPROJF_OPERATOR_NAME, 1, complex_to_complex_type, typing_function_complex_to_complex, 0},
   {CPROJL_OPERATOR_NAME, 1, longdoublecomplex_to_longdoublecomplex_type, typing_function_longdcomplex_to_longdcomplex, 0},
   {CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
+  {GCC_CREAL_OPERATOR_NAME, 1, doublecomplex_to_double_type, typing_function_dcomplex_to_double, 0},
   {CREALF_OPERATOR_NAME, 1,  complex_to_real_type, typing_function_complex_to_real, 0},
   {CREALL_OPERATOR_NAME, 1, longdoublecomplex_to_longdouble_type, typing_function_longdcomplex_to_longdouble, 0},
 
