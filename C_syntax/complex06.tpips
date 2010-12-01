@@ -1,5 +1,5 @@
-delete complex04
-create complex04 complex04.c
+delete complex06
+create complex06 complex06.c
 
 echo
 echo parsed printed file
@@ -8,5 +8,5 @@ echo
 display PARSED_PRINTED_FILE[main]
 
 close
-delete complex04
+delete complex06
 quit

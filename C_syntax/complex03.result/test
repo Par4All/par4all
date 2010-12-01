@@ -1,0 +1,15 @@
+
+parsed printed file
+
+int main(void)
+{
+   double z = 42.0+42.0*1.0iF;
+
+   printf("z = %f + %fI\n", creal(z), cimag(z));
+
+   z = z*z;
+
+   printf("z * z = %f + %fI\n", creal(z), cimag(z));
+
+   return 0;
+}
