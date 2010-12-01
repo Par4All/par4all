@@ -243,7 +243,7 @@ int main(int argc, char *argv[]) {
   int t, i;
 
   P4A_init_accel;
-
+  exit(0);
   if (argc != 2) {
     fprintf(stderr,
 	    "%s needs only one argument that is the PGM image input file\n",
@@ -264,6 +264,9 @@ int main(int argc, char *argv[]) {
   float_t (*p4a_var_space)[SIZE][SIZE];
   P4A_accel_malloc((void **) &p4a_var_space, sizeof(space));
   P4A_copy_to_accel(sizeof(space), space, p4a_var_space);
+
+  exit(0);
+
 
   float_t (*p4a_var_save)[SIZE][SIZE];
   P4A_accel_malloc((void **) &p4a_var_save, sizeof(save));
