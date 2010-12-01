@@ -1,0 +1,12 @@
+delete complex04
+create complex04 complex04.c
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+close
+delete complex04
+quit

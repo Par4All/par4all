@@ -6,12 +6,9 @@ echo parsed printed file
 echo
 
 display PARSED_PRINTED_FILE[main]
-quit
-echo
-echo printed file
-echo
 
-display PRINTED_FILE[main]
+apply UNSPLIT
+shell gcc -c complex03.database/Src/complex03.c -o complex03.database/complex03.o
 
 close
 delete complex03
