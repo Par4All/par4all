@@ -39,9 +39,9 @@ echo
 
 
 
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE[call14]
-display PRINTED_FILE[main]
+#activate PRINT_CODE_PROPER_POINTER_EFFECTS
+#display PRINTED_FILE[call14]
+#display PRINTED_FILE[main]
 
 
 

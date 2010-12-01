@@ -51,47 +51,43 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 {
    int i, j1, j2, k1, k2;
    float R, I;
-//               <must be written>: R
+//             <    is written>: R
 
    R = 0.0;
-//               <must be written>: I
+//             <    is written>: I
    I = 0.0;
-//               <must be read   >: nrec ntt
-//               <must be written>: i
+//             <    is read   >: nrec ntt
+//             <    is written>: i
 
    for(i = 0; i <= nrec-ntt+1-1; i += 1)
-//               <must be read   >: nrec ntt
-//               <must be written>: j1
+//             <    is read   >: nrec ntt
+//             <    is written>: j1
       //    MOTIF     
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
-//               <must be read   >: nrec nsa ntt
-//               <must be written>: j2
+//             <    is read   >: nrec nsa ntt
+//             <    is written>: j2
          for(j2 = 0; j2 <= nsa-1; j2 += 1)
-//               <must be read   >: nrec nsa ntt
-//               <must be written>: k1
+//             <    is read   >: nrec nsa ntt
+//             <    is written>: k1
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
-//               <must be read   >: nrec nsa ntt
-//               <must be written>: k2
+//             <    is read   >: nrec nsa ntt
+//             <    is written>: k2
                for(k2 = 0; k2 <= nsa-1; k2 += 1) {
-//               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                                  ptrin[i+k1][k2][.im] 
-//                                  ptrin[i+j1][j2][.im] 
-//                                  ptrin[i+k1][k2][.re] 
-//                                  ptrin[i+j1][j2][.re]
-//               <must be written>: R
+//             <    is read   >: i j1 j2 k1 k2 nrec nsa ntt 
+//                               ptrin[i+k1][k2].im ptrin[i+j1][j2].im
+//                               ptrin[i+k1][k2].re ptrin[i+j1][j2].re
+//             <    is written>: R
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
-//               <must be read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                                  ptrin[i+k1][k2][.re] 
-//                                  ptrin[i+j1][j2][.im] 
-//                                  ptrin[i+k1][k2][.im] 
-//                                  ptrin[i+j1][j2][.re]
-//               <must be written>: I
+//             <    is read   >: i j1 j2 k1 k2 nrec nsa ntt 
+//                               ptrin[i+j1][j2].im ptrin[i+k1][k2].im
+//                               ptrin[i+k1][k2].re ptrin[i+j1][j2].re
+//             <    is written>: I
                   I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
-//               <must be read   >: R i j1 j2 k1 k2 nrec nsa ntt
-//               <must be written>: ptrout[i][j1][j2][k1][k2][.re]
+//             <    is read   >: R i j1 j2 k1 k2 nrec nsa ntt
+//             <    is written>: ptrout[i][j1][j2][k1][k2].re
                   ptrout[i][j1][j2][k1][k2].re = R;
-//               <must be read   >: I i j1 j2 k1 k2 nrec nsa ntt
-//               <must be written>: ptrout[i][j1][j2][k1][k2][.im]
+//             <    is read   >: I i j1 j2 k1 k2 nrec nsa ntt
+//             <    is written>: ptrout[i][j1][j2][k1][k2].im
                   ptrout[i][j1][j2][k1][k2].im = I;
                }
 }
