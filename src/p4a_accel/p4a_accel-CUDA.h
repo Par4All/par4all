@@ -175,6 +175,18 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     the host in CUDA */
 #define P4A_accel_kernel_wrapper __global__ void
 
+/** The address space visible for all functions. 
+    Allocation in the global memory pool.
+ */
+#define P4A_accel_global_address
+
+/** The address space in the global memory pool but in read-only mode.
+ */
+#define P4A_accel_constant_address __constant__
+
+/** The <<shared>> memory in the CUDA architecture.
+ */
+#define P4A_accel_local_address __shared__
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
     CUDA

@@ -79,6 +79,20 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 #define P4A_accel_kernel_wrapper
 
 
+/** The address space visible for all functions. 
+    Allocation in the global memory pool.
+ */
+#define P4A_accel_global_address 
+
+/** The address space in the global memory pool but in read-only mode.
+ */
+#define P4A_accel_constant_address const
+
+/** 
+ */
+#define P4A_accel_local_address 
+
+
 /** Get the coordinate of the virtual processor in X (first) dimension in
     OpenMP emulation */
 #define P4A_vp_0 P4A_vp_coordinate[0]

@@ -70,20 +70,12 @@ inline void checkErrorInline(cl_int error,
 			     const char *currentFile, 
 			     const int currentLine)
 {
-#ifndef P4A_DEBUG
     if(CL_SUCCESS != error) {
-      //fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, oclErrorString(error));
-      fprintf(stderr, "File %s - Line %i - The runtime error is %d\n",
-	      currentFile,currentLine,error);
+      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
+	      currentFile,currentLine,oclErrorString(error));
       exit(-1);
     }
-#else
-    if(CL_SUCCESS != error) {
-      //fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, oclErrorString(error));
-      fprintf(stderr, "File %s - Line %i - The runtime error is %d\n",
-	      currentFile,currentLine,error);
-      exit(-1);
-    }
+#ifdef P4A_DEBUG
     else
       fprintf(stdout, "File %s - Line %i - The runtime is successful\n",
 	      currentFile,currentLine);
@@ -92,40 +84,40 @@ inline void checkErrorInline(cl_int error,
 
 // S. Even : I didn't find an equivalent for cudaGetLastError() at once
 // To see later
-inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
+inline void checkErrorMessageInline(const char *message, const char *currentFile, const int currentLine)
 {
-#ifndef P4A_DEBUG
   //cudaError_t error = cudaGetLastError();
   if(CL_SUCCESS != p4a_global_error){
-    //fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(p4a_global_error));
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %d\n", currentFile, currentLine, errorMessage, p4a_global_error);
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, oclErrorString(p4a_global_error));
     exit(-1);
   }
-#else
-  //cl_int error = cudaThreadSynchronize();
-  clWaitForEvents(1, &p4a_event);
-  if(CL_SUCCESS != p4a_global_error){
-    //fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, oclErrorString(error));
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %d\n", 
-	    currentFile, currentLine, errorMessage, p4a_global_error);
-    exit(-1);
-  }
+#ifdef P4A_DEBUG
   else {
-    fprintf(stdout, "File %s - Line %i - Success - %s : %d\n", 
-	    currentFile, currentLine, errorMessage, p4a_global_error);
+    fprintf(stdout, "File %s - Line %i - Success - %s\n", 
+	    currentFile, currentLine, message);
   }
 #endif 
 }
 
+/** When launching the kernel, need to create the program from sources
+    and select the kernel.
+
+    Arguments are pushed from the ... list.
+
+    @param kernel Name of the kernel and the source MUST have the same
+    name with .cl extension.
+ */
+
 inline void checkArgsInline(const char *kernel,...)
 {
   if (!p4a_program) {
+    // Creates the name of the source file of the program 
     // Length of <<kernel>> + 2*'.' + '/' 'c' + 'l' + '\0' (= +4 char)
     int size = strlen(kernel)+6;
     char* kernelFile = (char *)malloc(size);
     sprintf(kernelFile,"./%s.cl",kernel);
-    PRINT_LOG("Program and Kernel creation from %s\n",kernelFile);
-    
+
+    PRINT_LOG("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
     const char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
     if (cSourceCL == NULL)
@@ -143,6 +135,13 @@ inline void checkArgsInline(const char *kernel,...)
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
     toolTestExecMessage("clCreateKernel");
   }
+  // The argument list is pushed.
+  // The __VA_ARGS__ contains to very first one, the number of arguments 
+  // to be loaded.
+  // And then, two informations per argument :
+  // - it sizeof(type)
+  // - the value of the argument pointeur
+  // - the very first one is the number of arguments to be loaded.
   va_list ap;
   va_start(ap, kernel);
   int n = va_arg(ap, int);
@@ -282,17 +281,32 @@ inline void checkArgsInline(const char *kernel,...)
 
 /** @} */
 
-
-
 /** A declaration attribute of a hardware-accelerated kernel in CL
     called from the GPU it-self
 */
-
 #define P4A_accel_kernel inline void
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in CL */
 #define P4A_accel_kernel_wrapper __kernel void
+
+/** The address space visible for all functions. 
+    Allocation in the global memory pool.
+ */
+#define P4A_accel_global_address __global
+
+/** The address space in the global memory pool but in read-only mode.
+ */
+#define P4A_accel_constant_address __constant
+
+/** The address space visible by all work-items in a work group.
+    This is the <<shared>> memory in the CUDA architecture.
+    Can't be initialized :
+    * __local float a = 1; is not allowed
+    * __local float a;
+              a = 1;       is allowed.
+ */
+#define P4A_accel_local_address __local
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension in

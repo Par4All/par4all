@@ -17,3 +17,20 @@ as the main program but in a string form ?
 The kernel file (.cl) as the same name as the kernel_wrapper but with
 the extension .cl.
 
+A p4a_accel-opencl.mk was created, separately from 
+p4a_accel.mk for CUDA. Any problem ? Is it used with PIPS ?
+Have to fusion the two files ?
+
+date : 2/12/2010
+Author : Stéphanie Even
+
+The kernel must contain the definition of 
+#define P4A_accel_kernel inline void
+#define P4A_accel_kernel_wrapper __kernel void
+and eventually variable prefixes.
+
+Adding address space qualifiers like
+       P4A_accel_global_address, 
+       P4A_accel_constant_address 
+       P4A_accel_local_address 
+for OpenCL and thus CUDA and OpenMP versions.
