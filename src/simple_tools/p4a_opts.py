@@ -306,6 +306,43 @@ def suggest_rebuild():
         suggest("You may try running again with --clean --rebuild --reconf all")
 
 
+def exec_and_deal_with_errors(fun):
+    """Execute a function and deal with some errors that may happen by
+    enclosing in try/catch"""
+    try:
+        fun()
+    except p4a_error:
+        (t, e, tb) = sys.exc_info()
+        error(str(e))
+        debug("".join(traceback.format_exception(t, e, tb)))
+        if e.code == -2:
+            error("Interrupted")
+        else:
+            suggest_more_verbosity()
+            send_report_email_if_enabled()
+        sys.exit(e.code)
+    except EnvironmentError: # IOError, OSError.
+        (t, e, tb) = sys.exc_info()
+        error(str(e))
+        debug("".join(traceback.format_exception(t, e, tb)))
+        suggest_more_verbosity()
+        send_report_email_if_enabled()
+        sys.exit(e.errno)
+    except KeyboardInterrupt:
+        error("Interrupted")
+        sys.exit(-2)
+    except SystemExit:
+        raise
+    except: # All other exceptions.
+        (t, e, tb) = sys.exc_info()
+        error("Unhandled " + e.__class__.__name__ + ": " + str(e))
+        error("".join(traceback.format_exception(t, e, tb)))
+        suggest_more_verbosity()
+        send_report_email_if_enabled()
+        sys.exit(255)
+
+
+
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")

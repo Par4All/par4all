@@ -26,7 +26,7 @@ class p4a_git:
 
     def is_valid_git_dir(self, dir):
         '''Returns True if the directory appears to be a valid Git repository.'''
-        result = ((os.path.splitext(dir)[1] == self._git_ext or os.path.split(dir)[1] == self._git_ext) 
+        result = ((os.path.splitext(dir)[1] == self._git_ext or os.path.split(dir)[1] == self._git_ext)
             and os.path.exists(os.path.join(dir, "index")))
         #debug("is_valid_git_dir("+ dir +") = " + str(result))
         return result
