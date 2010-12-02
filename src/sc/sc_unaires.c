@@ -38,6 +38,7 @@
 
 #include "boolean.h"
 #include "arithmetique.h"
+#include "assert.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"

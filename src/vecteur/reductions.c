@@ -33,6 +33,7 @@
 #include <limits.h>
 
 #include "boolean.h"
+#include "assert.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 
