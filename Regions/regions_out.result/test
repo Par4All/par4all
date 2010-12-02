@@ -89,39 +89,90 @@ int main(int argc, char **argv)
 
    return 0;
 }
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI1,
+//    PHI1<=127, 0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5,
+//    PHI5<=2}>
+
 void p4a_kernel_2(int i, int j, coord pos[128][128][128], coord vel[128][128][128])
 {
    //PIPS generated variable
    int k;
    //PIPS generated variable
    float posX, posY, posZ;
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI1,
+//    0<=PHI2, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2, i<=127, j<=127}>
+
    // Loop nest P4A end
    if (i<=127&&j<=127)
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI1,
+//    0<=PHI2, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2, i<=127, j<=127}>
+
       for(k = 0; k <= 127; k += 1) {
          posX = (pos[i][j][k]._)[0]+(vel[i][j][k]._)[0]*5*1e-2;
          posY = (pos[i][j][k]._)[1]+(vel[i][j][k]._)[1]*5*1e-2;
          posZ = (pos[i][j][k]._)[2]+(vel[i][j][k]._)[2]*5*1e-2;
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, PHI3==k,
+//    PHI5==0, 0<=PHI1, 0<=PHI2, 0<=k, k<=127, i<=127, j<=127}>
+
          (pos[i][j][k]._)[0] = posX+6.*((posX<0)-(posX>6.));
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, PHI3==k,
+//    PHI5==1, 0<=PHI1, 0<=PHI2, 0<=k, k<=127, i<=127, j<=127}>
+
          (pos[i][j][k]._)[1] = posY+6.*((posY<0)-(posY>6.));
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, PHI3==k,
+//    PHI5==2, 0<=PHI1, 0<=PHI2, 0<=k, k<=127, i<=127, j<=127}>
+
          (pos[i][j][k]._)[2] = posZ+6.*((posZ<0)-(posZ>6.));
       }
 }
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{0<=PHI1, PHI1<=127,
+//    0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2}>
+
 void p4a_kernel_launcher_10(coord pos[128][128][128], coord vel[128][128][128])
 {
    //PIPS generated variable
    int i, j, k;
    //PIPS generated variable
    float posX, posY, posZ;
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{0<=PHI1, PHI1<=127,
+//    0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2}>
+
    // Loop nest P4A begin,2D(128,128)
    for(i = 0; i <= 127; i += 1)
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, 0<=PHI2,
+//    PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2, 0<=i, i<=127}>
+
       for(j = 0; j <= 127; j += 1)
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI3,
+//    PHI3<=127, 0<=PHI5, PHI5<=2, 0<=i, i<=127, 0<=j, j<=127}>
+
          // To be assigned to a call to P4A_vp_0: i
          // To be assigned to a call to P4A_vp_1: j
          // Loop nest P4A end
          p4a_kernel_wrapper_2(i, j, pos, vel);
 }
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI1,
+//    PHI1<=127, 0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5,
+//    PHI5<=2}>
+
 void p4a_kernel_wrapper_2(int i, int j, coord pos[128][128][128], coord vel[128][128][128])
 {
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{PHI1==i, PHI2==j, 0<=PHI1,
+//    PHI1<=127, 0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5,
+//    PHI5<=2}>
+
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    // Loop nest P4A end
@@ -254,10 +305,18 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
    // Fin de lecture du fichier
    fclose(ic);
 }
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{0<=PHI1, PHI1<=127,
+//    0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2}>
+
 void updatepos(coord pos[128][128][128], coord vel[128][128][128])
 {
    float posX, posY, posZ;
    int i, j, k;
+
+//  <pos[PHI1][PHI2][PHI3]._[PHI5]-OUT-MAY-{0<=PHI1, PHI1<=127,
+//    0<=PHI2, PHI2<=127, 0<=PHI3, PHI3<=127, 0<=PHI5, PHI5<=2}>
+
    p4a_kernel_launcher_10(pos, vel);
 }
 
