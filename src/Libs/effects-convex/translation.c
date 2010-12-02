@@ -240,7 +240,7 @@ region_translation_statistics_close(char *mod_name, char *prefix)
     fprintf(fp, " %d", scalar_to_array_stat + array_to_array_stat - total);
 
     /* translation */
-    fprintf(fp, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",	
+    fprintf(fp, " %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
 	    common_dimension_stat.nb_calls,
 	    common_dimension_stat.all_similar,
 	    common_dimension_stat.not_same_decl,
@@ -2484,7 +2484,7 @@ void convex_cell_reference_with_value_of_cell_reference_translation
 {
 
   /* assume exactness */
-  *exact_p = true; 
+  *exact_p = true;
 
   /* we do not handle yet the cases where the type of value_of_ref does not match
      the type of a[i]. I need a special function to test if types are compatible,
@@ -2501,10 +2501,10 @@ void convex_cell_reference_with_value_of_cell_reference_translation
   int nb_phi_value_of = (int) gen_length(value_of_inds);
 
   *output_ref = copy_reference(value_of_ref);
-  
+
   /* we add the indices of the input reference past the nb_common_indices
      (they have already be poped out) to the copy of the value_of reference */
-  
+
   for(int i = 0; i<nb_common_indices; i++, POP(input_inds));
 
   int i = nb_phi_value_of+1; /* current index to be handled */
@@ -2512,26 +2512,39 @@ void convex_cell_reference_with_value_of_cell_reference_translation
     {
       if (entity_field_p(expression_variable(input_ind)))
 	reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
-						   CONS(EXPRESSION, 
-							copy_expression(input_ind), 
+						   CONS(EXPRESSION,
+							copy_expression(input_ind),
 							NIL));
       else
 	reference_indices(*output_ref) = gen_nconc(reference_indices(*output_ref),
-						   CONS(EXPRESSION, 
-							 make_phi_expression(i), 
+						   CONS(EXPRESSION,
+							 make_phi_expression(i),
 							NIL));
       i++;
     }
- 
+
   /* Then deal with the output descriptor*/
   Psysteme input_sc2 = sc_dup(descriptor_convex(input_desc));
   Psysteme value_of_sc = descriptor_convex(value_of_desc);
 
   Psysteme output_sc = sc_dup(value_of_sc);
 
+  /* preparing the part of sc_input which is to be added to sc_output */
+  /* first eliminate common dimensions in sc_input (well a copy, do not modify the original) */
+  if (nb_common_indices >0)
+    {
+      list l_phi = phi_entities_list(1,nb_common_indices);
+      FOREACH(ENTITY,phi, l_phi)
+	{
+	  bool exact_projection;
+	  input_sc2 = cell_reference_sc_exact_projection_along_variable(input_ref, input_sc2, phi, &exact_projection);
+	  *exact_p = *exact_p && exact_projection;
+	}
+    }
+
   if(nb_phi_value_of - nb_common_indices != 0) /* avoid useless renaming */
     {
-      
+
       for(i= nb_phi_input; i>nb_common_indices; i--)
 	{
 	  entity old_phi = make_phi_entity(i);
