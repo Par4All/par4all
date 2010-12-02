@@ -8,7 +8,7 @@
 # Guess that you have a copy of the svn trunks in
 # ../../PIPS/git-svn-work and the Polylib in ../polylib
 
-src/simple_tools/p4a_setup --polylib-src ../polylib \
+src/simple_tools/p4a_setup.py --polylib-src ../polylib \
     --nlpmake-src ../../PIPS/git-svn-work/nlpmake \
     --newgen-src ../../PIPS/git-svn-work/newgen \
     --linear-src ../../PIPS/git-svn-work/linear \

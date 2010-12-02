@@ -10,7 +10,7 @@ Par4All Common Utility Functions
 '''
 
 import string, sys, random, logging, logging.handlers, os, re, datetime, shutil
-import subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob, platform
+import subprocess, time, tempfile, optparse, StringIO, fcntl, cPickle, glob, platform, traceback
 from threading import Thread
 import p4a_term
 
@@ -779,7 +779,6 @@ def load_pickle(file):
     obj = cPickle.load(f)
     f.close()
     return obj
-
 
 if __name__ == "__main__":
     print(__doc__)

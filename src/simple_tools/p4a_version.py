@@ -142,7 +142,7 @@ def make_full_revision(file_dir = None, custom_version = "", custom_gitrev = "")
     #    version += "~" + utc_datetime()
 
     debug("Version string for " + repr(file_dir) + ": " + version)
-    
+
     return version, versiond
 
 
