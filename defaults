@@ -2,6 +2,7 @@
 # the default validation includes the following subdirectories
 Benchmarks
 SAC
+Scalopes
 Syntax
 Control
 Preprocessor
@@ -48,7 +49,6 @@ Privatizing
 Terapix
 Tpips
 TutorialPPoPP2010
-Scalopes
 Expressions
 Properties
 Crough
