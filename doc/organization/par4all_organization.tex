@@ -164,7 +164,7 @@ also need:
 
 Once you have the \Apfa source directory (have a look to
 section~\ref{sec:public-repositories}), \Apfa is compiled and configured
-by running \verb|src/simple_tools/p4a_setup| in it.
+by running \verb|src/simple_tools/p4a_setup.py| in it.
 
 If you want to download \Apfa from the \Agit and compile it, do:
 \begin{alltt}
@@ -175,7 +175,7 @@ cd par4all
 # Switch to the p4a branch, where everything is assembled:
 git checkout -b p4a remotes/origin/p4a
 # Build everything using 8 processes to speed up things:
-src/simple_tools/p4a_setup [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
+src/simple_tools/p4a_setup.py [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%
 Everything will be installed into \verb|/usr/local/par4all| by default.
 So we should make the target directory writable by you, either by running
@@ -189,7 +189,7 @@ chown \emph{your_login_name} /usr/local/par4all
 
 If you want to install in another location, use the \verb|--prefix|
 option.  If you need more installation options (such as if you want to
-specify the location for the various packages), run \verb|p4a_setup -h| to
+specify the location for the various packages), run \verb|p4a_setup.py -h| to
 list them or look at section~\ref{sec:p4a_s-comp-script}.
 
 If you want to pull a new version, do:
@@ -197,7 +197,7 @@ If you want to pull a new version, do:
 git pull origin p4a
 \end{verbatim}
 
-And run \verb|p4a_setup| again. It is wise to do it with the
+And run \verb|p4a_setup.py| again. It is wise to do it with the
 \verb|--rebuild| and \verb|--clean| parameters to make sure you recompile
 everything (\Apips being a quickly moving project, incremental build is
 not always guaranteed to work). Removing the \texttt{build} directory can
@@ -206,7 +206,7 @@ some obsolete information about the installation directory may remain in
 the \texttt{build} directory and that makes the compilation to fail.
 
 To create a \texttt{.deb} or \texttt{.tar.gz} package of the installation
-you have made using \verb|p4a_setup| as explained in
+you have made using \verb|p4a_setup.py| as explained in
 \S~\ref{sec:making-distributions}.
 
 About committing your change to the \Agit repository (assuming you work
@@ -239,10 +239,10 @@ Afterwards you can do a \texttt{git push} into the central \Apfa
 repository with less risks.
 
 The classical \Aautotools environment variables can be used to influence
-the compilation but some are directly set up from the \verb|p4a_setup|
+the compilation but some are directly set up from the \verb|p4a_setup.py|
 script. So, if you want to set the \texttt{CFLAGS} and \texttt{CPPFLAGS}
 to compile \Apfa in debug mode you should pass their value change through
-a \verb|p4a_setup| option, for example with
+a \verb|p4a_setup.py| option, for example with
 \begin{verbatim}
 --configure-options="CFLAGS='-ggdb -g3 -Wall -std=c99'"
 \end{verbatim}
@@ -251,7 +251,7 @@ definitions that are heavily used in \Apips. Indeed this case is so common
 when debugging \Apfa that the \verb|--debug| or \verb|-g| options are just
 doing this for simplicity.
 
-You can pass some options to \verb|p4a_setup| to modify the
+You can pass some options to \verb|p4a_setup.py| to modify the
 installation process as explained in \S~\ref{sec:p4a_s-comp-script} for
 all the options, for example to skip the (re)compilation of a package (for
 example with \verb/--skip-polylib/).
@@ -277,14 +277,14 @@ using the \texttt{-{}-\emph{PACKAGE}-c-opts=...}
 For example, if you want just to reconfigure to compile \Apips with
 Fortran 95 support:
 \begin{verbatim}
-p4a_setup --only=pips --pips-c-opts="--enable-tpips --enable-pyps \
+p4a_setup.py --only=pips --pips-c-opts="--enable-tpips --enable-pyps \
   --enable-hpfc --enable-fortran95" --reconf --no-final
 \end{verbatim}
 
 Then, if you have modified \Apips and you just want to recompile and
 install it, just use:
 \begin{verbatim}
-p4a_setup --only=pips --no-final
+p4a_setup.py --only=pips --no-final
 \end{verbatim}
 
 Beware that if you use a \Apips directory with \verb|--pips-src| and that
@@ -298,7 +298,7 @@ make clean
 in the \Apips source directory you are really using first.
 
 Another way to recompile a part of \Apfa, for example when you are
-debugging one of the components, without using \verb|p4a_setup|, you go to
+debugging one of the components, without using \verb|p4a_setup.py|, you go to
 \verb|$P4A_ROOT/build|, in the component you are interested, such as
 \verb|$P4A_ROOT/build/newgen| and type a
 \begin{verbatim}
@@ -316,12 +316,12 @@ verify it still compiles at the same time without breaking the running
 version.
 
 
-\subsection{The \protect\texttt{p4a\_setup} compilation and installation
+\subsection{The \protect\texttt{p4a\_setup.py} compilation and installation
 script}
 \label{sec:p4a_s-comp-script}
 
 The compilation and installation of \Apfa is controlled by the
-\verb|p4a_setup| that has the following usage and options.
+\verb|p4a_setup.py| that has the following usage and options.
 
 \input{p4a_setup-help}
 
@@ -597,7 +597,7 @@ p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
 \end{verbatim}
 \texttt{}
 If you want to develop and try a new version of the scripts dealing with
-the \Apfa infrastructure itself such as \verb|p4a_setup|, it becomes
+the \Apfa infrastructure itself such as \verb|p4a_setup.py|, it becomes
 really tricky since it change the branch when executing and the script
 itself may disappear during it execution since it not committed into the
 final branch\footnote{It is really a case where it cuts the branch it sits
@@ -609,7 +609,7 @@ directory. Then set \verb|P4A_ROOT| to the new repository,
 and may be even \verb|P4A_TOP| to a new world if you really want to do
 quite independent stuff. You set \verb|P4A_ETC| to point to the directory
 where the \verb|p4a_git_lib.bash| you want to use is. Then you can execute
-the \verb|p4a_setup| you are working on to do some action to the new
+the \verb|p4a_setup.py| you are working on to do some action to the new
 sand-box repository working copy.
 
 Example to test the merge and build process into a new \texttt{p5}
@@ -630,7 +630,7 @@ $P4A_TOP/par4all/src/dev/p4a_git --fetch-remote-git
 # Merge all the component branches into the p4a branch:
 $P4A_TOP/par4all/src/dev/p4a_git --pull-remote-git
 # Build all the infrastructure:
-$P4A_TOP/par4all/src/dev/p4a_setup
+$P4A_TOP/par4all/src/dev/p4a_setup.py
 # Source the new environment. Be carefull, it override the P4A_ETC
 # variable above:
 source $P4A_ROOT/run/etc/par4all-rc.sh
@@ -751,7 +751,7 @@ You build a new \Apfa version using this \Apips version in debug mode,
 compiled with 4 compilation processes to take advantage of your 4-core
 machine, just with:
 \begin{verbatim}
-src/simple_tools/p4a_setup -vvv --pips-src=<where the wanted PIPS is> --debug --jobs=4
+src/simple_tools/p4a_setup.py -vvv --pips-src=<where the wanted PIPS is> --debug --jobs=4
 \end{verbatim}
 
 It runs everything. Once you have all the infrastructure setup, it is
@@ -759,7 +759,7 @@ useless to recompile everything, or even reconfigure \Apips when you only
 change few things. You can just recompile \Apips and skip the installation
 of typical \Apfa things, with a:
 \begin{verbatim}
-src/simple_tools/p4a_setup -vvv --pips-src=<where the wanted PIPS is> \
+src/simple_tools/p4a_setup.py -vvv --pips-src=<where the wanted PIPS is> \
    --debug --only=pips --no-final --jobs=4
 \end{verbatim}
 
@@ -977,7 +977,7 @@ There are scripts to ease the developer and user life.
 \item \verb|p4a_recover_includes| is mainly used to get standard
   \verb|#include| back after \Apips digestion. See
   section~\ref{sec:p4a_recover_includes} for the use case;
-\item \verb|p4a_setup| is used to compile all the \Apfa infrastructure and
+\item \verb|p4a_setup.py| is used to compile all the \Apfa infrastructure and
   to set up many things. It should be used at least for the first
   compilation. See \S~\ref{sec:p4a_s-comp-script} for more details;
 \item \verb|p4a_validate| is used to leverage the \Apips validation.
@@ -1061,7 +1061,7 @@ So you should choose the location at build time. To have a distribution
 that build up into for example \texttt{/usr/local/par4all}, you should
 first create a \texttt{/usr/local/par4all} \emph{writable by you} (you may
 create this directory as super-user and change the owner to you with a
-\texttt{chown}), and do a \verb|p4a_setup|.
+\texttt{chown}), and do a \verb|p4a_setup.py|.
 
 Then you can pack this directory into what format you want with for
 example:
