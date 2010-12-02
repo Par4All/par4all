@@ -40,31 +40,34 @@ extern cl_context p4a_context;
 /** The OpenCL command queue, that allows delayed execution
  */
 extern cl_command_queue p4a_queue;
+
+
+
 /** The selected device */
-extern cl_device_id p4a_device_id;  
+//extern cl_device_id p4a_device_id;  
 /** The OpenCL platform : a set of devices 
     The device_id is the selected device from his type
     CL_DEVICE_TYPE_GPU
     CL_DEVICE_TYPE_CPU
 */
-extern cl_platform_id p4a_platform_id;  
+//extern cl_platform_id p4a_platform_id;  
 /** The OpenCL programm composed of a set of modules
  */
-extern cl_program p4a_program;  
+//extern cl_program p4a_program;  
 /** The module selected in the program
  */
 extern cl_kernel p4a_kernel;  
 
 
 #ifdef P4A_DEBUG
-#define PRINT_LOG(...)               fprintf(stderr,__VA_ARGS__)
+#define P4A_log(...)               fprintf(stderr,__VA_ARGS__)
 #else
-#define PRINT_LOG(...)   
+#define P4A_log(...)   
 #endif
 
 
-#define toolTestExec(error)          checkErrorInline(error, __FILE__, __LINE__)
-#define toolTestExecMessage(message) checkErrorMessageInline(message, __FILE__, __LINE__)
+#define P4A_test_execution(error)          checkErrorInline(error, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message) checkErrorMessageInline(message, __FILE__, __LINE__)
 
 inline void checkErrorInline(cl_int error, 
 			     const char *currentFile, 
@@ -110,30 +113,33 @@ inline void checkErrorMessageInline(const char *message, const char *currentFile
 
 inline void checkArgsInline(const char *kernel,...)
 {
-  if (!p4a_program) {
+  if (!p4a_kernel) {
     // Creates the name of the source file of the program 
     // Length of <<kernel>> + 2*'.' + '/' 'c' + 'l' + '\0' (= +4 char)
-    int size = strlen(kernel)+6;
-    char* kernelFile = (char *)malloc(size);
-    sprintf(kernelFile,"./%s.cl",kernel);
+    //int size = strlen(kernel)+6;
+    //char* kernelFile = (char *)malloc(size);
+    //sprintf(kernelFile,"./%s.cl",kernel);
+    char* kernelFile;
+    asprintf(&kernelFile,"./%s.cl",kernel);
 
-    PRINT_LOG("Program and Kernel creation from %s\n",kernelFile);    
+    P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
     const char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
     if (cSourceCL == NULL)
-      PRINT_LOG("source du program null\n");
+      P4A_log("source du program null\n");
     else
-      PRINT_LOG("%s\n",cSourceCL);
+      P4A_log("%s\n",cSourceCL);
     /*Create and compile the program : 1 for 1 kernel */
+    cl_program p4a_program;
     p4a_program=clCreateProgramWithSource(p4a_context,1,
 					  (const char **)&cSourceCL,
 					  &kernelLength,
 					  &p4a_global_error);
-    toolTestExecMessage("clCreateProgramWithSource");
+    P4A_test_execution_with_message("clCreateProgramWithSource");
     p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
-    toolTestExecMessage("clBuildProgram");
+    P4A_test_execution_with_message("clBuildProgram");
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
-    toolTestExecMessage("clCreateKernel");
+    P4A_test_execution_with_message("clCreateKernel");
   }
   // The argument list is pushed.
   // The __VA_ARGS__ contains to very first one, the number of arguments 
@@ -146,11 +152,11 @@ inline void checkArgsInline(const char *kernel,...)
   va_start(ap, kernel);
   int n = va_arg(ap, int);
   for (int i = 0;i < n;i++) {
-    PRINT_LOG("Argument %d\n",i);
+    P4A_log("Argument %d\n",i);
     size_t size = va_arg(ap, size_t);
     cl_mem arg_address = va_arg(ap, cl_mem);
     p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
-    toolTestExecMessage("clSetKernelArg");
+    P4A_test_execution_with_message("clSetKernelArg");
   }
   va_end(ap);
 }
@@ -187,6 +193,7 @@ inline void checkArgsInline(const char *kernel,...)
 #ifndef P4A_CL_ITEM_MAX
 /** The maximum number of work_items in a work_group */
 #define P4A_CL_ITEM_MAX 512
+//#define P4A_CL_ITEM_MAX CL_DEVICE_MAX_WORK_GROUP_SIZE
 #endif
 
 // The localWorkGroupSize
@@ -239,26 +246,31 @@ inline void checkArgsInline(const char *kernel,...)
 
     Just initialize events for time measure right now.
 */
-#define P4A_init_accel	                                                  \
-  /* Get an OpenCL platform */						  \
-  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);           \
-  toolTestExecMessage("clGetPlatformIDs");                                \
-/* Get the devices,could be a collection of device */                     \
-  p4a_global_error=clGetDeviceIDs(p4a_platform_id,                        \
-			      CL_DEVICE_TYPE_GPU,                         \
-			      1,                                          \
-			      &p4a_device_id,                             \
-			      NULL);                                      \
-  toolTestExecMessage("clGetDeviceIDs");                                  \
-  /* Create the context */                                                \
-  p4a_context=clCreateContext(0, 1,&p4a_device_id, NULL, NULL,            \
-			      &p4a_global_error);			  \
-  toolTestExecMessage("clCreateContext");                                 \
-  /* ... could query many device, we retain only the first one ... */     \
-  /* Create a file allocated to the first device ...   */		  \
-  p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,0,             \
-				 &p4a_global_error);			  \
-  toolTestExecMessage("clCreateCommandQueue");
+#define P4A_init_accel	                                                \
+  do {                                                                  \
+     /* Get an OpenCL platform */					\
+     cl_platform_id p4a_platform_id = NULL;                             \
+     p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);	\
+     P4A_test_execution_with_message("clGetPlatformIDs");				\
+     /* Get the devices,could be a collection of device */		\
+     cl_device_id p4a_device_id = NULL;                                 \
+     p4a_global_error=clGetDeviceIDs(p4a_platform_id,			\
+				     CL_DEVICE_TYPE_GPU,		\
+				     1,					\
+				     &p4a_device_id,			\
+				     NULL);				\
+     P4A_test_execution_with_message("clGetDeviceIDs");				\
+     /* Create the context */						\
+     p4a_context=clCreateContext(0, 1,&p4a_device_id, NULL, NULL,	\
+				 &p4a_global_error);			\
+     P4A_test_execution_with_message("clCreateContext");				\
+     /* ... could query many device, we retain only the first one ... */ \
+     /* Create a file allocated to the first device ...   */		\
+     p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,          \
+				    CL_QUEUE_PROFILING_ENABLE,		\
+				    &p4a_global_error);			\
+     P4A_test_execution_with_message("clCreateCommandQueue");                       \
+  } while (0)
 
 
 /** Release the hardware accelerator in CL
@@ -498,25 +510,29 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     into:
 
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage ("P4A CL kernel execution failed", "init.cu", 58); } while (0);
+    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); P4A_test_execution_with_message ("P4A CL kernel execution failed", "init.cu", 58); } while (0);
 */
+
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
     P4A_skip_debug(P4A_dump_location());				\
     P4A_skip_debug(P4A_dump_message("Invoking %s with %s\n",	        \
 				    #context,				\
 				    #parameters));                      \
+    P4A_call_accel_kernel_context context				\
     P4A_call_accel_kernel_parameters parameters;			\
-    toolTestExecMessage("P4A OpenCL kernel execution");		        \
+    P4A_test_execution_with_message("P4A OpenCL kernel execution");	\
   } while (0)
+
+
 
 /* @} */
 
 
 /** CL kernel invocation.
 */
-#define P4A_call_accel_kernel_context(kernel, ...)
-
+#define P4A_call_accel_kernel_context(kernel, ...)	\
+  kernel
 
 /** Add CL kernel parameters for invocation.
 
@@ -546,13 +562,25 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
 /** Allocate the descriptors for a 2D set of thread with a simple
     strip-mining in each dimension for CL
+
+    globalWorkSize = global number of work-items.
+    localWorkSize = number of work-items in a work-group.
+    The dimension is equal to work_dim.
+
+    The total number of work-items in a work-group equals
+    localWorkSize[0] * ... * localWorkSize[work_dim-1]
+    This value must be less than CL_DEVICE_MAX_WORK_GROUP_SIZE.
+
+    localWorkSize can be set as NULL, and OpenCL implementation will 
+    determine how to break the globalWorkSize.
+  
+
 */
 #define P4A_create_2d_thread_descriptors(grid_descriptor_name,		\
 					 block_descriptor_name,		\
 					 n_x_iter, n_y_iter)		\
   int p4a_block_x, p4a_block_y;						\
   /* Define the number of thread per block: */				\
-									\
   if (n_y_iter > 10000) {						\
     /* If we have a lot of interations in Y, use asymptotical block	\
        sizes: */							\
@@ -568,11 +596,15 @@ void P4A_copy_to_accel_3d(size_t element_size,
                           P4A_CL_ITEM_MAX/p4a_block_x);		        \
   }									\
   cl_uint work_dim = 2;                                                 \
+  /* The localWorkSize argument for clEnqueueNDRangeKernel */		\
   size_t block_descriptor_name[]={(size_t)p4a_block_x,(size_t)p4a_block_y}; \
+  /* The globalWorkSize argument for clEnqueueNDRangeKernel */		\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name[]={((size_t) n_x_iter),((size_t) n_y_iter)};\
-  /*P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)*/	\
-  /*P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)*/
+  size_t grid_descriptor_name[]={(size_t) n_x_iter,(size_t) n_y_iter};	\
+  P4A_log("grid size : %d %d\n",n_x_iter,n_y_iter);			\
+  P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);		\
+  /*P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name)); */  \	
+  /*P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)*/  \
 
 
 /** Dump a CL dim3 descriptor with an introduction message */
@@ -608,14 +640,15 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
-    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
-                   P4A_n_iter_0));					\
+    checkArgsInline(kernel,__VA_ARGS__);				\
+    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel      \
+				    "\" of size %d\n",P4A_n_iter_0));	\
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0);			\
-    P4A_call_accel_kernel(clEnqueueNDRangeKernel,                       \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
 			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   &P4A_block_descriptor,&P4A_grid_descriptor,  \
+			   P4A_block_descriptor,P4A_grid_descriptor,  \
 			   0,NULL,&p4a_event));				\
   } while (0)
 
@@ -642,10 +675,9 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0, P4A_n_iter_1);	\
-    printf("work_dim = %d\n",work_dim);                                 \
-    P4A_call_accel_kernel(clEnqueueNDRangeKernel,                       \
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
                           (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   &P4A_block_descriptor,&P4A_grid_descriptor,  \
+			   P4A_grid_descriptor,P4A_block_descriptor,  \
 			   0,NULL,&p4a_event));				\
   } while (0)
 

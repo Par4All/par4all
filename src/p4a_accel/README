@@ -34,3 +34,6 @@ Adding address space qualifiers like
        P4A_accel_constant_address 
        P4A_accel_local_address 
 for OpenCL and thus CUDA and OpenMP versions.
+
+The functions oclErrorString or oclLoadProgSource, specific to NVIDIA,
+must be rewritten later.

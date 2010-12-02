@@ -23,8 +23,8 @@
 //#include <cutil_inline.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
-#define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
-#define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
+#define P4A_test_execution(error)		checkErrorInline      	(error, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
 
 inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
 {
@@ -140,8 +140,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 #define P4A_init_accel					\
   do {							\
-    toolTestExec(cudaEventCreate(&p4a_start_event));	\
-    toolTestExec(cudaEventCreate(&p4a_stop_event));	\
+    P4A_test_execution(cudaEventCreate(&p4a_start_event));	\
+    P4A_test_execution(cudaEventCreate(&p4a_stop_event));	\
   } while (0);
 
 
@@ -160,7 +160,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 
 /** Start a timer on the accelerator in CUDA */
-#define P4A_accel_timer_start toolTestExec(cudaEventRecord(p4a_start_event, 0))
+#define P4A_accel_timer_start P4A_test_execution(cudaEventRecord(p4a_start_event, 0))
 
 /** @} */
 
@@ -372,7 +372,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     into:
 
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); toolTestExecMessage ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
+    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); P4A_test_execution_with_message ("P4A CUDA kernel execution failed", "init.cu", 58); } while (0);
 */
 #define P4A_call_accel_kernel(context, parameters)			\
   do {									\
@@ -382,7 +382,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 				    #parameters));			\
     P4A_call_accel_kernel_context context				\
     P4A_call_accel_kernel_parameters parameters;			\
-    toolTestExecMessage("P4A CUDA kernel execution failed");			\
+    P4A_test_execution_with_message("P4A CUDA kernel execution failed");			\
   } while (0)
 
 /* @} */

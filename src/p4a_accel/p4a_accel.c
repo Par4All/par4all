@@ -293,10 +293,10 @@ cudaEvent_t p4a_start_event, p4a_stop_event;
 
 double P4A_accel_timer_stop_and_float_measure() {
   float execution_time;
-  toolTestExec(cudaEventRecord(p4a_stop_event, 0));
-  toolTestExec(cudaEventSynchronize(p4a_stop_event));
+  P4A_test_execution(cudaEventRecord(p4a_stop_event, 0));
+  P4A_test_execution(cudaEventSynchronize(p4a_stop_event));
   /* Get the time in ms: */
-  toolTestExec(cudaEventElapsedTime(&execution_time,
+  P4A_test_execution(cudaEventElapsedTime(&execution_time,
           p4a_start_event,
           p4a_stop_event));
   /* Return the time in second: */
@@ -313,7 +313,7 @@ double P4A_accel_timer_stop_and_float_measure() {
     @param[in] size is the size to allocate in bytes
 */
 void P4A_accel_malloc(void **address, size_t size) {
-  toolTestExec(cudaMalloc(address, size));
+  P4A_test_execution(cudaMalloc(address, size));
 }
 
 
@@ -323,7 +323,7 @@ void P4A_accel_malloc(void **address, size_t size) {
     the hardware accelerator
 */
 void P4A_accel_free(void *address) {
-  toolTestExec(cudaFree(address));
+  P4A_test_execution(cudaFree(address));
 }
 
 /** Copy a scalar from the hardware accelerator to the host
@@ -643,11 +643,14 @@ void P4A_copy_from_accel_4d(size_t element_size,
     zone in the hardware accelerator.
 */
 void P4A_copy_to_accel_4d(size_t element_size,
-          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
-          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
-          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
-          const void *host_address,
-          void *accel_address) {
+			  size_t d1_size, size_t d2_size, 
+			  size_t d3_size, size_t d4_size,
+			  size_t d1_block_size, size_t d2_block_size, 
+			  size_t d3_block_size, size_t d4_block_size,
+			  size_t d1_offset, size_t d2_offset, 
+			  size_t d3_offset, size_t d4_offset,
+			  const void *host_address,
+			  void *accel_address) {
   if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
     // We transfer all in one shot !
     P4A_copy_to_accel_3d(element_size,
@@ -684,12 +687,11 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 cl_event p4a_event;
 cl_int p4a_global_error;
-cl_device_id  p4a_device = NULL;
 cl_context p4a_context = NULL;
 cl_command_queue p4a_queue = NULL;
-cl_device_id p4a_device_id = NULL;  
-cl_platform_id p4a_platform_id = NULL;
-cl_program p4a_program = NULL;  
+//cl_device_id p4a_device_id = NULL;  
+//cl_platform_id p4a_platform_id = NULL;
+//cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
 
 /** Stop a timer on the accelerator and get float time in second
@@ -697,17 +699,26 @@ cl_kernel p4a_kernel = NULL;
  @addtogroup P4A_opencl_time_measure
  */
 
-double P4A_accel_timer_stop_and_float_measure() {
+double P4A_accel_timer_stop_and_float_measure() 
+{
   cl_ulong start,end;
   float execution_time;
 
   clWaitForEvents(1, &p4a_event);
 
-  toolTestExec(clGetEventProfilingInfo(p4a_event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, NULL));
-  toolTestExec(clGetEventProfilingInfo(p4a_event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, NULL));
+  P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+					     CL_PROFILING_COMMAND_END, 
+					     sizeof(cl_ulong), 
+					     &end, 
+					     NULL));
+  P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+					     CL_PROFILING_COMMAND_START, 
+					     sizeof(cl_ulong), 
+					     &start, 
+					     NULL));
   // execution_time in nanoseconds	      
   execution_time = (float)(end - start); 
-  /* Return the time in second: */
+  // Return the time in second: 
   return execution_time*1.0e-9;
 }
 
@@ -719,11 +730,14 @@ double P4A_accel_timer_stop_and_float_measure() {
     @param[in] size is the size to allocate in bytes
 */
 void P4A_accel_malloc(void **address, size_t size) {
+  // The mem flag can be : CL_MEM_READ_ONLY, CL_MEM_WRITE_ONLY, 
+  // CL_MEM_READ_WRITE or CL_MEM_USE_HOST_PTR
   *address=(void *)clCreateBuffer(p4a_context,
-				  CL_MEM_READ_ONLY,
-				  size,NULL,
+				  CL_MEM_READ_WRITE,
+				  size,
+				  NULL,
 				  &p4a_global_error);
-  toolTestExecMessage("Memory allocation via clCreateBuffer");
+  P4A_test_execution_with_message("Memory allocation via clCreateBuffer");
 }
 
 /** Free memory on the hardware accelerator in OpenCL mode
@@ -731,8 +745,10 @@ void P4A_accel_malloc(void **address, size_t size) {
     @param[in] address points to a previously allocated memory zone for
     the hardware accelerator
 */
-void P4A_accel_free(void *address) {
-  toolTestExec(clReleaseMemObject((cl_mem)address));
+void P4A_accel_free(void *address) 
+{
+  p4a_global_error=clReleaseMemObject((cl_mem)address);
+  P4A_test_execution_with_message("clReleaseMemObject");
 }
 
 /** Copy a scalar from the hardware accelerator to the host
@@ -752,7 +768,16 @@ void P4A_copy_from_accel(size_t element_size,
 			 const void *accel_address) 
 {
   // CL_TRUE : synchronous read
-  toolTestExec(clEnqueueReadBuffer(p4a_queue,(cl_mem)accel_address,CL_TRUE,0,element_size,host_address,0,NULL,NULL));
+  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
+				       (cl_mem)accel_address,
+				       CL_TRUE,
+				       0,
+				       element_size,
+				       host_address,
+				       0,
+				       NULL,
+				       NULL);
+  P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -772,8 +797,16 @@ void P4A_copy_to_accel(size_t element_size,
 		       void *accel_address) 
 {
   // CL_FALSE : asynchronous write
-  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,(cl_mem)accel_address,CL_FALSE,0,element_size,host_address,0,NULL,NULL);
-  toolTestExecMessage("clEnqueueWriteBuffer");
+  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
+					(cl_mem)accel_address,
+					CL_FALSE,
+					0,
+					element_size,
+					host_address,
+					0,
+					NULL,
+					NULL);
+  P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
@@ -806,7 +839,16 @@ void P4A_copy_from_accel_1d(size_t element_size,
 {
   char * cdest = d1_offset*element_size + (char *)host_address;
   // CL_TRUE : synchronous read
-  toolTestExec(clEnqueueReadBuffer(p4a_queue,(cl_mem)accel_address,CL_TRUE,0,d1_block_size*element_size,cdest,0,NULL,NULL));
+  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
+				       (cl_mem)accel_address,
+				       CL_TRUE,
+				       0,
+				       d1_block_size*element_size,
+				       cdest,
+				       0,
+				       NULL,
+				       NULL);
+  P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
 
@@ -840,8 +882,16 @@ void P4A_copy_to_accel_1d(size_t element_size,
 			  void *accel_address) 
 {
   const char * csrc = d1_offset*element_size + (char *)host_address;
-  // CL_FALSE : asynchronous write
-  toolTestExec(clEnqueueWriteBuffer(p4a_queue,(cl_mem)accel_address,CL_FALSE,0,d1_block_size*element_size,csrc,0,NULL,NULL));
+  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
+					(cl_mem)accel_address,
+					CL_FALSE, //CL_FALSE:asynchronous write
+					0,
+					d1_block_size*element_size,
+					csrc,
+					0,
+					NULL,
+					NULL);
+  P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
 /** Function for copying memory from the hardware accelerator to a 2D array in
@@ -1053,12 +1103,15 @@ void P4A_copy_from_accel_4d(size_t element_size,
     zone in the hardware accelerator.
 */
 void P4A_copy_to_accel_4d(size_t element_size,
-     size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
-     size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
-     size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+			  size_t d1_size, size_t d2_size, 
+			  size_t d3_size, size_t d4_size,
+			  size_t d1_block_size, size_t d2_block_size, 
+			  size_t d3_block_size, size_t d4_block_size,
+			  size_t d1_offset, size_t d2_offset, 
+			  size_t d3_offset, size_t d4_offset,
 			  const void *host_address,
 			  void *accel_address) {
-  if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
+  if (d4_size == d4_block_size) { //d4 is fully transfered ? We can optimize :-)
     // We transfer all in one shot !
     P4A_copy_to_accel_3d(element_size,
                          d1_size,d2_size,d3_size * d4_size,
@@ -1066,7 +1119,8 @@ void P4A_copy_to_accel_4d(size_t element_size,
                          d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
                          host_address,
                          accel_address);
-  } else { // Transfer row by row !
+  } 
+  else { // Transfer row by row !
     // Compute the adress of the begining of the first row to transfer
     char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
     char * accel_row = (char*)accel_address;
