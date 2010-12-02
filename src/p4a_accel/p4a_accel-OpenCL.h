@@ -27,10 +27,13 @@
 //#include <cl.h>
 
 
+/**
+ */
+extern double p4a_execution_time;
 /** Global error in absence of a getLastError equivalent in OpenCL */
 extern cl_int p4a_global_error;
 /** Events for timing in CL: */
-extern cl_event p4a_event;
+extern cl_event p4a_event_execution, p4a_event_copy;
 /** The OpenCL context ~ a CPU process 
 - a module
 - data
@@ -60,13 +63,13 @@ extern cl_kernel p4a_kernel;
 
 
 #ifdef P4A_DEBUG
-#define P4A_log(...)               fprintf(stderr,__VA_ARGS__)
+#define P4A_log(...)               fprintf(stdout,__VA_ARGS__)
 #else
 #define P4A_log(...)   
 #endif
 
 
-#define P4A_test_execution(error)          checkErrorInline(error, __FILE__, __LINE__)
+#define P4A_test_execution(error)  checkErrorInline(error, __FILE__, __LINE__)
 #define P4A_test_execution_with_message(message) checkErrorMessageInline(message, __FILE__, __LINE__)
 
 inline void checkErrorInline(cl_int error, 
@@ -125,10 +128,12 @@ inline void checkArgsInline(const char *kernel,...)
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
     const char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
+    /*
     if (cSourceCL == NULL)
       P4A_log("source du program null\n");
     else
       P4A_log("%s\n",cSourceCL);
+    */
     /*Create and compile the program : 1 for 1 kernel */
     cl_program p4a_program;
     p4a_program=clCreateProgramWithSource(p4a_context,1,
@@ -601,10 +606,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
   /* The globalWorkSize argument for clEnqueueNDRangeKernel */		\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   size_t grid_descriptor_name[]={(size_t) n_x_iter,(size_t) n_y_iter};	\
-  P4A_log("grid size : %d %d\n",n_x_iter,n_y_iter);			\
-  P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);		\
-  /*P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name)); */  \	
-  /*P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)*/  \
+  /*P4A_log("grid size : %d %d\n",n_x_iter,n_y_iter);*/			\
+  /*P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);*/
 
 
 /** Dump a CL dim3 descriptor with an introduction message */
@@ -649,7 +652,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
 			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
 			   P4A_block_descriptor,P4A_grid_descriptor,  \
-			   0,NULL,&p4a_event));				\
+			   0,NULL,&p4a_event_execution));				\
   } while (0)
 
 
@@ -675,10 +678,11 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0, P4A_n_iter_1);	\
+    P4A_accel_timer_stop_and_float_measure();				\
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
                           (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   P4A_grid_descriptor,P4A_block_descriptor,  \
-			   0,NULL,&p4a_event));				\
+			   P4A_grid_descriptor,P4A_block_descriptor,	\
+			   0,NULL,&p4a_event_execution));		\
   } while (0)
 
 /** @} */

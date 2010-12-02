@@ -685,7 +685,9 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 #ifdef P4A_ACCEL_CL
 
-cl_event p4a_event;
+double p4a_execution_time = 0.;
+double p4a_copy_time = 0.;
+cl_event p4a_event_execution, p4a_event_copy;
 cl_int p4a_global_error;
 cl_context p4a_context = NULL;
 cl_command_queue p4a_queue = NULL;
@@ -699,27 +701,57 @@ cl_kernel p4a_kernel = NULL;
  @addtogroup P4A_opencl_time_measure
  */
 
+double P4A_accel_copy_timer()
+{
+  cl_ulong start,end;
+  double time;
+
+  if (p4a_event_copy) {
+    clWaitForEvents(1, &p4a_event_copy);
+    
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
+					       CL_PROFILING_COMMAND_END, 
+					       sizeof(cl_ulong), 
+					       &end, 
+					       NULL));
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
+					       CL_PROFILING_COMMAND_START, 
+					       sizeof(cl_ulong), 
+					       &start, 
+					       NULL));
+    // execution_time in nanoseconds	      
+    time = (float)(end - start);
+    // Return the time in second: 
+    //return execution_time*1.0e-9;
+    return time*1.0e-9;
+  }
+  
+}
+
 double P4A_accel_timer_stop_and_float_measure() 
 {
   cl_ulong start,end;
-  float execution_time;
 
-  clWaitForEvents(1, &p4a_event);
-
-  P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-					     CL_PROFILING_COMMAND_END, 
-					     sizeof(cl_ulong), 
-					     &end, 
-					     NULL));
-  P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-					     CL_PROFILING_COMMAND_START, 
-					     sizeof(cl_ulong), 
-					     &start, 
-					     NULL));
-  // execution_time in nanoseconds	      
-  execution_time = (float)(end - start); 
-  // Return the time in second: 
-  return execution_time*1.0e-9;
+  if (p4a_event_execution) {
+    clWaitForEvents(1, &p4a_event_execution);
+    
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_execution, 
+					       CL_PROFILING_COMMAND_END, 
+					       sizeof(cl_ulong), 
+					       &end, 
+					       NULL));
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_execution, 
+					       CL_PROFILING_COMMAND_START, 
+					       sizeof(cl_ulong), 
+					       &start, 
+					       NULL));
+    // execution_time in nanoseconds	      
+    p4a_execution_time += (float)(end - start);
+    // Return the time in second:
+    printf("Copy time : %f\n",p4a_copy_time);
+    return p4a_execution_time*1.0e-9;
+  }
+  return 0;
 }
 
 /** Allocate memory on the hardware accelerator in OpenCL mode.
@@ -776,7 +808,8 @@ void P4A_copy_from_accel(size_t element_size,
 				       host_address,
 				       0,
 				       NULL,
-				       NULL);
+				       &p4a_event_copy);
+  p4a_copy_time += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -847,7 +880,8 @@ void P4A_copy_from_accel_1d(size_t element_size,
 				       cdest,
 				       0,
 				       NULL,
-				       NULL);
+				       &p4a_event_copy);
+  p4a_copy_time += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
