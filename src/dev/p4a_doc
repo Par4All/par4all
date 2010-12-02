@@ -1,0 +1,71 @@
+#! /bin/bash
+
+# Script to deal with Par4All documentation
+
+# What to do:
+make_target=""
+
+script=${0/*\//}
+# verb level 'message to be shown...'
+verb=0
+
+# Display help
+function usage()
+{
+  local status=$1 msg=$2
+  if [[ $msg ]]
+  then
+    echo -e "message: $msg\n" >&2
+  fi
+  if [[ $status == 0 || $status == 1 ]]
+  then
+    echo -e \
+      "$script [options] ...\n" \
+      "Build and install the p4a documentation\n" \
+	"options (displayed in a logical sequential order to apply):\n" \
+	"  -h|--help: display the usual help message\n" \
+	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \
+	"  --clean: remove previously compiled documentation\n" \
+	"  --make: build the documentation\n" \
+	"  --publish: publish the documentation on the WWW server"
+  fi
+  exit ${status:-1}
+}
+
+if [[ -z $P4A_ROOT ]]; then
+    echo "You need to have \$P4A_ROOT defined to the Par4All top-level directory
+"
+    exit
+fi
+
+if [ $# == 0 ]; then
+    usage 1 "You should specify an option"
+fi
+
+# Get options:
+while [ "$1" ] ; do
+  opt=$1
+  shift
+  case $opt in
+      -h|--help) usage 0 ;;
+      -v|--verbose) let verb++ ;;
+      --clean) make_target+="clean ";;
+      --make) make_target+="default "; set -o errexit;;
+      --publish) make_target+="publish ";;
+      *) usage 1 "unexpected option: $opt"
+  esac
+done
+
+if (( $verb >= 1)) ; then
+    # Put shell tracing on:
+    set -vx
+fi
+
+# Subdirectory where there is some documentation to build or publish:
+doc_dirs="doc/organization doc/simple_tools/p4a_article doc/simple_tools/p4a_slides"
+
+for d in $doc_dirs; do
+    ad=$P4A_ROOT/$d
+    echo "Dealing with $ad..."
+    ( cd $ad; make $make_target )
+done
