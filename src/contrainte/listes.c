@@ -49,23 +49,21 @@
  * (elle est toujours verifiee) appartient a toutes les listes de contraintes.
  *
  */
-boolean contrainte_in_liste(c,lc)
-Pcontrainte c;
-Pcontrainte lc;
+boolean contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
 {
-    Pcontrainte c1;
+  Pcontrainte c1;
 
-    assert(!CONTRAINTE_UNDEFINED_P(c));
+  assert(!CONTRAINTE_UNDEFINED_P(c));
 
-    if (CONTRAINTE_NULLE_P(c))
-	return(TRUE);
+  if (CONTRAINTE_NULLE_P(c))
+    return true;
 
-    for (c1=lc; !CONTRAINTE_UNDEFINED_P(c1); c1=c1->succ) {
-	if (vect_equal((c1->vecteur),(c->vecteur))) {
-	    return(TRUE);
-	}
+  for (c1=lc; !CONTRAINTE_UNDEFINED_P(c1); c1=c1->succ) {
+    if (vect_equal((c1->vecteur),(c->vecteur))) {
+	    return true;
     }
-    return(FALSE);
+  }
+  return false;
 }
 
 /* boolean egalite_in_liste(Pcontrainte eg, Pcontrainte leg): test si une
@@ -77,20 +75,18 @@ Pcontrainte lc;
  *
  * Ancien nom: vect_in_liste1()
  */
-boolean egalite_in_liste(v,listev)
-Pcontrainte v;
-Pcontrainte listev;
+boolean egalite_in_liste(Pcontrainte v, Pcontrainte listev)
 {
-    Pcontrainte v1;
+  Pcontrainte v1;
 
-    if (v->vecteur == NULL) return(TRUE);
-    for (v1=listev;v1!=NULL;v1=v1->succ) {
-	if (vect_equal((v1->vecteur),(v->vecteur)) ||
-	    vect_oppos((v1->vecteur),(v->vecteur))) {
-	    return(TRUE);
-	}
+  if (v->vecteur == NULL) return(TRUE);
+  for (v1=listev;v1!=NULL;v1=v1->succ) {
+    if (vect_equal((v1->vecteur),(v->vecteur)) ||
+        vect_oppos((v1->vecteur),(v->vecteur))) {
+	    return true;
     }
-    return(FALSE);
+  }
+  return false;
 }
 
 /* int nb_elems_list(Pcontrainte list): nombre de contraintes se trouvant
@@ -98,13 +94,47 @@ Pcontrainte listev;
  *
  * Ancien nom: nb_elems_eq()
  */
-int nb_elems_list(list)
-Pcontrainte list;
+int nb_elems_list(Pcontrainte list)
 {
 	int i;
 
 	for(i=0;list!=NULL;i++,list=list->succ)
-	    ;
+    ;
 
-	return(i);
+	return i;
+}
+
+/* @return a constraint list without constraint with large coeffs
+ * @param lc list of constraint, which is modified
+ * @param val maximum value allowed for coefficients
+ */
+Pcontrainte contrainte_remove_large_coef(Pcontrainte lc, Value val)
+{
+  linear_assert("value must be positive", value_posz_p(val));
+
+  Pcontrainte first = lc, previous = NULL;
+
+  if (value_zero_p(val)) // nothing to do
+    return lc;
+
+  while (lc!=NULL)
+  {
+    if (vect_larger_coef_p(lc->vecteur, val))
+    {
+      // unlink and free
+      Pcontrainte next = lc->succ;
+      lc->succ = NULL;
+      contrainte_free(lc);
+      if (lc==first) first = next;
+      if (previous) previous->succ = next;
+      // "previous" constraint itself is unchanged
+      lc = next;
+    }
+    else
+    {
+      previous = lc;
+      lc = lc->succ;
+    }
+  }
+  return first;
 }
