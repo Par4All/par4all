@@ -186,6 +186,15 @@ function do_merge_remote_branches() {
     stop_on_error
     local merge_to_prefix_branches=$1
     local merge_origin_branch_prefix=$2
+    # Since we only have integration branches here, we can always select
+    # without conflict the branch we import. If the user committed by
+    # error something into the integration branch, she can anyway
+    # cherry-pick this commit into the branch where real stuff are
+    # developed and reapply this integration later:
+    # Indeed it does not work :-(
+    ###local merge_strategy="--strategy recursive --strategy-option=theirs"
+    local merge_strategy=""
+
     if [[ -z $merge_origin_branch_prefix ]]; then
 	# If we do not have $merge_origin_branch_prefix defined,
 	# we use the standard reference branch:
@@ -205,19 +214,19 @@ function do_merge_remote_branches() {
 	    # Merge into the current branch the branch that buffers the remote
 	    # PIPS git svn gateway that should have been populated by a
 	    # previous do_pull_remote_git:
-	    git merge --log p4a-$i
+	    git merge $merge_strategy --log p4a-$i
 	done
 	git checkout $merge_to_prefix_branches-packages
 	for i in $P4A_PACKAGES; do
 	    # The merge into packages branch:
-	    git merge --log $merge_to_prefix_branches-$i
+	    git merge $merge_strategy --log $merge_to_prefix_branches-$i
 	done
 	# And finish with the own branch:
         create_branch_if_needed $merge_to_prefix_branches-own $merge_origin_branch_prefix-own
 	git checkout $merge_to_prefix_branches
 	# Then merge into main branch the 2 subsidiary branches:
-	git merge --log $merge_to_prefix_branches-packages
-	git merge --log $merge_to_prefix_branches-own
+	git merge $merge_strategy --log $merge_to_prefix_branches-packages
+	git merge $merge_strategy --log $merge_to_prefix_branches-own
     )
 }
 
