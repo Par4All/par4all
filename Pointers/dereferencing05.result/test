@@ -18,18 +18,18 @@ void dereferencing05()
 {
    double *p;
    int i;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
 
    *p++ = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[0]
+//             <    is read   >: p
+//             <    is written>: p p[0]
    *p-- = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[1]
+//             <    is read   >: p
+//             <    is written>: p p[1]
    *++p = 0.;
-//               <must be read   >: p
-//               <must be written>: p p[-1]
+//             <    is read   >: p
+//             <    is written>: p p[-1]
    *--p = 0.;
 }
 
@@ -38,17 +38,17 @@ POINTS TO
 //  {}
 void dereferencing05()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    double *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    *p++ = 0.;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    *p-- = 0.;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    *++p = 0.;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    *--p = 0.;
 }

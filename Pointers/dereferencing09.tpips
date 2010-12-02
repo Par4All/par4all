@@ -1,6 +1,6 @@
 delete dereferencing09
 create dereferencing09 dereferencing09.c
-
+setproperty ABORT_ON_USER_ERROR TRUE
 #echo Select some options to deal with the C Language:
 #echo Parse as C:
 setenv PIPS_CPP="cpp -C"
@@ -32,18 +32,18 @@ echo POINTS TO for "main"
 echo
 display PRINTED_FILE[main]
 
-echo 
-echo Proper effects using points_to
-echo
-module main
-activate PROPER_EFFECTS_WITH_POINTS_TO
+#echo 
+#echo Proper effects using points_to
+#echo
+#module main
+#activate PROPER_EFFECTS_WITH_POINTS_TO
 #setenv PROPER_EFFECTS_DEBUG_LEVEL 8
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE
  
-activate MUST_REGIONS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_REGIONS
-display PRINTED_FILE
+#activate MUST_REGIONS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_REGIONS
+#display PRINTED_FILE
 
 close
 delete dereferencing09
