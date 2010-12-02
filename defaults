@@ -1,8 +1,9 @@
 # $Id$
 # the default validation includes the following subdirectories
+# ??? Scalopes/wcdma_original takes about 4mn on its own on 2010-12-02
+Scalopes
 Benchmarks
 SAC
-Scalopes
 Syntax
 Control
 Preprocessor
