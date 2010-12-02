@@ -180,15 +180,21 @@ SUMMARY.short: # SUMMARY
 	  grep -v '^passed: ' SUMMARY ; \
 	} > $@
 
+# cleanup case duration before diffing
+NOTIME	= perl -p -e 's/^((passed|failed|changed|timeout): .*) [0-9]+$$/$$1/'
+
 .PHONY: archive
 archive: SUMMARY $(DEST.d)
 	cp SUMMARY $(DEST.d)/$(NOW) ; \
 	$(RM) $(SUM.prev) ; \
 	test -L $(SUM.last) && mv $(SUM.last) $(SUM.prev) ; \
 	ln -s $(NOW.d)/$(NOW) $(SUM.last)
-	-test -f $(SUM.prev) -a -f $(SUM.last) && \
-	  diff $(SUM.prev) $(SUM.last) | \
-	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff
+	-test -f $(SUM.prev) -a -f $(SUM.last) && { \
+          $(NOTIME) $(SUM.prev) > /tmp/$$$$.prev ; \
+          $(NOTIME) $(SUM.last) > /tmp/$$$$.last ; \
+	  diff /tmp/$$$$.prev /tmp/$$$$.last | \
+	  egrep -v '^([0-9,]+[acd][0-9,]+|---)$$' > $(SUM.d)/SUMMARY.diff ; \
+	  $(RM) /tmp/$$$$.prev /tmp/$$$$.last ; }
 
 # overall targets
 .PHONY: parallel-clean
