@@ -66,7 +66,7 @@ extern cl_command_queue_properties p4a_queue_properties;
 //extern cl_platform_id p4a_platform_id;  
 /** The OpenCL programm composed of a set of modules
  */
-//extern cl_program p4a_program;  
+extern cl_program p4a_program;  
 /** The module selected in the program
  */
 extern cl_kernel p4a_kernel;  
@@ -82,6 +82,20 @@ extern cl_kernel p4a_kernel;
 #define P4A_test_execution(error)  checkErrorInline(error, __FILE__, __LINE__)
 #define P4A_test_execution_with_message(message) checkErrorMessageInline(message, __FILE__, __LINE__)
 
+
+/** To quit properly.
+ */
+inline void checkToClean(int exitCode)
+{
+  if(p4a_program)clReleaseProgram(p4a_program);
+  if(p4a_kernel)clReleaseKernel(p4a_kernel);  
+  if(p4a_queue)clReleaseCommandQueue(p4a_queue);
+  if(p4a_context)clReleaseContext(p4a_context);
+  exit(exitCode);
+}
+
+
+
 inline void checkErrorInline(cl_int error, 
 			     const char *currentFile, 
 			     const int currentLine)
@@ -89,7 +103,8 @@ inline void checkErrorInline(cl_int error,
     if(CL_SUCCESS != error) {
       fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
 	      currentFile,currentLine,oclErrorString(error));
-      exit(-1);
+      //exit(-1);
+      checkToClean(EXIT_FAILURE);
     }
 #ifdef P4A_DEBUG
     else
@@ -105,7 +120,8 @@ inline void checkErrorMessageInline(const char *message, const char *currentFile
   //cudaError_t error = cudaGetLastError();
   if(CL_SUCCESS != p4a_global_error){
     fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, oclErrorString(p4a_global_error));
-    exit(-1);
+    checkToClean(EXIT_FAILURE);
+    //exit(-1);
   }
 #ifdef P4A_DEBUG
   else {
@@ -137,7 +153,7 @@ inline void checkArgsInline(const char *kernel,...)
 
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
-    const char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
+    char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
     /*
     if (cSourceCL == NULL)
       P4A_log("source du program null\n");
@@ -145,7 +161,7 @@ inline void checkArgsInline(const char *kernel,...)
       P4A_log("%s\n",cSourceCL);
     */
     /*Create and compile the program : 1 for 1 kernel */
-    cl_program p4a_program;
+    //cl_program p4a_program;
     p4a_program=clCreateProgramWithSource(p4a_context,1,
 					  (const char **)&cSourceCL,
 					  &kernelLength,
@@ -155,6 +171,7 @@ inline void checkArgsInline(const char *kernel,...)
     P4A_test_execution_with_message("clBuildProgram");
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
     P4A_test_execution_with_message("clCreateKernel");
+    free(cSourceCL);
   }
   // The argument list is pushed.
   // The __VA_ARGS__ contains to very first one, the number of arguments 
@@ -289,14 +306,15 @@ inline void checkArgsInline(const char *kernel,...)
 
 
 /** Release the hardware accelerator in CL
-
-    Nothing to do
 */
 #ifdef P4A_PROFILING
 #define P4A_release_accel		\
-  if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);
+  do {								\
+    if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);	\
+    checkToClean(EXIT_SUCCESS);					\
+  } while (0)
 #else
-#define P4A_release_accel
+#define P4A_release_accel    checkToClean(EXIT_SUCCESS)
 #endif
     
 

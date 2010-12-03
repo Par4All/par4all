@@ -694,13 +694,13 @@ cl_command_queue_properties p4a_queue_properties = 0;
 bool p4a_time_tag=false;
 double p4a_time_execution = 0.;
 double p4a_time_copy = 0.;
-cl_event p4a_event_execution, p4a_event_copy;
-cl_int p4a_global_error;
+cl_event p4a_event_execution=NULL, p4a_event_copy=NULL;
+cl_int p4a_global_error=0;
 cl_context p4a_context = NULL;
 cl_command_queue p4a_queue = NULL;
 //cl_device_id p4a_device_id = NULL;  
 //cl_platform_id p4a_platform_id = NULL;
-//cl_program p4a_program = NULL;  
+cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
 
 /** Stop a timer on the accelerator and get float time in second
