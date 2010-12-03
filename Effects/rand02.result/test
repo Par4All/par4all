@@ -42,7 +42,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
    // MOTIF 
    u = 0;
 //             <may be read   >: A B Sigma2 ix iy nx pt_in[*][*].im 
-//                               pt_in[*][*].re u u v 
+//                               pt_in[*][*].re u v 
 //                               _RANDOM_EFFECTS:GEN_SEED
 //             <may be written>: A B ix pt_out[*][*].im 
 //                               pt_out[*][*].re u v 
@@ -51,7 +51,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //             <    is written>: iy
    for(iy = 0; iy <= ny-1; iy += 1)
 //             <may be read   >: A B Sigma2 ix iy pt_in[*][*].im 
-//                               pt_in[*][*].re u u v 
+//                               pt_in[*][*].re u v 
 //                               _RANDOM_EFFECTS:GEN_SEED
 //             <may be written>: A B pt_out[*][*].im pt_out[*][*].re u
 //                               v _RANDOM_EFFECTS:GEN_SEED
@@ -60,7 +60,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
       for(ix = 0; ix <= nx-1; ix += 1) {
 //             <may be read   >: nx ny _RANDOM_EFFECTS:GEN_SEED
 //             <may be written>: u _RANDOM_EFFECTS:GEN_SEED
-//             <    is read   >: u u
+//             <    is read   >: u
 
          while (u==0||u>1)
 //             <    is read   >: nx ny _RANDOM_EFFECTS:GEN_SEED
@@ -147,7 +147,6 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <pt_out[PHI1][PHI2].re-W-MAY-{0<=PHI1, PHI1+1<=ny, 0<=PHI2,
 //    PHI2+1<=nx}>
 //  <u-R-EXACT-{}>
-//  <u-R-EXACT-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
@@ -175,7 +174,6 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  <pt_out[PHI1][PHI2].re-W-MAY-{PHI1==iy, 0<=PHI2, PHI2+1<=nx,
 //    0<=iy, iy+1<=ny}>
 //  <u-R-EXACT-{}>
-//  <u-R-EXACT-{}>
 //  <u-W-EXACT-{}>
 //  <v-R-EXACT-{}>
 //  <v-W-EXACT-{}>
@@ -186,7 +184,6 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 
 //  <nx-R-MAY-{}>
 //  <ny-R-MAY-{}>
-//  <u-R-EXACT-{}>
 //  <u-R-EXACT-{}>
 //  <u-W-MAY-{}>
 //  <_RANDOM_EFFECTS:GEN_SEED-R-MAY-{}>
