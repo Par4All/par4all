@@ -1182,9 +1182,8 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			   and the system must be feasible.
 			   We should also take care of linearization here.
 			*/
-
-			if(effect_entity(eff_orig) == effect_entity(eff_real)
-			   &&  nb_phi_orig >= nb_phi_real)
+			bool exact_p;
+			if(path_preceding_p(eff_real, eff_orig, transformer_undefined, false, &exact_p))
 			  {
 			    effect eff_formal = (*effect_dup_func)(eff_orig);
 			    region_sc_append_and_normalize(eff_formal, region_system(eff_real), 1);
@@ -1196,6 +1195,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			      }
 			    else
 			      {
+				/* I guess we could reuse convex_cell_reference_with_address_of_cell_reference_translation */
 				/* At least part of the original effect corresponds to the actual argument :
 				   we need to translate it
 				*/
@@ -1349,7 +1349,8 @@ list c_convex_effects_on_actual_parameter_forward_translation
 	       and the system must be feasible.
 	    */
 
-	    if(effect_entity(eff_orig) == effect_entity(eff_real)
+	    bool exact_p;
+	    if(path_preceding_p(eff_real, eff_orig, transformer_undefined, true, &exact_p)
 	       &&  nb_phi_orig >= nb_phi_real)
 	      {
 		effect eff_orig_dup = (*effect_dup_func)(eff_orig);

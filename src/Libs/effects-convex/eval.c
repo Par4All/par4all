@@ -46,6 +46,8 @@
 
 /*
   @param r1 and r2 are two path references
+  @param strict_p is true if the path length of r1 must be strictly inferior
+         to the path length of r2
   @param exact_p is a pointer towards a boolean, which is set to false
          is the result is an over-approximation, true if it's an exact answer.
   @return true if r1 path may be a predecessor of r2 path
@@ -56,6 +58,7 @@
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 				       reference r2, descriptor d2,
 				       transformer current_precondition,
+				       bool strict_p,
 				       bool * exact_p)
 {
   bool res = true;
@@ -72,7 +75,8 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 
   *exact_p = true;
   if (same_entity_p(e1, e2)
-      && (r1_path_length < r2_path_length))
+      && ((r1_path_length < r2_path_length)
+	  || (!strict_p && r1_path_length == r2_path_length)))
     {
       /* same entity and the path length of r1 is shorter than the
 	 path length of r2.

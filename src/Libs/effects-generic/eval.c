@@ -109,7 +109,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 				      transformer current_precondition,
 				      bool (*cell_reference_preceding_p_func)(reference, descriptor,
 									      reference, descriptor ,
-									      transformer, bool * ),
+									      transformer, bool, bool * ),
 				      void (*cell_reference_with_address_of_cell_reference_translation_func)(reference, descriptor,
 													    reference, descriptor,
 													    int,
@@ -195,7 +195,8 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	         their path must be a predecessor of the input_ref
 	         path.*/
 	      if ( (source_path_length >= current_max_path_length)
-		   && (*cell_reference_preceding_p_func)(source_ref, source_desc, input_ref, input_desc, current_precondition, &exact_prec))
+		   && (*cell_reference_preceding_p_func)(source_ref, source_desc, input_ref, input_desc, current_precondition, true,
+							 &exact_prec))
 		{
 		  pips_debug(8, "exact_prec is %s\n", exact_prec? "true":"false");
 		  if (source_path_length > current_max_path_length )

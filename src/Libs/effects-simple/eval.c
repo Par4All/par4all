@@ -46,6 +46,8 @@
 
 /*
   @param r1 and r2 are two path references
+  @param strict_p is true if the path length of r1 must be strictly inferior
+         to the path length of r2
   @param exact_p is a pointer towards a boolean, which is set to false
          is the result is an over-approximation, true if it's an exact answer.
   @return true if r1 path may be a predecessor of r2 path
@@ -56,6 +58,7 @@
 bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((unused)) d1,
 			     reference r2, descriptor __attribute__ ((unused)) d2,
 			     transformer __attribute__ ((unused)) current_precondition,
+		             bool strict_p,
 			     bool * exact_p)
 {
   bool res = true;
@@ -72,7 +75,8 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
 
   *exact_p = true;
   if (same_entity_p(e1, e2)
-      && (r1_path_length < r2_path_length))
+      && ((r1_path_length < r2_path_length)
+	  || (!strict_p && r1_path_length == r2_path_length)))
     {
       /* same entity and the path length of r1 is shorter than the path length of r2.
          we now have to check that each common index matches
@@ -104,12 +108,14 @@ bool simple_cell_reference_preceding_p(reference r1, descriptor __attribute__ ((
       *exact_p = true;
     }
 
-  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n", res ? "":"not", *exact_p ? "":"not");
+  pips_debug(8, "end : r1 is %s a predecessor of r2 (%s exact)\n",
+	     res ? "":"not", *exact_p ? "":"not");
   return res;
 }
 
 bool path_preceding_p(effect eff1, effect eff2,
 		      transformer current_precondition,
+		      bool strict_p,
 		      bool * exact_p)
 {
   reference r1 = effect_any_reference(eff1);
@@ -117,10 +123,13 @@ bool path_preceding_p(effect eff1, effect eff2,
   reference r2 = effect_any_reference(eff2);
   descriptor d2 = effect_descriptor(eff2);
 
-  return simple_cell_reference_preceding_p(r1, d1, r2, d2, current_precondition, exact_p);
+  return simple_cell_reference_preceding_p(r1, d1, r2, d2, current_precondition,
+					   strict_p, exact_p);
 }
 
-void simple_reference_to_simple_reference_conversion(reference ref, reference * output_ref, descriptor * output_desc)
+void simple_reference_to_simple_reference_conversion(reference ref,
+						     reference * output_ref,
+						     descriptor * output_desc)
 {
   *output_ref = ref;
   *output_desc = descriptor_undefined;
@@ -158,7 +167,9 @@ void simple_reference_to_simple_reference_conversion(reference ref, reference * 
   points_to_filter_effects() to reduce the number of anywhere
   locations generated.
 */
-list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d, list ptl, bool *exact_p, transformer __attribute__ ((unused)) t)
+list eval_simple_cell_with_points_to(cell c, descriptor __attribute__ ((unused)) d,
+				     list ptl, bool *exact_p,
+				     transformer __attribute__ ((unused)) t)
 {
 
   return generic_eval_cell_with_points_to(c, descriptor_undefined, ptl, exact_p,
