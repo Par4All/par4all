@@ -415,7 +415,7 @@ def main():
             add_debug_flags = options.debug,
             add_optimization_flags = not options.no_fast,
             no_default_flags = options.no_default_flags,
-            build = (len options.output_file)
+            build = (len (options.output_file))
           )
 
         # TODO: override cpp exe used by pyps/pips with builder.cpp? Not

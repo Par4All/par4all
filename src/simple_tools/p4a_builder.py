@@ -230,7 +230,8 @@ class p4a_builder:
         self.fortran = fortran
 
         self.m64 = m64
-        if cuda:
+        # update cuda flags only if somathing will be built at the end
+        if cuda and (self.builder == True):
             self.cudafy_flags()
 
     def cu2cpp(self, file, output_file):
