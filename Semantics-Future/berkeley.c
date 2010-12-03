@@ -23,7 +23,7 @@ void checking_error(void) {
 	exit(2);
 }
 
-#if USE_ASSERT == 1
+#if USE_ASSERT == 0
 #define assert(e)
 #else
 #define assert(e) {if (!(e)) assert_error();}
