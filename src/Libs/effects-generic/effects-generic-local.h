@@ -88,6 +88,7 @@ static void db_put_##name(char *m, list l) \
 #define DB_GETPUT_LS(name, NAME) DB_GET_LS(name, NAME) DB_PUT_LS(name, NAME)
 #define DB_GETNOPUT_LS(name, NAME) DB_GET_LS(name, NAME)DB_NOPUT_LS(name)
 
+typedef enum {with_no_pointer_info, with_points_to, with_pointer_values} pointer_info_val;
 
 /* end of effects-generic-local.h
  */

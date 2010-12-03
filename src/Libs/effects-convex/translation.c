@@ -2454,7 +2454,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
            using a value_of memory access path reference
 
     This function is used when we want to translate a cell or an effect on a[i][j][k] as input_ref,
-    knowing that a[i] = &value_of_ref. In this case the list of remaning_input_indices is [j][k].
+    knowing that a[i] = value_of_ref. In this case the list of remaning_input_indices is [j][k].
 
     @param input_ref is the input convex cell reference
     @param input_desc is the descriptor describing the input reference

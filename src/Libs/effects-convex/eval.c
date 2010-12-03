@@ -245,3 +245,48 @@ list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact
 }
 
 
+list convex_effect_to_constant_path_effects_with_points_to(effect eff)
+{
+  list le = NIL;
+  bool exact_p;
+  reference ref = effect_any_reference(eff);
+
+  if (effect_reference_dereferencing_p(ref, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+      bool exact_p = false;
+      transformer context;
+      if (effects_private_current_context_empty_p())
+	context = transformer_undefined;
+      else {
+	context = effects_private_current_context_head();
+      }
+
+      list l_eval = eval_convex_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
+						    points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
+						    &exact_p, context);
+      if (ENDP(l_eval))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+	  /* We have not found any equivalent constant path : it may point anywhere */
+	  /* We should maybe contract these effects later. Is it done by the callers ? */
+	  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	}
+      else
+	{
+	  /* change the resulting effects action to the current effect action */
+	  if (effect_read_p(eff))
+	    effects_to_read_effects(l_eval);
+	  le = gen_nconc(l_eval,le);
+	}
+    }
+  else
+    le = CONS(EFFECT, copy_effect(eff), le);
+ return le;
+
+}
+
+list convex_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
+{
+  pips_internal_error("not yet implemented\n");
+}

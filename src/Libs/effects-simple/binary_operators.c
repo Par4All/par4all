@@ -104,6 +104,26 @@ EffectsMayUnion(list l1, list l2,
  *            the output list of effects are freed.
  */
 list 
+ProperEffectsMustUnion(list l1, list l2,
+		      boolean (*union_combinable_p)(effect, effect)) 
+{
+    list lr;
+
+    lr = list_of_effects_generic_binary_op(l1, l2,
+					   union_combinable_p,
+					   effects_must_union,
+					   effect_to_list,
+					   effect_to_list);
+    return(lr);
+}
+
+/* list EffectsMustUnion(list l1, list l2, union_combinable_p)
+ * input    : two lists of effects
+ * output   : a list of effects, must union of the two initial lists
+ * modifies : l1 and l2 and their effects. Effects that are not reused in
+ *            the output list of effects are freed.
+ */
+list 
 EffectsMustUnion(list l1, list l2,
 		      boolean (*union_combinable_p)(effect, effect)) 
 {

@@ -54,18 +54,6 @@
 
 /********************************************************************* MISC */
 
-static bool constant_paths_p = FALSE;
-
-void set_constant_paths_p(bool b)
-{
-  constant_paths_p = b;
-}
-
-bool get_constant_paths_p()
-{
-  return constant_paths_p;
-}
-
 
 /* Statement stack to walk on control flow representation */
 DEFINE_GLOBAL_STACK(effects_private_current_stmt, statement)
@@ -1447,20 +1435,6 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
 /************ CONVERSION TO CONSTANT PATH EFFECTS ***********/
 
-static bool use_points_to = false;
-
-void set_use_points_to(bool pt_p)
-{
-  use_points_to = pt_p;
-}
-void reset_use_points_to()
-{
-  use_points_to = false;
-}
-bool get_use_points_to()
-{
-  return use_points_to;
-}
 
 static bool FILE_star_effect_reference(reference ref)
 {
@@ -1516,132 +1490,30 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 
   pips_debug_effects(8, "input effects : \n", l_pointer_eff);
 
-  if (get_use_points_to())
+  FOREACH(EFFECT, eff, l_pointer_eff)
     {
-      FOREACH(EFFECT, eff, l_pointer_eff)
+      if(store_effect_p(eff))
 	{
-	  if(store_effect_p(eff))
+	  bool exact_p;
+	  reference ref = effect_any_reference(eff);
+
+	  if (io_effect_p(eff)
+	      || malloc_effect_p(eff)
+	      || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+		  && std_file_effect_p(eff)))
 	    {
-	      bool exact_p;
-	      reference ref = effect_any_reference(eff);
-
-	      if (io_effect_p(eff)
-		  || malloc_effect_p(eff)
-		  || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
-		      && std_file_effect_p(eff)))
-		{
-		  le = CONS(EFFECT, copy_effect(eff), le);
-		}
-	      else
-		{
-		  if (effect_reference_dereferencing_p(ref, &exact_p))
-		    {
-		      pips_debug(8, "dereferencing case \n");
-		      bool exact_p = false;
-		      transformer context;
-		      if (effects_private_current_context_empty_p())
-			context = transformer_undefined;
-		      else {
-			context = effects_private_current_context_head();
-		      }
-
-		      list l_eval = (*eval_cell_with_points_to_func)(effect_cell(eff), effect_descriptor(eff),
-								     points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-								     &exact_p, context);
-		      if (ENDP(l_eval))
-			{
-			  pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
-			  /* We have not found any equivalent constant path : it may point anywhere */
-			  /* We should maybe contract these effects later. Is it done by the callers ? */
-			  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
-			}
-		      else
-			{
-			  /* change the resulting effects action to the current effect action */
-			  if (effect_read_p(eff))
-			    effects_to_read_effects(l_eval);
-			  le = gen_nconc(l_eval,le);
-			}
-		    }
-		  else
-		    le = CONS(EFFECT, copy_effect(eff), le);
-		}
-	    }
-	}
-
-      le = gen_nreverse(le);
-
-    }
-  else
-    {
-      bool read_dereferencing_p = false;
-      bool write_dereferencing_p = false;
-      list l = l_pointer_eff, lkeep = NIL;
-
-      while (!ENDP(l))
-	{
-	  effect eff = EFFECT(CAR(l));
-	  if(store_effect_p(eff))
-	    {
-	      reference ref = effect_any_reference(eff);
-	      bool exact_p;
-
-	      if (io_effect_p(eff)|| malloc_effect_p(eff)
-		  || (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff))
-		  || (!get_bool_property("ALIASING_ACROSS_IO_STREAMS") && FILE_star_effect_reference(ref)))
-		{
-		  lkeep = CONS(EFFECT, eff, lkeep);
-		}
-	      else
-		if (!(read_dereferencing_p && write_dereferencing_p)
-		    && effect_reference_dereferencing_p(ref, &exact_p))
-		  {
-		    if (effect_read_p(eff)) read_dereferencing_p = true;
-		    else write_dereferencing_p = true;
-		  }
-	    }
-	  POP(l);
-	}
-
-      lkeep = gen_nreverse(lkeep);
-
-      if (write_dereferencing_p)
-	le = CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), le);
-      if (read_dereferencing_p)
-	le = CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), le);
-
-      if (!write_dereferencing_p)
-	if (!read_dereferencing_p)
-	  {
-	    le = effects_dup(l_pointer_eff);
-	  }
-	else
-	  {
-	    list l_write = effects_write_effects(l_pointer_eff);
-	    list lkeep_read = effects_read_effects(lkeep);
-	    le = gen_nconc(le, effects_dup(lkeep_read));
-	    le = gen_nconc(le, effects_dup(l_write));
-	    gen_free_list(l_write);
-	    gen_free_list(lkeep_read);
-	  }
-      else
-	{
-	  if (!read_dereferencing_p)
-	    {
-	      list l_read = effects_read_effects(l_pointer_eff);
-	      list lkeep_write = effects_write_effects(lkeep);
-	      le = gen_nconc(le, effects_dup(lkeep_write));
-	      le = gen_nconc(le, effects_dup(l_read));
-	      gen_free_list(l_read);
-	      gen_free_list(lkeep_write);
+	      le = CONS(EFFECT, (*effect_dup_func)(eff), le);
 	    }
 	  else
 	    {
-	      le = gen_nconc(le, effects_dup(lkeep));
+	      list l_const = (*effect_to_constant_path_effects_func)(eff);
+	      le = (*effects_union_op)(l_const, le, effects_same_action_p);
 	    }
 	}
-      gen_free_list(lkeep);
-
+      else
+	{
+	  le = CONS(EFFECT, (*effect_dup_func)(eff), le);
+	}
     }
 
   pips_debug_effects(8, "ouput effects : \n", le);
@@ -1649,5 +1521,22 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
   return le;
 }
 
+
+list effect_to_constant_path_effects_with_no_pointer_information(effect eff)
+{
+  list le = NIL;
+  bool exact_p;
+  reference ref = effect_any_reference(eff);
+
+  if (effect_reference_dereferencing_p(ref, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+      le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+    }
+  else
+    le = CONS(EFFECT, (*effect_dup_func)(eff), le);
+
+  return le;
+}
 
 

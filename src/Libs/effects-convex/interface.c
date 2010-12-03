@@ -60,10 +60,12 @@
 
 /******************************************************* CONVEX R/W REGIONS */
 
-bool 
+bool
 summary_pointer_regions(char *module_name)
 {
     bool res;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_rw_pointer_effects();
     res = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -74,10 +76,15 @@ summary_pointer_regions(char *module_name)
 /* bool summary_regions(char *module_name): computes the global
  * regions of a module : global regions only use formal or common variables.
  */
-bool 
+bool
 summary_regions(char *module_name)
 {
     bool res;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_rw_effects();
     res = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -85,35 +92,42 @@ summary_regions(char *module_name)
 }
 
 
-bool 
+bool
 may_pointer_regions(char *module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", FALSE);
-  
+
+  set_constant_paths_p(false);
+  set_pointer_info_kind(with_no_pointer_info);
   set_methods_for_convex_rw_pointer_effects();
   res1 = proper_effects_engine(module_name);
   generic_effects_reset_all_methods();
-  
+
   set_methods_for_convex_rw_pointer_effects();
   res2 = rw_effects_engine(module_name);
   generic_effects_reset_all_methods();
   return res1 && res2;
 }
 
-/* bool may_regions(char *module_name) 
+/* bool may_regions(char *module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool 
+bool
 may_regions(char *module_name)
 {
     bool res1, res2;
 
     set_bool_property("MUST_REGIONS", FALSE);
 
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_rw_effects();
 
     res1 = proper_effects_engine(module_name);
@@ -123,93 +137,109 @@ may_regions(char *module_name)
     res2 = rw_effects_engine(module_name);
 
     generic_effects_reset_all_methods();
-   
+
     return res1 && res2;
 }
 
 
-bool 
+bool
 must_pointer_regions(char *module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", TRUE);
-  
+
+  set_constant_paths_p(false);
+  set_pointer_info_kind(with_no_pointer_info);
   set_methods_for_convex_rw_pointer_effects();
   res1 = proper_effects_engine(module_name);
   generic_effects_reset_all_methods();
-  
+
   set_methods_for_convex_rw_pointer_effects();
   res2 = rw_effects_engine(module_name);
- 
+
   generic_effects_reset_all_methods();
   return res1 && res2;
 }
 
-bool 
+bool
 must_pointer_regions_with_points_to(char *module_name)
 {
   bool res1, res2;
   set_bool_property("MUST_REGIONS", TRUE);
-  
+
+  set_constant_paths_p(false);
+  set_pointer_info_kind(with_points_to);
   set_methods_for_convex_rw_pointer_effects();
   res1 = proper_effects_engine(module_name);
   generic_effects_reset_all_methods();
-  
+
+  set_constant_paths_p(false);
+  set_pointer_info_kind(with_points_to);
   set_methods_for_convex_rw_pointer_effects();
   res2 = rw_effects_engine(module_name);
- 
+
   generic_effects_reset_all_methods();
   return res1 && res2;
 }
 
 
-/* bool must_regions(char *module_name) 
+/* bool must_regions(char *module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool 
+bool
 must_regions(char *module_name)
 {
     bool res1, res2;
 
     set_bool_property("MUST_REGIONS", TRUE);
 
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_rw_effects();
     res1 = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
 
-    set_methods_for_convex_rw_effects();
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
+     set_methods_for_convex_rw_effects();
     res2 = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
 
     return res1 && res2;
 }
 
-/* bool must_regions(char *module_name) 
+/* bool must_regions(char *module_name)
  * input    : the name of the current module
  * output   : nothing.
  * modifies : computes the local regions of a module.
  * comment  : local regions can contain local variables.
  */
-bool 
+bool
 must_regions_with_points_to(char *module_name)
 {
     bool res1, res2;
 
     set_bool_property("MUST_REGIONS", TRUE);
 
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_points_to);
     set_methods_for_convex_rw_effects();
-    set_use_points_to(true);
     res1 = proper_effects_engine(module_name);
-    reset_use_points_to();
     generic_effects_reset_all_methods();
 
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_points_to);
     set_methods_for_convex_rw_effects();
-    set_use_points_to(true);
     res2 = rw_effects_engine(module_name);
-    reset_use_points_to();
     generic_effects_reset_all_methods();
 
     return res1 && res2;
@@ -218,33 +248,43 @@ must_regions_with_points_to(char *module_name)
 /******************************************************** CONVEX IN REGIONS */
 
 
-/* bool in_summary_regions(char *module_name): 
+/* bool in_summary_regions(char *module_name):
  * input    : the name of the current module.
  * output   : nothing !
  * modifies : the database.
  * comment  : computes the summary in regions of the current module, using the
- *            regions of its embedding statement.	
+ *            regions of its embedding statement.
  */
-bool 
+bool
 in_summary_regions(char *module_name)
 {
     bool res;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
     res =  summary_in_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return res;
 }
 
-/* bool in_regions(char *module_name): 
+/* bool in_regions(char *module_name):
  * input    : the name of the current module.
  * output   : nothing !
  * modifies : the database.
- * comment  : computes the in regions of the current module.	
+ * comment  : computes the in regions of the current module.
  */
-bool 
+bool
 in_regions(char *module_name)
 {
     bool res;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
     res = in_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -259,6 +299,11 @@ out_summary_regions(char * module_name)
 {
     bool res;
 
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
     init_convex_rw_prettyprint(module_name); // for debugging
     res =  summary_out_effects_engine(module_name);
@@ -271,6 +316,11 @@ bool
 out_regions(char *module_name)
 {
     bool res;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_convex_in_out_effects();
     res = out_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -285,10 +335,10 @@ out_regions(char *module_name)
 #define is_copyinout	(3)
 #define is_private	(4)
 
-static bool 
+static bool
 print_code_any_regions(
     string module_name,
-    int what_tag, 
+    int what_tag,
     bool is_user_view,
     bool is_attached,
     string resource_name,
@@ -299,7 +349,7 @@ print_code_any_regions(
     set_methods_for_convex_effects();
     switch(what_tag)
     {
-    case is_rw: 
+    case is_rw:
 	init_convex_rw_prettyprint(module_name);
 	break;
     case is_inout:
@@ -322,91 +372,91 @@ print_code_any_regions(
 bool
 print_code_proper_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_PROPER_POINTER_REGIONS, string_undefined, ".preg");
 }
 
 bool
 print_code_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
 print_code_inv_pointer_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_INV_POINTER_REGIONS, DBR_SUMMARY_POINTER_REGIONS, ".reg");
 }
 
 bool
 print_code_proper_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_PROPER_REGIONS, string_undefined, ".preg");
 }
 
 bool
 print_source_proper_regions(char* module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
 			  DBR_PROPER_REGIONS, string_undefined, ".upreg");
 }
 
 bool
 print_code_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
 print_source_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
 			  DBR_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
 print_code_inv_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, FALSE, FALSE,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".reg");
 }
 
 bool
 print_source_inv_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_rw, TRUE, FALSE, 
+    return print_code_any_regions(module_name, is_rw, TRUE, FALSE,
 			  DBR_INV_REGIONS, DBR_SUMMARY_REGIONS, ".ureg");
 }
 
 bool
 print_code_in_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_inout, FALSE, FALSE,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".inreg");
 }
 
 bool
 print_source_in_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, TRUE, FALSE, 
+    return print_code_any_regions(module_name, is_inout, TRUE, FALSE,
 			  DBR_IN_REGIONS, DBR_IN_SUMMARY_REGIONS, ".uinreg");
 }
 
 bool
 print_code_out_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, FALSE, FALSE, 
+    return print_code_any_regions(module_name, is_inout, FALSE, FALSE,
 			  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".outreg");
 }
 
 bool
 print_source_out_regions(string module_name)
 {
-    return print_code_any_regions(module_name, is_inout, TRUE, FALSE, 
+    return print_code_any_regions(module_name, is_inout, TRUE, FALSE,
 		  DBR_OUT_REGIONS, DBR_OUT_SUMMARY_REGIONS, ".uoutreg");
 }
 
@@ -417,9 +467,9 @@ print_source_out_regions(string module_name)
  * input    : an expression and the current context
  * output   : the correpsonding list of regions.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 regions_of_expression(expression e, transformer context)
 {
     list le;
@@ -433,13 +483,13 @@ regions_of_expression(expression e, transformer context)
  * input    : an expression and the current context
  * output   : the correpsonding list of effects.
  * modifies : nothing.
- * comment  :	
+ * comment  :
  */
-list 
+list
 proper_regions_of_expression(expression e, transformer context)
 {
     list le;
-    bool context_stack_defined_p = 
+    bool context_stack_defined_p =
 	effects_private_current_context_stack_initialized_p();
 
     if (!context_stack_defined_p)
@@ -448,9 +498,9 @@ proper_regions_of_expression(expression e, transformer context)
 	make_effects_private_current_context_stack();
     }
     effects_private_current_context_push(context);
-    
+
     le = generic_proper_effects_of_expression(e);
-    
+
     effects_private_current_context_pop();
 
     if (!context_stack_defined_p)
@@ -461,7 +511,7 @@ proper_regions_of_expression(expression e, transformer context)
     return(le);
 }
 
-list 
+list
 proper_regions_of_expressions(list l_exp, transformer context)
 {
     list le = NIL;

@@ -48,6 +48,31 @@
 
 #include "effects-generic.h"
 
+/* All this has to be changed into a context structure */
+
+
+static pointer_info_val pointer_info_kind = with_no_pointer_info;
+
+void set_pointer_info_kind(pointer_info_val val)
+{
+  pointer_info_kind = val;
+}
+pointer_info_val get_pointer_info_kind()
+{
+  return pointer_info_kind;
+}
+
+static bool constant_paths_p = FALSE;
+
+void set_constant_paths_p(bool b)
+{
+  constant_paths_p = b;
+}
+
+bool get_constant_paths_p()
+{
+  return constant_paths_p;
+}
 
 
 /* GENERIC FUNCTIONS on lists of effects to be instanciated for
@@ -97,8 +122,9 @@ list (*effects_transformer_inverse_composition_op)(list, transformer);
 /* composition with preconditions */
 list (*effects_precondition_composition_op)(list,transformer);
 
-/* evaluation with alias information */
+/* evaluation with pointer information */
 list (*eval_cell_with_points_to_func)(cell, descriptor, list, bool *, transformer);
+list (*effect_to_constant_path_effects_func)(effect);
 
 /* union over a range */
 list (*effects_descriptors_variable_change_func)(list, entity, entity);
@@ -111,11 +137,11 @@ list (*effects_union_over_range_op)(list, entity, range, descriptor);
 descriptor (*vector_to_descriptor_func)(Pvecteur);
 
 /* interprocedural translation */
-void (*effects_translation_init_func)(entity /* callee */, 
+void (*effects_translation_init_func)(entity /* callee */,
 				      list /* real_args */,
 				      bool /* backward_p */);
 void (*effects_translation_end_func)();
-void (*effect_descriptor_interprocedural_translation_op)(effect); 
+void (*effect_descriptor_interprocedural_translation_op)(effect);
 
 list (*fortran_effects_backward_translation_op)(entity, list, list, transformer);
 list (*fortran_effects_forward_translation_op)(entity /* callee */, list /* args */,
@@ -123,15 +149,15 @@ list (*fortran_effects_forward_translation_op)(entity /* callee */, list /* args
 				       transformer /* context */);
 
 list (*c_effects_on_formal_parameter_backward_translation_func)
-(list /* of effects */, 
- expression /* args */, 
+(list /* of effects */,
+ expression /* args */,
  transformer /* context */);
 
 list (*c_effects_on_actual_parameter_forward_translation_func)
-(entity /* callee */ , 
- expression /* real arg */, 
- entity /* formal entity */, 
- list /* effects */, 
+(entity /* callee */ ,
+ expression /* real arg */,
+ entity /* formal entity */,
+ list /* effects */,
  transformer /* context */);
 
 /* local to global name space translation */
@@ -212,7 +238,7 @@ typedef transformer (*transformer_function)();
 typedef statement_effects (*statement_effects_function)();
 typedef text (*text_function)();
 
-void 
+void
 generic_effects_reset_all_methods()
 {
     effects_computation_init_func = (void_function) UNDEF;
@@ -233,7 +259,7 @@ generic_effects_reset_all_methods()
     effects_descriptors_variable_change_func = (list_function) UNDEF;
 
     eval_cell_with_points_to_func = (list_function) UNDEF;
-
+    effect_to_constant_path_effects_func = (list_function) UNDEF;
 
     effects_loop_normalize_func = (list (*)(list, entity, range, entity* , descriptor ,bool)) UNDEF;
     effects_union_over_range_op = (list (*)(list, entity, range, descriptor)) UNDEF;
