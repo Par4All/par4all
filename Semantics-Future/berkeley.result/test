@@ -33,15 +33,16 @@ void run(void)
          checking_error();
 
 //  T(e,i,ne,uo) {e+i==i#init, e#init==0, ne==0, ne#init==0, uo==0,
-//    uo#init==0, e<=1, 1<=i#init}
+//    uo#init==0, e<=1, 1<=i, 1<=i#init}
 
       while (1)
 
 //  T(e,i,ne,uo) {e#init+i#init+ne#init+uo#init==e+i, ne==0, uo==0,
-//    e<=1, 1<=i#init}
+//    e#init+i#init+ne#init+uo#init<=i+1,
+//    2<=e#init+i#init+ne#init+uo#init, 1<=i#init}
 
 
-         if (flip())
+         if (flip()) {
 
 //  T(e,i,ne,uo) {e==1, e#init+i#init+ne#init+uo#init==i+1, ne==0,
 //    uo==0, 2<=e#init+i#init+ne#init+uo#init, 1<=i#init}
@@ -81,6 +82,15 @@ void run(void)
 //  T() {}
 
                   ;
+
+//  T() {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
+         }
          else if (flip()) {
 
 //  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==i#init-1,
@@ -122,10 +132,18 @@ void run(void)
 
                   ;
 
-//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i+uo==i#init+uo#init,
-//    1<=i, uo#init<=uo}
+//  T() {e==0, 1<=i, 1<=ne+uo}
 
-            while (flip())
+            if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i+uo==i#init+uo#init,
+//    1<=i, 1<=ne+uo, uo#init<=uo}
+
+            while (flip()) {
 
 //  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==i#init-1,
 //    uo==uo#init+1, 1<=i}
@@ -166,33 +184,43 @@ void run(void)
 
                      ;
 
+//  T() {e==0, 1<=i, 1<=ne+uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+                  assert_error();
+            }
+
 //  T(e,i,ne,uo) {e#init+i#init+ne#init+uo#init==e+i, ne==0, uo==0,
-//    e<=1}
+//    e<=1, 2<=e+i, i#init+1<=e+i}
 
             if (flip())
 
 //  T(e,i,ne,uo) {e==e#init+1, i#init+ne#init+uo#init==i+1, ne==0,
-//    uo==0, e<=1, 1<=ne#init+uo#init}
+//    uo==0, e<=1, 3<=e+i#init+ne#init+uo#init, 2<=e+ne#init+uo#init,
+//    1<=ne#init+uo#init}
 
                if (ne+uo>=1) {
 
-//  T(i) {i#init+ne+uo==i+1, 1<=ne+uo}
+//  T(i) {i#init+ne+uo==i+1, 2<=e+i#init+ne+uo, 1<=e+ne+uo, 1<=ne+uo}
 
                   i += ne+uo-1;
 
-//  T(e) {e==e#init+1, 1<=ne+uo}
+//  T(e) {e==e#init+1, 2<=e+i, 2<=e+ne+uo, 1<=ne+uo}
 
                   e++;
 
-//  T(ne) {ne==0, 1<=ne#init+uo}
+//  T(ne) {ne==0, 2<=e+i, 2<=e+ne#init+uo, 1<=ne#init+uo}
 
                   ne = 0;
 
-//  T(uo) {ne==0, uo==0}
+//  T(uo) {ne==0, uo==0, 2<=e+i}
 
                   uo = 0;
 
-//  T() {ne==0, uo==0, e<=1}
+//  T() {ne==0, uo==0, e<=1, 2<=e+i}
 
                   if (e>=2||uo+ne>=1&&e>=1)
 
@@ -202,32 +230,33 @@ void run(void)
                }
                else
 
-//  T() {ne+uo<=0}
+//  T() {2<=e+i+ne+uo, 1<=e+ne+uo, ne+uo<=0}
 
                   while (1)
 
-//  T() {ne+uo<=0}
+//  T() {2<=e+i+ne+uo, 1<=e+ne+uo, ne+uo<=0}
 
                      ;
             else if (i>=1) {
 
-//  T(i) {e+i#init+ne+uo==i+1, 1<=i#init}
+//  T(i) {e+i#init+ne+uo==i+1, 2<=e+i#init+ne+uo, 1<=e+ne+uo,
+//    1<=i#init}
 
                i += e+ne+uo-1;
 
-//  T(e) {e==1, e#init+ne+uo<=i}
+//  T(e) {e==1, e#init+ne+uo<=i, 1<=e#init+ne+uo, 1<=i}
 
                e = 1;
 
-//  T(ne) {e==1, ne==0}
+//  T(ne) {e==1, ne==0, 1<=i}
 
                ne = 0;
 
-//  T(uo) {e==1, ne==0, uo==0}
+//  T(uo) {e==1, ne==0, uo==0, 1<=i}
 
                uo = 0;
 
-//  T() {e==1, ne==0, uo==0}
+//  T() {e==1, ne==0, uo==0, 1<=i}
 
                if (e>=2||uo+ne>=1&&e>=1)
 
@@ -237,13 +266,21 @@ void run(void)
             }
             else
 
-//  T() {i<=0}
+//  T() {2<=e+i+ne+uo, 1<=e+ne+uo, i<=0}
 
                while (1)
 
-//  T() {i<=0}
+//  T() {2<=e+i+ne+uo, 1<=e+ne+uo, i<=0}
 
                   ;
+
+//  T() {ne==0, uo==0, e<=1, 2<=e+i, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -286,6 +323,14 @@ void run(void)
 
                   ;
 
+//  T() {e==0, i==0, 1<=ne+uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
 //  T(e,i,ne,uo) {e==1, e#init==0, ne#init+uo#init==i+1, i#init==0,
 //    ne==0, uo==0, 2<=ne#init+uo#init}
 
@@ -317,13 +362,21 @@ void run(void)
             }
             else
 
-//  T() {e==0, i==0, ne+uo<=1}
+//  T() {e==0, i==0, ne+uo==1}
 
                while (1)
 
-//  T() {e==0, i==0, ne+uo<=1}
+//  T() {e==0, i==0, ne+uo==1}
 
                   ;
+
+//  T() {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -366,10 +419,18 @@ void run(void)
 
                   ;
 
-//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i+uo==i#init+uo#init,
-//    1<=i, uo#init<=uo}
+//  T() {e==0, 1<=i, 1<=ne+uo}
 
-            while (flip())
+            if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i+uo==i#init+uo#init,
+//    1<=i, 1<=ne+uo, uo#init<=uo}
+
+            while (flip()) {
 
 //  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==i#init-1,
 //    uo==uo#init+1, 1<=i}
@@ -410,28 +471,37 @@ void run(void)
 
                      ;
 
+//  T() {e==0, 1<=i, 1<=ne+uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+                  assert_error();
+            }
+
 //  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==0, i#init==1,
-//    uo==uo#init+1}
+//    uo==uo#init+1, 2<=e#init+ne#init+uo}
 
             if (i==1) {
 
-//  T(ne) {e+ne#init==ne, i==1}
+//  T(ne) {e+ne#init==ne, i==1, 1<=e+ne#init+uo}
 
                ne += e;
 
-//  T(uo) {i==1, uo==uo#init+1}
+//  T(uo) {i==1, uo==uo#init+1, 2<=ne+uo}
 
                uo++;
 
-//  T(i) {i==0, i#init==1}
+//  T(i) {i==0, i#init==1, 2<=ne+uo}
 
                i--;
 
-//  T(e) {e==0, i==0}
+//  T(e) {e==0, i==0, 2<=ne+uo}
 
                e = 0;
 
-//  T() {e==0, i==0}
+//  T() {e==0, i==0, 2<=ne+uo}
 
                if (e>=2||uo+ne>=1&&e>=1)
 
@@ -441,13 +511,21 @@ void run(void)
             }
             else
 
-//  T() {}
+//  T() {4<=2e+i+2ne+2uo, 2<=e+i+ne+uo, 1<=e+ne+uo}
 
                while (1)
 
-//  T() {}
+//  T() {4<=2e+i+2ne+2uo, 2<=e+i+ne+uo, 1<=e+ne+uo}
 
                   ;
+
+//  T() {e==0, i==0, 2<=ne+uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
 
 //  T(e,i,ne,uo) {e==1, e#init==0, ne#init+uo#init==i+1, i#init==0,
 //    ne==0, uo==0, 2<=ne#init+uo#init}
@@ -480,13 +558,21 @@ void run(void)
             }
             else
 
-//  T() {e==0, i==0, ne+uo<=1}
+//  T() {0==-1}
 
                while (1)
 
-//  T() {e==0, i==0, ne+uo<=1}
+//  T() {0==-1}
 
                   ;
+
+//  T() {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -531,13 +617,21 @@ void run(void)
 
 //  T() {e==1, i==0, ne==0, uo==0}
 
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T() {e==1, i==0, ne==0, uo==0}
+
             while (1)
 
 //  T() {e==1, i==0, ne==0, uo==0}
 
                ;
          }
-         else {
+         else if (flip()) {
 
 //  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==0, i#init==1,
 //    uo==uo#init+1}
@@ -578,6 +672,14 @@ void run(void)
 
                   ;
 
+//  T() {e==0, i==0, 1<=ne+uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
 //  T(e,i,ne,uo) {e==1, e#init==0, i==0, i#init==0, ne==0,
 //    ne#init+uo#init==1, uo==0}
 
@@ -609,19 +711,230 @@ void run(void)
             }
             else
 
-//  T() {e==0, i==0}
+//  T() {e==0, i==0, 2<=ne+uo}
 
                while (1)
 
-//  T() {e==0, i==0}
+//  T() {e==0, i==0, 2<=ne+uo}
 
                   ;
+
+//  T() {e==1, i==0, ne==0, uo==0}
+
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
 
 //  T() {e==1, i==0, ne==0, uo==0}
 
             while (1)
 
 //  T() {e==1, i==0, ne==0, uo==0}
+
+               ;
+         }
+         else {
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==i#init-1,
+//    uo==uo#init+1, 1<=i}
+
+            if (i>=2) {
+
+//  T(ne) {e+ne#init==ne, 2<=i}
+
+               ne += e;
+
+//  T(uo) {uo==uo#init+1, 2<=i}
+
+               uo++;
+
+//  T(i) {i==i#init-1, 1<=i}
+
+               i--;
+
+//  T(e) {e==0, 1<=i}
+
+               e = 0;
+
+//  T() {e==0, 1<=i}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {i<=1}
+
+               while (1)
+
+//  T() {i<=1}
+
+                  ;
+
+//  T() {e==0, 1<=i, 1<=ne+uo}
+
+            if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i+uo==i#init+uo#init,
+//    1<=i, 1<=ne+uo, uo#init<=uo}
+
+            while (flip()) {
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==i#init-1,
+//    uo==uo#init+1, 1<=i}
+
+               if (i>=2) {
+
+//  T(ne) {e+ne#init==ne, 2<=i}
+
+                  ne += e;
+
+//  T(uo) {uo==uo#init+1, 2<=i}
+
+                  uo++;
+
+//  T(i) {i==i#init-1, 1<=i}
+
+                  i--;
+
+//  T(e) {e==0, 1<=i}
+
+                  e = 0;
+
+//  T() {e==0, 1<=i}
+
+                  if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+                     checking_error();
+               }
+               else
+
+//  T() {i<=1}
+
+                  while (1)
+
+//  T() {i<=1}
+
+                     ;
+
+//  T() {e==0, 1<=i, 1<=ne+uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  T() {0==-1}
+
+                  assert_error();
+            }
+
+//  T(e,i,ne,uo) {e==0, e#init+ne#init==ne, i==0, i#init==1,
+//    uo==uo#init+1, 2<=e#init+ne#init+uo}
+
+            if (i==1) {
+
+//  T(ne) {e+ne#init==ne, i==1, 1<=e+ne#init+uo}
+
+               ne += e;
+
+//  T(uo) {i==1, uo==uo#init+1, 2<=ne+uo}
+
+               uo++;
+
+//  T(i) {i==0, i#init==1, 2<=ne+uo}
+
+               i--;
+
+//  T(e) {e==0, i==0, 2<=ne+uo}
+
+               e = 0;
+
+//  T() {e==0, i==0, 2<=ne+uo}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {4<=2e+i+2ne+2uo, 2<=e+i+ne+uo, 1<=e+ne+uo}
+
+               while (1)
+
+//  T() {4<=2e+i+2ne+2uo, 2<=e+i+ne+uo, 1<=e+ne+uo}
+
+                  ;
+
+//  T() {e==0, i==0, 2<=ne+uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T() {0==-1}
+
+            if (ne+uo==1) {
+
+//  T() {0==-1}
+
+               i += ne+uo-1;
+
+//  T() {0==-1}
+
+               e++;
+
+//  T() {0==-1}
+
+               ne = 0;
+
+//  T() {0==-1}
+
+               uo = 0;
+
+//  T() {0==-1}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {e==0, i==0, 2<=ne+uo}
+
+               while (1)
+
+//  T() {e==0, i==0, 2<=ne+uo}
+
+                  ;
+
+//  T() {0==-1}
+
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  T() {0==-1}
+
+               assert_error();
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
 
                ;
          }
@@ -668,7 +981,7 @@ void run(void)
 //  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i}
 
 
-         if (flip())
+         if (flip()) {
 
 //  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i}
 
@@ -707,6 +1020,15 @@ void run(void)
 //  P(e,i,ne,uo) {e+i==1, ne==0, uo==0, 0<=e, e<=1}
 
                   ;
+
+//  P(e,i,ne,uo) {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
+         }
          else if (flip()) {
 
 //  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i}
@@ -749,7 +1071,15 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
 
-            while (flip())
+            if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
+
+            while (flip()) {
 
 //  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
 
@@ -789,6 +1119,15 @@ void run(void)
 
                      ;
 
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 2<=uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+                  assert_error();
+            }
+
 //  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
 
             if (flip())
@@ -801,11 +1140,11 @@ void run(void)
 
                   i += ne+uo-1;
 
-//  P(e,i,ne,uo) {e==0, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
+//  P(e,i,ne,uo) {e==0, 1<=i, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
 
                   e++;
 
-//  P(e,i,ne,uo) {e==1, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
+//  P(e,i,ne,uo) {e==1, 1<=i, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
 
                   ne = 0;
 
@@ -836,15 +1175,15 @@ void run(void)
 
                i += e+ne+uo-1;
 
-//  P(e,i,ne,uo) {e==0, ne+uo<=i, 0<=ne, ne<=1, 1<=uo}
+//  P(e,i,ne,uo) {e==0, 1<=i, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
 
                e = 1;
 
-//  P(e,i,ne,uo) {e==1, ne+uo<=i, 0<=ne, ne<=1, 1<=uo}
+//  P(e,i,ne,uo) {e==1, 1<=i, ne+uo<=i, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
 
                ne = 0;
 
-//  P(e,i,ne,uo) {e==1, ne==0, uo<=i, 1<=uo}
+//  P(e,i,ne,uo) {e==1, ne==0, 1<=i, uo<=i, 1<=uo}
 
                uo = 0;
 
@@ -865,6 +1204,14 @@ void run(void)
 //  P() {0==-1}
 
                   ;
+
+//  P(e,i,ne,uo) {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -908,6 +1255,14 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==0, i==0, uo==1, 0<=ne, ne<=1}
 
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, i==0, uo==1, 0<=ne, ne<=1}
+
             if (ne+uo>=2) {
 
 //  P(e,i,ne,uo) {e==0, i==0, ne==1, uo==1}
@@ -943,6 +1298,14 @@ void run(void)
 //  P(e,i,ne,uo) {e==0, i==0, ne==0, uo==1}
 
                   ;
+
+//  P(e,i,ne,uo) {e==1, i==1, ne==0, uo==0}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -986,7 +1349,15 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
 
-            while (flip())
+            if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
+
+            while (flip()) {
 
 //  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
 
@@ -1026,6 +1397,15 @@ void run(void)
 
                      ;
 
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 2<=uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+                  assert_error();
+            }
+
 //  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
 
             if (i==1) {
@@ -1034,19 +1414,19 @@ void run(void)
 
                ne += e;
 
-//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=uo}
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
 
                uo++;
 
-//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 2<=uo}
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
 
                i--;
 
-//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=uo}
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
 
                e = 0;
 
-//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=uo}
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
 
                if (e>=2||uo+ne>=1&&e>=1)
 
@@ -1064,7 +1444,15 @@ void run(void)
 
                   ;
 
-//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=uo}
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
 
             if (ne+uo>=2) {
 
@@ -1101,6 +1489,14 @@ void run(void)
 //  P() {0==-1}
 
                   ;
+
+//  P(e,i,ne,uo) {e==1, ne==0, uo==0, 1<=i}
+
+            if (!(i>=1&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
          }
          else if (flip()) {
 
@@ -1144,13 +1540,21 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
 
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
+
             while (1)
 
 //  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
 
                ;
          }
-         else {
+         else if (flip()) {
 
 //  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i}
 
@@ -1192,6 +1596,14 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==0, i==0, uo==1, 0<=ne, ne<=1}
 
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, i==0, uo==1, 0<=ne, ne<=1}
+
             if (ne+uo==1) {
 
 //  P(e,i,ne,uo) {e==0, i==0, ne==0, uo==1}
@@ -1230,9 +1642,216 @@ void run(void)
 
 //  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
 
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
+
             while (1)
 
 //  P(e,i,ne,uo) {e==1, i==0, ne==0, uo==0}
+
+               ;
+         }
+         else {
+
+//  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i}
+
+            if (i>=2) {
+
+//  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i, 2<=i}
+
+               ne += e;
+
+//  P(e,i,ne,uo) {e==ne, uo==0, 0<=e, e<=1, 1<=e+i, 2<=i}
+
+               uo++;
+
+//  P(e,i,ne,uo) {e==ne, uo==1, 0<=e, e<=1, 1<=e+i, 2<=i}
+
+               i--;
+
+//  P(e,i,ne,uo) {e==ne, uo==1, 0<=e, e<=1, 0<=e+i, 1<=i}
+
+               e = 0;
+
+//  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i, i<=1}
+
+               while (1)
+
+//  P(e,i,ne,uo) {ne==0, uo==0, 0<=e, e<=1, 1<=e+i, i<=1}
+
+                  ;
+
+//  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
+
+            if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, uo==1, 1<=i, 0<=i+ne, 0<=ne, ne<=1}
+
+            while (flip()) {
+
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
+
+               if (i>=2) {
+
+//  P(e,i,ne,uo) {e==0, 2<=i, 0<=ne, ne<=1, 1<=uo}
+
+                  ne += e;
+
+//  P(e,i,ne,uo) {e==0, 2<=i, 0<=ne, ne<=1, 1<=uo}
+
+                  uo++;
+
+//  P(e,i,ne,uo) {e==0, 2<=i, 0<=ne, ne<=1, 2<=uo}
+
+                  i--;
+
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 2<=uo}
+
+                  e = 0;
+
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 2<=uo}
+
+                  if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+                     checking_error();
+               }
+               else
+
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=uo}
+
+                  while (1)
+
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=uo}
+
+                     ;
+
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 2<=uo}
+
+               if (!(i>=1&&ne+uo>=1))
+
+//  P() {0==-1}
+
+                  assert_error();
+            }
+
+//  P(e,i,ne,uo) {e==0, 1<=i, 0<=ne, ne<=1, 1<=uo}
+
+            if (i==1) {
+
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=uo}
+
+               ne += e;
+
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 1<=ne+uo, 1<=uo}
+
+               uo++;
+
+//  P(e,i,ne,uo) {e==0, i==1, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+               i--;
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+               e = 0;
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P(e,i,ne,uo) {e==0, 2<=i, 0<=ne, ne<=1, 1<=uo}
+
+               while (1)
+
+//  P(e,i,ne,uo) {e==0, 2<=i, 0<=ne, ne<=1, 1<=uo}
+
+                  ;
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+            if (!(!(i>=1)&&ne+uo>=1))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+            if (ne+uo==1) {
+
+//  P() {0==-1}
+
+               i += ne+uo-1;
+
+//  P() {0==-1}
+
+               e++;
+
+//  P() {0==-1}
+
+               ne = 0;
+
+//  P() {0==-1}
+
+               uo = 0;
+
+//  P() {0==-1}
+
+               if (e>=2||uo+ne>=1&&e>=1)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+               while (1)
+
+//  P(e,i,ne,uo) {e==0, i==0, 0<=ne, ne<=1, 2<=ne+uo, 2<=uo}
+
+                  ;
+
+//  P() {0==-1}
+
+            if (!(!(i>=1)&&!(ne+uo>=1)))
+
+//  P() {0==-1}
+
+               assert_error();
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
 
                ;
          }

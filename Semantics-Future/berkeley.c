@@ -23,7 +23,7 @@ void checking_error(void) {
 	exit(2);
 }
 
-#if USE_ASSERT == 0
+#if USE_ASSERT == 1
 #define assert(e)
 #else
 #define assert(e) {if (!(e)) assert_error();}
@@ -100,7 +100,21 @@ void run(void) {
 				freeze;
 			}
 			
+			else if (flip()) {
+				trans(i == 1, C_RM);
+				assert(!G_i && G_ne_uo);
+				trans(ne + uo == 1, C_WH);
+				assert(!G_i && !G_ne_uo);
+				freeze;
+			}
+			
 			else {
+				trans(i >= 2, C_RM);
+				assert(G_i && G_ne_uo);
+				while (flip()) {
+					trans(i >= 2, C_RM);
+					assert(G_i && G_ne_uo);
+				}
 				trans(i == 1, C_RM);
 				assert(!G_i && G_ne_uo);
 				trans(ne + uo == 1, C_WH);
