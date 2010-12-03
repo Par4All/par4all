@@ -685,6 +685,13 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 #ifdef P4A_ACCEL_CL
 
+#ifdef P4A_PROFILING
+cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
+#else
+cl_command_queue_properties p4a_queue_properties = 0;
+#endif
+
+bool p4a_time_tag=false;
 double p4a_execution_time = 0.;
 double p4a_copy_time = 0.;
 cl_event p4a_event_execution, p4a_event_copy;
@@ -706,6 +713,7 @@ double P4A_accel_copy_timer()
   cl_ulong start,end;
   double time;
 
+#ifdef P4A_PROFILING
   if (p4a_event_copy) {
     clWaitForEvents(1, &p4a_event_copy);
     
@@ -725,13 +733,15 @@ double P4A_accel_copy_timer()
     //return execution_time*1.0e-9;
     return time*1.0e-9;
   }
-  
+#endif
+  return 0;
 }
 
 double P4A_accel_timer_stop_and_float_measure() 
 {
   cl_ulong start,end;
 
+#ifdef P4A_PROFILING
   if (p4a_event_execution) {
     clWaitForEvents(1, &p4a_event_execution);
     
@@ -748,9 +758,11 @@ double P4A_accel_timer_stop_and_float_measure()
     // execution_time in nanoseconds	      
     p4a_execution_time += (float)(end - start);
     // Return the time in second:
-    printf("Copy time : %f\n",p4a_copy_time);
+    if (p4a_time_tag)
+      printf("Copy time : %f\n",p4a_copy_time);
     return p4a_execution_time*1.0e-9;
   }
+#endif
   return 0;
 }
 

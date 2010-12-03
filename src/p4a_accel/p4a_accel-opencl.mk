@@ -12,7 +12,7 @@ OBJFILES += p4a_accel.o
 p4a_accel.cpp: $(P4A_ACCEL_DIR)/p4a_accel.c
 	ln -s $< $@
 
-CXXFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_DEBUG -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX
+CXXFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_DEBUG -DP4A_PROFILING -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX
 
 LDFLAGS = -fPIC -L/usr/lib 
 

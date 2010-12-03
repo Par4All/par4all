@@ -22,12 +22,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <oclUtils.h>
 #include <opencl.h>
 //#include <cl.h>
 
 
-/**
+/** A timer Tag to know when to print p4a_copy_time
+ */
+extern bool p4a_time_tag;
+/** Total execution time.
+    In OpenCL, time is mesured for each lunch of the kernel.
+    We also need to cumulate all the particulate times.
  */
 extern double p4a_execution_time;
 /** Global error in absence of a getLastError equivalent in OpenCL */
@@ -44,6 +50,7 @@ extern cl_context p4a_context;
  */
 extern cl_command_queue p4a_queue;
 
+extern cl_command_queue_properties p4a_queue_properties;
 
 
 /** The selected device */
@@ -272,7 +279,7 @@ inline void checkArgsInline(const char *kernel,...)
      /* ... could query many device, we retain only the first one ... */ \
      /* Create a file allocated to the first device ...   */		\
      p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,          \
-				    CL_QUEUE_PROFILING_ENABLE,		\
+				    p4a_queue_properties,		\
 				    &p4a_global_error);			\
      P4A_test_execution_with_message("clCreateCommandQueue");                       \
   } while (0)
@@ -678,11 +685,13 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0, P4A_n_iter_1);	\
+    p4a_time_tag = false;						\
     P4A_accel_timer_stop_and_float_measure();				\
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
                           (p4a_queue,p4a_kernel,work_dim,NULL,          \
 			   P4A_grid_descriptor,P4A_block_descriptor,	\
 			   0,NULL,&p4a_event_execution));		\
+    p4a_time_tag = true;						\
   } while (0)
 
 /** @} */
