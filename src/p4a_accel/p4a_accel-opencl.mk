@@ -14,11 +14,12 @@ p4a_accel.cpp: $(P4A_ACCEL_DIR)/p4a_accel.c
 
 CXXFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_DEBUG -DP4A_PROFILING -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX
 
-LDFLAGS = -fPIC -L/usr/lib -L$(SHARED_DIR)/lib -L$(OCL_DIR)/lib
+LDFLAGS = -fPIC -L/usr/lib #-L$(SHARED_DIR)/lib -L$(OCL_DIR)/lib
 
 #LDLIBS = -lcudart -lcutil_x86_64
 #LDLIBS =  $(OCL_DIR)/lib/liboclUtil_x86_64.a $(SHARED_DIR)/lib/libshrutil_x86_64.a -lOpenCL
-LDLIBS =  -loclUtil_x86_64 -lshrutil_x86_64 -lOpenCL
+#LDLIBS =  -loclUtil_x86_64 -lshrutil_x86_64 -lOpenCL
+LDLIBS =  -lOpenCL
 
 # New default rule to compile OpenCL source files:
 %.o: %.cpp

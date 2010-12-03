@@ -23,9 +23,16 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
-#include <oclUtils.h>
+//#include <oclUtils.h>
 #include <opencl.h>
-//#include <cl.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#include <cl.h>
+#include <p4a_wrap-opencl.h>
 
 
 /** A timer Tag to know when to print p4a_time_copy
@@ -58,7 +65,7 @@ extern cl_command_queue_properties p4a_queue_properties;
 
 /** The selected device */
 //extern cl_device_id p4a_device_id;  
-/** The OpenCL platform : a set of devices 
+/** The OpenCL platform : a set of devices available 
     The device_id is the selected device from his type
     CL_DEVICE_TYPE_GPU
     CL_DEVICE_TYPE_CPU
@@ -78,6 +85,12 @@ extern cl_kernel p4a_kernel;
 #define P4A_log(...)   
 #endif
 
+#define P4A_log_and_exit(code,...)               \
+  do {						 \
+  fprintf(stdout,__VA_ARGS__);			 \
+  exit(code);					 \
+  } while(0)
+
 
 #define P4A_test_execution(error)  checkErrorInline(error, __FILE__, __LINE__)
 #define P4A_test_execution_with_message(message) checkErrorMessageInline(message, __FILE__, __LINE__)
@@ -95,21 +108,23 @@ inline void checkToClean(int exitCode)
 }
 
 
-
 inline void checkErrorInline(cl_int error, 
 			     const char *currentFile, 
 			     const int currentLine)
 {
     if(CL_SUCCESS != error) {
-      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
+      /*fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
 	      currentFile,currentLine,oclErrorString(error));
+      */
+      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
+	      currentFile,currentLine,p4a_error_to_string(error));
       //exit(-1);
       checkToClean(EXIT_FAILURE);
     }
 #ifdef P4A_DEBUG
     else
-      fprintf(stdout, "File %s - Line %i - The runtime is successful\n",
-	      currentFile,currentLine);
+      fprintf(stdout, "File %s - Line %i - %s\n",
+	      currentFile,currentLine,p4a_error_to_string(error));
 #endif
 }
 
@@ -119,7 +134,7 @@ inline void checkErrorMessageInline(const char *message, const char *currentFile
 {
   //cudaError_t error = cudaGetLastError();
   if(CL_SUCCESS != p4a_global_error){
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, oclErrorString(p4a_global_error));
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, p4a_error_to_string(p4a_global_error));
     checkToClean(EXIT_FAILURE);
     //exit(-1);
   }
@@ -129,6 +144,40 @@ inline void checkErrorMessageInline(const char *message, const char *currentFile
 	    currentFile, currentLine, message);
   }
 #endif 
+}
+
+/** Load and store the content of the kernel file in a string.
+    Replace the oclLoadProgSource function of NVIDIA.
+ */
+inline char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
+{
+  // Initialize the size and memory space
+  struct stat buf;
+  stat(cl_kernel_file,&buf);
+  size_t size = buf.st_size;
+  size_t len = strlen(head);
+  char *source = (char *)malloc(len+size+1);
+  strncpy(source,head,len);
+
+  // A string pointer referencing to the position after the head
+  // where the storage of the file content must begin
+  char *p = source+len;
+
+  // Open the file
+  int in = open(cl_kernel_file,O_RDONLY);
+  if (!in) 
+    P4A_log_and_exit(EXIT_FAILURE,"Bad kernel source reference : %s\n",cl_kernel_file);
+  
+  // Read the file content
+  int n=0;
+  if ((n = read(in,(void *)p,size)) != (int)size) 
+    P4A_log_and_exit(EXIT_FAILURE,"Read was not completed : %d / %lu octets\n",n,size);
+  
+  // Final string marker
+  source[len+n]='\0';
+  close(in);
+  *length = size+len;
+  return source;
 }
 
 /** When launching the kernel, need to create the program from sources
@@ -153,13 +202,14 @@ inline void checkArgsInline(const char *kernel,...)
 
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
-    char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
-    /*
+    //char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
+    char* cSourceCL = p4a_load_prog_source(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
     if (cSourceCL == NULL)
       P4A_log("source du program null\n");
     else
       P4A_log("%s\n",cSourceCL);
-    */
+    P4A_log("Kernel length = %lu\n",kernelLength);
+    
     /*Create and compile the program : 1 for 1 kernel */
     //cl_program p4a_program;
     p4a_program=clCreateProgramWithSource(p4a_context,1,
@@ -192,6 +242,8 @@ inline void checkArgsInline(const char *kernel,...)
   }
   va_end(ap);
 }
+
+
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
 
@@ -291,9 +343,13 @@ inline void checkArgsInline(const char *kernel,...)
 				     1,					\
 				     &p4a_device_id,			\
 				     NULL);				\
-     P4A_test_execution_with_message("clGetDeviceIDs");				\
+     P4A_test_execution_with_message("clGetDeviceIDs");			\
      /* Create the context */						\
-     p4a_context=clCreateContext(0, 1,&p4a_device_id, NULL, NULL,	\
+     p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/ \
+				 1,/*cl_uint num_devices*/		\
+				 &p4a_device_id,			\
+				 NULL,/*CL_CALLBACK *pfn_notify*/	\
+				 NULL,					\
 				 &p4a_global_error);			\
      P4A_test_execution_with_message("clCreateContext");				\
      /* ... could query many device, we retain only the first one ... */ \
@@ -301,7 +357,7 @@ inline void checkArgsInline(const char *kernel,...)
      p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,          \
 				    p4a_queue_properties,		\
 				    &p4a_global_error);			\
-     P4A_test_execution_with_message("clCreateCommandQueue");                       \
+     P4A_test_execution_with_message("clCreateCommandQueue");		\
   } while (0)
 
 
