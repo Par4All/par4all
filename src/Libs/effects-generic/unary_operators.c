@@ -180,12 +180,13 @@ effects_to_must_effects(list l_eff)
 void
 effect_to_write_effect(effect eff)
 {
-  if (effect_read_p(eff))
-    {
-      action ac = make_action_read(copy_action_kind(action_read(effect_action(eff))));
-      free_action(effect_action(eff));
-      effect_action(eff) = ac;
-    }
+  effect_action_tag(eff) = is_action_write;
+/*   if (effect_read_p(eff)) */
+/*     { */
+/*       action ac = make_action_read(copy_action_kind(action_read(effect_action(eff)))); */
+/*       free_action(effect_action(eff)); */
+/*       effect_action(eff) = ac; */
+/*     } */
 }
 
 void
@@ -197,12 +198,13 @@ effects_to_write_effects(list l_eff)
 void
 effect_to_read_effect(effect eff)
 {
-  if (effect_write_p(eff))
-    {
-      action ac = make_action_read(copy_action_kind(action_write(effect_action(eff))));
-      free_action(effect_action(eff));
-      effect_action(eff) = ac;
-    }
+  effect_action_tag(eff) = is_action_read;
+/*   if (effect_write_p(eff)) */
+/*     { */
+/*       action ac = make_action_read(copy_action_kind(action_write(effect_action(eff)))); */
+/*       free_action(effect_action(eff)); */
+/*       effect_action(eff) = ac; */
+/*     } */
 }
 
 void
