@@ -28,14 +28,17 @@
 //#include <cl.h>
 
 
-/** A timer Tag to know when to print p4a_copy_time
+/** A timer Tag to know when to print p4a_time_copy
  */
 extern bool p4a_time_tag;
 /** Total execution time.
     In OpenCL, time is mesured for each lunch of the kernel.
     We also need to cumulate all the particulate times.
  */
-extern double p4a_execution_time;
+extern double p4a_time_execution;
+/** Total time for copy of data (transfers host <-> device).
+ */
+extern double p4a_time_copy;
 /** Global error in absence of a getLastError equivalent in OpenCL */
 extern cl_int p4a_global_error;
 /** Events for timing in CL: */
@@ -289,7 +292,12 @@ inline void checkArgsInline(const char *kernel,...)
 
     Nothing to do
 */
-#define P4A_release_accel                                               
+#ifdef P4A_PROFILING
+#define P4A_release_accel		\
+  if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);
+#else
+#define P4A_release_accel
+#endif
     
 
 /** @} */

@@ -692,8 +692,8 @@ cl_command_queue_properties p4a_queue_properties = 0;
 #endif
 
 bool p4a_time_tag=false;
-double p4a_execution_time = 0.;
-double p4a_copy_time = 0.;
+double p4a_time_execution = 0.;
+double p4a_time_copy = 0.;
 cl_event p4a_event_execution, p4a_event_copy;
 cl_int p4a_global_error;
 cl_context p4a_context = NULL;
@@ -729,8 +729,8 @@ double P4A_accel_copy_timer()
 					       NULL));
     // execution_time in nanoseconds	      
     time = (float)(end - start);
+    //printf("p4a_time_copy : %f\n",time*1.0e-9);
     // Return the time in second: 
-    //return execution_time*1.0e-9;
     return time*1.0e-9;
   }
 #endif
@@ -756,11 +756,9 @@ double P4A_accel_timer_stop_and_float_measure()
 					       &start, 
 					       NULL));
     // execution_time in nanoseconds	      
-    p4a_execution_time += (float)(end - start);
+    p4a_time_execution += (float)(end - start);
     // Return the time in second:
-    if (p4a_time_tag)
-      printf("Copy time : %f\n",p4a_copy_time);
-    return p4a_execution_time*1.0e-9;
+    return p4a_time_execution*1.0e-9;
   }
 #endif
   return 0;
@@ -811,17 +809,16 @@ void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
 			 const void *accel_address) 
 {
-  // CL_TRUE : synchronous read
   p4a_global_error=clEnqueueReadBuffer(p4a_queue,
 				       (cl_mem)accel_address,
-				       CL_TRUE,
+				       CL_TRUE, // synchronous read
 				       0,
 				       element_size,
 				       host_address,
 				       0,
 				       NULL,
 				       &p4a_event_copy);
-  p4a_copy_time += P4A_accel_copy_timer();
+  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -841,16 +838,16 @@ void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
 		       void *accel_address) 
 {
-  // CL_FALSE : asynchronous write
   p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
 					(cl_mem)accel_address,
-					CL_FALSE,
+					CL_FALSE,// asynchronous write
 					0,
 					element_size,
 					host_address,
 					0,
 					NULL,
-					NULL);
+					&p4a_event_copy);
+  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
@@ -893,7 +890,7 @@ void P4A_copy_from_accel_1d(size_t element_size,
 				       0,
 				       NULL,
 				       &p4a_event_copy);
-  p4a_copy_time += P4A_accel_copy_timer();
+  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -936,7 +933,8 @@ void P4A_copy_to_accel_1d(size_t element_size,
 					csrc,
 					0,
 					NULL,
-					NULL);
+					&p4a_event_copy);
+  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
