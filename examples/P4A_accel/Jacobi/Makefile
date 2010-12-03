@@ -73,7 +73,7 @@ demo : $(addprefix demo_, $(TARGETS))
 
 
 clean :
-	rm -rf $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=.p4a.c) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda) *~ *.database output.pgm amplitude.pgm phase.pgm
+	rm -rf $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=.p4a.c) $(TARGETS:=.p4a.cu) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda) *~ *.database output.pgm amplitude.pgm phase.pgm
 
 all : $(TARGET) $(TARGET)_pips_omp
 
