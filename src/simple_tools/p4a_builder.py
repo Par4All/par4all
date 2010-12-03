@@ -87,6 +87,12 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
     return flags
 
 class p4a_builder:
+    """The p4a_builder is used for two main things.
+    1 - It keeps track and arrange all the CPP, C, Fortran etc. flags.
+    2-  It can buil the program when all the files have been processed by
+    PIPS.
+    """
+    # the lists of flags
     cpp_flags = []
     c_flags = []
     cxx_flags = []
@@ -94,6 +100,7 @@ class p4a_builder:
     nvcc_flags = []
     fortran_flags = []
 
+    # the compilers
     cpp = None
     cc = None
     cxx = None
@@ -102,9 +109,11 @@ class p4a_builder:
     nvcc = None
     fortran = None
 
+    # extra flags
     m64 = False
     cudafied = False
     extra_source_files = []
+    builder = False
 
     def cudafy_flags(self):
         if self.cudafied:
@@ -118,12 +127,16 @@ class p4a_builder:
         self.cudafied = True
 
     def __init__(self,
-        cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [], nvcc_flags = [], fortran_flags = [],
-        cpp = None, cc = None, cxx = None, ld = None, ar = None, nvcc = None, fortran = None,
-        arch = None,
-        openmp = False, accel_openmp = False, icc = False, cuda = False,
-        add_debug_flags = False, add_optimization_flags = False, no_default_flags = False
-    ):
+                 cpp_flags = [], c_flags = [], cxx_flags = [], ld_flags = [],
+                 nvcc_flags = [], fortran_flags = [],
+                 cpp = None, cc = None, cxx = None, ld = None, ar = None,
+                 nvcc = None, fortran = None, arch = None,
+                 openmp = False, accel_openmp = False, icc = False, cuda = False,
+                 add_debug_flags = False, add_optimization_flags = False,
+                 no_default_flags = False, build = False
+                 ):
+
+        self.builder = build
 
         if not nvcc:
             nvcc = "nvcc"
