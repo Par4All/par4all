@@ -50,6 +50,7 @@ void run(void) {
 	i = rand();
 	
 	if (i >= 1) {
+		assert(G_i && !G_ne_uo);
 		check_not(BAD);
 		while (1) {
 			
