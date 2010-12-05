@@ -23,7 +23,7 @@ $(DOCUMENT).tex: p4a-help.tex
 %-help.tex: %.help Makefile
 	../../../src/dev/optparse_help_to_tex --slides --no-output-usage $< > $@
 
-%.help: ../../../src/simple_tools/% Makefile
+%.help: ../../../src/simple_tools/%.py Makefile
 	# Generate raw help message for the given command:
 	$< -h > $@
 

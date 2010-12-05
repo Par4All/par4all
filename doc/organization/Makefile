@@ -64,7 +64,13 @@ p4a_coffee-help.tex: p4a_coffee.help Makefile
 	../../src/dev/optparse_help_to_tex --article --article-section-level 5 $< > $@
 
 # Match commands into the directories specified in the VPATH above
+# If the command has a basic name:
 %.help:% Makefile
+	# Generate raw help message for the given command:
+	$< -h > $@
+
+# If the command has a basic.py name:
+%.help:%.py Makefile
 	# Generate raw help message for the given command:
 	$< -h > $@
 
