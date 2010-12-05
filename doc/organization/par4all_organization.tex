@@ -381,7 +381,9 @@ be created and used on demand.
 \Apfa integrates different tools from different projects. Right now \Apfa
 is composed by \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
 project is included in \Apfa as a package and is placed in a directory
-inside the \texttt{package} top-level directory.
+inside the \texttt{package} top-level directory. Technically speaking,
+this directories are indeed \Agit subtrees to ease revision control and
+integration, even when off-line.
 
 Since \Apfa is an integration project, if you want to modify or develop in
 some packages, please work in the upstream package and not in
@@ -846,7 +848,7 @@ the \Apfa{} \Agit:
 \end{description}
 
 These remote repositories are merged into \Apfa in the following
-respective directories:
+respective subtree directories:
 \begin{description}
 \item[\texttt{packages/PIPS/linear}]
 \item[\texttt{packages/PIPS/newgen}]
