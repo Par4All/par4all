@@ -93,6 +93,10 @@ done
 [[ $(cproto -V 2>&1) = 4.7* ]] || \
   error "Pips compilation requires at least cproto 4.7c"
 
+# reject old svn versions because of relative externals used
+[[ $(svn --version | head -1) == *' '1.[01234].* ]] &&
+  error "Checking out pips requires svn 1.5 or better"
+
 echo
 echo "### downloading pips"
 svn $subcmd $PIPS_SVN/bundles/trunks $prod || error "cannot checkout pips"
