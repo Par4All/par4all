@@ -53,12 +53,6 @@ on \PfaAllOrganizationHTDOC.
 % To automatically build reports from this content:
 %%ContentBegin
 
-\bigskip{}
-
-You can get this document in PDF format on \PfaOrganizationPDF and in HTML
-on \PfaAllOrganizationHTDOC.
-
-
 \section{Introduction}
 \label{sec:introduction}
 
@@ -169,11 +163,9 @@ by running \verb|src/simple_tools/p4a_setup.py| in it.
 If you want to download \Apfa from the \Agit and compile it, do:
 \begin{alltt}
 # Get a working copy of the Par4All public read-only git repository:
-git clone git://git.hpc-project.com/git/par4all.git
+git clone --branch p4a git://git.hpc-project.com/git/par4all.git
 # Go into the working copy:
 cd par4all
-# Switch to the p4a branch, where everything is assembled:
-git checkout -b p4a remotes/origin/p4a
 # Build everything using 8 processes to speed up things:
 src/simple_tools/p4a_setup.py [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%
@@ -228,7 +220,7 @@ For example, you can create a light\footnote{Because the objects are
   shared with symbolic links and not copied, since we did not use the
   \texttt{file://} syntax.} clone with a
 \begin{verbatim}
-git clone par4all par4all-compile
+git clone --branch p4a par4all par4all-compile
 \end{verbatim}
 and after you have tested and committed your modifications inside the
 \texttt{par4all} working copy, you do the same into the
