@@ -289,4 +289,5 @@ list convex_effect_to_constant_path_effects_with_points_to(effect eff)
 list convex_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
 {
   pips_internal_error("not yet implemented\n");
+  return NIL;
 }

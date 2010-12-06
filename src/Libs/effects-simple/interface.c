@@ -44,6 +44,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "properties.h"
 #include "database.h"
 #include "resources.h"
 #include "effects-generic.h"

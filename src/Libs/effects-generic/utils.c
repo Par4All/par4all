@@ -1436,6 +1436,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 /************ CONVERSION TO CONSTANT PATH EFFECTS ***********/
 
 
+#if 0
 static bool FILE_star_effect_reference(reference ref)
 {
   bool res = false;
@@ -1466,6 +1467,7 @@ static bool FILE_star_effect_reference(reference ref)
 
   return res;
 }
+#endif
 
 
 /**
@@ -1494,8 +1496,8 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
     {
       if(store_effect_p(eff))
 	{
-	  bool exact_p;
-	  reference ref = effect_any_reference(eff);
+	  //bool exact_p;
+	  //reference ref = effect_any_reference(eff);
 
 	  if (io_effect_p(eff)
 	      || malloc_effect_p(eff)

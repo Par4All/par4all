@@ -198,7 +198,7 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect __attribu
 	context = effects_private_current_context_head();
       }
 
-      list l_eval = eval_simple_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
+      /*list l_eval = */eval_simple_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
 						    points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
 						    &exact_p, context);
       
