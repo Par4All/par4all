@@ -18,8 +18,8 @@ El Dorado Hills, CA, 95762
 */ 
 #include "coremark.h"
 /* local functions */
-#ifndef _IN_PIPS
-enum CORE_STATE core_state_transition( ee_u8 **instr , ee_u32 *transition_count);
+#ifndef __PIPS__
+enum CORE_STATE core_state_transition( ee_u8 **instr , ee_u32 transition_count[NUM_CORE_STATES]);
 
 /*
 Topic: Description
@@ -182,7 +182,7 @@ static ee_u8 ee_isdigit(ee_u8 c) {
 	The input pointer is updated to point to the end of the token, and the end state is returned (either specific format determined or invalid).
 */
 
-enum CORE_STATE core_state_transition( ee_u8 **instr , ee_u32 *transition_count) {
+enum CORE_STATE core_state_transition( ee_u8 **instr , ee_u32 transition_count[NUM_CORE_STATES]) {
 	ee_u8 *str=*instr;
 	ee_u8 NEXT_SYMBOL;
 	enum CORE_STATE state=CORE_START;
