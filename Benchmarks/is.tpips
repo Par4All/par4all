@@ -1,0 +1,44 @@
+setenv WS="is"
+setenv PIPS_CPP_FLAGS="-I$WS"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS  is/c_timers.c is/wtime.c is/c_print_results.c is/is.c
+
+
+#display PRINTED_FILE[%ALLFUNC]
+
+display CALLGRAPH_FILE[%ALLFUNC]
+
+echo accurate analysis
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+echo by pass some subscripts
+#apply SIMPLIFY_SUBSCRIPTS[jcdctmgr!forward_DCT]
+
+echo restructuring
+apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+
+echo privatize
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+echo // loop detection
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+
+echo omp display
+capply INTERNALIZE_PARALLEL_CODE[%ALLFUNC]
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
+display PRINTED_FILE[%ALLFUNC]
+
+close
+
