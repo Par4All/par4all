@@ -255,7 +255,7 @@ void ResetCurrentCompilationUnitEntity(bool is_compilation_unit_parser)
 
 /************* EXPRESSIONS (half moved to ri-util ******************/
 
-/* e is now owned by returend expression and must not be used any longer */
+/* e is now owned by returned expression and must not be used any longer */
 expression MakeFunctionExpression(expression e, list le)
 {
   /* There are 2 cases:
