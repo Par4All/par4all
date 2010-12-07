@@ -702,6 +702,8 @@ cl_command_queue p4a_queue = NULL;
 //cl_platform_id p4a_platform_id = NULL;
 cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
+int args;
+struct arg_type *args_type=NULL,*current_type=NULL;
 
 /** Stop a timer on the accelerator and get float time in second
 

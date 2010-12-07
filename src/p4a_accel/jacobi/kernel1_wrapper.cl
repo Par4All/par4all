@@ -1,4 +1,5 @@
 typedef float float_t;
+typedef float data_t;
 #define SIZE 501
 #define P4A_accel_kernel inline void
 #define P4A_accel_kernel_wrapper __kernel void

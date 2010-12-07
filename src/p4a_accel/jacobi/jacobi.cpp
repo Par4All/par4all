@@ -16,48 +16,6 @@ float_t save[SIZE][SIZE];
 
 const char *kernel1_wrapper = "kernel1_wrapper";
 
-/*
-const char *kernel1_wrapper = "\n" \
-
-"#define SIZE 501                                                       \n" \
-
-"P4A_accel_kernel kernel1(                                              \n" \
-
-"   __global float_t space[SIZE][SIZE],                                 \n" \
-
-"   __global float_t save[SIZE][SIZE],                                  \n" \
-
-"   int i,                                                              \n" \
-
-"   int j)                                                              \n" \
-
-"{                                                                      \n" \
-
-"  save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);                                                                         \n" \
-
-"}                                                                      \n" \
-
-"P4A_accel_kernel_wrapper kernel1_wrapper(                              \n" \
-
-"   __global float_t space[SIZE][SIZE],                                 \n" \
-
-"   __global float_t save[SIZE][SIZE])                                  \n" \
-
-"{                                                                      \n" \
-
-"   int i = get_global_id(0);                                           \n" \
-
-"   int j = get_global_id(1);                                           \n" \
-
-"   if(i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)              \n" \
-
-"       kernel1(space, save, i, j);                                     \n" \
-
-"}                                                                      \n" \
-
-"\n";
-*/
-
 void get_data(char filename[]) {
   int i, j, nx, ny;
   unsigned char c;
@@ -138,7 +96,8 @@ void write_data(char filename[]) {
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
   //printf("adresses %p %p\n",&space,&save);
-  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, 2,sizeof(cl_mem),&space,sizeof(cl_mem),&save);
+  //P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, 2,sizeof(cl_mem),&space,sizeof(cl_mem),&save);
+  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE,&space,&save);
 }
 
 /*

@@ -79,26 +79,13 @@ extern cl_program p4a_program;
 extern cl_kernel p4a_kernel;  
 
 
-#ifdef P4A_DEBUG
-#define P4A_log(...)               fprintf(stdout,__VA_ARGS__)
-#else
-#define P4A_log(...)   
-#endif
-
-#define P4A_log_and_exit(code,...)               \
-  do {						 \
-  fprintf(stdout,__VA_ARGS__);			 \
-  exit(code);					 \
-  } while(0)
-
-
-#define P4A_test_execution(error)  checkErrorInline(error, __FILE__, __LINE__)
-#define P4A_test_execution_with_message(message) checkErrorMessageInline(message, __FILE__, __LINE__)
+#define P4A_test_execution(error)  p4a_error_inline(error, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message) p4a_message_inline(message, __FILE__, __LINE__)
 
 
 /** To quit properly.
  */
-inline void checkToClean(int exitCode)
+inline void p4a_clean_inline(int exitCode)
 {
   if(p4a_program)clReleaseProgram(p4a_program);
   if(p4a_kernel)clReleaseKernel(p4a_kernel);  
@@ -107,36 +94,27 @@ inline void checkToClean(int exitCode)
   exit(exitCode);
 }
 
-
-inline void checkErrorInline(cl_int error, 
+inline void p4a_error_inline(cl_int error, 
 			     const char *currentFile, 
 			     const int currentLine)
 {
     if(CL_SUCCESS != error) {
-      /*fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
-	      currentFile,currentLine,oclErrorString(error));
-      */
       fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
-	      currentFile,currentLine,p4a_error_to_string(error));
-      //exit(-1);
-      checkToClean(EXIT_FAILURE);
+	      currentFile,currentLine,P4A_error_to_string(error));
+      p4a_clean_inline(EXIT_FAILURE);
     }
 #ifdef P4A_DEBUG
     else
       fprintf(stdout, "File %s - Line %i - %s\n",
-	      currentFile,currentLine,p4a_error_to_string(error));
+	      currentFile,currentLine,P4A_error_to_string(error));
 #endif
 }
 
-// S. Even : I didn't find an equivalent for cudaGetLastError() at once
-// To see later
-inline void checkErrorMessageInline(const char *message, const char *currentFile, const int currentLine)
+inline void p4a_message_inline(const char *message, const char *currentFile, const int currentLine)
 {
-  //cudaError_t error = cudaGetLastError();
   if(CL_SUCCESS != p4a_global_error){
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, p4a_error_to_string(p4a_global_error));
-    checkToClean(EXIT_FAILURE);
-    //exit(-1);
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, P4A_error_to_string(p4a_global_error));
+    p4a_clean_inline(EXIT_FAILURE);
   }
 #ifdef P4A_DEBUG
   else {
@@ -144,40 +122,6 @@ inline void checkErrorMessageInline(const char *message, const char *currentFile
 	    currentFile, currentLine, message);
   }
 #endif 
-}
-
-/** Load and store the content of the kernel file in a string.
-    Replace the oclLoadProgSource function of NVIDIA.
- */
-inline char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
-{
-  // Initialize the size and memory space
-  struct stat buf;
-  stat(cl_kernel_file,&buf);
-  size_t size = buf.st_size;
-  size_t len = strlen(head);
-  char *source = (char *)malloc(len+size+1);
-  strncpy(source,head,len);
-
-  // A string pointer referencing to the position after the head
-  // where the storage of the file content must begin
-  char *p = source+len;
-
-  // Open the file
-  int in = open(cl_kernel_file,O_RDONLY);
-  if (!in) 
-    P4A_log_and_exit(EXIT_FAILURE,"Bad kernel source reference : %s\n",cl_kernel_file);
-  
-  // Read the file content
-  int n=0;
-  if ((n = read(in,(void *)p,size)) != (int)size) 
-    P4A_log_and_exit(EXIT_FAILURE,"Read was not completed : %d / %lu octets\n",n,size);
-  
-  // Final string marker
-  source[len+n]='\0';
-  close(in);
-  *length = size+len;
-  return source;
 }
 
 /** When launching the kernel, need to create the program from sources
@@ -189,21 +133,18 @@ inline char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *
     name with .cl extension.
  */
 
-inline void checkArgsInline(const char *kernel,...)
+inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
 {
   if (!p4a_kernel) {
-    // Creates the name of the source file of the program 
-    // Length of <<kernel>> + 2*'.' + '/' 'c' + 'l' + '\0' (= +4 char)
-    //int size = strlen(kernel)+6;
-    //char* kernelFile = (char *)malloc(size);
-    //sprintf(kernelFile,"./%s.cl",kernel);
     char* kernelFile;
     asprintf(&kernelFile,"./%s.cl",kernel);
 
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
-    //char* cSourceCL = oclLoadProgSource(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
-    char* cSourceCL = p4a_load_prog_source(kernelFile,"// This kernel was generated for P4A\n",&kernelLength);
+    const char *comment = "// This kernel was generated for P4A\n";
+    char* cSourceCL = p4a_load_prog_source(kernelFile,
+					   comment,
+					   &kernelLength);
     if (cSourceCL == NULL)
       P4A_log("source du program null\n");
     else
@@ -232,6 +173,8 @@ inline void checkArgsInline(const char *kernel,...)
   // - the very first one is the number of arguments to be loaded.
   va_list ap;
   va_start(ap, kernel);
+
+  /*
   int n = va_arg(ap, int);
   for (int i = 0;i < n;i++) {
     P4A_log("Argument %d\n",i);
@@ -240,6 +183,18 @@ inline void checkArgsInline(const char *kernel,...)
     p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
     P4A_test_execution_with_message("clSetKernelArg");
   }
+  */
+  current_type = args_type;
+  for (int i = 0;i < args;i++) {
+    P4A_log("Argument %d\n",i);
+    //size_t size = va_arg(ap, size_t);
+    size_t size = current_type->size;
+    current_type = current_type->next;
+    cl_mem arg_address = va_arg(ap, cl_mem);
+    p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
+    P4A_test_execution_with_message("clSetKernelArg");
+  }
+  
   va_end(ap);
 }
 
@@ -367,10 +322,10 @@ inline void checkArgsInline(const char *kernel,...)
 #define P4A_release_accel		\
   do {								\
     if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);	\
-    checkToClean(EXIT_SUCCESS);					\
+    p4a_clean_inline(EXIT_SUCCESS);					\
   } while (0)
 #else
-#define P4A_release_accel    checkToClean(EXIT_SUCCESS)
+#define P4A_release_accel    p4a_clean_inline(EXIT_SUCCESS)
 #endif
     
 
@@ -732,7 +687,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
-    checkArgsInline(kernel,__VA_ARGS__);				\
+    p4a_load_kernel_arguments_inline(kernel,__VA_ARGS__);				\
     P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel      \
 				    "\" of size %d\n",P4A_n_iter_0));	\
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
@@ -761,7 +716,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {	                                                                \
-    checkArgsInline(kernel,__VA_ARGS__);				\
+    p4a_load_kernel_arguments_inline(kernel,__VA_ARGS__);		\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
                    "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
