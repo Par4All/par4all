@@ -7,10 +7,21 @@ struct arg_type {
   struct arg_type *next;
 };
 
+struct p4a_kernel_list {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+  int n_args;
+  struct arg_type *args;
+  struct p4a_kernel_list *next;
+};
+
 extern cl_program p4a_program; 
 extern cl_kernel p4a_kernel;
-extern int args;
-extern struct arg_type *args_type,*current_type;
+//extern int args;
+extern struct arg_type *current_type;
+extern struct p4a_kernel_list *p4a_kernels,*current_kernel;
+
 
 #define P4A_log_and_exit(code,...)               \
   do {						 \
@@ -417,7 +428,7 @@ inline void p4a_read_up_to_argument_list_end(char *p,char buf[])
 	printf("Count %d : %s\n",i,t[i]);
       */
 
-      args++;
+      current_kernel->n_args++;
       struct arg_type *type = (struct arg_type*)malloc(sizeof(struct arg_type));
       // By default, gloabal and constant key word have been skipped...
       // The following is necessarily the type in t[0]
@@ -440,13 +451,12 @@ inline void p4a_read_up_to_argument_list_end(char *p,char buf[])
 	} 
       }
 
-      printf("Args %d : t[0] = %s\n",args,type->type_name);
+      printf("Args %d : t[0] = %s\n",current_kernel->n_args,type->type_name);
       
-      if (args_type==NULL)
-	args_type = type;
-      else {
+      if (current_kernel->args == NULL)
+	current_kernel->args = type;
+      else 
 	current_type->next = type;
-      }
       current_type = type;
       type->next = NULL;
       count = 0;
@@ -456,7 +466,7 @@ inline void p4a_read_up_to_argument_list_end(char *p,char buf[])
     if (strcmp(buf,"P4A_accel_global_address") != 0
 	&&strcmp(buf,"P4A_accel_constant_address") != 0
 	&& *tmp != ',' && *tmp != ')') {
-      printf("Argument %d : type %s (%d)\n",args,buf,count);
+      //printf("Argument %d : type %s (%d)\n",current_kernel->n_args,buf,count);
       if (count < 2)
 	t[count++] = strdup(buf);
     }
@@ -512,8 +522,9 @@ inline void p4a_parse_kernel(char *source,const char *comment)
 
   p4a_read_up_to_argument_list_end(p,buf);
   //printf("On s'est arrêté normalement : %d\n",args);
+  //current_kernel->n_args = args;
 
-  struct arg_type *type = args_type;
+  struct arg_type *type = current_kernel->args;
   while (type) {
     //printf("%s\n",type->type_name);
     for (int i = 0;i < n;i++) {

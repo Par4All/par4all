@@ -76,7 +76,7 @@ extern cl_command_queue_properties p4a_queue_properties;
 extern cl_program p4a_program;  
 /** The module selected in the program
  */
-extern cl_kernel p4a_kernel;  
+extern cl_kernel p4a_kernel; 
 
 
 #define P4A_test_execution(error)  p4a_error_inline(error, __FILE__, __LINE__)
@@ -135,9 +135,39 @@ inline void p4a_message_inline(const char *message, const char *currentFile, con
 
 inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
 {
+  //cl_kernel p4a_kernel = NULL;
+  p4a_kernel = NULL;
+
+  struct p4a_kernel_list *kernels_list=p4a_kernels;
+  while (kernels_list != NULL) {
+    if (strcmp(kernels_list->name,kernel) == 0)
+      p4a_kernel = kernels_list->kernel;
+    if (p4a_kernel != NULL) {
+      printf("Kernel existant %s\n",kernel);
+      current_kernel = kernels_list;
+      break;
+    }
+    else
+      kernels_list = kernels_list->next;
+  }
+
   if (!p4a_kernel) {
+    printf("Kernel non existant %s\n",kernel);
+    struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
+
+    if (p4a_kernels == NULL)
+      p4a_kernels = new_kernel;
+    else
+      current_kernel->next = new_kernel;
+    current_kernel = new_kernel;
+    new_kernel->next = NULL;
+
+    current_kernel->name = strdup(kernel);
+    current_kernel->kernel = NULL;
+
     char* kernelFile;
     asprintf(&kernelFile,"./%s.cl",kernel);
+    current_kernel->file_name = strdup(kernelFile);
 
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
@@ -161,6 +191,7 @@ inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
     p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
     P4A_test_execution_with_message("clBuildProgram");
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
+    current_kernel->kernel = p4a_kernel;
     P4A_test_execution_with_message("clCreateKernel");
     free(cSourceCL);
   }
@@ -174,6 +205,7 @@ inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
   va_list ap;
   va_start(ap, kernel);
 
+  // Before sparsing the kernel : specific call for kernel
   /*
   int n = va_arg(ap, int);
   for (int i = 0;i < n;i++) {
@@ -184,14 +216,18 @@ inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
     P4A_test_execution_with_message("clSetKernelArg");
   }
   */
-  current_type = args_type;
-  for (int i = 0;i < args;i++) {
+  // After parsing the kernel ...
+  printf("kernel %s : nombre d'arguments %d\n",kernel,current_kernel->n_args);
+  current_type = current_kernel->args;
+  for (int i = 0;i < current_kernel->n_args;i++) {
     P4A_log("Argument %d\n",i);
     //size_t size = va_arg(ap, size_t);
     size_t size = current_type->size;
+    printf("Argument %d : size %lu\n",i,size);
     current_type = current_type->next;
     cl_mem arg_address = va_arg(ap, cl_mem);
     p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
+    printf("Ici\n");
     P4A_test_execution_with_message("clSetKernelArg");
   }
   
