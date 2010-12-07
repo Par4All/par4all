@@ -91,10 +91,7 @@ DEFINE_CURRENT_MAPPING(precondition, transformer)
 DEFINE_CURRENT_MAPPING(total_precondition, transformer)
 
 
-transformer (* transformer_fix_point_operator)(transformer);
-
-static void
-select_fix_point_operator()
+static void select_fix_point_operator()
 {
     if(get_bool_property(SEMANTICS_FIX_POINT)) {
 	string fp_name = get_string_property("SEMANTICS_FIX_POINT_OPERATOR");
