@@ -10,7 +10,6 @@ int dump_pos(coord pos[128][128][128], int npdt)
 
    snprintf(fname, 255, "out%d", npdt);
 
-//  <stdout[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==1}>
 
    printf("dump part in %s\n", fname);
@@ -197,12 +196,10 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
 
    ic = fopen(filename, "r");
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
    if (ic==(void *) 0) {
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0, np==n}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2, np==n}>
 
       
@@ -218,7 +215,6 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
    // Nombre de particules dans le fichier
    if (1!=fread(&n, sizeof(int), 1, ic)) {
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       perror("Erreur de lecture du nombre de particules dans le fichier.");
@@ -248,7 +244,6 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
    // Masses
    if (np!=fread(mp, sizeof(float), np, ic)) {
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       perror("Erreur de lecture des masses dans le fichier.");
@@ -268,7 +263,6 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
    // Positions
    if (np!=fread(*pos, sizeof(float), np, ic)) {
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       perror("Erreur de lecture des positions dans le fichier.");
@@ -287,7 +281,6 @@ void readDataFile(unsigned int n, float mp[128][128][128], coord pos[128][128][1
    // Vélocité
    if (np!=fread(*vel, sizeof(float), np, ic)) {
 
-//  <stderr[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{PHI1==2}>
 
       perror("Erreur de lecture des vélocités dans le fichier.");
