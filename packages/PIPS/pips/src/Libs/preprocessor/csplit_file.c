@@ -32,6 +32,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "genC.h"
 #include "misc.h"
@@ -420,9 +421,25 @@ void csplit_copy(string module_name,
 
   /* Step 4: Copy the function definition */
   /* Fabien: you could add here anything you might want to unsplit the
-     file later. */
-  if(strncmp("static", signature, 6)==0 || (strncmp("extern", signature, 6)==0))
+     file later.
+     SG: what about inline static ? why add an extern qualifier ?
+     */
+  /* check for the static qualifier */
+  char * where;
+  if( (where = strstr(signature,"static") ) &&
+          isspace(where[sizeof("static")-1]) &&
+              ( where == signature || isspace(where[-1]) )
+    ) {
     fprintf(compilation_unit_file, "%s;\n", signature);
+  }
+  /* or the extern qualifier */
+  else if ( (where = strstr(signature,"extern") ) &&
+          isspace(where[sizeof("extern")-1]) &&
+              ( where == signature || isspace(where[-1]) )
+    ){
+    fprintf(compilation_unit_file, "%s;\n", signature);
+  }
+  /* default to extern qualifier */
   else
     fprintf(compilation_unit_file, "extern %s;\n", signature);
 

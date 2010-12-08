@@ -1,184 +1,131 @@
+// BERKELEY CACHE CONSISTENCY PROTOCOL
+// Randy H. Katz, Susan J. Eggers, David A. Wood, C. L. Perkins, R. G. Sheldon:
+// Implementing A Cache Consistency Protocol. ISCA 1985:276-283
 
-/*#define USE_ASSERT*/
+// $Id$
 
-#ifdef USE_ASSERT
-#include <assert.h>
-#else
-#define assert(c) {}
-#endif
+#define USE_ASSERT 0
+#define BAD (e >= 2 || (uo + ne >= 1 && e >= 1))
 
-#define check(c) if (!(c)) error()
-#define check_not(c) if (c) error()
-
-/*#define VERBOSE*/
-
-#ifdef VERBOSE
-#include <stdio.h>
-#define display(c) {printf(c); printf("\n"); fflush(stdout);}
-#else
-#define display(c)
-#endif
+// usefull stuff
 
 #include <stdlib.h>
 
-void error() {
-	exit(1);
-}
-
-int alea() {
+int flip(void) {
 	return rand() % 2;
 }
 
-#define CP_VALS {e_ = e; ne_ = ne; uo_ = uo; i_ = i;}
-
-#define G_RM (i >= 1)
-#define U_RM {display("RM"); check(G_RM); CP_VALS; e = 0; ne = e_ + ne_; uo = uo_ + 1; i = i_ - 1;}
-#define G_WH (ne + uo >= 1)
-#define U_WH {display("WH"); check(G_WH); CP_VALS; e = e_ + 1; ne = 0; uo = 0; i = ne_ + uo_ + i_ - 1;}
-#define G_WM (i >= 1)
-#define U_WM {display("WM"); check(G_WM); CP_VALS; e = 1; ne = 0; uo = 0; i = e_ + ne_ + uo_ + i_ - 1;}
-
-/*
-void run_() {
-	
-	int i0 = 2;
-	
-	int e = 0, ne = 0, uo = 0, i = i0;
-	int e_, ne_, uo_, i_;
-	
-	assert(e == 0 && ne == 0 && uo == 0 && i >= 1);
-	if (alea()) {
-		U_RM;
-	}
-	else {
-		U_WM;
-		assert(e == 1 && ne == 0 && uo == 0 && i >= 0);
-		while (alea() && G_WM) {
-			U_WM;
-			assert(e == 1 && ne == 0 && uo == 0 && i >= 0);		
-		}
-		if (G_RM) {
-			U_RM;
-		}
-		else {
-			return;
-		}
-	}
-	
-	while (1) {
-		assert(e == 0 && ne <= 1 && uo >= 1 && i >= 0);
-		while (alea() && G_RM) {
-			U_RM;
-			assert(e == 0 && ne <= 1 && uo >= 1 && i >= 0);
-		}
-		while (alea()) {
-			if (alea() && G_WM) {
-				U_WM;
-			}
-			else {
-				U_WH;
-			}
-			assert(e == 1 && ne == 0 && uo == 0 && i >= 0);
-			while (alea() && G_WM) {
-				U_WM;
-				assert(e == 1 && ne == 0 && uo == 0 && i >= 0);
-			}
-			if (G_RM) {
-				U_RM;
-			}
-			else {
-				return;
-			}
-		}
-	}
-	
+void assert_error(void) {
+	exit(1);
 }
-*/
 
-void run() {
-	
-	//int i0 = 1 + rand();
-	int i0 = 5;
-	
-	int e = 0, ne = 0, uo = 0, i = i0;
-	int e_, ne_, uo_, i_;
+void checking_error(void) {
+	exit(2);
+}
 
-	assert(e == 0 && ne == 0 && uo == 0 && i == i0);
+#if USE_ASSERT == 0
+#define assert(e)
+#else
+#define assert(e) {if (!(e)) assert_error();}
+#endif
 
-	if (i0 == 1) {
-		check_not(G_WH);
-		if (alea()) {
-			U_RM;
-			assert(e == 0 && ne == 0 && uo == 1 && i == 0);
-			check_not(G_RM);
-			check_not(G_WM);
-			U_WH;
-		}
-		else {
-			U_WM;
-		}
-		assert(e == 1 && ne == 0 && uo == 0 && i == 0);
-	}
+#define check(e) {if (!(e)) checking_error();}
+#define check_not(e) {if (e) checking_error();}
+#define freeze {while(1);}
+
+// transition system
+
+#define trans(g, c) {if (g) {c; check_not(BAD);} else freeze;}
+
+#define G_i (i >= 1)
+#define G_ne_uo (ne + uo >= 1)
+
+#define C_RM {ne += e; uo++; i--; e = 0;}
+#define C_WH {i += ne + uo - 1; e++; ne = 0; uo = 0;}
+#define C_WM {i += e + ne + uo - 1; e = 1; ne = 0; uo = 0;}
+
+void run(void) {
+	int e, ne, uo, i;
+	e = ne = uo = 0;
+	i = rand();
 	
-	else {
-	
-		check_not(G_WH);
-		if (alea()) {
-			U_RM;
-			assert(e == 0 && ne == 0 && uo != 0 && i != 0 && uo + i == i0);
-			while (alea() && G_RM) {
-				U_RM;
-				assert(e == 0 && ne == 0 && uo + i == i0);
-			}
-			if (i != 0) {
-				if (alea()) {
-					U_WH;
-				}
-				else {
-					U_WM;
-				}
-			}
-			else {
-				check_not(G_RM);
-				check_not(G_WM);
-				U_WH;
-			}
-		}
-		else {
-			U_WM;
-		}
-		
+	if (i >= 1) {
+		assert(G_i && !G_ne_uo);
+		check_not(BAD);
 		while (1) {
-			assert(e == 1 && ne == 0 && uo == 0 && i == i0 - 1);
-			check_not(G_WH);
-			while (alea()) {
-				U_WM;
+			
+			if (flip()) {
+				trans(G_i && e + ne + uo + i >= 2, C_WM);
+				assert(G_i && !G_ne_uo);
 			}
-			while (alea()) {
-				U_RM;
-				assert(e == 0 && ne == 1 && uo + i == i0 - 1);
-				while (alea() && G_RM) {
-					U_RM;
-					assert(e == 0 && ne == 1 && uo + i == i0 - 1);
+
+			else if (flip()) {
+				trans(i >= 2, C_RM);
+				assert(G_i && G_ne_uo);
+				while (flip()) {
+					trans(i >= 2, C_RM);
+					assert(G_i && G_ne_uo);
 				}
-				if (i != 0) {
-					if (alea()) {
-						U_WH;
-					}
-					else {
-						U_WM;
-					}
+				if (flip()) {
+					trans(G_ne_uo, C_WH);
 				}
 				else {
-					check_not(G_RM);
-					check_not(G_WM);
-					U_WH;
+					trans(G_i, C_WM);
 				}
+				assert(G_i && !G_ne_uo);
 			}
+
+			else if (flip()) {
+				trans(i == 1, C_RM);
+				assert(!G_i && G_ne_uo);
+				trans(ne + uo >= 2, C_WH);
+				assert(G_i && !G_ne_uo);
+			}
+
+			else if (flip()) {
+				trans(i >= 2, C_RM);
+				assert(G_i && G_ne_uo);
+				while (flip()) {
+					trans(i >= 2, C_RM);
+					assert(G_i && G_ne_uo);
+				}
+				trans(i == 1, C_RM);
+				assert(!G_i && G_ne_uo);
+				trans(ne + uo >= 2, C_WH);
+				assert(G_i && !G_ne_uo);
+			}
+
+			else if (flip()) {
+				trans(i == 1 && e + ne + uo == 0, C_WM);
+				assert(!G_i && !G_ne_uo);
+				freeze;
+			}
+			
+			else if (flip()) {
+				trans(i == 1, C_RM);
+				assert(!G_i && G_ne_uo);
+				trans(ne + uo == 1, C_WH);
+				assert(!G_i && !G_ne_uo);
+				freeze;
+			}
+			
+			else {
+				trans(i >= 2, C_RM);
+				assert(G_i && G_ne_uo);
+				while (flip()) {
+					trans(i >= 2, C_RM);
+					assert(G_i && G_ne_uo);
+				}
+				trans(i == 1, C_RM);
+				assert(!G_i && G_ne_uo);
+				trans(ne + uo == 1, C_WH);
+				assert(!G_i && !G_ne_uo);
+				freeze;
+			}
+			
 		}
-	
 	}
-	
+
 }
 
 int main(void) {

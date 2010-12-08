@@ -45,81 +45,84 @@
  * sommets rationnels du systeme generateur de ps ne sont pas respectes.
  *
  * Remarque: il ne faut pas appliquer de normalisation du systeme apres
- *  inversion de la contrainte et avant le test de faisabilite en RATIONELS, 
- * car l'elimination des redondances n'est alors pas  necessairement 
+ *  inversion de la contrainte et avant le test de faisabilite en RATIONELS,
+ * car l'elimination des redondances n'est alors pas  necessairement
  * correcte en entiers.
  *
  *  resultat retourne par la fonction :
  *
- *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si 
+ *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si
  *		      le systeme initial est non faisable.
  *
  *  Les parametres de la fonction :
  *
- *  Psysteme ps    : systeme lineaire 
+ *  Psysteme ps    : systeme lineaire
  *
  */
 
-Psysteme sc_inequations_elim_redund(ps)
-Psysteme ps;
+Psysteme sc_inequations_elim_redund(Psysteme ps)
 {
-    Pcontrainte eq, eq1;
+  Pcontrainte eq, eq1;
 
-    for (eq = ps->inegalites;eq != NULL; eq = eq1) {
-	eq1 = eq->succ;
-	contrainte_reverse(eq);	
-	if (sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL,TRUE))
+  // hmmm... in order to prevent overflows and keep systems simple,
+  // there may be some strategy to try to remove bad constraints first?
+
+  // hmmm... why choosing "eq" to scan inequalities?
+  for (eq = ps->inegalites;eq != NULL; eq = eq1) {
+    eq1 = eq->succ;
+    contrainte_reverse(eq);
+    if (sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL,TRUE))
 	    contrainte_reverse(eq);
-	else  { 
+    else  {
 	    eq_set_vect_nul(eq);
 	    sc_rm_empty_constraints(ps,0);
-	}
     }
-   
-    return(ps);
+  }
+  return ps;
 }
 
 /* Psysteme sc_elim_redund(Psysteme ps):
  * elimination des contraintes lineaires redondantes dans le systeme par test
- * de faisabilite. Les tests de faisabilite sont appliques sur tout le 
+ * de faisabilite. Les tests de faisabilite sont appliques sur tout le
  * systeme. L'elimination des redondances est donc totale.
  *
  *  resultat retourne par la fonction :
  *
- *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si 
+ *  Psysteme	    : Le systeme initial est modifie. Il est egal a NULL si
  *		      le systeme initial est non faisable.
  *
  *  Les parametres de la fonction :
  *
- *  Psysteme ps    : systeme lineaire 
+ *  Psysteme ps    : systeme lineaire
  *
  */
 
-Psysteme sc_elim_redund(ps)
-Psysteme ps;
+Psysteme sc_elim_redund(Psysteme ps)
 {
-    Pcontrainte eq;
+  Pcontrainte eq;
 
-    for (eq = ps->egalites; eq != NULL; eq=eq->succ)
-	vect_normalize(eq->vecteur);
-    ps = sc_kill_db_eg(ps);
+  for (eq = ps->egalites; eq != NULL; eq=eq->succ)
+    vect_normalize(eq->vecteur);
 
-    if (SC_UNDEFINED_P(ps)) return(ps);
-    if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
-    {
-	sc_rm(ps);
-	return(NULL);
-    }
-    
-    ps = sc_inequations_elim_redund(ps);
-    return(ps);
+  ps = sc_kill_db_eg(ps);
+
+  if (SC_UNDEFINED_P(ps))
+    return ps;
+
+  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
+  {
+    sc_rm(ps);
+    return NULL;
+  }
+
+  ps = sc_inequations_elim_redund(ps);
+  return ps;
 }
 
 /* Same as above, but the basis is preserved and sc_empty is returned is
-the system is not feasible. ps is assumed to be a consistent system of
-constraints.  */
-Psysteme sc_safe_elim_redund(ps)
-Psysteme ps;
+   the system is not feasible. ps is assumed to be a consistent system of
+   constraints. */
+Psysteme sc_safe_elim_redund(Psysteme ps)
 {
   Pbase b = base_copy(sc_base(ps));
 
@@ -134,5 +137,5 @@ Psysteme ps;
     base_rm(b);
   }
 
-  return(ps);
+  return ps;
 }

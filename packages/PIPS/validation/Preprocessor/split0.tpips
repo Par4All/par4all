@@ -1,0 +1,8 @@
+setenv WS="split0"
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+display PRINTED_FILE[%ALL]
+close
+delete $WS
+

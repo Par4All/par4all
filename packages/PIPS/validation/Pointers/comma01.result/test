@@ -5,9 +5,9 @@ void comma01()
    int *p;
    int *q;
    int *r;
-//               <must be written>: p q r
+//             <    is written>: p q r
    p = &i, q = &i, r = &i;
-//               <must be written>: i
+//             <    is written>: i
    
    
    i = 2;
@@ -21,13 +21,16 @@ void comma01()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *q;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *r;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    p = &i, q = &i, r = &i;
 //  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
    

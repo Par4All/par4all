@@ -46,6 +46,8 @@
 
 /*
   @param r1 and r2 are two path references
+  @param strict_p is true if the path length of r1 must be strictly inferior
+         to the path length of r2
   @param exact_p is a pointer towards a boolean, which is set to false
          is the result is an over-approximation, true if it's an exact answer.
   @return true if r1 path may be a predecessor of r2 path
@@ -56,6 +58,7 @@
 bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 				       reference r2, descriptor d2,
 				       transformer current_precondition,
+				       bool strict_p,
 				       bool * exact_p)
 {
   bool res = true;
@@ -72,7 +75,8 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 
   *exact_p = true;
   if (same_entity_p(e1, e2)
-      && (r1_path_length < r2_path_length))
+      && ((r1_path_length < r2_path_length)
+	  || (!strict_p && r1_path_length == r2_path_length)))
     {
       /* same entity and the path length of r1 is shorter than the
 	 path length of r2.
@@ -241,3 +245,49 @@ list eval_convex_cell_with_points_to(cell c, descriptor d, list ptl, bool *exact
 }
 
 
+list convex_effect_to_constant_path_effects_with_points_to(effect eff)
+{
+  list le = NIL;
+  bool exact_p;
+  reference ref = effect_any_reference(eff);
+
+  if (effect_reference_dereferencing_p(ref, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+      bool exact_p = false;
+      transformer context;
+      if (effects_private_current_context_empty_p())
+	context = transformer_undefined;
+      else {
+	context = effects_private_current_context_head();
+      }
+
+      list l_eval = eval_convex_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
+						    points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
+						    &exact_p, context);
+      if (ENDP(l_eval))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+	  /* We have not found any equivalent constant path : it may point anywhere */
+	  /* We should maybe contract these effects later. Is it done by the callers ? */
+	  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	}
+      else
+	{
+	  /* change the resulting effects action to the current effect action */
+	  if (effect_read_p(eff))
+	    effects_to_read_effects(l_eval);
+	  le = gen_nconc(l_eval,le);
+	}
+    }
+  else
+    le = CONS(EFFECT, copy_effect(eff), le);
+ return le;
+
+}
+
+list convex_effect_to_constant_path_effects_with_pointer_values(effect __attribute__ ((unused)) eff)
+{
+  pips_internal_error("not yet implemented\n");
+  return NIL;
+}

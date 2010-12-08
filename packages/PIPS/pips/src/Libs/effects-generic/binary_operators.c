@@ -43,6 +43,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "misc.h"
+#include "properties.h"
 #include "text.h"
 #include "text-util.h"
 
@@ -427,7 +428,9 @@ bool effects_combinable_p(effect eff1, effect eff2)
     if (anywhere_effect_p(eff1))
       {
 	pips_debug(8, "eff1 is an anywhere effect\n");
-	if (malloc_effect_p(eff2) || io_effect_p(eff2))
+	if (malloc_effect_p(eff2) || io_effect_p(eff2)
+	    || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+		&& std_file_effect_p(eff2)))
 	  same_p = false;
 	else
 	  same_p = true;
@@ -439,7 +442,9 @@ bool effects_combinable_p(effect eff1, effect eff2)
       {
 	pips_debug(8, "eff2 is an anywhere effect\n");
 
-	if (malloc_effect_p(eff1) || io_effect_p(eff1))
+	if (malloc_effect_p(eff1) || io_effect_p(eff1)
+	    || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+		&& std_file_effect_p(eff1)))
 	  same_p = false;
 	else
 	  same_p = true;

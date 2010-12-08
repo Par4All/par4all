@@ -1,31 +1,31 @@
 void call18(int i, ...)
 {
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
    i++;
-//               <must be read   >: i
+//             <    is read   >: i
    if (i) {
       va_list pa;
       int r;
-//               <must be read   >: pa
-//               <must be written>: pa
+//             <    is read   >: pa
+//             <    is written>: pa
 
       va_start(pa, fmt);
-//               <may be written >: pa
-//               <must be read   >: pa
+//             <may be written>: pa
+//             <    is read   >: pa
 
       va_end(pa);
    }
 }
 int main()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 1;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <must be written>: k
+//             <    is written>: k
    int k = 3;
-//               <must be read   >: i j k
+//             <    is read   >: i j k
 
    call18(i, i, j, k, 0);
 }

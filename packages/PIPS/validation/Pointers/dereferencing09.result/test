@@ -4,19 +4,19 @@ Proper effects for "main"
 int main()
 {
    int a, aa, *b, *bb, **c;                                             /*0003*/
-//               <must be written>: a
+//             <    is written>: a
 
    a = 1;                                                               /*0005*/
-//               <must be written>: b
+//             <    is written>: b
    b = &a;                                                              /*0006*/
-//               <must be written>: c
+//             <    is written>: c
    c = &b;                                                              /*0007*/
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: bb
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: bb
 
    bb = *c;                                                             /*0009*/
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: aa
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: aa
    aa = **c;                                                            /*0010*/
    return 0;                                                            /*0011*/
 }
@@ -26,74 +26,24 @@ POINTS TO for "main"
 //  {}
 int main()
 {
-//  points to = {}
+//  {(b,*ANY_MODULE*:*NOWHERE*,-Exact-);(bb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int a, aa, *b, *bb, **c;                                             /*0003*/
-//  points to = {}
+//  {(b,*ANY_MODULE*:*NOWHERE*,-Exact-);(bb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    a = 1;                                                               /*0005*/
-//  points to = {}
+//  {(b,*ANY_MODULE*:*NOWHERE*,-Exact-);(bb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    b = &a;                                                              /*0006*/
-//  {(b,a,-Exact-)}
+//  {(b,a,-Exact-);(bb,*ANY_MODULE*:*NOWHERE*,-Exact-);(c,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    c = &b;                                                              /*0007*/
-//  {(b,a,-Exact-);(c,b,-Exact-)}
+//  {(b,a,-Exact-);(bb,*ANY_MODULE*:*NOWHERE*,-Exact-);(c,b,-Exact-)}
 
    bb = *c;                                                             /*0009*/
 //  {(b,a,-Exact-);(bb,a,-Exact-);(c,b,-Exact-)}
    aa = **c;                                                            /*0010*/
 //  {(b,a,-Exact-);(bb,a,-Exact-);(c,b,-Exact-)}
-   return 0;                                                            /*0011*/
-}
-
-Proper effects using points_to
-
-int main()
-{
-   int a, aa, *b, *bb, **c;                                             /*0003*/
-//               <must be written>: a
-
-   a = 1;                                                               /*0005*/
-//               <must be written>: b
-   b = &a;                                                              /*0006*/
-//               <must be written>: c
-   c = &b;                                                              /*0007*/
-//               <must be read   >: b c
-//               <must be written>: bb
-
-   bb = *c;                                                             /*0009*/
-//               <must be read   >: a b c
-//               <must be written>: aa
-   aa = **c;                                                            /*0010*/
-   return 0;                                                            /*0011*/
-}
-int main()
-{
-   int a, aa, *b, *bb, **c;                                             /*0003*/
-
-//  <a-W-EXACT-{}>
-
-
-   a = 1;                                                               /*0005*/
-
-//  <b-W-EXACT-{}>
-
-   b = &a;                                                              /*0006*/
-
-//  <c-W-EXACT-{}>
-
-   c = &b;                                                              /*0007*/
-
-//  <b-R-EXACT-{a==1}>
-//  <bb-W-EXACT-{}>
-//  <c-R-EXACT-{}>
-
-
-   bb = *c;                                                             /*0009*/
-
-//  <a-R-EXACT-{}>
-//  <aa-W-EXACT-{}>
-//  <b-R-EXACT-{a==1}>
-//  <c-R-EXACT-{}>
-
-   aa = **c;                                                            /*0010*/
    return 0;                                                            /*0011*/
 }

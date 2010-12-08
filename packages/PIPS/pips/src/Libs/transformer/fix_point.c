@@ -24,7 +24,7 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
- /* transformer package - fix point computations
+ /* transformer package - fix-point or transitive closure computations
   *
   * Several algorithms are available:
   *
@@ -78,6 +78,11 @@
   *    Note that the second constraint is redundant with the other two, but the last
   *    one cannot be found before the constant terms are eliminated.
   *
+  *
+  * The current algorithm, the derivative version, is published and
+  * describes in NSAD 2010, A/426/CRI. See also A/429/CRI:
+  * http://www.cri.ensmp.fr/classement/doc/A-429.pdf
+  *
   * Francois Irigoin, 21 April 1990
   */
 
@@ -105,11 +110,11 @@
 
 #include "transformer.h"
 
+/* The fixpoint operator is selected according to properties */
+transformer (* transformer_fix_point_operator)(transformer);
+
 /*
-transformer 
-transformer_fix_point(t1, t2)
-transformer t1;
-transformer t2;
+transformer transformer_fix_point(transformer t1, transformer t2)
 {
     Psysteme r1;
     Psysteme r2;
@@ -135,9 +140,7 @@ transformer t2;
 }
 */
 
-transformer 
-transformer_halbwachs_fix_point(tf)
-transformer tf;
+transformer transformer_halbwachs_fix_point(transformer tf)
 {
     /* THIS FUNCTION WAS NEVER CORRECT AND HAS NOT BEEN REWRITTEN FOR
        THE NEW VALUE PACKAGE */
@@ -229,8 +232,7 @@ transformer tf;
  * Also, the matrice type is now obsolete and should not appear in
  * transformer.h. Hence buil_transfer_matrix() must be static.
  */
-static void 
-build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
+static void build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
 
 /* Let A be the affine loop transfert function. The affine transfer fix-point T
  * is such that T(A-I) = 0
@@ -245,7 +247,7 @@ build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
  * A = P^-1 H Q^-1
  * T A = T P^-1 H Q^-1 = 0
  * T P^-1 H = 0 (by multipliying by Q)
- * 
+ *
  * Soit X t.q. X H = 0
  * A basis for all solutions is given by X chosen such that
  * X is a rectangular matrix (0 I) selecting the zero submatrix of H
@@ -261,9 +263,7 @@ build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
  * loop_to_transformer() and whileloop_to_transformer().
  */
 
-transformer 
-transformer_equality_fix_point(tf)
-transformer tf;
+transformer transformer_equality_fix_point(transformer tf)
 {
     /* result */
     transformer fix_tf = transformer_identity();
@@ -290,10 +290,11 @@ transformer tf;
     /* Pbase t = BASE_UNDEFINED; */
 
     ifdebug(8) {
-	debug(8, "transformer_equality_fix_point", "begin for transformer %p\n", tf);
-	fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
+	pips_debug(8, "begin for transformer %p\n", tf);
+	fprint_transformer(stderr, tf,
+			   (get_variable_name_t) external_value_name);
     }
- 
+
     /* If the input transformer is not feasible, so is not its fixpoint
      * because the number of iterations may be zero which implies identity.
      */
@@ -301,7 +302,8 @@ transformer tf;
       /* fix_tf = transformer_identity(); */
 	ifdebug(8) {
 	    debug(8, "transformer_equality_fix_point", "fix-point fix_tf=\n");
-	    fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
+	    fprint_transformer(stderr, fix_tf,
+			       (get_variable_name_t) external_value_name);
 	    debug(8, "transformer_equality_fix_point", "end\n");
 	}
 	return fix_tf;
@@ -310,8 +312,9 @@ transformer tf;
     /* find or build explicit transfer equations: v#new = f(v1#old, v2#old,...)
      * and the corresponding sub-basis
      *
-     * FI: for each constant variable, whose constance is implictly implied by not having it
-     * in the argument field, an equation should be added...
+     * FI: for each constant variable, whose constance is implictly
+     * implied by not having it in the argument field, an equation
+     * should be added...
      *
      * lieq = build_implicit_equalities(tf);
      * lieq->succ = leq;
@@ -340,22 +343,22 @@ transformer tf;
     DENOMINATOR(p) = VALUE_ONE;
     DENOMINATOR(q) = VALUE_ONE;
     matrice_smith(a, n_eq, n_eq, p, h, q);
- 
+
     ifdebug(8) {
-	debug(8, "transformer_equality_fix_point", "smith matrix h=p.a.q:\n");
+	pips_debug(8, "smith matrix h=p.a.q:\n");
 	matrice_fprint(stderr, h, n_eq, n_eq);
-	debug(8, "transformer_equality_fix_point", "p  matrix:\n");
+	pips_debug(8, "p  matrix:\n");
 	matrice_fprint(stderr, p, n_eq, n_eq);
-	debug(8, "transformer_equality_fix_point", "q  matrix:\n");
+	pips_debug(8, "q  matrix:\n");
 	matrice_fprint(stderr, q, n_eq, n_eq);
     }
 
     /* Find out the number of invariants n_inv */
-    for(i=1; i <= n_eq && 
+    for(i=1; i <= n_eq &&
 	    value_notzero_p(ACCESS(h, n_eq, i, i)) ; i++)
 	;
     n_inv = n_eq - i + 1;
-    debug(8, "transformer_equality_fix_point", "number of useful invariants: %d\n", n_inv-1);
+    pips_debug(8, "number of useful invariants: %d\n", n_inv-1);
     pips_assert("transformer_equality_fix_point", n_inv >= 1);
 
     /* Convert p's last n_inv rows into constraints */
@@ -390,9 +393,9 @@ transformer tf;
     sc_creer_base(sc_inv);
 
     ifdebug(8) {
-	debug(8, "transformer_equality_fix_point", "fix-point sc_inv=\n");
+	pips_debug(8, "fix-point sc_inv=\n");
 	sc_fprint(stderr, sc_inv, (char * (*)(Variable)) external_value_name);
-	debug(8, "transformer_equality_fix_point", "end\n");
+	pips_debug(8, "end\n");
     }
 
     /* Set fix_tf's argument list */
@@ -409,7 +412,7 @@ transformer tf;
     sc_base(sc_inv) = base_dup(sc_base(predicate_system(transformer_relation(tf))));
     sc_dimension(sc_inv) = sc_dimension(predicate_system(transformer_relation(tf)));
     transformer_relation(fix_tf) = make_predicate(sc_inv);
- 
+
     /* get rid of dense matrices */
     matrice_free(a);
     matrice_free(h);
@@ -427,11 +430,9 @@ transformer tf;
     return fix_tf;
 }
 
-void 
-build_transfer_equations(leq, plteq, pb_new)
-Pcontrainte leq;
-Pcontrainte *plteq;
-Pbase * pb_new;
+void build_transfer_equations(Pcontrainte leq,
+			      Pcontrainte *plteq,
+			      Pbase * pb_new)
 {
     Pcontrainte lteq = CONTRAINTE_UNDEFINED;
     Pbase b_new = BASE_NULLE;
@@ -463,18 +464,20 @@ Pbase * pb_new;
     }
 
     ifdebug(8) {
-	debug(8, "build_transfer_equations", "preliminary transfer equations:\n");
-	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
+      pips_debug(8, "preliminary transfer equations:\n");
+      egalites_fprint(stderr, lteq,
+		      (char * (*)(Variable)) external_value_name);
     }
 
     /* derive the new basis and the old basis */
     equations_to_bases(lteq, &b_new, &b_old);
 
-    /* check that the old basis is included in the new basis (else no fix-point!) */
+    /* check that the old basis is included in the new basis (else no
+       fix-point!) */
     ifdebug(8) {
-	debug(8, "build_transfer_equations", "old basis:\n");
+	pips_debug(8, "old basis:\n");
 	base_fprint(stderr, b_old, (char * (*)(Variable)) external_value_name);
-	debug(8, "build_transfer_equations", "new basis:\n");
+	pips_debug(8, "new basis:\n");
 	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
     }
 
@@ -487,7 +490,9 @@ Pbase * pb_new;
 	for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = next_eq) {
 	    bool preserve = TRUE;
 	    Pvecteur t = VECTEUR_UNDEFINED;
-	    for(t = contrainte_vecteur(eq); !VECTEUR_UNDEFINED_P(t) && preserve; t = t->succ) {
+	    for(t = contrainte_vecteur(eq);
+		!VECTEUR_UNDEFINED_P(t) && preserve;
+		t = t->succ) {
 		entity e = (entity) vecteur_var(t);
 
 		preserve = base_contains_variable_p(b_diff, (Variable) e);
@@ -507,11 +512,12 @@ Pbase * pb_new;
     }
 
     ifdebug(8) {
-	debug(8, "build_transfer_equations", "final transfer equations:\n");
-	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
-	debug(8, "build_transfer_equations", "old basis:\n");
+	pips_debug(8, "final transfer equations:\n");
+	egalites_fprint(stderr, lteq,
+			(char * (*)(Variable)) external_value_name);
+	pips_debug(8, "old basis:\n");
 	base_fprint(stderr, b_old, (char * (*)(Variable)) external_value_name);
-	debug(8, "build_transfer_equations", "new basis:\n");
+	pips_debug(8, "new basis:\n");
 	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
     }
 
@@ -524,11 +530,11 @@ Pbase * pb_new;
     *pb_new = b_new;
 
     ifdebug(8) {
-	debug(8, "build_transfer_equations", "results\ntransfer equations:\n");
+	pips_debug(8, "results\ntransfer equations:\n");
 	egalites_fprint(stderr, lteq, (char * (*)(Variable)) external_value_name);
-	debug(8, "build_transfer_equations", "results\ntransfer basis:\n");
+	pips_debug(8, "results\ntransfer basis:\n");
 	base_fprint(stderr, b_new, (char * (*)(Variable)) external_value_name);
-	debug(8, "build_transfer_equations", "end\n");
+	pips_debug(8, "end\n");
     }
 }
 
@@ -538,13 +544,12 @@ Pbase * pb_new;
  * one or minus one. We assume that the equation is reduced (i.e.
  * gcd(coeffs) == 1).
  *
- * FI: Non-unary coefficients may appear because equations were combined, for instance
- * by a previous internal fix-point as in KINETI of mdg-fi.f (Perfect Club). Maybe, something
- * could be done for these nested fix-points.
+ * FI: Non-unary coefficients may appear because equations were
+ * combined, for instance by a previous internal fix-point as in
+ * KINETI of mdg-fi.f (Perfect Club). Maybe, something could be done
+ * for these nested fix-points.
  */
-bool 
-transfer_equation_p(eq)
-Pvecteur eq;
+bool transfer_equation_p(Pvecteur eq)
 {
     Pvecteur t;
     int n_new = 0;
@@ -562,9 +567,7 @@ Pvecteur eq;
     return (n_new==1) && (value_one_p(coeff) || value_mone_p(coeff));
 }
 
-entity 
-new_value_in_transfer_equation(eq)
-Pvecteur eq;
+entity new_value_in_transfer_equation(Pvecteur eq)
 {
     Pvecteur t;
     int n_new = 0;
@@ -574,7 +577,7 @@ Pvecteur eq;
     for(t=eq; !VECTEUR_UNDEFINED_P(t) && n_new <= 1; t = t->succ) {
 	entity e = (entity) vecteur_var(t);
 
-	if( e != (entity) TCST && new_value_entity_p(e) && 
+	if( e != (entity) TCST && new_value_entity_p(e) &&
 	   (value_one_p(vecteur_val(t)) || value_mone_p(vecteur_val(t)))) {
 	    new_value = e;
 	    coeff = vecteur_val(t);
@@ -595,12 +598,10 @@ Pvecteur eq;
 
 
 
-static void 
-build_transfer_matrix(pa, lteq, n_eq, b_new)
-matrice * pa;
-Pcontrainte lteq;
-int n_eq;
-Pbase b_new;
+static void build_transfer_matrix(matrice * pa,
+				  Pcontrainte lteq,
+				  int n_eq,
+				  Pbase b_new)
 {
     matrice a = matrice_new(n_eq, n_eq);
     Pcontrainte eq = CONTRAINTE_UNDEFINED;
@@ -617,7 +618,7 @@ Pbase b_new;
 
 	    if( e != (entity) TCST ) {
 		if(new_value_entity_p(e)) {
-		    pips_assert("build_transfer_matrix", 
+		    pips_assert("build_transfer_matrix",
 				value_one_p(vecteur_val(t)));
 		}
 		else {
@@ -625,12 +626,12 @@ Pbase b_new;
 		    int ov_rank = rank_of_variable(b_new, (Variable) ov);
 		    debug(8,"build_transfer_matrix", "nv_rank=%d, ov_rank=%d\n",
 			  nv_rank, ov_rank);
-		    ACCESS(a, n_eq, nv_rank, ov_rank) = 
+		    ACCESS(a, n_eq, nv_rank, ov_rank) =
 			value_uminus(vecteur_val(t));
 		}
 	    }
 	    else {
-		ACCESS(a, n_eq, nv_rank, n_eq) = 
+		ACCESS(a, n_eq, nv_rank, n_eq) =
 		    value_uminus(vecteur_val(t));
 	    }
 	}
@@ -644,10 +645,7 @@ Pbase b_new;
 /* FI: should be moved in base.c */
 
 /* sub_basis_p(Pbase b1, Pbase b2): check if b1 is included in b2 */
-bool 
-sub_basis_p(b1, b2)
-Pbase b1;
-Pbase b2;
+bool sub_basis_p(Pbase b1, Pbase b2)
 {
     bool is_a_sub_basis = TRUE;
     Pbase t;
@@ -659,44 +657,42 @@ Pbase b2;
     return is_a_sub_basis;
 }
 
-void 
-equations_to_bases(lteq, pb_new, pb_old)
-Pcontrainte lteq;
-Pbase * pb_new;
-Pbase * pb_old;
+void equations_to_bases(Pcontrainte lteq, Pbase * pb_new, Pbase * pb_old)
 {
-    Pbase b_new = BASE_UNDEFINED;
-    Pbase b_old = BASE_UNDEFINED;
-    Pcontrainte eq = CONTRAINTE_UNDEFINED;
+  Pbase b_new = BASE_UNDEFINED;
+  Pbase b_old = BASE_UNDEFINED;
+  Pcontrainte eq = CONTRAINTE_UNDEFINED;
 
-    for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
-	Pvecteur t;
+  for(eq = lteq; !CONTRAINTE_UNDEFINED_P(eq); eq = eq->succ) {
+    Pvecteur t;
 
-	for(t=contrainte_vecteur(eq); !VECTEUR_UNDEFINED_P(t); t = t->succ) {
-	    entity e = (entity) vecteur_var(t);
+    for(t=contrainte_vecteur(eq); !VECTEUR_UNDEFINED_P(t); t = t->succ) {
+      entity e = (entity) vecteur_var(t);
 
-	    if( e != (entity) TCST ) {
-		if(new_value_entity_p(e)) {
-		    b_new = vect_add_variable(b_new, (Variable) e);
-		}
-		else {
-		    b_old = vect_add_variable(b_old, (Variable) old_value_to_new_value(e));
-		}
-	    }
+      if( e != (entity) TCST ) {
+	if(new_value_entity_p(e)) {
+	  b_new = vect_add_variable(b_new, (Variable) e);
 	}
+	else {
+	  b_old = vect_add_variable(b_old,
+				    (Variable) old_value_to_new_value(e));
+	}
+      }
     }
+  }
 
-    *pb_new = b_new;
-    *pb_old = b_old;
+  *pb_new = b_new;
+  *pb_old = b_old;
 }
 
 
-/* This fixpoint function was developped to present a talk at FORMA. I used
- * examples published by Pugh and I realized that the fixpoint constraints 
- * were obvious in the loop body transformer. You just had to identify them.
- * This is not a clever algorithm. It certainly would not resist any messing up
- * with the constraints, i.e. a change of basis. But it provides very good result
- * for a class of applications.
+/* This fixpoint function was developped to present a talk at FORMA. I
+ * used examples published by Pugh and I realized that the fixpoint
+ * constraints were obvious in the loop body transformer. You just had
+ * to identify them.  This is not a clever algorithm. It certainly
+ * would not resist any messing up with the constraints, i.e. a change
+ * of basis. But it provides very good result for a class of
+ * applications.
  *
  * Algorithm:
  *  1. Find a loop counter
@@ -710,9 +706,7 @@ Pbase * pb_old;
  * for an inequality is unchanged.
  */
 
-transformer 
-transformer_pattern_fix_point(tf)
-transformer tf;
+transformer transformer_pattern_fix_point(transformer tf)
 {
     /* result */
     transformer fix_tf =  transformer_dup(tf);
@@ -721,8 +715,9 @@ transformer tf;
     int inc = 1;
 
     ifdebug(8) {
-	debug(8, "transformer_pattern_fix_point", "Begin for transformer %p:\n", tf);
-	fprint_transformer(stderr, tf, (get_variable_name_t) external_value_name);
+	pips_debug(8, "Begin for transformer %p:\n", tf);
+	fprint_transformer(stderr, tf,
+			   (get_variable_name_t) external_value_name);
     }
 
     /* Look for the best loop counter: the smallest increment is chosen */
@@ -731,7 +726,7 @@ transformer tf;
     if(!VECTEUR_UNDEFINED_P(v_inc)) {
 
 	ifdebug(8) {
-	    debug(8, "transformer_pattern_fix_point", "incrementation vector=\n");
+	    pips_debug(8, "incrementation vector=\n");
 	    vect_fprint(stderr, v_inc, (char * (*)(Variable)) external_value_name);
 	}
 
@@ -747,33 +742,33 @@ transformer tf;
 	fix_sc = sc_eliminate_constant_terms(fix_sc, v_inc);
 
 	ifdebug(8) {
-	    debug(8, "transformer_pattern_fix_point", "after constant term elimination=\n");
+	    pips_debug(8, "after constant term elimination=\n");
 	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_elim_redund(fix_sc);
 
 	ifdebug(8) {
-	    debug(8, "transformer_pattern_fix_point", "after normalization=\n");
+	    pips_debug(8, "after normalization=\n");
 	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_keep_invariants_only(fix_sc);
 
 	ifdebug(8) {
-	    debug(8, "transformer_pattern_fix_point", "after non-invariant elimination=\n");
+	    pips_debug(8, "after non-invariant elimination=\n");
 	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
 
 	fix_sc = sc_elim_redund(fix_sc);
 
 	ifdebug(8) {
-	    debug(8, "transformer_pattern_fix_point", "after 2nd normalization=\n");
+	    pips_debug(8, "after 2nd normalization=\n");
 	    sc_fprint(stderr, fix_sc, (char * (*)(Variable)) external_value_name);
 	}
     }
     else {
-	debug(8, "transformer_pattern_fix_point", "No counter found\n");
+	pips_debug(8, "No counter found\n");
 	/* Remove all constraints to build the invariant transformer */
 	contraintes_free(sc_egalites(fix_sc));
 	sc_egalites(fix_sc) = CONTRAINTE_UNDEFINED;
@@ -784,9 +779,9 @@ transformer tf;
     }
 
     ifdebug(8) {
-	debug(8, "transformer_pattern_fix_point", "fix-point fix_tf=\n");
+	pips_debug(8, "fix-point fix_tf=\n");
 	fprint_transformer(stderr, fix_tf, (get_variable_name_t) external_value_name);
-	debug(8, "transformer_pattern_fix_point", "end\n");
+	pips_debug(8, "end\n");
     }
 
     return fix_tf;
@@ -797,14 +792,13 @@ transformer tf;
  * If the transformer has been build naively, a loop counter
  * should have a transformer equation like i#new = i#old + K_i
  * where K_i is a numerical constant.
- * 
+ *
  * Since the loop counter is later used to eliminate constant
  * terms in other constraints, variable i with the minimal absolute
  * value K_i shuold be chosen.
  */
 
-Pvecteur
-look_for_the_best_counter(Pcontrainte egs)
+Pvecteur look_for_the_best_counter(Pcontrainte egs)
 {
     Pvecteur v_inc = VECTEUR_UNDEFINED;
     entity old_index = entity_undefined;
@@ -864,8 +858,7 @@ look_for_the_best_counter(Pcontrainte egs)
  *
  * This function should be located in Linear/sc
  */
-Psysteme
-sc_eliminate_constant_terms(Psysteme sc, Pvecteur v)
+Psysteme sc_eliminate_constant_terms(Psysteme sc, Pvecteur v)
 {
     int cv = vect_coeff(TCST, v);
 
@@ -877,8 +870,7 @@ sc_eliminate_constant_terms(Psysteme sc, Pvecteur v)
     return sc;
 }
 
-Pcontrainte
-constraints_eliminate_constant_terms(Pcontrainte lc, Pvecteur v)
+Pcontrainte constraints_eliminate_constant_terms(Pcontrainte lc, Pvecteur v)
 {
     Value c1 = vect_coeff(TCST, v);
     Pcontrainte cc = CONTRAINTE_UNDEFINED;
@@ -915,8 +907,7 @@ constraints_eliminate_constant_terms(Pcontrainte lc, Pvecteur v)
  * it is possible to derive p#new >= p#old. Or even better
  * if a's value turns out to be known.
  */
-Psysteme
-sc_keep_invariants_only(Psysteme sc)
+Psysteme sc_keep_invariants_only(Psysteme sc)
 {
     sc_egalites(sc) = constraints_keep_invariants_only(sc_egalites(sc));
     sc_inegalites(sc) = constraints_keep_invariants_only(sc_inegalites(sc));
@@ -924,8 +915,7 @@ sc_keep_invariants_only(Psysteme sc)
 }
 
 
-Pcontrainte
-constraints_keep_invariants_only(Pcontrainte lc)
+Pcontrainte constraints_keep_invariants_only(Pcontrainte lc)
 {
     Pcontrainte cc;
 
@@ -949,8 +939,7 @@ constraints_keep_invariants_only(Pcontrainte lc)
  * earlier using a loop counter.
  */
 
-bool
-invariant_vector_p(Pvecteur v)
+bool invariant_vector_p(Pvecteur v)
 {
     bool invariant = TRUE;
     Pvecteur cv = VECTEUR_UNDEFINED;
@@ -991,11 +980,11 @@ invariant_vector_p(Pvecteur v)
     v_sum = vect_add(v_new, v_old);
 
     ifdebug(8) {
-	debug(8, "invariant_vector_p", "vector v_new: ");
+	pips_debug(8, "vector v_new: ");
 	vect_fprint(stderr, v_new, (char * (*)(Variable)) external_value_name);
-	debug(8, "invariant_vector_p", "vector v_old: ");
+	pips_debug(8, "vector v_old: ");
 	vect_fprint(stderr, v_old, (char * (*)(Variable)) external_value_name);
-	debug(8, "invariant_vector_p", "vector v_sum: ");
+	pips_debug(8, "vector v_sum: ");
 	vect_fprint(stderr, v_sum, (char * (*)(Variable)) external_value_name);
     }
 
@@ -1013,7 +1002,7 @@ invariant_vector_p(Pvecteur v)
     vect_rm(v_new);
     vect_rm(v_old);
 
-    debug(8, "invariant_vector_p", "end invariant=%s\n",
+    pips_debug(8, "end invariant=%s\n",
 	  bool_to_string(invariant));
 
     return invariant;
@@ -1063,7 +1052,7 @@ static Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
 }
 
 /* Computation of a transitive closure using constraints on the
- * discrete derivative. See TR CRI ???.
+ * discrete derivative. See http://www.cri.ensmp.fr/classement/doc/A-429.pdf
  *
  * Implicit equations, n#new - n#old = 0, are not added. Instead, invariant
  * constraints in tf are obtained by projection and added.
@@ -1266,4 +1255,112 @@ transformer transformer_basic_fix_point(transformer tf)
   }
 
   return fix_tf;
+}
+
+/* Derived from any_loop_to_k_transformer()
+ *
+ * The recursive computation of the loop transformer is not performed here.
+*/
+transformer any_transformer_to_k_closure(transformer t_init,
+					 transformer t_enter,
+					 transformer t_next,
+					 transformer t_body,
+					 transformer post_init, // precondition
+								// holding
+								// after
+								// loop
+								// initialization
+								// but
+								// before
+								// the
+								// loop
+								// is entered
+					 int k,
+					 bool assume_previous_iteration_p)
+{
+  transformer t_fbody = transformer_undefined; // t_body; t_next
+  transformer t_fbody_star = transformer_undefined; // t_fbody*
+  transformer t_body_star = transformer_undefined; // t_init ; t_enter ; tfbodystar
+  transformer post_enter = transformer_apply(t_enter, post_init);
+  transformer enter_condition = transformer_range(post_enter);
+  transformer next_condition = transformer_range(t_next);
+  transformer post_next = transformer_undefined;
+  //transformer pre_iteration = transformer_convex_hull(enter_condition, next_condition);
+  transformer npre_iteration = transformer_undefined;
+  transformer post_loop_star = transformer_undefined;
+  transformer post_loop_plus = transformer_undefined;
+  transformer post_loop = transformer_undefined;
+  transformer t_next_star = transformer_undefined;
+  transformer t_fbody_k = transformer_undefined;
+  int ck; // used to unroll k-1 times the loop body
+
+  ifdebug(8) {
+    fprintf(stderr, "t_init:\n");
+    print_transformer(t_init);
+    fprintf(stderr, "t_enter:\n");
+    print_transformer(t_enter);
+    fprintf(stderr, "t_next:\n");
+    print_transformer(t_next);
+    fprintf(stderr, "t_body:\n");
+    print_transformer(t_body);
+    fprintf(stderr, "post_init:\n");
+    print_transformer(post_init);
+  }
+
+  if(assume_previous_iteration_p)
+    t_body = transformer_intersect_range_with_domain(t_body);
+
+  /* Complete the body transformer with t_next (t_body is modified by
+     side effects into t_fbody) */
+  t_fbody = transformer_combine(t_body, t_next);
+
+  /* Compute the fix point */
+  t_fbody_k = copy_transformer(t_fbody);
+  for(ck=2; ck<=k; ck++)
+    t_fbody_k = transformer_combine(t_fbody_k, t_fbody);
+  t_fbody_star = (* transformer_fix_point_operator)(t_fbody_k);
+  free_transformer(t_fbody_k);
+
+  /* Compute t_body_star = t_init ; t_enter */
+  t_body_star = transformer_combine(transformer_dup(t_init), t_enter);
+  t_body_star = transformer_combine(t_body_star, t_fbody_star);
+
+  /* and add the continuation condition, pre_iteration improved with
+     knowledge about the body, npre_iteration. Note that pre_iteration
+     would also provide correct results, although less accurate. */
+  post_loop_star = transformer_apply(t_fbody_star, enter_condition);
+  post_loop_plus = transformer_apply(t_fbody, post_loop_star);
+  post_loop = transformer_range(post_loop_plus);
+  npre_iteration = transformer_convex_hull(enter_condition, post_loop);
+  if(k==2) { // Should be a loop over k
+    transformer post_loop_plus_plus =  transformer_apply(t_fbody, post_loop_plus);
+    transformer old_npre_iteration = npre_iteration;
+    post_loop = transformer_range(post_loop_plus_plus);
+    npre_iteration = transformer_convex_hull(npre_iteration, post_loop);
+    free_transformer(post_loop_plus_plus);
+    free_transformer(old_npre_iteration);
+  }
+  t_body_star = transformer_combine(t_body_star, npre_iteration);
+
+  /* Any transformer or other data structure to free? */
+  //free_transformer(t_body); transformed into t_fbody
+  free_transformer(t_fbody);
+  free_transformer(t_fbody_star);
+  free_transformer(post_next);
+  //free_transformer(t_effects);
+  free_transformer(post_enter);
+  free_transformer(enter_condition);
+  free_transformer(next_condition);
+  free_transformer(npre_iteration);
+  free_transformer(post_loop_star);
+  free_transformer(post_loop_plus);
+  free_transformer(post_loop);
+  free_transformer(t_next_star);
+
+  ifdebug(8) {
+    fprintf(stderr, "t_body_star:\n");
+    print_transformer(t_body_star);
+  }
+
+  return t_body_star;
 }

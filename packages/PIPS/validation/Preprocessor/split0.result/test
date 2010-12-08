@@ -1,0 +1,18 @@
+static int a();
+
+static int b();
+
+static int c();
+static int a()
+{
+   return 1;
+}
+static int b()
+{
+   return 1;
+}
+static int c()
+{
+   return 1;
+}
+

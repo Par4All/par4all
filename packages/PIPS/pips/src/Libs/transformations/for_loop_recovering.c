@@ -304,6 +304,8 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 	whileloop_body(wl) = statement_undefined;
 	whileloop_condition(wl) = expression_undefined;
 	free_whileloop(wl);
+    wl=whileloop_undefined;
+    break;
       }
     }
   }
