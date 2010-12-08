@@ -44,6 +44,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "properties.h"
 #include "database.h"
 #include "resources.h"
 #include "effects-generic.h"
@@ -57,8 +58,9 @@ bool
 cumulated_references(string module_name)
 {
     bool ok;
-    set_methods_for_cumulated_references();
     set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
+    set_methods_for_cumulated_references();
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return ok;
@@ -68,8 +70,9 @@ bool
 proper_references(string module_name)
 {
     bool ok;
-    set_methods_for_proper_references();
     set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
+    set_methods_for_proper_references();
     ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
     return ok;
@@ -80,6 +83,8 @@ bool
 proper_pointer_effects(string module_name)
 {
     bool ok;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_proper_simple_pointer_effects();
     ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -90,6 +95,8 @@ bool
 summary_pointer_effects(string module_name)
 {
     bool ok;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_simple_pointer_effects();
     ok = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -100,6 +107,8 @@ bool
 cumulated_pointer_effects(string module_name)
 {
     bool ok;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_simple_pointer_effects();
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -110,6 +119,8 @@ bool
 cumulated_pointer_effects_with_points_to(string module_name)
 {
     bool ok;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_points_to);
     set_methods_for_simple_pointer_effects();
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -120,6 +131,11 @@ bool
 proper_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_proper_simple_effects();
     ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -130,10 +146,10 @@ bool
 proper_effects_with_points_to(string module_name)
 {
     bool ok;
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_points_to);
     set_methods_for_proper_simple_effects();
-    set_use_points_to(true);
     ok = proper_effects_engine(module_name);
-    reset_use_points_to();
     generic_effects_reset_all_methods();
     return ok;
 }
@@ -142,6 +158,11 @@ bool
 summary_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_simple_effects();
     ok = summary_rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -152,6 +173,11 @@ bool
 cumulated_effects(string module_name)
 {
     bool ok;
+     if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_simple_effects();
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -162,6 +188,10 @@ bool
 in_summary_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
     set_methods_for_inout_effects(module_name);
     ok = summary_in_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -173,6 +203,11 @@ bool
 out_summary_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_inout_effects(module_name);
     ok = summary_out_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -185,6 +220,11 @@ bool
 in_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
+    set_pointer_info_kind(with_no_pointer_info);
     set_methods_for_inout_effects(module_name);
     ok = in_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -196,6 +236,10 @@ bool
 out_effects(string module_name)
 {
     bool ok;
+    if (! c_module_p(module_name_to_entity(module_name)) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
+      set_constant_paths_p(false);
+    else
+      set_constant_paths_p(true);
     set_methods_for_inout_effects(module_name);
     ok = out_effects_engine(module_name);
     generic_effects_reset_all_methods();

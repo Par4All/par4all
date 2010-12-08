@@ -746,6 +746,13 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
       // we should also do some kind of unioning...
 
     } /* if (!ENDP(l_decl))*/
+  if (get_constant_paths_p())
+    {
+      list l_tmp = rb_lrw;
+      rb_lrw = pointer_effects_to_constant_path_effects(rb_lrw);
+      effects_free(l_tmp);
+    }
+
   return rb_lrw;
 }
 
@@ -786,11 +793,11 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(s1_lrw);
 	    pips_debug(3, "R/W effects of remaining sequence: \n");
 	    (*effects_prettyprint_func)(rb_lrw);
-	    /* if (!transformer_undefined_p(t1))
+	    if (!transformer_undefined_p(t1))
 	    {
-		pips_debug(3, "transformer of first statement: %s\n",
-			   transformer_to_string(t1));
-	    }*/
+	      pips_debug(3, "transformer of first statement: %s\n",
+			 transformer_to_string(t1));
+	    }
 	}
 	if (rb_lrw !=NIL)
 	  {
@@ -810,12 +817,6 @@ static list r_rw_effects_of_sequence(list l_inst)
 
 	/* then take care of declarations if any */
 	rb_lrw = rw_effects_of_declarations(rb_lrw, l_decl);
-	if (get_constant_paths_p())
-	  {
-	    list l_tmp = rb_lrw;
-	    rb_lrw = pointer_effects_to_constant_path_effects(rb_lrw);
-	    effects_free(l_tmp);
-	  }
 
 	ifdebug(5){
 	    pips_debug(5, "R/W effects of remaining sequence "
@@ -904,9 +905,6 @@ void rw_effects_of_module_statement(statement module_stat)
     make_effects_private_current_stmt_stack();
     make_effects_private_current_context_stack();
     pips_debug(1,"begin\n");
-    /* for backward compatibility and experimental purposes */
-    if (! c_module_p(get_current_module_entity()) || !get_bool_property("CONSTANT_PATH_EFFECTS"))
-      set_constant_paths_p(false);
 
     gen_multi_recurse
 	(module_stat,
@@ -944,7 +942,7 @@ bool rw_effects_engine(char * module_name)
     init_rw_effects();
     init_invariant_rw_effects();
 
-   if (get_use_points_to())
+   if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
 
@@ -957,7 +955,7 @@ bool rw_effects_engine(char * module_name)
     pips_debug(1, "end\n");
     debug_off();
 
-    if (get_use_points_to())
+    if (get_pointer_info_kind() == with_points_to)
        reset_pt_to_list();
 
     (*db_put_rw_effects_func)

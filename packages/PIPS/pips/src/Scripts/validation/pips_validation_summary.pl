@@ -52,10 +52,12 @@ my %d = (); # per-directory: { dir -> { status -> cnt } }
 my ($start, $stop);
 
 # process input formatted as
-# <status>: dir/case
 while (<>)
 {
-  if (/^($status|$others): ([-\w]+)(\/[-\w]+)?$/)
+  # parse: <status>: dir/case duration
+  # "case" may be empty for some status about the whole directory
+  # "duration" may be empty for some status and in a transition
+  if (/^($status|$others): ([-\w]+)(\/[-\w]+)?( \d*)?$/)
   {
     my ($stat, $dir, $case) = ($1, $2, $3);
     $d{$dir} = zeroed() unless exists $d{$dir};

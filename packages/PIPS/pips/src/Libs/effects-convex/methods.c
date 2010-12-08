@@ -88,7 +88,7 @@ set_methods_for_convex_effects()
     effect_free_func = region_free;
 
     reference_to_effect_func = reference_to_convex_region;
-    effect_to_store_independent_effect_list_func = 
+    effect_to_store_independent_effect_list_func =
       region_to_store_independent_region_list;
     effect_add_expression_dimension_func =
       convex_region_add_expression_dimension;
@@ -111,6 +111,23 @@ set_methods_for_convex_effects()
 
 
     eval_cell_with_points_to_func = eval_convex_cell_with_points_to;
+    if (get_constant_paths_p())
+      {
+	switch (get_pointer_info_kind())
+	{
+	case with_no_pointer_info:
+	  effect_to_constant_path_effects_func = effect_to_constant_path_effects_with_no_pointer_information;
+	  break;
+	case with_points_to:
+	  effect_to_constant_path_effects_func = convex_effect_to_constant_path_effects_with_points_to;
+	  break;
+	case with_pointer_values:
+	  effect_to_constant_path_effects_func = convex_effect_to_constant_path_effects_with_pointer_values;
+	  break;
+	default:
+	  pips_internal_error("unexpected value\n");
+	}
+      }
 
 
     effects_descriptors_variable_change_func =
@@ -172,7 +189,6 @@ set_methods_for_convex_effects()
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
     set_contracted_proper_effects(TRUE);
-    set_constant_paths_p(TRUE);
     set_descriptor_range_p(TRUE);
 }
 
@@ -191,7 +207,7 @@ void set_methods_for_convex_rw_pointer_effects()
     effect_free_func = region_free;
 
     reference_to_effect_func = reference_to_convex_region;
-    effect_to_store_independent_effect_list_func = 
+    effect_to_store_independent_effect_list_func =
       region_to_store_independent_region_list;
     effect_add_expression_dimension_func =
       convex_region_add_expression_dimension;
@@ -271,7 +287,6 @@ void set_methods_for_convex_rw_pointer_effects()
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
     set_contracted_proper_effects(TRUE);
-    set_constant_paths_p(FALSE);
     set_descriptor_range_p(TRUE);
 
     effects_computation_init_func = init_convex_rw_regions;

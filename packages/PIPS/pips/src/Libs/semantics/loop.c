@@ -153,12 +153,20 @@
  * post_init = t_init(pre)
  *
  * A new transformer is allocated. None of the arguments are modified.
+ *
+ * The source code has been restructured with a lot of the processing
+ * moved into any_transformer_to_k_closure
  */
 /* k is the periodicity sought. The normal standard default value is
    1. If k == 1, the body transformer is computed first and the loop
    transformer is derived from it. If k>1, the body transformer is
    retrieved and the loop transformer is based on the assumption that
-   the number of iterations executed is always a multiple of k. */
+   the number of iterations executed is always a multiple of k.
+
+   This is obsolete and k should always be equal to 1. When a
+   different value of k is required, call direclty
+   any_transformer_to_k_closure().
+ */
 transformer any_loop_to_k_transformer(transformer t_init,
 				      transformer t_enter,
 				      transformer t_next,
@@ -168,28 +176,17 @@ transformer any_loop_to_k_transformer(transformer t_init,
 				      int k)
 {
   transformer t_body = transformer_undefined; // Body transformer
-  transformer t_fbody = transformer_undefined; // t_body; t_next
-  transformer t_fbody_star = transformer_undefined; // t_fbody*
-  transformer t_body_star = transformer_undefined; // t_init ; t_enter ; tfbodystar
+  transformer t_body_star = transformer_undefined; // result: t_init ; t_enter ; tfbodystar
   transformer pre_body = transformer_undefined;
   transformer post_body = transformer_undefined;
   list bel = load_cumulated_rw_effects_list(body);
   transformer post_enter = transformer_apply(t_enter, post_init);
   transformer t_effects = effects_to_transformer(bel);
-  //transformer enter_condition = transformer_range(t_enter);
-  transformer enter_condition = transformer_range(post_enter);
-  transformer next_condition = transformer_range(t_next);
   transformer post_next = transformer_undefined;
-  transformer pre_iteration = transformer_convex_hull(enter_condition, next_condition);
-  transformer npre_iteration = transformer_undefined;
-  transformer post_loop_star = transformer_undefined;
-  transformer post_loop_plus = transformer_undefined;
-  transformer post_loop = transformer_undefined;
   transformer t_next_star = transformer_undefined;
-  transformer t_fbody_k = transformer_undefined;
-  int ck; // used to unroll k-1 times the loop body
 
-  ifdebug(8) {
+  // They are displayed by any_transformer_to_k_closure()
+  ifdebug(9) {
     fprintf(stderr, "t_init:\n");
     print_transformer(t_init);
     fprintf(stderr, "t_enter:\n");
@@ -218,60 +215,38 @@ transformer any_loop_to_k_transformer(transformer t_init,
   pre_body = transformer_range(transformer_convex_hull(post_next, post_enter));
 
   /* Compute the body transformer */
+  // THIS PART SHOULD BE CLEANED-UP and k not used to avoid
+  // recomputing the transformers inside the loop body
+  // There is no longer any reason to call this function with k !=1
+  // For k == 2, call directly any_transformer_to_k_closure()
   // statement_to_transformer() allocated a new transformer which is not the stored transformer
   //t_body = transformer_dup(statement_to_transformer(body, pre_body));
-  if(k==1)
+  if(k==1) {
     t_body = statement_to_transformer(body, pre_body);
-  else
+    // Experimental: produces wrong results
+    // t_body = transformer_intersect_range_with_domain(t_body);
+  }
+  else // assume k==2
     t_body = copy_transformer(load_statement_transformer(body));
 
-  /* Complete the body transformer with t_next (t_body is modified by side effects into t_fbody) */
-  t_fbody = transformer_combine(t_body, t_next);
 
-  /* Compute the fix point */
-  t_fbody_k = copy_transformer(t_fbody);
-  for(ck=2; ck<=k; ck++)
-    t_fbody_k = transformer_combine(t_fbody_k, t_fbody);
-  t_fbody_star = (* transformer_fix_point_operator)(t_fbody_k);
-  free_transformer(t_fbody_k);
-
-  /* Compute t_body_star = t_init ; t_enter */
-  t_body_star = transformer_combine(transformer_dup(t_init), t_enter);
-  t_body_star = transformer_combine(t_body_star, t_fbody_star);
-
-  /* and add the continuation condition, pre_iteration improved with
-     knowledge about the body, npre_iteration. Note that pre_iteration
-     would also provide correct results, although less accurate. */
-  post_loop_star = transformer_apply(t_fbody_star, enter_condition);
-  post_loop_plus = transformer_apply(t_fbody, post_loop_star);
-  post_loop = transformer_range(post_loop_plus);
-  npre_iteration = transformer_convex_hull(enter_condition, post_loop);
-  if(k==2) { // Should be a loop over k
-    transformer post_loop_plus_plus =  transformer_apply(t_fbody, post_loop_plus);
-    transformer old_npre_iteration = npre_iteration;
-    post_loop = transformer_range(post_loop_plus_plus);
-    npre_iteration = transformer_convex_hull(npre_iteration, post_loop);
-    free_transformer(post_loop_plus_plus);
-    free_transformer(old_npre_iteration);
-  }
-  t_body_star = transformer_combine(t_body_star, npre_iteration);
+  // Insert a call to any_transformer_to_k_closure()
+  t_body_star = any_transformer_to_k_closure(t_init,
+					     t_enter,
+					     t_next,
+					     t_body,
+					     post_init,
+					     k, // unrollling degree
+					     FALSE); // assume a first
+						     // execution of t_body
 
   /* Any transformer or other data structure to free? */
-  //free_transformer(t_body); transformed into t_fbody
-  free_transformer(t_fbody);
-  free_transformer(t_fbody_star);
+  //free_transformer(t_body); FI: no idea if it should be freed or not...
   free_transformer(pre_body);
   free_transformer(post_body);
   free_transformer(post_next);
   free_transformer(t_effects);
   free_transformer(post_enter);
-  free_transformer(enter_condition);
-  free_transformer(next_condition);
-  free_transformer(pre_iteration);
-  free_transformer(npre_iteration);
-  free_transformer(post_loop_star);
-  free_transformer(post_loop_plus);
-  free_transformer(post_loop);
   free_transformer(t_next_star);
 
   ifdebug(8) {
@@ -350,7 +325,10 @@ transformer new_whileloop_to_transformer(whileloop wl,
 					 transformer pre,
 					 list wlel) /* effects of whileloop wl */
 {
-  /* t_body_star =  t_init ; t_enter ;(t_body ; t_continue)* */
+  /* Equation:
+   *
+   * t_body_star =  t_init ; t_enter ;(t_body ; t_continue)*
+   */
   transformer t_body_star = transformer_undefined;
   statement body_s = whileloop_body(wl);
 
@@ -2961,17 +2939,8 @@ transformer whileloop_to_postcondition(
 	tb = complete_statement_transformer(tb, pre_fuzzy, s);
       }
       else {
-	/* recompute the body transformer without taking identity into
-	   account */
-	/*
-	transformer ftf = TRANSFORMER(CAR(btl));
-	if(transformer_identity_p(ftf)) {
-	  tb = active_transformer_list_to_transformer(btl);
-	}
-	else {
-	  tb = transformer_list_to_transformer(btl);
-	}
-	*/
+	/* recompute the body transformer without taking identity
+	   transformers into account */
 	tb = active_transformer_list_to_transformer(btl);
       }
     }

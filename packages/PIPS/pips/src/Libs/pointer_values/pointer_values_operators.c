@@ -108,6 +108,7 @@ list make_simple_pv_from_simple_effects(effect lhs_eff, effect rhs_eff, cell_int
   if (simple_cell_reference_preceding_p(cell_reference(lhs_c), descriptor_undefined,
 					cell_reference(rhs_c), descriptor_undefined,
 					transformer_undefined,
+					true,
 					& exact_preceding_p))
     {
       list l_remnants = NIL;
@@ -284,6 +285,7 @@ list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in,
 			simple_cell_reference_preceding_p(ref_kill, descriptor_undefined,
 							  ref_in_2, descriptor_undefined,
 							  transformer_undefined,
+							  true,
 							  &exact_preceding_test)))
 		    to_be_translated = true;
 		  else to_be_translated = false;
@@ -301,6 +303,7 @@ list kill_pointer_value(effect eff_kill, list /* of cell_relations */ l_in,
 		    simple_cell_reference_preceding_p(ref_kill, descriptor_undefined,
 						      ref_in_1, descriptor_undefined,
 						      transformer_undefined,
+						      true,
 						      &exact_preceding_test)))
 		to_be_translated = true;
 	      else to_be_translated = false;
@@ -1208,6 +1211,7 @@ list effect_find_aliased_paths_with_pointer_values(effect eff, list l_pv, pv_con
 		  && simple_cell_reference_preceding_p(pv_remnant_second_ref, descriptor_undefined,
 						       eff_ref, descriptor_undefined,
 						       transformer_undefined,
+						       true,
 						       &exact_preceding_test))
 		{
 		  reference ref;
