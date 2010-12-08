@@ -1,0 +1,678 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(s) {}
+
+   int s;
+
+//  T(l,t,x) {}
+
+   int l, t, x;
+
+//  T(s) {s==0}
+
+   s = 0;
+
+//  T(l,t,x) {l==0, s==0, t==0, x==0}
+
+   l = t = x = 0;
+
+//  T() {l==0, s==0, t==0, x==0}
+
+   if (6*l>t+50)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(l,s,t,x) {l#init==0, s==0, s#init==0, t#init==0, x==0,
+//    x#init==0, 0<=l, l<=t, 6l<=t}
+
+   while (1) {
+
+//  T(l,t,x) {l+x#init==l#init+x, t+x#init==t#init+x, x#init<=x}
+
+      while (flip())
+
+//  T(l,t,x) {l==l#init+1, s==0, t==t#init+1, x==x#init+1, 6l<=t+50,
+//    x<=9}
+
+         if (x<=8&&s==L&&x<=9) {
+
+//  T(t) {s==0, t==t#init+1, x<=8}
+
+            t++;
+
+//  T(l) {l==l#init+1, s==0, x<=8}
+
+            l++;
+
+//  T(x) {s==0, x==x#init+1, x<=9}
+
+            x++;
+
+//  T() {s==0, 6l<=t+50, x<=9}
+
+            if (6*l>t+50)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(l,t,x) {l+t#init==l#init+t, l+x#init==l#init+x, l#init<=l,
+//    l<=l#init+1}
+
+      if (flip())
+
+//  T(l,t,x) {l==l#init+1, s==0, t==t#init+1, x==10, x#init==9,
+//    6l<=t+50}
+
+         if (x==9&&s==L&&x<=9) {
+
+//  T(t) {s==0, t==t#init+1, x==9}
+
+            t++;
+
+//  T(l) {l==l#init+1, s==0, x==9}
+
+            l++;
+
+//  T(x) {s==0, x==10, x#init==9}
+
+            x++;
+
+//  T() {s==0, x==10, 6l<=t+50}
+
+            if (6*l>t+50)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(s,x) {s==1, s#init==0, x==0, 6l<=t+50}
+
+      if (s==L) {
+
+//  T(x) {s==0, x==0}
+
+         x = 0;
+
+//  T(s) {s==1, s#init==0, x==0}
+
+         s = N;
+
+//  T() {s==1, x==0, 6l<=t+50}
+
+         if (6*l>t+50)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {}
+
+         while (1)
+
+//  T() {}
+
+            ;
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, 0<=x, x<=9,
+//    x#init<=x}
+
+      while (flip())
+
+//  T(t,x) {s==1, t==t#init+1, x==x#init+1, 6l<=t+50, x<=9}
+
+         if (x<=8&&s==N) {
+
+//  T(t) {s==1, t==t#init+1, x<=8}
+
+            t++;
+
+//  T(x) {s==1, x==x#init+1, x<=9}
+
+            x++;
+
+//  T() {s==1, 6l<=t+50, x<=9}
+
+            if (6*l>t+50)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {s==1, 9<=x}
+
+            while (1)
+
+//  T() {s==1, 9<=x}
+
+               ;
+
+//  T(t,x) {s==1, t==t#init+1, x==10, x#init==9, 6l<=t+40}
+
+      if (x==9&&s==N) {
+
+//  T(t) {s==1, t==t#init+1, x==9, 6l<=t+40}
+
+         t++;
+
+//  T(x) {s==1, x==10, x#init==9, 6l<=t+40}
+
+         x++;
+
+//  T() {s==1, x==10, 6l<=t+40}
+
+         if (6*l>t+50)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {s==1, 6l+x<=t+50, 0<=x}
+
+         while (1)
+
+//  T() {s==1, 6l+x<=t+50, 0<=x}
+
+            ;
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, 10<=x, x<=49,
+//    x#init<=x}
+
+      while (flip())
+
+//  T(t,x) {s==1, t==t#init+1, x==x#init+1, 6l<=t+50, x<=49}
+
+         if (x<=48&&s==N) {
+
+//  T(t) {s==1, t==t#init+1, x<=48}
+
+            t++;
+
+//  T(x) {s==1, x==x#init+1, x<=49}
+
+            x++;
+
+//  T() {s==1, 6l<=t+50, x<=49}
+
+            if (6*l>t+50)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {s==1, 49<=x}
+
+            while (1)
+
+//  T() {s==1, 49<=x}
+
+               ;
+
+//  T(t,x) {s==1, t==t#init+1, x==50, x#init==49, 6l<=t}
+
+      if (x==49&&s==N) {
+
+//  T(t) {s==1, t==t#init+1, x==49, 6l<=t}
+
+         t++;
+
+//  T(x) {s==1, x==50, x#init==49, 6l<=t}
+
+         x++;
+
+//  T() {s==1, x==50, 6l<=t}
+
+         if (6*l>t+50)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {s==1, 6l+x<=t+50, 10<=x}
+
+         while (1)
+
+//  T() {s==1, 6l+x<=t+50, 10<=x}
+
+            ;
+
+//  T(t,x) {s==1, t+x#init==t#init+x, 6l+x<=t+50, 50<=x, x#init<=x}
+
+      while (flip())
+
+//  T(t,x) {s==1, t==t#init+1, x==x#init+1, 6l<=t+50}
+
+         if (s==N) {
+
+//  T(t) {s==1, t==t#init+1}
+
+            t++;
+
+//  T(x) {s==1, x==x#init+1}
+
+            x++;
+
+//  T() {s==1, 6l<=t+50}
+
+            if (6*l>t+50)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+
+//  T(s,x) {s==0, s#init==1, x==0, 6l<=t, 6l+x#init<=t+50, 50<=x#init}
+
+      if (s==N&&x>=50) {
+
+//  T(x) {s==1, x==0, 6l+x#init<=t+50, 50<=x#init}
+
+         x = 0;
+
+//  T(s) {s==0, s#init==1, x==0, 6l<=t}
+
+         s = L;
+
+//  T() {s==0, x==0, 6l<=t}
+
+         if (6*l>t+50)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {0==-1}
+
+         while (1)
+
+//  T() {0==-1}
+
+            ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int s;
+
+//  P(s) {}
+
+   int l, t, x;
+
+//  P(l,s,t,x) {}
+
+   s = 0;
+
+//  P(l,s,t,x) {s==0}
+
+   l = t = x = 0;
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   if (6*l>t+50)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(l,s,t,x) {l==0, s==0, t==0, x==0}
+
+   while (1) {
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, 6l<=t}
+
+      while (flip())
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         if (x<=8&&s==L&&x<=9) {
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=8}
+
+            t++;
+
+//  P(l,s,t,x) {s==0, 6l+1<=t+5x, x<=l, 0<=x, x<=8}
+
+            l++;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x+5, x+1<=l, 0<=x, x<=8}
+
+            x++;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 1<=x, x<=9}
+
+            if (6*l>t+50)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+45}
+
+            while (1)
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+45}
+
+               ;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+      if (flip())
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=9}
+
+         if (x==9&&s==L&&x<=9) {
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+45}
+
+            t++;
+
+//  P(l,s,t,x) {s==0, x==9, 9<=l, 6l<=t+44}
+
+            l++;
+
+//  P(l,s,t,x) {s==0, x==9, 10<=l, 6l<=t+50}
+
+            x++;
+
+//  P(l,s,t,x) {s==0, x==10, 10<=l, 6l<=t+50}
+
+            if (6*l>t+50)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=8}
+
+            while (1)
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=8}
+
+               ;
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=10}
+
+      if (s==L) {
+
+//  P(l,s,t,x) {s==0, 6l<=t+5x, x<=l, 0<=x, x<=10}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         s = N;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+50}
+
+         if (6*l>t+50)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l<=t, 6l<=t+50}
+
+      while (flip())
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=9}
+
+         if (x<=8&&s==N) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=8}
+
+            t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 0<=x, x<=8}
+
+            x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 1<=x, x<=9}
+
+            if (6*l>t+50)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+9<=t, 6l<=t+41}
+
+            while (1)
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+9<=t, 6l<=t+41}
+
+               ;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=9}
+
+      if (x==9&&s==N) {
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+9<=t, 6l<=t+41}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, x==9, 0<=l, l+10<=t, 6l<=t+40}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, x==10, 0<=l, l+10<=t, 6l<=t+40}
+
+         if (6*l>t+50)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=8}
+
+         while (1)
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 0<=x, x<=8}
+
+            ;
+
+//  P(l,s,t,x) {s==1, x==10, 0<=l, l+10<=t, 6l<=t+40}
+
+      while (flip())
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=49}
+
+         if (x<=48&&s==N) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=48}
+
+            t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 10<=x, x<=48}
+
+            x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 11<=x, x<=49}
+
+            if (6*l>t+50)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+49<=t, 6l<=t+1}
+
+            while (1)
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+49<=t, 6l<=t+1}
+
+               ;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=49}
+
+      if (x==49&&s==N) {
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+49<=t, 6l<=t+1}
+
+         t++;
+
+//  P(l,s,t,x) {s==1, x==49, 0<=l, l+50<=t, 6l<=t}
+
+         x++;
+
+//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+
+         if (6*l>t+50)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=48}
+
+         while (1)
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 10<=x, x<=48}
+
+            ;
+
+//  P(l,s,t,x) {s==1, x==50, 0<=l, l+50<=t, 6l<=t}
+
+      while (flip())
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+         if (s==N) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+            t++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x+1<=t, 6l+x<=t+49, 50<=x}
+
+            x++;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 51<=x}
+
+            if (6*l>t+50)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+      if (s==N&&x>=50) {
+
+//  P(l,s,t,x) {s==1, 0<=l, l+x<=t, 6l+x<=t+50, 50<=x}
+
+         x = 0;
+
+//  P(l,s,t,x) {s==1, x==0, 0<=l, l+50<=t, 6l<=t}
+
+         s = L;
+
+//  P(l,s,t,x) {s==0, x==0, 0<=l, l+50<=t, 6l<=t}
+
+         if (6*l>t+50)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+   }
+}

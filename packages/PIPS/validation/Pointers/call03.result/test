@@ -23,17 +23,17 @@ Proper effects for "call03"
 
 void call03()
 {
-//               <must be read   >: pi
-//               <must be written>: pi[0]
+//             <    is read   >: pi
+//             <    is written>: pi[0]
    *pi = 1;
-//               <must be read   >: pi
-//               <must be written>: pi
+//             <    is read   >: pi
+//             <    is written>: pi
    pi++;
-//               <must be read   >: q
-//               <must be written>: q[0][.one]
+//             <    is read   >: q
+//             <    is written>: q[0].one
    q->one = 1;
-//               <must be read   >: q
-//               <must be written>: q[0][.two][4]
+//             <    is read   >: q
+//             <    is written>: q[0].two[4]
    (q->two)[4] = 2;
 }
 
@@ -46,9 +46,9 @@ void call03()
    *pi = 1;
 //  points to = {}
    pi++;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    q->one = 1;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    (q->two)[4] = 2;
 }
 

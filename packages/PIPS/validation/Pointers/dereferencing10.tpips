@@ -16,12 +16,12 @@ echo
 activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE[main]
 
-echo
-echo Proper Pointer effetcs for "dereferencing10"
-echo
+#echo
+#echo Proper Pointer effetcs for "dereferencing10"
+#echo
 
-activate PRINT_CODE_PROPER_POINTER_EFFECTS 
-display PRINTED_FILE[main]
+#activate PRINT_CODE_PROPER_POINTER_EFFECTS 
+#display PRINTED_FILE[main]
 
 echo
 echo POINTS TO

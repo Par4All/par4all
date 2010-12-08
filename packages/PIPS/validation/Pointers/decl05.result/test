@@ -3,10 +3,10 @@ Proper effects
 
 int main()
 {
-//               <may be written >: tab[*]
+//             <may be written>: tab[*]
    int tab[3] = {0, 1, 2};                                              /*0006*/
-//               <must be read   >: tab[0]
-//               <must be written>: tab[0]
+//             <    is read   >: tab[0]
+//             <    is written>: tab[0]
 
    tab[0] = tab[0]+2;                                                   /*0008*/
    return 0;                                                            /*0009*/

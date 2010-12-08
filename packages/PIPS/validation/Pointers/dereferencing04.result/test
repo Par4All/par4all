@@ -16,8 +16,8 @@ void dereferencing04()
    double *p;
    double *q;
    double *r;
-//               <must be read   >: p q r
-//               <must be written>: p[q-r]
+//             <    is read   >: p q r
+//             <    is written>: p[q-r]
    *(p+q-r) = 0.;
 }
 
@@ -26,12 +26,15 @@ POINTS TO
 //  {}
 void dereferencing04()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    double *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    double *q;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    double *r;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    *(p+q-r) = 0.;
 }
