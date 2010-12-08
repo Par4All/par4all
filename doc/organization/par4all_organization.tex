@@ -1042,7 +1042,7 @@ projects or if things go really wrong. There are located in
 \subsubsection{Making distributions}
 \label{sec:making-distributions}
 
-The \verb|p4a_pack| is used to build compressed \texttt{tar} balls or Debian
+The \verb|p4a_pack.py| is used to build compressed \texttt{tar} balls or Debian
 \texttt{.deb} packet files.
 
 The place of where the \Apfa files are looked for is specified according
@@ -1060,7 +1060,7 @@ create this directory as super-user and change the owner to you with a
 Then you can pack this directory into what format you want with for
 example:
 \begin{alltt}
-src/simple_tools/p4a_pack <--deb|--tgz> --revision=\emph{0.1-mybuild} \(\backslash\)
+src/simple_tools/p4a_pack.py <--deb|--tgz> --revision=\emph{0.1-mybuild} \(\backslash\)
   --dir=\emph{/current/install/dir} [--prefix=\emph{/final/install/dir}]
 \end{alltt}
 
@@ -1075,7 +1075,7 @@ Here are the usage and full option list of this command.
 After validating, a release is done by making some branch at a given state
 a tag.
 
-There is also a \verb|p4a_coffee| script to build and publish everything
+There is also a \verb|p4a_coffee.py| script to build and publish everything
 at once.
 
 \input{p4a_coffee-help}
