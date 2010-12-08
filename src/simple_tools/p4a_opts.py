@@ -310,6 +310,7 @@ def exec_and_deal_with_errors(fun):
     """Execute a function and deal with some errors that may happen by
     enclosing in try/catch"""
     try:
+        # Executing a function is always a lot of fun :-)
         fun()
     except p4a_error:
         (t, e, tb) = sys.exc_info()

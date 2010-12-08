@@ -14,6 +14,7 @@ from p4a_util import *
 from p4a_rc import *
 from p4a_git import *
 from p4a_version import *
+from p4a_opts import *
 
 
 # Default directory to take current binary installation from.
@@ -109,8 +110,8 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
     info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
     run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
-    
-    p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"), 
+
+    p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"),
         dict(
             root = abs_prefix,
             dist = abs_prefix,
@@ -118,7 +119,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
             fortran = "gfortran" # ???
         )
     )
-    
+
     write_VERSION(temp_dir_with_prefix, version)
     write_GITREV(temp_dir_with_prefix, gitrev)
 
@@ -270,7 +271,12 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
 
 
-def main(options, args = []):
+def work(options, args = []):
+    '''Do the real work. The main goal of this function is to be able to
+    call p4a_setup from another tool (p4a_coffee.py) that has already
+    parsed the arguments and options of the command.
+    '''
+
     # Determine architecture for binary packages (and special arch name for debs).
     deb_arch = arch = options.arch
     if not arch:
@@ -300,7 +306,7 @@ def main(options, args = []):
     if options.development and not options.append_date:
         options.append_date = True
 
-    if (not options.deb #and not options.sdeb 
+    if (not options.deb #and not options.sdeb
         and not options.tgz and not options.stgz):
         warn("--deb and/or --tgz and/or --stgz not specified, assuming --deb --tgz --stgz")
         options.deb = True
@@ -373,7 +379,7 @@ def main(options, args = []):
     output_files = []
     try:
         if options.deb:
-            output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix, 
+            output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix,
                 version = version, gitrev = gitrev, distro = distro, arch = deb_arch,
                 keep_temp = options.keep_temp))
 
@@ -411,6 +417,30 @@ def main(options, args = []):
                 warn("NOT Removing " + dir + " (--keep-temp)")
             else:
                 rmtree(dir, can_fail = True)
+
+
+def main():
+    '''The function called when this program is executed by its own'''
+
+    parser = optparse.OptionParser(description = __doc__,
+        usage = "%prog <--deb|--tgz|-stgz> [--version=0.1] [--append-date] "
+            + "[--dir=/current/install/dir] [--prefix=/final/install/dir] "
+            + "[--publish] [other options] [optional additional files to publish]; "
+            + "run %prog --help for options")
+
+    add_module_options(parser)
+
+    add_common_options(parser)
+
+    (options, args) = parser.parse_args()
+
+    if process_common_options(options, args):
+        work(options, args)
+
+
+# If this file is called as a script, execute the main:
+if __name__ == "__main__":
+    exec_and_deal_with_errors(main)
 
 
 # Some Emacs stuff:

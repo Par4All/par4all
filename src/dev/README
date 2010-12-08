@@ -1,7 +1,8 @@
 This directory contains some script used to build and manage the Par4All
 framework itself.
 
-p4a_setup : compile and setup the whole Par4All infrastructure
+p4a_setup.old : compile and setup the whole Par4All infrastructure. But
+now this is obsolete and you should use src/simple_tools/p4a_setup.py instead.
 
 
 Some scripts to be used only once, but that are here because it was subtle
@@ -20,6 +21,8 @@ p4a_apply_pips_patches : used to patch the original PIPS files to fit the
 p4a_fetch_all : fetch all the remote git repository. For sanity reason,
 the programmer is responsible to do the merge.
 
+To ease everyday work, p4a_git exists and you should read the document
+describing the Par4All architecture.
 
 
 Ronan Keryell.
