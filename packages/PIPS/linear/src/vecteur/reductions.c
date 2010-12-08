@@ -33,6 +33,7 @@
 #include <limits.h>
 
 #include "boolean.h"
+#include "assert.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 
@@ -547,4 +548,19 @@ boolean vect_check(Pvecteur v)
 
   linear_hashtable_free(seen);
   return consistent;
+}
+
+/* @return whether one coef in v is greater than abs(val), but CST
+ * @param v vecteur being scanned
+ * @param val maximum absolute value allowed, or 0 to ignore
+ */
+boolean vect_larger_coef_p(Pvecteur v, Value val)
+{
+  linear_assert("positive value", value_posz_p(val));
+  if (value_zero_p(val)) return false;
+  for (; v!=NULL; v=v->succ)
+    if (var_of(v) &&
+        (value_lt(val_of(v), value_uminus(val)) || value_gt(val_of(v), val)))
+      return true;
+  return false;
 }
