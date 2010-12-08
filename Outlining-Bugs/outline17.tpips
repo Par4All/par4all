@@ -1,5 +1,5 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS="outline15"
+setenv WS="outline17"
 delete $WS
 create $WS $WS.f
 
@@ -17,8 +17,8 @@ echo
 
 setproperty OUTLINE_MODULE_NAME "TOTO"
 setproperty OUTLINE_LABEL "10"
-apply OUTLINE[OUTLINE15]
-apply CLEAN_DECLARATIONS[OUTLINE15]
+apply OUTLINE[OUTLINE17]
+apply CLEAN_DECLARATIONS[OUTLINE17]
 
 display PRINTED_FILE[%ALL]
 
