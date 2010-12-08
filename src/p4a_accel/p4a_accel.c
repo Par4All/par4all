@@ -1188,4 +1188,354 @@ void P4A_copy_to_accel_4d(size_t element_size,
   }
 }
 
+char * p4a_error_to_string(int error) 
+{
+  switch (error)
+    {
+    case CL_SUCCESS:
+      return (char *)"P4A : Success";
+    case CL_DEVICE_NOT_FOUND:
+      return (char *)"P4A : Device Not Found";
+    case CL_DEVICE_NOT_AVAILABLE:
+      return (char *)"P4A : Device Not Available";
+    case CL_COMPILER_NOT_AVAILABLE:
+      return (char *)"P4A : Compiler Not Available";
+    case CL_MEM_OBJECT_ALLOCATION_FAILURE:
+      return (char *)"P4A : Mem Object Allocation Failure";
+    case CL_OUT_OF_RESOURCES:
+      return (char *)"P4A : Out Of Ressources";
+    case CL_OUT_OF_HOST_MEMORY:
+      return (char *)"P4A : Out Of Host Memory";
+    case CL_PROFILING_INFO_NOT_AVAILABLE:
+      return (char *)"P4A : Profiling Info Not Available";
+    case CL_MEM_COPY_OVERLAP:
+      return (char *)"P4A : Mem Copy Overlap";
+    case CL_IMAGE_FORMAT_MISMATCH:
+      return (char *)"P4A : Image Format Mismatch";
+    case CL_IMAGE_FORMAT_NOT_SUPPORTED:
+      return (char *)"P4A : Image Format Not Supported";
+    case CL_BUILD_PROGRAM_FAILURE:
+      return (char *)"P4A : Build Program Failure";
+    case CL_MAP_FAILURE:
+      return (char *)"P4A : Map Failure";
+    case CL_INVALID_VALUE:
+      return (char *)"P4A : Invalid Value";
+    case CL_INVALID_DEVICE_TYPE:
+      return (char *)"P4A : Invalid Device Type";
+    case CL_INVALID_PLATFORM:
+      return (char *)"P4A : Invalid Platform";
+    case CL_INVALID_DEVICE:
+      return (char *)"P4A : Invalid Device";
+    case CL_INVALID_CONTEXT:
+      return (char *)"P4A : Invalid Context";
+    case CL_INVALID_QUEUE_PROPERTIES:
+      return (char *)"P4A : Invalid Queue Properties";
+    case CL_INVALID_COMMAND_QUEUE:
+      return (char *)"P4A : Invalid Command Queue";
+    case CL_INVALID_HOST_PTR:
+      return (char *)"P4A : Invalid Host Ptr";
+    case CL_INVALID_MEM_OBJECT:
+      return (char *)"P4A : Invalid Mem Object";
+    case CL_INVALID_IMAGE_FORMAT_DESCRIPTOR:
+      return (char *)"P4A : Invalid Image Format Descriptor";
+    case CL_INVALID_IMAGE_SIZE:
+      return (char *)"P4A : Invalid Image Size";
+    case CL_INVALID_SAMPLER:
+      return (char *)"P4A : Invalid Sampler";
+    case CL_INVALID_BINARY:
+      return (char *)"P4A : Invalid Binary";
+    case CL_INVALID_BUILD_OPTIONS:
+      return (char *)"P4A : Invalid Build Options";
+    case CL_INVALID_PROGRAM:
+      return (char *)"P4A : Invalid Program";
+    case CL_INVALID_PROGRAM_EXECUTABLE:
+      return (char *)"P4A : Invalid Program Executable";
+    case CL_INVALID_KERNEL_NAME:
+      return (char *)"P4A : Invalid Kernel Name";
+    case CL_INVALID_KERNEL_DEFINITION:
+      return (char *)"P4A : Invalid Kernel Definition";
+    case CL_INVALID_KERNEL:
+      return (char *)"P4A : Invalid Kernel";
+    case CL_INVALID_ARG_INDEX:
+      return (char *)"P4A : Invalid Arg Index";
+    case CL_INVALID_ARG_VALUE:
+      return (char *)"P4A : Invalid Arg Value";
+    case CL_INVALID_ARG_SIZE:
+      return (char *)"P4A : Invalid Arg Size";
+    case CL_INVALID_KERNEL_ARGS:
+      return (char *)"P4A : Invalid Kernel Args";
+    case CL_INVALID_WORK_DIMENSION:
+      return (char *)"P4A : Invalid Work Dimension";
+    case CL_INVALID_WORK_GROUP_SIZE:
+      return (char *)"P4A : Invalid Work Group Size";
+    case CL_INVALID_WORK_ITEM_SIZE:
+      return (char *)"P4A : Invalid Work Item Size";
+    case CL_INVALID_GLOBAL_OFFSET:
+      return (char *)"P4A : Invalid Global Offset";
+    case CL_INVALID_EVENT_WAIT_LIST:
+      return (char *)"P4A : Invalid Event Wait List";
+    case CL_INVALID_EVENT:
+      return (char *)"P4A : Invalid Event";
+    case CL_INVALID_OPERATION:
+      return (char *)"P4A : Invalid Operation";
+    case CL_INVALID_GL_OBJECT:
+      return (char *)"P4A : Invalid GL Object";
+    case CL_INVALID_BUFFER_SIZE:
+      return (char *)"P4A : Invalid Buffer Size";
+    case CL_INVALID_MIP_LEVEL:
+      return (char *)"P4A : Invalid Mip Level";
+    case CL_INVALID_GLOBAL_WORK_SIZE:
+      return (char *)"P4A : Invalid Global Work Size";
+    default:
+      break;
+    }
+} 
+
+/** To quit properly.
+ */
+void p4a_clean(int exitCode)
+{
+  if(p4a_program)clReleaseProgram(p4a_program);
+  if(p4a_kernel)clReleaseKernel(p4a_kernel);  
+  if(p4a_queue)clReleaseCommandQueue(p4a_queue);
+  if(p4a_context)clReleaseContext(p4a_context);
+  exit(exitCode);
+}
+
+void p4a_error(cl_int error, 
+			     const char *currentFile, 
+			     const int currentLine)
+{
+    if(CL_SUCCESS != error) {
+      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
+	      currentFile,currentLine,P4A_error_to_string(error));
+      p4a_clean(EXIT_FAILURE);
+    }
+#ifdef P4A_DEBUG
+    else
+      fprintf(stdout, "File %s - Line %i - %s\n",
+	      currentFile,currentLine,P4A_error_to_string(error));
+#endif
+}
+
+void p4a_message(const char *message, const char *currentFile, const int currentLine)
+{
+  if(CL_SUCCESS != p4a_global_error){
+    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, P4A_error_to_string(p4a_global_error));
+    p4a_clean(EXIT_FAILURE);
+  }
+#ifdef P4A_DEBUG
+  else {
+    fprintf(stdout, "File %s - Line %i - Success - %s\n", 
+	    currentFile, currentLine, message);
+  }
+#endif 
+}
+
+/** When launching the kernel, need to create the program from sources
+    and select the kernel.
+
+    Arguments are pushed from the ... list.
+
+    @param kernel Name of the kernel and the source MUST have the same
+    name with .cl extension.
+ */
+
+void p4a_load_kernel_arguments(const char *kernel,...)
+{
+  /*
+    p4a_kernel = NULL;
+    
+    // Try to find if the kernel already exists...
+    struct p4a_kernel_list *kernels_list=p4a_kernels;
+    while (kernels_list != NULL) {
+    if (strcmp(kernels_list->name,kernel) == 0)
+    p4a_kernel = kernels_list->kernel;
+    if (p4a_kernel != NULL) {
+    current_kernel = kernels_list;
+    break;
+    }
+    else
+    kernels_list = kernels_list->next;
+    }
+  */
+  current_kernel = p4a_search_current_kernel(kernel);
+  if (current_kernel)
+    p4a_kernel = current_kernel->kernel;
+
+  // If not ...
+  if (!p4a_kernel) {
+    P4A_log("The kernel %s is loaded for the first time\n",kernel);
+    /*
+    struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
+
+    if (p4a_kernels == NULL) {
+      P4A_log("Begin of the kernel list\n");
+      p4a_kernels = new_kernel;
+    }
+    else {
+      P4A_log("Follows the kernel list\n");
+      current_kernel->next = new_kernel;
+    }
+    current_kernel = new_kernel;
+    new_kernel->next = NULL;
+
+    current_kernel->name = strdup(kernel);
+    current_kernel->kernel = NULL;
+    current_kernel->n_args = 0;
+    current_kernel->args = NULL;
+    */
+    current_kernel = new_p4a_kernel(kernel);
+    /*
+    char* kernelFile;
+    asprintf(&kernelFile,"./%s.cl",kernel);
+    current_kernel->file_name = strdup(kernelFile);
+    */
+    char* kernelFile = current_kernel->file_name;
+    P4A_log("Program and Kernel creation from %s\n",kernelFile);    
+    size_t kernelLength;
+    const char *comment = "// This kernel was generated for P4A\n";
+    char* cSourceCL = p4a_load_prog_source(kernelFile,
+					   comment,
+					   &kernelLength);
+    if (cSourceCL == NULL)
+      P4A_log("source du program null\n");
+    else
+      P4A_log("%s\n",cSourceCL);
+    P4A_log("Kernel length = %lu\n",kernelLength);
+    
+    /*Create and compile the program : 1 for 1 kernel */
+    //cl_program p4a_program;
+    p4a_program=clCreateProgramWithSource(p4a_context,1,
+					  (const char **)&cSourceCL,
+					  &kernelLength,
+					  &p4a_global_error);
+    P4A_test_execution_with_message("clCreateProgramWithSource");
+    p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
+    P4A_test_execution_with_message("clBuildProgram");
+    p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
+    current_kernel->kernel = p4a_kernel;
+    P4A_test_execution_with_message("clCreateKernel");
+    free(cSourceCL);
+  }
+  // The argument list is pushed.
+  // The __VA_ARGS__ contains to very first one, the number of arguments 
+  // to be loaded.
+  // And then, two informations per argument :
+  // - it sizeof(type)
+  // - the value of the argument pointeur
+  // - the very first one is the number of arguments to be loaded.
+  va_list ap;
+  va_start(ap, kernel);
+
+  // Before sparsing the kernel : specific call for kernel
+  /*
+  int n = va_arg(ap, int);
+  for (int i = 0;i < n;i++) {
+    P4A_log("Argument %d\n",i);
+    size_t size = va_arg(ap, size_t);
+    cl_mem arg_address = va_arg(ap, cl_mem);
+    p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
+    P4A_test_execution_with_message("clSetKernelArg");
+  }
+  */
+  // After parsing the kernel ...
+  P4A_log("kernel %s : number of arguments %d\n",kernel,current_kernel->n_args);
+  struct arg_type *current_type = current_kernel->args;
+  for (int i = 0;i < current_kernel->n_args;i++) {
+    P4A_log("Argument %d\n",i);
+    //size_t size = va_arg(ap, size_t);
+    size_t size = current_type->size;
+    current_type = current_type->next;
+    cl_mem arg_address = va_arg(ap, cl_mem);
+    p4a_global_error = clSetKernelArg(p4a_kernel,i,size,arg_address);
+    P4A_test_execution_with_message("clSetKernelArg");
+  }
+  va_end(ap);
+}
+
+/** Load and store the content of the kernel file in a string.
+    Replace the oclLoadProgSource function of NVIDIA.
+ */
+char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
+{
+  // Initialize the size and memory space
+  struct stat buf;
+  stat(cl_kernel_file,&buf);
+  size_t size = buf.st_size;
+  size_t len = strlen(head);
+  char *source = (char *)malloc(len+size+1);
+  strncpy(source,head,len);
+
+  // A string pointer referencing to the position after the head
+  // where the storage of the file content must begin
+  char *p = source+len;
+
+  // Open the file
+  int in = open(cl_kernel_file,O_RDONLY);
+  if (!in) 
+    P4A_log_and_exit(EXIT_FAILURE,"Bad kernel source reference : %s\n",cl_kernel_file);
+  
+  // Read the file content
+  int n=0;
+  if ((n = read(in,(void *)p,size)) != (int)size) 
+    P4A_log_and_exit(EXIT_FAILURE,"Read was not completed : %d / %lu octets\n",n,size);
+  
+  // Final string marker
+  source[len+n]='\0';
+  close(in);
+  *length = size+len;
+
+  // Manual parsing ...
+  //p4a_parse_kernel(source,head);
+  
+  // Parsing with lex/yacc
+  P4A_log("Begin to parse the kernel ...\n");
+  int result = parse_file(cl_kernel_file);
+  P4A_log("End of kernel parsing.\n");
+
+  exit(0);
+  return source;
+}
+
+
+struct p4a_kernel_list* new_p4a_kernel(const char *kernel)
+{
+  struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
+
+  if (p4a_kernels == NULL) {
+    P4A_log("Begin of the kernel list\n");
+    p4a_kernels = new_kernel;
+  }
+  else {
+    P4A_log("Follows the kernel list\n");
+    current_kernel->next = new_kernel;
+  }
+  new_kernel->next = NULL;
+  
+  new_kernel->name = strdup(kernel);
+  new_kernel->kernel = NULL;
+  new_kernel->n_args = 0;
+  new_kernel->args = NULL;
+
+  char* kernelFile;
+  asprintf(&kernelFile,"./%s.cl",kernel);
+  new_kernel->file_name = strdup(kernelFile);
+
+  P4A_log("A new kernel has been created and initialized\n");
+  return new_kernel;
+}
+
+struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel)
+{
+  struct p4a_kernel_list *kernels_list=p4a_kernels;
+  while (kernels_list != NULL) {
+    if (strcmp(kernels_list->name,kernel) == 0)
+      return kernels_list;
+    kernels_list = kernels_list->next;
+  }
+  return kernels_list;
+}
+
+
 #endif // P4A_ACCEL_CL

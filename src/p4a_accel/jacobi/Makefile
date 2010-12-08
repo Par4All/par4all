@@ -1,6 +1,6 @@
 # Add source files here
 EXECUTABLE = jacobi
-OBJFILES = jacobi.o
+OBJFILES = jacobi-cl.o
 
 P4A_ACCEL_DIR = ..
 

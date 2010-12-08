@@ -30,10 +30,29 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-
 #include <cl.h>
-#include <p4a_wrap-opencl.h>
 
+//#include <p4a_wrap-opencl.h>
+
+/** A data structure to store the arguments types for a given 
+    kernel arguments list.
+*/
+struct arg_type {
+  char *type_name;
+  size_t size;
+  struct arg_type *next;
+};
+
+/** A kernel list.
+*/
+struct p4a_kernel_list {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+  int n_args;
+  struct arg_type *args;
+  struct p4a_kernel_list *next;
+};
 
 /** A timer Tag to know when to print p4a_time_copy
  */
@@ -74,167 +93,43 @@ extern cl_command_queue_properties p4a_queue_properties;
 /** The OpenCL programm composed of a set of modules
  */
 extern cl_program p4a_program;  
-/** The module selected in the program
+/** The current module selected in the program
  */
 extern cl_kernel p4a_kernel; 
 
-
-#define P4A_test_execution(error)  p4a_error_inline(error, __FILE__, __LINE__)
-#define P4A_test_execution_with_message(message) p4a_message_inline(message, __FILE__, __LINE__)
-
-
-/** To quit properly.
+//extern struct arg_type *current_type;
+/** Begin of the kernels list
  */
-inline void p4a_clean_inline(int exitCode)
-{
-  if(p4a_program)clReleaseProgram(p4a_program);
-  if(p4a_kernel)clReleaseKernel(p4a_kernel);  
-  if(p4a_queue)clReleaseCommandQueue(p4a_queue);
-  if(p4a_context)clReleaseContext(p4a_context);
-  exit(exitCode);
-}
+extern struct p4a_kernel_list *p4a_kernels;
+/** Pointer to the current kernel descriptor
+ */
+extern struct p4a_kernel_list *current_kernel;
 
-inline void p4a_error_inline(cl_int error, 
-			     const char *currentFile, 
-			     const int currentLine)
-{
-    if(CL_SUCCESS != error) {
-      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
-	      currentFile,currentLine,P4A_error_to_string(error));
-      p4a_clean_inline(EXIT_FAILURE);
-    }
+char * p4a_error_to_string(int error);
+void p4a_clean(int exitCode);
+void p4a_error(cl_int error,const char *currentFile,const int currentLine);
+void p4a_message(const char *message,const char *currentFile,const int currentLine);
+void p4a_load_kernel_arguments(const char *kernel,...);
+struct p4a_kernel_list* new_p4a_kernel(const char *kernel);
+char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length);
+struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel);
+
+
+#define P4A_log_and_exit(code,...)               \
+  do {						 \
+  fprintf(stdout,__VA_ARGS__);			 \
+  exit(code);					 \
+  } while(0)
+
 #ifdef P4A_DEBUG
-    else
-      fprintf(stdout, "File %s - Line %i - %s\n",
-	      currentFile,currentLine,P4A_error_to_string(error));
+#define P4A_log(...)               fprintf(stdout,__VA_ARGS__)
+#else
+#define P4A_log(...)   
 #endif
-}
 
-inline void p4a_message_inline(const char *message, const char *currentFile, const int currentLine)
-{
-  if(CL_SUCCESS != p4a_global_error){
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, P4A_error_to_string(p4a_global_error));
-    p4a_clean_inline(EXIT_FAILURE);
-  }
-#ifdef P4A_DEBUG
-  else {
-    fprintf(stdout, "File %s - Line %i - Success - %s\n", 
-	    currentFile, currentLine, message);
-  }
-#endif 
-}
-
-/** When launching the kernel, need to create the program from sources
-    and select the kernel.
-
-    Arguments are pushed from the ... list.
-
-    @param kernel Name of the kernel and the source MUST have the same
-    name with .cl extension.
- */
-
-inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
-{
-  //cl_kernel p4a_kernel = NULL;
-  p4a_kernel = NULL;
-
-  struct p4a_kernel_list *kernels_list=p4a_kernels;
-  while (kernels_list != NULL) {
-    if (strcmp(kernels_list->name,kernel) == 0)
-      p4a_kernel = kernels_list->kernel;
-    if (p4a_kernel != NULL) {
-      printf("Kernel existant %s\n",kernel);
-      current_kernel = kernels_list;
-      break;
-    }
-    else
-      kernels_list = kernels_list->next;
-  }
-
-  if (!p4a_kernel) {
-    printf("Kernel non existant %s\n",kernel);
-    struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
-
-    if (p4a_kernels == NULL)
-      p4a_kernels = new_kernel;
-    else
-      current_kernel->next = new_kernel;
-    current_kernel = new_kernel;
-    new_kernel->next = NULL;
-
-    current_kernel->name = strdup(kernel);
-    current_kernel->kernel = NULL;
-
-    char* kernelFile;
-    asprintf(&kernelFile,"./%s.cl",kernel);
-    current_kernel->file_name = strdup(kernelFile);
-
-    P4A_log("Program and Kernel creation from %s\n",kernelFile);    
-    size_t kernelLength;
-    const char *comment = "// This kernel was generated for P4A\n";
-    char* cSourceCL = p4a_load_prog_source(kernelFile,
-					   comment,
-					   &kernelLength);
-    if (cSourceCL == NULL)
-      P4A_log("source du program null\n");
-    else
-      P4A_log("%s\n",cSourceCL);
-    P4A_log("Kernel length = %lu\n",kernelLength);
-    
-    /*Create and compile the program : 1 for 1 kernel */
-    //cl_program p4a_program;
-    p4a_program=clCreateProgramWithSource(p4a_context,1,
-					  (const char **)&cSourceCL,
-					  &kernelLength,
-					  &p4a_global_error);
-    P4A_test_execution_with_message("clCreateProgramWithSource");
-    p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
-    P4A_test_execution_with_message("clBuildProgram");
-    p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
-    current_kernel->kernel = p4a_kernel;
-    P4A_test_execution_with_message("clCreateKernel");
-    free(cSourceCL);
-  }
-  // The argument list is pushed.
-  // The __VA_ARGS__ contains to very first one, the number of arguments 
-  // to be loaded.
-  // And then, two informations per argument :
-  // - it sizeof(type)
-  // - the value of the argument pointeur
-  // - the very first one is the number of arguments to be loaded.
-  va_list ap;
-  va_start(ap, kernel);
-
-  // Before sparsing the kernel : specific call for kernel
-  /*
-  int n = va_arg(ap, int);
-  for (int i = 0;i < n;i++) {
-    P4A_log("Argument %d\n",i);
-    size_t size = va_arg(ap, size_t);
-    cl_mem arg_address = va_arg(ap, cl_mem);
-    p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
-    P4A_test_execution_with_message("clSetKernelArg");
-  }
-  */
-  // After parsing the kernel ...
-  printf("kernel %s : nombre d'arguments %d\n",kernel,current_kernel->n_args);
-  current_type = current_kernel->args;
-  for (int i = 0;i < current_kernel->n_args;i++) {
-    P4A_log("Argument %d\n",i);
-    //size_t size = va_arg(ap, size_t);
-    size_t size = current_type->size;
-    printf("Argument %d : size %lu\n",i,size);
-    current_type = current_type->next;
-    cl_mem arg_address = va_arg(ap, cl_mem);
-    p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
-    printf("Ici\n");
-    P4A_test_execution_with_message("clSetKernelArg");
-  }
-  
-  va_end(ap);
-}
-
-
+#define P4A_error_to_string(error)     (char *)p4a_error_to_string(error)
+#define P4A_test_execution(error)      p4a_error(error, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message) p4a_message(message, __FILE__, __LINE__)
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
 
@@ -323,8 +218,11 @@ inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
 */
 #define P4A_init_accel	                                                \
   do {                                                                  \
-     /* Get an OpenCL platform */					\
-     cl_platform_id p4a_platform_id = NULL;                             \
+    /* Get an OpenCL platform : a set of devices available */		\
+    /* The device_id is the selected device from his type */		\
+    /* CL_DEVICE_TYPE_GPU */						\
+    /*  CL_DEVICE_TYPE_CPU */						\
+    cl_platform_id p4a_platform_id = NULL;				\
      p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);	\
      P4A_test_execution_with_message("clGetPlatformIDs");				\
      /* Get the devices,could be a collection of device */		\
@@ -358,10 +256,10 @@ inline void p4a_load_kernel_arguments_inline(const char *kernel,...)
 #define P4A_release_accel		\
   do {								\
     if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);	\
-    p4a_clean_inline(EXIT_SUCCESS);					\
+    p4a_clean(EXIT_SUCCESS);					\
   } while (0)
 #else
-#define P4A_release_accel    p4a_clean_inline(EXIT_SUCCESS)
+#define P4A_release_accel    p4a_clean(EXIT_SUCCESS)
 #endif
     
 
@@ -723,7 +621,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
-    p4a_load_kernel_arguments_inline(kernel,__VA_ARGS__);				\
+    p4a_load_kernel_arguments(kernel,__VA_ARGS__);			\
     P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel      \
 				    "\" of size %d\n",P4A_n_iter_0));	\
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
@@ -731,8 +629,8 @@ void P4A_copy_to_accel_3d(size_t element_size,
 				     P4A_n_iter_0);			\
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
 			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   P4A_block_descriptor,P4A_grid_descriptor,  \
-			   0,NULL,&p4a_event_execution));				\
+			   P4A_block_descriptor,P4A_grid_descriptor,	\
+			   0,NULL,&p4a_event_execution));		\
   } while (0)
 
 
@@ -752,7 +650,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {	                                                                \
-    p4a_load_kernel_arguments_inline(kernel,__VA_ARGS__);		\
+    p4a_load_kernel_arguments(kernel,__VA_ARGS__);			\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
                    "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
@@ -768,5 +666,6 @@ void P4A_copy_to_accel_3d(size_t element_size,
   } while (0)
 
 /** @} */
+
 
 #endif //P4A_ACCEL_CL_H
