@@ -26,15 +26,15 @@ Proper effects for "call12"
 void call12(int n, int m, int x[n][m])
 {
    int i, j;
-//               <must be read   >: n
-//               <must be written>: i
+//             <    is read   >: n
+//             <    is written>: i
 
    for(i = 0; i <= n-1; i += 1)
-//               <must be read   >: m n
-//               <must be written>: j
+//             <    is read   >: m n
+//             <    is written>: j
       for(j = 0; j <= m-1; j += 1)
-//               <must be read   >: i j m n
-//               <must be written>: x[i][j]
+//             <    is read   >: i j m n
+//             <    is written>: x[i][j]
          x[i][j] = 0;
 }
 

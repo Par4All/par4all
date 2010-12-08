@@ -1,0 +1,9 @@
+
+delete regions_out
+create regions_out regions_out.c
+
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[%ALLFUNC]
+apply UNSPLIT
+

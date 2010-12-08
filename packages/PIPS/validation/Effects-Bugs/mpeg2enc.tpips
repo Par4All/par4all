@@ -1,0 +1,64 @@
+# The assignment:
+#
+# signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
+#
+# seems to result in undue information loss because *ANY_MODULE*:*ANYWHERE*
+# is read without any obvious reason. As a consequence, mpeg1 is no longer
+# visible in the cumulated effects of "putnonintrablk()".
+
+setenv WS="mpeg2enc"
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete $WS
+create $WS mpeg2enc/conform.c mpeg2enc/stats.c mpeg2enc/putvlc.c mpeg2enc/putmpg.c mpeg2enc/puthdr.c mpeg2enc/writepic.c mpeg2enc/fdctref.c mpeg2enc/idct.c mpeg2enc/quantize.c mpeg2enc/readpic.c mpeg2enc/motion.c mpeg2enc/transfrm.c mpeg2enc/mpeg2enc.c mpeg2enc/putseq.c mpeg2enc/predict.c mpeg2enc/ratectl.c mpeg2enc/putbits.c mpeg2enc/putpic.c
+
+# Too time consuming
+# display PRINTED_FILE[%ALLFUNC]
+
+echo accurate analysis
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+echo restructuring
+apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+
+echo
+echo Cumulated effects for "putnonintrablk"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[putnonintrablk]
+
+quit
+
+echo
+echo Transformers for "putnonintrablk"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[putnonintrablk]
+
+echo privatize
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+echo // loop detection
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+
+echo omp display
+capply INTERNALIZE_PARALLEL_CODE[%ALLFUNC]
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
+display PRINTED_FILE[%ALLFUNC]
+
+close
+

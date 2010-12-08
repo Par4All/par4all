@@ -3,19 +3,19 @@ Proper effects for "decl01"
 
 int decl01()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 2;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    int j = i;
    int a[sizeof(i)];
-//               <must be written>: i
+//             <    is written>: i
 
    i = 2;
-//               <must be read   >: i
-//               <must be written>: j
+//             <    is read   >: i
+//             <    is written>: j
    j = i;
-//               <must be written>: j
+//             <    is written>: j
    j = sizeof(i);
    return 0;
 }

@@ -28,18 +28,18 @@ Proper effects for "call10"
 void call10(int i, int x[10], int j, int y[10])
 {
    int k, l;
-//               <must be read   >: i
-//               <must be written>: k
+//             <    is read   >: i
+//             <    is written>: k
 
    for(k = 0; k <= i-1; k += 1)
-//               <must be read   >: i
-//               <must be written>: x[i]
+//             <    is read   >: i
+//             <    is written>: x[i]
       x[i] = 0;
-//               <must be read   >: j
-//               <must be written>: l
+//             <    is read   >: j
+//             <    is written>: l
    for(l = 0; l <= j-1; l += 1)
-//               <must be read   >: i j
-//               <must be written>: y[i]
+//             <    is read   >: i j
+//             <    is written>: y[i]
       y[i] = 0;
 }
 
@@ -68,9 +68,9 @@ int main()
 {
 //  points to = {}
    tf_t s;
-//  points to = {}
+//  {(sp,s,-Exact-)}
    tf_t *sp = &s;
-//  points to = {}
+//  {(sp,s,-Exact-)}
 
    call10(s.one, s.two, sp->one, sp->two);
 }

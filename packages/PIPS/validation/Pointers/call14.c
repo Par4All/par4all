@@ -1,6 +1,6 @@
 /* linearization of call04 */
 
-/* #include<stdio.h> */
+#include<stdio.h>
 
 void call14(int n, int m, int *x)
 {
