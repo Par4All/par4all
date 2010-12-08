@@ -788,6 +788,18 @@ outline(char* module_name)
     /* retrieve name of the outiled module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");
 
+    // Check the language. In case of Fortran the modul name must be in
+    // capital letters.
+    value mv = entity_initial(module_name_to_entity(module_name));
+    if(value_code_p(mv)) {
+      code c = value_code(mv);
+      if ((language_tag(code_language(c))) == is_language_fortran) {
+	for (int i = 0; i < strlen (outline_module_name); i++) {
+	  outline_module_name[i] = toupper (outline_module_name[i]);
+	}
+      }
+    }
+
     /* retrieve statement to outline */
     list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),OUTLINE_PRAGMA) ;
     if(ENDP(statements_to_outline)) {
