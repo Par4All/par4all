@@ -64,8 +64,10 @@ transformer simple_unary_minus_to_transformer(entity e, entity f)
   return tf;
 }
 
-transformer 
-generic_equality_to_transformer(entity e, entity f, bool assignment, bool unary_minus_p)
+transformer generic_equality_to_transformer(entity e,
+					    entity f,
+					    bool assignment,
+					    bool unary_minus_p)
 {
   transformer tf = transformer_undefined;
   Pvecteur eq = vect_new((Variable) e, VALUE_ONE);
@@ -94,9 +96,12 @@ generic_equality_to_transformer(entity e, entity f, bool assignment, bool unary_
   return tf;
 }
 
-/* e and e1 and e2 are assumed to be values. State e=e1+e2 or e=e1-e2. Type independent. */
-transformer 
-simple_addition_to_transformer(entity e, entity e1, entity e2, bool addition_p)
+/* e and e1 and e2 are assumed to be values. State e=e1+e2 or
+   e=e1-e2. Type independent. */
+transformer simple_addition_to_transformer(entity e,
+					   entity e1,
+					   entity e2,
+					   bool addition_p)
 {
   transformer tf = transformer_undefined;
   Pvecteur eq = vect_new((Variable) e, VALUE_ONE);
@@ -104,7 +109,9 @@ simple_addition_to_transformer(entity e, entity e1, entity e2, bool addition_p)
 
   ifdebug(9) {
     pips_debug(9, "entity e: %s, entity e1: %s, entity e2: %s, %s\n",
-	       entity_local_name(e), entity_local_name(e1), entity_local_name(e2),
+	       entity_local_name(e),
+	       entity_local_name(e1),
+	       entity_local_name(e2),
 	       addition_p? "Is an addition" : "Is a subtraction");
   }
 
@@ -124,8 +131,8 @@ simple_addition_to_transformer(entity e, entity e1, entity e2, bool addition_p)
 
 /* e and f are assumed to be values. Operator op is overloaded and the
    result is operator and type dependent */
-transformer 
-relation_to_transformer(entity op, entity e1, entity e2, bool veracity)
+transformer relation_to_transformer(entity op, entity e1, entity e2,
+				    bool veracity)
 {
   transformer tf = transformer_undefined;
   basic b1 = variable_basic(type_variable(entity_type(e1)));
@@ -603,7 +610,7 @@ transformer transformer_safe_domain_intersection(transformer tf,
 /* Return the range of relation tf in a newly allocated transformer.
  * Projection of all old values.
  */
-transformer transformer_range(transformer tf)
+ transformer transformer_range(transformer tf)
 {
   transformer rtf = transformer_dup(tf);
   list args = NIL;
@@ -668,13 +675,13 @@ transformer transformer_to_domain(transformer tf)
   Psysteme sc = predicate_system(transformer_relation(dtf));
   Pbase b = sc_base(sc);
 
-  MAP(ENTITY, a, {
+  FOREACH(ENTITY, a, transformer_arguments(dtf)) {
     entity nv = entity_to_new_value(a);
 
     if(base_contains_variable_p(b, (Variable)  nv)) {
       new_args = CONS(ENTITY, nv, new_args);
     }
-  }, transformer_arguments(dtf));
+  }
 
   /* dtf = transformer_projection(dtf, args); */
   /* dtf = transformer_projection_with_redundancy_elimination(dtf, new_args,
@@ -688,7 +695,7 @@ transformer transformer_to_domain(transformer tf)
   sc = predicate_system(transformer_relation(dtf));
   b = sc_base(sc);
 
-  MAP(ENTITY, a, {
+  FOREACH(ENTITY, a, new_args) {
     entity ov = entity_to_old_value(a);
     entity nv = entity_to_new_value(a);
 
@@ -697,12 +704,13 @@ transformer transformer_to_domain(transformer tf)
     if(base_contains_variable_p(b, (Variable)  ov)) {
       dtf = transformer_value_substitute(dtf, ov, nv);
     }
-  }, new_args);
+  }
 
   gen_free_list(new_args);
 
   return dtf;
 }
+
 transformer transformer_safe_domain(transformer tf)
 {
   transformer dtf = transformer_undefined;
@@ -724,6 +732,37 @@ transformer transformer_range_intersection(transformer tf, transformer r)
   tf = transformer_image_intersection(tf, r);
 
   return tf;
+}
+
+/* When tf is used repeatedly in a loop, the range is part of the
+   domain from iteration 2 to the end. This improves the derivative of
+   tf when tf is involutive on a subspace. A new transformer is
+   allocated. Of course, it cannot be used without caution. note that
+   tf must be a range, i.e. no arguments, no old values in the
+   basis. */
+transformer transformer_intersect_range_with_domain(transformer tf)
+{
+  transformer r = transformer_range(tf);
+  transformer ntf = copy_transformer(tf);
+  Psysteme sc = predicate_system(transformer_relation(ntf));
+  Psysteme scr = predicate_system(transformer_relation(r));
+  Pbase b = sc_base(scr);
+  list vl = base_to_entities(b);
+
+  // No convenient iterator on the basis, hence the temporary list of values
+  FOREACH(ENTITY, v, vl) {
+    entity ov = entity_to_old_value(v);
+
+    r = transformer_value_substitute(r, v, ov);
+  }
+
+  scr = predicate_system(transformer_relation(r));
+  // let's hope sc_append takes care of the consistency of sc
+  sc = sc_append(sc, scr);
+
+  gen_free_list(vl);
+
+  return ntf;
 }
 
 static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)

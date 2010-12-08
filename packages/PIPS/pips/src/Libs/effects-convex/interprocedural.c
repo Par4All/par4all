@@ -578,15 +578,15 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		    effect n_eff;
 		    bool exact_translation_p;
 		    effect init_eff = (*effect_dup_func)(eff);
-		    
+
 		    /* we translate the initial region descriptor
 		       into the caller's name space
 		    */
 		    convex_region_descriptor_translation(init_eff);
 		    /* and then perform the translation */
-		    convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff), 
+		    convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff),
 										   effect_descriptor(init_eff),
-										   effect_any_reference(real_eff), 
+										   effect_any_reference(real_eff),
 										   effect_descriptor(real_eff),
 										   0,
 										   &n_eff_ref, &n_eff_d,
@@ -1182,9 +1182,8 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			   and the system must be feasible.
 			   We should also take care of linearization here.
 			*/
-
-			if(effect_entity(eff_orig) == effect_entity(eff_real)
-			   &&  nb_phi_orig >= nb_phi_real)
+			bool exact_p;
+			if(path_preceding_p(eff_real, eff_orig, transformer_undefined, false, &exact_p))
 			  {
 			    effect eff_formal = (*effect_dup_func)(eff_orig);
 			    region_sc_append_and_normalize(eff_formal, region_system(eff_real), 1);
@@ -1196,6 +1195,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 			      }
 			    else
 			      {
+				/* I guess we could reuse convex_cell_reference_with_address_of_cell_reference_translation */
 				/* At least part of the original effect corresponds to the actual argument :
 				   we need to translate it
 				*/
@@ -1349,93 +1349,52 @@ list c_convex_effects_on_actual_parameter_forward_translation
 	       and the system must be feasible.
 	    */
 
-	    if(effect_entity(eff_orig) == effect_entity(eff_real)
+	    bool exact_p;
+	    if(path_preceding_p(eff_real, eff_orig, transformer_undefined, true, &exact_p)
 	       &&  nb_phi_orig >= nb_phi_real)
 	      {
-		effect eff_formal = (*effect_dup_func)(eff_orig);
-		region_sc_append_and_normalize(eff_formal, region_system(eff_real), 1);
+		effect eff_orig_dup = (*effect_dup_func)(eff_orig);
+		region_sc_append_and_normalize(eff_orig_dup, region_system(eff_real), 1);
 
-		if (sc_empty_p(region_system(eff_formal)))
+		if (sc_empty_p(region_system(eff_orig_dup)))
 		  {
 		    pips_debug(5, "the original effect does not correspond to the actual argument \n");
-		    free_effect(eff_formal);
+		    free_effect(eff_orig_dup);
 		  }
 		else
 		  {
 		    /* At least part of the original effect corresponds to the actual argument :
 		       we need to translate it
 		    */
-		    Psysteme sc_formal;
-		    reference ref_formal = effect_any_reference(eff_formal);
-		    reference new_ref;
-		    list new_inds = NIL;
-		    int i;
+		    reference ref_formal = make_reference(formal_ent, NIL);
+		    effect eff_formal = make_reference_region(ref_formal, copy_action(effect_action(eff_orig)));
 
-		    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_formal);
+		    pips_debug_effect(5, "matching access paths, considered effect is : \n", eff_orig_dup);
 
-		    /* first we translate the predicate in the callee's name space */
-		    convex_region_descriptor_translation(eff_formal);
-		    pips_debug_effect(5, "eff_formal after context translation: \n", eff_formal);
+		    /* first we perform the path translation */
+		    reference n_eff_ref;
+		    descriptor n_eff_d;
+		    effect n_eff;
+		    bool exact_translation_p;
+		    convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(eff_orig_dup),
+										   effect_descriptor(eff_orig_dup),
+										   ref_formal,
+										   effect_descriptor(eff_formal),
+										   nb_phi_real,
+										   &n_eff_ref, &n_eff_d,
+										   &exact_translation_p);
+		    n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff_orig)),
+					exact_translation_p? copy_approximation(effect_approximation(eff_orig)) : make_approximation_may(),
+					n_eff_d);
+		    pips_debug_effect(5, "final eff_formal : \n", n_eff);
 
-		    /* Then we remove the phi variables common to the two regions */
-		    /* This is only valid when there is no linearization ; in the general case
-		       a translation system should be built
-		    */
-		    if(nb_phi_real >= 1)
-		      {
-			sc_formal = region_system(eff_formal);
-			for(i = 1; i <= nb_phi_real; i++)
-			  {
-			    entity phi_i = make_phi_entity(i);
-			    entity psi_i = make_psi_entity(i);
+		    /* then  we translate the predicate in the callee's name space */
+		    convex_region_descriptor_translation(n_eff);
+		    pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
 
-			    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) psi_i);
-			  }
-			region_system(eff_formal) = sc_formal;
-			region_remove_psi_variables(eff_formal);
-			pips_debug_effect(5, "eff_formal after renaming common dimensions: \n", eff_formal);
-		      }
-		    else
-		      pips_debug(8, "nb_phi_real == 0, no need for renaming. \n");
-
-		    /* Finally, we must rename remaining phi variables from 1
-		       and change the resulting region entity for the formal entity
-		    */
-		    if(nb_phi_real >= 1)
-		      {
-			sc_formal = region_system(eff_formal);
-			for(i = nb_phi_real+1; i <= nb_phi_orig; i++)
-			  {
-			    entity phi_i = make_phi_entity(i);
-			    entity phi_formal = make_phi_entity(i-nb_phi_real);
-
-			    sc_formal = sc_variable_rename(sc_formal, (Variable) phi_i, (Variable) phi_formal);
-
-			    new_inds = gen_nconc(new_inds,
-						 CONS(EXPRESSION,
-						      make_phi_expression(i-nb_phi_real),
-						      NIL));
-
-			  }
-			region_system(eff_formal) = sc_formal;
-		      }
-		    else
-		      {
-			for (i = 1; i<= nb_phi_orig - nb_phi_real; i++)
-			  new_inds = gen_nconc(new_inds,
-					       CONS(EXPRESSION,
-						    make_phi_expression(i),
-						    NIL));
-		      }
-		    pips_debug_effect(5, "eff_formal after renaming remaining phi variables: \n", eff_formal);
-		    free_reference(ref_formal);
-		    new_ref = make_reference(formal_ent, new_inds);
-		    cell_reference(effect_cell(eff_formal)) = new_ref;
-		    pips_debug_effect(5, "final eff_formal : \n", eff_formal);
-		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, eff_formal, NIL),regions_same_action_p);
+		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),regions_same_action_p);
 		    pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
 		  } /* else of the if (sc_empty_p) */
-
 
 	      } /* if(effect_entity(eff_orig) == effect_entity(eff_real) ...)*/
 

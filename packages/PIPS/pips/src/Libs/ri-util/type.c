@@ -944,7 +944,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
     }
   case is_syntax_application:
     {
-      b = basic_of_any_expression(application_function(syntax_application(sy)), TRUE);
+      b = basic_of_any_expression(application_function(syntax_application(sy)), apply_p);
       break;
     }
   case is_syntax_va_arg:
@@ -1156,7 +1156,7 @@ basic basic_of_external(call c)
 /* basic basic_of_intrinsic(call c): returns the basic of the result
  * given by call to an intrinsic function. This basic must be computed
  * with the basic of the arguments of the intrinsic for overloaded
- * operators.  It should be able to accomodate more than two arguments
+ * operators.  It should be able to accommodate more than two arguments
  * as for generic min and max operators. ultimate_p controls the
  * behavior when typedef'ed types are encountered: should they be
  * replaced by their definitions or not?
@@ -1239,8 +1239,9 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
                         if(type_variable_p(rt))
                             rb = copy_basic(variable_basic(type_variable(rt)));
                         else {
-                            /* Too bad for "void"... */
-                            pips_internal_error("result type of a functional type must be a variable type");
+                            /* Too bad for "void"... 
+                             * SG: should not happen because dereferencing a void* is a mistake */
+                            pips_internal_error("input code seems to derference a void* pointer ?");
                         }
                     }
                     else {

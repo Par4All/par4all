@@ -289,7 +289,11 @@ class workspace(object):
 			self.props.USER_LOG_P = False
 		self.props.MAXIMUM_USER_ERROR = 42  # after this number of exceptions the programm will abort
 		pypsutils.build_module_list(self)
-		self._name=self.info("workspace")[0]
+		# Get the workspace name, if any:
+		self._name = self.info("workspace")
+		if self._name:
+			# The name is indeed the first element of the returned list:
+			self._name = self._name[0]
 
 		"""Call all the functions 'post_init' of the given parents"""
 		for pws in reversed(self.iparents):

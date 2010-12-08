@@ -315,10 +315,6 @@ transformer generic_transformer_list_to_transformer(list ltl, bool active_p)
 {
   transformer ltf = transformer_undefined; // list transformer
 
-  /* FI: an extra effort is needed to handle the general case of n
-     transformers. For the time being, the list can contain at most
-     two transformers. */
-
   if(ENDP(ltl))
     ltf = transformer_empty();
   else {
@@ -333,20 +329,28 @@ transformer generic_transformer_list_to_transformer(list ltl, bool active_p)
       }
       POP(ctl);
     }
-    /* Take care of the following useful transformers */
-    while(!ENDP(ctl)) {
-      /* Look for the next useful transformer in the list */
-      FOREACH(TRANSFORMER, tf, ctl) {
-	if(!active_p || !ENDP(transformer_arguments(tf))) {
-	  transformer ntf = copy_transformer(tf);
-	  transformer ptf = ltf;
-	  ltf = transformer_convex_hull(ptf, ntf);
-	  free_transformer(ntf);
-	  free_transformer(ptf);
+    if(ENDP(ctl)) {
+      if(transformer_undefined_p(ltf))
+	/* Only range conditions have been found: the store is
+	   restricted but not changed. */
+	ltf = transformer_identity();
+    }
+    else {
+      /* Take care of the following useful transformers */
+      while(!ENDP(ctl)) {
+	/* Look for the next useful transformer in the list */
+	FOREACH(TRANSFORMER, tf, ctl) {
+	  if(!active_p || !ENDP(transformer_arguments(tf))) {
+	    transformer ntf = copy_transformer(tf);
+	    transformer ptf = ltf;
+	    ltf = transformer_convex_hull(ptf, ntf);
+	    free_transformer(ntf);
+	    free_transformer(ptf);
+	    POP(ctl);
+	    break;
+	  }
 	  POP(ctl);
-	  break;
 	}
-	POP(ctl);
       }
     }
   }
