@@ -1,0 +1,33 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline16"
+delete $WS
+create $WS $WS.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+
+setproperty OUTLINE_MODULE_NAME "toto"
+setproperty OUTLINE_LABEL "10"
+apply OUTLINE[OUTLINE16]
+apply CLEAN_DECLARATIONS[OUTLINE16]
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+close
+delete $WS
+quit
