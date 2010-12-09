@@ -50,6 +50,18 @@ F.py	= $(wildcard *.py)
 
 F.exe	= $(F.tpips) $(F.tpips2) $(F.test) $(F.py)
 
+# optimistic possible results for Ronan
+F.future_result = \
+	$(F.tpips:%.tpips=%.result) \
+	$(F.tpips2:%.tpips2=%.result) \
+	$(F.test:%.test=%.result) \
+	$(F.py:%.py=%.result) \
+	$(F.c:%.c=%.result) \
+	$(F.f:%.f=%.result) \
+	$(F.F:%.F=%.result) \
+	$(F.f90:%.f90=%.result) \
+	$(F.f95:%.f95=%.result)
+
 # validation output
 F.valid	= $(F.result:%=%/$(TEST))
 
@@ -155,6 +167,17 @@ validate-%:
 # generate missing "test" files
 .PHONY: generate-test
 generate-test: $(F.valid)
+
+# generate empty result directories, for Ronan
+# beware that this is a magick guess from the contents of the directory
+# you then have to generate the corresponding "test" file
+# and commit everything on the svn
+.PHONY: generate-result
+generate-result: $(F.future_result)
+
+# generate an empty result directory
+%.result:
+	@echo "creating: $@" ; mkdir $@
 
 # (shell) script
 %.result/$(TEST): %.test
