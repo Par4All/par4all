@@ -1,4 +1,4 @@
-// N. Halbwachs 2010-12-09 Aussois
+// N. Halbwachs 2010-12-09 Aussois, slide 16-18
 
 #include <stdio.h>
 // #define assert(b) if (!(b)) exit(1);
