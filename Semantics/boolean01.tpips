@@ -1,4 +1,5 @@
-setenv WSPACE=boolean00
+setenv WSPACE=boolean01
+delete $WSPACE
 setenv FILE=$WSPACE.c
 create $WSPACE $FILE
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
