@@ -31,7 +31,9 @@ OBJFILES += $(SOURCES.y:.y=.o) $(SOURCES.l:.l=.o)
 
 #OBJFILES += y.tab.o
 
-CFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_DEBUG -DP4A_PROFILING -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX -std=c99
+
+#CFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_DEBUG -DP4A_PROFILING -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX -std=c99
+CFLAGS = -I.. -I.  -DP4A_ACCEL_CL -DP4A_PROFILING -I$(OCL_DIR)/inc -I$(OCL_DIR)/inc/CL -I$(SHARED_DIR)/inc -DUNIX -std=c99
 
 LDFLAGS = -fPIC -L/usr/lib #-L$(SHARED_DIR)/lib -L$(OCL_DIR)/lib
 

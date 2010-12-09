@@ -6,7 +6,8 @@
 
     Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
     Compétitivité Images and Network) and SCALOPES (Artemis European
-    Project project)
+    Project project), with participation of MODENA (French Pôle de
+    Compétitivité Mer Bretagne)
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
@@ -685,6 +686,17 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 #ifdef P4A_ACCEL_CL
 
+/** @author Stéphanie Even
+
+    OpenCL is a bit more complicated than CUDA or OpenMP.
+    
+    Aside the procedure defined for these previous interface,
+    OpenCL needs a complex interface, from loading the kernel from
+    a source file to analysing the argument list of the kernel.
+
+    Procedure to manage a kernel list have thus been created.
+ */
+
 #ifdef P4A_PROFILING
 cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
 #else
@@ -1189,6 +1201,11 @@ void P4A_copy_to_accel_4d(size_t element_size,
   }
 }
 
+/** @author : Stéphanie Even
+
+    In OpenCL, errorToString doesn't exists by default ...
+    Macros have been picked from cl.h
+ */
 char * p4a_error_to_string(int error) 
 {
   switch (error)
@@ -1292,7 +1309,9 @@ char * p4a_error_to_string(int error)
     }
 } 
 
-/** To quit properly.
+/** @author : Stéphanie Even
+
+    To quit properly OpenCL.
  */
 void p4a_clean(int exitCode)
 {
@@ -1300,26 +1319,66 @@ void p4a_clean(int exitCode)
   if(p4a_kernel)clReleaseKernel(p4a_kernel);  
   if(p4a_queue)clReleaseCommandQueue(p4a_queue);
   if(p4a_context)clReleaseContext(p4a_context);
+
+  // Free the kernels list
+  struct p4a_kernel_list *kernel = p4a_kernels;
+  while (kernel) {
+    current_kernel = kernel->next;
+    free(kernel->kernel);
+    free(kernel->name);
+    free(kernel->file_name);
+    struct arg_type * type = kernel->args;
+    while (type) {
+      kernel->current = type->next;
+      free(type);
+      type = kernel->current;
+    }
+    free(kernel);
+    kernel = current_kernel;
+  }
+
+  // Free the typedef
+  struct type_substitution * type_def = substitution_list;
+  while (type_def) {
+    current_substitution = type_def->next;
+    free(type_def);
+    type_def = current_substitution;
+  }
+
   exit(exitCode);
 }
 
+/** @author : Based on the CUDA version from Grégoire Péan. 
+              Picked and adapted to OpenCL by Stéphanie Even
+
+    Error display based on OpenCL error codes.
+
+    Each OpenCL function returns an error information.
+ */
 void p4a_error(cl_int error, 
-			     const char *currentFile, 
-			     const int currentLine)
+	       const char *currentFile, 
+	       const int currentLine)
 {
-    if(CL_SUCCESS != error) {
-      fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
-	      currentFile,currentLine,P4A_error_to_string(error));
-      p4a_clean(EXIT_FAILURE);
-    }
+  if(CL_SUCCESS != error) {
+    fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
+	    currentFile,currentLine,P4A_error_to_string(error));
+    p4a_clean(EXIT_FAILURE);
+  }
 #ifdef P4A_DEBUG
-    else
-      fprintf(stdout, "File %s - Line %i - %s\n",
-	      currentFile,currentLine,P4A_error_to_string(error));
+  else
+    fprintf(stdout, "File %s - Line %i - %s\n",
+	    currentFile,currentLine,P4A_error_to_string(error));
 #endif
 }
 
-void p4a_message(const char *message, const char *currentFile, const int currentLine)
+/** @author : Based on the CUDA version from Grégoire Péan. 
+              Picked and adapted to OpenCL by Stéphanie Even
+
+    Error display with message based on OpenCL error codes.
+ */
+void p4a_message(const char *message, 
+		 const char *currentFile, 
+		 const int currentLine)
 {
   if(CL_SUCCESS != p4a_global_error){
     fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, P4A_error_to_string(p4a_global_error));
@@ -1333,24 +1392,30 @@ void p4a_message(const char *message, const char *currentFile, const int current
 #endif 
 }
 
-/** When launching the kernel, need to create the program from sources
-    and select the kernel.
+/** @author : Stéphanie Even
+
+    When launching the kernel
+    - need to create the program from sources
+    - select the kernel call within the program source
 
     Arguments are pushed from the ... list.
+    Two solutions are proposed :
+    - One, is actually commented : the parameters list (...)
+      must contain the number of parameters, the sizeof(type)
+      and the parameter as a reference &;
+    - Second, the program source is parsed and the argument list is analysed.
+      The result of the aprser is :
+      - the number of arguments
+      - the sizeof(argument type)
 
-    @param kernel Name of the kernel and the source MUST have the same
+    @param kernel: Name of the kernel and the source MUST have the same
     name with .cl extension.
  */
 
 void p4a_load_kernel_arguments(const char *kernel,...)
 {
-  //p4a_kernel = NULL;
   current_kernel = p4a_search_current_kernel(kernel);
-  //if (current_kernel)
-  // p4a_kernel = current_kernel->kernel;
-  
-  // If not ...
-  //if (!p4a_kernel) {
+  // If not found ...
   if (!current_kernel) {
     P4A_log("The kernel %s is loaded for the first time\n",kernel);
     current_kernel = new_p4a_kernel(kernel);
@@ -1358,6 +1423,7 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
     const char *comment = "// This kernel was generated for P4A\n";
+    // Same design as the NVIDIA oclLoadProgSource
     char* cSourceCL = p4a_load_prog_source(kernelFile,
 					   comment,
 					   &kernelLength);
@@ -1368,7 +1434,6 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_log("Kernel length = %lu\n",kernelLength);
     
     /*Create and compile the program : 1 for 1 kernel */
-    //cl_program p4a_program;
     p4a_program=clCreateProgramWithSource(p4a_context,1,
 					  (const char **)&cSourceCL,
 					  &kernelLength,
@@ -1381,44 +1446,50 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_test_execution_with_message("clCreateKernel");
     free(cSourceCL);
   }
+
+  // Arguments are re-launched at each call because their values may have 
+  // changed.
   p4a_kernel = current_kernel->kernel;
-  // The argument list is pushed.
-  // The __VA_ARGS__ contains to very first one, the number of arguments 
-  // to be loaded.
-  // And then, two informations per argument :
-  // - it sizeof(type)
-  // - the value of the argument pointeur
-  // - the very first one is the number of arguments to be loaded.
   va_list ap;
   va_start(ap, kernel);
 
-  // Before sparsing the kernel : specific call for kernel
+  /* Kernel arguments setting, solution One : specific call for kernel
+     The argument list is pushed.
+     The __VA_ARGS__ contains to very first one, the number of arguments 
+     to be loaded.
+     And then, two informations per argument :
+     - it sizeof(type)
+     - the value of the argument pointeur
+     - the very first one is the number of arguments to be loaded.
+  */
   /*
-  int n = va_arg(ap, int);
-  for (int i = 0;i < n;i++) {
+    int n = va_arg(ap, int);
+    for (int i = 0;i < n;i++) {
     P4A_log("Argument %d\n",i);
     size_t size = va_arg(ap, size_t);
     cl_mem arg_address = va_arg(ap, cl_mem);
     p4a_global_error=clSetKernelArg(p4a_kernel,i,size,arg_address);
     P4A_test_execution_with_message("clSetKernelArg");
-  }
+    }
   */
-  // After parsing the kernel ...
+  // Kernel arguments setting, solution Two : after kernel parsing
   P4A_log("kernel %s : number of arguments %d\n",kernel,current_kernel->n_args);
   struct arg_type *current_type = current_kernel->args;
   for (int i = 0;i < current_kernel->n_args;i++) {
     P4A_log("Argument %d, type %s, size %lu ",i,current_type->type_name,current_type->size);
-    //size_t size = va_arg(ap, size_t);
     size_t size = current_type->size;
-    current_type = current_type->next;
+    // Each argument is passed as a reference ...
     cl_mem arg_address = va_arg(ap, cl_mem);
     p4a_global_error = clSetKernelArg(p4a_kernel,i,size,arg_address);
     P4A_test_execution_with_message("clSetKernelArg");
+    current_type = current_type->next;
   }
   va_end(ap);
 }
 
-/** Load and store the content of the kernel file in a string.
+/** @author : Stéphanie Even
+
+    Load and store the content of the kernel file in a string.
     Replace the oclLoadProgSource function of NVIDIA.
  */
 char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
@@ -1450,23 +1521,26 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
   close(in);
   *length = size+len;
 
-  // Manual parsing ...
-  //p4a_parse_kernel(source,head);
-  
-  // Parsing with lex/yacc
+  // Parsing with lex/yacc to retrieve the argument characteristics
   P4A_log("Begin to parse the kernel ...\n");
-  int result = parse_file(cl_kernel_file);
+  parse_file(cl_kernel_file);
   P4A_log("End of kernel parsing : %d\n",current_kernel->n_args);
 
+  // Some comment to verify
+  /*
   struct arg_type * type = current_kernel->args;
   while (type) {
     printf("Type : %s, size %d\n",type->type_name,type->size);
     type = type->next;
   }
+  */
   return source;
 }
 
+/** @author : Stéphanie Even
 
+    Creation of a new kernel, initialisation and insertion in the kernel list.
+ */
 struct p4a_kernel_list* new_p4a_kernel(const char *kernel)
 {
   struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
@@ -1496,17 +1570,27 @@ struct p4a_kernel_list* new_p4a_kernel(const char *kernel)
   return new_kernel;
 }
 
+/** @author : Stéphanie Even
+
+    Search if the <kernel> is already in the list.
+ */
+
 struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel)
 {
-  struct p4a_kernel_list *kernels_list=p4a_kernels;
-  while (kernels_list != NULL) {
-    if (strcmp(kernels_list->name,kernel) == 0)
-      return kernels_list;
-    kernels_list = kernels_list->next;
+  struct p4a_kernel_list *kernel_in_the_list=p4a_kernels;
+  while (kernel_in_the_list != NULL) {
+    if (strcmp(kernel_in_the_list->name,kernel) == 0)
+      return kernel_in_the_list;
+    kernel_in_the_list = kernel_in_the_list->next;
   }
   return NULL;
 }
 
+/** @author : Stéphanie Even
+    
+    Create a new type for an argument.
+The objectives is to retrieve the sizeof().
+ */
 struct arg_type * new_type(char *str_type)
 {
   struct arg_type *type = (struct arg_type*)malloc(sizeof(struct arg_type));
@@ -1554,10 +1638,4 @@ struct arg_type * new_type(char *str_type)
   current_kernel->current = type;
 }
 
-/*
-void set_type(char *str_type)
-{
-  current_kernel->current->type_name = strdup(str_type);
-}
-*/
 #endif // P4A_ACCEL_CL

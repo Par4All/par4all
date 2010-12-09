@@ -8,7 +8,7 @@
 #include <string.h>
 #include "p4a_include-OpenCL.h"
 
-  int parse_file(char *name);
+  void parse_file(char *name);
 
   // File Name
   char *file_name;
@@ -139,7 +139,7 @@ void yyerror(char *s)
   exit(EXIT_FAILURE);
 }
 
-int parse_file(char *name)
+void parse_file(char *name)
 {
   no_line = 1;
   file_name = name;
@@ -148,7 +148,6 @@ int parse_file(char *name)
     exit(EXIT_FAILURE);
   }
   yyparse();
-  return EXIT_SUCCESS;
 }
 
 struct type_substitution * new_typedef(char *str1,char *str2)

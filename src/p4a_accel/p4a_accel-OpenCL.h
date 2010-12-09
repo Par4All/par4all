@@ -6,7 +6,8 @@
 
     Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
     Compétitivité Images and Network) and SCALOPES (Artemis European
-    Project project)
+    Project project), with participation of MODENA (French Pôle de
+    Compétitivité Mer Bretagne)
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
@@ -49,7 +50,8 @@
 
 #define P4A_error_to_string(error)     (char *)p4a_error_to_string(error)
 #define P4A_test_execution(error)      p4a_error(error, __FILE__, __LINE__)
-#define P4A_test_execution_with_message(message) p4a_message(message, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message)	\
+  p4a_message(message, __FILE__, __LINE__)
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
 
@@ -58,7 +60,7 @@
 
 /** Parameters used to choose work_item allocation per work_group in OpenCL.
 
-    This allow to choose the size of the blocks of work_item in 1,2 and 3D.
+    This allow to choose the size of the group of work_item in 1,2 and 3D.
 
     If there is not enough iterations to fill an expected work_group size in a
     dimension, the work_group size is indeed the number of iteration in this
@@ -79,6 +81,7 @@
     There are unfortunately some hardware limits on the group size
     that appear at the programming level, so we should add another level
     of tiling.
+    
 */
 #ifndef P4A_CL_ITEM_MAX
 /** The maximum number of work_items in a work_group */
@@ -173,7 +176,7 @@
 /** Release the hardware accelerator in CL
 */
 #ifdef P4A_PROFILING
-#define P4A_release_accel		\
+#define P4A_release_accel					\
   do {								\
     if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);	\
     p4a_clean(EXIT_SUCCESS);					\
@@ -191,7 +194,15 @@
     @{
 */
 
-/** Start a timer on the accelerator in CL */
+/** Start a timer on the accelerator
+    
+    Nothing to do in OpenCL.
+    Timer functions are linked to events.
+    An event is called as an argument of a specific function 
+    (kernel call, mem copy).
+    The end and start time are available only after the call
+    and are retrieved from the event.
+ */
 #define P4A_accel_timer_start 
 
 /** @} */
@@ -240,161 +251,7 @@
 #define P4A_vp_2 get_global_id(2)
 
 
-/** @defgroup P4A_CL_memory_allocation_copy Memory allocation and copy for 
-    CL acceleration
-
-    @{
-*/
-
-/** Copy a scalar from the hardware accelerator to the host
-
- It's a wrapper around CudaMemCopy*.
-
- Do not change the place of the pointers in the API. The host address
- is always first...
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[out] host_address point to the element on the host to write
- into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
- */
-void P4A_copy_from_accel(size_t element_size,
-			 void *host_address,
-			 const void *accel_address);
-
-/** Copy a scalar from the host to the hardware accelerator
-
- It's a wrapper around CudaMemCopy*.
-
- Do not change the place of the pointers in the API. The host address
- is always before the accel address...
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[out] host_address point to the element on the host to write
- into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
- */
-void P4A_copy_to_accel(size_t element_size,
-		       const void *host_address,
-		       void *accel_address);
-
-/** Function for copying memory from the hardware accelerator to a 1D array in
- the host.
-
- It's a wrapper around CudaMemCopy*.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from (host side)
-
- @param[out] host_address point to the array on the host to write into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
-
- @return the host_address, by compatibility with memcpy().
- */
-void P4A_copy_from_accel_1d(size_t element_size,
-			    size_t d1_size,
-			    size_t d1_block_size,
-			    size_t d1_offset,
-			    void *host_address,
-			    const void *accel_address);
-
-/** Function for copying a 1D memory zone from the host to a compact memory
- zone in the hardware accelerator.
-
- This function could be quite simpler but is designed by symmetry with
- other functions.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from
-
- @param[in] host_address point to the array on the host to read
-
- @param[out] accel_address refer to the compact memory area to write
- data. In the general case, accel_address may be seen as a unique idea
- (FIFO) and not some address in some memory space.
- */
-void P4A_copy_to_accel_1d(size_t element_size,
-			  size_t d1_size,
-			  size_t d1_block_size,
-			  size_t d1_offset,
-			  const void *host_address,
-			  void *accel_address);
-
-/** Function for copying memory from the hardware accelerator to a 2D array in
- the host.
- */
-void P4A_copy_from_accel_2d(size_t element_size,
-			    size_t d1_size, size_t d2_size,
-			    size_t d1_block_size, size_t d2_block_size,
-			    size_t d1_offset, size_t d2_offset,
-			    void *host_address,
-			    const void *accel_address);
-
-/** Function for copying a 2D memory zone from the host to a compact memory
- zone in the hardware accelerator.
- */
-void P4A_copy_to_accel_2d(size_t element_size,
-			  size_t d1_size, size_t d2_size,
-			  size_t d1_block_size, size_t d2_block_size,
-			  size_t d1_offset, size_t d2_offset,
-			  const void *host_address,
-			  void *accel_address);
-
-/** Function for copying memory from the hardware accelerator to a 3D array in
-    the host.
-*/
-void P4A_copy_from_accel_3d(size_t element_size,
-			    size_t d1_size, size_t d2_size, size_t d3_size,
-			    size_t d1_block_size, 
-			    size_t d2_block_size, 
-			    size_t d3_block_size,
-			    size_t d1_offset,size_t d2_offset,size_t d3_offset,
-			    void *host_address,
-			    const void *accel_address);
-
-/** Function for copying a 3D memory zone from the host to a compact memory
-    zone in the hardware accelerator.
-*/
-void P4A_copy_to_accel_3d(size_t element_size,
-			  size_t d1_size, size_t d2_size, size_t d3_size,
-			  size_t d1_block_size, 
-			  size_t d2_block_size, 
-			  size_t d3_block_size,
-			  size_t d1_offset, size_t d2_offset, size_t d3_offset,
-			  const void *host_address,
-			  void *accel_address);
-
-/* @} */
-
-
-/** @addtogroup P4A_cl_kernel_call
+/** @defgroup P4A_cl_kernel_call
 
     @{
 */
@@ -406,14 +263,14 @@ void P4A_copy_to_accel_3d(size_t element_size,
     @see P4A_call_accel_kernel_2d, 
     @see P4A_call_accel_kernel_3d
 
-    This transforms for example:
+    This transforms :
 
-    P4A_call_accel_kernel((pips_accel_1, 1, pips_accel_dimBlock_1),
-                          (*accel_imagein_re, *accel_imagein_im));
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),
+                          (p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event_execution));
 
     into:
 
-    do { pips_accel_1<<<1, pips_accel_dimBlock_1>>> (*accel_imagein_re, *accel_imagein_im); P4A_test_execution_with_message ("P4A CL kernel execution failed", "init.cu", 58); } while (0);
+    do { clEnqueueNDRangeKernel(p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event_execution); } while (0);
 */
 
 #define P4A_call_accel_kernel(context, parameters)			\
@@ -453,14 +310,14 @@ void P4A_copy_to_accel_3d(size_t element_size,
 #define P4A_create_1d_thread_descriptors(grid_descriptor_name,		\
 					 block_descriptor_name,		\
 					 size)				\
+  cl_uint work_dim = 1;							\
   /* Define the number of thread per block: */				\
-  cl_uint work_dim = 1;                                                 \
-  size_t block_descriptor_name[] = {P4A_min((int) size,			\
-					    (int) P4A_CL_ITEM_PER_GROUP_IN_1D)};                                                                        \
+  size_t block_descriptor_name = {P4A_min((int) size,			\
+					  (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name[] = {(int)size};                         \
-  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
-  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
+  size_t grid_descriptor_name = {(int)size};				\
+  /*P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)*/	\
+  /*P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)*/ \
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -494,18 +351,18 @@ void P4A_copy_to_accel_3d(size_t element_size,
     /* Allocate a maximum of threads alog X axis (the warp dimension) for \
        better average efficiency: */					\
     p4a_block_x = P4A_min((int) n_x_iter,				\
-                          (int) P4A_CL_ITEM_MAX);			\
+			  (int) P4A_CL_ITEM_MAX);			\
     p4a_block_y = P4A_min((int) n_y_iter,				\
-                          P4A_CL_ITEM_MAX/p4a_block_x);		        \
+			  P4A_CL_ITEM_MAX/p4a_block_x);			\
   }									\
-  cl_uint work_dim = 2;                                                 \
+  cl_uint work_dim = 2;							\
   /* The localWorkSize argument for clEnqueueNDRangeKernel */		\
   size_t block_descriptor_name[]={(size_t)p4a_block_x,(size_t)p4a_block_y}; \
   /* The globalWorkSize argument for clEnqueueNDRangeKernel */		\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   size_t grid_descriptor_name[]={(size_t) n_x_iter,(size_t) n_y_iter};	\
   /*P4A_log("grid size : %d %d\n",n_x_iter,n_y_iter);*/			\
-  /*P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);*/
+  /*P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);*/		\
 
 
 /** Dump a CL dim3 descriptor with an introduction message */
@@ -549,7 +406,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 				     P4A_n_iter_0);			\
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
 			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   P4A_block_descriptor,P4A_grid_descriptor,	\
+			   &P4A_block_descriptor,&P4A_grid_descriptor,	\
 			   0,NULL,&p4a_event_execution));		\
   } while (0)
 
