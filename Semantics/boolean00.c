@@ -25,4 +25,7 @@ int main(void)
   b6 = !b3;
   // b7 ???
   b7 = b1 ^ b2;
+
+  fprintf(stdout, "b1=%d b2=%d b3=%d b4=%d b5=%d b6=%d b7=%d\n",
+          b1, b2, b3, b4, b5, b6, b7);
 }
