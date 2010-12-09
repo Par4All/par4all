@@ -703,6 +703,7 @@ cl_command_queue p4a_queue = NULL;
 cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
 struct p4a_kernel_list *p4a_kernels=NULL,*current_kernel=NULL;
+struct p4a_kernel_list *last_kernel;
 //int args;
 struct arg_type *current_type=NULL;
 
@@ -1343,54 +1344,16 @@ void p4a_message(const char *message, const char *currentFile, const int current
 
 void p4a_load_kernel_arguments(const char *kernel,...)
 {
-  /*
-    p4a_kernel = NULL;
-    
-    // Try to find if the kernel already exists...
-    struct p4a_kernel_list *kernels_list=p4a_kernels;
-    while (kernels_list != NULL) {
-    if (strcmp(kernels_list->name,kernel) == 0)
-    p4a_kernel = kernels_list->kernel;
-    if (p4a_kernel != NULL) {
-    current_kernel = kernels_list;
-    break;
-    }
-    else
-    kernels_list = kernels_list->next;
-    }
-  */
+  //p4a_kernel = NULL;
   current_kernel = p4a_search_current_kernel(kernel);
-  if (current_kernel)
-    p4a_kernel = current_kernel->kernel;
-
+  //if (current_kernel)
+  // p4a_kernel = current_kernel->kernel;
+  
   // If not ...
-  if (!p4a_kernel) {
+  //if (!p4a_kernel) {
+  if (!current_kernel) {
     P4A_log("The kernel %s is loaded for the first time\n",kernel);
-    /*
-    struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
-
-    if (p4a_kernels == NULL) {
-      P4A_log("Begin of the kernel list\n");
-      p4a_kernels = new_kernel;
-    }
-    else {
-      P4A_log("Follows the kernel list\n");
-      current_kernel->next = new_kernel;
-    }
-    current_kernel = new_kernel;
-    new_kernel->next = NULL;
-
-    current_kernel->name = strdup(kernel);
-    current_kernel->kernel = NULL;
-    current_kernel->n_args = 0;
-    current_kernel->args = NULL;
-    */
     current_kernel = new_p4a_kernel(kernel);
-    /*
-    char* kernelFile;
-    asprintf(&kernelFile,"./%s.cl",kernel);
-    current_kernel->file_name = strdup(kernelFile);
-    */
     char* kernelFile = current_kernel->file_name;
     P4A_log("Program and Kernel creation from %s\n",kernelFile);    
     size_t kernelLength;
@@ -1418,6 +1381,7 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_test_execution_with_message("clCreateKernel");
     free(cSourceCL);
   }
+  p4a_kernel = current_kernel->kernel;
   // The argument list is pushed.
   // The __VA_ARGS__ contains to very first one, the number of arguments 
   // to be loaded.
@@ -1443,7 +1407,7 @@ void p4a_load_kernel_arguments(const char *kernel,...)
   P4A_log("kernel %s : number of arguments %d\n",kernel,current_kernel->n_args);
   struct arg_type *current_type = current_kernel->args;
   for (int i = 0;i < current_kernel->n_args;i++) {
-    P4A_log("Argument %d\n",i);
+    P4A_log("Argument %d, type %s, size %lu ",i,current_type->type_name,current_type->size);
     //size_t size = va_arg(ap, size_t);
     size_t size = current_type->size;
     current_type = current_type->next;
@@ -1492,9 +1456,13 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
   // Parsing with lex/yacc
   P4A_log("Begin to parse the kernel ...\n");
   int result = parse_file(cl_kernel_file);
-  P4A_log("End of kernel parsing.\n");
+  P4A_log("End of kernel parsing : %d\n",current_kernel->n_args);
 
-  exit(0);
+  struct arg_type * type = current_kernel->args;
+  while (type) {
+    printf("Type : %s, size %d\n",type->type_name,type->size);
+    type = type->next;
+  }
   return source;
 }
 
@@ -1505,22 +1473,24 @@ struct p4a_kernel_list* new_p4a_kernel(const char *kernel)
 
   if (p4a_kernels == NULL) {
     P4A_log("Begin of the kernel list\n");
-    p4a_kernels = new_kernel;
+    last_kernel = p4a_kernels = new_kernel;
   }
   else {
     P4A_log("Follows the kernel list\n");
-    current_kernel->next = new_kernel;
+    last_kernel->next = new_kernel;
+    last_kernel = new_kernel;
   }
   new_kernel->next = NULL;
   
-  new_kernel->name = strdup(kernel);
+  new_kernel->name = (char *)strdup(kernel);
   new_kernel->kernel = NULL;
   new_kernel->n_args = 0;
   new_kernel->args = NULL;
+  new_kernel->current = NULL;
 
   char* kernelFile;
   asprintf(&kernelFile,"./%s.cl",kernel);
-  new_kernel->file_name = strdup(kernelFile);
+  new_kernel->file_name = (char *)strdup(kernelFile);
 
   P4A_log("A new kernel has been created and initialized\n");
   return new_kernel;
@@ -1534,8 +1504,60 @@ struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel)
       return kernels_list;
     kernels_list = kernels_list->next;
   }
-  return kernels_list;
+  return NULL;
 }
 
+struct arg_type * new_type(char *str_type)
+{
+  struct arg_type *type = (struct arg_type*)malloc(sizeof(struct arg_type));
+  type->size=-1;
+  type->type_name = strdup(str_type);
+  type->next = NULL;
+  int stop = 0;
 
+  do {
+    if (strcmp(type->type_name,"cl_mem")==0)
+      type->size = sizeof(cl_mem);
+    else if (strcmp(type->type_name,"int")==0)
+      type->size = sizeof(int);
+    else if (strcmp(type->type_name,"cl_int")==0)
+      type->size = sizeof(cl_int);
+    else if (strcmp(type->type_name,"float")==0)
+      type->size = sizeof(float);
+    else if (strcmp(type->type_name,"cl_float")==0)
+      type->size = sizeof(cl_float);
+    else if (strcmp(type->type_name,"double")==0)
+      type->size = sizeof(double);
+    else if (strcmp(type->type_name,"char")==0)
+      type->size = sizeof(char);
+    else if (strcmp(type->type_name,"cl_char")==0)
+      type->size = sizeof(cl_char);
+    else if (strcmp(type->type_name,"size_t")==0)
+      type->size = sizeof(size_t);
+
+    stop++;
+    if (type->size == -1) {
+      stop = false;
+      char * s = search_type_for_substitute(str_type);
+      if (s == NULL)
+	P4A_log_and_exit(EXIT_FAILURE,"Non identified type %s\n",str_type);
+      type->type_name = strdup(s);
+    }
+  } while (stop < 2);
+  if (stop ==2 && type->size == -1)
+    P4A_log_and_exit(EXIT_FAILURE,"Non identified type %s\n",str_type);
+
+  if (current_kernel->args == NULL)
+    current_kernel->args = type;
+  else 
+    current_kernel->current->next = type;
+  current_kernel->current = type;
+}
+
+/*
+void set_type(char *str_type)
+{
+  current_kernel->current->type_name = strdup(str_type);
+}
+*/
 #endif // P4A_ACCEL_CL

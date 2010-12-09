@@ -82,8 +82,8 @@ void write_data(char filename[]) {
 
   for(j = 0; j < SIZE; j++)
     for(i = 0; i < SIZE; i++) {
-      //c = space[i][j];
-      c = save[i][j];
+      c = space[i][j];
+      //c = save[i][j];
       fputc(c, fp);
     }
   fclose(fp);
@@ -96,8 +96,6 @@ void write_data(char filename[]) {
  */
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
-  //printf("adresses %p %p\n",&space,&save);
-  //P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, 2,sizeof(cl_mem),&space,sizeof(cl_mem),&save);
   P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE,&space,&save);
 }
 
@@ -106,9 +104,8 @@ void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
  */
 void launch_kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 {
-  
 kernel2:
-  P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
+  P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, &space, &save);
 }
 
 void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
@@ -154,8 +151,8 @@ int main(int argc, char *argv[]) {
 
   P4A_accel_timer_start;
 
-  //for(t = 0; t < T; t++)
-  for(t = 0; t < 2; t++)
+  for(t = 0; t < T; t++)
+  //for(t = 0; t < 2; t++)
    compute(*p4a_var_space, *p4a_var_save);
 
   double execution_time = P4A_accel_timer_stop_and_float_measure();
@@ -163,8 +160,8 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "GFLOPS : %f\n",
 	    4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
   
-  //P4A_copy_from_accel((size_t)sizeof(space), (void *)space, (void *)p4a_var_space);
-  P4A_copy_from_accel((size_t)sizeof(save), (void *)save, (void *)p4a_var_save);
+  P4A_copy_from_accel((size_t)sizeof(space), (void *)space, (void *)p4a_var_space);
+  //P4A_copy_from_accel((size_t)sizeof(save), (void *)save, (void *)p4a_var_save);
 
   P4A_accel_free(p4a_var_space);
   P4A_accel_free(p4a_var_save);

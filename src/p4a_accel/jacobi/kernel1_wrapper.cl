@@ -6,11 +6,6 @@ typedef float float_t;
 #define P4A_vp_0 get_global_id(0)
 #define P4A_vp_1 get_global_id(1)
 
-// Un commentaire
-
-/* Un commentaire en bloc
- */
-
 P4A_accel_kernel kernel1(P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE],int i, int j) 
 { 
   save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
