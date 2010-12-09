@@ -3087,8 +3087,11 @@ region region_rectangular_hull(region reg, bool nofield)
     if(!effect_undefined_p(nr)) {
         sc_fix(region_system(nr));
         region_system(hyper)=sc_dup(region_system(nr));
+        if(!sc_equal_p(region_system(hyper),region_system(reg)))
+            region_approximation_tag(hyper)=is_approximation_may;
         free_effect(nr);
     }
+    // in case of error, we keep the original region
     return hyper;
 }
 
