@@ -4,7 +4,7 @@ SUFFIXES=.tex .pdf .eps .idraw
 	$(EPSTOPDF) --outfile=$@ $<
 
 .idraw.pdf:
-	$(EPSTOPDF) --outfile=$@ $<
+	$(EPSTOPDF) --nogs --outfile=$@ $<
 
 .tex.pdf:
 	TEXINPUTS=`$(KPSEPATH) tex`:$(builddir):$(srcdir) $(PDFLATEX) $<
