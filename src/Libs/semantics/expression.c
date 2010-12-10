@@ -1973,7 +1973,7 @@ static transformer logical_binary_function_to_transformer(entity v,
   if(ENTITY_AND_P(op)||ENTITY_OR_P(op)) {
     tf = logical_binary_operation_to_transformer(v, c, pre, is_internal);
   }
-  else {
+  else if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
     expression expr1 = EXPRESSION(CAR(call_arguments(c)));
     expression expr2 = EXPRESSION(CAR(CDR(call_arguments(c))));
     basic b1 = basic_of_expression(expr1);
@@ -2011,6 +2011,42 @@ static transformer logical_binary_function_to_transformer(entity v,
     free_basic(b1);
     free_basic(b2);
   }
+  else {
+    /* general case due to C convention about integers equal to 0 or
+     *  not.
+     *
+     * if v is in [0..1], v can be used as such.
+     * else if v>0, return 1
+     * else if v<0, return 1
+     * else 0<=v<=1
+     */
+    expression e1 = EXPRESSION(CAR(call_arguments(c)));
+    expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
+    tf = integer_binary_operation_to_transformer(v, op, e1, e2,
+						 pre, is_internal);
+    if(!transformer_undefined_p(tf)) {
+      // FI: should we restrict us to the range of tf?
+      intptr_t vmin, vmax;
+      bool success = precondition_minmax_of_value(v, tf, &vmin, &vmax);
+      if(success) {
+	if(vmin>=0 && vmax<=1)
+	  ; // tf can be returned as such
+	else if(vmin>=1 || vmax<=-1) {
+	  // Must return v==1
+	  free_transformer(tf);
+	  tf = transformer_identity();
+	  tf = transformer_add_equality_with_integer_constant(tf, v, 1);
+	}
+      }
+    }
+
+    if(transformer_undefined_p(tf)) {
+      // Must return 0<=v<=1
+      tf = transformer_identity();
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+    }
+  }
 
   return tf;
 }
@@ -2033,6 +2069,30 @@ static transformer logical_reference_to_transformer(entity v,
   return tf;
 }
 
+transformer logical_intrinsic_to_transformer(entity v,
+					     call c,
+					     transformer pre,
+					     bool is_internal)
+{
+  transformer tf = transformer_undefined;
+
+    switch(gen_length(call_arguments(c))) {
+    case 0:
+      tf = logical_constant_to_transformer(v, call_function(c));
+      break;
+    case 1:
+      tf = logical_unary_operation_to_transformer(v, c, pre, is_internal);
+      break;
+    case 2:
+      tf = logical_binary_function_to_transformer(v, c, pre, is_internal);
+      break;
+    default:
+      pips_internal_error("Too many logical arguments, %d, for operator %s",
+			  gen_length(call_arguments(c)),
+			  entity_name(call_function(c)));
+    }
+}
+
 /* Could be used to compute preconditions too. v is assumed to be a new
    value or a temporary value. */
 transformer logical_expression_to_transformer(entity v,
@@ -2044,23 +2104,34 @@ transformer logical_expression_to_transformer(entity v,
   syntax srhs = expression_syntax(rhs);
 
   switch(syntax_tag(srhs)) {
-  case is_syntax_call:
-    switch(gen_length(call_arguments(syntax_call(srhs)))) {
-    case 0:
-      tf = logical_constant_to_transformer(v, call_function(syntax_call(srhs)));
-      break;
-    case 1:
-      tf = logical_unary_operation_to_transformer(v, syntax_call(srhs), pre, is_internal);
-      break;
-    case 2:
-      tf = logical_binary_function_to_transformer(v, syntax_call(srhs), pre, is_internal);
-      break;
-    default:
-      pips_internal_error("Too many logical arguments, %d, for operator %s",
-			  gen_length(call_arguments(syntax_call(srhs))),
-			  entity_name(call_function(syntax_call(srhs))));
+  case is_syntax_call: {
+    call c = syntax_call(srhs);
+    entity f = call_function(c);
+    if(intrinsic_entity_p(f))
+      tf = logical_intrinsic_to_transformer(v, c, pre, is_internal);
+    else if(call_constant_p(c)) {
+      entity cf = call_function(c);
+      int i;
+      if(logical_constant_p(cf)) {
+	  /* Is likely to be handled as a nullary intrinsics */
+	  tf = logical_intrinsic_to_transformer(v, c, pre, is_internal);
+	}
+      else if(integer_constant_p(cf, &i)) {
+	if(i!=0)
+	  i = 1;
+	tf = transformer_identity();
+	tf = transformer_add_equality_with_integer_constant(tf, v, i);
+      }
+      else
+	pips_internal_error("Unexpected case.\n");
+    }
+    else {
+      // call to a C or Fortran boolean function
+      //list ef = expression_to_proper_effects(rhs);
+      tf = user_function_call_to_transformer(v, rhs, pre);
     }
     break;
+  }
   case is_syntax_reference:
     tf = logical_reference_to_transformer(v, reference_variable(syntax_reference(srhs)),
 					  is_internal);
@@ -2453,7 +2524,8 @@ transformer any_expression_to_transformer(
   }
 
   ifdebug(8) {
-    pips_debug(8, "begin for entity %s of type %s and %s expression ", entity_local_name(v),
+    pips_debug(8, "begin for entity %s of type %s and %s expression ",
+	       entity_local_name(v),
 	       basic_to_string(bv), basic_to_string(be));
     print_expression(expr);
   }
@@ -2461,7 +2533,8 @@ transformer any_expression_to_transformer(
   /* Assume v is a value */
   if( (basic_tag(bv)==basic_tag(be))
       || (basic_float_p(bv) && basic_int_p(be))
-      || (basic_derived_p(bv) && basic_int_p(be))) {
+      || (basic_derived_p(bv) && basic_int_p(be))
+      || (basic_logical_p(bv) && basic_int_p(be))) {
     switch(basic_tag(be)) {
     case is_basic_int:
       if(integer_analyzed_p()) {
@@ -2471,6 +2544,9 @@ transformer any_expression_to_transformer(
 	else if(basic_derived_p(bv)) {
 	  /* If we are here, it should be an enum type... */
 	  tf = integer_expression_to_transformer(v, expr, pre, is_internal);
+	}
+	else if(basic_logical_p(bv)) {
+	  tf = logical_expression_to_transformer(v, expr, pre, is_internal);
 	}
 	else {
 	  pips_user_warning("Integer expression assigned to float value\n"
@@ -2924,6 +3000,34 @@ transformer any_expressions_to_transformer(entity v,
   return tf;
 }
 
+/* compute integer bounds @p pmax, @p pmin of value @p val under
+ * preconditions @p tr require value mappings set !
+ */
+bool precondition_minmax_of_value(entity val,
+				  transformer tr,
+				  intptr_t* pmin, intptr_t* pmax)
+{
+    bool success;
+    /* retrieve the associated psysteme*/
+    Psysteme ps = sc_dup(predicate_system(transformer_relation(tr)));
+    /* compute min / max bounds */
+    Value vmin,vmax;
+    if((success=sc_minmax_of_variable(ps,val,&vmin,&vmax)))
+    {
+        /* special case to handle VMIN and VMAX in 32 bits*/
+        if(vmax != (Value)(intptr_t)(vmax) && vmax == VALUE_MAX) vmax= INT_MAX;
+        if(vmin != (Value)(intptr_t)(vmin) && vmin == VALUE_MIN) vmin= INT_MIN;
+        pips_assert("no data loss", vmin == (Value)(intptr_t)(vmin));
+        pips_assert("no data loss", vmax == (Value)(intptr_t)(vmax));
+        *pmin=(intptr_t)vmin;
+        *pmax=(intptr_t)vmax;
+    }
+    // FI: ps is destroyed by sc_minmax_of_variable(). Should it
+    // nevertheless be freed?
+    return success;
+}
+
+
 /* compute integer bounds @p pmax, @p pmin of expression @p exp under preconditions @p tr
  * require value mappings set !
  */
@@ -2937,20 +3041,9 @@ bool precondition_minmax_of_expression(expression exp, transformer tr,intptr_t* 
 
     /* compute its preconditions */
     transformer var_tr = safe_any_expression_to_transformer(var,exp,tr,false);
-    /* retreive the associated psysteme*/
-    Psysteme ps = predicate_system(transformer_relation(var_tr));
-    /* compute min / max bounds */
-    Value vmin,vmax;
-    if((success=sc_minmax_of_variable(ps,var,&vmin,&vmax)))
-    {
-        /* special case to handle VMIN and VMAX in 32 bits*/
-        if(vmax != (Value)(intptr_t)(vmax) && vmax == VALUE_MAX) vmax= INT_MAX;
-        if(vmin != (Value)(intptr_t)(vmin) && vmin == VALUE_MIN) vmin= INT_MIN;
-        pips_assert("no data loss", vmin == (Value)(intptr_t)(vmin));
-        pips_assert("no data loss", vmax == (Value)(intptr_t)(vmax));
-        *pmin=(intptr_t)vmin;
-        *pmax=(intptr_t)vmax;
-    }
+
+    success = precondition_minmax_of_value(var, var_tr, pmin, pmax);
+
     /* tidy & return */
     predicate_system(transformer_relation(var_tr))=SC_UNDEFINED;
     free_transformer(var_tr);
