@@ -1,9 +1,9 @@
 void CONTINUE_TEST()
 {
-   int L1;
-   int L2;
-   int L3;
-   int L4;
+   bool L1;
+   bool L2;
+   bool L3;
+   bool L4;
    float X;
 
    _f77_intrinsics_read_(X) ;
