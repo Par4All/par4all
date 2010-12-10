@@ -83,7 +83,7 @@ int main(void)
 
    int x = 0, y = 0;
 
-//  T(x,y) {x<=100, x#init<=100}
+//  T(x,y) {x<=100, x#init+y<=x+y#init, x#init<=100, y#init<=y}
 
    while (x<=100)
 
@@ -123,20 +123,20 @@ int main(void)
 
    while (x<=100)
 
-//  P(x,y) {x<=100}
+//  P(x,y) {x<=100, y<=x, 0<=y}
 
       if (alea())
 
-//  P(x,y) {x<=100}
+//  P(x,y) {x<=100, y<=x, 0<=y}
 
          x = x+2;
       else
 
-//  P(x,y) {x<=100}
+//  P(x,y) {x<=100, y<=x, 0<=y}
 
          x = x+1, y = y+1;
 
-//  P(x,y) {101<=x, x<=102}
+//  P(x,y) {101<=x, x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
 
    // immediate widening: :0 <= y <= x, x >= 101
    // iterated once: 0 <= y <= x, 101 <= x <= 102, x+y<=202

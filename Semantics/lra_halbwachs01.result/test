@@ -1,0 +1,108 @@
+
+Transformers for lra_halbwachs01
+
+
+//  T(main) {101<=main}
+
+int main(int argc, char *argv[])
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(y) {y==0}
+
+   int y = 0;
+
+//  T(b) {}
+
+   char b;
+
+//  T(b,x,y) {x<=100, x#init+y<=x+y#init, x#init<=100, y#init<=y}
+
+
+   while (x<=100) {
+
+//  T(b) {}
+
+      b = getchar();
+
+//  T(x,y) {x+y==x#init+y#init+2, x#init+1<=x, x<=x#init+2}
+
+      if (b)
+
+//  T(x) {x==x#init+2}
+
+         x = x+2;
+      else {
+
+//  T(x) {x==x#init+1}
+
+         x = x+1;
+
+//  T(y) {y==y#init+1}
+
+         y = y+1;
+      }
+   }
+
+//  T(main) {main==x}
+
+   /* After widening: 0 <= y <= x , x >= 101 */
+   return x;
+}
+
+Preconditions for lra_halbwachs01
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   char b;
+
+//  P(b,x,y) {x==0, y==0}
+
+
+   while (x<=100) {
+
+//  P(b,x,y) {x<=100, y<=x, 0<=y}
+
+      b = getchar();
+
+//  P(b,x,y) {x<=100, y<=x, 0<=y}
+
+      if (b)
+
+//  P(b,x,y) {x<=100, y<=x, 0<=y}
+
+         x = x+2;
+      else {
+
+//  P(b,x,y) {b==0, x<=100, y<=x, 0<=y}
+
+         x = x+1;
+
+//  P(b,x,y) {b==0, x<=101, y+1<=x, 0<=y}
+
+         y = y+1;
+      }
+   }
+
+//  P(b,x,y) {101<=x, x<=102, 2<=x+y, y<=x, x+y<=202, 0<=y}
+
+   /* After widening: 0 <= y <= x , x >= 101 */
+   return x;
+}

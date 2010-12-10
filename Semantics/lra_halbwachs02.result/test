@@ -1,0 +1,110 @@
+
+Transformers for lra_halbwachs02
+
+
+//  T() {0==-1}
+
+int main(int argc, char *argv[])
+{
+
+//  T(d,s,t) {}
+
+   int t, d, s;
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+
+   t = d = s = 0;
+
+//  T(d,s,t) {d#init<=d, d+t#init<=d#init+t}
+
+
+   while (1)
+
+//  T(d,s,t) {s==0, t==t#init+1, d#init<=d, d<=d#init+1}
+
+      // Just to display infos on this block
+      if (1) {
+
+//  T(d,s) {d+s#init==d#init+s, s#init<=s, s<=s#init+1}
+
+         if (s<=3) {
+
+//  T(s) {s==s#init+1}
+
+            s++;
+
+//  T(d) {d==d#init+1}
+
+            d++;
+         }
+
+//  T(t) {t==t#init+1}
+
+         t++;
+
+//  T(s) {s==0}
+
+         s = 0;
+      }
+
+//  T(main) {main==0}
+
+   /* Unreachable */
+   return 0;
+}
+
+Preconditions for lra_halbwachs02
+
+
+//  P() {}
+
+int main(int argc, char *argv[])
+{
+
+//  P() {}
+
+   int t, d, s;
+
+//  P(d,s,t) {}
+
+
+   t = d = s = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+
+   while (1)
+
+//  P(d,s,t) {s==0, 0<=d, d<=t}
+
+      // Just to display infos on this block
+      if (1) {
+
+//  P(d,s,t) {s==0, 0<=d, d<=t}
+
+         if (s<=3) {
+
+//  P(d,s,t) {s==0, 0<=d, d<=t}
+
+            s++;
+
+//  P(d,s,t) {s==1, 0<=d, d<=t}
+
+            d++;
+         }
+
+//  P(d,s,t) {s==1, 1<=d, d<=t+1}
+
+         t++;
+
+//  P(d,s,t) {s==1, 1<=d, d<=t}
+
+         s = 0;
+      }
+
+//  P() {0==-1}
+
+   /* Unreachable */
+   return 0;
+}
