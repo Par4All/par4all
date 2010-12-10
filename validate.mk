@@ -89,7 +89,7 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 # four possible outcomes: passed, changed, failed, timeout
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
-	  if [ "$$status" -eq 255 ] ; then \
+	  if [ "$$status" -eq 203 ] ; then \
 	     echo "timeout: $(SUBDIR)/$* $$SECONDS" ; \
 	  elif [ "$$status" != 0 ] ; then \
 	     echo "failed: $(SUBDIR)/$* $$SECONDS" ; \
