@@ -76,7 +76,7 @@ int main()
 
    if (new==1&&old==0||new==0&&old==1)
 
-//  T() {new+old==1, x==10, y+z==10, 0<=new, new<=1, 0<=y, y<=10}
+//  T() {new+old==1, x==10, y+z==10, 0<=new, new<=1, 0<=z, z<=10}
 
       printf("property  verified\n");
    else
