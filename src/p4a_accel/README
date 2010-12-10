@@ -50,3 +50,8 @@ Attention : argument of the kernel launcher are passed as adresses.
 	  1) setKernelArg ask for the reference
 	  2) this simplifies the argument recuperation. They all are of
 	     cl_mem type.
+
+	  Resolved and seems to work!
+
+Quid if kernels were externalised for every option OpenMP, CUDA and OpenCL ?
+     Because for automated Hyantes, this an abostacle.
