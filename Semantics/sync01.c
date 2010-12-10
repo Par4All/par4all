@@ -1,16 +1,19 @@
 // N. Halbwachs 2010-12-09 Aussois, slide 16-18
 
 #include <stdio.h>
-// #define assert(b) if (!(b)) exit(1);
+#define assert(b) if (!(b)) exit(1);
 
-typedef enum { false, true } boolean;
+//typedef enum { false, true } boolean;
+#include <stdbool.h>
 
 int main(void)
 {
-  boolean b = false, ok = true;
-  int x=0, y=0;
+  //bool b = false, ok = true;
+  //int x=0, y=0;
+  bool b, ok;
+  int x, y;
 
-  // assert(!b && ok && x==0 && y==0);
+  assert(!b && ok && x==0 && y==0);
   while (true)
   {
     if (b)

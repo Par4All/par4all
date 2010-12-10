@@ -1,21 +1,21 @@
 // N. Halbwachs 2010-12-09 Aussois, slide 23-24
 
 #include <stdio.h>
-// #define assert(b) if (!(b)) exit(1);
+#include <stdbool.h>
 
-typedef enum { false, true } boolean;
+#define assert(b) if (!(b)) exit(1);
 
 int main(void)
 {
-  boolean b0 = false, b1 = false, ok = true;
+  bool b0 = false, b1 = false, ok = true;
   int x=0, y=0;
 
-  // assert(!b0 && !b1 && ok && x==0 && y==0);
+  assert(!b0 && !b1 && ok && x==0 && y==0);
   while (true)
   {
     if (b0 == b1)
       x = x+1;
-    if (b0 ^ b1) // hmmm, no ^^
+    if (b0 ^ b1) // hmmm, no xor analysis yet because it's a bitwise operator
       y = y+1;
 
     // flip-flap-flop

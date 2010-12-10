@@ -10,7 +10,7 @@ activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
-# This property seems useless to analyze boolean variables!
+# This property is set to analyze C99 boolean variables
 setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
 
 echo
@@ -18,6 +18,12 @@ echo Symbol table for "main" (check the type of boolean variables)
 echo
 
 display SYMBOL_TABLE_FILE[main]
+
+# because of the flip-flop on "b" in the source code
+setproperty SEMANTICS_K_FIX_POINT 2
+
+# The other option is to use transformer lists, when the transitive
+# closure has been improved
 
 echo
 echo Preconditions for "main"
