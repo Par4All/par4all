@@ -46,7 +46,7 @@
  * v := v1 + v2;
  *        ->
  * return v;
- * 
+ *
  * RT: j'ai besoin d'un vect_add a effet de bord pour la normalisation d'expression
  * lineaire. idem pour vect_substract, vect_mult, ...
  */
