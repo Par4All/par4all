@@ -1,0 +1,66 @@
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   _Bool b0 = 0, b1 = 0, ok = 1;
+
+//  P(b0,b1,ok) {b0==0, b1==0, ok==1}
+
+   int x = 0, y = 0;
+
+//  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
+   if (!(!b0&&!b1&&ok&&x==0&&y==0))
+
+//  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
+
+      exit(1);
+
+//  P(b0,b1,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
+   while (1) {
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+      if (b0==b1)
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+         x = x+1;
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+      if (b0^b1)
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+         // hmmm, no xor analysis yet because it's a bitwise operator
+         y = y+1;
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+      
+      // flip-flap-flop
+      b0 = !b1;
+
+//  P(b0,b1,ok,x,y) {b0+b1==1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+      b1 = b0;
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+
+      ok = ok&&x>=y;
+
+//  P(b0,b1,ok,x,y) {b0==b1, 0<=b0, b0<=1, 0<=ok, ok<=1, 0<=x, 0<=y}
+
+      // assert(ok);
+      // we want ok==1
+      fprintf(stdout, "b0=%d b1=%d ok=%d x=%d y=%d\n", b0, b1, ok, x, y);
+   }
+}

@@ -1,0 +1,54 @@
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int v, t, x, d;
+
+//  P(d,t,v,x) {}
+
+   v = t = x = d = 0;
+
+//  P(d,t,v,x) {d==0, t==0, v==0, x==0}
+
+
+   while (1) {
+
+//  P(d,t,v,x) {d<=t, t+5x<=d+5v, 0<=t, 0<=v}
+
+      if (alea()&&x<=4)
+
+//  P(d,t,v,x) {d<=t, t+5x<=d+5v, 0<=t, 0<=v, x<=4}
+
+         x++, v++;
+
+//  P(d,t,v,x) {d<=t, t+5x<=d+5v, 0<=t, 0<=v}
+
+
+      if (alea()&&d<=9)
+
+//  P(d,t,v,x) {d<=9, d<=t, t+5x<=d+5v, 0<=t, 0<=v}
+
+         d++, t++;
+
+//  P(d,t,v,x) {d<=t, t+5x<=d+5v, 0<=t, 0<=v}
+
+
+      if (alea()&&d==10&&x>=2)
+
+//  P(d,t,v,x) {d==10, 10<=t, t+5x<=5v+10, 0<=v, 2<=x}
+
+         x = 0, d = 0;
+
+//  P(d,t,v,x) {d<=t, t+5x<=d+5v, 0<=t, 0<=v}
+
+      
+      // Which invariant do you expect? Just a figure in the slide
+      // something like v>=(t-9)/5, v<=t, v <=t/2+3 (numerical
+      // coefficients are guessed); variable x and d must be projected
+      fprintf(stdout, "v=%d t=%d x=%d d=%d\n", v, t, x, d);
+   }
+}
