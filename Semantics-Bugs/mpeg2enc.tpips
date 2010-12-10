@@ -21,6 +21,30 @@ setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
 setproperty ALIASING_ACROSS_IO_STREAMS FALSE
 setproperty CONSTANT_PATH_EFFECTS FALSE
 
+# eliminate some numerical constants
+
+shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+
+
+shell (cd $WS.database/putnonintrablk; sed -e 's/64/(2<<6)/' <putnonintrablk.c >tmp.c; mv tmp.c putnonintrablk.c)
+
+shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+
+display PARSED_PRINTED_FILE[putnonintrablk]
+display PRINTED_FILE[putnonintrablk]
+#quit
+
+shell cat  $WS.database/putAC/putAC.c
+
+
+shell (cd $WS.database/putAC; sed -e 's/63/((2<<6)-1)/;s/127/((2<<7)-1)/;s/255/((2<<8)-1)/;s/2047/((2<<11)-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
+
+shell cat  $WS.database/putAC/putAC.c
+
+display PRINTED_FILE[putnonintrablk]
+display PRINTED_FILE[putAC]
+#quit
+
 echo restructuring
 apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
 apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
@@ -31,6 +55,13 @@ echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[error]
+
+echo
+echo Cumulated effects for "putAC"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[putAC]
 
 echo
 echo Transformers for "putAC"
@@ -54,11 +85,32 @@ activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[putbits]
 
 echo
+echo Cumulated effects for "putnonintrablk"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[putnonintrablk]
+
+echo
 echo Transformers for "putnonintrablk"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[putnonintrablk]
+
+echo
+echo Cumulated effects for "putpict"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[putpict]
+#quit
+echo
+echo Transformers for "putpict"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[putpict]
 
 echo privatize
 apply PRIVATIZE_MODULE[%ALLFUNC]
