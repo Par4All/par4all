@@ -29,7 +29,7 @@ int while01()
    n = 0;
    {
 
-//  T(i,j) {0`n==0, i==5, 2i==j-1, i#init==0, j#init==1}
+//  T(i,j) {0`n==0, i==5, i#init==0, j==11, j#init==1}
 
       // BEGIN BLOCK
 
