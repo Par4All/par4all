@@ -37,3 +37,16 @@ for OpenCL and thus CUDA and OpenMP versions.
 
 The functions oclErrorString or oclLoadProgSource, specific to NVIDIA,
 must be rewritten later.
+
+9/12/2010 :
+Author : Stéphanie Even
+
+The actual P4A_CL_ITEM_MAX 512 suits for CUDA architecture. What for AMD/ATI ? ....
+
+10/12/2010 :
+Author : Stéphanie Even
+
+Attention : argument of the kernel launcher are passed as adresses.
+	  1) setKernelArg ask for the reference
+	  2) this simplifies the argument recuperation. They all are of
+	     cl_mem type.

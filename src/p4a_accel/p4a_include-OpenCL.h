@@ -3,6 +3,7 @@
 
 #include <opencl.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 /** A data structure to store the arguments types for a given 
     kernel arguments list.
@@ -100,6 +101,6 @@ struct arg_type * new_type(char *str_type);
 struct type_substitution * new_typedef(char *str1,char *str2);
 char * search_type_for_substitute(char *str);
 void parse_file(char *name);
-
+void * argument_reference(va_list ap, struct arg_type *type);
 
 #endif

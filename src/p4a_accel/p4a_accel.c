@@ -788,8 +788,11 @@ double P4A_accel_timer_stop_and_float_measure()
     @param[in] size is the size to allocate in bytes
 */
 void P4A_accel_malloc(void **address, size_t size) {
-  // The mem flag can be : CL_MEM_READ_ONLY, CL_MEM_WRITE_ONLY, 
-  // CL_MEM_READ_WRITE or CL_MEM_USE_HOST_PTR
+  // The mem flag can be : 
+  // CL_MEM_READ_ONLY, 
+  // CL_MEM_WRITE_ONLY, 
+  // CL_MEM_READ_WRITE, 
+  // CL_MEM_USE_HOST_PTR
   *address=(void *)clCreateBuffer(p4a_context,
 				  CL_MEM_READ_WRITE,
 				  size,
@@ -1325,8 +1328,8 @@ void p4a_clean(int exitCode)
   while (kernel) {
     current_kernel = kernel->next;
     free(kernel->kernel);
-    free(kernel->name);
-    free(kernel->file_name);
+    //free(kernel->name);
+    //free(kernel->file_name);
     struct arg_type * type = kernel->args;
     while (type) {
       kernel->current = type->next;
@@ -1344,7 +1347,6 @@ void p4a_clean(int exitCode)
     free(type_def);
     type_def = current_substitution;
   }
-
   exit(exitCode);
 }
 
@@ -1479,9 +1481,80 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_log("Argument %d, type %s, size %lu ",i,current_type->type_name,current_type->size);
     size_t size = current_type->size;
     // Each argument is passed as a reference ...
-    cl_mem arg_address = va_arg(ap, cl_mem);
-    p4a_global_error = clSetKernelArg(p4a_kernel,i,size,arg_address);
-    P4A_test_execution_with_message("clSetKernelArg");
+    //cl_mem arg_address = va_arg(ap, cl_mem);
+    //cl_mem arg_address = argument_reference(ap, current_type);
+    
+    if (current_type->size > 0) {
+      if (strcmp(current_type->type_name,"cl_mem")==0) {
+	//type->size = sizeof(cl_mem);
+	cl_mem arg_address = va_arg(ap, cl_mem);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"int")==0) {
+	//type->size = sizeof(int);
+	int arg_address = va_arg(ap, int);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"cl_int")==0) {
+	//type->size = sizeof(cl_int);
+	cl_int arg_address = va_arg(ap, cl_int);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"float")==0) {
+	//type->size = sizeof(float);
+	float arg_address = va_arg(ap, float);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"cl_float")==0) {
+	//type->size = sizeof(cl_float);
+	cl_float arg_address = va_arg(ap, cl_float);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"double")==0) {
+	//type->size = sizeof(double);
+	double arg_address = va_arg(ap, double);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"char")==0) {
+	//type->size = sizeof(char);
+	char arg_address = va_arg(ap, char);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"cl_char")==0) {
+	//type->size = sizeof(cl_char);
+	cl_char arg_address = va_arg(ap, cl_char);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else if (strcmp(current_type->type_name,"size_t")==0) {
+	//type->size = sizeof(size_t);
+	size_t arg_address = va_arg(ap, size_t);
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,&arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+      }
+      else
+	P4A_log_and_exit("Bad reference to argument %d, kernel %s\n",i,kernel);
+    } 
+
+  
+    /*
+	printf("On arrive bien ici\n");
+	void * arg_address = argument_reference(ap, current_type);
+	if (arg_address) {
+	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,arg_address);
+	P4A_test_execution_with_message("clSetKernelArg");
+	}
+	else
+	P4A_log_and_exit("Bad reference to argument %d, kernel %s\n",i,kernel);
+    */
+
     current_type = current_type->next;
   }
   va_end(ap);
@@ -1594,7 +1667,7 @@ The objectives is to retrieve the sizeof().
 struct arg_type * new_type(char *str_type)
 {
   struct arg_type *type = (struct arg_type*)malloc(sizeof(struct arg_type));
-  type->size=-1;
+  type->size = -1;
   type->type_name = strdup(str_type);
   type->next = NULL;
   int stop = 0;
@@ -1621,14 +1694,13 @@ struct arg_type * new_type(char *str_type)
 
     stop++;
     if (type->size == -1) {
-      stop = false;
       char * s = search_type_for_substitute(str_type);
       if (s == NULL)
 	P4A_log_and_exit(EXIT_FAILURE,"Non identified type %s\n",str_type);
       type->type_name = strdup(s);
     }
   } while (stop < 2);
-  if (stop ==2 && type->size == -1)
+  if (stop == 2 && type->size == -1)
     P4A_log_and_exit(EXIT_FAILURE,"Non identified type %s\n",str_type);
 
   if (current_kernel->args == NULL)
@@ -1637,5 +1709,60 @@ struct arg_type * new_type(char *str_type)
     current_kernel->current->next = type;
   current_kernel->current = type;
 }
+
+void * argument_reference(va_list ap, struct arg_type *type)
+{
+  void * ptr = NULL;
+
+  if (type->size > 0) {
+    if (strcmp(type->type_name,"cl_mem")==0) {
+      //type->size = sizeof(cl_mem);
+      cl_mem arg_address = va_arg(ap, cl_mem);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"int")==0) {
+      //type->size = sizeof(int);
+      int arg_address = va_arg(ap, int);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"cl_int")==0) {
+      //type->size = sizeof(cl_int);
+      cl_int arg_address = va_arg(ap, cl_int);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"float")==0) {
+      //type->size = sizeof(float);
+      float arg_address = va_arg(ap, float);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"cl_float")==0) {
+      //type->size = sizeof(cl_float);
+      cl_float arg_address = va_arg(ap, cl_float);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"double")==0) {
+      //type->size = sizeof(double);
+      double arg_address = va_arg(ap, double);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"char")==0) {
+      //type->size = sizeof(char);
+      char arg_address = va_arg(ap, char);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"cl_char")==0) {
+      //type->size = sizeof(cl_char);
+      cl_char arg_address = va_arg(ap, cl_char);
+      ptr = &arg_address;
+    }
+    else if (strcmp(type->type_name,"size_t")==0) {
+      //type->size = sizeof(size_t);
+      size_t arg_address = va_arg(ap, size_t);
+      ptr = &arg_address;
+    }
+  } 
+  return ptr;
+}
+
 
 #endif // P4A_ACCEL_CL

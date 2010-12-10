@@ -2,7 +2,6 @@
 
 #include <p4a_accel.h>
 
-
 #include <stdio.h>
 #include <stdlib.h>
 typedef float float_t;
@@ -96,7 +95,8 @@ void write_data(char filename[]) {
  */
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
-  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE,&space,&save);
+  //P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE,&space,&save);
+  P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE,space,save);
 }
 
 /*
@@ -105,7 +105,8 @@ void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 void launch_kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 {
 kernel2:
-  P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, &space, &save);
+  //P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, &space, &save);
+  P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
 }
 
 void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {

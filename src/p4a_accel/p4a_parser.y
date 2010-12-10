@@ -8,8 +8,6 @@
 #include <string.h>
 #include "p4a_include-OpenCL.h"
 
-  void parse_file(char *name);
-
   // File Name
   char *file_name;
 
