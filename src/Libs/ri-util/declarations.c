@@ -412,8 +412,16 @@ list words_basic(basic obj, list pdl)
             pc = CHAIN_IWORD(pc,basic_logical(obj));
             break;
           case is_language_c:
-            pc = CHAIN_SWORD(pc,"bool"); /* FI: Use stdbool.h instead
-					    of "int" */
+            pc = CHAIN_SWORD(pc,"int"); /* FI: Use "bool" of stdbool.h instead
+					    of "int" but it leads to
+					    include issue for
+					    generated code; avoid stdbool.h
+					    and use "_Bool" directly
+					    but it leads to infinite
+					    loop from "_Bool" to
+					    "_Bool" because "_Bool"
+					    is declared as a typedef
+					    in anr999 */
             break;
           case is_language_fortran95:
             pips_internal_error("Need to update F95 case");

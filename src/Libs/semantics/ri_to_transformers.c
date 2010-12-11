@@ -417,7 +417,9 @@ static transformer block_to_transformer(list b, transformer pre)
   // mpeg2, although it's probably too late to recover from the very
   // large coefficients introduced earlier
   //
-  btf = transformer_normalize(btf, 4);
+  // FI: does not seem to do much good because the normalization may
+  // increase the compelxity of the constraints
+  // btf = transformer_normalize(btf, 4);
 
   pips_debug(8, "end\n");
   return btf;
