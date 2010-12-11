@@ -1,30 +1,37 @@
-\documentstyle{farticle}
-\include{/usr/share/local/lib/tex/macroslocales/Dimensions}
-\title{Recursive Pattern Matching on Concrete Data Types}
+%% $Id$
+%% ACM SIGPLAN Notices, nov 1989
 
-\author{{\em Pierre Jouvelot} \\
+\documentclass[a4paper,11pt]{article}
+
+\usepackage[a4paper,hmargin=2cm,vmargin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+\title{Recursive Pattern Matching on Concrete Data Types \\ \emph{with appendix}}
+
+\author{\emph{Pierre Jouvelot} \\
 CAI, Ecole des Mines de Paris, Fontainebleau (F.) \\
 LCS, Massachusetts Institute of Technology, Cambridge (U.S.A.) \\
-({\small E-mail: {\tt jouvelot@\{fremp11.bitnet,brokaw.lcs.mit.edu\}}}) \\
+({\small E-mail: \texttt{jouvelot@\{fremp11.bitnet,brokaw.lcs.mit.edu\}}}) \\
 \\
-{\em Babak Dehbonei} \\
+\emph{Babak Dehbonei} \\
 Corporate Research Center, BULL, Louveciennes (F.) \\
-({\small E-mail: {\tt Babak.Dehbonei@crg.bull.fr}})}
+({\small E-mail: \texttt{Babak.Dehbonei@crg.bull.fr}})}
 
-\date{}
+\date{ACM SIGPLAN Notices, Vol 24, Issue 11, Nov 1989, pp 84--91}
 
-\newcommand{\rpm}{{\tt rpm}}
+\newcommand{\rpm}{\texttt{rpm}}
 \newcommand{\E}{\mbox{${\cal E}$}}
 \newcommand{\C}{\mbox{${\cal C}$}}
 \renewcommand{\P}{\mbox{${\cal P}$}}
-\newcommand{\dbl}[1]{\mbox{$\lbrack\!\lbrack$~{\tt #1}~$\rbrack\!\rbrack$}}
+\newcommand{\dbl}[1]{\mbox{$\lbrack\!\lbrack$~\texttt{#1}~$\rbrack\!\rbrack$}}
 \newcommand{\Exp}{{\rm Expression}}
 \newcommand{\Ide}{{\rm Identifier}}
 \newcommand{\Cl}{{\rm Clause}}
 \newcommand{\Pat}{{\rm Pattern}}
+\newcommand{\QED}{\hfill\(\Box\)}
 
 \begin{document}
-\begin{sloppypar}
 
 \maketitle
 
@@ -34,11 +41,11 @@ The functional programming model favors recursive definitions of
 functions by structural induction over user-defined concrete data
 types. Most functional languages (e.g., Lisp, ML, Miranda, Haskell)
 offer powerful programming constructs that ease the writing of
-programs based on this idea; destructuring {\tt let}, {\tt
+programs based on this idea; destructuring \texttt{let}, {\tt
 multiple-value-bind},... 
 
 We propose an extension to the usual notion of pattern-matching,
-called {\em Recursive Pattern Matching}. Our motivation is based on
+called \emph{Recursive Pattern Matching}. Our motivation is based on
 the observation that most real-life data types are recursive, e.g.
 abstract syntax trees, control graphs, ...  Consequently, many
 functions that manipulate these data types are recursive. The RPM
@@ -75,17 +82,17 @@ the variables to the corresponding values in the right hand side. The
 right hand side value has to match the corresponding pattern. 
 
 The simplest way of using this technique is given in many widely used
-imperative languages. In Pascal [JW85], the {\tt case} command allows the
+imperative languages. In Pascal [JW85], the \texttt{case} command allows the
 programmer to execute statements according to the value of an integer
 or an enumerated variable. In the C programming language [KR78], an
 equivalent treatment is performed on integer expressions using the
-{\tt switch} statement. However, these matching possibilities are not
+\texttt{switch} statement. However, these matching possibilities are not
 sufficiently powerful to be applied on more abstract data.
 
 In Lisp-like languages [St84], a flavor of abstract pattern matching is
 present for structured lists or trees. This is performed on function
 calls or macro expansions with the dotted notation or the CommonLISP
-keywords (e.g., {\tt \&rest}, {\tt \&optional}).
+keywords (e.g., \texttt{\&rest}, \texttt{\&optional}).
 
 A more sophisticated technique is used in the ML functional language
 [M83].  It is performed on expressions that have (possibly recursive)
@@ -96,26 +103,26 @@ approach:
 #        zero |
 #        succ of Num ;;
 \end{verbatim}
-The recursive {\tt Num} type denotes the set of positive or null
-integers. We can then define a function {\tt Add} that computes the
-sum of two values (given in a pair argument) of type {\tt Num}.
+The recursive \texttt{Num} type denotes the set of positive or null
+integers. We can then define a function \texttt{Add} that computes the
+sum of two values (given in a pair argument) of type \texttt{Num}.
 \begin{verbatim}
 #letrec sum = fun
 #       (zero,Y). Y |
 #       (succ X,Y). sum (X, succ Y) ;;
 \end{verbatim}
-The matching is performed on the two type constructors {\tt zero} and
-{\tt succ} of {\tt Num}; this is usually implemented by a one-way
+The matching is performed on the two type constructors \texttt{zero} and
+\texttt{succ} of \texttt{Num}; this is usually implemented by a one-way
 unification routine.
 
-The mechanism of {\em views} has been proposed for matching expression
+The mechanism of \emph{views} has been proposed for matching expression
 that have an abstract data type [W87]. This allows the programmer to
 use pattern-matching without losing the abstraction. Changing the
 implementation of an abstract data type won't require any modification
 of programs that import this type (this wouldn't be the case with the
 ML kind of matching which is concrete).  An external (resp.  internal)
 description of an abstract value is given through the attribute {\em
-out} (resp. {\em in}) in the data type definition.  For instance, an
+out} (resp. \emph{in}) in the data type definition.  For instance, an
 integer can be seen as:
 \begin{verbatim}
 view int ::= Zero | Succ int
@@ -132,7 +139,7 @@ type via the abstract functions.
 A very similar notion to our pattern facility has been recently
 introduced in [J87]. This approach is based on the attribute grammar
 paradigm applied to LML, a lazy version of ML. A recursive control
-structure called {\tt case rec} is introduced to traverse concrete
+structure called \texttt{case rec} is introduced to traverse concrete
 data structures and compute attributes; this construct is complex (not
 restricted to non-circular grammars) and was not implemented at that
 time. Furthermore, it relies heavily on the laziness of LML since it
@@ -150,7 +157,7 @@ constraints that might be defined on patterns.
 %(defun foo ((l x) y)
 %  (..))
 %\end{verbatim}
-%where the function {\tt l} represents the last element of a list. The
+%where the function \texttt{l} represents the last element of a list. The
 %matching is performed by multiple visits over the structure of the
 %calling argument. This search can be successfully terminated or can
 %lead to a fail on the structure of the calling argument.
@@ -163,32 +170,32 @@ types.
 
 \subsection{Type Notation}
 
-A concrete type {\tt T} can either be a basic type (like {\tt Int} or
-{\tt Bool}) or a constructed type. A constructed type is a sum of
+A concrete type \texttt{T} can either be a basic type (like \texttt{Int} or
+\texttt{Bool}) or a constructed type. A constructed type is a sum of
 product types (i.e., disjoint unions of structures with multiple
-members like {\tt t1:T1 + t2:(T2 $\times$ T3)}). We assume that each
-value of sum type {\tt T} with tag {\tt t} satisfies the run-time
-predicate $has\_tag_{\tt t}$; this means that tags (representing
+members like \texttt{t1:T1 + t2:(T2 $\times$ T3)}). We assume that each
+value of sum type \texttt{T} with tag \texttt{t} satisfies the run-time
+predicate $has\_tag_\texttt{t}$; this means that tags (representing
 types) are carried around by the underlying implementation. For every
-sum type {\tt T}, the function {\em untag} retrieves the untagged
-component of the value.  For every product type {\tt T} that has {\tt
-T1} as component, there exists a function {\tt T\_T1} that retrieves
-the component of type {\tt T1} in an object of type {\tt T}.
+sum type \texttt{T}, the function \emph{untag} retrieves the untagged
+component of the value.  For every product type \texttt{T} that has {\tt
+T1} as component, there exists a function \texttt{T\_T1} that retrieves
+the component of type \texttt{T1} in an object of type \texttt{T}.
 
 \subsection{Definition of RPM}
 
 The core of the RPM technique is a special form, called \rpm. Its
 BNF syntax is the following:
 \begin{tabbing}
-{\tt rpm}~~~~~~\=::= {\tt (rpm} root Clause*{\tt )} \\
+\texttt{rpm}~~~~~~\=::= \texttt{(rpm} root Clause*\texttt{)} \\
 root    \>::= Expression \\
-Clause  \>::= {\tt (}Pattern body{\tt  )} \\
-Pattern \>::= {\tt (}head member*{\tt )} \\
+Clause  \>::= \texttt{(}Pattern body\texttt{ )} \\
+Pattern \>::= \texttt{(}head member*\texttt{)} \\
 head    \>::= Identifier \\
 member  \>::= Identifier \\
 body    \>::= Expression*
 \end{tabbing}
-where {\em item}* represents a non-empty list of {\em item},
+where \emph{item}* represents a non-empty list of \emph{item},
 Identifier is a Lisp symbol and Expression any Lisp expression.
 
 Recursive pattern matching performs a recursive traversal of a
@@ -208,7 +215,7 @@ reported). The result of the evaluation of the list of expressions
 inside $c$ in an augmented environment is returned. The augmented
 environment is defined as follows: $h$ is bound to $(untag v)$ and each member
 $m$ is bound to the result of the recursive evaluation of the whole
-process on the value {\tt ($h$\_$m$ $({\em untag} v$))} where {\tt
+process on the value \texttt{($h$\_$m$ $(\emph{untag} v$))} where {\tt
 $h$\_$m$} is the function that retrieves the $m$ component of a value
 of type $h$.
 
@@ -240,15 +247,15 @@ $\C\dbl{C1 C2}vk_1k_2s =
         \C\dbl{C1}v$\=$(\lambda vs.\C\dbl{C1 C2}vk_1k_2s)$ \\
         \>$(\lambda vs.\C\dbl{C2}v(\lambda vs.\C\dbl{C1 C2}vk_1k_2s)
         (\lambda vs.{\bf error}))s$ \\
-$\C\dbl{P E}vk_1k_2s =$ \=${\rm let}~{\tt Id1},{\tt Id2},a = 
+$\C\dbl{P E}vk_1k_2s =$ \=${\rm let}~\texttt{Id1},\texttt{Id2},a = 
         \P\dbl{P}~{\rm in}$\\
-        \>${\rm if}~has\_tag_{\tt Id1}(v)~{\rm then}~
-                \E\dbl{E}[{\em untag}~v/{\tt Id1}][k_1 (a({\em untag}~v)) s/{\tt Id2}]s~
+        \>${\rm if}~has\_tag_\texttt{Id1}(v)~{\rm then}~
+                \E\dbl{E}[\emph{untag}~v/\texttt{Id1}][k_1 (a(\emph{untag}~v)) s/\texttt{Id2}]s~
         {\rm else}~k_2 v s$ \\
-$\P\dbl{(Id1 Id2)} = {\tt Id1}, {\tt Id2}, \mbox{{\tt Id1\_Id2}}$
+$\P\dbl{(Id1 Id2)} = \texttt{Id1}, \texttt{Id2}, \texttt{Id1\_Id2}$
 \end{tabbing}
-where \mbox{\tt Id1\_Id2} is the function that returns the {\tt Id2}
-member of a value of type {\tt Id1}.  Note the recursive behavior of
+where \texttt{Id1\_Id2} is the function that returns the \texttt{Id2}
+member of a value of type \texttt{Id1}.  Note the recursive behavior of
 \rpm\ pictured in the use of $\C\dbl{C1 C2}$ in its own definition.
 
 \subsection{RPM Computes Primitive Recursive Functions}
@@ -258,18 +265,18 @@ has the expressive power of primitive recursion.
 ~~~\\
 ~~~\\
 \noindent {\bf Definition} [C87]. A function $f$ of arity $n$ is
-defined by {\em primitive recursion} over the functions $g$ and $h$ if
+defined by \emph{primitive recursion} over the functions $g$ and $h$ if
 and only if: 
 \begin{itemize}
 \item $f(x_1,...,x_ n) = g(x_1,...,x_n)$ if $x_n = 0$,
 \item $h(x_1,...,x_n,f(x_1,...,x_n-1)$ otherwise
 \end{itemize}
 
-\noindent {\bf Theorem} {\em Any primitive recursive function f can be
+\noindent {\bf Theorem} \emph{Any primitive recursive function f can be
 encoded with \rpm\ without recursion.}
 ~~\\
 ~~\\
-\noindent {\bf Proof}. Let {\tt Num} be the recursive concrete type {\tt
+\noindent {\bf Proof}. Let \texttt{Num} be the recursive concrete type {\tt
 Zero + Succ:Num}. Let $f'$ be the
 curried function such that $f'(x_n)(x_1,..,x_{n-1}) = f(x_1,...,x_n)$.
 
@@ -277,31 +284,31 @@ By definition, we have
 $f'(x_n) = \lambda x_1,..,x_{n-1} . g(x_1,..,x_n)$ if $x_n$ is {\tt
 Zero} and $f'(x_n) = \lambda x_1,..,x_{n-1} .
 h(x_1,...,x_n,f'(y)(x_1,...,x_{n-1}))$ if $x_n$ is the successor of
-$y$ (i.e., $y = \mbox{\tt Num-Succ}~ x_n$).
+$y$ (i.e., $y = \texttt{Num-Succ}~ x_n$).
 
 Thus, by definition of \rpm:
 \begin{tabbing}
 $f'(x_n) = \rpm~$\=$x_n$ \\
-        \>$(({\tt Zero})~ \lambda x_1,..,x_{n-1} .
+        \>$((\texttt{Zero})~ \lambda x_1,..,x_{n-1} .
                                 g(x_1,..,x_n))$ \\
-        \>$(({\tt Succ~Num})~ \lambda x_1,..,x_{n-1} .
-                        h(x_1,...,{\tt Succ},{\tt Num}(x_1,...,x_{n-1})))$
+        \>$((\texttt{Succ~Num})~ \lambda x_1,..,x_{n-1} .
+                        h(x_1,...,\texttt{Succ},\texttt{Num}(x_1,...,x_{n-1})))$
 \end{tabbing}
-Inside the body of the second clause, {\tt Succ} is bound to the
-current value of $x_n$ and {\tt Num} denotes the result of the
-recursive invocation of $f'$ on $y$ if $y = \mbox{\tt Num-Succ}~x_n$.
+Inside the body of the second clause, \texttt{Succ} is bound to the
+current value of $x_n$ and \texttt{Num} denotes the result of the
+recursive invocation of $f'$ on $y$ if $y = \texttt{Num-Succ}~x_n$.
 We can define $f$ in the following way:
 \begin{tabbing}
 $f(x_1,...,x_n) = (\rpm~$\=$x_n$ \\
-                \>$(({\tt Zero})~ \lambda x_1,..,x_{n-1} .
+                \>$((\texttt{Zero})~ \lambda x_1,..,x_{n-1} .
                                 g(x_1,..,x_n))$ \\
-                \>$(({\tt Succ~ Num})~ \lambda x_1,..,x_{n-1} .
-                                h(x_1,...,{\tt Succ},{\tt
+                \>$((\texttt{Succ~ Num})~ \lambda x_1,..,x_{n-1} .
+                                h(x_1,...,\texttt{Succ},{\tt
                                         Num}(x_1,...,x_{n-1})))$ \\
                 \> $x_1 ... x_{n-1})$
 \end{tabbing}
 The formal proof of equivalence between these two forms is
-straightforward and left to the reader. \hfill$\Box$
+straightforward and left to the reader. \QED
 
 Note that we supposed that concrete types were not circular. If we
 relax this restriction (i.e., we quit the pure functional paradigm) or
@@ -332,8 +339,8 @@ to use (once assimilated by programmers !).
 \section{Examples}
 
 In the sequel, we will use the CommonLISP notation; product types are
-coded by {\tt defstruct}, sum types by a corresponding {\tt deftype}
-with an {\tt or} constructor and basic types by the underlying implementation.
+coded by \texttt{defstruct}, sum types by a corresponding \texttt{deftype}
+with an \texttt{or} constructor and basic types by the underlying implementation.
 We present three simple examples that use the \rpm\ package provided in
 the Appendix: a factorial function, the computation of the free
 variables of a $\lambda$-expression and a Lambda-Calculus evaluator.
@@ -353,12 +360,12 @@ define the type of integer numbers and some functions on them:
 
 (declare (function num-product (num num) num))
 \end{verbatim}
-where {\tt num} is either a {\tt zero} or a {\tt succ} with a
-unique member {\tt of} which is a {\tt num}. For convenience, we
-defined {\tt num-1} and declared the product function on {\tt nums}
+where \texttt{num} is either a \texttt{zero} or a \texttt{succ} with a
+unique member \texttt{of} which is a \texttt{num}. For convenience, we
+defined \texttt{num-1} and declared the product function on \texttt{nums}
 (the code of which is left as an exercise to the reader).
 
-The \rpm\ version of factorial on values of type {\tt num} is the
+The \rpm\ version of factorial on values of type \texttt{num} is the
 following:
 \begin{verbatim}
 (defun factorial (num)
@@ -373,7 +380,7 @@ which can be used in the following way :
 #(succ #(succ #(zero)))
 \end{verbatim}
 Note that unlike other programming techniques, there is no explicit
-recursive call to {\tt factorial}; it is embedded inside the 
+recursive call to \texttt{factorial}; it is embedded inside the 
 \rpm\ macro.
 
 \subsection{Free Variables of Lambda Expressions}
@@ -400,14 +407,14 @@ We introduce the notion of a free variable in a $\lambda$-expression
 by structural induction on the domain of $\lambda$-expressions:
 {~~~~~}\\
 ~~~~~\\
-\noindent{\bf Definition} [S77] A variable {\tt x} {\em occurs free} in a
-$\lambda$-expression {\tt E} if and only if:
+\noindent{\bf Definition} [S77] A variable \texttt{x} \emph{occurs free} in a
+$\lambda$-expression \texttt{E} if and only if:
 \begin{itemize}
-\item {\tt E} is {\tt x},
-\item {\tt E} is {\tt (E${}_1$ E${}_2$)} and {\tt x} occurs free in
-{\tt E${}_1$} or {\tt E${}_2$}
-\item {\tt E} is {\tt (lambda V E)}, {\tt x} and {\tt V} are
-different and {\tt x} occurs free in {\tt E}
+\item \texttt{E} is \texttt{x},
+\item \texttt{E} is \texttt{(E${}_1$ E${}_2$)} and \texttt{x} occurs free in
+\texttt{E${}_1$} or \texttt{E${}_2$}
+\item \texttt{E} is \texttt{(lambda V E)}, \texttt{x} and \texttt{V} are
+different and \texttt{x} occurs free in \texttt{E}
 \end{itemize}
 
 \noindent We define the function that computes the set of all free
@@ -431,10 +438,10 @@ of free variables of the body of an abstraction).
 We will use the previous data type and associated functions to write a
 simple evaluator of $\lambda$-expressions. This will be the occasion
 of using higher order functions as a means to deal with
-arguments; the {\tt evaluate} function takes, beside the expression, 
-a {\tt store} that maps variables to {\tt num} values (for instance).
+arguments; the \texttt{evaluate} function takes, beside the expression, 
+a \texttt{store} that maps variables to \texttt{num} values (for instance).
 
-We used the {\tt [} macro character to wrap the special form {\tt funcall}
+We used the \texttt{[} macro character to wrap the special form \texttt{funcall}
 around the arguments (see Appendix). They wouldn't be required if we
 used a one-namespace language like Scheme.
 
@@ -460,12 +467,12 @@ used a one-namespace language like Scheme.
                                     store)]))))
    store])
 \end{verbatim}
-The function {\tt update-store} updates the store (which is a function)
-to bind the value to the variable. The constant {\tt init-store}
-denotes an empty store.  The core function {\tt evaluate} evaluates an
+The function \texttt{update-store} updates the store (which is a function)
+to bind the value to the variable. The constant \texttt{init-store}
+denotes an empty store.  The core function \texttt{evaluate} evaluates an
 expression in a given store. The key idea is that each clause in the
 \rpm\  macro returns a function that maps stores to values. We
-give below a simple example that evaluates {\tt ((lambda (x) x) 1)} in
+give below a simple example that evaluates \texttt{((lambda (x) x) 1)} in
 an empty initial store:
 \begin{verbatim}
 -> (let* ((x (make-variable :name "x"))
@@ -496,7 +503,7 @@ be a list, the recursive process is mapped on each element of the list
 and a list of results is returned. This could also be applied to
 vectors.
 \item
-	a default pattern could be introduced ({\em a la} {\tt \_} of
+	a default pattern could be introduced (\emph{a la} \texttt{\_} of
 ML) to trap the values that didn't match any of the clauses.
 \end{itemize}
 
@@ -613,34 +620,33 @@ the recursive call of LOOP on the MEMBER of OBJ (which is of type HEAD)."
 
 \begin{description}
 \item[\mbox{[C87]}]
-        Cohen, D.E {\em Computability and Logic}. Ellis Horwood,
+        Cohen, D.E \emph{Computability and Logic}. Ellis Horwood,
 Halstead Press, J.Wiley and Sons, New York 1987
 \item[\mbox{[JW85]}]
-        Jensen, K., and Wirth, N. {\em The Pascal User Manual and
+        Jensen, K., and Wirth, N. \emph{The Pascal User Manual and
 Report}. Third Edition, Springer-Verlag, New York 1985
 \item[\mbox{[J87]}]
 	Johnsson, T. Attribute Grammars as a Functional Programming
-Paradigm. In the {\em Proceedings of the 1987 Int. Conf. on Func. Prog.
+Paradigm. In the \emph{Proceedings of the 1987 Int. Conf. on Func. Prog.
 Lang. and Comp. Arch.}, Portland, 1987
 \item[\mbox{[M83]}]
-        Milner, R. A Proposal for Standard ML. {\em Polymorphism Letters I},
+        Milner, R. A Proposal for Standard ML. \emph{Polymorphism Letters I},
 Bell Labs, 1983.
 \item[\mbox{[KR78]}]
-        Kernighan, B., and Ritchie, D. {\em The C Programming
+        Kernighan, B., and Ritchie, D. \emph{The C Programming
 Language}. Prentice-Hall, 1978.
 \item[\mbox{[S77]}]
-        Stoy, J. E. {\em Denotational Semantics: the Scott-Strachey
+        Stoy, J. E. \emph{Denotational Semantics: the Scott-Strachey
 Approach to Programming Language Theory}. MIT Press, 1977.
 \item[\mbox{[St84]}]
-        Steele, G. L., Jr. {\em CommonLISP: The Language}. Digital Press, 1984.
+        Steele, G. L., Jr. \emph{CommonLISP: The Language}. Digital Press, 1984.
 \item[\mbox{[St77]}]
-        Steele, G.L., Jr. {\em Rabbit}. MS Thesis, MIT AI Lab, 1977
+        Steele, G.L., Jr. \emph{Rabbit}. MS Thesis, MIT AI Lab, 1977
 \item[\mbox{[W87]}]
         Wadler, P. Views: A way for pattern matching to cohabit with
-data abstraction. In {\em Proceedings of the Conference on Principles
+data abstraction. In \emph{Proceedings of the Conference on Principles
 Of Programming Languages}. ACM, Munich, 1987.
 \end{description}
 
-\end{sloppypar}
 \end{document}
 
