@@ -277,14 +277,15 @@ encoded with \rpm\ without recursion.}
 ~~\\
 ~~\\
 \noindent {\bf Proof}. Let \texttt{Num} be the recursive concrete type {\tt
-Zero + Succ:Num}. Let $f'$ be the
-curried function such that $f'(x_n)(x_1,..,x_{n-1}) = f(x_1,...,x_n)$.
+Zero + Succ:Num}.
+%%
+Let $f'$ be the curried function such that
+$f'(x_n)(x_1,..,x_{n-1}) = f(x_1,...,x_n)$.
 
-By definition, we have
-$f'(x_n) = \lambda x_1,..,x_{n-1} . g(x_1,..,x_n)$ if $x_n$ is {\tt
-Zero} and $f'(x_n) = \lambda x_1,..,x_{n-1} .
-h(x_1,...,x_n,f'(y)(x_1,...,x_{n-1}))$ if $x_n$ is the successor of
-$y$ (i.e., $y = \texttt{Num-Succ}~ x_n$).
+By definition, if $x_n$ is \texttt{Zero} we have:
+\[f'(x_n) = \lambda x_1,..,x_{n-1} . g(x_1,..,x_n)\]
+and if $x_n$ is the successor of $y$ (i.e., $y = \texttt{Num-Succ}~ x_n$):
+\[f'(x_n) = \lambda x_1,..,x_{n-1} . h(x_1,...,x_n,f'(y)(x_1,...,x_{n-1})) \]
 
 Thus, by definition of \rpm:
 \begin{tabbing}
@@ -522,9 +523,42 @@ A portable CommonLISP implementation of \rpm\ is provided.
 We would like to thank Vincent Dornic for pointing out the quite
 relevant paper [J87].
 
+\section*{References}
+
+\begin{description}
+\item[\mbox{[C87]}]
+        Cohen, D.E \emph{Computability and Logic}. Ellis Horwood,
+Halstead Press, J.Wiley and Sons, New York 1987
+\item[\mbox{[JW85]}]
+        Jensen, K., and Wirth, N. \emph{The Pascal User Manual and
+Report}. Third Edition, Springer-Verlag, New York 1985
+\item[\mbox{[J87]}]
+	Johnsson, T. Attribute Grammars as a Functional Programming
+Paradigm. In the \emph{Proceedings of the 1987 Int. Conf. on Func. Prog.
+Lang. and Comp. Arch.}, Portland, 1987
+\item[\mbox{[M83]}]
+        Milner, R. A Proposal for Standard ML. \emph{Polymorphism Letters I},
+Bell Labs, 1983.
+\item[\mbox{[KR78]}]
+        Kernighan, B., and Ritchie, D. \emph{The C Programming
+Language}. Prentice-Hall, 1978.
+\item[\mbox{[S77]}]
+        Stoy, J. E. \emph{Denotational Semantics: the Scott-Strachey
+Approach to Programming Language Theory}. MIT Press, 1977.
+\item[\mbox{[St84]}]
+        Steele, G. L., Jr. \emph{CommonLISP: The Language}. Digital Press, 1984.
+\item[\mbox{[St77]}]
+        Steele, G.L., Jr. \emph{Rabbit}. MS Thesis, MIT AI Lab, 1977
+\item[\mbox{[W87]}]
+        Wadler, P. Views: A way for pattern matching to cohabit with
+data abstraction. In \emph{Proceedings of the Conference on Principles
+Of Programming Languages}. ACM, Munich, 1987.
+\end{description}
+
 \newpage
 \section*{Appendix: A CommonLISP Implementation of \rpm}
 
+{\small
 \begin{verbatim}
 ;; The "rpm" (Recursive Pattern Matching) macro package.
 ;;
@@ -614,39 +648,8 @@ the recursive call of LOOP on the MEMBER of OBJ (which is of type HEAD)."
                                          (symbol-name (intern member))))
                           ,obj))))
             members))
-\end{verbatim}
-
-\section*{References}
-
-\begin{description}
-\item[\mbox{[C87]}]
-        Cohen, D.E \emph{Computability and Logic}. Ellis Horwood,
-Halstead Press, J.Wiley and Sons, New York 1987
-\item[\mbox{[JW85]}]
-        Jensen, K., and Wirth, N. \emph{The Pascal User Manual and
-Report}. Third Edition, Springer-Verlag, New York 1985
-\item[\mbox{[J87]}]
-	Johnsson, T. Attribute Grammars as a Functional Programming
-Paradigm. In the \emph{Proceedings of the 1987 Int. Conf. on Func. Prog.
-Lang. and Comp. Arch.}, Portland, 1987
-\item[\mbox{[M83]}]
-        Milner, R. A Proposal for Standard ML. \emph{Polymorphism Letters I},
-Bell Labs, 1983.
-\item[\mbox{[KR78]}]
-        Kernighan, B., and Ritchie, D. \emph{The C Programming
-Language}. Prentice-Hall, 1978.
-\item[\mbox{[S77]}]
-        Stoy, J. E. \emph{Denotational Semantics: the Scott-Strachey
-Approach to Programming Language Theory}. MIT Press, 1977.
-\item[\mbox{[St84]}]
-        Steele, G. L., Jr. \emph{CommonLISP: The Language}. Digital Press, 1984.
-\item[\mbox{[St77]}]
-        Steele, G.L., Jr. \emph{Rabbit}. MS Thesis, MIT AI Lab, 1977
-\item[\mbox{[W87]}]
-        Wadler, P. Views: A way for pattern matching to cohabit with
-data abstraction. In \emph{Proceedings of the Conference on Principles
-Of Programming Languages}. ACM, Munich, 1987.
-\end{description}
+\end{verbatim}%
+}
 
 \end{document}
 
