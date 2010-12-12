@@ -1327,6 +1327,127 @@ static transformer integer_multiply_to_transformer(entity v,
   return tf;
 }
 
+/* Assumes that e1 and e2 are integer expressions, i.e. explicit casting
+ * is supposed to be used.
+ *
+ * This piece of code has been copied and pasted from
+ * integer_multiply_to_transformer(). Common issues like evaluating
+ * the intervals for the values of the arguments should be factored
+ * out. */
+static transformer integer_shift_to_transformer(entity v,
+						expression e1,
+						expression e2,
+						transformer ipre,
+						bool left_p,
+						bool is_internal)
+{
+  transformer tf = transformer_undefined;
+  // FI: ultimate_type should be called? Or int assumed?
+  entity v1 = make_local_temporary_value_entity(entity_type(v));
+  transformer t1 = safe_integer_expression_to_transformer(v1, e1, ipre, is_internal);
+  entity v2 = make_local_temporary_value_entity(entity_type(v));
+  transformer npre = transformer_safe_apply(t1, ipre);
+  transformer t2 = safe_integer_expression_to_transformer(v2, e2, npre, is_internal);
+  transformer pre = transformer_undefined_p(ipre)? transformer_identity() :
+    copy_transformer(ipre);
+
+  pips_debug(8, "Begin\n");
+
+  if(!transformer_undefined_p(t1) && !transformer_undefined_p(t2)) {
+    intptr_t lb1 = 0;
+    intptr_t ub1 = 0;
+    intptr_t lb2 = 0;
+    intptr_t ub2 = 0;
+
+    /* FI: I had to switch the arguments to satisfy a reasonnable
+       assert in image_intersection(), but the switch may be
+       detrimental to memory allocation. */
+    //t1 = transformer_safe_image_intersection(pre, t1);
+    //t2 = transformer_safe_image_intersection(pre, t2);
+    t1 = transformer_range(transformer_apply(pre, t1));
+    t2 = transformer_range(transformer_apply(pre, t2));
+
+    (void) precondition_minmax_of_value(v1, t1, &lb1, &ub1);
+    (void) precondition_minmax_of_value(v2, t2, &lb2, &ub2);
+
+    if(lb1==ub1) {
+	pips_internal_error("not implemented yet.");
+      /* The numerical value of expression e1 is known: v = lb1*v2 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      vect_add_elem(&veq, (Variable) v2, (Value) lb1);
+      transformer_equality_add(t2, veq);
+      tf = t2;
+      free_transformer(t1);
+    }
+    else if(lb2==ub2) {
+      /* The numerical value of expression e2 is known: v = v1*2^lb2 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      if(!left_p)
+	lb2 = -lb2;
+
+      if(lb2>=0) {
+	vect_add_elem(&veq, (Variable) v1,
+		      value_lshift((Value) 1, (Value) lb2));
+      }
+      else
+	pips_internal_error("not implemented yet.");
+
+      tf = transformer_equality_add(t1, veq);
+      free_transformer(t2);
+    }
+    else {
+      pips_internal_error("not implemented yet.");
+      /* Do we have range information? */
+      long long p1 = ((long long) lb1 )*((long long) lb2 );
+      long long p2 = ((long long) lb1 )*((long long) ub2 );
+      long long p3 = ((long long) ub1 )*((long long) lb2 );
+      long long p4 = ((long long) ub1 )*((long long) ub2 );
+      long long lb = (p2<p1)? p2 : p1;
+      long long ub = (p2>p1)? p2 : p1;
+
+      lb = (p3<lb)? p3 : lb;
+      lb = (p4<lb)? p4 : lb;
+
+      ub = (p3>ub)? p3 : ub;
+      ub = (p4>ub)? p4 : ub;
+
+      free_transformer(t1);
+      free_transformer(t2);
+
+      if(lb > INT_MIN || ub < INT_MAX)
+	tf = transformer_identity();
+
+      if(lb > INT_MIN) {
+	Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
+
+	vect_add_elem(&vineql, TCST, lb);
+	tf = transformer_inequality_add(transformer_identity(), vineql);
+      }
+      if(ub < INT_MAX) {
+	Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
+
+	vect_add_elem(&vinequ, TCST, -ub);
+	tf = transformer_inequality_add(tf, vinequ);
+      }
+    }
+  }
+  else if(!transformer_undefined_p(t1)) {
+    free_transformer(t1);
+  }
+  else if(!transformer_undefined_p(t2)) {
+    free_transformer(t2);
+  }
+
+  free_transformer(pre);
+
+  pips_debug(8, "End with tf=%p\n", tf);
+  ifdebug(8) (void) dump_transformer(tf);
+
+  return tf;
+}
+
 static transformer integer_power_to_transformer(entity e,
 						expression arg1,
 						expression arg2,
@@ -1651,14 +1772,19 @@ static transformer integer_binary_operation_to_transformer(entity e,
   else if(ENTITY_ASSIGN_P(op)) {
     tf = assign_operation_to_transformer(e, e1, e2, pre);
   }
+  else if(ENTITY_LEFT_SHIFT_P(op)) {
+    tf = integer_shift_to_transformer(e, e1, e2, pre, TRUE, is_internal);
+  }
+  else if(ENTITY_RIGHT_SHIFT_P(op)) {
+    tf = integer_shift_to_transformer(e, e1, e2, pre, FALSE, is_internal);
+  }
 
   pips_debug(8, "End with tf=%p\n", tf);
 
   return tf;
 }
 
-static transformer 
-integer_call_expression_to_transformer(
+static transformer integer_call_expression_to_transformer(
     entity e,
     expression expr, /* needed to compute effects for user calls */
     transformer pre, /* Predicate on current store assumed not modified by
@@ -2076,21 +2202,22 @@ transformer logical_intrinsic_to_transformer(entity v,
 {
   transformer tf = transformer_undefined;
 
-    switch(gen_length(call_arguments(c))) {
-    case 0:
-      tf = logical_constant_to_transformer(v, call_function(c));
-      break;
-    case 1:
-      tf = logical_unary_operation_to_transformer(v, c, pre, is_internal);
-      break;
-    case 2:
-      tf = logical_binary_function_to_transformer(v, c, pre, is_internal);
-      break;
-    default:
-      pips_internal_error("Too many logical arguments, %d, for operator %s",
-			  gen_length(call_arguments(c)),
-			  entity_name(call_function(c)));
-    }
+  switch(gen_length(call_arguments(c))) {
+  case 0:
+    tf = logical_constant_to_transformer(v, call_function(c));
+    break;
+  case 1:
+    tf = logical_unary_operation_to_transformer(v, c, pre, is_internal);
+    break;
+  case 2:
+    tf = logical_binary_function_to_transformer(v, c, pre, is_internal);
+    break;
+  default:
+    pips_internal_error("Too many logical arguments, %d, for operator %s",
+			gen_length(call_arguments(c)),
+			entity_name(call_function(c)));
+  }
+  return tf;
 }
 
 /* Could be used to compute preconditions too. v is assumed to be a new
