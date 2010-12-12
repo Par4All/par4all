@@ -1199,9 +1199,56 @@ static transformer integer_divide_to_transformer(entity e,
   }
 
   ifdebug(8) {
-    debug(8, "integer_divide_to_transformer", "result:\n");
+    pips_debug(8, "result:\n");
     dump_transformer(tf);
-    debug(8, "integer_divide_to_transformer", "end\n");
+    pips_debug(8, "end\n");
+  }
+
+  return tf;
+}
+/* More could be done along the line of
+   integer_left_shift_to_transformer()... when need arises.*/
+static transformer integer_right_shift_to_transformer(entity e,
+						      expression arg1,
+						      expression arg2,
+						      transformer pre,
+						      bool is_internal)
+{
+  transformer tf = transformer_undefined;
+  normalized n1 = NORMALIZE_EXPRESSION(arg1);
+
+  pips_debug(8, "begin with is_internal=%s\n",
+	     bool_to_string(is_internal));
+
+  /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
+  pips_assert("Shut up the compiler", pre==pre);
+
+  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
+    int d = integer_constant_expression_value(arg2);
+    Value val = value_lshift((Value) 1, (Value) d);
+    /* must be duplicated right now  because it will be
+       renamed and checked at the same time by
+       value_mappings_compatible_vector_p() */
+    Pvecteur vlb =
+      vect_multiply(vect_dup(normalized_linear(n1)), VALUE_MONE);
+    Pvecteur vub = vect_dup(normalized_linear(n1));
+    Pcontrainte clb = CONTRAINTE_UNDEFINED;
+    Pcontrainte cub = CONTRAINTE_UNDEFINED;
+
+    vect_add_elem(&vlb, (Variable) e, val);
+    vect_add_elem(&vub, (Variable) e, -val);
+    vect_add_elem(&vub, TCST, VALUE_ONE-val);
+    clb = contrainte_make(vlb);
+    cub = contrainte_make(vub);
+    clb->succ = cub;
+    tf = make_transformer(NIL,
+			  make_predicate(sc_make(CONTRAINTE_UNDEFINED, clb)));
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "result:\n");
+    dump_transformer(tf);
+    pips_debug(8, "end\n");
   }
 
   return tf;
@@ -1334,11 +1381,10 @@ static transformer integer_multiply_to_transformer(entity v,
  * integer_multiply_to_transformer(). Common issues like evaluating
  * the intervals for the values of the arguments should be factored
  * out. */
-static transformer integer_shift_to_transformer(entity v,
+static transformer integer_left_shift_to_transformer(entity v,
 						expression e1,
 						expression e2,
 						transformer ipre,
-						bool left_p,
 						bool is_internal)
 {
   transformer tf = transformer_undefined;
@@ -1374,28 +1420,53 @@ static transformer integer_shift_to_transformer(entity v,
       /* The numerical value of expression e2 is known: v = v1*2^lb2 */
       Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
 
-      if(left_p && lb2>=0) {
+      if(lb2>=0) {
 	vect_add_elem(&veq, (Variable) v1,
 		      value_lshift((Value) 1, (Value) lb2));
       }
-      else if(left_p && lb2<0) {
+      else  /* lb2<0 */ {
 	// FI: Should look at the norm; seems to return 0 with gdb
 	;
       }
-      else
-	pips_user_warning("Analysis of right shift not implemented yet.\n");
 
-      if(left_p) {
-	tf = transformer_equality_add(t1, veq);
+      tf = transformer_equality_add(t1, veq);
+      free_transformer(t2);
+    }
+    else if(0<lb2 && ub2<INT_MAX) {
+      /* The value of v belongs to a bounded interval */
+      if(0<=lb1) {
+	// v1 is positive: v1*2^lb2 <= v <= v1*2^ub2
+	Pvecteur veq1 = vect_new((Variable) v, VALUE_MONE);
+	Pvecteur veq2 = vect_new((Variable) v, VALUE_ONE);
+	vect_add_elem(&veq1, (Variable) v1,
+		      value_lshift((Value) 1, (Value) lb2));
+	vect_add_elem(&veq2, (Variable) v1,
+		      -value_lshift((Value) 1, (Value) ub2));
+	tf = transformer_inequality_add(t1, veq1);
+	tf = transformer_inequality_add(t1, veq2);
+	free_transformer(t2);
+      }
+      else if(ub1<=0) {
+	// v1 is negative: v1*2^ub2 <= v <= v1*2^lb2
+	Pvecteur veq1 = vect_new((Variable) v, VALUE_MONE);
+	Pvecteur veq2 = vect_new((Variable) v, VALUE_ONE);
+	vect_add_elem(&veq1, (Variable) v1,
+		      value_lshift((Value) 1, (Value) ub2));
+	vect_add_elem(&veq2, (Variable) v1,
+		      -value_lshift((Value) 1, (Value) lb2));
+	tf = transformer_inequality_add(t1, veq1);
+	tf = transformer_inequality_add(t1, veq2);
 	free_transformer(t2);
       }
       else {
-	free_transformer(t1);
-	free_transformer(t2);
+	// No information is available because the sign of v1 is
+	// unknown
+	;
       }
     }
     else if(lb1==ub1) {
-	pips_internal_error("not implemented yet.");
+      /* a constant is shifted */
+      pips_internal_error("not implemented yet.");
       /* The numerical value of expression e1 is known: v = lb1*v2 */
       Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
 
@@ -1405,38 +1476,36 @@ static transformer integer_shift_to_transformer(entity v,
       free_transformer(t1);
     }
     else {
+      // Let's hope that the sign of v2 is known as well as the sign
+      // of v1
       // a new transformer must be built
       //free_transformer(t1);
       free_transformer(t2);
       //transformer tf = transformer_identity();
 
-      if(left_p) {
-	if(lb2>=0 && lb1>=1) {
-	  // The value of v is greater than the value of v1
-	  tf = transformer_add_inequality(t1, v1, v, TRUE);
-	}
-	else if(lb2>=0 && lb1==0) {
-	  // The value of v is 0
-	  tf = transformer_add_inequality(t1, v1, v, FALSE);
-	  //tf = transformer_add_equality_with_integer_constant(tf, v, 0);
-	}
-	else if(lb2>0 && ub1<0) {
-	  // The value of v is lesser than the value of v1
-	  tf = transformer_add_inequality(t1, v, v1, TRUE);
-	}
-	else if(lb2>0 && ub1==0) {
-	  // The value of v is lesser than the value of v1
-	  tf = transformer_add_inequality(t1, v, v1, FALSE);
-	}
-	else if(ub2<0) {
-	  // The value of v is zero
-	  free_transformer(t1);
-	  tf = transformer_identity();
-	  tf = transformer_add_equality_with_integer_constant(tf, v, 0);
-	}
+      if(lb2>=0 && lb1>=1) {
+	// The value of v is greater than the value of v1
+	tf = transformer_add_inequality(t1, v1, v, TRUE);
       }
-      else // right shift
-	pips_user_warning("Analysis of right shift not implemented yet.\n");
+      else if(lb2>=0 && lb1==0) {
+	// The value of v is 0
+	tf = transformer_add_inequality(t1, v1, v, FALSE);
+	//tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+      }
+      else if(lb2>0 && ub1<0) {
+	// The value of v is lesser than the value of v1
+	tf = transformer_add_inequality(t1, v, v1, TRUE);
+      }
+      else if(lb2>0 && ub1==0) {
+	// The value of v is lesser than the value of v1
+	tf = transformer_add_inequality(t1, v, v1, FALSE);
+      }
+      else if(ub2<0) {
+	// The value of v is zero
+	free_transformer(t1);
+	tf = transformer_identity();
+	tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+      }
     }
   }
   else if(!transformer_undefined_p(t1)) {
@@ -1779,10 +1848,10 @@ static transformer integer_binary_operation_to_transformer(entity e,
     tf = assign_operation_to_transformer(e, e1, e2, pre);
   }
   else if(ENTITY_LEFT_SHIFT_P(op)) {
-    tf = integer_shift_to_transformer(e, e1, e2, pre, TRUE, is_internal);
+    tf = integer_left_shift_to_transformer(e, e1, e2, pre, is_internal);
   }
   else if(ENTITY_RIGHT_SHIFT_P(op)) {
-    tf = integer_shift_to_transformer(e, e1, e2, pre, FALSE, is_internal);
+    tf = integer_right_shift_to_transformer(e, e1, e2, pre, is_internal);
   }
 
   pips_debug(8, "End with tf=%p\n", tf);
