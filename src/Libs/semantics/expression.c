@@ -1370,7 +1370,31 @@ static transformer integer_shift_to_transformer(entity v,
     (void) precondition_minmax_of_value(v1, t1, &lb1, &ub1);
     (void) precondition_minmax_of_value(v2, t2, &lb2, &ub2);
 
-    if(lb1==ub1) {
+    if(lb2==ub2) {
+      /* The numerical value of expression e2 is known: v = v1*2^lb2 */
+      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
+
+      if(left_p && lb2>=0) {
+	vect_add_elem(&veq, (Variable) v1,
+		      value_lshift((Value) 1, (Value) lb2));
+      }
+      else if(left_p && lb2<0) {
+	// FI: Should look at the norm; seems to return 0 with gdb
+	;
+      }
+      else
+	pips_user_warning("Analysis of right shift not implemented yet.\n");
+
+      if(left_p) {
+	tf = transformer_equality_add(t1, veq);
+	free_transformer(t2);
+      }
+      else {
+	free_transformer(t1);
+	free_transformer(t2);
+      }
+    }
+    else if(lb1==ub1) {
 	pips_internal_error("not implemented yet.");
       /* The numerical value of expression e1 is known: v = lb1*v2 */
       Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
@@ -1380,57 +1404,39 @@ static transformer integer_shift_to_transformer(entity v,
       tf = t2;
       free_transformer(t1);
     }
-    else if(lb2==ub2) {
-      /* The numerical value of expression e2 is known: v = v1*2^lb2 */
-      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
-
-      if(!left_p)
-	lb2 = -lb2;
-
-      if(lb2>=0) {
-	vect_add_elem(&veq, (Variable) v1,
-		      value_lshift((Value) 1, (Value) lb2));
-      }
-      else
-	pips_internal_error("not implemented yet.");
-
-      tf = transformer_equality_add(t1, veq);
-      free_transformer(t2);
-    }
     else {
-      pips_internal_error("not implemented yet.");
-      /* Do we have range information? */
-      long long p1 = ((long long) lb1 )*((long long) lb2 );
-      long long p2 = ((long long) lb1 )*((long long) ub2 );
-      long long p3 = ((long long) ub1 )*((long long) lb2 );
-      long long p4 = ((long long) ub1 )*((long long) ub2 );
-      long long lb = (p2<p1)? p2 : p1;
-      long long ub = (p2>p1)? p2 : p1;
-
-      lb = (p3<lb)? p3 : lb;
-      lb = (p4<lb)? p4 : lb;
-
-      ub = (p3>ub)? p3 : ub;
-      ub = (p4>ub)? p4 : ub;
-
-      free_transformer(t1);
+      // a new transformer must be built
+      //free_transformer(t1);
       free_transformer(t2);
+      //transformer tf = transformer_identity();
 
-      if(lb > INT_MIN || ub < INT_MAX)
-	tf = transformer_identity();
-
-      if(lb > INT_MIN) {
-	Pvecteur vineql = vect_new((Variable) v, VALUE_MONE);
-
-	vect_add_elem(&vineql, TCST, lb);
-	tf = transformer_inequality_add(transformer_identity(), vineql);
+      if(left_p) {
+	if(lb2>=0 && lb1>=1) {
+	  // The value of v is greater than the value of v1
+	  tf = transformer_add_inequality(t1, v1, v, TRUE);
+	}
+	else if(lb2>=0 && lb1==0) {
+	  // The value of v is 0
+	  tf = transformer_add_inequality(t1, v1, v, FALSE);
+	  //tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+	}
+	else if(lb2>0 && ub1<0) {
+	  // The value of v is lesser than the value of v1
+	  tf = transformer_add_inequality(t1, v, v1, TRUE);
+	}
+	else if(lb2>0 && ub1==0) {
+	  // The value of v is lesser than the value of v1
+	  tf = transformer_add_inequality(t1, v, v1, FALSE);
+	}
+	else if(ub2<0) {
+	  // The value of v is zero
+	  free_transformer(t1);
+	  tf = transformer_identity();
+	  tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+	}
       }
-      if(ub < INT_MAX) {
-	Pvecteur vinequ = vect_new((Variable) v, VALUE_ONE);
-
-	vect_add_elem(&vinequ, TCST, -ub);
-	tf = transformer_inequality_add(tf, vinequ);
-      }
+      else // right shift
+	pips_user_warning("Analysis of right shift not implemented yet.\n");
     }
   }
   else if(!transformer_undefined_p(t1)) {
