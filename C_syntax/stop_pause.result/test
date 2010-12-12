@@ -1,9 +1,9 @@
 void STOP_PAUSE()
 {
-   bool L1;
-   bool L2;
-   bool L3;
-   bool L4;
+   int L1;
+   int L2;
+   int L3;
+   int L4;
    float X;
    float RAND();
    X = RAND();
