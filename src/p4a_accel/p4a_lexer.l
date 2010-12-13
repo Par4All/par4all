@@ -25,7 +25,7 @@
 %%
 \/\/[^\n]*\n 	           {no_line++;}	// Skip line comment
 \n	                   {no_line++;}
-[ \t]*                     ; // Skip blank and tabulation
+[ \t]+                     ; // Skip blank and tabulation
 "/*"                       {BEGIN(comment);}
 "typedef"                  {BEGIN(type);return TYPEDEF;} 
 "#define"                  {BEGIN(define);} 
@@ -46,7 +46,7 @@
 
 <wrapper>"("                 {BEGIN(type);}
 <wrapper>\n                  {no_line++;}
-<wrapper>[ \t]*               ;
+<wrapper>[ \t]+               ;
 <wrapper>[^ \t\n)(]+ {
   yylval.string = (char *)strdup(yytext);
   return NOM;
@@ -56,7 +56,7 @@
 <type>"P4A_accel_global_address"                  ;
 <type>"P4A_accel_constant_address"                ;
 <type>"*"                              {return PTR;}               
-<type>[ \t]*                                      ;
+<type>[ \t]+                                      ;
 <type>[^ \t\n)(,*\[\]]+ {
   BEGIN(argument);
   yylval.string = (char *)strdup(yytext);
@@ -70,7 +70,7 @@
 <argument>"["                              {return TAB;}
 <argument>"]"                              {return TAB;}               
 <argument>\n                                {no_line++;}
-<argument>[ \t]*                                      ;
+<argument>[ \t]+                                      ;
 <argument>[^ \t\n)(,*\[\];]+ {
   yylval.string = (char *)strdup(yytext);
   return ARG;
