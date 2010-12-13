@@ -387,8 +387,12 @@ static transformer block_to_transformer(list b, transformer pre)
       s = STATEMENT(CAR(l));
       if(!transformer_undefined_p(next_pre))
 	free_transformer(next_pre);
-      next_pre = transformer_range(post);
-      free_transformer(post);
+
+      // In case, this is a performance bug due to r18644
+      //next_pre = transformer_range(post);
+      //free_transformer(post);
+      next_pre = post;
+
       stf = statement_to_transformer(s, next_pre);
       post = transformer_safe_apply(stf, next_pre);
 /*       post = transformer_safe_normalize(post, 4); */
