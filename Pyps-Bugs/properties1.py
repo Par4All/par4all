@@ -19,6 +19,11 @@ main = w.fun.main
 main.privatize_module ()
 main.internalize_parallel_code ()
 main.ompify_code ()
+
+# The merge_pragma work differently depending on the property OMP_MERGE_POLICY
+# Here we set it to "inner" but the value seen from the phase is still "outer"
+# which is the default value. As a consequence the pragma are merge on the
+# outer loop and not on the inner loop as expected.
 main.omp_merge_pragma ()
 
 main.display ()
