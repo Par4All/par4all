@@ -6,7 +6,7 @@ delete $WS
 create $WS mpeg2enc/conform.c mpeg2enc/stats.c mpeg2enc/putvlc.c mpeg2enc/putmpg.c mpeg2enc/puthdr.c mpeg2enc/writepic.c mpeg2enc/fdctref.c mpeg2enc/idct.c mpeg2enc/quantize.c mpeg2enc/readpic.c mpeg2enc/motion.c mpeg2enc/transfrm.c mpeg2enc/mpeg2enc.c mpeg2enc/putseq.c mpeg2enc/predict.c mpeg2enc/ratectl.c mpeg2enc/putbits.c mpeg2enc/putpic.c
 
 # Too time consuming
-# display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
 
 echo accurate analysis
 activate MUST_REGIONS
@@ -23,27 +23,26 @@ setproperty CONSTANT_PATH_EFFECTS FALSE
 
 # eliminate some numerical constants
 
-shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+#shell cat  $WS.database/putnonintrablk/putnonintrablk.c
 
 
-shell (cd $WS.database/putnonintrablk; sed -e 's/64/(2<<6)/' <putnonintrablk.c >tmp.c; mv tmp.c putnonintrablk.c)
+#shell (cd $WS.database/putnonintrablk; sed -e 's/64/(2<<6)/' <putnonintrablk.c >tmp.c; mv tmp.c putnonintrablk.c)
 
-shell cat  $WS.database/putnonintrablk/putnonintrablk.c
+#shell cat  $WS.database/putnonintrablk/putnonintrablk.c
 
-display PARSED_PRINTED_FILE[putnonintrablk]
-display PRINTED_FILE[putnonintrablk]
-#quit
+#display PARSED_PRINTED_FILE[putnonintrablk]
+#display PRINTED_FILE[putnonintrablk]
 
-shell cat  $WS.database/putAC/putAC.c
+#shell cat  $WS.database/putAC/putAC.c
 
 
-shell (cd $WS.database/putAC; sed -e 's/63/((2<<6)-1)/;s/127/((2<<7)-1)/;s/255/((2<<8)-1)/;s/2047/((2<<11)-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
+#shell (cd $WS.database/putAC; sed -e 's/63/((2<<6)-1)/;s/127/((2<<7)-1)/;s/255/((2<<8)-1)/;s/2047/(((int)sqrt(2048*2048))-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
+shell (cd $WS.database/putAC; sed -e 's/2047/(((int)sqrt(2048*2048))-1)/;' <putAC.c >tmp.c; mv tmp.c putAC.c)
 
-shell cat  $WS.database/putAC/putAC.c
+#shell cat  $WS.database/putAC/putAC.c
 
 display PRINTED_FILE[putnonintrablk]
 display PRINTED_FILE[putAC]
-#quit
 
 echo restructuring
 apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
@@ -91,6 +90,9 @@ echo
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[putnonintrablk]
 
+# If the constants are not eliminated by the substitutioon above, this
+# transformer computation does not end in a reasonnable amount of time
+
 echo
 echo Transformers for "putnonintrablk"
 echo
@@ -104,13 +106,65 @@ echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE[putpict]
-#quit
+
 echo
 echo Transformers for "putpict"
 echo
 
 activate PRINT_CODE_TRANSFORMERS
 display PRINTED_FILE[putpict]
+
+echo
+echo Cumulated effects for "calcSNR1"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[stats!calcSNR1]
+
+echo
+echo Cumulated effects for "calcSNR"
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[calcSNR]
+
+echo
+echo Transformers for "calcSNR"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[calcSNR]
+
+echo
+echo Transformers for %ALLFUNC
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALLFUNC]
+
+# Another core dump in the prettyprinter
+
+echo
+echo Preconditions for "predict!predict_mb"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[predict!predict_mb]
+
+echo
+echo Preconditions for %ALLFUNC
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete mpeg2enc
+quit
+
+# What follows takes forever because the regions are all recomputer,
+# and hence the effects, transformers and preconditions, for each
+# function in %ALLFUNC
 
 echo privatize
 apply PRIVATIZE_MODULE[%ALLFUNC]
@@ -124,4 +178,5 @@ setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
 display PRINTED_FILE[%ALLFUNC]
 
 close
-
+delete mpeg2enc
+quit
