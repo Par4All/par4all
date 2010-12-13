@@ -1,3 +1,7 @@
+omp
+outer
+do
+inner
 int main(void)
 {
    int k = 0, i = 0, l = 0;
