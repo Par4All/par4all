@@ -44,7 +44,7 @@ int for03()
 
       x[i] = 0;
 
-//  T(for03) {for03==0, i==128j, j==4}
+//  T(for03) {for03==0, i==512, j==4}
 
    
    //printf("%d, %d\n", i, j);
