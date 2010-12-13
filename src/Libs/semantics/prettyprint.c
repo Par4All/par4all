@@ -343,7 +343,16 @@ text semantic_to_text(
     return txt;
 }
 
-/* The strange argument type is required by qsort(), deep down in the calls */
+/* The strange argument type is required by qsort(), deep down in the
+ * calls.
+ *
+ * FI: what is it supposed to do? Is it allowed to return with
+ * equal==0, which leads to an assert failure later above
+ * vect_lexicographic_unsafe_compare_generic ().
+ *
+ * Too many functions share this name. It should be something like
+ * semantics_is_inferior_pvarval()
+ */
 static int
 is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
@@ -363,10 +372,15 @@ is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 	is_equal = 0;
     else if(term_cst(*pvarval2))
 	is_equal = -1;
-    else
+    else {
 	is_equal =
 	    strcmp(pips_user_value_name((entity) vecteur_var(*pvarval1)),
 		   pips_user_value_name((entity) vecteur_var(*pvarval2)));
+	if(is_equal==0 && !vect_equal(*pvarval1, *pvarval2))
+	  is_equal =
+	    strcmp(entity_name((entity) vecteur_var(*pvarval1)),
+		   entity_name((entity) vecteur_var(*pvarval2)));
+    }
 
     return is_equal;
 }

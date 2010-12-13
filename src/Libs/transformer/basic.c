@@ -390,7 +390,7 @@ transformer transformer_add_inequality(transformer tf, entity v1, entity v2, boo
   return tf;
 }
 
-/* Add the equality v <= cst or v >= cst */
+/* Add the inequality v <= cst or v >= cst */
 transformer transformer_add_inequality_with_integer_constraint(transformer tf, entity v, int cst, bool less_than_p)
 {
   Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
@@ -402,6 +402,27 @@ transformer transformer_add_inequality_with_integer_constraint(transformer tf, e
   else {
     eq = vect_new((Variable) v, VALUE_MONE);
     vect_add_elem(&eq, TCST, (Value) cst);
+  }
+
+  tf = transformer_inequality_add(tf, eq);
+
+  return tf;
+}
+
+/* Add the inequality v <= a x + cst or v >= a x + cst */
+transformer transformer_add_inequality_with_affine_term(transformer tf, entity v, entity x, int a, int cst, bool less_than_p)
+{
+  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+
+  if(less_than_p) {
+    eq = vect_new((Variable) v, VALUE_ONE);
+    vect_add_elem(&eq, (Variable) x, (Value) -a);
+    vect_add_elem(&eq, TCST, (Value) -cst);
+  }
+  else {
+    eq = vect_new((Variable) v, VALUE_MONE);
+    vect_add_elem(&eq, TCST, (Value) cst);
+    vect_add_elem(&eq, (Variable) x, (Value) a);
   }
 
   tf = transformer_inequality_add(tf, eq);

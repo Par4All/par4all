@@ -1177,7 +1177,8 @@ static transformer integer_divide_to_transformer(entity e,
   /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
   pips_assert("Shut up the compiler", pre==pre);
 
-  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
+  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)
+     && value_mappings_compatible_vector_p(normalized_linear(n1))) {
     int d = integer_constant_expression_value(arg2);
     /* must be duplicated right now  because it will be
        renamed and checked at the same time by
@@ -1223,7 +1224,8 @@ static transformer integer_right_shift_to_transformer(entity e,
   /* pips_assert("Precondition is unused", transformer_undefined_p(pre)); */
   pips_assert("Shut up the compiler", pre==pre);
 
-  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)) {
+  if(integer_constant_expression_p(arg2) && normalized_linear_p(n1)
+     && value_mappings_compatible_vector_p(normalized_linear(n1))) {
     int d = integer_constant_expression_value(arg2);
     Value val = value_lshift((Value) 1, (Value) d);
     /* must be duplicated right now  because it will be
@@ -1464,28 +1466,18 @@ static transformer integer_left_shift_to_transformer(entity v,
 	;
       }
     }
-    else if(lb1==ub1) {
-      /* a constant is shifted */
-      pips_internal_error("not implemented yet.");
-      /* The numerical value of expression e1 is known: v = lb1*v2 */
-      Pvecteur veq = vect_new((Variable) v, VALUE_MONE);
-
-      vect_add_elem(&veq, (Variable) v2, (Value) lb1);
-      transformer_equality_add(t2, veq);
-      tf = t2;
-      free_transformer(t1);
-    }
     else {
       // Let's hope that the sign of v2 is known as well as the sign
-      // of v1
+      // of v1. It does not matter if v1 is known exactly or not
       // a new transformer must be built
       //free_transformer(t1);
       free_transformer(t2);
       //transformer tf = transformer_identity();
 
       if(lb2>=0 && lb1>=1) {
-	// The value of v is greater than the value of v1
-	tf = transformer_add_inequality(t1, v1, v, TRUE);
+	// The value of v is greater than the value of v1 multiplied
+	// by 2
+	tf = transformer_add_inequality_with_affine_term(t1, v, v1, 2, 0, FALSE);
       }
       else if(lb2>=0 && lb1==0) {
 	// The value of v is 0
@@ -1506,6 +1498,12 @@ static transformer integer_left_shift_to_transformer(entity v,
 	tf = transformer_identity();
 	tf = transformer_add_equality_with_integer_constant(tf, v, 0);
       }
+      else // nothing is know about v2: the sign of v1 is preserved
+	// To be checked in C standard...
+	if(0<=lb1)
+	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, FALSE);
+	else if(ub1<=0)
+	  tf = transformer_add_inequality_with_integer_constraint(t1, v, 0, TRUE);
     }
   }
   else if(!transformer_undefined_p(t1)) {
