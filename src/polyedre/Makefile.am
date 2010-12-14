@@ -22,7 +22,7 @@
 TARGET=polyedre
 BUILT_SOURCES=$(TARGET).h
 nodist_include_HEADERS=$(TARGET).h
-AM_CPPFLAGS=$(POLYLIB64_CFLAGS) -I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I../sc -I../sommet -I../ray_dte -I../sg
+AM_CPPFLAGS=$(POLYLIB64_CFLAGS) -I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I../sc -I../sommet -I../ray_dte -I../sg -I../polynome
 
 noinst_LTLIBRARIES=libpolyedre.la
 
