@@ -30,6 +30,8 @@ echo
 
 apply UNSPLIT
 
+shell gfortran $WS.database/Src/*.f  -o $WS.database/Tmp/$WS
+
 close
-delete $WS
+#delete $WS
 quit
