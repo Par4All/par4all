@@ -686,6 +686,8 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 #ifdef P4A_ACCEL_CL
 
+#include "p4a_include-OpenCL.h"
+
 /** @author Stéphanie Even
 
     OpenCL is a bit more complicated than CUDA or OpenMP.
@@ -1323,6 +1325,7 @@ void p4a_clean(int exitCode)
   if(p4a_queue)clReleaseCommandQueue(p4a_queue);
   if(p4a_context)clReleaseContext(p4a_context);
 
+  /*
   // Free the kernels list
   struct p4a_kernel_list *kernel = p4a_kernels;
   while (kernel) {
@@ -1339,7 +1342,9 @@ void p4a_clean(int exitCode)
     free(kernel);
     kernel = current_kernel;
   }
+  */
 
+  /*
   // Free the typedef
   struct type_substitution * type_def = substitution_list;
   while (type_def) {
@@ -1347,6 +1352,7 @@ void p4a_clean(int exitCode)
     free(type_def);
     type_def = current_substitution;
   }
+  */
   exit(exitCode);
 }
 
@@ -1448,13 +1454,21 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_test_execution_with_message("clCreateKernel");
     free(cSourceCL);
   }
+  p4a_kernel = current_kernel->kernel;
 
   // Arguments are re-launched at each call because their values may have 
   // changed.
+  /*
   p4a_kernel = current_kernel->kernel;
+  int n = PP_NARG(...);
+  printf("N : %d\n",n);
+  
+  exit(0);
+  */
+  /*
   va_list ap;
   va_start(ap, kernel);
-
+  */
   /* Kernel arguments setting, solution One : specific call for kernel
      The argument list is pushed.
      The __VA_ARGS__ contains to very first one, the number of arguments 
@@ -1474,6 +1488,8 @@ void p4a_load_kernel_arguments(const char *kernel,...)
     P4A_test_execution_with_message("clSetKernelArg");
     }
   */
+
+  /*
   // Kernel arguments setting, solution Two : after kernel parsing
   P4A_log("kernel %s : number of arguments %d\n",kernel,current_kernel->n_args);
   struct arg_type *current_type = current_kernel->args;
@@ -1540,24 +1556,14 @@ void p4a_load_kernel_arguments(const char *kernel,...)
 	P4A_test_execution_with_message("clSetKernelArg");
       }
       else
-	P4A_log_and_exit("Bad reference to argument %d, kernel %s\n",i,kernel);
+	P4A_log_and_exit("Bad reference to argument %d\n",i);
     } 
 
   
-    /*
-	printf("On arrive bien ici\n");
-	void * arg_address = argument_reference(ap, current_type);
-	if (arg_address) {
-	p4a_global_error = clSetKernelArg(p4a_kernel,i,size,arg_address);
-	P4A_test_execution_with_message("clSetKernelArg");
-	}
-	else
-	P4A_log_and_exit("Bad reference to argument %d, kernel %s\n",i,kernel);
-    */
-
     current_type = current_type->next;
   }
   va_end(ap);
+  */
 }
 
 /** @author : Stéphanie Even
@@ -1594,11 +1600,12 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
   close(in);
   *length = size+len;
 
+  /*
   // Parsing with lex/yacc to retrieve the argument characteristics
   P4A_log("Begin to parse the kernel ...\n");
   parse_file(cl_kernel_file);
   P4A_log("End of kernel parsing : %d\n",current_kernel->n_args);
-
+  */
   // Some comment to verify
   /*
   struct arg_type * type = current_kernel->args;
@@ -1664,6 +1671,7 @@ struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel)
     Create a new type for an argument.
 The objectives is to retrieve the sizeof().
  */
+/*
 struct arg_type * new_type(char *str_type)
 {
   struct arg_type *type = (struct arg_type*)malloc(sizeof(struct arg_type));
@@ -1709,7 +1717,8 @@ struct arg_type * new_type(char *str_type)
     current_kernel->current->next = type;
   current_kernel->current = type;
 }
-
+*/
+/*
 void * argument_reference(va_list ap, struct arg_type *type)
 {
   void * ptr = NULL;
@@ -1763,6 +1772,6 @@ void * argument_reference(va_list ap, struct arg_type *type)
   } 
   return ptr;
 }
-
+*/
 
 #endif // P4A_ACCEL_CL

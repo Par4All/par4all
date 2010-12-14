@@ -36,6 +36,14 @@
 //#include <p4a_wrap-opencl.h>
 #include "p4a_include-OpenCL.h"
 
+/** @}
+ */
+
+/** @defgroup P4A printing error and log functions.
+
+   @{
+ */
+
 #define P4A_log_and_exit(code,...)               \
   do {						 \
   fprintf(stdout,__VA_ARGS__);			 \
@@ -52,6 +60,65 @@
 #define P4A_test_execution(error)      p4a_error(error, __FILE__, __LINE__)
 #define P4A_test_execution_with_message(message)	\
   p4a_message(message, __FILE__, __LINE__)
+
+/** @}
+ */
+
+/** @defgroup P4A macros to automatically treat __VA_ARGS__ calls
+
+    @{
+*/
+
+/** To solve the number of arguments
+    from 
+    http://stackoverflow.com/questions/3868289/count-number-of-parameters-in-c-variable-argument-method-call
+ */
+#define PP_NARG(...) \
+         PP_NARG_(__VA_ARGS__,PP_RSEQ_N())
+
+#define PP_NARG_(...) \
+         PP_ARG_N(__VA_ARGS__)
+
+#define PP_ARG_N( \
+          _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
+         _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
+         _21,_22,_23,_24,_25,_26,_27,_28,_29,_30, \
+         _31,_32,_33,_34,_35,_36,_37,_38,_39,_40, \
+         _41,_42,_43,_44,_45,_46,_47,_48,_49,_50, \
+         _51,_52,_53,_54,_55,_56,_57,_58,_59,_60, \
+         _61,_62,_63,N,...) N
+
+#define PP_RSEQ_N() \
+         63,62,61,60,                   \
+         59,58,57,56,55,54,53,52,51,50, \
+         49,48,47,46,45,44,43,42,41,40, \
+         39,38,37,36,35,34,33,32,31,30, \
+         29,28,27,26,25,24,23,22,21,20, \
+         19,18,17,16,15,14,13,12,11,10, \
+         9,8,7,6,5,4,3,2,1,0 
+
+
+
+#define CONCATN(a,b) CONCAT(a,b) 
+
+#define CONCAT(a,b) a ## b
+
+template<typename ARG0> inline void setArguments(int i,char *s,ARG0 arg0) {
+  printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
+  p4a_global_error = clSetKernelArg(p4a_kernel,i,sizeof(arg0),&arg0);
+  P4A_test_execution_with_message("clSetKernelArg");
+}
+ 
+#define STRINGIFY(val) (char *)#val
+
+#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
+#define SETARG2(n,x,...)  SETARG1(n,x,...) SETARG1(n+1,__VA_ARGS__) 	
+#define SETARG3(n,x,...)  SETARG1(n,x,...) SETARG2(n+1,__VA_ARGS__) 	
+#define SETARG4(n,x,...)  SETARG1(n,x,...) SETARG3(n+1,__VA_ARGS__) 	
+
+
+#define SETARGSN(...)  CONCATN(SETARG,PP_NARG(__VA_ARGS__))(0,__VA_ARGS__)
+
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
 
@@ -428,6 +495,7 @@
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {	                                                                \
     p4a_load_kernel_arguments(kernel,__VA_ARGS__);			\
+    SETARGSN(__VA_ARGS__);						\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
                    "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
