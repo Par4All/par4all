@@ -3144,3 +3144,30 @@ expression region_reference_to_expression(reference r) {
     }
     return p;
 }
+
+/* computes the volume of a region
+ * output it as a Polynomial representing the number of elements counted
+ */
+Ppolynome region_enumerate(region reg)
+{
+    Psysteme r_sc = region_system(reg);
+    sc_fix(r_sc);
+    Pbase sorted_base = region_sorted_base_dup(reg);
+    sc_base(r_sc)=sorted_base;
+    Pbase local_base = BASE_NULLE;
+    for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
+        if(!variable_phi_p((entity)b->var))
+            local_base=base_add_variable(local_base,b->var);
+
+    const char * base_names [sc_dimension(r_sc)];
+    int i=0;
+    for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
+        base_names[i++]=entity_user_name((entity)b->var);
+
+    ifdebug(1) print_region(reg);
+
+    Ppolynome p = sc_enumerate(r_sc,
+            local_base,
+            base_names);
+    return p;
+}

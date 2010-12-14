@@ -134,7 +134,6 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 				if debug:m.display()
 				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=memoryPE*nbPE,type="VOLUME")
 				if debug:m.display()
-				m.run(["psolve"])
 				if debug:m.display(activate="PRINT_CODE_REGIONS")
 				m.partial_eval()
 				if debug:m.display()

@@ -1941,6 +1941,31 @@ int expression_to_int(expression exp)
     pips_internal_error("expression is not an integer constant");
   return(rv);
 }
+/* same as above for floats */
+float expression_to_float(expression exp)
+{
+  int rv = 0;
+
+  pips_debug( 7, "doing\n");
+  if(expression_constant_p(exp)) {
+    call c = syntax_call(expression_syntax(exp));
+    switch(value_tag(entity_initial(call_function(c)))) {
+    case is_value_constant:	{
+      rv = atof(entity_user_name(call_function(c)));
+      break;
+    }
+    case is_value_intrinsic: {
+      rv = 0 - expression_to_float(binary_call_lhs(c));
+      break;
+    }
+    default:
+      pips_internal_error("expression is not a constant");
+    }
+  }
+  else
+    pips_internal_error("expression is not a constant");
+  return(rv);
+}
 
 constant expression_constant(expression exp)
 {
@@ -1960,6 +1985,34 @@ constant expression_constant(expression exp)
     }
   }
   return constant_undefined;
+}
+
+bool expression_integer_constant_p(e)
+expression e;
+{
+    syntax s = expression_syntax(e);
+    normalized n = expression_normalized(e);
+
+    if ((n!=normalized_undefined) && (normalized_linear_p(n)))
+    {
+	Pvecteur v = normalized_linear(n);
+	int s = vect_size(v);
+
+	if (s==0) return(TRUE);
+	if (s>1) return(FALSE);
+	return((s==1) && value_notzero_p(vect_coeff(TCST,v)));
+    }
+    else
+    if (syntax_call_p(s))
+    {
+	call c = syntax_call(s);
+	value v = entity_initial(call_function(c));
+
+	/* I hope a short evaluation is made by the compiler */
+	return((value_constant_p(v)) && (constant_int_p(value_constant(v))));
+    }
+    
+    return(FALSE);
 }
 /*=================================================================*/
 /* bool expression_constant_p(expression exp)
@@ -3095,7 +3148,22 @@ expression monome_to_expression(Pmonome pm)
             coeff = (x==1.f)? expression_undefined:int_to_expression((int)x);
         else
             coeff = float_to_expression(x);
-        expression term = Pvecteur_to_expression(monome_term(pm));
+        expression term = expression_undefined;
+        for(Pvecteur v = monome_term(pm);!VECTEUR_NUL_P(v);v=vecteur_succ(v)) {
+            Value exp = vecteur_val(v);
+            Variable var = vecteur_var(v);
+            expression tmp ;
+            if(exp==0||var==TCST) tmp = int_to_expression(1); 
+            else {
+                Value val = exp>0 ? exp: -exp;
+                tmp = entity_to_expression((entity)var);
+                while(--val)
+                    tmp=MakeBinaryCall(entity_intrinsic(MULTIPLY_OPERATOR_NAME),tmp,entity_to_expression((entity)var));
+                if(exp<0)
+                    tmp=MakeBinaryCall(entity_intrinsic(DIVIDE_OPERATOR_NAME),int_to_expression(1),tmp);
+            }
+            term=expression_undefined_p(term)?tmp:make_op_exp(MULTIPLY_OPERATOR_NAME,term,tmp);
+        }
         return expression_undefined_p(coeff)?term:
             make_op_exp(MULTIPLY_OPERATOR_NAME, coeff, term);
     }

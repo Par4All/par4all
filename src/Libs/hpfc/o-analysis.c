@@ -279,34 +279,6 @@ list l;
 }
 */
 
-bool expression_integer_constant_p(e)
-expression e;
-{
-    syntax s = expression_syntax(e);
-    normalized n = expression_normalized(e);
-
-    if ((n!=normalized_undefined) && (normalized_linear_p(n)))
-    {
-	Pvecteur v = normalized_linear(n);
-	int s = vect_size(v);
-
-	if (s==0) return(TRUE);
-	if (s>1) return(FALSE);
-	return((s==1) && value_notzero_p(vect_coeff(TCST,v)));
-    }
-    else
-    if (syntax_call_p(s))
-    {
-	call c = syntax_call(s);
-	value v = entity_initial(call_function(c));
-
-	/* I hope a short evaluation is made by the compiler */
-	return((value_constant_p(v)) && (constant_int_p(value_constant(v))));
-    }
-    
-    return(FALSE);
-}
-
 /*   generate the call to the dynamic loop bounds computation
  */
 static statement 

@@ -44,6 +44,7 @@
 #include "misc.h"
 #include "control.h"
 #include "conversion.h"
+#include "expressions.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
@@ -53,59 +54,6 @@
 #include "transformer.h"
 #include "accel-util.h"
 
-
-/* computes the volume of a region
- * output it as a string representing the associated polynomial
- * maybe one day, conversion from string to expression will be possible ?
- *
- * the string is here to communicate with polylib.
- * It would be far better to convert polylib view into an expression
- *
- * the result is in number of bytes used
- */
-static
-Ppolynome region_enumerate(region reg)
-{
-    Psysteme r_sc = region_system(reg);
-    sc_fix(r_sc);
-    Pbase sorted_base = region_sorted_base_dup(reg);
-    sc_base(r_sc)=sorted_base;
-    Pbase local_base = BASE_NULLE;
-    for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
-        if(!variable_phi_p((entity)b->var))
-            local_base=base_add_variable(local_base,b->var);
-
-    const char * base_names [sc_dimension(r_sc)];
-    int i=0;
-    for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
-        base_names[i++]=entity_user_name((entity)b->var);
-
-    ifdebug(1) print_region(reg);
-
-    Ppolynome p = sc_enumerate(r_sc,
-            local_base,
-            base_names);
-    return p;
-}
-
-#define SCILAB_PSOLVE "psolve"
-
-#if 0
-static bool statement_parent_walker(statement s, statement *param)
-{
-    if(s == param[0]) {
-        param[1]=(statement)gen_get_ancestor(statement_domain,s);
-        gen_recurse_stop(NULL);
-    }
-    return true;
-}
-static statement statement_parent(statement root, statement s)
-{
-    statement args[] = { s, statement_undefined };
-    gen_context_recurse(root,args,statement_domain,statement_parent_walker,gen_null);
-    return args[1] == NULL || statement_undefined_p(args[1]) ? s : args[1];
-}
-#endif
 static bool do_solve_hardware_constraints_on_nb_proc(entity e, statement s) {
     list regions = load_cumulated_rw_effects_list(s);
 
@@ -212,7 +160,7 @@ static bool do_solve_hardware_constraints_on_nb_proc(entity e, statement s) {
     return true;
 }
 
-static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
+static bool do_solve_hardware_constraints_on_volume(entity unknown, statement s) {
     list regions = load_cumulated_rw_effects_list(s);
 
     list read_regions = regions_read_regions(regions);
@@ -220,9 +168,8 @@ static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
     transformer tr = transformer_range(load_statement_precondition(s));
 
     set visited_entities = set_make(set_pointer);
-    char * volume_used[gen_length(regions)];
-    size_t volume_index=0;
 
+    Ppolynome volume_used = POLYNOME_NUL;
     FOREACH(REGION,reg,regions)
     {
         reference r = region_any_reference(reg);
@@ -244,9 +191,8 @@ static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
                 region hregion = rw_region;//region_hypercube(rw_region);
                 Ppolynome p = region_enumerate(hregion);
                 if(p) {
-                    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
-                    char * vused = polynome_sprint(p,(char * (*)(Variable))entity_user_name,is_inferior_pvarval);
-                    volume_used[volume_index++]=vused;
+                    polynome_add(&volume_used,p);
+                    polynome_rm(&p);
                 }
                 else
                     pips_user_error("unable to compute volume of the region of %s\n",entity_user_name(e));
@@ -255,23 +201,44 @@ static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
     }
     int max_volume= get_int_property("SOLVE_HARDWARE_CONSTRAINTS_LIMIT");
     if(max_volume<=0) pips_user_error("constraint limit must be greater than 0\n");
-    /* create a string representation of all polynome gathered */
-    char* full_poly =strdup(itoa(-max_volume));
-    for(int i=0;i<volume_index;i++) {
-        char *tmp;
-        asprintf(&tmp,"%s+%s",full_poly,volume_used[i]);
-        free(full_poly);
-        full_poly=tmp;
+    /* create a string representation of all polynomials gathered */
+    Pmonome m = monome_constant_new(-max_volume);
+    polynome_monome_add(&volume_used,m);
+    monome_rm(&m);
+    /* try to solve the polynomial */
+    Pvecteur roots = polynome_roots(volume_used,unknown);
+    expression eroot;
+    if(VECTEUR_UNDEFINED_P(roots)) { // that is volume_used is independent of unknown
+        expression cst = polynome_to_expression(volume_used);
+        partial_eval_expression_and_regenerate(&cst,predicate_system(transformer_relation(tr)),load_cumulated_rw_effects(s));
+        intptr_t val;
+        if(expression_integer_value(cst,&val) && val < 0 )
+            eroot=int_to_expression(42);//any value is ok
+        else
+            pips_user_error("no solution possible for this limit\n");
     }
-    /* call an external solver */
-    char *scilab_cmd;
-    asprintf(&scilab_cmd,SCILAB_PSOLVE " '%s' '%s'",full_poly,entity_user_name(e));
-    /* must put the pragma on a new statement, because the pragma will be changed into a statement later */
-    statement holder = make_continue_statement(entity_empty_label());
-    add_pragma_str_to_statement(holder,scilab_cmd,false);
-    //statement parent = statement_parent(get_current_module_statement(),s);
-    insert_statement(get_current_module_statement(),holder,true);
+    else {
+        Ppolynome root = (Ppolynome)vecteur_var(roots);//yes take the first without thinking more ...
+        eroot = polynome_to_expression(root);
+        if(expression_constant_p(eroot) &&!expression_integer_constant_p(eroot)) {
+            /* this takes the floor of the floating point expression ...*/
+            int ival = (int)expression_to_float(eroot);
+            free_expression(eroot);
+            eroot=int_to_expression(ival);
+        }
+    }
 
+    /* insert solution ~ this is an approximation ! 
+     * it only works if root is increasing
+     */
+    insert_statement(get_current_module_statement(),
+            make_assign_statement(entity_to_expression(unknown),eroot),
+            true);
+
+    /* tidy */
+    for(Pvecteur v = roots;!VECTEUR_NUL_P(v);v=vecteur_succ(v))
+        polynome_rm((Ppolynome*)&vecteur_var(v));
+    vect_rm(roots);
     set_free(visited_entities);
     gen_free_list(read_regions);
     gen_free_list(write_regions);

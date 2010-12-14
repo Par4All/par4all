@@ -398,6 +398,7 @@ entity float_to_entity(float c)
     string num;
     asprintf(&num, "%f", c);
     entity e = MakeConstant(num,is_basic_float);
+
     free(num);
     return e;
 }

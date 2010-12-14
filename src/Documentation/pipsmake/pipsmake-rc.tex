@@ -5418,6 +5418,48 @@ internalize_parallel_code             > MODULE.code
         < MODULE.parallelized_code
 \end{PipsMake}
 
+\subsection{Detect Computation Intensive Loops}
+
+\begin{PipsPass}{computation_intensity}
+Generate a pragma on each loop that seems to be computation intensive according to a simple cost model.
+\end{PipsPass}
+
+The computation intensity is derived from the complexity and the memory footprint.
+It assumes the cost model: 
+$$execution\_time = startup\_overhead + \frac{memory\_footprint}{bandwidth} + \frac{complexity}{frequency}$$
+A loop is marked with pragma \PipsPropRef{COMPUTATION_INTENSITY_PRAGMA} if the communication costs are lower
+than the execution cost as given by \PipsPassRef{uniform_complexities}.
+\begin{PipsMake}
+computation_intensity > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< MODULE.complexities
+\end{PipsMake}
+
+This correspond to the transfer startup overhead.
+Time unit is the same as in complexities.
+\begin{PipsProp}{COMPUTATION_INTENSITY_STARTUP_OVERHEAD}
+COMPUTATION_INTENSITY_STARTUP_OVERHEAD 10
+\end{PipsProp}
+
+This corresponds to the memory bandwidth in octet per time unit.
+\begin{PipsProp}{COMPUTATION_INTENSITY_BANDWIDTH}
+COMPUTATION_INTENSITY_BANDWIDTH 100
+\end{PipsProp}
+
+And This is the processor frequency, in operation per time unit.
+\begin{PipsProp}{COMPUTATION_INTENSITY_FREQUENCY}
+COMPUTATION_INTENSITY_FREQUENCY 1000
+\end{PipsProp}
+
+This is the generated pragma.
+\begin{PipsProp}{COMPUTATION_INTENSITY_PRAGMA}
+COMPUTATION_INTENSITY_PRAGMA "pips intensive loop"
+\end{PipsProp}
+
+Those values have limited meaning here, only their ratio have some.
+Having \PipsPropRef{COMPUTATION_INTENSITY_FREQUENCY} and \PipsPropRef{COMPUTATION_INTENSITY_BANDWIDTH}
+of the same magnitude clearly limits the number of generated pragmas\dots
 
 \subsection{Limit Parallelism in Parallel Loop Nests}
 \label{sec:manage-parallel-loops}
