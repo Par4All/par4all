@@ -29,3 +29,4 @@ main.ompify_code ()
 main.omp_merge_pragma ()
 
 main.display ()
+w.close()

@@ -150,7 +150,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 }
 Help on method unfolding in module pyps:
 
-unfolding(self, inlining_use_initialization_list=True, **props) unbound pyps.module method
+unfolding(self, inlining_use_initialization_list=None, **props) unbound pyps.module method
     Unfolding is a complementary transformation of
     inlining .  While inlining inlines all call
     sites to a given module in other modules, unfolding inlines
@@ -310,17 +310,16 @@ iable
 
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         I_3 = j_0*w+i_0;
-         current_0 = bytes[I_3];
+         current_0 = bytes[j_0*w+i_0];
          current_1 = lut[current_0];
-         dest[I_3] = (int) current_1+val>255?255:current_1+val;
+         dest[j_0*w+i_0] = (int) current_1+val>255?255:current_1+val;
       }
    
    
 }
 Help on method expression_substitution in module pyps:
 
-expression_substitution(self, pattern='', relax_float_associativity=False, **props) unbound pyps.module method
+expression_substitution(self, pattern=None, relax_float_associativity=None, **props) unbound pyps.module method
     This transformation is quickly developed to fulfill the need of a
     simple pattern matcher in pips.  The user provide a module name
     through  property and all
@@ -355,10 +354,9 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         I_3 = j_0*w+i_0;
-         current_0 = bytes[I_3];
+         current_0 = bytes[j_0*w+i_0];
          current_1 = lut[current_0];
-         dest[I_3] = adds(current_1, val);
+         dest[j_0*w+i_0] = adds(current_1, val);
       }
    
    
@@ -384,13 +382,11 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
-#pragma omp parallel for private(I_3,current_0,current_1,j_0)
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         I_3 = j_0*w+i_0;
-         current_0 = bytes[I_3];
+         current_0 = bytes[j_0*w+i_0];
          current_1 = lut[current_0];
-         dest[I_3] = adds(current_1, val);
+         dest[j_0*w+i_0] = adds(current_1, val);
       }
    
    
@@ -416,7 +412,6 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
-#pragma omp parallel for private(j_0)
 l99983:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
 l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
@@ -426,32 +421,26 @@ l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
-   int I_3;
-   //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
    int j_0;
 l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-      I_3 = j_0*w+*i_0;
-      current_0 = bytes[I_3];
+      current_0 = bytes[j_0*w+*i_0];
       current_1 = lut[current_0];
-      dest[I_3] = adds(current_1, val);
+      dest[j_0*w+*i_0] = adds(current_1, val);
    }
 }
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
-   //PIPS generated variable
-   int I_3;
    //PIPS generated variable
    unsigned char voltage_0, voltage_1;
    //PIPS generated variable
    int j_0;
 l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-      I_3 = j_0*w+*i_0;
-      voltage_0 = bytes[I_3];
+      voltage_0 = bytes[j_0*w+*i_0];
       voltage_1 = lut[voltage_0];
-      dest[I_3] = adds(voltage_1, val);
+      dest[j_0*w+*i_0] = adds(voltage_1, val);
    }
 }
