@@ -78,7 +78,7 @@ words_constant(constant obj)
 
 static list words_value(value obj)
 {
-    list pc;
+    list pc=NIL;
 
     if (value_symbolic_p(obj)) {
 	pc = words_constant(symbolic_constant(value_symbolic(obj)));
