@@ -8,16 +8,16 @@
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
 
-      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C, I, J)                      0008
+      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)                            0008
 
-      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C, I, J)                   0015
+      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)                         0015
 
       END
 !!
 !! file for matadd.f.f
 !!
-      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C, I, J)
-      INTEGER J, I, M, N, I, J
+      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      INTEGER J, I, M, N
       REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
 
       DO I = 1, M                                                       0005
@@ -26,8 +26,8 @@
          ENDDO
       ENDDO
       END
-      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C, I, J)
-      INTEGER J, I, M, N, I, J
+      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      INTEGER J, I, M, N
       REAL*4 B(1:M, 1:N), C(1:M, 1:N)
 
       DO I = 1, M                                                       0005
