@@ -34,7 +34,92 @@
 #include <cl.h>
 
 //#include <p4a_wrap-opencl.h>
-#include "p4a_include-OpenCL.h"
+//#include "p4a_include-OpenCL.h"
+
+/** A kernel list.
+*/
+#ifdef __cplusplus
+#include <map>
+#include <string>
+struct p4a_kernel_list {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+
+  p4a_kernel_list(const char *k) {
+    name = (char *)strdup(k);
+    kernel = NULL;  
+    char* kernelFile;
+    asprintf(&kernelFile,"./%s.cl",k);
+    file_name = (char *)strdup(kernelFile);
+  }
+  ~p4a_kernel_list() {}
+};
+
+extern std::map<std::string, struct p4a_kernel_list * > p4a_kernels_map ;
+#else
+struct p4a_kernel_list {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+  struct p4a_kernel_list *next;
+};
+
+/** Begin of the kernels list
+ */
+extern struct p4a_kernel_list *p4a_kernels;
+
+/** Pointer to the current kernel descriptor
+ */
+extern struct p4a_kernel_list *current_kernel;
+
+struct p4a_kernel_list* new_p4a_kernel(const char *kernel);
+struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel);
+void setArguments(int i,char *s,size_t size,void * ref_arg);
+#endif
+
+/** A timer Tag to know when to print p4a_time_copy
+ */
+extern bool p4a_time_tag;
+/** Total execution time.
+    In OpenCL, time is mesured for each lunch of the kernel.
+    We also need to cumulate all the particulate times.
+ */
+extern double p4a_time_execution;
+/** Total time for copy of data (transfers host <-> device).
+ */
+extern double p4a_time_copy;
+/** Global error in absence of a getLastError equivalent in OpenCL */
+extern cl_int p4a_global_error;
+/** Events for timing in CL: */
+extern cl_event p4a_event_execution, p4a_event_copy;
+/** The OpenCL context ~ a CPU process 
+- a module
+- data
+- specific memory address 
+*/
+extern cl_context p4a_context;
+/** The OpenCL command queue, that allows delayed execution
+ */
+extern cl_command_queue p4a_queue;
+
+extern cl_command_queue_properties p4a_queue_properties;
+
+
+/** The OpenCL programm composed of a set of modules
+ */
+extern cl_program p4a_program;  
+/** The current module selected in the program
+ */
+extern cl_kernel p4a_kernel; 
+
+
+char * p4a_error_to_string(int error);
+void p4a_clean(int exitCode);
+void p4a_error(cl_int error,const char *currentFile,const int currentLine);
+void p4a_message(const char *message,const char *currentFile,const int currentLine);
+void p4a_load_kernel_arguments(const char *kernel,...);
+char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length);
 
 /** @}
  */
@@ -103,19 +188,35 @@
 
 #define CONCAT(a,b) a ## b
 
+#define STRINGIFY(val) (char *)#val
+
+#ifdef __cplusplus
 template<typename ARG0> inline void setArguments(int i,char *s,ARG0 arg0) {
   printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,sizeof(arg0),&arg0);
   P4A_test_execution_with_message("clSetKernelArg");
 }
- 
-#define STRINGIFY(val) (char *)#val
-
 #define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
+#else
+/* See the function setArguments in p4a_accel.h */
+#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),sizeof(x),&x);		
+#endif 
+
+
+//#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
 #define SETARG2(n,x,...)  SETARG1(n,x,...) SETARG1(n+1,__VA_ARGS__) 	
 #define SETARG3(n,x,...)  SETARG1(n,x,...) SETARG2(n+1,__VA_ARGS__) 	
 #define SETARG4(n,x,...)  SETARG1(n,x,...) SETARG3(n+1,__VA_ARGS__) 	
-
+#define SETARG5(n,x,...)  SETARG1(n,x,...) SETARG4(n+1,__VA_ARGS__) 	
+#define SETARG6(n,x,...)  SETARG1(n,x,...) SETARG5(n+1,__VA_ARGS__) 	
+#define SETARG7(n,x,...)  SETARG1(n,x,...) SETARG6(n+1,__VA_ARGS__) 	
+#define SETARG8(n,x,...)  SETARG1(n,x,...) SETARG7(n+1,__VA_ARGS__) 	
+#define SETARG9(n,x,...)  SETARG1(n,x,...) SETARG8(n+1,__VA_ARGS__) 	
+#define SETARG10(n,x,...)  SETARG1(n,x,...) SETARG9(n+1,__VA_ARGS__) 	
+#define SETARG11(n,x,...)  SETARG1(n,x,...) SETARG10(n+1,__VA_ARGS__) 	
+#define SETARG12(n,x,...)  SETARG1(n,x,...) SETARG11(n+1,__VA_ARGS__) 	
+#define SETARG13(n,x,...)  SETARG1(n,x,...) SETARG12(n+1,__VA_ARGS__) 	
+#define SETARG14(n,x,...)  SETARG1(n,x,...) SETARG13(n+1,__VA_ARGS__) 	
 
 #define SETARGSN(...)  CONCATN(SETARG,PP_NARG(__VA_ARGS__))(0,__VA_ARGS__)
 
