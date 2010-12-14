@@ -644,10 +644,13 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                 hash_put(ctxt->entity_to_entity,already_there,other);
                 AddEntityToCurrentModule(already_there);
                 /* and fill the header / footer / increment */
+                intptr_t v;
                 ctxt->header_statements=CONS(
                         STATEMENT,
                         make_assign_statement(
                             entity_to_expression(already_there),
+                            expression_integer_value(ctxt->init,&v) && v == 0 ?
+                            entity_to_expression(other):
                             MakeBinaryCall(
                                 entity_intrinsic(PLUS_C_OPERATOR_NAME),
                                 entity_to_expression(other),
