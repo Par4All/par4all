@@ -64,9 +64,8 @@
  * the result is in number of bytes used
  */
 static
-char* region_enumerate(region reg)
+Ppolynome region_enumerate(region reg)
 {
-    char * volume_used = NULL;
     Psysteme r_sc = region_system(reg);
     sc_fix(r_sc);
     Pbase sorted_base = region_sorted_base_dup(reg);
@@ -83,19 +82,10 @@ char* region_enumerate(region reg)
 
     ifdebug(1) print_region(reg);
 
-    Pehrhart er = sc_enumerate(r_sc,
+    Ppolynome p = sc_enumerate(r_sc,
             local_base,
             base_names);
-    if(er) {
-        char ** ps = Pehrhart_string(er,base_names);
-        /* use the smallest ... */
-        volume_used = *ps;
-        for(char **iter=ps +1;*iter ; ++iter)
-            if(strlen(volume_used) > strlen(*iter)) volume_used=*iter;
-        for(char ** iter = ps; *iter; iter++) if(*iter!=volume_used) free(*iter);
-        free(ps);
-    }
-    return volume_used;
+    return p;
 }
 
 #define SCILAB_PSOLVE "psolve"
@@ -252,9 +242,12 @@ static bool do_solve_hardware_constraints_on_volume(entity e, statement s) {
                     regions_must_convex_hull(read_region,write_region);
 
                 region hregion = rw_region;//region_hypercube(rw_region);
-                char * vused = region_enumerate(hregion);
-                if(vused)
+                Ppolynome p = region_enumerate(hregion);
+                if(p) {
+                    extern int is_inferior_pvarval(Pvecteur *, Pvecteur *);
+                    char * vused = polynome_sprint(p,(char * (*)(Variable))entity_user_name,is_inferior_pvarval);
                     volume_used[volume_index++]=vused;
+                }
                 else
                     pips_user_error("unable to compute volume of the region of %s\n",entity_user_name(e));
             }
