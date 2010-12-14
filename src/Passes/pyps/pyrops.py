@@ -91,7 +91,8 @@ import pyps
 class pworkspace(pyps.workspace):
 	def __init__(self,*args,**kwargs):
 		self.launcher = Launcher()
-		super(pworkspace, self).__init__(*args, cpypips=self.launcher.getObj(), **kwargs)
+		kwargs['cpypips']=self.launcher.getObj()
+		super(pworkspace, self).__init__(*args, **kwargs)
        
 	def close(self):
 		pyps.workspace.close(self)

@@ -60,15 +60,16 @@ def printPythonMethod(name,doc):
 		props = []
 		for prop in pipsdep[name]:
 			short_prop = re.sub(r'^' + name + '\_(.*)', r'\1', prop)
-			arg = short_prop + "=" + pipsprops[prop.upper()]
+			arg = short_prop + "=None" # + pipsprops[prop.upper()]
 
 			if prop == "loop_label":
 				has_loop_label = True;
 				extraparamsetter = '\t\tif self._ws:pypsutils._set_property(self._ws,"' + prop.upper() + '", self._label)\n' + extraparamsetter
 			else:
 				props.append(arg)
-				extraparamsetter = '\t\tif self._ws:self._ws.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop) + extraparamsetter
-				extraparamresetter = extraparamresetter + '\t\tif self._ws:self._ws.cpypips.pop_property("%s")\n' % (prop.upper()) 
+				extraparamsetter += '\t\tif not '+short_prop+' and self._ws:'+short_prop+'=self._ws.props.'+prop + '\n'
+				extraparamsetter += '\t\tif self._ws:self._ws.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop)
+				extraparamresetter = '\t\tif self._ws:self._ws.cpypips.pop_property("%s")\n' % (prop.upper()) + extraparamresetter
 
 		if len(props) > 0:
 			extraparams = ",".join(props) + ","
