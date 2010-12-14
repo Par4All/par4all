@@ -380,9 +380,10 @@ static hash_table outliner_smart_references_computation(list referenced_entities
     }
     return entity_to_init;
 }
-static void statements_localize_declarations(list statements,entity module,statement module_statement)
+static list statements_localize_declarations(list statements,entity module,statement module_statement)
 {
     list sd = statements_to_declarations(statements);
+    list localized = NIL;
     FOREACH(STATEMENT, s, statements)
     {
         /* We want to declare private variables as locals, but it may not
@@ -393,11 +394,13 @@ static void statements_localize_declarations(list statements,entity module,state
         {
             if(gen_chunk_undefined_p(gen_find_eq(e,sd))) {
                 AddLocalEntityToDeclarations(e,module,module_statement);
+                localized=CONS(ENTITY,e,localized);
             }
         }
         gen_free_list(private_ents);
     }
     gen_free_list(sd);
+    return localized;
 }
 static list statements_referenced_entities(list statements)
 {
@@ -537,9 +540,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
 
     /* Retrieve declared entities */
-    statements_localize_declarations(statements_to_outline,new_fun,new_body);
+    list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
-    declared_entities=gen_nconc(declared_entities,statement_to_declarations(new_body));
+    declared_entities=gen_nconc(declared_entities,localized);
     
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
@@ -548,7 +551,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* purge the functions from the parameter list, we assume they are declared externally
      * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
-     * also purge memebers, not relevant
+     * also purge members, not relevant
      */
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
