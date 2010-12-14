@@ -359,9 +359,27 @@ transformer declarations_to_transformer(list dl, transformer pre)
 
 /* Compute the transformer of a block under precondition pre
  *
+ * Precondition pre may be undefined to compute transformers purely
+ * upwards or be defined if the transformers are refined (apply
+ * REFINE_TRANSFORMERS) or if the transformers are computed in context.
+ *
  * FI: it is not clear if postconditions should be propagated or if
  * the range of the current transformer is exactly what is needed to
  * compute the transformer of the next statement.
+ *
+ * When precondition pre is undefined, this piece of code is supposed
+ * to behave as if preconditions were never calculated nor used. The
+ * complexiy problem encountered with Semantics/mpeg2enc even with the
+ * option SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT FALSE seems to
+ * indicate that we end up with usable preconditions even when they
+ * are not needed.
+ *
+ * FI: more investigation is needed to control the execution time. The
+ * spontaneous computation of preconditions would lead to a time
+ * increase at all levels, for instance when non-affine operators are
+ * approximated. The behavior of block_to_transformer() seems OK with
+ * Semantics-New/block01. It should be checked again with
+ * Semantics-New mpeg2enc.
  */
 static transformer block_to_transformer(list b, transformer pre)
 {
@@ -388,9 +406,9 @@ static transformer block_to_transformer(list b, transformer pre)
       if(!transformer_undefined_p(next_pre))
 	free_transformer(next_pre);
 
-      // In case, this is a performance bug due to r18644
-      //next_pre = transformer_range(post);
-      //free_transformer(post);
+      // In case "ocean", this is a performance bug due to r18644
+      // next_pre = transformer_range(post);
+      // free_transformer(post);
       next_pre = post;
 
       stf = statement_to_transformer(s, next_pre);
@@ -422,7 +440,7 @@ static transformer block_to_transformer(list b, transformer pre)
   // large coefficients introduced earlier
   //
   // FI: does not seem to do much good because the normalization may
-  // increase the compelxity of the constraints
+  // increase the complexity of the constraints
   // btf = transformer_normalize(btf, 4);
 
   pips_debug(8, "end\n");
@@ -434,17 +452,15 @@ list effects_to_arguments(list fx) /* list of effects */
   /* algorithm: keep only write effects on scalar variable with values */
   list args = NIL;
 
-  MAP(EFFECT, ef, 
-  {
+  FOREACH(EFFECT, ef, fx) {
     reference r = effect_any_reference(ef);
     action a = effect_action(ef);
     entity e = reference_variable(r);
-	
+
     if(action_write_p(a) && entity_has_values_p(e)) {
       args = arguments_add_entity(args, e);
     }
-  },
-      fx);
+  }
 
   return args;
 }
