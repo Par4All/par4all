@@ -331,8 +331,7 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    int x, y;
    //PIPS generated variable
    int x0, I_0, I_1, yt, xt;
-#pragma psolve '-65536+( 124 * __TERAPYPS_HEIGHT + 0 ) +( 128 * __TERAPYPS_HEIGHT + 0 ) ' '__TERAPYPS_HEIGHT'
-
+   __TERAPYPS_HEIGHT = 260;
    I_1 = (__TERAPYPS_HEIGHT+n-1)/__TERAPYPS_HEIGHT;
    I_0 = (n+119)/124;
 l99998:
@@ -358,8 +357,7 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    int x, y;
    //PIPS generated variable
    int x0, I_0, I_1, yt, xt;
-   __TERAPYPS_HEIGHT = 16384/63;
-
+   __TERAPYPS_HEIGHT = 260;
    I_1 = (__TERAPYPS_HEIGHT+n-1)/__TERAPYPS_HEIGHT;
    I_0 = (n+119)/124;
 
@@ -380,8 +378,8 @@ l99998:
 //    PHI2+1<=260I_1, __TERAPYPS_HEIGHT==260, __TERAPYPS_WIDTH==124,
 //    yt+122<=124I_0, n<=124I_0+4, 124I_0<=n+119, 1<=I_1, 2<=yt}>
 
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= __TERAPYPS_HEIGHT*I_1-__TERAPYPS_HEIGHT; xt += __TERAPYPS_HEIGHT)
 
 //  <img[PHI1][PHI2]-R-MAY-{yt<=PHI1+2, PHI1<=yt+125, xt<=PHI2,
@@ -393,8 +391,8 @@ l99993:
 //    yt+122<=124I_0, n<=124I_0+4, 124I_0<=n+119, xt+260<=260I_1,
 //    0<=xt, 2<=yt}>
 
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
 
 //  <img[PHI1][PHI2]-R-MAY-{y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -406,8 +404,8 @@ l99994:
 //    n<=124I_0+4, 124I_0<=n+119, xt+260<=260I_1, 0<=xt, yt<=y,
 //    y<=yt+123, 2<=yt}>
 
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= MIN(__TERAPYPS_HEIGHT+xt, __TERAPYPS_HEIGHT*I_1)-1; x += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{PHI2==x, y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -428,19 +426,18 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    //PIPS generated variable
    int x0, I_0, I_1, yt, xt;
    __TERAPYPS_HEIGHT = 260;
-
    I_1 = (n+259)/260;
    I_0 = (n+119)/124;
 l99998:
    for(yt = 2; yt <= 124*I_0-122; yt += 124)
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*I_1-260; xt += 260)
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 }
@@ -451,19 +448,18 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    //PIPS generated variable
    int x0, I_0, I_1, yt, xt;
    __TERAPYPS_HEIGHT = 260;
-
    I_1 = (n+259)/260;
    I_0 = (n+119)/124;
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 }
@@ -478,7 +474,6 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    int x, y;
    //PIPS generated variable
    int yt, xt;
-
 
 
 
@@ -496,8 +491,8 @@ l99998:
 //  <img_out[PHI1][PHI2]-W-MAY-{yt<=PHI1+2, PHI1<=yt+121, 0<=PHI2,
 //    PHI2<=n+258, 2<=yt, yt+3<=n}>
 
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
 
 //  <img[PHI1][PHI2]-R-EXACT-{yt<=PHI1+2, PHI1<=yt+125, xt<=PHI2,
@@ -505,8 +500,8 @@ l99993:
 //  <img_out[PHI1][PHI2]-W-EXACT-{yt<=PHI1+2, PHI1<=yt+121, xt<=PHI2,
 //    PHI2<=xt+259, 0<=xt, xt+1<=n, 2<=yt, yt+3<=n}>
 
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -514,8 +509,8 @@ l99994:
 //  <img_out[PHI1][PHI2]-W-EXACT-{PHI1==y-2, xt<=PHI2, PHI2<=xt+259,
 //    0<=xt, xt+1<=n, yt<=y, y<=yt+123, 2<=yt, yt+3<=n}>
 
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{PHI2==x, y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -533,22 +528,21 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260) {
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 #pragma pips inserted statement to check
          for(y = yt+124; y <= yt+127; y += 1)
-l99999:
+l99992:
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
       }
@@ -561,22 +555,21 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260) {
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= yt+123; y += 1)
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 #pragma pips inserted statement to check
          for(y = yt+124; y <= yt+127; y += 1)
-l99999:
+l99992:
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
       }
@@ -590,17 +583,16 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
+#pragma omp parallel for private(x)
 l99993:
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260) {
+#pragma omp parallel for 
 l99994:
-#pragma  omp parallel for 
          for(y = yt; y <= 128*I_2+yt-1; y += 1)
+#pragma omp parallel for 
 l99995:
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 
@@ -615,14 +607,10 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
-#pragma  omp parallel for 
          for(y = yt; y <= yt+127; y += 1)
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 }
@@ -637,7 +625,6 @@ void runner(int n, int img_out[n-4][n], int img[n][n])
    int x, y;
    //PIPS generated variable
    int yt, xt, I_2;
-
 
 
 
@@ -656,7 +643,6 @@ l99998:
 //  <img_out[PHI1][PHI2]-W-MAY-{yt<=PHI1+2, PHI1<=yt+125, 0<=PHI2,
 //    PHI2<=n+258, 2<=yt, yt+3<=n}>
 
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
 
 //  <img[PHI1][PHI2]-R-EXACT-{yt<=PHI1+2, PHI1<=yt+129, xt<=PHI2,
@@ -664,7 +650,6 @@ l99998:
 //  <img_out[PHI1][PHI2]-W-EXACT-{yt<=PHI1+2, PHI1<=yt+125, xt<=PHI2,
 //    PHI2<=xt+259, 0<=xt, xt+1<=n, 2<=yt, yt+3<=n}>
 
-#pragma  omp parallel for 
          for(y = yt; y <= yt+127; y += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -672,7 +657,6 @@ l99998:
 //  <img_out[PHI1][PHI2]-W-EXACT-{PHI1==y-2, xt<=PHI2, PHI2<=xt+259,
 //    0<=xt, xt+1<=n, yt<=y, y<=yt+127, 2<=yt, yt+3<=n}>
 
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{PHI2==x, y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -691,14 +675,10 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
-#pragma  omp parallel for private(x)
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
-#pragma  omp parallel for 
          for(y = yt; y <= yt+127; y += 1)
-#pragma  omp parallel for 
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 }
@@ -797,7 +777,6 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 //  <img[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=n+126, 0<=PHI2,
 //    PHI2<=n+258, 5<=n}>
 //  <img_out[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=n+122, 0<=PHI2,
@@ -811,8 +790,7 @@ l99998:
 //  <img_out[PHI1][PHI2]-W-MAY-{yt<=PHI1+2, PHI1<=yt+125, 0<=PHI2,
 //    PHI2<=n+258, 2<=yt, yt+3<=n}>
 
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
 
 //  <img[PHI1][PHI2]-R-EXACT-{yt<=PHI1+2, PHI1<=yt+129, xt<=PHI2,
@@ -820,8 +798,7 @@ l99992:
 //  <img_out[PHI1][PHI2]-W-EXACT-{yt<=PHI1+2, PHI1<=yt+125, xt<=PHI2,
 //    PHI2<=xt+259, 0<=xt, xt+1<=n, 2<=yt, yt+3<=n}>
 
-l99996:
-#pragma  omp parallel for 
+l99990:
          for(y = yt; y <= yt+127; y += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -829,8 +806,7 @@ l99996:
 //  <img_out[PHI1][PHI2]-W-EXACT-{PHI1==y-2, xt<=PHI2, PHI2<=xt+259,
 //    0<=xt, xt+1<=n, yt<=y, y<=yt+127, 2<=yt, yt+3<=n}>
 
-l99997:
-#pragma  omp parallel for 
+l99991:
             for(x = xt; x <= xt+259; x += 1)
 
 //  <img[PHI1][PHI2]-R-EXACT-{PHI2==x, y<=PHI1+2, PHI1<=y+2, xt<=PHI2,
@@ -849,17 +825,13 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260)
-l99996:
-#pragma  omp parallel for 
+l99990:
          for(y = yt; y <= yt+127; y += 1)
-l99997:
-#pragma  omp parallel for 
+l99991:
             for(x = xt; x <= xt+259; x += 1)
                img_out[y-2][x] = MIN(MIN(MIN(MIN(img[y-2][x], img[y-1][x]), img[y][x]), img[y+1][x]), img[y+2][x]);
 }
@@ -872,11 +844,9 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 2; yt <= 124*((n+119)/124)-122; yt += 124)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= 260*((n+259)/260)-260; xt += 260) {
          {
             //PIPS generated variable
@@ -885,11 +855,9 @@ l99992:
             P4A_accel_malloc((void **) &img0, sizeof(int)*34320);
             P4A_copy_to_accel_2d(sizeof(int), MIN((131*n-131)/4, n+126)+1, MIN((263*n-263)/4, n+258)+1, 132, 260, yt-2, xt, &img[0][0], *img0);
 
-l99996:
-#pragma  omp parallel for 
+l99990:
             for(y = yt; y <= yt+127; y += 1)
-l99997:
-#pragma  omp parallel for 
+l99991:
                for(x = xt; x <= xt+259; x += 1)
                   (*img_out0)[y-2-(yt-2)][x-xt] = MIN(MIN(MIN(MIN((*img0)[y-2-(yt-2)][x-xt], (*img0)[y-1-(yt-2)][x-xt]), (*img0)[y-(yt-2)][x-xt]), (*img0)[y+1-(yt-2)][x-xt]), (*img0)[y+2-(yt-2)][x-xt]);
             P4A_copy_from_accel_2d(sizeof(int), n+123, n+259, 128, 260, yt-2, xt, &img_out[0][0], *img_out0);
@@ -907,11 +875,9 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 0; yt <= (124*((n+119)/124)-122-2+124)/124+-1; yt += 1)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= (260*((n+259)/260)-260+260)/260+-1; xt += 1) {
          {
             //PIPS generated variable
@@ -920,11 +886,9 @@ l99992:
             P4A_accel_malloc((void **) &img0, sizeof(int)*34320);
             P4A_copy_to_accel_2d(sizeof(int), MIN((131*n-131)/4, n+126)+1, MIN((263*n-263)/4, n+258)+1, 132, 260, 124*yt+2-2, 260*xt, &img[0][0], *img0);
 
-l99996:
-#pragma  omp parallel for 
+l99990:
             for(y = 0; y <= 127; y += 1)
-l99997:
-#pragma  omp parallel for 
+l99991:
                for(x = 0; x <= 259; x += 1)
                   (*img_out0)[y+124*yt+2-2-(124*yt+2-2)][x+260*xt-260*xt] = MIN(MIN(MIN(MIN((*img0)[y+124*yt+2-2-(124*yt+2-2)][x+260*xt-260*xt], (*img0)[y+124*yt+2-1-(124*yt+2-2)][x+260*xt-260*xt]), (*img0)[y+124*yt+2-(124*yt+2-2)][x+260*xt-260*xt]), (*img0)[y+124*yt+2+1-(124*yt+2-2)][x+260*xt-260*xt]), (*img0)[y+124*yt+2+2-(124*yt+2-2)][x+260*xt-260*xt]);
             P4A_copy_from_accel_2d(sizeof(int), n+123, n+259, 128, 260, 124*yt+2-2, 260*xt, &img_out[0][0], *img_out0);
@@ -942,11 +906,9 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 0; yt <= (n+119)/124-1; yt += 1)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= (n+259)/260-1; xt += 1) {
          {
             //PIPS generated variable
@@ -955,11 +917,9 @@ l99992:
             P4A_accel_malloc((void **) &img0, 34320*sizeof(int));
             P4A_copy_to_accel_2d(sizeof(int), MIN((131*n-131)/4, n+126)+1, MIN((263*n-263)/4, n+258)+1, 132, 260, 124*yt, 260*xt, &img[0][0], *img0);
 
-l99996:
-#pragma  omp parallel for 
+l99990:
             for(y = 0; y <= 127; y += 1)
-l99997:
-#pragma  omp parallel for 
+l99991:
                for(x = 0; x <= 259; x += 1)
                   (*img_out0)[y][x] = MIN(MIN(MIN(MIN((*img0)[y][x], (*img0)[y+1][x]), (*img0)[y+2][x]), (*img0)[y+3][x]), (*img0)[y+4][x]);
             P4A_copy_from_accel_2d(sizeof(int), n+123, n+259, 128, 260, 124*yt, 260*xt, &img_out[0][0], *img_out0);
@@ -978,11 +938,9 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 0; yt <= (n+119)/124-1; yt += 1)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= (n+259)/260-1; xt += 1) {
          {
             //PIPS generated variable
@@ -991,7 +949,7 @@ l99992:
             P4A_accel_malloc((void **) &img0, 34320*sizeof(int));
             P4A_copy_to_accel_2d(sizeof(int), MIN((131*n-131)/4, n+126)+1, MIN((263*n-263)/4, n+258)+1, 132, 260, 124*yt, 260*xt, &img[0][0], *img0);
 
-l99996:            launcher_0(259+1, *img0, *img_out0);
+l99990:            launcher_0(259+1, *img0, *img_out0);
             P4A_copy_from_accel_2d(sizeof(int), n+123, n+259, 128, 260, 124*yt, 260*xt, &img_out[0][0], *img_out0);
             P4A_accel_free(img_out0);
             P4A_accel_free(img0);
@@ -1014,8 +972,7 @@ void launcher_0(int I_3, int img0[132][260], int img_out0[128][260])
 //  <img_out0[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=127, 0<=PHI2,
 //    PHI2<=259, I_3==260}>
 
-l99996:
-#pragma   omp parallel for 
+l99990:
    for(y = 0; y <= 127; y += 1)
 
 //  <img0[PHI1][PHI2]-R-EXACT-{y<=PHI1, PHI1<=y+4, 0<=PHI2, PHI2<=259,
@@ -1023,8 +980,7 @@ l99996:
 //  <img_out0[PHI1][PHI2]-W-EXACT-{PHI1==y, 0<=PHI2, PHI2<=259,
 //    I_3==260, 0<=y, y<=127}>
 
-l99997:
-#pragma   omp parallel for 
+l99991:
       for(x = 0; x <= I_3-1; x += 1)
 
 //  <img0[PHI1][PHI2]-R-EXACT-{PHI2==x, y<=PHI1, PHI1<=y+4, I_3==260,
@@ -1039,11 +995,9 @@ void launcher_0(int I_3, int img0[132][260], int img_out0[128][260])
 {
    //PIPS generated variable
    int x, y;
-l99996:
-#pragma   omp parallel for 
+l99990:
    for(y = 0; y <= 127; y += 1)
-l99997:
-#pragma   omp parallel for 
+l99991:
       for(x = 0; x <= I_3-1; x += 1)
          img_out0[y][x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y+1][x]), img0[y+2][x]), img0[y+3][x]), img0[y+4][x]);
 }
@@ -1051,15 +1005,13 @@ void launcher_0(int I_3, int img0[132][260], int img_out0[128][260])
 {
    //PIPS generated variable
    int x, y;
-l99996:
-#pragma   omp parallel for 
+l99990:
    for(y = 0; y <= 127; y += 1)
-l99997:
-#pragma   omp parallel for 
+l99991:
       for(x = 0; x <= I_3-1; x += 1)
          img_out0[y][x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y+1][x]), img0[y+2][x]), img0[y+3][x]), img0[y+4][x]);
 }
-label: l99997
+label: l99991
 void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+126)+1][MIN((263*n-263)/4, n+258)+1])
 {
    int x, y;
@@ -1069,11 +1021,9 @@ void runner(int n, int img_out[n+122+1][n+258+1], int img[MIN((131*n-131)/4, n+1
 
 
 
-
 l99998:
    for(yt = 0; yt <= (n+119)/124-1; yt += 1)
-l99992:
-#pragma  omp parallel for private(x)
+l99989:
       for(xt = 0; xt <= (n+259)/260-1; xt += 1) {
          {
             //PIPS generated variable
@@ -1082,7 +1032,7 @@ l99992:
             P4A_accel_malloc((void **) &img0, 34320*sizeof(int));
             P4A_copy_to_accel_2d(sizeof(int), MIN((131*n-131)/4, n+126)+1, MIN((263*n-263)/4, n+258)+1, 132, 260, 124*yt, 260*xt, &img[0][0], *img0);
 
-l99996:            launcher_0(259+1, *img0, *img_out0);
+l99990:            launcher_0(259+1, *img0, *img_out0);
             P4A_copy_from_accel_2d(sizeof(int), n+123, n+259, 128, 260, 124*yt, 260*xt, &img_out[0][0], *img_out0);
             P4A_accel_free(img_out0);
             P4A_accel_free(img0);
@@ -1093,17 +1043,15 @@ void launcher_0(int I_3, int img0[132][260], int img_out0[128][260])
 {
    //PIPS generated variable
    int x, y;
-l99996:
-#pragma   omp parallel for 
+l99990:
    for(y = 0; y <= 127; y += 1)
-l99997:      launcher_0_microcode(y, I_3, img0, *&img_out0[y]);
+l99991:      launcher_0_microcode(y, I_3, img0, *&img_out0[y]);
 }
 void launcher_0_microcode(int y, int I_3, int img0[132][260], int img_out00[260])
 {
    //PIPS generated variable
    int x;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1)
       img_out00[x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y+1][x]), img0[y+2][x]), img0[y+3][x]), img0[y+4][x]);
 }
@@ -1113,8 +1061,7 @@ void launcher_0_microcode(int y, int I_3, int img0[132][260], int img_out00[260]
 {
    //PIPS generated variable
    int x;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1)
       img_out00[x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y+1][x]), img0[y+2][x]), img0[y+3][x]), img0[y+4][x]);
 
@@ -1123,8 +1070,7 @@ void launcher_0_microcode(int y, int I_3, int img0[132][260], int img_out00[260]
 {
    //PIPS generated variable
    int x;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1)
       img_out00[x] = MIN(MIN(MIN(MIN(img0[y][x], img0[y+1][x]), img0[y+2][x]), img0[y+3][x]), img0[y+4][x]);
 }
@@ -1132,8 +1078,7 @@ void launcher_0_microcode(int y, int I_3, int *img0, int *img_out00)
 {
    //PIPS generated variable
    int x;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1)
       *(img_out00+x) = MIN(MIN(MIN(MIN(*(img0+x+260*y), *(img0+x+260*y+260)), *(img0+x+260*y+520)), *(img0+x+260*y+780)), *(img0+x+260*y+1040));
 }
@@ -1144,8 +1089,7 @@ void launcher_0_microcode(int y, int I_3, int *img0, int *img_out00)
    //PIPS generated variable
    int *img_out000;
    img_out000 = img_out00;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1) {
       *img_out000 = MIN(MIN(MIN(MIN(*(img0+x+260*y), *(img0+x+260*y+260)), *(img0+x+260*y+520)), *(img0+x+260*y+780)), *(img0+x+260*y+1040));
       img_out000 += 1;
@@ -1179,8 +1123,7 @@ void launcher_0_microcode(int y, int I_3, int *img0, int *img_out00)
    //PIPS generated variable
    int *P_4;
    img_out000 = img_out00;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1) {
       I_4 = 260;
       I_4 = I_4*y;
@@ -1258,8 +1201,7 @@ void launcher_0_microcode(int y, int I_3, int *img0, int *img_out00)
    //PIPS generated variable
    int *P_4;
    img_out000 = img_out00;
-l99997:
-#pragma    omp parallel for 
+l99991:
    for(x = 0; x <= I_3-1; x += 1) {
       I_4 = 260;
       I_4 = I_4*y;
@@ -1397,10 +1339,9 @@ void launcher_0(int I_3, int img0[132][260], int img_out0[128][260])
 {
    //PIPS generated variable
    int x, y;
-l99996:
-#pragma   omp parallel for 
+l99990:
    for(y = 0; y <= 127; y += 1)
-l99997:      launcher_0_microcode(*&img_out0[y], img0, I_3, y);
+l99991:      launcher_0_microcode(*&img_out0[y], img0, I_3, y);
 }
 **** check ok ******
 void launcher_0_microcode(int *FIFO1, int *FIFO0, int N0, int y)

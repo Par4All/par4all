@@ -322,8 +322,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-#pragma psolve '-16384+128+( ( 128 * Nv + 0 )  * N + 0 ) ' 'N'
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -353,8 +352,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 
@@ -393,8 +391,8 @@ l99998:
 //    PHI2+1<=N+rgt, rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, I_0==1, tht==0,
 //    Nrg==13, Nth==12}>
 
+#pragma omp parallel for 
 l99992:
-#pragma  omp parallel for 
          for(th = tht; th <= MIN(tht+128, 128*I_0-1+1)-1; th += 1)
 
 //  <Pow[PHI1]-R-MAY-{PHI1==th, I_0==1, tht==0, Nrg==13, Nth==12,
@@ -408,8 +406,8 @@ l99992:
 //    rgt<=PHI2, 0<=PHI3, PHI3+1<=Nv, I_0==1, tht==0, Nrg==13,
 //    Nth==12, 0<=th, th<=127}>
 
+#pragma omp parallel for 
 l99993:
-#pragma  omp parallel for 
             for(rg = rgt; rg <= MIN(rgt+N, N*I_1-1+1)-1; rg += 1)
 
 //  <Pow[PHI1]-R-EXACT-{PHI1==th, I_0==1, tht==0, Nrg==13, Nth==12,
@@ -444,8 +442,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -455,11 +452,11 @@ l99998:
          //PIPS generated variable
          float (*Pow0)[Nth] = (float (*)[Nth]) 0;
 
+#pragma omp parallel for 
 l99992:
-#pragma  omp parallel for 
          for(th = tht; th <= MIN(tht+128, 128*I_0-1+1)-1; th += 1)
+#pragma omp parallel for 
 l99993:
-#pragma  omp parallel for 
             for(rg = rgt; rg <= MIN(rgt+N, N*I_1-1+1)-1; rg += 1)
 l99999:
                for(v = 0; v <= Nv-1; v += 1)
@@ -472,8 +469,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -483,11 +479,11 @@ l99998:
          //PIPS generated variable
          float (*Pow0)[Nth] = (float (*)[Nth]) 0;
 
+#pragma omp parallel for 
 l99992:
-#pragma  omp parallel for 
          for(th = 0; th <= MIN(128*tht+128, 128*I_0-1+1)-1-128*tht+1+-1; th += 1)
+#pragma omp parallel for 
 l99993:
-#pragma  omp parallel for 
             for(rg = 0; rg <= MIN(rgt+N, N*I_1-1+1)-1-rgt+1+-1; rg += 1)
 l99999:
                for(v = 0; v <= Nv-1; v += 1)
@@ -500,8 +496,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -511,11 +506,11 @@ l99998:
          //PIPS generated variable
          float (*Pow0)[Nth] = (float (*)[Nth]) 0;
 
+#pragma omp parallel for 
 l99992:
-#pragma  omp parallel for 
          for(th = 0; th <= 127; th += 1)
+#pragma omp parallel for 
 l99993:
-#pragma  omp parallel for 
             for(rg = 0; rg <= MIN(N+rgt, N*I_1)-rgt-1; rg += 1)
 l99999:
                for(v = 0; v <= Nv-1; v += 1)
@@ -529,8 +524,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -573,7 +567,6 @@ void launcher_0(int Nrg, int Nth, int Nv, int I_2, float Pow0[Nth], int rgt, Cpl
 //    Nth==12}>
 
 l99992:
-#pragma   omp parallel for 
    for(th = 0; th <= 127; th += 1)
 
 //  <Pow0[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, 0<=th, th<=127,
@@ -588,7 +581,6 @@ l99992:
 //    th<=127}>
 
 l99993:
-#pragma   omp parallel for 
       for(rg = 0; rg <= I_2-1; rg += 1)
 
 //  <Pow0[PHI1]-R-EXACT-{PHI1==th, Nrg==13, Nth==12, 0<=rg, rg+1<=I_2,
@@ -625,8 +617,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127/Nv;
-
+   N = 127*(1/Nv);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -645,7 +636,6 @@ void launcher_0(int Nrg, int Nth, int Nv, int I_2, float Pow0[Nth], int rgt, Cpl
    //PIPS generated variable
    int rg, th, v;
 l99992:
-#pragma   omp parallel for 
    for(th = 0; th <= 127; th += 1)
 l99993:      launcher_0_microcode(Nrg, Nv, I_2, rgt, &Pow0[th], *&ptrin[th]);
 }
@@ -654,7 +644,6 @@ void launcher_0_microcode(int Nrg, int Nv, int I_2, int rgt, float *Pow00, Cplfl
    //PIPS generated variable
    int rg, v;
 l99993:
-#pragma    omp parallel for 
    for(rg = 0; rg <= I_2-1; rg += 1)
 l99999:
       for(v = 0; v <= Nv-1; v += 1)

@@ -62,7 +62,6 @@ if __name__ == "__main__":
 				m.display(activate="PRINT_CODE_REGIONS")
 				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=2**14,type="VOLUME")
 				m.display()
-				m.run(["psolve"])
 				m.display(activate="PRINT_CODE_REGIONS")
 	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 	#			m.display()
