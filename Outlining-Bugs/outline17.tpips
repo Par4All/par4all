@@ -9,16 +9,17 @@ echo
 
 display PRINTED_FILE[%ALL]
 
+setproperty OUTLINE_MODULE_NAME "TOTO"
+setproperty OUTLINE_LABEL "10"
+
+apply PRIVATIZE_MODULE[OUTLINE17]
+apply OUTLINE[OUTLINE17]
+apply CLEAN_DECLARATIONS[OUTLINE17]
+apply CLEAN_DECLARATIONS[TOTO]
 
 echo
 echo Code after outlining
 echo
-
-
-setproperty OUTLINE_MODULE_NAME "TOTO"
-setproperty OUTLINE_LABEL "10"
-apply OUTLINE[OUTLINE17]
-apply CLEAN_DECLARATIONS[OUTLINE17]
 
 display PRINTED_FILE[%ALL]
 
