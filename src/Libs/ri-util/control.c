@@ -1124,6 +1124,10 @@ void
 link_2_control_nodes(control source,
 		     control target)
 {
+  // FI: should we check here that the statement of "source" is
+  // defined and if it is defined and that it already has a successor
+  // then it is a test? Might be better done here than later when
+  // trying to print out the statements...
     control_successors(source) = CONS(CONTROL,
 				      target,
 				      control_successors(source));
@@ -1143,6 +1147,7 @@ void
 unlink_2_control_nodes(control source,
 		       control target)
 {
+  // FI: no check that the nodes are properly linked before unlinking
     gen_remove(&control_successors(source), target);
     gen_remove(&control_predecessors(target), source);
 }

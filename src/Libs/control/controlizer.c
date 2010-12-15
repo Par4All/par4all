@@ -1589,11 +1589,12 @@ static bool controlize_test(control c_res,
   /* Then insert the 2 nodes for each branch, in the correct order since
      the "then" branch is the first successor of the test and the "else"
      branch is the second one: */
-  // TODO correct order ???
-  link_2_control_nodes(c_res, c_then);
-  link_2_control_nodes(c_then, succ);
+  // TODO correct order: link_2_control_nodes add the new arc in the
+  // first slot; so reverse linking of c_else and c_then
   link_2_control_nodes(c_res, c_else);
   link_2_control_nodes(c_else, succ);
+  link_2_control_nodes(c_res, c_then);
+  link_2_control_nodes(c_then, succ);
 
   /* Now we can contolize each branch statement to deal with some control
      flow fun: */

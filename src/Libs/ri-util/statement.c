@@ -1066,8 +1066,7 @@ statement_loop(statement s)
 
 
 /* Get the whileloop of a statement */
-whileloop
-statement_whileloop(statement s)
+whileloop statement_whileloop(statement s)
 {
   pips_assert("statement_whileloop", statement_whileloop_p(s));
 
