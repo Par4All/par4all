@@ -449,6 +449,13 @@ statement unsugared_loop_header(statement sl)
   return hs;
 }
 
+statement unsugared_whileloop_header(statement sl __attribute__ ((__unused__)))
+{
+  statement hs = make_plain_continue_statement();
+
+  return hs;
+}
+
 
 /* Do a crude test of end of do-loop for do-loop unsugaring.
 
@@ -468,6 +475,18 @@ statement unsugared_loop_test(statement sl)
 			  entity_to_expression(loop_index(l)),
 			  copy_expression(range_upper(loop_range(l))));
   /* Build if (i < u) with empty branches: */
+  test t = make_test(c,
+		     make_plain_continue_statement(),
+		     make_plain_continue_statement());
+
+  statement ts = instruction_to_statement(make_instruction_test(t));
+  return ts;
+}
+
+statement unsugared_whileloop_test(statement sl)
+{
+  whileloop wl = statement_whileloop(sl);
+  expression c = copy_expression(whileloop_condition(wl));
   test t = make_test(c,
 		     make_plain_continue_statement(),
 		     make_plain_continue_statement());
@@ -536,7 +555,8 @@ static bool controlize_loop(control c_res,
 
   /* Remove the loop body from the loop just in case we want to
      prettyprint our work in progress: */
-  loop_body(l) = statement_undefined;
+  //loop_body(l) = statement_undefined;
+  loop_body(l) = make_plain_continue_statement();
   /* Create a control node to host the loop body and insert it in the
      control graph: */
   control c_body = make_conditional_control(body_s);
@@ -566,7 +586,8 @@ static bool controlize_loop(control c_res,
   }
   */
   /* Recurse by controlizing inside the loop: */
-  bool controlized = controlize_statement(c_body, succ, loop_used_labels);
+  link_2_control_nodes(c_body, c_inc);
+  bool controlized = controlize_statement(c_body, c_inc, loop_used_labels);
 
   if (!controlized) {
     /* First the easy way. We have a kindly control-localized loop body,
@@ -607,10 +628,246 @@ static bool controlize_loop(control c_res,
     link_2_control_nodes(c_inc, c_test);
     /* Add the else branch of the test toward the loop exit: */
     link_2_control_nodes(c_test, succ);
+    /* Detach the succ node from the body node */
+    //unlink_2_control_nodes(c_body, succ);
     /* We can remove  */
   }
 
-  /* Keep track of labels that was used by the statements of the loop: */
+  /* Keep track of labels that were used by the statements of the loop: */
+  union_used_labels( used_labels, loop_used_labels);
+  hash_table_free(loop_used_labels);
+
+  pips_debug(5, "Exiting\n");
+
+  return controlized;
+}
+
+/* Computes the control graph of a Fortran or C  while loop statement
+
+   @param[in,out] c_res is the entry control node with the do-loop
+   statement to controlize. If the do-loop has complex control code such
+   as some goto to outside, it is transformed into an equivalent control
+   graph.
+
+   @param[in,out] succ must be the control node successor of @p c_res that
+   will be the current end of the control node sequence and an exit node
+
+   @param[in,out] used_labels is a hash table mapping a label name to a
+   list of statements that use it, as their label or because it is a goto
+   to it
+
+   @return TRUE if the code is not a structured control.
+*/
+static bool controlize_whileloop(control c_res,
+				 control succ,
+				 hash_table used_labels)
+{
+  /* To track the statement related to labels inside the loop body: */
+  hash_table loop_used_labels = hash_table_make(hash_string, 0);
+  statement sl = control_statement(c_res);
+
+  pips_debug(5, "(st = %p, c_res = %p, succ = %p)\n", sl, c_res, succ);
+
+  whileloop wl = statement_whileloop(sl);
+  statement body_s = whileloop_body(wl);
+
+  /* Remove the loop body from the loop just in case we want to
+     prettyprint our work in progress: */
+  whileloop_body(wl) = statement_undefined;
+  /* Create a control node to host the loop body and insert it in the
+     control graph: */
+  control c_body = make_conditional_control(body_s);
+  insert_control_in_arc(c_body, c_res, succ);
+  /* We also insert a dummy node between the body and the exit that will
+     be used for the incrementation because if the control body has goto
+     to succ node, we will have trouble to insert it later: */
+  // useless for a while loop
+  //control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
+  //insert_control_in_arc(c_inc, c_body, succ);
+  /* TODO
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      cs = strdup(concatenate(prev_comm,
+                              get_comment_sentinel(),
+                              "     DO loop ",
+                              lab,
+                              " with exit had to be desugared\n",
+                              NULL));
+      break;
+    case is_language_c:
+      cs = prev_comm;
+      break;
+    default:
+      pips_internal_error("This language is not handled !");
+      break;
+  }
+  */
+  /* Recurse by controlizing inside the loop: */
+  bool controlized = controlize_statement(c_body, succ, loop_used_labels);
+
+  if (!controlized) {
+    /* First the easy way. We have a kindly control-localized loop body,
+       revert to the original code */
+    pips_debug(6, "Since we can keep the  whileloop, remove the useless control node %p that was allocated for the loop_body.\n", c_body);
+    control_statement(c_body) = statement_undefined;
+    /* Remove the control node from the control graph by carefully
+       relinking around: */
+    remove_a_control_from_an_unstructured(c_body);
+    /* Remove also the dummy increment node that has not been used
+       either: */
+    //remove_a_control_from_an_unstructured(c_inc);
+    /* Move the loop body into its own loop: */
+    whileloop_body(wl) = body_s;
+  }
+  else {
+    /* We are in trouble since the loop body is not locally structured,
+       there are goto from inside or outside the loop body. So we
+       replace the  while loop with a desugared version with an equivalent
+       control graph. */
+    /* Update the increment control node with the real computation: */
+    /* First remove the dummy statement added above: */
+    //free_statement(control_statement(c_inc));
+    /* And put "i = i + s" instead: */
+    //control_statement(c_inc) = unsugared_loop_inc(sl);
+    /* Now build the desugared loop: */
+    /* We can replace the former loop statement by the new header. That
+       means that all pragma, comment, extensions, label on the previous
+       loop stay on this. */
+    //control_statement(c_res) = unsugared_loop_header(sl);
+    control_statement(c_res) = unsugared_whileloop_header(sl);
+    /* Add the continuation test between the header and the body that are
+       already connected: */
+    //control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
+    control c_test = make_control(unsugared_whileloop_test(sl), NIL, NIL);
+    //insert_control_in_arc(c_test, c_res, c_body);
+    /* Detach the increment node from the loop exit */
+    // unlink_2_control_nodes(c_inc, succ);
+    /* And reconnect it to the test node to make the loop: */
+    link_2_control_nodes(c_body, c_test);
+    /* Add the else branch of the test toward the loop exit: */
+    link_2_control_nodes(c_test, succ);
+    link_2_control_nodes(c_test, c_res);
+    /* We can remove  */
+  }
+
+  /* Keep track of labels that were used by the statements of the loop: */
+  union_used_labels( used_labels, loop_used_labels);
+  hash_table_free(loop_used_labels);
+
+  pips_debug(5, "Exiting\n");
+
+  return controlized;
+}
+
+/* Computes the control graph of a C repeat until loop statement
+
+   @param[in,out] c_res is the entry control node with the do-loop
+   statement to controlize. If the do-loop has complex control code such
+   as some goto to outside, it is transformed into an equivalent control
+   graph.
+
+   @param[in,out] succ must be the control node successor of @p c_res that
+   will be the current end of the control node sequence and an exit node
+
+   @param[in,out] used_labels is a hash table mapping a label name to a
+   list of statements that use it, as their label or because it is a goto
+   to it
+
+   @return TRUE if the code is not a structured control.
+*/
+static bool controlize_repeatloop(control c_res,
+				 control succ,
+				 hash_table used_labels)
+{
+  /* To track the statement related to labels inside the loop body: */
+  hash_table loop_used_labels = hash_table_make(hash_string, 0);
+  statement sl = control_statement(c_res);
+
+  pips_debug(5, "(st = %p, c_res = %p, succ = %p)\n", sl, c_res, succ);
+
+  whileloop wl = statement_whileloop(sl);
+  statement body_s = whileloop_body(wl);
+
+  /* Remove the loop body from the loop just in case we want to
+     prettyprint our work in progress: */
+  whileloop_body(wl) = statement_undefined;
+  /* Create a control node to host the loop body and insert it in the
+     control graph: */
+  control c_body = make_conditional_control(body_s);
+  insert_control_in_arc(c_body, c_res, succ);
+  /* We also insert a dummy node between the body and the exit that will
+     be used for the incrementation because if the control body has goto
+     to succ node, we will have trouble to insert it later: */
+  //control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
+  //insert_control_in_arc(c_inc, c_body, succ);
+  /* TODO
+  switch(get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      cs = strdup(concatenate(prev_comm,
+                              get_comment_sentinel(),
+                              "     DO loop ",
+                              lab,
+                              " with exit had to be desugared\n",
+                              NULL));
+      break;
+    case is_language_c:
+      cs = prev_comm;
+      break;
+    default:
+      pips_internal_error("This language is not handled !");
+      break;
+  }
+  */
+  /* Recurse by controlizing inside the loop: */
+  bool controlized = controlize_statement(c_body, succ, loop_used_labels);
+
+  if (!controlized) {
+    /* First the easy way. We have a kindly control-localized loop body,
+       revert to the original code */
+    pips_debug(6, "Since we can keep the do-loop, remove the useless control node %p that was allocated for the loop_body.\n", c_body);
+    control_statement(c_body) = statement_undefined;
+    /* Remove the control node from the control graph by carefully
+       relinking around: */
+    remove_a_control_from_an_unstructured(c_body);
+    /* Remove also the dummy increment node that has not been used
+       either: */
+    //remove_a_control_from_an_unstructured(c_inc);
+    /* Move the loop body into its own loop: */
+    whileloop_body(wl) = body_s;
+  }
+  else {
+    /* We are in trouble since the loop body is not locally structured,
+       there are goto from inside or outside the loop body. So we
+       replace the do-loop with a desugared version with an equivalent
+       control graph. */
+    /* Update the increment control node with the real computation: */
+    /* First remove the dummy statement added above: */
+    //free_statement(control_statement(c_inc));
+    /* And put "i = i + s" instead: */
+    //control_statement(c_inc) = unsugared_loop_inc(sl);
+    /* Now build the desugared loop: */
+    /* We can replace the former loop statement by the new header. That
+       means that all pragma, comment, extensions, label on the previous
+       loop stay on this. */
+    control_statement(c_res) = unsugared_loop_header(sl);
+    /* Add the continuation test between the header and the body that are
+       already connected: */
+    control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
+    // insert_control_in_arc(c_test, c_res, c_body);
+    /* Detach the increment node from the loop exit */
+    //unlink_2_control_nodes(c_inc, succ);
+    /* And reconnect it to the test node to make the loop: */
+    //link_2_control_nodes(c_inc, c_test);
+    link_2_control_nodes(c_body, c_test);
+    link_2_control_nodes(c_test, c_res);
+    /* Add the else branch of the test toward the loop exit: */
+    link_2_control_nodes(c_test, succ);
+    /* We can remove  */
+  }
+
+  /* Keep track of labels that were used by the statements of the loop: */
   union_used_labels( used_labels, loop_used_labels);
   hash_table_free(loop_used_labels);
 
@@ -728,7 +985,7 @@ statement whileloop_test(statement sl)
 
 /* NN : What about other kind of whileloop, evaluation = after ? TO BE IMPLEMENTED   */
 
-bool controlize_whileloop(st, l, pred, succ, c_res, used_labels)
+bool old_controlize_whileloop(st, l, pred, succ, c_res, used_labels)
 statement st;
 whileloop l;
 control pred, succ;
@@ -1200,11 +1457,14 @@ static bool controlize_sequence(control c_res,
          the sequence statement and then we cannot do anything and return
          the control graph marked as with control side effect.
     */
-    /* Remove the sequence list but not the statements them-self since
+    bool covers_p = covers_labels_p(st, block_used_labels);
+    /* Remove the sequence list but not the statements themselves since
        each one has been moved into a control node: */
     gen_free_list(sequence_statements(statement_sequence(st)));
 
-    if (covers_labels_p(st, block_used_labels)) {
+    // FI: this fails because st has been gutted out... covers_p must
+    // be computed earlier
+    if (covers_p) {
       /* There are no goto from/to the statements of the statement list,
 	 so we can encapsulate all this local control graph in an
 	 "unstructured" statement: */
@@ -1567,14 +1827,16 @@ bool controlize_statement(control c_res,
     controlized = controlize_loop(c_res, succ, used_labels);
     break;
 
-#if 0
-  case is_instruction_whileloop:
+  case is_instruction_whileloop: {
     /* Controlize a while() or do { } while() loop: */
-    controlized = controlize_whileloop(st, instruction_whileloop(i),
-				       pred, succ, c_res, used_labels);
+    whileloop wl = instruction_whileloop(i);
+    if(evaluation_before_p(whileloop_evaluation(wl)))
+      controlized = controlize_whileloop(c_res, succ, used_labels);
+    else
+      controlized = controlize_repeatloop(c_res, succ, used_labels);
     statement_consistent_p(st);
     break;
-#endif
+  }
 
   case is_instruction_goto: {
     /* The hard case, the goto, that will add some trouble in this well
@@ -1587,6 +1849,7 @@ bool controlize_statement(control c_res,
   case is_instruction_call:
     /* Controlize some function call (that hides many things in PIPS) */
     /* FI: IO calls may have control effects; they should be handled here! */
+    // FI: no specific handling of return? controlized = return_instruction_p(i)
     controlized = controlize_call(c_res, succ);
     statement_consistent_p(st);
     break;
@@ -1599,20 +1862,25 @@ bool controlize_statement(control c_res,
 				     pred, succ, c_res, used_labels);
     statement_consistent_p(st);
     break;
-
-  case is_instruction_expression:
+#endif
+  case is_instruction_expression: {
+    expression e = instruction_expression(i);
+    if(expression_reference_p(e)) {
+      controlized = FALSE;
+    }
+    else if(expression_call_p(e))
     /* PJ: controlize_call() controlize any "nice" statement, so even a C
        expression used as an instruction: */
-    controlized = return_instruction_p(i)
-      || controlize_call(st, pred, succ, c_res);
+      controlized = controlize_call(c_res, succ);
     statement_consistent_p(st);
     break;
-#endif
+  }
+
   default:
     pips_internal_error("Unknown instruction tag %d", instruction_tag(i));
   }
 
-    statement_consistent_p(st);
+  statement_consistent_p(st);
   ifdebug(5) {
     pips_debug(1, "st %p at exit:\n", st);
     print_statement(st);
