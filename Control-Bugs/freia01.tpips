@@ -9,6 +9,8 @@ create freia01 freia01.c
 activate C_PARSER
 activate C_SYMBOL_TABLE
 
+activate NEW_CONTROLIZER
+
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
