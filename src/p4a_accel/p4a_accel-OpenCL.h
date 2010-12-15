@@ -33,49 +33,43 @@
 #include <fcntl.h>
 #include <cl.h>
 
-//#include <p4a_wrap-opencl.h>
-//#include "p4a_include-OpenCL.h"
-
 /** A kernel list.
 */
 #ifdef __cplusplus
 #include <map>
 #include <string>
-struct p4a_kernel_list {
+struct p4a_cl_kernel {
   cl_kernel kernel;
   char *name;
   char *file_name;
 
-  p4a_kernel_list(const char *k) {
+  p4a_cl_kernel(const char *k) {
     name = (char *)strdup(k);
     kernel = NULL;  
     char* kernelFile;
     asprintf(&kernelFile,"./%s.cl",k);
     file_name = (char *)strdup(kernelFile);
   }
-  ~p4a_kernel_list() {}
+  ~p4a_cl_kernel() {}
 };
 
-extern std::map<std::string, struct p4a_kernel_list * > p4a_kernels_map ;
+extern std::map<std::string, struct p4a_cl_kernel * > p4a_kernels_map ;
 #else
-struct p4a_kernel_list {
+struct p4a_cl_kernel {
   cl_kernel kernel;
   char *name;
   char *file_name;
-  struct p4a_kernel_list *next;
+  struct p4a_cl_kernel *next;
+  //The constructor new_ is defined in the p4a_accel.h file
 };
 
 /** Begin of the kernels list
  */
-extern struct p4a_kernel_list *p4a_kernels;
+extern struct p4a_cl_kernel *p4a_kernels;
 
-/** Pointer to the current kernel descriptor
- */
-extern struct p4a_kernel_list *current_kernel;
-
-struct p4a_kernel_list* new_p4a_kernel(const char *kernel);
-struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel);
-void setArguments(int i,char *s,size_t size,void * ref_arg);
+struct p4a_cl_kernel* new_p4a_kernel(const char *kernel);
+struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
+void p4a_setArguments(int i,char *s,size_t size,void * ref_arg);
 #endif
 
 /** A timer Tag to know when to print p4a_time_copy
@@ -113,18 +107,17 @@ extern cl_program p4a_program;
  */
 extern cl_kernel p4a_kernel; 
 
-
 char * p4a_error_to_string(int error);
-void p4a_clean(int exitCode);
-void p4a_error(cl_int error,const char *currentFile,const int currentLine);
-void p4a_message(const char *message,const char *currentFile,const int currentLine);
-void p4a_load_kernel_arguments(const char *kernel,...);
-char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length);
+void   p4a_clean(int exitCode);
+void   p4a_error(cl_int error,const char *currentFile,const int currentLine);
+void   p4a_message(const char *message,const char *currentFile,const int currentLine);
+void   p4a_load_kernel(const char *kernel,...);
+char * p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length);
 
 /** @}
  */
 
-/** @defgroup P4A printing error and log functions.
+/** @defgroup P4A print error and log functions.
 
    @{
  */
@@ -158,13 +151,13 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
     from 
     http://stackoverflow.com/questions/3868289/count-number-of-parameters-in-c-variable-argument-method-call
  */
-#define PP_NARG(...) \
-         PP_NARG_(__VA_ARGS__,PP_RSEQ_N())
+#define P4A_NARG(...) \
+         P4A_NARG_(__VA_ARGS__,P4A_RSEQ_N())
 
-#define PP_NARG_(...) \
-         PP_ARG_N(__VA_ARGS__)
+#define P4A_NARG_(...) \
+         P4A_ARG_N(__VA_ARGS__)
 
-#define PP_ARG_N( \
+#define P4A_ARG_N( \
           _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
          _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
          _21,_22,_23,_24,_25,_26,_27,_28,_29,_30, \
@@ -173,7 +166,7 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
          _51,_52,_53,_54,_55,_56,_57,_58,_59,_60, \
          _61,_62,_63,N,...) N
 
-#define PP_RSEQ_N() \
+#define P4A_RSEQ_N() \
          63,62,61,60,                   \
          59,58,57,56,55,54,53,52,51,50, \
          49,48,47,46,45,44,43,42,41,40, \
@@ -184,41 +177,41 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
 
 
 
-#define CONCATN(a,b) CONCAT(a,b) 
+#define P4A_CONCATN(a,b) P4A_CONCAT(a,b) 
 
-#define CONCAT(a,b) a ## b
+#define P4A_CONCAT(a,b) a ## b
 
-#define STRINGIFY(val) (char *)#val
+#define P4A_STRINGIFY(val) (char *)#val
 
 #ifdef __cplusplus
-template<typename ARG0> inline void setArguments(int i,char *s,ARG0 arg0) {
+template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
   printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,sizeof(arg0),&arg0);
   P4A_test_execution_with_message("clSetKernelArg");
 }
-#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
+#define P4A_arg1(n,x,...)  p4a_setArguments(n,P4A_STRINGIFY(x),x);		
 #else
 /* See the function setArguments in p4a_accel.h */
-#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),sizeof(x),&x);		
+#define P4A_arg1(n,x,...)  p4a_setArguments(n,P4A_STRINGIFY(x),sizeof(x),&x);		
 #endif 
 
 
-//#define SETARG1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
-#define SETARG2(n,x,...)  SETARG1(n,x,...) SETARG1(n+1,__VA_ARGS__) 	
-#define SETARG3(n,x,...)  SETARG1(n,x,...) SETARG2(n+1,__VA_ARGS__) 	
-#define SETARG4(n,x,...)  SETARG1(n,x,...) SETARG3(n+1,__VA_ARGS__) 	
-#define SETARG5(n,x,...)  SETARG1(n,x,...) SETARG4(n+1,__VA_ARGS__) 	
-#define SETARG6(n,x,...)  SETARG1(n,x,...) SETARG5(n+1,__VA_ARGS__) 	
-#define SETARG7(n,x,...)  SETARG1(n,x,...) SETARG6(n+1,__VA_ARGS__) 	
-#define SETARG8(n,x,...)  SETARG1(n,x,...) SETARG7(n+1,__VA_ARGS__) 	
-#define SETARG9(n,x,...)  SETARG1(n,x,...) SETARG8(n+1,__VA_ARGS__) 	
-#define SETARG10(n,x,...)  SETARG1(n,x,...) SETARG9(n+1,__VA_ARGS__) 	
-#define SETARG11(n,x,...)  SETARG1(n,x,...) SETARG10(n+1,__VA_ARGS__) 	
-#define SETARG12(n,x,...)  SETARG1(n,x,...) SETARG11(n+1,__VA_ARGS__) 	
-#define SETARG13(n,x,...)  SETARG1(n,x,...) SETARG12(n+1,__VA_ARGS__) 	
-#define SETARG14(n,x,...)  SETARG1(n,x,...) SETARG13(n+1,__VA_ARGS__) 	
+//#define P4A_arg1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
+#define P4A_arg2(n,x,...)  P4A_arg1(n,x,...) P4A_arg1(n+1,__VA_ARGS__) 	
+#define P4A_arg3(n,x,...)  P4A_arg1(n,x,...) P4A_arg2(n+1,__VA_ARGS__) 	
+#define P4A_arg4(n,x,...)  P4A_arg1(n,x,...) P4A_arg3(n+1,__VA_ARGS__) 	
+#define P4A_arg5(n,x,...)  P4A_arg1(n,x,...) P4A_arg4(n+1,__VA_ARGS__) 	
+#define P4A_arg6(n,x,...)  P4A_arg1(n,x,...) P4A_arg5(n+1,__VA_ARGS__) 	
+#define P4A_arg7(n,x,...)  P4A_arg1(n,x,...) P4A_arg6(n+1,__VA_ARGS__) 	
+#define P4A_arg8(n,x,...)  P4A_arg1(n,x,...) P4A_arg7(n+1,__VA_ARGS__) 	
+#define P4A_arg9(n,x,...)  P4A_arg1(n,x,...) P4A_arg8(n+1,__VA_ARGS__) 	
+#define P4A_arg10(n,x,...)  P4A_arg1(n,x,...) P4A_arg9(n+1,__VA_ARGS__) 	
+#define P4A_arg11(n,x,...)  P4A_arg1(n,x,...) P4A_arg10(n+1,__VA_ARGS__) 	
+#define P4A_arg12(n,x,...)  P4A_arg1(n,x,...) P4A_arg11(n+1,__VA_ARGS__) 	
+#define P4A_arg13(n,x,...)  P4A_arg1(n,x,...) P4A_arg12(n+1,__VA_ARGS__) 	
+#define P4A_arg14(n,x,...)  P4A_arg1(n,x,...) P4A_arg13(n+1,__VA_ARGS__) 	
 
-#define SETARGSN(...)  CONCATN(SETARG,PP_NARG(__VA_ARGS__))(0,__VA_ARGS__)
+#define P4A_argN(...)  P4A_CONCATN(P4A_arg,P4A_NARG(__VA_ARGS__))(0,__VA_ARGS__)
 
 
 /** @defgroup P4A_cl_kernel_call Accelerator kernel call
@@ -566,7 +559,8 @@ template<typename ARG0> inline void setArguments(int i,char *s,ARG0 arg0) {
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
-    p4a_load_kernel_arguments(kernel,__VA_ARGS__);			\
+    p4a_load_kernel(kernel,__VA_ARGS__);				\
+    P4A_argN(__VA_ARGS__);						\
     P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel      \
 				    "\" of size %d\n",P4A_n_iter_0));	\
     P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
@@ -595,8 +589,8 @@ template<typename ARG0> inline void setArguments(int i,char *s,ARG0 arg0) {
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {	                                                                \
-    p4a_load_kernel_arguments(kernel,__VA_ARGS__);			\
-    SETARGSN(__VA_ARGS__);						\
+    p4a_load_kernel(kernel,__VA_ARGS__);				\
+    P4A_argN(__VA_ARGS__);						\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
                    "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\

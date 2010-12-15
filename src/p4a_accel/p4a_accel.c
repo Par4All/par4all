@@ -690,13 +690,13 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 /** @author Stéphanie Even
 
-    OpenCL is a bit more complicated than CUDA or OpenMP.
-    
-    Aside the procedure defined for these previous interface,
-    OpenCL needs a complex interface, from loading the kernel from
-    a source file to analysing the argument list of the kernel.
+    Aside the procedure defined for CUDA or OpenMP, OpenCL needs
+    loading the kernel from a source file.
 
-    Procedure to manage a kernel list have thus been created.
+    Procedure to manage a kernel list have thus been created for the C version.
+    In C++, this a map.
+
+    C and C++ versions are implemented because of the argument passing.
  */
 
 #ifdef P4A_PROFILING
@@ -712,25 +712,73 @@ cl_event p4a_event_execution=NULL, p4a_event_copy=NULL;
 cl_int p4a_global_error=0;
 cl_context p4a_context = NULL;
 cl_command_queue p4a_queue = NULL;
-//cl_device_id p4a_device_id = NULL;  
-//cl_platform_id p4a_platform_id = NULL;
 cl_program p4a_program = NULL;  
 cl_kernel p4a_kernel = NULL;  
 
 #ifdef __cplusplus
-std::map<std::string,struct p4a_kernel_list *> p4a_kernels_map;
+std::map<std::string,struct p4a_cl_kernel *> p4a_kernels_map;
 #else
-struct p4a_kernel_list *p4a_kernels=NULL,*current_kernel=NULL;
-struct p4a_kernel_list *last_kernel;
-//int args;
-//struct arg_type *current_type=NULL;
+struct p4a_cl_kernel *p4a_kernels=NULL;
+// Only used when creating the kernel list
+struct p4a_cl_kernel *last_kernel=NULL;
 
-void setArguments(int i,char *s,size_t size,void * ref_arg) {
+// The C++ equivalent function is in the p4a_accel-OpenCL.h file
+void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) {
   //printf("%s : size %lu, rang %d\n",s,size,i);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
   P4A_test_execution_with_message("clSetKernelArg");
 }
-#endif
+
+/** @author : Stéphanie Even
+
+    Creation of a new kernel, initialisation and insertion in the kernel list.
+ */
+struct p4a_cl_kernel* new_p4a_kernel(const char *kernel)
+{
+  struct p4a_cl_kernel *new_kernel = (struct p4a_cl_kernel *)malloc(sizeof(struct p4a_cl_kernel));
+
+  if (p4a_kernels == NULL) {
+    //P4A_log("Begin of the kernel list\n");
+    last_kernel = p4a_kernels = new_kernel;
+  }
+  else {
+    //P4A_log("Follows the kernel list\n");
+    last_kernel->next = new_kernel;
+    last_kernel = new_kernel;
+  }
+  new_kernel->next = NULL;
+  
+  new_kernel->name = (char *)strdup(kernel);
+  new_kernel->kernel = NULL;
+  //new_kernel->n_args = 0;
+  //new_kernel->args = NULL;
+  //new_kernel->current = NULL;
+
+  char* kernelFile;
+  asprintf(&kernelFile,"./%s.cl",kernel);
+  new_kernel->file_name = (char *)strdup(kernelFile);
+
+  //P4A_log("A new kernel has been created and initialized\n");
+  return new_kernel;
+}
+
+/** @author : Stéphanie Even
+
+    Search if the <kernel> is already in the list.
+ */
+
+struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
+{
+  struct p4a_cl_kernel *kernel_in_the_list=p4a_kernels;
+  while (kernel_in_the_list != NULL) {
+    if (strcmp(kernel_in_the_list->name,kernel) == 0)
+      return kernel_in_the_list;
+    kernel_in_the_list = kernel_in_the_list->next;
+  }
+  return NULL;
+}
+
+#endif //!__cplusplus
 
 /** Stop a timer on the accelerator and get float time in second
 
@@ -1335,35 +1383,6 @@ void p4a_clean(int exitCode)
   if(p4a_kernel)clReleaseKernel(p4a_kernel);  
   if(p4a_queue)clReleaseCommandQueue(p4a_queue);
   if(p4a_context)clReleaseContext(p4a_context);
-
-  /*
-  // Free the kernels list
-  struct p4a_kernel_list *kernel = p4a_kernels;
-  while (kernel) {
-    current_kernel = kernel->next;
-    free(kernel->kernel);
-    //free(kernel->name);
-    //free(kernel->file_name);
-    struct arg_type * type = kernel->args;
-    while (type) {
-      kernel->current = type->next;
-      free(type);
-      type = kernel->current;
-    }
-    free(kernel);
-    kernel = current_kernel;
-  }
-  */
-
-  /*
-  // Free the typedef
-  struct type_substitution * type_def = substitution_list;
-  while (type_def) {
-    current_substitution = type_def->next;
-    free(type_def);
-    type_def = current_substitution;
-  }
-  */
   exit(exitCode);
 }
 
@@ -1431,21 +1450,21 @@ void p4a_message(const char *message,
     name with .cl extension.
  */
 
-void p4a_load_kernel_arguments(const char *kernel,...)
+void p4a_load_kernel(const char *kernel,...)
 {
 #ifdef __cplusplus
   std::string scpy(kernel);
-  struct p4a_kernel_list *k = p4a_kernels_map[scpy];
+  struct p4a_cl_kernel *k = p4a_kernels_map[scpy];
   
 #else
-  struct p4a_kernel_list *k = p4a_search_current_kernel(kernel);
+  struct p4a_cl_kernel *k = p4a_search_current_kernel(kernel);
 #endif
   // If not found ...
   if (!k) {
     P4A_log("The kernel %s is loaded for the first time\n",kernel);
 
 #ifdef __cplusplus
-    k = new p4a_kernel_list(kernel);
+    k = new p4a_cl_kernel(kernel);
     p4a_kernels_map[scpy] = k;
 #else
     k = new_p4a_kernel(kernel);
@@ -1517,56 +1536,5 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
   *length = size+len;
   return source;
 }
-
-#ifndef __cplusplus
-/** @author : Stéphanie Even
-
-    Creation of a new kernel, initialisation and insertion in the kernel list.
- */
-struct p4a_kernel_list* new_p4a_kernel(const char *kernel)
-{
-  struct p4a_kernel_list *new_kernel = (struct p4a_kernel_list *)malloc(sizeof(struct p4a_kernel_list));
-
-  if (p4a_kernels == NULL) {
-    P4A_log("Begin of the kernel list\n");
-    last_kernel = p4a_kernels = new_kernel;
-  }
-  else {
-    P4A_log("Follows the kernel list\n");
-    last_kernel->next = new_kernel;
-    last_kernel = new_kernel;
-  }
-  new_kernel->next = NULL;
-  
-  new_kernel->name = (char *)strdup(kernel);
-  new_kernel->kernel = NULL;
-  //new_kernel->n_args = 0;
-  //new_kernel->args = NULL;
-  //new_kernel->current = NULL;
-
-  char* kernelFile;
-  asprintf(&kernelFile,"./%s.cl",kernel);
-  new_kernel->file_name = (char *)strdup(kernelFile);
-
-  P4A_log("A new kernel has been created and initialized\n");
-  return new_kernel;
-}
-
-/** @author : Stéphanie Even
-
-    Search if the <kernel> is already in the list.
- */
-
-struct p4a_kernel_list *p4a_search_current_kernel(const char *kernel)
-{
-  struct p4a_kernel_list *kernel_in_the_list=p4a_kernels;
-  while (kernel_in_the_list != NULL) {
-    if (strcmp(kernel_in_the_list->name,kernel) == 0)
-      return kernel_in_the_list;
-    kernel_in_the_list = kernel_in_the_list->next;
-  }
-  return NULL;
-}
-#endif //__cplusplus
 
 #endif // P4A_ACCEL_CL
