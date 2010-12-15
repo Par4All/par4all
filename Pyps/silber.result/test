@@ -310,9 +310,10 @@ iable
 
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         current_0 = bytes[j_0*w+i_0];
+         I_3 = j_0*w+i_0;
+         current_0 = bytes[I_3];
          current_1 = lut[current_0];
-         dest[j_0*w+i_0] = (int) current_1+val>255?255:current_1+val;
+         dest[I_3] = (int) current_1+val>255?255:current_1+val;
       }
    
    
@@ -354,9 +355,10 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         current_0 = bytes[j_0*w+i_0];
+         I_3 = j_0*w+i_0;
+         current_0 = bytes[I_3];
          current_1 = lut[current_0];
-         dest[j_0*w+i_0] = adds(current_1, val);
+         dest[I_3] = adds(current_1, val);
       }
    
    
@@ -382,11 +384,13 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
+#pragma omp parallel for private(I_3,current_0,current_1,j_0)
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-         current_0 = bytes[j_0*w+i_0];
+         I_3 = j_0*w+i_0;
+         current_0 = bytes[I_3];
          current_1 = lut[current_0];
-         dest[j_0*w+i_0] = adds(current_1, val);
+         dest[I_3] = adds(current_1, val);
       }
    
    
@@ -412,6 +416,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    int I_10;
 
+#pragma omp parallel for private(j_0)
 l99983:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
 l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
@@ -421,26 +426,32 @@ l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
+   int I_3;
+   //PIPS generated variable
    unsigned char current_0, current_1;
    //PIPS generated variable
    int j_0;
 l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-      current_0 = bytes[j_0*w+*i_0];
+      I_3 = j_0*w+*i_0;
+      current_0 = bytes[I_3];
       current_1 = lut[current_0];
-      dest[j_0*w+*i_0] = adds(current_1, val);
+      dest[I_3] = adds(current_1, val);
    }
 }
 void inner(int h, int w, int *i_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
+   //PIPS generated variable
+   int I_3;
    //PIPS generated variable
    unsigned char voltage_0, voltage_1;
    //PIPS generated variable
    int j_0;
 l99984:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
-      voltage_0 = bytes[j_0*w+*i_0];
+      I_3 = j_0*w+*i_0;
+      voltage_0 = bytes[I_3];
       voltage_1 = lut[voltage_0];
-      dest[j_0*w+*i_0] = adds(voltage_1, val);
+      dest[I_3] = adds(voltage_1, val);
    }
 }
