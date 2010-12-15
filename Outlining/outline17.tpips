@@ -29,7 +29,7 @@ echo
 
 apply UNSPLIT
 
-shell $PIPS_F77 $WS.database/Src/*.f  -o $WS.database/Tmp/$WS
+shell ${PIPS_F77:-gfortran} $WS.database/Src/*.f  -o $WS.database/Tmp/$WS
 
 close
 delete $WS
