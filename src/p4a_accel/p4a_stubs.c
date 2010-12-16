@@ -321,6 +321,23 @@ void P4A_accel_free(void *address) {
   free(address);
 }
 
+
+/** Stubs for P4A runtime */
+void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
+  P4A_copy_to_accel(size,host_ptr,NULL);
+}
+void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */) {
+  P4A_copy_from_accel(size,host_ptr,NULL);
+}
+void *P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
+  void *accel_ptr;
+  malloc(size);
+  P4A_accel_malloc(&accel_ptr, size);
+  return accel_ptr;
+}
+
+
+
 /** @} */
 
 /** @} */
