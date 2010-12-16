@@ -783,9 +783,9 @@ cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
 cl_command_queue_properties p4a_queue_properties = 0;
 #endif
 
-bool p4a_time_tag=false;
-double p4a_time_execution = 0.;
-double p4a_time_copy = 0.;
+bool p4a_execution_time_tag=false;
+bool p4a_copy_time_tag=false;
+double p4a_time = 0.;
 cl_event p4a_event_execution=NULL, p4a_event_copy=NULL;
 cl_int p4a_global_error=0;
 cl_context p4a_context = NULL;
@@ -825,18 +825,12 @@ struct p4a_cl_kernel* new_p4a_kernel(const char *kernel)
     last_kernel = new_kernel;
   }
   new_kernel->next = NULL;
-  
   new_kernel->name = (char *)strdup(kernel);
   new_kernel->kernel = NULL;
-  //new_kernel->n_args = 0;
-  //new_kernel->args = NULL;
-  //new_kernel->current = NULL;
-
+  new_kernel->time_execution = 0.;
   char* kernelFile;
   asprintf(&kernelFile,"./%s.cl",kernel);
   new_kernel->file_name = (char *)strdup(kernelFile);
-
-  //P4A_log("A new kernel has been created and initialized\n");
   return new_kernel;
 }
 
@@ -862,7 +856,7 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
 
  @addtogroup P4A_opencl_time_measure
  */
-
+/*
 double P4A_accel_copy_timer()
 {
   cl_ulong start,end;
@@ -891,13 +885,14 @@ double P4A_accel_copy_timer()
 #endif
   return 0;
 }
+*/
 
 double P4A_accel_timer_stop_and_float_measure() 
 {
   cl_ulong start,end;
 
 #ifdef P4A_PROFILING
-  if (p4a_event_execution) {
+  if (p4a_execution_time_tag == true && p4a_event_execution) {
     clWaitForEvents(1, &p4a_event_execution);
     
     P4A_test_execution(clGetEventProfilingInfo(p4a_event_execution, 
@@ -910,13 +905,34 @@ double P4A_accel_timer_stop_and_float_measure()
 					       sizeof(cl_ulong), 
 					       &start, 
 					       NULL));
-    // execution_time in nanoseconds	      
-    p4a_time_execution += (float)(end - start);
+    // time in nanoseconds	      
+    p4a_time += (float)(end - start);
     // Return the time in second:
-    return p4a_time_execution*1.0e-9;
+    return p4a_time*1.0e-9;
   }
-#endif
+  else if (p4a_copy_time_tag == true && p4a_event_copy) {
+    clWaitForEvents(1, &p4a_event_copy);
+    
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
+					       CL_PROFILING_COMMAND_END, 
+					       sizeof(cl_ulong), 
+					       &end, 
+					       NULL));
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
+					       CL_PROFILING_COMMAND_START, 
+					       sizeof(cl_ulong), 
+					       &start, 
+					       NULL));
+    // time in nanoseconds	      
+    p4a_time = (float)(end - start);
+    // Return the time in second: 
+    return p4a_time*1.0e-9;
+  }
+  else
+    return p4a_time*1.0e-9;
+#else
   return 0;
+#endif
 }
 
 /** Allocate memory on the hardware accelerator in OpenCL mode.
@@ -976,7 +992,10 @@ void P4A_copy_from_accel(size_t element_size,
 				       0,
 				       NULL,
 				       &p4a_event_copy);
-  p4a_time_copy += P4A_accel_copy_timer();
+  p4a_copy_time_tag = true;			
+  P4A_accel_timer_stop_and_float_measure();
+  p4a_copy_time_tag = false;			
+  //p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -1005,7 +1024,10 @@ void P4A_copy_to_accel(size_t element_size,
 					0,
 					NULL,
 					&p4a_event_copy);
-  p4a_time_copy += P4A_accel_copy_timer();
+  p4a_copy_time_tag = true;			
+  P4A_accel_timer_stop_and_float_measure();
+  p4a_copy_time_tag = false;			
+  //  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
@@ -1048,7 +1070,10 @@ void P4A_copy_from_accel_1d(size_t element_size,
 				       0,
 				       NULL,
 				       &p4a_event_copy);
-  p4a_time_copy += P4A_accel_copy_timer();
+  p4a_copy_time_tag = true;			
+  P4A_accel_timer_stop_and_float_measure();
+  p4a_copy_time_tag = false;			
+  //  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -1092,7 +1117,10 @@ void P4A_copy_to_accel_1d(size_t element_size,
 					0,
 					NULL,
 					&p4a_event_copy);
-  p4a_time_copy += P4A_accel_copy_timer();
+  p4a_copy_time_tag = true;			
+  P4A_accel_timer_stop_and_float_measure();
+  p4a_copy_time_tag = false;			
+  //  p4a_time_copy += P4A_accel_copy_timer();
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
@@ -1571,7 +1599,6 @@ void p4a_load_kernel(const char *kernel,...)
     p4a_global_error=clBuildProgram(p4a_program,0,NULL,NULL,NULL,NULL);
     P4A_test_execution_with_message("clBuildProgram");
     p4a_kernel=clCreateKernel(p4a_program,kernel,&p4a_global_error);
-    //current_kernel->kernel = p4a_kernel;
     k->kernel = p4a_kernel;
     P4A_test_execution_with_message("clCreateKernel");
     free(cSourceCL);

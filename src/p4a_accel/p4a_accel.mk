@@ -12,6 +12,12 @@ EXECUTABLES = $(EXECUTABLE) $(EXECUTABLE-OMP) $(EXECUTABLE-CU) $(EXECUTABLE-CL)
 
 all: $(EXECUTABLES) 
 
+seq : $(EXECUTABLE)
+openmp : $(EXECUTABLE-OMP)
+cuda : $(EXECUTABLE-CU)
+opencl : $(EXECUTABLE-CL)
+
+
 #Creation of the kernel wrapper with header for OpenMP
 WRAPFILES = $(KERNELFILES:.c=_wrapper.c)
 

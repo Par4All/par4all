@@ -41,6 +41,7 @@ struct p4a_cl_kernel {
   cl_kernel kernel;
   char *name;
   char *file_name;
+  double time_execution;
 
   p4a_cl_kernel(const char *k) {
     name = (char *)strdup(k);
@@ -48,6 +49,7 @@ struct p4a_cl_kernel {
     char* kernelFile;
     asprintf(&kernelFile,"./%s.cl",k);
     file_name = (char *)strdup(kernelFile);
+    time_execution = 0.;
   }
   ~p4a_cl_kernel() {}
 };
@@ -59,6 +61,7 @@ struct p4a_cl_kernel {
   char *name;
   char *file_name;
   struct p4a_cl_kernel *next;
+  double time_execution;
   //The constructor new_ is defined in the p4a_accel.h file
 };
 
@@ -71,17 +74,18 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
 void p4a_setArguments(int i,char *s,size_t size,void * ref_arg);
 #endif
 
-/** A timer Tag to know when to print p4a_time_copy
+/** A tag to identifiy if it is a kernel executuon timer call
  */
-extern bool p4a_time_tag;
+extern bool p4a_execution_time_tag;
+/** A tag to identifiy if it is a copy timer call
+ */
+extern bool p4a_copy_time_tag;
 /** Total execution time.
     In OpenCL, time is mesured for each lunch of the kernel.
     We also need to cumulate all the particulate times.
  */
-extern double p4a_time_execution;
-/** Total time for copy of data (transfers host <-> device).
- */
-extern double p4a_time_copy;
+extern double p4a_time;
+
 /** Global error in absence of a getLastError equivalent in OpenCL */
 extern cl_int p4a_global_error;
 /** Events for timing in CL: */
@@ -108,10 +112,17 @@ extern cl_kernel p4a_kernel;
 
 char * p4a_error_to_string(int error);
 void   p4a_clean(int exitCode);
-void   p4a_error(cl_int error,const char *currentFile,const int currentLine);
-void   p4a_message(const char *message,const char *currentFile,const int currentLine);
+void   p4a_error(cl_int error,
+		 const char *currentFile,
+		 const int currentLine);
+void   p4a_message(const char *message,
+		   const char *currentFile,
+		   const int currentLine);
 void   p4a_load_kernel(const char *kernel,...);
-char * p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length);
+char * p4a_load_prog_source(char *cl_kernel_file,
+			    const char *head,
+			    size_t *length);
+double P4A_accel_timer_stop_and_float_measure();
 
 /** @}
  */
@@ -335,15 +346,7 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 
 /** Release the hardware accelerator in CL
 */
-#ifdef P4A_PROFILING
-#define P4A_release_accel					\
-  do {								\
-    if (p4a_time_tag) printf("Copy time : %f\n",p4a_time_copy);	\
-    p4a_clean(EXIT_SUCCESS);					\
-  } while (0)
-#else
 #define P4A_release_accel    p4a_clean(EXIT_SUCCESS)
-#endif
     
 
 /** @} */
@@ -363,7 +366,15 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
     The end and start time are available only after the call
     and are retrieved from the event.
  */
+
+#ifdef P4A_PROFILING
+#define P4A_accel_timer_start			\
+  p4a_execution_time_tag = false;		\
+  p4a_copy_time_tag = false;			\
+  p4a_time = 0.;
+#else
 #define P4A_accel_timer_start 
+#endif
 
 /** @} */
 
@@ -600,13 +611,13 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
     P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
 				     P4A_block_descriptor,		\
 				     P4A_n_iter_0, P4A_n_iter_1);	\
-    p4a_time_tag = false;						\
-    P4A_accel_timer_stop_and_float_measure();				\
+    p4a_execution_time_tag = true;					\
     P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
                           (p4a_queue,p4a_kernel,work_dim,NULL,          \
 			   P4A_grid_descriptor,P4A_block_descriptor,	\
 			   0,NULL,&p4a_event_execution));		\
-    p4a_time_tag = true;						\
+    P4A_accel_timer_stop_and_float_measure();				\
+    p4a_execution_time_tag = false;					\
   } while (0)
 
 /** @} */
