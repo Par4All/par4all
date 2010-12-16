@@ -273,6 +273,15 @@
 	(READER) unexpected, (WRITER) unexpected, \
 	(FREER) unexpected, (CHECKER) unexpected
 
+
+
+/*
+ * Kernels
+ */
+{ DBR_KERNEL_COPY_IN,  NEWGEN_METHODS },
+{ DBR_KERNEL_COPY_OUT,  NEWGEN_METHODS },
+
+
 /* this one MUST be the last one.
  */
 { NULL,				UNEXPECTED_METHODS }
