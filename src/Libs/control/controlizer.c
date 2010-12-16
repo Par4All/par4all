@@ -673,17 +673,19 @@ static bool controlize_whileloop(control c_res,
 
   /* Remove the loop body from the loop just in case we want to
      prettyprint our work in progress: */
-  whileloop_body(wl) = statement_undefined;
+  // incompatible with debugging code
+  //whileloop_body(wl) = statement_undefined;
+  whileloop_body(wl) = make_plain_continue_statement();
+
   /* Create a control node to host the loop body and insert it in the
      control graph: */
   control c_body = make_conditional_control(body_s);
-  insert_control_in_arc(c_body, c_res, succ);
-  /* We also insert a dummy node between the body and the exit that will
-     be used for the incrementation because if the control body has goto
-     to succ node, we will have trouble to insert it later: */
-  // useless for a while loop
-  //control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
-  //insert_control_in_arc(c_inc, c_body, succ);
+  // FI: if c_test were already available, it should be used instead
+  // of succ
+  // insert_control_in_arc(c_body, c_res, succ);
+
+  // FI: this should be language neutral. The prettyprinter is
+  // supposed to fix comments according to language rules...
   /* TODO
   switch(get_prettyprint_language_tag()) {
     case is_language_fortran:
@@ -703,8 +705,11 @@ static bool controlize_whileloop(control c_res,
       break;
   }
   */
+
+  control c_test = make_control(unsugared_whileloop_test(sl), NIL, NIL);
   /* Recurse by controlizing inside the loop: */
-  bool controlized = controlize_statement(c_body, succ, loop_used_labels);
+  link_2_control_nodes(c_body, c_test);
+  bool controlized = controlize_statement(c_body, c_test, loop_used_labels);
 
   if (!controlized) {
     /* First the easy way. We have a kindly control-localized loop body,
@@ -735,20 +740,36 @@ static bool controlize_whileloop(control c_res,
        means that all pragma, comment, extensions, label on the previous
        loop stay on this. */
     //control_statement(c_res) = unsugared_loop_header(sl);
+    // FI: c_res is useless and should be identified with c_test
     control_statement(c_res) = unsugared_whileloop_header(sl);
     /* Add the continuation test between the header and the body that are
        already connected: */
     //control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
-    control c_test = make_control(unsugared_whileloop_test(sl), NIL, NIL);
+    link_2_control_nodes(c_res, c_test);
     //insert_control_in_arc(c_test, c_res, c_body);
-    /* Detach the increment node from the loop exit */
-    // unlink_2_control_nodes(c_inc, succ);
+    /* Detach succ from the loop body exit */
+    //unlink_2_control_nodes(c_body, succ);
     /* And reconnect it to the test node to make the loop: */
-    link_2_control_nodes(c_body, c_test);
-    /* Add the else branch of the test toward the loop exit: */
+    //link_2_control_nodes(c_body, c_test);
+    /* Add the else branch of the test toward the loop exit: arc
+       ordering matters */
+    unlink_2_control_nodes(c_test, c_body);
     link_2_control_nodes(c_test, succ);
-    link_2_control_nodes(c_test, c_res);
-    /* We can remove  */
+    link_2_control_nodes(c_test, c_body);
+    // link_2_control_nodes(c_test, c_res);
+    unlink_2_control_nodes(c_res, succ);
+
+    pips_assert("c_test is a test with two successors",
+		gen_length(control_successors(c_test))==2
+		&& statement_test_p(control_statement(c_test)));
+    pips_assert("c_body may have two successors if it is a test",
+		gen_length(control_successors(c_body))==2
+		&& statement_test_p(control_statement(c_body))
+		||gen_length(control_successors(c_body))==1
+		&& !statement_test_p(control_statement(c_body)) );
+    pips_assert("c_res should not be a test",
+		gen_length(control_successors(c_res))==1
+		&& !statement_test_p(control_statement(c_res)) );
   }
 
   /* Keep track of labels that were used by the statements of the loop: */
@@ -791,11 +812,11 @@ static bool controlize_repeatloop(control c_res,
 
   /* Remove the loop body from the loop just in case we want to
      prettyprint our work in progress: */
-  whileloop_body(wl) = statement_undefined;
+  whileloop_body(wl) = make_plain_continue_statement();
   /* Create a control node to host the loop body and insert it in the
      control graph: */
   control c_body = make_conditional_control(body_s);
-  insert_control_in_arc(c_body, c_res, succ);
+  //insert_control_in_arc(c_body, c_res, succ);
   /* We also insert a dummy node between the body and the exit that will
      be used for the incrementation because if the control body has goto
      to succ node, we will have trouble to insert it later: */
@@ -820,8 +841,10 @@ static bool controlize_repeatloop(control c_res,
       break;
   }
   */
+  control c_test = make_control(unsugared_whileloop_test(sl), NIL, NIL);
   /* Recurse by controlizing inside the loop: */
-  bool controlized = controlize_statement(c_body, succ, loop_used_labels);
+  link_2_control_nodes(c_body, c_test);
+  bool controlized = controlize_statement(c_body, c_test, loop_used_labels);
 
   if (!controlized) {
     /* First the easy way. We have a kindly control-localized loop body,
@@ -851,20 +874,39 @@ static bool controlize_repeatloop(control c_res,
     /* We can replace the former loop statement by the new header. That
        means that all pragma, comment, extensions, label on the previous
        loop stay on this. */
-    control_statement(c_res) = unsugared_loop_header(sl);
+    control_statement(c_res) = unsugared_whileloop_header(sl);
     /* Add the continuation test between the header and the body that are
        already connected: */
-    control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
+    //control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
     // insert_control_in_arc(c_test, c_res, c_body);
     /* Detach the increment node from the loop exit */
     //unlink_2_control_nodes(c_inc, succ);
     /* And reconnect it to the test node to make the loop: */
     //link_2_control_nodes(c_inc, c_test);
-    link_2_control_nodes(c_body, c_test);
-    link_2_control_nodes(c_test, c_res);
+    //link_2_control_nodes(c_body, c_test);
+    //link_2_control_nodes(c_test, c_res);
     /* Add the else branch of the test toward the loop exit: */
-    link_2_control_nodes(c_test, succ);
+    //link_2_control_nodes(c_test, succ);
     /* We can remove  */
+    link_2_control_nodes(c_res, c_body);
+    /* Add the else branch of the test toward the loop exit: arc
+       ordering matters */
+    unlink_2_control_nodes(c_test, c_body);
+    link_2_control_nodes(c_test, succ);
+    link_2_control_nodes(c_test, c_body);
+    unlink_2_control_nodes(c_res, succ);
+
+    pips_assert("c_test is a test with two successors",
+		gen_length(control_successors(c_test))==2
+		&& statement_test_p(control_statement(c_test)));
+    pips_assert("c_body may have two successors if it is a test",
+		gen_length(control_successors(c_body))==2
+		&& statement_test_p(control_statement(c_body))
+		||gen_length(control_successors(c_body))==1
+		&& !statement_test_p(control_statement(c_body)) );
+    pips_assert("c_res should not be a test",
+		gen_length(control_successors(c_res))==1
+		&& !statement_test_p(control_statement(c_res)) );
   }
 
   /* Keep track of labels that were used by the statements of the loop: */
@@ -1589,7 +1631,7 @@ static bool controlize_test(control c_res,
   /* Then insert the 2 nodes for each branch, in the correct order since
      the "then" branch is the first successor of the test and the "else"
      branch is the second one: */
-  // TODO correct order: link_2_control_nodes add the new arc in the
+  // Correct order: link_2_control_nodes add the new arc in the
   // first slot; so reverse linking of c_else and c_then
   link_2_control_nodes(c_res, c_else);
   link_2_control_nodes(c_else, succ);
