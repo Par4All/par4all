@@ -210,9 +210,12 @@ static void loop_annotate(loop l, gpu_lna_context * p)
   if (gen_length(p->l_enclosing_loops) == 1)
     {
       statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
-#define LOOP_NEST_P4A_BEGIN "// Loop nest P4A begin,"
+      /* Then we add the comment : // Loop nest P4A end */
+      string s_tmp = strdup(concatenate (get_comment_sentinel (),
+					 " Loop nest P4A begin,",
+					 NULL));
       string outer_s;
-      (void) asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , p->loop_nest_depth);
+      (void) asprintf(&outer_s, "%s%dD" OPENPAREN, s_tmp, p->loop_nest_depth);
 
       FOREACH(EXPRESSION, upper_exp, p->l_number_iter_exp) {
         string buf;

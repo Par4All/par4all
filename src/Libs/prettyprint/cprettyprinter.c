@@ -291,6 +291,7 @@ static string c_basic_string(basic b)
     return allocated ? result : strdup(result);
 }
 
+/// @return a newly allocated string of the dimensions in C
 static string c_dim_string(list ldim)
 {
     string result = "";
@@ -347,7 +348,7 @@ static string c_dim_string(list ldim)
         }
     }
     /* otherwise the list is empty, no dimension to declare */
-    return result;
+    return strlower (strdup (result), result);
 }
 
 static string c_qualifier_string(list l)
@@ -492,7 +493,7 @@ static string this_entity_cdeclaration(entity var)
                             "Bitfield to be finished...");
                 }
                 free(st);
-                //free(sd);
+                free(sd);
                 break;
             }
         case is_type_struct:

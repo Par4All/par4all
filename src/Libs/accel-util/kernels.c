@@ -169,7 +169,7 @@ static expression get_sizeofexpression_for_reference(entity variable, list indic
 
 
 /**
- * converts dimensions to a dma call from a memory @a from to another memory @a to
+ * converts dimensions to a dma call from a memory @a from, to another memory @a to
  *
  * @param from expression giving the adress of the input memory
  * @param to expression giving the adress of the output memory

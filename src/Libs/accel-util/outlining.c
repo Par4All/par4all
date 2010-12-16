@@ -543,7 +543,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
     declared_entities=gen_nconc(declared_entities,localized);
-    
+
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
@@ -712,7 +712,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	}
     /* either use origin's compilation unit or a new one */
     char * cu_name = string_undefined;
-    // In fortran wa always want to use an independat compilation unit
+    // In fortran we always want to generate the outline function
+    // in its own new file
     if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT") ||
        (fortran_module_p(get_current_module_entity()))) {
     }
@@ -724,7 +725,6 @@ statement outliner(string outline_module_name, list statements_to_outline)
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, new_body);
-
 
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
     set_bool_property(STAT_ORDER,saved);

@@ -282,7 +282,7 @@ const char* entity_minimal_user_name(entity e)
 {
   return entity_more_or_less_minimal_name(e, FALSE);
 }
-
+
 /* Retrieve the compilation unit containing a module definition.
 
    The implementation is clumsy.
