@@ -139,6 +139,29 @@ void P4A_copy_from_accel_3d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address);
 
+
+/** Prototype for copying memory from a 4D array in the host to the hardware
+    accelerator.
+*/
+void P4A_copy_to_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          const void *host_address,
+          void *accel_address);
+
+
+/** Prototype for copying memory from the hardware accelerator to a 4D
+    array in the host.
+*/
+void P4A_copy_from_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          void *host_address,
+          const void *accel_address);
+
+
 /** A macro to enable or skip debug instructions
 
     Just define P4A_DEBUG to have debug information at runtime
