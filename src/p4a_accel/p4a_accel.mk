@@ -2,6 +2,21 @@ CC = gcc
 CUC = nvcc
 LINK       := gcc -fPIC
 CUDA_DIR=/usr/local/cuda
+STDDEFDIR=/usr/local/par4all/packages/pips-gfc/gcc/ginclude
+
+BASEFLAGS = -I$(P4A_ACCEL_DIR) -I.. -I.  -DP4A_PROFILING  -DUNIX 
+#Flags for openMP mode
+CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99
+
+#Flags for OpenCL mode 
+CLFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENCL -I$(CUDA_DIR)/include/CL -I$(CUDA_DIR)/include -std=c99 
+LDFLAGS = -fPIC -L/usr/lib 
+CLLIBS =  -lOpenCL 
+
+#Flags for Cuda mode (nvcc ~ g++)
+CPPFLAGS = $(BASEFLAGS) -DP4A_ACCEL_CUDA -I../../../../P4A_CUDA -I$(CUDA_DIR)/include 
+CUFLAGS += --compiler-options -fno-strict-aliasing -O2 
+
 
 EXECUTABLE =     $(TARGET:=-seq) 
 EXECUTABLE-OMP = $(TARGET:=-omp) 
@@ -31,23 +46,10 @@ p4a_accel.c: $(P4A_ACCEL_DIR)/p4a_accel.c
 	ln -s $<
 
 %.cl:%.c
-	cpp -DP4A_ACCEL_OPENCL -I$(P4A_ACCEL_DIR) -P -fdirectives-only -nostdinc $< -o $@
+	cpp $(CLFLAGS) -P -fdirectives-only $< -o $@
 
 %.cu:%.c
 	ln -s $< $@ 
-
-BASEFLAGS = -I$(P4A_ACCEL_DIR) -I.. -I.  -DP4A_PROFILING  -DUNIX 
-#Flags for openMP mode
-CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99
-
-#Flags for OpenCL mode 
-CLFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENCL -I$(CUDA_DIR)/include/CL -I$(CUDA_DIR)/include -std=c99 
-LDFLAGS = -fPIC -L/usr/lib 
-CLLIBS =  -lOpenCL 
-
-#Flags for Cuda mode (nvcc ~ g++)
-CPPFLAGS = $(BASEFLAGS) -DP4A_ACCEL_CUDA -I../../../../P4A_CUDA -I$(CUDA_DIR)/include 
-CUFLAGS += --compiler-options -fno-strict-aliasing -O2 
 
 
 # New default rule to compile CUDA source files:
