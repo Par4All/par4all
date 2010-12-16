@@ -5,6 +5,7 @@ c square matrix multiplication
       integer a(n,n), b(n,n), c(n,n), x
       integer i, j, k
       logical flg
+      print *,n
 C initialize the square matrices with ones
       do j=1, n
          do i=1, n

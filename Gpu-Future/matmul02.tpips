@@ -2,6 +2,8 @@ setenv WKS matmul02
 
 delete $WKS
 
+setenv CPRETTYPRINTER_DEBUG_LEVEL 9
+
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create $WKS $WKS.f include/p4a_stubs.f
@@ -102,13 +104,13 @@ shell cp $WKS.database/P4A_KERNEL_1/P4A_KERNEL_1.c  $WKS.database/Src
 echo
 echo producing objects
 echo
-shell ${PIPS_F77:-gfortran} -c $WKS.database/Src/$WKS.f  -o $WKS.database/Src/$WKS.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_LAUNCHER_0.c  -o $WKS.database/Src/P4A_KERNEL_LAUNCHER_0.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_LAUNCHER_1.c  -o $WKS.database/Src/P4A_KERNEL_LAUNCHER_1.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_WRAPPER_0.c  -o $WKS.database/Src/P4A_KERNEL_WRAPPER_0.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_WRAPPER_1.c  -o $WKS.database/Src/P4A_KERNEL_WRAPPER_1.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_0.c  -o $WKS.database/Src/P4A_KERNEL_0.o
-shell cc -c $WKS.database/Src/P4A_KERNEL_1.c  -o $WKS.database/Src/P4A_KERNEL_1.o
+shell ${PIPS_F77:-gfortran} -g -c $WKS.database/Src/$WKS.f  -o $WKS.database/Src/$WKS.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_LAUNCHER_0.c  -o $WKS.database/Src/P4A_KERNEL_LAUNCHER_0.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_LAUNCHER_1.c  -o $WKS.database/Src/P4A_KERNEL_LAUNCHER_1.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_WRAPPER_0.c  -o $WKS.database/Src/P4A_KERNEL_WRAPPER_0.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_WRAPPER_1.c  -o $WKS.database/Src/P4A_KERNEL_WRAPPER_1.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_0.c  -o $WKS.database/Src/P4A_KERNEL_0.o
+shell cc -g -c $WKS.database/Src/P4A_KERNEL_1.c  -o $WKS.database/Src/P4A_KERNEL_1.o
 
 echo
 echo producing executables
