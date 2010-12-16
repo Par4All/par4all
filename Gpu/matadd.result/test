@@ -130,9 +130,9 @@ main (int argc, char *argv[])
   static const int n = 160;
   int i;
   int j;
-  float a[N - 0][M - 0];
-  float b[N - 0][M - 0];
-  float c[N - 0][M - 0];
+  float a[n - 0][m - 0];
+  float b[n - 0][m - 0];
+  float c[n - 0][m - 0];
 
   for (i = 0; i <= ((m - 1) + 1) + -1; i++)
     {
@@ -170,7 +170,7 @@ p4a_accel_malloc (int dest, int n)
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
 int
-p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
+p4a_copy_from_accel (char host_address[n - 0], char accel_address[n - 0],
 		     int n)
 {
   int result;
@@ -185,7 +185,7 @@ p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
 int
-p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
+p4a_copy_to_accel (char host_address[n - 0], char accel_address[n - 0], int n)
 {
   int result;
   int i;
@@ -246,9 +246,9 @@ main (int argc, char *argv[])
   static const int n = 160;
   int i;
   int j;
-  float a[N - 0][M - 0];
-  float b[N - 0][M - 0];
-  float c[N - 0][M - 0];
+  float a[n - 0][m - 0];
+  float b[n - 0][m - 0];
+  float c[n - 0][m - 0];
 
   p4a_kernel_launcher_0 (m, n, b, c);
   p4a_kernel_launcher_1 (m, n, a, b, c);
@@ -272,7 +272,7 @@ p4a_accel_malloc (int dest, int n)
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
 int
-p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
+p4a_copy_from_accel (char host_address[n - 0], char accel_address[n - 0],
 		     int n)
 {
   int result;
@@ -287,7 +287,7 @@ p4a_copy_from_accel (char host_address[N - 0], char accel_address[N - 0],
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
 int
-p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
+p4a_copy_to_accel (char host_address[n - 0], char accel_address[n - 0], int n)
 {
   int result;
   int i;
@@ -301,7 +301,7 @@ p4a_copy_to_accel (char host_address[N - 0], char accel_address[N - 0], int n)
 }
 /* C pretty print for module P4A_KERNEL_0. */
 void
-p4a_kernel_0 (int m, int n, float b[N - 0][M - 0], float c[N - 0][M - 0],
+p4a_kernel_0 (int m, int n, float b[n - 0][m - 0], float c[n - 0][m - 0],
 	      int i, int j)
 {
   ;
@@ -312,8 +312,8 @@ p4a_kernel_0 (int m, int n, float b[N - 0][M - 0], float c[N - 0][M - 0],
 }
 /* C pretty print for module P4A_KERNEL_1. */
 void
-p4a_kernel_1 (int m, int n, float a[N - 0][M - 0], float b[N - 0][M - 0],
-	      float c[N - 0][M - 0], int i, int j)
+p4a_kernel_1 (int m, int n, float a[n - 0][m - 0], float b[n - 0][m - 0],
+	      float c[n - 0][m - 0], int i, int j)
 {
   ;
 
@@ -323,8 +323,8 @@ p4a_kernel_1 (int m, int n, float a[N - 0][M - 0], float b[N - 0][M - 0],
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
 void
-p4a_kernel_launcher_0 (int m, int n, float b[N - 0][M - 0],
-		       float c[N - 0][M - 0])
+p4a_kernel_launcher_0 (int m, int n, float b[n - 0][m - 0],
+		       float c[n - 0][m - 0])
 {
   int j;
   int i;
@@ -340,8 +340,8 @@ p4a_kernel_launcher_0 (int m, int n, float b[N - 0][M - 0],
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
 void
-p4a_kernel_launcher_1 (int m, int n, float a[N - 0][M - 0],
-		       float b[N - 0][M - 0], float c[N - 0][M - 0])
+p4a_kernel_launcher_1 (int m, int n, float a[n - 0][m - 0],
+		       float b[n - 0][m - 0], float c[n - 0][m - 0])
 {
   int j;
   int i;
@@ -357,8 +357,8 @@ p4a_kernel_launcher_1 (int m, int n, float a[N - 0][M - 0],
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
 void
-p4a_kernel_wrapper_0 (int m, int n, float b[N - 0][M - 0],
-		      float c[N - 0][M - 0], int i, int j)
+p4a_kernel_wrapper_0 (int m, int n, float b[n - 0][m - 0],
+		      float c[n - 0][m - 0], int i, int j)
 {
   ;
 
@@ -367,8 +367,8 @@ p4a_kernel_wrapper_0 (int m, int n, float b[N - 0][M - 0],
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
 void
-p4a_kernel_wrapper_1 (int m, int n, float a[N - 0][M - 0],
-		      float b[N - 0][M - 0], float c[N - 0][M - 0], int i,
+p4a_kernel_wrapper_1 (int m, int n, float a[n - 0][m - 0],
+		      float b[n - 0][m - 0], float c[n - 0][m - 0], int i,
 		      int j)
 {
   ;

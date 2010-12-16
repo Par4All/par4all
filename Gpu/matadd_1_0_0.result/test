@@ -1,4 +1,31 @@
 !!
+!! file for P4A_KERNEL_LAUNCHER_0.f
+!!
+      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      INTEGER J, I, M, N
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+
+      DO I = 1, M                                                       0005
+         DO J = 1, N                                                    0006
+            B(I,J) = I                                                  0007
+            C(I,J) = J                                                  0008
+         ENDDO
+      ENDDO
+      END
+!!
+!! file for P4A_KERNEL_LAUNCHER_1.f
+!!
+      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      INTEGER J, I, M, N
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+
+      DO I = 1, M                                                       0005
+         DO J = 1, N                                                    0006
+            A(I,J) = B(I,J)+C(I,J)                                      0007
+         ENDDO
+      ENDDO
+      END
+!!
 !! file for matadd.f
 !!
       PROGRAM MATADD
@@ -12,28 +39,4 @@
 
       CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)                         0015
 
-      END
-!!
-!! file for matadd.f.f
-!!
-      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
-      INTEGER J, I, M, N
-      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
-
-      DO I = 1, M                                                       0005
-         DO J = 1, N                                                    0006
-            A(I,J) = B(I,J)+C(I,J)                                      0007
-         ENDDO
-      ENDDO
-      END
-      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
-      INTEGER J, I, M, N
-      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
-
-      DO I = 1, M                                                       0005
-         DO J = 1, N                                                    0006
-            B(I,J) = I                                                  0007
-            C(I,J) = J                                                  0008
-         ENDDO
-      ENDDO
       END
