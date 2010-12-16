@@ -17,6 +17,7 @@ float_t save[SIZE][SIZE];
 P4A_wrapper_proto(kernel1_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
 P4A_wrapper_proto(kernel2_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
 
+
 void get_data(char filename[]) {
   int i, j, nx, ny;
   unsigned char c;

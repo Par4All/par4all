@@ -2,7 +2,7 @@
 TARGET = jacobi 
 #EXECUTABLE = jacobi 
 CFILES = jacobi-p4a.c
-KERNELFILES = kernel1.c kernel2.c
+KERNELFILES = kernel1_wrapper.c kernel2_wrapper.c
 
 P4A_ACCEL_DIR = ..
 

@@ -1,3 +1,4 @@
+#include "p4a_accel_wrapper-OpenCL.h"
 typedef float float_t;
 #define SIZE 501
 
