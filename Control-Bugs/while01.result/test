@@ -1,0 +1,29 @@
+void while01()
+{
+   int c = 10;
+   while (c>0) {
+      c--;
+      if (c%2==0)
+         goto end;
+   }
+   c++;
+end:   return;
+}
+void while01()
+{
+   // BEGIN BLOCK
+   int c = 10;
+l99998:   ;
+   if (c>0) goto l99999;
+   c++;
+   goto end;
+l99999:   ;
+   c--;
+   if (c%2==0) {
+   }
+   else {
+      goto l99998;
+   }
+end:   return;
+   // END BLOCK
+}
