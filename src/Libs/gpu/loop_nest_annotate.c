@@ -113,7 +113,7 @@ typedef struct {
 /* True only when we reached the inner annotated loop: */
   bool inner_reached;
 } gpu_lna_context;
-  
+
 
 /* Push a loop that match the criterion for annotation */
 static bool loop_push(loop l, gpu_lna_context * p)
@@ -135,6 +135,11 @@ static bool loop_push(loop l, gpu_lna_context * p)
 /* Do the real annotation work on previously marked loops bottom-up */
 static void loop_annotate(loop l, gpu_lna_context * p)
 {
+  /* We have to selct the operators that are different in C and FORTAN*/
+  string and_op = (get_prettyprint_language_tag() == is_language_c) ?
+    C_AND_OPERATOR_NAME : AND_OPERATOR_NAME;
+  string less_op =  (get_prettyprint_language_tag() == is_language_c) ?
+    C_LESS_OR_EQUAL_OPERATOR_NAME : LESS_OR_EQUAL_OPERATOR_NAME;
   /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
@@ -159,7 +164,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  expression c_guard;
 
 	  c_guard =
-	    MakeBinaryCall(entity_intrinsic(C_LESS_OR_EQUAL_OPERATOR_NAME),
+	    MakeBinaryCall(entity_intrinsic(less_op),
 			   reference_to_expression(make_reference(c_index,
 								  NIL)),
 			   copy_expression(c_upper));
@@ -167,7 +172,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  if (expression_undefined_p(guard_exp))
 	    guard_exp = c_guard;
 	  else
-	    guard_exp = MakeBinaryCall(entity_intrinsic(C_AND_OPERATOR_NAME),
+	    guard_exp = MakeBinaryCall(entity_intrinsic(and_op),
 				       guard_exp,
 				       c_guard);
 	  /* Keep the number of iterations for the generation of the
@@ -191,10 +196,10 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 					    loop_body(l),
 					    make_empty_block_statement()));
       /* Then we add the comment : // Loop nest P4A end */
-      statement_comments(guard_s) = strdup("// Loop nest P4A end\n");
-
+      statement_comments(guard_s) = strdup(concatenate (get_comment_sentinel (),
+							" Loop nest P4A end\n",
+							NULL));
       loop_body(l) = guard_s;
-
     }
 
 
