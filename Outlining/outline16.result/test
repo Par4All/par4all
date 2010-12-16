@@ -1,10 +1,10 @@
 
 Initial code
 
-        PROGRAM OUTLINE16
-        INTEGER I
-        INTEGER J
-        INTEGER A(50,50)
+      PROGRAM OUTLINE16
+      INTEGER I
+      INTEGER J
+      INTEGER A(50,50)
       DO 10 I = 1, 50                                                   0005
          DO J = 1, 50                                                   0006
             A(I,J) = I*J                                                0007
@@ -14,10 +14,10 @@ Initial code
 
 Code after outlining
 
-        PROGRAM OUTLINE16
-        INTEGER I
-        INTEGER J
-        INTEGER A(50,50)
+      PROGRAM OUTLINE16
+      INTEGER I
+      INTEGER J
+      INTEGER A(50,50)
       CALL TOTO(A)                                                      0005
       END
       SUBROUTINE TOTO(A)
