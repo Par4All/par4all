@@ -29,6 +29,7 @@ LIB_CFILES =group_constants.c \
 			array_to_pointer.c  \
 			inlining.c\
  			kernels.c\
+ 			ikernels.c\
 			terapixify.c \
 			constraints.c \
 			computation_intensity.c
