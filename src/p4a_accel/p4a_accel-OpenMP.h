@@ -33,6 +33,17 @@ struct timeval p4a_time_begin, p4a_time_end;
 //extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 
+/** @defgroup P4A_OpenMP signatures of kernel
+
+    @{
+*/
+
+/** Start a timer on the host for OpenMP implementation */
+#define P4A_wrapper_proto(kernel, ...)		\
+  P4A_accel_kernel_wrapper kernel(__VA_ARGS__)
+
+/** @} */
+
 /** @defgroup P4A_OpenMP_time_measure Time execution measurement
 
     @{

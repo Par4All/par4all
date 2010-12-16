@@ -12,15 +12,10 @@ float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
 
-#ifndef P4A_ACCEL_OPENCL
-P4A_accel_kernel_wrapper kernel1_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE]);
-P4A_accel_kernel kernel1(P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE],int i, int j);
-P4A_accel_kernel_wrapper kernel2_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE]);
-P4A_accel_kernel kernel2(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE], int i, int j);
-#else
-const char *kernel1_wrapper = "kernel1_wrapper";
-const char *kernel2_wrapper = "kernel2_wrapper";
-#endif
+// Signatures des fonctions exportées dans les kernels 
+// et appelées depuis le launch_kernel
+P4A_wrapper_proto(kernel1_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
+P4A_wrapper_proto(kernel2_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
 
 void get_data(char filename[]) {
   int i, j, nx, ny;

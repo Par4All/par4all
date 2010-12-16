@@ -20,7 +20,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <cutil_inline.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
 #define P4A_test_execution(error)   p4a_error(error, __FILE__, __LINE__)
@@ -173,6 +172,17 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 #else
 #define P4A_accel_timer_start /* Nothing */
 #endif
+
+/** @} */
+
+/** @defgroup P4A_CUDA signatures of kernel
+
+    @{
+*/
+
+/** Start a timer on the host for OpenMP implementation */
+#define P4A_wrapper_proto(kernel, ...)		\
+  P4A_accel_kernel_wrapper kernel(__VA_ARGS__)
 
 /** @} */
 

@@ -62,3 +62,5 @@ Quid if kernels were externalised for every option OpenMP, CUDA and OpenCL ?
 	   p4a_accel-CUDA.h et p4a_accel_OpenMP.h :
 	    extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 	    Seulement besoin dans p4a_accel_OpenMP.h.
+
+16/12/2010 : Adding the macro p4a_wrapper_proto 

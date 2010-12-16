@@ -378,6 +378,16 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 
 /** @} */
 
+/** @defgroup P4A_CUDA signatures of kernel
+
+    @{
+*/
+
+/** Start a timer on the host for OpenMP implementation */
+#define P4A_wrapper_proto(kernel, ...)	 const char *kernel = #kernel;
+
+/** @} */
+
 #include "p4a_accel_wrapper-OpenCL.h"
 
 /** A declaration attribute of a hardware-accelerated kernel in CL
