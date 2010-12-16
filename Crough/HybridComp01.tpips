@@ -41,5 +41,5 @@ shell ${PIPS_F77:-gfortran} $WS.database/Src/$WS.o $WS.database/Src/TOTO.o -o $W
 shell ./$WS.database/Src/$WS
 
 close
-#delete $WS
+delete $WS
 quit
