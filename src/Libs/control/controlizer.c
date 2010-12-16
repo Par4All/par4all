@@ -760,13 +760,15 @@ static bool controlize_whileloop(control c_res,
     unlink_2_control_nodes(c_res, succ);
 
     pips_assert("c_test is a test with two successors",
-		gen_length(control_successors(c_test))==2
-		&& statement_test_p(control_statement(c_test)));
+                gen_length(control_successors(c_test))==2
+                && statement_test_p(control_statement(c_test)));
     pips_assert("c_body may have two successors if it is a test",
-		gen_length(control_successors(c_body))==2
-		&& statement_test_p(control_statement(c_body))
-		||gen_length(control_successors(c_body))==1
-		&& !statement_test_p(control_statement(c_body)) );
+                ( gen_length(control_successors(c_body))==2
+                   && statement_test_p(control_statement(c_body)) )
+                ||
+                ( gen_length(control_successors(c_body))==1
+                  && !statement_test_p(control_statement(c_body)) )
+                );
     pips_assert("c_res should not be a test",
 		gen_length(control_successors(c_res))==1
 		&& !statement_test_p(control_statement(c_res)) );
@@ -897,13 +899,15 @@ static bool controlize_repeatloop(control c_res,
     unlink_2_control_nodes(c_res, succ);
 
     pips_assert("c_test is a test with two successors",
-		gen_length(control_successors(c_test))==2
-		&& statement_test_p(control_statement(c_test)));
+                gen_length(control_successors(c_test))==2
+                && statement_test_p(control_statement(c_test)));
     pips_assert("c_body may have two successors if it is a test",
-		gen_length(control_successors(c_body))==2
-		&& statement_test_p(control_statement(c_body))
-		||gen_length(control_successors(c_body))==1
-		&& !statement_test_p(control_statement(c_body)) );
+                ( gen_length(control_successors(c_body))==2
+                  && statement_test_p(control_statement(c_body)) )
+                ||
+                ( gen_length(control_successors(c_body))==1
+                  && !statement_test_p(control_statement(c_body)) )
+               );
     pips_assert("c_res should not be a test",
 		gen_length(control_successors(c_res))==1
 		&& !statement_test_p(control_statement(c_res)) );
