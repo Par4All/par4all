@@ -106,6 +106,7 @@ bool compilation_unit_p(const char* module_name) {
 /* Check if the given module entity is a compilation unit.
  */
 bool compilation_unit_entity_p(entity e) {
+  if (e == entity_undefined) return false;
   return compilation_unit_p(entity_name(e));
 }
 

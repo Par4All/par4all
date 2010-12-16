@@ -712,10 +712,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	}
     /* either use origin's compilation unit or a new one */
     char * cu_name = string_undefined;
-    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+    // In fortran wa always want to use an independat compilation unit
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT") ||
+       (fortran_module_p(get_current_module_entity()))) {
     }
     else {
-        cu_name = compilation_unit_of_module(get_current_module_name());
+      cu_name = compilation_unit_of_module(get_current_module_name());
     }
 
     /* we can now begin the outlining */
