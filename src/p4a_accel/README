@@ -55,3 +55,10 @@ Attention : argument of the kernel launcher are passed as adresses.
 
 Quid if kernels were externalised for every option OpenMP, CUDA and OpenCL ?
      Because for automated Hyantes, this an abostacle.
+
+
+15/12/2010 :
+	   p4_accel.h : enum { P4A_vp_dim_max = 3 }; 
+	   p4a_accel-CUDA.h et p4a_accel_OpenMP.h :
+	    extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
+	    Seulement besoin dans p4a_accel_OpenMP.h.

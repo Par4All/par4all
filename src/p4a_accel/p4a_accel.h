@@ -30,7 +30,7 @@
 #include <stddef.h>
 
 /** Note that in CUDA and OpenCL there is 3 dimensions max: */
-enum { P4A_vp_dim_max = 3 };
+//enum { P4A_vp_dim_max = 3 };
 
 extern double P4A_accel_timer_stop_and_float_measure();
 
@@ -38,12 +38,12 @@ extern double P4A_accel_timer_stop_and_float_measure();
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
 #endif
 
-#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_CL) 
-#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_CL defined, yet"
+#if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENCL) 
+#error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENCL defined, yet"
 #endif
 
-#if defined(P4A_ACCEL_CL) && defined(P4A_ACCEL_OPENMP) 
-#error "You cannot have both P4A_ACCEL_CL and P4A_ACCEL_OPENMP defined, yet"
+#if defined(P4A_ACCEL_OPENCL) && defined(P4A_ACCEL_OPENMP) 
+#error "You cannot have both P4A_ACCEL_OPENCL and P4A_ACCEL_OPENMP defined, yet"
 #endif
 
 /* Some common function prototypes. */
@@ -182,10 +182,10 @@ void P4A_copy_from_accel_3d(size_t element_size,
 #ifdef P4A_ACCEL_OPENMP
 #include <p4a_accel-OpenMP.h>
 #else
-#ifdef P4A_ACCEL_CL
+#ifdef P4A_ACCEL_OPENCL
 #include <p4a_accel-OpenCL.h>
 #else
-#error "You have to define either P4A_ACCEL_CUDA, P4A_ACCEL_OPENMP or P4A_ACCEL_CL"
+#error "You have to define either P4A_ACCEL_CUDA, P4A_ACCEL_OPENMP or P4A_ACCEL_OPENCL"
 #endif
 #endif
 #endif

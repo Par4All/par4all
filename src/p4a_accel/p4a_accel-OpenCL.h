@@ -16,22 +16,21 @@
 */
 
 /* Do not include twice this file: */
-#ifndef P4A_ACCEL_CL_H
-#define P4A_ACCEL_CL_H
+#ifndef P4A_ACCEL_OPENCL_H
+#define P4A_ACCEL_OPENCL_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdbool.h>
-//#include <oclUtils.h>
 #include <opencl.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <cl.h>
+//#include <cl.h>
 
 /** A kernel list.
 */
@@ -368,23 +367,25 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 
 /** @} */
 
+#include "p4a_accel_wrapper-OpenCL.h"
+
 /** A declaration attribute of a hardware-accelerated kernel in CL
     called from the GPU it-self
 */
-#define P4A_accel_kernel inline void
+//#define P4A_accel_kernel inline void
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in CL */
-#define P4A_accel_kernel_wrapper __kernel void
+//#define P4A_accel_kernel_wrapper __kernel void
 
 /** The address space visible for all functions. 
     Allocation in the global memory pool.
  */
-#define P4A_accel_global_address __global
+//#define P4A_accel_global_address __global
 
 /** The address space in the global memory pool but in read-only mode.
  */
-#define P4A_accel_constant_address __constant
+//#define P4A_accel_constant_address __constant
 
 /** The address space visible by all work-items in a work group.
     This is the <<shared>> memory in the CUDA architecture.
@@ -393,24 +394,27 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
     * __local float a;
               a = 1;       is allowed.
  */
-#define P4A_accel_local_address __local
+//#define P4A_accel_local_address __local
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
     CL
 */
-#define P4A_vp_0 get_global_id(0)
+//#define P4A_vp_0 get_global_id(0)
 
 /** Get the coordinate of the virtual processor in Y (second) dimension in
     CL
 */
-#define P4A_vp_1 get_global_id(1)
+//#define P4A_vp_1 get_global_id(1)
 
 /** Get the coordinate of the virtual processor in Z (second) dimension in
     CL
 */
-#define P4A_vp_2 get_global_id(2)
+//#define P4A_vp_2 get_global_id(2)
 
+/**
+   @}
+*/
 
 /** @defgroup P4A_cl_kernel_call
 
@@ -608,4 +612,4 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 /** @} */
 
 
-#endif //P4A_ACCEL_CL_H
+#endif //P4A_ACCEL_OPENCL_H

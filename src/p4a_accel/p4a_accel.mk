@@ -1,32 +1,78 @@
+CC = gcc
 CUC = nvcc
-
-all: $(EXECUTABLE)
-
-# This should be more configurable:
-#NVIDIA_SDK_DIR=$(HOME)/NVIDIA_GPU_Computing_SDK
+LINK       := gcc -fPIC
 CUDA_DIR=/usr/local/cuda
 
-# Add runtime:
-OBJFILES += p4a_accel.o
+EXECUTABLE =     $(TARGET:=-seq) 
+EXECUTABLE-OMP = $(TARGET:=-omp) 
+EXECUTABLE-CU  = $(TARGET:=-cuda) 
+EXECUTABLE-CL  = $(TARGET:=-cl) 
 
-p4a_accel.cu: $(P4A_ACCEL_DIR)/p4a_accel.cu
+EXECUTABLES = $(EXECUTABLE) $(EXECUTABLE-OMP) $(EXECUTABLE-CU) $(EXECUTABLE-CL) 
+
+all: $(EXECUTABLES) 
+
+#Creation of the kernel wrapper with header for OpenMP
+WRAPFILES = $(KERNELFILES:.c=_wrapper.c)
+
+#Kernels are not included in C files in OpenCL ...
+CFILES += p4a_accel.c
+
+CUFILES = $(CFILES:.c=.cu) $(WRAPFILES:.c=.cu) 
+
+CLFILES = $(KERNELFILES:.c=_wrapper.cl)
+
+# Add runtime:
+OBJCUFILES = $(CUFILES:.cu=.cu.o)
+
+p4a_accel.c: $(P4A_ACCEL_DIR)/p4a_accel.c
 	ln -s $<
 
-#CPPFLAGS = -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I$(CUDA_DIR)/include -I$(NVIDIA_SDK_DIR)/C/common/inc -DUNIX
-CPPFLAGS = -I.. -I.  -I../../../../P4A_CUDA -DP4A_ACCEL_CUDA -DP4A_DEBUG -I$(CUDA_DIR)/include -DUNIX
-CUFLAGS += --compiler-options -fno-strict-aliasing --ptxas-options=-v -arch=sm_13 -O2 -c
+%_wrapper.c:%.c
+	cat $(P4A_ACCEL_DIR)/p4a_accel_wrapper-OpenMP.h $< > $@
 
-#LDFLAGS = -fPIC -L$(CUDA_DIR)/lib64 -L$(NVIDIA_SDK_DIR)/C/lib -L$(NVIDIA_SDK_DIR)/C/common/lib/linux
-LDFLAGS = -fPIC -L$(CUDA_DIR)/lib64
+#Specification of _wrapper.cu before %.cu
+%_wrapper.cu:%.c
+	cat $(P4A_ACCEL_DIR)/p4a_accel_wrapper-CUDA.h $< > $@
 
-#LDLIBS = -lcudart -lcutil_x86_64
-LDLIBS = -lcudart
+%_wrapper.cl:%.c
+	cat $(P4A_ACCEL_DIR)/p4a_accel_wrapper-OpenCL.h $< > $@
+
+%.cu:%.c
+	ln -s $< $@ 
+
+BASEFLAGS = -I.. -I.  -DP4A_PROFILING  -DUNIX 
+#Flags for openMP mode
+CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99
+
+#Flags for OpenCL mode 
+CLFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENCL -I$(CUDA_DIR)/include/CL -I$(CUDA_DIR)/include -std=c99 
+LDFLAGS = -fPIC -L/usr/lib 
+LDLIBS =  -lOpenCL 
+
+#Flags for Cuda mode (nvcc ~ g++)
+CPPFLAGS = $(BASEFLAGS) -DP4A_ACCEL_CUDA -I../../../../P4A_CUDA -I$(CUDA_DIR)/include 
+CUFLAGS += --compiler-options -fno-strict-aliasing -O2 
+
 
 # New default rule to compile CUDA source files:
-%.o: %.cu
-	$(CUC) -c $(CPPFLAGS) $(CUFLAGS) $<
 
-$(EXECUTABLE): $(OBJFILES)
+$(EXECUTABLE): $(CFILES) $(WRAPFILES)
+	$(CC) $(CFLAGS) -o $@ $(CFILES)  $(WRAPFILES)  
+
+$(EXECUTABLE-OMP): $(CFILES) $(WRAPFILES)
+	$(CC) $(CFLAGS) -fopenmp -o $@ $(CFILES)  $(WRAPFILES) -fopenmp
+
+# New default rule to compile CUDA source files:
+%.cu.o: %.cu
+	$(CUC) $(CPPFLAGS) $(CUFLAGS) -o $@ -c $< 
+
+$(EXECUTABLE-CU): $(OBJCUFILES)
+	$(CUC) -o $(EXECUTABLE-CU) $(OBJCUFILES) $(LDLIBS) 
+
+# rule to compile OpenCL source files:
+$(EXECUTABLE-CL): $(CFILES) $(CLFILES)
+	$(CC) $(CLFLAGS) -o $@ $(CFILES) $(LDLIBS) $(LDFLAGS)
 
 clean::
-	rm -f $(EXECUTABLE) $(OBJFILES)
+	rm -f $(EXECUTABLES) $(WRAPFILES) *.o $(CUFILES) $(CLFILES) *~ ./p4a_accel.c

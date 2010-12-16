@@ -12,6 +12,15 @@ float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
 
+#ifndef P4A_ACCEL_OPENCL
+P4A_accel_kernel_wrapper kernel1_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE]);
+P4A_accel_kernel kernel1(P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE],int i, int j);
+P4A_accel_kernel_wrapper kernel2_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE]);
+P4A_accel_kernel kernel2(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE], int i, int j);
+#else
+const char *kernel1_wrapper = "kernel1_wrapper";
+const char *kernel2_wrapper = "kernel2_wrapper";
+#endif
 
 void get_data(char filename[]) {
   int i, j, nx, ny;
@@ -86,40 +95,6 @@ void write_data(char filename[]) {
 
 
 #define MIN(a,b) (a < b ? a : b )
-/*
- * file for kernel1.c
- */
-
-P4A_accel_kernel kernel1(float_t space[SIZE][SIZE],
-			 float_t save[SIZE][SIZE],
-			 int i,
-			 int j) {
-  save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
-}
-
-
-/*
- * file for launch_kernel1.c
- */
-P4A_accel_kernel_wrapper kernel1_wrapper(float_t space[SIZE][SIZE],
-					 float_t save[SIZE][SIZE]) {
-  int j;
-  int i;
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-  kernel1:
-   //for(i = 1; i <= 62; i += 10)
-  /* We need this wrapper to get the virtual processor coordinates
-
-     The Cuda compiler inline P4A_accel_kernel functions by default, so
-     there is no overhead */
-  i = P4A_vp_0;
-  j = P4A_vp_1;
-  // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
-  /* We need a phase to generate this clamping too: */
-  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
-    kernel1(space, save, i, j);
-}
 
 /*
  * file for launch_kernel1.c
@@ -127,39 +102,6 @@ P4A_accel_kernel_wrapper kernel1_wrapper(float_t space[SIZE][SIZE],
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
   P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
-}
-
-P4A_accel_kernel kernel2(float_t space[SIZE][SIZE], 
-			 float_t save[SIZE][SIZE], 
-			 int i, 
-			 int j)
-{
-   space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
-}
-
-
-/*
- * file for launch_kernel2.c
- */
-P4A_accel_kernel_wrapper kernel2_wrapper(float_t space[SIZE][SIZE], 
-					 float_t save[SIZE][SIZE])
-{
-  int j;
-  int i;
-   /* Use 2 array in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-kernel2:
-   //for(i = 1; i <= 62; i += 10)
-  /* We need this wrapper to get the virtual processor coordinates
-
-     The Cuda compiler inline P4A_accel_kernel functions by default, so
-     there is no overhead */
-  i = P4A_vp_0;
-  j = P4A_vp_1;
-  // Oops. I forgotten a loop normalize since the GPU iterate in [0..SIZE-1]...
-  /* We need a phase to generate this clamping too: */
-  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
-    kernel2(space, save, i, j);
 }
 
 /*
@@ -204,6 +146,7 @@ int main(int argc, char *argv[]) {
   // Useless to transfer and allocate data everytime... So this should be
   //  put at the highest level. It needs the interprocedural PIPS region
   //  analysis... :-) 
+  P4A_accel_timer_start;
   float_t (*p4a_var_space)[SIZE][SIZE];
   P4A_accel_malloc((void **) &p4a_var_space, sizeof(space));
   P4A_copy_to_accel(sizeof(space), space, p4a_var_space);
@@ -211,6 +154,7 @@ int main(int argc, char *argv[]) {
   float_t (*p4a_var_save)[SIZE][SIZE];
   P4A_accel_malloc((void **) &p4a_var_save, sizeof(save));
   P4A_copy_to_accel(sizeof(space), save, p4a_var_save);
+  double copy_time = P4A_accel_timer_stop_and_float_measure();
 
   P4A_accel_timer_start;
 
@@ -224,7 +168,10 @@ int main(int argc, char *argv[]) {
   fprintf(stderr, "GFLOPS : %f\n",
 	  4e-9/execution_time*T*(SIZE - 1)*(SIZE - 1));
   
+  P4A_accel_timer_start;
   P4A_copy_from_accel((size_t)sizeof(space), (void *)space, (void *)p4a_var_space);
+  copy_time += P4A_accel_timer_stop_and_float_measure();
+  fprintf(stderr, "Temps de copie : %f s\n", copy_time);
 
   P4A_accel_free(p4a_var_space);
   P4A_accel_free(p4a_var_save);

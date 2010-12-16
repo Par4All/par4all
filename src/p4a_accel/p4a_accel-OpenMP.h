@@ -30,7 +30,7 @@ struct timeval p4a_time_begin, p4a_time_end;
 
     Use thead local storage (TLS) to have it local to each OpenMP thread.
  */
-extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
+//extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 
 /** @defgroup P4A_OpenMP_time_measure Time execution measurement
@@ -39,7 +39,11 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 */
 
 /** Start a timer on the host for OpenMP implementation */
+#ifdef P4A_PROFILING
 #define P4A_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
+#else
+#define P4A_accel_timer_start 
+#endif
 /** @} */
 
 /** @defgroup P4A_init_OpenMP Initialization of P4A C to OpenMP
@@ -63,12 +67,13 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
 /** @} */
 
+#include "p4a_accel_wrapper-OpenMP.h"
 
 /** A declaration attribute of a hardware-accelerated kernel in OpenMP
 
     Nothing by default for OpenMP since it is normal C
 */
-#define P4A_accel_kernel
+//#define P4A_accel_kernel void
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
@@ -76,36 +81,36 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
     Nothing by default since it is homogeneous programming model
 */
-#define P4A_accel_kernel_wrapper
+//#define P4A_accel_kernel_wrapper void
 
 
 /** The address space visible for all functions. 
     Allocation in the global memory pool.
  */
-#define P4A_accel_global_address 
+//#define P4A_accel_global_address 
 
 /** The address space in the global memory pool but in read-only mode.
  */
-#define P4A_accel_constant_address const
+//#define P4A_accel_constant_address const
 
 /** 
  */
-#define P4A_accel_local_address 
+//#define P4A_accel_local_address 
 
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
     OpenMP emulation */
-#define P4A_vp_0 P4A_vp_coordinate[0]
+//#define P4A_vp_0 P4A_vp_coordinate[0]
 
 
 /** Get the coordinate of the virtual processor in Y (second) dimension in
     OpenMP emulation */
-#define P4A_vp_1 P4A_vp_coordinate[1]
+//#define P4A_vp_1 P4A_vp_coordinate[1]
 
 
 /** Get the coordinate of the virtual processor in Z (second) dimension in
     OpenMP emulation */
-#define P4A_vp_2 P4A_vp_coordinate[2]
+//#define P4A_vp_2 P4A_vp_coordinate[2]
 
 
 /** @addtogroup P4A_cuda_kernel_call

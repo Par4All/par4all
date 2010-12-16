@@ -23,36 +23,41 @@
 //#include <cutil_inline.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
-#define P4A_test_execution(error)		checkErrorInline      	(error, __FILE__, __LINE__)
-#define P4A_test_execution_with_message(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
+#define P4A_test_execution(error)   p4a_error(error, __FILE__, __LINE__)
+#define P4A_test_execution_with_message(message)	\
+  p4a_message(message, __FILE__, __LINE__)
 
-inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
+inline void p4a_error(cudaError_t error, 
+			     const char *currentFile, 
+			     const int currentLine)
 {
-    if(cudaSuccess != error){
-	fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
-        exit(-1);
-    }
+  if(cudaSuccess != error){
+    fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
+    exit(-1);
+  }
 }
 
-inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
+inline void p4a_message(const char *errorMessage, 
+			const char *currentFile, 
+			const int currentLine)
 {
-    cudaError_t error = cudaGetLastError();
-    if(cudaSuccess != error){
-        fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
-        exit(-1);
-    }
+  cudaError_t error = cudaGetLastError();
+  if(cudaSuccess != error){
+    fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
+    exit(-1);
+  }
 #ifdef P4A_DEBUG
-    error = cudaThreadSynchronize();
-    if(cudaSuccess != error){
-	fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
-        exit(-1);
-    }
+  error = cudaThreadSynchronize();
+  if(cudaSuccess != error){
+    fprintf(stderr, "File %s - Line %i - Error after ThreadSynchronize %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
+    exit(-1);
+  }
 #endif
 }
 
 
 /** @defgroup P4A_cuda_kernel_call Accelerator kernel call
-
+    
     @{
 */
 
@@ -138,12 +143,15 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 
     Just initialize events for time measure right now.
 */
-#define P4A_init_accel					\
-  do {							\
+#ifdef P4A_PROFILING
+#define P4A_init_accel						\
+  do {								\
     P4A_test_execution(cudaEventCreate(&p4a_start_event));	\
     P4A_test_execution(cudaEventCreate(&p4a_stop_event));	\
   } while (0);
-
+#else
+#define P4A_init_accel /* Nothing*/
+#endif
 
 /** Release the hardware accelerator in CUDA
 
@@ -160,48 +168,52 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 */
 
 /** Start a timer on the accelerator in CUDA */
+#ifdef P4A_PROFILING
 #define P4A_accel_timer_start P4A_test_execution(cudaEventRecord(p4a_start_event, 0))
+#else
+#define P4A_accel_timer_start /* Nothing */
+#endif
 
 /** @} */
 
-
+#include "p4a_accel_wrapper-CUDA.h"
 
 /** A declaration attribute of a hardware-accelerated kernel in CUDA
     called from the GPU it-self
 */
-#define P4A_accel_kernel __device__ void
+//#define P4A_accel_kernel __device__ void
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in CUDA */
-#define P4A_accel_kernel_wrapper __global__ void
+//#define P4A_accel_kernel_wrapper __global__ void
 
 /** The address space visible for all functions. 
     Allocation in the global memory pool.
  */
-#define P4A_accel_global_address
+//#define P4A_accel_global_address
 
 /** The address space in the global memory pool but in read-only mode.
  */
-#define P4A_accel_constant_address __constant__
+//#define P4A_accel_constant_address __constant__
 
 /** The <<shared>> memory in the CUDA architecture.
  */
-#define P4A_accel_local_address __shared__
+//#define P4A_accel_local_address __shared__
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
     CUDA
 */
-#define P4A_vp_0 (blockIdx.x*blockDim.x + threadIdx.x)
+//#define P4A_vp_0 (blockIdx.x*blockDim.x + threadIdx.x)
 
 /** Get the coordinate of the virtual processor in Y (second) dimension in
     CUDA
 */
-#define P4A_vp_1 (blockIdx.y*blockDim.y + threadIdx.y)
+//#define P4A_vp_1 (blockIdx.y*blockDim.y + threadIdx.y)
 
 /** Get the coordinate of the virtual processor in Z (second) dimension in
     CUDA
 */
-#define P4A_vp_2 (blockIdx.z*blockDim.z + threadIdx.z)
+//#define P4A_vp_2 (blockIdx.z*blockDim.z + threadIdx.z)
 
 
 /** @defgroup P4A_CUDA_memory_allocation_copy Memory allocation and copy for CUDA acceleration
