@@ -60,7 +60,8 @@ class p4a_processor_input(object):
     project_name = ""
     accel = False
     cuda = False
-    mem_optimization = False
+    com_optimization = False
+    fftw3 = False
     openmp = False
     fine = False
     select_modules = ""
@@ -110,7 +111,8 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
-            mem_optimization = input.mem_optimization,
+            com_optimization = input.com_optimization,
+            fftw3 = input.fftw3,
             recover_includes = input.recover_includes,
             native_recover_includes = input.native_recover_includes,
             properties = input.properties,
@@ -198,7 +200,8 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False, mem_optimization = False,
+                 filter_exclude = None, accel = False, cuda = False, 
+                 com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  properties = {}, activates = []):
 
@@ -206,9 +209,8 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
-        self.mem_optimization = mem_optimization
-        warn('Mem optimization')
-        warn(mem_optimization)
+        self.com_optimization = com_optimization
+        self.fftw3 = fftw3,
 
         if workspace:
             # There is one provided: use it!
@@ -437,7 +439,7 @@ class p4a_processor(object):
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
         # Add communication around all the call site of the kernels:
-        if not self.mem_optimization :
+        if not self.com_optimization :
             kernel_launchers.kernel_load_store(concurrent=True,
                                                KERNEL_LOAD_STORE_LOAD_FUNCTION_2D = "P4A_copy_to_accel_2d",
                                                KERNEL_LOAD_STORE_STORE_FUNCTION_2D = "P4A_copy_from_accel_2d"
@@ -445,6 +447,11 @@ class p4a_processor(object):
         else :
             # Identify kernels first
             kernels.flag_kernel()
+            if  self.com_optimization :
+                #kernel for fftw3 runtime
+                fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
+                fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
+                fftw3_kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
@@ -477,7 +484,7 @@ class p4a_processor(object):
         wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
         kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
 
-        if self.mem_optimization :
+        if self.com_optimization :
             wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
             wrappers.cast_at_call_sites()
 
