@@ -166,20 +166,28 @@ DEFINE_LOCAL_STACK(scoping_statement, statement)
 
    It returns NULL if the statement has a label but it is not associated to
    any control node yet
+
+   FI: the call sites do not seem to check if c==NULL...
  */
 static control make_conditional_control(statement st) {
   string label = entity_name(statement_label(st));
+  control c = control_undefined;
 
   if (empty_global_label_p(label))
     /* No label, so there cannot be a control already associated to a
        label */
-    return make_control(st, NIL, NIL);
+  c = make_control(st, NIL, NIL);
   else
       /* Get back the control node associated with this statement
 	 label. Since we store control object in this hash table, use
 	 cast. We rely on the fact that NIL for a list is indeed
 	 NULL... */
-    return (control) hash_get_default_empty_list(Label_control, label);
+    c = (control) hash_get_default_empty_list(Label_control, label);
+
+  pips_assert("c==0 || control_consistent_p(c)",
+	      c==0 || control_consistent_p(c));
+
+  return c;
 }
 
 
@@ -760,15 +768,15 @@ static bool controlize_whileloop(control c_res,
     unlink_2_control_nodes(c_res, succ);
 
     pips_assert("c_test is a test with two successors",
-                gen_length(control_successors(c_test))==2
-                && statement_test_p(control_statement(c_test)));
+		gen_length(control_successors(c_test))==2
+		&& statement_test_p(control_statement(c_test)));
     pips_assert("c_body may have two successors if it is a test",
-                ( gen_length(control_successors(c_body))==2
-                   && statement_test_p(control_statement(c_body)) )
-                ||
-                ( gen_length(control_successors(c_body))==1
-                  && !statement_test_p(control_statement(c_body)) )
-                );
+		( gen_length(control_successors(c_body))==2
+		  && statement_test_p(control_statement(c_body)) )
+		||
+		( gen_length(control_successors(c_body))==1
+		  && !statement_test_p(control_statement(c_body)) )
+		);
     pips_assert("c_res should not be a test",
 		gen_length(control_successors(c_res))==1
 		&& !statement_test_p(control_statement(c_res)) );
@@ -1403,7 +1411,8 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
    list of statements that use it, as their label or because it is a goto
    to it
 
-   @return TRUE if the code is not a structured control.
+   @return TRUE if the code is not a structured control, i.e. it has
+   to be "controlized", i.e. transformed into an "unstructured".
 */
 static bool controlize_sequence(control c_res,
 				control succ,
@@ -1440,20 +1449,53 @@ static bool controlize_sequence(control c_res,
   /* We first transform a structured block of statement in a thread of
      control node with all the statements that we insert from c_res up to
      succ: */
+  bool must_be_controlized_p = FALSE;
+  //bool previous_control_preexisting_p = FALSE;
   FOREACH(STATEMENT, s, sts) {
-    /* Create a new control node for this statement: */
+    /* Create a new control node for this statement, or retrieve one
+       if it as a label: */
     control c = make_conditional_control(s);
-    ifdebug(6) {
-      pips_debug(0, "Inserting new control node %p between %p and %p with statement %p:\n", c, pred, succ, s);
-      print_statement(s);
+    //bool control_preexisting_p = FALSE;
+
+    // FI: I'm not sure this is enough to dectet that
+    // make_conditional_control() has not made a new control but
+    // retrieved a control by its label...
+    //if(!ENDP(control_successors(c)) || !ENDP(control_predecessors(c)) ) {
+    if(!unlabelled_statement_p(s)) {
+      pips_debug(8, "This control %p pre-existed. "
+		 "The sequence cannot be controlized.\n", c);
+      must_be_controlized_p = TRUE;
+      //control_preexisting_p = TRUE;
     }
-    /* Insert it in a sequence of control list: */
-    insert_control_in_arc(c, pred, succ);
+
+    // "insert_control_in_arc(c, pred, succ);" with additional checks
+    unlink_2_control_nodes(pred,succ); // whether they are linked or not
+    if(ENDP(control_successors(pred)))
+      link_2_control_nodes(pred, c);
+    if(ENDP(control_successors(c)))
+      link_2_control_nodes(c, succ);
+
+
     /* Keep track of the control node associated to this statement. Note
        that the list is built in reverse order: */
     ctls = CONS(CONTROL, c, ctls);
     /* The next control node will be inserted after the new created node: */
     pred = c;
+    //previous_control_preexisting_p = control_preexisting_p;
+  }
+
+  // FI: check that this is a neat sequence if it does not must be controlized
+  if(!must_be_controlized_p) {
+    FOREACH(CONTROL, c, ctls) {
+      pips_assert("c may have only one successor even if it is a test "
+		  "a this point",
+		  ( gen_length(control_successors(c))==1
+		    && statement_test_p(control_statement(c)) )
+		  ||
+		  ( gen_length(control_successors(c))==1
+		    && !statement_test_p(control_statement(c)) )
+		  );
+    }
   }
 
   /* Now do the real controlizer job on the previously inserted thread of
@@ -1466,28 +1508,73 @@ static bool controlize_sequence(control c_res,
   control next = succ;
   pips_debug(5, "Controlize each statement sequence node in reverse order:\n");
   FOREACH(CONTROL, c, ctls) {
-    /* Recurse on each statement: */
+    /* Recurse on each statement: controlized has been initialized to
+       FALSE */
     controlized |= controlize_statement(c, next, block_used_labels);
     /* The currently processed element will be the successor of the one to
        be processed: */
     next = c;
   }
 
-  if (!controlized) {
+  if (!controlized && !must_be_controlized_p) {
+
+    // FI: check that this is a neat sequence
+    FOREACH(CONTROL, c, ctls) {
+      if(controlized) // unstructured case: impossible
+	pips_assert("c may have two successors only if it is a test",
+		    ( gen_length(control_successors(c))==2
+		      && statement_test_p(control_statement(c)) )
+		    ||
+		    ( gen_length(control_successors(c))<=1
+		      && !statement_test_p(control_statement(c)) )
+		    );
+      else // the sequence is structured: always
+	pips_assert("c may have two successors only if it is a test",
+		    ( gen_length(control_successors(c))==2
+		      && statement_test_p(control_statement(c)) )
+		    ||
+		    ( gen_length(control_successors(c))==1
+		      && !statement_test_p(control_statement(c)) )
+		    );
+    }
     /* Each control node of the sequence is indeed well structured, that
        each control node is without any goto from or to outside itself. So
        we can keep the original sequence back! */
-    pips_debug(5, "Keep a statement sequence and thus remove previously allocated control nodes for the sequence.\n");
+    pips_debug(5, "Keep a statement sequence and thus remove"
+	       " previously allocated control nodes for the sequence.\n");
     /* Easy, just remove all the control nodes of the sequence and relink
        around the control graph: */
     FOREACH(CONTROL, c, ctls) {
+      statement s = control_statement(c);
+      int nsucc = (int) gen_length(control_successors(c));
       /* Do not forget to detach the statement of its control node since
 	 we do not want the statement to be freed at the same time: */
       pips_debug(6, "Removing useless control node %p.\n", c);
       control_statement(c) = statement_undefined;
-      /* Remove the control node from the control graph by carefully
-	 relinking around: */
-      remove_a_control_from_an_unstructured(c);
+
+      if(statement_test_p(s)) {
+	// FI: this had not been planned by Ronan
+	if(nsucc==1) {
+	  // FI: might this happen when a test is found out well-structured?
+	  remove_a_control_from_an_unstructured(c);
+	}
+	else {
+	  pips_assert("a test has two successors\n", nsucc==2);
+	  remove_a_control_from_an_unstructured_without_relinking(c);
+	}
+      }
+      else {
+	if(nsucc<=1) {
+	  pips_assert("a non test has one successor at most\n", nsucc<=1);
+	  /* Remove the control node from the control graph by carefully
+	     relinking around: */
+	  remove_a_control_from_an_unstructured(c);
+	}
+	else {
+	  pips_debug(1, "Abnormal control: not a test, two successors.\n");
+	  remove_a_control_from_an_unstructured_without_relinking(c);
+	}
+      }
     }
   }
   else {
@@ -1535,7 +1622,8 @@ static bool controlize_sequence(control c_res,
 	check_control_coherency(exit);
       }
 
-      statement u_s = instruction_to_statement(make_instruction(is_instruction_unstructured, u));
+      statement u_s =
+	instruction_to_statement(make_instruction_unstructured(u));
       /* We keep the old block statement since it may old extensions,
 	 declarations... If useless, it should be removed later by another
 	 phase. So, move the unstructured statement as the only statement
@@ -1549,8 +1637,12 @@ static bool controlize_sequence(control c_res,
     else {
       /* There are some goto from or to external control nodes, so we
 	 cannot localize stuff. */
-      pips_debug(5, "There are goto to/from outside this statement list so keep control nodes without any hierarchy here.\n");
+      pips_debug(5, "There are goto to/from outside this statement list"
+		 " so keep control nodes without any hierarchy here.\n");
       /* Keep the empty block statement for extensions and declarations: */
+      // FI; maybe for extensions, but certainly not for declarations;
+      // similar code to flatten_code must be used to rename the local
+      // variables and to move them up the AST; see sequence04.c for instance
       sequence_statements(instruction_sequence(statement_instruction(st))) =
 	NIL;
       // TODO move declarations up, keep extensions & here

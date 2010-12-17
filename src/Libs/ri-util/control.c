@@ -934,7 +934,9 @@ remove_a_control_from_an_unstructured(control c)
    /* Unlink from the predecessor. Note that a node may have more than
       one predecessor. Since we cannot discard an IF this way, we have
       at most 1 successor: */
-   pips_assert("remove_a_control_from_an_unstructured: more than one successor", number_of_successors <= 1);
+   pips_assert("remove_a_control_from_an_unstructured:"
+	       " no more than one successor",
+	       number_of_successors <= 1);
    remove_a_control_from_a_list_and_relink(c,
                                            the_predecessors,
                                            the_successors,
