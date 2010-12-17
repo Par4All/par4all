@@ -365,6 +365,9 @@ class p4a_processor(object):
     def get_kernel_prefix (self):
         return self.workspace.props.GPU_KERNEL_PREFIX
 
+    def get_wrapper_prefix (self):
+        return self.workspace.props.GPU_WRAPPER_PREFIX
+
     def gpuify(self, filter_select = None, filter_exclude = None):
         """Apply transformations to the parallel loop nested found in the
         workspace to generate GPU-oriented code
@@ -443,7 +446,6 @@ class p4a_processor(object):
             # Identify kernels first
             kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
-            
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
@@ -467,7 +469,8 @@ class p4a_processor(object):
 
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
-        wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+        wrapper_prefix = self.get_wrapper_prefix ()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
         # set return type for wrappers && kernel
