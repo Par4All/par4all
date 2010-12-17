@@ -359,11 +359,6 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization()
 
-    def get_launcher_prefix (self):
-        return self.workspace.props.GPU_LAUNCHER_PREFIX
-
-    def get_kernel_prefix (self):
-        return self.workspace.props.GPU_KERNEL_PREFIX
 
     def gpuify(self, filter_select = None, filter_exclude = None):
         """Apply transformations to the parallel loop nested found in the
@@ -378,9 +373,8 @@ class p4a_processor(object):
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
-        # functions have their names beginning with the launcher prefix:
-        launcher_prefix = self.get_launcher_prefix ()
-        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
+        # functions have their names beginning with "p4a_kernel_launcher":
+        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
@@ -429,8 +423,7 @@ class p4a_processor(object):
 
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
-        kernel_prefix = self.get_kernel_prefix ()
-        kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
+        kernel_filter_re = re.compile("p4a_kernel_\\d+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
         # Add communication around all the call site of the kernels:
@@ -451,7 +444,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-
+        
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
         # original code for more precise analysis but we need to remove

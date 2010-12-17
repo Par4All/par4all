@@ -95,7 +95,7 @@ void P4A_copy_to_accel(size_t element_size,
 
     @param[in] d1_block_size is the number of element to transfer
 
-    @param[in] d1_offset is element order to start the transfer to
+    @param[in] d1_offset is element order to start the transfer from
 
     @param[out] host_address point to the array on the host to write into
 
