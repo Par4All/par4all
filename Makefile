@@ -96,6 +96,13 @@ check-run-consistency:
 	  exit 1 ; \
 	}
 
+# check for Makefiles in subdirectories
+.PHONY: check-makefile
+check-makefile:
+	-for dir in * ; do \
+	  test -d $$dir -a ! -f $$dir/Makefile && echo "missing $$dir/Makefile" ; \
+	done
+
 # this target should replace the "validate" target
 .PHONY: new-validate
 new-validate:
