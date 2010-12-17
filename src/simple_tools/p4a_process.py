@@ -359,6 +359,14 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization()
 
+    def get_launcher_prefix (self):
+        return self.workspace.props.GPU_LAUNCHER_PREFIX
+
+    def get_kernel_prefix (self):
+        return self.workspace.props.GPU_KERNEL_PREFIX
+
+    def get_wrapper_prefix (self):
+        return self.workspace.props.GPU_WRAPPER_PREFIX
 
     def gpuify(self, filter_select = None, filter_exclude = None):
         """Apply transformations to the parallel loop nested found in the
@@ -373,8 +381,9 @@ class p4a_processor(object):
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
-        # functions have their names beginning with "p4a_kernel_launcher":
-        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+        # functions have their names beginning with the launcher prefix:
+        launcher_prefix = self.get_launcher_prefix ()
+        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
@@ -423,7 +432,8 @@ class p4a_processor(object):
 
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
-        kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+        kernel_prefix = self.get_kernel_prefix ()
+        kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
         # Add communication around all the call site of the kernels:
@@ -436,7 +446,6 @@ class p4a_processor(object):
             # Identify kernels first
             kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
-            
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
@@ -444,7 +453,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        
+
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
         # original code for more precise analysis but we need to remove
@@ -460,7 +469,8 @@ class p4a_processor(object):
 
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
-        wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+        wrapper_prefix = self.get_wrapper_prefix ()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
         # set return type for wrappers && kernel
