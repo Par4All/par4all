@@ -2087,12 +2087,14 @@ effects in which intermediary access paths may refer to different
 memory locations at different program points; regular {\tt effects}
 are constant path effects, which means that their intermediary access
 paths all refer to unique memory locations. The same distinction holds
-for convex array regions (see section~\ref{subsection-array-regions}). 
+for convex array regions (see section~\ref{subsection-array-regions}).
 
-{\tt proper\_effects\_with\_points\_to} is an alternative to compute
-constant path proper effects using points-to analysis (see
-subsection~\ref{subsection-points-to-analysis}). This is still highly
-experimental.
+{\tt proper\_effects\_with\_points\_to} and {\tt
+  proper\_effects\_with\_pointer\_values} are alternatives to compute
+constant path proper effects using points-to (see
+subsection~\ref{subsection-points-to-analysis}) or pointer values
+analyses (see subsection~\ref{subsection-pointer-values}). This is
+still at an experimental stage.
 
 Summary effects (see
 Section~\ref{subsubection-summary-data-flow-information}) of a called
@@ -2103,7 +2105,7 @@ binding. If too many actual arguments are defined, a user warning is
 issued but the processing goes on because a simple semantics is
 available: ignore useless actual arguments. If too few actual
 arguments are provided, a user error is issued because the effects of
-the call are not defined. 
+the call are not defined.
 
 Variables private to loops are handled like regular variable.
 
@@ -2124,8 +2126,16 @@ proper_effects                  > MODULE.proper_effects
 \begin{PipsMake}
 proper_effects_with_points_to > MODULE.proper_effects
         < PROGRAM.entities
-        < MODULE.code        
+        < MODULE.code
         < MODULE.points_to_list
+        < CALLEES.summary_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+proper_effects_with_pointer_values > MODULE.proper_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.pointer_values
         < CALLEES.summary_effects
 \end{PipsMake}
 
@@ -2177,7 +2187,29 @@ cumulated_pointer_effects_with_points_to > MODULE.cumulated_pointer_effects
 \end{PipsMake}
 
 \begin{PipsMake}
+cumulated_pointer_effects_with_pointer_values > MODULE.cumulated_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_effects
+        < MODULE.points_to_list
+\end{PipsMake}
+
+\begin{PipsMake}
 cumulated_effects            > MODULE.cumulated_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+cumulated_effects_with_points_to        > MODULE.cumulated_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
@@ -2185,7 +2217,7 @@ cumulated_effects            > MODULE.cumulated_effects
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops. 
+Fortran parallel DO loops.
 
 
 
@@ -6997,8 +7029,8 @@ of data that have to be copied on the GPU before each statement in the module,
 and the set of data that have to be copied back from the GPU after the execution 
 of each statement.
 
-Then according to this information, the copy-in & copy-out transfert are 
-generated using same property than \PipsPassRef{KERNEL_LOAD_STORE} :
+Then according to this information, the copy-in and copy-out transfers are 
+generated using same properties as \PipsPassRef{KERNEL_LOAD_STORE}:
 
 \end{PipsPass}
 \begin{PipsMake}

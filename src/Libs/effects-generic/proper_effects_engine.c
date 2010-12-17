@@ -56,6 +56,7 @@
 #include "pipsdbm.h"
 #include "resources.h"
 
+#include "pointer_values.h"
 #include "effects-generic.h"
 
 /* For debuging
@@ -2223,6 +2224,8 @@ bool proper_effects_engine(char *module_name)
     if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
+    else if (get_pointer_info_kind() == with_pointer_values)
+      set_pv( db_get_simple_pv(module_name));
 
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
@@ -2236,6 +2239,9 @@ bool proper_effects_engine(char *module_name)
 
      if (get_pointer_info_kind() == with_points_to)
        reset_pt_to_list();
+     else if (get_pointer_info_kind() == with_pointer_values)
+       reset_pv();
+
     reset_current_module_entity();
     reset_current_module_statement();
     reset_proper_rw_effects();
