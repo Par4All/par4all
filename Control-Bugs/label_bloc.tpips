@@ -4,6 +4,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create label_bloc label_bloc.c
 
+activate NEW_CONTROLIZER
+
 #SELECT C LANGUAGE
 activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"

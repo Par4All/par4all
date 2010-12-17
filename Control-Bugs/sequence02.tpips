@@ -1,0 +1,24 @@
+delete sequence02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence02 sequence02.c
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo Printed file
+echo
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE
+
+close
+quit
