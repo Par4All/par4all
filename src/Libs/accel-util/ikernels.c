@@ -260,7 +260,27 @@ static void copy_from_test(statement st, test t) {
 
 
   /* Compute "out" sets for the test */
-  set_intersection(COPY_FROM_OUT( st ), COPY_FROM_OUT( test_true(t)), COPY_FROM_OUT( test_false(t)));
+  set copy_from_out = COPY_TO_OUT( st );
+
+  set_intersection(copy_from_out, COPY_FROM_OUT( test_true(t)), COPY_FROM_OUT( test_false(t)));
+
+
+  ifdebug(6) {
+    pips_debug(6,"Handling copy from for test expression : ");
+    print_expression(test_condition(t));
+    fprintf(stderr,"\n");
+  }
+
+  // We remove from "copy from" what is used by this statement
+  FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
+    entity e_used = reference_variable(effect_any_reference(eff));
+    if(entity_array_p(e_used)) {
+      pips_debug(6,"Removing %s from copy_out\n",entity_name(e_used));
+      set_del_element(copy_from_out, copy_from_out, e_used);
+    }
+  }
+
+
 }
 
 static void copy_from_all_kind_of_loop(statement st, statement body) {
@@ -496,8 +516,28 @@ static void copy_to_test(statement st, test t) {
   copy_to_statement(test_false(t));
 
 
-  /* Compute "out" sets for the test */
-  set_intersection(COPY_TO_IN( st ), COPY_TO_IN( test_true(t)), COPY_TO_IN( test_false(t)));
+  /* Compute "in" sets for the test */
+  set copy_to_in = COPY_TO_IN( st );
+
+  set_intersection(copy_to_in, COPY_TO_IN( test_true(t)), COPY_TO_IN( test_false(t)));
+
+  ifdebug(6) {
+    pips_debug(6,"Handling copy to for test expression : ");
+    print_expression(test_condition(t));
+    fprintf(stderr,"\n");
+  }
+
+  // We remove from "copy to" what is used by the test condition
+  FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
+    entity e_used = reference_variable(effect_any_reference(eff));
+    if(entity_array_p(e_used)) {
+      pips_debug(6,"Removing %s from copy_in\n",entity_name(e_used));
+      set_del_element(copy_to_in, copy_to_in, e_used);
+    }
+  }
+
+
+
 }
 static void copy_to_all_kind_of_loop(statement st, statement body) {
   /* Compute "out" sets for the loop body */
