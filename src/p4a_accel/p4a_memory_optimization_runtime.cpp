@@ -24,24 +24,39 @@ static p4a_memory_mapping memory_mapping;
  * @return a pointer in the GPU memory corresponding to host_ptr
  */
 void * P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
-  // Try to convert host_ptr into corresponding accel_ptr
-  p4a_memory_mapping::iterator it = memory_mapping.find(host_ptr);
   void *accel_ptr;
 
-  if ( it != memory_mapping.end() ) {
-    // We found a mapping
-    accel_ptr = it->second;
-  } else {
-    // If there's no existing mapping, then allocating a new one and register it
+
+/* Mandatory in openmp accel emulation, because of macro implementation */
+#pragma omp critical
+  {
+    // Try to convert host_ptr into corresponding accel_ptr
+    p4a_memory_mapping::iterator it = memory_mapping.find(host_ptr);
+
+    if(it != memory_mapping.end()) {
+      // We found a mapping
+      accel_ptr = it->second;
+    } else {
+      // If there's no existing mapping, then allocating a new one and register it
 
 #ifdef P4A_RUNTIME_DEBUG
-    fprintf(stderr,"[%s:%d] allocating memory for host %p !\n",__FUNCTION__,__LINE__, host_ptr);
+      fprintf(stderr,"[%s:%d] allocating %zd bytes of memory for host %p !\n",__FUNCTION__,__LINE__, size, host_ptr);
 #endif
 
-    // Alloc && map
-    P4A_accel_malloc(&accel_ptr, size);
-    memory_mapping[host_ptr]=accel_ptr;
+      // Alloc && map
+      P4A_accel_malloc(&accel_ptr, size);
+      memory_mapping.insert(it, p4a_memory_mapping::value_type(host_ptr,
+                                                               accel_ptr));
+
+      it = memory_mapping.find(host_ptr);
+      if(it == memory_mapping.end()) {
+        fprintf(stderr, "Error insert failed !\n");
+        exit(-1);
+      }
+
+    }
   }
+
 
 #ifdef P4A_RUNTIME_DEBUG
   fprintf(stderr,"[%s:%d] Resolved accel adress for host %p is %p\n",__FUNCTION__,__LINE__, host_ptr, accel_ptr);
@@ -85,19 +100,27 @@ void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
  * @return nothing
  */
 void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */) {
-  // Try to convert host_ptr into corresponding accel_ptr
-  p4a_memory_mapping::iterator it = memory_mapping.find(host_ptr);
   void *accel_ptr;
 
-  if ( it == memory_mapping.end() ) {
-    // We didn't found a mapping
-    fprintf(stderr,"[%s:%d] Error : no mapping in the accel memory for host ptr %p ! Abort...\n",__FUNCTION__,__LINE__, host_ptr);
-    exit(-1);
-  } else {
-    // A mapping was found !
-    accel_ptr = it->second;
-  }
+/* Mandatory in openmp accel emulation, because of macro implementation */
+  #pragma omp critical
+  {
+    // Try to convert host_ptr into corresponding accel_ptr
+    p4a_memory_mapping::iterator it = memory_mapping.find(host_ptr);
 
+    if(it == memory_mapping.end()) {
+      // We didn't found a mapping
+      fprintf(stderr,
+              "[%s:%d] Error : no mapping in the accel memory for host ptr %p ! Abort...\n",
+              __FUNCTION__,
+              __LINE__,
+              host_ptr);
+      exit(-1);
+    } else {
+      // A mapping was found !
+      accel_ptr = it->second;
+    }
+  }
 
 #ifdef P4A_RUNTIME_DEBUG
   fprintf(stderr,"[%s:%d] Copying %zd bytes of memory from accel %p to host %p !\n",__FUNCTION__,__LINE__,size, accel_ptr,host_ptr);
