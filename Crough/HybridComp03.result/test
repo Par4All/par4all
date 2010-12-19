@@ -1,0 +1,62 @@
+
+Initial code
+
+      PROGRAM HYBRIDCOMP03
+      INTEGER I
+      INTEGER J
+      INTEGER N
+      INTEGER A
+      N = 5                                                             0006
+      A = 0                                                             0007
+      DO 10 I = 1, N                                                    0008
+         DO J = 1, N                                                    0009
+            A = I*J                                                     0010
+         ENDDO
+10       CONTINUE                                                       0012
+      PRINT *, A                                                        0013
+      END
+
+Code after outlining
+
+      PROGRAM HYBRIDCOMP03
+      INTEGER I
+      INTEGER J
+      INTEGER N
+      INTEGER A
+      N = 5                                                             0006
+      A = 0                                                             0007
+      CALL TOTO(A, N)                                                   0008
+      PRINT *, A                                                        0013
+      END
+/* C pretty print for module TOTO. */
+void
+toto_ (int *a_p4a_copy, int *n_p4a_copy)
+{
+  int j;
+  int i;
+  int a = *a_p4a_copy;
+  int n = *n_p4a_copy;
+
+  for (i = 1; i <= n; i++)
+    {
+      for (j = 1; j <= n; j++)
+	{
+	  a = (i * j);
+	}
+      continue;
+    }
+  *a_p4a_copy = a;
+  *n_p4a_copy = n;
+  return;
+}
+
+unsplit
+
+
+compiles pgm from fortran files and executes
+
+          25
+
+compiles pgm from fortran and C files and executes
+
+          25
