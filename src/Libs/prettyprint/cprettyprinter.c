@@ -75,9 +75,19 @@
 #define SHARPDEF      "#define"
 #define COMMENT	      "//" SPACE
 
+// define an extension to append to scalar name in function signature
+#define SCALAR_IN_SIG_EXT "_p4a_copy"
+
+
 /* forward declaration. */
 static string c_expression(expression,bool);
 
+// Create some list to keep trac of scalar variable that arguments of the
+// function. They need to be renamed in the function signature. Copy at
+// function entrance and updated at fonction output.
+static list l_type   = NIL;
+static list l_name   = NIL;
+static list l_rename = NIL;
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
@@ -146,6 +156,39 @@ static string c_entity_local_name(entity var)
     return name;
 }
 
+/**************************************************** Function Pre and Postlude */
+
+static string scalar_prelude () {
+  string result = NULL;
+  string previous = NULL;
+  list t = l_type;
+  list n = l_name;
+  list r = l_rename;
+  for (; n != NIL && r!= NIL && t!= NIL; n = n->cdr, r = r->cdr, t = t->cdr) {
+    result = strdup (concatenate ((char*) gen_car (t), SPACE,
+				  (string) gen_car (n), " = ", "*",
+				  (string) gen_car (r), ";\n", previous,
+				  NULL));
+    if (previous != NULL) free (previous);
+    previous = result;
+  }
+  return (result == NULL) ? strdup("") : result;
+}
+
+static string scalar_postlude () {
+  string result = NULL;
+  string previous = NULL;
+  list n = l_name;
+  list r = l_rename;
+  for (; n != NIL && r!= NIL; n = n->cdr, r = r->cdr) {
+    result = strdup (concatenate ("*", (string) gen_car (r), " = ",
+				  (string) gen_car (n), ";\n", previous, NULL));
+    if (previous != NULL) free (previous);
+    previous = result;
+  }
+  return (result == NULL) ? strdup("") : result;
+}
+
 /************************************************************** DECLARATIONS */
 
 /*
@@ -192,6 +235,7 @@ static string c_type_string(type t)
     return strdup(result);
 }
 
+// Convert the fortran type to its c string value
 static string c_basic_string(basic b)
 {
     string result = "UNKNOWN_BASIC" SPACE;
@@ -292,6 +336,7 @@ static string c_basic_string(basic b)
 }
 
 /// @return a newly allocated string of the dimensions in C
+/// @param ldim the variable dimension
 static string c_dim_string(list ldim)
 {
     string result = "";
@@ -395,7 +440,9 @@ static string c_brace_expression_string(expression exp)
     return result;
 }
 
-static string this_entity_cdeclaration(entity var)
+/// @param var, the variable to get the c declaration
+/// @param fct_sig, set to true if the variable is part of a function signature
+static string this_entity_cdeclaration(entity var, bool fct_sig)
 {
     string result = NULL;
     //string name = entity_local_name(var);
@@ -409,7 +456,7 @@ static string this_entity_cdeclaration(entity var)
     {
         string tmp = NULL;
         tmp=c_entity_local_name(var);
-        result = strdup(concatenate("typedef ", c_type_string(t),SPACE,c_entity_local_name(var),NULL));
+        result = strdup(concatenate("typedef ", c_type_string(t),SPACE,tmp,NULL));
         free(tmp);
         return result;
     }
@@ -462,15 +509,33 @@ static string this_entity_cdeclaration(entity var)
         case is_type_variable:
             {
                 variable v = type_variable(t);
-                string st, sd, svar, sq;
+                string sptr, st, sd, svar, sq, ext;
                 value val = entity_initial(var);
                 st = c_basic_string(variable_basic(v));
                 sd = c_dim_string(variable_dimensions(v));
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
+		// if the variable is a scalar inside a function signature a
+		// "*" must be added because fortran assumes passing by pointers
+		if ((variable_dimensions(v)==NIL)&&(fct_sig==true)) {
+		  ext = SCALAR_IN_SIG_EXT;
+		  sptr = "*";
+		  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
+					     l_type);
+		  l_name   = gen_string_cons(strdup(concatenate(svar, NULL)),
+					     l_name);
+		  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
+					     l_rename);
+		}
+		else {
+		  ext = "";
+		  sptr = "";
+		}
+
 
                 /* problems with order !*/
-                result = strdup(concatenate(sq, st, SPACE, svar, sd, NULL));
+                result = strdup(concatenate(sq, st, sptr, SPACE, svar, ext,
+					    sd, NULL));
                 free(svar);
                 if (!value_undefined_p(val))
                 {
@@ -505,7 +570,7 @@ static string this_entity_cdeclaration(entity var)
                 free(tmp);
                 MAP(ENTITY,ent,
                         {
-                        string s = this_entity_cdeclaration(ent);	
+			string s = this_entity_cdeclaration(ent, fct_sig);
                         result = strdup(concatenate(result, s, SEMICOLON, NULL));
                         free(s);
                         },l);
@@ -521,7 +586,7 @@ static string this_entity_cdeclaration(entity var)
                 free(tmp);
                 MAP(ENTITY,ent,
                         {
-                        string s = this_entity_cdeclaration(ent);	
+			  string s = this_entity_cdeclaration(ent, fct_sig);
                         result = strdup(concatenate(result, s, SEMICOLON, NULL));
                         free(s);
                         },l);
@@ -580,11 +645,17 @@ static bool argument_p(entity e)
         storage_formal_p(entity_storage(e));
 }
 
+/// @param module, the module to get the declaration
+/// @param consider_this_entity, the function test pointer
+/// @param separator, the separatot to be used between vars
+/// @param lastsep, set to true if a final separator is needed
+/// @param fct_sig, set to true if in a function signature
 static string c_declarations(
         entity module,
         bool (*consider_this_entity)(entity),
         string separator,
-        bool lastsep
+        bool lastsep,
+	bool fct_sig
         )
 {
     string result = strdup("");
@@ -603,7 +674,7 @@ static string c_declarations(
         if (consider_this_entity(var))
         {
             string old = result;
-            string svar = this_entity_cdeclaration(var);
+            string svar = this_entity_cdeclaration(var, fct_sig);
             pips_debug(6, "svar = %s\n", svar);
             result = strdup(concatenate(old, !first ? separator: "",
                         svar, NULL));
@@ -613,7 +684,7 @@ static string c_declarations(
             first = FALSE;
         }
     }
-    if (lastsep) 
+    if (lastsep)
       result = strdup(concatenate(result, separator, NULL));
     return result;
 }
@@ -658,7 +729,7 @@ static string c_head(entity module)
         /* define args. */
         if (functional_parameters(f))
         {
-            args = c_declarations(module, argument_p, ", ", FALSE);
+	  args = c_declarations(module, argument_p, ", ", FALSE, true);
         }
         else
         {
@@ -667,10 +738,10 @@ static string c_head(entity module)
 
         svar = c_entity_local_name(module);
 	if (get_bool_property("PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE"))
-	  
+
 	  result = strdup(concatenate(head, SPACE, svar, "_",
-				      OPENPAREN, args, CLOSEPAREN, NL, NULL)); 
-	  
+				      OPENPAREN, args, CLOSEPAREN, NL, NULL));
+
 	else
 	  result = strdup(concatenate(head, SPACE, svar,
 				      OPENPAREN, args, CLOSEPAREN, NL, NULL));
@@ -877,15 +948,16 @@ static string c_call(call c,bool breakable)
     string result = NULL;
 
     /* special case... */
-    if (same_string_p(local_name, "RETURN"))
-    {
-        if (entity_main_module_p(get_current_module_entity()))
-            result = RET " 0";
-        else if (current_module_is_a_function())
-            result = RET SPACE RESULT_NAME;
-        else
-            result = RET;
-        result=strdup(result);
+    if (same_string_p(local_name, "RETURN")) {
+      string copy_out = scalar_postlude ();
+      if (entity_main_module_p(get_current_module_entity()))
+	result = RET " 0";
+      else if (current_module_is_a_function())
+	result = RET SPACE RESULT_NAME;
+      else
+	result = RET;
+      result = strdup(concatenate (copy_out, result, NULL));
+      free (copy_out);
     }
     else if (same_string_p(local_name, "CONTINUE") )
     {
@@ -907,14 +979,14 @@ static string c_call(call c,bool breakable)
     return result;
 }
 
-/* Attention with Fortran: the indexes are reversed. 
+/* Attention with Fortran: the indexes are reversed.
    And array dimensions in C always rank from 0. BC.
 */
 static string c_reference(reference r)
 {
     string result = strdup(EMPTY), old, svar;
 
-    list l_dim = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r))))); 
+    list l_dim = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
 
     MAP(EXPRESSION, e,
     {
@@ -923,19 +995,19 @@ static string c_reference(reference r)
       string s;
       intptr_t itmp;
 
-      if( !expression_equal_integer_p(e_lower, 0)) 
-	e_tmp = 
+      if( !expression_equal_integer_p(e_lower, 0))
+	e_tmp =
 	  MakeBinaryCall(entity_intrinsic(MINUS_OPERATOR_NAME),
-			 copy_expression(e), 
+			 copy_expression(e),
 			 copy_expression(e_lower));
       else
-	e_tmp = copy_expression(e);      
-      
+	e_tmp = copy_expression(e);
+
       if(expression_integer_value(e_tmp, &itmp))
 	s = i2a(itmp);
       else
 	s = c_expression( e_tmp,false);
-      
+
       old = result;
       result = strdup(concatenate(OPENBRACKET, s, CLOSEBRACKET,old, NULL));
       //free(old);
@@ -1322,7 +1394,7 @@ static string c_statement(statement s, bool breakable)
             string tmp = c_entity_local_name(var);
             debug(2, "\n In block declaration for variable :", tmp);
             free(tmp);
-            svar = this_entity_cdeclaration(var);
+            svar = this_entity_cdeclaration(var, false);
             decl = strdup(concatenate(decl, svar, SEMICOLON, NULL));
             free(svar);
         },l);
@@ -1334,35 +1406,48 @@ static string c_statement(statement s, bool breakable)
 
 static string c_code_string(entity module, statement stat)
 {
-    string head, decls, body, result;
+  string head, decls, body, result, copy_in;
 
-    /* What about declarations that are external a module scope ?
-       Consider a source file as a module entity, put all declarations in it
-       (external static + TOP-LEVEL) */
+  /// init the list needed for the function pre and postlude
+  l_type   = NIL;
+  l_name   = NIL;
+  l_rename = NIL;
 
-    /* before_head only generates the constant declarations, such as #define*/
-    ifdebug(2)
+  /* What about declarations that are external a module scope ?
+     Consider a source file as a module entity, put all declarations in it
+     (external static + TOP-LEVEL) */
+
+  /* before_head only generates the constant declarations, such as #define*/
+  ifdebug(2)
     {
-        printf("Module statement: \n");
-        print_statement(stat);
-        printf("and declarations: \n");
-        print_entities(statement_declarations(stat));
+      printf("Module statement: \n");
+      print_statement(stat);
+      printf("and declarations: \n");
+      print_entities(statement_declarations(stat));
     }
 
-    //before_head = c_declarations(module, parameter_p, NL, TRUE);
-    head        = c_head(module);
-    /* What about declarations associated to statements */
-    decls       = c_declarations(module, parameter_or_variable_p, SEMICOLON, TRUE);
-    body        = c_statement(stat, false);
+  //before_head = c_declarations(module, parameter_p, NL, TRUE);
+  head        = c_head(module);
+  /* What about declarations associated to statements */
+  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,FALSE);
+  body        = c_statement(stat, false);
+  copy_in     = scalar_prelude ();
+  result = concatenate(/*before_head,*/ head, OPENBRACE, NL, decls,
+		       copy_in, NL, body, CLOSEBRACE, NL, NULL);
 
-    result = concatenate(/*before_head,*/ head, OPENBRACE, NL,
-            decls, NL, body, CLOSEBRACE, NL, NULL);
+  free(head);
+  free(decls);
+  free(body);
+  free(copy_in);
+  // free and reset strin lists
+  gen_free_string_list (l_type);
+  gen_free_string_list (l_name);
+  gen_free_string_list (l_rename);
+  l_type   = NIL;
+  l_name   = NIL;
+  l_rename = NIL;
 
-    free(head);
-    free(decls);
-    free(body);
-
-    return strdup(result);
+  return strdup(result);
 }
 
 /******************************************************** PIPSMAKE INTERFACE */
@@ -1395,7 +1480,9 @@ bool print_crough(string module_name)
 
     /* save to file */
     out = safe_fopen(filename, "w");
-    fprintf(out, "/* C pretty print for module %s. */\n%s", module_name, ppt);
+    fprintf(out, "/* C pretty print for module %s. */\n", module_name);
+    //    fprintf(out, "#include \"p4a_crough_types.h\"\n\n");
+    fprintf(out, "%s", ppt);
     safe_fclose(out, filename);
 
     free(ppt);
