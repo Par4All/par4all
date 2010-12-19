@@ -21,44 +21,241 @@
       END
 
 
-	SUBROUTINE P4A_ACCEL_FREE(DEST)
-	INTEGER DEST
+!>  Stub for freeing memory on the hardware accelerator.
+!>
+!>  @param[in] address is the address of a previously allocated memory
+!>  zone on the hardware accelerator
+	SUBROUTINE P4A_ACCEL_FREE(ADDRESS)
+	INTEGER ADDRESS
 ! Do nothing since it is not representable in Fortran 77...
       END
 
 
-	SUBROUTINE P4A_ACCEL_MALLOC(DEST, N)
-	INTEGER N
-	INTEGER DEST
+!>  Stub for allocating memory on the hardware accelerator.
+!>
+!>  @param[out] address is the address of a variable that is updated by
+!>  this macro to contains the address of the allocated memory block
+!>  @param[in] size is the size to allocate in bytes
+	SUBROUTINE P4A_ACCEL_MALLOC(ADDRESS, SIZE)
+	INTEGER SIZE
+	INTEGER ADDRESS
 ! Do nothing since it is not representable in Fortran 77...
       END
 
-
-	FUNCTION P4A_COPY_FROM_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
-	INTEGER N
-	CHARACTER HOST_ADDRESS(N)
-	CHARACTER ACCEL_ADDRESS(N)
+!>  Stub for copying memory from the hardware accelerator to the host.
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  @param[out] host_add is the address of a destination zone in the
+!>  host memory
+!>
+!>  @param[in] accel_add is the address of a source zone in the
+!>  accelerator memory
+!>
+!>  @param[in] size is the size in bytes of the memory zone to copy
+	SUBROUTINE P4A_COPY_FROM_ACCEL(HOST_ADD, ACCEL_ADD, SIZE)
+	INTEGER SIZE
+	CHARACTER HOST_ADD(SIZE)
+	CHARACTER ACCEL_ADD(SIZE)
 	INTEGER I
-	INTEGER P4A_COPY_FROM_ACCEL
 
-      DO I = 1, N
-         HOST_ADDRESS(I) = ACCEL_ADDRESS(I)
+      DO I = 1, SIZE
+         HOST_ADD(I) = ACCEL_ADD(I)
       ENDDO
-      P4A_COPY_FROM_ACCEL = HOST_ADDRESS
       END
-! Equivalent stubs of Par4All runtime to keep the PIPS analyzes happy
 
-	FUNCTION P4A_COPY_TO_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
-	INTEGER N
-	CHARACTER HOST_ADDRESS(N)
-	CHARACTER ACCEL_ADDRESS(N)
+
+!> Stub for copying memory from the host to the hardware accelerator.
+!>
+!> Since it is a stub so that PIPS can understand it, use simple
+!> implementation with standard memory copy operations
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  This function could be quite simpler but is designed by symmetry with
+!>  other functions.
+!>
+!>  @param[in] elem_size is the size of one element of the array in
+!>  byte
+!>
+!>  @param[in] d1_size is the number of elements in the array.
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_block_size is the number of element to transfer
+!>
+!>  @param[in] d1_offset is the element order to start the transfer to
+!>
+!>  @param[out] host_add point to the array on the host to write into
+!>
+!>  @param[in] accel_add refer to the compact memory area to read
+!>  data. In the general case, accel_add may be seen as a unique idea (FIFO)
+!>  and not some address in some memory space.
+
+	SUBROUTINE P4A_COPY_FROM_ACCEL_1D (ELEM_SIZE, D1_SIZE,
+     &  D1_BLOCK_SIZE, D1_OFFSET, HOST_ADD, ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE)
 	INTEGER I
-	INTEGER P4A_COPY_TO_ACCEL
+	INTEGER SIZE
+	INTEGER OFFSET
 
-      DO I = 1, N
-         ACCEL_ADDRESS(I) = HOST_ADDRESS(I)
+      OFFSET = D1_OFFSET*ELEM_SIZE
+      SIZE = D1_SIZE*ELEM_SIZE
+      DO I = 1, SIZE
+         HOST_ADD(OFFSET+I) = ACCEL_ADD(I)
       ENDDO
-      P4A_COPY_TO_ACCEL = ACCEL_ADDRESS
+      END
+
+!>  Stub for copying memory from the hardware accelerator to a 2D array in
+!>  the host.
+
+	SUBROUTINE P4A_COPY_FROM_ACCEL_2D (ELEM_SIZE, D1_SIZE, D2_SIZE,
+     &  D1_BLOCK_SIZE, D2_BLOCK_SIZE, D1_OFFSET, D2_OFFSET, HOST_ADD,
+     &  ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER D2_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D2_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	INTEGER D2_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE, D2_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE,
+     &                      D2_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I_1
+	INTEGER I_2
+	INTEGER OFFSET_1
+	INTEGER OFFSET_2
+
+      OFFSET_1 = D1_OFFSET*ELEM_SIZE
+      OFFSET_2 = D2_OFFSET*ELEM_SIZE
+      DO I_2 = 1, D2_BLOCK_SIZE*ELEM_SIZE
+         DO I_1 = 1, D1_BLOCK_SIZE*ELEM_SIZE
+            HOST_ADD(OFFSET_1+I_1,OFFSET_2+I_2) = ACCEL_ADD(I_1,I_2)
+         ENDDO
+      ENDDO
+      END
+!> @addtogroup p4a_accel_stubs
+
+!> @{
+
+!> @defgroup p4a_accel_Fortran_stubs Equivalent stubs in Fortran of Par4All runtime to have PIPS analyzes happy
+
+!> @{
+
+!>  Stub for copying memory from the host to the hardware accelerator.
+!>
+!>  Since it is a stub so that PIPS can understand it, use simple
+!>  implementation with standard memory copy operations
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  @param[in] host_add is the address of a source zone in the host memory
+!>
+!>  @param[out] accel_add is the address of a destination zone in the
+!>  accelerator memory
+!>
+!>  @param[in] size is the size in bytes of the memory zone to copy
+	SUBROUTINE P4A_COPY_TO_ACCEL(HOST_ADD, ACCEL_ADD, SIZE)
+	INTEGER SIZE
+	CHARACTER HOST_ADD(SIZE)
+	CHARACTER ACCEL_ADD(SIZE)
+	INTEGER I
+
+      DO I = 1, SIZE
+         ACCEL_ADD(I) = HOST_ADD(I)
+      ENDDO
+      END
+
+
+!>  Stub for copying a 1D memory zone from the hardware accelerator to the
+!>  host.
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  This function could be quite simpler but is designed by symmetry with
+!>  other functions.
+!>
+!>  @param[in] elem_size is the size of one element of the array in
+!>  byte
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_block_size is the number of element to transfer
+!>
+!>  @param[in] d1_offset is element order to start the transfer from
+!>
+!>  @param[in] host_add point to the array on the host to read
+!>
+!>  @param[out] accel_add refer to the compact memory area to write
+!>  data. In the general case, accel_add may be seen as a unique idea
+!>  (FIFO) and not some address in some memory space.
+
+	SUBROUTINE P4A_COPY_TO_ACCEL_1D(ELEM_SIZE, D1_SIZE,
+     &  D1_BLOCK_SIZE, D1_OFFSET, HOST_ADD, ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I
+	INTEGER SIZE
+	INTEGER OFFSET
+
+      OFFSET = D1_OFFSET*ELEM_SIZE
+      SIZE = D1_SIZE*ELEM_SIZE
+      DO I = 1, SIZE
+         ACCEL_ADD(I) = HOST_ADD(OFFSET+I)
+      ENDDO
+      END
+
+!>  Stub for copying a 2D memory zone from the host to a compact memory
+!>  zone in the hardware accelerator.
+
+	SUBROUTINE P4A_COPY_TO_ACCEL_2D (ELEM_SIZE, D1_SIZE, D2_SIZE,
+     &  D1_BLOCK_SIZE, D2_BLOCK_SIZE, D1_OFFSET, D2_OFFSET, HOST_ADD,
+     &  ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER D2_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D2_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	INTEGER D2_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE, D2_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE,
+     &                      D2_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I_1
+	INTEGER I_2
+	INTEGER OFFSET_1
+	INTEGER OFFSET_2
+
+      OFFSET_1 = D1_OFFSET*ELEM_SIZE
+      OFFSET_2 = D2_OFFSET*ELEM_SIZE
+      DO I_2 = 1, D2_BLOCK_SIZE*ELEM_SIZE
+         DO I_1 = 1, D1_BLOCK_SIZE*ELEM_SIZE
+            ACCEL_ADD(I_1,I_2) = HOST_ADD(OFFSET_1+I_1,OFFSET_2+I_2)
+         ENDDO
+      ENDDO
       END
       PROGRAM MATADD
       INTEGER M
@@ -83,44 +280,241 @@
       END
 
 
-	SUBROUTINE P4A_ACCEL_FREE(DEST)
-	INTEGER DEST
+!>  Stub for freeing memory on the hardware accelerator.
+!>
+!>  @param[in] address is the address of a previously allocated memory
+!>  zone on the hardware accelerator
+	SUBROUTINE P4A_ACCEL_FREE(ADDRESS)
+	INTEGER ADDRESS
 ! Do nothing since it is not representable in Fortran 77...
       END
 
 
-	SUBROUTINE P4A_ACCEL_MALLOC(DEST, N)
-	INTEGER N
-	INTEGER DEST
+!>  Stub for allocating memory on the hardware accelerator.
+!>
+!>  @param[out] address is the address of a variable that is updated by
+!>  this macro to contains the address of the allocated memory block
+!>  @param[in] size is the size to allocate in bytes
+	SUBROUTINE P4A_ACCEL_MALLOC(ADDRESS, SIZE)
+	INTEGER SIZE
+	INTEGER ADDRESS
 ! Do nothing since it is not representable in Fortran 77...
       END
 
-
-	FUNCTION P4A_COPY_FROM_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
-	INTEGER N
-	CHARACTER HOST_ADDRESS(N)
-	CHARACTER ACCEL_ADDRESS(N)
+!>  Stub for copying memory from the hardware accelerator to the host.
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  @param[out] host_add is the address of a destination zone in the
+!>  host memory
+!>
+!>  @param[in] accel_add is the address of a source zone in the
+!>  accelerator memory
+!>
+!>  @param[in] size is the size in bytes of the memory zone to copy
+	SUBROUTINE P4A_COPY_FROM_ACCEL(HOST_ADD, ACCEL_ADD, SIZE)
+	INTEGER SIZE
+	CHARACTER HOST_ADD(SIZE)
+	CHARACTER ACCEL_ADD(SIZE)
 	INTEGER I
-	INTEGER P4A_COPY_FROM_ACCEL
 
-      DO I = 1, N
-         HOST_ADDRESS(I) = ACCEL_ADDRESS(I)
+      DO I = 1, SIZE
+         HOST_ADD(I) = ACCEL_ADD(I)
       ENDDO
-      P4A_COPY_FROM_ACCEL = HOST_ADDRESS
       END
-! Equivalent stubs of Par4All runtime to keep the PIPS analyzes happy
 
-	FUNCTION P4A_COPY_TO_ACCEL(HOST_ADDRESS, ACCEL_ADDRESS, N)
-	INTEGER N
-	CHARACTER HOST_ADDRESS(N)
-	CHARACTER ACCEL_ADDRESS(N)
+
+!> Stub for copying memory from the host to the hardware accelerator.
+!>
+!> Since it is a stub so that PIPS can understand it, use simple
+!> implementation with standard memory copy operations
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  This function could be quite simpler but is designed by symmetry with
+!>  other functions.
+!>
+!>  @param[in] elem_size is the size of one element of the array in
+!>  byte
+!>
+!>  @param[in] d1_size is the number of elements in the array.
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_block_size is the number of element to transfer
+!>
+!>  @param[in] d1_offset is the element order to start the transfer to
+!>
+!>  @param[out] host_add point to the array on the host to write into
+!>
+!>  @param[in] accel_add refer to the compact memory area to read
+!>  data. In the general case, accel_add may be seen as a unique idea (FIFO)
+!>  and not some address in some memory space.
+
+	SUBROUTINE P4A_COPY_FROM_ACCEL_1D (ELEM_SIZE, D1_SIZE,
+     &  D1_BLOCK_SIZE, D1_OFFSET, HOST_ADD, ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE)
 	INTEGER I
-	INTEGER P4A_COPY_TO_ACCEL
+	INTEGER SIZE
+	INTEGER OFFSET
 
-      DO I = 1, N
-         ACCEL_ADDRESS(I) = HOST_ADDRESS(I)
+      OFFSET = D1_OFFSET*ELEM_SIZE
+      SIZE = D1_SIZE*ELEM_SIZE
+      DO I = 1, SIZE
+         HOST_ADD(OFFSET+I) = ACCEL_ADD(I)
       ENDDO
-      P4A_COPY_TO_ACCEL = ACCEL_ADDRESS
+      END
+
+!>  Stub for copying memory from the hardware accelerator to a 2D array in
+!>  the host.
+
+	SUBROUTINE P4A_COPY_FROM_ACCEL_2D (ELEM_SIZE, D1_SIZE, D2_SIZE,
+     &  D1_BLOCK_SIZE, D2_BLOCK_SIZE, D1_OFFSET, D2_OFFSET, HOST_ADD,
+     &  ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER D2_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D2_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	INTEGER D2_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE, D2_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE,
+     &                      D2_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I_1
+	INTEGER I_2
+	INTEGER OFFSET_1
+	INTEGER OFFSET_2
+
+      OFFSET_1 = D1_OFFSET*ELEM_SIZE
+      OFFSET_2 = D2_OFFSET*ELEM_SIZE
+      DO I_2 = 1, D2_BLOCK_SIZE*ELEM_SIZE
+         DO I_1 = 1, D1_BLOCK_SIZE*ELEM_SIZE
+            HOST_ADD(OFFSET_1+I_1,OFFSET_2+I_2) = ACCEL_ADD(I_1,I_2)
+         ENDDO
+      ENDDO
+      END
+!> @addtogroup p4a_accel_stubs
+
+!> @{
+
+!> @defgroup p4a_accel_Fortran_stubs Equivalent stubs in Fortran of Par4All runtime to have PIPS analyzes happy
+
+!> @{
+
+!>  Stub for copying memory from the host to the hardware accelerator.
+!>
+!>  Since it is a stub so that PIPS can understand it, use simple
+!>  implementation with standard memory copy operations
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  @param[in] host_add is the address of a source zone in the host memory
+!>
+!>  @param[out] accel_add is the address of a destination zone in the
+!>  accelerator memory
+!>
+!>  @param[in] size is the size in bytes of the memory zone to copy
+	SUBROUTINE P4A_COPY_TO_ACCEL(HOST_ADD, ACCEL_ADD, SIZE)
+	INTEGER SIZE
+	CHARACTER HOST_ADD(SIZE)
+	CHARACTER ACCEL_ADD(SIZE)
+	INTEGER I
+
+      DO I = 1, SIZE
+         ACCEL_ADD(I) = HOST_ADD(I)
+      ENDDO
+      END
+
+
+!>  Stub for copying a 1D memory zone from the hardware accelerator to the
+!>  host.
+!>
+!>  Do not change the place of the pointers in the API. The host address
+!>  is always in the first position...
+!>
+!>  This function could be quite simpler but is designed by symmetry with
+!>  other functions.
+!>
+!>  @param[in] elem_size is the size of one element of the array in
+!>  byte
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_size is the number of elements in the array. It is not
+!>  used but here for symmetry with functions of higher dimensionality
+!>
+!>  @param[in] d1_block_size is the number of element to transfer
+!>
+!>  @param[in] d1_offset is element order to start the transfer from
+!>
+!>  @param[in] host_add point to the array on the host to read
+!>
+!>  @param[out] accel_add refer to the compact memory area to write
+!>  data. In the general case, accel_add may be seen as a unique idea
+!>  (FIFO) and not some address in some memory space.
+
+	SUBROUTINE P4A_COPY_TO_ACCEL_1D(ELEM_SIZE, D1_SIZE,
+     &  D1_BLOCK_SIZE, D1_OFFSET, HOST_ADD, ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I
+	INTEGER SIZE
+	INTEGER OFFSET
+
+      OFFSET = D1_OFFSET*ELEM_SIZE
+      SIZE = D1_SIZE*ELEM_SIZE
+      DO I = 1, SIZE
+         ACCEL_ADD(I) = HOST_ADD(OFFSET+I)
+      ENDDO
+      END
+
+!>  Stub for copying a 2D memory zone from the host to a compact memory
+!>  zone in the hardware accelerator.
+
+	SUBROUTINE P4A_COPY_TO_ACCEL_2D (ELEM_SIZE, D1_SIZE, D2_SIZE,
+     &  D1_BLOCK_SIZE, D2_BLOCK_SIZE, D1_OFFSET, D2_OFFSET, HOST_ADD,
+     &  ACCEL_ADD)
+
+	INTEGER D1_SIZE
+	INTEGER D2_SIZE
+	INTEGER ELEM_SIZE
+	INTEGER D1_BLOCK_SIZE
+	INTEGER D2_BLOCK_SIZE
+	INTEGER D1_OFFSET
+	INTEGER D2_OFFSET
+	CHARACTER HOST_ADD(D1_SIZE * ELEM_SIZE, D2_SIZE * ELEM_SIZE)
+	CHARACTER ACCEL_ADD(D1_BLOCK_SIZE * ELEM_SIZE,
+     &                      D2_BLOCK_SIZE * ELEM_SIZE)
+	INTEGER I_1
+	INTEGER I_2
+	INTEGER OFFSET_1
+	INTEGER OFFSET_2
+
+      OFFSET_1 = D1_OFFSET*ELEM_SIZE
+      OFFSET_2 = D2_OFFSET*ELEM_SIZE
+      DO I_2 = 1, D2_BLOCK_SIZE*ELEM_SIZE
+         DO I_1 = 1, D1_BLOCK_SIZE*ELEM_SIZE
+            ACCEL_ADD(I_1,I_2) = HOST_ADD(OFFSET_1+I_1,OFFSET_2+I_2)
+         ENDDO
+      ENDDO
       END
 /* C pretty print for module MATADD. */
 int
@@ -154,48 +548,193 @@ main (int argc, char *argv[])
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
 void
-p4a_accel_free (int dest)
+p4a_accel_free (int *address_p4a_copy)
 {
   ;
+  int address = *address_p4a_copy;
 
+  *address_p4a_copy = address;
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
 void
-p4a_accel_malloc (int dest, int n)
+p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
   ;
+  int address = *address_p4a_copy;
+  int size = *size_p4a_copy;
 
+  *address_p4a_copy = address;
+  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
-int
-p4a_copy_from_accel (char host_address[n - 0], char accel_address[n - 0],
-		     int n)
+void
+p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
+		     int *size_p4a_copy)
 {
-  int result;
   int i;
+  int size = *size_p4a_copy;
 
-  for (i = 1; i <= n; i++)
+  for (i = 1; i <= size; i++)
     {
-      host_address[i - 1] = accel_address[i - 1];
+      host_add[i - 1] = accel_add[i - 1];
     }
-  result = host_address;
-  return result;
+  *size_p4a_copy = size;
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+void
+p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
+			char host_add[d1_size * elem_size - 0],
+			char accel_add[d1_block_size * elem_size - 0])
+{
+  int i;
+  int size;
+  int offset;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+
+  offset = (d1_offset * elem_size);
+  size = (d1_size * elem_size);
+  for (i = 1; i <= size; i++)
+    {
+      host_add[(offset + i) - 1] = accel_add[i - 1];
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+void
+p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
+			int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
+			int *d2_offset_p4a_copy,
+			char host_add[d2_size * elem_size -
+				      0][d1_size * elem_size - 0],
+			char accel_add[d2_block_size * elem_size -
+				       0][d1_block_size * elem_size - 0])
+{
+  int i_1;
+  int i_2;
+  int offset_1;
+  int offset_2;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d2_size = *d2_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d2_block_size = *d2_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+  int d2_offset = *d2_offset_p4a_copy;
+
+  offset_1 = (d1_offset * elem_size);
+  offset_2 = (d2_offset * elem_size);
+  for (i_2 = 1; i_2 <= d2_block_size * elem_size; i_2++)
+    {
+      for (i_1 = 1; i_1 <= d1_block_size * elem_size; i_1++)
+	{
+	  host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1] =
+	    accel_add[i_2 - 1][i_1 - 1];
+	}
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d2_size_p4a_copy = d2_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d2_block_size_p4a_copy = d2_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  *d2_offset_p4a_copy = d2_offset;
+  return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
-int
-p4a_copy_to_accel (char host_address[n - 0], char accel_address[n - 0], int n)
+void
+p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
+		   int *size_p4a_copy)
 {
-  int result;
   int i;
+  int size = *size_p4a_copy;
 
-  for (i = 1; i <= n; i++)
+  for (i = 1; i <= size; i++)
     {
-      accel_address[i - 1] = host_address[i - 1];
+      accel_add[i - 1] = host_add[i - 1];
     }
-  result = accel_address;
-  return result;
+  *size_p4a_copy = size;
+  return;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+void
+p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
+		      char host_add[d1_size * elem_size - 0],
+		      char accel_add[d1_block_size * elem_size - 0])
+{
+  int i;
+  int size;
+  int offset;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+
+  offset = (d1_offset * elem_size);
+  size = (d1_size * elem_size);
+  for (i = 1; i <= size; i++)
+    {
+      accel_add[i - 1] = host_add[(offset + i) - 1];
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  return;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+void
+p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
+		      int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
+		      int *d2_offset_p4a_copy,
+		      char host_add[d2_size * elem_size -
+				    0][d1_size * elem_size - 0],
+		      char accel_add[d2_block_size * elem_size -
+				     0][d1_block_size * elem_size - 0])
+{
+  int i_1;
+  int i_2;
+  int offset_1;
+  int offset_2;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d2_size = *d2_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d2_block_size = *d2_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+  int d2_offset = *d2_offset_p4a_copy;
+
+  offset_1 = (d1_offset * elem_size);
+  offset_2 = (d2_offset * elem_size);
+  for (i_2 = 1; i_2 <= d2_block_size * elem_size; i_2++)
+    {
+      for (i_1 = 1; i_1 <= d1_block_size * elem_size; i_1++)
+	{
+	  accel_add[i_2 - 1][i_1 - 1] =
+	    host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1];
+	}
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d2_size_p4a_copy = d2_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d2_block_size_p4a_copy = d2_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  *d2_offset_p4a_copy = d2_offset;
+  return;
 }
       PROGRAM MATADD
       INTEGER M
@@ -256,78 +795,242 @@ main (int argc, char *argv[])
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
 void
-p4a_accel_free (int dest)
+p4a_accel_free (int *address_p4a_copy)
 {
   ;
+  int address = *address_p4a_copy;
 
+  *address_p4a_copy = address;
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
 void
-p4a_accel_malloc (int dest, int n)
+p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
   ;
+  int address = *address_p4a_copy;
+  int size = *size_p4a_copy;
 
+  *address_p4a_copy = address;
+  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
-int
-p4a_copy_from_accel (char host_address[n - 0], char accel_address[n - 0],
-		     int n)
+void
+p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
+		     int *size_p4a_copy)
 {
-  int result;
   int i;
+  int size = *size_p4a_copy;
 
-  for (i = 1; i <= n; i++)
+  for (i = 1; i <= size; i++)
     {
-      host_address[i - 1] = accel_address[i - 1];
+      host_add[i - 1] = accel_add[i - 1];
     }
-  result = host_address;
-  return result;
+  *size_p4a_copy = size;
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+void
+p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
+			char host_add[d1_size * elem_size - 0],
+			char accel_add[d1_block_size * elem_size - 0])
+{
+  int i;
+  int size;
+  int offset;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+
+  offset = (d1_offset * elem_size);
+  size = (d1_size * elem_size);
+  for (i = 1; i <= size; i++)
+    {
+      host_add[(offset + i) - 1] = accel_add[i - 1];
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  return;
+}
+/* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+void
+p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
+			int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
+			int *d2_offset_p4a_copy,
+			char host_add[d2_size * elem_size -
+				      0][d1_size * elem_size - 0],
+			char accel_add[d2_block_size * elem_size -
+				       0][d1_block_size * elem_size - 0])
+{
+  int i_1;
+  int i_2;
+  int offset_1;
+  int offset_2;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d2_size = *d2_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d2_block_size = *d2_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+  int d2_offset = *d2_offset_p4a_copy;
+
+  offset_1 = (d1_offset * elem_size);
+  offset_2 = (d2_offset * elem_size);
+  for (i_2 = 1; i_2 <= d2_block_size * elem_size; i_2++)
+    {
+      for (i_1 = 1; i_1 <= d1_block_size * elem_size; i_1++)
+	{
+	  host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1] =
+	    accel_add[i_2 - 1][i_1 - 1];
+	}
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d2_size_p4a_copy = d2_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d2_block_size_p4a_copy = d2_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  *d2_offset_p4a_copy = d2_offset;
+  return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
-int
-p4a_copy_to_accel (char host_address[n - 0], char accel_address[n - 0], int n)
+void
+p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
+		   int *size_p4a_copy)
 {
-  int result;
   int i;
+  int size = *size_p4a_copy;
 
-  for (i = 1; i <= n; i++)
+  for (i = 1; i <= size; i++)
     {
-      accel_address[i - 1] = host_address[i - 1];
+      accel_add[i - 1] = host_add[i - 1];
     }
-  result = accel_address;
-  return result;
+  *size_p4a_copy = size;
+  return;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+void
+p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
+		      char host_add[d1_size * elem_size - 0],
+		      char accel_add[d1_block_size * elem_size - 0])
+{
+  int i;
+  int size;
+  int offset;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+
+  offset = (d1_offset * elem_size);
+  size = (d1_size * elem_size);
+  for (i = 1; i <= size; i++)
+    {
+      accel_add[i - 1] = host_add[(offset + i) - 1];
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  return;
+}
+/* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+void
+p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
+		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
+		      int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
+		      int *d2_offset_p4a_copy,
+		      char host_add[d2_size * elem_size -
+				    0][d1_size * elem_size - 0],
+		      char accel_add[d2_block_size * elem_size -
+				     0][d1_block_size * elem_size - 0])
+{
+  int i_1;
+  int i_2;
+  int offset_1;
+  int offset_2;
+  int elem_size = *elem_size_p4a_copy;
+  int d1_size = *d1_size_p4a_copy;
+  int d2_size = *d2_size_p4a_copy;
+  int d1_block_size = *d1_block_size_p4a_copy;
+  int d2_block_size = *d2_block_size_p4a_copy;
+  int d1_offset = *d1_offset_p4a_copy;
+  int d2_offset = *d2_offset_p4a_copy;
+
+  offset_1 = (d1_offset * elem_size);
+  offset_2 = (d2_offset * elem_size);
+  for (i_2 = 1; i_2 <= d2_block_size * elem_size; i_2++)
+    {
+      for (i_1 = 1; i_1 <= d1_block_size * elem_size; i_1++)
+	{
+	  accel_add[i_2 - 1][i_1 - 1] =
+	    host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1];
+	}
+    }
+  *elem_size_p4a_copy = elem_size;
+  *d1_size_p4a_copy = d1_size;
+  *d2_size_p4a_copy = d2_size;
+  *d1_block_size_p4a_copy = d1_block_size;
+  *d2_block_size_p4a_copy = d2_block_size;
+  *d1_offset_p4a_copy = d1_offset;
+  *d2_offset_p4a_copy = d2_offset;
+  return;
 }
 /* C pretty print for module P4A_KERNEL_0. */
 void
-p4a_kernel_0 (int m, int n, float b[n - 0][m - 0], float c[n - 0][m - 0],
-	      int i, int j)
+p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
+	      float c[n - 0][m - 0], int *i_p4a_copy, int *j_p4a_copy)
 {
   ;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
 
   b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
   c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
+  *i_p4a_copy = i;
+  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_1. */
 void
-p4a_kernel_1 (int m, int n, float a[n - 0][m - 0], float b[n - 0][m - 0],
-	      float c[n - 0][m - 0], int i, int j)
+p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy, float a[n - 0][m - 0],
+	      float b[n - 0][m - 0], float c[n - 0][m - 0], int *i_p4a_copy,
+	      int *j_p4a_copy)
 {
   ;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
 
   a[(j + 1) - 1][(i + 1) - 1] =
     (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
+  *i_p4a_copy = i;
+  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
 void
-p4a_kernel_launcher_0 (int m, int n, float b[n - 0][m - 0],
-		       float c[n - 0][m - 0])
+p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
+		       float b[n - 0][m - 0], float c[n - 0][m - 0])
 {
   int j;
   int i;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
 
   for (i = 0; i <= ((m - 1) + 1) + -1; i++)
     {
@@ -336,15 +1039,20 @@ p4a_kernel_launcher_0 (int m, int n, float b[n - 0][m - 0],
 	  p4a_kernel_wrapper_0 (m, n, b, c, i, j);
 	}
     }
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
 void
-p4a_kernel_launcher_1 (int m, int n, float a[n - 0][m - 0],
-		       float b[n - 0][m - 0], float c[n - 0][m - 0])
+p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
+		       float a[n - 0][m - 0], float b[n - 0][m - 0],
+		       float c[n - 0][m - 0])
 {
   int j;
   int i;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
 
   for (i = 0; i <= ((m - 1) + 1) + -1; i++)
     {
@@ -353,26 +1061,44 @@ p4a_kernel_launcher_1 (int m, int n, float a[n - 0][m - 0],
 	  p4a_kernel_wrapper_1 (m, n, a, b, c, i, j);
 	}
     }
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
 void
-p4a_kernel_wrapper_0 (int m, int n, float b[n - 0][m - 0],
-		      float c[n - 0][m - 0], int i, int j)
+p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
+		      float c[n - 0][m - 0], int *i_p4a_copy, int *j_p4a_copy)
 {
   ;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
 
   p4a_kernel_0 (m, n, b, c, i, j);
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
+  *i_p4a_copy = i;
+  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
 void
-p4a_kernel_wrapper_1 (int m, int n, float a[n - 0][m - 0],
-		      float b[n - 0][m - 0], float c[n - 0][m - 0], int i,
-		      int j)
+p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy, float a[n - 0][m - 0],
+		      float b[n - 0][m - 0], float c[n - 0][m - 0],
+		      int *i_p4a_copy, int *j_p4a_copy)
 {
   ;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
 
   p4a_kernel_1 (m, n, a, b, c, i, j);
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
+  *i_p4a_copy = i;
+  *j_p4a_copy = j;
   return;
 }

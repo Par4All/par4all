@@ -55,6 +55,10 @@ apply GPU_IFY[MATADD]
 
 display PRINTED_FILE[MATADD]
 display C_PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+
+
 quit
 # Should be automatic with pyps:
 #apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0,p4a_kernel_launcher_1,p4a_kernel_launcher_2,p4a_kernel_launcher_3,p4a_kernel_launcher_4,p4a_kernel_launcher_5]

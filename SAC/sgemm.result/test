@@ -3393,9 +3393,10 @@ nsucc = 1
 nsucc = 0 
 /* C pretty print for module SGEMM. */
 void
-sgemm (char transa, char transb, int m, int n, int k, float alpha,
-       float a[10][10], int lda, float b[10][10], int ldb, float beta,
-       float c[10][10], int ldc)
+sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
+       int *n_p4a_copy, int *k_p4a_copy, float *alpha_p4a_copy,
+       float a[10][10], int *lda_p4a_copy, float b[10][10], int *ldb_p4a_copy,
+       float *beta_p4a_copy, float c[10][10], int *ldc_p4a_copy)
 {
   static const float size = 10;
   a2sf pdata7;
@@ -3580,6 +3581,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int i;
   int l;
   float temp;
+  char transa = *transa_p4a_copy;
+  char transb = *transb_p4a_copy;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int k = *k_p4a_copy;
+  float alpha = *alpha_p4a_copy;
+  int lda = *lda_p4a_copy;
+  int ldb = *ldb_p4a_copy;
+  float beta = *beta_p4a_copy;
+  int ldc = *ldc_p4a_copy;
 
   pdata3[1] = alpha;
   pdata3[0] = alpha;
@@ -4050,6 +4061,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 	    }
 	}
     }
+  *transa_p4a_copy = transa;
+  *transb_p4a_copy = transb;
+  *m_p4a_copy = m;
+  *n_p4a_copy = n;
+  *k_p4a_copy = k;
+  *alpha_p4a_copy = alpha;
+  *lda_p4a_copy = lda;
+  *ldb_p4a_copy = ldb;
+  *beta_p4a_copy = beta;
+  *ldc_p4a_copy = ldc;
   return;
 }
 

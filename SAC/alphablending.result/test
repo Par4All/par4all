@@ -255,7 +255,7 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
 /* C pretty print for module ALPHABLENDING. */
 void
 alphablending (float result[50000], float src[50000], float dest[50000],
-	       float alpha)
+	       float *alpha_p4a_copy)
 {
   static const int size = 50000;
   v4sf vec110;
@@ -270,6 +270,7 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   v4sf vec10;
   v4sf vec00;
   int lu_ind00;
+  float alpha = *alpha_p4a_copy;
 
   pdata3[3] = 1;
   pdata3[2] = 1;
@@ -294,6 +295,7 @@ alphablending (float result[50000], float src[50000], float dest[50000],
       simd_store_v4sf (vec110, result[(1 + lu_ind00) - 1]);
       continue;
     }
+  *alpha_p4a_copy = alpha;
   return;
 }
 
