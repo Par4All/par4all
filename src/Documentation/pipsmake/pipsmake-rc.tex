@@ -13522,21 +13522,55 @@ PRINT_DOTDG_INPUT_DEP_STYLE "dashed"
 Style for each type of dependence
 
 
-
 \section{Prettyprinters for C}
 
-A very basic and experimental C dumper to output a Fortran program in C
-code. It is not the same as the default pretty printer that is used the
-normal way to pretty print C code in C.
+\begin{PipsPass}{print_crough}
+A basic and experimental C dumper to output a Fortran program in C
+code. It is not the same as the default pretty printer that is normaly used
+to pretty print C code in C. This pass is mainly use inside PIPS
+and Par4All to be able to generate call to CUDA kernels from a fortran code.
+The kernel is supposed not to use I/O intrinsics (such as WRITE, READ),
+they are not handle at the moment (and not usefull in the CUDA context)
+by the crough printer.
+\end{PipsPass}
 
 \begin{PipsMake}
 print_crough  > MODULE.crough
               < PROGRAM.entities
               < MODULE.code
+\end{PipsMake}
 
+\begin{PipsMake}
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
+
+By default the crough pass tries to match the best C type for any Fortran
+type. However, many Fortran compilers (ifort, gfortran) allow to change
+the type size at compile time. It is possible to do the same by setting the
+property CROUGH\_USER\_DEFINED\_TYPE to TRUE. In such a case the include file
+specified by the property CROUGH\_INCLUDE\_FILE is included by any file
+generated using crough. It has to define (using \#define or
+typedef) the two types defined by the properties CROUGH\_INTEGER\_TYPE and
+CROUGH\_REAL\_TYPE. Obviously those types are used in the generated C file to
+declare variables that has the types INTEGER or REAL in the original Fortan
+file.
+
+\begin{PipsProp}{CROUGH_USER_DEFINED_TYPE}
+CROUGH_USER_DEFINED_TYPE FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_INCLUDE_FILE}
+CROUGH_INCLUDE_FILE "p4a_crough_types.h"
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_INTEGER_TYPE}
+CROUGH_INTEGER_TYPE "p4a_int"
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_REAL_TYPE}
+CROUGH_REAL_TYPE "p4a_real"
+\end{PipsProp}
 
 \subsection{Prettyprint for C  properties}
 \index{PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE}

@@ -238,106 +238,113 @@ static string c_type_string(type t)
 // Convert the fortran type to its c string value
 static string c_basic_string(basic b)
 {
-    string result = "UNKNOWN_BASIC" SPACE;
-    bool allocated =false;
-    switch (basic_tag(b))
-    {
-        case is_basic_int:
-            {
-                pips_debug(2,"Basic int\n");
-                switch (basic_int(b))
-                {
-                    case 1: result = "char" SPACE;
-                            break;
-                    case 2: result = "short" SPACE;
-                            break;
-                    case 4: result = "int" SPACE;
-                            break;
-                    case 6: result = "long" SPACE;
-                            break;
-                    case 8: result = "long long" SPACE;
-                            break;
-                    case 11: result = "unsigned char" SPACE;
-                             break;
-                    case 12: result = "unsigned short" SPACE;
-                             break;
-                    case 14: result = "unsigned int" SPACE;
-                             break;
-                    case 16: result = "unsigned long" SPACE;
-                             break;
-                    case 18: result = "unsigned long long" SPACE;
-                             break;
-                    case 21: result = "signed char" SPACE;
-                             break;
-                    case 22: result = "signed short" SPACE;
-                             break;
-                    case 24: result = "signed int" SPACE;
-                             break;
-                    case 26: result = "signed long" SPACE;
-                             break;
-                    case 28: result = "signed long long" SPACE;
-                             break;
-                }
-                break;
-            }
-        case is_basic_float:
-            switch (basic_float(b))
-            {
-                case 4: result = "float" SPACE;
-                        break;
-                case 8: result = "double" SPACE;
-                        break;
-            }
-            break;
-        case is_basic_logical:
-            result = "int" SPACE;
-            break;
-        case is_basic_string:
-            result = "char" SPACE;
-            break;
-        case is_basic_bit:
-            {
-	      /* An expression indeed... To be fixed... */
-                _int i = (_int) basic_bit(b);
-                pips_debug(2,"Bit field basic: %td\n", i);
-                result = "int" SPACE; /* ignore if it is signed or unsigned */
-                break;
-            }
-        case is_basic_pointer:
-            {
-                type t = basic_pointer(b);
-                pips_debug(2,"Basic pointer\n");
-                result = concatenate(c_type_string(t),"* ",NULL);
-                break;
-            }
-        case is_basic_derived:
-            {
-                entity ent = basic_derived(b);
-                type t = entity_type(ent);
-                string name = c_entity_local_name(ent);
-                result = concatenate(c_type_string(t),name,NULL);
-                free(name);
-                break;
-            }
-        case is_basic_typedef:
-            {
-                entity ent = basic_typedef(b);
-                result = c_entity_local_name(ent);
-                allocated=true;
-                break;
-            }
-        case is_basic_complex:
-            result = "_Complex" SPACE; /* c99 style */
-            break;
-        default:
-            pips_internal_error("unhandled case");
+  string result = "UNKNOWN_BASIC" SPACE;
+  bool allocated =false;
+  bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
+  switch (basic_tag(b)) {
+  case is_basic_int: {
+    pips_debug(2,"Basic int\n");
+    if (user_type == false) {
+      switch (basic_int(b)) {
+      case 1: result = "char" SPACE;
+	break;
+      case 2: result = "short" SPACE;
+	break;
+      case 4: result = "int" SPACE;
+	break;
+      case 6: result = "long" SPACE;
+	break;
+      case 8: result = "long long" SPACE;
+	break;
+      case 11: result = "unsigned char" SPACE;
+	break;
+      case 12: result = "unsigned short" SPACE;
+	break;
+      case 14: result = "unsigned int" SPACE;
+	break;
+      case 16: result = "unsigned long" SPACE;
+	break;
+      case 18: result = "unsigned long long" SPACE;
+	break;
+      case 21: result = "signed char" SPACE;
+	break;
+      case 22: result = "signed short" SPACE;
+	break;
+      case 24: result = "signed int" SPACE;
+	break;
+      case 26: result = "signed long" SPACE;
+	break;
+      case 28: result = "signed long long" SPACE;
+	break;
+      }
+    } else {
+      result = get_string_property ("CROUGH_INTEGER_TYPE");
     }
-    return allocated ? result : strdup(result);
+    break;
+  }
+  case is_basic_float: {
+    if (user_type == false) {
+      switch (basic_float(b)){
+      case 4: result = "float" SPACE;
+	break;
+      case 8: result = "double" SPACE;
+	break;
+      }
+    } else {
+      result = get_string_property ("CROUGH_REAL_TYPE");
+    }
+    break;
+  }
+  case is_basic_logical:
+    result = "int" SPACE;
+    break;
+  case is_basic_string:
+    result = "char" SPACE;
+    break;
+  case is_basic_bit:
+    {
+      /* An expression indeed... To be fixed... */
+      _int i = (_int) basic_bit(b);
+      pips_debug(2,"Bit field basic: %td\n", i);
+      result = "int" SPACE; /* ignore if it is signed or unsigned */
+      break;
+    }
+  case is_basic_pointer:
+    {
+      type t = basic_pointer(b);
+      pips_debug(2,"Basic pointer\n");
+      result = concatenate(c_type_string(t),"* ",NULL);
+      break;
+    }
+  case is_basic_derived:
+    {
+      entity ent = basic_derived(b);
+      type t = entity_type(ent);
+      string name = c_entity_local_name(ent);
+      result = concatenate(c_type_string(t),name,NULL);
+      free(name);
+      break;
+    }
+  case is_basic_typedef:
+    {
+      entity ent = basic_typedef(b);
+      result = c_entity_local_name(ent);
+      allocated=true;
+      break;
+    }
+  case is_basic_complex:
+    result = "_Complex" SPACE; /* c99 style */
+    break;
+  default:
+    pips_internal_error("unhandled case");
+  }
+  return allocated ? result : strdup(result);
 }
 
 /// @return a newly allocated string of the dimensions in C
 /// @param ldim the variable dimension
-static string c_dim_string(list ldim)
+/// @param fct_sig, set to true if the variable is part of a function signature
+static string c_dim_string(list ldim, bool fct_sig)
 {
     string result = "";
     if (ldim != NIL )
@@ -371,14 +378,19 @@ static string c_dim_string(list ldim)
                 }
                 else
                 {
-                    if (expression_integer_value(eup, &up))
-                        result = strdup(concatenate(OPENBRACKET,i2a(up-low+1),CLOSEBRACKET,result,NULL));
-                    else
-                    {
-		      sup = words_to_string(words_expression(eup, NIL));
-                        result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
-                        free(sup);
-                    }
+		  if (expression_integer_value(eup, &up)) {
+		    result = strdup(concatenate(OPENBRACKET,i2a(up-low+1),CLOSEBRACKET,result,NULL));
+		  } else {
+		    sup = words_to_string(words_expression(eup, NIL));
+		    if (fct_sig == true) {
+		      string tmp = NULL;
+		      tmp = strdup (concatenate ("(*",sup, SCALAR_IN_SIG_EXT, ")", NULL));
+		      free (sup);
+		      sup = tmp;
+		    }
+		    result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
+		    free(sup);
+		  }
                 }
             }
             else
@@ -512,7 +524,7 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 string sptr, st, sd, svar, sq, ext;
                 value val = entity_initial(var);
                 st = c_basic_string(variable_basic(v));
-                sd = c_dim_string(variable_dimensions(v));
+                sd = c_dim_string(variable_dimensions(v), fct_sig);
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
 		// if the variable is a scalar inside a function signature a
@@ -645,11 +657,12 @@ static bool argument_p(entity e)
         storage_formal_p(entity_storage(e));
 }
 
-/// @param module, the module to get the declaration
-/// @param consider_this_entity, the function test pointer
-/// @param separator, the separatot to be used between vars
-/// @param lastsep, set to true if a final separator is needed
-/// @param fct_sig, set to true if in a function signature
+/// @return the string representation of the given declarations.
+/// @param module, the module to get the declaration.
+/// @param consider_this_entity, the function test pointer.
+/// @param separator, the separatot to be used between vars.
+/// @param lastsep, set to true if a final separator is needed.
+/// @param fct_sig, set to true if in a function signature.
 static string c_declarations(
         entity module,
         bool (*consider_this_entity)(entity),
@@ -1481,7 +1494,10 @@ bool print_crough(string module_name)
     /* save to file */
     out = safe_fopen(filename, "w");
     fprintf(out, "/* C pretty print for module %s. */\n", module_name);
-    //    fprintf(out, "#include \"p4a_crough_types.h\"\n\n");
+    bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
+    if (user_type == true) {
+      fprintf(out, "#include \"%s\"%s", get_string_property ("CROUGH_INCLUDE_FILE"),"\n\n");
+    }
     fprintf(out, "%s", ppt);
     safe_fclose(out, filename);
 
