@@ -737,7 +737,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* we need to free them now, otherwise recompilation fails */
     FOREACH(PARAMETER,p,formal_parameters) {
         entity e = dummy_identifier(parameter_dummy(p));
-        if(entity_variable_p(e)) {
+        if(!type_undefined_p(entity_type(e)) &&
+                entity_variable_p(e)) {
             free_type(entity_type(e));
             entity_type(e)=type_undefined;
         }
@@ -790,7 +791,7 @@ outline(char* module_name)
  	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
  	set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
-    /* retrieve name of the outiled module */
+    /* retrieve name of the outlined module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");
 
     // Check the language. In case of Fortran the module name must be in
