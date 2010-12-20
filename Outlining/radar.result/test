@@ -1,0 +1,138 @@
+void STAP_PulseComp(int tv, float ptrin[tv], int tf, float ptrfiltre[tf], float ptrout[tv-tf+1])
+{
+
+   int i, j, k;
+   float R, I;
+#pragma omp parallel for private(I,R,i,j)
+   for(k = 0; k <= 31; k += 1)
+
+#pragma omp parallel for private(I,R,j)
+      for(i = 0; i <= tv-tf+1-1; i += 1) {
+
+         R = 0.0;
+         I = 0.0;
+#pragma omp parallel for 
+         for(j = 0; j <= tf-1; j += 1) {
+
+            R += ptrin[i+j]*ptrfiltre[j]-ptrin[i+j]*ptrfiltre[j];
+
+            I += ptrin[i+j]*ptrfiltre[j]+ptrin[i+j]*ptrfiltre[j];
+         }
+         ptrout[i] = R;
+         ptrout[i] = I;
+      }
+   printf("result %f, %f", ptrout[1], ptrout[2]);
+}
+int main()
+{
+}
+void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
+{
+   //int tv=95; int tf=16; 
+   int lv = 20;
+   int j, k, i;
+   float filtre[16];
+   
+   //init_array();
+#pragma omp parallel for private(j,k)
+   for(i = 0; i <= 89; i += 1)
+
+#pragma omp parallel for private(k)
+      for(j = 0; j <= 4; j += 1)
+#pragma omp parallel for 
+         for(k = 0; k <= 31; k += 1)
+
+            STAP_PulseComp(tv, in_pulse[j][k], tf, filtre, out_pulse[j][k]);
+}
+void STAP_PulseComp(int tv, float ptrin[tv], int tf, float ptrfiltre[tf], float ptrout[tv-tf+1])
+{
+
+   int i, j, k;
+   float R, I;
+   p4a_kernel_launcher_0(tf, tv, ptrfiltre, ptrin, ptrout);
+   printf("result %f, %f", ptrout[1], ptrout[2]);
+}
+int main()
+{
+}
+void p4a_kernel_0(int tf, int tv, float *I, float *R, int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
+{
+   //PIPS generated variable
+   int j;
+
+   *R = 0.0;
+   *I = 0.0;
+   for(j = 0; j <= tf-1; j += 1) {
+
+      *R += ptrin[i+j]*ptrfiltre[j]-ptrin[i+j]*ptrfiltre[j];
+
+      *I += ptrin[i+j]*ptrfiltre[j]+ptrin[i+j]*ptrfiltre[j];
+   }
+   ptrout[i] = *R;
+   ptrout[i] = *I;
+}
+void p4a_kernel_1(int, int, float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+{
+
+   STAP_PulseComp(tv, in_pulse[*j][*k], tf, filtre, out_pulse[*j][*k]);
+}
+void p4a_kernel_launcher_0(int tf, int tv, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
+{
+   //PIPS generated variable
+   float I, R;
+   //PIPS generated variable
+   int i, j, k;
+   for(k = 0; k <= 31; k += 1)
+
+      for(i = 0; i <= tv-tf+1-1; i += 1)
+         // To be assigned to a call to P4A_vp_0: k
+         // To be assigned to a call to P4A_vp_1: i
+         p4a_kernel_wrapper_0(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
+}
+void p4a_kernel_launcher_1(float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+{
+   //PIPS generated variable
+   int i, j, k;
+   
+   //init_array();
+   for(i = 0; i <= 89; i += 1) {
+
+      j = 0;
+      while (j<=4) {
+         k = 0;
+         while (k<=31) {
+            // To be assigned to a call to P4A_vp_0: i
+            // To be assigned to a call to P4A_vp_1: j
+            // To be assigned to a call to P4A_vp_2: k
+            
+            p4a_kernel_wrapper_1(filtre, &j, &k, in_pulse, out_pulse, tf, tv);
+            k += 1;
+         }
+         j += 1;
+      }
+   }
+}
+void p4a_kernel_wrapper_0(int tf, int tv, float *I, float *R, int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
+{
+   // To be assigned to a call to P4A_vp_0: k
+   // To be assigned to a call to P4A_vp_1: i
+   p4a_kernel_0(tf, tv, &*I, &*R, i, ptrfiltre, ptrin, ptrout);
+}
+void p4a_kernel_wrapper_1(float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+{
+   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_1: j
+   // To be assigned to a call to P4A_vp_2: k
+   
+   p4a_kernel_1(tf, tv, filtre, &*j, &*k, in_pulse, out_pulse, tf, tv);
+}
+void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
+{
+   //int tv=95; int tf=16; 
+   int lv = 20;
+   int j, k, i;
+   float filtre[16];
+   
+   //init_array();
+   p4a_kernel_launcher_1(filtre, in_pulse, out_pulse, tf, tv);
+}

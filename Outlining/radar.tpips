@@ -1,0 +1,23 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete radar
+
+#setenv PIPS_CPP_FLAGS " -D TIME "
+#setenv PIPSMAKE_DEBUG_LEVEL 7
+
+create radar radar.c
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+
+apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
+
+display PRINTED_FILE[%ALLFUNC]
+
+apply GPU_IFY[%ALLFUNC]
+display PRINTED_FILE[%ALLFUNC]
+
+
+quit
