@@ -3,6 +3,8 @@ setenv WS="HybridComp02"
 delete $WS
 create $WS $WS.f
 
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
 echo
 echo Initial code
 echo
