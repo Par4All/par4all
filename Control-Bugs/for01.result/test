@@ -1,0 +1,26 @@
+void for01()
+{
+   int c;
+   int k = 0;
+   for (c = 10;c>0;c--, k++)
+      if (c%2==0)
+         goto end;
+   c++;
+end:   return;
+}
+void for01()
+{
+   // BEGIN BLOCK
+   int c;
+   int k = 0;
+   c = 10;
+l99998:   ;
+   if (c>0) goto l99999;
+   if (c%2==0) goto end;
+   c--, k++;
+   goto l99998;
+l99999:   ;
+   c++;
+end:   return;
+   // END BLOCK
+}
