@@ -4031,6 +4031,107 @@ text C_comment_to_text(int margin, string comment)
   return ct;
 }
 
+static list cstrsplit(const char * s, char delim) {
+    list out = NIL;
+    const char *b=s,*e=s;
+    while(*e) {
+        while(*e && *e!=delim) ++e;
+        char * word = strndup(b,e-b);
+        out=CONS(STRING,word,out);
+        if(*e) {
+            ++e;
+            b=e;
+        }
+    }
+    return gen_nreverse(out);
+}
+
+/* returner a formatted comment, that takes care of adding the relevant // or C
+ * depending on output language */
+static string ensure_comment_consistency(const char * i_comments, language l) {
+    string comments;
+    /* Special handling of comments linked to declarations and to the
+       poor job of the lexical analyzer as regards C comments:
+       failure. */
+    if(empty_comments_p(i_comments)) {
+        comments = strdup("");
+    }
+    else {
+        if(get_bool_property("PRETTYPRINT_CHECK_COMMENTS")) {
+            char * patterns [] = { NULL, NULL, NULL, NULL, NULL, NULL };
+            char prefix[3]= { 0,0,0 };
+            if(language_c_p(l)) {
+                patterns[0] = "//";
+                patterns[1] = "/*";
+                strcat(prefix,"//");
+            }
+            else if(language_fortran95_p(l) || language_fortran_p(l)) {
+                patterns[0]= "C";       
+                patterns[1]= "!";       
+                patterns[2]= "*";       
+                patterns[3]= "c";       
+                patterns[3]= "#";       // a single test case in PIPS validation forces me to do this (Syntax/sharpcomment)
+                if(language_fortran95_p(l))
+                    strcat(prefix,"! ");
+                else
+                    strcat(prefix,"C ");//to keep consistency with old fashioned code
+            }
+            // be multi-line comments compliant
+            list lines = cstrsplit(i_comments,'\n');
+            list lcomments = NIL;
+            for(list liter=lines;!ENDP(liter);POP(liter)){
+                string line = STRING(CAR(liter));
+                bool comment_ok =false;
+                char *iter =line;
+                while(*iter && isspace(*iter)) iter++;
+                if(*iter) {
+                    for(char **piter=&patterns[0];*piter;piter++) {
+                        if((comment_ok=(strncmp(iter,*piter,strlen(*piter))==0)))
+                            break;
+                    }
+                    if(!comment_ok) 
+                        asprintf(&comments,"%s%s",prefix,line);
+                    else 
+                        comments=strdup(line);
+                }
+                else /*blank line */
+                    comments=strdup(line);
+                if(language_c_p(l) && strncmp(iter,"/*",2)==0 ){ // multi-line comment started, assume it's ok now
+                    lcomments=gen_nconc(lcomments,gen_copy_string_list(liter));
+                    break; // so bad if we close the multi-line comment and keep commenting afterwards ...
+                }
+                else
+                    lcomments=gen_nconc(lcomments,CONS(STRING,comments,NIL));
+            }
+            comments=words_join(lcomments,"\n");
+            gen_free_string_list(lcomments);
+            gen_free_string_list(lines);
+        }
+        else
+            return strdup(i_comments);
+
+#if 0
+
+        if(declaration_statement_p(stmt)) {
+            /* LF interspersed within C struct or union or initialization
+               declarations may damage the user comment. However, there is no
+               way no know if the LF are valid because thay are located
+               between two statements or invalid because they are located
+               within one statement. The information is lost by the lexer and
+               the parser. */
+            //comments = string_strip_final_linefeeds(strdup(i_comments));
+            //comments = string_fuse_final_linefeeds(strdup(i_comments));
+            comments = strdup(i_comments);
+        }
+        else {
+            comments = strdup(i_comments);
+        }
+#endif
+    }
+    return comments;
+
+}
+
 
 /* Build the text of a statement
 
@@ -4084,26 +4185,7 @@ text text_statement_enclosed(entity module,
     pips_internal_error("Blocks should have no comments");
   }
 
-  /* Special handling of comments linked to declarations and to the
-     poor job of the lexical analyzer as regards C comments:
-     failure. */
-  if(empty_comments_p(i_comments)) {
-    comments = strdup("");
-  }
-  else if(declaration_statement_p(stmt)) {
-      /* LF interspersed within C struct or union or initialization
-         declarations may damage the user comment. However, there is no
-         way no know if the LF are valid because thay are located
-         between two statements or invalid because they are located
-         within one statement. The information is lost by the lexer and
-         the parser. */
-      //comments = string_strip_final_linefeeds(strdup(i_comments));
-      //comments = string_fuse_final_linefeeds(strdup(i_comments));
-      comments = strdup(i_comments);
-  }
-  else {
-    comments = strdup(i_comments);
-  }
+  comments = ensure_comment_consistency(i_comments,get_prettyprint_language());
 
   /* Generate text for local declarations
    *
