@@ -2969,6 +2969,45 @@ bool brace_expression_p(expression e)
     }
     return FALSE;
 }
+
+/* helper for brace_expression_to_statements */
+static list do_brace_expression_to_statements(entity arr,expression e, list curr_indices) {
+  int new_index = 0;
+  list out = NIL;
+  FOREACH(EXPRESSION,arg,call_arguments(expression_call(e))) {
+    expression ee = int_to_expression(new_index);
+    list ind = gen_append(gen_full_copy_list(curr_indices),make_expression_list(ee));
+    if(brace_expression_p(arg)) {
+      list out_bis = do_brace_expression_to_statements(arr,arg,ind);
+      gen_full_free_list(ind);
+      out=gen_append(out,out_bis);
+    }
+    else {
+      out=gen_append(out,make_statement_list(
+            make_assign_statement(
+              reference_to_expression(
+                make_reference(arr,ind)
+                ),
+              copy_expression(arg)
+              )
+            )
+          );
+    }
+    ++new_index;
+  }
+  return out;
+}
+
+/* converts a brace expression used to initialize an array (not a struct yet)
+ * into a statement sequence
+ */
+list brace_expression_to_statements(entity arr, expression e) {
+  pips_assert("is a brace expression\n",brace_expression_p(e));
+  pips_assert("is an array\n",array_entity_p(arr));//SG: needs work to support structures
+  list curr_index = NIL;
+  list out = do_brace_expression_to_statements(arr,e,curr_index);
+  return out;
+}
 /* This function returns TRUE if Reference r is scalar
 */
 
