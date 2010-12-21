@@ -383,16 +383,15 @@ void dump_text(text t)
     print_text(stderr, t);
 }
 
-/* Convert a word list into a string and translate the position of
-   eventual attachment accordingly: */
-string words_to_string(list ls)
+string words_join(list ls,const char* sep)
 {
     int size = 1; /* 1 for null termination. */
+    size_t sep_sz = strlen(sep);
     string buffer, p;
 
     /* computes the buffer length.
      */
-    MAP(STRING, s, size+=strlen(s), ls);
+    MAP(STRING, s, size+=strlen(s)+sep_sz, ls);
     buffer = (char*) malloc(sizeof(char)*size);
     pips_assert("malloc ok", buffer);
 
@@ -400,10 +399,20 @@ string words_to_string(list ls)
      */
     buffer[0] = '\0';
     p=buffer;
-    MAP(STRING, s,
-	{ strcat_word_and_migrate_attachments(p, s); p+=strlen(s); }, ls);
-
+    FOREACH(STRING, s,ls) {
+        strcat_word_and_migrate_attachments(p, s);
+        strcat_word_and_migrate_attachments(p, sep);
+        p+=strlen(s);
+        p+=sep_sz;
+    }
     return buffer;
+}
+
+/* Convert a word list into a string and translate the position of
+   eventual attachment accordingly: */
+string words_to_string(list ls)
+{
+    return words_join(ls,"");
 }
 
 /* SG: moved here from icfdg */
