@@ -64,7 +64,6 @@ fun1 (int *i_p4a_copy)
   int i = *i_p4a_copy;
 
   result = 3;
-  *i_p4a_copy = i;
   return result;
 }
 /* C pretty print for module MAIN. */
@@ -103,8 +102,6 @@ sub (int *j_p4a_copy, int *k_p4a_copy)
       a[i] = 0;
     }
   sub4 (a);
-  *j_p4a_copy = j;
-  *k_p4a_copy = k;
   return;
 }
 /* C pretty print for module SUB2. */
@@ -124,8 +121,6 @@ sub2 (int *n_p4a_copy, int *m_p4a_copy)
 	  b[i][j] = (i + j);
 	}
     }
-  *n_p4a_copy = n;
-  *m_p4a_copy = m;
   return;
 }
 /* C pretty print for module SUB3. */

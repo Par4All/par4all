@@ -553,7 +553,6 @@ p4a_accel_free (int *address_p4a_copy)
   ;
   int address = *address_p4a_copy;
 
-  *address_p4a_copy = address;
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
@@ -564,8 +563,6 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   int address = *address_p4a_copy;
   int size = *size_p4a_copy;
 
-  *address_p4a_copy = address;
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
@@ -580,7 +577,6 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
     {
       host_add[i - 1] = accel_add[i - 1];
     }
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
@@ -605,10 +601,6 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
     {
       host_add[(offset + i) - 1] = accel_add[i - 1];
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d1_offset_p4a_copy = d1_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
@@ -645,13 +637,6 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 	    accel_add[i_2 - 1][i_1 - 1];
 	}
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d2_size_p4a_copy = d2_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d2_block_size_p4a_copy = d2_block_size;
-  *d1_offset_p4a_copy = d1_offset;
-  *d2_offset_p4a_copy = d2_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
@@ -666,7 +651,6 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
     {
       accel_add[i - 1] = host_add[i - 1];
     }
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
@@ -691,10 +675,6 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
     {
       accel_add[i - 1] = host_add[(offset + i) - 1];
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d1_offset_p4a_copy = d1_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
@@ -731,13 +711,6 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 	    host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1];
 	}
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d2_size_p4a_copy = d2_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d2_block_size_p4a_copy = d2_block_size;
-  *d1_offset_p4a_copy = d1_offset;
-  *d2_offset_p4a_copy = d2_offset;
   return;
 }
       PROGRAM MATADD
@@ -804,7 +777,6 @@ p4a_accel_free (int *address_p4a_copy)
   ;
   int address = *address_p4a_copy;
 
-  *address_p4a_copy = address;
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
@@ -815,8 +787,6 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   int address = *address_p4a_copy;
   int size = *size_p4a_copy;
 
-  *address_p4a_copy = address;
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
@@ -831,7 +801,6 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
     {
       host_add[i - 1] = accel_add[i - 1];
     }
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
@@ -856,10 +825,6 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
     {
       host_add[(offset + i) - 1] = accel_add[i - 1];
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d1_offset_p4a_copy = d1_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
@@ -896,13 +861,6 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 	    accel_add[i_2 - 1][i_1 - 1];
 	}
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d2_size_p4a_copy = d2_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d2_block_size_p4a_copy = d2_block_size;
-  *d1_offset_p4a_copy = d1_offset;
-  *d2_offset_p4a_copy = d2_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
@@ -917,7 +875,6 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
     {
       accel_add[i - 1] = host_add[i - 1];
     }
-  *size_p4a_copy = size;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
@@ -942,10 +899,6 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
     {
       accel_add[i - 1] = host_add[(offset + i) - 1];
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d1_offset_p4a_copy = d1_offset;
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
@@ -982,13 +935,6 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 	    host_add[(offset_2 + i_2) - 1][(offset_1 + i_1) - 1];
 	}
     }
-  *elem_size_p4a_copy = elem_size;
-  *d1_size_p4a_copy = d1_size;
-  *d2_size_p4a_copy = d2_size;
-  *d1_block_size_p4a_copy = d1_block_size;
-  *d2_block_size_p4a_copy = d2_block_size;
-  *d1_offset_p4a_copy = d1_offset;
-  *d2_offset_p4a_copy = d2_offset;
   return;
 }
 /* C pretty print for module P4A_KERNEL_0. */
@@ -1006,10 +952,6 @@ p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
 
   b[(j + 1) - 1][(i + 1) - 1] = (i + 1);
   c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
-  *i_p4a_copy = i;
-  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_1. */
@@ -1028,10 +970,6 @@ p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
 
   a[(j + 1) - 1][(i + 1) - 1] =
     (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
-  *i_p4a_copy = i;
-  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
@@ -1052,8 +990,6 @@ p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
 	  p4a_kernel_wrapper_0 (m, n, b, c, i, j);
 	}
     }
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
@@ -1075,8 +1011,6 @@ p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
 	  p4a_kernel_wrapper_1 (m, n, a, b, c, i, j);
 	}
     }
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
@@ -1093,10 +1027,6 @@ p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
   int j = *j_p4a_copy;
 
   p4a_kernel_0 (m, n, b, c, i, j);
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
-  *i_p4a_copy = i;
-  *j_p4a_copy = j;
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
@@ -1114,9 +1044,5 @@ p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
   int j = *j_p4a_copy;
 
   p4a_kernel_1 (m, n, a, b, c, i, j);
-  *m_p4a_copy = m;
-  *n_p4a_copy = n;
-  *i_p4a_copy = i;
-  *j_p4a_copy = j;
   return;
 }
