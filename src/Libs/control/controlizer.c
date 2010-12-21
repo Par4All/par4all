@@ -1455,6 +1455,7 @@ hash_table used_labels;
 
   return(controlized);
 }
+#endif
 
 /* Move all the declarations found in a list of control to a given
    statement
@@ -1474,6 +1475,10 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   statement s = scoping_statement_head();
   list declarations = statement_declarations(s);
   statement s_above = scoping_statement_nth(2);
+  list nctls = NIL; // build a new list of controls to include the
+		    // initialization statements that are derived from
+		    // the declaration statements
+
   pips_debug(2, "Dealing with block statement %p included into block"
 	     " statement %p\n", s, s_above);
 
@@ -1521,28 +1526,86 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
     /* Add the inner declaration to the upper statement later */
     new_declarations = gen_entity_cons(v , new_declarations);
   }
+
   /* Remove the inner declaration from the inner statement block:
    */
   gen_free_list(statement_declarations(s));
   statement_declarations(s) = NIL;
 
-  /* Add all the declarations to the statement block above and keep the
-     same order: */
+  /* Add all the declarations to the statement block above and
+      preserve the order: */
+  new_declarations = gen_nreverse(new_declarations);
   statement_declarations(s_above) = gen_nconc(declarations_above,
-					      gen_nreverse(new_declarations));
+					      new_declarations);
+  FOREACH(ENTITY, dv, new_declarations)
+    // This does not seem to work because the above statement is being
+    // controlized. Hence, the new declaration statements are simply
+    // ignored... It might be better to rely on the block declaration
+    // list and to fix the declarations a posteriori, maybe at the end
+    // of controlize_statement(). The other option is to generate C99
+    // code with declarations anywhere in the execution flow
+    add_declaration_statement(s_above, dv);
+
+  /* Replace initializations in declarations by assignment
+     statements, when possible; see split_initializations(); do not
+     worry about variable renaming yet */
+  FOREACH(CONTROL, c, ctls) {
+    statement s = control_statement(c);
+    nctls = gen_nconc(nctls, CONS(CONTROL, c, NIL));
+    // FI: the entity must also be substituted in the
+    // initializations contained by the declarations. Also old
+    // declarations must be transformed into assignments.
+    if(declaration_statement_p(s)) {
+      list icl = NIL;
+      /* If old is declared in s, its declaration must be removed
+	 and replaced if necessary by an assignment with its
+	 initial value... It seems tricky at first if many
+	 variables are declared simultaneously but is does not
+	 matter if all have to be substituted. Oops for
+	 functional declarations... */
+      list dvl = statement_declarations(s);
+      //list il = NIL; // initialization list
+      FOREACH(ENTITY, dv, dvl) {
+	value iv = entity_initial(dv);
+	if(!value_unknown_p(iv)) {
+	  expression ie = variable_initial_expression(dv);
+	  expression lhs= entity_to_expression(dv);
+	  statement s = make_assign_statement(lhs, ie);
+	  control ic = make_control(s, NIL, NIL);
+	  nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
+	  icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
+	}
+      }
+      /* chain icl to c, assume ctls is a list over a control sequence... */
+      if(!ENDP(icl)) {
+	pips_assert("c has one successor (but may be zero with"
+		    " dead code behind declarations:-(",
+		    gen_length(control_successors(c))==1);
+	control succ = CONTROL(CAR(control_successors(c)));
+	control lic = CONTROL(CAR(gen_last(icl)));
+	unlink_2_control_nodes(c, succ);
+	link_2_control_nodes(c, CONTROL(CAR(icl)));
+	link_2_control_nodes(lic, succ);
+	/* They should be added into ctls too... because the
+	   initialization expressions may require some renaming... */
+	statement_declarations(s) = NIL;
+      }
+    }
+  }
 
   /* Replace all the references on old variables to references to the new
      ones in all the corresponding control nodes by in the code */
   HASH_MAP(old, new, {
-      FOREACH(CONTROL, c, ctls) {
+      FOREACH(CONTROL, c, nctls) {
 	statement s = control_statement(c);
 	replace_entity(s, old, new);
       }
       /* We should free in some way the old variable... */
     }, old_to_new_variables);
   hash_table_free(old_to_new_variables);
+
+  return;
 }
-#endif
 
 
 /* Computes the control graph of a sequence statement
@@ -1583,6 +1646,8 @@ static bool controlize_sequence(control c_res,
     check_control_coherency(succ);
   }
 
+  scoping_statement_push(st);
+
   /* A C block may have a label and even goto from outside on it. */
   /* To track variable scoping, track this statement */
   // TODO scoping_statement_push(st);
@@ -1611,6 +1676,7 @@ static bool controlize_sequence(control c_res,
     // make_conditional_control() has not made a new control but
     // retrieved a control by its label...
     //if(!ENDP(control_successors(c)) || !ENDP(control_predecessors(c)) ) {
+    // FI: too bad if the label is unused...
     if(!unlabelled_statement_p(s)) {
       pips_debug(8, "This control %p pre-existed. "
 		 "The sequence cannot be controlized.\n", c);
@@ -1796,6 +1862,7 @@ static bool controlize_sequence(control c_res,
       sequence_statements(instruction_sequence(statement_instruction(st))) =
 	NIL;
       // TODO move declarations up, keep extensions & here
+      move_declaration_control_node_declarations_to_statement(ctls);
     }
   }
   /* Integrate the statements related to the labels inside its statement
@@ -1805,8 +1872,8 @@ static bool controlize_sequence(control c_res,
   hash_table_free(block_used_labels);
 
 #if 0
-TODO
-  if (!hierarchized_labels) {
+//  TODO
+    if (!hierarchized_labels) {
     /* We are in trouble since we will have an unstructured with goto
        from or to outside this statement sequence, but the statement
        sequence that define the scoping rules is going to disappear...
@@ -1814,8 +1881,9 @@ TODO
     move_declaration_control_node_declarations_to_statement(ctls);
   }
 #endif
-  ///* Revert to the variable scope of the outer block statement: */
+    ///* Revert to the variable scope of the outer block statement: */
   // TODO scoping_statement_pop();
+  scoping_statement_pop();
   statement_consistent_p(st);
 
   return controlized;
