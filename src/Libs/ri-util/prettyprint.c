@@ -4070,7 +4070,7 @@ static string ensure_comment_consistency(const char * i_comments, language l) {
                 patterns[1]= "!";       
                 patterns[2]= "*";       
                 patterns[3]= "c";       
-                patterns[3]= "#";       // a single test case in PIPS validation forces me to do this (Syntax/sharpcomment)
+                patterns[4]= "#";       // a single test case in PIPS validation forces me to do this (Syntax/sharpcomment)
                 if(language_fortran95_p(l))
                     strcat(prefix,"! ");
                 else
