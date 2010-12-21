@@ -13591,6 +13591,7 @@ by the crough printer.
 print_crough  > MODULE.crough
               < PROGRAM.entities
               < MODULE.code
+              < MODULE.summary_effects
 \end{PipsMake}
 
 \begin{PipsMake}
@@ -13599,7 +13600,16 @@ print_c_code  > MODULE.c_printed_file
 \end{PipsMake}
 
 By default the crough pass tries to match the best C type for any Fortran
-type. However, many Fortran compilers (ifort, gfortran) allow to change
+type. Here is the matches between Fortran and C variables:
+\begin{itemize}
+\item INTEGER is matched to int.
+\item INTEGER*4 is matched to int.
+\item INTEGER*8 is matched to long long int.
+\item REAL is matched to float.
+\item REAL*4 is matched to float.
+\item REAL*8 is matched to double.
+\end{itemize}
+However, many Fortran compilers (ifort, gfortran) allow to change
 the type size at compile time. It is possible to do the same by setting the
 property CROUGH\_USER\_DEFINED\_TYPE to TRUE. In such a case the include file
 specified by the property CROUGH\_INCLUDE\_FILE is included by any file
@@ -13607,7 +13617,9 @@ generated using crough. It has to define (using \#define or
 typedef) the two types defined by the properties CROUGH\_INTEGER\_TYPE and
 CROUGH\_REAL\_TYPE. Obviously those types are used in the generated C file to
 declare variables that has the types INTEGER or REAL in the original Fortan
-file.
+file. When choosing that solution all INTEGER and REAL (including INTEGER*4,
+INTEGER*8, REAL*4 and REAL*8) variables will be set
+to the same user defined types.
 
 \begin{PipsProp}{CROUGH_USER_DEFINED_TYPE}
 CROUGH_USER_DEFINED_TYPE FALSE
@@ -13628,9 +13640,9 @@ CROUGH_REAL_TYPE "p4a_real"
 \subsection{Prettyprint for C  properties}
 \index{PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE}
 
-When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified. 
+When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified.
 
-\begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE} 
+\begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE}
 PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
 \end{PipsProp}
 

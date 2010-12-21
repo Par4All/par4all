@@ -55,6 +55,7 @@
 #include "misc.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "effects-generic.h"
 #include "pipsdbm.h"
 #include "text-util.h"
 
@@ -82,12 +83,15 @@
 /* forward declaration. */
 static string c_expression(expression,bool);
 
-// Create some list to keep trac of scalar variable that arguments of the
-// function. They need to be renamed in the function signature. Copy at
-// function entrance and updated at fonction output.
-static list l_type   = NIL;
-static list l_name   = NIL;
-static list l_rename = NIL;
+// Create some list to keep track of scalar variable that are arguments of the
+// function. They need to be renamed in the function signature, copy at
+// function entrance and updated at fonction output if they have been written.
+static list l_type    = NIL;
+static list l_name    = NIL;
+static list l_rename  = NIL;
+static list l_entity  = NIL;
+static list l_written = NIL;
+
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
@@ -156,6 +160,25 @@ static string c_entity_local_name(entity var)
     return name;
 }
 
+// build the list of written entity
+static void build_written_list (list l) {
+  list l_effects = l;
+  FOREACH (EFFECT, eff,  l_effects) {
+    if (effect_write_p (eff)) {
+      entity e = effect_any_entity (eff);
+      l_written = gen_entity_cons(e, l_written);
+      pips_debug (5, "entity %s (%p) is written\n", entity_local_name (e), e);
+    } else {
+      entity e = effect_any_entity (eff);
+      pips_debug (5, "entity %s (%p) is not written\n", entity_local_name (e), e);
+    }
+  }
+}
+
+//@return true if the entity is in the writen list
+static bool written_p (entity e) {
+  return gen_in_list_p (e, l_written);
+}
 /**************************************************** Function Pre and Postlude */
 
 static string scalar_prelude () {
@@ -180,11 +203,22 @@ static string scalar_postlude () {
   string previous = NULL;
   list n = l_name;
   list r = l_rename;
-  for (; n != NIL && r!= NIL; n = n->cdr, r = r->cdr) {
-    result = strdup (concatenate ("*", (string) gen_car (r), " = ",
-				  (string) gen_car (n), ";\n", previous, NULL));
-    if (previous != NULL) free (previous);
-    previous = result;
+  list e = l_entity;
+
+  for (; n != NIL && r != NIL && e != NIL; n = n->cdr, r = r->cdr, e = e->cdr) {
+    if (written_p (gen_car (e))) {
+      result = strdup (concatenate ("*", (string) gen_car (r), " = ",
+				    (string) gen_car (n), ";\n", previous, NULL));
+      if (previous != NULL) free (previous);
+      previous = result;
+      pips_debug (5, "entity %s (%p) restored\n",
+		  entity_local_name(gen_car (e)),
+		  gen_car (e));
+    } else {
+      pips_debug (5, "entity %s (%p) not restored\n",
+		  entity_local_name(gen_car (e)),
+		  gen_car (e));
+    }
   }
   return (result == NULL) ? strdup("") : result;
 }
@@ -538,6 +572,7 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
 					     l_name);
 		  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
 					     l_rename);
+		  l_entity = gen_entity_cons(var, l_entity);
 		}
 		else {
 		  ext = "";
@@ -1421,11 +1456,6 @@ static string c_code_string(entity module, statement stat)
 {
   string head, decls, body, result, copy_in;
 
-  /// init the list needed for the function pre and postlude
-  l_type   = NIL;
-  l_name   = NIL;
-  l_rename = NIL;
-
   /* What about declarations that are external a module scope ?
      Consider a source file as a module entity, put all declarations in it
      (external static + TOP-LEVEL) */
@@ -1452,14 +1482,6 @@ static string c_code_string(entity module, statement stat)
   free(decls);
   free(body);
   free(copy_in);
-  // free and reset strin lists
-  gen_free_string_list (l_type);
-  gen_free_string_list (l_name);
-  gen_free_string_list (l_rename);
-  l_type   = NIL;
-  l_name   = NIL;
-  l_rename = NIL;
-
   return strdup(result);
 }
 
@@ -1475,18 +1497,33 @@ bool print_crough(string module_name)
     string ppt, crough, dir, filename;
     entity module;
     statement stat;
+    list l_effect = NULL;
 
+    // get what is needed from PIPS DBM
     crough = db_build_file_resource_name(DBR_CROUGH, module_name, CROUGH);
     module = module_name_to_entity(module_name);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", crough, NULL));
     stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
-
+    l_effect = effects_to_list((effects)
+			       db_get_memory_resource(DBR_SUMMARY_EFFECTS,
+						      module_name, TRUE));
     set_current_module_entity(module);
     set_current_module_statement(stat);
 
     debug_on("CPRETTYPRINTER_DEBUG_LEVEL");
     pips_debug(1, "Begin C prettyprrinter for %s\n", entity_name(module));
+
+    // init the list needed for the function pre and postlude
+    l_type    = NIL;
+    l_name    = NIL;
+    l_rename  = NIL;
+    l_entity  = NIL;
+    l_written = NIL;
+    // build the list of written entity
+    build_written_list (l_effect);
+
+    // get the c code as a string
     ppt = c_code_string(module, stat);
     pips_debug(1, "end\n");
     debug_off();
@@ -1501,6 +1538,17 @@ bool print_crough(string module_name)
     fprintf(out, "%s", ppt);
     safe_fclose(out, filename);
 
+    // free and reset strin lists
+    gen_free_list (l_entity);
+    gen_free_list (l_written);
+    gen_free_string_list (l_type);
+    gen_free_string_list (l_name);
+    gen_free_string_list (l_rename);
+    l_type    = NIL;
+    l_name    = NIL;
+    l_rename  = NIL;
+    l_entity  = NIL;
+    l_written = NIL;
     free(ppt);
     free(dir);
     free(filename);
