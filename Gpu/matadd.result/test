@@ -570,8 +570,8 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
 void
-p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
-		     int *size_p4a_copy)
+p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
+		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
 {
   int i;
   int size = *size_p4a_copy;
@@ -587,8 +587,9 @@ p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
-			char host_add[d1_size * elem_size - 0],
-			char accel_add[d1_block_size * elem_size - 0])
+			char host_add[(*d1_size * elem_size_p4a_copy) - 0],
+			char accel_add[(*d1_block_size * elem_size_p4a_copy) -
+				       0])
 {
   int i;
   int size;
@@ -616,10 +617,11 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
 			int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
 			int *d2_offset_p4a_copy,
-			char host_add[d2_size * elem_size -
-				      0][d1_size * elem_size - 0],
-			char accel_add[d2_block_size * elem_size -
-				       0][d1_block_size * elem_size - 0])
+			char host_add[(*d2_size * elem_size_p4a_copy) -
+				      0][(*d1_size * elem_size_p4a_copy) - 0],
+			char accel_add[(*d2_block_size * elem_size_p4a_copy) -
+				       0][(*d1_block_size *
+					   elem_size_p4a_copy) - 0])
 {
   int i_1;
   int i_2;
@@ -654,8 +656,8 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
 void
-p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
-		   int *size_p4a_copy)
+p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
+		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
 {
   int i;
   int size = *size_p4a_copy;
@@ -671,8 +673,9 @@ p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
-		      char host_add[d1_size * elem_size - 0],
-		      char accel_add[d1_block_size * elem_size - 0])
+		      char host_add[(*d1_size * elem_size_p4a_copy) - 0],
+		      char accel_add[(*d1_block_size * elem_size_p4a_copy) -
+				     0])
 {
   int i;
   int size;
@@ -700,10 +703,11 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
 		      int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
 		      int *d2_offset_p4a_copy,
-		      char host_add[d2_size * elem_size -
-				    0][d1_size * elem_size - 0],
-		      char accel_add[d2_block_size * elem_size -
-				     0][d1_block_size * elem_size - 0])
+		      char host_add[(*d2_size * elem_size_p4a_copy) -
+				    0][(*d1_size * elem_size_p4a_copy) - 0],
+		      char accel_add[(*d2_block_size * elem_size_p4a_copy) -
+				     0][(*d1_block_size *
+					 elem_size_p4a_copy) - 0])
 {
   int i_1;
   int i_2;
@@ -817,8 +821,8 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
 void
-p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
-		     int *size_p4a_copy)
+p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
+		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
 {
   int i;
   int size = *size_p4a_copy;
@@ -834,8 +838,9 @@ p4a_copy_from_accel (char host_add[size - 0], char accel_add[size - 0],
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
-			char host_add[d1_size * elem_size - 0],
-			char accel_add[d1_block_size * elem_size - 0])
+			char host_add[(*d1_size * elem_size_p4a_copy) - 0],
+			char accel_add[(*d1_block_size * elem_size_p4a_copy) -
+				       0])
 {
   int i;
   int size;
@@ -863,10 +868,11 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
 			int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
 			int *d2_offset_p4a_copy,
-			char host_add[d2_size * elem_size -
-				      0][d1_size * elem_size - 0],
-			char accel_add[d2_block_size * elem_size -
-				       0][d1_block_size * elem_size - 0])
+			char host_add[(*d2_size * elem_size_p4a_copy) -
+				      0][(*d1_size * elem_size_p4a_copy) - 0],
+			char accel_add[(*d2_block_size * elem_size_p4a_copy) -
+				       0][(*d1_block_size *
+					   elem_size_p4a_copy) - 0])
 {
   int i_1;
   int i_2;
@@ -901,8 +907,8 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
 void
-p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
-		   int *size_p4a_copy)
+p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
+		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
 {
   int i;
   int size = *size_p4a_copy;
@@ -918,8 +924,9 @@ p4a_copy_to_accel (char host_add[size - 0], char accel_add[size - 0],
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
-		      char host_add[d1_size * elem_size - 0],
-		      char accel_add[d1_block_size * elem_size - 0])
+		      char host_add[(*d1_size * elem_size_p4a_copy) - 0],
+		      char accel_add[(*d1_block_size * elem_size_p4a_copy) -
+				     0])
 {
   int i;
   int size;
@@ -947,10 +954,11 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
 		      int *d2_block_size_p4a_copy, int *d1_offset_p4a_copy,
 		      int *d2_offset_p4a_copy,
-		      char host_add[d2_size * elem_size -
-				    0][d1_size * elem_size - 0],
-		      char accel_add[d2_block_size * elem_size -
-				     0][d1_block_size * elem_size - 0])
+		      char host_add[(*d2_size * elem_size_p4a_copy) -
+				    0][(*d1_size * elem_size_p4a_copy) - 0],
+		      char accel_add[(*d2_block_size * elem_size_p4a_copy) -
+				     0][(*d1_block_size *
+					 elem_size_p4a_copy) - 0])
 {
   int i_1;
   int i_2;
@@ -985,8 +993,10 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 }
 /* C pretty print for module P4A_KERNEL_0. */
 void
-p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
-	      float c[n - 0][m - 0], int *i_p4a_copy, int *j_p4a_copy)
+p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
+	      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
+	      int *j_p4a_copy)
 {
   ;
   int m = *m_p4a_copy;
@@ -1004,8 +1014,10 @@ p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
 }
 /* C pretty print for module P4A_KERNEL_1. */
 void
-p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy, float a[n - 0][m - 0],
-	      float b[n - 0][m - 0], float c[n - 0][m - 0], int *i_p4a_copy,
+p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
+	      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+	      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
 	      int *j_p4a_copy)
 {
   ;
@@ -1025,7 +1037,8 @@ p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy, float a[n - 0][m - 0],
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
 void
 p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
-		       float b[n - 0][m - 0], float c[n - 0][m - 0])
+		       float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		       float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0])
 {
   int j;
   int i;
@@ -1046,8 +1059,9 @@ p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
 void
 p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
-		       float a[n - 0][m - 0], float b[n - 0][m - 0],
-		       float c[n - 0][m - 0])
+		       float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		       float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		       float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0])
 {
   int j;
   int i;
@@ -1067,8 +1081,10 @@ p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
 void
-p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
-		      float c[n - 0][m - 0], int *i_p4a_copy, int *j_p4a_copy)
+p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
+		      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		      int *i_p4a_copy, int *j_p4a_copy)
 {
   ;
   int m = *m_p4a_copy;
@@ -1085,8 +1101,10 @@ p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy, float b[n - 0][m - 0],
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
 void
-p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy, float a[n - 0][m - 0],
-		      float b[n - 0][m - 0], float c[n - 0][m - 0],
+p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
+		      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy)
 {
   ;

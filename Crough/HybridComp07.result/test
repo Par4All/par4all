@@ -22,8 +22,6 @@ Code after outlining
       CALL TOTO(A)
       PRINT *, A
       END
-Module statement: 
-and declarations: 
 /* C pretty print for module TOTO. */
 #include "p4a_crough_types.h"
 
