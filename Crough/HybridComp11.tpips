@@ -43,9 +43,9 @@ echo
 echo compiles pgm from fortran files and executes
 echo
 shell cp $WS.database/TOTO/TOTO.c  $WS.database/Src
-shell ${PIPS_F77:-gfortran}  -fdefault-integer-8 -Wall -g -c $WS.database/Src/$WS.f  -o $WS.database/Src/$WS.o
-shell ${PIPS_F77:-gfortran}  -fdefault-integer-8 -Wall -g -c $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.o
-shell ${PIPS_F77:-gfortran}  -fdefault-integer-8 -Wall -g -S $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.S
+shell ${PIPS_F77:-gfortran} -Wall -g -c $WS.database/Src/$WS.f  -o $WS.database/Src/$WS.o
+shell ${PIPS_F77:-gfortran} -Wall -g -c $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.o
+shell ${PIPS_F77:-gfortran} -Wall -g -S $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.S
 shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.f.o -o $WS.database/Src/$WS.f.exe
 shell ./$WS.database/Src/$WS.f.exe
 
