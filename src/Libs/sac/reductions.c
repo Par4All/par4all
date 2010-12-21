@@ -39,6 +39,7 @@
 
 #include "effects-generic.h"
 
+#include "accel-util.h"
 #include "reductions.h"
 #include "sac.h"
 #include "ricedg.h"

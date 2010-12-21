@@ -32,6 +32,7 @@ LIB_CFILES =group_constants.c \
  			ikernels.c\
 			terapixify.c \
 			constraints.c \
+			delay.c \
 			computation_intensity.c
 
 INC_TARGET =    $(TARGET).h

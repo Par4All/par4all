@@ -339,7 +339,7 @@ get_declaration_comments(entity module)
 
 /* list module_formal_parameters(entity func)
  * input    : an entity representing a function.
- * output   : the unsorted list (of entities) of parameters of the function "func".
+ * output   : the ordered list (of entities) of parameters of the function "func".
  * modifies : nothing.
  * comment  : Made from "entity_to_formal_integer_parameters()" that considers 
  *            only integer variables.
@@ -364,7 +364,7 @@ module_formal_parameters(entity func)
      },
 	 decl);
     
-    return (formals);
+    return gen_nreverse(formals);
 }
 
 /* Number of user declaration lines for a module */

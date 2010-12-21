@@ -1474,6 +1474,15 @@ following property:
 \begin{PipsProp}{PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS} 
 PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS FALSE
 \end{PipsProp}
+
+Using a mixed C / Fortran RI is troublesome for comments handling:
+sometimes the comment guard is stored in the comment, sometime not.
+Sometimes it is on purpose, sometimes it is not.
+When following property is set to true, \PIPS does its best to prettyprint comments correctly.
+\begin{PipsProp}{PRETTYPRINT_CHECK_COMMENTS}
+PRETTYPRINT_CHECK_COMMENTS TRUE
+\end{PipsProp}
+
 % no longer used {
 % \begin{PipsProp}{PRETTYPRINT_REGENERATED_LABEL}
 % PRETTYPRINT_REGENERATED_LABEL "12345"
@@ -5788,21 +5797,6 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
 
-\begin{PipsPass}{simd_loop_const_elim}
-This phase tries to optimize the SIMD code by removing from the loop body
-the SIMD statement that does not depends on the loop iteration.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias simd_loop_const_elim 'SIMD loop constant elimination'
-
-simd_loop_const_elim                    > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.proper_effects
-        < MODULE.cumulated_effects
-        < MODULE.dg
-\end{PipsMake}
 
 \begin{PipsPass}{simd_memory_packing}
 This phase is to be called after simdization of affectation operator.
@@ -6743,6 +6737,7 @@ Rectangular hull of regions are used to match allocator and data transfers proto
 If an analysis fails, definition regions are use instead.
 If a sizeof is involved, \PipsPropRef{EVAL_SIZEOF} must be set to true.
 
+
 \begin{PipsMake}
 isolate_statement > MODULE.code
 	> MODULE.callees
@@ -6753,6 +6748,64 @@ isolate_statement > MODULE.code
 
 \begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
 ISOLATE_STATEMENT_LABEL ""
+\end{PipsProp}
+
+\subsubsection{Delay Communications}
+\begin{PipsPass}{delay_communications}
+Optimize the load/store dma by delaying the stores and 
+performing the stores as soon as possible.
+\end{PipsPass}
+
+It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
+to distinguish loads and stores from other calls.
+
+The communication elimination makes the assumption that a load/store pair can always be removed.
+
+\begin{PipsMake}
+delay_communications                    > MODULE.code
+        > MODULE.callees
+        ! CALLEES.delay_communications
+        ! MODULE.delay_load_communications
+        ! MODULE.delay_store_communications
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_load_communications                    > MODULE.code
+        > MODULE.callees
+        > CALLERS.code
+        > CALLERS.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_store_communications                    > MODULE.code
+        > MODULE.callees
+        > CALLERS.code
+        > CALLERS.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+
+This property can be used to suppress inter-procedural propagation,
+for example when data are not persistent across calls.
+\begin{PipsProp}{DELAY_COMMUNICATIONS_INTERPROCEDURAL}
+DELAY_COMMUNICATIONS_INTERPROCEDURAL TRUE
 \end{PipsProp}
 
 \subsubsection{Hardware Constraints Solver}
