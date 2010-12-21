@@ -1546,58 +1546,73 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
     // code with declarations anywhere in the execution flow
     add_declaration_statement(s_above, dv);
 
-  /* Replace initializations in declarations by assignment
-     statements, when possible; see split_initializations(); do not
-     worry about variable renaming yet */
-  FOREACH(CONTROL, c, ctls) {
-    statement s = control_statement(c);
-    nctls = gen_nconc(nctls, CONS(CONTROL, c, NIL));
-    // FI: the entity must also be substituted in the
-    // initializations contained by the declarations. Also old
-    // declarations must be transformed into assignments.
-    if(declaration_statement_p(s)) {
-      list icl = NIL;
-      /* If old is declared in s, its declaration must be removed
-	 and replaced if necessary by an assignment with its
-	 initial value... It seems tricky at first if many
-	 variables are declared simultaneously but is does not
-	 matter if all have to be substituted. Oops for
-	 functional declarations... */
-      list dvl = statement_declarations(s);
-      //list il = NIL; // initialization list
-      FOREACH(ENTITY, dv, dvl) {
-	value iv = entity_initial(dv);
-	if(!value_unknown_p(iv)) {
-	  expression ie = variable_initial_expression(dv);
-	  expression lhs= entity_to_expression(dv);
-	  statement s = make_assign_statement(lhs, ie);
-	  control ic = make_control(s, NIL, NIL);
-	  nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
-	  icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
+  if(get_bool_property("C89_CODE_GENERATION")) {
+    /* Replace initializations in declarations by assignment
+       statements, when possible; see split_initializations(); do not
+       worry about variable renaming yet */
+    FOREACH(CONTROL, c, ctls) {
+      statement s = control_statement(c);
+      nctls = gen_nconc(nctls, CONS(CONTROL, c, NIL));
+      // FI: the entity must also be substituted in the
+      // initializations contained by the declarations. Also old
+      // declarations must be transformed into assignments.
+      if(declaration_statement_p(s)) {
+	list icl = NIL;
+	/* If old is declared in s, its declaration must be removed
+	   and replaced if necessary by an assignment with its
+	   initial value... It seems tricky at first if many
+	   variables are declared simultaneously but is does not
+	   matter if all have to be substituted. Oops for
+	   functional declarations... */
+	list dvl = statement_declarations(s);
+	//list il = NIL; // initialization list
+	FOREACH(ENTITY, dv, dvl) {
+	  value iv = entity_initial(dv);
+	  if(!value_unknown_p(iv)) {
+	    expression ie = variable_initial_expression(dv);
+	    expression lhs= entity_to_expression(dv);
+	    statement s = make_assign_statement(lhs, ie);
+	    control ic = make_control(s, NIL, NIL);
+	    nctls = gen_nconc(nctls, CONS(CONTROL, ic, NIL));
+	    icl = gen_nconc(icl, CONS(CONTROL, ic, NIL));
+	  }
 	}
-      }
-      /* chain icl to c, assume ctls is a list over a control sequence... */
-      if(!ENDP(icl)) {
-	pips_assert("c has one successor (but may be zero with"
-		    " dead code behind declarations:-(",
-		    gen_length(control_successors(c))==1);
-	control succ = CONTROL(CAR(control_successors(c)));
-	control lic = CONTROL(CAR(gen_last(icl)));
-	unlink_2_control_nodes(c, succ);
-	link_2_control_nodes(c, CONTROL(CAR(icl)));
-	link_2_control_nodes(lic, succ);
-	/* They should be added into ctls too... because the
-	   initialization expressions may require some renaming... */
-	statement_declarations(s) = NIL;
+	/* chain icl to c, assume ctls is a list over a control sequence... */
+	if(!ENDP(icl)) {
+	  pips_assert("c has one successor (but may be zero with"
+		      " dead code behind declarations:-(",
+		      gen_length(control_successors(c))==1);
+	  control succ = CONTROL(CAR(control_successors(c)));
+	  control lic = CONTROL(CAR(gen_last(icl)));
+	  unlink_2_control_nodes(c, succ);
+	  link_2_control_nodes(c, CONTROL(CAR(icl)));
+	  link_2_control_nodes(lic, succ);
+	  /* They should be added into ctls too... because the
+	     initialization expressions may require some renaming... */
+	  statement_declarations(s) = NIL;
+	}
       }
     }
   }
+  else
+    nctls = gen_copy_seq(ctls);
 
   /* Replace all the references on old variables to references to the new
      ones in all the corresponding control nodes by in the code */
   HASH_MAP(old, new, {
       FOREACH(CONTROL, c, nctls) {
 	statement s = control_statement(c);
+	if(!get_bool_property("C89_CODE_GENERATION")) { // C99 assumed
+	  if(declaration_statement_p(s)) {
+	    list dl = statement_declarations(s);
+	    list cl;
+	    for(cl=dl; !ENDP(cl); POP(cl)) {
+	      entity dv = ENTITY(CAR(cl));
+	      if(dv==old)
+		ENTITY_(CAR(cl)) = new;
+	    }
+	  }
+	}
 	replace_entity(s, old, new);
       }
       /* We should free in some way the old variable... */
