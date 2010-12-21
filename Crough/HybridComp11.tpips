@@ -3,8 +3,6 @@ setenv WS="HybridComp11"
 delete $WS
 create $WS $WS.f
 
-setenv CPRETTYPRINTER_DEBUG_LEVEL 9
-
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo
@@ -52,8 +50,8 @@ shell ./$WS.database/Src/$WS.f.exe
 echo
 echo compiles pgm from fortran and C files and executes
 echo
-shell cc -std=c99 -Wall -g -I./include -DP4A_USE_INT64 -c $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.o
-shell cc -std=c99 -Wall -g -I./include -DP4A_USE_INT64 -S $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.S
+shell cc -std=c99 -Wall -g -c $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.o
+shell cc -std=c99 -Wall -g -S $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.S
 shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.c.o -o $WS.database/Src/$WS.c.exe
 shell ./$WS.database/Src/$WS.c.exe
 

@@ -1,5 +1,5 @@
       program HybridComp10
-      integer i
+      integer*8 i
       integer j
       integer*8 a(5, 5)
       do 10 i = 1, 5

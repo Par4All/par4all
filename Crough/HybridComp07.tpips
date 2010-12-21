@@ -3,8 +3,6 @@ setenv WS="HybridComp07"
 delete $WS
 create $WS $WS.f
 
-setenv CPRETTYPRINTER_DEBUG_LEVEL 9
-
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo

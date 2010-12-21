@@ -1,10 +1,10 @@
 
 Initial code
 
-      PROGRAM HYBRIDCOMP11
+      PROGRAM HYBRIDCOMP12
       INTEGER I
       INTEGER J
-      INTEGER*4 A(5, 5)
+      INTEGER A(5, 5)
       DO 10 I = 1, 5
          DO J = 1, 5
             A(I,J) = I*1147483648
@@ -15,10 +15,10 @@ Initial code
 
 Code after outlining
 
-      PROGRAM HYBRIDCOMP11
+      PROGRAM HYBRIDCOMP12
       INTEGER I
       INTEGER J
-      INTEGER*4 A(5, 5)
+      INTEGER A(5, 5)
       CALL TOTO(A)
       PRINT *, A
       END
