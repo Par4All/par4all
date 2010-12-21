@@ -50,6 +50,11 @@ echo
 #setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[main]
 
+apply UNSPLIT
+
+shell gcc freia02.database/Src/freia02.c -o freia02.database/a.out
+shell freia02.database/a.out
+
 close
 
 #delete freia02
