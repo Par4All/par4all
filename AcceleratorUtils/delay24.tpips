@@ -1,0 +1,23 @@
+setenv WS delay24
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c include/delay.c
+
+activate REGION_CHAINS
+activate MUST_REGIONS
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+
+display PRINTED_FILE[main,a]
+setproperty ACCEL_LOAD="load"
+setproperty ACCEL_STORE="store"
+apply DELAY_COMMUNICATIONS[main]
+display PRINTED_FILE[main,a]
+
+apply UNSPLIT
+
+close
+
+shell cc $WS.c include/delay.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c include/delay.c -o $WS.database/Tmp/out
+shell test `$WS.database/Tmp/ref` = `$WS.database/Tmp/out`
+delete $WS
