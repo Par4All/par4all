@@ -46,7 +46,6 @@ toto_ (int *a_p4a_copy, int *n_p4a_copy)
       continue;
     }
   *a_p4a_copy = a;
-  *n_p4a_copy = n;
   return;
 }
 

@@ -20,6 +20,12 @@ apply OUTLINE[HYBRIDCOMP06]
 apply CLEAN_DECLARATIONS[HYBRIDCOMP06]
 apply CLEAN_DECLARATIONS[TOTO]
 
+echo
+echo print code cumulated effects
+echo
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE[TOTO]
 
 echo
 echo Code after outlining
@@ -55,5 +61,5 @@ shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.c.o 
 shell ./$WS.database/Src/$WS.c.exe
 
 close
-#delete $WS
+delete $WS
 quit

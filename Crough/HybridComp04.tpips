@@ -1,9 +1,7 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS="HybridComp05"
+setenv WS="HybridComp04"
 delete $WS
 create $WS $WS.f
-
-setenv CPRETTYPRINTER_DEBUG_LEVEL 9
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
@@ -17,9 +15,9 @@ setproperty OUTLINE_MODULE_NAME "TOTO"
 setproperty OUTLINE_LABEL "10"
 setproperty OUTLINE_INDEPENDENT_COMPILATION_UNIT TRUE
 
-apply PRIVATIZE_MODULE[HYBRIDCOMP05]
-apply OUTLINE[HYBRIDCOMP05]
-apply CLEAN_DECLARATIONS[HYBRIDCOMP05]
+apply PRIVATIZE_MODULE[HYBRIDCOMP04]
+apply OUTLINE[HYBRIDCOMP04]
+apply CLEAN_DECLARATIONS[HYBRIDCOMP04]
 apply CLEAN_DECLARATIONS[TOTO]
 
 
@@ -29,7 +27,7 @@ echo
 
 setproperty PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE TRUE
 
-display PRINTED_FILE[HYBRIDCOMP05]
+display PRINTED_FILE[HYBRIDCOMP04]
 display C_PRINTED_FILE[TOTO]
 
 echo
@@ -57,5 +55,5 @@ shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.c.o 
 shell ./$WS.database/Src/$WS.c.exe
 
 close
-#delete $WS
+delete $WS
 quit
