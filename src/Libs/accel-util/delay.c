@@ -70,6 +70,23 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "accel-util.h"
 
+/* helper to transform preferences in references */
+static void do_remove_preference(cell c){
+    if(cell_preference_p(c)) {
+        reference r = copy_reference(
+                preference_reference(cell_preference(c))
+                );
+        free_preference(cell_preference(c));
+        cell_tag(c)=is_cell_reference;
+        cell_reference(c)=r;
+    }
+}
+
+/* entry point to transform preferences in references */
+void remove_preferences(void * obj) {
+    gen_recurse(obj,cell_domain,do_remove_preference,gen_null);
+}
+
 static graph dependence_graph=graph_undefined;
 
 static bool simd_load_call_p(call c) {
@@ -144,6 +161,20 @@ static bool statements_conflict_p(statement s0, statement s1) {
             ( simd_store_stat_p(s0) || simd_store_stat_p(s1) ) &&
             ( return_statement_p(s0) || return_statement_p(s1) ) )
         return true;
+
+    /* special hook for loop statements: dependency on the index are not well generated */
+    if(statement_loop_p(s1)) {
+        list effs0 = load_proper_rw_effects_list(ordering_to_statement(statement_ordering(s0)));
+        list effs1 = load_proper_rw_effects_list(ordering_to_statement(statement_ordering(s1)));
+        bool conflict = false;
+        FOREACH(EFFECT,eff0,effs0){
+            FOREACH(EFFECT,eff1,effs1)
+            if((conflict=effects_may_conflict_p(eff0,eff1)))
+                goto end;
+        }
+end:
+        return conflict;
+    }
 
     FOREACH(VERTEX,v,graph_vertices(dependence_graph)) {
         statement s = vertex_to_statement(v);
@@ -548,6 +579,10 @@ bool delay_load_communications(char * module_name)
     set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
+    set_proper_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true)
+    );
+    remove_preferences(get_proper_rw_effects());
     set_cumulated_rw_effects(
             (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
     );
@@ -590,6 +625,7 @@ bool delay_load_communications(char * module_name)
     reset_ordering_to_statement();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_proper_rw_effects();
 
     return c.result;
 }
@@ -601,6 +637,10 @@ bool delay_store_communications(char * module_name)
     set_ordering_to_statement(module_stat);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
+    set_proper_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true)
+    );
+    remove_preferences(get_proper_rw_effects());
     set_cumulated_rw_effects(
             (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
     );
@@ -644,6 +684,7 @@ bool delay_store_communications(char * module_name)
     reset_ordering_to_statement();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_proper_rw_effects();
 
     return c.result;
 }
@@ -838,6 +879,10 @@ bool delay_communications(char * module_name)
     set_current_module_statement( module_stat);
     set_ordering_to_statement(module_stat);
 
+    set_proper_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true)
+    );
+    remove_preferences(get_proper_rw_effects());
     set_cumulated_rw_effects(
             (statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true)
     );
@@ -866,6 +911,7 @@ bool delay_communications(char * module_name)
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_proper_rw_effects();
     reset_ordering_to_statement();
 
     return true;
