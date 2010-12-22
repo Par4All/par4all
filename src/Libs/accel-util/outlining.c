@@ -496,6 +496,21 @@ static void convert_pointer_to_array(entity e,entity re, expression x, list stat
     update_expression_syntax(x,syn2);
 }
 
+static void outline_remove_duplicates(list *entities) {
+    list tentities = gen_copy_seq(*entities);
+    for(list iter=tentities;!ENDP(iter);POP(iter)) {
+        entity e0 = ENTITY(CAR(iter));
+        FOREACH(ENTITY,e1,CDR(iter)) {
+            if( !same_entity_p(e0,e1) &&
+                    same_entity_lname_p(e0,e1)) {
+                gen_remove_once(entities,e1);
+                break;
+            }
+        }
+    }
+    gen_free_list(tentities);
+}
+
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -559,12 +574,14 @@ statement outliner(string outline_module_name, list statements_to_outline)
         /* function should be added to compilation unit */
         if(entity_function_p(e))
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
-        else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
-                !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
+        else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) //&&
+                //!( formal_parameter_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
+            )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
     gen_free_list(referenced_entities);
     referenced_entities=tmp_list;
+
 
 
     /* remove global variables if needed */
@@ -593,6 +610,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     sort_entities_with_dep(&referenced_entities);
 
 
+    /* in some rare case, we can have too functions with the same local name */
+    outline_remove_duplicates(&referenced_entities);
 
 
     intptr_t i=0;
@@ -800,7 +819,7 @@ outline(char* module_name)
         strupper(outline_module_name,outline_module_name);
 
     /* retrieve statement to outline */
-    list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),OUTLINE_PRAGMA) ;
+    list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),get_string_property("OUTLINE_PRAGMA")) ;
     if(ENDP(statements_to_outline)) {
         string label_name = get_string_property("OUTLINE_LABEL");
         if( empty_string_p(label_name) ) {

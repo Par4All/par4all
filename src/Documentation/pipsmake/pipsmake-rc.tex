@@ -9440,6 +9440,8 @@ set \PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
 
 The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
 the user is prompted if not set.
+But first the pass scans the code for any statement flagged with the pragma defined in
+\PipsPropRef{OUTLINE_PRAGMA}.
 
 If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the statement to
 outline.
@@ -9452,6 +9454,9 @@ Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT} make it pos
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_PRAGMA}
+OUTLINE_PRAGMA "pips outline"
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_LABEL}
 OUTLINE_LABEL ""
