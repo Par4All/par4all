@@ -1,23 +1,4 @@
 
-C  T(S) {"Hello World!"==S}
-
-
-      SUBROUTINE FOO(S)
-
-C     Variable and constant lengths must be taken into account and
-C     substring applied... except when you cannot and have to assume
-C     that the assignment is legal
-
-      CHARACTER*(*) S
-
-C  T(S) {"Hello World!"==S}
-
-
-C     Should not be truncated since the actual lenght of s is unknown
-      S = "Hello World!"                                                0011
-
-      END
-
 C  T() {}
 
       PROGRAM TYPE24
@@ -41,6 +22,25 @@ C  T() {}
 
 
       PRINT *, S1, S2                                                   0012
+
+      END
+
+C  T(S) {"Hello World!"==S}
+
+
+      SUBROUTINE FOO(S)
+
+C     Variable and constant lengths must be taken into account and
+C     substring applied... except when you cannot and have to assume
+C     that the assignment is legal
+
+      CHARACTER*(*) S
+
+C  T(S) {"Hello World!"==S}
+
+
+C     Should not be truncated since the actual lenght of s is unknown
+      S = "Hello World!"                                                0011
 
       END
 

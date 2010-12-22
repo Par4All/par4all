@@ -125,5 +125,4 @@ void main(int n)
          d++, s++;
    }
    printf("healthy");
-   ;
 }

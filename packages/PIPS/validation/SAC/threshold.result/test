@@ -66,7 +66,6 @@ void threshold(float data[128], float val)
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
@@ -88,7 +87,6 @@ void threshold(float data[128], float val)
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
@@ -110,7 +108,6 @@ void threshold(float data[128], float val)
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
@@ -132,7 +129,6 @@ void threshold(float data[128], float val)
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
@@ -162,73 +158,58 @@ void threshold(float data[128], float val)
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
    int i;
    //PIPS generated variable
-   int I_0;
+   int I_0, I_0_0[128];
+   //PIPS generated variable
+   v4si vec00_0;
+   //PIPS generated variable
+   v4sf vec10_0, vec20_0, vec30_0;
+   //PIPS generated variable
+   v4si vec40_0;
+   //PIPS generated variable
+   v4sf vec50_0;
    //SAC generated temporary array
    a4sf pdata0 = {val, val, val, val};
+   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
    {
       //PIPS generated variable
-      int I_0[128];
-      {
-         //PIPS:SAC generated v4sf vector(s)
-         v4sf vec20;
-         SIMD_LOAD_V4SF(vec20, &pdata0[0]);
-         for(i = 0; i <= 127; i += 4) {
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec00;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec10, vec30;
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec40;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec50;
-            SIMD_LOAD_V4SF(vec10, &data[i]);
-            SIMD_GTPS(vec00, vec10, vec20);
-            SIMD_STORE_V4SI(vec00, &I_0[i]);
-            SIMD_PHIPS(vec30, vec00, vec20, vec10);
-            SIMD_STORE_V4SF(vec30, &data[i]);
-         }
+      for(i = 0; i <= 127; i += 4) {
+         //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
+         SIMD_LOAD_V4SF(vec10_0, &data[i]);
+         SIMD_GTPS(vec00_0, vec10_0, vec20_0);
+         SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
+         SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
+         SIMD_STORE_V4SF(vec30_0, &data[i]);
       }
       i = 128;
    }
-   ;
 }
 void threshold(float data[128], float val)
 {
    int i;
+   //PIPS generated variable
+   int I_0_0[128];
+   //PIPS generated variable
+   v4si vec00_0;
+   //PIPS generated variable
+   v4sf vec10_0, vec20_0, vec30_0;
    //SAC generated temporary array
    a4sf pdata0 = {val, val, val, val};
-   {
-      //PIPS generated variable
-      int I_0[128];
-      {
-         //PIPS:SAC generated v4sf vector(s)
-         v4sf vec20;
-         SIMD_LOAD_V4SF(vec20, &pdata0[0]);
-         for(i = 0; i <= 127; i += 4) {
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec00;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec10, vec30;
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec40;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec50;
-            SIMD_LOAD_V4SF(vec10, &data[i]);
-            SIMD_GTPS(vec00, vec10, vec20);
-            SIMD_STORE_V4SI(vec00, &I_0[i]);
-            SIMD_PHIPS(vec30, vec00, vec20, vec10);
-            SIMD_STORE_V4SF(vec30, &data[i]);
-         }
-      }
-      i = 128;
+   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   //PIPS generated variable
+   for(i = 0; i <= 127; i += 4) {
+      //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec10_0, &data[i]);
+      SIMD_GTPS(vec00_0, vec10_0, vec20_0);
+      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
+      SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
+      SIMD_STORE_V4SF(vec30_0, &data[i]);
    }
-   ;
+   i = 128;
 }
 
 simdized code
@@ -236,33 +217,24 @@ simdized code
 void threshold(float data[128], float val)
 {
    int i;
+   //PIPS generated variable
+   int I_0_0[128];
+   //PIPS generated variable
+   v4si vec00_0;
+   //PIPS generated variable
+   v4sf vec10_0, vec20_0, vec30_0;
    //SAC generated temporary array
    a4sf pdata0 = {val, val, val, val};
-   {
-      //PIPS generated variable
-      int I_0[128];
-      {
-         //PIPS:SAC generated v4sf vector(s)
-         v4sf vec20;
-         SIMD_LOAD_V4SF(vec20, &pdata0[0]);
-         for(i = 0; i <= 127; i += 4) {
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec00;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec10, vec30;
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec40;
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec50;
-            SIMD_LOAD_V4SF(vec10, &data[i]);
-            SIMD_GTPS(vec00, vec10, vec20);
-            SIMD_STORE_V4SI(vec00, &I_0[i]);
-            SIMD_PHIPS(vec30, vec00, vec20, vec10);
-            SIMD_STORE_V4SF(vec30, &data[i]);
-         }
-      }
-      i = 128;
+   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   //PIPS generated variable
+   for(i = 0; i <= 127; i += 4) {
+      //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec10_0, &data[i]);
+      SIMD_GTPS(vec00_0, vec10_0, vec20_0);
+      SIMD_STORE_V4SI(vec00_0, &I_0_0[i]);
+      SIMD_PHIPS(vec30_0, vec00_0, vec20_0, vec10_0);
+      SIMD_STORE_V4SF(vec30_0, &data[i]);
    }
-   ;
+   i = 128;
 }
 seq-ok

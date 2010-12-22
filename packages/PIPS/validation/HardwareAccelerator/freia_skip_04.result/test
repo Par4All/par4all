@@ -352,7 +352,6 @@ void freia_skip_04(freia_data2d *o, freia_data2d *i)
       seuil = max+15;                                                   /*0013*/
    freia_skip_04_helper_0_1_0(o, t, 8, seuil-4, 1);                     /*0014*/
    freia_common_destruct_data(t);                                       /*0015*/
-   ;
 }
 #
 # TERAPIX
@@ -698,7 +697,6 @@ void freia_skip_04(freia_data2d *o, freia_data2d *i)
       seuil = max+15;                                                   /*0013*/
    freia_skip_04_helper_0_0(o, t, 8, seuil-4, 1);                       /*0014*/
    freia_common_destruct_data(t);                                       /*0015*/
-   ;
 }
 #
 # FREIA COMPILATION DONE

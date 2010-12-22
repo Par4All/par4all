@@ -1,0 +1,29 @@
+
+Initial code
+
+int pof()
+{
+   int a;
+#pragma  pips outline
+   a = 1;
+}
+int pof();
+
+Code after outlining
+
+void kernel(int *a)
+{
+#pragma   pips outline
+   *a = 1;
+}
+int pof()
+{
+   int a;
+   kernel(&a);
+}
+int pof();
+//PIPS generated variable
+void kernel(int *a);
+
+unsplit
+

@@ -203,7 +203,6 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
    border_dead_helper_0_0_0(out, in, kernel);                           /*0009*/
-   ;
 }
 #
 # TERAPIX
@@ -405,7 +404,6 @@ void border_dead(freia_data2d *out, freia_data2d *in)
    
    const int32_t kernel = {0, 0, 0, 0, 0, 0, 0, 0, 0};                  /*0008*/
    border_dead_helper_0_0(out, in, kernel);                             /*0009*/
-   ;
 }
 #
 # FREIA COMPILATION DONE

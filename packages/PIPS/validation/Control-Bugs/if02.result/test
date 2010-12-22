@@ -14,9 +14,8 @@ Variable list:
 	Declared entity "if02!:*STACK*" with type "area" with size 0
 	Declared entity "if02!:*STATIC*" with type "area" with size 0
 
-External variable list:
+* empty extern declaration list *
 
-	Declared external entity "TOP-LEVEL:test"	with type "functional" "() -> void"
 
 Layouts for memory areas:
 
@@ -95,7 +94,7 @@ Parser output
 
 {{
    /* Simple case for tests in the controlizer: */
-   extern void test();
+   void test();
 }}
 
 void test()

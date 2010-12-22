@@ -1,0 +1,28 @@
+int a(int i)
+{
+   int j[2] = {2, 2}, k[2], l;
+   j[0] = 0;
+   l = 0;
+   if (i)
+      k[0] = 1;
+   else
+      l = i;
+   load(k, j);
+   return k[0]+k[1];
+}
+int a(int i)
+{
+   int j[2] = {2, 2}, k[2], l;
+   j[0] = 0;
+   l = 0;
+   if (i) {
+      k[0] = 1;
+      load(k, j);
+   }
+   else {
+      load(k, j);
+      l = i;
+   }
+   return k[0]+k[1];
+}
+

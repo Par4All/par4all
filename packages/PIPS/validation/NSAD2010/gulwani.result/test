@@ -129,5 +129,4 @@ int main()
 
    if (y==100)
       printf("property  verified\n");
-   ;
 }

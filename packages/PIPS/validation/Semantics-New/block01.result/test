@@ -1,0 +1,208 @@
+
+Source code with transformers out of context for "twice"
+
+
+//  T(twice) {}
+
+int twice(int j)
+{
+
+//  T(n) {n==2}
+
+   int n = 2;
+
+//  T(twice) {}
+
+   return n*j;
+}
+
+Source code with transformers out of context
+
+
+//  T(block01) {}
+
+int block01(int j)
+{
+
+//  T(i) {i==2}
+
+   int i = 2;
+
+//  T(k) {}
+
+   int k = i*j;
+
+//  T(l) {}
+
+   int l = multiply(i, j);
+
+//  T(m) {}
+
+   int m = twice(j);
+
+//  T(block01) {block01==k}
+
+   return k;
+}
+
+Source code with preconditions derived with transformers out of context
+
+
+//  P() {}
+
+int block01(int j)
+{
+
+//  P() {}
+
+   int i = 2;
+
+//  P(i) {i==2}
+
+   int k = i*j;
+
+//  P(i,k) {i==2, 2j==k}
+
+   int l = multiply(i, j);
+
+//  P(i,k,l) {i==2, 2j==k}
+
+   int m = twice(j);
+
+//  P(i,k,l,m) {i==2, 2j==k}
+
+   return k;
+}
+
+Source code with transformers in context for twice
+
+
+//  T(twice) {2j==twice}
+
+int twice(int j)
+{
+
+//  T(n) {n==2}
+
+   int n = 2;
+
+//  T(twice) {2j==twice, n==2}
+
+   return n*j;
+}
+
+Source code with transformers in context
+
+
+//  T(block01) {block01==2j}
+
+int block01(int j)
+{
+
+//  T(i) {i==2}
+
+   int i = 2;
+
+//  T(k) {i==2, 2j==k}
+
+   int k = i*j;
+
+//  T(l) {i==2, 2j==k}
+
+   int l = multiply(i, j);
+
+//  T(m) {i==2, 2j==k, 2j==m}
+
+   int m = twice(j);
+
+//  T(block01) {block01==2j, i==2, 2j==k, 2j==m}
+
+   return k;
+}
+
+Source code with preconditions derived with transformers computed in context
+
+
+//  P() {}
+
+int block01(int j)
+{
+
+//  P() {}
+
+   int i = 2;
+
+//  P(i) {i==2}
+
+   int k = i*j;
+
+//  P(i,k) {i==2, 2j==k}
+
+   int l = multiply(i, j);
+
+//  P(i,k,l) {i==2, 2j==k}
+
+   int m = twice(j);
+
+//  P(i,k,l,m) {i==2, 2j==k, 2j==m}
+
+   return k;
+}
+
+Source code with preconditions for "multiply"
+
+
+//  P() {i==2}
+
+int multiply(int i, int j)
+{
+
+//  P() {i==2}
+
+   return i*j;
+}
+
+Apply transformer refinment with the preconditions
+
+
+Source code with refined transformers
+
+
+//  T(multiply) {i==2, 2j==multiply}
+
+int multiply(int i, int j)
+{
+
+//  T(multiply) {i==2, 2j==multiply}
+
+   return i*j;
+}
+
+Source code with preconditions derived with refined transformers
+
+
+//  P() {}
+
+int block01(int j)
+{
+
+//  P() {}
+
+   int i = 2;
+
+//  P(i) {i==2}
+
+   int k = i*j;
+
+//  P(i,k) {i==2, 2j==k}
+
+   int l = multiply(i, j);
+
+//  P(i,k,l) {i==2, 2j==k, 2j==l}
+
+   int m = twice(j);
+
+//  P(i,k,l,m) {i==2, 2j==k, 2j==l, 2j==m}
+
+   return k;
+}

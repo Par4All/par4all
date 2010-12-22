@@ -1,0 +1,44 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(n) {n==0}
+
+   int n = 0;
+
+//  T() {n==0}
+
+   while (1)
+
+//  T() {n==0}
+
+      if (rand())
+         ;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int n = 0;
+
+//  P(n) {n==0}
+
+   while (1)
+
+//  P(n) {n==0}
+
+      if (rand())
+         ;
+}

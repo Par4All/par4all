@@ -391,7 +391,6 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_skip_03_helper_0_1_0(o, t1, seuil, 250, 0);                    /*0015*/
    // cleanup
    freia_common_destruct_data(t1);                                      /*0018*/
-   ;
 }
 #
 # TERAPIX
@@ -784,7 +783,6 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_skip_03_helper_0_0(o, t1, seuil, 250, 0);                      /*0015*/
    // cleanup
    freia_common_destruct_data(t1);                                      /*0018*/
-   ;
 }
 #
 # FREIA COMPILATION DONE

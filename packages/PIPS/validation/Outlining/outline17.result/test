@@ -1,0 +1,34 @@
+
+Initial code
+
+        PROGRAM OUTLINE17
+        INTEGER I
+        INTEGER J
+        INTEGER A(50,50)
+      DO 10 I = 1, 50                                                   0005
+         DO J = 1, 50                                                   0006
+            A(I,J) = I*J                                                0007
+         ENDDO
+10       CONTINUE                                                       0009
+      END
+
+Code after outlining
+
+        PROGRAM OUTLINE17
+        INTEGER I
+        INTEGER J
+        INTEGER A(50,50)
+      CALL TOTO(A)                                                      0005
+      END
+      SUBROUTINE TOTO(A)
+      INTEGER J, I
+      INTEGER A(1:50, 1:50)
+      DO 10 I = 1, 50                                                   0004
+         DO J = 1, 50                                                   0005
+            A(I,J) = I*J                                                0006
+         ENDDO
+10       CONTINUE                                                       0008
+      END
+
+unsplit
+

@@ -143,6 +143,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    short RED0[8];
    //PIPS generated variable
    unsigned int i0, i1;
+   //PIPS generated variable
+   v8hi vec00_0, vec10_0;
    RED0[0] = 0;
    RED0[1] = 0;
    RED0[2] = 0;
@@ -151,18 +153,14 @@ short accumulate(unsigned int n, short a[n], short seed)
    RED0[5] = 0;
    RED0[6] = 0;
    RED0[7] = 0;
-   {
+   SIMD_LOAD_V8HI(vec00_0, &RED0[0]);
+   for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
       //PIPS:SAC generated v8hi vector(s)
-      v8hi vec00;
-      SIMD_LOAD_V8HI(vec00, &RED0[0]);
-      for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
-         //PIPS:SAC generated v8hi vector(s)
-         v8hi vec10;
-         SIMD_LOAD_V8HI(vec10, &a[i0]);
-         SIMD_ADDW(vec00, vec00, vec10);
-      }
-      SIMD_STORE_V8HI(vec00, &RED0[0]);
+      ;
+      SIMD_LOAD_V8HI(vec10_0, &a[i0]);
+      SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
+   SIMD_STORE_V8HI(vec00_0, &RED0[0]);
    seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
@@ -174,6 +172,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    short RED0[8];
    //PIPS generated variable
    unsigned int i0, i1;
+   //PIPS generated variable
+   v8hi vec00_0, vec10_0;
    RED0[0] = 0;
    RED0[1] = 0;
    RED0[2] = 0;
@@ -182,18 +182,13 @@ short accumulate(unsigned int n, short a[n], short seed)
    RED0[5] = 0;
    RED0[6] = 0;
    RED0[7] = 0;
-   {
+   SIMD_LOAD_V8HI(vec00_0, &RED0[0]);
+   for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
       //PIPS:SAC generated v8hi vector(s)
-      v8hi vec00;
-      SIMD_LOAD_V8HI(vec00, &RED0[0]);
-      for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
-         //PIPS:SAC generated v8hi vector(s)
-         v8hi vec10;
-         SIMD_LOAD_V8HI(vec10, &a[i0]);
-         SIMD_ADDW(vec00, vec00, vec10);
-      }
-      SIMD_STORE_V8HI(vec00, &RED0[0]);
+      SIMD_LOAD_V8HI(vec10_0, &a[i0]);
+      SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
+   SIMD_STORE_V8HI(vec00_0, &RED0[0]);
    seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];
@@ -208,6 +203,8 @@ short accumulate(unsigned int n, short a[n], short seed)
    short RED0[8];
    //PIPS generated variable
    unsigned int i0, i1;
+   //PIPS generated variable
+   v8hi vec00_0, vec10_0;
    RED0[0] = 0;
    RED0[1] = 0;
    RED0[2] = 0;
@@ -216,18 +213,13 @@ short accumulate(unsigned int n, short a[n], short seed)
    RED0[5] = 0;
    RED0[6] = 0;
    RED0[7] = 0;
-   {
+   SIMD_LOAD_V8HI(vec00_0, &RED0[0]);
+   for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
       //PIPS:SAC generated v8hi vector(s)
-      v8hi vec00;
-      SIMD_LOAD_V8HI(vec00, &RED0[0]);
-      for(i0 = 0; i0 <= 8*(n/8)-1; i0 += 8) {
-         //PIPS:SAC generated v8hi vector(s)
-         v8hi vec10;
-         SIMD_LOAD_V8HI(vec10, &a[i0]);
-         SIMD_ADDW(vec00, vec00, vec10);
-      }
-      SIMD_STORE_V8HI(vec00, &RED0[0]);
+      SIMD_LOAD_V8HI(vec10_0, &a[i0]);
+      SIMD_ADDW(vec00_0, vec00_0, vec10_0);
    }
+   SIMD_STORE_V8HI(vec00_0, &RED0[0]);
    seed = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+seed+RED0[0];
    for(i1 = 8*(n/8); i1 <= n-1; i1 += 1)
       seed = seed+a[i1];

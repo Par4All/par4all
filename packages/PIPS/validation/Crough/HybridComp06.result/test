@@ -1,0 +1,92 @@
+
+Initial code
+
+      PROGRAM HYBRIDCOMP06
+      INTEGER*8 I
+      INTEGER*8 J
+      INTEGER*8 N
+      INTEGER*8 A
+      PARAMETER (N = 5)
+      A = 0
+      DO 10 I = 1, N
+         DO J = 1, N
+            A = I*J
+         ENDDO
+10       CONTINUE
+      PRINT *, A
+      END
+
+print code cumulated effects
+
+C             <may be written>: A
+C             <    is read   >: N
+      SUBROUTINE TOTO(A, N)
+      INTEGER N
+      INTEGER*8 J, I, A
+C             <may be read   >: I J
+C             <may be written>: A J
+C             <    is read   >: N
+C             <    is written>: I
+      DO 10 I = 1, N
+C             <may be read   >: I J
+C             <may be written>: A
+C             <    is read   >: N
+C             <    is written>: J
+         DO J = 1, N
+C             <    is read   >: I J N
+C             <    is written>: A
+            A = I*J
+         ENDDO
+C             <    is read   >: N
+10       CONTINUE
+      END
+
+Code after outlining
+
+C             <    is read   >: __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
+      PROGRAM HYBRIDCOMP06
+      INTEGER*8 I
+      INTEGER*8 J
+      INTEGER*8 N
+      INTEGER*8 A
+      PARAMETER (N = 5)
+C             <    is written>: A
+      A = 0
+C             <may be written>: A
+      CALL TOTO(A, N)
+C             <    is read   >: A __IO_EFFECTS:LUNS(6)
+C             <    is written>: __IO_EFFECTS:LUNS(6)
+      PRINT *, A
+      END
+/* C pretty print for module TOTO. */
+void
+toto_ (long long *a_p4a_copy, int *n_p4a_copy)
+{
+  long long j;
+  long long i;
+  long long a = *a_p4a_copy;
+  int n = *n_p4a_copy;
+
+  for (i = 1; i <= n; i++)
+    {
+      for (j = 1; j <= n; j++)
+	{
+	  a = (i * j);
+	}
+      continue;
+    }
+  *a_p4a_copy = a;
+  return;
+}
+
+unsplit
+
+
+compiles pgm from fortran files and executes
+
+                   25
+
+compiles pgm from fortran and C files and executes
+
+                   25

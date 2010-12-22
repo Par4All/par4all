@@ -158,5 +158,4 @@ int main()
       }
    }
    printf("property  verified\n");
-   ;
 }

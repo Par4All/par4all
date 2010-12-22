@@ -118,7 +118,6 @@ void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
-   ;
 }
 
 Microcode after scalarization
@@ -145,7 +144,6 @@ void microcode(int isi, int isj, int i, float image[isi][isj], float kernel[3][3
             new_image[i_1][j] = __scalar__0;
          }
    }
-   ;
 }
 
 Microcode After array conversion
@@ -172,5 +170,4 @@ void microcode(int isi, int isj, int i, float image[isi*isj], float kernel[9], f
             new_image[j+i_1*isj] = __scalar__0;
          }
    }
-   ;
 }

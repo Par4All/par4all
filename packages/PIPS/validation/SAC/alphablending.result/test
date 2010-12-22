@@ -255,7 +255,7 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
 /* C pretty print for module ALPHABLENDING. */
 void
 alphablending (float result[50000], float src[50000], float dest[50000],
-	       float alpha)
+	       float *alpha_p4a_copy)
 {
   static const int size = 50000;
   v4sf vec110;
@@ -270,29 +270,30 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   v4sf vec10;
   v4sf vec00;
   int lu_ind00;
+  float alpha = *alpha_p4a_copy;
 
   pdata3[3] = 1;
   pdata3[2] = 1;
   pdata3[1] = 1;
   pdata3[0] = 1;
+  simd_load_v4si_to_v4sf (vec70, pdata3[0]);
   pdata0[3] = alpha;
   pdata0[2] = alpha;
   pdata0[1] = alpha;
   pdata0[0] = alpha;
-  ;
   simd_load_v4sf (vec10, pdata0[0]);
-  simd_load_v4si_to_v4sf (vec70, pdata3[0]);
+  ;
   for (lu_ind00 = 0; lu_ind00 <= 49999; lu_ind00 += 4)
     {
+      simd_load_v4sf (vec100, dest[(1 + lu_ind00) - 1]);
       simd_load_v4sf (vec20, src[(1 + lu_ind00) - 1]);
       simd_mulps (vec00, vec10, vec20);
       simd_uminps (vec30, vec10);
       simd_addps (vec50, vec30, vec70);
-      simd_load_v4sf (vec100, dest[(1 + lu_ind00) - 1]);
       simd_mulps (vec80, vec50, vec100);
       simd_addps (vec110, vec00, vec80);
-      simd_store_v4sf (vec110, result[(1 + lu_ind00) - 1]);
       continue;
+      simd_store_v4sf (vec110, result[(1 + lu_ind00) - 1]);
     }
   return;
 }

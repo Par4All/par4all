@@ -160,7 +160,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
-   ;
 }
 
 After atomization of "microcode"
@@ -202,7 +201,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
-   ;
 }
 
 After array to pointer conversion of "microcode"
@@ -288,7 +286,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
          }
    }
-   ;
 }
 int main()
 {
@@ -644,5 +641,4 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
          }
    }
-   ;
 }

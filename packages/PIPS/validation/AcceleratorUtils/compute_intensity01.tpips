@@ -1,0 +1,16 @@
+setenv WS compute_intensity01
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+activate PRINT_CODE_COMPLEXITIES
+display PRINTED_FILE[%ALLFUNC]
+
+apply COMPUTATION_INTENSITY[%ALLFUNC]
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+apply UNSPLIT
+close
+delete $WS
+
+

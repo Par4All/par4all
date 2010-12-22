@@ -1,0 +1,82 @@
+int a(int i)
+{
+
+//  <j[PHI1]-W-MAY-{}>
+
+   int j[2] = {1, 2}, k[2];
+
+//  <j[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <j[PHI1]-W-MAY-{0<=PHI1, PHI1<=1}>
+//  <k[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <k[PHI1]-W-MAY-{0<=PHI1, PHI1<=1}>
+
+   while (i--) {
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+
+      load(k, j);
+
+//  <k[PHI1]-W-EXACT-{PHI1==0, i<=2}>
+
+      k[0] = i;
+
+//  <j[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+//  <k[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+
+      store(j, k);
+   }
+
+//  <j[PHI1]-R-EXACT-{PHI1==1, i<=2}>
+
+   return j[1];
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   printf("%d\n", a(2));
+   return 0;
+}
+int a(int i)
+{
+
+//  <j[PHI1]-W-MAY-{}>
+
+   int j[2] = {1, 2}, k[2];
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+
+   load(k, j);
+
+//  <k[PHI1]-W-MAY-{PHI1==0}>
+
+   while (i--)
+
+//  <k[PHI1]-W-EXACT-{PHI1==0, i<=2}>
+
+      k[0] = i;
+
+//  <j[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+//  <k[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i<=2}>
+
+   store(j, k);
+
+//  <j[PHI1]-R-EXACT-{PHI1==1, i<=2}>
+
+   return j[1];
+}
+

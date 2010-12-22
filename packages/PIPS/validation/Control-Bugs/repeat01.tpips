@@ -1,0 +1,21 @@
+delete repeat01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create repeat01 repeat01.c
+
+display PARSED_PRINTED_FILE
+
+activate NEW_CONTROLIZER
+
+setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE[repeat01]
+
+apply UNSPLIT
+
+shell gcc repeat01.database/Src/repeat01.c -o repeat01.database/a.out
+shell repeat01.database/a.out
+
+close
+quit

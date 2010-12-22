@@ -1,0 +1,18 @@
+setenv WSPACE=sync03
+delete $WSPACE
+setenv FILE=$WSPACE.c
+create $WSPACE $FILE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# This property is set to analyze C99 boolean variables
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+close
+delete $WSPACE
+quit

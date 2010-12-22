@@ -17,7 +17,7 @@ with workspace("basics0.c",deleteOnClose=True) as w:
 	mb=w["megablast"]
 	
 	# and apply transformation to modules
-	foo.inlining(callers="bar",USE_INITIALIZATION_LIST=False)
+	foo.inlining(callers="bar",use_initialization_list=False)
 	
 	#the good old display, default to PRINTED_FILE, but you can give args
 	foo.display()

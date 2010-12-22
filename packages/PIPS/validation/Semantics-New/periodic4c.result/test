@@ -153,5 +153,4 @@ int main()
       x++;
    }
    printf("property  verified\n");
-   ;
 }

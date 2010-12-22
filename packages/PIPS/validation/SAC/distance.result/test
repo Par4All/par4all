@@ -224,17 +224,17 @@ double distance(double X[2], double Y[2])
 // (0,8)
    a2df pdata2 = {0, 0};
 // (0,9)
-   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
+   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
 // (0,10)
-   SIMD_COSPD(vec00, vec10);
+   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
 // (0,11)
-   SIMD_STORE_V2DF(vec00, &pdata0[0]);
+   SIMD_COSPD(vec00, vec10);
 // (0,12)
    F_30 = X[1]-Y[0];
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,14)
    SIMD_SINPD(vec20, vec30);
+// (0,14)
+   SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
 // (0,16)
@@ -244,9 +244,9 @@ double distance(double X[2], double Y[2])
 // (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
 // (0,19)
-   SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,20)
    F_40 = cos(F_30);
+// (0,20)
+   SIMD_STORE_V2DF(vec40, &pdata2[0]);
 // (0,21)
    F_50 = pdata2[0]*F_40;
 // (0,22)
@@ -278,17 +278,17 @@ double distance(double X[2], double Y[2])
 // (0,8)
    a2df pdata2 = {0, 0};
 // (0,9)
-   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
+   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
 // (0,10)
-   SIMD_COSPD(vec00, vec10);
+   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
 // (0,11)
-   SIMD_STORE_V2DF(vec00, &pdata0[0]);
+   SIMD_COSPD(vec00, vec10);
 // (0,12)
    F_30 = X[1]-Y[0];
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,14)
    SIMD_SINPD(vec20, vec30);
+// (0,14)
+   SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
 // (0,16)
@@ -298,9 +298,9 @@ double distance(double X[2], double Y[2])
 // (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
 // (0,19)
-   SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,20)
    F_40 = cos(F_30);
+// (0,20)
+   SIMD_STORE_V2DF(vec40, &pdata2[0]);
 // (0,21)
    F_50 = pdata2[0]*F_40;
 // (0,22)
@@ -335,17 +335,17 @@ double distance(double X[2], double Y[2])
 // (0,8)
    a2df pdata2 = {0, 0};
 // (0,9)
-   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
+   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
 // (0,10)
-   SIMD_COSPD(vec00, vec10);
+   SIMD_LOAD_GENERIC_V2DF(vec10, X[0], Y[0]);
 // (0,11)
-   SIMD_STORE_V2DF(vec00, &pdata0[0]);
+   SIMD_COSPD(vec00, vec10);
 // (0,12)
    F_30 = X[1]-Y[0];
 // (0,13)
-   SIMD_LOAD_GENERIC_V2DF(vec30, X[0], Y[0]);
-// (0,14)
    SIMD_SINPD(vec20, vec30);
+// (0,14)
+   SIMD_STORE_V2DF(vec00, &pdata0[0]);
 // (0,15)
    SIMD_STORE_V2DF(vec20, &pdata1[0]);
 // (0,16)
@@ -355,9 +355,9 @@ double distance(double X[2], double Y[2])
 // (0,18)
    SIMD_MULPD(vec40, vec50, vec60);
 // (0,19)
-   SIMD_STORE_V2DF(vec40, &pdata2[0]);
-// (0,20)
    F_40 = cos(F_30);
+// (0,20)
+   SIMD_STORE_V2DF(vec40, &pdata2[0]);
 // (0,21)
    F_50 = pdata2[0]*F_40;
 // (0,22)

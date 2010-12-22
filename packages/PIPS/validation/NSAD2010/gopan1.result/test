@@ -142,5 +142,4 @@ l99999:   ;
 
    if (x==102)
       printf("property  verified\n");
-   ;
 }
