@@ -59,7 +59,7 @@
  */
 
 /*VARARGS0*/
-void polynome_error(char * name, char * fmt, ...)
+void polynome_error(const char * name, char * fmt, ...)
 {
     va_list args;
 

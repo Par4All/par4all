@@ -28,6 +28,7 @@ LIB_CFILES=	pnome-alloc.c \
 		pnome-private.c \
 		pnome-reduc.c \
 		pnome-scal.c \
+		pnome-root.c \
 		pnome-unaires.c 
 
 LIB_TARGET	= lib$(TARGET).a

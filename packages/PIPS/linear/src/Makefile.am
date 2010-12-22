@@ -16,7 +16,7 @@ SUBDIRS= \
 
 lib_LTLIBRARIES=liblinearlibs.la
 liblinearlibs_la_SOURCES=
-liblinearlibs_la_LDFLAGS=$(POLYLIB64_LIBS) $(LDFLAGS_NO_UNDEFINED)
+liblinearlibs_la_LDFLAGS=$(POLYLIB64_LIBS) $(LDFLAGS_NO_UNDEFINED) -lm
 liblinearlibs_la_LIBADD=\
 	gnulib/libgnu.la\
 	arithmetique/libarithmetique.la\
