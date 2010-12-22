@@ -405,7 +405,7 @@ statement effects_to_dma(statement stat,
               may_write_effects=CONS(EFFECT,fake,may_write_effects);
           }
       }
-      /* then we will merge these effects with those 
+      /* then we will merge these effects with those
        * that were already gathered
        * because we are manipulating sets, it is not very efficient
        * but there should not be that many effects anyway
@@ -443,9 +443,14 @@ statement effects_to_dma(statement stat,
     }
   }
 
-  if(effects_on_non_local_variable_p(effects)){
-      pips_user_warning("Cannot handle non local variables in isolated statement\n");
-      return statement_undefined;
+  /* The following test could be refined, but it is OK right now if we can
+     override it with the following property when generating code for GPU
+     for example. */
+  if (!get_bool_property("ISOLATE_STATEMENT_EVEN_NON_LOCAL")
+     && effects_on_non_local_variable_p(effects)) {
+    pips_user_error("Cannot handle with some effects on non local variables in isolate_statement\n");
+    /* Should not return from previous exception anyway... */
+    return statement_undefined;
   }
 
   /* builds out transfer from gathered effects */

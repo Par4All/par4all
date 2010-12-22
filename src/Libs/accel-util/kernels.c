@@ -54,23 +54,40 @@
 #include "parser_private.h"
 #include "accel-util.h"
 
+
+/* Generate a communication around a statement instead of plain memory
+   access if it is a call to a function named module_name
+
+   @param[in,out] s is the statment to isolate with some communication arounds
+
+   @param[in] module_name is the name of the function to isolate
+*/
 static void
 kernel_load_store_generator(statement s, string module_name)
 {
     if(statement_call_p(s))
     {
         call c = statement_call(s);
-        if(!call_intrinsic_p(c) &&
-                same_string_p(module_local_name(call_function(c)),module_name))
+	/* Generate communication operations around the call to a function
+	   named "module_name". */
+        if(same_string_p(module_local_name(call_function(c)),module_name))
         {
             do_isolate_statement(s);
         }
     }
 }
 
-/* run kernel load store using either region or effect engine,
+/* run kernel load store using either region or effect engine
+
+   @param[in] module_name is the name of the function we want to isolate
+   with communications and memory allocations
+
+   @param[in] enginerc is the name of the resources to use to analyse
+   which data need to be allocated and transfers. It can be DBR_REGIONS
+   (more precise) or DBR_EFFECTS
  */
-static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
+static bool kernel_load_store_engine(const string module_name,
+				     const string enginerc) {
     /* generate a load stores on each caller */
 
     debug_on("KERNEL_LOAD_STORE_DEBUG_LEVEL");
@@ -116,8 +133,8 @@ static bool kernel_load_store_engine(char *module_name,const char * enginerc) {
 /** Generate malloc/copy-in/copy-out on the call sites of this module.
   * based on convex array regions
   */
-bool kernel_load_store(char *module_name) {
-    return kernel_load_store_engine(module_name,DBR_REGIONS);
+bool kernel_load_store(const string module_name) {
+    return kernel_load_store_engine(module_name, DBR_REGIONS);
 }
 
 
