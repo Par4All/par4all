@@ -246,7 +246,16 @@ sc_lexicographic_sort(
         vect_rm(v2);
       }
       else {
-        /* we are in trouble: v1 and v2 are different but not comparable */
+        /* we are in trouble: v1 and v2 are different but not
+	   comparable because the compare function is not strong
+	   enough */
+	/* This may occur if the same local names are used for two
+	   different variables that can be live simultaneously. For
+	   instance, "predict!predict_mb:pict_struct" and
+	   "TOP-LEVEL:pict_struct" which are or seem to be both int
+	   variables in mpeg2enc. We could take a default action here
+	   or force the user to improve his/her comparison function
+	   where more information is available. */
         assert(FALSE);
       }
     }
@@ -266,7 +275,7 @@ sc_lexicographic_sort(
  * @return whether the system was changed
  */
 boolean sc_remove_large_coef(Psysteme sc, Value val,
-                              boolean equalities, boolean inequalities)
+			     boolean equalities, boolean inequalities)
 {
   boolean changed = false;
 

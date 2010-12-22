@@ -22,7 +22,7 @@
 TARGET=union
 BUILT_SOURCES=$(TARGET).h sl_gram.h
 nodist_include_HEADERS=$(TARGET).h
-AM_CPPFLAGS=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I../sc -I../sommet -I../polyedre -I../ray_dte -I../sg -I$(top_srcdir)
+AM_CPPFLAGS=-I$(srcdir)/../arithmetique -I../arithmetique -I../vecteur -I../contrainte -I../sc -I../sommet -I../polyedre -I../ray_dte -I../sg -I../polynome -I$(top_srcdir)
 AM_YFLAGS=-p slx_ -d
 AM_LFLAGS=-p slx_
 

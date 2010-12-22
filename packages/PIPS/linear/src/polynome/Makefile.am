@@ -32,6 +32,7 @@ libpolynome_la_SOURCES=	pnome-alloc.c \
 		pnome-private.c \
 		pnome-reduc.c \
 		pnome-scal.c \
+		pnome-root.c \
 		pnome-unaires.c 
 
 include $(top_srcdir)/makes/cproto.mk

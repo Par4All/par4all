@@ -32,6 +32,7 @@
  */
 #include "ray_dte.h"
 #include "sg.h"
+#include "polynome.h"
 
 /* obsolete (not maintained)
  */
@@ -79,7 +80,4 @@ typedef struct Spoly {
 #define poly_nbre_egalites(p) (sc_nbre_egalites((p)->sc))
 #define poly_nbre_inegalites(p) (sc_nbre_inegalites((p)->sc))
 */
-
-/* incomplete type used to manipulate erhart polynomials */
-typedef struct pehrhart *Pehrhart;
 

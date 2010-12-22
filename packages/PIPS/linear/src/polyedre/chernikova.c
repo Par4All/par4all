@@ -44,6 +44,7 @@
 #include "ray_dte.h"
 #include "sg.h"
 #include "polyedre.h"
+#include "polynome.h"
 
 
 /* IRISA/POLYLIB data structures.
@@ -777,9 +778,47 @@ Psysteme sc_convex_hull(Psysteme sc1, Psysteme sc2)
     return sc;
 }
 
-struct pehrhart {
-    Enumeration *e;
-};
+static Variable base_nth(Pbase b,size_t i) {
+    while(i--) {
+        b=vecteur_succ(b);
+    }
+    return vecteur_var(b);
+}
+
+static Ppolynome evalue_to_polynome(evalue *, Pbase );
+static Ppolynome enode_to_polynome(enode *e, Pbase ordered_base) {
+    int i;
+    if (!e)
+        return POLYNOME_UNDEFINED;
+    Ppolynome p = POLYNOME_NUL;
+    switch(e->type) {
+        case evector:
+            for (i=0; i<e->size; i++) {
+                Ppolynome pp = evalue_to_polynome(&e->arr[i],ordered_base);
+                polynome_add(&p,pp);
+            }
+            return p;
+        case polynomial:
+            for (i=e->size-1; i>=0; i--) {
+                Ppolynome pp = evalue_to_polynome(&e->arr[i],ordered_base);
+                pp=polynome_mult(pp,make_polynome(1,base_nth(ordered_base,e->pos-1),i));
+                polynome_add(&p,pp);
+            }
+            return p;
+        default:
+            fprintf(stderr,"cannot represent periodic polynomials in linear\n");
+            return POLYNOME_UNDEFINED;
+    }
+} 
+static Ppolynome evalue_to_polynome(evalue *e, Pbase ordered_base) {
+    Ppolynome p = NULL;
+    if(value_notzero_p(e->d))
+        p=make_polynome((float)e->x.n/(float)e->d,TCST,0);
+    else
+        p = enode_to_polynome(e->x.p,ordered_base);
+    return p;
+}
+
 /* enumerate the systeme sc using base pb
  * pb contains the unknow variables
  * and sc all the constraints
@@ -787,7 +826,7 @@ struct pehrhart {
  * elements from ordered_base appear last
  * variable_names can be provided for debugging purpose (name of bases) or set to NULL
  */ 
-Pehrhart sc_enumerate(Psysteme ordered_sc, Pbase ordered_base, const char* variable_names[])
+Ppolynome sc_enumerate(Psysteme ordered_sc, Pbase ordered_base, const char* variable_names[])
 {
     /* Automatic variables read in a CATCH block need to be declared volatile as
      * specified by the documentation*/
@@ -798,114 +837,41 @@ Pehrhart sc_enumerate(Psysteme ordered_sc, Pbase ordered_base, const char* varia
 
     int nbrows = 0;
     int nbcolumns = 0;
-
-    CATCH(any_exception_error)
-    {
-      if (A) my_Polyhedron_Free(&A);
-      if (a) my_Matrix_Free(&a);
-      if (C) my_Polyhedron_Free(&C);
-
-      RETHROW();
-    }
-    TRY 
-    {
-        assert(!SC_UNDEFINED_P(ordered_sc) && (sc_dimension(ordered_sc) != 0));
-        nbrows = ordered_sc->nb_eq + ordered_sc->nb_ineq+1;
-        nbcolumns = ordered_sc->dimension +2;
-        a = Matrix_Alloc(nbrows, nbcolumns);
-        sc_to_matrix(ordered_sc,a);
-
-        A = Constraints2Polyhedron(a, MAX_NB_RAYS);
-        my_Matrix_Free(&a);
-
-        C = Universe_Polyhedron(base_dimension(ordered_base));
-
-        ehrhart = Polyhedron_Enumerate(A,C, MAX_NB_RAYS,variable_names);
-        /*
-        Value vals[2]= {0,0};
-        Value *val = compute_poly(ehrhart,&vals[0]);
-        printf("%lld\n",*val);*/
-        my_Polyhedron_Free(&A);
-        my_Polyhedron_Free(&C);
-    } /* end TRY */
-
-    UNCATCH(any_exception_error);
-
-    {
-        Pehrhart p;
-        p=malloc(sizeof(*p));
-        p->e=ehrhart;
-        return p;
-    }
-}
-
-/* evaluate the ehrhart polynomial p using values as context
- * returned value is allocated
- */
-Value* Pehrhart_evaluate(Pehrhart p, Value values[])
-{
-    return compute_poly(p->e,values);
-}
-
-/* generate a pretty printed version of the polynomial p,
- * suitable for interaction with third party tools
- * pname is the name of each basis
- *
- * the implementation could use open_memstream,
- * but it is not portable and not handled by gnulib ...
- */
-char ** Pehrhart_string(Pehrhart p, const char *pname[])
-{
-    Enumeration * curr = p->e,*iter=p->e;
-    size_t nb_enum = 0,i;
-    char ** enum_strings;
-    /* count the number of domains */
-    while(iter) {
-        nb_enum++;
-        iter=iter->next;
-    }
-
-    if(!nb_enum || !(enum_strings=malloc(sizeof(*enum_strings)*(1+nb_enum))))
-        return NULL;
+    if( sc_dimension(ordered_sc) == 0 )
+        return make_polynome(1,TCST,1);
     else {
-        char seed[]="pipsXXXXXX";
-        int tmpfd;
-        FILE * tmpf;
-        tmpfd=mkstemp(seed);
-        if(tmpfd==-1) {
-            perror(strerror(errno));
-            return NULL;
-        }
-        tmpf=fdopen(tmpfd,"r+");
-        if(!tmpf) {
-            close(tmpfd);
-            unlink(seed);
-            perror(strerror(errno));
-            return NULL;
-        }
 
-        for(i=0;i<nb_enum;i++,curr++)
+        CATCH(any_exception_error)
         {
-            char * generated_string,*iter;
-            long pos;
-            size_t generated_string_size;
-            rewind(tmpf);
-            print_evalue(tmpf,&curr->EP,pname);
-            pos=ftell(tmpf);
-            rewind(tmpf);
-            generated_string=calloc(1+pos,sizeof(*generated_string));
-            generated_string_size=fread(generated_string,sizeof(*generated_string),1+pos,tmpf);
-            for(iter=generated_string;*iter;iter++)
-                if(iter[0]=='\n' )
-                    iter[0]=' ';
-            enum_strings[i]=generated_string;
+            if (A) my_Polyhedron_Free(&A);
+            if (a) my_Matrix_Free(&a);
+            if (C) my_Polyhedron_Free(&C);
 
+            RETHROW();
         }
-        enum_strings[i]=NULL;
-        if(fclose(tmpf)!=0)
-            perror(strerror(errno));
-        unlink(seed);
-        return enum_strings;
+        TRY 
+        {
+            assert(!SC_UNDEFINED_P(ordered_sc) && (sc_dimension(ordered_sc) != 0));
+            nbrows = ordered_sc->nb_eq + ordered_sc->nb_ineq+1;
+            nbcolumns = ordered_sc->dimension +2;
+            a = Matrix_Alloc(nbrows, nbcolumns);
+            sc_to_matrix(ordered_sc,a);
+
+            A = Constraints2Polyhedron(a, MAX_NB_RAYS);
+            my_Matrix_Free(&a);
+
+            C = Universe_Polyhedron(base_dimension(ordered_base));
+
+            ehrhart = Polyhedron_Enumerate(A,C, MAX_NB_RAYS,variable_names);
+            /*
+               Value vals[2]= {0,0};
+               Value *val = compute_poly(ehrhart,&vals[0]);
+               printf("%lld\n",*val);*/
+            my_Polyhedron_Free(&A);
+            my_Polyhedron_Free(&C);
+        } /* end TRY */
+
+        UNCATCH(any_exception_error);
+        return evalue_to_polynome(&ehrhart->EP,ordered_base);
     }
 }
-
