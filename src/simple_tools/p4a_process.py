@@ -431,19 +431,19 @@ class p4a_processor(object):
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
                                  concurrent=True)
 
-
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
         kernel_prefix = self.get_kernel_prefix ()
         kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
-        # Add communication around all the call site of the kernels:
         if not self.com_optimization :
-            kernel_launchers.kernel_load_store(concurrent=True,
-                                               KERNEL_LOAD_STORE_LOAD_FUNCTION_2D = "P4A_copy_to_accel_2d",
-                                               KERNEL_LOAD_STORE_STORE_FUNCTION_2D = "P4A_copy_from_accel_2d"
-                                               )
+            # Add communication around all the call site of the kernels. Since
+            # the code has been outlined, any non local effect is no longer an
+            # issue:
+        kernel_launchers.kernel_load_store(concurrent=True,
+                                           ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
+                                           )
         else :
             # Identify kernels first
             kernels.flag_kernel()
@@ -487,6 +487,8 @@ class p4a_processor(object):
         if self.com_optimization :
             wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
             wrappers.cast_at_call_sites()
+
+        #self.workspace.all_functions.display()
 
         # To be able to inject Par4All accelerator run time initialization
         # later:

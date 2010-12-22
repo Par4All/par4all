@@ -1,3 +1,12 @@
+2010-12-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+		* Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
+		  global variables.
+
+		  Thanks to Sarnath Kannan for this bug report.
+
+
+
 2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
 		* Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
