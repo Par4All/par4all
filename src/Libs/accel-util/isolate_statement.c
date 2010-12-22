@@ -331,35 +331,23 @@ call dimensions_to_dma(entity from,
   return make_call(mcpy, args);
 }
 
-static bool effect_on_non_local_variable_p(effect eff) {
-    return !same_string_p(
-            entity_module_name(reference_variable(effect_any_reference(eff))),
-            get_current_module_name()
-            );
-}
-
-static bool effects_on_non_local_variable_p(list effects) {
-    FOREACH(EFFECT,eff,effects)
-        if( effect_on_non_local_variable_p(eff)) {
-            char * seffect = effect_to_string(eff);
-            pips_user_warning("effect on non local variable: %s\n",seffect);
-            free(seffect);
-            return true;
-        }
-    return false;
-}
-
 
 /* Compute a call to a DMA function from the effects of a statement
 
+   @param[in] stat is the statement we want to generate communication
+   operations for
+
    @return a statement of the DMA transfers or statement_undefined if
-   nothing needed or if the dma function has been set to "" in the relevant property
+   nothing is needed or if the dma function has been set
+   to "" in the relevant property
+
+   If this cannot be done, it throws a pips_user_error
  */
 static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
 			 hash_table e2e, expression * condition,
-             bool fine_grain_analysis)
+			 bool fine_grain_analysis)
 {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
@@ -694,7 +682,7 @@ static void lowerbound_of_expression(expression e, transformer tr)
 
 
 
-/** 
+/**
  * generate a list of dimensions @p dims and of offsets @p from a region @p r
  * for example if r = a[phi0,phi1] 0<=phi0<=2 and 1<=phi1<=4
  * we get dims = ( (0,3), (0,4) )
@@ -703,7 +691,7 @@ static void lowerbound_of_expression(expression e, transformer tr)
  *
  * if at least one of the resulting dimension can be 0 (according to preconditions)
  * @p dimension_may_be_null is set to true
- * 
+ *
  * @return false if we were enable to gather enough informations
  */
 bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *offsets,bool exact, expression *condition)
