@@ -11,6 +11,18 @@
 
       phi = x
       end
+      subroutine SIMD_STORE_V2DF_TO_V2SF(vdc,vdi)
+      real*8 vdi(2)
+      real*4 vdc(2)
+      vdc(1)=vdi(1)
+      vdc(2)=vdi(2)
+      end
+      subroutine SIMD_LOAD_V2DF_TO_V2SF(vdc,vdi)
+      real*8 vdi(2)
+      real*4 vdc(2)
+      vdc(1)=vdi(1)
+      vdc(2)=vdi(2)
+      end
       subroutine SIMD_LOAD_V2DC_TO_V2DI(vdc,vdi)
       integer*8 vdi(2)
       complex*8 vdc(2)

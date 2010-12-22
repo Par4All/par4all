@@ -110,7 +110,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t = 4;
-   ;
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
@@ -138,7 +137,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t = 4;
-   ;
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
@@ -172,7 +170,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t = 4;
-   ;
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
@@ -208,7 +205,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t1 = 4;
-   ;
 }
 
 simdized code
@@ -251,7 +247,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t1 = 4;
-   ;
 }
 void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
 {
@@ -272,8 +267,8 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
                for(k0 = 1; k0 <= 16; k0 += 4) {
                   //PIPS:SAC generated v4sf vector(s)
                   v4sf vec00, vec10, vec20;
-                  SIMD_LOAD_GENERIC_V4SF(vec20, b[k0-1][j0+4*j_t0-5], b[k0][j0+4*j_t0-5], b[1+k0][j0+4*j_t0-5], b[2+k0][j0+4*j_t0-5]);
                   SIMD_LOAD_V4SF(vec10, &a[i0+4*i_t0-5][k0-1]);
+                  SIMD_LOAD_GENERIC_V4SF(vec20, b[k0-1][j0+4*j_t0-5], b[k0][j0+4*j_t0-5], b[1+k0][j0+4*j_t0-5], b[2+k0][j0+4*j_t0-5]);
                   SIMD_MULPS(vec00, vec10, vec20);
                   SIMD_STORE_V4SF(vec00, &pdata0[0]);
                   c[i0+4*i_t0-5][j0+4*j_t0-5] = c[i0+4*i_t0-5][j0+4*j_t0-5]+pdata0[0];
@@ -291,7 +286,6 @@ void Matrix_Mult(float a[16][16], float b[16][16], float c[16][16])
       j_t = 4;
    }
    i_t1 = 4;
-   ;
 }
 seq-ok
 sse-ok

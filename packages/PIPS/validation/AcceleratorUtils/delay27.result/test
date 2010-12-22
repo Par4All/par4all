@@ -1,0 +1,56 @@
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+
+int a(int i, int j[2], int k[2])
+{
+   i++;
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==3}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==3}>
+
+   load(k, j);
+}
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+
+int a(int i, int j[2], int k[2])
+{
+
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+
+   load(k, j);
+   i++;
+}
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+int main()
+{
+
+//  <J[PHI1]-W-MAY-{}>
+
+   int J[2] = {1, 2}, K[2];
+
+//  <J[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1}>
+//  <K[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1}>
+
+   a(2, J, K);
+
+//  <K[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   printf("%d\n", K[0]+K[1]);
+   return 0;
+}
+

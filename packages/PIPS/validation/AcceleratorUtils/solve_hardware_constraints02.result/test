@@ -1,0 +1,26 @@
+void doiv(int a[128])
+{
+   int i;
+here:
+   for(i = 0; i <= N-1; i += 1)
+      a[0] = 0;
+}
+---------------------------------------
+Domain:
+         N  -1 >= 0
+          1 >= 0
+
+Vertices:
+[ 0 ]
+
+Ehrhart Polynomial:
+1
+void doiv(int a[128])
+{
+   int i;
+   N = 42;
+here:
+   for(i = 0; i <= N-1; i += 1)
+      a[0] = 0;
+}
+

@@ -1,0 +1,16 @@
+delete while01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create while01 while01.c
+
+display PARSED_PRINTED_FILE
+
+activate NEW_CONTROLIZER
+
+setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE
+
+close
+quit

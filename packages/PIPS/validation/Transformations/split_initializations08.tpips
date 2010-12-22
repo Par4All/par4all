@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete split_initializations08
+create split_initializations08 split_initializations08.c
+
+echo
+echo Initial code
+echo
+display PRINTED_FILE[split_initializations08]
+
+echo
+echo Code after c89 split_initializations
+echo
+
+setproperty C89_CODE_GENERATION TRUE
+apply SPLIT_INITIALIZATIONS[split_initializations08]
+activate PRINT_CODE
+display PRINTED_FILE[split_initializations08]
+
+close
+delete split_initializations08
+quit
+

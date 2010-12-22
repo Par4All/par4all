@@ -12,7 +12,7 @@ make PRINTED_FILE[%ALL]
 module convol
 display PRINTED_FILE 
 
-apply SIMD_LOOP_CONST_ELIM
+apply DELAY_COMMUNICATIONS
 display PRINTED_FILE
 
 close

@@ -33,7 +33,7 @@ int main(void)
   int _return0, _return1, _return2, _return3;
 
  l99995:;
-
+  /*
   if (!(end==FREIA_OK)) goto break_1;
 
   if (end!=FREIA_OK) goto break_1;
@@ -44,7 +44,7 @@ int main(void)
   else {
     ;
   }
-
+  */
   if (contrastenhance==1) {
     {
       int I_0;
@@ -91,8 +91,8 @@ int main(void)
     }
     _return3;
   }
-  else
-  if (motiondetect==1) {
+  /*
+  else if (motiondetect==1) {
     if (maxmotion-minmotion>motion_trig)
       ;
     {
@@ -130,6 +130,7 @@ int main(void)
   else
     ;
   goto l99995;
+  */
  break_1:   ;
 
   return 0;

@@ -30,7 +30,9 @@ int flatten_code13(void)
 {
    int i1, i2;
    //PIPS generated variable
-   int _return0, _return1;
+   int _return0;
+   //PIPS generated variable
+   int _return1;
    {
       int bla(void);
       _return0 = bla();
@@ -47,7 +49,10 @@ int flatten_code13(void)
 {
    int i1, i2;
    //PIPS generated variable
-   int _return0, _return1;
+   int _return0;
+   //PIPS generated variable
+   int _return1;
+   //PIPS generated variable
    _return0 = bla();
    i1 = _return0;
    _return1 = bla();
@@ -58,7 +63,10 @@ int flatten_code13(void)
 {
    int i1, i2;
    //PIPS generated variable
-   int _return0, _return1;
+   int _return0;
+   //PIPS generated variable
+   int _return1;
+   //PIPS generated variable
    _return0 = bla();
    i1 = _return0;
    _return1 = bla();

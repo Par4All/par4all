@@ -48,6 +48,7 @@ int main(void)
    
    _return0 = 0;
    //PIPS generated variable
+   //PIPS generated variable
    
    imtmp = freia_common_create_data(imout_gradient->bpp, imout_gradient->widthWa, imout_gradient->heightWa);
    

@@ -11,6 +11,7 @@ create transpose transpose.f
 # compile !
 #
 activate MUST_REGIONS 
+setproperty PRETTYPRINT_CHECK_COMMENTS FALSE
 apply HPFC_INSTALL
 close
 #

@@ -1,0 +1,36 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="outline17"
+delete $WS
+create $WS $WS.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+setproperty OUTLINE_MODULE_NAME "TOTO"
+setproperty OUTLINE_LABEL "10"
+
+apply PRIVATIZE_MODULE[OUTLINE17]
+apply OUTLINE[OUTLINE17]
+apply CLEAN_DECLARATIONS[OUTLINE17]
+apply CLEAN_DECLARATIONS[TOTO]
+
+echo
+echo Code after outlining
+echo
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+shell ${PIPS_F77:-gfortran} $WS.database/Src/*.f  -o $WS.database/Tmp/$WS
+
+close
+delete $WS
+quit

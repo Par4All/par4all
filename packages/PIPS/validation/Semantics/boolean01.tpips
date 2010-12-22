@@ -1,0 +1,36 @@
+setenv WSPACE=boolean01
+delete $WSPACE
+setenv FILE=$WSPACE.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WSPACE $FILE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+echo
+echo Transformer for "alea"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[alea]
+
+echo
+echo Preconditions for "alea"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[alea]
+
+echo
+echo Preconditions for "main"
+echo
+
+display PRINTED_FILE[main]
+close
+#delete $WSPACE
+quit

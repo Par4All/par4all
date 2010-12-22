@@ -1,0 +1,16 @@
+delete sequence01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence01 sequence01.f
+
+display PARSED_PRINTED_FILE
+
+activate NEW_CONTROLIZER
+
+setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE
+
+close
+quit

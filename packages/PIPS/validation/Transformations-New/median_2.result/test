@@ -4,7 +4,9 @@ freia_status median_2(freia_data2d *o, freia_data2d *i)
    freia_status ret;
    freia_data2d *t = freia_common_create_data(i->bpp, i->widthWa, i->heightWa);
    //PIPS generated variable
-   freia_status _return0, _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17, ret_0;
+   freia_status _return0, _return1, _return2, _return3, _return4, _return5, _return6, _return7, _return8, _return9, _return10, _return11, _return12, _return13, _return14, _return15, _return16, _return17;
+   //PIPS generated variable
+   freia_status ret_0;
    //PIPS generated variable
    int i__0, i_0;
    //PIPS generated variable

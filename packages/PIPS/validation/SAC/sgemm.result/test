@@ -3393,9 +3393,10 @@ nsucc = 1
 nsucc = 0 
 /* C pretty print for module SGEMM. */
 void
-sgemm (char transa, char transb, int m, int n, int k, float alpha,
-       float a[10][10], int lda, float b[10][10], int ldb, float beta,
-       float c[10][10], int ldc)
+sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
+       int *n_p4a_copy, int *k_p4a_copy, float *alpha_p4a_copy,
+       float a[10][10], int *lda_p4a_copy, float b[10][10], int *ldb_p4a_copy,
+       float *beta_p4a_copy, float c[10][10], int *ldc_p4a_copy)
 {
   static const float size = 10;
   a2sf pdata7;
@@ -3580,6 +3581,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int i;
   int l;
   float temp;
+  char transa = *transa_p4a_copy;
+  char transb = *transb_p4a_copy;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int k = *k_p4a_copy;
+  float alpha = *alpha_p4a_copy;
+  int lda = *lda_p4a_copy;
+  int ldb = *ldb_p4a_copy;
+  float beta = *beta_p4a_copy;
+  int ldc = *ldc_p4a_copy;
 
   pdata3[1] = alpha;
   pdata3[0] = alpha;
@@ -3753,6 +3764,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		    {
 		      lu_nub1 = m;
 		      lu_ib1 = mod (lu_nub1, 4);
+		      simd_load_v4sf (vec10, pdata0[0]);
 		      for (lu_ind10 = 0; lu_ind10 <= lu_ib1 - 1; lu_ind10++)
 			{
 			  red0[0] = 1.000000;
@@ -3761,16 +3773,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  c[j1 - 1][(1 + lu_ind10) - 1] =
 			    (red0[0] * c[j1 - 1][(1 + lu_ind10) - 1]);
 			}
-		      simd_load_v4sf (vec10, pdata0[0]);
 		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
 			   lu_ind1 += 4)
 			{
 			  simd_load_v4sf (vec00,
 					  c[j1 - 1][(1 + lu_ind1) - 1]);
 			  simd_mulps (vec00, vec10, vec00);
+			  continue;
 			  simd_store_v4sf (vec00,
 					   c[j1 - 1][(1 + lu_ind1) - 1]);
-			  continue;
 			}
 		      continue;
 		    }
@@ -3810,6 +3821,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				{
 				  lu_nub3 = m;
 				  lu_ib3 = mod (lu_nub3, 4);
+				  simd_load_v4sf (vec30, pdata0[0]);
 				  for (lu_ind30 = 0; lu_ind30 <= lu_ib3 - 1;
 				       lu_ind30++)
 				    {
@@ -3820,7 +3832,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red1[0] *
 					 c[j2 - 1][(1 + lu_ind30) - 1]);
 				    }
-				  simd_load_v4sf (vec30, pdata0[0]);
 				  for (lu_ind3 = lu_ib3;
 				       lu_ind3 <= lu_nub3 - 1; lu_ind3 += 4)
 				    {
@@ -3829,11 +3840,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							1][(1 + lu_ind3) -
 							   1]);
 				      simd_mulps (vec20, vec30, vec20);
+				      continue;
 				      simd_store_v4sf (vec20,
 						       c[j2 -
 							 1][(1 + lu_ind3) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3848,6 +3859,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				  temp = (pdata3[0] * b[j2 - 1][l - 1]);
 				  lu_nub4 = m;
 				  lu_ib4 = mod (lu_nub4, 4);
+				  simd_load_generic_v4sf (vec50, temp, temp,
+							  temp, temp);
 				  for (lu_ind40 = 0; lu_ind40 <= lu_ib4 - 1;
 				       lu_ind40++)
 				    {
@@ -3860,25 +3873,23 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red2[0] +
 					 c[j2 - 1][(1 + lu_ind40) - 1]);
 				    }
-				  simd_load_generic_v4sf (vec50, temp, temp,
-							  temp, temp);
 				  for (lu_ind4 = lu_ib4;
 				       lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
 				    {
-				      simd_load_v4sf (vec60,
-						      a[l - 1][(1 + lu_ind4) -
-							       1]);
-				      simd_mulps (vec40, vec50, vec60);
 				      simd_load_v4sf (vec70,
 						      c[j2 -
 							1][(1 + lu_ind4) -
 							   1]);
+				      simd_load_v4sf (vec60,
+						      a[l - 1][(1 + lu_ind4) -
+							       1]);
+				      simd_mulps (vec40, vec50, vec60);
 				      simd_addps (vec70, vec70, vec40);
+				      continue;
 				      simd_store_v4sf (vec70,
 						       c[j2 -
 							 1][(1 + lu_ind4) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3944,6 +3955,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				{
 				  lu_nub7 = m;
 				  lu_ib7 = mod (lu_nub7, 4);
+				  simd_load_v4sf (vec180, pdata0[0]);
 				  for (lu_ind70 = 0; lu_ind70 <= lu_ib7 - 1;
 				       lu_ind70++)
 				    {
@@ -3954,7 +3966,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red5[0] *
 					 c[j4 - 1][(1 + lu_ind70) - 1]);
 				    }
-				  simd_load_v4sf (vec180, pdata0[0]);
 				  for (lu_ind7 = lu_ib7;
 				       lu_ind7 <= lu_nub7 - 1; lu_ind7 += 4)
 				    {
@@ -3963,11 +3974,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							1][(1 + lu_ind7) -
 							   1]);
 				      simd_mulps (vec170, vec180, vec170);
+				      continue;
 				      simd_store_v4sf (vec170,
 						       c[j4 -
 							 1][(1 + lu_ind7) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3982,6 +3993,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				  temp = (pdata3[0] * b[l - 1][j4 - 1]);
 				  lu_nub8 = m;
 				  lu_ib8 = mod (lu_nub8, 4);
+				  simd_load_generic_v4sf (vec200, temp, temp,
+							  temp, temp);
 				  for (lu_ind80 = 0; lu_ind80 <= lu_ib8 - 1;
 				       lu_ind80++)
 				    {
@@ -3994,25 +4007,23 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red6[0] +
 					 c[j4 - 1][(1 + lu_ind80) - 1]);
 				    }
-				  simd_load_generic_v4sf (vec200, temp, temp,
-							  temp, temp);
 				  for (lu_ind8 = lu_ib8;
 				       lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
 				    {
-				      simd_load_v4sf (vec210,
-						      a[l - 1][(1 + lu_ind8) -
-							       1]);
-				      simd_mulps (vec190, vec200, vec210);
 				      simd_load_v4sf (vec220,
 						      c[j4 -
 							1][(1 + lu_ind8) -
 							   1]);
+				      simd_load_v4sf (vec210,
+						      a[l - 1][(1 + lu_ind8) -
+							       1]);
+				      simd_mulps (vec190, vec200, vec210);
 				      simd_addps (vec220, vec220, vec190);
+				      continue;
 				      simd_store_v4sf (vec220,
 						       c[j4 -
 							 1][(1 + lu_ind8) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else

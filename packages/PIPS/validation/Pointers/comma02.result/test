@@ -1,0 +1,53 @@
+int main()
+{
+//             <    is written>: i j k l
+   int i = 0, j = 1, k = 2, l = 3;
+   int *p, *q, *r, *s;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is read   >: p q r
+//             <    is written>: p s
+   p = r, q, s = p;
+   /* here the comma operator defines a sequence point.
+        we treat this instructions asfollow :
+        p = r;
+        q;
+        s = p;
+     */
+   
+   return 0;
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0, j = 1, k = 2, l = 3;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p, *q, *r, *s;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   r = &i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,i,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   q = &j;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   p = r, q, s = p;
+//  {(p,i,-Exact-);(q,j,-Exact-);(r,i,-Exact-);(s,i,-Exact-)}
+   /* here the comma operator defines a sequence point.
+        we treat this instructions asfollow :
+        p = r;
+        q;
+        s = p;
+     */
+   
+   return 0;
+}

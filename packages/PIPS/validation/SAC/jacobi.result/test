@@ -132,7 +132,6 @@ void compute()
          space[i][j] = 0.25*F_5;
       }
    }
-   ;
 }
 void compute()
 {
@@ -194,7 +193,6 @@ void compute()
          space[i][j] = 0.25*F_5;
       }
    }
-   ;
 }
 void compute()
 {
@@ -258,7 +256,6 @@ void compute()
          space[i1][j] = 0.25*F_5;
       }
    }
-   ;
 }
 void compute()
 {
@@ -322,7 +319,6 @@ void compute()
          space[i1][j] = 0.25*F_5;
       }
    }
-   ;
 }
 void compute()
 {
@@ -331,32 +327,30 @@ void compute()
    float F_0, F_1, F_2, F_3, F_4, F_5, F_50, F_51, F_52, F_53, F_40, F_41, F_42, F_43, F_30, F_31, F_32, F_33, F_20, F_21, F_22, F_23, F_10, F_11, F_12, F_13, F_00, F_01, F_02, F_03;
    //PIPS generated variable
    int i0, i1, j0, j1;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0, vec230_0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0}, pdata7 = {0.25, 0.25, 0.25, 0.25};
+   SIMD_LOAD_V4SF(vec100_0, &pdata3[0]);
+   SIMD_LOAD_V4SF(vec220_0, &pdata7[0]);
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
    for(i0 = 1; i0 <= 62; i0 += 1) {
-      {
+      for(j0 = 1; j0 <= 60; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         v4sf vec00, vec30, vec60, vec100;
-         SIMD_LOAD_V4SF(vec100, &pdata3[0]);
-         for(j0 = 1; j0 <= 60; j0 += 4) {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec10, vec20, vec40, vec50, vec70, vec80, vec90, vec110;
-            SIMD_LOAD_V4SF(vec20, &space[1+i0][j0]);
-            SIMD_LOAD_V4SF(vec10, &space[i0-1][j0]);
-            SIMD_ADDPS(vec00, vec10, vec20);
-            SIMD_LOAD_V4SF(vec50, &space[i0][j0-1]);
-            SIMD_ADDPS(vec30, vec00, vec50);
-            SIMD_LOAD_V4SF(vec80, &space[i0][1+j0]);
-            SIMD_ADDPS(vec60, vec30, vec80);
-            SIMD_MULPS(vec90, vec100, vec60);
-            SIMD_STORE_V4SF(vec90, &save[i0][j0]);
-         }
-         SIMD_STORE_V4SF(vec00, &pdata0[0]);
-         SIMD_STORE_V4SF(vec30, &pdata1[0]);
-         SIMD_STORE_V4SF(vec60, &pdata2[0]);
+         SIMD_LOAD_V4SF(vec80_0, &space[i0][1+j0]);
+         SIMD_LOAD_V4SF(vec50_0, &space[i0][j0-1]);
+         SIMD_LOAD_V4SF(vec10_0, &space[i0-1][j0]);
+         SIMD_LOAD_V4SF(vec20_0, &space[1+i0][j0]);
+         SIMD_ADDPS(vec00_0, vec10_0, vec20_0);
+         SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+         SIMD_ADDPS(vec30_0, vec00_0, vec50_0);
+         SIMD_STORE_V4SF(vec30_0, &pdata1[0]);
+         SIMD_ADDPS(vec60_0, vec30_0, vec80_0);
+         SIMD_STORE_V4SF(vec60_0, &pdata2[0]);
+         SIMD_MULPS(vec90_0, vec100_0, vec60_0);
+         SIMD_STORE_V4SF(vec90_0, &save[i0][j0]);
       }
       for(j = 61; j <= 62; j += 1) {
          F_0 = space[i0-1][j]+space[1+i0][j];
@@ -366,26 +360,20 @@ void compute()
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
-      {
+      for(j1 = 1; j1 <= 60; j1 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         v4sf vec120, vec150, vec180, vec220;
-         SIMD_LOAD_V4SF(vec220, &pdata7[0]);
-         for(j1 = 1; j1 <= 60; j1 += 4) {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec130, vec140, vec160, vec170, vec190, vec200, vec210, vec230;
-            SIMD_LOAD_V4SF(vec140, &save[1+i1][j1]);
-            SIMD_LOAD_V4SF(vec130, &save[i1-1][j1]);
-            SIMD_ADDPS(vec120, vec130, vec140);
-            SIMD_LOAD_V4SF(vec170, &save[i1][j1-1]);
-            SIMD_ADDPS(vec150, vec120, vec170);
-            SIMD_LOAD_V4SF(vec200, &save[i1][1+j1]);
-            SIMD_ADDPS(vec180, vec150, vec200);
-            SIMD_MULPS(vec210, vec220, vec180);
-            SIMD_STORE_V4SF(vec210, &space[i1][j1]);
-         }
-         SIMD_STORE_V4SF(vec120, &pdata4[0]);
-         SIMD_STORE_V4SF(vec150, &pdata5[0]);
-         SIMD_STORE_V4SF(vec180, &pdata6[0]);
+         SIMD_LOAD_V4SF(vec200_0, &save[i1][1+j1]);
+         SIMD_LOAD_V4SF(vec170_0, &save[i1][j1-1]);
+         SIMD_LOAD_V4SF(vec130_0, &save[i1-1][j1]);
+         SIMD_LOAD_V4SF(vec140_0, &save[1+i1][j1]);
+         SIMD_ADDPS(vec120_0, vec130_0, vec140_0);
+         SIMD_STORE_V4SF(vec120_0, &pdata4[0]);
+         SIMD_ADDPS(vec150_0, vec120_0, vec170_0);
+         SIMD_STORE_V4SF(vec150_0, &pdata5[0]);
+         SIMD_ADDPS(vec180_0, vec150_0, vec200_0);
+         SIMD_STORE_V4SF(vec180_0, &pdata6[0]);
+         SIMD_MULPS(vec210_0, vec220_0, vec180_0);
+         SIMD_STORE_V4SF(vec210_0, &space[i1][j1]);
       }
       for(j = 61; j <= 62; j += 1) {
          F_3 = save[i1-1][j]+save[1+i1][j];
@@ -394,7 +382,6 @@ void compute()
          space[i1][j] = 0.25*F_5;
       }
    }
-   ;
 }
 void compute()
 {
@@ -403,29 +390,27 @@ void compute()
    float F_0, F_1, F_2, F_3, F_4, F_5;
    //PIPS generated variable
    int i0, i1, j0, j1;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec60_0, vec80_0, vec90_0, vec100_0, vec120_0, vec130_0, vec140_0, vec150_0, vec170_0, vec180_0, vec200_0, vec210_0, vec220_0;
    //SAC generated temporary array
    a4sf pdata3 = {0.25, 0.25, 0.25, 0.25}, pdata7 = {0.25, 0.25, 0.25, 0.25};
+   SIMD_LOAD_V4SF(vec100_0, &pdata3[0]);
+   SIMD_LOAD_V4SF(vec220_0, &pdata7[0]);
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
    for(i0 = 1; i0 <= 62; i0 += 1) {
-      {
+      for(j0 = 1; j0 <= 60; j0 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         v4sf vec00, vec30, vec60, vec100;
-         SIMD_LOAD_V4SF(vec100, &pdata3[0]);
-         for(j0 = 1; j0 <= 60; j0 += 4) {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec10, vec20, vec40, vec50, vec70, vec80, vec90, vec110;
-            SIMD_LOAD_V4SF(vec20, &space[1+i0][j0]);
-            SIMD_LOAD_V4SF(vec10, &space[i0-1][j0]);
-            SIMD_ADDPS(vec00, vec10, vec20);
-            SIMD_LOAD_V4SF(vec50, &space[i0][j0-1]);
-            SIMD_ADDPS(vec30, vec00, vec50);
-            SIMD_LOAD_V4SF(vec80, &space[i0][1+j0]);
-            SIMD_ADDPS(vec60, vec30, vec80);
-            SIMD_MULPS(vec90, vec100, vec60);
-            SIMD_STORE_V4SF(vec90, &save[i0][j0]);
-         }
+         SIMD_LOAD_V4SF(vec80_0, &space[i0][1+j0]);
+         SIMD_LOAD_V4SF(vec50_0, &space[i0][j0-1]);
+         SIMD_LOAD_V4SF(vec10_0, &space[i0-1][j0]);
+         SIMD_LOAD_V4SF(vec20_0, &space[1+i0][j0]);
+         SIMD_ADDPS(vec00_0, vec10_0, vec20_0);
+         SIMD_ADDPS(vec30_0, vec00_0, vec50_0);
+         SIMD_ADDPS(vec60_0, vec30_0, vec80_0);
+         SIMD_MULPS(vec90_0, vec100_0, vec60_0);
+         SIMD_STORE_V4SF(vec90_0, &save[i0][j0]);
       }
       for(j = 61; j <= 62; j += 1) {
          F_0 = space[i0-1][j]+space[1+i0][j];
@@ -435,23 +420,17 @@ void compute()
       }
    }
    for(i1 = 1; i1 <= 62; i1 += 1) {
-      {
+      for(j1 = 1; j1 <= 60; j1 += 4) {
          //PIPS:SAC generated v4sf vector(s)
-         v4sf vec120, vec150, vec180, vec220;
-         SIMD_LOAD_V4SF(vec220, &pdata7[0]);
-         for(j1 = 1; j1 <= 60; j1 += 4) {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec130, vec140, vec160, vec170, vec190, vec200, vec210, vec230;
-            SIMD_LOAD_V4SF(vec140, &save[1+i1][j1]);
-            SIMD_LOAD_V4SF(vec130, &save[i1-1][j1]);
-            SIMD_ADDPS(vec120, vec130, vec140);
-            SIMD_LOAD_V4SF(vec170, &save[i1][j1-1]);
-            SIMD_ADDPS(vec150, vec120, vec170);
-            SIMD_LOAD_V4SF(vec200, &save[i1][1+j1]);
-            SIMD_ADDPS(vec180, vec150, vec200);
-            SIMD_MULPS(vec210, vec220, vec180);
-            SIMD_STORE_V4SF(vec210, &space[i1][j1]);
-         }
+         SIMD_LOAD_V4SF(vec200_0, &save[i1][1+j1]);
+         SIMD_LOAD_V4SF(vec170_0, &save[i1][j1-1]);
+         SIMD_LOAD_V4SF(vec130_0, &save[i1-1][j1]);
+         SIMD_LOAD_V4SF(vec140_0, &save[1+i1][j1]);
+         SIMD_ADDPS(vec120_0, vec130_0, vec140_0);
+         SIMD_ADDPS(vec150_0, vec120_0, vec170_0);
+         SIMD_ADDPS(vec180_0, vec150_0, vec200_0);
+         SIMD_MULPS(vec210_0, vec220_0, vec180_0);
+         SIMD_STORE_V4SF(vec210_0, &space[i1][j1]);
       }
       for(j = 61; j <= 62; j += 1) {
          F_3 = save[i1-1][j]+save[1+i1][j];
@@ -460,5 +439,4 @@ void compute()
          space[i1][j] = 0.25*F_5;
       }
    }
-   ;
 }

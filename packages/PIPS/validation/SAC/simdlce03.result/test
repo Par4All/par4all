@@ -72,29 +72,23 @@ l300:
          RED0[0] = 0.000000;
          RED0[1] = 0.000000;
          RED0[2] = 0.000000;
-         {
+l200:
+         for(ki = 0; ki <= 2; ki += 1) {
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec3[4];
+            float v4sf_vec0[4], v4sf_vec1[4], v4sf_vec2[4];
             //PIPS:SAC generated variable
             float aligned[4] = {0, 0, 0, 0};
             //PIPS:SAC generated float vector(s)
-            float v4sf_vec0[4];
-l200:            ;
+            float v4sf_vec3[4], v4sf_vec4[4];
             SIMD_LOAD_V4SF(v4sf_vec3, &RED0[0]);
-            for(ki = 0; ki <= 2; ki += 1) {
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec1[4], v4sf_vec2[4];
-               //PIPS:SAC generated float vector(s)
-               float v4sf_vec4[4];
-l100:               ;
-               SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
-               SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
-               SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
-               SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
-               kj = 3;
-            }
-            SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
+            SIMD_LOAD_V4SF(v4sf_vec1, &image[i+ki-1][j-1]);
+            SIMD_LOAD_V4SF(v4sf_vec2, &kernel[ki][0]);
+l100:            ;
+            SIMD_MULPS(v4sf_vec0, v4sf_vec1, v4sf_vec2);
+            SIMD_ADDPS(v4sf_vec3, v4sf_vec3, v4sf_vec0);
+            kj = 3;
             SIMD_STORE_MASKED_V4SF(v4sf_vec3, &RED0[0]);
+            SIMD_STORE_V4SF(v4sf_vec0, &aligned[0]);
          }
          F_30 = RED0[0]+new_image[i][j];
          F_40 = RED0[1]+F_30;

@@ -1,0 +1,64 @@
+
+Source code with transformers
+
+
+//  T(shift01) {8i==shift01}
+
+int shift01(int i)
+{
+
+//  T(j) {4i==j}
+
+   int j = i<<2;
+
+//  T(n) {4i==j, n==1}
+
+   int n = 1;
+
+//  T(j) {8i==j, 4i==j#init, n==1}
+
+
+   j = j<<n;
+
+//  T() {8i==j, n==1}
+
+   
+   
+   printf("j=%d\n", j);
+
+//  T(shift01) {8i==j, 8i==shift01, n==1}
+
+   return j;
+}
+
+Source code with preconditions
+
+
+//  P() {i==20}
+
+int shift01(int i)
+{
+
+//  P() {i==20}
+
+   int j = i<<2;
+
+//  P(j) {i==20, j==80}
+
+   int n = 1;
+
+//  P(j,n) {i==20, j==80, n==1}
+
+
+   j = j<<n;
+
+//  P(j,n) {i==20, j==160, n==1}
+
+   
+   
+   printf("j=%d\n", j);
+
+//  P(j,n) {i==20, j==160, n==1}
+
+   return j;
+}

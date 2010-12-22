@@ -35,7 +35,7 @@ C	X = 0
 C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
 C	New anti-dependence with statement
 C	X = X+1
-Y = 10
+C Y = 10
       CALL FOO1(X)                                                      0015
 C	Attention: impact alias MAY at (IMPACT:(0,2))  between Y and X
 C	New output-dependence with statement
@@ -50,7 +50,7 @@ C	X = 0
 C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
 C	New anti-dependence with statement
 C	X = X+1
-Y = 10
+C Y = 10
 CALL FOO1(X)
 C	Attention: impact alias MUST at (IMPACT:(0,2))  between Y and X
 C	New anti-dependence with statement

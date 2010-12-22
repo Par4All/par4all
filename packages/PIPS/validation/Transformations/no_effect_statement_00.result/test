@@ -16,9 +16,7 @@ void foo(void)
 void bla(void)
 {
    foo();
-   ;
 }
 void foo(void)
 {
-   ;
 }
