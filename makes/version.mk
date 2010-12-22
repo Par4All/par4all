@@ -19,23 +19,32 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-SVN_VERSION	= $(MAKE.d)/version.sh
+GET_VERSION	= $(MAKE.d)/version.sh
 
+.PHONY: .revisions_h
+# try to keep previous revisions.h if cannot be regenerated
+# the actual result depends on the kind of git-svn setup used,
+# so some more tweaking may be needed here.
 .revisions_h:
-	$(RM) revisions.h
-	{ \
-	  echo '#define NEWGEN_REV "$(shell $(SVN_VERSION) $(NEWGEN_ROOT))"'; \
-	  echo '#define LINEAR_REV "$(shell $(SVN_VERSION) $(LINEAR_ROOT))"'; \
-	  echo '#define PIPS_REV "$(shell $(SVN_VERSION) $(ROOT))"'; \
-	  echo '#define NLPMAKE_REV "$(shell $(SVN_VERSION) $(ROOT)/makes)"'; \
-	  echo '#define CC_VERSION "$(shell $(CC_VERSION))"'; \
-	} > revisions.h
-
+	if [ -d .svn -o -d $(ROOT)/.git -o ! -f revisions.h ] ; \
+	then \
+	  $(RM) revisions.h ; \
+	  { \
+	   echo '#define NEWGEN_REV "$(shell $(GET_VERSION) $(NEWGEN_ROOT))"'; \
+	   echo '#define LINEAR_REV "$(shell $(GET_VERSION) $(LINEAR_ROOT))"'; \
+	   echo '#define PIPS_REV "$(shell $(GET_VERSION) $(ROOT))"'; \
+	   echo '#define NLPMAKE_REV "$(shell $(GET_VERSION) $(ROOT)/makes)"'; \
+	   echo '#define CC_VERSION "$(shell $(CC_VERSION))"'; \
+	  } > revisions.h ; \
+	else \
+	  touch revisions.h ; \
+	fi
 
 $(ARCH)/revisions.o: CPPFLAGS += -DUTC_DATE='$(UTC_DATE)'
 
 revisions.h: .revisions_h
 
 clean: version-clean
+# keep revision if cannot be regenerated?
 version-clean:
-	$(RM) revisions.h
+	[ -d .svn -o -d $(ROOT)/.git ] && $(RM) revisions.h
