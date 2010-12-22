@@ -19,6 +19,6 @@
 #
 
 docdir=$(datadir)/doc
-dist_noinst_DATA=newgen_manual.tex newgen_paper.tex tutoriel_newgen.tex
-doc_DATA=newgen_manual.pdf newgen_paper.pdf tutoriel_newgen.pdf
+dist_noinst_DATA=newgen_manual.tex newgen_paper.tex newgen_recursion_paper.tex tutoriel_newgen.tex
+doc_DATA=newgen_manual.pdf newgen_paper.pdf newgen_recursion_paper.pdf tutoriel_newgen.pdf
 include $(top_srcdir)/makes/latex.mk

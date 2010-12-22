@@ -21,24 +21,23 @@
 
 use_pdflatex	= 1
 
-TEX = 	newgen_manual.tex \
+F.tex =	newgen_manual.tex \
 	newgen_paper.tex \
+	newgen_recursion_paper.tex \
 	tutoriel_newgen.tex
 
-SOURCES = $(TEX) obtention.txt
+SOURCES = $(F.tex) obtention.txt
 
-PDF 	= $(TEX:%.tex=%.pdf)
+F.pdf 	= $(F.tex:%.tex=%.pdf)
 
-INSTALL_DOC =	$(PDF)
+INSTALL_DOC =	$(F.pdf)
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
 
 all: $(INSTALL_DOC)
 
-pdf: $(PDF)
-ps: $(PS)
-dvi: $(DVI)
+pdf: $(F.pdf)
 
 clean: local-clean
 
