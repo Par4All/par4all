@@ -2072,18 +2072,21 @@ The data structures used to represent memory effects and their
 computation are described in~\cite{IJT92}. Another description is
 available on line, in \Pri{} Technical Report.
 
-Note that the standard name in the Dragon book is likely ot be {\em
-Gen} and {\em Kill} sets, but PIPS uses the more general concept of
-{\em effect} developped by P.~Jouvelot and D.~Gifford.
+Note that the standard name in the Dragon book is likely to be {\em
+  Gen} and {\em Kill} sets in the standard data flow analysis
+framework, but PIPS uses the more general concept of {\em effect}
+developped by P.~Jouvelot and D.~Gifford~\cite{JG89} and its analyses are mostly
+based on the abstgract syntac tree (AST) rather than the control flow
+graph (CFG).
 
-\subsection{Proper Effects}
+\subsection{Proper Memory Effects}
 \label{subsubsection-proper-effects}
 \index{Proper Effects}
 \index{Effects (Proper)}
 
-The proper effects of a statement basically are a list of variables
+The proper memory effects of a statement basically are a list of variables
 that may be read or written by the statement. They are used to build use-def
-chains and then the dependence graph.
+chains (see~\cite{Aho86} or a later edition) and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
 effects of lower level statements. For instance, the body of a loop, true and
@@ -2149,7 +2152,7 @@ proper_effects_with_pointer_values > MODULE.proper_effects
 \end{PipsMake}
 
 
-\subsection{Filtered Proper Effects}
+\subsection{Filtered Proper Memroy Effects}
 \label{subsubsection-filtered-proper-effects}
 
 \marginpar{To be continued...by whom?}
@@ -2168,14 +2171,14 @@ filter_proper_effects         > MODULE.filtered_proper_effects
 \end{PipsMake}
 
 
-\subsection{Cumulated Effects}
+\subsection{Cumulated Memory Effects}
 \label{subsubsection-cumulated-effects}
 \index{Cumulated Effects}
 \index{Effects (Cumulated)}
 
 \begin{PipsPass}{cumulated_effects}
-Cumulated effects of statements are also lists of read or written
-variables. Cumulated means that the effects of a compound statement, do
+Cumulated effects of statements are lists of read or written
+variables, just like the proper effects (see Section~\ref{subsubsection-proper-effects}). Cumulated means that the effects of a compound statement, do
 loop, test or unstructured, include the effects of the lower level
 statements such as a loop body or a test branch.
 \end{PipsPass}
@@ -2236,11 +2239,13 @@ Fortran parallel DO loops.
 
 Summary data flow information is the simplest interprocedural
 information needed to take procedure into account in a
-parallelizer. They were introduced in Parafrase.
+parallelizer. It was introduced in Parafrase (see~\cite{Li88}) under
+this name, but should be called summary memory effects in PIPS context.
 
 \begin{PipsPass}{summary_effects}
-The \PipsPassRef{summary_effects} of a module are the cumulated effects of its
-top level statement, but effects on local dynamic variables are
+The \PipsPassRef{summary_effects} of a module are the cumulated memory
+effects of its
+top level statement (see Section~\ref{subsubsection-cumulated-effects}), but effects on local dynamic variables are
 ignored (because they cannot be observed by the callers\footnote{Unless
 it accesses illegally the stack: see Tom Reps,
 http://pages.cs.wisc.edu/~reps}) and subscript expressions of remaining
@@ -14293,6 +14298,27 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
 
+%@inproceedings{Jouvelot:1989:RCC:73141.74837,
+% author = {Jouvelot, P. and Gifford, D. K.},
+% title = {Reasoning about continuations with control effects},
+% booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming language design and implementation},
+% series = {PLDI '89},
+% year = {1989},
+% isbn = {0-89791-306-X},
+% location = {Portland, Oregon, United States},
+% pages = {218--226},
+% numpages = {9},
+% url = {http://doi.acm.org/10.1145/73141.74837},
+% doi = {http://doi.acm.org/10.1145/73141.74837},
+% acmid = {74837},
+% publisher = {ACM},
+% address = {New York, NY, USA},
+%} 
+\bibitem{JG89} P. Jouvellot, D. Gifford, {\em Reasoning about
+    continuations with control effects}, in Proceedings of the ACM
+  SIGPLAN 1989 Conference on Programming language design and
+  implementation, PLDI'89, pp. 218-226.
+
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 	{\em NewGen : A Langage-Independent Program Generator},
 Rapport interne EMP-CRI-E191, July 1989. This report is available
@@ -14300,6 +14326,24 @@ on-line and regularly updated.
 
 \bibitem{Karr76} M. Karr, Affine Relationships among Variables of a Program,
 {\em Acta Informatica}, (1976).
+
+%@article {springerlink:10.1007/BF00128178,
+%  author = {Li, Zhiyuan and Yew, Pen-Chung},
+%   title = {Program parallelization with interprocedural analysis},
+%   journal = {The Journal of Supercomputing},
+%   publisher = {Springer Netherlands},
+%   issn = {0920-8542},
+%   keyword = {Computer Science},
+%   pages = {225-244},
+%   volume = {2},
+%   issue = {2},
+%   url = {http://dx.doi.org/10.1007/BF00128178},
+%   note = {10.1007/BF00128178},
+%   year = {1988}
+%}
+\bibitem{Li88} Zhiyuan Li, Pen-Chung Yew, {\em Program parallelization
+    with interprocedural analysis}, The Journal of Supercomputing,
+  Vol. 2, N. 2, pp. 225-244, Springer, 1988.
 
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}
