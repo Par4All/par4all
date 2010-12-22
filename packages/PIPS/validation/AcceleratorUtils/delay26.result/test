@@ -1,0 +1,14 @@
+int a(int i, int j[2], int k[2])
+{
+   load(k, j);
+   for(i = 0; i <= 9; i += 1)
+      load(j, j);
+}
+int a(int i, int j[2], int k[2])
+{
+   load(k, j);
+   load(j, j);
+   for(i = 0; i <= 9; i += 1)
+      ;
+}
+

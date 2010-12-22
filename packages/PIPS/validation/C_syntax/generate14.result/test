@@ -1,0 +1,63 @@
+
+Parsed printed file
+
+void generate14()
+{
+   int i = 0;
+   double x = 1.;
+   _Bool b;
+   _Bool func(int, double);
+
+   b = func(i, x);
+}
+
+Printed file
+
+void generate14()
+{
+   int i = 0;
+   double x = 1.;
+   _Bool b;
+   _Bool func(int, double);
+
+   b = func(i, x);
+}
+
+Printed file generate14 with intraprocedural preconditions
+
+
+//  P() {}
+
+void generate14()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   double x = 1.;
+
+//  P(i) {i==0}
+
+   _Bool b;
+
+//  P(i) {i==0}
+
+   _Bool func(int f1, double f2);
+
+//  P(i) {i==0}
+
+
+   b = func(i, x);
+}
+
+Printed file func with intraprocedural preconditions
+
+
+//  P() {}
+
+_Bool func(int f1, double f2)
+{
+}

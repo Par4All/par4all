@@ -1,0 +1,45 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="HybridComp01"
+delete $WS
+create $WS $WS.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+setproperty OUTLINE_MODULE_NAME "TOTO"
+setproperty OUTLINE_LABEL "10"
+setproperty OUTLINE_INDEPENDENT_COMPILATION_UNIT TRUE
+
+apply PRIVATIZE_MODULE[HYBRIDCOMP01]
+apply OUTLINE[HYBRIDCOMP01]
+apply CLEAN_DECLARATIONS[HYBRIDCOMP01]
+apply CLEAN_DECLARATIONS[TOTO]
+
+
+echo
+echo Code after outlining
+echo
+
+setproperty PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE TRUE
+
+display PRINTED_FILE[HYBRIDCOMP01]
+display C_PRINTED_FILE[TOTO]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+shell cp $WS.database/TOTO/TOTO.c  $WS.database/Src
+shell ${PIPS_F77:-gfortran} -c $WS.database/Src/$WS.f  -o $WS.database/Src/$WS.o
+shell cc -c $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.o
+shell ${PIPS_F77:-gfortran} $WS.database/Src/$WS.o $WS.database/Src/TOTO.o -o $WS.database/Src/$WS
+shell ./$WS.database/Src/$WS
+
+close
+delete $WS
+quit

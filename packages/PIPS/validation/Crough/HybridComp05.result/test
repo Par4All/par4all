@@ -1,0 +1,57 @@
+
+Initial code
+
+      PROGRAM HYBRIDCOMP05
+      INTEGER*8 I
+      INTEGER*8 J
+      INTEGER*8 N
+      PARAMETER (N=5)
+      INTEGER*8 A(N, N)
+      DO 10 I = 1, N
+         DO J = 1, N
+            A(I,J) = I*J
+         ENDDO
+10       CONTINUE
+      PRINT *, A
+      END
+
+Code after outlining
+
+      PROGRAM HYBRIDCOMP05
+      INTEGER*8 I
+      INTEGER*8 J
+      INTEGER*8 N
+      PARAMETER (N=5)
+      INTEGER*8 A(N, N)
+      CALL TOTO(N, A)
+      PRINT *, A
+      END
+/* C pretty print for module TOTO. */
+void
+toto_ (int *n_p4a_copy, long long a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
+{
+  long long j;
+  long long i;
+  int n = *n_p4a_copy;
+
+  for (i = 1; i <= n; i++)
+    {
+      for (j = 1; j <= n; j++)
+	{
+	  a[j - 1][i - 1] = (i * j);
+	}
+      continue;
+    }
+  return;
+}
+
+unsplit
+
+
+compiles pgm from fortran files and executes
+
+                    1                    2                    3                    4                    5                    2                    4                    6                    8                   10                    3                    6                    9                   12                   15                    4                    8                   12                   16                   20                    5                   10                   15                   20                   25
+
+compiles pgm from fortran and C files and executes
+
+                    1                    2                    3                    4                    5                    2                    4                    6                    8                   10                    3                    6                    9                   12                   15                    4                    8                   12                   16                   20                    5                   10                   15                   20                   25

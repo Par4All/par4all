@@ -1,0 +1,20 @@
+int a(int i)
+{
+   int j[2] = {2, 2}, k[2], l;
+   j[0] = 0;
+   for(l = 0; l <= 9; l += 1) {
+      load(k, j);
+      i++;
+   }
+   return k[0]+k[1];
+}
+int a(int i)
+{
+   int j[2] = {2, 2}, k[2], l;
+   j[0] = 0;
+   load(k, j);
+   for(l = 0; l <= 9; l += 1)
+      i++;
+   return k[0]+k[1];
+}
+

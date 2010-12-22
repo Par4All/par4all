@@ -1,0 +1,17 @@
+int main();                                                             /*0001*/
+int main()
+{
+   int i = 0;                                                           /*0003*/
+   if (i) goto label;                                                   /*0004*/
+l99998:   ;
+   if (!i) {                                                            /*0011*/
+   }
+   else {
+      goto l99999;
+   }
+label:   ;
+   i = 1;                                                               /*0008*/
+   goto l99998;
+l99999:   ;
+   return 0;                                                            /*0013*/
+}

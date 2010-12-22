@@ -1,0 +1,31 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="pragma01"
+delete $WS
+create $WS $WS.c
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+
+echo
+echo Code after outlining
+echo
+
+
+setproperty OUTLINE_MODULE_NAME "kernel"
+apply OUTLINE[pof]
+
+display PRINTED_FILE[%ALL]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+close
+delete $WS
+quit

@@ -198,14 +198,16 @@ void reset_static_phase_variables()
    library...
 
    The output is undefined if the module is referenced but not defined in
-   the workspace, for instance because its code should be synthetized.
+   the workspace, for instance because its code should be synthesized.
 
-   Fabien Coelho suggests to build a defaut compilation unit where all
+   Fabien Coelho suggests to build a default compilation unit where all
    synthesized module codes would be located.
 
   */
 string compilation_unit_of_module(const char* module_name)
 {
+  entity e = module_name_to_entity(module_name);
+  pips_assert("only for C modules\n", entity_undefined_p(e) || c_module_p(e));
   /* Should only be called for C modules. */
   string compilation_unit_name = string_undefined;
 

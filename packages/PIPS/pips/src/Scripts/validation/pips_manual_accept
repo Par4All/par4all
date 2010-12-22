@@ -88,7 +88,8 @@ fi
 if [[ $1 == "--new" ]] ; then
   # Validate all against what is newer in the last validation than in the
   # previous one:
-  set -- `diff SUMMARY_Archive/SUMMARY-previous SUMMARY_Archive/SUMMARY-last | sed -n 's/> changed: //p'`
+  set -- `diff SUMMARY_Archive/SUMMARY-previous SUMMARY_Archive/SUMMARY-last |
+          sed -n 's/ [0-9]*$//;s/> changed: //p'`
 fi
 
 for arg ; do

@@ -624,7 +624,8 @@ string external_value_name(entity e)
       }
       else {
 	/* This should never occur. Please core dump! */
-	pips_internal_error("Unexpected value %s for current module %s",
+	pips_internal_error("\nUnexpected value \"%s\""
+			    " for current module \"%s\"",
 			    entity_name(e),
 			    module_local_name(get_current_module_entity()));
       }

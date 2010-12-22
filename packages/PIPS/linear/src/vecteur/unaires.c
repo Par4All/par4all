@@ -448,7 +448,7 @@ vect_lexicographic_compare(Pvecteur v1, Pvecteur v2,
 
 /* Version for inequalities */
 int
-vect_lexicographic_compare2(Pvecteur v1, Pvecteur v2, 
+vect_lexicographic_compare2(Pvecteur v1, Pvecteur v2,
 			    int (*compare)(Pvecteur*, Pvecteur*))
 {
     int cmp12 = 0;
@@ -463,7 +463,7 @@ vect_lexicographic_compare2(Pvecteur v1, Pvecteur v2,
 }
 
 int
-vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2, 
+vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 				  int (*compare)(Pvecteur*, Pvecteur*))
 {
     int cmp = 0;
@@ -474,7 +474,7 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 }
 
 int
-vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2, 
+vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
 			   int (*compare)(Pvecteur*, Pvecteur*))
 {
     int cmp = 0;
@@ -495,7 +495,7 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
  * be handled in the same way because only equalities can be multiplied by -1.
  */
 int
-vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2, 
+vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 					  int (*compare)(Pvecteur*, Pvecteur*),
 					  boolean is_equation)
 {
@@ -506,7 +506,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
     Pvecteur pv1 = VECTEUR_UNDEFINED;
     Pvecteur pv2 = VECTEUR_UNDEFINED;
 
-    for(pv1 = v1, pv2 = v2; 
+    for(pv1 = v1, pv2 = v2;
 	!VECTEUR_UNDEFINED_P(pv1) && !VECTEUR_UNDEFINED_P(pv2) && cmp == 0
 	&& !term_cst(pv1) && !term_cst(pv2);
 	pv1 = pv1->succ, pv2= pv2->succ) {
@@ -516,7 +516,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 	if(cmp==0) {
 	    /* if same coordinate, use coefficient, but only for
 	     the last coordinate */
-	    Value tmp = is_equation? 
+	    Value tmp = is_equation?
 		value_minus(value_abs(vecteur_val(pv1)), value_abs(vecteur_val(pv2)))
 		:
 		value_minus(vecteur_val(pv1), vecteur_val(pv2));
@@ -553,12 +553,12 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 	    ;
 	}
         else if(cmp==0) {
-	    if (term_cst(pv2)) 
+	    if (term_cst(pv2))
 	    {
 		/* This looks strange because you would expect cmp==-1 for
 		 * equations. Unless val_of(pv2)==0... which should never
 		 * occur!
-		 * 
+		 *
 		 * Does it make sense for inequalities?
 		 */
 		Value tmp = is_equation?
@@ -577,7 +577,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
     else {
 	if(VECTEUR_UNDEFINED_P(pv2)) {
 	    if (cmp==0) {
-		if (term_cst(pv1)) 
+		if (term_cst(pv1))
 		{
 		    Value tmp = is_equation?
 			value_abs(vecteur_val(pv1))
@@ -585,7 +585,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 			vecteur_val(pv1);
 		    cmp = value_sign(tmp);
 		}
-		else 
+		else
 		    cmp = 1;
 	    }
 	    else {
@@ -617,6 +617,8 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 	    }
 	}
     }
+
+    assert(cmp!=0 || vect_equal(v1, v2));
 
     return cmp;
 }

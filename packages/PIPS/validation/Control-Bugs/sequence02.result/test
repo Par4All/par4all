@@ -1,0 +1,28 @@
+
+Parsed printed file
+
+void sequence02()
+{
+   int i = 4;
+   if (i%2==0)
+      goto l100;
+
+   i = i+10;
+l100:   i = i+20;
+
+   return;
+}
+
+Printed file
+
+void sequence02()
+{
+   int i = 4;
+   if (i%2==0) goto l100;
+
+   i = i+10;
+l100:   ;
+   i = i+20;
+
+   return;
+}

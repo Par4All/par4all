@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+from __future__ import with_statement # this is to work with python2.5
 from pyps import *
 from sys import exit
 import terapips

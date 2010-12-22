@@ -104,7 +104,7 @@ bool empty_code_list_p(list l)
 
 
 bool
-empty_comments_p(string s)
+empty_comments_p(const char* s)
 {
   /* Could be replaced by a macro. See macro empty_comments */
   pips_assert("comments cannot be NULL", s!=NULL);
@@ -742,7 +742,7 @@ statement make_return_statement(entity module)
 		       RETURN_LABEL_NAME,NULL);
     entity l = gen_find_tabulated(name, entity_domain);
     if (entity_undefined_p(l)) l = make_label(strdup(name));
-    return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
+    return make_call_statement(c_module_p(module)?C_RETURN_FUNCTION_NAME:RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
 /*****************************************************************************
@@ -1066,8 +1066,7 @@ statement_loop(statement s)
 
 
 /* Get the whileloop of a statement */
-whileloop
-statement_whileloop(statement s)
+whileloop statement_whileloop(statement s)
 {
   pips_assert("statement_whileloop", statement_whileloop_p(s));
 
@@ -2342,11 +2341,7 @@ void pop_generated_variable_commenter()
 
 string generated_variable_comment(entity e)
 {
-    string tmp = generated_variable_commenters[nb_commenters-1](e);
-    string out;
-    asprintf(&out,"%s%s",c_module_p(get_current_module_entity())?"//":"C ",tmp);
-    free(tmp);
-    return out;
+    return generated_variable_commenters[nb_commenters-1](e);;
 }
 
 

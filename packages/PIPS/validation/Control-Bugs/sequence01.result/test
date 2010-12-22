@@ -1,0 +1,34 @@
+! Debug the destructuration of a Fortran sequence by the new controlizer
+
+      PROGRAM SEQUENCE01
+
+      I = 4                                                             0005
+
+      IF (MOD(I, 2).EQ.0) THEN                                          0007
+         GOTO 100                                                       0007
+      ENDIF
+
+      I = I+10                                                          0009
+
+100   CONTINUE                                                          0011
+
+      I = I+20                                                          0013
+
+      END
+! Debug the destructuration of a Fortran sequence by the new controlizer
+
+      PROGRAM SEQUENCE01
+C     BEGIN BLOCK
+
+      I = 4                                                             0005
+
+      IF (MOD(I, 2).EQ.0) GOTO 100                                      0007
+
+      I = I+10                                                          0009
+
+100   CONTINUE                                                          0011
+
+      I = I+20                                                          0013
+
+C     END BLOCK
+      END

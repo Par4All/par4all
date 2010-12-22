@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 import re as RE
 import operator
 from logging import info, getLogger

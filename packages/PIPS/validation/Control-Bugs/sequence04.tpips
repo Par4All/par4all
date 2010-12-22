@@ -1,0 +1,33 @@
+delete sequence04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence04 sequence04.c
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[sequence04]
+
+echo
+echo Printed file
+echo
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+display PRINTED_FILE[sequence04]
+
+echo
+echo Execution result
+echo
+
+apply UNSPLIT
+
+shell gcc sequence04.database/Src/sequence04.c -o sequence04.database/a.out
+shell sequence04.database/a.out
+
+close
+quit

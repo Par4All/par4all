@@ -1,47 +1,25 @@
 !!
-!! file for matadd.f
+!! file for P4A_KERNEL_0.f
 !!
-      PROGRAM MATADD
-      INTEGER M
-      INTEGER N
-      PARAMETER (M = 402, N = 160)
-      INTEGER I, J
-      REAL A(M, N), B(M, N), C(M, N)
-
-      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C, I, J)                      0008
-
-      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C, I, J)                   0015
-
-      END
-!!
-!! file for matadd.f.f
-!!
-      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C, I, J)
-      INTEGER J, I, M, N, I, J
-      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
-
-      DO I = 1, M                                                       0005
-         DO J = 1, N                                                    0006
-C To be assigned to a call to P4A_vp_0: I
-C To be assigned to a call to P4A_vp_1: J
-            CALL P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)              0009
-         ENDDO
-      ENDDO
-      END
-      SUBROUTINE P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)
+      SUBROUTINE P4A_KERNEL_0(M, N, B, C, I, J)
       INTEGER M, N, I, J
-      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
-C To be assigned to a call to P4A_vp_0: I
-C To be assigned to a call to P4A_vp_1: J
-      CALL P4A_KERNEL_1(M, N, A, B, C, I, J)                            0006
+      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
+      B(I,J) = I                                                        0004
+      C(I,J) = J                                                        0005
       END
+!!
+!! file for P4A_KERNEL_1.f
+!!
       SUBROUTINE P4A_KERNEL_1(M, N, A, B, C, I, J)
       INTEGER M, N, I, J
       REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
       A(I,J) = B(I,J)+C(I,J)                                            0004
       END
-      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C, I, J)
-      INTEGER J, I, M, N, I, J
+!!
+!! file for P4A_KERNEL_LAUNCHER_0.f
+!!
+      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      INTEGER J, I, M, N
       REAL*4 B(1:M, 1:N), C(1:M, 1:N)
 
       DO I = 1, M                                                       0005
@@ -52,6 +30,24 @@ C To be assigned to a call to P4A_vp_1: J
          ENDDO
       ENDDO
       END
+!!
+!! file for P4A_KERNEL_LAUNCHER_1.f
+!!
+      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      INTEGER J, I, M, N
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+
+      DO I = 1, M                                                       0005
+         DO J = 1, N                                                    0006
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+            CALL P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)              0009
+         ENDDO
+      ENDDO
+      END
+!!
+!! file for P4A_KERNEL_WRAPPER_0.f
+!!
       SUBROUTINE P4A_KERNEL_WRAPPER_0(M, N, B, C, I, J)
       INTEGER M, N, I, J
       REAL*4 B(1:M, 1:N), C(1:M, 1:N)
@@ -59,9 +55,28 @@ C To be assigned to a call to P4A_vp_0: I
 C To be assigned to a call to P4A_vp_1: J
       CALL P4A_KERNEL_0(M, N, B, C, I, J)                               0006
       END
-      SUBROUTINE P4A_KERNEL_0(M, N, B, C, I, J)
+!!
+!! file for P4A_KERNEL_WRAPPER_1.f
+!!
+      SUBROUTINE P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)
       INTEGER M, N, I, J
-      REAL*4 B(1:M, 1:N), C(1:M, 1:N)
-      B(I,J) = I                                                        0004
-      C(I,J) = J                                                        0005
+      REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
+C To be assigned to a call to P4A_vp_0: I
+C To be assigned to a call to P4A_vp_1: J
+      CALL P4A_KERNEL_1(M, N, A, B, C, I, J)                            0006
+      END
+!!
+!! file for matadd.f
+!!
+      PROGRAM MATADD
+      INTEGER M
+      INTEGER N
+      PARAMETER (M = 402, N = 160)
+      INTEGER I, J
+      REAL A(M, N), B(M, N), C(M, N)
+
+      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)                            0008
+
+      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)                         0015
+
       END

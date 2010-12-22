@@ -97,14 +97,12 @@ Clean-up the mess with dead code elimination
 
 void getimage(void)
 {
-   ;
 }
 Privatize scalar variables on all the modules of the program:
 Ask for some statistics about the job to be done:
 Ask for the parallelization of all the modules of the program with OpenMP output:
 void getimage(void)
 {
-   ;
 }
 Consider the generated parallel as the sequential code now:
 

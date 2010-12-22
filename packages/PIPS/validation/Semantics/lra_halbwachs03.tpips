@@ -1,0 +1,47 @@
+setenv WS lra_halbwachs03
+
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+activate TRANSFORMERS_INTER_FULL
+
+echo
+echo Transformers (1)
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions (1)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+# pipsmake does not handle dependencies on properties
+shell sleep 1
+shell touch $WS.database/main/main.c
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Transformers (2)
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions (2)
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete $WS
+quit

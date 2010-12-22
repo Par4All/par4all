@@ -1,0 +1,42 @@
+
+TRANSFORMERS
+
+
+//  T(main) {}
+
+int main()
+{
+
+//  T(i) {}
+
+   int i = 2<<6-1;
+
+//  T(j) {}
+
+   int j = 2<<1-1;
+
+//  T(main) {i+j==main}
+
+   return i+j;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 2<<6-1;
+
+//  P(i) {}
+
+   int j = 2<<1-1;
+
+//  P(i,j) {}
+
+   return i+j;
+}

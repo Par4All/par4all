@@ -363,6 +363,20 @@ transformer transformer_add_equality(transformer tf, entity v1, entity v2)
   return tf;
 }
 
+/* Add an equality between a value and an integer constant: v==cst */
+transformer transformer_add_equality_with_integer_constant(transformer tf, entity v, int cst)
+{
+  Pvecteur eq = vect_new((Variable) v, VALUE_MONE);
+
+  //pips_assert("v1 has values", entity_has_values_p(v1));
+  //pips_assert("v2 has values", entity_has_values_p(v2));
+
+  vect_add_elem(&eq, TCST, (Value) cst);
+  tf = transformer_equality_add(tf, eq);
+
+  return tf;
+}
+
 /* Add the equality v1 <= v2 or v1 < v2 */
 transformer transformer_add_inequality(transformer tf, entity v1, entity v2, bool strict_p)
 {
@@ -371,6 +385,46 @@ transformer transformer_add_inequality(transformer tf, entity v1, entity v2, boo
   vect_add_elem(&eq, (Variable) v2, VALUE_MONE);
   if(strict_p)
     vect_add_elem(&eq, TCST, VALUE_ONE);
+  tf = transformer_inequality_add(tf, eq);
+
+  return tf;
+}
+
+/* Add the inequality v <= cst or v >= cst */
+transformer transformer_add_inequality_with_integer_constraint(transformer tf, entity v, int cst, bool less_than_p)
+{
+  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+
+  if(less_than_p) {
+    eq = vect_new((Variable) v, VALUE_ONE);
+    vect_add_elem(&eq, TCST, (Value) -cst);
+  }
+  else {
+    eq = vect_new((Variable) v, VALUE_MONE);
+    vect_add_elem(&eq, TCST, (Value) cst);
+  }
+
+  tf = transformer_inequality_add(tf, eq);
+
+  return tf;
+}
+
+/* Add the inequality v <= a x + cst or v >= a x + cst */
+transformer transformer_add_inequality_with_affine_term(transformer tf, entity v, entity x, int a, int cst, bool less_than_p)
+{
+  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+
+  if(less_than_p) {
+    eq = vect_new((Variable) v, VALUE_ONE);
+    vect_add_elem(&eq, (Variable) x, (Value) -a);
+    vect_add_elem(&eq, TCST, (Value) -cst);
+  }
+  else {
+    eq = vect_new((Variable) v, VALUE_MONE);
+    vect_add_elem(&eq, TCST, (Value) cst);
+    vect_add_elem(&eq, (Variable) x, (Value) a);
+  }
+
   tf = transformer_inequality_add(tf, eq);
 
   return tf;

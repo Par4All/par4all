@@ -7,6 +7,7 @@ shell rm -rf matmul.hpfc
 set HPFC_IGNORE_FCD_TIME TRUE
 set HPFC_IGNORE_FCD_SYNCHRO TRUE
 create matmul matmul.f
+setproperty PRETTYPRINT_CHECK_COMMENTS FALSE
 #
 # compile !
 #

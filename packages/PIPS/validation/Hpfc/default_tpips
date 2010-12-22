@@ -6,7 +6,9 @@ setenv LANG C
 setenv LC_ALL C
 setenv LC_COLLATE C
 create $WSPACE $FILE include/hpfc_stubs.direct.f include/stub.f
-setproperty ABORT_ON_USER_LEVEL TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
+#use this one because dirty tricks with include as comments are used
+setproperty PRETTYPRINT_CHECK_COMMENTS FALSE
 # what about other interprocedural options?
 activate MUST_REGIONS
 apply HPFC_INSTALL[%PROGRAM]

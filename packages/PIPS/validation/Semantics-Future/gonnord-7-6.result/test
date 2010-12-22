@@ -1,0 +1,312 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(x,y,z) {}
+
+   int x, y, z;
+
+//  T(x,y,z) {x==0, y==0, z==0}
+
+   x = y = z = 0;
+
+//  T(x,y,z) {x==y, x#init==0, y#init==0, z#init==0, 0<=x}
+
+   while (1) {
+
+//  T(x,y,z) {x+z#init==x#init+z, y+z#init==y#init+z, z#init<=z}
+
+      while (flip())
+
+//  T(x,y,z) {x==x#init+1, y==y#init+1, z==z#init+1, 0<=x, x<=y, z<=x,
+//    2z<=x, 0<=y, 0<=z}
+
+         if (x>=2*z+1) {
+
+//  T(x) {x==x#init+1, 2z+2<=x}
+
+            x++;
+
+//  T(y) {y==y#init+1, 2z+2<=x}
+
+            y++;
+
+//  T(z) {z==z#init+1, 2z<=x}
+
+            z++;
+
+//  T() {0<=x, x<=y, z<=x, 2z<=x, 0<=y, 0<=z}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {x<=2z}
+
+            while (1)
+
+//  T() {x<=2z}
+
+               ;
+
+//  T(z) {}
+
+      while (flip())
+
+//  T(z) {z==0, 0<=x, x<=y, 0<=y}
+
+         if (1) {
+
+//  T(z) {z==0}
+
+            z = 0;
+
+//  T() {z==0, 0<=x, x<=y, 0<=y}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+
+//  T(x,y,z) {x+y#init==x#init+y, x#init<=x, z<=z#init}
+
+      while (flip()) {
+
+//  T(x,y,z) {x==2z-1, x#init==2z-2, y==y#init+1, z==z#init+1, 0<=y,
+//    2z<=y+1, 1<=z}
+
+         if (x==2*z) {
+
+//  T(x) {x==2z+1, x#init==2z}
+
+            x++;
+
+//  T(y) {x==2z+1, y==y#init+1}
+
+            y++;
+
+//  T(z) {x==2z-1, z==z#init+1}
+
+            z++;
+
+//  T() {x==2z-1, 0<=y, 2z<=y+1, 1<=z}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(z) {x==2z#init-1, z==0, 0<=y, 2z#init<=y+1, 1<=z#init}
+
+         if (1) {
+
+//  T(z) {x==2z#init-1, z==0, 0<=y, 2z#init<=y+1, 1<=z#init}
+
+            z = 0;
+
+//  T() {z==0, 1<=x, x<=y, 0<=y}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+      }
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int x, y, z;
+
+//  P(x,y,z) {}
+
+   x = y = z = 0;
+
+//  P(x,y,z) {x==0, y==0, z==0}
+
+   while (1) {
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+      while (flip())
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+         if (x>=2*z+1) {
+
+//  P(x,y,z) {x==y, 2z+1<=x, 0<=z}
+
+            x++;
+
+//  P(x,y,z) {x==y+1, 2z+2<=x, 0<=z}
+
+            y++;
+
+//  P(x,y,z) {x==y, 2z+2<=x, 0<=z}
+
+            z++;
+
+//  P(x,y,z) {x==y, 2z<=x, 1<=z}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,y,z) {x==2z, y==2z, 0<=z}
+
+            while (1)
+
+//  P(x,y,z) {x==2z, y==2z, 0<=z}
+
+               ;
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+      while (flip())
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+         if (1) {
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+            z = 0;
+
+//  P(x,y,z) {x==y, z==0, 0<=x}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+      while (flip()) {
+
+//  P(x,y,z) {x==y, 2z<=x, 0<=z}
+
+         if (x==2*z) {
+
+//  P(x,y,z) {x==2z, y==2z, 0<=z}
+
+            x++;
+
+//  P(x,y,z) {x==2z+1, y==2z, 0<=z}
+
+            y++;
+
+//  P(x,y,z) {x==2z+1, y==2z+1, 0<=z}
+
+            z++;
+
+//  P(x,y,z) {x==2z-1, y==2z-1, 1<=z}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,y,z) {x==y, 2z+1<=x, 0<=z}
+
+            while (1)
+
+//  P(x,y,z) {x==y, 2z+1<=x, 0<=z}
+
+               ;
+
+//  P(x,y,z) {x==2z-1, y==2z-1, 1<=z}
+
+         if (1) {
+
+//  P(x,y,z) {x==2z-1, y==2z-1, 1<=z}
+
+            z = 0;
+
+//  P(x,y,z) {x==y, z==0, 1<=x}
+
+            if (!(x>=0&&y>=0&&z>=0&&z<=x&&x<=y))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      }
+   }
+}

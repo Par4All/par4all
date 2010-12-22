@@ -2463,7 +2463,9 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   fgUINT16 _return0, _return1, _return2;
+   fgUINT16 _return0;
+   //PIPS generated variable
+   fgUINT16 _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2624,7 +2626,9 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
    //PIPS generated variable
    void **P_39;
    //PIPS generated variable
-   fgUINT16 _return0, _return1, _return2;
+   fgUINT16 _return0;
+   //PIPS generated variable
+   fgUINT16 _return1, _return2;
    w = imgsrc->size_x;
    h = imgsrc->size_y;
    result = flgr_vector_create(imgsrc->spp, imgsrc->type);
@@ -2934,7 +2938,9 @@ int main(int argc, char *argv[])
                      //PIPS generated variable
                      void **P_39;
                      //PIPS generated variable
-                     fgUINT16 _return0, _return1, _return2;
+                     fgUINT16 _return0;
+                     //PIPS generated variable
+                     fgUINT16 _return1, _return2;
                      spp = imgsrc0->spp;
                      w = imgsrc0->size_x;
                      h = imgsrc0->size_y;

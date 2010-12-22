@@ -934,7 +934,9 @@ remove_a_control_from_an_unstructured(control c)
    /* Unlink from the predecessor. Note that a node may have more than
       one predecessor. Since we cannot discard an IF this way, we have
       at most 1 successor: */
-   pips_assert("remove_a_control_from_an_unstructured: more than one successor", number_of_successors <= 1);
+   pips_assert("remove_a_control_from_an_unstructured:"
+	       " no more than one successor",
+	       number_of_successors <= 1);
    remove_a_control_from_a_list_and_relink(c,
                                            the_predecessors,
                                            the_successors,
@@ -1124,6 +1126,10 @@ void
 link_2_control_nodes(control source,
 		     control target)
 {
+  // FI: should we check here that the statement of "source" is
+  // defined and if it is defined and that it already has a successor
+  // then it is a test? Might be better done here than later when
+  // trying to print out the statements...
     control_successors(source) = CONS(CONTROL,
 				      target,
 				      control_successors(source));
@@ -1143,6 +1149,7 @@ void
 unlink_2_control_nodes(control source,
 		       control target)
 {
+  // FI: no check that the nodes are properly linked before unlinking
     gen_remove(&control_successors(source), target);
     gen_remove(&control_predecessors(target), source);
 }

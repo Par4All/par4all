@@ -25,7 +25,7 @@ C	New flow-dependence with statement
 C	C	Attention: impact alias MUST at (SWAP:(0,6))  between T and I
 C	New output-dependence with statement
 C	T = I
-I = J
+C I = J
 C	Attention: impact alias MUST at (SWAP:(0,3))  between J and I
 C	New output-dependence with statement
 C	I = J

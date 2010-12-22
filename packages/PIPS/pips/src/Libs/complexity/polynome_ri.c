@@ -132,36 +132,44 @@ Variable var1, var2;
 int is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
 {
   int is_inferior;
-    
+
   if (term_cst(varval1))
     is_inferior = 1;
   else if(term_cst(varval2))
     is_inferior = -1;
   else
-    is_inferior = - strcmp(variable_local_name(vecteur_var(varval1)), 
+    is_inferior = - strcmp(variable_local_name(vecteur_var(varval1)),
 			   variable_local_name(vecteur_var(varval2)));
 
-  return is_inferior; 
+  return is_inferior;
 }
 
 int is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
   int is_inferior;
-    
+
   if (term_cst(*pvarval1))
     is_inferior = -1;
   else if(term_cst(*pvarval2))
     is_inferior = 1;
-  else
-    is_inferior = strcmp(variable_local_name(vecteur_var(*pvarval1)), 
+  else {
+    // FI: should be entity_user_name...
+    is_inferior = strcmp(variable_local_name(vecteur_var(*pvarval1)),
 			 variable_local_name(vecteur_var(*pvarval2)));
+  }
 
-  return is_inferior; 
+  // FI: Make sure that you do not return 0 for two different entities
+  if(is_inferior==0 && vecteur_var(*pvarval1)!=vecteur_var(*pvarval2)) {
+    is_inferior = strcmp(entity_name((entity)vecteur_var(*pvarval1)),
+			 entity_name((entity)vecteur_var(*pvarval2)));
+  }
+
+  return is_inferior;
 }
 
 Variable name_to_variable(char * name)
 {
-    if (strcmp(name, TCST_NAME) == 0) 
+    if (strcmp(name, TCST_NAME) == 0)
 	return(TCST);
     /*
     else if (strcmp(name, UNKNOWN_VARIABLE_NAME) == 0) 

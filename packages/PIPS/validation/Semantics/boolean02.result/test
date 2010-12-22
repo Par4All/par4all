@@ -1,0 +1,39 @@
+
+C  P() {}
+
+	PROGRAM BOOLEAN02
+	LOGICAL B1, B2, B3, B4, B5, B6, B7
+
+C  P() {}
+
+      B1 = .TRUE.                                                       0003
+
+C  P(B1) {B1==1}
+
+      B2 = .FALSE.                                                      0004
+
+C  P(B1,B2) {B1==1, B2==0}
+
+      READ *, B3                                                        0005
+
+C  P(B1,B2,B3) {B1==1, B2==0}
+
+      B4 = B1.AND.B3                                                    0006
+
+C  P(B1,B2,B3,B4) {B1==1, B2==0, B3==B4, 0<=B3, B3<=1, 0<=B4, B4<=1}
+
+      B5 = B2.OR.B3                                                     0007
+
+C  P(B1,B2,B3,B4,B5) {B1==1, B2==0, B3==B4, B3==B5, 0<=B3, B3<=1,
+C    0<=B4, B4<=1, 0<=B5, B5<=1}
+
+      B6 = .NOT.B3                                                      0008
+
+C  P(B1,B2,B3,B4,B5,B6) {B1==1, B2==0, B3==B4, B3==B5, B3+B6==1,
+C    0<=B3, B3<=1, 0<=B4, B4<=1, 0<=B5, B5<=1}
+
+! XOR is missing
+! http://gcc.gnu.org/onlinedocs/gfortran/XOR.html
+!       b7 = XOR(b3,b2)
+      PRINT *, B1, B2, B3, B4, B5, B6, B7                               0012
+      END

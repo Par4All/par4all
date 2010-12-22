@@ -1,0 +1,29 @@
+void putnonintrablk(short *blk)
+{
+  int n, run, signed_level, first;
+
+  run = 0;
+  first = 1;
+
+  for (n = 0;n<1<<6;n++) {
+    /* use appropriate entropy scanning pattern */
+    signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
+
+    if (signed_level!=0) {
+      if (first) {
+	/* first coefficient in non-intra block */
+	putACfirst(run, signed_level);
+	first = 0;
+      }
+      else
+	putAC(run, signed_level, 0);
+
+      run = 0;
+    }
+    else
+      run++;
+  }
+
+  /* End of Block -- normative block punctuation  */
+  putbits(2, 2);
+}

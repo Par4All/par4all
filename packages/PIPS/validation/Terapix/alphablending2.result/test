@@ -514,12 +514,12 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = I_2-1;
+   int N0 = I_2-1;
    im3 = FIFO3;
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1)
+   for(re2 = 0; re2 <= N0; re2 += 1)
       *(im1+re2+1-1) = (*(ma0+3)**(im2+re2+1-1)+*(ma0+4)**(im3+re2+1-1))*(*(ma0+0)/(*(ma0+1))<<*(ma0+2))>>*(ma0+2);
 }
 void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, int I_2)
@@ -539,7 +539,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = I_2-1;
+   int N0 = I_2-1;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -574,7 +574,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0+3;
       I_3 = re2+1;
       I_4 = I_3-1;
@@ -616,7 +616,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = I_2-1;
+   int N0 = I_2-1;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -651,7 +651,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0;
       P_0 = P_0+3;
       I_3 = re2;
@@ -707,7 +707,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    //PIPS generated variable
    unsigned int re2;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = I_2-1;
+   int N0 = I_2-1;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -742,7 +742,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
    seti(im2, FIFO2);
    seti(im1, FIFO1);
    seti(ma0, FIFO0);
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       seti(P_0, ma0);
       seti(P_0, P_0+3);
       seti(I_3, re2);

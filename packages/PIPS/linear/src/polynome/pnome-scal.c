@@ -33,6 +33,7 @@
 #endif
 #include <stdio.h>
 #include <boolean.h>
+#include <math.h>
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "polynome.h"
@@ -114,7 +115,7 @@ float term;
  *  returns pp ^ n  (n>=0)
  *
  * Modification:
- *  - treat n < 0 if pp is a monomail.
+ *  - treat n < 0 if pp is a monomial.
  *    LZ 6 Nov. 92
  */
 Ppolynome polynome_power_n(pp, n)
@@ -167,6 +168,29 @@ int n;
     /* FI: a unique return would be welcome! No enough time for cleaning */
     polynome_error("polynome_power_n", "Cannot happen!\n");
     return POLYNOME_UNDEFINED;
+}
+
+/* computes the n-root of polynomial if possible, that is if all 
+ * exponents are multiple of n
+ * return POLYNOME_UNDEFINED if not possible symbolically
+ */
+Ppolynome polynome_nth_root(Ppolynome p, int n) {
+    Ppolynome pp = polynome_dup(p);
+    for(p=pp;!POLYNOME_NUL_P(p);p=polynome_succ(p)) {
+        Pmonome m = polynome_monome(p);
+        Pvecteur v ;
+        monome_coeff(m)=powf(monome_coeff(m),1.f/n);
+        for(v = monome_term(m); !VECTEUR_NUL_P(v); v=vecteur_succ(v)) {
+            if(vecteur_val(v)%n == 0) {
+                vecteur_val(v)/=n; 
+            }
+            else if(vecteur_var(v)!=(Variable)TCST){
+                polynome_rm(&pp);
+                return POLYNOME_UNDEFINED;
+            }
+        }
+    }
+    return pp;
 }
 
 

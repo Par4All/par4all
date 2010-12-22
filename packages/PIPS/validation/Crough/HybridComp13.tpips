@@ -1,0 +1,59 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="HybridComp13"
+delete $WS
+create $WS $WS.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+setproperty OUTLINE_MODULE_NAME "TOTO"
+setproperty OUTLINE_LABEL "10"
+setproperty OUTLINE_INDEPENDENT_COMPILATION_UNIT TRUE
+
+apply PRIVATIZE_MODULE[HYBRIDCOMP13]
+apply OUTLINE[HYBRIDCOMP13]
+apply CLEAN_DECLARATIONS[HYBRIDCOMP13]
+apply CLEAN_DECLARATIONS[TOTO]
+
+
+echo
+echo Code after outlining
+echo
+
+setproperty PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE TRUE
+
+display PRINTED_FILE[HYBRIDCOMP13]
+display C_PRINTED_FILE[TOTO]
+
+echo
+echo unsplit
+echo
+
+apply UNSPLIT
+
+echo
+echo compiles pgm from fortran files and executes
+echo
+shell cp $WS.database/TOTO/TOTO.c  $WS.database/Src
+shell ${PIPS_F77:-gfortran} -Wall -g -c $WS.database/Src/$WS.f  -o $WS.database/Src/$WS.o
+shell ${PIPS_F77:-gfortran} -Wall -g -c $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.o
+shell ${PIPS_F77:-gfortran} -Wall -g -S $WS.database/Src/TOTO.f  -o $WS.database/Src/TOTO.f.S
+shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.f.o -o $WS.database/Src/$WS.f.exe
+shell ./$WS.database/Src/$WS.f.exe
+
+echo
+echo compiles pgm from fortran and C files and executes
+echo
+shell cc -std=c99 -Wall -g -c $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.o
+shell cc -std=c99 -Wall -g -S $WS.database/Src/TOTO.c  -o $WS.database/Src/TOTO.c.S
+shell ${PIPS_F77:-gfortran} -g $WS.database/Src/$WS.o $WS.database/Src/TOTO.c.o -o $WS.database/Src/$WS.c.exe
+shell ./$WS.database/Src/$WS.c.exe
+
+close
+delete $WS
+quit
