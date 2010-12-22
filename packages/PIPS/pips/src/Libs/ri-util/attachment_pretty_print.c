@@ -600,7 +600,7 @@ relocate_attachments(char * source,
    point to the new location: */
 char *
 strcat_word_and_migrate_attachments(char * target,
-				    char * source)
+				    const char * source)
 {
     char * new_string;
     
@@ -609,7 +609,7 @@ strcat_word_and_migrate_attachments(char * target,
 
 	/* The actual copy: */
 	new_string = strcat(target, source);
-	relocate_attachments(source, target + target_length);
+	relocate_attachments((char*)source, target + target_length);
     }
     else
 	/* The actual copy: */

@@ -150,7 +150,7 @@ list callers_to_statements(list callers)
         statement caller_statement=(statement) db_get_memory_resource(DBR_CODE,caller_name,true);
         statements=CONS(STATEMENT,caller_statement,statements);
     }
-    return statements;
+    return gen_nreverse(statements);
 }
 
 /* change the parameter order for function @p module

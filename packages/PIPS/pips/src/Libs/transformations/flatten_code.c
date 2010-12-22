@@ -439,7 +439,7 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
 
   - replace declaration statements
 */
-static void statement_flatten_declarations(entity module, statement s)
+void statement_flatten_declarations(entity module, statement s)
 {
   /* For the time being, we handle only blocks with declarations */
     if (statement_block_p(s)) {
@@ -662,8 +662,12 @@ static void split_initializations_in_statement(statement s)
 	      inits = gen_nconc(inits, CONS(statement, is, NIL));
 	      entity_initial(var) = make_value_unknown();
 	    }
+	    else if(entity_array_p(var)) {
+          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
+	      entity_initial(var) = make_value_unknown();
+	    }
 	    else {
-	      free_expression(ie);
+          pips_user_warning("split initializations not implemented yet for structures\n");
 	    }
 	  }
 	}
@@ -725,9 +729,13 @@ static void split_initializations_in_statement(statement s)
 	      inits = gen_nconc(inits, CONS(statement, is, NIL));
 	      entity_initial(var) = make_value_unknown();
 	    }
-	    else {
-	      free_expression(ie);
+	    else if(entity_array_p(var)) {
+          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
+	      entity_initial(var) = make_value_unknown();
 	    }
+        else {
+          pips_user_warning("split initializations not implemented yet for structures\n");
+        }
 	  }
 	}
       }

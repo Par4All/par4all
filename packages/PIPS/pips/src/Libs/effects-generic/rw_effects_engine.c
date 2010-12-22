@@ -58,6 +58,7 @@
 
 #include "effects-generic.h"
 #include "effects-convex.h"
+#include "pointer_values.h"
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
@@ -945,6 +946,8 @@ bool rw_effects_engine(char * module_name)
    if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
 			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
+    else if (get_pointer_info_kind() == with_pointer_values)
+      set_pv( db_get_simple_pv(module_name));
 
 
     debug_on("EFFECTS_DEBUG_LEVEL");
@@ -957,6 +960,8 @@ bool rw_effects_engine(char * module_name)
 
     if (get_pointer_info_kind() == with_points_to)
        reset_pt_to_list();
+     else if (get_pointer_info_kind() == with_pointer_values)
+       reset_pv();
 
     (*db_put_rw_effects_func)
 	(module_name, get_rw_effects());

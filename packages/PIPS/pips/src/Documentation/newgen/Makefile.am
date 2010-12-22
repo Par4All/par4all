@@ -50,6 +50,7 @@ F_c=ri.c \
 	outlining_private.c \
 	step_private.c \
 	points_to_private.c \
+	kernel_memory_mapping.c \
 	freia_spoc_private.c
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
@@ -85,6 +86,7 @@ F_h=ri.h \
 	outlining_private.h \
 	step_private.h \
 	points_to_private.h \
+	kernel_memory_mapping.h \
 	freia_spoc_private.h
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
@@ -120,6 +122,7 @@ F_tex=ri.tex \
 	outlining_private.tex \
 	step_private.tex \
 	points_to_private.tex \
+	kernel_memory_mapping.tex \
 	freia_spoc_private.tex
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
@@ -155,6 +158,7 @@ F_pdf=ri.pdf \
 	outlining_private.pdf \
 	step_private.pdf \
 	points_to_private.pdf \
+	kernel_memory_mapping.pdf \
 	freia_spoc_private.pdf
 
 if WITH_DOC

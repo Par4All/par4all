@@ -259,7 +259,7 @@ terapix_loop_handler(statement sl,terapix_loop_handler_param *p)
             }
             else {
                 string new_name;
-                asprintf(&new_name,"%s" MODULE_SEP_STRING TERAPIX_LOOPARG_PREFIX "%zd",get_current_module_name(),(*p->cnt)++);
+                asprintf(&new_name,TERAPIX_LOOPARG_PREFIX "%zd",(*p->cnt)++);
                 loop_bound=make_scalar_integer_entity(new_name,get_current_module_name());
                 value v = entity_initial(loop_bound);
                 free_constant(value_constant(v));

@@ -958,6 +958,8 @@ hash_table used_labels;
 
    It relies on correct calls to push_declarations()/push_declarations()
    before to track where to put the declarations.
+
+   FI: let's assume they have become scoping_statement_push/pop...
 */
 static void
 move_declaration_control_node_declarations_to_statement(list ctls) {

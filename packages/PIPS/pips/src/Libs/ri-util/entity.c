@@ -2408,6 +2408,8 @@ bool c_module_p(entity m)
   value v = entity_initial(m);
 
   if(!value_undefined_p(v)) {
+    if(value_intrinsic_p(v))
+        return true;
     language l = code_language(value_code(v));
     c_p = language_c_p(l);
     /* Temporary fix for the too many make_unknown_language()... */
@@ -2431,6 +2433,8 @@ bool fortran_module_p(entity m)
   bool fortran_p = FALSE;
   value v = entity_initial(m);
   if(!value_undefined_p(v)) {
+    if(value_intrinsic_p(v))
+        return true;
     fortran_p = language_fortran_p(code_language(value_code(v)));
   }
   else {

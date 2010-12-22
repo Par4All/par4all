@@ -40,6 +40,7 @@
 
 #include "effects-generic.h"
 #include "effects-simple.h"
+#include "accel-util.h"
 
 #include "ray_dte.h"
 #include "sommet.h"
@@ -758,22 +759,6 @@ static void decr_counter(loop l, simdizer_context *sc) {
     sc->nb_enclosing_loops--;
 }
 
-/* helper to transform preferences in references */
-static void do_remove_preference(cell c){
-    if(cell_preference_p(c)) {
-        reference r = copy_reference(
-                preference_reference(cell_preference(c))
-                );
-        free_preference(cell_preference(c));
-        cell_tag(c)=is_cell_reference;
-        cell_reference(c)=r;
-    }
-}
-
-/* entry point to transform preferences in references */
-static void remove_preferences(void * obj) {
-    gen_recurse(obj,cell_domain,do_remove_preference,gen_null);
-}
 
 
 /*

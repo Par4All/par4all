@@ -39,6 +39,7 @@ libtransformations_la_SOURCES=\
 		induction_substitution.c \
 		loop_fusion.c \
 		set_return_type.c \
+    cast_at_call_sites.c \
 		manage_parallel_loops.c
 
 

@@ -11,8 +11,10 @@ libaccel_util_la_SOURCES=group_constants.c \
 			array_to_pointer.c  \
 			inlining.c\
  			kernels.c\
+      ikernels.c\
 			terapixify.c\
-			constraints.c
-dist_bin_SCRIPTS=psolve
+			constraints.c\
+			delay.c\
+			computation_intensity.c
 
 include $(srcdir)/../pipslibs_includes.mk
