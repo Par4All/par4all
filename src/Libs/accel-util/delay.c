@@ -164,15 +164,10 @@ static bool statements_conflict_p(statement s0, statement s1) {
 
     /* special hook for loop statements: dependency on the index are not well generated */
     if(statement_loop_p(s1)) {
-        list effs0 = load_proper_rw_effects_list(ordering_to_statement(statement_ordering(s0)));
-        list effs1 = load_proper_rw_effects_list(ordering_to_statement(statement_ordering(s1)));
-        bool conflict = false;
-        FOREACH(EFFECT,eff0,effs0){
-            FOREACH(EFFECT,eff1,effs1)
-            if((conflict=effects_may_conflict_p(eff0,eff1)))
-                goto end;
-        }
-end:
+        entity index = loop_index(statement_loop(s1));
+        set re = get_referenced_entities(s0);
+        bool conflict = set_belong_p(re,index);
+        set_free(re);
         return conflict;
     }
 
