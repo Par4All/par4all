@@ -1130,12 +1130,19 @@ basic basic_of_external(call c)
     basic b = basic_undefined;
     type call_type = entity_type(f);
 
+
     pips_debug(7, "External call to %s\n", entity_name(f));
 
-    if (type_tag(call_type) != is_type_functional)
-	pips_internal_error("Bad call type tag");
+    /* support calling a function pointer :) */
+    type ut = ultimate_type(call_type);
+    if(type_variable_p(ut) &&
+        basic_pointer_p(variable_basic(type_variable(ut))))
+      ut = basic_pointer(variable_basic(type_variable(ut)));
 
-    return_type = functional_result(type_functional(call_type));
+    if (! type_functional_p(ut) )
+      pips_internal_error("Bad call type tag");
+
+    return_type = functional_result(type_functional(ut));
 
     if (!type_variable_p(return_type)) {
       if(type_void_p(return_type)) {
