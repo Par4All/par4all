@@ -742,7 +742,7 @@ statement make_return_statement(entity module)
 		       RETURN_LABEL_NAME,NULL);
     entity l = gen_find_tabulated(name, entity_domain);
     if (entity_undefined_p(l)) l = make_label(strdup(name));
-    return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
+    return make_call_statement(c_module_p(module)?C_RETURN_FUNCTION_NAME:RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
 /*****************************************************************************

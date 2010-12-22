@@ -70,7 +70,7 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "accel-util.h"
 
-static graph dependence_graph;
+static graph dependence_graph=graph_undefined;
 
 static bool simd_load_call_p(call c) {
   string funcName = entity_local_name(call_function(c));
@@ -158,6 +158,32 @@ static bool statements_conflict_p(statement s0, statement s1) {
     }
   return false;
 }
+/* same as statements_conflict_p but W-* conflicts are ignored if load_p,
+ * R-* conflicts are ignored if not load_p */
+static bool statements_conflict_relaxed_p(statement s0, statement s1, bool load_p) {
+    /* in intra procedural, a store always conflicts with a return */
+    if(!get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
+            ( simd_store_stat_p(s0) || simd_store_stat_p(s1) ) &&
+            ( return_statement_p(s0) || return_statement_p(s1) ) )
+        return true;
+
+    FOREACH(VERTEX,v,graph_vertices(dependence_graph)) {
+        statement s = vertex_to_statement(v);
+        if(statement_ordering(s) == statement_ordering(s0) ) {
+            intptr_t expected = statement_ordering(s1) ;
+            FOREACH(SUCCESSOR,su,vertex_successors(v)) {
+                if(statement_ordering(vertex_to_statement(successor_vertex(su))) == expected ) {
+                    FOREACH(CONFLICT,c,dg_arc_label_conflicts(successor_arc_label(su))) {
+                        if( (load_p && !effect_write_p(conflict_source(c))) ||
+                                (!load_p && !effect_read_p(conflict_source(c))) )
+                            return true;
+                    }
+                }
+            }
+        }
+    }
+  return false;
+}
 static bool dma_statements_conflict_p(statement s0, statement s1) {
     FOREACH(VERTEX,v,graph_vertices(dependence_graph)) {
         statement s = vertex_to_statement(v);
@@ -184,9 +210,8 @@ typedef struct {
 static void do_recurse_statements_conflict_p(statement s, conflict_t *c) {
     if(statement_ordering(s) == statement_ordering(c->s))
         c->conflict=dma_statements_conflict_p(s,c->s);
-    else if((c->conflict=statements_conflict_p(s,c->s))) {
-        gen_recurse_stop(0);
-    }
+    else if((c->conflict=statements_conflict_relaxed_p(c->s,s,simd_load_stat_p(c->s))))
+            gen_recurse_stop(0);
 }
 
 /* checks if there is a conflict between @p s and any statement in @p in */
@@ -200,12 +225,13 @@ typedef struct {
   bool result;
   list stats;
   bool backward;
+  bool need_flatten;
   entity caller;
   statement caller_statement;
 } context;
 
 static context context_dup(context *c) {
-  context cp = { c->result, gen_copy_seq(c->stats), c->backward, c->caller };
+  context cp = { c->result, gen_copy_seq(c->stats), c->backward, c->need_flatten , c->caller };
   return cp;
 }
 
@@ -342,7 +368,9 @@ static void delay_communications_anyloop(statement s, context *c) {
   gen_free_list(tstats);
 
   /* then we propagate the dma inside the body */
+  context cb = context_dup(c);
   delay_communications_statement(body,c);
+
 
   /* then we check for conflicts with indices or over iterations */
   tstats = gen_copy_seq(c->stats);
@@ -354,6 +382,17 @@ static void delay_communications_anyloop(statement s, context *c) {
     }
   }
   gen_free_list(tstats);
+  /* if statements have been moved outside the loop
+   * then we (may) need to flatten
+   */
+  FOREACH(STATEMENT,st,c->stats) {
+      if(gen_chunk_undefined_p(gen_find_eq(st,cb.stats))) {
+          c->need_flatten|=true;
+          break;
+      }
+  }
+  gen_free_list(cb.stats);
+
 }
 
 static void delay_communications_statement(statement s, context *c) {
@@ -481,6 +520,134 @@ static void delay_communications_intraprocedurally(statement module_stat, contex
     gen_free_list(c->stats);c->stats=NIL;
 }
 
+
+static bool __delay_communications_patch_properties;
+static void delay_communications_init() {
+    pips_assert("reset called",graph_undefined_p(dependence_graph));
+    __delay_communications_patch_properties = get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
+        ENDP(callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true))); 
+    if(__delay_communications_patch_properties)
+        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",false);
+}
+static void delay_communications_reset() {
+    pips_assert("init called",!graph_undefined_p(dependence_graph));
+    if(__delay_communications_patch_properties)
+        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",true);
+    dependence_graph=graph_undefined;
+
+}
+
+/* This phase looks for load or save statements that can be
+ * put out of the loop body and move these statements, if possible.
+ */
+bool delay_load_communications(char * module_name)
+{
+    /* Get the code of the module. */
+    entity module = module_name_to_entity(module_name);
+    statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
+    set_ordering_to_statement(module_stat);
+    set_current_module_entity( module);
+    set_current_module_statement( module_stat);
+    set_cumulated_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
+    );
+
+
+    debug_on("DELAY_COMMUNICATIONS_DEBUG_LEVEL");
+    delay_communications_init();
+    dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
+
+    /* Go through all the statements */
+    context c = { true, NIL, true, false };
+
+    /* then a backward translation */
+    delay_communications_statement(module_stat,&c);
+
+    /* propagate inter procedurally , except if we have no caller*/
+    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
+        delay_communications_interprocedurally(&c);
+    else
+        delay_communications_intraprocedurally(module_stat,&c);
+
+    if(c.need_flatten)
+        statement_flatten_declarations(module,module_stat);
+
+    /* clean badly generated sequences */
+    clean_up_sequences(module_stat);
+
+    delay_communications_reset();
+
+
+    pips_assert("Statement is consistent\n" , statement_consistent_p(module_stat));
+
+    module_reorder(module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
+
+    debug_off();
+
+    reset_current_module_entity();
+    reset_ordering_to_statement();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    return c.result;
+}
+bool delay_store_communications(char * module_name)
+{
+    /* Get the code of the module. */
+    entity module = module_name_to_entity(module_name);
+    statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
+    set_ordering_to_statement(module_stat);
+    set_current_module_entity( module);
+    set_current_module_statement( module_stat);
+    set_cumulated_rw_effects(
+            (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
+    );
+    delay_communications_init();
+
+    dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
+
+    debug_on("DELAY_COMMUNICATIONS_DEBUG_LEVEL");
+
+
+
+    /* Go through all the statements */
+    context c = { true, NIL, false, false };
+
+    /* a first forward translation */
+    delay_communications_statement(module_stat,&c);
+
+    /* propagate inter procedurally , except if we have no caller*/
+    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
+        delay_communications_interprocedurally(&c);
+    else
+        delay_communications_intraprocedurally(module_stat,&c);
+
+    if(c.need_flatten)
+        statement_flatten_declarations(module,module_stat);
+
+    /* clean badly generated sequences */
+    clean_up_sequences(module_stat);
+
+    delay_communications_reset();
+
+    pips_assert("Statement is consistent\n" , statement_consistent_p(module_stat));
+
+    module_reorder(module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
+    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
+
+    debug_off();
+
+    reset_current_module_entity();
+    reset_ordering_to_statement();
+    reset_current_module_statement();
+    reset_cumulated_rw_effects();
+
+    return c.result;
+}
+
 static bool dmas_invert_p(statement s0, statement s1) {
     pips_assert("called on dmas",simd_dma_stat_p(s0) && simd_dma_stat_p(s1));
     list p_reg = load_cumulated_rw_effects_list(s0);
@@ -542,7 +709,7 @@ static bool dmas_invert_p(statement s0, statement s1) {
     }
 }
 
-static void do_remove_redundant_communications_in_sequence(sequence s){
+static void do_remove_redundant_communications_in_sequence(sequence s, bool *need_flatten){
     list ts = gen_copy_seq(sequence_statements(s));
     statement prev = statement_undefined;
     FOREACH(STATEMENT,st,ts) {
@@ -570,177 +737,97 @@ static void do_remove_redundant_communications_in_sequence(sequence s){
     gen_free_list(ts);
 }
 
-static bool need_flatten = false;
+static void select_independent_dmas(list * stats, statement parent) {
+    list rtmp = NIL;
+    FOREACH(STATEMENT,st,*stats)
+        if(simd_dma_stat_p(st)) {
+            bool conflict = false;
+            FOREACH(STATEMENT,st2,rtmp) {
+                if((conflict=statements_conflict_p(st,st2)))
+                    break;
+            }
+            conflict|=statements_conflict_p(st,parent);
+            if(conflict) break;
+            rtmp=CONS(STATEMENT,st,rtmp);
+        }
+        else
+            break;
+    gen_free_list(*stats);
+    *stats=rtmp;
+}
 
-static void do_remove_redundant_communications_in_anyloop(statement parent, statement body) {
+static bool do_remove_redundant_communications_in_anyloop(statement parent, statement body) {
+    bool need_flatten=false;
     if(statement_block_p(body)) {
         list b = statement_block(body);
-        list ordered = gen_copy_seq(b);
-        list reversed = gen_nreverse(gen_copy_seq(b));
-        for(list oter=ordered,rter=reversed;!ENDP(oter)&&!ENDP(rter);POP(oter),POP(rter)) {
-            statement os = STATEMENT(CAR(oter)),
-                      rs = STATEMENT(CAR(rter));
-            if(simd_dma_stat_p(os) &&
-                    simd_dma_stat_p(rs) &&
-                    dmas_invert_p(os,rs)) {
-                gen_remove_once(&b,rs);
-                gen_remove_once(&b,os);
-                /* insert them around the loop */
-                insert_statement(parent,os,true);
-                insert_statement(parent,rs,false);
-                /* flatten_code if needed */
-                set re = get_referenced_entities(os);
-                set de = set_make(set_pointer);
-                set_assign_list(de,statement_declarations(body));
-                if(set_intersection_p(de,re)) need_flatten = true;
-                set_free(de);set_free(re);
-                /* and remove them from the alternate list */
-                gen_remove_once(&ordered,rs);
-                gen_remove_once(&reversed,os);
+        list iordered=b;
+        /* skip declarations */
+        while(!ENDP(iordered) &&
+                declaration_statement_p(STATEMENT(CAR(iordered))) ) POP(iordered);
+        bool skipped_declarations= (iordered != b);
+        list reversed = gen_nreverse(gen_copy_seq(iordered));
+        /* look for heading dma statements */
+        iordered=gen_copy_seq(iordered); // to be consistent with `reversed' allocation
+        select_independent_dmas(&iordered, parent);
+        /* look for trailing dma statements */
+        select_independent_dmas(&reversed, parent);
+
+        bool did_something=false;
+        for(list oter=iordered;!ENDP(oter);POP(oter)) {
+            statement os = STATEMENT(CAR(oter));
+            FOREACH(STATEMENT,rs,reversed) {
+                if(simd_dma_stat_p(os) &&
+                        simd_dma_stat_p(rs) &&
+                        dmas_invert_p(os,rs)) {
+                    gen_remove_once(&b,rs);
+                    gen_remove_once(&b,os);
+                    /* insert them around the loop */
+                    insert_statement(parent,os,true);
+                    insert_statement(parent,rs,false);
+                    /* flatten_code if needed */
+                    set re = get_referenced_entities(os);
+                    set de = set_make(set_pointer);
+                    set_assign_list(de,statement_declarations(body));
+                    if(set_intersection_p(de,re)) need_flatten = true;
+                    set_free(de);set_free(re);
+                    /* and remove them from the alternate list */
+                    gen_remove_once(&b,rs);
+                    gen_remove_once(&reversed,os);
+                    did_something=true;
+                    break;
+                }
             }
         }
+        gen_free_list(iordered);
+        gen_free_list(reversed);
+        if(did_something && skipped_declarations)
+            need_flatten=true;
         sequence_statements(statement_sequence(body)) = b;
     }
-
+    return need_flatten;
 }
 
-static void do_remove_redundant_communications_in_loop( loop l) {
-    do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),loop_body(l));
+static void do_remove_redundant_communications_in_loop( loop l, bool *need_flatten) {
+    *need_flatten|=do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),loop_body(l));
 }
 
-static void do_remove_redundant_communications_in_whileloop( whileloop l) {
-    do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),whileloop_body(l));
+static void do_remove_redundant_communications_in_whileloop( whileloop l, bool *need_flatten) {
+    *need_flatten|=do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),whileloop_body(l));
 }
 
-static void do_remove_redundant_communications_in_forloop( forloop l) {
-    do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),forloop_body(l));
+static void do_remove_redundant_communications_in_forloop( forloop l, bool *need_flatten) {
+    *need_flatten|=do_remove_redundant_communications_in_anyloop((statement)gen_get_ancestor(statement_domain,l),forloop_body(l));
 }
 
-static void remove_redundant_communications(statement s) {
-    gen_multi_recurse(s,
+static bool remove_redundant_communications(statement s) {
+    bool need_flatten=false;
+    gen_context_multi_recurse(s,&need_flatten,
             sequence_domain,gen_true,do_remove_redundant_communications_in_sequence,
             loop_domain,gen_true,do_remove_redundant_communications_in_loop,
             whileloop_domain,gen_true,do_remove_redundant_communications_in_whileloop,
             forloop_domain,gen_true,do_remove_redundant_communications_in_forloop,
             NULL);
-}
-
-static bool __delay_communications_patch_properties;
-static void delay_communications_init_properties() {
-    __delay_communications_patch_properties = get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
-        ENDP(callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true))); 
-    if(__delay_communications_patch_properties)
-        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",false);
-}
-static void delay_communications_reset_properties() {
-    if(__delay_communications_patch_properties)
-        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",true);
-
-}
-
-/* This phase looks for load or save statements that can be
- * put out of the loop body and move these statements, if possible.
- */
-bool delay_load_communications(char * module_name)
-{
-    /* Get the code of the module. */
-    entity module = module_name_to_entity(module_name);
-    statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
-    set_ordering_to_statement(module_stat);
-    set_current_module_entity( module);
-    set_current_module_statement( module_stat);
-    set_cumulated_rw_effects(
-            (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
-    );
-
-    dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
-
-    debug_on("DELAY_COMMUNICATIONS_DEBUG_LEVEL");
-    delay_communications_init_properties();
-
-    /* Go through all the statements */
-    context c = { true, NIL, true };
-
-    /* then a backward translation */
-    delay_communications_statement(module_stat,&c);
-
-    /* propagate inter procedurally , except if we have no caller*/
-    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
-        delay_communications_interprocedurally(&c);
-    else
-        delay_communications_intraprocedurally(module_stat,&c);
-
-    /* clean badly generated sequences */
-    clean_up_sequences(module_stat);
-
-    delay_communications_reset_properties();
-
-
-    pips_assert("Statement is consistent\n" , statement_consistent_p(module_stat));
-
-    module_reorder(module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
-
-    debug_off();
-
-    reset_current_module_entity();
-    reset_ordering_to_statement();
-    reset_current_module_statement();
-    reset_cumulated_rw_effects();
-
-    return c.result;
-}
-bool delay_store_communications(char * module_name)
-{
-    /* Get the code of the module. */
-    entity module = module_name_to_entity(module_name);
-    statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
-    set_ordering_to_statement(module_stat);
-    set_current_module_entity( module);
-    set_current_module_statement( module_stat);
-    set_cumulated_rw_effects(
-            (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true)
-    );
-
-    dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
-
-    debug_on("DELAY_COMMUNICATIONS_DEBUG_LEVEL");
-
-    delay_communications_init_properties();
-
-
-    /* Go through all the statements */
-    context c = { true, NIL, false };
-
-    /* a first forward translation */
-    delay_communications_statement(module_stat,&c);
-
-    /* propagate inter procedurally , except if we have no caller*/
-    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
-        delay_communications_interprocedurally(&c);
-    else
-        delay_communications_intraprocedurally(module_stat,&c);
-
-    /* clean badly generated sequences */
-    clean_up_sequences(module_stat);
-
-    delay_communications_reset_properties();
-
-    pips_assert("Statement is consistent\n" , statement_consistent_p(module_stat));
-
-    module_reorder(module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_stat);
-    DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
-
-    debug_off();
-
-    reset_current_module_entity();
-    reset_ordering_to_statement();
-    reset_current_module_statement();
-    reset_cumulated_rw_effects();
-
-    return c.result;
+    return need_flatten;
 }
 bool delay_communications(char * module_name)
 {
@@ -749,14 +836,16 @@ bool delay_communications(char * module_name)
     statement module_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
     set_current_module_entity( module);
     set_current_module_statement( module_stat);
-
+    set_ordering_to_statement(module_stat);
 
     set_cumulated_rw_effects(
             (statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, true)
     );
+    dependence_graph = (graph) db_get_memory_resource(DBR_DG, module_name, true);
+
     debug_on("DELAY_COMMUNICATIONS_DEBUG_LEVEL");
-    need_flatten=false;
-    remove_redundant_communications(module_stat);
+    bool need_flatten=
+        remove_redundant_communications(module_stat);
 
     /* clean badly generated sequences */
     clean_up_sequences(module_stat);
@@ -772,10 +861,12 @@ bool delay_communications(char * module_name)
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name, compute_callees(module_stat));
 
     debug_off();
+    dependence_graph=graph_undefined;
 
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
+    reset_ordering_to_statement();
 
     return true;
 }

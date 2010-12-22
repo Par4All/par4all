@@ -986,23 +986,26 @@ bool entity_atomic_reference_p(entity e)
  */
 bool entity_non_pointer_scalar_p(entity e)
 {
-  type ct = basic_concrete_type(entity_type(e));
-  variable vt = type_variable(ct);
-  bool atomic_p = FALSE;
+    bool atomic_p = FALSE;
+    type ct = basic_concrete_type(entity_type(e));
+    if(type_variable_p(ct))  {
+        variable vt = type_variable(ct);
 
-  pips_assert("entity e is a variable", type_variable_p(ct));
+        //pips_assert("entity e is a variable", type_variable_p(ct));
+        //entity can be a functional in C too
 
-  if(ENDP(variable_dimensions(vt)))
-    {
-      /* The property is not true for overloaded, string, derived
-       */
-      basic bt = variable_basic(vt);
-      atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
-	|| basic_complex_p(bt) || basic_bit_p(bt);
+        if(ENDP(variable_dimensions(vt)))
+        {
+            /* The property is not true for overloaded, string, derived
+            */
+            basic bt = variable_basic(vt);
+            atomic_p = basic_int_p(bt) || basic_float_p(bt) || basic_logical_p(bt)
+                || basic_complex_p(bt) || basic_bit_p(bt);
+        }
+
+        free_type(ct);
     }
-
-  free_type(ct);
-  return atomic_p;
+    return atomic_p;
 }
 
 
