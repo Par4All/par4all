@@ -354,13 +354,14 @@ static text compilation_unit_text(entity cu, entity module)
 
    Should be checked with different module with the same name... Maybe a
    conflict in WORKSPACE_TMP_SPACE ?
-   if compilation_unit_name is set to string_undefined, a new compilation unit is generated
+   if compilation_unit_name is set to string_undefined, a new compilation unit is generated, but not in fortran, where compilation unit do not exist!
 */
 bool
 add_new_module_from_text(string module_name,
 			 text code_text,
 			 bool is_fortran,
 			 string compilation_unit_name) {
+    pips_assert("fortran module have no compilation unit\n",!is_fortran || (is_fortran && string_undefined_p(compilation_unit_name)));
     boolean success_p = TRUE;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
@@ -380,36 +381,39 @@ add_new_module_from_text(string module_name,
       return FALSE;
     }
 
+    /* depending on output language, build compilation unit,
+     * select prettyprinter
+     * choose out file name
+     */
     if(is_fortran) {
       set_prettyprint_language_tag(is_language_fortran);
+      asprintf(&file_name,"%s" FORTRAN_FILE_SUFFIX ,module_name );
     } else {
-      set_prettyprint_language_tag(is_language_c);
-    }
+        set_prettyprint_language_tag(is_language_c);
 
-    // Build the corresponding compilation unit for C code
-    if(string_undefined_p(compilation_unit_name) ) {
-      // Function defined in pipsmake
-      cun = compilation_unit_of_module(module_name);
+        // Build the corresponding compilation unit for C code
+        if( string_undefined_p(compilation_unit_name) ) {
+            // Function defined in pipsmake
+            cun = compilation_unit_of_module(module_name);
 
-      if(string_undefined_p(cun)) {
-          int count = 0;
-          asprintf(&cun,"%s" FILE_SEP_STRING, module_name);
-          while(!entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun))) {
-              free(cun);
-              asprintf(&cun,"%s%d" FILE_SEP_STRING, module_name, count ++);
-          }
-          cu = MakeCompilationUnitEntity(cun);
-      }
-    }
-    else
-        cun=strdup(compilation_unit_name);
+            if(string_undefined_p(cun)) {
+                int count = 0;
+                asprintf(&cun,"%s" FILE_SEP_STRING, module_name);
+                while(!entity_undefined_p(FindEntity(TOP_LEVEL_MODULE_NAME,cun))) {
+                    free(cun);
+                    asprintf(&cun,"%s%d" FILE_SEP_STRING, module_name, count ++);
+                }
+                cu = MakeCompilationUnitEntity(cun);
+            }
+        }
+        else
+            cun=strdup(compilation_unit_name);
 
-    /* pips' current directory is just above the workspace
-     */
-    {
+        /* pips' current directory is just above the workspace
+        */
         string cu_real = strdup(cun);
         cu_real[strlen(cu_real)-1]=0;
-        asprintf(&file_name,"%s%s",cu_real,is_fortran?FORTRAN_FILE_SUFFIX:PP_C_ED);
+        asprintf(&file_name,"%s" PP_C_ED ,cu_real);
         free(cu_real);
     }
     dir_name = db_get_current_workspace_directory();

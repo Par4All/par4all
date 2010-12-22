@@ -78,13 +78,17 @@ words_constant(constant obj)
 
 static list words_value(value obj)
 {
-    list pc;
+    list pc=NIL;
 
     if (value_symbolic_p(obj)) {
 	pc = words_constant(symbolic_constant(value_symbolic(obj)));
     }
-    else if (value_constant(obj)) {
+    else if (value_constant_p(obj)) {
 	pc = words_constant(value_constant(obj));
+    }
+    else if (value_unknown_p(obj)) {
+      // FI: Only good for Fortran
+      pc = CHAIN_SWORD(pc, "(*)");
     }
     else {
 	pips_internal_error("unexpected tag");
@@ -408,7 +412,16 @@ list words_basic(basic obj, list pdl)
             pc = CHAIN_IWORD(pc,basic_logical(obj));
             break;
           case is_language_c:
-            pc = CHAIN_SWORD(pc,"int"); /* FI: Use stdbool.h instead? */
+            pc = CHAIN_SWORD(pc,"int"); /* FI: Use "bool" of stdbool.h instead
+					    of "int" but it leads to
+					    include issue for
+					    generated code; avoid stdbool.h
+					    and use "_Bool" directly
+					    but it leads to infinite
+					    loop from "_Bool" to
+					    "_Bool" because "_Bool"
+					    is declared as a typedef
+					    in anr999 */
             break;
           case is_language_fortran95:
             pips_internal_error("Need to update F95 case");

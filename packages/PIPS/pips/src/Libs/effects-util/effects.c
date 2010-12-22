@@ -398,6 +398,38 @@ bool fortran_compatible_effect_p(effect e)
   return compatible_p;
 }
 
+
+/* Test if an effect has a non local effect
+
+   @param[in] eff is the effect to analyse
+
+   @return true if the effect is on a non local effect
+*/
+bool effect_on_non_local_variable_p(effect eff) {
+  return !same_string_p(
+            entity_module_name(reference_variable(effect_any_reference(eff))),
+            get_current_module_name()
+            );
+}
+
+/* Test if a list of effects concerns non local variables
+
+   @param[in] effects is the effect list to scan
+
+   @return true if there is an effect on a global variable
+*/
+bool effects_on_non_local_variable_p(list effects) {
+  FOREACH(EFFECT,eff,effects)
+    if (effect_on_non_local_variable_p(eff)) {
+      //char * seffect = effect_to_string(eff);
+      //pips_user_warning("effect on non local variable: %s\n",seffect);
+      //free(seffect);
+      return true;
+    }
+  return false;
+}
+
+
 
 /* Two effects interfere if one of them modify the set of locations
    defined by the other one. For instance, an index or a pointer may

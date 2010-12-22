@@ -1474,6 +1474,15 @@ following property:
 \begin{PipsProp}{PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS} 
 PRETTYPRINT_REGENERATE_ALTERNATE_RETURNS FALSE
 \end{PipsProp}
+
+Using a mixed C / Fortran RI is troublesome for comments handling:
+sometimes the comment guard is stored in the comment, sometime not.
+Sometimes it is on purpose, sometimes it is not.
+When following property is set to true, \PIPS does its best to prettyprint comments correctly.
+\begin{PipsProp}{PRETTYPRINT_CHECK_COMMENTS}
+PRETTYPRINT_CHECK_COMMENTS TRUE
+\end{PipsProp}
+
 % no longer used {
 % \begin{PipsProp}{PRETTYPRINT_REGENERATED_LABEL}
 % PRETTYPRINT_REGENERATED_LABEL "12345"
@@ -2063,18 +2072,21 @@ The data structures used to represent memory effects and their
 computation are described in~\cite{IJT92}. Another description is
 available on line, in \Pri{} Technical Report.
 
-Note that the standard name in the Dragon book is likely ot be {\em
-Gen} and {\em Kill} sets, but PIPS uses the more general concept of
-{\em effect} developped by P.~Jouvelot and D.~Gifford.
+Note that the standard name in the Dragon book is likely to be {\em
+  Gen} and {\em Kill} sets in the standard data flow analysis
+framework, but PIPS uses the more general concept of {\em effect}
+developped by P.~Jouvelot and D.~Gifford~\cite{JG89} and its analyses are mostly
+based on the abstgract syntac tree (AST) rather than the control flow
+graph (CFG).
 
-\subsection{Proper Effects}
+\subsection{Proper Memory Effects}
 \label{subsubsection-proper-effects}
 \index{Proper Effects}
 \index{Effects (Proper)}
 
-The proper effects of a statement basically are a list of variables
+The proper memory effects of a statement basically are a list of variables
 that may be read or written by the statement. They are used to build use-def
-chains and then the dependence graph.
+chains (see~\cite{Aho86} or a later edition) and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
 effects of lower level statements. For instance, the body of a loop, true and
@@ -2087,12 +2099,14 @@ effects in which intermediary access paths may refer to different
 memory locations at different program points; regular {\tt effects}
 are constant path effects, which means that their intermediary access
 paths all refer to unique memory locations. The same distinction holds
-for convex array regions (see section~\ref{subsection-array-regions}). 
+for convex array regions (see section~\ref{subsection-array-regions}).
 
-{\tt proper\_effects\_with\_points\_to} is an alternative to compute
-constant path proper effects using points-to analysis (see
-subsection~\ref{subsection-points-to-analysis}). This is still highly
-experimental.
+{\tt proper\_effects\_with\_points\_to} and {\tt
+  proper\_effects\_with\_pointer\_values} are alternatives to compute
+constant path proper effects using points-to (see
+subsection~\ref{subsection-points-to-analysis}) or pointer values
+analyses (see subsection~\ref{subsection-pointer-values}). This is
+still at an experimental stage.
 
 Summary effects (see
 Section~\ref{subsubection-summary-data-flow-information}) of a called
@@ -2103,7 +2117,7 @@ binding. If too many actual arguments are defined, a user warning is
 issued but the processing goes on because a simple semantics is
 available: ignore useless actual arguments. If too few actual
 arguments are provided, a user error is issued because the effects of
-the call are not defined. 
+the call are not defined.
 
 Variables private to loops are handled like regular variable.
 
@@ -2124,13 +2138,21 @@ proper_effects                  > MODULE.proper_effects
 \begin{PipsMake}
 proper_effects_with_points_to > MODULE.proper_effects
         < PROGRAM.entities
-        < MODULE.code        
+        < MODULE.code
         < MODULE.points_to_list
         < CALLEES.summary_effects
 \end{PipsMake}
 
+\begin{PipsMake}
+proper_effects_with_pointer_values > MODULE.proper_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.pointer_values
+        < CALLEES.summary_effects
+\end{PipsMake}
 
-\subsection{Filtered Proper Effects}
+
+\subsection{Filtered Proper Memroy Effects}
 \label{subsubsection-filtered-proper-effects}
 
 \marginpar{To be continued...by whom?}
@@ -2149,14 +2171,14 @@ filter_proper_effects         > MODULE.filtered_proper_effects
 \end{PipsMake}
 
 
-\subsection{Cumulated Effects}
+\subsection{Cumulated Memory Effects}
 \label{subsubsection-cumulated-effects}
 \index{Cumulated Effects}
 \index{Effects (Cumulated)}
 
 \begin{PipsPass}{cumulated_effects}
-Cumulated effects of statements are also lists of read or written
-variables. Cumulated means that the effects of a compound statement, do
+Cumulated effects of statements are lists of read or written
+variables, just like the proper effects (see Section~\ref{subsubsection-proper-effects}). Cumulated means that the effects of a compound statement, do
 loop, test or unstructured, include the effects of the lower level
 statements such as a loop body or a test branch.
 \end{PipsPass}
@@ -2177,7 +2199,29 @@ cumulated_pointer_effects_with_points_to > MODULE.cumulated_pointer_effects
 \end{PipsMake}
 
 \begin{PipsMake}
+cumulated_pointer_effects_with_pointer_values > MODULE.cumulated_pointer_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_pointer_effects
+        < MODULE.points_to_list
+\end{PipsMake}
+
+\begin{PipsMake}
 cumulated_effects            > MODULE.cumulated_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+cumulated_effects_with_points_to        > MODULE.cumulated_effects
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+\end{PipsMake}
+
+\begin{PipsMake}
+cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
@@ -2185,7 +2229,7 @@ cumulated_effects            > MODULE.cumulated_effects
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops. 
+Fortran parallel DO loops.
 
 
 
@@ -2195,11 +2239,13 @@ Fortran parallel DO loops.
 
 Summary data flow information is the simplest interprocedural
 information needed to take procedure into account in a
-parallelizer. They were introduced in Parafrase.
+parallelizer. It was introduced in Parafrase (see~\cite{Li88}) under
+this name, but should be called summary memory effects in PIPS context.
 
 \begin{PipsPass}{summary_effects}
-The \PipsPassRef{summary_effects} of a module are the cumulated effects of its
-top level statement, but effects on local dynamic variables are
+The \PipsPassRef{summary_effects} of a module are the cumulated memory
+effects of its
+top level statement (see Section~\ref{subsubsection-cumulated-effects}), but effects on local dynamic variables are
 ignored (because they cannot be observed by the callers\footnote{Unless
 it accesses illegally the stack: see Tom Reps,
 http://pages.cs.wisc.edu/~reps}) and subscript expressions of remaining
@@ -5418,6 +5464,48 @@ internalize_parallel_code             > MODULE.code
         < MODULE.parallelized_code
 \end{PipsMake}
 
+\subsection{Detect Computation Intensive Loops}
+
+\begin{PipsPass}{computation_intensity}
+Generate a pragma on each loop that seems to be computation intensive according to a simple cost model.
+\end{PipsPass}
+
+The computation intensity is derived from the complexity and the memory footprint.
+It assumes the cost model: 
+$$execution\_time = startup\_overhead + \frac{memory\_footprint}{bandwidth} + \frac{complexity}{frequency}$$
+A loop is marked with pragma \PipsPropRef{COMPUTATION_INTENSITY_PRAGMA} if the communication costs are lower
+than the execution cost as given by \PipsPassRef{uniform_complexities}.
+\begin{PipsMake}
+computation_intensity > MODULE.code
+	< MODULE.code
+	< MODULE.regions
+	< MODULE.complexities
+\end{PipsMake}
+
+This correspond to the transfer startup overhead.
+Time unit is the same as in complexities.
+\begin{PipsProp}{COMPUTATION_INTENSITY_STARTUP_OVERHEAD}
+COMPUTATION_INTENSITY_STARTUP_OVERHEAD 10
+\end{PipsProp}
+
+This corresponds to the memory bandwidth in octet per time unit.
+\begin{PipsProp}{COMPUTATION_INTENSITY_BANDWIDTH}
+COMPUTATION_INTENSITY_BANDWIDTH 100
+\end{PipsProp}
+
+And This is the processor frequency, in operation per time unit.
+\begin{PipsProp}{COMPUTATION_INTENSITY_FREQUENCY}
+COMPUTATION_INTENSITY_FREQUENCY 1000
+\end{PipsProp}
+
+This is the generated pragma.
+\begin{PipsProp}{COMPUTATION_INTENSITY_PRAGMA}
+COMPUTATION_INTENSITY_PRAGMA "pips intensive loop"
+\end{PipsProp}
+
+Those values have limited meaning here, only their ratio have some.
+Having \PipsPropRef{COMPUTATION_INTENSITY_FREQUENCY} and \PipsPropRef{COMPUTATION_INTENSITY_BANDWIDTH}
+of the same magnitude clearly limits the number of generated pragmas\dots
 
 \subsection{Limit Parallelism in Parallel Loop Nests}
 \label{sec:manage-parallel-loops}
@@ -5714,21 +5802,6 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
 
-\begin{PipsPass}{simd_loop_const_elim}
-This phase tries to optimize the SIMD code by removing from the loop body
-the SIMD statement that does not depends on the loop iteration.
-\end{PipsPass}
-
-\begin{PipsMake}
-alias simd_loop_const_elim 'SIMD loop constant elimination'
-
-simd_loop_const_elim                    > MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.proper_effects
-        < MODULE.cumulated_effects
-        < MODULE.dg
-\end{PipsMake}
 
 \begin{PipsPass}{simd_memory_packing}
 This phase is to be called after simdization of affectation operator.
@@ -5817,6 +5890,8 @@ scalopragma                    > MODULE.code
                < MODULE.code
                < MODULE.cumulated_effects
 \end{PipsMake}
+
+
 \subsubsection{Bufferization}
 The goal of Bufferization is to generate a dataflow communication through buffers between modules. The communication is done by special function call generated by \PipsPassRef{kernel_load_store}. To keep flows consistent outside the module \PipsPassRef{scalopify} surround variable call with a special function too.
 A C file with stubs is needed.
@@ -5832,6 +5907,7 @@ scalopify                    > MODULE.code
 		< MODULE.code
                 < MODULE.cumulated_effects
 \end{PipsMake}
+
 
 \subsubsection{SCMP generation}
 The goal of the following phase is to generate SCMP tasks from 'normal' modules. The tasks are linked and scheduled using the SCMP HAL.
@@ -6669,6 +6745,7 @@ Rectangular hull of regions are used to match allocator and data transfers proto
 If an analysis fails, definition regions are use instead.
 If a sizeof is involved, \PipsPropRef{EVAL_SIZEOF} must be set to true.
 
+
 \begin{PipsMake}
 isolate_statement > MODULE.code
 	> MODULE.callees
@@ -6679,6 +6756,72 @@ isolate_statement > MODULE.code
 
 \begin{PipsProp}{ISOLATE_STATEMENT_LABEL}
 ISOLATE_STATEMENT_LABEL ""
+\end{PipsProp}
+
+By default we cannot isolate a statement with some complex effects on
+the non local memory. But if we know we can (for example ), we can override this
+behaviour by setting the following property:
+\begin{PipsProp}{ISOLATE_STATEMENT_EVEN_NON_LOCAL}
+ISOLATE_STATEMENT_EVEN_NON_LOCAL FALSE
+\end{PipsProp}
+
+\subsubsection{Delay Communications}
+\begin{PipsPass}{delay_communications}
+Optimize the load/store dma by delaying the stores and 
+performing the stores as soon as possible.
+\end{PipsPass}
+
+It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
+to distinguish loads and stores from other calls.
+
+The communication elimination makes the assumption that a load/store pair can always be removed.
+
+\begin{PipsMake}
+delay_communications                    > MODULE.code
+        > MODULE.callees
+        ! CALLEES.delay_communications
+        ! MODULE.delay_load_communications
+        ! MODULE.delay_store_communications
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_load_communications                    > MODULE.code
+        > MODULE.callees
+        > CALLERS.code
+        > CALLERS.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_store_communications                    > MODULE.code
+        > MODULE.callees
+        > CALLERS.code
+        > CALLERS.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < CALLERS.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+
+This property can be used to suppress inter-procedural propagation,
+for example when data are not persistent across calls.
+\begin{PipsProp}{DELAY_COMMUNICATIONS_INTERPROCEDURAL}
+DELAY_COMMUNICATIONS_INTERPROCEDURAL TRUE
 \end{PipsProp}
 
 \subsubsection{Hardware Constraints Solver}
@@ -6752,6 +6895,8 @@ Enable/disable the scalar handling by kernel load store.
 KERNEL_LOAD_STORE_SCALAR FALSE
 \end{PipsProp}
 
+The \PipsPropRef{ISOLATE_STATEMENT_EVEN_NON_LOCAL} property can be used to
+force the generation even with non local memory access.
 
 The following properties can be used to customized the allocate/load/store functions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}
@@ -6945,6 +7090,63 @@ Use this property for accuracy of divide to multiply conversion.
 \begin{PipsProp}{TERAPIX_REMOVE_DIVIDE_ACCURACY}
 TERAPIX_REMOVE_DIVIDE_ACCURACY 4
 \end{PipsProp}
+
+\subsubsection{Generating communications}
+
+
+\begin{PipsPass}{kernel_data_mapping}
+This phase computes the mapping of data on the accelarators. It records the set 
+of data that have to be copied on the GPU before each statement in the module, 
+and the set of data that have to be copied back from the GPU after the execution 
+of each statement.
+
+Then according to this information, the copy-in and copy-out transfers are 
+generated using same properties as \PipsPassRef{KERNEL_LOAD_STORE}:
+
+\end{PipsPass}
+\begin{PipsMake}
+alias kernel_data_mapping "Kernel data mapping"
+kernel_data_mapping > MODULE.kernel_copy_in
+		    > MODULE.kernel_copy_out
+        < PROGRAM.entities
+        < PROGRAM.kernels
+        < MODULE.code
+        < MODULE.summary_effects
+        < MODULE.cumulated_effects
+        < MODULE.transformers
+        < MODULE.preconditions
+        < MODULE.regions
+        < MODULE.in_regions
+        < MODULE.out_regions
+        < MODULE.callees
+        < MODULE.callers
+        < CALLEES.kernel_copy_out
+        < CALLEES.kernel_copy_in
+\end{PipsMake}
+
+\begin{PipsPass}{wrap_kernel_argument}
+
+This phase wrap argument at call site with an access function. The wrapper name 
+is controlled with \PipsPropRef{WRAP_KERNEL_ARGUMENT_FUNCTION_NAME}. Currently
+the purpose of this is to insert call to a runtime to resolve addresses in 
+accelerator memory corresponding to addresses in host memory.
+
+
+\begin{PipsProp}{WRAP_KERNEL_ARGUMENT_FUNCTION_NAME}
+WRAP_KERNEL_ARGUMENT_FUNCTION_NAME "P4A_runtime_host_ptr_to_accel_ptr"
+\end{PipsProp}
+
+\end{PipsPass}
+\begin{PipsMake}
+alias wrap_kernel_argument "wrap_kernel_argument"
+wrap_kernel_argument > CALLERS.code
+		   > CALLERS.callees
+        < PROGRAM.entities
+        < CALLERS.code
+        < CALLERS.callees
+        < MODULE.callers
+\end{PipsMake}
+
 
 \subsection{Code distribution on GPU}
 \label{sec:code-distr-gpu}
@@ -9250,6 +9452,8 @@ set \PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
 
 The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
 the user is prompted if not set.
+But first the pass scans the code for any statement flagged with the pragma defined in
+\PipsPropRef{OUTLINE_PRAGMA}.
 
 If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the statement to
 outline.
@@ -9262,6 +9466,9 @@ Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT} make it pos
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_PRAGMA}
+OUTLINE_PRAGMA "pips outline"
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_LABEL}
 OUTLINE_LABEL ""
@@ -9794,6 +10001,25 @@ alias set_return_type_as_typedef 'Set return type as typedef'
 set_return_type_as_typedef > MODULE.code
         < PROGRAM.entities
         < MODULE.code
+\end{PipsMake}
+
+
+\subsection{Cast at call sites}
+
+\begin{PipsPass}{cast_at_call_sites}
+The purpose of this transformation is to force parameters at call sites to be
+casted as expected according to the prototype of the functions.
+\end{PipsPass}
+
+
+
+\begin{PipsMake}
+alias cast_at_call_sites 'Call parameters at call sites'
+cast_at_call_sites > CALLERS.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.callers
+        < CALLERS.code
 \end{PipsMake}
 
 
@@ -10544,7 +10770,7 @@ PIPS phase OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. If set to TRUE the number
 of iterations of the inner loops will be used to test if the threshold is
 reached. Otherwise only the nunber of iteration of the processed loop will be
 used.
-\begin{PipsProp}{OMP_LOOP_PARALLEL_THRESHOLD_VALUE}
+\begin{PipsProp}{OMP_IF_CLAUSE_RECURSIVE}
 OMP_IF_CLAUSE_RECURSIVE TRUE
 \end{PipsProp}
 
@@ -13372,28 +13598,74 @@ PRINT_DOTDG_INPUT_DEP_STYLE "dashed"
 Style for each type of dependence
 
 
-
 \section{Prettyprinters for C}
 
-A very basic and experimental C dumper to output a Fortran program in C
-code. It is not the same as the default pretty printer that is used the
-normal way to pretty print C code in C.
+\begin{PipsPass}{print_crough}
+A basic and experimental C dumper to output a Fortran program in C
+code. It is not the same as the default pretty printer that is normaly used
+to pretty print C code in C. This pass is mainly use inside PIPS
+and Par4All to be able to generate call to CUDA kernels from a fortran code.
+The kernel is supposed not to use I/O intrinsics (such as WRITE, READ),
+they are not handle at the moment (and not usefull in the CUDA context)
+by the crough printer.
+\end{PipsPass}
 
 \begin{PipsMake}
 print_crough  > MODULE.crough
               < PROGRAM.entities
               < MODULE.code
+              < MODULE.summary_effects
+\end{PipsMake}
 
+\begin{PipsMake}
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
 
+By default the crough pass tries to match the best C type for any Fortran
+type. Here is the matches between Fortran and C variables:
+\begin{itemize}
+\item INTEGER is matched to int.
+\item INTEGER*4 is matched to int.
+\item INTEGER*8 is matched to long long int.
+\item REAL is matched to float.
+\item REAL*4 is matched to float.
+\item REAL*8 is matched to double.
+\end{itemize}
+However, many Fortran compilers (ifort, gfortran) allow to change
+the type size at compile time. It is possible to do the same by setting the
+property CROUGH\_USER\_DEFINED\_TYPE to TRUE. In such a case the include file
+specified by the property CROUGH\_INCLUDE\_FILE is included by any file
+generated using crough. It has to define (using \#define or
+typedef) the two types defined by the properties CROUGH\_INTEGER\_TYPE and
+CROUGH\_REAL\_TYPE. Obviously those types are used in the generated C file to
+declare variables that has the types INTEGER or REAL in the original Fortan
+file. When choosing that solution all INTEGER and REAL (including INTEGER*4,
+INTEGER*8, REAL*4 and REAL*8) variables will be set
+to the same user defined types.
+
+\begin{PipsProp}{CROUGH_USER_DEFINED_TYPE}
+CROUGH_USER_DEFINED_TYPE FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_INCLUDE_FILE}
+CROUGH_INCLUDE_FILE "p4a_crough_types.h"
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_INTEGER_TYPE}
+CROUGH_INTEGER_TYPE "p4a_int"
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_REAL_TYPE}
+CROUGH_REAL_TYPE "p4a_real"
+\end{PipsProp}
+
 \subsection{Prettyprint for C  properties}
 \index{PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE}
 
-When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified. 
+When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified.
 
-\begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE} 
+\begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE}
 PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
 \end{PipsProp}
 
@@ -14044,6 +14316,27 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
 
+%@inproceedings{Jouvelot:1989:RCC:73141.74837,
+% author = {Jouvelot, P. and Gifford, D. K.},
+% title = {Reasoning about continuations with control effects},
+% booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming language design and implementation},
+% series = {PLDI '89},
+% year = {1989},
+% isbn = {0-89791-306-X},
+% location = {Portland, Oregon, United States},
+% pages = {218--226},
+% numpages = {9},
+% url = {http://doi.acm.org/10.1145/73141.74837},
+% doi = {http://doi.acm.org/10.1145/73141.74837},
+% acmid = {74837},
+% publisher = {ACM},
+% address = {New York, NY, USA},
+%} 
+\bibitem{JG89} P. Jouvellot, D. Gifford, {\em Reasoning about
+    continuations with control effects}, in Proceedings of the ACM
+  SIGPLAN 1989 Conference on Programming language design and
+  implementation, PLDI'89, pp. 218-226.
+
 \bibitem{JT89} P. Jouvelot, R. Triolet,
 	{\em NewGen : A Langage-Independent Program Generator},
 Rapport interne EMP-CRI-E191, July 1989. This report is available
@@ -14051,6 +14344,24 @@ on-line and regularly updated.
 
 \bibitem{Karr76} M. Karr, Affine Relationships among Variables of a Program,
 {\em Acta Informatica}, (1976).
+
+%@article {springerlink:10.1007/BF00128178,
+%  author = {Li, Zhiyuan and Yew, Pen-Chung},
+%   title = {Program parallelization with interprocedural analysis},
+%   journal = {The Journal of Supercomputing},
+%   publisher = {Springer Netherlands},
+%   issn = {0920-8542},
+%   keyword = {Computer Science},
+%   pages = {225-244},
+%   volume = {2},
+%   issue = {2},
+%   url = {http://dx.doi.org/10.1007/BF00128178},
+%   note = {10.1007/BF00128178},
+%   year = {1988}
+%}
+\bibitem{Li88} Zhiyuan Li, Pen-Chung Yew, {\em Program parallelization
+    with interprocedural analysis}, The Journal of Supercomputing,
+  Vol. 2, N. 2, pp. 225-244, Springer, 1988.
 
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}

@@ -380,9 +380,10 @@ static hash_table outliner_smart_references_computation(list referenced_entities
     }
     return entity_to_init;
 }
-static void statements_localize_declarations(list statements,entity module,statement module_statement)
+static list statements_localize_declarations(list statements,entity module,statement module_statement)
 {
     list sd = statements_to_declarations(statements);
+    list localized = NIL;
     FOREACH(STATEMENT, s, statements)
     {
         /* We want to declare private variables as locals, but it may not
@@ -393,11 +394,13 @@ static void statements_localize_declarations(list statements,entity module,state
         {
             if(gen_chunk_undefined_p(gen_find_eq(e,sd))) {
                 AddLocalEntityToDeclarations(e,module,module_statement);
+                localized=CONS(ENTITY,e,localized);
             }
         }
         gen_free_list(private_ents);
     }
     gen_free_list(sd);
+    return localized;
 }
 static list statements_referenced_entities(list statements)
 {
@@ -493,6 +496,21 @@ static void convert_pointer_to_array(entity e,entity re, expression x, list stat
     update_expression_syntax(x,syn2);
 }
 
+static void outline_remove_duplicates(list *entities) {
+    list tentities = gen_copy_seq(*entities);
+    for(list iter=tentities;!ENDP(iter);POP(iter)) {
+        entity e0 = ENTITY(CAR(iter));
+        FOREACH(ENTITY,e1,CDR(iter)) {
+            if( !same_entity_p(e0,e1) &&
+                    same_entity_lname_p(e0,e1)) {
+                gen_remove_once(entities,e1);
+                break;
+            }
+        }
+    }
+    gen_free_list(tentities);
+}
+
 /**
  * outline the statements in statements_to_outline into a module named outline_module_name
  * the outlined statements are replaced by a call to the newly generated module
@@ -537,10 +555,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
 
     /* Retrieve declared entities */
-    statements_localize_declarations(statements_to_outline,new_fun,new_body);
+    list localized = statements_localize_declarations(statements_to_outline,new_fun,new_body);
     list declared_entities = statements_to_declarations(statements_to_outline);
-    declared_entities=gen_nconc(declared_entities,statement_to_declarations(new_body));
-    
+    declared_entities=gen_nconc(declared_entities,localized);
+
     /* get the relative complements and create the parameter list*/
     gen_list_and_not(&referenced_entities,declared_entities);
     gen_free_list(declared_entities);
@@ -548,7 +566,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* purge the functions from the parameter list, we assume they are declared externally
      * also purge the formal parameters from other modules, gathered by get_referenced_entities but wrong here
-     * also purge memebers, not relevant
+     * also purge members, not relevant
      */
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
@@ -556,12 +574,14 @@ statement outliner(string outline_module_name, list statements_to_outline)
         /* function should be added to compilation unit */
         if(entity_function_p(e))
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
-        else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) &&
-                !( entity_formal_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
+        else if( (!entity_constant_p(e) ) && (!entity_field_p(e)) //&&
+                //!( formal_parameter_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
+            )
             tmp_list=CONS(ENTITY,e,tmp_list);
     }
     gen_free_list(referenced_entities);
     referenced_entities=tmp_list;
+
 
 
     /* remove global variables if needed */
@@ -590,6 +610,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     sort_entities_with_dep(&referenced_entities);
 
 
+    /* in some rare case, we can have too functions with the same local name */
+    outline_remove_duplicates(&referenced_entities);
 
 
     intptr_t i=0;
@@ -709,17 +731,19 @@ statement outliner(string outline_module_name, list statements_to_outline)
 	}
     /* either use origin's compilation unit or a new one */
     char * cu_name = string_undefined;
-    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT")) {
+    // In fortran we always want to generate the outline function
+    // in its own new file
+    if(get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT") ||
+       (fortran_module_p(get_current_module_entity()))) {
     }
     else {
-        cu_name = compilation_unit_of_module(get_current_module_name());
+      cu_name = compilation_unit_of_module(get_current_module_name());
     }
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
     set_bool_property(STAT_ORDER,false);
     text t = text_named_module(new_fun, new_fun /*get_current_module_entity()*/, new_body);
-
 
     add_new_module_from_text(outline_module_name, t, fortran_module_p(get_current_module_entity()), cu_name );
     set_bool_property(STAT_ORDER,saved);
@@ -732,7 +756,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* we need to free them now, otherwise recompilation fails */
     FOREACH(PARAMETER,p,formal_parameters) {
         entity e = dummy_identifier(parameter_dummy(p));
-        if(entity_variable_p(e)) {
+        if(!type_undefined_p(entity_type(e)) &&
+                entity_variable_p(e)) {
             free_type(entity_type(e));
             entity_type(e)=type_undefined;
         }
@@ -785,11 +810,16 @@ outline(char* module_name)
  	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
  	set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
 
-    /* retrieve name of the outiled module */
+    /* retrieve name of the outlined module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");
 
+    // Check the language. In case of Fortran the module name must be in
+    // capital letters.
+    if(fortran_module_p(get_current_module_entity()))
+        strupper(outline_module_name,outline_module_name);
+
     /* retrieve statement to outline */
-    list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),OUTLINE_PRAGMA) ;
+    list statements_to_outline = find_statements_with_pragma(get_current_module_statement(),get_string_property("OUTLINE_PRAGMA")) ;
     if(ENDP(statements_to_outline)) {
         string label_name = get_string_property("OUTLINE_LABEL");
         if( empty_string_p(label_name) ) {

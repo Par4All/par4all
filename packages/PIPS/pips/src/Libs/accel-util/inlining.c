@@ -525,9 +525,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
     /* fix declarations */
     {
         /* retreive formal parameters*/
-        list formal_parameters = gen_nreverse(
-                module_formal_parameters(inlined_module(p))
-                );
+        list formal_parameters = module_formal_parameters(inlined_module(p));
         list new_old_pairs = NIL ; /* store association between new and old declarations */
         { /* some basic checks */
             size_t n1 = gen_length(formal_parameters), n2 = gen_length(call_arguments(callee));
@@ -551,7 +549,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
                 }
                 else {
                     if(formal_parameter_p(e)) {
-                        new = make_temporary_pointer_to_array_entity(e,expression_undefined);
+                        new = make_temporary_pointer_to_array_entity(e,expression_undefined,get_current_module_entity());
                         expression etmp = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e));
                         replace_entity_by_expression(expanded,e,etmp);
                         free_expression(etmp);
@@ -603,7 +601,7 @@ reget:
                                 }
                                 else
                                 {
-                                    new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
+                                    new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
                                     add_dereferencment=true;
                                 }
                                 AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);
@@ -647,7 +645,7 @@ reget:
                             }
                             else
                             {
-                                new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from));
+                                new = make_temporary_pointer_to_array_entity(e,MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),from),get_current_module_entity());
                                 add_dereferencment=true;
                             }
                             AddLocalEntityToDeclarations(new,get_current_module_entity(),declaration_holder);

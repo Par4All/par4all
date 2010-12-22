@@ -566,6 +566,7 @@ typedef struct {
     hash_table entity_to_entity; ///< mapping between an entity and its strength_reduced value
     entity index;               ///< induction variable
     expression increment;       ///< original loop increment
+    expression init;            ///< original loop increment initial value
     list header_statements;     ///< assignments from external to internal var
     list incr_statements;       ///< the internal vars increments
 } strength_reduction_context_t;
@@ -643,11 +644,18 @@ static bool do_strength_reduction_gather(expression exp, strength_reduction_cont
                 hash_put(ctxt->entity_to_entity,already_there,other);
                 AddEntityToCurrentModule(already_there);
                 /* and fill the header / footer / increment */
+                intptr_t v;
                 ctxt->header_statements=CONS(
                         STATEMENT,
                         make_assign_statement(
                             entity_to_expression(already_there),
-                            entity_to_expression(other)
+                            expression_integer_value(ctxt->init,&v) && v == 0 ?
+                            entity_to_expression(other):
+                            MakeBinaryCall(
+                                entity_intrinsic(PLUS_C_OPERATOR_NAME),
+                                entity_to_expression(other),
+                                copy_expression(ctxt->init)
+                                )
                             ),
                         ctxt->header_statements);
                 /* compute the value of the new increment */
@@ -695,6 +703,7 @@ static void do_strength_reduction_in_loop(loop l) {
         hash_table_make(hash_pointer,HASH_DEFAULT_SIZE),
         loop_index(l),
         range_increment(loop_range(l)),
+        range_lower(loop_range(l)),
         NIL,NIL
     };
     // find all possible & relevant cases and fill the context

@@ -1171,7 +1171,8 @@ bool suppress_dead_code(string mod_name)
   initialize_dead_code_statistics();
   some_unstructured_ifs_have_been_changed = false;
   suppress_dead_code_statement(mod_stmt);
-  insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
+  if(!c_module_p(get_current_module_entity()))
+    insure_return_as_last_statement(get_current_module_entity(), &mod_stmt);
   display_dead_code_statistics();
   free_value_mappings();
   reset_cumulated_rw_effects();

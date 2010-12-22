@@ -155,7 +155,7 @@ static entity build_a_clone_for(entity cloned,
 				comment_prefix,"\n", NULL));
   text_sentences(t) =
     CONS(SENTENCE, make_sentence(is_sentence_formatted, comments), text_sentences(t));
-  add_new_module_from_text(new_name,t,fortran_module_p(cloned),compilation_unit_of_module(get_current_module_name()));
+  add_new_module_from_text(new_name,t,fortran_module_p(cloned),fortran_module_p(cloned)?string_undefined:compilation_unit_of_module(get_current_module_name()));
   free_text(t);
 
   /* should fix the declarations ... but not the language... */

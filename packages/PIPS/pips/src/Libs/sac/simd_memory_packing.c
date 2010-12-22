@@ -37,6 +37,7 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
+#include "accel-util.h"
 
 #include "sac.h"
 
