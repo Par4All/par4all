@@ -19,5 +19,11 @@ display PRINTED_FILE[%ALLFUNC]
 apply GPU_IFY[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 
+apply UNSPLIT[%ALLFUNC]
+
+close
+
+shell cc -c radar.database/Src/radar.c -o radar.database/Tmp/radar.o
+
 
 quit

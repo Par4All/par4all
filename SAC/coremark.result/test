@@ -42,7 +42,6 @@ void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i][j] = A[i][j]*val;
    }
-   ;
 }
 void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
 {
@@ -57,7 +56,6 @@ void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i][j] = A[i][j]*val;
    }
-   ;
 }
 void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
 {
@@ -74,7 +72,6 @@ void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i0][j] = A[i0][j]*val;
    }
-   ;
 }
 void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
 {
@@ -95,57 +92,48 @@ void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i0][j] = pdata0[0]*A[i0][j];
    }
-   ;
 }
 void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
 {
    ee_u32 j;
    //PIPS generated variable
    ee_u32 i0, j0;
+   //PIPS generated variable
+   v4si vec00_0, vec10_0, vec20_0;
    //SAC generated temporary array
    a4hi pdata0 = {val, val, val, val};
+   SIMD_LOAD_V4HI_TO_V4SI(vec10_0, &pdata0[0]);
    for(i0 = 0; i0 <= N-1; i0 += 1) {
-      {
+      for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
          //PIPS:SAC generated v4si vector(s)
-         v4si vec10;
-         SIMD_LOAD_V4HI_TO_V4SI(vec10, &pdata0[0]);
-         for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec00, vec20;
-            SIMD_LOAD_V4HI_TO_V4SI(vec20, &A[i0][j0]);
-            SIMD_MULD(vec00, vec10, vec20);
-            SIMD_STORE_V4SI(vec00, &C[i0][j0]);
-         }
+         SIMD_LOAD_V4HI_TO_V4SI(vec20_0, &A[i0][j0]);
+         SIMD_MULD(vec00_0, vec10_0, vec20_0);
+         SIMD_STORE_V4SI(vec00_0, &C[i0][j0]);
       }
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i0][j] = pdata0[0]*A[i0][j];
    }
-   ;
 }
 void matrix_mul_const(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT val)
 {
    ee_u32 j;
    //PIPS generated variable
    ee_u32 i0, j0;
+   //PIPS generated variable
+   v4si vec00_0, vec10_0, vec20_0;
    //SAC generated temporary array
    a4hi pdata0 = {val, val, val, val};
+   SIMD_LOAD_V4HI_TO_V4SI(vec10_0, &pdata0[0]);
    for(i0 = 0; i0 <= N-1; i0 += 1) {
-      {
+      for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
          //PIPS:SAC generated v4si vector(s)
-         v4si vec10;
-         SIMD_LOAD_V4HI_TO_V4SI(vec10, &pdata0[0]);
-         for(j0 = 0; j0 <= 4*(N/4)-1; j0 += 4) {
-            //PIPS:SAC generated v4si vector(s)
-            v4si vec00, vec20;
-            SIMD_LOAD_V4HI_TO_V4SI(vec20, &A[i0][j0]);
-            SIMD_MULD(vec00, vec10, vec20);
-            SIMD_STORE_V4SI(vec00, &C[i0][j0]);
-         }
+         SIMD_LOAD_V4HI_TO_V4SI(vec20_0, &A[i0][j0]);
+         SIMD_MULD(vec00_0, vec10_0, vec20_0);
+         SIMD_STORE_V4SI(vec00_0, &C[i0][j0]);
       }
       for(j = 4*(N/4); j <= N-1; j += 1)
          C[i0][j] = pdata0[0]*A[i0][j];
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
@@ -192,7 +180,6 @@ void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i][j] = A[i][j]+val;
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
@@ -211,7 +198,6 @@ void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i][j] = A[i][j]+val;
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
@@ -232,7 +218,6 @@ void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i0][j] = A[i0][j]+val;
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
@@ -253,57 +238,48 @@ void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i0][j] = pdata0[0]+A[i0][j];
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
    ee_u32 j;
    //PIPS generated variable
    ee_u32 i0, j0;
+   //PIPS generated variable
+   v8hi vec30_0, vec40_0;
    //SAC generated temporary array
    a8hi pdata0 = {val, val, val, val, val, val, val, val};
+   SIMD_LOAD_V8HI(vec40_0, &pdata0[0]);
    for(i0 = 0; i0 <= N-1; i0 += 1) {
-      {
+      for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
          //PIPS:SAC generated v8hi vector(s)
-         v8hi vec40;
-         SIMD_LOAD_V8HI(vec40, &pdata0[0]);
-         for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
-            //PIPS:SAC generated v8hi vector(s)
-            v8hi vec30;
-            SIMD_LOAD_V8HI(vec30, &A[i0][j0]);
-            SIMD_ADDW(vec30, vec40, vec30);
-            SIMD_STORE_V8HI(vec30, &A[i0][j0]);
-         }
+         SIMD_LOAD_V8HI(vec30_0, &A[i0][j0]);
+         SIMD_ADDW(vec30_0, vec40_0, vec30_0);
+         SIMD_STORE_V8HI(vec30_0, &A[i0][j0]);
       }
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i0][j] = pdata0[0]+A[i0][j];
    }
-   ;
 }
 void matrix_add_const(ee_u32 N, MATDAT A[N][N], MATDAT val)
 {
    ee_u32 j;
    //PIPS generated variable
    ee_u32 i0, j0;
+   //PIPS generated variable
+   v8hi vec30_0, vec40_0;
    //SAC generated temporary array
    a8hi pdata0 = {val, val, val, val, val, val, val, val};
+   SIMD_LOAD_V8HI(vec40_0, &pdata0[0]);
    for(i0 = 0; i0 <= N-1; i0 += 1) {
-      {
+      for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
          //PIPS:SAC generated v8hi vector(s)
-         v8hi vec40;
-         SIMD_LOAD_V8HI(vec40, &pdata0[0]);
-         for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
-            //PIPS:SAC generated v8hi vector(s)
-            v8hi vec30;
-            SIMD_LOAD_V8HI(vec30, &A[i0][j0]);
-            SIMD_ADDW(vec30, vec40, vec30);
-            SIMD_STORE_V8HI(vec30, &A[i0][j0]);
-         }
+         SIMD_LOAD_V8HI(vec30_0, &A[i0][j0]);
+         SIMD_ADDW(vec30_0, vec40_0, vec30_0);
+         SIMD_STORE_V8HI(vec30_0, &A[i0][j0]);
       }
       for(j = 8*(N/8); j <= N-1; j += 1)
          A[i0][j] = pdata0[0]+A[i0][j];
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -375,7 +351,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
          C[i] = C[i]+I_0;
       }
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -420,7 +395,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       }
       C[i] = RED1[0]+C[i];
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -469,7 +443,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       }
       C[i0] = RED1[0]+C[i0];
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -513,7 +486,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       }
       C[i0] = C[i0]+RED1[0];
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -528,6 +500,8 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
    ee_u32 i0, j0;
    //SAC generated temporary array
    a8hi pdata0 = {0, 0, 0, 0, 0, 0, 0, 0};
+   //PIPS generated variable
+   v8hi vec50_0, vec60_0, vec70_0, vec80_0, vec90_0;
    for(i0 = 0; i0 <= N-1; i0 += 1) {
       C[i0] = 0;
       RED0[0] = 0;
@@ -538,20 +512,15 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       RED0[5] = 0;
       RED0[6] = 0;
       RED0[7] = 0;
-      {
+      SIMD_LOAD_V8SI_TO_V8HI(vec80_0, &RED0[0]);
+      for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
          //PIPS:SAC generated v8hi vector(s)
-         v8hi vec50, vec80;
-         SIMD_LOAD_V8SI_TO_V8HI(vec80, &RED0[0]);
-         for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
-            //PIPS:SAC generated v8hi vector(s)
-            v8hi vec60, vec70, vec90;
-            SIMD_LOAD_V8HI(vec70, &B[j0]);
-            SIMD_LOAD_V8HI(vec60, &A[i0][j0]);
-            SIMD_MULW(vec50, vec60, vec70);
-            SIMD_ADDW(vec80, vec50, vec80);
-         }
-         SIMD_STORE_V8HI(vec50, &pdata0[0]);
-         SIMD_STORE_V8HI_TO_V8SI(vec80, &RED0[0]);
+         SIMD_LOAD_V8HI(vec60_0, &A[i0][j0]);
+         SIMD_LOAD_V8HI(vec70_0, &B[j0]);
+         SIMD_MULW(vec50_0, vec60_0, vec70_0);
+         SIMD_STORE_V8HI(vec50_0, &pdata0[0]);
+         SIMD_ADDW(vec80_0, vec50_0, vec80_0);
+         SIMD_STORE_V8HI_TO_V8SI(vec80_0, &RED0[0]);
       }
       C[i0] = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+C[i0]+RED0[0];
       RED1[0] = 0;
@@ -561,7 +530,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       }
       C[i0] = C[i0]+RED1[0];
    }
-   ;
 }
 void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
 {
@@ -572,6 +540,8 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
    signed int RED0[8], RED1[1];
    //PIPS generated variable
    ee_u32 i0, j0;
+   //PIPS generated variable
+   v8hi vec50_0, vec60_0, vec70_0, vec80_0;
    for(i0 = 0; i0 <= N-1; i0 += 1) {
       C[i0] = 0;
       RED0[0] = 0;
@@ -582,19 +552,14 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       RED0[5] = 0;
       RED0[6] = 0;
       RED0[7] = 0;
-      {
+      SIMD_LOAD_V8SI_TO_V8HI(vec80_0, &RED0[0]);
+      for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
          //PIPS:SAC generated v8hi vector(s)
-         v8hi vec50, vec80;
-         SIMD_LOAD_V8SI_TO_V8HI(vec80, &RED0[0]);
-         for(j0 = 0; j0 <= 8*(N/8)-1; j0 += 8) {
-            //PIPS:SAC generated v8hi vector(s)
-            v8hi vec60, vec70, vec90;
-            SIMD_LOAD_V8HI(vec70, &B[j0]);
-            SIMD_LOAD_V8HI(vec60, &A[i0][j0]);
-            SIMD_MULW(vec50, vec60, vec70);
-            SIMD_ADDW(vec80, vec50, vec80);
-         }
-         SIMD_STORE_V8HI_TO_V8SI(vec80, &RED0[0]);
+         SIMD_LOAD_V8HI(vec60_0, &A[i0][j0]);
+         SIMD_LOAD_V8HI(vec70_0, &B[j0]);
+         SIMD_MULW(vec50_0, vec60_0, vec70_0);
+         SIMD_ADDW(vec80_0, vec50_0, vec80_0);
+         SIMD_STORE_V8HI_TO_V8SI(vec80_0, &RED0[0]);
       }
       C[i0] = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+C[i0]+RED0[0];
       RED1[0] = 0;
@@ -604,7 +569,6 @@ void matrix_mul_vect(ee_u32 N, MATRES C[N], MATDAT A[N][N], MATDAT B[N])
       }
       C[i0] = C[i0]+RED1[0];
    }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -681,7 +645,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
             C[i][j] = C[i][j]+I_0;
          }
       }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -727,7 +690,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i][j] = RED3[0]+C[i][j];
       }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -777,7 +739,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i0][j] = RED3[0]+C[i0][j];
       }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -822,7 +783,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i0][j] = C[i0][j]+RED3[0];
       }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -837,6 +797,8 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
    ee_u32 i0, k0;
    //SAC generated temporary array
    a8hi pdata0 = {0, 0, 0, 0, 0, 0, 0, 0};
+   //PIPS generated variable
+   v8hi vec100_0, vec110_0, vec120_0, vec130_0, vec140_0;
    for(i0 = 0; i0 <= N-1; i0 += 1)
       for(j = 0; j <= N-1; j += 1) {
          C[i0][j] = 0;
@@ -848,20 +810,15 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          RED2[5] = 0;
          RED2[6] = 0;
          RED2[7] = 0;
-         {
+         SIMD_LOAD_V8SI_TO_V8HI(vec130_0, &RED2[0]);
+         for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
             //PIPS:SAC generated v8hi vector(s)
-            v8hi vec100, vec130;
-            SIMD_LOAD_V8SI_TO_V8HI(vec130, &RED2[0]);
-            for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
-               //PIPS:SAC generated v8hi vector(s)
-               v8hi vec110, vec120, vec140;
-               SIMD_LOAD_GENERIC_V8HI(vec120, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
-               SIMD_LOAD_V8HI(vec110, &A[i0][k0]);
-               SIMD_MULW(vec100, vec110, vec120);
-               SIMD_ADDW(vec130, vec100, vec130);
-            }
-            SIMD_STORE_V8HI(vec100, &pdata0[0]);
-            SIMD_STORE_V8HI_TO_V8SI(vec130, &RED2[0]);
+            SIMD_LOAD_V8HI(vec110_0, &A[i0][k0]);
+            SIMD_LOAD_GENERIC_V8HI(vec120_0, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
+            SIMD_MULW(vec100_0, vec110_0, vec120_0);
+            SIMD_STORE_V8HI(vec100_0, &pdata0[0]);
+            SIMD_ADDW(vec130_0, vec100_0, vec130_0);
+            SIMD_STORE_V8HI_TO_V8SI(vec130_0, &RED2[0]);
          }
          C[i0][j] = RED2[7]+RED2[6]+RED2[5]+RED2[4]+RED2[3]+RED2[2]+RED2[1]+C[i0][j]+RED2[0];
          RED3[0] = 0;
@@ -871,7 +828,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i0][j] = C[i0][j]+RED3[0];
       }
-   ;
 }
 void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
 {
@@ -882,6 +838,8 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
    signed int RED2[8], RED3[1];
    //PIPS generated variable
    ee_u32 i0, k0;
+   //PIPS generated variable
+   v8hi vec100_0, vec110_0, vec120_0, vec130_0;
    for(i0 = 0; i0 <= N-1; i0 += 1)
       for(j = 0; j <= N-1; j += 1) {
          C[i0][j] = 0;
@@ -893,19 +851,14 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          RED2[5] = 0;
          RED2[6] = 0;
          RED2[7] = 0;
-         {
+         SIMD_LOAD_V8SI_TO_V8HI(vec130_0, &RED2[0]);
+         for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
             //PIPS:SAC generated v8hi vector(s)
-            v8hi vec100, vec130;
-            SIMD_LOAD_V8SI_TO_V8HI(vec130, &RED2[0]);
-            for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
-               //PIPS:SAC generated v8hi vector(s)
-               v8hi vec110, vec120, vec140;
-               SIMD_LOAD_GENERIC_V8HI(vec120, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
-               SIMD_LOAD_V8HI(vec110, &A[i0][k0]);
-               SIMD_MULW(vec100, vec110, vec120);
-               SIMD_ADDW(vec130, vec100, vec130);
-            }
-            SIMD_STORE_V8HI_TO_V8SI(vec130, &RED2[0]);
+            SIMD_LOAD_V8HI(vec110_0, &A[i0][k0]);
+            SIMD_LOAD_GENERIC_V8HI(vec120_0, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
+            SIMD_MULW(vec100_0, vec110_0, vec120_0);
+            SIMD_ADDW(vec130_0, vec100_0, vec130_0);
+            SIMD_STORE_V8HI_TO_V8SI(vec130_0, &RED2[0]);
          }
          C[i0][j] = RED2[7]+RED2[6]+RED2[5]+RED2[4]+RED2[3]+RED2[2]+RED2[1]+C[i0][j]+RED2[0];
          RED3[0] = 0;
@@ -915,7 +868,6 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i0][j] = C[i0][j]+RED3[0];
       }
-   ;
 }
 
 simdized code
@@ -929,6 +881,8 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
    signed int RED2[8], RED3[1];
    //PIPS generated variable
    ee_u32 i0, k0;
+   //PIPS generated variable
+   v8hi vec100_0, vec110_0, vec120_0, vec130_0;
    for(i0 = 0; i0 <= N-1; i0 += 1)
       for(j = 0; j <= N-1; j += 1) {
          C[i0][j] = 0;
@@ -940,19 +894,14 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          RED2[5] = 0;
          RED2[6] = 0;
          RED2[7] = 0;
-         {
+         SIMD_LOAD_V8SI_TO_V8HI(vec130_0, &RED2[0]);
+         for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
             //PIPS:SAC generated v8hi vector(s)
-            v8hi vec100, vec130;
-            SIMD_LOAD_V8SI_TO_V8HI(vec130, &RED2[0]);
-            for(k0 = 0; k0 <= 8*(N/8)-1; k0 += 8) {
-               //PIPS:SAC generated v8hi vector(s)
-               v8hi vec110, vec120, vec140;
-               SIMD_LOAD_GENERIC_V8HI(vec120, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
-               SIMD_LOAD_V8HI(vec110, &A[i0][k0]);
-               SIMD_MULW(vec100, vec110, vec120);
-               SIMD_ADDW(vec130, vec100, vec130);
-            }
-            SIMD_STORE_V8HI_TO_V8SI(vec130, &RED2[0]);
+            SIMD_LOAD_V8HI(vec110_0, &A[i0][k0]);
+            SIMD_LOAD_GENERIC_V8HI(vec120_0, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j], B[4+k0][j], B[5+k0][j], B[6+k0][j], B[7+k0][j]);
+            SIMD_MULW(vec100_0, vec110_0, vec120_0);
+            SIMD_ADDW(vec130_0, vec100_0, vec130_0);
+            SIMD_STORE_V8HI_TO_V8SI(vec130_0, &RED2[0]);
          }
          C[i0][j] = RED2[7]+RED2[6]+RED2[5]+RED2[4]+RED2[3]+RED2[2]+RED2[1]+C[i0][j]+RED2[0];
          RED3[0] = 0;
@@ -962,5 +911,4 @@ void matrix_mul_matrix(ee_u32 N, MATRES C[N][N], MATDAT A[N][N], MATDAT B[N][N])
          }
          C[i0][j] = C[i0][j]+RED3[0];
       }
-   ;
 }

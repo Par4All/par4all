@@ -62,7 +62,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][j].im = a[j][i].im;
       }
    }
-   ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
@@ -83,7 +82,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i][j].im = a[j][i].im;
       }
    }
-   ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
@@ -106,7 +104,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i0][j].im = a[j][i0].im;
       }
    }
-   ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
@@ -129,7 +126,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i0][j].im = a[j][i0].im;
       }
    }
-   ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
@@ -152,7 +148,6 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i0][j].im = a[j][i0].im;
       }
    }
-   ;
 }
 void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
 {
@@ -175,6 +170,5 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          b[i0][j].im = a[j][i0].im;
       }
    }
-   ;
 }
 

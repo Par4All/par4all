@@ -11,7 +11,6 @@ echo Initial code
 echo
 make PRINTED_FILE[%ALL]
 apply SIMPLIFY_SUBSCRIPTS[calc_func]
-activate PRINT_CODE_REGIONS
 
 module matrix_mul_const
 source include/benchmark.tpips.h

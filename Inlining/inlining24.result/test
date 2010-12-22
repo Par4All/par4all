@@ -1658,7 +1658,6 @@ int main()
    
    
    _return1 = ret_2;
-   ;
 }
 
 Code after second flattening of "freia_cipo_outer_gradient" (unrolling should be performed this time)
@@ -1817,7 +1816,6 @@ int main()
    
    
    _return1 = ret_2;
-   ;
 }
 
 Unsplit and compile resulting code

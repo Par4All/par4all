@@ -77,6 +77,5 @@ int main()
       printf("%d", *(a+2));
       return 0;
    }
-   ;
 }
 

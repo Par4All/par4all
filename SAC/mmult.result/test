@@ -272,49 +272,46 @@ void Matrix_Mult(float a[4][4], float b[4][4], float c[4][4])
    int i0, k0, k1, k2, k3;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0};
-   {
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0;
+   SIMD_LOAD_V4SF(vec110_0, &b[3][0]);
+   SIMD_LOAD_V4SF(vec80_0, &b[2][0]);
+   SIMD_LOAD_V4SF(vec50_0, &b[1][0]);
+   SIMD_LOAD_V4SF(vec20_0, &b[0][0]);
+loop0:
+   for(i0 = 0; i0 <= 3; i0 += 1) {
       //PIPS:SAC generated v4sf vector(s)
-      v4sf vec00, vec20, vec30, vec50, vec60, vec80, vec90, vec110;
-loop0:      ;
-      SIMD_LOAD_V4SF(vec20, &b[0][0]);
-      SIMD_LOAD_V4SF(vec50, &b[1][0]);
-      SIMD_LOAD_V4SF(vec80, &b[2][0]);
-      SIMD_LOAD_V4SF(vec110, &b[3][0]);
-      for(i0 = 0; i0 <= 3; i0 += 1) {
-         //PIPS:SAC generated v4sf vector(s)
-         v4sf vec10, vec40, vec70, vec100, vec120, vec130, vec140, vec150, vec160, vec170, vec180, vec190;
-loop1:         ;
-         c[i0][0] = 0;
-         SIMD_LOAD_GENERIC_V4SF(vec10, a[i0][0], a[i0][0], a[i0][0], a[i0][0]);
-         SIMD_MULPS(vec00, vec10, vec20);
-         SIMD_LOAD_GENERIC_V4SF(vec40, a[i0][1], a[i0][1], a[i0][1], a[i0][1]);
-         SIMD_MULPS(vec30, vec40, vec50);
-         SIMD_LOAD_GENERIC_V4SF(vec70, a[i0][2], a[i0][2], a[i0][2], a[i0][2]);
-         SIMD_MULPS(vec60, vec70, vec80);
-         SIMD_LOAD_GENERIC_V4SF(vec100, a[i0][3], a[i0][3], a[i0][3], a[i0][3]);
-         SIMD_MULPS(vec90, vec100, vec110);
+      SIMD_LOAD_GENERIC_V4SF(vec100_0, a[i0][3], a[i0][3], a[i0][3], a[i0][3]);
+      SIMD_LOAD_GENERIC_V4SF(vec70_0, a[i0][2], a[i0][2], a[i0][2], a[i0][2]);
+      SIMD_LOAD_GENERIC_V4SF(vec40_0, a[i0][1], a[i0][1], a[i0][1], a[i0][1]);
+      SIMD_LOAD_GENERIC_V4SF(vec10_0, a[i0][0], a[i0][0], a[i0][0], a[i0][0]);
+loop1:      ;
+      c[i0][0] = 0;
+      SIMD_MULPS(vec00_0, vec10_0, vec20_0);
 
-         c[i0][1] = 0;
+      SIMD_MULPS(vec30_0, vec40_0, vec50_0);
 
-         c[i0][2] = 0;
+      SIMD_MULPS(vec60_0, vec70_0, vec80_0);
 
-         c[i0][3] = 0;
+      SIMD_MULPS(vec90_0, vec100_0, vec110_0);
+
+      c[i0][1] = 0;
+
+      c[i0][2] = 0;
+
+      c[i0][3] = 0;
+
+      SIMD_LOAD_V4SF(vec120_0, &c[i0][0]);
 
 
-         SIMD_LOAD_V4SF(vec120, &c[i0][0]);
-         SIMD_ADDPS(vec120, vec120, vec00);
-         SIMD_STORE_V4SF(vec120, &c[i0][0]);
-         SIMD_ADDPS(vec140, vec120, vec30);
-         SIMD_STORE_V4SF(vec140, &c[i0][0]);
-         SIMD_ADDPS(vec160, vec140, vec60);
-         SIMD_STORE_V4SF(vec160, &c[i0][0]);
-         SIMD_ADDPS(vec180, vec160, vec90);
-         SIMD_STORE_V4SF(vec180, &c[i0][0]);
-      }
-
-
-
-
+      SIMD_ADDPS(vec120_0, vec120_0, vec00_0);
+      SIMD_STORE_V4SF(vec120_0, &c[i0][0]);
+      SIMD_ADDPS(vec140_0, vec120_0, vec30_0);
+      SIMD_STORE_V4SF(vec140_0, &c[i0][0]);
+      SIMD_ADDPS(vec160_0, vec140_0, vec60_0);
+      SIMD_STORE_V4SF(vec160_0, &c[i0][0]);
+      SIMD_ADDPS(vec180_0, vec160_0, vec90_0);
+      SIMD_STORE_V4SF(vec180_0, &c[i0][0]);
    }
 }
 seq-ok

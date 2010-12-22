@@ -71,7 +71,7 @@ void p4a_kernel_0(int tf, int tv, float *I, float *R, int i, float ptrfiltre[tf]
    ptrout[i] = *R;
    ptrout[i] = *I;
 }
-void p4a_kernel_1(int, int, float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+void p4a_kernel_1(int tf, int tv, float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
 
    STAP_PulseComp(tv, in_pulse[*j][*k], tf, filtre, out_pulse[*j][*k]);
@@ -89,7 +89,7 @@ void p4a_kernel_launcher_0(int tf, int tv, float ptrfiltre[tf], float ptrin[tv],
          // To be assigned to a call to P4A_vp_1: i
          p4a_kernel_wrapper_0(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
 }
-void p4a_kernel_launcher_1(float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+void p4a_kernel_launcher_1(int tf, int tv, float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
    //PIPS generated variable
    int i, j, k;
@@ -105,7 +105,7 @@ void p4a_kernel_launcher_1(float filtre[16], float in_pulse[5][32][95], float ou
             // To be assigned to a call to P4A_vp_1: j
             // To be assigned to a call to P4A_vp_2: k
             
-            p4a_kernel_wrapper_1(filtre, &j, &k, in_pulse, out_pulse, tf, tv);
+            p4a_kernel_wrapper_1(tf, tv, filtre, &j, &k, in_pulse, out_pulse);
             k += 1;
          }
          j += 1;
@@ -118,13 +118,13 @@ void p4a_kernel_wrapper_0(int tf, int tv, float *I, float *R, int i, float ptrfi
    // To be assigned to a call to P4A_vp_1: i
    p4a_kernel_0(tf, tv, &*I, &*R, i, ptrfiltre, ptrin, ptrout);
 }
-void p4a_kernel_wrapper_1(float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
+void p4a_kernel_wrapper_1(int tf, int tv, float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
    // To be assigned to a call to P4A_vp_2: k
    
-   p4a_kernel_1(tf, tv, filtre, &*j, &*k, in_pulse, out_pulse, tf, tv);
+   p4a_kernel_1(tf, tv, filtre, &*j, &*k, in_pulse, out_pulse);
 }
 void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
@@ -134,5 +134,5 @@ void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
    float filtre[16];
    
    //init_array();
-   p4a_kernel_launcher_1(filtre, in_pulse, out_pulse, tf, tv);
+   p4a_kernel_launcher_1(tf, tv, filtre, in_pulse, out_pulse);
 }

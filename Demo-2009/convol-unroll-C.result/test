@@ -186,5 +186,4 @@ void convol(int isi, int isj, float new_image[isi][isj], float image[isi][isj], 
                new_image[i][j] = new_image[i][j]+image[i+ki-1][j+kj-1]*kernel[ki][kj];
          new_image[i][j] = new_image[i][j]/9;
       }
-   ;
 }
