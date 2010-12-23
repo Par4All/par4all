@@ -30,7 +30,8 @@ SOURCES = $(F.tex) obtention.txt
 
 F.pdf 	= $(F.tex:%.tex=%.pdf)
 
-INSTALL_DOC =	$(F.pdf)
+INSTALL_DOC = $(F.pdf)
+INSTALL_HTM = $(F.tex:%.tex=%.htdoc)
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
