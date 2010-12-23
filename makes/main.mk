@@ -729,6 +729,7 @@ htm-install .build_htm: $(INSTALL_HTM)
 	# Deal also with directories.
 	# By the way, how to install directories with "install" ?
 	# The cp -r*f*. is to overide read-only that may exist in the target
+	# bad idea: this also copies .svn directories...
 	for f in $(INSTALL_HTM) ; do \
 	  if [ -d $$f ] ; then \
 	    cp -rf $$f $(HTM.d)/$(HTM.subd) ; \
