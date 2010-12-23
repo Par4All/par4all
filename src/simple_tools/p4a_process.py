@@ -16,7 +16,9 @@ from p4a_util import *
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
-    ABORT_ON_USER_ERROR = True,
+    #ABORT_ON_USER_ERROR = True,
+    ABORT_ON_USER_ERROR = False,
+    # Compute the intraprocedural preconditions at the same
     # Compute the intraprocedural preconditions at the same
     # time as transformers and use them to improve the
     # accuracy of expression and statement transformers:
@@ -441,17 +443,16 @@ class p4a_processor(object):
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
             # issue:
-        kernel_launchers.kernel_load_store(concurrent=True,
-                                           ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
-                                           )
+            kernel_launchers.kernel_load_store(concurrent=True,
+                                               ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
+                                               )
         else :
             # Identify kernels first
             kernels.flag_kernel()
-            if  self.com_optimization :
-                #kernel for fftw3 runtime
-                fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
-                fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
-                fftw3_kernels.flag_kernel()
+            #kernel for fftw3 runtime
+            fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
+            fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
+            fftw3_kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
