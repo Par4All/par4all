@@ -33,7 +33,7 @@ F.pdf 	= $(F.tex:%.tex=%.pdf)
 INSTALL_DOC = $(F.pdf)
 
 ngF.tex	= $(wildcard newgen_*.tex)
-INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc)
+INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc) index.htm
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
