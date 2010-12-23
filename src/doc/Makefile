@@ -33,7 +33,7 @@ F.pdf 	= $(F.tex:%.tex=%.pdf)
 INSTALL_DOC = $(F.pdf)
 
 ngF.tex	= $(wildcard newgen_*.tex)
-INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc) index.htm
+INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc) index.html
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
@@ -46,4 +46,4 @@ clean: local-clean
 
 local-clean:
 	$(RM) -r $(INSTALL_DOC) $(PDF) *.htdoc \
-		*.html *.aux *.log *.ps *.dvi *.out *~
+		*.aux *.log *.ps *.dvi *.out *~
