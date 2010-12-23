@@ -24,7 +24,9 @@ ROOT	= ../../..
 TARGET	= gfc2pips
 
 WGET = wget
-MD5SUM = md5sum
+
+# md5sum seems not universally available
+MD5SUM = openssl md5
 
 srcdir = .
 
