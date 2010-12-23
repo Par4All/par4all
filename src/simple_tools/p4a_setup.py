@@ -648,7 +648,7 @@ def work(options, args = None):
     accel_src_dir = os.path.join(root, "src/p4a_accel")
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
-        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu" or ext == ".cpp" :
             run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
 
     # Copy python dependencies and templates.

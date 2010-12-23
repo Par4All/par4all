@@ -16,7 +16,9 @@ from p4a_util import *
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
-    ABORT_ON_USER_ERROR = True,
+    #ABORT_ON_USER_ERROR = True,
+    ABORT_ON_USER_ERROR = False,
+    # Compute the intraprocedural preconditions at the same
     # Compute the intraprocedural preconditions at the same
     # time as transformers and use them to improve the
     # accuracy of expression and statement transformers:
@@ -60,6 +62,8 @@ class p4a_processor_input(object):
     project_name = ""
     accel = False
     cuda = False
+    com_optimization = False
+    fftw3 = False
     openmp = False
     fine = False
     select_modules = ""
@@ -109,6 +113,8 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
+            com_optimization = input.com_optimization,
+            fftw3 = input.fftw3,
             recover_includes = input.recover_includes,
             native_recover_includes = input.native_recover_includes,
             properties = input.properties,
@@ -196,7 +202,8 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False,
+                 filter_exclude = None, accel = False, cuda = False, 
+                 com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  properties = {}, activates = []):
 
@@ -204,6 +211,8 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.com_optimization = com_optimization
+        self.fftw3 = fftw3,
 
         if workspace:
             # There is one provided: use it!
@@ -354,6 +363,14 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization()
 
+    def get_launcher_prefix (self):
+        return self.workspace.props.GPU_LAUNCHER_PREFIX
+
+    def get_kernel_prefix (self):
+        return self.workspace.props.GPU_KERNEL_PREFIX
+
+    def get_wrapper_prefix (self):
+        return self.workspace.props.GPU_WRAPPER_PREFIX
 
     def gpuify(self, filter_select = None, filter_exclude = None):
         """Apply transformations to the parallel loop nested found in the
@@ -368,8 +385,9 @@ class p4a_processor(object):
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
-        # functions have their names beginning with "p4a_kernel_launcher":
-        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+        # functions have their names beginning with the launcher prefix:
+        launcher_prefix = self.get_launcher_prefix ()
+        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
@@ -415,16 +433,27 @@ class p4a_processor(object):
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
                                  concurrent=True)
 
-        # Add communication around all the call site of the kernels:
-        kernel_launchers.kernel_load_store(concurrent=True,
-                                           KERNEL_LOAD_STORE_LOAD_FUNCTION_2D = "P4A_copy_to_accel_2d",
-                                           KERNEL_LOAD_STORE_STORE_FUNCTION_2D = "P4A_copy_from_accel_2d"
-                                           )
-
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
-        kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+        kernel_prefix = self.get_kernel_prefix ()
+        kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+
+        if not self.com_optimization :
+            # Add communication around all the call site of the kernels. Since
+            # the code has been outlined, any non local effect is no longer an
+            # issue:
+            kernel_launchers.kernel_load_store(concurrent=True,
+                                               ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
+                                               )
+        else :
+            # Identify kernels first
+            kernels.flag_kernel()
+            #kernel for fftw3 runtime
+            fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
+            fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
+            fftw3_kernels.flag_kernel()
+            self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
@@ -432,7 +461,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        
+
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
         # original code for more precise analysis but we need to remove
@@ -448,13 +477,18 @@ class p4a_processor(object):
 
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
-        wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+        wrapper_prefix = self.get_wrapper_prefix ()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
         # set return type for wrappers && kernel
         wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
         kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
-        
+
+        if self.com_optimization :
+            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
+            wrappers.cast_at_call_sites()
+
         #self.workspace.all_functions.display()
 
         # To be able to inject Par4All accelerator run time initialization

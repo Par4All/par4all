@@ -26,6 +26,11 @@
 #ifndef P4A_ACCEL_H
 #define P4A_ACCEL_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* For size_t: */
 #include <stddef.h>
 
@@ -139,6 +144,66 @@ void P4A_copy_from_accel_3d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address);
 
+
+/** Prototype for copying memory from a 4D array in the host to the hardware
+    accelerator.
+*/
+void P4A_copy_to_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          const void *host_address,
+          void *accel_address);
+
+
+/** Prototype for copying memory from the hardware accelerator to a 4D
+    array in the host.
+*/
+void P4A_copy_from_accel_4d(size_t element_size,
+          size_t d1_size, size_t d2_size, size_t d3_size, size_t d4_size,
+          size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d4_block_size,
+          size_t d1_offset, size_t d2_offset, size_t d3_offset, size_t d4_offset,
+          void *host_address,
+          const void *accel_address);
+
+
+
+/**
+ * This function return a pointer on the area in the GPU memory corresponding to
+ * an area in the host memory. If the mapping doesn't exist, an area is
+ * allocated in the GPU memory and the mapping is created
+ *
+ * @params host_ptr is the pointer in the host memory
+ * @params size is the size of the area, in case we need to allocate it
+ * @return a pointer in the GPU memory corresponding to host_ptr
+ */
+void * P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size);
+
+
+/**
+ * This function copy "size" bytes from "host_ptr" to the corresponding area in
+ * the GPU memory. The memory area can be allocated if there's none existing
+ *
+ * @params host_ptr is the pointer in the host memory
+ * @params size is the size of the area
+ * @return nothing
+ */
+void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */);
+
+
+
+/**
+ * This function copy "size" bytes to "host_ptr" from the corresponding area in
+ * the GPU memory. An abort is raised if no mapping if found.
+ *
+ * @params host_ptr is the pointer in the host memory
+ * @params size is the size of the area
+ * @return nothing
+ */
+void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
+
+
+
 /** A macro to enable or skip debug instructions
 
     Just define P4A_DEBUG to have debug information at runtime
@@ -177,6 +242,11 @@ void P4A_copy_from_accel_3d(size_t element_size,
 #else
 #error "You have to define either P4A_ACCEL_CUDA or P4A_ACCEL_OPENMP"
 #endif
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif //P4A_ACCEL_H

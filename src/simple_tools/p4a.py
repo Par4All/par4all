@@ -54,6 +54,9 @@ def add_own_options(parser):
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
         help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
 
+    proc_group.add_option("--com-optimization", action = "store_true", default = False,
+        help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
+
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
         help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
@@ -105,6 +108,9 @@ def add_own_options(parser):
 
 
     compile_group = optparse.OptionGroup(parser, "Back-end compilation options")
+
+    compile_group.add_option("--fftw3", action = "store_true", default = False,
+        help = "Use fftw3 library. Do not add -lfftw3 or -lfftw3f, p4a will add it automatically if needed. It's an experimental option, use with care !")
 
     compile_group.add_option("--output-file", "--output", "-o", action = "append", metavar = "FILE", default = [],
         help = "This enables automatic compilation of binaries. There can be several of them. Output files can be .o, .so, .a files or have no extension in which case an executable will be built.")
@@ -306,6 +312,10 @@ def main():
             info("Enabling --accel because of --cuda")
             options.accel = True
 
+        if options.com_optimization and not options.accel:
+            info("Enabling --accel because of --com-optimization")
+            options.accel = True
+
         files = []
         other_files = []
         header_files = []
@@ -342,7 +352,7 @@ def main():
                 header_files.append(abs_file)
                 info("Ignoring header file: " + abs_file)
             else:
-                die("File format not supported: " + abs_file)
+                die("File extension not supported: " + abs_file)
 
         for file in options.extra_file:
             abs_file = os.path.abspath(os.path.expanduser(file))
@@ -412,6 +422,8 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            com_optimization = options.com_optimization,
+            fftw3 = options.fftw3,
             add_debug_flags = options.debug,
             add_optimization_flags = not options.no_fast,
             no_default_flags = options.no_default_flags,
@@ -445,6 +457,8 @@ def main():
             input.project_name = project_name
             input.accel = options.accel
             input.cuda = options.cuda
+            input.com_optimization = options.com_optimization
+            input.fftw3 = options.fftw3
             input.openmp = options.openmp
             input.fine = options.fine
             input.select_modules = options.select_modules

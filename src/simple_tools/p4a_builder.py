@@ -131,7 +131,8 @@ class p4a_builder:
                  nvcc_flags = [], fortran_flags = [],
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
-                 openmp = False, accel_openmp = False, icc = False, cuda = False,
+                 openmp = False, accel_openmp = False, icc = False, 
+                 cuda = False,com_optimization=False,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  no_default_flags = False, build = False
                  ):
@@ -188,6 +189,19 @@ class p4a_builder:
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
+                
+        if com_optimization:
+            self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]
+
+        if fftw3:
+            cpp_flags += [ "-DP4A_RUNTIME_FFTW", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+            self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_fftw3_runtime.cpp") ]
+            if cuda :
+                ld_flags += [ "-lcufft" ]
+            else :
+                ld_flags += [ "-lfftw3 -lfftw3f" ]
+                
+
 
         if add_debug_flags:
             cpp_flags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
