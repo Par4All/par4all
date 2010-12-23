@@ -45,5 +45,5 @@ pdf: $(F.pdf)
 clean: local-clean
 
 local-clean:
-	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) $(PDF) \
+	$(RM) -r $(INSTALL_DOC) $(PDF) *.htdoc \
 		*.html *.aux *.log *.ps *.dvi *.out *~
