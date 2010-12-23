@@ -79,8 +79,9 @@ PY.d	= $(LIB.d)
 DOC.d	= $(INSTALL_DIR)/doc
 MAN.d	= $(INSTALL_DIR)/man
 # By default, install HTML stuff directly into $(HTM.d) but HTM.subd can
-# be used to specify a subdirectory:
-HTM.d	= $(INSTALL_DIR)/html
+# be used to specify a subdirectory. It is put in doc because it helps
+# with the publication of the html documentation.
+HTM.d	= $(INSTALL_DIR)/doc
 UTL.d	= $(INSTALL_DIR)/utils
 SHR.d	= $(INSTALL_DIR)/share
 RTM.d	= $(INSTALL_DIR)/runtime
