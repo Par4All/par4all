@@ -370,7 +370,10 @@ then
   COMPILE_SECONDS=$SECONDS
 
   # get there on success, as report exits
-  [ "$exec" ] && eval "$exec"
+  [ "$exec" ] && {
+    eval "$exec" > out 2> err \
+      || report 'KO:post' 'post-exec' 'post exec failed!'
+  }
 
   # clean up if no error
   rm -f out err
