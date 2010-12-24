@@ -47,3 +47,5 @@ phase3:
 phase4:
 phase5: install
 phase6:
+
+doxygen-publish:
