@@ -370,6 +370,7 @@ then
   COMPILE_SECONDS=$SECONDS
 
   # get there on success, as report exits
+  # should it run after the validation?
   [ "$exec" ] && {
     eval "$exec" > out 2> err \
       || report 'KO:post' 'post-exec' 'post exec failed!'
