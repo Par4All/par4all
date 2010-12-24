@@ -36,6 +36,7 @@
 nice=
 wait=
 tail=
+make=make
 force=
 report=
 source=
@@ -69,10 +70,13 @@ do
     --tail=*) tail=${1//*=/} ;;
     # compilation & validation name
     -v|--vname) vname=$2 ; shift ;;
-    --vname=*) wait=${1//*=/} ;;
+    --vname=*) vname=${1//*=/} ;;
     # environment setup
     -S|--source) source=$2; shift ;;
     --source=*) source=${1//*=/} ;;
+    # make command
+    -m|--make) make=$2; shift ;;
+    --make=*) make=${1//*=/} ;;
     # this help
     -h|--help)
       echo -e \
@@ -82,6 +86,7 @@ do
 	"  -a: compile with autoconf\n" \
 	"  -f: force even if not needed\n" \
 	"  -h: show this help and exit\n"
+	"  -m make: make command\n" \
 	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
 	"  -r: report compilation result even if not changed\n" \
@@ -117,10 +122,9 @@ then
   # note that the reported hardware can be somehow virtual
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
-  make="make -j $jobs -l $load"
+  make+=" -j $jobs -l $load"
   tail=$((12 + 3 * $nproc))
 else
-  make=make
   tail=15
 fi
 
