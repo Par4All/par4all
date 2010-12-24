@@ -42,7 +42,10 @@ all: $(INSTALL_DOC)
 
 pdf: $(F.pdf)
 
-clean: local-clean
+clean: local-clean dox-clean
+
+dox-clean:
+	$(MAKE) -C doxygen clean
 
 local-clean:
 	$(RM) -r $(INSTALL_DOC) $(PDF) *.htdoc \
