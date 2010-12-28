@@ -26,13 +26,13 @@ display PRINTED_FILE[duck2]
 echo
 echo POINTS TO
 echo 
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[duck1]
+#activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[duck1]
 
 echo
 echo POINTS TO
 echo 
-display PRINTED_FILE[duck2]
+#display PRINTED_FILE[duck2]
 
 close
 delete  dereferencing08

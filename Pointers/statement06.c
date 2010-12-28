@@ -9,24 +9,24 @@ int main() {
   d = 4;
 
   pa = &a;
-  ppa = &b;
-  *ppa = &pa;
+  ppa = &pa;
+  *ppa = &b;
 
   pb = &b;
-  ppb = &a;
-  *ppb = &pb;
+  ppb = &pb;
+  *ppb = &a;
 
   pc = &c;
-  ppc = &d;
-  *ppc = &pc;
+  ppc = &pc;
+  *ppc = &a;
 
   pd = &d;
-  ppd = &c;
-  *ppd = &pd;
+  ppd = &pd;
+  *ppd = &c;
 
   pc = pd;
 
-  *ppc = &a;
+  *ppc = &b;
 
   *ppa = pc;
 
