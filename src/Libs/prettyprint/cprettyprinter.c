@@ -887,7 +887,6 @@ static string ppt_call(string in_c, list le)
             scall = strdup(concatenate(old, first? "" : ", ",
 				       expression_scalar_p(e)? "&" : "",
 				       arg, NULL));
-	    //PIER
             //free(arg);
             //free(old);
             first = FALSE;

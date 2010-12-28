@@ -201,7 +201,7 @@ call dimensions_to_dma(entity from,
 		    "KERNEL_LOAD_STORE_..._FUNCTION "
 		    "to a defined entity and added the correct .c file?\n",function_name);
   }
-  else {
+  else if (!fortran_module_p(get_current_module_entity())) {
       AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
   }
 
