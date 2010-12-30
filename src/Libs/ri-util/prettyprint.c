@@ -1847,7 +1847,19 @@ words_goto_label(string tlabel)
 {
     list pc = NIL;
   if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
-    pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+    switch (get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+      break;
+    case is_language_c:
+      pc = CHAIN_SWORD(pc, C_RETURN_FUNCTION_NAME);
+      pc = CHAIN_SWORD(pc, ";");
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+    }
   } else {
     switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
@@ -4258,7 +4270,7 @@ text text_statement_enclosed(entity module,
       if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
 	 || !last_statement_p(stmt))
 	{
-	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, RETURN_FUNCTION_NAME);
+	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, prettyprint_language_is_c_p()?C_RETURN_FUNCTION_NAME";":RETURN_FUNCTION_NAME);
 	  temp = make_text(CONS(SENTENCE, s, NIL));
 	}
       else {
