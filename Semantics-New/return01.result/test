@@ -55,7 +55,7 @@ end:   ;
 //  T(run) {a==1, b==2, run==2}
 
    run = b;
-   goto l0000;
+   return run;
 
 //  T() {a==1, b==0}
 
@@ -75,7 +75,7 @@ l99999:   ;
 
 //  T(run) {a==1, b==2run-2, run==run#init, 1<=run, run<=2}
 
-l0000:   return run;
+   return run;
 }
 
 PRECONDITIONS
@@ -134,7 +134,7 @@ end:   ;
 //  P(a,b,run) {a==1, b==2}
 
    run = b;
-   goto l0000;
+   return run;
 
 //  P(a,b,run) {a==1, b==0}
 
@@ -154,5 +154,5 @@ l99999:   ;
 
 //  P(a,b,run) {a==1, b==2run-2, 1<=run, run<=2}
 
-l0000:   return run;
+   return run;
 }
