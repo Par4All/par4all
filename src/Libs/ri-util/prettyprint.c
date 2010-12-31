@@ -4300,10 +4300,11 @@ text text_statement_enclosed(entity module,
 		  return_statement_p(stmt));
 
       /* do not add a redundant RETURN before an END, unless
-	 requested or unless needed because a value must be returned */
+	 requested or unless needed because a value must be returned
+	 in C */
       if(get_bool_property("PRETTYPRINT_FINAL_RETURN")
 	 || !last_statement_p(stmt)
-	 || !void_function_p(module))
+	 || (!void_function_p(module) && c_module_p(module)))
 	{
 	  sentence s = sentence_undefined;
 	  if(entity_undefined_p(module)
