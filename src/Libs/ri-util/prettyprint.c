@@ -4306,7 +4306,9 @@ text text_statement_enclosed(entity module,
 	 || !void_function_p(module))
 	{
 	  sentence s = sentence_undefined;
-	  if(void_function_p(module) || fortran_module_p(module)) {
+	  if(entity_undefined_p(module)
+	     || void_function_p(module)
+	     || fortran_module_p(module)) {
 	    s = MAKE_ONE_WORD_SENTENCE(nmargin,
 				       prettyprint_language_is_c_p()?
 				       C_RETURN_FUNCTION_NAME";"
