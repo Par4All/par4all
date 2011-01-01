@@ -77,11 +77,11 @@ void run(void)
             n++;
       else if (n==10) {
 
-//  P() {n==10}
+//  P(n) {n==10}
 
          printf("reachable instruction!\n");
 
-//  P() {n==10}
+//  P(n) {n==10}
 
          n = 0;
       }
