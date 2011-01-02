@@ -32,13 +32,14 @@ test -d doxygen && rm -rf doxygen
 # the same files are generated several times
 {
   cat pips/makes/share/doxygen/Doxyfile
-  echo "INPUT = newgen/src/genC linear/src pips/src/Libs pips/src/Passes"
+  echo "INPUT = newgen/src/genC linear/src pips/src/Libs pips/src/Passes pips/src/Documentation/newgen"
   # let us skip gcc sources and .svn
   echo "EXCLUDE_PATTERNS = */.svn/* */Passes/fortran95/gcc-*"
   echo "PROJECT_NAME = PIPS"
   echo "OUTPUT_DIRECTORY = doxygen"
   echo "GENERATE_LATEX = NO"
   echo "HAVE_DOT = YES"
+  echo "SHOW_DIRECTORIES = YES"
 } | doxygen - > doxy.out 2> doxy.err
 
 $rsync doxygen/html/. $ddir/doxygen/.
