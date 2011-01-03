@@ -535,6 +535,24 @@ entity function_to_return_value(entity m)
 
   return rv;
 }
+
+/* Check if m is a C void function or a Fortran subroutine. No
+   information about m is available when FALSE is returned. */
+bool void_function_p(entity m)
+{
+  type ft = ultimate_type(entity_type(m));
+  bool void_p = FALSE;
+
+  if(type_functional_p(ft)) {
+    functional f = type_functional(ft);
+    type r = functional_result(f);
+    if(type_void_p(r)) {
+      void_p = TRUE;
+    }
+  }
+
+  return void_p;
+}
 /*
  *  that is all
  */

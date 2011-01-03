@@ -22,7 +22,8 @@
 #
 # TODO
 # - doxygen?
-# - check documentation generation? I recall that latex errors are ignored in nlpmake.
+# - check documentation generation?
+#   I recall that latex errors are ignored in nlpmake.
 #
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
@@ -33,9 +34,11 @@
 # - if there is a persistant LOCK, investigate by hand...
 
 # default settings
+exec=
 nice=
 wait=
 tail=
+make=make
 force=
 report=
 source=
@@ -52,7 +55,7 @@ do
     # how to compile pips
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
-    --nlpmake=*) autoconf= ; build=${1//*=/} ;;
+    --nlpmake=*) autoconf= ; build=${1#*=} ;;
     -n|--nice) nice=nice ;;
     # force compilation & validation & validation mail
     -f|--force) validate=mail-validate ; force=1 ;;
@@ -60,19 +63,25 @@ do
     -r|--report) report=1 ;;
     # how long to wait for lock
     -w|--wait) wait=1200 ;;
-    --wait=*) wait=${1//*=/} ;;
+    --wait=*) wait=${1#*=} ;;
     # whether to run in parallel
     -p|--parallel) parallel=1 ;;
     -s|--sequential) parallel= ;;
     # trace length to include on compilation error
     -t|--tail) tail=$2 ; shift ;;
-    --tail=*) tail=${1//*=/} ;;
+    --tail=*) tail=${1#*=} ;;
     # compilation & validation name
     -v|--vname) vname=$2 ; shift ;;
-    --vname=*) wait=${1//*=/} ;;
+    --vname=*) vname=${1#*=} ;;
     # environment setup
     -S|--source) source=$2; shift ;;
-    --source=*) source=${1//*=/} ;;
+    --source=*) source=${1#*=} ;;
+    # make command
+    -m|--make) make=$2; shift ;;
+    --make=*) make=${1#*=} ;;
+    # execute on success
+    -e|--exec) exec=$2; shift ;;
+    --exec=*) exec=${1#*=} ;;
     # this help
     -h|--help)
       echo -e \
@@ -80,8 +89,10 @@ do
         "check pips compilation and validation health\n" \
 	"available options:\n" \
 	"  -a: compile with autoconf\n" \
+        "  -e exec: execute with eval on success\n" \
 	"  -f: force even if not needed\n" \
 	"  -h: show this help and exit\n"
+	"  -m make: make command\n" \
 	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
 	"  -r: report compilation result even if not changed\n" \
@@ -117,10 +128,9 @@ then
   # note that the reported hardware can be somehow virtual
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
-  make="make -j $jobs -l $load"
+  make+=" -j $jobs -l $load"
   tail=$((12 + 3 * $nproc))
 else
-  make=make
   tail=15
 fi
 
@@ -215,7 +225,8 @@ function report()
 	svn log --revision COMMITTED $repos
       done
     fi
-  } | mailx -a "Reply-To: $dest" -s "$vname $arch compilation status is $current" $dest
+  } | mailx -a "Reply-To: $dest" \
+          -s "$vname $arch compilation status is $current" $dest
 
   # fix compile with previous state on 'unchanged'
   [ $compile = 'unchanged' ] && compile=$prevcomp
@@ -326,7 +337,7 @@ then
     # polylib is assumed to be available somewhere
     # aggressive cleanup
     rm -rf ../install
-    # ???
+    # should not be needed???
     $nice $make unbuild > out 2> err \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     $nice $make auto > out 2> err \
@@ -357,6 +368,13 @@ then
 
   # record compilation time, for "report"
   COMPILE_SECONDS=$SECONDS
+
+  # get there on success, as report exits
+  # should it run after the validation?
+  [ "$exec" ] && {
+    eval "$exec" > out 2> err \
+      || report 'KO:post' 'post-exec' 'post exec failed!'
+  }
 
   # clean up if no error
   rm -f out err

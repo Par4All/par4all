@@ -2411,6 +2411,44 @@ statement add_declaration_statement(statement s, entity e)
     return s;
 }
 
+/* s is assumed to be a block statement and its declarations field is
+   assumed to be correct, but not necessarily the declaration
+   statements within the block s. This function checks that no variable is
+   declared by a declaration statement within the block but not
+   declared at the block level. Also, if a variable is declared at the
+   block level but not by a declaration statement, a new declaration
+   statement is added. */
+void fix_block_statement_declarations(statement s)
+{
+  list bdvl = gen_copy_seq(statement_declarations(s)); // block declarations
+
+  pips_assert("s is a block statement", statement_block_p(s));
+
+  if(!ENDP(bdvl)) {
+    list sl = statement_block(s);
+    list edvl = statements_to_direct_declarations(sl); // effective declarations
+    list mdvl = gen_copy_seq(statement_declarations(s)); // block declarations
+
+    // List of variables declared within the block but not at the
+    // block level
+    gen_list_and_not(&mdvl, edvl); // missing declarations
+
+    // Add the missing declaration statements.
+    // Might be better to add only one statement for all missing variables...
+    FOREACH(ENTITY, v, mdvl) {
+      add_declaration_statement(s, v);
+    }
+    gen_free_list(mdvl);
+
+    // List of variables declared within the block but not at the
+    // block level
+    gen_list_and_not(&edvl, bdvl);
+
+    pips_assert("edvl-bdvl=empty set", ENDP(edvl));
+    gen_free_list(edvl);
+  }
+  gen_free_list(bdvl);
+}
 
 /* Declarations are not only lists of entities, but also statement to
    carry the line number, comments,... For the time begin, a
