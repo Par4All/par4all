@@ -223,6 +223,31 @@ static string scalar_postlude () {
   return (result == NULL) ? strdup("") : result;
 }
 
+/// @brief we want to decide if a scalar variable need to be
+/// passed by pointer or by value to a C function.
+/// Fortran77 assumes that all scalars are
+/// passed by pointer. Starting With Fotran95,
+/// the arguments can be passed by value by using interfaces.
+/// @return true if the variable has to be passed by pointer
+/// @param var, the variable to be test as an entity
+static bool scalar_by_pointer (entity var) {
+  // init result to false
+  bool result = false;
+  if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == false)) {
+    // no interface, var is a scalar
+    result = true;
+  }
+  else if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == true) &&
+	   (get_bool_property ("CROUGH_ALL_SCALAR_BY_VALUE") == false) &&
+	   (written_p (var) == true)) {
+    // interface exists but var is written (and user doesn't use the property
+    // to force the passing of scalar by  value)
+    result = true;
+  }
+
+  return result;
+}
+
 /************************************************************** DECLARATIONS */
 
 /*
@@ -418,9 +443,11 @@ static string c_dim_string(list ldim, bool fct_sig)
 		    sup = words_to_string(words_expression(eup, NIL));
 		    if (fct_sig == true) {
 		      string tmp = NULL;
-		      tmp = strdup (concatenate ("(*",sup, SCALAR_IN_SIG_EXT, ")", NULL));
-		      free (sup);
-		      sup = tmp;
+		      if (get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == false) {
+			tmp = strdup (concatenate ("(*",sup, SCALAR_IN_SIG_EXT, ")", NULL));
+			free (sup);
+			sup = tmp;
+		      }
 		    }
 		    result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
 		    free(sup);
@@ -561,9 +588,12 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 sd = c_dim_string(variable_dimensions(v), fct_sig);
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
-		// if the variable is a scalar inside a function signature a
-		// "*" must be added because fortran assumes passing by pointers
-		if ((variable_dimensions(v)==NIL)&&(fct_sig==true)) {
+
+		// In the case of a signature check if the scalar need to
+		// be passed by pointer. If the check return true
+		// a "*" must be added
+		if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
+		    (scalar_by_pointer (var) == true)) {
 		  ext = SCALAR_IN_SIG_EXT;
 		  sptr = "*";
 		  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
@@ -732,7 +762,9 @@ static string c_declarations(
             first = FALSE;
         }
     }
-    if (lastsep)
+    // insert the last separtor if required and if at least one declaration
+    // has been inserted.
+    if (lastsep && !first)
       result = strdup(concatenate(result, separator, NULL));
     return result;
 }

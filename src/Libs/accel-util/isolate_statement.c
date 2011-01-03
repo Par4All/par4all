@@ -55,6 +55,7 @@
 #include "callgraph.h"
 #include "expressions.h"
 #include "accel-util.h"
+#include "hpfc.h"
 
 
 /**
@@ -203,7 +204,8 @@ call dimensions_to_dma(entity from,
   }
   else if (!fortran_module_p(get_current_module_entity())) {
       AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
-  }
+  } else
+    AddEntityToModule(mcpy,get_current_module_entity());
 
   /* Scalar detection: */
   bool scalar_entity = entity_scalar_p(from);
