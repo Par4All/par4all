@@ -1,5 +1,5 @@
 /* example from Serge Guelton */
-
+#include<stdio.h>
 int duck1(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
    int *zaza = (int *) fifi+(3-1-0+1)*1;

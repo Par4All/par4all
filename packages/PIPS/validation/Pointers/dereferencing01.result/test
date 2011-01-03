@@ -15,18 +15,18 @@ Proper effetcs for "dereferencing01"
 
 void dereferencing01()
 {
-//               <must be written>: x
+//             <    is written>: x
    double x = 1.;
-//               <must be written>: p
+//             <    is written>: p
    double *p = &x;
-//               <must be written>: q
+//             <    is written>: q
    double *q = 0;
-//               <must be read   >: p
-//               <must be written>: q
+//             <    is read   >: p
+//             <    is written>: q
 
    q = p;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p = 2.;
 }
 
@@ -37,13 +37,13 @@ void dereferencing01()
 {
 //  points to = {}
    double x = 1.;
-//  points to = {}
+//  {(p,x,-Exact-)}
    double *p = &x;
-//  points to = {}
+//  {(p,x,-Exact-)}
    double *q = 0;
-//  points to = {}
+//  {(p,x,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    q = p;
-//  {(q,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(p,x,-Exact-);(q,x,-Exact-)}
    *p = 2.;
 }

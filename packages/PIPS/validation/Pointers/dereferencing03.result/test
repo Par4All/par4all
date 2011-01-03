@@ -16,12 +16,12 @@ void dereferencing03()
 {
    double *p;
    int i;
-//               <must be read   >: p
-//               <must be written>: p[1]
+//             <    is read   >: p
+//             <    is written>: p[1]
 
    *(p+1) = 0.;
-//               <must be read   >: i p
-//               <must be written>: p[i]
+//             <    is read   >: i p
+//             <    is written>: p[i]
    *(p+i) = 0.;
 }
 
@@ -30,13 +30,13 @@ POINTS TO
 //  {}
 void dereferencing03()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    double *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    *(p+1) = 0.;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    *(p+i) = 0.;
 }

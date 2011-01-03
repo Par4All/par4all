@@ -1,5 +1,5 @@
 c square matrix multiplication
-      program matmul
+      program matmul01
       integer n
       parameter (n=100)
       integer a(n,n), b(n,n), c(n,n), x

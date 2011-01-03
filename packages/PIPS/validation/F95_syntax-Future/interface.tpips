@@ -1,0 +1,20 @@
+delete interface
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create interface interface.f95
+
+display PRINTED_FILE(TEST)
+
+apply UNSPLIT (%ALL)
+
+echo
+echo "compile sources produced by pips"
+echo
+shell gcc -c -o interface.database/Src/interface.o interface.database/Src/interface.f90
+
+close
+
+delete interface
+quit
+# EOF

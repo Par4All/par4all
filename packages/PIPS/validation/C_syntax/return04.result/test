@@ -9,17 +9,17 @@ int return04()
    if (i) {
       j = 1;
       return04 = 1;
-      goto l0000;
+      return return04;
    }
    else {
       j = 2;
       return04 = 2;
-      goto l0000;
+      return return04;
    }
    j = 3;
    return04 = 3;
-   goto l0000;
-l0000:   return return04;
+   return return04;
+   return return04;
 }
 
 Printed file
@@ -32,11 +32,11 @@ int return04()
    if (i) goto l99999;
    j = 2;
    return04 = 2;
-   goto l0000;
+   return return04;
 l99999:   ;
    j = 1;
    return04 = 1;
-l0000:   return return04;
+   return return04;
 }
 
 Printed file after control restructuring
@@ -54,5 +54,5 @@ int return04()
       j = 2;
       return04 = 2;
    }
-l0000:   return return04;
+   return return04;
 }

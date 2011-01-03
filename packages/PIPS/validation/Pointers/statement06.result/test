@@ -4,64 +4,64 @@ int main()
    int a, b, c, d;
    int *pa, *pb, *pc, *pd;
    int **ppa, **ppb, **ppc, **ppd;
-//               <must be written>: a
+//             <    is written>: a
    a = 1;
-//               <must be written>: b
+//             <    is written>: b
    b = 2;
-//               <must be written>: c
+//             <    is written>: c
    c = 3;
-//               <must be written>: d
+//             <    is written>: d
    d = 4;
-//               <must be written>: pa
+//             <    is written>: pa
 
    pa = &a;
-//               <must be written>: ppa
-   ppa = &b;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ppa
-   *ppa = &pa;
-//               <must be written>: pb
+//             <    is written>: ppa
+   ppa = &pa;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppa
+   *ppa = &b;
+//             <    is written>: pb
 
    pb = &b;
-//               <must be written>: ppb
-   ppb = &a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ppb
-   *ppb = &pb;
-//               <must be written>: pc
+//             <    is written>: ppb
+   ppb = &pb;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppb
+   *ppb = &a;
+//             <    is written>: pc
 
    pc = &c;
-//               <must be written>: ppc
-   ppc = &d;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ppc
-   *ppc = &pc;
-//               <must be written>: pd
+//             <    is written>: ppc
+   ppc = &pc;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppc
+   *ppc = &a;
+//             <    is written>: pd
 
    pd = &d;
-//               <must be written>: ppd
-   ppd = &c;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ppd
-   *ppd = &pd;
-//               <must be read   >: pd
-//               <must be written>: pc
+//             <    is written>: ppd
+   ppd = &pd;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppd
+   *ppd = &c;
+//             <    is read   >: pd
+//             <    is written>: pc
 
    pc = pd;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: ppc
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppc
 
-   *ppc = &a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: pc ppa
+   *ppc = &b;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pc ppa
 
    *ppa = pc;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: pa
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: pa
 
    pa = *ppd;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    *ppa = *ppd;
 
@@ -128,91 +128,80 @@ int main()
 //   -Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppb,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   ppa = &b;
+   ppa = &pa;
 //  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,-Exact-);(pc,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,b,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   *ppa = &pa;
-//  {(b,pa,-Exact-);(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,b,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   *ppa = &b;
+//  {(pa,b,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pb = &b;
-//  {(b,pa,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,b,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   ppb = &a;
-//  {(b,pa,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(ppc,
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   *ppb = &pb;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+   ppb = &pb;
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   *ppb = &a;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pc = &c;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,
-//   c,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   ppc = &d;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(pa,a,-Exact-);(pb,b,-Exact-);(pc,
-//   c,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   *ppc = &pc;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(d,pc,-Exact-);(pa,a,-Exact-);(pb,
-//   b,-Exact-);(pc,c,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,b,-Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   ppc = &pc;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   *ppc = &a;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pd = &d;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(d,pc,-Exact-);(pa,a,-Exact-);(pb,
-//   b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,
-//   -Exact-);(ppc,d,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   ppd = &c;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(d,pc,-Exact-);(pa,a,-Exact-);(pb,
-//   b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,b,-Exact-);(ppb,a,
-//   -Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
-   *ppd = &pd;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(c,pd,-Exact-);(d,pc,-Exact-);(pa,
-//   a,-Exact-);(pb,b,-Exact-);(pc,c,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   ppd = &pd;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+   *ppd = &c;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    pc = pd;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(c,pd,-Exact-);(d,pc,-Exact-);(pa,
-//   a,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
-   *ppc = &a;
-//  {(a,pb,-Exact-);(b,pa,-Exact-);(c,pd,-Exact-);(d,a,-Exact-);(pa,a,
-//   -Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+   *ppc = &b;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    *ppa = pc;
-//  {(a,pb,-Exact-);(b,d,-Exact-);(c,pd,-Exact-);(d,a,-Exact-);(pa,a,
-//   -Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    pa = *ppd;
-//  {(a,pb,-Exact-);(b,d,-Exact-);(c,pd,-Exact-);(d,a,-Exact-);(pa,pd,
-//   -Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    *ppa = *ppd;
-//  {(a,pb,-Exact-);(b,pd,-Exact-);(c,pd,-Exact-);(d,a,-Exact-);(pa,
-//   pd,-Exact-);(pb,b,-Exact-);(pc,d,-Exact-);(pd,d,-Exact-);(ppa,b,
-//   -Exact-);(ppb,a,-Exact-);(ppc,d,-Exact-);(ppd,c,-Exact-)}
+//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    return 0;
    // END BLOCK

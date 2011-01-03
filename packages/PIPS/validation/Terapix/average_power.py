@@ -67,7 +67,7 @@ if __name__ == "__main__":
 	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 	#			m.display()
 				kernels+=[l2]
-				m.isolate_statement(label=l2.label)
+				m.isolate_statement(label=l2.label, ISOLATE_STATEMENT_EVEN_NON_LOCAL = True)
 	m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.display()
