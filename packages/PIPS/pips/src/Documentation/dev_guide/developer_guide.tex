@@ -261,12 +261,6 @@ know by a PIPS programmer as modules and submodules.
 
 \subsection{Developing with Eclipse}
 \label{sec:developing-with-eclipse}
-\newcommand{\inclEclipse}[2]{
-  \begin{center}
-  \noindent
-  \includegraphics[scale=#1]{eclipse/#2}
-  \end{center}
-}
 
 Eclipse is a multi-language software development environment comprising an 
 integrated development environment (IDE) and an extensible plug-in system. 
@@ -290,8 +284,14 @@ need to have both project in the same workspace.
 The creation of a project in a workspace is easy and suppose that you already 
 have PIPS sources somewhere on you hard drive.
 
-\inclEclipse{0.4}{eclipse-project-creation-1}
-\inclEclipse{0.35}{eclipse-project-creation-2}
+\begin{center}
+\noindent
+\includegraphics[scale=0.4]{eclipse/eclipse-project-creation-1.png}
+\end{center}
+\begin{center}
+\noindent
+\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-2.png}
+\end{center}
 
 First use menu \textit{File} $=>$ \textit{New} $=>$ \textit{Project} or 
 right-click and contextual menu as shown on 
@@ -311,11 +311,17 @@ a little. You'll find some part of the underlined by Eclipse. Eclipse just like
 your favorite compiler detect undefined symbol and report it to you in a 
 friendly way.
 
-\inclEclipse{0.4}{eclipse-missing-includes}
+\begin{center}
+\noindent
+\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes.png}
+\end{center}
 
 We are missing Newgen and Linear includes, we have only default Eclipse includes :
 
-\inclEclipse{0.4}{eclipse-missing-includes-2}
+\begin{center}
+\noindent
+\includegraphics[scale=0.4]{eclipse/eclipse-missing-includes-2.png}
+\end{center}
 
 Select project root and push \textit{alt+enter} or right click on it and select properties 
 item in the contextual menu. Then go to C/C++ General submenu and select Paths 
@@ -323,7 +329,10 @@ and Symbols. In the Includes tab select language GNU C in the left part and clic
 add. Then choose \textit{Workspace...} and find you pips/include/ dir. Repeat 
 the same operation for including Newgen and Linear include dirs.
 
-\inclEclipse{0.35}{eclipse-project-creation-add-includes}
+\begin{center}
+\noindent
+\includegraphics[scale=0.35]{eclipse/eclipse-project-creation-add-includes.png}
+\end{center}
 
 Validate two times and accept to rebuild the index when Eclipse ask. After index
 rebuilding you can observe that the code is no longer underlined :-)
@@ -333,7 +342,10 @@ rebuilding you can observe that the code is no longer underlined :-)
 Eclipse provide many features to help you becoming more productive. Firstly is
 the vertical bar just right to the code :
 
-\inclEclipse{0.4}{eclipse-shortcut-vertical-bar}
+\begin{center}
+\noindent
+\includegraphics[scale=0.4]{eclipse/eclipse-shortcut-vertical-bar.png}
+\end{center}
 
 Clicking on this bar make you move inside a source file quickly, there is kind
 of colored \textit{post it} that are shortcut. Color informs you from what's
@@ -342,7 +354,10 @@ occurence of currently focused variable (very useful !), and blue are occurence
 of \textit{FIXME} stickers in comments (use it !). Yes I know that there's a lot 
 of blue post it in chains ;-)
 
-\inclEclipse{0.4}{eclipse-completion}
+\begin{center}
+\noindent
+\includegraphics[scale=0.4]{eclipse/eclipse-completion.png}
+\end{center}
 
 Eclipse provide you some completion capabilities, try to write the begin of a 
 symbol at some place in the code and hit \textit{ctrl+enter}
@@ -357,7 +372,10 @@ Another very pleasant feature is the lookup windows, which you can get using
 \textit{ctrl+alt+t} or menu \textit{Navigate} $=>$ \textit{Open element}. You 
 can use the star as a joker for searching symbol by their name.
 
-\inclEclipse{0.35}{eclipse-symbol-lookup}
+\begin{center}
+\noindent
+\includegraphics[scale=0.35]{eclipse/eclipse-symbol-lookup.png}
+\end{center}
 
 PIPS/Newgen make high usage of macro, Eclipse has a powerful macro expansion 
 step-by-step. You can have a quick view by moving your pointer over the macro. 

@@ -9661,7 +9661,7 @@ rules. New array declarations in the called procedure are
 computed with respect to the declarations in the calling procedures.
 It is  faster than the first one because convex array regions are not needed.
 
-This phase is implemented by Thi Viet Nga \textsc{Nguyen}.
+This phase is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9685,7 +9685,7 @@ array in each module are merged and a new value for the upper bound of the last
 dimension is calculated and then it will replace the 1 or *.
 
 This function is firstly implemented by Trinh Quoc \textsc{Anh}, and
-ameliorated by Corinne \textsc{Ancourt}, Thi Viet Nga \textsc{Nguyen}.
+ameliorated by Corinne \textsc{Ancourt} and Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10045,7 +10045,7 @@ regions. They are used to prove that all accessed in a compound
 statement are correct.
 
 These two dynamic analyses are implemented for Fortran. They are
-described in Nga Nguyen's PhD\marginpar{reference to be added}. They
+described in Nga Nguyen's PhD (see~\cite{Nguyen2002}). They
 may work for C code, but this has not been validated.
 
 
@@ -10151,7 +10151,7 @@ array_bound_check_interprocedural             > MODULE.code
 We provide here a tool to calculate the number of dynamic bound checks
 from both initial and PIPS generated code.
 
-These transformations are implemented by Thi Viet Nga \textsc{Nguyen}.
+These transformations are implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10249,7 +10249,7 @@ offsets of actual parameters to formal parameters following a certain call
 path. Precise alias information are computed for both scalar and array
 variables. The analysis is called alias propagation.
 
-This analysis is implemented by Thi Viet Nga \textsc{Nguyen}.
+This analysis is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10288,7 +10288,7 @@ not. If these informations are not known at compile-time, we instrument
 the code with tests that check the violation dynamically during
 execution of program.
 
-This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 % Attention : will we use the preconditions, regions, effects ?
@@ -10337,7 +10337,7 @@ check for the formal parameters in the current module or not. In addition,
 we produce information in the resource MODULE.ubs to tell if the formal
 parameters of the called procedures have to be checked or not.
 
-This verification is implemented by Thi Viet Nga \textsc{Nguyen}.
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14366,6 +14366,11 @@ on-line and regularly updated.
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}
   Morgan Kaufmann Publishers, 1997
+
+\bibitem{Nguyen2002} Thi Viet Nga Nguyen, {\em Effeicient and
+    Effective Software verifications for Scientific Applications Using
+    Static analysis and Code Instrumentation}, PhD Ecole nationale
+  Superieure des Mines de Paris, 2002.
 
 \bibitem{Ost83} L.~J.~Osterweil, TOOLPACK - An Experimental Software
     Development Environment Research Project,
