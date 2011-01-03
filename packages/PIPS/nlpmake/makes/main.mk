@@ -79,8 +79,9 @@ PY.d	= $(LIB.d)
 DOC.d	= $(INSTALL_DIR)/doc
 MAN.d	= $(INSTALL_DIR)/man
 # By default, install HTML stuff directly into $(HTM.d) but HTM.subd can
-# be used to specify a subdirectory:
-HTM.d	= $(INSTALL_DIR)/html
+# be used to specify a subdirectory. It is put in doc because it helps
+# with the publication of the html documentation.
+HTM.d	= $(INSTALL_DIR)/doc
 UTL.d	= $(INSTALL_DIR)/utils
 SHR.d	= $(INSTALL_DIR)/share
 RTM.d	= $(INSTALL_DIR)/runtime
@@ -729,6 +730,7 @@ htm-install .build_htm: $(INSTALL_HTM)
 	# Deal also with directories.
 	# By the way, how to install directories with "install" ?
 	# The cp -r*f*. is to overide read-only that may exist in the target
+	# bad idea: this also copies .svn directories...
 	for f in $(INSTALL_HTM) ; do \
 	  if [ -d $$f ] ; then \
 	    cp -rf $$f $(HTM.d)/$(HTM.subd) ; \
