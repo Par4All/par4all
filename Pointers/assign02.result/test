@@ -4,18 +4,18 @@ POINTS TO for "make_s"
 //  {}
 s_t make_s(int i, float x)
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    s_t *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *malloc(int);
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    p->entier = i;
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    p->reel = x;
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    return *p;
 }
 
