@@ -1,0 +1,16 @@
+setenv WKS interface01
+
+delete $WKS
+
+#setenv CPRETTYPRINTER_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+apply PRINT_INTERFACE [foo]
+
+
+close $WKS
+#delete $WKS
+quit
