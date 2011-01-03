@@ -5,19 +5,21 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
+import p4a_builder 
+import p4a_opts
+import p4a_process 
+import p4a_util 
+import os
+import re
+import optparse
+import tempfile
 
 """ @mainpage Par4All frontend
 
 Par4All frontend implementation
 """
 
-import string, sys, os, re, optparse
-from p4a_util import *
-from p4a_process import *
-from p4a_builder import *
-from p4a_git import *
-from p4a_version import *
-from p4a_opts import *
+
 
 # To store some arbitrary Python code to be executed inside p4a_process,
 # since p4a_process itself is normally executed inside another process:
@@ -240,23 +242,23 @@ def pips_output_filter(s):
     elif began_comment:
         began_comment += s
         if s.find("\" is lost") != -1:
-            warn("PIPS: " + began_comment)
+            p4a_util.warn("PIPS: " + began_comment)
             already_printed_warning_errors.append(began_comment)
             began_comment = ""
     elif s.find("Cannot preprocess file") != -1:
-        error("PIPS: " + s)
+        p4a_util.error("PIPS: " + s)
     elif error_re.search(s) and s not in already_printed_warning_errors:
-        error("PIPS: " + s)
+        p4a_util.error("PIPS: " + s)
         already_printed_warning_errors.append(s)
     elif warning_re.search(s) and not property_redefined_re.search(s) and s not in already_printed_warning_errors:
-        warn("PIPS: " + s)
+        p4a_util.warn("PIPS: " + s)
         already_printed_warning_errors.append(s)
     elif s.find("python3.1: No such file or directory") != -1:
-        error("Python 3.1 is required to run the post-processor, please install it")
+        p4a_util.error("Python 3.1 is required to run the post-processor, please install it")
     elif s.find("p4a_process: ") == 0:
-        debug(s, bare = True)
+        p4a_util.debug(s, bare = True)
     else:
-        debug("PIPS: " + s)
+        p4a_util.debug("PIPS: " + s)
 
 
 def main():
@@ -266,7 +268,7 @@ def main():
     # Define all the p4a options:
     add_own_options(parser)
     # Add also all the options common to all the p4a tools:
-    add_common_options(parser)
+    p4a_opts.add_common_options(parser)
 
     # Parse the arguments
     (options, args) = parser.parse_args()
@@ -278,7 +280,7 @@ def main():
         # The local variables upwards are not modified
         #print local_var
 
-    if process_common_options(options, args):
+    if p4a_opts.process_common_options(options, args):
         # Delay the PyPS import to be able to give an explicative error message:
         pyps = None
         try:
@@ -287,33 +289,33 @@ def main():
             pass
 
         if pyps is None:
-            p4a_die_env("Cannot find PyPS!")
+            p4a_util.p4a_die_env("Cannot find PyPS!")
         if "P4A_ROOT" not in os.environ:
-            p4a_die_env("P4A_ROOT environment variable is not set!")
+            p4a_util.p4a_die_env("P4A_ROOT environment variable is not set!")
         if "P4A_ACCEL_DIR" not in os.environ:
-            p4a_die_env("P4A_ACCEL_DIR environment variable is not set!")
+            p4a_util.p4a_die_env("P4A_ACCEL_DIR environment variable is not set!")
         if not os.path.isdir(os.environ["P4A_ROOT"]):
-            p4a_die_env("Directory pointed by P4A_ROOT environment variable does not exist!")
+            p4a_util.p4a_die_env("Directory pointed by P4A_ROOT environment variable does not exist!")
         if not os.path.isdir(os.environ["P4A_ACCEL_DIR"]):
-            p4a_die_env("Directory pointed by P4A_ACCEL_DIR environment variable does not exist!")
+            p4a_util.p4a_die_env("Directory pointed by P4A_ACCEL_DIR environment variable does not exist!")
 
         # Check options and set up defaults.
         if len(args) == 0:
-            die("Missing input files")
+            p4a_util.die("Missing input files")
 
         if options.simple and (options.cuda or options.openmp):
-            die("Cannot combine --simple with --cuda and/or --openmp")
+            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp")
 
         if not options.simple and not options.cuda and not options.openmp:
-            info("Defaulting to --openmp")
+            p4a_util.info("Defaulting to --openmp")
             options.openmp = True
 
         if options.cuda and not options.accel:
-            info("Enabling --accel because of --cuda")
+            p4a_util.info("Enabling --accel because of --cuda")
             options.accel = True
 
         if options.com_optimization and not options.accel:
-            info("Enabling --accel because of --com-optimization")
+            p4a_util.info("Enabling --accel because of --com-optimization")
             options.accel = True
 
         files = []
@@ -324,43 +326,43 @@ def main():
         for file in args:
             abs_file = os.path.abspath(os.path.expanduser(file))
             if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
-                die("Invalid/missing input file: " + abs_file)
+                p4a_util.die("Invalid/missing input file: " + abs_file)
             # Check if file has the .p4a suffix, and skip it it is the case:
-            if change_file_ext(abs_file, "").endswith(".p4a"):
-                warn("Ignoring already processed file: " + file)
+            if p4a_util.change_file_ext(abs_file, "").endswith(".p4a"):
+                p4a_util.warn("Ignoring already processed file: " + file)
                 continue
             # Check that a file with the exact same path is not already included:
             if abs_file in files or abs_file in other_files or abs_file in header_files:
-                warn("Ignoring second mention of file: " + abs_file)
+                p4a_util.warn("Ignoring second mention of file: " + abs_file)
                 continue
             # Check that there is no file with the same name in files
             # to be processed by PIPS (PIPS does not accept several files
             # with same name):
             for review_file in files:
                 if os.path.split(review_file)[1] == os.path.split(abs_file)[1]:
-                    error(review_file + " has same name as " + abs_file)
-                    die("PIPS does not accept several files with same name")
-            report_add_file(file)
-            ext = get_file_ext(abs_file)
-            if c_file_p(file) or fortran_file_p(file):
+                    p4a_util.error(review_file + " has same name as " + abs_file)
+                    p4a_util.die("PIPS does not accept several files with same name")
+            p4a_opts.report_add_file(file)
+            ext = p4a_util.get_file_ext(abs_file)
+            if p4a_util.c_file_p(file) or p4a_util.fortran_file_p(file):
                 files.append(abs_file)
-                debug("Input file: " + abs_file)
-            elif cxx_file_p(file) or cuda_file_p(file):
+                p4a_util.debug("Input file: " + abs_file)
+            elif p4a_util.cxx_file_p(file) or p4a_util.cuda_file_p(file):
                 other_files.append(abs_file)
-                info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
-            elif header_file_p(file):
+                p4a_util.info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
+            elif p4a_util.header_file_p(file):
                 header_files.append(abs_file)
-                info("Ignoring header file: " + abs_file)
+                p4a_util.info("Ignoring header file: " + abs_file)
             else:
-                die("File extension not supported: " + abs_file)
+                p4a_util.die("File extension not supported: " + abs_file)
 
         for file in options.extra_file:
             abs_file = os.path.abspath(os.path.expanduser(file))
             if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
-                die("Invalid/missing extra file: " + abs_file)
+                p4a_util.die("Invalid/missing extra file: " + abs_file)
             # Push the file for a potential report (so that if --report-files is specified, the report
             # will include the input files).
-            report_add_file(file)
+            p4a_opts.report_add_file(file)
 
         # If no project name is provided, try some random names.
         # XXX: would be good to be able to specify the location for the .database and .build dir?
@@ -370,21 +372,21 @@ def main():
         build_dir = ""
         if not project_name:
             while True:
-                project_name = gen_name()
+                project_name = p4a_util.gen_name()
                 expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
                 build_dir = os.path.join(os.getcwd(), project_name + ".build")
                 if options.remove_first or (not os.path.exists(expected_database_dir) and not os.path.exists(build_dir)):
                     break
-            info("Generated project name: " + project_name)
+            p4a_util.info("Generated project name: " + project_name)
         else:
             expected_database_dir = os.path.join(os.getcwd(), project_name + ".database")
             build_dir = os.path.join(os.getcwd(), project_name + ".build")
 
         if options.remove_first:
             if os.path.exists(expected_database_dir):
-                rmtree(expected_database_dir)
+                p4a_util.rmtree(expected_database_dir)
             if os.path.exists(build_dir):
-                rmtree(build_dir)
+                p4a_util.rmtree(build_dir)
 
         # Prepare the C preprocessor flags and linker flags.
         cpp_flags = options.cpp_flags
@@ -403,7 +405,7 @@ def main():
         # Instantiate the builder. It will be used to keep track and arrange all
         # the CPP, C, Fortran etc. flags, apart from being used for building the
         # project after processing, if requested.
-        builder = p4a_builder(
+        builder = p4a_builder.p4a_builder(
             cpp_flags = cpp_flags,
             c_flags = options.c_flags,
             cxx_flags = options.cxx_flags,
@@ -433,18 +435,18 @@ def main():
         # TODO: override cpp exe used by pyps/pips with builder.cpp? Not
         # really possible...
 
-        info("CPP flags: " + " ".join(builder.cpp_flags))
+        p4a_util.info("CPP flags: " + " ".join(builder.cpp_flags))
 
         # Process (parallelize) files (or not).
         database_dir = ""
         processed_files = []
 
         if options.no_process:
-            warn("Bypassing PIPS process")
+            p4a_util.warn("Bypassing PIPS process")
             processed_files = files
 
         elif len(files) == 0:
-            warn("No supported files to process!")
+            p4a_util.warn("No supported files to process!")
 
         else:
             # Craft a p4a_processor_input class instance.
@@ -453,7 +455,7 @@ def main():
             # If --no-spawn is not specified, this instance
             # will be serialized (pickle'd) to ease the
             # passing of parameters to the processor.
-            input = p4a_processor_input()
+            input = p4a_process.p4a_processor_input()
             input.project_name = project_name
             input.accel = options.accel
             input.cuda = options.cuda
@@ -500,7 +502,7 @@ def main():
             if options.no_spawn:
                 # If --no-spawn is specified, run the processor in the current process:
                 # no serialization (pickling) neeed.
-                output = process(input)
+                output = p4a_process.process(input)
 
             else:
                 # Else, we are going to serialize the p4a_processor_input instance
@@ -515,15 +517,15 @@ def main():
                 # The processor is a different/separate script, so that we can run it as a different process.
                 # We run the processor in a separate process because we want to be able
                 # to filter out the PIPS (pyps) output.
-                save_pickle(input_file, input)
+                p4a_util.save_pickle(input_file, input)
 
                 # Where is the processor script?
-                process_script = os.path.join(get_program_dir(), "p4a_process")
+                process_script = os.path.join(p4a_util.get_program_dir(), "p4a_process")
 
                 out, err, ret = "", "", -1
                 try:
                     # Do the PIPS job, run the processor script with our input and output pickle files as parameters:
-                    out, err, ret = run([ process_script, "--input-file", input_file, "--output-file", output_file ],
+                    out, err, ret = p4a_util.run([ process_script, "--input-file", input_file, "--output-file", output_file ],
                         silent = True,
                         # Do not overload current locale because then we can
                         # no longer work on files with special characters:
@@ -531,10 +533,10 @@ def main():
                         stdout_handler = pips_output_filter,
                         stderr_handler = pips_output_filter)
                 except:
-                    raise p4a_error("PIPS processing aborted")
+                    raise p4a_util.p4a_error("PIPS processing aborted")
 
                 # Load the results of the processor from the output pickle file:
-                output = load_pickle(output_file)
+                output = p4a_util.load_pickle(output_file)
 
                 # Remove our pickle files:
                 os.remove(input_file)
@@ -553,29 +555,29 @@ def main():
             # are made, so that we can handle --report, etc., etc.
             if output.exception:
                 if database_dir:
-                    warn("Not removing database directory " + database_dir)
+                    p4a_util.warn("Not removing database directory " + database_dir)
                 raise output.exception
 
         if os.path.isdir(database_dir):
             # Remove database unless otherwise specified.
             if options.keep_database:
-                warn("Not removing database directory " + database_dir + " (--keep-database)")
+                p4a_util.warn("Not removing database directory " + database_dir + " (--keep-database)")
             else:
                 # To improve later with a workspace.close() and
                 # workspace.delete() some days... -> Yes because some files are left open
                 # and we cannot remote the database everytime :-(
                 # We should be able to work on an existing database too!
-                rmtree(database_dir, can_fail = True)
+                p4a_util.rmtree(database_dir, can_fail = True)
 
         for file in processed_files:
-            done("Generated " + file, level = 1)
+            p4a_util.done("Generated " + file, level = 1)
             # Push the file for a potential report (so that if --report-files is specified, the report
             # will include the processed files).
-            report_add_file(file)
+            p4a_opts.report_add_file(file)
 
         if len(options.output_file) == 0:
             if options.cmake or options.cmake_gen or options.cmake_build:
-                die("--cmake, --cmake-gen and/or --cmake-build was given but no output files were specified (-o mybinary, -o mysharedlib.so etc.)")
+                p4a_util.die("--cmake, --cmake-gen and/or --cmake-build was given but no output files were specified (-o mybinary, -o mysharedlib.so etc.)")
             # Build not requested.
             return
 
@@ -589,15 +591,15 @@ def main():
             for exclude_file in options.exclude_file:
                 abs_exclude_file = os.path.abspath(os.path.expanduser(exclude_file))
                 if abs_exclude_file == file:
-                    warn("Excluding " + file + " from the build (--exclude-file " + exclude_file + ")")
+                    p4a_util.warn("Excluding " + file + " from the build (--exclude-file " + exclude_file + ")")
                     found = True
                 else:
-                    debug("Compared " + file + " to --exclude-file " + exclude_file + " -> " + abs_exclude_file + ", no match")
+                    p4a_util.debug("Compared " + file + " to --exclude-file " + exclude_file + " -> " + abs_exclude_file + ", no match")
             if not found:
                 all_buildable_files.append(file)
 
         if len(all_buildable_files) == 0:
-            die("No buildable input files!")
+            p4a_util.die("No buildable input files!")
 
         # Make every path absolute.
         output_files = []
@@ -609,7 +611,7 @@ def main():
             # Push the CMakeLists.txt file for a potential report
             # (so that if --report-files is specified, the report
             # will include this file).
-            report_add_file(os.path.join(options.cmake_dir, "CMakeLists.txt"))
+            p4a_opts.report_add_file(os.path.join(options.cmake_dir, "CMakeLists.txt"))
             if options.cmake:
                 builder.cmake_write(project_name, all_buildable_files + header_files,
                     output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
@@ -620,23 +622,23 @@ def main():
 
         # All the building is handled by p4a_builder.py:
         try:
-            info("Building " + ", ".join(output_files))
+            p4a_util.info("Building " + ", ".join(output_files))
             builder.build(files = all_buildable_files, output_files = output_files,
                 extra_obj = options.extra_obj, build_dir = build_dir)
         except:
-            warn("Build directory was not removed: " + build_dir)
+            p4a_util.warn("Build directory was not removed: " + build_dir)
             raise
 
         # Remove build dir as requested.
         if os.path.isdir(build_dir):
             if options.keep_build_dir:
-                warn("Not removing build directory " + build_dir + " (--keep-build-dir)")
+                p4a_util.warn("Not removing build directory " + build_dir + " (--keep-build-dir)")
             else:
-                rmtree(build_dir, can_fail = True)
+                p4a_util.rmtree(build_dir, can_fail = True)
 
 # If this file is called as a script, execute the main:
 if __name__ == "__main__":
-    exec_and_deal_with_errors(main)
+    p4a_opts.exec_and_deal_with_errors(main)
 
 # Some Emacs stuff:
 ### Local Variables:

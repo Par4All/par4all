@@ -5,13 +5,19 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
+import p4a_util 
+import optparse
+import subprocess
+import sys
+import os
+import re
+import shutil
 
 '''
 Par4All processing
 '''
 
-import sys, os, re, shutil
-from p4a_util import *
+
 
 # Basic properties to be used in Par4All:
 default_properties = dict(
@@ -145,7 +151,7 @@ def process(input):
         e = sys.exc_info()
         exception = e[1]
         if exception.__class__.__name__ == "RuntimeError" and str(exception).find("pips") != -1:
-            output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
+            output.exception = p4a_util.p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
         else:
             # Since the traceback object cannot be serialized, display
             # here the exec_info for more information on stderr:
@@ -157,9 +163,9 @@ def process(input):
 
 
 def process_file(input_file, output_file):
-    input = load_pickle(input_file)
+    input = p4a_util.load_pickle(input_file)
     output = process(input)
-    save_pickle(output_file, output)
+    p4a_util.save_pickle(output_file, output)
 
 
 def main(options, args = []):
@@ -169,13 +175,13 @@ def main(options, args = []):
     object files with names given as parameters
     """
     if not options.input_file:
-        die("Missing --input-file")
+        p4a_util.die("Missing --input-file")
 
     if not options.output_file:
-        die("Missing --output-file")
+        p4a_util.die("Missing --output-file")
 
     if not os.path.exists(options.input_file):
-        die("Input file does not exist: " + options.input_file)
+        p4a_util.die("Input file does not exist: " + options.input_file)
 
     process_file(options.input_file, options.output_file)
 
@@ -224,7 +230,7 @@ class p4a_processor(object):
                 cpp_flags = ""
 
             if not project_name:
-                raise p4a_error("Missing project_name")
+                raise p4a_util.p4a_error("Missing project_name")
 
             self.project_name = project_name
 
@@ -238,13 +244,13 @@ class p4a_processor(object):
                     # Track the language for an eventual later compilation
                     # by a back-end target compiler. The first file type
                     # select the type for all the workspace:
-                    if fortran_file_p(file):
+                    if p4a_util.fortran_file_p(file):
                         self.fortran = True
                     else:
                         self.fortran = False
 
                 if not os.path.exists(file):
-                    raise p4a_error("File does not exist: " + file)
+                    raise p4a_util.p4a_error("File does not exist: " + file)
 
             self.files = files
 
@@ -291,7 +297,7 @@ class p4a_processor(object):
             for k in properties:
                 all_properties[k] = properties[k]
             for k in all_properties:
-                debug("Property " + k + " = " + str(all_properties[k]))
+                p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
                 self.workspace.props[k] = all_properties[k]
 
 
@@ -496,7 +502,7 @@ class p4a_processor(object):
         if "main" in self.workspace:
             self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
         else:
-            warn('''
+            p4a_util.warn('''
             There is no "main()" function in the given sources.
             That means the P4A Accel runtime initialization can not be
             inserted and that the compiled application may not work.
@@ -522,16 +528,16 @@ class p4a_processor(object):
     def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''
 
-        info("Post-processing " + file)
+        p4a_util.info("Post-processing " + file)
 
-        post_process_script = os.path.join(get_program_dir(), "p4a_post_processor.py")
+        post_process_script = os.path.join(p4a_util.get_program_dir(), "p4a_post_processor.py")
 
         args = [ post_process_script ]
         if dest_dir:
             args += [ '--dest-dir', dest_dir ]
         args.append(file)
 
-        run(args,force_locale = None)
+        p4a_util.run(args,force_locale = None)
         #~ subprocess.call(args)
 
 
@@ -570,7 +576,7 @@ class p4a_processor(object):
 
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
-            if self.recover_includes and not self.native_recover_includes and c_file_p(file):
+            if self.recover_includes and not self.native_recover_includes and p4a_util.c_file_p(file):
                 subprocess.call([ 'p4a_recover_includes',
                                   '--simple', pips_file ])
 
@@ -585,12 +591,12 @@ class p4a_processor(object):
             output_name = prefix + name
 
             if suffix:
-                output_name = file_add_suffix(output_name, suffix)
+                output_name = p4a_util.file_add_suffix(output_name, suffix)
 
             # The final destination
             output_file = os.path.join(dir, output_name)
 
-            if self.accel and c_file_p(file):
+            if self.accel and p4a_util.c_file_p(file):
                 # We generate code for P4A Accel, so first post process
                 # the output:
                 self.accel_post(pips_file,
@@ -603,7 +609,7 @@ class p4a_processor(object):
                 if self.cuda:
                     # To have the nVidia compiler to be happy, we need to
                     # have a .cu version of the .c file
-                    output_file = change_file_ext(output_file, ".cu")
+                    output_file = p4a_util.change_file_ext(output_file, ".cu")
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)

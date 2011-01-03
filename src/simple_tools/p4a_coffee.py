@@ -4,23 +4,23 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
+import p4a_git 
+import p4a_opts
+import p4a_util 
+from urlparse import urlparse
+import p4a_pack
+import p4a_setup
+import sys
+import os
+import optparse
+import tempfile
 
 '''
 Clone the Par4All public Git repository, build it, package it, and optionally publish it.
 '''
 
-import string, sys, os, re, optparse, tempfile
-from urlparse import urlparse
 #from urllib.parse import urlparse
 
-from p4a_util import *
-from p4a_builder import *
-from p4a_git import *
-from p4a_version import *
-from p4a_opts import *
-
-import p4a_setup
-import p4a_pack
 
 
 def add_module_options(parser):
@@ -52,11 +52,11 @@ def main():
 
     add_module_options(parser)
 
-    add_common_options(parser)
+    p4a_opts.add_common_options(parser)
 
     (options, args) = parser.parse_args()
 
-    if process_common_options(options, args):
+    if p4a_opts.process_common_options(options, args):
         # To be able to execute the very same version of this command later:
         exec_path_name = os.path.abspath(sys.argv[0])
 
@@ -65,14 +65,14 @@ def main():
         try:
             if options.here:
                 #os.system("env")
-                info("Using the local working copy", level = 0)
+                p4a_util.info("Using the local working copy", level = 0)
                 setup_options = options
                 p4a_setup.work(setup_options)
 
                 pack_options = options
 
                 if options.git_revision:
-                    run([ "git", "checkout", options.git_revision ])
+                    p4a_util.run([ "git", "checkout", options.git_revision ])
 
                 # Unset P4A_ROOT environment variable if set, to avoid using
                 # the packages from somewhere else:
@@ -106,15 +106,15 @@ def main():
                     git_branch = "p4a"
 
                 # Clone the git repository into p4a directory:
-                run([ "git", "clone", "-b", git_branch, url, "p4a" ])
+                p4a_util.run([ "git", "clone", "-b", git_branch, url, "p4a" ])
 
                 # Jump into the new working copy:
                 work_dir_p4a = os.path.join(work_dir, "p4a")
                 os.chdir(work_dir_p4a)
 
                 # Compute a revision name that includes the current date:
-                suffix = utc_datetime()
-                revision = p4a_git(work_dir_p4a).current_revision()
+                suffix = p4a_util.utc_datetime()
+                revision = p4a_git.p4a_git(work_dir_p4a).current_revision()
                 if revision:
                     suffix += "~" + revision
 
@@ -122,7 +122,7 @@ def main():
                 # debug messages of PIPS and we can trace back a faulty
                 # revision.
                 work_dir_p4a_version = os.path.join(work_dir, "p4a_" + suffix)
-                run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
+                p4a_util.run([ "mv", "-v", work_dir_p4a, work_dir_p4a_version ])
 
                 os.chdir(prev_cwd)
                 ## Make sure child coffee maker will be using the python modules
@@ -132,9 +132,9 @@ def main():
                 os.environ["PYTHONPATH"] = os.path.join(os.path.dirname(exec_path_name))
                 ret = os.system(exec_path_name + " --here --root " + work_dir_p4a_version + " " + " ".join(sys.argv[1:]))
                 if ret:
-                    raise p4a_error("Child p4a_coffee failed")
+                    raise p4a_util.p4a_error("Child p4a_coffee failed")
 
-                done('''All done. Here is your cup of coffee:
+                p4a_util.done('''All done. Here is your cup of coffee:
 
              (    (     (     (
               )    )     )     )
@@ -153,17 +153,17 @@ def main():
         except:
             #~ if not options.work_dir:
             if work_dir:
-                warn("Work directory was " + work_dir + " (not removed)")
+                p4a_util.warn("Work directory was " + work_dir + " (not removed)")
             raise
 
         #~ if not options.work_dir:
         if work_dir:
-            rmtree(work_dir)
+            p4a_util.rmtree(work_dir)
 
 
 # If this file is called as a script, execute the main:
 if __name__ == "__main__":
-    exec_and_deal_with_errors(main)
+    p4a_opts.exec_and_deal_with_errors(main)
 
 
 # Some Emacs stuff:
