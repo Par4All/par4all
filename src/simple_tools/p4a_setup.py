@@ -572,8 +572,9 @@ def work(options, args = None):
         # patches the sources and that would mark the files as
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
-        # to relauch the patch:
-        p4a_util.run([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        # to relauch the patch.
+        # If we do not build with Fortran 95 support, admit this can fail...
+        p4a_util.run([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ], can_fail = True)
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
         for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
