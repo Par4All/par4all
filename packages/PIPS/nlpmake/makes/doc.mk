@@ -33,7 +33,7 @@ DVIPS	= dvips
 PS2PDF	= ps2pdf
 EPS2PDF	= epstopdf --compress
 # To publish on a WWW server:
-RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose
+RSYNC = rsync --archive --hard-links --delete --force --partial --compress --verbose --cvs-exclude
 
 # whether to generate pdf directly from tex
 ifdef use_pdflatex
