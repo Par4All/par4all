@@ -183,8 +183,8 @@ This document describes the new build infrastructure of \PIPS{},
 It describes
 \begin{itemize}
 \item the meaning of each involved file~\ref{sec:structure};
-\item maintenance processes~\ref{sec:maintain} for \PIPS{} developers;
-\item installation process~\ref{sec:install} for \PIPS{} users and developers.
+\item the installation process~\ref{sec:install} for \PIPS{} users and developers.
+\item the maintenance processes~\ref{sec:maintain} for \PIPS{} developers;
 \end{itemize}
 
 This new infrastructure allows better portability and quite faster
@@ -291,6 +291,96 @@ Its whole configuration is stored in \dir{src/Libs/gnulib} and \dir{src/Libs/gnu
 A few lines have been added in \file{configure.ac} to manage \gnulib{} configuration.
 
 For in-depth documentation of \gnulib{}, feel free to read \url{http://www.gnu.org/software/gnulib/manual}.
+
+%%%
+\section{Installation Processes}
+\label{sec:install}
+
+An automated script does all the nasty things for you if you want to
+install a \emph{production} version, that is to say copies of Linear, Newgen
+and Pips trunks. Just begin by typing the following lines in the
+directory where you want your production version to be installed (for
+instance \lstinline|~/Pips4u/prod|)
+\begin{lstlisting}
+wget http://ridee.enstb.org/pips/get-pips4u.sh
+chmod u+x get-pips4u.sh
+./get-pips4u.sh --help
+\end{lstlisting}
+The last command displays all the options available for
+get-pips4u.sh. In particular, check the default value for the
+\texttt{--prefix} command (\lstinline|~/pips4u-0.1|). This is the
+directory where the libraries and executables are installed. If you
+also want to work on development branches (strongly recommended), this
+may not be convenient as you may want to have several versions
+available at the same time. For that purpose, you can specify another
+installation directory with:
+\begin{lstlisting}
+./get-pips4u.sh --devel --prefix ~/Pips4u/prod/auto-root
+\end{lstlisting}
+or whatever location pleases you. Launching this script does (almost)
+everything for you, from checking out \PIPS{} sources to compiling and
+installing the libraries and executables.
+
+After installation, if you want to activate some extra \PIPS{} modules
+such as \texttt{hpfc} or \texttt{pyps} for instance, you can invoke:
+\begin{lstlisting}
+cd ~/Pips4u/prod/pips4u-0.1/src/pips-0.1/_build
+./config.status -V
+\end{lstlisting}
+The last commant gives you the options previously used for the
+configure. Then, from the very same directory execute:
+\begin{lstlisting}
+../configure ...the same options... --enable-hpfc --enable-pyps
+\end{lstlisting}
+If you want to be able to run the validation, use the
+\lstinline|--enable-devel-mode| option. Beware that it also sets the
+compilation flags to \lstinline|-Wall -Werror -O0|.
+After all this you have to recompile and install by typing
+\begin{lstlisting}
+make; make install
+\end{lstlisting}
+in the \lstinline|_build| directory.
+
+Now, you may also want a \emph{development} branch. This is not automated,
+and you have to do it by yourself. Here are some guidelines to achieve
+this.
+
+First get your development area from svn (in \lstinline|~/Pips4u/dev|
+for instance), and create a development branch:
+\begin{lstlisting}
+svn co http://svn.cri.ensmp.fr/svn/pips/branches/luther dev
+cd dev
+svn cp http://svn.cri.ensmp.fr/svn/pips/trunk my-branch-name
+svn commit my-branch-name
+cd my-branch-name
+\end{lstlisting}
+Then you have to get the \lstinline|PATH|, \lstinline|PKG_CONFIG_PATH|
+and \lstinline|LD_LIBRARY_PATH| values used for the configure
+in your production building directory:
+\begin{lstlisting}
+pushd  ~/Pips4u/prod/pips4u-0.1/src/pips-0.1/_build
+./config.status -V
+popd
+\end{lstlisting}
+And perform the configure:
+\begin{lstlisting}
+autoreconf -vi
+mkdif _build
+cd _build
+../configure --disable-static --prefix=~/Pips4u/dev/my-branch-name/auto-root PATH=... PKG_CONFIG_PATH=... LD_LIBRAY_PATH=... --enable-devel-mode
+\end{lstlisting}
+where the ... stand for the values retrieved from the production
+environment, and where you can add whatever --enable options you want.
+
+At last, don't forget to compile and then install in you development
+installation directory (here
+\lstinline|~/Pips4u/dev/my-branch-name/auto-root|).
+
+In some cases, \PIPS{} may be included in another distribution and you may
+build \PIPS{} differently. For example in Par4All, where only this
+\texttt{autotools} build method is used, this is done by the Par4All
+installation process and you do not need to care about the previous
+installation script.
 
 %%%
 \section{Maintenance Processes}
@@ -427,23 +517,6 @@ To fully understand usage of \texttt{AX\_DEPENDS(...)}, please read section on p
 \label{sec:passes}
 2bedone
 
-
-%%%
-\section{Installation Processes}
-\label{sec:install}
-
-For short for \PIPS{}
-\begin{lstlisting}
-wget http://ridee.enstb.org/pips/get-pips4u.sh
-chmod u+x get-pips4u.sh
-./get-pips4u.sh --help
-\end{lstlisting}
-
-In some cases, \PIPS{} may be included in another distribution and you may
-build \PIPS{} differently. For example in Par4All, where only this
-\texttt{autotools} build method is used, this is done by the Par4All
-installation process and you do not need to care about the previous
-installation script.
 
 %%%
 \section{Additional Checks}

@@ -1,3 +1,116 @@
+void compute(float_t space[501][501], float_t save[501][501])
+{
+   int t;                                                               /*0106*/
+   
+   /* Apply the relaxation T times: */
+   for(t = 0; t <= 399; t += 1)
+      iteration(space, save);                                           /*0110*/
+}
+void get_data(char filename[])
+{
+   int i, j, nx, ny;                                                    /*0017*/
+   unsigned char c;                                                     /*0018*/
+   FILE *fp;                                                            /*0019*/
+   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
+      perror("Error loading file");                                     /*0022*/
+      exit(0);                                                          /*0023*/
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);                                                       /*0027*/
+   c = fgetc(fp);                                                       /*0028*/
+   do {                                                                 /*0033*/
+      while ((c = fgetc(fp))!='\n')                                     /*0032*/
+         ;                                                              /*0032*/
+   }
+   while ((c = fgetc(fp))=='#');                                        /*0033*/
+   
+   /* Put back good char */
+   ungetc(c, fp);                                                       /*0036*/
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);                                                /*0041*/
+   /* Get ONE carriage return */
+   fgetc(fp);                                                           /*0043*/
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
+   
+   /* Erase the memory, in case the image is not big enough: */
+   for(i = 0; i <= 500; i += 1)
+      for(j = 0; j <= 500; j += 1)
+         space[i][j] = 0;                                               /*0049*/
+   
+   /* Read the pixel grey value: */
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
+         c = fgetc(fp);                                                 /*0054*/
+         /* Truncate the image if too big: */
+         if (i<501&&j<501)                                              /*0056*/
+            space[i][j] = c;                                            /*0057*/
+      }
+
+   fclose(fp);                                                          /*0060*/
+}
+void iteration(float_t space[501][501], float_t save[501][501])
+{
+   int i, j;                                                            /*0087*/
+   
+   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
+        could use also a flip-flop dimension instead... */
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
+
+   for(i = 1; i <= 499; i += 1)
+      for(j = 1; j <= 499; j += 1)
+
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
+}
+void write_data(char filename[])
+{
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
+
+   for(j = 0; j <= 500; j += 1)
+      for(i = 0; i <= 500; i += 1) {
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
+      }
+   fclose(fp);                                                          /*0082*/
+}
+int main(int argc, char *argv[])
+{
+   int i;                                                               /*0116*/
+
+   if (argc!=2) {                                                       /*0118*/
+      
+      
+      fprintf(stderr, "%s needs only one argument that is the PGM image input file\n", argv[0]);      /*0121*/
+      exit(0);                                                          /*0122*/
+   }
+   get_data(argv[1]);                                                   /*0124*/
+   
+   /* Initialize the border of the destination image, since it is used but
+        never written to: */
+   for(i = 0; i <= 500; i += 1)
+      save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
+
+   compute(space, save);                                                /*0131*/
+
+   write_data("output.pgm");                                            /*0133*/
+
+   return 0;                                                            /*0135*/
+}
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -43,8 +156,15 @@ void compute(float_t space[501][501], float_t save[501][501])
       iteration(space, save);                                           /*0110*/
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <filename[PHI1]-R-MAY-{}>
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -74,8 +194,9 @@ void get_data(char filename[])
       exit(0);                                                          /*0023*/
    }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -83,22 +204,25 @@ void get_data(char filename[])
    /* Get *.pgm file type */
    c = fgetc(fp);                                                       /*0027*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    c = fgetc(fp);                                                       /*0028*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    do {                                                                 /*0033*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -107,8 +231,9 @@ void get_data(char filename[])
    }
    while ((c = fgetc(fp))=='#');                                        /*0033*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -116,8 +241,9 @@ void get_data(char filename[])
    /* Put back good char */
    ungetc(c, fp);                                                       /*0036*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -125,16 +251,18 @@ void get_data(char filename[])
    /* Get image dimensions */
    fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    /* Get grey levels */
    fscanf(fp, "%d", &i);                                                /*0041*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -166,8 +294,11 @@ void get_data(char filename[])
 
          space[i][j] = 0;                                               /*0049*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, i==501, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, i==501, 1<=ny}>
+//  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
+//    PHI2<=500, PHI2+1<=ny, i==501}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -175,32 +306,39 @@ void get_data(char filename[])
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       for(i = 0; i <= nx-1; i += 1) {
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          c = fgetc(fp);                                                 /*0054*/
 
-//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, i<=500, j<=500}>
+//  <space[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, 0<=i, i<=500, i+1<=nx,
+//    0<=j, j<=500, j+1<=ny}>
 
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
 
-//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, i<=500, j<=500}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500,
+//    i+1<=nx, 0<=j, j<=500, j+1<=ny}>
 
             space[i][j] = c;                                            /*0057*/
       }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -232,52 +370,56 @@ void iteration(float_t space[501][501], float_t save[501][501])
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   for(i = 0; i <= 498; i += 1)
+   for(i = 1; i <= 499; i += 1)
 
-//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
-//    i<=498}>
-//  <space[PHI1][PHI2]-R-MAY-{i+1<=PHI1+PHI2, PHI2+i<=PHI1+499,
-//    PHI1<=PHI2+i+1, PHI1+PHI2<=i+501, i<=PHI1, PHI1<=i+2, 0<=i,
-//    i<=498}>
+//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
+//    i<=499}>
+//  <space[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
+//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//    i<=499}>
 
-      for(j = 0; j <= 498; j += 1)
+      for(j = 1; j <= 499; j += 1)
 
-//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i+1, PHI2==j+1, 0<=i, i<=498,
-//    0<=j, j<=498}>
-//  <space[PHI1][PHI2]-R-MAY-{i+j+1<=PHI1+PHI2, PHI2+i<=PHI1+j+1,
-//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+3, 0<=i, i<=498, 0<=j, j<=498}>
+//  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
+//    j<=499}>
+//  <space[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
+//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
 
 
-         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0094*/
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
-//    PHI2<=500, j==499}>
+//    PHI2<=500, j==500}>
 //  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
-//    PHI2<=499, j==499}>
+//    PHI2<=499, j==500}>
 
 
-   for(i = 0; i <= 498; i += 1)
+   for(i = 1; i <= 499; i += 1)
 
-//  <save[PHI1][PHI2]-R-MAY-{i+1<=PHI1+PHI2, PHI2+i<=PHI1+499,
-//    PHI1<=PHI2+i+1, PHI1+PHI2<=i+501, i<=PHI1, PHI1<=i+2, 0<=i,
-//    i<=498}>
-//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i+1, 1<=PHI2, PHI2<=499, 0<=i,
-//    i<=498}>
+//  <save[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
+//    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
+//    i<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
+//    i<=499}>
 
-      for(j = 0; j <= 498; j += 1)
+      for(j = 1; j <= 499; j += 1)
 
-//  <save[PHI1][PHI2]-R-MAY-{i+j+1<=PHI1+PHI2, PHI2+i<=PHI1+j+1,
-//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+3, 0<=i, i<=498, 0<=j, j<=498}>
-//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i+1, PHI2==j+1, 0<=i, i<=498,
-//    0<=j, j<=498}>
+//  <save[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
+//    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
+//  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
+//    j<=499}>
 
 
-         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0100*/
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <filename[PHI1]-R-MAY-{}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -307,8 +449,9 @@ void write_data(char filename[])
       exit(0);                                                          /*0071*/
    }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -316,43 +459,67 @@ void write_data(char filename[])
    /* Write the PGM header: */
    fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
    for(j = 0; j <= 500; j += 1)
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
+//    j<=500}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
       for(i = 0; i <= 500; i += 1) {
 
-//  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
+//    j<=500}>
 
          c = space[i][j];                                               /*0079*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
          fputc(c, fp);                                                  /*0080*/
       }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
    fclose(fp);                                                          /*0082*/
 }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <argv[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <argv[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=1}>
+//  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
+//    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
+//    PHI2<=500, argc==2}>
+//  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2, PHI2<=500,
+//    argc==2}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500, argc==2}>
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -360,16 +527,22 @@ int main(int argc, char *argv[])
 {
    int i;                                                               /*0116*/
 
+//  <argv[PHI1]-R-MAY-{PHI1==0}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==2}>
 
 
    if (argc!=2) {                                                       /*0118*/
 
+//  <argv[PHI1]-R-EXACT-{PHI1==0}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==0}>
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
 
@@ -379,8 +552,16 @@ int main(int argc, char *argv[])
       exit(0);                                                          /*0122*/
    }
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <argv[PHI1]-R-EXACT-{PHI1==1, argc==2}>
+//  <argv[PHI1][PHI2]-R-MAY-{PHI1==1, argc==2}>
+//  <space[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -413,8 +594,11 @@ int main(int argc, char *argv[])
 
    compute(space, save);                                                /*0131*/
 
-//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
@@ -462,6 +646,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
+#pragma omp parallel for private(j)
    for(i = 0; i <= 500; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 500; j += 1)
@@ -485,18 +670,18 @@ void iteration(float_t space[501][501], float_t save[501][501])
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 498; i += 1)
+   for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
-      for(j = 0; j <= 498; j += 1)
+      for(j = 1; j <= 499; j += 1)
 
-         save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);            /*0094*/
+         save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 498; i += 1)
+   for(i = 1; i <= 499; i += 1)
 #pragma omp parallel for 
-      for(j = 0; j <= 498; j += 1)
+      for(j = 1; j <= 499; j += 1)
 
-         space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);               /*0100*/
+         space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
 void write_data(char filename[])
 {
@@ -541,6 +726,54 @@ int main(int argc, char *argv[])
 
    return 0;                                                            /*0135*/
 }
+void get_data(char filename[])
+{
+   int i, j, nx, ny;                                                    /*0017*/
+   unsigned char c;                                                     /*0018*/
+   FILE *fp;                                                            /*0019*/
+   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
+      perror("Error loading file");                                     /*0022*/
+      exit(0);                                                          /*0023*/
+   }
+   
+   /* Get *.pgm file type */
+   c = fgetc(fp);                                                       /*0027*/
+   c = fgetc(fp);                                                       /*0028*/
+   do {                                                                 /*0033*/
+      while ((c = fgetc(fp))!='\n')                                     /*0032*/
+         ;                                                              /*0032*/
+   }
+   while ((c = fgetc(fp))=='#');                                        /*0033*/
+   
+   /* Put back good char */
+   ungetc(c, fp);                                                       /*0036*/
+   
+   /* Get image dimensions */
+   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
+   /* Get grey levels */
+   fscanf(fp, "%d", &i);                                                /*0041*/
+   /* Get ONE carriage return */
+   fgetc(fp);                                                           /*0043*/
+   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
+   
+   /* Erase the memory, in case the image is not big enough: */
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 500; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 500; j += 1)
+         space[i][j] = 0;                                               /*0049*/
+   
+   /* Read the pixel grey value: */
+   for(j = 0; j <= ny-1; j += 1)
+      for(i = 0; i <= nx-1; i += 1) {
+         c = fgetc(fp);                                                 /*0054*/
+         /* Truncate the image if too big: */
+         if (i<501&&j<501)                                              /*0056*/
+            space[i][j] = c;                                            /*0057*/
+      }
+
+   fclose(fp);                                                          /*0060*/
+}
 void compute(float_t space[501][501], float_t save[501][501])
 {
    int t;                                                               /*0106*/
@@ -580,8 +813,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 500; i += 1)
-      p4a_kernel_launcher_0(space, i, &j);
+   p4a_kernel_launcher_0(space);
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
@@ -652,9 +884,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
    int i, j;                                                            /*0087*/
    {
       //PIPS generated variable
-      float_t (*save1)[501][501] = (float_t (*)[501][501]) 0, (*space1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
+      float_t (*space1)[501][501] = (float_t (*)[501][501]) 0, (*save1)[501][501] = (float_t (*)[501][501]) 0;
       P4A_accel_malloc((void **) &save1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space1);
 
       
@@ -662,21 +894,21 @@ void iteration(float_t space[501][501], float_t save[501][501])
            could use also a flip-flop dimension instead... */
       p4a_kernel_launcher_1(*save1, *space1);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save1);
-      P4A_accel_free(space1);
       P4A_accel_free(save1);
+      P4A_accel_free(space1);
    }
    {
       //PIPS generated variable
-      float_t (*save0)[501][501] = (float_t (*)[501][501]) 0, (*space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
+      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0, (*save0)[501][501] = (float_t (*)[501][501]) 0;
       P4A_accel_malloc((void **) &save0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save0);
 
 
       p4a_kernel_launcher_2(*save0, *space0);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
-      P4A_accel_free(space0);
       P4A_accel_free(save0);
+      P4A_accel_free(space0);
    }
 }
 void get_data(char filename[])
@@ -708,10 +940,17 @@ void get_data(char filename[])
    /* Get ONE carriage return */
    fgetc(fp);                                                           /*0043*/
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
-   
-   /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 500; i += 1)
-      p4a_kernel_launcher_0(space, i, &j);
+   {
+      //PIPS generated variable
+      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0;
+      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
+
+      
+      /* Erase the memory, in case the image is not big enough: */
+      p4a_kernel_launcher_0(*space0);
+      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
+      P4A_accel_free(space0);
+   }
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
@@ -729,9 +968,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
    int i, j;                                                            /*0087*/
    {
       //PIPS generated variable
-      float_t (*save1)[501][501] = (float_t (*)[501][501]) 0, (*space1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
+      float_t (*space1)[501][501] = (float_t (*)[501][501]) 0, (*save1)[501][501] = (float_t (*)[501][501]) 0;
       P4A_accel_malloc((void **) &save1, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space1);
 
       
@@ -739,82 +978,58 @@ void iteration(float_t space[501][501], float_t save[501][501])
            could use also a flip-flop dimension instead... */
       p4a_kernel_launcher_1(*save1, *space1);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save1);
-      P4A_accel_free(space1);
       P4A_accel_free(save1);
+      P4A_accel_free(space1);
    }
    {
       //PIPS generated variable
-      float_t (*save0)[501][501] = (float_t (*)[501][501]) 0, (*space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
+      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0, (*save0)[501][501] = (float_t (*)[501][501]) 0;
       P4A_accel_malloc((void **) &save0, sizeof(float)*251001);
+      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
       P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save0);
 
 
       p4a_kernel_launcher_2(*save0, *space0);
       P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
-      P4A_accel_free(space0);
       P4A_accel_free(save0);
+      P4A_accel_free(space0);
    }
-}
-void p4a_kernel_launcher_2(float_t save[501][501], float_t space[501][501])
-{
-   //PIPS generated variable
-   int i, j;                                                            /*0004*/
-
-   for(i = 0; i <= 498; i += 1)
-      for(j = 0; j <= 498; j += 1)
-         // To be assigned to a call to P4A_vp_0: i
-         // To be assigned to a call to P4A_vp_1: j
-         
-         p4a_kernel_wrapper_2(i, j, save, space);                       /*0011*/
-}
-void p4a_kernel_launcher_0(float_t space[501][501], int i, int *j)
-{
-   *j = 0;
-   while (*j<=500) {
-      // To be assigned to a call to P4A_vp_0: j
-      p4a_kernel_wrapper_0(space, i, *j);                               /*0005*/
-      *j += 1;
-   }
-}
-void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
-{
-   //PIPS generated variable
-   int i, j;                                                            /*0004*/
-   
-   /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-   for(i = 0; i <= 498; i += 1)
-      for(j = 0; j <= 498; j += 1)
-         // To be assigned to a call to P4A_vp_0: i
-         // To be assigned to a call to P4A_vp_1: j
-         
-         p4a_kernel_wrapper_1(i, j, save, space);                       /*0013*/
 }
 void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[501][501])
 {
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
-   
-   
-   space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);      /*0008*/
-   /*0004*/
+   // Loop nest P4A end
+   // Loop nest P4A end
+   if (i<=498&&j<=498)                                                  /*0008*/
+      /*0004*/
+      
+      save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);               /*0010*/
+   /*0006*/
    ;
 }
-void p4a_kernel_wrapper_0(float_t space[501][501], int i, int j)
-{
-   // To be assigned to a call to P4A_vp_0: j
-   space[i][j] = 0;                                                     /*0005*/
-   /*0003*/
-   ;
-}
-void p4a_kernel_wrapper_1(int i, int j, float_t save[501][501], float_t space[501][501])
+void p4a_kernel_wrapper_0(int i, int j, float_t save[501][501], float_t space[501][501])
 {
    // To be assigned to a call to P4A_vp_0: i
    // To be assigned to a call to P4A_vp_1: j
-   
-   
-   save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);   /*0008*/
-   /*0004*/
+   // Loop nest P4A end
+   // Loop nest P4A end
+   if (i<=498&&j<=498)                                                  /*0008*/
+      /*0004*/
+      
+      space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);   /*0010*/
+   /*0006*/
+   ;
+}
+void p4a_kernel_wrapper_1(int i, int j, float_t space[501][501])
+{
+   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_1: j
+   // Loop nest P4A end
+   // Loop nest P4A end
+   if (i<=500&&j<=500)                                                  /*0008*/
+      /*0004*/
+      space[i][j] = 0;                                                  /*0009*/
+   /*0005*/
    ;
 }

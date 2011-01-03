@@ -175,7 +175,7 @@ A concrete type \texttt{T} can either be a basic type (like \texttt{Int} or
 product types (i.e., disjoint unions of structures with multiple
 members like \texttt{t1:T1 + t2:(T2 $\times$ T3)}). We assume that each
 value of sum type \texttt{T} with tag \texttt{t} satisfies the run-time
-predicate $has\_tag_\texttt{t}$; this means that tags (representing
+predicate $has\_tag_t$; this means that tags (representing
 types) are carried around by the underlying implementation. For every
 sum type \texttt{T}, the function \emph{untag} retrieves the untagged
 component of the value.  For every product type \texttt{T} that has {\tt
@@ -249,7 +249,7 @@ $\C\dbl{C1 C2}vk_1k_2s =
         (\lambda vs.{\bf error}))s$ \\
 $\C\dbl{P E}vk_1k_2s =$ \=${\rm let}~\texttt{Id1},\texttt{Id2},a = 
         \P\dbl{P}~{\rm in}$\\
-        \>${\rm if}~has\_tag_\texttt{Id1}(v)~{\rm then}~
+        \>${\rm if}~has\_tag_{Id1}(v)~{\rm then}~
                 \E\dbl{E}[\emph{untag}~v/\texttt{Id1}][k_1 (a(\emph{untag}~v)) s/\texttt{Id2}]s~
         {\rm else}~k_2 v s$ \\
 $\P\dbl{(Id1 Id2)} = \texttt{Id1}, \texttt{Id2}, \texttt{Id1\_Id2}$

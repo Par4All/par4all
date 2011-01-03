@@ -81,7 +81,7 @@ main (int argc, char *argv[])
     {
       i = 3;
     }
-  sub (i, 10);
+  sub (&i, 10);
   sub2 (10, 20);
   sub3 ();
   i = fun1 (2);

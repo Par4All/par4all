@@ -48,6 +48,9 @@ destination=${1:-`pwd`/MYPIPS}
 developer=${2:-${USER:-${LOGNAME:-$USERNAME}}}
 subcmd=${3:-checkout}
 
+# allow to substitude another make command from the environment.
+make=${MAKE:-make}
+
 # If the destination directory is relative, transform it in an absolute
 # path name:
 [[ $destination != /* ]] && destination=`pwd`/$destination
@@ -84,7 +87,7 @@ prod=$destination/prod
 
 echo
 echo "### checking needed softwares"
-for exe in svn wget tar gunzip make cproto flex bison gcc perl sed tr
+for exe in svn wget tar gunzip $make cproto flex bison gcc perl sed tr
 do
   type $exe || error "no such executable, please install: $exe"
 done
@@ -217,9 +220,9 @@ tar xf $POLYLIB.tar || error "cannot untar polylib"
 cd $POLYLIB || error "cannot cd into polylib"
 ./configure --prefix=$prod/extern || error "cannot configure polylib"
 # I'm not the only one to cheat with dependencies:-)
-make -j1 || error "cannot make polylib"
+$make -j1 || error "cannot make polylib"
 
-make install || error "cannot install polylib"
+$make install || error "cannot install polylib"
 cd .. || error "cannot cd .."
 rm -rf $POLYLIB || error "cannot remove polylib"
 rm -f $POLYLIB.tar || error "cannot remove polylib tar"
@@ -237,22 +240,22 @@ warn "cproto header generation results in many cpp warnings..."
 echo
 echo "### building newgen"
 cd $prod/newgen
-make clean
-make $target
+$make clean
+$make $target
 
 echo
 echo "### building linear"
 cd $prod/linear
-make clean
-make $target
+$make clean
+$make $target
 
 echo
 echo "### building pips"
 cd $prod/pips
-make clean
+$make clean
 # must find newgen and newC executable...
 PATH=$prod/newgen/bin:$prod/newgen/bin/$PIPS_ARCH:$PATH \
-    make $target
+    $make $target
 
 echo
 echo "### checking useful softwares"

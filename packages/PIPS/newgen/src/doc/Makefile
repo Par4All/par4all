@@ -30,7 +30,10 @@ SOURCES = $(F.tex) obtention.txt
 
 F.pdf 	= $(F.tex:%.tex=%.pdf)
 
-INSTALL_DOC =	$(F.pdf)
+INSTALL_DOC = $(F.pdf)
+
+ngF.tex	= $(wildcard newgen_*.tex)
+INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc) index.html
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
@@ -39,8 +42,11 @@ all: $(INSTALL_DOC)
 
 pdf: $(F.pdf)
 
-clean: local-clean
+clean: local-clean dox-clean
+
+dox-clean:
+	$(MAKE) -C doxygen clean
 
 local-clean:
-	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) $(PDF) \
-		*.html *.aux *.log *.ps *.dvi *.out *~
+	$(RM) -r $(INSTALL_DOC) $(PDF) *.htdoc \
+		*.aux *.log *.ps *.dvi *.out *~

@@ -122,5 +122,6 @@ echo execution
 echo
 shell ./$WKS.database/Src/$WKS
 
-
+close $WKS
+delete $WKS
 quit

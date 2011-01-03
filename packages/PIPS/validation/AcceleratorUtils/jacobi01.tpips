@@ -10,6 +10,7 @@ setproperty LOOP_LABEL "kernel1"
 setproperty KERNELIZE_NBNODES 10
 setproperty KERNELIZE_KERNEL_NAME "kernel1"
 setproperty KERNELIZE_HOST_CALL_NAME "launch_kernel1"
+setproperty ISOLATE_STATEMENT_EVEN_NON_LOCAL TRUE
 
 apply KERNELIZE[compute]
 
@@ -31,10 +32,10 @@ echo
 apply UNSPLIT
 
 shell sed -i -e '1 i #define MIN(a,b) (a < b ? a : b )' $WKS.database/Src/$WKS.c
-shell cc $WKS.database/Src/$WKS.c  -o $WKS.database/Src/$WKS
+shell cc $WKS.database/Src/$WKS.c  -o $WKS.database/Src/{$WKS,par4all.c}
 shell cd $WKS.database/Src > /dev/null ; ./$WKS  ../../input.pgm; diff output.pgm ../../output-ref.pgm
 
 close
-delete $WKS
+#delete $WKS
 quit
 

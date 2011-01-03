@@ -532,7 +532,7 @@ saxpy (float sx[1000], float sy[1000])
     }
   else
     {
-      simd_load_generic_v4sf (vec10, sa0, sa0, sa0, sa0);
+      simd_load_generic_v4sf (vec10, &sa0, &sa0, &sa0, &sa0);
       ;
       ;
       for (lu_ind00 = 0; lu_ind00 <= 999; lu_ind00 += 4)

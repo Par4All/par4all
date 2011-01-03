@@ -38,15 +38,21 @@ ifndef PIPS_NO_TAGS
 	$(MAKE) tags
 endif
 
+.PHONY: doc htdoc build full-build clean
+
+# hmmm... not sure it is a good idea to go on errors.
 doc: compile
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase6
 
 htdoc: doc
 	$(MAKE) -C src FWD_STOP_ON_ERROR= phase7
 
+# various convenient short-hands
 build: doc
+full-build: htdoc
 
-full-build: build htdoc
+# more documentation
+doxygen: htdoc
 
 # do not include dependencies for some target
 clean: NO_INCLUDES=1
