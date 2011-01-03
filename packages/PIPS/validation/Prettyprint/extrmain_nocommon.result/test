@@ -18,11 +18,6 @@ d (int *j_p4a_copy, int *k_p4a_copy, int *jp_p4a_copy, int *kp_p4a_copy,
 									    -
 									    1],
 			   2));
-  *j_p4a_copy = j;
-  *k_p4a_copy = k;
-  *jp_p4a_copy = jp;
-  *kp_p4a_copy = kp;
-  *l_p4a_copy = l;
   return result;
 }
 /* C pretty print for module EXTR. */
@@ -48,9 +43,9 @@ extr (int *ni_p4a_copy, int *nc_p4a_copy, float t[60][21][52],
   k = k1;
   for (j = j1; j <= ja; j++)
     {
-      s1 = d (j, k, j, k + 1);
-      s2 = (d (j, k + 1, j, k + 2) + s1);
-      s3 = (d (j, k + 2, j, k + 3) + s2);
+      s1 = d (&j, &k, &j, k + 1, t, 0);
+      s2 = (d (&j, k + 1, &j, k + 2, t, 0) + s1);
+      s3 = (d (&j, k + 2, &j, k + 3, t, 0) + s2);
       t[(nc + 3) - 1][0][j - 1] = ((s2 * s3) / ((s1 - s2) * (s1 - s3)));
       t[(nc + 4) - 1][0][j - 1] = ((s3 * s1) / ((s2 - s3) * (s2 - s1)));
       t[(nc + 5) - 1][0][j - 1] = ((s1 * s2) / ((s3 - s1) * (s3 - s2)));
@@ -60,10 +55,5 @@ extr (int *ni_p4a_copy, int *nc_p4a_copy, float t[60][21][52],
       t[(nc + 5) - 1][0][jh - 1] = t[(nc + 5) - 1][0][j - 1];
       continue;
     }
-  *ni_p4a_copy = ni;
-  *nc_p4a_copy = nc;
-  *j1_p4a_copy = j1;
-  *ja_p4a_copy = ja;
-  *k1_p4a_copy = k1;
   return;
 }

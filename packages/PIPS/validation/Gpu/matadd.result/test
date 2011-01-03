@@ -987,7 +987,7 @@ p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
     {
       for (j = 0; j <= ((n - 1) + 1) + -1; j++)
 	{
-	  p4a_kernel_wrapper_0 (m, n, b, c, i, j);
+	  p4a_kernel_wrapper_0 (&m, &n, b, c, &i, &j);
 	}
     }
   return;
@@ -1008,7 +1008,7 @@ p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
     {
       for (j = 0; j <= ((n - 1) + 1) + -1; j++)
 	{
-	  p4a_kernel_wrapper_1 (m, n, a, b, c, i, j);
+	  p4a_kernel_wrapper_1 (&m, &n, a, b, c, &i, &j);
 	}
     }
   return;
@@ -1026,7 +1026,7 @@ p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
 
-  p4a_kernel_0 (m, n, b, c, i, j);
+  p4a_kernel_0 (&m, &n, b, c, &i, &j);
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
@@ -1043,6 +1043,6 @@ p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
 
-  p4a_kernel_1 (m, n, a, b, c, i, j);
+  p4a_kernel_1 (&m, &n, a, b, c, &i, &j);
   return;
 }

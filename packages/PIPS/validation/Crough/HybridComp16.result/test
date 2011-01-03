@@ -1,0 +1,95 @@
+
+Initial code
+
+      PROGRAM HYBRIDCOMP16
+      INTEGER I
+      INTEGER J
+      INTEGER N
+      INTEGER A
+      N = 5
+      A = 0
+      DO 10 I = 1, N
+         DO 20 J = 1, N
+            A = I*J
+20          CONTINUE
+10       CONTINUE
+      PRINT *, A
+      END
+
+Code after the first outlining
+
+      PROGRAM HYBRIDCOMP16
+      INTEGER I
+      INTEGER J
+      INTEGER N
+      INTEGER A
+      N = 5
+      A = 0
+      DO 10 I = 1, N
+         CALL TITI(A, I, N)
+10       CONTINUE
+      PRINT *, A
+      END
+      SUBROUTINE TITI(A, I, N)
+      INTEGER J, A, I, N
+      DO 20 J = 1, N
+         A = I*J
+20       CONTINUE
+      END
+
+Code after the second outlining
+
+      PROGRAM HYBRIDCOMP16
+      INTEGER I
+      INTEGER J
+      INTEGER N
+      INTEGER A
+      N = 5
+      A = 0
+      CALL TOTO(A, N)
+      PRINT *, A
+      END
+/* C pretty print for module TITI. */
+void
+titi (int *a_p4a_copy, int *i_p4a_copy, int *n_p4a_copy)
+{
+  int j;
+  int a = *a_p4a_copy;
+  int i = *i_p4a_copy;
+  int n = *n_p4a_copy;
+
+  for (j = 1; j <= n; j++)
+    {
+      a = (i * j);
+      continue;
+    }
+  *a_p4a_copy = a;
+  return;
+}
+/* C pretty print for module TOTO. */
+void
+toto_ (int *a_p4a_copy, int *n_p4a_copy)
+{
+  int i;
+  int a = *a_p4a_copy;
+  int n = *n_p4a_copy;
+
+  for (i = 1; i <= n; i++)
+    {
+      titi (&a, &i, &n);
+      continue;
+    }
+  *a_p4a_copy = a;
+  return;
+}
+
+unsplit
+
+
+compiles pgm from fortran files and executes
+
+          25
+
+compiles pgm from fortran and C files and executes
+
+          25

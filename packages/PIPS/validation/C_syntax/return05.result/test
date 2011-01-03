@@ -5,9 +5,9 @@ void return05()
 {
    int i = 1;
    i++;
-   goto l0000;
+   return;
    i++;
-l0000:   return;
+   ;
 }
 
 Printed file
@@ -16,5 +16,5 @@ void return05()
 {
    int i = 1;
    i++;
-l0000:   return;
+   ;
 }

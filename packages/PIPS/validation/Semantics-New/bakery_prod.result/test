@@ -46,7 +46,7 @@ CW:   z = 0.;
 //  T() {a==1, b==2}
 
 end:   ;
-   goto l0000;
+   return;
 
 //  T() {a==1, b==0}
 
@@ -66,7 +66,7 @@ l99999:   ;
 
 //  T() {a==1, 0<=b, b<=2}
 
-l0000:   return;
+   return;
 }
 
 PRECONDITIONS
@@ -116,7 +116,7 @@ CW:   z = 0.;
 //  P(a,b) {a==1, b==2}
 
 end:   ;
-   goto l0000;
+   return;
 
 //  P(a,b) {a==1, b==0}
 
@@ -136,5 +136,5 @@ l99999:   ;
 
 //  P(a,b) {a==1, 0<=b, b<=2}
 
-l0000:   return;
+   return;
 }

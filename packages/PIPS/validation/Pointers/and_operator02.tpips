@@ -1,0 +1,23 @@
+delete and_operator02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create and_operator02 and_operator02.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+# setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+
+
+echo
+echo POINTS TO
+echo 
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[main]
+
+
+close
+delete and_operator02
+quit
