@@ -95,7 +95,7 @@ void P4A_copy_to_accel(size_t element_size,
 
     @param[in] d1_block_size is the number of element to transfer
 
-    @param[in] d1_offset is element order to start the transfer from
+    @param[in] d1_offset is element order to start the transfer to
 
     @param[out] host_address point to the array on the host to write into
 
@@ -320,6 +320,82 @@ void P4A_accel_malloc(void **address,  size_t size) {
 void P4A_accel_free(void *address) {
   free(address);
 }
+
+
+/** Stubs for P4A runtime */
+void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
+  P4A_copy_to_accel(size,host_ptr,NULL);
+}
+void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */) {
+  P4A_copy_from_accel(size,host_ptr,NULL);
+}
+void *P4A_runtime_host_ptr_to_accel_ptr(void *host_ptr, size_t size) {
+  void *accel_ptr;
+  malloc(size);
+  P4A_accel_malloc(&accel_ptr, size);
+  return accel_ptr;
+}
+
+
+
+
+#ifdef P4A_RUNTIME_FFTW
+#include <fftw3.h>
+void fftwf_free(void *p) {
+  free(p);
+}
+
+void fftwf_destroy_plan( fftwf_plan p) {
+  free(p);
+}
+
+
+struct fftwf_plan_s {
+  int x,y,z;
+  fftwf_complex *in;
+  fftwf_complex *out;
+  int direction;
+  int params;
+  size_t datasize;
+};
+
+
+
+void fftwf_execute(fftwf_plan plan) {
+  int i,j,k;
+  for(i=0; i<plan->x;i++) {
+    for(j=0; j<plan->y;j++) {
+      for(k=0; k<plan->z;k++) {
+        plan->out[(i*plan->y*plan->z)+j*plan->z+k][0] = plan->in[(i*plan->y*plan->z)+j*plan->z+k][0];
+        plan->out[(i*plan->y*plan->z)+j*plan->z+k][1] = plan->in[(i*plan->y*plan->z)+j*plan->z+k][1];
+      }
+    }
+  }
+}
+
+fftwf_plan fftwf_plan_dft_3d(int nx, int ny, int nz, fftwf_complex *in, fftwf_complex *out, int direction, unsigned int params) {
+  fftwf_plan plan = malloc(sizeof(struct fftwf_plan_s));
+  plan->x = nx;
+  plan->y = ny;
+  plan->z = nz;
+  plan->in = in;
+  plan->out = out;
+  plan->direction = direction;
+  plan->params = params;
+  return plan;
+}
+
+void* fftwf_malloc(size_t size) {
+ return malloc(size);
+}
+
+
+
+#endif // P4A_RUNTIME_FFTW
+
+
+
+
 
 /** @} */
 

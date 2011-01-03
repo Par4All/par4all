@@ -4,17 +4,23 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
+import p4a_git 
+import p4a_opts
+import p4a_rc 
+import p4a_util
+import p4a_version 
+import string
+import sys
+import os
+import re
+import optparse
+import tempfile
+import shutil
 
 '''
 Par4All packing routines: allows you to create .deb or .tar.gz packages of Par4all.
 '''
 
-import string, sys, os, re, optparse, tempfile, shutil, time
-from p4a_util import *
-from p4a_rc import *
-from p4a_git import *
-from p4a_version import *
-from p4a_opts import *
 
 
 # Default directory to take current binary installation from.
@@ -104,14 +110,14 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
     global temp_dirs
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_")
     temp_dirs.append(temp_dir)
-    debug("Temp dir is " + temp_dir)
+    p4a_util.debug("Temp dir is " + temp_dir)
     temp_dir_with_prefix = os.path.join(temp_dir, install_prefix)
     os.makedirs(os.path.split(temp_dir_with_prefix)[0])
-    info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
-    run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
+    p4a_util.info("Copying " + pack_dir + " to " + temp_dir_with_prefix)
+    p4a_util.run([ "cp", "-av", pack_dir + "/", temp_dir_with_prefix ])
     abs_prefix = "/" + install_prefix
 
-    p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"),
+    p4a_rc.p4a_write_rc(os.path.join(temp_dir_with_prefix, "etc"),
         dict(
             root = abs_prefix,
             dist = abs_prefix,
@@ -120,8 +126,8 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
         )
     )
 
-    write_VERSION(temp_dir_with_prefix, version)
-    write_GITREV(temp_dir_with_prefix, gitrev)
+    p4a_version.write_VERSION(temp_dir_with_prefix, version)
+    p4a_version.write_GITREV(temp_dir_with_prefix, gitrev)
 
     return [ temp_dir, temp_dir_with_prefix ]
 
@@ -132,30 +138,30 @@ def create_deb(pack_dir, install_prefix, version, gitrev, distro, arch, keep_tem
     global debian_dir, package_name
     (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
     temp_debian_dir = os.path.join(temp_dir, "DEBIAN")
-    info("Copying " + debian_dir + " to " + temp_debian_dir)
+    p4a_util.info("Copying " + debian_dir + " to " + temp_debian_dir)
     shutil.copytree(debian_dir, temp_debian_dir)
     control_file = os.path.join(temp_debian_dir, "control.tpl")
-    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+    (revision, versiond) = p4a_version.make_full_revision(custom_version = version, custom_gitrev = gitrev)
     subs_map = dict(NAME = package_name, VERSION = revision, ARCH = arch, DIST = "/" + install_prefix)
-    info("Adjusting values in " + control_file)
-    subs_template_file(control_file, subs_map)
+    p4a_util.info("Adjusting values in " + control_file)
+    p4a_util.subs_template_file(control_file, subs_map)
     postinst_file = os.path.join(temp_debian_dir, "postinst.tpl")
-    info("Adjusting values in " + postinst_file)
-    subs_template_file(postinst_file, subs_map)
+    p4a_util.info("Adjusting values in " + postinst_file)
+    p4a_util.subs_template_file(postinst_file, subs_map)
     package_file_name = package_name + "-" + revision + "_" + arch + ".deb"
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
-        warn("Removing existing " + package_file)
+        p4a_util.warn("Removing existing " + package_file)
         os.remove(package_file)
-    run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
+    p4a_util.run([ "fakeroot", "dpkg-deb", "--build", temp_dir, package_file_name ])
     if os.path.exists(package_file_name):
-        done("Created " + package_file_name)
+        p4a_util.done("Created " + package_file_name)
     else:
-        warn(package_file_name + " file not created!?")
+        p4a_util.warn(package_file_name + " file not created!?")
     if keep_temp:
-        warn("Temporary directory was " + temp_dir)
+        p4a_util.warn("Temporary directory was " + temp_dir)
     else:
-        rmtree(temp_dir, can_fail = 1)
+        p4a_util.rmtree(temp_dir, can_fail = 1)
     return package_file_name
 
 def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_temp = False):
@@ -163,78 +169,78 @@ def create_tgz(pack_dir, install_prefix, version, gitrev, distro, arch, keep_tem
     global package_name
     (temp_dir, temp_dir_with_prefix) = create_dist(pack_dir, install_prefix, version, gitrev)
     if not arch:
-        arch = get_machine_arch()
-    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+        arch = p4a_util.get_machine_arch()
+    (revision, versiond) = p4a_version.make_full_revision(custom_version = version, custom_gitrev = gitrev)
     package_file_name = package_name + "-" + revision + "_" + arch + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
     if os.path.exists(package_file):
-        warn("Removing existing " + package_file)
+        p4a_util.warn("Removing existing " + package_file)
         os.remove(package_file)
     tar_dir = os.path.split(temp_dir_with_prefix)[0]
     new_temp_dir_with_prefix = os.path.join(tar_dir, package_name + "-" + versiond)
     shutil.move(temp_dir_with_prefix, new_temp_dir_with_prefix)
     tar_cmd = " ".join([ "tar", "czvf", package_file_name, "-C", tar_dir, "." ])
     sh_cmd = '"chown -R root:root ' + tar_dir + " && find " + tar_dir + " -type d -exec chmod 755 '{}' \\; && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
+    p4a_util.run([ "fakeroot", "sh", "-c", sh_cmd])
     if os.path.exists(package_file_name):
-        done("Created " + package_file_name)
+        p4a_util.done("Created " + package_file_name)
     else:
-        warn(package_file_name + " file not created!?")
+        p4a_util.warn(package_file_name + " file not created!?")
     if keep_temp:
-        warn("Temporary directory was " + temp_dir)
+        p4a_util.warn("Temporary directory was " + temp_dir)
     else:
-        rmtree(temp_dir, can_fail = True)
+        p4a_util.rmtree(temp_dir, can_fail = True)
     return package_file
 
 def create_stgz(pack_dir, install_prefix, version, gitrev, keep_temp = False):
     global package_name, temp_dirs
-    (revision, versiond) = make_full_revision(custom_version = version, custom_gitrev = gitrev)
+    (revision, versiond) = p4a_version.make_full_revision(custom_version = version, custom_gitrev = gitrev)
     package_full_name = package_name + "-" + revision + "_src"
     package_file_name = package_full_name + ".tar.gz"
     package_file = os.path.abspath(package_file_name)
-    package_file_tar = change_file_ext(package_file, "")
+    package_file_tar = p4a_util.change_file_ext(package_file, "")
     if os.path.exists(package_file):
-        warn("Removing existing " + package_file)
+        p4a_util.warn("Removing existing " + package_file)
         os.remove(package_file)
-    git = p4a_git(script_dir)
+    git = p4a_git.p4a_git(script_dir)
     current_branch = git.current_branch()
     #if current_branch != "p4a":
-    #    die("Not on branch p4a (" + current_branch + "), cannot create a source package")
+    #    p4a_util.die("Not on branch p4a (" + current_branch + "), cannot create a source package")
     prefix = package_name + "-" + versiond + "_src"
     git.archive(package_file_tar, prefix = prefix + "/")
     temp_dir = tempfile.mkdtemp(prefix = "p4a_pack_version_")
-    debug("Temp dir is " + temp_dir)
+    p4a_util.debug("Temp dir is " + temp_dir)
     temp_dirs.append(temp_dir)
     prev_cwd = os.getcwd()
     os.chdir(temp_dir)
     os.makedirs(os.path.join(temp_dir, prefix))
-    relative_version_file = write_VERSION(prefix, version)
-    relative_gitrev_file = write_GITREV(prefix, gitrev)
+    relative_version_file = p4a_version.write_VERSION(prefix, version)
+    relative_gitrev_file = p4a_version.write_GITREV(prefix, gitrev)
     tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_version_file ])
     sh_cmd = '"chown root:root ' + relative_version_file + " && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
+    p4a_util.run([ "fakeroot", "sh", "-c", sh_cmd])
     tar_cmd = " ".join([ "tar", "uvf", package_file_tar, relative_gitrev_file ])
     sh_cmd = '"chown root:root ' + relative_gitrev_file + " && " + tar_cmd + '"'
-    run([ "fakeroot", "sh", "-c", sh_cmd])
+    p4a_util.run([ "fakeroot", "sh", "-c", sh_cmd])
     os.chdir(prev_cwd)
-    rmtree(temp_dir)
-    run([ "gzip", "-9", package_file_tar ])
+    p4a_util.rmtree(temp_dir)
+    p4a_util.run([ "gzip", "-9", package_file_tar ])
     if os.path.exists(package_file_name):
-        done("Created " + package_file_name)
+        p4a_util.done("Created " + package_file_name)
     return package_file
 
 
 def publish_deb(file, host, repos_dir, arch):
-    #~ arch = change_file_ext(file, "").split("_")[-1]
-    info("Publishing " + file + " in the deb repository (" + arch + ")")
+    #~ arch = p4a_util.change_file_ext(file, "").split("_")[-1]
+    p4a_util.info("Publishing " + file + " in the deb repository (" + arch + ")")
     repos_arch_dir = repos_dir + "/binary-" + arch
-    warn("Removing existing .deb file for arch " + arch + " (" + repos_arch_dir + ")")
-    run([ "ssh", host, "mkdir -p " + repos_arch_dir ])
-    run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
-    warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
-    run([ "scp", file, host + ":" + repos_arch_dir ])
-    warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
-    warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
+    p4a_util.warn("Removing existing .deb file for arch " + arch + " (" + repos_arch_dir + ")")
+    p4a_util.run([ "ssh", host, "mkdir -p " + repos_arch_dir ])
+    p4a_util.run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
+    p4a_util.warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
+    p4a_util.run([ "scp", file, host + ":" + repos_arch_dir ])
+    p4a_util.warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
+    p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
 
 def publish_files(files, distro, deb_distro, arch, deb_arch, development = False):
@@ -253,20 +259,20 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
 
     # Substitute placeholders such as $DISTRO, $DATE etc.
     publish_dir = string.Template(publish_dir).substitute(
-        DISTRO = distro, ARCH = arch, DATE = utc_date())
+        DISTRO = distro, ARCH = arch, DATE = p4a_util.utc_date())
     deb_publish_dir = string.Template(deb_publish_dir).substitute(
-        DISTRO = deb_distro, ARCH = deb_arch, DATE = utc_date())
+        DISTRO = deb_distro, ARCH = deb_arch, DATE = p4a_util.utc_date())
 
     for file in files:
         file = os.path.abspath(os.path.expanduser(file))
         if not os.path.exists(file):
-            die("Invalid file: " + file)
-        warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
-        warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
-        warn("If something goes wrong, try creating directories or publishing the file manually")
-        run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
-        run([ "scp", file, default_publish_host + ":" + publish_dir ])
-        ext = get_file_ext(file)
+            p4a_util.die("Invalid file: " + file)
+        p4a_util.warn("Copying " + file + " in " + publish_dir + " on " + default_publish_host)
+        p4a_util.warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
+        p4a_util.warn("If something goes wrong, try creating directories or publishing the file manually")
+        p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
+        p4a_util.run([ "scp", file, default_publish_host + ":" + publish_dir ])
+        ext = p4a_util.get_file_ext(file)
         if ext == ".deb":
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
 
@@ -280,26 +286,26 @@ def work(options, args = []):
     # Determine architecture for binary packages (and special arch name for debs).
     deb_arch = arch = options.arch
     if not arch:
-        arch = get_machine_arch()
+        arch = p4a_util.get_machine_arch()
     if arch == "x86_64":
         deb_arch = "amd64"
     elif re.match("i\d86", arch):
         deb_arch = "i386"
-    debug("arch=" + arch)
-    debug("deb_arch=" + deb_arch)
+    p4a_util.debug("arch=" + arch)
+    p4a_util.debug("deb_arch=" + deb_arch)
 
     # Determine current running distro unless provided.
     distro = options.distro
     if not distro:
-        distro = get_distro()
+        distro = p4a_util.get_distro()
     if options.deb:
         if distro not in [ "ubuntu", "debian" ]:
-            die("Invalid target distro for building .debs: " + distro)
-    debug("distro=" + distro)
+            p4a_util.die("Invalid target distro for building .debs: " + distro)
+    p4a_util.debug("distro=" + distro)
 
     if len(args):
         if not options.publish:
-            die("You specified files on command line but did not specify --publish")
+            p4a_util.die("You specified files on command line but did not specify --publish")
         publish_files(args, distro, distro, arch, deb_arch, options.development)
         return
 
@@ -308,17 +314,17 @@ def work(options, args = []):
 
     if (not options.deb #and not options.sdeb
         and not options.tgz and not options.stgz):
-        warn("--deb and/or --tgz and/or --stgz not specified, assuming --deb --tgz --stgz")
+        p4a_util.warn("--deb and/or --tgz and/or --stgz not specified, assuming --deb --tgz --stgz")
         options.deb = True
         options.tgz = True
         options.stgz = True
 
     prefix = options.install_prefix
     if prefix:
-        warn("Installation prefix: " + prefix + " (--install-prefix)")
+        p4a_util.warn("Installation prefix: " + prefix + " (--install-prefix)")
     else:
         prefix = default_install_prefix
-        warn("Installation prefix: " + prefix + " (default; override with --install-prefix)")
+        p4a_util.warn("Installation prefix: " + prefix + " (default; override with --install-prefix)")
 
     # Strip forward slash:
     if prefix[0] == "/" and len(prefix):
@@ -328,52 +334,52 @@ def work(options, args = []):
     if options.deb or options.tgz:
         if pack_dir:
             pack_dir = os.path.realpath(os.path.abspath(os.path.expanduser(pack_dir)))
-            warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
+            p4a_util.warn("Par4All installation is to be found in " + pack_dir + " (--pack-dir)")
         else:
             pack_dir = default_pack_dir
-            warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
+            p4a_util.warn("Assuming Par4All is currently installed in " + pack_dir + " (default; use --pack-dir to override)")
         if not os.path.isdir(pack_dir):
-            die("Directory does not exist: " + pack_dir)
+            p4a_util.die("Directory does not exist: " + pack_dir)
 
     output_dir = options.pack_output_dir
     if output_dir:
         output_dir = os.path.abspath(os.path.expanduser(output_dir))
-        warn("Packages will be put in " + output_dir + " (--pack-output-dir)")
+        p4a_util.warn("Packages will be put in " + output_dir + " (--pack-output-dir)")
         if output_dir == os.getcwd():
             output_dir = None
     else:
-        warn("Packages will be put in " + os.getcwd() + " (default; override with --pack-output-dir)")
+        p4a_util.warn("Packages will be put in " + os.getcwd() + " (default; override with --pack-output-dir)")
 
     version = ""
     if options.version:
         version = options.version
-        info("Version: " + version + " (--package-version)")
+        p4a_util.info("Version: " + version + " (--package-version)")
     else:
-        version = VERSION(pack_dir)
-        info("Version: " + version + " (override with --package-version)")
+        version = p4a_version.VERSION(pack_dir)
+        p4a_util.info("Version: " + version + " (override with --package-version)")
 
     src_version = ""
     if options.src_version:
         src_version = options.src_version
-        info("Sources version: " + src_version + " (--package-src-version)")
+        p4a_util.info("Sources version: " + src_version + " (--package-src-version)")
     else:
-        src_version = VERSION()
-        info("Sources version: " + src_version + " (override with --package-src-version)")
+        src_version = p4a_version.VERSION()
+        p4a_util.info("Sources version: " + src_version + " (override with --package-src-version)")
 
     if options.append_date:
-        dt = utc_datetime()
+        dt = p4a_util.utc_datetime()
         version += "~" + dt
         src_version += "~" + dt
 
-    gitrev = GITREV(pack_dir)
-    info("Git revision: " + gitrev)
+    gitrev = p4a_version.GITREV(pack_dir)
+    p4a_util.info("Git revision: " + gitrev)
 
-    src_gitrev = GITREV()
-    info("Sources Git revision: " + src_gitrev)
+    src_gitrev = p4a_version.GITREV()
+    p4a_util.info("Sources Git revision: " + src_gitrev)
 
     # Check that fakeroot is available.
-    if not which("fakeroot"):
-        die("fakeroot not found, please install it (sudo aptitude install fakeroot)")
+    if not p4a_util.which("fakeroot"):
+        p4a_util.die("fakeroot not found, please install it (sudo aptitude install fakeroot)")
 
     global temp_dirs
     output_files = []
@@ -402,21 +408,21 @@ def work(options, args = []):
                 if dest_file == file:
                     continue
                 if os.path.exists(dest_file):
-                    warn("Removing existing " + dest_file)
+                    p4a_util.warn("Removing existing " + dest_file)
                     os.remove(dest_file)
-                run([ "mv", "-v", file, dest_file ])
+                p4a_util.run([ "mv", "-v", file, dest_file ])
     except:
         for dir in temp_dirs:
             if os.path.isdir(dir):
-                warn("NOT Removing " + dir)
+                p4a_util.warn("NOT Removing " + dir)
         raise
 
     for dir in temp_dirs:
         if os.path.isdir(dir):
             if options.keep_temp:
-                warn("NOT Removing " + dir + " (--keep-temp)")
+                p4a_util.warn("NOT Removing " + dir + " (--keep-temp)")
             else:
-                rmtree(dir, can_fail = True)
+                p4a_util.rmtree(dir, can_fail = True)
 
 
 def main():
@@ -430,17 +436,17 @@ def main():
 
     add_module_options(parser)
 
-    add_common_options(parser)
+    p4a_opts.add_common_options(parser)
 
     (options, args) = parser.parse_args()
 
-    if process_common_options(options, args):
+    if p4a_opts.process_common_options(options, args):
         work(options, args)
 
 
 # If this file is called as a script, execute the main:
 if __name__ == "__main__":
-    exec_and_deal_with_errors(main)
+    p4a_opts.exec_and_deal_with_errors(main)
 
 
 # Some Emacs stuff:

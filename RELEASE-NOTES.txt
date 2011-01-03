@@ -1,4 +1,4 @@
-Release notes for Par4All 1.1, 2010/11/24
+Release notes for Par4All 1.0.5, 2010/12/22
 ===========================================
 
 Ronan Keryell, HPC Project.

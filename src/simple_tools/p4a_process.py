@@ -5,18 +5,26 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
+import p4a_util 
+import optparse
+import subprocess
+import sys
+import os
+import re
+import shutil
 
 '''
 Par4All processing
 '''
 
-import sys, os, re, shutil
-from p4a_util import *
+
 
 # Basic properties to be used in Par4All:
 default_properties = dict(
     # Useless to go on if something goes wrong... :-(
-    ABORT_ON_USER_ERROR = True,
+    #ABORT_ON_USER_ERROR = True,
+    ABORT_ON_USER_ERROR = False,
+    # Compute the intraprocedural preconditions at the same
     # Compute the intraprocedural preconditions at the same
     # time as transformers and use them to improve the
     # accuracy of expression and statement transformers:
@@ -60,6 +68,8 @@ class p4a_processor_input(object):
     project_name = ""
     accel = False
     cuda = False
+    com_optimization = False
+    fftw3 = False
     openmp = False
     fine = False
     select_modules = ""
@@ -109,6 +119,8 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
+            com_optimization = input.com_optimization,
+            fftw3 = input.fftw3,
             recover_includes = input.recover_includes,
             native_recover_includes = input.native_recover_includes,
             properties = input.properties,
@@ -139,7 +151,7 @@ def process(input):
         e = sys.exc_info()
         exception = e[1]
         if exception.__class__.__name__ == "RuntimeError" and str(exception).find("pips") != -1:
-            output.exception = p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
+            output.exception = p4a_util.p4a_error("An error occurred in PIPS while processing " + ", ".join(input.files))
         else:
             # Since the traceback object cannot be serialized, display
             # here the exec_info for more information on stderr:
@@ -151,9 +163,9 @@ def process(input):
 
 
 def process_file(input_file, output_file):
-    input = load_pickle(input_file)
+    input = p4a_util.load_pickle(input_file)
     output = process(input)
-    save_pickle(output_file, output)
+    p4a_util.save_pickle(output_file, output)
 
 
 def main(options, args = []):
@@ -163,13 +175,13 @@ def main(options, args = []):
     object files with names given as parameters
     """
     if not options.input_file:
-        die("Missing --input-file")
+        p4a_util.die("Missing --input-file")
 
     if not options.output_file:
-        die("Missing --output-file")
+        p4a_util.die("Missing --output-file")
 
     if not os.path.exists(options.input_file):
-        die("Input file does not exist: " + options.input_file)
+        p4a_util.die("Input file does not exist: " + options.input_file)
 
     process_file(options.input_file, options.output_file)
 
@@ -196,7 +208,8 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False,
+                 filter_exclude = None, accel = False, cuda = False, 
+                 com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  properties = {}, activates = []):
 
@@ -204,6 +217,8 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.com_optimization = com_optimization
+        self.fftw3 = fftw3,
 
         if workspace:
             # There is one provided: use it!
@@ -215,7 +230,7 @@ class p4a_processor(object):
                 cpp_flags = ""
 
             if not project_name:
-                raise p4a_error("Missing project_name")
+                raise p4a_util.p4a_error("Missing project_name")
 
             self.project_name = project_name
 
@@ -229,13 +244,13 @@ class p4a_processor(object):
                     # Track the language for an eventual later compilation
                     # by a back-end target compiler. The first file type
                     # select the type for all the workspace:
-                    if fortran_file_p(file):
+                    if p4a_util.fortran_file_p(file):
                         self.fortran = True
                     else:
                         self.fortran = False
 
                 if not os.path.exists(file):
-                    raise p4a_error("File does not exist: " + file)
+                    raise p4a_util.p4a_error("File does not exist: " + file)
 
             self.files = files
 
@@ -282,7 +297,7 @@ class p4a_processor(object):
             for k in properties:
                 all_properties[k] = properties[k]
             for k in all_properties:
-                debug("Property " + k + " = " + str(all_properties[k]))
+                p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
                 self.workspace.props[k] = all_properties[k]
 
 
@@ -354,6 +369,14 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization()
 
+    def get_launcher_prefix (self):
+        return self.workspace.props.GPU_LAUNCHER_PREFIX
+
+    def get_kernel_prefix (self):
+        return self.workspace.props.GPU_KERNEL_PREFIX
+
+    def get_wrapper_prefix (self):
+        return self.workspace.props.GPU_WRAPPER_PREFIX
 
     def gpuify(self, filter_select = None, filter_exclude = None):
         """Apply transformations to the parallel loop nested found in the
@@ -368,8 +391,9 @@ class p4a_processor(object):
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
-        # functions have their names beginning with "p4a_kernel_launcher":
-        kernel_launcher_filter_re = re.compile("p4a_kernel_launcher_.*[^!]$")
+        # functions have their names beginning with the launcher prefix:
+        launcher_prefix = self.get_launcher_prefix ()
+        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
@@ -415,16 +439,27 @@ class p4a_processor(object):
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
                                  concurrent=True)
 
-        # Add communication around all the call site of the kernels:
-        kernel_launchers.kernel_load_store(concurrent=True,
-                                           KERNEL_LOAD_STORE_LOAD_FUNCTION_2D = "P4A_copy_to_accel_2d",
-                                           KERNEL_LOAD_STORE_STORE_FUNCTION_2D = "P4A_copy_from_accel_2d"
-                                           )
-
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
-        kernel_filter_re = re.compile("p4a_kernel_\\d+$")
+        kernel_prefix = self.get_kernel_prefix ()
+        kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+
+        if not self.com_optimization :
+            # Add communication around all the call site of the kernels. Since
+            # the code has been outlined, any non local effect is no longer an
+            # issue:
+            kernel_launchers.kernel_load_store(concurrent=True,
+                                               ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
+                                               )
+        else :
+            # Identify kernels first
+            kernels.flag_kernel()
+            #kernel for fftw3 runtime
+            fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
+            fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
+            fftw3_kernels.flag_kernel()
+            self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
@@ -432,7 +467,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        
+
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
         # original code for more precise analysis but we need to remove
@@ -448,13 +483,18 @@ class p4a_processor(object):
 
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
-        wrapper_filter_re = re.compile("p4a_kernel_wrapper_\\d+$")
+        wrapper_prefix = self.get_wrapper_prefix ()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
         # set return type for wrappers && kernel
         wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
         kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
-        
+
+        if self.com_optimization :
+            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
+            wrappers.cast_at_call_sites()
+
         #self.workspace.all_functions.display()
 
         # To be able to inject Par4All accelerator run time initialization
@@ -462,7 +502,7 @@ class p4a_processor(object):
         if "main" in self.workspace:
             self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
         else:
-            warn('''
+            p4a_util.warn('''
             There is no "main()" function in the given sources.
             That means the P4A Accel runtime initialization can not be
             inserted and that the compiled application may not work.
@@ -488,16 +528,16 @@ class p4a_processor(object):
     def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''
 
-        info("Post-processing " + file)
+        p4a_util.info("Post-processing " + file)
 
-        post_process_script = os.path.join(get_program_dir(), "p4a_post_processor.py")
+        post_process_script = os.path.join(p4a_util.get_program_dir(), "p4a_post_processor.py")
 
         args = [ post_process_script ]
         if dest_dir:
             args += [ '--dest-dir', dest_dir ]
         args.append(file)
 
-        run(args,force_locale = None)
+        p4a_util.run(args,force_locale = None)
         #~ subprocess.call(args)
 
 
@@ -536,7 +576,7 @@ class p4a_processor(object):
 
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
-            if self.recover_includes and not self.native_recover_includes and c_file_p(file):
+            if self.recover_includes and not self.native_recover_includes and p4a_util.c_file_p(file):
                 subprocess.call([ 'p4a_recover_includes',
                                   '--simple', pips_file ])
 
@@ -551,12 +591,12 @@ class p4a_processor(object):
             output_name = prefix + name
 
             if suffix:
-                output_name = file_add_suffix(output_name, suffix)
+                output_name = p4a_util.file_add_suffix(output_name, suffix)
 
             # The final destination
             output_file = os.path.join(dir, output_name)
 
-            if self.accel and c_file_p(file):
+            if self.accel and p4a_util.c_file_p(file):
                 # We generate code for P4A Accel, so first post process
                 # the output:
                 self.accel_post(pips_file,
@@ -569,7 +609,7 @@ class p4a_processor(object):
                 if self.cuda:
                     # To have the nVidia compiler to be happy, we need to
                     # have a .cu version of the .c file
-                    output_file = change_file_ext(output_file, ".cu")
+                    output_file = p4a_util.change_file_ext(output_file, ".cu")
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
