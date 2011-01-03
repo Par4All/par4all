@@ -201,12 +201,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     /* Outline the kernel launcher with a prefix defined in the
        GPU_LAUNCHER_PREFIX property: */
     list sl = CONS(STATEMENT, s, NIL);
-    statement st = statement_undefined;
-    st = outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
-    if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
-      string fwp = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
-      outliner (build_new_top_level_module_name (fwp),CONS(STATEMENT,st,NIL));
-    }
+    outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
     //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
   }
 }

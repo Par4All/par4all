@@ -7225,18 +7225,6 @@ GPU_USE_WRAPPER TRUE
 GPU_USE_KERNEL TRUE
 \end{PipsProp}
 
-When the original code is in Fortran it might be usefull to wrap the kernel
-launcher in an indepedant C file. The
-\PipsPropRef{GPU_USE_FORTRAN_WRAPPER} can be used for that purpose. The name of
-the function wrapper can be configured using the property
-\PipsPropRef{GPU_FORTRAN_WRAPPER_PREFIX}. As specified before it is safe to use
-prefix name in uppercase.
-\begin{PipsProp}{GPU_USE_FORTRAN_WRAPPER}
-GPU_USE_FORTRAN_WRAPPER FALSE
-\end{PipsProp}
-\begin{PipsProp}{GPU_FORTRAN_WRAPPER_PREFIX}
-GPU_FORTRAN_WRAPPER_PREFIX "P4A_FORTRAN_WRAPPER"
-\end{PipsProp}
 
 The phase generates a wrapper function to get the iteration coordinate from
 intrinsics functions instead of the initial loop indices. Using this kind
@@ -13432,7 +13420,7 @@ print_whole_dependence_graph          > MODULE.dg_file
 
 \begin{PipsPass}{print_filtered_dependence_graph}
 Same as \PipsPassRef{print_whole_dependence_graph} but it's filtered by
-some variables. Variables to filter is a comma separated list set by
+some variables. Variables to filter is a comma separated list set by 
 user via property ``EFFECTS\_FILTER\_ON\_VARIABLE''.
 \end{PipsPass}
 
@@ -13610,7 +13598,7 @@ PRINT_DOTDG_INPUT_DEP_STYLE "dashed"
 Style for each type of dependence
 
 
-\section{Fortran to C prettyprinter}
+\section{Prettyprinters for C}
 
 \begin{PipsPass}{print_crough}
 A basic and experimental C dumper to output a Fortran program in C
@@ -13633,8 +13621,6 @@ print_crough  > MODULE.crough
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
-
-\subsection{Properties for Fortran to C prettyprinter}
 
 By default the crough pass tries to match the best C type for any Fortran
 type. Here is the matches between Fortran and C variables:
@@ -13674,32 +13660,15 @@ CROUGH_INTEGER_TYPE "p4a_int"
 CROUGH_REAL_TYPE "p4a_real"
 \end{PipsProp}
 
-When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an
-underscore is added at the end of the module name. This is needed when
-translating only some part of a Fortran Program to C. This property must be
-used with great care, so that only interface function names are changed : the
-function names in subsequent calls are not modified. An other solution to call
-a C function from a fortran program is to use/declare an interface in the
-fortran source code (This feature is part of the Fortran 2003 standard
-but many Fortran95 compilers support it). The property
-CROUGH\_FORTRAN\_USES\_INTERFACE can be set to TRUE when the Fotran code
-integrates interfaces. In such a case, the unmodified scalar function
-parameters (by the function or any of its callees) are expected to be passed by
-values, the other parameters are passed by pointers. Finally when using
-interfaces it is also possible to pass all the scalar variables by values using
-the propetty CROUGH\_ALL\_SCALAR\_BY\_VALUE
+\subsection{Prettyprint for C  properties}
+\index{PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE}
+
+When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an underscore is added at the end of the module name. This is needed when translating only some part of a Fortran Program to C. This property must be used with great care, so that only interface function names are changed : the function names in subsequent calls are not modified.
 
 \begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE}
 PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
 \end{PipsProp}
 
-\begin{PipsProp}{CROUGH_FORTRAN_USES_INTERFACE}
-CROUGH_FORTRAN_USES_INTERFACE FALSE
-\end{PipsProp}
-
-\begin{PipsProp}{CROUGH_ALL_SCALAR_BY_VALUE}
-CROUGH_ALL_SCALAR_BY_VALUE FALSE
-\end{PipsProp}
 
 \section{Prettyprinters Smalltalk}
 \label{subsection-prettyprinters-smalltalk}
