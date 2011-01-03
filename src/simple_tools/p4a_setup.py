@@ -69,6 +69,9 @@ def add_module_options(parser):
     group.add_option("--prefix", "-p", metavar = "DIR", default = None,
         help = "Specify the prefix used to configure the packages. Default is /usr/local/par4all.")
 
+    group.add_option("--build-dir", "-b", metavar = "DIR", default = "build",
+        help = "Specify the build directory to be used relatively to the root directory as specify the --root option. Default to build")
+
     group.add_option("--polylib-src", metavar = "DIR", default = None,
         help = "Specify polylib source directory.")
 
@@ -339,7 +342,7 @@ def work(options, args = None):
         os.makedirs(install_dir)
 
     # Build directory: where the Makefile are generated, where the make commands are issued, etc.
-    build_dir = os.path.join(root, "build")
+    build_dir = os.path.join(root, options.build_dir)
     p4a_util.debug("Build directory: " + build_dir)
 
     # Path for source packages:
