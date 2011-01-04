@@ -8,7 +8,7 @@ Workspace implchar created and opened.
 Main module PROGRAM "IMPLCHAR" selected.
 Module IMPLCHAR selected
 setproperty PARSER_DUMP_SYMBOL_TABLE=TRUE 
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module DUMMY selected
 Module DUMMY already active.
 Request: build resource PRINTED_FILE for module DUMMY.

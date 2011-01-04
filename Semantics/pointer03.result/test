@@ -83,6 +83,9 @@ int pointer03()
 Warnings
 
 unknown[unknown] (activate_phase) Rule `C_PARSER' already active
+unknown[unknown] (parse_properties) property PRETTYPRINT_LANGUAGE redefined
+unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
 INITIAL_PRECONDITION[pointer03] (add_or_kill_equivalenced_variables) storage return
 PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning pointer03 instead
 PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
