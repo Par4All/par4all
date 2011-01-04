@@ -59,6 +59,16 @@
 static hash_table pl = (hash_table) NULL;
 static bool update_property = FALSE;
 
+/* A flag used to avoid infinite recursion in the case of use error here */
+static size_t pending_errors = false;
+
+
+/* Call pips_user_error and notice it first */	\
+#define property_user_error(...) do {		\
+  pending_errors++;				\
+  user_error(__FUNCTION__, __VA_ARGS__);	\
+} while(0)
+
 #ifdef FLEX_SCANNER
 
 /* We may parse strings or files...
@@ -97,10 +107,7 @@ void parse_properties_string(char *s)
 
 void parse_properties_string(char *s)
 {
-    // DO NOT CALL pips_user_error here
-    fprintf(stderr, "[parse_properties_string] "
-	    "cannot parse string (%s) without flex\n", s);
-    exit(1);
+    property_user_error("cannot parse string (%s) without flex\n", s);
 }
 
 #endif /* FLEX_SCANNER */
@@ -121,11 +128,6 @@ FALSE			{ return(TFALSE); }
 			}
 %%
 
-/* pips_user_error() is not always used: because the catch may not be set? The
- * control flow is not interrupted by error() as it is by pips_user_error().
- */
-#define error(f, s)  fprintf(stderr, "[property] " f, s), abort()
-
 int yywrap(void)
 { return 1;}
 
@@ -145,7 +147,7 @@ static bool property_equal_p(property p1, property p2)
             equal_p = (strcmp(property_string(p1),property_string(p2))==0);
             break;
         default:
-	    error("illegal tag %d\n", property_tag(p1));
+	    property_user_error("illegal tag %d\n", property_tag(p1));
         }
     }
 
@@ -174,20 +176,16 @@ static void parse_properties(void)
 	string n;
 
 	if (tok != TIDENT) {
-	    // DO NOT CALL pips_user_error here
-	    fprintf(stderr, "syntax error in parse_properties, "
-		    "ident expected, got %d for -%s-.\n", tok, yytext);
+	    property_user_error("syntax error: ident expected, got %d for -%s-.\n", tok, yytext);
 	    return;
 	}
 
 	n = strdup(yytext);
 
 	if (update_property && property_undefined_p(get_property(n, TRUE))) {
-	    // DO NOT CALL pips_user_error here
-	    fprintf(stderr, "user error in parse_properties: "
-		    "Unknown property %s to update\n", n);
-		free(n);
-	    return;
+	  property_user_error("Unknown property %s to update\n", n);
+	  free(n);
+	  return;
 	}
 
 	switch (tok = yylex())
@@ -207,9 +205,7 @@ static void parse_properties(void)
             char *s = strdup(yytext + 1);
             char *q = strrchr(s, '"');
 			if (q == NULL) {
-				// DO NOT CALL pips_user_error here
-				fprintf(stderr, "user error in parse_properties: "
-						"bad string : %s\n", yytext);
+				property_user_error("bad string : %s\n", yytext);
 				free(n);
 				return;
 			}
@@ -218,9 +214,7 @@ static void parse_properties(void)
 	    break;
 	}
 	default:
-	    // DO NOT CALL pips_user_error here
-	    fprintf(stderr, "user error in parse_properties: "
-		    "bad value for property %s: %s\n", n, yytext);
+	    property_user_error("bad value for property %s: %s\n", n, yytext);
 	    return;
 	}
 
@@ -229,23 +223,19 @@ static void parse_properties(void)
 	{
 	    if (property_tag(opr)!=property_tag(pr))
 	    {
-	    // DO NOT CALL pips_user_error here
-		fprintf(stderr, "user warning, "
-			"cannot change type from %s to %s "
-			"when updating property %s\n",
-			property_tag_to_string(property_tag(opr)),
-			property_tag_to_string(property_tag(pr)),
-			n);
-		free_property(pr);
+	      property_user_error("cannot change type from %s to %s "
+				  "when updating property %s\n",
+				  property_tag_to_string(property_tag(opr)),
+				  property_tag_to_string(property_tag(pr)),
+				  n);
+	      free_property(pr);
 	    }
 	    else
 	    {
-		if(!property_equal_p(pr, opr))
-	    // DO NOT CALL pips_user_error here
-		    fprintf(stderr, "user warning, "
-			    "property %s redefined\n", n);
-		free_property(opr);
-		hash_update(pl, n, (char *) pr);
+	      if(!property_equal_p(pr, opr))
+		pips_user_warning("property %s redefined\n", n);
+	      free_property(opr);
+	      hash_update(pl, n, (char *) pr);
 	    }
         }
         else
@@ -312,6 +302,25 @@ static void read_properties(void)
 }
 
 
+/* Test if we have too many property errors pending
+
+   It is useful in pips_user_error to avoid infinite recursion where
+   properties are used there to change the behaviour of pips_user_error...
+   */
+bool too_many_property_errors_pending_p() {
+  /* Well, this limit should depend on the actual implementation of
+     user_error, that may change in tpips, pyps, wpips... It should be
+     configurable... */
+  return pending_errors > 3;
+}
+
+
+/* Reset the pending stuff in case we where able to cope with... */
+void reset_property_error() {
+  pending_errors = 0;
+}
+
+
 /* Get a property
 
    @param[in] name is the name of the property to look-up
@@ -334,10 +343,7 @@ property get_property(const char* name, bool cool)
 
     if (p == u) {
 	if (!cool) {
-            fprintf(stderr, "unknown property: --%s--\n", name);
-            /* Not a nice exit from PIPS... */
-            abort();
-            //error("unknown property: --%s--\n", name);
+	  property_user_error("unknown property: --%s--\n", name);
         }
 	/* else since error does not return */
 	p = property_undefined;
@@ -356,7 +362,7 @@ bool get_bool_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
-	error("property %s is not bool\n", name);
+	property_user_error("property %s is not bool\n", name);
     return(property_bool(p));
 }
 
@@ -371,7 +377,7 @@ void set_bool_property(const char* name, bool b)
 {
     property p = get_property(name, FALSE);
     if (! property_bool_p(p))
-	error("property %s is not bool\n", name);
+	property_user_error("property %s is not bool\n", name);
     property_bool(p) = b;
 }
 
@@ -386,7 +392,7 @@ string get_string_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
-	error("property %s is not string\n", name);
+	property_user_error("property %s is not string\n", name);
     return property_string(p);
 }
 
@@ -405,7 +411,7 @@ string get_string_property_or_ask(const char* name,const char question[])
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
-        error("property %s is not string\n", name);
+        property_user_error("property %s is not string\n", name);
     string s = property_string(p);
     while(!s || string_undefined_p(s) || s[0] == '\0' )
         s = user_request(question);
@@ -425,7 +431,7 @@ void set_string_property(const char* name, string s)
 {
     property p = get_property(name, FALSE);
     if (! property_string_p(p))
-	error("property %s is not string\n", name);
+	property_user_error("property %s is not string\n", name);
     free(property_string(p));
     property_string(p) = strdup(s);
 }
@@ -442,7 +448,7 @@ get_int_property(const char* name)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p))
-	error("property %s is not int\n", name);
+	property_user_error("property %s is not int\n", name);
     return property_int(p);
 }
 
@@ -457,7 +463,7 @@ void set_int_property(const char* name, int i)
 {
     property p = get_property(name, FALSE);
     if (! property_int_p(p))
-	error("property %s is not int\n", name);
+	property_user_error("property %s is not int\n", name);
     property_int(p) = i;
 }
 
