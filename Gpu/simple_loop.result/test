@@ -46,8 +46,22 @@ void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
 int main()
 {
    int i;
+   {
+      //PIPS generated variable
+      double (*a0)[10000] = (double (*)[10000]) 0, (*b0)[10000] = (double (*)[10000]) 0, (*c0)[10000] = (double (*)[10000]) 0;
+      P4A_accel_malloc((void **) &c0, sizeof(double)*10000);
+      P4A_accel_malloc((void **) &b0, sizeof(double)*10000);
+      P4A_accel_malloc((void **) &a0, sizeof(double)*10000);
+      P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &c[0], *c0);
+      P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
 
-   p4a_kernel_launcher_0(N, a, b, c);
+
+      p4a_kernel_launcher_0(N, *a0, *b0, *c0);
+      P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);
+      P4A_accel_free(c0);
+      P4A_accel_free(b0);
+      P4A_accel_free(a0);
+   }
 
    return 0;
 }
@@ -80,6 +94,10 @@ double a[N], b[N], c[N];
 int main();
 //PIPS generated variable
 void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N]);
+//PIPS generated variable
+typedef unsigned int size_t;
+//PIPS generated variable
+void P4A_accel_malloc(void **address, size_t size), P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
 void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
@@ -101,8 +119,22 @@ void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
 int main()
 {
    int i;
+   {
+      //PIPS generated variable
+      double (*a0)[10000] = (double (*)[10000]) 0, (*b0)[10000] = (double (*)[10000]) 0, (*c0)[10000] = (double (*)[10000]) 0;
+      P4A_accel_malloc((void **) &c0, sizeof(double)*10000);
+      P4A_accel_malloc((void **) &b0, sizeof(double)*10000);
+      P4A_accel_malloc((void **) &a0, sizeof(double)*10000);
+      P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &c[0], *c0);
+      P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
 
-   p4a_kernel_launcher_0(N, a, b, c);
+
+      p4a_kernel_launcher_0(N, *a0, *b0, *c0);
+      P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);
+      P4A_accel_free(c0);
+      P4A_accel_free(b0);
+      P4A_accel_free(a0);
+   }
 
    return 0;
 }
