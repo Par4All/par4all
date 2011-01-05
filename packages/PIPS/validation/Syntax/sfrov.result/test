@@ -5,7 +5,7 @@ Splitting file    ./sfrov.f
 Workspace sfrov created and opened.
 Module SFROV selected
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module SFROV already active.
 Request: build resource PRINTED_FILE for module SFROV.
   BOOTSTRAP                      building   ENTITIES()

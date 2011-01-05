@@ -1,388 +1,125 @@
 
-Proper effects for "main"
-
-int main()
-{
-   int t[100][10][3];                                                   /*0005*/
-
-   int (*p)[3];                                                         /*0007*/
-   int *pu;                                                             /*0008*/
-
-   int (*q)[10][3];                                                     /*0010*/
-   int (*qu)[3];                                                        /*0011*/
-
-   int (*r)[100][10][3];                                                /*0013*/
-   int (*ru)[10][3];                                                    /*0014*/
-//             <    is written>: p
-   
-   
-   p = &t[1][2];                                                        /*0017*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   (*p)[1] = 0;                                                         /*0018*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   p[1][1] = 0;                                                         /*0019*/
-//             <    is written>: pu
-
-   pu = &t[1][2][0];                                                    /*0021*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pu
-   *pu = 0;                                                             /*0022*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: pu
-   pu[2] = 0;                                                           /*0023*/
-//             <    is written>: q
-
-   q = &t[1];                                                           /*0025*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   ((*q)[2])[3] = 0;                                                    /*0026*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   q[1][2][3] = 0;                                                      /*0027*/
-//             <    is written>: qu
-
-   qu = &t[1][0];                                                       /*0029*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: qu
-   (*qu)[1] = 0;                                                        /*0030*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: qu
-   qu[1][1] = 0;                                                        /*0031*/
-//             <    is written>: r
-
-   r = &t;                                                              /*0033*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r
-   (((*r)[0])[0])[0] = 0;                                               /*0034*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: r
-   (((*r)[1])[2])[3] = 0;                                               /*0035*/
-//             <    is written>: ru
-
-   ru = &t[0];                                                          /*0037*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: ru
-   ((*ru)[0])[0] = 0;                                                   /*0038*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: ru
-   ru[0][0][0] = 0;                                                     /*0039*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: ru
-   ru[1][2][1] = 0;                                                     /*0040*/
-
-   return 0;                                                            /*0042*/
-}
-
 POINTS TO for "main"
 
 //  {}
 int main()
 {
 //  points to = {}
-   int t[100][10][3];                                                   /*0005*/
+   int t[100][10][3];
 
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int (*p)[3];                                                         /*0007*/
+   int (*p)[3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   int *pu;                                                             /*0008*/
+   int *pu;
 
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int (*q)[10][3];                                                     /*0010*/
+   int (*q)[10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int (*qu)[3];                                                        /*0011*/
+   int (*qu)[3];
 
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   int (*r)[100][10][3];                                                /*0013*/
+   int (*r)[100][10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int (*ru)[10][3];                                                    /*0014*/
+   int (*ru)[10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    
    
-   p = &t[1][2];                                                        /*0017*/
+   p = &t[1][2];
 //  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   (*p)[1] = 0;                                                         /*0018*/
+   (*p)[1] = 0;
 //  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   p[1][1] = 0;                                                         /*0019*/
+   p[1][1] = 0;
 //  {(p,t[1][2],-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   pu = &t[1][2][0];                                                    /*0021*/
+   pu = &t[1][2][0];
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   *pu = 0;                                                             /*0022*/
+   *pu = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   pu[2] = 0;                                                           /*0023*/
+   pu[2] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(qu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   q = &t[1];                                                           /*0025*/
+   q = &t[1];
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   ((*q)[2])[3] = 0;                                                    /*0026*/
+   ((*q)[2])[3] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   q[1][2][3] = 0;                                                      /*0027*/
+   q[1][2][3] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   qu = &t[1][0];                                                       /*0029*/
+   qu = &t[1][0];
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   (*qu)[1] = 0;                                                        /*0030*/
+   (*qu)[1] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
-   qu[1][1] = 0;                                                        /*0031*/
+   qu[1][1] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(ru,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   r = &t;                                                              /*0033*/
+   r = &t;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   (((*r)[0])[0])[0] = 0;                                               /*0034*/
+   (((*r)[0])[0])[0] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   (((*r)[1])[2])[3] = 0;                                               /*0035*/
+   (((*r)[1])[2])[3] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
 
-   ru = &t[0];                                                          /*0037*/
+   ru = &t[0];
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
-   ((*ru)[0])[0] = 0;                                                   /*0038*/
+   ((*ru)[0])[0] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
-   ru[0][0][0] = 0;                                                     /*0039*/
+   ru[0][0][0] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
-   ru[1][2][1] = 0;                                                     /*0040*/
+   ru[1][2][1] = 0;
 //  {(p,t[1][2],-Exact-);(pu,t[1][2][0],-Exact-);(q,t[1],-Exact-);(qu,
 //   t[1][0],-Exact-);(r,t,-Exact-);(ru,t[0],-Exact-)}
 
-   return 0;                                                            /*0042*/
-}
-
-Proper effects using points_to
-
-int main()
-{
-   int t[100][10][3];                                                   /*0005*/
-
-   int (*p)[3];                                                         /*0007*/
-   int *pu;                                                             /*0008*/
-
-   int (*q)[10][3];                                                     /*0010*/
-   int (*qu)[3];                                                        /*0011*/
-
-   int (*r)[100][10][3];                                                /*0013*/
-   int (*ru)[10][3];                                                    /*0014*/
-//             <    is written>: p
-   
-   
-   p = &t[1][2];                                                        /*0017*/
-//             <    is read   >: p
-//             <    is written>: t[1][2][1]
-   (*p)[1] = 0;                                                         /*0018*/
-//             <    is read   >: p
-//             <    is written>: t[1][3][1]
-   p[1][1] = 0;                                                         /*0019*/
-//             <    is written>: pu
-
-   pu = &t[1][2][0];                                                    /*0021*/
-//             <    is read   >: pu
-//             <    is written>: t[1][2][0]
-   *pu = 0;                                                             /*0022*/
-//             <    is read   >: pu
-//             <    is written>: t[1][2][2]
-   pu[2] = 0;                                                           /*0023*/
-//             <    is written>: q
-
-   q = &t[1];                                                           /*0025*/
-//             <    is read   >: q
-//             <    is written>: t[1][2][3]
-   ((*q)[2])[3] = 0;                                                    /*0026*/
-//             <    is read   >: q
-//             <    is written>: t[2][2][3]
-   q[1][2][3] = 0;                                                      /*0027*/
-//             <    is written>: qu
-
-   qu = &t[1][0];                                                       /*0029*/
-//             <    is read   >: qu
-//             <    is written>: t[1][0][1]
-   (*qu)[1] = 0;                                                        /*0030*/
-//             <    is read   >: qu
-//             <    is written>: t[1][1][1]
-   qu[1][1] = 0;                                                        /*0031*/
-//             <    is written>: r
-
-   r = &t;                                                              /*0033*/
-//             <    is read   >: r
-//             <    is written>: t[0][0][0]
-   (((*r)[0])[0])[0] = 0;                                               /*0034*/
-//             <    is read   >: r
-//             <    is written>: t[1][2][3]
-   (((*r)[1])[2])[3] = 0;                                               /*0035*/
-//             <    is written>: ru
-
-   ru = &t[0];                                                          /*0037*/
-//             <    is read   >: ru
-//             <    is written>: t[0][0][0]
-   ((*ru)[0])[0] = 0;                                                   /*0038*/
-//             <    is read   >: ru
-//             <    is written>: t[0][0][0]
-   ru[0][0][0] = 0;                                                     /*0039*/
-//             <    is read   >: ru
-//             <    is written>: t[1][2][1]
-   ru[1][2][1] = 0;                                                     /*0040*/
-
-   return 0;                                                            /*0042*/
-}
-int main()
-{
-   int t[100][10][3];                                                   /*0005*/
-
-   int (*p)[3];                                                         /*0007*/
-   int *pu;                                                             /*0008*/
-
-   int (*q)[10][3];                                                     /*0010*/
-   int (*qu)[3];                                                        /*0011*/
-
-   int (*r)[100][10][3];                                                /*0013*/
-   int (*ru)[10][3];                                                    /*0014*/
-
-//  <p-W-EXACT-{}>
-
-   
-   
-   p = &t[1][2];                                                        /*0017*/
-
-//  <p-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==1}>
-
-   (*p)[1] = 0;                                                         /*0018*/
-
-//  <p-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==3, PHI3==1}>
-
-   p[1][1] = 0;                                                         /*0019*/
-
-//  <pu-W-EXACT-{}>
-
-
-   pu = &t[1][2][0];                                                    /*0021*/
-
-//  <pu-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==0}>
-
-   *pu = 0;                                                             /*0022*/
-
-//  <pu-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==2}>
-
-   pu[2] = 0;                                                           /*0023*/
-
-//  <q-W-EXACT-{}>
-
-
-   q = &t[1];                                                           /*0025*/
-
-//  <q-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==3}>
-
-   ((*q)[2])[3] = 0;                                                    /*0026*/
-
-//  <q-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==2, PHI2==2, PHI3==3}>
-
-   q[1][2][3] = 0;                                                      /*0027*/
-
-//  <qu-W-EXACT-{}>
-
-
-   qu = &t[1][0];                                                       /*0029*/
-
-//  <qu-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==0, PHI3==1}>
-
-   (*qu)[1] = 0;                                                        /*0030*/
-
-//  <qu-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==1, PHI3==1}>
-
-   qu[1][1] = 0;                                                        /*0031*/
-
-//  <r-W-EXACT-{}>
-
-
-   r = &t;                                                              /*0033*/
-
-//  <r-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
-
-   (((*r)[0])[0])[0] = 0;                                               /*0034*/
-
-//  <r-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==3}>
-
-   (((*r)[1])[2])[3] = 0;                                               /*0035*/
-
-//  <ru-W-EXACT-{}>
-
-
-   ru = &t[0];                                                          /*0037*/
-
-//  <ru-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
-
-   ((*ru)[0])[0] = 0;                                                   /*0038*/
-
-//  <ru-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, PHI2==0, PHI3==0}>
-
-   ru[0][0][0] = 0;                                                     /*0039*/
-
-//  <ru-R-EXACT-{}>
-//  <t[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==1, PHI2==2, PHI3==1}>
-
-   ru[1][2][1] = 0;                                                     /*0040*/
-
-   return 0;                                                            /*0042*/
+   return 0;
 }

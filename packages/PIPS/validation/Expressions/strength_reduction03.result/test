@@ -4,6 +4,10 @@
 int main()
 {
 
+//  T(main) {0<=main, main<=1}
+
+   // BEGIN BLOCK
+
 //  T(i) {i==0}
 
    int i = 0, *a = malloc(10*sizeof(int)), b[10];
@@ -16,6 +20,10 @@ int main()
 
       return 1;
    else {
+
+//  T(i,main) {i==10, i#init==0, main==0}
+
+      // BEGIN BLOCK
 
 //  T() {i==0}
 
@@ -36,46 +44,60 @@ int main()
 //  T(main) {i==10, main==0}
 
       return 0;
+      // END BLOCK
    }
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, *a = malloc(10*sizeof(int)), b[10];
    //PIPS generated variable
    int *a0, *c0;
    if (!a)
       return 1;
    else {
+      // BEGIN BLOCK
       int *c = &b[0];
       c0 = c;
       a0 = a;
       for(i = 0; i <= 9; i += 1) {
+         // BEGIN BLOCK
          *a0 = 2+*c0;
          c0 += 1;
          a0 += 1;
+         // END BLOCK
       }
       printf("%d", *(a+2));
       return 0;
+      // END BLOCK
    }
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, *a = malloc(10*sizeof(int)), b[10];
    //PIPS generated variable
    int *a0, *c0;
    if (!a)
       return 1;
    else {
+      // BEGIN BLOCK
       int *c = &b[0];
       c0 = c;
       a0 = a;
       for(i = 0; i <= 9; i += 1) {
+         // BEGIN BLOCK
          *a0 = 2+*c0;
          c0 += 1;
          a0 += 1;
+         // END BLOCK
       }
       printf("%d", *(a+2));
       return 0;
+      // END BLOCK
    }
+   // END BLOCK
 }
 
