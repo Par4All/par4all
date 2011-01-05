@@ -344,8 +344,8 @@ default_user_error(const char * calling_function_name,
    /* print name of function causing error */
    (void) fprintf(stderr, "user error in %s: ", calling_function_name);
    /* FI: no impact on some_arguments because of format content */
-	append_to_warning_file(calling_function_name, "user error\n",
-			       some_arguments);
+   append_to_warning_file(calling_function_name, "user error\n",
+			  some_arguments);
 
    /* print out remainder of message */
    (void) vfprintf(stderr, a_message_format, * some_arguments);
@@ -354,8 +354,10 @@ default_user_error(const char * calling_function_name,
 			       &save);
 
    /* terminate PIPS request */
-   /* here is an issue: what if the user error was raised from properties */
-   if (get_bool_property("ABORT_ON_USER_ERROR")) 
+   /* here is an issue: what if the user error was raised from properties?
+      We abort anyway! */
+   if (too_many_property_errors_pending_p()
+       || get_bool_property("ABORT_ON_USER_ERROR"))
        abort();
    else {
       static int user_error_called = 0;
@@ -368,7 +370,9 @@ default_user_error(const char * calling_function_name,
          user_error_called++;
       }
 
-      /* throw according to linear exception stack! */
+      /* throw according to linear exception stack!
+	 If it is OK there, we should do a reset_property_error()
+      */
       THROW(user_exception_error);
    }
 }
@@ -387,9 +391,17 @@ user_error(const char * calling_function_name,
 {
    va_list some_arguments;
    va_start(some_arguments, a_message_format);
-   (* pips_error_handler)
+
+   if (too_many_property_errors_pending_p())
+     /* We are in bad mood, just use the default error that will core-dump... */
+     default_user_error(calling_function_name, a_message_format, &some_arguments);
+   else
+     /* Use the normal user error message: */
+     (* pips_error_handler)
        (calling_function_name, a_message_format, &some_arguments);
    va_end(some_arguments);
+   /* We should never return since it is an error... */
+   abort();
 }
 
 
