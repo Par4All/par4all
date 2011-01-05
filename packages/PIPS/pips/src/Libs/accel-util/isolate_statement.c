@@ -55,6 +55,7 @@
 #include "callgraph.h"
 #include "expressions.h"
 #include "accel-util.h"
+#include "hpfc.h"
 
 
 /**
@@ -203,7 +204,8 @@ call dimensions_to_dma(entity from,
   }
   else if (!fortran_module_p(get_current_module_entity())) {
       AddEntityToModuleCompilationUnit(mcpy,get_current_module_entity());
-  }
+  } else
+    AddEntityToModule(mcpy,get_current_module_entity());
 
   /* Scalar detection: */
   bool scalar_entity = entity_scalar_p(from);
@@ -336,6 +338,8 @@ call dimensions_to_dma(entity from,
 
    @param[in] stat is the statement we want to generate communication
    operations for
+   @param[in] prefix is the prefix to be used for added variable.
+   operations for
 
    @return a statement of the DMA transfers or statement_undefined if
    nothing is needed or if the dma function has been set
@@ -347,7 +351,7 @@ static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
 			 hash_table e2e, expression * condition,
-			 bool fine_grain_analysis)
+			 bool fine_grain_analysis, string prefix)
 {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
@@ -477,7 +481,11 @@ statement effects_to_dma(statement stat,
               entity renew = make_new_array_variable(get_current_module_entity(),copy_basic(entity_basic(re)),the_dims);
               entity declaring_module = 
                 get_current_module_entity();
-              eto = make_temporary_pointer_to_array_entity_with_prefix(entity_local_name(re),renew,declaring_module,init);
+	      // PIER Here we need to add a P4A variable prefix to the name to help
+	      // p4a postprocessing
+	      string str = strdup (concatenate (prefix,entity_local_name(re),NULL));
+              eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
+	      free (str);
               AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
               isolate_patch_entities(stat,re,eto,the_offsets);
 
@@ -516,10 +524,10 @@ static bool do_isolate_statement_preconditions(statement s)
 }
 
 /* perform statement isolation on statement @p s
- * that is make sure that all access to variables in @p s 
- * are made either on private variables or on new entities declared on a new memory space
+ * that is make sure that all access to variables in @p s
+ * are made either on private variables or on new entities declared on a new memory space. The @p prefix is used as a prefix to new entities' name.
  */
-void do_isolate_statement(statement s) {
+void do_isolate_statement(statement s, string prefix) {
     bool fine_grain_analysis = true;
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
@@ -530,10 +538,12 @@ void do_isolate_statement(statement s) {
     }
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
-    allocates = effects_to_dma(s,dma_allocate,e2e,&condition,fine_grain_analysis);
-    loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis);
-    stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis);
-    deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL,fine_grain_analysis);
+    allocates = effects_to_dma(s,dma_allocate,e2e,&condition,
+			       fine_grain_analysis,prefix);
+    loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis,prefix);
+    stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis,prefix);
+    deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL,fine_grain_analysis,
+				 prefix);
     HASH_MAP(k,v,free(v),e2e);
     hash_table_free(e2e);
 
@@ -839,8 +849,8 @@ isolate_statement(const char* module_name)
     /* and proceed */
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
-    else 
-        do_isolate_statement(statement_to_isolate);
+    else
+        do_isolate_statement(statement_to_isolate, "");
 
 
 
