@@ -37,7 +37,6 @@ LIBS_PIPS =  $(LIBS_PIPS_DIR)/libri-util.a \
 	$(LIBS_PIPS_DIR)/libri-util.a \
 	$(LIBS_PIPS_DIR)/libmisc.a \
 	$(LIBS_PIPS_DIR)/libnewgen.a \
-	$(LIBS_PIPS_DIR)/libproperties.a \
 	$(NEWGEN_ROOT)/lib/$(ARCH)/libgenC.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libpolynome.a \
 	$(LINEAR_ROOT)/lib/$(ARCH)/libvecteur.a \
