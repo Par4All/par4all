@@ -1230,6 +1230,18 @@ transformer transformer_derivative_fix_point(transformer tf)
 
   return fix_tf;
 }
+
+list transformers_derivative_fix_point(list tl)
+{
+  list ntl = NIL;
+  FOREACH(TRANSFORMER, tf, tl) {
+    transformer fix_tf = transformer_derivative_fix_point(tf);
+    ntl = CONS(TRANSFORMER, fix_tf, ntl);
+  }
+  ntl = gen_nreverse(ntl);
+  return ntl;
+}
+
 
 /* Computation of a fix point: drop all constraints, remember which
  * variables are changed. Except if the transformer is syntactically
