@@ -550,7 +550,6 @@ main (int argc, char *argv[])
 void
 p4a_accel_free (int *address_p4a_copy)
 {
-  ;
   int address = *address_p4a_copy;
 
   return;
@@ -559,7 +558,6 @@ p4a_accel_free (int *address_p4a_copy)
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
-  ;
   int address = *address_p4a_copy;
   int size = *size_p4a_copy;
 
@@ -774,7 +772,6 @@ main (int argc, char *argv[])
 void
 p4a_accel_free (int *address_p4a_copy)
 {
-  ;
   int address = *address_p4a_copy;
 
   return;
@@ -783,7 +780,6 @@ p4a_accel_free (int *address_p4a_copy)
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
-  ;
   int address = *address_p4a_copy;
   int size = *size_p4a_copy;
 
@@ -944,7 +940,6 @@ p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
 	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
 	      int *j_p4a_copy)
 {
-  ;
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
@@ -962,7 +957,6 @@ p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
 	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
 	      int *j_p4a_copy)
 {
-  ;
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
@@ -1020,7 +1014,6 @@ p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
 		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy)
 {
-  ;
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
@@ -1037,7 +1030,6 @@ p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
 		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy)
 {
-  ;
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;

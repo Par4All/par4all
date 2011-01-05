@@ -76,6 +76,12 @@
 #define SHARPDEF      "#define"
 #define COMMENT	      "//" SPACE
 
+// extension relative to pipsmake
+#define INDENT		"indent"
+#define CROUGH		".crough"
+#define CPRETTY		".c"
+#define INTERFACE	"_interface.f95"
+
 // define an extension to append to scalar name in function signature
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
 
@@ -221,6 +227,31 @@ static string scalar_postlude () {
     }
   }
   return (result == NULL) ? strdup("") : result;
+}
+
+/// @brief we want to decide if a scalar variable need to be
+/// passed by pointer or by value to a C function.
+/// Fortran77 assumes that all scalars are
+/// passed by pointer. Starting With Fotran95,
+/// the arguments can be passed by value by using interfaces.
+/// @return true if the variable has to be passed by pointer
+/// @param var, the variable to be test as an entity
+static bool scalar_by_pointer (entity var) {
+  // init result to false
+  bool result = false;
+  if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == false)) {
+    // no interface, var is a scalar
+    result = true;
+  }
+  else if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == true) &&
+	   (get_bool_property ("CROUGH_ALL_SCALAR_BY_VALUE") == false) &&
+	   (written_p (var) == true)) {
+    // interface exists but var is written (and user doesn't use the property
+    // to force the passing of scalar by  value)
+    result = true;
+  }
+
+  return result;
 }
 
 /************************************************************** DECLARATIONS */
@@ -418,9 +449,11 @@ static string c_dim_string(list ldim, bool fct_sig)
 		    sup = words_to_string(words_expression(eup, NIL));
 		    if (fct_sig == true) {
 		      string tmp = NULL;
-		      tmp = strdup (concatenate ("(*",sup, SCALAR_IN_SIG_EXT, ")", NULL));
-		      free (sup);
-		      sup = tmp;
+		      if (get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == false) {
+			tmp = strdup (concatenate ("(*",sup, SCALAR_IN_SIG_EXT, ")", NULL));
+			free (sup);
+			sup = tmp;
+		      }
 		    }
 		    result = strdup(concatenate(OPENBRACKET,sup,"-",i2a(low-1),CLOSEBRACKET,result,NULL));
 		    free(sup);
@@ -561,9 +594,12 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 sd = c_dim_string(variable_dimensions(v), fct_sig);
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
-		// if the variable is a scalar inside a function signature a
-		// "*" must be added because fortran assumes passing by pointers
-		if ((variable_dimensions(v)==NIL)&&(fct_sig==true)) {
+
+		// In the case of a signature check if the scalar need to
+		// be passed by pointer. If the check return true
+		// a "*" must be added
+		if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
+		    (scalar_by_pointer (var) == true)) {
 		  ext = SCALAR_IN_SIG_EXT;
 		  sptr = "*";
 		  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
@@ -685,6 +721,7 @@ static bool parameter_or_variable_p(entity e)
     return parameter_p(e) || variable_p(e);
 }
 
+/// @return true if the entity is an argument
 static bool argument_p(entity e)
 {
     /* Formal variables */
@@ -732,7 +769,9 @@ static string c_declarations(
             first = FALSE;
         }
     }
-    if (lastsep)
+    // insert the last separtor if required and if at least one declaration
+    // has been inserted.
+    if (lastsep && !first)
       result = strdup(concatenate(result, separator, NULL));
     return result;
 }
@@ -1454,6 +1493,251 @@ static string c_statement(statement s, bool breakable)
     return result;
 }
 
+/*******************************************************PRINT INTERFACE FCTS */
+static string interface_type_string (type t, bool value);
+
+/// @brief Convert the fortran basic to its interface string value
+/// @param b, the basic to be converted to string
+/// @param value, set to true if the var has to be passed by value
+static string interface_basic_string(basic b, bool value)
+{
+  string result = "UNKNOWN_BASIC" SPACE;
+  bool allocated = false;
+  bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
+  switch (basic_tag(b)) {
+  case is_basic_int: {
+    pips_debug(2,"Basic int\n");
+    if (user_type == false) {
+      switch (basic_int(b)) {
+      /* case 1: result = "char"; */
+      /* 	break; */
+      /* case 2: result = "short"; */
+      /* 	break; */
+      case 4:
+	result = "integer (c_int)";
+	break;
+      /* case 6: result = "long"; */
+      /* 	break; */
+      case 8:
+	result = "integer (c_size_t)";
+	break;
+      /* case 11: result = "unsigned char"; */
+      /* 	break; */
+      /* case 12: result = "unsigned short"; */
+      /* 	break; */
+      /* case 14: result = "unsigned int"; */
+      /* 	break; */
+      /* case 16: result = "unsigned long"; */
+      /* 	break; */
+      /* case 18: result = "unsigned long long"; */
+      /* 	break; */
+      /* case 21: result = "signed char"; */
+      /* 	break; */
+      /* case 22: result = "signed short"; */
+      /* 	break; */
+      /* case 24: result = "signed int"; */
+      /* 	break; */
+      /* case 26: result = "signed long"; */
+      /* 	break; */
+      /* case 28: result = "signed long long"; */
+      /* 	break; */
+      default:
+	pips_assert ("not handle case", false);
+	break;
+      }
+    } else {
+      result = get_string_property ("CROUGH_INTEGER_TYPE");
+    }
+    break;
+  }
+  case is_basic_float: {
+    if (user_type == false) {
+      switch (basic_float(b)){
+      case 4: result = "real (c_float)";
+	break;
+      case 8: result = "real (c_double)";
+	break;
+      }
+    } else {
+      result = get_string_property ("CROUGH_REAL_TYPE");
+    }
+    break;
+  }
+  case is_basic_logical:
+    result = "integer (c_int)";
+    break;
+  case is_basic_string:
+    result = "character (c_char)";
+    break;
+  case is_basic_bit:
+    pips_internal_error("unhandled case");
+    break;
+  case is_basic_pointer:
+    {
+      if (value == true) {
+	type t = basic_pointer(b);
+	pips_debug(2,"Basic pointer\n");
+	result = interface_type_string (t, false);
+	if (type_void_p (t)) {
+	  // if type is void and value flag set to true
+	  // the value specifier need to be add
+	  allocated = true;
+	}
+	else return result;
+      }
+      else {
+	result = "type (c_ptr)";
+      }
+      break;
+    }
+  case is_basic_derived:
+    pips_internal_error("unhandled case");
+    break;
+  case is_basic_typedef:
+    pips_internal_error("unhandled case");
+  default:
+    pips_internal_error("unhandled case");
+  }
+  if (value == true) {
+    string tmp = result;
+    result = strdup (concatenate (result, ", value", NULL));
+    if (allocated == true) free (tmp);
+  }
+  return result ;
+}
+
+/// @param t, the type to be converted to its string representation
+/// @param value, set to true if the associated argument is passed by value
+/// (i.e. not by pointer)
+static string interface_type_string (type t, bool value)
+{
+    string result = "UNKNOWN_TYPE" SPACE;
+    switch (type_tag(t)) {
+    case is_type_variable: {
+      basic b = variable_basic(type_variable(t));
+      result = interface_basic_string(b, value);
+      break;
+    }
+    case is_type_void: {
+      result = strdup ("type (c_ptr)");
+      break;
+    }
+    default:
+      pips_user_error("case not handled yet \n");
+    }
+    return result;
+}
+
+/// @brief return a string representation of the type to be used
+/// for a variable decalaration in an interface module in order to ensure
+/// that the C function can be called from fotran codes
+static string interface_argument_type_string (entity var) {
+  pips_assert("this function is deicated to arguments", argument_p(var));
+  string result = NULL;
+  type t = entity_type(var);
+  variable v = type_variable(t);
+  if (variable_dimensions (v) != NULL) {
+    result = strdup ("type (c_ptr), value");
+  } else {
+    result = strdup(interface_type_string(t, true));
+  }
+  return result;
+}
+
+/// @return the string representation of the arguments of the given modules
+/// to be used as a variable declaration in an interface.
+/// @param module, the module to get the declaration.
+/// @param separator, the separatot to be used between vars.
+/// @param lastsep, set to true if a final separator is needed.
+static string interface_argument_declaration (entity module, string separator,
+					      string indent) {
+  code c;
+  bool first = TRUE;
+  string tmp = NULL;
+  string args = strdup ("");
+  string result = NULL;
+
+  pips_assert("it is a code", value_code_p(entity_initial(module)));
+
+  c = value_code(entity_initial(module));
+  FOREACH(ENTITY, var,code_declarations(c)) {
+    if (argument_p(var) == true) {
+      tmp = args;
+      args = strdup (concatenate (args, indent,
+				  interface_argument_type_string (var),
+				  " :: ",
+				  c_entity_local_name (var),
+				  separator,
+				  NULL));
+      free(tmp);
+      first = FALSE;
+    }
+  }
+  result = strdup (args);
+  free (args);
+  return result;
+}
+
+/// @brief return the interface signature for a module, i.e. the list of the
+/// variable names that are comma serparated.
+static string interface_signature (entity module)
+{
+    code c = code_undefined;
+    bool first = TRUE;
+    string tmp = NULL;
+    string args = strdup ("(");
+    string result = NULL;
+
+    pips_assert("it is a function", type_functional_p(entity_type(module)));
+    pips_assert("it is a code", value_code_p(entity_initial(module)));
+
+    c = value_code(entity_initial(module));
+
+    FOREACH(ENTITY, var,code_declarations(c)) {
+      if (argument_p (var) == true) {
+	tmp = args;
+	args = strdup (concatenate (args, first == TRUE ? "" : ", ",
+				    c_entity_local_name (var), NULL));
+	free(tmp);
+	first = FALSE;
+      }
+    }
+
+    result = strdup (concatenate (args, ")", NULL));
+    free (args);
+    return result;
+}
+
+static string interface_code_string(entity module, statement stat)
+{
+  string name      = NULL;
+  string decls     = NULL;
+  string result    = NULL;
+  string signature = NULL;
+
+  pips_assert("only available for subroutines, to be implemented for functions",
+	      entity_subroutine_p(module));
+
+  name = c_entity_local_name (module);
+  signature = interface_signature (module);
+  decls = interface_argument_declaration (module, "\n", "\t\t\t");
+
+  result = strdup(concatenate ("module ", name, "_interface\n",
+			       "\tinterface\n",
+			       "\t\tsubroutine ", name, signature,
+			       " bind(C, name = \"", name, "\"\n",
+			       "\t\t\tuse iso_c_binding\n", decls,
+			       "\t\tend subroutine ", name,
+			       "\n\tend interface\n",
+			       "end module ", name, "_interface\n",
+			       NULL));
+  free (name);
+  free (decls);
+  free (signature);
+
+  return result;
+}
+
 static string c_code_string(entity module, statement stat)
 {
   string head, decls, body, result, copy_in;
@@ -1489,9 +1773,48 @@ static string c_code_string(entity module, statement stat)
 
 /******************************************************** PIPSMAKE INTERFACE */
 
-#define INDENT		"indent"
-#define CROUGH		".crough"
-#define CPRETTY		".c"
+bool print_interface (string module_name)
+{
+  FILE * out;
+  string interface_code, interface, dir, filename;
+  entity module;
+  statement stat;
+
+  // get what is needed from PIPS DBM
+  interface = db_build_file_resource_name(DBR_INTERFACE, module_name, INTERFACE);
+  module = module_name_to_entity(module_name);
+  dir = db_get_current_workspace_directory();
+  filename = strdup(concatenate(dir, "/", interface, NULL));
+  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+
+  set_current_module_entity(module);
+  set_current_module_statement(stat);
+
+  debug_on("INTERFACE_DEBUG_LEVEL");
+  pips_debug(1, "Begin print_interface for %s\n", entity_name(module));
+
+  // get the inteface code as a string
+  interface_code = interface_code_string(module, stat);
+  pips_debug(1, "end\n");
+  debug_off();
+
+  /* save to file */
+  out = safe_fopen(filename, "w");
+  fprintf(out, "/* Fortran interface module for %s. */\n", module_name);
+  fprintf(out, "%s", interface_code);
+  safe_fclose(out, filename);
+
+  DB_PUT_FILE_RESOURCE(DBR_INTERFACE, module_name, INTERFACE);
+
+  reset_current_module_statement();
+  reset_current_module_entity();
+
+  free (interface_code);
+  free (dir);
+  free (filename);
+
+  return TRUE;
+}
 
 bool print_crough(string module_name)
 {

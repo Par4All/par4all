@@ -55,11 +55,11 @@ Properties
 Crough
 Top-level
 Demo-2009
-Gpu
 Inlining
 AcceleratorUtils
 PointerValues
 # put intra-directory parallel validations at the end!
+Gpu
 Hpfc
 HardwareAccelerator
 Scilab

@@ -1807,6 +1807,11 @@ static bool controlize_sequence(control c_res,
 	}
       }
     }
+    // You may have to fix C89 declarations if some unstructured has
+    // been created below in the recursion
+    if(get_bool_property("C89_CODE_GENERATION")) {
+      fix_block_statement_declarations(st);
+    }
   }
   else {
     /* So, there is some unstructured stuff. We can consider 2 cases to
@@ -1861,6 +1866,11 @@ static bool controlize_sequence(control c_res,
 	 of the block: */
       sequence_statements(instruction_sequence(statement_instruction(st))) =
 	CONS(STATEMENT, u_s, NIL);
+      // You may have to fix C89 declarations if some unstructured has
+      // been created below in the recursion
+      //if(get_bool_property("C89_CODE_GENERATION")) {
+      //fix_block_statement_declarations(st);
+      //}
       /* From outside of this block statement, everything is hierarchized,
 	 so we claim it: */
       controlized = FALSE;
@@ -1878,6 +1888,7 @@ static bool controlize_sequence(control c_res,
 	NIL;
       // TODO move declarations up, keep extensions & here
       move_declaration_control_node_declarations_to_statement(ctls);
+      controlized = TRUE;
     }
   }
   /* Integrate the statements related to the labels inside its statement

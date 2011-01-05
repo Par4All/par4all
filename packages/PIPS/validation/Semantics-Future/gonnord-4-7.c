@@ -72,7 +72,7 @@ void checking_error(void) {
 void run(void) {
 	int i, j, k;
 	i = j = k = 0;
-	
+
 	S1;
 	while (flip()) {
 		if (flip()) {
@@ -104,7 +104,7 @@ void run(void) {
 		T2b; S2;
 		T3b; S3;
 	}
-	
+
 }
 
 int main(void) {

@@ -997,8 +997,8 @@ void iteration(float_t space[501][501], float_t save[501][501])
 }
 void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[501][501])
 {
-   // To be assigned to a call to P4A_vp_0: i
-   // To be assigned to a call to P4A_vp_1: j
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
    // Loop nest P4A end
    // Loop nest P4A end
    if (i<=498&&j<=498)                                                  /*0008*/
@@ -1010,8 +1010,8 @@ void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[50
 }
 void p4a_kernel_wrapper_0(int i, int j, float_t save[501][501], float_t space[501][501])
 {
-   // To be assigned to a call to P4A_vp_0: i
-   // To be assigned to a call to P4A_vp_1: j
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
    // Loop nest P4A end
    // Loop nest P4A end
    if (i<=498&&j<=498)                                                  /*0008*/
@@ -1023,8 +1023,8 @@ void p4a_kernel_wrapper_0(int i, int j, float_t save[501][501], float_t space[50
 }
 void p4a_kernel_wrapper_1(int i, int j, float_t space[501][501])
 {
-   // To be assigned to a call to P4A_vp_0: i
-   // To be assigned to a call to P4A_vp_1: j
+   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_0: j
    // Loop nest P4A end
    // Loop nest P4A end
    if (i<=500&&j<=500)                                                  /*0008*/

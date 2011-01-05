@@ -989,6 +989,9 @@ static IntrinsicToPostPVDescriptor IntrinsicToPostPVDescriptorTable[] = {
   {ETIME_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
   {DTIME_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
 
+  /* F2003 */
+  {C_LOC_FUNCTION_NAME,                    intrinsic_to_identical_post_pv},
+
   /* BSD <err.h> */
   /* SG: concerning the err* family of functions, they also exit() from the program
    * This is not represented in the EXIT_FUNCTION_NAME description, so neither it is here

@@ -409,9 +409,9 @@ static list test_to_transformer_list(test t,
     list post_tffwc = NIL;
     list ta = NIL;
     list fa = NIL;
-    /* True condition transformer */
+    /* True condition transformer, TCT */
     transformer tct = condition_to_transformer(e, context, TRUE);
-    /* False condition transformer */
+    /* False condition transformer, FCT */
     transformer fct = condition_to_transformer(e, context, FALSE);
 
     tftwc = transformer_apply(tct, context);
@@ -426,7 +426,9 @@ static list test_to_transformer_list(test t,
       pips_debug(8, "tftwc before transformer_apply %p:\n", tftwc);
       (void) print_transformer(tftwc);
     }
-    post_tftwc = transformer_apply_map(statement_to_transformer_list(st, tftwc), tftwc);
+    list ttl = statement_to_transformer_list(st, tftwc);
+    // FI: why should we compute postconditions for ttl?!?
+    post_tftwc = transformer_apply_map(ttl, tftwc);
     ifdebug(8) {
       pips_debug(8, "tftwc after transformer_apply %p:\n", tftwc);
       (void) print_transformer(tftwc);
@@ -438,7 +440,9 @@ static list test_to_transformer_list(test t,
     tffwc = transformer_apply(fct, context);
     tffwc = transformer_temporary_value_projection(tffwc);
     reset_temporary_value_counter();
-    post_tffwc = transformer_apply_map(statement_to_transformer_list(sf, tffwc), tffwc);
+    list ftl = statement_to_transformer_list(sf, tffwc);
+    // FI: why should we compute postconditions for ftl?!?
+    post_tffwc = transformer_apply_map(ftl, tffwc);
 
     ifdebug(8) {
       pips_debug(8, "post_tftwc before transformer_convex_hull %p:\n", post_tftwc);
@@ -448,6 +452,8 @@ static list test_to_transformer_list(test t,
     }
 
     //tf = transformer_convex_hull(post_tftwc, post_tffwc);
+    //tl = merge_transformer_lists(ttl, ftl); condition and its side
+    //effects are lost
     tl = merge_transformer_lists(post_tftwc, post_tffwc);
     transformer_free(context);
     transformer_free(tftwc);
@@ -462,6 +468,7 @@ static list test_to_transformer_list(test t,
     (void) statement_to_transformer(st, id);
     (void) statement_to_transformer(sf, id);
     tf = effects_to_transformer(ef);
+    tl = CONS(TRANSFORMER, tl, NIL);
     free_transformer(id);
   }
 
@@ -923,13 +930,15 @@ static list instruction_to_transformer_list(instruction i,
     pips_internal_error("unexpected goto in semantics analysis");
     tl = NIL; // never executed
     break;
-  case is_instruction_call:
+  case is_instruction_call: {
     /* Nothing fancy yet in spite of the C ? and , operators*/
-    //c = instruction_call(i);
-    //tf = call_to_transformer(c, pre, e);
-    //tl = CONS(TRANSFORMER, tf, NIL);
-    // Reuse the existing transformer
-    tl = NIL;
+    call c = instruction_call(i);
+    tf = call_to_transformer(c, pre, e);
+    if(!transformer_empty_p(tf))
+      tl = CONS(TRANSFORMER, tf, NIL);
+    // Reuse the existing transformer: tl==NIL has a semantic, not feasible
+    // tl = NIL;
+  }
     break;
   case is_instruction_unstructured:
     /* Bourdoncle's to be replaced */
@@ -1023,10 +1032,14 @@ list statement_to_transformer_list(statement s,
     }
     else {
       tl = instruction_to_transformer_list(i, tf, pre, e);
+      /* FI: an empty tl means that s does not return... Also, tf
+	 should not be added to tl if it is not feasible */
+      /*
       if(ENDP(tl)) {
 	transformer tf = load_statement_transformer(s);
 	tl = CONS(TRANSFORMER, copy_transformer(tf), NIL);
       }
+      */
     }
 
     FOREACH(TRANSFORMER, nt, tl) {
@@ -1121,7 +1134,7 @@ list statement_to_transformer_list(statement s,
      context sensitive transformers for replicated statements in
      CFG/unstructured. See comments in loop.c */
 
-  // Should not be useful for transformer lists
+  // FI: Should not be useful for transformer lists? Why?
   // te = complete_statement_transformer(nt, pre, s);
 
   free_transformer(pre);

@@ -27,6 +27,11 @@ void run(void)
 //  T(x) {x==x#init+1, x<=0}
 
             x++;
+
+//  T() {}
+
+   /* We'd like some information about x at loop exit, if any. */
+   ;
 }
 
 PRECONDITIONS
@@ -57,4 +62,9 @@ void run(void)
 //  P(x) {x+1<=0}
 
             x++;
+
+//  P(x) {}
+
+   /* We'd like some information about x at loop exit, if any. */
+   ;
 }
