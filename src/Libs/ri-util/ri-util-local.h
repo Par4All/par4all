@@ -382,6 +382,11 @@
 #define ETIME_FUNCTION_NAME             "ETIME"
 #define DTIME_FUNCTION_NAME             "DTIME"
 
+/* F2003 */
+#define C_LOC_FUNCTION_NAME             "C_LOC"
+
+/* F2008 */
+
 /* BSD <err.h> */
 #define ERR_FUNCTION_NAME		"err"
 #define ERRX_FUNCTION_NAME		"errx"

@@ -72,7 +72,9 @@ kernel_load_store_generator(statement s, string module_name)
 	   named "module_name". */
         if(same_string_p(module_local_name(call_function(c)),module_name))
         {
-            do_isolate_statement(s);
+	  string prefix =  get_string_property ("KERNEL_LOAD_STORE_VAR_PREFIX");
+	  pips_debug (5, "kernel_load_store used prefix : %s\n", prefix);
+	  do_isolate_statement(s, prefix);
         }
     }
 }

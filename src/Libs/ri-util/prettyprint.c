@@ -4922,7 +4922,19 @@ static list words_sizeofexpression(sizeofexpression obj,
 				   list pdl)
 {
   list pc = NIL;
-  pc = CHAIN_SWORD(pc,"sizeof(");
+  switch(get_prettyprint_language_tag()) {
+  case is_language_fortran:
+  case is_language_fortran95:
+    pips_user_warning("generating FORTRAN 2008 function call defined in the the module ISO_C_BINDING\n");
+    pc = CHAIN_SWORD(pc,"c_sizeof(");
+    break;
+  case is_language_c:
+    pc = CHAIN_SWORD(pc,"sizeof(");
+    break;
+  default:
+    pips_internal_error("Language unknown !");
+    break;
+  }
   if (sizeofexpression_type_p(obj)) {
     type t = sizeofexpression_type(obj);
     /* FI: the test used below is probably too strict I believe, because
