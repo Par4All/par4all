@@ -33,13 +33,16 @@ test -d doxygen && rm -rf doxygen
 {
   cat pips/makes/share/doxygen/Doxyfile
   echo "INPUT = newgen/src/genC linear/src pips/src/Libs pips/src/Passes pips/src/Documentation/newgen"
-  # let us skip gcc sources and .svn
-  echo "EXCLUDE_PATTERNS = */.svn/* */Passes/fortran95/gcc-*"
+  # let us skip gcc sources & .svn dirs
+  echo "EXCLUDE_PATTERNS = */.svn/* */Passes/fortran95/gcc* */Passes/fortran95/build/*"
   echo "PROJECT_NAME = PIPS"
   echo "OUTPUT_DIRECTORY = doxygen"
   echo "GENERATE_LATEX = NO"
   echo "HAVE_DOT = YES"
+  # show directories & path
   echo "SHOW_DIRECTORIES = YES"
+  echo "FULL_PATH_NAMES = YES"
+  echo "STRIP_FROM_PATH ="
 } | doxygen - > doxy.out 2> doxy.err
 
 $rsync doxygen/html/. $ddir/doxygen/.

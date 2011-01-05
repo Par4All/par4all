@@ -395,7 +395,7 @@ on the memory) of the functions and procedures called by the given
 
 Properties are also declared in this file. For instance
 \begin{alltt}
-ABORT_ON_USER_LOG FALSE
+ABORT_ON_USER_ERROR FALSE
 \end{alltt}
 declares a property to stop interpreting user commands when an error
 is made and sets its default value to false, which makes sense most of
@@ -6882,7 +6882,7 @@ kernel_load_store	> CALLERS.code
         < CALLERS.preconditions
 \end{PipsMake}
 
-The legacy \PipsPassRef{kernel_load_store} approach is limited because it generates the dma around a call, and \PipsPassRef{isolate_statement} engine does not perform well in interprocedural.
+The legacy \PipsPassRef{kernel_load_store} approach is limited because it generates the DMA around a call, and \PipsPassRef{isolate_statement} engine does not perform well in interprocedural.
 
 The following properties are used to specify the names of runtime
 functions. Since they are used in Par4All, their default names begin with
@@ -6896,7 +6896,8 @@ KERNEL_LOAD_STORE_SCALAR FALSE
 \end{PipsProp}
 
 The \PipsPropRef{ISOLATE_STATEMENT_EVEN_NON_LOCAL} property can be used to
-force the generation even with non local memory access.
+force the generation even with non local memory access. But beware it
+would not solve all the issues...
 
 The following properties can be used to customized the allocate/load/store functions:
 \begin{PipsProp}{KERNEL_LOAD_STORE_ALLOCATE_FUNCTION}
