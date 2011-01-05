@@ -109,8 +109,8 @@ mark_loop_to_outline(const statement s) {
    If the GPU_USE_WRAPPER property is true, this kind of function is generated:
    void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
    {
-     i = P4A_pv_0(i);
-     j = P4A_pv_1(j);
+     // To be assigned to a call to P4A_vp_0: i
+     // To be assigned to a call to P4A_vp_1: j
      p4a_kernel_0(save, space, i, j);
    }
 
@@ -169,9 +169,15 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
       /* Add a comment to know what to do later: */
       string comment;
       string intrinsic_name;
+      /* Map the inner loop index (numbered i) with the lower GPU
+	 coordinate (numbered depth - 1 - i)). In this way, if the code
+	 was cache-friendly, it should remain GPU-memory friendly
+
+	 Build the intrinsics of this form: P4A_vp_<depth - 1 - i>
+      */
       asprintf(&intrinsic_name,
 	       get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
-	       i);
+	       depth - 1 - i);
       /* Add a comment in the form of
 
 	 To be replaced with a call to P4A_vp_1: j
