@@ -4,8 +4,8 @@
       SUBROUTINE P4A_KERNEL_WRAPPER_0(M, N, B, C, I, J)
       INTEGER M, N, I, J
       REAL*4 B(1:M, 1:N), C(1:M, 1:N)
-C To be assigned to a call to P4A_vp_0: I
-C To be assigned to a call to P4A_vp_1: J
+C To be assigned to a call to P4A_vp_1: I
+C To be assigned to a call to P4A_vp_0: J
       B(I,J) = I                                                        0006
       C(I,J) = J                                                        0007
       END
@@ -15,8 +15,8 @@ C To be assigned to a call to P4A_vp_1: J
       SUBROUTINE P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)
       INTEGER M, N, I, J
       REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
-C To be assigned to a call to P4A_vp_0: I
-C To be assigned to a call to P4A_vp_1: J
+C To be assigned to a call to P4A_vp_1: I
+C To be assigned to a call to P4A_vp_0: J
       A(I,J) = B(I,J)+C(I,J)                                            0006
       END
 !!
@@ -45,8 +45,8 @@ C To be assigned to a call to P4A_vp_1: J
 
 !$OMP    PARALLEL DO 
          DO J = 1, N                                                    0016
-C To be assigned to a call to P4A_vp_0: I
-C To be assigned to a call to P4A_vp_1: J
+C To be assigned to a call to P4A_vp_1: I
+C To be assigned to a call to P4A_vp_0: J
             CALL P4A_KERNEL_WRAPPER_1(M, N, A, B, C, I, J)              0017
          ENDDO
       ENDDO
