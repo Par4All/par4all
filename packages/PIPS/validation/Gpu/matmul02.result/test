@@ -51,7 +51,6 @@ p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
 	      int *j_p4a_copy)
 {
-  ;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
@@ -100,7 +99,6 @@ p4a_kernel_wrapper_0 (int *n_p4a_copy,
 		      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy)
 {
-  ;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
@@ -118,7 +116,6 @@ p4a_kernel_wrapper_1 (int *n_p4a_copy,
 		      int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy, int *x_p4a_copy)
 {
-  ;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;

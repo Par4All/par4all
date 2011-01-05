@@ -16,6 +16,7 @@ with workspace([ program + ".c",	"include/p4a_stubs.c" ], name = program, delete
 	w.props.UNSPAGHETTIFY_TEST_RESTRUCTURING = True
 	w.props.UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION = True
 	w.props.FOR_TO_DO_LOOP_IN_CONTROLIZER = True
+	w.props.KERNEL_LOAD_STORE_VAR_PREFIX = ""
 	       # Some temporary hack to have this parallelized loop:
 ## 	       /* Erase the memory, in case the image is not big enough: */
 ## #pragma omp parallel for private(j)

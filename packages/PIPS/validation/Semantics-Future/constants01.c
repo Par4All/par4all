@@ -10,8 +10,8 @@
 
 int main()
 {
-  int i = 2<<6-1;
-  int j = 2<<11-1;
+  int i = 2<<6-1; // i == 64
+  int j = 2<<11-1; // j == 2048
   printf("i=%d, j=%d\n", i, j);
   return i+j;
 }

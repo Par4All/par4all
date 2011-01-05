@@ -13,6 +13,7 @@ create $WKS /tmp/$WKS/$WKS.c /tmp/$WKS/p4a_stubs.c
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty KERNEL_LOAD_STORE_VAR_PREFIX ""
 
 activate MUST_REGIONS
 activate TRANSFORMERS_INTER_FULL

@@ -1,4 +1,4 @@
-delete gpu_lna01
+delete gpu_lna02
 create gpu_lna02 gpu_lna02.c
 
 setenv PIPS_CPP="cpp -C"

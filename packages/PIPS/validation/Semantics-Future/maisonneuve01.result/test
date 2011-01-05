@@ -20,7 +20,7 @@ void run()
       if (alea()) {
 //  T() {}
          // here, cannot see that b == 0
-         if (alea()&&b!=0) 
+         if (alea()&&b!=0)
 //  T() {0==-1}
             error();
 //  T(b) {b==0}
@@ -50,7 +50,7 @@ void run()
       if (alea()) {
 //  P(a,b) {b==0}
          // here, cannot see that b == 0
-         if (alea()&&b!=0) 
+         if (alea()&&b!=0)
 //  P() {0==-1}
             error();
 //  P(a,b) {b==0}
