@@ -85,8 +85,8 @@ void p4a_kernel_launcher_0(int tf, int tv, float ptrfiltre[tf], float ptrin[tv],
    for(k = 0; k <= 31; k += 1)
 
       for(i = 0; i <= tv-tf+1-1; i += 1)
-         // To be assigned to a call to P4A_vp_0: k
-         // To be assigned to a call to P4A_vp_1: i
+         // To be assigned to a call to P4A_vp_1: k
+         // To be assigned to a call to P4A_vp_0: i
          p4a_kernel_wrapper_0(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
 }
 void p4a_kernel_launcher_1(int tf, int tv, float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80])
@@ -101,9 +101,9 @@ void p4a_kernel_launcher_1(int tf, int tv, float filtre[16], float in_pulse[5][3
       while (j<=4) {
          k = 0;
          while (k<=31) {
-            // To be assigned to a call to P4A_vp_0: i
+            // To be assigned to a call to P4A_vp_2: i
             // To be assigned to a call to P4A_vp_1: j
-            // To be assigned to a call to P4A_vp_2: k
+            // To be assigned to a call to P4A_vp_0: k
             
             p4a_kernel_wrapper_1(tf, tv, filtre, &j, &k, in_pulse, out_pulse);
             k += 1;
@@ -114,15 +114,15 @@ void p4a_kernel_launcher_1(int tf, int tv, float filtre[16], float in_pulse[5][3
 }
 void p4a_kernel_wrapper_0(int tf, int tv, float *I, float *R, int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
 {
-   // To be assigned to a call to P4A_vp_0: k
-   // To be assigned to a call to P4A_vp_1: i
+   // To be assigned to a call to P4A_vp_1: k
+   // To be assigned to a call to P4A_vp_0: i
    p4a_kernel_0(tf, tv, &*I, &*R, i, ptrfiltre, ptrin, ptrout);
 }
 void p4a_kernel_wrapper_1(int tf, int tv, float filtre[16], int *j, int *k, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
-   // To be assigned to a call to P4A_vp_0: i
+   // To be assigned to a call to P4A_vp_2: i
    // To be assigned to a call to P4A_vp_1: j
-   // To be assigned to a call to P4A_vp_2: k
+   // To be assigned to a call to P4A_vp_0: k
    
    p4a_kernel_1(tf, tv, filtre, &*j, &*k, in_pulse, out_pulse);
 }
