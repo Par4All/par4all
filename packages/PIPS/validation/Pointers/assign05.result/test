@@ -1,0 +1,18 @@
+
+POINTS TO
+
+//  {}
+void assign05()
+{
+//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *r;
+//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i;
+//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   r = bar(i);
+//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+   i = 1;
+//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+   *r = 0;
+}

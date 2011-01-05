@@ -34,26 +34,27 @@ activate PRINT_CODE
 
 apply COARSE_GRAIN_PARALLELIZATION[main]
 
-echo 
+echo
 echo "After COARSE_GRAIN_PARALLELIZATION"
-echo 
+echo
 display PRINTED_FILE[main]
 
 apply GPU_IFY[main]
 
-echo 
+echo
 echo "After GPU_IFY"
-echo 
+echo
 display PRINTED_FILE[main]
 display PRINTED_FILE[p4a_kernel_launcher_0]
 display PRINTED_FILE[p4a_kernel_wrapper_0]
 display PRINTED_FILE[p4a_kernel_0]
 
 
+setproperty ISOLATE_STATEMENT_EVEN_NON_LOCAL TRUE
 apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
-echo 
+echo
 echo "After KERNEL_LOAD_STORE"
-echo 
+echo
 display PRINTED_FILE[main]
 display PRINTED_FILE[p4a_kernel_launcher_0]
 display PRINTED_FILE[p4a_kernel_wrapper_0]

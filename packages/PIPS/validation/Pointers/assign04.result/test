@@ -1,0 +1,68 @@
+
+Parsed printed file for "assign04"
+
+void assign04()
+{
+   int ***p;
+   int **q;
+   int *r;
+   int i;
+
+   r = &i;
+   //q = &r;
+   p = &q;
+   **p = r;
+   ***p = 0;
+}
+
+Proper effetcs for "assign04"
+
+void assign04()
+{
+   int ***p;
+   int **q;
+   int *r;
+   int i;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: p
+   //q = &r;
+   p = &q;
+//             <    is read   >: p p[0] r
+//             <    is written>: p[0][0]
+   **p = r;
+//             <    is read   >: p p[0] p[0][0]
+//             <    is written>: p[0][0][0]
+   ***p = 0;
+}
+
+POINTS TO
+
+//  {}
+void assign04()
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int ***p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int **q;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *r;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   r = &i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,i,-Exact-)}
+   //q = &r;
+   p = &q;
+//  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,i,-Exact-)}
+   **p = r;
+//  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,i,-Exact-)}
+   ***p = 0;
+}
