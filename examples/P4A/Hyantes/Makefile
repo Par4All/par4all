@@ -33,7 +33,7 @@ SOURCES= $(TARGET:=.c)
 #	echo Target $@ not implemented...
 
 # Keep intermediate files for the demo for further inspection:
-.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
+.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
 
 
 #.INTERMEDIATE: $(TARGET:=_seq)
@@ -45,11 +45,11 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo : display_seq display_openmp display_cuda ;
+demo : display_seq display_openmp display_cuda display_accel ;
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) *~ *.database *.build output_seq output_openmp output_cuda
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq output_openmp output_cuda output_accel
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
@@ -83,3 +83,7 @@ run_ref:;
 %_cuda : %.c
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) --cuda -o $@ $< $(LDLIBS)
+
+%_accel : %.c
+	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
+	p4a $(P4A_OPTIONS) --accel -o $@ $< $(LDLIBS)
