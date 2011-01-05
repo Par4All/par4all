@@ -25,8 +25,6 @@ activate PRINT_CODE
 
 echo isolated code
 setproperty ISOLATE_STATEMENT_LABEL "l99996"
-setproperty ISOLATE_STATEMENT_LOAD_FUNCTION "chaaaaaaarge"
-setproperty ISOLATE_STATEMENT_STORE_FUNCTION "retreaaaaaat"
 apply ISOLATE_STATEMENT
 display PRINTED_FILE
 

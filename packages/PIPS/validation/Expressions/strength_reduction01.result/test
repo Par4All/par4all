@@ -4,6 +4,10 @@
 int main()
 {
 
+//  T(main) {main==0}
+
+   // BEGIN BLOCK
+
 //  T(a,i) {a==1, i==0}
 
    int i = 0, a = 1;
@@ -23,31 +27,40 @@ int main()
 //  T(main) {i==10, main==0, 10<=a, a<=91}
 
    return 0;
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, a = 1;
    //PIPS generated variable
    int a0;
    a0 = a;
    for(i = 0; i <= 9; i += 1) {
+      // BEGIN BLOCK
       a = a0;
       a0 += 1;
+      // END BLOCK
    }
    printf("%d", a);
    return 0;
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, a = 1;
    //PIPS generated variable
    int a0;
    a0 = a;
    for(i = 0; i <= 9; i += 1) {
+      // BEGIN BLOCK
       a = a0;
       a0 += 1;
+      // END BLOCK
    }
    printf("%d", a);
    return 0;
+   // END BLOCK
 }
 

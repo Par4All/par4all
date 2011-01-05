@@ -7,7 +7,7 @@ Workspace equiv08 created and opened.
 Main module PROGRAM "EQUIV08" selected.
 Module EQUIV08 selected
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module EQUIV08 already active.
 Request: build resource PRINTED_FILE for module EQUIV08.
   BOOTSTRAP                      building   ENTITIES()
