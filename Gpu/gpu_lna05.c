@@ -11,7 +11,7 @@ int main(){
   // first loop nest : 
   // do par <- annotate
   //   do seq
-   for(i = 0; i <= 498; i += 1)
+   for(i = 0; i <= 123; i += 1)
       for(j = 0; j <= 498; j += 1)
 	{
 	  if (i==0)
@@ -23,7 +23,7 @@ int main(){
   // second loop nest : 
   // do par <- annotate whole loop nest
   //   do par
-   for(i = 0; i <= 498; i += 1)
+   for(i = 0; i <= 123; i += 1)
       for(j = 0; j <= 498; j += 1)
 	b[i][j] = (float) i*j;
 
@@ -31,8 +31,8 @@ int main(){
   // do par <- annotate whole loop nest
   //   do par
   //     do par
-   for(i = 0; i <= 498; i += 1)
-      for(j = 0; j <= 498; j += 1)
+   for(i = 0; i <= 123; i += 1)
+      for(j = 0; j <= 234; j += 1)
 	for(k = 0; k <= 498; k += 1)
 	  c[i][j][k] = (float) i*j;
 
@@ -47,7 +47,7 @@ int main(){
   // fifth loop nest : 
   // do seq
   //   do par <- do not annotate
-   for(i = 0; i <= 498; i += 1)
+   for(i = 0; i <= 123; i += 1)
       for(j = 0; j <= 498; j += 1)
 	b[i+1][j] = b[i][j] * 2.0;
 
