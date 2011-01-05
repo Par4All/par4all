@@ -2,7 +2,7 @@
 // increment, but in the loop b is always positive. Unlike
 // maisonneuve08.c, another variable, i, muddles the situation
 
-// $Id: $
+// $Id$
 
 #include <stdlib.h>
 #include <stdio.h>
