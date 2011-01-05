@@ -141,32 +141,34 @@ bool check_transformer_list(list tl)
   bool identity_p = FALSE;
   bool one_p = FALSE; // useless for the time being
 
-  if(ENDP(tl))
-    /* The empty transformer list could be used to represent the
-       empty transformer... */
-    pips_internal_error("Empty transformer list");
-
-  FOREACH(TRANSFORMER, tf, tl) {
-    if(transformer_identity_p(tf)) {
-      if(identity_p) {
-	one_p = FALSE;
-	pips_internal_error("Two identity transformers in one list.");
-      }
-      else {
-	identity_p = TRUE;
-	one_p = TRUE;
+  if(ENDP(tl)) {
+    /* The empty transformer list is used to represent the empty
+       transformer... */
+    ;
+  }
+  else {
+    FOREACH(TRANSFORMER, tf, tl) {
+      if(transformer_identity_p(tf)) {
+	if(identity_p) {
+	  one_p = FALSE;
+	  pips_internal_error("Two identity transformers in one list.");
+	}
+	else {
+	  identity_p = TRUE;
+	  one_p = TRUE;
+	}
       }
     }
-  }
-  if(identity_p) {
-    /* It must be the first one */
-    if(!transformer_identity_p(TRANSFORMER(CAR(tl))))
-      pips_internal_error("The identity transformer is not the list header.");
-  }
+    if(identity_p) {
+      /* It must be the first one */
+      if(!transformer_identity_p(TRANSFORMER(CAR(tl))))
+	pips_internal_error("The identity transformer is not the list header.");
+    }
 
-  FOREACH(TRANSFORMER, tf, tl) {
-    if(transformer_empty_p(tf))
-      pips_internal_error("An empty transformer has been found.");
+    FOREACH(TRANSFORMER, tf, tl) {
+      if(transformer_empty_p(tf))
+	pips_internal_error("An empty transformer has been found.");
+    }
   }
 
   return TRUE;
@@ -189,8 +191,11 @@ list combine_transformer_lists(list tl1, list tl2)
 
   FOREACH(TRANSFORMER, t1, tl1) {
     FOREACH(TRANSFORMER, t2, tl2) {
-      transformer nt = transformer_combine(t1, t2);
+      transformer nt = transformer_combine(copy_transformer(t1), t2);
 
+      // transformer_empty_p() is not strong enough currently
+      // It does not detect that k<= 2 && k>=3 is empty...
+      nt = transformer_normalize(nt, 2);
       if(!transformer_empty_p(nt))
 	ntl = CONS(TRANSFORMER, nt, ntl);
       else
@@ -204,6 +209,72 @@ list combine_transformer_lists(list tl1, list tl2)
   pips_assert("nn is n1*n2-en", nn==n1*n2-en);
 
   return ntl;
+}
+
+/* each transformer of tl1 must be applied to each precondition of
+   tl2, including the identity transformer. If an identity
+   transformer is generated and if identity transformers are always
+   first in the list, it will again be first in the returned
+   list. Empty preconditions are not preserved in the returned
+   list. An empty list is unfeasible.
+
+   if exclude_p==FALSE, return U_i1 U_i2 apply(t_i1, p_i2);
+   else return U_i1 U_i2!=i1 apply(t_i1, p_i2);
+ */
+list apply_transformer_lists_generic(list tl1, list tl2, bool exclude_p)
+{
+  list ntl = NIL;
+  int n1 = gen_length(tl1);
+  int n2 = gen_length(tl2);
+  int en = 0; // number of empty preconditions generated
+  int sn = 0; // number of excluded/skipped preconditions
+  int nn = -1; // number of preconditions in the result
+  int i1 = 0;
+
+  // FI: not true is option keep_p has been used to maintain
+  //|tl_1|==|tl_2| which is useful when exclude_p is TRUE
+  if(!exclude_p) {
+    pips_assert("tl1 is OK\n", check_transformer_list(tl1));
+    pips_assert("tl2 is OK\n", check_transformer_list(tl2));
+  }
+
+  FOREACH(TRANSFORMER, t1, tl1) {
+    int i2 = 0;
+    i1++;
+    FOREACH(TRANSFORMER, t2, tl2) {
+      i2++;
+      if(i1!=i2 && exclude_p) {
+	transformer nt = transformer_apply(t1, t2);
+
+	if(!transformer_empty_p(nt))
+	  ntl = CONS(TRANSFORMER, nt, ntl);
+	else
+	  en++;
+      }
+      else if(exclude_p)
+	sn++;
+    }
+  }
+  ntl = gen_nreverse(ntl);
+
+  nn = gen_length(ntl);
+  pips_assert("nn is n1*n2-en", nn==n1*n2-en-sn);
+  //FI: there is no guarantee here that the identity transformer is
+  //not returned multiple times... although it would make sense if the
+  //input lists are properly sorted.
+  pips_assert("ntl is OK\n", check_transformer_list(ntl));
+
+  return ntl;
+}
+
+list apply_transformer_lists(list tl1, list tl2)
+{
+  return apply_transformer_lists_generic(tl1, tl2, FALSE);
+}
+
+list apply_transformer_lists_with_exclusion(list tl1, list tl2)
+{
+  return apply_transformer_lists_generic(tl1, tl2, TRUE);
 }
 
 /* Eliminate empty transformers and keep at most one identity
@@ -377,4 +448,132 @@ transformer transformer_list_to_transformer(list ltl)
 transformer active_transformer_list_to_transformer(list ltl)
 {
   return generic_transformer_list_to_transformer(ltl, TRUE);
+}
+
+// Remove all inactive transformers from ltl and generate a new list
+// with copied elements
+list transformer_list_to_active_transformer_list(list tl)
+{
+  list atl = NIL;
+
+  FOREACH(TRANSFORMER, tf, tl) {
+    if(!ENDP(transformer_arguments(tf)))
+      atl = CONS(TRANSFORMER, copy_transformer(tf), atl);
+  }
+
+  atl = gen_nreverse(atl);
+
+  return atl;
+}
+
+
+/* Compute the precondition of a loop whose body transformers T_i are
+ * in transformer list tl and whose condition is modelized by
+ * transformer c_t. The precondition of iteration 0 is p_0.
+ *
+ * We need a developped formulae for P*=(U_i T_i)^*P_0... to postpone
+ * the convex hulls as much as possible
+ *
+ * For instance:
+ *
+ * P_0 is known as pre_init
+ *
+ * P_1 = U_i T_i(P_0)
+ *
+ * P_2 = U_i U_j T_i(T_j(P_0))
+ *
+ * P_3^s = U_i T_i^+(P_0)  --- only one path is used
+ *
+ * P_3^+ = U_i U_j!=i T^+_i(T_j(T^*(P_1)))  --- at least two
+ *                                              paths are used
+ *
+ * which would make more sense when i and j are in
+ * [0..1]. Note that in P_3, T_j and T^+_i could be recomputed
+ * wrt P_1 instead of pre_fuzzy... which is not provided
+ *
+ * Maybe T^*=(U_i T_i)^* could/should be computed as (U_i T_i*)* but
+ * it is not clear how all the useful conditions could be taken into
+ * account.
+ *
+ * A more accurate approach would use several developped formulae for
+ * P* and an intersection of their results.
+ */
+transformer transformer_list_closure_to_precondition(list tl,
+						     transformer c_t,
+						     transformer p_0)
+{
+  list ntl = transformers_combine(gen_full_copy_list(tl), c_t);
+
+  list p_1_l = transformers_apply(ntl, p_0);
+  transformer p_1 = transformer_list_to_transformer(p_1_l);
+
+  list t_2_l = combine_transformer_lists(ntl, ntl);
+  list p_2_l = transformers_apply(t_2_l, p_0);
+  transformer p_2 = transformer_list_to_transformer(p_2_l);
+
+  list itcl = transformers_derivative_fix_point(ntl); // individual
+						      // transformer closures
+  itcl = transformers_combine(itcl, c_t);
+  list itcl_plus = gen_full_copy_list(itcl); // to preserve ictl
+  itcl_plus = one_to_one_transformers_combine(itcl_plus, ntl);
+  list p_3_l = transformers_apply(itcl_plus, p_0);
+  transformer p_3 = transformer_list_to_transformer(gen_full_copy_list(p_3_l));
+
+  // Not satisfying: works only for the whole space, not for subpaces
+  // left untouched
+  transformer t_star = active_transformer_list_to_transformer(itcl);
+  transformer p_4_1 = transformer_apply(t_star, p_1); // one + * iteration
+  list p_4_2_l = transformers_apply_and_keep_all(ntl, p_4_1); // another iteration
+  pips_assert("itcl_plus and p_4_2_l have the same numer of elements",
+	      gen_length(itcl_plus)==gen_length(p_4_2_l));
+  list p_4_3_l = apply_transformer_lists_with_exclusion(itcl_plus, p_4_2_l);
+  transformer p_4 = transformer_list_to_transformer(p_4_3_l);
+
+  transformer p_star = transformer_undefined;
+
+  ifdebug(8) {
+    pips_debug(8, "p_0:\n");
+    print_transformer(p_0);
+    pips_debug(8, "p_1:\n");
+    print_transformer(p_1);
+    pips_debug(8, "p_2:\n");
+    print_transformer(p_2);
+    pips_debug(8, "p_3:\n");
+    print_transformer(p_3);
+    pips_debug(8, "p_4:\n");
+    print_transformer(p_4);
+  }
+
+  // reduce p_0, p_1, p_2, p_3 and p_4 to p_star
+  transformer p_01 = transformer_convex_hull(p_0, p_1);
+  transformer p_012 = transformer_convex_hull(p_01, p_2);
+  transformer p_0123 = transformer_convex_hull(p_012, p_3);
+  p_star = transformer_convex_hull(p_0123, p_4);
+
+  ifdebug(8) {
+    pips_debug(8, "p_star:\n");
+    print_transformer(p_star);
+  }
+
+  // Clean up all intermediate variables
+  gen_full_free_list(ntl);
+  //gen_full_free_list(p_1_l);
+  free_transformer(p_1);
+  //gen_full_free_list(t_2_l);
+  //gen_full_free_list(p_2_l);
+  free_transformer(p_2);
+  //gen_full_free_list(itcl);
+  gen_full_free_list(itcl_plus);
+  //gen_full_free_list(p_3_l);
+  free_transformer(p_3);
+  free_transformer(t_star);
+  free_transformer(p_4_1);
+  gen_full_free_list(p_4_2_l);
+  //gen_full_free_list(p_4_3_l);
+  free_transformer(p_4);
+  free_transformer(p_01);
+  free_transformer(p_012);
+  free_transformer(p_0123);
+
+  return p_star;
 }

@@ -2930,48 +2930,94 @@ transformer whileloop_to_postcondition(
     */
     transformer pre_fuzzy = transformer_apply(tf, pre);
     //tb = complete_non_identity_statement_transformer(tb, pre_fuzzy, s);
+    list btl = list_undefined;
+    int fbtll = 0;
 
     if(get_bool_property("SEMANTICS_USE_TRANSFORMER_LISTS")) {
-      list btl = statement_to_transformer_list(s, pre_fuzzy);
+      list fbtl = statement_to_transformer_list(s, pre_fuzzy);
+      fbtll = (int) gen_length(fbtl);
+      // filter out transformers that do not modify the state
+      // FI: this is not a general approach since it depends on the
+      // framework used and on the other variables, but it helps!
+      btl = transformer_list_to_active_transformer_list(fbtl);
+      gen_full_free_list(fbtl);
 
-      if(gen_length(btl)==1) {
+      if(gen_length(btl)==0) {
+	tb = empty_transformer(transformer_identity());
+      }
+      else if(gen_length(btl)==1) {
 	/* Nothing special in the loop body: no tests, no while,... */
-	tb = complete_statement_transformer(tb, pre_fuzzy, s);
+	if(fbtll==1)
+	  tb = complete_statement_transformer(tb, pre_fuzzy, s);
+	else
+	  // FI: not to sure about reuse and memory leaks...
+	  tb = copy_transformer(TRANSFORMER(CAR(btl)));
       }
       else {
-	/* recompute the body transformer without taking identity
-	   transformers into account */
-	tb = active_transformer_list_to_transformer(btl);
+	/* Recompute the body transformer without taking identity
+	   transformers into account. This is not enough because the
+	   decision about "activity" should be made dimension by
+	   dimension. We cannot get good result in general with a
+	   convex hull performed here: only specific cases are
+	   handled. We need instead a complex formulae to compute the
+	   loop precondition as a function of p_0 and all t_i*/
+	/* btl is copied because the function below frees at least
+	   its components */
+	tb = active_transformer_list_to_transformer(gen_full_copy_list(btl));
       }
     }
     else {
       tb = complete_statement_transformer(tb, pre_fuzzy, s);
     }
 
-    free_transformer(pre_fuzzy);
-
     pips_debug(8, "The loop may be executed and preconditions must"
 	       " be propagated in the loop body\n");
 
     if(k==1) {
-      /* The loop fix point transformer T* could be used to obtain the
-       * set of stores for any number of iterations, including
-       * 0. Instead, use T+ and a convex hull with the precondition for
-       * the first iteration, which preserves more information when the
-       * fixpoint is not precise.
-       *
-       * Bertrand Jeannet suggests that we compute P0 U T(P0) U
-       * T^2(P0) U T_3(P0) where T_3 is the transitive closure
-       * obtained for iterations 3 to infinity by setting the initial
-       * iteration number k to 3 before projection. NSAD 2010.
-       */
-      pre_next = transformer_combine(pre_next, tf);
-      pre_next = precondition_add_condition_information(pre_next, c,
-							pre_next, TRUE);
-      pre_next = transformer_combine(pre_next, tb);
-      pre_next = precondition_add_condition_information(pre_next, c,
-							pre_next, TRUE);
-      preb = transformer_convex_hull(pre_init, pre_next);
+      if(!get_bool_property("SEMANTICS_USE_TRANSFORMER_LISTS")
+	 || gen_length(btl)==1) {
+	/* The loop fix point transformer T* could be used to obtain the
+	 * set of stores for any number of iterations, including
+	 * 0. Instead, use T+ and a convex hull with the precondition for
+	 * the first iteration, which preserves more information when the
+	 * fixpoint is not precise:
+	 *
+	 * P^* = P_0 U cond(c)(tb(cond(c)(tb^*(P_0))))
+	 *
+	 * Bertrand Jeannet suggests that we compute P0 U T(P0) U
+	 * T^2(P0) U T_3(P0) where T_3 is the transitive closure
+	 * obtained for iterations 3 to infinity by setting the initial
+	 * iteration number k to 3 before projection. NSAD 2010. No test
+	 * case has been forwarded to show that this would be useful.
+	 */
+	// FI: I do not know why pre_next==pre is used instead of
+	// pre_init==P_0 in the statement just below
+	pre_next = transformer_combine(pre_next, tf);
+	pre_next = precondition_add_condition_information(pre_next, c,
+							  pre_next, TRUE);
+	pre_next = transformer_combine(pre_next, tb);
+	pre_next = precondition_add_condition_information(pre_next, c,
+							  pre_next, TRUE);
+	preb = transformer_convex_hull(pre_init, pre_next);
+      }
+      else { // transformer lists are used and at least two
+	     // transformers have been found
+	transformer c_t = condition_to_transformer(c, pre_fuzzy, TRUE);
+	transformer preb1 = transformer_list_closure_to_precondition(btl, c_t, pre_init);
+	//pre_next = transformer_combine(pre_next, tf);
+	//pre_next = precondition_add_condition_information(pre_next, c,
+	//						  pre_next, TRUE);
+      //pre_next = transformer_combine(pre_next, tb);
+      //pre_next = precondition_add_condition_information(pre_next, c,
+	//					  pre_next, TRUE);
+    //transformer preb2 = transformer_convex_hull(pre_init, pre_next);
+    //pips_assert("The two preconditions have the same arguments",
+    //		    arguments_equal_p(transformer_arguments(preb1),
+    //			      transformer_arguments(preb2)));
+	// FI: the intersection generates overflows
+	//preb = transformer_intersection(preb1, preb2);
+	preb = preb1;
+      }
     }
     else if (k==2) {
       /* We need the loop effects to recompute the unrolled
@@ -3004,6 +3050,8 @@ transformer whileloop_to_postcondition(
     }
     else
       pips_user_error("Unexpected value %d for k.\n", k);
+
+    free_transformer(pre_fuzzy);
 
     /* propagate preconditions in the loop body and get its postcondition */
 

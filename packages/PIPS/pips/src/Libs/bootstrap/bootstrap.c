@@ -5418,6 +5418,9 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
 
+  /* F2003 */
+  {C_LOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+
   /* PIPS run-time support for C code generation
    *
    * Source code located in validation/Hyperplane/run_time.src for the
