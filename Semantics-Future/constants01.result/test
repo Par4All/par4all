@@ -2,20 +2,24 @@
 TRANSFORMERS
 
 
-//  T(main) {}
+//  T(main) {main==2112}
 
 int main()
 {
 
-//  T(i) {}
+//  T(i) {i==64}
 
    int i = 2<<6-1;
 
-//  T(j) {}
+//  T(j) {i==64, j==2048}
 
-   int j = 2<<1-1;
+   int j = 2<<11-1;
 
-//  T(main) {i+j==main}
+//  T() {i==64, j==2048}
+
+   printf("i=%d, j=%d\n", i, j);
+
+//  T(main) {i==64, j==2048, main==2112}
 
    return i+j;
 }
@@ -32,11 +36,15 @@ int main()
 
    int i = 2<<6-1;
 
-//  P(i) {}
+//  P(i) {i==64}
 
-   int j = 2<<1-1;
+   int j = 2<<11-1;
 
-//  P(i,j) {}
+//  P(i,j) {i==64, j==2048}
+
+   printf("i=%d, j=%d\n", i, j);
+
+//  P(i,j) {i==64, j==2048}
 
    return i+j;
 }

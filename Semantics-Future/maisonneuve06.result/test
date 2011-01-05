@@ -64,15 +64,15 @@ void run(void)
 
    while (1)
 
-//  P(n) {n<=10}
+//  P(n) {0<=n, n<=10}
 
       if (rand()%2)
 
-//  P(n) {n<=10}
+//  P(n) {0<=n, n<=10}
 
          if (n<=9)
 
-//  P(n) {n<=9}
+//  P(n) {0<=n, n<=9}
 
             n++;
       else if (n==10) {
