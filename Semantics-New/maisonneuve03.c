@@ -20,6 +20,8 @@ void run(void)
       }
     }
   }
+  /* We'd like some information about x at loop exit, if any. */
+  ;
 }
 
 int main(void)
