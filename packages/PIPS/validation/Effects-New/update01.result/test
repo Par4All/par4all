@@ -1,0 +1,10 @@
+Select some options to deal with th C Language:
+Parse as C:
+Prettyprint the source as C, of course
+Do not display original number lines as comment:
+void foo(wt *s)
+{
+//             <    is read   >: s s[0].pi
+//             <    is written>: s[0].pi s[0].pi[0]
+   *s->pi++ = 0;                                                        /*0006*/
+}
