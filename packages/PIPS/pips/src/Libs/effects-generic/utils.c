@@ -657,6 +657,27 @@ effect make_anywhere_effect(action act)
   return anywhere_eff;
 }
 
+effect make_anywhere_write_memory_effect()
+{
+
+  return make_anywhere_effect(make_action_write_memory());
+}
+
+effect make_anywhere_read_memory_effect()
+{
+
+  return make_anywhere_effect(make_action_read_memory());
+}
+
+list make_anywhere_read_write_memory_effects()
+{
+  list l = NIL;
+  l = CONS(EFFECT, make_anywhere_write_memory_effect(), l);
+  l = CONS(EFFECT, make_anywhere_read_memory_effect(), l);
+  return l;
+}
+
+
 /**
    remove duplicate anywhere effects and keep anywhere effects and
    effects not combinable with anywhere effects.
@@ -915,9 +936,28 @@ list generic_effect_generate_all_accessible_paths_effects_with_level(effect eff,
 	      l_res = CONS(EFFECT, eff, NIL);
 	    break;
 	  }
+	case is_type_functional:
+	  pips_debug(8, "functional case\n");
+	  pips_user_warning("possible effect through indirect call -> returning anywhere\n");
+
+	  l_res = make_anywhere_read_write_memory_effects();
+	  break;
+	case is_type_struct:
+	case is_type_union:
+	case is_type_enum:
+	  pips_debug(8, "agregate type case\n");
+	  pips_internal_error("aggregate type not handeld yet\n");
+	  break;
+
+	case is_type_area:
+	case is_type_statement:
+	case is_type_varargs:
+	case is_type_unknown:
+	  pips_internal_error("unexpected type in this context \n");
+	  break;
 	default:
 	  {
-	    pips_internal_error("case not handled yet");
+	    pips_internal_error("unknown type tag\n");
 	  }
 	} /*switch */
 

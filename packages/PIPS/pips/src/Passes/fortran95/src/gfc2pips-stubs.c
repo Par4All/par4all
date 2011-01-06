@@ -199,6 +199,10 @@ void set_string_property( const string name, string s ) {
   fprintf( stderr, "***** Property requested : %s ***** ", name );
   STUB_ERROR();
 }
+bool too_many_property_errors_pending_p() {
+  STUB_WARNING_MSG("unimplemented in gfc2pips !");
+}
+
 
 /*************************************************
  * PIPSMAKE
