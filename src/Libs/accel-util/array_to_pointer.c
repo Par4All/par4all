@@ -46,17 +46,23 @@
 #include "accel-util.h"
 
 /**
- * This boolean is controlled by "LINEARIZE_ARRAY_CAST_AT_CALL_SITE" property
- * Turning it on break further effects analysis, but without the cast it might
+ * This boolean is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
+ * property Turning it on break further effects analysis, but without
+ * the cast it might
  * break compilation or at least generate warnings for type mismatch
  */
 static bool cast_at_call_site_p = FALSE;
 
 /**
- * This boolean is controlled by "LINEARIZE_ARRAY_USE_POINTERS" property
+ * This boolean is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
  */
 static bool use_pointers_p = FALSE;
 
+/**
+ * This boolean is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
+ * property
+ */
+static bool modify_call_site_p = FALSE;
 
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
@@ -122,6 +128,7 @@ static void do_linearize_array_subscript(subscript s) {
 
 static bool do_linearize_type(type *t, bool *rr) {
     bool linearized =false;
+    if (!type_variable_p (*t)) return linearized;
     if(rr)*rr=false;
     variable v = type_variable(*t);
     type ut = ultimate_type(*t);
@@ -449,7 +456,7 @@ static void do_linearize_array(entity m, statement s) {
     /* pips bonus step: the consistency */
     set linearized_param = set_make(set_pointer);
     FOREACH(PARAMETER,p,module_functional_parameters(m)) {
-        dummy d = parameter_dummy(p);
+      dummy d = parameter_dummy(p);
         if(dummy_identifier_p(d))
         {
             entity di = dummy_identifier(d);
@@ -467,11 +474,13 @@ static void do_linearize_array(entity m, statement s) {
           }
           do_array_to_pointer_type(&parameter_type(p));
         }
-        pips_assert("everything went well",parameter_consistent_p(p));
+	pips_assert("everything went well",parameter_consistent_p(p));
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
-    do_linearize_array_manage_callers(m,linearized_param);
+    if (modify_call_site_p) {
+      do_linearize_array_manage_callers(m,linearized_param);
+    }
     set_free(linearized_param);
 
     /* final step: fix expressions if we have disturbed typing in the process */
@@ -667,6 +676,7 @@ bool linearize_array(char *module_name)
     /* Do we have to cast the array at call site ? */
     cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
     use_pointers_p = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
+    modify_call_site_p = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
@@ -689,7 +699,8 @@ bool linearize_array(char *module_name)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-        db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
+	if (language_c_p (get_prettyprint_language ()))
+	  db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
 
         /*postlude*/
         reset_current_module_statement();
@@ -699,3 +710,39 @@ bool linearize_array(char *module_name)
     return true;
 }
 
+bool linearize_array_fortran(char *module_name)
+{
+    debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
+    /* prelude */
+    set_current_module_entity(module_name_to_entity( module_name ));
+
+    /* Update the static variables according to properties*/
+    use_pointers_p      = false;
+    modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
+    cast_at_call_site_p = false;
+
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+
+    /* just linearize accesses and change signature from n-D arrays to 1-D arrays */
+    do_linearize_array(get_current_module_entity(),get_current_module_statement());
+
+    /* additionnaly perform array-to-pointer conversion for c modules only */
+    if(use_pointers_p) {
+      if(c_module_p(get_current_module_entity())) {
+	do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
+	cleanup_subscripts(get_current_module_statement());
+      }
+      else pips_user_warning("no pointers in fortran !,LINEARIZE_ARRAY_USE_POINTERS ignored\n");
+    }
+
+    /* validate */
+    pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+
+    /*postlude*/
+    reset_current_module_statement();
+    reset_current_module_entity();
+    debug_off();
+    return true;
+}

@@ -9144,17 +9144,37 @@ linearize_array > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are 
-declared as 1D arrays or pointers. Pointers are accessed using dereferencement 
-and arrays using subscripts.
+\begin{PipsPass}{linearize_array_fortran}
+This transformation replaces all arrays in the module by equivalent linearized
+arrays. With this simple version the callers are not modified.
+\end{PipsPass}
+
+\begin{PipsMake}
+linearize_array_fortran > MODULE.code
+                        > CALLERS.code
+		        > PROGRAM.entities
+		        < PROGRAM.entities
+		        < MODULE.code
+		        < CALLERS.code
+\end{PipsMake}
+
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are
+declared as 1D arrays or pointers. Pointers are accessed using dereferencement
+and arrays using subscripts. This property does not apply to the fortran case.
 \begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
 LINEARIZE_ARRAY_USE_POINTERS FALSE
 \end{PipsProp}
 
+Use \PipsPropRef{LINEARIZE_ARRAY_MODIFY_CALL_SITE} to control wether the call site
+is modified or not.
+\begin{PipsProp}{LINEARIZE_ARRAY_MODIFY_CALL_SITE}
+LINEARIZE_ARRAY_MODIFY_CALL_SITE TRUE
+\end{PipsProp}
+
 Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control wether a cast is
- inserted at call sites. Turning it on break further effects analysis, but 
-without the cast it might break compilation or at least generate warnings for 
-type mismatch
+ inserted at call sites. Turning it on break further effects analysis, but
+without the cast it might break compilation or at least generate warnings for
+type mismatch. This property does not apply to the fortran case.
 \begin{PipsProp}{LINEARIZE_ARRAY_CAST_AT_CALL_SITE}
 LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
