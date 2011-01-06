@@ -1,0 +1,300 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(d,s,t) {}
+
+   int t, d, s;
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   t = d = s = 0;
+
+//  T(d,s,t) {d#init==0, s#init==0, t#init==0, 0<=d, s<=3d, d<=s+4t,
+//    0<=s, s<=3, 0<=t}
+
+
+   while (1)
+
+//  T(d,s,t) {0<=d, d<=d#init+1, d#init+t#init+1<=d+t,
+//    d<=d#init+t#init+1, d<=s+4t, 0<=s, s+3t<=3t#init+3}
+
+      if (flip())
+
+//  T(d,s) {d==d#init+1, s==s#init+1, 0<=d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         if (s<=2) {
+
+//  T(s) {s==s#init+1, s<=3}
+
+            s++;
+
+//  T(d) {d==d#init+1, s<=3}
+
+            d++;
+
+//  T() {0<=d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {3<=s}
+
+            while (1)
+
+//  T() {3<=s}
+
+               ;
+      else if (flip())
+
+//  T(s,t) {s==0, t==t#init+1, 0<=d, d<=4t, 0<=t}
+
+         if (1) {
+
+//  T(t) {t==t#init+1}
+
+            t++;
+
+//  T(s) {s==0}
+
+            s = 0;
+
+//  T() {s==0, 0<=d, d<=4t, 0<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+      else {
+
+//  T(d,s) {d==d#init+1, s==4, s#init==3, 0<=d, d<=4t+4, 0<=t}
+
+         if (s==3) {
+
+//  T(s) {s==4, s#init==3}
+
+            s++;
+
+//  T(d) {d==d#init+1, s==4}
+
+            d++;
+
+//  T() {s==4, 0<=d, d<=4t+4, 0<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(s,t) {s==0, s#init==4, t==t#init+1, 0<=d, d<=4t, 1<=t}
+
+         if (1) {
+
+//  T(t) {s==4, t==t#init+1, 0<=d, d<=4t, 1<=t}
+
+            t++;
+
+//  T(s) {s==0, s#init==4, 0<=d, d<=4t, 1<=t}
+
+            s = 0;
+
+//  T() {s==0, 0<=d, d<=4t, 1<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int t, d, s;
+
+//  P(d,s,t) {}
+
+   t = d = s = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+
+   while (1)
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+      if (flip())
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         if (s<=2) {
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=2, 0<=t}
+
+            s++;
+
+//  P(d,s,t) {s<=3d+1, d+1<=s+4t, 1<=s, s<=3, 0<=t}
+
+            d++;
+
+//  P(d,s,t) {s+2<=3d, d<=s+4t, 1<=s, s<=3, 0<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(d,s,t) {s==3, 1<=d, d<=4t+3, 0<=t}
+
+            while (1)
+
+//  P(d,s,t) {s==3, 1<=d, d<=4t+3, 0<=t}
+
+               ;
+      else if (flip())
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         if (1) {
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+            t++;
+
+//  P(d,s,t) {s<=3d, d+4<=s+4t, 0<=s, s<=3, 1<=t}
+
+            s = 0;
+
+//  P(d,s,t) {s==0, 0<=d, 2<=d+2t, d+1<=4t, 1<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      else {
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         if (s==3) {
+
+//  P(d,s,t) {s==3, 1<=d, d<=4t+3, 0<=t}
+
+            s++;
+
+//  P(d,s,t) {s==4, 1<=d, d<=4t+3, 0<=t}
+
+            d++;
+
+//  P(d,s,t) {s==4, 2<=d, d<=4t+4, 0<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=2, 0<=t}
+
+            while (1)
+
+//  P(d,s,t) {s<=3d, d<=s+4t, 0<=s, s<=2, 0<=t}
+
+               ;
+
+//  P(d,s,t) {s==4, 2<=d, d<=4t+4, 0<=t}
+
+         if (1) {
+
+//  P(d,s,t) {s==4, 2<=d, d<=4t+4, 0<=t}
+
+            t++;
+
+//  P(d,s,t) {s==4, 2<=d, d<=4t, 1<=t}
+
+            s = 0;
+
+//  P(d,s,t) {s==0, 2<=d, d<=4t, 1<=t}
+
+            if (!(t>=0&&s>=0&&s<=4&&d>=0&&d<=4*t+s))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      }
+}
