@@ -743,23 +743,36 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	    else if(ENTITY_POST_INCREMENT_P(s_op) ||
 		    ENTITY_POST_DECREMENT_P(s_op))
 	      {
+		// case *(e1++) or *(e1--)
+		// the is a read and write effect on e1
 		expression e1 = EXPRESSION(CAR(s_args));
-		syntax s1 = expression_syntax(e1);
-		reference r1 = syntax_reference(s1);
-		entity v1 = reference_variable(r1);
 
-	      /* YOU DO NOT WANT TO GO DOWN RECURSIVELY. DO AS FOR C_PLUS ABOVE: p[0]! */
+		le = generic_proper_effects_of_complex_address_expression
+		  (e1, pme, write_p);
 
-		pips_assert("The argument is a reference", syntax_reference_p(s1));
 
-		/* This seems OK for a scalar. How about an indexed reference? */
+		if (! effect_undefined_p(*pme)&& !anywhere_effect_p(*pme))
+		  {
+		    /* we must add a read effect on *pme if it is a pointer
+		       type
+		    */
+		    if (effect_pointer_type_p(*pme))
+		      {
+			pips_debug(4, "It's a pointer; we add a read and write effect \n");
 
-		le = generic_proper_effects_of_expression(EXPRESSION(CAR(args)));
-		mr = make_reference(v1, CONS(EXPRESSION, int_to_expression(0), NIL));
-		/* DO NOT go down recursively with this new s_exp since the
-		   incrementation or decrementation can be ignored for the
-		   dereferencing. */
+			    effect eff_read = (*effect_dup_func)(*pme);
+			    effect_action(eff_read) = make_action_read_memory();
+			    le = gen_nconc(le, CONS(EFFECT, eff_read, NIL));
+			    effect eff_write = (*effect_dup_func)(*pme);
+			    effect_action(eff_write) = make_action_write_memory();
+			    le = gen_nconc(le, CONS(EFFECT, eff_write, NIL));
+		      }
+		  }
+
+		/* We add a dereferencing */
+		effect_add_dereferencing_dimension(* pme);
 		finished_p = TRUE;
+		result_computed_p = true;
 	      }
 	    else if(ENTITY_PRE_INCREMENT_P(s_op) ||
 		    ENTITY_PRE_DECREMENT_P(s_op))
@@ -1296,9 +1309,9 @@ list generic_proper_effects_of_application(application a __attribute__((__unused
 {
   list le = NIL;
 
-  /* Add code here */
-  pips_user_warning("Effect of indirect calls not implemented\n");
+  pips_user_warning("Effect of indirect calls not implemented -> returning anywhere\n");
 
+  le = make_anywhere_read_write_memory_effects();
   return(le);
 }
 
@@ -1747,18 +1760,23 @@ static void proper_effects_of_expression_instruction(instruction i)
       {
 	  /* This may happen when a structure field contains a pointer to
 	     a function. We do not know which function is is... */
-	  application a = syntax_application(is);
-	  expression fe = application_function(a);
+	  //application a = syntax_application(is);
+	  //expression fe = application_function(a);
 
-	  /* Effect to find which function it it */
-	  l_proper = generic_proper_effects_of_expression(fe);
+	  /* we should try here to retrieve the name of the function through pointer analysis */
+	  /* NOT IMPLEMENTED -> returning anywhere read and write, as the function
+	     can read and write any global variable as well as it's pointer arguments targets.
+           */
+
+	  l_proper = make_anywhere_read_write_memory_effects();
+
 	  /* More effects should be added to take the call site into account */
 	  /* Same as for pointer-based call: use type, assume worst case,... */
 	  /* A new function is needed to retrieve all functions with a
 	     given signature. Then the effects of all the candidates must
 	     be unioned. */
-	  pips_user_warning("Effects of call site using a function pointer in "
-			    "a structure are ignored for the time being\n");
+	  pips_user_warning("call trhough a function pointer in a structure -> anywhere effects\n");
+	 
 	  break;
       }
     case is_syntax_reference:
