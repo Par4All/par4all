@@ -5,15 +5,15 @@ int main()
 {
    int *p, *q;
    int i, j;
-//               <must be written>: p
+//             <    is written>: p
    p = &i;
-//               <must be written>: q
+//             <    is written>: q
    q = &j;
-//               <must be read   >: q
-//               <must be written>: p
+//             <    is read   >: q
+//             <    is written>: p
    p = q;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    *p = 1;
    return 0;
 }
@@ -21,13 +21,16 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *p, *q;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int i, j;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    p = &i;
-//  {(p,i,-Exact-)}
+//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    q = &j;
 //  {(p,i,-Exact-);(q,j,-Exact-)}
    p = q;

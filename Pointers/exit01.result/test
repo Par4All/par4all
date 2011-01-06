@@ -3,11 +3,11 @@ void exit01()
    // BEGIN BLOCK
    int i;
    int *j;
-//               <must be written>: j
+//             <    is written>: j
 
    j = &i;
    exit(0);
-//               <must be written>: i
+//             <    is written>: i
    i = 2;
    // END BLOCK
 }
@@ -19,14 +19,14 @@ void exit01()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  points to = {}
+//  {(j,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *j;
-//  points to = {}
+//  {(j,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    j = &i;
 //  {(j,i,-Exact-)}
    exit(0);
-//  points to = {}
+//  {(j,i,-Exact-)}
    i = 2;
    // END BLOCK
 }
