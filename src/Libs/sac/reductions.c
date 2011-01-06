@@ -583,7 +583,7 @@ static void reductions_rewrite(statement s)
 }
 
 /** 
- * remove reductions by expanding recuced scalar to an array
+ * remove reductions by expanding reduced scalar to an array
  * 
  * @param mod_name  module to remove reductions from
  * 
@@ -619,6 +619,7 @@ bool simd_remove_reductions(char * mod_name)
     return true;
 }
 
+#if 0
 static bool statement_reduction_prelude_p(statement s) {
   if (statement_undefined_p(s))
     return false;
@@ -728,6 +729,7 @@ static void do_sac_reduction_optimizations(graph dg)
   gen_context_recurse(get_current_module_statement(),moved_vectors,
       statement_domain,gen_true,redundant_load_store_elimination_move_vectors);
 }
+#endif
 
 static bool no_write_read_conflicts_p(list succs) {
 	FOREACH(SUCCESSOR, succ, succs) {
@@ -814,7 +816,8 @@ bool redundant_load_store_elimination(char * module_name)
 
     graph dependence_graph = (graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
 
-    do_sac_reduction_optimizations(dependence_graph);
+    // buggy and incomplete
+    //do_sac_reduction_optimizations(dependence_graph);
     do_redundant_load_store_elimination(dependence_graph);
 
     module_reorder(module_stat);
