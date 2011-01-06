@@ -1,0 +1,278 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(b0,b1,b_tmp,ok,x,y) {}
+
+   int b_tmp, b0, b1, ok, x, y;
+
+//  T(b0,b1,x,y) {b0==0, b1==0, x==0, y==0}
+
+   b0 = b1 = x = y = 0;
+
+//  T(ok) {b0==0, b1==0, ok==1, x==0, y==0}
+
+   ok = 1;
+
+//  T(b0,b1,b_tmp,ok,x,y) {b0==b1, b0#init==0, b1#init==0, ok==1,
+//    ok#init==1, x==y, x#init==0, y#init==0, 0<=b0, b0<=1, 0<=b0+x,
+//    b0<=x}
+
+
+   while (1) {
+
+//  T(b0,b1,b_tmp,ok,x) {b0+b0#init==1, b0+b1==1, b0+b1#init==1,
+//    b0+b_tmp==1, ok==1, x==x#init+1}
+
+      if (b0==b1&&!(b0==0&&b1==1||b0==1&&b1==0)) {
+
+//  T(b_tmp) {b0==b1, b0==b_tmp}
+
+         b_tmp = b0;
+
+//  T(b0) {b0+b0#init==1, b0+b1==1, b0+b_tmp==1}
+
+         b0 = 1-b1;
+
+//  T(b1) {b0+b1==1, b0+b1#init==1, b0+b_tmp==1}
+
+         b1 = b_tmp;
+
+//  T(x) {b0+b1==1, b0+b_tmp==1, x==x#init+1}
+
+         x++;
+
+//  T(ok) {b0+b1==1, b0+b_tmp==1, 0<=ok, ok<=1}
+
+         if (ok==1&&x>=y)
+
+//  T(ok) {b0+b1==1, b0+b_tmp==1, ok==1, ok#init==1, y<=x}
+
+            ok = 1;
+         else
+
+//  T(ok) {b0+b1==1, b0+b_tmp==1, ok==0}
+
+            ok = 0;
+
+//  T() {b0+b1==1, b0+b_tmp==1, ok==1}
+
+         if (!(ok==1))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {}
+
+         while (1)
+
+//  T() {}
+
+            ;
+
+//  T(b0,b1,b_tmp,ok,y) {b0==b0#init, b0==b1, b0+b1#init==1,
+//    b0==b_tmp, b0+b_tmp#init==1, ok==1, ok#init==1, y==y#init+1,
+//    0<=b0, b0<=1}
+
+      if (b0!=b1&&(b0==0&&b1==1||b0==1&&b1==0)) {
+
+//  T(b_tmp) {b0+b1==1, b0==b_tmp, b0+b_tmp#init==1, ok==1, 0<=b0,
+//    b0<=1}
+
+         b_tmp = b0;
+
+//  T(b0) {b0==b0#init, b0+b1==1, b0==b_tmp, ok==1, 0<=b0, b0<=1}
+
+         b0 = 1-b1;
+
+//  T(b1) {b0==b1, b0+b1#init==1, b0==b_tmp, ok==1, 0<=b0, b0<=1}
+
+         b1 = b_tmp;
+
+//  T(y) {b0==b1, b0==b_tmp, ok==1, y==y#init+1, 0<=b0, b0<=1}
+
+         y++;
+
+//  T(ok) {b0==b1, b0==b_tmp, ok#init==1, 0<=b0, b0<=1, 0<=ok, ok<=1}
+
+         if (ok==1&&x>=y)
+
+//  T(ok) {b0==b1, b0==b_tmp, ok==1, ok#init==1, 0<=b0, b0<=1, y<=x}
+
+            ok = 1;
+         else
+
+//  T(ok) {b0==b1, b0==b_tmp, ok==0, ok#init==1, 0<=b0, b0<=1, x+1<=y}
+
+            ok = 0;
+
+//  T() {b0==b1, b0==b_tmp, ok==1, 0<=b0, b0<=1}
+
+         if (!(ok==1))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {b0+b1==1, b0+b_tmp==1, ok==1}
+
+         while (1)
+
+//  T() {b0+b1==1, b0+b_tmp==1, ok==1}
+
+            ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int b_tmp, b0, b1, ok, x, y;
+
+//  P(b0,b1,b_tmp,ok,x,y) {}
+
+   b0 = b1 = x = y = 0;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==0, b1==0, x==0, y==0}
+
+   ok = 1;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==0, b1==0, ok==1, x==0, y==0}
+
+
+   while (1) {
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, ok==1, x==y, 0<=b0, b0<=1, b0<=x}
+
+      if (b0==b1&&!(b0==0&&b1==1||b0==1&&b1==0)) {
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, ok==1, x==y, 0<=b0, b0<=1, b0<=x}
+
+         b_tmp = b0;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, b0==b_tmp, ok==1, x==y, 0<=b0,
+//    b0<=1, b0<=x}
+
+         b0 = 1-b1;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y, 0<=b0,
+//    b0<=1, 1<=b0+x}
+
+         b1 = b_tmp;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y, 0<=b0,
+//    b0<=1, 1<=b0+x}
+
+         x++;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y+1,
+//    0<=b0, b0<=1, 2<=b0+x}
+
+         if (ok==1&&x>=y)
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y+1,
+//    0<=b0, b0<=1, 2<=b0+x}
+
+            ok = 1;
+         else
+
+//  P() {0==-1}
+
+            ok = 0;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y+1,
+//    0<=b0, b0<=1, 2<=b0+x}
+
+         if (!(ok==1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y+1,
+//    0<=b0, b0<=1, 2<=b0+x}
+
+      if (b0!=b1&&(b0==0&&b1==1||b0==1&&b1==0)) {
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0+b_tmp==1, ok==1, x==y+1,
+//    0<=b0, b0<=1, 2<=b0+x}
+
+         b_tmp = b0;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0==b_tmp, ok==1, x==y+1, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+         b0 = 1-b1;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0+b1==1, b0==b_tmp, ok==1, x==y+1, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+         b1 = b_tmp;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, b0==b_tmp, ok==1, x==y+1, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+         y++;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, b0==b_tmp, ok==1, x==y, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+         if (ok==1&&x>=y)
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, b0==b_tmp, ok==1, x==y, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+            ok = 1;
+         else
+
+//  P() {0==-1}
+
+            ok = 0;
+
+//  P(b0,b1,b_tmp,ok,x,y) {b0==b1, b0==b_tmp, ok==1, x==y, 0<=b0,
+//    b0<=1, 2<=b0+x}
+
+         if (!(ok==1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+   }
+}
