@@ -18,7 +18,7 @@
 
  See the GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
+ You should have rea copy of the GNU General Public License
  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 
  */
@@ -199,6 +199,10 @@ void set_string_property( const string name, string s ) {
   fprintf( stderr, "***** Property requested : %s ***** ", name );
   STUB_ERROR();
 }
+bool too_many_property_errors_pending_p() {
+  STUB_WARNING_MSG("unimplemented in gfc2pips !");
+}
+
 
 /*************************************************
  * PIPSMAKE
