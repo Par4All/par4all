@@ -48,6 +48,16 @@ void P4A_accel_malloc(void **ptr, size_t n)
    else
       *ptr = (void *) 0;
 }
+void P4A_copy_from_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, void *host_address, const void *accel_address)
+{
+   size_t i, j, k;
+   char *cdest = d3_offset*element_size+(char *) host_address;
+   const char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
+            cdest[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k] = csrc[(i*d2_block_size+j)*d3_block_size*element_size+k];
+}
 int psubi(int *lhs, int rhs)
 {
    return lhs = lhs-rhs;
@@ -181,6 +191,16 @@ float lshiftf(float lhs, float rhs)
 float psetf(float *lhs, float rhs)
 {
    return *lhs = rhs;
+}
+void P4A_copy_to_accel_3d(size_t element_size, size_t d1_size, size_t d2_size, size_t d3_size, size_t d1_block_size, size_t d2_block_size, size_t d3_block_size, size_t d1_offset, size_t d2_offset, size_t d3_offset, const void *host_address, void *accel_address)
+{
+   size_t i, j, k;
+   char *cdest = (char *) accel_address;
+   const char *csrc = d3_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size-1; j += 1)
+         for(k = 0; k <= d3_block_size*element_size-1; k += 1)
+            cdest[(i*d2_block_size+j)*d3_block_size*element_size+k] = csrc[((i+d1_offset)*d2_block_size+j+d2_offset)*element_size*d3_size+k];
 }
 int prshifti(int *lhs, int rhs)
 {
@@ -740,12 +760,12 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = 8;
+   int N0 = 8;
    im3 = FIFO3;
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1)
+   for(re2 = 0; re2 <= N0; re2 += 1)
       *(im1+re2+1-1) = (*(ma0+2)**(im2+re2+1-1)+*(ma0+3)**(im3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
 }
 void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
@@ -765,7 +785,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = 8;
+   int N0 = 8;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -796,7 +816,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0+2;
       I_1 = re2+1;
       I_2 = I_1-1;
@@ -836,7 +856,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    //PIPS generated variable
    short *im5, *im6, *im7;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = 8;
+   int N0 = 8;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -867,7 +887,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0;
       P_0 = P_0+2;
       I_1 = re2;
@@ -919,7 +939,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    //PIPS generated variable
    unsigned int re2;
    //PIPS generated variable
-   int launcher_0_microcode:N0 = 8;
+   int N0 = 8;
    //PIPS generated variable
    int *P_0;
    //PIPS generated variable
@@ -950,7 +970,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    seti(im2, FIFO2);
    seti(im1, FIFO1);
    seti(ma0, FIFO0);
-   for(re2 = 0; re2 <= launcher_0_microcode:N0; re2 += 1) {
+   for(re2 = 0; re2 <= N0; re2 += 1) {
       seti(P_0, ma0);
       seti(P_0, P_0+2);
       seti(I_1, re2);

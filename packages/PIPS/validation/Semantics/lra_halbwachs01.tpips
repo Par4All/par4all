@@ -1,0 +1,33 @@
+setenv WS lra_halbwachs01
+
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WS $WS.c
+
+# Tune the minimal PIPS intelligence to cope with this problem :-)
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+# Use the more precise fix point operator to cope with while loops:
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Transformers for $WS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions for $WS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete $WS
+quit

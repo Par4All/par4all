@@ -1,4 +1,4 @@
-user warning, property PRETTYPRINT_MEMORY_EFFECTS_ONLY redefined
+user warning in parse_properties: property PRETTYPRINT_MEMORY_EFFECTS_ONLY redefined
 Selecting rule: PRINT_CODE_PROPER_EFFECTS
   PROPER_EFFECTS                 building   PROPER_EFFECTS(CONDINC)
   CUMULATED_EFFECTS              building   CUMULATED_EFFECTS(CONDINC)

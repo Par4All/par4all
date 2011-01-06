@@ -1,0 +1,42 @@
+
+Source code with transformers
+
+
+//  T(shift03) {}
+
+int shift03(int i, int k)
+{
+
+//  T(j) {i==j}
+
+   int j = i;
+
+//  T(j) {i==j#init}
+
+   
+   // Check a subset of particular cases
+   if (j<0&&2<=k&&k<=4)
+
+//  T(j) {i==j#init, i+1<=0, j<=4i, 16i<=j, 2<=k, k<=4}
+
+      j = j<<k;
+   else if (j>=0&&2<=k&&k<=4)
+
+//  T(j) {i==j#init, 0<=i, j<=16i, 4i<=j, 2<=k, k<=4}
+
+      j = j<<k;
+   else
+
+//  T(j) {i==j#init}
+
+      j = j<<k;
+
+//  T() {}
+
+
+   printf("j=%d\n", j);
+
+//  T(shift03) {j==shift03}
+
+   return j;
+}

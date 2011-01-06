@@ -107,7 +107,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
-   ;
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -148,7 +147,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
-   ;
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -204,7 +202,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
       Pow[th].im = 0.;
    }
-   ;
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -260,7 +257,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
       Pow[th0].im = 0.;
    }
-   ;
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -322,7 +318,6 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
       Pow[th0].im = 0.;
       Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
    }
-   ;
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -335,6 +330,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
    //SAC generated temporary array
    a2sf pdata2 = {0, 0};
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0;
+   //PIPS generated variable
+   v2df vec80_0, vec90_0, vec100_0, vec110_0;
 
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP0 = 0.;
@@ -349,50 +348,39 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED0[5] = 0.000000;
          RED0[6] = 0.000000;
          RED0[7] = 0.000000;
-         {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec00, vec20, vec40, vec60;
-            SIMD_LOAD_GENERIC_V4SF(vec40, RED0[1], RED0[0], RED0[3], RED0[2]);
-            SIMD_LOAD_GENERIC_V4SF(vec60, RED0[5], RED0[4], RED0[7], RED0[6]);
-            for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
-               //PIPS:SAC generated v4sf vector(s)
-               v4sf vec10, vec30, vec50, vec70;
-               SIMD_LOAD_V4SF(vec10, &ptrin[th0][rg][v0].re);
-               SIMD_MULPS(vec00, vec10, vec10);
-               SIMD_LOAD_V4SF(vec30, &ptrin[th0][rg][2+v0].re);
-               SIMD_MULPS(vec20, vec30, vec30);
-               SIMD_ADDPS(vec40, vec00, vec40);
-               SIMD_ADDPS(vec60, vec20, vec60);
-            }
-            SIMD_STORE_V4SF(vec00, &pdata0[0]);
-            SIMD_STORE_V4SF(vec20, &pdata1[0]);
-            SIMD_STORE_GENERIC_V4SF(vec40, &RED0[1], &RED0[0], &RED0[3], &RED0[2]);
-            SIMD_STORE_GENERIC_V4SF(vec60, &RED0[5], &RED0[4], &RED0[7], &RED0[6]);
+         //PIPS:SAC generated v4sf vector(s)
+         SIMD_LOAD_GENERIC_V4SF(vec60_0, RED0[5], RED0[4], RED0[7], RED0[6]);
+         for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
+            SIMD_LOAD_GENERIC_V4SF(vec40_0, RED0[1], RED0[0], RED0[3], RED0[2]);
+            SIMD_LOAD_V4SF(vec30_0, &ptrin[th0][rg][2+v0].re);
+            SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
+            SIMD_MULPS(vec00_0, vec10_0, vec10_0);
+            SIMD_MULPS(vec20_0, vec30_0, vec30_0);
+            SIMD_ADDPS(vec40_0, vec00_0, vec40_0);
+            SIMD_ADDPS(vec60_0, vec20_0, vec60_0);
+            SIMD_STORE_GENERIC_V4SF(vec40_0, &RED0[1], &RED0[0], &RED0[3], &RED0[2]);
          }
+         SIMD_STORE_GENERIC_V4SF(vec60_0, &RED0[5], &RED0[4], &RED0[7], &RED0[6]);
          RED2[0] = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+RED2[0];
          RED1[0] = 0.000000;
          RED1[1] = 0.000000;
-         {
-            //PIPS:SAC generated v2df vector(s)
-            v2df vec80, vec100;
-            SIMD_LOAD_GENERIC_V2DF(vec100, RED1[1], RED1[0]);
-            for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
-               //PIPS:SAC generated v2df vector(s)
-               v2df vec90, vec110;
-               SIMD_LOAD_V2SF_TO_V2DF(vec90, &ptrin[th0][rg][v].re);
-               SIMD_MULPD(vec80, vec90, vec90);
-               SIMD_ADDPD(vec100, vec80, vec100);
-            }
-            SIMD_STORE_V2DF_TO_V2SF(vec80, &pdata2[0]);
-            SIMD_STORE_GENERIC_V2DF(vec100, &RED1[1], &RED1[0]);
+         //PIPS:SAC generated v2df vector(s)
+         SIMD_LOAD_GENERIC_V2DF(vec100_0, RED1[1], RED1[0]);
+         for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
+            SIMD_LOAD_V2SF_TO_V2DF(vec90_0, &ptrin[th0][rg][v].re);
+            SIMD_MULPD(vec80_0, vec90_0, vec90_0);
+            SIMD_ADDPD(vec100_0, vec80_0, vec100_0);
          }
+         SIMD_STORE_GENERIC_V2DF(vec100_0, &RED1[1], &RED1[0]);
          RED2[1] = RED1[1]+RED1[0]+RED2[1];
       }
       PP0 = RED2[1]+PP0+RED2[0];
       Pow[th0].im = 0.;
       Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
    }
-   ;
+   SIMD_STORE_V2DF_TO_V2SF(vec80_0, &pdata2[0]);
+   SIMD_STORE_V4SF(vec20_0, &pdata1[0]);
+   SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
@@ -401,6 +389,10 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
    float RED0[8], RED1[2], RED2[2], PP0;
    //PIPS generated variable
    int th0, v0;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec60_0;
+   //PIPS generated variable
+   v2df vec80_0, vec90_0, vec100_0;
 
    for(th0 = 0; th0 <= Nth-1; th0 += 1) {
       PP0 = 0.;
@@ -415,47 +407,36 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
          RED0[5] = 0.000000;
          RED0[6] = 0.000000;
          RED0[7] = 0.000000;
-         {
-            //PIPS:SAC generated v4sf vector(s)
-            v4sf vec00, vec20, vec40, vec60;
-            SIMD_LOAD_GENERIC_V4SF(vec40, RED0[1], RED0[0], RED0[3], RED0[2]);
-            SIMD_LOAD_GENERIC_V4SF(vec60, RED0[5], RED0[4], RED0[7], RED0[6]);
-            for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
-               //PIPS:SAC generated v4sf vector(s)
-               v4sf vec10, vec30, vec50, vec70;
-               SIMD_LOAD_V4SF(vec10, &ptrin[th0][rg][v0].re);
-               SIMD_MULPS(vec00, vec10, vec10);
-               SIMD_LOAD_V4SF(vec30, &ptrin[th0][rg][2+v0].re);
-               SIMD_MULPS(vec20, vec30, vec30);
-               SIMD_ADDPS(vec40, vec00, vec40);
-               SIMD_ADDPS(vec60, vec20, vec60);
-            }
-            SIMD_STORE_GENERIC_V4SF(vec40, &RED0[1], &RED0[0], &RED0[3], &RED0[2]);
-            SIMD_STORE_GENERIC_V4SF(vec60, &RED0[5], &RED0[4], &RED0[7], &RED0[6]);
+         //PIPS:SAC generated v4sf vector(s)
+         SIMD_LOAD_GENERIC_V4SF(vec60_0, RED0[5], RED0[4], RED0[7], RED0[6]);
+         for(v0 = 0; v0 <= 4*(Nv/4)-1; v0 += 4) {
+            SIMD_LOAD_GENERIC_V4SF(vec40_0, RED0[1], RED0[0], RED0[3], RED0[2]);
+            SIMD_LOAD_V4SF(vec30_0, &ptrin[th0][rg][2+v0].re);
+            SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
+            SIMD_MULPS(vec00_0, vec10_0, vec10_0);
+            SIMD_MULPS(vec20_0, vec30_0, vec30_0);
+            SIMD_ADDPS(vec40_0, vec00_0, vec40_0);
+            SIMD_ADDPS(vec60_0, vec20_0, vec60_0);
+            SIMD_STORE_GENERIC_V4SF(vec40_0, &RED0[1], &RED0[0], &RED0[3], &RED0[2]);
          }
+         SIMD_STORE_GENERIC_V4SF(vec60_0, &RED0[5], &RED0[4], &RED0[7], &RED0[6]);
          RED2[0] = RED0[7]+RED0[6]+RED0[5]+RED0[4]+RED0[3]+RED0[2]+RED0[1]+RED0[0]+RED2[0];
          RED1[0] = 0.000000;
          RED1[1] = 0.000000;
-         {
-            //PIPS:SAC generated v2df vector(s)
-            v2df vec80, vec100;
-            SIMD_LOAD_GENERIC_V2DF(vec100, RED1[1], RED1[0]);
-            for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
-               //PIPS:SAC generated v2df vector(s)
-               v2df vec90, vec110;
-               SIMD_LOAD_V2SF_TO_V2DF(vec90, &ptrin[th0][rg][v].re);
-               SIMD_MULPD(vec80, vec90, vec90);
-               SIMD_ADDPD(vec100, vec80, vec100);
-            }
-            SIMD_STORE_GENERIC_V2DF(vec100, &RED1[1], &RED1[0]);
+         //PIPS:SAC generated v2df vector(s)
+         SIMD_LOAD_GENERIC_V2DF(vec100_0, RED1[1], RED1[0]);
+         for(v = 4*(Nv/4); v <= Nv-1; v += 1) {
+            SIMD_LOAD_V2SF_TO_V2DF(vec90_0, &ptrin[th0][rg][v].re);
+            SIMD_MULPD(vec80_0, vec90_0, vec90_0);
+            SIMD_ADDPD(vec100_0, vec80_0, vec100_0);
          }
+         SIMD_STORE_GENERIC_V2DF(vec100_0, &RED1[1], &RED1[0]);
          RED2[1] = RED1[1]+RED1[0]+RED2[1];
       }
       PP0 = RED2[1]+PP0+RED2[0];
       Pow[th0].im = 0.;
       Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
    }
-   ;
 }
 seq-ok
 sse-ok

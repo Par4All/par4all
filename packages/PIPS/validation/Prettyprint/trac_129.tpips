@@ -47,6 +47,10 @@ echo
 
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
+apply INTERNALIZE_PARALLEL_CODE
+
+apply UNSPLIT
+shell gcc -fopenmp -c trac_129.database/Src/trac_129.c
 
 close
 #delete trac_129

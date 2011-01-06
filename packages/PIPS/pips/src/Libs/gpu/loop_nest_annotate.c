@@ -37,8 +37,8 @@ void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
   int i;
   int j;
 kernel2:
-  for(i = 0; i <= 498; i += 1)
-    for(j = 0; j <= 498; j += 1)
+  for(i = 0; i <= 100; i += 1)
+    for(j = 0; j <= 200; j += 1)
       p4a_kernel_wrapper_1(save, space, i+1, j+1);
 }
 
@@ -51,11 +51,11 @@ void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
    int i;
    int j;
 kernel2:
-   // Loop nest P4A begin, 2D(498,498)
-   for(i = 0; i <= 498; i += 1)
-      for(j = 0; j <= 498; j += 1)
+   // Loop nest P4A begin, 2D(200, 100)
+   for(i = 0; i <= 100; i += 1)
+      for(j = 0; j <= 200; j += 1)
    // Loop nest P4A end
-   if (i <= 498 && j <= 498)
+   if (i <= 100 && j <= 200)
          p4a_kernel_wrapper_1(save, space, i+1, j+1);
 }
 
@@ -102,9 +102,9 @@ for further generation of CUDA code.
 #define CLOSEPAREN    ")"
 
 
-/* In modern PIPS programming, all this should be passed through a context
-   instead of having this global variable. This should allow some PIPS
-   parallelization some days... */
+/* In modern PIPS programming, all is passed through a context instead of
+   having a global variable. This should allow some PIPS parallelization
+   some days... :-) */
 
 typedef struct {
   list l_enclosing_loops;
@@ -113,7 +113,7 @@ typedef struct {
 /* True only when we reached the inner annotated loop: */
   bool inner_reached;
 } gpu_lna_context;
-  
+
 
 /* Push a loop that match the criterion for annotation */
 static bool loop_push(loop l, gpu_lna_context * p)
@@ -135,6 +135,11 @@ static bool loop_push(loop l, gpu_lna_context * p)
 /* Do the real annotation work on previously marked loops bottom-up */
 static void loop_annotate(loop l, gpu_lna_context * p)
 {
+  /* We have to select the operators that are different in C and FORTRAN */
+  string and_op = (get_prettyprint_language_tag() == is_language_c) ?
+    C_AND_OPERATOR_NAME : AND_OPERATOR_NAME;
+  string less_op =  (get_prettyprint_language_tag() == is_language_c) ?
+    C_LESS_OR_EQUAL_OPERATOR_NAME : LESS_OR_EQUAL_OPERATOR_NAME;
   /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
@@ -159,7 +164,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  expression c_guard;
 
 	  c_guard =
-	    MakeBinaryCall(entity_intrinsic(C_LESS_OR_EQUAL_OPERATOR_NAME),
+	    MakeBinaryCall(entity_intrinsic(less_op),
 			   reference_to_expression(make_reference(c_index,
 								  NIL)),
 			   copy_expression(c_upper));
@@ -167,7 +172,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  if (expression_undefined_p(guard_exp))
 	    guard_exp = c_guard;
 	  else
-	    guard_exp = MakeBinaryCall(entity_intrinsic(C_AND_OPERATOR_NAME),
+	    guard_exp = MakeBinaryCall(entity_intrinsic(and_op),
 				       guard_exp,
 				       c_guard);
 	  /* Keep the number of iterations for the generation of the
@@ -178,9 +183,9 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
 					   c_number_iter_exp,
 					   make_integer_constant_expression(1));
-	  p->l_number_iter_exp =
-	    gen_nconc(p->l_number_iter_exp,
-		      CONS(EXPRESSION, c_number_iter_exp, NIL));
+	  /* We will have deepest loop size first: */
+	  p->l_number_iter_exp = CONS(EXPRESSION, c_number_iter_exp,
+				      p->l_number_iter_exp);
 	}
 
       /* FI: how about an expression_to_string() */
@@ -191,10 +196,10 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 					    loop_body(l),
 					    make_empty_block_statement()));
       /* Then we add the comment : // Loop nest P4A end */
-      statement_comments(guard_s) = strdup("// Loop nest P4A end\n");
-
+      statement_comments(guard_s) = strdup(concatenate (get_comment_sentinel (),
+							" Loop nest P4A end\n",
+							NULL));
       loop_body(l) = guard_s;
-
     }
 
 
@@ -205,32 +210,35 @@ static void loop_annotate(loop l, gpu_lna_context * p)
   if (gen_length(p->l_enclosing_loops) == 1)
     {
       statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
-#define LOOP_NEST_P4A_BEGIN "// Loop nest P4A begin,"
+      // Then we add the comment such as: '// Loop nest P4A begin,3D(200, 100)'
       string outer_s;
-      (void) asprintf(&outer_s, LOOP_NEST_P4A_BEGIN "%dD" OPENPAREN , p->loop_nest_depth);
+      (void) asprintf(&outer_s, "%s Loop nest P4A begin,%dD" OPENPAREN,
+		      get_comment_sentinel(), p->loop_nest_depth);
 
+      bool first_iteration = true;
+      /* Output inner dimension first: */
       FOREACH(EXPRESSION, upper_exp, p->l_number_iter_exp) {
         string buf;
 	string buf1 = words_to_string(words_expression(upper_exp, NIL));
-        (void) asprintf(&buf,"%s%s",outer_s,buf1);
+	if (first_iteration)
+	  /* Concatenate the dimension of the innermost loop: */
+	  (void) asprintf(&buf, "%s%s", outer_s, buf1);
+	else
+	  /* Idem for other dimensions, but do not forget to insert the ', ' */
+	  (void) asprintf(&buf, "%s%s%s", outer_s, COMMA" ", buf1);
         free(outer_s);
 	free(buf1);
-        outer_s=buf;
-	p->loop_nest_depth --;
-	if (p->loop_nest_depth > 0) {
-          (void) asprintf(&buf,"%s"COMMA,outer_s);
-          free(outer_s);
-          outer_s=buf;
-	}
+        outer_s = buf;
+	first_iteration = false;
       }
 
       (void) asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
       free(outer_s);
       /* reset context*/
       p->inner_reached = FALSE;
-      p->loop_nest_depth = 0; 
-      gen_free_list(p->l_number_iter_exp); 
-      p->l_number_iter_exp = NIL;     
+      p->loop_nest_depth = 0;
+      gen_free_list(p->l_number_iter_exp);
+      p->l_number_iter_exp = NIL;
     }
 
   POP(p->l_enclosing_loops);
@@ -241,17 +249,17 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 /**
  * annotates loop nests in the following way :
  *
- * for(i=0; i<=498; i++)
- *    for(j=0; j<=498; j++)
+ * for(i=0; i<=100; i++)
+ *    for(j=0; j<=200; j++)
  *       foo();
  *
  * ==>
  *
- * // Loop nest P4A begin,2D(498,498)
- * for(i=0; i<=498; i++)
- *    for(j=0; j<=498; j++)
+ * // Loop nest P4A begin,2D(200, 100)
+ * for(i=0; i<=100; i++)
+ *    for(j=0; j<=200; j++)
  *       // Loop nest P4A end
- *       if (i<=498&&j<=498)
+ *       if (i<=100&&j<=200)
  *       foo();
  *
  * for loops must have been transformed into loops.

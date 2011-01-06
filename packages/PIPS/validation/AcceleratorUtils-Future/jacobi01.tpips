@@ -1,0 +1,41 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WKS jacobi01
+delete $WKS
+create $WKS $WKS.c include/par4all.c
+
+display PRINTED_FILE[%ALLFUNC]
+
+
+setproperty LOOP_LABEL "kernel1"
+setproperty KERNELIZE_NBNODES 10
+setproperty KERNELIZE_KERNEL_NAME "kernel1"
+setproperty KERNELIZE_HOST_CALL_NAME "launch_kernel1"
+setproperty ISOLATE_STATEMENT_EVEN_NON_LOCAL TRUE
+
+apply KERNELIZE[compute]
+
+display PRINTED_FILE[%ALLFUNC]
+apply KERNEL_LOAD_STORE[compute]
+display PRINTED_FILE[compute]
+
+echo
+echo Code after cleanup
+echo
+
+apply SUPPRESS_DEAD_CODE
+display PRINTED_FILE
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+
+shell sed -i -e '1 i #define MIN(a,b) (a < b ? a : b )' $WKS.database/Src/$WKS.c
+shell cc $WKS.database/Src/$WKS.c  -o $WKS.database/Src/{$WKS,par4all.c}
+shell cd $WKS.database/Src > /dev/null ; ./$WKS  ../../input.pgm; diff output.pgm ../../output-ref.pgm
+
+close
+#delete $WKS
+quit
+

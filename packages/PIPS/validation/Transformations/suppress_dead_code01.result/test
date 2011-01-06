@@ -101,4 +101,5 @@ void suppress_dead_code01(int *x)
    /* Not dead code because of memory read-write effects, even if
         masked because the implementation is thread-safe, but dead
         because the previous loop never terminates. */
+   ;
 }

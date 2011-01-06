@@ -28,6 +28,9 @@ struct entity_pair
 static void
 replace_entity_declaration_walker(statement s, struct entity_pair* thecouple)
 {
+  // FI: this does not seem to replace the declaration itself
+  // I need a side-effect on the statement_declarations list when
+  // decl_ent == thecouple->old
     FOREACH(ENTITY,decl_ent,statement_declarations(s))
     {
         replace_entity(decl_ent,thecouple->old,thecouple->new);

@@ -382,6 +382,11 @@
 #define ETIME_FUNCTION_NAME             "ETIME"
 #define DTIME_FUNCTION_NAME             "DTIME"
 
+/* F2003 */
+#define C_LOC_FUNCTION_NAME             "C_LOC"
+
+/* F2008 */
+
 /* BSD <err.h> */
 #define ERR_FUNCTION_NAME		"err"
 #define ERRX_FUNCTION_NAME		"errx"
@@ -1199,6 +1204,8 @@
 #define ENTITY_NON_EQUAL_P(e) (entity_an_operator_p(e, NON_EQUAL) || entity_an_operator_p(e, C_NON_EQUAL))
 #define ENTITY_EQUIV_P(e) entity_an_operator_p(e, EQUIV)
 #define ENTITY_NON_EQUIV_P(e) entity_an_operator_p(e, NON_EQUIV)
+#define ENTITY_LEFT_SHIFT_P(e) entity_an_operator_p(e, LEFT_SHIFT)
+#define ENTITY_RIGHT_SHIFT_P(e) entity_an_operator_p(e, RIGHT_SHIFT)
 
 /* Attention :
    This definition is different with the Fortran Standard where the logical

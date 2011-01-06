@@ -336,7 +336,6 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
       }
-   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -370,7 +369,6 @@ l99992:
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
       }
-   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -400,7 +398,6 @@ l99988:
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
       }
-   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -423,6 +420,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       }
    
    
+   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -445,6 +443,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       }
    
    
+   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -465,6 +464,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       }
    
    
+   ;
 }
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
@@ -485,6 +485,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       }
    
    
+   ;
 }
 
 Unsplit resulting code

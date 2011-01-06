@@ -1,0 +1,33 @@
+! Debug the destructuration of a Fortran DO loop by the new controlizer
+
+      PROGRAM LOOOP01
+
+      DO I = 1, N                                                       0005
+         IF (MOD(I, 2).EQ.0) THEN                                       0006
+            GOTO 100                                                    0006
+         ENDIF
+      ENDDO
+
+      I = I+10                                                          0009
+
+100   CONTINUE                                                          0011
+
+      END
+! Debug the destructuration of a Fortran DO loop by the new controlizer
+
+      PROGRAM LOOOP01
+C     BEGIN BLOCK
+      I = 1
+99998 CONTINUE
+      IF (I.GT.N) GOTO 99999
+      IF (MOD(I, 2).EQ.0) GOTO 100                                      0006
+      I = I+1
+      GOTO 99998
+99999 CONTINUE
+
+      I = I+10                                                          0009
+
+100   CONTINUE                                                          0011
+
+C     END BLOCK
+      END

@@ -879,6 +879,7 @@ fortran_summary_to_proper_effects(entity func,
     int ipc;
     list l_formals = module_formal_parameters(func);
     int n_formals = (int) gen_length(l_formals);
+    gen_free_list(l_formals);
 
     pips_debug(3, "effects on formals on call to %s\n", entity_name(func));
 

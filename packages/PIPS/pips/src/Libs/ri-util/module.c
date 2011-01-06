@@ -106,6 +106,7 @@ bool compilation_unit_p(const char* module_name) {
 /* Check if the given module entity is a compilation unit.
  */
 bool compilation_unit_entity_p(entity e) {
+  if (e == entity_undefined) return false;
   return compilation_unit_p(entity_name(e));
 }
 
@@ -338,7 +339,7 @@ get_declaration_comments(entity module)
 
 /* list module_formal_parameters(entity func)
  * input    : an entity representing a function.
- * output   : the unsorted list (of entities) of parameters of the function "func".
+ * output   : the ordered list (of entities) of parameters of the function "func".
  * modifies : nothing.
  * comment  : Made from "entity_to_formal_integer_parameters()" that considers 
  *            only integer variables.
@@ -363,7 +364,7 @@ module_formal_parameters(entity func)
      },
 	 decl);
     
-    return (formals);
+    return gen_nreverse(formals);
 }
 
 /* Number of user declaration lines for a module */
@@ -533,6 +534,24 @@ entity function_to_return_value(entity m)
 			" \"%s\".\n", entity_user_name(m));
 
   return rv;
+}
+
+/* Check if m is a C void function or a Fortran subroutine. No
+   information about m is available when FALSE is returned. */
+bool void_function_p(entity m)
+{
+  type ft = ultimate_type(entity_type(m));
+  bool void_p = FALSE;
+
+  if(type_functional_p(ft)) {
+    functional f = type_functional(ft);
+    type r = functional_result(f);
+    if(type_void_p(r)) {
+      void_p = TRUE;
+    }
+  }
+
+  return void_p;
 }
 /*
  *  that is all

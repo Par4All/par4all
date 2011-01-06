@@ -1,4 +1,4 @@
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Registering file retype.f
 Splitting file    ./retype.f
   Module         RETYPE3

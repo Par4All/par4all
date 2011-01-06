@@ -393,6 +393,37 @@ transformer transformer_combine(transformer t1, transformer t2)
   return t1;
 }
 
+/* Combine each transformer of transformer list tl1 with
+   t2. Side-effect on tl1. See comments for transformer_combine() */
+list transformers_combine(list tl1, transformer t2)
+{
+  FOREACH(TRANSFORMER, t1, tl1) {
+    t1 = transformer_combine(t1, t2);
+  }
+  return tl1;
+}
+
+/* Combine each transformer of transformer list tl1 with the
+ * corresponding transformer in transformer list tl2.
+ *
+ * Side-effect on tl1. See comments for transformer_combine().
+ *
+ * See combine_transformer_lists() to combine each element of t1 with
+ * each element of t2.
+ */
+list one_to_one_transformers_combine(list tl1, list tl2)
+{
+  list ntl2 = tl2;
+  pips_assert("The two lists have the same number of elements",
+	      gen_length(tl1)==gen_length(tl2));
+  FOREACH(TRANSFORMER, t1, tl1) {
+    transformer t2 = TRANSFORMER(CAR(ntl2));
+    t1 = transformer_combine(t1, t2);
+    POP(ntl2);
+  }
+  return tl1;
+}
+
 /* Transformer tf1 and tf2 are supposed to be independent but they may
    interfere, for instance because subexpressions have non-standard
    conformant side effects. tf12 is a newly allocated transformer with no
@@ -1376,19 +1407,46 @@ transformer transformer_apply(transformer tf, transformer pre)
     return post;
 }
 
-list transformer_apply_map(list tl, transformer pre)
+/* Generates a new list of postconditions, one for each transformer
+ * in tl, unless the postcondition is empty and keep_p is FALSE.
+ *
+ * keep_p is used to preserve the list lengths: the output list is
+ * exactly as long as the input list.
+ *
+ * If keep_p is TRUE, the output list is not "normalized"
+ */
+list transformer_apply_generic(list tl, transformer pre, bool keep_p)
 {
   list ntl = NIL;
   FOREACH(TRANSFORMER, tf, tl) {
     transformer post = transformer_apply(tf, pre);
 
-    // Be careful with empty transformers than may creep out
+    // Be careful with empty transformers that may creep out
 
-    if(!transformer_empty_p(post))
+    if(!transformer_empty_p(post) || keep_p)
       ntl = CONS(TRANSFORMER, post, ntl);
   }
-  gen_nreverse(ntl);
+  ntl = gen_nreverse(ntl);
   return ntl;
+}
+
+/* Generates a new list of postconditions, one for each transformer
+   in tl, unless the postcondition is empty. */
+list transformer_apply_map(list tl, transformer pre)
+{
+  return transformer_apply_generic(tl, pre, FALSE);
+}
+
+/* Same as previous one, but with a more normalized name */
+list transformers_apply(list tl, transformer pre)
+{
+  return transformer_apply_generic(tl, pre, FALSE);
+}
+
+/* Same as previous one, but with a more normalized name */
+list transformers_apply_and_keep_all(list tl, transformer pre)
+{
+  return transformer_apply_generic(tl, pre, TRUE);
 }
 
 transformer transformer_safe_apply(transformer tf, transformer pre)
@@ -2048,6 +2106,9 @@ static bool parametric_transformer_empty_p(transformer t,
 /* If TRUE is returned, the transformer certainly is empty.
  * If FALSE is returned,
  * the transformer still might be empty, but it's not too likely...
+ *
+ * Well, k <= 2 and k >= 3 does not return empty in spite of
+ * sc_strong_normalize()...
  */
 bool transformer_empty_p(transformer t)
 {

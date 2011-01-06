@@ -143,7 +143,7 @@ typedef struct Ssysteme {
  * minimise en entier mais le polyedre rationnel correspondant peut augmenter.
  * Si une enveloppe convexe est calculee ulterieurement, le resultat peut donc
  * etre degrade par une elimination de redondance anterieure.
- * 
+ *
  */
 
 #define get_sc_debug_level() sc_debug_level

@@ -44,7 +44,6 @@ void pack_transposition(double a[5][5])
       a[i][2] = a[i][1]+a[i][3];
       j = 2;
    }
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -58,7 +57,6 @@ void pack_transposition(double a[5][5])
       j = 2;
    }
    i = 4;
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -72,7 +70,6 @@ void pack_transposition(double a[5][5])
       j = 2;
    }
    i = 4;
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -87,7 +84,6 @@ void pack_transposition(double a[5][5])
       j1 = 2;
    }
    i1 = 4;
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -107,7 +103,6 @@ void pack_transposition(double a[5][5])
       SIMD_STORE_GENERIC_V2DF(vec30, &a[i0][2], &a[1+i0][2]);
    }
    i1 = 4;
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -116,18 +111,17 @@ void pack_transposition(double a[5][5])
    for(i0 = 0; i0 <= 3; i0 += 2) {
       //PIPS:SAC generated v2df vector(s)
       v2df vec00, vec10, vec20, vec30, vec40, vec50;
-      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
+      SIMD_LOAD_GENERIC_V2DF(vec50, a[i0][3], a[1+i0][3]);
       SIMD_LOAD_GENERIC_V2DF(vec10, a[i0][0], a[1+i0][0]);
+      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
       SIMD_ADDPD(vec00, vec10, vec20);
-      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
       j0 = 2;
       j1 = 2;
-      SIMD_LOAD_GENERIC_V2DF(vec50, a[i0][3], a[1+i0][3]);
       SIMD_ADDPD(vec30, vec00, vec50);
       SIMD_STORE_GENERIC_V2DF(vec30, &a[i0][2], &a[1+i0][2]);
+      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
    }
    i1 = 4;
-   ;
 }
 void pack_transposition(double a[5][5])
 {
@@ -136,18 +130,17 @@ void pack_transposition(double a[5][5])
    for(i0 = 0; i0 <= 3; i0 += 2) {
       //PIPS:SAC generated v2df vector(s)
       v2df vec00, vec10, vec20, vec30, vec50;
-      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
-      SIMD_LOAD_GENERIC_V2DF(vec10, a[i0][0], a[1+i0][0]);
-      SIMD_ADDPD(vec00, vec10, vec20);
-      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
-
-
       SIMD_LOAD_GENERIC_V2DF(vec50, a[i0][3], a[1+i0][3]);
+      SIMD_LOAD_GENERIC_V2DF(vec10, a[i0][0], a[1+i0][0]);
+      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
+      SIMD_ADDPD(vec00, vec10, vec20);
+
+
       SIMD_ADDPD(vec30, vec00, vec50);
       SIMD_STORE_GENERIC_V2DF(vec30, &a[i0][2], &a[1+i0][2]);
+      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
    }
 
-   ;
 }
 
 simdized code
@@ -159,18 +152,17 @@ void pack_transposition(double a[5][5])
    for(i0 = 0; i0 <= 3; i0 += 2) {
       //PIPS:SAC generated v2df vector(s)
       v2df vec00, vec10, vec20, vec30, vec50;
-      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
-      SIMD_LOAD_GENERIC_V2DF(vec10, a[i0][0], a[1+i0][0]);
-      SIMD_ADDPD(vec00, vec10, vec20);
-      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
-
-
       SIMD_LOAD_GENERIC_V2DF(vec50, a[i0][3], a[1+i0][3]);
+      SIMD_LOAD_GENERIC_V2DF(vec10, a[i0][0], a[1+i0][0]);
+      SIMD_LOAD_GENERIC_V2DF(vec20, a[i0][2], a[1+i0][2]);
+      SIMD_ADDPD(vec00, vec10, vec20);
+
+
       SIMD_ADDPD(vec30, vec00, vec50);
       SIMD_STORE_GENERIC_V2DF(vec30, &a[i0][2], &a[1+i0][2]);
+      SIMD_STORE_GENERIC_V2DF(vec00, &a[i0][1], &a[1+i0][1]);
    }
 
-   ;
 }
 seq-ok
 sse-ok

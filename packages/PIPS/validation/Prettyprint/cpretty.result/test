@@ -58,9 +58,10 @@
       END
 /* C pretty print for module FUN1. */
 int
-fun1 (int i)
+fun1 (int *i_p4a_copy)
 {
   int result;
+  int i = *i_p4a_copy;
 
   result = 3;
   return result;
@@ -80,7 +81,7 @@ main (int argc, char *argv[])
     {
       i = 3;
     }
-  sub (i, 10);
+  sub (&i, 10);
   sub2 (10, 20);
   sub3 ();
   i = fun1 (2);
@@ -88,11 +89,13 @@ main (int argc, char *argv[])
 }
 /* C pretty print for module SUB. */
 void
-sub (int j, int k)
+sub (int *j_p4a_copy, int *k_p4a_copy)
 {
   int i;
   static const int n = 10;
   double a[11];
+  int j = *j_p4a_copy;
+  int k = *k_p4a_copy;
 
   for (i = 0; i <= k; i++)
     {
@@ -103,11 +106,13 @@ sub (int j, int k)
 }
 /* C pretty print for module SUB2. */
 void
-sub2 (int n, int m)
+sub2 (int *n_p4a_copy, int *m_p4a_copy)
 {
   float b[21][11];
   int i;
   int j;
+  int n = *n_p4a_copy;
+  int m = *m_p4a_copy;
 
   for (i = 0; i <= m; i++)
     {

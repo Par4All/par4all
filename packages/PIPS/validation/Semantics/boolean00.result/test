@@ -1,0 +1,49 @@
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   bool b1, b2, b3, b4, b5, b6, b7;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {}
+
+   b1 = true;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1}
+
+   b2 = false;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0}
+
+   // b3 in 0..1 because of type? %2?
+   b3 = alea();
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0, 0<=b3, b3<=1}
+
+   // b4 in 0..1 because logical
+   b4 = b1&&b3;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0, 0<=b3, b3<=1}
+
+   // b5 in 0..1 because logical
+   b5 = b1||b3;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0, 0<=b3, b3<=1}
+
+   // b6 in 0..1 because logical
+   b6 = !b3;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0, 0<=b3, b3<=1}
+
+   // b7 ???
+   b7 = b1^b2;
+
+//  P(b1,b2,b3,b4,b5,b6,b7) {b1==1, b2==0, 0<=b3, b3<=1}
+
+   
+   
+   fprintf(stdout, "b1=%d b2=%d b3=%d b4=%d b5=%d b6=%d b7=%d\n", b1, b2, b3, b4, b5, b6, b7);
+}

@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 from pyps import module, workspace
 import terapyps_asm
 import pypsutils
@@ -52,11 +53,8 @@ class workspace:
 def smart_loop_expansion(m,l,sz,debug,center=False):
 	""" smart loop expansion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
 	l.loop_expansion_init(loop_expansion_size=sz)
-	if debug:m.display()
 	m.statement_insertion()
-	if debug:m.display()
 	l.loop_expansion(size=sz,center=center)
-	if debug:m.display()
 	m.partial_eval()
 	m.invariant_code_motion()
 	m.redundant_load_store_elimination()
@@ -98,7 +96,6 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	m.partial_eval()
 	 
 	#print "I have to do this early"
-	if debug:m.display()
 	m.recover_for_loop()
 	m.for_loop_to_do_loop()
 	if debug:m.display()
@@ -120,36 +117,27 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 				l.symbolic_tiling(force=True,vector=vconv(tiling_vector))
 				if debug:m.display()
 				#m.icm()
-				if debug:m.display()
 
 	print "group constants and isolate"
 	kernels=[]
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
-				if debug:m.display(activate="PRINT_CODE_REGIONS")
 				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[0],limit=nbPE,type="NB_PROC")
-				if debug:m.display()
 				m.partial_eval()
 				if debug:m.display()
 				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=memoryPE*nbPE,type="VOLUME")
 				if debug:m.display()
-				m.run(["psolve"])
-				if debug:m.display(activate="PRINT_CODE_REGIONS")
 				m.partial_eval()
-				if debug:m.display()
 				m.forward_substitute()
-				if debug:m.display()
 				m.redundant_load_store_elimination()
 				m.clean_declarations()
-	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
-				if debug:m.display(activate="PRINT_CODE_REGIONS")
-				m.smart_loop_expansion(l2,str(nbPE),debug,center=False)
-				if debug:m.display(activate="PRINT_CODE_REGIONS")
+				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+				if debug:m.display()
+				#m.smart_loop_expansion(l2,str(nbPE),debug,center=False)
 				m.array_expansion()
 				if debug:m.display()
 				for k in all_callers(m):
-					if debug:k.display(activate="PRINT_CODE_REGIONS")
 					k.array_expansion()
 					if debug:k.display()
 				w.check(debug)
@@ -157,16 +145,13 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
-				if debug:m.display(activate="PRINT_CODE_REGIONS")
 				kernels+=[l2]
 				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 				if debug:m.display()
 				m.isolate_statement(label=l2.label)
-	if debug:m.display()
+				if debug:m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
-	if debug:m.display()
 	m.partial_eval()
-	if debug:m.display()
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
 	#m.display(activate="PRINT_CODE_PROPER_EFFECTS")
@@ -192,16 +177,12 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	print "outlining to microcode"
 	microcodes=[]
 	for l in launchers:
-		if debug:l.display()
 		theloop=l.loops()[0]
 		#l.loop_normalize(one_increment=True,lower_bound=0)
 		#l.redundant_load_store_elimination()
-		if debug:l.display()
 		name=l.name+"_microcode"
 		loop_to_outline=theloop.loops()[0]
-		print "label:" , loop_to_outline.label
 		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
-		if debug:m.display()
 		mc=w[name]
 		if debug:l.display()
 		if debug:mc.display()
@@ -211,23 +192,23 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	for m in microcodes:
 		m.loop_normalize(one_increment=True,lower_bound=0)
 		m.redundant_load_store_elimination()
-		if debug:m.display()
 		m.flatten_code(flatten_code_unroll=False)
-		if debug:m.display()
 		m.linearize_array(use_pointers=True)
 		if debug:m.display()
+		#m.common_subexpression_elimination()
+		#if debug:m.display()
 		m.strength_reduction()
 		m.forward_substitute()
 		m.redundant_load_store_elimination()
-		if debug:m.display()
 		m.split_update_operator()
+		#m.expression_substitution("refi")
+		#if debug:m.display()
 		m.simd_atomizer(atomize_reference=True,atomize_lhs=True)
-		m.generate_two_addresses_code()
+		#m.generate_two_addresses_code()
 		w.check(debug)
 		if debug:m.display()
 		m.flatten_code(flatten_code_unroll=False)
 		m.clean_declarations()
-		if debug:m.display()
 		w.check(debug)
 		m.normalize_microcode()
 		m.clean_declarations()
@@ -358,9 +339,14 @@ runtime[assembly]="""
 #define TYPE int
 #define SUFF i
 
-TYPE OP(add,SUFF)(TYPE lhs, TYPE rhs)
+TYPE OP(ref,SUFF)(TYPE *ptr, int index)
 {
-    return lhs=lhs+rhs;
+	return *(ptr+index);
+}
+
+TYPE OP(add,SUFF)(TYPE lhs, TYPE rhs0, TYPE rhs1)
+{
+    return lhs=rhs0+rhs1;
 }
 TYPE OP(addr,SUFF)(TYPE lhs, TYPE *rhs)
 {
@@ -414,9 +400,9 @@ TYPE OP(psetp,SUFF)(TYPE *lhs, TYPE *rhs)
 {
     return *lhs=*rhs;
 }
-TYPE* OP(padd,SUFF)(TYPE *lhs, int rhs)
+TYPE* OP(padd,SUFF)(TYPE *lhs, TYPE *rhs, int val)
 {
-    return lhs=lhs+rhs;
+    return lhs=rhs+val;
 }
 TYPE* OP(psub,SUFF)(TYPE *lhs, int rhs)
 {

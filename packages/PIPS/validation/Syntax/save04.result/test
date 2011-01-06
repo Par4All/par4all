@@ -7,7 +7,7 @@ Module SAVE04 selected
 Main module PROGRAM "SAVE04" selected.
 Module SAVE04 already active.
 setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
-user warning, property PARSER_DUMP_SYMBOL_TABLE redefined
+user warning in parse_properties: property PARSER_DUMP_SYMBOL_TABLE redefined
 Module SAVE04 already active.
 Request: build resource PRINTED_FILE for module SAVE04.
   BOOTSTRAP                      building   ENTITIES()

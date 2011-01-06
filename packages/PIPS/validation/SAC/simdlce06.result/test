@@ -13,7 +13,7 @@ void caram()
    while (1) {
       j[0] = 1;
       my_memcpy(&k[0], &j[0], 4*sizeof(int));
-      memstore(&j[0], &k[0], 4*sizeof(int));
    }
+   memstore(&j[0], &k[0], 4*sizeof(int));
 }
 

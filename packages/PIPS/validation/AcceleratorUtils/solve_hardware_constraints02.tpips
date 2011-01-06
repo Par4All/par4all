@@ -1,0 +1,17 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS 'solve_hardware_constraints02'
+delete $WS
+create $WS $WS.c
+
+display PRINTED_FILE
+
+setproperty SOLVE_HARDWARE_CONSTRAINTS_UNKNOWN "N"
+setproperty SOLVE_HARDWARE_CONSTRAINTS_LABEL "here"
+setproperty SOLVE_HARDWARE_CONSTRAINTS_LIMIT 10
+setproperty SOLVE_HARDWARE_CONSTRAINTS_TYPE "VOLUME"
+apply SOLVE_HARDWARE_CONSTRAINTS
+display PRINTED_FILE
+
+close
+delete $WS
+

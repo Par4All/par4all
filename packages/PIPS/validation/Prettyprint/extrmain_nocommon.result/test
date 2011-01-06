@@ -1,8 +1,14 @@
 /* C pretty print for module D. */
 float
-d (int j, int k, int jp, int kp, float t[60][21][52], int l)
+d (int *j_p4a_copy, int *k_p4a_copy, int *jp_p4a_copy, int *kp_p4a_copy,
+   float t[60][21][52], int *l_p4a_copy)
 {
   float result;
+  int j = *j_p4a_copy;
+  int k = *k_p4a_copy;
+  int jp = *jp_p4a_copy;
+  int kp = *kp_p4a_copy;
+  int l = *l_p4a_copy;
 
   result =
     sqrt ((pow (t[l - 1][k - 1][j - 1] - t[l - 1][kp - 1][jp - 1], 2) +
@@ -16,7 +22,8 @@ d (int j, int k, int jp, int kp, float t[60][21][52], int l)
 }
 /* C pretty print for module EXTR. */
 void
-extr (int ni, int nc, float t[60][21][52], int j1, int ja, int k1)
+extr (int *ni_p4a_copy, int *nc_p4a_copy, float t[60][21][52],
+      int *j1_p4a_copy, int *ja_p4a_copy, int *k1_p4a_copy)
 {
   int l;
   int k;
@@ -26,14 +33,19 @@ extr (int ni, int nc, float t[60][21][52], int j1, int ja, int k1)
   float s3;
   int jh;
   int j2;
+  int ni = *ni_p4a_copy;
+  int nc = *nc_p4a_copy;
+  int j1 = *j1_p4a_copy;
+  int ja = *ja_p4a_copy;
+  int k1 = *k1_p4a_copy;
 
   l = ni;
   k = k1;
   for (j = j1; j <= ja; j++)
     {
-      s1 = d (j, k, j, k + 1);
-      s2 = (d (j, k + 1, j, k + 2) + s1);
-      s3 = (d (j, k + 2, j, k + 3) + s2);
+      s1 = d (&j, &k, &j, k + 1, t, 0);
+      s2 = (d (&j, k + 1, &j, k + 2, t, 0) + s1);
+      s3 = (d (&j, k + 2, &j, k + 3, t, 0) + s2);
       t[(nc + 3) - 1][0][j - 1] = ((s2 * s3) / ((s1 - s2) * (s1 - s3)));
       t[(nc + 4) - 1][0][j - 1] = ((s3 * s1) / ((s2 - s3) * (s2 - s1)));
       t[(nc + 5) - 1][0][j - 1] = ((s1 * s2) / ((s3 - s1) * (s3 - s2)));

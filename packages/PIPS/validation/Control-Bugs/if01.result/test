@@ -1,11 +1,6 @@
 
 Parser output
 
-{{
-   /* Simple case for tests in the controlizer: */
-   extern void test();
-}}
-
 void test()
 {
 {{
@@ -33,18 +28,3 @@ void test()
       x = 3;
 }}
 }
-void test()
-{
-{{
-// (0,2)
-   int x = 6;
-// (0,3)
-   if (x>4)
-// (0,4)
-      x = 2;
-   else
-// (0,5)
-      x = 3;
-}}
-}
-

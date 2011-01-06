@@ -1,0 +1,52 @@
+
+Initial code
+
+      PROGRAM HYBRIDCOMP10
+      INTEGER*8 I
+      INTEGER J
+      INTEGER*8 A(5, 5)
+      DO 10 I = 1, 5
+         DO J = 1, 5
+            A(I,J) = I*1147483648
+         ENDDO
+10       CONTINUE
+      PRINT *, A
+      END
+
+Code after outlining
+
+      PROGRAM HYBRIDCOMP10
+      INTEGER*8 I
+      INTEGER J
+      INTEGER*8 A(5, 5)
+      CALL TOTO(A)
+      PRINT *, A
+      END
+/* C pretty print for module TOTO. */
+void
+toto_ (long long a[5][5])
+{
+  int j;
+  long long i;
+
+  for (i = 1; i <= 5; i++)
+    {
+      for (j = 1; j <= 5; j++)
+	{
+	  a[j - 1][i - 1] = (i * 1147483648);
+	}
+      continue;
+    }
+  return;
+}
+
+unsplit
+
+
+compiles pgm from fortran files and executes
+
+           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240
+
+compiles pgm from fortran and C files and executes
+
+           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240           1147483648           2294967296           3442450944           4589934592           5737418240

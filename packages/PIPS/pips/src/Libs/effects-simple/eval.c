@@ -40,6 +40,7 @@
 #include "text-util.h"
 #include "newgen_set.h"
 #include "points_to_private.h"
+#include "pointer_values.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -198,10 +199,15 @@ list simple_effect_to_constant_path_effects_with_pointer_values(effect __attribu
 	context = effects_private_current_context_head();
       }
 
-      /*list l_eval = */eval_simple_cell_with_points_to(effect_cell(eff), effect_descriptor(eff),
-						    points_to_list_list(load_pt_to_list(effects_private_current_stmt_head())),
-						    &exact_p, context);
-      
+      //list lpv = cell_relations_list(load_pv(effects_private_current_stmt_head()));
+      if (effect_reference_dereferencing_p(ref, &exact_p))
+	{
+	  pips_debug(8, "dereferencing case \n");
+	  le = CONS(EFFECT, make_anywhere_effect(copy_action(effect_action(eff))), le);
+	}
+      else
+	le = CONS(EFFECT, (*effect_dup_func)(eff), le);
+
     }
   else
     le = CONS(EFFECT, copy_effect(eff), le);

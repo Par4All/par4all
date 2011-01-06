@@ -104,7 +104,7 @@ bool empty_code_list_p(list l)
 
 
 bool
-empty_comments_p(string s)
+empty_comments_p(const char* s)
 {
   /* Could be replaced by a macro. See macro empty_comments */
   pips_assert("comments cannot be NULL", s!=NULL);
@@ -742,7 +742,7 @@ statement make_return_statement(entity module)
 		       RETURN_LABEL_NAME,NULL);
     entity l = gen_find_tabulated(name, entity_domain);
     if (entity_undefined_p(l)) l = make_label(strdup(name));
-    return make_call_statement(RETURN_FUNCTION_NAME, NIL, l, empty_comments);
+    return make_call_statement(c_module_p(module)?C_RETURN_FUNCTION_NAME:RETURN_FUNCTION_NAME, NIL, l, empty_comments);
 }
 
 /*****************************************************************************
@@ -1066,8 +1066,7 @@ statement_loop(statement s)
 
 
 /* Get the whileloop of a statement */
-whileloop
-statement_whileloop(statement s)
+whileloop statement_whileloop(statement s)
 {
   pips_assert("statement_whileloop", statement_whileloop_p(s));
 
@@ -2342,11 +2341,7 @@ void pop_generated_variable_commenter()
 
 string generated_variable_comment(entity e)
 {
-    string tmp = generated_variable_commenters[nb_commenters-1](e);
-    string out;
-    asprintf(&out,"%s%s",c_module_p(get_current_module_entity())?"//":"C ",tmp);
-    free(tmp);
-    return out;
+    return generated_variable_commenters[nb_commenters-1](e);;
 }
 
 
@@ -2416,6 +2411,44 @@ statement add_declaration_statement(statement s, entity e)
     return s;
 }
 
+/* s is assumed to be a block statement and its declarations field is
+   assumed to be correct, but not necessarily the declaration
+   statements within the block s. This function checks that no variable is
+   declared by a declaration statement within the block but not
+   declared at the block level. Also, if a variable is declared at the
+   block level but not by a declaration statement, a new declaration
+   statement is added. */
+void fix_block_statement_declarations(statement s)
+{
+  list bdvl = gen_copy_seq(statement_declarations(s)); // block declarations
+
+  pips_assert("s is a block statement", statement_block_p(s));
+
+  if(!ENDP(bdvl)) {
+    list sl = statement_block(s);
+    list edvl = statements_to_direct_declarations(sl); // effective declarations
+    list mdvl = gen_copy_seq(statement_declarations(s)); // block declarations
+
+    // List of variables declared within the block but not at the
+    // block level
+    gen_list_and_not(&mdvl, edvl); // missing declarations
+
+    // Add the missing declaration statements.
+    // Might be better to add only one statement for all missing variables...
+    FOREACH(ENTITY, v, mdvl) {
+      add_declaration_statement(s, v);
+    }
+    gen_free_list(mdvl);
+
+    // List of variables declared within the block but not at the
+    // block level
+    gen_list_and_not(&edvl, bdvl);
+
+    pips_assert("edvl-bdvl=empty set", ENDP(edvl));
+    gen_free_list(edvl);
+  }
+  gen_free_list(bdvl);
+}
 
 /* Declarations are not only lists of entities, but also statement to
    carry the line number, comments,... For the time begin, a

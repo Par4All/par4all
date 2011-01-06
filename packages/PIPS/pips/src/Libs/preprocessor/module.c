@@ -282,7 +282,7 @@ const char* entity_minimal_user_name(entity e)
 {
   return entity_more_or_less_minimal_name(e, FALSE);
 }
-
+
 /* Retrieve the compilation unit containing a module definition.
 
    The implementation is clumsy.
@@ -377,8 +377,8 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
     }
     /* SG: when adding a new entity to compilation unit,
      * one should check the entity is not already present
-     * but an entity with the same name may already be defiend there
-     * so check this with a avery costly test*/
+     * but an entity with the same name may already be defined there
+     * so check this with a very costly test*/
     list cu_entities = entity_declarations(cu);
     FOREACH(ENTITY,cue,cu_entities)
         if(same_string_p(entity_user_name(e),entity_user_name(cue)))

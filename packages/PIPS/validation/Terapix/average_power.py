@@ -1,3 +1,4 @@
+from __future__ import with_statement # this is to work with python2.5
 from pyps import *
 import terapips
 import os,sys
@@ -62,12 +63,11 @@ if __name__ == "__main__":
 				m.display(activate="PRINT_CODE_REGIONS")
 				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=2**14,type="VOLUME")
 				m.display()
-				m.run(["psolve"])
 				m.display(activate="PRINT_CODE_REGIONS")
 	#			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
 	#			m.display()
 				kernels+=[l2]
-				m.isolate_statement(label=l2.label)
+				m.isolate_statement(label=l2.label, ISOLATE_STATEMENT_EVEN_NON_LOCAL = True)
 	m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.display()

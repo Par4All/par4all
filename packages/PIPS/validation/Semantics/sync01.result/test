@@ -1,0 +1,130 @@
+
+Symbol table for "main" (check the type of boolean variables)
+
+main
+
+Declarations for module "main" with type "void -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 26
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`b" with type "variable" "_Bool"
+	Declared entity "main:0`ok" with type "variable" "_Bool"
+	Declared entity "main:0`x" with type "variable" "int"
+	Declared entity "main:0`y" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "sync01!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	External Variable "TOP-LEVEL:_IO_2_1_stdin_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stdout_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:_IO_2_1_stderr_"	offset = UNKNOWN,	size = unknown
+	External Variable "TOP-LEVEL:stdin"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stdout"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:stderr"	offset = UNKNOWN,	size = 8
+	External Variable "TOP-LEVEL:sys_nerr"	offset = UNKNOWN,	size = 4
+	External Variable "TOP-LEVEL:sys_errlist"	offset = UNKNOWN,	size = 8
+
+
+Layout for memory area "main:*DYNAMIC*" of size 26:
+	Variable "main:0`b"	offset = 10	size = 4
+	Variable "main:0`ok"	offset = 14	size = 4
+	Variable "main:0`x"	offset = 18	size = 4
+	Variable "main:0`y"	offset = 22	size = 4
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "sync01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+   //bool b = false, ok = true;
+   //int x=0, y=0;
+
+//  P() {}
+
+   _Bool b, ok;
+
+//  P(b,ok) {}
+
+   int x, y;
+
+//  P(b,ok,x,y) {}
+
+   if (!(!b&&ok&&x==0&&y==0))
+
+//  P(b,ok,x,y) {}
+
+
+      exit(1);
+
+//  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
+
+   while (1) {
+
+//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=ok+x}
+
+      if (b)
+
+//  P(b,ok,x,y) {b==1, x==y+1, 0<=ok, ok<=1, 1<=ok+x, 1<=x}
+
+         y = y+1;
+      else
+
+//  P(b,ok,x,y) {b==0, x==y, 0<=ok, ok<=1, 1<=ok+x, 0<=x}
+
+         x = x+1;
+
+//  P(b,ok,x,y) {b+x==y+1, 0<=ok, ok<=1, 1<=ok+y, 1<=x, y<=x, x<=y+1}
+
+      // flip-flop
+      b = !b;
+
+//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=ok+y, 1<=x, y<=x, x<=y+1}
+
+      ok = ok&&x>=y;
+
+//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=x, y<=x, x<=y+1, 0<=y}
+
+      // assert(ok);
+      // we want ok==1
+      fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
+   }
+}

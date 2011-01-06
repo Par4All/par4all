@@ -58,12 +58,12 @@ GENERIC_GLOBAL_FUNCTION(kill_pv, statement_effects)
 
 /******************** PIPSDBM INTERFACES */
 
-static statement_cell_relations db_get_simple_pv(char * module_name)
+statement_cell_relations db_get_simple_pv(char * module_name)
 {
   return (statement_cell_relations) db_get_memory_resource(DBR_SIMPLE_POINTER_VALUES, module_name, TRUE);
 }
 
-static void db_put_simple_pv(char * module_name, statement_cell_relations scr)
+void db_put_simple_pv(char * module_name, statement_cell_relations scr)
 {
    DB_PUT_MEMORY_RESOURCE(DBR_SIMPLE_POINTER_VALUES, module_name, (char*) scr);
 }

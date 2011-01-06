@@ -67,6 +67,18 @@ For the CUDA parallel execution on nVidia GPU:
   make display_cuda : build first if needed, run if needed, then display
   the output of the CUDA parallel version with gnuplot
 
+For an OpenMP parallel emulation of a GPU-like accelerator (useful for
+debugging, without any GPU):
+
+  make accel : parallelize the code to GPU-like OpenMP source
+  hyantes-static-99.p4a-accel.c and program hyantes-static-99_accel
+
+  make run_accel : build first if needed, then run the parallel program
+
+  make display_accel : build first if needed, run if needed, then display
+  the output of the accelerator OpenMP parallel emulation version with
+  gnuplot
+
 You can set the P4A_OPTIONS variable to pass some options to p4a.
 
   For example, globally with an:

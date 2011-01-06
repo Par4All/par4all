@@ -128,6 +128,18 @@ cumulated_pointer_effects_with_points_to(string module_name)
 }
 
 bool
+cumulated_pointer_effects_with_pointer_values(string module_name)
+{
+    bool ok;
+    set_constant_paths_p(false);
+    set_pointer_info_kind(with_pointer_values);
+    set_methods_for_simple_pointer_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool
 proper_effects(string module_name)
 {
     bool ok;
@@ -148,6 +160,18 @@ proper_effects_with_points_to(string module_name)
     bool ok;
     set_constant_paths_p(true);
     set_pointer_info_kind(with_points_to);
+    set_methods_for_proper_simple_effects();
+    ok = proper_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool
+proper_effects_with_pointer_values(string module_name)
+{
+    bool ok;
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_pointer_values);
     set_methods_for_proper_simple_effects();
     ok = proper_effects_engine(module_name);
     generic_effects_reset_all_methods();
@@ -178,6 +202,30 @@ cumulated_effects(string module_name)
     else
       set_constant_paths_p(true);
     set_pointer_info_kind(with_no_pointer_info);
+    set_methods_for_simple_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool
+cumulated_effects_with_points_to(string module_name)
+{
+    bool ok;
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_points_to);
+    set_methods_for_simple_effects();
+    ok = rw_effects_engine(module_name);
+    generic_effects_reset_all_methods();
+    return ok;
+}
+
+bool
+cumulated_effects_with_pointer_values(string module_name)
+{
+    bool ok;
+    set_constant_paths_p(true);
+    set_pointer_info_kind(with_pointer_values);
     set_methods_for_simple_effects();
     ok = rw_effects_engine(module_name);
     generic_effects_reset_all_methods();

@@ -6,15 +6,15 @@ void return03()
    int i, j;
    if (i) {
       j = 1;
-      goto l0000;
+      return;
    }
    else {
       j = 2;
-      goto l0000;
+      return;
    }
    j = 3;
-   goto l0000;
-l0000:   return;
+   return;
+   ;
 }
 
 Printed file
@@ -24,10 +24,9 @@ void return03()
    int i, j;
    if (i) goto l99999;
    j = 2;
-   goto l0000;
+   return;
 l99999:   ;
    j = 1;
-l0000:   return;
 }
 
 Printed file after restructure_control
@@ -39,5 +38,5 @@ void return03()
       j = 1;
    else
       j = 2;
-l0000:   return;
+   ;
 }

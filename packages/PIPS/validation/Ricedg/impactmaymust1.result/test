@@ -48,7 +48,7 @@ C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between ZZ and X
 C	New flow-dependence with statement
 C	X = X+1
-Z(I) = ZZ*Z(I)
+C Z(I) = ZZ*Z(I)
 C	Attention: impact alias MAY at (IMPACT:(0,6))  between Z and X
 C	New output-dependence with statement
 C	C	Attention: impact alias MAY at (IMPACT:(0,6))  between Z and X
@@ -63,7 +63,7 @@ C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between ZZ and X
 C	New flow-dependence with statement
 C	X = X+1
-Z(I) = ZZ*Z(I)
+C Z(I) = ZZ*Z(I)
 C	Attention: impact alias MAY at (IMPACT:(0,6))  between Z and X
 C	New anti-dependence with statement
 C	C	Attention: impact alias MAY at (IMPACT:(0,6))  between Z and X
@@ -78,13 +78,13 @@ C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between ZZ and X
 C	New flow-dependence with statement
 C	X = X+1
-Z(I) = ZZ*Z(I)
+C Z(I) = ZZ*Z(I)
 C	Attention: impact alias MUST at (IMPACT:(0,5))  between ZZ and X
 C	New anti-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,5))  between ZZ and X
 C	New flow-dependence with statement
 C	X = X+1
-Z(I) = ZZ*Z(I)
+C Z(I) = ZZ*Z(I)
 C	Attention: impact alias MUST at (IMPACT:(0,4))  between Y and X
 C	New flow-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,4))  between Y and X
@@ -93,13 +93,13 @@ C	X = X+1
 C	Attention: impact alias MUST at (IMPACT:(0,4))  between Y and X
 C	New anti-dependence with statement
 C	X = X+1
-Y = 2
+C Y = 2
 C	Attention: impact alias MUST at (IMPACT:(0,4))  between Y and X
 C	New anti-dependence with statement
 C	C	Attention: impact alias MUST at (IMPACT:(0,4))  between Y and X
 C	New flow-dependence with statement
 C	X = X+1
-DO I = 1, YX = X+2ENDDO
+C DO I = 1, YX = X+2ENDDO
          X = X+2                                                        0013
       ENDDO
       END

@@ -1,0 +1,158 @@
+
+TRANSFORMERS
+
+
+//  T(run) {1<=run, run<=2}
+
+int run()
+{
+
+//  T(a,b) {a==0, b==0}
+
+   int a = 0, b = 0;
+
+//  T() {a==0, b==0}
+
+   float z;
+   //PIPS generated variable
+
+//  T(run) {a==0, b==0}
+
+   int run;
+
+//  T(a) {a==1, a#init==0, b==0}
+
+
+TT:   a = b+1;
+
+//  T() {a==1, b==0}
+
+
+WT:   if (alea()) goto CT;
+
+//  T(b) {a==1, b==2, b#init==0}
+
+   b = a+1;
+
+//  T() {a==1, b==2}
+
+   z = 0.;
+
+//  T() {a==1, b==2}
+
+
+WW1:   z = 0.;
+
+//  T() {a==1, b==2}
+
+
+CW:   z = 0.;
+
+//  T() {a==1, b==2}
+
+end:   ;
+
+//  T(run) {a==1, b==2, run==2}
+
+   run = b;
+   return run;
+
+//  T() {a==1, b==0}
+
+
+CT:   if (alea()) goto l99999;
+
+//  T(b) {a==1, b==2, b#init==0}
+
+   b = a+1;
+   goto CW;
+l99999:   ;
+
+//  T(run) {a==1, b==0, run==1}
+
+   //goto end;
+   run = a;
+
+//  T(run) {a==1, b==2run-2, run==run#init, 1<=run, run<=2}
+
+   return run;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int run()
+{
+
+//  P() {}
+
+   int a = 0, b = 0;
+
+//  P(a,b) {a==0, b==0}
+
+   float z;
+   //PIPS generated variable
+
+//  P(a,b) {a==0, b==0}
+
+   int run;
+
+//  P(a,b,run) {a==0, b==0}
+
+
+TT:   a = b+1;
+
+//  P(a,b,run) {a==1, b==0}
+
+
+WT:   if (alea()) goto CT;
+
+//  P(a,b,run) {a==1, b==0}
+
+   b = a+1;
+
+//  P(a,b,run) {a==1, b==2}
+
+   z = 0.;
+
+//  P(a,b,run) {a==1, b==2}
+
+
+WW1:   z = 0.;
+
+//  P(a,b,run) {a==1, b==2}
+
+
+CW:   z = 0.;
+
+//  P(a,b,run) {a==1, b==2}
+
+end:   ;
+
+//  P(a,b,run) {a==1, b==2}
+
+   run = b;
+   return run;
+
+//  P(a,b,run) {a==1, b==0}
+
+
+CT:   if (alea()) goto l99999;
+
+//  P(a,b,run) {a==1, b==0}
+
+   b = a+1;
+   goto CW;
+l99999:   ;
+
+//  P(a,b,run) {a==1, b==0}
+
+   //goto end;
+   run = a;
+
+//  P(a,b,run) {a==1, b==2run-2, 1<=run, run<=2}
+
+   return run;
+}

@@ -1,51 +1,16 @@
 
-Proper effects for "main"
-
-int main()
-{
-   int t[100][10][3];                                                   /*0006*/
-   int *pu;                                                             /*0007*/
-//             <    is written>: pu
-
-   pu = t[1][2];                                                        /*0009*/
-   return 0;                                                            /*0010*/
-}
-
 POINTS TO for "main"
 
 //  {}
 int main()
 {
 //  points to = {}
-   int t[100][10][3];                                                   /*0006*/
+   int t[100][10][3];
 //  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int *pu;                                                             /*0007*/
+   int *pu;
 //  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   pu = t[1][2];                                                        /*0009*/
+   pu = t[1][2];
 //  {(pu,t[1][2][0],-Exact-)}
-   return 0;                                                            /*0010*/
-}
-
-Proper effects using points_to
-
-int main()
-{
-   int t[100][10][3];                                                   /*0006*/
-   int *pu;                                                             /*0007*/
-//             <    is written>: pu
-
-   pu = t[1][2];                                                        /*0009*/
-   return 0;                                                            /*0010*/
-}
-int main()
-{
-   int t[100][10][3];                                                   /*0006*/
-   int *pu;                                                             /*0007*/
-
-//  <pu-W-EXACT-{}>
-
-
-   pu = t[1][2];                                                        /*0009*/
-   return 0;                                                            /*0010*/
+   return 0;
 }

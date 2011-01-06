@@ -21,27 +21,32 @@
 
 use_pdflatex	= 1
 
-TEX = 	newgen_manual.tex \
+F.tex =	newgen_manual.tex \
 	newgen_paper.tex \
+	newgen_recursion_paper.tex \
 	tutoriel_newgen.tex
 
-SOURCES = $(TEX) obtention.txt
+SOURCES = $(F.tex) obtention.txt
 
-PDF 	= $(TEX:%.tex=%.pdf)
+F.pdf 	= $(F.tex:%.tex=%.pdf)
 
-INSTALL_DOC =	$(PDF)
+INSTALL_DOC = $(F.pdf)
+
+ngF.tex	= $(wildcard newgen_*.tex)
+INSTALL_HTM = $(ngF.tex:%.tex=%.htdoc) index.html
 
 ROOT	= ../..
 include $(ROOT)/makes/main.mk
 
 all: $(INSTALL_DOC)
 
-pdf: $(PDF)
-ps: $(PS)
-dvi: $(DVI)
+pdf: $(F.pdf)
 
-clean: local-clean
+clean: local-clean dox-clean
+
+dox-clean:
+	$(MAKE) -C doxygen clean
 
 local-clean:
-	$(RM) -r $(INSTALL_DOC) $(INSTALL_HTM) $(PDF) \
-		*.html *.aux *.log *.ps *.dvi *.out *~
+	$(RM) -r $(INSTALL_DOC) $(PDF) *.htdoc \
+		*.aux *.log *.ps *.dvi *.out *~

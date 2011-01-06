@@ -24,8 +24,8 @@ echo
 echo Parser output
 echo
 
-display PARSED_PRINTED_FILE[$WKS!]
-echo
+#display PARSED_PRINTED_FILE[$WKS!]
+#echo
 display PARSED_PRINTED_FILE[test]
 
 echo
@@ -37,11 +37,11 @@ setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 #setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[test]
 
-apply RESTRUCTURE_CONTROL[test]
-display PRINTED_FILE[test]
+#apply RESTRUCTURE_CONTROL[test]
+#display PRINTED_FILE[test]
 
 close
 
 #delete $WKS
 
-
+quit

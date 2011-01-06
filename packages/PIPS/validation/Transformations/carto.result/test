@@ -226,7 +226,6 @@ void carto(float towns[100][100], float result[100][100])
                result[i][j] += towns[k00][l0000]/dist(i, j, k00, l0000);
          }
       }
-   ;
 }
 
 Diff, must be empty

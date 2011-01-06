@@ -1,0 +1,38 @@
+delete generate14
+create generate14 generate14.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[generate14]
+
+echo
+echo Printed file
+echo
+
+display PRINTED_FILE[generate14]
+#display PRINTED_FILE[%ALL]
+
+activate PRINT_CODE_PRECONDITIONS
+
+echo
+echo Printed file generate14 with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[generate14]
+
+echo
+echo Printed file func with intraprocedural preconditions
+echo
+
+display PRINTED_FILE[func]
+
+close
+delete generate14
+quit

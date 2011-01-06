@@ -57,6 +57,7 @@ LIB_CFILES =	\
 		induction_substitution.c \
     loop_fusion.c \
 		set_return_type.c \
+    cast_at_call_sites.c \
 		manage_parallel_loops.c
 
 INC_TARGET =    $(TARGET).h

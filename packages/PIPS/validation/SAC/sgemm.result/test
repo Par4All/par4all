@@ -3393,9 +3393,10 @@ nsucc = 1
 nsucc = 0 
 /* C pretty print for module SGEMM. */
 void
-sgemm (char transa, char transb, int m, int n, int k, float alpha,
-       float a[10][10], int lda, float b[10][10], int ldb, float beta,
-       float c[10][10], int ldc)
+sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
+       int *n_p4a_copy, int *k_p4a_copy, float *alpha_p4a_copy,
+       float a[10][10], int *lda_p4a_copy, float b[10][10], int *ldb_p4a_copy,
+       float *beta_p4a_copy, float c[10][10], int *ldc_p4a_copy)
 {
   static const float size = 10;
   a2sf pdata7;
@@ -3580,6 +3581,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   int i;
   int l;
   float temp;
+  char transa = *transa_p4a_copy;
+  char transb = *transb_p4a_copy;
+  int m = *m_p4a_copy;
+  int n = *n_p4a_copy;
+  int k = *k_p4a_copy;
+  float alpha = *alpha_p4a_copy;
+  int lda = *lda_p4a_copy;
+  int ldb = *ldb_p4a_copy;
+  float beta = *beta_p4a_copy;
+  int ldc = *ldc_p4a_copy;
 
   pdata3[1] = alpha;
   pdata3[0] = alpha;
@@ -3589,12 +3600,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   pdata0[0] = beta;
   one0 = 1.0e+0;
   zero0 = 0.0e+0;
-  nota0 = lsame (transa, 'n');
-  notb0 = lsame (transb, 'n');
+  nota0 = lsame (&transa, 'n');
+  notb0 = lsame (&transb, 'n');
   info0 = 0;
-  nrowa0 = __c - conditional__ (nota0, m, k);
-  nrowb0 = __c - conditional__ (notb0, k, n);
-  if ((!nota0 && !lsame (transa, 'c')) && !lsame (transa, 't'))
+  nrowa0 = __c - conditional__ (&nota0, &m, &k);
+  nrowb0 = __c - conditional__ (&notb0, &k, &n);
+  if ((!nota0 && !lsame (&transa, 'c')) && !lsame (&transa, 't'))
     {
       info1 = 1;
       info0 = info1;
@@ -3602,14 +3613,14 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
   else
     {
       l_911 = !notb0;
-      l_110 = lsame (transb, 'c');
-      l_140 = lsame (transb, 't');
+      l_110 = lsame (&transb, 'c');
+      l_140 = lsame (&transb, 't');
       l_500 = (m < 0);
       l_400 = (n < 0);
       l_300 = (k < 0);
-      i_00 = max (1, nrowa0);
-      i_10 = max (1, nrowb0);
-      i_20 = max (1, m);
+      i_00 = max (1, &nrowa0);
+      i_10 = max (1, &nrowb0);
+      i_20 = max (1, &m);
       l_120 = !l_110;
       l_150 = !l_140;
       l_200 = (lda < i_00);
@@ -3617,7 +3628,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_000 = (ldc < i_20);
       l_130 = (l_911 && l_120);
       l_611 = (l_130 && l_150);
-      info0 = __c - conditional__ (l_611, 2, info0);
+      info0 = __c - conditional__ (&l_611, 2, &info0);
       l_160 = !l_611;
       l_170 = !l_611;
       l_190 = !l_611;
@@ -3630,7 +3641,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_650 = !l_611;
       l_750 = !l_611;
       l_860 = !l_611;
-      l_5 = __c - conditional__ (l_160, l_500, l_5);
+      l_5 = __c - conditional__ (&l_160, &l_500, &l_5);
       l_180 = (l_170 && l_5);
       l_210 = !l_5;
       l_240 = !l_5;
@@ -3642,9 +3653,9 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_660 = !l_5;
       l_760 = !l_5;
       l_870 = !l_5;
-      info0 = __c - conditional__ (l_180, 3, info0);
+      info0 = __c - conditional__ (&l_180, 3, &info0);
       l_220 = (l_190 && l_210);
-      l_4 = __c - conditional__ (l_220, l_400, l_4);
+      l_4 = __c - conditional__ (&l_220, &l_400, &l_4);
       l_250 = (l_240 && l_4);
       l_290 = !l_4;
       l_350 = !l_4;
@@ -3656,9 +3667,9 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_880 = !l_4;
       l_260 = (l_230 && l_250);
       l_310 = (l_280 && l_290);
-      info0 = __c - conditional__ (l_260, 4, info0);
+      info0 = __c - conditional__ (&l_260, 4, &info0);
       l_320 = (l_270 && l_310);
-      l_3 = __c - conditional__ (l_320, l_300, l_3);
+      l_3 = __c - conditional__ (&l_320, &l_300, &l_3);
       l_360 = (l_350 && l_3);
       l_430 = !l_3;
       l_510 = !l_3;
@@ -3670,9 +3681,9 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_440 = (l_420 && l_430);
       l_380 = (l_330 && l_370);
       l_450 = (l_410 && l_440);
-      info0 = __c - conditional__ (l_380, 5, info0);
+      info0 = __c - conditional__ (&l_380, 5, &info0);
       l_460 = (l_390 && l_450);
-      l_2 = __c - conditional__ (l_460, l_200, l_2);
+      l_2 = __c - conditional__ (&l_460, &l_200, &l_2);
       l_520 = (l_510 && l_2);
       l_600 = !l_2;
       l_690 = !l_2;
@@ -3684,9 +3695,9 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_620 = (l_580 && l_610);
       l_550 = (l_470 && l_540);
       l_630 = (l_570 && l_620);
-      info0 = __c - conditional__ (l_550, 8, info0);
+      info0 = __c - conditional__ (&l_550, 8, &info0);
       l_640 = (l_560 && l_630);
-      l_1 = __c - conditional__ (l_640, l_100, l_1);
+      l_1 = __c - conditional__ (&l_640, &l_100, &l_1);
       l_700 = (l_690 && l_1);
       l_800 = !l_1;
       l_910 = !l_1;
@@ -3698,16 +3709,16 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
       l_830 = (l_770 && l_820);
       l_740 = (l_650 && l_730);
       l_840 = (l_760 && l_830);
-      info0 = __c - conditional__ (l_740, 10, info0);
+      info0 = __c - conditional__ (&l_740, 10, &info0);
       l_850 = (l_750 && l_840);
-      l_0 = __c - conditional__ (l_850, l_000, l_0);
+      l_0 = __c - conditional__ (&l_850, &l_000, &l_0);
       l_920 = (l_910 && l_0);
       l_930 = (l_900 && l_920);
       l_940 = (l_890 && l_930);
       l_950 = (l_880 && l_940);
       l_960 = (l_870 && l_950);
       l_970 = (l_860 && l_960);
-      info0 = __c - conditional__ (l_970, 13, info0);
+      info0 = __c - conditional__ (&l_970, 13, &info0);
     }
   if (info0 != 0)
     {
@@ -3729,7 +3740,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  for (j0 = 1; j0 <= n; j0++)
 		    {
 		      lu_nub0 = m;
-		      lu_ib0 = mod (lu_nub0, 4);
+		      lu_ib0 = mod (&lu_nub0, 4);
 		      for (lu_ind00 = 0; lu_ind00 <= lu_ib0 - 1; lu_ind00++)
 			{
 			  c[j0 - 1][(1 + lu_ind00) - 1] = zero0;
@@ -3752,7 +3763,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 		  for (j1 = 1; j1 <= n; j1++)
 		    {
 		      lu_nub1 = m;
-		      lu_ib1 = mod (lu_nub1, 4);
+		      lu_ib1 = mod (&lu_nub1, 4);
+		      simd_load_v4sf (vec10, pdata0[0]);
 		      for (lu_ind10 = 0; lu_ind10 <= lu_ib1 - 1; lu_ind10++)
 			{
 			  red0[0] = 1.000000;
@@ -3761,16 +3773,15 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  c[j1 - 1][(1 + lu_ind10) - 1] =
 			    (red0[0] * c[j1 - 1][(1 + lu_ind10) - 1]);
 			}
-		      simd_load_v4sf (vec10, pdata0[0]);
 		      for (lu_ind1 = lu_ib1; lu_ind1 <= lu_nub1 - 1;
 			   lu_ind1 += 4)
 			{
 			  simd_load_v4sf (vec00,
 					  c[j1 - 1][(1 + lu_ind1) - 1]);
 			  simd_mulps (vec00, vec10, vec00);
+			  continue;
 			  simd_store_v4sf (vec00,
 					   c[j1 - 1][(1 + lu_ind1) - 1]);
-			  continue;
 			}
 		      continue;
 		    }
@@ -3787,7 +3798,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  if (pdata0[0] == zero0)
 			    {
 			      lu_nub2 = m;
-			      lu_ib2 = mod (lu_nub2, 4);
+			      lu_ib2 = mod (&lu_nub2, 4);
 			      for (lu_ind20 = 0; lu_ind20 <= lu_ib2 - 1;
 				   lu_ind20++)
 				{
@@ -3809,7 +3820,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      if (pdata0[0] != one0)
 				{
 				  lu_nub3 = m;
-				  lu_ib3 = mod (lu_nub3, 4);
+				  lu_ib3 = mod (&lu_nub3, 4);
+				  simd_load_v4sf (vec30, pdata0[0]);
 				  for (lu_ind30 = 0; lu_ind30 <= lu_ib3 - 1;
 				       lu_ind30++)
 				    {
@@ -3820,7 +3832,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red1[0] *
 					 c[j2 - 1][(1 + lu_ind30) - 1]);
 				    }
-				  simd_load_v4sf (vec30, pdata0[0]);
 				  for (lu_ind3 = lu_ib3;
 				       lu_ind3 <= lu_nub3 - 1; lu_ind3 += 4)
 				    {
@@ -3829,11 +3840,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							1][(1 + lu_ind3) -
 							   1]);
 				      simd_mulps (vec20, vec30, vec20);
+				      continue;
 				      simd_store_v4sf (vec20,
 						       c[j2 -
 							 1][(1 + lu_ind3) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3847,7 +3858,9 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				{
 				  temp = (pdata3[0] * b[j2 - 1][l - 1]);
 				  lu_nub4 = m;
-				  lu_ib4 = mod (lu_nub4, 4);
+				  lu_ib4 = mod (&lu_nub4, 4);
+				  simd_load_generic_v4sf (vec50, &temp, &temp,
+							  &temp, &temp);
 				  for (lu_ind40 = 0; lu_ind40 <= lu_ib4 - 1;
 				       lu_ind40++)
 				    {
@@ -3860,25 +3873,23 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red2[0] +
 					 c[j2 - 1][(1 + lu_ind40) - 1]);
 				    }
-				  simd_load_generic_v4sf (vec50, temp, temp,
-							  temp, temp);
 				  for (lu_ind4 = lu_ib4;
 				       lu_ind4 <= lu_nub4 - 1; lu_ind4 += 4)
 				    {
-				      simd_load_v4sf (vec60,
-						      a[l - 1][(1 + lu_ind4) -
-							       1]);
-				      simd_mulps (vec40, vec50, vec60);
 				      simd_load_v4sf (vec70,
 						      c[j2 -
 							1][(1 + lu_ind4) -
 							   1]);
+				      simd_load_v4sf (vec60,
+						      a[l - 1][(1 + lu_ind4) -
+							       1]);
+				      simd_mulps (vec40, vec50, vec60);
 				      simd_addps (vec70, vec70, vec40);
+				      continue;
 				      simd_store_v4sf (vec70,
 						       c[j2 -
 							 1][(1 + lu_ind4) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3899,12 +3910,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      l_7 = (pdata0[0] == zero0);
 			      l_98 = !l_7;
 			      c[j3 - 1][i - 1] =
-				__c - conditional__ (l_7, pdata4[0],
+				__c - conditional__ (&l_7, pdata4[0],
 						     c[j3 - 1][i - 1]);
 			      f_3 = (pdata0[0] * c[j3 - 1][i - 1]);
 			      c1 = (pdata4[1] + f_3);
 			      c[j3 - 1][i - 1] =
-				__c - conditional__ (l_98, c1,
+				__c - conditional__ (&l_98, &c1,
 						     c[j3 - 1][i - 1]);
 			      continue;
 			    }
@@ -3921,7 +3932,7 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			  if (pdata0[0] == zero0)
 			    {
 			      lu_nub6 = m;
-			      lu_ib6 = mod (lu_nub6, 4);
+			      lu_ib6 = mod (&lu_nub6, 4);
 			      for (lu_ind60 = 0; lu_ind60 <= lu_ib6 - 1;
 				   lu_ind60++)
 				{
@@ -3943,7 +3954,8 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      if (pdata0[0] != one0)
 				{
 				  lu_nub7 = m;
-				  lu_ib7 = mod (lu_nub7, 4);
+				  lu_ib7 = mod (&lu_nub7, 4);
+				  simd_load_v4sf (vec180, pdata0[0]);
 				  for (lu_ind70 = 0; lu_ind70 <= lu_ib7 - 1;
 				       lu_ind70++)
 				    {
@@ -3954,7 +3966,6 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red5[0] *
 					 c[j4 - 1][(1 + lu_ind70) - 1]);
 				    }
-				  simd_load_v4sf (vec180, pdata0[0]);
 				  for (lu_ind7 = lu_ib7;
 				       lu_ind7 <= lu_nub7 - 1; lu_ind7 += 4)
 				    {
@@ -3963,11 +3974,11 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 							1][(1 + lu_ind7) -
 							   1]);
 				      simd_mulps (vec170, vec180, vec170);
+				      continue;
 				      simd_store_v4sf (vec170,
 						       c[j4 -
 							 1][(1 + lu_ind7) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -3981,7 +3992,10 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 				{
 				  temp = (pdata3[0] * b[l - 1][j4 - 1]);
 				  lu_nub8 = m;
-				  lu_ib8 = mod (lu_nub8, 4);
+				  lu_ib8 = mod (&lu_nub8, 4);
+				  simd_load_generic_v4sf (vec200, &temp,
+							  &temp, &temp,
+							  &temp);
 				  for (lu_ind80 = 0; lu_ind80 <= lu_ib8 - 1;
 				       lu_ind80++)
 				    {
@@ -3994,25 +4008,23 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 					(red6[0] +
 					 c[j4 - 1][(1 + lu_ind80) - 1]);
 				    }
-				  simd_load_generic_v4sf (vec200, temp, temp,
-							  temp, temp);
 				  for (lu_ind8 = lu_ib8;
 				       lu_ind8 <= lu_nub8 - 1; lu_ind8 += 4)
 				    {
-				      simd_load_v4sf (vec210,
-						      a[l - 1][(1 + lu_ind8) -
-							       1]);
-				      simd_mulps (vec190, vec200, vec210);
 				      simd_load_v4sf (vec220,
 						      c[j4 -
 							1][(1 + lu_ind8) -
 							   1]);
+				      simd_load_v4sf (vec210,
+						      a[l - 1][(1 + lu_ind8) -
+							       1]);
+				      simd_mulps (vec190, vec200, vec210);
 				      simd_addps (vec220, vec220, vec190);
+				      continue;
 				      simd_store_v4sf (vec220,
 						       c[j4 -
 							 1][(1 + lu_ind8) -
 							    1]);
-				      continue;
 				    }
 				}
 			      else
@@ -4033,12 +4045,12 @@ sgemm (char transa, char transb, int m, int n, int k, float alpha,
 			      l_8 = (pdata0[0] == zero0);
 			      l_99 = !l_8;
 			      c[j5 - 1][i - 1] =
-				__c - conditional__ (l_8, pdata7[0],
+				__c - conditional__ (&l_8, pdata7[0],
 						     c[j5 - 1][i - 1]);
 			      f_7 = (pdata0[0] * c[j5 - 1][i - 1]);
 			      c3 = (pdata7[1] + f_7);
 			      c[j5 - 1][i - 1] =
-				__c - conditional__ (l_99, c3,
+				__c - conditional__ (&l_99, &c3,
 						     c[j5 - 1][i - 1]);
 			      continue;
 			    }

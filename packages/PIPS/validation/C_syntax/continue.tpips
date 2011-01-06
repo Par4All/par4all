@@ -4,4 +4,5 @@ setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 display PRINTED_FILE
 close
+delete continue
 quit

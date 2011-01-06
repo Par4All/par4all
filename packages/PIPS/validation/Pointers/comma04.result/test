@@ -1,0 +1,59 @@
+int main()
+{
+//             <    is written>: i j k l
+   int i = 0, j = 1, k = 2, l = 3;
+   int *p, *q, *r, *s, *t;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is written>: s
+   s = &k;
+//             <    is read   >: s
+//             <    is written>: p r
+   /* we treat this instruction as:
+        r = &j;
+        r = s;
+        p = r;
+     */
+   p = (r = &j, r = s);
+   return 0;
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0, j = 1, k = 2, l = 3;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int *p, *q, *r, *s, *t;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+
+   r = &i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,i,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   q = &j;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   s = &k;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,k,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   /* we treat this instruction as:
+        r = &j;
+        r = s;
+        p = r;
+     */
+   p = (r = &j, r = s);
+//  {(p,k,-Exact-);(q,j,-Exact-);(r,k,-Exact-);(s,k,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   return 0;
+}

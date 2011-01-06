@@ -1,0 +1,21 @@
+int a(int i, int j[2], int k[2])
+{
+   i = 0;
+   while (i<10) {
+      j[0] = i;
+      load(k, j);
+      i += 1;
+      i++;
+   }
+}
+int a(int i, int j[2], int k[2])
+{
+   i = 0;
+   while (i<10) {
+      j[0] = i;
+      load(k, j);
+      i += 1;
+      i++;
+   }
+}
+

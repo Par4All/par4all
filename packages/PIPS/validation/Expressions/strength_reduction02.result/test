@@ -4,6 +4,10 @@
 int main()
 {
 
+//  T(main) {main==0}
+
+   // BEGIN BLOCK
+
 //  T(i) {i==0}
 
    int i = 0, *a = malloc(10*sizeof(int));
@@ -31,9 +35,11 @@ int main()
 //  T(main) {i==10, main==0}
 
    return 0;
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, *a = malloc(10*sizeof(int));
    //PIPS generated variable
    int *a0;
@@ -41,14 +47,18 @@ int main()
       return 1;
    a0 = a;
    for(i = 0; i <= 9; i += 1) {
+      // BEGIN BLOCK
       *a0 = 3;
       a0 += 1;
+      // END BLOCK
    }
    printf("%d", *(a+2));
    return 0;
+   // END BLOCK
 }
 int main()
 {
+   // BEGIN BLOCK
    int i = 0, *a = malloc(10*sizeof(int));
    //PIPS generated variable
    int *a0;
@@ -56,10 +66,13 @@ int main()
       return 1;
    a0 = a;
    for(i = 0; i <= 9; i += 1) {
+      // BEGIN BLOCK
       *a0 = 3;
       a0 += 1;
+      // END BLOCK
    }
    printf("%d", *(a+2));
    return 0;
+   // END BLOCK
 }
 

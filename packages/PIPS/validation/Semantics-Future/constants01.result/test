@@ -1,0 +1,54 @@
+
+TRANSFORMERS
+
+
+//  T(main) {main==2112}
+
+int main()
+{
+
+//  T(i) {i==64}
+
+   int i = 2<<6-1;
+   // i == 64
+
+//  T(j) {i==64, j==2048}
+
+   int j = 2<<11-1;
+
+//  T() {i==64, j==2048}
+
+   // j == 2048
+   printf("i=%d, j=%d\n", i, j);
+
+//  T(main) {i==64, j==2048, main==2112}
+
+   return i+j;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i = 2<<6-1;
+   // i == 64
+
+//  P(i) {i==64}
+
+   int j = 2<<11-1;
+
+//  P(i,j) {i==64, j==2048}
+
+   // j == 2048
+   printf("i=%d, j=%d\n", i, j);
+
+//  P(i,j) {i==64, j==2048}
+
+   return i+j;
+}

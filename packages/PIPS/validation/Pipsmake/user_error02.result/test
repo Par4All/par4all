@@ -23,7 +23,7 @@ Request: build resource PRINTED_FILE for module USER_ERROR02.
   SUMMARY_EFFECTS                building   SUMMARY_EFFECTS(B)
   PROPER_EFFECTS                 building   PROPER_EFFECTS(USER_ERROR02)
 2 formal arguments for module B:
-B:Y, B:X
+B:X, B:Y
 1 actual arguments:
 syntax = X
 normalized = NORMALIZED UNDEFINED

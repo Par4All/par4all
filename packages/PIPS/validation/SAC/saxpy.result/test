@@ -532,17 +532,17 @@ saxpy (float sx[1000], float sy[1000])
     }
   else
     {
+      simd_load_generic_v4sf (vec10, &sa0, &sa0, &sa0, &sa0);
       ;
       ;
-      simd_load_generic_v4sf (vec10, sa0, sa0, sa0, sa0);
       for (lu_ind00 = 0; lu_ind00 <= 999; lu_ind00 += 4)
 	{
+	  simd_load_v4sf (vec30, sy[(1 + lu_ind00) - 1]);
 	  simd_load_v4sf (vec20, sx[(1 + lu_ind00) - 1]);
 	  simd_mulps (vec00, vec10, vec20);
-	  simd_load_v4sf (vec30, sy[(1 + lu_ind00) - 1]);
 	  simd_addps (vec30, vec30, vec00);
-	  simd_store_v4sf (vec30, sy[(1 + lu_ind00) - 1]);
 	  continue;
+	  simd_store_v4sf (vec30, sy[(1 + lu_ind00) - 1]);
 	}
       ;
     }

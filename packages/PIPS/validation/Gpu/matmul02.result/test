@@ -1,0 +1,141 @@
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+void
+p4a_kernel_launcher_0_ (int *n_p4a_copy,
+			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
+{
+  int j;
+  int i;
+  int n = *n_p4a_copy;
+
+  for (j = 0; j <= n - 1; j++)
+    {
+      for (i = 0; i <= n - 1; i++)
+	{
+	  p4a_kernel_wrapper_0 (&n, a, b, &i, &j);
+	}
+    }
+  return;
+}
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+void
+p4a_kernel_launcher_1_ (int *n_p4a_copy,
+			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
+{
+  int x;
+  int k;
+  int j;
+  int i;
+  int n = *n_p4a_copy;
+
+  for (j = 0; j <= n - 1; j++)
+    {
+      for (i = 0; i <= n - 1; i++)
+	{
+	  p4a_kernel_wrapper_1 (&n, a, b, c, &i, &j, &x);
+	}
+    }
+  return;
+}
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_0. */
+void
+p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
+	      int *j_p4a_copy)
+{
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
+
+  if ((j <= (n - 1)) && (i <= (n - 1)))
+    {
+      a[(j + 1) - 1][(i + 1) - 1] = 1;
+      b[(j + 1) - 1][(i + 1) - 1] = 1;
+    }
+  return;
+}
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_1. */
+void
+p4a_kernel_1 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+	      int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
+	      int *j_p4a_copy, int *x_p4a_copy)
+{
+  int k;
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
+  int x = *x_p4a_copy;
+
+  if ((j <= (n - 1)) && (i <= (n - 1)))
+    {
+      x = 0;
+      for (k = 0; k <= n - 1; k++)
+	{
+	  x =
+	    (x + (a[(k + 1) - 1][(i + 1) - 1] * b[(j + 1) - 1][(k + 1) - 1]));
+	}
+      c[(j + 1) - 1][(i + 1) - 1] = x;
+    }
+  *x_p4a_copy = x;
+  return;
+}
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+void
+p4a_kernel_wrapper_0 (int *n_p4a_copy,
+		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		      int *i_p4a_copy, int *j_p4a_copy)
+{
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
+
+  p4a_kernel_0 (&n, a, b, &i, &j);
+  return;
+}
+Module statement: 
+and declarations: 
+/* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+void
+p4a_kernel_wrapper_1 (int *n_p4a_copy,
+		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		      int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		      int *i_p4a_copy, int *j_p4a_copy, int *x_p4a_copy)
+{
+  int n = *n_p4a_copy;
+  int i = *i_p4a_copy;
+  int j = *j_p4a_copy;
+  int x = *x_p4a_copy;
+
+  p4a_kernel_1 (&n, a, b, c, &i, &j, &x);
+  *x_p4a_copy = x;
+  return;
+}
+
+copying files
+
+
+producing objects
+
+
+producing executables
+
+
+execution
+
+         100
+ CHECK SUCCEED

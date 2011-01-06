@@ -47,6 +47,8 @@ struct __string_buffer_head
 {
   stack ins;
   boolean dup; // whether to duplicate all strings appended to the buffer.
+  // we could keep track of the current buffer size on the fly:
+  // size_t size;
 };
 
 /* allocate a new string buffer
