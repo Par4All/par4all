@@ -81,7 +81,7 @@ def add_own_options(parser):
         help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
 
     parser.add_option_group(proc_group)
- = optparse.OptionGroup(parser, "Preprocessing options")
+    cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
 
     cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
         help = "C preprocessor to use (defaults to gcc -E).")
