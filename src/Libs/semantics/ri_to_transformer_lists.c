@@ -468,7 +468,7 @@ static list test_to_transformer_list(test t,
     (void) statement_to_transformer(st, id);
     (void) statement_to_transformer(sf, id);
     tf = effects_to_transformer(ef);
-    tl = CONS(TRANSFORMER, tl, NIL);
+    tl = CONS(TRANSFORMER, tf, NIL);
     free_transformer(id);
   }
 
