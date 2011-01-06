@@ -4524,7 +4524,24 @@ invariant versions for loop bodies (\texttt{MODULE.inv\_regions} and
 equal to the corresponding regions in which all variables that may be
 modified by the loop body (except the current loop index) are
 eliminated from the descriptors (convex polyhedron). For other
-statements, they are equal to the empty list of regions.  
+statements, they are equal to the empty list of regions.
+
+In the following trivial example,
+\begin{lstlisting}
+k = 0;
+for(i=0; i<N; i++)
+{
+// regions for loop body:
+//    <a[phi1]-W-EXACT-{PHI1==K,K==I}>
+// invariant regions for loop body:
+//    <a[phi1]-W-EXACT-{PHI1==I}>
+  k = k+1;
+  a[k] = k;
+}
+\end{lstlisting}
+notice that the variable \lstinline|k| which is modified in the loop
+body, and which appears in the loop body region polyhedron, does not appear
+anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
 by Rémi \textsc{Triolet}~\cite{T84} and then revisited by François
