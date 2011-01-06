@@ -1,0 +1,34 @@
+setenv WS="jpeg-6a"
+setenv PIPS_CPP_FLAGS="-I$WS"
+setproperty ABORT_ON_USER_ERROR TRUE
+delete $WS
+create $WS  jpeg-6a/jcapimin.c jpeg-6a/jcapistd.c jpeg-6a/jctrans.c jpeg-6a/jcparam.c jpeg-6a/jdatadst.c jpeg-6a/jcinit.c jpeg-6a/jcmaster.c jpeg-6a/jcmarker.c jpeg-6a/jcmainct.c jpeg-6a/jcprepct.c jpeg-6a/jccoefct.c jpeg-6a/jccolor.c jpeg-6a/jcsample.c jpeg-6a/jchuff.c jpeg-6a/jcphuff.c jpeg-6a/jcdctmgr.c jpeg-6a/jfdctfst.c jpeg-6a/jfdctflt.c jpeg-6a/jfdctint.c jpeg-6a/jdapimin.c jpeg-6a/jdapistd.c jpeg-6a/jdtrans.c jpeg-6a/jdatasrc.c jpeg-6a/jdmaster.c jpeg-6a/jdinput.c jpeg-6a/jdmarker.c jpeg-6a/jdhuff.c jpeg-6a/jdphuff.c jpeg-6a/jdmainct.c jpeg-6a/jdcoefct.c jpeg-6a/jdpostct.c jpeg-6a/jddctmgr.c jpeg-6a/jidctfst.c jpeg-6a/jidctflt.c jpeg-6a/jidctint.c jpeg-6a/jidctred.c jpeg-6a/jdsample.c jpeg-6a/jdcolor.c jpeg-6a/jquant1.c jpeg-6a/jquant2.c jpeg-6a/jdmerge.c jpeg-6a/jcomapi.c jpeg-6a/jutils.c jpeg-6a/jerror.c jpeg-6a/jmemmgr.c jpeg-6a/jmemnobs.c
+
+
+echo accurate analysis
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate REGION_CHAINS
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING=TRUE
+setproperty UNSPAGHETTIFY_RECURSIVE_DECOMPOSITION=TRUE
+setproperty ALIASING_ACROSS_IO_STREAMS FALSE
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+echo by pass some subscripts
+#apply SIMPLIFY_SUBSCRIPTS[jcdctmgr!forward_DCT]
+
+echo restructuring
+apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
+apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+
+echo proper effects
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
+close
+delete $WS
+quit
