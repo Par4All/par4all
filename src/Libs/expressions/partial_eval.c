@@ -694,9 +694,9 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
   }
   else if(ENTITY_ADDRESS_OF_P(func)) {
       ef = partial_eval_expression_and_copy(*sub_ep, ps, fx);
-      if(ef.icoef==0) { // it means we have a constant now
-          ef = eformat_undefined; // so we revert the partial eval, even if we could do better by skipping only the first step of the expression.
-      }
+      if(ef.icoef!=0) // it means we should not generate a constant now
+          partial_eval_expression_and_regenerate(sub_ep, ps, fx);
+      ef = eformat_undefined;
   }
   else {
     /* operator can be a pre/post inc/dec C operator */
