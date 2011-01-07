@@ -1,11 +1,10 @@
 delete parabolic
 
-setproperty ABORT_ON_USER_ERROR 2
+setproperty ABORT_ON_USER_ERROR TRUE
 
 create parabolic parabolic.c
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
-
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 setenv SEMANTICS_DEBUG_LEVEL "0"
