@@ -64,12 +64,6 @@ static bool use_pointers_p = FALSE;
  */
 static bool modify_call_site_p = FALSE;
 
-/**
- * This boolean is set to true when in fortran case
- * property
- */
-static bool is_fortran_p = FALSE;
-
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
@@ -87,7 +81,8 @@ size_t type_dereferencement_depth(type t) {
 static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
     list indices = reference_indices(r);
-    if (is_fortran_p) {
+    list to_be_free = indices;
+    if (fortran_module_p(get_current_module_entity())) {
       indices = gen_nreverse (indices);
     }
     if(!ENDP(indices)) {
@@ -128,6 +123,7 @@ static void do_linearize_array_reference(reference r) {
             new_indices=CONS(EXPRESSION,new_index,new_indices);
         }
 	reference_indices(r)=gen_nreverse(new_indices);
+	gen_full_free_list (to_be_free);
     }
 }
 
@@ -147,7 +143,7 @@ static bool do_linearize_type(type *t, bool *rr) {
     size_t vl = gen_length(variable_dimensions(v));
     if(uvl > 1 ) {
       dimension nd = dimension_undefined;
-      if (is_fortran_p == true) {
+      if (fortran_module_p(get_current_module_entity()) == true) {
 	nd = make_dimension(int_to_expression(1),
 			    SizeOfDimensions(variable_dimensions(uv)));
       }
@@ -710,7 +706,7 @@ bool linearize_array_generic (char *module_name)
     set_current_module_entity(module_name_to_entity( module_name ));
 
     /* Do we have to cast the array at call site ? */
-    if (is_fortran_p == true) {
+    if (fortran_module_p(get_current_module_entity()) == true) {
       use_pointers_p      = false;
       modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
       cast_at_call_site_p = false;
@@ -742,7 +738,7 @@ bool linearize_array_generic (char *module_name)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-	if (is_fortran_p == true) {
+	if (fortran_module_p(get_current_module_entity()) == true) {
 	  // remove decls_text or the prettyprinter will use that field
 	  discard_module_declaration_text (get_current_module_entity ());
 	}
@@ -766,6 +762,5 @@ bool linearize_array(char *module_name)
 
 bool linearize_array_fortran(char *module_name)
 {
-  is_fortran_p = true;
   return linearize_array_generic (module_name);
 }
