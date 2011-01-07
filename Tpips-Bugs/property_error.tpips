@@ -1,18 +1,13 @@
-
-delete property_error
-create property_error car.c
-
+# type error, should be a boolean
 setproperty ABORT_ON_USER_ERROR 2
+getproperty ABORT_ON_USER_ERROR
+# this property setting is ignored?!
 setproperty PRETTYPRINT_BLOCKS TRUE
+echo # PRETTYPRINT_BLOCKS should be TRUE
+getproperty PRETTYPRINT_BLOCKS
+# try again...
+setproperty PRETTYPRINT_BLOCKS TRUE
+getproperty PRETTYPRINT_BLOCKS
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
-
-# An error on the first property is detected. 
-# The second property that should prettyprint blocks is not taken into account
-# The third property that gives statement ordering is properly set
-
-display PRINTED_FILE
-
-echo Note that BLOCKS are not prettyprinted
- 
-close
+getproperty PRETTYPRINT_STATEMENT_ORDERING
 quit

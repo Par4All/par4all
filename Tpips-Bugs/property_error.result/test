@@ -1,25 +1,5 @@
-void main(int n)
-{
-// (0,2)
-   int s = 0, t = 0, d = 0;
-// (0,3)
-   n>=0?(void) 0:__assert_fail("n>=0", "./car.c", 18, (const char *) 0);
-// (0,4)
-   while (s<=2&&t<=n)
-// (0,5)
-      if (alea())
-// (0,6)
-         t++, s = 0;
-      else
-// (0,7)
-         d++, s++;
-// (0,8)
-
-   if (d<=2*n+3)
-// (0,9)
-      printf("healthy");
-   else
-// (0,10)
-      printf("crashed!");
-}
-Note that BLOCKS are not prettyprinted
+ABORT_ON_USER_ERROR FALSE
+# PRETTYPRINT_BLOCKS should be TRUE
+PRETTYPRINT_BLOCKS FALSE
+PRETTYPRINT_BLOCKS TRUE
+PRETTYPRINT_STATEMENT_ORDERING TRUE
