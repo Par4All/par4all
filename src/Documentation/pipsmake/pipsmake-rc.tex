@@ -9146,7 +9146,7 @@ linearize_array > MODULE.code
 
 \begin{PipsPass}{linearize_array_fortran}
 This transformation replaces all arrays in the module by equivalent linearized
-arrays. With this simple version the callers are not modified.
+arrays. This only works with array starting their indices at 1.
 \end{PipsPass}
 
 \begin{PipsMake}

@@ -64,6 +64,12 @@ static bool use_pointers_p = FALSE;
  */
 static bool modify_call_site_p = FALSE;
 
+/**
+ * This boolean is set to true when in fortran case
+ * property
+ */
+static bool is_fortran_p = FALSE;
+
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
@@ -81,6 +87,9 @@ size_t type_dereferencement_depth(type t) {
 static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
     list indices = reference_indices(r);
+    if (is_fortran_p) {
+      indices = gen_nreverse (indices);
+    }
     if(!ENDP(indices)) {
         type et = ultimate_type(entity_type(e));
         list new_indices = NIL;
@@ -118,7 +127,7 @@ static void do_linearize_array_reference(reference r) {
             }
             new_indices=CONS(EXPRESSION,new_index,new_indices);
         }
-        reference_indices(r)=gen_nreverse(new_indices);
+	reference_indices(r)=gen_nreverse(new_indices);
     }
 }
 
@@ -137,11 +146,17 @@ static bool do_linearize_type(type *t, bool *rr) {
     size_t uvl = gen_length(variable_dimensions(uv));
     size_t vl = gen_length(variable_dimensions(v));
     if(uvl > 1 ) {
-      dimension nd = make_dimension(int_to_expression(0),
-                         make_op_exp(MINUS_OPERATOR_NAME,
-				     SizeOfDimensions(variable_dimensions(uv)),
-				     int_to_expression(1))
-				    );
+      dimension nd = dimension_undefined;
+      if (is_fortran_p == true) {
+	nd = make_dimension(int_to_expression(1),
+			    SizeOfDimensions(variable_dimensions(uv)));
+      }
+      else {
+	nd = make_dimension(int_to_expression(0),
+			    make_op_exp(MINUS_OPERATOR_NAME,
+					SizeOfDimensions(variable_dimensions(uv)),
+					int_to_expression(1)));
+      }
 
       type nt = type_undefined;
       bool free_it = false;
@@ -687,7 +702,7 @@ static void do_array_to_pointer(entity m, statement s) {
 }
 
 /* linearize accesses to an array, and use pointers if asked to */
-bool linearize_array_generic (char *module_name, const bool is_fortran)
+bool linearize_array_generic (char *module_name)
 {
 
     debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
@@ -695,7 +710,7 @@ bool linearize_array_generic (char *module_name, const bool is_fortran)
     set_current_module_entity(module_name_to_entity( module_name ));
 
     /* Do we have to cast the array at call site ? */
-    if (is_fortran == true) {
+    if (is_fortran_p == true) {
       use_pointers_p      = false;
       modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
       cast_at_call_site_p = false;
@@ -727,7 +742,7 @@ bool linearize_array_generic (char *module_name, const bool is_fortran)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-	if (is_fortran == true) {
+	if (is_fortran_p == true) {
 	  // remove decls_text or the prettyprinter will use that field
 	  discard_module_declaration_text (get_current_module_entity ());
 	}
@@ -746,10 +761,11 @@ bool linearize_array_generic (char *module_name, const bool is_fortran)
 /* linearize accesses to an array, and use pointers if asked to */
 bool linearize_array(char *module_name)
 {
-  return linearize_array_generic (module_name, false);
+  return linearize_array_generic (module_name);
 }
 
 bool linearize_array_fortran(char *module_name)
 {
-  return linearize_array_generic (module_name, true);
+  is_fortran_p = true;
+  return linearize_array_generic (module_name);
 }
