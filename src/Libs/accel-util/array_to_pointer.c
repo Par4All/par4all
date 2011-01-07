@@ -45,24 +45,24 @@
 #include "preprocessor.h"
 #include "accel-util.h"
 
-/**
- * This boolean is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
- * property Turning it on break further effects analysis, but without
- * the cast it might
- * break compilation or at least generate warnings for type mismatch
- */
-static bool cast_at_call_site_p = FALSE;
-
-/**
- * This boolean is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
- */
-static bool use_pointers_p = FALSE;
-
-/**
- * This boolean is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
- * property
- */
-static bool modify_call_site_p = FALSE;
+typedef struct {
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
+     * property Turning it on break further effects analysis, but without
+     * the cast it might
+     * break compilation or at least generate warnings for type mismatch
+     */
+    bool cast_at_call_site_p;
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
+     */
+    bool use_pointers_p;
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
+     * property
+     */
+    bool modify_call_site_p;
+} param_t;
 
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
@@ -143,7 +143,7 @@ static bool do_linearize_type(type *t, bool *rr) {
     size_t vl = gen_length(variable_dimensions(v));
     if(uvl > 1 ) {
       dimension nd = dimension_undefined;
-      if (fortran_module_p(get_current_module_entity()) == true) {
+      if (fortran_module_p(get_current_module_entity()) ) {
 	nd = make_dimension(int_to_expression(1),
 			    SizeOfDimensions(variable_dimensions(uv)));
       }
@@ -218,7 +218,7 @@ static bool do_array_to_pointer_type(type *t) {
 }
 
 
-static void do_linearize_array_manage_callers(entity m,set linearized_param) {
+static void do_linearize_array_manage_callers(entity m,set linearized_param, param_t *param) {
     list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(m), true));
     list callers_statement = callers_to_statements(callers);
     list call_sites = callers_to_call_sites(callers_statement,m);
@@ -242,7 +242,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                             );
                             */
                     if(array_type_p(type_at_call_site)) {
-                      if(cast_at_call_site_p) {
+                      if(param->cast_at_call_site_p) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
@@ -253,7 +253,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        if(!use_pointers_p) {
+                        if(!param->use_pointers_p) {
                           *arg=MakeUnaryCall(
                               entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                               *arg);
@@ -274,14 +274,14 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        if(!use_pointers_p) {
+                        if(!param->use_pointers_p) {
                           *arg=MakeUnaryCall(
                               entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                               *arg);
                         }
                     }
                 }
-                else if(!use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
+                else if(!param->use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
                     *arg =
                         MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
@@ -459,7 +459,7 @@ static void do_linearize_prepatch(entity m,statement s) {
     }
 }
 
-static void do_linearize_array(entity m, statement s) {
+static void do_linearize_array(entity m, statement s, param_t *param) {
     /* step 0: remind all expressions types */
     hash_table e2t = init_expression_is_pointer(s);
 
@@ -499,7 +499,7 @@ static void do_linearize_array(entity m, statement s) {
             set_add_element(linearized_param,linearized_param,p);
 
         // Convert to pointer if requested
-        if(use_pointers_p) {
+        if(param->use_pointers_p) {
           if(dummy_identifier_p(d)) {
             entity di = dummy_identifier(d);
             do_array_to_pointer_type(&entity_type(di));
@@ -510,8 +510,8 @@ static void do_linearize_array(entity m, statement s) {
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
-    if (modify_call_site_p) {
-      do_linearize_array_manage_callers(m,linearized_param);
+    if (param->modify_call_site_p) {
+      do_linearize_array_manage_callers(m,linearized_param,param);
     }
     set_free(linearized_param);
 
@@ -664,7 +664,7 @@ static void insert_statements_after_declarations(statement st, list stats) {
 }
 
 /* transform each array type in module @p m with statement @p s */
-static void do_array_to_pointer(entity m, statement s) {
+static void do_array_to_pointer(entity m, statement s, param_t *p) {
     /* step1: the statements */
     do_array_to_pointer_walker(s);
     FOREACH(ENTITY,e,entity_declarations(m))
@@ -705,17 +705,13 @@ bool linearize_array_generic (char *module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
 
+    param_t param = { .use_pointers_p = false , .modify_call_site_p = false, .cast_at_call_site_p = false };
     /* Do we have to cast the array at call site ? */
-    if (fortran_module_p(get_current_module_entity()) == true) {
-      use_pointers_p      = false;
-      modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
-      cast_at_call_site_p = false;
+    if (c_module_p(get_current_module_entity())) {
+      param.use_pointers_p      = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
+      param.cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
     }
-    else {
-      use_pointers_p      = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
-      modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
-      cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
-    }
+    param.modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
@@ -723,12 +719,12 @@ bool linearize_array_generic (char *module_name)
         set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
         /* just linearize accesses and change signature from n-D arrays to 1-D arrays */
-        do_linearize_array(get_current_module_entity(),get_current_module_statement());
+        do_linearize_array(get_current_module_entity(),get_current_module_statement(),&param);
 
         /* additionnaly perform array-to-pointer conversion for c modules only */
-        if(use_pointers_p) {
+        if(param.use_pointers_p) {
             if(c_module_p(get_current_module_entity())) {
-                do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
+                do_array_to_pointer(get_current_module_entity(),get_current_module_statement(),&param);
                 cleanup_subscripts(get_current_module_statement());
             }
             else pips_user_warning("no pointers in fortran !,LINEARIZE_ARRAY_USE_POINTERS ignored\n");
@@ -738,7 +734,7 @@ bool linearize_array_generic (char *module_name)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-	if (fortran_module_p(get_current_module_entity()) == true) {
+	if (fortran_module_p(get_current_module_entity()) ) {
 	  // remove decls_text or the prettyprinter will use that field
 	  discard_module_declaration_text (get_current_module_entity ());
 	}
