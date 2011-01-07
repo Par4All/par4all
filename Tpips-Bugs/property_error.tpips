@@ -1,0 +1,18 @@
+
+delete property_error
+create property_error car.c
+
+setproperty ABORT_ON_USER_ERROR 2
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+
+# An error on the first property is detected. 
+# The second property that should prettyprint blocks is not taken into account
+# The third property that gives statement ordering is properly set
+
+display PRINTED_FILE
+
+echo Note that BLOCKS are not prettyprinted
+ 
+close
+quit
