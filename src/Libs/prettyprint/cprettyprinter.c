@@ -1077,8 +1077,7 @@ static string c_reference(reference r)
 
     list l_dim = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
 
-    MAP(EXPRESSION, e,
-    {
+    FOREACH (EXPRESSION, e,reference_indices(r)) {
       expression e_tmp;
       expression e_lower = dimension_lower(DIMENSION(CAR(l_dim)));
       string s;
@@ -1103,7 +1102,7 @@ static string c_reference(reference r)
       //free(s);
       free_expression(e_tmp);
       POP(l_dim);
-    }, reference_indices(r));
+    }
 
 
     old = result;
