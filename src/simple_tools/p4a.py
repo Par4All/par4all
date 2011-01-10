@@ -82,7 +82,6 @@ def add_own_options(parser):
 
     parser.add_option_group(proc_group)
 
-
     cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
 
     cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
