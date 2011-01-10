@@ -10041,8 +10041,9 @@ must exist in the symbol table.
 
 This transformation loop over the symbol table, and for each of them which is
 a typedef, compare the local name to the property 
-\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure 
-because there can be differents typedef with same in different compilation unit, 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure
+because there can be differents typedef with the same name in different
+compilation units,
 resulting in differents entries in the symbol table for a same local name. The
 return type can also be incoherent with the return statement, thus it's not sure
 to run it on a non void function.
@@ -13675,15 +13676,21 @@ print_crough  > MODULE.crough
               < MODULE.summary_effects
 \end{PipsMake}
 
+\begin{PipsPass}{print_c_code}
+Display the crough output of a fortran function.
+\end{PipsPass}
+
 \begin{PipsMake}
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
 
+\begin{PipsPass}{print_interface}
 Once C version of fortran code has been generated, ones might like to call this
 C functions from fortran code. A convenient way to do this is to use an
 interface in the fortran code. PIPS can generate the interface module for any
 function using the following pass.
+\end{PipsPass}
 
 \begin{PipsMake}
 print_interface  > MODULE.interface
