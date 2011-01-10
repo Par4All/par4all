@@ -214,6 +214,10 @@ def p4a_die_env(message):
 
     die(message + "\nIt looks like the Par4All environment has not been properly set.\n Have you sourced par4all-rc.sh?")
 
+def add_list_to_set (l, s):
+    """ add all elements of the list to the set"""
+    for e in l:
+        s.add (e)
 
 default_log_file = os.path.join(os.getcwd(), program_name + ".log")
 log_file_handler = None
