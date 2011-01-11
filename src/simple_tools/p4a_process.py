@@ -552,7 +552,7 @@ class p4a_processor(object):
         if (dest_dir == None) and ( prefix == "") and (suffix == ""):
             suffix = "p4a"
         
-        #Set the suffix to p4a-accel if the file uses an OpenMP simulation of accelerator   
+        #Set the suffix to p4a-accel if the file uses an OpenMP simulation of accelerators   
         if self.accel and self.openmp:
                 suffix = "p4a-accel"
 
