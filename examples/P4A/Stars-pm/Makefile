@@ -102,7 +102,7 @@ clean :
 				 $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.cu) \
 				 $(COMMON_SOURCES:.c=.p4a.c)  $(BASE_SOURCES:.c=.p4a.c) $(GRAPHICS:.c=.p4a.c) \
 				 $(COMMON_SOURCES:.c=.p4a.cu) $(BASE_SOURCES:.c=.p4a.cu) $(GRAPHICS:.c=.p4a.cu) \
-				  *~ *.database *.build *.o include/stars-pm.h
+				  *~ *.database *.build *.o include/stars-pm-generated.h
 
 run-%: $(TARGET)_%
 	# Run a version and display timing information:
@@ -113,35 +113,28 @@ run-%: $(TARGET)_%
 # To have shortcut as seq for of typing hyantes-static-99_seq
 %:$(TARGET)_% ;
 
-%_seq : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h
+%_seq : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated.h
 	# Compilation of the sequential program:
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 
-%_openmp : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h $(STUBS)
+%_openmp : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated.h $(STUBS)
 	# Parallelize and build an OpenMP version:
 	p4a $(P4A_OPTIONS) $(CPPFLAGS)  -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 	# P4A openmp end !
 
-%_autocuda : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h $(STUBS)
+%_autocuda : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated.h $(STUBS)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) $(LDLIBS)
 	
 
-%_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm.h
+%_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm-generated.h
 	# Parallelize and build a CUDA version:
 	$(NVCC) $(CPPFLAGS) $(LDFLAGS) -lcufft $(LDLIBS) -o $@ $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 
 	
-include/stars-pm.h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
+include/stars-pm-generated.h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	@echo "Generating headers $@" 
-	echo '#include "varglob.h"' > $@
-	echo '#ifdef __cplusplus' >> $@
-	echo 'extern "C" {' >> $@
-	echo '#endif' >> $@	
-	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ >> $@
-	echo '#ifdef __cplusplus' >> $@
-	echo '}' >> $@
-	echo '#endif' >> $@	
-	
+	echo >$@
+	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
 	
 	  

@@ -1,4 +1,4 @@
-#include "stars-pm.h"
+#include "stars-pm-cuda.h"
 #include "kernel_tools.h"
 
 
