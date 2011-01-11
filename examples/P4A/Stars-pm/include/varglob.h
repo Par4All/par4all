@@ -9,7 +9,7 @@
 #define NPART (NP*NP*NP)
 #define LBOX 6.
 #define G 1.
-#define TMAX 10
+#define TMAX 7.5
 #define DX (LBOX/NP)
 #define DT (5*1e-2)
 #define BLOCK_SIZE 2

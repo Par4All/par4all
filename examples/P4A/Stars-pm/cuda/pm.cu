@@ -65,6 +65,8 @@ int main(int argc, char **argv) {
 
   potential_init_plan(NULL); // Init fft stuff
 
+  P4A_init_timing; // Init timing stuff
+
 #ifdef _GLGRAPHICS_
       graphic_gldraw(argc, argv, pos); // Initialize Opengl
 #endif

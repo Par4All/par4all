@@ -12,8 +12,25 @@ endif
 
 # You can set P4A_OPTIONS to pass options to p4a
 CFLAGS+= -O3 -std=c99 -Wall
-CPPFLAGS+= -D_GNU_SOURCE -I./include
+CPPFLAGS+= -D_GNU_SOURCE -I./include -I./
 LDLIBS+= -lm -lfftw3f
+
+ifdef size
+CPPFLAGS+= -DNP=$(size)
+endif
+
+
+
+
+ifeq ($(debug),1)
+CPPFLAGS+= -DP4A_DEBUG
+P4A_OPTIONS+= -DP4A_DEBUG 
+endif
+
+ifeq ($(timing),1)
+CPPFLAGS+= -DP4A_TIMING
+P4A_OPTIONS+= -DP4A_TIMING
+endif
 
 
 # To play with OpenMP parameters:
@@ -34,7 +51,7 @@ BASE_SOURCES= sequential/pm.c \
 							sequential/1-discretization.c sequential/2-histogramme.c sequential/3-potential.c \
 							sequential/4-updateforce.c sequential/4-updatevel.c sequential/6-updatepos.c
 
-CUDA_SOURCES= cuda/pm.cu \
+CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
 							cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
 							cuda/4-updateforce.cu cuda/4-updatevel.cu cuda/6-updatepos.cu
 
@@ -100,14 +117,14 @@ run-%: $(TARGET)_%
 	# Compilation of the sequential program:
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 
-%_openmp : $(SOURCES) $(GRAPHICS) include/stars-pm.h
+%_openmp : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h $(STUBS)
 	# Parallelize and build an OpenMP version:
-	p4a $(P4A_OPTIONS) -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
-        # P4A openmp end !
+	p4a $(P4A_OPTIONS) $(CPPFLAGS)  -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
+	# P4A openmp end !
 
-%_autocuda : $(SOURCES) $(GRAPHICS) include/stars-pm.h
+%_autocuda : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.cu) $(LDLIBS)
+	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) $(LDLIBS)
 	
 
 %_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm.h
@@ -118,5 +135,13 @@ run-%: $(TARGET)_%
 include/stars-pm.h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	@echo "Generating headers $@" 
 	echo '#include "varglob.h"' > $@
-	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(GRAPHICS_CPPFLAGS) -I./include/ >> $@
-  
+	echo '#ifdef __cplusplus' >> $@
+	echo 'extern "C" {' >> $@
+	echo '#endif' >> $@	
+	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ >> $@
+	echo '#ifdef __cplusplus' >> $@
+	echo '}' >> $@
+	echo '#endif' >> $@	
+	
+	
+	  

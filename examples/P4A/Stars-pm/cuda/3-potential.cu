@@ -83,12 +83,11 @@ __global__ void k_correction_pot(float *pot, float coeff)
 
 
 static cufftHandle plan = NULL;
-cufftComplex *cdens;
+cufftComplex *cdens = NULL;
 
-void potential_init_plan(float cdens[NP][NP][NP][2]) {
+void potential_init_plan(float unused[NP][NP][NP][2]) {
   cufftPlan3d(&plan,NP,NP,NP,CUFFT_C2C);
   toolTestExec(cudaMalloc((void**)&cdens,sizeof(cufftComplex)*NP*NP*NP));
-
 }
 
 void potential_free_plan() {
