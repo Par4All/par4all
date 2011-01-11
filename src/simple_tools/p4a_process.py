@@ -214,6 +214,8 @@ class p4a_processor(object):
     generated_modules = []
     # the list of the crough modules
     crough_modules = []
+    # the list of module with interfaces
+    interface_modules = []
     # the set of cuda modules
     cuda_modules = set ()
     # the set of c modules
@@ -416,9 +418,7 @@ class p4a_processor(object):
     def fortran_wrapper_p (self, file_name):
         prefix = self.get_fortran_wrapper_prefix()
         fortran_wrapper_file_name_re = re.compile(prefix + "_[0-9]+.f")
-        m = fortran_wrapper_file_name_re.match (file_name)
-        print "gortran_wrapper : "
-        print m
+        m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
     def gpuify(self, filter_select = None, filter_exclude = None):
@@ -508,22 +508,12 @@ class p4a_processor(object):
             fftw3_kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
-        # Unfortunately CUDA 3.0 does not accept C99 array declarations
-        # with sizes also passed as parameters in kernels. So we degrade
-        # the quality of the generated code by generating array
-        # declarations as pointers and by accessing them as
-        # array[linearized expression]:
-        if (self.fortran == False):
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        else:
-            kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-
         # Indeed, it is not only in kernels but also in all the CUDA code
         # that these C99 declarations are forbidden. We need them in the
         # original code for more precise analysis but we need to remove
         # them everywhere :-(
-        kernel_P4A_re = re.compile("^(P4A_.*|main)$")
-        skip_P4A = self.workspace.filter(lambda m: not kernel_P4A_re.match(m.name))
+        #kernel_P4A_re = re.compile("^(P4A_.*|main)$")
+        #skip_P4A = self.workspace.filter(lambda m: not kernel_P4A_re.match(m.name))
         #self.workspace.all_functions.array_to_pointer(
         #skip_P4A.array_to_pointer(
         #    ARRAY_TO_POINTER_FLATTEN_ONLY = True,
@@ -537,14 +527,23 @@ class p4a_processor(object):
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
+        # Select fortran wrappers by using the fact that all the generated
+        # fortran wrappers
+        # have their names of this form:
+        f_wrapper_prefix = self.get_fortran_wrapper_prefix ()
+        f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\d+$")
+        f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
+
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         if (self.fortran == False):
+            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
         else:
+            kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
         # set return type for wrappers && kernel
@@ -568,6 +567,8 @@ class p4a_processor(object):
             # the C functions of the wrappers from the fortran_wrapper
             # subroutines
             wrappers.print_interface ()
+            self.interface_modules.extend (map(lambda x:x.name, wrappers))
+            self.generated_modules.extend (map(lambda x:x.name, f_wrappers))
 
         #update some list of modules
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
@@ -695,8 +696,6 @@ class p4a_processor(object):
                         # To have the nVidia compiler to be happy, we need to
                         # have a .cu version of the .c file
                         output_file = p4a_util.change_file_ext(output_file, ".cu")
-                if (self.fortran_wrapper_p (file) == True):
-                    self.post_process_fortran_wrapper (file)
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
@@ -704,15 +703,13 @@ class p4a_processor(object):
             output_files.append(output_file)
 
         # Save crough files
-        output_dir = os.path.join(os.getcwd(), "added_file")
+        output_dir = os.path.join(os.getcwd(), "p4a_new_file")
         if dest_dir:
-            output_dir = os.path.join(dest_dir,"added_file")
+            output_dir = os.path.join(dest_dir,"p4a_new_file")
         if not (os.path.isdir(output_dir)):
             os.makedirs (output_dir)
 
         for name in self.crough_modules:
-            if not (os.path.isdir(dir)):
-                os.makedirs (dir)
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname(), name, name + ".c")
             # set the destination file
@@ -720,13 +717,32 @@ class p4a_processor(object):
                 output_name = name + ".cu"
             else:
                 output_name = name + ".c"
-
-            if prefix:
-                 output_name = prefix + output_name
-            if suffix:
-                p4a_util.file_add_suffix(output_name, suffix)
             # The final destination
             output_file = os.path.join(output_dir, output_name)
+            # Copy the PIPS production to its destination:
+            shutil.copyfile(pips_file, output_file)
+            output_files.append(output_file)
+
+        for name in self.interface_modules:
+            # Where the file does well in the .database workspace:
+            pips_file = os.path.join(self.workspace.dirname(), name,
+                                     name + "_interface.f95")
+            output_name = name + "_interface.f95"
+            # The final destination
+            output_file = os.path.join(output_dir, output_name)
+            # Copy the PIPS production to its destination:
+            shutil.copyfile(pips_file, output_file)
+            output_files.append(output_file)
+
+        for name in self.generated_modules:
+            # Where the file does well in the .database workspace:
+            pips_file = os.path.join(self.workspace.dirname(), "Src",
+                                     name + ".f")
+            output_name = name + ".f08"
+            # The final destination
+            output_file = os.path.join(output_dir, output_name)
+            if (self.fortran_wrapper_p (pips_file) == True):
+                self.post_process_fortran_wrapper (pips_file)
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             output_files.append(output_file)

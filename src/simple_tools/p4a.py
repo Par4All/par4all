@@ -268,6 +268,7 @@ def add_fortran_cuda_properties (prop_dict):
     prop_dict ["GPU_LAUNCHER_PREFIX"]                   = "P4A_KERNEL_LAUNCHER"
     prop_dict ["GPU_FORTRAN_WRAPPER_PREFIX"]            = "P4A_FORTRAN_WRAPPER"
     prop_dict ["CROUGH_ALL_SCALAR_BY_VALUE"]            = True
+    prop_dict ["PRETTYPRINT_STATEMENT_NUMBER"]          = False
     prop_dict ["CROUGH_FORTRAN_USES_INTERFACE"]         = True
     prop_dict ["KERNEL_LOAD_STORE_LOAD_FUNCTION_2D"]    = "P4A_COPY_TO_ACCEL_2D"
     prop_dict ["KERNEL_LOAD_STORE_ALLOCATE_FUNCTION"]   = "P4A_ACCEL_MALLOC"
