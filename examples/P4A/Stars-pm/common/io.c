@@ -5,16 +5,16 @@
 // FIXME .cpp ?
 
 
-void readDataFile(unsigned int n,
-                  float mp[NCELL][NCELL][NCELL],
-                  coord pos[NCELL][NCELL][NCELL],
-                  coord vel[NCELL][NCELL][NCELL],
+void readDataFile(float mp[NP][NP][NP],
+                  coord pos[NP][NP][NP],
+                  coord vel[NP][NP][NP],
                   char *filename) {
-  unsigned int np = n;
+  int n;
+  int np = NPART;
 
   // Initialisation des particules depuis un fichier
 #ifdef VERBOSE
-  printf("Reading %d particules in %s\n",np, filename);
+  printf("Reading %d particules in %s\n",NP, filename);
 #endif
 
   FILE *ic;
@@ -43,7 +43,6 @@ void readDataFile(unsigned int n,
     exit(-1);
   }
 
-
   // Masses
   if(np != fread(mp, sizeof(float), np, ic)) {
     perror("Erreur de lecture des masses dans le fichier.");
@@ -51,7 +50,8 @@ void readDataFile(unsigned int n,
     exit(-1);
   }
 
-  np = 3 * np;
+  np = 3 * NPART;
+
   // Positions
   if(np != fread(*pos, sizeof(float), np, ic)) {
     perror("Erreur de lecture des positions dans le fichier.");
@@ -107,7 +107,7 @@ int writeparti(char fname[], int field[]) {
 
 void dumpfield(char fname[], float *field) {
   FILE *fp;
-  int ncell = NCELL;
+  int ncell = NP;
   float lbox = LBOX;
 
   printf("dumping field in %s\n", fname);
@@ -115,12 +115,13 @@ void dumpfield(char fname[], float *field) {
   fp = fopen(fname, "w");
   fwrite(&ncell, sizeof(int), 1, fp);
   fwrite(&lbox, sizeof(float), 1, fp);
-  fwrite(field, sizeof(float), NCELL * NCELL * NCELL, fp);
+  fwrite(field, sizeof(float), NP * NP * NP, fp);
   fclose(fp);
 }
 
-int writepos(int np, char fname[], float *pos, float *vel, float time) {
+int writepos(char fname[], float *pos, float *vel, float time) {
   FILE *fp;
+  int np = NPART;
 
   printf("dump part in %s\n", fname);
 
@@ -135,20 +136,20 @@ int writepos(int np, char fname[], float *pos, float *vel, float time) {
 
 }
 
-int dump_pos(coord pos[NCELL][NCELL][NCELL], int npdt) {
+int dump_pos(coord pos[NP][NP][NP], int npdt) {
   FILE *fp;
   char fname[255];
   snprintf(fname,255,"out%d",npdt);
   printf("dump part in %s\n", fname);
 
   fp = fopen(fname, "w");
-  fwrite(pos, sizeof(coord), NCELL*NCELL*NCELL, fp);
+  fwrite(pos, sizeof(coord), NP*NP*NP, fp);
   fclose(fp);
 
   return 0;
 
 }
-int read_pos(coord pos[NCELL][NCELL][NCELL], int npdt, char *fname_) {
+int read_pos(coord pos[NP][NP][NP], int npdt, char *fname_) {
   FILE *fp;
   char static_fname[255];
   char *fname = static_fname;
@@ -166,7 +167,11 @@ int read_pos(coord pos[NCELL][NCELL][NCELL], int npdt, char *fname_) {
   }
 
   printf("Reading %s\n", fname);
-  fread(pos, sizeof(coord), NCELL*NCELL*NCELL, fp);
+  if(NPART != fread(pos, sizeof(coord), NPART, fp)) {
+    perror("Erreur de lecture des coordonnées dans le fichier.");
+    fclose(fp);
+    exit(-1);
+  }
   fclose(fp);
 
   return 1;

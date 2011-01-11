@@ -9,8 +9,8 @@ int usleep(int usec);
 
 int idList;
 
-static coord (*pos)[NCELL][NCELL] = NULL;
-static int (*histo)[NCELL][NCELL] = NULL;
+static coord (*pos)[NP][NP] = NULL;
+static int (*histo)[NP][NP] = NULL;
 
 pthread_t thread1 = 0;
 int redisplay_p = 2;
@@ -29,7 +29,7 @@ static int init_p = 0;
 #define LEFT_ARROW 75
 #define RIGHT_ARROW 77
 
-void renderScene(void) {
+static void renderScene(void) {
   if(init_p) {
     if(redisplay_p) {
       redisplay_p--;
@@ -41,9 +41,9 @@ void renderScene(void) {
 
       if(pos) {
         glBegin(GL_POINTS);
-        for (int i = 0; i < NCELL; i++) {
-          for (int j = 0; j < NCELL; j++) {
-            for (int k = 0; k < NCELL; k++) {
+        for (int i = 0; i < NP; i++) {
+          for (int j = 0; j < NP; j++) {
+            for (int k = 0; k < NP; k++) {
               float x = pos[i][j][k]._[0] - 3;
               float y = pos[i][j][k]._[1] - 3;
               float z = pos[i][j][k]._[2] - 3;
@@ -58,10 +58,10 @@ void renderScene(void) {
       if(histo) {
         float max = 0;
         float delta = 6.0f/128.0f;
-        for (int i = 0; i < NCELL; i++) {
-          for (int j = 0; j < NCELL; j++) {
+        for (int i = 0; i < NP; i++) {
+          for (int j = 0; j < NP; j++) {
             int sum = 0;
-            for (int k = 0; k < NCELL; k++) {
+            for (int k = 0; k < NP; k++) {
               sum +=histo[i][j][k];
             }
             float c = sqrtf(sqrtf((float)sum/11000));
@@ -69,12 +69,12 @@ void renderScene(void) {
           }
         }
         printf("max : %f\n",max);
-        for (int i = 0; i < NCELL; i++) {
+        for (int i = 0; i < NP; i++) {
           float i_ = ((float)i)*delta-3.0;
-          for (int j = 0; j < NCELL; j++) {
+          for (int j = 0; j < NP; j++) {
             float j_ = ((float)j)*delta-3.0;
             int sum = 0;
-            for (int k = 0; k < NCELL; k++) {
+            for (int k = 0; k < NP; k++) {
               sum +=histo[i][j][k];
             }
             float c = sqrtf(sqrtf((float)sum/max));
@@ -96,8 +96,9 @@ void renderScene(void) {
     glutPostRedisplay();
   }
 }
+
 /* The function called whenever a normal key is pressed. */
-void keyPressed(unsigned char key, int x, int y) {
+static void keyPressed(unsigned char key, int x, int y) {
   /* avoid thrashing this procedure */
   usleep(100);
 
@@ -141,7 +142,7 @@ void keyPressed(unsigned char key, int x, int y) {
 }
 
 /* The function called whenever a normal key is pressed. */
-void specialKeyPressed(int key, int x, int y) {
+static void specialKeyPressed(int key, int x, int y) {
   /* avoid thrashing this procedure */
   usleep(100);
 
@@ -167,7 +168,7 @@ void specialKeyPressed(int key, int x, int y) {
 }
 
 /* The function called when our window is resized (which shouldn't happen, because we're fullscreen) */
-GLvoid ReSizeGLScene(GLsizei Width, GLsizei Height) {
+static GLvoid ReSizeGLScene(GLsizei Width, GLsizei Height) {
   /*
    if(Height == 0) // Prevent A Divide By Zero If The Window Is Too Small
    Height = 1;
@@ -216,7 +217,7 @@ void *mainloop(void *unused) {
   return NULL;
 }
 
-void graphic_gldraw(int argc_, char **argv_, coord pos_[NCELL][NCELL][NCELL]) {
+void graphic_gldraw(int argc_, char **argv_, coord pos_[NP][NP][NP]) {
   argc = argc_;
   argv = argv_;
   pos = pos_;
@@ -226,7 +227,7 @@ void graphic_gldraw(int argc_, char **argv_, coord pos_[NCELL][NCELL][NCELL]) {
   }
 }
 
-void graphic_gldraw_histo(int argc_, char **argv_, int histo_[NCELL][NCELL][NCELL]) {
+void graphic_gldraw_histo(int argc_, char **argv_, int histo_[NP][NP][NP]) {
   argc = argc_;
   argv = argv_;
   pos = NULL;
@@ -241,7 +242,7 @@ void graphic_gldestroy(void) {
   thread1 = 0;
 }
 
-void graphic_glupdate(coord pos_[NCELL][NCELL][NCELL]) {
+void graphic_glupdate(coord pos_[NP][NP][NP]) {
   redisplay_p++;
 }
 

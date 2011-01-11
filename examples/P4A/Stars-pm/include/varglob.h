@@ -1,16 +1,19 @@
 #ifndef __VARGLOB__H_
 #define __VARGLOB__H_
 
-#define NCELL 128
-#define NPART (NCELL*NCELL*NCELL)
-#define NELEM (NPART)
+#ifndef NP
+// Default size
+#define NP 128
+#endif
+
+#define NPART (NP*NP*NP)
 #define LBOX 6.
 #define G 1.
 #define TMAX 10
-#define DX (LBOX/NCELL)
+#define DX (LBOX/NP)
 #define DT (5*1e-2)
 #define BLOCK_SIZE 2
-#define NPBLOCK (NCELL)
+#define NPBLOCK (NP)
 #define NTHREAD 256
 #define NDATA_PER_THREAD 1
 #define MAXDIMZ 32

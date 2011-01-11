@@ -18,10 +18,10 @@ static void init(int argc, char **argv) {
   gtk_init(&argc, &argv);
 
   pix_data.magic = GDK_PIXBUF_MAGIC_NUMBER;
-  pix_data.height = NCELL;
-  pix_data.width = NCELL;
+  pix_data.height = NP;
+  pix_data.width = NP;
   pix_data.pixdata_type = GDK_PIXDATA_COLOR_TYPE_RGB;
-  pix_data.rowstride = NCELL * sizeof(int);
+  pix_data.rowstride = NP * sizeof(int);
   pix_data.pixel_data = malloc(sizeof(int) * pix_data.height
       * pix_data.rowstride);
   memset(pix_data.pixel_data, 0, sizeof(int) * pix_data.height
@@ -55,22 +55,22 @@ static void init(int argc, char **argv) {
   gdk_rgb_init();
 }
 
-void graphic_draw(int argc, char **argv, int histo[NCELL][NCELL][NCELL]) {
+void graphic_draw(int argc, char **argv, int histo[NP][NP][NP]) {
   if(window == NULL) {
     init(argc, argv);
   }
 
-  guchar pixbuf[3 * NCELL * NCELL];
+  guchar pixbuf[3 * NP * NP];
 
-  for (int x = 0; x < NCELL; x++) {
-    for (int y = 0; y < NCELL; y++) {
+  for (int x = 0; x < NP; x++) {
+    for (int y = 0; y < NP; y++) {
       int sum = 0;
-      for (int z = 0; z < NCELL; z++) {
+      for (int z = 0; z < NP; z++) {
         sum += histo[x][y][z];
       }
-      pixbuf[x * NCELL * 3 + y * 3] = sum & 0xFF0000 >> 16;
-      pixbuf[x * NCELL * 3 + y * 3 + 1] = sum & 0xFF00 >> 8;
-      pixbuf[x * NCELL * 3 + y * 3 + 2] = sum & 0xFF;
+      pixbuf[x * NP * 3 + y * 3] = sum & 0xFF0000 >> 16;
+      pixbuf[x * NP * 3 + y * 3 + 1] = sum & 0xFF00 >> 8;
+      pixbuf[x * NP * 3 + y * 3 + 2] = sum & 0xFF;
     }
   }
 
@@ -78,11 +78,11 @@ void graphic_draw(int argc, char **argv, int histo[NCELL][NCELL][NCELL]) {
                      *image->style->fg_gc,
                      0,
                      0,
-                     NCELL,
-                     NCELL,
+                     NP,
+                     NP,
                      GDK_RGB_DITHER_NONE,
                      pixbuf,
-                     NCELL * 3);
+                     NP * 3);
 
   while(gtk_events_pending())
     gtk_main_iteration();

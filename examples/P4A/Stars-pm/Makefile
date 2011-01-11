@@ -1,16 +1,18 @@
 # A GNU makefile to run a demo of Par4All on "stars-pm" application
-
+NVCC= nvcc
+CC= gcc
 TARGET= stars-pm
 
 ifeq "$(USE_FLOAT)" "1"
 # Use single precision for the OpenMP and GPU version:
 P4A_OPTIONS= -DUSE_FLOAT
 # Use also single precision for the sequential version:
-CFLAGS+= -DUSE_FLOAT
+CPPFLAGS+= -DUSE_FLOAT
 endif
 
 # You can set P4A_OPTIONS to pass options to p4a
-CFLAGS+= -O3 -std=c99 -Wall -D_GNU_SOURCE
+CFLAGS+= -O3 -std=c99 -Wall
+CPPFLAGS+= -D_GNU_SOURCE -I./include
 LDLIBS+= -lm -lfftw3f
 
 
@@ -26,12 +28,22 @@ LDLIBS+= -lm -lfftw3f
 #export OMP_NESTED
 
 
-SOURCES= pm.c io.c
+COMMON_SOURCES = common/io.c
+
+BASE_SOURCES= sequential/pm.c \
+							sequential/1-discretization.c sequential/2-histogramme.c sequential/3-potential.c \
+							sequential/4-updateforce.c sequential/4-updatevel.c sequential/6-updatepos.c
+
+CUDA_SOURCES= cuda/pm.cu \
+							cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
+							cuda/4-updateforce.cu cuda/4-updatevel.cu cuda/6-updatepos.cu
+
+STUBS = stubs/pips_stubs.c
+
+
 OBJS=$(SOURCES:.c=.o)
-STUBS = pips_stubs.c
 
 #.PHONY: clean demo $(addprefix demo_, $(TARGET)) $(addprefix run_, $(TARGET) $(TARGET:=_omp) $(TARGET:=_p4a_omp) $(TARGET:=_p4a_cuda))
-
 #.DEFAULT:
 #	echo Target $@ not implemented...
 
@@ -42,14 +54,18 @@ STUBS = pips_stubs.c
 #.INTERMEDIATE: $(TARGET:=_seq)
 
 ifeq ($(opengl),1)
-CFLAGS+= -D_GLGRAPHICS_
-GRAPHICS+= glgraphics.o
+GRAPHICS_CPPFLAGS+= -D_GLGRAPHICS_
+CPPFLAGS+=$(GRAPHICS_CPPFLAGS)
+GRAPHICS+= common/glgraphics.o
+GRAPHICS_SRC+= common/glgraphics.c
 LDLIBS+= -lGL -lGLU -lglut
 P4A_OPTIONS+= -D_GLGRAPHICS_ --extra-obj=glgraphics.o
 endif
 ifeq ($(gtk),1)
-CFLAGS+= -D_GRAPHICS_ `pkg-config --cflags gtk+-2.0`
-GRAPHICS+= graphics.o
+GRAPHICS_CPPFLAGS+= -D_GRAPHICS_ `pkg-config --cflags-only-I gtk+-2.0` 
+CPPFLAGS+=-D_GRAPHICS_ `pkg-config --cflags gtk+-2.0`
+GRAPHICS+= common/graphics.o
+GRAPHICS_SRC+= common/graphics.c
 LDLIBS+= `pkg-config --libs gtk+-2.0`
 P4A_OPTIONS+= -D_GRAPHICS_ --extra-obj=graphics.o
 endif
@@ -64,7 +80,12 @@ demo : display_seq display_openmp display_cuda ;
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.c) $(SOURCES:.c=.p4a.c) $(STUBS:.c=.p4a.cu) $(SOURCES:.c=.p4a.cu) *~ *.database *.build *.o
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) \
+				 $(TARGET:=.p4a.c) $(STUBS:.c=.p4a.c) \
+				 $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.cu) \
+				 $(COMMON_SOURCES:.c=.p4a.c)  $(BASE_SOURCES:.c=.p4a.c) $(GRAPHICS:.c=.p4a.c) \
+				 $(COMMON_SOURCES:.c=.p4a.cu) $(BASE_SOURCES:.c=.p4a.cu) $(GRAPHICS:.c=.p4a.cu) \
+				  *~ *.database *.build *.o include/stars-pm.h
 
 run-%: $(TARGET)_%
 	# Run a version and display timing information:
@@ -75,15 +96,27 @@ run-%: $(TARGET)_%
 # To have shortcut as seq for of typing hyantes-static-99_seq
 %:$(TARGET)_% ;
 
-%_seq : $(SOURCES) $(GRAPHICS)
+%_seq : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm.h
 	# Compilation of the sequential program:
-	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $^
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 
-%_openmp : $(SOURCES) $(GRAPHICS)
+%_openmp : $(SOURCES) $(GRAPHICS) include/stars-pm.h
 	# Parallelize and build an OpenMP version:
 	p4a $(P4A_OPTIONS) -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
         # P4A openmp end !
 
-%_cuda : $(SOURCES) $(GRAPHICS)
+%_autocuda : $(SOURCES) $(GRAPHICS) include/stars-pm.h
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.cu) $(LDLIBS)
+	
+
+%_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm.h
+	# Parallelize and build a CUDA version:
+	$(NVCC) $(CPPFLAGS) $(LDFLAGS) -lcufft $(LDLIBS) -o $@ $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
+
+	
+include/stars-pm.h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
+	@echo "Generating headers $@" 
+	echo '#include "varglob.h"' > $@
+	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(GRAPHICS_CPPFLAGS) -I./include/ >> $@
+  
