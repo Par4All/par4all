@@ -306,7 +306,7 @@ class p4a_processor(object):
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
         # on, not to be parallelized :-)
-        skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
+        skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!$")
 
         # Also filter out modules based on --include-modules and
         # --exclude-modules.

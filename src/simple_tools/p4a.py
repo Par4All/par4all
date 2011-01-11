@@ -5,10 +5,10 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
-import p4a_builder 
+import p4a_builder
 import p4a_opts
-import p4a_process 
-import p4a_util 
+import p4a_process
+import p4a_util
 import os
 import re
 import optparse
@@ -48,7 +48,7 @@ def add_own_options(parser):
     proc_group = optparse.OptionGroup(parser, "PIPS processing options")
 
     proc_group.add_option("--accel", "-A", action = "store_true", default = False,
-        help = "Parallelize for heterogeneous accelerators by using the Par4All Accel run-time that allows executing code for various hardware accelerators such as GPU or even OpenMP emulation.")
+        help = "Parallelize for heterogeneous accelerators by using the Par4All Accel run-time that allows executing code for various hardware accelerators such as GPU or even OpenMP emulation. If used alone, it uses OpenMP simulation of the heterogeneous accelerator")
 
     proc_group.add_option("--cuda", "-C", action = "store_true", default = False,
         help = "Enable CUDA generation. Implies --accel.")
@@ -81,8 +81,6 @@ def add_own_options(parser):
         help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
 
     parser.add_option_group(proc_group)
-
-
     cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
 
     cpp_group.add_option("--cpp", metavar = "PREPROCESSOR", default = None,
@@ -227,6 +225,9 @@ def add_own_options(parser):
 
     parser.add_option_group(output_group)
 
+empty_precondition_re = re.compile(r"user warning in ordinary_summary_precondition: empty precondition to \w+ because not in call tree from main.$")
+does_not_modify_the_store_re = re.compile(r"user warning in proper_effects_of_call: Statement [0-9]+ is ignored because it does not modify the store.$")
+storage_return_re = re.compile(r"user warning in add_or_kill_equivalenced_variables: storage return$")
 error_re = re.compile(r"^\w+ error ")
 warning_re = re.compile(r"^\w+ warning ")
 property_redefined_re = re.compile(r"property \S+ redefined")
@@ -242,9 +243,12 @@ def pips_output_filter(s):
     elif began_comment:
         began_comment += s
         if s.find("\" is lost") != -1:
-            p4a_util.warn("PIPS: " + began_comment)
+            #Filter out these
+            #p4a_util.warn("PIPS: " + began_comment)
             already_printed_warning_errors.append(began_comment)
             began_comment = ""
+    elif empty_precondition_re.search(s) or does_not_modify_the_store_re.search (s):
+        already_printed_warning_errors.append(s)
     elif s.find("Cannot preprocess file") != -1:
         p4a_util.error("PIPS: " + s)
     elif error_re.search(s) and s not in already_printed_warning_errors:

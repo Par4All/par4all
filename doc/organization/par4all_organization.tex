@@ -905,10 +905,22 @@ which is merged into \texttt{p4a-packages}.
 During \Apfa construction, these sources are patched and compiled into the
 \Apips Fortran~95 parser.
 
+Concretely, to add for example the new 4.4.4 version, you do a:
+\begin{verbatim}
+git checkout p4a-gcc-gfc
+git checkout -b p4a-gcc-gfc-4.4.4
+<do your work and commit>
+git checkout p4a-gcc-gfc
+git merge p4a-gcc-gfc-4.4.4
+\end{verbatim}
 
-\subsubsection{Old version}
+
+\subsubsection{Old version (historical)}
 \label{sec:old-version}
 
+
+This describes the organization at the begin of the project, if you want
+to understand the past organization for historical reasons.
 
 This part from Raphaël \textsc{Roosz}is into the \texttt{package/pips-gfc}
 directory. It contains plain \Agcc core and Fortran 4.4.1 distribution,

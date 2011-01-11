@@ -1,11 +1,19 @@
-2010-12-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2011-01-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
 		* Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
 		  global variables.
 
-		  Thanks to Sarnath Kannan for this bug report.
+		  Thanks to Sarnath Kannan for this bug report. It should work now
+		  on common cases.
 
+		* Prototype on lazy CUDA communication optimizations
 
+		* Fixed a space iteration transposition bug in accelerator mode
+		  that was killing performances
+
+		* Better error and warning messages
+
+		* Script cleaning by using Python module names everywhere
 
 2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
