@@ -1,3 +1,7 @@
+#ifndef __KERNEL_TOOLS__H_
+#define __KERNEL_TOOLS__H_
+
+
 #include <stdio.h>
 
 /*********************************
@@ -120,3 +124,5 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     P4A_TIMING_display_elasped_time(kernel); \
   } while (0)
 
+
+#endif // __KERNEL_TOOLS__H_

@@ -8,6 +8,7 @@
 #include "varglob.h"
 #include "io.h"
 
+#ifndef P4A_FFTW3
 
 void fftwf_free(void *p) {
   free(p);
@@ -30,6 +31,8 @@ fftwf_plan fftwf_plan_dft_3d(int nx, int ny, int nz, fftwf_complex *in, fftwf_co
 void* fftwf_malloc(int size) {
  return malloc(size);
 }
+
+#endif // P4A_FFTW3
 
 int getopt_long(int argc, char * const argv[],
                   const char *optstring,
