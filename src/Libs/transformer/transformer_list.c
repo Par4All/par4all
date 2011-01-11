@@ -577,3 +577,137 @@ transformer transformer_list_closure_to_precondition(list tl,
 
   return p_star;
 }
+
+/* Returns a list of projected transformers. If a value of a variable
+   in list proj appears in t of tl, it is projected. New transformers
+   are allocated to build the projection list*/
+list transformer_list_safe_variables_projection(list tl, list proj)
+{
+  list ptl = NIL;
+  FOREACH(TRANSFORMER, t, tl) {
+    list apl = NIL; // actual projection list
+    transformer nt = copy_transformer(t);
+    FOREACH(ENTITY, v, proj) {
+      if(entity_is_argument_p(v, transformer_arguments(t))) {
+	entity ov = entity_to_old_value(v);
+	apl = CONS(ENTITY, ov, apl);
+      }
+      apl = CONS(ENTITY, v, apl);
+    }
+    nt = safe_transformer_projection(nt, apl);
+    ptl = CONS(TRANSFORMER, nt, ptl);
+    gen_free_list(apl);
+  }
+  ptl = gen_nreverse(ptl);
+  return ptl;
+}
+
+/* Returns the list of variables modified by at least one transformer
+   in tl */
+list transformer_list_to_argument(list tl)
+{
+  list vl = NIL;
+
+  FOREACH(TRANSFORMER, t, tl) {
+    FOREACH(ENTITY, v, transformer_arguments(t)) {
+      if(!gen_in_list_p(v, vl))
+	vl = CONS(ENTITY, v, vl);
+    }
+  }
+
+  vl = gen_nreverse(vl);
+
+  return vl;
+}
+
+/* build a sublist sl of the transformer list tl with transformers that
+   modify the value of variable v */
+list transformer_list_with_effect(list tl, entity v)
+{
+  list sl = NIL;
+
+  FOREACH(TRANSFORMER, t, tl){
+    if(entity_is_argument_p(v, transformer_arguments(t)))
+      sl = CONS(TRANSFORMER, t, sl);
+  }
+  sl = gen_nreverse(sl);
+  return sl;
+}
+
+/* returns the list of variables in vl which are not modified by
+   transformers belonging to tl-tl_v. tl_v is assumed to be a subset
+   of tl. */
+list transformer_list_preserved_variables(list vl, list tl, list tl_v)
+{
+  list pvl = NIL;
+
+  FOREACH(ENTITY, v, vl) {
+    bool found_p = FALSE;
+    FOREACH(TRANSFORMER, t, tl) {
+      if(!gen_in_list_p(t, tl_v)) {
+	if(entity_is_argument_p(v, transformer_arguments(t))) {
+	  found_p = TRUE;
+	  break;
+	}
+      }
+    }
+    if(!found_p) {
+      pvl = CONS(ENTITY, v, pvl);
+    }
+  }
+
+  pvl = gen_nreverse(pvl);
+
+  return pvl;
+}
+
+/* When some variables are not modified by some transformers, use
+   projections on subsets to increase the number of identity
+   transformers and to increase the accuracy of the loop precondition.
+
+   The preconditions obtained with the different projections are
+   intersected.
+ */
+transformer transformer_list_multiple_closure_to_precondition(list tl,
+							      transformer c_t,
+							      transformer p_0)
+{
+  transformer prec = transformer_list_closure_to_precondition(tl, c_t, p_0);
+  list al = transformer_arguments(prec);
+  list vl = transformer_list_to_argument(tl); // list of modified
+					      // variables
+  // FI: this is too strong vl must only be included in transformer_arguments(prec)
+  //pips_assert("all modified variables are argument of the global precondition",
+  //arguments_equal_p(vl, transformer_arguments(prec)));
+  FOREACH(ENTITY, v, vl) {
+    // FI: the same projection could be obtained for different
+    // variables v and the computation should not be performed again
+    // but I choose not to memoize past lists tl_v
+    list tl_v = transformer_list_with_effect(tl, v);
+
+    if(gen_length(tl_v)<gen_length(tl)) {
+      list keep_v = transformer_list_preserved_variables(vl, tl, tl_v);
+      list proj_v = arguments_difference(vl, keep_v);
+      list ptl_v = transformer_list_safe_variables_projection(tl_v, proj_v);
+      transformer p_0_v
+	= safe_transformer_projection(copy_transformer(p_0), proj_v);
+      transformer c_t_v
+	= safe_transformer_projection(copy_transformer(c_t), proj_v);
+      transformer prec_v
+	= transformer_list_closure_to_precondition(ptl_v, c_t_v, p_0_v);
+      transformer_arguments(prec_v) = gen_copy_seq(al); // memory leak
+      prec = transformer_intersection(prec, prec_v); // memory leak
+
+      free_transformer(prec_v);
+      free_transformer(c_t_v);
+      free_transformer(p_0_v);
+      gen_full_free_list(ptl_v);
+      gen_free_list(keep_v);
+    }
+    gen_free_list(tl_v);
+  }
+
+  gen_free_list(vl);
+  pips_assert("prec is consistent", transformer_consistency_p(prec));
+  return prec;
+}

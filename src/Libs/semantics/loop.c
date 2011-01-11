@@ -3003,7 +3003,8 @@ transformer whileloop_to_postcondition(
       else { // transformer lists are used and at least two
 	     // transformers have been found
 	transformer c_t = condition_to_transformer(c, pre_fuzzy, TRUE);
-	transformer preb1 = transformer_list_closure_to_precondition(btl, c_t, pre_init);
+	//transformer preb1 = transformer_list_closure_to_precondition(btl, c_t, pre_init);
+	transformer preb1 = transformer_list_multiple_closure_to_precondition(btl, c_t, pre_init);
 	//pre_next = transformer_combine(pre_next, tf);
 	//pre_next = precondition_add_condition_information(pre_next, c,
 	//						  pre_next, TRUE);
