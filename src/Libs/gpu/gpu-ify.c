@@ -177,7 +177,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
       */
       asprintf(&intrinsic_name,
 	       get_string_property("GPU_COORDINATE_INTRINSICS_FORMAT"),
-	       i);
+	       depth - 1 - i);
       /* Add a comment in the form of
 
 	 To be replaced with a call to P4A_vp_1: j
