@@ -119,6 +119,7 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
+            openmp=input.openmp,
             com_optimization = input.com_optimization,
             fftw3 = input.fftw3,
             recover_includes = input.recover_includes,
@@ -208,7 +209,7 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False, 
+                 filter_exclude = None, accel = False, cuda = False, openmp = False,
                  com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  properties = {}, activates = []):
@@ -217,6 +218,7 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.openmp = openmp
         self.com_optimization = com_optimization
         self.fftw3 = fftw3,
 
@@ -549,6 +551,10 @@ class p4a_processor(object):
         #Set the suffix if needed to avoid file destruction
         if (dest_dir == None) and ( prefix == "") and (suffix == ""):
             suffix = "p4a"
+        
+        #Set the suffix to p4a-accel if the file uses an OpenMP simulation of accelerator   
+        if self.accel and self.openmp:
+                suffix = "p4a-accel"
 
         #append or prepend the . to prefix or suffix
         if not (suffix == ""):
@@ -609,7 +615,7 @@ class p4a_processor(object):
                 if self.cuda:
                     # To have the nVidia compiler to be happy, we need to
                     # have a .cu version of the .c file
-                    output_file = p4a_util.change_file_ext(output_file, ".cu")
+                    output_file = p4a_util.change_file_ext(output_file, ".cu")                        
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
