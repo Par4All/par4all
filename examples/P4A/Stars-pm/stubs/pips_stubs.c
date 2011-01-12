@@ -1,15 +1,10 @@
 
 #include <stdio.h>
-#include <math.h>
-#include <stdlib.h>
 #include <string.h>
-#include <getopt.h>
+#include "stars-pm.h"
+
+#ifndef P4A_RUNTIME_FFTW
 #include <fftw3.h>
-#include "varglob.h"
-#include "io.h"
-
-#ifndef P4A_FFTW3
-
 void fftwf_free(void *p) {
   free(p);
 }
@@ -32,7 +27,7 @@ void* fftwf_malloc(int size) {
  return malloc(size);
 }
 
-#endif // P4A_FFTW3
+#endif // P4A_RUNTIME_FFTW
 
 int getopt_long(int argc, char * const argv[],
                   const char *optstring,
@@ -45,7 +40,7 @@ int getopt_long(int argc, char * const argv[],
 void graphic_destroy(void) {
   printf("");
 }
-void graphic_draw(int argc, char **argv, int histo[NCELL][NCELL][NCELL]) {
+void graphic_draw(int argc, char **argv, int histo[NP][NP][NP]) {
   printf("");
 }
 #endif
@@ -54,11 +49,11 @@ void graphic_draw(int argc, char **argv, int histo[NCELL][NCELL][NCELL]) {
 void graphic_gldestroy(void) {
   printf("");
 }
-void graphic_glupdate(coord pos[NCELL][NCELL][NCELL]) {
+void graphic_glupdate(coord pos[NP][NP][NP]) {
   int i,j,k;
-  for (i = 0; i < NCELL; i++) {
-    for (j = 0; j < NCELL; j++) {
-      for (k = 0; k < NCELL; k++) {
+  for (i = 0; i < NP; i++) {
+    for (j = 0; j < NP; j++) {
+      for (k = 0; k < NP; k++) {
         float x = pos[i][j][k]._[0]-3;
         float y = pos[i][j][k]._[1]-3;
         float z = pos[i][j][k]._[2]-3;
@@ -67,7 +62,7 @@ void graphic_glupdate(coord pos[NCELL][NCELL][NCELL]) {
     }
   }
 }
-void graphic_gldraw(int argc, char **argv, coord pos_[NCELL][NCELL][NCELL]) {
+void graphic_gldraw(int argc, char **argv, coord pos_[NP][NP][NP]) {
   printf("");
 }
 #endif

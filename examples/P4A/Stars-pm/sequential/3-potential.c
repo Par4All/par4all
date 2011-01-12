@@ -64,12 +64,14 @@ static void fft_laplacian7(float field[NP][NP][NP][2]) {
         field[i][j][k][1] = field[i][j][k][1] * G * M_PI * DX * DX / k2 / NP
             / NP / NP; // FFT NORMALISATION
 
+        if(i==0&&j==0&&k==0) {
+          field[0][0][0][0] = 0;
+          field[0][0][0][1] = 0;
+        }
       }
     }
   }
 
-  field[0][0][0][0] = 0;
-  field[0][0][0][1] = 0;
 
 }
 

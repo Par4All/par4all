@@ -1,7 +1,7 @@
 #include <string.h>
 #include <math.h>
 
-#include "stars-pm.h"
+#include "stars-pm-cuda.h"
 
 void histogram(int data[NP][NP][NP],
                int histo[NP][NP][NP]) {

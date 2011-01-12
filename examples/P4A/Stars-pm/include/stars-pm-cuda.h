@@ -15,6 +15,9 @@ void graphic_gldraw(int argc_, char **argv_, coord pos_[NP][NP][NP]);
 void graphic_gldraw_histo(int argc_, char **argv_, int histo_[NP][NP][NP]);
 void graphic_gldestroy(void);
 void graphic_glupdate(coord pos_[NP][NP][NP]);
+/* common/graphics.c */
+void graphic_destroy(void);
+void graphic_draw(int argc, char **argv, int histo[NP][NP][NP]);
 }
 
 

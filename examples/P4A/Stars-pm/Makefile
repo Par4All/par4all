@@ -61,6 +61,8 @@ CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
 							cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
 							cuda/4-updateforce.cu cuda/4-updatevel.cu cuda/6-updatepos.cu
 
+CPROTO_GRAPHICS_SRC = common/graphics.c common/glgraphics.c
+
 STUBS = stubs/pips_stubs.c
 
 
@@ -82,16 +84,19 @@ CPPFLAGS+=$(GRAPHICS_CPPFLAGS)
 GRAPHICS+= common/glgraphics.o
 GRAPHICS_SRC+= common/glgraphics.c
 LDLIBS+= -lGL -lGLU -lglut
-P4A_OPTIONS+= -D_GLGRAPHICS_ --extra-obj=glgraphics.o
+CULIBS+= -lGL -lGLU -lglut
+P4A_OPTIONS+= -D_GLGRAPHICS_ --extra-obj=common/glgraphics.o
 BIN_SUFFIX:=$(BIN_SUFFIX)_opengl
 endif
 ifeq ($(gtk),1)
 GRAPHICS_CPPFLAGS+= -D_GRAPHICS_ `pkg-config --cflags-only-I gtk+-2.0` 
-CPPFLAGS+=-D_GRAPHICS_ `pkg-config --cflags gtk+-2.0`
+CFLAGS+=`pkg-config --cflags gtk+-2.0`
+CPPFLAGS+=-D_GRAPHICS_ 
 GRAPHICS+= common/graphics.o
 GRAPHICS_SRC+= common/graphics.c
-LDLIBS+= `pkg-config --libs gtk+-2.0`
-P4A_OPTIONS+= -D_GRAPHICS_ --extra-obj=graphics.o
+LDLIBS+= `pkg-config --libs-only-l --libs-only-L gtk+-2.0`
+CULIBS+= `pkg-config --libs-only-l --libs-only-L gtk+-2.0`
+P4A_OPTIONS+= -D_GRAPHICS_ --extra-obj=common/graphics.o
 BIN_SUFFIX:=$(BIN_SUFFIX)_gtk
 endif
 
@@ -134,11 +139,11 @@ run-%: $(TARGET)_%
 
 %_autocuda : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 %_autocuda_comm_optimization : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 
 %_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h
@@ -149,6 +154,6 @@ run-%: $(TARGET)_%
 include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	@echo "Generating headers $@" 
 	echo >$@
-	cproto  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
+	cproto  `pkg-config --cflags-only-I gtk+-2.0` $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
 	
 	  
