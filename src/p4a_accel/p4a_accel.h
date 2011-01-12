@@ -217,6 +217,7 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 #define P4A_skip_debug(debug_stuff)
 #endif
 
+#include <stdio.h>
 
 /** Output a debug message à la printf */
 #define P4A_dump_message(...)						\
