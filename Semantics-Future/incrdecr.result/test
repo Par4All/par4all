@@ -1,4 +1,8 @@
 
+WITHOUT TRANSFORMER LISTS
+=========================
+
+
 TRANSFORMERS
 
 
@@ -24,8 +28,7 @@ void run(void)
 
       checking_error();
 
-//  T(c,d,i) {c+d==c#init+i, c+d==i, d#init==0, i#init==0, c#init<=c,
-//    0<=d}
+//  T(c,d,i) {c==0, c#init==0, d==i, d#init==0, i#init==0, 0<=d}
 
    while (1) {
 
@@ -63,88 +66,53 @@ void run(void)
 
                ;
 
-//  T(c,d,i) {c==c#init, d+i#init==d#init+i, d#init<=d}
-
-
-      while (flip()) {
-
 //  T(c,i) {c==1, c#init==0, i==i#init+1, d<=i}
 
-         if (c==0) {
+      if (c==0) {
 
 //  T(c) {c==1, c#init==0}
 
-            c++;
+         c++;
 
 //  T(i) {c==1, i==i#init+1}
 
-            i++;
+         i++;
 
 //  T() {c==1, d<=i}
 
-            if (i<d)
+         if (i<d)
 
 //  T() {0==-1}
 
-               checking_error();
-         }
-         else
+            checking_error();
+      }
+      else
 
 //  T() {}
 
-            while (1)
+         while (1)
 
 //  T() {}
 
-               ;
+            ;
 
 //  T(c,d) {c==1, c#init+d#init==d+1, d#init<=d, d<=i}
 
-         while (flip())
+      while (flip())
 
 //  T(c,d) {c==c#init-1, d==d#init+1, 1<=c, d<=i}
 
-            if (c>=2) {
+         if (c>=2) {
 
 //  T(c) {c==c#init-1, 1<=c}
 
-               c--;
+            c--;
 
 //  T(d) {d==d#init+1, 1<=c}
 
-               d++;
-
-//  T() {1<=c, d<=i}
-
-               if (i<d)
-
-//  T() {0==-1}
-
-                  checking_error();
-            }
-            else
-
-//  T() {c<=1}
-
-               while (1)
-
-//  T() {c<=1}
-
-                  ;
-
-//  T(c,d) {c==0, c#init==1, d==d#init+1, d<=i}
-
-         if (c==1) {
-
-//  T(c) {c==0, c#init==1, d<=i}
-
-            c--;
-
-//  T(d) {c==0, d==d#init+1, d<=i+1}
-
             d++;
 
-//  T() {c==0, d<=i}
+//  T() {1<=c, d<=i}
 
             if (i<d)
 
@@ -154,14 +122,43 @@ void run(void)
          }
          else
 
-//  T() {0==-1}
+//  T() {c<=1}
 
             while (1)
 
-//  T() {0==-1}
+//  T() {c<=1}
 
                ;
+
+//  T(c,d) {c==0, c#init==1, d==d#init+1, d<=i}
+
+      if (c==1) {
+
+//  T(c) {c==0, c#init==1, d<=i}
+
+         c--;
+
+//  T(d) {c==0, d==d#init+1, d<=i+1}
+
+         d++;
+
+//  T() {c==0, d<=i}
+
+         if (i<d)
+
+//  T() {0==-1}
+
+            checking_error();
       }
+      else
+
+//  T() {0==-1}
+
+         while (1)
+
+//  T() {0==-1}
+
+            ;
    }
 }
 
@@ -230,86 +227,51 @@ void run(void)
 
 //  P(c,d,i) {c==0, d==i, 0<=d}
 
-
-      while (flip()) {
-
-//  P(c,d,i) {c==0, d==i, 0<=d}
-
-         if (c==0) {
+      if (c==0) {
 
 //  P(c,d,i) {c==0, d==i, 0<=d}
 
-            c++;
+         c++;
 
 //  P(c,d,i) {c==1, d==i, 0<=d}
 
-            i++;
+         i++;
 
 //  P(c,d,i) {c==1, d==i-1, 0<=d}
 
-            if (i<d)
+         if (i<d)
 
 //  P() {0==-1}
 
-               checking_error();
-         }
-         else
+            checking_error();
+      }
+      else
 
 //  P() {0==-1}
 
-            while (1)
+         while (1)
 
 //  P() {0==-1}
 
-               ;
+            ;
 
 //  P(c,d,i) {c==1, d==i-1, 0<=d}
 
-         while (flip())
+      while (flip())
 
 //  P(c,d,i) {c==1, d==i-1, 0<=d}
 
-            if (c>=2) {
+         if (c>=2) {
 
 //  P() {0==-1}
-
-               c--;
-
-//  P() {0==-1}
-
-               d++;
-
-//  P() {0==-1}
-
-               if (i<d)
-
-//  P() {0==-1}
-
-                  checking_error();
-            }
-            else
-
-//  P(c,d,i) {c==1, d==i-1, 0<=d}
-
-               while (1)
-
-//  P(c,d,i) {c==1, d==i-1, 0<=d}
-
-                  ;
-
-//  P(c,d,i) {c==1, d==i-1, 0<=d}
-
-         if (c==1) {
-
-//  P(c,d,i) {c==1, d==i-1, 0<=d}
 
             c--;
 
-//  P(c,d,i) {c==0, d==i-1, 0<=d}
+//  P() {0==-1}
 
             d++;
 
-//  P(c,d,i) {c==0, d==i, 1<=d}
+//  P() {0==-1}
 
             if (i<d)
 
@@ -319,13 +281,364 @@ void run(void)
          }
          else
 
-//  P() {0==-1}
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
 
             while (1)
 
-//  P() {0==-1}
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
 
                ;
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+      if (c==1) {
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+         c--;
+
+//  P(c,d,i) {c==0, d==i-1, 0<=d}
+
+         d++;
+
+//  P(c,d,i) {c==0, d==i, 1<=d}
+
+         if (i<d)
+
+//  P() {0==-1}
+
+            checking_error();
       }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+   }
+}
+
+WITH TRANSFORMER LISTS
+======================
+
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(c,d,i) {}
+
+   int i, d, c;
+
+//  T(c,d,i) {c==0, d==0, i==0}
+
+   i = d = c = 0;
+
+//  T() {c==0, d==0, i==0}
+
+
+   if (i<d)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(c,d,i) {c==0, c#init==0, d==i, d#init==0, i#init==0, 0<=d}
+
+   while (1) {
+
+//  T(c,i) {c+i#init==c#init+i, i#init<=i}
+
+      while (flip())
+
+//  T(c,i) {c==c#init+1, i==i#init+1, c<=0, d<=i}
+
+         if (c<0) {
+
+//  T(c) {c==c#init+1, c<=0}
+
+            c++;
+
+//  T(i) {i==i#init+1, c<=0}
+
+            i++;
+
+//  T() {c<=0, d<=i}
+
+            if (i<d)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0<=c}
+
+            while (1)
+
+//  T() {0<=c}
+
+               ;
+
+//  T(c,i) {c==1, c#init==0, i==i#init+1, d<=i}
+
+      if (c==0) {
+
+//  T(c) {c==1, c#init==0}
+
+         c++;
+
+//  T(i) {c==1, i==i#init+1}
+
+         i++;
+
+//  T() {c==1, d<=i}
+
+         if (i<d)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {}
+
+         while (1)
+
+//  T() {}
+
+            ;
+
+//  T(c,d) {c==1, c#init+d#init==d+1, d#init<=d, d<=i}
+
+      while (flip())
+
+//  T(c,d) {c==c#init-1, d==d#init+1, 1<=c, d<=i}
+
+         if (c>=2) {
+
+//  T(c) {c==c#init-1, 1<=c}
+
+            c--;
+
+//  T(d) {d==d#init+1, 1<=c}
+
+            d++;
+
+//  T() {1<=c, d<=i}
+
+            if (i<d)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {c<=1}
+
+            while (1)
+
+//  T() {c<=1}
+
+               ;
+
+//  T(c,d) {c==0, c#init==1, d==d#init+1, d<=i}
+
+      if (c==1) {
+
+//  T(c) {c==0, c#init==1, d<=i}
+
+         c--;
+
+//  T(d) {c==0, d==d#init+1, d<=i+1}
+
+         d++;
+
+//  T() {c==0, d<=i}
+
+         if (i<d)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {0==-1}
+
+         while (1)
+
+//  T() {0==-1}
+
+            ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int i, d, c;
+
+//  P(c,d,i) {}
+
+   i = d = c = 0;
+
+//  P(c,d,i) {c==0, d==0, i==0}
+
+
+   if (i<d)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(c,d,i) {c==0, d==0, i==0}
+
+   while (1) {
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+      while (flip())
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+         if (c<0) {
+
+//  P() {0==-1}
+
+            c++;
+
+//  P() {0==-1}
+
+            i++;
+
+//  P() {0==-1}
+
+            if (i<d)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+            while (1)
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+               ;
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+      if (c==0) {
+
+//  P(c,d,i) {c==0, d==i, 0<=d}
+
+         c++;
+
+//  P(c,d,i) {c==1, d==i, 0<=d}
+
+         i++;
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+         if (i<d)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+      while (flip())
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+         if (c>=2) {
+
+//  P() {0==-1}
+
+            c--;
+
+//  P() {0==-1}
+
+            d++;
+
+//  P() {0==-1}
+
+            if (i<d)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+            while (1)
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+               ;
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+      if (c==1) {
+
+//  P(c,d,i) {c==1, d==i-1, 0<=d}
+
+         c--;
+
+//  P(c,d,i) {c==0, d==i-1, 0<=d}
+
+         d++;
+
+//  P(c,d,i) {c==0, d==i, 1<=d}
+
+         if (i<d)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
    }
 }
