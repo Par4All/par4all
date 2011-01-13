@@ -15,11 +15,11 @@ int main()
    pFile = fopen("myfile.txt", "w");
 //  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    for(n = 0; n <= 2; n += 1) {
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       puts("please, enter a name: ");
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       gets(name);
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 //  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}

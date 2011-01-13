@@ -45,12 +45,7 @@ echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[inter01]
-echo
-echo POINTS TO
-echo
-
-display PRINTED_FILE[main]
+display PRINTED_FILE[%ALLFUNC]
 
 
 

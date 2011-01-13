@@ -21,9 +21,9 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
       register int k;
       unsigned short _return0;
       for ((k = 0, i = col*I_0);k<I_0;(k++, i++)) {
-         _return0 = array_s[k];
-         val = _return0;
-         array_d[i] = val;
+	_return0 = array_s[k];
+	val = _return0;
+	array_d[i] = val;
       }
    }
 }

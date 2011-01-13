@@ -8,7 +8,6 @@ create fprintf01 fprintf01.c
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
-
 echo
 echo POINTS TO
 echo
