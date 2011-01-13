@@ -80,7 +80,7 @@
 #define INDENT		"indent"
 #define CROUGH		".crough"
 #define CPRETTY		".c"
-#define INTERFACE	"_interface.f95"
+#define INTERFACE	"_interface.f08"
 
 // define an extension to append to scalar name in function signature
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
@@ -595,8 +595,8 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
 
-		// In the case of a signature check if the scalar need to
-		// be passed by pointer. If the check return true
+		// In the case of a signature check if the scalars need to
+		// be passed by pointers. If the check return true
 		// a "*" must be added
 		if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
 		    (scalar_by_pointer (var) == true)) {
@@ -609,6 +609,16 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
 		  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
 					     l_rename);
 		  l_entity = gen_entity_cons(var, l_entity);
+		}
+		// In case of a signature check if the arrays need to
+		// be passed by pointers. If the check return true
+		// a "*" must be added and the dim must be remove
+		else if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
+			 (scalar_by_pointer (var) == true)) {
+		  ext = "";
+		  sptr = "*";
+		  free (sd);
+		  sd = "";
 		}
 		else {
 		  ext = "";
@@ -1724,7 +1734,7 @@ static string interface_code_string(entity module, statement stat)
   result = strdup(concatenate ("module ", name, "_interface\n",
 			       "\tinterface\n",
 			       "\t\tsubroutine ", name, signature,
-			       " bind(C, name = \"", name, "\"\n",
+			       " bind(C, name = \"", name, "\")\n",
 			       "\t\t\tuse iso_c_binding\n", decls,
 			       "\t\tend subroutine ", name,
 			       "\n\tend interface\n",
@@ -1799,7 +1809,7 @@ bool print_interface (string module_name)
 
   /* save to file */
   out = safe_fopen(filename, "w");
-  fprintf(out, "/* Fortran interface module for %s. */\n", module_name);
+  fprintf(out, "! Fortran interface module for %s. \n", module_name);
   fprintf(out, "%s", interface_code);
   safe_fclose(out, filename);
 

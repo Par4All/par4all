@@ -11742,7 +11742,7 @@ When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
 \verb+TRUE+. The resulting code is more readable, but is larger.
 
-\begin{PipsProp}{PRETTYPRINT_LOOSE} 
+\begin{PipsProp}{PRETTYPRINT_LOOSE}
 PRETTYPRINT_LOOSE TRUE
 \end{PipsProp}
 
@@ -13736,6 +13736,13 @@ CROUGH_INTEGER_TYPE "p4a_int"
 
 \begin{PipsProp}{CROUGH_REAL_TYPE}
 CROUGH_REAL_TYPE "p4a_real"
+\end{PipsProp}
+
+Is is possible to prettyprint function parameters that are arrays as pointers
+using the propertie CROUGH\_ARRAY\_PARAMETER\_AS\_POINTER
+
+\begin{PipsProp}{CROUGH_ARRAY_PARAMETER_AS_POINTER}
+CROUGH_ARRAY_PARAMETER_AS_POINTER FALSE
 \end{PipsProp}
 
 When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an
