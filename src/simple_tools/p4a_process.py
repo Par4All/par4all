@@ -64,6 +64,7 @@ default_fortran_cuda_properties = dict(
     KERNEL_LOAD_STORE_ALLOCATE_FUNCTION   = "P4A_ACCEL_MALLOC",
     KERNEL_LOAD_STORE_STORE_FUNCTION_2D   = "P4A_COPY_FROM_ACCEL_2D",
     KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_ACCEL_FREE",
+    KERNEL_LOAD_STORE_VAR_SUFFIX="_num"
 )
 
 # Import of pyps will be done manually.
