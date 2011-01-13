@@ -1,0 +1,25 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="ArrayPointer02"
+delete $WS
+create $WS $WS.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+setproperty CROUGH_ARRAY_PARAMETER_AS_POINTER TRUE
+
+display C_PRINTED_FILE[ARRAYPOINTER02]
+
+echo
+echo compiles C output
+echo
+shell cc -Wall -Werror -c $WS.database/ARRAYPOINTER02/ARRAYPOINTER02.c  -o $WS.database/ARRAYPOINTER02/ARRAYPOINTER02.o
+
+close
+delete $WS
+quit
