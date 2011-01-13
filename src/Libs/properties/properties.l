@@ -248,6 +248,8 @@ static void parse_properties(void)
 static void parse_properties_file(FILE * fd)
 {
     string_to_parse = NULL;
+    update_property = FALSE; // FI: Tpips/property.tpips, to survive
+			     // the open after the close
     yyrestart(fd);
     parse_properties();
 }
