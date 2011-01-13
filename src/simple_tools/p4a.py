@@ -265,23 +265,6 @@ def pips_output_filter(s):
     else:
         p4a_util.debug("PIPS: " + s)
 
-def add_fortran_cuda_properties (prop_dict):
-    """The default values of some PIPS propeties are ok for C but has to be
-    redifined for FORTRAN
-    """
-    prop_dict ["GPU_KERNEL_PREFIX"]                     = "P4A_KERNEL"
-    prop_dict ["GPU_WRAPPER_PREFIX"]                    = "P4A_KERNEL_WRAPPER"
-    prop_dict ["GPU_LAUNCHER_PREFIX"]                   = "P4A_KERNEL_LAUNCHER"
-    prop_dict ["GPU_FORTRAN_WRAPPER_PREFIX"]            = "P4A_FORTRAN_WRAPPER"
-    prop_dict ["CROUGH_ALL_SCALAR_BY_VALUE"]            = True
-    prop_dict ["PRETTYPRINT_STATEMENT_NUMBER"]          = False
-    prop_dict ["CROUGH_FORTRAN_USES_INTERFACE"]         = True
-    prop_dict ["KERNEL_LOAD_STORE_LOAD_FUNCTION_2D"]    = "P4A_COPY_TO_ACCEL_2D"
-    prop_dict ["KERNEL_LOAD_STORE_ALLOCATE_FUNCTION"]   = "P4A_ACCEL_MALLOC"
-    prop_dict ["KERNEL_LOAD_STORE_STORE_FUNCTION_2D"]   = "P4A_COPY_FROM_ACCEL_2D"
-    prop_dict ["KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION"] = "P4A_ACCEL_FREE"
-    return
-
 def main():
     '''The function called when this program is executed by its own'''
     parser = optparse.OptionParser(description = __doc__, usage = "%prog [options] [files]; run %prog --help for options")
@@ -498,8 +481,6 @@ def main():
             # Interpret correctly the True/False strings, and integer strings,
             # for the --property option specifications:
             prop_dict = dict()
-            # Set some properties that are needed to gpuify fortran. The user can overwrite some of them later on.
-            add_fortran_cuda_properties (prop_dict)
             for p in options.property:
                 (k, v) = p.split("=")
                 if v == "False" or v == "false" or v == "FALSE":

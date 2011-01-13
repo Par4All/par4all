@@ -50,6 +50,22 @@ default_properties = dict(
     PRETTYPRINT_SEQUENTIAL_STYLE = "do"
 )
 
+# The default values of some PIPS propeties are ok for C but has to be
+# redifined for FORTRAN
+default_fortran_cuda_properties = dict(
+    GPU_KERNEL_PREFIX                     = "P4A_KERNEL",
+    GPU_WRAPPER_PREFIX                    = "P4A_KERNEL_WRAPPER",
+    GPU_LAUNCHER_PREFIX                   = "P4A_KERNEL_LAUNCHER",
+    GPU_FORTRAN_WRAPPER_PREFIX            = "P4A_FORTRAN_WRAPPER",
+    CROUGH_ALL_SCALAR_BY_VALUE            = True,
+    PRETTYPRINT_STATEMENT_NUMBER          = False,
+    CROUGH_FORTRAN_USES_INTERFACE         = True,
+    KERNEL_LOAD_STORE_LOAD_FUNCTION_2D    = "P4A_COPY_TO_ACCEL_2D",
+    KERNEL_LOAD_STORE_ALLOCATE_FUNCTION   = "P4A_ACCEL_MALLOC",
+    KERNEL_LOAD_STORE_STORE_FUNCTION_2D   = "P4A_COPY_FROM_ACCEL_2D",
+    KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_ACCEL_FREE",
+)
+
 # Import of pyps will be done manually.
 # Module instance will be held in following variable.
 pyps = None
@@ -297,27 +313,23 @@ class p4a_processor(object):
             except:
                 raise
 
+            # If we have #include recovery
+            # and want to use the native
+            # one:
+            recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
             self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
-                                            # If we have #include recovery
-                                            # and want to use the native
-                                            # one:
-                                            recoverInclude = self.recover_includes and self.native_recover_includes)
+                                            recoverInclude = recover_Include)
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
             self.workspace.activate("MUST_REGIONS")
 
-            global default_properties
-            all_properties = default_properties
-            for k in properties:
-                all_properties[k] = properties[k]
-            for k in all_properties:
-                p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
-                self.workspace.props[k] = all_properties[k]
+            # set the workspace properties
+            self.set_properties (properties)
 
 
         # Skip the compilation units and the modules of P4A runtime, they
@@ -338,6 +350,25 @@ class p4a_processor(object):
             and (filter_exclude_re == None or not filter_exclude_re.match(module.name))
             and (filter_select_re == None or filter_select_re.match(module.name)))
 
+    def set_properties (self, user_properties):
+        """ Initialize the properties according to the default defined properties
+        and to the user defined ones.
+        """
+        global default_properties
+        global default_fortran_cuda_properties
+        all_properties = default_properties
+        # if cuda and fortran add some properties
+        if ((self.cuda == True) and (self.fortran == True)):
+            for k in default_fortran_cuda_properties:
+                all_properties[k] = default_fortran_cuda_properties[k]
+        # overwrite default properties with the user defined ones
+        for k in user_properties:
+            all_properties[k] = properties[k]
+        # apply the properties to the workspace
+        for k in all_properties:
+            p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
+            self.workspace.props[k] = all_properties[k]
+        return
 
     def get_database_directory(self):
         "Return the directory of the current PIPS database"
@@ -732,7 +763,7 @@ class p4a_processor(object):
                 if self.cuda:
                     # To have the nVidia compiler to be happy, we need to
                     # have a .cu version of the .c file
-                    output_file = p4a_util.change_file_ext(output_file, ".cu")                        
+                    output_file = p4a_util.change_file_ext(output_file, ".cu")
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
