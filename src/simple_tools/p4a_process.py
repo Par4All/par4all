@@ -428,9 +428,12 @@ class p4a_processor(object):
         2 - insert the pointer declaration for P4A inserted variable
         3 - replace the &origin_var_name by c_loc (origin_var_name)
         4 - declare the origin_var_name as a target
+        5 - replace the f77 multiline mode by the f08 multiline mode
         """
-        print "Processing fortran_wrapper" + file_name
-
+        p4a_util.debug ("Processing fortran_wrapper " + file_name)
+        code = p4a_util.read_file (file_name, True)
+        code = code.replace ("(void **) &", "")
+        p4a_util.write_file(file_name, code, True)
         return
 
     def get_launcher_prefix (self):
@@ -450,7 +453,7 @@ class p4a_processor(object):
 
     def fortran_wrapper_p (self, file_name):
         prefix = self.get_fortran_wrapper_prefix()
-        fortran_wrapper_file_name_re = re.compile(prefix + "_[0-9]+.f")
+        fortran_wrapper_file_name_re = re.compile(prefix + "_[0-9]+.f[0-9]*")
         m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
@@ -585,8 +588,13 @@ class p4a_processor(object):
             kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
         else:
             # generate the C version of kernels, wrappers and launchers.
+            # kernel and wrappers need to be prettyprinted with arrays as
+            # pointers because they will be .cu files
+            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = True
             kernels.display ("c_printed_file")
             wrappers.display ("c_printed_file")
+            # kernel_launchers will be .c file so c99 is allowed
+            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = False
             kernel_launchers.display ("c_printed_file")
             # Do the phase set_return_type_as_typedef using regular expressions
             # because the phase is not available in fortran
@@ -707,8 +715,8 @@ class p4a_processor(object):
         for name in self.interface_modules:
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname(), name,
-                                     name + "_interface.f95")
-            output_name = name + "_interface.f95"
+                                     name + "_interface.f08")
+            output_name = name + "_interface.f08"
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             # Copy the PIPS production to its destination:
