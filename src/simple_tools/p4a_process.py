@@ -64,7 +64,7 @@ default_fortran_cuda_properties = dict(
     KERNEL_LOAD_STORE_ALLOCATE_FUNCTION   = "P4A_ACCEL_MALLOC",
     KERNEL_LOAD_STORE_STORE_FUNCTION_2D   = "P4A_COPY_FROM_ACCEL_2D",
     KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_ACCEL_FREE",
-    KERNEL_LOAD_STORE_VAR_SUFFIX="_num"
+    KERNEL_LOAD_STORE_VAR_SUFFIX          = "_num"
 )
 
 # Import of pyps will be done manually.
@@ -431,42 +431,65 @@ class p4a_processor(object):
         4 - declare the origin_var_name as a target
         5 - replace the f77 multiline mode by the f08 multiline mode
         6 - remove the (void **) & that is not usefull in fortran
+        7 - remove the * in front of the inserted variables
         """
         p4a_util.debug ("Processing fortran_wrapper " + file_name)
+        indent = "      "
         # get the code to be post process
         code = p4a_util.read_file (file_name, True)
         p4a_util.debug (code)
         # step 1
         # insert the needed use statement right after the subroutine declaration
         # common interface to be used
-        use_string = "      use iso_c_binding\n      use p4a_runtime_interface\n"
+        use_string  = indent + "use iso_c_binding\n"
+        use_string += indent + "use p4a_runtime_interface\n"
         # add the dedicated interface i.e use the KERNEL_LAUNCHER prefix
         # instead of the FORTRAN_WRAPPER prefix
-        use_string += "      use "
+        use_string += indent + "use "
         use_string += subroutine_name.replace(self.get_fortran_wrapper_prefix(),
                                               self.get_launcher_prefix())
 
-        use_string += "\n"
-
-        # identify where to insert the use string
-        subroutine_line_re = re.compile("SUBROUTINE " + subroutine_name + ".*$",
-                                        re.MULTILINE)
-        subroutine_l = subroutine_line_re.findall (code)
-        assert (len (subroutine_l) == 1)
-        code = code.replace (subroutine_l[0], subroutine_l[0] + "\n" + use_string)
+        use_string += "_interface\n"
 
         # step 2
         # first identify the inserted variable
         var_prefix = self.get_kernel_load_store_var_prefix ()
-        var_re = re.compile(var_prefix + ".*\\d+")
-        var_l = var_re.findall (code)
-        for m in var_l:
-            p4a_util.debug (m)
-#        f_wrappers.print_call_graph ()
+        var_suffix = self.get_kernel_load_store_var_suffix ()
+        var_re = re.compile(var_prefix + "\\w+" + var_suffix + "\\d+")
+        inserted_var_l = var_re.findall (code)
+        origin_var_s = set ()
+        inserted_var_s = set ()
+        p4a_util.add_list_to_set (inserted_var_l, inserted_var_s)
+        inserted_var_decl = indent + "type (c_ptr) ::"
+        first = True
+        for var in inserted_var_s:
+            if (first == True):
+                first = False
+            else:
+                inserted_var_decl += ","
+            inserted_var_decl += " " + var
+            # extract the original variable name
+            origin_var_s.add (var.replace (var_prefix, "").replace (var_suffix, ""))
+
+        # identify where to insert the use string and the variable declaration
+        subroutine_line_re = re.compile("SUBROUTINE " + subroutine_name + ".*$",
+                                        re.MULTILINE)
+        subroutine_l = subroutine_line_re.findall (code)
+        assert (len (subroutine_l) == 1)
+        code = code.replace (subroutine_l[0], subroutine_l[0] + "\n" +
+                             use_string + inserted_var_decl)
+
+
+
+        # step 5
 
 
         # step 6
         code = code.replace ("(void **) &", "")
+
+        # step 7
+        for var in inserted_var_s:
+            code = code.replace ("*" + var, var)
 
         # write the post processed code
         p4a_util.write_file(file_name, code, True)
@@ -487,6 +510,9 @@ class p4a_processor(object):
 
     def get_kernel_load_store_var_prefix (self):
         return self.workspace.props.KERNEL_LOAD_STORE_VAR_PREFIX
+
+    def get_kernel_load_store_var_suffix (self):
+        return self.workspace.props.KERNEL_LOAD_STORE_VAR_SUFFIX
 
     def fortran_wrapper_p (self, file_name):
         prefix = self.get_fortran_wrapper_prefix()
@@ -645,8 +671,8 @@ class p4a_processor(object):
             # Generate the interface of the wrappers. This will be used to call
             # the C functions of the wrappers from the fortran_wrapper
             # subroutines
-            wrappers.print_interface ()
-            self.interface_modules.extend (map(lambda x:x.name, wrappers))
+            kernel_launchers.print_interface ()
+            self.interface_modules.extend (map(lambda x:x.name, kernel_launchers))
             self.generated_modules.extend (map(lambda x:x.name, f_wrappers))
 
         #update some list of modules
