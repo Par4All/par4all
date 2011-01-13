@@ -45,7 +45,7 @@ fftwf_plan *fftwf_plan_dft_3d(int x,
   plan->out = (cufftComplex *)out;
   plan->direction = direction;
   plan->params = params;
-  plan->datasize = x*y*z*sizeof(float);
+  plan->datasize = x*y*z*sizeof(cufftComplex);
 
   cufftPlan3d(&(plan->cu_plan),x,y,z,CUFFT_C2C);
 
@@ -67,21 +67,41 @@ void fftwf_execute(fftwf_plan *plan) {
 #ifdef P4A_RUNTIME_DEBUG
     fprintf(stderr,"Running fftwf_execute wrapper in P4A cuda, direction is : %d ",plan->direction);
 #endif
+
+    cufftComplex *in,*out;
+#ifndef P4A_COMMUNICATION_RUNTIME
+    P4A_accel_malloc((void **)&in, plan->datasize);
+    P4A_accel_malloc((void **)&out, plan->datasize);
+    P4A_copy_to_accel(plan->datasize,plan->in,in);
+#else
+    in  = (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->in,plan->datasize);
+    out = (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->out,plan->datasize);
+#endif
+
+
   if(plan->direction==FFTW_FORWARD) {
     cufftExecC2C(plan->cu_plan,
-                 (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->in,plan->datasize),
-                 (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->out,plan->datasize),
+                 in,
+                 out,
                  CUFFT_FORWARD);
   } else if(plan->direction==FFTW_BACKWARD ) {
     cufftExecC2C(plan->cu_plan,
-                 (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->in,plan->datasize),
-                 (cufftComplex *)P4A_runtime_host_ptr_to_accel_ptr(plan->out,plan->datasize),
+                 in,
+                 out,
                  CUFFT_INVERSE);
   } else {
     fprintf(stderr,"[%s:%d] Error : unknown direction (%d)\n",__FUNCTION__,__LINE__,plan->direction);
     exit(-1);
   }
+
+#ifndef P4A_COMMUNICATION_RUNTIME
+    P4A_copy_from_accel(plan->datasize,plan->in,in);
+    P4A_accel_free(in);
+    P4A_accel_free(out);
+#endif
 }
+
+
 
 } // Extern "C"
 

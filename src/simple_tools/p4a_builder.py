@@ -195,6 +195,7 @@ class p4a_builder:
                 
         if com_optimization:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]
+            cpp_flags += [ "-DP4A_COMMUNICATION_RUNTIME" ]
 
         if fftw3:
             cpp_flags += [ "-DP4A_RUNTIME_FFTW", "-I" + os.environ["P4A_ACCEL_DIR"] ]

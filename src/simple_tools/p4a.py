@@ -226,6 +226,9 @@ def add_own_options(parser):
 
     parser.add_option_group(output_group)
 
+empty_precondition_re = re.compile(r"user warning in ordinary_summary_precondition: empty precondition to \w+ because not in call tree from main.$")
+does_not_modify_the_store_re = re.compile(r"user warning in proper_effects_of_call: Statement [0-9]+ is ignored because it does not modify the store.$")
+storage_return_re = re.compile(r"user warning in add_or_kill_equivalenced_variables: storage return$")
 error_re = re.compile(r"^\w+ error ")
 warning_re = re.compile(r"^\w+ warning ")
 property_redefined_re = re.compile(r"property \S+ redefined")
@@ -241,9 +244,12 @@ def pips_output_filter(s):
     elif began_comment:
         began_comment += s
         if s.find("\" is lost") != -1:
-            p4a_util.warn("PIPS: " + began_comment)
+            #Filter out these
+            #p4a_util.warn("PIPS: " + began_comment)
             already_printed_warning_errors.append(began_comment)
             began_comment = ""
+    elif empty_precondition_re.search(s) or does_not_modify_the_store_re.search (s):
+        already_printed_warning_errors.append(s)
     elif s.find("Cannot preprocess file") != -1:
         p4a_util.error("PIPS: " + s)
     elif error_re.search(s) and s not in already_printed_warning_errors:

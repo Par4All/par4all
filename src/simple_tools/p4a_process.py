@@ -119,6 +119,7 @@ def process(input):
             filter_exclude = input.exclude_modules,
             accel = input.accel,
             cuda = input.cuda,
+            openmp=input.openmp,
             com_optimization = input.com_optimization,
             fftw3 = input.fftw3,
             recover_includes = input.recover_includes,
@@ -225,7 +226,7 @@ class p4a_processor(object):
 
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
-                 filter_exclude = None, accel = False, cuda = False,
+                 filter_exclude = None, accel = False, cuda = False, openmp = False,
                  com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  properties = {}, activates = []):
@@ -234,6 +235,7 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.openmp = openmp
         self.com_optimization = com_optimization
         self.fftw3 = fftw3,
 
@@ -321,7 +323,7 @@ class p4a_processor(object):
         # Skip the compilation units and the modules of P4A runtime, they
         # are just here so that PIPS has a global view of what is going
         # on, not to be parallelized :-)
-        skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!")
+        skip_p4a_runtime_and_compilation_unit_re = re.compile("P4A_.*|.*!$")
 
         # Also filter out modules based on --include-modules and
         # --exclude-modules.
@@ -717,21 +719,20 @@ class p4a_processor(object):
             # The final destination
             output_file = os.path.join(dir, output_name)
 
-            if self.accel:
-                if p4a_util.c_file_p(file):
-                    # We generate code for P4A Accel, so first post process
-                    # the output:
-                    self.accel_post(pips_file,
-                                    os.path.join(self.workspace.dirname(), "P4A"))
-                    # Where the P4A output file does dwell in the .database
-                    # workspace:
-                    p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
-                    # Update the normal location then:
-                    pips_file = p4a_file
-                    if self.cuda:
-                        # To have the nVidia compiler to be happy, we need to
-                        # have a .cu version of the .c file
-                        output_file = p4a_util.change_file_ext(output_file, ".cu")
+            if self.accel and p4a_util.c_file_p(file):
+                # We generate code for P4A Accel, so first post process
+                # the output:
+                self.accel_post(pips_file,
+                                os.path.join(self.workspace.dirname(), "P4A"))
+                # Where the P4A output file does dwell in the .database
+                # workspace:
+                p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
+                # Update the normal location then:
+                pips_file = p4a_file
+                if self.cuda:
+                    # To have the nVidia compiler to be happy, we need to
+                    # have a .cu version of the .c file
+                    output_file = p4a_util.change_file_ext(output_file, ".cu")                        
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
