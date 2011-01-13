@@ -131,9 +131,18 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
 static expression entity_to_address(entity e) {
     size_t n = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(e)))));
     list indices = NIL;
-    while(n--) indices = CONS(EXPRESSION,int_to_expression(0),indices);
+    bool is_fortran = fortran_module_p(get_current_module_entity());
+    int indice_first = (is_fortran == true) ? 1 : 0;
+    while(n--) indices = CONS(EXPRESSION,int_to_expression(indice_first),indices);
     reference r = make_reference(e,indices);
-    return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
+    expression result = expression_undefined;
+    if (fortran_module_p(get_current_module_entity()))
+      result = MakeUnaryCall(entity_intrinsic(C_LOC_FUNCTION_NAME),
+			     reference_to_expression(r));
+    else
+      result = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+			     reference_to_expression(r));
+    return result;
 }
 
 /* generate an expression of the form
