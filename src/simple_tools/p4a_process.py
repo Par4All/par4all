@@ -5,7 +5,7 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
-import p4a_util 
+import p4a_util
 import optparse
 import subprocess
 import sys
@@ -419,7 +419,7 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization()
 
-    def post_process_fortran_wrapper (self, file_name):
+    def post_process_fortran_wrapper (self, file_name, subroutine_name):
         """ All the dirty thing about C and Fortran interoperability is hidden
         in one unique file, the fortran wrapper. This method does the last
         modification to make the file compilable by gfortran.
@@ -429,11 +429,47 @@ class p4a_processor(object):
         3 - replace the &origin_var_name by c_loc (origin_var_name)
         4 - declare the origin_var_name as a target
         5 - replace the f77 multiline mode by the f08 multiline mode
+        6 - remove the (void **) & that is not usefull in fortran
         """
         p4a_util.debug ("Processing fortran_wrapper " + file_name)
+        # get the code to be post process
         code = p4a_util.read_file (file_name, True)
+        p4a_util.debug (code)
+        # step 1
+        # insert the needed use statement right after the subroutine declaration
+        # common interface to be used
+        use_string = "      use iso_c_binding\n      use p4a_runtime_interface\n"
+        # add the dedicated interface i.e use the KERNEL_LAUNCHER prefix
+        # instead of the FORTRAN_WRAPPER prefix
+        use_string += "      use "
+        use_string += subroutine_name.replace(self.get_fortran_wrapper_prefix(),
+                                              self.get_launcher_prefix())
+
+        use_string += "\n"
+
+        # identify where to insert the use string
+        subroutine_line_re = re.compile("SUBROUTINE " + subroutine_name + ".*$",
+                                        re.MULTILINE)
+        subroutine_l = subroutine_line_re.findall (code)
+        assert (len (subroutine_l) == 1)
+        code = code.replace (subroutine_l[0], subroutine_l[0] + "\n" + use_string)
+
+        # step 2
+        # first identify the inserted variable
+        var_prefix = self.get_kernel_load_store_var_prefix ()
+        var_re = re.compile(var_prefix + ".*\\d+")
+        var_l = var_re.findall (code)
+        for m in var_l:
+            p4a_util.debug (m)
+#        f_wrappers.print_call_graph ()
+
+
+        # step 6
         code = code.replace ("(void **) &", "")
+
+        # write the post processed code
         p4a_util.write_file(file_name, code, True)
+
         return
 
     def get_launcher_prefix (self):
@@ -569,6 +605,7 @@ class p4a_processor(object):
         f_wrapper_prefix = self.get_fortran_wrapper_prefix ()
         f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\d+$")
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
+#        f_wrappers.print_call_graph ()
 
         # Unfortunately CUDA 3.0 does not accept C99 array declarations
         # with sizes also passed as parameters in kernels. So we degrade
@@ -700,7 +737,7 @@ class p4a_processor(object):
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             if (self.fortran_wrapper_p (pips_file) == True):
-                self.post_process_fortran_wrapper (pips_file)
+                self.post_process_fortran_wrapper (pips_file, name)
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
