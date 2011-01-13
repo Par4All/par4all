@@ -482,7 +482,9 @@ class p4a_processor(object):
 
 
         # step 5
-
+        F77_CONTINUATION = "\n     &"
+        F95_CONTINUATION = "&\n     "
+        code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
 
         # step 6
         code = code.replace ("(void **) &", "")
