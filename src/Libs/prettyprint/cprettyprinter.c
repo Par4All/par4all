@@ -613,12 +613,11 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
 		// In case of a signature check if the arrays need to
 		// be passed by pointers. If the check return true
 		// a "*" must be added and the dim must be remove
-		else if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
-			 (scalar_by_pointer (var) == true)) {
+		else if ((fct_sig == true) && (variable_dimensions(v) != NIL)) {
 		  ext = "";
 		  sptr = "*";
 		  free (sd);
-		  sd = "";
+		  sd = strdup ("");
 		}
 		else {
 		  ext = "";
