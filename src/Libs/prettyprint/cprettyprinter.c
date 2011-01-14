@@ -244,7 +244,7 @@ static bool scalar_by_pointer (entity var) {
     result = true;
   }
   else if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == true) &&
-	   (get_bool_property ("CROUGH_ALL_SCALAR_BY_VALUE") == false) &&
+	   (get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL") == false) &&
 	   (written_p (var) == true)) {
     // interface exists but var is written (and user doesn't use the property
     // to force the passing of scalar by  value)
@@ -595,35 +595,35 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
 
-		// In the case of a signature check if the scalars need to
-		// be passed by pointers. If the check return true
-		// a "*" must be added
-		if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
-		    (scalar_by_pointer (var) == true)) {
-		  ext = SCALAR_IN_SIG_EXT;
-		  sptr = "*";
-		  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
-					     l_type);
-		  l_name   = gen_string_cons(strdup(concatenate(svar, NULL)),
-					     l_name);
-		  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
-					     l_rename);
-		  l_entity = gen_entity_cons(var, l_entity);
-		}
-		// In case of a signature check if the arrays need to
-		// be passed by pointers. If the check return true
-		// a "*" must be added and the dim must be remove
-		else if ((fct_sig == true) && (variable_dimensions(v) != NIL) &&
-			 (get_bool_property("CROUGH_ARRAY_PARAMETER_AS_POINTER") == true)) {
-		  ext = "";
-		  sptr = "*";
-		  free (sd);
-		  sd = strdup ("");
-		}
-		else {
-		  ext = "";
-		  sptr = "";
-		}
+				// In the case of a signature check if the scalars need to
+				// be passed by pointers. If the check return true
+				// a "*" must be added
+				if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
+					(scalar_by_pointer (var) == true)) {
+				  ext = SCALAR_IN_SIG_EXT;
+				  sptr = "*";
+				  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
+											 l_type);
+				  l_name   = gen_string_cons(strdup(concatenate(svar, NULL)),
+											 l_name);
+				  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
+											 l_rename);
+				  l_entity = gen_entity_cons(var, l_entity);
+				}
+				// In case of a signature check if the arrays need to
+				// be passed by pointers. If the check return true
+				// a "*" must be added and the dim must be remove
+				else if ((fct_sig == true) && (variable_dimensions(v) != NIL) &&
+						 (get_bool_property("CROUGH_ARRAY_PARAMETER_AS_POINTER") == true)) {
+				  ext = "";
+				  sptr = "*";
+				  free (sd);
+				  sd = strdup ("");
+				}
+				else {
+				  ext = "";
+				  sptr = "";
+				}
 
 
                 /* problems with order !*/
@@ -919,6 +919,7 @@ static string ppt_unary_post(string in_c, list le)
 static string ppt_call(string in_c, list le)
 {
     string scall, old;
+	bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
     if (le == NIL)
     {
         scall = strdup(concatenate(in_c, "()", NULL));
@@ -929,17 +930,17 @@ static string ppt_call(string in_c, list le)
         scall = strdup(concatenate(in_c, OPENPAREN, NULL));
 
         /* Attention: not like this for io statements*/
-        MAP(EXPRESSION, e,
+        FOREACH (EXPRESSION, e, le)
         {
             string arg = c_expression(e,false);
             old = scall;
             scall = strdup(concatenate(old, first? "" : ", ",
-				       expression_scalar_p(e)? "&" : "",
+				       expression_scalar_p(e) && pointer ? "&" : "",
 				       arg, NULL));
-            //free(arg);
-            //free(old);
+            free(arg);
+            free(old);
             first = FALSE;
-        },le);
+        }
 
         old = scall;
         scall = strdup(concatenate(old, CLOSEPAREN, NULL));

@@ -13746,7 +13746,7 @@ CROUGH_REAL_TYPE "p4a_real"
 \end{PipsProp}
 
 Is is possible to prettyprint function parameters that are arrays as pointers
-using the propertie CROUGH\_ARRAY\_PARAMETER\_AS\_POINTER
+using the property CROUGH\_ARRAY\_PARAMETER\_AS\_POINTER
 
 \begin{PipsProp}{CROUGH_ARRAY_PARAMETER_AS_POINTER}
 CROUGH_ARRAY_PARAMETER_AS_POINTER FALSE
@@ -13765,7 +13765,11 @@ integrates interfaces. In such a case, the unmodified scalar function
 parameters (by the function or any of its callees) are expected to be passed by
 values, the other parameters are passed by pointers. Finally when using
 interfaces it is also possible to pass all the scalar variables by values using
-the propetty CROUGH\_ALL\_SCALAR\_BY\_VALUE
+the propety CROUGH\_SCALAR\_BY\_VALUE\_IN\_FCT\_DECL. Now, let's talk about function
+called from the fortran code PIPS has to print in C. The problem on
+how to pass scalars (by value or by pointer) also exists. At the moment PIPS
+is less flexible for function call. One of the solution has to be choosen
+using the property CROUGH\_SCALAR\_BY\_VALUE\_IN\_FCT\_CALL.
 
 \begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE}
 PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
@@ -13775,8 +13779,12 @@ PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
 CROUGH_FORTRAN_USES_INTERFACE FALSE
 \end{PipsProp}
 
-\begin{PipsProp}{CROUGH_ALL_SCALAR_BY_VALUE}
-CROUGH_ALL_SCALAR_BY_VALUE FALSE
+\begin{PipsProp}{CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL}
+CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL}
+CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL FALSE
 \end{PipsProp}
 
 \section{Prettyprinters Smalltalk}
