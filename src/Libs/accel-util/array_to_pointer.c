@@ -133,54 +133,59 @@ static void do_linearize_array_subscript(subscript s) {
 
 static bool do_linearize_type(type *t, bool *rr) {
     bool linearized =false;
-    pips_assert ("variable expected", type_variable_p (*t));
-    pips_debug (5, "try to linearize type: %s\n", type_to_string (*t));
-    if(rr)*rr=false;
-    variable v = type_variable(*t);
-    type ut = ultimate_type(*t);
-    variable uv = type_variable(ut);
-    size_t uvl = gen_length(variable_dimensions(uv));
-    size_t vl = gen_length(variable_dimensions(v));
-    if(uvl > 1 ) {
-      dimension nd = dimension_undefined;
-      if (fortran_module_p(get_current_module_entity()) ) {
-	nd = make_dimension(int_to_expression(1),
-			    SizeOfDimensions(variable_dimensions(uv)));
-      }
-      else {
-	nd = make_dimension(int_to_expression(0),
-			    make_op_exp(MINUS_OPERATOR_NAME,
-					SizeOfDimensions(variable_dimensions(uv)),
-					int_to_expression(1)));
-      }
-
-      type nt = type_undefined;
-      bool free_it = false;
-      // copy only if needed, otherwise modify in place
-      if (ut == *t) {
-	nt = *t;
-	free_it = false;
-      }
-      else {
-	nt = copy_type(uvl>vl?ut:*t);
-	free_it = true;
-      }
-      variable nv = type_variable(nt);
-      gen_full_free_list(variable_dimensions(nv));
-      variable_dimensions(nv)=CONS(DIMENSION,nd,NIL);
-      if (free_it) {
-	// it might be dangerous to free the type that can be reused somewhere
-	// else in the RI
-	free_type(*t);
-	*t=nt;
-      }
-      linearized=true;
-      if(rr)*rr=true;
-      pips_debug (5, "type has been linearized\n");
+    if(type_void_p(*t)) {
+        pips_user_warning("cannot linearize void type\n");
     }
+    else {
+        pips_assert ("variable expected", type_variable_p (*t));
+        pips_debug (5, "try to linearize type: %s\n", type_to_string (*t));
+        if(rr)*rr=false;
+        variable v = type_variable(*t);
+        type ut = ultimate_type(*t);
+        variable uv = type_variable(ut);
+        size_t uvl = gen_length(variable_dimensions(uv));
+        size_t vl = gen_length(variable_dimensions(v));
+        if(uvl > 1 ) {
+            dimension nd = dimension_undefined;
+            if (fortran_module_p(get_current_module_entity()) ) {
+                nd = make_dimension(int_to_expression(1),
+                        SizeOfDimensions(variable_dimensions(uv)));
+            }
+            else {
+                nd = make_dimension(int_to_expression(0),
+                        make_op_exp(MINUS_OPERATOR_NAME,
+                            SizeOfDimensions(variable_dimensions(uv)),
+                            int_to_expression(1)));
+            }
 
-    if(basic_pointer_p(variable_basic(type_variable(*t))))
-        return do_linearize_type(&basic_pointer(variable_basic(type_variable(*t))),rr) || linearized;
+            type nt = type_undefined;
+            bool free_it = false;
+            // copy only if needed, otherwise modify in place
+            if (ut == *t) {
+                nt = *t;
+                free_it = false;
+            }
+            else {
+                nt = copy_type(uvl>vl?ut:*t);
+                free_it = true;
+            }
+            variable nv = type_variable(nt);
+            gen_full_free_list(variable_dimensions(nv));
+            variable_dimensions(nv)=CONS(DIMENSION,nd,NIL);
+            if (free_it) {
+                // it might be dangerous to free the type that can be reused somewhere
+                // else in the RI
+                free_type(*t);
+                *t=nt;
+            }
+            linearized=true;
+            if(rr)*rr=true;
+            pips_debug (5, "type has been linearized\n");
+        }
+
+        if(basic_pointer_p(variable_basic(type_variable(*t))))
+            return do_linearize_type(&basic_pointer(variable_basic(type_variable(*t))),rr) || linearized;
+    }
     return linearized;
 }
 
