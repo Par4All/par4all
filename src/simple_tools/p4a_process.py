@@ -427,17 +427,18 @@ class p4a_processor(object):
         Those steps are done
         1 - insert the needed "use" statement
         2 - insert the pointer declaration for P4A inserted variable
-        3 - replace the &origin_var_name by c_loc (origin_var_name)
-        4 - declare the origin_var_name as a target
-        5 - replace the f77 multiline mode by the f08 multiline mode
-        6 - remove the (void **) & that is not usefull in fortran
-        7 - remove the * in front of the inserted variables
+        3 - types are wrtitten with a () in the size_of function
+        4 - replace the f77 multiline mode by the f08 multiline mode
+        5 - remove the (void **) & that is not usefull in fortran
+        6 - remove the * in front of the inserted variables
+        7 - declare the origin_var_name as a target
         """
         p4a_util.debug ("Processing fortran_wrapper " + file_name)
         indent = "      "
         # get the code to be post process
         code = p4a_util.read_file (file_name, True)
         p4a_util.debug (code)
+
         # step 1
         # insert the needed use statement right after the subroutine declaration
         # common interface to be used
@@ -471,27 +472,46 @@ class p4a_processor(object):
             # extract the original variable name
             origin_var_s.add (var.replace (var_prefix, "").replace (var_suffix, ""))
 
-        # identify where to insert the use string and the variable declaration
+        #step 3
+        c_sizeof_replace = dict()
+        c_sizeof_replace ["CHARACTER()"] = "c_char"
+        c_sizeof_replace ["LOGICAL()"]   = "c_bool"
+        c_sizeof_replace ["INTEGER()"]   = "c_int"
+        c_sizeof_replace ["INTEGER*4()"] = "c_int"
+        c_sizeof_replace ["INTEGER*8()"] = "c_long_long"
+        c_sizeof_replace ["REAL()"]      = "c_float"
+        c_sizeof_replace ["REAL*4()"]    = "c_float"
+        c_sizeof_replace ["REAL*8()"]    = "c_double"
+        for k, v in c_sizeof_replace.iteritems ():
+            code = code.replace (k, v)
+
+        # step 4
+        F77_CONTINUATION = "\n     &"
+        F95_CONTINUATION = "&\n      "
+        code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
+
+        # step 5
+        code = code.replace ("(void **) &", "")
+
+        # step 6
+        for var in inserted_var_s:
+            code = code.replace ("*" + var, var)
+
+        # step 7
+        # insert the target attribute for all declared variables
+        types_l = ["CHARACTER", "LOGICAL", "INTEGER*4", "INTEGER*8", "INTEGER",
+                   "REAL*4", "REAL*8","REAL"]
+        for t in types_l:
+            code = code.replace (t, t.lower () + ", target ::")
+
+        # identify where to insert the use string and the inserted variable
+        # declaration
         subroutine_line_re = re.compile("SUBROUTINE " + subroutine_name + ".*$",
                                         re.MULTILINE)
         subroutine_l = subroutine_line_re.findall (code)
         assert (len (subroutine_l) == 1)
         code = code.replace (subroutine_l[0], subroutine_l[0] + "\n" +
                              use_string + inserted_var_decl)
-
-
-
-        # step 5
-        F77_CONTINUATION = "\n     &"
-        F95_CONTINUATION = "&\n     "
-        code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
-
-        # step 6
-        code = code.replace ("(void **) &", "")
-
-        # step 7
-        for var in inserted_var_s:
-            code = code.replace ("*" + var, var)
 
         # write the post processed code
         p4a_util.write_file(file_name, code, True)
