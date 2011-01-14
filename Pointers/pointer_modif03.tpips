@@ -6,26 +6,23 @@ create pointer_modif03 pointer_modif03.c
 
 activate C_PARSER
 
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty EFFECTS_POINTER_MODIFICATION_CHECKING TRUE
+
+
+echo
+echo PROPER EFFECTS
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALLFUNC]
+
 
 echo
 echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[make_s]
-
-echo
-echo POINTS TO
-echo
-
-display PRINTED_FILE[main]
-
-
+display PRINTED_FILE[%ALLFUNC]
 
 
 

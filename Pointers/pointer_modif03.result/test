@@ -1,23 +1,43 @@
 
-POINTS TO
+PROPER EFFECTS
 
-//  {}
+int main()
+{
+   s_t s;
+   int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   s = make_s(1, 2.);
+//             <    is written>: s.entier
+   s.entier = 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   j = make_s(1, 2.).entier;
+//             <    is read   >: j
+
+   return j;
+}
 s_t make_s(int i, float x)
 {
-//  points to = {}
-   // BEGIN BLOCK
-//  points to = {}
    s_t *p;
-//  points to = {}
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i p
    p->entier = i;
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p x
    p->reel = x;
-//  {(p,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
    return *p;
-   // END BLOCK
 }
 
 POINTS TO
@@ -25,8 +45,6 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    s_t s;
 //  points to = {}
@@ -39,8 +57,22 @@ int main()
 //  points to = {}
 
    j = make_s(1, 2.).entier;
-//  {(*ANY_MODULE*:*ANYWHERE*,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(*ANY_MODULE*:*ANYWHERE*,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
 
    return j;
-   // END BLOCK
+}
+//  {}
+s_t make_s(int i, float x)
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   s_t *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   p = (s_t *) malloc(sizeof(s_t));
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+   p->entier = i;
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+   p->reel = x;
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+   return *p;
 }

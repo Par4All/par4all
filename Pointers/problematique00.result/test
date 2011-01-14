@@ -1,54 +1,44 @@
 int main()
 {
-   int *p, *q, i, j;
-//               <must be written>: i
-
-   i = 1;
-//               <must be written>: j
-   j = 0;
-//               <must be written>: p
-   /* Initialisation des pointeurs*/
-   p = &i;
-//               <must be written>: q
-   q = &j;
-//               <must be read   >: q
-//               <must be written>: p
+   int *a, b, c, d;
+//             <    is written>: c
+   c = 3;
+//             <    is written>: a
+   /* S1 */
+   a = &c;
+//             <    is read   >: d __IO_EFFECTS:LUNS[d]
+//             <    is written>: __IO_EFFECTS:LUNS[d]
+   /* S2 */
+   read(d);
+//             <    is read   >: a a[0]
+//             <    is written>: b
+   /* S3 */
+   b = *a;
+   /* S4 */
    
-   /* Les deux pointeurs pointent vers la meme case memoire j */
-   p = q;
-//               <must be read   >: p
-//               <must be written>: p[0]
    
-   /* Dereferencement du pointeur p -> acces à la variable j */
-   *p = 1;
-
    return 0;
 }
 POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
-   int *p, *q, i, j;
-//  points to = {}
-
-   i = 1;
-//  points to = {}
-   j = 0;
-//  points to = {}
-   /* Initialisation des pointeurs*/
-   p = &i;
-//  {(p,i,-Exact-)}
-   q = &j;
-//  {(p,i,-Exact-);(q,j,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *a, b, c, d;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   c = 3;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   /* S1 */
+   a = &c;
+//  {(a,c,-Exact-)}
+   /* S2 */
+   read(d);
+//  {(a,c,-Exact-)}
+   /* S3 */
+   b = *a;
+//  {(a,c,-Exact-)}
+   /* S4 */
    
-   /* Les deux pointeurs pointent vers la meme case memoire j */
-   p = q;
-//  {(p,j,-Exact-);(q,j,-Exact-)}
    
-   /* Dereferencement du pointeur p -> acces à la variable j */
-   *p = 1;
-//  {(p,j,-Exact-);(q,j,-Exact-)}
-
    return 0;
 }
