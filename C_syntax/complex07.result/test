@@ -1,0 +1,25 @@
+
+parsed printed file
+
+int main(void)
+{
+   double z;
+
+   printf("z = %f + %fI\n", creal(z), cimag(z));
+
+   return 0;
+}
+
+printed file
+
+int main(void)
+{
+   double z;
+
+   printf("z = %f + %fI\n", creal(z), cimag(z));
+
+   return 0;
+}
+
+try a transforamtion
+

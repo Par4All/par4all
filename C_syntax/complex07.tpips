@@ -1,0 +1,24 @@
+delete complex07
+create complex07 complex07.c
+
+echo
+echo parsed printed file
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo printed file
+echo
+
+display PRINTED_FILE[main]
+
+echo
+echo try a transforamtion
+echo
+
+apply PRIVATIZE_MODULE[main]
+
+close
+delete complex07
+quit
