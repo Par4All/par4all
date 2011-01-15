@@ -677,14 +677,20 @@ class p4a_processor(object):
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
             # pointers because they will be .cu files
-            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = True
-            kernels.display ("c_printed_file")
-            wrappers.display ("c_printed_file")
-            # kernel_launchers will be .c file so c99 is allowed
-            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = False
-            kernel_launchers.display ("c_printed_file")
+            kernels.display ("c_printed_file",
+                             DO_RETURN_TYPE_AS_TYPEDEF=True,
+                             CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
+                             SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
+            wrappers.display ("c_printed_file",
+                              DO_RETURN_TYPE_AS_TYPEDEF=True,
+                              CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
+                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
             # Do the phase set_return_type_as_typedef using regular expressions
             # because the phase is not available in fortran
+            # kernel_launchers will be .c file so c99 is allowed
+            kernel_launchers.display ("c_printed_file",
+                                      DO_RETURN_TYPE_AS_TYPEDEF=False,
+                                      CROUGH_ARRAY_PARAMETER_AS_POINTER=False)
 #            print kernels
             # those newly generated modules has to be append to the dedicated list
             # for later processing
