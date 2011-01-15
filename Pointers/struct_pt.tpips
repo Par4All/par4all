@@ -6,6 +6,7 @@ create struct_pt struct_pt.c
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "flow-sensitive"
 ##TODO: explain
 
 echo
