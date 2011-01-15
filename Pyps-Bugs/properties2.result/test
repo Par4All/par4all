@@ -1,0 +1,54 @@
+/* C pretty print for module FOO1. */
+void
+foo1 (void)
+{
+  int i;
+
+  i = 1;
+  return;
+}
+/* C pretty print for module FOO2. */
+plouch
+foo2 (void)
+{
+  int i;
+
+  i = 2;
+  return;
+}
+/* C pretty print for module FOO3. */
+void
+foo3 (void)
+{
+  int i;
+
+  i = 3;
+  return;
+}
+/* C pretty print for module FOO4. */
+void
+foo4 (void)
+{
+  int i;
+
+  i = 4;
+  return;
+}
+/* C pretty print for module FOO5. */
+void
+foo5 (void)
+{
+  int i;
+
+  i = 5;
+  return;
+}
+/* C pretty print for module FOO6. */
+P4A_accel_kernel_wrapper
+foo6 (void)
+{
+  int i;
+
+  i = 6;
+  return;
+}
