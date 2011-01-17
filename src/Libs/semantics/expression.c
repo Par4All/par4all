@@ -1894,6 +1894,10 @@ static transformer integer_call_expression_to_transformer(
   else if(ENTITY_CONDITIONAL_P(f)) {
     tf = any_conditional_to_transformer(e, args, pre);
   }
+  else if(ENTITY_RAND_P(f)) {
+    tf = transformer_identity();
+    tf = transformer_add_inequality(tf, e, VALUE_ZERO, FALSE);
+  }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {
       tf = user_function_call_to_transformer(e, expr, pre);

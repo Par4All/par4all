@@ -606,6 +606,10 @@ transformer intrinsic_to_transformer(entity e,
     expression cond = EXPRESSION(CAR(pc));
     tf = condition_to_transformer(cond, pre, TRUE);
   }
+  else if(ENTITY_RAND_P(e)) {
+    /* The result is positive and less than RAND_MAX */
+    pips_internal_error("Intrinsic \"rand\" should not be analyzed here.\n");
+  }
   else
     tf = effects_to_transformer(ef);
 

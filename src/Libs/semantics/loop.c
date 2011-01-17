@@ -157,6 +157,44 @@
  * The source code has been restructured with a lot of the processing
  * moved into any_transformer_to_k_closure
  */
+/* Would be nicer with a proper graph. The transformer associated to a
+   loop in a PIPS print out is the transformer leading from the loop
+   precondition to the loop invariant, t_????. But the transformer
+   recursively returned is t_loop, leading from the loop precondition
+   to the loop postcondition. Designed in West Palm Beach, Dec. 2009.
+   Notations may have sliglhty changed during the coding.
+
+      x loop precondition-------------------------------------
+      | t_init                               | t_?????       | t_loop
+      v                                      |               |
+      x post_init                            |               |
+      |                                      |               |
+      --------------------------             |               |
+      |                        | t_enter     |               |
+      | t_skip                 v             |               |
+      |                        x post_enter  |               |
+      |                        | identity    |               |
+      |                        v             |               |
+      |                     -> x <------------loop invariant |
+      |        tf_body_star/__/| t_body      |               |
+      |                        v             |               |
+      |                        x             |               |
+      |                        | t_inc       |               |
+      |                        v             |               |
+      |                        x             |               !
+      |                        |             |               |
+      |       ------------------             |               |
+      |       | t_exit         | t_continue  |               |
+      v       v                v             |               |
+      ---------                x--------------               |
+      |                                                      |
+      v                                                      |
+      x loop postcondition <----------------------------------
+
+  The same scheme is used for all kinds of loops. Of coursse, t_inc,
+  t_exit, t_skip and t_continue have to be adapted to the loop kind.
+ */
+
 /* k is the periodicity sought. The normal standard default value is
    1. If k == 1, the body transformer is computed first and the loop
    transformer is derived from it. If k>1, the body transformer is
@@ -164,7 +202,7 @@
    the number of iterations executed is always a multiple of k.
 
    This is obsolete and k should always be equal to 1. When a
-   different value of k is required, call direclty
+   different value of k is required, call directly
    any_transformer_to_k_closure().
  */
 transformer any_loop_to_k_transformer(transformer t_init,
