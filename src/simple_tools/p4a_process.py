@@ -363,8 +363,8 @@ class p4a_processor(object):
         global default_properties
         global default_fortran_cuda_properties
         all_properties = default_properties
-        # if cuda and fortran add some properties
-        if ((self.cuda == True) and (self.fortran == True)):
+        # if accel (might be cuda) and fortran add some properties
+        if ((self.accel == True) and (self.fortran == True)):
             for k in default_fortran_cuda_properties:
                 all_properties[k] = default_fortran_cuda_properties[k]
         # overwrite default properties with the user defined ones
@@ -770,10 +770,13 @@ class p4a_processor(object):
         result = []
         for name in self.crough_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), name, name + ".c")
+            pips_file = os.path.join(self.workspace.dirname(),
+                                     name, name + ".c")
             # set the destination file
+            output_name = name + ".c"
             if name in self.cuda_modules:
-                output_name = name + ".cu"
+                if self.cuda:
+                    output_name = p4a_util.change_file_ext(output_name, ".cu")
                 # generate the header file
                 header_file = os.path.join(output_dir, name + ".h")
                 args = ["cproto"]
@@ -785,8 +788,6 @@ class p4a_processor(object):
                 args.append (header_file)
                 args.append (pips_file)
                 p4a_util.run (args, force_locale = None)
-            else:
-                output_name = name + ".c"
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             # Copy the PIPS production to its destination:

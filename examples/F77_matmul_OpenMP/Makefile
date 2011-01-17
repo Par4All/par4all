@@ -18,6 +18,6 @@ matmul_par:
 	$(FC) $(PAR_FLAG) $(OPT_FLAG) matmul.database/Src/matmul.f -o $@
 
 clean:
-	rm -rf *.o *.database *~
+	rm -rf *.o *.database *~ p4a_new_files
 	rm -f matmul
 	rm -f matmul_par
