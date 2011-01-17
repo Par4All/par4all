@@ -69,7 +69,7 @@ int main()
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
 
-//  T(entier) {}
+//  T(entier) {1<=entier}
 
    entier = 1+rand();
 }
