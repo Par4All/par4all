@@ -1,0 +1,76 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+//  T(i,m,n) {}
+
+   int i, n, m;
+
+//  T(i) {}
+
+   i = rand();
+
+//  T(n) {}
+
+   n = rand();
+
+//  T(m) {}
+
+   m = rand();
+
+//  T() {}
+
+
+   if (m>=0&&n>=1&&i<=m)
+
+//  T() {i<=m, 0<=m, 1<=n}
+
+      if (i>n*m)
+
+//  T() {1<=i, i<=m, 0<=m, 1<=n}
+
+         "unreachable";
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int i, n, m;
+
+//  P(i,m,n) {}
+
+   i = rand();
+
+//  P(i,m,n) {}
+
+   n = rand();
+
+//  P(i,m,n) {}
+
+   m = rand();
+
+//  P(i,m,n) {}
+
+
+   if (m>=0&&n>=1&&i<=m)
+
+//  P(i,m,n) {i<=m, 0<=m, 1<=n}
+
+      if (i>n*m)
+
+//  P(i,m,n) {0 == -1}
+
+         "unreachable";
+}
