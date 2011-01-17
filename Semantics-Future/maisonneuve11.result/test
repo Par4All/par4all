@@ -11,28 +11,28 @@ void run(void)
 
    int i, n, m;
 
-//  T(i) {}
+//  T(i) {i<=1}
 
    i = rand();
 
-//  T(n) {}
+//  T(n) {i<=1, n<=1}
 
    n = rand();
 
-//  T(m) {}
+//  T(m) {i<=1, m<=1, n<=1}
 
    m = rand();
 
-//  T() {}
+//  T() {i<=1, m<=1, n<=1}
 
 
    if (m>=0&&n>=1&&i<=m)
 
-//  T() {i<=m, 0<=m, 1<=n}
+//  T() {n==1, i<=1, i<=m, 0<=m, m<=1}
 
       if (i>n*m)
 
-//  T() {1<=i, i<=m, 0<=m, 1<=n}
+//  T() {0==-1}
 
          "unreachable";
 }
@@ -53,24 +53,24 @@ void run(void)
 
    i = rand();
 
-//  P(i,m,n) {}
+//  P(i,m,n) {i<=1}
 
    n = rand();
 
-//  P(i,m,n) {}
+//  P(i,m,n) {i<=1, n<=1}
 
    m = rand();
 
-//  P(i,m,n) {}
+//  P(i,m,n) {i<=1, m<=1, n<=1}
 
 
    if (m>=0&&n>=1&&i<=m)
 
-//  P(i,m,n) {i<=m, 0<=m, 1<=n}
+//  P(i,m,n) {n==1, i<=1, i<=m, 0<=m, m<=1}
 
       if (i>n*m)
 
-//  P(i,m,n) {0 == -1}
+//  P() {0==-1}
 
          "unreachable";
 }
