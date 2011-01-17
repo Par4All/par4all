@@ -242,6 +242,10 @@ class p4a_processor(object):
     # the list of fortran modules
     fortran_modules = set ()
 
+    # the typedef to be used in cuda
+    kernel_return_type  = "P4A_accel_kernel"
+    wrapper_return_type = "P4A_accel_kernel_wrapper"
+
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False, openmp = False,
@@ -438,7 +442,6 @@ class p4a_processor(object):
         indent = "      "
         # get the code to be post process
         code = p4a_util.read_file (file_name, True)
-        p4a_util.debug (code)
 
         # step 1
         # insert the needed use statement right after the subroutine declaration
@@ -671,8 +674,8 @@ class p4a_processor(object):
 
         # set return type for wrappers && kernel
         if (self.fortran == False):
-            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
-            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
+            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
+            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
         else:
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
@@ -680,18 +683,18 @@ class p4a_processor(object):
             kernels.display ("c_printed_file",
                              DO_RETURN_TYPE_AS_TYPEDEF=True,
                              CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
-                             SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
+                             SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
             wrappers.display ("c_printed_file",
                               DO_RETURN_TYPE_AS_TYPEDEF=True,
                               CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
-                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
+                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
             # Do the phase set_return_type_as_typedef using regular expressions
             # because the phase is not available in fortran
             # kernel_launchers will be .c file so c99 is allowed
             kernel_launchers.display ("c_printed_file",
                                       DO_RETURN_TYPE_AS_TYPEDEF=False,
                                       CROUGH_ARRAY_PARAMETER_AS_POINTER=False)
-#            print kernels
+
             # those newly generated modules has to be append to the dedicated list
             # for later processing
             self.crough_modules.extend (map(lambda x:x.name, kernels))
@@ -771,6 +774,17 @@ class p4a_processor(object):
             # set the destination file
             if name in self.cuda_modules:
                 output_name = name + ".cu"
+                # generate the header file
+                header_file = os.path.join(output_dir, name + ".h")
+                args = ["cproto"]
+                args.append ("-D")
+                args.append (self.wrapper_return_type + "=void")
+                args.append ("-D")
+                args.append (self.kernel_return_type + "=void")
+                args.append ("-o")
+                args.append (header_file)
+                args.append (pips_file)
+                p4a_util.run (args, force_locale = None)
             else:
                 output_name = name + ".c"
             # The final destination
