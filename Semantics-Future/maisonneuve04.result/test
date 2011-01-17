@@ -23,11 +23,11 @@ void run()
          if (alea()&&b!=0)
 //  T() {0==-1}
             error();
-//  T(a) {}
+//  T(a) {0<=a}
          a = rand();
-//  T(b) {b==0}
+//  T(b) {b==0, 0<=a}
          b = 0;
-//  T(c) {b==0, 0<=c, c<=1}
+//  T(c) {b==0, 0<=a, 0<=c, c<=1}
          c = alea();
       }
 //  T(a,c) {c==0, c#init<=0}
@@ -38,9 +38,9 @@ void run()
          if (alea()&&b!=0)
 //  T() {0==-1}
             error();
-//  T(a) {c<=0}
+//  T(a) {0<=a, c<=0}
          a = rand();
-//  T(c) {0<=c, c<=1, c#init<=0}
+//  T(c) {0<=a, 0<=c, c<=1, c#init<=0}
          c = alea();
       }
    }
@@ -72,9 +72,9 @@ void run()
             error();
 //  P(a,b,c) {b==0, c==1}
          a = rand();
-//  P(a,b,c) {b==0, c==1}
+//  P(a,b,c) {b==0, c==1, 0<=a}
          b = 0;
-//  P(a,b,c) {b==0, c==1}
+//  P(a,b,c) {b==0, c==1, 0<=a}
          c = alea();
       }
 //  P(a,b,c) {b==0, c==0}
@@ -87,7 +87,7 @@ void run()
             error();
 //  P(a,b,c) {b==0, c==0}
          a = rand();
-//  P(a,b,c) {b==0, c==0}
+//  P(a,b,c) {b==0, c==0, 0<=a}
          c = alea();
       }
    }

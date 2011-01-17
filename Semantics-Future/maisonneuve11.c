@@ -1,21 +1,22 @@
-// poor analysis
+// poor analysis of multiplication: fixed
 
 // $Id$
 
-void run(void) {
-	int i, n, m;
-	i = rand();
-	n = rand();
-	m = rand();
-	
-	if (m >= 0 && n >= 1 && i <= m) {
-		if (i > n * m) "unreachable";
-	}
-	
+void run(void)
+{
+  int i, n, m;
+  i = rand();
+  n = rand();
+  m = rand();
+
+  if (m >= 0 && n >= 1 && i <= m) {
+    if (i > n*m) "unreachable";
+  }
 }
 
-int main(void) {
-	run();
-	return 0;
+int main(void)
+{
+  run();
+  return 0;
 }
 

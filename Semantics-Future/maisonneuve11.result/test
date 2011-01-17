@@ -11,24 +11,24 @@ void run(void)
 
    int i, n, m;
 
-//  T(i) {i<=1}
+//  T(i) {0<=i}
 
    i = rand();
 
-//  T(n) {i<=1, n<=1}
+//  T(n) {0<=i, 0<=n}
 
    n = rand();
 
-//  T(m) {i<=1, m<=1, n<=1}
+//  T(m) {0<=i, 0<=m, 0<=n}
 
    m = rand();
 
-//  T() {i<=1, m<=1, n<=1}
+//  T() {0<=i, 0<=m, 0<=n}
 
 
    if (m>=0&&n>=1&&i<=m)
 
-//  T() {n==1, i<=1, i<=m, 0<=m, m<=1}
+//  T() {0<=i, i<=m, 0<=m, 1<=n}
 
       if (i>n*m)
 
@@ -53,20 +53,20 @@ void run(void)
 
    i = rand();
 
-//  P(i,m,n) {i<=1}
+//  P(i,m,n) {0<=i}
 
    n = rand();
 
-//  P(i,m,n) {i<=1, n<=1}
+//  P(i,m,n) {0<=i, 0<=n}
 
    m = rand();
 
-//  P(i,m,n) {i<=1, m<=1, n<=1}
+//  P(i,m,n) {0<=i, 0<=m, 0<=n}
 
 
    if (m>=0&&n>=1&&i<=m)
 
-//  P(i,m,n) {n==1, i<=1, i<=m, 0<=m, m<=1}
+//  P(i,m,n) {0<=i, i<=m, 0<=m, 1<=n}
 
       if (i>n*m)
 
