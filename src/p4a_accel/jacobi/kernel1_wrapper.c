@@ -1,3 +1,25 @@
+/** @file 
+*/
+
+/** @defgroup Examples
+
+    @{
+*/
+
+/** @addtogroup Jacobi
+
+    @{
+*/
+
+/** @addtogroup kernel1Jacobi The first kernel.
+
+    @{
+    Transforms the input to the output after averaging the pixels.
+
+    It is composed of a kernel_wrapper and a core kernel.
+
+*/
+
 #include "p4a_accel_wrapper.h"
 typedef float float_t;
 #define SIZE 501
@@ -16,3 +38,8 @@ P4A_accel_kernel_wrapper kernel1_wrapper(P4A_accel_global_address float_t space[
   if(i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
     kernel1(space, save, i, j);
 }
+
+/** @} */
+/** @} */
+/** @} */
+

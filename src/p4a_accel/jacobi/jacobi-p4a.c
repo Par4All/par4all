@@ -1,4 +1,30 @@
-/* Adapted from Terapix PIPS output */
+/** @file  
+
+    "mailto:Ronan.Keryell@hpc-project.com"
+    
+*/
+
+/** @defgroup Examples
+
+    @{
+
+    Jacobi-p4a, Adapted from Terapix PIPS output.
+    This is a FREIA (French ANR) example.
+*/
+
+/** @defgroup Jacobi
+
+    @{
+*/
+
+/** @defgroup mainJacobi The main functions.
+
+    @{
+    Read the input image and write the oupt image.
+    Call to the main and kernels.
+*/
+
+
 
 #include <p4a_accel.h>
 
@@ -12,11 +38,12 @@ float_t space[SIZE][SIZE];
 // For the dataparallel semantics:
 float_t save[SIZE][SIZE];
 
-// Signatures des fonctions exportées dans les kernels 
-// et appelées depuis le launch_kernel
+// Prototypes for the two kernels of jacobi
 P4A_wrapper_proto(kernel1_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
 P4A_wrapper_proto(kernel2_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
 
+/** Read the input image
+ */
 
 void get_data(char filename[]) {
   int i, j, nx, ny;
@@ -68,6 +95,9 @@ void get_data(char filename[]) {
 }
 
 
+/** Write the output image
+ */
+
 void write_data(char filename[]) {
   int i,j;
   unsigned char c;
@@ -93,7 +123,7 @@ void write_data(char filename[]) {
 #define MIN(a,b) (a < b ? a : b )
 
 /*
- * file for launch_kernel1.c
+ * Launch the first kernel.
  */
 void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   kernel1:
@@ -101,7 +131,7 @@ void launch_kernel1(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
 }
 
 /*
- * file for launch_kernel2.c
+ * Launch the second kernel.
  */
 void launch_kernel2(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE])
 {
@@ -110,6 +140,8 @@ kernel2:
   P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
 }
 
+/** Manage the call to the kernels.
+ */
 void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
   int i, j;
 
@@ -119,6 +151,8 @@ void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
  kernel2:   launch_kernel2(space, save);
 }
 
+/** Main function
+ */
 
 int main(int argc, char *argv[]) {
   int t, i;
@@ -177,3 +211,7 @@ int main(int argc, char *argv[]) {
   P4A_release_accel;
   return 0;
 }
+/** @} */
+/** @} */
+/** @} */
+

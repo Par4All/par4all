@@ -1,6 +1,6 @@
 /** @file
 
-    API of Par4All C to OpenMP
+    API of Par4All C to OpenMP, CUDA and OpenCL.
 
     This file is an implementation of the C to accelerator Par4All API.
 
@@ -18,9 +18,12 @@
 
 #ifdef P4A_ACCEL_OPENMP
 
-/** Stop a timer on the accelerator and get double ms time
+/** @addtogroup P4A_time_measure
 
-    @addtogroup P4A_OpenMP_time_measure
+    @{
+*/
+
+/** In OpenMP, stop a timer on the accelerator and get double ms time
 */
 
 double P4A_accel_timer_stop_and_float_measure() 
@@ -37,6 +40,12 @@ double P4A_accel_timer_stop_and_float_measure()
 #endif
 }
 
+/* @} */
+
+/** @addtogroup P4A_qualifiers Kernels and arguments qualifiers
+
+    @{
+*/
 
 /** This is a global variable used to simulate P4A virtual processor
     coordinates in OpenMP because we need to pass a local variable to a
@@ -49,8 +58,11 @@ double P4A_accel_timer_stop_and_float_measure()
  */
 __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 
+/* @} */
 
-/** @defgroup P4A_OpenMP_memory_allocation_copy Memory allocation and copy for OpenMP simulation
+
+/** @addtogroup P4A_memory_allocation_copy Memory allocation and copy
+    for OpenMP simulation
 
     @{
 */
@@ -311,15 +323,17 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
 #ifdef P4A_ACCEL_CUDA
 
-//#include <cutil_inline.h>
+/** @addtogroup P4A_time_measure
+
+    @{
+ */
 
 /** To do basic time measure. Do not nest... */
 
 cudaEvent_t p4a_start_event, p4a_stop_event;
 
-/** Stop a timer on the accelerator and get float time in second
-
- @addtogroup P4A_cuda_time_measure
+/** In CUDA, stop a timer on the accelerator and get float time in
+    second.
  */
 
 double P4A_accel_timer_stop_and_float_measure() 
@@ -339,10 +353,16 @@ double P4A_accel_timer_stop_and_float_measure()
 #endif
 }
 
+/* @} */
 
+/** @defgroup P4A_memory_allocation_copy Memory allocation and copy for CUDA 
+    simulation
+    
+    @{
+*/
 
 /** Allocate memory on the hardware accelerator in Cuda mode.
-
+    
     @param[out] address is the address of a variable that is updated by
     this function to contains the address of the allocated memory block
 
@@ -759,6 +779,7 @@ void P4A_copy_to_accel_4d(size_t element_size,
   }
 }
 
+/* @} */
 
 #endif //P4A_ACCEL_CUDA
 
@@ -774,602 +795,16 @@ void P4A_copy_to_accel_4d(size_t element_size,
     Procedure to manage a kernel list have thus been created for the C version.
     In C++, this a map.
 
-    C and C++ versions are implemented because of the argument passing.
+    C and C++ versions are implemented.
  */
 
-#ifdef P4A_PROFILING
-cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
-#else
-cl_command_queue_properties p4a_queue_properties = 0;
-#endif
 
-bool p4a_execution_time_tag=false;
-bool p4a_copy_time_tag=false;
-double p4a_time = 0.;
-cl_event p4a_event_execution=NULL, p4a_event_copy=NULL;
+/** @defgroup P4A_log Debug messages and errors tracking.
+    
+    @{
+*/
+
 cl_int p4a_global_error=0;
-cl_context p4a_context = NULL;
-cl_command_queue p4a_queue = NULL;
-cl_program p4a_program = NULL;  
-cl_kernel p4a_kernel = NULL;  
-
-#ifdef __cplusplus
-std::map<std::string,struct p4a_cl_kernel *> p4a_kernels_map;
-#else
-struct p4a_cl_kernel *p4a_kernels=NULL;
-// Only used when creating the kernel list
-struct p4a_cl_kernel *last_kernel=NULL;
-
-// The C++ equivalent function is in the p4a_accel-OpenCL.h file
-void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) {
-  //printf("%s : size %lu, rang %d\n",s,size,i);
-  p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
-  P4A_test_execution_with_message("clSetKernelArg");
-}
-
-/** @author : Stéphanie Even
-
-    Creation of a new kernel, initialisation and insertion in the kernel list.
- */
-struct p4a_cl_kernel* new_p4a_kernel(const char *kernel)
-{
-  struct p4a_cl_kernel *new_kernel = (struct p4a_cl_kernel *)malloc(sizeof(struct p4a_cl_kernel));
-
-  if (p4a_kernels == NULL) {
-    //P4A_log("Begin of the kernel list\n");
-    last_kernel = p4a_kernels = new_kernel;
-  }
-  else {
-    //P4A_log("Follows the kernel list\n");
-    last_kernel->next = new_kernel;
-    last_kernel = new_kernel;
-  }
-  new_kernel->next = NULL;
-  new_kernel->name = (char *)strdup(kernel);
-  new_kernel->kernel = NULL;
-  new_kernel->time_execution = 0.;
-  char* kernelFile;
-  asprintf(&kernelFile,"./%s.cl",kernel);
-  new_kernel->file_name = (char *)strdup(kernelFile);
-  return new_kernel;
-}
-
-/** @author : Stéphanie Even
-
-    Search if the <kernel> is already in the list.
- */
-
-struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
-{
-  struct p4a_cl_kernel *kernel_in_the_list=p4a_kernels;
-  while (kernel_in_the_list != NULL) {
-    if (strcmp(kernel_in_the_list->name,kernel) == 0)
-      return kernel_in_the_list;
-    kernel_in_the_list = kernel_in_the_list->next;
-  }
-  return NULL;
-}
-
-#endif //!__cplusplus
-
-/** Stop a timer on the accelerator and get float time in second
-
- @addtogroup P4A_opencl_time_measure
- */
-/*
-double P4A_accel_copy_timer()
-{
-  cl_ulong start,end;
-  double time;
-
-#ifdef P4A_PROFILING
-  if (p4a_event_copy) {
-    clWaitForEvents(1, &p4a_event_copy);
-    
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
-					       CL_PROFILING_COMMAND_END, 
-					       sizeof(cl_ulong), 
-					       &end, 
-					       NULL));
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
-					       CL_PROFILING_COMMAND_START, 
-					       sizeof(cl_ulong), 
-					       &start, 
-					       NULL));
-    // execution_time in nanoseconds	      
-    time = (float)(end - start);
-    //printf("p4a_time_copy : %f\n",time*1.0e-9);
-    // Return the time in second: 
-    return time*1.0e-9;
-  }
-#endif
-  return 0;
-}
-*/
-
-double P4A_accel_timer_stop_and_float_measure() 
-{
-  cl_ulong start,end;
-
-#ifdef P4A_PROFILING
-  if (p4a_execution_time_tag == true && p4a_event_execution) {
-    clWaitForEvents(1, &p4a_event_execution);
-    
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_execution, 
-					       CL_PROFILING_COMMAND_END, 
-					       sizeof(cl_ulong), 
-					       &end, 
-					       NULL));
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_execution, 
-					       CL_PROFILING_COMMAND_START, 
-					       sizeof(cl_ulong), 
-					       &start, 
-					       NULL));
-    // time in nanoseconds	      
-    p4a_time += (float)(end - start);
-    // Return the time in second:
-    return p4a_time*1.0e-9;
-  }
-  else if (p4a_copy_time_tag == true && p4a_event_copy) {
-    clWaitForEvents(1, &p4a_event_copy);
-    
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
-					       CL_PROFILING_COMMAND_END, 
-					       sizeof(cl_ulong), 
-					       &end, 
-					       NULL));
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event_copy, 
-					       CL_PROFILING_COMMAND_START, 
-					       sizeof(cl_ulong), 
-					       &start, 
-					       NULL));
-    // time in nanoseconds	      
-    p4a_time = (float)(end - start);
-    // Return the time in second: 
-    return p4a_time*1.0e-9;
-  }
-  else
-    return p4a_time*1.0e-9;
-#else
-  return 0;
-#endif
-}
-
-/** Allocate memory on the hardware accelerator in OpenCL mode.
-
-    @param[out] address is the address of a variable that is updated by
-    this function to contains the address of the allocated memory block
-
-    @param[in] size is the size to allocate in bytes
-*/
-void P4A_accel_malloc(void **address, size_t size) {
-  // The mem flag can be : 
-  // CL_MEM_READ_ONLY, 
-  // CL_MEM_WRITE_ONLY, 
-  // CL_MEM_READ_WRITE, 
-  // CL_MEM_USE_HOST_PTR
-  *address=(void *)clCreateBuffer(p4a_context,
-				  CL_MEM_READ_WRITE,
-				  size,
-				  NULL,
-				  &p4a_global_error);
-  P4A_test_execution_with_message("Memory allocation via clCreateBuffer");
-}
-
-/** Free memory on the hardware accelerator in OpenCL mode
-
-    @param[in] address points to a previously allocated memory zone for
-    the hardware accelerator
-*/
-void P4A_accel_free(void *address) 
-{
-  p4a_global_error=clReleaseMemObject((cl_mem)address);
-  P4A_test_execution_with_message("clReleaseMemObject");
-}
-
-/** Copy a scalar from the hardware accelerator to the host
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[out] host_address point to the element on the host to write
- into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
- */
-void P4A_copy_from_accel(size_t element_size,
-			 void *host_address,
-			 const void *accel_address) 
-{
-  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
-				       (cl_mem)accel_address,
-				       CL_TRUE, // synchronous read
-				       0,
-				       element_size,
-				       host_address,
-				       0,
-				       NULL,
-				       &p4a_event_copy);
-  p4a_copy_time_tag = true;			
-  P4A_accel_timer_stop_and_float_measure();
-  p4a_copy_time_tag = false;			
-  //p4a_time_copy += P4A_accel_copy_timer();
-  P4A_test_execution_with_message("clEnqueueReadBuffer");
-}
-
-/** Copy a scalar from the host to the hardware accelerator
-
-  @param[in] element_size is the size of one element of the array in
- byte
-
- @param[out] host_address point to the element on the host to write
- into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
- */
-void P4A_copy_to_accel(size_t element_size,
-		       const void *host_address,
-		       void *accel_address) 
-{
-  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
-					(cl_mem)accel_address,
-					CL_FALSE,// asynchronous write
-					0,
-					element_size,
-					host_address,
-					0,
-					NULL,
-					&p4a_event_copy);
-  p4a_copy_time_tag = true;			
-  P4A_accel_timer_stop_and_float_measure();
-  p4a_copy_time_tag = false;			
-  //  p4a_time_copy += P4A_accel_copy_timer();
-  P4A_test_execution_with_message("clEnqueueWriteBuffer");
-}
-
-/** Function for copying memory from the hardware accelerator to a 1D array in
- the host.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from (host side)
-
- @param[out] host_address point to the array on the host to write into
-
- @param[in] accel_address refer to the compact memory area to read
- data. In the general case, accel_address may be seen as a unique idea (FIFO)
- and not some address in some memory space.
-
- @return the host_address, by compatibility with memcpy().
- */
-void P4A_copy_from_accel_1d(size_t element_size,
-			    size_t d1_size,
-			    size_t d1_block_size,
-			    size_t d1_offset,
-			    void *host_address,
-			    const void *accel_address) 
-{
-  char * cdest = d1_offset*element_size + (char *)host_address;
-  // CL_TRUE : synchronous read
-  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
-				       (cl_mem)accel_address,
-				       CL_TRUE,
-				       0,
-				       d1_block_size*element_size,
-				       cdest,
-				       0,
-				       NULL,
-				       &p4a_event_copy);
-  p4a_copy_time_tag = true;			
-  P4A_accel_timer_stop_and_float_measure();
-  p4a_copy_time_tag = false;			
-  //  p4a_time_copy += P4A_accel_copy_timer();
-  P4A_test_execution_with_message("clEnqueueReadBuffer");
-}
-
-
-/** Function for copying a 1D memory zone from the host to a compact memory
- zone in the hardware accelerator.
-
- This function could be quite simpler but is designed by symmetry with
- other functions.
-
- @param[in] element_size is the size of one element of the array in
- byte
-
- @param[in] d1_size is the number of elements in the array. It is not
- used but here for symmetry with functions of higher dimensionality
-
- @param[in] d1_block_size is the number of element to transfer
-
- @param[in] d1_offset is element order to start the transfer from
-
- @param[in] host_address point to the array on the host to read
-
- @param[out] accel_address refer to the compact memory area to write
- data. In the general case, accel_address may be seen as a unique idea
- (FIFO) and not some address in some memory space.
- */
-void P4A_copy_to_accel_1d(size_t element_size,
-			  size_t d1_size,
-			  size_t d1_block_size,
-			  size_t d1_offset,
-			  const void *host_address,
-			  void *accel_address) 
-{
-  const char * csrc = d1_offset*element_size + (char *)host_address;
-  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
-					(cl_mem)accel_address,
-					CL_FALSE, //CL_FALSE:asynchronous write
-					0,
-					d1_block_size*element_size,
-					csrc,
-					0,
-					NULL,
-					&p4a_event_copy);
-  p4a_copy_time_tag = true;			
-  P4A_accel_timer_stop_and_float_measure();
-  p4a_copy_time_tag = false;			
-  //  p4a_time_copy += P4A_accel_copy_timer();
-  P4A_test_execution_with_message("clEnqueueWriteBuffer");
-}
-
-/** Function for copying memory from the hardware accelerator to a 2D array in
- the host.
- */
-void P4A_copy_from_accel_2d(size_t element_size,
-			    size_t d1_size, size_t d2_size,
-			    size_t d1_block_size, size_t d2_block_size,
-			    size_t d1_offset, size_t d2_offset,
-			    void *host_address,
-			    const void *accel_address) {
-
-  if(d2_size==d2_block_size ) { // d2 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_from_accel_1d(element_size,
-                           d2_size * d1_size,
-                           d2_size * d1_block_size,
-                           d1_offset*d2_size+d2_offset,
-                           host_address,
-                           accel_address);
-  } else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*element_size;
-    char * accel_row = (char*)accel_address;
-
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_from_accel_1d(element_size,
-                             d2_size,
-                             d2_block_size,
-                             d2_offset,
-                             host_row,
-                             accel_row);
-
-      // Comput addresses for next row
-      host_row += d2_size*element_size;
-      accel_row += d2_block_size*element_size;
-    }
-  }
-}
-
-/** Function for copying a 2D memory zone from the host to a compact memory
- zone in the hardware accelerator.
- */
-void P4A_copy_to_accel_2d(size_t element_size,
-			  size_t d1_size, size_t d2_size,
-			  size_t d1_block_size, size_t d2_block_size,
-			  size_t d1_offset, size_t d2_offset,
-			  const void *host_address,
-			  void *accel_address) 
-{
-  if(d2_size==d2_block_size ) { // d2 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_to_accel_1d(element_size,
-                         d2_size * d1_size,
-                         d2_size * d1_block_size,
-                         d1_offset*d2_size+d2_offset,
-                         host_address,
-                         accel_address);
-  } else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*element_size;
-    char * accel_row = (char*)accel_address;
-    
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_to_accel_1d(element_size,
-                           d2_size,
-                           d2_block_size,
-                           d2_offset,
-                           host_row,
-                           accel_row);
-
-      // Comput addresses for next row
-      host_row += d2_size*element_size;
-      accel_row += d2_block_size*element_size;
-    }
-  }
-
-}
-
-/** Function for copying memory from the hardware accelerator to a 3D array in
-    the host.
-*/
-void P4A_copy_from_accel_3d(size_t element_size,
-			    size_t d1_size, size_t d2_size, size_t d3_size,
-			    size_t d1_block_size, 
-			    size_t d2_block_size, size_t d3_block_size,
-			    size_t d1_offset, 
-			    size_t d2_offset, size_t d3_offset,
-			    void *host_address,
-			    const void *accel_address) {
-
-
-  if(d3_size==d3_block_size ) { // d3 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_from_accel_2d(element_size,
-                           d1_size,d3_size * d2_size,
-                           d1_block_size, d3_size * d2_block_size,
-                           d1_offset, d2_offset*d3_size+d3_offset,
-                           host_address,
-                           accel_address);
-  } else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*element_size;
-    char * accel_row = (char*)accel_address;
-
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_from_accel_2d(element_size,
-                             d2_size,d3_size,
-                             d2_block_size, d3_block_size,
-                             d2_offset, d3_offset,
-                             host_row,
-                             accel_row);
-
-      // Comput addresses for next row
-      host_row += d3_size*element_size;
-      accel_row += d3_block_size*element_size;
-    }
-  }
-}
-
-
-/** Function for copying a 3D memory zone from the host to a compact memory
-    zone in the hardware accelerator.
-*/
-void P4A_copy_to_accel_3d(size_t element_size,
-			  size_t d1_size, size_t d2_size, size_t d3_size,
-			  size_t d1_block_size, 
-			  size_t d2_block_size, 
-			  size_t d3_block_size,
-			  size_t d1_offset, size_t d2_offset, size_t d3_offset,
-			  const void *host_address,
-			  void *accel_address) 
-{
-  if(d3_size==d3_block_size ) { // d3 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_to_accel_2d(element_size,
-                         d1_size,d3_size * d2_size,
-                         d1_block_size, d3_size * d2_block_size,
-                         d1_offset, d2_offset*d3_size+d3_offset,
-                         host_address,
-                         accel_address);
-  } else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*element_size;
-    char * accel_row = (char*)accel_address;
-
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_to_accel_2d(element_size,
-                           d2_size,d3_size,
-                           d2_block_size, d3_block_size,
-                           d2_offset, d3_offset,
-                           host_row,
-                           accel_row);
-
-      // Comput addresses for next row
-      host_row += d3_size*element_size;
-      accel_row += d3_block_size*element_size;
-    }
-  }
-}
-
-/** Function for copying memory from the hardware accelerator to a 4D array in
-    the host.
-*/
-void P4A_copy_from_accel_4d(size_t element_size,
-			    size_t d1_size, size_t d2_size, 
-			    size_t d3_size, size_t d4_size,
-			    size_t d1_block_size, size_t d2_block_size, 
-			    size_t d3_block_size, size_t d4_block_size,
-			    size_t d1_offset, size_t d2_offset, 
-			    size_t d3_offset, size_t d4_offset,
-			    void *host_address,
-			    const void *accel_address) {
-
-  if(d4_size==d4_block_size ) { // d4 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_from_accel_3d(element_size,
-                         d1_size,d2_size,d3_size * d4_size,
-                         d1_block_size, d2_block_size, d3_block_size * d4_size,
-                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
-                         host_address,
-                         accel_address);
-  } else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
-    char * accel_row = (char*)accel_address;
-
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_from_accel_3d(element_size,
-                           d2_size,d3_size,d4_size,
-                           d2_block_size, d3_block_size, d4_block_size,
-                           d2_offset, d3_offset, d4_offset,
-                           host_row,
-                           accel_row);
-
-      // Comput addresses for next row
-      host_row += d4_size*element_size;
-      accel_row += d4_block_size*element_size;
-    }
-  }
-}
-
-/** Function for copying a 4D memory zone from the host to a compact memory
-    zone in the hardware accelerator.
-*/
-void P4A_copy_to_accel_4d(size_t element_size,
-			  size_t d1_size, size_t d2_size, 
-			  size_t d3_size, size_t d4_size,
-			  size_t d1_block_size, size_t d2_block_size, 
-			  size_t d3_block_size, size_t d4_block_size,
-			  size_t d1_offset, size_t d2_offset, 
-			  size_t d3_offset, size_t d4_offset,
-			  const void *host_address,
-			  void *accel_address) {
-  if (d4_size == d4_block_size) { //d4 is fully transfered ? We can optimize :-)
-    // We transfer all in one shot !
-    P4A_copy_to_accel_3d(element_size,
-                         d1_size,d2_size,d3_size * d4_size,
-                         d1_block_size, d2_block_size, d3_block_size * d4_size,
-                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
-                         host_address,
-                         accel_address);
-  } 
-  else { // Transfer row by row !
-    // Compute the adress of the begining of the first row to transfer
-    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
-    char * accel_row = (char*)accel_address;
-
-    // Will transfert "d1_block_size" rows
-    for(size_t i = 0; i < d1_block_size; i++) {
-      P4A_copy_to_accel_3d(element_size,
-                           d2_size,d3_size,d4_size,
-                           d2_block_size, d3_block_size, d4_block_size,
-                           d2_offset, d3_offset, d4_offset,
-                           host_row,
-                           accel_row);
-
-      // Comput addresses for next row
-      host_row += d4_size*element_size;
-      accel_row += d4_block_size*element_size;
-    }
-  }
-}
 
 /** @author : Stéphanie Even
 
@@ -1485,56 +920,136 @@ char * p4a_error_to_string(int error)
  */
 void p4a_clean(int exitCode)
 {
-  if(p4a_program)clReleaseProgram(p4a_program);
+  //if(p4a_program)clReleaseProgram(p4a_program);
   if(p4a_kernel)clReleaseKernel(p4a_kernel);  
   if(p4a_queue)clReleaseCommandQueue(p4a_queue);
   if(p4a_context)clReleaseContext(p4a_context);
   exit(exitCode);
 }
 
-/** @author : Based on the CUDA version from Grégoire Péan. 
-              Picked and adapted to OpenCL by Stéphanie Even
+/* @} */
 
-    Error display based on OpenCL error codes.
+/** @addtogroup P4A_time_measure
 
-    Each OpenCL function returns an error information.
+    @{
  */
-void p4a_error(cl_int error, 
-	       const char *currentFile, 
-	       const int currentLine)
+
+#ifdef P4A_PROFILING
+cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
+#else
+cl_command_queue_properties p4a_queue_properties = 0;
+#endif
+
+double p4a_time = 0.;
+cl_event p4a_event = NULL;
+
+
+/** In OpenCL, stop a timer on the accelerator and get float time in
+    second.
+ */
+
+double P4A_accel_timer_stop_and_float_measure() 
 {
-  if(CL_SUCCESS != error) {
-    fprintf(stderr, "File %s - Line %i - The runtime error is %s\n",
-	    currentFile,currentLine,P4A_error_to_string(error));
-    p4a_clean(EXIT_FAILURE);
+  cl_ulong start,end;
+
+#ifdef P4A_PROFILING
+  if (p4a_event) {
+    clWaitForEvents(1, &p4a_event);
+    
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+					       CL_PROFILING_COMMAND_END, 
+					       sizeof(cl_ulong), 
+					       &end, 
+					       NULL));
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+					       CL_PROFILING_COMMAND_START, 
+					       sizeof(cl_ulong), 
+					       &start, 
+					       NULL));
+    // time in nanoseconds	      
+    p4a_time += (float)(end - start);
+    // Return the time in second:
+    return p4a_time*1.0e-9;
   }
-#ifdef P4A_DEBUG
   else
-    fprintf(stdout, "File %s - Line %i - %s\n",
-	    currentFile,currentLine,P4A_error_to_string(error));
+    return p4a_time*1.0e-9;
+#else
+  return 0;
 #endif
 }
 
-/** @author : Based on the CUDA version from Grégoire Péan. 
-              Picked and adapted to OpenCL by Stéphanie Even
+/* @} */
 
-    Error display with message based on OpenCL error codes.
- */
-void p4a_message(const char *message, 
-		 const char *currentFile, 
-		 const int currentLine)
-{
-  if(CL_SUCCESS != p4a_global_error){
-    fprintf(stderr, "File %s - Line %i - Failed - %s : %s\n", currentFile, currentLine, message, P4A_error_to_string(p4a_global_error));
-    p4a_clean(EXIT_FAILURE);
-  }
-#ifdef P4A_DEBUG
-  else {
-    fprintf(stdout, "File %s - Line %i - Success - %s\n", 
-	    currentFile, currentLine, message);
-  }
-#endif 
+/** @addtogroup P4A_kernel_call Accelerator kernel call
+
+    @{
+*/
+cl_context p4a_context = NULL;
+cl_command_queue p4a_queue = NULL;
+cl_kernel p4a_kernel = NULL;  
+
+#ifdef __cplusplus
+std::map<std::string,struct p4a_cl_kernel *> p4a_kernels_map;
+#else
+struct p4a_cl_kernel *p4a_kernels=NULL;
+// Only used when creating the kernel list
+struct p4a_cl_kernel *last_kernel=NULL;
+
+/** @addtogroup P4A_call_parameters Parameters invocation.
+
+    @{
+    The C function to invoke clSetKernelArg where the reference to the
+    parameter is set as (void *).
+*/
+void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) {
+  p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
+  P4A_test_execution_with_message("clSetKernelArg");
 }
+/** 
+    @}
+*/
+
+/** @author : Stéphanie Even
+
+    Creation of a new kernel, initialisation and insertion in the kernel list.
+ */
+struct p4a_cl_kernel* new_p4a_kernel(const char *kernel)
+{
+  struct p4a_cl_kernel *new_kernel = (struct p4a_cl_kernel *)malloc(sizeof(struct p4a_cl_kernel));
+
+  if (p4a_kernels == NULL) {
+    last_kernel = p4a_kernels = new_kernel;
+  }
+  else {
+    last_kernel->next = new_kernel;
+    last_kernel = new_kernel;
+  }
+  new_kernel->next = NULL;
+  new_kernel->name = (char *)strdup(kernel);
+  new_kernel->kernel = NULL;
+  char* kernelFile;
+  asprintf(&kernelFile,"./%s.cl",kernel);
+  new_kernel->file_name = (char *)strdup(kernelFile);
+  return new_kernel;
+}
+
+/** @author : Stéphanie Even
+
+    Search if the <kernel> is already in the list.
+ */
+
+struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
+{
+  struct p4a_cl_kernel *kernel_in_the_list=p4a_kernels;
+  while (kernel_in_the_list != NULL) {
+    if (strcmp(kernel_in_the_list->name,kernel) == 0)
+      return kernel_in_the_list;
+    kernel_in_the_list = kernel_in_the_list->next;
+  }
+  return NULL;
+}
+
+#endif //!__cplusplus
 
 /** @author : Stéphanie Even
 
@@ -1567,7 +1082,7 @@ void p4a_load_kernel(const char *kernel,...)
 #endif
   // If not found ...
   if (!k) {
-    P4A_log("The kernel %s is loaded for the first time\n",kernel);
+    P4A_skip_debug(P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
@@ -1577,7 +1092,7 @@ void p4a_load_kernel(const char *kernel,...)
 #endif
 
     char* kernelFile =  k->file_name;
-    P4A_log("Program and Kernel creation from %s\n",kernelFile);    
+    P4A_skip_debug(P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
     size_t kernelLength;
     const char *comment = "// This kernel was generated for P4A\n";
     // Same design as the NVIDIA oclLoadProgSource
@@ -1585,13 +1100,14 @@ void p4a_load_kernel(const char *kernel,...)
 					   comment,
 					   &kernelLength);
     if (cSourceCL == NULL)
-      P4A_log("source du program null\n");
+      P4A_skip_debug(P4A_dump_message("source du program null\n"));
     else
-      P4A_log("%s\n",cSourceCL);
-    P4A_log("Kernel length = %lu\n",kernelLength);
+      P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
+      
+    P4A_skip_debug(P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
     /*Create and compile the program : 1 for 1 kernel */
-    p4a_program=clCreateProgramWithSource(p4a_context,1,
+    cl_program p4a_program=clCreateProgramWithSource(p4a_context,1,
 					  (const char **)&cSourceCL,
 					  &kernelLength,
 					  &p4a_global_error);
@@ -1627,13 +1143,17 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
 
   // Open the file
   int in = open(cl_kernel_file,O_RDONLY);
-  if (!in) 
-    P4A_log_and_exit(EXIT_FAILURE,"Bad kernel source reference : %s\n",cl_kernel_file);
+  if (!in) {
+    fprintf(stderr,"Bad kernel source reference : %s\n",cl_kernel_file);
+    exit(EXIT_FAILURE);
+  }
   
   // Read the file content
   int n=0;
-  if ((n = read(in,(void *)p,size)) != (int)size) 
-    P4A_log_and_exit(EXIT_FAILURE,"Read was not completed : %d / %lu octets\n",n,size);
+  if ((n = read(in,(void *)p,size)) != (int)size) {
+    fprintf(stderr,"Read was not completed : %d / %lu octets\n",n,size);
+    exit(EXIT_FAILURE);
+  }
   
   // Final string marker
   source[len+n]='\0';
@@ -1641,5 +1161,447 @@ char *p4a_load_prog_source(char *cl_kernel_file,const char *head,size_t *length)
   *length = size+len;
   return source;
 }
+
+/** @} */
+
+/** @defgroup P4A_memory_allocation_copy Memory allocation and copy 
+
+    @{
+*/
+/** Allocate memory on the hardware accelerator in OpenCL mode.
+
+    @param[out] address is the address of a variable that is updated by
+    this function to contains the address of the allocated memory block
+
+    @param[in] size is the size to allocate in bytes
+*/
+void P4A_accel_malloc(void **address, size_t size) {
+  // The mem flag can be : 
+  // CL_MEM_READ_ONLY, 
+  // CL_MEM_WRITE_ONLY, 
+  // CL_MEM_READ_WRITE, 
+  // CL_MEM_USE_HOST_PTR
+  *address=(void *)clCreateBuffer(p4a_context,
+				  CL_MEM_READ_WRITE,
+				  size,
+				  NULL,
+				  &p4a_global_error);
+  P4A_test_execution_with_message("Memory allocation via clCreateBuffer");
+}
+
+/** Free memory on the hardware accelerator in OpenCL mode
+
+    @param[in] address points to a previously allocated memory zone for
+    the hardware accelerator
+*/
+void P4A_accel_free(void *address) 
+{
+  p4a_global_error=clReleaseMemObject((cl_mem)address);
+  P4A_test_execution_with_message("clReleaseMemObject");
+}
+
+/** Copy a scalar from the hardware accelerator to the host
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[out] host_address point to the element on the host to write
+ into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+ */
+void P4A_copy_from_accel(size_t element_size,
+			 void *host_address,
+			 const void *accel_address) 
+{
+  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
+				       (cl_mem)accel_address,
+				       CL_TRUE, // synchronous read
+				       0,
+				       element_size,
+				       host_address,
+				       0,
+				       NULL,
+				       &p4a_event);
+  P4A_accel_timer_stop_and_float_measure();
+  P4A_test_execution_with_message("clEnqueueReadBuffer");
+}
+
+/** Copy a scalar from the host to the hardware accelerator
+
+  @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[out] host_address point to the element on the host to write
+ into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+ */
+void P4A_copy_to_accel(size_t element_size,
+		       const void *host_address,
+		       void *accel_address) 
+{
+  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
+					(cl_mem)accel_address,
+					CL_FALSE,// asynchronous write
+					0,
+					element_size,
+					host_address,
+					0,
+					NULL,
+					&p4a_event);
+  P4A_accel_timer_stop_and_float_measure();
+  P4A_test_execution_with_message("clEnqueueWriteBuffer");
+}
+
+/** Function for copying memory from the hardware accelerator to a 1D array in
+ the host.
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[in] d1_size is the number of elements in the array. It is not
+ used but here for symmetry with functions of higher dimensionality
+
+ @param[in] d1_block_size is the number of element to transfer
+
+ @param[in] d1_offset is element order to start the transfer from (host side)
+
+ @param[out] host_address point to the array on the host to write into
+
+ @param[in] accel_address refer to the compact memory area to read
+ data. In the general case, accel_address may be seen as a unique idea (FIFO)
+ and not some address in some memory space.
+
+ @return the host_address, by compatibility with memcpy().
+ */
+void P4A_copy_from_accel_1d(size_t element_size,
+			    size_t d1_size,
+			    size_t d1_block_size,
+			    size_t d1_offset,
+			    void *host_address,
+			    const void *accel_address) 
+{
+  char * cdest = d1_offset*element_size + (char *)host_address;
+  // CL_TRUE : synchronous read
+  p4a_global_error=clEnqueueReadBuffer(p4a_queue,
+				       (cl_mem)accel_address,
+				       CL_TRUE,
+				       0,
+				       d1_block_size*element_size,
+				       cdest,
+				       0,
+				       NULL,
+				       &p4a_event);
+  P4A_accel_timer_stop_and_float_measure();
+  P4A_test_execution_with_message("clEnqueueReadBuffer");
+}
+
+
+/** Function for copying a 1D memory zone from the host to a compact memory
+ zone in the hardware accelerator.
+
+ This function could be quite simpler but is designed by symmetry with
+ other functions.
+
+ @param[in] element_size is the size of one element of the array in
+ byte
+
+ @param[in] d1_size is the number of elements in the array. It is not
+ used but here for symmetry with functions of higher dimensionality
+
+ @param[in] d1_block_size is the number of element to transfer
+
+ @param[in] d1_offset is element order to start the transfer from
+
+ @param[in] host_address point to the array on the host to read
+
+ @param[out] accel_address refer to the compact memory area to write
+ data. In the general case, accel_address may be seen as a unique idea
+ (FIFO) and not some address in some memory space.
+ */
+void P4A_copy_to_accel_1d(size_t element_size,
+			  size_t d1_size,
+			  size_t d1_block_size,
+			  size_t d1_offset,
+			  const void *host_address,
+			  void *accel_address) 
+{
+  const char * csrc = d1_offset*element_size + (char *)host_address;
+  p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
+					(cl_mem)accel_address,
+					CL_FALSE, //CL_FALSE:asynchronous write
+					0,
+					d1_block_size*element_size,
+					csrc,
+					0,
+					NULL,
+					&p4a_event);
+  P4A_accel_timer_stop_and_float_measure();
+  P4A_test_execution_with_message("clEnqueueWriteBuffer");
+}
+
+/** Function for copying memory from the hardware accelerator to a 2D array in
+ the host.
+ */
+void P4A_copy_from_accel_2d(size_t element_size,
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address) 
+{
+  // d2 is fully transfered ? We can optimize :-)
+  if(d2_size==d2_block_size ) { 
+    // We transfer all in one shot !
+    P4A_copy_from_accel_1d(element_size,
+                           d2_size * d1_size,
+                           d2_size * d1_block_size,
+                           d1_offset*d2_size+d2_offset,
+                           host_address,
+                           accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_from_accel_1d(element_size,
+                             d2_size,
+                             d2_block_size,
+                             d2_offset,
+                             host_row,
+                             accel_row);
+
+      // Comput addresses for next row
+      host_row += d2_size*element_size;
+      accel_row += d2_block_size*element_size;
+    }
+  }
+}
+
+/** Function for copying a 2D memory zone from the host to a compact memory
+ zone in the hardware accelerator.
+ */
+void P4A_copy_to_accel_2d(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset, size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address) 
+{
+  // d2 is fully transfered ? We can optimize :-)
+  if(d2_size==d2_block_size ) { 
+    // We transfer all in one shot !
+    P4A_copy_to_accel_1d(element_size,
+                         d2_size * d1_size,
+                         d2_size * d1_block_size,
+                         d1_offset*d2_size+d2_offset,
+                         host_address,
+                         accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*element_size;
+    char * accel_row = (char*)accel_address;
+    
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_to_accel_1d(element_size,
+                           d2_size,
+                           d2_block_size,
+                           d2_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d2_size*element_size;
+      accel_row += d2_block_size*element_size;
+    }
+  }
+
+}
+
+/** Function for copying memory from the hardware accelerator to a 3D array in
+    the host.
+*/
+void P4A_copy_from_accel_3d(size_t element_size,
+			    size_t d1_size, size_t d2_size, size_t d3_size,
+			    size_t d1_block_size, 
+			    size_t d2_block_size, size_t d3_block_size,
+			    size_t d1_offset, 
+			    size_t d2_offset, size_t d3_offset,
+			    void *host_address,
+			    const void *accel_address) 
+{
+  // d3 is fully transfered ? We can optimize :-)
+  if(d3_size==d3_block_size ) { 
+    // We transfer all in one shot !
+    P4A_copy_from_accel_2d(element_size,
+                           d1_size,d3_size * d2_size,
+                           d1_block_size, d3_size * d2_block_size,
+                           d1_offset, d2_offset*d3_size+d3_offset,
+                           host_address,
+                           accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_from_accel_2d(element_size,
+                             d2_size,d3_size,
+                             d2_block_size, d3_block_size,
+                             d2_offset, d3_offset,
+                             host_row,
+                             accel_row);
+
+      // Comput addresses for next row
+      host_row += d3_size*element_size;
+      accel_row += d3_block_size*element_size;
+    }
+  }
+}
+
+
+/** Function for copying a 3D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_3d(size_t element_size,
+			  size_t d1_size, size_t d2_size, size_t d3_size,
+			  size_t d1_block_size, 
+			  size_t d2_block_size, 
+			  size_t d3_block_size,
+			  size_t d1_offset, size_t d2_offset, size_t d3_offset,
+			  const void *host_address,
+			  void *accel_address) 
+{
+  // d3 is fully transfered ? We can optimize :-)
+  if(d3_size==d3_block_size ) { 
+    // We transfer all in one shot !
+    P4A_copy_to_accel_2d(element_size,
+                         d1_size,d3_size * d2_size,
+                         d1_block_size, d3_size * d2_block_size,
+                         d1_offset, d2_offset*d3_size+d3_offset,
+                         host_address,
+                         accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_to_accel_2d(element_size,
+                           d2_size,d3_size,
+                           d2_block_size, d3_block_size,
+                           d2_offset, d3_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d3_size*element_size;
+      accel_row += d3_block_size*element_size;
+    }
+  }
+}
+
+/** Function for copying memory from the hardware accelerator to a 4D array in
+    the host.
+*/
+void P4A_copy_from_accel_4d(size_t element_size,
+			    size_t d1_size, size_t d2_size, 
+			    size_t d3_size, size_t d4_size,
+			    size_t d1_block_size, size_t d2_block_size, 
+			    size_t d3_block_size, size_t d4_block_size,
+			    size_t d1_offset, size_t d2_offset, 
+			    size_t d3_offset, size_t d4_offset,
+			    void *host_address,
+			    const void *accel_address) 
+{
+  // d4 is fully transfered ? We can optimize :-)
+  if(d4_size==d4_block_size ) { 
+    // We transfer all in one shot !
+    P4A_copy_from_accel_3d(element_size,
+                         d1_size,d2_size,d3_size * d4_size,
+                         d1_block_size, d2_block_size, d3_block_size * d4_size,
+                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
+                         host_address,
+                         accel_address);
+  } else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_from_accel_3d(element_size,
+                           d2_size,d3_size,d4_size,
+                           d2_block_size, d3_block_size, d4_block_size,
+                           d2_offset, d3_offset, d4_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d4_size*element_size;
+      accel_row += d4_block_size*element_size;
+    }
+  }
+}
+
+/** Function for copying a 4D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_4d(size_t element_size,
+			  size_t d1_size, size_t d2_size, 
+			  size_t d3_size, size_t d4_size,
+			  size_t d1_block_size, size_t d2_block_size, 
+			  size_t d3_block_size, size_t d4_block_size,
+			  size_t d1_offset, size_t d2_offset, 
+			  size_t d3_offset, size_t d4_offset,
+			  const void *host_address,
+			  void *accel_address) 
+{
+  //d4 is fully transfered ? We can optimize :-)
+  if (d4_size == d4_block_size) { 
+    // We transfer all in one shot !
+    P4A_copy_to_accel_3d(element_size,
+                         d1_size,d2_size,d3_size * d4_size,
+                         d1_block_size, d2_block_size, d3_block_size * d4_size,
+                         d1_offset, d2_offset, d3_offset*d4_size+d4_offset,
+                         host_address,
+                         accel_address);
+  } 
+  else { // Transfer row by row !
+    // Compute the adress of the begining of the first row to transfer
+    char * host_row = (char*)host_address + d1_offset*d2_size*d3_size*d4_size*element_size;
+    char * accel_row = (char*)accel_address;
+
+    // Will transfert "d1_block_size" rows
+    for(size_t i = 0; i < d1_block_size; i++) {
+      P4A_copy_to_accel_3d(element_size,
+                           d2_size,d3_size,d4_size,
+                           d2_block_size, d3_block_size, d4_block_size,
+                           d2_offset, d3_offset, d4_offset,
+                           host_row,
+                           accel_row);
+
+      // Comput addresses for next row
+      host_row += d4_size*element_size;
+      accel_row += d4_block_size*element_size;
+    }
+  }
+}
+
+/* @} */
+
+
+
+
 
 #endif // P4A_ACCEL_OPENCL

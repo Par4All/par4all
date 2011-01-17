@@ -55,10 +55,10 @@ p4a_accel.c: $(P4A_ACCEL_DIR)/p4a_accel.c
 # New default rule to compile CUDA source files:
 
 $(EXECUTABLE): $(CFILES) $(KERNELFILES)
-	$(CC) $(CFLAGS) -o $@ $(CFILES)  $(KERNELFILES)  
+	$(CC) $(CFLAGS) -o $@ $(CFILES)  $(KERNELFILES) $(LDLIBS)  
 
 $(EXECUTABLE-OMP): $(CFILES) $(KERNELFILES)
-	$(CC) $(CFLAGS) -fopenmp -o $@ $(CFILES)  $(KERNELFILES) -fopenmp
+	$(CC) $(CFLAGS) -fopenmp -o $@ $(CFILES)  $(KERNELFILES) $(LDLIBS)  -fopenmp
 
 # New default rule to compile CUDA source files:
 %.cu.o: %.cu

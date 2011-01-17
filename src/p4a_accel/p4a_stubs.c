@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
-/** @defgroup p4a_accel_stubs Equivalent stubs of Par4All runtime to have
-    PIPS analyzis happy
+/** @defgroup p4a_accel_stubs Equivalent stubs of Par4All runtime 
+    to have PIPS analyzis happy
 
     The main idea is that PIPS is interprocedural and needs to know
     everything about the program to be analysed. Since the generated

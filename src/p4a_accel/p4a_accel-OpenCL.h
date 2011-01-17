@@ -30,66 +30,128 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
-//#include <cl.h>
 
-/** A kernel list.
+// Includes the kernel and variable qualifiers.
+// Some are used when launching the kernel.
+#include "p4a_accel_wrapper-OpenCL.h"
+
+/** @addtogroup P4A_log Debug messages and errors tracking.
+    
+    @{
 */
-#ifdef __cplusplus
-#include <map>
-#include <string>
-struct p4a_cl_kernel {
-  cl_kernel kernel;
-  char *name;
-  char *file_name;
-  double time_execution;
 
-  p4a_cl_kernel(const char *k) {
-    name = (char *)strdup(k);
-    kernel = NULL;  
-    char* kernelFile;
-    asprintf(&kernelFile,"./%s.cl",k);
-    file_name = (char *)strdup(kernelFile);
-    time_execution = 0.;
-  }
-  ~p4a_cl_kernel() {}
-};
+/** Global error in absence of a getLastError in OpenCL */
+extern cl_int p4a_global_error;
 
-extern std::map<std::string, struct p4a_cl_kernel * > p4a_kernels_map ;
-#else
-struct p4a_cl_kernel {
-  cl_kernel kernel;
-  char *name;
-  char *file_name;
-  struct p4a_cl_kernel *next;
-  double time_execution;
-  //The constructor new_ is defined in the p4a_accel.h file
-};
-
-/** Begin of the kernels list
+/** Prototypes for the functions that converts OpenCL error codes to
+string. This function does not exists by default in OpenCL standard.
  */
-extern struct p4a_cl_kernel *p4a_kernels;
+char * p4a_error_to_string(int error);
 
-struct p4a_cl_kernel* new_p4a_kernel(const char *kernel);
-struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
-void p4a_setArguments(int i,char *s,size_t size,void * ref_arg);
-#endif
+/** Prototype for a clean up function.
 
-/** A tag to identifiy if it is a kernel executuon timer call
+    A function is prefered to a MACRO definition as the clean up
+    function is called to exit after error.
  */
-extern bool p4a_execution_time_tag;
-/** A tag to identifiy if it is a copy timer call
+void   p4a_clean(int exitCode);
+
+/** @author : Based on the CUDA version from Grégoire Péan. 
+              Picked and adapted to OpenCL by Stéphanie Even
+
+    Error display based on OpenCL error codes.
+
+    Each OpenCL function returns an error information.
  */
-extern bool p4a_copy_time_tag;
-/** Total execution time.
-    In OpenCL, time is mesured for each lunch of the kernel.
-    We also need to cumulate all the particulate times.
+#define P4A_test_execution(error)					\
+  do {									\
+    if(CL_SUCCESS != error) {						\
+      fprintf(stderr, "%s - The runtime error is %s\n",AT,		\
+	      (char *)p4a_error_to_string(error));			\
+      p4a_clean(EXIT_FAILURE);						\
+    }									\
+  } while (0)
+
+/** @author : Based on the CUDA version from Grégoire Péan. 
+              Picked and adapted to OpenCL by Stéphanie Even
+
+    Error display with message based on OpenCL error codes.
+ */
+#define P4A_test_execution_with_message(message)			\
+  do {									\
+    if (CL_SUCCESS != p4a_global_error) {				\
+      fprintf(stderr, "%s - Failed - %s : %s\n",AT,message,		\
+	      p4a_error_to_string(p4a_global_error));			\
+      p4a_clean(EXIT_FAILURE);						\
+    }									\
+  } while (0)
+
+/** @} */
+
+
+/** @addtogroup P4A_time_measure Time measurement
+
+    In OpenCL, the time is measured for single call of OpenCL
+    functions via a unique event.
+
+    In OpenCL, only one event is defined, in opposition to CUDA
+    where the time is measured between two events record. The is
+    called as the last argument in OpenCL functions like
+    clEnqueueNDRangeKernel for a kernel execution,
+    clEnqueueWriteBuffer or clEnqueueReadBuffer for copy. The event
+    records also the time elapsed during the execution of single
+    specific function. The p4a_time global variable has been defined
+    to cumulate the total time between the P4A_accel_timer_start call
+    and the P4A_accel_timer_stop_and_float_measure() call. The
+    p4a_time global variable is initialized at 0 at each call to the
+    P4A_accel_timer_start.
+
+    @{
+*/
+
+/** A tag to enable profiling in an OpenCL command queue
+    - if 0 : no profiling enabled
+    - if CL_QUEUE_PROFILING_ENABLE : profiling enabled.
+
+    Must be defined at the creation of the command queue
+
+    Because the context and the queue are created in the p4a_init,
+    when p4a_accel_timer_start is called everywhere the
+    p4a_queue_properties is defined as global variable. It is
+    initialized in the p4a_accel.c and not here.
+ */
+extern cl_command_queue_properties p4a_queue_properties;
+
+/** Cumulated time in OpenCL.  
+
+    In OpenCL, time is measured after each call of a
+    function (clEnqueueNDRangeKernel for a kernel execution,
+    clEnqueueWriteBuffer or clEnqueueReadBuffer for copy).  
+
+    We also need to cumulate each single time.
  */
 extern double p4a_time;
 
-/** Global error in absence of a getLastError equivalent in OpenCL */
-extern cl_int p4a_global_error;
-/** Events for timing in CL: */
-extern cl_event p4a_event_execution, p4a_event_copy;
+/** Event for timing in OpenCL */
+extern cl_event p4a_event;
+
+/** Start a timer on the accelerator in OpenCL.
+    
+    Initialize the global time variable.
+ */
+
+#ifdef P4A_PROFILING
+#define P4A_accel_timer_start   p4a_time = 0.						
+#else
+#define P4A_accel_timer_start 
+#endif
+
+/** @} */
+
+/** @addtogroup P4A_init_release Begin and end actions 
+
+    @{
+*/
+
 /** The OpenCL context ~ a CPU process 
 - a module
 - data
@@ -100,73 +162,144 @@ extern cl_context p4a_context;
  */
 extern cl_command_queue p4a_queue;
 
-extern cl_command_queue_properties p4a_queue_properties;
+/** OpenCL initialization implies to identifiy the platform and select the 
+    device. In our case, only GPU device and, at the moment,
+    only the first one is selected.
 
+    Context and queue linked to the selected device are created.
+*/
+#define P4A_init_accel	                                                \
+  /* Get an OpenCL platform : a set of devices available */		\
+  /* The device_id is the selected device from his type */		\
+  /* CL_DEVICE_TYPE_GPU */						\
+  /* CL_DEVICE_TYPE_CPU */						\
+  cl_platform_id p4a_platform_id = NULL;				\
+  p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);		\
+  P4A_test_execution_with_message("clGetPlatformIDs");			\
+  /* Get the devices,could be a collection of device */			\
+  cl_device_id p4a_device_id = NULL;					\
+  p4a_global_error=clGetDeviceIDs(p4a_platform_id,			\
+				  CL_DEVICE_TYPE_GPU,			\
+				  1,					\
+				  &p4a_device_id,			\
+				  NULL);				\
+  P4A_test_execution_with_message("clGetDeviceIDs");			\
+  /* Create the context */						\
+  p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/ \
+			      1,/*cl_uint num_devices*/			\
+			      &p4a_device_id,				\
+			      NULL,/*CL_CALLBACK *pfn_notify*/		\
+			      NULL,					\
+			      &p4a_global_error);			\
+  P4A_test_execution_with_message("clCreateContext");			\
+  /* ... could query many device, we retain only the first one */	\
+  /* Create a file allocated to the first device ...   */		\
+  p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,		\
+				 p4a_queue_properties,			\
+				 &p4a_global_error);			\
+  P4A_test_execution_with_message("clCreateCommandQueue")		
 
-/** The OpenCL programm composed of a set of modules
+/** Release the hardware accelerator in CL
  */
-extern cl_program p4a_program;  
-/** The current module selected in the program
- */
-extern cl_kernel p4a_kernel; 
+#define P4A_release_accel    p4a_clean(EXIT_SUCCESS)
+    
+/** @} */
 
-char * p4a_error_to_string(int error);
-void   p4a_clean(int exitCode);
-void   p4a_error(cl_int error,
-		 const char *currentFile,
-		 const int currentLine);
-void   p4a_message(const char *message,
-		   const char *currentFile,
-		   const int currentLine);
-void   p4a_load_kernel(const char *kernel,...);
-char * p4a_load_prog_source(char *cl_kernel_file,
-			    const char *head,
-			    size_t *length);
-double P4A_accel_timer_stop_and_float_measure();
-
-/** @}
- */
-
-/** @defgroup P4A print error and log functions.
-
-   @{
- */
-
-#define P4A_log_and_exit(code,...)               \
-  do {						 \
-  fprintf(stdout,__VA_ARGS__);			 \
-  exit(code);					 \
-  } while(0)
-
-#ifdef P4A_DEBUG
-#define P4A_log(...)               fprintf(stdout,__VA_ARGS__)
-#else
-#define P4A_log(...)   
-#endif
-
-#define P4A_error_to_string(error)     (char *)p4a_error_to_string(error)
-#define P4A_test_execution(error)      p4a_error(error, __FILE__, __LINE__)
-#define P4A_test_execution_with_message(message)	\
-  p4a_message(message, __FILE__, __LINE__)
-
-/** @}
- */
-
-/** @defgroup P4A macros to automatically treat __VA_ARGS__ calls
+/** @addtogroup P4A_kernel Accelerator kernel call
 
     @{
 */
 
-/** To solve the number of arguments
-    from 
-    http://stackoverflow.com/questions/3868289/count-number-of-parameters-in-c-variable-argument-method-call
+/** @addtogroup P4A_kernel_protoizer Kernel protoizer
+
+    @{
+  
+    In OpenCL, this is the name of the kernel declared as a string.
+*/
+#define P4A_wrapper_proto(kernel, ...)	 const char *kernel = #kernel
+
+/** 
+    @}
+*/
+
+/** @addtogroup P4A_kernel_context Kernel contextualization.
+
+    The kernel is called over a work groups of work items in OpenCL.
+
+    @{
+*/
+
+/** OpenCL invocation of clEnqueueNDRangeKernel.
+*/
+#define P4A_call_accel_kernel_context(kernel, ...)	kernel
+
+/** 
+    @}
+*/
+
+/** @addtogroup P4A_kernel_parameters Parameters invocation.
+
+    @{
+
+    Two types of call in OpenCL.
+
+    ---
+
+    Two types of call in OpenCL.
+
+    -# OpenCL, the kernel is invoked via the clEnqueueNDRangeKernel.
+    The call to parameters for clEnqueueNDRangeKernel is done in 
+    P4A_call_accel_kernel_parameters(...).
+
+    -# In a second step in OpenCL, the kernel parameters list must be enqueued
+    via the clSetKernelArg function. Cmplex transformations are necessary
+    to push the kernel arguments from a __VA_ARGS__ list.
+
+    In OpenCL, the parameters are pushed one by one using the clSetKernelArg
+    function taking the range, sizeof(type) and reference of the argument.
+    The (__VA_ARGS__) should also be replaced by
+
+    for (int i = 0;i < nargs;i++)
+
+       clSetKernelArg(p4a_kernel,i,sizeof(arg),&arg);
+    
+    The P4A_argN(...) macro is called just before the P4A_call_accel_kernel
+    invocation. Three steps are necessary:
+    -# Counting the number of parameters;
+    -# Construct the good P4A_arg##N(...) call by concatenation which 
+       recursively calls the push of parameters one by one;
+    -# Call the setKernelArg function with the good arguments.
+*/
+
+/** The OpenCL parameters for invocation of clEnqueueNDRangeKernel
+    (p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event).
+    */
+#define P4A_call_accel_kernel_parameters(...)    (__VA_ARGS__)
+
+/** To solve the number of arguments from a __VA_ARGS__.
+
+    See
+    http://stackoverflow.com/questions/3868289/count-number-of-parameters-in-c-variable-argument-method-call.
+
+    Invokes P4A_NARG_ with the parameters list followed by a reverse
+    enumeration of number between 63 and 0.
+
+    Let to see: the case of the 0 argument.
+
  */
-#define P4A_NARG(...) \
-         P4A_NARG_(__VA_ARGS__,P4A_RSEQ_N())
+#define P4A_NARG(...) P4A_NARG_(__VA_ARGS__,P4A_RSEQ_N())
 
-#define P4A_NARG_(...) \
-         P4A_ARG_N(__VA_ARGS__)
+/** Interprets the preceding list as a unique __VA_ARGS__
+ */
 
+#define P4A_NARG_(...) P4A_ARG_N(__VA_ARGS__)
+
+
+/** Positional parameters are expands before inserting the macro
+expansion.  The expansion of parametres list followed by the reverse
+enumeration results in the returned value N that equals the exact
+number of paramters.
+ */
 #define P4A_ARG_N( \
           _1, _2, _3, _4, _5, _6, _7, _8, _9,_10, \
          _11,_12,_13,_14,_15,_16,_17,_18,_19,_20, \
@@ -176,6 +309,8 @@ double P4A_accel_timer_stop_and_float_measure();
          _51,_52,_53,_54,_55,_56,_57,_58,_59,_60, \
          _61,_62,_63,N,...) N
 
+/** A reverse enumeration used to calculate the argument number up to 63.
+ */
 #define P4A_RSEQ_N() \
          63,62,61,60,                   \
          59,58,57,56,55,54,53,52,51,50, \
@@ -185,46 +320,110 @@ double P4A_accel_timer_stop_and_float_measure();
          19,18,17,16,15,14,13,12,11,10, \
          9,8,7,6,5,4,3,2,1,0 
 
+/** When the number of arguments is known, automatic call by
+    concatenation to the function P4A_argn, where n is the number of
+    arguments.
+ */
+#define P4A_argN(...) P4A_CONCATN(P4A_arg,P4A_NARG(__VA_ARGS__))(0,__VA_ARGS__)
 
-
+/** Forcing the interpretation of two fields that have to be concatenate.
+ */
 #define P4A_CONCATN(a,b) P4A_CONCAT(a,b) 
 
+/** Concatenation of two fields 
+ */
 #define P4A_CONCAT(a,b) a ## b
 
-#define P4A_STRINGIFY(val) (char *)#val
+/** 14 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg13().*/
+#define P4A_arg14(n,x,...)  P4A_arg1(n,x,...) P4A_arg13(n+1,__VA_ARGS__) 	
+/** 13 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg12(). */
+#define P4A_arg13(n,x,...)  P4A_arg1(n,x,...) P4A_arg12(n+1,__VA_ARGS__) 	
+/** 12 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg11(). */
+#define P4A_arg12(n,x,...)  P4A_arg1(n,x,...) P4A_arg11(n+1,__VA_ARGS__) 	
+/** 11 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg10(). */
+#define P4A_arg11(n,x,...)  P4A_arg1(n,x,...) P4A_arg10(n+1,__VA_ARGS__) 	
+/** 10 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg9(). */
+#define P4A_arg10(n,x,...)  P4A_arg1(n,x,...) P4A_arg9(n+1,__VA_ARGS__) 	
+/** 9 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg8(). */
+#define P4A_arg9(n,x,...)  P4A_arg1(n,x,...) P4A_arg8(n+1,__VA_ARGS__) 	
+/** 8 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg7(). */
+#define P4A_arg8(n,x,...)  P4A_arg1(n,x,...) P4A_arg7(n+1,__VA_ARGS__) 	
+/** 7 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg6(). */
+#define P4A_arg7(n,x,...)  P4A_arg1(n,x,...) P4A_arg6(n+1,__VA_ARGS__) 	
+/** 6 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg5(). */
+#define P4A_arg6(n,x,...)  P4A_arg1(n,x,...) P4A_arg5(n+1,__VA_ARGS__) 	
+/** 5 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg4(). */
+#define P4A_arg5(n,x,...)  P4A_arg1(n,x,...) P4A_arg4(n+1,__VA_ARGS__) 	
+/** 4 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg3(). */
+#define P4A_arg4(n,x,...)  P4A_arg1(n,x,...) P4A_arg3(n+1,__VA_ARGS__) 	
+/** 3 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+13 last parameters are passed to P4A_arg2(). */
+#define P4A_arg3(n,x,...)  P4A_arg1(n,x,...) P4A_arg2(n+1,__VA_ARGS__) 	
+/** 2 parameters interpreter in OpenCl. The two parameters are
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameters. */
+#define P4A_arg2(n,x,...)  P4A_arg1(n,x,...) P4A_arg1(n+1,__VA_ARGS__) 	
 
+/** Final call of the clSetKernelArg function call with the good parameters.
+    
+    C++ version with template, to properly solve the type issue.
+ */
 #ifdef __cplusplus
 template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
   printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,sizeof(arg0),&arg0);
   P4A_test_execution_with_message("clSetKernelArg");
 }
-#define P4A_arg1(n,x,...)  p4a_setArguments(n,P4A_STRINGIFY(x),x);		
+
+/** Interpretation of one parameter in OpenCL. Call to the
+clSetKernelArg via the C++ version of p4a_setArguments() such that the
+parameters types are resolved.
+ */
+#define P4A_arg1(n,x,...)  p4a_setArguments(n,STRINGIFY(x),x);		
 #else
-/* See the function setArguments in p4a_accel.h */
-#define P4A_arg1(n,x,...)  p4a_setArguments(n,P4A_STRINGIFY(x),sizeof(x),&x);		
+/* See the C version of the p4a_setArguments in p4a_accel.c. The
+    reference to the parameter is set as (void *) 
+*/
+void p4a_setArguments(int i,char *s,size_t size,void * ref_arg);
+
+/** Interpretation of one parameter in OpenCL. Call to the
+clSetKernelArg via the C version of p4a_setArguments() such that the
+parameters types are resolved.
+ */
+#define P4A_arg1(n,x,...)  p4a_setArguments(n,STRINGIFY(x),sizeof(x),&x);  	
 #endif 
 
+/** 
+    @}
+*/
 
-//#define P4A_arg1(n,x,...)  setArguments(n,STRINGIFY(x),x);		
-#define P4A_arg2(n,x,...)  P4A_arg1(n,x,...) P4A_arg1(n+1,__VA_ARGS__) 	
-#define P4A_arg3(n,x,...)  P4A_arg1(n,x,...) P4A_arg2(n+1,__VA_ARGS__) 	
-#define P4A_arg4(n,x,...)  P4A_arg1(n,x,...) P4A_arg3(n+1,__VA_ARGS__) 	
-#define P4A_arg5(n,x,...)  P4A_arg1(n,x,...) P4A_arg4(n+1,__VA_ARGS__) 	
-#define P4A_arg6(n,x,...)  P4A_arg1(n,x,...) P4A_arg5(n+1,__VA_ARGS__) 	
-#define P4A_arg7(n,x,...)  P4A_arg1(n,x,...) P4A_arg6(n+1,__VA_ARGS__) 	
-#define P4A_arg8(n,x,...)  P4A_arg1(n,x,...) P4A_arg7(n+1,__VA_ARGS__) 	
-#define P4A_arg9(n,x,...)  P4A_arg1(n,x,...) P4A_arg8(n+1,__VA_ARGS__) 	
-#define P4A_arg10(n,x,...)  P4A_arg1(n,x,...) P4A_arg9(n+1,__VA_ARGS__) 	
-#define P4A_arg11(n,x,...)  P4A_arg1(n,x,...) P4A_arg10(n+1,__VA_ARGS__) 	
-#define P4A_arg12(n,x,...)  P4A_arg1(n,x,...) P4A_arg11(n+1,__VA_ARGS__) 	
-#define P4A_arg13(n,x,...)  P4A_arg1(n,x,...) P4A_arg12(n+1,__VA_ARGS__) 	
-#define P4A_arg14(n,x,...)  P4A_arg1(n,x,...) P4A_arg13(n+1,__VA_ARGS__) 	
+/** @addtogroup P4A_grid_descriptors Constructors of the the grid descriptor
 
-#define P4A_argN(...)  P4A_CONCATN(P4A_arg,P4A_NARG(__VA_ARGS__))(0,__VA_ARGS__)
-
-
-/** @defgroup P4A_cl_kernel_call Accelerator kernel call
+    In OpenCL, the grid (total number of work items) and threads
+    (local number of work item) descriptors are size_t [] of 1, 2 or 3
+    dimension.
 
     @{
 */
@@ -296,199 +495,7 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 #define P4A_CL_ITEM_Z_PER_GROUP_IN_3D 8
 #endif
 
-/** @} */
-
-/** @defgroup P4A_init_CL Initialization of P4A C to CL
-
-    @{
-*/
-
-/** Associate the program to the accelerator in CL
-    Could be placed in a inlined function ...
-
-    Initialized the use of the hardware accelerator
-
-    Just initialize events for time measure right now.
-*/
-#define P4A_init_accel	                                                \
-  do {                                                                  \
-    /* Get an OpenCL platform : a set of devices available */		\
-    /* The device_id is the selected device from his type */		\
-    /* CL_DEVICE_TYPE_GPU */						\
-    /*  CL_DEVICE_TYPE_CPU */						\
-    cl_platform_id p4a_platform_id = NULL;				\
-     p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);	\
-     P4A_test_execution_with_message("clGetPlatformIDs");				\
-     /* Get the devices,could be a collection of device */		\
-     cl_device_id p4a_device_id = NULL;                                 \
-     p4a_global_error=clGetDeviceIDs(p4a_platform_id,			\
-				     CL_DEVICE_TYPE_GPU,		\
-				     1,					\
-				     &p4a_device_id,			\
-				     NULL);				\
-     P4A_test_execution_with_message("clGetDeviceIDs");			\
-     /* Create the context */						\
-     p4a_context=clCreateContext(0,/*const cl_context_properties *properties*/ \
-				 1,/*cl_uint num_devices*/		\
-				 &p4a_device_id,			\
-				 NULL,/*CL_CALLBACK *pfn_notify*/	\
-				 NULL,					\
-				 &p4a_global_error);			\
-     P4A_test_execution_with_message("clCreateContext");				\
-     /* ... could query many device, we retain only the first one ... */ \
-     /* Create a file allocated to the first device ...   */		\
-     p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,          \
-				    p4a_queue_properties,		\
-				    &p4a_global_error);			\
-     P4A_test_execution_with_message("clCreateCommandQueue");		\
-  } while (0)
-
-
-/** Release the hardware accelerator in CL
-*/
-#define P4A_release_accel    p4a_clean(EXIT_SUCCESS)
-    
-
-/** @} */
-
-
-/** @defgroup P4A_cl_time_measure Time execution measurement
-
-    @{
-*/
-
-/** Start a timer on the accelerator
-    
-    Nothing to do in OpenCL.
-    Timer functions are linked to events.
-    An event is called as an argument of a specific function 
-    (kernel call, mem copy).
-    The end and start time are available only after the call
-    and are retrieved from the event.
- */
-
-#ifdef P4A_PROFILING
-#define P4A_accel_timer_start			\
-  p4a_execution_time_tag = false;		\
-  p4a_copy_time_tag = false;			\
-  p4a_time = 0.;
-#else
-#define P4A_accel_timer_start 
-#endif
-
-/** @} */
-
-/** @defgroup P4A_CUDA signatures of kernel
-
-    @{
-*/
-
-/** Start a timer on the host for OpenMP implementation */
-#define P4A_wrapper_proto(kernel, ...)	 const char *kernel = #kernel;
-
-/** @} */
-
-#include "p4a_accel_wrapper-OpenCL.h"
-
-/** A declaration attribute of a hardware-accelerated kernel in CL
-    called from the GPU it-self
-*/
-//#define P4A_accel_kernel inline void
-
-/** A declaration attribute of a hardware-accelerated kernel called from
-    the host in CL */
-//#define P4A_accel_kernel_wrapper __kernel void
-
-/** The address space visible for all functions. 
-    Allocation in the global memory pool.
- */
-//#define P4A_accel_global_address __global
-
-/** The address space in the global memory pool but in read-only mode.
- */
-//#define P4A_accel_constant_address __constant
-
-/** The address space visible by all work-items in a work group.
-    This is the <<shared>> memory in the CUDA architecture.
-    Can't be initialized :
-    * __local float a = 1; is not allowed
-    * __local float a;
-              a = 1;       is allowed.
- */
-//#define P4A_accel_local_address __local
-
-
-/** Get the coordinate of the virtual processor in X (first) dimension in
-    CL
-*/
-//#define P4A_vp_0 get_global_id(0)
-
-/** Get the coordinate of the virtual processor in Y (second) dimension in
-    CL
-*/
-//#define P4A_vp_1 get_global_id(1)
-
-/** Get the coordinate of the virtual processor in Z (second) dimension in
-    CL
-*/
-//#define P4A_vp_2 get_global_id(2)
-
-/**
-   @}
-*/
-
-/** @defgroup P4A_cl_kernel_call
-
-    @{
-*/
-
-/** Call a CL kernel on the accelerator.
-
-    An API for full call control. For simpler usage: 
-    @see P4A_call_accel_kernel_1d, 
-    @see P4A_call_accel_kernel_2d, 
-    @see P4A_call_accel_kernel_3d
-
-    This transforms :
-
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),
-                          (p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event_execution));
-
-    into:
-
-    do { clEnqueueNDRangeKernel(p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event_execution); } while (0);
-*/
-
-#define P4A_call_accel_kernel(context, parameters)			\
-  do {									\
-    P4A_skip_debug(P4A_dump_location());				\
-    P4A_skip_debug(P4A_dump_message("Invoking %s with %s\n",	        \
-				    #context,				\
-				    #parameters));                      \
-    P4A_call_accel_kernel_context context				\
-    P4A_call_accel_kernel_parameters parameters;			\
-    P4A_test_execution_with_message("P4A OpenCL kernel execution");	\
-  } while (0)
-
-
-
-/* @} */
-
-
-/** CL kernel invocation.
-*/
-#define P4A_call_accel_kernel_context(kernel, ...)	\
-  kernel
-
-/** Add CL kernel parameters for invocation.
-
-    Simply add them in parenthesis.  Well, this could be done without
-    variadic arguments... Just for fun. :-)
-*/
-#define P4A_call_accel_kernel_parameters(...)    \
-  (__VA_ARGS__)
-
-/** Creation of block and thread descriptors for CL */
+/** Creation of block and thread descriptors for OpenCL */
 
 /** Allocate the descriptors for a linear set of thread with a
     simple strip-mining for CL
@@ -502,8 +509,8 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 					  (int) P4A_CL_ITEM_PER_GROUP_IN_1D)}; \
   /* Define the ceil-rounded number of needed blocks of threads: */	\
   size_t grid_descriptor_name = {(int)size};				\
-  /*P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)*/	\
-  /*P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)*/ \
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Allocate the descriptors for a 2D set of thread with a simple
@@ -527,7 +534,7 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 					 n_x_iter, n_y_iter)		\
   int p4a_block_x, p4a_block_y;						\
   /* Define the number of thread per block: */				\
-  if (n_y_iter > 10000) {						\
+  if ((n_y_iter) > 10000) {						\
     /* If we have a lot of interations in Y, use asymptotical block	\
        sizes: */							\
     p4a_block_x = P4A_CL_ITEM_X_PER_GROUP_IN_2D;			\
@@ -536,9 +543,9 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
   else {								\
     /* Allocate a maximum of threads alog X axis (the warp dimension) for \
        better average efficiency: */					\
-    p4a_block_x = P4A_min((int) n_x_iter,				\
+    p4a_block_x = P4A_min((int) (n_x_iter),				\
 			  (int) P4A_CL_ITEM_MAX);			\
-    p4a_block_y = P4A_min((int) n_y_iter,				\
+    p4a_block_y = P4A_min((int) (n_y_iter),				\
 			  P4A_CL_ITEM_MAX/p4a_block_x);			\
   }									\
   cl_uint work_dim = 2;							\
@@ -546,9 +553,9 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
   size_t block_descriptor_name[]={(size_t)p4a_block_x,(size_t)p4a_block_y}; \
   /* The globalWorkSize argument for clEnqueueNDRangeKernel */		\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name[]={(size_t) n_x_iter,(size_t) n_y_iter};	\
-  /*P4A_log("grid size : %d %d\n",n_x_iter,n_y_iter);*/			\
-  /*P4A_log("block size : %d %d\n",p4a_block_x,p4a_block_y);*/		\
+  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)}; \
+  P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
+  P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
 
 /** Dump a CL dim3 descriptor with an introduction message */
@@ -560,19 +567,117 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 
 /** Dump a CL dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)			\
-  P4A_dump_descriptor("Creating thread block descriptor ", descriptor_name)
+  P4A_dump_descriptor("Creating thread block descriptor ",#descriptor_name)
 
 
 /** Dump a CL dim3 grid descriptor */
 #define P4A_dump_grid_descriptor(descriptor_name)		\
-  P4A_dump_descriptor("Creating grid of block descriptor ",	\
-		      descriptor_name)
+  P4A_dump_descriptor("Creating grid of block descriptor ",#descriptor_name)
 
 
-/** @addtogroup P4A_cuda_kernel_call
+/** 
+    @}
+*/
+
+/** @addtogroup P4A_kernel_call Kernel call constructor
+
+    The kernel call itself.
+
+    For simple usage
+    @see P4A_call_accel_kernel_1d, 
+    @see P4A_call_accel_kernel_2d, 
+    @see P4A_call_accel_kernel_3d
 
     @{
+
 */
+
+/** An OpenCL kernel is launched on the accelerator. This transforms :
+
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),
+                          (p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event));
+
+    into:
+
+    do { 
+       clEnqueueNDRangeKernel(p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event); 
+    } while (0);
+*/
+
+#define P4A_call_accel_kernel(context, parameters)			\
+  P4A_skip_debug(P4A_dump_location());					\
+  P4A_skip_debug(P4A_dump_message("Invoking %s with %s\n",	        \
+				  #context,				\
+				  #parameters));			\
+  P4A_call_accel_kernel_context context					\
+  P4A_call_accel_kernel_parameters parameters;				\
+  P4A_test_execution_with_message("P4A OpenCL kernel execution")
+
+/** In OpenCL, each kernel is referenced by its name as a string, but
+    is launched via a pointer. 
+    The pointer is created at the first load via clCreateKernel.
+
+    For many kernels, we have to memorise
+    the correspondance between the name and the pointer i a structure.
+
+    At each call of a kernel, we search it in a kernel list and
+    initialise the global pointer p4a_kernel.
+
+    The kernel structure.
+
+    Possible to choose between the C++ version with a map or
+    a classical list in C.
+*/
+
+#ifdef __cplusplus
+#include <map>
+#include <string>
+struct p4a_cl_kernel {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+
+  p4a_cl_kernel(const char *k) {
+    name = (char *)strdup(k);
+    kernel = NULL;  
+    char* kernelFile;
+    asprintf(&kernelFile,"./%s.cl",k);
+    file_name = (char *)strdup(kernelFile);
+  }
+  ~p4a_cl_kernel() {}
+};
+
+extern std::map<std::string, struct p4a_cl_kernel * > p4a_kernels_map ;
+#else
+struct p4a_cl_kernel {
+  cl_kernel kernel;
+  char *name;
+  char *file_name;
+  struct p4a_cl_kernel *next;
+  //The constructor new_p4a_kernel is defined in the p4a_accel.c file
+};
+
+/** In C, pointer to the first element of the kernel list
+ */
+extern struct p4a_cl_kernel *p4a_kernels;
+struct p4a_cl_kernel* new_p4a_kernel(const char *kernel);
+struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
+#endif
+
+/** A global pointer to the current kernel selected
+ */
+extern cl_kernel p4a_kernel; 
+
+/** Prototype of the function that loads the kernel source as a string
+    from an external file.
+ */
+void   p4a_load_kernel(const char *kernel,...);
+
+/** Prototype of the function that creates the program and the kernel pointer.
+ */
+char * p4a_load_prog_source(char *cl_kernel_file,
+			    const char *head,
+			    size_t *length);
 
 /** Call a kernel in a 1-dimension parallel loop in CL
 
@@ -583,19 +688,17 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
     @param ... the following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
-  do {									\
-    p4a_load_kernel(kernel,__VA_ARGS__);				\
-    P4A_argN(__VA_ARGS__);						\
-    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel      \
-				    "\" of size %d\n",P4A_n_iter_0));	\
-    P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
-				     P4A_block_descriptor,		\
-				     P4A_n_iter_0);			\
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
-			  (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   &P4A_block_descriptor,&P4A_grid_descriptor,	\
-			   0,NULL,&p4a_event_execution));		\
-  } while (0)
+  p4a_load_kernel(kernel,__VA_ARGS__);					\
+  P4A_argN(__VA_ARGS__);						\
+  P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel	\
+				  "\" of size %d\n",P4A_n_iter_0));	\
+  P4A_create_1d_thread_descriptors(P4A_grid_descriptor,			\
+				   P4A_block_descriptor,		\
+				   P4A_n_iter_0);			\
+  P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
+			(p4a_queue,p4a_kernel,work_dim,NULL,		\
+			 &P4A_block_descriptor,&P4A_grid_descriptor,	\
+			 0,NULL,&p4a_event))
 
 
 /** Call a kernel in a 2-dimension parallel loop in CL
@@ -613,24 +716,26 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
     @param ... following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
-  do {	                                                                \
-    p4a_load_kernel(kernel,__VA_ARGS__);				\
-    P4A_argN(__VA_ARGS__);						\
-    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel      \
-                   "\" of size (%dx%d)\n",P4A_n_iter_0, P4A_n_iter_1)); \
-    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
-				     P4A_block_descriptor,		\
-				     P4A_n_iter_0, P4A_n_iter_1);	\
-    p4a_execution_time_tag = true;					\
-    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
-                          (p4a_queue,p4a_kernel,work_dim,NULL,          \
-			   P4A_grid_descriptor,P4A_block_descriptor,	\
-			   0,NULL,&p4a_event_execution));		\
-    P4A_accel_timer_stop_and_float_measure();				\
-    p4a_execution_time_tag = false;					\
-  } while (0)
+  p4a_load_kernel(kernel,__VA_ARGS__);					\
+  P4A_argN(__VA_ARGS__);						\
+  P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel	\
+				  "\" of size (%dx%d)\n",		\
+				  P4A_n_iter_0, P4A_n_iter_1));		\
+  P4A_create_2d_thread_descriptors(P4A_grid_descriptor,			\
+				   P4A_block_descriptor,		\
+				   P4A_n_iter_0, P4A_n_iter_1);		\
+  P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
+			(p4a_queue,p4a_kernel,work_dim,NULL,		\
+			 P4A_grid_descriptor,P4A_block_descriptor,	\
+			 0,NULL,&p4a_event));				\
+  P4A_accel_timer_stop_and_float_measure();				\
 
-/** @} */
+/** 
+    @}
+*/
+
+
+
 
 
 #endif //P4A_ACCEL_OPENCL_H

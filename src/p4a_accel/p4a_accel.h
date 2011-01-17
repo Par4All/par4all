@@ -2,6 +2,10 @@
 
     API of Par4All C for accelerator
 
+    This files contains 
+    - prototypes of general functions defined in p4a_accel.c
+    - includes the header .h in function of the hardware
+
     @mainpage
 
     The Par4All API leverages the code to program an hardware accelerator
@@ -15,24 +19,37 @@
 
     Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
     Compétitivité Images and Network) and SCALOPES (Artemis European
-    Project project)
+    Project project), with the support of the MODENA project (French Pôle de
+    Compétitivité Mer Bretagne)
 
     "mailto:Stephanie.Even@enstb.org"
     "mailto:Ronan.Keryell@hpc-project.com"
 */
 
-/* License BSD */
+// License BSD
 
 #ifndef P4A_ACCEL_H
 #define P4A_ACCEL_H
 
-/* For size_t: */
+// For size_t
 #include <stddef.h>
 
-/** Note that in CUDA and OpenCL there is 3 dimensions max: */
-//enum { P4A_vp_dim_max = 3 };
+/** @defgroup P4A_time_measure Time measurement
 
+    The time is measured with the call to two markers: 
+    -# the P4A_accel_timer_start macro to begin;
+    -# P4A_accel_timer_stop_and_float_measure() to end.
+
+    @{
+*/
+
+/** Prototype of the function that ends the timer in OpenMP, CUDA and
+    OpenCL.
+ */
 extern double P4A_accel_timer_stop_and_float_measure();
+
+/** @}
+*/
 
 #if defined(P4A_ACCEL_CUDA) && defined(P4A_ACCEL_OPENMP) 
 #error "You cannot have both P4A_ACCEL_CUDA and P4A_ACCEL_OPENMP defined, yet"
@@ -47,6 +64,11 @@ extern double P4A_accel_timer_stop_and_float_measure();
 #endif
 
 /* Some common function prototypes. */
+
+/** @defgroup P4A_memory_allocation_copy Memory allocation and copy 
+
+    @{
+*/
 
 /** Prototype for allocating memory on the hardware accelerator.
 
@@ -67,6 +89,22 @@ void P4A_accel_free(void *address);
 
 /** Prototype for copying a scalar from the host to a memory zone in the
     hardware accelerator.
+
+    It's a wrapper around memcpy, CudaMemCopy* in CUDA or clEnqueueWriteBuffer 
+    in OpenCL.
+ 
+    Do not change the place of the pointers in the API in opposition
+    to CUDA. The host address is always before the accel address...
+
+    @param[in] element_size is the size of one element of the array in
+    byte
+    
+    @param[out] host_address point to the element on the host to write
+    into
+    
+    @param[in] accel_address refer to the compact memory area to read
+    data. In the general case, accel_address may be seen as a unique idea (FIFO)
+    and not some address in some memory space.
 */
 void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
@@ -75,6 +113,22 @@ void P4A_copy_to_accel(size_t element_size,
 
 /** Prototype for copying a scalar from the hardware accelerator memory to
     the host.
+
+    It's a wrapper around memcpy, CudaMemCopy* in CUDA or clEnqueueReadBuffer 
+    in OpenCL.
+ 
+    Do not change the place of the pointers in the API, in opposition
+    to CUDA. The host address is always first...
+    
+    @param[in] element_size is the size of one element of the array in
+    byte
+    
+    @param[out] host_address point to the element on the host to write
+    into
+    
+    @param[in] accel_address refer to the compact memory area to read
+    data. In the general case, accel_address may be seen as a unique idea (FIFO)
+    and not some address in some memory space.
 */
 void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
@@ -83,6 +137,28 @@ void P4A_copy_from_accel(size_t element_size,
 
 /** Prototype for copying a 1D memory zone from the host to a compact
     memory zone in the hardware accelerator.
+
+    It's a wrapper around memcpy, CudaMemCopy* in CUDA or clEnqueueWriteBuffer 
+    in OpenCL.
+
+    This function could be quite simpler but is designed by symmetry with
+    other functions.
+    
+    @param[in] element_size is the size of one element of the array in
+    byte
+    
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+    
+    @param[in] d1_block_size is the number of element to transfer
+    
+    @param[in] d1_offset is element order to start the transfer from
+    
+    @param[in] host_address point to the array on the host to read
+    
+    @param[out] accel_address refer to the compact memory area to write
+    data. In the general case, accel_address may be seen as a unique idea
+    (FIFO) and not some address in some memory space.
 */
 void P4A_copy_to_accel_1d(size_t element_size,
 			  size_t d1_size,
@@ -94,6 +170,25 @@ void P4A_copy_to_accel_1d(size_t element_size,
 
 /** Prototype for copying memory from the hardware accelerator to a 1D
     array in the host.
+
+    It's a wrapper around memcpy, CudaMemCopy* in CUDA or clEnqueueReadBuffer 
+    in OpenCL.
+ 
+    @param[in] element_size is the size of one element of the array in
+    byte
+    
+    @param[in] d1_size is the number of elements in the array. It is not
+    used but here for symmetry with functions of higher dimensionality
+    
+    @param[in] d1_block_size is the number of element to transfer
+    
+    @param[in] d1_offset is element order to start the transfer from (host side)
+    
+    @param[out] host_address point to the array on the host to write into
+    
+    @param[in] accel_address refer to the compact memory area to read
+    data. In the general case, accel_address may be seen as a unique idea (FIFO)
+    and not some address in some memory space.
 */
 void P4A_copy_from_accel_1d(size_t element_size,
 			    size_t d1_size,
@@ -145,6 +240,19 @@ void P4A_copy_from_accel_3d(size_t element_size,
 			    size_t d1_offset, size_t d2_offset, size_t d3_offset,
 			    void *host_address,
 			    const void *accel_address);
+/* @} */
+
+/** @defgroup P4A_log Debug messages and errors tracking.
+    
+    @{
+*/
+
+/** Formats the standard MACROS  __FILE__ and __LINE__ for message print.
+ */
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define AT __FILE__ ":" TOSTRING(__LINE__)
+
 
 /** A macro to enable or skip debug instructions
 
@@ -153,6 +261,7 @@ void P4A_copy_from_accel_3d(size_t element_size,
     @param debug_stuff is some text that is included texto if P4A_DEBUG is
     defined
 */
+
 #ifdef P4A_DEBUG
 #define P4A_skip_debug(debug_stuff) debug_stuff
 #else
@@ -161,20 +270,28 @@ void P4A_copy_from_accel_3d(size_t element_size,
 
 
 /** Output a debug message à la printf */
-#define P4A_dump_message(...)						\
+#define P4A_dump_message(...)			\
   fprintf(stderr, " P4A: " __VA_ARGS__)
 
 /** Output where we are */
-#define P4A_dump_location()						\
-  fprintf(stderr, " P4A: line %d of function %s in file \"%s\":\n",	\
-          __LINE__, __func__, __FILE__)
+#define P4A_dump_location()					\
+  fprintf(stderr, " P4A: %s, function %s\n",AT,__func__)
 
+/** @} */
+
+
+/** @defgroup P4A_util Useful functions
+    
+    @{
+*/
 
 /** A macro to compute an minimum value of 2 values
 
     Since it is a macro, beware of side effects...
 */
 #define P4A_min(a, b) ((a) > (b) ? (b) : (a))
+
+/** @} */
 
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>

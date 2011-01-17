@@ -1,7 +1,25 @@
+/** @file
+
+    API of Par4All C to OpenCL for the kernel wrapper and kernel.
+
+    Funded by the FREIA (French ANR), TransMedi\@ (French Pôle de
+    Compétitivité Images and Network) and SCALOPES (Artemis European
+    Project project), with the support of the MODENA project (French
+    Pôle de Compétitivité Mer Bretagne)
+
+    "mailto:Stephanie.Even@enstb.org"
+    "mailto:Ronan.Keryell@hpc-project.com"
+
+    This work is done under MIT license.
+*/
+
 #ifndef P4A_ACCEL_WRAPPER_CL_H
 #define P4A_ACCEL_WRAPPER_CL_H
 
-/** @} */
+/** @defgroup P4A_qualifiers Kernels and arguments qualifiers
+
+    @{
+*/
 
 /** A declaration attribute of a hardware-accelerated kernel in CL
     called from the GPU it-self
