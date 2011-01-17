@@ -1001,7 +1001,8 @@ struct p4a_cl_kernel *last_kernel=NULL;
     The C function to invoke clSetKernelArg where the reference to the
     parameter is set as (void *).
 */
-void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) {
+void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) 
+{
   p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
   P4A_test_execution_with_message("clSetKernelArg");
 }
