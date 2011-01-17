@@ -883,6 +883,7 @@ class p4a_processor(object):
 
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
+            result.append (output_file)
         return result
 
     def save(self, dest_dir = None, prefix = "", suffix = "p4a"):

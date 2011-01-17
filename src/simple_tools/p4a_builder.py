@@ -267,7 +267,12 @@ class p4a_builder:
         p4a_util.run([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
-
+        """ Build progams, libraries , objects or ...
+        files, the files to be used by the building process
+        output_files, the files to be produced
+        extra_obj, some exta objects to be used by the building process
+        build_dir, the build directory
+        """
         files += self.extra_source_files
 
         has_cuda = False
