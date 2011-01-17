@@ -331,50 +331,104 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   return smt;
 }
 
-statement MakeForloop(expression e1, expression e2, expression e3, statement s)
-{								
+
+/* Create a for-loop statement with some parser-specific characteristics.
+
+   A more generic implementation would have been in ri-util instead.
+
+   @param[in] e1 is the init part of the for
+
+   @param[in] e2 is the conditional part of the for
+
+   @param[in] e3 is the increment part of the for
+
+   @param[in] body is the loop body statement
+*/
+statement MakeForloop(expression e1,
+		      expression e2,
+		      expression e3,
+		      statement body) {
   forloop f;
   statement smt;
+  string sc = pop_current_C_comment();
+  int sn = pop_current_C_line_number();
+  expression init = e1;
+  expression cond = e2;
+  expression inc = e3;
+
+  pips_assert("For loop body consistent",statement_consistent_p(body));
+
+  if(expression_undefined_p(init))
+    init = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+				NIL);
+  else
+    simplify_C_expression(init);
+
+  if(expression_undefined_p(cond))
+    /* A bool C constant cannot be used
+       because stdbool.h may not be
+       included */
+    /* cond = make_call_expression(MakeConstant(TRUE_OPERATOR_NAME, */
+    /* is_basic_logical), */
+    /* NIL); */
+    cond = int_to_expression(1);
+  else
+    simplify_C_expression(cond);
+
+  if(expression_undefined_p(inc))
+    inc = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+			       NIL);
+  else
+    simplify_C_expression(inc);
+
+
   int i = basic_int((basic) stack_head(LoopStack));
+  /* Create some land-pad labels to deal with break and continue.
+
+     Looks like some memory leaks if no break or continue... */
   string lab1;
-  asprintf(&lab1,"%s%d","loop_end_",i);
+  asprintf(&lab1, "%s%d","loop_end_", i);
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   free(lab1);
   string lab2;
-  asprintf(&lab2,"%s%d","break_",i);
+  asprintf(&lab2, "%s%d", "break_", i);
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   free(lab2);
 
- if (!statement_undefined_p(s1))
-    {
-      /* This loop has a continue statement which has been transformed to goto
-	 Add the labeled statement at the end of loop body*/
-      insert_statement(s,s1,FALSE);
-    }
-  f = make_forloop(e1,e2,e3,s);
+  if (!statement_undefined_p(s1))
+    /* This loop has a continue statement which has been transformed to goto.
+
+       Add the labeled statement at the end of loop body*/
+    insert_statement(body, s1, FALSE);
+
+  /*  The for clause may contain declarations*/
+  f = make_forloop(init, cond, inc, body);
   smt = make_statement(entity_empty_label(),
 		       get_current_C_line_number(),
 		       STATEMENT_ORDERING_UNDEFINED,
 		       string_undefined,
 		       make_instruction_forloop(f),
 		       NIL, string_undefined,
-		       empty_extensions ());
+		       empty_extensions());
 
   if (!statement_undefined_p(s2))
-    {
-      /* This loop has a break statement which has been transformed to goto
-	 Add the labeled statement after the loop */
-      insert_statement(smt,s2,FALSE);
-    }
-  pips_assert("For loop is consistent",forloop_consistent_p(f));
-  ifdebug(5)
-    {
-      printf("For loop statement: \n");
-      print_statement(smt);
-    }
+    /* This loop has a break statement which has been transformed to goto
+       Add the labeled statement after the loop */
+    insert_statement(smt, s2, FALSE);
+
+  smt = add_comment_and_line_number(smt, sc, sn);
+  stack_pop(LoopStack);
+  pips_assert("For loop consistent", statement_consistent_p(smt));
+
+  pips_assert("For loop is consistent", forloop_consistent_p(f));
+  ifdebug(5) {
+    printf("For loop statement: \n");
+    print_statement(smt);
+  }
   return smt;
 }
-
+
+
 statement MakeSwitchStatement(statement s)
 {
   /* Transform a switch statement to if - else - goto. Example:

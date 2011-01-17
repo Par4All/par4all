@@ -140,8 +140,8 @@ entity GetFunction()
 }
 
  // FI: I assumed it was the current context; in fact the current
- // context is rather the top of the ContextStack.I tried to maintain
- // as an invariant ycontext==stack_head(ContextStack) But this is not
+ // context is rather the top of the ContextStack. I tried to maintain
+ // as an invariant ycontext==stack_head(ContextStack). But this is not
  // be a good idea as it interferes with cyacc.y use of ycontext and
  // ContextStack
 static c_parser_context ycontext = c_parser_context_undefined;
@@ -149,7 +149,7 @@ static c_parser_context ycontext = c_parser_context_undefined;
 /* FI: these two variables are used in conjunction with comma
    expressions. I do not remember why they are needed. They sometimes
    stay set although they have become useless. The parser used not to
-   reset them systematically, which caused problemes with
+   reset them systematically, which caused problems with
    io_intrinsics*.c */
 static string expression_comment = string_undefined;
 static int expression_line_number = STATEMENT_NUMBER_UNDEFINED;
@@ -274,7 +274,7 @@ void EnterScope()
   // Add scope information if any
   C_scope_identifier++;
   // A scope is needed right away to distinguish between formal
-  // parameters and local variable. See
+  // parameters and local variables. See
   // Validation/C_syntax/block_scope01.c, identifier x in function foo
   if(C_scope_identifier>=0) {
     string ns = i2a(C_scope_identifier);
@@ -1384,7 +1384,7 @@ block: /* ISO 6.8.2 */
 						      get_current_C_comment(),
 						      get_current_C_line_number());
 			  /* Add the pragmaifyed nop at the end of the block: */
-			  insert_statement($1, nop,false);
+			  insert_statement($1, nop, false);
 			  $$ = $1;
 			}
 |   error location TK_RBRACE
@@ -1454,7 +1454,7 @@ pragma:
 
 
 pragmas:
-pragma { /* No pragma... The common case, return the empty list */
+pragma { /* Only one pragma... The common case, return it in a list */
   pips_debug(1, "No longer pragma\n");
   $$ = CONS(STRING, $1, NIL);
 }
@@ -1590,43 +1590,7 @@ statement_without_pragma:
 			}
     TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
 	                {
-			  string sc = pop_current_C_comment();
-			  int sn = pop_current_C_line_number();
-			  expression init = $4;
-			  expression cond = $5;
-			  expression inc = $7;
-
-			  pips_assert("For loop body consistent",statement_consistent_p($9));
-
-			  if(expression_undefined_p(init))
-			    init = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
-							NIL);
-			  else
-			    simplify_C_expression(init);
-
-			  if(expression_undefined_p(cond)) {
-			    /* A bool C constant cannot be used
-			       because stdbool.h may not be
-			       included */
-			    /* cond = make_call_expression(MakeConstant(TRUE_OPERATOR_NAME, */
-			    /* is_basic_logical), */
-			    /* NIL); */
-			    cond = int_to_expression(1);
-			  }
-			  else
-			    simplify_C_expression(cond);
-
-			  if(expression_undefined_p(inc))
-			    inc = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
-							NIL);
-			  else
-			    simplify_C_expression(inc);
-
-			  /*  The for clause may contain declarations*/
-			  $$ = MakeForloop(init, cond, inc,$9);
-			  $$ = add_comment_and_line_number($$, sc, sn);
-			  stack_pop(LoopStack);
-			  pips_assert("For loop consistent",statement_consistent_p($$));
+			  $$ = MakeForloop($4, $5, $7, $9);
 			}
 |   label statement
                         {
