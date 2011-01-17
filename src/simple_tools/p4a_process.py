@@ -57,7 +57,8 @@ default_fortran_cuda_properties = dict(
     GPU_WRAPPER_PREFIX                    = "P4A_KERNEL_WRAPPER",
     GPU_LAUNCHER_PREFIX                   = "P4A_KERNEL_LAUNCHER",
     GPU_FORTRAN_WRAPPER_PREFIX            = "P4A_FORTRAN_WRAPPER",
-    CROUGH_ALL_SCALAR_BY_VALUE            = True,
+    CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL    = True,
+    CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL    = True,
     PRETTYPRINT_STATEMENT_NUMBER          = False,
     CROUGH_FORTRAN_USES_INTERFACE         = True,
     KERNEL_LOAD_STORE_LOAD_FUNCTION_2D    = "P4A_COPY_TO_ACCEL_2D",
@@ -241,6 +242,10 @@ class p4a_processor(object):
     # the list of fortran modules
     fortran_modules = set ()
 
+    # the typedef to be used in cuda
+    kernel_return_type  = "P4A_accel_kernel"
+    wrapper_return_type = "P4A_accel_kernel_wrapper"
+
     def __init__(self, workspace = None, project_name = "", cpp_flags = "",
                  verbose = False, files = [], filter_select = None,
                  filter_exclude = None, accel = False, cuda = False, openmp = False,
@@ -358,8 +363,8 @@ class p4a_processor(object):
         global default_properties
         global default_fortran_cuda_properties
         all_properties = default_properties
-        # if cuda and fortran add some properties
-        if ((self.cuda == True) and (self.fortran == True)):
+        # if accel (might be cuda) and fortran add some properties
+        if ((self.accel == True) and (self.fortran == True)):
             for k in default_fortran_cuda_properties:
                 all_properties[k] = default_fortran_cuda_properties[k]
         # overwrite default properties with the user defined ones
@@ -437,7 +442,6 @@ class p4a_processor(object):
         indent = "      "
         # get the code to be post process
         code = p4a_util.read_file (file_name, True)
-        p4a_util.debug (code)
 
         # step 1
         # insert the needed use statement right after the subroutine declaration
@@ -670,21 +674,27 @@ class p4a_processor(object):
 
         # set return type for wrappers && kernel
         if (self.fortran == False):
-            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel_wrapper")
-            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE="P4A_accel_kernel")
+            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
+            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
         else:
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
             # pointers because they will be .cu files
-            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = True
-            kernels.display ("c_printed_file")
-            wrappers.display ("c_printed_file")
-            # kernel_launchers will be .c file so c99 is allowed
-            self.workspace.props["CROUGH_ARRAY_PARAMETER_AS_POINTER"] = False
-            kernel_launchers.display ("c_printed_file")
+            kernels.display ("c_printed_file",
+                             DO_RETURN_TYPE_AS_TYPEDEF=True,
+                             CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
+                             SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
+            wrappers.display ("c_printed_file",
+                              DO_RETURN_TYPE_AS_TYPEDEF=True,
+                              CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
+                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
             # Do the phase set_return_type_as_typedef using regular expressions
             # because the phase is not available in fortran
-#            print kernels
+            # kernel_launchers will be .c file so c99 is allowed
+            kernel_launchers.display ("c_printed_file",
+                                      DO_RETURN_TYPE_AS_TYPEDEF=False,
+                                      CROUGH_ARRAY_PARAMETER_AS_POINTER=False)
+
             # those newly generated modules has to be append to the dedicated list
             # for later processing
             self.crough_modules.extend (map(lambda x:x.name, kernels))
@@ -760,12 +770,24 @@ class p4a_processor(object):
         result = []
         for name in self.crough_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), name, name + ".c")
+            pips_file = os.path.join(self.workspace.dirname(),
+                                     name, name + ".c")
             # set the destination file
+            output_name = name + ".c"
             if name in self.cuda_modules:
-                output_name = name + ".cu"
-            else:
-                output_name = name + ".c"
+                if self.cuda:
+                    output_name = p4a_util.change_file_ext(output_name, ".cu")
+                # generate the header file
+                header_file = os.path.join(output_dir, name + ".h")
+                args = ["cproto"]
+                args.append ("-D")
+                args.append (self.wrapper_return_type + "=void")
+                args.append ("-D")
+                args.append (self.kernel_return_type + "=void")
+                args.append ("-o")
+                args.append (header_file)
+                args.append (pips_file)
+                p4a_util.run (args, force_locale = None)
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             # Copy the PIPS production to its destination:

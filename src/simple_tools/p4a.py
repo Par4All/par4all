@@ -5,10 +5,10 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
-import p4a_builder 
+import p4a_builder
 import p4a_opts
-import p4a_process 
-import p4a_util 
+import p4a_process
+import p4a_util
 import os
 import re
 import optparse
@@ -198,7 +198,7 @@ def add_own_options(parser):
     cmake_group.add_option("--cmake-flags", action = "append", metavar = "FLAGS", default = [],
         help = "Specify additional flags to pass to CMake. Several are allowed.")
 
-    cmake_group.add_option("--cmake-dir", metavar = "DIR", default = None,
+    cmake_group.add_option("--cmake-dir", metavar = "DIR", default = os.getcwd(),
         help = "Output/lookup the CMakeLists.txt file in this directory instead of the current working directory.")
 
     cmake_group.add_option("--cmake-gen", action = "store_true", default = False,

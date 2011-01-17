@@ -192,7 +192,7 @@ class p4a_builder:
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
-                
+
         if com_optimization:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]
             cpp_flags += [ "-DP4A_COMMUNICATION_RUNTIME" ]
@@ -204,7 +204,7 @@ class p4a_builder:
                 ld_flags += [ "-lcufft" ]
             else :
                 ld_flags += [ "-lfftw3 -lfftw3f" ]
-                
+
 
 
         if add_debug_flags:
