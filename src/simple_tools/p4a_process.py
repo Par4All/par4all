@@ -434,9 +434,10 @@ class p4a_processor(object):
         2 - insert the pointer declaration for P4A inserted variable
         3 - types are wrtitten with a () in the size_of function
         4 - replace the f77 multiline mode by the f08 multiline mode
-        5 - remove the (void **) & that is not usefull in fortran
-        6 - remove the * in front of the inserted variables
-        7 - declare the origin_var_name as a target
+        5 - replace f77 comments with f95 comments
+        6 - remove the (void **) & that is not usefull in fortran
+        7 - remove the * in front of the inserted variables
+        8 - declare the origin_var_name as a target
         """
         p4a_util.debug ("Processing fortran_wrapper " + file_name)
         indent = "      "
@@ -495,13 +496,18 @@ class p4a_processor(object):
         code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
 
         # step 5
-        code = code.replace ("(void **) &", "")
+        F77_CONTINUATION = "\nC"
+        F95_CONTINUATION = "\n!"
+        code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
 
         # step 6
+        code = code.replace ("(void **) &", "")
+
+        # step 7
         for var in inserted_var_s:
             code = code.replace ("*" + var, var)
 
-        # step 7
+        # step 8
         # insert the target attribute for all declared variables
         types_l = ["CHARACTER", "LOGICAL", "INTEGER*4", "INTEGER*8", "INTEGER",
                    "REAL*4", "REAL*8","REAL"]
@@ -681,10 +687,12 @@ class p4a_processor(object):
             # kernel and wrappers need to be prettyprinted with arrays as
             # pointers because they will be .cu files
             kernels.display ("c_printed_file",
+                             CROUGH_INCLUDE_FILE_LIST="p4a_accel.h",
                              DO_RETURN_TYPE_AS_TYPEDEF=True,
                              CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
             wrappers.display ("c_printed_file",
+                             CROUGH_INCLUDE_FILE_LIST="p4a_accel.h",
                               DO_RETURN_TYPE_AS_TYPEDEF=True,
                               CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
                               SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
@@ -830,6 +838,8 @@ class p4a_processor(object):
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
+        result.append (os.path.join(os.environ["P4A_ACCEL_DIR"],
+                                    "p4a_runtime_interface.f95"))
         return result
 
     def save_user_file (self, dest_dir, prefix, suffix):

@@ -134,7 +134,7 @@ class p4a_builder:
                  nvcc_flags = [], fortran_flags = [],
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
-                 openmp = False, accel_openmp = False, icc = False, 
+                 openmp = False, accel_openmp = False, icc = False,
                  cuda = False,com_optimization=False,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  no_default_flags = False, build = False
@@ -286,6 +286,10 @@ class p4a_builder:
         p4a_util.debug("Build dir: " + build_dir)
         if not os.path.isdir(build_dir):
             os.makedirs(build_dir)
+
+        # the build_dir has to be added to the compiler search path in fortran
+        # because .mod file are produce there
+        self.fortran_flags.append ("-J " + build_dir)
 
         # First pass: make .c, .cpp or .f files out of other extensions (.cu, ..):
         first_pass_files = []
