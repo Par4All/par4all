@@ -67,7 +67,7 @@ Proper effetcs for "null01"
 int main()
 {
    int *p;
-//               <must be written>: p
+//             <    is written>: p
    p = (void *) 0;
 
    return 0;
@@ -78,7 +78,7 @@ Proper Pointer effetcs for "null01"
 int main()
 {
    int *p;
-//               <must be written>: p
+//             <    is written>: p
    p = (void *) 0;
 
    return 0;
@@ -89,11 +89,11 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    p = (void *) 0;
-//  {(p,main:NULL,-EXACT-)}
+//  {(p,*NULL_POINTER*,-Exact-)}
 
    return 0;
 }

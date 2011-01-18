@@ -5,42 +5,40 @@ int main()
    char buf[200];
    fp = fopen("file.txt", "rb");
    n = fread(&buf[0], sizeof(double), 50, fp);
-   if (n==-1) 
+   if (n==-1)
       printf("fread failed");
    fclose(fp);
 }
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1] 
-//                                  __IO_EFFECTS:LUNS[*]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1] 
-//                                  __IO_EFFECTS:LUNS[*]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1] 
+//                               __IO_EFFECTS:LUNS[*]
 int main()
 {
    FILE *fp;
    size_t n;
    char buf[200];
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be written>: fp
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fp
    fp = fopen("file.txt", "rb");
-//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0]
-//               <may be written >: __IO_EFFECTS:LUNS[*] buf[*] fp[0]
-//               <must be read   >: fp
-//               <must be written>: n
+//             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: buf[*] fp[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fp
+//             <    is written>: n
    n = fread(&buf[0], sizeof(double), 50, fp);
-//               <may be read    >: stdout stdout[0] 
-//                                  __IO_EFFECTS:LUNS[1]
-//               <may be written >: stdout[0] __IO_EFFECTS:LUNS[1]
-//               <must be read   >: n
-   if (n==-1) 
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: n
+   if (n==-1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("fread failed");
-//               <may be read    >: __IO_EFFECTS:LUNS[*] fp[0]
-//               <may be written >: __IO_EFFECTS:LUNS[*] fp[0]
-//               <must be read   >: fp
+//             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fp[0] __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fp
    fclose(fp);
 }
 
@@ -49,20 +47,20 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    FILE *fp;
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    size_t n;
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char buf[200];
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    fp = fopen("file.txt", "rb");
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    n = fread(&buf[0], sizeof(double), 50, fp);
-//  points to = {}
-   if (n==-1) 
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+   if (n==-1)
+//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       printf("fread failed");
-//  points to = {}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    fclose(fp);
 }

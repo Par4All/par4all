@@ -1,0 +1,82 @@
+
+Transformers for "main"
+
+
+//  T() {0==-1}
+
+int main(void)
+{
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   int t = 0, d = 0, s = 0;
+
+//  T(d,s,t) {d#init==0, s#init==0, t#init==0, 0<=d, 0<=t}
+
+   while (1) {
+
+//  T(d,s) {d+s#init==d#init+s, s<=3, s#init<=s, s#init<=3}
+
+      while (alea()&&s<=3)
+
+//  T(d,s) {d==d#init+1, s==s#init+1, s<=4}
+
+         s++, d++;
+
+//  T(s,t) {t#init<=t}
+
+      while (alea())
+
+//  T(s,t) {s==0, t==t#init+1}
+
+         t++, s = 0;
+
+//  T() {}
+
+      
+      // The expected invariant is given as a 3-D figure in d, s and t
+      // s<=4, s<=d, ???
+      fprintf(stdout, "t=%d d=%d s=%d\n", t, d, s);
+   }
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int t = 0, d = 0, s = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+   while (1) {
+
+//  P(d,s,t) {0<=d, s<=d, 0<=s, s<=4, 0<=t}
+
+      while (alea()&&s<=3)
+
+//  P(d,s,t) {s<=d, 0<=s, s<=3, 0<=t}
+
+         s++, d++;
+
+//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+
+      while (alea())
+
+//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+
+         t++, s = 0;
+
+//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+
+      
+      // The expected invariant is given as a 3-D figure in d, s and t
+      // s<=4, s<=d, ???
+      fprintf(stdout, "t=%d d=%d s=%d\n", t, d, s);
+   }
+}

@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM NON_LINEAR04
 
-C  T(K) {2<=I, I<=10, 3<=J, J<=11, 4<=K, K<=100}
+C  T(K) {2<=I, I<=10, K<=10I, 2I<=K, 3<=J, J<=11, K+10<=10J, 2J<=K+2}
 
 C (0,1)
 C     BEGIN BLOCK
@@ -16,7 +16,7 @@ C     Check non-linear expression handling
 
       IF (I.LT.2.OR.I.GT.10.OR.J.LT.3.OR.J.GT.11) STOP                  0005
 
-C  T(K) {2<=I, I<=10, 3<=J, J<=11, 4<=K, K<=100}
+C  T(K) {2<=I, I<=10, K<=10I, 2I<=K, 3<=J, J<=11, K+10<=10J, 2J<=K+2}
 
 C (0,5)
 

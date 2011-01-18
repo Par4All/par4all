@@ -4,19 +4,19 @@ POINTS TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p, i, j;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    i = 0;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    j = 1;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    for(i = 1; i <= 4; i += 1)
-//  {(p,*HEAP*_l_11,-MAY-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,*HEAP*_l_11,-MAY-)}
 
       p = (int *) malloc(sizeof(int));
-//  {(p,*HEAP*_l_11,-MAY-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,*HEAP*_l_11,-MAY-)}
    
    
    return 0;

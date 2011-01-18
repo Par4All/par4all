@@ -1,0 +1,26 @@
+
+Initial code
+
+	  SUBROUTINE ARRAYPOINTER01 (A)
+      INTEGER I
+      INTEGER A(5)
+      DO 10 I = 1, 5
+         A(I) = I
+10       CONTINUE
+      END
+/* C pretty print for module ARRAYPOINTER01. */
+void
+arraypointer01 (int a[5])
+{
+  int i;
+
+  for (i = 1; i <= 5; i++)
+    {
+      a[i - 1] = i;
+      continue;
+    }
+  return;
+}
+
+compiles C output
+

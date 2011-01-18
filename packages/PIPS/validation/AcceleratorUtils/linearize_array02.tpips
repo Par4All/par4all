@@ -1,0 +1,24 @@
+setenv WKS linearize_array02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setenv LINEARIZE_ARRAY_DEBUG_LEVEL 9
+
+delete $WKS
+create $WKS $WKS.f
+
+setproperty CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL TRUE
+setproperty CROUGH_FORTRAN_USES_INTERFACE TRUE
+
+display PRINTED_FILE [FOO]
+
+apply LINEARIZE_ARRAY_FORTRAN[FOO]
+apply UNSPLIT [FOO]
+
+display PRINTED_FILE [FOO]
+
+display C_PRINTED_FILE [FOO]
+
+close $WKS
+delete $WKS
+quit

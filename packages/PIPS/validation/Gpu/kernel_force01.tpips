@@ -20,10 +20,6 @@ setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
 setproperty LOOP_NORMALIZE_LOWER_BOUND 0
 # It is legal in the following by construction:
 setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
-# If we do this here, the side effect at the end of a loop on the index
-# break paramemstorellelization. It would require to apply USE_DEF_ELIM...
-
-setproperty KERNEL_LOAD_STORE_FORCE_LOAD TRUE
 
 apply KERNEL_LOAD_STORE[myKernel]
 

@@ -15,24 +15,24 @@ int main()
 
 PRINT CUMULATED EFFECTS for main
 
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
 int main()
 {
    int entier;
    int graine;
    double virgule;
-//               <must be written>: graine
+//             <    is written>: graine
    graine = 50;
-//               <must be read   >: graine
-//               <must be written>: _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: graine
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
    srandom(graine);
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: _RANDOM_EFFECTS:GEN_SEED virgule
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: virgule _RANDOM_EFFECTS:GEN_SEED
    /* generator initialization */
    virgule = (double) rand()/(2147483647+1);
-//               <must be read   >: _RANDOM_EFFECTS:GEN_SEED
-//               <must be written>: _RANDOM_EFFECTS:GEN_SEED entier
+//             <    is read   >: _RANDOM_EFFECTS:GEN_SEED
+//             <    is written>: entier _RANDOM_EFFECTS:GEN_SEED
    entier = 1+rand();
 }
 

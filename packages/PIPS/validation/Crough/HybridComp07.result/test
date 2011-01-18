@@ -24,7 +24,6 @@ Code after outlining
       END
 /* C pretty print for module TOTO. */
 #include "p4a_crough_types.h"
-
 void
 toto_ (p4a_int a[5][5])
 {

@@ -1,92 +1,61 @@
 int main()
 {
-   // BEGIN BLOCK
    int **x, *x1, x2, *y, y1;
-//               <must be written>: x2
+//             <    is written>: x2
    x2 = 0;
-//               <must be written>: y1
+//             <    is written>: y1
    y1 = 1;
-//               <must be written>: x1
+//             <    is written>: x1
    x1 = &x2;
-//               <must be read   >: true
+//             <    is read   >: true
 
    if (true) {
-      // BEGIN BLOCK
-//               <must be written>: x
+//             <    is written>: x
 
       x = &x1;
-//               <must be written>: y
+//             <    is written>: y
       y = &y1;
-      // END BLOCK
    }
    else
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: x
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: x
       *x = &y;
 
    return 0;
-   // END BLOCK
 }
 POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int **x, *x1, x2, *y, y1;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    x2 = 0;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    y1 = 1;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    x1 = &x2;
-//  {(x1,x2,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,x2,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (true) {
-//  {(x1,x2,-Exact-)}
-      // BEGIN BLOCK
-//  {(x1,x2,-Exact-)}
+//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,y1,-Exact-)}
 
       x = &x1;
-//  {(x,x1,-Exact-);(x1,x2,-Exact-)}
+//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,y1,-Exact-)}
       y = &y1;
-      // END BLOCK
    }
    else
-//  {(x1,x2,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*,y,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(x1,x2,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       *x = &y;
-//  {(x,x1,-MAY-);(x1,x2,-Exact-);(y,y1,-MAY-)}
+//  {(*ANY_MODULE*:*ANYWHERE*,y,-MAY-);(x,*ANY_MODULE*:*NOWHERE*,
+//   -MAY-);(x,x1,-MAY-);(x1,x2,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -MAY-);(y,y1,-MAY-)}
 
    return 0;
-   // END BLOCK
-}
-int main()
-{
-   // BEGIN BLOCK
-   int **x, *x1, x2, *y, y1;
-//               <must be written>: x2
-   x2 = 0;
-//               <must be written>: y1
-   y1 = 1;
-//               <must be written>: x1
-   x1 = &x2;
-//               <must be read   >: true
-
-   if (true) {
-      // BEGIN BLOCK
-//               <must be written>: x
-
-      x = &x1;
-//               <must be written>: y
-      y = &y1;
-      // END BLOCK
-   }
-   else
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: x
-      *x = &y;
-
-   return 0;
-   // END BLOCK
 }

@@ -1175,12 +1175,12 @@ int main()
    //Sending...	
    //generate frame
    int32_t data = 0, data_bit;
-   int32_t symbole_flow_user1[8*sizeof(int32_t)];
+   int32_t symbole_flow_user1[8*4];
    
    //spreading
    int32_t ovsf_code_user1[8] = {-1, -1, 1, 1, -1, -1, 1, 1};
    //user code
-   int32_t pilot[8*sizeof(int32_t)] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+   int32_t pilot[8*4] = {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
    int32_t spreading_signal1[64*4+5+1];
    int32_t spreading_signals[64*4+5+1];
    int32_t channel_delay1 = 0, channel_delay2 = 0, channel_delay3 = 0, channel_delay4 = 0;
@@ -1239,17 +1239,35 @@ int main()
    //Loop on the number of frame. The number of frame is made of "nb data frame" + "nb pilot frame". 
    //Pilot frames are added to initial frames for the channel estimation.
    for(t = 0; t <= 145635; t += 1) {
-      P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, image_in, img_index, ovsf_code_user1, pilot, spreading_signal1, symbole_flow_user1, t);
       {
          //PIPS generated variable
-         int32_t (*spreading_signals0)[262] = (int32_t (*)[262]) 0, (*spreading_signal10)[262] = (int32_t (*)[262]) 0;
+         int32_t (*symbole_flow_user10)[32] = (int32_t (*)[32]) 0, (*spreading_signal10)[262] = (int32_t (*)[262]) 0, (*pilot0)[32] = (int32_t (*)[32]) 0, (*ovsf_code_user10)[8] = (int32_t (*)[8]) 0;
+         //PIPS generated variable
+         unsigned char (*image_in0)[524288] = (unsigned char (*)[524288]) 0;
+         P4A_scmp_malloc((void **) &image_in0, sizeof(unsigned char)*524288);
+         P4A_scmp_malloc((void **) &ovsf_code_user10, sizeof(int)*8);
+         P4A_scmp_malloc((void **) &pilot0, sizeof(int)*32);
          P4A_scmp_malloc((void **) &spreading_signal10, sizeof(int)*262);
+         P4A_scmp_malloc((void **) &symbole_flow_user10, sizeof(int)*32);
+         P4A_copy_to_accel_1d(sizeof(unsigned char), 524288, 524288, 0, &image_in[0], *image_in0);
+         P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *ovsf_code_user10);
+         P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &pilot[0], *pilot0);
+         P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *symbole_flow_user10);
+
+         P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, *image_in0, img_index, *ovsf_code_user10, *pilot0, *spreading_signal10, *symbole_flow_user10, t);
+         P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal10);
+         P4A_copy_from_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *symbole_flow_user10);
+      }
+      {
+         //PIPS generated variable
+         int32_t (*spreading_signals0)[262] = (int32_t (*)[262]) 0, (*spreading_signal11)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &spreading_signal11, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals0, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal10);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal11);
 
          //generate multipath
          //main path
-         P4A_scmp_kernel_1(*spreading_signal10, *spreading_signals0);
+         P4A_scmp_kernel_1(*spreading_signal11, *spreading_signals0);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals0);
       }
 
@@ -1272,17 +1290,17 @@ int main()
          ;
       {
          //PIPS generated variable
-         int32_t (*spreading_signals2)[262] = (int32_t (*)[262]) 0, (*spreading_signal11)[262] = (int32_t (*)[262]) 0;
-         P4A_scmp_malloc((void **) &spreading_signal11, sizeof(int)*262);
+         int32_t (*spreading_signals2)[262] = (int32_t (*)[262]) 0, (*spreading_signal12)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &spreading_signal12, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals2, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal11);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal12);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals2);
 
          //printf("\n");
          
          
          //other path
-         P4A_scmp_kernel_3(channel_delay1, *spreading_signal11, *spreading_signals2);
+         P4A_scmp_kernel_3(channel_delay1, *spreading_signal12, *spreading_signals2);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals2);
       }
 
@@ -1290,15 +1308,15 @@ int main()
          ;
       {
          //PIPS generated variable
-         int32_t (*spreading_signals3)[262] = (int32_t (*)[262]) 0, (*spreading_signal12)[262] = (int32_t (*)[262]) 0;
-         P4A_scmp_malloc((void **) &spreading_signal12, sizeof(int)*262);
+         int32_t (*spreading_signals3)[262] = (int32_t (*)[262]) 0, (*spreading_signal13)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &spreading_signal13, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals3, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal12);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal13);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals3);
 
          //printf("\n");
          
-         P4A_scmp_kernel_4(channel_delay2, *spreading_signal12, *spreading_signals3);
+         P4A_scmp_kernel_4(channel_delay2, *spreading_signal13, *spreading_signals3);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals3);
       }
 
@@ -1306,32 +1324,32 @@ int main()
          ;
       {
          //PIPS generated variable
-         int32_t (*spreading_signals4)[262] = (int32_t (*)[262]) 0, (*spreading_signal13)[262] = (int32_t (*)[262]) 0;
-         P4A_scmp_malloc((void **) &spreading_signal13, sizeof(int)*262);
+         int32_t (*spreading_signals4)[262] = (int32_t (*)[262]) 0, (*spreading_signal14)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &spreading_signal14, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals4, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal13);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal14);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals4);
 
          //printf("\n");
          
-         P4A_scmp_kernel_5(channel_delay3, *spreading_signal13, *spreading_signals4);
+         P4A_scmp_kernel_5(channel_delay3, *spreading_signal14, *spreading_signals4);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals4);
       }
       for(i = 0; i <= 261; i += 1)
          ;
       {
          //PIPS generated variable
-         int32_t (*spreading_signals5)[262] = (int32_t (*)[262]) 0, (*spreading_signal14)[262] = (int32_t (*)[262]) 0;
-         P4A_scmp_malloc((void **) &spreading_signal14, sizeof(int)*262);
+         int32_t (*spreading_signals5)[262] = (int32_t (*)[262]) 0, (*spreading_signal15)[262] = (int32_t (*)[262]) 0;
+         P4A_scmp_malloc((void **) &spreading_signal15, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals5, sizeof(int)*262);
-         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal14);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal15);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals5);
 
          //printf("\n");
          
          
          
-         P4A_scmp_kernel_6(channel_delay4, *spreading_signal14, *spreading_signals5);
+         P4A_scmp_kernel_6(channel_delay4, *spreading_signal15, *spreading_signals5);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals5);
       }
 
@@ -1571,19 +1589,19 @@ int main()
       }
       {
          //PIPS generated variable
-         int32_t (*symbole_flow0)[32] = (int32_t (*)[32]) 0, (*ovsf_code_user10)[8] = (int32_t (*)[8]) 0, (*inv_qpsk_user11)[262] = (int32_t (*)[262]) 0, (*finger0)[6] = (int32_t (*)[6]) 0, (*coeff1)[6] = (int32_t (*)[6]) 0;
+         int32_t (*symbole_flow0)[32] = (int32_t (*)[32]) 0, (*ovsf_code_user11)[8] = (int32_t (*)[8]) 0, (*inv_qpsk_user11)[262] = (int32_t (*)[262]) 0, (*finger0)[6] = (int32_t (*)[6]) 0, (*coeff1)[6] = (int32_t (*)[6]) 0;
          P4A_scmp_malloc((void **) &coeff1, sizeof(int)*6);
          P4A_scmp_malloc((void **) &finger0, sizeof(int)*6);
          P4A_scmp_malloc((void **) &inv_qpsk_user11, sizeof(int)*262);
-         P4A_scmp_malloc((void **) &ovsf_code_user10, sizeof(int)*8);
+         P4A_scmp_malloc((void **) &ovsf_code_user11, sizeof(int)*8);
          P4A_scmp_malloc((void **) &symbole_flow0, sizeof(int)*32);
          P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &coeff[0], *coeff1);
          P4A_copy_to_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *finger0);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &inv_qpsk_user1[0], *inv_qpsk_user11);
-         P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *ovsf_code_user10);
+         P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *ovsf_code_user11);
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow[0], *symbole_flow0);
 
-         P4A_scmp_kernel_24(*coeff1, &data, *finger0, *inv_qpsk_user11, *ovsf_code_user10, *symbole_flow0, t);
+         P4A_scmp_kernel_24(*coeff1, &data, *finger0, *inv_qpsk_user11, *ovsf_code_user11, *symbole_flow0, t);
          P4A_copy_from_accel_1d(sizeof(int), 6, 6, 0, &finger[0], *finger0);
          P4A_copy_from_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow[0], *symbole_flow0);
       }

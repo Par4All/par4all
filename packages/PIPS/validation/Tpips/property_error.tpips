@@ -1,0 +1,13 @@
+# type error, should be a boolean
+setproperty ABORT_ON_USER_ERROR 2
+getproperty ABORT_ON_USER_ERROR
+# this property setting is ignored?!
+setproperty PRETTYPRINT_BLOCKS TRUE
+echo # PRETTYPRINT_BLOCKS should be TRUE
+getproperty PRETTYPRINT_BLOCKS
+# try again...
+setproperty PRETTYPRINT_BLOCKS TRUE
+getproperty PRETTYPRINT_BLOCKS
+setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
+getproperty PRETTYPRINT_STATEMENT_ORDERING
+quit

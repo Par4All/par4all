@@ -166,7 +166,7 @@ void run(void)
 
    while (1) {
 
-//  P(x,z) {2z<=x, 0<=z}
+//  P(x,z) {0<=x, 2z<=x, 0<=z}
 
       while (flip())
 

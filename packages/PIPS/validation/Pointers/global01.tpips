@@ -1,8 +1,8 @@
 delete global01
 create global01 global01.c
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty PRETTYPRINT_BLOCKS TRUE
-setproperty PRETTYPRINT_LANGUAGE "C"
+#setproperty PRETTYPRINT_BLOCKS TRUE
+#setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -10,12 +10,12 @@ setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
 
-setenv PIPS_CPP="cpp -C"
-activate C_PARSER
+#setenv PIPS_CPP="cpp -C"
+#activate C_PARSER
 
 
-activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[global01]
+#activate PRINT_CODE_PROPER_EFFECTS
+#display PRINTED_FILE[global01]
 
 #apply POINTS_TO_ANALYSIS[global01]
 #display PRINTED_FILE[global01]

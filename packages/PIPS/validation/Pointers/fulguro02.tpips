@@ -8,12 +8,12 @@ setenv PIPS_CPP_FLAGS=" -D__u64='unsigned long long' -D__s64='long long' -D__sig
 #	fulguro-2-1-1.src/core/flgrCoreData.c \
 
 create fulguro02 fulguro02.c
-activate C_PARSER
-activate C_SYMBOL_TABLE
+#activate C_PARSER
+#activate C_SYMBOL_TABLE
 
 setproperty PRETTYPRINT_LANGUAGE "C"
 #setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
@@ -29,8 +29,8 @@ echo POINTS TO
 echo
 
 activate PRINT_CODE_POINTS_TO_LIST
+#display PRINTED_FILE[flgr2d_arith_add_fgINT32]
 display PRINTED_FILE[%ALLFUNC]
-
 
 close
 delete fulguro02
