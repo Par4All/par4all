@@ -785,6 +785,38 @@ static string c_declarations(
       result = strdup(concatenate(result, separator, NULL));
     return result;
 }
+/******************************************************************* INCLUDE */
+static string c_include (void) {
+  string result = strdup ("");
+
+  // take care of include file required by the user
+  string user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
+  pips_debug (5, "including the user file list %s\n", user_req);
+  string match = NULL;
+  match = strtok (user_req, " ,");
+  while (match != NULL) {
+	string old = result;
+	pips_debug (7, "including the file %s\n", match);
+	result = strdup (concatenate (result, "#include \"", match, "\"\n", NULL));
+	match = strtok (NULL, " ,");
+	free (old);
+  }
+  free (match);
+
+  // user might use its own type that are define in a specific file
+  bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
+  pips_debug (5, "includind the user define type file %s\n", user_req);
+  if (user_type == true) {
+	string old = result;
+	string f_name = get_string_property ("CROUGH_INCLUDE_FILE");
+	pips_debug (7, "including the file %s\n", f_name);
+	result = strdup (concatenate (result, "#include \"", f_name, "\"\n",
+								  NULL));
+	free (old);
+  }
+  pips_debug (5, "include string : %s\n", result);
+  return result;
+}
 
 /********************************************************************** HEAD */
 
@@ -799,34 +831,33 @@ static string c_head(entity module)
 
     pips_assert("it is a function", type_functional_p(entity_type(module)));
 
-    if (entity_main_module_p(module))
-    {
-        /* another kind : "int main(void)" ?*/
-        result = strdup(MAIN_DECLARATION);
+    if (entity_main_module_p(module)) {
+	    /* another kind : "int main(void)" ?*/
+	    result = strdup(MAIN_DECLARATION);
     }
-    else
-    {
-        string head, args, svar;
-        functional f = type_functional(entity_type(module));
+    else {
+       string head, args, svar;
+	   functional f = type_functional(entity_type(module));
 
-        /* define type head. */
-        if (entity_subroutine_p(module))
-        {
-            head = strdup("void");
-        }
-        else
-        {
-            variable v;
-            pips_assert("type of result is a variable",
-                    type_variable_p(functional_result(f)));
-            v = type_variable(functional_result(f));
-            head = c_basic_string(variable_basic(v));
+	   /* define type head. */
+	   if (get_bool_property ("DO_RETURN_TYPE_AS_TYPEDEF") == true) {
+           head = strdup (get_string_property ("SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE"));
+	   }
+	   else if (entity_subroutine_p(module)) {
+           head = strdup("void");
+	   }
+       else {
+		   variable v;
+           pips_assert("type of result is a variable",
+					   type_variable_p(functional_result(f)));
+           v = type_variable(functional_result(f));
+           head = c_basic_string(variable_basic(v));
         }
 
         /* define args. */
         if (functional_parameters(f))
         {
-	  args = c_declarations(module, argument_p, ", ", FALSE, true);
+            args = c_declarations(module, argument_p, ", ", FALSE, true);
         }
         else
         {
@@ -1750,7 +1781,7 @@ static string interface_code_string(entity module, statement stat)
 
 static string c_code_string(entity module, statement stat)
 {
-  string head, decls, body, result, copy_in;
+  string head, decls, body, result, copy_in, include;
 
   /* What about declarations that are external a module scope ?
      Consider a source file as a module entity, put all declarations in it
@@ -1765,15 +1796,18 @@ static string c_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  //before_head = c_declarations(module, parameter_p, NL, TRUE);
+  // generate the user required includes
+  include     = c_include ();
+  // function declaration
   head        = c_head(module);
-  /* What about declarations associated to statements */
+  // What about declarations associated to statements
   decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,FALSE);
   body        = c_statement(stat, false);
   copy_in     = scalar_prelude ();
-  result = concatenate(/*before_head,*/ head, OPENBRACE, NL, decls,
+  result = concatenate(include, head, OPENBRACE, NL, decls,
 		       copy_in, NL, body, CLOSEBRACE, NL, NULL);
 
+  free (include);
   free(head);
   free(decls);
   free(body);
@@ -1866,10 +1900,6 @@ bool print_crough(string module_name)
     /* save to file */
     out = safe_fopen(filename, "w");
     fprintf(out, "/* C pretty print for module %s. */\n", module_name);
-    bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
-    if (user_type == true) {
-      fprintf(out, "#include \"%s\"%s", get_string_property ("CROUGH_INCLUDE_FILE"),"\n\n");
-    }
     fprintf(out, "%s", ppt);
     safe_fclose(out, filename);
 

@@ -10038,6 +10038,7 @@ generate either C89 or C99 code.
 
 
 \subsection{Set return type}
+\label{subsec:set-return-type}
 
 \begin{PipsPass}{set_return_type_as_typedef}
 The purpose of this transformation is to change the return type of a function.
@@ -13785,6 +13786,25 @@ CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL FALSE
 
 \begin{PipsProp}{CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL}
 CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL FALSE
+\end{PipsProp}
+
+If the property DO\_RETURN\_TYPE\_AS\_TYPEDEF is set to TRUE the crough
+phase  additionaly does the same thing that the phase
+set\_return\_type\_as\_typedef does (cf section ~\ref{chapter-global-options}).
+In such a case the same property SET\_RETURN\_TYPE\_AS\_TYPEDEF\_NEW\_TYPE is
+taken into account. This is only posible for the SUBROUTINES and the FUNCTIONS
+but not for the PROGRAMS
+
+\begin{PipsProp}{DO_RETURN_TYPE_AS_TYPEDEF}
+DO_RETURN_TYPE_AS_TYPEDEF FALSE
+\end{PipsProp}
+
+Using the property INCLUDE\_FILES\_LIST, it is possible to insert some
+\#include statement before to output the code. The INCLUDE\_FILES\_LIST
+is a string interpreted as coma (and/or blank) separated list of files.
+
+\begin{PipsProp}{CROUGH_INCLUDE_FILE_LIST}
+CROUGH_INCLUDE_FILE_LIST ""
 \end{PipsProp}
 
 \section{Prettyprinters Smalltalk}
