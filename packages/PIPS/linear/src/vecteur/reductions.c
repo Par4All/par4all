@@ -30,6 +30,7 @@
     #include "config.h"
 #endif
 #include <stdio.h>
+#include <stdlib.h>
 #include <limits.h>
 
 #include "boolean.h"
