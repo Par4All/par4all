@@ -3370,3 +3370,163 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 
   gen_free_list(decls);
 }
+
+
+/* Transform a declaration with an initialization statement into 2 parts,
+   a declaration statement and an initializer statement
+
+   gen_recurse callback on exiting statements. For a declaration to be split:
+
+   - it must be a local declaration
+
+   - the initial value, if any, must be a valid rhs expression
+ */
+void split_initializations_in_statement(statement s)
+{
+#if 0
+  if (FALSE && statement_block_p(s)) { // based on old declaration representation
+    list inits = NIL;
+    list decls = statement_declarations(s); // Non-recursive
+    instruction old = statement_instruction(s);
+
+    FOREACH(ENTITY, var, decls) {
+      string mn  = module_name(entity_name(var));
+      string cmn = entity_user_name(get_current_module_entity());
+      if ( strcmp(mn,cmn) == 0
+	   && !value_unknown_p(entity_initial(var))
+	   ) {
+	expression ie = variable_initial_expression(var);
+	if (expression_is_C_rhs_p(ie)) {
+	  statement is = make_assign_statement(entity_to_expression(var), ie);
+	  inits = gen_nconc(inits, CONS(statement, is, NIL));
+	  entity_initial(var) = make_value_unknown();
+	}
+      }
+    }
+    /* Insert the list of initialisation statements as a sequence at
+       the beginning of s. */
+    inits = gen_nconc(inits,
+		      CONS(statement, instruction_to_statement(old), NIL));
+    statement_instruction(s) = make_instruction_sequence(make_sequence(inits));
+  }
+  //else if(declaration_statement_p(s)) {
+  //else
+#endif
+  if(!get_bool_property("C89_CODE_GENERATION") && statement_block_p(s)) {
+    /* generate C99 code */
+    list cs = list_undefined;
+    list pcs = NIL;
+    list nsl = statement_block(s); // new statement list
+    for( cs = statement_block(s); !ENDP(cs); ) {
+      statement ls = STATEMENT(CAR(cs));
+      if(declaration_statement_p(ls)) {
+	list inits = NIL;
+	list decls = statement_declarations(ls); // Non-recursive
+	//statement sc = statement_undefined; // statement copy
+
+	FOREACH(ENTITY, var, decls) {
+	  string mn  = module_name(entity_name(var));
+	  string cmn =get_current_module_name();
+	  if ( same_string_p(mn,cmn)
+	       && !value_unknown_p(entity_initial(var))
+	       ) {
+	    expression ie = variable_initial_expression(var);
+	    if (expression_is_C_rhs_p(ie)) {
+	      statement is = make_assign_statement(entity_to_expression(var), ie);
+	      inits = gen_nconc(inits, CONS(statement, is, NIL));
+	      entity_initial(var) = make_value_unknown();
+	    }
+	    else if(entity_array_p(var)) {
+          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
+	      entity_initial(var) = make_value_unknown();
+	    }
+	    else {
+          pips_user_warning("split initializations not implemented yet for structures\n");
+	    }
+	  }
+	}
+
+	if(!ENDP(inits)) {
+	  /* This is not very smart... You do not need pcs in C99
+	     since you are going to add the assignment statements
+	     just after the current declaration statement... */
+	  inits = CONS(STATEMENT, ls, inits);
+	  /* Chain the new list within the current statement list */
+	  if(ENDP(pcs)) {
+	    nsl = inits;
+	  }
+	  else {
+	    CDR(pcs) = inits;
+	  }
+	  /* Move to the next original element nsl */
+	  pcs = gen_last(inits);
+	  CDR(pcs) = CDR(cs);
+	  POP(cs);
+	}
+	else {
+	  /* Move to the next statement */
+	  pcs = cs;
+	  POP(cs);
+	}
+      }
+      else {
+	/* Move to the next statement */
+	pcs = cs;
+	POP(cs);
+      }
+    }
+    instruction_block(statement_instruction(s)) = nsl;
+  }
+  else if(statement_block_p(s)) {
+    /* generate C89 code */
+    list cs = list_undefined;
+    //list pcs = NIL;
+    //list nsl = statement_block(s); // new statement list
+    list inits = NIL; // list of initialization statements
+
+    for( cs = statement_block(s); !ENDP(cs); POP(cs)) {
+      statement ls = STATEMENT(CAR(cs));
+      if(declaration_statement_p(ls)) {
+	list decls = statement_declarations(ls); // Non-recursive
+	//statement sc = statement_undefined; // statement copy
+
+	FOREACH(ENTITY, var, decls) {
+	  string mn  = module_name(entity_name(var));
+          const char* cmn = get_current_module_name();
+	  if ( strcmp(mn,cmn) == 0
+	       && !value_unknown_p(entity_initial(var))
+	       ) {
+	    expression ie = variable_initial_expression(var);
+            if(expression_undefined_p(ie)) {}
+            else if (expression_is_C_rhs_p(ie)) {
+	      statement is = make_assign_statement(entity_to_expression(var), ie);
+	      inits = gen_nconc(inits, CONS(statement, is, NIL));
+	      entity_initial(var) = make_value_unknown();
+	    }
+	    else if(entity_array_p(var)) {
+          inits=gen_nconc(inits,brace_expression_to_statements(var,ie));
+	      entity_initial(var) = make_value_unknown();
+	    }
+        else {
+          pips_user_warning("split initializations not implemented yet for structures\n");
+        }
+	  }
+	}
+      }
+
+      if(!ENDP(inits)) {
+	list ncs = CDR(cs);
+	if(ENDP(ncs) || !declaration_statement_p(STATEMENT(CAR(ncs)))) {
+	  list pcs = gen_last(inits);
+	  CDR(cs) = inits;
+	  CDR(pcs) = ncs;
+	  break;
+	}
+      }
+    }
+    //instruction_block(statement_instruction(s)) = nsl;
+  }
+  else {
+    /* Do nothing ? */
+  }
+}
