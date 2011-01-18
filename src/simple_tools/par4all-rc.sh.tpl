@@ -70,6 +70,11 @@ if [ -d $$PLY_PATH/ply ]; then
     PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
     export PYTHONPATH
 fi
+PLY_PATH=/usr/lib/python2.7/site-packages
+if [ -d $$PLY_PATH/ply ]; then
+    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
+    export PYTHONPATH
+fi
 PLY_PATH=/usr/lib/python3.1/site-packages
 if [ -d $$PLY_PATH/ply ]; then
     PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)

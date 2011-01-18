@@ -162,6 +162,39 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
 /** Start a timer on the accelerator in CUDA */
 #define P4A_accel_timer_start toolTestExec(cudaEventRecord(p4a_start_event, 0))
 
+/** Stop a timer on the accelerator in CUDA */
+#define P4A_accel_timer_stop toolTestExec(cudaEventRecord(p4a_stop_event, 0))
+
+#ifdef P4A_TIMING
+// Set of routine for timing kernel executions
+extern float p4a_timing_elapsedTime;
+#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+#define P4A_TIMING_accel_timer_stop \
+{ P4A_accel_timer_stop; \
+  cudaEventSynchronize(p4a_stop_event); \
+}
+#define P4A_TIMING_elapsed_time(elapsed) \
+    cudaEventElapsedTime(&elapsed, p4a_start_event, p4a_stop_event);
+#define P4A_TIMING_get_elapsed_time \
+{   P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime); \
+    p4a_timing_elapsedTime; }
+#define P4A_TIMING_display_elasped_time(msg) \
+{ P4A_TIMING_elapsed_time(p4a_timing_elapsedTime); \
+  P4A_dump_message("Time for '%s' : %fms\n",  \
+                   #msg,      \
+                   p4a_timing_elapsedTime ); }
+
+#else
+#define P4A_TIMING_accel_timer_start
+#define P4A_TIMING_accel_timer_stop
+#define P4A_TIMING_elapsed_time(elapsed)
+#define P4A_TIMING_get_elapsed_time
+#define P4A_TIMING_display_elasped_time(msg)
+#endif //P4A_TIMING
+
+
+
+
 /** @} */
 
 
@@ -367,9 +400,12 @@ void P4A_copy_to_accel_3d(size_t element_size,
     P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
 				    #context,				\
 				    #parameters));			\
+		P4A_TIMING_accel_timer_start; \
     P4A_call_accel_kernel_context context				\
     P4A_call_accel_kernel_parameters parameters;			\
     toolTestExecMessage("P4A CUDA kernel execution failed");			\
+    P4A_TIMING_accel_timer_stop; \
+    P4A_TIMING_display_elasped_time(context); \
   } while (0)
 
 /* @} */

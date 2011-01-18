@@ -21,7 +21,7 @@ Par4All setup script implementation module.
 
 default_configure_opts = [ "--disable-static", "CFLAGS='-O2 -std=c99'" ]
 default_debug_configure_opts = [ "--disable-static", "CFLAGS='-ggdb -g3 -O0 -Wall -std=c99'" ]
-default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc", "--enable-fortran95" ]
 
 
 def add_module_options(parser):
@@ -161,6 +161,7 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
             #~ configure_opts.append ("DESTDIR=" + dest_dir)
         # Call configure to generate the Makefiles.
         print build_dir
+        print [ configure_script ] + configure_opts
         p4a_util.run([ configure_script ] + configure_opts, working_dir = build_dir)
 
     # Call make all to compile.
@@ -574,15 +575,16 @@ def work(options, args = None):
         # that if this setup is run again, the .files are removed
         # to relauch the patch.
         # If we do not build with Fortran 95 support, admit this can fail...
-        p4a_util.run([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ], can_fail = True)
+        version = "4.4.5"
+        p4a_util.run([ "rsync", "-av", os.path.join(packages_dir, "pips-gfc/."), fortran ], can_fail = True)
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
-        for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
+        for file in [ "gcc-"+version+".md5", "gcc-core-"+version+".tar.bz2", "gcc-fortran-"+version+".tar.bz2" ]:
             p4a_util.run([ "touch", os.path.join(fortran, file) ])
-        fortran2 = os.path.join(fortran, "gcc-4.4.3")
+        fortran2 = os.path.join(fortran, "gcc-"+version)
         if not os.path.isdir(fortran2):
             os.makedirs(fortran2)
-        for file in [ ".dir", ".md5-check-core", ".md5-check-fortran", ".untar-core", ".untar-fortran", ".untar" ]:
+        for file in [ ".dir", ".md5-check-core", ".md5-check-core.list",  ".md5-check-core.liste", ".md5-check-fortran", ".md5-check-fortran.liste", ".untar-core", ".untar-fortran", ".untar", ".patched" ]:
             p4a_util.run([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
 
@@ -653,7 +655,7 @@ def work(options, args = None):
     accel_src_dir = os.path.join(root, "src/p4a_accel")
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
-        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu" or ext == ".cpp" :
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu" or ext == ".cpp" or ext == ".f95" :
             p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
 
     # Copy python dependencies and templates.

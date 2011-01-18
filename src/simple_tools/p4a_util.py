@@ -214,6 +214,10 @@ def p4a_die_env(message):
 
     die(message + "\nIt looks like the Par4All environment has not been properly set.\n Have you sourced par4all-rc.sh?")
 
+def add_list_to_set (l, s):
+    """ add all elements of the list to the set"""
+    for e in l:
+        s.add (e)
 
 default_log_file = os.path.join(os.getcwd(), program_name + ".log")
 log_file_handler = None
@@ -603,7 +607,7 @@ def find(file_re, dir = None, abs_path = True, match_files = True,
 def fortran_file_p(file):
     '''Tests if a file has a Fortran name.'''
     ext = get_file_extension(file)
-    return ext == '.f' or ext == '.f77' or ext == '.f90' or ext == '.f95'
+    return ext == '.f' or ext == '.f77' or ext == '.f90' or ext == '.f95' or ext == '.f03' or ext == '.f08'
 
 def c_file_p(file):
     '''Tests if a file has a C name.'''
