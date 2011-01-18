@@ -177,7 +177,7 @@ generate-result: $(F.future_result)
 
 # generate an empty result directory
 %.result:
-	@echo "creating: $@" ; mkdir $@
+	@echo "creating: $@" ; mkdir $@ ; touch $@/test
 
 # (shell) script
 %.result/$(TEST): %.test
