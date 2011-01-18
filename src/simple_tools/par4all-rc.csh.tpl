@@ -93,6 +93,14 @@ if ( -d $$PLY_PATH/ply ) then
 	setenv PYTHONPATH $$PLY_PATH
     endif
 endif
+set PLY_PATH=/usr/lib/python2.7/site-packages
+if ( -d $$PLY_PATH/ply ) then
+    if ( $$?PYTHONPATH ) then
+	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
+    else
+	setenv PYTHONPATH $$PLY_PATH
+    endif
+endif
 set PLY_PATH=/usr/lib/python3.1/site-packages
 if ( -d $$PLY_PATH/ply ) then
     if ( $$?PYTHONPATH ) then
