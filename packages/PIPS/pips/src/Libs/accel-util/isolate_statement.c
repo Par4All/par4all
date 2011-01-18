@@ -131,9 +131,18 @@ static void effect_to_dimensions(effect eff, transformer tr, list *dimensions, l
 static expression entity_to_address(entity e) {
     size_t n = gen_length(variable_dimensions(type_variable(ultimate_type(entity_type(e)))));
     list indices = NIL;
-    while(n--) indices = CONS(EXPRESSION,int_to_expression(0),indices);
+    bool is_fortran = fortran_module_p(get_current_module_entity());
+    int indice_first = (is_fortran == true) ? 1 : 0;
+    while(n--) indices = CONS(EXPRESSION,int_to_expression(indice_first),indices);
     reference r = make_reference(e,indices);
-    return MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), reference_to_expression(r));
+    expression result = expression_undefined;
+    if (fortran_module_p(get_current_module_entity()))
+      result = MakeUnaryCall(entity_intrinsic(C_LOC_FUNCTION_NAME),
+			     reference_to_expression(r));
+    else
+      result = MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+			     reference_to_expression(r));
+    return result;
 }
 
 /* generate an expression of the form
@@ -351,7 +360,8 @@ static
 statement effects_to_dma(statement stat,
 			 enum region_to_dma_switch s,
 			 hash_table e2e, expression * condition,
-			 bool fine_grain_analysis, string prefix)
+			 bool fine_grain_analysis, string prefix,
+			 string suffix)
 {
     /* if no dma is provided, skip the computation
      * it is used for scalope at least */
@@ -483,7 +493,7 @@ statement effects_to_dma(statement stat,
                 get_current_module_entity();
 	      // PIER Here we need to add a P4A variable prefix to the name to help
 	      // p4a postprocessing
-	      string str = strdup (concatenate (prefix,entity_local_name(re),NULL));
+	      string str = strdup (concatenate (prefix,entity_local_name(re), suffix, NULL));
               eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
 	      free (str);
               AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
@@ -527,7 +537,7 @@ static bool do_isolate_statement_preconditions(statement s)
  * that is make sure that all access to variables in @p s
  * are made either on private variables or on new entities declared on a new memory space. The @p prefix is used as a prefix to new entities' name.
  */
-void do_isolate_statement(statement s, string prefix) {
+void do_isolate_statement(statement s, string prefix, string suffix) {
     bool fine_grain_analysis = true;
     statement allocates, loads, stores, deallocates;
     /* this hash table holds an entity to (entity + tag ) binding */
@@ -539,11 +549,13 @@ void do_isolate_statement(statement s, string prefix) {
     e2e = hash_table_make(hash_pointer,HASH_DEFAULT_SIZE);
     expression condition = expression_undefined;
     allocates = effects_to_dma(s,dma_allocate,e2e,&condition,
-			       fine_grain_analysis,prefix);
-    loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis,prefix);
-    stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis,prefix);
+			       fine_grain_analysis,prefix,suffix);
+    loads = effects_to_dma(s,dma_load,e2e,NULL,fine_grain_analysis,prefix,
+			   suffix);
+    stores = effects_to_dma(s,dma_store,e2e,NULL,fine_grain_analysis,prefix,
+			    suffix);
     deallocates = effects_to_dma(s,dma_deallocate,e2e,NULL,fine_grain_analysis,
-				 prefix);
+				 prefix,suffix);
     HASH_MAP(k,v,free(v),e2e);
     hash_table_free(e2e);
 
@@ -850,7 +862,7 @@ isolate_statement(const char* module_name)
     if(statement_undefined_p(statement_to_isolate))
         pips_user_error("statement labeled '%s' not found\n",stmt_label);
     else
-        do_isolate_statement(statement_to_isolate, "");
+      do_isolate_statement(statement_to_isolate, "", "");
 
 
 

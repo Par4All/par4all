@@ -1278,7 +1278,7 @@ statement:
 |   TK_FOR
                         {
 			}
-    TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
+    TK_LPAREN for_clause
 	                {
 			}
 |   TK_IDENT TK_COLON statement
@@ -1328,8 +1328,10 @@ statement:
 ;
 
 for_clause:
-    opt_expression TK_SEMICOLON   { }
-|   declaration
+    opt_expression TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
+                        {
+			}
+|   declaration opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
                         {
 			}
 ;

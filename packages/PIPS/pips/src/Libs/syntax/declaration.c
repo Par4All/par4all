@@ -2067,3 +2067,23 @@ SafeFindOrCreateEntity(
 
   return e;
 }
+
+void add_entity_to_declarations (string name, string area, enum basic_utype tag,
+								 void* val) {
+  entity new_e = FindOrCreateTopLevelEntity (name);
+  basic b = make_basic (tag, val);
+  variable v = make_variable (b, NIL, NIL);
+  entity_type (new_e) = make_type_variable (v);
+  string module_name = module_local_name(get_current_module_entity ());
+  entity stack_area = global_name_to_entity(module_name,
+											area);
+  storage s = make_storage_ram(make_ram(get_current_module_entity (),
+										stack_area,
+										CurrentOffsetOfArea(stack_area, new_e),
+										NIL));
+  entity_storage (new_e) = s;
+  value initial = make_value_unknown ();
+  entity_initial (new_e) = initial;
+  AddEntityToDeclarations (new_e, get_current_module_entity ());
+  discard_module_declaration_text(get_current_module_entity ());
+}

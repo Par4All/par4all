@@ -429,6 +429,12 @@ transformer transformer_add_inequality_with_affine_term(transformer tf, entity v
 
   return tf;
 }
+
+/* Add the inequality v <= a x or v >= a x */
+transformer transformer_add_inequality_with_linear_term(transformer tf, entity v, entity x, int a, bool less_than_p)
+{
+  return transformer_add_inequality_with_affine_term(tf, v, x, a, VALUE_ZERO, less_than_p);
+}
 
 bool transformer_argument_consistency_p(transformer t)
 {

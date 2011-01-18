@@ -45,18 +45,24 @@
 #include "preprocessor.h"
 #include "accel-util.h"
 
-/**
- * This boolean is controlled by "LINEARIZE_ARRAY_CAST_AT_CALL_SITE" property
- * Turning it on break further effects analysis, but without the cast it might
- * break compilation or at least generate warnings for type mismatch
- */
-static bool cast_at_call_site_p = FALSE;
-
-/**
- * This boolean is controlled by "LINEARIZE_ARRAY_USE_POINTERS" property
- */
-static bool use_pointers_p = FALSE;
-
+typedef struct {
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_CAST_AT_CALL_SITE"
+     * property Turning it on break further effects analysis, but without
+     * the cast it might
+     * break compilation or at least generate warnings for type mismatch
+     */
+    bool cast_at_call_site_p;
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_USE_POINTERS" property
+     */
+    bool use_pointers_p;
+    /**
+     * This boolean is controlled by the "LINEARIZE_ARRAY_MODIFY_CALL_SITE"
+     * property
+     */
+    bool modify_call_site_p;
+} param_t;
 
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
@@ -75,6 +81,10 @@ size_t type_dereferencement_depth(type t) {
 static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
     list indices = reference_indices(r);
+    list to_be_free = indices;
+    if (fortran_module_p(get_current_module_entity())) {
+      indices = gen_nreverse (indices);
+    }
     if(!ENDP(indices)) {
         type et = ultimate_type(entity_type(e));
         list new_indices = NIL;
@@ -112,7 +122,8 @@ static void do_linearize_array_reference(reference r) {
             }
             new_indices=CONS(EXPRESSION,new_index,new_indices);
         }
-        reference_indices(r)=gen_nreverse(new_indices);
+	reference_indices(r)=gen_nreverse(new_indices);
+	gen_full_free_list (to_be_free);
     }
 }
 
@@ -122,30 +133,59 @@ static void do_linearize_array_subscript(subscript s) {
 
 static bool do_linearize_type(type *t, bool *rr) {
     bool linearized =false;
-    if(rr)*rr=false;
-    variable v = type_variable(*t);
-    type ut = ultimate_type(*t);
-    variable uv = type_variable(ut);
-    size_t uvl = gen_length(variable_dimensions(uv));
-    size_t vl = gen_length(variable_dimensions(v));
-    if(uvl > 1 ) {
-        dimension nd = make_dimension(
-                int_to_expression(0),
-                make_op_exp(MINUS_OPERATOR_NAME,
-                    SizeOfDimensions(variable_dimensions(uv)),
-                    int_to_expression(1))
-                );
-        type nt = copy_type(uvl>vl?ut:*t);
-        variable nv = type_variable(nt);
-        gen_full_free_list(variable_dimensions(nv));
-        variable_dimensions(nv)=CONS(DIMENSION,nd,NIL);
-        free_type(*t);
-        *t=nt;
-        linearized=true;
-        if(rr)*rr=true;
+    if(type_void_p(*t)) {
+        pips_user_warning("cannot linearize void type\n");
     }
-    if(basic_pointer_p(variable_basic(type_variable(*t))))
-        return do_linearize_type(&basic_pointer(variable_basic(type_variable(*t))),rr) || linearized;
+    else {
+        pips_assert ("variable expected", type_variable_p (*t));
+        pips_debug (5, "try to linearize type: %s\n", type_to_string (*t));
+        if(rr)*rr=false;
+        variable v = type_variable(*t);
+        type ut = ultimate_type(*t);
+        variable uv = type_variable(ut);
+        size_t uvl = gen_length(variable_dimensions(uv));
+        size_t vl = gen_length(variable_dimensions(v));
+        if(uvl > 1 ) {
+            dimension nd = dimension_undefined;
+            if (fortran_module_p(get_current_module_entity()) ) {
+                nd = make_dimension(int_to_expression(1),
+                        SizeOfDimensions(variable_dimensions(uv)));
+            }
+            else {
+                nd = make_dimension(int_to_expression(0),
+                        make_op_exp(MINUS_OPERATOR_NAME,
+                            SizeOfDimensions(variable_dimensions(uv)),
+                            int_to_expression(1)));
+            }
+
+            type nt = type_undefined;
+            bool free_it = false;
+            // copy only if needed, otherwise modify in place
+            if (ut == *t) {
+                nt = *t;
+                free_it = false;
+            }
+            else {
+                nt = copy_type(uvl>vl?ut:*t);
+                free_it = true;
+            }
+            variable nv = type_variable(nt);
+            gen_full_free_list(variable_dimensions(nv));
+            variable_dimensions(nv)=CONS(DIMENSION,nd,NIL);
+            if (free_it) {
+                // it might be dangerous to free the type that can be reused somewhere
+                // else in the RI
+                free_type(*t);
+                *t=nt;
+            }
+            linearized=true;
+            if(rr)*rr=true;
+            pips_debug (5, "type has been linearized\n");
+        }
+
+        if(basic_pointer_p(variable_basic(type_variable(*t))))
+            return do_linearize_type(&basic_pointer(variable_basic(type_variable(*t))),rr) || linearized;
+    }
     return linearized;
 }
 
@@ -183,7 +223,7 @@ static bool do_array_to_pointer_type(type *t) {
 }
 
 
-static void do_linearize_array_manage_callers(entity m,set linearized_param) {
+static void do_linearize_array_manage_callers(entity m,set linearized_param, param_t *param) {
     list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(m), true));
     list callers_statement = callers_to_statements(callers);
     list call_sites = callers_to_call_sites(callers_statement,m);
@@ -207,7 +247,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                             );
                             */
                     if(array_type_p(type_at_call_site)) {
-                      if(cast_at_call_site_p) {
+                      if(param->cast_at_call_site_p) {
                         *arg = 
                             make_expression(
                                     make_syntax_cast(
@@ -218,7 +258,7 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        if(!use_pointers_p) {
+                        if(!param->use_pointers_p) {
                           *arg=MakeUnaryCall(
                               entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                               *arg);
@@ -239,14 +279,14 @@ static void do_linearize_array_manage_callers(entity m,set linearized_param) {
                                         ),
                                     normalized_undefined
                                     );
-                        if(!use_pointers_p) {
+                        if(!param->use_pointers_p) {
                           *arg=MakeUnaryCall(
                               entity_intrinsic(DEREFERENCING_OPERATOR_NAME),
                               *arg);
                         }
                     }
                 }
-                else if(!use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
+                else if(!param->use_pointers_p && !type_equal_p(type_at_call_site,type_in_func_prototype)) {
                     *arg =
                         MakeUnaryCall(
                                 entity_intrinsic(DEREFERENCING_OPERATOR_NAME),*arg);
@@ -424,7 +464,7 @@ static void do_linearize_prepatch(entity m,statement s) {
     }
 }
 
-static void do_linearize_array(entity m, statement s) {
+static void do_linearize_array(entity m, statement s, param_t *param) {
     /* step 0: remind all expressions types */
     hash_table e2t = init_expression_is_pointer(s);
 
@@ -433,45 +473,51 @@ static void do_linearize_array(entity m, statement s) {
 
     /* step1: the statements */
     do_linearize_array_walker(s);
+
     FOREACH(ENTITY,e,entity_declarations(m))
         if(entity_variable_p(e))
             do_linearize_array_walker(entity_initial(e));
 
     /* step2: the declarations */
     FOREACH(ENTITY,e,entity_declarations(m))
-        if(entity_variable_p(e)) {
-            bool rr;
-            do_linearize_type(&entity_type(e),&rr);
-            if(rr) do_linearize_remove_dereferencment(s,e);
-            do_linearize_array_init(entity_initial(e));
-        }
+      if(entity_variable_p(e)) {
+	bool rr;
+	pips_debug (5, "linearizing entity %s\n", entity_name (e));
+	do_linearize_type(&entity_type(e),&rr);
+	if(rr) do_linearize_remove_dereferencment(s,e);
+	do_linearize_array_init(entity_initial(e));
+      }
 
     /* pips bonus step: the consistency */
     set linearized_param = set_make(set_pointer);
     FOREACH(PARAMETER,p,module_functional_parameters(m)) {
         dummy d = parameter_dummy(p);
+	pips_debug (5, "linearizing parameters\n");
         if(dummy_identifier_p(d))
         {
             entity di = dummy_identifier(d);
             do_linearize_type(&entity_type(di),NULL);
-
+	    pips_debug (5, "linearizing dummy parameter %s\n", entity_name (di));
         }
+
         if(do_linearize_type(&parameter_type(p),NULL))
             set_add_element(linearized_param,linearized_param,p);
 
         // Convert to pointer if requested
-        if(use_pointers_p) {
+        if(param->use_pointers_p) {
           if(dummy_identifier_p(d)) {
             entity di = dummy_identifier(d);
             do_array_to_pointer_type(&entity_type(di));
           }
           do_array_to_pointer_type(&parameter_type(p));
         }
-        pips_assert("everything went well",parameter_consistent_p(p));
+	pips_assert("everything went well",parameter_consistent_p(p));
     }
 
     /* step3: change the caller to reflect the new types accordinlgy */
-    do_linearize_array_manage_callers(m,linearized_param);
+    if (param->modify_call_site_p) {
+      do_linearize_array_manage_callers(m,linearized_param,param);
+    }
     set_free(linearized_param);
 
     /* final step: fix expressions if we have disturbed typing in the process */
@@ -623,7 +669,7 @@ static void insert_statements_after_declarations(statement st, list stats) {
 }
 
 /* transform each array type in module @p m with statement @p s */
-static void do_array_to_pointer(entity m, statement s) {
+static void do_array_to_pointer(entity m, statement s, param_t *p) {
     /* step1: the statements */
     do_array_to_pointer_walker(s);
     FOREACH(ENTITY,e,entity_declarations(m))
@@ -656,17 +702,21 @@ static void do_array_to_pointer(entity m, statement s) {
 
 }
 
-
 /* linearize accesses to an array, and use pointers if asked to */
-bool linearize_array(char *module_name)
+bool linearize_array_generic (char *module_name)
 {
+
     debug_on("LINEARIZE_ARRAY_DEBUG_LEVEL");
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
 
+    param_t param = { .use_pointers_p = false , .modify_call_site_p = false, .cast_at_call_site_p = false };
     /* Do we have to cast the array at call site ? */
-    cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
-    use_pointers_p = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
+    if (c_module_p(get_current_module_entity())) {
+      param.use_pointers_p      = get_bool_property("LINEARIZE_ARRAY_USE_POINTERS");
+      param.cast_at_call_site_p = get_bool_property("LINEARIZE_ARRAY_CAST_AT_CALL_SITE");
+    }
+    param.modify_call_site_p  = get_bool_property("LINEARIZE_ARRAY_MODIFY_CALL_SITE");
 
     /* it is too dangerous to perform this task on compilation unit, system variables may be changed */
     if(!compilation_unit_entity_p(get_current_module_entity())) {
@@ -674,12 +724,12 @@ bool linearize_array(char *module_name)
         set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
         /* just linearize accesses and change signature from n-D arrays to 1-D arrays */
-        do_linearize_array(get_current_module_entity(),get_current_module_statement());
+        do_linearize_array(get_current_module_entity(),get_current_module_statement(),&param);
 
         /* additionnaly perform array-to-pointer conversion for c modules only */
-        if(use_pointers_p) {
+        if(param.use_pointers_p) {
             if(c_module_p(get_current_module_entity())) {
-                do_array_to_pointer(get_current_module_entity(),get_current_module_statement());
+                do_array_to_pointer(get_current_module_entity(),get_current_module_statement(),&param);
                 cleanup_subscripts(get_current_module_statement());
             }
             else pips_user_warning("no pointers in fortran !,LINEARIZE_ARRAY_USE_POINTERS ignored\n");
@@ -689,8 +739,14 @@ bool linearize_array(char *module_name)
         pips_assert("everything went well",statement_consistent_p(get_current_module_statement()));
         module_reorder(get_current_module_statement());
         DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
-        db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
-
+	if (fortran_module_p(get_current_module_entity()) ) {
+	  // remove decls_text or the prettyprinter will use that field
+	  discard_module_declaration_text (get_current_module_entity ());
+	}
+	else {
+	  //compilation unti doesn't exit in fortran
+	  db_touch_resource(DBR_CODE,compilation_unit_of_module(module_name));
+	}
         /*postlude*/
         reset_current_module_statement();
     }
@@ -699,3 +755,13 @@ bool linearize_array(char *module_name)
     return true;
 }
 
+/* linearize accesses to an array, and use pointers if asked to */
+bool linearize_array(char *module_name)
+{
+  return linearize_array_generic (module_name);
+}
+
+bool linearize_array_fortran(char *module_name)
+{
+  return linearize_array_generic (module_name);
+}

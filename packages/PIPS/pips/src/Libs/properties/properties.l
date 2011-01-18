@@ -96,6 +96,7 @@ static void parse_properties(void);
 
 void parse_properties_string(char *s)
 {
+    yyrestart(NULL); // In case, lex has been interrupted by an error
     update_property = TRUE;
     string_to_parse = s;
     parse_properties();
@@ -203,7 +204,7 @@ static void parse_properties(void)
 	    /* GO: We need to free(s) so the skeep now
 	       the quote and do not use s+1 anymore*/
             char *s = strdup(yytext + 1);
-            char *q = strrchr(s, '"');
+            char *q = strrchr(s, '"'); // "
 			if (q == NULL) {
 				property_user_error("bad string : %s\n", yytext);
 				free(n);
@@ -246,6 +247,9 @@ static void parse_properties(void)
 
 static void parse_properties_file(FILE * fd)
 {
+    string_to_parse = NULL;
+    update_property = FALSE; // FI: Tpips/property.tpips, to survive
+			     // the open after the close
     yyrestart(fd);
     parse_properties();
 }

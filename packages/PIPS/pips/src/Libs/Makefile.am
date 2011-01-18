@@ -12,21 +12,23 @@ PIPS_SUBDIRS=\
 
 SUBDIRS=gnulib $(PIPS_SUBDIRS)
 
-BUILT_SOURCES=cprotoify
+.PHONY:cprotoify1 cprotify2 $(PIPS_SUBDIRS)
+
+BUILT_SOURCES=cprotoify2
+
+cprotoify2:cprotoify1
 
 pips_absolute_top_srcdir=`cd $(top_srcdir) ; pwd`
 pips_includes:Makefile
 	{ for dir in $(PIPS_SUBDIRS) ; do printf -- "-I../$$dir -I$(pips_absolute_top_srcdir)/src/Libs/$$dir " ; done } > $@
 
-cprotoify:Makefile pips_includes
-if USE_PARALLEL_CPROTO
-	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} cproto_bootstrap  & done ; wait
-	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h  & done ; wait
-else
+cprotoify1:Makefile pips_includes
 	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} cproto_bootstrap ; done
-	for dir in $(PIPS_SUBDIRS) ; do $(MAKE) -C $${dir} $${dir}.h ; done
-endif
 
+cprotoify2:Makefile $(PIPS_SUBDIRS)
+
+$(PIPS_SUBDIRS):
+	$(MAKE) -C $@ $@.h
 
 CLEANFILES=pips_includes
 

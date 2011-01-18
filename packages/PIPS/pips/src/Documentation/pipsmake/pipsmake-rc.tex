@@ -1768,6 +1768,31 @@ C_PARSER_RETURN_SUBSTITUTION FALSE
 \end{PipsProp}
 
 
+The C99 for-loop with a declaration such as %
+\lstinline|for(int i = a;...;...)| are represented in the RI as
+\begin{lstlisting}
+{
+  int i;
+  for(i = a;...;...)
+}
+\end{lstlisting}
+by using a declaration splitting. Since it is not fully implemented
+(initializer with complex structure fields...) a naive but robust version
+is provided to generate a code like this:
+
+\begin{lstlisting}
+{
+  int i = a;
+  for(;...;...)
+}
+\end{lstlisting}
+This is generated according to the following property
+\PipsPropRef{C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION}
+
+\begin{PipsProp}{C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION}
+C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION FALSE
+\end{PipsProp}
+
 
 \section{Controlized Code (hierarchical control flow graph)}
 \label{subsection-controlized-code}
@@ -2152,7 +2177,7 @@ proper_effects_with_pointer_values > MODULE.proper_effects
 \end{PipsMake}
 
 
-\subsection{Filtered Proper Memroy Effects}
+\subsection{Filtered Proper Memory Effects}
 \label{subsubsection-filtered-proper-effects}
 
 \marginpar{To be continued...by whom?}
@@ -3227,15 +3252,12 @@ Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
 subspace (i.e. \emph{à la} K{\sc arr}~\cite{Karr76}) or one based on
-the discrete derivatives~\cite{Irigoin2006}. The iterative fix point
+the discrete derivatives~\cite{I05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{HC78} is implemented but not used because the results
 obtained with transitive closure algorithms are faster and up-to-now
-sufficient.\marginpar{RK: Still true? FI: To be deleted?} Properties
-are set to select the transitive closure algorithm used (see the
-Semantics section of the property documentation~\cite{}).
-
-\PipsPropRef{SEMANTICS_FIX_POINT_OPERATOR}
+sufficient. Property \PipsPropRef{SEMANTICS_FIX_POINT_OPERATOR}
+is set to select the transitive closure algorithm used.
 
 Additional information, such as array declarations and array
 references, can be used to improve transformers. See the property
@@ -5433,9 +5455,10 @@ For each loop direction, the amount of spatial and temporal localities
 is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
-This algorithm still is in the development stage. Do not use
-it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by
-  IEF. Or replaced by a call to PoCC.}
+This algorithm still is in the development stage. It can be tried to
+check that loops are interchanged when locality can be
+improved\marginpar{Internship!}. An alternative for static control
+section, is to use the interface with PoCC (see Section~\ref{}).
 
 \end{PipsPass}
 
@@ -6291,7 +6314,8 @@ HPFC_EXTRACT_LATTICE TRUE
 \index{MPI}
 \index{OpenMP}
 
-\marginpar{RK: IT SudParis : insert your documentation here}
+\marginpar{RK: IT SudParis : insert your documentation here; FI: or a
+  pointer towards you documentation}
 
 \subsubsection{STEP outlining-inlining}
 
@@ -6990,10 +7014,17 @@ KERNEL_LOAD_STORE_STORE_FUNCTION_6D "P4A_copy_from_accel_6d"
 
 As a side effect of kernel load store pass, some new variables are declared
 into the function. A prefix can be used for the names of those variables
-using the property KERNEL\_LOAD\_STORE\_VAR\_PREFIX.
+using the property KERNEL\_LOAD\_STORE\_VAR\_PREFIX. It is also possible to
+insert a suffix using the property KERNEL\_LOAD\_STORE\_VAR\_PREFIX.
+The suffix will be inserted between the original variable name
+and the instance number of the copy.
 
 \begin{PipsProp}{KERNEL_LOAD_STORE_VAR_PREFIX}
 KERNEL_LOAD_STORE_VAR_PREFIX "P4A_var_"
+\end{PipsProp}
+
+\begin{PipsProp}{KERNEL_LOAD_STORE_VAR_SUFFIX}
+KERNEL_LOAD_STORE_VAR_SUFFIX ""
 \end{PipsProp}
 
 \begin{PipsPass}{kernelize}
@@ -9144,17 +9175,37 @@ linearize_array > MODULE.code
 		< CALLERS.code
 \end{PipsMake}
 
-Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are 
-declared as 1D arrays or pointers. Pointers are accessed using dereferencement 
-and arrays using subscripts.
+\begin{PipsPass}{linearize_array_fortran}
+This transformation replaces all arrays in the module by equivalent linearized
+arrays. This only works with array starting their indices at 1.
+\end{PipsPass}
+
+\begin{PipsMake}
+linearize_array_fortran > MODULE.code
+                        > CALLERS.code
+		        > PROGRAM.entities
+		        < PROGRAM.entities
+		        < MODULE.code
+		        < CALLERS.code
+\end{PipsMake}
+
+Use \PipsPropRef{LINEARIZE_ARRAY_USE_POINTERS} to control wether arrays are
+declared as 1D arrays or pointers. Pointers are accessed using dereferencement
+and arrays using subscripts. This property does not apply to the fortran case.
 \begin{PipsProp}{LINEARIZE_ARRAY_USE_POINTERS}
 LINEARIZE_ARRAY_USE_POINTERS FALSE
 \end{PipsProp}
 
+Use \PipsPropRef{LINEARIZE_ARRAY_MODIFY_CALL_SITE} to control wether the call site
+is modified or not.
+\begin{PipsProp}{LINEARIZE_ARRAY_MODIFY_CALL_SITE}
+LINEARIZE_ARRAY_MODIFY_CALL_SITE TRUE
+\end{PipsProp}
+
 Use \PipsPropRef{LINEARIZE_ARRAY_CAST_AT_CALL_SITE} to control wether a cast is
- inserted at call sites. Turning it on break further effects analysis, but 
-without the cast it might break compilation or at least generate warnings for 
-type mismatch
+ inserted at call sites. Turning it on break further effects analysis, but
+without the cast it might break compilation or at least generate warnings for
+type mismatch. This property does not apply to the fortran case.
 \begin{PipsProp}{LINEARIZE_ARRAY_CAST_AT_CALL_SITE}
 LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \end{PipsProp}
@@ -9958,7 +10009,8 @@ FLATTEN_CODE_UNROLL TRUE
 \subsection{Split Update Operator}
 
 \begin{PipsPass}{split_update_operator}
-Split C operators such as +=, *= >>= into their expanded form = ... +
+  Split C operators such as \verb/a += b/, \verb/a *= b/, \verb/a >>= b/,
+  etc. into their expanded form such as \verb/a = a + b/.
 \end{PipsPass}
 
 Note that if you have side effects in the destination, since the
@@ -9985,18 +10037,12 @@ declaration, if the initial value can be assigned. The declarations
 are modified by eliminating the initial value, and a new assignment
 statement with the initial value is added to the source code.
 
-As explained above, the purpose of this transformation is to obtain
-correct use-def chains and dependence graphs, even though PIPS does
-not (yet) take into account memory effects linked to
-declarations. Whenever possible, this transformation transfers these
-effects into usual executable statements.
-
 This transformation can be used, for instance, to improve reduction
 detection (see TRAC ticket 181).
 
 Note that C array and structure initializations, which use braces,
 cannot be converted into assignments. In such cases, the initial
-declaration is left untouched.
+declaration is left untouched\marginpar{FI->SG: improved?}.
 
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
@@ -10010,7 +10056,8 @@ generate either C89 or C99 code.
 
 
 
-\subsection{Set return type}
+\subsection{Set Return Type}
+\label{subsec:set-return-type}
 
 \begin{PipsPass}{set_return_type_as_typedef}
 The purpose of this transformation is to change the return type of a function.
@@ -10021,8 +10068,9 @@ must exist in the symbol table.
 
 This transformation loop over the symbol table, and for each of them which is
 a typedef, compare the local name to the property 
-\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure 
-because there can be differents typedef with same in different compilation unit, 
+\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure
+because there can be differents typedef with the same name in different
+compilation units,
 resulting in differents entries in the symbol table for a same local name. The
 return type can also be incoherent with the return statement, thus it's not sure
 to run it on a non void function.
@@ -10042,7 +10090,7 @@ set_return_type_as_typedef > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Cast at call sites}
+\subsection{Cast at Call Sites}
 
 \begin{PipsPass}{cast_at_call_sites}
 The purpose of this transformation is to force parameters at call sites to be
@@ -11721,7 +11769,7 @@ When prettyprinting semantic information (preconditions, transformers and
 regions), add a line before and after each piece of information if set to
 \verb+TRUE+. The resulting code is more readable, but is larger.
 
-\begin{PipsProp}{PRETTYPRINT_LOOSE} 
+\begin{PipsProp}{PRETTYPRINT_LOOSE}
 PRETTYPRINT_LOOSE TRUE
 \end{PipsProp}
 
@@ -13655,15 +13703,21 @@ print_crough  > MODULE.crough
               < MODULE.summary_effects
 \end{PipsMake}
 
+\begin{PipsPass}{print_c_code}
+Display the crough output of a fortran function.
+\end{PipsPass}
+
 \begin{PipsMake}
 print_c_code  > MODULE.c_printed_file
               < MODULE.crough
 \end{PipsMake}
 
+\begin{PipsPass}{print_interface}
 Once C version of fortran code has been generated, ones might like to call this
 C functions from fortran code. A convenient way to do this is to use an
 interface in the fortran code. PIPS can generate the interface module for any
 function using the following pass.
+\end{PipsPass}
 
 \begin{PipsMake}
 print_interface  > MODULE.interface
@@ -13711,6 +13765,13 @@ CROUGH_INTEGER_TYPE "p4a_int"
 CROUGH_REAL_TYPE "p4a_real"
 \end{PipsProp}
 
+Is is possible to prettyprint function parameters that are arrays as pointers
+using the property CROUGH\_ARRAY\_PARAMETER\_AS\_POINTER
+
+\begin{PipsProp}{CROUGH_ARRAY_PARAMETER_AS_POINTER}
+CROUGH_ARRAY_PARAMETER_AS_POINTER FALSE
+\end{PipsProp}
+
 When PRETTYPRINT\_C\_FUNCTION\_NAME\_WITH\_UNDERSCORE is set to TRUE, an
 underscore is added at the end of the module name. This is needed when
 translating only some part of a Fortran Program to C. This property must be
@@ -13724,7 +13785,11 @@ integrates interfaces. In such a case, the unmodified scalar function
 parameters (by the function or any of its callees) are expected to be passed by
 values, the other parameters are passed by pointers. Finally when using
 interfaces it is also possible to pass all the scalar variables by values using
-the propetty CROUGH\_ALL\_SCALAR\_BY\_VALUE
+the propety CROUGH\_SCALAR\_BY\_VALUE\_IN\_FCT\_DECL. Now, let's talk about function
+called from the fortran code PIPS has to print in C. The problem on
+how to pass scalars (by value or by pointer) also exists. At the moment PIPS
+is less flexible for function call. One of the solution has to be choosen
+using the property CROUGH\_SCALAR\_BY\_VALUE\_IN\_FCT\_CALL.
 
 \begin{PipsProp}{PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE}
 PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
@@ -13734,8 +13799,31 @@ PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
 CROUGH_FORTRAN_USES_INTERFACE FALSE
 \end{PipsProp}
 
-\begin{PipsProp}{CROUGH_ALL_SCALAR_BY_VALUE}
-CROUGH_ALL_SCALAR_BY_VALUE FALSE
+\begin{PipsProp}{CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL}
+CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL FALSE
+\end{PipsProp}
+
+\begin{PipsProp}{CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL}
+CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL FALSE
+\end{PipsProp}
+
+If the property DO\_RETURN\_TYPE\_AS\_TYPEDEF is set to TRUE the crough
+phase  additionaly does the same thing that the phase
+set\_return\_type\_as\_typedef does (cf section ~\ref{chapter-global-options}).
+In such a case the same property SET\_RETURN\_TYPE\_AS\_TYPEDEF\_NEW\_TYPE is
+taken into account. This is only posible for the SUBROUTINES and the FUNCTIONS
+but not for the PROGRAMS
+
+\begin{PipsProp}{DO_RETURN_TYPE_AS_TYPEDEF}
+DO_RETURN_TYPE_AS_TYPEDEF FALSE
+\end{PipsProp}
+
+Using the property INCLUDE\_FILES\_LIST, it is possible to insert some
+\#include statement before to output the code. The INCLUDE\_FILES\_LIST
+is a string interpreted as coma (and/or blank) separated list of files.
+
+\begin{PipsProp}{CROUGH_INCLUDE_FILE_LIST}
+CROUGH_INCLUDE_FILE_LIST ""
 \end{PipsProp}
 
 \section{Prettyprinters Smalltalk}
@@ -14256,6 +14344,13 @@ Addison-Wesley, (1986)
 {\em Automatic Translation of {FORTRAN} Programs to Vector Form},
 TOPLAS, V. 9, n. 4, 1987
 
+\bibitem{ACI10} Corinne Ancourt, Fabien Coelho, Francois Irigoin,
+{\em A Modular Static Analysis Approach to Affine Loop Invariants
+  Detection},
+ Numerical and Symbolic Abstract Domains 2010 (NSAD 2010),
+Electronic Notes in Theoretical Computer Science, ENTCS17986
+
+
   \bibitem{AI91} C. Ancourt, F. Irigoin,
 {\em Scanning Polyhedra With DO Loops},
 PPoPP'91 Principle and Practice of Parallel Programming, Williamsburg, USA,
@@ -14383,6 +14478,10 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 {\em Projet PIPS. Environnement de développement},
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
+
+\bibitem{I05} F. Irigoin,
+{\em Detecting Affine Loop Invariants using a Modular Static Analysis*
+  - Version préliminaire}, Tech. report A/368/CRI, 2005
 
 %@inproceedings{Jouvelot:1989:RCC:73141.74837,
 % author = {Jouvelot, P. and Gifford, D. K.},

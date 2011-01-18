@@ -73,8 +73,10 @@ kernel_load_store_generator(statement s, string module_name)
         if(same_string_p(module_local_name(call_function(c)),module_name))
         {
 	  string prefix =  get_string_property ("KERNEL_LOAD_STORE_VAR_PREFIX");
+	  string suffix =  get_string_property ("KERNEL_LOAD_STORE_VAR_SUFFIX");
 	  pips_debug (5, "kernel_load_store used prefix : %s\n", prefix);
-	  do_isolate_statement(s, prefix);
+	  pips_debug (5, "kernel_load_store used suffix : %s\n", suffix);
+	  do_isolate_statement(s, prefix, suffix);
         }
     }
 }

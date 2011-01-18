@@ -164,8 +164,8 @@ generate_shared_io_system(
 	region = effect_system(entity_to_region(stat, array, act)), 
 	a_decl = entity_to_declaration_constraints(array, 0),
 	stamme = hpfc_unstutter_dummies(array),
-	contxt = statement_context(stat, move); 
-    
+	contxt = statement_context(stat, move);
+
     pips_assert("distributed array", !array_distributed_p(array));
 
     result = sc_append(sc_rn(NULL), region);
