@@ -1586,11 +1586,12 @@ statement_without_pragma:
 |   TK_FOR
                         {
 			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
-			  /* push_current_C_comment(); */
+			  push_current_C_comment();
+			  push_current_C_line_number();
 			}
-    TK_LPAREN for_clause opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
+    TK_LPAREN for_clause
 	                {
-			  $$ = MakeForloop($4, $5, $7, $9);
+			  $$ = $4;
 			}
 |   label statement
                         {
@@ -1715,12 +1716,11 @@ statement_without_pragma:
 ;
 
 for_clause:
-    opt_expression TK_SEMICOLON
+    opt_expression TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
                         {
-			  push_current_C_comment();
-			  push_current_C_line_number();
+			  $$ = MakeForloop($1, $3, $5, $7);
 			}
-|   declaration
+|   declaration opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
                         {
 			  // FI: commented out while trying to
 			  // retrieve all comments
