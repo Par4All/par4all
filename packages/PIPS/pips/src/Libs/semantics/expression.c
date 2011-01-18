@@ -1317,7 +1317,86 @@ static transformer integer_multiply_to_transformer(entity v,
       tf = transformer_equality_add(t1, veq);
       free_transformer(t2);
     }
-    else {
+    else if(ub1<=0) { // e1 is negative
+      if(ub2<=0) { // e2 is negative
+	// v >= v1 * ub2, v >= ub1 * v2
+	// v <= v1 * lb2, v <= lb1 * v2 (if lb1 and lb2 exist)
+	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	tf = transformer_normalize(tf, 2);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,FALSE);
+	if(lb2>INT_MIN)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
+	if(lb1>INT_MIN)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,TRUE);
+      }
+      else if(lb2>=0) { // e2 is positive
+	// v <= v1 * lb2, v <= ub1 * v2
+	// v >= v1 * ub2, v >= lb1 * v2 (if lb1 and ub2 exist)
+	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	tf = transformer_normalize(tf, 2);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,TRUE);
+	if(ub2<INT_MAX)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
+	if(lb1>INT_MIN)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,FALSE);
+      }
+      else { // if lb2 and ub2 are known and their signs are different
+	if(lb2>INT_MIN && ub2<INT_MAX) {
+	  // v1 * ub2 <= v <= v1 * lb2
+	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	  tf = transformer_normalize(tf, 2);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,TRUE);
+	  ;
+	}
+	else {
+	  tf = transformer_identity();
+	}
+
+      }
+    }
+    else if(lb1>=0) {
+      if(lb2>=0) {
+	// v >= lb1 * v2, v >= v1 * lb2
+	// v <= ub1 * v2, v <= v1 * ub2 (if ub1 and ub2 exist)
+	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	tf = transformer_normalize(tf, 2);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,FALSE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
+	if(ub1<INT_MAX)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,TRUE);
+	if(ub2<INT_MAX)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
+      }
+      else if(ub2<=0) {
+	// v <= v1 * ub2, v <= lb1 * v2
+	// v >= v1 * lb2, v >= ub1 * v2 (if ub1 and lb2 exist)
+	tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	tf = transformer_normalize(tf, 2);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
+	tf = transformer_add_inequality_with_linear_term(tf,v,v2,lb1,TRUE);
+	if(lb2>INT_MIN)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
+	if(ub1>INT_MAX)
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v2,ub1,FALSE);
+	;
+      }
+      else {
+	if(lb2>INT_MIN && ub2<INT_MAX) { // FI: separated test needed
+	  // v1 * lb2 <= v <= v1 * ub2
+	  tf = transformer_intersection(t1,t2); // FI: not good if side effects!
+	  tf = transformer_normalize(tf, 2);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,lb2,FALSE);
+	  tf = transformer_add_inequality_with_linear_term(tf,v,v1,ub2,TRUE);
+	}
+	else {
+	  tf = transformer_identity();
+	}
+      }
+    }
+    else { // FI: This should now be obsolete...
       /* Do we have range information? */
       long long p1 = ((long long) lb1 )*((long long) lb2 );
       long long p2 = ((long long) lb1 )*((long long) ub2 );
@@ -1893,6 +1972,10 @@ static transformer integer_call_expression_to_transformer(
   }
   else if(ENTITY_CONDITIONAL_P(f)) {
     tf = any_conditional_to_transformer(e, args, pre);
+  }
+  else if(ENTITY_RAND_P(f)) {
+    tf = transformer_identity();
+    tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, FALSE);
   }
   else if(value_code_p(entity_initial(f))) {
     if(get_bool_property(SEMANTICS_INTERPROCEDURAL)) {

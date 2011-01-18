@@ -22,6 +22,9 @@
 
 */
 #include <stdlib.h>
+/* For strdup: */
+#define _GNU_SOURCE
+#include <string.h>
 
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"

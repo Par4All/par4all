@@ -579,29 +579,19 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
   case is_value_unknown: {
     /* it might be an intrinsic function */
     cons *la = call_arguments(ec);
-    int token;
-
-    if ((token = IsUnaryOperator(func)) > 0)
-      ef = partial_eval_unary_operator(func, la, ps, fx);
-    else if ((token = IsBinaryOperator(func)) > 0)
-      ef = partial_eval_binary_operator(func, la, ps, fx);
-    else if ((token = IsNaryOperator(func)) > 0 && gen_length(la)==2)
-      ef = partial_eval_binary_operator(func, la, ps, fx);
-    else {
-      MAPL(le, {
-	  /*
-	    expression expr = EXPRESSION(CAR(le));
-
-	    partial_eval_expression_and_regenerate(&expr, ps, fx);
-	  */
-	  //expression expr = EXPRESSION(CAR(le));
-
-	  partial_eval_expression_and_regenerate((expression*)&EXPRESSION_(CAR(le)), ps, fx);
-	}, call_arguments(ec) );
-      ef = eformat_undefined;
+    size_t nbargs = gen_length(la);
+    switch(nbargs) {
+        case 1:
+            ef = partial_eval_unary_operator(func, la, ps, fx);break;
+        case 2:
+            ef = partial_eval_binary_operator(func, la, ps, fx);break;
+        default:
+            {
+                MAPL(le, partial_eval_expression_and_regenerate((expression*)&EXPRESSION_(CAR(le)), ps, fx), call_arguments(ec) );
+                ef = eformat_undefined;
+            }
     }
-  }
-    break;
+  } break;
   case is_value_constant:
     if(integer_constant_p(func, &ef.ishift)) {
       ef.icoef = 0;
@@ -689,7 +679,7 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
   pips_assert("one argument", gen_length(la)==1);
   sub_ep = /*&EXPRESSION(CAR(la));*/ (expression*) REFCAR(la);
 
-  if (strcmp(entity_local_name(func), UNARY_MINUS_OPERATOR_NAME) == 0) {
+  if (ENTITY_UNARY_MINUS_P(func)) {
     ef = partial_eval_expression_and_copy(*sub_ep, ps, fx);
 
     if(ef.icoef==0
@@ -701,6 +691,12 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
 
     ef.icoef= -(ef.icoef);
     ef.ishift= -(ef.ishift);
+  }
+  else if(ENTITY_ADDRESS_OF_P(func)) {
+      ef = partial_eval_expression_and_copy(*sub_ep, ps, fx);
+      if(ef.icoef!=0) // it means we should not generate a constant now
+          partial_eval_expression_and_regenerate(sub_ep, ps, fx);
+      ef = eformat_undefined;
   }
   else {
     /* operator can be a pre/post inc/dec C operator */

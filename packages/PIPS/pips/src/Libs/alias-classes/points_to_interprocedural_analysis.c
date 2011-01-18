@@ -1,5 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
+/* For strdup: */
+#define _GNU_SOURCE
+#include <string.h>
+
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"

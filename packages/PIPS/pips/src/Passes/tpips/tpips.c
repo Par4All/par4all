@@ -897,6 +897,7 @@ static string tp_substitutions(string line)
 		substituted = safe_system_substitute(line);
 		if (!substituted)
 		{
+			tpips_init();
 			pips_user_warning("error in shell substitutions...\n");
 			substituted = strdup(line);
 		}

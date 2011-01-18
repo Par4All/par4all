@@ -280,8 +280,9 @@ void clean_up_sequences_rewrite(statement s)
 	  clean_up_empty_block_removed++;
 	}
 	else {
-	  if (instruction_sequence_p(statement_instruction(st))
-	      && ENDP(statement_declarations(st))) {
+	  if (instruction_sequence_p(statement_instruction(st)) &&
+			  !empty_statement_p(st) && // there can be statements with only extensions
+	       ENDP(statement_declarations(st))) {
 	    /* A sequence without declarations in a sequence: they can be fused: */
 	    list statements = sequence_statements(instruction_sequence(statement_instruction(st)));
 	    statement first = STATEMENT(CAR(statements));
