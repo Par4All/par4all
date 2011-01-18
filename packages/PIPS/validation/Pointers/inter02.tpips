@@ -7,7 +7,7 @@ setenv PIPS_CPP="cpp -C"
 activate C_PARSER
 #echo Prettyprint the source as C, of course
 setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
 
 setproperty CONSTANT_PATH_EFFECTS FALSE

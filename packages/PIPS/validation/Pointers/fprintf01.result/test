@@ -1,80 +1,27 @@
 
-Code for "fprintf01"
-
-int main()
-{
-   FILE *pFile;
-   int n;
-   char name[100];
-
-   pFile = fopen("myfile.txt", "w");
-   for(n = 0; n <= 2; n += 1) {
-      puts("please, enter a name: ");
-      gets(name);
-      fprintf(pFile, "Name %d %s\n", n, name);
-   }
-   fclose(pFile);
-}
-
-Code with proper effects for "fprintf01"
-
-int main()
-{
-   FILE *pFile;
-   int n;
-   char name[100];
-//               <may be read    >: __IO_EFFECTS:LUNS[*]
-//               <may be written >: __IO_EFFECTS:LUNS[*]
-//               <must be written>: pFile
-
-   pFile = fopen("myfile.txt", "w");
-//               <must be written>: n
-   for(n = 0; n <= 2; n += 1) {
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1]
-//               <must be written>: __IO_EFFECTS:LUNS[1]
-      puts("please, enter a name: ");
-//               <may be read    >: stdin[0]
-//               <may be written >: stdin[0] name[*]
-//               <must be read   >: stdin __IO_EFFECTS:LUNS[0]
-//               <must be written>: __IO_EFFECTS:LUNS[0]
-      gets(name);
-//               <may be read    >: __IO_EFFECTS:LUNS[*] name[*] 
-//                                  pFile[0]
-//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[0]
-//               <must be read   >: n pFile
-      fprintf(pFile, "Name %d %s\n", n, name);
-   }
-//               <may be read    >: __IO_EFFECTS:LUNS[*] pFile[0]
-//               <may be written >: __IO_EFFECTS:LUNS[*] pFile[0]
-//               <must be read   >: pFile
-   fclose(pFile);
-}
-
 POINTS TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    FILE *pFile;
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int n;
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char name[100];
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pFile = fopen("myfile.txt", "w");
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    for(n = 0; n <= 2; n += 1) {
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       puts("please, enter a name: ");
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       gets(name);
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
       fprintf(pFile, "Name %d %s\n", n, name);
    }
-//  points to = {}
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    fclose(pFile);
 }

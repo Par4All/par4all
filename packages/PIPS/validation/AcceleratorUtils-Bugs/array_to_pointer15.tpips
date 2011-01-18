@@ -1,0 +1,19 @@
+setenv WKS array_to_pointer15
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete $WKS
+create $WKS $WKS.f
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS  TRUE
+setproperty CROUGH_ALL_SCALAR_BY_VALUE    TRUE
+setproperty CROUGH_FORTRAN_USES_INTERFACE TRUE
+
+apply LINEARIZE_ARRAY_FORTRAN[P4A_KERNEL_0]
+apply UNSPLIT [P4A_KERNEL_0]
+
+display C_PRINTED_FILE [P4A_KERNEL_0]
+
+close $WKS
+delete $WKS
+quit

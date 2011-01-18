@@ -1,49 +1,21 @@
 
-Parsed printed file for "dereferencing01"
-
-void dereferencing01()
-{
-   double x = 1.;
-   double *p = &x;
-   double *q = 0;
-
-   q = p;
-   *p = 2.;
-}
-
-Proper effetcs for "dereferencing01"
-
-void dereferencing01()
-{
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
-//             <    is written>: q
-   double *q = 0;
-//             <    is read   >: p
-//             <    is written>: q
-
-   q = p;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-   *p = 2.;
-}
-
 POINTS TO
 
 //  {}
-void dereferencing01()
+int main()
 {
 //  points to = {}
    double x = 1.;
 //  {(p,x,-Exact-)}
    double *p = &x;
-//  {(p,x,-Exact-)}
+//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    double *q = 0;
-//  {(p,x,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-
+//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+   printf("q = %p", q);
+//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    q = p;
 //  {(p,x,-Exact-);(q,x,-Exact-)}
    *p = 2.;
+//  {(p,x,-Exact-);(q,x,-Exact-)}
+   return 0;
 }

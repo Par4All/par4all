@@ -312,7 +312,7 @@ AC_DEFUN([AX_CHECK_CPROTO],[
 		AX_COMPARE_VERSION([$ax_cproto_version],[ge],[$1],[AC_MSG_RESULT([yes ($ax_cproto_version)])],[
 			AC_MSG_RESULT([no ($ax_cproto_version)])
 			AX_WITH([cproto])="no"
-			AX_MSG([cproto])="cproto version too low"
+			AX_MSG([cproto])="cproto version too low, $1 minimum required"
 		])
 	])
 ])

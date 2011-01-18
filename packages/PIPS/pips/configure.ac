@@ -70,10 +70,6 @@ AC_TYPE_UINT32_T
 AC_C_VOLATILE
 AX_LD_NO_UNDEFINED
 
-# we cannot lauch all cproto in // if ulimit -u is too low
-AS_IF([test `ulimit -u` = "unlimited" || test `ulimit -u` -gt 10000],[ax_use_parallel_cproto=yes],[ax_use_parallel_cproto=no])
-AM_CONDITIONAL([USE_PARALLEL_CPROTO],[test x$ax_use_parallel_cproto = xyes])
-
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_ERROR_AT_LINE

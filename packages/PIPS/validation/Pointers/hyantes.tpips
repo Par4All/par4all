@@ -7,7 +7,9 @@ echo just check parsing
 make PRINTED_FILE[%ALL]
 module run
 display PRINTED_FILE[run]
-
+echo POINTS TO
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[run]
 close
 delete $WS
 quit

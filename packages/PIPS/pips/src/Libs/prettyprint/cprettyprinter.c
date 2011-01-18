@@ -80,7 +80,7 @@
 #define INDENT		"indent"
 #define CROUGH		".crough"
 #define CPRETTY		".c"
-#define INTERFACE	"_interface.f95"
+#define INTERFACE	"_interface.f08"
 
 // define an extension to append to scalar name in function signature
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
@@ -244,7 +244,7 @@ static bool scalar_by_pointer (entity var) {
     result = true;
   }
   else if ((get_bool_property ("CROUGH_FORTRAN_USES_INTERFACE") == true) &&
-	   (get_bool_property ("CROUGH_ALL_SCALAR_BY_VALUE") == false) &&
+	   (get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL") == false) &&
 	   (written_p (var) == true)) {
     // interface exists but var is written (and user doesn't use the property
     // to force the passing of scalar by  value)
@@ -595,25 +595,35 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                 sq = c_qualifier_string(variable_qualifiers(v));
                 svar = c_entity_local_name(var);
 
-		// In the case of a signature check if the scalar need to
-		// be passed by pointer. If the check return true
-		// a "*" must be added
-		if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
-		    (scalar_by_pointer (var) == true)) {
-		  ext = SCALAR_IN_SIG_EXT;
-		  sptr = "*";
-		  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
-					     l_type);
-		  l_name   = gen_string_cons(strdup(concatenate(svar, NULL)),
-					     l_name);
-		  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
-					     l_rename);
-		  l_entity = gen_entity_cons(var, l_entity);
-		}
-		else {
-		  ext = "";
-		  sptr = "";
-		}
+				// In the case of a signature check if the scalars need to
+				// be passed by pointers. If the check return true
+				// a "*" must be added
+				if ((fct_sig == true) && (variable_dimensions(v) == NIL) &&
+					(scalar_by_pointer (var) == true)) {
+				  ext = SCALAR_IN_SIG_EXT;
+				  sptr = "*";
+				  l_type   = gen_string_cons(strdup(concatenate(sq, st, NULL)),
+											 l_type);
+				  l_name   = gen_string_cons(strdup(concatenate(svar, NULL)),
+											 l_name);
+				  l_rename = gen_string_cons(strdup(concatenate(svar,ext,NULL)),
+											 l_rename);
+				  l_entity = gen_entity_cons(var, l_entity);
+				}
+				// In case of a signature check if the arrays need to
+				// be passed by pointers. If the check return true
+				// a "*" must be added and the dim must be remove
+				else if ((fct_sig == true) && (variable_dimensions(v) != NIL) &&
+						 (get_bool_property("CROUGH_ARRAY_PARAMETER_AS_POINTER") == true)) {
+				  ext = "";
+				  sptr = "*";
+				  free (sd);
+				  sd = strdup ("");
+				}
+				else {
+				  ext = "";
+				  sptr = "";
+				}
 
 
                 /* problems with order !*/
@@ -775,6 +785,38 @@ static string c_declarations(
       result = strdup(concatenate(result, separator, NULL));
     return result;
 }
+/******************************************************************* INCLUDE */
+static string c_include (void) {
+  string result = strdup ("");
+
+  // take care of include file required by the user
+  string user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
+  pips_debug (5, "including the user file list %s\n", user_req);
+  string match = NULL;
+  match = strtok (user_req, " ,");
+  while (match != NULL) {
+	string old = result;
+	pips_debug (7, "including the file %s\n", match);
+	result = strdup (concatenate (result, "#include \"", match, "\"\n", NULL));
+	match = strtok (NULL, " ,");
+	free (old);
+  }
+  free (match);
+
+  // user might use its own type that are define in a specific file
+  bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
+  pips_debug (5, "includind the user define type file %s\n", user_req);
+  if (user_type == true) {
+	string old = result;
+	string f_name = get_string_property ("CROUGH_INCLUDE_FILE");
+	pips_debug (7, "including the file %s\n", f_name);
+	result = strdup (concatenate (result, "#include \"", f_name, "\"\n",
+								  NULL));
+	free (old);
+  }
+  pips_debug (5, "include string : %s\n", result);
+  return result;
+}
 
 /********************************************************************** HEAD */
 
@@ -789,34 +831,33 @@ static string c_head(entity module)
 
     pips_assert("it is a function", type_functional_p(entity_type(module)));
 
-    if (entity_main_module_p(module))
-    {
-        /* another kind : "int main(void)" ?*/
-        result = strdup(MAIN_DECLARATION);
+    if (entity_main_module_p(module)) {
+	    /* another kind : "int main(void)" ?*/
+	    result = strdup(MAIN_DECLARATION);
     }
-    else
-    {
-        string head, args, svar;
-        functional f = type_functional(entity_type(module));
+    else {
+       string head, args, svar;
+	   functional f = type_functional(entity_type(module));
 
-        /* define type head. */
-        if (entity_subroutine_p(module))
-        {
-            head = strdup("void");
-        }
-        else
-        {
-            variable v;
-            pips_assert("type of result is a variable",
-                    type_variable_p(functional_result(f)));
-            v = type_variable(functional_result(f));
-            head = c_basic_string(variable_basic(v));
+	   /* define type head. */
+	   if (get_bool_property ("DO_RETURN_TYPE_AS_TYPEDEF") == true) {
+           head = strdup (get_string_property ("SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE"));
+	   }
+	   else if (entity_subroutine_p(module)) {
+           head = strdup("void");
+	   }
+       else {
+		   variable v;
+           pips_assert("type of result is a variable",
+					   type_variable_p(functional_result(f)));
+           v = type_variable(functional_result(f));
+           head = c_basic_string(variable_basic(v));
         }
 
         /* define args. */
         if (functional_parameters(f))
         {
-	  args = c_declarations(module, argument_p, ", ", FALSE, true);
+            args = c_declarations(module, argument_p, ", ", FALSE, true);
         }
         else
         {
@@ -909,6 +950,7 @@ static string ppt_unary_post(string in_c, list le)
 static string ppt_call(string in_c, list le)
 {
     string scall, old;
+	bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
     if (le == NIL)
     {
         scall = strdup(concatenate(in_c, "()", NULL));
@@ -919,17 +961,17 @@ static string ppt_call(string in_c, list le)
         scall = strdup(concatenate(in_c, OPENPAREN, NULL));
 
         /* Attention: not like this for io statements*/
-        MAP(EXPRESSION, e,
+        FOREACH (EXPRESSION, e, le)
         {
             string arg = c_expression(e,false);
             old = scall;
             scall = strdup(concatenate(old, first? "" : ", ",
-				       expression_scalar_p(e)? "&" : "",
+				       expression_scalar_p(e) && pointer ? "&" : "",
 				       arg, NULL));
-            //free(arg);
-            //free(old);
+            free(arg);
+            free(old);
             first = FALSE;
-        },le);
+        }
 
         old = scall;
         scall = strdup(concatenate(old, CLOSEPAREN, NULL));
@@ -1077,8 +1119,7 @@ static string c_reference(reference r)
 
     list l_dim = variable_dimensions(type_variable(ultimate_type(entity_type(reference_variable(r)))));
 
-    MAP(EXPRESSION, e,
-    {
+    FOREACH (EXPRESSION, e,reference_indices(r)) {
       expression e_tmp;
       expression e_lower = dimension_lower(DIMENSION(CAR(l_dim)));
       string s;
@@ -1103,7 +1144,7 @@ static string c_reference(reference r)
       //free(s);
       free_expression(e_tmp);
       POP(l_dim);
-    }, reference_indices(r));
+    }
 
 
     old = result;
@@ -1725,7 +1766,7 @@ static string interface_code_string(entity module, statement stat)
   result = strdup(concatenate ("module ", name, "_interface\n",
 			       "\tinterface\n",
 			       "\t\tsubroutine ", name, signature,
-			       " bind(C, name = \"", name, "\"\n",
+			       " bind(C, name = \"", name, "\")\n",
 			       "\t\t\tuse iso_c_binding\n", decls,
 			       "\t\tend subroutine ", name,
 			       "\n\tend interface\n",
@@ -1740,7 +1781,7 @@ static string interface_code_string(entity module, statement stat)
 
 static string c_code_string(entity module, statement stat)
 {
-  string head, decls, body, result, copy_in;
+  string head, decls, body, result, copy_in, include;
 
   /* What about declarations that are external a module scope ?
      Consider a source file as a module entity, put all declarations in it
@@ -1755,15 +1796,18 @@ static string c_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  //before_head = c_declarations(module, parameter_p, NL, TRUE);
+  // generate the user required includes
+  include     = c_include ();
+  // function declaration
   head        = c_head(module);
-  /* What about declarations associated to statements */
+  // What about declarations associated to statements
   decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,FALSE);
   body        = c_statement(stat, false);
   copy_in     = scalar_prelude ();
-  result = concatenate(/*before_head,*/ head, OPENBRACE, NL, decls,
+  result = concatenate(include, head, OPENBRACE, NL, decls,
 		       copy_in, NL, body, CLOSEBRACE, NL, NULL);
 
+  free (include);
   free(head);
   free(decls);
   free(body);
@@ -1800,7 +1844,7 @@ bool print_interface (string module_name)
 
   /* save to file */
   out = safe_fopen(filename, "w");
-  fprintf(out, "/* Fortran interface module for %s. */\n", module_name);
+  fprintf(out, "! Fortran interface module for %s. \n", module_name);
   fprintf(out, "%s", interface_code);
   safe_fclose(out, filename);
 
@@ -1856,10 +1900,6 @@ bool print_crough(string module_name)
     /* save to file */
     out = safe_fopen(filename, "w");
     fprintf(out, "/* C pretty print for module %s. */\n", module_name);
-    bool user_type = get_bool_property ("CROUGH_USER_DEFINED_TYPE");
-    if (user_type == true) {
-      fprintf(out, "#include \"%s\"%s", get_string_property ("CROUGH_INCLUDE_FILE"),"\n\n");
-    }
     fprintf(out, "%s", ppt);
     safe_fclose(out, filename);
 

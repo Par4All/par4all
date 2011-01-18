@@ -532,6 +532,9 @@ i_help: TK_HELP TK_NAME TK_ENDOFLINE
 i_setprop: TK_SET_PROPERTY TK_LINE TK_ENDOFLINE
 	{
 		user_log("setproperty%s\n", $2);
+		reset_property_error(); // We start again at tpips
+					// level and should be able to
+					// avoid the fatal loop...
 		parse_properties_string($2);
 		fflush(stdout);
 		free($2);
@@ -640,6 +643,10 @@ i_setenv: TK_SET_ENVIRONMENT TK_NAME TK_NAME TK_ENDOFLINE
 	{ set_env_log_and_free($2, $3);	}
 	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL TK_A_STRING TK_ENDOFLINE
 	{ set_env_log_and_free($2, $4);	}
+	| TK_SET_ENVIRONMENT TK_NAME filename_list TK_ENDOFLINE
+	{ set_env_log_and_free($2, strdup(string_array_join($3, " ")));	}
+	| TK_SET_ENVIRONMENT TK_NAME TK_EQUAL filename_list TK_ENDOFLINE
+	{ set_env_log_and_free($2, strdup(string_array_join($4, " ")));	}
 	;
 
 i_checkpoint: TK_CHECKPOINT TK_ENDOFLINE

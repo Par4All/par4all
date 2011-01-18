@@ -1,6 +1,6 @@
-user warning, property ACTIVE_PHASES redefined
-user warning, property SEMANTICS_FIX_POINT_OPERATOR redefined
-user warning, property PRETTYPRINT_MEMORY_EFFECTS_ONLY redefined
+user warning in parse_properties: property ACTIVE_PHASES redefined
+user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property PRETTYPRINT_MEMORY_EFFECTS_ONLY redefined
 user warning in tp_parse: loops: No such workspace
 Registering file loops.f
 Splitting file    ./loops.f
@@ -11,7 +11,7 @@ Main module PROGRAM "LOOPS" selected.
 Module LOOPS already active.
 setproperty ABORT_ON_USER_ERROR FALSE
 setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
-user warning, property PRETTYPRINT_BLOCK_IF_ONLY redefined
+user warning in parse_properties: property PRETTYPRINT_BLOCK_IF_ONLY redefined
 Selecting rule: MUST_REGIONS
 Selecting rule: PRINT_CODE_REGIONS
 Module LOOPS already active.

@@ -1,0 +1,19 @@
+
+Initial code
+
+      SUBROUTINE FOO
+      INTEGER I
+      I = 1
+      END
+/* C pretty print for module FOO. */
+#include "toto.h"
+#include "titi.h"
+#include "tutu.h"
+void
+foo (void)
+{
+  int i;
+
+  i = 1;
+  return;
+}

@@ -1,0 +1,94 @@
+
+TRANSFORMERS
+
+//  T() {0==-1}
+void run()
+{
+   // two variables: a is never known, b is always 0
+//  T(a) {}
+   int a;
+//  T(b) {b==0}
+   int b = 0;
+//  T(c) {0<=c, c<=1}
+   int c = alea();
+//  T(a,b,c) {b#init==0, 0<=c, 0<=c#init, c#init<=1}
+
+   while (1) {
+//  T(a,b,c) {}
+      
+      
+      while (c) {
+//  T() {}
+         // here, cannot see that b == 0
+         if (alea()&&b!=0)
+//  T() {0==-1}
+            error();
+//  T(a) {0<=a}
+         a = rand();
+//  T(b) {b==0, 0<=a}
+         b = 0;
+//  T(c) {b==0, 0<=a, 0<=c, c<=1}
+         c = alea();
+      }
+//  T(a,c) {c==0, c#init<=0}
+
+      while (!c) {
+//  T() {c<=0}
+         // here, cannot see that b == 0
+         if (alea()&&b!=0)
+//  T() {0==-1}
+            error();
+//  T(a) {0<=a, c<=0}
+         a = rand();
+//  T(c) {0<=a, 0<=c, c<=1, c#init<=0}
+         c = alea();
+      }
+   }
+}
+
+PRECONDITIONS
+
+//  P() {}
+void run()
+{
+   // two variables: a is never known, b is always 0
+//  P() {}
+   int a;
+//  P(a) {}
+   int b = 0;
+//  P(a,b) {b==0}
+   int c = alea();
+//  P(a,b,c) {b==0, 0<=c, c<=1}
+
+   while (1) {
+//  P(a,b,c) {b==0, 0<=c, c<=1}
+      
+      
+      while (c) {
+//  P(a,b,c) {b==0, c==1}
+         // here, cannot see that b == 0
+         if (alea()&&b!=0)
+//  P() {0==-1}
+            error();
+//  P(a,b,c) {b==0, c==1}
+         a = rand();
+//  P(a,b,c) {b==0, c==1, 0<=a}
+         b = 0;
+//  P(a,b,c) {b==0, c==1, 0<=a}
+         c = alea();
+      }
+//  P(a,b,c) {b==0, c==0}
+
+      while (!c) {
+//  P(a,b,c) {b==0, c==0}
+         // here, cannot see that b == 0
+         if (alea()&&b!=0)
+//  P() {0==-1}
+            error();
+//  P(a,b,c) {b==0, c==0}
+         a = rand();
+//  P(a,b,c) {b==0, c==0, 0<=a}
+         c = alea();
+      }
+   }
+}

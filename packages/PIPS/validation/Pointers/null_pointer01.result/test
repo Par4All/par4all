@@ -5,16 +5,16 @@ int main()
 {
    // BEGIN BLOCK
    int i;
-//               <must be written>: p
+//             <    is written>: p
    int *p = 0;
-//               <must be written>: q
+//             <    is written>: q
    int **q = 0;
-//               <must be read   >: p
-//               <must be written>: p[0]
+//             <    is read   >: p
+//             <    is written>: p[0]
 
    *p = 1;
-//               <must be read   >: q
-//               <must be written>: q[0]
+//             <    is read   >: q
+//             <    is written>: q[0]
    *q = &i;
 
    return 0;
@@ -30,16 +30,17 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  points to = {}
+//  {(p,*NULL_POINTER*,-Exact-)}
    int *p = 0;
-//  points to = {}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    int **q = 0;
-//  points to = {}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
 
    *p = 1;
-//  points to = {}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    *q = &i;
-//  {(q[0],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(*NULL_POINTER*,i,-Exact-);(p,*NULL_POINTER*,-Exact-);(q,
+//   *NULL_POINTER*,-Exact-)}
 
    return 0;
    // END BLOCK

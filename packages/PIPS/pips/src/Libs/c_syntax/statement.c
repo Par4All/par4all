@@ -144,7 +144,8 @@ void InitializeBlock()
 
 statement MakeBlock(list decls, list stmts)
 {
-  /* To please the controlizer, blocks cannot carry line numbers nor comments */
+  /* To please to current RI choices about Fortran, blocks cannot carry
+     line numbers nor comments */
   /* Anyway, it might be much too late to retrieve the comment
      associated to the beginning of the block. The lost comment
      appears after the last statement of the block. To save it, as is
@@ -331,50 +332,194 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
   return smt;
 }
 
-statement MakeForloop(expression e1, expression e2, expression e3, statement s)
-{								
+
+/* Create a for-loop statement with some parser-specific characteristics.
+
+   A more generic implementation would have been in ri-util instead.
+
+   @param[in] e1 is the init part of the for
+
+   @param[in] e2 is the conditional part of the for
+
+   @param[in] e3 is the increment part of the for
+
+   @param[in] body is the loop body statement
+
+   @return a statement with the for
+*/
+statement MakeForloop(expression e1,
+		      expression e2,
+		      expression e3,
+		      statement body) {
   forloop f;
   statement smt;
+  string sc = pop_current_C_comment();
+  int sn = pop_current_C_line_number();
+  expression init = e1;
+  expression cond = e2;
+  expression inc = e3;
+
+  pips_assert("For loop body consistent",statement_consistent_p(body));
+
+  if(expression_undefined_p(init))
+    init = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+				NIL);
+  else
+    simplify_C_expression(init);
+
+  if(expression_undefined_p(cond))
+    /* A bool C constant cannot be used
+       because stdbool.h may not be
+       included */
+    /* cond = make_call_expression(MakeConstant(TRUE_OPERATOR_NAME, */
+    /* is_basic_logical), */
+    /* NIL); */
+    cond = int_to_expression(1);
+  else
+    simplify_C_expression(cond);
+
+  if(expression_undefined_p(inc))
+    inc = make_call_expression(entity_intrinsic(CONTINUE_FUNCTION_NAME),
+			       NIL);
+  else
+    simplify_C_expression(inc);
+
+
   int i = basic_int((basic) stack_head(LoopStack));
+  /* Create some land-pad labels to deal with break and continue.
+
+     Looks like some memory leaks if no break or continue... */
   string lab1;
-  asprintf(&lab1,"%s%d","loop_end_",i);
+  asprintf(&lab1, "%s%d","loop_end_", i);
   statement s1 = FindStatementFromLabel(MakeCLabel(lab1));
   free(lab1);
   string lab2;
-  asprintf(&lab2,"%s%d","break_",i);
+  asprintf(&lab2, "%s%d", "break_", i);
   statement s2 = FindStatementFromLabel(MakeCLabel(lab2));
   free(lab2);
 
- if (!statement_undefined_p(s1))
-    {
-      /* This loop has a continue statement which has been transformed to goto
-	 Add the labeled statement at the end of loop body*/
-      insert_statement(s,s1,FALSE);
-    }
-  f = make_forloop(e1,e2,e3,s);
+  if (!statement_undefined_p(s1))
+    /* This loop has a continue statement which has been transformed to goto.
+
+       Add the labeled statement at the end of loop body*/
+    insert_statement(body, s1, FALSE);
+
+  /*  The for clause may contain declarations*/
+  f = make_forloop(init, cond, inc, body);
   smt = make_statement(entity_empty_label(),
 		       get_current_C_line_number(),
 		       STATEMENT_ORDERING_UNDEFINED,
 		       string_undefined,
 		       make_instruction_forloop(f),
 		       NIL, string_undefined,
-		       empty_extensions ());
+		       empty_extensions());
 
   if (!statement_undefined_p(s2))
-    {
-      /* This loop has a break statement which has been transformed to goto
-	 Add the labeled statement after the loop */
-      insert_statement(smt,s2,FALSE);
-    }
-  pips_assert("For loop is consistent",forloop_consistent_p(f));
-  ifdebug(5)
-    {
-      printf("For loop statement: \n");
-      print_statement(smt);
-    }
+    /* This loop has a break statement which has been transformed to goto
+       Add the labeled statement after the loop */
+    insert_statement(smt, s2, FALSE);
+
+  smt = add_comment_and_line_number(smt, sc, sn);
+  stack_pop(LoopStack);
+  pips_assert("For loop consistent", statement_consistent_p(smt));
+
+  pips_assert("For loop is consistent", forloop_consistent_p(f));
+  ifdebug(5) {
+    printf("For loop statement: \n");
+    print_statement(smt);
+  }
   return smt;
 }
-
+
+
+/* Create a C99 for-loop statement with a declaration as first parameter
+   in the for clause, with some parser-specific characteristics.
+
+   To represent for(int i = a;...;...) we generate instead:
+   {
+     int i;
+     for(int i = a;...;...)
+   }
+
+   The for could be generated back into the original form by the
+   prettyprinter.  To differentiate between such a C99 for loop or a
+   for-loop that was really written with the i declaration just before, we
+   may mark the for loop with an extension here so that the prettyprinter
+   could use this hint to know if it has to do some resugaring or not.
+
+   @param[in,out] s1 is the init part of the for. It is a list with one
+   statement
+
+   @param[in] e2 is the conditional part of the for
+
+   @param[in] e3 is the increment part of the for
+
+   @param[in] body is the loop body statement
+
+   @return a statement that contains the declaration and the for
+*/
+statement MakeForloopWithIndexDeclaration(list s1,
+					  expression e2,
+					  expression e3,
+					  statement body) {
+  pips_assert("s1 is a list of one element", gen_length(s1) == 1);
+  // Get the declaration statement:
+  statement decl = STATEMENT(CAR(s1));
+  gen_free_list(s1);
+  ifdebug(6) {
+    printf("For loop statement declaration: \n");
+    print_statement(decl);
+  }
+  /* First generate naive but more robust version in the RI, such as:
+
+     {
+       int i = a;
+       for(;...;...)
+     }
+  */
+  statement for_s = MakeForloop(expression_undefined, e2, e3, body);
+  // We inject the for in its declaration statement:
+  insert_statement(decl, for_s, FALSE);
+  if (!get_bool_property("C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION")) {
+    /* We try to refine to inject back an initialization in the for-clause.
+
+       Note split_initializations_in_statemen() works only on a block */
+    split_initializations_in_statement(decl);
+    list l = statement_block(decl);
+    size_t len = gen_length(l);
+    ifdebug(6)
+      printf("Number of statements in the block: %zd\n", len);
+    if (len == 3) {
+      /* We are interested in solving the simple case when there are 3
+	 statements because we should be in the form of:
+	 int i;
+	 i = a;
+	 for(;...;...)
+      */
+      // So we pick the initialization part which is the second statement:
+      statement init = STATEMENT(gen_nth(1, l));
+      // Remove it from the enclosing declaration statement:
+      gen_remove(&l, init);
+      // Get the assignment:
+      call c = statement_call(init);
+      // Housekeeping: first protect what we want to keep somewhere else...
+      instruction_call(statement_instruction(init)) = call_undefined;
+      // ... and free the now useless container:
+      free_statement(init);
+      // Make from it an expression that can appear inside the for clause:
+      expression e = call_to_expression(c);
+      // Get the for-loop:
+      forloop f = statement_forloop(for_s);
+      // Remove the default-generated initialization expression:
+      free_expression(forloop_initialization(f));
+      // Put the new one instead:
+      forloop_initialization(f) = e;
+    }
+  }
+  return decl;
+}
+
+
 statement MakeSwitchStatement(statement s)
 {
   /* Transform a switch statement to if - else - goto. Example:

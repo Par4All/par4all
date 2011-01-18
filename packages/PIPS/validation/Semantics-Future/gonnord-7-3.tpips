@@ -16,6 +16,7 @@ echo
 echo PRECONDITIONS
 echo
 
+# required!
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS

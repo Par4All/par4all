@@ -1,0 +1,62 @@
+
+Parsed code for "call14"
+
+void call14(int n, int m, int *x)
+{
+   int i, j;
+
+   for (i = 0;i<n*m;i++)
+      x[i] = i;
+}
+
+Code for "call14"
+
+void call14(int n, int m, int *x)
+{
+   int i, j;
+
+   for(i = 0; i <= n*m-1; i += 1)
+      x[i] = i;
+}
+
+Proper effects for "call14"
+
+
+POINTS TO
+
+//  {(x,_x_1,-Exact-)}
+void call14(int n, int m, int *x)
+{
+//  {(x,_x_1,-Exact-)}
+   int i, j;
+//  {(x,_x_1,-Exact-)}
+
+   for(i = 0; i <= n*m-1; i += 1)
+//  {(x,_x_1,-Exact-)}
+      x[i] = i;
+}
+//  {}
+int main()
+{
+//  points to = {}
+   int d1 = 4;
+//  points to = {}
+   int d2 = 4;
+//  points to = {}
+   int y[d1][d2];
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   call14(d1, d2, (int *) y);
+//  points to = {}
+
+   for(i = 0; i <= d1-1; i += 1) {
+//  points to = {}
+      for(j = 0; j <= d2-1; j += 1)
+//  points to = {}
+         printf("y[%d][%d] = %d\t", i, j, y[i][j]);
+//  points to = {}
+      printf("\n");
+   }
+}

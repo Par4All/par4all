@@ -1,0 +1,194 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2}
+
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+
+//  T(y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2, 0<=y, y<=1}
+
+   y = foo();
+
+//  T(p,x2,y) {p#init==1, 1<=p, p<=20, 0<=x1, x1<=1, 1<=x2#init,
+//    x2#init<=2, 0<=y#init, y#init<=1}
+
+   while (p<=20) {
+
+//  T(x2,y) {p<=20, 2x1+2x2<=p, 2x1+2x2#init<=p, 0<=x1, x1<=1}
+
+      while (2*x1+2*x2<=p&&alea()) {
+
+//  T(x2) {x2==y, p<=20, 2x1+2x2#init<=p, 0<=x1, x1<=1}
+
+         //x1 = x1 + y + 1;
+         x2 = y;
+
+//  T(y) {x2==y#init, p<=20, 0<=x1, x1<=1, 0<=y, y<=1}
+
+         y = foo();
+      }
+
+//  T(p) {p==p#init+1, p<=21, 0<=x1, x1<=1}
+
+      p++;
+   }
+
+//  T(y) {p==21, y==y#init, 0<=x1, x1<=1}
+
+
+   y = y;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+
+//  P(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2}
+
+   y = foo();
+
+//  P(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2, 0<=y, y<=1}
+
+   while (p<=20) {
+
+//  P(p,x1,x2,y) {1<=p, p<=20, 0<=x1, x1<=1, 0<=y, y<=1}
+
+      while (2*x1+2*x2<=p&&alea()) {
+
+//  P(p,x1,x2,y) {1<=p, p<=20, 2x1+2x2<=p, 0<=x1, x1<=1, 0<=y, y<=1}
+
+         //x1 = x1 + y + 1;
+         x2 = y;
+
+//  P(p,x1,x2,y) {x2==y, 1<=p, p<=20, 0<=x1, x1<=1, 0<=x2, x2<=1}
+
+         y = foo();
+      }
+
+//  P(p,x1,x2,y) {1<=p, p<=20, 0<=x1, x1<=1, 0<=y, y<=1}
+
+      p++;
+   }
+
+//  P(p,x1,x2,y) {p==21, 0<=x1, x1<=1, 0<=y, y<=1}
+
+
+   y = y;
+}
+
+Try to refine the transformers: first refinement
+
+
+TRANSFORMERS after first refinement
+
+
+//  T() {}
+
+void main()
+{
+
+//  T(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2}
+
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+
+//  T(y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2, 0<=y, y<=1}
+
+   y = foo();
+
+//  T(p,x2,y) {p#init==1, 1<=p, p<=20, 11<=10p+x2, x2#init+10<=10p+x2,
+//    y#init+1<=p+y, y+1<=p+y#init, 0<=x1, x1<=1, 1<=x2#init,
+//    x2#init<=2, 0<=y, y<=1, 0<=y#init, y#init<=1}
+
+   while (p<=20) {
+
+//  T(x2,y) {1<=p, p<=20, 2x1+2x2<=p, 2x1+2x2#init<=p, 0<=x1, x1<=1,
+//    0<=y, y<=1, 0<=y#init, y#init<=1}
+
+      while (2*x1+2*x2<=p&&alea()) {
+
+//  T(x2) {x2==y, 1<=p, p<=20, 2x1+2x2#init<=p, 0<=x1, x1<=1, 0<=x2,
+//    x2<=1}
+
+         //x1 = x1 + y + 1;
+         x2 = y;
+
+//  T(y) {x2==y#init, 1<=p, p<=20, 0<=x1, x1<=1, 0<=x2, x2<=1, 0<=y,
+//    y<=1}
+
+         y = foo();
+      }
+
+//  T(p) {p==p#init+1, 2<=p, p<=21, 0<=x1, x1<=1, 0<=y, y<=1}
+
+      p++;
+   }
+
+//  T(y) {p==21, y==y#init, 0<=x1, x1<=1, 0<=x2+199, 0<=y, y<=1}
+
+
+   y = y;
+}
+
+PRECONDITIONS after first refinement
+
+
+//  P() {}
+
+void main()
+{
+
+//  P() {}
+
+   int x1 = foo(), y, x2 = 2-foo(), p = 1;
+
+//  P(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2}
+
+   y = foo();
+
+//  P(p,x1,x2,y) {p==1, 0<=x1, x1<=1, 1<=x2, x2<=2, 0<=y, y<=1}
+
+   while (p<=20) {
+
+//  P(p,x1,x2,y) {1<=p, p<=20, x1+21<=10p+12x2, 21<=10p+11x2, 0<=x1,
+//    x1<=1, 0<=x2, x2<=2, 0<=y, y<=1}
+
+      while (2*x1+2*x2<=p&&alea()) {
+
+//  P(p,x1,x2,y) {p<=20, 22x1+42<=31p, 13x1+21<=16p, 2x1+2x2<=p,
+//    0<=x1, x1<=1, 0<=x2, x2<=2, 0<=y, y<=1}
+
+         //x1 = x1 + y + 1;
+         x2 = y;
+
+//  P(p,x1,x2,y) {x2==y, 1<=p, p<=20, 22x1+42<=31p, 13x1+21<=16p,
+//    2x1<=p, 0<=x1, x1<=1, 0<=x2, x2<=1}
+
+         y = foo();
+      }
+
+//  P(p,x1,x2,y) {1<=p, p<=20, 22x1+42<=31p+33x2, 13x1+21<=16p+18x2,
+//    42<=31p+11x2, 0<=x1, x1<=1, 0<=x2, x2<=2, 0<=y, y<=1}
+
+      p++;
+   }
+
+//  P(p,x1,x2,y) {p==21, 0<=x1, x1<=1, 2x1<=3x2+52, 13x1<=18x2+299,
+//    0<=x2, x2<=2, 0<=y, y<=1}
+
+
+   y = y;
+}

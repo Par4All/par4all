@@ -2,15 +2,15 @@ int main()
 {
    // BEGIN BLOCK
    int *p, i;
-//               <must be written>: i
+//             <    is written>: i
    i = 1;
-//               <must be read   >: i
+//             <    is read   >: i
 
    if (i>0)
-//               <must be written>: p
+//             <    is written>: p
       p = &i;
    else
-//               <must be written>: p
+//             <    is written>: p
       p = &i;
 
    return 0;
@@ -22,17 +22,17 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p, i;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    i = 1;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (i>0)
-//  points to = {}
+//  {(p,i,-Exact-)}
       p = &i;
    else
-//  points to = {}
+//  {(p,i,-Exact-)}
       p = &i;
 //  {(p,i,-Exact-)}
 
@@ -43,15 +43,15 @@ int main()
 {
    // BEGIN BLOCK
    int *p, i;
-//               <must be written>: i
+//             <    is written>: i
    i = 1;
-//               <must be read   >: i
+//             <    is read   >: i
 
    if (i>0)
-//               <must be written>: p
+//             <    is written>: p
       p = &i;
    else
-//               <must be written>: p
+//             <    is written>: p
       p = &i;
 
    return 0;

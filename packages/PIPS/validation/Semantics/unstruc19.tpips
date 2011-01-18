@@ -2,6 +2,9 @@
 # the internal representation
 
 delete unstruc19
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create unstruc19 unstruc19.f
 
 # display PRINTED_FILE[UNSTRUC19]
@@ -27,7 +30,7 @@ setproperty PRETTYPRINT_CHECK_IO_STATEMENTS TRUE
 activate INTERPROCEDURAL_SUMMARY_PRECONDITION
 activate PRECONDITIONS_INTER_FULL
 activate TRANSFORMERS_INTER_FULL
-setproprety SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 setproperty UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
 

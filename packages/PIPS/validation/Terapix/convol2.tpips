@@ -55,7 +55,6 @@ echo loop expansion again
 echo
 setproperty LOOP_LABEL "l99991"
 setproperty LOOP_EXPANSION_SIZE "128"
-setproperty LOOP_EXPANSION_OFFSET 1
 apply PRIVATIZE_MODULE
 apply LOOP_EXPANSION
 display PRINTED_FILE

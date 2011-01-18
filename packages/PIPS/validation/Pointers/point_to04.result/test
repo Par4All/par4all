@@ -4,14 +4,14 @@ POINTS TO
 //  {}
 void point_to04()
 {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    struct s {
       int a;
       int b;
       int c;
       int d;
    } c, *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = &c;
 //  {(p,c,-Exact-)}

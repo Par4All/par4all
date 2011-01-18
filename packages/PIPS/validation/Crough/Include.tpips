@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setenv WS="Include"
+delete $WS
+create $WS $WS.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[FOO]
+
+setproperty PRETTYPRINT_C_FUNCTION_NAME_WITH_UNDERSCORE FALSE
+setproperty CROUGH_INCLUDE_FILE_LIST "toto.h   , titi.h, tutu.h"
+
+display C_PRINTED_FILE[FOO]
+
+close
+delete $WS
+quit
