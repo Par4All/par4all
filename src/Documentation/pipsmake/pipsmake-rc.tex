@@ -2177,7 +2177,7 @@ proper_effects_with_pointer_values > MODULE.proper_effects
 \end{PipsMake}
 
 
-\subsection{Filtered Proper Memroy Effects}
+\subsection{Filtered Proper Memory Effects}
 \label{subsubsection-filtered-proper-effects}
 
 \marginpar{To be continued...by whom?}
@@ -3252,15 +3252,12 @@ Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
 subspace (i.e. \emph{à la} K{\sc arr}~\cite{Karr76}) or one based on
-the discrete derivatives~\cite{Irigoin2006}. The iterative fix point
+the discrete derivatives~\cite{I05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{HC78} is implemented but not used because the results
 obtained with transitive closure algorithms are faster and up-to-now
-sufficient.\marginpar{RK: Still true? FI: To be deleted?} Properties
-are set to select the transitive closure algorithm used (see the
-Semantics section of the property documentation~\cite{}).
-
-\PipsPropRef{SEMANTICS_FIX_POINT_OPERATOR}
+sufficient. Property \PipsPropRef{SEMANTICS_FIX_POINT_OPERATOR}
+is set to select the transitive closure algorithm used.
 
 Additional information, such as array declarations and array
 references, can be used to improve transformers. See the property
@@ -5458,9 +5455,10 @@ For each loop direction, the amount of spatial and temporal localities
 is estimated. The loop with maximal locality is chosen as innermost
 loop.
 
-This algorithm still is in the development stage. Do not use
-it!\marginpar{RK: Who is working on ? :-/ FI! Could be redesigned by
-  IEF. Or replaced by a call to PoCC.}
+This algorithm still is in the development stage. It can be tried to
+check that loops are interchanged when locality can be
+improved\marginpar{Internship!}. An alternative for static control
+section, is to use the interface with PoCC (see Section~\ref{}).
 
 \end{PipsPass}
 
@@ -6316,7 +6314,8 @@ HPFC_EXTRACT_LATTICE TRUE
 \index{MPI}
 \index{OpenMP}
 
-\marginpar{RK: IT SudParis : insert your documentation here}
+\marginpar{RK: IT SudParis : insert your documentation here; FI: or a
+  pointer towards you documentation}
 
 \subsubsection{STEP outlining-inlining}
 
@@ -10038,19 +10037,12 @@ declaration, if the initial value can be assigned. The declarations
 are modified by eliminating the initial value, and a new assignment
 statement with the initial value is added to the source code.
 
-As explained above, the purpose of this transformation is to obtain
-correct use-def chains and dependence graphs, even though PIPS does
-not (yet) take into account memory effects linked to
-\marginpar{RK: François, Mehdi, is it still true?}
-declarations. Whenever possible, this transformation transfers these
-effects into usual executable statements.
-
 This transformation can be used, for instance, to improve reduction
 detection (see TRAC ticket 181).
 
 Note that C array and structure initializations, which use braces,
 cannot be converted into assignments. In such cases, the initial
-declaration is left untouched.
+declaration is left untouched\marginpar{FI->SG: improved?}.
 
 \begin{PipsMake}
 alias split_initializations 'Split Initializations'
@@ -10064,7 +10056,7 @@ generate either C89 or C99 code.
 
 
 
-\subsection{Set return type}
+\subsection{Set Return Type}
 \label{subsec:set-return-type}
 
 \begin{PipsPass}{set_return_type_as_typedef}
@@ -10098,7 +10090,7 @@ set_return_type_as_typedef > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Cast at call sites}
+\subsection{Cast at Call Sites}
 
 \begin{PipsPass}{cast_at_call_sites}
 The purpose of this transformation is to force parameters at call sites to be
@@ -14352,6 +14344,13 @@ Addison-Wesley, (1986)
 {\em Automatic Translation of {FORTRAN} Programs to Vector Form},
 TOPLAS, V. 9, n. 4, 1987
 
+\bibitem{ACI10} Corinne Ancourt, Fabien Coelho, Francois Irigoin,
+{\em A Modular Static Analysis Approach to Affine Loop Invariants
+  Detection},
+ Numerical and Symbolic Abstract Domains 2010 (NSAD 2010),
+Electronic Notes in Theoretical Computer Science, ENTCS17986
+
+
   \bibitem{AI91} C. Ancourt, F. Irigoin,
 {\em Scanning Polyhedra With DO Loops},
 PPoPP'91 Principle and Practice of Parallel Programming, Williamsburg, USA,
@@ -14479,6 +14478,10 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 {\em Projet PIPS. Environnement de développement},
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
+
+\bibitem{I05} F. Irigoin,
+{\em Detecting Affine Loop Invariants using a Modular Static Analysis*
+  - Version préliminaire}, Tech. report A/368/CRI, 2005
 
 %@inproceedings{Jouvelot:1989:RCC:73141.74837,
 % author = {Jouvelot, P. and Gifford, D. K.},
