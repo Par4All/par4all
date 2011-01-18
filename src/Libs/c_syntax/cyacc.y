@@ -614,7 +614,7 @@ static void ResetDerivedEntityDeclarations()
 %type <liste> rest_par_list rest_par_list1
 %type <liste> declaration_list
 %type <liste> statement_list
-%type <expression> for_clause
+%type <statement> for_clause
 %type <liste> decl_spec_list /* to store the list of entities such as struct, union and enum, typedef*/
 %type <liste> my_decl_spec_list
 %type <liste> decl_spec_list_opt_no_named
@@ -1722,10 +1722,7 @@ for_clause:
 			}
 |   declaration opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
                         {
-			  // FI: commented out while trying to
-			  // retrieve all comments
-			  // discard_C_comment();
-			  CParserError("For clause containing declaration not implemented\n");
+			  $$ = MakeForloopWithIndexDeclaration($1, $2, $4, $6);
 			}
 ;
 

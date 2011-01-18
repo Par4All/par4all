@@ -144,7 +144,8 @@ void InitializeBlock()
 
 statement MakeBlock(list decls, list stmts)
 {
-  /* To please the controlizer, blocks cannot carry line numbers nor comments */
+  /* To please to current RI choices about Fortran, blocks cannot carry
+     line numbers nor comments */
   /* Anyway, it might be much too late to retrieve the comment
      associated to the beginning of the block. The lost comment
      appears after the last statement of the block. To save it, as is
@@ -428,6 +429,32 @@ statement MakeForloop(expression e1,
   return smt;
 }
 
+
+/* Create a C99 for-loop statement with an initializer as first parameter,
+   with some parser-specific characteristics.
+
+   @param[in,out] s1 is the init part of the for. It is a list with one
+   statement
+
+   @param[in] e2 is the conditional part of the for
+
+   @param[in] e3 is the increment part of the for
+
+   @param[in] body is the loop body statement
+*/
+statement MakeForloopWithIndexDeclaration(list s1,
+					  expression e2,
+					  expression e3,
+					  statement body) {
+  //split_initializations_in_statement(statement s)
+  pips_assert("s1 is a list of one element", gen_length(s1) == 1);
+  // Get the initializer statement:
+  statement init = STATEMENT(CAR(s1));
+  gen_free_list(s1);
+  statement for_s = MakeForloop(expression_undefined, e2, e3, body);
+  insert_statement(init, for_s, FALSE);
+  return init;
+}
 
 statement MakeSwitchStatement(statement s)
 {
