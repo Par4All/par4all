@@ -9985,7 +9985,8 @@ FLATTEN_CODE_UNROLL TRUE
 \subsection{Split Update Operator}
 
 \begin{PipsPass}{split_update_operator}
-Split C operators such as +=, *= >>= into their expanded form = ... +
+  Split C operators such as \verb/a += b/, \verb/a *= b/, \verb/a >>= b/,
+  etc. into their expanded form such as \verb/a = a + b/.
 \end{PipsPass}
 
 Note that if you have side effects in the destination, since the
@@ -10015,6 +10016,7 @@ statement with the initial value is added to the source code.
 As explained above, the purpose of this transformation is to obtain
 correct use-def chains and dependence graphs, even though PIPS does
 not (yet) take into account memory effects linked to
+\marginpar{RK: François, Mehdi, is it still true?}
 declarations. Whenever possible, this transformation transfers these
 effects into usual executable statements.
 
