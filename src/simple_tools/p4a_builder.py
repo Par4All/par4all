@@ -126,7 +126,7 @@ class p4a_builder:
 
         self.cpp_flags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
         self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
-
+        self.fortran_flags.append ("-ffree-line-length-none")
         self.cudafied = True
 
     def __init__(self,
@@ -191,6 +191,7 @@ class p4a_builder:
 
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+                fortran_flags.append ("-ffree-line-length-none")
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
 
         if com_optimization:
