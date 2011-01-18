@@ -1768,6 +1768,31 @@ C_PARSER_RETURN_SUBSTITUTION FALSE
 \end{PipsProp}
 
 
+The C99 for-loop with a declaration such as %
+\lstinline|for(int i = a;...;...)| are represented in the RI as
+\begin{lstlisting}
+{
+  int i;
+  for(i = a;...;...)
+}
+\end{lstlisting}
+by using a declaration splitting. Since it is not fully implemented
+(initializer with complex structure fields...) a naive but robust version
+is provided to generate a code like this:
+
+\begin{lstlisting}
+{
+  int i = a;
+  for(;...;...)
+}
+\end{lstlisting}
+This is generated according to the following property
+\PipsPropRef{C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION}
+
+\begin{PipsProp}{C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION}
+C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION FALSE
+\end{PipsProp}
+
 
 \section{Controlized Code (hierarchical control flow graph)}
 \label{subsection-controlized-code}

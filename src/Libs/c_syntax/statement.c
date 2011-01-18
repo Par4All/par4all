@@ -344,6 +344,8 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
    @param[in] e3 is the increment part of the for
 
    @param[in] body is the loop body statement
+
+   @return a statement with the for
 */
 statement MakeForloop(expression e1,
 		      expression e2,
@@ -430,8 +432,20 @@ statement MakeForloop(expression e1,
 }
 
 
-/* Create a C99 for-loop statement with an initializer as first parameter,
-   with some parser-specific characteristics.
+/* Create a C99 for-loop statement with a declaration as first parameter
+   in the for clause, with some parser-specific characteristics.
+
+   To represent for(int i = a;...;...) we generate instead:
+   {
+     int i;
+     for(int i = a;...;...)
+   }
+
+   The for could be generated back into the original form by the
+   prettyprinter.  To differentiate between such a C99 for loop or a
+   for-loop that was really written with the i declaration just before, we
+   may mark the for loop with an extension here so that the prettyprinter
+   could use this hint to know if it has to do some resugaring or not.
 
    @param[in,out] s1 is the init part of the for. It is a list with one
    statement
@@ -441,20 +455,70 @@ statement MakeForloop(expression e1,
    @param[in] e3 is the increment part of the for
 
    @param[in] body is the loop body statement
+
+   @return a statement that contains the declaration and the for
 */
 statement MakeForloopWithIndexDeclaration(list s1,
 					  expression e2,
 					  expression e3,
 					  statement body) {
-  //split_initializations_in_statement(statement s)
   pips_assert("s1 is a list of one element", gen_length(s1) == 1);
-  // Get the initializer statement:
-  statement init = STATEMENT(CAR(s1));
+  // Get the declaration statement:
+  statement decl = STATEMENT(CAR(s1));
   gen_free_list(s1);
+  ifdebug(6) {
+    printf("For loop statement declaration: \n");
+    print_statement(decl);
+  }
+  /* First generate naive but more robust version in the RI, such as:
+
+     {
+       int i = a;
+       for(;...;...)
+     }
+  */
   statement for_s = MakeForloop(expression_undefined, e2, e3, body);
-  insert_statement(init, for_s, FALSE);
-  return init;
+  // We inject the for in its declaration statement:
+  insert_statement(decl, for_s, FALSE);
+  if (!get_bool_property("C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION")) {
+    /* We try to refine to inject back an initialization in the for-clause.
+
+       Note split_initializations_in_statemen() works only on a block */
+    split_initializations_in_statement(decl);
+    list l = statement_block(decl);
+    size_t len = gen_length(l);
+    ifdebug(6)
+      printf("Number of statements in the block: %zd\n", len);
+    if (len == 3) {
+      /* We are interested in solving the simple case when there are 3
+	 statements because we should be in the form of:
+	 int i;
+	 i = a;
+	 for(;...;...)
+      */
+      // So we pick the initialization part which is the second statement:
+      statement init = STATEMENT(gen_nth(1, l));
+      // Remove it from the enclosing declaration statement:
+      gen_remove(&l, init);
+      // Get the assignment:
+      call c = statement_call(init);
+      // Housekeeping: first protect what we want to keep somewhere else...
+      instruction_call(statement_instruction(init)) = call_undefined;
+      // ... and free the now useless container:
+      free_statement(init);
+      // Make from it an expression that can appear inside the for clause:
+      expression e = call_to_expression(c);
+      // Get the for-loop:
+      forloop f = statement_forloop(for_s);
+      // Remove the default-generated initialization expression:
+      free_expression(forloop_initialization(f));
+      // Put the new one instead:
+      forloop_initialization(f) = e;
+    }
+  }
+  return decl;
 }
+
 
 statement MakeSwitchStatement(statement s)
 {
