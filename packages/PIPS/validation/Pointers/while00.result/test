@@ -1,59 +1,34 @@
-int main()
-{
-   // BEGIN BLOCK
-   int *a, *b, c, d;
-//               <must be written>: c
-   c = 0;
-//               <must be written>: d
-   d = 1;
-//               <must be written>: b
-   b = &c;
-//               <must be read   >: c
-
-   while (c>0) {
-      // BEGIN BLOCK
-//               <must be read   >: b
-//               <must be written>: a
-
-      a = b;
-//               <must be written>: b
-      b = &d;
-      // END BLOCK
-   }
-//               <must be written>: b
-   b = &c;
-   return 0;
-   // END BLOCK
-}
 POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *a, *b, c, d;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    c = 0;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    d = 1;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    b = &c;
-//  {(b,c,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,c,-Exact-)}
 
    while (c>0) {
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-MAY-);(b,d,-MAY-)}
-      // BEGIN BLOCK
-//  points to = {}
-
+//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
+//   -MAY-);(b,d,-MAY-)}
       a = b;
-//  points to = {}
-      b = &d;
-      // END BLOCK
-   }
 //  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-MAY-);(b,d,-MAY-)}
+      b = &d;
+   }
+//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
+//   -MAY-);(b,d,-MAY-)}
+
    b = &c;
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
+//   -Exact-)}
+
    return 0;
-   // END BLOCK
 }

@@ -11,14 +11,14 @@ int main(int argc, char *argv[])
 //  points to = {}
 
    for(i = 0; i <= 63; i += 1) {
-//  points to = {}
+//  {(a[i],*HEAP*_l_13,-MAY-)}
       a[i] = (float) malloc(64*sizeof(float));
-//  points to = {}
+//  {(a[i],*HEAP*_l_13,-Exact-)}
       for(j = 0; j <= 63; j += 1)
-//  {(a[i],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(a[i],*HEAP*_l_13,-Exact-)}
          a[i][j] = 0.;
    }
-//  {(a[i],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(a[i],*HEAP*_l_13,-MAY-)}
 
    return 0;
 }

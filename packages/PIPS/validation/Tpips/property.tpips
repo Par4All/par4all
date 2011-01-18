@@ -51,6 +51,13 @@ echo ! saved values
 getproperty COMPLEXITY_PRINT_STATISTICS
 getproperty COMPUTE_ALL_DEPENDENCES
 close
+
+echo
+echo Warnings
+echo
+
+shell cat property.database/Warnings
+
 delete property
 echo ! done
 quit

@@ -1,5 +1,5 @@
-delete problematique01
-create problematique01 problematique01.c
+delete problematique00
+create problematique00 problematique00.c
 setproperty ABORT_ON_USER_ERROR TRUE
 
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
@@ -26,5 +26,5 @@ display PRINTED_FILE[main]
 
 
 close
-delete problematique01
+delete problematique00
 quit

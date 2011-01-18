@@ -6,9 +6,9 @@ int * j;
 
 int k;
 
-void global01()
+int global01()
 {
   i = &k;
   j = i;
-  printf("i = %p",i);
+  return 0;
 }

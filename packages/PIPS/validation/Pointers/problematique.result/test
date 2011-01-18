@@ -5,47 +5,47 @@ int main()
 {
    int *a, *b, *c;
    int i;
-//               <must be written>: i
+//             <    is written>: i
    i = 0;
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ a
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
    /* Allocation dynamiques des tableaux */
    a = (int *) malloc(20*sizeof(int));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ b
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
    b = (int *) malloc(20*sizeof(int));
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_ c
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: c _MALLOC_EFFECTS:_MALLOC_
    c = (int *) malloc(20*sizeof(int));
-//               <must be read   >: b
-//               <must be written>: a
+//             <    is read   >: b
+//             <    is written>: a
    /* Creation d'alias entre a et b */
    a = b;
-//               <must be read   >: c
-//               <must be written>: a
+//             <    is read   >: c
+//             <    is written>: a
    
    /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
     * entre a et c */
    a = c;
-//               <must be written>: i
+//             <    is written>: i
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: b i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b i
       b[i] = i;
-//               <must be written>: i
+//             <    is written>: i
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: c i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: c i
       c[i] = 1;
-//               <must be written>: i
+//             <    is written>: i
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       a[i] = b[i];
    return 0;
 }
@@ -53,63 +53,59 @@ POINTS TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *a, *b, *c;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    i = 0;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    /* Allocation dynamiques des tableaux */
    a = (int *) malloc(20*sizeof(int));
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    b = (int *) malloc(20*sizeof(int));
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    c = (int *) malloc(20*sizeof(int));
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    /* Creation d'alias entre a et b */
    a = b;
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    
    /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
     * entre a et c */
    a = c;
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
       b[i] = i;
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
       c[i] = 1;
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
       a[i] = b[i];
-//  {(a,*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(b,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-);(c,
-//   *ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}
    return 0;
 }

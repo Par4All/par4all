@@ -40,18 +40,18 @@ void inter01()
    static int l;
    int m;
    int n;
-//               <must be written>: n
+//             <    is written>: n
 
    for(n = 0; n <= 9; n += 1) {
-//               <must be written>: i
+//             <    is written>: i
       i = 1;
-//               <must be written>: j
+//             <    is written>: j
       j = 2;
-//               <must be written>: k
+//             <    is written>: k
       k = 3;
-//               <must be written>: l
+//             <    is written>: l
       l = 4;
-//               <must be written>: m
+//             <    is written>: m
       m = 5;
    }
 }
@@ -82,9 +82,6 @@ void inter01()
       m = 5;
    }
 }
-
-POINTS TO
-
 //  {}
 int main()
 {

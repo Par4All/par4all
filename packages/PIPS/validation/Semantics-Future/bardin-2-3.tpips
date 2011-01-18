@@ -6,6 +6,34 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 echo
+echo WITHOUT TRANSFORMER LISTS
+echo =========================
+echo
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[run]
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[run]
+
+close
+delete bardin-2-3
+create bardin-2-3 bardin-2-3.c
+
+echo
+echo WITH TRANSFORMER LISTS
+echo ======================
+echo
+
+echo
 echo TRANSFORMERS
 echo
 

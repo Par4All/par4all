@@ -18,11 +18,11 @@ void point_to03()
    typedef double a_t[10][20];
    a_t a;
    a_t *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &a;
-//               <must be read   >: p
-//               <must be written>: p[0][2][3]
+//             <    is read   >: p
+//             <    is written>: p[0][2][3]
    ((*p)[2])[3] = 1.5;
 }
 
@@ -33,11 +33,11 @@ void point_to03()
    typedef double a_t[10][20];
    a_t a;
    a_t *p;
-//               <must be written>: p
+//             <    is written>: p
 
    p = &a;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: p
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
    ((*p)[2])[3] = 1.5;
 }
 
@@ -50,9 +50,9 @@ void point_to03()
    typedef double a_t[10][20];
 //  points to = {}
    a_t a;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    a_t *p;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = &a;
 //  {(p,a,-Exact-)}

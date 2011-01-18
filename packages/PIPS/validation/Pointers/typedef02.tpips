@@ -17,7 +17,7 @@ activate C_PARSER
 
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[main]
+display PRINTED_FILE[%ALLFUNC]
 
 
 echo POINTS TO

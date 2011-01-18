@@ -18,4 +18,20 @@ ABORT_ON_USER_ERROR FALSE
 ! saved values
 COMPLEXITY_PRINT_STATISTICS 1
 COMPUTE_ALL_DEPENDENCES TRUE
+
+Warnings
+
+unknown[unknown] (parse_properties) user error
+unknown[unknown] (parse_properties) Unknown property here to update
+unknown[unknown] (tp_error) user error
+unknown[unknown] (tp_error) expecting a property name
+
+unknown[unknown] (tp_error) user error
+unknown[unknown] (tp_error) expecting a property name
+
+unknown[unknown] (parse_properties) user error
+unknown[unknown] (parse_properties) Unknown property PRETTY to update
+unknown[unknown] (tp_error) user error
+unknown[unknown] (tp_error) expecting a property name
+
 ! done

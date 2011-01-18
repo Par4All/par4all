@@ -2,19 +2,19 @@ int main()
 {
    // BEGIN BLOCK
    int *x, x1, x2, y;
-//               <must be written>: x1
+//             <    is written>: x1
    x1 = 1;
-//               <must be written>: x2
+//             <    is written>: x2
    x2 = 2;
 
    if (0==0)
-//               <must be written>: x
+//             <    is written>: x
       x = &x1;
    else
-//               <must be written>: x
+//             <    is written>: x
       x = &x2;
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be written>: y
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: y
 
    y = *x;
    return 0;
@@ -26,19 +26,19 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *x, x1, x2, y;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    x1 = 1;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    x2 = 2;
-//  points to = {}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (0==0)
-//  points to = {}
+//  {(x,x1,-Exact-)}
       x = &x1;
    else
-//  points to = {}
+//  {(x,x2,-Exact-)}
       x = &x2;
 //  {(x,x1,-MAY-);(x,x2,-MAY-)}
 
@@ -51,20 +51,20 @@ int main()
 {
    // BEGIN BLOCK
    int *x, x1, x2, y;
-//               <must be written>: x1
+//             <    is written>: x1
    x1 = 1;
-//               <must be written>: x2
+//             <    is written>: x2
    x2 = 2;
 
    if (0==0)
-//               <must be written>: x
+//             <    is written>: x
       x = &x1;
    else
-//               <must be written>: x
+//             <    is written>: x
       x = &x2;
-//               <may be read    >: x1 x2
-//               <must be read   >: x
-//               <must be written>: y
+//             <may be read   >: x1 x2
+//             <    is read   >: x
+//             <    is written>: y
 
    y = *x;
    return 0;
