@@ -15,8 +15,8 @@ C Loop nest P4A end
       INTEGER A(1:N*N), B(1:N*N)
 C Loop nest P4A end
       IF (J.LE.N-1.AND.I.LE.N-1) THEN                                   0008
-         A(I+1+(J+1)*N) = 1                                             0009
-         B(I+1+(J+1)*N) = 1                                             0010
+         A(I+1+J*N) = 1                                                 0009
+         B(I+1+J*N) = 1                                                 0010
       ENDIF
       END
 /* C pretty print for module P4A_KERNEL_0. */
@@ -26,8 +26,8 @@ p4a_kernel_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
 
   if ((j <= (n - 1)) && (i <= (n - 1)))
     {
-      a[((i + 1) + ((j + 1) * n)) - 1] = 1;
-      b[((i + 1) + ((j + 1) * n)) - 1] = 1;
+      a[((i + 1) + (j * n)) - 1] = 1;
+      b[((i + 1) + (j * n)) - 1] = 1;
     }
   return;
 }
