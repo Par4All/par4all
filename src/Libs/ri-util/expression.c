@@ -1856,6 +1856,12 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
   return (result_exp);
 }
 
+/// @return a new expression that adds the an expression with an integer
+/// @param e, the expression to add
+/// @param n, the integer to add
+expression add_integer_to_expression (expression exp, int val) {
+  make_op_exp (PLUS_OPERATOR_NAME, exp, int_to_expression(val));
+}
 
 /*=================================================================*/
 /* expression make_lin_op_exp(entity op_ent, expression exp1 exp2): returns

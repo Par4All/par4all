@@ -82,7 +82,8 @@ static void do_linearize_array_reference(reference r) {
     entity e =reference_variable(r);
     list indices = reference_indices(r);
     list to_be_free = indices;
-    if (fortran_module_p(get_current_module_entity())) {
+    bool fortran_p = fortran_module_p(get_current_module_entity());
+    if (fortran_p) {
       indices = gen_nreverse (indices);
     }
     if(!ENDP(indices)) {
@@ -100,10 +101,15 @@ static void do_linearize_array_reference(reference r) {
                 /* merge all */
                 new_index=int_to_expression(0);/* better start with this than nothing */
                 while(!ENDP(vdims) && !ENDP(indices) ) {
-                    expression curr_exp = EXPRESSION(CAR(indices));
+		    expression curr_exp = copy_expression(EXPRESSION(CAR(indices)));
+		    if (fortran_p && !ENDP(CDR(indices))) {
+		      // remove -1 to the index since index 1 is offset 0 but not
+		      // for the last index that is not loinearized
+		      curr_exp = add_integer_to_expression (curr_exp, -1);
+		    }
                     new_index=make_op_exp(PLUS_OPERATOR_NAME,
                             make_op_exp(MULTIPLY_OPERATOR_NAME,
-                                copy_expression(curr_exp),
+                                curr_exp,
                                 SizeOfDimensions(CDR(vdims))
                                 ),
                             new_index
