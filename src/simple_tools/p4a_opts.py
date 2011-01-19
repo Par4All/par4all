@@ -5,7 +5,7 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <Ronan Keryell@hpc-project.com>
 #
-import p4a_util 
+import p4a_util
 import p4a_version
 import os
 import sys
@@ -205,7 +205,7 @@ def send_report_email(from_addr = "anonymous@par4all.org", recipient = "support@
             + "\n\nTranslated options:\n\n" + repr(static_options)
             + "\n\nTranslated arguments:\n\n" + args
             + "\nAttached files:\n\n" + files_desc
-            + "\nMachine: " + p4a_util.uname() + "\n"
+            + "\nMachine: " + platform.uname() + "\n"
             + "\nUsername: " + p4a_util.whoami() + "\n"
             + "\nEnvironment:\n\n" + env
             + "\nThe full log for this session follows:\n\n" + p4a_util.read_file(current_log_file)))
