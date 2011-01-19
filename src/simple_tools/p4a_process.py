@@ -886,7 +886,7 @@ class p4a_processor(object):
             if flag:
                 result.append (os.path.join(os.environ["P4A_ACCEL_DIR"],
                                             "p4a_runtime_interface.f95"))
-                flag = false
+                flag = False
         return result
 
     def save_user_file (self, dest_dir, prefix, suffix):
