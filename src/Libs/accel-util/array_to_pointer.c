@@ -64,6 +64,9 @@ typedef struct {
     bool modify_call_site_p;
 } param_t;
 
+/* @return the number of dimensions in @param t, 
+ * counting pointers as a dimension
+ * */
 size_t type_dereferencement_depth(type t) {
     t = ultimate_type(t);
     if(type_variable(t)) {
