@@ -104,21 +104,34 @@ static void do_linearize_array_reference(reference r) {
                 /* merge all */
                 new_index=int_to_expression(0);/* better start with this than nothing */
                 while(!ENDP(vdims) && !ENDP(indices) ) {
-		    expression curr_exp = copy_expression(EXPRESSION(CAR(indices)));
-		    if (fortran_p && !ENDP(CDR(indices))) {
-		      // remove -1 to the index since index 1 is offset 0 but not
-		      // for the last index that is not loinearized
-		      curr_exp = add_integer_to_expression (curr_exp, -1);
-		    }
-                    new_index=make_op_exp(PLUS_OPERATOR_NAME,
-                            make_op_exp(MULTIPLY_OPERATOR_NAME,
-                                curr_exp,
-                                SizeOfDimensions(CDR(vdims))
-                                ),
-                            new_index
-                            );
-                    POP(vdims);
-                    POP(indices);
+				  expression curr_exp = copy_expression(EXPRESSION(CAR(indices)));
+				  if (fortran_p) {
+					// in fortran we have to take care of the lower bound that can
+					// be set to any value
+					// First compute the lower bound
+					expression lower = copy_expression(dimension_lower(DIMENSION(CAR(vdims))));
+					if (ENDP(CDR(indices))) {
+					  // for the last dimension (the most contiguous in the memory)
+					  // substract the lower bound minus 1 since the first index is
+					  // one
+					  lower = add_integer_to_expression (lower, -1);
+					  curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
+					}
+					else {
+					  // substract the lower bound to the index to compute the
+					  // dimension stride in the linearized array
+					  curr_exp = make_op_exp (MINUS_OPERATOR_NAME, curr_exp, lower);
+					}
+				  }
+				  new_index=make_op_exp(PLUS_OPERATOR_NAME,
+										make_op_exp(MULTIPLY_OPERATOR_NAME,
+													curr_exp,
+													SizeOfDimensions(CDR(vdims))
+													),
+										new_index
+										);
+				  POP(vdims);
+				  POP(indices);
                 }
             }
             /* it's a pointer: pop type */
