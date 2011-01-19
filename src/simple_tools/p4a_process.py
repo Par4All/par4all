@@ -619,14 +619,24 @@ class p4a_processor(object):
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
-        kernel_launchers.loop_normalize(
-            # Loop normalize for the C language and GPU friendly
-            LOOP_NORMALIZE_ONE_INCREMENT = True,
-            # Arrays start at 0 in C, so the iteration loops:
-            LOOP_NORMALIZE_LOWER_BOUND = 0,
-            # It is legal in the following by construction (...Hmmm to verify)
-            LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
-            concurrent=True)
+        if (self.fortran == False):
+            kernel_launchers.loop_normalize(
+                # Loop normalize for the C language and GPU friendly
+                LOOP_NORMALIZE_ONE_INCREMENT = True,
+                # Arrays start at 0 in C, so the iteration loops:
+                LOOP_NORMALIZE_LOWER_BOUND = 0,
+                # It is legal in the following by construction (...Hmmm to verify)
+                LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
+                concurrent=True)
+        else:
+            kernel_launchers.loop_normalize(
+                # Loop normalize for the C language and GPU friendly
+                LOOP_NORMALIZE_ONE_INCREMENT = True,
+                # Arrays start at 0 in C, so the iteration loops:
+                LOOP_NORMALIZE_LOWER_BOUND = 1,
+                # It is legal in the following by construction (...Hmmm to verify)
+                LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
+                concurrent=True)
 
         # Unfortunately the information about parallelization and
         # privatization is lost by the current outliner, so rebuild
