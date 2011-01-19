@@ -1,0 +1,31 @@
+setenv WKS linearize_array04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+#setenv LINEARIZE_ARRAY_DEBUG_LEVEL 9
+
+delete $WKS
+create $WKS $WKS.f
+
+setproperty CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL    TRUE
+setproperty CROUGH_FORTRAN_USES_INTERFACE TRUE
+
+display PRINTED_FILE [FOO]
+
+apply LINEARIZE_ARRAY_FORTRAN[FOO]
+apply UNSPLIT [FOO]
+
+display PRINTED_FILE [FOO]
+
+
+#exec original version
+shell ${PIPS_F77:-gfortran} -g $WKS.f -o $WKS.database/Src/$WKS
+shell $WKS.database/Src/$WKS
+
+#exec pips version
+shell ${PIPS_F77:-gfortran} -g $WKS.database/Src/$WKS.f -o $WKS.database/Src/$WKS
+shell $WKS.database/Src/$WKS
+
+close $WKS
+delete $WKS
+quit
