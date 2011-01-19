@@ -1860,7 +1860,7 @@ expression make_op_exp(char *op_name, expression exp1, expression exp2)
 /// @param e, the expression to add
 /// @param n, the integer to add
 expression add_integer_to_expression (expression exp, int val) {
-  make_op_exp (PLUS_OPERATOR_NAME, exp, int_to_expression(val));
+  return make_op_exp (PLUS_OPERATOR_NAME, exp, int_to_expression(val));
 }
 
 /*=================================================================*/
