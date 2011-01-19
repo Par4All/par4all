@@ -1,0 +1,8 @@
+//  {}
+int main()
+{
+//  points to = {}
+   mystruct s;
+//  points to = {}
+   return 0;
+}

@@ -1,0 +1,16 @@
+//  {}
+int main()
+{
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *b[10];
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i = 5;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   a = b[i];
+//  {(a,b[*][0],-Exact-)}
+   b[++i] = a;
+//  {(a,b[*][0],-Exact-);(b[++i],b[*][0],-Exact-)}
+   return 0;
+}

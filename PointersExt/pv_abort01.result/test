@@ -1,0 +1,12 @@
+//  {}
+int main()
+{
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int **a;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int b;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   a[0] = &b;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(a[0],b,-Exact-)}
+   return 0;
+}

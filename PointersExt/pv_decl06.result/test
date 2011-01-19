@@ -1,0 +1,8 @@
+//  {}
+int main()
+{
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int (*a)[10];
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   return 0;
+}

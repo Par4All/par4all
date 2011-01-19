@@ -1,0 +1,18 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0;
+//  points to = {}
+   int a[10];
+//  points to = {}
+   do {
+//  points to = {}
+      a[i] = i;
+//  points to = {}
+      i++;
+   }
+   while (i<10);
+//  points to = {}
+   return 0;
+}

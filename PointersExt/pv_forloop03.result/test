@@ -1,0 +1,28 @@
+//  {}
+int main()
+{
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   float *a, *p;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int i;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+
+   a = (float *) malloc(10*sizeof(float));
+//  {(a,*HEAP*_l_8,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   p = a, i = 0;
+//  {(a,*HEAP*_l_8,-Exact-);(p,*HEAP*_l_8,-Exact-)}
+   while (i<10) {
+//  {(a,*HEAP*_l_8,-Exact-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,
+//   *HEAP*_l_8,-MAY-)}
+      *p = 1.0;
+//  {(a,*HEAP*_l_8,-Exact-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,
+//   *HEAP*_l_8,-MAY-)}
+      p++;
+   }
+//  {(a,*HEAP*_l_8,-Exact-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}

@@ -1,0 +1,10 @@
+//  {}
+int main()
+{
+//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *s;
+//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   s = "hello\n";
+//  {(s,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+   return 0;
+}

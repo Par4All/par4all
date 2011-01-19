@@ -1,0 +1,22 @@
+//  {}
+int main()
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p, *q, *r;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int a = 0, b = 1, c = 2, d = 4;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   p = &a;
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   q = a==b?&c:&d;
+//  {(p,a,-Exact-);(q,c,-MAY-);(q,d,-MAY-);(r,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   r = a<b?&c:q;
+//  {(p,a,-Exact-);(q,c,-MAY-);(q,d,-MAY-);(r,c,-MAY-);(r,d,-MAY-)}
+   return 0;
+}

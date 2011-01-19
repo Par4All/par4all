@@ -1,0 +1,27 @@
+//  {}
+int main()
+{
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int b = 0;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int c = 1;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   if (b==c)
+//  {(a,b,-Exact-)}
+      a = &b;
+   else
+//  {(a,c,-Exact-)}
+      a = &c;
+//  {(a,b,-MAY-);(a,c,-MAY-)}
+
+   if (b<=c)
+//  {(a,b,-Exact-)}
+      a = &b;
+   else
+//  {(a,b,-Exact-)}
+      a = &b;
+//  {(a,b,-Exact-)}
+   return 0;
+}

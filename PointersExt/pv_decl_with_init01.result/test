@@ -1,0 +1,10 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int a;
+//  {(b,a,-Exact-)}
+   int *b = &a;
+//  {(b,a,-Exact-)}
+   return 0;
+}
