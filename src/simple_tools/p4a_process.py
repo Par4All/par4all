@@ -432,15 +432,17 @@ class p4a_processor(object):
         Those steps are done
         1 - insert the needed "use" statement
         2 - insert the pointer declaration for P4A inserted variable
+        3 - insert the 64 bit integer var
         3 - types are wrtitten with a () in the size_of function
-        4 - replace the f77 multiline mode by the f08 multiline mode
+        4 - remove the f77 multiline. Also remove the first blank chars
         5 - replace f77 comments with f95 comments
         6 - remove the (void **) & that is not usefull in fortran
         7 - remove the * in front of the inserted variables
         8 - declare the origin_var_name as a target
+        9 - make DMA transfer variable to be 64 bit variables
         """
         p4a_util.debug ("Processing fortran_wrapper " + file_name)
-        indent = "      "
+        indent = "  "
         # get the code to be post process
         code = p4a_util.read_file (file_name, True)
 
@@ -476,6 +478,7 @@ class p4a_processor(object):
             inserted_var_decl += " " + var
             # extract the original variable name
             origin_var_s.add (var.replace (var_prefix, "").replace (var_suffix, ""))
+        inserted_var_decl += "\n" + indent + "integer (c_size_t), target :: p4a_zero"
 
         #step 3
         c_sizeof_replace = dict()
@@ -491,9 +494,12 @@ class p4a_processor(object):
             code = code.replace (k, v)
 
         # step 4
+        F77_INDENTATION  = "\n      "
+        F95_INDENTATION  = "\n" + indent
         F77_CONTINUATION = "\n     &"
         F95_CONTINUATION = "&\n      "
-        code = code.replace (F77_CONTINUATION, F95_CONTINUATION)
+        code = code.replace (F77_CONTINUATION, " ")
+        code = code.replace (F77_INDENTATION, F95_INDENTATION)
 
         # step 5
         F77_CONTINUATION = "\nC"
@@ -514,6 +520,44 @@ class p4a_processor(object):
         for t in types_l:
             code = code.replace (t, t.lower () + ", target ::")
 
+        # step 9
+        function_l = ["P4A_COPY_FROM_ACCEL_2D", "P4A_COPY_TO_ACCEL_2D"]
+        for func in function_l:
+            # this re match the full line where the CALL to the dma transfer happends
+            func_line_re = re.compile("^ *CALL " + func + "\(.*\)",
+                                           re.MULTILINE)
+            # this re match the same line and extract the parameters
+            func_sig_re = re.compile("^ *CALL " + func + "\((.*)\)",
+                                          re.MULTILINE)
+            # this re match the function name
+            func_name_re = re.compile("^ *(CALL " + func + ")\(.*\)",
+                                           re.MULTILINE)
+            new_line_l = []
+            line_l = func_line_re.findall (code)
+            name_l = func_name_re.findall (code)
+            sig_l = func_sig_re.findall (code)
+            insert_init = True
+            for index in range (len (line_l)):
+                #for each match we need to ensure that parameter 2..7 are 64 bits
+                no_space = sig_l[index].replace (" ", "")
+                arg_l = no_space.split (",")
+                for arg_num in range (1,7):
+                    arg_l[arg_num] += "+p4a_zero"
+                    new_line = indent + name_l [index] +"("
+                    first = True
+                for arg in arg_l:
+                    if first:
+                        first = False
+                    else:
+                        new_line += ","
+                    new_line += arg
+                new_line += ")"
+                if insert_init:
+                    insert_init = False
+                    code = code.replace (line_l[index], indent + "p4a_zero = 0\n" + line_l[index])
+                code = code.replace (line_l[index], new_line)
+
+        # step 10
         # identify where to insert the use string and the inserted variable
         # declaration
         subroutine_line_re = re.compile("SUBROUTINE " + subroutine_name + ".*$",
@@ -828,6 +872,7 @@ class p4a_processor(object):
         they are not produced in the standard Src folder by the unsplit phase.
         """
         result = []
+        flag = True
         for name in self.interface_modules:
             # Where the file does well in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname(), name,
@@ -838,8 +883,10 @@ class p4a_processor(object):
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
-        result.append (os.path.join(os.environ["P4A_ACCEL_DIR"],
-                                    "p4a_runtime_interface.f95"))
+            if flag:
+                result.append (os.path.join(os.environ["P4A_ACCEL_DIR"],
+                                            "p4a_runtime_interface.f95"))
+                flag = false
         return result
 
     def save_user_file (self, dest_dir, prefix, suffix):
