@@ -1,0 +1,247 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+//  T(a,i,n) {}
+
+   int i, n, a;
+
+//  T(i) {0<=i}
+
+
+   i = rand();
+
+//  T(n) {0<=i, 0<=n}
+
+   n = rand();
+
+//  T(a) {0<=a, 0<=i, 0<=n}
+
+   a = rand();
+
+//  T(i) {0<=a, i<=a+i#init+n, i#init<=i, n+1<=i, 0<=i#init, 0<=n}
+
+
+   if (i<=n)
+
+//  T(i) {1<=a, a<=i, a+i#init<=i, i<=a+n, n+1<=i, 0<=i#init,
+//    i#init<=n, 0<=n}
+
+      if (a<=0) {
+
+//  T(i) {a==0, i==i#init, 0<=i, i<=n, 0<=n}
+
+         while (flip())
+
+//  T(i) {a==0, i==i#init, i<=n, 0<=n}
+
+            if (i<=n&&i+a<=n)
+
+//  T(i) {a==0, i==i#init, i#init<=n, 0<=n}
+
+               i += a;
+            else
+
+//  T() {a==0, n+1<=i, 0<=n}
+
+               while (1)
+
+//  T() {a==0, n+1<=i, 0<=n}
+
+                  ;
+
+//  T() {0==-1}
+
+         if (i<=n&&i+a>n)
+
+//  T() {0==-1}
+
+            i += a;
+         else
+
+//  T() {a==0, 0<=i, i<=n, 0<=n}
+
+            while (1)
+
+//  T() {a==0, 0<=i, i<=n, 0<=n}
+
+               ;
+
+//  T() {0==-1}
+
+         printf("not reachable\n");
+      }
+      else {
+
+//  T(i) {1<=a, 0<=i, i#init<=i, i<=n}
+
+         while (flip())
+
+//  T(i) {a+i#init==i, 1<=a, a+i#init<=n, i#init<=n, 0<=n}
+
+            if (i<=n&&i+a<=n)
+
+//  T(i) {a+i#init==i, 1<=a, a+i#init<=n, i#init<=n, 0<=n}
+
+               i += a;
+            else
+
+//  T() {1<=a, n+1<=a+i, 0<=n}
+
+               while (1)
+
+//  T() {1<=a, n+1<=a+i, 0<=n}
+
+                  ;
+
+//  T(i) {a+i#init==i, 1<=a, n+1<=a+i#init, 0<=i#init, i#init<=n,
+//    0<=n}
+
+         if (i<=n&&i+a>n)
+
+//  T(i) {a+i#init==i, 1<=a, n+1<=a+i#init, 0<=i#init, i#init<=n,
+//    0<=n}
+
+            i += a;
+         else
+
+//  T() {1<=a, 0<=i, 1<=i+n, 0<=n}
+
+            while (1)
+
+//  T() {1<=a, 0<=i, 1<=i+n, 0<=n}
+
+               ;
+
+//  T() {1<=a, a<=i, i<=a+n, n+1<=i, 0<=n}
+
+         printf("reachable\n");
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int i, n, a;
+
+//  P(a,i,n) {}
+
+
+   i = rand();
+
+//  P(a,i,n) {0<=i}
+
+   n = rand();
+
+//  P(a,i,n) {0<=i, 0<=n}
+
+   a = rand();
+
+//  P(a,i,n) {0<=a, 0<=i, 0<=n}
+
+
+   if (i<=n)
+
+//  P(a,i,n) {0<=a, 0<=i, i<=n, 0<=n}
+
+      if (a<=0) {
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+         while (flip())
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+            if (i<=n&&i+a<=n)
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+               i += a;
+            else
+
+//  P() {0==-1}
+
+               while (1)
+
+//  P() {0==-1}
+
+                  ;
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+         if (i<=n&&i+a>n)
+
+//  P() {0==-1}
+
+            i += a;
+         else
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+            while (1)
+
+//  P(a,i,n) {a==0, 0<=i, i<=n, 0<=n}
+
+               ;
+
+//  P() {0==-1}
+
+         printf("not reachable\n");
+      }
+      else {
+
+//  P(a,i,n) {1<=a, 0<=i, i<=n, 0<=n}
+
+         while (flip())
+
+//  P(a,i,n) {1<=a, 0<=i, i<=n}
+
+            if (i<=n&&i+a<=n)
+
+//  P(a,i,n) {1<=a, a+i<=n, 0<=i, i<=n}
+
+               i += a;
+            else
+
+//  P(a,i,n) {1<=a, n+1<=a+i, 0<=i, i<=n}
+
+               while (1)
+
+//  P(a,i,n) {n+1<=a+i, 0<=i, i<=n}
+
+                  ;
+
+//  P(a,i,n) {1<=a, 0<=i, i<=n}
+
+         if (i<=n&&i+a>n)
+
+//  P(a,i,n) {1<=a, n+1<=a+i, 0<=i, i<=n}
+
+            i += a;
+         else
+
+//  P(a,i,n) {1<=a, a+i<=n, 0<=i, i<=n}
+
+            while (1)
+
+//  P(a,i,n) {1<=a, a+i<=n, 0<=i}
+
+               ;
+
+//  P(a,i,n) {1<=a, a<=i, i<=a+n, n+1<=i, 0<=n}
+
+         printf("reachable\n");
+      }
+}

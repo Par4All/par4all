@@ -1,7 +1,6 @@
 delete maisonneuve04
 create maisonneuve04 maisonneuve04.c
 
-setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
@@ -25,4 +24,3 @@ display PRINTED_FILE[run]
 close
 delete maisonneuve04
 quit
-

@@ -1,27 +1,20 @@
-// This example makes PIPS segfault (at least revisions 18437 & 18499)
+// Segfaults in deprecated versions of PIPS
 
 // $Id$
 
 #include <stdlib.h>
 
-int flip(void)
-{
-  return rand() % 2;
-}
-
 void run(void)
 {
   int x;
 
-  while (flip()) {
-    if (flip()) {
+  while (rand() % 2) {
+    if (rand() % 2) {
       if (x < 0) {
-	x++;
+        x++;
       }
     }
   }
-  /* We'd like some information about x at loop exit, if any. */
-  ;
 }
 
 int main(void)
