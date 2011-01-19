@@ -1,0 +1,296 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+
+//  T(x,z) {}
+
+   int x, z;
+
+//  T(x,z) {x==0, z==0}
+
+   x = z = 0;
+
+//  T(x,z) {x#init==0, z#init==0, 0<=x}
+
+   while (1) {
+
+//  T(x,z) {x+z#init==x#init+z, z#init<=z}
+
+      while (flip())
+
+//  T(x,z) {x==x#init+1, z==z#init+1, 0<=x, z<=x, 2z<=x, 0<=z}
+
+         if (x>=2*z&&x+1>=2*z+2) {
+
+//  T(x) {x==x#init+1, 2z+2<=x}
+
+            x++;
+
+//  T(z) {z==z#init+1, 2z<=x}
+
+            z++;
+
+//  T() {0<=x, z<=x, 2z<=x, 0<=z}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {x<=2z}
+
+            while (1)
+
+//  T() {x<=2z}
+
+               ;
+
+//  T(z) {}
+
+      while (flip())
+
+//  T(z) {z==0, 0<=x}
+
+         if (1) {
+
+//  T(z) {z==0}
+
+            z = 0;
+
+//  T() {z==0, 0<=x}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+
+//  T(x,z) {x#init<=x, z<=z#init}
+
+      while (flip()) {
+
+//  T(x,z) {x==2z-1, x#init==2z-2, z==z#init+1, 1<=z}
+
+         if (x>=2*z&&x+1<2*z+2) {
+
+//  T(x) {x==2z+1, x#init==2z}
+
+            x++;
+
+//  T(z) {x==2z-1, z==z#init+1}
+
+            z++;
+
+//  T() {x==2z-1, 1<=z}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(z) {x==2z#init-1, z==0, 1<=z#init}
+
+         if (1) {
+
+//  T(z) {x==2z#init-1, z==0, 1<=z#init}
+
+            z = 0;
+
+//  T() {z==0, 1<=x}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+      }
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x, z;
+
+//  P(x,z) {}
+
+   x = z = 0;
+
+//  P(x,z) {x==0, z==0}
+
+   while (1) {
+
+//  P(x,z) {0<=x, 2z<=x, 0<=z}
+
+      while (flip())
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (x>=2*z&&x+1>=2*z+2) {
+
+//  P(x,z) {2z+1<=x, 0<=z}
+
+            x++;
+
+//  P(x,z) {2z+2<=x, 0<=z}
+
+            z++;
+
+//  P(x,z) {2z<=x, 1<=z}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,z) {x==2z, 0<=z}
+
+            while (1)
+
+//  P(x,z) {x==2z, 0<=z}
+
+               ;
+
+//  P(x,z) {2z<=x, 0<=z}
+
+      while (flip())
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (1) {
+
+//  P(x,z) {2z<=x, 0<=z}
+
+            z = 0;
+
+//  P(x,z) {z==0, 0<=x}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+
+//  P(x,z) {2z<=x, 0<=z}
+
+      while (flip()) {
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (x>=2*z&&x+1<2*z+2) {
+
+//  P(x,z) {x==2z, 0<=z}
+
+            x++;
+
+//  P(x,z) {x==2z+1, 0<=z}
+
+            z++;
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,z) {2z+1<=x, 0<=z}
+
+            while (1)
+
+//  P(x,z) {2z+1<=x, 0<=z}
+
+               ;
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+         if (1) {
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+            z = 0;
+
+//  P(x,z) {z==0, 1<=x}
+
+            if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      }
+   }
+}
