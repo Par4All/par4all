@@ -137,7 +137,8 @@ class p4a_builder:
                  openmp = False, accel_openmp = False, icc = False,
                  cuda = False,com_optimization=False,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
-                 no_default_flags = False, build = False
+                 add_openmp_flag = False, no_default_flags = False,
+                 build = False
                  ):
 
         self.builder = build
@@ -179,20 +180,31 @@ class p4a_builder:
                 fortran_flags += [ "-O3" ]
 
         if openmp:
-            if icc:
-                c_flags += [ "-openmp" ]
-                fortran_flags += [ "-openmp" ]
-                ld_flags += [ "-openmp" ]
+            # Ask for C99 since PIPS generates C99 code:
+            c_flags.append ("-std=c99")
+            if add_openmp_flag:
+                if icc:
+                    c_flags += [ "-openmp" ]
+                    fortran_flags += [ "-openmp" ]
+                    ld_flags += [ "-openmp" ]
+                else:
+                    c_flags += [ "-fopenmp" ]
+                    fortran_flags += [ "-fopenmp" ]
+                    ld_flags += [ "-fopenmp" ]
             else:
-                # Ask for C99 since we generate C99 code:
-                c_flags += [ "-std=c99 -fopenmp" ]
-                fortran_flags += [ "-fopenmp" ]
-                ld_flags += [ "-fopenmp" ]
+                if icc:
+                    c_flags += [ "-openmp-stubs" ]
+                    fortran_flags += [ "-openmp-stubs" ]
+                    ld_flags += [ "-openmp-stubs" ]
+                else:
+                    c_flags += [ "-fno-openmp" ]
+                    fortran_flags += [ "-fno-openmp" ]
+                    ld_flags += [ "-fno-openmp" ]
 
-            if accel_openmp:
-                cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
-                fortran_flags.append ("-ffree-line-length-none")
-                self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
+        if accel_openmp:
+            cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+            fortran_flags.append ("-ffree-line-length-none")
+            self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
 
         if com_optimization:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]

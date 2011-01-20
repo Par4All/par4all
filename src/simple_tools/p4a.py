@@ -146,6 +146,9 @@ def add_own_options(parser):
     compile_group.add_option("--no-fast", "--not-fast", action = "store_true", default = False,
         help = "Do not add optimized compilation flags automatically.")
 
+    compile_group.add_option("--no-openmp", "--nomp", action = "store_true", default = False,
+        help = "Do not add openmp compilation flags automatically. This option allows to get a sequential version of the openmp code produced by p4a. When icc is used this enable the option openmp-stubs.")
+
     compile_group.add_option("--no-default-flags", action = "store_true", default = False,
         help = "Do not add some C flags such as -fPIC, -g, etc. automatically.")
 
@@ -433,6 +436,7 @@ def main():
             add_debug_flags = options.debug,
             add_optimization_flags = not options.no_fast,
             no_default_flags = options.no_default_flags,
+            add_openmp_flag = not options.no_openmp,
             build = (len (options.output_file))
           )
 
