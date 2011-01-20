@@ -432,6 +432,312 @@
       end do
       end
 
+!>  Stub for copying a 5D memory zone from the host to a compact memory
+!>  zone in the hardware accelerator.
+
+      subroutine P4A_COPY_TO_ACCEL_5D (elem_size, d1_size, d2_size,
+     &d3_size, d4_size, d5_size,
+     &d1_block_size, d2_block_size, d3_block_size, d4_block_size,
+     &d5_block_size,
+     &d1_offset, d2_offset, d3_offset, d4_offset, d5_offset,
+     & host_address, accel_address)
+
+      integer d1_size
+      integer d2_size
+      integer d3_size
+      integer d4_size
+      integer d5_size
+      integer elem_size
+      integer d1_block_size
+      integer d2_block_size
+      integer d3_block_size
+      integer d4_block_size
+      integer d5_block_size
+      integer d1_offset
+      integer d2_offset
+      integer d3_offset
+      integer d4_offset
+      integer d5_offset
+      character host_address(d1_size * elem_size,
+     &                       d2_size * elem_size,
+     &                       d3_size * elem_size,
+     &                       d4_size * elem_size,
+     &                       d5_size * elem_size)
+      character accel_address(d1_block_size * elem_size,
+     &                        d2_block_size * elem_size,
+     &                        d3_block_size * elem_size,
+     &                        d4_block_size * elem_size,
+     &                        d5_block_size * elem_size)
+      integer i_1
+      integer i_2
+      integer i_3
+      integer i_4
+      integer i_5
+      integer offset_1
+      integer offset_2
+      integer offset_3
+      integer offset_4
+      integer offset_5
+
+      offset_1  = d1_offset*elem_size
+      offset_2  = d2_offset*elem_size
+      offset_3  = d3_offset*elem_size
+      offset_4  = d4_offset*elem_size
+      offset_5  = d5_offset*elem_size
+      do i_5 = 1, d5_block_size * elem_size
+         do i_4 = 1, d4_block_size * elem_size
+            do i_3 = 1, d3_block_size * elem_size
+               do i_2 = 1, d2_block_size * elem_size
+                  do i_1 = 1, d1_block_size * elem_size
+                     accel_address (i_1, i_2, i_3, i_4, i_5)
+     &               =
+     &               host_address  (offset_1 + i_1,
+     &                              offset_2 + i_2,
+     &                              offset_3 + i_3,
+     &                              offset_4 + i_4,
+     &                              offset_5 + i_5)
+                  end do
+               end do
+            end do
+         end do
+      end do
+      end
+
+!>  Stub for copying memory from the hardware accelerator to a 5D array in
+!>  the host.
+
+      subroutine P4A_COPY_FROM_ACCEL_5D (elem_size, d1_size, d2_size,
+     &d3_size, d4_size, d5_size,
+     &d1_block_size, d2_block_size, d3_block_size, d4_block_size,
+     &d5_block_size,
+     &d1_offset, d2_offset, d3_offset, d4_offset, d5_offset,
+     &host_address, accel_address)
+
+      integer d1_size
+      integer d2_size
+      integer d3_size
+      integer d4_size
+      integer d5_size
+      integer elem_size
+      integer d1_block_size
+      integer d2_block_size
+      integer d3_block_size
+      integer d4_block_size
+      integer d5_block_size
+      integer d1_offset
+      integer d2_offset
+      integer d3_offset
+      integer d4_offset
+      integer d5_offset
+      character host_address(d1_size * elem_size,
+     &                       d2_size * elem_size,
+     &                       d3_size * elem_size,
+     &                       d4_size * elem_size,
+     &                       d5_size * elem_size)
+      character accel_address(d1_block_size * elem_size,
+     &                        d2_block_size * elem_size,
+     &                        d3_block_size * elem_size,
+     &                        d4_block_size * elem_size,
+     &                        d5_block_size * elem_size)
+      integer i_1
+      integer i_2
+      integer i_3
+      integer i_4
+      integer i_5
+      integer offset_1
+      integer offset_2
+      integer offset_3
+      integer offset_4
+      integer offset_5
+
+      offset_1  = d1_offset*elem_size
+      offset_2  = d2_offset*elem_size
+      offset_3  = d3_offset*elem_size
+      offset_4  = d4_offset*elem_size
+      offset_5  = d5_offset*elem_size
+      do i_5 = 1, d5_block_size * elem_size
+         do i_4 = 1, d4_block_size * elem_size
+            do i_3 = 1, d3_block_size * elem_size
+               do i_2 = 1, d2_block_size * elem_size
+                  do i_1 = 1, d1_block_size * elem_size
+                     host_address (offset_1 + i_1,
+     &                             offset_2 + i_2,
+     &                             offset_3 + i_3,
+     &                             offset_4 + i_4,
+     &                             offset_5 + i_5)
+     &               =
+     &               accel_address (i_1, i_2, i_3, i_4, i_5)
+                  end do
+               end do
+            end do
+         end do
+      end do
+      end
+
+!>  Stub for copying a 6D memory zone from the host to a compact memory
+!>  zone in the hardware accelerator.
+
+      subroutine P4A_COPY_TO_ACCEL_6D (elem_size, d1_size, d2_size,
+     &d3_size, d4_size, d5_size, d6_size,
+     &d1_block_size, d2_block_size, d3_block_size, d4_block_size,
+     &d5_block_size, d6_block_size,
+     &d1_offset, d2_offset, d3_offset, d4_offset, d5_offset, d6_offset,
+     &host_address, accel_address)
+
+      integer d1_size
+      integer d2_size
+      integer d3_size
+      integer d4_size
+      integer d5_size
+      integer d6_size
+      integer elem_size
+      integer d1_block_size
+      integer d2_block_size
+      integer d3_block_size
+      integer d4_block_size
+      integer d5_block_size
+      integer d6_block_size
+      integer d1_offset
+      integer d2_offset
+      integer d3_offset
+      integer d4_offset
+      integer d5_offset
+      integer d6_offset
+      character host_address(d1_size * elem_size,
+     &                       d2_size * elem_size,
+     &                       d3_size * elem_size,
+     &                       d4_size * elem_size,
+     &                       d5_size * elem_size,
+     &                       d6_size * elem_size)
+      character accel_address(d1_block_size * elem_size,
+     &                        d2_block_size * elem_size,
+     &                        d3_block_size * elem_size,
+     &                        d4_block_size * elem_size,
+     &                        d5_block_size * elem_size,
+     &                        d6_block_size * elem_size)
+      integer i_1
+      integer i_2
+      integer i_3
+      integer i_4
+      integer i_5
+      integer i_6
+      integer offset_1
+      integer offset_2
+      integer offset_3
+      integer offset_4
+      integer offset_5
+      integer offset_6
+
+      offset_1  = d1_offset*elem_size
+      offset_2  = d2_offset*elem_size
+      offset_3  = d3_offset*elem_size
+      offset_4  = d4_offset*elem_size
+      offset_5  = d5_offset*elem_size
+      offset_6  = d6_offset*elem_size
+      do i_6 = 1, d6_block_size * elem_size
+         do i_5 = 1, d5_block_size * elem_size
+            do i_4 = 1, d4_block_size * elem_size
+               do i_3 = 1, d3_block_size * elem_size
+                  do i_2 = 1, d2_block_size * elem_size
+                     do i_1 = 1, d1_block_size * elem_size
+                        accel_address (i_1, i_2, i_3, i_4, i_5, i_6)
+     &                  =
+     &                  host_address  (offset_1 + i_1,
+     &                                 offset_2 + i_2,
+     &                                 offset_3 + i_3,
+     &                                 offset_4 + i_4,
+     &                                 offset_5 + i_5,
+     &                                 offset_6 + i_6)
+                     end do
+                  end do
+               end do
+            end do
+         end do
+      end do
+      end
+
+!>  Stub for copying memory from the hardware accelerator to a 6D array in
+!>  the host.
+
+      subroutine P4A_COPY_FROM_ACCEL_6D (elem_size, d1_size, d2_size,
+     &d3_size, d4_size, d5_size, d6_size,
+     &d1_block_size, d2_block_size, d3_block_size, d4_block_size,
+     &d5_block_size, d6_block_size,
+     &d1_offset, d2_offset, d3_offset, d4_offset, d5_offset, d6_offset,
+     &host_address, accel_address)
+
+      integer d1_size
+      integer d2_size
+      integer d3_size
+      integer d4_size
+      integer d5_size
+      integer d6_size
+      integer elem_size
+      integer d1_block_size
+      integer d2_block_size
+      integer d3_block_size
+      integer d4_block_size
+      integer d5_block_size
+      integer d6_block_size
+      integer d1_offset
+      integer d2_offset
+      integer d3_offset
+      integer d4_offset
+      integer d5_offset
+      integer d6_offset
+      character host_address(d1_size * elem_size,
+     &                       d2_size * elem_size,
+     &                       d3_size * elem_size,
+     &                       d4_size * elem_size,
+     &                       d5_size * elem_size,
+     &                       d6_size * elem_size)
+      character accel_address(d1_block_size * elem_size,
+     &                        d2_block_size * elem_size,
+     &                        d3_block_size * elem_size,
+     &                        d4_block_size * elem_size,
+     &                        d5_block_size * elem_size,
+     &                        d6_block_size * elem_size)
+      integer i_1
+      integer i_2
+      integer i_3
+      integer i_4
+      integer i_5
+      integer i_6
+      integer offset_1
+      integer offset_2
+      integer offset_3
+      integer offset_4
+      integer offset_5
+      integer offset_6
+
+      offset_1  = d1_offset*elem_size
+      offset_2  = d2_offset*elem_size
+      offset_3  = d3_offset*elem_size
+      offset_4  = d4_offset*elem_size
+      offset_5  = d5_offset*elem_size
+      offset_6  = d6_offset*elem_size
+      do i_6 = 1, d6_block_size * elem_size
+         do i_5 = 1, d5_block_size * elem_size
+            do i_4 = 1, d4_block_size * elem_size
+               do i_3 = 1, d3_block_size * elem_size
+                  do i_2 = 1, d2_block_size * elem_size
+                     do i_1 = 1, d1_block_size * elem_size
+                        host_address (offset_1 + i_1,
+     &                                offset_2 + i_2,
+     &                                offset_3 + i_3,
+     &                                offset_4 + i_4,
+     &                                offset_5 + i_5,
+     &                                offset_6 + i_6)
+     &                  =
+     &                  accel_address (i_1, i_2, i_3, i_4, i_5, i_6)
+                     end do
+                  end do
+               end do
+            end do
+         end do
+      end do
+      end
+
 !>  Stub for allocating memory on the hardware accelerator.
 !>
 !>  @param[out] address is the address of a variable that is updated by
