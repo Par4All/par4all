@@ -1,6 +1,6 @@
 TARGET = upscale
 CFILES = upscale-p4a.c yuv.c
-KERNELFILES = luminance1_wrapper.c  luminance2_wrapper.c  chrominance_wrapper.c 
+KERNELFILES = luminance1_wrapper.c  chrominance_wrapper.c 
 
 P4A_ACCEL_DIR = ../../..
 include $(P4A_ACCEL_DIR)/p4a_accel.mk
