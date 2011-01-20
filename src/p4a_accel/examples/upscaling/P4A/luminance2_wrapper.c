@@ -2,7 +2,7 @@
 
 #define WIDTH 400
 #define HEIGHT 226
-#define OFFSET 2
+#define OFFSET 3
 
 #define SIZE WIDTH*HEIGHT
 
@@ -53,6 +53,60 @@ uint8 interpolation_luminance2(uint8 *y,int im2,int im1,int i,int ip1,int ip2,in
 
 P4A_accel_kernel_wrapper upscale_luminance_xplus1yplus1(P4A_accel_global_address uint8 *y_fout)
 {
+  const int offset_max = WIDTH-OFFSET-1;
+  
+  for(int y=0;y<HEIGHT;y++){
+    
+    int Wy = W_Y_OUT*(2*y+1);
+    
+    //for(int x=0;x < 2*OFFSET; x += 2) {
+    for(int x=0;x < OFFSET; x++) {
+      int indice = 2*x+Wy;
+      y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,Wy,Wy,indice,indice+2,indice+4,indice+6);
+    }
+    
+    //for(int x=2*OFFSET;x <= offset_max-2;x=x+2) {
+    for(int x=OFFSET;x < offset_max;x++) {
+      int indice = 2*x+Wy;
+      y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,indice+2,indice+4,indice+6);
+    }
+
+  /*
+  //const int offset_max = W_Y_OUT-2*OFFSET-2;
+  const int offset_max = WIDTH-OFFSET-1;
+
+  for(int y=0;y<HEIGHT;y++){
+
+    int Wy = W_Y_OUT*(2*y+1);
+
+    //for(int x=0;x < 2*OFFSET; x += 2) {
+    for(int x=0;x < OFFSET; x++) {
+      int indice = 2*x+Wy;
+      y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,Wy,Wy,indice,indice+2,indice+4,indice+6);
+    }
+
+    //for(int x=2*OFFSET;x <= offset_max-2;x=x+2) {
+    for(int x=OFFSET;x < offset_max;x++) {
+      int indice = 2*x+Wy;
+      y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,indice+2,indice+4,indice+6);
+    }
+  */
+
+    int lim = W_Y_OUT-2+W_Y_OUT*(2*y+1);
+    int x = offset_max;
+    int indice = 2*x+Wy;
+    y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,indice+2,indice+4,lim);
+
+    x = offset_max+1;
+    indice = 2*x+Wy;
+    y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,indice+2,lim,lim);
+
+    x = offset_max+2;
+    indice = 2*x+Wy;
+    y_fout[Wy+2*x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,lim,lim,lim);
+  }
+
+  /*
   const int offset_max = W_Y_OUT-2*OFFSET-2;
 
   for(int y=0;y<H_Y_OUT;y=y+2){
@@ -82,6 +136,7 @@ P4A_accel_kernel_wrapper upscale_luminance_xplus1yplus1(P4A_accel_global_address
     indice = x+Wy;
     y_fout[Wy+x+1]=interpolation_luminance2(y_fout,indice-4,indice-2,indice,lim,lim,lim);
   }
+  */
 }
 
 

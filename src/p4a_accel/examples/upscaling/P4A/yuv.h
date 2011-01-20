@@ -3,7 +3,7 @@
 
 #define WIDTH 400
 #define HEIGHT 226
-#define OFFSET 2
+#define OFFSET 3
 
 #define SIZE WIDTH*HEIGHT
 
