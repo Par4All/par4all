@@ -134,30 +134,6 @@ void upscale_luminance(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out
   upscale_luminance_xplus1yplus1(frame_out->y,W,H);  
 }
 
-/*
-void copy_luminance(type_yuv_frame_in *frame_in,type_yuv_frame_in *frame_out)
-{
-  int i,j;
-  for (j = 0;j < HEIGHT;j++) {
-    for (i = 0;i < WIDTH;i++) {
-      frame_out->y[j*WIDTH+i] = frame_in->y[j*WIDTH+i];
-    }
-  }
-}
-
-void copy_chrominance(type_yuv_frame_in *frame_in,type_yuv_frame_in *frame_out)
-{
-  int i,j;
-
-  for (j = 0;j < HEIGHT/2;j++) {
-    for (i = 0;i < WIDTH/2;i++) {
-      frame_out->u[j*WIDTH/2+i]=frame_in->u[j*WIDTH/2+i];
-      frame_out->v[j*WIDTH/2+i]=frame_in->v[j*WIDTH/2+i];
-    }
-  }
-}
-*/
-
 void upscale(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out)
 {
   upscale_luminance(frame_in,frame_out);

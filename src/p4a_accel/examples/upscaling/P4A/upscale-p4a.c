@@ -3,7 +3,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "yuv.h"
-#include "upscale.h"
+//#include "upscale.h"
+
+// Prototypes for the two kernels 
+P4A_wrapper_proto(upscale_luminance_centre,P4A_accel_global_address uint8 *y_fin,P4A_accel_global_address uint8 *y_fout);
+P4A_wrapper_proto(upscale_luminance_xplus1yplus1,P4A_accel_global_address uint8 *y_fout);
+P4A_wrapper_proto(upscale_chrominance,P4A_accel_global_address type_yuv_frame_in *frame_in,P4A_accel_global_address type_yuv_frame_out *frame_out);
+
+
+void upscale(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out)
+{
+  upscale_luminance_centre(frame_in->y,frame_out->y);
+  upscale_luminance_xplus1yplus1(frame_out->y);
+  upscale_chrominance(frame_in,frame_out);
+}
+
 
 /* réalise le processing de la video */
 /* fpin: fichier d'entrée */
@@ -34,6 +48,7 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
   printf("Begin computation\n");
   // Computation ... no dependance
   for(int i=0;i<nbframes;i++) { 
+    P4A_accel_timer_start;
     P4A_copy_to_accel(sizeof(type_yuv_frame_in),&frame_in[i],p4a_in);
     //upscale(&frame_in[i],&frame_out[i]);
     upscale(p4a_in,p4a_out);

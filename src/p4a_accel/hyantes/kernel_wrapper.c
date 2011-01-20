@@ -42,7 +42,6 @@ P4A_accel_kernel kernel_hyantes(data_t xmin, data_t ymin, data_t step,data_t ran
     if( tmp < range )
       pt[i][j].stock += t[k].stock  / (1 + tmp) ;
   }
-  
 }
 
 P4A_accel_kernel_wrapper kernel_wrapper(data_t xmin, data_t ymin, data_t step,data_t range, P4A_accel_global_address town pt[rangex][rangey], P4A_accel_global_address town t[nb])
