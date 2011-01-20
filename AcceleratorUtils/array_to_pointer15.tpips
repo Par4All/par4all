@@ -22,7 +22,8 @@ echo
 
 apply UNSPLIT
 shell cc $WS.c -o  $WS.database/Tmp/ref
-shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+# note the trick to make sure alloca doesnot disturb us on some configuration
+shell cc -Dalloca=malloc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
 shell ./$WS.database/Tmp/ref 100 > ./$WS.database/Tmp/ref-out
 shell ./$WS.database/Tmp/out 100 > ./$WS.database/Tmp/out-out
 shell cmp ./$WS.database/Tmp/ref-out ./$WS.database/Tmp/out-out
