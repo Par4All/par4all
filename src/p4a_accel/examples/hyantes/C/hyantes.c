@@ -1,4 +1,14 @@
-/* For more information about this application excerpt, look at:
+/** @addtogroup Examples
+
+    @{
+
+*/
+
+/** @defgroup Hyantes
+
+    @{
+
+   For more information about this application excerpt, look at:
 
    http://hyantes.gforge.inria.fr
 
@@ -13,6 +23,21 @@
    a C library that takes sets of geographic data as inputs and computes a
    smoothed representation of this data taking account of neighbourhood's
    influence.
+
+    "mailto:Serge.Guelton@telecom-bretagne.eu"
+*/
+
+/** @defgroup CHyantes Classic C version
+
+    @{
+    An original C version of Hyantes.
+*/
+
+/** @defgroup mainHyantes The main functions.
+
+    @{
+    Read the input data and write the ouput image.
+    Call to the main.
 */
 
 #include <stdio.h>
@@ -48,6 +73,8 @@ typedef struct {
     town *data;
 } towns;
 
+/** Reads the data
+ */
 towns read_towns(const char fname[])
 {
     FILE * fd = fopen(fname,"r");
@@ -138,3 +165,8 @@ int main(int argc, char * argv[])
     }
     return 0;
 }
+
+/** @} */
+/** @} */
+/** @} */
+/** @} */

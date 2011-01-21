@@ -1,3 +1,14 @@
+/** @addtogroup P4AUpscaling P4A version
+
+    @{
+*/
+
+/** @defgroup ChrUpscaling Luminance upscaling.
+
+    @{
+    Kernel to upscale the chrominance of a frame.
+*/
+
 #include "p4a_accel_wrapper.h"
 
 //typedef unsigned char uchar;
@@ -50,12 +61,12 @@ P4A_accel_kernel void upscale_chrominance(P4A_accel_global_address uchar u_fin[S
   int jj = W_UV_OUT*j*2;
   int ll = W_UV_IN*j;
   
-  // première ligne de frame_out
+  // First line of frame_out
   int indice  = ll+i;
   u_fout[jj+2*i] = u_fout[jj+2*i+1] = u_fin[indice];
   v_fout[jj+2*i] = v_fout[jj+2*i+1] = v_fin[indice];
  
-  // deuxième ligne de frame_out
+  // Second line of frame_out
   jj += W_UV_OUT;
   u_fout[jj+2*i] = u_fout[jj+2*i+1] = u_fin[indice];
   v_fout[jj+2*i] = v_fout[jj+2*i+1] = v_fin[indice];
@@ -70,3 +81,6 @@ P4A_accel_kernel_wrapper chrominance_wrapper(P4A_accel_global_address type_yuv_f
     upscale_chrominance(frame_in->u,frame_out->u,frame_in->v,frame_out->v,i,j);
 }
 
+
+/** @} */
+/** @} */

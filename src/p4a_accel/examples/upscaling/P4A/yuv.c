@@ -1,3 +1,14 @@
+/** @addtogroup P4AUpscaling P4A version
+
+    @{
+*/
+
+/** @defgroup yuvUpscaling Read and Write.
+
+    @{
+    Functions to manipulate the video (read an write).
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include "yuv.h"
@@ -97,3 +108,6 @@ int write_yuv_frame(FILE* fp,type_yuv_frame_out *frame)
   }
   return 0;
 }
+
+/** @} */
+/** @} */

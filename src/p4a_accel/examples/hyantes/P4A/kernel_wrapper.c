@@ -1,3 +1,14 @@
+/** @addtogroup P4AHyantes P4A version.
+
+    @{
+*/
+
+/** @defgroup kernelHyantes The kernel of Hyantes
+
+    @{
+    The kernel of Hyantes invoked by P4A.
+*/
+
 #include "p4a_accel_wrapper.h"
 #define rangex 290
 #define rangey 299
@@ -52,3 +63,6 @@ P4A_accel_kernel_wrapper kernel_wrapper(data_t xmin, data_t ymin, data_t step,da
   if (i < rangex && j < rangey)
     kernel_hyantes(xmin,ymin,step,range,pt,t,i,j);
 }
+
+/** @} */
+/** @} */

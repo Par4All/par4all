@@ -1,3 +1,29 @@
+/** @defgroup Examples
+
+    @{
+
+*/
+
+/** @defgroup Jacobi
+
+    @{
+    "mailto:Ronan.Keryell@hpc-project.com"
+*/
+
+/** @defgroup CJacobi Classic C version
+
+    @{
+    An original C version of Jacobi, adapted from Terapix PIPS output.
+    This is a FREIA (French ANR) example.
+*/
+
+/** @defgroup mainJacobi The main functions.
+
+    @{
+    Read the input image and write the ouput image.
+    Call to the main.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 typedef float float_t;
@@ -121,3 +147,8 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
+/** @} */
+/** @} */
+/** @} */
+/** @} */

@@ -1,18 +1,26 @@
-/* For more information about this application excerpt, look at:
+/** @addtogroup Examples
 
-   http://hyantes.gforge.inria.fr
+    @{
 
-   Hyantes is a library to compute neighbourhood population potential with
-   scale control. It is developed by the Mescal team from the Laboratoire
-   Informatique de Grenoble, as a part of Hypercarte project. The
-   Hypercarte project aims to develop new methods for the cartographic
-   representation of human distributions (population density, population
-   increase, etc.) with various smoothing functions and opportunities for
-   time-scale animations of maps. Hyantes provides one of the smoothing
-   methods related to multiscalar neighbourhood density estimation. It is
-   a C library that takes sets of geographic data as inputs and computes a
-   smoothed representation of this data taking account of neighbourhood's
-   influence.
+*/
+
+/** @addtogroup Hyantes
+
+    @{
+
+*/
+
+/** @defgroup P4AHyantes P4A version.
+
+    @{
+    A P4A version of Hyantes.
+*/
+
+/** @defgroup mainHyantes The main functions.
+
+    @{
+    Read the input data and write the ouput image.
+    Call to the main.
 */
 
 #include <p4a_accel.h>
@@ -162,3 +170,8 @@ int main(int argc, char * argv[])
   P4A_release_accel;
   return 0;
 }
+
+/** @} */
+/** @} */
+/** @} */
+/** @} */

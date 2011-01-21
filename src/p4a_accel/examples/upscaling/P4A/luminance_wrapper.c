@@ -1,6 +1,15 @@
-#include "p4a_accel_wrapper.h"
+/** @addtogroup P4AUpscaling P4A version
 
-//typedef unsigned char uchar;
+    @{
+*/
+
+/** @defgroup LUpscaling Luminance upscaling.
+
+    @{
+    Kernel to upscale the luminance of a frame.
+*/
+
+#include "p4a_accel_wrapper.h"
 
 #ifdef P4A_ACCEL_OPENMP
 typedef unsigned char uchar;
@@ -101,3 +110,6 @@ P4A_accel_kernel_wrapper luminance_wrapper(P4A_accel_global_address type_yuv_fra
     upscale_luminance_centre(frame_in->y,frame_out->y,x,y);
 }
 
+
+/** @} */
+/** @} */

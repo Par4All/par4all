@@ -1,12 +1,7 @@
 /** @file 
 */
 
-/** @defgroup Examples
-
-    @{
-*/
-
-/** @addtogroup Jacobi
+/** @addtogroup P4AJacobi
 
     @{
 */
@@ -36,6 +31,5 @@ P4A_accel_kernel_wrapper kernel2_wrapper(P4A_accel_global_address float_t space[
 }
 
 
-/** @} */
 /** @} */
 /** @} */

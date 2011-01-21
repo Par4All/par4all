@@ -1,12 +1,41 @@
+/** @defgroup Examples
+
+    @{
+
+*/
+
+/** @defgroup Upscaling
+
+    @{
+    A two folds upscaling function. The video format is YUV.
+
+    This was developped and tested in the framework of the transmedi@ project.
+
+    "mailto:Stephanie.Even@enstb.org"
+*/
+
+/** @defgroup CUpscaling Classic C version
+
+    @{
+    An original C version of the upscaling.
+*/
+
+/** @defgroup mainUpscaling The main.
+
+    @{
+    Call to the main and video processing functions.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "yuv.h"
 #include "upscale.h"
 
-/* réalise le processing de la video */
-/* fpin: fichier d'entrée */
-/* fpout: fichier de sortie */
-/* nbframes: nombre de frames dans la video  */
+/* Realize the processing of the video */
+/* fpin: input file */
+/* fpout: output file */
+/* nbframes: number of frames in the video  */
+
 void video_processing(FILE* fpin,FILE* fpout,int nbframes)
 {
   type_yuv_frame_in frame_in[nbframes];
@@ -66,3 +95,8 @@ int main ( int argc, char *argv[] )
 
   return EXIT_SUCCESS;
 }
+
+/** @} */
+/** @} */
+/** @} */
+/** @} */

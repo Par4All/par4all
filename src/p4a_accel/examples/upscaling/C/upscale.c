@@ -1,3 +1,16 @@
+/** @addtogroup CUpscaling Classic C version
+
+    @{
+*/
+
+/** @defgroup FUpscaling Upscaling functions.
+
+    @{
+    Functions to upscale the video.
+    Chrominances are just copied.
+    The Luminance is interpolated with an interpolation function at 6 points.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,9 +19,9 @@
 #include "yuv.h"
 #include "upscale.h"
 
-/* fonction d'upcaling au demi pixel */
-/* frame_in: frame initiale */
-/* frame_out: frame upscalée */
+/* Upscaling at the half-pixel */
+/* frame_in: input frame  */
+/* frame_out: output frame */
 const short normalisation=5;
 const short bias=16;
 
@@ -141,3 +154,5 @@ void upscale(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out)
 }
 
 
+/** @} */
+/** @} */

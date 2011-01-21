@@ -4,17 +4,22 @@
     
 */
 
-/** @defgroup Examples
+/** @addtogroup Examples
 
     @{
-
-    Jacobi-p4a, Adapted from Terapix PIPS output.
-    This is a FREIA (French ANR) example.
 */
 
-/** @defgroup Jacobi
+/** @addtogroup Jacobi
 
     @{
+*/
+
+/** @defgroup P4AJacobi P4A version
+
+    @{
+
+    P4A version of Jacobi, adapted from Terapix PIPS output.
+    This is a FREIA (French ANR) example.
 */
 
 /** @defgroup mainJacobi The main functions.
@@ -211,6 +216,7 @@ int main(int argc, char *argv[]) {
   P4A_release_accel;
   return 0;
 }
+/** @} */
 /** @} */
 /** @} */
 /** @} */

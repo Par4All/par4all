@@ -1,3 +1,19 @@
+/** @addtogroup Upscaling
+
+    @{
+*/
+
+/** @defgroup P4AUpscaling P4A version
+
+    @{
+    The P4A version for upscaling a video.
+*/
+
+/** @defgroup mainUpscaling The main.
+
+    @{
+    Call to the main and video processing functions.
+*/
 #include <p4a_accel.h>
 
 #include <stdio.h>
@@ -102,3 +118,7 @@ int main ( int argc, char *argv[] )
 
   return EXIT_SUCCESS;
 }
+
+/** @} */
+/** @} */
+/** @} */
