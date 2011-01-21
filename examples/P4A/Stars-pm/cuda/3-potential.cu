@@ -37,6 +37,26 @@ __global__ void k_complex2Real(cufftComplex *field, cufftReal *rfield) {
       + tx]);
 }
 
+__global__ void k_complex2Real_correctionPot(cufftComplex *field, cufftReal *rfield, float coeff) {
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
+  int tx = threadIdx.x;
+  float r = cuCrealf(field[bx * NP * NP + by * NP + tx]);
+  rfield[bx * NP * NP + by * NP + tx] = (float)(r) * coeff / (DX * DX * DX);
+}
+
+
+__global__ void k_correction_pot(float *pot, float coeff) {
+  int tx = threadIdx.x;
+  int bx = blockIdx.x;
+  int by = blockIdx.y;
+
+  int cellCoord = bx * NP * NP + by * NP + tx;
+
+  pot[cellCoord] = (float)(pot[cellCoord]) * coeff / (DX * DX * DX);
+}
+
+
 __global__ void k_fft_laplacian7(cufftComplex *field) {
   int i = blockIdx.x;
   int j = blockIdx.y;
@@ -87,16 +107,6 @@ __global__ void k_fft_laplacian7(cufftComplex *field) {
       *DX / k2 / NP / NP / NP); // FFT NORMALISATION
 }
 
-__global__ void k_correction_pot(float *pot, float coeff) {
-  int tx = threadIdx.x;
-  int bx = blockIdx.x;
-  int by = blockIdx.y;
-
-  int cellCoord = bx * NP * NP + by * NP + tx;
-
-  pot[cellCoord] = (float)(pot[cellCoord]) * coeff / (DX * DX * DX);
-}
-
 static cufftHandle plan = NULL;
 cufftComplex *cdens = NULL;
 
@@ -137,9 +147,11 @@ void potential(int histo[NP][NP][NP],
                (cufftComplex *)cdens,
                CUFFT_INVERSE);
 
+  P4A_launch_kernel(dimGridC2R,dimBlockC2R,k_complex2Real_correctionPot,(cufftComplex *)cdens,(float *)dens, mp[0][0][0]);
+/*
+  Fused is 2 times faster
   P4A_launch_kernel(dimGridC2R,dimBlockC2R,k_complex2Real,(cufftComplex *)cdens,(float *)dens);
-
   P4A_launch_kernel(dimGridC2R,dimBlockC2R,k_correction_pot, (float *)dens, mp[0][0][0]);
-
+*/
 }
 
