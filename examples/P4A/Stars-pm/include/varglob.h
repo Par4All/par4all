@@ -12,11 +12,8 @@
 #define TMAX 7.5
 #define DX (LBOX/NP)
 #define DT (5*1e-2)
+#define NPBLOCK 128
 #define BLOCK_SIZE 2
-#define NPBLOCK (NP)
-#define NTHREAD 256
-#define NDATA_PER_THREAD 1
-#define MAXDIMZ 32
 #define MODT 1000
 #define MODDISP 4
 #define CUERR() printf("\n %s \n",cudaGetErrorString(cudaGetLastError()))
