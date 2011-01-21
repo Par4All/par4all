@@ -18,7 +18,7 @@ void updatevel(coord vel[NP][NP][NP],
                int data[NP][NP][NP],
                int coord,
                float dt) {
-  dim3 dimGriddata(NP/NPBLOCK);
+  dim3 dimGriddata(NPART/NPBLOCK);
   dim3 dimBlockdata(NPBLOCK);
   P4A_launch_kernel(dimGriddata,dimBlockdata,k_updatevel,(float *)vel, (float *)force, (int *)data, coord, dt);
 }
