@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "stars-pm-cuda.h"
 
@@ -69,6 +70,7 @@ int main(int argc, char **argv) {
 
 #ifdef _GLGRAPHICS_
       graphic_gldraw(argc, argv, pos); // Initialize Opengl
+      graphic_glupdate(pos);
 #endif
 
 
@@ -116,11 +118,11 @@ int main(int argc, char **argv) {
     dt = DT;
 
 #ifdef _GLGRAPHICS_
-    cudaMemcpy(posd, pos, sizeof(coord) * NPART, cudaMemcpyDeviceToHost);
+    cudaMemcpy(pos, posd, sizeof(coord) * NPART, cudaMemcpyDeviceToHost);
     graphic_glupdate(pos);
 #endif
 #ifdef _DUMPPOS_
-    cudaMemcpy(posd, pos, sizeof(coord) * NPART, cudaMemcpyDeviceToHost);
+    cudaMemcpy(pos, posd, sizeof(coord) * NPART, cudaMemcpyDeviceToHost);
     dump_pos(pos,npdt);
 #endif
 
