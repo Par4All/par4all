@@ -117,6 +117,7 @@ clean :
 				 $(TARGET:=.p4a.cu) $(STUBS:.c=.p4a.cu) \
 				 $(COMMON_SOURCES:.c=.p4a.c)  $(BASE_SOURCES:.c=.p4a.c) $(GRAPHICS:.c=.p4a.c) \
 				 $(COMMON_SOURCES:.c=.p4a.cu) $(BASE_SOURCES:.c=.p4a.cu) $(GRAPHICS:.c=.p4a.cu) \
+				 $(CPROTO_GRAPHICS_SRC:.c=.o) \
 				  *~ *.database *.build *.o include/stars-pm-generated*.h
 
 run-%: $(TARGET)_%
@@ -128,32 +129,33 @@ run-%: $(TARGET)_%
 # To have shortcut as seq for of typing hyantes-static-99_seq
 %:$(TARGET)_% ;
 
-%_seq : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h
+%_seq : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	# Compilation of the sequential program:
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 
-%_openmp : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h $(STUBS)
+%_openmp : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build an OpenMP version:
 	p4a $(P4A_OPTIONS) $(CPPFLAGS)  -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 	# P4A openmp end !
 
-%_autocuda : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h $(STUBS)
+%_autocuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
-%_autocuda_comm_optimization : $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h $(STUBS)
+%_autocuda_comm_optimization : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 
-%_cuda : $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS) include/stars-pm-generated_$(SIZE).h
+%_cuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 	# Parallelize and build a CUDA version:
 	$(NVCC) $(CPPFLAGS) $(LDFLAGS) -lcufft $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 
 	
-include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
+include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC)
 	@echo "Generating headers $@" 
 	echo >$@
+	rm -f include/stars-pm-generated_* common/*.o *.o
 	cproto  `pkg-config --cflags-only-I gtk+-2.0` $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC) $(CPPFLAGS) $(GRAPHICS_CPPFLAGS) -I./include/ > $@
 	
 	  
