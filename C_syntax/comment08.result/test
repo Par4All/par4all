@@ -1,0 +1,17 @@
+
+Initial source code
+
+int comment08()
+{
+   int x[512];
+   int i;
+   int j;
+
+   for (i = 0;i<500;i += 128)
+      /*, j = 0*//*, j++*/
+      x[i] = 0;
+   
+   //printf("%d, %d\n", i, j);
+   
+   return 0;
+}
