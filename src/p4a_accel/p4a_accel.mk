@@ -69,7 +69,7 @@ $(EXECUTABLE-CU): $(OBJCUFILES)
 
 # rule to compile OpenCL source files:
 $(EXECUTABLE-CL): $(CFILES) $(CLFILES)
-	$(CC) $(CLFLAGS) -o $@ $(CFILES) $(CLLIBS) $(LDFLAGS)
+	$(CC) $(CLFLAGS) -o $@ $(CFILES) $(CLLIBS) $(LDFLAGS) $(LDLIBS) 
 
 clean::
 	rm -f $(EXECUTABLES) *.o $(CUFILES) $(CLFILES) *~ ./p4a_accel.c $(DUMMYFILE)
