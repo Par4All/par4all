@@ -21,7 +21,7 @@
 typedef float float_t;
 #define SIZE 501
 
-P4A_accel_kernel kernel2(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE], int i, int j)
+P4A_accel_kernel void kernel2(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE], int i, int j)
 {
    space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }

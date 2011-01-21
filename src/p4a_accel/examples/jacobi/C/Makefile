@@ -1,6 +1,5 @@
 # Add source files here
 TARGET = jacobi 
-#EXECUTABLE = jacobi 
 CFILES = jacobi.c
 CFLAGS = -std=c99
 
@@ -13,3 +12,5 @@ run: $(TARGET)
 display:
 	gimp output.pgm
 
+clean:
+	rm $(TARGET) output.pgm

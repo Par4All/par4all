@@ -15,8 +15,6 @@
    influence.
 */
 
-#include <p4a_accel.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -24,7 +22,10 @@
 #define rangex 290
 #define rangey 299
 #define nb 2878
+
+#ifndef M_PI
 #define M_PI 3.14
+#endif
 
 #ifdef USE_FLOAT
 typedef float data_t;
@@ -46,10 +47,6 @@ typedef struct {
     size_t n;
     town *data;
 } towns;
-
-
-// Prototypes for the two kernels of jacobi
-P4A_wrapper_proto(kernel_wrapper,data_t xmin, data_t ymin, data_t step,data_t range, P4A_accel_global_address town pt[rangex][rangey], P4A_accel_global_address town t[nb]);
 
 towns read_towns(const char fname[])
 {
@@ -86,23 +83,32 @@ towns read_towns(const char fname[])
     the_towns.data=(town *) realloc(the_towns.data,curr*sizeof(town));
     the_towns.n=curr;
     fprintf(stderr,"parsed %zu towns\n",curr);
+    /*
+    for(curr=0;curr<the_towns.nb;curr++)
+        fprintf(stderr,OUTPUT_FORMAT,the_towns.data[curr][0],the_towns.data[curr][1],the_towns.data[curr][2]);
+    */
     return the_towns;
-}
-
-
-void launch_kernel(data_t xmin, data_t ymin, data_t step,data_t range, town pt[rangex][rangey], town t[nb]) 
-{
-  //P4A_call_accel_kernel_2d(kernel_wrapper, rangex, rangey, xmin,ymin,step,range,pt,t);
-  P4A_call_accel_kernel_2d(kernel_wrapper, rangex, rangey, xmin,ymin,step,range,pt,t);
 }
 
 
 void run(data_t xmin, data_t ymin, data_t step,data_t range, town pt[rangex][rangey], town t[nb])
 {
+    size_t i,j,k;
+
     fprintf(stderr,"begin computation ...\n");
 
-    launch_kernel(xmin,ymin,step,range,pt,t);
-
+    for(i=0;i<rangex;i++)
+        for(j=0;j<rangey;j++) {
+            pt[i][j].latitude =(xmin+step*i)*180/M_PI;
+            pt[i][j].longitude =(ymin+step*j)*180/M_PI;
+            pt[i][j].stock =0.;
+            for(k=0;k<nb;k++) {
+                data_t tmp =
+                    6368.* acos(cos(xmin+step*i)*cos( t[k].latitude ) * cos((ymin+step*j)-t[k].longitude) + sin(xmin+step*i)*sin(t[k].latitude));
+                if( tmp < range )
+                    pt[i][j].stock += t[k].stock  / (1 + tmp) ;
+            }
+        }
     fprintf(stderr,"end computation ...\n");
 }
 
@@ -119,47 +125,16 @@ void display(town pt[rangex][rangey])
 
 int main(int argc, char * argv[])
 {
-  P4A_init_accel;
-  if(argc != 6) return 1;
-  {
-    town pt[rangex][rangey];
-    towns t = read_towns(argv[1]);
-    data_t xmin = atof(argv[2])*M_PI/180.,
-      ymin =atof(argv[3])*M_PI/180.,
-      step=atof(argv[4])*M_PI/180.,
-      range=atof(argv[5]);
-    
-
-    P4A_accel_timer_start;
-    town (*p4a_pt)[rangex][rangey];
-    P4A_accel_malloc((void **) &p4a_pt, sizeof(pt));
-    //P4A_copy_to_accel(sizeof(pt), pt, p4a_pt);
-    
-
-    town (*p4a_t)[nb];
-    P4A_accel_malloc((void **) &p4a_t, nb*sizeof(town));
-    P4A_copy_to_accel(nb*sizeof(town), t.data, p4a_t);
-    
-    double copy_time = P4A_accel_timer_stop_and_float_measure();
-
-    P4A_accel_timer_start;
-    run(xmin,ymin,step,range, *p4a_pt, *p4a_t);
-    
-    double execution_time = P4A_accel_timer_stop_and_float_measure();
-    fprintf(stderr, "Time of execution : %f s\n", execution_time);
-    fprintf(stderr, "GFLOPS : %f\n",
-	    4e-9/execution_time*(rangex)*(rangey));
-    
-    P4A_accel_timer_start;
-    P4A_copy_from_accel((size_t)sizeof(pt), (void *)pt, (void *)p4a_pt);
-    copy_time += P4A_accel_timer_stop_and_float_measure();
-    fprintf(stderr, "Time of copy : %f s\n", copy_time);
-
-    P4A_accel_free(p4a_pt);
-    P4A_accel_free(p4a_t);
-
-    display(pt);
-  }
-  P4A_release_accel;
-  return 0;
+    if(argc != 6) return 1;
+    {
+	town pt[rangex][rangey];
+        towns t = read_towns(argv[1]);
+        data_t xmin = atof(argv[2])*M_PI/180.,
+               ymin =atof(argv[3])*M_PI/180.,
+               step=atof(argv[4])*M_PI/180.,
+               range=atof(argv[5]);
+        run(xmin,ymin,step,range, pt, t.data);
+        display(pt);
+    }
+    return 0;
 }

@@ -92,7 +92,6 @@ towns read_towns(const char fname[])
 
 void launch_kernel(data_t xmin, data_t ymin, data_t step,data_t range, town pt[rangex][rangey], town t[nb]) 
 {
-  //P4A_call_accel_kernel_2d(kernel_wrapper, rangex, rangey, xmin,ymin,step,range,pt,t);
   P4A_call_accel_kernel_2d(kernel_wrapper, rangex, rangey, xmin,ymin,step,range,pt,t);
 }
 

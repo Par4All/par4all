@@ -23,11 +23,19 @@
 
 /** A declaration attribute of a hardware-accelerated kernel in CUDA
     called from the GPU it-self
+
+    This is the return type of the kernel.
+    The type is here undefined and must be locally defined.
 */
-#define P4A_accel_kernel __device__ void
+#define P4A_accel_kernel __device__ 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
-    the host in CUDA */
+    the host in CUDA.
+
+    This is the return type of the kernel wrapper.
+    It must be a void function.
+    Type used in the protoizer.
+*/
 #define P4A_accel_kernel_wrapper __global__ void
 
 /** The address space visible for all functions. 

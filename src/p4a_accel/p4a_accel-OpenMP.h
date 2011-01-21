@@ -249,15 +249,17 @@ struct timeval p4a_time_end;
     @param ... the following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
-  P4A_skip_debug(P4A_dump_location();)					\
-  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_1d(%d) of \"%s\"\n", P4A_n_iter_0, #kernel);)	\
-  _Pragma("omp parallel for")						\
-  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
-    P4A_vp_0 = P4A_index_0;						\
-    P4A_vp_1 = 0;							\
-    P4A_vp_2 = 0;							\
-    kernel(__VA_ARGS__);						\
-  }
+  do {									\
+    P4A_skip_debug(P4A_dump_location();)				\
+      P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_1d(%d) of \"%s\"\n", P4A_n_iter_0, #kernel);) \
+      _Pragma("omp parallel for")					\
+      for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
+	P4A_vp_0 = P4A_index_0;						\
+	P4A_vp_1 = 0;							\
+	P4A_vp_2 = 0;							\
+	kernel(__VA_ARGS__);						\
+      }									\
+  } while (0)
 
 
 /** Call a kernel in a 2-dimension parallel loop with OpenMP emulation.
@@ -273,18 +275,20 @@ struct timeval p4a_time_end;
     @param ... following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
-  P4A_skip_debug(P4A_dump_location();)					\
-  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_2d(%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, #kernel);)	\
-  _Pragma("omp parallel for")						\
-  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
-    for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
-      P4A_vp_0 = P4A_index_0;						\
-      P4A_vp_1 = P4A_index_1;						\
-      P4A_vp_2 = 0;							\
-      P4A_skip_debug(P4A_dump_message("%d %d\n", P4A_vp_0, P4A_vp_1));	\
-      kernel(__VA_ARGS__);						\
-    }									\
-  }
+  do {									\
+    P4A_skip_debug(P4A_dump_location();)				\
+      P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_2d(%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, #kernel);) \
+      _Pragma("omp parallel for")					\
+      for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
+	for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+	  P4A_vp_0 = P4A_index_0;					\
+	  P4A_vp_1 = P4A_index_1;					\
+	  P4A_vp_2 = 0;							\
+	  P4A_skip_debug(P4A_dump_message("%d %d\n", P4A_vp_0, P4A_vp_1)); \
+	  kernel(__VA_ARGS__);						\
+	}								\
+      }									\
+  } while (0)
 
 
 /** Call a kernel in a 3-dimension parallel loop with OpenMP emulation.
@@ -302,19 +306,21 @@ struct timeval p4a_time_end;
     @param ... following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_3d(kernel, P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, ...) \
-  P4A_skip_debug(P4A_dump_location();)					\
-  P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_3d(%d,%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, #kernel);)	\
-  _Pragma("omp parallel for")						\
-  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) {	\
-    for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
-      for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
-        P4A_vp_0 = P4A_index_0;						\
-        P4A_vp_1 = P4A_index_1;						\
-        P4A_vp_2 = P4A_index_2;						\
-        kernel(__VA_ARGS__);						\
+  do {									\
+    P4A_skip_debug(P4A_dump_location();)				\
+      P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_3d(%d,%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, #kernel);) \
+      _Pragma("omp parallel for")					\
+      for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
+	for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+	  for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
+	    P4A_vp_0 = P4A_index_0;					\
+	    P4A_vp_1 = P4A_index_1;					\
+	    P4A_vp_2 = P4A_index_2;					\
+	    kernel(__VA_ARGS__);					\
+	  }								\
+	}								\
       }									\
-    }									\
-  }
+  } while (0)
 
 /** @} */
 /** @} */

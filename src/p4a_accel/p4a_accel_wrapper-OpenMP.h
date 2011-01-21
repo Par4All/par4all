@@ -24,14 +24,17 @@
 /** A declaration attribute of a hardware-accelerated kernel in OpenMP
 
     This is the return type of the kernel.
+    The type is here undefined and must be locally defined.
 */
-#define P4A_accel_kernel void
+#define P4A_accel_kernel 
 
 
 /** A declaration attribute of a hardware-accelerated kernel called from
     the host in OpenMP
 
     This is the return type of the kernel wrapper.
+    It must be a void function.
+    Type used in the protoizer.
 */
 #define P4A_accel_kernel_wrapper void
 

@@ -134,13 +134,16 @@ extern double p4a_time;
 /** Event for timing in OpenCL */
 extern cl_event p4a_event;
 
+/** A tag to identify if timer_stop is called from inside P4A or from outside */
+extern bool timer_call_from_p4a;
+
 /** Start a timer on the accelerator in OpenCL.
     
     Initialize the global time variable.
  */
 
 #ifdef P4A_PROFILING
-#define P4A_accel_timer_start   p4a_time = 0.						
+#define P4A_accel_timer_start   p4a_time = 0. 
 #else
 #define P4A_accel_timer_start 
 #endif
@@ -688,17 +691,19 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     @param ... the following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
-  p4a_load_kernel(kernel,__VA_ARGS__);					\
-  P4A_argN(__VA_ARGS__);						\
-  P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel	\
-				  "\" of size %d\n",P4A_n_iter_0));	\
-  P4A_create_1d_thread_descriptors(P4A_grid_descriptor,			\
-				   P4A_block_descriptor,		\
-				   P4A_n_iter_0);			\
-  P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
-			(p4a_queue,p4a_kernel,work_dim,NULL,		\
-			 &P4A_block_descriptor,&P4A_grid_descriptor,	\
-			 0,NULL,&p4a_event))
+  do {									\
+    p4a_load_kernel(kernel,__VA_ARGS__);				\
+    P4A_argN(__VA_ARGS__);						\
+    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel	\
+				    "\" of size %d\n",P4A_n_iter_0));	\
+    P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
+				     P4A_block_descriptor,		\
+				     P4A_n_iter_0);			\
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
+			  (p4a_queue,p4a_kernel,work_dim,NULL,		\
+			   &P4A_block_descriptor,&P4A_grid_descriptor,	\
+			   0,NULL,&p4a_event));				\
+  } while(0)
 
 
 /** Call a kernel in a 2-dimension parallel loop in CL
@@ -706,6 +711,9 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     The creation of the program depends on the kernel that is known only 
     from here. Could not place this initialization in the P4A_accel_init
     macro.
+
+    do { } while(0) is needed to privatize local variable that can be
+    duplicate if many kernels are launched at the same time.
 
     @param[in] kernel to call
 
@@ -716,19 +724,23 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     @param ... following parameters are given to the kernel
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
-  p4a_load_kernel(kernel,__VA_ARGS__);					\
-  P4A_argN(__VA_ARGS__);						\
-  P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel	\
-				  "\" of size (%dx%d)\n",		\
-				  P4A_n_iter_0, P4A_n_iter_1));		\
-  P4A_create_2d_thread_descriptors(P4A_grid_descriptor,			\
-				   P4A_block_descriptor,		\
-				   P4A_n_iter_0, P4A_n_iter_1);		\
-  P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
-			(p4a_queue,p4a_kernel,work_dim,NULL,		\
-			 P4A_grid_descriptor,P4A_block_descriptor,	\
-			 0,NULL,&p4a_event));				\
-  P4A_accel_timer_stop_and_float_measure();				\
+  do {									\
+    p4a_load_kernel(kernel,__VA_ARGS__);				\
+    P4A_argN(__VA_ARGS__);						\
+    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel	\
+				    "\" of size (%dx%d)\n",		\
+				    P4A_n_iter_0, P4A_n_iter_1));	\
+    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
+				     P4A_block_descriptor,		\
+				     P4A_n_iter_0, P4A_n_iter_1);	\
+    P4A_call_accel_kernel((clEnqueueNDRangeKernel),			\
+			  (p4a_queue,p4a_kernel,work_dim,NULL,		\
+			   P4A_grid_descriptor,P4A_block_descriptor,	\
+			   0,NULL,&p4a_event));				\
+    timer_call_from_p4a = true;						\
+    P4A_accel_timer_stop_and_float_measure();				\
+    timer_call_from_p4a = false;					\
+  } while (0)
 
 /** 
     @}

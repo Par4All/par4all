@@ -72,4 +72,4 @@ $(EXECUTABLE-CL): $(CFILES) $(CLFILES)
 	$(CC) $(CLFLAGS) -o $@ $(CFILES) $(CLLIBS) $(LDFLAGS)
 
 clean::
-	rm -f $(EXECUTABLES) *.o $(CUFILES) $(CLFILES) *~ ./p4a_accel.c
+	rm -f $(EXECUTABLES) *.o $(CUFILES) $(CLFILES) *~ ./p4a_accel.c $(DUMMYFILE)

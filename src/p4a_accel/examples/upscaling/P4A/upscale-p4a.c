@@ -3,17 +3,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "yuv.h"
-//#include "upscale.h"
 
 // Prototypes for the two kernels 
-P4A_wrapper_proto(luminance1_wrapper,P4A_accel_global_address uint8 *y_fin,P4A_accel_global_address uint8 *y_fout);
-P4A_wrapper_proto(chrominance_wrapper,P4A_accel_global_address uint8 *u_fin,P4A_accel_global_address uint8 *u_fout, P4A_accel_global_address uint8 *v_fin,P4A_accel_global_address uint8 *v_fout);
+
+P4A_wrapper_proto(luminance_wrapper,P4A_accel_global_address type_yuv_frame_in *frame_in,P4A_accel_global_address type_yuv_frame_out *frame_out);
+
+P4A_wrapper_proto(chrominance_wrapper,P4A_accel_global_address type_yuv_frame_in *frame_in, P4A_accel_global_address type_yuv_frame_out *frame_out);
 
 
 void upscale(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out)
 {
-  P4A_call_accel_kernel_2d(luminance1_wrapper, HEIGHT, WIDTH, frame_in->y,frame_out->y);
-  P4A_call_accel_kernel_2d(chrominance_wrapper, H_UV_IN, W_UV_IN, frame_in->u,frame_out->u,frame_in->v,frame_out->v);
+  P4A_call_accel_kernel_2d(luminance_wrapper,HEIGHT,WIDTH,frame_in,frame_out);
+  P4A_call_accel_kernel_2d(chrominance_wrapper,H_UV_IN,W_UV_IN,frame_in,frame_out);
 }
 
 
@@ -51,11 +52,11 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
     P4A_accel_timer_start;
     P4A_copy_to_accel(sizeof(type_yuv_frame_in),&frame_in[i],p4a_in);
     copy_time += P4A_accel_timer_stop_and_float_measure();
-
+    
     P4A_accel_timer_start;
     upscale(p4a_in,p4a_out);
     execution_time += P4A_accel_timer_stop_and_float_measure();
-
+    
     P4A_accel_timer_start;
     P4A_copy_from_accel(sizeof(type_yuv_frame_out),&frame_out[i],p4a_out);
     copy_time += P4A_accel_timer_stop_and_float_measure();

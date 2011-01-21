@@ -29,7 +29,7 @@ typedef struct {
 
 
 
-P4A_accel_kernel kernel_hyantes(data_t xmin, data_t ymin, data_t step,data_t range, P4A_accel_global_address town pt[rangex][rangey], P4A_accel_global_address town t[nb], int i, int j)
+P4A_accel_kernel void kernel_hyantes(data_t xmin, data_t ymin, data_t step,data_t range, P4A_accel_global_address town pt[rangex][rangey], P4A_accel_global_address town t[nb], int i, int j)
 {
   int k;
   

@@ -942,7 +942,7 @@ cl_command_queue_properties p4a_queue_properties = 0;
 
 double p4a_time = 0.;
 cl_event p4a_event = NULL;
-
+bool timer_call_from_p4a = true;
 
 /** In OpenCL, stop a timer on the accelerator and get float time in
     second.
@@ -954,20 +954,22 @@ double P4A_accel_timer_stop_and_float_measure()
 
 #ifdef P4A_PROFILING
   if (p4a_event) {
-    clWaitForEvents(1, &p4a_event);
-    
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-					       CL_PROFILING_COMMAND_END, 
-					       sizeof(cl_ulong), 
-					       &end, 
-					       NULL));
-    P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-					       CL_PROFILING_COMMAND_START, 
-					       sizeof(cl_ulong), 
-					       &start, 
-					       NULL));
-    // time in nanoseconds	      
-    p4a_time += (float)(end - start);
+    if (timer_call_from_p4a == true) {
+      clWaitForEvents(1, &p4a_event);
+      
+      P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+						 CL_PROFILING_COMMAND_END, 
+						 sizeof(cl_ulong), 
+						 &end, 
+						 NULL));
+      P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+						 CL_PROFILING_COMMAND_START, 
+						 sizeof(cl_ulong), 
+						 &start, 
+						 NULL));
+      // time in nanoseconds	      
+      p4a_time += (float)(end - start);
+    }
     // Return the time in second:
     return p4a_time*1.0e-9;
   }
@@ -1003,6 +1005,7 @@ struct p4a_cl_kernel *last_kernel=NULL;
 */
 void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) 
 {
+  //printf("Argument %d : size = %u\n",i,size);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
   P4A_test_execution_with_message("clSetKernelArg");
 }
@@ -1226,7 +1229,9 @@ void P4A_copy_from_accel(size_t element_size,
 				       0,
 				       NULL,
 				       &p4a_event);
+  timer_call_from_p4a = true;
   P4A_accel_timer_stop_and_float_measure();
+  timer_call_from_p4a = false;
   P4A_test_execution_with_message("clEnqueueReadBuffer");
 }
 
@@ -1255,7 +1260,9 @@ void P4A_copy_to_accel(size_t element_size,
 					0,
 					NULL,
 					&p4a_event);
+  timer_call_from_p4a = true;
   P4A_accel_timer_stop_and_float_measure();
+  timer_call_from_p4a = false;
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
 }
 
