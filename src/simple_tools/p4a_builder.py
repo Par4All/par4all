@@ -126,7 +126,7 @@ class p4a_builder:
 
         self.cpp_flags += [ "-DP4A_ACCEL_CUDA", "-I" + os.environ["P4A_ACCEL_DIR"] ]
         self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.cu") ]
-
+        self.fortran_flags.append ("-ffree-line-length-none")
         self.cudafied = True
 
     def __init__(self,
@@ -134,7 +134,7 @@ class p4a_builder:
                  nvcc_flags = [], fortran_flags = [],
                  cpp = None, cc = None, cxx = None, ld = None, ar = None,
                  nvcc = None, fortran = None, arch = None,
-                 openmp = False, accel_openmp = False, icc = False, 
+                 openmp = False, accel_openmp = False, icc = False,
                  cuda = False,com_optimization=False,fftw3=False,
                  add_debug_flags = False, add_optimization_flags = False,
                  no_default_flags = False, build = False
@@ -191,8 +191,9 @@ class p4a_builder:
 
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+                fortran_flags.append ("-ffree-line-length-none")
                 self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
-                
+
         if com_optimization:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]
             cpp_flags += [ "-DP4A_COMMUNICATION_RUNTIME" ]
@@ -204,7 +205,7 @@ class p4a_builder:
                 ld_flags += [ "-lcufft" ]
             else :
                 ld_flags += [ "-lfftw3 -lfftw3f" ]
-                
+
 
 
         if add_debug_flags:
@@ -267,7 +268,12 @@ class p4a_builder:
         p4a_util.run([ self.fortran, "-c" ] + self.cpp_flags + self.fortran_flags + [ "-o", output_file, file ])
 
     def build(self, files, output_files, extra_obj = [], build_dir = None):
-
+        """ Build progams, libraries , objects or ...
+        files, the files to be used by the building process
+        output_files, the files to be produced
+        extra_obj, some exta objects to be used by the building process
+        build_dir, the build directory
+        """
         files += self.extra_source_files
 
         has_cuda = False
@@ -281,6 +287,10 @@ class p4a_builder:
         p4a_util.debug("Build dir: " + build_dir)
         if not os.path.isdir(build_dir):
             os.makedirs(build_dir)
+
+        # the build_dir has to be added to the compiler search path in fortran
+        # because .mod file are produce there
+        self.fortran_flags.append ("-J " + build_dir)
 
         # First pass: make .c, .cpp or .f files out of other extensions (.cu, ..):
         first_pass_files = []

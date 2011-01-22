@@ -59,24 +59,21 @@ on \PfaAllOrganizationHTDOC.
 \Apfa is a platform that merges various open source developments to ease
 the migration of sequential software to multicore and other parallel
 processors.
-
-It is mainly developed by \Ahpcp, MINES ParisTech/\Acri, Institut
+\Apfa is mainly developed by \Ahpcp, MINES ParisTech/\Acri, Institut
 Télécom/Télécom Bretagne and others.
-
 This document describes the internal organization of \Apfa and how its
 construction relies on \Agit repositories, \Asvn repositories and other
 projects.
+This document describes also the internal workings of \Apfa.
+This information may be useful not only for \Apfa core developers but
+also for advanced users desiring more functionality from \Apfa.
+Since \Apfa relies on other tool projects, the documentation of these other
+projects should also be consulted independently and is not included here.
 
-Since it relies on other tool projects, the documentation of these other
-projects should also be taken into account and are not included here.
-
-This document describes also some internal details about how \Apfa works
-and this can be useful to power user wanting to get more from \Apfa, not
-only the \Apfa core developers.
-
-It first describes inside the release notes how to install \Apfa without
-compiling it and later from section~\ref{sec:compilation} how to compile
-it, if you want to dig into the infrastructure.
+The first section contains the release notes for \Apfa, including
+installations instructions. For detailed information on \Apfa
+infrastructure, including instructions for compilation, see
+sections~\ref{sec:compilation} and above.
 
 \tableofcontents{}
 
@@ -94,14 +91,14 @@ it, if you want to dig into the infrastructure.
 The installation has been tested on Ubuntu/Linux 9.10 \& 10.04,
 Fedora Core 13 \& 14 and Debian/unstable.
 
-To only run \Apfa with Debian or Ubuntu, the following packages are needed:
+To run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
   \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
   \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran},
   \texttt{ipython}.
 \end{quote}
 
-To only run \Apfa with Fedora Core 14 or 13, the following packages are needed:
+To run \Apfa with Fedora Core 14 or 13, the following packages are needed:
 \begin{quote}
   \texttt{ncurses-5}, \texttt{readline}, \texttt{python},
   \texttt{python-ply}, \texttt{python3}, \texttt{gcc-gfortran},
@@ -111,8 +108,8 @@ To only run \Apfa with Fedora Core 14 or 13, the following packages are needed:
 % To ease copy/paste:
 % libncurses5 libreadline5 python python-ply python3.1 gfortran
 
-If you want to compile \Apfa by your own with Debian or Ubuntu, you also
-need to the following packages:
+To compile \Apfa with Debian or Ubuntu, the following additional
+packages are needed:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
   \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
@@ -122,13 +119,8 @@ need to the following packages:
   \texttt{git}
 \end{quote}
 
-If you want also to compile the documentation, you need also:
-\begin{quote}
-  \texttt{texlive-full}, \texttt{tex4ht}
-\end{quote}
-
-If you want to compile \Apfa by your own with Fedora Core 14 or 13, you also
-need to install the following packages:
+To compile \Apfa with Fedora Core 14 or 13, the following additional
+packages are needed:
 \begin{quote}
   \texttt{cproto}, \texttt{indent}, \texttt{flex}, \texttt{bison},
   \texttt{automake}, \texttt{libtool}, \texttt{autoconf},
@@ -141,14 +133,14 @@ need to install the following packages:
 % To ease copy/paste:
 % cproto indent flex bison automake libtool autoconf libreadline5-dev python-dev swig python-ply python3.1 libgmp3-dev libmpfr-dev gfortran subversion git
 
-If you want also to compile the documentation with Debian or Ubuntu, you 
-also need:
+To compile the documentation with Debian or Ubuntu, the following
+additional packages are needed:
 \begin{quote}
   \texttt{texlive-full}, \texttt{tex4ht}
 \end{quote}
 
-If you want also to compile the documentation with Fedora Core 14 or 13, you 
-also need:
+To compile the documentation with Fedora Core 14 or 13, the following
+additional packages are needed:
 \begin{quote}
   \texttt{texlive}, \texttt{tex4ht}
 \end{quote}
@@ -156,11 +148,11 @@ also need:
 \subsection{The compilation process}
 \label{sec:compilation-process}
 
-Once you have the \Apfa source directory (have a look to
-section~\ref{sec:public-repositories}), \Apfa is compiled and configured
-by running \verb|src/simple_tools/p4a_setup.py| in it.
+From the \Apfa source directory, \Apfa is compiled and configured
+by running \verb|src/simple_tools/p4a_setup.py|. See
+section~\ref{sec:public-repositories} for details.
 
-If you want to download \Apfa from the \Agit and compile it, do:
+To download and compile \Apfa from the \Agit, do the following:
 \begin{alltt}
 # Get a working copy of the Par4All public read-only git repository:
 git clone --branch p4a git://git.hpc-project.com/git/par4all.git
@@ -169,151 +161,155 @@ cd par4all
 # Build everything using 8 processes to speed up things:
 src/simple_tools/p4a_setup.py [--prefix=\emph{/install/dir}] [-v[v[v]]] --jobs=8 [...]
 \end{alltt}%
-Everything will be installed into \verb|/usr/local/par4all| by default.
-So we should make the target directory writable by you, either by running
-as \texttt{root} with \texttt{sudo} for example, or better (to limit
-running things as \texttt{root} which may be dangerous) create the target
-directory with the good right access, for example with a:
+\Apfa will be installed into \verb|/usr/local/par4all| by default.
+The target directory must be writable by the installer, either by running
+as \texttt{root} with \texttt{sudo} or by creating a
+writable target directory as follows:
 \begin{alltt}
 mkdir /usr/local/par4all
 chown \emph{your_login_name} /usr/local/par4all
 \end{alltt}
+In general, it is less dangerous to limit the number of commands
+executed as \texttt{root}, therefore, the latter approach to \Apfa
+installation is preferable.
 
-If you want to install in another location, use the \verb|--prefix|
-option.  If you need more installation options (such as if you want to
-specify the location for the various packages), run \verb|p4a_setup.py -h| to
-list them or look at section~\ref{sec:p4a_s-comp-script}.
+To install in another location, the \verb|--prefix| option can be
+used. To see more installation options (including specifying
+the locations for other packages), run \verb|p4a_setup.py -h|
+or see section~\ref{sec:p4a_s-comp-script}.
 
-If you want to pull a new version, do:
+To pull a new version, do:
 \begin{verbatim}
 git pull origin p4a
 \end{verbatim}
 
-And run \verb|p4a_setup.py| again. It is wise to do it with the
-\verb|--rebuild| and \verb|--clean| parameters to make sure you recompile
-everything (\Apips being a quickly moving project, incremental build is
-not always guaranteed to work). Removing the \texttt{build} directory can
-help when you change the \verb|--prefix| directory because it seems that
-some obsolete information about the installation directory may remain in
-the \texttt{build} directory and that makes the compilation to fail.
+and run \verb|p4a_setup.py| again. The
+\verb|--rebuild| and \verb|--clean| parameters should be used to
+ensure that all sources are recompiled
+(since \Apips is a frequently-updated project, incremental build is
+not always guaranteed to succeed). Removing the \texttt{build}
+directory 
+when the \verb|--prefix| directory changes is also recommended
+in order to remove obsolete
+information about the installation directory that may remain in
+the \texttt{build} directory and cause the compilation to fail.
 
-To create a \texttt{.deb} or \texttt{.tar.gz} package of the installation
-you have made using \verb|p4a_setup.py| as explained in
-\S~\ref{sec:making-distributions}.
+To create a \texttt{.deb} or \texttt{.tar.gz} package of a \Apfa installation
+created with \verb|p4a_setup.py|, see \S~\ref{sec:making-distributions}.
 
-About committing your change to the \Agit repository (assuming you work
-only in the \texttt{p4a-own} branch itself and not in one of the \Apfa
-sub-packages, in this case see section~\ref{sec:packages} to make sure you
-do not break the compilation process, you should compile your work before
-committing it on the central repositories. By a nice side effect, it
-allows you to test your code. \smiley
+In general, to commit changes to the \Agit repository, the
+\texttt{p4a-own} branch should be used and not any of the \Apfa
+sub-packages. If a branch must be used, see section~\ref{sec:packages}
+to ensure consistency with the \Apfa compilation process. It is highly
+advisable to compile work before
+committing it on the central repositories and to make sure that all
+files are committed so that the code compiles in all user
+environments. In addition to providing
+consistency, this has the added advantage of
+allowing one to test one's code before releasing it for general
+consumption! \smiley
 
-More seriously, it is not obvious that it may compile on your account but
-not for other people. For example because you forgot to commit some
-files...
+A nice feature of \Agit over \Asvn is that since the commit is separated from
+the publication, a commtted state can be tested independently from the
+rest of the team before pushing to the global server.
 
-A nice feature of \Agit over \Asvn is that since you split the commit from
-the publication, you can test your own committed state before it hurts the
-team when you push it on the global server.
-
-For example, you can create a light\footnote{Because the objects are
+For example, one can create a light\footnote{Because the objects are
   shared with symbolic links and not copied, since we did not use the
-  \texttt{file://} syntax.} clone with a
+  \texttt{file://} syntax.} clone with
 \begin{verbatim}
 git clone --branch p4a par4all par4all-compile
 \end{verbatim}
-and after you have tested and committed your modifications inside the
-\texttt{par4all} working copy, you do the same into the
+and after testing and committing modifications inside the
+\texttt{par4all} working copy, one does the same into the
 \texttt{par4all-compile} working copy after a \texttt{git pull}.
-If some files are lacking from the commit, it will be detected.
+If some files are lacking from the commit, git will be detect the discrepancy.
 
-Afterwards you can do a \texttt{git push} into the central \Apfa
-repository with less risks.
+Afterwards, a \texttt{git push} into the central \Apfa
+repository will have fewer associated risks.
 
 The classical \Aautotools environment variables can be used to influence
-the compilation but some are directly set up from the \verb|p4a_setup.py|
-script. So, if you want to set the \texttt{CFLAGS} and \texttt{CPPFLAGS}
-to compile \Apfa in debug mode you should pass their value change through
-a \verb|p4a_setup.py| option, for example with
+the compilation, however, some are directly set up from the \verb|p4a_setup.py|
+script. Therefore, to set the \texttt{CFLAGS} and \texttt{CPPFLAGS}
+to compile \Apfa in debug mode, value changes should be passed through 
+a \verb|p4a_setup.py| option. For example,
 \begin{verbatim}
 --configure-options="CFLAGS='-ggdb -g3 -Wall -std=c99'"
 \end{verbatim}
-to set good debugging options that allow \texttt{gdb} to access macro
+sets debugging options that allow \texttt{gdb} to access macro
 definitions that are heavily used in \Apips. Indeed this case is so common
 when debugging \Apfa that the \verb|--debug| or \verb|-g| options are just
 doing this for simplicity.
 
-You can pass some options to \verb|p4a_setup.py| to modify the
-installation process as explained in \S~\ref{sec:p4a_s-comp-script} for
-all the options, for example to skip the (re)compilation of a package (for
-example with \verb/--skip-polylib/).
+The installation process can be modified by passing options to
+\verb|p4a_setup.py|. For example, to skip the (re)compilation of a package,
+\verb/--skip-polylib/) is used. The complete set of options is described in
+\S~\ref{sec:p4a_s-comp-script}.
 
-To speed up the compilation, you can pass options to \texttt{make}, and more
-specifically you can run on, say, 8 processes by adding the
-\verb/--jobs=8/ option.
+The \texttt{make} command has options for speeding up the compilation. For
+example, to run on 8 processes, the \verb/--jobs=8/ option is added.
 
-You may want to compile \Apfa directly from source packages that are not
-inside the \Apfa directory hierarchy (see \S~\ref{sec:direct-organ}). For
-this, you can specify with \texttt{-{}-\emph{PACKAGE}-src=...} the
-location of the sources of \texttt{\emph{package}}, for example
-\verb|-pips-src=...| or \verb|--polylib-src=...|. If all these options are
-set (for example to a working copy of the \Apips{} \Asvn), you should be
-able to compile with only the \texttt{p4a-own} branch. For the \Apips
-packages, you should have the links to \texttt{nlpmake/makes} to have them
-to compile. Have a look to \S~\ref{sec:comp-from-sourc} for more
-information on this.
+To compile \Apfa directly from source packages that are not
+inside the \Apfa directory hierarchy, see \S~\ref{sec:direct-organ}. In
+this case, \texttt{-{}-\emph{PACKAGE}-src=...} specifies the
+location of the sources of \texttt{\emph{package}}, (e.g.,
+\verb|-pips-src=...| or \verb|--polylib-src=...|). If all these options are
+set (e.g., if the source locations point to working copies of the
+\Apips{} \Asvn), then the \texttt{p4a-own} branch can be used for
+compilation. For the \Apips
+packages, there must be links to \texttt{nlpmake/makes} to enable compilation.
+See \S~\ref{sec:comp-from-sourc} for more information on alternate
+source locations.
 
-You can change the options passed to \texttt{configure} for a package by
+The options passed to \texttt{configure} for a package can be changed by
 using the \texttt{-{}-\emph{PACKAGE}-c-opts=...}
 
-For example, if you want just to reconfigure to compile \Apips with
-Fortran 95 support:
+For example, to compile \Apips with Fortran 95 support, use:
 \begin{verbatim}
 p4a_setup.py --only=pips --pips-c-opts="--enable-tpips --enable-pyps \
   --enable-hpfc --enable-fortran95" --reconf --no-final
 \end{verbatim}
 
-Then, if you have modified \Apips and you just want to recompile and
-install it, just use:
+To recompile and intall \Apips after subsequent modifications, use:
 \begin{verbatim}
 p4a_setup.py --only=pips --no-final
 \end{verbatim}
 
-Beware that if you use a \Apips directory with \verb|--pips-src| and that
-you also used before this directory to build \Apips in a classical way
-(such as the classical \Asvn build), the compilation will fail because of
-the wrong dependencies between files existing there and not related to the
-\Apfa \texttt{build} directory location. You should do a
+Beware that if \verb|--pips-src| is used to designate a \Apips
+directory that has been previously build in a classical way (such as
+the classical \Asvn build), the compilation will fail because of
+incorrect dependencies between the files contained therein (which are not
+related to \Apfa \texttt{build} directory location). Prior to running
+the script, run the following in the \Apips source directory.
 \begin{verbatim}
 make clean
 \end{verbatim}
-in the \Apips source directory you are really using first.
 
-Another way to recompile a part of \Apfa, for example when you are
-debugging one of the components, without using \verb|p4a_setup.py|, you go to
-\verb|$P4A_ROOT/build|, in the component you are interested, such as
-\verb|$P4A_ROOT/build/newgen| and type a
+To recompile a part of \Apfa (for example to debug
+one of the components) without using \verb|p4a_setup.py|, change to
+the directory \verb|$P4A_ROOT/build| in the relevant component. For
+example, change to \verb|$P4A_ROOT/build/newgen| and type:
 \begin{verbatim}
 make
 \end{verbatim}
-and when you are happy do a
+and upon completion, type:
 \begin{verbatim}
 make install
 \end{verbatim}
-to put it on production. You can also try directly the \texttt{install}
-approach if you do not want to test the compilation first. But this 2-step
-approach is interesting for example if you have a debug session or a
-validation on the installed version and you want in parallel develop and
-verify it still compiles at the same time without breaking the running
-version.
-
+to complete the build process. The direct \texttt{install}
+approach can be used to avoid testing the compilation a
+priori. However, the 2-step 
+approach is most useful if, for example, there is a debug session or a
+validation on the installed version and at the same time, a parallel
+development and verification effort. One can work in the latter
+without invalidating the running version.
 
 \subsection{The \protect\texttt{p4a\_setup.py} compilation and installation
 script}
 \label{sec:p4a_s-comp-script}
 
 The compilation and installation of \Apfa is controlled by the
-\verb|p4a_setup.py| that has the following usage and options.
+\verb|p4a_setup.py| script, with the usage and options described in
+this section.
 
 \input{p4a_setup-help}
 
@@ -325,22 +321,22 @@ The compilation and installation of \Apfa is controlled by the
 \subsection{Public repositories}
 \label{sec:public-repositories}
 
-There are few \Agit repositories used by the project.
+There are several \Agit repositories used by the project.
 
-To have access without authentication and only for reading/cloning, you
-can use the \texttt{git:} prefix instead of \texttt{ssh:}, such as
+To have access without authentication and only for reading/cloning, use
+the \texttt{git:} prefix instead of \texttt{ssh:}, e.g.,
 \url{git://git.hpc-project.com/git/par4all.git}.
 
-The main repository for the project is:
+The main repository for the project is located at
 \url{ssh://git.hpc-project.com/git/par4all.git}
 
-It can be seen with a \Awww browser at
+This repository can be viewed with a \Awww browser at
 \url{https://git.hpc-project.com/cgit/par4all}
 
-To get directly involved into the project with full commit right in the
-repositories, ask \Ahpcp.
+To get directly involved into the project with full commit capability
+directly into the repositories, ask \Ahpcp.
 
-There are also ancillary \Agit repositories to offer a \Agit interface to
+There are also ancillary \Agit repositories that provide a \Agit interface to
 the trunk of the \Asvn repositories for the \Apips components from
 \Acri:
 \begin{itemize}
@@ -350,67 +346,67 @@ the trunk of the \Asvn repositories for the \Apips components from
 \item \url{ssh://git.hpc-project.com/git/svn-pips.git}
 \item \url{ssh://git.hpc-project.com/git/svn-validation.git}
 \end{itemize}
-These ancillary gateways only include the \texttt{trunk} history since at
+These ancillary gateways only include the \texttt{trunk} history since the
 \Acri branches are not public.
 
-In the case of \texttt{nlpmake}, another \Agit{} \Asvn gateway of the top
-level has been used for the integration (but is not published in a public
-git because it is old history) with \texttt{trunk}, \texttt{branch} and
-\texttt{tag} because \texttt{nlpmake} started without this standard
-layout, that was added later around revision 750.
-
+In the case of \texttt{nlpmake}, another \Agit{} \Asvn gateway at the top
+level has been used for the integration with \texttt{trunk},
+\texttt{branch} and \texttt{tag}. This is due to the fact that
+\texttt{nlpmake} started without the standard 
+layout, which was added later at approximately revision 750. Because
+of this prior history, this gateway is not published in a public git.
 
 \subsection{Private repositories}
 \label{sec:private-repositories}
 
-There is a private directory shared between core developers used mainly
-for validation of the project on non public codes, benchmarks, demos, for
-developing private reports, phases, scripts and so on:
+There is a private directory shared between core developers and used mainly
+for validation of the project on non public codes, benchmarks, demos,
+and for developing private reports, phases, scripts and so on:
 \url{ssh://git.hpc-project.com/git/par4all-private.git}
 
 For \Ahpcp-confidential information,
 \url{ssh://git.hpc-project.com/git/par4all-private-hpc.git} is used.
 
-According to the evolving private collaborations, other repositories can
-be created and used on demand.
-
+Other repositories can be created and used on demand according to the
+needs of evolving private collaborations.
 
 \section{Packages}
 \label{sec:packages}
 
-\Apfa integrates different tools from different projects. Right now \Apfa
-is composed by \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
+\Apfa integrates different tools from different projects. Currently, \Apfa
+is composed of \Apips, \Apipsgfc, \Apolylib, with some extensions. Each
 project is included in \Apfa as a package and is placed in a directory
-inside the \texttt{package} top-level directory. Technically speaking,
-this directories are indeed \Agit subtrees to ease revision control and
-integration, even when off-line.
+inside the \texttt{package} top-level directory. 
+These directories exist as \Agit subtrees to ease revision control and
+integration, including off-line revisions.
 
-Since \Apfa is an integration project, if you want to modify or develop in
-some packages, please work in the upstream package and not in
-\Apfa\footnote{Well, indeed this is the way \Apfa is used at Rensselaer
-  Polytechnic Institute, with easy global developments in \Apips directly
-  into the \texttt{package/PIPS} directory. It is quite easy to do so, but
-  the re-integration is quite more difficult since you need to extract the
-  patch history in \texttt{package/PIPS} and merge it into the \Apips
-  upstream \Asvn repository anyway.}. Since it is easy to compile \Apfa
-with some package stuff outside of \Apfa (see
-\S~\ref{sec:p4a_s-comp-script}) and commit them onto their own upstream
+Since \Apfa is an integration project, to modify or develop in
+a particular package, please work in the upstream package and not in
+\Apfa\footnote{In fact, this method is used for \Apfa development at Rensselaer
+  Polytechnic Institute; global developments in \Apips are created
+  directly and easily into \texttt{package/PIPS}. However,
+  the re-integration becomes more difficult since it requires extracting the
+  patch history in \texttt{package/PIPS} and merging it into the \Apips
+  upstream \Asvn repository.}. Working in this manner facilitates
+compilation of \Apfa with package sources outside of \Apfa (see
+\S~\ref{sec:p4a_s-comp-script}), which can be committed into their own upstream
 version control systems.
-
 
 \section{Directory organization}
 \label{sec:direct-organ}
+The \Apfa distribution contains the following directories:
 
 \begin{description}
-\item[\texttt{build}] is the directory created when compiling the various
+\item[\texttt{build}] is created when compiling the various
   \Apfa packages from the \Aautotools;
-\item[\texttt{doc}] are the sources of the \Apfa documentation, for the
-  user, the programmer and about the infrastructure;
-\item[\texttt{examples}] comes with some examples to exercise \Apfa;
+\item[\texttt{doc}] contains the sources of the \Apfa documentation,
+  including those for the user and the programmer as well as those
+  about the infrastructure;
+\item[\texttt{examples}] contains some examples to exercise \Apfa;
 \item[\texttt{packages}] contains the different components of \Apfa:
   \begin{description}
-  \item[\texttt{PIPS}] contains the components of \Apips framework itself
-    with:
+  \item[\texttt{PIPS}] contains the components of \Apips framework
+    itself, including:
     \begin{description}
     \item[\texttt{linear}:] the main linear library of \Apips;
     \item[\texttt{newgen}:] the object management infrastructure used by
@@ -420,31 +416,31 @@ version control systems.
     \item[\texttt{pips}:] the \Apips core;
     \item[\texttt{validation}:] the validation of \Apips;
     \end{description}
-  \item[\texttt{pips-gfc}] contains a \Agcc 4.4 source patched to be
-    compiled and linked with \Apips to add a Fortran 95+ parser to \Apips;
+  \item[\texttt{pips-gfc}] contains a \Agcc 4.4 source patch to be
+    compiled and linked with \Apips that adds a Fortran 95+ parser to \Apips;
   \item[\texttt{polylib}] contains the \Apolylib linear library source;
   \end{description}
-\item[\texttt{src}] contains source of tools used for the internal
+\item[\texttt{src}] contains sources of tools used for the internal
   organization of \Apfa itself, such as repository and product management,
-  publication process or some run-time, such as \verb|p4a_accel|;
-\item[\texttt{\emph{PREFIX-DIR}}] is where the usable \Apfa is installed
+  product publication, or run-time management (e.g., \verb|p4a_accel|);
+\item[\texttt{\emph{PREFIX-DIR}}] contains the usable \Apfa is installed
   after compilation:
   \begin{description}
   \item[\texttt{bin}] contains the executable programs from \Apfa;
-  \item[\texttt{doc}] is the generated documentation for the \Apfa
+  \item[\texttt{doc}] contains the generated documentation for the \Apfa
     infrastructure;
   \item[\texttt{etc}] contains some generated configuration files;
-  \item[\texttt{examples}] comes with some examples to exercise \Apfa;
+  \item[\texttt{examples}] contains with some examples to exercise \Apfa;
   \item[\texttt{include}] contains the include files used for the
     compilation of \Apfa;
-  \item[\texttt{lib}] owns the libraries used to run \Apfa;
-  \item[\texttt{makes}] contains some \texttt{make}-file stuff for the
+  \item[\texttt{lib}] contains the libraries used to run \Apfa;
+  \item[\texttt{makes}] contains \texttt{make}-file tools for the
     \Apips validation;
-  \item[\texttt{RELEASE-NOTES.txt}] stores the release notes of this \Apfa
+  \item[\texttt{RELEASE-NOTES.txt}] is the release notes of this \Apfa
     instance;
   \item[\texttt{share}] contains shared files for run-time and
     configuration files
-  \item[\texttt{VERSION}] stores the current version of this \Apfa
+  \item[\texttt{VERSION}] is the current version of this \Apfa
     instance.
   \end{description}
 \end{description}
@@ -454,27 +450,26 @@ version control systems.
 \label{sec:repos-workfl}
 
 For history tracking and collaborative development, \Apfa relies on a main
-\Agit repository that is accessed by \Apfa developers, users, integrators
-and the product and quality team.
+\Agit repository that is accessed by \Apfa developers, users, integrators,
+and the production and quality assurance team.
 
 The script \verb|p4a_git| is used to automate the management of the
 workflow.
 
-Since \Apfa intimately extends some tools such as \Apips, their are some
+Since \Apfa extends some tools such as \Apips, their are some
 ancillary repositories to ease the impedance matching between \Apfa and
 those other projects.
 
 Since \Apolylib is already a \Agit repository, it is simply fetched as a
 remote \Agit into the \Apfa at the right place.
 
-But this is far more complex with \Apips which is a project split in 5
-independent \Asvn repositories, so its organization needs more massage to
-be presented in a coherent way, with some \Asvn-\Agit gateways. We can
-take advantage of these gateways to offer more free developments, more
-independent with some other review hierarchies, with light branches stored
-into a common \Agit view of the \Apips{} \Asvn repositories that can be
-pushed back into the \Apips{} \Asvn.
-
+The process is more complex with \Apips, which is a project split in 5
+independent \Asvn repositories requiring more effort for coherent presentation.
+Toward this end, \Asvn-\Agit gateways are used to offer freedom of
+development and independence from other review hierarchies. Using
+these dateways, light
+branches are stored into a common \Agit view of the \Apips{} \Asvn
+repositories; these light branches can be pushed back into the \Apips{} \Asvn.
 
 \subsection{The p4a\_git script to deal with workflow}
 \label{sec:p4a_git-script-deal}
@@ -482,133 +477,136 @@ pushed back into the \Apips{} \Asvn.
 The \verb|p4a_git| script is used to manage the workflow of \Apfa
 involving all the related \Agit and \Asvn repositories.
 
-Do not forget it may be useful to create a branch with a \texttt{git
-  checkout -b} before to test it, so the branch can be deleted for an easy
-rollback. Have a look to the \texttt{git reset} documentation to undo
-things if things go wrong.
+For easy rollback to a robust state, a branch can be created with
+\texttt{git checkout -b} and tested independently prior to merging
+with the public repository. If the independent branch fails, then it
+can be deleted without impacting other work.
+See the \texttt{git reset} documentation for more details.
 
-Some commands of \verb|p4a_git| need to have the \verb|P4A_TOP|
-environment variable defined to the top directory of the \Apfa
-infrastructure that owns the various \Agit working copies involved in the
+Some use cases of \verb|p4a_git| require that the \verb|P4A_TOP|
+environment variable be set to the top directory of the \Apfa
+infrastructure wherein reside the various \Agit working copies involved in the
 project.
 
-We first introduce some examples before detailing all the options.
-
+The following section presents some examples, after which the full
+list of options is described in detail.
 
 \subsubsection{\protect\texttt{p4a\_git} and \protect\texttt{git} typical use cases}
 \label{sec:p4a_git-typical-use}
 
-To get an up-to-date version of the \Apfa \texttt{p4a} reference branches
-used to construct \Apfa, you can merge in all these branches containing
-the integration work potentially done by your colleagues, if any, with a:
+The \Apfa \testtt{p4a} reference branches are used to contstruct \Apfa
+and potentially contain integration work performed by \Apfa team
+members beyond the current release. To retrieve an up-to-date version
+of a reference branch, use:
 \begin{verbatim}
 p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 \end{verbatim}
 
-If you are only working in \Apfa it-self, that is into the
-\texttt{p4a-own} branch, and you do not integrate new versions of upstream
-packages, you can integrate your work with only simple classical
+Work performed on \Apfa itself without integrating new versions of upstream
+packages is first integrated into the \texttt{p4a-own} branch using:
 \texttt{git} stuff:
 \begin{verbatim}
 git checkout p4a
 git merge p4a-own
 \end{verbatim}
-and if you are happy with the result (reread, validate...), publish it
-with:
+When the results are validated and reread, work is published to the
+main \testtt{p4a} branch using:
 \begin{verbatim}
 git push origin p4a-own
 git push origin p4a
 \end{verbatim}
 
-A typical example to build a \Apfa with the last \Apips version into the
-reference \verb|p4a| branch infrastructure after having merged potentially
-colleague works as previously shown:
+A typical example to build a \Apfa with the latest \Apips version into the
+reference \verb|p4a| branch infrastructure after having merged
+reference branches is as follows:
 \begin{itemize}
-\item you fetch all the development of upstream packets (\Apips,
+\item fetch the most recent developments of upstream packets (\Apips,
   \Apolylib...):
 \begin{verbatim}
 p4a_git --update-git-svn
 \end{verbatim}
-\item then merge the new versions of the upstream packages into the \Apfa
-  reference branches:
+\item merge the new versions of the upstream packages into the \Apfa
+  reference branches
 \begin{verbatim}
 p4a_git --fetch-remote-git
 \end{verbatim}
-\item then fuse all the component branches into the \Apfa integration
+\item fuse all the component branches into the \Apfa integration
   branch hierarchy:
 \begin{verbatim}
 p4a_git --pull-remote-git
 \end{verbatim}
 \end{itemize}
-Then you have all \Apfa into the \verb|p4a| branch infrastructure. You can
-test it, validate it. When all is correct, publish it as the last official
-version with:
+At the end of this sequence of steps, the most recent developments in
+all of \Apfa is contained in the \verb|p4a| branch infrastructure.
+After testing and validation, this branch can be published as the latest
+official version with:
 \begin{verbatim}
 p4a_git --branch-action git push origin p4a\$suffix
 \end{verbatim}
-If someone update one of these branch in the meantime, you should merge
-back the new branches into your own versions by restarting a cycle as
-shown at the begin of this section.
-
+If someone else updates a branch in the meantime, the new branches
+must be merged back into the local versions by re-executing the sequence
+of steps at the beginning of this section.
 
 \subsubsection{More advanced use cases for \protect\texttt{p4a\_git}}
 \label{sec:more-advanced-use}
 
-Previous section should be enough for normal integration and maintenance
-of \Apfa, but here are described more actions in details.
+The previous section provides enough guidance for simple integration
+and maintenance of \Apfa. In this section, more advanced use cases are
+presented.
 
-If you want to begin from this \texttt{p4a} your own branch infrastructure
-\verb|p4a-very-personal|, with \verb|p4a-very-personal-pips| for the
-\Apips, \verb|p4a-very-personal-polylib| for the \Apolylib and so on,
-attached to the main \verb|p4a|-prefixed branch infrastructure, you have
-to do a:
+The developer can create from \texttt{p4a} a branch infrastructure
+\verb|p4a-very-personal|, with \verb|p4a-very-personal-pips| for
+\Apips, \verb|p4a-very-personal-polylib| for \Apolylib, etc.,
+with each attached to the main \verb|p4a|-prefixed branch
+infrastructure. To do this, use;
 \begin{verbatim}
 p4a_git --merge-remote-branches p4a-very-personal
 \end{verbatim}
 
-If you want to start from the \texttt{p4a-0.2-alpha}, use a
+To start from \texttt{p4a-0.2-alpha}, use:
 \begin{verbatim}
 p4a_git --merge-remote-branches p4a-very-personal p4a-0.2-alpha
 \end{verbatim}
 
-When you are happy with this version, you can push these branches for
-sharing or merge them into the main \Apfa \texttt{p4a} with
+When finished, these branches can be pushed for sharing or merged 
+into the main \Apfa \texttt{p4a} with:
 \begin{verbatim}
 p4a_git --branch-action git push origin p4a-very-personal\$suffix
 \end{verbatim}
 
-If you want to pull all the different \Apfa branches that may have been
+To pull all the different \Apfa branches that may have been
 changed by others:
 \begin{verbatim}
 p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 \end{verbatim}
 
-An example to set up all the tracking branches for version
+To set up all the tracking branches for version
 \texttt{p4a-0.2-alpha} before you can use them:
 \begin{verbatim}
 p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
         remotes/origin/p4a-0.2-alpha\$suffix
 \end{verbatim}
 \texttt{}
-If you want to develop and try a new version of the scripts dealing with
-the \Apfa infrastructure itself such as \verb|p4a_setup.py|, it becomes
-really tricky since it change the branch when executing and the script
-itself may disappear during it execution since it not committed into the
-final branch\footnote{It is really a case where it cuts the branch it sits
-on. \smiley}.
+Developing and trying a new version of the scripts dealing with
+the \Apfa infrastructure itself, such as \verb|p4a_setup.py|, is
+complicated by the fact that script execution changes the branch. This may
+cause the script to disappear during execution since it has not been
+committed into the final branch\footnote{This occurs when the script
+  modifies its own branch. \smiley}..
 
-To test this, you can first clone the repository into a new one into the
-\verb|$P4A_TOP| %$
-directory. Then set \verb|P4A_ROOT| to the new repository,
-and may be even \verb|P4A_TOP| to a new world if you really want to do
-quite independent stuff. You set \verb|P4A_ETC| to point to the directory
-where the \verb|p4a_git_lib.bash| you want to use is. Then you can execute
-the \verb|p4a_setup.py| you are working on to do some action to the new
-sand-box repository working copy.
+To test script modifications, first clone the repository into a new
+one in the \verb|$P4A_TOP| %$
+directory. Then, set \verb|P4A_ROOT| to the new repository.
+For a more independent development environment, one could also set
+\verb|P4A_TOP| to a new world.
+Then, set \verb|P4A_ETC| to point to the directory
+that contains the \verb|p4a_git_lib.bash| that will be
+used. Subsequent executions of the \verb|p4a_setup.py| under revision 
+will act on the new sand-box repository working copy.
 
-Example to test the merge and build process into a new \texttt{p5}
-repository from an old \texttt{par4all} one you want to test before
-pushing all the stuff:
+To test a \texttt{par4all} repository before the final push by
+merging and building into a new \texttt{p5} repository, use the
+following sequence of steps:
 \begin{verbatim}
 cd $P4A_TOP
 git clone par4all p5
@@ -635,7 +633,7 @@ source $P4A_ROOT/run/etc/par4all-rc.sh
 \subsubsection{\protect\texttt{p4a\_git} options}
 \label{sec:p4a_git-options}
 
-The \verb|p4a_git| options come into short and long form:
+The \verb|p4a_git| options are available in short and long forms:
 \begin{description}
 \item[\texttt{-h} or \texttt{--help}] display the usual help message;
 \item[\texttt{-v} or \texttt{--verbose}] increase the verbosity of the
@@ -653,8 +651,9 @@ The \verb|p4a_git| options come into short and long form:
   remote \Agit repositories into their respective branches and update the
   \texttt{p4a} branch hierarchy to point to the last version of \Apfa;
 \item[\texttt{-m} or \texttt{--merge-remote-branches}
-  \texttt{\emph{<to-prefix>}} \texttt{\emph{[<origin-prefix>]}}] merge all
-  the \texttt{p4a} branch infrastructure into the
+  \texttt{\emph{<to-prefix>}} \texttt{\emph{[<origin-prefix>]}}] merge
+  the entire
+  \texttt{p4a} branch infrastructure into the
   \texttt{\emph{<to-prefix>}} branch architecture. If the
   \texttt{\emph{<to-prefix>}} branch infrastructure does not exist, it is
   created from the \texttt{\emph{<origin-prefix>}} branch infrastructure
@@ -665,46 +664,47 @@ The \verb|p4a_git| options come into short and long form:
   \verb|$suffix| variable. Do not forget to escape special shell
   characters you want in the final shell;
 \item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
-  into \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
+  to \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
-  change the git repository to work on.
+  change the git working repository.
 \end{description}
 
 
 \subsection{PolyLib work-flow}
 \label{sec:polylib-workflow}
 
-The basic workflow for \Apolylib is to develop new features into the
-original \Apolylib{} \Agit, to fetch it into the \Apfa{} \Agit and select what
-feature we want to have into the \texttt{packages/polylib} of \Apfa.
+The basic workflow for \Apolylib is first to develop new features into the
+original \Apolylib{} \Agit repository, and then to fetch into the
+\Apfa{} \Agit and select particular features for the
+\texttt{packages/polylib} of \Apfa. 
 
 The script \verb|p4a_git| is used to automate the management of the
 workflow.
 
 \verb|p4a_git --pull-remote-git| pulls the \Apolylib into the
-\texttt{polylib} branch so that you can apply global modifications there
-if needed and later \texttt{git merge} it into your working branch. In
-this way global modifications are persistent and available to everybody.
+\texttt{polylib} branch so that global modifications can be applied there
+if needed and later \texttt{git merge}d into the local working branch. In
+this way, global modifications are persistent and available to everybody.
 
-If you want to directly manage the \Apolylib workflow, here are some
-details about how it works.
+The following presents information on the direct management of the
+\Apolylib workflow.
 
-Since the \Apolylib is already in a \Agit, the \texttt{polylib} is simply
-a remote in the \Apfa{} \Agit.
-
-So to import the latest \Apolylib development into the \Apfa{} \Agit for
-inspection, choice for inclusion, you fetch \Apolylib with:
+Since the \Apolylib is already in a \Agit repository, the
+\texttt{polylib} is simply a remote reference in the \Apfa{} \Agit.
+Therefore, to import the latest \Apolylib development into the \Apfa{}
+\Agit for
+inspection and inclusion, fetch \Apolylib with:
 \begin{verbatim}
 git fetch ICPS/polylib
 \end{verbatim}
 
-You can then merge the feature you want with
+then merge the desired feature with
 \begin{verbatim}
 git merge -s subtree remotes/polylib/master
 \end{verbatim}
-or from any tree identifier. The \texttt{-s subtree} is necessary since in
+or using any tree identifier. The \texttt{-s subtree} is necessary since in
 \Apfa the \Apolylib files are not at the top-level directory. This should
-be done into the \texttt{polylib} branch if you want to be compatible with
+be done into the \texttt{polylib} branch for compatibility with
 the workflow chosen in \Apfa.
 
 
@@ -714,50 +714,51 @@ the workflow chosen in \Apfa.
 \subsubsection{Compilation from sources outside of Par4All}
 \label{sec:comp-from-sourc}
 
-Before digging into details, the most important thing when developing some
-\Apfa packages is to be able to test them \emph{before} being included
-into \Apfa.
+When developing \Apfa packages, it is of critical importance to test them
+\emph{before} including them into \Apfa.
+For example, a new \Apips version is developed in the
+\Acri{} \Asvn repository before building \Apfa to test the integration.
 
-For example, you may want to develop a new \Apips version that is in the
-\Acri{} \Asvn repository and build all \Apfa to test it does work with.
+This process has been described in section~\ref{sec:compilation};
+further details are provided in the following example.
 
-The way to achieve it has been described in section~\ref{sec:compilation}
-but we can detail it a bit further for this example.
+Assuming there is a \Asvn working copy of \Apips (including the \texttt{trunk}
+into \texttt{prod}, your branch in \verb|pips_dev|, etc. Refer
+to the \Apips developer guide for more information). Use the
+\verb|--pips-src=| to make \Apfa point to this directory.
 
-For example, you have a \Asvn working copy of \Apips (the \texttt{trunk}
-into \texttt{prod}, your branch in \verb|pips_dev|, or whatever. Refer
-to the \Apips developer guide for more informations). You just need to
-point this directory to \Apfa by using the \verb|--pips-src=| option.
+Verify that the correctd \Apfa variable is set in your shell, that
+the previous configuration file from the \Apips \Asvn environment from
+\Acri is not automatically sourced in your shell and that there are no
+incorrect environment variables from previous invocations of a script
+(e.g., \verb|PATH|, etc.)
 
-Be sure you do not have sourced the old configuration file of the \Apips
-\Asvn environment from \Acri in your shell and that you do not have old
-environment variables referring to it (\verb|PATH|...). You need to have
-instead the right \Apfa variable set in your shell.
-
-Then you clean this directory to remove dangling dependencies the first
-time you use a classical \Apips directory with \Apfa with:
+Clean this directory to remove any dangling dependencies that may
+result from previous
+usage by \Apfa of a \Apips directory that was installed in the
+classical manner. This is accomplished using:
 \begin{verbatim}
 cd <where the wanted PIPS is>
 make clean
 \end{verbatim}
 
-You build a new \Apfa version using this \Apips version in debug mode,
-compiled with 4 compilation processes to take advantage of your 4-core
-machine, just with:
+Subsequently, a new \Apfa version is built using the new \Apips
+version in debug mode using the following command, which uses
+four compilation processes (assuming a 4-core machine):
 \begin{verbatim}
-src/simple_tools/p4a_setup.py -vvv --pips-src=<where the wanted PIPS is> --debug --jobs=4
+src/simple_tools/p4a_setup.py -vvv --pips-src=<where the desired PIPS is> --debug --jobs=4
 \end{verbatim}
 
-It runs everything. Once you have all the infrastructure setup, it is
-useless to recompile everything, or even reconfigure \Apips when you only
-change few things. You can just recompile \Apips and skip the installation
-of typical \Apfa things, with a:
+After building the complete infrastructure, subsequent changes to
+\Apips do not require rebuilding all packages or reconfiguring
+\Apips. The following command recompiles \Apips only and skips the
+installation of other \Apfa components:
 \begin{verbatim}
 src/simple_tools/p4a_setup.py -vvv --pips-src=<where the wanted PIPS is> \
    --debug --only=pips --no-final --jobs=4
 \end{verbatim}
 
-An example of script that does this is
+An example script performs all of the above actions can be found in:
 \verb|src/simple_tools/p4a_setup_with_my_PIPS|:
 \lstinputlisting[language=bash]{p4a_setup_with_my_PIPS}
 
@@ -765,9 +766,9 @@ An example of script that does this is
 \subsubsection{Debuging PIPS and p4a}
 \label{sec:debuging-pips-p4a}
 
-To debug \texttt{tpips} in \Apfa, you just need to run \texttt{gdb
-  tpips}\footnote{Or whatever debugger or frontend such as Eclipse or
-  Emacs. For example with Emacs, use \texttt{M-x gdb} and then ask for
+To debug \texttt{tpips} in \Apfa, it is sufficient to run \texttt{gdb
+  tpips}\footnote{Or an equivalent debugger or frontend such as Eclipse or
+  Emacs. For example with Emacs, use \texttt{M-x gdb} and then select
   many windows in the \texttt{Gud/Gdb-UI} menu.} and then \texttt{run
   \emph{the}.tpips} file in parameter.
 

@@ -4,9 +4,9 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
-import p4a_git 
+import p4a_git
 import p4a_opts
-import p4a_util 
+import p4a_util
 from urlparse import urlparse
 import p4a_pack
 import p4a_setup

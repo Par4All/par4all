@@ -4,11 +4,11 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
-import p4a_git 
+import p4a_git
 import p4a_opts
-import p4a_rc 
+import p4a_rc
 import p4a_util
-import p4a_version 
+import p4a_version
 import string
 import sys
 import os
@@ -286,7 +286,7 @@ def work(options, args = []):
     # Determine architecture for binary packages (and special arch name for debs).
     deb_arch = arch = options.arch
     if not arch:
-        arch = p4a_util.get_machine_arch()
+        arch = platform.machine()
     if arch == "x86_64":
         deb_arch = "amd64"
     elif re.match("i\d86", arch):
