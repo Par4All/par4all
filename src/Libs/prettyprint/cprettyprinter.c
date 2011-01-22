@@ -85,6 +85,9 @@
 // define an extension to append to scalar name in function signature
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
 
+// define some C macro to support some fortran intrinsics
+string macro = "#define mod(a,b) (a%b)\n";
+
 
 /* forward declaration. */
 static string c_expression(expression,bool);
@@ -97,6 +100,8 @@ static list l_name    = NIL;
 static list l_rename  = NIL;
 static list l_entity  = NIL;
 static list l_written = NIL;
+
+static basic cur_basic = basic_undefined;
 
 /**************************************************************** MISC UTILS */
 
@@ -507,14 +512,14 @@ static string c_brace_expression_string(expression exp)
     list args = call_arguments(syntax_call(expression_syntax(exp)));
 
     bool first = TRUE;
-    MAP(EXPRESSION,e,
+    FOREACH (EXPRESSION,e,args)
     {
         if (brace_expression_p(e))
             result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
         else
 	  result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
         first = FALSE;
-    },args);
+    }
     result = strdup(concatenate(result,"}",NULL));
     return result;
 }
@@ -787,7 +792,12 @@ static string c_declarations(
 }
 /******************************************************************* INCLUDE */
 static string c_include (void) {
-  string result = strdup ("");
+  string result = NULL;
+
+  // add some c include files in order to support fortran intrinsic
+  result = strdup (concatenate ("#include \"math.h\"\n",   // fabs
+								"#include \"stdlib.h\"\n", // abs
+								NULL));
 
   // take care of include file required by the user
   string user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
@@ -896,6 +906,18 @@ struct s_ppt
     prettyprinter ppt;
 };
 
+// Define a struct to easily find the function full name according to its
+// base_name. Basically some letters are prepend or append according to the
+// size ant type of the opperand. For example abs can become absl or fabsf.
+typedef struct
+{
+  char * c_base_name;
+  enum basic_utype type;
+  intptr_t size;
+  char* prefix;
+  char* suffix;
+} c_full_name;
+
 static bool expression_needs_parenthesis_p(expression);
 
 static string ppt_binary(string in_c, list le)
@@ -980,64 +1002,237 @@ static string ppt_call(string in_c, list le)
     return scall;
 }
 
+// Try to determine the type of the operands of a call. The
+// question is should we used abs or fabs for example. This should be used
+// in a gen_recurse, the goal is to determine the type of inputs to be used.
+static bool find_basic (reference r) {
+  pips_debug (7, "processing a reference\n");
+  entity e = reference_variable (r);
+  basic b = variable_basic (type_variable (entity_type (e)));
+  if (cur_basic == basic_undefined) {
+	// initialize basic by copying it
+	cur_basic = copy_basic (b);
+  }
+  else if (basic_tag ((b)) != basic_tag (cur_basic)) {
+	pips_user_error("dont know how to merge two different types");
+  }
+  else {
+	switch (basic_tag(b)) {
+	case is_basic_int:
+	  switch basic_int (b) {
+		case 1:    //char
+		case 2:    //short
+		case 4:    //int
+		case 6:    //long
+		case 8:    //long long
+		  if (basic_int(b) > basic_int(cur_basic))
+			basic_int(cur_basic) = basic_int(b);
+		  break;
+		case 21:    //signed char
+		case 22:    //signed short
+		case 24:    //signed int
+		case 26:    //signed long
+		case 28:    //signed long long
+		  if (basic_int(b) - 20 > basic_int(cur_basic))
+			basic_int(cur_basic) = basic_int(b);
+		  break;
+		case 11:
+		case 12:
+		case 14:
+		case 16:
+		case 18:
+		  // should nt happen
+		  pips_user_error("found an unsigned integer in fortran");
+		  break;
+		}
+	  break;
+	case is_basic_float:
+	  if (basic_float(b) > basic_float(cur_basic))
+		basic_float(cur_basic) = basic_float(b);
+	  break;
+	case is_basic_complex:
+	  if (basic_complex(b) > basic_complex(cur_basic))
+		basic_complex(cur_basic) = basic_complex(b);
+	  break;
+	case is_basic_logical:
+	case is_basic_string:
+	  // we don t care of the size
+	  break;
+	default:
+	  // What should be done?
+	  pips_user_error("the basic can not be a variable");
+	  break;
+	}
+  }
+  return true;
+}
+
+static c_full_name c_base_name_to_c_full_name [] = {
+  {"abs"   , is_basic_int     , 1  , ""     , "" }, //char
+  {"abs"   , is_basic_int     , 2  , ""     , "" }, //short
+  {"abs"   , is_basic_int     , 4  , ""     , "" }, //int
+  {"abs"   , is_basic_int     , 6  , "l"    , "" }, //long
+  {"abs"   , is_basic_int     , 8  , "ll"   , "" }, //long long
+  {"abs"   , is_basic_float   , 4  , "f"    , "f"}, //float
+  {"abs"   , is_basic_float   , 8  , "f"    , "" }, //double
+  {"abs"   , is_basic_complex , 8  , "c"    , "f"}, //float complex
+  {"abs"   , is_basic_complex , 16 , "c"    , "" }, //double complex
+  {NULL    , is_basic_int     , 0  , ""     , ""}
+};
+
+/// @brief fill the c_base_name to get the c full name accorgind to its basic
+static void get_c_full_name (string* base_in_c, basic b) {
+  pips_debug (7, "find the C function according to the basic\n");
+  // initialize some varaibles
+  c_full_name * table = c_base_name_to_c_full_name;
+  enum basic_utype type = basic_tag (b);
+  intptr_t size = basic_type_size (b);
+
+  // find the correct row
+  while ((table->c_base_name != NULL) &&
+		 !(same_string_p(*base_in_c, table->c_base_name) &&
+		   (table->type == type) &&
+		   (table->size == size)))
+	table++;
+  if (table->c_base_name == NULL) {
+    pips_internal_error("can not determin the c function to call");
+  }
+  str_append  (base_in_c, table->suffix);
+  str_prepend (base_in_c, table->prefix);
+  return;
+}
+
+// fortran intrinsic accepts different types but c function only
+// accept one type. This type of intrinsic is handle by this ppt_math
+// function, it calls the right c function according to its input types.
+static string ppt_math(string in_c, list le)
+{
+  cur_basic = basic_undefined;
+  FOREACH (EXPRESSION, exp, le) {
+	// gen_recurse on reference because entites are tabulated and thus
+	// not visited
+	pips_debug (7, "let's dig into the expression to find the involved basics\n");
+	//gen_recurse (exp, reference_domain, gen_true, gen_identity);
+	//	gen_recurse (exp, reference_domain, gen_true, find_basic);
+	gen_recurse (exp, reference_domain, find_basic, gen_identity);
+  }
+  string str_copy = strdup (in_c);
+  get_c_full_name (&str_copy, cur_basic);
+  string result = ppt_call (str_copy, le);
+  if (cur_basic != basic_undefined)
+	free_basic (cur_basic);
+  free (str_copy);
+  return result;
+}
+
+// @brief Generate a pips_user_error for intrinsic that can not be handle
+// right now
+///@param in_f, the instrinsic in fortran
+static string ppt_error(string in_f, list le)
+{
+  string result = strdup ("");
+  pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
+  return result;
+}
+
+// @brief Generate a pips_user_error for intrinsic that must not be fined in a
+// fortran code
+///@param in_f, the instrinsic in fortran
+static string ppt_must_error(string in_f, list le)
+{
+  string result = strdup ("");
+  pips_user_error("This intrinsic should not be found in a fortran code: %s\n",
+				  in_f);
+  return result;
+}
+
 static struct s_ppt intrinsic_to_c[] =
 {
-    { "+", "+", ppt_binary  },
-    { "-", "-", ppt_binary },
-    { "/", "/", ppt_binary },
-    { "*", "*", ppt_binary },
-    { "--", "-", ppt_unary },
-    { "**", "pow", ppt_call },
-    { "=", "=", ppt_binary },
-    { ".OR.", "||", ppt_binary },
-    { ".AND.", "&&", ppt_binary },
-    { ".NOT.", "!", ppt_unary },
-    { ".LT.", "<", ppt_binary },
-    { ".GT.", ">", ppt_binary },
-    { ".LE.", "<=", ppt_binary },
-    { ".GE.", ">=", ppt_binary },
-    { ".EQ.", "==", ppt_binary },
-    { ".EQV.", "==", ppt_binary },
-    { ".NE.", "!=", ppt_binary },
-    { ".", ".", ppt_binary },
-    { "->", "->", ppt_binary},
-    { "post++", "++", ppt_unary_post },
-    {"post--", "--" , ppt_unary_post },
-    {"++pre", "++" , ppt_unary },
-    {"--pre", "--" , ppt_unary },
-    {"&", "&" , ppt_unary },
-    {"*indirection", "*" , ppt_unary },
-    {"+unary", "+", ppt_unary },
-    {"-unary", "-", ppt_unary },
-    {"~", "~", ppt_unary },
-    {"!", "!", ppt_unary },
-    {"%", "%" , ppt_binary },
-    {"+C", "+" , ppt_binary },
-    {"-C", "-", ppt_binary },
-    {"<<", "<<", ppt_binary },
-    {">>", ">>", ppt_binary },
-    {"<", "<" , ppt_binary },
-    {">", ">" , ppt_binary },
-    {"<=", "<=", ppt_binary },
-    {">=", ">=", ppt_binary },
-    {"==", "==", ppt_binary },
-    {"!=", "!=", ppt_binary },
-    {"&bitand", "&", ppt_binary},
-    {"^", "^", ppt_binary },
-    {"|", "|", ppt_binary },
-    {"&&", "&&", ppt_binary },
-    {"||", "||", ppt_binary },
-    {"*=", "*=", ppt_binary },
-    {"/=", "/=", ppt_binary },
-    {"%=", "%=", ppt_binary },
-    {"+=", "+=", ppt_binary },
-    {"-=", "-=", ppt_binary },
-    {"<<=", "<<=" , ppt_binary },
-    {">>=", ">>=", ppt_binary },
-    {"&=", "&=", ppt_binary },
-    {"^=", "^=", ppt_binary },
-    {"|=","|=" , ppt_binary },
-    { NULL, NULL, ppt_call }
+    { "+"                    , "+"                     , ppt_binary     },
+    { "-"                    , "-"                     , ppt_binary     },
+    { "/"                    , "/"                     , ppt_binary     },
+    { "*"                    , "*"                     , ppt_binary     },
+    { "--"                   , "-"                     , ppt_unary      },
+    { "="                    , "="                     , ppt_binary     },
+    { ".OR."                 , "||"                    , ppt_binary     },
+    { ".AND."                , "&&"                    , ppt_binary     },
+    { ".NOT."                , "!"                     , ppt_unary      },
+    { ".LT."                 , "<"                     , ppt_binary     },
+    { ".GT."                 , ">"                     , ppt_binary     },
+    { ".LE."                 , "<="                    , ppt_binary     },
+    { ".GE."                 , ">="                    , ppt_binary     },
+    { ".EQ."                 , "=="                    , ppt_binary     },
+    { ".EQV."                , "=="                    , ppt_binary     },
+    { ".NE."                 , "!="                    , ppt_binary     },
+    { "."                    , "."                     , ppt_binary     },
+    { "->"                   , "->"                    , ppt_binary     },
+    { "post++"               , "++"                    , ppt_unary_post },
+    {"post--"                , "--"                    , ppt_unary_post },
+    {"++pre"                 , "++"                    , ppt_unary      },
+    {"--pre"                 , "--"                    , ppt_unary      },
+    {"&"                     , "&"                     , ppt_unary      },
+    {"*indirection"          , "*"                     , ppt_unary      },
+    {"+unary"                , "+"                     , ppt_unary      },
+    {"-unary"                , "-"                     , ppt_unary      },
+    {"~"                     , "~"                     , ppt_unary      },
+    {"!"                     , "!"                     , ppt_unary      },
+    {PLUS_C_OPERATOR_NAME    , PLUS_C_OPERATOR_NAME    , ppt_must_error },
+    {MINUS_C_OPERATOR_NAME   , MINUS_C_OPERATOR_NAME   , ppt_must_error },
+    {"<<"                    , "<<"                    , ppt_binary     },
+    {">>"                    , ">>"                    , ppt_binary     },
+    {"<"                     , "<"                     , ppt_binary     },
+    {">"                     , ">"                     , ppt_binary     },
+    {"<="                    , "<="                    , ppt_binary     },
+    {">="                    , ">="                    , ppt_binary     },
+    {"=="                    , "=="                    , ppt_binary     },
+    {"!="                    , "!="                    , ppt_binary     },
+    {"&bitand"               , "&"                     , ppt_binary     },
+    {"^"                     , "^"                     , ppt_binary     },
+    {"|"                     , "|"                     , ppt_binary     },
+    {"&&"                    , "&&"                    , ppt_binary     },
+    {"||"                    , "||"                    , ppt_binary     },
+    {"*="                    , "*="                    , ppt_binary     },
+    {"/="                    , "/="                    , ppt_binary     },
+    {"%="                    , "%="                    , ppt_binary     },
+    {"+="                    , "+="                    , ppt_binary     },
+    {"-="                    , "-="                    , ppt_binary     },
+    {"<<="                   , "<<="                   , ppt_binary     },
+    {">>="                   , ">>="                   , ppt_binary     },
+    {"&="                    , "&="                    , ppt_binary     },
+    {"^="                    , "^="                    , ppt_binary     },
+    {"|="                    , "|="                    , ppt_binary     },
+    {POWER_OPERATOR_NAME     , "pow"                   , ppt_error      },
+    {MODULO_OPERATOR_NAME    , "%"                     , ppt_binary     },
+	{ABS_OPERATOR_NAME       , "abs"                   , ppt_math       },
+	{IABS_OPERATOR_NAME      , "abs"                   , ppt_call       },
+	{DABS_OPERATOR_NAME      , "fabs"                  , ppt_call       },
+	{CABS_OPERATOR_NAME      , "cabsf"                 , ppt_call       },
+	{CDABS_OPERATOR_NAME     , "cabs"                  , ppt_call       },
+	{WRITE_FUNCTION_NAME     , WRITE_FUNCTION_NAME     , ppt_error      },
+	{PRINT_FUNCTION_NAME     , PRINT_FUNCTION_NAME     , ppt_error      },
+	{REWIND_FUNCTION_NAME    , REWIND_FUNCTION_NAME    , ppt_error      },
+	{OPEN_FUNCTION_NAME      , OPEN_FUNCTION_NAME      , ppt_error      },
+	{CLOSE_FUNCTION_NAME     , CLOSE_FUNCTION_NAME     , ppt_error      },
+	{INQUIRE_FUNCTION_NAME   , INQUIRE_FUNCTION_NAME   , ppt_error      },
+	{BACKSPACE_FUNCTION_NAME , BACKSPACE_FUNCTION_NAME , ppt_error      },
+	{READ_FUNCTION_NAME      , READ_FUNCTION_NAME      , ppt_error      },
+	{BUFFERIN_FUNCTION_NAME  , BUFFERIN_FUNCTION_NAME  , ppt_error      },
+	{BUFFEROUT_FUNCTION_NAME , BUFFEROUT_FUNCTION_NAME , ppt_error      },
+    {ENDFILE_FUNCTION_NAME   , ENDFILE_FUNCTION_NAME   , ppt_error      },
+    {FORMAT_FUNCTION_NAME    , FORMAT_FUNCTION_NAME    , ppt_error      },
+    {MIN_OPERATOR_NAME       , MIN_OPERATOR_NAME       , ppt_error      },
+	{MIN0_OPERATOR_NAME      , MIN0_OPERATOR_NAME      , ppt_error      },
+	{MIN1_OPERATOR_NAME      , MIN1_OPERATOR_NAME      , ppt_error      },
+    {AMIN0_OPERATOR_NAME     , AMIN0_OPERATOR_NAME     , ppt_error      },
+    {AMIN1_OPERATOR_NAME     , AMIN1_OPERATOR_NAME     , ppt_error      },
+    {DMIN1_OPERATOR_NAME     , DMIN1_OPERATOR_NAME     , ppt_error      },
+    {MAX_OPERATOR_NAME       , MAX_OPERATOR_NAME       , ppt_error      },
+    {MAX0_OPERATOR_NAME      , MAX0_OPERATOR_NAME      , ppt_error      },
+    {AMAX0_OPERATOR_NAME     , AMAX0_OPERATOR_NAME     , ppt_error      },
+    {MAX1_OPERATOR_NAME      , MAX1_OPERATOR_NAME      , ppt_error      },
+    {AMAX1_OPERATOR_NAME     , AMAX1_OPERATOR_NAME     , ppt_error      },
+    {DMAX1_OPERATOR_NAME     , DMAX1_OPERATOR_NAME     , ppt_error      },
+    {NULL                    , NULL                    , ppt_call       }
 };
 
 /* return the prettyprinter structure for c.*/
@@ -1369,14 +1564,14 @@ static string c_test(test t,bool breakable)
 static string c_sequence(sequence seq, bool breakable)
 {
     string result = strdup(EMPTY);
-    MAP(STATEMENT, s,
+    FOREACH (STATEMENT, s, sequence_statements(seq))
     {
         string oldresult = result;
         string current = c_statement(s,breakable);
         result = strdup(concatenate(oldresult, current, NULL));
         free(current);
         free(oldresult);
-    }, sequence_statements(seq));
+    }
     return result;
 }
 
