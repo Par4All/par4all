@@ -6,9 +6,15 @@
 
 static void int2float(int v1[NP][NP][NP], float v2[NP][NP][NP]) {
   int i, j, k;
+#ifdef P4A_CUDA_CHEAT               // 0.17ms per kernel launch
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+#else                               // 4.1ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
+#endif
         v2[i][j][k] = v1[i][j][k] - 1; // Avg density = 0
       }
     }
@@ -29,9 +35,15 @@ static void float2int(float v1[NP][NP][NP], int v2[NP][NP][NP]) {
 static void real2Complex(float cdens[NP][NP][NP][2],
                   float dens[NP][NP][NP]) {
   int i, j, k;
+#ifdef P4A_CUDA_CHEAT               // 0.31ms per kernel launch
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+#else                               // 4.7ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
+#endif
         cdens[i][j][k][0] = dens[i][j][k];
         cdens[i][j][k][1] = 0;
       }
@@ -43,9 +55,15 @@ static void complex2Real(float cdens[NP][NP][NP][2],
                          float dens[NP][NP][NP]) {
 
   int i, j, k;
+#ifdef P4A_CUDA_CHEAT               // 0.31ms per kernel launch
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+#else                               // 4.0ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
+#endif
         dens[i][j][k] = cdens[i][j][k][0];
       }
     }
@@ -56,9 +74,15 @@ static void complex2Real_correctionPot(float cdens[NP][NP][NP][2],
                                        float dens[NP][NP][NP],
                                        float coeff) {
   int i, j, k;
+#ifdef P4A_CUDA_CHEAT               // 0.25ms per kernel launch
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+#else                               // 4.1ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
+#endif
         dens[i][j][k] = (float)(cdens[i][j][k][0]) * coeff / (DX * DX * DX);
       }
     }
@@ -83,9 +107,15 @@ static void fft_laplacian7(float field[NP][NP][NP][2]) {
   int limit = NP >> 2;
   float coeff = M_PI / NP;
 
+#ifdef P4A_CUDA_CHEAT               // 1.02ms per kernel launch
+  for (i = 0; i < NP; i++) {
+    for (k = 0; k < NP; k++) {
+      for (j = 0; j < NP; j++) {
+#else                               // 5.2ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
+#endif
         int offset;
         float coeff2;
         if(i > limit) {
