@@ -1,0 +1,26 @@
+
+Initial code
+
+      PROGRAM FOO
+      INTEGER I, J, K
+      REAL L, M, N
+      K = MOD(I, J)                                                     0004
+      N = MOD(L, M)                                                     0005
+      END
+/* C pretty print for module FOO. */
+#include "math.h"
+#include "stdlib.h"
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int j;
+  int k;
+  float l;
+  float m;
+  float n;
+
+  k = (i % j);
+  n = (l % m);
+  return 0;
+}

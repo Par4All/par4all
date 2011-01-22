@@ -1,0 +1,16 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="intrinsic_mod"
+delete $WS
+create $WS $WS.f
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+display C_PRINTED_FILE[FOO]
+
+close
+delete $WS
+quit
