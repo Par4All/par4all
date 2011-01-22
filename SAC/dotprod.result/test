@@ -273,6 +273,8 @@
 
       END
 /* C pretty print for module DOTPROD. */
+#include "math.h"
+#include "stdlib.h"
 void
 dotprod (short a[1], short b[10000], short c[10000])
 {
