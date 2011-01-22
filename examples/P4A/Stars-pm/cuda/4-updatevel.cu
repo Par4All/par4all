@@ -7,9 +7,10 @@ __global__ void k_updatevel( float *vel, float *force, int *data, int coord, flo
 {
   int tx=threadIdx.x;
   int bx=blockIdx.x;
+  int gIdx = bx * NPBLOCK + tx;
 
   // FIXME coalescence
-  vel[ (bx * NPBLOCK + tx) * 3 + coord ] += force[ data [ bx*NPBLOCK + tx ] ] * dt;
+  vel[ gIdx * 3 + coord ] += force[ data [ gIdx ] ] * dt;
 }
 
 

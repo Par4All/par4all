@@ -41,8 +41,8 @@ __global__ void k_complex2Real_correctionPot(cufftComplex *field, cufftReal *rfi
   int bx = blockIdx.x;
   int by = blockIdx.y;
   int tx = threadIdx.x;
-  float r = cuCrealf(field[bx * NP * NP + by * NP + tx]);
-  rfield[bx * NP * NP + by * NP + tx] = (float)(r) * coeff / (DX * DX * DX);
+  int gIdx = bx * NP * NP + by * NP + tx;
+  rfield[gIdx] = cuCrealf(field[gIdx]) * coeff / (DX * DX * DX);
 }
 
 
@@ -51,9 +51,9 @@ __global__ void k_correction_pot(float *pot, float coeff) {
   int bx = blockIdx.x;
   int by = blockIdx.y;
 
-  int cellCoord = bx * NP * NP + by * NP + tx;
+  int gIdx = bx * NP * NP + by * NP + tx;
 
-  pot[cellCoord] = (float)(pot[cellCoord]) * coeff / (DX * DX * DX);
+  pot[gIdx] = pot[gIdx] * coeff / (DX * DX * DX);
 }
 
 
@@ -66,45 +66,44 @@ __global__ void k_fft_laplacian7(cufftComplex *field) {
   float k2;
 
   int offset;
-
+  int limit = NP >> 2;
+  float coeff = M_PI / NP;
   if(k == 0) {
-    if(i > NP / 2.) {
+    if(i > limit) {
       offset = NP;
     } else {
       offset = 0;
     }
-    i2 = sinf(M_PI / NP * (i - offset));
+    i2 = sinf(coeff * (i - offset));
 
     offset = 0;
-    if(j > NP / 2.) {
+    if(j > limit) {
       offset = NP;
     } else {
       offset = 0;
     }
-    j2 = sinf(M_PI / NP * (j - offset));
+    j2 = sinf(coeff * (j - offset));
 
     offset = 0;
   } else {
-    if(k > NP / 2.) {
+    if(k > limit) {
       offset = NP;
     } else {
       offset = 0;
     }
   }
 
-  k2 = sinf(M_PI / NP * (k - offset));
+  k2 = sinf(coeff * (k - offset));
   k2 = k2 * k2;
   __syncthreads();
 
   k2 = k2 + i2 * i2 + j2 * j2;
   k2 += (k2 == 0);
 
-
-  cufftComplex _field = field[i * NP * NP + j * NP + k];
-
-  field[i * NP * NP + j * NP + k] = make_cuFloatComplex(cuCrealf(_field) * G
-      *M_PI * DX * DX / k2 / NP / NP / NP, cuCimagf(_field) * G * M_PI * DX
-      *DX / k2 / NP / NP / NP); // FFT NORMALISATION
+  int gIdx = i * NP * NP + j * NP + k;
+  cufftComplex _field = field[gIdx];
+  coeff = G *M_PI * DX * DX / k2 / NP / NP / NP;
+  field[gIdx] = make_cuFloatComplex(cuCrealf(_field) * coeff, cuCimagf(_field) * coeff); // FFT NORMALISATION
 }
 
 static cufftHandle plan = NULL;

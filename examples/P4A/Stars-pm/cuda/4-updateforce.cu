@@ -11,7 +11,7 @@ __global__ void k_forcex1( float *pot, float *fx)
   int idlocp=bx+by*NP+((tx+1)&(NP-1))*NP*NP;
   int idlocm=bx+by*NP+((tx-1)&(NP-1))*NP*NP;
 
-  fx[idloc]=(pot[idlocp]-pot[idlocm])/(2.*DX);
+  fx[idloc]=(pot[idlocp]-pot[idlocm])/(2.f*DX);
 }
 
 #define STRIDE_FORCE32 32
@@ -35,7 +35,7 @@ __global__ void k_forcex32(float *pot, float *fx)
     idx=(idx+NP*NP)&(NP*NP*NP-1);
     c = pot[idx];
 
-    fx[oldIdx] = (c-a )/(2.*DX);
+    fx[oldIdx] = (c-a )/(2.f*DX);
 
     a = b;
     b = c;
@@ -61,7 +61,7 @@ __global__ void k_forcex64(float *pot, float *fx)
     idx=(idx+NP*NP)&(NP*NP*NP-1);
     c = pot[idx];
 
-    fx[oldIdx] = (c-a )/(2.*DX);
+    fx[oldIdx] = (c-a )/(2.f*DX);
 
     a = b;
     b = c;
@@ -105,7 +105,7 @@ __global__ void k_forcey(float *pot, float *fx)
   float x1 = pot[prevCoord];
   float x2 = pot[nextCoord];
 
-  fx[cellCoord]=(x2-x1)/(2.*DX);
+  fx[cellCoord]=(x2-x1)/(2.f*DX);
 }
 
 void forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
@@ -134,7 +134,7 @@ __global__ void k_forcez( float *pot, float *fx )
   float x1 = spot[ ((unsigned int)(tx - 1 )) % NP ];
   float x2 = spot[ (tx + 1 ) % NP ];
 
-  fx[cellCoord]=(x2-x1)/(2.*DX);
+  fx[cellCoord]=(x2-x1)/(2.f*DX);
 }
 
 void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
