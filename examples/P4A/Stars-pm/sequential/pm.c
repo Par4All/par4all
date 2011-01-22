@@ -61,11 +61,12 @@ int main(int argc, char **argv) {
    *                  MAIN LOOP !!
    ******************************************************/
   for (time = 0; time <= TMAX; time += DT) {
+#ifndef P4A_BENCH
     if(0 == npdt % MODDISP) {
       puts("**********************************");
       printf("Time= %5.2e Npdt= %d\n", time, npdt);
     }
-
+#endif
     // Stage 1 : discretization of particles position
     discretization(pos, data);
 
@@ -122,9 +123,12 @@ int main(int argc, char **argv) {
   graphic_gldestroy(); // Free opengl stuff
 #endif
 
+
+#ifndef P4A_BENCH
   puts("-----------------------------");
   puts("         Finished");
   puts("-----------------------------");
+#endif
 
   return 0;
 }

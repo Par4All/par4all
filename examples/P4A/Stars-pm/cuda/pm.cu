@@ -142,9 +142,11 @@ int main(int argc, char **argv) {
   potential_free_plan();
 
 
+#ifndef P4A_BENCH
 	puts("-----------------------------");
 	puts("Finished");
 	puts("-----------------------------");
+#endif
 	
 	return 0;
 }
