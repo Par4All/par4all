@@ -17,6 +17,8 @@
       ENDDO
       END
 /* C pretty print for module FOO. */
+#include "math.h"
+#include "stdlib.h"
 int
 main (int argc, char *argv[])
 {

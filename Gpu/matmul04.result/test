@@ -1,4 +1,6 @@
 /* C pretty print for module P4A_KERNEL_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
 {
@@ -11,6 +13,8 @@ p4a_kernel_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
   return;
 }
 /* C pretty print for module P4A_KERNEL_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_1 (int n, int a[n * n - 0], int b[n * n - 0], int c[n * n - 0],
 	      int i, int j, int x)
@@ -29,6 +33,8 @@ p4a_kernel_1 (int n, int a[n * n - 0], int b[n * n - 0], int c[n * n - 0],
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
 {
@@ -37,6 +43,8 @@ p4a_kernel_wrapper_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_1 (int n, int a[n * n - 0], int b[n * n - 0],
 		      int c[n * n - 0], int i, int j, int x)
@@ -46,6 +54,8 @@ p4a_kernel_wrapper_1 (int n, int a[n * n - 0], int b[n * n - 0],
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_0 (int n, int a[n - 0][n - 0], int b[n - 0][n - 0])
 {
@@ -62,6 +72,8 @@ p4a_kernel_launcher_0 (int n, int a[n - 0][n - 0], int b[n - 0][n - 0])
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_1 (int n, int a[n - 0][n - 0], int b[n - 0][n - 0],
 		       int c[n - 0][n - 0])

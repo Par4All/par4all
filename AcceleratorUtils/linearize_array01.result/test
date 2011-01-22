@@ -20,6 +20,8 @@ C Loop nest P4A end
       ENDIF
       END
 /* C pretty print for module P4A_KERNEL_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
 {

@@ -517,6 +517,8 @@
       ENDDO
       END
 /* C pretty print for module MATADD. */
+#include "math.h"
+#include "stdlib.h"
 int
 main (int argc, char *argv[])
 {
@@ -547,6 +549,8 @@ main (int argc, char *argv[])
   return 0;
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_accel_free (int *address_p4a_copy)
 {
@@ -555,6 +559,8 @@ p4a_accel_free (int *address_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
@@ -564,6 +570,8 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
 		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -578,6 +586,8 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -602,6 +612,8 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -638,6 +650,8 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
 		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -652,6 +666,8 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -676,6 +692,8 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -753,6 +771,8 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 
       END
 /* C pretty print for module MATADD. */
+#include "math.h"
+#include "stdlib.h"
 int
 main (int argc, char *argv[])
 {
@@ -769,6 +789,8 @@ main (int argc, char *argv[])
   return 0;
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_accel_free (int *address_p4a_copy)
 {
@@ -777,6 +799,8 @@ p4a_accel_free (int *address_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
@@ -786,6 +810,8 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
 		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -800,6 +826,8 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -824,6 +852,8 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -860,6 +890,8 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
 		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -874,6 +906,8 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -898,6 +932,8 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -934,6 +970,8 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
 	      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -950,6 +988,8 @@ p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
 	      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -967,6 +1007,8 @@ p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
 		       float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -987,6 +1029,8 @@ p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
 		       float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -1008,6 +1052,8 @@ p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
 		      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -1023,6 +1069,8 @@ p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
 		      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],

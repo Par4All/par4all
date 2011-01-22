@@ -1,6 +1,8 @@
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_0_ (int *n_p4a_copy,
 			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
@@ -22,6 +24,8 @@ p4a_kernel_launcher_0_ (int *n_p4a_copy,
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_launcher_1_ (int *n_p4a_copy,
 			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
@@ -46,6 +50,8 @@ p4a_kernel_launcher_1_ (int *n_p4a_copy,
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
@@ -65,6 +71,8 @@ p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_1 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
@@ -93,6 +101,8 @@ p4a_kernel_1 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_0 (int *n_p4a_copy,
 		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
@@ -109,6 +119,8 @@ p4a_kernel_wrapper_0 (int *n_p4a_copy,
 Module statement: 
 and declarations: 
 /* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+#include "math.h"
+#include "stdlib.h"
 void
 p4a_kernel_wrapper_1 (int *n_p4a_copy,
 		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
