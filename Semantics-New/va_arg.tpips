@@ -1,0 +1,7 @@
+setenv WS=va_arg
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+apply SUPPRESS_DEAD_CODE[main]
+close
+delete $WS
