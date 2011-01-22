@@ -2,6 +2,7 @@
 #include "kernel_tools.h"
 extern "C" {
 /* common/io.c */
+double get_time(void);
 void readDataFile(float mp[NP][NP][NP], coord pos[NP][NP][NP], coord vel[NP][NP][NP], char *filename);
 int writepart(char fname[], float field[]);
 int writeparti(char fname[], int field[]);

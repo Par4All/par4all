@@ -18,9 +18,9 @@ int main(int argc, char **argv) {
   coord pos[NP][NP][NP]; // Position (x,y,z) for each particle
   coord vel[NP][NP][NP]; // Velocity (x,y,z) for each particle
 
-  int data[NP][NP][NP]; //
+#ifdef _GRAPHICS_
   int histo[NP][NP][NP]; //
-
+#endif
 
   float time;
   int npdt = 0;
@@ -73,28 +73,33 @@ int main(int argc, char **argv) {
       graphic_glupdate(pos);
 #endif
 
+  /*** TIMING ***/
+  double start_time = get_time();
+  /***        ***/
 
   /******************************************************
    *                  MAIN LOOP !!
    ******************************************************/
   for (time = 0; time <= TMAX; time += DT) {
+#ifndef P4A_BENCH
     if(0 == npdt % MODDISP) {
       puts("**********************************");
       printf("Time= %5.2e Npdt= %d\n", time, npdt);
     }
+#endif
 
     // Stage 1 : discretization of particles position
     discretization((coord (*)[NP][NP])posd, (int (*)[NP][NP])datad);
 
     // Stage 2 : computing density, sequential histogramming pass
-    cudaMemcpy(data, datad, sizeof(int) * NPART, cudaMemcpyDeviceToHost);
-    histogram(data,histo);
-    cudaMemcpy(histod, histo, sizeof(int) * NPART, cudaMemcpyHostToDevice);
+    histogram((int (*)[NP][NP])datad,(int (*)[NP][NP])histod);
 
 #ifdef _GRAPHICS_
     if(0 == npdt % MODDISP) {
       // GTK graphic output
+      cudaMemcpy(histo, histod, sizeof(int) * NPART, cudaMemcpyDeviceToHost);
       graphic_draw(argc, argv, histo);
+//      sleep(1);
     }
 #endif
 
@@ -129,6 +134,11 @@ int main(int argc, char **argv) {
     npdt++;
   }
 	
+  /*** TIMING ***/
+  double end_time = get_time();
+  fprintf(stderr," P4A: Time for '%s' : %fms\n",__FUNCTION__, (end_time-start_time)*1000);
+  /***        ***/
+
   potential_free_plan();
 
 
