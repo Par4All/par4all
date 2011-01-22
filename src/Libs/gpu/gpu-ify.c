@@ -122,7 +122,7 @@ mark_loop_to_outline(const statement s) {
 
 */
 static void
-gpu_ify_statement(statement s, int depth) {
+gpu_ify_statement(statement s, int depth, string mod_name) {
   ifdebug(1) {
     pips_debug(1, "Parallel loop-nest of depth %d\n", depth);
     print_statement(s);
@@ -137,8 +137,16 @@ gpu_ify_statement(statement s, int depth) {
        first. The kernel name with a prefix defined in the
        GPU_KERNEL_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    outliner(build_new_top_level_module_name(get_string_property("GPU_KERNEL_PREFIX")),
-	     sk);
+    string prefix = strdup(concatenate(get_string_property("GPU_KERNEL_PREFIX"),
+                                "_",
+                                mod_name,
+                                NULL));
+    string outline_name = build_new_top_level_module_name(prefix);
+    ifdebug(3) {
+      pips_debug(1, "Outline kernel %s (prefix was %s)\n", outline_name, prefix);
+    }
+    free(prefix);
+    outliner(build_new_top_level_module_name(outline_name),sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel:");
   }
 
@@ -199,7 +207,16 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        the kernel call. The kernel wrapper name with a prefix defined in the
        GPU_WRAPPER_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    outliner(build_new_top_level_module_name(get_string_property("GPU_WRAPPER_PREFIX")), sk);
+    string prefix = strdup(concatenate(get_string_property("GPU_WRAPPER_PREFIX"),
+                                "_",
+                                mod_name,
+                                NULL));
+    string outline_name = build_new_top_level_module_name(prefix);
+    ifdebug(3) {
+      pips_debug(1, "Outline wrapper %s (prefix was %s)\n", outline_name, prefix);
+    }
+    free(prefix);
+    outliner(build_new_top_level_module_name(outline_name), sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
 
@@ -208,9 +225,21 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        GPU_LAUNCHER_PREFIX property: */
     list sl = CONS(STATEMENT, s, NIL);
     statement st = statement_undefined;
-    st = outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
+    string prefix = strdup(concatenate(get_string_property("GPU_LAUNCHER_PREFIX"),
+                                "_",
+                                mod_name,
+                                NULL));
+    string outline_name = build_new_top_level_module_name(prefix);
+    ifdebug(3) {
+      pips_debug(1, "Outline launcher %s (prefix was %s)\n", outline_name, prefix);
+    }
+    free(prefix);
+    st = outliner(build_new_top_level_module_name(outline_name), sl);
     if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
       string fwp = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
+      ifdebug(3) {
+        pips_debug(1, "Outline Fortan_wrapper with prefix %s\n", fwp);
+      }
       outliner (build_new_top_level_module_name (fwp),CONS(STATEMENT,st,NIL));
     }
     //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
@@ -248,7 +277,7 @@ bool gpu_ify(const string module_name) {
   loop_nests_to_outline = gen_nreverse(loop_nests_to_outline);
   FOREACH(STATEMENT, s, loop_nests_to_outline) {
     // We could have stored the depth, but it complexify the code...
-    gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s));
+    gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s),module_name);
   }
 
   gen_free_list(loop_nests_to_outline);
