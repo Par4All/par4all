@@ -66,7 +66,7 @@ static void print_dimension(dimension d)
     print_expression(dimension_upper(d));
 }
 /* print_entity_variable(e)
- * 
+ *
  * if it is just a variable, the type is printed,
  * otherwise just the entity name is printed
  */
@@ -75,7 +75,7 @@ void print_entity_variable(entity e)
     variable v;
 
     (void) fprintf(stderr,"name: %s\n",entity_name(e));
-    
+
     if (!type_variable_p(entity_type(e)))
 	return;
 
@@ -195,7 +195,7 @@ entity make_empty_program(string name,language l)
 entity make_empty_subroutine(string name,language l)
 {
   string full_name = concatenate(TOP_LEVEL_MODULE_NAME
-         MODULE_SEP_STRING, name, NULL);
+				 MODULE_SEP_STRING, name, NULL);
   return make_empty_module(full_name, make_type_void(NIL),l);
 }
 
@@ -1205,11 +1205,11 @@ entity FindEntity( const char* package, const char* name ) {
   entity e = global_name_to_entity(package, name);
   if ( entity_undefined_p(e) ) {
     e = gen_find_tabulated( concatenate( package,
-                                         MODULE_SEP_STRING,
-                                         "0",
-                                         BLOCK_SEP_STRING,
-                                         name,
-                                         NULL ), entity_domain );
+					 MODULE_SEP_STRING,
+					 "0",
+					 BLOCK_SEP_STRING,
+					 name,
+					 NULL ), entity_domain );
   }
   return e;
 }
