@@ -5,10 +5,10 @@ int f(int a, ...)
 
 int main()
 {
-	int a,b,c;
-	// This works 
+	int a = 1, b, c;
+	// This works
 	// f(a,b,c);
 	// but not this...
-	f(a,b);
-	return 0;
+	c = f(a,b);
+	return c;
 }
