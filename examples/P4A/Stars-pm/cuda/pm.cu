@@ -135,6 +135,7 @@ int main(int argc, char **argv) {
   }
 	
   /*** TIMING ***/
+  cudaThreadSynchronize();
   double end_time = get_time();
   fprintf(stderr," P4A: Time for '%s' : %fms\n",__FUNCTION__, (end_time-start_time)*1000);
   /***        ***/
