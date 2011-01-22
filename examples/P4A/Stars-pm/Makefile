@@ -7,11 +7,12 @@ ifneq ($(do_not_cheat),1)
 P4A_CHEAT= -DP4A_CUDA_CHEAT
 endif
 
+P4A_OPTIONS+=-DP4A
 NVCCFLAGS=-lcufft
 
 ifeq "$(USE_FLOAT)" "1"
 # Use single precision for the OpenMP and GPU version:
-P4A_OPTIONS= -DUSE_FLOAT -DP4A_FFTW3
+P4A_OPTIONS+= -DUSE_FLOAT
 # Use also single precision for the sequential version:
 CPPFLAGS+= -DUSE_FLOAT
 endif
