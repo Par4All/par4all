@@ -76,7 +76,7 @@ bool scalopragma (char* module_name) {
     /*delete statement pragma*/
     extensions_extension(statement_extensions(stmt))=NIL;
 
-    outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), CONS(STATEMENT,stmt,NIL));
+    outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX"), false ), CONS(STATEMENT,stmt,NIL));
   }
 
 

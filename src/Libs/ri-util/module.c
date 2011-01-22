@@ -66,21 +66,32 @@ bool static_module_name_p(const char* name)
 
    @param prefix is the prefix string
 
+   @param prevent_suffix is a flag that prevent from adding a "_0" suffix if possible
+
    @return the first module name (malloc'd string) of the form
    "<prefix>_<integer>" that do not correspond to an existing module with
    integer starting at 0
  */
 string
-build_new_top_level_module_name(string prefix) {
+build_new_top_level_module_name(string prefix, bool prevent_suffix) {
   string name;
   int version = 0;
 
+  if(prevent_suffix) {
+    name = strdup(prefix);
+  }
+
   for(;;) {
-    asprintf(&name, "%s_%d", prefix, version++);
+    if(!prevent_suffix || version!=0)
+      asprintf(&name, "%s_%d", prefix, version);
+
     if (module_name_to_entity(name) == entity_undefined)
       break;
+
     free(name);
+    version++;
   }
+
   return name;
 }
 
