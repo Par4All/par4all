@@ -23,6 +23,8 @@ Code after outlining
       PRINT *, A
       END
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto_ (int a[5][5])
 {

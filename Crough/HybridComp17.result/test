@@ -38,6 +38,8 @@ Code after the first outlining
 Code after the second outlining
 
 /* C pretty print for module TITI. */
+#include "math.h"
+#include "stdlib.h"
 void
 titi (int i, int n)
 {
@@ -52,6 +54,8 @@ titi (int i, int n)
   return;
 }
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto (int n)
 {
@@ -65,6 +69,8 @@ toto (int n)
   return;
 }
 /* C pretty print for module HYBRIDCOMP17. */
+#include "math.h"
+#include "stdlib.h"
 int
 main (int argc, char *argv[])
 {

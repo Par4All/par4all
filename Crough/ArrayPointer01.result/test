@@ -9,6 +9,8 @@ Initial code
 10       CONTINUE
       END
 /* C pretty print for module ARRAYPOINTER01. */
+#include "math.h"
+#include "stdlib.h"
 void
 arraypointer01 (int a[5])
 {

@@ -29,6 +29,8 @@ Code after outlining
       PRINT *, A                                                        0013
       END
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto_ (int *a_p4a_copy, int *n_p4a_copy)
 {

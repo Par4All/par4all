@@ -60,6 +60,8 @@ C             <    is written>: __IO_EFFECTS:LUNS(6)
       PRINT *, A
       END
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto_ (long long *a_p4a_copy, int *n_p4a_copy)
 {

@@ -20,6 +20,8 @@
 
       END
 /* C pretty print for module MATADD. */
+#include "math.h"
+#include "stdlib.h"
 int
 main (int argc, char *argv[])
 {

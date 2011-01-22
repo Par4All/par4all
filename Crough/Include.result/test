@@ -6,6 +6,8 @@ Initial code
       I = 1
       END
 /* C pretty print for module FOO. */
+#include "math.h"
+#include "stdlib.h"
 #include "toto.h"
 #include "titi.h"
 #include "tutu.h"

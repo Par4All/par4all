@@ -27,6 +27,8 @@ Code after outlining
       PRINT *, A
       END
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto_ (int *n_p4a_copy, long long a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
 {

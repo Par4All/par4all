@@ -50,6 +50,8 @@ Code after the second outlining
       PRINT *, A
       END
 /* C pretty print for module TITI. */
+#include "math.h"
+#include "stdlib.h"
 void
 titi (int *a_p4a_copy, int *i_p4a_copy, int *n_p4a_copy)
 {
@@ -67,6 +69,8 @@ titi (int *a_p4a_copy, int *i_p4a_copy, int *n_p4a_copy)
   return;
 }
 /* C pretty print for module TOTO. */
+#include "math.h"
+#include "stdlib.h"
 void
 toto_ (int *a_p4a_copy, int *n_p4a_copy)
 {
