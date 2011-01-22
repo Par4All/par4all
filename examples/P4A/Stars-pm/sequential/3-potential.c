@@ -80,30 +80,47 @@ static void correctionPot(float pot[NP][NP][NP],
 static void fft_laplacian7(float field[NP][NP][NP][2]) {
   int i, j, k;
   float i2, j2, k2;
+  int limit = NP >> 2;
+  float coeff = M_PI / NP;
 
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
-        i2 = (i > NP / 2. ? sinf(M_PI / NP * (i - NP)) * sinf(M_PI
-            / NP * (i - NP)) : sinf(M_PI / NP * i) * sinf(M_PI / NP
-            * i));
-        j2 = (j > NP / 2. ? sinf(M_PI / NP * (j - NP)) * sinf(M_PI
-            / NP * (j - NP)) : sinf(M_PI / NP * j) * sinf(M_PI / NP
-            * j));
-        k2 = (k > NP / 2. ? sinf(M_PI / NP * (k - NP)) * sinf(M_PI
-            / NP * (k - NP)) : sinf(M_PI / NP * k) * sinf(M_PI / NP
-            * k)) + i2 + j2;
+        int offset;
+        float coeff2;
+        if(i > limit) {
+          offset = NP;
+        } else {
+          offset = 0;
+        }
+        i2 = sinf(coeff * (i - offset));
+
+        offset = 0;
+        if(j > limit) {
+          offset = NP;
+        } else {
+          offset = 0;
+        }
+        j2 = sinf(coeff * (j - offset));
+
+        if(k > limit) {
+          offset = NP;
+        } else {
+          offset = 0;
+        }
+        k2 = sinf(coeff * (k - offset));
+
+        k2 = k2 * k2 + i2 * i2 + j2 * j2;
         k2 += (k2 == 0);
 
-        field[i][j][k][0] = field[i][j][k][0] * G * M_PI * DX * DX / k2 / NP
-            / NP / NP;
-        field[i][j][k][1] = field[i][j][k][1] * G * M_PI * DX * DX / k2 / NP
-            / NP / NP; // FFT NORMALISATION
-
+        coeff2 = G * M_PI * DX * DX / k2 / NP / NP / NP;
+        field[i][j][k][0] = field[i][j][k][0] * coeff2;
+        field[i][j][k][1] = field[i][j][k][1] * coeff2; // FFT NORMALISATION
+/*
         if(i==0&&j==0&&k==0) {
           field[0][0][0][0] = 0;
           field[0][0][0][1] = 0;
-        }
+        }*/
       }
     }
   }
