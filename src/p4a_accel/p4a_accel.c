@@ -211,7 +211,20 @@ void P4A_accel_free(void *address) {
 void P4A_copy_from_accel(size_t element_size,
     void *host_address,
     void const*accel_address) {
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
+                    "%.1fms - %.2fGB/s\n",element_size, accel_address,host_address,
+                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -234,7 +247,19 @@ void P4A_copy_from_accel(size_t element_size,
 void P4A_copy_to_accel(size_t element_size,
     void const*host_address,
     void *accel_address) {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
+                    "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
+                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 
