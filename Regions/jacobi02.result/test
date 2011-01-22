@@ -609,8 +609,8 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -647,7 +647,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
@@ -691,24 +691,24 @@ int main(int argc, char *argv[])
    return 0;
    // END BLOCK
 }
-void p4a_kernel_0(float_t save[501][501], float_t space[501][501], int i, int j)
+void p4a_kernel_compute(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    
    save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
 }
-void p4a_kernel_1(float_t save[501][501], float_t space[501][501], int i, int j)
+void p4a_kernel_compute_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    
    space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
 }
-void p4a_kernel_2(float_t space[501][501], int i, int j)
+void p4a_kernel_get_data(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    space[i][j] = 0;
 }
-void p4a_kernel_launcher_0(float_t save[501][501], float_t space[501][501])
+void p4a_kernel_launcher_compute(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
@@ -723,10 +723,10 @@ kernel1:
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
          
-         p4a_kernel_wrapper_0(save, space, i, j);
+         p4a_kernel_wrapper_compute(save, space, i, j);
    // END BLOCK
 }
-void p4a_kernel_launcher_1(float_t save[501][501], float_t space[501][501])
+void p4a_kernel_launcher_compute_1(float_t save[501][501], float_t space[501][501])
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
@@ -738,10 +738,10 @@ kernel2:
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
          
-         p4a_kernel_wrapper_1(save, space, i, j);
+         p4a_kernel_wrapper_compute_1(save, space, i, j);
    // END BLOCK
 }
-void p4a_kernel_launcher_2(float_t space[501][501])
+void p4a_kernel_launcher_get_data(float_t space[501][501])
 {
    // BEGIN BLOCK
    // BEGIN BLOCK
@@ -753,31 +753,31 @@ void p4a_kernel_launcher_2(float_t space[501][501])
       for(j = 0; j <= 500; j += 1)
          // To be assigned to a call to P4A_vp_1: i
          // To be assigned to a call to P4A_vp_0: j
-         p4a_kernel_wrapper_2(space, i, j);
+         p4a_kernel_wrapper_get_data(space, i, j);
    // END BLOCK
 }
-void p4a_kernel_wrapper_0(float_t save[501][501], float_t space[501][501], int i, int j)
+void p4a_kernel_wrapper_compute(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
    
-   p4a_kernel_0(save, space, i, j);
+   p4a_kernel_compute(save, space, i, j);
 }
-void p4a_kernel_wrapper_1(float_t save[501][501], float_t space[501][501], int i, int j)
+void p4a_kernel_wrapper_compute_1(float_t save[501][501], float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
    
-   p4a_kernel_1(save, space, i, j);
+   p4a_kernel_compute_1(save, space, i, j);
 }
-void p4a_kernel_wrapper_2(float_t space[501][501], int i, int j)
+void p4a_kernel_wrapper_get_data(float_t space[501][501], int i, int j)
 {
    // BEGIN BLOCK
    // To be assigned to a call to P4A_vp_1: i
    // To be assigned to a call to P4A_vp_0: j
-   p4a_kernel_2(space, i, j);
+   p4a_kernel_get_data(space, i, j);
 }
 void write_data(char filename[])
 {
@@ -846,7 +846,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -854,7 +854,7 @@ kernel1:   p4a_kernel_launcher_0(save, space);
 //  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 
@@ -1007,7 +1007,7 @@ void get_data(char filename[])
 
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
 
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
@@ -1089,7 +1089,7 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -1097,7 +1097,7 @@ kernel1:   p4a_kernel_launcher_0(save, space);
 //  <space[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=499, 1<=PHI2,
 //    PHI2<=499}>
 
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -1214,7 +1214,7 @@ void get_data(char filename[])
 
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
@@ -1279,13 +1279,13 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <save[PHI1][PHI2]-IN-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
 //    PHI2<=500}>
 
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 
@@ -1402,7 +1402,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
 
 //  <fp-IN-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0, 1<=nx, 1<=ny}>
@@ -1474,13 +1474,13 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
 
 //  <space[PHI1][PHI2]-OUT-MAY-{1<=PHI1, PHI1<=499, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 1<=PHI2,
 //    PHI2<=499}>
 
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 
@@ -1581,7 +1581,7 @@ void get_data(char filename[])
 
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
 
 //  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx,
@@ -1640,8 +1640,8 @@ void compute()
    
    /* Use 2 array in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-kernel1:   p4a_kernel_launcher_0(save, space);
-kernel2:   p4a_kernel_launcher_1(save, space);
+kernel1:   p4a_kernel_launcher_compute(save, space);
+kernel2:   p4a_kernel_launcher_compute_1(save, space);
    // END BLOCK
 }
 void get_data(char filename[])
@@ -1678,7 +1678,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_2(space);
+   p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
 #pragma omp for private(j)

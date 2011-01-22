@@ -1,10 +1,10 @@
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+/* C pretty print for module P4A_LAUNCHER_MATMUL02. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_launcher_0_ (int *n_p4a_copy,
+p4a_launcher_matmul02_ (int *n_p4a_copy,
 			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 			int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
 {
@@ -16,21 +16,21 @@ p4a_kernel_launcher_0_ (int *n_p4a_copy,
     {
       for (i = 0; i <= n - 1; i++)
 	{
-	  p4a_kernel_wrapper_0 (&n, a, b, &i, &j);
+	  p4a_wrapper_matmul02 (&n, a, b, &i, &j);
 	}
     }
   return;
 }
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+/* C pretty print for module P4A_LAUNCHER_MATMUL02_1. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_launcher_1_ (int *n_p4a_copy,
-			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-			int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-			int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
+p4a_launcher_matmul02_1_ (int *n_p4a_copy,
+			  int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			  int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			  int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0])
 {
   int x;
   int k;
@@ -42,20 +42,21 @@ p4a_kernel_launcher_1_ (int *n_p4a_copy,
     {
       for (i = 0; i <= n - 1; i++)
 	{
-	  p4a_kernel_wrapper_1 (&n, a, b, c, &i, &j, &x);
+	  p4a_wrapper_matmul02_1 (&n, a, b, c, &i, &j, &x);
 	}
     }
   return;
 }
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_0. */
+/* C pretty print for module P4A_KERNEL_MATMUL02. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
-	      int *j_p4a_copy)
+p4a_kernel_matmul02 (int *n_p4a_copy,
+		     int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		     int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		     int *i_p4a_copy, int *j_p4a_copy)
 {
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
@@ -70,14 +71,15 @@ p4a_kernel_0 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 }
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_1. */
+/* C pretty print for module P4A_KERNEL_MATMUL02_1. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_1 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-	      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-	      int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0], int *i_p4a_copy,
-	      int *j_p4a_copy, int *x_p4a_copy)
+p4a_kernel_matmul02_1 (int *n_p4a_copy,
+		       int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		       int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		       int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+		       int *i_p4a_copy, int *j_p4a_copy, int *x_p4a_copy)
 {
   int k;
   int n = *n_p4a_copy;
@@ -100,11 +102,11 @@ p4a_kernel_1 (int *n_p4a_copy, int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 }
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+/* C pretty print for module P4A_WRAPPER_MATMUL02. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_wrapper_0 (int *n_p4a_copy,
+p4a_wrapper_matmul02 (int *n_p4a_copy,
 		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 		      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
 		      int *i_p4a_copy, int *j_p4a_copy)
@@ -113,27 +115,27 @@ p4a_kernel_wrapper_0 (int *n_p4a_copy,
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
 
-  p4a_kernel_0 (&n, a, b, &i, &j);
+  p4a_kernel_matmul02 (&n, a, b, &i, &j);
   return;
 }
 Module statement: 
 and declarations: 
-/* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+/* C pretty print for module P4A_WRAPPER_MATMUL02_1. */
 #include "math.h"
 #include "stdlib.h"
 void
-p4a_kernel_wrapper_1 (int *n_p4a_copy,
-		      int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-		      int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-		      int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
-		      int *i_p4a_copy, int *j_p4a_copy, int *x_p4a_copy)
+p4a_wrapper_matmul02_1 (int *n_p4a_copy,
+			int a[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int b[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int c[(*n_p4a_copy) - 0][(*n_p4a_copy) - 0],
+			int *i_p4a_copy, int *j_p4a_copy, int *x_p4a_copy)
 {
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
   int x = *x_p4a_copy;
 
-  p4a_kernel_1 (&n, a, b, c, &i, &j, &x);
+  p4a_kernel_matmul02_1 (&n, a, b, c, &i, &j, &x);
   *x_p4a_copy = x;
   return;
 }
