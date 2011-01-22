@@ -3,6 +3,12 @@ NVCC= nvcc
 CC= gcc
 TARGET= stars-pm
 
+ifneq ($(do_not_cheat),1)
+P4A_CHEAT= -DP4A_CUDA_CHEAT
+endif
+
+NVCCFLAGS=-lcufft
+
 ifeq "$(USE_FLOAT)" "1"
 # Use single precision for the OpenMP and GPU version:
 P4A_OPTIONS= -DUSE_FLOAT -DP4A_FFTW3
@@ -25,6 +31,14 @@ CPPFLAGS+=
 
 
 
+ifeq ($(oldgpu),1)
+CPPFLAGS+= -DCPUHISTO
+P4A_OPTIONS+= -DCPUHISTO 
+else
+NVCCFLAGS+=-arch sm_11 
+endif
+
+
 
 ifeq ($(debug),1)
 CPPFLAGS+= -DP4A_DEBUG
@@ -36,6 +50,11 @@ ifeq ($(timing),1)
 CPPFLAGS+= -DP4A_TIMING
 P4A_OPTIONS+= -DP4A_TIMING
 BIN_SUFFIX:=$(BIN_SUFFIX)_timing
+endif
+
+ifeq ($(bench),1)
+CPPFLAGS+= -DP4A_BENCH
+P4A_OPTIONS+= -DP4A_BENCH
 endif
 
 
@@ -73,7 +92,7 @@ OBJS=$(SOURCES:.c=.o)
 #	echo Target $@ not implemented...
 
 # Keep intermediate files for the demo for further inspection:
-.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
+.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) common/graphics.o
 
 
 #.INTERMEDIATE: $(TARGET:=_seq)
@@ -140,7 +159,7 @@ run-%: $(TARGET)_%
 
 %_autocuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(P4A_CHEAT) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 %_autocuda_comm_optimization : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
@@ -149,7 +168,7 @@ run-%: $(TARGET)_%
 
 %_cuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 	# Parallelize and build a CUDA version:
-	$(NVCC) $(CPPFLAGS) $(LDFLAGS) -lcufft $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
+	$(NVCC) $(CPPFLAGS) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 
 	
 include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC)
