@@ -40,7 +40,7 @@ static string launcher_prefix = 0;
 
 
 /* Return a pointer on the first char after the bad_prefix */
-static string clean_prefix(string full_name, string bad_prefix) {
+static const char* clean_prefix(const char* full_name, string bad_prefix) {
   int len = strlen(bad_prefix);
   if(strncasecmp(full_name,bad_prefix,len)==0) {
     full_name = full_name+len;
@@ -54,13 +54,13 @@ static string clean_prefix(string full_name, string bad_prefix) {
  * Trying to get only the original function name without prefix
  *
  */
-static string get_clean_mod_name(string mod_name) {
+static const char* get_clean_mod_name(const char *mod_name) {
 
   kernel_prefix   = get_string_property("GPU_KERNEL_PREFIX");
   launcher_prefix = get_string_property("GPU_LAUNCHER_PREFIX");
   wrapper_prefix  = get_string_property("GPU_WRAPPER_PREFIX");
 
-  string clean_mod_name = mod_name;
+  const char * clean_mod_name = mod_name;
 
   // Order is important !
   clean_mod_name = clean_prefix(clean_mod_name,launcher_prefix);
@@ -164,7 +164,7 @@ mark_loop_to_outline(const statement s) {
 
 */
 static void
-gpu_ify_statement(statement s, int depth, string mod_name) {
+gpu_ify_statement(statement s, int depth, const char* mod_name) {
   ifdebug(1) {
     pips_debug(1, "Parallel loop-nest of depth %d\n", depth);
     print_statement(s);
@@ -309,7 +309,7 @@ bool gpu_ify(const string mod_name) {
   loop_nests_to_outline = gen_nreverse(loop_nests_to_outline);
 
   /* Clean module name from prefix */
-  string clean_mod_name=get_clean_mod_name(global_name_to_user_name(entity_name(get_current_module_entity())));
+  const char* clean_mod_name=get_clean_mod_name(global_name_to_user_name(entity_name(get_current_module_entity())));
 
   FOREACH(STATEMENT, s, loop_nests_to_outline) {
     // We could have stored the depth, but it complexify the code...
