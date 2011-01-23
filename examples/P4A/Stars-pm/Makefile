@@ -164,7 +164,7 @@ run-%: $(TARGET)_%
 	
 %_autocuda_comm_optimization : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(P4A_CHEAT) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 
 %_cuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
