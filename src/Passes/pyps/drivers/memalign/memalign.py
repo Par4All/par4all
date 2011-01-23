@@ -2,7 +2,7 @@
 import re
 import fileinput
 import sys
-import utils
+import pypsutils
 
 alignsize = 16
 
@@ -49,14 +49,14 @@ class workspace:
         # defaults to false, as the user needs to invoke memalign
         self.memaligned = False
         self.ws = ws
-        utils.string2file(pattern_c, pattern_tmpfile)
-        sources.append(pattern_tmpfile)
+        pypsutils.string2file(pattern_c, pattern_tmpfile)
+	ws._sources.append(pattern_tmpfile)
 
     def memalign(self):
         for m in self.ws:
             if m.name == "pips_memalign":
                 continue
-            m.expression_substitution(pattern = "pips_memalign")
+	    #m.expression_substitution(pattern = "pips_memalign")
         self.memaligned = True
 
     def pre_goingToRunWith(self, files, outdir):

@@ -2002,7 +2002,7 @@ PREPEND_COMMENT "/* This comment is added by PREPEND_COMMENT phase */"
 \section{Prepending a call}
 \label{sec:prepending-call}
 
-\begin{PipsPass}{prepend_comment}
+\begin{PipsPass}{prepend_call}
 This phase inserts a call to function \verb/MY_TRACK/ just before the first statement of a module.
 Useful as a pedagogical example to explore the internal representation
 and Newgen. Not to be used for any pratical purpose as it is
@@ -2024,6 +2024,30 @@ PREPEND_CALL "MY_TRACK"
 \end{PipsProp}
 but it is not.
 
+\section{Add a pragma to a module}
+\label{sec:add-pragma}
+
+\begin{PipsPass}{add_pragma}
+This phase prepend or appends a pragma to a module.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias add_pragma 'Prepends or append a pragma to the code of a module'
+
+add_pragma > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+The pragma name can be defined by this property:
+\begin{PipsProp}{PRAGMA_NAME} 
+PRAGMA_NAME "MY_PRAGMA" 
+\end{PipsProp}
+
+The pragma can be append or prepend thanks to this property:
+\begin{PipsProp}{PRAGMA_PREPEND} 
+PRAGMA_PREPEND TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{remove_useless_label}
 Remove labels that are not usefull
