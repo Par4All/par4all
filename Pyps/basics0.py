@@ -2,7 +2,7 @@ from __future__ import with_statement # this is to work with python2.5
 #!/usr/bin/env python
 
 # import everything so that a session looks like tpips one
-from pyps import workspace
+from pyps import workspace, ccexecParams
 import shutil,os
 
 
@@ -56,7 +56,7 @@ with workspace("basics0.c",deleteOnClose=True) as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	a_out=w.compile(rep="basics0", link=False)
+	a_out=w.compile(ccexecParams(CC="gcc",rep="basics0"), link=False)
 
 
 # tidy ..
