@@ -511,6 +511,8 @@ def get_python_lib_dir(dist_dir):
         raise p4a_error("Could not determine Python modules installation path in " + dist_dir + ", try reinstalling Par4All")
     return dir
 
+def get_machine_arch():
+    return platform.machine()
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password.'''
