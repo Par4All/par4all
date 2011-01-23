@@ -6,6 +6,12 @@
 void histogram(int data[NP][NP][NP],
                int histo[NP][NP][NP]) {
   int i, j, k;
+
+#ifdef P4A_TIMING
+  double start_time = get_time();
+#endif
+
+
   memset(histo, 0, NPART * sizeof(int));
 #ifndef P4A
   /* Les casts ne passent pas dans PIPS :-( */
@@ -25,5 +31,12 @@ void histogram(int data[NP][NP][NP],
     }
   }
 #endif
+
+#ifdef P4A_TIMING
+  double end_time = get_time();
+  fprintf(stderr," P4A: Time for '%s' : %fms\n",__FUNCTION__, (end_time-start_time)*1000);
+#endif
+
+
 }
 
