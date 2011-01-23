@@ -7,14 +7,14 @@ void updatevel(coord vel[NP][NP][NP],
                int data[NP][NP][NP],
                int c,
                float dt) {
-  int i, j, k;
-
 #ifndef P4A
+  int i;
   /* Les casts ne passent pas dans PIPS :-( */
   for (i = 0; i < NPART; i++) {
-    (((int *)vel)[i]._[c] += force[((int*)data)[i]] * dt;
+    ((coord *)vel)[i]._[c] += ((float *)force)[((int*)data)[i]] * dt;
   }
 #else
+  int i, j, k;
 #ifdef P4A_CUDA_CHEAT               // 1.5ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (k = 0; k < NP; k++) {
