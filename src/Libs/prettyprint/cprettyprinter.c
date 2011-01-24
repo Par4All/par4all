@@ -1126,12 +1126,13 @@ static string ppt_math(string in_c, list le)
 }
 
 // @brief Generate a pips_user_error for intrinsic that can not be handle
-// right now
+// right now according to the property defined by the user
 ///@param in_f, the instrinsic in fortran
-static string ppt_error(string in_f, list le)
+static string ppt_unknown(string in_f, list le)
 {
-  string result = strdup ("");
-  pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
+  if (get_bool_property ("CROUGH_PRINT_UNKNOWN_INTRINSIC") == FALSE)
+	pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
+  string result = ppt_call (in_f, le);
   return result;
 }
 
@@ -1201,37 +1202,37 @@ static struct s_ppt intrinsic_to_c[] =
     {"&="                    , "&="                    , ppt_binary     },
     {"^="                    , "^="                    , ppt_binary     },
     {"|="                    , "|="                    , ppt_binary     },
-    {POWER_OPERATOR_NAME     , "pow"                   , ppt_error      },
+    {POWER_OPERATOR_NAME     , "pow"                   , ppt_unknown    },
     {MODULO_OPERATOR_NAME    , "%"                     , ppt_binary     },
 	{ABS_OPERATOR_NAME       , "abs"                   , ppt_math       },
 	{IABS_OPERATOR_NAME      , "abs"                   , ppt_call       },
 	{DABS_OPERATOR_NAME      , "fabs"                  , ppt_call       },
 	{CABS_OPERATOR_NAME      , "cabsf"                 , ppt_call       },
 	{CDABS_OPERATOR_NAME     , "cabs"                  , ppt_call       },
-	{WRITE_FUNCTION_NAME     , WRITE_FUNCTION_NAME     , ppt_error      },
-	{PRINT_FUNCTION_NAME     , PRINT_FUNCTION_NAME     , ppt_error      },
-	{REWIND_FUNCTION_NAME    , REWIND_FUNCTION_NAME    , ppt_error      },
-	{OPEN_FUNCTION_NAME      , OPEN_FUNCTION_NAME      , ppt_error      },
-	{CLOSE_FUNCTION_NAME     , CLOSE_FUNCTION_NAME     , ppt_error      },
-	{INQUIRE_FUNCTION_NAME   , INQUIRE_FUNCTION_NAME   , ppt_error      },
-	{BACKSPACE_FUNCTION_NAME , BACKSPACE_FUNCTION_NAME , ppt_error      },
-	{READ_FUNCTION_NAME      , READ_FUNCTION_NAME      , ppt_error      },
-	{BUFFERIN_FUNCTION_NAME  , BUFFERIN_FUNCTION_NAME  , ppt_error      },
-	{BUFFEROUT_FUNCTION_NAME , BUFFEROUT_FUNCTION_NAME , ppt_error      },
-    {ENDFILE_FUNCTION_NAME   , ENDFILE_FUNCTION_NAME   , ppt_error      },
-    {FORMAT_FUNCTION_NAME    , FORMAT_FUNCTION_NAME    , ppt_error      },
-    {MIN_OPERATOR_NAME       , MIN_OPERATOR_NAME       , ppt_error      },
-	{MIN0_OPERATOR_NAME      , MIN0_OPERATOR_NAME      , ppt_error      },
-	{MIN1_OPERATOR_NAME      , MIN1_OPERATOR_NAME      , ppt_error      },
-    {AMIN0_OPERATOR_NAME     , AMIN0_OPERATOR_NAME     , ppt_error      },
-    {AMIN1_OPERATOR_NAME     , AMIN1_OPERATOR_NAME     , ppt_error      },
-    {DMIN1_OPERATOR_NAME     , DMIN1_OPERATOR_NAME     , ppt_error      },
-    {MAX_OPERATOR_NAME       , MAX_OPERATOR_NAME       , ppt_error      },
-    {MAX0_OPERATOR_NAME      , MAX0_OPERATOR_NAME      , ppt_error      },
-    {AMAX0_OPERATOR_NAME     , AMAX0_OPERATOR_NAME     , ppt_error      },
-    {MAX1_OPERATOR_NAME      , MAX1_OPERATOR_NAME      , ppt_error      },
-    {AMAX1_OPERATOR_NAME     , AMAX1_OPERATOR_NAME     , ppt_error      },
-    {DMAX1_OPERATOR_NAME     , DMAX1_OPERATOR_NAME     , ppt_error      },
+	{WRITE_FUNCTION_NAME     , WRITE_FUNCTION_NAME     , ppt_unknown    },
+	{PRINT_FUNCTION_NAME     , PRINT_FUNCTION_NAME     , ppt_unknown    },
+	{REWIND_FUNCTION_NAME    , REWIND_FUNCTION_NAME    , ppt_unknown    },
+	{OPEN_FUNCTION_NAME      , OPEN_FUNCTION_NAME      , ppt_unknown    },
+	{CLOSE_FUNCTION_NAME     , CLOSE_FUNCTION_NAME     , ppt_unknown    },
+	{INQUIRE_FUNCTION_NAME   , INQUIRE_FUNCTION_NAME   , ppt_unknown    },
+	{BACKSPACE_FUNCTION_NAME , BACKSPACE_FUNCTION_NAME , ppt_unknown    },
+	{READ_FUNCTION_NAME      , READ_FUNCTION_NAME      , ppt_unknown    },
+	{BUFFERIN_FUNCTION_NAME  , BUFFERIN_FUNCTION_NAME  , ppt_unknown    },
+	{BUFFEROUT_FUNCTION_NAME , BUFFEROUT_FUNCTION_NAME , ppt_unknown    },
+    {ENDFILE_FUNCTION_NAME   , ENDFILE_FUNCTION_NAME   , ppt_unknown    },
+    {FORMAT_FUNCTION_NAME    , FORMAT_FUNCTION_NAME    , ppt_unknown    },
+    {MIN_OPERATOR_NAME       , MIN_OPERATOR_NAME       , ppt_unknown    },
+	{MIN0_OPERATOR_NAME      , MIN0_OPERATOR_NAME      , ppt_unknown    },
+	{MIN1_OPERATOR_NAME      , MIN1_OPERATOR_NAME      , ppt_unknown    },
+    {AMIN0_OPERATOR_NAME     , AMIN0_OPERATOR_NAME     , ppt_unknown    },
+    {AMIN1_OPERATOR_NAME     , AMIN1_OPERATOR_NAME     , ppt_unknown    },
+    {DMIN1_OPERATOR_NAME     , DMIN1_OPERATOR_NAME     , ppt_unknown    },
+    {MAX_OPERATOR_NAME       , MAX_OPERATOR_NAME       , ppt_unknown    },
+    {MAX0_OPERATOR_NAME      , MAX0_OPERATOR_NAME      , ppt_unknown    },
+    {AMAX0_OPERATOR_NAME     , AMAX0_OPERATOR_NAME     , ppt_unknown    },
+    {MAX1_OPERATOR_NAME      , MAX1_OPERATOR_NAME      , ppt_unknown    },
+    {AMAX1_OPERATOR_NAME     , AMAX1_OPERATOR_NAME     , ppt_unknown    },
+    {DMAX1_OPERATOR_NAME     , DMAX1_OPERATOR_NAME     , ppt_unknown    },
     {NULL                    , NULL                    , ppt_call       }
 };
 

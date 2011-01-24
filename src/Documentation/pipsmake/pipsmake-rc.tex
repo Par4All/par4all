@@ -13717,7 +13717,9 @@ to pretty print C code in C. This pass is mainly use inside PIPS
 and Par4All to be able to generate call to CUDA kernels from a fortran code.
 The kernel is supposed not to use I/O intrinsics (such as WRITE, READ),
 they are not handle at the moment (and not usefull in the CUDA context)
-by the crough printer.
+by the crough printer. However it is still possible to print the C code with
+the name of the fortran intrinsic using the property
+CROUGH\_PRINT\_UNKNOWN\_INTRINSIC.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -13750,6 +13752,13 @@ print_interface  > MODULE.interface
 \end{PipsMake}
 
 \subsection{Properties for Fortran to C prettyprinter}
+
+By default the crough pass fails if it encounters a fortran intrinsic that
+cannot be translated to C. However it is still possible to print the C code
+with the name of the fortran intrinsic using the following property.
+\begin{PipsProp}{CROUGH_PRINT_UNKNOWN_INTRINSIC}
+CROUGH_PRINT_UNKNOWN_INTRINSIC FALSE
+\end{PipsProp}
 
 By default the crough pass tries to match the best C type for any Fortran
 type. Here is the matches between Fortran and C variables:
