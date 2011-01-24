@@ -1370,8 +1370,8 @@ after \Apips digestion to have a smoother recompilation (for \Acuda it is a
 requirement) and more readable code without ugly macro inclusions at
 the beginning of all the files.
 
-This script can also be use to do expansion of the \verb|#include| of
-\Apfa Accel only to have a look for example to the real \Acuda or \Aopenmp
+This script can also be used to do expansion of the \verb|#include| of
+\Apfa Accel to see the \Acuda or \Aopenmp code
 that is generated.
 
 \input{p4a_recover_includes-help}
@@ -1381,9 +1381,9 @@ that is generated.
   Par4All Accel}
 \label{sec:p4a_p-script-from}
 
-\verb|p4a_post_processor.py| is the script that transforms the \Apips
+\verb|p4a_post_processor.py| transforms the \Apips
 output into calls to \Apfa Accel. It is mainly used by the \texttt{p4a}
-script but can be used for power users that need to write their own
+script but can be used by advanced users who need to write their own
 specialized \Apips scripts with \texttt{tpips} or \texttt{PyPS}.
 
 \input{p4a_post_processor.py-help}
@@ -1394,8 +1394,9 @@ specialized \Apips scripts with \texttt{tpips} or \texttt{PyPS}.
 \label{sec:help-docum-tex}
 
 \verb|optparse_help_to_tex| is a small compiler that translates a help
-output message of a command using the \texttt{optparse} format when
-launched with \texttt{-h} into La\TeX{} code with section for inclusion in
+output message of a command launched with \texttt{-h} using the
+\texttt{optparse} format when into La\TeX{} code with section for
+inclusion in 
 an article or slide generation with Beamer.
 
 The following section should be a very demonstration of this tool
