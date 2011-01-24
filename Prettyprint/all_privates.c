@@ -21,7 +21,7 @@ int main () {
     }
   }
 
-  // use the value of the array to prevent pips doing optilization on unused
+  // use the value of the array to prevent pips doing optimization on unused
   // values
   for (i = 0; i < 10; i++) {
     for (j = 0; j < 10; j++) {
