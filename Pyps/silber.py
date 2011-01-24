@@ -5,7 +5,7 @@ from os import system
 with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
 	# print out all functions
 	w.all_functions.display()
-	a_out=w.compile(ccexecParams(CC="gcc"))
+	a_out=w.compile()
 	system("./"+a_out+" include/input.pgm include/mapfile.amp /dev/null")
 
 	# print all function with both callers and callees
@@ -46,7 +46,7 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		t.coarse_grain_parallelization()
 		# great ! OMP pragmas
 		t.display()
-		(rc,out,err)=w.compile_and_run(ccexecParams(CC="gcc",CFLAGS='-g -O2 -fopenmp', args=["include/input.pgm","include/mapfile.amp", "/dev/null"]))
+		(rc,out,err)=w.compile_and_run(ccexecParams(CFLAGS='-g -O2 -fopenmp', args=["include/input.pgm","include/mapfile.amp", "/dev/null"]))
 
 		w.props.constant_path_effects=False
 		lbl=t.loops()[0].loops()[0].label

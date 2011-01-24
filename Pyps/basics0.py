@@ -56,7 +56,7 @@ with workspace("basics0.c",deleteOnClose=True) as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	a_out=w.compile(ccexecParams(CC="gcc",rep="basics0"), link=False)
+	a_out=w.compile(ccexecParams(rep="basics0"), link=False)
 
 
 # tidy ..
