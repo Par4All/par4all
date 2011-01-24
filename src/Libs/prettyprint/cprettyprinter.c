@@ -86,8 +86,14 @@
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
 
 // define some C macro to support some fortran intrinsics
-string macro = "#define mod(a,b) (a%b)\n";
-
+#define MAX_FCT    "crough_max"
+#define MIN_FCT    "crough_min"
+#define MAX_DEF    "#define " MAX_FCT "(a,b) (((a)>(b))?(a):(b))\n"
+#define MIN_DEF    "#define " MIN_FCT "(a,b) (((a)<(b))?(a):(b))\n"
+#define POW_PRE    "crough_"
+#define POW_DEF    "#define " POW_PRE "powi(a,b) ((a)^(b))\n"
+#define CMPLX_FCT  "init_complex"
+#define CMPLX_DEF  "#define " CMPLX_FCT "(a,b) (a + b*I)\n"
 
 /* forward declaration. */
 static string c_expression(expression,bool);
@@ -111,27 +117,57 @@ static basic cur_basic = basic_undefined;
 
 #define RESULT_NAME	"result"
 
+/**
+ * @brief test if the string looks like a REAL*8 (double in C) declaration
+ * i.e something like 987987D54654 : a bunch of digit with a letter in the
+ * middle. if yes convert it to C (i.e replace D by E) and return true
+ */
+static bool convert_doudle_value (string *str) {
+  bool result = true;
+  int match = 0;
+  int i = 0;
+  pips_debug (5, "test if str : %s is a double value. %c 0 = \n", *str, '0');
+  for (i = 0; ((*str)[i] != '\0') && (result == true); i++) {
+	bool cond = ((*str)[i] == 'D') && (match == 0);
+	if (cond == true) {
+	  match = i;
+	  continue;
+	}
+	result &= (((*str)[i] >= '0') && ((*str)[i] <= '9')) || ((*str)[i] == '.') || (cond);
+  }
+  pips_debug (5, "end with i = %d, match = %d result = %s\n",
+			  i, match, (result)?"true":"false");
+  result &= ((*str)[i] == '\0') && (match + 1 != i) && (match != 0);
+  if (result == true) {
+	*str = strdup (*str);
+	(*str)[match] = 'E';
+  }
+  return result;
+}
 
 /*
  * convert some fortran constant to their equivalent in C
  */
 static void const_wrapper(string* s)
 {
-    static char * const_to_c[][2] = { { ".true." , "1" } , { ".false." , "0" } };
-    static const int const_to_c_sz = sizeof(const_to_c)/sizeof(*const_to_c);
-    int i;
-
-    /* search fortran constant */
-    char *name = strlower(strdup(*s),*s);
-    for(i=0;i<const_to_c_sz;i++)
-    {
-        if(strcmp(name,const_to_c[i][0]) == 0 )
-        {
-            *s = const_to_c[i][1];
-            break;
-        }
-    }
-    free(name);
+  static char * const_to_c[][2] = {	{ ".true." , "1" } , { ".false." , "0" }};
+  static const int const_to_c_sz = sizeof(const_to_c)/sizeof(*const_to_c);
+  int i;
+  pips_debug (5, "constant to convert : %s\n", *s);
+  if (convert_doudle_value (s) == false) {
+	/* search fortran constant */
+	char *name = strlower(strdup(*s),*s);
+	for(i=0;i<const_to_c_sz;i++)
+	  {
+		if(strcmp(name,const_to_c[i][0]) == 0 )
+		  {
+			*s = const_to_c[i][1];
+			break;
+		  }
+	  }
+	free(name);
+  }
+  pips_debug (5, "constant converted : %s\n", *s);
 }
 
 /*
@@ -168,6 +204,7 @@ static string c_entity_local_name(entity var)
 
     }
     name=strlower(strdup(name),name);
+	pips_debug (5, "local name %s found\n", name);
     return name;
 }
 
@@ -403,7 +440,7 @@ static string c_basic_string(basic b)
       break;
     }
   case is_basic_complex:
-    result = "_Complex" SPACE; /* c99 style */
+    result = "complex" SPACE; /* c99 style with include of complex.h*/
     break;
   default:
     pips_internal_error("unhandled case");
@@ -795,8 +832,11 @@ static string c_include (void) {
   string result = NULL;
 
   // add some c include files in order to support fortran intrinsic
-  result = strdup (concatenate ("#include \"math.h\"\n",   // fabs
+  result = strdup (concatenate ("//needed include to compile the C output\n"
+								"#include \"math.h\"\n",   // fabs
 								"#include \"stdlib.h\"\n", // abs
+								"#include \"complex.h\"\n", // abs
+								"\n",
 								NULL));
 
   // take care of include file required by the user
@@ -825,6 +865,17 @@ static string c_include (void) {
 	free (old);
   }
   pips_debug (5, "include string : %s\n", result);
+  return result;
+}
+
+/********************************************************************* MACRO */
+static string c_macro (void) {
+  string result = NULL;
+  // add some macro to support fortran intrinsics
+  result = strdup (concatenate ("// The macros to support some fortran intrinsics\n",
+								"// and complex declaration\n"
+								MAX_DEF, MIN_DEF, POW_DEF, CMPLX_DEF, "\n",
+								NULL));
   return result;
 }
 
@@ -1081,7 +1132,16 @@ static c_full_name c_base_name_to_c_full_name [] = {
   {"abs"   , is_basic_float   , 8  , "f"    , "" }, //double
   {"abs"   , is_basic_complex , 8  , "c"    , "f"}, //float complex
   {"abs"   , is_basic_complex , 16 , "c"    , "" }, //double complex
-  {NULL    , is_basic_int     , 0  , ""     , ""}
+  {"pow"   , is_basic_int     , 1  , POW_PRE, "i"}, //char
+  {"pow"   , is_basic_int     , 2  , POW_PRE, "i"}, //short
+  {"pow"   , is_basic_int     , 4  , POW_PRE, "i"}, //int
+  {"pow"   , is_basic_int     , 6  , POW_PRE, "i"}, //long
+  {"pow"   , is_basic_int     , 8  , POW_PRE, "i"}, //long long
+  {"pow"   , is_basic_float   , 4  , ""     , "f"}, //float
+  {"pow"   , is_basic_float   , 8  , ""     , "" }, //double
+  {"pow"   , is_basic_complex , 8  , "c"    , "f"}, //float complex
+  {"pow"   , is_basic_complex , 16 , "c"    , "" }, //double complex
+  {NULL    , is_basic_int     , 0  , ""     , "" }
 };
 
 /// @brief fill the c_base_name to get the c full name accorgind to its basic
@@ -1126,6 +1186,35 @@ static string ppt_math(string in_c, list le)
   if (cur_basic != basic_undefined)
 	free_basic (cur_basic);
   free (str_copy);
+  return result;
+}
+
+// fortran min and max intrinsic accept from 2 to n elements. This can be done
+// in c using an ellipse or using a simple macro. The second possibility is
+// chosen
+static string ppt_min_max (string in_c, list le)
+{
+  bool flag = false;
+  bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
+  expression exp = EXPRESSION (CAR (le));
+  string arg = c_expression (exp, false);
+  string result = strdup(concatenate ((expression_scalar_p(exp) &&
+									   pointer)? "&" : "", arg, NULL));
+  POP (le);
+  free (arg);
+
+  FOREACH (EXPRESSION, e, le){
+	arg = c_expression(e,false);
+	string old = result;
+	result = strdup(concatenate(in_c , OPENPAREN, old, ", ",
+								expression_scalar_p(e) && pointer ? "&" : "",
+								arg, CLOSEPAREN, NULL));
+	free(arg);
+	free(old);
+	flag = true;
+  }
+
+  pips_assert ("min and max should have at least 2 arguments", flag == true);
   return result;
 }
 
@@ -1206,7 +1295,7 @@ static struct s_ppt intrinsic_to_c[] =
     {"&="                    , "&="                    , ppt_binary     },
     {"^="                    , "^="                    , ppt_binary     },
     {"|="                    , "|="                    , ppt_binary     },
-    {POWER_OPERATOR_NAME     , "pow"                   , ppt_unknown    },
+    {POWER_OPERATOR_NAME     , "pow"                   , ppt_math       },
     {MODULO_OPERATOR_NAME    , "%"                     , ppt_binary     },
 	{ABS_OPERATOR_NAME       , "abs"                   , ppt_math       },
 	{IABS_OPERATOR_NAME      , "abs"                   , ppt_call       },
@@ -1225,18 +1314,20 @@ static struct s_ppt intrinsic_to_c[] =
 	{BUFFEROUT_FUNCTION_NAME , BUFFEROUT_FUNCTION_NAME , ppt_unknown    },
     {ENDFILE_FUNCTION_NAME   , ENDFILE_FUNCTION_NAME   , ppt_unknown    },
     {FORMAT_FUNCTION_NAME    , FORMAT_FUNCTION_NAME    , ppt_unknown    },
-    {MIN_OPERATOR_NAME       , MIN_OPERATOR_NAME       , ppt_unknown    },
-	{MIN0_OPERATOR_NAME      , MIN0_OPERATOR_NAME      , ppt_unknown    },
-	{MIN1_OPERATOR_NAME      , MIN1_OPERATOR_NAME      , ppt_unknown    },
-    {AMIN0_OPERATOR_NAME     , AMIN0_OPERATOR_NAME     , ppt_unknown    },
-    {AMIN1_OPERATOR_NAME     , AMIN1_OPERATOR_NAME     , ppt_unknown    },
-    {DMIN1_OPERATOR_NAME     , DMIN1_OPERATOR_NAME     , ppt_unknown    },
-    {MAX_OPERATOR_NAME       , MAX_OPERATOR_NAME       , ppt_unknown    },
-    {MAX0_OPERATOR_NAME      , MAX0_OPERATOR_NAME      , ppt_unknown    },
-    {AMAX0_OPERATOR_NAME     , AMAX0_OPERATOR_NAME     , ppt_unknown    },
-    {MAX1_OPERATOR_NAME      , MAX1_OPERATOR_NAME      , ppt_unknown    },
-    {AMAX1_OPERATOR_NAME     , AMAX1_OPERATOR_NAME     , ppt_unknown    },
-    {DMAX1_OPERATOR_NAME     , DMAX1_OPERATOR_NAME     , ppt_unknown    },
+    {MIN_OPERATOR_NAME       , MIN_FCT                 , ppt_min_max    },
+	{MIN0_OPERATOR_NAME      , MIN_FCT                 , ppt_min_max    },
+	{MIN1_OPERATOR_NAME      , MIN_FCT                 , ppt_min_max    }, // implicit cast
+    {AMIN0_OPERATOR_NAME     , MIN_FCT                 , ppt_min_max    }, // implicit cast
+    {AMIN1_OPERATOR_NAME     , MIN_FCT                 , ppt_min_max    },
+    {DMIN1_OPERATOR_NAME     , MIN_FCT                 , ppt_min_max    },
+    {MAX_OPERATOR_NAME       , MAX_FCT                 , ppt_min_max    },
+    {MAX0_OPERATOR_NAME      , MAX_FCT                 , ppt_min_max    }, // implicit cast
+    {AMAX0_OPERATOR_NAME     , MAX_FCT                 , ppt_min_max    }, // implicit cast
+    {MAX1_OPERATOR_NAME      , MAX_FCT                 , ppt_min_max    },
+    {AMAX1_OPERATOR_NAME     , MAX_FCT                 , ppt_min_max    },
+    {DMAX1_OPERATOR_NAME     , MAX_FCT                 , ppt_min_max    },
+	{IMPLIED_COMPLEX_NAME    , CMPLX_FCT               , ppt_call       },
+	{IMPLIED_DCOMPLEX_NAME   , CMPLX_FCT               , ppt_call       },
     {NULL                    , NULL                    , ppt_call       }
 };
 
@@ -1296,7 +1387,7 @@ static string c_call(call c,bool breakable)
     }
     else if (call_constant_p(c))
     {
-        const_wrapper(&local_name);
+	  const_wrapper(&local_name);
         result = strlower(strdup(local_name),local_name);
     }
     else
@@ -1981,7 +2072,7 @@ static string interface_code_string(entity module, statement stat)
 
 static string c_code_string(entity module, statement stat)
 {
-  string head, decls, body, result, copy_in, include;
+  string head, decls, body, result, copy_in, include, macro;
 
   /* What about declarations that are external a module scope ?
      Consider a source file as a module entity, put all declarations in it
@@ -1996,16 +2087,21 @@ static string c_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  // generate the user required includes
+  // get the needed includes
   include     = c_include ();
+  // get the needed macro
+  macro       = c_macro ();
   // function declaration
   head        = c_head(module);
   // What about declarations associated to statements
-  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,FALSE);
+  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,
+							   FALSE);
   body        = c_statement(stat, false);
   copy_in     = scalar_prelude ();
-  result = concatenate(include, head, OPENBRACE, NL, decls,
-		       copy_in, NL, body, CLOSEBRACE, NL, NULL);
+
+  // concatenate everything to get the code
+  result = concatenate(include, macro, head, OPENBRACE, NL, decls,
+					   copy_in, NL, body, CLOSEBRACE, NL, NULL);
 
   free (include);
   free(head);
