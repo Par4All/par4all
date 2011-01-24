@@ -200,11 +200,11 @@ class p4a_builder:
                     c_flags += [ "-fno-openmp" ]
                     fortran_flags += [ "-fno-openmp" ]
                     ld_flags += [ "-fno-openmp" ]
-
-        if accel_openmp:
-            cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
-            fortran_flags.append ("-ffree-line-length-none")
-            self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
+            
+            if accel_openmp:
+                cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
+                fortran_flags.append ("-ffree-line-length-none")
+                self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_accel.c") ]
 
         if com_optimization:
             self.extra_source_files += [ os.path.join(os.environ["P4A_ACCEL_DIR"], "p4a_communication_optimization_runtime.cpp") ]
