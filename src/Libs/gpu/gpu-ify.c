@@ -62,13 +62,33 @@ static const char* get_clean_mod_name(const char *mod_name) {
 
   const char * clean_mod_name = mod_name;
 
-  // Order is important !
   clean_mod_name = clean_prefix(clean_mod_name,launcher_prefix);
   clean_mod_name = clean_prefix(clean_mod_name,wrapper_prefix);
   clean_mod_name = clean_prefix(clean_mod_name,kernel_prefix);
   return clean_mod_name;
 }
 
+/**
+ * Build the outline function name
+ */
+static string build_outline_name(const char *base_prefix,
+                                      const char *mod_name) {
+  bool name_suffix_p = get_bool_property("GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME");
+
+  char *prefix;
+  if(name_suffix_p) {
+    // strdup because concatenate is used during build_new_top_level_module_name
+    prefix = strdup(concatenate(base_prefix,"_",mod_name,NULL));
+  } else {
+    prefix = strdup(base_prefix);
+  }
+
+  string outline_name = build_new_top_level_module_name(prefix,true);
+
+  free(prefix);
+
+  return outline_name;
+}
 
 
 
@@ -179,13 +199,7 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
        first. The kernel name with a prefix defined in the
        GPU_KERNEL_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    string prefix = strdup(concatenate(kernel_prefix,"_",mod_name,NULL));
-    string outline_name = build_new_top_level_module_name(prefix,true);
-    ifdebug(3) {
-      pips_debug(1, "Outline kernel %s (prefix was %s)\n", outline_name, prefix);
-    }
-    free(prefix);
-    outliner(outline_name,sk);
+    outliner(build_outline_name(kernel_prefix, mod_name),sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel:");
   }
 
@@ -246,13 +260,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        the kernel call. The kernel wrapper name with a prefix defined in the
        GPU_WRAPPER_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    string prefix = strdup(concatenate(wrapper_prefix,"_",mod_name,NULL));
-    string outline_name = build_new_top_level_module_name(prefix,true);
-    ifdebug(3) {
-      pips_debug(1, "Outline wrapper %s (prefix was %s)\n", outline_name, prefix);
-    }
-    free(prefix);
-    outliner(outline_name, sk);
+    outliner(build_outline_name(wrapper_prefix, mod_name), sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
 
@@ -260,14 +268,8 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     /* Outline the kernel launcher with a prefix defined in the
        GPU_LAUNCHER_PREFIX property: */
     list sl = CONS(STATEMENT, s, NIL);
-    statement st = statement_undefined;
-    string prefix = strdup(concatenate(launcher_prefix,"_",mod_name,NULL));
-    string outline_name = build_new_top_level_module_name(prefix,true);
-    ifdebug(3) {
-      pips_debug(1, "Outline launcher %s (prefix was %s)\n", outline_name, prefix);
-    }
-    free(prefix);
-    st = outliner(outline_name, sl);
+    statement st;
+    st = outliner(build_outline_name(launcher_prefix, mod_name), sl);
     if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
       string fwp = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
       ifdebug(3) {

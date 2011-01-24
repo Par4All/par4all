@@ -7289,7 +7289,15 @@ GPU_WRAPPER_PREFIX "p4a_wrapper"
 \end{PipsProp}
 \begin{PipsProp}{GPU_KERNEL_PREFIX}
 GPU_KERNEL_PREFIX "p4a_kernel"
+
+This boolean property control wherever the outliner use the original function
+name as a suffix instead of only numerical suffix.
+
+\begin{PipsProp}{GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME}
+GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME TRUE
 \end{PipsProp}
+
+
 For Fortran output you may need to have these prefix name in uppercase.
 
 Indeed, each level of outlining can be enabled or disabled according to
