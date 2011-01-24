@@ -1007,6 +1007,7 @@ static string ppt_call(string in_c, list le)
 // in a gen_recurse, the goal is to determine the type of inputs to be used.
 static bool find_basic (reference r) {
   pips_debug (7, "processing a reference\n");
+  bool result = true;
   entity e = reference_variable (r);
   basic b = variable_basic (type_variable (entity_type (e)));
   if (cur_basic == basic_undefined) {
@@ -1014,7 +1015,8 @@ static bool find_basic (reference r) {
 	cur_basic = copy_basic (b);
   }
   else if (basic_tag ((b)) != basic_tag (cur_basic)) {
-	pips_user_error("dont know how to merge two different types");
+	pips_user_error("dont know how to merge two different types : %s and %s\n",
+					basic_to_string (b), basic_to_string (cur_basic));
   }
   else {
 	switch (basic_tag(b)) {
@@ -1042,7 +1044,7 @@ static bool find_basic (reference r) {
 		case 16:
 		case 18:
 		  // should nt happen
-		  pips_user_error("found an unsigned integer in fortran");
+		  pips_user_error("found an unsigned integer in fortran\n");
 		  break;
 		}
 	  break;
@@ -1060,11 +1062,13 @@ static bool find_basic (reference r) {
 	  break;
 	default:
 	  // What should be done?
-	  pips_user_error("the basic can not be a variable");
+	  pips_user_error("the basic can not be a variable\n");
 	  break;
 	}
   }
-  return true;
+  // we don't want to look at indices of an array
+  result &= (reference_indices (r) == NIL);
+  return result;
 }
 
 static c_full_name c_base_name_to_c_full_name [] = {
