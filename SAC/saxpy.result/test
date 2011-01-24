@@ -514,6 +514,8 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SAXPY. */
+#include "math.h"
+#include "stdlib.h"
 void
 saxpy (float sx[1000], float sy[1000])
 {
