@@ -47,7 +47,7 @@
 
 \maketitle
 
-You can get this document in PDF format on \PfaOrganizationPDF and in HTML
+This document can be found in PDF format on \PfaOrganizationPDF and in HTML
 on \PfaAllOrganizationHTDOC.
 
 % To automatically build reports from this content:
@@ -581,7 +581,7 @@ p4a_git --branch-action "git checkout p4a\$suffix; git pull origin p4a\$suffix"
 \end{verbatim}
 
 To set up all the tracking branches for version
-\texttt{p4a-0.2-alpha} before you can use them:
+\texttt{p4a-0.2-alpha} before using them:
 \begin{verbatim}
 p4a_git --branch-action git branch p4a-0.2-alpha\$suffix \
         remotes/origin/p4a-0.2-alpha\$suffix
@@ -662,7 +662,7 @@ The \verb|p4a_git| options are available in short and long forms:
   the \texttt{\emph{args+}} shell-script to a branch hierarchy, with the
   branch suffix available to the \texttt{\emph{args+}} script in the
   \verb|$suffix| variable. Do not forget to escape special shell
-  characters you want in the final shell;
+  characters in the final shell;
 \item[\texttt{-a} or \texttt{--add-remotes}] create the remotes pointing
   to \verb|$P4A_CRI_GIT_SVN| and on the \Apolylib{} \Agit;
 \item[\texttt{-r} or \texttt{--root} \texttt{<\emph{directory}>}] to
@@ -723,8 +723,8 @@ This process has been described in section~\ref{sec:compilation};
 further details are provided in the following example.
 
 Assuming there is a \Asvn working copy of \Apips (including the \texttt{trunk}
-into \texttt{prod}, your branch in \verb|pips_dev|, etc. Refer
-to the \Apips developer guide for more information). Use the
+into \texttt{prod}, your branch in \verb|pips_dev|, etc.; refer
+to the \Apips developer guide for more information), use the
 \verb|--pips-src=| to make \Apfa point to this directory.
 
 Verify that the correctd \Apfa variable is set in your shell, that
@@ -762,7 +762,6 @@ An example script performs all of the above actions can be found in:
 \verb|src/simple_tools/p4a_setup_with_my_PIPS|:
 \lstinputlisting[language=bash]{p4a_setup_with_my_PIPS}
 
-
 \subsubsection{Debuging PIPS and p4a}
 \label{sec:debuging-pips-p4a}
 
@@ -772,71 +771,73 @@ To debug \texttt{tpips} in \Apfa, it is sufficient to run \texttt{gdb
   many windows in the \texttt{Gud/Gdb-UI} menu.} and then \texttt{run
   \emph{the}.tpips} file in parameter.
 
-To debug a \Apyps program, since indeed it is a Python program that uses
-\Apips libraries, you then need to launch \texttt{gdb python} and inside
-the debugger run the program with \texttt{run \emph{the\_PyPS\_file}.py}
+\Apyps programs are Python programs that use
+\Apips libraries. To debug \Apyps programs, launch \texttt{gdb python}
+and inside the debugger and run the program with \texttt{run
+\emph{the\_PyPS\_file}.py} 
 
-To debug \texttt{p4a}, it is still a Python program, but you need to run
-\texttt{p4a} and passing arguments to it. Since \texttt{p4a} itself
-launch many processes, it is difficult to debug a \Apips directly for
-example.
+\texttt{p4a} is also a Python program, however, it requires several
+arguments and launches many processes. This complicates the debugging
+of \Apips directly.
 
-A first way is to ask the debugger to follow the
-\texttt{fork()} and \texttt{exec()} system calls. For example in
-\texttt{gdb}, setting \texttt{detach-on-fork off} and also looking at
-\texttt{follow-exec-mode}.
+One way to debug \Apips is to ask the debugger to follow the
+\texttt{fork()} and \texttt{exec()} system calls. This can be achieved
+by setting \texttt{detach-on-fork off} in
+\texttt{gdb} and also looking at \texttt{follow-exec-mode}.
 
-A second easier way is to avoid \texttt{p4a} launching processes. This is
-done with the \verb/--no-spawn/ option. Avoiding colors and other
-decoration is useful when debugging, so the \verb/--plain/ is useful too.
+A second easier way is to prevent \texttt{p4a} from launching
+processes. This is accomplished with the \verb/--no-spawn/
+option. Avoiding colors and other 
+decoration by using the \verb/--plain/ is also useful when debugging.
 
-So a good way to debug \texttt{p4a} from \texttt{gdb} it to launch first a
-\texttt{gdb python} and then run \texttt{p4a} like:
+The preferred method for debugging \texttt{p4a} from \texttt{gdb} is
+to launch first 
+\texttt{gdb python} and then run \texttt{p4a} with:
 \begin{verbatim}
 run /usr/local/par4all/bin/p4a --plain --no-spawn
     -o hyantes-static-99_openmp hyantes-static-99.c -lm
 \end{verbatim}
 
-To run your own version of \texttt{p4a}, you can put the directory
-containing your \texttt{p4a} \texttt{.py} libraries first into the
+To run your own version of \texttt{p4a}, add the directory
+containing your \texttt{p4a} \texttt{.py} libraries to the
 \texttt{PYTHONPATH} environment variable.
 
-For memory debugging with Valgrind, look at
+For memory debugging with Valgrind, see
 section~\ref{sec:scripts-debugging}.
-
 
 \subsubsection{Internal organization}
 \label{sec:intern-organ}
 
-The work-flow related to \Apips is quite more complex since we must
+The work-flow related to \Apips is complicated by the need to
 consolidate data from 5 different \Asvn repositories. The script
-\verb|p4a_git| is used to automate the management of this workflow too,
-but we describes it further here if you want to dig into it.
+\verb|p4a_git| is used to automate the management of this workflow.
+Further details are provided in this section.
 
 The basic \Apips work-flow is to develop into the 5 original \Apips{}
 \Asvn repositories at MINES ParisTech/\Acri and to import the selected
 developments into the \Apfa{} \Agit.
 
-For this, we use 5 \Agit repositories that are gateways with these \Asvn
-repositories. For technical reasons, it is better that this kind of subtle
-gateway exists in only one place and this is currently done on the laptop
-of Ronan \textsc{Keryell}. Then these 5 gateways are used as remotes into
+The infrastructure that supports this work-flow consists of 5 \Agit
+repositories that are
+gateways to the original \Asvn
+repositories. For security, these gateways exist only on the laptop
+of Ronan \textsc{Keryell} and are used as remotes into
 the \Apfa{} \Agit. To synchronize these gateways to the latest version of
-the \Apips{} \Asvn repositories, use a \verb|pips_git| in the directory
+the \Apips{} \Asvn repositories, run \verb|pips_git| in the directory
 owning these \Agit-\Asvn repositories.
 
-But since we have then a \Agit interface of the original \Apips{} \Asvn
-repositories and \Agit is quite more powerful than \Asvn, some people may
-want to develop into \Apips with \Agit by using these gateways. For
-example they may want to develop with common branches easily and when they
-are right with them push them back into the \Apips{} \Asvn trunk. To have
-a public interface for them, these \Agit gateways are pushed to public
-\Agit repository programmers can play with. Regularly these public
-gateways are synchronized manually with the \Apips{} \Asvn. Nevertheless,
+Since the gateway provides a \Agit interface to the original \Apips{} \Asvn
+repositories and \Agit is more powerful than \Asvn, some users may
+want to develop code into \Apips using \Agit via the gateways. For
+example, development and verification can proceed with with common
+branches in \Agit before pushing into the \Apips{} \Asvn trunk. To provide
+a public interface for programmers, the \Agit gateways are pushed to a public
+\Agit repository. These public gateways are synchronized regularly and
+manually with the \Apips{} \Asvn. However,
 \Asvn may not be credited with the right owner of the commit but with the
-one running the gateway, which is not fair. So the preferred way is to
-directly develop in the original \Apips \Asvn repository (eventually with
-her own \Agit-\Asvn gateway).
+one running the gateway, which is not accurate. Therefore, the
+preferred method is to 
+develop code directly in the original \Apips \Asvn repository.
 
 The 5 public gateway \Agit repositories are also defined as 5 remotes into
 the \Apfa{} \Agit:
@@ -859,8 +860,8 @@ respective subtree directories:
 \end{description}
 
 To import the latest \Apips development into the \Apfa{} \Agit for
-inspection, choice for inclusion, you fetch the repositories you want
-with:
+inspection and to choose these projects for inclusion, fetch the
+desired repositories with:
 \begin{verbatim}
 git fetch CRI/linear
 git fetch CRI/newgen
@@ -868,11 +869,11 @@ git fetch CRI/nlpmake
 git fetch CRI/pips
 git fetch CRI/validation
 \end{verbatim}
-These commands are also done by a \verb|p4a_fetch_all| that fetches also the
+This can also be achieved with \verb|p4a_fetch_all|, which includes the
 \Apolylib part.
 
-You can then merge the feature you want with a \texttt{git merge -s
-  subtree} from \texttt{remotes/CRI/.../master} as:
+After the import, merge the desired feature with a \texttt{git merge -s
+  subtree} from \texttt{remotes/CRI/.../master} with:
 \begin{verbatim}
 git merge -strategy=subtree remotes/CRI/linear/master
 git merge -strategy=subtree remotes/CRI/newgen/master
@@ -881,16 +882,16 @@ git merge -strategy=subtree remotes/CRI/pips/master
 git merge -strategy=subtree remotes/CRI/validation/master
 \end{verbatim}
 or from any tree identifier to do more precise version selection. The
-\texttt{-s subtree} is necessary since in \Apfa the \Apips files are not
-at the top-level directory and you do not want them to appear at the
-top-level directory.
+\texttt{-s subtree} is necessary since in \Apfa the \Apips files
+should not be
+at the top-level directory.
 
-To pull everything at one for testing, this is done with the
-\verb|p4a_git| script described in \S~\ref{sec:p4a_git-script-deal}. Do
-not forget it may useful to create a branch with a \texttt{git checkout
-  -b} before to test it, so the branch can be deleted for an easy
-rollback.
-
+To pull everything at once for testing, use the
+\verb|p4a_git| script described in
+\S~\ref{sec:p4a_git-script-deal}. Remember that
+it is preferable to create a branch with a \texttt{git checkout
+  -b} before pulling everything, since the branch can be deleted after
+testing for easy rollback.
 
 \subsection{PIPS-GFC extension workflow}
 \label{sec:pips-gfc-workflow}
@@ -899,14 +900,14 @@ rollback.
 \label{sec:new-version}
 
 In the work of Mehdi \textsc{Amini}, the branch
-\texttt{p4a-gcc-gfc-4.4.3} contains the sources of \Agcc-\Agfc 4.4.3 to
-get the Fortran~95. Then the branch is named also \texttt{p4a-gcc-gfc}
+\texttt{p4a-gcc-gfc-4.4.3} contains the sources of \Agcc-\Agfc 4.4.3
+which includes Fortran~95. The branch is also named \texttt{p4a-gcc-gfc},
 which is merged into \texttt{p4a-packages}.
 
 During \Apfa construction, these sources are patched and compiled into the
 \Apips Fortran~95 parser.
 
-Concretely, to add for example the new 4.4.4 version, you do a:
+For example, to add the new 4.4.4 version, use:
 \begin{verbatim}
 git checkout p4a-gcc-gfc
 git checkout -b p4a-gcc-gfc-4.4.4
@@ -915,81 +916,79 @@ git checkout p4a-gcc-gfc
 git merge p4a-gcc-gfc-4.4.4
 \end{verbatim}
 
-
 \subsubsection{Old version (historical)}
 \label{sec:old-version}
 
 
-This describes the organization at the begin of the project, if you want
-to understand the past organization for historical reasons.
+This section describes the past organization that was instituted at
+the beginning of the project and provides the historical context for
+the current organization.
 
-This part from Raphaël \textsc{Roosz}is into the \texttt{package/pips-gfc}
-directory. It contains plain \Agcc core and Fortran 4.4.1 distribution,
-pointed by the branch \texttt{gcc-4.4.1}
+This part is derived from Raphaël \textsc{Roosz}is into the
+\texttt{package/pips-gfc}
+directory. The branch \texttt{gcc-4.4.1} contains plain \Agcc core and Fortran 4.4.1 distribution.
 
 The development of \Apipsgfc should be done in the branch
-\texttt{pips-gfc-4.4.1} and this branch should be merged with the
+\texttt{pips-gfc-4.4.1}. This branch should be merged with the
 branch \texttt{gcc-4.4.1} into a branch \texttt{pips-gfc+gcc-4.4.1} with a
-more global name \texttt{pips-gfc+gcc} tracking which version is to be
-merged into the global \texttt{master} branch.
+more global name \texttt{pips-gfc+gcc}. This provides versions for the merge
+into the global \texttt{master} branch.
 
-So in \texttt{pips-gfc-4.4.1} there should be only files different from
+The branch \texttt{pips-gfc-4.4.1} should contains only files that differ from
 the \Agcc distribution. In this way, if we want to have more subtle
-construction methods, later, it will be clearer how to get the real
+construction methods later, it will be clearer how to get the real
 content.
 
-There is the same variation in branches for version 4.4.2.
+The same branch structure exists for version 4.4.2.
 
-So to develop and test the \Apipsgfc extension, you get into for example
+To develop and test the \Apipsgfc extension, change to
 \texttt{pips-gfc-4.4.1} with
 \begin{verbatim}
 git checkout pips-gfc-4.4.1
 \end{verbatim}
 and develop your code in this branch.
 
-To test, you commit and change to the \texttt{pips-gfc+gcc-4.4.1} branch with
+To test code, commit and change to the \texttt{pips-gfc+gcc-4.4.1} branch with
 \begin{verbatim}
 git checkout pips-gfc+gcc-4.4.1
 \end{verbatim}
-where you merge with a
+and then merge with:
 \begin{verbatim}
 git merge pips-gfc-4.4.1
 \end{verbatim}
-and compile. If you are happy, you commit or you revert and then go back
-into branch \texttt{pips-gfc-4.4.1}.
+and compile. Upon completion, either commit or revert and then return
+to branch \texttt{pips-gfc-4.4.1}.
 
-If you want to avoid spoiling the branches \texttt{pips-gfc-4.4.1} and
-\texttt{pips-gfc+gcc-4.4.1}, you can create sub-branches of them, commit in
-them and merge this work in the former one back (with the \verb|--slashed|
-if you want to be modest about your gory hesitations \smiley{} and delete
-these branches).
+To avoid corrupting the branches \texttt{pips-gfc-4.4.1} and
+\texttt{pips-gfc+gcc-4.4.1}, it is preferable to create sub-branches
+and commit in the sub-branches. Work can then be merged
+back, after which the sub-branches can be deleted. The
+\verb|--slashed| option can be used 
+if you want to be modest about your gory hesitations \smiley{}.
 
-
-\subsection{Setting and running the infrastructure up}
+\subsection{Infrastructure Setup and Maintenance}
 \label{sec:setup}
 
-There are scripts to ease the developer and user life.
-
+There are scripts to facilitate development.
 
 \subsubsection{Scripts for an everyday work}
 \label{sec:an-everyday-work}
 
 \begin{itemize}
-\item to automate the \Apfa workflow and deal with \texttt{git} stuff, the
+\item to automate the \Apfa workflow and work with \texttt{git}, the
   \verb|p4a_git| is available, as described in
   \S~\ref{sec:p4a_git-script-deal};
 \item \verb|p4a_post_processor.py| is used to generate programs that use
-  the \Apfa Accel runtime from the \Apips output. This script is more
-  detailed on section~\ref{sec:p4a_p-script-from};
-\item \verb|p4a_recover_includes| is mainly used to get standard
+  the \Apfa Accel runtime from the \Apips output. More information on
+  this script can be found in section~\ref{sec:p4a_p-script-from};
+\item \verb|p4a_recover_includes| is used primarily to get standard
   \verb|#include| back after \Apips digestion. See
   section~\ref{sec:p4a_recover_includes} for the use case;
-\item \verb|p4a_setup.py| is used to compile all the \Apfa infrastructure and
-  to set up many things. It should be used at least for the first
+\item \verb|p4a_setup.py| is used to compile and setup the entire \Apfa
+  infrastructure and should be used at least for the first
   compilation. See \S~\ref{sec:p4a_s-comp-script} for more details;
 \item \verb|p4a_validate| is used to leverage the \Apips validation.
 \end{itemize}
-
 
 \subsubsection{Scripts for debugging}
 \label{sec:scripts-debugging}
@@ -997,13 +996,13 @@ There are scripts to ease the developer and user life.
 \begin{itemize}
 \item \verb|p4a_recover_includes| can be used to evaluate the inclusion of
   \Apfa Accel to ease debugging this package without evaluating other
-  preprocessor inclusion. See section~\ref{sec:p4a_recover_includes} for
+  preprocessor inclusions. See section~\ref{sec:p4a_recover_includes} for
   the use case;
-\item \verb|p4a_valgrind| launch a command with Valgrind with a memory
+\item \verb|p4a_valgrind| launches a command with Valgrind with a memory
   checker in paranoid mode, mainly with the options described in the
   \Apips development guide. As seen in section
   \ref{sec:debuging-pips-p4a}, to debug \Apips in \texttt{p4a}, it is
-  useful to call it like in:
+  useful to do the following:
 \begin{verbatim}
 p4a_valgrind python /usr/local/par4all/bin/p4a --plain --no-spawn
              -o hyantes-static-99_openmp hyantes-static-99.c -lm
@@ -1012,72 +1011,69 @@ p4a_valgrind python /usr/local/par4all/bin/p4a --plain --no-spawn
   \verb/p4a_valgrind/ for less verbosity.
 \end{itemize}
 
-
 \subsubsection{Scripts used to setup the infrastructure}
 \label{sec:scripts-used-setup}
 
-Some scripts used to setup the infrastructure. They have been used to
-bootstrap the \Apfa infrastructure and should not be used by ordinary
-people but contain some interesting hacks that could be usefull for other
-projects or if things go really wrong. There are located in
-\texttt{src/dev}, that should be used in this order:
+The following scripts are used to
+bootstrap the \Apfa infrastructure and should only be used by advanced
+users in the case of dramatic failures.
+They are located in
+\texttt{src/dev} and should be used in the order presented as follows:
 \begin{itemize}
 \item \verb/p4a_create_CRI_git_svn/ is used once to create the \Apips{}
-  \Asvn-\Agit gateways. This script is here to show how it can be done but
-  also to keep track of the exact parameters used to create them in the
-  case we loose them and want to recreate them with exactly with the same
-  identifiers (that depends from the creation parameters);
+  \Asvn-\Agit gateways. This script is included in the distribution to
+  show the exact parameters used in case there is a future need
+  to recreate the gateways.
 \item \verb/p4a_import_external_gits/ imports all the external \Agit
   repositories into the \Apfa{} \Agit repository. It should be used only
-  once but are included as example for other projects or to help adding
-  other repositories later;
+  once but is included as an example for other projects in case there is
+  a future need to add other repositories.
 \item \verb/p4a_apply_pips_patches/ is used to patch the original \Apips
   files to fit the \Apfa architecture. It should be used only once, after
-  external \Agit import. It is no longer used since we switch to the
+  external \Agit import. N.B. this script is obsolete in the
   \Aautotools version of \Apips;
 \end{itemize}
 
-
-\subsubsection{Script to deal with the documentation}
+\subsubsection{Script to manage documentation}
 \label{sec:script-deal-with}
 
 \begin{itemize}
-\item \verb|optparse_help_to_tex| is a small compiler that transforms a
-  help output message of a command (using the \texttt{optparse} format)
-  when launched with \texttt{-h} into La\TeX{} code for inclusion in
-  articles or slides. See \S~\ref{sec:help-docum-tex} for more details;
+\item \verb|optparse_help_to_tex| is a small compiler that transforms the
+  help output message of a command launched with \texttt{-h} (using
+  the \texttt{optparse} format) into La\TeX{} code for inclusion
+  in articles or slides. See \S~\ref{sec:help-docum-tex} for more details;
 \item \verb|p4a_doc| in \verb|src/dev| is used to compile the \Apfa
-  documentation and publish it on the server. Have a look to
-  \texttt{p4a\_doc -h} for the help.
+  documentation and publish it on the server. See
+  \texttt{p4a\_doc -h} for the instructions.
 \end{itemize}
 
-
-\subsubsection{Making distributions}
+\subsubsection{Creating distributions}
 \label{sec:making-distributions}
 
 The \verb|p4a_pack.py| is used to build compressed \texttt{tar} balls or Debian
 \texttt{.deb} packet files.
 
-The place of where the \Apfa files are looked for is specified according
-to the \verb|P4A_DIST| variable or \texttt{--dir} option, but there may be
-some hard-coded locations at configure and build time, so moving the
+The location of the \Apfa files is specified according
+to the \verb|P4A_DIST| variable or \texttt{--dir} option. However, there may be
+hard-coded locations at configure and build time. Therefore, moving the
 installation directory afterwards and changing \verb|P4A_ROOT| to follow
-the new location may not be enough.
+the new location may be insufficient.
 
-So you should choose the location at build time. To have a distribution
-that build up into for example \texttt{/usr/local/par4all}, you should
-first create a \texttt{/usr/local/par4all} \emph{writable by you} (you may
-create this directory as super-user and change the owner to you with a
-\texttt{chown}), and do a \verb|p4a_setup.py|.
+Because of this, the location should be chosen at build time. For
+example, to have a distribution built
+into \texttt{/usr/local/par4all},
+first create a \emph{writable} \texttt{/usr/local/par4all} (i.e.,
+create this directory as super-user and change the owner using
+\texttt{chown}), and then run \verb|p4a_setup.py|.
 
-Then you can pack this directory into what format you want with for
-example:
+The directory is then packed into the desired format as in the
+following:
 \begin{alltt}
 src/simple_tools/p4a_pack.py <--deb|--tgz> --revision=\emph{0.1-mybuild} \(\backslash\)
   --dir=\emph{/current/install/dir} [--prefix=\emph{/final/install/dir}]
 \end{alltt}
 
-Here are the usage and full option list of this command.
+Below are the usage and full option list for this command.
 
 \input{p4a_pack-help}
 
@@ -1085,8 +1081,8 @@ Here are the usage and full option list of this command.
 \subsubsection{Making releases}
 \label{sec:releases}
 
-After validating, a release is done by making some branch at a given state
-a tag.
+After validating, a release is created by tagging the current branch
+at the current state.
 
 There is also a \verb|p4a_coffee.py| script to build and publish everything
 at once.
@@ -1097,128 +1093,126 @@ at once.
 \section{Examples and demos}
 \label{sec:examples-demos}
 
-The \texttt{examples} directory comes with examples to show some aspects
-of \Apfa. Of course there are far more examples in the validation of \Apfa
-(\S~\ref{sec:validation}) but it is often less pedagogical.
-
+The \texttt{examples} directory contains examples to demonstrated the
+different features
+of \Apfa. There are many more examples in the validation directory of \Apfa
+(\S~\ref{sec:validation}), but they are less useful for training
+purposes.
 
 \section{Validation}
 \label{sec:validation}
 
 
 Validation of \Apfa is done inside the \texttt{validation} directory with
-\texttt{make validate}.
-
-But right now it is still mostly done in the
-\texttt{package/PIPS/validation} directory.
+\texttt{make validate}. Currently, there is a also more comprehensive set of
+validation cases in the \texttt{package/PIPS/validation} directory.
 
 
 \subsection{\protect\texttt{p4a\_validate} utility}
 \label{sec:p4a_validate-utility}
 
 
-To ease interacting with the validation, the \verb|p4a_validate| is a
-script that adds the concept of validation classes to the \Apips
-validation. A class is a set of validation cases.
+To facilitate validation, the \verb|p4a_validate| 
+script adds the concept of validation classes to the \Apips
+validation. A class is a set of validation cases with common characteristics.
 
-TODO: For example we may have a class for \texttt{ALL} the validation, the
+TODO: For example, there could be a class for \texttt{ALL} the
+validation, for cases with the same result (e.g.,
 \texttt{CHANGED}, \texttt{FAILED}, \texttt{PASS}, \verb|PREVIOUS_ALL|,
-\verb|PREVIOUS_CHANGED|, \verb|PREVIOUS_FAILED|, \verb|PREVIOUS_PASS|,
-whatever user class and it is possible to make actions with them, combine
-them with operators (unions, intersections...).
+\verb|PREVIOUS_CHANGED|, \verb|PREVIOUS_FAILED|, \verb|PREVIOUS_PASS|),
+etc. Once the classes are defined, set operations can be performed to combine
+them (e.g., unions, intersections, etc.)
 
-TODO: Some other classes can be defined directly in the validation
-directories with \texttt{.vclass} line-oriented regexp filter lines or
+TODO: Other classes can be defined directly in the validation
+directories with \texttt{.vclass} line-oriented regexp filter lines or with
 generic Python code \texttt{.vclasspy}.
 
-\verb|p4a_validate| has a small script interface, but the power user
-should use the Python classes directly, for example from \texttt{iPython}
-to add interactivity.
+\verb|p4a_validate| has a small script interface, but the advanced
+user desiring more interactivity
+should use the Python classes directly, for example from \texttt{iPython}.
 
-The first use in \Apfa is to select from \Apips only the test cases that
-pass the validation (futuristic cases are interesting for \Apips but from
-least interest for \Apfa...), defining smaller validation classes such as
-a \Amat (Minimal Acceptance Test).
-
+The first use of validation classes in \Apfa is to select from \Apips
+only the test cases that pass the \Apips validation. This class can used to
+construct a
+\Amat (Minimal Acceptance Test) for \Apfa. Other \Apips validation
+cases are more useful for \Apips developers, and are of less relevance
+to \Apfa validation.
 
 \subsubsection{Example}
 \label{sec:example}
 
-To display from the last validation the test cases marked as
-\texttt{changed} only in \verb|C_syntax|, you can use:
+To display from the last validation run only the test cases marked as
+\texttt{changed} in \verb|C_syntax|, use:
 \begin{verbatim}
 p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/' \
              --keep-status=changed --list
 \end{verbatim}
 
-To show what changed compared to the reference:
+To show the test cases that changed in comparison to the reference output:
 \begin{verbatim}
 p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
              --keep-status=changed --show-diff-files
 \end{verbatim}
 
-To accept the validation of what changed in \texttt{C\_syntax/decl\emph{*}}:
+To accept the changed validation output in \texttt{C\_syntax/decl\emph{*}}:
 \begin{verbatim}
 p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
              --keep-status=changed --accept
 \end{verbatim}
-then if you are happy with it you can commit with \Agit or revert back to
-previous state with \Agit.
+When validation is complete, commit or revert to the previous state with \Agit.
 
-You may want to move all the currently failing test of the validation for
+Occasionally, it is desirable to move all of the failed validation tests for
 \texttt{Control} into a new validation directory \texttt{Control-Bugs} to
-clean up the mainstream validation. You can do with:
+clean up the mainstream validation. This is accomplished with:
 \begin{verbatim}
 mkdir Control-Bugs
 p4a_validate --file=RESULTS/SUMMARY  --list --filter=^Control/ --keep-status=failed \
  | sed -n -e 's,failed: ,,p' > files-to-move
 \end{verbatim}
-If you are happy after inspection of \texttt{files-to-move} after some
-cleaning with a
+Once the state \texttt{files-to-move} is complete, the database is
+cleaned with:
 \begin{verbatim}
 rm -rf Control/*.database
 \end{verbatim}
-you can really move stuffs into with:
+and the test cases are moved with:
 \begin{verbatim}
 for f in `cat files-to-move` ; do git mv $f* Control-Bugs ; done
 \end{verbatim}
 
-
 \subsubsection{Option list of \protect\texttt{p4a\_validate}}
 \label{sec:opti-list-p4a_v-1}
 
-Here is a small description of the usage and options of
-\verb|p4a_validate|, that are processed in the order of class
-construction, filtering, display and acceptance, so that you can pipe
-actions. To be useful, \verb|pips_validate| should be run with the
-\texttt{-k} (history keeping) option before, so that you can operate on
-differences between different validations.
+Below is a description of the usage and options for
+\verb|p4a_validate|. The options are processed in the order of class
+construction, filtering, display and acceptance, so that
+actions can be piped. To track the differences between
+multiple validations, \verb|pips_validate| should be run with the
+\texttt{-k} (history keeping) option.
 
 \input{p4a_validate-help}
-
 
 \subsection{Validation script}
 \label{sec:validation_script}
 
-It is possible to select different options to test with the python script
-\verb|p4a_validate_class.py|
+The python script \verb|p4a_validate_class.py| has several options for
+selecting validation tests.
 
 Currently, available options are:
 \begin{description}
-\item[\texttt{--pips}:] validate tests which are done by default file (in
-  \texttt{packages/PIPS/validation})
+\item[\texttt{--pips}:] validate tests which are done by default in
+  \texttt{packages/PIPS/validation}
 
 \item[\texttt{--p4a}:] validate tests which are done by
-  \verb|par4all_validation.txt| (which must be previously created in
+  \verb|par4all_validation.txt| (which exist in
   \texttt{src/validation})
 
-\item[\texttt{--diff}:] this command make a diff between tests done by
+\item[\texttt{--diff}:] compare the tests done with
   \texttt{--pips} and \texttt{--p4a} options. The list of the tests which
-  are not done by \texttt{--p4a} options are into \texttt{diff.txt}
+  are not done by \texttt{--p4a} options are included in \texttt{diff.txt}
 
 \item[\texttt{--dir}:] Validate tests which are done in \verb|packages/PIPS/validation/directory_name|. Syntax is \verb|./p4a_validate_class.py --dir dir1 dir2 dir3|
 
-\item[\texttt{--test}:] Validate tests which are done in argument. Syntax is \verb|./p4a_validate_class.py --test directory_test/test.f| for example
+\item[\texttt{--test}:] Validate tests which are given by the argument. Syntax is \verb|./p4a_validate_class.py --test directory_test/test.f| for example
 
 \item[\texttt{-h} or \texttt{--help}:] Help for \verb|p4a_validate_class.py|
 \end{description}
@@ -1246,57 +1240,56 @@ Syntax/alias.f
 Syntax/altret01.f
 \end{verbatim}
 
-
 \section{Branches}
 \label{sec:branches}
 
-Since there are restrictions on the use of \texttt{/} in branch names, we
-prefer to use \texttt{-} to add hierarchy.
+Since there are restrictions on the use of \texttt{/} in branch names,
+it is preferable to use \texttt{-} to add hierarchy.
 
-To ease the developments and the organization, there are some already
+To facilitate development and organization, there are some already
 defined branches:
 \begin{description}
 \item[\texttt{gcc-4.4.1}] is the original \Agcc 4.4.1 core \& Fortran in
   \texttt{package/pips-gfc};
 \item[\texttt{gcc-4.4.2}] is the original \Agcc 4.4.2 core \& Fortran in
   \texttt{package/pips-gfc};
-\item[\texttt{initial}] points to the initial commit of the \Apfa
-  repository. It is useful to add stuff directly add the root of the
-  repository to set the branch for the different packages. It should not
-  be useful for normal people;
-\item[\texttt{p4a-\emph{numerical}}] a branch corresponding to a given version
-  snapshot;
-\item[\texttt{p4a-\emph{numerical}-alpha}] a branch corresponding to an alpha
-  version of a given version snapshot;
-\item[\texttt{p4a-\emph{numerical}-beta}] a branch corresponding to an beta
+\item[\texttt{initial}] is the initial commit of the \Apfa
+  repository. This branch is used 
+  to set the branches for the different packages and should not
+  be used for development.
+\item[\texttt{p4a-\emph{numerical}}] is a branch corresponding to a
+  given version snapshot;
+\item[\texttt{p4a-\emph{numerical}-alpha}] is a branch corresponding
+  to an alpha version of a given version snapshot;
+\item[\texttt{p4a-\emph{numerical}-beta}] is a branch corresponding to a beta
   version of a given version snapshot;
 \item[\texttt{p4a}] is the branch to get the full latest \Apfa version
-  with all the different components, that is the merge of the branches
+  with all the different components, which is the merge of the branches
   \texttt{p4a-own} and \texttt{p4a-packages};
 \item[\texttt{p4a-linear}] points to the import of \Apips \texttt{linear}
-  part. Thus this branch should contain only the files from
-  \texttt{package/PIPS/linear} and used to merge from when you want to use
+  part. Therefore, this branch should contain only files from
+  \texttt{package/PIPS/linear} and is the merge source for 
   the last version from \texttt{linear};
-\item[\texttt{p4a-newgen}] points to the import of \Apips \texttt{newgen}
-  part. So this branch should contain only the files from
+\item[\texttt{p4a-newgen}] points to the import of the \Apips \texttt{newgen}
+  part and should contain only files from
   \texttt{package/PIPS/newgen};
 \item[\texttt{p4a-nlpmake}] points to the import of \Apips \texttt{nlpmake}
-  part. Thus this branch should contain only the files from
+  part and should contain only files from
   \texttt{package/PIPS/nlpmake};
-\item[\texttt{p4a-own}] points to the last development of the \Apfa own files,
+\item[\texttt{p4a-own}] points to the last development of the \Apfa files,
   without packages, etc;
 \item[\texttt{p4a-packages}] points to the last merge of all the \Apfa
   package components;
-\item[\texttt{p4a-pips}] points to the import of \Apips \texttt{pips}
-  par. Thus this branch should contain only the files from
-  \texttt{package/PIPS/pips} and used to merge from when you want to use
+\item[\texttt{p4a-pips}] points to the import of the \Apips \texttt{pips}
+  part. Therefore, this branch should contain only files from
+  \texttt{package/PIPS/pips} and is the merge source for 
   the last version from \texttt{pips};
-\item[\texttt{p4a-polylib}] points to the import of \Apips \texttt{polylib}
-  par. Thus this branch should contain only the files from
-  \texttt{package/polylib} and used to merge from when you want to use
+\item[\texttt{p4a-polylib}] points to the import of the \Apips \texttt{polylib}
+  part. Therefore, this branch should contain only files from
+  \texttt{package/polylib} and is the merge source for
   the last version from \texttt{polylib};
-\item[\texttt{p4a-validation}] points to the import of \Apips
-  \texttt{validation} part, with only files into
+\item[\texttt{p4a-validation}] points to the import of the \Apips
+  \texttt{validation} part and consists only of file from
   \texttt{package/PIPS/validation};
 \item[\texttt{pips-gfc+gcc}] points to a working \Apipsgfc implementation
   of the Fortran 95 extension for \Apips in \texttt{package/pips-gfc};
@@ -1304,75 +1297,77 @@ defined branches:
   Raphaël in \Agcc in \texttt{package/pips-gfc}.
 \end{description}
 
-
-Of course, for a better tractability, there are also branches that point
-to specific versions of conceptual branches such as
+For tractability, there are also branches that point
+to specific versions of particular branches such as
 \texttt{p4a-0.2-alpha-nlpmake}, \texttt{p4a-own-0.1} or
 \texttt{p4a-packages-0.2-beta}.
 
 
-\section{Some \protect\Agit tricks useful in \protect\Apfa}
+\section{Useful \protect\Agit features for \protect\Apfa}
 \label{sec:some-agit-tricks}
 
-\subsection{You have committed to the wrong branch}
+\subsection{Files committed to the wrong branch}
 \label{sec:you-have-comited}
 
-There are (too) many branches in \Apfa, right? It is so easy for example
-to do a commit on the \texttt{p4a} for example instead of the
-\texttt{p4a-own} one. The good new is that since \Agit separate commit and
-publish phase, if you reread what you have done with for example
-\texttt{gitk}, you should figure out what you did wrong before it explode
-to the faces of your colleagues.
+There are (too) many branches in \Apfa, right? Distinguishing the many
+branches of \Apfa is complicated; for example, it is easy
+to commit to the \texttt{p4a} branch instead of the correct
+\texttt{p4a-own} branch. The good news is that since \Agit separates
+the commit and publish phases, one can examine the history
+with tools such as \texttt{gitk} to find errors before negatively
+impacting your colleagues.
 
-Here is an example of a wrong \texttt{p4a} commit and how to get your work
-in a good way before pushing to others.
+Here is an example of a wrong \texttt{p4a} commit and how to achieve a
+good state before pushing to the public repository.
 
-First create a branch to ease following of what you did wrong:
+First create a branch to facilitate tracking:
 \begin{verbatim}
 git checkout -b wrong
 \end{verbatim}
-Go back up to a clean state (here only 1 \verb|^| so only to the previous
+Return to a clean state (use only 1 \verb|^| to return to the previous
 commit):
 \begin{verbatim}
 git branch -f p4a p4a^
 \end{verbatim}
-Move what you did wrong to the branch where it should always have been:
+Move the incorrect commit to the correct branch:
 \begin{verbatim}
 git rebase --onto p4a-own p4a wrong
 \end{verbatim}
-The go to the target branch:
+Then go to the target branch:
 \begin{verbatim}
 git checkout p4a-own
 \end{verbatim}
-and merge in it your work:
+and merge the current work into it:
 \begin{verbatim}
 git merge wrong
 \end{verbatim}
-and delete your helping branch:
+and delete the helping branch:
 \begin{verbatim}
 git branch -d wrong
 \end{verbatim}
 Magic isn't it? \smiley
 
-You can see that your wrong work is still connected to the branch
-\texttt{p4a}, but no longer \emph{in} the branch. It is typical
-representative of all the work done in \Apfa to avoid loosing information.
+The wrong work is still connected to the branch
+\texttt{p4a}, but no longer \emph{in} the branch. It is typical in
+\Apfa development to perform this
+sequence of steps in order to avoid the loss
+of information.
 
+****************JOM****************************
 
 \appendix
 
 \section{Various script details}
 \label{sec:vari-script-deta}
 
-Here are described the options or various minor scripts that should have
-obfuscated the main part.
+In this appendix, options and other ancillary scripts are desribed.
 
 \subsection{The \protect\texttt{p4a\_recover\_includes} script}
 \label{sec:p4a_recover_includes}
 
 \verb|p4a_recover_includes| is used to get C standard \verb|#include|
-after \Apips digestion to have nicer recompilation (for \Acuda it is a
-requirement) and of course nicer code instead of ugly macro inclusion at
+after \Apips digestion to have a smoother recompilation (for \Acuda it is a
+requirement) and more readable code without ugly macro inclusions at
 the beginning of all the files.
 
 This script can also be use to do expansion of the \verb|#include| of
