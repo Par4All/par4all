@@ -3392,6 +3392,8 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SGEMM. */
+#include "math.h"
+#include "stdlib.h"
 void
 sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
        int *n_p4a_copy, int *k_p4a_copy, float *alpha_p4a_copy,
@@ -3740,7 +3742,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 		  for (j0 = 1; j0 <= n; j0++)
 		    {
 		      lu_nub0 = m;
-		      lu_ib0 = mod (&lu_nub0, 4);
+		      lu_ib0 = (lu_nub0 % 4);
 		      for (lu_ind00 = 0; lu_ind00 <= lu_ib0 - 1; lu_ind00++)
 			{
 			  c[j0 - 1][(1 + lu_ind00) - 1] = zero0;
@@ -3763,7 +3765,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 		  for (j1 = 1; j1 <= n; j1++)
 		    {
 		      lu_nub1 = m;
-		      lu_ib1 = mod (&lu_nub1, 4);
+		      lu_ib1 = (lu_nub1 % 4);
 		      simd_load_v4sf (vec10, pdata0[0]);
 		      for (lu_ind10 = 0; lu_ind10 <= lu_ib1 - 1; lu_ind10++)
 			{
@@ -3798,7 +3800,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			  if (pdata0[0] == zero0)
 			    {
 			      lu_nub2 = m;
-			      lu_ib2 = mod (&lu_nub2, 4);
+			      lu_ib2 = (lu_nub2 % 4);
 			      for (lu_ind20 = 0; lu_ind20 <= lu_ib2 - 1;
 				   lu_ind20++)
 				{
@@ -3820,7 +3822,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			      if (pdata0[0] != one0)
 				{
 				  lu_nub3 = m;
-				  lu_ib3 = mod (&lu_nub3, 4);
+				  lu_ib3 = (lu_nub3 % 4);
 				  simd_load_v4sf (vec30, pdata0[0]);
 				  for (lu_ind30 = 0; lu_ind30 <= lu_ib3 - 1;
 				       lu_ind30++)
@@ -3858,7 +3860,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 				{
 				  temp = (pdata3[0] * b[j2 - 1][l - 1]);
 				  lu_nub4 = m;
-				  lu_ib4 = mod (&lu_nub4, 4);
+				  lu_ib4 = (lu_nub4 % 4);
 				  simd_load_generic_v4sf (vec50, &temp, &temp,
 							  &temp, &temp);
 				  for (lu_ind40 = 0; lu_ind40 <= lu_ib4 - 1;
@@ -3932,7 +3934,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			  if (pdata0[0] == zero0)
 			    {
 			      lu_nub6 = m;
-			      lu_ib6 = mod (&lu_nub6, 4);
+			      lu_ib6 = (lu_nub6 % 4);
 			      for (lu_ind60 = 0; lu_ind60 <= lu_ib6 - 1;
 				   lu_ind60++)
 				{
@@ -3954,7 +3956,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 			      if (pdata0[0] != one0)
 				{
 				  lu_nub7 = m;
-				  lu_ib7 = mod (&lu_nub7, 4);
+				  lu_ib7 = (lu_nub7 % 4);
 				  simd_load_v4sf (vec180, pdata0[0]);
 				  for (lu_ind70 = 0; lu_ind70 <= lu_ib7 - 1;
 				       lu_ind70++)
@@ -3992,7 +3994,7 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
 				{
 				  temp = (pdata3[0] * b[l - 1][j4 - 1]);
 				  lu_nub8 = m;
-				  lu_ib8 = mod (&lu_nub8, 4);
+				  lu_ib8 = (lu_nub8 % 4);
 				  simd_load_generic_v4sf (vec200, &temp,
 							  &temp, &temp,
 							  &temp);

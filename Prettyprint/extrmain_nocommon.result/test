@@ -1,4 +1,6 @@
 /* C pretty print for module D. */
+#include "math.h"
+#include "stdlib.h"
 float
 d (int *j_p4a_copy, int *k_p4a_copy, int *jp_p4a_copy, int *kp_p4a_copy,
    float t[60][21][52], int *l_p4a_copy)
@@ -21,6 +23,8 @@ d (int *j_p4a_copy, int *k_p4a_copy, int *jp_p4a_copy, int *kp_p4a_copy,
   return result;
 }
 /* C pretty print for module EXTR. */
+#include "math.h"
+#include "stdlib.h"
 void
 extr (int *ni_p4a_copy, int *nc_p4a_copy, float t[60][21][52],
       int *j1_p4a_copy, int *ja_p4a_copy, int *k1_p4a_copy)

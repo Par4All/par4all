@@ -253,6 +253,8 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
 
       END
 /* C pretty print for module ALPHABLENDING. */
+#include "math.h"
+#include "stdlib.h"
 void
 alphablending (float result[50000], float src[50000], float dest[50000],
 	       float *alpha_p4a_copy)
