@@ -19,9 +19,11 @@ void run() {
 	while (1) {
 #endif
 		while (1) {
+		  if(1) {
 			if (b < 1) error();
 			b = a + 1;
 			a = 0;
+		  }
 		}
 #ifdef NESTEDWHILE
 	}
