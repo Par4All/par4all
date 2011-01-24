@@ -2,6 +2,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete ALPHABLENDING
 create ALPHABLENDING kernels/ALPHABLENDING/ALPHABLENDING.f include/simd.f
 
+setproperty CROUGH_PRINT_UNKNOWN_INTRINSIC TRUE
+
 module ALPHABLENDING
 
 source include/fortran.tpips

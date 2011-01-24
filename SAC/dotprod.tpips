@@ -2,6 +2,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete DOTPROD
 create DOTPROD kernels/DOTPROD/DOTPROD.f include/simd.f
 
+setproperty CROUGH_PRINT_UNKNOWN_INTRINSIC TRUE
+
 module DOTPROD
 
 display PRINTED_FILE
