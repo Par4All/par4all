@@ -9,8 +9,18 @@ Initial code
 10       CONTINUE
       END
 /* C pretty print for module ARRAYPOINTER01. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 arraypointer01 (int a[5])
 {
