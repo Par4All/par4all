@@ -3392,8 +3392,18 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SGEMM. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
        int *n_p4a_copy, int *k_p4a_copy, float *alpha_p4a_copy,
@@ -3620,9 +3630,9 @@ sgemm (char *transa_p4a_copy, char *transb_p4a_copy, int *m_p4a_copy,
       l_500 = (m < 0);
       l_400 = (n < 0);
       l_300 = (k < 0);
-      i_00 = max (1, &nrowa0);
-      i_10 = max (1, &nrowb0);
-      i_20 = max (1, &m);
+      i_00 = crough_max (1, &nrowa0);
+      i_10 = crough_max (1, &nrowb0);
+      i_20 = crough_max (1, &m);
       l_120 = !l_110;
       l_150 = !l_140;
       l_200 = (lda < i_00);

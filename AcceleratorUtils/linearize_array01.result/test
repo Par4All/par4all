@@ -20,8 +20,18 @@ C Loop nest P4A end
       ENDIF
       END
 /* C pretty print for module P4A_KERNEL_0. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_kernel_0 (int n, int a[n * n - 0], int b[n * n - 0], int i, int j)
 {

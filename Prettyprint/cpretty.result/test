@@ -57,8 +57,18 @@
       ENDDO
       END
 /* C pretty print for module FUN1. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 int
 fun1 (int *i_p4a_copy)
 {
@@ -69,8 +79,18 @@ fun1 (int *i_p4a_copy)
   return result;
 }
 /* C pretty print for module MAIN. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 int
 main (int argc, char *argv[])
 {
@@ -92,8 +112,18 @@ main (int argc, char *argv[])
   return 0;
 }
 /* C pretty print for module SUB. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 sub (int *j_p4a_copy, int *k_p4a_copy)
 {
@@ -111,8 +141,18 @@ sub (int *j_p4a_copy, int *k_p4a_copy)
   return;
 }
 /* C pretty print for module SUB2. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 sub2 (int *n_p4a_copy, int *m_p4a_copy)
 {
@@ -132,8 +172,18 @@ sub2 (int *n_p4a_copy, int *m_p4a_copy)
   return;
 }
 /* C pretty print for module SUB3. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 sub3 (void)
 {
@@ -150,8 +200,18 @@ sub3 (void)
   return;
 }
 /* C pretty print for module SUB4. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 sub4 (double a[11])
 {

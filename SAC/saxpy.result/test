@@ -514,8 +514,18 @@ nsucc = 1
 nsucc = 1 
 nsucc = 0 
 /* C pretty print for module SAXPY. */
+//needed include to compile the C output
 #include "math.h"
 #include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 saxpy (float sx[1000], float sy[1000])
 {
