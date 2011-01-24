@@ -2,7 +2,7 @@
 
 
 
-void forcex(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
+static void _forcex(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
   int i, j, k;
 #ifdef P4A_CUDA_CHEAT               // 0.17ms per kernel launch
   for (i = 0; i < NP; i++) {
@@ -20,9 +20,13 @@ void forcex(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
   }
 }
 
+void forcex(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
+  TIMING(_forcex(pot,fx));
+}
+
 
 //========================================================================
-void forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
+static void _forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
   int i, j, k;
 #ifdef P4A_CUDA_CHEAT               // 0.19ms per kernel launch
   for (i = 0; i < NP; i++) {
@@ -38,14 +42,14 @@ void forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
       }
     }
   }
-
+}
+void forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
+  TIMING(_forcey(pot,fx));
 }
 
 //========================================================================
-void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
-
+static void _forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
   int i, j, k;
-
 #ifdef P4A_CUDA_CHEAT               // 0.19ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (k = 0; k < NP; k++) {
@@ -60,6 +64,8 @@ void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
       }
     }
   }
-
+}
+void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
+  TIMING(_forcez(pot,fx));
 }
 

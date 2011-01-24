@@ -27,6 +27,15 @@ void* fftwf_malloc(int size) {
  return malloc(size);
 }
 
+void fftwf_init_threads() {
+  fprintf(stderr,"FFTW STUB : %s\n",__FUNCTION__);
+}
+void fftwf_plan_with_nthreads(int nthreads) {
+  fprintf(stderr,"FFTW STUB : %s\n",__FUNCTION__);
+}
+int omp_get_max_threads() {
+  return rand();
+}
 #endif // P4A_RUNTIME_FFTW
 
 int getopt_long(int argc, char * const argv[],

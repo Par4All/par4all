@@ -2,11 +2,11 @@
 
 #include "stars-pm.h"
 
-void updatevel(coord vel[NP][NP][NP],
-               float force[NP][NP][NP],
-               int data[NP][NP][NP],
-               int c,
-               float dt) {
+static void _updatevel(coord vel[NP][NP][NP],
+                       float force[NP][NP][NP],
+                       int data[NP][NP][NP],
+                       int c,
+                       float dt) {
 #ifndef P4A
   int i;
   /* Les casts ne passent pas dans PIPS :-( */
@@ -35,3 +35,11 @@ void updatevel(coord vel[NP][NP][NP],
 #endif
 }
 
+
+void updatevel(coord vel[NP][NP][NP],
+                     float force[NP][NP][NP],
+                     int data[NP][NP][NP],
+                     int c,
+                     float dt) {
+  TIMING(_updatevel(vel,force,data,c,dt));
+}

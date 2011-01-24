@@ -11,8 +11,7 @@ P4A_OPTIONS+=-DP4A
 NVCCFLAGS=-lcufft
 
 ifeq "$(USE_FLOAT)" "1"
-# Use single precision for the OpenMP and GPU version:
-P4A_OPTIONS+= -DUSE_FLOAT
+# Use single precision for the OpenMP and GPU version
 # Use also single precision for the sequential version:
 CPPFLAGS+= -DUSE_FLOAT
 endif
@@ -34,7 +33,6 @@ CPPFLAGS+=
 
 ifeq ($(oldgpu),1)
 CPPFLAGS+= -DCPUHISTO
-P4A_OPTIONS+= -DCPUHISTO 
 else
 NVCCFLAGS+=-arch sm_11 
 endif
@@ -43,19 +41,17 @@ endif
 
 ifeq ($(debug),1)
 CPPFLAGS+= -DP4A_DEBUG
-P4A_OPTIONS+= -DP4A_DEBUG 
 BIN_SUFFIX:=$(BIN_SUFFIX)_dgb
 endif
 
 ifeq ($(timing),1)
-CPPFLAGS+= -DP4A_TIMING
-P4A_OPTIONS+= -DP4A_TIMING
+GPU_TIMING=-DP4A_TIMING 
+CPU_TIMING=-DCPU_TIMING
 BIN_SUFFIX:=$(BIN_SUFFIX)_timing
 endif
 
 ifeq ($(bench),1)
 CPPFLAGS+= -DP4A_BENCH
-P4A_OPTIONS+= -DP4A_BENCH
 endif
 
 
@@ -151,25 +147,25 @@ run-%: $(TARGET)_%
 
 %_seq : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	# Compilation of the sequential program:
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
+	$(CC) $(CPPFLAGS) $(CPU_TIMING) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 
 %_openmp : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build an OpenMP version:
-	p4a $(P4A_OPTIONS) $(CPPFLAGS)  -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
+	p4a -DFFTW3_THREADED -lfftw3f_threads $(P4A_OPTIONS) $(CPU_TIMING) $(CPPFLAGS)  -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 	# P4A openmp end !
 
 %_autocuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(P4A_CHEAT) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(P4A_CHEAT) $(CPPFLAGS)  --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 %_autocuda_comm_optimization : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) $(P4A_CHEAT) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
+	p4a $(P4A_OPTIONS) $(GPU_TIMING) $(P4A_CHEAT) $(CPPFLAGS) --com-optimization --cuda -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS)  --exclude-file=$(STUBS:.c=.p4a.cu) --exclude-file=$(STUBS:.c=.p4a.c) $(CULIBS)
 	
 
 %_cuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 	# Parallelize and build a CUDA version:
-	$(NVCC) $(CPPFLAGS) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
+	$(NVCC) $(CPPFLAGS) $(GPU_TIMING) $(LDFLAGS) $(NVCCFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(CUDA_SOURCES) $(GRAPHICS)
 
 	
 include/stars-pm-generated_$(SIZE).h :  $(COMMON_SOURCES) $(BASE_SOURCES) $(CPROTO_GRAPHICS_SRC)

@@ -20,7 +20,7 @@ static void int2float(int v1[NP][NP][NP], float v2[NP][NP][NP]) {
     }
   }
 }
-
+/*
 static void float2int(float v1[NP][NP][NP], int v2[NP][NP][NP]) {
   int i, j, k;
   for (i = 0; i < NP; i++) {
@@ -31,7 +31,7 @@ static void float2int(float v1[NP][NP][NP], int v2[NP][NP][NP]) {
     }
   }
 }
-
+*/
 static void real2Complex(float cdens[NP][NP][NP][2],
                   float dens[NP][NP][NP]) {
   int i, j, k;
@@ -50,26 +50,20 @@ static void real2Complex(float cdens[NP][NP][NP][2],
     }
   }
 }
-
+/*
 static void complex2Real(float cdens[NP][NP][NP][2],
                          float dens[NP][NP][NP]) {
 
   int i, j, k;
-#ifdef P4A_CUDA_CHEAT               // 0.31ms per kernel launch
-  for (i = 0; i < NP; i++) {
-    for (k = 0; k < NP; k++) {
-      for (j = 0; j < NP; j++) {
-#else                               // 4.0ms per kernel launch
   for (i = 0; i < NP; i++) {
     for (j = 0; j < NP; j++) {
       for (k = 0; k < NP; k++) {
-#endif
         dens[i][j][k] = cdens[i][j][k][0];
       }
     }
   }
 }
-
+*/
 static void complex2Real_correctionPot(float cdens[NP][NP][NP][2],
                                        float dens[NP][NP][NP],
                                        float coeff) {
@@ -88,7 +82,7 @@ static void complex2Real_correctionPot(float cdens[NP][NP][NP][2],
     }
   }
 }
-
+/*
 static void correctionPot(float pot[NP][NP][NP],
                           float coeff) {
   int i, j, k;
@@ -100,7 +94,7 @@ static void correctionPot(float pot[NP][NP][NP],
     }
   }
 }
-
+*/
 static void fft_laplacian7(float field[NP][NP][NP][2]) {
   int i, j, k;
   float i2, j2, k2;
@@ -163,6 +157,15 @@ static fftwf_plan fft_forward;
 static fftwf_plan fft_backward;
 
 void potential_init_plan(float cdens[NP][NP][NP][2]) {
+#ifdef FFTW3_THREADED
+  int nthreads = omp_get_max_threads();
+  if(nthreads>8) nthreads=8;
+  fftwf_init_threads();
+#ifndef P4A_BENCH
+  fprintf(stderr,"Initialising threaded FFTW3 with %d threads\n",nthreads);
+#endif
+  fftwf_plan_with_nthreads(nthreads);
+#endif
   fft_forward = fftwf_plan_dft_3d(NP,
                                   NP,
                                   NP,
@@ -190,17 +193,17 @@ void potential(int histo[NP][NP][NP],
                float mp[NP][NP][NP] ) {
 
   // Conversion
-  int2float(histo, dens);
+  TIMING(int2float(histo,dens));
 
   //************************************ Laplace Solver  ************************************
 
-  real2Complex(cdens, dens); /* conversion de format*/
-  fftwf_execute(fft_forward); /* repeat as needed */
-  fft_laplacian7(cdens);
-  fftwf_execute(fft_backward); /* repeat as needed */
+  TIMING(real2Complex(cdens,dens)); /* conversion de format*/
+  TIMING(fftwf_execute(fft_forward)); /* repeat as needed */
+  TIMING(fft_laplacian7(cdens));
+  TIMING(fftwf_execute(fft_backward)); /* repeat as needed */
 
 
-  complex2Real_correctionPot(cdens, dens, mp[0][0][0]);
+  TIMING(complex2Real_correctionPot(cdens,dens,mp[0][0][0]));
 
 /*  complex2Real(cdens, dens);
   correctionPot(dens, mp[0][0][0]);*/

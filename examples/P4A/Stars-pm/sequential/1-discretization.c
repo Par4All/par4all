@@ -4,7 +4,7 @@
 /**
  * Compute the mapping between particles position and grid coordinates
  */
-void discretization(coord pos[NP][NP][NP],
+static void _discretization(coord pos[NP][NP][NP],
                     int data[NP][NP][NP]) {
   int i, j, k;
   float x, y, z;
@@ -28,3 +28,8 @@ void discretization(coord pos[NP][NP][NP],
 
 }
 
+
+void discretization(coord pos[NP][NP][NP],
+                    int data[NP][NP][NP]) {
+  TIMING(_discretization(pos,data));
+}

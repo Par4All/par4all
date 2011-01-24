@@ -1,6 +1,6 @@
 #include "stars-pm.h"
 
-void updatepos(coord pos[NP][NP][NP],
+static void _updatepos(coord pos[NP][NP][NP],
                coord vel[NP][NP][NP]) {
   float posX, posY, posZ;
   int i, j, k;
@@ -23,5 +23,8 @@ void updatepos(coord pos[NP][NP][NP],
     }
   }
 
+}
+void updatepos(coord pos[NP][NP][NP], coord vel[NP][NP][NP]) {
+  TIMING(_updatepos(pos,vel));
 }
 
