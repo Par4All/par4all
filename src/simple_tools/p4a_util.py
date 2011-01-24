@@ -486,10 +486,6 @@ def hostname(silent = True): # platform.node()???
     '''Calls the hostname UNIX utility.'''
     return run([ "hostname", "--fqdn" ], can_fail = True, silent = silent)[0].rstrip("\n")
 
-def uname(silent = True): # platform.uname()???
-    '''Calls the uname UNIX utility.'''
-    return run([ "uname", "-a" ], can_fail = True, silent = silent)[0].rstrip("\n")
-
 def ping(host, silent = True):
     '''Calls the ping utility. Returns True if remote host answers within 1 second.'''
     return 0 == run([ "ping", "-w1", "-q", host ], can_fail = True, silent = silent)[2]
@@ -497,17 +493,7 @@ def ping(host, silent = True):
 
 def get_distro():
     '''Returns currently running Linux distribution name (ubuntu, debian, redhat, etc.).'''
-    s = ""
-    distro = ""
-    try:
-        s = platform.platform()
-        distro = s.split("-")[-3].lower()
-    except:
-        pass
-    if not re.match(r"\w+", distro):
-        raise p4a_error("Could not determine distribution name from this: " + s)
-    debug("distro=" + distro)
-    return distro
+    return platform.linux_distribution()[0]
 
 
 def pkg_config(dist_dir, variable):
@@ -518,12 +504,15 @@ def pkg_config(dist_dir, variable):
             raise p4a_error("Could not determine PKG_CONFIG_PATH in " + dist_dir + ", try reinstalling Par4All")
     return run([ "pkg-config", "pips", "--variable=" + variable ], extra_env = dict(PKG_CONFIG_PATH = pkg_config_path))[0].rstrip("\n")
 
+
 def get_python_lib_dir(dist_dir):
     dir = pkg_config(dist_dir, "pkgpythondir")
     if not dir or not os.path.isdir(dir):
         raise p4a_error("Could not determine Python modules installation path in " + dist_dir + ", try reinstalling Par4All")
     return dir
 
+def get_machine_arch():
+    return platform.machine()
 
 def gen_name(length = 4, prefix = "P4A", suffix = "", chars = string.ascii_letters + string.digits):
     '''Generates a random name or password.'''
@@ -645,12 +634,6 @@ def header_file_p(file):
     '''Tests if a file has an header name.'''
     ext = get_file_extension(file)
     return ext == '.h' or ext == '.hpp'
-
-
-def get_machine_arch():
-    '''Returns current machine architecture'''
-    (sysname, nodename, release, version, machine) = os.uname()
-    return machine
 
 
 def subs_template_file(template_file, map = {}, output_file = None, trim_tpl_ext = True):

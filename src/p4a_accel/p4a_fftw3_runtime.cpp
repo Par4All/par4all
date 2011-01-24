@@ -65,7 +65,7 @@ void fftwf_destroy_plan(fftwf_plan *plan) {
 
 void fftwf_execute(fftwf_plan *plan) {
 #ifdef P4A_RUNTIME_DEBUG
-    fprintf(stderr,"Running fftwf_execute wrapper in P4A cuda, direction is : %d ",plan->direction);
+    fprintf(stderr,"Running fftwf_execute wrapper in P4A cuda, direction is : %d\n",plan->direction);
 #endif
 
     cufftComplex *in,*out;
@@ -79,6 +79,9 @@ void fftwf_execute(fftwf_plan *plan) {
 #endif
 
 
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
   if(plan->direction==FFTW_FORWARD) {
     cufftExecC2C(plan->cu_plan,
                  in,
@@ -93,9 +96,15 @@ void fftwf_execute(fftwf_plan *plan) {
     fprintf(stderr,"[%s:%d] Error : unknown direction (%d)\n",__FUNCTION__,__LINE__,plan->direction);
     exit(-1);
   }
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("FFT on GPU direction %d (%d,%d,%d) took %.1fms \n",
+                   plan->direction,plan->x,plan->y,plan->z,p4a_timing_elapsedTime);
+#endif
 
 #ifndef P4A_COMMUNICATION_RUNTIME
-    P4A_copy_from_accel(plan->datasize,plan->in,in);
+    P4A_copy_from_accel(plan->datasize,plan->out,out);
     P4A_accel_free(in);
     P4A_accel_free(out);
 #endif

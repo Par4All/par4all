@@ -81,11 +81,12 @@ void P4A_runtime_copy_to_accel(void *host_ptr, size_t size /* in bytes */) {
   void *accel_ptr = P4A_runtime_host_ptr_to_accel_ptr(host_ptr,size);
 
 #ifdef P4A_RUNTIME_DEBUG
-    fprintf(stderr,"[%s:%d] Copying %zd bytes of memory from host %p to accel %p !\n",__FUNCTION__,__LINE__,size, host_ptr,accel_ptr);
+    fprintf(stderr,"P4A_RUNTIME : Copying %zd bytes of memory from host %p to accel %p !\n",__FUNCTION__,__LINE__,size, host_ptr,accel_ptr);
 #endif
 
   // Copy data
   P4A_copy_to_accel(size,host_ptr,accel_ptr);
+
 }
 
 

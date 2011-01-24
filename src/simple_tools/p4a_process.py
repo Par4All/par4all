@@ -686,7 +686,7 @@ class p4a_processor(object):
         # Select kernels by using the fact that all the generated kernels
         # have their names of this form:
         kernel_prefix = self.get_kernel_prefix ()
-        kernel_filter_re = re.compile(kernel_prefix + "_\\d+$")
+        kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
         if not self.com_optimization :
@@ -721,7 +721,7 @@ class p4a_processor(object):
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
         wrapper_prefix = self.get_wrapper_prefix ()
-        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\d+$")
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
         # Select fortran wrappers by using the fact that all the generated

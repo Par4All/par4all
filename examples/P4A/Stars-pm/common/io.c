@@ -1,9 +1,16 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>
 #include "io.h"
 
-// FIXME .cpp ?
-
+// Timing
+double get_time()
+{
+    struct timeval t;
+    struct timezone tzp;
+    gettimeofday(&t, &tzp);
+    return t.tv_sec + t.tv_usec*1e-6;
+}
 
 void readDataFile(float mp[NP][NP][NP],
                   coord pos[NP][NP][NP],

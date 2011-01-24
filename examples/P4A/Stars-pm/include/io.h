@@ -6,7 +6,7 @@
  extern "C" {
 #endif
 
-
+double get_time();
 int dump_pos(coord pos[NP][NP][NP], int npdt);
 int read_pos(coord pos[NP][NP][NP], int npdt, char *fname_);
 
