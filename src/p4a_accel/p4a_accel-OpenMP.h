@@ -70,7 +70,7 @@ struct timeval p4a_time_end;
 
 /** Associate the program to the accelerator as OpenMP
 
-    Initialized the use of the hardware accelerator: nothing to do since
+    Initialize the use of the hardware accelerator: nothing to do since
     there is no accelerator, only OpenMP with local processors...
 */
 #define P4A_init_accel

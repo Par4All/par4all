@@ -3,7 +3,7 @@
     @{
 */
 
-/** @defgroup ChrUpscaling Luminance upscaling.
+/** @defgroup ChrUpscaling Chrominance upscaling.
 
     @{
     Kernel to upscale the chrominance of a frame.
