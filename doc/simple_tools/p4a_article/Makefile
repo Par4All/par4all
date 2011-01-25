@@ -51,7 +51,7 @@ p4a_script.tex: p4a-help.tex ../../figures/p4a_work_flow.pdf
 %-help.tex: %.help Makefile
 	../../../src/dev/optparse_help_to_tex --article --article-section-level 3 $< > $@
 
-%.help: ../../../src/simple_tools/% Makefile
+%.help: ../../../src/simple_tools/%.py Makefile
 	# Generate raw help message for the given command:
 	$< -h > $@
 

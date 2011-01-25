@@ -5,21 +5,23 @@
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
+import p4a_opts
+import p4a_rc 
+import p4a_util
+import p4a_version 
+import glob
+import os
+import optparse
 
 '''
 Par4All setup script implementation module.
 '''
 
-import string, sys, os, re, optparse, tempfile, shutil
-from p4a_util import *
-from p4a_rc import *
-from p4a_git import *
-from p4a_version import *
 
 
 default_configure_opts = [ "--disable-static", "CFLAGS='-O2 -std=c99'" ]
 default_debug_configure_opts = [ "--disable-static", "CFLAGS='-ggdb -g3 -O0 -Wall -std=c99'" ]
-default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc" ]
+default_pips_conf_opts = [ "--enable-tpips", "--enable-pyps", "--enable-hpfc", "--enable-fortran95" ]
 
 
 def add_module_options(parser):
@@ -66,6 +68,9 @@ def add_module_options(parser):
 
     group.add_option("--prefix", "-p", metavar = "DIR", default = None,
         help = "Specify the prefix used to configure the packages. Default is /usr/local/par4all.")
+
+    group.add_option("--build-dir", "-b", metavar = "DIR", default = "build",
+        help = "Specify the build directory to be used relatively to the root directory as specify the --root option. Default to build")
 
     group.add_option("--polylib-src", metavar = "DIR", default = None,
         help = "Specify polylib source directory.")
@@ -150,33 +155,39 @@ def build_package(package_dir, build_dir, dest_dir, configure_opts = [], make_op
 
     if reconf:
         # Call autoconf to generate the configure utility.
-        run([ "autoreconf", "--install" ], working_dir = package_dir)
+        p4a_util.run([ "autoreconf", "--install" ], working_dir = package_dir)
         print package_dir
         #~ if dest_dir:
             #~ configure_opts.append ("DESTDIR=" + dest_dir)
         # Call configure to generate the Makefiles.
         print build_dir
-        run([ configure_script ] + configure_opts, working_dir = build_dir)
+        print [ configure_script ] + configure_opts
+        p4a_util.run([ configure_script ] + configure_opts, working_dir = build_dir)
 
     # Call make all to compile.
-    info("Building " + package_dir + " in " + build_dir)
-    run([ "make" ] + make_opts, working_dir = build_dir)
+    p4a_util.info("Building " + package_dir + " in " + build_dir)
+    p4a_util.run([ "make" ] + make_opts, working_dir = build_dir)
 
     if install:
         # Call make install to install in DESTDIR if requested.
         install_make_opts = []
         #~ if dest_dir:
             #~ install_make_opts.append("DESTDIR=" + dest_dir)
-            #~ info("Installing " + package_dir + " in " + dest_dir)
-        run([ "make", "install" ] + install_make_opts, working_dir = build_dir)
+            #~ p4a_util.info("Installing " + package_dir + " in " + dest_dir)
+        p4a_util.run([ "make", "install" ] + install_make_opts, working_dir = build_dir)
 
 
-def main(options, args = []):
+def work(options, args = None):
+    '''Do the real work. The main goal of this function is to be able to
+    call p4a_setup from another tool (p4a_coffee.py) that has already
+    parsed the arguments and options of the command.
 
+    TODO: modularize this function...
+    '''
     if args:
-        die("No arguments are accepted by this script, only options")
+        p4a_util.die("No arguments are accepted by this script, only options")
 
-    actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
+    actual_script = p4a_util.change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
     script_dir = os.path.split(actual_script)[0]
     default_root = os.path.normpath(os.path.join(script_dir, "..", ".."))
     default_prefix = "/usr/local/par4all"
@@ -201,9 +212,9 @@ def main(options, args = []):
             options.skip_linear = True
             options.skip_pips = True
         else:
-            die("Invalid option: --skip=" + s)
+            p4a_util.die("Invalid option: --skip=" + s)
         if options.clean:
-            die("--skip is not compatible with --clean")
+            p4a_util.die("--skip is not compatible with --clean")
     for s in options.only:
         # Skip everything...
         options.skip_polylib = True
@@ -220,9 +231,9 @@ def main(options, args = []):
         elif s == "pips":
             options.skip_pips = False
         else:
-            die("Invalid option: --only=" + s)
+            p4a_util.die("Invalid option: --only=" + s)
         if options.clean:
-            die("--only is not compatible with --clean")
+            p4a_util.die("--only is not compatible with --clean")
     if options.clean:
         options.skip_polylib = False
         options.skip_newgen = False
@@ -249,46 +260,46 @@ def main(options, args = []):
             options.reconf_linear = True
             options.reconf_pips = True
         else:
-            die("Invalid option: --reconf=" + s)
+            p4a_util.die("Invalid option: --reconf=" + s)
 
     # Initialize main variables and set defaults.
     # "root" is the Par4All source root directory.
     root = ""
     if options.root:
         root = os.path.abspath(os.path.expanduser(options.root))
-        warn("Par4All source tree root is " + root + " (--root)")
+        p4a_util.warn("Par4All source tree root is " + root + " (--root)")
     # If environment variable P4A_ROOT is defined and
     # --root was not specified, pick it up from there.
     #~ elif "P4A_ROOT" in os.environ and os.environ["P4A_ROOT"]:
         #~ root = os.path.abspath(os.path.expanduser(os.environ["P4A_ROOT"]))
-        #~ warn("Assuming Par4All source tree root is " + root + " (P4A_ROOT environment variable)")
+        #~ p4a_util.warn("Assuming Par4All source tree root is " + root + " (P4A_ROOT environment variable)")
     else:
         root = default_root
-        warn("Assuming Par4All source tree root is " + root + " (default; use --root to override)")
+        p4a_util.warn("Assuming Par4All source tree root is " + root + " (default; use --root to override)")
     if not os.path.isdir(root):
-        die("Directory does not exist: " + root)
-    #~ info("Par4All source tree root: " + root)
+        p4a_util.die("Directory does not exist: " + root)
+    #~ p4a_util.info("Par4All source tree root: " + root)
 
     # "packages_dir" is where the source packages lie.
     packages_dir = ""
     if options.packages_dir:
         packages_dir = os.path.abspath(os.path.expanduser(options.packages_dir))
-        warn("Packages directory is " + packages_dir + " (--packages-dir)")
+        p4a_util.warn("Packages directory is " + packages_dir + " (--packages-dir)")
     else:
         packages_dir = os.path.join(root, "packages")
-        warn("Assuming packages directory is " + packages_dir + " (individual packages location may be overriden with --xxx-src)")
+        p4a_util.warn("Assuming packages directory is " + packages_dir + " (individual packages location may be overriden with --xxx-src)")
     #~ if not os.path.isdir(packages_dir):
-        #~ die("Invalid packages dir: " + packages_dir)
+        #~ p4a_util.die("Invalid packages dir: " + packages_dir)
 
     # "dest_dir" is the staging installation directory.
     # XXX: DISABLED because PIPS does not play well with "make install"'s DESTDIR parameter.
     if options.dest_dir:
-        die("--dest-dir is ignored for now")
+        p4a_util.die("--dest-dir is ignored for now")
     dest_dir = "" #options.dest_dir
     #if not dest_dir:
     #    dest_dir = os.path.join(root, "run") # By default.
     if dest_dir:
-        debug("DESTDIR=" + dest_dir)
+        p4a_util.debug("DESTDIR=" + dest_dir)
         dest_dir = os.path.abspath(os.path.expanduser(dest_dir)) # Make it absolute whatsoever.
 
     # "prefix" is the installation prefix which is passed
@@ -297,9 +308,9 @@ def main(options, args = []):
     prefix = default_prefix
     if options.prefix:
         prefix = os.path.abspath(os.path.expanduser(options.prefix))
-        warn("Prefix is " + prefix + " (--prefix)")
+        p4a_util.warn("Prefix is " + prefix + " (--prefix)")
     else:
-        warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
+        p4a_util.warn("Assuming prefix is " + prefix + " (default; use --prefix to override)")
 
     # "safe_prefix" is the same as prefix except that
     # if prefix is empty or does not begin with a /,
@@ -309,31 +320,31 @@ def main(options, args = []):
         safe_prefix = "/" + prefix
     else:
         safe_prefix = prefix
-    debug("Prefix: " + quote(prefix) + " (" + safe_prefix + ")")
+    p4a_util.debug("Prefix: " + p4a_util.quote(prefix) + " (" + safe_prefix + ")")
 
     # "install_dir" is the most important variable here.
     # It is dest_dir + safe_prefix.
     install_dir = os.path.normpath(dest_dir + safe_prefix)
-    warn("Install directory is " + install_dir)
+    p4a_util.warn("Install directory is " + install_dir)
     # Check that we are not installing in a system or an invalid directory.
-    if not install_dir or is_system_dir(install_dir):
-        die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
+    if not install_dir or p4a_util.is_system_dir(install_dir):
+        p4a_util.die("Invalid installation/staging directory: " + install_dir + ". It must not be a system directory")
     # Create install_dir it if it does not already exist.
     if os.path.isdir(install_dir):
         if options.clean:
             if glob.glob(os.path.join(install_dir, "*")):
                 # If we are requested to clean first, remove everything
                 # under install_dir.
-                warn("Removing everything in " + install_dir + " (--clean)")
-                rmtree(install_dir, remove_top = False)
+                p4a_util.warn("Removing everything in " + install_dir + " (--clean)")
+                p4a_util.rmtree(install_dir, remove_top = False)
         else:
-            info("Install directory " + install_dir + " already exists")
+            p4a_util.info("Install directory " + install_dir + " already exists")
     else:
         os.makedirs(install_dir)
 
     # Build directory: where the Makefile are generated, where the make commands are issued, etc.
-    build_dir = os.path.join(root, "build")
-    debug("Build directory: " + build_dir)
+    build_dir = os.path.join(root, options.build_dir)
+    p4a_util.debug("Build directory: " + build_dir)
 
     # Path for source packages:
 
@@ -342,36 +353,36 @@ def main(options, args = []):
         polylib_src_dir = options.polylib_src
     else:
         polylib_src_dir = os.path.join(packages_dir, "polylib")
-    debug("polylib source directory: " + polylib_src_dir)
+    p4a_util.debug("polylib source directory: " + polylib_src_dir)
     if not options.skip_polylib and not os.path.isdir(polylib_src_dir) and not options.skip_polylib:
-        die("polylib source directory does not exist: " + polylib_src_dir)
+        p4a_util.die("polylib source directory does not exist: " + polylib_src_dir)
 
     newgen_src_dir = ""
     if options.newgen_src:
         newgen_src_dir = options.newgen_src
     else:
         newgen_src_dir = os.path.join(packages_dir, "PIPS/newgen")
-    debug("newgen source directory: " + newgen_src_dir)
+    p4a_util.debug("newgen source directory: " + newgen_src_dir)
     if not os.path.isdir(newgen_src_dir) and not options.skip_newgen:
-        die("newgen source directory does not exist: " + newgen_src_dir)
+        p4a_util.die("newgen source directory does not exist: " + newgen_src_dir)
 
     linear_src_dir = ""
     if options.linear_src:
         linear_src_dir = options.linear_src
     else:
         linear_src_dir = os.path.join(packages_dir, "PIPS/linear")
-    debug("linear source directory: " + linear_src_dir)
+    p4a_util.debug("linear source directory: " + linear_src_dir)
     if not os.path.isdir(linear_src_dir) and not options.skip_linear:
-        die("linear source directory does not exist: " + linear_src_dir)
+        p4a_util.die("linear source directory does not exist: " + linear_src_dir)
 
     pips_src_dir = ""
     if options.pips_src:
         pips_src_dir = options.pips_src
     else:
         pips_src_dir = os.path.join(packages_dir, "PIPS/pips")
-    debug("PIPS source directory: " + pips_src_dir)
+    p4a_util.debug("PIPS source directory: " + pips_src_dir)
     if not os.path.isdir(pips_src_dir) and not options.skip_pips:
-        die("PIPS source directory does not exist: " + pips_src_dir)
+        p4a_util.die("PIPS source directory does not exist: " + pips_src_dir)
 
     nlpmake_src_dir = ""
     if options.nlpmake_src:
@@ -381,9 +392,9 @@ def main(options, args = []):
     # Normalize the directory so that we can build symbolic links to here
     # easily later:
     nlpmake_src_dir = os.path.abspath(nlpmake_src_dir)
-    debug("nlpmake source directory: " + nlpmake_src_dir)
+    p4a_util.debug("nlpmake source directory: " + nlpmake_src_dir)
     #~ if not os.path.isdir(nlpmake_src_dir):
-        #~ die("Directory does not exist: " + nlpmake_src_dir)
+        #~ p4a_util.die("Directory does not exist: " + nlpmake_src_dir)
 
     # Global configure flags:
     configure_opts = [ "--prefix=" + prefix ]
@@ -403,20 +414,20 @@ def main(options, args = []):
         make_opts.append("-j" + options.jobs)
 
     #~ if get_verbosity() == 0:
-        #~ warn("Building and installing", spin = True)
+        #~ p4a_util.warn("Building and installing", spin = True)
 
     ############################## polylib
 
     if not options.skip_polylib:
 
-        info("Processing polylib")
+        p4a_util.info("Processing polylib")
 
         package_build_dir = os.path.join(build_dir, "polylib")
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                info("Package " + polylib_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
-                rmtree(package_build_dir)
+                p4a_util.info("Package " + polylib_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                p4a_util.rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
             os.makedirs(package_build_dir)
@@ -446,22 +457,22 @@ def main(options, args = []):
     ############################## newgen
 
     if not options.skip_newgen:
-        info("Processing newgen")
+        p4a_util.info("Processing newgen")
 
         package_build_dir = os.path.join(build_dir, "newgen")
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                info("Package " + newgen_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
-                rmtree(package_build_dir)
+                p4a_util.info("Package " + newgen_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                p4a_util.rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
             os.makedirs(package_build_dir)
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-Rfv", os.path.join(newgen_src_dir, "makes") ])
-        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
+        p4a_util.run([ "rm", "-Rfv", os.path.join(newgen_src_dir, "makes") ])
+        p4a_util.run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
 
         newgen_conf_opts = configure_opts
         if options.newgen_conf_opts:
@@ -479,27 +490,27 @@ def main(options, args = []):
     # This was used for testing with DESTDIR...
     #configure_opts.extend ([ 'NEWGENLIBS_CFLAGS="-I' + os.path.join(install_dir, "include") + '"',
     #    'NEWGENLIBS_LIBS="-L' + os.path.join(install_dir, "lib") + ' -lnewgenlibs"' ])
-    configure_opts.append ("PKG_CONFIG_PATH=" + quote(os.path.join(install_dir, "lib/pkgconfig")))
+    configure_opts.append ("PKG_CONFIG_PATH=" + p4a_util.quote(os.path.join(install_dir, "lib/pkgconfig")))
 
     ############################## linear
 
     if not options.skip_linear:
-        info("Processing linear")
+        p4a_util.info("Processing linear")
 
         package_build_dir = os.path.join(build_dir, "linear")
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                info("Package " + linear_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
-                rmtree(package_build_dir)
+                p4a_util.info("Package " + linear_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                p4a_util.rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
             os.makedirs(package_build_dir)
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-Rfv", os.path.join(linear_src_dir, "makes") ])
-        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
+        p4a_util.run([ "rm", "-Rfv", os.path.join(linear_src_dir, "makes") ])
+        p4a_util.run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
         linear_conf_opts = configure_opts
 
         if options.linear_conf_opts:
@@ -521,37 +532,37 @@ def main(options, args = []):
         #~ 'LD_LIBRARY_PATH="' + os.path.join(install_dir, "lib") + ':' + env("LD_LIBRARY_PATH") + '"' ])
 
     # Update the PATH. Needed because PIPS relies on utilities built by newgen.
-    add_to_path(os.path.join(install_dir, "bin"))
+    p4a_util.add_to_path(os.path.join(install_dir, "bin"))
 
     # This was used for testing with DESTDIR...
-    #add_to_path(os.path.join(install_dir, "lib"), var = "LD_LIBRARY_PATH")
+    #p4a_util.add_to_path(os.path.join(install_dir, "lib"), var = "LD_LIBRARY_PATH")
 
     ############################## pips
 
     if not options.skip_pips:
-        info("Processing pips")
+        p4a_util.info("Processing pips")
 
         package_build_dir = os.path.join(build_dir, "pips")
 
         # Rebuild requested? Delete existing build directory.
         if options.rebuild and os.path.isdir(package_build_dir):
-                info("Package " + pips_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
-                rmtree(package_build_dir)
+                p4a_util.info("Package " + pips_src_dir + " marked for rebuild, removing existing build dir " + package_build_dir)
+                p4a_util.rmtree(package_build_dir)
 
         if not os.path.isdir(package_build_dir):
             os.makedirs(package_build_dir)
 
         # Make a symlink to the old make infrastructure (and remove any existing one
         # or a symlink recursion will appear).
-        run([ "rm", "-Rfv", os.path.join(pips_src_dir, "makes") ])
-        run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
+        p4a_util.run([ "rm", "-Rfv", os.path.join(pips_src_dir, "makes") ])
+        p4a_util.run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(pips_src_dir, "makes") ])
 
         # Fix the following error:
         # /bin/sed: can't read /lib/libpolylib64.la: No such file or directory
         # libtool: link: `/lib/libpolylib64.la' is not a valid libtool archive
         # make[5]: *** [libpipslibs.la] Error 1
         # make[5]: Leaving directory `/home/gpean/p4a-foo/build/pips/src/Libs'
-        #~ run([ "sudo", "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
+        #~ p4a_util.run([ "sudo", "ln", "-sfv", os.path.join(install_dir, "lib/libpolylib64.la"), os.path.join(safe_prefix, "lib/libpolylib64.la") ])
 
         ### FIX for fortran
         fortran = os.path.join(build_dir, "pips/src/Passes/fortran95")
@@ -562,17 +573,19 @@ def main(options, args = []):
         # patches the sources and that would mark the files as
         # touched in the git repositiry (if any). Use --delete so
         # that if this setup is run again, the .files are removed
-        # to relauch the patch:
-        run([ "rsync", "-rv", "--delete", os.path.join(packages_dir, "pips-gfc/."), os.path.join(fortran, "gcc-4.4.3") ])
+        # to relauch the patch.
+        # If we do not build with Fortran 95 support, admit this can fail...
+        version = "4.4.5"
+        p4a_util.run([ "rsync", "-av", os.path.join(packages_dir, "pips-gfc/."), fortran ], can_fail = True)
         # To cheat the Makefile process that would like to
         # download the sources from the Internet:
-        for file in [ "gcc-4.4.3.md5", "gcc-core-4.4.3.tar.bz2", "gcc-fortran-4.4.3.tar.bz2" ]:
-            run([ "touch", os.path.join(fortran, file) ])
-        fortran2 = os.path.join(fortran, "gcc-4.4.3")
+        for file in [ "gcc-"+version+".md5", "gcc-core-"+version+".tar.bz2", "gcc-fortran-"+version+".tar.bz2" ]:
+            p4a_util.run([ "touch", os.path.join(fortran, file) ])
+        fortran2 = os.path.join(fortran, "gcc-"+version)
         if not os.path.isdir(fortran2):
             os.makedirs(fortran2)
-        for file in [ ".dir", ".md5-check-core", ".md5-check-fortran", ".untar-core", ".untar-fortran", ".untar" ]:
-            run([ "touch", os.path.join(fortran2, file) ])
+        for file in [ ".dir", ".md5-check-core", ".md5-check-core.list",  ".md5-check-core.liste", ".md5-check-fortran", ".md5-check-fortran.liste", ".untar-core", ".untar-fortran", ".untar", ".patched" ]:
+            p4a_util.run([ "touch", os.path.join(fortran2, file) ])
         ### End of FIX for fortran
 
         pips_conf_opts = configure_opts
@@ -593,14 +606,14 @@ def main(options, args = []):
     ##############################
 
     if options.no_final:
-        warn("Skipping final installation steps (--no-final)")
+        p4a_util.warn("Skipping final installation steps (--no-final)")
         return
 
 
     # Proceed with local scripts and libraries installation.
 
     # Create directory tree.
-    info("Creating dirs")
+    p4a_util.info("Creating dirs")
     install_dir_bin = os.path.join(install_dir, "bin")
     if not os.path.isdir(install_dir_bin):
         os.makedirs(install_dir_bin)
@@ -621,34 +634,33 @@ def main(options, args = []):
         os.makedirs(install_dir_makes)
 
     # Install a few scripts.
-    info("Installing scripts")
+    p4a_util.info("Installing scripts")
 
     for file in [
         "src/dev/p4a_git",
         "src/dev/p4a_valgrind",
-        "src/simple_tools/p4a",
         "src/simple_tools/p4a_process",
         "src/postprocessor/p4a_recover_includes",
         "src/validation/p4a_validate",
         "src/validation/p4a_validation",
         "src/p4a_accel/p4a_post_processor.py"
         ]:
-        run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
+        p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_bin ])
 
     for file in [ "src/dev/p4a_git_lib.bash" ]:
-        run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
+        p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, file), install_dir_etc ])
 
     # Install accelerator source.
-    info("Installing accel files")
+    p4a_util.info("Installing accel files")
     accel_src_dir = os.path.join(root, "src/p4a_accel")
     for file in os.listdir(accel_src_dir):
         ext = os.path.splitext(file)[1]
-        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu":
-            run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu" or ext == ".cpp" or ext == ".f95" :
+            p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
 
     # Copy python dependencies and templates.
-    info("Copying python libs")
-    install_python_lib_dir = get_python_lib_dir(install_dir)
+    p4a_util.info("Copying python libs")
+    install_python_lib_dir = p4a_util.get_python_lib_dir(install_dir)
     #~ for file in os.listdir(install_dir_lib):
         #~ if file.startswith("python") and os.path.isdir(os.path.join(install_dir_lib, file)):
             #~ install_python_lib_dir = os.path.join(install_dir_lib, file, "site-packages/pips")
@@ -656,61 +668,88 @@ def main(options, args = []):
                 #~ install_python_lib_dir = os.path.join(install_dir_lib, file, "dist-packages/pips")
             #~ break
     #~ if not install_python_lib_dir:
-        #~ die("Cannot not determine python lib dir in " + install_dir_lib + ", try --rebuild")
+        #~ p4a_util.die("Cannot not determine python lib dir in " + install_dir_lib + ", try --rebuild")
     dir = os.path.join(root, "src/simple_tools")
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
-            run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
+            p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
+
+    # Create a shortcut name for binaries to the Python file, so that
+    # we can type p4a instead of p4a.py. We need the .py versions
+    # anyway since they can be imported by other Python programs
+    # I guess it does not sense on Windows... RK
+    for file in [ "p4a" ]:
+        p4a_util.run([ "ln", "-fs", os.path.join(install_python_lib_dir, file + '.py'), os.path.join(install_dir_bin, file) ])
 
     # Install stuff still lacking from PIPS install.
     if not options.skip_pips:
-        info("Installing pips scripts")
+        p4a_util.info("Installing pips scripts")
         dir = os.path.join(pips_src_dir, "src/Scripts/validation")
         for file in os.listdir(dir):
             if file.startswith("pips"):
-                run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
-            run([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
-    
+                p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_bin ])
+            p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(pips_src_dir, "src/Scripts/misc/logfile_to_tpips"), install_dir_bin ])
+
 
     # Fix validation.
     if not options.skip_pips and not options.skip_linear and not options.skip_newgen:
-        info("Fixing validation")
+        p4a_util.info("Fixing validation")
         dir = os.path.join(nlpmake_src_dir, "makes")
         for file in os.listdir(dir):
             if file == "arch.sh" or file == "version.sh":
-                run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
+                p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_dir_makes ])
 
     # Install various files.
-    info("Installing release notes")
-    run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
-    info("Installing examples")
-    run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
+    p4a_util.info("Installing release notes")
+    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
+    p4a_util.info("Installing examples")
+    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
     # Write the environment shell scripts.
-    info("Writing shell rc files")
+    p4a_util.info("Writing shell rc files")
     fortran = ""
-    if which("gfortran"):
+    if p4a_util.which("gfortran"):
         fortran = "gfortran"
-    elif which("g77"):
+    elif p4a_util.which("g77"):
         fortran = "g77"
     else:
         fortran = "false"
-    p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
+    p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
         accel = install_dir_share_accel, fortran = fortran))
 
     # Write version file.
-    write_VERSION(install_dir, VERSION(root))
-    write_GITREV(install_dir, GITREV(root))
-    (revision, versiond) = make_full_revision(install_dir)
+    p4a_version.write_VERSION(install_dir, p4a_version.VERSION(root))
+    p4a_version.write_GITREV(install_dir, p4a_version.GITREV(root))
+    (revision, versiond) = p4a_version.make_full_revision(install_dir)
 
-    done("")
-    done("All done. Par4All " + revision + " is ready and has been installed in " + install_dir)
-    done("To begin using it, you should source, depending on your shell religion:")
-    done("")
-    done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
-    done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
-    done("")
+    p4a_util.done("")
+    p4a_util.done("All done. Par4All " + revision + " is ready and has been installed in " + install_dir)
+    p4a_util.done("To begin using it, you should source, depending on your shell religion:")
+    p4a_util.done("")
+    p4a_util.done("  " + os.path.join(install_dir, "etc/par4all-rc.sh") + " (for bash, dash, sh...) or")
+    p4a_util.done("  " + os.path.join(install_dir, "etc/par4all-rc.csh") + " (tcsh, csh...)")
+    p4a_util.done("")
+
+
+def main():
+    '''The function called when this program is executed by its own.'''
+
+    parser = optparse.OptionParser(description = __doc__, usage = "%prog [options]; run %prog --help for options")
+
+    add_module_options(parser)
+
+    p4a_opts.add_common_options(parser)
+
+    (options, args) = parser.parse_args()
+
+    if p4a_opts.process_common_options(options, args):
+        work(options, args)
+
+
+# If this file is called as a script, execute the main:
+if __name__ == "__main__":
+    p4a_opts.exec_and_deal_with_errors(main)
 
 
 # Some Emacs stuff:

@@ -15,6 +15,11 @@
 
 #include <p4a_accel.h>
 
+/**
+ *  This is used by P4A_TIMING routine to compute elapsed time for a kernel
+ *  execution (in ms)
+ */
+float p4a_timing_elapsedTime = -1;
 
 #ifdef P4A_ACCEL_OPENMP
 
@@ -319,6 +324,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 }
 
 /* @} */
+
 #endif // P4A_ACCEL_OPENMP
 
 #ifdef P4A_ACCEL_CUDA
@@ -368,6 +374,7 @@ double P4A_accel_timer_stop_and_float_measure()
 
     @param[in] size is the size to allocate in bytes
 */
+
 void P4A_accel_malloc(void **address, size_t size) 
 {
   P4A_test_execution(cudaMalloc(address, size));
@@ -405,7 +412,18 @@ void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
 			 const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
   cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
+                    "%.1fms - %.2fGB/s\n",element_size, accel_address,host_address,
+                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -429,7 +447,18 @@ void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
 		       void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
   cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
+                    "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
+                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
@@ -496,7 +525,7 @@ void P4A_copy_to_accel_1d(size_t element_size,
 			  void *accel_address) 
 {
   const char * csrc = d1_offset*element_size + (char *)host_address;
-  cudaMemcpy(accel_address,csrc,d1_block_size*element_size,cudaMemcpyHostToDevice);
+  P4A_copy_to_accel(d1_block_size * element_size, csrc, accel_address);
 }
 
 /** Function for copying memory from the hardware accelerator to a 2D array in
@@ -512,7 +541,8 @@ void P4A_copy_from_accel_2d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address) 
 {
-  if(d2_size==d2_block_size ) { // d2 is fully transfered ? We can optimize :-)
+  // d2 is fully transfered ? We can optimize :-)
+  if (d2_size == d2_block_size ) { 
     // We transfer all in one shot !
     P4A_copy_from_accel_1d(element_size,
                            d2_size * d1_size,
@@ -520,11 +550,12 @@ void P4A_copy_from_accel_2d(size_t element_size,
                            d1_offset*d2_size+d2_offset,
                            host_address,
                            accel_address);
-  } else { // Transfer row by row !
+  } 
+  else { // Transfer row by row !
     // Compute the adress of the begining of the first row to transfer
     char * host_row = (char*)host_address + d1_offset*d2_size*element_size;
     char * accel_row = (char*)accel_address;
-
+    
     // Will transfert "d1_block_size" rows
     for(size_t i = 0; i < d1_block_size; i++) {
       P4A_copy_from_accel_1d(element_size,
@@ -782,7 +813,6 @@ void P4A_copy_to_accel_4d(size_t element_size,
 /* @} */
 
 #endif //P4A_ACCEL_CUDA
-
 #ifdef P4A_ACCEL_OPENCL
 
 #include <string.h>

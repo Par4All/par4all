@@ -3,6 +3,9 @@ TARGET = jacobi
 CFILES = jacobi-p4a.c
 KERNELFILES = kernel1_wrapper.c kernel2_wrapper.c
 DUMMYFILE = output.pgm
+BASEFLAGS = -DP4A_PROFILING
+#BASEFLAGS = 
+
 
 P4A_ACCEL_DIR = ../../..
 include $(P4A_ACCEL_DIR)/p4a_accel.mk

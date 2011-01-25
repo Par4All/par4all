@@ -153,14 +153,17 @@ int main(int argc, char * argv[])
     run(xmin,ymin,step,range, *p4a_pt, *p4a_t);
     
     double execution_time = P4A_accel_timer_stop_and_float_measure();
-    fprintf(stderr, "Time of execution : %f s\n", execution_time);
-    fprintf(stderr, "GFLOPS : %f\n",
-	    4e-9/execution_time*(rangex)*(rangey));
     
     P4A_accel_timer_start;
     P4A_copy_from_accel((size_t)sizeof(pt), (void *)pt, (void *)p4a_pt);
     copy_time += P4A_accel_timer_stop_and_float_measure();
+
+#ifdef P4A_PROFILING
+    fprintf(stderr, "Time of execution : %f s\n", execution_time);
+    fprintf(stderr, "GFLOPS : %f\n",
+	    4e-9/execution_time*(rangex)*(rangey));
     fprintf(stderr, "Time of copy : %f s\n", copy_time);
+#endif
 
     P4A_accel_free(p4a_pt);
     P4A_accel_free(p4a_t);

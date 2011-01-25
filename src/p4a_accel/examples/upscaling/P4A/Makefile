@@ -2,6 +2,7 @@ TARGET = upscale
 CFILES = upscale-p4a.c yuv.c
 KERNELFILES = luminance_wrapper.c  chrominance_wrapper.c 
 DUMMYFILE = res.out
+BASEFLAGS = -DP4A_PROFILING
 
 P4A_ACCEL_DIR = ../../..
 include $(P4A_ACCEL_DIR)/p4a_accel.mk

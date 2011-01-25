@@ -268,19 +268,22 @@ struct timeval p4a_time_end;
 
     @param[in] kernel to call
 
-    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+    @param[in] P4A_n_iter_0 is the number of iterations in the first
+    dimension, corresponding to deepest loop
 
-    @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
+    @param[in] P4A_n_iter_1 is the number of iterations in the second
+    dimension, corresponding to outermost loop
 
     @param ... following parameters are given to the kernel
 */
+
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {									\
     P4A_skip_debug(P4A_dump_location();)				\
       P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_2d(%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, #kernel);) \
       _Pragma("omp parallel for")					\
-      for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
-	for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+      for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
+	for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
 	  P4A_vp_0 = P4A_index_0;					\
 	  P4A_vp_1 = P4A_index_1;					\
 	  P4A_vp_2 = 0;							\
@@ -297,11 +300,14 @@ struct timeval p4a_time_end;
 
     @param[in] kernel to call
 
-    @param[in] P4A_n_iter_0 is the number of iterations in the first dimension
+    @param[in] P4A_n_iter_0 is the number of iterations in the first
+    dimension, corresponding to deepest loop
 
-    @param[in] P4A_n_iter_1 is the number of iterations in the second dimension
+    @param[in] P4A_n_iter_1 is the number of iterations in the second
+    dimension
 
-    @param[in] P4A_n_iter_2 is the number of iterations in the third dimension
+    @param[in] P4A_n_iter_2 is the number of iterations in the third
+    dimension, corresponding to outermost loop
 
     @param ... following parameters are given to the kernel
 */
@@ -310,9 +316,9 @@ struct timeval p4a_time_end;
     P4A_skip_debug(P4A_dump_location();)				\
       P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_3d(%d,%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, #kernel);) \
       _Pragma("omp parallel for")					\
-      for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
+      for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
 	for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
-	  for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
+	  for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
 	    P4A_vp_0 = P4A_index_0;					\
 	    P4A_vp_1 = P4A_index_1;					\
 	    P4A_vp_2 = P4A_index_2;					\

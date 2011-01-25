@@ -99,13 +99,65 @@ extern cudaEvent_t p4a_stop_event;
 /** Start a timer on the accelerator in CUDA.
 
     Records the p4a_start_event.
+
+    Two versions are proposed :
+    -# One from Stéphanie Even preserving the user point view which is invited
+    to place P4A_accel_timer_start and P4A_accel_timer_stop_and_float_measure()
+    everywhere he wants;
+    -# One from Mehdi Amini which privilegies the P4A internal point of
+       view with pre-formated and very detailed calls from P4A.
+
+   The two versions have been preserved with two differents conditional, 
+   respectively, P4A_PROFILING or P4A_TIMING.
 */
+
+/** Stéphanie Even version : user point of view */
 #ifdef P4A_PROFILING
 #define P4A_accel_timer_start					\
   P4A_test_execution(cudaEventRecord(p4a_start_event, 0))
 #else
 #define P4A_accel_timer_start /* Nothing */
 #endif
+
+
+/** Mehdi Amini version : P4A internal */
+
+// Stop a timer on the accelerator in CUDA 
+#define P4A_accel_timer_stop toolTestExec(cudaEventRecord(p4a_stop_event, 0))
+
+#ifdef P4A_TIMING
+// Set of routine for timing kernel executions
+extern float p4a_timing_elapsedTime;
+
+#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+
+#define P4A_TIMING_accel_timer_stop		\
+  { P4A_accel_timer_stop;			\
+    cudaEventSynchronize(p4a_stop_event);	\
+  }
+
+#define P4A_TIMING_elapsed_time(elapsed)				\
+  cudaEventElapsedTime(&elapsed, p4a_start_event, p4a_stop_event);
+
+#define P4A_TIMING_get_elapsed_time		      \
+  {   P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime); \
+    p4a_timing_elapsedTime; }
+
+#define P4A_TIMING_display_elasped_time(msg)	   \
+  { P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
+    P4A_dump_message("Time for '%s' : %fms\n",		\
+		     #msg,				\
+		     p4a_timing_elapsedTime ); }
+
+#else
+
+#define P4A_TIMING_accel_timer_start
+#define P4A_TIMING_accel_timer_stop
+#define P4A_TIMING_elapsed_time(elapsed)
+#define P4A_TIMING_get_elapsed_time
+#define P4A_TIMING_display_elasped_time(msg)
+
+#endif //P4A_TIMING
 
 /** @} */
 
@@ -157,11 +209,6 @@ extern cudaEvent_t p4a_stop_event;
 #define P4A_wrapper_proto(kernel, ...)		\
   P4A_accel_kernel_wrapper kernel(__VA_ARGS__)
 
-/** 
-    @}
-*/
-
-
 /** @addtogroup P4A_kernel_context Kernel contextualization.
 
     The kernel is called over a grid of threads in CUDA.
@@ -176,7 +223,6 @@ extern cudaEvent_t p4a_stop_event;
 */
 #define P4A_call_accel_kernel_context(kernel, ...)	\
   kernel<<<__VA_ARGS__>>>
-
 
 /** 
     @}
@@ -399,9 +445,12 @@ extern cudaEvent_t p4a_stop_event;
     P4A_skip_debug(P4A_dump_message("Invoking kernel %s with %s\n",	\
 				    #context,				\
 				    #parameters));			\
+    P4A_TIMING_accel_timer_start;					\
     P4A_call_accel_kernel_context context				\
     P4A_call_accel_kernel_parameters parameters;			\
-    P4A_test_execution_with_message("P4A CUDA kernel execution failed");			\
+    P4A_test_execution_with_message("P4A CUDA kernel execution failed"); \
+    P4A_TIMING_accel_timer_stop;					\
+    P4A_TIMING_display_elasped_time(context);				\
   } while (0)
 
 

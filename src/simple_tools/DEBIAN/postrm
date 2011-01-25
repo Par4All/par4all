@@ -20,7 +20,7 @@
 
 case "$1" in
     purge|remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
-	rm -v /etc/profile.d/par4all-rc.* /etc/ld.so.conf.d/par4all.conf 2>/dev/null
+	rm -fv /etc/profile.d/par4all-rc.* /etc/ld.so.conf.d/par4all.conf
 	/sbin/ldconfig
     ;;
 

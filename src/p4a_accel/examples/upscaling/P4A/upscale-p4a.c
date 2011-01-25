@@ -78,8 +78,11 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
     copy_time += P4A_accel_timer_stop_and_float_measure();
   }
   printf("End of computation\n");
+
+#ifdef P4A_PROFILING
   fprintf(stderr, "Time of execution : %f s\n", execution_time);
   fprintf(stderr, "Time for copy : %f s\n", copy_time);
+#endif
 
   printf("Begin writing output video\n");
   // Writing ... data dependance

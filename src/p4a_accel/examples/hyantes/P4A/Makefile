@@ -3,7 +3,7 @@ TARGET = hyantes
 CFILES = hyantes-p4a.c
 KERNELFILES = kernel_wrapper.c
 LDLIBS = -lm
-BASEFLAGS = -DUSE_FLOAT
+BASEFLAGS = -DUSE_FLOAT -DP4A_PROFILING
 DUMMYFILE = h.out
 
 P4A_ACCEL_DIR = ../../..

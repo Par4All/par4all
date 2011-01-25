@@ -4,16 +4,18 @@
 # Authors:
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 #
+import p4a_util 
+import re
+import os
 
 '''
 Git Repositories Manipulation Class
 '''
 
-import sys, os, string
-from p4a_util import *
 
 
-actual_script = change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
+
+actual_script = p4a_util.change_file_ext(os.path.realpath(os.path.abspath(__file__)), ".py", if_ext = ".pyc")
 script_dir = os.path.split(actual_script)[0]
 
 
@@ -26,16 +28,16 @@ class p4a_git:
 
     def is_valid_git_dir(self, dir):
         '''Returns True if the directory appears to be a valid Git repository.'''
-        result = ((os.path.splitext(dir)[1] == self._git_ext or os.path.split(dir)[1] == self._git_ext) 
+        result = ((os.path.splitext(dir)[1] == self._git_ext or os.path.split(dir)[1] == self._git_ext)
             and os.path.exists(os.path.join(dir, "index")))
-        #debug("is_valid_git_dir("+ dir +") = " + str(result))
+        #p4a_util.debug("is_valid_git_dir("+ dir +") = " + str(result))
         return result
 
     def __init__(self, any_file_inside_target_repos = os.getcwd(), git_ext = ".git"):
         '''Construct a class for manipulating a Git repository in which "any_file_inside_target_repos" lies.'''
         self._git_ext = git_ext
         git_dir = os.path.abspath(os.path.realpath(os.path.expanduser(any_file_inside_target_repos)))
-        debug("Looking for Git root for " + git_dir)
+        p4a_util.debug("Looking for Git root for " + git_dir)
         while True:
             if not os.path.isdir(git_dir):
                 (git_dir, name) = os.path.split(git_dir)
@@ -60,8 +62,8 @@ class p4a_git:
         if self._git_dir:
             self._dir = os.path.normpath(re.sub(re.escape(self._git_ext) + "$", "", self._git_dir))
         else:
-            raise p4a_error("Git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
-        debug("Git root for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
+            raise p4a_util.p4a_error("Git ext " + self._git_ext + " not found for " + any_file_inside_target_repos)
+        p4a_util.debug("Git root for " + any_file_inside_target_repos + ": " + self._git_dir + " (" + self._dir + ")")
 
     def fix_input_file_path(self, path):
         '''Function for fixing input paths: make it relative to the repository root or carp if it is not in there.'''
@@ -69,13 +71,13 @@ class p4a_git:
             return ""
         path = os.path.abspath(os.path.realpath(os.path.expanduser(path)))
         if path[0:len(self._dir)] != self._dir:
-            raise p4a_error("File is outside repository in " + self._dir + ": " + path)
+            raise p4a_util.p4a_error("File is outside repository in " + self._dir + ": " + path)
         path = path[len(self._dir) + 1:]
         return path
 
     def cmd(self, git_command, can_fail = True, silent = True):
         '''Runs a git command with correct environment and path settings.'''
-        output = run([ "git" ] + git_command, can_fail = can_fail, 
+        output = p4a_util.run([ "git" ] + git_command, can_fail = can_fail, 
             working_dir = self._dir, silent = silent,
             extra_env = dict(
                     GIT_DIR = self._git_dir,
@@ -91,7 +93,7 @@ class p4a_git:
             if b.startswith("* "):
                 br = b.replace("* ", "")
                 break
-        debug("current_branch() = " + br)
+        p4a_util.debug("current_branch() = " + br)
         return br
 
     def is_dirty(self, file = None):
@@ -105,7 +107,7 @@ class p4a_git:
         result = False
         if re.search("Changes to be committed:", output) or re.search("Changed but not updated:", output):
             result = True
-        debug("is_dirty("+ repr(file) +") = " + str(result))
+        p4a_util.debug("is_dirty("+ repr(file) +") = " + str(result))
         return result
 
     def current_revision(self, file = None, test_dirty = True, include_tag = True):
@@ -124,7 +126,7 @@ class p4a_git:
             short_rev = output.split(" ")[0]
             if test_dirty and self.is_dirty(file):
                 short_rev += "~dirty"
-        debug("current_revision("+ repr(file) +") = " + short_rev)
+        p4a_util.debug("current_revision("+ repr(file) +") = " + short_rev)
         return short_rev
 
     def archive(self, output_file, prefix, format = "tar"):

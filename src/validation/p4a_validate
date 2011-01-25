@@ -12,7 +12,7 @@ Introduce the concept of validation class, not that far from CfEngine one.
 Ronan.Keryell@hpc-project.com
 """
 
-import re, optparse, pickle, os, shutil, subprocess, functools, sys
+import re, optparse, pickle, os, shutil, subprocess, functools, sys, string
 
 verbose = False
 
@@ -145,7 +145,9 @@ class ValidationElement:
     def verify_status(status):
         "Verify it is a valid status"
 
-        if status == ValidationElement.BUG \
+        # Accept also trailing ':'
+        status = status.rstrip(':')
+        return status == ValidationElement.BUG \
             or status == ValidationElement.CHANGED \
             or status == ValidationElement.FAILED \
             or status == ValidationElement.LATER \
@@ -155,7 +157,13 @@ class ValidationElement:
             or status == ValidationElement.ORPHAN \
             or status == ValidationElement.PASSED \
             or status == ValidationElement.SKIPPED \
-            or status == ValidationElement.TIMEOUT :
+            or status == ValidationElement.TIMEOUT
+
+
+    def assert_status(status):
+        "Verify it is a valid status"
+
+        if ValidationElement.verify_status(status):
             pass
         else:
             print('Status', status, 'not allowed.', file = sys.stderr)
@@ -225,6 +233,8 @@ class ValidationClass:
     def add(self, element, value = None):
         "Adding an element to the validation class"
 
+        if verbose:
+            print ('Adding', element, value)
         self.elements[element] = value
 
 
@@ -260,7 +270,7 @@ class ValidationClass:
         return self
 
 
-    def from_string(self, string):
+    def from_string(self, s):
         "Add the elements from a line-oriented string"
 
         # Try to guess the format of the file that can be a mail output, a
@@ -268,13 +278,16 @@ class ValidationClass:
         # validation output:
         first_line = True
         validation_output = False
-        for line in string.splitlines():
+        for line in s.splitlines():
             args = line.split()
+            if verbose:
+                print ('Reading', len(args), 'arg(s):', args)
             if len(args) == 0:
-                # Blank line
+                if verbose:
+                    print ('continue: Blank line')
                 continue
             if first_line:
-                if len(args) > 2 or (args[0] == "parallel" and args[1] == "validation"):
+                if (len(args) > 2 and not ValidationElement.verify_status(args[0])) or (args[0] == "parallel" and args[1] == "validation"):
                     # It is a validation output, in file or mail format:
                     validation_output = True
                 first_line = False
@@ -294,9 +307,10 @@ class ValidationClass:
                 # See next line:
                 continue
             # Should be in normal mode now:
-            if len(args) == 2:
+            if len(args) == 2 or (len(args) == 3 and  args[2] in string.digits):
                 # We are in a 'skipped/failed/changed:
-                # Syntax/common2.tpips' form:
+                # Syntax/common2.tpips' form, with an optional number at
+                # the end:
                 attribute = args[0].rstrip(':')
                 self.add(args[1], attribute)
             elif len(args) == 1:
@@ -424,7 +438,7 @@ class ValidationClass:
     def filter_status(self, status):
         "Only keep elements that match the given status"
 
-        ValidationElement.verify_status(status)
+        ValidationElement.assert_status(status)
         # Only keep elements with the correct status:
         self.generic_filter(lambda e : e[1] == status)
 
@@ -432,7 +446,7 @@ class ValidationClass:
     def filter_out_status(self, status):
         "Remove elements that match the given status"
 
-        ValidationElement.verify_status(status)
+        ValidationElement.assert_status(status)
         # Only keep elements with the correct status:
         self.generic_filter(lambda e : e[1] != status)
 
