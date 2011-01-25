@@ -1,6 +1,5 @@
-// this program reveals a problem with preconditions: PIPS claims that the
-// `printf' instruction is unreachable, while it is actually reachable
-// (tested on PIPS r18499, r18960)
+// Bad reachability analysis in deprecated versions of PIPS, with
+// transformer lists
 
 // $Id$
 
@@ -10,7 +9,7 @@
 void run(void) {
 	int n;
 	n = 0;
-
+	
 	while (1) {
 		if (rand() % 2) {
 			if (n <= 9) n++;
@@ -22,7 +21,7 @@ void run(void) {
 			}
 		}
 	}
-
+	
 }
 
 int main(void) {

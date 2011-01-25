@@ -277,52 +277,12 @@ l99999:
 
                   Pow[th] += CplAbs(&ptrin[th][rg][v]);
 }
----------------------------------------
-Domain:
-         I_0  -1 = 0
-         Nrg  -13 = 0
-         Nth  -12 = 0
-         tht  = 0
-         N  -1 >= 0
-         Nv  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 0 ]
-[ 127 ]
-
-Ehrhart Polynomial:
-128
----------------------------------------
-Domain:
-         I_0  -1 = 0
-         Nrg  -13 = 0
-         Nth  -12 = 0
-         tht  = 0
-         Nv  -1 >= 0
-         N  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 127,  rgt,  0 ]
-[ 127,  N+rgt-1,  0 ]
-[ 127,  rgt,  Nv-1 ]
-[ 127,  N+rgt-1,  Nv-1 ]
-[ 0,  rgt,  0 ]
-[ 0,  N+rgt-1,  0 ]
-[ 0,  rgt,  Nv-1 ]
-[ 0,  N+rgt-1,  Nv-1 ]
-
-Ehrhart Polynomial:
-( ( 128 * Nv + 0 )
- * N + 0 )
-
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float Pow[Nth])
 {
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -352,7 +312,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 
@@ -442,7 +402,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -477,7 +437,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -512,7 +472,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -548,7 +508,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:
@@ -649,7 +609,7 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float
    int th, v, rg;
    //PIPS generated variable
    int rg0, v0, I_0, v1, I_1, tht, rgt;
-   N = 127*(1/Nv);
+   N = 127*1/Nv*(1/N);
    I_1 = (N+12)/N;
    I_0 = 1;
 l99997:

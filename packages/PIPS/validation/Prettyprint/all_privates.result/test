@@ -1,0 +1,43 @@
+// OMP style
+int main()
+{
+   float a[10][10][10][10][10];                                         /*0004*/
+   int i, j, k, l, m;                                                   /*0005*/
+   float x = 2.12;                                                      /*0006*/
+   float z = 0.0;                                                       /*0007*/
+   float y = 2.0;                                                       /*0008*/
+
+#pragma omp parallel for private(j,i)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for private(k,j)
+      for(j = 0; j <= 9; j += 1)
+#pragma omp parallel for private(z,l,k)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;                                                  /*0013*/
+#pragma omp parallel for private(m,l)
+            for(l = 0; l <= 9; l += 1)
+#pragma omp parallel for private(y,m)
+               for(m = 0; m <= 9; m += 1) {
+                  y = 3.5+x+z;                                          /*0016*/
+                  a[i][j][k][l][m] = x*y;                               /*0017*/
+               }
+         }
+   
+   // use the value of the array to prevent pips doing optimization on unused
+   // values
+#pragma omp for private(j,i)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp for private(k,j)
+      for(j = 0; j <= 9; j += 1)
+#pragma omp for private(z,l,k)
+         for(k = 0; k <= 9; k += 1) {
+            z = k*2.0;                                                  /*0029*/
+#pragma omp for private(m,l)
+            for(l = 0; l <= 9; l += 1)
+#pragma omp for private(m)
+               for(m = 0; m <= 9; m += 1)
+                  fprintf(stdout, "%f", a[i][j][k][l][m]);              /*0032*/
+         }
+
+   return 0;                                                            /*0039*/
+}

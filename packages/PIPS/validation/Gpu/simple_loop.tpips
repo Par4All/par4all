@@ -46,23 +46,23 @@ echo
 echo "After GPU_IFY"
 echo
 display PRINTED_FILE[main]
-display PRINTED_FILE[p4a_kernel_launcher_0]
-display PRINTED_FILE[p4a_kernel_wrapper_0]
-display PRINTED_FILE[p4a_kernel_0]
+display PRINTED_FILE[p4a_launcher_main]
+display PRINTED_FILE[p4a_wrapper_main]
+display PRINTED_FILE[p4a_kernel_main]
 
 
 setproperty ISOLATE_STATEMENT_EVEN_NON_LOCAL TRUE
-apply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+apply KERNEL_LOAD_STORE[p4a_launcher_main]
 echo
 echo "After KERNEL_LOAD_STORE"
 echo
 display PRINTED_FILE[main]
-display PRINTED_FILE[p4a_kernel_launcher_0]
-display PRINTED_FILE[p4a_kernel_wrapper_0]
-display PRINTED_FILE[p4a_kernel_0]
+display PRINTED_FILE[p4a_launcher_main]
+display PRINTED_FILE[p4a_wrapper_main]
+display PRINTED_FILE[p4a_kernel_main]
 
 
-apply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+apply GPU_LOOP_NEST_ANNOTATE[p4a_launcher_main]
 
 apply UNSPLIT
 

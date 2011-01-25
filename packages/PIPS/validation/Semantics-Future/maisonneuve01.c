@@ -1,14 +1,11 @@
-// This example is derived from bakery.c
-// It is properly analyzed by PIPS r18437
+// This example requires transformer lists to be properly analyzed
+
+// $Id$
 
 #include <stdlib.h>
 
 void error() {
 	exit(1);
-}
-
-int alea() {
-	return rand() % 2;
 }
 
 void run() {
@@ -20,9 +17,8 @@ void run() {
 
 		a = rand();
 
-		if (alea()) {
-			// here, cannot see that b == 0
-			if (alea() && b != 0) error();
+		if (rand() % 2) {
+			if (rand() % 2 && b != 0) error();
 			b = 0;
 		}
 

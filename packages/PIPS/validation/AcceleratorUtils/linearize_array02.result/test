@@ -12,11 +12,23 @@
       INTEGER A(1:100)
       DO J = 1, 10                                                      0004
          DO I = 1, 10                                                   0005
-            A(I+10*J) = I+J*10                                          0006
+            A(I+10*J-10) = I+J*10                                       0006
          ENDDO
       ENDDO
       END
 /* C pretty print for module FOO. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 int
 main (int argc, char *argv[])
 {
@@ -28,7 +40,7 @@ main (int argc, char *argv[])
     {
       for (i = 1; i <= 10; i++)
 	{
-	  a[(i + (10 * j)) - 1] = (i + (j * 10));
+	  a[((i + (10 * j)) - 10) - 1] = (i + (j * 10));
 	}
     }
   return 0;

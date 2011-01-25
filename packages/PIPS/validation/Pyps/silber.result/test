@@ -299,8 +299,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    unsigned char current_1;
    //PIPS generated variable
    int I_0, I_1, I_2, I_3;
-   //PIPS generatew=1024, h=1024, max=255
-d variable
+   //PIPS generated variable
    unsigned char I_4, I_5;
    //PIPS generated variable
    int I_6, I_7, I_8;

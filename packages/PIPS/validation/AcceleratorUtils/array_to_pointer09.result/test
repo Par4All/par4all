@@ -29,7 +29,7 @@ void atp(float *cdens)
 }
 int main(int argc, char **argv)
 {
-   float *cdens = alloca(sizeof(float[2048]));
+   float *cdens = (float *) alloca(sizeof(float[2048]));
    float *pdens;
    pdens = (float *) malloc(sizeof(float[2])*1024);
    atp(cdens);

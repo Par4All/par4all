@@ -31,7 +31,7 @@ echo
 display PRINTED_FILE
 
 #apply UNSPLIT[%PROGRAM]
-#shell $PIPS_F77 loop_interchange08.database/Src/loop_interchange08.f -o loop_interchange08.database/out
+#shell ${PIPS_F77:-gfortran} loop_interchange08.database/Src/loop_interchange08.f -o loop_interchange08.database/out
 
 close
 quit

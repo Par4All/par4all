@@ -11,13 +11,13 @@ capply LIMIT_NESTED_PARALLELISM[init]
 setproperty GPU_USE_WRAPPER FALSE
 setproperty GPU_USE_KERNEL FALSE
 capply GPU_IFY[init]
-#capply LOOP_NORMALIZE[p4a_kernel_launcher_0]
-#capply PRIVATIZE_MODULE[p4a_kernel_launcher_0]
-#display PRINTED_FILE[p4a_kernel_launcher_0,main,init]
-#capply COARSE_GRAIN_PARALLELIZATION[p4a_kernel_launcher_0]
-#capply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
-#capply GPU_IFY[p4a_kernel_launcher_0]
-capply KERNEL_LOAD_STORE[p4a_kernel_launcher_0]
+#capply LOOP_NORMALIZE[p4a_launcher_0]
+#capply PRIVATIZE_MODULE[p4a_launcher_0]
+#display PRINTED_FILE[p4a_launcher_0,main,init]
+#capply COARSE_GRAIN_PARALLELIZATION[p4a_launcher_0]
+#capply GPU_LOOP_NEST_ANNOTATE[p4a_launcher_0]
+#capply GPU_IFY[p4a_launcher_0]
+capply KERNEL_LOAD_STORE[p4a_launcher_0]
 
 setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
 

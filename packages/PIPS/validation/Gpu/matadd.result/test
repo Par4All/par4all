@@ -517,6 +517,18 @@
       ENDDO
       END
 /* C pretty print for module MATADD. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 int
 main (int argc, char *argv[])
 {
@@ -547,6 +559,18 @@ main (int argc, char *argv[])
   return 0;
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_accel_free (int *address_p4a_copy)
 {
@@ -555,6 +579,18 @@ p4a_accel_free (int *address_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
@@ -564,6 +600,18 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
 		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -578,6 +626,18 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -602,6 +662,18 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -638,6 +710,18 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
 		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -652,6 +736,18 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -676,6 +772,18 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -747,12 +855,24 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
 
-      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      CALL P4A_LAUNCHER_MATADD(M, N, B, C)
 
-      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)
 
       END
 /* C pretty print for module MATADD. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 int
 main (int argc, char *argv[])
 {
@@ -764,11 +884,23 @@ main (int argc, char *argv[])
   float b[n - 0][m - 0];
   float c[n - 0][m - 0];
 
-  p4a_kernel_launcher_0 (m, n, b, c);
-  p4a_kernel_launcher_1 (m, n, a, b, c);
+  p4a_launcher_matadd (m, n, b, c);
+  p4a_launcher_matadd_1 (m, n, a, b, c);
   return 0;
 }
 /* C pretty print for module P4A_ACCEL_FREE. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_accel_free (int *address_p4a_copy)
 {
@@ -777,6 +909,18 @@ p4a_accel_free (int *address_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_ACCEL_MALLOC. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
 {
@@ -786,6 +930,18 @@ p4a_accel_malloc (int *address_p4a_copy, int *size_p4a_copy)
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
 		     char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -800,6 +956,18 @@ p4a_copy_from_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_1D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -824,6 +992,18 @@ p4a_copy_from_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_FROM_ACCEL_2D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 			int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -860,6 +1040,18 @@ p4a_copy_from_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
 		   char accel_add[(*size_p4a_copy) - 0], int *size_p4a_copy)
@@ -874,6 +1066,18 @@ p4a_copy_to_accel (char host_add[(*size_p4a_copy) - 0],
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_1D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d1_block_size_p4a_copy, int *d1_offset_p4a_copy,
@@ -898,6 +1102,18 @@ p4a_copy_to_accel_1d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
   return;
 }
 /* C pretty print for module P4A_COPY_TO_ACCEL_2D. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
 p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
 		      int *d2_size_p4a_copy, int *d1_block_size_p4a_copy,
@@ -933,12 +1149,24 @@ p4a_copy_to_accel_2d (int *elem_size_p4a_copy, int *d1_size_p4a_copy,
     }
   return;
 }
-/* C pretty print for module P4A_KERNEL_0. */
+/* C pretty print for module P4A_KERNEL_MATADD. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
-	      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
-	      int *j_p4a_copy)
+p4a_kernel_matadd (int *m_p4a_copy, int *n_p4a_copy,
+		   float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		   float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		   int *i_p4a_copy, int *j_p4a_copy)
 {
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
@@ -949,13 +1177,25 @@ p4a_kernel_0 (int *m_p4a_copy, int *n_p4a_copy,
   c[(j + 1) - 1][(i + 1) - 1] = (j + 1);
   return;
 }
-/* C pretty print for module P4A_KERNEL_1. */
+/* C pretty print for module P4A_KERNEL_MATADD_1. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
-	      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-	      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-	      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0], int *i_p4a_copy,
-	      int *j_p4a_copy)
+p4a_kernel_matadd_1 (int *m_p4a_copy, int *n_p4a_copy,
+		     float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		     float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		     float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		     int *i_p4a_copy, int *j_p4a_copy)
 {
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
@@ -966,11 +1206,23 @@ p4a_kernel_1 (int *m_p4a_copy, int *n_p4a_copy,
     (b[(j + 1) - 1][(i + 1) - 1] + c[(j + 1) - 1][(i + 1) - 1]);
   return;
 }
-/* C pretty print for module P4A_KERNEL_LAUNCHER_0. */
+/* C pretty print for module P4A_LAUNCHER_MATADD. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
-		       float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-		       float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0])
+p4a_launcher_matadd (int *m_p4a_copy, int *n_p4a_copy,
+		     float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		     float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0])
 {
   int j;
   int i;
@@ -981,14 +1233,26 @@ p4a_kernel_launcher_0 (int *m_p4a_copy, int *n_p4a_copy,
     {
       for (j = 0; j <= ((n - 1) + 1) + -1; j++)
 	{
-	  p4a_kernel_wrapper_0 (&m, &n, b, c, &i, &j);
+	  p4a_wrapper_matadd (&m, &n, b, c, &i, &j);
 	}
     }
   return;
 }
-/* C pretty print for module P4A_KERNEL_LAUNCHER_1. */
+/* C pretty print for module P4A_LAUNCHER_MATADD_1. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
+p4a_launcher_matadd_1 (int *m_p4a_copy, int *n_p4a_copy,
 		       float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		       float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		       float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0])
@@ -1002,29 +1266,53 @@ p4a_kernel_launcher_1 (int *m_p4a_copy, int *n_p4a_copy,
     {
       for (j = 0; j <= ((n - 1) + 1) + -1; j++)
 	{
-	  p4a_kernel_wrapper_1 (&m, &n, a, b, c, &i, &j);
+	  p4a_wrapper_matadd_1 (&m, &n, a, b, c, &i, &j);
 	}
     }
   return;
 }
-/* C pretty print for module P4A_KERNEL_WRAPPER_0. */
+/* C pretty print for module P4A_WRAPPER_MATADD. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_wrapper_0 (int *m_p4a_copy, int *n_p4a_copy,
-		      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
-		      int *i_p4a_copy, int *j_p4a_copy)
+p4a_wrapper_matadd (int *m_p4a_copy, int *n_p4a_copy,
+		    float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		    float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
+		    int *i_p4a_copy, int *j_p4a_copy)
 {
   int m = *m_p4a_copy;
   int n = *n_p4a_copy;
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
 
-  p4a_kernel_0 (&m, &n, b, c, &i, &j);
+  p4a_kernel_matadd (&m, &n, b, c, &i, &j);
   return;
 }
-/* C pretty print for module P4A_KERNEL_WRAPPER_1. */
+/* C pretty print for module P4A_WRAPPER_MATADD_1. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
 void
-p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
+p4a_wrapper_matadd_1 (int *m_p4a_copy, int *n_p4a_copy,
 		      float a[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		      float b[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
 		      float c[(*n_p4a_copy) - 0][(*m_p4a_copy) - 0],
@@ -1035,6 +1323,6 @@ p4a_kernel_wrapper_1 (int *m_p4a_copy, int *n_p4a_copy,
   int i = *i_p4a_copy;
   int j = *j_p4a_copy;
 
-  p4a_kernel_1 (&m, &n, a, b, c, &i, &j);
+  p4a_kernel_matadd_1 (&m, &n, a, b, c, &i, &j);
   return;
 }

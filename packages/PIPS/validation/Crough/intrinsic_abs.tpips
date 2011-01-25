@@ -1,0 +1,18 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="intrinsic_abs"
+delete $WS
+create $WS $WS.f
+
+#setenv CPRETTYPRINTER_DEBUG_LEVEL 9
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+display C_PRINTED_FILE[FOO]
+
+close
+delete $WS
+quit

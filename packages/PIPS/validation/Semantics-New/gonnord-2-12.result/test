@@ -1,0 +1,274 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(i,j) {i==0, j==0}
+
+   i = j = 0;
+
+//  T(i,j) {i<=100, i#init+2j<=i+2j#init, 2j<=i, 0<=j, j#init<=j}
+
+   while (flip())
+
+//  T(i,j) {i+2j==i#init+2j#init+4, i<=100, i#init+2<=i, i<=i#init+4,
+//    2j<=i, 0<=j}
+
+      if (flip())
+
+//  T(i) {i==i#init+4, i<=100, 2j<=i, 0<=j}
+
+         if (i<=96) {
+
+//  T(i) {i==i#init+4, i<=100}
+
+            i += 4;
+
+//  T() {i<=100, 2j<=i, 0<=j}
+
+            if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {97<=i}
+
+            while (1)
+
+//  T() {97<=i}
+
+               ;
+      else if (i<=98) {
+
+//  T(i) {i==i#init+2, i<=100}
+
+         i += 2;
+
+//  T(j) {j==j#init+1, i<=100}
+
+         j++;
+
+//  T() {i<=100, 2j<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {99<=i}
+
+         while (1)
+
+//  T() {99<=i}
+
+            ;
+
+//  T(i,j) {i+2j==i#init+2j#init+4, 101<=i, i#init+2<=i, i<=i#init+4,
+//    i#init+4<=i+2j, i+2j<=2i#init+4, i#init<=100}
+
+   if (flip())
+
+//  T(i) {i==i#init+4, 101<=i, i<=104, 2j+4<=i, 0<=j}
+
+      if (i<=100&&i>96) {
+
+//  T(i) {i==i#init+4, 101<=i, i<=104, 2j+4<=i, 0<=j}
+
+         i += 4;
+
+//  T() {101<=i, i<=104, 2j+4<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {2j<=i, 0<=j}
+
+         while (1)
+
+//  T() {2j<=i, 0<=j}
+
+            ;
+   else if (i<=100&&i>98) {
+
+//  T(i) {i==i#init+2, 101<=i, i<=102, 2j+2<=i, 0<=j}
+
+      i += 2;
+
+//  T(j) {j==j#init+1, 101<=i, i<=102, 2j<=i, 1<=j}
+
+      j++;
+
+//  T() {101<=i, i<=102, 2j<=i, 1<=j}
+
+      if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+   else
+
+//  T() {2j<=i, 0<=j}
+
+      while (1)
+
+//  T() {2j<=i, 0<=j}
+
+         ;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   i = j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+   while (flip())
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+      if (flip())
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+         if (i<=96) {
+
+//  P(i,j) {i<=96, 2j<=i, 0<=j}
+
+            i += 4;
+
+//  P(i,j) {i<=100, 2j+4<=i, 0<=j}
+
+            if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(i,j) {97<=i, i<=100, 2j<=i, 0<=j}
+
+            while (1)
+
+//  P(i,j) {97<=i, i<=100, 2j<=i, 0<=j}
+
+               ;
+      else if (i<=98) {
+
+//  P(i,j) {i<=98, 2j<=i, 0<=j}
+
+         i += 2;
+
+//  P(i,j) {i<=100, 2j+2<=i, 0<=j}
+
+         j++;
+
+//  P(i,j) {i<=100, 2j<=i, 1<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P(i,j) {99<=i, i<=100, 2j<=i, 0<=j}
+
+         while (1)
+
+//  P(i,j) {99<=i, i<=100, 2j<=i, 0<=j}
+
+            ;
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+   if (flip())
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+      if (i<=100&&i>96) {
+
+//  P(i,j) {97<=i, i<=100, 2j<=i, 0<=j}
+
+         i += 4;
+
+//  P(i,j) {101<=i, i<=104, 2j+4<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P(i,j) {i<=96, 2j<=i, 0<=j}
+
+         while (1)
+
+//  P(i,j) {i<=96, 2j<=i, 0<=j}
+
+            ;
+   else if (i<=100&&i>98) {
+
+//  P(i,j) {99<=i, i<=100, 2j<=i, 0<=j}
+
+      i += 2;
+
+//  P(i,j) {101<=i, i<=102, 2j+2<=i, 0<=j}
+
+      j++;
+
+//  P(i,j) {101<=i, i<=102, 2j<=i, 1<=j}
+
+      if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+   else
+
+//  P(i,j) {i<=98, 2j<=i, 0<=j}
+
+      while (1)
+
+//  P(i,j) {i<=98, 2j<=i, 0<=j}
+
+         ;
+}

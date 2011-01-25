@@ -17,8 +17,8 @@ apply COARSE_GRAIN_PARALLELIZATION[main]
 
 
 set GPU_KERNEL_PREFIX "p4a_kernel"
-set GPU_WRAPPER_PREFIX "p4a_kernel_wrapper"
-set GPU_LAUNCHER_PREFIX "p4a_kernel_launcher"
+set GPU_WRAPPER_PREFIX "p4a_wrapper"
+set GPU_LAUNCHER_PREFIX "p4a_launcher"
 set GPU_USE_KERNEL FALSE
 set GPU_USE_WRAPPER FALSE
 capply GPU_IFY[updateBug,main]
@@ -27,45 +27,45 @@ capply GPU_IFY[updateBug,main]
 echo
 echo "Initial launcher"
 echo
-display PRINTED_FILE[p4a_kernel_launcher_0]
+display PRINTED_FILE[p4a_launcher_updateBug]
 
 
 
 
-capply PRIVATIZE_MODULE[p4a_kernel_launcher_0]
-capply COARSE_GRAIN_PARALLELIZATION[p4a_kernel_launcher_0]
+capply PRIVATIZE_MODULE[p4a_launcher_updateBug]
+capply COARSE_GRAIN_PARALLELIZATION[p4a_launcher_updateBug]
 set NESTED_PARALLELISM_THRESHOLD 0
 set NESTED_PARALLELISM_THRESHOLD 2
-capply LIMIT_NESTED_PARALLELISM[p4a_kernel_launcher_0]
+capply LIMIT_NESTED_PARALLELISM[p4a_launcher_updateBug]
 set NESTED_PARALLELISM_THRESHOLD 0
 set GPU_LOOP_NEST_ANNOTATE_PARALLEL TRUE
-capply GPU_LOOP_NEST_ANNOTATE[p4a_kernel_launcher_0]
+capply GPU_LOOP_NEST_ANNOTATE[p4a_launcher_updateBug]
 
 echo
 echo "After annotate"
 echo
-display PRINTED_FILE[p4a_kernel_launcher_0]
+display PRINTED_FILE[p4a_launcher_updateBug]
 
 
 
 
 set GPU_KERNEL_PREFIX "p4a_kernel"
-set GPU_WRAPPER_PREFIX "p4a_kernel_wrapper"
-set GPU_LAUNCHER_PREFIX "p4a_kernel_launcher"
+set GPU_WRAPPER_PREFIX "p4a_wrapper"
+set GPU_LAUNCHER_PREFIX "p4a_launcher"
 set GPU_USE_LAUNCHER FALSE
 set GPU_USE_KERNEL TRUE
 set GPU_USE_WRAPPER TRUE
-capply GPU_IFY[p4a_kernel_launcher_0]
+capply GPU_IFY[p4a_launcher_updateBug]
 
 
 echo
 echo "After WRAPPER && KERNEL"
 echo
-display PRINTED_FILE[p4a_kernel_launcher_0]
+display PRINTED_FILE[p4a_launcher_updateBug]
 echo
-display PRINTED_FILE[p4a_kernel_wrapper_0]
+display PRINTED_FILE[p4a_wrapper_updateBug]
 echo
-display PRINTED_FILE[p4a_kernel_0]
+display PRINTED_FILE[p4a_kernel_updateBug]
 
 
 

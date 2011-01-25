@@ -1,0 +1,44 @@
+
+Initial code
+
+      PROGRAM FOO
+      INTEGER*4 I
+      INTEGER*8 L
+      REAL*4 F
+      REAL*8 D
+      I = ABS(I)                                                        0006
+      L = ABS(L)                                                        0007
+      F = ABS(F)                                                        0008
+      D = ABS(D)                                                        0009
+      I = IABS(I)                                                       0010
+      D = DABS(D)                                                       0011
+      END
+/* C pretty print for module FOO. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  long long l;
+  float f;
+  double d;
+
+  i = abs (&i);
+  l = llabs (&l);
+  f = fabsf (&f);
+  d = fabs (&d);
+  i = abs (&i);
+  d = fabs (&d);
+  return 0;
+}
