@@ -58,7 +58,10 @@ Pvecteur polynome_roots(Ppolynome p, Variable var) {
                         Value val ;
                         if((val=vect_coeff(var, monome_term(m)))!=VALUE_ZERO) {
                             Pmonome dup = monome_dup(m);
-                            vect_chg_var(&monome_term(dup),var,TCST);
+                            if(vect_size(monome_term(dup))>1)
+                                vect_del_var(monome_term(dup),var);
+                            else
+                                vect_chg_var(&monome_term(dup),var,TCST);
                             polynome_monome_add(&a,dup);
                             monome_rm(&dup);
                         }
