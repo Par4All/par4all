@@ -1,0 +1,10 @@
+void run(int n, int a[n], int b[n], int c[n])
+{
+   int i;
+   ;
+#pragma __pyps_benchmark_start
+   for(i = 0; i <= n-1; i += 1)
+      a[i] += b[i]*c[i];
+   ;
+#pragma __pyps_benchmark_stop_run
+}

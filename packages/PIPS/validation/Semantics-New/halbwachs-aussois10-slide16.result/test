@@ -1,0 +1,229 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+
+//  T(b,ok,x,y) {}
+
+   int b, ok, x, y;
+
+//  T(b,x,y) {b==0, x==0, y==0}
+
+   b = x = y = 0;
+
+//  T(ok) {b==0, ok==1, x==0, y==0}
+
+   ok = 1;
+
+//  T(b,ok,x,y) {b==0, b#init==0, ok==1, ok#init==1, x==y, x#init==0,
+//    y#init==0, 0<=x}
+
+
+   while (1) {
+
+//  T(b,ok,x) {b==1, b#init==0, ok==1, x==x#init+1}
+
+      if (b==0) {
+
+//  T(b) {b==1, b#init==0}
+
+         b = 1;
+
+//  T(x) {b==1, x==x#init+1}
+
+         x++;
+
+//  T(ok) {b==1, 0<=ok, ok<=1}
+
+         if (ok==1&&x>=y)
+
+//  T(ok) {b==1, ok==1, ok#init==1, y<=x}
+
+            ok = 1;
+         else
+
+//  T(ok) {b==1, ok==0}
+
+            ok = 0;
+
+//  T() {b==1, ok==1}
+
+         if (!(ok==1))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {}
+
+         while (1)
+
+//  T() {}
+
+            ;
+
+//  T(b,ok,y) {b==0, b#init==1, ok==1, ok#init==1, y==y#init+1}
+
+      if (b==1) {
+
+//  T(b) {b==0, b#init==1, ok==1}
+
+         b = 0;
+
+//  T(y) {b==0, ok==1, y==y#init+1}
+
+         y++;
+
+//  T(ok) {b==0, ok#init==1, 0<=ok, ok<=1}
+
+         if (ok==1&&x>=y)
+
+//  T(ok) {b==0, ok==1, ok#init==1, y<=x}
+
+            ok = 1;
+         else
+
+//  T(ok) {b==0, ok==0, ok#init==1, x+1<=y}
+
+            ok = 0;
+
+//  T() {b==0, ok==1}
+
+         if (!(ok==1))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {0==-1}
+
+         while (1)
+
+//  T() {0==-1}
+
+            ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int b, ok, x, y;
+
+//  P(b,ok,x,y) {}
+
+   b = x = y = 0;
+
+//  P(b,ok,x,y) {b==0, x==0, y==0}
+
+   ok = 1;
+
+//  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
+
+
+   while (1) {
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 0<=x}
+
+      if (b==0) {
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 0<=x}
+
+         b = 1;
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y, 0<=x}
+
+         x++;
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+         if (ok==1&&x>=y)
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+            ok = 1;
+         else
+
+//  P() {0==-1}
+
+            ok = 0;
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+         if (!(ok==1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+      if (b==1) {
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+         b = 0;
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y+1, 1<=x}
+
+         y++;
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 1<=x}
+
+         if (ok==1&&x>=y)
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 1<=x}
+
+            ok = 1;
+         else
+
+//  P() {0==-1}
+
+            ok = 0;
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 1<=x}
+
+         if (!(ok==1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P() {0==-1}
+
+         while (1)
+
+//  P() {0==-1}
+
+            ;
+   }
+}

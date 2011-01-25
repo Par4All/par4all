@@ -1,0 +1,50 @@
+
+Initial code
+
+      PROGRAM FOO
+      REAL*4 F
+      REAL*8 X
+      COMPLEX*8 L,M,N
+      REAL*4 F2D0
+      L = (1, 1)                                                        0006
+      M = (2, 2)                                                        0007
+      N = (2, 2D0)                                                      0008
+      F = 2D0                                                           0009
+      X = 5.5D0                                                         0010
+      F2D0 = 2D0                                                        0011
+      F = 12345E-3                                                      0012
+      END
+Module statement: 
+and declarations: 
+/* C pretty print for module FOO. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+int
+main (int argc, char *argv[])
+{
+  float f;
+  double x;
+  complex l;
+  complex m;
+  complex n;
+  float f2d0;
+
+  l = init_complex (1, 1);
+  m = init_complex (2, 2);
+  n = init_complex (2, 2e0);
+  f = 2e0;
+  x = 5.5e0;
+  f2d0 = 2e0;
+  f = 12345e-3;
+  return 0;
+}

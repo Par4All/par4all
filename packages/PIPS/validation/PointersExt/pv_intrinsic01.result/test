@@ -1,0 +1,248 @@
+//  {}
+int main()
+{
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   FILE *fp;
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   size_t n, nr;
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char buf1[200];
+//  {(buf2,*HEAP*_l_10,-Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *buf2 = malloc(200*sizeof(char));
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *fmt;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *i_name;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i, r, c, max;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   fpos_t *fp_pos, pos;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   long int fp_pos_indic;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   va_list vl;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   // formatted IO functions
+   fmt = "%s%d";
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   max = 100;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   n = 200;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   fp = fopen("file.txt", "rb");
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) fscanf(fp, fmt, i_name, &i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) fprintf(fp, "%s%d", i_name, i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   
+   (void) scanf("%s%d", i_name, &i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) printf(fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   
+   (void) sscanf(buf1, fmt, i_name, &i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) sprintf(buf2, fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) snprintf(buf2, 100, fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) fgets(buf1, max, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) fputc(c, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) fputs(buf1, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+
+   c = _IO_getc(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) _IO_putc(c, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) ungetc(c, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+
+   c = getchar();
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) putchar(c);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+
+   (void) gets(buf1);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   (void) puts(buf1);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   nr = fwrite(buf2, sizeof(char), n, fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   
+   // file positionning functions
+   fp_pos = &pos;
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   (void) fgetpos(fp, fp_pos);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   (void) fgetpos(fp, &pos);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   (void) fseek(fp, 0L, 0);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   (void) fsetpos(fp, fp_pos);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   fp_pos_indic = ftell(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   rewind(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   
+   // error handling functions
+   
+   clearerr(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   r = feof(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   r = ferror(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   perror(buf1);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   fclose(fp);
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   fprintf(stderr, "The END\n");
+//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   return 0;
+}

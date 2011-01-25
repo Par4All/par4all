@@ -1,0 +1,20 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   while (i<10) {
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
+      p = &a[i];
+//  {(p,a[i],-Exact-)}
+      i++;
+   }
+//  {(p,a[i],-Exact-)}
+   return 0;
+}

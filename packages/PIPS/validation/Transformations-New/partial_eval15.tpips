@@ -15,7 +15,7 @@ echo Result before partial evaluation
 echo
 
 apply UNSPLIT
-shell $PIPS_F77 partial_eval15.database/Src/partial_eval15.f -o partial_eval15.database/Src/a.out ; ./partial_eval15.database/Src/a.out 
+shell ${PIPS_F77:-gfortran} partial_eval15.database/Src/partial_eval15.f -o partial_eval15.database/Src/a.out ; ./partial_eval15.database/Src/a.out 
 
 apply PARTIAL_EVAL[MAIN]
 
@@ -31,7 +31,7 @@ echo Result after partial evaluation
 echo
 
 apply UNSPLIT
-shell $PIPS_F77 partial_eval15.database/Src/partial_eval15.f -o partial_eval15.database/Src/a.out ; ./partial_eval15.database/Src/a.out 
+shell ${PIPS_F77:-gfortran} partial_eval15.database/Src/partial_eval15.f -o partial_eval15.database/Src/a.out ; ./partial_eval15.database/Src/a.out 
 
 close
 delete partial_eval15

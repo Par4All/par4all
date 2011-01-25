@@ -1,0 +1,23 @@
+//  {}
+int main()
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int *p, *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int a;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   p = (int *) malloc(2*sizeof(int));
+//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   p[0] = 0;
+//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   p[1] = 1;
+//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   q = p;
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-Exact-)}
+   free(q);
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-Exact-)}
+   return 0;
+}

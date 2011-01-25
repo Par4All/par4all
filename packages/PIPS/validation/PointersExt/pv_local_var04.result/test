@@ -1,0 +1,28 @@
+//  {}
+int main()
+{
+//  points to = {}
+
+   if (a>1) {
+//  points to = {}
+      static int *p = &a;
+//  points to = {}
+      static int *q;
+//  points to = {}
+      q = &b;
+//  points to = {}
+      a = a-1;
+   }
+   else {
+//  points to = {}
+      static int *r = &a;
+//  points to = {}
+      static int *s;
+//  points to = {}
+      s = &b;
+//  points to = {}
+      a = a+2;
+   }
+//  {(p,a,-MAY-);(q,b,-MAY-);(r,a,-MAY-);(s,b,-MAY-)}
+   return 0;
+}

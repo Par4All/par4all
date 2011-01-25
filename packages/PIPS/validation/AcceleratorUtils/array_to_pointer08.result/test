@@ -34,8 +34,8 @@ int main(int argc, char **argv);
 void *alloca(unsigned int);
 int main(int argc, char **argv)
 {
-   double *cdens = alloca(sizeof(double[2048]));
-   mystruct *m = alloca(sizeof(mystruct[1024]));
+   double *cdens = (double *) alloca(sizeof(double[2048]));
+   mystruct *m = (struct {float a; float b;} *) alloca(sizeof(mystruct[1024]));
    int i;
    for(i = 0; i <= 1023; i += 1) {
       *(cdens+2*i) = 1;

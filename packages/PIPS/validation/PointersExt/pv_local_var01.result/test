@@ -1,0 +1,24 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 3;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   if (i>1) {
+//  points to = {}
+      int *q;
+//  points to = {}
+      q = &a[i];
+//  points to = {}
+      p = q;
+//  points to = {}
+      i = 0;
+   }
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-);(q,a[i],-MAY-)}
+   return 0;
+}

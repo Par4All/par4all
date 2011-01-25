@@ -1,0 +1,36 @@
+
+Initial code
+
+      PROGRAM FOO
+      INTEGER I, J, K
+      REAL L, M, N
+      K = MOD(I, J)                                                     0004
+      N = MOD(L, M)                                                     0005
+      END
+/* C pretty print for module FOO. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int j;
+  int k;
+  float l;
+  float m;
+  float n;
+
+  k = (i % j);
+  n = (l % m);
+  return 0;
+}

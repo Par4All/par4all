@@ -15,42 +15,6 @@ void code(int n, int a[n])
 //                                                                    5 (STMT)
          a[i] += j;
 }
----------------------------------------
-Domain:
-         n  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 0 ]
-[ n-1 ]
-
-Ehrhart Polynomial:
-( 1 * n + 0 )
-
----------------------------------------
-Domain:
-         n  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 0 ]
-[ n-1 ]
-
-Ehrhart Polynomial:
-( 1 * n + 0 )
-
----------------------------------------
-Domain:
-         n  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 0 ]
-[ n-1 ]
-
-Ehrhart Polynomial:
-( 1 * n + 0 )
-
 void code(int n, int a[n])
 {
    int i, j;

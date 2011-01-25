@@ -1,0 +1,411 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+
+//  T(i,m,n,x,x0,y,y0) {}
+
+   int x, y, x0, y0, n, m, i;
+
+//  T(x0) {0<=x0}
+
+   x0 = rand();
+
+//  T(y0) {0<=x0, 0<=y0}
+
+   y0 = rand();
+
+//  T(x) {x==x0, 0<=x, 0<=y0}
+
+   x = x0;
+
+//  T(y) {x==x0, y==y0, 0<=x, 0<=y}
+
+   y = y0;
+
+//  T(i) {i==0, x==x0, y==y0, 0<=x, 0<=y}
+
+   i = 0;
+
+//  T(n) {i==0, x==x0, y==y0, 0<=n, 0<=x, 0<=y}
+
+   n = rand();
+
+//  T(m) {i==0, x==x0, y==y0, 0<=m, 0<=n, 0<=x, 0<=y}
+
+   m = rand();
+
+//  T(i,x,y) {i+x#init+y#init==x+y, i#init==0, x#init==x0, y#init==y0,
+//    i+y#init<=n+y, y<=i+y#init, y<=m+y#init, 0<=x#init, y#init<=y,
+//    0<=y#init}
+
+
+   if (x0<n&&y0<m) {
+
+//  T(i,y) {i+y#init==i#init+m, i+y#init==m, m==y, x==x0, y#init==y0,
+//    0<=m, y#init+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y#init}
+
+      if (y<m) {
+
+//  T(i,y) {i+y#init==i#init+y, i+y0==y, x==x0, i#init<=i, y+1<=m,
+//    x+1<=n, 0<=x, y0<=y, 0<=y0}
+
+         while (flip())
+
+//  T(i,y) {i==i#init+1, x==x0, y==y#init+1, i+x+y0<=m+n, y+1<=m,
+//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+
+            if (x<n&&y<m-1) {
+
+//  T(y) {x==x0, y==y#init+1, y+1<=m, y0+1<=m, 0<=n, x+1<=n, 0<=x,
+//    0<=y0}
+
+               y++;
+
+//  T(i) {i==i#init+1, x==x0, y+1<=m, y0+1<=m, 0<=n, x+1<=n, 0<=x,
+//    0<=y0}
+
+               i++;
+
+//  T() {x==x0, i+x+y0<=m+n, y+1<=m, y0+1<=m, 0<=n, x+1<=n, 0<=x,
+//    0<=y0}
+
+               if (!(i<=n-x0+m-y0))
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {x==x0, m<=y+1, y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+
+               while (1)
+
+//  T() {x==x0, m<=y+1, y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+
+                  ;
+
+//  T(i,y) {i==i#init+1, i+y0==m, m==y, m==y#init+1, x==x0, 0<=m,
+//    y0+1<=m, 0<=n, x+1<=n, 0<=x, 0<=y0}
+
+         if (x<n&&y==m-1) {
+
+//  T(y) {i+y0==m-1, m==y, m==y#init+1, x==x0, 0<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
+
+            y++;
+
+//  T(i) {i==i#init+1, i+y0==m, m==y, x==x0, 0<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
+
+            i++;
+
+//  T() {i+y0==m, m==y, x==x0, 0<=m, y0+1<=m, 0<=n, x+1<=n, 0<=x,
+//    0<=y0}
+
+            if (!(i<=n-x0+m-y0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {i+y0==y, x==x0, 0<=i, y+2<=2i+m, y+1<=i+m, i<=y, 0<=m, 0<=n,
+//    x+1<=n, 0<=x}
+
+            while (1)
+
+//  T() {i+y0==y, x==x0, y+2<=2i+m, 0<=m, y0+1<=m, 0<=n, x+1<=n, 0<=x,
+//    y0<=y, 0<=y0}
+
+               ;
+      }
+
+//  T(i,x) {i+x#init==i#init+x, i+x0+y0==m+x, m==y, i#init<=i,
+//    x+1<=i+x0, x+1<=n, x0<=x, 0<=x0, 0<=y0}
+
+      while (flip())
+
+//  T(i,x) {i==i#init+1, m==y, x==x#init+1, i+x0+y0<=m+n, y0+1<=m,
+//    x+1<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+         if (x<n-1&&y>=m) {
+
+//  T(x) {m==y, x==x#init+1, y0+1<=m, x+1<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+            x++;
+
+//  T(i) {i==i#init+1, m==y, y0+1<=m, x+1<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+            i++;
+
+//  T() {m==y, i+x0+y0<=m+n, y0+1<=m, x+1<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+            if (!(i<=n-x0+m-y0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {m==y, y0+1<=m, n<=x+1, x0+1<=n, 0<=x0, 0<=y0}
+
+            while (1)
+
+//  T() {m==y, y0+1<=m, n<=x+1, x0+1<=n, 0<=x0, 0<=y0}
+
+               ;
+
+//  T(i,x) {i==i#init+1, i+x0+y0==m+n, m==y, n==x, n==x#init+1, 0<=m,
+//    y0+1<=m, 0<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+      if (x==n-1&&y>=m) {
+
+//  T(x) {i+x0+y0==m+n-1, m==y, n==x, n==x#init+1, 0<=m, y0+1<=m,
+//    0<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+         x++;
+
+//  T(i) {i==i#init+1, i+x0+y0==m+n, m==y, n==x, 0<=m, y0+1<=m, 0<=n,
+//    x0+1<=n, 0<=x0, 0<=y0}
+
+         i++;
+
+//  T() {i+x0+y0==m+n, m==y, n==x, 0<=m, y0+1<=m, 0<=n, x0+1<=n,
+//    0<=x0, 0<=y0}
+
+         if (!(i<=n-x0+m-y0))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  T() {i+x0+y0==m+x, m==y, i+x0<=m+x, x+1<=i+x0, 0<=m, 0<=n,
+//    2x0+2<=n+x, x0+1<=n, x0<=x, 0<=x0}
+
+         while (1)
+
+//  T() {i+x0+y0==m+x, m==y, 0<=m, y0+1<=m, 0<=n, 2x0+2<=n+x, x0+1<=n,
+//    x0<=x, 0<=x0, 0<=y0}
+
+            ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x, y, x0, y0, n, m, i;
+
+//  P(i,m,n,x,x0,y,y0) {}
+
+   x0 = rand();
+
+//  P(i,m,n,x,x0,y,y0) {0<=x0}
+
+   y0 = rand();
+
+//  P(i,m,n,x,x0,y,y0) {0<=x0, 0<=y0}
+
+   x = x0;
+
+//  P(i,m,n,x,x0,y,y0) {x==x0, 0<=x, 0<=y0}
+
+   y = y0;
+
+//  P(i,m,n,x,x0,y,y0) {x==x0, y==y0, 0<=x, 0<=y}
+
+   i = 0;
+
+//  P(i,m,n,x,x0,y,y0) {i==0, x==x0, y==y0, 0<=x, 0<=y}
+
+   n = rand();
+
+//  P(i,m,n,x,x0,y,y0) {i==0, x==x0, y==y0, 0<=n, 0<=x, 0<=y}
+
+   m = rand();
+
+//  P(i,m,n,x,x0,y,y0) {i==0, x==x0, y==y0, 0<=m, 0<=n, 0<=x, 0<=y}
+
+
+   if (x0<n&&y0<m) {
+
+//  P(i,m,n,x,x0,y,y0) {i==0, x==x0, y==y0, 0<=m, y+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y}
+
+      if (y<m) {
+
+//  P(i,m,n,x,x0,y,y0) {i==0, x==x0, y==y0, 0<=m, y+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y}
+
+         while (flip())
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, y+1<=m, x+1<=n, 0<=x, y0<=y,
+//    0<=y0}
+
+            if (x<n&&y<m-1) {
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, y+2<=m, x+1<=n, 0<=x, y0<=y,
+//    0<=y0}
+
+               y++;
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y-1, x==x0, y+1<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, y0+1<=y, 0<=y0}
+
+               i++;
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, y+1<=m, y0+1<=m, 0<=n, x+1<=n,
+//    0<=x, y0+1<=y, 0<=y0}
+
+               if (!(i<=n-x0+m-y0))
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m-1, m==y+1, x==x0, y0+1<=m, x+1<=n,
+//    0<=x, 0<=y0}
+
+               while (1)
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m-1, i+y0==y, x==x0, y0+1<=m, x+1<=n,
+//    0<=x, 0<=y0}
+
+                  ;
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, y+1<=m, x+1<=n, 0<=x, y0<=y,
+//    0<=y0}
+
+         if (x<n&&y==m-1) {
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m-1, m==y+1, x==x0, y0+1<=m, x+1<=n,
+//    0<=x, 0<=y0}
+
+            y++;
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m-1, m==y, x==x0, 0<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
+
+            i++;
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m, m==y, x==x0, 0<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
+
+            if (!(i<=n-x0+m-y0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, y+2<=m, x+1<=n, 0<=x, y0<=y,
+//    0<=y0}
+
+            while (1)
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==y, x==x0, 0<=i, i+y0+2<=m, x+1<=n, 0<=x,
+//    0<=y0}
+
+               ;
+      }
+
+//  P(i,m,n,x,x0,y,y0) {i+y0==m, m==y, x==x0, 0<=m, y0+1<=m, 0<=n,
+//    x+1<=n, 0<=x, 0<=y0}
+
+      while (flip())
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+1<=n, x0<=x,
+//    0<=x0, 0<=y0}
+
+         if (x<n-1&&y>=m) {
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+2<=n, x0<=x,
+//    0<=x0, 0<=y0}
+
+            x++;
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x-1, m==y, x<=i+x0, x+1<=n,
+//    x0+1<=n, x0+1<=x, 0<=x0, 0<=y0}
+
+            i++;
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+1<=n,
+//    x0+1<=n, x0+1<=x, 0<=x0, 0<=y0}
+
+            if (!(i<=n-x0+m-y0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+n-1, m==y, n==x+1, n<=i+x0,
+//    x0+1<=n, 0<=x0, 0<=y0}
+
+            while (1)
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+n-1, m==y, n==x+1, n<=i+x0,
+//    x0+1<=n, 0<=x0, 0<=y0}
+
+               ;
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+1<=n, x0<=x,
+//    0<=x0, 0<=y0}
+
+      if (x==n-1&&y>=m) {
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+n-1, m==y, n==x+1, n<=i+x0,
+//    x0+1<=n, 0<=x0, 0<=y0}
+
+         x++;
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+n-1, m==y, n==x, n<=i+x0, 0<=m,
+//    0<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+         i++;
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+n, m==y, n==x, n+1<=i+x0, 0<=m,
+//    0<=n, x0+1<=n, 0<=x0, 0<=y0}
+
+         if (!(i<=n-x0+m-y0))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+2<=n, x0<=x,
+//    0<=x0, 0<=y0}
+
+         while (1)
+
+//  P(i,m,n,x,x0,y,y0) {i+x0+y0==m+x, m==y, x+1<=i+x0, x+2<=n, x0<=x,
+//    0<=x0, 0<=y0}
+
+            ;
+   }
+}

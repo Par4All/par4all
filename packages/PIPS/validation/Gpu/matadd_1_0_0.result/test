@@ -1,7 +1,7 @@
 !!
-!! file for P4A_KERNEL_LAUNCHER_0.f
+!! file for P4A_LAUNCHER_MATADD.f
 !!
-      SUBROUTINE P4A_KERNEL_LAUNCHER_0(M, N, B, C)
+      SUBROUTINE P4A_LAUNCHER_MATADD(M, N, B, C)
       INTEGER J, I, M, N
       REAL*4 B(1:M, 1:N), C(1:M, 1:N)
 
@@ -13,9 +13,9 @@
       ENDDO
       END
 !!
-!! file for P4A_KERNEL_LAUNCHER_1.f
+!! file for P4A_LAUNCHER_MATADD_1.f
 !!
-      SUBROUTINE P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)
+      SUBROUTINE P4A_LAUNCHER_MATADD_1(M, N, A, B, C)
       INTEGER J, I, M, N
       REAL*4 A(1:M, 1:N), B(1:M, 1:N), C(1:M, 1:N)
 
@@ -35,8 +35,8 @@
       INTEGER I, J
       REAL A(M, N), B(M, N), C(M, N)
 
-      CALL P4A_KERNEL_LAUNCHER_0(M, N, B, C)                            0008
+      CALL P4A_LAUNCHER_MATADD(M, N, B, C)                              0008
 
-      CALL P4A_KERNEL_LAUNCHER_1(M, N, A, B, C)                         0015
+      CALL P4A_LAUNCHER_MATADD_1(M, N, A, B, C)                         0015
 
       END

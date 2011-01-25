@@ -1,4 +1,4 @@
-void P4A_sesam_task_0()
+void P4A_sesam_task_main()
 {
    //PIPS generated variable
    int i;
@@ -14,7 +14,7 @@ void P4A_sesam_task_0()
    sesam_unmap_data(P_0);
    sesam_chown_data(0, 1);
 }
-void P4A_sesam_task_1()
+void P4A_sesam_task_main_1()
 {
    //PIPS generated variable
    int i;
@@ -37,10 +37,10 @@ void P4A_sesam_task_1()
 int main()
 {
    int i;
-   P4A_sesam_task_0();
+   P4A_sesam_task_main();
    i = 100;
 
-   P4A_sesam_task_1();
+   P4A_sesam_task_main_1();
    i = 100;
 }
 void sesam_chown_data(int id_data, int id_task)

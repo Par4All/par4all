@@ -6,20 +6,6 @@ here:
       for(i = 0; i <= N-1; i += 1)
          a[i][j] = 1;
 }
----------------------------------------
-Domain:
-         N  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ 0,  2N-1 ]
-[ 0,  0 ]
-[ N-1,  2N-1 ]
-[ N-1,  0 ]
-
-Ehrhart Polynomial:
-( 2 * N^2 + 0 * N + 0 )
-
 void doiv(int a[128][128])
 {
    int i, j;

@@ -1,0 +1,17 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   for(i = 0; i <= 9; i += 1)
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
+      p = &a[i];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
+   return 0;
+}

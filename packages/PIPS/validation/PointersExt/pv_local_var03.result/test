@@ -1,0 +1,27 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i;
+//  points to = {}
+   mystruct s1, s2;
+//  points to = {}
+
+   i = 0;
+//  points to = {}
+   do {
+//  points to = {}
+      mystruct tab_s[2];
+//  points to = {}
+      tab_s[0] = s1;
+//  points to = {}
+      tab_s[1] = s1;
+//  points to = {}
+      tab_s[1] = s2;
+//  points to = {}
+      i++;
+   }
+   while (i<10);
+//  points to = {}
+   return 0;
+}

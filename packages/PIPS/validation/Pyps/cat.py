@@ -6,14 +6,14 @@ from shutil import rmtree
 
 with workspace("cat.c",deleteOnClose=True) as w:
 	w.fun.main.display()
-	binary=w.compile(rep="toto")
+	binary=w.compile(ccexecParams(CC="gcc",rep="toto"))
 	call("./"+binary)
 	rmtree("toto")
 	
 	w.fun.main.run(["sed","-e",'s/cats/dogs/'])
 	w.fun.main.display()
-	binary=w.compile(rep="toto")
-	call("./"+binary)
+	(rc,out,err) = w.compile_and_run(ccexecParams(CC="gcc",rep="toto"))
+	print out,err
 	rmtree("toto")
 
 

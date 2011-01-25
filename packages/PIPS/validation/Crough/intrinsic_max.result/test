@@ -1,0 +1,66 @@
+
+Initial code
+
+      PROGRAM FOO
+      INTEGER*4 I, J, K
+      REAL*4 F, G, H
+      REAL*8 X, Y, Z
+      I = 1                                                             0005
+      J = 2                                                             0006
+      K = 3                                                             0007
+      F = 1                                                             0008
+      G = 2                                                             0009
+      H = 3                                                             0010
+      X = 1                                                             0011
+      Y = 2                                                             0012
+      Z = 3                                                             0013
+      I = MAX(I, J, K)                                                  0014
+      I = MAX0(I, J, K)                                                 0015
+      F = AMAX1(F, G, H)                                                0016
+      X = DMAX1(X, Y, Z)                                                0017
+      I = MAX1(F, G, H)                                                 0018
+      F = AMAX0(I, J, K)                                                0019
+      END
+/* C pretty print for module FOO. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+int
+main (int argc, char *argv[])
+{
+  int i;
+  int j;
+  int k;
+  float f;
+  float g;
+  float h;
+  double x;
+  double y;
+  double z;
+
+  i = 1;
+  j = 2;
+  k = 3;
+  f = 1;
+  g = 2;
+  h = 3;
+  x = 1;
+  y = 2;
+  z = 3;
+  i = crough_max (crough_max (i, j), k);
+  i = crough_max (crough_max (i, j), k);
+  f = crough_max (crough_max (f, g), h);
+  x = crough_max (crough_max (x, y), z);
+  i = crough_max (crough_max (f, g), h);
+  f = crough_max (crough_max (i, j), k);
+  return 0;
+}

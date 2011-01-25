@@ -1,0 +1,12 @@
+//  {}
+int main()
+{
+//  points to = {}
+   mystruct s1;
+//  points to = {}
+   mystruct s2;
+//  points to = {}
+   s2 = s1;
+//  points to = {}
+   return 0;
+}

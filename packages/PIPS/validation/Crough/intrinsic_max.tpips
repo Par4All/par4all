@@ -1,0 +1,22 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="intrinsic_max"
+delete $WS
+create $WS $WS.f
+
+#setenv CPRETTYPRINTER_DEBUG_LEVEL 9
+
+setproperty CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[%ALL]
+
+display C_PRINTED_FILE[FOO]
+
+shell cc -Wall -Werror -c $WS.database/FOO/FOO.c -o $WS.database/FOO/FOO.o
+
+close
+delete $WS
+quit
