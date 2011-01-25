@@ -725,6 +725,7 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
 {
     pips_assert("empty parameters\n",ENDP(*dims)&&ENDP(*offsets));
     reference ref = region_any_reference(r);
+    bool fortran_p = fortran_module_p(get_current_module_entity());
     for(list iter = reference_indices(ref);!ENDP(iter); POP(iter))
     {
         expression index = EXPRESSION(CAR(iter));
@@ -740,6 +741,11 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
                 if(bounds_equal_p(phi,lower,upper))
                 {
                     expression bound = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+		    if (fortran_p) {
+		      // in fortran remove -1 to the bound since index 1 is
+		      // offset 0
+		      bound = add_integer_to_expression (bound, -1);
+		    }
                     *dims=CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),*dims);
                     *offsets=CONS(EXPRESSION,bound,*offsets);
                 }
@@ -752,6 +758,11 @@ bool region_to_minimal_dimensions(region r, transformer tr, list * dims, list *o
                     simplify_minmax_expression(elower,tr);
                     simplify_minmax_expression(eupper,tr);
                     expression offset = copy_expression(elower);
+		    if (fortran_p) {
+		      // in fortran remove -1 to the offset since index 1 is
+		      // offset 0
+		      offset = add_integer_to_expression (offset, -1);
+		    }
 
                     bool compute_upperbound_p = 
                         !exact && (expression_minmax_p(elower)||expression_minmax_p(eupper));

@@ -107,6 +107,8 @@ static oper_id_mapping operators[] =
     { C_EQUAL_OPERATOR_NAME,             EQUAL_OPERATOR_TOK },
     { CONDITIONAL_OPERATOR_NAME,         PHI_TOK },
 
+    { "__PIPS_SAC_MULADD",         	 MULADD_OPERATOR_TOK },
+
     { NULL,                              UNKNOWN_TOK }
 };
 

@@ -1101,6 +1101,23 @@ transformer transformer_intra_to_inter(transformer tf,
   return ftf;
 }
 
+/* Number of parameters in pl before a vararg is reached. The varargs
+   are not analyzed. */
+unsigned int number_of_usable_functional_parameters(list pl)
+{
+  int n = 0;
+  FOREACH(PARAMETER, p ,pl) {
+	  type lpt = ultimate_type(parameter_type(p));
+	  if(type_varargs_p(lpt))
+	    break;
+	  else
+	    n++;
+  }
+  return n;
+}
+
+/* FI: the handling of varargs had to be modified for
+   Semantics/va_arg.c. The code should probably now be refactored. */
 transformer any_user_call_site_to_transformer(entity f,
 					      list pc,
 					      transformer pre,
@@ -1112,50 +1129,52 @@ transformer any_user_call_site_to_transformer(entity f,
   type ft = ultimate_type(entity_type(f));
   functional fft = type_functional(ft); // proper assert checked earlier
   list pl = functional_parameters(fft);
+  unsigned int pll = number_of_usable_functional_parameters(pl);
   list cpl = pl; // to simplify debugging
   int n = 1; /* Formal parameters are counted 1, 2, 3,...*/
   int mn = 1000 /*MAX_INT*/; /* Maximal numer of actual arguments that can be
 		       used. */
   list fpvl = NIL; // list of formal parameter values
 
-  if(gen_length(pl)!= gen_length(pc)) {
+  if(pll != gen_length(pc)) {
     /* This may happen with a void declaration */
-    if(!(gen_length(pl)==1 && gen_length(pc)==0
-	 && type_void_p(parameter_type(PARAMETER(CAR(pl)))))) {
+    if(pll==1 && gen_length(pc)==0
+       && type_void_p(parameter_type(PARAMETER(CAR(pl))))) {
+      mn = -1;
+    }
+    else if(pll < gen_length(pc)) {
       /* This may happen with a varargs: the number of actual
-	 arguments is strictly greater than the number of formal
+	 arguments is greater than or equal to the number of formal
 	 parameters */
-      if(gen_length(pl)< gen_length(pc)) {
-	if(gen_length(pl)==0) {
-	  /* FI: this case could be processed... */
-	    pips_user_warning("Different numbers of actual and formal parameters"
-			    "(%d and %d) for function \"%s\"\n",
-			    gen_length(pc), gen_length(pl), entity_user_name(f));
-	    mn = -1;
-	}
-	else {
-	  parameter lp = PARAMETER(CAR(gen_last(pl)));
-	  type lpt = ultimate_type(parameter_type(lp));
-	  if(type_varargs_p(lpt)) {
-	    /* The first actual arguments can be used */
-	    mn = gen_length(pl)-1;
-	  }
-	  else {
-	    pips_user_error("Different numbers of actual and formal parameters"
-			    "(%d and %d) for function \"%s\"\n",
-			    gen_length(pc), gen_length(pl), entity_user_name(f));
-	  }
-	}
+      if(pll==0) {
+	/* FI: this case could be processed... */
+	pips_user_warning("Different numbers of actual and formal parameters"
+			  "(%d and %d) for function \"%s\"\n",
+			  gen_length(pc), gen_length(pl), entity_user_name(f));
+	mn = -1;
       }
       else {
-	pips_user_error("Different numbers of actual and formal parameters"
-		      "(%d and %d) for function \"%s\"\n",
-		      gen_length(pc), gen_length(pl), entity_user_name(f));
+	parameter lp = PARAMETER(CAR(gen_last(pl)));
+	type lpt = ultimate_type(parameter_type(lp));
+	if(type_varargs_p(lpt)) {
+	  /* The first actual arguments can be used */
+	  mn = pll;
+	}
+	else {
+	  pips_user_error("Different numbers of actual and formal parameters"
+			  "(%d and %d) for function \"%s\"\n",
+			  gen_length(pc), gen_length(pl), entity_user_name(f));
+	}
       }
+    }
+    else {
+      pips_user_error("Incompatible numbers of actual and formal parameters"
+		      "(%d and %d) for function \"%s\"\n",
+		      gen_length(pc), pll, entity_user_name(f));
     }
   }
   else
-    mn = gen_length(pl);
+    mn = pll;
 
   if(mn>=0) {
   /* Evaluate actual arguments from left to right linking it to a

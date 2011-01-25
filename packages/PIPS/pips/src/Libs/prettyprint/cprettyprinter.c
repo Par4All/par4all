@@ -85,6 +85,15 @@
 // define an extension to append to scalar name in function signature
 #define SCALAR_IN_SIG_EXT "_p4a_copy"
 
+// define some C macro to support some fortran intrinsics
+#define MAX_FCT    "crough_max"
+#define MIN_FCT    "crough_min"
+#define MAX_DEF    "#define " MAX_FCT "(a,b) (((a)>(b))?(a):(b))\n"
+#define MIN_DEF    "#define " MIN_FCT "(a,b) (((a)<(b))?(a):(b))\n"
+#define POW_PRE    "crough_"
+#define POW_DEF    "#define " POW_PRE "powi(a,b) ((a)^(b))\n"
+#define CMPLX_FCT  "init_complex"
+#define CMPLX_DEF  "#define " CMPLX_FCT "(a,b) (a + b*I)\n"
 
 /* forward declaration. */
 static string c_expression(expression,bool);
@@ -98,6 +107,8 @@ static list l_rename  = NIL;
 static list l_entity  = NIL;
 static list l_written = NIL;
 
+static basic cur_basic = basic_undefined;
+
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
@@ -106,27 +117,57 @@ static list l_written = NIL;
 
 #define RESULT_NAME	"result"
 
+/**
+ * @brief test if the string looks like a REAL*8 (double in C) declaration
+ * i.e something like 987987D54654 : a bunch of digit with a letter in the
+ * middle. if yes convert it to C (i.e replace D by E) and return true
+ */
+static bool convert_doudle_value (string *str) {
+  bool result = true;
+  int match = 0;
+  int i = 0;
+  pips_debug (5, "test if str : %s is a double value. %c 0 = \n", *str, '0');
+  for (i = 0; ((*str)[i] != '\0') && (result == true); i++) {
+	bool cond = ((*str)[i] == 'D') && (match == 0);
+	if (cond == true) {
+	  match = i;
+	  continue;
+	}
+	result &= (((*str)[i] >= '0') && ((*str)[i] <= '9')) || ((*str)[i] == '.') || (cond);
+  }
+  pips_debug (5, "end with i = %d, match = %d result = %s\n",
+			  i, match, (result)?"true":"false");
+  result &= ((*str)[i] == '\0') && (match + 1 != i) && (match != 0);
+  if (result == true) {
+	*str = strdup (*str);
+	(*str)[match] = 'E';
+  }
+  return result;
+}
 
 /*
  * convert some fortran constant to their equivalent in C
  */
 static void const_wrapper(string* s)
 {
-    static char * const_to_c[][2] = { { ".true." , "1" } , { ".false." , "0" } };
-    static const int const_to_c_sz = sizeof(const_to_c)/sizeof(*const_to_c);
-    int i;
-
-    /* search fortran constant */
-    char *name = strlower(strdup(*s),*s);
-    for(i=0;i<const_to_c_sz;i++)
-    {
-        if(strcmp(name,const_to_c[i][0]) == 0 )
-        {
-            *s = const_to_c[i][1];
-            break;
-        }
-    }
-    free(name);
+  static char * const_to_c[][2] = {	{ ".true." , "1" } , { ".false." , "0" }};
+  static const int const_to_c_sz = sizeof(const_to_c)/sizeof(*const_to_c);
+  int i;
+  pips_debug (5, "constant to convert : %s\n", *s);
+  if (convert_doudle_value (s) == false) {
+	/* search fortran constant */
+	char *name = strlower(strdup(*s),*s);
+	for(i=0;i<const_to_c_sz;i++)
+	  {
+		if(strcmp(name,const_to_c[i][0]) == 0 )
+		  {
+			*s = const_to_c[i][1];
+			break;
+		  }
+	  }
+	free(name);
+  }
+  pips_debug (5, "constant converted : %s\n", *s);
 }
 
 /*
@@ -163,6 +204,7 @@ static string c_entity_local_name(entity var)
 
     }
     name=strlower(strdup(name),name);
+	pips_debug (5, "local name %s found\n", name);
     return name;
 }
 
@@ -398,7 +440,7 @@ static string c_basic_string(basic b)
       break;
     }
   case is_basic_complex:
-    result = "_Complex" SPACE; /* c99 style */
+    result = "complex" SPACE; /* c99 style with include of complex.h*/
     break;
   default:
     pips_internal_error("unhandled case");
@@ -507,14 +549,14 @@ static string c_brace_expression_string(expression exp)
     list args = call_arguments(syntax_call(expression_syntax(exp)));
 
     bool first = TRUE;
-    MAP(EXPRESSION,e,
+    FOREACH (EXPRESSION,e,args)
     {
         if (brace_expression_p(e))
             result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
         else
 	  result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
         first = FALSE;
-    },args);
+    }
     result = strdup(concatenate(result,"}",NULL));
     return result;
 }
@@ -787,7 +829,15 @@ static string c_declarations(
 }
 /******************************************************************* INCLUDE */
 static string c_include (void) {
-  string result = strdup ("");
+  string result = NULL;
+
+  // add some c include files in order to support fortran intrinsic
+  result = strdup (concatenate ("//needed include to compile the C output\n"
+								"#include \"math.h\"\n",   // fabs
+								"#include \"stdlib.h\"\n", // abs
+								"#include \"complex.h\"\n", // abs
+								"\n",
+								NULL));
 
   // take care of include file required by the user
   string user_req = get_string_property ("CROUGH_INCLUDE_FILE_LIST");
@@ -815,6 +865,17 @@ static string c_include (void) {
 	free (old);
   }
   pips_debug (5, "include string : %s\n", result);
+  return result;
+}
+
+/********************************************************************* MACRO */
+static string c_macro (void) {
+  string result = NULL;
+  // add some macro to support fortran intrinsics
+  result = strdup (concatenate ("// The macros to support some fortran intrinsics\n",
+								"// and complex declaration\n"
+								MAX_DEF, MIN_DEF, POW_DEF, CMPLX_DEF, "\n",
+								NULL));
   return result;
 }
 
@@ -895,6 +956,18 @@ struct s_ppt
     char * c;
     prettyprinter ppt;
 };
+
+// Define a struct to easily find the function full name according to its
+// base_name. Basically some letters are prepend or append according to the
+// size ant type of the opperand. For example abs can become absl or fabsf.
+typedef struct
+{
+  char * c_base_name;
+  enum basic_utype type;
+  intptr_t size;
+  char* prefix;
+  char* suffix;
+} c_full_name;
 
 static bool expression_needs_parenthesis_p(expression);
 
@@ -980,64 +1053,357 @@ static string ppt_call(string in_c, list le)
     return scall;
 }
 
-static struct s_ppt intrinsic_to_c[] =
+// Try to determine the type of the operands of a call. The
+// question is should we used abs or fabs for example. This should be used
+// in a gen_recurse, the goal is to determine the type of inputs to be used.
+static bool find_basic (reference r) {
+  pips_debug (7, "processing a reference\n");
+  bool result = true;
+  entity e = reference_variable (r);
+  basic b = variable_basic (type_variable (entity_type (e)));
+  if (cur_basic == basic_undefined) {
+	// initialize basic by copying it
+	cur_basic = copy_basic (b);
+  }
+  else if (basic_tag ((b)) != basic_tag (cur_basic)) {
+	pips_user_error("dont know how to merge two different types : %s and %s\n",
+					basic_to_string (b), basic_to_string (cur_basic));
+  }
+  else {
+	switch (basic_tag(b)) {
+	case is_basic_int:
+	  switch basic_int (b) {
+		case 1:    //char
+		case 2:    //short
+		case 4:    //int
+		case 6:    //long
+		case 8:    //long long
+		  if (basic_int(b) > basic_int(cur_basic))
+			basic_int(cur_basic) = basic_int(b);
+		  break;
+		case 21:    //signed char
+		case 22:    //signed short
+		case 24:    //signed int
+		case 26:    //signed long
+		case 28:    //signed long long
+		  if (basic_int(b) - 20 > basic_int(cur_basic))
+			basic_int(cur_basic) = basic_int(b);
+		  break;
+		case 11:
+		case 12:
+		case 14:
+		case 16:
+		case 18:
+		  // should nt happen
+		  pips_user_error("found an unsigned integer in fortran\n");
+		  break;
+		}
+	  break;
+	case is_basic_float:
+	  if (basic_float(b) > basic_float(cur_basic))
+		basic_float(cur_basic) = basic_float(b);
+	  break;
+	case is_basic_complex:
+	  if (basic_complex(b) > basic_complex(cur_basic))
+		basic_complex(cur_basic) = basic_complex(b);
+	  break;
+	case is_basic_logical:
+	case is_basic_string:
+	  // we don t care of the size
+	  break;
+	default:
+	  // What should be done?
+	  pips_user_error("the basic can not be a variable\n");
+	  break;
+	}
+  }
+  // we don't want to look at indices of an array
+  result &= (reference_indices (r) == NIL);
+  return result;
+}
+
+static c_full_name c_base_name_to_c_full_name [] = {
+  {"abs"   , is_basic_int     , 1  , ""     , "" }, //char
+  {"abs"   , is_basic_int     , 2  , ""     , "" }, //short
+  {"abs"   , is_basic_int     , 4  , ""     , "" }, //int
+  {"abs"   , is_basic_int     , 6  , "l"    , "" }, //long
+  {"abs"   , is_basic_int     , 8  , "ll"   , "" }, //long long
+  {"abs"   , is_basic_float   , 4  , "f"    , "f"}, //float
+  {"abs"   , is_basic_float   , 8  , "f"    , "" }, //double
+  {"abs"   , is_basic_complex , 8  , "c"    , "f"}, //float complex
+  {"abs"   , is_basic_complex , 16 , "c"    , "" }, //double complex
+  {"pow"   , is_basic_int     , 1  , POW_PRE, "i"}, //char
+  {"pow"   , is_basic_int     , 2  , POW_PRE, "i"}, //short
+  {"pow"   , is_basic_int     , 4  , POW_PRE, "i"}, //int
+  {"pow"   , is_basic_int     , 6  , POW_PRE, "i"}, //long
+  {"pow"   , is_basic_int     , 8  , POW_PRE, "i"}, //long long
+  {"pow"   , is_basic_float   , 4  , ""     , "f"}, //float
+  {"pow"   , is_basic_float   , 8  , ""     , "" }, //double
+  {"pow"   , is_basic_complex , 8  , "c"    , "f"}, //float complex
+  {"pow"   , is_basic_complex , 16 , "c"    , "" }, //double complex
+  {NULL    , is_basic_int     , 0  , ""     , "" }
+};
+
+/// @brief fill the c_base_name to get the c full name accorgind to its basic
+static void get_c_full_name (string* base_in_c, basic b) {
+  pips_debug (7, "find the C function according to the basic\n");
+  // initialize some varaibles
+  c_full_name * table = c_base_name_to_c_full_name;
+  enum basic_utype type = basic_tag (b);
+  intptr_t size = basic_type_size (b);
+
+  // find the correct row
+  while ((table->c_base_name != NULL) &&
+		 !(same_string_p(*base_in_c, table->c_base_name) &&
+		   (table->type == type) &&
+		   (table->size == size)))
+	table++;
+  if (table->c_base_name == NULL) {
+    pips_internal_error("can not determin the c function to call");
+  }
+  str_append  (base_in_c, table->suffix);
+  str_prepend (base_in_c, table->prefix);
+  return;
+}
+
+// fortran intrinsic accepts different types but c function only
+// accept one type. This type of intrinsic is handle by this ppt_math
+// function, it calls the right c function according to its input types.
+static string ppt_math(string in_c, list le)
 {
-    { "+", "+", ppt_binary  },
-    { "-", "-", ppt_binary },
-    { "/", "/", ppt_binary },
-    { "*", "*", ppt_binary },
-    { "--", "-", ppt_unary },
-    { "**", "pow", ppt_call },
-    { "=", "=", ppt_binary },
-    { ".OR.", "||", ppt_binary },
-    { ".AND.", "&&", ppt_binary },
-    { ".NOT.", "!", ppt_unary },
-    { ".LT.", "<", ppt_binary },
-    { ".GT.", ">", ppt_binary },
-    { ".LE.", "<=", ppt_binary },
-    { ".GE.", ">=", ppt_binary },
-    { ".EQ.", "==", ppt_binary },
-    { ".EQV.", "==", ppt_binary },
-    { ".NE.", "!=", ppt_binary },
-    { ".", ".", ppt_binary },
-    { "->", "->", ppt_binary},
-    { "post++", "++", ppt_unary_post },
-    {"post--", "--" , ppt_unary_post },
-    {"++pre", "++" , ppt_unary },
-    {"--pre", "--" , ppt_unary },
-    {"&", "&" , ppt_unary },
-    {"*indirection", "*" , ppt_unary },
-    {"+unary", "+", ppt_unary },
-    {"-unary", "-", ppt_unary },
-    {"~", "~", ppt_unary },
-    {"!", "!", ppt_unary },
-    {"%", "%" , ppt_binary },
-    {"+C", "+" , ppt_binary },
-    {"-C", "-", ppt_binary },
-    {"<<", "<<", ppt_binary },
-    {">>", ">>", ppt_binary },
-    {"<", "<" , ppt_binary },
-    {">", ">" , ppt_binary },
-    {"<=", "<=", ppt_binary },
-    {">=", ">=", ppt_binary },
-    {"==", "==", ppt_binary },
-    {"!=", "!=", ppt_binary },
-    {"&bitand", "&", ppt_binary},
-    {"^", "^", ppt_binary },
-    {"|", "|", ppt_binary },
-    {"&&", "&&", ppt_binary },
-    {"||", "||", ppt_binary },
-    {"*=", "*=", ppt_binary },
-    {"/=", "/=", ppt_binary },
-    {"%=", "%=", ppt_binary },
-    {"+=", "+=", ppt_binary },
-    {"-=", "-=", ppt_binary },
-    {"<<=", "<<=" , ppt_binary },
-    {">>=", ">>=", ppt_binary },
-    {"&=", "&=", ppt_binary },
-    {"^=", "^=", ppt_binary },
-    {"|=","|=" , ppt_binary },
-    { NULL, NULL, ppt_call }
+  cur_basic = basic_undefined;
+  FOREACH (EXPRESSION, exp, le) {
+	// gen_recurse on reference because entites are tabulated and thus
+	// not visited
+	pips_debug (7, "let's dig into the expression to find the involved basics\n");
+	//gen_recurse (exp, reference_domain, gen_true, gen_identity);
+	//	gen_recurse (exp, reference_domain, gen_true, find_basic);
+	gen_recurse (exp, reference_domain, find_basic, gen_identity);
+  }
+  string str_copy = strdup (in_c);
+  get_c_full_name (&str_copy, cur_basic);
+  string result = ppt_call (str_copy, le);
+  if (cur_basic != basic_undefined)
+	free_basic (cur_basic);
+  free (str_copy);
+  return result;
+}
+
+// fortran min and max intrinsic accept from 2 to n elements. This can be done
+// in c using an ellipse or using a simple macro. The second possibility is
+// chosen
+static string ppt_min_max (string in_c, list le)
+{
+  bool flag = false;
+  bool pointer = !get_bool_property ("CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL");
+  expression exp = EXPRESSION (CAR (le));
+  string arg = c_expression (exp, false);
+  string result = strdup(concatenate ((expression_scalar_p(exp) &&
+									   pointer)? "&" : "", arg, NULL));
+  POP (le);
+  free (arg);
+
+  FOREACH (EXPRESSION, e, le){
+	arg = c_expression(e,false);
+	string old = result;
+	result = strdup(concatenate(in_c , OPENPAREN, old, ", ",
+								expression_scalar_p(e) && pointer ? "&" : "",
+								arg, CLOSEPAREN, NULL));
+	free(arg);
+	free(old);
+	flag = true;
+  }
+
+  pips_assert ("min and max should have at least 2 arguments", flag == true);
+  return result;
+}
+
+// @brief Generate a pips_user_error for intrinsic that can not be handle
+// right now according to the property defined by the user
+///@param in_f, the instrinsic in fortran
+static string ppt_unknown(string in_f, list le)
+{
+  if (get_bool_property ("CROUGH_PRINT_UNKNOWN_INTRINSIC") == FALSE)
+	pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
+  string result = ppt_call (in_f, le);
+  return result;
+}
+
+// @brief Generate a pips_user_error for intrinsic that must not be fined in a
+// fortran code
+///@param in_f, the instrinsic in fortran
+static string ppt_must_error(string in_f, list le)
+{
+  string result = strdup ("");
+  pips_user_error("This intrinsic should not be found in a fortran code: %s\n",
+				  in_f);
+  return result;
+}
+
+static struct s_ppt intrinsic_to_c[] = {
+  { "+"                        , "+"                         , ppt_binary    },
+  { "-"                        , "-"                         , ppt_binary    },
+  { "/"                        , "/"                         , ppt_binary    },
+  { "*"                        , "*"                         , ppt_binary    },
+  { "--"                       , "-"                         , ppt_unary     },
+  { "="                        , "="                         , ppt_binary    },
+  { ".OR."                     , "||"                        , ppt_binary    },
+  { ".AND."                    , "&&"                        , ppt_binary    },
+  { ".NOT."                    , "!"                         , ppt_unary     },
+  { ".LT."                     , "<"                         , ppt_binary    },
+  { ".GT."                     , ">"                         , ppt_binary    },
+  { ".LE."                     , "<="                        , ppt_binary    },
+  { ".GE."                     , ">="                        , ppt_binary    },
+  { ".EQ."                     , "=="                        , ppt_binary    },
+  { ".EQV."                    , "=="                        , ppt_binary    },
+  { ".NE."                     , "!="                        , ppt_binary    },
+  { "."                        , "."                         , ppt_binary    },
+  { "->"                       , "->"                        , ppt_binary    },
+  { "post++"                   , "++"                        , ppt_unary_post},
+  {"post--"                    , "--"                        , ppt_unary_post},
+  {"++pre"                     , "++"                        , ppt_unary     },
+  {"--pre"                     , "--"                        , ppt_unary     },
+  {"&"                         , "&"                         , ppt_unary     },
+  {"*indirection"              , "*"                         , ppt_unary     },
+  {"+unary"                    , "+"                         , ppt_unary     },
+  {"-unary"                    , "-"                         , ppt_unary     },
+  {"~"                         , "~"                         , ppt_unary     },
+  {"!"                         , "!"                         , ppt_unary     },
+  {PLUS_C_OPERATOR_NAME        , PLUS_C_OPERATOR_NAME        , ppt_must_error},
+  {MINUS_C_OPERATOR_NAME       , MINUS_C_OPERATOR_NAME       , ppt_must_error},
+  {"<<"                        , "<<"                        , ppt_binary    },
+  {">>"                        , ">>"                        , ppt_binary    },
+  {"<"                         , "<"                         , ppt_binary    },
+  {">"                         , ">"                         , ppt_binary    },
+  {"<="                        , "<="                        , ppt_binary    },
+  {">="                        , ">="                        , ppt_binary    },
+  {"=="                        , "=="                        , ppt_binary    },
+  {"!="                        , "!="                        , ppt_binary    },
+  {"&bitand"                   , "&"                         , ppt_binary    },
+  {"^"                         , "^"                         , ppt_binary    },
+  {"|"                         , "|"                         , ppt_binary    },
+  {"&&"                        , "&&"                        , ppt_binary    },
+  {C_OR_OPERATOR_NAME          , C_OR_OPERATOR_NAME          , ppt_must_error},
+  {"*="                        , "*="                        , ppt_binary    },
+  {"/="                        , "/="                        , ppt_binary    },
+  {"%="                        , "%="                        , ppt_binary    },
+  {"+="                        , "+="                        , ppt_binary    },
+  {"-="                        , "-="                        , ppt_binary    },
+  {"<<="                       , "<<="                       , ppt_binary    },
+  {">>="                       , ">>="                       , ppt_binary    },
+  {"&="                        , "&="                        , ppt_binary    },
+  {"^="                        , "^="                        , ppt_binary    },
+  {"|="                        , "|="                        , ppt_binary    },
+  {POWER_OPERATOR_NAME         , "pow"                       , ppt_math      },
+  {MODULO_OPERATOR_NAME        , "%"                         , ppt_binary    },
+  {ABS_OPERATOR_NAME           , "abs"                       , ppt_math      },
+  {IABS_OPERATOR_NAME          , "abs"                       , ppt_call      },
+  {DABS_OPERATOR_NAME          , "fabs"                      , ppt_call      },
+  {CABS_OPERATOR_NAME          , "cabsf"                     , ppt_call      },
+  {CDABS_OPERATOR_NAME         , "cabs"                      , ppt_call      },
+  {WRITE_FUNCTION_NAME         , WRITE_FUNCTION_NAME         , ppt_unknown   },
+  {PRINT_FUNCTION_NAME         , PRINT_FUNCTION_NAME         , ppt_unknown   },
+  {REWIND_FUNCTION_NAME        , REWIND_FUNCTION_NAME        , ppt_unknown   },
+  {OPEN_FUNCTION_NAME          , OPEN_FUNCTION_NAME          , ppt_unknown   },
+  {CLOSE_FUNCTION_NAME         , CLOSE_FUNCTION_NAME         , ppt_unknown   },
+  {INQUIRE_FUNCTION_NAME       , INQUIRE_FUNCTION_NAME       , ppt_unknown   },
+  {BACKSPACE_FUNCTION_NAME     , BACKSPACE_FUNCTION_NAME     , ppt_unknown   },
+  {READ_FUNCTION_NAME          , READ_FUNCTION_NAME          , ppt_unknown   },
+  {BUFFERIN_FUNCTION_NAME      , BUFFERIN_FUNCTION_NAME      , ppt_unknown   },
+  {BUFFEROUT_FUNCTION_NAME     , BUFFEROUT_FUNCTION_NAME     , ppt_unknown   },
+  {ENDFILE_FUNCTION_NAME       , ENDFILE_FUNCTION_NAME       , ppt_unknown   },
+  {FORMAT_FUNCTION_NAME        , FORMAT_FUNCTION_NAME        , ppt_unknown   },
+  {MIN_OPERATOR_NAME           , MIN_FCT                     , ppt_min_max   },
+  {MIN0_OPERATOR_NAME          , MIN_FCT                     , ppt_min_max   },
+  {MIN1_OPERATOR_NAME          , MIN_FCT                     , ppt_min_max   }, // implicit cast
+  {AMIN0_OPERATOR_NAME         , MIN_FCT                     , ppt_min_max   }, // implicit cast
+  {AMIN1_OPERATOR_NAME         , MIN_FCT                     , ppt_min_max   },
+  {DMIN1_OPERATOR_NAME         , MIN_FCT                     , ppt_min_max   },
+  {MAX_OPERATOR_NAME           , MAX_FCT                     , ppt_min_max   },
+  {MAX0_OPERATOR_NAME          , MAX_FCT                     , ppt_min_max   }, // implicit cast
+  {AMAX0_OPERATOR_NAME         , MAX_FCT                     , ppt_min_max   }, // implicit cast
+  {MAX1_OPERATOR_NAME          , MAX_FCT                     , ppt_min_max   },
+  {AMAX1_OPERATOR_NAME         , MAX_FCT                     , ppt_min_max   },
+  {DMAX1_OPERATOR_NAME         , MAX_FCT                     , ppt_min_max   },
+  {IMPLIED_COMPLEX_NAME        , CMPLX_FCT                   , ppt_call      },
+  {IMPLIED_DCOMPLEX_NAME       , CMPLX_FCT                   , ppt_call      },
+  {SIGN_OPERATOR_NAME          , SIGN_OPERATOR_NAME          , ppt_unknown   },
+  {ISIGN_OPERATOR_NAME         , ISIGN_OPERATOR_NAME         , ppt_unknown   },
+  {DSIGN_OPERATOR_NAME         , DSIGN_OPERATOR_NAME         , ppt_unknown   },
+  {DIM_OPERATOR_NAME           , DIM_OPERATOR_NAME           , ppt_unknown   },
+  {IDIM_OPERATOR_NAME          , IDIM_OPERATOR_NAME          , ppt_unknown   },
+  {DDIM_OPERATOR_NAME          , DDIM_OPERATOR_NAME          , ppt_unknown   },
+  {DPROD_OPERATOR_NAME         , DPROD_OPERATOR_NAME         , ppt_unknown   },
+  {CONJG_OPERATOR_NAME         , CONJG_OPERATOR_NAME         , ppt_unknown   },
+  {DCONJG_OPERATOR_NAME        , DCONJG_OPERATOR_NAME        , ppt_unknown   },
+  {SQRT_OPERATOR_NAME          , SQRT_OPERATOR_NAME          , ppt_unknown   },
+  {DSQRT_OPERATOR_NAME         , DSQRT_OPERATOR_NAME         , ppt_unknown   },
+  {CSQRT_OPERATOR_NAME         , CSQRT_OPERATOR_NAME         , ppt_unknown   },
+  {CDSQRT_OPERATOR_NAME        , CDSQRT_OPERATOR_NAME        , ppt_unknown   },
+  {EXP_OPERATOR_NAME           , EXP_OPERATOR_NAME           , ppt_unknown   },
+  {DEXP_OPERATOR_NAME          , DEXP_OPERATOR_NAME          , ppt_unknown   },
+  {CEXP_OPERATOR_NAME          , CEXP_OPERATOR_NAME          , ppt_unknown   },
+  {CDEXP_OPERATOR_NAME         , CDEXP_OPERATOR_NAME         , ppt_unknown   },
+  {LOG_OPERATOR_NAME           , LOG_OPERATOR_NAME           , ppt_unknown   },
+  {ALOG_OPERATOR_NAME          , ALOG_OPERATOR_NAME          , ppt_unknown   },
+  {DLOG_OPERATOR_NAME          , DLOG_OPERATOR_NAME          , ppt_unknown   },
+  {CLOG_OPERATOR_NAME          , CLOG_OPERATOR_NAME          , ppt_unknown   },
+  {CDLOG_OPERATOR_NAME         , CDLOG_OPERATOR_NAME         , ppt_unknown   },
+  {LOG10_OPERATOR_NAME         , LOG10_OPERATOR_NAME         , ppt_unknown   },
+  {ALOG10_OPERATOR_NAME        , ALOG10_OPERATOR_NAME        , ppt_unknown   },
+  {DLOG10_OPERATOR_NAME        , DLOG10_OPERATOR_NAME        , ppt_unknown   },
+  {SIN_OPERATOR_NAME           , SIN_OPERATOR_NAME           , ppt_unknown   },
+  {DSIN_OPERATOR_NAME          , DSIN_OPERATOR_NAME          , ppt_unknown   },
+  {CSIN_OPERATOR_NAME          , CSIN_OPERATOR_NAME          , ppt_unknown   },
+  {CDSIN_OPERATOR_NAME         , CDSIN_OPERATOR_NAME         , ppt_unknown   },
+  {COS_OPERATOR_NAME           , COS_OPERATOR_NAME           , ppt_unknown   },
+  {DCOS_OPERATOR_NAME          , DCOS_OPERATOR_NAME          , ppt_unknown   },
+  {CCOS_OPERATOR_NAME          , CCOS_OPERATOR_NAME          , ppt_unknown   },
+  {CDCOS_OPERATOR_NAME         , CDCOS_OPERATOR_NAME         , ppt_unknown   },
+  {TAN_OPERATOR_NAME           , TAN_OPERATOR_NAME           , ppt_unknown   },
+  {DTAN_OPERATOR_NAME          , DTAN_OPERATOR_NAME          , ppt_unknown   },
+  {ASIN_OPERATOR_NAME          , ASIN_OPERATOR_NAME          , ppt_unknown   },
+  {DASIN_OPERATOR_NAME         , DASIN_OPERATOR_NAME         , ppt_unknown   },
+  {ACOS_OPERATOR_NAME          , ACOS_OPERATOR_NAME          , ppt_unknown   },
+  {DACOS_OPERATOR_NAME         , DACOS_OPERATOR_NAME         , ppt_unknown   },
+  {ATAN_OPERATOR_NAME          , ATAN_OPERATOR_NAME          , ppt_unknown   },
+  {DATAN_OPERATOR_NAME         , DATAN_OPERATOR_NAME         , ppt_unknown   },
+  {ATAN2_OPERATOR_NAME         , ATAN2_OPERATOR_NAME         , ppt_unknown   },
+  {DATAN2_OPERATOR_NAME        , DATAN2_OPERATOR_NAME        , ppt_unknown   },
+  {SINH_OPERATOR_NAME          , SINH_OPERATOR_NAME          , ppt_unknown   },
+  {DSINH_OPERATOR_NAME         , DSINH_OPERATOR_NAME         , ppt_unknown   },
+  {COSH_OPERATOR_NAME          , COSH_OPERATOR_NAME          , ppt_unknown   },
+  {DCOSH_OPERATOR_NAME         , DCOSH_OPERATOR_NAME         , ppt_unknown   },
+  {TANH_OPERATOR_NAME          , TANH_OPERATOR_NAME          , ppt_unknown   },
+  {DTANH_OPERATOR_NAME         , DTANH_OPERATOR_NAME         , ppt_unknown   },
+  {LENGTH_OPERATOR_NAME        , LENGTH_OPERATOR_NAME        , ppt_unknown   },
+  {INDEX_OPERATOR_NAME         , INDEX_OPERATOR_NAME         , ppt_unknown   },
+  {LGE_OPERATOR_NAME           , LGE_OPERATOR_NAME           , ppt_unknown   },
+  {LGT_OPERATOR_NAME           , LGT_OPERATOR_NAME           , ppt_unknown   },
+  {LLE_OPERATOR_NAME           , LLE_OPERATOR_NAME           , ppt_unknown   },
+  {LLT_OPERATOR_NAME           , LLT_OPERATOR_NAME           , ppt_unknown   },
+  {AINT_CONVERSION_NAME        , AINT_CONVERSION_NAME        , ppt_unknown   },
+  {DINT_CONVERSION_NAME        , DINT_CONVERSION_NAME        , ppt_unknown   },
+  {ANINT_CONVERSION_NAME       , ANINT_CONVERSION_NAME       , ppt_unknown   },
+  {DNINT_CONVERSION_NAME       , DNINT_CONVERSION_NAME       , ppt_unknown   },
+  {NINT_CONVERSION_NAME        , NINT_CONVERSION_NAME        , ppt_unknown   },
+  {IDNINT_CONVERSION_NAME      , IDNINT_CONVERSION_NAME      , ppt_unknown   },
+  {AIMAG_CONVERSION_NAME       , AIMAG_CONVERSION_NAME       , ppt_unknown   },
+  {DIMAG_CONVERSION_NAME       , DIMAG_CONVERSION_NAME       , ppt_unknown   },
+  {INT_GENERIC_CONVERSION_NAME   , INT_GENERIC_CONVERSION_NAME   , ppt_unknown   },
+  {IFIX_GENERIC_CONVERSION_NAME  , IFIX_GENERIC_CONVERSION_NAME  , ppt_unknown   },
+  {IDINT_GENERIC_CONVERSION_NAME , IDINT_GENERIC_CONVERSION_NAME , ppt_unknown   },
+  {REAL_GENERIC_CONVERSION_NAME  , REAL_GENERIC_CONVERSION_NAME  , ppt_unknown   },
+  {FLOAT_GENERIC_CONVERSION_NAME , FLOAT_GENERIC_CONVERSION_NAME , ppt_unknown   },
+  {DFLOAT_GENERIC_CONVERSION_NAME, DFLOAT_GENERIC_CONVERSION_NAME, ppt_unknown   },
+  {SNGL_GENERIC_CONVERSION_NAME  , SNGL_GENERIC_CONVERSION_NAME  , ppt_unknown   },
+  {DBLE_GENERIC_CONVERSION_NAME  , DBLE_GENERIC_CONVERSION_NAME  , ppt_unknown   },
+  {DREAL_GENERIC_CONVERSION_NAME , DREAL_GENERIC_CONVERSION_NAME , ppt_unknown   },
+  {CMPLX_GENERIC_CONVERSION_NAME , CMPLX_GENERIC_CONVERSION_NAME , ppt_unknown   },
+  {DCMPLX_GENERIC_CONVERSION_NAME, DCMPLX_GENERIC_CONVERSION_NAME, ppt_unknown   },
+  {INT_TO_CHAR_CONVERSION_NAME   , INT_TO_CHAR_CONVERSION_NAME   , ppt_unknown   },
+  {CHAR_TO_INT_CONVERSION_NAME   , CHAR_TO_INT_CONVERSION_NAME   , ppt_unknown   },
+  {NULL                        , NULL                        , ppt_call      }
 };
 
 /* return the prettyprinter structure for c.*/
@@ -1096,7 +1462,7 @@ static string c_call(call c,bool breakable)
     }
     else if (call_constant_p(c))
     {
-        const_wrapper(&local_name);
+	  const_wrapper(&local_name);
         result = strlower(strdup(local_name),local_name);
     }
     else
@@ -1369,14 +1735,14 @@ static string c_test(test t,bool breakable)
 static string c_sequence(sequence seq, bool breakable)
 {
     string result = strdup(EMPTY);
-    MAP(STATEMENT, s,
+    FOREACH (STATEMENT, s, sequence_statements(seq))
     {
         string oldresult = result;
         string current = c_statement(s,breakable);
         result = strdup(concatenate(oldresult, current, NULL));
         free(current);
         free(oldresult);
-    }, sequence_statements(seq));
+    }
     return result;
 }
 
@@ -1781,7 +2147,7 @@ static string interface_code_string(entity module, statement stat)
 
 static string c_code_string(entity module, statement stat)
 {
-  string head, decls, body, result, copy_in, include;
+  string head, decls, body, result, copy_in, include, macro;
 
   /* What about declarations that are external a module scope ?
      Consider a source file as a module entity, put all declarations in it
@@ -1796,16 +2162,21 @@ static string c_code_string(entity module, statement stat)
       print_entities(statement_declarations(stat));
     }
 
-  // generate the user required includes
+  // get the needed includes
   include     = c_include ();
+  // get the needed macro
+  macro       = c_macro ();
   // function declaration
   head        = c_head(module);
   // What about declarations associated to statements
-  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,FALSE);
+  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,
+							   FALSE);
   body        = c_statement(stat, false);
   copy_in     = scalar_prelude ();
-  result = concatenate(include, head, OPENBRACE, NL, decls,
-		       copy_in, NL, body, CLOSEBRACE, NL, NULL);
+
+  // concatenate everything to get the code
+  result = concatenate(include, macro, head, OPENBRACE, NL, decls,
+					   copy_in, NL, body, CLOSEBRACE, NL, NULL);
 
   free (include);
   free(head);

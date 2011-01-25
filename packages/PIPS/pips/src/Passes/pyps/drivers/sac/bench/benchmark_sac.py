@@ -2,196 +2,208 @@
 # -*- encoding: utf-8 -*-
 from __future__ import with_statement # to cope with python2.5
 
-import pyrops
+#import pyrops
+import pyps
 import workspace_gettime as gt
+import workspace_remote as rt
+import workspace_check as ck
 import memalign
 import sac
 import sys
 import os
 import time
 import shutil
+import bench_cfg
+import shlex
 
 from subprocess import *
 from optparse import OptionParser
 import re
 
-benchmarkruns = [
-	## memalign for jacobi.c disabled: alignment issues
-	#{'sources': ["jacobi.c"], 'module': "compute", 'args': "bonjour.pgm"},
-	#{'sources': ["ddot_r.c"], 'module': "ddot_r",  'memalign': True, 'args':"2000000"},
-	#{'sources': ["ddot_ur.c"], 'module': "ddot_ur",  'memalign': True, 'args':"2000000"},
-	#{'sources': ["daxpy_r.c"], 'module': "daxpy_r",  'memalign': True, 'args':"2000000"},
-	#{'sources': ["daxpy_ur.c"], 'module': "daxpy_ur",  'memalign': True, 'args':"2000000"},
-	#{'sources': ["dscal_r.c"], 'module': "dscal_r",  'memalign': True, 'args':"2000000"},
-	#{'sources': ["dscal_ur.c"], 'module': "dscal_ur",  'memalign': True, 'args':"2000000"},
-	{'sources': ["alphablending.c", "alphablending_main.c"],
-	 'module': "alphablending", 'args': "20000000", 'memalign': True},
-	#{'sources': ["fir.c"], 'module': "FIRFilter",'args':"100000", 'memalign': False},
-	#{'sources': ["convol3x3.c"], 'module': "convol", 'args':'256'},
-	#{'sources': ["average_power.c"], 'module': "average_power"},
-	#{'sources':["matrix_mul_const.c"], 'module':"matrix_mul_const", 'args':'1000', 'memalign': True },
-	#{'sources':["matrix_add_const.c"], 'module':"matrix_add_const", 'args':'1000', 'memalign': True },
-	#{'sources':["matrix_mul_vect.c"], 'module':"matrix_mul_vect", 'args':'1000', 'memalign': True ,'path': { 'enhanced_reduction':True}},
-	#{'sources':["matrix_mul_matrix.c"], 'module':"matrix_mul_matrix", 'args':'1000', 'memalign': True ,'path': { 'enhanced_reduction':True}},
-	]
+def benchrun(s):
+	def do_benchmark(ws, wcfg, cc_cfg, compile_f, args, n_iter, name_custom):
+		times = {wcfg.module: [0]}
+		benchname = cc_cfg.name() + "+" + name_custom
+		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args)
+		try:
+			if doBench:
+				times = ws.benchmark(execname=benchname,ccexecp=ccp,iterations=n_iter)
+				benchtimes[benchname] = {'time': times[wcfg.module][0], 'cc_cmd': ccp.cc_cmd, 'cc_stderr': ccp.cc_stderr}
+			else:
+				good,out = ws.check_output(ccexecp=ccp)
+				if not good:
+					msg = "Validation case %s-%s failed !" % (wcfg.name(),benchname)
+					errors.append(msg)
+					print >>sys.stderr, msg
+					if opts.strict: raise RuntimeError(msg)
+		except RuntimeError, e:
+			errors.append("Benchmark: %s\n%s" % (benchname, str(e)))
+			print >> sys.stderr, e
+			if opts.strict: raise
 
-n_iterations = 50
+	doBench = s.default_mode=="benchmark"
+	wk_parents = [sac.workspace,memalign.workspace]
+	if doBench:
+		wk_parents.append(gt.workspace)
+	else:
+		wk_parents.append(ck.workspace)
+	if s.remoteExec:
+		wk_parents.append(rt.workspace)
+	for wcfg in s.workspaces:
+		wcfg.load()
+		benchtimes = {}
+		srcs = map(lambda s: str(s), wcfg.files)
+		wcfg.module = str(wcfg.module)
+		if doBench:
+			cflags = "-D__PYPS_SAC_BENCHMARK "
+		else:
+			cflags = "-D__PYPS_SAC_VALIDATE "
+		if "include_dirs" in wcfg:
+			cflags += "-I" +  str(" -I".join(wcfg.include_dirs))
+		s.cc_reference.load()
+		ccp_ref=None
+		if not doBench:
+			args = shlex.split(str(wcfg.args_validate))
+			ccp_ref = pyps.ccexecParams(CC=s.cc_reference.cc,CFLAGS=s.cc_reference.cflags,args=args)
+		with pyps.workspace(*srcs,
+				       parents = wk_parents,
+				       driver = s.default_driver,
+				       remoteExec = s.remoteExec,
+				       cppflags = cflags,
+				       deleteOnClose=False,
+				       recoverIncludes=False,
+				       ccexecp_ref=ccp_ref) as ws:
+			m = ws[wcfg.module]
+			if doBench:
+				args = wcfg.args_benchmark
+				n_iter = wcfg.iterations_bench
+				m.benchmark()
+			else:
+				args = wcfg.args_validate
+				n_iter = 1
+			args = shlex.split(str(args))
+
+			if wcfg.memalign:
+				ws.memalign()
+			if doBench:
+				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref")
+				for cc in s.ccs_nosac:
+					cc.load()
+					do_benchmark(ws, wcfg, cc, ws.compile, args, n_iter, "nosac")
+
+			if "ccs_sac" in s:
+				m.sac()
+				for cc in s.ccs_sac:
+					cc.load()
+					do_benchmark(ws, wcfg, cc, ws.simd_compile, args, n_iter, "sac")
+
+			if not doBench:
+				if "ccs_sac" not in s:
+					m.sac()
+				# If we are in validation mode, validate the generic SIMD implementation thanks
+				# to s.cc_reference
+				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref+sac")
+
+		wstimes[wcfg.name()] = benchtimes
+
 
 parser = OptionParser(usage = "%prog")
-parser.add_option("-s", "--strict", dest = "strict",
-				  action = "store_true", default = False,
-				  help = "check program output")
-parser.add_option("-q", "--quick", dest = "quick",
-				  action = "store_true", default = False,
-				  help = "do only one iteration when timing stuff")
-parser.add_option("--blork", dest = "blork",
-				  action = "store_true", default = False,
-				  help = "do not destroy workspace on close")
+parser.add_option("-m", "--mode", dest = "mode",
+				  help = "benchmark mode: validation or benchmark")
+parser.add_option("-s", "--session", dest = "session_name",
+				  help = "session to use (defined in sessions.cfg")
+parser.add_option("-d", "--driver", dest = "driver",
+				  help = "driver to use (avx|sac|3dnow|neon)")
 parser.add_option("--cflags", "--CFLAGS", dest = "cflags",
 				  help = "additionnal CFLAGS for all compilations")
-parser.add_option("--outfile", dest = "outfile",
-				  help = "put the results in a file suitable for gnuplot")
 parser.add_option("--normalize", dest = "normalize", action = "store_true",
 				  default = False, help = "normalize timing results")
-parser.add_option("--driver", dest = "driver", default = "sse",
-				  help = "3DNow or SSE (the default)")
-parser.add_option("--outdir", dest = "outdir",
-				  help = "put the resulting transformation in this directory")
+parser.add_option("--remote-host", dest = "remoteHost",
+				  help = "compile and execute sources on a remote machine (using SSH)")
+parser.add_option("--control-master-path", dest = "controlMasterPath",
+				  help = "path to the SSH control master (if wanted) [optional]")
+parser.add_option("--remote-working-directory", dest = "remoteDir",
+				  help = "path to the remote directory that will be used")
+parser.add_option("--outfile", dest="outfile",
+				  help = "write the results into a file [default=stdout]")
+parser.add_option("--strict", dest="strict", action="store_true",
+		help = "stop the program as soon as an exception occurs.")
 (opts, _) = parser.parse_args()
 
-benchtimes = {}
+wstimes = {}
 errors = []
 
-if opts.quick:
-	for bench in benchmarkruns:
-		if "args" in bench and re.match("\d+", bench["args"]):
-			bench["args"] = "200"
-	n_iterations = 1
+session = bench_cfg.sessions.get(opts.session_name)
+session.load()
 
-if opts.outdir:
-	try: shutil.rmtree(opts.outdir)
-	except: pass
-	os.makedirs(opts.outdir)
+if opts.remoteHost:
+	if opts.remoteDir == None:
+		raise RuntimeError("--remote-working-directory option is required !")
+	session.remoteExec = rt.remoteExec(host=opts.remoteHost, controlMasterPath=opts.controlMasterPath, remoteDir=opts.remoteDir)
+elif "default_remote" in session:
+	session.default_remote.load()
+	session.remoteExec = rt.remoteExec(host=session.default_remote.host, controlMasterPath=session.default_remote.control_path, remoteDir=session.default_remote.remote_working_dir)
+else:
+	session.remoteExec = False
 
-def benchrun(bench):
-	benchtime = {}
-	referenceout = []
-	def tryBenchmark(*args, **kwargs):
-		if bench.get("args",None):
-			kwargs["args"]	   = [ bench.get("args",None) ]
-		kwargs["iterations"] = n_iterations
-		kwargs["reference"]  = (referenceout if opts.strict else False)
-		time = 0
-		try:
-			time = ws.benchmark(*args, **kwargs)
-		except RuntimeError, e:
-			errors.append(e)
-			if opts.strict: raise
-		return time
+if opts.driver:
+	session.default_driver = opts.driver
 
-	# build a name for the benchmark using the basename of the first source file
-	if not bench.has_key("name"):
-		bench["name"] = os.path.basename(bench["sources"][0])
-		if bench.get("unfold"):
-			bench["name"] += "-unfold"
+if opts.mode:
+	session.default_mode = opts.mode
 
-	EXTRACFLAGS = bench.get("EXTRACFLAGS", "")
-	if opts.cflags:
-		EXTRACFLAGS += " " + opts.cflags
-
-	parents = [gt.workspace, sac.workspace]
-	if bench.get("memalign",False):
-		parents.append(memalign.workspace)
-	with pyrops.pworkspace(bench["sources"],
-						   parents = parents,
-						   deleteOnClose = not opts.blork,
-						   driver = opts.driver,
-						   cppflags = bench.get("cppflags", "")) as ws:
-
-		# get the result from the initial, reference file, without SIMD'izing anything
-		if opts.outdir:
-			ws.compile(rep = "%s/ref/%s" % (opts.outdir, bench["name"]),
-					   CFLAGS = "-O3 " + EXTRACFLAGS)
-		else:
-			benchtime["gcc-ref"] = tryBenchmark("gcc", CFLAGS = "-O3 -fno-tree-vectorize" + EXTRACFLAGS)
-			benchtime["gcc"] = tryBenchmark("gcc", CFLAGS = "-O3 " + EXTRACFLAGS)
-			benchtime["icc"] = tryBenchmark("icc", CC = "icc", CFLAGS = "-O3 " + EXTRACFLAGS)
-			benchtime["llvm"] = tryBenchmark("llvm", CC = "llvm-gcc-4.2", CFLAGS = "-O3 " + EXTRACFLAGS)
-
-		module = ws[bench["module"]]
-		# Magie !
-		if bench.get("unfold"):
-			module.unfolding()
-
-		try:
-			if bench.get("path"):
-				module.sac(**bench["path"])
-			else:
-				module.sac()
-		except RuntimeError, e:
-			errors.append(e.args)
-			if opts.strict: raise
-
-		if bench.get("memalign",False):
-			# Try with alignement
-			ws.memalign()
-
-		# Compile using the naïve implementation of SIMD operations
-		if opts.outdir:
-			ws.compile(rep = "%s/seq/%s" % (opts.outdir, bench["name"]),
-					   CFLAGS = "-O3 " + EXTRACFLAGS)
-		else:
-			benchtime["gcc+seq"] = tryBenchmark("gcc+seq", CFLAGS = "-O3 " + EXTRACFLAGS)
-
-		# Replace the SIMD_* functions with SSE ones. Compile once with
-		# ICC, once with GCC. Note that simd_compile always uses -O3.
-		if opts.outdir:
-			ws.simd_compile(rep = "{0}/{1}/{2}".format(opts.outdir, opts.driver, bench["name"]),
-							CFLAGS = EXTRACFLAGS)
-		else:
-			benchtime["gcc+sac"] = tryBenchmark("gcc+sac", compilemethod = ws.simd_compile,
-												CFLAGS = EXTRACFLAGS)
-			benchtime["icc+sac"] = tryBenchmark("icc+sac", compilemethod = ws.simd_compile,
-												CC = "icc", CFLAGS = EXTRACFLAGS)
-			benchtime["llvm+sac"] = tryBenchmark("llvm+sac", compilemethod = ws.simd_compile,
-												CC = "llvm-gcc-4.2", CFLAGS = EXTRACFLAGS)
-
-	benchtimes[bench['name']] = benchtime
-
-for bench in benchmarkruns:
-	benchrun(bench)
-
-if errors != []:
-	print "There were some errors:"
-for e in errors:
-	print e
-
-# if we only wanted the resulting files, we are done now
-if opts.outdir:
-	exit(0)
-# Otherwise print the results
-columns = ["gcc-ref", "gcc", "icc", "llvm", "gcc+seq", "gcc+sac", "icc+sac", "llvm+sac"]
+benchrun(session)
 
 if opts.outfile:
 	outfile = open(opts.outfile, "w")
 else:
 	outfile = sys.stdout
-outfile.write("# results for benchmark_sac.py, generated the "+ time.asctime() +"\n")
-outfile.write("# Based on " + os.popen('git log|head -n1').read() + "\n")
-outfile.write("Compilation\t"+ "\t".join(columns) + "\n")
-for benchname, benchtime in benchtimes.iteritems():
-	outfile.write(benchname + "\t")
-	for col in columns:
-		time = benchtime.get(col, "0")
-		if opts.normalize:
-			if col == 'gcc':
-				time = - ( (time / float(benchtime.get("gcc-ref", 1) ) -1 ) *100)
-			else:
-				time = - ( (time / float(benchtime.get("gcc", 1) ) -1 ) *100)
 
-		outfile.write(str(time))
-		outfile.write("\t")
+if session.default_mode == "benchmark":
+	outfile.write("\t")
+	cc_ref_name = session.cc_reference.name()+"+ref"
+	columns = [cc_ref_name]
+	for cc in session.ccs_nosac: columns.append(cc.name()+"+nosac")
+	if "ccs_sac" in session:
+		for cc in session.ccs_sac: columns.append(cc.name()+"+sac")
+	for c in columns:
+		outfile.write(c+"\t")
 	outfile.write("\n")
+	for wsname, benchtimes in wstimes.iteritems():
+		outfile.write(wsname + "\t")
+		if cc_ref_name not in benchtimes:
+			print >>sys.stderr, "Warning: reference compilater %s not computed. Normalisation disabled." % cc_ref_name
+			opts.normalize = False
 
-if errors != []:
+		for benchname in columns:
+			if benchname not in benchtimes:
+				outfile.write("NA\t")
+				continue
+			res = benchtimes[benchname]
+			bencht = res['time']
+			if opts.normalize:
+				bencht = float(benchtimes[cc_ref_name]['time']) / float(bencht)
+
+			outfile.write(str(bencht))
+			outfile.write("\t")
+		if opts.normalize:
+			outfile.write("("+str(float(benchtimes[cc_ref_name]['time']))+")")
+		outfile.write("\n")
+	outfile.write("\n")
+	
+	for wsname, benchtimes in wstimes.iteritems():
+		outfile.write("Details for workspace %s:\n" % wsname)
+		outfile.write("---------------------\n")
+		for benchname, res in benchtimes.iteritems():
+			outfile.write("Compiler configuration: "+benchname+"\n")
+			outfile.write("CC command: "+res['cc_cmd']+"\n")
+			outfile.write("CC stderr output: "+res['cc_stderr']+"\n\n")
+		outfile.write("\n")
+
+
+
+if len(errors) > 0:
+	outfile.write("\nErrors:\n")
+	outfile.write("-------\n\n")
+	outfile.write("\n".join(errors))
 	exit(1)

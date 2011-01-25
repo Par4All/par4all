@@ -120,7 +120,7 @@ static entity build_a_clone_for(entity cloned,
    */
   new_name = get_string_property("CLONE_NAME");
   new_name = empty_string_p(new_name) ?
-    build_new_top_level_module_name(name) :
+    build_new_top_level_module_name(name,false) :
     strdup(new_name);
 
   new_fun = FindOrCreateEntity(TOP_LEVEL_MODULE_NAME,new_name);

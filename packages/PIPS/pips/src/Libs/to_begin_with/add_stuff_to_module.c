@@ -17,6 +17,7 @@
 #include "control.h"    // for module_reorder()
 #include "callgraph.h"  // for compute_callees()
 #include "properties.h" // for get_string_property()
+#include "syntax.h"
 #include "pipsdbm.h"
 #include "resources.h"
 
@@ -82,11 +83,11 @@ bool prepend_call(string mn) {
   code co = make_code(NIL, strdup(""), make_sequence(NIL),NIL,
 		      make_language_c());
   value v = make_value_code(co);
-  string name = "MY_TRACK";
+  string name = get_string_property("PREPEND_CALL");
   string ffn = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 				  MODULE_SEP_STRING,
 				  name,
-				  NULL));
+				  NULL)); 
   /* This works only once. So use FindOrCreateEntity() instead... or
      rely on functions in library ri-util. */
   entity f = make_entity(ffn, t, st, v);
@@ -100,6 +101,17 @@ bool prepend_call(string mn) {
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mn, compute_callees(module_statement));
   PIPS_PHASE_POSTLUDE(module_statement);
 }
+
+bool add_pragma(string mn) {
+  string pragma_name = get_string_property("PRAGMA_NAME");
+  bool prepend = get_bool_property("PRAGMA_PREPEND");
+  statement pragma_s = make_empty_statement();
+  add_pragma_str_to_statement(pragma_s, pragma_name, TRUE);
+  statement module_statement = PIPS_PHASE_PRELUDE(mn, "ADD_PRAGMA_DEBUG_LEVEL");
+  insert_statement(module_statement, pragma_s, prepend);
+  PIPS_PHASE_POSTLUDE(module_statement);
+}
+
 
 /** End of this group
     @} */
