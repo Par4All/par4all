@@ -221,7 +221,7 @@ class modules:
 
 class ccexecParams(object):
 	''' Parameters for workspace.compile_and_run . Used for convenience. '''
-	def __init__(self, CC, CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+	def __init__(self, CC="gcc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
 		'''
 		CC, CFLAGS, LDFLAGS: same as usual
 		compilemethod: bound method used for compilation
@@ -484,7 +484,7 @@ class workspace(object):
 
 		return saved
 
-	def user_headers(self, ccexecp, extrafiles=None):
+	def user_headers(self, ccexecp=ccexecParams(), extrafiles=None):
 		""" List the user headers used in self._sources with the compiler configuration given in ccexecp """
 		rep = os.path.join(self.tmpdirname(),"userh")
 		if extrafiles == None:
@@ -496,7 +496,7 @@ class workspace(object):
 		rc = p.returncode
 		# TODO: finish!
 
-	def compile(self, ccexecp, link=True):
+	def compile(self, ccexecp=ccexecParams(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
 		CC=ccexecp.CC
 		CFLAGS=ccexecp.CFLAGS
@@ -530,13 +530,13 @@ class workspace(object):
 		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
 		return ccexecp.outfile
 
-	def compile_and_run(self, ccexecp):
+	def compile_and_run(self, ccexecp=ccexecParams()):
 		if ccexecp.compilemethod == None:
 			ccexecp.compilemethod = self.compile
 		ccexecp.compilemethod(ccexecp)
 		return self.run_output(ccexecp)
 
-	def run_output(self, ccexecp):
+	def run_output(self, ccexecp=ccexecParams()):
 		if not ccexecp._compile_done:
 			return self.compile_and_run(ccexecp)
 		p = Popen(ccexecp.cmd, stdout = PIPE, stderr = PIPE)

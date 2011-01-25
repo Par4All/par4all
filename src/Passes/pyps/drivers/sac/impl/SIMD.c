@@ -1,5 +1,5 @@
 #if !defined(RWBITS) || (RWBITS != 64 && RWBITS != 128 && RWBITS != 256 && RWBITS != 512)
-	#error The register width variable RWBITS must be declared to 64,128,256 or 512 bits.
+	#error The register width variable RWBITS must be declared as 64,128,256 or 512 bits.
 #endif
 
 #define RW (RWBITS/8)
@@ -17,7 +17,7 @@
 #define CTYPE_W int16_t
 #define CTYPE_B int8_t
 
-// Types definition with "argument promotion" (used with va_arg)
+// Types definition with "argument promotion" (used by va_arg)
 #define CTYPEP_PD double
 #define CTYPEP_PS double
 #define CTYPEP_DI int64_t
@@ -80,7 +80,7 @@
 	}
 
 // Muladd uses three parameters
-// P is unused but here so that _DEF_FOR_TYPES can be used
+// P is unused but present so that _DEF_FOR_TYPES can be used
 #define OP_MULADD_TYPE(P,T)\
 	CTYPE_##T F_MULADD##T(int i, va_list ap)\
 	{\
@@ -91,8 +91,8 @@
 		return v1[i] + v2[i]*v3[i];\
 	}
 
-// Unary-minus operations
-// P is unused but here so that _DEF_FOR_TYPES can be used
+// Unary-minus operation
+// P is unused but present so that _DEF_FOR_TYPES can be used
 #define OP_UMIN_TYPE(P,T)\
 	CTYPE_##T F_UMIN##T(int i, va_list ap)\
 	{\

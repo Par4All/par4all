@@ -71,6 +71,8 @@ def benchmark_module(module, **kwargs):
 	module.add_pragma(pragma_name='__pyps_benchmark_start', pragma_prepend=True)
 	module.add_pragma("__pyps_benchmark_stop_%s" % module.name, pragma_prepend=False)
 
+pyps.module.benchmark_module=benchmark_module
+
 
 """ When going to compile, edit all the c files to add the macros
     allowing us to measure the time taken by the program"""
@@ -90,11 +92,6 @@ class workspace:
 			path = os.path.join("/tmp", "pipstime"+randstr)
 			bExists = os.path.islink(path) or os.path.exists(path)
 		return path
-
-	def post_init(self, sources, **args):
-		"""Clean the temporary directory used for holding `SIMD.c'."""
-		for m in self.ws:
-			m.__class__.benchmark = benchmark_module
 
 	def pre_goingToRunWith(self, files, outdir):
 		"""Editing the source files to add the include in them"""
@@ -160,15 +157,14 @@ class workspace:
 			raise RuntimeError("self.benchmark() must have been run !")
 		return self._final_runtimes[module.name]
 
-	def benchmark(self, execname, ccexecp, iterations = 1):
-		ccexecp.rep = self.ws.name +".database/Tmp"
-		ccexecp.outfile = ccexecp.rep + "/" + execname
+	def benchmark(self, ccexecp, iterations = 1):
+		ccexecp.rep = self.ws.dirname() +"Tmp"
 		
 		self.ws.compile_and_run(ccexecp)
 
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
-			print >>sys.stderr, "Launch execution of %s..." % execname
+			print >>sys.stderr, "Launch execution of %s..." % ccexecp.outfile
 			rc,out,err = self.ws.run_output(ccexecp)
 			print >>sys.stderr, "Program done."
 			if rc != 0:
