@@ -8,7 +8,7 @@ with workspace(s+'.c',name=s,deleteOnClose=True) as ws:
 	ws.props.constant_path_effects=False
 	firs=ws.filter(lambda s:s.name.find('fir_') != -1)
 	firs.display(activate=module.print_code_complexities)
-	firs.computation_intensity(bandwidth=1,frequency=100) # that is we need a factor of 100 between the two
+	firs.computation_intensity(bandwidth=1,frequency=300) # that is we need a factor of 300 between the two
 	firs.display()
 	firs.privatize_module()
 	firs.coarse_grain_parallelization()
