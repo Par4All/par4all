@@ -67,6 +67,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "constants.h"
+#include "conversion.h"
 #include "misc.h"
 #include "text-util.h"
 #include "text.h"
@@ -3011,6 +3012,49 @@ string region_to_string(effect reg __attribute__ ((unused)))
     return strdup("[region_to_string] no longer implemented\n");
 }
 
+static bool max_one_phi_var_per_constraint(c)
+Pcontrainte c;
+{
+    for(; c; c=c->succ)
+	if (base_nb_phi(c->vecteur)>=2) return FALSE;
+
+    return TRUE;
+}
+
+/* returns TRUE is syst defines a rectangle on phi variables
+ */
+bool rectangular_region_p(region r)
+{
+
+    Psysteme syst = region_system(r);
+    /*  this is an approximation, and the system should be normalized
+     *  for the result to be correct, I guess...
+     */
+    return max_one_phi_var_per_constraint(sc_egalites(syst)) &&
+        max_one_phi_var_per_constraint(sc_inegalites(syst));
+}
+
+bool rectangular_must_region_p(var, s)
+entity var;
+statement s;
+{
+    list le = load_statement_local_regions(s);
+
+    FOREACH(EFFECT, e,le)
+    {
+        if (reference_variable(effect_any_reference(e)) == var)
+        {
+            if (!approximation_exact_p(effect_approximation(e)) ||
+                    !rectangular_region_p(e))
+            {
+                pips_debug(6, "FALSE\n"); return FALSE;
+            }
+        }
+    }
+    pips_debug(6, "TRUE\n");
+    return TRUE;
+}
+
 /********************************************************************
  * SG awful contributions to BC wonderful work
  */
@@ -3150,24 +3194,82 @@ expression region_reference_to_expression(reference r) {
  */
 Ppolynome region_enumerate(region reg)
 {
-    Psysteme r_sc = region_system(reg);
-    sc_fix(r_sc);
-    Pbase sorted_base = region_sorted_base_dup(reg);
-    sc_base(r_sc)=sorted_base;
-    Pbase local_base = BASE_NULLE;
-    for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
-        if(!variable_phi_p((entity)b->var))
-            local_base=base_add_variable(local_base,b->var);
+    Ppolynome p = POLYNOME_UNDEFINED;
+    if(rectangular_region_p(reg)) // in that case, use a simpler algorithm */
+    {
+        Psysteme r_sc = region_system(reg);
+        sc_normalize2(r_sc);
+        reference ref = region_any_reference(reg);
+        p = make_polynome(1.,TCST,0);
+        for(list iter = reference_indices(ref);!ENDP(iter); POP(iter))
+        {
+            expression index = EXPRESSION(CAR(iter));
+            Variable phi = expression_to_entity(index);
+            if(variable_phi_p((entity)phi)) {
+                /* first search into the equalities if any */
+                bool found = false;
+                for(Pcontrainte c = sc_egalites(r_sc);
+                        !CONTRAINTE_UNDEFINED_P(c);
+                        c=contrainte_succ(c)) {
+                    Pvecteur v = c->vecteur;
+                    if((found=base_contains_variable_p(v,phi))) {
+                        // if an equality is found, the volume is not affected
+                        break;
+                    }
+                }
+                if(!found) {
 
-    const char * base_names [sc_dimension(r_sc)];
-    int i=0;
-    for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
-        base_names[i++]=entity_user_name((entity)b->var);
+                    /* else try to find the range */
+                    Psysteme sc = sc_dup(r_sc);
+                    sc_transform_eg_in_ineg(sc);
+                    Pcontrainte lower,upper;
+                    constraints_for_bounds(phi, &sc_inegalites(sc), &lower, &upper);
+                    if( !CONTRAINTE_UNDEFINED_P(lower) && !CONTRAINTE_UNDEFINED_P(upper))
+                    {
+                        /* this is a constant */
+                        if(bounds_equal_p(phi,lower,upper))
+                            ; /* skip */
+                        /* this is a range : eupper-elower +1 */
+                        else
+                        {
+                            expression elower = constraints_to_loop_bound(lower,phi,true,entity_intrinsic(DIVIDE_OPERATOR_NAME));
+                            expression eupper = constraints_to_loop_bound(upper,phi,false,entity_intrinsic(DIVIDE_OPERATOR_NAME));
 
-    ifdebug(1) print_region(reg);
+                            expression diff = make_op_exp(MINUS_OPERATOR_NAME,eupper,elower);
+                            diff = make_op_exp(PLUS_OPERATOR_NAME,diff,int_to_expression(1));
+                            Ppolynome pdiff = expression_to_polynome(diff);
+                            free_expression(diff);
+                            p=polynome_mult(p,pdiff);
+                        }
+                    }
+                    else {
+                        pips_internal_error("failed to analyse region\n");
+                    }
+                    sc_free(sc);
+                }
+            }
+        }
+    }
+    else {
+        Psysteme r_sc = region_system(reg);
+        sc_fix(r_sc);
+        Pbase sorted_base = region_sorted_base_dup(reg);
+        sc_base(r_sc)=sorted_base;
+        Pbase local_base = BASE_NULLE;
+        for(Pbase b = sc_base(r_sc);!BASE_NULLE_P(b);b=b->succ)
+            if(!variable_phi_p((entity)b->var))
+                local_base=base_add_variable(local_base,b->var);
 
-    Ppolynome p = sc_enumerate(r_sc,
-            local_base,
-            base_names);
+        const char * base_names [sc_dimension(r_sc)];
+        int i=0;
+        for(Pbase b = local_base;!BASE_NULLE_P(b);b=b->succ)
+            base_names[i++]=entity_user_name((entity)b->var);
+
+        ifdebug(1) print_region(reg);
+
+        p = sc_enumerate(r_sc,
+                local_base,
+                base_names);
+    }
     return p;
 }

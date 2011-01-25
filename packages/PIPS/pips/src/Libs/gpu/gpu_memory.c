@@ -65,11 +65,11 @@ gpu_memory_apply(statement s, int depth) {
   list sk = CONS(STATEMENT,
 		 perfectly_nested_loop_to_body_at_depth(s, depth),
 		 NIL);
-  outliner(build_new_top_level_module_name("kernel_wrapper"), sk);
+  outliner(build_new_top_level_module_name("kernel_wrapper",false), sk);
 
   // Outline the kernel launcher:
   list sl = CONS(STATEMENT, s, NIL);
-  outliner(build_new_top_level_module_name("kernel_launcher"), sl);
+  outliner(build_new_top_level_module_name("kernel_launcher",false), sl);
 }
 
 

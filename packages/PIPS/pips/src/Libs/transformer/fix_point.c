@@ -237,8 +237,8 @@ static void build_transfer_matrix(matrice *, Pcontrainte, int, Pbase);
 /* Let A be the affine loop transfert function. The affine transfer fix-point T
  * is such that T(A-I) = 0
  *
- * T A = 0 also gives a fix-point when merged with the initial state. It can only be
- * used to compute preconditions.
+ * T A = 0 also gives a fix-point when merged with the initial
+ * state. It can only be used to compute preconditions.
  *
  * Algorithm (let H be A's Smith normal form):
  *

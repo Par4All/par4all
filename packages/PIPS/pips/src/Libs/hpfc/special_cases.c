@@ -395,49 +395,7 @@ Pvecteur v;
     return VECTEUR_NUL_P(v) || (!v->succ && var_of(v)==TCST && val_of(v)==0);
 }
 
-bool max_one_phi_var_per_constraint(c)
-Pcontrainte c;
-{
-    for(; c; c=c->succ)
-	if (base_nb_phi(c->vecteur)>=2) return FALSE;
 
-    return TRUE;
-}
-
-/* returns TRUE is syst defines a rectangle on phi variables
- */
-bool rectangular_region_p(syst)
-Psysteme syst;
-{
-    /*  this is an approximation, and the system should be normalized
-     *  for the result to be correct, I guess...
-     */
-    return max_one_phi_var_per_constraint(sc_egalites(syst)) &&
-	   max_one_phi_var_per_constraint(sc_inegalites(syst));
-}
-
-bool rectangular_must_region_p(var, s)
-entity var;
-statement s;
-{
-    list le = load_statement_local_regions(s);
-    
-    MAP(EFFECT, e,
-     {
-	 if (reference_variable(effect_any_reference(e)) == var)
-	 {
-	     if (!approximation_exact_p(effect_approximation(e)) ||
-		 !rectangular_region_p(effect_system(e)))
-	     {
-		 pips_debug(6, "FALSE\n"); return FALSE;
-	     }
-	 }
-     },
-	 le);
-
-    pips_debug(6, "TRUE\n");
-    return TRUE;
-}
 
 /* some static variables used for the detection...
  */
