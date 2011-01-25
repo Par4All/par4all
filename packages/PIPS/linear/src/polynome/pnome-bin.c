@@ -399,3 +399,30 @@ Ppolynome pp1, pp2;
 	return (ppresult);
     }
 }
+/*============================================================================*/
+/* Ppolynome vecteur_to_polynome(Pvecteur pv): translates a Pvecteur into a
+ * Ppolynome.
+ */
+Ppolynome vecteur_to_polynome(Pvecteur pv)
+{
+  Ppolynome pp;
+
+  if(VECTEUR_NUL_P(pv))
+    pp = POLYNOME_NUL;
+  else {
+    Pvecteur vec;
+
+    pp = NULL;
+    for(vec = pv; vec != NULL; vec = vec->succ) {
+      Variable var = vecteur_var(vec);
+      float val = VALUE_TO_FLOAT(vecteur_val(vec));
+      Ppolynome newpp;
+
+      newpp = make_polynome(val, var, VALUE_ONE);
+      polynome_succ(newpp) = pp;
+      pp = newpp;
+    }
+  }
+
+  return(pp);
+}
