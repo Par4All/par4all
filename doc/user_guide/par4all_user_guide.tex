@@ -1,0 +1,521 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide}
+\usepackage{url}
+\usepackage{alltt}
+\usepackage{hyperref}
+\usepackage{abbrev_reactive}
+\usepackage{listings}
+\usepackage{color}
+
+\begin{document}
+
+\title{Par4All programming user guide\\
+  ---\\
+  HPC Project}
+
+\author{Mehdi \textsc{Amini} \and Amaury \textsc{Darsch} \and
+  Stéphanie \textsc{Even} \and Serge \textsc{Guelton} \and Ronan
+  \textsc{Keryell} \and Grégoire \textsc{Péan} \and Claire
+  \textsc{Seguin} \and Mickaël \textsc{Thievent} \and Pierre
+  \textsc{Villalon}}
+
+\maketitle
+
+\tableofcontents
+
+\section{Introduction}
+\label{sec:introduction}
+
+The backend of \Apfa defines a common interface for target languages
+and architecture such as C/OpenMP on CPUs or C for CUDA and OpenCL for
+GPUs. Based on macros, this backend can also be used independantly of
+the whole \Apfa platform, that comprises various open source tools to
+automate the migration of sequential software to multicore and other
+parallel processors.  The set of macros of the backend of \Apfa can be
+used inside a program in a very simple way, allowing the target
+architecture and/or language to be tested by changing only one
+compilation option. The main difference with using the complete \Apfa
+suite is that i) the automatic analysis to optimize the loop (prevent
+data dependence, data structuring) have to be manually performed by
+the user, ii) the source language must be C/C++ compatible.
+
+\section{The set of macros}
+\label{sec:macros}
+
+\subsection{Begin and End actions}
+
+\begin{description}
+\item[\texttt{P4A\_init\_accel}] Initialize the use of the hardware
+  accelerator ;
+\item[\texttt{P4A\_release\_accel}] Release the hardware accelerator.
+\end{description}
+
+Those two commands must be placed once at the beginning and once at
+the end of the program. In addition, the \texttt{p4a\_accel.h} must be
+included from the main file.
+
+\subsection{Memory allocation and copy}
+
+\begin{description}
+\item[\texttt{P4A\_accel\_malloc(void **address, size\_t size)}]
+  Allocate memory on the hardware accelerator.
+
+  \begin{description}
+  \item[address] Address of the allocated memory zone;
+  \item[size] Size of the memory zone to be allocated.
+  \end{description}
+
+\item[\texttt{P4A\_accel\_free(void *address)}]
+  Free memory on the hardware accelerator.
+
+   \begin{description}
+  \item[address] Address of the memory zone to be free.
+  \end{description}
+ 
+
+\item[\texttt{P4A\_copy\_to\_accel(size\_t element\_size, void
+    *host\_address, const void *accel\_address)}] Copy a scalar or a
+  compact memory zone from the host to the hardware accelerator;
+
+  \begin{description}
+  \item[element\_size] Total size in byte of the memory that must be copied;
+  \item[host\_address] Address of the host memory zone from where to copy;
+  \item[accel\_address] Address of the device memory where to copy.
+  \end{description}
+
+
+\item[\texttt{P4A\_copy\_from\_accel(size\_t element\_size, void
+    *host\_address, const void *accel\_address)}] Copy a scalar or a
+  compact memory zone from the hardware accelerator to the host.  Do
+  not change the place of the pointers in the API. The host address is
+  always first.
+
+  \begin{description}
+  \item[element\_size] Total size of the memory that must be copied;
+  \item[host\_address] Address of the host memory zone from where to copy;
+  \item[accel\_address] Address of the device memory where to copy.
+  \end{description}
+
+
+
+\item[\texttt{P4A\_copy\_to\_accel\_1d(size\_t element\_size, size\_t
+    d1\_size,size\_t d1\_block\_size, size\_t d1\_offset, void
+    *host\_address, const void *accel\_address)}] Function for copying
+  a 1D memory zone from the host to a compact memory zone in the
+  hardware accelerator.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in the array;
+  \item[d1\_block\_size] The number of element to transfer;
+  \item[d1\_offset] The element order to start the transfer from (host
+    side);
+  \item[host\_address] Address of the host memory zone from where to copy;
+  \item[accel\_address] Address of the device memory where to copy.
+  \end{description}
+
+
+\item[\texttt{P4A\_copy\_from\_accel\_1d(size\_t element\_size,
+    size\_t d1\_size,size\_t d1\_block\_size, size\_t d1\_offset, void
+    *host\_address, const void *accel\_address)}] Function for copying
+  a compact memory zone from the hardware accelerator to a 1D array in the
+  host.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in the array;
+  \item[d1\_block\_size] The number of element to transfer;
+  \item[d1\_offset] The element order to start the transfer to (host
+    side);
+  \item[host\_address] Address of the host memory zone where to copy;
+  \item[accel\_address] Address of the device memory from where to copy.
+  \end{description}
+
+
+\item[\texttt{P4A\_copy\_to\_accel\_2d(size\_t element\_size, size\_t
+    d1\_size, size\_t d2\_size, size\_t d1\_block\_size, size\_t
+    d2\_block\_size, size\_t d1\_offset, size\_t d2\_offset, void
+    *host\_address, const void *accel\_address)}] Function for copying
+  a 2D memory zone from the host to a compact memory zone in the
+  hardware accelerator.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in a row;
+  \item[d2\_size] The number of rows;
+  \item[d1\_block\_size] The number of element to transfer in a row;
+  \item[d2\_block\_size] The number of rows to transfer;
+  \item[d1\_offset] The element order to start the transfer from (host
+    side);
+  \item[d2\_offset] The number of rows to be skipped (host side);
+  \item[host\_address] Address of the host memory zone from where to copy;
+  \item[accel\_address] Address of the device memory where to copy.
+  \end{description}
+
+
+\item[\texttt{P4A\_copy\_from\_accel\_2d(size\_t element\_size, size\_t
+    d1\_size, size\_t d2\_size, size\_t d1\_block\_size, size\_t
+    d2\_block\_size, size\_t d1\_offset, size\_t d2\_offset, void
+    *host\_address, const void *accel\_address)}] Function for copying
+  a 2D memory zone from the accelerator (compact zone) to the host.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in a row;
+  \item[d2\_size] The number of rows;
+  \item[d1\_block\_size] The number of element to transfer in a row;
+  \item[d2\_block\_size] The number of rows to transfer;
+  \item[d1\_offset] The element order to start the transfer
+    to (host side);
+  \item[d2\_offset] The number of rows to be skipped (host side);
+  \item[host\_address] Address of the host memory zone where to copy;
+  \item[accel\_address] Address of the device memory from where to copy.
+  \end{description}
+
+\item[\texttt{P4A\_copy\_to\_accel\_3d(size\_t element\_size, size\_t
+    d1\_size, size\_t d2\_size, size\_t d2\_size, size\_t
+    d1\_block\_size, size\_t d2\_block\_size, size\_t d3\_block\_size,
+    size\_t d1\_offset, size\_t d2\_offset, size\_t d3\_offset, void
+    *host\_address, const void *accel\_address)}] Function for copying
+  a 3D memory zone from the host to a compact memory zone in the
+  hardware accelerator.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in a row;
+  \item[d2\_size] The number of rows;
+  \item[d3\_size] The number of elements in the third dimension;
+  \item[d1\_block\_size] The number of element to transfer in a row;
+  \item[d2\_block\_size] The number of rows to transfer;
+  \item[d3\_block\_size] The number of element in the third
+    dimension to transfer;
+  \item[d1\_offset] The element order to start the transfer from (host
+    side);
+  \item[d2\_offset] The number of rows to be skipped (host side);
+  \item[d2\_offset] The number of element in the third dimension to
+    be skipped (host side);
+  \item[host\_address] Address of the host memory zone from where to copy;
+  \item[accel\_address] Address of the device memory where to copy.
+  \end{description}
+
+
+\item[\texttt{P4A\_copy\_from\_accel\_3d(size\_t element\_size,
+    size\_t d1\_size, size\_t d2\_size, size\_t d1\_block\_size,
+    size\_t d2\_block\_size, size\_t d1\_offset, size\_t d2\_offset,
+    void *host\_address, const void *accel\_address)}] Function for
+  copying memory from the hardware accelerator to a 3D array in the
+  host.
+
+  \begin{description}
+  \item[element\_size] The size of one element of the array in byte;
+  \item[d1\_size] The number of elements in a row;
+  \item[d2\_size] The number of rows;
+  \item[d3\_size] The number of elements in the third dimension;
+  \item[d1\_block\_size] The number of element to transfer in a row;
+  \item[d2\_block\_size] The number of rows to transfer;
+  \item[d3\_block\_size] The number of element in the third dimension
+    to transfer;
+  \item[d1\_offset] The element order to start the transfer to (host
+    side);
+  \item[d2\_offset] The number of rows to be skipped (host side);
+  \item[d2\_offset] The number of element in the third dimension to be
+    skipped (host side);
+  \item[host\_address] Address of the host memory zone where to copy;
+  \item[accel\_address] Adress of the device memory from where to copy.
+  \end{description}
+
+\end{description}
+
+\subsection{The call to the kernel}
+
+The core of the computation, typically a loop, will constitute the kernel.
+The call to the kernel must follows many rules :
+
+\begin{enumerate}
+\item the kernel must be isolated is a separate file. For many kernel,
+  each kernel must be in a separate file;
+\item the kernel file must contain a kernel\_wrapper and the kernel itself;
+\item the kernel\_wrapper is the function that is called from the main
+  file. It must be declared from there (prototype);
+\item the name of the file containing the kernel function and the
+  kernel\_wrapper must be equal to the kernel\_wrapper name;
+\item absolutely avoid the name <<kernel>> for the kernel. This a key
+  word for some languages;
+\item the \texttt{p4a\_accel\_wrapper.h} file must be included in each
+  kernel file;
+\item apart from \texttt{p4a\_accel\_wrapper.h}, avoid inclusion of files
+  in the kernel file. That means that internal struct, typedef or
+  specific macros must be explicitly replicated.
+\end{enumerate}
+
+\begin{description}
+\item[\texttt{P4A\_wrapper\_proto(kernel, ...)}] To automatically
+  declare the prototype of a kernel\_wrapper. Must be placed at the
+  head of the main file.
+
+  \begin{description}
+  \item[kernel] The name of the kernel wrapper to be called from the main file;
+  \item[...] List of the arguments to the kernel wrapper.
+  \end{description}
+
+\item[\texttt{P4A\_call\_accel\_kernel\_1d(kernel,
+    P4A\_n\_iter\_0,...)}] Call a kernel in a 1-dimension parallel
+  loop.
+
+  \begin{description}
+  \item[kernel] The name of the kernel wrapper called from the main file;
+  \item[P4A\_n\_iter\_0] Maximum  value of the iteration indice in the loop;
+  \item[...] List of the arguments to the kernel wrapper.
+  \end{description}
+
+\item[\texttt{P4A\_call\_accel\_kernel\_2d(kernel,
+    P4A\_n\_iter\_0,P4A\_n\_iter\_1,...)}] Call a kernel in a
+  2-dimension parallel loop.
+
+  \begin{description}
+  \item[kernel] The name of the kernel wrapper called from the main file;
+  \item[P4A\_n\_iter\_0] Maximum value of the external iteration
+    indice in the loop;
+  \item[P4A\_n\_iter\_1] Maximum value of the internal iteration
+    indice in the loop;
+  \item[...] List of the arguments to the kernel wrapper.
+  \end{description}
+
+\end{description}
+
+Appart from the prototype and call macros, \Apfa defines some general
+key words for functions and arguments types :
+
+\begin{description}
+\item[P4A\_accel\_kernel] A declaration attribute for the
+  hardware-accelerated kernel. The type must be specified in addition;
+\item[P4A\_accel\_kernel\_wrapper] A declaration attribute for the
+  hardware-accelerated kernel wrapper. As the type must be void, it is
+  included in the macro.
+\item[P4A\_accel\_constant\_address] Some constant variable, even in
+  the argument list;
+\item[P4A\_accel\_global\_address] Address of a variable placed in the global
+  memory pool in the hardware-accelerated;
+\item[P4A\_accel\_local\_address] Address of a variable placed in the local
+  memory pool in the hardware-accelerated;
+\item[P4A\_vp\_0] The local external indice value in the loop;
+\item[P4A\_vp\_1] The local first internal indice value in the loop;
+\item[P4A\_vp\_2] The local second internal indice value in the loop.
+\end{description}
+
+\subsection{The timer functions}
+
+The timer functions is composed of the calls :
+
+\begin{description}
+\item[\texttt{P4A\_accel\_timer\_start}] To start the timer;
+\item[\texttt{P4A\_accel\_timer\_stop\_and\_float\_measure()}] To stop
+  the timer. Returns the elapsed time since the last
+  P4A\_accel\_timer\_start call (in seconds);
+\end{description}
+
+
+\section{Example}
+\lstset{language=C,stepnumber=1,rulesepcolor=\color{blue}}
+
+\subsection{Original version}
+The example is based on the Jacobi calculated over an
+image.  Appart from the read and write of the results, the original
+loop, written in C, looks like :
+
+\begin{lstlisting}
+typedef float float_t;
+#define SIZE 501
+#define T 400
+
+float_t space[SIZE][SIZE];
+float_t save[SIZE][SIZE];
+
+void compute() {
+  int i, j;
+
+  /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+     could use also a flip-flop dimension instead... */
+  for(i = 1;i < SIZE - 1; i++)
+    for(j = 1;j < SIZE - 1; j++) {
+      save[i][j] = 0.25*(space[i - 1][j] + space[i + 1][j]
+			  + space[i][j - 1] + space[i][j + 1]);
+    }
+  for(i = 1;i < SIZE - 1; i++)
+    for(j = 1;j < SIZE - 1; j++) {
+      space[i][j] = 0.25*(save[i - 1][j] + save[i + 1][j]
+			  + save[i][j - 1] + save[i][j + 1]);
+    }
+}
+
+
+int main(int argc, char *argv[]) {
+  
+  for(t = 0; t < T; t++) {
+    compute();
+  }
+}
+\end{lstlisting}
+
+\subsection{P4A transformations}
+
+\subsubsection{The begin and End actions}
+\begin{lstlisting}
+int main(int argc, char *argv[]) {
+  P4A_init_accel;
+  for(t = 0; t < T; t++) {
+    compute();
+  }
+  P4A_release_accel;
+}
+
+\end{lstlisting}
+
+\subsubsection{Memory allocation and copy with timer}
+\begin{lstlisting}
+int main(int argc, char *argv[]) {
+  P4A_init_accel;
+
+  P4A_accel_timer_start;
+  float_t (*p4a_var_space)[SIZE][SIZE];
+  P4A_accel_malloc((void **) &p4a_var_space, sizeof(space));
+  P4A_copy_to_accel(sizeof(space), space, p4a_var_space);
+
+  float_t (*p4a_var_save)[SIZE][SIZE];
+  P4A_accel_malloc((void **) &p4a_var_save, sizeof(save));
+  P4A_copy_to_accel(sizeof(space), save, p4a_var_save);
+  double copy_time = P4A_accel_timer_stop_and_float_measure();
+
+  for(t = 0; t < T; t++) {
+    compute();
+  }
+
+  P4A_accel_timer_start;
+  P4A_copy_from_accel((size_t)sizeof(space), (void *)space, (void *)p4a_var_space);
+  copy_time += P4A_accel_timer_stop_and_float_measure();
+  fprintf(stderr, "Time for copy : %f s\n", copy_time);
+
+  P4A_accel_free(p4a_var_space);
+  P4A_accel_free(p4a_var_save);
+  P4A_release_accel;
+}
+
+\end{lstlisting}
+
+\subsubsection{Loop transformation}
+
+There are two kernels. Two files must be created, one for each kernel.
+
+
+The file for the first kernel must be called
+\texttt{kernel1\_wrapper.c}, in correspondence with the name given to
+the kernel1 wrapper function :
+
+\begin{lstlisting}
+#include "p4a_accel_wrapper.h"
+typedef float float_t;
+#define SIZE 501
+
+
+P4A_accel_kernel void kernel1(P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE],int i, int j) 
+{ 
+  save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
+}
+
+P4A_accel_kernel_wrapper kernel1_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE])
+{
+    
+  int i = P4A_vp_0;
+  int j = P4A_vp_1;
+  if(i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
+    kernel1(space, save, i, j);
+}
+\end{lstlisting}
+
+In the same way, the \texttt{kernel2\_wrapper.c} file contains :
+
+\begin{lstlisting}
+#include "p4a_accel_wrapper.h"
+typedef float float_t;
+#define SIZE 501
+
+P4A_accel_kernel void kernel2(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE], int i, int j)
+{
+   space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);
+}
+
+P4A_accel_kernel_wrapper kernel2_wrapper(P4A_accel_global_address float_t space[SIZE][SIZE], P4A_accel_global_address float_t save[SIZE][SIZE])
+{
+  int j = P4A_vp_1;
+  int i = P4A_vp_0;
+
+  if (i >= 1 && i <= SIZE - 2 && j >= 1 && j <= SIZE - 2)
+    kernel2(space, save, i, j);
+}
+\end{lstlisting}
+
+The transformations in the main are i) adding the kernels wrapper prototypes, ii) call to the kernels wrappers via \texttt{P4A\_call\_accel\_kernel\_2d()}.
+
+
+\begin{lstlisting}
+#include <p4a_accel.h>
+#include <stdio.h>
+#include <stdlib.h>
+typedef float float_t;
+#define SIZE 501
+#define T 400
+
+float_t space[SIZE][SIZE];
+// For the dataparallel semantics:
+float_t save[SIZE][SIZE];
+
+// Prototypes for the two kernels of jacobi
+P4A_wrapper_proto(kernel1_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
+P4A_wrapper_proto(kernel2_wrapper,P4A_accel_global_address float_t space[SIZE][SIZE],P4A_accel_global_address float_t save[SIZE][SIZE]);
+
+void compute(float_t space[SIZE][SIZE], float_t save[SIZE][SIZE]) {
+  int i, j;
+
+  /* Use 2 array in flip-flop to have dataparallel forall semantics. I
+     could use also a flip-flop dimension instead... */
+ P4A_call_accel_kernel_2d(kernel1_wrapper, SIZE, SIZE, space, save);
+ P4A_call_accel_kernel_2d(kernel2_wrapper, SIZE, SIZE, space, save);
+}
+
+int main(int argc, char *argv[]) {
+  ...
+
+  P4A_accel_timer_start;
+  for(t = 0; t < T; t++)
+    compute(*p4a_var_space, *p4a_var_save);
+  double execution_time = P4A_accel_timer_stop_and_float_measure();
+  fprintf(stderr, "Execution time : %f s\n", execution_time);
+
+  ...
+}
+
+\end{lstlisting}
+
+\subsubsection{To compile}
+
+A specific \texttt{p4a\_accel.mk} file has been created to help
+compiling. The Makefile created from the user must contain the
+definition of \texttt{TARGET, CFILES, KERNELFILES} and
+\texttt{P4A\_ACCEL\_DIR}.  \texttt{DUMMYFILE} is added to the make
+clean and can be used to define some output, non permanent, files.
+
+\begin{lstlisting}
+TARGET = jacobi
+CFILES = jacobi-p4a.c
+KERNELFILES = kernel1_wrapper.c kernel2_wrapper.c
+DUMMYFILE = output.pgm
+
+P4A_ACCEL_DIR = ../../..
+include $(P4A_ACCEL_DIR)/p4a_accel.mk
+\end{lstlisting}
+
+The command \texttt{make} will make the seq, openmp, cuda and opencl binaries.
+But \texttt{make seq}, \texttt{make openmp}, \texttt{make cuda} and \texttt{make opencl} are working as well.
+
+\end{document}

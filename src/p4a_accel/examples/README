@@ -1,0 +1,18 @@
+In each example C sub-sirectory
+- make
+- make run
+- make display
+
+In each example P4A sub-directory :
+- make
+- or make seq
+- or make openmp
+- or make cuda
+- or make opencl
+
+- make run-seq
+- or make run-omp
+- or make run-cuda
+- or make run-cl
+
+- make display
