@@ -1,6 +1,19 @@
 #include "stars-pm-cuda.h"
 
 //========================================================================
+__global__ void k_forcex1( float *pot, float *fx)
+{
+  int tx=threadIdx.x;
+  int bx=blockIdx.x;
+  int by=blockIdx.y;
+
+  int idloc=bx+by*NP+tx*NP*NP;
+  int idlocp=bx+by*NP+((tx+1)&(NP-1))*NP*NP;
+  int idlocm=bx+by*NP+((tx-1)&(NP-1))*NP*NP;
+
+  fx[idloc]=(pot[idlocp]-pot[idlocm])/(2.f*DX);
+}
+
 #define STRIDE_FORCE32 32
 #define STRIDE_FORCE64 64
 __global__ void k_forcex32(float *pot, float *fx)
@@ -22,7 +35,7 @@ __global__ void k_forcex32(float *pot, float *fx)
     idx=(idx+NP*NP)&(NP*NP*NP-1);
     c = pot[idx];
 
-    fx[oldIdx] = (c-a )/(2.*DX);
+    fx[oldIdx] = (c-a )/(2.f*DX);
 
     a = b;
     b = c;
@@ -48,7 +61,7 @@ __global__ void k_forcex64(float *pot, float *fx)
     idx=(idx+NP*NP)&(NP*NP*NP-1);
     c = pot[idx];
 
-    fx[oldIdx] = (c-a )/(2.*DX);
+    fx[oldIdx] = (c-a )/(2.f*DX);
 
     a = b;
     b = c;
@@ -59,15 +72,18 @@ __global__ void k_forcex64(float *pot, float *fx)
 
 
 void forcex(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
-  dim3 dimGridForceX32(NP/STRIDE_FORCE32,NP);
-  dim3 dimGridForceX64(NP/STRIDE_FORCE64,NP);
   dim3 dimBlockForce(NP);
 
-  if(NP<64) {
-    P4A_launch_kernel(dimGridForceX32, dimBlockForce, k_forcex32, (float *)pot,(float *)fx);
-  } else {
-    P4A_launch_kernel(dimGridForceX64, dimBlockForce, k_forcex64, (float *)pot,(float *)fx);
-  }
+#if NP<32
+  dim3 dimGridForce(NP,NP);
+  P4A_launch_kernel(dimGridForce, dimBlockForce, k_forcex1, (float *)pot,(float *)fx);
+#elif NP<64
+  dim3 dimGridForceX32(NP/STRIDE_FORCE32,NP);
+  P4A_launch_kernel(dimGridForceX32, dimBlockForce, k_forcex32, (float *)pot,(float *)fx);
+#else
+  dim3 dimGridForceX64(NP/STRIDE_FORCE64,NP);
+  P4A_launch_kernel(dimGridForceX64, dimBlockForce, k_forcex64, (float *)pot,(float *)fx);
+#endif
 }
 
 
@@ -89,7 +105,7 @@ __global__ void k_forcey(float *pot, float *fx)
   float x1 = pot[prevCoord];
   float x2 = pot[nextCoord];
 
-  fx[cellCoord]=(x2-x1)/(2.*DX);
+  fx[cellCoord]=(x2-x1)/(2.f*DX);
 }
 
 void forcey(float pot[NP][NP][NP], float fx[NP][NP][NP]) {
@@ -118,7 +134,7 @@ __global__ void k_forcez( float *pot, float *fx )
   float x1 = spot[ ((unsigned int)(tx - 1 )) % NP ];
   float x2 = spot[ (tx + 1 ) % NP ];
 
-  fx[cellCoord]=(x2-x1)/(2.*DX);
+  fx[cellCoord]=(x2-x1)/(2.f*DX);
 }
 
 void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {

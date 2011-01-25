@@ -17,7 +17,7 @@ kernel_launcher_declarations = {}
 
 # To catch stuff like
 # void p4a_kernel_launcher_1(void *accel_address, void *host_address, size_t n);
-kernel_launcher_declaration = re.compile("void (p4a_kernel_launcher_\\d+)[^;]+")
+kernel_launcher_declaration = re.compile("void (p4a_kernel_launcher_\\w+)[^;]+")
 
 def gather_kernel_launcher_declarations(file_name):
     f = open(file_name)
@@ -97,8 +97,8 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?(?#
           to skip to the next "Loop nest P4A end", not the last one...
         )// Loop nest P4A end\n.*?(?#
-          to skip to "the p4a_kernel_wrapper", not the last one...
-        )(p4a_kernel_wrapper_\\d+)\\(([^;]*)\\;.*?(?#
+          to skip to "the p4a_wrapper", not the last one...
+        )(p4a_wrapper_\\w+)\\(([^;]*)\\;.*?(?#
           no slurp to the next "}" at the begin of a line
         )\n}""",
       "P4A_call_accel_kernel_\\1d(\\3, \\2, \\4;\n}", content)

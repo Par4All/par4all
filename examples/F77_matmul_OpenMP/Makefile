@@ -19,6 +19,6 @@ matmul_par:
 
 clean:
 	rm -rf *.database p4a_new_files *.build
-	rm -f *.o *~ *.mod
+	rm -f *.o *~ *.mod *.p4a.f
 	rm -f matmul
 	rm -f matmul_par

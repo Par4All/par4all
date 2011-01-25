@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   int npdt = 0;
   float dt = DT / 2; // Will be 1/2 only for the first iteration
   char * icfile;
-
+  double start_time,end_time; // Timing stuff
 
 
   /******************************************************
@@ -55,17 +55,21 @@ int main(int argc, char **argv) {
       graphic_gldraw(argc, argv, pos); // Initialize Opengl
 #endif
 
+  /*** TIMING ***/
+  start_time = get_time();
+  /***        ***/
 
 
   /******************************************************
    *                  MAIN LOOP !!
    ******************************************************/
   for (time = 0; time <= TMAX; time += DT) {
+#ifndef P4A_BENCH
     if(0 == npdt % MODDISP) {
       puts("**********************************");
       printf("Time= %5.2e Npdt= %d\n", time, npdt);
     }
-
+#endif
     // Stage 1 : discretization of particles position
     discretization(pos, data);
 
@@ -112,6 +116,13 @@ int main(int argc, char **argv) {
   }
   //************************************  END LOOP  ********************************
 
+
+  /*** TIMING ***/
+  end_time = get_time();
+  fprintf(stderr," P4A: Time for '%s' : %fms\n",__FUNCTION__, (end_time-start_time)*1000);
+  /***        ***/
+
+
   // Free ftt allocation
   potential_free_plan();
 
@@ -122,9 +133,12 @@ int main(int argc, char **argv) {
   graphic_gldestroy(); // Free opengl stuff
 #endif
 
+
+#ifndef P4A_BENCH
   puts("-----------------------------");
   puts("         Finished");
   puts("-----------------------------");
+#endif
 
   return 0;
 }
