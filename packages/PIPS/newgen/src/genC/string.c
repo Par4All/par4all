@@ -331,3 +331,31 @@ list strsplit(const char *s,const char *d)
 int gen_qsort_string_cmp(const void * s1, const void *s2) {
   return strcmp(*(char **)s1, *(char **)s2);
 }
+
+/**
+ * @brief Prepend the prefix to the string. Free the destination string
+ * if needed
+ * @param dst, the string to be modified
+ * @param prefix, the prefix to be prepended
+ */
+void str_prepend (string* dst, string prefix) {
+  if ((prefix == NULL) || prefix == string_undefined || strlen (prefix) == 0)
+	return;
+  string old = * dst;
+  *dst = strdup (concatenate (prefix, *dst,NULL));
+  free (old);
+}
+
+/**
+ * @brief Append the suffix to the string. Free the destination string
+ * if needed
+ * @param dst, the string to be modified
+ * @param suffix, the suffix to be appended
+ */
+void str_append (string* dst, string suffix) {
+  if ((suffix == NULL) || suffix == string_undefined || strlen (suffix) == 0)
+	return;
+  string old = * dst;
+  *dst = strdup (concatenate (*dst, suffix, NULL));
+  free (old);
+}
