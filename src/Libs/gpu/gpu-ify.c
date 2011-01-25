@@ -37,6 +37,7 @@ static list loop_nests_to_outline;
 static string kernel_prefix   = 0;
 static string wrapper_prefix  = 0;
 static string launcher_prefix = 0;
+static string fwrapper_prefix = 0;
 
 
 /* Return a pointer on the first char after the bad_prefix */
@@ -59,10 +60,12 @@ static const char* get_clean_mod_name(const char *mod_name) {
   kernel_prefix   = get_string_property("GPU_KERNEL_PREFIX");
   launcher_prefix = get_string_property("GPU_LAUNCHER_PREFIX");
   wrapper_prefix  = get_string_property("GPU_WRAPPER_PREFIX");
+  fwrapper_prefix = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
 
   const char * clean_mod_name = mod_name;
 
   clean_mod_name = clean_prefix(clean_mod_name,launcher_prefix);
+  clean_mod_name = clean_prefix(clean_mod_name,fwrapper_prefix);
   clean_mod_name = clean_prefix(clean_mod_name,wrapper_prefix);
   clean_mod_name = clean_prefix(clean_mod_name,kernel_prefix);
   return clean_mod_name;
@@ -271,11 +274,12 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     statement st;
     st = outliner(build_outline_name(launcher_prefix, mod_name), sl);
     if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
-      string fwp = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
+      string fwp = strdup(concatenate(fwrapper_prefix,"_",mod_name,NULL));
       ifdebug(3) {
         pips_debug(1, "Outline Fortan_wrapper with prefix %s\n", fwp);
       }
-      outliner (build_new_top_level_module_name(fwp,true),CONS(STATEMENT,st,NIL));
+      outliner (build_new_top_level_module_name(fwp, true),CONS(STATEMENT,st,NIL));
+	  free(fwp);
     }
     //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
   }
@@ -314,7 +318,7 @@ bool gpu_ify(const string mod_name) {
   const char* clean_mod_name=get_clean_mod_name(global_name_to_user_name(entity_name(get_current_module_entity())));
 
   FOREACH(STATEMENT, s, loop_nests_to_outline) {
-    // We could have stored the depth, but it complexify the code...
+    // We could have stored the depth, but it complexifies the code...
     gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s),clean_mod_name);
   }
 
