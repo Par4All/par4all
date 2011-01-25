@@ -3245,7 +3245,6 @@ expression polynome_to_expression(Ppolynome pp)
  */
 Ppolynome expression_to_polynome(expression exp)
 {
-#define ENTITY_FOUR_OPERATION_P(s) (ENTITY_PLUS_P(s) || ENTITY_MINUS_P(s) || ENTITY_MULTIPLY_P(s) || ENTITY_DIVIDE_P(s))
     Ppolynome pp_new=POLYNOME_UNDEFINED; /* This the resulting polynome */
     syntax sy = expression_syntax(exp);
 
@@ -3286,7 +3285,7 @@ Ppolynome expression_to_polynome(expression exp)
                     /* The call must be one of the four classical operations:
                      *	+, - (unary or binary), *, /
                      */
-                    if(ENTITY_FOUR_OPERATION_P(op_ent))
+                    if(ENTITY_FIVE_OPERATION_P(op_ent))
                     {
                         /* This call has one (unary minus) or two (binary plus, minus,
                          * multiply or divide) arguments, no less and no more.
@@ -3356,7 +3355,6 @@ Ppolynome expression_to_polynome(expression exp)
             }
     }
     return(pp_new);
-#undef ENTITY_FOUR_OPERATION_P
 }
 
 /* use polynomials to simplify an expression */
