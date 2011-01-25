@@ -3,6 +3,8 @@ delete SAXPY
 
 create SAXPY kernels/SAXPY/SAXPY.f include/simd.f
 
+setproperty CROUGH_PRINT_UNKNOWN_INTRINSIC TRUE
+
 module SAXPY
 
 source include/fortran.tpips

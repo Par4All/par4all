@@ -1,39 +1,30 @@
-// this program has an invariant of kind -b<=a.s<=b which cannot be
-// derived from T'(dx)
+// This example requires transformer lists to be properly analyzed
 
-// New version of maisonneuve07.c, implemented with nested whiles
-// instead of while, and some more modifications.
-
-// $Id: $
+// $Id$
 
 #include <stdlib.h>
-#include <stdio.h>
 
-int alea() {
-  return rand() % 2;
+int flip(void) {
+	return rand() % 2;
 }
 
-void run(void)
-{
-  int x = 0;
-  int t = 0;
-  int b = 10; // b>0 should be enough
-  // while(x >= -b || x<=b) { no results at all with an or which is
-  // always true...
-  while(x >= -b && x<=b) { // this restrict the initial state and the
-			   // boundaries of maisonneuve07.c
-    if(1) {
-      if(1) while(alea() && x>=-b) x--, t++;
-      if(1) while(alea() && x<=b) x++, t++;
-      if(1) while(alea()) t++;
-    }
-  }
-  return;
+void run(void) {
+	int j;
+	j = 0;
+	
+	while (flip()) {
+		if (j > 8) {
+			"unreachable";
+		}
+		if (flip()) {
+			if (j < 8) {j++;}
+		}
+	}
+	
 }
 
-int main(void)
-{
-  run();
-  return 0;
+int main(void) {
+	run();
+	return 0;
 }
 

@@ -1,0 +1,86 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+//  T(j) {}
+
+   int j;
+
+//  T(j) {j==0}
+
+   j = 0;
+
+//  T(j) {0<=j, j#init<=j}
+
+
+   while (flip()) {
+
+//  T() {}
+
+      if (j>8)
+
+//  T() {9<=j}
+
+         "unreachable";
+
+//  T(j) {j#init<=j, j<=j#init+1}
+
+      if (flip())
+
+//  T(j) {j#init<=j, j<=j#init+1}
+
+         if (j<8)
+
+//  T(j) {j==j#init+1, j<=8}
+
+            j++;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int j;
+
+//  P(j) {}
+
+   j = 0;
+
+//  P(j) {j==0}
+
+
+   while (flip()) {
+
+//  P(j) {0<=j, j<=8}
+
+      if (j>8)
+
+//  P() {0==-1}
+
+         "unreachable";
+
+//  P(j) {0<=j, j<=8}
+
+      if (flip())
+
+//  P(j) {0<=j, j<=8}
+
+         if (j<8)
+
+//  P(j) {0<=j, j<=7}
+
+            j++;
+   }
+}

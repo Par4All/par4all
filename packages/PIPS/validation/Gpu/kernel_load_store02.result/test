@@ -3,28 +3,28 @@ void give()
    int k;
    double array[N];
 
-   p4a_kernel_launcher_0(N, array, &k);
+   p4a_launcher_give(N, array, &k);
 
    exit(k);
 }
-void p4a_kernel_0(int N, double array[N], int k)
+void p4a_kernel_give(int N, double array[N], int k)
 {
    array[k] = 0;
 }
-void p4a_kernel_launcher_0(int N, double array[N], int *k)
+void p4a_launcher_give(int N, double array[N], int *k)
 {
 
    *k = 0;
    while (*k<=99) {
       // To be assigned to a call to P4A_vp_0: k
-      p4a_kernel_wrapper_0(N, array, *k);
+      p4a_wrapper_give(N, array, *k);
       *k += 1;
    }
 }
-void p4a_kernel_wrapper_0(int N, double array[N], int k)
+void p4a_wrapper_give(int N, double array[N], int k)
 {
    // To be assigned to a call to P4A_vp_0: k
-   p4a_kernel_0(N, array, k);
+   p4a_kernel_give(N, array, k);
 }
 [after unsplit and recovering]
 /*
@@ -38,23 +38,23 @@ enum {N=100};
 
 void give();
 //PIPS generated variable
-void p4a_kernel_0(int N, double array[N], int k), p4a_kernel_wrapper_0(int N, double array[N], int k), p4a_kernel_launcher_0(int N, double array[N], int *k);
-void p4a_kernel_launcher_0(int N, double array[N], int *k)
+void p4a_kernel_give(int N, double array[N], int k), p4a_wrapper_give(int N, double array[N], int k), p4a_launcher_give(int N, double array[N], int *k);
+void p4a_launcher_give(int N, double array[N], int *k)
 {
 
    *k = 0;
    while (*k<=99) {
       // To be assigned to a call to P4A_vp_0: k
-      p4a_kernel_wrapper_0(N, array, *k);
+      p4a_wrapper_give(N, array, *k);
       *k += 1;
    }
 }
-void p4a_kernel_wrapper_0(int N, double array[N], int k)
+void p4a_wrapper_give(int N, double array[N], int k)
 {
    // To be assigned to a call to P4A_vp_0: k
-   p4a_kernel_0(N, array, k);
+   p4a_kernel_give(N, array, k);
 }
-void p4a_kernel_0(int N, double array[N], int k)
+void p4a_kernel_give(int N, double array[N], int k)
 {
    array[k] = 0;
 }
@@ -63,7 +63,7 @@ void give()
    int k;
    double array[N];
 
-   p4a_kernel_launcher_0(N, array, &k);
+   p4a_launcher_give(N, array, &k);
 
    exit(k);
 }

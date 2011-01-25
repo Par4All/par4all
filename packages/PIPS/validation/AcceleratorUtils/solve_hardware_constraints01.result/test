@@ -5,18 +5,6 @@ here:
    for(i = 0; i <= N-1; i += 1)
       a[i] = a[i+1];
 }
----------------------------------------
-Domain:
-         N  -1 >= 0
-          1 >= 0
-
-Vertices:
-[ N ]
-[ 0 ]
-
-Ehrhart Polynomial:
-( 1 * N + 1 )
-
 void doiv(int a[128])
 {
    int i;

@@ -22,13 +22,13 @@ Code after array conversion
 
 int main()
 {
-   int *riri = alloca(sizeof(int[10]));
+   int *riri = (int *) alloca(sizeof(int[10]));
    
    
    
-   int *fifi = alloca(sizeof(int[6]));
+   int *fifi = (int *) alloca(sizeof(int[6]));
    int size = 2;
-   int *loulou = alloca(sizeof(int[6*size]));
+   int *loulou = (int *) alloca(sizeof(int[6*size]));
    int i, j, k = 16;
    riri[0] = 0;
    riri[1] = 1;

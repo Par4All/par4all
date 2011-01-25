@@ -1,0 +1,27 @@
+//  {}
+int main()
+{
+//  points to = {}
+   float t;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   float *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i;
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   a = (float *) malloc(10*sizeof(float));
+//  {(a,*HEAP*_l_9,-Exact-)}
+
+   t = 1.0;
+//  {(a,*HEAP*_l_9,-Exact-)}
+   while (t<2.0) {
+//  {(a,*HEAP*_l_9,-Exact-)}
+      for(i = 0; i <= 9; i += 1)
+//  {(a,*HEAP*_l_9,-Exact-)}
+         a[i] = a[i]+t*0, 5;
+//  {(a,*HEAP*_l_9,-Exact-)}
+      t+0, 01;
+   }
+//  {(a,*HEAP*_l_9,-Exact-)}
+   return 0;
+}

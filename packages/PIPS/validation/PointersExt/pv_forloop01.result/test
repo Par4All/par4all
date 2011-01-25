@@ -1,0 +1,20 @@
+//  {}
+int main()
+{
+//  points to = {}
+   float t;
+//  points to = {}
+   float a;
+//  points to = {}
+
+   t = 1.0;
+//  points to = {}
+   while (t<2.0) {
+//  points to = {}
+      a = a+t*0, 5;
+//  points to = {}
+      t += 0, 01;
+   }
+//  points to = {}
+   return 0;
+}

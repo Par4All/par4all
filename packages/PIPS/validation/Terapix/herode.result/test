@@ -82,44 +82,6 @@ l99995:
             for(x = xt; x <= MIN(__TERAPYPS_HEIGHT+xt, __TERAPYPS_HEIGHT*I_1+2)-1; x += 1)
                img_out[y][x-2] = MIN(MIN(MIN(MIN(img[y][x-2], img[y][x-1]), img[y][x]), img[y][x+1]), img[y][x+2]);
 }
----------------------------------------
-Domain:
-         __TERAPYPS_WIDTH  -128 = 0
-         __TERAPYPS_HEIGHT  -1 >= 0
-         n  -4 >= 0
-         128I_0 - yt  -128 >= 0
-         yt  >= 0
-         128I_0 - n  >= 0
-         -128I_0 + n + 127 >= 0
-
-Vertices:
-[ yt+127,  xt-2 ]
-[ yt+127,  __TERAPYPS_HEIGHT+xt-3 ]
-[ yt,  xt-2 ]
-[ yt,  __TERAPYPS_HEIGHT+xt-3 ]
-
-Ehrhart Polynomial:
-( 128 * __TERAPYPS_HEIGHT + 0 )
-
----------------------------------------
-Domain:
-         __TERAPYPS_WIDTH  -128 = 0
-         128I_0 - n  >= 0
-         __TERAPYPS_HEIGHT  -1 >= 0
-         yt  >= 0
-         128I_0 - yt  -128 >= 0
-         n  -4 >= 0
-         -128I_0 + n + 127 >= 0
-
-Vertices:
-[ yt+127,  xt-2 ]
-[ yt+127,  __TERAPYPS_HEIGHT+xt+1 ]
-[ yt,  xt-2 ]
-[ yt,  __TERAPYPS_HEIGHT+xt+1 ]
-
-Ehrhart Polynomial:
-( 128 * __TERAPYPS_HEIGHT + 512 )
-
 void runner(int n, int img_out[n][n-4], int img[n][n])
 {
    unsigned int __TERAPYPS_WIDTH = 128, __TERAPYPS_HEIGHT;

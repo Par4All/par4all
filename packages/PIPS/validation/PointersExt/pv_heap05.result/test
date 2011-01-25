@@ -1,0 +1,28 @@
+//  {}
+int main()
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int ***p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int **q;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int a = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   q = (int **) malloc(sizeof(int *));
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+   q[0] = &a;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*HEAP*_l_9,-Exact-);(q[0],
+//   a,-Exact-)}
+   p = (int ***) malloc(sizeof(int * *));
+//  {(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-);(q[0],a,-Exact-)}
+   p[0] = q;
+//  {(p,*HEAP*_l_11,-Exact-);(p[0],*HEAP*_l_9,-Exact-);(q,*HEAP*_l_9,
+//   -Exact-);(q[0],a,-Exact-)}
+   free(p);
+//  {(p,*HEAP*_l_11,-Exact-);(p[0],*HEAP*_l_9,-Exact-);(q,*HEAP*_l_9,
+//   -Exact-);(q[0],a,-Exact-)}
+   return 0;
+}

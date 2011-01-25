@@ -2002,7 +2002,7 @@ PREPEND_COMMENT "/* This comment is added by PREPEND_COMMENT phase */"
 \section{Prepending a call}
 \label{sec:prepending-call}
 
-\begin{PipsPass}{prepend_comment}
+\begin{PipsPass}{prepend_call}
 This phase inserts a call to function \verb/MY_TRACK/ just before the first statement of a module.
 Useful as a pedagogical example to explore the internal representation
 and Newgen. Not to be used for any pratical purpose as it is
@@ -2024,6 +2024,30 @@ PREPEND_CALL "MY_TRACK"
 \end{PipsProp}
 but it is not.
 
+\section{Add a pragma to a module}
+\label{sec:add-pragma}
+
+\begin{PipsPass}{add_pragma}
+This phase prepend or appends a pragma to a module.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias add_pragma 'Prepends or append a pragma to the code of a module'
+
+add_pragma > MODULE.code
+  < PROGRAM.entities
+  < MODULE.code
+\end{PipsMake}
+
+The pragma name can be defined by this property:
+\begin{PipsProp}{PRAGMA_NAME} 
+PRAGMA_NAME "MY_PRAGMA" 
+\end{PipsProp}
+
+The pragma can be append or prepend thanks to this property:
+\begin{PipsProp}{PRAGMA_PREPEND} 
+PRAGMA_PREPEND TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{remove_useless_label}
 Remove labels that are not usefull
@@ -7258,14 +7282,23 @@ it generates something like
 
 The launcher, wrapper and kernel prefix names to be used during the generation:
 \begin{PipsProp}{GPU_LAUNCHER_PREFIX}
-GPU_LAUNCHER_PREFIX "p4a_kernel_launcher"
+GPU_LAUNCHER_PREFIX "p4a_launcher"
 \end{PipsProp}
 \begin{PipsProp}{GPU_WRAPPER_PREFIX}
-GPU_WRAPPER_PREFIX "p4a_kernel_wrapper"
+GPU_WRAPPER_PREFIX "p4a_wrapper"
 \end{PipsProp}
 \begin{PipsProp}{GPU_KERNEL_PREFIX}
 GPU_KERNEL_PREFIX "p4a_kernel"
 \end{PipsProp}
+
+This boolean property control wherever the outliner use the original function
+name as a suffix instead of only numerical suffix.
+
+\begin{PipsProp}{GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME}
+GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME TRUE
+\end{PipsProp}
+
+
 For Fortran output you may need to have these prefix name in uppercase.
 
 Indeed, each level of outlining can be enabled or disabled according to
@@ -9177,7 +9210,7 @@ linearize_array > MODULE.code
 
 \begin{PipsPass}{linearize_array_fortran}
 This transformation replaces all arrays in the module by equivalent linearized
-arrays. This only works with array starting their indices at 1.
+arrays. This only makes the arrays starting their index from one.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -13693,7 +13726,9 @@ to pretty print C code in C. This pass is mainly use inside PIPS
 and Par4All to be able to generate call to CUDA kernels from a fortran code.
 The kernel is supposed not to use I/O intrinsics (such as WRITE, READ),
 they are not handle at the moment (and not usefull in the CUDA context)
-by the crough printer.
+by the crough printer. However it is still possible to print the C code with
+the name of the fortran intrinsic using the property
+CROUGH\_PRINT\_UNKNOWN\_INTRINSIC.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -13726,6 +13761,13 @@ print_interface  > MODULE.interface
 \end{PipsMake}
 
 \subsection{Properties for Fortran to C prettyprinter}
+
+By default the crough pass fails if it encounters a fortran intrinsic that
+cannot be translated to C. However it is still possible to print the C code
+with the name of the fortran intrinsic using the following property.
+\begin{PipsProp}{CROUGH_PRINT_UNKNOWN_INTRINSIC}
+CROUGH_PRINT_UNKNOWN_INTRINSIC FALSE
+\end{PipsProp}
 
 By default the crough pass tries to match the best C type for any Fortran
 type. Here is the matches between Fortran and C variables:

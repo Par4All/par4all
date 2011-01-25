@@ -1,0 +1,180 @@
+
+Transformers
+
+
+//  T() {0==-1}
+
+void run()
+{
+   // two variables : a is always 0, b is always 1
+
+//  T(a,b) {a==0, b==1}
+
+   int a = 0, b = 1;
+
+//  T() {a==0, b==1}
+
+
+   while (1)
+
+//  T(a,b) {a+b<=a#init+b#init}
+
+
+      while (1)
+
+//  T(a,b) {a==0, a#init==b-1, 1<=b#init}
+
+         if (1) {
+
+//  T() {1<=b}
+
+            if (b<1)
+
+//  T() {0==-1}
+
+               error();
+
+//  T(b) {a==b-1, 1<=b#init}
+
+            b = a+1;
+
+//  T(a) {a==0, a#init==b-1}
+
+            a = 0;
+         }
+}
+
+Preconditions
+
+
+//  P() {}
+
+void run()
+{
+   // two variables : a is always 0, b is always 1
+
+//  P() {}
+
+   int a = 0, b = 1;
+
+//  P(a,b) {a==0, b==1}
+
+
+   while (1)
+
+//  P(a,b) {a==0, b==1}
+
+
+      while (1)
+
+//  P(a,b) {a==0, b<=1}
+
+         if (1) {
+
+//  P(a,b) {a==0, b<=1}
+
+            if (b<1)
+
+//  P(a,b) {a==0, b<=0}
+
+               error();
+
+//  P(a,b) {a==0, b==1}
+
+            b = a+1;
+
+//  P(a,b) {a==0, b==1}
+
+            a = 0;
+         }
+}
+
+Transformers after refinement
+
+
+//  T() {0==-1}
+
+void run()
+{
+   // two variables : a is always 0, b is always 1
+
+//  T(a,b) {a==0, b==1}
+
+   int a = 0, b = 1;
+
+//  T() {a==0, b==1}
+
+
+   while (1)
+
+//  T(a,b) {a==0, a#init==0, b==1, b#init==1}
+
+
+      while (1)
+
+//  T(a,b) {a==0, a#init==0, b==1, b#init==1}
+
+         if (1) {
+
+//  T() {a==0, b==1}
+
+            if (b<1)
+
+//  T() {0==-1}
+
+               error();
+
+//  T(b) {a==0, b==1, b#init==1}
+
+            b = a+1;
+
+//  T(a) {a==0, a#init==0, b==1}
+
+            a = 0;
+         }
+}
+
+Preconditions after refinement
+
+
+//  P() {}
+
+void run()
+{
+   // two variables : a is always 0, b is always 1
+
+//  P() {}
+
+   int a = 0, b = 1;
+
+//  P(a,b) {a==0, b==1}
+
+
+   while (1)
+
+//  P(a,b) {a==0, b==1}
+
+
+      while (1)
+
+//  P(a,b) {a==0, b==1}
+
+         if (1) {
+
+//  P(a,b) {a==0, b==1}
+
+            if (b<1)
+
+//  P() {0==-1}
+
+               error();
+
+//  P(a,b) {a==0, b==1}
+
+            b = a+1;
+
+//  P(a,b) {a==0, b==1}
+
+            a = 0;
+         }
+}

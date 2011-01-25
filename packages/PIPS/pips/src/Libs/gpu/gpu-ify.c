@@ -31,6 +31,70 @@
 static list loop_nests_to_outline;
 
 
+/* These are the possibles prefixes for outline stuff, they are computed from a
+ * property and the current module name
+ */
+static string kernel_prefix   = 0;
+static string wrapper_prefix  = 0;
+static string launcher_prefix = 0;
+static string fwrapper_prefix = 0;
+
+
+/* Return a pointer on the first char after the bad_prefix */
+static const char* clean_prefix(const char* full_name, string bad_prefix) {
+  int len = strlen(bad_prefix);
+  if(strncasecmp(full_name,bad_prefix,len)==0) {
+    full_name = full_name+len;
+  }
+  // Jump over separator
+  if(*full_name=='_') full_name++;
+  return full_name;
+}
+
+/**
+ * Trying to get only the original function name without prefix
+ *
+ */
+static const char* get_clean_mod_name(const char *mod_name) {
+
+  kernel_prefix   = get_string_property("GPU_KERNEL_PREFIX");
+  launcher_prefix = get_string_property("GPU_LAUNCHER_PREFIX");
+  wrapper_prefix  = get_string_property("GPU_WRAPPER_PREFIX");
+  fwrapper_prefix = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
+
+  const char * clean_mod_name = mod_name;
+
+  clean_mod_name = clean_prefix(clean_mod_name,launcher_prefix);
+  clean_mod_name = clean_prefix(clean_mod_name,fwrapper_prefix);
+  clean_mod_name = clean_prefix(clean_mod_name,wrapper_prefix);
+  clean_mod_name = clean_prefix(clean_mod_name,kernel_prefix);
+  return clean_mod_name;
+}
+
+/**
+ * Build the outline function name
+ */
+static string build_outline_name(const char *base_prefix,
+                                      const char *mod_name) {
+  bool name_suffix_p = get_bool_property("GPU_OUTLINE_SUFFIX_WITH_OWNER_NAME");
+
+  char *prefix;
+  if(name_suffix_p) {
+    // strdup because concatenate is used during build_new_top_level_module_name
+    prefix = strdup(concatenate(base_prefix,"_",mod_name,NULL));
+  } else {
+    prefix = strdup(base_prefix);
+  }
+
+  string outline_name = build_new_top_level_module_name(prefix,true);
+
+  free(prefix);
+
+  return outline_name;
+}
+
+
+
 #if 0
 /* Get the intrinsic function to get iteration coordinate
 
@@ -78,6 +142,7 @@ mark_loop_to_outline(const statement s) {
 
 
 
+
 /* Transform a loop nest into a GPU kernel
 
    @param s is the loop-nest statement
@@ -122,7 +187,7 @@ mark_loop_to_outline(const statement s) {
 
 */
 static void
-gpu_ify_statement(statement s, int depth) {
+gpu_ify_statement(statement s, int depth, const char* mod_name) {
   ifdebug(1) {
     pips_debug(1, "Parallel loop-nest of depth %d\n", depth);
     print_statement(s);
@@ -137,8 +202,7 @@ gpu_ify_statement(statement s, int depth) {
        first. The kernel name with a prefix defined in the
        GPU_KERNEL_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    outliner(build_new_top_level_module_name(get_string_property("GPU_KERNEL_PREFIX")),
-	     sk);
+    outliner(build_outline_name(kernel_prefix, mod_name),sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel:");
   }
 
@@ -199,7 +263,7 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        the kernel call. The kernel wrapper name with a prefix defined in the
        GPU_WRAPPER_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
-    outliner(build_new_top_level_module_name(get_string_property("GPU_WRAPPER_PREFIX")), sk);
+    outliner(build_outline_name(wrapper_prefix, mod_name), sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
 
@@ -207,16 +271,19 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     /* Outline the kernel launcher with a prefix defined in the
        GPU_LAUNCHER_PREFIX property: */
     list sl = CONS(STATEMENT, s, NIL);
-    statement st = statement_undefined;
-    st = outliner(build_new_top_level_module_name(get_string_property("GPU_LAUNCHER_PREFIX")), sl);
+    statement st;
+    st = outliner(build_outline_name(launcher_prefix, mod_name), sl);
     if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
-      string fwp = get_string_property("GPU_FORTRAN_WRAPPER_PREFIX");
-      outliner (build_new_top_level_module_name (fwp),CONS(STATEMENT,st,NIL));
+      string fwp = strdup(concatenate(fwrapper_prefix,"_",mod_name,NULL));
+      ifdebug(3) {
+        pips_debug(1, "Outline Fortan_wrapper with prefix %s\n", fwp);
+      }
+      outliner (build_new_top_level_module_name(fwp, true),CONS(STATEMENT,st,NIL));
+	  free(fwp);
     }
     //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
   }
 }
-
 
 /* Transform all the parallel loop nests of a module into smaller
    independent functions suitable for GPU-style accelerators.
@@ -228,13 +295,13 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
 
    @return TRUE since it should succeed...
 */
-bool gpu_ify(const string module_name) {
+bool gpu_ify(const string mod_name) {
   // Use this module name and this environment variable to set
-  statement module_statement = PIPS_PHASE_PRELUDE(module_name,
+  statement module_statement = PIPS_PHASE_PRELUDE(mod_name,
 						  "GPU_IFY_DEBUG_LEVEL");
 
   // Get the effects and use them:
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
 
   // Initialize the loop nest set to outline to the empty set yet:
   loop_nests_to_outline = NIL;
@@ -246,9 +313,13 @@ bool gpu_ify(const string module_name) {
   /* Outline the previous marked loop nests.
      First put the statements to outline in the good order: */
   loop_nests_to_outline = gen_nreverse(loop_nests_to_outline);
+
+  /* Clean module name from prefix */
+  const char* clean_mod_name=get_clean_mod_name(global_name_to_user_name(entity_name(get_current_module_entity())));
+
   FOREACH(STATEMENT, s, loop_nests_to_outline) {
-    // We could have stored the depth, but it complexify the code...
-    gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s));
+    // We could have stored the depth, but it complexifies the code...
+    gpu_ify_statement(s, depth_of_parallel_perfect_loop_nest(s),clean_mod_name);
   }
 
   gen_free_list(loop_nests_to_outline);
@@ -257,7 +328,7 @@ bool gpu_ify(const string module_name) {
   reset_cumulated_rw_effects();
 
   // We may have outline some code, so recompute the callees:
-  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
 			 compute_callees(get_current_module_statement()));
 
   // Put back the new statement module

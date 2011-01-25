@@ -1,0 +1,13 @@
+//  {}
+int main()
+{
+//  {(end,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *end;
+//  {(end,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   long int li;
+//  {(end,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   li = strtol("32445667 is a number", &end, 0);
+//  {(end,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}

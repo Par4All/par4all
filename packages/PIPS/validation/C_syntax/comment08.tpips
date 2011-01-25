@@ -1,0 +1,34 @@
+delete comment08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create comment08 comment08.c
+
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+# setproperty PRETTYPRINT_BLOCKS TRUE
+# setproperty PPRETTYPRINT_EMPTY_BLOCKS TRUE
+
+# We use the winning combination, including TRANSFORMERS_IN_CONTEXT
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+echo
+echo Initial source code
+echo
+
+display PRINTED_FILE[comment08]
+
+close
+
+quit

@@ -614,7 +614,7 @@ entity make_temporary_pointer_to_array_entity_with_prefix(char *prefix,entity ef
       module, pointer);
   /* Set its initial */
   entity_initial(new) = expression_undefined_p(from)?make_value_unknown():
-    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(pointer,NIL,NIL)),copy_expression(from))),normalized_undefined));
+    make_value_expression(make_expression(make_syntax_cast(make_cast(make_type_variable(make_variable(copy_basic(pointer),NIL,NIL)),copy_expression(from))),normalized_undefined));
   return new;
 }
 

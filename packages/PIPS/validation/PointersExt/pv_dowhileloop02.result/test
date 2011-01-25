@@ -1,0 +1,21 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   p = (int *) malloc(10*sizeof(int));
+//  {(p,*HEAP*_l_7,-Exact-)}
+   do {
+//  points to = {}
+      p[i] = i;
+//  points to = {}
+      i++;
+   }
+   while (i<10);
+//  {(p,*HEAP*_l_7,-Exact-)}
+   return 0;
+}

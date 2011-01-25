@@ -1,4 +1,5 @@
-# coding=iso-8859-15
+# -*- coding: utf-8 -*-
+## coding=iso-8859-15
 from __future__ import with_statement # to cope with python2.5
 import pypips
 import pypsutils
@@ -82,18 +83,48 @@ class module:
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
 
+	def _prepare_modification(self):
+		""" [internal] Prepare everything so that the source code of the module can be modified
+		"""
+		self.print_code()
+		printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+		code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+		self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+		return (code_rc,printcode_rc)
+
 	def run(self,cmd):
 		"""run command `cmd' on current module and regenerate module code from the output of the command, that is run `cmd < 'path/to/module/src' > 'path/to/module/src''
 		   does nothing on compilation unit ...
 		"""
 		if not pypsutils.re_compilation_units.match(self.name):
-			self.print_code()
-			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
-			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
+			(code_rc,printcode_rc) = self._prepare_modification()
 			pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
+
+	def prepend_code(self, lines):
+		""" Prepend lines to the code of the module.
+		This is a quick and dirty way based on self.run().
+		We should maybe take example on prepend_comment in Libs/to_begin_with/add_stuff_to_module.c !
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			(code_rc,printcode_rc) = self._prepare_modification()
+			strtoadd = "\n".join(lines)
+			orgcode = pypsutils.file2string(printcode_rc)
+			newcode = orgcode.replace('{', '{\n'+strtoadd+"\n{\n", 1) + "\n}\n"
+			pypsutils.string2file(newcode, code_rc)
+			
+	def append_code(self, lines):
+		""" Append lines to the code of the module.
+		See prepend_code for some remarks.
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			(code_rc,printcode_rc) = self._prepare_modification()
+			lines = map(lambda s: s+"\n",lines)
+			orgcode = pypsutils.file2string(printcode_rc)
+			ocodespl = orgcode.rsplit('}', 1)
+			newcode = ''.join([ocodespl[0]]+lines+['\n}\n'])
+			pypsutils.string2file(newcode, code_rc)
 
 	def show(self,rc):
 		"""get name of `rc' resource"""
@@ -187,6 +218,57 @@ class modules:
 
 ### modules_methods /!\ do not touch this line /!\
 
+
+class ccexecParams(object):
+	''' Parameters for workspace.compile_and_run . Used for convenience. '''
+	def __init__(self, CC="gcc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		'''
+		CC, CFLAGS, LDFLAGS: same as usual
+		compilemethod: bound method used for compilation
+		rep: output directory*
+		outfile: name of the output file
+		args: list of arguments
+		'''
+		self.CC = CC
+		self.CFLAGS = CFLAGS
+		self.LDFLAGS = LDFLAGS
+		self.compilemethod = compilemethod
+		self.rep = rep
+		self.outfile = outfile
+		self.args = args
+		self.extrafiles = extrafiles
+		self.cmd = None
+		self.cc_stderr = None
+		self._compile_done = False
+	
+	def __setattr__(self, n, v):
+		if n in ('CC','CFLAGS','LDFLAGS','compilemethod','extrafiles'):
+			self._compile_done = False
+		object.__setattr__(self,n,v)
+	
+	def link_cmd(self, files, extraCFLAGS):
+		return self._cc_cmd(files, extraCFLAGS, mode="link")
+
+	def compile_cmd(self, files, extraCFLAGS):
+		return self._cc_cmd(files, extraCFLAGS, mode="compile")
+
+	def user_headers_cmd(self, files, extraCFLAGS):
+		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
+
+	def _cc_cmd(self, files, extraCFLAGS, mode):
+		command=[self.CC, extraCFLAGS, self.CFLAGS]
+		if mode=="link":
+			command+=files
+			command+=[self.LDFLAGS]
+			if self.outfile: command+=["-o", self.outfile]
+		elif mode=="compile":
+			command+=["-c"]
+			command+=files
+		elif mode=="userHeaders":
+			command+=["-MM"]
+			command+=files
+		return command
+
 class workspace(object):
 
 	"""Top level element of the pyps hierarchy, it represents a set of source
@@ -229,7 +311,9 @@ class workspace(object):
 			raise RuntimeError("Cannot create two workspaces with same database")
 
 		# because of the way we recover include, relative paths are changed, which could be a proplem for #includes
-		if recoverInclude: cppflags=pypsutils.patchIncludes(cppflags)
+		if recoverInclude:
+			cppflags=pypsutils.patchIncludes(cppflags)
+			kwargs["cppflags"] = cppflags
 
 
 		# In case the subworkspaces need to add files, the variable passed in
@@ -237,6 +321,13 @@ class workspace(object):
 		sources2 = deepcopy(sources)
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
+		# XXX Adrien Guinet : this is a good idea but the problem is that a tuple is
+		# used for sources2, which is immutable. So, sources2 can not be modified inside
+		# any "parent workspace".__init__ function (a new tuple will be created). This
+		# SAC, for instance, does not use this but ws (which is here "self")._sources.append.
+		# Maybe we should juste remove "sources" as an argument for "parent workspace".__init__ ?
+		# memalign does not work in git revision 872b010f420dc66aee04d8338f9abbebabb7749b because of this.
+		self.cppflags = cppflags
 		self.iparents = []
 		for p in parents:
 			pws = p(self, sources2, **kwargs)
@@ -249,9 +340,8 @@ class workspace(object):
 		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
-		if cppflags != "":
-			self.cpypips.setenviron('PIPS_CPP_FLAGS', cppflags)
-		self.cppflags = cppflags
+		if self.cppflags != "":
+			self.cpypips.setenviron('PIPS_CPP_FLAGS', self.cppflags)
 		if self.verbose:
 			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
@@ -394,32 +484,65 @@ class workspace(object):
 
 		return saved
 
-	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep=None, outfile="",extrafiles=[]):
+	def user_headers(self, ccexecp=ccexecParams(), extrafiles=None):
+		""" List the user headers used in self._sources with the compiler configuration given in ccexecp """
+		rep = os.path.join(self.tmpdirname(),"userh")
+		if extrafiles == None:
+			extrafiles = []
+		tmpfiles=self.save(rep=rep) + extrafiles
+		command = ccexecp.genCmdUserHeaders()
+		p = Popen(command, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		rc = p.returncode
+		# TODO: finish!
+
+	def compile(self, ccexecp=ccexecParams(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
-		if not rep:
-			rep=self.tmpdirname()+"d.out"
-		otmpfiles=self.save(rep=rep)+extrafiles
-		command=[CC, self.cppflags, CFLAGS]
-		if link:
-			if not outfile:
-				outfile=self._name
-			self.goingToRunWith(otmpfiles, rep)
-			command+=otmpfiles
-			command+=[LDFLAGS]
-			command+=["-o", outfile]
-		else:
-			self.goingToRunWith(otmpfiles, rep)
-			command+=["-c"]
-			command+=otmpfiles
+		CC=ccexecp.CC
+		CFLAGS=ccexecp.CFLAGS
+		LDFLAGS=ccexecp.LDFLAGS
+		outfile=ccexecp.outfile
+		extrafiles=ccexecp.extrafiles
+
+		if link and not outfile:
+			ccexecp.outfile=self._name
+		if ccexecp.rep==None:
+			ccexecp.rep=self.tmpdirname()+"d.out"
+		rep=ccexecp.rep
+		otmpfiles=self.save(rep=ccexecp.rep)+extrafiles
+		self.goingToRunWith(otmpfiles, rep)
+		command = ccexecp.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else ccexecp.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
 		commandline = " ".join(command)
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
-		ret = os.system(commandline)
-		if ret:
+		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		ccexecp.cc_stderr = err
+		ret = p.returncode
+		if ret != 0:
+			ccexecp._compile_done = False
 			if not link: map(os.remove,otmpfiles)
-			raise RuntimeError("`%s' failed with return code %d" % (commandline, ret >> 8))
-		return outfile
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+		ccexecp._compile_done = True
+		ccexecp.cc_cmd = commandline
+		# Command to execute our new binary
+		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
+		return ccexecp.outfile
 
+	def compile_and_run(self, ccexecp=ccexecParams()):
+		if ccexecp.compilemethod == None:
+			ccexecp.compilemethod = self.compile
+		ccexecp.compilemethod(ccexecp)
+		return self.run_output(ccexecp)
+
+	def run_output(self, ccexecp=ccexecParams()):
+		if not ccexecp._compile_done:
+			return self.compile_and_run(ccexecp)
+		p = Popen(ccexecp.cmd, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		rc = p.returncode
+		return (rc,out,err)
 
 	def goingToRunWith(self, files, rep):
 		""" hook that happens just before compilation of `files' in `rep'"""

@@ -1,7 +1,4 @@
 delete maisonneuve10
-
-setproperty ABORT_ON_USER_ERROR TRUE
-
 create maisonneuve10 maisonneuve10.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -25,5 +22,5 @@ activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]
 
 close
-#delete maisonneuve10
+delete maisonneuve10
 quit

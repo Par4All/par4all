@@ -1,3 +1,4 @@
+from __future__ import with_statement
 import re
 import os
 import fileinput
@@ -108,6 +109,11 @@ def string2file(string, fname):
     f = open(fname, "w")
     f.write(string)
     f.close()
+
+def file2string(fname):
+	with open(fname, "r") as f:
+		s = f.read()
+	return s
 
 def nameToTmpDirName(name): return "." + name + ".tmp"
 

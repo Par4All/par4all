@@ -1,0 +1,20 @@
+//  {}
+int main()
+{
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   float *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   float a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int i;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
+   i = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   while (i<10) {
+//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
+      p = &a[i];
+   }
+//  {(p,a[i],-Exact-)}
+   return 0;
+}

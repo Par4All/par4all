@@ -1,5 +1,5 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import module, workspace
+from pyps import module, workspace, ccexecParams
 import terapyps_asm
 import pypsutils
 from subprocess import Popen, PIPE
@@ -7,20 +7,19 @@ import os,sys,shutil,tempfile
 
 def generate_check_ref(self):
 	"""Generate a reference run for workspace"""
-	a_out=self.compile()
-	pid=Popen("./"+a_out,stdout=PIPE)
-	if pid.wait() == 0:
-		self.ref=pid.stdout.readlines()
+	(rc,out,err)=self.compile_and_run(ccexecParams(CC="gcc"))
+	if rc == 0:
+		self.ref=out
 	else :
+		print err
 		exit(1)
 workspace.generate_check_ref=generate_check_ref
 
 def check(self,debug):
 	if debug:
-		a_out=self.compile()
-		pid=Popen("./"+a_out,stdout=PIPE)
-		if pid.wait() == 0:
-			if self.ref!=pid.stdout.readlines():
+		(rc,out,err)=self.compile_and_run(ccexecParams(CC="gcc"))
+		if rc == 0:
+			if self.ref!=out:
 				print "**** check failed *****"
 				exit(1)
 			else:

@@ -18,25 +18,25 @@ int main()
 {
    int i;
 
-   p4a_kernel_launcher_0(N, a, b, c);
+   p4a_launcher_main(N, a, b, c);
 
    return 0;
 }
-void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
+void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
 
    for(i = 0; i <= 9999; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_0(N, a, b, c, i);
+      p4a_wrapper_main(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, a, b, c, i);
+   p4a_kernel_main(N, a, b, c, i);
 }
-void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
@@ -56,7 +56,7 @@ int main()
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
 
 
-      p4a_kernel_launcher_0(N, *a0, *b0, *c0);
+      p4a_launcher_main(N, *a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);
       P4A_accel_free(c0);
       P4A_accel_free(b0);
@@ -65,21 +65,21 @@ int main()
 
    return 0;
 }
-void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
+void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
 
    for(i = 0; i <= 9999; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_0(N, a, b, c, i);
+      p4a_wrapper_main(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, a, b, c, i);
+   p4a_kernel_main(N, a, b, c, i);
 }
-void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
@@ -93,26 +93,26 @@ double a[N], b[N], c[N];
 
 int main();
 //PIPS generated variable
-void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i), p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N]);
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i), p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i), p4a_launcher_main(int N, double a[N], double b[N], double c[N]);
 //PIPS generated variable
 typedef unsigned int size_t;
 //PIPS generated variable
 void P4A_accel_malloc(void **address, size_t size), P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
-void p4a_kernel_launcher_0(int N, double a[N], double b[N], double c[N])
+void p4a_launcher_main(int N, double a[N], double b[N], double c[N])
 {
    //PIPS generated variable
    int i;
 
    for(i = 0; i <= 9999; i += 1)
       // To be assigned to a call to P4A_vp_0: i
-      p4a_kernel_wrapper_0(N, a, b, c, i);
+      p4a_wrapper_main(N, a, b, c, i);
 }
-void p4a_kernel_wrapper_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_wrapper_main(int N, double a[N], double b[N], double c[N], int i)
 {
    // To be assigned to a call to P4A_vp_0: i
-   p4a_kernel_0(N, a, b, c, i);
+   p4a_kernel_main(N, a, b, c, i);
 }
-void p4a_kernel_0(int N, double a[N], double b[N], double c[N], int i)
+void p4a_kernel_main(int N, double a[N], double b[N], double c[N], int i)
 {
    a[i] = b[i]+c[i];
 }
@@ -129,7 +129,7 @@ int main()
       P4A_copy_to_accel_1d(sizeof(double), 10000, 10000, 0, &b[0], *b0);
 
 
-      p4a_kernel_launcher_0(N, *a0, *b0, *c0);
+      p4a_launcher_main(N, *a0, *b0, *c0);
       P4A_copy_from_accel_1d(sizeof(double), 10000, 10000, 0, &a[0], *a0);
       P4A_accel_free(c0);
       P4A_accel_free(b0);

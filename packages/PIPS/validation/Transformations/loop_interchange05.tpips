@@ -24,7 +24,7 @@ echo
 display PRINTED_FILE
 
 apply UNSPLIT[%PROGRAM]
-shell $PIPS_F77 loop_interchange05.database/Src/loop_interchange05.f -o loop_interchange05.database/out
+shell ${PIPS_F77:-gfortran} loop_interchange05.database/Src/loop_interchange05.f -o loop_interchange05.database/out
 
 close
 quit

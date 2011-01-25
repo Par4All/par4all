@@ -1,5 +1,7 @@
 user warning in parse_properties: property ACTIVE_PHASES redefined
 user warning in parse_properties: property SEMANTICS_FIX_POINT_OPERATOR redefined
+user warning in parse_properties: property GPU_LAUNCHER_PREFIX redefined
+user warning in parse_properties: property GPU_WRAPPER_PREFIX redefined
 user warning in parse_properties: property PRETTYPRINT_MEMORY_EFFECTS_ONLY redefined
 shell rm -f corinne1.f corinne2.f corinne3.f
 echo

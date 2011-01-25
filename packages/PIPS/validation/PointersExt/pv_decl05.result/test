@@ -1,0 +1,8 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int *a[10];
+//  points to = {}
+   return 0;
+}

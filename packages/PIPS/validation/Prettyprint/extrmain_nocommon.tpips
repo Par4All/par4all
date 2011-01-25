@@ -5,6 +5,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete extrmain_nocommon
 create extrmain_nocommon extrmain_nocommon.f
 
+setproperty CROUGH_PRINT_UNKNOWN_INTRINSIC TRUE
 
 module D
 activate PRINT_C_CODE
