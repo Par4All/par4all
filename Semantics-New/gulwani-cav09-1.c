@@ -86,11 +86,8 @@ void run(void) {
 			if (flip()) {
 				T1;
 			}
-			else if (flip()) {
-				T2;
-			}
 			else {
-				T3;
+				T2;
 			}
 		}
 		
