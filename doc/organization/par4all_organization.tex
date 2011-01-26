@@ -1078,8 +1078,11 @@ src/simple_tools/p4a_pack.py <--deb|--tgz> --revision=\emph{0.1-mybuild} \(\back
 
 If you are short in the default temporary directory to build up a new
 distribution (as our old machine used to build the 32-bit Debian
-distribution), you can change the \texttt{MPDIR}, \texttt{TEMP} or
-\texttt{TMP} to a directory location when there is enough room (1+ GB).
+distribution), you can change the \texttt{TMPDIR}\footnote{Indeed, at the
+  Python level, \texttt{TEMP} and \texttt{TMP} could be also used instead,
+  but \texttt{dpkg-deb} is used to build the package and it only follows
+  \texttt{TMPDIR}. So use \texttt{TMPDIR}...} to a directory location when
+there is enough room (1+ GB).
 
 Here are the usage and full option list of this command.
 
