@@ -115,15 +115,21 @@ extern cudaEvent_t p4a_stop_event;
 #ifdef P4A_PROFILING
 #define P4A_accel_timer_start					\
   P4A_test_execution(cudaEventRecord(p4a_start_event, 0))
+#else 
+#ifdef P4A_TIMING
+#define P4A_accel_timer_start					\
+  P4A_test_execution(cudaEventRecord(p4a_start_event, 0))
 #else
 #define P4A_accel_timer_start /* Nothing */
+#endif
 #endif
 
 
 /** Mehdi Amini version : P4A internal */
 
 // Stop a timer on the accelerator in CUDA 
-#define P4A_accel_timer_stop toolTestExec(cudaEventRecord(p4a_stop_event, 0))
+#define P4A_accel_timer_stop \
+  P4A_test_execution(cudaEventRecord(p4a_stop_event, 0))
 
 #ifdef P4A_TIMING
 // Set of routine for timing kernel executions
@@ -132,22 +138,27 @@ extern float p4a_timing_elapsedTime;
 #define P4A_TIMING_accel_timer_start P4A_accel_timer_start
 
 #define P4A_TIMING_accel_timer_stop		\
-  { P4A_accel_timer_stop;			\
+  do {						\
+    P4A_accel_timer_stop;			\
     cudaEventSynchronize(p4a_stop_event);	\
-  }
+  } while (0)
 
 #define P4A_TIMING_elapsed_time(elapsed)				\
   cudaEventElapsedTime(&elapsed, p4a_start_event, p4a_stop_event);
 
-#define P4A_TIMING_get_elapsed_time		      \
-  {   P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime); \
-    p4a_timing_elapsedTime; }
+#define P4A_TIMING_get_elapsed_time			\
+  {							\
+    P4A_TIMING_elapsed_time(&p4a_timing_elapsedTime);	\
+    p4a_timing_elapsedTime;				\
+  }
 
-#define P4A_TIMING_display_elasped_time(msg)	   \
-  { P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
+#define P4A_TIMING_display_elasped_time(msg)		\
+  {							\
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
     P4A_dump_message("Time for '%s' : %fms\n",		\
 		     #msg,				\
-		     p4a_timing_elapsedTime ); }
+		     p4a_timing_elapsedTime ); \
+  }
 
 #else
 
@@ -179,8 +190,16 @@ extern float p4a_timing_elapsedTime;
     P4A_test_execution(cudaEventCreate(&p4a_stop_event));	\
   } while (0)
 #else
+#ifdef P4A_TIMING
+#define P4A_init_accel						\
+  do {								\
+    P4A_test_execution(cudaEventCreate(&p4a_start_event));	\
+    P4A_test_execution(cudaEventCreate(&p4a_stop_event));	\
+  } while (0)
+#else
 /* Nothing*/
 #define P4A_init_accel 
+#endif
 #endif
 
 /** Release the hardware accelerator in CUDA

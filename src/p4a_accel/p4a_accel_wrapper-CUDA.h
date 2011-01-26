@@ -52,12 +52,12 @@
 #define P4A_accel_local_address __shared__
 
 /** Get the coordinate of the virtual processor in X (first) dimension in
-    CUDA
+    CUDA, corresponding to deepest loop to be memory friendly
 */
 #define P4A_vp_0 (blockIdx.x*blockDim.x + threadIdx.x)
 
 /** Get the coordinate of the virtual processor in Y (second) dimension in
-    CUDA
+    CUDA, corresponding to outermost loop
 */
 #define P4A_vp_1 (blockIdx.y*blockDim.y + threadIdx.y)
 
