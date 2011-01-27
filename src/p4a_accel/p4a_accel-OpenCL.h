@@ -131,6 +131,7 @@ extern cl_command_queue_properties p4a_queue_properties;
     We also need to cumulate each single time.
  */
 extern double p4a_time;
+extern double p4a_host_time;
 
 /** Event for timing in OpenCL */
 extern cl_event p4a_event;
@@ -161,13 +162,12 @@ struct timeval p4a_time_end;
  */
 
 #ifdef P4A_PROFILING
-#define P4A_accel_timer_start   p4a_time = 0.
-#else
-#ifdef P4A_TIMING
-#define P4A_accel_timer_start   gettimeofday(&p4a_time_begin, NULL)
+#define P4A_accel_timer_start	\
+  p4a_time = 0.;		\
+  p4a_host_time = 0.		
+  
 #else
 #define P4A_accel_timer_start 
-#endif
 #endif
 
 // Stop a timer on the accelerator 
@@ -183,7 +183,7 @@ struct timeval p4a_time_end;
 // Set of routine for timing kernel executions
 extern float p4a_timing_elapsedTime;
 
-#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+#define P4A_TIMING_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
 
 #define P4A_TIMING_accel_timer_stop P4A_accel_timer_stop
 
@@ -222,14 +222,20 @@ extern float p4a_timing_elapsedTime;
 #define P4A_TIMING_display_elasped_time(msg)		\
   {							\
     P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
-    P4A_dump_message("Time for '%s' : %fms\n",		\
+    P4A_dump_message("Time for '%s' : %f ms\n",		\
 		     #msg,				\
 		     p4a_timing_elapsedTime );		\
   }
 
 #else
 
+#ifdef P4A_PROFILING
+#define P4A_TIMING_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
+
+#else
 #define P4A_TIMING_accel_timer_start
+#endif
+
 #define P4A_TIMING_accel_timer_stop
 #define P4A_TIMING_elapsed_time(elapsed)
 #define P4A_TIMING_get_elapsed_time
@@ -798,6 +804,9 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_TIMING_accel_timer_start;					\
     p4a_load_kernel(kernel,__VA_ARGS__);				\
     P4A_argN(__VA_ARGS__);						\
+    timer_call_from_p4a = true;						\
+    P4A_accel_timer_stop_and_float_measure();				\
+    timer_call_from_p4a = false;					\
     P4A_TIMING_accel_timer_stop;					\
     P4A_TIMING_display_elasped_time(Kernel and arguments loading);	\
     P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel	\
@@ -834,6 +843,9 @@ char * p4a_load_prog_source(char *cl_kernel_file,
     P4A_TIMING_accel_timer_start;					\
     p4a_load_kernel(kernel,__VA_ARGS__);				\
     P4A_argN(__VA_ARGS__);						\
+    timer_call_from_p4a = true;						\
+    P4A_accel_timer_stop_and_float_measure();				\
+    timer_call_from_p4a = false;					\
     P4A_TIMING_accel_timer_stop;					\
     P4A_TIMING_display_elasped_time(Kernel and arguments loading);	\
     P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel	\

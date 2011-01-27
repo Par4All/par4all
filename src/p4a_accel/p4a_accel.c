@@ -1089,9 +1089,13 @@ cl_command_queue_properties p4a_queue_properties = 0;
 #endif
 
 double p4a_time = 0.;
+double p4a_host_time = 0.;
 cl_event p4a_event = NULL;
 bool timer_call_from_p4a = true;
 bool P4A_TIMING_fromHost = false;
+
+/** Counts the number of kernel to display nice timer / kernel load*/
+int nKernel = 0;
 
 /** In OpenCL, stop a timer on the accelerator and get float time in
     second.
@@ -1102,28 +1106,53 @@ double P4A_accel_timer_stop_and_float_measure()
   cl_ulong start,end;
 
 #ifdef P4A_PROFILING
-  if (p4a_event) {
-    if (timer_call_from_p4a == true) {
-      clWaitForEvents(1, &p4a_event);
-      
-      P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-						 CL_PROFILING_COMMAND_END, 
-						 sizeof(cl_ulong), 
-						 &end, 
-						 NULL));
-      P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
-						 CL_PROFILING_COMMAND_START, 
-						 sizeof(cl_ulong), 
-						 &start, 
-						 NULL));
-      // time in nanoseconds	      
-      p4a_time += (float)(end - start);
+  if (timer_call_from_p4a == true) {
+    if (!P4A_TIMING_fromHost)    {
+      if (p4a_event) {
+	clWaitForEvents(1, &p4a_event);
+	
+	P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+						   CL_PROFILING_COMMAND_END, 
+						   sizeof(cl_ulong), 
+						   &end, 
+						   NULL));
+	P4A_test_execution(clGetEventProfilingInfo(p4a_event, 
+						   CL_PROFILING_COMMAND_START, 
+						   sizeof(cl_ulong), 
+						   &start, 
+						   NULL));
+	// time in nanoseconds	      
+	p4a_time += (float)(end - start);
+      }
     }
-    // Return the time in second:
-    return p4a_time*1.0e-9;
+    else {
+      // Time in sec
+      gettimeofday(&p4a_time_end, NULL);
+      double t = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)
+	+ (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6;
+      // Conversion in nanosec
+      p4a_time += t*1.0e9;
+      p4a_host_time += t*1.0e9;
+      P4A_TIMING_fromHost = false;
+    }
   }
-  else
-    return p4a_time*1.0e-9;
+  else {
+    // p4a_host_time accounts for kernel load
+    // This is p4a_time-p4a_host_time that must be compared to cuda kernel timer
+    if (p4a_host_time > 0) {
+      printf("\n*** Begin message from P4A *** \n");
+      if (nKernel == 1) 
+	printf("Timer in the host (kernel load) : %fs\n",
+	       p4a_host_time*1.0e-9);
+      else 
+	printf("Timer in the host (%d kernels load) : %fs (%f/s per kernel on average)\n",
+	       nKernel,p4a_host_time*1.0e-9,p4a_host_time*1.0e-9/nKernel);
+      printf("Timer in the accel : %fs\n",(p4a_time-p4a_host_time)*1.0e-9);
+      printf("*** End message from P4A *** \n\n");
+    }
+  }
+  // Return the time in second:
+  return p4a_time*1.0e-9;
 #else
   return 0;
 #endif
@@ -1145,6 +1174,7 @@ std::map<std::string,struct p4a_cl_kernel *> p4a_kernels_map;
 struct p4a_cl_kernel *p4a_kernels=NULL;
 // Only used when creating the kernel list
 struct p4a_cl_kernel *last_kernel=NULL;
+
 
 /** @addtogroup P4A_call_parameters Parameters invocation.
 
@@ -1226,7 +1256,7 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
 
 void p4a_load_kernel(const char *kernel,...)
 {
-#ifdef P4A_TIMING
+#if defined(P4A_PROFILING) || defined(P4A_TIMING)
   P4A_TIMING_fromHost = true;
 #endif
 
@@ -1240,6 +1270,7 @@ void p4a_load_kernel(const char *kernel,...)
   // If not found ...
   if (!k) {
     P4A_skip_debug(P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
+    nKernel++;
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
