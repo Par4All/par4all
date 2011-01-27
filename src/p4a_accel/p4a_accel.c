@@ -1091,6 +1091,7 @@ cl_command_queue_properties p4a_queue_properties = 0;
 double p4a_time = 0.;
 cl_event p4a_event = NULL;
 bool timer_call_from_p4a = true;
+bool P4A_TIMING_fromHost = false;
 
 /** In OpenCL, stop a timer on the accelerator and get float time in
     second.
@@ -1225,6 +1226,10 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
 
 void p4a_load_kernel(const char *kernel,...)
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_fromHost = true;
+#endif
+
 #ifdef __cplusplus
   std::string scpy(kernel);
   struct p4a_cl_kernel *k = p4a_kernels_map[scpy];
