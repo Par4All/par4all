@@ -1103,9 +1103,9 @@ int nKernel = 0;
 
 double P4A_accel_timer_stop_and_float_measure() 
 {
-  cl_ulong start,end;
 
 #ifdef P4A_PROFILING
+  cl_ulong start,end;
   if (timer_call_from_p4a == true) {
     if (!P4A_TIMING_fromHost)    {
       if (p4a_event) {
@@ -1139,16 +1139,18 @@ double P4A_accel_timer_stop_and_float_measure()
   else {
     // p4a_host_time accounts for kernel load
     // This is p4a_time-p4a_host_time that must be compared to cuda kernel timer
-    if (p4a_host_time > 0) {
-      printf("\n*** Begin message from P4A *** \n");
+    if ((float)p4a_host_time > p4a_time*0.01) {
+      fprintf(stderr,"\n*** Begin message from P4A *** \n");
+
       if (nKernel == 1) 
-	printf("Timer in the host (kernel load) : %fs\n",
+	fprintf(stderr,"Timer in the host (kernel load), included in the kernel execution time:\n\t %fs\n",
 	       p4a_host_time*1.0e-9);
       else 
-	printf("Timer in the host (%d kernels load) : %fs (%f/s per kernel on average)\n",
+	fprintf(stderr,"Timer in the host (%d kernels load), included in the kernel execution time:\n\t %fs (%f/s per kernel on average)\n",
 	       nKernel,p4a_host_time*1.0e-9,p4a_host_time*1.0e-9/nKernel);
-      printf("Timer in the accel : %fs\n",(p4a_time-p4a_host_time)*1.0e-9);
-      printf("*** End message from P4A *** \n\n");
+
+      //fprintf(stderr,"Timer in the accel : %fs\n",(p4a_time-p4a_host_time)*1.0e-9);
+      fprintf(stderr,"*** End message from P4A *** \n\n");
     }
   }
   // Return the time in second:

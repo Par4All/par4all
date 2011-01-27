@@ -151,7 +151,7 @@ int main(int argc, char * argv[])
 
     P4A_accel_timer_start;
     run(xmin,ymin,step,range, *p4a_pt, *p4a_t);
-    
+
     double execution_time = P4A_accel_timer_stop_and_float_measure();
     
     P4A_accel_timer_start;

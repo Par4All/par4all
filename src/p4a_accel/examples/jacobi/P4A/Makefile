@@ -3,8 +3,8 @@ TARGET = jacobi
 CFILES = jacobi-p4a.c
 KERNELFILES = kernel1_wrapper.c kernel2_wrapper.c
 DUMMYFILE = output.pgm
-#BASEFLAGS = -DP4A_PROFILING
-BASEFLAGS = -DP4A_TIMING
+BASEFLAGS = -DP4A_PROFILING
+#BASEFLAGS = -DP4A_TIMING
 #BASEFLAGS = 
 
 
