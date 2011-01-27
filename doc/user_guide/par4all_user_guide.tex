@@ -504,6 +504,13 @@ compiling. The Makefile created from the user must contain the
 definition of \texttt{TARGET, CFILES, KERNELFILES} and
 \texttt{P4A\_ACCEL\_DIR}.  \texttt{DUMMYFILE} is added to the make
 clean and can be used to define some output, non permanent, files.
+Additional compilation options are added in the \texttt{BASEFLAGS}
+field. Typically, two profiling options are proposed
+
+\begin{enumerate}
+\item \texttt{P4A\_PROFILING} enables the user to place timer makers everywhere he wants as described in the upper part ;
+\item \texttt{P4A\_TIMING} will display automated P4A internal timer.
+\end{enumerate}
 
 \begin{lstlisting}
 TARGET = jacobi

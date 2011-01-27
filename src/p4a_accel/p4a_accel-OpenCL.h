@@ -108,7 +108,7 @@ void   p4a_clean(int exitCode);
     @{
 */
 
-/** A tag to enable profiling in an OpenCL command queue
+/** A tag is required to enable profiling in an OpenCL command queue
     - if 0 : no profiling enabled
     - if CL_QUEUE_PROFILING_ENABLE : profiling enabled.
 
@@ -139,7 +139,9 @@ extern bool timer_call_from_p4a;
 
 /** Start a timer on the accelerator in OpenCL.
     
-    Initialize the global time variable.
+    Initialize the global time variable that will cumulates the timer.
+    in the case of external user that is allowed to place the begin and
+    end commands everywhere she/he wants.
  */
 
 #ifdef P4A_PROFILING
@@ -147,6 +149,59 @@ extern bool timer_call_from_p4a;
 #else
 #define P4A_accel_timer_start 
 #endif
+
+// Stop a timer on the accelerator 
+/**  
+     No need in OpenCL since the timer is linked to instances of 
+     OpenCL functions.
+*/
+#define P4A_accel_timer_stop 
+
+#ifdef P4A_TIMING
+// Set of routine for timing kernel executions
+extern float p4a_timing_elapsedTime;
+
+#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+
+#define P4A_TIMING_accel_timer_stop clWaitForEvents(1, &p4a_event)
+
+#define P4A_TIMING_elapsed_time(elapsed)				\
+  {									\
+    cl_ulong start,end;							\
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event,		\
+					       CL_PROFILING_COMMAND_END, \
+					       sizeof(cl_ulong),	\
+					       &end,NULL));		\
+    P4A_test_execution(clGetEventProfilingInfo(p4a_event,		\
+					       CL_PROFILING_COMMAND_START, \
+					       sizeof(cl_ulong),	\
+					       &start,NULL));		\
+    /* Time in ms */							\
+    elapsed = (float)(end - start)*1.0e-6;				\
+  }
+
+#define P4A_TIMING_get_elapsed_time			\
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime)
+
+#define P4A_TIMING_display_elasped_time(msg)		\
+  {							\
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
+    P4A_dump_message("Time for '%s' : %fms\n",		\
+		     #msg,				\
+		     p4a_timing_elapsedTime );		\
+  }
+
+#else
+
+#define P4A_TIMING_accel_timer_start
+#define P4A_TIMING_accel_timer_stop
+#define P4A_TIMING_elapsed_time(elapsed)
+#define P4A_TIMING_get_elapsed_time
+#define P4A_TIMING_display_elasped_time(msg)
+
+#endif //P4A_TIMING
+
+
 
 /** @} */
 
@@ -605,6 +660,12 @@ parameters types are resolved.
     do { 
        clEnqueueNDRangeKernel(p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event); 
     } while (0);
+
+    P4A_TIMING displays internal P4A timer at each call of the kernel.
+    P4A_PROFILING cumulates the timer that is displayed only when the
+    user calls the stop_timer function from outside P4A.
+    Thus, the two calls inhibits each other but can't be mixed.
+
 */
 
 #define P4A_call_accel_kernel(context, parameters)			\
@@ -614,7 +675,13 @@ parameters types are resolved.
 				  #parameters));			\
   P4A_call_accel_kernel_context context					\
   P4A_call_accel_kernel_parameters parameters;				\
-  P4A_test_execution_with_message("P4A OpenCL kernel execution")
+  P4A_test_execution_with_message("P4A OpenCL kernel execution");	\
+  P4A_TIMING_accel_timer_start;						\
+  timer_call_from_p4a = true;						\
+  P4A_accel_timer_stop_and_float_measure();				\
+  timer_call_from_p4a = false;						\
+  P4A_TIMING_accel_timer_stop;						\
+  P4A_TIMING_display_elasped_time(context)				\
 
 /** In OpenCL, each kernel is referenced by its name as a string, but
     is launched via a pointer. 
@@ -737,9 +804,6 @@ char * p4a_load_prog_source(char *cl_kernel_file,
 			  (p4a_queue,p4a_kernel,work_dim,NULL,		\
 			   P4A_grid_descriptor,P4A_block_descriptor,	\
 			   0,NULL,&p4a_event));				\
-    timer_call_from_p4a = true;						\
-    P4A_accel_timer_stop_and_float_measure();				\
-    timer_call_from_p4a = false;					\
   } while (0)
 
 /** 

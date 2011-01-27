@@ -53,12 +53,55 @@ struct timeval p4a_time_end;
 /** Start a timer on the host for OpenMP.
 
     Records the p4a_time_begin absolute time.
+
+    P4A_PROFILING is a external user timer.
+    P4A_TIMING is a P4A internal timer.
 */
-#ifdef P4A_PROFILING
+#if defined(P4A_PROFILING) || defined(P4A_TIMING)
 #define P4A_accel_timer_start gettimeofday(&p4a_time_begin, NULL)
 #else
 #define P4A_accel_timer_start 
 #endif
+
+
+// Stop a timer in OpenMP 
+#define P4A_accel_timer_stop gettimeofday(&p4a_time_end, NULL)
+
+#ifdef P4A_TIMING
+// Set of routine for timing kernel executions
+extern float p4a_timing_elapsedTime;
+
+#define P4A_TIMING_accel_timer_start P4A_accel_timer_start
+
+#define P4A_TIMING_accel_timer_stop  P4A_accel_timer_stop
+
+#define P4A_TIMING_elapsed_time(elapsed)				\
+  elapsed = (p4a_time_end.tv_sec - p4a_time_begin.tv_sec)		\
+    + (p4a_time_end.tv_usec - p4a_time_begin.tv_usec)*1e-6
+
+#define P4A_TIMING_get_elapsed_time			\
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime)
+
+#define P4A_TIMING_display_elasped_time(msg)		\
+  {							\
+    P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);	\
+    P4A_dump_message("Time for '%s' : %fms\n",		\
+		     #msg,				\
+		     p4a_timing_elapsedTime );		\
+  }
+
+#else
+
+#define P4A_TIMING_accel_timer_start
+#define P4A_TIMING_accel_timer_stop
+#define P4A_TIMING_elapsed_time(elapsed)
+#define P4A_TIMING_get_elapsed_time
+#define P4A_TIMING_display_elasped_time(msg)
+
+#endif //P4A_TIMING
+
+
+
 /** 
     @} 
 */
@@ -252,13 +295,16 @@ struct timeval p4a_time_end;
   do {									\
     P4A_skip_debug(P4A_dump_location();)				\
       P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_1d(%d) of \"%s\"\n", P4A_n_iter_0, #kernel);) \
-      _Pragma("omp parallel for")					\
+      P4A_TIMING_accel_timer_start;					\
+    _Pragma("omp parallel for")						\
       for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
 	P4A_vp_0 = P4A_index_0;						\
 	P4A_vp_1 = 0;							\
 	P4A_vp_2 = 0;							\
 	kernel(__VA_ARGS__);						\
       }									\
+    P4A_TIMING_accel_timer_stop;					\
+    P4A_TIMING_display_elasped_time(kernel);				\
   } while (0)
 
 
@@ -281,7 +327,8 @@ struct timeval p4a_time_end;
   do {									\
     P4A_skip_debug(P4A_dump_location();)				\
       P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_2d(%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, #kernel);) \
-      _Pragma("omp parallel for")					\
+      P4A_TIMING_accel_timer_start;					\
+    _Pragma("omp parallel for")						\
       for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
 	for(int P4A_index_0 = 0; P4A_index_0 < P4A_n_iter_0; P4A_index_0++) { \
 	  P4A_vp_0 = P4A_index_0;					\
@@ -291,6 +338,8 @@ struct timeval p4a_time_end;
 	  kernel(__VA_ARGS__);						\
 	}								\
       }									\
+    P4A_TIMING_accel_timer_stop;					\
+    P4A_TIMING_display_elasped_time(kernel);				\
   } while (0)
 
 
@@ -315,6 +364,7 @@ struct timeval p4a_time_end;
   do {									\
     P4A_skip_debug(P4A_dump_location();)				\
       P4A_skip_debug(P4A_dump_message("P4A_call_accel_kernel_3d(%d,%d,%d) of \"%s\"\n", P4A_n_iter_0, P4A_n_iter_1, P4A_n_iter_2, #kernel);) \
+      P4A_TIMING_accel_timer_start;					\
       _Pragma("omp parallel for")					\
       for(int P4A_index_2 = 0; P4A_index_2 < P4A_n_iter_2; P4A_index_2++) { \
 	for(int P4A_index_1 = 0; P4A_index_1 < P4A_n_iter_1; P4A_index_1++) { \
@@ -326,6 +376,8 @@ struct timeval p4a_time_end;
 	  }								\
 	}								\
       }									\
+    P4A_TIMING_accel_timer_stop;					\
+    P4A_TIMING_display_elasped_time(kernel);				\
   } while (0)
 
 /** @} */

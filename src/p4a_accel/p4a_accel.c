@@ -122,8 +122,22 @@ void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
 			 const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   /* We can use memcpy() since we are sure there is no overlap */
   memcpy(host_address, accel_address, element_size);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+		   "%gms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Copy a scalar from the host to the hardware accelerator in OpenMP
@@ -149,8 +163,22 @@ void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
 		       void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   /* We can use memcpy() since we are sure there is no overlap */
   memcpy(accel_address, host_address, element_size);
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+		   "%gms - %.2fGB/s\n",
+		   element_size, host_address,accel_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
@@ -182,12 +210,26 @@ void P4A_copy_from_accel_1d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   // Compute the destination address on host side
   char * cdest = d1_offset*element_size + (char *)host_address;
   const char * csrc = (char*)accel_address;
   // Copy element by element
   for(size_t i = 0; i < d1_block_size*element_size; i++)
     cdest[i] = csrc[i];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+		   "%gms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying a 1D memory zone from the host to a compact memory
@@ -219,6 +261,10 @@ void P4A_copy_to_accel_1d(size_t element_size,
 			  const void *host_address,
 			  void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   // Compute the destination address on host side
   const char * csrc = d1_offset*element_size + (char *)host_address;
   char * cdest = (char*)accel_address;
@@ -226,6 +272,16 @@ void P4A_copy_to_accel_1d(size_t element_size,
   // Copy element by element
   for(size_t i = 0; i < d1_block_size*element_size; i++)
     cdest[i] = csrc[i];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+		   "%gms - %.2fGB/s\n",
+		   element_size, host_address,accel_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying memory from the hardware accelerator to a 2D array in
@@ -241,6 +297,11 @@ void P4A_copy_from_accel_2d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
+
   // Compute the destination address for the first rown on dim1 on host side
   char * cdest = d2_offset*element_size + (char*)host_address;
   const char * csrc = (char*)accel_address;
@@ -250,6 +311,16 @@ void P4A_copy_from_accel_2d(size_t element_size,
     for(size_t j = 0; j < d2_block_size*element_size; j++)
       cdest[(i + d1_offset)*element_size*d2_size + j] =
           csrc[i*element_size*d2_block_size + j];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+                    "%gms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying a 2D memory zone from the host to a compact memory
@@ -265,11 +336,25 @@ void P4A_copy_to_accel_2d(size_t element_size,
 			  const void *host_address,
 			  void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   char * cdest = (char *)accel_address;
   const char * csrc = d2_offset*element_size + (char *)host_address;
   for(size_t i = 0; i < d1_block_size; i++)
     for(size_t j = 0; j < d2_block_size*element_size; j++)
       cdest[i*element_size*d2_block_size + j] = csrc[(i + d1_offset)*element_size*d2_size + j];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+                    "%gms - %.2fGB/s\n",
+		   element_size, host_address,accel_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying memory from the hardware accelerator to a 3D array in
@@ -288,6 +373,10 @@ void P4A_copy_from_accel_3d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+ 
   char * cdest = d3_offset*element_size + (char*)host_address;
   const char * csrc = (char*)accel_address;
   for(size_t i = 0; i < d1_block_size; i++)
@@ -295,6 +384,16 @@ void P4A_copy_from_accel_3d(size_t element_size,
       for(size_t k = 0; k < d3_block_size*element_size; k++)
 	cdest[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k] =
 	  csrc[(i*d2_block_size + j)*d3_block_size*element_size + k];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "
+                    "%gms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 
@@ -314,6 +413,10 @@ void P4A_copy_to_accel_3d(size_t element_size,
 			  const void *host_address,
 			  void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   char * cdest = (char *)accel_address;
   const char * csrc = d3_offset*element_size + (char *)host_address;
   for(size_t i = 0; i < d1_block_size; i++)
@@ -321,6 +424,16 @@ void P4A_copy_to_accel_3d(size_t element_size,
       for(size_t k = 0; k < d3_block_size*element_size; k++)
 	cdest[(i*d2_block_size + j)*d3_block_size*element_size + k] =
 	  csrc[((i + d1_offset)*d2_block_size + j + d2_offset)*element_size*d3_size + k];
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from %p to %p : "	
+		   "%gms - %.2fGB/s\n",				
+		   element_size, host_address,accel_address,		
+		   p4a_timing_elapsedTime,				
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /* @} */
@@ -415,14 +528,17 @@ void P4A_copy_from_accel(size_t element_size,
 #ifdef P4A_TIMING
   P4A_TIMING_accel_timer_start;
 #endif
+ 
   cudaMemcpy(host_address,accel_address,element_size,cudaMemcpyDeviceToHost);
 
 #ifdef P4A_TIMING
   P4A_TIMING_accel_timer_stop;
   P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
   P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
-                    "%.1fms - %.2fGB/s\n",element_size, accel_address,host_address,
-                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+		   "%.1fms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
 #endif
 }
 
@@ -450,14 +566,16 @@ void P4A_copy_to_accel(size_t element_size,
 #ifdef P4A_TIMING
   P4A_TIMING_accel_timer_start;
 #endif
+
   cudaMemcpy(accel_address,host_address,element_size,cudaMemcpyHostToDevice);
 
 #ifdef P4A_TIMING
   P4A_TIMING_accel_timer_stop;
   P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
   P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
-                    "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
-                    p4a_timing_elapsedTime,(float)element_size/(p4a_timing_elapsedTime*1000000));
+		   "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
 #endif
 }
 
@@ -964,7 +1082,7 @@ void p4a_clean(int exitCode)
     @{
  */
 
-#ifdef P4A_PROFILING
+#if defined(P4A_PROFILING) || defined(P4A_TIMING)
 cl_command_queue_properties p4a_queue_properties = CL_QUEUE_PROFILING_ENABLE;
 #else
 cl_command_queue_properties p4a_queue_properties = 0;
@@ -1250,6 +1368,10 @@ void P4A_copy_from_accel(size_t element_size,
 			 void *host_address,
 			 const void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   p4a_global_error=clEnqueueReadBuffer(p4a_queue,
 				       (cl_mem)accel_address,
 				       CL_TRUE, // synchronous read
@@ -1263,6 +1385,16 @@ void P4A_copy_from_accel(size_t element_size,
   P4A_accel_timer_stop_and_float_measure();
   timer_call_from_p4a = false;
   P4A_test_execution_with_message("clEnqueueReadBuffer");
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from accel %p to host %p : "
+		   "%.1fms - %.2fGB/s\n",
+		   element_size, accel_address,host_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Copy a scalar from the host to the hardware accelerator
@@ -1281,6 +1413,10 @@ void P4A_copy_to_accel(size_t element_size,
 		       const void *host_address,
 		       void *accel_address) 
 {
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
+
   p4a_global_error=clEnqueueWriteBuffer(p4a_queue,
 					(cl_mem)accel_address,
 					CL_FALSE,// asynchronous write
@@ -1294,6 +1430,15 @@ void P4A_copy_to_accel(size_t element_size,
   P4A_accel_timer_stop_and_float_measure();
   timer_call_from_p4a = false;
   P4A_test_execution_with_message("clEnqueueWriteBuffer");
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("Copied %zd bytes of memory from host %p to accel %p : "
+		   "%.1fms - %.2fGB/s\n",element_size, host_address,accel_address,
+		   p4a_timing_elapsedTime,
+		   (float)element_size/(p4a_timing_elapsedTime*1000000));
+#endif
 }
 
 /** Function for copying memory from the hardware accelerator to a 1D array in
