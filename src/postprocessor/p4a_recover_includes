@@ -594,7 +594,10 @@ parse_line_pragma_re = re.compile(r'\# (\d+) ([<"][^">]+[">]) (\d) ?(\d)? ?(\d)?
 include_stack = []
 
 def postpreprocess_simple(output_string):
-    "Add a comment on all the begin of standard include files"
+    """Add a comment on all the begin of standard include files before
+    PIPS digestion so that we can detect their inclusion later and recover
+    them in recover_header_simple() in the PIPS output"""
+
     # Build the lexer:
     l = SimpleC99Lexer_simple()
     l.build()
@@ -678,9 +681,34 @@ def postpreprocess_simple(output_string):
     flush_lexer_output("")
 
 
+def sanitize_recover_output(content):
+    """Replace in the content string some work overdone by the
+    gcc preprocessor on Linux.
+
+    Not really portable and do some global rewriting without subtlety..."""
+
+    # Sanitize stuff like
+    # '#include "/usr/lib/gcc/x86_64-linux-gnu/4.4.3/include/stdbool.h"'
+    # or
+    # '#include "/usr/lib/gcc/x86_64-linux-gnu/4.4.3/include-fixed/limits.h"'
+    # into '#include <stdbool.h>'
+    content = re.sub(r'#include "/usr/lib/gcc/[^/]+/[^/]+/include(-fixed)?/([^"]+)"',
+                     '#include <\\2>', content)
+    # Recover C99 floating point constants:
+    content = re.sub(r'\(__huge_val\.__d\)',
+                     'HUGE_VAL', content)
+    content = re.sub(r'\(__huge_valf.__f\)',
+                     'HUGE_VALF', content)
+    content = re.sub(r'\(\(long double\) HUGE_VAL\)',
+                     'HUGE_VALL', content)
+    # TODO to be completed...
+
+    return content
+
+
 def recover_header_simple(file_name, output_file_name):
     """Replace CPP-inlined stuff from previous #include <something.h> by
-    the #include <something.h> itself"""
+    the #include <something.h> itself using a simple method"""
 
     f = open(file_name)
     # slurp all the file in a string:
@@ -694,11 +722,14 @@ def recover_header_simple(file_name, output_file_name):
         output_file_name = file_name
     output = open(output_file_name, mode='w')
 
+    # The string output:
+    so = ""
+
     def flush_lexer_output(content):
-        """Print to output l.lexer.content and content and reset
+        """Append to output l.lexer.content and content and reset
         l.lexer.content
        """
-        print(l.lexer.content + content, end = '', file = output)
+        so += l.lexer.content + content
         l.lexer.content = ""
 
 
@@ -708,65 +739,68 @@ def recover_header_simple(file_name, output_file_name):
         content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/.+?/\* P4A include \1 stops here \*/',
                 r'#include \1', content, 0, re.DOTALL)
 
-        print(content, file = output)
+        so += content
         if verbose:
             print('on ', output_file_name)
-        return
 
-    # Else, the complex method...
+    else:
+        # Else, the complex method...
 
-    # To store the set of found headers:
-    found_headers = set()
+        # To store the set of found headers:
+        found_headers = set()
 
-    # Build the lexer:
-    l = SimpleC99Lexer_simple()
-    l.build()
+        # Build the lexer:
+        l = SimpleC99Lexer_simple()
+        l.build()
 
-    # Give the lexer some input:
-    l.lexer.input(content)
+        # Give the lexer some input:
+        l.lexer.input(content)
 
-    # The current header encountered, used also as a FSM:
-    header = None
+        # The current header encountered, used also as a FSM:
+        header = None
 
-    # Tokenize:
-    for tok in l.lexer:
-        if verbose:
-            print(tok)
-        if tok.type == 'comment':
-            #print(tok.value, end = '')
-            m = parse_pseudo_comment_re.match(tok.value)
-            if m:
-                header = m.group(1)
-                if verbose:
-                    print('Header used:', header)
-                found_headers.add(header)
+        # Tokenize:
+        for tok in l.lexer:
+            if verbose:
+                print(tok)
+            if tok.type == 'comment':
+                #print(tok.value, end = '')
+                m = parse_pseudo_comment_re.match(tok.value)
+                if m:
+                    header = m.group(1)
+                    if verbose:
+                        print('Header used:', header)
+                    found_headers.add(header)
+                else:
+                    # Normal comment
+                    flush_lexer_output(tok.value)
+            elif header:
+                # We are skipping up to the end of the statement since it will
+                # be replaced later by a #include:
+                if tok.type == 'SEMICOLON' and l.lexer.level == 0:
+                    if verbose:
+                        print('End of header used:', header)
+                    # It is the end of the statement, revert in normal mode:
+                    header = None
+                    # Throw away the pending text:
+                    l.lexer.content = ""
+                else:
+                    # Just wait for the future end of statement:
+                    # Just in case we are in a weird file:
+                    l.lexer.content = ""
             else:
-                # Normal comment
-                flush_lexer_output(tok.value)
-        elif header:
-            # We are skipping up to the end of the statement since it will
-            # be replaced later by a #include:
-            if tok.type == 'SEMICOLON' and l.lexer.level == 0:
-                if verbose:
-                    print('End of header used:', header)
-                # It is the end of the statement, revert in normal mode:
-                header = None
-                # Throw away the pending text:
+                # Normal content & output:
+                l.lexer.content += tok.value
+                print(l.lexer.content, end = '')
+                # Reset the content buffer:
                 l.lexer.content = ""
-            else:
-                # Just wait for the future end of statement:
-                # Just in case we are in a weird file:
-                l.lexer.content = ""
-        else:
-            # Normal content & output:
-            l.lexer.content += tok.value
-            print(l.lexer.content, end = '')
-            # Reset the content buffer:
-            l.lexer.content = ""
-    # Flush the output
-    print(l.lexer.content, end = '')
-    # For later use of the lexer, if any, throw away useless characters:
-    l.lexer.content = ""
+        # Flush the output
+        print(l.lexer.content, end = '')
+        # For later use of the lexer, if any, throw away useless characters:
+        l.lexer.content = ""
+
+    # Output the result to the file:
+    print(sanitize_recover_output(so), end = '', file = output)
 
 
 def postpreprocess(output_string):
