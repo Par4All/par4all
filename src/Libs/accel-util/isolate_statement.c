@@ -403,6 +403,24 @@ statement effects_to_dma(statement stat,
         effects=CONS(EFFECT,e,effects);
   }
 
+  /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
+   */
+  if(!fine_grain_analysis) {
+    FOREACH(EFFECT,eff,rw_effects) {
+        if(entity_pointer_p(reference_variable(region_any_reference(eff))))
+            pips_internal_error("pointers wreak havoc with isolate_statement\n");
+      descriptor d = effect_descriptor(eff);
+      if(descriptor_convex_p(d)) {
+          Psysteme sc_old = descriptor_convex(d);
+          Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
+          if(!sc_equal_p(sc_old,sc_new)) {
+              sc_free(sc_old);
+              descriptor_convex(d)=sc_new;
+              effect_approximation_tag(eff)=is_approximation_may;
+          }
+      }
+    }
+  }
 
   /* handle the may approximations here: if the approximation is may,
    * we have to load the data, otherwise the store may store
@@ -445,17 +463,6 @@ statement effects_to_dma(statement stat,
       gen_full_free_list(may_write_effects);
   }
 
-  /* if we failed to provide a fine_grain_analysis, we can still rely on the definition region to over approximate the result
-   */
-  if(!fine_grain_analysis) {
-    FOREACH(EFFECT,eff,effects) {
-      descriptor d = effect_descriptor(eff);
-      if(descriptor_convex_p(d)) {
-        sc_free(descriptor_convex(d));
-        descriptor_convex(d)=entity_declaration_sc(reference_variable(region_any_reference(eff)));
-      }
-    }
-  }
 
   /* The following test could be refined, but it is OK right now if we can
      override it with the following property when generating code for GPU
