@@ -1,0 +1,274 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+
+//  T(x) {}
+
+   int x;
+
+//  T(x) {1<=x}
+
+   x = 1+rand();
+
+//  T(x) {1<=x, x<=x#init, 1<=x#init}
+
+
+   while (1)
+
+//  T(x) {1<=x, x#init<=x+1, x<=x#init}
+
+      if (flip())
+
+//  T(x) {x==x#init-1, 1<=x}
+
+         if (x>1) {
+
+//  T(x) {x==x#init-1, 1<=x}
+
+            x--;
+
+//  T() {1<=x}
+
+            if (!(x>=0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {x<=1}
+
+            while (1)
+
+//  T() {x<=1}
+
+               ;
+      else {
+
+//  T(x) {x==0, x#init==1}
+
+         if (x==1) {
+
+//  T(x) {x==0, x#init==1}
+
+            x--;
+
+//  T() {x==0}
+
+            if (!(x>=0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(x) {x==0, x#init<=0}
+
+         while (flip())
+
+//  T(x) {x==0, x#init==-1}
+
+            if (x<=-1) {
+
+//  T(x) {x==x#init+1, x<=0}
+
+               x++;
+
+//  T() {x==0}
+
+               if (!(x>=0))
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {0<=x}
+
+               while (1)
+
+//  T() {0<=x}
+
+                  ;
+
+//  T(x) {x==1, x#init==0}
+
+         if (x==0) {
+
+//  T(x) {x==1, x#init==0}
+
+            x++;
+
+//  T() {x==1}
+
+            if (!(x>=0))
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {0==-1}
+
+            while (1)
+
+//  T() {0==-1}
+
+               ;
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x;
+
+//  P(x) {}
+
+   x = 1+rand();
+
+//  P(x) {1<=x}
+
+
+   while (1)
+
+//  P(x) {1<=x}
+
+      if (flip())
+
+//  P(x) {1<=x}
+
+         if (x>1) {
+
+//  P(x) {2<=x}
+
+            x--;
+
+//  P(x) {1<=x}
+
+            if (!(x>=0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x) {x==1}
+
+            while (1)
+
+//  P(x) {x==1}
+
+               ;
+      else {
+
+//  P(x) {1<=x}
+
+         if (x==1) {
+
+//  P(x) {x==1}
+
+            x--;
+
+//  P(x) {x==0}
+
+            if (!(x>=0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x) {2<=x}
+
+            while (1)
+
+//  P(x) {2<=x}
+
+               ;
+
+//  P(x) {x==0}
+
+         while (flip())
+
+//  P(x) {x==0}
+
+            if (x<=-1) {
+
+//  P() {0==-1}
+
+               x++;
+
+//  P() {0==-1}
+
+               if (!(x>=0))
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P(x) {x==0}
+
+               while (1)
+
+//  P(x) {x==0}
+
+                  ;
+
+//  P(x) {x==0}
+
+         if (x==0) {
+
+//  P(x) {x==0}
+
+            x++;
+
+//  P(x) {x==1}
+
+            if (!(x>=0))
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      }
+}

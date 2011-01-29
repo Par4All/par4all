@@ -1,0 +1,141 @@
+original code
+void P4A_accel_free(void *ptr)
+{
+   free(ptr);
+}
+void P4A_accel_malloc(void **ptr, size_t n)
+{
+   if (n)
+      *ptr = malloc(n);
+   else
+      *ptr = (void *) 0;
+}
+void P4A_copy_from_accel(size_t element_size, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = d1_offset*element_size+(char *) host_address;
+   char *csrc = accel_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_from_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = d2_offset*element_size+(char *) host_address;
+   char *csrc = (char *) accel_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+         cdest[(i+d1_offset)*element_size*d2_size+j] = csrc[i*element_size*d2_block_size+j];
+}
+void P4A_copy_to_accel(size_t element_size, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = host_address;
+   for(i = 0; i <= element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, void *accel_address)
+{
+   size_t i;
+   char *cdest = accel_address;
+   char *csrc = d1_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size*element_size-1; i += 1)
+      cdest[i] = csrc[i];
+}
+void P4A_copy_to_accel_2d(size_t element_size, size_t d1_size, size_t d2_size, size_t d1_block_size, size_t d2_block_size, size_t d1_offset, size_t d2_offset, void *host_address, void *accel_address)
+{
+   size_t i, j;
+   char *cdest = (char *) accel_address;
+   char *csrc = d2_offset*element_size+(char *) host_address;
+   for(i = 0; i <= d1_block_size-1; i += 1)
+      for(j = 0; j <= d2_block_size*element_size-1; j += 1)
+
+         cdest[i*element_size*d2_block_size+j] = csrc[(i+d1_offset)*element_size*d2_size+j];
+}
+void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
+{
+   unsigned int i, j;
+   for(i = 1; i <= 3; i += 1)
+      for(j = 1; j <= 3; j += 1)
+         result[i][j] = (40*src0[i][j]+60*src1[i][j])/100;
+}
+int main(int argc, char *argv[])
+{
+   short a[4][4], b[4][4], c[4][4];
+   int i, j;
+   for(i = 0; i <= 3; i += 1)
+      for(j = 0; j <= 3; j += 1)
+         c[i][j] = 1+(a[i][j] = 1+(b[i][j] = i*j));
+   alphablending(a, b, c);
+   for(i = 0; i <= 3; i += 1) {
+      for(j = 0; j <= 3; j += 1)
+         printf("%hd ", c[i][j]);
+      puts("\n");
+   }
+   return 0;
+}
+tiled code
+void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
+{
+   unsigned int i, j;
+l99998:
+   for(i = 1; i <= 3; i += 1)
+l99999:      doudou(i, result, src0, src1);
+}
+with r-w regions
+
+//  <result[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+
+void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
+{
+   unsigned int i, j;
+
+//  <result[PHI1][PHI2]-W-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{1<=PHI1, PHI1<=3, 1<=PHI2, PHI2<=3}>
+
+l99998:
+   for(i = 1; i <= 3; i += 1)
+
+//  <result[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=3, 1<=i,
+//    i<=3}>
+//  <src0[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=3, 1<=i, i<=3}>
+//  <src1[PHI1][PHI2]-R-EXACT-{PHI1==i, 1<=PHI2, PHI2<=3, 1<=i, i<=3}>
+
+l99999:      doudou(i, result, src0, src1);
+}
+isolated code
+void alphablending(short src0[4][4], short src1[4][4], short result[4][4])
+{
+   unsigned int i, j;
+   {
+      //PIPS generated variable
+      short (*src10)[4][4] = (short (*)[4][4]) 0, (*src00)[4][4] = (short (*)[4][4]) 0, (*result0)[4][4] = (short (*)[4][4]) 0;
+      P4A_accel_malloc((void **) &result0, sizeof(short)*16);
+      P4A_accel_malloc((void **) &src00, sizeof(short)*16);
+      P4A_accel_malloc((void **) &src10, sizeof(short)*16);
+      P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src0[0][0], *src00);
+      P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &src1[0][0], *src10);
+      P4A_copy_to_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &result[0][0], *result0);
+
+l99998:
+      for(i = 1; i <= 3; i += 1)
+l99999:         doudou(i, *result0, *src00, *src10);
+      P4A_copy_from_accel_2d(sizeof(short), 4, 4, 4, 4, 0, 0, &result[0][0], *result0);
+      P4A_accel_free(result0);
+      P4A_accel_free(src00);
+      P4A_accel_free(src10);
+   }
+}
+

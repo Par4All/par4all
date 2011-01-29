@@ -1,12 +1,11 @@
-// Sumit Gulwani: SPEED: Symbolic Complexity Bound Analysis. CAV 2009:51-62
-// example 1
+// Same as maisonneuve13-1, using graph restructuration
+// Transformer lists are not needed here
 
 // $Id$
 
 #define USE_ASSERT 0
 #define USE_CHECK 1
-#define RESTRUCTURE 1
-#define GOOD (i <= 100 + m)
+#define GOOD (x >= 0)
 
 // usefull stuff
 
@@ -52,65 +51,42 @@ void checking_error(void) {
 
 // transition system
 
-#define G1 (x < 100 && y < m)
-#define G1a (x < 100 && y < m - 1)
-#define G1b (x < 100 && y == m - 1)
-#define U1 {y++; i++;}
+#define G1 (x > 0)
+#define G1a (x == 1)
+#define G1b (x > 1)
+#define U1 {x--;}
 #define T1 {trans(G1, U1);}
 #define T1a {trans(G1a, U1);}
 #define T1b {trans(G1b, U1);}
 
-#define G2 (x < 100 && y >= m)
-#define G2a (x < 99 && y >= m)
-#define G2b (x == 99 && y >= m)
-#define U2 {x++; i++;}
+#define G2 (x <= 0)
+#define G2a (x <= -1)
+#define G2b (x == 0)
+#define U2 {x++;}
 #define T2 {trans(G2, U2);}
 #define T2a {trans(G2a, U2);}
 #define T2b {trans(G2b, U2);}
 
-#define S1 {assert(x < 100 && y < m);}
-#define S2 {assert(x < 100 && y >= m);}
-#define S3 {assert(x >= 100 && y >= m);}
+#define S1 {assert(G1);}
+#define S2 {assert(G2);}
 
 void run(void) {
 	
-	int x, y, m, i;
-	x = y = i = 0;
-	m = rand();
+	int x;
+	x = 1 + rand();
 
-	if (m >= 0) {
-
-#if RESTRUCTURE == 0
-
-		while (1) {
-			if (flip()) {
-				T1;
-			}
-			else {
-				T2;
-			}
+	while (1) {
+		S1;
+		if (flip()) {
+			T1b; S1;
 		}
-		
-#else
-		
-		if (y < m) {
-			S1;
+		else {
+			T1a; S2;
 			while (flip()) {
-				T1a; S1;
+				T2a; S2;
 			}
-			T1b;
+			T2b; S1;
 		}
-		
-		S2;
-		while (flip()) {
-			T2a; S2;
-		}
-		T2b;
-		
-		S3;
-		
-#endif
-		
 	}
 	
 }
