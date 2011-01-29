@@ -6,7 +6,7 @@ TRANSFORMERS
 
 void run()
 {
-   // two variables: a is never known, b is always 0
+   // a and c are never known, b is always 0
 
 //  T(a) {}
 
@@ -83,7 +83,7 @@ PRECONDITIONS
 
 void run()
 {
-   // two variables: a is never known, b is always 0
+   // a and c are never known, b is always 0
 
 //  P() {}
 

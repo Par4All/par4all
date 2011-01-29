@@ -1,0 +1,90 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+
+//  T(x) {}
+
+   int x;
+
+//  T(x) {1<=x}
+
+   x = 1+rand();
+
+//  T(x) {1<=x#init}
+
+
+   while (1) {
+
+//  T() {}
+
+      if (x<0)
+
+//  T() {x+1<=0}
+
+         printf("unreachable\n");
+
+//  T(x) {x#init<=x+1, x<=x#init+1}
+
+      if (x>0)
+
+//  T(x) {x==x#init-1, 0<=x}
+
+         x--;
+      else if (x<=0)
+
+//  T(x) {x==x#init+1, x<=1}
+
+         x++;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x;
+
+//  P(x) {}
+
+   x = 1+rand();
+
+//  P(x) {1<=x}
+
+
+   while (1) {
+
+//  P(x) {0<=x}
+
+      if (x<0)
+
+//  P() {0==-1}
+
+         printf("unreachable\n");
+
+//  P(x) {0<=x}
+
+      if (x>0)
+
+//  P(x) {1<=x}
+
+         x--;
+      else if (x<=0)
+
+//  P(x) {x==0}
+
+         x++;
+   }
+}

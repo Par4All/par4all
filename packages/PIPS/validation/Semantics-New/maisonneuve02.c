@@ -1,6 +1,7 @@
 // This examples works with one while loop,
 // but not with two nested while loops
 // (even with transformer lists)
+// In this case, it requires transformer refinement
 
 // $Id$
 

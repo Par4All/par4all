@@ -6,13 +6,6 @@
 
 // $Id$
 
-#define USE_ASSERT 0
-#define USE_CHECK 1
-#define RESTRUCTURE 1
-#define GOOD (1)
-
-// usefull stuff
-
 #include <stdlib.h>
 
 void error() {
@@ -20,7 +13,7 @@ void error() {
 }
 
 void run() {
-	// two variables: a is never known, b is always 0
+	// a and c are never known, b is always 0
 	int a;
 	int b = 0;
 	int c = rand() % 2;
