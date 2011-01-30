@@ -5945,7 +5945,11 @@ SIMD_PATTERN_FILE "patterns.def"
 
 \subsection{Scalopes project}
 \label{subsubsection-scalopes-project}
-This pass outline code parts based on pragma. It can outline blocs or loops with a \verb=#pragma scmp task= flag. It is based on oultine pass.
+\begin{PipsPass}{scalopragma}
+This pass outlines code parts based on pragma.
+It can outline blocs or loops with a \verb=#pragma scmp task= flag.
+It is based on the outline pass.
+\end{PipsPass}
 \begin{PipsMake}
 scalopragma                    > MODULE.code
                                > MODULE.callees
