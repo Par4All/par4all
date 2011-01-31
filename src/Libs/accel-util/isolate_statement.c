@@ -413,6 +413,10 @@ statement effects_to_dma(statement stat,
       if(descriptor_convex_p(d)) {
           Psysteme sc_old = descriptor_convex(d);
           Psysteme sc_new = entity_declaration_sc(reference_variable(region_any_reference(eff)));
+	  sc_intersection(sc_new,sc_new,predicate_system(transformer_relation(tr)));
+	  sc_intersection(sc_old,sc_old,predicate_system(transformer_relation(tr)));
+	  sc_old=sc_normalize2(sc_old);
+	  sc_new=sc_normalize2(sc_new);
           if(!sc_equal_p(sc_old,sc_new)) {
               sc_free(sc_old);
               descriptor_convex(d)=sc_new;
