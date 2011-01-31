@@ -1,4 +1,4 @@
-2011-01-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2011-01-31  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
 		* Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
 		  global variables.
@@ -6,14 +6,20 @@
 		  Thanks to Sarnath Kannan for this bug report. It should work now
 		  on common cases.
 
-		* Prototype on lazy CUDA communication optimizations
+		* Prototype on lazy CUDA communication optimizations to remove
+		  redundant host-accelerator communications.
 
 		* Fixed a space iteration transposition bug in accelerator mode
-		  that was killing performances
+		  that was killing performances. But right now, better results are
+		  obtained with 2D kernels.
 
-		* Better error and warning messages
+		* C99 for(int i;...;...) are now accepted.
 
-		* Script cleaning by using Python module names everywhere
+		* Can generate kernels with less perfectly nested loops.
+
+		* Better error and warning messages.
+
+		* Script cleaning by using Python module names everywhere.
 
 2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
@@ -24,7 +30,7 @@
 		  try to cope with these evolutions.
 
 		* Added the Stars-pm cosmological N-body simulation program as an
-		  example
+		  example.
 
 		* Now the runtime can deal with subarray transfers between the
 		  host and the accelerator, up to 4D arrays. Well right now the
@@ -35,69 +41,69 @@
 2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.3 is a base version to be used from Windows in a
-		  Wild Cruncher
+		  Wild Cruncher..
 
 		* NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
-		  code for nVidia GPU
+		  code for nVidia GPU.
 
-		* Can now compile on Fedora
+		* Can now compile on Fedora.
 
-        * New option to use simpler #include recovery
+        * New option to use simpler #include recovery.
 
-		* Can move produced files to a given directory
+		* Can move produced files to a given directory.
 
-        * Improved documentation
+        * Improved documentation.
 
-        * New options for Python code injection
+        * New options for Python code injection.
 
-        * Better error messages
+        * Better error messages.
 
 2010-09-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.2
 
-        * Clean up examples and their README files
+        * Clean up examples and their README files.
 
             Added an option to run Hyantes example in single precision
-            (for demos on laptops with small GPU)
+            (for demos on laptops with small GPU).
 
-        * Updated to current PIPS and PyPS version
+        * Updated to current PIPS and PyPS version.
 
-        * --accel without --cuda works again for GPU emulation in OpenMP
+        * --accel without --cuda works again for GPU emulation in OpenMP.
 
-        * Do not use new PyPS #include recovery
+        * Do not use new PyPS #include recovery.
 
         * Recover any #include, not only standard ones (useful for Par4All
-          Scilab)
+          Scilab).
 
-        * Do not use PIPS capply by default when running phases
+        * Do not use PIPS capply by default when running phases.
 
         * Added path normalization in p4a_setup so that configure can
-          take relative path
+          take relative path.
 
         * p4a_validate post-processing utility updated to cope with new
-          PIPS validation output
+          PIPS validation output.
 
 2010-07-23  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.1
 
-        * Corrected library name issue for libcutil on 32 bit x86
+        * Corrected library name issue for libcutil on 32 bit x86.
 
-        * Fixed bugs into array_to_pointer
+        * Fixed bugs into array_to_pointer.
 
-        * Corrected behaviour of NULL for nvcc
+        * Corrected behaviour of NULL for nvcc.
 
-        * Fixed usage of limit_nested_parallelism in p4a_process.py
+        * Fixed usage of limit_nested_parallelism in p4a_process.py.
 
-        * Better error message display
+        * Better error message display.
 
-        * Fixed OpenMP prettyprint of C parallel loops with label
+        * Fixed OpenMP prettyprint of C parallel loops with label.
 
-        * Deals with clock() intrinsic function
+        * Deals with clock() intrinsic function.
 
 2010-07-16  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0 released
 
-            Initial version
+            Initial version.
