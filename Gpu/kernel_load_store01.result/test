@@ -66,7 +66,6 @@ void give()
       //PIPS generated variable
       double (*array0)[100] = (double (*)[100]) 0;
       P4A_accel_malloc((void **) &array0, sizeof(double)*100);
-      P4A_copy_to_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
 
 
       change(&j, *array0);
@@ -102,7 +101,7 @@ void give();
 //PIPS generated variable
 typedef unsigned int size_t;
 //PIPS generated variable
-void P4A_accel_malloc(void **address, size_t size), P4A_copy_to_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, const void *host_address, void *accel_address), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
+void P4A_accel_malloc(void **address, size_t size), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
 void change(int *i, double array[N])
 {
    int k;
@@ -120,7 +119,6 @@ void give()
       //PIPS generated variable
       double (*array0)[100] = (double (*)[100]) 0;
       P4A_accel_malloc((void **) &array0, sizeof(double)*100);
-      P4A_copy_to_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
 
 
       change(&j, *array0);
