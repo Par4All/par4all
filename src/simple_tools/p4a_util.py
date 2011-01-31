@@ -492,8 +492,9 @@ def ping(host, silent = True):
 
 
 def get_distro():
-    '''Returns currently running Linux distribution name (ubuntu, debian, redhat, etc.).'''
-    return platform.linux_distribution()[0]
+    '''Returns currently running Linux distribution name (ubuntu, debian,
+    redhat, etc.) always in lower case.'''
+    return str.lower(platform.linux_distribution()[0])
 
 
 def pkg_config(dist_dir, variable):
