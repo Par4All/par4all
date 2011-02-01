@@ -235,6 +235,10 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 */
 #define P4A_min(a, b) ((a) > (b) ? (b) : (a))
 
+/* fallback for pips generated MIN and MAX */
+#define MIN(a,b) (((a)>(b))?(b):(a))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
 #ifdef P4A_ACCEL_CUDA
 #include <p4a_accel-CUDA.h>
 #else

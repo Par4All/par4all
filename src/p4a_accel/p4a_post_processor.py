@@ -91,7 +91,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     ## with
     ##   P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
     ## }
-#   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
+#    content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
     content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*?(?#
@@ -124,6 +124,18 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     # So here is a quick hack to recover NULL symbolic
     content = re.sub(r'\(void \*\) 0',
                      "NULL", content)
+
+    # Complex handler:
+    # Change float _Complex to p4a_fcomplex, as defined in p4a_complex.h.
+    # Update include file accordingly.
+    content = re.sub(r'float +_Complex',
+                     "p4a_complexf", content)
+    content = re.sub(r'complex.h','p4a_complex.h',content) # optimisitc :p
+    # This to be compatible with expanded I from complex.h
+    # There should be somethough about how to handle this.
+    # A pips phase seems more appropriate ....
+    content = re.sub(r'1.0iF','I',content) # optimisitc :p
+    content = re.sub(r'0.iF','0.f',content) # optimisitc :p
 
 
     if verbose:
