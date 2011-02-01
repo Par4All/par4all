@@ -1,0 +1,55 @@
+int main()
+{
+   int a[10];
+   int *p;
+//             <    is written>: b c
+   int b = 0, c = 1;
+//             <    is read   >: b c
+   if (b==c)
+//             <    is written>: p
+      p = &a[0];
+   else
+//             <    is written>: p
+      p = &a[1];
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+//             <    is read   >: p
+//             <    is written>: p
+   ++p;
+//             <    is read   >: p
+//             <    is written>: p
+   p--;
+//             <    is read   >: p
+//             <    is written>: p
+   --p;
+   return 0;
+}
+POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   int b = 0, c = 1;
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   if (b==c)
+//  {(p,a[0],-Exact-)}
+      p = &a[0];
+   else
+//  {(p,a[1],-Exact-)}
+      p = &a[1];
+//  {(p,a[1],-MAY-);(p,a[0],-MAY-)}
+   p++;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   ++p;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   p--;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   --p;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}

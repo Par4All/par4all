@@ -1,3 +1,25 @@
+int main()
+{
+   float t;
+   float *a;
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+
+   a = (float *) malloc(10*sizeof(float));
+//             <    is read   >: t
+//             <    is written>: t
+
+   for (t = 1.0;t<2.0;t+0, 01)
+//             <    is read   >: i
+//             <    is written>: i
+      for (i = 0;i<10;i++)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         a[i] = a[i]+t*0, 5;
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -10,18 +32,13 @@ int main()
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    a = (float *) malloc(10*sizeof(float));
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
 
-   t = 1.0;
-//  {(a,*HEAP*_l_9,-Exact-)}
-   while (t<2.0) {
-//  {(a,*HEAP*_l_9,-Exact-)}
-      for(i = 0; i <= 9; i += 1)
-//  {(a,*HEAP*_l_9,-Exact-)}
+   for (t = 1.0;t<2.0;t+0, 01)
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
+      for (i = 0;i<10;i++)
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
          a[i] = a[i]+t*0, 5;
-//  {(a,*HEAP*_l_9,-Exact-)}
-      t+0, 01;
-   }
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
    return 0;
 }

@@ -1,3 +1,23 @@
+int main()
+{
+   float f;
+   int *p, *q;
+   int a[10];
+   int b[10];
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: q
+   q = &b[0];
+//             <    is read   >: f
+//             <    is written>: f
+   for (f = 0.0;f<10.5;f += 1.0)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      *p++ = 2**q++;
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -19,17 +39,11 @@ int main()
 //  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    q = &b[0];
 //  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
-   f = 0.0;
-//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
-   while (f<10.5) {
+   for (f = 0.0;f<10.5;f += 1.0)
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,a[0],-MAY-);(q,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],-MAY-)}
       *p++ = 2**q++;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
-      f += 1.0;
-   }
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,a[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],-MAY-)}
    return 0;
 }

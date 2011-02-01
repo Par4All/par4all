@@ -1,3 +1,17 @@
+int main()
+{
+   float *p;
+   float a[10];
+   int i;
+//             <may be written>: p
+//             <    is read   >: i
+//             <    is written>: i
+
+   for (i = 0;i<10;p = &a[i])
+      ;
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -9,12 +23,9 @@ int main()
    int i;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   i = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   while (i<10) {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
-      p = &a[i];
-   }
+   for (i = 0;i<10;p = &a[i])
+//  {(p,a[i],-Exact-)}
+      ;
 //  {(p,a[i],-Exact-)}
    return 0;
 }
