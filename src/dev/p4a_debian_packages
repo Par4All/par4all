@@ -1,0 +1,15 @@
+# Build the Debian packages for 2 architectures in one command
+# An example used by Ronan Keryell
+
+# You can use the --publish and --release options, etc,
+# for example -z -j4 --publish --git-repository=.
+
+# The 64 bit version on the local machine:
+src/simple_tools/p4a_coffee.py $@ &
+
+# The 32 bit version on minou where the is no room enough in /tmp
+# Use -A to be able to push with the local ssh authentication agent to the
+# final git:
+ssh -A minou.enstb.org "export TMP=/export/bouteille/tmp_no_backup/par4all/par4all; cd \$TMP; git pull; src/simple_tools/p4a_coffee.py $@" &
+
+wait

@@ -307,7 +307,7 @@ class ValidationClass:
                 # See next line:
                 continue
             # Should be in normal mode now:
-            if len(args) == 2 or (len(args) == 3 and  args[2] in string.digits):
+            if len(args) == 2 or (len(args) == 3 and  str.isdigit(args[2])):
                 # We are in a 'skipped/failed/changed:
                 # Syntax/common2.tpips' form, with an optional number at
                 # the end:
