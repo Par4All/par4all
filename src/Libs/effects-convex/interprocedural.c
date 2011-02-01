@@ -612,7 +612,18 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       } /* case is_syntax_reference */
     case is_syntax_subscript:
       {
-	pips_internal_error("Subscript not supported yet");
+	pips_debug(8, "Subscript not supported yet -> anywhere");
+	bool read_p = false, write_p = false;
+	FOREACH(EFFECT, eff, l_sum_eff)
+	  {
+	    if(effect_write_p(eff)) write_p = true;
+	    else read_p = true;
+	  }
+
+	if (write_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL));
+	if (read_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), NIL));
 	break;
       }
     case is_syntax_call:
@@ -767,19 +778,16 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
     case is_syntax_cast :
       {
 	bool read_p = false, write_p = false;
-	    pips_user_warning("Cast in actual parameter -> anywhere effect\n");
-	    FOREACH(EFFECT, eff, l_sum_eff)
-	      {
-		if(effect_write_p(eff)) write_p = true;
-		else read_p = false;
-	      }
-
-	    if (write_p)
-	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL));
-	    if (read_p)
-	      l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), NIL));
-	    break;
-
+	pips_user_warning("Cast in actual parameter -> anywhere effect\n");
+	FOREACH(EFFECT, eff, l_sum_eff)
+	  {
+	    if(effect_write_p(eff)) write_p = true;
+	    else read_p = true;
+	  }
+	if (write_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL));
+	if (read_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), NIL));
 	break;
       }
     case is_syntax_sizeofexpression :
@@ -794,7 +802,17 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
       }
     case is_syntax_application :
       {
-	pips_internal_error("Application not supported yet");
+	bool read_p = false, write_p = false;
+	pips_user_warning("Application not supported yet -> anywhere effect\n");
+	FOREACH(EFFECT, eff, l_sum_eff)
+	  {
+	    if(effect_write_p(eff)) write_p = true;
+	    else read_p = true;
+	  }
+	if (write_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_write_memory()), NIL));
+	if (read_p)
+	  l_eff = gen_nconc(l_eff, CONS(EFFECT, make_anywhere_effect(make_action_read_memory()), NIL));
 	break;
       }
     case is_syntax_range :
