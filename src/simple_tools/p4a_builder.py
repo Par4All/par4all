@@ -200,7 +200,7 @@ class p4a_builder:
                     c_flags += [ "-fno-openmp" ]
                     fortran_flags += [ "-fno-openmp" ]
                     ld_flags += [ "-fno-openmp" ]
-            
+
             if accel_openmp:
                 cpp_flags += [ "-DP4A_ACCEL_OPENMP", "-I" + os.environ["P4A_ACCEL_DIR"] ]
                 fortran_flags.append ("-ffree-line-length-none")

@@ -54,9 +54,9 @@ default_properties = dict(
 # redifined for FORTRAN
 default_fortran_cuda_properties = dict(
     GPU_KERNEL_PREFIX                     = "P4A_KERNEL",
-    GPU_WRAPPER_PREFIX                    = "P4A_KERNEL_WRAPPER",
-    GPU_LAUNCHER_PREFIX                   = "P4A_KERNEL_LAUNCHER",
-    GPU_FORTRAN_WRAPPER_PREFIX            = "P4A_FORTRAN_WRAPPER",
+    GPU_WRAPPER_PREFIX                    = "P4A_WRAPPER",
+    GPU_LAUNCHER_PREFIX                   = "P4A_LAUNCHER",
+    GPU_FORTRAN_WRAPPER_PREFIX            = "P4A_F08_WRAPPER",
     CROUGH_SCALAR_BY_VALUE_IN_FCT_DECL    = True,
     CROUGH_SCALAR_BY_VALUE_IN_FCT_CALL    = True,
     PRETTYPRINT_STATEMENT_NUMBER          = False,
@@ -604,7 +604,7 @@ class p4a_processor(object):
 
     def fortran_wrapper_p (self, file_name):
         prefix = self.get_fortran_wrapper_prefix()
-        fortran_wrapper_file_name_re = re.compile(prefix + "_[0-9]+.f[0-9]*")
+        fortran_wrapper_file_name_re = re.compile(prefix + "_\\w+.f[0-9]*")
         m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
@@ -728,7 +728,7 @@ class p4a_processor(object):
         # fortran wrappers
         # have their names of this form:
         f_wrapper_prefix = self.get_fortran_wrapper_prefix ()
-        f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\d+$")
+        f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\w+$")
         f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
 #        f_wrappers.print_call_graph ()
 
@@ -854,6 +854,10 @@ class p4a_processor(object):
                 # generate the header file
                 header_file = os.path.join(output_dir, name + ".h")
                 args = ["cproto"]
+                args.append ("-I")
+                args.append (os.environ["P4A_ACCEL_DIR"])
+                args.append ("-D")
+                args.append ("P4A_ACCEL_OPENMP")
                 args.append ("-D")
                 args.append (self.wrapper_return_type + "=void")
                 args.append ("-D")
