@@ -435,6 +435,34 @@ number of paramters.
  */
 #define P4A_CONCAT(a,b) a ## b
 
+/** 21 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+20 last parameters are passed to P4A_arg20().*/
+#define P4A_arg21(n,x,...)  P4A_arg1(n,x,...) P4A_arg20(n+1,__VA_ARGS__) 	
+/** 20 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+19 last parameters are passed to P4A_arg19().*/
+#define P4A_arg20(n,x,...)  P4A_arg1(n,x,...) P4A_arg19(n+1,__VA_ARGS__) 	
+/** 19 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+18 last parameters are passed to P4A_arg18().*/
+#define P4A_arg19(n,x,...)  P4A_arg1(n,x,...) P4A_arg18(n+1,__VA_ARGS__) 	
+/** 18 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+17 last parameters are passed to P4A_arg17().*/
+#define P4A_arg18(n,x,...)  P4A_arg1(n,x,...) P4A_arg17(n+1,__VA_ARGS__) 	
+/** 17 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+16 last parameters are passed to P4A_arg16().*/
+#define P4A_arg17(n,x,...)  P4A_arg1(n,x,...) P4A_arg16(n+1,__VA_ARGS__) 	
+/** 16 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+15 last parameters are passed to P4A_arg15().*/
+#define P4A_arg16(n,x,...)  P4A_arg1(n,x,...) P4A_arg15(n+1,__VA_ARGS__) 	
+/** 15 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+14 last parameters are passed to P4A_arg14().*/
+#define P4A_arg15(n,x,...)  P4A_arg1(n,x,...) P4A_arg14(n+1,__VA_ARGS__) 	
 /** 14 parameters interpreter in OpenCl. The first parameter x is
 interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
 13 last parameters are passed to P4A_arg13().*/
