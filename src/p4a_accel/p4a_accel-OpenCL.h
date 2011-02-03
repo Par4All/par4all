@@ -670,7 +670,7 @@ parameters types are resolved.
     p4a_block_y = P4A_CL_ITEM_Y_PER_GROUP_IN_2D;			\
   }									\
   else {								\
-    /* Allocate a maximum of threads alog X axis (the warp dimension) for \
+    /* Allocate a maximum of threads along X axis (the warp dimension) for \
        better average efficiency: */					\
     p4a_block_x = P4A_min((int) (n_x_iter),				\
 			  (int) P4A_CL_ITEM_MAX);			\
@@ -682,7 +682,13 @@ parameters types are resolved.
   size_t block_descriptor_name[]={(size_t)p4a_block_x,(size_t)p4a_block_y}; \
   /* The globalWorkSize argument for clEnqueueNDRangeKernel */		\
   /* Define the ceil-rounded number of needed blocks of threads: */	\
-  size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)}; \
+  /*size_t grid_descriptor_name[]={(size_t)(n_x_iter),(size_t)(n_y_iter)};*/ \
+  /* In OpenCL, global_x must equal the total local dimension */	\
+  int global_x = p4a_block_x*p4a_block_y;				\
+  int global_y = n_x_iter*n_y_iter/global_x+1;				\
+  size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
+  /*fprintf(stderr,"p4a_block_x = %d et p4a_block_y = %d\n",p4a_block_x,p4a_block_y); */ \
+  /*fprintf(stderr,"n_x_iter = %d et n_y_iter = %d\n",global_x,global_y);*/ \
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
