@@ -1,63 +1,42 @@
-# A GNU makefile to run a demo of Par4All
+# A GNU makefile to run a demo of Par4All on Jacobi application excerpt
 
-TARGETS= jacobi
+TARGET= jacobi
 
-OPENMP= -fopenmp
-CFLAGS= -O3 -std=c99
-# -Wall
-LDLIBS= -lm
-DEMO_EDITOR=gedit
+ifeq "$(USE_FLOAT)" "1"
+# Use single precision for the OpenMP and GPU version:
+P4A_OPTIONS= -DUSE_FLOAT
+# Use also single precision for the sequential version:
+CFLAGS+= -DUSE_FLOAT
+endif
 
-# This can be overriden by CUDA_DIR and CUDA_SDK environment variables:
-CUDA_DIR=/usr/local/cuda
-#CUDA_SDK_DIR=$(HOME)/NVIDIA_GPU_Computing_SDK
-
-# For debugging, add -g -DP4A_DEBUG
-#P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc
-P4A_CFLAGS= -std=c99 -fopenmp -O3 -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_OPENMP -I$(CUDA_DIR)/include
-
-NVCC=$(CUDA_DIR)/bin/nvcc
-# GT200
-#CUDA_ARCHITECTURE= -arch=sm_13
-# G92
-CUDA_ARCHITECTURE= -arch=sm_11
-#CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -I$(CUDA_SDK_DIR)/C/common/inc -DUNIX -O2
-CUDA_CFLAGS= --compiler-options -fno-strict-aliasing --ptxas-options=-v $(CUDA_ARCHITECTURE) -I$(P4A_ACCEL_DIR) -DP4A_ACCEL_CUDA -I$(CUDA_DIR)/include -DUNIX -O2
-#CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64 -L$(CUDA_SDK_DIR)/C/lib -L$(CUDA_SDK_DIR)/C/common/lib/linux
-CUDA_LDFLAGS= -L$(CUDA_DIR)/lib64
-#CUDA_LIBS= -lcudart -lcutil_x86_64
-CUDA_LIBS= -lcudart
-LD_LIBRARY_PATH=$(CUDA_DIR)/lib64
-export LD_LIBRARY_PATH
+# You can set P4A_OPTIONS to pass options to p4a
+CFLAGS+= -O3 -std=c99 -Wall -D_GNU_SOURCE
+LDLIBS+= -lm
 
 # To play with OpenMP parameters:
 #OMP_SCHEDULE="dynamic"
 #OMP_NUM_THREADS=2
-OMP_DYNAMIC=false
-OMP_NESTED=false
+#OMP_DYNAMIC=false
+#OMP_NESTED=false
 
 #export OMP_SCHEDULE
 #export OMP_NUM_THREADS
-export OMP_DYNAMIC
+#export OMP_DYNAMIC
 #export OMP_NESTED
 
 
-SOURCES= $(TARGETS:=.c)
+SOURCES= $(TARGET:=.c)
 
-# Where to find files:
-vpath %.h $(P4A_ACCEL_DIR)
-vpath %.c $(P4A_ACCEL_DIR)
-
-#.PHONY: clean demo $(addprefix demo_, $(TARGETS)) $(addprefix run_, $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda))
+#.PHONY: clean demo $(addprefix demo_, $(TARGET)) $(addprefix run_, $(TARGET) $(TARGET:=_omp) $(TARGET:=_p4a_omp) $(TARGET:=_p4a_cuda))
 
 #.DEFAULT:
 #	echo Target $@ not implemented...
 
-# Keep intermediate files for the demo:
-.PRECIOUS: $(TARGETS:=.p4a.c) $(TARGETS:=.database)
+# Keep intermediate files for the demo for further inspection:
+.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
 
 
-.INTERMEDIATE: $(TARGETS)
+#.INTERMEDIATE: $(TARGET:=_seq)
 
 
 default:
@@ -66,53 +45,54 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo_% : run_% run_%_omp run_%_p4a_omp run_%_p4a_cuda ;
-
-# The full demo:
-demo : $(addprefix demo_, $(TARGETS))
+demo : display_seq display_openmp display_cuda display_accel ;
+demo : display_seq display_openmp display_cuda display_opt display_accel display_accel_opt ;
 
 
 clean :
-	rm -rf $(TARGETS) $(TARGETS:=_omp) $(TARGETS:=.p4a.c) $(TARGETS:=.p4a.cu) $(TARGETS:=_p4a_omp) $(TARGETS:=_p4a_cuda) *~ *.database output.pgm amplitude.pgm phase.pgm
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq.pgm output_openmp.pgm output_cuda.pgm output_accel.pgm
 
-all : $(TARGET) $(TARGET)_pips_omp
+run%: $(TARGET)%
+	# Run a version and display timing information:
+	time ./$< Logo_HPC-Project-GTC.pgm
+	mv output.pgm output$*.pgm
+	# It was total time (starting time, I/O and computations)
+	# Compare the result with the reference. Note that there may be
+	# some slight differences because of non associativity of floating
+	# point computations or different implementations of floating
+	# point computations on GPUs:
+	-diff -q output$*.pgm output-ref.pgm
 
-% : %.c
+display% : run%
+	# Display graphically the results:
+	eog output$*.pgm
+
+# To be able to display the reference too:
+run_ref:;
+
+# To have shortcut as seq for of typing hyantes-static-99_seq
+%:$(TARGET)_% ;
+
+%_seq : %.c
+	# Compilation of the sequential program:
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $<
 
-# Use complex more solution to avoid interaction with .c rules...
+%_openmp : %.c
+	# Parallelize and build an OpenMP version:
+	p4a $(P4A_OPTIONS) -o $@ $< $(LDLIBS)
 
-run_jacob%:
-	$(MAKE) jacob$*
-	time ./jacob$* Logo_HPC-Project-GTC.pgm
-	# It was total time (starting time, I/O and computations)
-	# Compare the result with the reference:
-	-diff -q output.pgm output-ref.pgm
+%_cuda : %.c
+	# Parallelize and build a CUDA version:
+	p4a $(P4A_OPTIONS) --cuda -o $@ $< $(LDLIBS)
 
+%_cuda_opt : %.c
+	# Parallelize and build a CUDA version with communication optimizations:
+	p4a $(P4A_OPTIONS) --cuda --com-optimization -o $@ $< $(LDLIBS)
 
-# This must be after the previous rules to avoid run_jacobi_omp to be
-# interpreted as a sequel of run_jacobi_omp.c... :-)
+%_accel : %.c
+	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
+	p4a $(P4A_OPTIONS) --accel -o $@ $< $(LDLIBS)
 
-%.p4a.c : %.c Makefile
-	# Parallelize the code:
-	p4a -vvv $<
-
-%_omp : %.p4a.c Makefile
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OPENMP) $(LDLIBS) -o $@ $<
-
-# Build the binary from the output of PIPS:
-%_p4a_omp : %.database Makefile
-	@echo Compiling Par4All OpenMP version
-	gcc $(P4A_CFLAGS) $*.database/P4A/*.c $(P4A_ACCEL_DIR)/p4a_accel.c -o $@ -lm
-
-# Build the binary from the output of PIPS:
-%_p4a_cuda : %.database Makefile
-	@echo Compiling Par4All CUDA version
-	cd $*.database/P4A; $(NVCC) -c $(CUDA_CFLAGS) *.cu $(P4A_ACCEL_DIR)/p4a_accel.cu
-	cd $*.database/P4A; g++ -fPIC $(CUDA_LDFLAGS) *.o -o $@ $(CUDA_LIBS) -lm
-	mv $*.database/P4A/$@ .
-
-# Run PIPS
-%.database : %.c
-	#tpips $*.tpips
-	python $*.py
+%_accel_opt : %.c
+	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator with communication optimizations:
+	p4a $(P4A_OPTIONS) --accel --com-optimization -o $@ $< $(LDLIBS)
