@@ -1,4 +1,4 @@
-Release notes for Par4All 1.0.5, 2010/12/22
+Release notes for Par4All 1.0.5, 2010/02/03
 ===========================================
 
 Ronan Keryell, HPC Project.
@@ -151,30 +151,9 @@ few known limitations :
 - variables in functions can only be defined at the beginning of a block,
   before any normal statement (like in C89)
 
-- for a similar reason, loop index variable can not be declared directly
-  in the loop such according the C99 syntax as in::
-
-    {
-      [...]
-      for(int i = 0; i < N; i++) {
-        [...]
-      }
-      [...]
-    }
-
-  but should be replaced with the C89 syntax as::
-
-    {
-      int i;
-      [...]
-      for(i = 0; i < N; i++) {
-        [...]
-      }
-      [...]
-    }
-
 - you should avoid heavy use of pointers to enable a good
-  parallelization. The point-to analysis is still on-going in PIPS
+  parallelization. The point-to analysis is still on-going in PIPS, but in
+  the general case it is untractable... So avoid if possible.
 
 - there are still issues in the part that analyzes the control graph (the
   PIPS ``controlizer``). For example, right now we cannot deal well with a
@@ -261,7 +240,7 @@ ready at release time but should be in a next release.
 Python
 ------
 
-On Debian, PLY seems to be installed only with Python 2.5. It works with
+On Debian, PLY seems to be installed only with Python 2.x. It works with
 Python 2.6 and 3.1 with the ``PYTHONPATH`` generated for Par4All (with a
 trailing ``:/usr/share/pyshared``). Unfortunately this breaks ``ipyps``.
 

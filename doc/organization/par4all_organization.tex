@@ -500,7 +500,7 @@ list of options is described in detail.
 \subsubsection{\protect\texttt{p4a\_git} and \protect\texttt{git} typical use cases}
 \label{sec:p4a_git-typical-use}
 
-The \Apfa \testtt{p4a} reference branches are used to contstruct \Apfa
+The \Apfa \texttt{p4a} reference branches are used to contstruct \Apfa
 and potentially contain integration work performed by \Apfa team
 members beyond the current release. To retrieve an up-to-date version
 of a reference branch, use:
@@ -517,7 +517,7 @@ git merge p4a-own
 \end{verbatim}
 When the results are validated and reread (for example verify with
 \texttt{gitk} that something has not been committed by error on
-\texttt{p4a} branch), work is published to the main \testtt{p4a} branch
+\texttt{p4a} branch), work is published to the main \texttt{p4a} branch
 using:
 \begin{verbatim}
 git push origin p4a-own
@@ -1381,6 +1381,83 @@ The wrong work is still connected to the branch
 \texttt{p4a}, but no longer \emph{in} the branch. It is typical in
 \Agit to avoid the loss
 of information.
+
+
+\subsection{The history has been rewritten on the server or how to resolve
+  an uchrony with git}
+\label{sec:history-has-been}
+
+\Apfa is complex with many branches and sometimes some commits that should
+have not existed reach the development server. For example, when an error
+should have been fixed as in section~\ref{sec:you-have-comited}
+\emph{before} pushing on the server...
+
+In this case, someone change the head of the wrong branches on the server
+and a mail is sent to the developer list to warn everybody that the
+branches have been sent back in the past to discard some commits. In
+general the action to do, if you have not committed new stuff since this
+event on this branch, is something like:
+\begin{verbatim}
+git fetch
+git branch -f p4a <some nice SHA-1 value>
+\end{verbatim}
+
+In the general case, if you have not done some developments since the
+history rewriting of the \texttt{p4a} branch for example, you can try:
+\begin{verbatim}
+git fetch
+git branch -f p4a remotes/origin/p4a
+\end{verbatim}
+to make the local tracking branch to the server branch.
+
+If you want to resynchronize all the branches, try:
+\begin{verbatim}
+# First park to a third-party unused branch to avoid interferences:
+git checkout master
+git fetch
+p4a_git --branch-action git branch -f p4a\$suffix remotes/origin/p4a\$suffix
+\end{verbatim}
+
+The following is for people willing to understand what can happen.
+
+If you do not do that what is going to happen? If no new commit is pushed
+on the server and you push candidly tour repository, the previously
+fetched wrong commits will be sent back to the server since you are in the
+future compared to the new reference on the server (which we sent back in
+the past by rewriting the history, do you remember?). Since \Agit is a
+peer-to-peer system, your repository or the central repository are
+considered of the same importance and yours is trusted as so. So the wrong
+commits will appear back in the central repository where they will
+reappear for everybody... \frownie{} Then, everybody recurse at the
+beginning of section~\ref{sec:history-has-been}... Too bad.
+
+If there has been some new commits on the server, the server branch is in
+some future compared to the point the server branch was sent back in the
+past but your branch (which is in the previous future \smiley) seems
+having diverged since this point. So if you do a \texttt{git pull}, the
+automatic merge is likely to fail. This is why you have to reset manually
+the reference branch with a \texttt{git branch -f} as previously
+explained.
+
+In the worst case, you have committed some work before figuring out the
+history has been rewritten. Then you can create a new branch to point on
+your work. Then you can sent back the wrong branch in the past. Then you
+pull from the server and you can apply back your commits by cherry-picking
+from the save branch or rebasing it as in
+section~\ref{sec:you-have-comited}.
+
+Have you still done something quite wrong? It is not an issue, everything
+is done in \Agit to avoid losing work. It is somewhere. Just figure out
+where and how to get back on rails. \smiley
+
+\begin{quote}
+  To summarize this section, you need to understand that rewriting the
+  history is globally a pain for everybody in the project. So, since a
+  nice feature of \Agit is to separate commits from pushing to a server,
+  take some times to review commits \emph{before} pushing them. If this is
+  not respected, we will forbid direct commits to the central server but
+  we will use quarantine server or branches first.
+\end{quote}
 
 
 \appendix
