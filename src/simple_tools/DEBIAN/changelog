@@ -1,4 +1,4 @@
-2011-01-31  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+2011-02-03  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
 		* Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
 		  global variables.
@@ -16,6 +16,9 @@
 		* C99 for(int i;...;...) are now accepted.
 
 		* Can generate kernels with less perfectly nested loops.
+
+		* Updated examples directory to new options and communication
+		  optimizations
 
 		* Better error and warning messages.
 
