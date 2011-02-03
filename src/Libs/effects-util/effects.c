@@ -297,6 +297,12 @@ bool io_effect_p(effect e)
 {
   return io_effect_entity_p(reference_variable(effect_any_reference(e)));
 }
+bool io_effects_p(list effects)
+{
+    FOREACH(EFFECT,eff,effects)
+        if(io_effect_p(eff)) return true;
+    return false;
+}
 
 bool std_file_effect_p(effect e)
 {

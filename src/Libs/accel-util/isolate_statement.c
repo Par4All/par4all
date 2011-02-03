@@ -472,7 +472,7 @@ statement effects_to_dma(statement stat,
      override it with the following property when generating code for GPU
      for example. */
   if (!get_bool_property("ISOLATE_STATEMENT_EVEN_NON_LOCAL")
-     && effects_on_non_local_variable_p(effects)) {
+     && effects_on_non_local_variable_p(effects) && !io_effects_p(effects)) {
     pips_user_error("Cannot handle with some effects on non local variables in isolate_statement\n");
     /* Should not return from previous exception anyway... */
     return statement_undefined;
@@ -487,7 +487,9 @@ statement effects_to_dma(statement stat,
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {
-        if(!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR")) {
+        if( !io_effect_p(eff) && 
+                (!entity_scalar_p(re) || get_bool_property("KERNEL_LOAD_STORE_SCALAR"))
+           ) {
             list /*of dimensions*/ the_dims = NIL,
                  /*of expressions*/the_offsets = NIL;
             effect_to_dimensions(eff,tr,&the_dims,&the_offsets,condition);
