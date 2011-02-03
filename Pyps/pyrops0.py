@@ -42,17 +42,11 @@ with pworkspace("basics0.c",deleteOnClose=True) as w:
 	
 	# recover a list of all labels in the source code ... without pipsing
 	##
-	import re # we are gonne use regular expression
+	import re # we are gonna use regular expression
 	label_re = re.compile("^ *(\w+):")
-	# code gives us a list of line view of modue's code
-	lines=foo.code()
-	labels=[]
-	for line in lines:
-		m = label_re.match(line)
-		if m:
-			for label in m.groups(1):
-				labels.append(label);
-	
+	# code gives us a list of line view of module's code
+	line=w.fun.megablast.code
+	labels = label_re.findall(line)
 	if labels:
 		print "found labels:"
 		for l in labels: print l
