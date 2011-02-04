@@ -309,6 +309,12 @@ bool std_file_effect_p(effect e)
   const char * s = entity_user_name(effect_entity(e));
   return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
 }
+bool std_file_effects_p(list effects)
+{
+    FOREACH(EFFECT,eff,effects)
+        if(std_file_effect_p(eff)) return true;
+    return false;
+}
 
 /* Can we merge these two effects because they are equal or because
    they only differ by their approximations and their descriptors? */
