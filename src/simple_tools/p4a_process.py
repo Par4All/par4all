@@ -584,6 +584,15 @@ class p4a_processor(object):
 
         return
 
+    def generated_modules_is_empty (self):
+        return (len (self.generated_modules) == 0)
+
+    def crough_modules_is_empty (self):
+        return (len (self.crough_modules) == 0)
+
+    def interface_modules_is_empty (self):
+        return (len (self.interface_modules) == 0)
+
     def get_launcher_prefix (self):
         return self.workspace.props.GPU_LAUNCHER_PREFIX
 
@@ -1000,11 +1009,14 @@ class p4a_processor(object):
         # The default place is fine for us since we work later on the files:
         self.workspace.save()
 
-        # Create the folder for p4a new files
+        # Create the folder for p4a new files if needed
+        new_file_flag =  not (self.generated_modules_is_empty () and
+                              self.crough_modules_is_empty () and
+                              self.interface_modules_is_empty ())
         output_dir = os.path.join(os.getcwd(), "p4a_new_files")
         if dest_dir:
             output_dir = os.path.join(dest_dir,"p4a_new_files")
-        if not (os.path.isdir(output_dir)):
+        if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
             os.makedirs (output_dir)
 
         # save the user files
