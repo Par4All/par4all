@@ -338,6 +338,9 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 
    A more generic implementation would have been in ri-util instead.
 
+   There are asumptions that 2 comments have been pushed in the parser
+   before.
+
    @param[in] e1 is the init part of the for
 
    @param[in] e2 is the conditional part of the for
@@ -354,7 +357,7 @@ statement MakeForloop(expression e1,
 		      statement body) {
   forloop f;
   statement smt;
-  string sc = pop_current_C_comment();
+  // Assume this push have been done in the parser:
   int sn = pop_current_C_line_number();
   expression init = e1;
   expression cond = e2;
@@ -420,6 +423,14 @@ statement MakeForloop(expression e1,
        Add the labeled statement after the loop */
     insert_statement(smt, s2, FALSE);
 
+  // Assume these 2 push have been done in the parser:
+  string comment_after_for_clause = pop_current_C_comment();
+  string comment_before_for_clause = pop_current_C_comment();
+  string sc = strdup(concatenate(comment_before_for_clause,
+				 comment_after_for_clause,
+				 NULL));
+  free(comment_after_for_clause);
+  free(comment_before_for_clause);
   smt = add_comment_and_line_number(smt, sc, sn);
   stack_pop(LoopStack);
   pips_assert("For loop consistent", statement_consistent_p(smt));

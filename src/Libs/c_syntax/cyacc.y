@@ -1597,18 +1597,25 @@ statement_without_pragma:
 			  stack_pop(LoopStack);
 			}
 |   for_clause
+    /* Since opt_expression may reset the comments, we should try to
+       preserve them first everytime. To do some days. Right now it is not
+       a top priority... */
     opt_expression /* So it is a C89 for loop */
-     TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression TK_RPAREN
+    TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression
 			{
 			  /* Save the comments agregated in the for close up to now: */
 			  push_current_C_comment();
 			}
+    TK_RPAREN
     statement
                         {
 			  $$ = MakeForloop($2, $4, $6, $9);
 			}
 |   for_clause
     declaration /* So it is a C99 for loop with a declaration in it */
+    /* Since opt_expression may reset the comments, we should try to
+       preserve them first everytime. To do some days. Right now it is not
+       a top priority... */
     opt_expression TK_SEMICOLON opt_expression TK_RPAREN
 			{
 			  /* Save the comments agregated in the for close up to now: */
@@ -1749,7 +1756,24 @@ for_clause:
 				     LoopStack);
                           /* Record the line number of thw "for" keyword: */
 			  push_current_C_line_number();
-                        }
+			  /* Try to save a max of comments. The issue is
+			     that opt_expression's afterwards can reset
+			     the comments if there is a comma_expression
+			     in them. So at least preserve the commemts
+			     before the for.
+
+			     Issue trigered by several examples such as
+			     validation/Semantics-New/do01.tpips
+
+			     But I think now (RK, 2011/02/05 :-) ) that in
+			     a source-to-source compiler comments should
+			     appear *explicitly* in the parser syntax and
+			     not be dealt by some side effects in the
+			     lexer as now in PIPS with some stacks and so
+			     on.
+			  */
+			  push_current_C_comment();
+			}
   TK_LPAREN
 ;
 
