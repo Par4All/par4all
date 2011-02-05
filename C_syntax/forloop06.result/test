@@ -1,0 +1,12 @@
+int main()
+{
+   int i, j;                                                            /*0004*/
+   i = 0;                                                               /*0005*/
+   /* This is an overcommented for loop :-) */
+   /* before init *//* after init *//* before cond *//* after cond *//* before inc *//* after inc */
+   for (j = 0;j<5;j++)                                                  /*0007*/
+      /* loop body */
+      i++;                                                              /*0009*/
+   /* after the loop */
+   return 0;                                                            /*0013*/
+}

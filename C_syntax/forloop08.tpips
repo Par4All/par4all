@@ -1,0 +1,18 @@
+setenv WS forloop08
+delete $WS
+create $WS $WS.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate NEW_CONTROLIZER
+display PRINTED_FILE[main]
+
+close
+
+delete $WS
+
+quit
+
