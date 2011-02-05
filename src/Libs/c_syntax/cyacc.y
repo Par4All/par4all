@@ -612,9 +612,7 @@ static void ResetDerivedEntityDeclarations()
 %type <string> one_string
 
 %type <liste> rest_par_list rest_par_list1
-%type <liste> declaration_list
 %type <liste> statement_list
-%type <statement> for_clause
 %type <liste> decl_spec_list /* to store the list of entities such as struct, union and enum, typedef*/
 %type <liste> my_decl_spec_list
 %type <liste> decl_spec_list_opt_no_named
@@ -1358,10 +1356,17 @@ bracket_comma_expression:
 
 statements_inside_block:
     TK_LBRACE
-                        { EnterScope(); discard_C_comment(); }
-    local_labels block_attrs declaration_list statement_list
+                        { EnterScope();
+			  /* To avoid some parasitic line skipping after the
+			     block opening brace. May be it should be
+			     cleaner to keep this eventual line-break as a
+			     comment in the statement, for subtler user
+			     source layout representation? */
+			  discard_C_comment();
+			}
+    local_labels block_attrs statement_list
                         {
-			  $$ = MakeBlock($5,$6);
+			  $$ = MakeBlock($5);
 			  ExitScope();
 			}
 
@@ -1397,15 +1402,6 @@ block_attrs:
                         { CParserError("BLOCKATTRIBUTE not implemented\n"); }
 ;
 
-declaration_list:
-    /* empty */         { $$ = NIL; }
-|   declaration declaration_list
-                        {
-			  //discard_C_comment();
-			  $$ = gen_nconc($1,$2);
-			}
-
-;
 statement_list:
     /* empty */         { $$ = NIL; }
 |   statement statement_list
@@ -1520,6 +1516,23 @@ statement_without_pragma:
 
 			}
 |   block               { }
+|   declaration         {
+  			  /* In C99 we can have a declaration anywhere!
+
+			     Declaration returns a statement list. Maybe
+			     it could be changed to return only a
+			     statement? Well sometimes NIL is returned
+			     here so deeper work is required for
+			     this... */
+ 			  list sl = $1;
+			  if (gen_length(sl) > 1) {
+			    print_statements(sl);
+			    pips_internal_error("There should be no more than 1 declaration at a time here instead of %zd\n", gen_length(sl));
+			  }
+			  /* Extract the statement from the list and free
+			     the list container: */
+			  $$ = make_statement_from_statement_list_or_empty_block(sl);
+}
 |   TK_IF paren_comma_expression statement                    %prec TK_IF
                 	{
 			  $$ = test_to_statement(make_test(MakeCommaExpression($2), $3,
@@ -1583,15 +1596,27 @@ statement_without_pragma:
 			  (void) pop_current_C_comment();
 			  stack_pop(LoopStack);
 			}
-|   TK_FOR
-                        {
-			  stack_push((char *) make_basic_int(loop_counter++), LoopStack);
+|   for_clause
+    opt_expression /* So it is a C89 for loop */
+     TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression TK_RPAREN
+			{
+			  /* Save the comments agregated in the for close up to now: */
 			  push_current_C_comment();
-			  push_current_C_line_number();
 			}
-    TK_LPAREN for_clause
-	                {
-			  $$ = $4;
+    statement
+                        {
+			  $$ = MakeForloop($2, $4, $6, $9);
+			}
+|   for_clause
+    declaration /* So it is a C99 for loop with a declaration in it */
+    opt_expression TK_SEMICOLON opt_expression TK_RPAREN
+			{
+			  /* Save the comments agregated in the for close up to now: */
+			  push_current_C_comment();
+			}
+    statement
+                        {
+			  $$ = MakeForloopWithIndexDeclaration($2, $3, $5, $8);
 			}
 |   label statement
                         {
@@ -1715,16 +1740,19 @@ statement_without_pragma:
 			}
 ;
 
+
 for_clause:
-    opt_expression TK_SEMICOLON opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
+  TK_FOR
                         {
-			  $$ = MakeForloop($1, $3, $5, $7);
-			}
-|   declaration opt_expression TK_SEMICOLON opt_expression TK_RPAREN statement
-                        {
-			  $$ = MakeForloopWithIndexDeclaration($1, $2, $4, $6);
-			}
+			  /* Number the loops in prefix depth-first: */
+			  stack_push((char *) make_basic_int(loop_counter++),
+				     LoopStack);
+                          /* Record the line number of thw "for" keyword: */
+			  push_current_C_line_number();
+                        }
+  TK_LPAREN
 ;
+
 
 declaration:                               /* ISO 6.7.*/
     decl_spec_list init_declarator_list TK_SEMICOLON
@@ -1979,7 +2007,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			  pips_assert("CONTINUE for declarations", continue_statements_p(sl));
 			  // el contains only hidden internal PIPS
 			  // entities, but some of them at least must
-			  // be seen b the prettyprinter
+			  // be seen by the prettyprinter
 			  if(ENDP(el)) {
 			    rl = sl;
 			  }
