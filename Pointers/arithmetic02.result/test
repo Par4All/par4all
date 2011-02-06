@@ -63,11 +63,14 @@ int main()
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
 //   -Exact-);(pfin,t[10-1],-Exact-)}
       // BEGIN BLOCK
-//  points to = {}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
       if (*p==0)
-//  points to = {}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
          printf("%d ", p-pdeb);
-//  points to = {}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
       p++;
       // END BLOCK
    }

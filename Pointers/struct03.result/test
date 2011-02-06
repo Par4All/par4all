@@ -9,18 +9,18 @@ int struct03()
       struct three un;
       struct three deux;
    } x[10];
-//               <must be written>: i
+//             <    is written>: i
    int i = 0;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
 
    for (i = 0;i<10;i++) {
       // BEGIN BLOCK
-//               <must be read   >: i
-//               <must be written>: x[i][.un][.first]
+//             <    is read   >: i
+//             <    is written>: x[i].un.first
       x[i].un.first = 1;
-//               <must be read   >: i
-//               <must be written>: x[i][.deux][.second]
+//             <    is read   >: i
+//             <    is written>: x[i].deux.second
       x[i].deux.second = 0;
       // END BLOCK
    }

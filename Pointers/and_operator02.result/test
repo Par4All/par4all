@@ -36,12 +36,12 @@ int main()
 //  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    if ((p = q)&&(r = s))
-//  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,j,-Exact-);(r,l,
+//   -Exact-);(s,l,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       *p++;
    else if ((p = q)||(r = s))
-//  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,j,-Exact-);(q,j,-Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(s,l,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       *r++;
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,j,-MAY-);(q,j,
 //   -Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(r,l,-MAY-);(s,l,

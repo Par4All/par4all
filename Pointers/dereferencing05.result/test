@@ -45,10 +45,10 @@ void dereferencing05()
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    *p++ = 0.;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    *p-- = 0.;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    *++p = 0.;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    *--p = 0.;
 }
