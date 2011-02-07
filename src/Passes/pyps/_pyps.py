@@ -11,7 +11,7 @@ import re
 import time
 import types
 from copy import deepcopy
-from string import split, upper, join
+from string import split, upper, lower, join
 from subprocess import Popen, PIPE
 import inspect
 
@@ -113,9 +113,9 @@ class module:
 		pypsutils.set_properties(self._ws,props)
 		return self._ws.cpypips.display(upper(rc),self._name)
 
-	def __get_code(self):
+	def __get_code(self, activate="print_code"):
 		"""get module code as a string"""
-		self._ws.cpypips.apply("PRINT_CODE",self._name)
+		getattr(self,lower(activate if isinstance(activate, str) else activate.__name__ ))()
 		rcfile=self.show("printed_file")
 		return file(self._ws.dirname()+rcfile).read()
 
@@ -168,11 +168,10 @@ class module:
 				#print "warning, changing ", name, "into", passe+"_"+name
 		return props
 
-	def saveas(self,path):
-		fd=file(path,"w")
-		for line in self.code():
-			fd.write(line)
-		fd.close()
+	def saveas(self,path,activate="print_code"):
+		with file(path,"w") as fd:
+			fd.write(self.__get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
+		
 
 ### module_methods /!\ do not touch this line /!\
 
@@ -552,10 +551,7 @@ class workspace(object):
 
 	def activate(self,phase):
 		"""activate a given phase"""
-		if isinstance(phase, str):
-			p = upper(phase)
-		else:
-			p = upper(phase.__name__)
+		p =  upper(phase if isinstance(phase, str) else phase.__name__ )
 		self.cpypips.user_log("Selecting rule: %s\n", p)
 		self.cpypips.activate(p)
 
