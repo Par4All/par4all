@@ -14,15 +14,16 @@ int main()
    q = (int **) malloc(sizeof(int *));
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*HEAP*_l_9,-Exact-)}
    q[0] = &a;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*HEAP*_l_9,-Exact-);(q[0],
-//   a,-Exact-)}
+//  {(*HEAP*_l_9,a,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,
+//   *HEAP*_l_9,-Exact-)}
    p = (int ***) malloc(sizeof(int * *));
-//  {(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-);(q[0],a,-Exact-)}
+//  {(*HEAP*_l_9,a,-Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,
+//   -Exact-)}
    p[0] = q;
-//  {(p,*HEAP*_l_11,-Exact-);(p[0],*HEAP*_l_9,-Exact-);(q,*HEAP*_l_9,
-//   -Exact-);(q[0],a,-Exact-)}
+//  {(*HEAP*_l_11,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(*HEAP*_l_9,a,
+//   -Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
    free(p);
-//  {(p,*HEAP*_l_11,-Exact-);(p[0],*HEAP*_l_9,-Exact-);(q,*HEAP*_l_9,
-//   -Exact-);(q[0],a,-Exact-)}
+//  {(*HEAP*_l_11,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(*HEAP*_l_9,a,
+//   -Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
    return 0;
 }

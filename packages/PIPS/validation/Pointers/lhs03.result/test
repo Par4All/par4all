@@ -13,7 +13,7 @@ Proper effects for "lhs03"
 void lhs03()
 {
    int i;
-//               <must be written>: i
+//             <    is written>: i
 
    i = 2;
 }

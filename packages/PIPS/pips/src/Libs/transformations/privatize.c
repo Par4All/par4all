@@ -52,6 +52,7 @@
 #include "dg.h"
 #include "control.h"
 #include "pipsdbm.h"
+#include "properties.h"
 #include "transformations.h"
 
 #include "resources.h"
@@ -546,6 +547,16 @@ bool privatize_module(char *mod_name)
  * @name localize declaration
  * @{ */
 
+static void do_gather_loop_indices(loop l, set s) {
+	set_add_element(s,s,loop_index(l));
+}
+
+static set gather_loop_indices(void *v) {
+	set s = set_make(set_pointer);
+	gen_context_recurse(v,s,loop_domain,gen_true,do_gather_loop_indices);
+	return s;
+}
+
 /**
    @brief Create a statement block around the statement if it is a do-loop with local/private variable
 
@@ -574,8 +585,12 @@ void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
 
         /* now add declarations to the created block */
         list locals = gen_copy_seq(loop_locals(l));
+	list sd = statement_to_declarations(s);
+    	set li = gather_loop_indices(s);
         FOREACH(ENTITY,e,locals)
         {
+            if(!entity_in_list_p(e,sd) && 
+		(!get_bool_property("LOCALIZE_DECLARATION_SKIP_LOOP_INDICES") || !set_belong_p(li,e))) {
             /* create a new name for the local entity */
             int n = get_statement_depth(s,get_current_module_statement());
             string new_entity_local_name = NULL;
@@ -598,8 +613,11 @@ void localize_declaration_walker(statement s, hash_table old_entity_to_new) {
             hash_put(old_entity_to_new,e,previous_replacements);
             FOREACH(ENTITY,prev,previous_replacements)
                 replace_entity(s,prev,new_entity);
+            }
         }
+set_free(li);
         gen_free_list(locals);
+        gen_free_list(sd);
     }
   }
 }

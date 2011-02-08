@@ -65,6 +65,7 @@ Parsed printed file
 
 void decl01(char *dir)
 {
+   ;
 
    struct c *y;
    struct c {

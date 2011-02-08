@@ -584,11 +584,19 @@ static void copy_to_call(statement st, call c) {
     pips_debug(3,"%s is a Kernel !\n",
         func_name);
     // it's a kernel call !!
-    // Let's add the "region in" to copy_to set !
+    // Let's add the "region in" and "region out" to copy_to set !
     list l_in = load_statement_in_regions(st);
     FOREACH(EFFECT, eff, l_in )
     {
-      print_effect(eff);
+      entity e_used = reference_variable(effect_any_reference(eff));
+      if(entity_array_p(e_used)) {
+        pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
+        copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
+      }
+    }
+    list l_out = load_statement_out_regions(st);
+    FOREACH(EFFECT, eff, l_out )
+    {
       entity e_used = reference_variable(effect_any_reference(eff));
       if(entity_array_p(e_used)) {
         pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));

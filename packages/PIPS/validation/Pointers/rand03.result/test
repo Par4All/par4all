@@ -11,7 +11,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
    for(iy = 0; iy <= ny-1; iy += 1)
       for(ix = 0; ix <= nx-1; ix += 1) {
 
-         while (u==0||u>1) 
+         while (u==0||u>1)
             u = rand()/32768.;
          A = sqrt(-(2.*log(u)));
          v = rand()/32768.;
@@ -45,7 +45,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
       for(ix = 0; ix <= nx-1; ix += 1) {
 //  points to = {}
 
-         while (u==0||u>1) 
+         while (u==0||u>1)
 //  points to = {}
             u = rand()/32768.;
 //  points to = {}

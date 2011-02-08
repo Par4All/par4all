@@ -1,25 +1,48 @@
+void compute()
+{
+   // BEGIN BLOCK
+   int i, j;
+//             <    is written>: i
+
+   for(i = 1; i <= 62; i += 1)
+//             <    is written>: j
+      for(j = 1; j <= 62; j += 1) {
+         // BEGIN BLOCK
+//             <    is read   >: i j
+//             <    is written>: tab1[i][j]
+         tab1[i][j] = i*j;
+//             <    is read   >: i j
+//             <    is written>: tab2[i][j]
+         tab2[i][j] = i*j;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i j tab3
+         tab3[i][j] = i*j;
+         // END BLOCK
+      }
+   // END BLOCK
+}
 int main(int argc, char *argv[])
 {
    // BEGIN BLOCK
    int t, i;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: tab3 _MALLOC_EFFECTS:_MALLOC_ i
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i tab3 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       tab3[i] = malloc(64*sizeof(float));
-//               <must be written>: t
+//             <    is written>: t
    for(t = 0; t <= 63; t += 1)
-//               <may be read    >: tab3
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: tab3
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       compute();
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//               <may be read    >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: _MALLOC_EFFECTS:_MALLOC_
-//               <must be written>: _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       free(tab3[i]);
 
    return 0;
@@ -60,18 +83,18 @@ int main(int argc, char *argv[])
 //  points to = {}
 
    for(i = 1; i <= 62; i += 1)
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
       tab3[i] = malloc(64*sizeof(float));
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
    for(t = 0; t <= 63; t += 1)
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
       compute();
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
 
    for(i = 1; i <= 62; i += 1)
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
       free(tab3[i]);
-//  {(tab3[i],*ANY_MODULE*:*HEAP**ANYWHERE*,-MAY-)}
+//  points to = {}
 
    return 0;
    // END BLOCK

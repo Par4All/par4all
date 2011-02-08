@@ -2,12 +2,12 @@ int main()
 {
    // BEGIN BLOCK
    int *x, *a, i;
-//               <must be written>: i
+//             <    is written>: i
    i = 1;
-//               <must be written>: a
+//             <    is written>: a
    a = &i;
-//               <must be read   >: a
-//               <must be written>: x
+//             <    is read   >: a
+//             <    is written>: x
    x = a;
 
    return 0;

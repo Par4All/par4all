@@ -7,6 +7,7 @@ int main()
    int b;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    a[0] = &b;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(a[0],b,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*,b,-Exact-);(a,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    return 0;
 }

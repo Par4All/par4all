@@ -6,7 +6,7 @@ class Pii(pipscc):
     def changes(self, ws):
         
         def filter(module):
-            return len(module.code()) < 3
+            return module.code.count("\n") < 3
 
         ws.filter(filter).inlining()
 

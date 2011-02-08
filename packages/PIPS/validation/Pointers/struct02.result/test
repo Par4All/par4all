@@ -5,29 +5,29 @@ int struct02()
       int first;
       int second;
    } x[10];
-//               <must be written>: i
+//             <    is written>: i
    int i = 0;
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
 
    for (i = 0;i<10;i++)
       if (1) {
          // BEGIN BLOCK
-//               <must be read   >: i
-//               <must be written>: x[i][.first]
+//             <    is read   >: i
+//             <    is written>: x[i].first
          x[i].first = 1;
-//               <must be read   >: i
-//               <must be written>: x[i][.second]
+//             <    is read   >: i
+//             <    is written>: x[i].second
          x[i].second = 0;
          // END BLOCK
       }
       else {
          // BEGIN BLOCK
-//               <must be read   >: i
-//               <must be written>: x[i][.first]
+//             <    is read   >: i
+//             <    is written>: x[i].first
          x[i].first = 0;
-//               <must be read   >: i
-//               <must be written>: x[i][.second]
+//             <    is read   >: i
+//             <    is written>: x[i].second
          x[i].second = 1;
          // END BLOCK
       }

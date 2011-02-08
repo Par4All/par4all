@@ -142,7 +142,12 @@ void InitializeBlock()
   BlockStack = stack_make(statement_domain,0,0);
 }
 
-statement MakeBlock(list decls, list stmts)
+/* Create a block statement
+
+   It also gather all the declarations in the statements and declare them
+   in the block sequence.
+*/
+statement MakeBlock(list stmts)
 {
   /* To please to current RI choices about Fortran, blocks cannot carry
      line numbers nor comments */
@@ -151,18 +156,14 @@ statement MakeBlock(list decls, list stmts)
      appears after the last statement of the block. To save it, as is
      done in Fortran, an empty statement should be added at the end of
      the sequence. */
-  /* Because of old C standard, the initial list of declaration
-     statements is separated from the executable statements. However,
-     C99 allows declarations anywhere in the block. So some
-     declaration statements may be located in stms. */
-  list sl = gen_nconc(decls, stmts);
-  list dl = statements_to_direct_declarations(sl);
+  // Gather all the direct declarations from the  statements:
+  list dl = statements_to_direct_declarations(stmts);
 
   statement s = make_statement(entity_empty_label(),
 			       STATEMENT_NUMBER_UNDEFINED /* get_current_C_line_number() */,
 			       STATEMENT_ORDERING_UNDEFINED,
 			       empty_comments /* get_current_C_comment() */,
-			       make_instruction_sequence(make_sequence(sl)),
+			       make_instruction_sequence(make_sequence(stmts)),
 			       dl, string_undefined, empty_extensions ());
 
   discard_C_comment();
@@ -337,6 +338,9 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
 
    A more generic implementation would have been in ri-util instead.
 
+   There are asumptions that 2 comments have been pushed in the parser
+   before.
+
    @param[in] e1 is the init part of the for
 
    @param[in] e2 is the conditional part of the for
@@ -353,7 +357,7 @@ statement MakeForloop(expression e1,
 		      statement body) {
   forloop f;
   statement smt;
-  string sc = pop_current_C_comment();
+  // Assume this push have been done in the parser:
   int sn = pop_current_C_line_number();
   expression init = e1;
   expression cond = e2;
@@ -419,6 +423,14 @@ statement MakeForloop(expression e1,
        Add the labeled statement after the loop */
     insert_statement(smt, s2, FALSE);
 
+  // Assume these 2 push have been done in the parser:
+  string comment_after_for_clause = pop_current_C_comment();
+  string comment_before_for_clause = pop_current_C_comment();
+  string sc = strdup(concatenate(comment_before_for_clause,
+				 comment_after_for_clause,
+				 NULL));
+  free(comment_after_for_clause);
+  free(comment_before_for_clause);
   smt = add_comment_and_line_number(smt, sc, sn);
   stack_pop(LoopStack);
   pips_assert("For loop consistent", statement_consistent_p(smt));
@@ -447,8 +459,8 @@ statement MakeForloop(expression e1,
    may mark the for loop with an extension here so that the prettyprinter
    could use this hint to know if it has to do some resugaring or not.
 
-   @param[in,out] s1 is the init part of the for. It is a list with one
-   statement
+   @param[in,out] decls is the init part of the for. It is a declaration
+   statement list
 
    @param[in] e2 is the conditional part of the for
 
@@ -458,18 +470,15 @@ statement MakeForloop(expression e1,
 
    @return a statement that contains the declaration and the for
 */
-statement MakeForloopWithIndexDeclaration(list s1,
+statement MakeForloopWithIndexDeclaration(list decls,
 					  expression e2,
 					  expression e3,
 					  statement body) {
-  pips_assert("s1 is a list of one element", gen_length(s1) == 1);
-  // Get the declaration statement:
-  statement decl = STATEMENT(CAR(s1));
-  gen_free_list(s1);
   ifdebug(6) {
-    printf("For loop statement declaration: \n");
-    print_statement(decl);
+    printf("For loop statement declarations: \n");
+    print_statements(decls);
   }
+  statement decl = make_statement_from_statement_list_or_empty_block(decls);
   /* First generate naive but more robust version in the RI, such as:
 
      {
