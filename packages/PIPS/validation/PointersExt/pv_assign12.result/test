@@ -1,0 +1,23 @@
+//  {}
+int main()
+{
+//  points to = {}
+   int *a[2];
+//  points to = {}
+   int b[2];
+//  points to = {}
+   int c = 0;
+//  points to = {}
+
+   if (1)
+//  points to = {}
+      a[0] = &b[0];
+   else
+//  points to = {}
+      a[0] = &b[1];
+//  {(a[0],b[1],-MAY-);(a[0],b[0],-MAY-)}
+
+   a[1] = &c;
+//  {(a[0],b[1],-MAY-);(a[0],b[0],-MAY-);(a[1],c,-Exact-)}
+   return 0;
+}
