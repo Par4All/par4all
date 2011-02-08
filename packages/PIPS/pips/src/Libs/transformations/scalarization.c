@@ -424,7 +424,8 @@ static bool loop_scalarization(loop l)
 	    statement_substitute_scalarized_array_references(s, pvr, sv);
 
 	    // Take care of copy-in and copy-out code if necessary
-	    if (!entity_undefined_p(ov)) {
+	    if (get_bool_property("SCALARIZATION_FORCE_OUT")
+		|| !entity_undefined_p(ov)) {
 	      // Generate copy-out code
 	      statement co_s =
 		make_assign_statement(reference_to_expression(pvr),
