@@ -24,11 +24,9 @@ def remove_libc_typedef (content):
     libc can be added here and there. This will make the compilation to fail.
     So remove them
     """
-    print "PIV\n\n\n\n"
     size_t_re = re.compile ("typedef.*size_t");
     match_l = size_t_re.findall (content)
     for m in match_l:
-        print "PIV match\n\n\n\n"
         assert (len (match_l) == 1)
         content = content.replace (m, "")
     return content
