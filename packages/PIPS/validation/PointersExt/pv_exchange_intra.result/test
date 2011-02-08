@@ -23,8 +23,7 @@ int main()
    p = r;
 //  {(p,b,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
    r = (int *) NULL;
-//  {(p,b,-Exact-);(q,a,-Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(r,b,-Exact-)}
+//  {(p,b,-Exact-);(q,a,-Exact-);(r,*NULL_POINTER*,-Exact-)}
 
    return 0;
 }

@@ -813,7 +813,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_kernel_launcher_0(space);
+   p4a_launcher_get_data(space);
    
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
@@ -832,9 +832,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   p4a_kernel_launcher_1(save, space);
+   p4a_launcher_iteration(save, space);
 
-   p4a_kernel_launcher_2(save, space);
+   p4a_launcher_iteration_1(save, space);
 }
 void write_data(char filename[])
 {
@@ -878,158 +878,4 @@ int main(int argc, char *argv[])
    write_data("output.pgm");                                            /*0133*/
 
    return 0;                                                            /*0135*/
-}
-void iteration(float_t space[501][501], float_t save[501][501])
-{
-   int i, j;                                                            /*0087*/
-   {
-      //PIPS generated variable
-      float_t (*space1)[501][501] = (float_t (*)[501][501]) 0, (*save1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &save1, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space1);
-
-      
-      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-      p4a_kernel_launcher_1(*save1, *space1);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save1);
-      P4A_accel_free(save1);
-      P4A_accel_free(space1);
-   }
-   {
-      //PIPS generated variable
-      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0, (*save0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &save0, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save0);
-
-
-      p4a_kernel_launcher_2(*save0, *space0);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
-      P4A_accel_free(save0);
-      P4A_accel_free(space0);
-   }
-}
-void get_data(char filename[])
-{
-   int i, j, nx, ny;                                                    /*0017*/
-   unsigned char c;                                                     /*0018*/
-   FILE *fp;                                                            /*0019*/
-   if ((fp = fopen(filename, "r"))==(void *) 0) {                       /*0021*/
-      perror("Error loading file");                                     /*0022*/
-      exit(0);                                                          /*0023*/
-   }
-   
-   /* Get *.pgm file type */
-   c = fgetc(fp);                                                       /*0027*/
-   c = fgetc(fp);                                                       /*0028*/
-   do {                                                                 /*0033*/
-      while ((c = fgetc(fp))!='\n')                                     /*0032*/
-         ;                                                              /*0032*/
-   }
-   while ((c = fgetc(fp))=='#');                                        /*0033*/
-   
-   /* Put back good char */
-   ungetc(c, fp);                                                       /*0036*/
-   
-   /* Get image dimensions */
-   fscanf(fp, "%d %d\n", &nx, &ny);                                     /*0039*/
-   /* Get grey levels */
-   fscanf(fp, "%d", &i);                                                /*0041*/
-   /* Get ONE carriage return */
-   fgetc(fp);                                                           /*0043*/
-   printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
-   {
-      //PIPS generated variable
-      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
-
-      
-      /* Erase the memory, in case the image is not big enough: */
-      p4a_kernel_launcher_0(*space0);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
-      P4A_accel_free(space0);
-   }
-   
-   /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
-      for(i = 0; i <= nx-1; i += 1) {
-         c = fgetc(fp);                                                 /*0054*/
-         /* Truncate the image if too big: */
-         if (i<501&&j<501)                                              /*0056*/
-            space[i][j] = c;                                            /*0057*/
-      }
-
-   fclose(fp);                                                          /*0060*/
-}
-void iteration(float_t space[501][501], float_t save[501][501])
-{
-   int i, j;                                                            /*0087*/
-   {
-      //PIPS generated variable
-      float_t (*space1)[501][501] = (float_t (*)[501][501]) 0, (*save1)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &save1, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &space1, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space1);
-
-      
-      /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
-           could use also a flip-flop dimension instead... */
-      p4a_kernel_launcher_1(*save1, *space1);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save1);
-      P4A_accel_free(save1);
-      P4A_accel_free(space1);
-   }
-   {
-      //PIPS generated variable
-      float_t (*space0)[501][501] = (float_t (*)[501][501]) 0, (*save0)[501][501] = (float_t (*)[501][501]) 0;
-      P4A_accel_malloc((void **) &save0, sizeof(float)*251001);
-      P4A_accel_malloc((void **) &space0, sizeof(float)*251001);
-      P4A_copy_to_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &save[0][0], *save0);
-
-
-      p4a_kernel_launcher_2(*save0, *space0);
-      P4A_copy_from_accel_2d(sizeof(float), 501, 501, 501, 501, 0, 0, &space[0][0], *space0);
-      P4A_accel_free(save0);
-      P4A_accel_free(space0);
-   }
-}
-void p4a_kernel_wrapper_2(int i, int j, float_t save[501][501], float_t space[501][501])
-{
-   // To be assigned to a call to P4A_vp_1: i
-   // To be assigned to a call to P4A_vp_0: j
-   // Loop nest P4A end
-   // Loop nest P4A end
-   if (i<=498&&j<=498)                                                  /*0008*/
-      /*0004*/
-      
-      save[i+1][j+1] = 0.25*(space[i+1-1][j+1]+space[i+1+1][j+1]+space[i+1][j+1-1]+space[i+1][j+1+1]);               /*0010*/
-   /*0006*/
-   ;
-}
-void p4a_kernel_wrapper_0(int i, int j, float_t save[501][501], float_t space[501][501])
-{
-   // To be assigned to a call to P4A_vp_1: i
-   // To be assigned to a call to P4A_vp_0: j
-   // Loop nest P4A end
-   // Loop nest P4A end
-   if (i<=498&&j<=498)                                                  /*0008*/
-      /*0004*/
-      
-      space[i+1][j+1] = 0.25*(save[i+1-1][j+1]+save[i+1+1][j+1]+save[i+1][j+1-1]+save[i+1][j+1+1]);   /*0010*/
-   /*0006*/
-   ;
-}
-void p4a_kernel_wrapper_1(int i, int j, float_t space[501][501])
-{
-   // To be assigned to a call to P4A_vp_1: i
-   // To be assigned to a call to P4A_vp_0: j
-   // Loop nest P4A end
-   // Loop nest P4A end
-   if (i<=500&&j<=500)                                                  /*0008*/
-      /*0004*/
-      space[i][j] = 0;                                                  /*0009*/
-   /*0005*/
-   ;
 }

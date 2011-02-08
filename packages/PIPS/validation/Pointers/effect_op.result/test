@@ -1,54 +1,54 @@
 int main()
 {
-//               <must be written>: b
+//             <    is written>: b
    int b = 1;
-//               <must be written>: i
+//             <    is written>: i
    int i = 10;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
 
    b = b+i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b = b*i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b = b/i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b = b&i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b = b^i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b = b|i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b += i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b *= i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b /= i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b -= i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b &= i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b |= i;
-//               <must be read   >: b i
-//               <must be written>: b
+//             <    is read   >: b i
+//             <    is written>: b
    b ^= i;
-//               <must be read   >: b
-//               <must be written>: b
+//             <    is read   >: b
+//             <    is written>: b
    b++;
-//               <must be read   >: b
-//               <must be written>: b
+//             <    is read   >: b
+//             <    is written>: b
    b--;
 
    return 0;

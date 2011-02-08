@@ -15,17 +15,17 @@ Proper effects for "lhs02"
 
 void lhs02()
 {
-//               <must be written>: i
+//             <    is written>: i
    int i = 2;
-//               <must be written>: j
+//             <    is written>: j
    int j = 2;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: i
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
 
    *(i>2?&i:&j) = 3;
-//               <may be read    >: j
-//               <must be read   >: i
-//               <must be written>: j
+//             <may be read   >: j
+//             <    is read   >: i
+//             <    is written>: j
 
    j = i>2?i+1:j+2;
 }

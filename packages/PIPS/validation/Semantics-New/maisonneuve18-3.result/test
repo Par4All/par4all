@@ -1,0 +1,398 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x,y) {x==0, y==0}
+
+   x = y = 0;
+
+//  T() {x==0, y==0}
+
+   if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+      checking_error();
+
+//  T(x,y) {x#init==0, y#init==0, 0<=x, 0<=y, y<=2}
+
+   while (1)
+
+//  T(x,y) {x#init+y#init+1<=x+y, x#init+y<=x+y#init+1,
+//    x+y#init<=x#init+y+1, y<=2}
+
+      if (flip())
+
+//  T(x) {x==x#init+1, y<=2}
+
+         if (y<=2) {
+
+//  T(x) {x==x#init+1, y<=2}
+
+            x++;
+
+//  T() {y<=2}
+
+            if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {3<=y}
+
+            while (1)
+
+//  T() {3<=y}
+
+               ;
+      else if (flip())
+
+//  T(y) {y==y#init+1, x<=2, y<=x}
+
+         if (x<=2&&y<x) {
+
+//  T(y) {y==y#init+1, x<=2, y<=x}
+
+            y++;
+
+//  T() {x<=2, y<=x}
+
+            if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+      else {
+
+//  T(y) {x==y-1, x==y#init, x<=2}
+
+         if (x<=2&&y==x) {
+
+//  T(y) {x==y-1, x==y#init, x<=2}
+
+            y++;
+
+//  T() {x==y-1, x<=2}
+
+            if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+
+//  T(x,y) {x<=2, x#init<=x, y#init<=y}
+
+         while (flip())
+
+//  T(x,y) {x+y==x#init+y#init+1, x#init<=x, x<=x#init+1,
+//    2x<=x#init+2}
+
+            if (flip())
+
+//  T(x) {x==x#init+1, x+1<=y, y<=2}
+
+               if (y<=2&&y>x+1) {
+
+//  T(x) {x==x#init+1, x+1<=y, y<=2}
+
+                  x++;
+
+//  T() {x+1<=y, y<=2}
+
+                  if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+                     checking_error();
+               }
+               else
+
+//  T() {}
+
+                  while (1)
+
+//  T() {}
+
+                     ;
+            else if (x<=2) {
+
+//  T(y) {y==y#init+1, x<=2}
+
+               y++;
+
+//  T() {x<=2}
+
+               if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {3<=x}
+
+               while (1)
+
+//  T() {3<=x}
+
+                  ;
+
+//  T(x) {x==x#init+1, x==y, x<=2}
+
+         if (y<=2&&y==x+1) {
+
+//  T(x) {x==x#init+1, x==y, x<=2}
+
+            x++;
+
+//  T() {x==y, x<=2}
+
+            if (x>=3&&y>=3)
+
+//  T() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  T() {}
+
+            while (1)
+
+//  T() {}
+
+               ;
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+   x = y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+      checking_error();
+
+//  P(x,y) {x==0, y==0}
+
+   while (1)
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+      if (flip())
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+         if (y<=2) {
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+            x++;
+
+//  P(x,y) {1<=x, 0<=y, y<=2}
+
+            if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P() {0==-1}
+
+            while (1)
+
+//  P() {0==-1}
+
+               ;
+      else if (flip())
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+         if (x<=2&&y<x) {
+
+//  P(x,y) {0<=x, x<=2, y+1<=x, 0<=y, y<=2}
+
+            y++;
+
+//  P(x,y) {0<=x, x<=2, y<=x, 1<=y, y<=3}
+
+            if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+            while (1)
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+               ;
+      else {
+
+//  P(x,y) {0<=x, 0<=y, y<=2}
+
+         if (x<=2&&y==x) {
+
+//  P(x,y) {x==y, 0<=x, x<=2}
+
+            y++;
+
+//  P(x,y) {x==y-1, 0<=x, x<=2}
+
+            if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,y) {0<=x, 1<=x+y, 0<=y, y<=2}
+
+            while (1)
+
+//  P(x,y) {0<=x, 1<=x+y, 0<=y, y<=2}
+
+               ;
+
+//  P(x,y) {x==y-1, 0<=x, x<=2}
+
+         while (flip())
+
+//  P(x,y) {0<=x, x<=2, x<=y, 1<=y}
+
+            if (flip())
+
+//  P(x,y) {0<=x, x<=2, x<=y, 1<=y}
+
+               if (y<=2&&y>x+1) {
+
+//  P(x,y) {0<=x, x<=2, x+2<=y, 1<=y, y<=2}
+
+                  x++;
+
+//  P(x,y) {1<=x, x<=3, x+1<=y, 1<=y, y<=2}
+
+                  if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+                     checking_error();
+               }
+               else
+
+//  P(x,y) {0<=x, x<=2, x<=y, 1<=y}
+
+                  while (1)
+
+//  P(x,y) {0<=x, x<=2, x<=y, 1<=y}
+
+                     ;
+            else if (x<=2) {
+
+//  P(x,y) {0<=x, x<=2, x<=y, 1<=y}
+
+               y++;
+
+//  P(x,y) {0<=x, x<=2, x+1<=y, 2<=y}
+
+               if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P() {0==-1}
+
+               while (1)
+
+//  P() {0==-1}
+
+                  ;
+
+//  P(x,y) {0<=x, x<=2, x+1<=y}
+
+         if (y<=2&&y==x+1) {
+
+//  P(x,y) {x==y-1, 0<=x, x<=1}
+
+            x++;
+
+//  P(x,y) {x==y, 1<=x, x<=2}
+
+            if (x>=3&&y>=3)
+
+//  P() {0==-1}
+
+               checking_error();
+         }
+         else
+
+//  P(x,y) {0<=x, x<=2, x+4<=2y, x+1<=y}
+
+            while (1)
+
+//  P(x,y) {0<=x, x<=2, x+4<=2y, x+1<=y}
+
+               ;
+      }
+}

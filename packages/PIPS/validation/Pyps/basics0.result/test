@@ -100,3 +100,7 @@ void malabar(int *c)
 {
    *c = foo(3);
 }
+found labels:
+l99999
+l99998
+l99997

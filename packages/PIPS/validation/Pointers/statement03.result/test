@@ -3,15 +3,15 @@ int main()
    // BEGIN BLOCK
    int *x, *y, k[5], h;
    k = 1;
-//               <must be written>: h
+//             <    is written>: h
    h = 2;
-//               <must be written>: x
+//             <    is written>: x
 
    x = &k[2];
-//               <must be written>: y
+//             <    is written>: y
    y = &h;
-//               <must be read   >: y
-//               <must be written>: x
+//             <    is read   >: y
+//             <    is written>: x
 
    x = y;
 

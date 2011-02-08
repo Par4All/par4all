@@ -43,10 +43,12 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (true) {
-//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,y1,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,x2,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
       x = &x1;
-//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,y1,-Exact-)}
+//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
       y = &y1;
    }
    else

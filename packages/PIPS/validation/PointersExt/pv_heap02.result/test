@@ -1,3 +1,19 @@
+int main()
+{
+   int *p, *q, *r;
+   int a;
+   void *s;
+//             <    is written>: p
+   p = (int *) calloc(2, sizeof(int));
+//             <    is written>: q
+   q = (int *) calloc(2, sizeof(a));
+//             <    is written>: r
+   r = (int *) calloc(1, sizeof(int));
+//             <    is written>: s
+   s = calloc(1, 15);
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -15,19 +31,20 @@ int main()
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    p = (int *) calloc(2, sizeof(int));
-//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    q = (int *) calloc(2, sizeof(a));
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    r = (int *) calloc(1, sizeof(int));
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,*HEAP*_l_10,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(r,*ANY_MODULE*:*HEAP*,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    s = calloc(1, 15);
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,*HEAP*_l_10,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,*HEAP*_l_11,
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(r,*ANY_MODULE*:*HEAP*,-Exact-);(s,*ANY_MODULE*:*HEAP*,
 //   -Exact-)}
    return 0;
 }

@@ -7,18 +7,18 @@ int struct05()
       int first;
       int second;
    } x[10];
-//               <must be written>: i
+//             <    is written>: i
    int i = 0;
-//               <must be written>: i
+//             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
       if (1)
-//               <must be read   >: i x[i][.second]
-//               <must be written>: x[i][.first]
+//             <    is read   >: i x[i].second
+//             <    is written>: x[i].first
          x[i].first = x[i].second;
       else
-//               <must be read   >: i x[i][.first]
-//               <must be written>: x[i][.second]
+//             <    is read   >: i x[i].first
+//             <    is written>: x[i].second
          x[i].second = x[i].first;
 }
 

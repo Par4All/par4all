@@ -1253,6 +1253,7 @@ int main()
          P4A_copy_to_accel_1d(sizeof(int), 8, 8, 0, &ovsf_code_user1[0], *ovsf_code_user10);
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &pilot[0], *pilot0);
          P4A_copy_to_accel_1d(sizeof(int), 32, 32, 0, &symbole_flow_user1[0], *symbole_flow_user10);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal10);
 
          P4A_scmp_kernel_0(&channel_delay1, &channel_delay2, &channel_delay3, &channel_delay4, &data, *image_in0, img_index, *ovsf_code_user10, *pilot0, *spreading_signal10, *symbole_flow_user10, t);
          P4A_copy_from_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal10);
@@ -1264,6 +1265,7 @@ int main()
          P4A_scmp_malloc((void **) &spreading_signal11, sizeof(int)*262);
          P4A_scmp_malloc((void **) &spreading_signals0, sizeof(int)*262);
          P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signal1[0], *spreading_signal11);
+         P4A_copy_to_accel_1d(sizeof(int), 262, 262, 0, &spreading_signals[0], *spreading_signals0);
 
          //generate multipath
          //main path
