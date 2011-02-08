@@ -59,6 +59,9 @@ def add_own_options(parser):
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
 
+    proc_group.add_option("--c99", action = "store_true", default = False,
+        help = "This option is usefull when generating some cuda code from C99 sources. Indeed nvcc doesn't support the folowing C99 syntax : foo (int n, int a[n]), then if the c99 option is enable, p4a will automaticly generates the cuda code in new files that will be compiled by nvcc. A simple call to the kernel will be inserted into the original file that can be compiled with your usual compiler.")
+
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
         help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
@@ -464,6 +467,7 @@ def main():
             # will be serialized (pickle'd) to ease the
             # passing of parameters to the processor.
             input = p4a_process.p4a_processor_input()
+            input.c99 = options.c99
             input.project_name = project_name
             input.accel = options.accel
             input.cuda = options.cuda

@@ -19,6 +19,20 @@ kernel_launcher_declarations = {}
 # void p4a_kernel_launcher_1(void *accel_address, void *host_address, size_t n);
 kernel_launcher_declaration = re.compile("void (p4a_kernel_launcher_\\w+)[^;]+")
 
+def remove_libc_typedef (content):
+    """ when outlining to independent compilation unit some typedef from the
+    libc can be added here and there. This will make the compilation to fail.
+    So remove them
+    """
+    print "PIV\n\n\n\n"
+    size_t_re = re.compile ("typedef.*size_t");
+    match_l = size_t_re.findall (content)
+    for m in match_l:
+        print "PIV match\n\n\n\n"
+        assert (len (match_l) == 1)
+        content = content.replace (m, "")
+    return content
+
 def gather_kernel_launcher_declarations(file_name):
     f = open(file_name)
     # slurp all the file in a string:
@@ -37,7 +51,7 @@ def insert_kernel_launcher_declaration(m):
     return decl
 
 
-def patch_to_use_p4a_methods(file_name, dir_name):
+def patch_to_use_p4a_methods(file_name, dir_name, includes):
     file_base_name = os.path.basename(file_name);
 
     if file_base_name == 'p4a_stubs.c':
@@ -56,11 +70,14 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     f.close()
 
     # Inject P4A accel header definitions:
-    content = """/* Use the Par4All accelerator run time: */
+    header = """/* Use the Par4All accelerator run time: */
 #include <p4a_accel.h>
-""" + content
+"""
+    for include in includes:
+        header += '#include "' + include + '"\n'
+    content = header + content
 
-    # Clean-up headers and inject standard header injection:
+    # Clean-up headers and inject standard headers:
     ## content = re.sub("(?s)(/\\*\n \\* file for [^\n]+\n \\*/\n).*/\* Define some macros helping to catch buffer overflows.  \*/",
     ##                  "\\1#include <p4a_accel.h>\n#include <stdio.h>\n#include <math.h>\n", content)
 
@@ -125,6 +142,7 @@ def patch_to_use_p4a_methods(file_name, dir_name):
     content = re.sub(r'\(void \*\) 0',
                      "NULL", content)
 
+    content = remove_libc_typedef (content)
 
     if verbose:
         print content,
@@ -153,6 +171,9 @@ def main():
                       help = """The destination directory name to create and
 to put files in. It defaults to "P4A" in the current directory>""")
 
+    parser.add_option("--includes", "-I", action = "append", metavar = "header_list", default = [],
+                      help = "Specify some includes to be insetred at the begining of the file to be post processed.")
+
     group = optparse.OptionGroup(parser, "Debug options")
 
     group.add_option("-v",  "--verbose",
@@ -179,7 +200,7 @@ to put files in. It defaults to "P4A" in the current directory>""")
         print kernel_launcher_declarations
 
     for name in args:
-        patch_to_use_p4a_methods(name, options.dest_dir)
+        patch_to_use_p4a_methods(name, options.dest_dir, options.includes)
 
 # If this programm is independent it is executed:
 if __name__ == "__main__":

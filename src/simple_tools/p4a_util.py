@@ -768,6 +768,22 @@ def load_pickle(file):
     f.close()
     return obj
 
+def generate_c_header (in_c_file, out_h_file, additional_args= []):
+    """ generate the header file for a given c file produced by p4a using
+    cproto.
+    in_c_file : The c file to be processed by cproto
+    out_h_file : The h file to be produced  by cproto
+    additional_ args : The additional arguments to the cproto command (for
+    example specific defines)
+    """
+    args = ["cproto"]
+    args.append ("-I")
+    args.append (os.environ["P4A_ACCEL_DIR"])
+    args.extend (additional_args)
+    args.append ("-o")
+    args.append (out_h_file)
+    args.append (in_c_file)
+    run (args, force_locale = None)
 
 if __name__ == "__main__":
     print(__doc__)

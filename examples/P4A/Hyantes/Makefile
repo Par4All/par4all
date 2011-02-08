@@ -49,7 +49,11 @@ demo : display_seq display_openmp display_cuda display_accel ;
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq output_openmp output_cuda output_accel
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
+	rm -rf $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu)
+	rm -rf $(TARGET:=.p4a-accel.cu)
+	rm -rf  *~ *.database *.build p4a_new_files
+	rm -rf  output_seq output_openmp output_cuda output_accel
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
