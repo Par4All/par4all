@@ -661,6 +661,26 @@ void copy_statement_attributes(statement from,
 
 /** Build a statement sequence from a statement list
 
+    @param[in] l is the statement list
+
+    @return the statement if there was only 1 sattement in the list or
+    build a block from the statement list. So, if the list was NIL, this
+    makes an empty statement block.
+*/
+statement
+make_statement_from_statement_list_or_empty_block(list l) {
+  if (gen_length(l) == 1) {
+    statement stat = STATEMENT(CAR(l));
+    gen_free_list(l);
+    return stat;
+  }
+  else
+    return make_block_statement(l);
+}
+
+
+/** Build a statement sequence from a statement list
+
     @return :
     - statement_undefined if the statement list is NIL
     - the statement of a list with one statement, after discarding the list
@@ -668,18 +688,10 @@ void copy_statement_attributes(statement from,
 */
 statement
 make_statement_from_statement_list(list l) {
-  switch (gen_length(l)) {
-  case 0:
+  if (l == NIL)
     return statement_undefined;
-  case 1:
-    {
-      statement stat = STATEMENT(CAR(l));
-      gen_free_list(l);
-      return stat;
-    }
-  default:
-    return make_block_statement(l);
-  }
+  else
+    return make_statement_from_statement_list_or_empty_block(l);
 }
 
 

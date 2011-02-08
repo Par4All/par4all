@@ -11,7 +11,7 @@ import re
 import time
 import types
 from copy import deepcopy
-from string import split, upper, join
+from string import split, upper, lower, join
 from subprocess import Popen, PIPE
 import inspect
 
@@ -83,7 +83,7 @@ class module:
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
 
-	def _prepare_modification(self):
+	def __prepare_modification(self):
 		""" [internal] Prepare everything so that the source code of the module can be modified
 		"""
 		self.print_code()
@@ -97,34 +97,10 @@ class module:
 		   does nothing on compilation unit ...
 		"""
 		if not pypsutils.re_compilation_units.match(self.name):
-			(code_rc,printcode_rc) = self._prepare_modification()
+			(code_rc,printcode_rc) = self.__prepare_modification()
 			pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
-
-	def prepend_code(self, lines):
-		""" Prepend lines to the code of the module.
-		This is a quick and dirty way based on self.run().
-		We should maybe take example on prepend_comment in Libs/to_begin_with/add_stuff_to_module.c !
-		"""
-		if not pypsutils.re_compilation_units.match(self.name):
-			(code_rc,printcode_rc) = self._prepare_modification()
-			strtoadd = "\n".join(lines)
-			orgcode = pypsutils.file2string(printcode_rc)
-			newcode = orgcode.replace('{', '{\n'+strtoadd+"\n{\n", 1) + "\n}\n"
-			pypsutils.string2file(newcode, code_rc)
-			
-	def append_code(self, lines):
-		""" Append lines to the code of the module.
-		See prepend_code for some remarks.
-		"""
-		if not pypsutils.re_compilation_units.match(self.name):
-			(code_rc,printcode_rc) = self._prepare_modification()
-			lines = map(lambda s: s+"\n",lines)
-			orgcode = pypsutils.file2string(printcode_rc)
-			ocodespl = orgcode.rsplit('}', 1)
-			newcode = ''.join([ocodespl[0]]+lines+['\n}\n'])
-			pypsutils.string2file(newcode, code_rc)
 
 	def show(self,rc):
 		"""get name of `rc' resource"""
@@ -137,11 +113,20 @@ class module:
 		pypsutils.set_properties(self._ws,props)
 		return self._ws.cpypips.display(upper(rc),self._name)
 
-	def code(self):
-		"""get module code as a string list"""
-		self._ws.cpypips.apply("PRINT_CODE",self._name)
+	def __get_code(self, activate="print_code"):
+		"""get module code as a string"""
+		getattr(self,lower(activate if isinstance(activate, str) else activate.__name__ ))()
 		rcfile=self.show("printed_file")
-		return file(self._ws.dirname()+rcfile).readlines()
+		return file(self._ws.dirname()+rcfile).read()
+
+	def __set_code(self,newcode):
+		"""set module content from a string"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			(code_rc,printcode_rc) = self.__prepare_modification()
+			pypsutils.string2file(newcode, code_rc)
+
+	code=property(__get_code,__set_code)
+
 
 	def loops(self, label=""):
 		"""get desired loop if label given, an iterator over outermost loops otherwise"""
@@ -183,11 +168,10 @@ class module:
 				#print "warning, changing ", name, "into", passe+"_"+name
 		return props
 
-	def saveas(self,path):
-		fd=file(path,"w")
-		for line in self.code():
-			fd.write(line)
-		fd.close()
+	def saveas(self,path,activate="print_code"):
+		with file(path,"w") as fd:
+			fd.write(self.__get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
+		
 
 ### module_methods /!\ do not touch this line /!\
 
@@ -567,10 +551,7 @@ class workspace(object):
 
 	def activate(self,phase):
 		"""activate a given phase"""
-		if isinstance(phase, str):
-			p = upper(phase)
-		else:
-			p = upper(phase.__name__)
+		p =  upper(phase if isinstance(phase, str) else phase.__name__ )
 		self.cpypips.user_log("Selecting rule: %s\n", p)
 		self.cpypips.activate(p)
 

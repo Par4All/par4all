@@ -5945,7 +5945,11 @@ SIMD_PATTERN_FILE "patterns.def"
 
 \subsection{Scalopes project}
 \label{subsubsection-scalopes-project}
-This pass outline code parts based on pragma. It can outline blocs or loops with a \verb=#pragma scmp task= flag. It is based on oultine pass.
+\begin{PipsPass}{scalopragma}
+This pass outlines code parts based on pragma.
+It can outline blocs or loops with a \verb=#pragma scmp task= flag.
+It is based on the outline pass.
+\end{PipsPass}
 \begin{PipsMake}
 scalopragma                    > MODULE.code
                                > MODULE.callees
@@ -7241,6 +7245,7 @@ alias gpu_ify 'Distribute // loop nests on GPU'
 gpu_ify                    > MODULE.code
 		> MODULE.callees
 		> PROGRAM.entities
+		! MODULE.privatize_module
 		< PROGRAM.entities
 		< MODULE.code
         < MODULE.cumulated_effects
@@ -9934,6 +9939,10 @@ scalarization  > MODULE.code
 \begin{PipsProp}{SCALARIZATION_PREFIX}
 SCALARIZATION_PREFIX "__scalar__"
 \end{PipsProp}
+\begin{PipsProp}{SCALARIZATION_FORCE_OUT}
+SCALARIZATION_FORCE_OUT FALSE
+\end{PipsProp}
+
 
 \begin{PipsPass}{constant_array_scalarization}
 Similar to \PipsPassRef{scalarization}, but with a different criterium:
@@ -9949,8 +9958,10 @@ constant_array_scalarization > MODULE.code
 
 \subsection{Induction substitution}
 
+\begin{PipsPass}{induction_substitution}
 Induction substitution is the process of replacing scalar variables
 by a linear expression of the loop indices.
+\end{PipsPass}
 
 
 \begin{PipsMake}
@@ -9966,7 +9977,7 @@ induction_substitution > MODULE.code
 \subsection{Strength Reduction}
 
 \begin{PipsPass}{strength_reduction}
-Reduce the complexity of expression computation by generating 
+Reduce the complexity of expression computation by generating
 induction variables when possible.
 \end{PipsPass}
 E.g.
@@ -10612,6 +10623,10 @@ localize_declaration > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+\begin{PipsProp}{LOCALIZE_DECLARATION_SKIP_LOOP_INDICES}
+LOCALIZE_DECLARATION_SKIP_LOOP_INDICES FALSE
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ARRAY PRIVATIZATION
 

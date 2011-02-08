@@ -438,8 +438,9 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
   - rename loop indexes
 
   - replace declaration statements
+  return false if the initial condition are not met, i.e. no parent block
 */
-void statement_flatten_declarations(entity module, statement s)
+bool statement_flatten_declarations(entity module, statement s)
 {
   /* For the time being, we handle only blocks with declarations */
     if (statement_block_p(s)) {
@@ -490,10 +491,13 @@ void statement_flatten_declarations(entity module, statement s)
             pips_user_warning("Code flattening fails because the statement does"
                     " not contain any local declaration\n");
         }
+        return true;
     }
-
-    else
-        pips_internal_error("Input assumptions not met.");
+    else {
+	//sg: just because there is no block to carry declarations ?!?
+        pips_user_warning("Input assumptions not met, skipping flatten code\n");
+        return false;
+    }
 }
 
 
@@ -570,30 +574,31 @@ bool flatten_code(string module_name)
   pips_debug(1, "begin\n");
 
   /* Step 1 and 2: flatten declarations and clean up sequences */
-  statement_flatten_declarations(module,module_stat);
-  statement_purge_declarations(module_stat);
-    // call sequence flattening as some declarations may have been
-    // moved up
-  clean_up_sequences(module_stat);
+  if((good_result_p=statement_flatten_declarations(module,module_stat))) {
+      statement_purge_declarations(module_stat);
+      // call sequence flattening as some declarations may have been
+      // moved up
+      clean_up_sequences(module_stat);
 
-  /* Step 3 and 4: unroll loops and clean up sequences */
-  if(get_bool_property("FLATTEN_CODE_UNROLL"))
-  {
-      gen_recurse( module_stat,
-              statement_domain, gen_true, unroll_loops_in_statement
-              );
+      /* Step 3 and 4: unroll loops and clean up sequences */
+      if(get_bool_property("FLATTEN_CODE_UNROLL"))
+      {
+          gen_recurse( module_stat,
+                  statement_domain, gen_true, unroll_loops_in_statement
+                  );
+      }
+      clean_up_sequences(module_stat); // again
+
+      // This might not really be necessary, probably thanks to clean_up_sequences
+      module_reorder(module_stat);
+
+      pips_debug(1, "end\n");
+      debug_off();
+
+      /* Save modified code to database */
+      module_reorder(module_stat);
+      DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
   }
-  clean_up_sequences(module_stat); // again
-
-  // This might not really be necessary, probably thanks to clean_up_sequences
-  module_reorder(module_stat);
-
-  pips_debug(1, "end\n");
-  debug_off();
-
-  /* Save modified code to database */
-  module_reorder(module_stat);
-  DB_PUT_MEMORY_RESOURCE(DBR_CODE, strdup(module_name), module_stat);
 
   reset_current_module_entity();
   reset_current_module_statement();

@@ -169,9 +169,12 @@ void error_reset_current_C_line_number()
      corresponding attachment point)
 
    - comments for structured control structures such as "for", "switch",
-     "while",... are stacked;
+     "while",... are stacked so that we can get them back when building
+     the statement at the end of the statement;
 
-     "do .... while()" is not handled properly; "else" cannot carry a comment;
+     "do .... while()" is not handled properly; "else" cannot carry a
+     comment, because the "while" and "else" do not really exist in the
+     RI;
 
    - the comments for other statements are the current comments
 
@@ -189,16 +192,17 @@ void error_reset_current_C_line_number()
      for declaration statements, but less frequent
 
    - some comments are still ignored, although available (to be implemented)
-
 */
 
 static string C_current_comment = string_undefined;
 
 DEFINE_LOCAL_STACK(comments, string)
 
-/* Return the current comment as a string to be freed    by the caller
-   and reset the current comment. If the current comment is undefined,
-   returns a copy of the empty string, "".
+/* Return the current comment as a string to be freed by the caller and
+   reset the current comment. If the current comment is undefined, returns
+   a copy of the empty string, "".
+
+   Reset also the current comment.
  */
 string get_current_C_comment()
 {
@@ -242,6 +246,11 @@ string get_current_C_comment()
   return cc;
 }
 
+/* Push the current C comment so that we can get it back when building the
+   statement later
+
+   This reset the current comment through get_current_C_comment()
+*/
 void push_current_C_comment()
 {
   string cc = get_current_C_comment();
@@ -255,14 +264,22 @@ void push_current_C_comment()
    comments_push(cc);
 }
 
+/* Pop the current comment.
+
+   @return the previous current comment.
+
+   This is typically used at the end of a statement to be built.
+
+   Note this do not set the current comment. Strange API...
+*/
 string pop_current_C_comment()
 {
   string cc = comments_pop();
   if (string_undefined_p(cc))
-    pips_debug(3, "empty comment poped at line %d\n",
+    pips_debug(3, "empty comment popped at line %d\n",
 	       get_current_C_line_number());
   else
-    pips_debug(3, "comment \"%s\" poped at line %d\n", cc,
+    pips_debug(3, "comment \"%s\" popped at line %d\n", cc,
 	       get_current_C_line_number());
   return cc;
 }

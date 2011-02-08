@@ -11,7 +11,8 @@ def p3(m):
 	m.flag_loops()
 	label=""
 	runs=[]
-	for line in m.code():
+	lines=m.code.split('\n')
+	for line in lines:
 		pm=pragma_re.match(line)
 		lm=label_re.match(line)
 		if pm:
@@ -24,7 +25,7 @@ def p3(m):
 	for r in runs:
 		print "running",r
 		eval(r)
-	m.run(["sed","-r","-e","/^ *#pragma +pyps/ d"])
+	m.code=pragma_re.sub("",m.code)
 
 pyps.module.p3=p3
 pyps.modules.p3=lambda m:map(p3,m._modules)
