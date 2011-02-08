@@ -10,7 +10,7 @@ int main() {
      i = i+1;
      a= b;
      b = &d;
-   }while(i<5);
+   }while(i<5); 
 
   return 0;
 }

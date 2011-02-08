@@ -1,0 +1,209 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void run(void)
+{
+
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x) {0<=x}
+
+   x = rand();
+
+//  T(y) {0<=x, 0<=y}
+
+   y = rand();
+
+//  T() {0<=x, 5<=x+y, 0<=y}
+
+   if (x>=0&&x<=4&&y>=0&&y<=4||x>=2&&x<=6&&y>=2&&y<=6) {
+
+//  T() {0<=x, x<=6, y<=x+4, x<=y+4, 0<=y, y<=6}
+
+      if (x==1&&y==5)
+
+//  T() {0==-1}
+
+         checking_error();
+
+//  T(x,y) {x+y#init==x#init+y, 0<=x#init, x#init<=6,
+//    y#init<=x#init+4, x#init<=y#init+4, 0<=y#init, y#init<=6}
+
+      while (1)
+
+//  T(x,y) {x+y#init==x#init+y, x#init<=x+2, x<=x#init+2}
+
+         if (x>=0&&x<=4&&y>=0&&y<=4&&flip())
+
+//  T(x,y) {x==x#init+2, y==y#init+2, 2<=x, x<=6, 2<=y, y<=6}
+
+            if (x>=0&&x<=4&&y>=0&&y<=4) {
+
+//  T(x) {x==x#init+2, 2<=x, x<=6, 0<=y, y<=4}
+
+               x += 2;
+
+//  T(y) {y==y#init+2, 2<=x, x<=6, 2<=y, y<=6}
+
+               y += 2;
+
+//  T() {2<=x, x<=6, 2<=y, y<=6}
+
+               if (x==1&&y==5)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {0==-1}
+
+               while (1)
+
+//  T() {0==-1}
+
+                  ;
+         else if (x>=2&&x<=6&&y>=2&&y<=6&&flip())
+
+//  T(x,y) {x==x#init-2, y==y#init-2, 0<=x, x<=4, 0<=y, y<=4}
+
+            if (x>=2&&x<=6&&y>=2&&y<=6) {
+
+//  T(x) {x==x#init-2, 0<=x, x<=4, 2<=y, y<=6}
+
+               x -= 2;
+
+//  T(y) {y==y#init-2, 0<=x, x<=4, 0<=y, y<=4}
+
+               y -= 2;
+
+//  T() {0<=x, x<=4, 0<=y, y<=4}
+
+               if (x==1&&y==5)
+
+//  T() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  T() {0==-1}
+
+               while (1)
+
+//  T() {0==-1}
+
+                  ;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+   x = rand();
+
+//  P(x,y) {0<=x}
+
+   y = rand();
+
+//  P(x,y) {0<=x, 0<=y}
+
+   if (x>=0&&x<=4&&y>=0&&y<=4||x>=2&&x<=6&&y>=2&&y<=6) {
+
+//  P(x,y) {0<=x, x<=6, y<=x+4, x<=y+4, 0<=y, y<=6}
+
+      if (x==1&&y==5)
+
+//  P(x,y) {x==1, y==5}
+
+         checking_error();
+
+//  P(x,y) {0<=x, x<=6, y<=x+4, x<=y+4, 0<=y, y<=6}
+
+      while (1)
+
+//  P(x,y) {y<=x+4, x<=y+4}
+
+         if (x>=0&&x<=4&&y>=0&&y<=4&&flip())
+
+//  P(x,y) {0<=x, x<=4, y<=x+4, x<=y+4, 0<=y, y<=4}
+
+            if (x>=0&&x<=4&&y>=0&&y<=4) {
+
+//  P(x,y) {0<=x, x<=4, y<=x+4, x<=y+4, 0<=y, y<=4}
+
+               x += 2;
+
+//  P(x,y) {2<=x, x<=6, y<=x+2, x<=y+6, 0<=y, y<=4}
+
+               y += 2;
+
+//  P(x,y) {2<=x, x<=6, y<=x+4, x<=y+4, 2<=y, y<=6}
+
+               if (x==1&&y==5)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P() {0==-1}
+
+               while (1)
+
+//  P() {0==-1}
+
+                  ;
+         else if (x>=2&&x<=6&&y>=2&&y<=6&&flip())
+
+//  P(x,y) {2<=x, x<=6, y<=x+4, x<=y+4, 2<=y, y<=6}
+
+            if (x>=2&&x<=6&&y>=2&&y<=6) {
+
+//  P(x,y) {2<=x, x<=6, y<=x+4, x<=y+4, 2<=y, y<=6}
+
+               x -= 2;
+
+//  P(x,y) {0<=x, x<=4, y<=x+6, x<=y+2, 2<=y, y<=6}
+
+               y -= 2;
+
+//  P(x,y) {0<=x, x<=4, y<=x+4, x<=y+4, 0<=y, y<=4}
+
+               if (x==1&&y==5)
+
+//  P() {0==-1}
+
+                  checking_error();
+            }
+            else
+
+//  P() {0==-1}
+
+               while (1)
+
+//  P() {0==-1}
+
+                  ;
+   }
+}

@@ -12,14 +12,14 @@ ATOM * a_m_serial(int serial)
       n = atomNUMBER;
 
    ap = first;
-   if (ap==(void *) 0) 
+   if (ap==(void *) 0)
       return (void *) 0;
-   if (lastmatched==(void *) 0) 
+   if (lastmatched==(void *) 0)
       lastmatched = first;
 
-   if (serial==lastmatched->serial) 
+   if (serial==lastmatched->serial)
       return lastmatched;
-   if (serial>lastmatched->serial) 
+   if (serial>lastmatched->serial)
       ap = lastmatched;
    for (i = 0;i<n;i++) {
       if (ap->serial==serial) {
@@ -41,59 +41,60 @@ ATOM * a_m_serial(int serial)
    static ATOM *ap = (void *) 0;
    static ATOM *lastmatched = (void *) 0;
    int i, n, a_number();
-//               <must be read   >: atomUPDATE
+//             <    is read   >: atomUPDATE
    if (atomUPDATE)
-//               <may be read    >: atomNUMBER atomUPDATE first
-//               <may be written >: atomNUMBER atomUPDATE
-//               <must be written>: n
+//             <may be read   >: first
+//             <may be written>: atomNUMBER atomUPDATE
+//             <    is read   >: atomNUMBER atomUPDATE
+//             <    is written>: n
       n = a_number();
    else
-//               <must be read   >: atomNUMBER
-//               <must be written>: n
+//             <    is read   >: atomNUMBER
+//             <    is written>: n
       n = atomNUMBER;
-//               <must be read   >: first
-//               <must be written>: ap
+//             <    is read   >: first
+//             <    is written>: ap
 
    ap = first;
-//               <must be read   >: ap
-   if (ap==(void *) 0) 
+//             <    is read   >: ap
+   if (ap==(void *) 0)
       return (void *) 0;
-//               <must be read   >: lastmatched
-   if (lastmatched==(void *) 0) 
-//               <must be read   >: first
-//               <must be written>: lastmatched
+//             <    is read   >: lastmatched
+   if (lastmatched==(void *) 0)
+//             <    is read   >: first
+//             <    is written>: lastmatched
       lastmatched = first;
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
 
-   if (serial==lastmatched->serial) 
-//               <must be read   >: lastmatched
+   if (serial==lastmatched->serial)
+//             <    is read   >: lastmatched
       return lastmatched;
-//               <must be read   >: lastmatched 
-//                                  lastmatched[0][.serial] serial
-   if (serial>lastmatched->serial) 
-//               <must be read   >: lastmatched
-//               <must be written>: ap
+//             <    is read   >: lastmatched lastmatched[0].serial 
+//                               serial
+   if (serial>lastmatched->serial)
+//             <    is read   >: lastmatched
+//             <    is written>: ap
       ap = lastmatched;
-//               <must be read   >: n
-//               <must be written>: i
+//             <    is read   >: n
+//             <    is written>: i
    for(i = 0; i <= n-1; i += 1) {
-//               <must be read   >: ap ap[0][.serial] n serial
+//             <    is read   >: ap ap[0].serial n serial
       if (ap->serial==serial) {
-//               <must be read   >: ap n
-//               <must be written>: lastmatched
+//             <    is read   >: ap n
+//             <    is written>: lastmatched
          lastmatched = ap;
-//               <must be read   >: ap n
+//             <    is read   >: ap n
          return ap;
       }
-//               <must be read   >: ap ap[0][.next] n
+//             <    is read   >: ap ap[0].next n
       if (ap==ap->next)
-//               <must be read   >: first n
-//               <must be written>: ap
+//             <    is read   >: first n
+//             <    is written>: ap
          ap = first;
       else
-//               <must be read   >: ap ap[0][.next] n
-//               <must be written>: ap
+//             <    is read   >: ap ap[0].next n
+//             <    is written>: ap
          ap = ap->next;
    }
    return (void *) 0;
@@ -102,172 +103,100 @@ POINTS TO
 //  {}
 ATOM * a_m_serial(int serial)
 {
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-)}
    static ATOM *ap = (void *) 0;
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
    static ATOM *lastmatched = (void *) 0;
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
    int i, n, a_number();
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
    if (atomUPDATE)
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
       n = a_number();
    else
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
       n = atomNUMBER;
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
 
    ap = first;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (ap==(void *) 0) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
+   if (ap==(void *) 0)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
       return (void *) 0;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (lastmatched==(void *) 0) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*NULL_POINTER*,-Exact-)}
+   if (lastmatched==(void *) 0)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
       lastmatched = first;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
 
-   if (serial==lastmatched->serial) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+   if (serial==lastmatched->serial)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
       return lastmatched;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (serial>lastmatched->serial) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
+   if (serial>lastmatched->serial)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
       ap = lastmatched;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
    for(i = 0; i <= n-1; i += 1) {
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
       if (ap->serial==serial) {
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
          lastmatched = ap;
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
          return ap;
       }
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
       if (ap==ap->next)
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
          ap = first;
       else
-//  points to = {}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
          ap = ap->next;
    }
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-);(lastmatched,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -MAY-);(lastmatched,*NULL_POINTER*,-Exact-)}
    return (void *) 0;
 }
 //  {}
 ATOM * a_next(int flag)
 {
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-)}
    static ATOM *ap = (void *) 0;
-//  points to = {}
-   if (ap==(void *) 0) 
-//  points to = {}
+//  {(ap,*NULL_POINTER*,-Exact-)}
+   if (ap==(void *) 0)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-)}
       ap = first;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (ap==(void *) 0) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      return (void *) 0;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (flag<=0) {
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      ap = first;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      return ap;
-   }
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   if (ap==ap->next) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      return (void *) 0;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   ap = ap->next;
-//  points to = {}
-   return ap;
-}
-//  {}
-int a_number()
-{
-//  points to = {}
-   ATOM *ap;
-//  points to = {}
-   if (atomUPDATE) {
-   }
-   else {
-      goto l99999;
-   }
-//  points to = {}
-   atomUPDATE = 0;
-//  points to = {}
-   atomNUMBER = 0;
-//  points to = {}
-   if (first==(void *) 0) 
-//  points to = {}
-      return 0;
-//  points to = {}
-   ap = first;
-l99998:   ;
-//  points to = {}
-   if (!1) goto break_1;
-//  points to = {}
-   if (ap->next==(void *) 0) goto break_1;
-//  points to = {}
-   atomNUMBER++;
-//  points to = {}
-   if (ap->next==ap) goto break_1;
-//  points to = {}
-   ap = ap->next;
-   goto l99998;
-//  points to = {}
-break_1:   ;
-l99999:   ;
-//  points to = {}
-   return atomNUMBER;
-}
-//  {}
-int activate(int i1, int i2)
-{
-//  points to = {}
-   int upper, lower;
-//  points to = {}
-   ATOM *ap, *a_m_serial(int), *a_next(int);
-//  points to = {}
-   int i, numatm, a_number();
-//  points to = {}
-
-   if (i2==0) {
-//  points to = {}
-      ap = a_m_serial(i1);
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      if (ap!=(void *) 0) 
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-         ap->active = 1;
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-      return 0;
-   }
-//  points to = {}
-
-   upper = i2;
-//  points to = {}
-   lower = i1;
-//  points to = {}
-   if (i2<i1) {
-//  points to = {}
-      lower = i2;
-//  points to = {}
-      upper = i1;
-   }
-//  points to = {}
-
-   numatm = a_number();
-//  points to = {}
-   for(i = 0; i <= numatm-1; i += 1) {
-//  points to = {}
-      ap = a_next(i);
-//  points to = {}
-      if (ap->serial>=lower&&ap->serial<=upper) 
-//  points to = {}
-         ap->active = 1;
-   }
-//  {(ap,*ANY_MODULE*:*ANYWHERE*,-MAY-)}
-   return 0;
-}
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   -Exact-)}
+   if (ap==(void *) 0)
+//  {(ap,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(ap,*NULL_POINTER*,
+//   

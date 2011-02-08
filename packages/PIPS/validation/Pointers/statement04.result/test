@@ -2,46 +2,21 @@ int main()
 {
    // BEGIN BLOCK
    int **x, *y, k, h;
-//               <must be written>: k
+//             <    is written>: k
    k = 1;
-//               <must be written>: h
+//             <    is written>: h
    h = 2;
-//               <must be written>: y
+//             <    is written>: y
    y = &h;
-//               <may be written >: *ANY_MODULE*:*ANYWHERE*
-//               <must be read   >: x y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: x y
    *x = y;
-//               <may be read    >: stdout[0]
-//               <may be written >: stdout[0]
-//               <must be read   >: stdout __IO_EFFECTS:LUNS[1] x
-//               <must be written>: __IO_EFFECTS:LUNS[1]
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("x = %p \n", x);
    return 0;
    // END BLOCK
 }
 POINTS TO
-//  {}
-int main()
-{
-//  points to = {}
-   // BEGIN BLOCK
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
-   int **x, *y, k, h;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
-   k = 1;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
-   h = 2;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
-   y = &h;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
-   *x = y;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
-   printf("x = %p \n", x);
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
-   return 0;
-   // END BLOCK
-}

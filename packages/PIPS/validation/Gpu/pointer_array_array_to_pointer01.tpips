@@ -1,0 +1,20 @@
+setenv WS pointer_array_array_to_pointer01
+delete $WS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+module p4a_kernel_launcher_0
+apply LINEARIZE_ARRAY
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%PROGRAM]
+shell cat $WS.database/Src/*
+
+setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+apply LINEARIZE_ARRAY
+display PRINTED_FILE[%ALL]
+apply UNSPLIT[%PROGRAM]
+shell cat $WS.database/Src/*
+
+close
+quit

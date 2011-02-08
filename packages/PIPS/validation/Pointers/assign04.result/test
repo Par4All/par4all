@@ -39,30 +39,3 @@ void assign04()
 
 POINTS TO
 
-//  {}
-void assign04()
-{
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int ***p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
-   int **q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-   int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-
-   r = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,i,-Exact-)}
-   //q = &r;
-   p = &q;
-//  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,i,-Exact-)}
-   **p = r;
-//  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,i,-Exact-)}
-   ***p = 0;
-}

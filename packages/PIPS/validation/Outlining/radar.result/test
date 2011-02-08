@@ -89,10 +89,12 @@ void p4a_launcher_STAP_PulseComp(int tf, int tv, float ptrfiltre[tf], float ptri
          // To be assigned to a call to P4A_vp_0: i
          p4a_wrapper_STAP_PulseComp(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
 }
-void p4a_launcher_trt(int tf, int tv, float filtre[16], float in_pulse[5][32][95], float out_pulse[5][32][80])
+void p4a_launcher_trt(int tf, int tv, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
-   //PIPS generated variable
-   int i, j, k;
+   //int tv=95; int tf=16; 
+   int lv = 20;
+   int j, k, i;
+   float filtre[16];
    
    //init_array();
    for(i = 0; i <= 89; i += 1) {
@@ -128,11 +130,5 @@ void p4a_wrapper_trt(int tf, int tv, float filtre[16], int *j, int *k, float in_
 }
 void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
-   //int tv=95; int tf=16; 
-   int lv = 20;
-   int j, k, i;
-   float filtre[16];
-   
-   //init_array();
-   p4a_launcher_trt(tf, tv, filtre, in_pulse, out_pulse);
+   p4a_launcher_trt(tf, tv, in_pulse, out_pulse);
 }

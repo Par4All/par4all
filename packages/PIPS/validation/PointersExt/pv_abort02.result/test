@@ -6,11 +6,10 @@ int main()
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int b;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+
    a = (int **) NULL;
-//  {(a,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(a,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*NULL_POINTER*,-Exact-)}
    a[0] = &b;
-//  {(a,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(a,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(a[0],b,-Exact-)}
+//  {(*NULL_POINTER*,b,-Exact-);(a,*NULL_POINTER*,-Exact-)}
    return 0;
 }

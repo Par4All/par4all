@@ -4,28 +4,38 @@ POINTS TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *pi;
-//  points to = {}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    float *px;
-//  points to = {}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    float *pz;
-//  points to = {}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*pt)[30];
-//  points to = {}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    pi = (int *) malloc(sizeof(int));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-MAY-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    px = (float *) malloc(sizeof(float));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-MAY-);(px,*ANY_MODULE*:*HEAP*_b1,
-//   -MAY-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    pz = (float *) malloc(sizeof(float));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-MAY-);(px,*ANY_MODULE*:*HEAP*_b1,
-//   -MAY-);(pz,*ANY_MODULE*:*HEAP*_b1,-MAY-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,
+//   *ANY_MODULE*:*HEAP*_b1,-Exact-)}
    pt = (int (*)[30]) malloc(sizeof(*pt));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-MAY-);(pt,*ANY_MODULE*:*HEAP*_b2,
-//   -MAY-);(px,*ANY_MODULE*:*HEAP*_b1,-MAY-);(pz,
-//   *ANY_MODULE*:*HEAP*_b1,-MAY-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*HEAP*_b0,
+//   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,
+//   *ANY_MODULE*:*HEAP*_b1,-Exact-)}
 
    return 0;
 }

@@ -63,15 +63,15 @@ void checking_error(void) {
 #define S2 {assert(n == 2);}
 
 void run(void) {
-	
+
 	int n = 0;
-		
+
 	while (1) {
 		S1;
 		T1; S2;
 		T2; S1;
 	}
-	
+
 }
 
 int main(void) {

@@ -2,24 +2,24 @@ int main()
 {
    // BEGIN BLOCK
    int *a, *b, c, d, i;
-//               <must be written>: c
+//             <    is written>: c
    c = 0;
-//               <must be written>: d
+//             <    is written>: d
    d = 1;
-//               <must be written>: i
+//             <    is written>: i
    i = 2;
-//               <must be written>: b
+//             <    is written>: b
    b = &c;
-//               <must be read   >: i
+//             <    is read   >: i
    do {
       // BEGIN BLOCK
-//               <must be read   >: i
-//               <must be written>: i
+//             <    is read   >: i
+//             <    is written>: i
       i = i+1;
-//               <must be read   >: b
-//               <must be written>: a
+//             <    is read   >: b
+//             <    is written>: a
       a = b;
-//               <must be written>: b
+//             <    is written>: b
       b = &d;
       // END BLOCK
    }
@@ -34,25 +34,30 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    int *a, *b, c, d, i;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    c = 0;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    d = 1;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    i = 2;
-//  points to = {}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
    b = &c;
-//  {(b,c,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,c,-Exact-)}
    do {
 //  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
       // BEGIN BLOCK
-//  points to = {}
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
       i = i+1;
-//  points to = {}
+//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
       a = b;
-//  points to = {}
+//  {(a,d,-Exact-);(b,d,-Exact-)}
       b = &d;
       // END BLOCK
    }

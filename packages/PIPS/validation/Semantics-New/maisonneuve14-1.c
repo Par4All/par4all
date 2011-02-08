@@ -11,14 +11,14 @@ int flip(void) {
 }
 
 void run(void) {
-	
+
 	int n = 0;
 	while (1) {
 		if (n == 1) printf("unreachable");
 		if (n == 0) n = 2;
 		else if (n == 2) n = 0;
 	}
-	
+
 }
 
 int main(void) {
