@@ -1168,6 +1168,25 @@ to \Apfa validation.
 \subsubsection{Example}
 \label{sec:example}
 
+Use for example with 4 processes
+\begin{verbatim}
+make validate-out -j4
+\end{verbatim}
+that you can run:
+\begin{itemize}
+\item in one of the \texttt{validation} directory (from \Apips or in
+  \texttt{par4all-priv}) to run all the validations cases defined in the
+  \texttt{default} file and it generates a \texttt{SUMMARY.short} and
+  archive it in the \verb|SUMMARY_Archive| directory;
+\item in a sub-directory of the previous \texttt{validation} directory and
+  it generates a \texttt{RESULTS} file in it.
+\end{itemize}
+In any case, \verb|p4a_validate| is to be used from a \texttt{validation}
+directory and not from a subdirectory.
+
+For more details on the validation process, look at the \Apips development
+guide since we use its validation infrastructure.
+
 To display from the last validation run only the test cases marked as
 \texttt{changed} in \verb|C_syntax|, use:
 \begin{verbatim}
@@ -1181,13 +1200,15 @@ p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
              --keep-status=changed --show-diff-files
 \end{verbatim}
 
-To accept the changed validation output in \texttt{C\_syntax/decl\emph{*}}:
+To accept the changed validation output in \texttt{C\_syntax/decl\emph{*}}
+after a validation done from inside the \verb|C_syntax| directory:
 \begin{verbatim}
-p4a_validate --file=SUMMARY_Archive/SUMMARY-last --filter='^C_syntax/decl' \
+p4a_validate --file=C_syntax/RESULTS --filter='^C_syntax/decl' \
              --keep-status=changed --accept
 \end{verbatim}
 When validation is complete, commit or revert to the previous state with \Agit.
 
+If you have run validation
 Occasionally, it is desirable to move all of the failed validation tests for
 \texttt{Control} into a new validation directory \texttt{Control-Bugs} to
 clean up the mainstream validation. This is accomplished with:
