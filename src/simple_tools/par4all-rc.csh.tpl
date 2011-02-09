@@ -77,14 +77,6 @@ if ( -d $$PYPS_PATH ) then
 endif
 
 # Update the Python module search path so python can find ply
-set PLY_PATH=/usr/share/pyshared
-if ( -d $$PLY_PATH ) then
-    if ( $$?PYTHONPATH ) then
-	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
-    else
-	setenv PYTHONPATH $$PLY_PATH
-    endif
-endif
 set PLY_PATH=/usr/lib/python2.6/site-packages
 if ( -d $$PLY_PATH/ply ) then
     if ( $$?PYTHONPATH ) then
