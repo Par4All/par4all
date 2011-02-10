@@ -2482,6 +2482,9 @@ void convex_cell_reference_with_value_of_cell_reference_translation
  reference *output_ref, descriptor *output_desc,
  bool *exact_p)
 {
+  pips_debug(8, "input_ref = %s\n", words_to_string(effect_words_reference(input_ref)));
+  pips_debug(8, "value_of_ref = %s\n", words_to_string(effect_words_reference(value_of_ref)));
+  pips_debug(8, "nb_common_indices = %d\n", nb_common_indices);
 
   /* assume exactness */
   *exact_p = true;
@@ -2544,20 +2547,23 @@ void convex_cell_reference_with_value_of_cell_reference_translation
 
   if(nb_phi_value_of - nb_common_indices != 0) /* avoid useless renaming */
     {
-      if (nb_phi_value_of>=nb_phi_input)
+      if (nb_phi_value_of<nb_common_indices)
 	for(i= nb_common_indices+1; i<=nb_phi_input; i++)
 	  {
 	    entity old_phi = make_phi_entity(i);
 	    entity new_phi = make_phi_entity(nb_phi_value_of+i-nb_common_indices);
-
+	    pips_debug(8, "case 1: i = %d, nb_phi_value_of+i-nb_common_indices = %d\n",
+		       i, nb_phi_value_of+i-nb_common_indices);
 	    sc_variable_rename(input_sc2, old_phi, new_phi);
 	  }
       else
-	for(i= nb_phi_input; i>nb_common_indices; i--)
+	for(i= nb_phi_input-1; i>nb_common_indices; i--)
 	{
 	  entity old_phi = make_phi_entity(i);
 	  entity new_phi = make_phi_entity(nb_phi_value_of+i-nb_common_indices);
 
+	  pips_debug(8, "case 2: i = %d, nb_phi_value_of+i-nb_common_indices = %d\n",
+		       i, nb_phi_value_of+i-nb_common_indices);
 	  sc_variable_rename(input_sc2, old_phi, new_phi);
 	}
 
