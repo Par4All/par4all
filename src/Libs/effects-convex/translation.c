@@ -2557,7 +2557,7 @@ void convex_cell_reference_with_value_of_cell_reference_translation
 	    sc_variable_rename(input_sc2, old_phi, new_phi);
 	  }
       else
-	for(i= nb_phi_input-1; i>nb_common_indices; i--)
+	for(i= nb_phi_input; i>nb_common_indices; i--)
 	{
 	  entity old_phi = make_phi_entity(i);
 	  entity new_phi = make_phi_entity(nb_phi_value_of+i-nb_common_indices);
