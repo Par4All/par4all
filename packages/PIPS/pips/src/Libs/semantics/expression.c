@@ -2612,6 +2612,26 @@ transformer float_expression_to_transformer(entity v,
   return tf;
 }
 
+/* Assimilate enum to int (used when they appear in logical
+ * operations)
+ *
+ * FI: Might be useful quite often in semantics... but forces the
+ * programmer to use tags of basic instead of basic variables.
+ */
+static int semantics_basic_tag(basic b)
+{
+  int t = basic_tag(b);
+
+  if(t==is_basic_derived) {
+    entity d = basic_derived(b);
+    type dt = entity_type(d);
+    if(type_enum_p(dt))
+      t = is_basic_int;
+  }
+
+  return t;
+}
+
 transformer transformer_add_any_relation_information(
 	transformer pre, /* precondition */
 	entity op,
@@ -2623,6 +2643,8 @@ transformer transformer_add_any_relation_information(
 {
   basic b1 = basic_of_expression(e1);
   basic b2 = basic_of_expression(e2);
+  int t1 = semantics_basic_tag(b1);
+  int t2 = semantics_basic_tag(b2);
 
   pips_debug(8, "begin %s with pre=%p\n",
 	     upwards? "upwards" : "downwards", pre);
@@ -2635,11 +2657,11 @@ transformer transformer_add_any_relation_information(
   /* context = upwards? transformer_undefined : pre; */
   /* context = transformer_range(pre); */
 
-  if( (basic_tag(b1)==basic_tag(b2))
-     || (basic_int_p(b1) && basic_string_p(b2))
-      || (basic_string_p(b1) && basic_int_p(b2)) ) {
+  if( (t1==t2)
+      || (t1==is_basic_int && t2==is_basic_string)
+      ||  (t2==is_basic_int && t1==is_basic_string) ) {
 
-    switch(basic_tag(b1)) {
+    switch(t1) {
     case is_basic_logical:
       /* Logical are represented by integer values*/
     case is_basic_float:
