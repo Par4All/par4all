@@ -1,0 +1,46 @@
+void main_PE0()
+{
+
+   int i = 0;
+
+   for(i = 0; i <= 1999; i += 1)
+      MTI(19, 64, IN[i], OUT[i]);
+}
+
+//  <IN[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=18}>
+//  <IN[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=18}>
+//  <OUT[PHI1][PHI2][PHI3].im-W-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=17}>
+//  <OUT[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=17}>
+
+void main_PE0()
+{
+
+   int i = 0;
+
+//  <IN[PHI1][PHI2][PHI3].im-R-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=18}>
+//  <IN[PHI1][PHI2][PHI3].re-R-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=18}>
+//  <OUT[PHI1][PHI2][PHI3].im-W-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=17}>
+//  <OUT[PHI1][PHI2][PHI3].re-W-EXACT-{0<=PHI1, PHI1<=1999, 0<=PHI2,
+//    PHI2<=63, 0<=PHI3, PHI3<=17}>
+
+
+   for(i = 0; i <= 1999; i += 1)
+
+//  <IN[PHI1][PHI2][PHI3].im-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63,
+//    0<=PHI3, PHI3<=18, 0<=i, i<=1999}>
+//  <IN[PHI1][PHI2][PHI3].re-R-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63,
+//    0<=PHI3, PHI3<=18, 0<=i, i<=1999}>
+//  <OUT[PHI1][PHI2][PHI3].im-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63,
+//    0<=PHI3, PHI3<=17, 0<=i, i<=1999}>
+//  <OUT[PHI1][PHI2][PHI3].re-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63,
+//    0<=PHI3, PHI3<=17, 0<=i, i<=1999}>
+
+      MTI(19, 64, IN[i], OUT[i]);
+}
