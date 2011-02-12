@@ -83,7 +83,7 @@ retrieve_active_phases(void)
     }
 }
 
-bool active_phase_p(string phase)
+bool active_phase_p(const char * phase)
 {
     makefile current_makefile = parse_makefile();
 
@@ -108,7 +108,7 @@ string active_phase_for_resource(string res)
     return rule_phase(find_rule_by_resource(res));
 }
 
-string activate_phase(string phase)
+const char * activate_phase(const char * phase)
 {
   rule r;
   //virtual_resource res;
@@ -116,7 +116,7 @@ string activate_phase(string phase)
   string old_phase;
   makefile current_makefile = parse_makefile();
   bool rule_cyclic_p = TRUE;
-  string status = phase;
+  const char * status = phase;
 
   debug_on("PIPSMAKE_DEBUG_LEVEL");
   pips_debug(1, "%s - requested\n", phase);
@@ -206,9 +206,9 @@ string activate_phase(string phase)
   return (status);
 }
 
-string activate(string phase)
+const char* activate(const char* phase)
 {
-  string r = activate_phase(phase);
+  const char* r = activate_phase(phase);
   if(!r)
     pips_user_error("Phase activation error: check the phase names\n");
   return r;
@@ -227,7 +227,7 @@ bool activate_phases(void)
   while(cap!=NULL) {
     pips_debug(1, "Phase to activate: %s\n", cap);
     if(!active_phase_p(cap)) {
-     string r =  activate_phase(cap);
+     const char* r =  activate_phase(cap);
      result = r!=NULL;
     }
     cap = strtok(NULL, d);
