@@ -508,7 +508,7 @@ statement effects_to_dma(statement stat,
                 get_current_module_entity();
 	      // PIER Here we need to add a P4A variable prefix to the name to help
 	      // p4a postprocessing
-	      string str = strdup (concatenate (prefix,entity_local_name(re), suffix, NULL));
+	      string str = strdup (concatenate (prefix,entity_user_name(re), suffix, NULL));
               eto = make_temporary_pointer_to_array_entity_with_prefix(str,renew,declaring_module,init);
 	      free (str);
               AddLocalEntityToDeclarations(eto,get_current_module_entity(),stat);
