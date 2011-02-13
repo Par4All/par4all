@@ -1,0 +1,61 @@
+main
+
+Declarations for module "main" with type "() -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 24
+	Declared entity "main:*DYNAMIC*" with type "area" with size 14
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`result" with type "variable" "int"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "symbol_table_typedef_struct!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 24:
+	Variable "TOP-LEVEL:titi"	offset = 0	type = "int"	user name = "titi"	size = 4
+	Variable "TOP-LEVEL:toto"	offset = 4	type = "struct {int var1; SomeStruct var2; int var3;}"	user name = "toto"
+		type = "int"	user name = "toto.var1"
+		type = "SomeStruct"	user name = "toto.var2"
+			type = "int"	user name = "toto.var2.var1"
+			type = "int"	user name = "toto.var2.var2"
+			type = "int"	user name = "toto.var2.var3"
+		type = "int"	user name = "toto.var3"
+	size = 20
+
+
+Layout for memory area "main:*DYNAMIC*" of size 14:
+	Variable "main:0`result"	offset = 10	type = "int"	user name = "result"	size = 4
+	Variable "main:0`__func__"	offset = 0	type = "char *"	user name = "__func__"	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	type = "char *"	user name = "__FUNCTION__"	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "symbol_table_typedef_struct!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+

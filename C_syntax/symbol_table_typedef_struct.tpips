@@ -1,0 +1,18 @@
+delete symbol_table_typedef_struct
+
+setenv PIPS_CPP="cpp -C"
+
+#setenv SYMBOL_TABLE_DEBUG_LEVEL 4
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty EXTENDED_VARIABLE_INFORMATION TRUE
+
+create symbol_table_typedef_struct symbol_table_typedef_struct.c
+
+apply C_SYMBOL_TABLE (%ALL)
+
+shell more symbol_table_typedef_struct.database/main/main
+
+close
+delete symbol_table_typedef_struct
+quit
