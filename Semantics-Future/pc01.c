@@ -1,4 +1,6 @@
-/* Check that encoded controls can be properly analyzed
+/* Check that encoded controls can be properly analyzed (PC stands for
+ * program counter). To avoid convexity issue, one variable is added
+ * for each control location instead of a unique program counter.
  *
  * Does not get the invariant s0+s1+s2==1, but 1<=s0+s1+s2<=2
  *
