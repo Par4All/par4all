@@ -9,9 +9,9 @@ setproperty EXTENDED_VARIABLE_INFORMATION TRUE
 
 create symbol_table_typedef symbol_table_typedef.c
 
-apply C_SYMBOL_TABLE (%ALL)
+activate C_SYMBOL_TABLE
 
-shell more symbol_table_typedef.database/main/main
+display SYMBOL_TABLE_FILE[main]
 
 close
 delete symbol_table_typedef

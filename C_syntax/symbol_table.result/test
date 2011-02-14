@@ -1,20 +1,17 @@
-symbol_table!add_comp_output
+main
 
-Declarations for module "symbol_table!add_comp_output" with type "() -> void"
+Declarations for module "main" with type "() -> void"
 
 Variable list:
 
 	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 16
+	Declared entity "main:*DYNAMIC*" with type "area" with size 10
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
 	Declared entity "symbol_table!:*STATIC*" with type "area" with size 0
-	Declared entity "symbol_table!add_comp_output:*DYNAMIC*" with type "area" with size 44
-	Declared entity "symbol_table!add_comp_output:*HEAP*" with type "area" with size 0
-	Declared entity "symbol_table!add_comp_output:*STACK*" with type "area" with size 0
-	Declared entity "symbol_table!add_comp_output:*STATIC*" with type "area" with size 0
-	Declared entity "symbol_table!add_comp_output:0`1`k" with type "variable" "int"
-	Declared entity "symbol_table!add_comp_output:0`__FUNCTION__" with type "variable" "char *"
-	Declared entity "symbol_table!add_comp_output:0`__func__" with type "variable" "char *"
-	Declared entity "symbol_table!add_comp_output:0`dst" with type "variable" "int"
-	Declared entity "symbol_table!add_comp_output:0`i" with type "variable" "int"
 
 * empty extern declaration list *
 
@@ -28,28 +25,25 @@ Layout for memory area "TOP-LEVEL:*STATIC*" of size 16:
 	Variable "TOP-LEVEL:out1"	offset = 12	size = 4
 
 
+Layout for memory area "main:*DYNAMIC*" of size 10:
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
 Layout for memory area "symbol_table!:*STATIC*" of size 0:
 	* empty area *
 
-
-Layout for memory area "symbol_table!add_comp_output:*DYNAMIC*" of size 44:
-	Variable "symbol_table!add_comp_output:0`dst"	offset = 32	size = 4
-	Variable "symbol_table!add_comp_output:0`i"	offset = 36	size = 4
-	Variable "symbol_table!add_comp_output:0`1`k"	offset = 40	size = 4
-	Variable "symbol_table!add_comp_output:0`__func__"	offset = 0	size = 16
-	Variable "symbol_table!add_comp_output:0`__FUNCTION__"	offset = 16	size = 16
-
-
-Layout for memory area "symbol_table!add_comp_output:*HEAP*" of size 0:
-	* empty area *
-
-
-Layout for memory area "symbol_table!add_comp_output:*STACK*" of size 0:
-	* empty area *
-
-
-Layout for memory area "symbol_table!add_comp_output:*STATIC*" of size 0:
-	* empty area *
-
-End of declarations for module symbol_table!add_comp_output
+End of declarations for module main
 

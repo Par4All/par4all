@@ -9,7 +9,8 @@ setproperty EXTENDED_VARIABLE_INFORMATION TRUE
 
 create symbol_table_typedef_struct symbol_table_typedef_struct.c
 
-apply C_SYMBOL_TABLE (%ALL)
+activate C_SYMBOL_TABLE
+display SYMBOL_TABLE_FILE (main)
 
 shell more symbol_table_typedef_struct.database/main/main
 
