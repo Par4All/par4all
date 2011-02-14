@@ -2131,7 +2131,15 @@ transformer statement_to_transformer(
 
   if(get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
     pre = transformer_undefined_p(spre)? transformer_identity() :
-      transformer_range(spre);
+      transformer_range(spre); // FI: transformer_range() implies
+			       // projection(s) and a possibly strong
+			       // increase of the number of
+			       // constraints. Many constraints may be
+			       // redundant as far as integer points
+			       // are concerned, but not redundant for
+			       // rational numbers. We could use an
+			       // approximate projection, elimination
+			       // of all constraints containing an old value...
     if(refine_transformers_p) {
       /* Transformation REFINE_TRANSFORMERS is being executed: add
          information available from the statement precondition */
@@ -2139,6 +2147,8 @@ transformer statement_to_transformer(
       transformer srpre_r = transformer_range(srpre);
 
       pre = transformer_domain_intersection(pre, srpre_r);
+      pre = transformer_normalize(pre, 2); // FI: redundancy
+					       // elimination required
       free_transformer(srpre_r);
     }
   }
