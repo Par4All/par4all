@@ -150,7 +150,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 }
 Help on method unfolding in module pyps:
 
-unfolding(self, inlining_use_initialization_list=None, **props) unbound pyps.module method
+unfolding(self, inlining_use_initialization_list=None, **props) unbound pypsbase.module method
     Unfolding is a complementary transformation of
     inlining .  While inlining inlines all call
     sites to a given module in other modules, unfolding inlines
@@ -321,7 +321,7 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
 }
 Help on method expression_substitution in module pyps:
 
-expression_substitution(self, pattern=None, relax_float_associativity=None, **props) unbound pyps.module method
+expression_substitution(self, pattern=None, relax_float_associativity=None, **props) unbound pypsbase.module method
     This transformation is quickly developed to fulfill the need of a
     simple pattern matcher in pips.  The user provide a module name
     through  property and all
