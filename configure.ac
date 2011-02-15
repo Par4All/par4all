@@ -262,6 +262,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/gpips/Makefile
 				 src/Passes/pips/Makefile
 				 src/Passes/pyps/Makefile
+				 src/Passes/pyps/ipyps
 				 src/Passes/pyps/doc/Makefile
 				 src/Passes/pyps/drivers/Makefile
 				 src/Passes/pyps/drivers/sac/Makefile
