@@ -22,7 +22,8 @@ TARGET	= scalopes
 
 LIB_CFILES =	scalopify.c \
 		sesamify.c \
-		scalopragma.c
+		scalopragma.c \
+                sesam_tasks_processing.c
 
 INC_TARGET =    $(TARGET).h
 
