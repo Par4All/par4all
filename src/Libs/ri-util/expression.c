@@ -1267,6 +1267,7 @@ bool syntax_equal_p(syntax s1, syntax s2)
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
+    pips_internal_error("Not implemented for syntax tag %d", t1);
   default:
     return FALSE;
     break;
@@ -2227,6 +2228,7 @@ bool same_sizeofexpression_name_p(sizeofexpression s0, sizeofexpression s1)
         return same_expression_name_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
     return false;
 }
+
 bool same_subscript_name_p(subscript ss1, subscript ss2)
 {
   return same_expression_name_p(subscript_array(ss1), subscript_array(ss2)) 
@@ -2244,14 +2246,18 @@ bool same_application_name_p(application a1, application a2)
   return  same_expression_name_p(application_function(a1), application_function(a2)) &&
    same_lexpr_name_p(application_arguments(a1), application_arguments(a2));
 }
+
 bool same_va_arg_name_p(list l1, list l2)
 {
   if (gen_length(l1)!=gen_length(l2))
     return FALSE;
 
-  for(; l1 && l2; POP(l1), POP(l2))
-    if (!same_sizeofexpression_name_p(l1, l2))
+  for(; l1 && l2; POP(l1), POP(l2)) {
+    sizeofexpression s1 = SIZEOFEXPRESSION(CAR(l1));
+    sizeofexpression s2 = SIZEOFEXPRESSION(CAR(l2));
+    if (!same_sizeofexpression_name_p(s1, s2))
       return FALSE;
+  }
   return TRUE;
 }
 
@@ -3153,7 +3159,7 @@ expression string_to_expression(const char * s,entity module)
     if(entity_undefined_p(e)) {
         /* try to find simple expression */
         static const char* seeds[] = {   PLUS_OPERATOR_NAME, MINUS_OPERATOR_NAME,MULTIPLY_OPERATOR_NAME, DIVIDE_OPERATOR_NAME};
-        for(int i=0;i< sizeof(seeds)/sizeof(seeds[0]); i++) {
+	for(int i=0; i < (int) (sizeof(seeds)/sizeof(seeds[0])); i++) {
             char *where = strchr(s,seeds[i][0]);
             if(where) {
                 char * head = strdup(s);
