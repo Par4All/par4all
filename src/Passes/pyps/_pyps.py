@@ -50,7 +50,7 @@ class loop:
 ### loop_methods /!\ do not touch this line /!\
 
 
-class module:
+class module(object): # deriving from object is needed for overloaded setter
 	"""A source code function"""
 
 	def __init__(self,ws,name,source=""):
@@ -113,19 +113,20 @@ class module:
 		pypsutils.set_properties(self._ws,props)
 		return self._ws.cpypips.display(upper(rc),self._name)
 
-	def __get_code(self, activate="print_code"):
-		"""get module code as a string"""
-		getattr(self,lower(activate if isinstance(activate, str) else activate.__name__ ))()
-		rcfile=self.show("printed_file")
-		return file(self._ws.dirname()+rcfile).read()
 
-	def __set_code(self,newcode):
+	def _set_code(self,newcode):
 		"""set module content from a string"""
 		if not pypsutils.re_compilation_units.match(self.name):
 			(code_rc,printcode_rc) = self.__prepare_modification()
 			pypsutils.string2file(newcode, code_rc)
 
-	code=property(__get_code,__set_code)
+	def _get_code(self, activate="print_code"):
+		"""get module code as a string"""
+		getattr(self,lower(activate if isinstance(activate, str) else activate.__name__ ))()
+		rcfile=self.show("printed_file")
+		return file(self._ws.dirname()+rcfile).read()
+
+	code = property(_get_code,_set_code)
 
 
 	def loops(self, label=""):
@@ -170,7 +171,7 @@ class module:
 
 	def saveas(self,path,activate="print_code"):
 		with file(path,"w") as fd:
-			fd.write(self.__get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
+			fd.write(self._get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
 		
 
 ### module_methods /!\ do not touch this line /!\
