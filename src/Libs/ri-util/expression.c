@@ -2227,6 +2227,33 @@ bool same_sizeofexpression_name_p(sizeofexpression s0, sizeofexpression s1)
         return same_expression_name_p(sizeofexpression_expression(s0),sizeofexpression_expression(s1));
     return false;
 }
+bool same_subscript_name_p(subscript ss1, subscript ss2)
+{
+  return same_expression_name_p(subscript_array(ss1), subscript_array(ss2)) 
+     && same_lexpr_name_p(subscript_indices(ss1), subscript_indices(ss2));
+}
+
+bool same_cast_name_p(cast cs1, cast cs2)
+{
+  return same_type_name_p(cast_type(cs1), cast_type(cs2)) &&
+    same_expression_name_p(cast_expression(cs1), cast_expression(cs2)) ;
+}
+
+bool same_application_name_p(application a1, application a2)
+{
+  return  same_expression_name_p(application_function(a1), application_function(a2)) &&
+   same_lexpr_name_p(application_arguments(a1), application_arguments(a2));
+}
+bool same_va_arg_name_p(list l1, list l2)
+{
+  if (gen_length(l1)!=gen_length(l2))
+    return FALSE;
+
+  for(; l1 && l2; POP(l1), POP(l2))
+    if (!same_sizeofexpression_name_p(l1, l2))
+      return FALSE;
+  return TRUE;
+}
 
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
@@ -2243,8 +2270,16 @@ bool same_syntax_name_p(syntax s1, syntax s2)
       return same_range_name_p(syntax_range(s1), syntax_range(s2));
     case is_syntax_sizeofexpression:
       return same_sizeofexpression_name_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
+    case is_syntax_subscript:
+      return same_subscript_name_p(syntax_subscript(s1), syntax_subscript(s2));
+    case is_syntax_cast:
+      return same_cast_name_p(syntax_cast(s1), syntax_cast(s2));
+    case is_syntax_application:
+      return same_application_name_p(syntax_application(s1), syntax_application(s2));
+    case is_syntax_va_arg:
+      return same_va_arg_name_p(syntax_va_arg(s1), syntax_va_arg(s2));
     default:
-      pips_internal_error("unexpected syntax tag");
+      pips_internal_error("unexpected syntax tag: %d", syntax_tag(s1));
     }
   return FALSE;
 }
