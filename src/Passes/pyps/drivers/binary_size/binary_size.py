@@ -3,27 +3,15 @@ import re
 import pyps
 import new
 
-def funcToMethod(func, clas):
-	"""Internal helper function : Adds function func to class clas"""
-	method = new.instancemethod(func, None, clas)
-	clas.__dict__[func.__name__] = method
-
-class workspace:
+def binary_size(module, ccexecp = pyps.ccexecParams()):
 	"""Workspace extension to provide a binary_size function to each module.
 
-	A call to the binary_size function of a given module attempts to compile the program and then to extract the compiled size and the instruction count of the given module.  The compiled size and the instruction count are returned by the functon in a tuple. A ValueError exception is thrown if the function is not found in the binary (see below).
+	A call to the binary_size function of a given module attempts to compile the program and then to extract the compiled size and the instruction count of the given module using objdump.  The compiled size and the instruction count are returned by the functon in a tuple. A ValueError exception is thrown if the function is not found in the binary (see below). A RuntimeError is thrown when the objdump call failed.
 
-	Be carefull. The symbol used by the compiler in the binary object for the given module must be guessed by the binary_size function. Given a function “foo”, the symbol can be “foo”, “foo.”, “_foo” or many others forms, thus we cannot ensure that this function will work in every situations. A wrong guess can lead to a ValueError exception or in a few cases to wrongs results.
-
-	def __init__(self, ws, **args):
-		self.ws = ws
-		funcToMethod(binary_size, pyps.module)
-
-def binary_size(module, func):
-	ccexecp = pyps.ccexecParams()
+	Be carefull. The symbol used by the compiler in the binary object for the given module must be guessed by the binary_size function. Given a function “foo”, the symbol can be “foo”, “foo.”, “_foo” or many others forms, thus we cannot ensure that this function will work in every situations. A wrong guess can lead to a ValueError exception or in a few cases to wrongs results."""
 	outfile = module._ws.compile(ccexecp)
 	
-	return __funcsize(func, outfile)
+	return __funcsize(module.name, outfile)
 
 
 def __getLinePos(line):
@@ -36,6 +24,9 @@ def __matchSymbol(symbol, dump):
 def __funcsize(func, outfile = ""):
 	args = ['objdump','-S',outfile]
 	objdump = subprocess.Popen(args, stdout=subprocess.PIPE)
+	if objdump == None:
+		raise RuntimeError("objdump call failed.")
+
 	dump = objdump.stdout.read()
 
 
@@ -57,3 +48,10 @@ def __funcsize(func, outfile = ""):
 	size = __getLinePos(lines[len(lines)-1]) - __getLinePos(lines[0])
 	return (size, lineCount)
 
+def funcToMethod(func, clas):
+	"""Internal helper function : Adds function func to class clas"""
+	method = new.instancemethod(func, None, clas)
+	clas.__dict__[func.__name__] = method
+
+#Add binary_size function to pyps.module
+funcToMethod(binary_size, pyps.module)
