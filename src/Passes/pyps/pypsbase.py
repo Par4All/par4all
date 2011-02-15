@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-## coding=iso-8859-15
 from __future__ import with_statement # to cope with python2.5
 import pypips
 import pypsutils
@@ -44,11 +43,6 @@ class loop:
 		"""get outer loops of this loop"""
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
 		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
-
-
-
-### loop_methods /!\ do not touch this line /!\
-
 
 class module(object): # deriving from object is needed for overloaded setter
 	"""A source code function"""
@@ -174,8 +168,6 @@ class module(object): # deriving from object is needed for overloaded setter
 			fd.write(self._get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
 		
 
-### module_methods /!\ do not touch this line /!\
-
 class modules:
 	"""high level representation of a module set"""
 	def __init__(self,modules):
@@ -200,8 +192,6 @@ class modules:
 	def loops(self):
 		""" get concatenation of all outermost loops"""
 		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
-
-### modules_methods /!\ do not touch this line /!\
 
 
 class ccexecParams(object):
@@ -319,9 +309,9 @@ class workspace(object):
 			self.iparents.append(pws)
 
 		self._modules = {}
-		self.props = workspace.props(self)
-		self.fun = workspace.fun(self)
-		self.cu = workspace.cu(self)
+		self.props = workspace.Props(self)
+		self.fun = workspace.Fun(self)
+		self.cu = workspace.Cu(self)
 		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
@@ -532,7 +522,7 @@ class workspace(object):
 	def goingToRunWith(self, files, rep):
 		""" hook that happens just before compilation of `files' in `rep'"""
 		for f in files:
-			pypsutils.addMAX0(f)
+			pypsutils.addGenericIntrinsics(f)
 			# fix bad pragma pretty print
 			lines=[]
 			with open(f,"r") as source:
@@ -699,20 +689,20 @@ class workspace(object):
 		return l
 
 
-	class cu(object):
+	class Cu(object):
 		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
 
 		def __setattr__(self, name, val):
-			raise AttributeError("Compilation Unit assignement is not allowed.")
+			raise AttributeError("Compilation Unit assignment is not allowed.")
 
 		def __getattr__(self, name):
 			n = name + '!'
 			if n in self._wp._modules:
 				return self._wp._modules[n]
 			else:
-				raise NameError("Unknow compilation unit : " + name)
+				raise NameError("Unknown compilation unit : " + name)
 
 		def __dir__(self):
 			return self._cuDict().keys()
@@ -729,11 +719,6 @@ class workspace(object):
 				map(do_something,my_workspace)"""
 			return self._cuDict().itervalues()
 
-		def __pyropsFakeIter__(self):
-			"""provide an iterator on workspace's module, so that you can write
-				map(do_something,my_workspace)"""
-			return self._cuDict().values()
-
 		def __getitem__(self,module_name):
 			"""retrieve a module of the workspace from its name"""
 			return self._cuDict()[module_name]
@@ -747,19 +732,19 @@ class workspace(object):
 			return module_name in self._cuDict()
 
 
-	class fun(object):
+	class Fun(object):
 		'''Allow user to access a module by writing w.fun.modulename'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
 
 		def __setattr__(self, name, val):
-			raise AttributeError("Module assignement is not allowed.")
+			raise AttributeError("Module assignment is not allowed.")
 
 		def __getattr__(self, name):
 			if name in self._functionDict():
 				return self._wp._modules[name]
 			else:
-				raise NameError("Unknow function : " + name)
+				raise NameError("Unknown function : " + name)
 
 		def _functionDict(self):
 			d = {}
@@ -772,14 +757,9 @@ class workspace(object):
 			return self._functionDict().keys()
 
 		def __iter__(self):
-			"""provide an iterator on workspace's funtions, so that you
+			"""provide an iterator on workspace's functions, so that you
 				can write map(do_something, my_workspace.fun)"""
 			return self._functionDict().itervalues()
-
-		def __pyropsFakeIter__(self):
-			"""provide an iterator on workspace's funtions, so that you
-				can write map(do_something, my_workspace.fun)"""
-			return self._functionDict().values()
 
 		def __getitem__(self,module_name):
 			"""retrieve a module of the workspace by its name"""
@@ -792,9 +772,9 @@ class workspace(object):
 			"""Test if the workspace contains a given module"""
 			return module_name in self._functionDict()
 
-	class props(object):
+	class Props(object):
 		"""Allow user to access a property by writing w.props.PROP,
-		this class contains a static dictionnary of every properties
+		this class contains a static dictionary of every properties
 		and default value
 
 		Provides also iterator and [] methods
@@ -811,13 +791,13 @@ class workspace(object):
 			if name.upper() in self.all:
 				pypsutils._set_property(self.wp,name,val)
 			else:
-				raise NameError("Unknow property : " + name)
+				raise NameError("Unknown property : " + name)
 
 		def __getattr__(self, name):
 			if name.upper() in self.all:
 				return pypsutils.get_property(self.wp,name)
 			else:
-				raise NameError("Unknow property : " + name)
+				raise NameError("Unknown property : " + name)
 
 		def __dir__(self):
 			"We should use the updated values, not the default ones..."
@@ -844,9 +824,6 @@ class workspace(object):
 		def __contains__(self, property_name):
 			"""Test if the workspace contains a given property"""
 			return property_name in self.all
-
-		# Here the source of the property all attribute will be generated:
-### props_methods /!\ do not touch this line /!\
 
 # Some Emacs stuff:
 ### Local Variables:
