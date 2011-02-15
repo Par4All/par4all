@@ -1263,11 +1263,11 @@ bool syntax_equal_p(syntax s1, syntax s2)
     return cast_equal_p(syntax_cast(s1), syntax_cast(s2));
   case is_syntax_sizeofexpression:
     return sizeofexpression_equal_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
-
   case is_syntax_subscript:
+    return subscript_equal_p(syntax_subscript(s1),syntax_subscript(s2));
   case is_syntax_application:
   case is_syntax_va_arg:
-    pips_internal_error("Not implemented for syntax tag %d", t1);
+    pips_internal_error("Not implemented for syntax tag %d\n", t1);
   default:
     return FALSE;
     break;
@@ -1275,6 +1275,11 @@ bool syntax_equal_p(syntax s1, syntax s2)
 
   pips_internal_error("illegal. syntax tag %d", t1);
   return FALSE;
+}
+
+bool subscript_equal_p(subscript s1, subscript s2) {
+            return expression_equal_p(subscript_array(s1),subscript_array(s2))
+        && gen_equals(subscript_indices(s1),subscript_indices(s2),(gen_eq_func_t)expression_equal_p);
 }
 
 bool reference_equal_p(reference r1, reference r2)
@@ -1288,18 +1293,7 @@ bool reference_equal_p(reference r1, reference r2)
   if(v1 != v2)
     return FALSE;
 
-  if(gen_length(dims1) != gen_length(dims2))
-    return FALSE;
-  /*
-    pips_internal_error("Different dimensions for %s: %d and %d",
-    entity_local_name(v1), gen_length(dims1), gen_length(dims2));
-  */
-
-  for(; !ENDP(dims1); POP(dims1), POP(dims2))
-    if(!expression_equal_p(EXPRESSION(CAR(dims1)), EXPRESSION(CAR(dims2))))
-      return FALSE;
-
-  return TRUE;
+  return gen_equals(dims1,dims2,(gen_eq_func_t)expression_equal_p);
 }
 
 
@@ -1320,12 +1314,7 @@ bool call_equal_p(call c1, call c2)
   if(f1 != f2)
     return FALSE;
 
-  if(gen_length(args1) != gen_length(args2)) /* this should be a bug */
-    return FALSE;
-
-  for(; !ENDP(args1); POP(args1), POP(args2))
-    if(!expression_equal_p(EXPRESSION(CAR(args1)), EXPRESSION(CAR(args2))))
-      return FALSE;
+  return gen_equals(args1,args2,(gen_eq_func_t)expression_equal_p);
 
   return TRUE;
 }
