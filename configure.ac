@@ -272,6 +272,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/memalign/Makefile
 				 src/Passes/pyps/drivers/sacexplore/Makefile
 				 src/Passes/pyps/drivers/p3/Makefile
+				 src/Passes/pyps/drivers/openmp/Makefile
 				 src/Passes/pyps/drivers/terapyps/Makefile
 				 src/Passes/tpips/Makefile
 
