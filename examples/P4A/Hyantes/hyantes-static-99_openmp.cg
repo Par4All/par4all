@@ -1,0 +1,162 @@
+CPU: Intel Core/i7, speed 2933.16 MHz (estimated)
+Counted CPU_CLK_UNHALTED events (Clock cycles when not halted) with a unit mask of 0x00 (No unit mask) count 100000
+samples  %        image name               app name                 symbol name
+-------------------------------------------------------------------------------
+1176907  90.1420  libm-2.12.1.so           libm-2.12.1.so           /lib/libm-2.12.1.so
+  1176907  100.000  libm-2.12.1.so           libm-2.12.1.so           /lib/libm-2.12.1.so [self]
+-------------------------------------------------------------------------------
+71031     5.4404  hyantes-static-99_openmp hyantes-static-99_openmp run.omp_fn.0
+  71031    100.000  hyantes-static-99_openmp hyantes-static-99_openmp run.omp_fn.0 [self]
+-------------------------------------------------------------------------------
+32696     2.5043  libgomp.so.1.0.0         libgomp.so.1.0.0         /usr/lib/libgomp.so.1.0.0
+  32696    100.000  libgomp.so.1.0.0         libgomp.so.1.0.0         /usr/lib/libgomp.so.1.0.0 [self]
+-------------------------------------------------------------------------------
+17535     1.3430  no-vmlinux               no-vmlinux               /no-vmlinux
+  17535    100.000  no-vmlinux               no-vmlinux               /no-vmlinux [self]
+-------------------------------------------------------------------------------
+4113      0.3150  libc-2.12.1.so           libc-2.12.1.so           /lib/libc-2.12.1.so
+  4113     100.000  libc-2.12.1.so           libc-2.12.1.so           /lib/libc-2.12.1.so [self]
+-------------------------------------------------------------------------------
+2532      0.1939  oprofiled                oprofiled                /usr/bin/oprofiled
+  2532     100.000  oprofiled                oprofiled                /usr/bin/oprofiled [self]
+-------------------------------------------------------------------------------
+180       0.0138  bash                     bash                     /bin/bash
+  180      100.000  bash                     bash                     /bin/bash [self]
+-------------------------------------------------------------------------------
+99        0.0076  libpixman-1.so.0.18.4    libpixman-1.so.0.18.4    /usr/lib/libpixman-1.so.0.18.4
+  99       100.000  libpixman-1.so.0.18.4    libpixman-1.so.0.18.4    /usr/lib/libpixman-1.so.0.18.4 [self]
+-------------------------------------------------------------------------------
+99        0.0076  nouveau_drv.so           nouveau_drv.so           /usr/lib/xorg/modules/drivers/nouveau_drv.so
+  99       100.000  nouveau_drv.so           nouveau_drv.so           /usr/lib/xorg/modules/drivers/nouveau_drv.so [self]
+-------------------------------------------------------------------------------
+80        0.0061  ld-2.12.1.so             ld-2.12.1.so             /lib/ld-2.12.1.so
+  80       100.000  ld-2.12.1.so             ld-2.12.1.so             /lib/ld-2.12.1.so [self]
+-------------------------------------------------------------------------------
+67        0.0051  libcairo.so.2.11000.0    libcairo.so.2.11000.0    /usr/lib/libcairo.so.2.11000.0
+  67       100.000  libcairo.so.2.11000.0    libcairo.so.2.11000.0    /usr/lib/libcairo.so.2.11000.0 [self]
+-------------------------------------------------------------------------------
+54        0.0041  Xorg                     Xorg                     /usr/bin/Xorg
+  54       100.000  Xorg                     Xorg                     /usr/bin/Xorg [self]
+-------------------------------------------------------------------------------
+39        0.0030  libexa.so                libexa.so                /usr/lib/xorg/modules/libexa.so
+  39       100.000  libexa.so                libexa.so                /usr/lib/xorg/modules/libexa.so [self]
+-------------------------------------------------------------------------------
+22        0.0017  ophelp                   ophelp                   /usr/bin/ophelp
+  22       100.000  ophelp                   ophelp                   /usr/bin/ophelp [self]
+-------------------------------------------------------------------------------
+19        0.0015  libdrm_nouveau.so.1.0.0  libdrm_nouveau.so.1.0.0  /lib/libdrm_nouveau.so.1.0.0
+  19       100.000  libdrm_nouveau.so.1.0.0  libdrm_nouveau.so.1.0.0  /lib/libdrm_nouveau.so.1.0.0 [self]
+-------------------------------------------------------------------------------
+18        0.0014  libglib-2.0.so.0.2600.0  libglib-2.0.so.0.2600.0  /lib/libglib-2.0.so.0.2600.0
+  18       100.000  libglib-2.0.so.0.2600.0  libglib-2.0.so.0.2600.0  /lib/libglib-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+17        0.0013  libvte.so.9.2600.0       libvte.so.9.2600.0       /usr/lib/libvte.so.9.2600.0
+  17       100.000  libvte.so.9.2600.0       libvte.so.9.2600.0       /usr/lib/libvte.so.9.2600.0 [self]
+-------------------------------------------------------------------------------
+10       7.7e-04  libgobject-2.0.so.0.2600.0 libgobject-2.0.so.0.2600.0 /usr/lib/libgobject-2.0.so.0.2600.0
+  10       100.000  libgobject-2.0.so.0.2600.0 libgobject-2.0.so.0.2600.0 /usr/lib/libgobject-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+8        6.1e-04  libgdk-x11-2.0.so.0.2200.0 libgdk-x11-2.0.so.0.2200.0 /usr/lib/libgdk-x11-2.0.so.0.2200.0
+  8        100.000  libgdk-x11-2.0.so.0.2200.0 libgdk-x11-2.0.so.0.2200.0 /usr/lib/libgdk-x11-2.0.so.0.2200.0 [self]
+-------------------------------------------------------------------------------
+8        6.1e-04  libmozjs.so              libmozjs.so              /usr/lib/firefox-3.6.13/libmozjs.so
+  8        100.000  libmozjs.so              libmozjs.so              /usr/lib/firefox-3.6.13/libmozjs.so [self]
+-------------------------------------------------------------------------------
+7        5.4e-04  libmurrine.so            libmurrine.so            /usr/lib/gtk-2.0/2.10.0/engines/libmurrine.so
+  7        100.000  libmurrine.so            libmurrine.so            /usr/lib/gtk-2.0/2.10.0/engines/libmurrine.so [self]
+-------------------------------------------------------------------------------
+7        5.4e-04  libxul.so                libxul.so                /usr/lib/firefox-3.6.13/libxul.so
+  7        100.000  libxul.so                libxul.so                /usr/lib/firefox-3.6.13/libxul.so [self]
+-------------------------------------------------------------------------------
+6        4.6e-04  grep                     grep                     /bin/grep
+  6        100.000  grep                     grep                     /bin/grep [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  hyantes-static-99_openmp hyantes-static-99_openmp display
+  5        100.000  hyantes-static-99_openmp hyantes-static-99_openmp display [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_lock
+  5        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_lock [self]
+-------------------------------------------------------------------------------
+4        3.1e-04  libgtk-x11-2.0.so.0.2200.0 libgtk-x11-2.0.so.0.2200.0 /usr/lib/libgtk-x11-2.0.so.0.2200.0
+  4        100.000  libgtk-x11-2.0.so.0.2200.0 libgtk-x11-2.0.so.0.2200.0 /usr/lib/libgtk-x11-2.0.so.0.2200.0 [self]
+-------------------------------------------------------------------------------
+4        3.1e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_pop_restore
+  4        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_pop_restore [self]
+-------------------------------------------------------------------------------
+4        3.1e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_push_defer
+  4        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_push_defer [self]
+-------------------------------------------------------------------------------
+4        3.1e-04  libwfb.so                libwfb.so                /usr/lib/xorg/modules/libwfb.so
+  4        100.000  libwfb.so                libwfb.so                /usr/lib/xorg/modules/libwfb.so [self]
+-------------------------------------------------------------------------------
+4        3.1e-04  mawk                     mawk                     /usr/bin/mawk
+  4        100.000  mawk                     mawk                     /usr/bin/mawk [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  libXrender.so.1.3.0      libXrender.so.1.3.0      /usr/lib/libXrender.so.1.3.0
+  3        100.000  libXrender.so.1.3.0      libXrender.so.1.3.0      /usr/lib/libXrender.so.1.3.0 [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  sudo                     sudo                     /usr/bin/sudo
+  3        100.000  sudo                     sudo                     /usr/bin/sudo [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  dash                     dash                     /bin/dash
+  2        100.000  dash                     dash                     /bin/dash [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  firefox-bin              firefox-bin              /usr/lib/firefox-3.6.13/firefox-bin
+  2        100.000  firefox-bin              firefox-bin              /usr/lib/firefox-3.6.13/firefox-bin [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  libX11.so.6.3.0          libX11.so.6.3.0          /usr/lib/libX11.so.6.3.0
+  2        100.000  libX11.so.6.3.0          libX11.so.6.3.0          /usr/lib/libX11.so.6.3.0 [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  libdbus-1.so.3.5.2       libdbus-1.so.3.5.2       /lib/libdbus-1.so.3.5.2
+  2        100.000  libdbus-1.so.3.5.2       libdbus-1.so.3.5.2       /lib/libdbus-1.so.3.5.2 [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  libpam.so.0.82.2         libpam.so.0.82.2         /lib/libpam.so.0.82.2
+  2        100.000  libpam.so.0.82.2         libpam.so.0.82.2         /lib/libpam.so.0.82.2 [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_unlock
+  2        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_unlock [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  irqbalance               irqbalance               /usr/sbin/irqbalance
+  1        100.000  irqbalance               irqbalance               /usr/sbin/irqbalance [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libORBit-2.so.0.1.0      libORBit-2.so.0.1.0      /usr/lib/libORBit-2.so.0.1.0
+  1        100.000  libORBit-2.so.0.1.0      libORBit-2.so.0.1.0      /usr/lib/libORBit-2.so.0.1.0 [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libavahi-core.so.7.0.0   libavahi-core.so.7.0.0   /usr/lib/libavahi-core.so.7.0.0
+  1        100.000  libavahi-core.so.7.0.0   libavahi-core.so.7.0.0   /usr/lib/libavahi-core.so.7.0.0 [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libdl-2.12.1.so          libdl-2.12.1.so          /lib/libdl-2.12.1.so
+  1        100.000  libdl-2.12.1.so          libdl-2.12.1.so          /lib/libdl-2.12.1.so [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libextmod.so             libextmod.so             /usr/lib/xorg/modules/extensions/libextmod.so
+  1        100.000  libextmod.so             libextmod.so             /usr/lib/xorg/modules/extensions/libextmod.so [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libgvfscommon.so.0.0.0   libgvfscommon.so.0.0.0   /usr/lib/libgvfscommon.so.0.0.0
+  1        100.000  libgvfscommon.so.0.0.0   libgvfscommon.so.0.0.0   /usr/lib/libgvfscommon.so.0.0.0 [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     __lseek_nocancel
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     __lseek_nocancel [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     __pthread_disable_asynccancel
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     __pthread_disable_asynccancel [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  librt-2.12.1.so          librt-2.12.1.so          /lib/librt-2.12.1.so
+  1        100.000  librt-2.12.1.so          librt-2.12.1.so          /lib/librt-2.12.1.so [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  ls                       ls                       /bin/ls
+  1        100.000  ls                       ls                       /bin/ls [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  rm                       rm                       /bin/rm
+  1        100.000  rm                       rm                       /bin/rm [self]
+-------------------------------------------------------------------------------
+1        7.7e-05  rsyslogd                 rsyslogd                 /usr/sbin/rsyslogd
+  1        100.000  rsyslogd                 rsyslogd                 /usr/sbin/rsyslogd [self]
+-------------------------------------------------------------------------------
+0              0  hyantes-static-99_openmp hyantes-static-99_openmp run
+  2        100.000  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0
+  0              0  hyantes-static-99_openmp hyantes-static-99_openmp run [self]
+-------------------------------------------------------------------------------
+  2        100.000  hyantes-static-99_openmp hyantes-static-99_openmp run
+0              0  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0
+  0              0  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0 [self]
+-------------------------------------------------------------------------------
