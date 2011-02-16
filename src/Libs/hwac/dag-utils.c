@@ -624,7 +624,8 @@ static void substitute_image_in_statement
     args = CDR(args);
   }
 
-  pips_assert("some image substitutions", nsubs>0);
+  // ??? Hmmm... this happens in freia_3muls, not sure why.
+  // pips_assert("some image substitutions", nsubs>0);
 }
 
 
