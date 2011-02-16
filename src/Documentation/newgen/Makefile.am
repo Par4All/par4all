@@ -88,7 +88,9 @@ F_h=ri.h \
 	step_private.h \
 	points_to_private.h \
 	kernel_memory_mapping.h \
-	freia_spoc_private.h
+	freia_spoc_private.h \
+	scalopes_private.h
+
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_tex=ri.tex \
