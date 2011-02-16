@@ -33,7 +33,7 @@ SOURCES= $(TARGET:=.c)
 #	echo Target $@ not implemented...
 
 # Keep intermediate files for the demo for further inspection:
-.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
+.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel)
 
 
 #.INTERMEDIATE: $(TARGET:=_seq)
