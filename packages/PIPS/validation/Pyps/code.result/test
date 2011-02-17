@@ -1,0 +1,20 @@
+int foo(int a)
+{
+   return a;
+}
+oldcode:
+int foo(int a)
+{
+   return a;
+}
+
+newcode:
+int foo(int a)
+{
+   return 2*a;
+}
+
+int foo(int a)
+{
+   return 2*a;
+}

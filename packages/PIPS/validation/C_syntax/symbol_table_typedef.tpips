@@ -1,0 +1,18 @@
+delete symbol_table_typedef
+
+setenv PIPS_CPP="cpp -C"
+
+#setenv SYMBOL_TABLE_DEBUG_LEVEL 4
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty EXTENDED_VARIABLE_INFORMATION TRUE
+
+create symbol_table_typedef symbol_table_typedef.c
+
+activate C_SYMBOL_TABLE
+
+display SYMBOL_TABLE_FILE[main]
+
+close
+delete symbol_table_typedef
+quit

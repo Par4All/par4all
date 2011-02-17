@@ -1,0 +1,13 @@
+delete symbol_table
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create symbol_table symbol_table.c
+
+activate C_SYMBOL_TABLE
+display SYMBOL_TABLE_FILE (main)
+
+close
+delete symbol_table
+quit

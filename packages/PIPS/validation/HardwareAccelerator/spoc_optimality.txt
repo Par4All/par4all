@@ -1,0 +1,97 @@
+# manually checked spoc optimality 
+#
+# for t in *.result/test
+# do
+#   sed -n -e "s/^freia_status .*_helper_.*/${t//.result\/*/}/p;/terapix/q" $t
+# done | cut -d' ' -f2 | uniq -c | grep -v '^ *1 ' > perf.out
+#
+#      2 anr999_01
+#      2 anr999_10
+#     11 anr999_1
+#      6 anr999_2
+#      4 anr999_3
+#      3 anr999_4
+#      3 anr999_5
+#      2 anr999_6
+#      2 anr999_7
+#      2 anr999_8
+#      2 anr999_9
+#      2 anr999
+#      2 copy_00
+#      8 freia_03_1
+#      4 freia_03_2
+#      3 freia_03_3
+#      2 freia_03_4
+#      2 freia_03_5
+#      2 freia_03_6
+#      2 freia_03_7
+#      2 freia_05
+#      3 freia_06
+#      2 freia_07
+#      3 freia_08 (? CIPO not inlined)
+#      3 freia_09 (? idem)
+#      2 freia_20
+#      3 freia_24 (ISTM)
+#      2 freia_25
+#      2 freia_26
+#      4 freia_28
+!      5 freia_33 (4)
+!      6 freia_42 (5?)
+!      6 freia_43 (5, idem previous)
+#      2 freia_dup_05 (could be 1 with advanced trafo? not sure)
+!?      2 freia_dup_09 (1, artificial dependency *BUG*)
+#      2 freia_reuse_01
+#      2 freia_scalar_00
+#      2 freia_scalar_02
+#      2 freia_scalar_03
+#      2 freia_scalar_04
+#      4 freia_scalar_05 (ISTM)
+#      4 freia_scalar_06
+!      5 freia_scalar_07 (4, reuse bug)
+#      2 freia_skip_01
+#      2 freia_skip_02
+#      2 freia_skip_03
+#      2 freia_skip_04
+!?      2 freia_skip_06 (1, bug?)
+!      4 license_plate_1 (3, greedy)
+!      5 license_plate_2 (4, greedy)
+!      6 license_plate_copies_13 (5, greedy)
+#      4 license_plate_copies_18
+#     51 license_plate_copies_1
+!      4 license_plate_copies_24 (3, greedy)
+#     26 license_plate_copies_2
+!      3 license_plate_copies_32 (2, greedy)
+#     18 license_plate_copies_3
+!     14 license_plate_copies_4 (13, greedy)
+#     11 license_plate_copies_5
+!     10 license_plate_copies_6 (9, greedy)
+!      9 license_plate_copies_7 (8, greedy)
+!      8 license_plate_copies_8 (7, greedy)
+!      8 license_plate_copies (7, greedy, idem previous)
+!      8 license_plate (7, greedy)
+#      2 median_1_10
+#      2 median_1_11
+#     12 median_1_1
+#      6 median_1_2
+#      4 median_1_3
+#      3 median_1_4
+#      3 median_1_5
+#      2 median_1_6
+#      2 median_1_7
+#      2 median_1_8
+#      2 median_1_9
+#      2 median_1
+!     10 oop_core_1 (7, quite bad, greedy stupid)
+!      8 oop_core_2 (7)
+#      6 oop_core_3
+#      6 oop_core_4
+#      6 oop_core
+#     12 vs_core_2_1
+!      8 vs_core_2_2 (7, . bug?)
+#      5 vs_core_2_3
+!      5 vs_core_2_4 (4?)
+!      5 vs_core_2_5 (4?)
+!      5 vs_core_2_6 (4?)
+#      4 vs_core_2_7
+#      4 vs_core_2
+#      4 vs_core
