@@ -116,10 +116,10 @@ class workspace:
 					lambda m: string.Template(c_bench_stop).substitute(mn=m.group(1)),
 					read_data)
 			#Don't put the include more than once
-			add_include = read_data.find('\n#include "{0}"\n'.format(gettime_h)) == -1;
+			add_include = read_data.find('\n#include "'+gettime_h+'"\n') == -1;
 			with open(file, 'w') as f:
 				if add_include:
-						f.write('/* Header automatically inserted by PYPS*/\n#include "{0}"\n\n'.format(gettime_h))
+						f.write('/* Header automatically inserted by PYPS*/\n#include "'+gettime_h+'"\n\n')
 				f.write(read_data)
 		files.append(gettime_c)
 

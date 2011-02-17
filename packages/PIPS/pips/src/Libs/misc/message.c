@@ -114,7 +114,7 @@ void (* pips_log_handler)(const char * fmt, va_list args) = default_user_log;
 
 /* USER_LOG(format [, arg] ... ) */
 /*VARARGS1*/
-void user_log(char * a_message_format, ...)
+void user_log(const char * a_message_format, ...)
 {
     va_list some_arguments;
     va_start(some_arguments, a_message_format);

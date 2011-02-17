@@ -51,7 +51,8 @@ F_c=ri.c \
 	step_private.c \
 	points_to_private.c \
 	kernel_memory_mapping.c \
-	freia_spoc_private.c
+	freia_spoc_private.c \
+	scalopes_private.c
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_h=ri.h \
@@ -87,7 +88,9 @@ F_h=ri.h \
 	step_private.h \
 	points_to_private.h \
 	kernel_memory_mapping.h \
-	freia_spoc_private.h
+	freia_spoc_private.h \
+	scalopes_private.h
+
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_tex=ri.tex \
@@ -123,7 +126,8 @@ F_tex=ri.tex \
 	step_private.tex \
 	points_to_private.tex \
 	kernel_memory_mapping.tex \
-	freia_spoc_private.tex
+	freia_spoc_private.tex \
+	scalopes_private.tex
 # this duplication cannot be avoided
 # for bsd-make compatibility ...
 F_pdf=ri.pdf \
@@ -159,7 +163,8 @@ F_pdf=ri.pdf \
 	step_private.pdf \
 	points_to_private.pdf \
 	kernel_memory_mapping.pdf \
-	freia_spoc_private.pdf
+	freia_spoc_private.pdf \
+	scalopes_private.pdf
 
 if WITH_DOC
 dist_noinst_DATA=$(F_tex) unstructured.idraw newgen_domain.sty

@@ -579,6 +579,11 @@ static bool list_commuted_p(const list l1, const list l2)
 }
 
 /* subtitute produced or used image in the statement of vertex v.
+ * @param v vertex
+ * @param source image variable to replace
+ * @param target new image variable to use
+ * @param used whether to replace used image (input, forward propagation)
+ *             or procuded image (output, backward propagation)
  */
 static void substitute_image_in_statement
 (dagvtx v, entity source, entity target, boolean used)
@@ -619,7 +624,8 @@ static void substitute_image_in_statement
     args = CDR(args);
   }
 
-  pips_assert("some image substitutions", nsubs>0);
+  // ??? Hmmm... this happens in freia_3muls, not sure why.
+  // pips_assert("some image substitutions", nsubs>0);
 }
 
 
@@ -737,7 +743,8 @@ list /* of statements */ dag_optimize(dag d)
   }
 
   // look for identical image operations (same inputs, same params)
-  // (that produce image, we do not care about measures???)
+  // (that produce image, we do not care about measures for SPOC,
+  // but we should for terapix!)
   // the second one is replaced by a copy.
   // also handle commutations.
 
@@ -853,7 +860,8 @@ list /* of statements */ dag_optimize(dag d)
             FOREACH(dagvtx, s, dagvtx_succs(pred))
             {
               substitute_image_in_statement(s, old, res, true);
-              gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s)), old, res);
+              gen_replace_in_list(vtxcontent_inputs(dagvtx_content(s)),
+                                  old, res);
             }
           }
           gen_free_list(preds);

@@ -6827,6 +6827,19 @@ isolate_statement > MODULE.code
 ISOLATE_STATEMENT_LABEL ""
 \end{PipsProp}
 
+As a side effect of isolate\_statement pass, some new variables are declared
+into the function. A prefix can be used for the names of those variables
+using the property \texttt{ISOLATE\_STATEMENT\_VAR\_PREFIX}. It is also possible to
+insert a suffix using the property \texttt{ISOLATE\_STATEMENT\_VAR\_SUFFIX}.
+The suffix will be inserted between the original variable name
+and the instance number of the copy.
+\begin{PipsProp}{ISOLATE_STATEMENT_VAR_PREFIX}
+ISOLATE_STATEMENT_VAR_PREFIX ""
+\end{PipsProp}
+\begin{PipsProp}{ISOLATE_STATEMENT_VAR_SUFFIX}
+ISOLATE_STATEMENT_VAR_SUFFIX ""
+\end{PipsProp}
+
 By default we cannot isolate a statement with some complex effects on
 the non local memory. But if we know we can (for example ), we can override this
 behaviour by setting the following property:
@@ -7393,6 +7406,30 @@ sesamify                    > MODULE.code
 		< MODULE.code
                 < MODULE.cumulated_effects
 \end{PipsMake}
+
+Phase \texttt{sesam\_buffers\_processing} is to be run after
+\texttt{isolate\_statement} has been applied to all tasks
+statements. It then produces a header file to be included by the
+future sesam application individual tasks. This header file describes
+how kernel and server tasks use the sesam buffers.
+\begin{PipsMake}
+sesam_buffers_processing    > MODULE.sesam_buffers_file
+              < PROGRAM.entities
+              < MODULE.code
+              < MODULE.cumulated_effects
+\end{PipsMake}
+
+The next two properties are used by phase
+\texttt{sesam\_buffers\_processing} to detect kernel tasks statements
+in the input module and to generate server tasks names in the output
+header file.
+
+\begin{PipsProp}{SCALOPES_KERNEL_TASK_PREFIX}
+SCALOPES_KERNEL_TASK_PREFIX "P4A_sesam_task_"
+\end{PipsProp}
+\begin{PipsProp}{SCALOPES_SERVER_TASK_PREFIX}
+SCALOPES_SERVER_TASK_PREFIX "P4A_sesam_server_"
+\end{PipsProp}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRANSFORMATIONS
 

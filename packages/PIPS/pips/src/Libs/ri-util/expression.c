@@ -1263,10 +1263,11 @@ bool syntax_equal_p(syntax s1, syntax s2)
     return cast_equal_p(syntax_cast(s1), syntax_cast(s2));
   case is_syntax_sizeofexpression:
     return sizeofexpression_equal_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
-
   case is_syntax_subscript:
+    return subscript_equal_p(syntax_subscript(s1),syntax_subscript(s2));
   case is_syntax_application:
   case is_syntax_va_arg:
+    pips_internal_error("Not implemented for syntax tag %d\n", t1);
   default:
     return FALSE;
     break;
@@ -1274,6 +1275,11 @@ bool syntax_equal_p(syntax s1, syntax s2)
 
   pips_internal_error("illegal. syntax tag %d", t1);
   return FALSE;
+}
+
+bool subscript_equal_p(subscript s1, subscript s2) {
+            return expression_equal_p(subscript_array(s1),subscript_array(s2))
+        && gen_equals(subscript_indices(s1),subscript_indices(s2),(gen_eq_func_t)expression_equal_p);
 }
 
 bool reference_equal_p(reference r1, reference r2)
@@ -1287,18 +1293,7 @@ bool reference_equal_p(reference r1, reference r2)
   if(v1 != v2)
     return FALSE;
 
-  if(gen_length(dims1) != gen_length(dims2))
-    return FALSE;
-  /*
-    pips_internal_error("Different dimensions for %s: %d and %d",
-    entity_local_name(v1), gen_length(dims1), gen_length(dims2));
-  */
-
-  for(; !ENDP(dims1); POP(dims1), POP(dims2))
-    if(!expression_equal_p(EXPRESSION(CAR(dims1)), EXPRESSION(CAR(dims2))))
-      return FALSE;
-
-  return TRUE;
+  return gen_equals(dims1,dims2,(gen_eq_func_t)expression_equal_p);
 }
 
 
@@ -1319,12 +1314,7 @@ bool call_equal_p(call c1, call c2)
   if(f1 != f2)
     return FALSE;
 
-  if(gen_length(args1) != gen_length(args2)) /* this should be a bug */
-    return FALSE;
-
-  for(; !ENDP(args1); POP(args1), POP(args2))
-    if(!expression_equal_p(EXPRESSION(CAR(args1)), EXPRESSION(CAR(args2))))
-      return FALSE;
+  return gen_equals(args1,args2,(gen_eq_func_t)expression_equal_p);
 
   return TRUE;
 }
@@ -2228,6 +2218,38 @@ bool same_sizeofexpression_name_p(sizeofexpression s0, sizeofexpression s1)
     return false;
 }
 
+bool same_subscript_name_p(subscript ss1, subscript ss2)
+{
+  return same_expression_name_p(subscript_array(ss1), subscript_array(ss2)) 
+     && same_lexpr_name_p(subscript_indices(ss1), subscript_indices(ss2));
+}
+
+bool same_cast_name_p(cast cs1, cast cs2)
+{
+  return same_type_name_p(cast_type(cs1), cast_type(cs2)) &&
+    same_expression_name_p(cast_expression(cs1), cast_expression(cs2)) ;
+}
+
+bool same_application_name_p(application a1, application a2)
+{
+  return  same_expression_name_p(application_function(a1), application_function(a2)) &&
+   same_lexpr_name_p(application_arguments(a1), application_arguments(a2));
+}
+
+bool same_va_arg_name_p(list l1, list l2)
+{
+  if (gen_length(l1)!=gen_length(l2))
+    return FALSE;
+
+  for(; l1 && l2; POP(l1), POP(l2)) {
+    sizeofexpression s1 = SIZEOFEXPRESSION(CAR(l1));
+    sizeofexpression s2 = SIZEOFEXPRESSION(CAR(l2));
+    if (!same_sizeofexpression_name_p(s1, s2))
+      return FALSE;
+  }
+  return TRUE;
+}
+
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
   if (syntax_tag(s1)!=syntax_tag(s2))
@@ -2243,8 +2265,16 @@ bool same_syntax_name_p(syntax s1, syntax s2)
       return same_range_name_p(syntax_range(s1), syntax_range(s2));
     case is_syntax_sizeofexpression:
       return same_sizeofexpression_name_p(syntax_sizeofexpression(s1),syntax_sizeofexpression(s2));
+    case is_syntax_subscript:
+      return same_subscript_name_p(syntax_subscript(s1), syntax_subscript(s2));
+    case is_syntax_cast:
+      return same_cast_name_p(syntax_cast(s1), syntax_cast(s2));
+    case is_syntax_application:
+      return same_application_name_p(syntax_application(s1), syntax_application(s2));
+    case is_syntax_va_arg:
+      return same_va_arg_name_p(syntax_va_arg(s1), syntax_va_arg(s2));
     default:
-      pips_internal_error("unexpected syntax tag");
+      pips_internal_error("unexpected syntax tag: %d", syntax_tag(s1));
     }
   return FALSE;
 }
@@ -3118,7 +3148,7 @@ expression string_to_expression(const char * s,entity module)
     if(entity_undefined_p(e)) {
         /* try to find simple expression */
         static const char* seeds[] = {   PLUS_OPERATOR_NAME, MINUS_OPERATOR_NAME,MULTIPLY_OPERATOR_NAME, DIVIDE_OPERATOR_NAME};
-        for(int i=0;i< sizeof(seeds)/sizeof(seeds[0]); i++) {
+	for(int i=0; i < (int) (sizeof(seeds)/sizeof(seeds[0])); i++) {
             char *where = strchr(s,seeds[i][0]);
             if(where) {
                 char * head = strdup(s);
