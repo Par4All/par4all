@@ -1,3 +1,2 @@
-p4a: (in /home/janice/par4all/examples/P4A/Hyantes) gcc -c -DP4A_ACCEL_OPENMP -I/home/janice/p4a/share/p4a_accel -DDEBUG -Wall -fno-strict-aliasing -fPIC -g -O3 -std=c99 -fopenmp -o /home/janice/par4all/examples/P4A/Hyantes/P4ALTWR.build/p4a_accel_RbZH.o /home/janice/p4a/share/p4a_accel/p4a_accel.c
-p4a: (in /home/janice/par4all/examples/P4A/Hyantes) gcc -lm -fopenmp -o /home/janice/par4all/examples/P4A/Hyantes/aout /home/janice/par4all/examples/P4A/Hyantes/P4ALTWR.build/hyantes-static-99.p4a_87aI.o /home/janice/par4all/examples/P4A/Hyantes/P4ALTWR.build/p4a_accel_RbZH.o
-
+gcc -c -DP4A_ACCEL_OPENMP -I/home/janice/p4a/share/p4a_accel -DDEBUG -Wall -fno-strict-aliasing -fPIC -g -O3 -std=c99 -fopenmp -o $1.o $1.c
+# gcc -lm -fopenmp -o $1 $1.o
