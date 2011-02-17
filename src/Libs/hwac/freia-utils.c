@@ -200,6 +200,11 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
     TRPX_OP(2, "SET_CONST?")
   },
+  { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
+      { TY_INT, TY_INT, NULL},
+    { 0, NO_POC, alu_unused, NO_MES },
+    NO_TERAPIX
+  },
   // MISC
   // this one may be ignored?!
   { AIPO "copy", "=", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
