@@ -1,0 +1,3 @@
+p4a: (in /home/janice/par4all/examples/P4A/Hyantes) gcc -c -DDEBUG -Wall -fno-strict-aliasing -fPIC -g -O3 -std=c99 -fopenmp -o /home/janice/par4all/examples/P4A/Hyantes/P4AiaLL.build/hyantes-static-99.p4a_AxHc.o /home/janice/par4all/examples/P4A/Hyantes/hyantes-static-99.p4a.c
+p4a: (in /home/janice/par4all/examples/P4A/Hyantes) gcc -lm -fopenmp -o /home/janice/par4all/examples/P4A/Hyantes/aout /home/janice/par4all/examples/P4A/Hyantes/P4AiaLL.build/hyantes-static-99.p4a_AxHc.o
+

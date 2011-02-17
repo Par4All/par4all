@@ -8,6 +8,7 @@ P4A_OPTIONS= -DUSE_FLOAT
 # Use also single precision for the sequential version:
 CFLAGS+= -DUSE_FLOAT
 endif
+P4A_OPTIONS= -g -vvv
 
 # You can set P4A_OPTIONS to pass options to p4a
 CFLAGS+= -O3 -std=c99 -Wall -D_GNU_SOURCE
@@ -64,6 +65,9 @@ run%: $(TARGET)%
 	# point computations or different implementations of floating
 	# point computations on GPUs:
 	-diff -q output$* output_ref
+
+prof%: $(TARGET)%
+	oprof-code.sh ./$< Rhone-alpesXYLongLat_pop.txt 1.1 32 4 35 0.01 40 > output$*
 
 display% : run%
 	# Display graphically the results:

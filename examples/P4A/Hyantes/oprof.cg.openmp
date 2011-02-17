@@ -1,0 +1,222 @@
+CPU: Intel Core/i7, speed 2933.3 MHz (estimated)
+Counted CPU_CLK_UNHALTED events (Clock cycles when not halted) with a unit mask of 0x00 (No unit mask) count 100000
+samples  %        image name               app name                 symbol name
+-------------------------------------------------------------------------------
+1175743  89.4684  libm-2.12.1.so           libm-2.12.1.so           /lib/libm-2.12.1.so
+  1175743  100.000  libm-2.12.1.so           libm-2.12.1.so           /lib/libm-2.12.1.so [self]
+-------------------------------------------------------------------------------
+70408     5.3577  hyantes-static-99_openmp hyantes-static-99_openmp run.omp_fn.0
+  70408    100.000  hyantes-static-99_openmp hyantes-static-99_openmp run.omp_fn.0 [self]
+-------------------------------------------------------------------------------
+35888     2.7309  libgomp.so.1.0.0         libgomp.so.1.0.0         /usr/lib/libgomp.so.1.0.0
+  35888    100.000  libgomp.so.1.0.0         libgomp.so.1.0.0         /usr/lib/libgomp.so.1.0.0 [self]
+-------------------------------------------------------------------------------
+23470     1.7860  no-vmlinux               no-vmlinux               /no-vmlinux
+  23470    100.000  no-vmlinux               no-vmlinux               /no-vmlinux [self]
+-------------------------------------------------------------------------------
+4302      0.3274  libc-2.12.1.so           libc-2.12.1.so           /lib/libc-2.12.1.so
+  4302     100.000  libc-2.12.1.so           libc-2.12.1.so           /lib/libc-2.12.1.so [self]
+-------------------------------------------------------------------------------
+2681      0.2040  oprofiled                oprofiled                /usr/bin/oprofiled
+  2681     100.000  oprofiled                oprofiled                /usr/bin/oprofiled [self]
+-------------------------------------------------------------------------------
+199       0.0151  nouveau_drv.so           nouveau_drv.so           /usr/lib/xorg/modules/drivers/nouveau_drv.so
+  199      100.000  nouveau_drv.so           nouveau_drv.so           /usr/lib/xorg/modules/drivers/nouveau_drv.so [self]
+-------------------------------------------------------------------------------
+196       0.0149  bash                     bash                     /bin/bash
+  196      100.000  bash                     bash                     /bin/bash [self]
+-------------------------------------------------------------------------------
+171       0.0130  Xorg                     Xorg                     /usr/bin/Xorg
+  171      100.000  Xorg                     Xorg                     /usr/bin/Xorg [self]
+-------------------------------------------------------------------------------
+165       0.0126  libcairo.so.2.11000.0    libcairo.so.2.11000.0    /usr/lib/libcairo.so.2.11000.0
+  165      100.000  libcairo.so.2.11000.0    libcairo.so.2.11000.0    /usr/lib/libcairo.so.2.11000.0 [self]
+-------------------------------------------------------------------------------
+139       0.0106  libpixman-1.so.0.18.4    libpixman-1.so.0.18.4    /usr/lib/libpixman-1.so.0.18.4
+  139      100.000  libpixman-1.so.0.18.4    libpixman-1.so.0.18.4    /usr/lib/libpixman-1.so.0.18.4 [self]
+-------------------------------------------------------------------------------
+133       0.0101  libglib-2.0.so.0.2600.0  libglib-2.0.so.0.2600.0  /lib/libglib-2.0.so.0.2600.0
+  133      100.000  libglib-2.0.so.0.2600.0  libglib-2.0.so.0.2600.0  /lib/libglib-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+118       0.0090  ld-2.12.1.so             ld-2.12.1.so             /lib/ld-2.12.1.so
+  118      100.000  ld-2.12.1.so             ld-2.12.1.so             /lib/ld-2.12.1.so [self]
+-------------------------------------------------------------------------------
+76        0.0058  libexa.so                libexa.so                /usr/lib/xorg/modules/libexa.so
+  76       100.000  libexa.so                libexa.so                /usr/lib/xorg/modules/libexa.so [self]
+-------------------------------------------------------------------------------
+63        0.0048  libgobject-2.0.so.0.2600.0 libgobject-2.0.so.0.2600.0 /usr/lib/libgobject-2.0.so.0.2600.0
+  63       100.000  libgobject-2.0.so.0.2600.0 libgobject-2.0.so.0.2600.0 /usr/lib/libgobject-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+46        0.0035  libgdk-x11-2.0.so.0.2200.0 libgdk-x11-2.0.so.0.2200.0 /usr/lib/libgdk-x11-2.0.so.0.2200.0
+  46       100.000  libgdk-x11-2.0.so.0.2200.0 libgdk-x11-2.0.so.0.2200.0 /usr/lib/libgdk-x11-2.0.so.0.2200.0 [self]
+-------------------------------------------------------------------------------
+45        0.0034  libvte.so.9.2600.0       libvte.so.9.2600.0       /usr/lib/libvte.so.9.2600.0
+  45       100.000  libvte.so.9.2600.0       libvte.so.9.2600.0       /usr/lib/libvte.so.9.2600.0 [self]
+-------------------------------------------------------------------------------
+37        0.0028  libdrm_nouveau.so.1.0.0  libdrm_nouveau.so.1.0.0  /lib/libdrm_nouveau.so.1.0.0
+  37       100.000  libdrm_nouveau.so.1.0.0  libdrm_nouveau.so.1.0.0  /lib/libdrm_nouveau.so.1.0.0 [self]
+-------------------------------------------------------------------------------
+26        0.0020  libpthread-2.12.1.so (deleted) libpthread-2.12.1.so (deleted) /lib/libpthread-2.12.1.so (deleted)
+  26       100.000  libpthread-2.12.1.so (deleted) libpthread-2.12.1.so (deleted) /lib/libpthread-2.12.1.so (deleted) [self]
+-------------------------------------------------------------------------------
+17        0.0013  libgtk-x11-2.0.so.0.2200.0 libgtk-x11-2.0.so.0.2200.0 /usr/lib/libgtk-x11-2.0.so.0.2200.0
+  17       100.000  libgtk-x11-2.0.so.0.2200.0 libgtk-x11-2.0.so.0.2200.0 /usr/lib/libgtk-x11-2.0.so.0.2200.0 [self]
+-------------------------------------------------------------------------------
+16        0.0012  libdbus-1.so.3.5.2 (deleted) libdbus-1.so.3.5.2 (deleted) /lib/libdbus-1.so.3.5.2 (deleted)
+  16       100.000  libdbus-1.so.3.5.2 (deleted) libdbus-1.so.3.5.2 (deleted) /lib/libdbus-1.so.3.5.2 (deleted) [self]
+-------------------------------------------------------------------------------
+16        0.0012  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_lock
+  16       100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_lock [self]
+-------------------------------------------------------------------------------
+15        0.0011  libc-2.12.1.so (deleted) libc-2.12.1.so (deleted) /lib/libc-2.12.1.so (deleted)
+  15       100.000  libc-2.12.1.so (deleted) libc-2.12.1.so (deleted) /lib/libc-2.12.1.so (deleted) [self]
+-------------------------------------------------------------------------------
+13       9.9e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_unlock
+  13       100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_mutex_unlock [self]
+-------------------------------------------------------------------------------
+13       9.9e-04  libwfb.so                libwfb.so                /usr/lib/xorg/modules/libwfb.so
+  13       100.000  libwfb.so                libwfb.so                /usr/lib/xorg/modules/libwfb.so [self]
+-------------------------------------------------------------------------------
+13       9.9e-04  ophelp                   ophelp                   /usr/bin/ophelp
+  13       100.000  ophelp                   ophelp                   /usr/bin/ophelp [self]
+-------------------------------------------------------------------------------
+11       8.4e-04  libmurrine.so            libmurrine.so            /usr/lib/gtk-2.0/2.10.0/engines/libmurrine.so
+  11       100.000  libmurrine.so            libmurrine.so            /usr/lib/gtk-2.0/2.10.0/engines/libmurrine.so [self]
+-------------------------------------------------------------------------------
+11       8.4e-04  make                     make                     /usr/bin/make
+  11       100.000  make                     make                     /usr/bin/make [self]
+-------------------------------------------------------------------------------
+10       7.6e-04  libX11.so.6.3.0          libX11.so.6.3.0          /usr/lib/libX11.so.6.3.0
+  10       100.000  libX11.so.6.3.0          libX11.so.6.3.0          /usr/lib/libX11.so.6.3.0 [self]
+-------------------------------------------------------------------------------
+9        6.8e-04  libxcb.so.1.1.0          libxcb.so.1.1.0          /usr/lib/libxcb.so.1.1.0
+  9        100.000  libxcb.so.1.1.0          libxcb.so.1.1.0          /usr/lib/libxcb.so.1.1.0 [self]
+-------------------------------------------------------------------------------
+8        6.1e-04  libdbus-1.so.3.5.2       libdbus-1.so.3.5.2       /lib/libdbus-1.so.3.5.2
+  8        100.000  libdbus-1.so.3.5.2       libdbus-1.so.3.5.2       /lib/libdbus-1.so.3.5.2 [self]
+-------------------------------------------------------------------------------
+7        5.3e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_getspecific
+  7        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_getspecific [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  dash                     dash                     /bin/dash
+  5        100.000  dash                     dash                     /bin/dash [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  libXrender.so.1.3.0      libXrender.so.1.3.0      /usr/lib/libXrender.so.1.3.0
+  5        100.000  libXrender.so.1.3.0      libXrender.so.1.3.0      /usr/lib/libXrender.so.1.3.0 [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  libgthread-2.0.so.0.2600.0 libgthread-2.0.so.0.2600.0 /usr/lib/libgthread-2.0.so.0.2600.0
+  5        100.000  libgthread-2.0.so.0.2600.0 libgthread-2.0.so.0.2600.0 /usr/lib/libgthread-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_push_defer
+  5        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_push_defer [self]
+-------------------------------------------------------------------------------
+5        3.8e-04  sudo                     sudo                     /usr/bin/sudo
+  5        100.000  sudo                     sudo                     /usr/bin/sudo [self]
+-------------------------------------------------------------------------------
+4        3.0e-04  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_pop_restore
+  4        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     _pthread_cleanup_pop_restore [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  libextmod.so             libextmod.so             /usr/lib/xorg/modules/extensions/libextmod.so
+  3        100.000  libextmod.so             libextmod.so             /usr/lib/xorg/modules/extensions/libextmod.so [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  libgio-2.0.so.0.2600.0   libgio-2.0.so.0.2600.0   /usr/lib/libgio-2.0.so.0.2600.0
+  3        100.000  libgio-2.0.so.0.2600.0   libgio-2.0.so.0.2600.0   /usr/lib/libgio-2.0.so.0.2600.0 [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  libgvfscommon.so.0.0.0   libgvfscommon.so.0.0.0   /usr/lib/libgvfscommon.so.0.0.0
+  3        100.000  libgvfscommon.so.0.0.0   libgvfscommon.so.0.0.0   /usr/lib/libgvfscommon.so.0.0.0 [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  libwnck-1.so.22.3.30     libwnck-1.so.22.3.30     /usr/lib/libwnck-1.so.22.3.30
+  3        100.000  libwnck-1.so.22.3.30     libwnck-1.so.22.3.30     /usr/lib/libwnck-1.so.22.3.30 [self]
+-------------------------------------------------------------------------------
+3        2.3e-04  mawk                     mawk                     /usr/bin/mawk
+  3        100.000  mawk                     mawk                     /usr/bin/mawk [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  [vdso] (tgid:2076 range:0x7fff72dff000-0x7fff72e00000) wnck-applet              [vdso] (tgid:2076 range:0x7fff72dff000-0x7fff72e00000)
+  2        100.000  [vdso] (tgid:2076 range:0x7fff72dff000-0x7fff72e00000) wnck-applet              [vdso] (tgid:2076 range:0x7fff72dff000-0x7fff72e00000) [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  evdev_drv.so             evdev_drv.so             /usr/lib/xorg/modules/input/evdev_drv.so
+  2        100.000  evdev_drv.so             evdev_drv.so             /usr/lib/xorg/modules/input/evdev_drv.so [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  hyantes-static-99_openmp hyantes-static-99_openmp display
+  2        100.000  hyantes-static-99_openmp hyantes-static-99_openmp display [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  irqbalance               irqbalance               /usr/sbin/irqbalance
+  2        100.000  irqbalance               irqbalance               /usr/sbin/irqbalance [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  libdrm.so.2.4.0          libdrm.so.2.4.0          /lib/libdrm.so.2.4.0
+  2        100.000  libdrm.so.2.4.0          libdrm.so.2.4.0          /lib/libdrm.so.2.4.0 [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  librt-2.12.1.so          librt-2.12.1.so          /lib/librt-2.12.1.so
+  2        100.000  librt-2.12.1.so          librt-2.12.1.so          /lib/librt-2.12.1.so [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  metacity                 metacity                 /usr/bin/metacity
+  2        100.000  metacity                 metacity                 /usr/bin/metacity [self]
+-------------------------------------------------------------------------------
+2        1.5e-04  python2.6                python2.6                /usr/bin/python2.6
+  2        100.000  python2.6                python2.6                /usr/bin/python2.6 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  [vdso] (tgid:31960 range:0x7fff2bbff000-0x7fff2bc00000) Xorg                     [vdso] (tgid:31960 range:0x7fff2bbff000-0x7fff2bc00000)
+  1        100.000  [vdso] (tgid:31960 range:0x7fff2bbff000-0x7fff2bc00000) Xorg                     [vdso] (tgid:31960 range:0x7fff2bbff000-0x7fff2bc00000) [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  [vdso] (tgid:32115 range:0x7fffe75ff000-0x7fffe7600000) gnome-terminal           [vdso] (tgid:32115 range:0x7fffe75ff000-0x7fffe7600000)
+  1        100.000  [vdso] (tgid:32115 range:0x7fffe75ff000-0x7fffe7600000) gnome-terminal           [vdso] (tgid:32115 range:0x7fffe75ff000-0x7fffe7600000) [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  grep                     grep                     /bin/grep
+  1        100.000  grep                     grep                     /bin/grep [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  hyantes-static-99_openmp hyantes-static-99_openmp read_towns
+  1        100.000  hyantes-static-99_openmp hyantes-static-99_openmp read_towns [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  im-ibus.so               im-ibus.so               /usr/lib/gtk-2.0/2.10.0/immodules/im-ibus.so
+  1        100.000  im-ibus.so               im-ibus.so               /usr/lib/gtk-2.0/2.10.0/immodules/im-ibus.so [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libORBit-2.so.0.1.0      libORBit-2.so.0.1.0      /usr/lib/libORBit-2.so.0.1.0
+  1        100.000  libORBit-2.so.0.1.0      libORBit-2.so.0.1.0      /usr/lib/libORBit-2.so.0.1.0 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libdbus-glib-1.so.2.1.0  libdbus-glib-1.so.2.1.0  /usr/lib/libdbus-glib-1.so.2.1.0
+  1        100.000  libdbus-glib-1.so.2.1.0  libdbus-glib-1.so.2.1.0  /usr/lib/libdbus-glib-1.so.2.1.0 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libgvfscommon.so.0.0.0 (deleted) libgvfscommon.so.0.0.0 (deleted) /usr/lib/libgvfscommon.so.0.0.0 (deleted)
+  1        100.000  libgvfscommon.so.0.0.0 (deleted) libgvfscommon.so.0.0.0 (deleted) /usr/lib/libgvfscommon.so.0.0.0 (deleted) [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libnss_nis-2.12.1.so     libnss_nis-2.12.1.so     /lib/libnss_nis-2.12.1.so
+  1        100.000  libnss_nis-2.12.1.so     libnss_nis-2.12.1.so     /lib/libnss_nis-2.12.1.so [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpam.so.0.82.2         libpam.so.0.82.2         /lib/libpam.so.0.82.2
+  1        100.000  libpam.so.0.82.2         libpam.so.0.82.2         /lib/libpam.so.0.82.2 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     __errno_location
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     __errno_location [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     __lseek_nocancel
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     __lseek_nocancel [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     __read_nocancel
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     __read_nocancel [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_cond_broadcast@@GLIBC_2.3.2
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_cond_broadcast@@GLIBC_2.3.2 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_self
+  1        100.000  libpthread-2.12.1.so     libpthread-2.12.1.so     pthread_self [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  libselinux.so.1          libselinux.so.1          /lib/libselinux.so.1
+  1        100.000  libselinux.so.1          libselinux.so.1          /lib/libselinux.so.1 [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  ls                       ls                       /bin/ls
+  1        100.000  ls                       ls                       /bin/ls [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  pam_gnome_keyring.so     pam_gnome_keyring.so     /lib/security/pam_gnome_keyring.so
+  1        100.000  pam_gnome_keyring.so     pam_gnome_keyring.so     /lib/security/pam_gnome_keyring.so [self]
+-------------------------------------------------------------------------------
+1        7.6e-05  rm                       rm                       /bin/rm
+  1        100.000  rm                       rm                       /bin/rm [self]
+-------------------------------------------------------------------------------
+0              0  hyantes-static-99_openmp hyantes-static-99_openmp run
+  3        100.000  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0
+  0              0  hyantes-static-99_openmp hyantes-static-99_openmp run [self]
+-------------------------------------------------------------------------------
+  3        100.000  hyantes-static-99_openmp hyantes-static-99_openmp run
+0              0  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0
+  0              0  libgomp.so.1.0.0         hyantes-static-99_openmp /usr/lib/libgomp.so.1.0.0 [self]
+-------------------------------------------------------------------------------
