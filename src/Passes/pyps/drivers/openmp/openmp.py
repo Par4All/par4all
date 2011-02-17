@@ -1,6 +1,6 @@
 import re
 import pyps
-from pyps import module
+from pyps import module, workspace
 
 def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
 	"""parallelize module with opennmp"""
@@ -35,3 +35,4 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
 
 pyps.module.openmp=openmp
 pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m._modules)
+

@@ -25,13 +25,13 @@ def benchrun(s,calms=None,calibrate_out=None):
 	def do_benchmark(ws, wcfg, cc_cfg, compile_f, args, n_iter, name_custom):
 		times = {wcfg.module: [0]}
 		benchname = cc_cfg.name() + "+" + name_custom
-		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
+		ccp = pyps.backendCompiler(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
 		try:
 			if doBench:
-				times = ws.benchmark(ccexecp=ccp,iterations=n_iter)
+				times = ws.benchmark(compiler=ccp,iterations=n_iter)
 				benchtimes[benchname] = {'time': times[wcfg.module][0], 'cc_cmd': ccp.cc_cmd, 'cc_stderr': ccp.cc_stderr}
 			else:
-				good,out = ws.check_output(ccexecp=ccp)
+				good,out = ws.check_output(compiler=ccp)
 				if not good:
 					msg = "Validation case %s-%s failed !" % (wcfg.name(),benchname)
 					errors.append(msg)
@@ -44,7 +44,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 	
 	def do_calibrate(ws, cc_cfg_ref, args, arg_n, calms, module_name):
 		''' Calibrate the args of a workspace using the reference compiler, such as it takes a given running time. '''
-		ccp = pyps.ccexecParams(compilemethod=ws.compile,CC=cc_cfg_ref.cc,CFLAGS=cc_cfg_ref.cflags,args=args,outfile=cc_cfg_ref.name()+"+calibrate")
+		ccp = pyps.backendCompiler(compilemethod=ws.compile,CC=cc_cfg_ref.cc,CFLAGS=cc_cfg_ref.cflags,args=args,outfile=cc_cfg_ref.name()+"+calibrate")
 		size_kernel = int(args[arg_n])
 
 		# First, it looks at the time taken by the workspace with the default argument.
@@ -62,7 +62,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 		def get_run_time(size_kernel):
 			''' Return the running time with the current kernel size in ms '''
 			ccp.args = make_args(size_kernel)
-			times = ws.benchmark(ccexecp=ccp,iterations=5) # Return time in us
+			times = ws.benchmark(compiler=ccp,iterations=5) # Return time in us
 			return float(times[module_name][0])/1000.0
 
 		cur_runtime = get_run_time(size_kernel)
@@ -121,7 +121,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 		ccp_ref=None
 		if not doBench:
 			args = shlex.split(str(wcfg.args_validate))
-			ccp_ref = pyps.ccexecParams(CC=s.cc_reference.cc,CFLAGS=s.cc_reference.cflags,args=args)
+			ccp_ref = pyps.backendCompiler(CC=s.cc_reference.cc,CFLAGS=s.cc_reference.cflags,args=args)
 		with pyps.workspace(*srcs,
 				       parents = wk_parents,
 				       driver = s.default_driver,
@@ -129,7 +129,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 				       cppflags = cflags,
 				       deleteOnClose=False,
 				       recoverIncludes=True,
-				       ccexecp_ref=ccp_ref) as ws:
+				       compiler_ref=ccp_ref) as ws:
 			m = ws[wcfg.module]
 			if doBench:
 				args = wcfg.args_benchmark

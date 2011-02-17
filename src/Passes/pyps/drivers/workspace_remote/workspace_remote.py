@@ -82,24 +82,24 @@ class workspace:
 		self.remoteExec = kwargs["remoteExec"]
 
 #	def compile(self,CC="gcc",CFLAGS="-O2 -g", LDFLAGS="", link=True, rep="d.out", outfile="",extrafiles=[],*args,**kwargs):
-	def compile(self,ccexecp,*args,**kwargs):
+	def compile(self,compiler,*args,**kwargs):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
 
-		CC = ccexecp.CC
-		CFLAGS = ccexecp.CFLAGS
-		LDFLAGS = ccexecp.LDFLAGS
+		CC = compiler.CC
+		CFLAGS = compiler.CFLAGS
+		LDFLAGS = compiler.LDFLAGS
 		link = kwargs.get("link", True)
-		outfile = ccexecp.outfile
-		extrafiles = ccexecp.extrafiles
+		outfile = compiler.outfile
+		extrafiles = compiler.extrafiles
 
-		if ccexecp.rep==None:
-			ccexecp.rep=self.ws.tmpdirname()+"d.out"
+		if compiler.rep==None:
+			compiler.rep=self.ws.tmpdirname()+"d.out"
 
-		otmpfiles=self.ws.save(rep=ccexecp.rep)+extrafiles
+		otmpfiles=self.ws.save(rep=compiler.rep)+extrafiles
 		otmpfilesrem = []
 		
 
-		rdir = os.path.join(self.remoteExec.working_dir(), ccexecp.rep)
+		rdir = os.path.join(self.remoteExec.working_dir(), compiler.rep)
 		self.remoteExec.do("rm -rf \"%s\"" % rdir)
 		self.remoteExec.do("mkdir -p \"%s\"" % rdir)
 
@@ -116,17 +116,17 @@ class workspace:
 			if not outfile:
 				outfile=self.ws._name
 			outfile = os.path.join(self.remoteExec.working_dir(),outfile)
-			self.ws.goingToRunWith(otmpfiles, ccexecp.rep)
+			self.ws.goingToRunWith(otmpfiles, compiler.rep)
 			for f in otmpfiles:
-				dst = os.path.join(rdir, f[len(ccexecp.rep)+1:])
+				dst = os.path.join(rdir, f[len(compiler.rep)+1:])
 				otmpfilesrem.append(dst)
 			command+=otmpfilesrem
 			command+=[LDFLAGS]
 			command+=["-o",outfile]
 		else:
-			self.ws.goingToRunWith(otmpfiles, ccexecp.rep)
+			self.ws.goingToRunWith(otmpfiles, compiler.rep)
 			for f in otmpfiles:
-				dst = os.path.join(rdir, f[len(ccexecp.rep)+1:])
+				dst = os.path.join(rdir, f[len(compiler.rep)+1:])
 				otmpfilesrem.append(dst)
 			command+=["-c"]
 			command+=otmpfilesrem
@@ -139,31 +139,31 @@ class workspace:
 			self.remoteExec.copy(f, rdir)
 
 		rtmp = os.path.split(rdir)[0]
-		print >>sys.stderr, "Copy recursive %s to remote %s..." % (ccexecp.rep, rtmp)
-		self.remoteExec.copyRec(ccexecp.rep, rtmp)
+		print >>sys.stderr, "Copy recursive %s to remote %s..." % (compiler.rep, rtmp)
+		self.remoteExec.copyRec(compiler.rep, rtmp)
 
 		if self.ws.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
 
 		p = self.remoteExec.doPopen(command)
 		(out,err) = p.communicate()
-		ccexecp.cc_stderr = err
+		compiler.cc_stderr = err
 		ret = p.returncode
 		if ret != 0:
 			if not link: map(os.remove,otmpfiles)
 			print >> sys.stderr, err
 			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
 
-		ccexecp.outfile = outfile
-		ccexecp._compile_done = True
-		ccexecp.cc_cmd = commandline
+		compiler.outfile = outfile
+		compiler._compile_done = True
+		compiler.cc_cmd = commandline
 		return outfile
 
-	def run_output(self, ccexecp):
-		if not ccexecp._compile_done:
-			return self.ws.compile_and_run(ccexecp)
-		ccexecp.cmd = [ccexecp.outfile] + ccexecp.args
-		p = self.remoteExec.doPopen(ccexecp.cmd)
+	def run_output(self, compiler):
+		if not compiler._compile_done:
+			return self.ws.compile_and_run(compiler)
+		compiler.cmd = [compiler.outfile] + compiler.args
+		p = self.remoteExec.doPopen(compiler.cmd)
 		(out,err) = p.communicate()
 		rc = p.returncode
 		return (rc,out,err)

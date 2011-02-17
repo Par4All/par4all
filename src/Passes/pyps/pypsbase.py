@@ -17,6 +17,79 @@ import inspect
 
 pypips.atinit()
 
+class backendCompiler(object):
+	''' Parameters for workspace.compile_and_run . Used for convenience. '''
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		'''
+		CC, CFLAGS, LDFLAGS: same as usual
+		compilemethod: bound method used for compilation
+		rep: output directory*
+		outfile: name of the output file
+		args: list of arguments
+		'''
+		self.CC = CC
+		self.CFLAGS = CFLAGS
+		self.LDFLAGS = LDFLAGS
+		self.compilemethod = compilemethod
+		self.rep = rep
+		self.outfile = outfile
+		self.args = args
+		self.extrafiles = extrafiles
+		self.cmd = None
+		self.cc_stderr = None
+		self._compile_done = False
+	
+	def __setattr__(self, n, v):
+		if n in ('CC','CFLAGS','LDFLAGS','compilemethod','extrafiles'):
+			self._compile_done = False
+		object.__setattr__(self,n,v)
+	
+	def link_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="link")
+
+	def compile_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="compile")
+
+	def user_headers_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
+
+	def _cc_cmd(self, files, extraCFLAGS, mode):
+		command=[self.CC, extraCFLAGS, self.CFLAGS]
+		if mode=="link":
+			command+=files
+			command+=[self.LDFLAGS]
+			if self.outfile: command+=["-o", self.outfile]
+		elif mode=="compile":
+			command+=["-c"]
+			command+=files
+		elif mode=="userHeaders":
+			command+=["-MM"]
+			command+=files
+		return command
+
+class ompCompiler(backendCompiler):
+	"""openmp backend compiler to use openmp"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+		if issubclass(self.__class__,gccCompiler):
+			self.CFLAGS += " -fopenmp"
+		elif issubclass(self.__class__,iccCompiler):
+			self.CFLAGS += " -openmp"
+		else:
+			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
+
+class gccCompiler(backendCompiler):
+	"""gcc backend compiler to use gcc"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(gccCompiler,self).__init__("gcc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+
+class iccCompiler(backendCompiler):
+	"""icc backend compiler to use icc"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(gccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+
+
+
 class loop:
 	"""do-loop from a module"""
 
@@ -195,55 +268,6 @@ class modules:
 		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
 
 
-class ccexecParams(object):
-	''' Parameters for workspace.compile_and_run . Used for convenience. '''
-	def __init__(self, CC="gcc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		'''
-		CC, CFLAGS, LDFLAGS: same as usual
-		compilemethod: bound method used for compilation
-		rep: output directory*
-		outfile: name of the output file
-		args: list of arguments
-		'''
-		self.CC = CC
-		self.CFLAGS = CFLAGS
-		self.LDFLAGS = LDFLAGS
-		self.compilemethod = compilemethod
-		self.rep = rep
-		self.outfile = outfile
-		self.args = args
-		self.extrafiles = extrafiles
-		self.cmd = None
-		self.cc_stderr = None
-		self._compile_done = False
-	
-	def __setattr__(self, n, v):
-		if n in ('CC','CFLAGS','LDFLAGS','compilemethod','extrafiles'):
-			self._compile_done = False
-		object.__setattr__(self,n,v)
-	
-	def link_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="link")
-
-	def compile_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="compile")
-
-	def user_headers_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
-
-	def _cc_cmd(self, files, extraCFLAGS, mode):
-		command=[self.CC, extraCFLAGS, self.CFLAGS]
-		if mode=="link":
-			command+=files
-			command+=[self.LDFLAGS]
-			if self.outfile: command+=["-o", self.outfile]
-		elif mode=="compile":
-			command+=["-c"]
-			command+=files
-		elif mode=="userHeaders":
-			command+=["-MM"]
-			command+=files
-		return command
 
 class workspace(object):
 
@@ -459,11 +483,11 @@ class workspace(object):
 
 		return saved
 
-	def user_headers(self, ccexecp=ccexecParams(), extrafiles=None):
-		""" List the user headers used in self._sources with the compiler configuration given in ccexecp """
+	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
+		""" List the user headers used in self._sources with the compiler configuration given in compiler """
 		if extrafiles == None:
 			extrafiles = []
-		command = ccexecp.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
+		command = compiler.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
 		command = " ".join(command) + ' |sed \':a;N;$!ba;s/\(.*\).o: \\\\\\n/:/g\' |sed \'s/ \\\\$//\' |cut -d\':\' -f2'
 		p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
@@ -484,50 +508,50 @@ class workspace(object):
 
 		
 
-	def compile(self, ccexecp=ccexecParams(), link=True):
+	def compile(self, compiler=backendCompiler(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
-		CC=ccexecp.CC
-		CFLAGS=ccexecp.CFLAGS
-		LDFLAGS=ccexecp.LDFLAGS
-		outfile=ccexecp.outfile
-		extrafiles=ccexecp.extrafiles
+		CC=compiler.CC
+		CFLAGS=compiler.CFLAGS
+		LDFLAGS=compiler.LDFLAGS
+		outfile=compiler.outfile
+		extrafiles=compiler.extrafiles
 
 		if link and not outfile:
-			ccexecp.outfile=self._name
-		if ccexecp.rep==None:
-			ccexecp.rep=self.tmpdirname()+"d.out"
-		rep=ccexecp.rep
-		otmpfiles=self.save(rep=ccexecp.rep)+extrafiles
+			compiler.outfile=self._name
+		if compiler.rep==None:
+			compiler.rep=self.tmpdirname()+"d.out"
+		rep=compiler.rep
+		otmpfiles=self.save(rep=compiler.rep)+extrafiles
 		self.goingToRunWith(otmpfiles, rep)
-		command = ccexecp.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else ccexecp.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
+		command = compiler.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else compiler.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
 		commandline = " ".join(command)
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
 		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
-		ccexecp.cc_stderr = err
+		compiler.cc_stderr = err
 		ret = p.returncode
 		if ret != 0:
-			ccexecp._compile_done = False
+			compiler._compile_done = False
 			if not link: map(os.remove,otmpfiles)
 			print >> sys.stderr, err
 			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		ccexecp._compile_done = True
-		ccexecp.cc_cmd = commandline
-		return ccexecp.outfile
+		compiler._compile_done = True
+		compiler.cc_cmd = commandline
+		return compiler.outfile
 
-	def compile_and_run(self, ccexecp=ccexecParams()):
-		if ccexecp.compilemethod == None:
-			ccexecp.compilemethod = self.compile
-		ccexecp.compilemethod(ccexecp)
-		return self.run_output(ccexecp)
+	def compile_and_run(self, compiler=backendCompiler()):
+		if compiler.compilemethod == None:
+			compiler.compilemethod = self.compile
+		compiler.compilemethod(compiler)
+		return self.run_output(compiler)
 
-	def run_output(self, ccexecp=ccexecParams()):
-		if not ccexecp._compile_done:
-			return self.compile_and_run(ccexecp)
+	def run_output(self, compiler=backendCompiler()):
+		if not compiler._compile_done:
+			return self.compile_and_run(compiler)
 		# Command to execute our binary
-		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
-		p = Popen(ccexecp.cmd, stdout = PIPE, stderr = PIPE)
+		compiler.cmd = [os.path.join("./",compiler.outfile)] + compiler.args
+		p = Popen(compiler.cmd, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
 		return (rc,out,err)

@@ -326,12 +326,12 @@ class workspace:
 		for fname in files:
 			pypsutils.addBeginnning(fname, patterns_h)
 
-	def simd_compile(self, ccexecp, *args, **kwargs):
+	def simd_compile(self, compiler, *args, **kwargs):
 		"""Compile the workspace with sse.h."""
 		self.use_generic_simd = False
 		CFLAGS = self.driver.CFLAGS
-		ccexecp.CFLAGS += " " + CFLAGS
-		r = self.ws.compile(ccexecp, *args, **kwargs)
+		compiler.CFLAGS += " " + CFLAGS
+		r = self.ws.compile(compiler, *args, **kwargs)
 		self.use_generic_simd = True
 		return r
 

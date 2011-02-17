@@ -157,24 +157,24 @@ class workspace:
 			raise RuntimeError("self.benchmark() must have been run !")
 		return self._final_runtimes[module.name]
 
-	def benchmark(self, ccexecp, iterations = 1):
-		ccexecp.rep = self.ws.dirname() +"Tmp"
+	def benchmark(self, compiler, iterations = 1):
+		compiler.rep = self.ws.dirname() +"Tmp"
 		
-		self.ws.run_output(ccexecp)
+		self.ws.run_output(compiler)
 
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
-			print >>sys.stderr, "Launch execution of %s %s..." % (ccexecp.outfile," ".join(ccexecp.args))
-			rc,out,err = self.ws.run_output(ccexecp)
+			print >>sys.stderr, "Launch execution of %s %s..." % (compiler.outfile," ".join(compiler.args))
+			rc,out,err = self.ws.run_output(compiler)
 			print >>sys.stderr, "Program done."
 			if rc != 0:
-				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(str(ccexecp.cmd), rc, out,err)
+				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(str(compiler.cmd), rc, out,err)
 				raise RuntimeError(message)
 			time = 0
 			try:
 				self._get_timefile_and_parse()
 			except IOError:
-				message = "cmd: " + str(ccexecp.cmd) + "\n"
+				message = "cmd: " + str(compiler.cmd) + "\n"
 				message += "out: " + out + "\n"
 				message += "err: " + err + "\n"
 				message += "return code: " + str(rc) + "\n"
