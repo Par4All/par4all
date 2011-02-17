@@ -56,8 +56,9 @@ pypips_aux.c:pypips.h pypips.c
 	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
 
 p2p_cmd= $(srcdir)/pipsmakerc2python.py $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
-pyps.py:$(p2p_cmd)
-	echo "from pypsbase import *" > pyps.py
+pyps.py:$(p2p_cmd) Makefile
+	echo '# -*- coding: utf-8 -*-' > pyps.py
+	echo "from pypsbase import *" >> pyps.py
 	$(PYTHON) $(p2p_cmd) -loop >> pyps.py
 	$(PYTHON) $(p2p_cmd) -module >> pyps.py
 	$(PYTHON) $(p2p_cmd) -modules >> pyps.py
