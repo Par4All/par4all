@@ -156,7 +156,7 @@
 			vec[i] = n;\
 		}\
 		va_end(ap);\
-	}\
+	}
 
 #define SIMD_STORE_TYPE(A,T) _SIMD_STORE_TYPE(T,RWBITS,A)
 #define _SIMD_STORE_TYPE(T,RWB,A) __SIMD_STORE_TYPE(T,RWB,A) // Process the "A" macro
@@ -182,7 +182,7 @@
 			*pn = vec[i];\
 		}\
 		va_end(ap);\
-	}\
+	}
 
 
 // Conversion functions

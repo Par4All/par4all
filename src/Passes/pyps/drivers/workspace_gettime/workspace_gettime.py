@@ -48,7 +48,7 @@ void __pyps_bench_stop(const char* module, const struct timeval *timestart)
 	}
 }
 
-void __pyps_bench_close()
+void __pyps_bench_close(void)
 {
 	if (__pyps_timefile != 0)
 		fclose(__pyps_timefile);

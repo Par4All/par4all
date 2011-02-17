@@ -105,6 +105,7 @@ class sacbase(object):
 
 		if cond.get("verbose"):
 			module.display()
+
 		module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
 		if cond.get("verbose"):
 			module.display()

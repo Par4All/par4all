@@ -465,11 +465,15 @@ class workspace(object):
 		if extrafiles == None:
 			extrafiles = []
 		command = ccexecp.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
-		command = " ".join(command) + " |cut -d':' -f2"
+		command = " ".join(command) + ' |sed \':a;N;$!ba;s/\(.*\).o: \\\\\\n/:/g\' |sed \'s/ \\\\$//\' |cut -d\':\' -f2'
 		p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
-
+		if rc != 0:
+			raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
+		
+		print command
+		print out
 		# Parse the results :
 		# each line is split thanks to shlex.split, and we only keep the header files
 		lines = map(shlex.split,out.split('\n'))

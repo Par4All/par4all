@@ -106,9 +106,10 @@ class workspace:
 		print >>sys.stderr, "Copying user headers to remote host %s..." % self.remoteExec.host()
 		user_headers = self.ws.user_headers()
 		for uh in user_headers:
-			rrep_inc = os.path.join(rdir, os.path.dirname(uh))
-			self.remoteExec.do("mkdir -p \"%s\"" % rrep_inc)
-			self.remoteExec.copy(uh, rrep_inc)
+			# TODO: try to find out in which directory the headers should go...
+			#rrep_inc = os.path.join(rdir, os.path.dirname(uh))
+			#self.remoteExec.do("mkdir -p \"%s\"" % rrep_inc)
+			self.remoteExec.copy(uh, rdir)
 
 		command=[CC, self.ws.cppflags, CFLAGS]
 		if link:
