@@ -262,8 +262,10 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/gpips/Makefile
 				 src/Passes/pips/Makefile
 				 src/Passes/pyps/Makefile
+				 src/Passes/pyps/ipyps
 				 src/Passes/pyps/doc/Makefile
 				 src/Passes/pyps/drivers/Makefile
+				 src/Passes/pyps/drivers/binary_size/Makefile
 				 src/Passes/pyps/drivers/sac/Makefile
 				 src/Passes/pyps/drivers/workspace_gettime/Makefile
 				 src/Passes/pyps/drivers/workspace_check/Makefile
@@ -272,6 +274,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/memalign/Makefile
 				 src/Passes/pyps/drivers/sacexplore/Makefile
 				 src/Passes/pyps/drivers/p3/Makefile
+				 src/Passes/pyps/drivers/openmp/Makefile
 				 src/Passes/pyps/drivers/terapyps/Makefile
 				 src/Passes/tpips/Makefile
 

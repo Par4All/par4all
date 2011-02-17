@@ -207,7 +207,7 @@ bool too_many_property_errors_pending_p() {
 /*************************************************
  * PIPSMAKE
  */
-bool active_phase_p(string phase)
+bool active_phase_p(const char* phase)
 {
   STUB_ERROR();
 }
