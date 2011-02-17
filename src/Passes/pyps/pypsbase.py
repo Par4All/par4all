@@ -514,8 +514,6 @@ class workspace(object):
 			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
 		ccexecp._compile_done = True
 		ccexecp.cc_cmd = commandline
-		# Command to execute our new binary
-		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
 		return ccexecp.outfile
 
 	def compile_and_run(self, ccexecp=ccexecParams()):
@@ -527,6 +525,8 @@ class workspace(object):
 	def run_output(self, ccexecp=ccexecParams()):
 		if not ccexecp._compile_done:
 			return self.compile_and_run(ccexecp)
+		# Command to execute our binary
+		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
 		p = Popen(ccexecp.cmd, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode

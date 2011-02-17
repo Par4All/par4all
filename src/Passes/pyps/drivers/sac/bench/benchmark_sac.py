@@ -74,7 +74,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 
 		if cur_runtime < calms:
 			low_size = size_kernel
-			high_size = size_kernel*2
+			high_size = size_kernel*10
 		else:
 			high_size = size_kernel
 			low_size = min(size_kernel/10,100)
@@ -83,9 +83,16 @@ def benchrun(s,calms=None,calibrate_out=None):
 			new_size = (high_size+low_size)/2
 			cur_runtime = get_run_time(new_size)
 			if cur_runtime < calms:
-				low_size = new_size
+				if low_size == new_size:
+					low_size = new_size/5
+				else:
+					low_size = new_size
 			else:
-				high_size = new_size
+				if high_size == new_size:
+					high_size = new_size*5
+				else:
+					high_size = new_size
+			print "New runtime:",cur_runtime,new_size
 
 		return make_args(size_kernel)
 

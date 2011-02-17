@@ -157,12 +157,12 @@ class workspace:
 		ccexecp.outfile = outfile
 		ccexecp._compile_done = True
 		ccexecp.cc_cmd = commandline
-		ccexecp.cmd = [ccexecp.outfile] + ccexecp.args
 		return outfile
 
 	def run_output(self, ccexecp):
-		if not ccexecp.cmd:
-			return self.compile_and_run(ccexecp)
+		if not ccexecp._compile_done:
+			return self.ws.compile_and_run(ccexecp)
+		ccexecp.cmd = [ccexecp.outfile] + ccexecp.args
 		p = self.remoteExec.doPopen(ccexecp.cmd)
 		(out,err) = p.communicate()
 		rc = p.returncode

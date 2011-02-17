@@ -160,11 +160,11 @@ class workspace:
 	def benchmark(self, ccexecp, iterations = 1):
 		ccexecp.rep = self.ws.dirname() +"Tmp"
 		
-		self.ws.compile_and_run(ccexecp)
+		self.ws.run_output(ccexecp)
 
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
-			print >>sys.stderr, "Launch execution of %s..." % ccexecp.outfile
+			print >>sys.stderr, "Launch execution of %s %s..." % (ccexecp.outfile," ".join(ccexecp.args))
 			rc,out,err = self.ws.run_output(ccexecp)
 			print >>sys.stderr, "Program done."
 			if rc != 0:
