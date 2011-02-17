@@ -24,10 +24,10 @@ def benchrun(s):
 	def do_benchmark(ws, wcfg, cc_cfg, compile_f, args, n_iter, name_custom):
 		times = {wcfg.module: [0]}
 		benchname = cc_cfg.name() + "+" + name_custom
-		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args)
+		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
 		try:
 			if doBench:
-				times = ws.benchmark(execname=benchname,ccexecp=ccp,iterations=n_iter)
+				times = ws.benchmark(ccexecp=ccp,iterations=n_iter)
 				benchtimes[benchname] = {'time': times[wcfg.module][0], 'cc_cmd': ccp.cc_cmd, 'cc_stderr': ccp.cc_stderr}
 			else:
 				good,out = ws.check_output(ccexecp=ccp)
@@ -77,7 +77,7 @@ def benchrun(s):
 			if doBench:
 				args = wcfg.args_benchmark
 				n_iter = wcfg.iterations_bench
-				m.benchmark()
+				m.benchmark_module()
 			else:
 				args = wcfg.args_validate
 				n_iter = 1

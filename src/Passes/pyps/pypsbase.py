@@ -9,6 +9,7 @@ import shutil
 import re
 import time
 import types
+import shlex
 from copy import deepcopy
 from string import split, upper, lower, join
 from subprocess import Popen, PIPE
@@ -221,13 +222,13 @@ class ccexecParams(object):
 			self._compile_done = False
 		object.__setattr__(self,n,v)
 	
-	def link_cmd(self, files, extraCFLAGS):
+	def link_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="link")
 
-	def compile_cmd(self, files, extraCFLAGS):
+	def compile_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="compile")
 
-	def user_headers_cmd(self, files, extraCFLAGS):
+	def user_headers_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
 
 	def _cc_cmd(self, files, extraCFLAGS, mode):
@@ -276,6 +277,7 @@ class workspace(object):
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
 		self._sources=[]
+		self._org_sources = sources
 
 		if not name :
 			#  generate a random place in $PWS
@@ -392,7 +394,6 @@ class workspace(object):
 		pypsutils.build_module_list(self)
 		return self._modules[module_name]
 
-
 	def __setitem__(self,i):
 		"""change a module of the module from its name"""
 		return self._modules[i]
@@ -461,15 +462,24 @@ class workspace(object):
 
 	def user_headers(self, ccexecp=ccexecParams(), extrafiles=None):
 		""" List the user headers used in self._sources with the compiler configuration given in ccexecp """
-		rep = os.path.join(self.tmpdirname(),"userh")
 		if extrafiles == None:
 			extrafiles = []
-		tmpfiles=self.save(rep=rep) + extrafiles
-		command = ccexecp.genCmdUserHeaders()
-		p = Popen(command, stdout = PIPE, stderr = PIPE)
+		command = ccexecp.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
+		command = " ".join(command) + " |cut -d':' -f2"
+		p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
-		# TODO: finish!
+
+		# Parse the results :
+		# each line is split thanks to shlex.split, and we only keep the header files
+		lines = map(shlex.split,out.split('\n'))
+		headers = list()
+		for l in lines:
+			l = filter(lambda s: s.endswith('.h'), l)
+			headers.extend(l)
+		return headers
+
+		
 
 	def compile(self, ccexecp=ccexecParams(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
