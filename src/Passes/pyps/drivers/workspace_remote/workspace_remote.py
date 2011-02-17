@@ -102,7 +102,13 @@ class workspace:
 		rdir = os.path.join(self.remoteExec.working_dir(), ccexecp.rep)
 		self.remoteExec.do("rm -rf \"%s\"" % rdir)
 		self.remoteExec.do("mkdir -p \"%s\"" % rdir)
-		
+
+		print >>sys.stderr, "Copying user headers to remote host %s..." % self.remoteExec.host()
+		user_headers = self.ws.user_headers()
+		for uh in user_headers:
+			rrep_inc = os.path.join(rdir, os.path.dirname(uh))
+			self.remoteExec.do("mkdir -p \"%s\"" % rrep_inc)
+			self.remoteExec.copy(uh, rrep_inc)
 
 		command=[CC, self.ws.cppflags, CFLAGS]
 		if link:
