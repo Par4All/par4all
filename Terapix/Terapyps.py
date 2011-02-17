@@ -43,7 +43,7 @@ def microcode_normalizer(ws,module):
 def terapyps(kernel_module,loop_label,*input_sources):
 	if verbose == 1 : print "Creating workspace from", list(input_sources)
 	# first create a workspace from the input sources
-	tws = workspace(list(input_sources) + ["include/load.c", "include/terasm.c"], verboseon=(verbose==2),cppflags="-I.", deleteOnClose=True)
+	tws = workspace(*input_sources ,"include/load.c", "include/terasm.c", verboseon=(verbose==2),cppflags="-I.", deleteOnClose=True)
 	# then select the given module
 	km = tws[kernel_module]
 	km.display()

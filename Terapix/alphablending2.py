@@ -59,7 +59,7 @@ module.smart_loop_expansion=smart_loop_expansion
 
 
 if __name__ == "__main__":
-	with workspace(["alphablending2.c", "include/terapix_runtime.c", "include/terasm.c"], cppflags="-I.",deleteOnClose=True) as w:
+	with workspace("alphablending2.c", "include/terapix_runtime.c", "include/terasm.c", cppflags="-I.",deleteOnClose=True) as w:
 		m = w["alphablending"]
 		w.activate(module.must_regions)
 		w.activate(module.region_chains)
