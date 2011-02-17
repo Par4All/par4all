@@ -1,4 +1,4 @@
-# $Id: Makefile 3128 2011-02-12 09:08:18Z coelho $
+# $Id$
 
 PARALLEL_VALIDATION = 1
 include ../validate.mk

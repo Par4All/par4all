@@ -1,4 +1,4 @@
-# $Id: Makefile 2805 2010-11-21 08:42:02Z coelho $
+# $Id$
 
 # the parallel validation does not work
 # because of collisions in the local directory,
