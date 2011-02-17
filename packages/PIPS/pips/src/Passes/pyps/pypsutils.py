@@ -29,7 +29,7 @@ def guardincludes(fname):
         if is_include:
             print mkguard(guard_end, l),
 
-define_MAX0 = """
+define_generic_intrinsics = """
 /* Header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
 #ifndef MAX0
 # define MAX0(a, b) ((a) > (b) ? (a) : (b))
@@ -68,9 +68,9 @@ define_MAX0 = """
 /* End header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
 """
 
-def addMAX0(fname):
+def addGenericIntrinsics(fname):
     """ Adds #define's for MAX0 and MOD."""
-    addBeginnning(fname, define_MAX0)
+    addBeginnning(fname, define_generic_intrinsics)
 
 def addBeginnning(fname, text):
     """Adds a line of text at the beginning of fname"""
@@ -136,9 +136,9 @@ def apply(m, phase, *args, **kwargs):
 	m._ws.cpypips.apply(phase.upper(),m._name)
 
 def update_props(passe,props):
-	"""Change a property dictionnary by appending the pass name to the property when needed """
+	"""Change a property dictionary by appending the pass name to the property when needed """
 	for name,val in props.iteritems():
-		if name.upper() not in pyps.workspace.props.all:
+		if name.upper() not in pyps.workspace.Props.all:
 			del props[name]
 			props[str.upper(passe+"_"+name)]=val
 			#print "warning, changing ", name, "into", passe+"_"+name
@@ -152,11 +152,11 @@ def build_module_list(ws):
 # A regex matching compilation unit names ending with a "!":
 re_compilation_units = re.compile("^.*!$")
 def filter_compilation_units(ws):
-	""" retreive compilation unit """
+	""" retrieve compilation unit """
 	return ws.filter(lambda m: re_compilation_units.match(m.name))
 
 def filter_all_functions(ws):
-	""" retreive function, all non compilation unit """
+	""" retrieve function, all non compilation unit """
 	return ws.filter(lambda m: not re_compilation_units.match(m.name))
 
 def get_property(ws, name):
@@ -168,7 +168,7 @@ def get_property(ws, name):
 	elif t == int:   return ws.cpypips.get_int_property(name)
 	elif t == bool : return ws.cpypips.get_bool_property(name)
 	else :
-		raise TypeError( 'Property type ' + str(t) + ' isn\'t supported')
+		raise TypeError( 'Property type ' + str(t) + ' is not supported')
 
 def get_properties(ws, props):
 	"""return a list of values of props list"""
@@ -188,14 +188,14 @@ def _set_property(ws, prop,value):
 	return old
 
 def set_properties(ws,props):
-	"""set properties based on the dictionnary props and returns a dictionnary containing the old state"""
+	"""set properties based on the dictionary props and returns a dictionary containing the old state"""
 	old = dict()
 	for prop,value in props.iteritems():
 		old[prop] = _set_property(ws,prop, value)
 	return old
 
 def set_property(ws, **props):
-	"""set properties and return a dictionnary containing the old state"""
+	"""set properties and return a dictionary containing the old state"""
 	return ws.set_properties(props)
 
 def patchIncludes(s):

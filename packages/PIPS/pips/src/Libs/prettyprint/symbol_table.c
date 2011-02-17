@@ -53,6 +53,80 @@
 
 #define NL       "\n"
 
+static string indent_table [9] = {"",
+								  "\t",
+								  "\t\t",
+								  "\t\t\t",
+								  "\t\t\t\t",
+								  "\t\t\t\t\t",
+								  "\t\t\t\t\t\t",
+								  "\t\t\t\t\t\t\t",
+								  "\t\t\t\t\t\t\t\t"};
+
+static string check_derived_and_typedef (basic b, int indent,
+										 const char* parent);
+
+static string  entities_type_and_name (list entities, int indent,
+									   const char* parent) {
+  string result = strdup ("");
+  string indent_str = (indent < 9)? indent_table[indent] : indent_table[8];
+  string old = NULL;
+
+  // if more that 8 indentation required continue to build the indentation
+  // string
+  for (int i = 8; i < indent; i++) {
+	old = indent_str;
+	indent_str = concatenate (indent_str, "\t", NULL);
+	free (old);
+  }
+
+  FOREACH (ENTITY, e, entities) {
+	type t = entity_type (e);
+	if (type_variable_p(t)) {
+	  old = result;
+	  variable v = type_variable(t);
+	  basic b = variable_basic(v);
+	  string name = strdup (concatenate (parent, ".", entity_user_name (e),
+										 NULL));
+	  string deeper = check_derived_and_typedef (b, indent + 1, name);
+	  result = strdup (concatenate(result, indent_str, "type = \"",
+								   basic_to_string(b), "\"",
+								   "\tuser name = \"", name, "\"\n",
+								   deeper, NULL)
+					   );
+	  free (deeper);
+	  free (name);
+	  free (old);
+	}
+  }
+  return result;
+}
+
+static string check_derived_and_typedef (basic b, int indent,
+										 const char* parent) {
+  string result = NULL;
+  if (basic_derived_p (b)) {
+	pips_debug(3, "Derived found, let's look at it\n");
+	entity e2 = basic_derived (b);
+	type t2 = entity_type (e2);
+	if (type_struct_p(t2)) {
+	  pips_debug(3, "Struct found, let's go deeper\n");
+	  result = entities_type_and_name (type_struct (t2), indent, parent);
+	}
+  }
+  if (basic_typedef_p (b)) {
+	pips_debug(3, "typedef found, let's look at it\n");
+	entity e2 = basic_typedef (b);
+	type t2 = entity_type (e2);
+	if (type_variable_p(t2)) {
+	  variable v2 = type_variable(t2);
+	  basic b2 = variable_basic(v2);
+	  result = check_derived_and_typedef (b2, indent, parent);
+	}
+  }
+  return ((result == NULL) ? strdup ("") : result);
+}
+
 /* This function is called from c_parse() via ResetCurrentModule() and fprint_environment() */
 
 void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfortran)
@@ -62,10 +136,11 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
   list equiv_members = NIL;
 
   string_buffer_append(result,
-		       concatenate(NL,"Layout for ",isfortran?"common /":"memory area \"",
-				   entity_name(c),isfortran?"/":"\""," of size ",
-				   itoa(area_size(type_area(entity_type(c)))),
-				   ":",NL,NULL));
+					   concatenate(NL,"Layout for ",
+								   isfortran?"common /":"memory area \"",
+								   entity_name(c),isfortran?"/":"\""," of size ",
+								   itoa(area_size(type_area(entity_type(c)))),
+								   ":",NL,NULL));
 
 
   if(ENDP(members)) {
@@ -77,111 +152,119 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
 
     if(isfortran){
       if(area_size(type_area(entity_type(c)))==0
-	 && fortran_relevant_area_entity_p(c))
-	{
-	  if(debug_p) {
-	    user_warning("dump_common_layout",
-			 "Non-empty area %s should have a final size greater than 0\n",
-			 entity_module_name(c));
-	  }
-	  else {
-	    pips_internal_error("Non-empty area %s should have a size greater than 0",
-		       entity_module_name(c));
-	  }
-	}
+		 && fortran_relevant_area_entity_p(c))
+		{
+		  if(debug_p) {
+			user_warning("dump_common_layout",
+						 "Non-empty area %s should have a final size greater than 0\n",
+						 entity_module_name(c));
+		  }
+		  else {
+			pips_internal_error("Non-empty area %s should have a size greater than 0",
+								entity_module_name(c));
+		  }
+		}
     }
     else {
       if(area_size(type_area(entity_type(c))) == 0)
-	{
-	  if(debug_p) {
-	    user_warning("dump_common_layout","Non-empty area %s should have a final size greater than 0\n",
-			 entity_module_name(c));
-	  }
-	}
+		{
+		  if(debug_p) {
+			user_warning("dump_common_layout","Non-empty area %s should have a final size greater than 0\n",
+						 entity_module_name(c));
+		  }
+		}
     }
     if(isfortran){
       FOREACH(ENTITY, m, members) {
-	pips_assert("RAM storage",
-		    storage_ram_p(entity_storage(m)));
-	if(ram_function(storage_ram(entity_storage(m)))==mod) {
-	  int s;
+		pips_assert("RAM storage",
+					storage_ram_p(entity_storage(m)));
+		if(ram_function(storage_ram(entity_storage(m)))==mod) {
+		  int s;
 
-	  if(ram_section(storage_ram(entity_storage(m)))!=c) {
-	    pips_internal_error("Variable %s declared in area %s but allocated in area %s",
-		       entity_local_name(m), entity_module_name(c),
-		       entity_module_name(ram_section(storage_ram(entity_storage(m)))));
-	  }
+		  if(ram_section(storage_ram(entity_storage(m)))!=c) {
+			pips_internal_error("Variable %s declared in area %s but allocated in area %s",
+								entity_local_name(m), entity_module_name(c),
+								entity_module_name(ram_section(storage_ram(entity_storage(m)))));
+		  }
 
-	  if(!SizeOfArray(m, &s)) {
-	    if(ram_section(storage_ram(entity_storage(m)))==HeapArea
-	       || ram_section(storage_ram(entity_storage(m)))==StackArea) {
-	      s = -1;
-	    }
-	    else {
-	      user_warning("print_common_layout",
-			   "Varying size of array \"%s\"\n", entity_name(m));
-	      ParserError("print_common_layout",
-			  "Fortran standard prohibit varying size array\n");
-	    }
-	  }
+		  if(!SizeOfArray(m, &s)) {
+			if(ram_section(storage_ram(entity_storage(m)))==HeapArea
+			   || ram_section(storage_ram(entity_storage(m)))==StackArea) {
+			  s = -1;
+			}
+			else {
+			  user_warning("print_common_layout",
+						   "Varying size of array \"%s\"\n", entity_name(m));
+			  ParserError("print_common_layout",
+						  "Fortran standard prohibit varying size array\n");
+			}
+		  }
 
-	  string_buffer_append(result,
-			       concatenate
-			       ("\tVariable ",entity_name(m),"\toffset = ",
-				itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
-	  string_buffer_append(result,
-			       concatenate("\tsize = ",itoa(s),NL,NULL));
-	}
+		  string_buffer_append(result,
+							   concatenate
+							   ("\tVariable ",entity_name(m),"\toffset = ",
+								itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
+		  string_buffer_append(result,
+							   concatenate("\tsize = ",itoa(s),NL,NULL));
+		}
       }
     }
     else { // C language
       FOREACH(ENTITY, m, members) {
-	pips_assert("RAM storage",
-		    storage_ram_p(entity_storage(m)));
-	int s;
+		pips_assert("RAM storage",
+					storage_ram_p(entity_storage(m)));
+		int s;
 
-	SizeOfArray(m, &s);
+		SizeOfArray(m, &s);
 
-	pips_assert("An area has no offset as -1",
-		    (ram_offset(storage_ram(entity_storage(m)))!= -1));
+		pips_assert("An area has no offset as -1",
+					(ram_offset(storage_ram(entity_storage(m)))!= -1));
 
-	if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
-	  string_buffer_append(result,
-			       concatenate(
-					   "\tDynamic Variable \"",entity_name(m),
-					   "\"\toffset = UNKNOWN, \tsize = DYNAMIC",
-					   NL,NULL));
-	}
-	else if (ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
-	  string_buffer_append(result,
-			       concatenate
-			       ("\tExternal Variable \"", entity_name(m),
-				"\"\toffset = UNKNOWN,\tsize = ",
-				s>0?itoa(s): "unknown", NL, NULL));
-	}
-	else {
-	  string_buffer_append(result,
-			       concatenate
-				      ("\tVariable \"", entity_name(m),"\"\toffset = ",
-				       itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
-	  if (get_bool_property("EXTENDED_VARIABLE_INFORMATION")) {
-	    type t = entity_type (m);
-	    if (type_variable_p(t)) {
-	      variable v = type_variable(t);
-	      basic b = variable_basic(v);
-	      string_buffer_append(result,
-				   concatenate("\ttype = \"",
-					       basic_to_string(b), "\"",
-					       "\tuser name = \"",
-					       entity_user_name (m), "\"",
-					       NULL));
-	    }
+		if(ram_offset(storage_ram(entity_storage(m))) == DYNAMIC_RAM_OFFSET) {
+		  string_buffer_append(result,
+							   concatenate(
+										   "\tDynamic Variable \"",entity_name(m),
+										   "\"\toffset = UNKNOWN, \tsize = DYNAMIC",
+										   NL,NULL));
+		}
+		else if (ram_offset(storage_ram(entity_storage(m))) == UNDEFINED_RAM_OFFSET) {
+		  string_buffer_append(result,
+							   concatenate
+							   ("\tExternal Variable \"", entity_name(m),
+								"\"\toffset = UNKNOWN,\tsize = ",
+								s>0?itoa(s): "unknown", NL, NULL));
+		}
+		else {
+		  string_buffer_append(result,
+							   concatenate
+							   ("\tVariable \"", entity_name(m),"\"\toffset = ",
+								itoa(ram_offset(storage_ram(entity_storage(m)))),NULL));
+		  if (get_bool_property("EXTENDED_VARIABLE_INFORMATION")) {
+			pips_debug(3, "extended information required\n");
+			type t = entity_type (m);
+			if (type_variable_p(t)) {
+			  variable v = type_variable(t);
+			  basic b = variable_basic(v);
+			  string_buffer_append(result,
+								   concatenate("\ttype = \"",
+											   basic_to_string(b), "\"",
+											   "\tuser name = \"",
+											   entity_user_name (m), "\"",
+											   NULL));
+			  // check if the basic is derived or typedef to be investigated
+			  string deeper = check_derived_and_typedef (b, 2, entity_user_name (m));
+			  if (strcmp (deeper, "") != 0) {
+				string_buffer_append (result, NL);
+				string_buffer_append (result, deeper);
+			  }
+			  else free (deeper);
+			}
+		  }
+		  string_buffer_append(result,
+							   concatenate("\tsize = ",itoa(s),NL,NULL));
+		}
 	  }
-	  string_buffer_append(result,
-			       concatenate("\tsize = ",itoa(s),NL,NULL));
 	}
-      }
-    }
 
     string_buffer_append(result, NL);
 
@@ -194,22 +277,22 @@ void dump_common_layout(string_buffer result, entity c, bool debug_p, bool isfor
     if(!ENDP(equiv_members)){
       equiv_members = arguments_difference(equiv_members, members);
       if(!ENDP(equiv_members)) {
-	sort_list_of_entities(equiv_members);
+		sort_list_of_entities(equiv_members);
 
-	string_buffer_append(result, concatenate("\tVariables aliased to this common:",NL,
-							NULL));
+		string_buffer_append(result, concatenate("\tVariables aliased to this common:",NL,
+												 NULL));
 
-	FOREACH(ENTITY, m, equiv_members) {
-	  pips_assert("RAM storage",
-		      storage_ram_p(entity_storage(m)));
-	  string_buffer_append(result,
-			       concatenate
-			       ("\tVariable", entity_name(m) ,"\toffset =",
-				ram_offset(storage_ram(entity_storage(m))),"\tsize = ",
-				SafeSizeOfArray(m),NL,NULL));
-	}
-	string_buffer_append(result, concatenate(NL,NULL));
-	gen_free_list(equiv_members);
+		FOREACH(ENTITY, m, equiv_members) {
+		  pips_assert("RAM storage",
+					  storage_ram_p(entity_storage(m)));
+		  string_buffer_append(result,
+							   concatenate
+							   ("\tVariable", entity_name(m) ,"\toffset =",
+								ram_offset(storage_ram(entity_storage(m))),"\tsize = ",
+								SafeSizeOfArray(m),NL,NULL));
+		}
+		string_buffer_append(result, concatenate(NL,NULL));
+		gen_free_list(equiv_members);
       }
     }
   }
@@ -226,22 +309,22 @@ void dump_functional(functional f, string_buffer result)
     type ta = parameter_type(p);
 
     pips_assert("Argument type is variable or varags:variable or functional or void",
-		type_variable_p(ta)
-		|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
-		|| type_functional_p(ta)
-		|| type_void_p(ta));
+				type_variable_p(ta)
+				|| (type_varargs_p(ta) && type_variable_p(type_varargs(ta)))
+				|| type_functional_p(ta)
+				|| type_void_p(ta));
 
     if(type_variable_p(ta)) {
       variable v = type_variable(ta);
       basic b = variable_basic(v);
       if(basic_pointer_p(b) && type_functional_p(basic_pointer(b))) {
-	functional f = type_functional(basic_pointer(b));
-	string_buffer_append(result, "(");
-	dump_functional(f,result);
-	string_buffer_append(result, ") *");
+		functional f = type_functional(basic_pointer(b));
+		string_buffer_append(result, "(");
+		dump_functional(f,result);
+		string_buffer_append(result, ") *");
       }
       else {
-	string_buffer_append(result, basic_to_string(b));
+		string_buffer_append(result, basic_to_string(b));
       }
     }
     else if(type_functional_p(ta)) {
@@ -255,12 +338,12 @@ void dump_functional(functional f, string_buffer result)
       string_buffer_append(result, concatenate(type_to_string(ta),":",NULL));
       ta = type_varargs(ta);
       string_buffer_append(result,
-			   basic_to_string(variable_basic(type_variable(ta))));
+						   basic_to_string(variable_basic(type_variable(ta))));
     }
     else if(type_void_p(ta)) {
       /* FI: we could do nothing or put "void". I choose to put "void"
-	 to give more information about the internal
-	 representation. */
+		 to give more information about the internal
+		 representation. */
       string_buffer_append(result, type_to_string(ta));
     }
     if(!ENDP(cp->cdr))
@@ -274,8 +357,8 @@ void dump_functional(functional f, string_buffer result)
 
   if(type_variable_p(tr))
     string_buffer_append(result,
-			 concatenate(basic_to_string(variable_basic(type_variable(tr)))
-					    /*,NL*/,NULL));
+						 concatenate(basic_to_string(variable_basic(type_variable(tr)))
+									 /*,NL*/,NULL));
   else if(type_void_p(tr))
     string_buffer_append(result, concatenate(type_to_string(tr)/*,NL*/,NULL));
   else if(type_unknown_p(tr)){
@@ -283,7 +366,7 @@ void dump_functional(functional f, string_buffer result)
   }
   else if(type_varargs_p(tr)) {
     string_buffer_append(result, concatenate(type_to_string(tr),":",
-					     basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL));
+											 basic_to_string(variable_basic(type_variable(type_varargs(tr)))),NULL));
   }
   else
     /* An argument can be functional, but not (yet) a result. */
@@ -524,12 +607,11 @@ string get_symbol_table(entity m, bool isfortran)
     string_buffer_append(result, concatenate(NL,"Layouts for ",isfortran?"commons:":"memory areas:",NL,NULL));
   }
 
-  MAP(ENTITY, e, {
-      if(type_area_p(entity_type(e))) {
-	dump_common_layout(result, e, FALSE, isfortran);
-      }
-    },
-    decls);
+  FOREACH (ENTITY, e, decls) {
+	if(type_area_p(entity_type(e))) {
+	  dump_common_layout(result, e, FALSE, isfortran);
+	}
+  }
 
   string_buffer_append(result, concatenate("End of declarations for module ",
 					   module_local_name(m), NL,NL, NULL));
@@ -554,6 +636,8 @@ void actual_symbol_table_dump(string module_name, bool isfortran)
   string dir = db_get_current_workspace_directory();
   string filename = strdup(concatenate(dir, "/", symboltable, NULL));
   bool reset_p = FALSE;
+
+  debug_on("SYMBOL_TABLE_DEBUG_LEVEL");
 
   /* This function is called in two different context: as a
      standalone phase or as part of debugging the parser?!? */

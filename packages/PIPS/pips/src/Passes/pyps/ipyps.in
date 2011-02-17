@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! @PYTHON@
 # -*- coding: utf-8 -*-
 
 
@@ -17,6 +17,8 @@ import sys
 
 # Load PyPS:
 from pyps import *
+
+
 
 # Inject line arguments to set the default prompt to something with iPyPS:
 sys.argv[1:1] = [ '-prompt_in1', 'iPyPS [\#]: ']

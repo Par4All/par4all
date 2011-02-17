@@ -27,8 +27,7 @@ class Launcher(Pyro.core.ObjBase):
 		uri = Launcher.daemon.connect(self,"launcher")
 		
 		#Launch child
-		#sp=subprocess.Popen(["python","Pyrops.py",str(uri)])
-		sp=subprocess.Popen(["python",PyropsFile,str(uri)])
+		sp=subprocess.Popen([sys.executable,PyropsFile,str(uri)])
 
 		Launcher.activeLaunchers.append(self)
 		

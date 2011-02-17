@@ -1,0 +1,92 @@
+%%
+%% $Id$
+%%
+%% Copyright 1989-2010 MINES ParisTech
+%% Copyright 2009-2010 HPC Project
+%%
+%% This file is part of PIPS.
+%%
+%% PIPS is free software: you can redistribute it and/or modify it
+%% under the terms of the GNU General Public License as published by
+%% the Free Software Foundation, either version 3 of the License, or
+%% any later version.
+%%
+%% PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+%% WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%% FITNESS FOR A PARTICULAR PURPOSE.
+%%
+%% See the GNU General Public License for more details.
+%%
+%% You should have received a copy of the GNU General Public License
+%% along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+%%
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{verbatim,comment,newgen_domain}
+\usepackage{graphicx,ifpdf}
+% Use classical figure extension if we are in classical LaTeX (instead of
+% pdflatex), necessary for TeX4ht (htlatex):
+\ifpdf
+\else
+  \DeclareGraphicsExtensions{.idraw,.eps}
+\fi
+\usepackage[backref,pagebackref]{hyperref}
+\usepackage[nofancy]{svninfo}
+\usepackage{array}
+\usepackage{listings}
+%% To generate an index:
+\usepackage{makeidx}
+\makeindex
+
+\title{SCALOPES: automatic generation of data flow tasks}
+\author{
+  Béatrice Creusillet\\
+  \\
+  HPC Project
+}
+\date{\svnInfoLongDate{}, revision r\svnInfoRevision}
+
+\begin{document}
+\svnInfo $Id$
+
+\maketitle
+\sloppy
+\lstset{language=C}
+
+\section{Imported Domains}
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import effect from "effects.newgen"}
+{}
+
+
+\section{Representing How Tasks use Buffers}
+
+\domain{task_buffers = input:entity\{\} x output:entity\{\} }
+{}
+\domain{entity_task_buffers = entity -> task_buffers}
+{}
+\domain{sesam_buffers_processing_context = kernel_tasks:entity\{\} x server_tasks:entity\{\} x kernel_buffers:entity_task_buffers x server_buffers:entity_task_buffers x buffers:entity\{\}}
+{}
+\section*{Annexe: NewGen Declarations -- effects.newgen --}
+\verbatiminput{scalopes_private.newgen}
+
+\newpage
+
+
+
+%\newpage
+
+% Cross-references for points and keywords
+
+
+\end{document}
+\end
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% ispell-local-dictionary: "american"
+%%% End:

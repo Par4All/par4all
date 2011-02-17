@@ -281,6 +281,12 @@
 { DBR_KERNEL_COPY_IN,  NEWGEN_METHODS },
 { DBR_KERNEL_COPY_OUT,  NEWGEN_METHODS },
 
+/*
+ * SCALOPES
+ */
+{ DBR_SESAM_BUFFERS_FILE,  STRING_METHODS },
+
+
 
 /* this one MUST be the last one.
  */

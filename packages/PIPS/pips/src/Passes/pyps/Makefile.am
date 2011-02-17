@@ -1,13 +1,13 @@
 SUBDIRS  = doc drivers
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
-dist_noinst_DATA=_pyps.py pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
+dist_noinst_DATA=pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
 
 dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 
 pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar
 
-dist_pkgpython_PYTHON = pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py 
+dist_pkgpython_PYTHON = pypsbase.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py 
 dist_python_DATA = pips.pth
 
 if WITH_PYPS_EXTRA
@@ -56,16 +56,12 @@ pypips_aux.c:pypips.h pypips.c
 	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
 
 p2p_cmd= $(srcdir)/pipsmakerc2python.py $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
-pyps.py:$(p2p_cmd) _pyps.py 
-	sed -n -e '1,/### loop_methods/ p' $(srcdir)/_pyps.py > pyps.py
+pyps.py:$(p2p_cmd)
+	echo "from pypsbase import *" > pyps.py
 	$(PYTHON) $(p2p_cmd) -loop >> pyps.py
-	sed -n -e '/### loop_methods/,/### module_methods/ p' $(srcdir)/_pyps.py >> pyps.py
 	$(PYTHON) $(p2p_cmd) -module >> pyps.py
-	sed -n -e '/### module_methods/,/### modules_methods/ p' $(srcdir)/_pyps.py >> pyps.py
 	$(PYTHON) $(p2p_cmd) -modules >> pyps.py
-	sed -n -e '/### modules_methods/,/### props_methods/ p' $(srcdir)/_pyps.py >> pyps.py
 	$(PYTHON) $(p2p_cmd) -properties >> pyps.py
-	sed -n -e '/### props_methods/,$$ p' $(srcdir)/_pyps.py >> pyps.py
 
 pips-make: pips-make.in
 	sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make

@@ -1,0 +1,65 @@
+setenv WKS data_flow01
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c p4a_scmp_stubs.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+setproperty GPU_LAUNCHER_PREFIX "P4A_scmp_kernel"
+
+setproperty KERNEL_LOAD_STORE_LOAD_FUNCTION "P4A_scmp_read"
+setproperty KERNEL_LOAD_STORE_STORE_FUNCTION "P4A_scmp_write"
+setproperty KERNEL_LOAD_STORE_ALLOCATE_FUNCTION "P4A_scmp_malloc"
+setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION "P4A_scmp_dealloc"
+setproperty KERNEL_LOAD_STORE_VAR_PREFIX "P4A_"
+setproperty KERNEL_LOAD_STORE_VAR_SUFFIX "__"
+
+setproperty ISOLATE_STATEMENT_VAR_PREFIX "P4A__"
+setproperty ISOLATE_STATEMENT_VAR_SUFFIX "__"
+setproperty SCALOPES_KERNEL_TASK_PREFIX "scmp_task_"
+
+#setproperty OUTLINE_ALLOW_GLOBALS TRUE
+
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+apply PRIVATIZE_MODULE[main]
+
+#apply SCALOPRAGMA[main]
+
+# by setting this property to empty, we prevent generation of deallocation function
+#setproperty KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION ""
+
+#apply KERNEL_LOAD_STORE[%ALLFUNC]
+module main
+
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+activate PRINT_CODE
+
+setproperty ISOLATE_STATEMENT_LABEL "scmp_task_0"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+setproperty ISOLATE_STATEMENT_LABEL "scmp_task_1"
+apply ISOLATE_STATEMENT
+display PRINTED_FILE
+
+#display PRINTED_FILE[%ALLFUNC]
+activate PRINT_CODE_CUMULATED_EFFECTS
+display PRINTED_FILE
+
+#setenv SCALOPES_DEBUG_LEVEL 8
+display SESAM_BUFFERS_FILE
+close
+
+delete $WKS
+
+quit

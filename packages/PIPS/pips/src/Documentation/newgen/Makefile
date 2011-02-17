@@ -58,7 +58,8 @@ F.tex =	ri.tex \
 	step_private.tex \
 	points_to_private.tex \
 	kernel_memory_mapping.tex \
-	freia_spoc_private.tex
+	freia_spoc_private.tex \
+	scalopes_private.tex
 
 
 

@@ -1,0 +1,448 @@
+//             <may be read   >: stdout stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <    is written>: s
+   int t, i, a[100], b[100/2], c[100/2], s = 0;
+//             <may be read   >: a[*] b[*] c[*] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: a[*] b[*] c[*] stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: t
+   for(t = 0; t <= 9; t += 1) {
+//             <may be read   >: t
+//             <may be written>: a[*]
+//             <    is written>: i
+scmp_task_0:
+      for(i = 0; i <= 99; i += 1)
+//             <may be written>: a[*]
+//             <    is read   >: i t
+         a[i] = i*t;
+//             <may be read   >: a[*]
+//             <may be written>: b[*]
+//             <    is written>: i
+scmp_task_1:
+      for(i = 0; i <= 49; i += 1)
+//             <may be read   >: a[*]
+//             <may be written>: b[*]
+//             <    is read   >: i
+         b[i] = a[i];
+//             <may be read   >: a[*]
+//             <may be written>: c[*]
+//             <    is written>: i
+scmp_task_2:
+      for(i = 0; i <= 49; i += 1)
+//             <may be read   >: a[*]
+//             <may be written>: c[*]
+//             <    is read   >: i
+         c[i] = a[i+100/2];
+//             <may be read   >: b[*] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
+scmp_task_3:
+      for(i = 0; i <= 49; i += 1)
+//             <may be read   >: b[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%d\n", b[i]);
+//             <may be read   >: c[*] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
+      //s = s + a[i];
+scmp_task_4:
+      for(i = 0; i <= 49; i += 1)
+//             <may be read   >: c[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: i stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%d\n", c[i]);
+   }
+   return 0;
+}
+int main()
+{
+   int t, i, a[100], b[100/2], c[100/2], s = 0;
+   for(t = 0; t <= 9; t += 1) {
+      {
+         //PIPS generated variable
+         int (*P4A__a__0)[100] = (int (*)[100]) 0;
+         P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
+
+scmp_task_0:
+         for(i = 0; i <= 99; i += 1)
+            (*P4A__a__0)[i-0] = i*t;
+         P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__0);
+         P4A_scmp_dealloc(P4A__a__0);
+      }
+      {
+         //PIPS generated variable
+         int (*P4A__a__1)[50] = (int (*)[50]) 0, (*P4A__b__0)[50] = (int (*)[50]) 0;
+         P4A_scmp_malloc((void **) &P4A__b__0, sizeof(int)*50);
+         P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*50);
+         P4A_copy_to_accel_1d(sizeof(int), 100, 50, 0, &a[0], *P4A__a__1);
+
+scmp_task_1:
+         for(i = 0; i <= 49; i += 1)
+            (*P4A__b__0)[i-0] = (*P4A__a__1)[i-0];
+         P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__0);
+         P4A_scmp_dealloc(P4A__b__0);
+         P4A_scmp_dealloc(P4A__a__1);
+      }
+      {
+         //PIPS generated variable
+         int (*P4A__a__2)[50] = (int (*)[50]) 0, (*P4A__c__0)[50] = (int (*)[50]) 0;
+         P4A_scmp_malloc((void **) &P4A__c__0, sizeof(int)*50);
+         P4A_scmp_malloc((void **) &P4A__a__2, sizeof(int)*50);
+         P4A_copy_to_accel_1d(sizeof(int), 100, 50, 50, &a[0], *P4A__a__2);
+
+scmp_task_2:
+         for(i = 0; i <= 49; i += 1)
+            (*P4A__c__0)[i-0] = (*P4A__a__2)[i+100/2-50];
+         P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__0);
+         P4A_scmp_dealloc(P4A__c__0);
+         P4A_scmp_dealloc(P4A__a__2);
+      }
+      {
+         //PIPS generated variable
+         int (*P4A__b__1)[50] = (int (*)[50]) 0;
+         P4A_scmp_malloc((void **) &P4A__b__1, sizeof(int)*50);
+         P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__1);
+
+scmp_task_3:
+         for(i = 0; i <= 49; i += 1)
+            printf("%d\n", (*P4A__b__1)[i-0]);
+         P4A_scmp_dealloc(P4A__b__1);
+      }
+      {
+         //PIPS generated variable
+         int (*P4A__c__1)[50] = (int (*)[50]) 0;
+         P4A_scmp_malloc((void **) &P4A__c__1, sizeof(int)*50);
+         P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__1);
+
+         //s = s + a[i];
+scmp_task_4:
+         for(i = 0; i <= 49; i += 1)
+            printf("%d\n", (*P4A__c__1)[i-0]);
+         P4A_scmp_dealloc(P4A__c__1);
+      }
+   }
+   return 0;
+}
+//             <may be read   >: stdout stdout[0] 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+int main()
+{
+//             <    is written>: s
+   int t, i, a[100], b[100/2], c[100/2], s = 0;
+//             <may be read   >: stdout stdout[0] 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[1]
+   for(t = 0; t <= 9; t += 1) {
+      {
+         //PIPS generated variable
+//             <    is written>: P4A__a__0
+         int (*P4A__a__0)[100] = (int (*)[100]) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__a__0, sizeof(int)*100);
+
+//             <may be read   >: P4A__a__0 t
+//             <may be written>: P4A__a__0[0][*]
+//             <    is written>: i
+scmp_task_0:
+         for(i = 0; i <= 99; i += 1)
+//             <may be written>: P4A__a__0[0][*]
+//             <    is read   >: P4A__a__0 i t
+            (*P4A__a__0)[i-0] = i*t;
+//             <may be read   >: P4A__a__0[0][*]
+//             <may be written>: P4A__a__0[0][*]
+//             <    is read   >: P4A__a__0
+         P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__0);
+//             <    is read   >: P4A__a__0
+         P4A_scmp_dealloc(P4A__a__0);
+      }
+      {
+         //PIPS generated variable
+//             <    is written>: P4A__a__1 P4A__b__0
+         int (*P4A__a__1)[50] = (int (*)[50]) 0, (*P4A__b__0)[50] = (int (*)[50]) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__b__0, sizeof(int)*50);
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*50);
+//             <may be read   >: P4A__a__1[0][*]
+//             <may be written>: P4A__a__1[0][*]
+//             <    is read   >: P4A__a__1
+         P4A_copy_to_accel_1d(sizeof(int), 100, 50, 0, &a[0], *P4A__a__1);
+
+//             <may be read   >: P4A__a__1 P4A__a__1[0][*] P4A__b__0
+//             <may be written>: P4A__b__0[0][*]
+//             <    is written>: i
+scmp_task_1:
+         for(i = 0; i <= 49; i += 1)
+//             <may be read   >: P4A__a__1[0][*]
+//             <may be written>: P4A__b__0[0][*]
+//             <    is read   >: P4A__a__1 P4A__b__0 i
+            (*P4A__b__0)[i-0] = (*P4A__a__1)[i-0];
+//             <may be read   >: P4A__b__0[0][*]
+//             <may be written>: P4A__b__0[0][*]
+//             <    is read   >: P4A__b__0
+         P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__0);
+//             <    is read   >: P4A__b__0
+         P4A_scmp_dealloc(P4A__b__0);
+//             <    is read   >: P4A__a__1
+         P4A_scmp_dealloc(P4A__a__1);
+      }
+      {
+         //PIPS generated variable
+//             <    is written>: P4A__a__2 P4A__c__0
+         int (*P4A__a__2)[50] = (int (*)[50]) 0, (*P4A__c__0)[50] = (int (*)[50]) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__c__0, sizeof(int)*50);
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__a__2, sizeof(int)*50);
+//             <may be read   >: P4A__a__2[0][*]
+//             <may be written>: P4A__a__2[0][*]
+//             <    is read   >: P4A__a__2
+         P4A_copy_to_accel_1d(sizeof(int), 100, 50, 50, &a[0], *P4A__a__2);
+
+//             <may be read   >: P4A__a__2 P4A__a__2[0][*] P4A__c__0
+//             <may be written>: P4A__c__0[0][*]
+//             <    is written>: i
+scmp_task_2:
+         for(i = 0; i <= 49; i += 1)
+//             <may be read   >: P4A__a__2[0][*]
+//             <may be written>: P4A__c__0[0][*]
+//             <    is read   >: P4A__a__2 P4A__c__0 i
+            (*P4A__c__0)[i-0] = (*P4A__a__2)[i+100/2-50];
+//             <may be read   >: P4A__c__0[0][*]
+//             <may be written>: P4A__c__0[0][*]
+//             <    is read   >: P4A__c__0
+         P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__0);
+//             <    is read   >: P4A__c__0
+         P4A_scmp_dealloc(P4A__c__0);
+//             <    is read   >: P4A__a__2
+         P4A_scmp_dealloc(P4A__a__2);
+      }
+      {
+         //PIPS generated variable
+//             <    is written>: P4A__b__1
+         int (*P4A__b__1)[50] = (int (*)[50]) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__b__1, sizeof(int)*50);
+//             <may be read   >: P4A__b__1[0][*]
+//             <may be written>: P4A__b__1[0][*]
+//             <    is read   >: P4A__b__1
+         P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__1);
+
+//             <may be read   >: P4A__b__1 P4A__b__1[0][*] stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
+scmp_task_3:
+         for(i = 0; i <= 49; i += 1)
+//             <may be read   >: P4A__b__1[0][*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: P4A__b__1 i stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            printf("%d\n", (*P4A__b__1)[i-0]);
+//             <    is read   >: P4A__b__1
+         P4A_scmp_dealloc(P4A__b__1);
+      }
+      {
+         //PIPS generated variable
+//             <    is written>: P4A__c__1
+         int (*P4A__c__1)[50] = (int (*)[50]) 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+         P4A_scmp_malloc((void **) &P4A__c__1, sizeof(int)*50);
+//             <may be read   >: P4A__c__1[0][*]
+//             <may be written>: P4A__c__1[0][*]
+//             <    is read   >: P4A__c__1
+         P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__1);
+
+//             <may be read   >: P4A__c__1 P4A__c__1[0][*] stdout 
+//                               stdout[0] __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: i
+         //s = s + a[i];
+scmp_task_4:
+         for(i = 0; i <= 49; i += 1)
+//             <may be read   >: P4A__c__1[0][*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: P4A__c__1 i stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+            printf("%d\n", (*P4A__c__1)[i-0]);
+//             <    is read   >: P4A__c__1
+         P4A_scmp_dealloc(P4A__c__1);
+      }
+   }
+   return 0;
+}
+#define NB_BUFFERS 7
+#define P4A__a__0_id 0
+#define P4A__a__1_id 1
+#define P4A__a__2_id 2
+#define P4A__b__0_id 3
+#define P4A__b__1_id 4
+#define P4A__c__0_id 5
+#define P4A__c__1_id 6
+
+#ifdef scmp_task_0
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 1
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef scmp_task_1
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 1
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 1
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef scmp_task_2
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 1
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 1
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef scmp_task_3
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 1
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef scmp_task_4
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 1
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef P4A_sesam_server_a
+#define P4A__a__0_cons_p 1
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 1
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 1
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef P4A_sesam_server_b
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 1
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 1
+#define P4A__c__0_cons_p 0
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 0
+#endif
+
+#ifdef P4A_sesam_server_c
+#define P4A__a__0_cons_p 0
+#define P4A__a__0_prod_p 0
+#define P4A__a__1_cons_p 0
+#define P4A__a__1_prod_p 0
+#define P4A__a__2_cons_p 0
+#define P4A__a__2_prod_p 0
+#define P4A__b__0_cons_p 0
+#define P4A__b__0_prod_p 0
+#define P4A__b__1_cons_p 0
+#define P4A__b__1_prod_p 0
+#define P4A__c__0_cons_p 1
+#define P4A__c__0_prod_p 0
+#define P4A__c__1_cons_p 0
+#define P4A__c__1_prod_p 1
+#endif
