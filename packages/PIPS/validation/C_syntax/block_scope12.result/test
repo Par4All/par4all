@@ -117,3 +117,4 @@ unknown[unknown] (activate_phase) Rule `C_SYMBOL_TABLE' already active
 unknown[unknown] (parse_properties) property PRETTYPRINT_LANGUAGE redefined
 C_PARSER[block_scope12!block_scope12] (simplify_C_expression) Variable "x" is probably used before it is defined
 C_PARSER[block_scope12!block_scope12] (simplify_C_expression) Variable "x" is probably used before it is defined
+C_SYMBOL_TABLE[block_scope12!block_scope12] (set_debug_stack_pointer) debug level stack is set to 2

@@ -1,0 +1,49 @@
+main
+
+Declarations for module "main" with type "() -> void"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 16
+	Declared entity "main:*DYNAMIC*" with type "area" with size 10
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "symbol_table!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 16:
+	Variable "TOP-LEVEL:in1"	offset = 0	size = 4
+	Variable "TOP-LEVEL:in2"	offset = 4	size = 4
+	Variable "TOP-LEVEL:in3"	offset = 8	size = 4
+	Variable "TOP-LEVEL:out1"	offset = 12	size = 4
+
+
+Layout for memory area "main:*DYNAMIC*" of size 10:
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "symbol_table!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+

@@ -64,13 +64,13 @@ void give()
    double array[N];
    {
       //PIPS generated variable
-      double (*array0)[100] = (double (*)[100]) 0;
-      P4A_accel_malloc((void **) &array0, sizeof(double)*100);
+      double (*P4A_var_array0)[100] = (double (*)[100]) 0;
+      P4A_accel_malloc((void **) &P4A_var_array0, sizeof(double)*100);
 
 
-      change(&j, *array0);
-      P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
-      P4A_accel_free(array0);
+      change(&j, *P4A_var_array0);
+      P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *P4A_var_array0);
+      P4A_accel_free(P4A_var_array0);
    }
 }
 void change(int *i, double array[N])
@@ -117,12 +117,12 @@ void give()
    double array[N];
    {
       //PIPS generated variable
-      double (*array0)[100] = (double (*)[100]) 0;
-      P4A_accel_malloc((void **) &array0, sizeof(double)*100);
+      double (*P4A_var_array0)[100] = (double (*)[100]) 0;
+      P4A_accel_malloc((void **) &P4A_var_array0, sizeof(double)*100);
 
 
-      change(&j, *array0);
-      P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *array0);
-      P4A_accel_free(array0);
+      change(&j, *P4A_var_array0);
+      P4A_copy_from_accel_1d(sizeof(double), 100, 100, 0, &array[0], *P4A_var_array0);
+      P4A_accel_free(P4A_var_array0);
    }
 }
