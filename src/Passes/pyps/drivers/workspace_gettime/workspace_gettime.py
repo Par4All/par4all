@@ -160,7 +160,7 @@ class workspace:
 	def benchmark(self, compiler, iterations = 1):
 		compiler.rep = self.ws.dirname() +"Tmp"
 		
-		self.ws.run_output(compiler)
+		self.ws.compile_and_run(compiler)
 
 		self._module_rtimes = dict()
 		for i in range(0, iterations):

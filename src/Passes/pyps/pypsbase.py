@@ -37,12 +37,6 @@ class backendCompiler(object):
 		self.extrafiles = extrafiles
 		self.cmd = None
 		self.cc_stderr = None
-		self._compile_done = False
-	
-	def __setattr__(self, n, v):
-		if n in ('CC','CFLAGS','LDFLAGS','compilemethod','extrafiles'):
-			self._compile_done = False
-		object.__setattr__(self,n,v)
 	
 	def link_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="link")
@@ -532,11 +526,9 @@ class workspace(object):
 		compiler.cc_stderr = err
 		ret = p.returncode
 		if ret != 0:
-			compiler._compile_done = False
 			if not link: map(os.remove,otmpfiles)
 			print >> sys.stderr, err
 			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		compiler._compile_done = True
 		compiler.cc_cmd = commandline
 		return compiler.outfile
 
@@ -547,8 +539,6 @@ class workspace(object):
 		return self.run_output(compiler)
 
 	def run_output(self, compiler=backendCompiler()):
-		if not compiler._compile_done:
-			return self.compile_and_run(compiler)
 		# Command to execute our binary
 		compiler.cmd = [os.path.join("./",compiler.outfile)] + compiler.args
 		p = Popen(compiler.cmd, stdout = PIPE, stderr = PIPE)
