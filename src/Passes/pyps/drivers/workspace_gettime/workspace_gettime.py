@@ -77,7 +77,7 @@ pyps.module.benchmark_module=benchmark_module
 """ When going to compile, edit all the c files to add the macros
     allowing us to measure the time taken by the program"""
 class workspace:
-	def __init__(self, ws, source, *args, **kwargs):
+	def __init__(self, ws, *args, **kwargs):
 		self.ws = ws
 		self._timefile = self._gen_timefile_name()
 		if "parents" in kwargs and workspace_rt in kwargs["parents"]:

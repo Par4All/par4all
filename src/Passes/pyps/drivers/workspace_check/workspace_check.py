@@ -2,7 +2,7 @@ from __future__ import with_statement # to cope with python2.5
 import pyps
 
 class workspace:
-	def __init__(self, ws, source, *args, **kwargs):
+	def __init__(self, ws, *args, **kwargs):
 		self._cc_ref = kwargs['ccexecp_ref']
 		self._ws = ws
 

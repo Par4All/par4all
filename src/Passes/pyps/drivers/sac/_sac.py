@@ -83,6 +83,10 @@ class sacbase(object):
 		if cond.get("verbose"):
 			module.display()
 
+		module.reduction_atomization()
+		if cond.get("verbose"):
+			module.display()
+
 		for p in ( "__PIPS_SAC_MULADD" , ):
 			module.expression_substitution(pattern=p)
 			if cond.get("verbose"):
@@ -162,6 +166,7 @@ class sacsse(sacbase):
 
 	@staticmethod
 	def addintrinsics(fname):
+		global curr_sse_h
 		replacements = [
 				# drop the alignement attribute on the __m128 registers
 				(r"(v4s[if]_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
@@ -264,8 +269,8 @@ class workspace:
 
 	Add a new transformation, for adapting code to SIMD instruction
 	sets (SSE, 3Dnow, AVX and ARM NEON)"""
-	def __init__(self, ws, sources, **args):
-		# add SIMD.c to the project
+	def __init__(self, ws, **args):
+		# Add SIMD.c and patterns.c to the project
 		self.tmpdir = tempfile.mkdtemp()
 		tmpSIMD = self.tmpdir + "/SIMD.c"
 		tmpPatterns = self.tmpdir + "/patterns.c"
@@ -282,7 +287,7 @@ class workspace:
 		self.ws.cppflags += " -DRWBITS=%d " % (self.driver.register_width)
 
 	def post_init(self, sources, **args):
-		"""Clean the temporary directory used for holding `SIMD.c'."""
+		"""Clean the temporary directory used for holding 'SIMD.c' and 'patterns.c'."""
 		shutil.rmtree(self.tmpdir)
 		for m in self.ws:
 			m.__class__.sac = self.driver.sac
@@ -314,7 +319,8 @@ class workspace:
 
 			pypsutils.string2file(simd_h+"\n"+simd_cus_header, simd_h_fname)
 			for fname in files:
-				pypsutils.addBeginnning(fname, '#include "SIMD.h"')
+				if not fname.endswith("SIMD.c"):
+					pypsutils.addBeginnning(fname, '#include "SIMD.h"')
 
 		# Add the contents of patterns.h
 		for fname in files:

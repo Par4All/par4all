@@ -34,7 +34,7 @@ runtime={}
 
 class workspace:
 	"""A Terapix workspace"""
-	def __init__(self, ws, sources, **args):
+	def __init__(self, ws, **args):
 		"""Add terapix runtime to the workspace"""
 		self.tmpdir = tempfile.mkdtemp()
 		for src in [ dma, assembly ]:

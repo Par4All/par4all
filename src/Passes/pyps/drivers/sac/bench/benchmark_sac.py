@@ -63,12 +63,12 @@ def benchrun(s,calms=None,calibrate_out=None):
 			''' Return the running time with the current kernel size in ms '''
 			ccp.args = make_args(size_kernel)
 			times = ws.benchmark(ccexecp=ccp,iterations=5) # Return time in us
-			return times[module_name][0]/1000
+			return float(times[module_name][0])/1000.0
 
 		cur_runtime = get_run_time(size_kernel)
 		print "Org runtime:",cur_runtime
 		# Compute the first approximation of size_kernel
-		size_kernel = size_kernel * calms/cur_runtime
+		size_kernel = int(size_kernel * calms/cur_runtime)
 		cur_runtime = get_run_time(size_kernel)
 		print "Approx runtime:",cur_runtime
 
@@ -121,7 +121,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 				       remoteExec = s.remoteExec,
 				       cppflags = cflags,
 				       deleteOnClose=False,
-				       recoverIncludes=False,
+				       recoverIncludes=True,
 				       ccexecp_ref=ccp_ref) as ws:
 			m = ws[wcfg.module]
 			if doBench:
@@ -148,8 +148,8 @@ def benchrun(s,calms=None,calibrate_out=None):
 					cc.load()
 					do_benchmark(ws, wcfg, cc, ws.compile, args, n_iter, "nosac")
 
+			m.sac()
 			if not doBench:
-				m.sac()
 				# If we are in validation mode, validate the generic SIMD implementation thanks
 				# to s.cc_reference
 				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref+sac")

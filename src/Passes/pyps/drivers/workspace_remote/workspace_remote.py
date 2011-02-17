@@ -77,7 +77,7 @@ class remoteExec:
 
 
 class workspace:
-	def __init__(self, ws, source, *args, **kwargs):
+	def __init__(self, ws, *args, **kwargs):
 		self.ws = ws
 		self.remoteExec = kwargs["remoteExec"]
 

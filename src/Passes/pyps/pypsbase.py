@@ -276,7 +276,7 @@ class workspace(object):
 		self.cpypips.verbose(int(verbose))
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
-		self._sources=[]
+		self._sources=list(sources)
 		self._org_sources = sources
 
 		if not name :
@@ -293,21 +293,12 @@ class workspace(object):
 			kwargs["cppflags"] = cppflags
 
 
-		# In case the subworkspaces need to add files, the variable passed in
-		# parameter will only be modified here and not in the scope of the caller
-		sources2 = deepcopy(sources)
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
-		# XXX Adrien Guinet : this is a good idea but the problem is that a tuple is
-		# used for sources2, which is immutable. So, sources2 can not be modified inside
-		# any "parent workspace".__init__ function (a new tuple will be created). This
-		# SAC, for instance, does not use this but ws (which is here "self")._sources.append.
-		# Maybe we should juste remove "sources" as an argument for "parent workspace".__init__ ?
-		# memalign does not work in git revision 872b010f420dc66aee04d8338f9abbebabb7749b because of this.
 		self.cppflags = cppflags
 		self.iparents = []
 		for p in parents:
-			pws = p(self, sources2, **kwargs)
+			pws = p(self, **kwargs)
 			self.iparents.append(pws)
 
 		self._modules = {}
@@ -322,12 +313,6 @@ class workspace(object):
 		if self.verbose:
 			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
-		def concatenate_list(x, y):
-			"Concatenate as list even if the second one is a simple element"
-			return x + y if isinstance(y,list) else x + [y]
-		sources2 = reduce(concatenate_list, sources2, [])
-		sources = []
-
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
@@ -336,15 +321,13 @@ class workspace(object):
 			except OSError:pass
 			os.mkdir(self.tmpDirName)
 
-			for f in sources2:
+			new_sources = []
+			for f in self._sources:
 				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
-				sources += [newfname]
+				new_sources += [newfname]
 				pypsutils.guardincludes(newfname)
-		else:
-			sources=sources2
-
-		self._sources += sources
+			self._sources = new_sources
 
 		try:
 			cpypips.create(name, self._sources)
@@ -358,9 +341,11 @@ class workspace(object):
 		pypsutils.build_module_list(self)
 		# Get the workspace name, if any:
 		self._name = self.info("workspace")
-		if self._name:
+		if len(self._name) > 0:
 			# The name is indeed the first element of the returned list:
 			self._name = self._name[0]
+		else:
+			self._name = name
 
 		"""Call all the functions 'post_init' of the given parents"""
 		for pws in reversed(self.iparents):
@@ -368,6 +353,20 @@ class workspace(object):
 				pws.post_init(sources, **kwargs)
 			except AttributeError:
 				pass
+
+	def add_source(self, fname):
+		""" Add a source file to the workspace, using PIPS guard includes if necessary """
+		if self.recoverInclude:
+			newfname = os.path.join(self.tmpDirName,os.path.basename(fname))
+			shutil.copy2(fname, newfname)
+			self.sources += [newfname]
+			pypsutils.guardincludes(newfname)
+		else:
+			self.sources += [fname]
+
+	def add_sources(self, files):
+		""" Add source files to the workspace thanks to add_source """
+		map(self.source_file, files)
 
 	def __enter__(self):
 		"""handler for the with keyword"""
