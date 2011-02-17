@@ -182,6 +182,11 @@ freia_status freia_common_draw_rect(freia_data2d *image,
   }
 
 // AIPO function definitions
+freia_status freia_aipo_scalar_copy(int32_t * p1, const int32_t * p2)
+{
+  *p1 = *p2;
+}
+
 // Arithmetic
 Fbin(freia_aipo_inf);
 Fbin(freia_aipo_sup);

@@ -4,16 +4,16 @@
 
 ! initial function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
+   // redudant measure
    freia_aipo_global_min(in0, x);                                       /*0006*/
-   freia_aipo_global_min(in0, x);                                       /*0007*/
+   freia_aipo_global_min(in0, y);                                       /*0007*/
 }
 
 ! graphs
 
-// graph for dag "dag_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_0" of module "freia_dup_13" in dot format
 digraph "dag_0" {
   // inputs
   "in0" [shape=circle];
@@ -22,13 +22,11 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
   "in0" -> "6 min";
 }
-// graph for dag "dag_cleaned_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_cleaned_0" of module "freia_dup_13" in dot format
 digraph "dag_cleaned_0" {
   // inputs
   "in0" [shape=circle];
@@ -37,20 +35,18 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "7 ?=" [shape=none];
-  "7 ?=" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 ?=" [arrowhead=empty,label="x"];
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
 
 ! updated function for
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
+   // redudant measure
    freia_aipo_global_min(in0, x);                                       /*0006*/
-   freia_aipo_scalar_copy(x, x);                                        /*0007*/
+   freia_aipo_scalar_copy(y, x);                                        /*0007*/
 }
 #
 # SPOC
@@ -58,16 +54,16 @@ void freia_dup_09(freia_data2d *in0, int32_t *x)
 
 ! initial function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
+   // redudant measure
    freia_aipo_global_min(in0, x);                                       /*0006*/
-   freia_aipo_global_min(in0, x);                                       /*0007*/
+   freia_aipo_global_min(in0, y);                                       /*0007*/
 }
 
 ! graphs
 
-// graph for dag "dag_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_0" of module "freia_dup_13" in dot format
 digraph "dag_0" {
   // inputs
   "in0" [shape=circle];
@@ -76,13 +72,11 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
   "in0" -> "6 min";
 }
-// graph for dag "dag_cleaned_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_cleaned_0" of module "freia_dup_13" in dot format
 digraph "dag_cleaned_0" {
   // inputs
   "in0" [shape=circle];
@@ -91,14 +85,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "7 ?=" [shape=none];
-  "7 ?=" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 ?=" [arrowhead=empty,label="x"];
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_09_helper_0_0" of module "freia_dup_09" in dot format
-digraph "freia_dup_09_helper_0_0" {
+// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -116,8 +108,8 @@ digraph "freia_dup_09_helper_0_0" {
 #include <freiaCoarseGrain.h>
 #include <spoc.h>
 
-// FREIA-SPoC helper function for module freia_dup_09
-freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0,
+// FREIA-SPoC helper function for module freia_dup_13
+freia_status freia_dup_13_helper_0_0_0(freia_data2d * i0,
   int32_t * po0)
 {
   spoc_instr si;
@@ -167,20 +159,20 @@ freia_status freia_dup_09_helper_0_0_0(freia_data2d * i0,
 
 ! updated function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
-   freia_aipo_scalar_copy(x, x);                                        /*0007*/
+   // redudant measure
+   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_aipo_scalar_copy(y, x);                                        /*0007*/
 }
 
 ! cleaned up function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0_0(in0, x);                                   /*0006*/
-   freia_aipo_scalar_copy(x, x);                                        /*0007*/
+   // redudant measure
+   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
+   freia_aipo_scalar_copy(y, x);                                        /*0007*/
 }
 #
 # TERAPIX
@@ -188,16 +180,16 @@ void freia_dup_09(freia_data2d *in0, int32_t *x)
 
 ! initial function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
+   // redudant measure
    freia_aipo_global_min(in0, x);                                       /*0006*/
-   freia_aipo_global_min(in0, x);                                       /*0007*/
+   freia_aipo_global_min(in0, y);                                       /*0007*/
 }
 
 ! graphs
 
-// graph for dag "dag_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_0" of module "freia_dup_13" in dot format
 digraph "dag_0" {
   // inputs
   "in0" [shape=circle];
@@ -206,13 +198,11 @@ digraph "dag_0" {
 
   // computation vertices
   "7 min" [shape=diamond];
-  "7 min" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 min" [arrowhead=empty,label="x"];
   "in0" -> "7 min";
   "in0" -> "6 min";
 }
-// graph for dag "dag_cleaned_0" of module "freia_dup_09" in dot format
+// graph for dag "dag_cleaned_0" of module "freia_dup_13" in dot format
 digraph "dag_cleaned_0" {
   // inputs
   "in0" [shape=circle];
@@ -221,14 +211,12 @@ digraph "dag_cleaned_0" {
 
   // computation vertices
   "7 ?=" [shape=none];
-  "7 ?=" -> "6 min" [arrowhead=empty,label="x"];
   "6 min" [shape=diamond];
-  "6 min" -> "7 ?=" [arrowhead=empty,label="x"];
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_09_helper_0_0" of module "freia_dup_09" in dot format
-digraph "freia_dup_09_helper_0_0" {
+// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_helper_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -247,13 +235,13 @@ digraph "freia_dup_09_helper_0_0" {
 #include <terapix.h>
 #include <terapix_ucode.h>
 
-/* FREIA terapix helper function for module freia_dup_09
+/* FREIA terapix helper function for module freia_dup_13
  * 1 input image, 0 output image
  * 2 image operations in dag
  * dag length is 2, dag width is 1
  * cost is 3 cycles per imagelet row
  */
-freia_status freia_dup_09_helper_0_0(
+freia_status freia_dup_13_helper_0_0(
   freia_data2d * i0,
   int32_t * po1)
 {
@@ -326,20 +314,20 @@ freia_status freia_dup_09_helper_0_0(
 
 ! updated function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0(in0, x);                                     /*0006*/
-   freia_aipo_scalar_copy(x, x);                                        /*0007*/
+   // redudant measure
+   freia_dup_13_helper_0_0(in0, x);                                     /*0006*/
+   freia_aipo_scalar_copy(y, x);                                        /*0007*/
 }
 
 ! cleaned up function
 
-void freia_dup_09(freia_data2d *in0, int32_t *x)
+void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
-   // artificial WW dependencies, could be merged...
-   freia_dup_09_helper_0_0(in0, x);                                     /*0006*/
-   freia_aipo_scalar_copy(x, x);                                        /*0007*/
+   // redudant measure
+   freia_dup_13_helper_0_0(in0, x);                                     /*0006*/
+   freia_aipo_scalar_copy(y, x);                                        /*0007*/
 }
 #
 # FREIA COMPILATION DONE
