@@ -1,6 +1,6 @@
 import re
 import pyps
-from pyps import module, workspace
+from pyps import module, workspace, backendCompiler
 
 class ompCompiler(backendCompiler):
 	"""openmp backend compiler to use openmp"""
