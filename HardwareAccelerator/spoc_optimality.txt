@@ -51,7 +51,7 @@
 #      2 freia_skip_02
 #      2 freia_skip_03
 #      2 freia_skip_04
-!?      2 freia_skip_06 (1, bug?)
+#      2 freia_skip_06 (ok, i is live)
 !      4 license_plate_1 (3, greedy)
 !      5 license_plate_2 (4, greedy)
 !      6 license_plate_copies_13 (5, greedy)
