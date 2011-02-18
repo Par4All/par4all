@@ -80,7 +80,7 @@
 #      2 median_1_8
 #      2 median_1_9
 #      2 median_1
-!     10 oop_core_1 (7, quite bad, greedy stupid)
+!     10 oop_core_1 (7, quite bad, greedy stupid; bug in terapix, 3 outputs??)
 !      8 oop_core_2 (7)
 #      6 oop_core_3
 #      6 oop_core_4
