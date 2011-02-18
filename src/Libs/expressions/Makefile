@@ -28,7 +28,8 @@ LIB_CFILES =	partial_eval.c \
 		sequence_gcm_cse.c \
 		instruction_selection.c \
 		expression_substitution.c \
-		simplify.c
+		simplify.c \
+		rename_operator.c
 
 INC_TARGET =    $(TARGET).h
 
