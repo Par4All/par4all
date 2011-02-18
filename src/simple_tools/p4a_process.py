@@ -394,7 +394,7 @@ class p4a_processor(object):
         #    all_properties["OUTLINE_INDEPENDENT_COMPILATION_UNIT"] = True
         # overwrite default properties with the user defined ones
         for k in user_properties:
-            all_properties[k] = properties[k]
+            all_properties[k] = user_properties[k]
         # apply the properties to the workspace
         for k in all_properties:
             p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
