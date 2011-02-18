@@ -86,11 +86,11 @@
 #      6 oop_core_4
 #      6 oop_core
 #     12 vs_core_2_1
-!      8 vs_core_2_2 (7, . bug?)
+!      8 vs_core_2_2 (7, greedy)
 #      5 vs_core_2_3
-!      5 vs_core_2_4 (4?)
-!      5 vs_core_2_5 (4?)
-!      5 vs_core_2_6 (4?)
+!      5 vs_core_2_4 (4, greedy)
+!      5 vs_core_2_5 (4, greedy)
+!      5 vs_core_2_6 (4, greedy)
 #      4 vs_core_2_7
 #      4 vs_core_2
 #      4 vs_core
