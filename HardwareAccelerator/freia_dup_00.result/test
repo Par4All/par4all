@@ -49,7 +49,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_aipo_global_max(i, &max1);                                     /*0007*/
-   freia_aipo_scalar_copy(&max2, &max1);                                /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #
@@ -170,7 +170,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
-   freia_aipo_scalar_copy(&max2, &max1);                                /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 
@@ -181,7 +181,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
-   freia_aipo_scalar_copy(&max2, &max1);                                /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #
@@ -331,7 +331,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
-   freia_aipo_scalar_copy(&max2, &max1);                                /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 
@@ -342,7 +342,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
-   freia_aipo_scalar_copy(&max2, &max1);                                /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #
