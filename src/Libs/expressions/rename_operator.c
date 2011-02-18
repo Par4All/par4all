@@ -131,7 +131,7 @@ void rename_op(call c)
             {
                 //Arguments have not the same type
                 //Skip it
-                free(t); free(n);
+                free_type(t); free(n);
                 return;
             }
             free(tname);
@@ -141,10 +141,10 @@ void rename_op(call c)
         {
         	//Not a basic type, maybe a compound type
         	//Skip it
-        	free(t);
+        	free_type(t);
         	return;
         }
-        free(t);
+        free_type(t);
     }
 
     if(!tname)
@@ -154,7 +154,10 @@ void rename_op(call c)
     //Try to find the suffix
     const char* suffix = typesuffix(tname);
     if(!suffix || !set_belong_p(suffixes_set, suffix))
+    {
+        free(tname);
         return; //Unknow suffix, is it really a basic type ?
+    }
 
     //Now try to construct a complete function name for the operator
     //Function name look like TOP-LEVEL:<prefix><op name><type suffix>
@@ -196,29 +199,14 @@ void rw_loop(statement sl)
         do_loop_to_for_loop(sl);
 }
 
-static
+static 
 set make_string_set_from_prop(string prop)
 {
-        char *bp, *sp;
-        char c;
-       bp = sp = prop;
-
-       set s = set_make(set_string);
-
-       for(;; c = *++sp)
-       {
-               if(c == ' ' || c == '\0')
-               {
-                       *sp = '\0';
-                       set_add_element(s,s,(void*)bp);
-                       bp = sp+1;
-               }
-
-               if(c == '\0')
-                       break;
-       }
-
-       return s;
+    set s = set_make(set_string);
+    list l = strsplit(prop," ");
+    set_append_list(s, l);
+    //list_free(l);
+    return s;
 }
 
 
