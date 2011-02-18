@@ -39,7 +39,6 @@
 !      6 freia_42 (5?)
 !      6 freia_43 (5, idem previous)
 #      2 freia_dup_05 (could be 1 with advanced trafo? not sure)
-#      1 freia_dup_09
 #      2 freia_reuse_01
 #      2 freia_scalar_00
 #      2 freia_scalar_02
