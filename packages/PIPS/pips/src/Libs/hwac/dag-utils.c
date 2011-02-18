@@ -512,7 +512,56 @@ static bool gen_list_equals_p(const list l1, const list l2)
   return equal;
 }
 
+/* replace target measure to a copy of source result...
+ * @param target to be removed/replaced because redundant
+ * @param source to be kept
+ * @return whether the statement is to be actually removed
+ */
+static bool
+switch_vertex_to_assign(dagvtx target, dagvtx source)
+{
+  pips_debug(5, "replacing measure %"_intFMT" by %"_intFMT" result\n",
+             dagvtx_number(target), dagvtx_number(source));
+
+  // update target vertex
+  vtxcontent cot = dagvtx_content(target);
+  vtxcontent_optype(cot) = spoc_type_oth;
+  vtxcontent_opid(cot) = hwac_freia_api_index("freia_aipo_scalar_copy");
+  // no more image inputs
+  gen_free_list(vtxcontent_inputs(cot));
+  vtxcontent_inputs(cot) = NIL;
+
+  // ??? source -> target scalar dependency?
+
+  // update actual statement.
+  call cref = statement_call(dagvtx_statement(source));
+  expression eref = EXPRESSION(CAR(CDR(call_arguments(cref))));
+  call cnew = statement_call(dagvtx_statement(target));
+  expression enew = EXPRESSION(CAR(CDR(call_arguments(cnew))));
+
+  if (expression_equal_p(eref, enew))
+    // just remove the fully redundant measure
+    return true;
+
+  // replace by assign
+  call_function(cnew) = local_name_to_top_level_entity("=");
+
+  // ??? memory leak or core dump
+  // gen_full_free_list(call_arguments(cnew));
+  // possibly due to effects which are loaded?
+  call_arguments(cnew) =
+    gen_make_list(expression_domain,
+                  dereference_expression(enew),
+                  dereference_expression(eref),
+                  NIL);
+
+  return false;
+}
+
 /* replace target vertex by a copy of source results...
+ * @param target to be removed
+ * @param source does perform the same computation
+ * @param tpreds target predecessors to be added to source
  */
 static void
 switch_vertex_to_a_copy(dagvtx target, dagvtx source, list tpreds)
@@ -757,14 +806,15 @@ list /* of statements */ dag_optimize(dag d)
     FOREACH(dagvtx, vr, vertices)
     {
       pips_debug(7, "at vertex %"_intFMT"\n", dagvtx_number(vr));
+
       // skip no-operations
       int op = (int) vtxcontent_optype(dagvtx_content(vr));
-      if (op<spoc_type_poc || op>spoc_type_thr) continue;
+      if (op<spoc_type_poc || op>spoc_type_mes) continue;
 
       // skip already removed ops
       if (set_belong_p(remove, vr)) continue;
 
-      pips_debug(8, "invesgating...\n");
+      pips_debug(8, "investigating...\n");
       list preds = dag_vertex_preds(d, vr);
       bool switched = false;
       HASH_MAP(pp, lp,
@@ -775,8 +825,21 @@ list /* of statements */ dag_optimize(dag d)
                    dagvtx_number(vr), dagvtx_number(p));
 
         // ??? maybe I should not remove all duplicates, because
-        // recomputing them may be cheap?
-        if (same_operation_p(vr, p) &&
+        // recomputing them may be cheaper?
+        if (dagvtx_is_measurement_p(vr) || dagvtx_is_measurement_p(p))
+        {
+          // special handling for measures, esp for terapix
+          if (same_operation_p(vr, p) &&
+              gen_list_equals_p(preds, (list) lp))
+          {
+            // min(A, px), min(A, py) => min(A, px) && *py = *px
+            if (switch_vertex_to_assign(vr, p))
+              set_add_element(remove, remove, vr);
+            switched = true;
+            break;
+          }
+        }
+        else if (same_operation_p(vr, p) &&
             gen_list_equals_p(preds, (list) lp) &&
             same_constant_parameters(vr, p))
         {

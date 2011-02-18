@@ -3574,5 +3574,26 @@ expression MakeBraceExpression(list l)
   return make_call_expression(CreateIntrinsic(BRACE_INTRINSIC),l);
 }
 
+/* generate a newly allocated expression for *(e)
+ */
+expression dereference_expression(expression e)
+{
+  if (expression_call_p(e))
+  {
+    call c = expression_call(e);
+    entity address = CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME);
 
+    if (call_function(c)==address) // "e == &x"
+    {
+      pips_assert("one arg to address operator (&)",
+                  gen_length(call_arguments(c))==1);
 
+      // result is simply "x"
+      return copy_expression(EXPRESSION(CAR(call_arguments(c))));
+    }
+  }
+
+  // result is "*e"
+  return MakeUnaryCall(CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+                       copy_expression(e));
+}
