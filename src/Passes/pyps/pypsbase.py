@@ -2,6 +2,7 @@
 from __future__ import with_statement # to cope with python2.5
 import pypips
 import pypsutils
+import pypsconfig
 import os
 import sys
 import tempfile
@@ -279,11 +280,11 @@ class workspace(object):
 			use the boolean `deleteOnClose' to turn full workspace deletion on/off
 		"""
 
-		name           = kwargs.setdefault("name",           "")
-		verbose        = kwargs.setdefault("verbose",        True)
-		cppflags       = kwargs.setdefault("cppflags",       "")
-		parents        = kwargs.setdefault("parents",        [])
-		cpypips	       = kwargs.setdefault("cpypips",        pypips)
+		name		   = kwargs.setdefault("name",		   "")
+		verbose		= kwargs.setdefault("verbose",		True)
+		cppflags	   = kwargs.setdefault("cppflags",	   "")
+		parents		= kwargs.setdefault("parents",		[])
+		cpypips		   = kwargs.setdefault("cpypips",		pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
 
@@ -371,21 +372,7 @@ class workspace(object):
 				pws.post_init(sources, **kwargs)
 			except AttributeError:
 				pass
-
-	def add_source(self, fname):
-		""" Add a source file to the workspace, using PIPS guard includes if necessary """
-		if self.recoverInclude:
-			newfname = os.path.join(self.tmpDirName,os.path.basename(fname))
-			shutil.copy2(fname, newfname)
-			self.sources += [newfname]
-			pypsutils.guardincludes(newfname)
-		else:
-			self.sources += [fname]
-
-	def add_sources(self, files):
-		""" Add source files to the workspace thanks to add_source """
-		map(self.source_file, files)
-
+	
 	def __enter__(self):
 		"""handler for the with keyword"""
 		return self

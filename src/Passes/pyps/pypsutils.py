@@ -207,3 +207,13 @@ def patchIncludes(s):
 		s+=" -I."
 	return s
 
+def get_runtimefile(self, fname):
+		"""Returns runtime file path"""
+		
+		if os.path.exists(fname):
+			return fname
+		elif os.path.exists(os.path.join(pypsconfig.terapypsruntime,runtimefile)):
+			return self,os.path.join(pypsconfig.terapypsruntime,runtimefile)
+		else:
+			raise RuntimeError, "Cannot find runtime file : "+fname	
+
