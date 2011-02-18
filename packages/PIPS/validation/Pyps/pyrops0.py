@@ -4,7 +4,7 @@ from __future__ import with_statement # this is to work with python2.5
 
 # import everything so that a session looks like tpips one
 from pyrops import pworkspace
-from pyps import ccexecParams
+from pyps import backendCompiler
 import shutil,os,pyrops
 
 
@@ -55,7 +55,7 @@ with pworkspace("basics0.c",deleteOnClose=True) as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	a_out=w.compile(ccexecParams(CC="gcc",rep="basics0"), link=False)
+	a_out=w.compile(backendCompiler(CC="gcc",rep="basics0"), link=False)
 
 # tidy ..
 shutil.rmtree("basics0")
