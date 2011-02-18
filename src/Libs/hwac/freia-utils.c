@@ -200,9 +200,8 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
     TRPX_OP(2, "SET_CONST?")
   },
-  // this is used temporarily (?)
-  // it is currently generated when redudant measures are removed
-  // but I may switch to assign "=" later
+  // not a real one, this is used internally only
+  // semantics of "scalar_copy(a, b);" is "*a = *b;"
   { AIPO "scalar_copy", "?=", NULL, 0, 0, 1, 1, NO_PARAM,
       { TY_INT, TY_INT, NULL},
     { 0, NO_POC, alu_unused, NO_MES },

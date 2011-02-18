@@ -513,8 +513,11 @@ static bool gen_list_equals_p(const list l1, const list l2)
 }
 
 /* replace target measure to a copy of source result...
+ * @param target to be removed as redundant
+ * @param source to be kept
+ * @return whether the statement is to be removed
  */
-static void
+static bool
 switch_vertex_to_assign(dagvtx target, dagvtx source)
 {
   pips_debug(5, "replacing measure %"_intFMT" by %"_intFMT" result\n",
@@ -536,14 +539,23 @@ switch_vertex_to_assign(dagvtx target, dagvtx source)
   call cnew = statement_call(dagvtx_statement(target));
   expression enew = EXPRESSION(CAR(CDR(call_arguments(cnew))));
 
-  call_function(cnew) =
-    local_name_to_top_level_entity("freia_aipo_scalar_copy"); // "="
+  if (expression_equal_p(eref, enew))
+    // just remove the fully redundant measure
+    return true;
+
+  // replace by assign
+  call_function(cnew) = local_name_to_top_level_entity("=");
 
   // ??? memory leak or core dump
   // gen_full_free_list(call_arguments(cnew));
+  // possibly due to effects which are loaded?
   call_arguments(cnew) =
-    CONS(EXPRESSION, copy_expression(enew),
-         CONS(EXPRESSION, copy_expression(eref), NIL));
+    gen_make_list(expression_domain,
+                  dereference_expression(enew),
+                  dereference_expression(eref),
+                  NIL);
+
+  return false;
 }
 
 /* replace target vertex by a copy of source results...
@@ -821,7 +833,8 @@ list /* of statements */ dag_optimize(dag d)
               gen_list_equals_p(preds, (list) lp))
           {
             // min(A, px), min(A, py) => min(A, px) && *py = *px
-            switch_vertex_to_assign(vr, p);
+            if (switch_vertex_to_assign(vr, p))
+              set_add_element(remove, remove, vr);
             switched = true;
             break;
           }
