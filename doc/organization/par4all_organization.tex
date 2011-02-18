@@ -97,6 +97,7 @@ Fedora Core 13 \& 14 and Debian/unstable.
 
 To run \Apfa with Debian or Ubuntu, the following packages are needed:
 \begin{quote}
+  \texttt{libmpfr1ldbl},
   \texttt{libncurses5}, \texttt{libreadline5}, \texttt{python},
   \texttt{python-ply}, \texttt{python3.1}, \texttt{gfortran},
   \texttt{ipython}.
@@ -192,7 +193,7 @@ and run \verb|p4a_setup.py| again. The
 ensure that all sources are recompiled
 (since \Apips is a frequently-updated project, incremental build is
 not always guaranteed to succeed). Removing the \texttt{build}
-directory 
+directory
 when the \verb|--prefix| directory changes is also recommended
 in order to remove obsolete
 information about the installation directory that may remain in
