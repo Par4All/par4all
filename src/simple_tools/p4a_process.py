@@ -346,7 +346,7 @@ class p4a_processor(object):
             # one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
-            self.workspace = pyps.workspace(self.files,
+            self.workspace = pyps.workspace(*self.files,
                                             name = self.project_name,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
