@@ -1,0 +1,30 @@
+int main()
+{
+   float a[10];
+   float b[10][10][10][10][10];
+   int m;
+   m = 0;
+   int n;
+   n = 0;
+   int o;
+   o = 2;
+
+   for(m = 0; m <= 9; m += 1) {
+      n = n+1;
+      a[m] = n;
+   }
+
+#pragma omp parallel for reduction(+:o)
+   for(m = 0; m <= 9; m += 1) {
+      o = 2+o;
+      o = 2+o;
+   }
+   for(m = 0; m <= 9; m += 1) {
+      // comments 4
+      n = n+1;
+      n = n+5;
+      b[0][0][1][m][0] = n;
+   }
+
+   return o;
+}

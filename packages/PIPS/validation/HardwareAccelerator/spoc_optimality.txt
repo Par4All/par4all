@@ -39,7 +39,6 @@
 !      6 freia_42 (5?)
 !      6 freia_43 (5, idem previous)
 #      2 freia_dup_05 (could be 1 with advanced trafo? not sure)
-!?      2 freia_dup_09 (1, artificial dependency *BUG*)
 #      2 freia_reuse_01
 #      2 freia_scalar_00
 #      2 freia_scalar_02
@@ -52,7 +51,7 @@
 #      2 freia_skip_02
 #      2 freia_skip_03
 #      2 freia_skip_04
-!?      2 freia_skip_06 (1, bug?)
+#      2 freia_skip_06 (ok, i is live)
 !      4 license_plate_1 (3, greedy)
 !      5 license_plate_2 (4, greedy)
 !      6 license_plate_copies_13 (5, greedy)

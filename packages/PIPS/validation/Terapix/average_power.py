@@ -20,7 +20,7 @@ def vconv(tiling_vector):
 
 
 if __name__ == "__main__":
-	w = workspace(["average_power.c","include/terapix_runtime.c"], cppflags="-I.",deleteOnClose=True)
+	w = workspace("average_power.c","include/terapix_runtime.c", cppflags="-I.",deleteOnClose=True)
 	w.props.constant_path_effects=False
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
