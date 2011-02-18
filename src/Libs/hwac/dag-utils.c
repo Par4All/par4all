@@ -513,9 +513,9 @@ static bool gen_list_equals_p(const list l1, const list l2)
 }
 
 /* replace target measure to a copy of source result...
- * @param target to be removed as redundant
+ * @param target to be removed/replaced because redundant
  * @param source to be kept
- * @return whether the statement is to be removed
+ * @return whether the statement is to be actually removed
  */
 static bool
 switch_vertex_to_assign(dagvtx target, dagvtx source)
