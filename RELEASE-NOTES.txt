@@ -1,4 +1,4 @@
-Release notes for Par4All 1.0.5, 2010/02/03
+Release notes for Par4All 1.1, 2011/02/18
 ===========================================
 
 Ronan Keryell, HPC Project.
@@ -70,7 +70,7 @@ versions. Development packages are generated often, may be unstable, and
 are best suited if you want to track more closely the Par4All development.
 
 Once this is done, run your favorite graphics package tool
-(``synaptic``...)  or::
+(``synaptic``...) or::
 
   sudo aptitude update
   sudo aptitude install par4all
@@ -93,7 +93,8 @@ An even less automatic way is to use a tar ball ``.tar.gz`` file. It
 contains the binaries as built on a stable Ubuntu or unstable Debian
 distribution. It should work on any GNU/Linux distribution with the
 following libraries installed: (a fairly recent) ``libc.so.6``,
-``libncurses.so.5``, ``libreadline.so.6``
+``libncurses.so.5``, ``libreadline.so.6``, etc. Look at the Par4All
+organization documentation to have the list of some needed packages.
 
 Once you have downloaded one of these ``.tar.gz`` packages from
 http://download.par4all.org, extract it with the following command::
@@ -103,7 +104,7 @@ http://download.par4all.org, extract it with the following command::
 It will create a directory named ``par4all``. Move this directory to its final
 location::
 
-  sudo mv par4all /usr/local/
+  sudo mv par4all /usr/local
 
 In any case, you will then need to source one of the following shell
 scripts which set up the environment variables for proper Par4All
@@ -137,9 +138,8 @@ Have a look at ``examples/README.txt``
 Fortran
 -------
 
-The support for Fortran95 is not included in this release since it was not
-mature enough at this release time, so only Fortran 77 with some
-extensions is currently accepted.
+A light Fortran95 support begins with this release. But only Fortran 77
+with some extensions is to be used for production.
 
 
 C
@@ -148,12 +148,11 @@ C
 Full C99 support is almost complete but right now there are nevertheless
 few known limitations :
 
-- variables in functions can only be defined at the beginning of a block,
-  before any normal statement (like in C89)
-
 - you should avoid heavy use of pointers to enable a good
   parallelization. The point-to analysis is still on-going in PIPS, but in
-  the general case it is untractable... So avoid if possible.
+  the general case it is untractable... So avoid if possible. Use nice C99
+  multidimensional arrays with dynamic size (as in Fortran for long time)
+  and pointer to arrays instead.
 
 - there are still issues in the part that analyzes the control graph (the
   PIPS ``controlizer``). For example, right now we cannot deal well with a
@@ -164,7 +163,7 @@ few known limitations :
   variables since those are internally represented with ``goto``.
 
 
-Cuda
+CUDA
 ----
 
 To compile and to run the CUDA output, you should have the following
@@ -174,6 +173,10 @@ environment variables set:
   ``/usr/local/cuda``)
 
 - ``LD_LIBRARY_PATH`` should contains at least ``$CUDA_DIR/lib64``
+
+There is now a static dataflow analysis to optimize communications between
+host and GPU and to remove redundant GPU array allocation. Have a look to
+the ``--com-optimization`` option.
 
 Sometimes, Par4All generates C99 array parameter declarations in the
 generated CUDA kernels that are not yet dealt with ``nvcc`` 3.2. To avoid this,
@@ -201,7 +204,7 @@ accept function declarations with incomplete types such as::
   void saxpy (long long size, t_precision dst[], t_precision src[], t_precision alpha) {
     long long i = 0;
     for (i = 0; i < size; i++)
-	  dst[i] = alpha * src[i] + dst[i];
+      dst[i] = alpha * src[i] + dst[i];
   }
 
 In this release the shared memory is not used yet, so to get the best
@@ -227,7 +230,7 @@ the target.
 Due to the immature state of the special code generation for the Ter@pix
 SIMD image processor from Thales TRT (funded by FREIA ANR project) or the
 SCMP dataflow architecture from CEA (funded by SCALOPES ARTEMIS European
-project) are not included in this release.
+project) are not included in this release yet.
 
 
 SIMD and multimedia extensions
@@ -236,16 +239,6 @@ SIMD and multimedia extensions
 The SIMD (SSE) output is not included in this release yet since it was not
 ready at release time but should be in a next release.
 
-
-Python
-------
-
-On Debian, PLY seems to be installed only with Python 2.x. It works with
-Python 2.6 and 3.1 with the ``PYTHONPATH`` generated for Par4All (with a
-trailing ``:/usr/share/pyshared``). Unfortunately this breaks ``ipyps``.
-
-On Ubuntu 10.04 there are also some configuration issues that make Python to
-output harmless warning messages.
 
 This text is typeset according to the reStructuredText Markup
 Specification. For more information:
