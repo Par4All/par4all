@@ -1,24 +1,24 @@
-void microcode(int i, int isi, int isj, float *image, float *kernel, float *new_image)
+void microcode(int i, int isi, int isj, int *image, int *kernel, int *new_image)
 {
-   float F_17;
-   float F_16;
-   float F_15;
+   int F_17;
+   int F_16;
+   int F_15;
    int I_22;
    int I_21;
-   float F_14;
-   float F_13;
-   float F_12;
+   int F_14;
+   int F_13;
+   int F_12;
    int I_20;
-   float F_11;
-   float F_10;
-   float F_9;
+   int F_11;
+   int F_10;
+   int F_9;
    int I_19;
    int I_18;
    int I_17;
    int I_14;
    int I_9;
    int I_5;
-   float __scalar__0;
+   int __scalar__0;
    int j;
    int i_1_0;
    int ki_0;
