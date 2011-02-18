@@ -1,2 +1,0 @@
-gcc -c -DP4A_ACCEL_OPENMP -I/home/janice/p4a/share/p4a_accel -DDEBUG -Wall -fno-strict-aliasing -fPIC -g -O3 -std=c99 -fopenmp -o $1.o $1.c
-# gcc -lm -fopenmp -o $1 $1.o

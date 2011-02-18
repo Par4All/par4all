@@ -1,2 +1,0 @@
-gcc -c -DDEBUG -Wall -fno-strict-aliasing -fPIC -g -O3 -std=c99 -fopenmp -o $1.o $1.c
-gcc -lm -fopenmp -o $1 $1.o
