@@ -4,6 +4,7 @@ import os
 import fileinput
 import sys
 import pyps
+import pypsconfig
 
 """ Pyps tool box
 it contains various utilities used in pyps.
@@ -207,13 +208,12 @@ def patchIncludes(s):
 		s+=" -I."
 	return s
 
-def get_runtimefile(self, fname):
+def get_runtimefile(fname,subdir=None):
 		"""Returns runtime file path"""
-		
-		if os.path.exists(fname):
-			return fname
-		elif os.path.exists(os.path.join(pypsconfig.terapypsruntime,runtimefile)):
-			return self,os.path.join(pypsconfig.terapypsruntime,runtimefile)
-		else:
-			raise RuntimeError, "Cannot find runtime file : "+fname	
+		searchdirs=[".",pypsconfig.pypsruntime]
+		if subdir: searchdirs.insert(1,os.path.join(pypsconfig.pypsruntime,subdir))
+		for d in searchdirs:
+			f=os.path.join(d,fname)
+			if os.path.isfile(f):return f
+		raise RuntimeError, "Cannot find runtime file : " + fname + "\nsearch path: "+":".join(searchdirs)
 

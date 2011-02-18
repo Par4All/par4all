@@ -14,7 +14,7 @@ def generate_check_ref(self):
 	else :
 		print err
 		exit(1)
-workspace.generate_check_ref=generate_check_ref
+pyps.workspace.generate_check_ref=generate_check_ref
 
 def check(self,debug):
 	if debug:
@@ -27,17 +27,17 @@ def check(self,debug):
 				print "**** check ok ******"
 		else :
 			exit(1)
-workspace.check=check
+pyps.workspace.check=check
 
-dma="terapix"
-assembly="terasm"
-runtime={}
+dma="terapix.c"
+assembly="terasm.c"
+runtime=["terapix", "terasm"]
 
 class workspace(pyps.workspace):
 	"""A Terapix workspace"""
 	def __init__(self, *sources, **kwargs):
 		"""Add terapix runtime to the workspace"""
-		super(workspace,self).__init__(pypsutils.get_runtimefile(dma),pypsutils.get_runtimefile(assembly), *sources, **kwargs)
+		super(workspace,self).__init__(pypsutils.get_runtimefile(dma,"terapyps"),pypsutils.get_runtimefile(assembly,"terapyps"), *sources, **kwargs)
 
 def smart_loop_expansion(m,l,sz,debug,center=False):
 	""" smart loop expansion, has a combinaison of loop_expansion_init, statement_insertion and loop_expansion """
@@ -69,7 +69,7 @@ def all_callers(m):
 
 def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	"""Generate terapix code for m if it's not part of the runtime """
-	if m.cu in runtime.keys():return
+	if m.cu in runtime:return
 	w=m._ws
 	w.generate_check_ref()
 	# choose the proper analyses and properties
@@ -131,6 +131,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 					if debug:k.display()
 				w.check(debug)
 
+
 	for l0 in m.loops():
 		for l1 in l0.loops():
 			for l2 in l1.loops():
@@ -141,6 +142,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 				if debug:m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.partial_eval()
+	w.check(debug)
 	#m.iterator_detection()
 	#m.array_to_pointer(convert_parameters="POINTER",flatten_only=False)
 	#m.display(activate="PRINT_CODE_PROPER_EFFECTS")
@@ -209,7 +211,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	# generate assembly
 	for m in microcodes:
 		for asm in w.fun:
-			if asm.cu == assembly:
+			if asm.cu == runtime[1]:
 				m.expression_substitution(asm.name)
 		if debug:m.display()
 		terapyps_asm.conv(w.dirname()+m.show("printed_file"),sys.stdout)

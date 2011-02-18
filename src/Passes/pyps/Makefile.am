@@ -67,7 +67,7 @@ pyps.py:$(p2p_cmd) Makefile
 pips-make: pips-make.in
 	sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
 
-pypsconfig.py:
-	echo 'terapypsruntime="$(pypsruntime)/terapyps"' > pypsconfig.py
+pypsconfig.py:Makefile
+	echo 'pypsruntime="$(pypsruntimedir)"' > pypsconfig.py
 
 CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h pypsconfig.py
