@@ -115,6 +115,7 @@ class p4a_processor_input(object):
     output_prefix=""
     # To store some arbitrary Python code to be executed inside p4a_process:
     execute_some_python_code_in_process = None
+    apply_before_parallelization=[]
 
 
 def add_module_options(parser):
@@ -157,12 +158,13 @@ def process(input):
             recover_includes = input.recover_includes,
             native_recover_includes = input.native_recover_includes,
             properties = input.properties,
+            apply_phases_before = input.apply_before_parallelization,       
         )
 
         output.database_dir = processor.get_database_directory()
 
         # First apply some generic parallelization:
-        processor.parallelize(fine = input.fine)
+        processor.parallelize(fine = input.fine, apply_phases_before=input.apply_before_parallelization )
 
         if input.accel:
             # Generate code for a GPU-like accelerator. Note that we can
@@ -272,7 +274,7 @@ class p4a_processor(object):
                  openmp = False, com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False,
-                 properties = {}, activates = []):
+                 properties = {}, apply_phases_before=[], activates = []):
 
         self.recover_includes = recover_includes
         self.native_recover_includes = native_recover_includes
@@ -282,6 +284,7 @@ class p4a_processor(object):
         self.com_optimization = com_optimization
         self.fftw3 = fftw3
         self.c99 = c99
+        self.apply_phases_before = apply_phases_before
 
         if workspace:
             # There is one provided: use it!
@@ -346,7 +349,7 @@ class p4a_processor(object):
             # one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
-            self.workspace = pyps.workspace(*self.files,
+            self.workspace = pyps.workspace(self.files,
                                             name = self.project_name,
                                             verbose = verbose,
                                             cppflags = cpp_flags,
@@ -394,7 +397,7 @@ class p4a_processor(object):
         #    all_properties["OUTLINE_INDEPENDENT_COMPILATION_UNIT"] = True
         # overwrite default properties with the user defined ones
         for k in user_properties:
-            all_properties[k] = user_properties[k]
+            all_properties[k] = properties[k]
         # apply the properties to the workspace
         for k in all_properties:
             p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
@@ -435,15 +438,19 @@ class p4a_processor(object):
         return self.workspace.filter(filter)
 
 
-    def parallelize(self, fine = False, filter_select = None, filter_exclude = None):
+    def parallelize(self, fine = False, filter_select = None, filter_exclude = None, apply_phases_before = None):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
+        
+        for ph in apply_phases_before:
+			 getattr(all_modules, ph)()
 
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
 
         if fine:
+			
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code()
         else:
