@@ -156,7 +156,7 @@
 			vec[i] = n;\
 		}\
 		va_end(ap);\
-	}\
+	}
 
 #define SIMD_STORE_TYPE(A,T) _SIMD_STORE_TYPE(T,RWBITS,A)
 #define _SIMD_STORE_TYPE(T,RWB,A) __SIMD_STORE_TYPE(T,RWB,A) // Process the "A" macro
@@ -182,7 +182,7 @@
 			*pn = vec[i];\
 		}\
 		va_end(ap);\
-	}\
+	}
 
 
 // Conversion functions
@@ -207,7 +207,7 @@
 #define _SIMD_STORE_CONV(A,TO,TD,RWB) __SIMD_STORE_CONV(A, TO, TD, RWB)
 #define __SIMD_STORE_CONV(A,TO,TD,RWB) ___SIMD_STORE_CONV(A,TO,TD,VW_##RWB##_##TD,LSTYPE_##TO,LSTYPE_##TD)
 #define ___SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST) ____SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST)
-#define ____SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST)\
+#define ____SIMD_STORE_CONV(A,TD,TO,VWD,TDLST,TOLST)\
 	void SIMD_STORE_##A##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TO src[VWD], CTYPE_##TD dst[VWD])\
 	{\
 		int i;\

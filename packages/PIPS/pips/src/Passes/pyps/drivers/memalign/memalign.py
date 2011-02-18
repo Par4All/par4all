@@ -45,7 +45,7 @@ def array2arrayalign(line):
     return line
 
 class workspace:
-    def __init__(self, ws, sources, *args, **kwargs):
+    def __init__(self, ws, *args, **kwargs):
         # defaults to false, as the user needs to invoke memalign
         self.memaligned = False
         self.ws = ws

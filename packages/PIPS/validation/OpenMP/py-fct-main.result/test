@@ -1,0 +1,23 @@
+void fct_lib(const long int size, t_real x[size])
+{
+   long int i;
+   
+   // compare loop
+#pragma omp parallel for
+   for(i = 0; i <= size-1; i += 1)
+      x[i] = x[i-1]+x[i]+x[i+1];
+   return;
+}
+int main()
+{
+   long int i;
+   t_real v[100];
+   
+   // load vector
+#pragma omp parallel for
+   for(i = 0; i <= 99; i += 1)
+      v[i] = 1.0;
+   
+   // exit without doing anything
+   return 0;
+}

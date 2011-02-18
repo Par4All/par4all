@@ -36,9 +36,9 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 max" [shape=diamond];
+  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
-  "i" -> "8 max";
+  "i" -> "8 ?=";
   "i" -> "7 max";
 }
 
@@ -49,7 +49,7 @@ int freia_dup_00(freia_data2d *i)
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
    freia_aipo_global_max(i, &max1);                                     /*0007*/
-   freia_aipo_global_max(i, &max2);                                     /*0008*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #
@@ -90,9 +90,9 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 max" [shape=diamond];
+  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
-  "i" -> "8 max";
+  "i" -> "8 ?=";
   "i" -> "7 max";
 }
 // graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
@@ -103,9 +103,7 @@ digraph "freia_dup_00_helper_0_0" {
   // outputs
 
   // computation vertices
-  "8 max" [shape=diamond];
   "7 max" [shape=diamond];
-  "i" -> "8 max";
   "i" -> "7 max";
 }
 
@@ -118,8 +116,7 @@ digraph "freia_dup_00_helper_0_0" {
 
 // FREIA-SPoC helper function for module freia_dup_00
 freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0,
-  int32_t * po0,
-  int32_t * po1)
+  int32_t * po0)
 {
   spoc_instr si;
   spoc_param sp;
@@ -139,9 +136,6 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0,
   // i [0 input 0] -> [0 measure 0] 0 undefined
   si.mux[0][0].op = SPOC_MUX_IN0;
 
-  // i [0 measure 0] -> [0 measure 0] 0 undefined
-  // nope
-
 
   // no output image
 
@@ -158,16 +152,13 @@ freia_status freia_dup_00_helper_0_0_0(freia_data2d * i0,
   ret |= freia_cg_write_dynamic_param(&dynparam);
 
   // actual call of spoc hardware
-  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, i0);
+  freia_cg_template_process_2i_2o(&param, NULL, NULL, i0, NULL);
 
   // get reductions
   freia_cg_read_reduction_results(&redres);
 
   // measure 7 global_max stage 0 side 0
   *po0 = (int32_t) reduc.measure[0][0].maximum;
-
-  // measure 8 global_max stage 0 side 0
-  *po1 = (int32_t) reduc.measure[0][0].maximum;
 
   return ret;
 }
@@ -178,7 +169,8 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1, &max2);                          /*0007*/
+   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 
@@ -188,7 +180,8 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0_0(i, &max1, &max2);                          /*0007*/
+   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #
@@ -229,9 +222,9 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 max" [shape=diamond];
+  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
-  "i" -> "8 max";
+  "i" -> "8 ?=";
   "i" -> "7 max";
 }
 // graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
@@ -242,9 +235,7 @@ digraph "freia_dup_00_helper_0_0" {
   // outputs
 
   // computation vertices
-  "8 max" [shape=diamond];
   "7 max" [shape=diamond];
-  "i" -> "8 max";
   "i" -> "7 max";
 }
 
@@ -258,14 +249,13 @@ digraph "freia_dup_00_helper_0_0" {
 
 /* FREIA terapix helper function for module freia_dup_00
  * 1 input image, 0 output image
- * 3 image operations in dag
+ * 2 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 6 cycles per imagelet row
+ * cost is 3 cycles per imagelet row
  */
 freia_status freia_dup_00_helper_0_0(
   freia_data2d * i0,
-  int32_t * po1,
-  int32_t * po2)
+  int32_t * po1)
 {
   // declarations:
   freia_microcode mcode;
@@ -274,7 +264,7 @@ freia_status freia_dup_00_helper_0_0(
   terapix_gram gram;
   int i;
   freia_status ret;
-  terapix_mcu_instr mcu_instr[2][2];
+  terapix_mcu_instr mcu_instr[2][1];
 
   // imagelets definitions:
   // - 1 computation imagelets
@@ -311,18 +301,6 @@ freia_status freia_dup_00_helper_0_0(
   mcu_instr[1][0].macrocode.iter2 = imagelet_size;
   mcu_instr[0][0].macrocode.addrStart = TERAPIX_UCODE_MAX?;
   mcu_instr[1][0].macrocode.addrStart = TERAPIX_UCODE_MAX?;
-  // set measure max at 1022
-  // 1: max(1)
-  mcu_instr[0][1].macrocode.xmin1 = imagelet_io_1_0;
-  mcu_instr[1][1].macrocode.xmin1 = imagelet_io_1_1;
-  mcu_instr[0][1].macrocode.ymin1 = 0;
-  mcu_instr[1][1].macrocode.ymin1 = 0;
-  mcu_instr[0][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[1][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_instr[0][1].macrocode.iter2 = imagelet_size;
-  mcu_instr[1][1].macrocode.iter2 = imagelet_size;
-  mcu_instr[0][1].macrocode.addrStart = TERAPIX_UCODE_MAX?;
-  mcu_instr[1][1].macrocode.addrStart = TERAPIX_UCODE_MAX?;
   // inputs:
   // - imagelet 1 is i0 for i
 
@@ -341,7 +319,6 @@ freia_status freia_dup_00_helper_0_0(
 
   // extract measures
   // get measure max result from 1023
-  // get measure max result from 1022
 
   return ret;
 }
@@ -353,7 +330,8 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0(i, &max1, &max2);                            /*0007*/
+   freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 
@@ -363,7 +341,8 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0(i, &max1, &max2);                            /*0007*/
+   freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
+   max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
 #

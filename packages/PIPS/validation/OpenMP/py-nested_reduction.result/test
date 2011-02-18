@@ -1,0 +1,17 @@
+int main(void)
+{
+   int k, i;
+   k = 0;
+   i = 0;
+   int sum;
+   sum = 0;
+
+#pragma omp parallel for private(i) reduction(+:sum)
+   for(k = 0; k <= 99; k += 1)
+      for(i = 0; i <= 99; i += 1)
+         sum += i+k;
+
+   printf("sum: %d\n", sum);
+
+   return 0;
+}

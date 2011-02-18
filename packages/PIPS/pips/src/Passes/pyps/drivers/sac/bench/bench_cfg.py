@@ -2,6 +2,7 @@
 # Parse the benchmark configuration files and create according
 # python object.
 
+import os
 import ConfigParser, copy
 from ConfigParser import SafeConfigParser
 ConfigParser.DEFAULTSECT='global'
@@ -24,8 +25,8 @@ class BenchSectionCfg(object):
 	_attrs = {}
 	_attrsVal = {}
 	def __init__(self, sec_name, cfg_parser):
-		self._sec_name = sec_name
 		self._cfg_parser = cfg_parser
+		self._sec_name = sec_name
 
 	def load(self):
 		for name,v in self._cfg_parser.items(self._sec_name):
@@ -52,7 +53,9 @@ class BenchSectionCfg(object):
 		attr = name.lower()
 		if attr not in self._attrs:
 			self.__dict__[name] = v
+			return
 		self._attrsVal[name] = v
+		self._cfg_parser.set(self._sec_name, name, str(v))
 
 	def __contains__(self, name):
 		if name.lower() in self._attrsVal:
@@ -82,6 +85,9 @@ class BenchSectionList(Singleton):
 		return self._secs[name]
 	def list(self):
 		return self._secs.keys()
+	def save(self, filename):
+		with open(filename, "w") as fp:
+			self._cfg_parser.write(fp)
 
 def _get_cls_section(clsList):
 	def get_section(name):
@@ -105,7 +111,8 @@ class workspace(BenchSectionCfg):
 		  'args_benchmark': (unicode, True),
 		  'iterations_bench': (int, True),
 		  'include_dirs': (make_list(unicode), False),
-		  'memalign': (bool, True)}
+		  'memalign': (bool, True),
+		  'arg_kernel_size': (int, True)}
 
 class remote_host(BenchSectionCfg):
 	_attrs = {'host': (unicode, True), 'remote_working_dir': (unicode, True), 'control_path': (unicode, False)}
@@ -137,14 +144,30 @@ sessions = sessionList()
 remoteHosts = remoteHostList()
 
 ccparser = SafeConfigParser()
-ccparser.read("etc/ccs.cfg")
-ccs.set_parser(ccparser)
 sessionparser = SafeConfigParser()
-sessionparser.read("etc/sessions.cfg")
-sessions.set_parser(sessionparser)
 workspaceparser = SafeConfigParser()
-workspaceparser.read("etc/workspaces.cfg")
-workspaces.set_parser(workspaceparser)
 rhparser = SafeConfigParser()
-rhparser.read("etc/remote_hosts.cfg")
-remoteHosts.set_parser(rhparser)
+
+def init(etc_dir, cc_file=None, session_file=None,wk_file=None,remote_file=None):
+	''' Initialise the benchmark config module, using files from etc_dir. If one
+	of the cc_file,session_file,wk_file or remote_file arguments are set, these
+	files will be used insted of those in etc_dir/* '''
+	def file_cfg(var, default):
+		if var == None:
+			return os.path.join(etc_dir, default)
+		return var
+	cc_file = file_cfg(cc_file, "ccs.cfg")
+	session_file = file_cfg(session_file, "sessions.cfg")
+	wk_file = file_cfg(wk_file, "workspaces.cfg")
+	remote_file = file_cfg(remote_file, "remote_hosts.cfg")
+	print session_file
+
+	ccparser.read(cc_file)
+	ccs.set_parser(ccparser)
+	sessionparser.read(session_file)
+	sessions.set_parser(sessionparser)
+	workspaceparser.read(wk_file)
+	workspaces.set_parser(workspaceparser)
+	rhparser.read(remote_file)
+	remoteHosts.set_parser(rhparser)
+
