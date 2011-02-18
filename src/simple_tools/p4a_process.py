@@ -452,10 +452,10 @@ class p4a_processor(object):
         if fine:
 			
             # Use a fine-grain parallelization à la Allen & Kennedy:
-            all_modules.internalize_parallel_code()
+            all_modules.internalize_parallel_code(concurrent=True)
         else:
             # Use a coarse-grain parallelization with regions:
-            all_modules.coarse_grain_parallelization()
+            all_modules.coarse_grain_parallelization(concurrent=True)
 
     def post_process_fortran_wrapper (self, file_name, subroutine_name):
         """ All the dirty thing about C and Fortran interoperability is hidden
@@ -728,7 +728,7 @@ class p4a_processor(object):
 
         # Select wrappers by using the fact that all the generated wrappers
         # have their names of this form:
-        wrapper_prefix = self.get_wrapper_prefix ()
+        wrapper_prefix = self.get_wrapper_prefix()
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
