@@ -23,6 +23,7 @@
 + remove useless images (computed but not used...) see licensePlate
 + take advantage of commutative operators to remove operations
 + copy to remove in freia_46 and freia_47
++ remove redundant measures, esp for terapix
 - should keep AIPO/software calls if accelerator calls are slower?
   I would I know that?
 - min commutes with dilate & max with erode, or vice-versa ?
@@ -79,7 +80,6 @@
 + license_plate_copies takes too much time to compile? 1mn -> 4.5s
 - reuse of images in some cases when nodes are reordered... SSA?
 - wrong copy extraction order in vs_core_2, and copies not really removed
-- should remove redundant measures for terapix
 
 * terapix target
 + must manage memory allocation in tiles

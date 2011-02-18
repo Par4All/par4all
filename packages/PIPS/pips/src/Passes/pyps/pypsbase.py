@@ -9,12 +9,80 @@ import shutil
 import re
 import time
 import types
+import shlex
 from copy import deepcopy
 from string import split, upper, lower, join
 from subprocess import Popen, PIPE
 import inspect
 
 pypips.atinit()
+
+class backendCompiler(object):
+	''' Parameters for workspace.compile_and_run . Used for convenience. '''
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		'''
+		CC, CFLAGS, LDFLAGS: same as usual
+		compilemethod: bound method used for compilation
+		rep: output directory*
+		outfile: name of the output file
+		args: list of arguments
+		'''
+		self.CC = CC
+		self.CFLAGS = CFLAGS
+		self.LDFLAGS = LDFLAGS
+		self.compilemethod = compilemethod
+		self.rep = rep
+		self.outfile = outfile
+		self.args = args
+		self.extrafiles = extrafiles
+		self.cmd = None
+		self.cc_stderr = None
+	
+	def link_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="link")
+
+	def compile_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="compile")
+
+	def user_headers_cmd(self, files, extraCFLAGS=""):
+		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
+
+	def _cc_cmd(self, files, extraCFLAGS, mode):
+		command=[self.CC, extraCFLAGS, self.CFLAGS]
+		if mode=="link":
+			command+=files
+			command+=[self.LDFLAGS]
+			if self.outfile: command+=["-o", self.outfile]
+		elif mode=="compile":
+			command+=["-c"]
+			command+=files
+		elif mode=="userHeaders":
+			command+=["-MM"]
+			command+=files
+		return command
+
+class ompCompiler(backendCompiler):
+	"""openmp backend compiler to use openmp"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+		if issubclass(self.__class__,gccCompiler):
+			self.CFLAGS += " -fopenmp"
+		elif issubclass(self.__class__,iccCompiler):
+			self.CFLAGS += " -openmp"
+		else:
+			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
+
+class gccCompiler(backendCompiler):
+	"""gcc backend compiler to use gcc"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(gccCompiler,self).__init__("gcc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+
+class iccCompiler(backendCompiler):
+	"""icc backend compiler to use icc"""
+	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+		super(gccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+
+
 
 class loop:
 	"""do-loop from a module"""
@@ -194,55 +262,6 @@ class modules:
 		return reduce(lambda l1,l2:l1+l2.loops(), self._modules, [])
 
 
-class ccexecParams(object):
-	''' Parameters for workspace.compile_and_run . Used for convenience. '''
-	def __init__(self, CC="gcc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		'''
-		CC, CFLAGS, LDFLAGS: same as usual
-		compilemethod: bound method used for compilation
-		rep: output directory*
-		outfile: name of the output file
-		args: list of arguments
-		'''
-		self.CC = CC
-		self.CFLAGS = CFLAGS
-		self.LDFLAGS = LDFLAGS
-		self.compilemethod = compilemethod
-		self.rep = rep
-		self.outfile = outfile
-		self.args = args
-		self.extrafiles = extrafiles
-		self.cmd = None
-		self.cc_stderr = None
-		self._compile_done = False
-	
-	def __setattr__(self, n, v):
-		if n in ('CC','CFLAGS','LDFLAGS','compilemethod','extrafiles'):
-			self._compile_done = False
-		object.__setattr__(self,n,v)
-	
-	def link_cmd(self, files, extraCFLAGS):
-		return self._cc_cmd(files, extraCFLAGS, mode="link")
-
-	def compile_cmd(self, files, extraCFLAGS):
-		return self._cc_cmd(files, extraCFLAGS, mode="compile")
-
-	def user_headers_cmd(self, files, extraCFLAGS):
-		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
-
-	def _cc_cmd(self, files, extraCFLAGS, mode):
-		command=[self.CC, extraCFLAGS, self.CFLAGS]
-		if mode=="link":
-			command+=files
-			command+=[self.LDFLAGS]
-			if self.outfile: command+=["-o", self.outfile]
-		elif mode=="compile":
-			command+=["-c"]
-			command+=files
-		elif mode=="userHeaders":
-			command+=["-MM"]
-			command+=files
-		return command
 
 class workspace(object):
 
@@ -275,7 +294,8 @@ class workspace(object):
 		self.cpypips.verbose(int(verbose))
 		self.deleteOnClose=deleteOnClose
 		self.checkpoints=[]
-		self._sources=[]
+		self._sources=list(sources)
+		self._org_sources = sources
 
 		if not name :
 			#  generate a random place in $PWS
@@ -291,21 +311,12 @@ class workspace(object):
 			kwargs["cppflags"] = cppflags
 
 
-		# In case the subworkspaces need to add files, the variable passed in
-		# parameter will only be modified here and not in the scope of the caller
-		sources2 = deepcopy(sources)
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
-		# XXX Adrien Guinet : this is a good idea but the problem is that a tuple is
-		# used for sources2, which is immutable. So, sources2 can not be modified inside
-		# any "parent workspace".__init__ function (a new tuple will be created). This
-		# SAC, for instance, does not use this but ws (which is here "self")._sources.append.
-		# Maybe we should juste remove "sources" as an argument for "parent workspace".__init__ ?
-		# memalign does not work in git revision 872b010f420dc66aee04d8338f9abbebabb7749b because of this.
 		self.cppflags = cppflags
 		self.iparents = []
 		for p in parents:
-			pws = p(self, sources2, **kwargs)
+			pws = p(self, **kwargs)
 			self.iparents.append(pws)
 
 		self._modules = {}
@@ -320,12 +331,6 @@ class workspace(object):
 		if self.verbose:
 			print>>sys.stderr, "Using CPPFLAGS =", self.cppflags
 
-		def concatenate_list(x, y):
-			"Concatenate as list even if the second one is a simple element"
-			return x + y if isinstance(y,list) else x + [y]
-		sources2 = reduce(concatenate_list, sources2, [])
-		sources = []
-
 		if recoverInclude:
 			# add guards around #include's, in order to be able to undo the
 			# inclusion of headers.
@@ -334,15 +339,13 @@ class workspace(object):
 			except OSError:pass
 			os.mkdir(self.tmpDirName)
 
-			for f in sources2:
+			new_sources = []
+			for f in self._sources:
 				newfname = os.path.join(self.tmpDirName,os.path.basename(f))
 				shutil.copy2(f, newfname)
-				sources += [newfname]
+				new_sources += [newfname]
 				pypsutils.guardincludes(newfname)
-		else:
-			sources=sources2
-
-		self._sources += sources
+			self._sources = new_sources
 
 		try:
 			cpypips.create(name, self._sources)
@@ -356,9 +359,11 @@ class workspace(object):
 		pypsutils.build_module_list(self)
 		# Get the workspace name, if any:
 		self._name = self.info("workspace")
-		if self._name:
+		if len(self._name) > 0:
 			# The name is indeed the first element of the returned list:
 			self._name = self._name[0]
+		else:
+			self._name = name
 
 		"""Call all the functions 'post_init' of the given parents"""
 		for pws in reversed(self.iparents):
@@ -366,6 +371,20 @@ class workspace(object):
 				pws.post_init(sources, **kwargs)
 			except AttributeError:
 				pass
+
+	def add_source(self, fname):
+		""" Add a source file to the workspace, using PIPS guard includes if necessary """
+		if self.recoverInclude:
+			newfname = os.path.join(self.tmpDirName,os.path.basename(fname))
+			shutil.copy2(fname, newfname)
+			self.sources += [newfname]
+			pypsutils.guardincludes(newfname)
+		else:
+			self.sources += [fname]
+
+	def add_sources(self, files):
+		""" Add source files to the workspace thanks to add_source """
+		map(self.source_file, files)
 
 	def __enter__(self):
 		"""handler for the with keyword"""
@@ -391,7 +410,6 @@ class workspace(object):
 		"""retrieve a module of the module from its name"""
 		pypsutils.build_module_list(self)
 		return self._modules[module_name]
-
 
 	def __setitem__(self,i):
 		"""change a module of the module from its name"""
@@ -459,62 +477,71 @@ class workspace(object):
 
 		return saved
 
-	def user_headers(self, ccexecp=ccexecParams(), extrafiles=None):
-		""" List the user headers used in self._sources with the compiler configuration given in ccexecp """
-		rep = os.path.join(self.tmpdirname(),"userh")
+	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
+		""" List the user headers used in self._sources with the compiler configuration given in compiler """
 		if extrafiles == None:
 			extrafiles = []
-		tmpfiles=self.save(rep=rep) + extrafiles
-		command = ccexecp.genCmdUserHeaders()
-		p = Popen(command, stdout = PIPE, stderr = PIPE)
+		command = compiler.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
+		command = " ".join(command) + ' |sed \':a;N;$!ba;s/\(.*\).o: \\\\\\n/:/g\' |sed \'s/ \\\\$//\' |cut -d\':\' -f2'
+		p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
-		# TODO: finish!
+		if rc != 0:
+			raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
+		
+		print command
+		print out
+		# Parse the results :
+		# each line is split thanks to shlex.split, and we only keep the header files
+		lines = map(shlex.split,out.split('\n'))
+		headers = list()
+		for l in lines:
+			l = filter(lambda s: s.endswith('.h'), l)
+			headers.extend(l)
+		return headers
 
-	def compile(self, ccexecp=ccexecParams(), link=True):
+		
+
+	def compile(self, compiler=backendCompiler(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
-		CC=ccexecp.CC
-		CFLAGS=ccexecp.CFLAGS
-		LDFLAGS=ccexecp.LDFLAGS
-		outfile=ccexecp.outfile
-		extrafiles=ccexecp.extrafiles
+		CC=compiler.CC
+		CFLAGS=compiler.CFLAGS
+		LDFLAGS=compiler.LDFLAGS
+		outfile=compiler.outfile
+		extrafiles=compiler.extrafiles
 
 		if link and not outfile:
-			ccexecp.outfile=self._name
-		if ccexecp.rep==None:
-			ccexecp.rep=self.tmpdirname()+"d.out"
-		rep=ccexecp.rep
-		otmpfiles=self.save(rep=ccexecp.rep)+extrafiles
+			compiler.outfile=self._name
+		if compiler.rep==None:
+			compiler.rep=self.tmpdirname()+"d.out"
+		rep=compiler.rep
+		otmpfiles=self.save(rep=compiler.rep)+extrafiles
 		self.goingToRunWith(otmpfiles, rep)
-		command = ccexecp.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else ccexecp.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
+		command = compiler.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else compiler.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
 		commandline = " ".join(command)
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
 		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
-		ccexecp.cc_stderr = err
+		compiler.cc_stderr = err
 		ret = p.returncode
 		if ret != 0:
-			ccexecp._compile_done = False
 			if not link: map(os.remove,otmpfiles)
 			print >> sys.stderr, err
 			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		ccexecp._compile_done = True
-		ccexecp.cc_cmd = commandline
-		# Command to execute our new binary
-		ccexecp.cmd = [os.path.join("./",ccexecp.outfile)] + ccexecp.args
-		return ccexecp.outfile
+		compiler.cc_cmd = commandline
+		return compiler.outfile
 
-	def compile_and_run(self, ccexecp=ccexecParams()):
-		if ccexecp.compilemethod == None:
-			ccexecp.compilemethod = self.compile
-		ccexecp.compilemethod(ccexecp)
-		return self.run_output(ccexecp)
+	def compile_and_run(self, compiler=backendCompiler()):
+		if compiler.compilemethod == None:
+			compiler.compilemethod = self.compile
+		compiler.compilemethod(compiler)
+		return self.run_output(compiler)
 
-	def run_output(self, ccexecp=ccexecParams()):
-		if not ccexecp._compile_done:
-			return self.compile_and_run(ccexecp)
-		p = Popen(ccexecp.cmd, stdout = PIPE, stderr = PIPE)
+	def run_output(self, compiler=backendCompiler()):
+		# Command to execute our binary
+		compiler.cmd = [os.path.join("./",compiler.outfile)] + compiler.args
+		p = Popen(compiler.cmd, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
 		return (rc,out,err)

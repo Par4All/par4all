@@ -81,7 +81,7 @@ typedef __m256i	v32qi;
 #define SIMD_ADDPD(vec1,vec2,vec3) vec1=_mm256_add_pd(vec2,vec3)
 #define SIMD_MULADDPD(vec1, vec2, vec3, vec4) \
 		do { \
-		__m256 __pips_tmp;\
+		__m256d __pips_tmp;\
 		SIMD_MULPD(__pips_tmp,vec3,vec4); \
 		SIMD_ADDPD(vec1,__pips_tmp,vec2); \
 		} while(0)

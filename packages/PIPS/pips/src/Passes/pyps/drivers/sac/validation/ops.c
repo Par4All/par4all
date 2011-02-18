@@ -1,51 +1,62 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void sum_f(float* a, float *b, float *r, int n)
+#include "tools.h"
+
+void sum_f(int n ,float* a, float *b, float *r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i]=a[i]+b[i];
 }
 
-void mul_f(float* a, float *b, float *r, int n)
+void mul_f(int n ,float* a, float *b, float *r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i]=a[i]*b[i];
 }
 
-void subs_f(float* a, float *b, float *r, int n)
+void subs_f(int n ,float* a, float *b, float *r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i]=a[i]-b[i];
 }
 
-void div_f(float* a, float *b, float *r, int n)
+void div_f(int n ,float* a, float *b, float *r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i]=a[i]/b[i];
 }
 
-void muladd_f(float* a, float* b, float* r, int n)
+void muladd_f(int n ,float* a, float* b, float* r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i]+=a[i]*b[i];
 }
 
-void umin_f(float* a, float* b, float* r, int n)
+void umin_f(int n ,float* a, float* b, float* r)
 {
 	int i;
 	for (i=0;i<n;i++)
 		r[i] = -(b[i]);
 }
 
-typedef void (*paction)(float*,float*,float*,int);
+void load_gen_f(int n, float a[n], float b[n], float r[n])
+{
+	int i;
+	//float a0 = 0.4;
+	for (i=0;i<n;i++) {
+		r[i]=0.4;
+	}
+}
 
-paction _funcs[] = {sum_f,mul_f,subs_f,div_f,muladd_f,umin_f};
+typedef void (*paction)(int,float*,float*,float*);
+
+paction _funcs[] = {sum_f,mul_f,subs_f,div_f,muladd_f,umin_f,load_gen_f};
 
 int main(int argc, char** argv)
 {
@@ -89,12 +100,13 @@ int main(int argc, char** argv)
 	f(a,b,r,n);*/
 	switch (fi)
 	{
-		case 0: sum_f(a,b,r,n); break;
-		case 1: mul_f(a,b,r,n); break;
-		case 2: subs_f(a,b,r,n); break;
-		case 3: div_f(a,b,r,n); break;
-		case 4: muladd_f(a,b,r,n); break;
-		case 5: umin_f(a,b,r,n); break;
+		case 0: sum_f(n,a,b,r); break;
+		case 1: mul_f(n,a,b,r); break;
+		case 2: subs_f(n,a,b,r); break;
+		case 3: div_f(n,a,b,r); break;
+		case 4: muladd_f(n,a,b,r); break;
+		case 5: umin_f(n,a,b,r); break;
+		case 6: load_gen_f(n,a,b,r); break;
 		default: break;
 	}
 
