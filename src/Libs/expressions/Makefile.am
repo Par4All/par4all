@@ -10,7 +10,8 @@ libexpressions_la_SOURCES=partial_eval.c \
 		sequence_gcm_cse.c \
 		instruction_selection.c \
 		expression_substitution.c \
-		simplify.c
+		simplify.c \
+		rename_operator.c
 
 
 include $(srcdir)/../pipslibs_includes.mk

@@ -136,3 +136,19 @@ void do_loop_to_while_loop(statement sl) {
 
     update_statement_instruction(sl,make_instruction_sequence(seq));
 }
+
+/* converts a doloop to a for loop, in place*/
+void do_loop_to_for_loop(statement sl)
+{
+    pips_assert("statement is a loop",statement_loop_p(sl));
+    loop l =statement_loop(sl);
+    range r = loop_range(l);
+
+    forloop fl = make_forloop(
+		    make_assign_expression(entity_to_expression(loop_index(l)), copy_expression(range_lower(r))),
+		    MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME), entity_to_expression(loop_index(l)), copy_expression(range_upper(r))),
+		    MakeBinaryCall(entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME), entity_to_expression(loop_index(l)), copy_expression(range_increment(r))),
+	            copy_statement(loop_body(l)));
+    update_statement_instruction(sl, make_instruction_forloop(fl));
+}
+
