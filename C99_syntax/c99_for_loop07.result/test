@@ -2,13 +2,15 @@ int main()
 {
    int i;
    i = 0;
-   /* before init *//* after init */
-   int j;
-   /* This is an overcommented C99 for loop :-) */
-   /* before cond *//* after cond *//* before inc *//* after inc */
-   for (j = 0;j<5;j++)
-      /* loop body */
-      i++;
+   {
+      /* before init *//* after init */
+      int j;
+      /* This is an overcommented C99 for loop :-) */
+      /* before cond *//* after cond *//* before inc *//* after inc */
+      for (j = 0;j<5;j++)
+         /* loop body */
+         i++;
+   }
    /* after the loop */
    return 0;
 }

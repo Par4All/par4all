@@ -7,12 +7,14 @@ void fir_1_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                   12 (DO)
-      for(j = 0; j <= 0; j += 1)
+         for(j = 0; j <= 0; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                            708*n + 5 (SUMMARY)
@@ -24,12 +26,14 @@ void fir_64_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                  705 (DO)
-      for(j = 0; j <= 63; j += 1)
+         for(j = 0; j <= 63; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                            356*n + 5 (SUMMARY)
@@ -41,12 +45,14 @@ void fir_32_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                  353 (DO)
-      for(j = 0; j <= 31; j += 1)
+         for(j = 0; j <= 31; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                           2820*n + 5 (SUMMARY)
@@ -58,12 +64,14 @@ void fir_256_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                 2817 (DO)
-      for(j = 0; j <= 255; j += 1)
+         for(j = 0; j <= 255; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                             48*n + 5 (SUMMARY)
@@ -75,12 +83,14 @@ void fir_4_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                   45 (DO)
-      for(j = 0; j <= 3; j += 1)
+         for(j = 0; j <= 3; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                             92*n + 5 (SUMMARY)
@@ -92,12 +102,14 @@ void fir_8_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                   89 (DO)
-      for(j = 0; j <= 7; j += 1)
+         for(j = 0; j <= 7; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                            180*n + 5 (SUMMARY)
@@ -109,12 +121,14 @@ void fir_16_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                  177 (DO)
-      for(j = 0; j <= 15; j += 1)
+         for(j = 0; j <= 15; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                             26*n + 5 (SUMMARY)
@@ -126,12 +140,14 @@ void fir_2_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                   23 (DO)
-      for(j = 0; j <= 1; j += 1)
+         for(j = 0; j <= 1; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                          11268*n + 5 (SUMMARY)
@@ -143,12 +159,14 @@ void fir_1024_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                11265 (DO)
-      for(j = 0; j <= 1023; j += 1)
+         for(j = 0; j <= 1023; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                           1412*n + 5 (SUMMARY)
@@ -160,12 +178,14 @@ void fir_128_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                 1409 (DO)
-      for(j = 0; j <= 127; j += 1)
+         for(j = 0; j <= 127; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 //                                                           5636*n + 5 (SUMMARY)
@@ -177,12 +197,14 @@ void fir_512_(int n, int in[n], int out[n], int kernel[1024])
    for(i = 0; i <= n-1+1-1; i += 1) {
 //                                                                    2 (STMT)
       out[i] = 0.0;
+      {
 //                                                                    0 (STMT)
-      int j;
+         int j;
 //                                                                 5633 (DO)
-      for(j = 0; j <= 511; j += 1)
+         for(j = 0; j <= 511; j += 1)
 //                                                                   11 (STMT)
-         out[i] += in[i+j]*kernel[j];
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_1_(int n, int in[n], int out[n], int kernel[1024])
@@ -190,9 +212,11 @@ void fir_1_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 0; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 0; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_64_(int n, int in[n], int out[n], int kernel[1024])
@@ -200,9 +224,11 @@ void fir_64_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 63; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 63; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_32_(int n, int in[n], int out[n], int kernel[1024])
@@ -210,9 +236,11 @@ void fir_32_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 31; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 31; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_256_(int n, int in[n], int out[n], int kernel[1024])
@@ -221,9 +249,11 @@ void fir_256_(int n, int in[n], int out[n], int kernel[1024])
 #pragma pips intensive loop
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 255; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 255; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_4_(int n, int in[n], int out[n], int kernel[1024])
@@ -231,9 +261,11 @@ void fir_4_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 3; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 3; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_8_(int n, int in[n], int out[n], int kernel[1024])
@@ -241,9 +273,11 @@ void fir_8_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 7; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 7; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_16_(int n, int in[n], int out[n], int kernel[1024])
@@ -251,9 +285,11 @@ void fir_16_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 15; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 15; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_2_(int n, int in[n], int out[n], int kernel[1024])
@@ -261,9 +297,11 @@ void fir_2_(int n, int in[n], int out[n], int kernel[1024])
    int i;
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 1; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 1; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_1024_(int n, int in[n], int out[n], int kernel[1024])
@@ -272,9 +310,11 @@ void fir_1024_(int n, int in[n], int out[n], int kernel[1024])
 #pragma pips intensive loop
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 1023; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 1023; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_128_(int n, int in[n], int out[n], int kernel[1024])
@@ -283,9 +323,11 @@ void fir_128_(int n, int in[n], int out[n], int kernel[1024])
 #pragma pips intensive loop
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 127; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 127; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_512_(int n, int in[n], int out[n], int kernel[1024])
@@ -294,9 +336,11 @@ void fir_512_(int n, int in[n], int out[n], int kernel[1024])
 #pragma pips intensive loop
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 511; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 511; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_1_(int n, int in[n], int out[n], int kernel[1024])
@@ -305,9 +349,11 @@ void fir_1_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 0; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 0; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_64_(int n, int in[n], int out[n], int kernel[1024])
@@ -316,9 +362,11 @@ void fir_64_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 63; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 63; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_32_(int n, int in[n], int out[n], int kernel[1024])
@@ -327,9 +375,11 @@ void fir_32_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 31; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 31; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_256_(int n, int in[n], int out[n], int kernel[1024])
@@ -339,9 +389,11 @@ void fir_256_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 255; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 255; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_4_(int n, int in[n], int out[n], int kernel[1024])
@@ -350,9 +402,11 @@ void fir_4_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 3; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 3; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_8_(int n, int in[n], int out[n], int kernel[1024])
@@ -361,9 +415,11 @@ void fir_8_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 7; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 7; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_16_(int n, int in[n], int out[n], int kernel[1024])
@@ -372,9 +428,11 @@ void fir_16_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 15; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 15; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_2_(int n, int in[n], int out[n], int kernel[1024])
@@ -383,9 +441,11 @@ void fir_2_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 1; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 1; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_1024_(int n, int in[n], int out[n], int kernel[1024])
@@ -395,9 +455,11 @@ void fir_1024_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 1023; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 1023; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_128_(int n, int in[n], int out[n], int kernel[1024])
@@ -407,9 +469,11 @@ void fir_128_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 127; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 127; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
 void fir_512_(int n, int in[n], int out[n], int kernel[1024])
@@ -419,8 +483,10 @@ void fir_512_(int n, int in[n], int out[n], int kernel[1024])
 #pragma omp parallel for 
    for(i = 0; i <= n-1+1-1; i += 1) {
       out[i] = 0.0;
-      int j;
-      for(j = 0; j <= 511; j += 1)
-         out[i] += in[i+j]*kernel[j];
+      {
+         int j;
+         for(j = 0; j <= 511; j += 1)
+            out[i] += in[i+j]*kernel[j];
+      }
    }
 }
