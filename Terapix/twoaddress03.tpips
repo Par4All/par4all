@@ -1,5 +1,5 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-setenv WS "twoaddress02"
+setenv WS "twoaddress03"
 delete $WS
 create $WS $WS.c
 display PRINTED_FILE[%ALLFUNC]
