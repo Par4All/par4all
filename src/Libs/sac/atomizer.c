@@ -370,6 +370,44 @@ bool simd_atomizer(char * mod_name)
     return TRUE;
 }
 
+static void do_expression_reduction(statement s, reduction r, expression e) {
+    reference redref = reduction_reference(r);
+    entity redop = reduction_operator_entity(reduction_op(r));
+
+    if(expression_call_p(e)) {
+      call ce = expression_call(e);
+      if(same_entity_p(call_function(ce), redop)) {
+        expression lhs = binary_call_lhs(ce),
+                   rhs = binary_call_rhs(ce);
+
+        do_expression_reduction(s, r, lhs);
+        do_expression_reduction(s, r, rhs);
+
+        if(expression_reference_p(lhs) &&
+            reference_equal_p(expression_reference(lhs), redref)) {
+          update_expression_syntax(e, copy_syntax(expression_syntax(rhs)));
+        }
+        else if(expression_reference_p(rhs) &&
+                 reference_equal_p(expression_reference(rhs), redref)) {
+            update_expression_syntax(e, copy_syntax(expression_syntax(lhs)));
+        }
+        else
+        {
+            statement snew = make_assign_statement(
+                reference_to_expression(copy_reference(redref)),
+                MakeBinaryCall(redop,
+                    reference_to_expression(copy_reference(redref)),
+                    copy_expression(rhs)));
+            store_cumulated_reductions(snew,copy_reductions(load_cumulated_reductions(s)));
+            update_expression_syntax(e, copy_syntax(expression_syntax(lhs)));
+            insert_statement(s, snew, false);
+            store_cumulated_reductions(STATEMENT(CAR(statement_block(s))),copy_reductions(load_cumulated_reductions(s)));
+        }
+      }
+    }
+}
+
+
 static bool do_reduction_atomization(statement s) {
     list reductions = reductions_list(load_cumulated_reductions(s));
     if(!ENDP(reductions)) {
@@ -386,36 +424,11 @@ static bool do_reduction_atomization(statement s) {
               reference  rlhs = expression_reference(lhs);
               if(reference_equal_p(rlhs,redref)) {
                 expression rhs = binary_call_rhs(c);
-                if(expression_call_p(rhs)) {
-                  call crhs = expression_call(rhs);
-                  if(same_entity_p(call_function(crhs),redop)) {
-                    expression lhs = binary_call_lhs(crhs),
-                               rhs = binary_call_rhs(crhs);
-                    if(expression_reference_p(lhs) && 
-                        reference_equal_p(expression_reference(lhs),redref)) {
-                      if(expression_call_p(rhs) ) {
-                        call crhs = expression_call(rhs);
-                        if(same_entity_p(call_function(crhs),redop)) {
-                          expression lhs2 = binary_call_lhs(crhs),
-                                     rhs2 = binary_call_rhs(crhs);
-                          /* here we are ! now split the statement ! */
-                          statement snew = make_assign_statement(
-                              reference_to_expression(copy_reference(redref)),
-                              MakeBinaryCall(redop,
-                                reference_to_expression(copy_reference(redref)),
-                                copy_expression(rhs2)
-                                )
-                              );
-                          store_cumulated_reductions(snew,copy_reductions(load_cumulated_reductions(s)));
-                          update_expression_syntax(rhs,copy_syntax(expression_syntax(lhs2)));
-                          insert_statement(s,snew,false);
-                          store_cumulated_reductions(STATEMENT(CAR(statement_block(s))),copy_reductions(load_cumulated_reductions(s)));
-
-                        }
-                      }
-                    }
-                  }
-                }
+                do_expression_reduction(s, r, rhs);
+                update_expression_syntax(rhs, expression_syntax(
+                                        MakeBinaryCall(redop,
+                                                reference_to_expression(copy_reference(redref)),
+                                                copy_expression(rhs))));
               }
             }
         }

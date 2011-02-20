@@ -10972,7 +10972,8 @@ reduction_variable_expansion      > MODULE.code
 \end{PipsMake}
 
 \begin{PipsPass}{reduction_atomization}
-TODO
+  A variant of atomization that splits expressions but keep as much
+  reduction as possible. E.g: r+=a+b becomes r+=a ; r+=b;
 \end{PipsPass}
 
 \begin{PipsMake}
