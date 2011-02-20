@@ -10971,6 +10971,17 @@ reduction_variable_expansion      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{reduction_atomization}
+TODO
+\end{PipsPass}
+
+\begin{PipsMake}
+reduction_atomization      > MODULE.code
+        < PROGRAM.entities
+        < MODULE.cumulated_reductions
+        < MODULE.code
+\end{PipsMake}
+
 \subsubsection{Array Expansion}
 \index{Array Expansion}
 
