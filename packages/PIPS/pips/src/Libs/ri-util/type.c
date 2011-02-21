@@ -1529,6 +1529,9 @@ basic basic_maximum(basic fb1, basic fb2)
 
 	b = make_basic(is_basic_int, UUINT(s1>s2?s1:s2));
       }
+      else if(basic_pointer_p(b2)) {
+          return copy_basic(b2);
+      }
       else
 	b = make_basic(is_basic_overloaded, UU);
       break;

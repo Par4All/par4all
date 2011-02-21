@@ -245,7 +245,7 @@ void InitScope()
   C_scope_identifier = -1;
 }
 
-void EnterScope()
+static void EnterScope()
 {
   c_parser_context nc = CreateDefaultContext();
   string cs = string_undefined;
@@ -1611,8 +1611,14 @@ statement_without_pragma:
                         {
 			  $$ = MakeForloop($2, $4, $6, $9);
 			}
-|   for_clause
-    declaration /* So it is a C99 for loop with a declaration in it */
+|   for_clause /* A C99 for loop with a declaration in it */
+                        {
+			  /* We need a new variable scope to avoid
+			     conflict names between the loop index and
+			     some previous upper declarations: */
+                          EnterScope();
+                        }
+    declaration
     /* Since opt_expression may reset the comments, we should try to
        preserve them first everytime. To do some days. Right now it is not
        a top priority... */
@@ -1623,7 +1629,8 @@ statement_without_pragma:
 			}
     statement
                         {
-			  $$ = MakeForloopWithIndexDeclaration($2, $3, $5, $8);
+			  $$ = MakeForloopWithIndexDeclaration($3, $4, $6, $9);
+			  ExitScope();
 			}
 |   label statement
                         {

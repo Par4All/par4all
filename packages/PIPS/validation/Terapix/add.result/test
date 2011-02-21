@@ -218,6 +218,7 @@ l99995:
          P4A_accel_free(in00);
       }
 }
+**** check ok ******
 outlining to launcher
 void runner(int n, int out[n+126+1][n+168+1], int in0[n+126+1][n+168+1], int in1[n+126+1][n+168+1])
 {

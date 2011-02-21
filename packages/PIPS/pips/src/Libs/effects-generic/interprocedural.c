@@ -404,10 +404,14 @@ list generic_c_effects_backward_translation(entity callee,
 	{
 	  list l_eff_on_current_formal = NIL;
 
+	  dummy formal_arg_dummy = parameter_dummy(formal_arg);
+	  if (!dummy_unknown_p(formal_arg_dummy))
+	    pips_debug(5, "corresponding formal argument :%s\n",
+		       entity_name(dummy_identifier(formal_arg_dummy))
+		       );
+	  else
+	    pips_debug(5, "unknown dummy\n");
 
-	  pips_debug(5, "corresponding formal argument :%s\n",
-		     entity_name(dummy_identifier(parameter_dummy(formal_arg)))
-		     );
 	  /* first build the list of effects on the current formal argument */
 	  l_current = l_begin;
 	  l_prec = NIL;

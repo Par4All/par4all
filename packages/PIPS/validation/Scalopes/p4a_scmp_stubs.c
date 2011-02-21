@@ -46,10 +46,10 @@ void P4A_copy_from_accel_1d(size_t element_size,
 			    void *host_address,
 			    const void *accel_address) {
   size_t i;
-  char * cdest = d1_offset*element_size + (char *)host_address;
+  char * cdest = host_address;
   const char * csrc = accel_address;
   for(i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
+    cdest[i+d1_offset*element_size] = csrc[i];
 }
 
 void P4A_copy_to_accel_1d(size_t element_size,
@@ -60,9 +60,9 @@ void P4A_copy_to_accel_1d(size_t element_size,
 			  void *accel_address) {
   size_t i;
   char * cdest = accel_address;
-  const char * csrc = d1_offset*element_size + (char *)host_address;
+  const char * csrc = host_address ;
   for(i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
+    cdest[i] = csrc[d1_offset*element_size + i];
 }
 
 void P4A_copy_from_accel_2d(size_t element_size,

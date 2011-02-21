@@ -156,7 +156,7 @@ statement MakeBlock(list stmts)
      appears after the last statement of the block. To save it, as is
      done in Fortran, an empty statement should be added at the end of
      the sequence. */
-  // Gather all the direct declarations from the  statements:
+  // Gather all the direct declaration entities from the statements:
   list dl = statements_to_direct_declarations(stmts);
 
   statement s = make_statement(entity_empty_label(),
@@ -455,9 +455,10 @@ statement MakeForloop(expression e1,
 
    The for could be generated back into the original form by the
    prettyprinter.  To differentiate between such a C99 for loop or a
-   for-loop that was really written with the i declaration just before, we
-   may mark the for loop with an extension here so that the prettyprinter
-   could use this hint to know if it has to do some resugaring or not.
+   for-loop that was really written with the i declaration just before,
+   west may mark the for loop with an extension here so that the
+   prettyprinter could use this hint to know if it has to do some
+   resugaring or not.
 
    @param[in,out] decls is the init part of the for. It is a declaration
    statement list
@@ -487,8 +488,14 @@ statement MakeForloopWithIndexDeclaration(list decls,
      }
   */
   statement for_s = MakeForloop(expression_undefined, e2, e3, body);
-  // We inject the for in its declaration statement:
+  /* We inject the for in its declaration statement to have the naive
+     representation: */
   insert_statement(decl, for_s, FALSE);
+  // Gather all the direct declarations from the statements in the block
+  list dl = statements_to_direct_declarations(statement_block(decl));
+  // to put them on the block statement:
+  statement_declarations(decl) = dl;
+
   if (!get_bool_property("C_PARSER_GENERATE_NAIVE_C99_FOR_LOOP_DECLARATION")) {
     /* We try to refine to inject back an initialization in the for-clause.
 
@@ -523,6 +530,15 @@ statement MakeForloopWithIndexDeclaration(list decls,
       free_expression(forloop_initialization(f));
       // Put the new one instead:
       forloop_initialization(f) = e;
+      if (get_bool_property("C_PARSER_GENERATE_COMPACT_C99_FOR_LOOP_DECLARATION")) {
+	/* We need to remove the decl block statement and move the index
+	   declaration directly in the for statement. */
+
+	/* Not yet implemented because it needs to extend
+	   declaration_statement_p for any kind of loops, the loop
+	   restructurers... */
+	;
+      }
     }
   }
   return decl;
