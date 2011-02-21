@@ -88,42 +88,42 @@ def add_module_options(parser):
         help = "Specify nlpmake source directory.")
 
     global default_configure_opts, default_debug_configure_opts
-    group.add_option("--configure-opts", "--configure-flags", "-c", metavar = "OPTS", action = "append", default = [],
-        help = "Specify global configure opts. Default is '" + " ".join(default_configure_opts)
+    group.add_option("--configure-options", "--configure-flags", "-c", metavar = "OPTS", action = "append", default = [],
+        help = "Specify global configure options. Default is '" + " ".join(default_configure_opts)
         + "' OR '" + " ".join(default_debug_configure_opts) + "' if --debug is specified.")
 
     group.add_option("--debug", "-g", action = "store_true", default = False,
-        help = "Set debug CFLAGS in configure opts (see --configure-opts). Please note that this option has NO EFFECT if --configure-opts is manually set.")
+        help = "Set debug CFLAGS in configure options (see --configure-options). Please note that this option has NO EFFECT if --configure-options is manually set.")
 
-    group.add_option("--polylib-conf-opts", "--polylib-conf-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify polylib configure opts (appended to --configure-opts).")
+    group.add_option("--polylib-conf-options", "--polylib-conf-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify polylib configure opts (appended to --configure-options).")
 
-    group.add_option("--newgen-conf-opts", "--newgen-conf-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify newgen configure opts (appended to --configure-opts).")
+    group.add_option("--newgen-conf-options", "--newgen-conf-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify newgen configure options (appended to --configure-options).")
 
-    group.add_option("--linear-conf-opts", "--linear-conf-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify linear configure opts (appended to --configure-opts).")
+    group.add_option("--linear-conf-options", "--linear-conf-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify linear configure options (appended to --configure-options).")
 
     global default_pips_conf_opts
-    group.add_option("--pips-conf-opts", "--pips-conf-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify PIPS configure opts (appended to --configure-opts). Defaults to " + " ".join(default_pips_conf_opts) +
+    group.add_option("--pips-conf-options", "--pips-conf-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify PIPS configure options (appended to --configure-options). Defaults to " + " ".join(default_pips_conf_opts) +
                      ". Setting this option will reset the default value. Note that several flags can be set like this : " +
-                     ' --pips-conf-opts "--enable-tpips --enable-pyps --enable-doc"')
+                     ' --pips-conf-options "--enable-tpips --enable-pyps --enable-doc"')
 
-    group.add_option("--make-opts", "--make-flags", "-m", metavar = "OPTS", action = "append", default = [],
-        help = "Specify global make opts.")
+    group.add_option("--make-options", "--make-flags", "-m", metavar = "OPTS", action = "append", default = [],
+        help = "Specify global make options.")
 
-    group.add_option("--polylib-make-opts", "--polylib-make-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify polylib make opts (appended to --make-opts).")
+    group.add_option("--polylib-make-options", "--polylib-make-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify polylib make opts (appended to --make-options).")
 
-    group.add_option("--newgen-make-opts", "--newgen-make-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify newgen make opts (appended to --make-opts).")
+    group.add_option("--newgen-make-options", "--newgen-make-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify newgen make options (appended to --make-options).")
 
-    group.add_option("--linear-make-opts", "--linear-make-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify linear make opts (appended to --make-opts).")
+    group.add_option("--linear-make-options", "--linear-make-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify linear make options (appended to --make-options).")
 
-    group.add_option("--pips-make-opts", "--pips-make-flags", metavar = "OPTS", action = "append", default = [],
-        help = "Specify PIPS make opts (appended to --make-opts).")
+    group.add_option("--pips-make-options", "--pips-make-flags", metavar = "OPTS", action = "append", default = [],
+        help = "Specify PIPS make options (appended to --make-options).")
 
     group.add_option("--jobs", "-j", metavar = "COUNT", default = None,
         help = "Make packages concurrently using COUNT jobs.")
@@ -398,8 +398,8 @@ def work(options, args = None):
 
     # Global configure flags:
     configure_opts = [ "--prefix=" + prefix ]
-    if options.configure_opts:
-        configure_opts.extend(options.configure_opts)
+    if options.configure_options:
+        configure_opts.extend(options.configure_options)
     else:
         if options.debug:
             configure_opts.extend(default_debug_configure_opts)
@@ -408,8 +408,8 @@ def work(options, args = None):
 
     # Global make flags:
     make_opts = []
-    if options.make_opts:
-        make_opts.extend(options.make_opts)
+    if options.make_options:
+        make_opts.extend(options.make_options)
     if options.jobs:
         make_opts.append("-j" + options.jobs)
 
@@ -433,11 +433,11 @@ def work(options, args = None):
             os.makedirs(package_build_dir)
 
         polylib_conf_opts = configure_opts
-        if options.polylib_conf_opts:
-            polylib_conf_opts.extend(options.polylib_conf_opts)
+        if options.polylib_conf_options:
+            polylib_conf_opts.extend(options.polylib_conf_options)
         polylib_make_opts = make_opts
-        if options.polylib_make_opts:
-            polylib_make_opts.extend(options.polylib_make_opts)
+        if options.polylib_make_options:
+            polylib_make_opts.extend(options.polylib_make_options)
 
         build_package(package_dir = polylib_src_dir, build_dir = package_build_dir,
             configure_opts = polylib_conf_opts, make_opts = polylib_make_opts, dest_dir = dest_dir,
@@ -475,11 +475,11 @@ def work(options, args = None):
         p4a_util.run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(newgen_src_dir, "makes") ])
 
         newgen_conf_opts = configure_opts
-        if options.newgen_conf_opts:
-            newgen_conf_opts.extend(options.newgen_conf_opts)
+        if options.newgen_conf_options:
+            newgen_conf_opts.extend(options.newgen_conf_options)
         newgen_make_opts = make_opts
-        if options.newgen_make_opts:
-            newgen_make_opts.extend(options.newgen_make_opts)
+        if options.newgen_make_options:
+            newgen_make_opts.extend(options.newgen_make_options)
 
         build_package(package_dir = newgen_src_dir, build_dir = package_build_dir,
             configure_opts = newgen_conf_opts, make_opts = newgen_make_opts, dest_dir = dest_dir,
@@ -513,11 +513,11 @@ def work(options, args = None):
         p4a_util.run([ "ln", "-sv", os.path.join(nlpmake_src_dir, "makes"), os.path.join(linear_src_dir, "makes") ])
         linear_conf_opts = configure_opts
 
-        if options.linear_conf_opts:
-            linear_conf_opts.extend(options.linear_conf_opts)
+        if options.linear_conf_options:
+            linear_conf_opts.extend(options.linear_conf_options)
         linear_make_opts = make_opts
-        if options.linear_make_opts:
-            linear_make_opts.extend(options.linear_make_opts)
+        if options.linear_make_options:
+            linear_make_opts.extend(options.linear_make_options)
 
         build_package(package_dir = linear_src_dir, build_dir = package_build_dir,
             configure_opts = linear_conf_opts, make_opts = linear_make_opts, dest_dir = dest_dir,
@@ -589,14 +589,14 @@ def work(options, args = None):
         ### End of FIX for fortran
 
         pips_conf_opts = configure_opts
-        if options.pips_conf_opts:
-            pips_conf_opts.extend(options.pips_conf_opts)
+        if options.pips_conf_options:
+            pips_conf_opts.extend(options.pips_conf_options)
         else:
             global default_pips_conf_opts
             pips_conf_opts.extend(default_pips_conf_opts)
         pips_make_opts = make_opts
-        if options.pips_make_opts:
-            pips_make_opts.extend(options.pips_make_opts)
+        if options.pips_make_options:
+            pips_make_opts.extend(options.pips_make_options)
 
         build_package(package_dir = pips_src_dir, build_dir = package_build_dir,
             configure_opts = pips_conf_opts, make_opts = pips_make_opts, dest_dir = dest_dir,
