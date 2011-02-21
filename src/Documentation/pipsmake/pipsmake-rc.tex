@@ -7423,11 +7423,13 @@ sesamify                    > MODULE.code
                 < MODULE.cumulated_effects
 \end{PipsMake}
 
+\begin{PipsPass}{sesam_buffers_processing}
 Phase \texttt{sesam\_buffers\_processing} is to be run after
 \texttt{isolate\_statement} has been applied to all tasks
 statements. It then produces a header file to be included by the
 future sesam application individual tasks. This header file describes
 how kernel and server tasks use the sesam buffers.
+\end{PipsPass}
 \begin{PipsMake}
 sesam_buffers_processing    > MODULE.sesam_buffers_file
               < PROGRAM.entities
