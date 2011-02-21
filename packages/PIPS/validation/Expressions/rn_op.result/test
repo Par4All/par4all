@@ -1,0 +1,42 @@
+void sum_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for(i = 0; i <= n+1; i += 1)
+      r[i] = a[i]+b[i];
+}
+void sum_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for(i = 0; i <= n+1; i += 1)
+      r[i] = op_plusf(a[i], b[i]);
+}
+void sum_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for(i = 0; i <= n+1; i += 1)
+      op_assignf(&r[i], op_plusf(a[i], b[i]));
+}
+void sum_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for(i = 0; i <= op_plusi(n, 1); i += 1)
+      op_assignf(&r[i], op_plusf(a[i], b[i]));
+}
+void sum_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for (op_assigni(&i, 0);i<=op_plusi(n, 1);op_plus_upi(&i, 1))
+      op_assignf(&r[i], op_plusf(a[i], b[i]));
+}
+void muladd_f(int n, float *a, float *b, float *r)
+{
+   int i;
+   for(i = 0; i <= n+1; i += 1)
+      op_plus_upf(&r[i], op_plusf(a[i], b[i]));
+}
+void sum_c(int n, _Complex *a, _Complex *b, _Complex *r)
+{
+   int i;
+   for(i = 0; i <= n+1; i += 1)
+      op_assignC(&r[i], op_plusC(a[i], b[i]));
+}

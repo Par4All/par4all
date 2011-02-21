@@ -141,7 +141,7 @@ int main()
 {
 //             <    is written>: s
    int t, i, a[100], b[100/2], c[100/2], s = 0;
-//             <may be read   >: stdout stdout[0] 
+//             <may be read   >: a[*] b[*] c[*] stdout stdout[0] 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
@@ -166,7 +166,7 @@ scmp_task_0:
 //             <    is read   >: P4A__a__0 i t
             (*P4A__a__0)[i-0] = i*t;
 //             <may be read   >: P4A__a__0[0][*]
-//             <may be written>: P4A__a__0[0][*]
+//             <may be written>: P4A__a__0[0][*] a[*]
 //             <    is read   >: P4A__a__0
          P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__0);
 //             <    is read   >: P4A__a__0
@@ -184,7 +184,7 @@ scmp_task_0:
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*50);
-//             <may be read   >: P4A__a__1[0][*]
+//             <may be read   >: P4A__a__1[0][*] a[*]
 //             <may be written>: P4A__a__1[0][*]
 //             <    is read   >: P4A__a__1
          P4A_copy_to_accel_1d(sizeof(int), 100, 50, 0, &a[0], *P4A__a__1);
@@ -199,7 +199,7 @@ scmp_task_1:
 //             <    is read   >: P4A__a__1 P4A__b__0 i
             (*P4A__b__0)[i-0] = (*P4A__a__1)[i-0];
 //             <may be read   >: P4A__b__0[0][*]
-//             <may be written>: P4A__b__0[0][*]
+//             <may be written>: P4A__b__0[0][*] b[*]
 //             <    is read   >: P4A__b__0
          P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__0);
 //             <    is read   >: P4A__b__0
@@ -219,7 +219,7 @@ scmp_task_1:
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__2, sizeof(int)*50);
-//             <may be read   >: P4A__a__2[0][*]
+//             <may be read   >: P4A__a__2[0][*] a[*]
 //             <may be written>: P4A__a__2[0][*]
 //             <    is read   >: P4A__a__2
          P4A_copy_to_accel_1d(sizeof(int), 100, 50, 50, &a[0], *P4A__a__2);
@@ -234,7 +234,7 @@ scmp_task_2:
 //             <    is read   >: P4A__a__2 P4A__c__0 i
             (*P4A__c__0)[i-0] = (*P4A__a__2)[i+100/2-50];
 //             <may be read   >: P4A__c__0[0][*]
-//             <may be written>: P4A__c__0[0][*]
+//             <may be written>: P4A__c__0[0][*] c[*]
 //             <    is read   >: P4A__c__0
          P4A_copy_from_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__0);
 //             <    is read   >: P4A__c__0
@@ -250,7 +250,7 @@ scmp_task_2:
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__b__1, sizeof(int)*50);
-//             <may be read   >: P4A__b__1[0][*]
+//             <may be read   >: P4A__b__1[0][*] b[*]
 //             <may be written>: P4A__b__1[0][*]
 //             <    is read   >: P4A__b__1
          P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &b[0], *P4A__b__1);
@@ -278,7 +278,7 @@ scmp_task_3:
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__c__1, sizeof(int)*50);
-//             <may be read   >: P4A__c__1[0][*]
+//             <may be read   >: P4A__c__1[0][*] c[*]
 //             <may be written>: P4A__c__1[0][*]
 //             <    is read   >: P4A__c__1
          P4A_copy_to_accel_1d(sizeof(int), 50, 50, 0, &c[0], *P4A__c__1);

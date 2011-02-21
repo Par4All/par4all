@@ -746,7 +746,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
       seti(P_0, ma0);
       seti(P_0, P_0+3);
       seti(I_3, re2);
-      addi(I_3, 1);
+      addi(I_3, I_3, 1);
       seti(I_4, I_3);
       subi(I_4, 1);
       seti(P_1, im2);
@@ -756,7 +756,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
       seti(P_2, ma0);
       seti(P_2, P_2+4);
       seti(I_6, re2);
-      addi(I_6, 1);
+      addi(I_6, I_6, 1);
       seti(I_7, I_6);
       subi(I_7, 1);
       seti(P_3, im3);
@@ -764,7 +764,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
       seti(I_8, *P_2);
       muli(I_8, *P_3);
       seti(I_9, I_5);
-      addi(I_9, I_8);
+      addi(I_9, I_9, I_8);
       seti(P_4, ma0);
       seti(P_4, P_4+0);
       seti(P_5, ma0);
@@ -780,7 +780,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0, 
       seti(P_7, ma0);
       seti(P_7, P_7+2);
       seti(I_13, re2);
-      addi(I_13, 1);
+      addi(I_13, I_13, 1);
       seti(I_14, I_13);
       subi(I_14, 1);
       seti(P_8, im1);
