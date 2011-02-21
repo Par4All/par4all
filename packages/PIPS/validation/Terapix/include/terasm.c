@@ -1,16 +1,16 @@
-#ifndef TYPE
 #define _OP(a,b) a##b
 #define OP(a,b) _OP(a,b)
-#define TYPE float
-#define SUFF f
-#include "include/terasm.c"
 #define TYPE int
 #define SUFF i
-#include "include/terasm.c"
-#else
-TYPE OP(add,SUFF)(TYPE lhs, TYPE rhs)
+
+TYPE OP(ref,SUFF)(TYPE *ptr, int index)
 {
-    return lhs=lhs+rhs;
+	return *(ptr+index);
+}
+
+TYPE OP(add,SUFF)(TYPE lhs, TYPE rhs0, TYPE rhs1)
+{
+    return lhs=rhs0+rhs1;
 }
 TYPE OP(addr,SUFF)(TYPE lhs, TYPE *rhs)
 {
@@ -60,12 +60,16 @@ TYPE OP(setp,SUFF)(TYPE lhs, TYPE *rhs)
 {
     return lhs=*rhs;
 }
-TYPE OP(padd,SUFF)(TYPE *lhs, int rhs)
+TYPE OP(psetp,SUFF)(TYPE *lhs, TYPE *rhs)
 {
-    return lhs=lhs+rhs;
+    return *lhs=*rhs;
 }
-TYPE OP(psub,SUFF)(TYPE *lhs, int rhs)
+TYPE* OP(padd,SUFF)(TYPE *lhs, TYPE *rhs, int val)
+{
+    return lhs=rhs+val;
+}
+TYPE* OP(psub,SUFF)(TYPE *lhs, int rhs)
 {
     return lhs=lhs-rhs;
 }
-#endif
+

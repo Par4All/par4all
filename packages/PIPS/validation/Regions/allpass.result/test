@@ -1,0 +1,76 @@
+
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <tools!:_f_data_file-W-EXACT-{}>
+//  <tools!:_f_data_file[PHI1]-W-MAY-{PHI1==0}>
+
+int main(int argc, char **argv)
+{
+
+//  <argv-R-MAY-{}>
+//  <argv[PHI1]-R-MAY-{PHI1==1}>
+
+   int n = argc>1?atoi(argv[1]):1000;
+   double r;
+
+//  <in-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double (*in)[n] = (double (*)[n]) malloc(sizeof(double)*n);
+
+//  <in2-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+   double (*in2)[n] = (double (*)[n]) malloc(sizeof(double)*n);
+
+//  <argv-R-EXACT-{}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <tools!:_f_data_file-W-EXACT-{}>
+
+   init_args(argc, argv);
+
+//  <in-R-EXACT-{}>
+//  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <tools!:_f_data_file[PHI1]-W-MAY-{PHI1==0}>
+
+   init_data_double(*in, n);
+
+//  <in-R-EXACT-{}>
+//  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+//  <tools!:_f_data_file[PHI1]-W-MAY-{PHI1==0}>
+
+   init_data_double(*in, n);
+
+//  <in-R-EXACT-{}>
+//  <in[PHI1][PHI2]-R-MAY-{PHI1==0}>
+//  <in2-R-EXACT-{}>
+
+   r = allpass(4, *in, in2, 0.4f, 0.9f);
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+   printf("%ld\n", r);
+   return 0;
+}
