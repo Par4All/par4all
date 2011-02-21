@@ -715,6 +715,78 @@ list c_convex_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 	    free_effect(eff_real);
 
 	  }
+	else if(ENTITY_DEREFERENCING_P(real_op))
+	{
+	  // expression arg1 = EXPRESSION(CAR(args));
+
+	  pips_debug(6, "dereferencing operator case \n");
+
+
+	  /* if it's a pointer or a partially indexed array
+	   * We should do more testing here to check if types
+	   * are compatible...
+	   */
+	  if (pointer_type_p(real_arg_t) ||
+	      !ENDP(variable_dimensions(type_variable(real_arg_t))))
+	    {
+	      pips_debug(8, "pointer type real arg\n");
+	      /* first compute the region corresponding to the
+		 real argument
+	      */
+	      effect real_eff = effect_undefined;
+	      list l_real_arg =
+		generic_proper_effects_of_complex_address_expression
+		(real_arg, &real_eff, true);
+
+	      pips_debug_effect(6, "base effect :\n", real_eff);
+
+	      FOREACH(EFFECT, eff, l_sum_eff)
+		{
+		  /* this could easily be made generic BC. */
+		  /* FI: I add the restriction on store regions, but
+		     they should have been eliminated before translation
+		     is attempted */
+		  if(!anywhere_effect_p(real_eff) && store_effect_p(real_eff))
+		    {
+		      reference n_eff_ref;
+		      descriptor n_eff_d;
+		      effect n_eff;
+		      bool exact_translation_p;
+		      effect init_eff = (*effect_dup_func)(eff);
+
+		      /* we translate the initial region descriptor
+			 into the caller's name space
+		      */
+		      convex_region_descriptor_translation(init_eff);
+		      /* and then perform the translation */
+		      convex_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff),
+										     effect_descriptor(init_eff),
+										     effect_any_reference(real_eff),
+										     effect_descriptor(real_eff),
+										     0,
+										     &n_eff_ref, &n_eff_d,
+										     &exact_translation_p);
+		      n_eff = make_effect(make_cell_reference(n_eff_ref), copy_action(effect_action(eff)),
+					  exact_translation_p? copy_approximation(effect_approximation(eff)) : make_approximation_may(),
+					  n_eff_d);
+		      /* shouldn't it be a union ? BC */
+		      l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+		      free_effect(init_eff);
+		    }
+
+		}
+	      gen_free_list(l_real_arg);
+	      free_effect(real_eff);
+
+
+	    } /*  if (pointer_type_p(real_arg_t)) */
+	  else
+	    {
+	      pips_debug(8, "real arg reference is not a pointer and is not a partially indexed array -> NIL \n");
+
+	    } /* else */
+	  break;
+	}
 	else if(ENTITY_POINT_TO_P(real_op)|| ENTITY_FIELD_P(real_op))
 	  {
 	    list l_real_arg = NIL;

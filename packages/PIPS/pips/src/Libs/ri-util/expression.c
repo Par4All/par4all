@@ -3581,9 +3581,7 @@ expression dereference_expression(expression e)
   if (expression_call_p(e))
   {
     call c = expression_call(e);
-    entity address = CreateIntrinsic(ADDRESS_OF_OPERATOR_NAME);
-
-    if (call_function(c)==address) // "e == &x"
+    if (ENTITY_ADDRESS_OF_P(call_function(c))) // e is "&x"
     {
       pips_assert("one arg to address operator (&)",
                   gen_length(call_arguments(c))==1);

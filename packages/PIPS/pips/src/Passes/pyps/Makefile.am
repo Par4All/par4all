@@ -7,7 +7,7 @@ dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar
 
-dist_pkgpython_PYTHON = pypsbase.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py 
+dist_pkgpython_PYTHON = pypsbase.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
 dist_python_DATA = pips.pth
 
 if WITH_PYPS_EXTRA
@@ -67,4 +67,7 @@ pyps.py:$(p2p_cmd) Makefile
 pips-make: pips-make.in
 	sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
 
-CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h
+pypsconfig.py:Makefile
+	echo 'pypsruntime="$(pypsruntimedir)"' > pypsconfig.py
+
+CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h pypsconfig.py

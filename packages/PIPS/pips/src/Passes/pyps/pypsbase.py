@@ -61,17 +61,6 @@ class backendCompiler(object):
 			command+=files
 		return command
 
-class ompCompiler(backendCompiler):
-	"""openmp backend compiler to use openmp"""
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
-		if issubclass(self.__class__,gccCompiler):
-			self.CFLAGS += " -fopenmp"
-		elif issubclass(self.__class__,iccCompiler):
-			self.CFLAGS += " -openmp"
-		else:
-			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
-
 class gccCompiler(backendCompiler):
 	"""gcc backend compiler to use gcc"""
 	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
@@ -279,11 +268,11 @@ class workspace(object):
 			use the boolean `deleteOnClose' to turn full workspace deletion on/off
 		"""
 
-		name           = kwargs.setdefault("name",           "")
-		verbose        = kwargs.setdefault("verbose",        True)
-		cppflags       = kwargs.setdefault("cppflags",       "")
-		parents        = kwargs.setdefault("parents",        [])
-		cpypips	       = kwargs.setdefault("cpypips",        pypips)
+		name		   = kwargs.setdefault("name",		   "")
+		verbose		= kwargs.setdefault("verbose",		True)
+		cppflags	   = kwargs.setdefault("cppflags",	   "")
+		parents		= kwargs.setdefault("parents",		[])
+		cpypips		   = kwargs.setdefault("cpypips",		pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
 
@@ -371,21 +360,7 @@ class workspace(object):
 				pws.post_init(sources, **kwargs)
 			except AttributeError:
 				pass
-
-	def add_source(self, fname):
-		""" Add a source file to the workspace, using PIPS guard includes if necessary """
-		if self.recoverInclude:
-			newfname = os.path.join(self.tmpDirName,os.path.basename(fname))
-			shutil.copy2(fname, newfname)
-			self.sources += [newfname]
-			pypsutils.guardincludes(newfname)
-		else:
-			self.sources += [fname]
-
-	def add_sources(self, files):
-		""" Add source files to the workspace thanks to add_source """
-		map(self.source_file, files)
-
+	
 	def __enter__(self):
 		"""handler for the with keyword"""
 		return self

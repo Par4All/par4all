@@ -47,6 +47,7 @@
 #include "resources.h"
 #include "control.h"
 #include "arithmetique.h"
+#include "reductions.h"
 
 #include "effects-generic.h"
 #include "effects-simple.h"
@@ -367,4 +368,90 @@ bool simd_atomizer(char * mod_name)
     debug_off();
 
     return TRUE;
+}
+
+static void do_expression_reduction(statement s, reduction r, expression e) {
+    reference redref = reduction_reference(r);
+    entity redop = reduction_operator_entity(reduction_op(r));
+
+    if(expression_call_p(e)) {
+      call ce = expression_call(e);
+      if(same_entity_p(call_function(ce), redop)) {
+        expression lhs = binary_call_lhs(ce),
+                   rhs = binary_call_rhs(ce);
+
+        do_expression_reduction(s, r, lhs);
+        do_expression_reduction(s, r, rhs);
+
+        if(expression_reference_p(lhs) &&
+            reference_equal_p(expression_reference(lhs), redref)) {
+          update_expression_syntax(e, copy_syntax(expression_syntax(rhs)));
+        }
+        else if(expression_reference_p(rhs) &&
+                 reference_equal_p(expression_reference(rhs), redref)) {
+            update_expression_syntax(e, copy_syntax(expression_syntax(lhs)));
+        }
+        else
+        {
+            statement snew = make_assign_statement(
+                reference_to_expression(copy_reference(redref)),
+                MakeBinaryCall(redop,
+                    reference_to_expression(copy_reference(redref)),
+                    copy_expression(rhs)));
+            store_cumulated_reductions(snew,copy_reductions(load_cumulated_reductions(s)));
+            update_expression_syntax(e, copy_syntax(expression_syntax(lhs)));
+            insert_statement(s, snew, false);
+            store_cumulated_reductions(STATEMENT(CAR(statement_block(s))),copy_reductions(load_cumulated_reductions(s)));
+        }
+      }
+    }
+}
+
+
+static bool do_reduction_atomization(statement s) {
+    list reductions = reductions_list(load_cumulated_reductions(s));
+    if(!ENDP(reductions)) {
+      FOREACH(REDUCTION,r,reductions) {
+        /* the reduction must be of the pattern red = red op exp1 op exp2 */
+        reference redref = reduction_reference(r);
+        entity redop = reduction_operator_entity(reduction_op(r));
+        if(statement_call_p(s)) {
+          call c = statement_call(s);
+          entity assign = call_function(c);
+          if(ENTITY_ASSIGN_P(assign)) {
+            expression lhs = binary_call_lhs(c);
+            if(expression_reference_p(lhs)) {
+              reference  rlhs = expression_reference(lhs);
+              if(reference_equal_p(rlhs,redref)) {
+                expression rhs = binary_call_rhs(c);
+                do_expression_reduction(s, r, rhs);
+                update_expression_syntax(rhs, expression_syntax(
+                                        MakeBinaryCall(redop,
+                                                reference_to_expression(copy_reference(redref)),
+                                                copy_expression(rhs))));
+              }
+            }
+        }
+      }
+    }
+  }
+  return true;
+}
+
+bool reduction_atomization(const char * module_name) {
+    /* prelude */
+    set_current_module_entity(module_name_to_entity(module_name));
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name,true));
+    set_cumulated_reductions((pstatement_reductions) db_get_memory_resource(DBR_CUMULATED_REDUCTIONS, module_name, true));
+
+    /* do the job */
+    gen_recurse(get_current_module_statement(),statement_domain,do_reduction_atomization,gen_null);
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, get_current_module_name(), get_current_module_statement());
+
+    /* postlude */
+    reset_cumulated_reductions();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    return true;
 }
