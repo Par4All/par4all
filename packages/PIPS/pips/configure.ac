@@ -139,7 +139,7 @@ AX_ARG_ENABLE([pyps],
 			 AX_DEPENDS([pyps],[swig python_devel ipython])
 			]
 )
-
+AC_SUBST(pypsruntimedir,[$\{datarootdir\}/runtime])
 AX_ARG_ENABLE([pyps-extra],
 			[enable extra python tools],
 			[no],

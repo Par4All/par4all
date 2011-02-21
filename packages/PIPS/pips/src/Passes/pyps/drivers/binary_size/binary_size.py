@@ -51,7 +51,7 @@ def __funcsize(func, outfile = ""):
 def funcToMethod(func, clas):
 	"""Internal helper function : Adds function func to class clas"""
 	method = new.instancemethod(func, None, clas)
-	clas.__dict__[func.__name__] = method
+	setattr(clas, func.__name__, method)
 
 #Add binary_size function to pyps.module
 funcToMethod(binary_size, pyps.module)
