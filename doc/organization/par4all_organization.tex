@@ -267,11 +267,11 @@ See \S~\ref{sec:comp-from-sourc} for more information on alternate
 source locations.
 
 The options passed to \texttt{configure} for a package can be changed by
-using the \texttt{-{}-\emph{PACKAGE}-c-opts=...}
+using the \texttt{-{}-\emph{PACKAGE}-conf-options=...}
 
 For example, to compile \Apips with Fortran 95 support, use:
 \begin{verbatim}
-p4a_setup.py --only=pips --pips-c-opts="--enable-tpips --enable-pyps \
+p4a_setup.py --only=pips --pips-conf-options="--enable-tpips --enable-pyps \
   --enable-hpfc --enable-fortran95" --reconf --no-final
 \end{verbatim}
 
