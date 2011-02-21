@@ -428,30 +428,24 @@ l99995:
 //  <caillou[PHI1]-R-EXACT-{0<=PHI1, PHI1<=3, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <caillou0-R-EXACT-{}>
-//  <caillou0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <caillou0[PHI1][PHI2]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
+//  <caillou0[PHI1][PHI2]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=3, 1<=i_t,
+//    i_t<=4, 1<=j_t, j_t<=64}>
 
             P4A_copy_to_accel_1d(sizeof(int), -caillou[0]+4, 4, 0, &caillou[0], *caillou0);
 
 //  <src1[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src10-R-EXACT-{}>
-//  <src10[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <src10[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
+//  <src10[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
+//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src1[0][0], *src10);
 
 //  <src0[PHI1][PHI2]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
 //    j_t<=64}>
 //  <src00-R-EXACT-{}>
-//  <src00[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
-//  <src00[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, 1<=i_t, i_t<=4, 1<=j_t,
-//    j_t<=64}>
+//  <src00[PHI1][PHI2][PHI3]-W-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
+//    0<=PHI3, PHI3<=7, 1<=i_t, i_t<=4, 1<=j_t, j_t<=64}>
 
             P4A_copy_to_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &src0[0][0], *src00);
 
@@ -506,10 +500,9 @@ l99997:
 //  <result[PHI1][PHI2]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t, i_t<=4,
 //    1<=j_t, j_t<=64}>
 //  <result0-R-EXACT-{}>
-//  <result0[PHI1][PHI2][PHI3]-R-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
-//    i_t<=4, 1<=j_t, j_t<=64}>
-//  <result0[PHI1][PHI2][PHI3]-W-MAY-{PHI1==0, i==129, j==9, 1<=i_t,
-//    i_t<=4, 1<=j_t, j_t<=64}>
+//  <result0[PHI1][PHI2][PHI3]-R-EXACT-{PHI1==0, 0<=PHI2, PHI2<=127,
+//    0<=PHI3, PHI3<=7, i==129, j==9, 1<=i_t, i_t<=4, 1<=j_t,
+//    j_t<=64}>
 
             P4A_copy_from_accel_2d(sizeof(short), 512, 512, 128, 8, 128*i_t-128, 8*j_t-8, &result[0][0], *result0);
 
