@@ -52,28 +52,28 @@ def add_own_options(parser):
 
     proc_group.add_option("--cuda", "-C", action = "store_true", default = False,
         help = "Enable CUDA generation. Implies --accel.")
-	
+
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
         help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
-	
+
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
-	
+
     proc_group.add_option("--c99", action = "store_true", default = False,
         help = "This option is usefull when generating some cuda code from C99 sources. Indeed nvcc doesn't support the folowing C99 syntax : foo (int n, int a[n]), then if the c99 option is enable, p4a will automaticly generates the cuda code in new files that will be compiled by nvcc. A simple call to the kernel will be inserted into the original file that can be compiled with your usual compiler.")
-	
+
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
         help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
-	
+
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
-	
+
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
         help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
-	
+
     proc_group.add_option("--exclude-modules", metavar = "REGEXP", default = None,
 		help = "Exclude the modules (functions and subroutines) with names matching the regular expression from the parallelization. For example '(?i)^my_runtime' will skip all the functions or subroutines which names begin with 'my_runtime' in uppercase or lowercase. Have a look to the regular expression documentation for more details.")
-	
+
     proc_group.add_option("--no-process", "-N", action = "store_true", default = False,
 		help = "Bypass all PIPS processing (no parallelizing...) and voids all processing options. The given files are just passed to the back-end compiler. This is merely useful for testing compilation and linking options.")
 
@@ -82,10 +82,10 @@ def add_own_options(parser):
 
     proc_group.add_option("--no-spawn", action = "store_true", default = False,
 		help = "Do not spawn a child process to run processing (this child process is normally used to post-process the PIPS output and reporting simpler error message for example).")
-	
-    proc_group.add_option("--apply-before-parallelization", "--abp", action = "append", metavar = "PIPSPHASES", default = None,
-		help = "Add a pips phase that will be passed to pips before parallelization")
-			
+
+    proc_group.add_option("--apply-before-parallelization", "--abp", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied before parallelization.")
+
     parser.add_option_group(proc_group)
 
     cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
@@ -488,7 +488,13 @@ def main():
             input.output_dir = options.output_dir
             input.output_prefix = options.output_prefix
             input.output_suffix = options.output_suffix
-            input.apply_before_parallelization = options.apply_before_parallelization
+
+            # Phases in --apply-before-parallelization can be specified by
+            # several options or by separating phase names by ",":
+            input.apply_before_parallelization = []
+            for phases in options.apply_before_parallelization:
+                # Concatenate all the phases found in each option:
+                input.apply_before_parallelization += phases.split(",")
 
             # Interpret correctly the True/False strings, and integer strings,
             # for the --property option specifications:
@@ -506,14 +512,7 @@ def main():
                         pass
                 prop_dict[k] = v
 
-            input.properties = prop_dict         
-
-            # split the phases to apply to pips
-            phases=[]
-            for p in options.apply_before_parallelization:
-			   phases.extend(p.split(","))
-			
-            input.apply_before_parallelization = phases	
+            input.properties = prop_dict
 
             # This will hold the output (p4a_processor_output instance)
             # when the processor has been called and its output has been
