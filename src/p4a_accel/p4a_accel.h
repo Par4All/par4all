@@ -31,9 +31,11 @@
 #ifndef P4A_ACCEL_H
 #define P4A_ACCEL_H
 
+/*
 #ifdef __cplusplus
 extern "C" {
 #endif
+*/
 
 // For size_t
 #include <stddef.h>
@@ -372,8 +374,10 @@ void P4A_runtime_copy_from_accel(void *host_ptr, size_t size /* in bytes */);
 #endif
 #endif
 
+  /*
 #ifdef __cplusplus
 }
 #endif
+  */
 
 #endif //P4A_ACCEL_H

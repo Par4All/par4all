@@ -20,6 +20,8 @@
  *  execution (in ms)
  */
 float p4a_timing_elapsedTime = -1;
+struct timeval p4a_time_begin; 
+struct timeval p4a_time_end;
 
 #ifdef P4A_ACCEL_OPENMP
 

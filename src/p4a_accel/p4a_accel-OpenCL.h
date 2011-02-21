@@ -146,13 +146,13 @@ extern bool P4A_TIMING_fromHost;
 
     To record times for OpenCL functions executed in the host (kernel load, ...)
  */
-struct timeval p4a_time_begin; 
+extern struct timeval p4a_time_begin; 
 
 /** The absolute time recorded when the timer ends
 
     To record times for OpenCL functions executed in the host (kernel load, ...)
  */
-struct timeval p4a_time_end;
+extern struct timeval p4a_time_end;
 
 /** Start a timer on the accelerator in OpenCL.
     
@@ -372,6 +372,10 @@ extern cl_command_queue p4a_queue;
     -# Call the setKernelArg function with the good arguments.
 */
 
+/** A global pointer to the current kernel selected
+ */
+extern cl_kernel p4a_kernel; 
+
 /** The OpenCL parameters for invocation of clEnqueueNDRangeKernel
     (p4a_queue,p4a_kernel,work_dim,NULL,P4A_block_descriptor,P4A_grid_descriptor,0,NULL,&p4a_event).
     */
@@ -520,8 +524,9 @@ interpreted via P4A_arg1(n,x,...); n is the rank of the parameters. */
     C++ version with template, to properly solve the type issue.
  */
 #ifdef __cplusplus
-template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
-  printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
+template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) 
+{
+  //printf("%s : size %lu, rang %d\n",s,sizeof(arg0),i);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,sizeof(arg0),&arg0);
   P4A_test_execution_with_message("clSetKernelArg");
 }
@@ -530,7 +535,7 @@ template<typename ARG0> inline void p4a_setArguments(int i,char *s,ARG0 arg0) {
 clSetKernelArg via the C++ version of p4a_setArguments() such that the
 parameters types are resolved.
  */
-#define P4A_arg1(n,x,...)  p4a_setArguments(n,STRINGIFY(x),x);		
+#define P4A_arg1(n,x,...)  p4a_setArguments(n,(char *)STRINGIFY(x),x);		
 #else
 /* See the C version of the p4a_setArguments in p4a_accel.c. The
     reference to the parameter is set as (void *) 
@@ -687,8 +692,6 @@ parameters types are resolved.
   global_x *= p4a_block_x;						\
   int global_y = n_y_iter;						\
   size_t grid_descriptor_name[]={(size_t)(global_x),(size_t)(global_y)}; \
-  /*fprintf(stderr,"p4a_block_x = %d et p4a_block_y = %d\n",p4a_block_x,p4a_block_y);*/ \
-  /*fprintf(stderr,"n_x_iter = %d et n_y_iter = %d\n",global_x,global_y);*/ \
   P4A_skip_debug(P4A_dump_grid_descriptor(grid_descriptor_name);)	\
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
@@ -810,10 +813,6 @@ extern struct p4a_cl_kernel *p4a_kernels;
 struct p4a_cl_kernel* new_p4a_kernel(const char *kernel);
 struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
 #endif
-
-/** A global pointer to the current kernel selected
- */
-extern cl_kernel p4a_kernel; 
 
 /** Prototype of the function that loads the kernel source as a string
     from an external file.
