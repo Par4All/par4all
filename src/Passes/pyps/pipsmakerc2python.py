@@ -112,7 +112,7 @@ def printPythonMethod(name,doc):
 #Print workspace properties
 if generator == "-properties":
 	del pipsprops[""]
-	sys.stdout.write("workspace.Props.all=dict({")
+	sys.stdout.write("workspace.props.all=dict({")
 	sys.stdout.write(",".join(map(lambda (key,val) : "'"+key+"': "+val,pipsprops.iteritems())))
 	sys.stdout.write("})")
 	exit(0)
