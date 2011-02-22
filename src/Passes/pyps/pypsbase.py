@@ -309,9 +309,9 @@ class workspace(object):
 			self.iparents.append(pws)
 
 		self._modules = {}
-		self.props = workspace.Props(self)
-		self.fun = workspace.Fun(self)
-		self.cu = workspace.Cu(self)
+		self.props = workspace.props(self)
+		self.fun = workspace.fun(self)
+		self.cu = workspace.cu(self)
 		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
@@ -691,7 +691,7 @@ class workspace(object):
 		return l
 
 
-	class Cu(object):
+	class cu(object):
 		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
@@ -734,7 +734,7 @@ class workspace(object):
 			return module_name in self._cuDict()
 
 
-	class Fun(object):
+	class fun(object):
 		'''Allow user to access a module by writing w.fun.modulename'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
@@ -774,7 +774,7 @@ class workspace(object):
 			"""Test if the workspace contains a given module"""
 			return module_name in self._functionDict()
 
-	class Props(object):
+	class props(object):
 		"""Allow user to access a property by writing w.props.PROP,
 		this class contains a static dictionary of every properties
 		and default value
