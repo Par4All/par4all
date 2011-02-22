@@ -293,7 +293,9 @@ static void print_entity_task_buffers(FILE *fp, set tasks,
 
   FOREACH(ENTITY, task, l_tasks)
     {
-      fprintf(fp, "\n%s%s%s\n", "#ifdef ", task_prefix, entity_user_name(task));
+      char * task_name = entity_user_name(task);
+      fprintf(fp, "\n%s%s%s\n", "#ifdef ", task_prefix, task_name);
+      fprintf(fp, "#define %s%s_p 1\n", task_prefix, task_name);
       task_buffers bufs = apply_entity_task_buffers(tasks_to_buffers, task);
       set input_bufs = task_buffers_input(bufs);
       set output_bufs = task_buffers_output(bufs);
@@ -310,6 +312,8 @@ static void print_entity_task_buffers(FILE *fp, set tasks,
 	    fprintf(fp, "%s %s%s\n", "#define", entity_user_name(buf), "_prod_p 0");
 
 	}
+      fprintf(fp, "#else\n");
+      fprintf(fp, "#define %s%s_p 0\n", task_prefix, task_name);
       fprintf(fp, "%s\n", "#endif");
     }
   gen_free_list(l_tasks);
@@ -328,11 +332,12 @@ static void print_sesam_tasks_buffers_header(char *module_name,
   FILE *fp;
   local_buffers_header_name =
     db_build_file_resource_name(DBR_SESAM_BUFFERS_FILE,
-				module_name, ".buffers");
+				module_name, "_buffers.h");
   buffers_header_name =
     strdup(concatenate(db_get_current_workspace_directory(),
 		       "/", local_buffers_header_name, NULL));
   fp = safe_fopen(buffers_header_name, "w");
+
 
   /* first sort buffers list so that buffers are always
      printed in the same order */
@@ -383,6 +388,21 @@ static void print_sesam_tasks_buffers_header(char *module_name,
   safe_fclose(fp, buffers_header_name);
   free(buffers_header_name);
   gen_free_list(l_buffers);
+
+  char * server_file_name =
+    strdup(concatenate(db_get_current_workspace_directory(),
+		       "/", module_name, "/", module_name, ".servers", NULL));
+  fp = safe_fopen(server_file_name, "w");
+
+  list l_server_tasks = set_to_sorted_list(server_tasks, (gen_cmp_func_t) compare_entities);
+  string prefix = get_string_property ("SCALOPES_SERVER_TASK_PREFIX");
+  FOREACH(ENTITY, server_task, l_server_tasks)
+    {
+      fprintf(fp, "%s%s\n", prefix, entity_user_name(server_task));
+    }
+  gen_free_list(l_server_tasks);
+  safe_fclose(fp, server_file_name);
+  free(server_file_name);
 
   DB_PUT_FILE_RESOURCE(DBR_SESAM_BUFFERS_FILE, strdup(module_name),
 		       local_buffers_header_name);
