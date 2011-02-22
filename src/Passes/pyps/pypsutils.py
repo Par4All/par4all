@@ -143,7 +143,7 @@ def apply(m, phase, *args, **kwargs):
 def update_props(passe,props):
 	"""Change a property dictionary by appending the pass name to the property when needed """
 	for name,val in props.iteritems():
-		if name.upper() not in pyps.workspace.Props.all:
+		if name.upper() not in pyps.workspace.props.all:
 			del props[name]
 			props[str.upper(passe+"_"+name)]=val
 			#print "warning, changing ", name, "into", passe+"_"+name
