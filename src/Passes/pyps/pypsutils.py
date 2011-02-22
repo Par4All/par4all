@@ -3,7 +3,7 @@ import re
 import os
 import fileinput
 import sys
-import pyps
+import pypsbase
 import pypsconfig
 
 """ Pyps tool box
