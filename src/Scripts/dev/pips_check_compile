@@ -158,7 +158,8 @@ function report()
 
   # out if locked
   [ $current = 'locked' ] && {
-    echo "message: $msg" | mailx -s 'PIPS compilation status is locked' $dest
+    echo "message: $msg" | \
+      mailx -s "$vname pips compilation status is locked" $dest
     exit 0
   }
 
