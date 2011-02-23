@@ -24,9 +24,10 @@ int main(void)
   }
 
   // pp points to a dead value in the stack
-  // should generate an error
-  // **pp = 0; // segfault?
-
   printf("%p\n", pp);
+
+  // possible segfault.
+  // should generate an error while analyzing?
+  **pp = 0;
   return 0;
 }
