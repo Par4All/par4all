@@ -50,7 +50,7 @@ void point_to03()
    typedef double a_t[10][20];
 //  points to = {}
    a_t a;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    a_t *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 

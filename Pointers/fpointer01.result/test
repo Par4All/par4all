@@ -19,14 +19,11 @@ void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_str
       /* indentation ok ? */
       
       while (*col<indent) {
-//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
-//   _nbout_3,-Exact-)}
+//  points to = {}
          my_fputc(' ', _stream);
-//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
-//   _nbout_3,-Exact-)}
+//  points to = {}
          (*nbout)++;
-//  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
-//   _nbout_3,-Exact-)}
+//  points to = {}
          (*col)++;
       }
 //  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,

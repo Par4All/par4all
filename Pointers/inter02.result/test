@@ -15,7 +15,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *x;
 //  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int tab[10];
@@ -23,8 +23,7 @@ int main()
    int *tab2[10];
 //  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int tab3[10][10];
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int **tab4;
 //  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}

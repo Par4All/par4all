@@ -7,13 +7,13 @@ int main()
 //  points to = {}
    int t[100][10][3], i;
 
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int (*p)[3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    for(i = 0; i <= 2; i += 1)
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,t[*][0],-MAY-)}
+//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
       p = t[i];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,t[*][0],-MAY-)}
+//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
 
    return 0;
 }

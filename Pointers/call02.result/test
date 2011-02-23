@@ -134,7 +134,7 @@ int main()
    int *ap[10];
 //  points to = {}
    tf_t s;
-//  {(sp,s,-Exact-)}
+//  points to = {}
    tf_t *sp = &s;
 //  {(sp,s,-Exact-)}
 

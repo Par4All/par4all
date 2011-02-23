@@ -57,14 +57,14 @@ int main()
 //  points to = {}
 
    j = make_s(1, 2.).entier;
-//  {(*ANY_MODULE*:*ANYWHERE*,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  points to = {}
 
    return j;
 }
 //  {}
 s_t make_s(int i, float x)
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    s_t *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 

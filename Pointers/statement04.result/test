@@ -20,3 +20,29 @@ int main()
    // END BLOCK
 }
 POINTS TO
+//  {}
+int main()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   int **x, *y, k, h;
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   k = 1;
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   h = 2;
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   y = &h;
+//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
+   *x = y;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
+   printf("x = %p \n", x);
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,h,-Exact-)}
+   return 0;
+   // END BLOCK
+}

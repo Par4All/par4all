@@ -22,17 +22,17 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p, i;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    i = 1;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (i>0)
-//  {(p,i,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = &i;
    else
-//  {(p,i,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = &i;
 //  {(p,i,-Exact-)}
 
