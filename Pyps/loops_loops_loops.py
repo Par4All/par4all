@@ -19,4 +19,5 @@ with workspace("loops_loops_loops.c",verbose=False,deleteOnClose=True) as w:
 			print "== loops of" , l1.label
 			for l2 in l1.loops():
 				print l2.label
+	m.loops("l99995")
 	m.display()

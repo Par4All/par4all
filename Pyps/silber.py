@@ -25,7 +25,7 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 	# this will stop when force_loop_fusion fails
 	try:
 		while len(t.loops()) > 0:
-			l=t.loops()[0]
+			l=t.loops(0)
 			l.force_loop_fusion()
 			t.suppress_dead_code()
 			l.display()
@@ -49,7 +49,7 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		(rc,out,err)=w.compile_and_run(backendCompiler(CFLAGS='-g -O2 -fopenmp', args=["include/input.pgm","include/mapfile.amp", "/dev/null"]))
 
 		w.props.constant_path_effects=False
-		lbl=t.loops()[0].loops()[0].label
+		lbl=t.loops(0).loops(0).label
 		t.outline(module_name=outline_module,label=lbl)
 		t.display()
 		w[outline_module].display()
