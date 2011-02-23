@@ -1,3 +1,11 @@
+/*
+!
+! Example of syntax_cast case that has made 
+!
+! to reach the function  same_syntax_name_p() updated for C 
+! 
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
