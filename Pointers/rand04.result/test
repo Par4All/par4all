@@ -1,0 +1,46 @@
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i1, i2;
+//  points to = {}
+   int *pi1 = &i1;
+//  {(pi1,i1,-Exact-)}
+   int *pi2 = &i2;
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-)}
+   int **pp;
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   srand(time((void *) 0));
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   if (alea())
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+      pp = &pi1;
+   else
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+      pp = &pi2;
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,pi1,-MAY-);(pp,pi2,-MAY-)}
+   *pp = (void *) 0;
+//  {(pi1,*NULL_POINTER*,-Exact-);(pi2,*NULL_POINTER*,-Exact-);(pp,
+//   pi1,-MAY-);(pp,pi2,-MAY-)}
+   printf("%p %p %p\n", pp, pi1, pi2);
+//  {(pi1,*NULL_POINTER*,-Exact-);(pi2,*NULL_POINTER*,-Exact-);(pp,
+//   pi2,-MAY-);(pp,pi1,-MAY-)}
+   return 0;
+}
+//  {}
+static int alea(void)
+{
+//  points to = {}
+   int r = rand();
+//  points to = {}
+   printf("%d\n", r);
+//  points to = {}
+   return rand()%2==1;
+}
+
+POINTS TO
+
