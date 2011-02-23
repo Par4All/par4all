@@ -1,4 +1,5 @@
 #include <stdio.h>
+/* we must start using predicates on the approximations when we compute points-to relations */
 #include <stdlib.h>
 #include <time.h>
 
