@@ -1,13 +1,13 @@
 //  {}
 int main()
 {
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int **a;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int b;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    a[0] = &b;
-//  {(*ANY_MODULE*:*ANYWHERE*,b,-Exact-);(a,*ANY_MODULE*:*NOWHERE*,
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
    return 0;
 }

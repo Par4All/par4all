@@ -6,21 +6,21 @@ int main()
    if (a>1) {
 //  points to = {}
       static int *p = &a;
-//  points to = {}
+//  {(p,a,-Exact-)}
       static int *q;
-//  points to = {}
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       q = &b;
-//  points to = {}
+//  {(p,a,-Exact-);(q,b,-Exact-)}
       a = a-1;
    }
    else {
 //  points to = {}
       static int *r = &a;
-//  points to = {}
+//  {(r,a,-Exact-)}
       static int *s;
-//  points to = {}
+//  {(r,a,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       s = &b;
-//  points to = {}
+//  {(r,a,-Exact-);(s,b,-Exact-)}
       a = a+2;
    }
 //  {(p,a,-MAY-);(q,b,-MAY-);(r,a,-MAY-);(s,b,-MAY-)}

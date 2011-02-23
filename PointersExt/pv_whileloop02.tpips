@@ -1,17 +1,16 @@
-delete pv_abort02
-create pv_abort02 pv_abort02.c 
+delete pv_whileloop02
+create pv_whileloop02 pv_whileloop02.c 
 
-setproperty ABORT_ON_USER_ERROR TRUE
+setproperty DOWHILELOOP_ON_USER_ERROR TRUE
 setproperty ALIASING_ACROSS_TYPES FALSE
 setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
-#setenv POINTER_VALUES_DEBUG_LEVEL 2
+#setenv POINTER_VALUES_DEBUG_LEVEL 3
 
 module main
 #activate PRINT_CODE_SIMPLE_POINTER_VALUES
-#activate PRINT_CODE_PROPER_EFFECTS
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 
 close
-delete pv_abort02
+delete pv_whileloop02
 quit
