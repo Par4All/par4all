@@ -102,7 +102,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 				# this take care of expanding the loop in order to match number of processor constraint
 				m.smart_loop_expansion(l,tiling_vector[0],debug)
 				# this take care of expanding the loop in order to match memory size constraint
-				m.smart_loop_expansion(l.loops()[0],tiling_vector[1],debug)
+				m.smart_loop_expansion(l.loops(0),tiling_vector[1],debug)
 				l.symbolic_tiling(force=True,vector=vconv(tiling_vector))
 				if debug:m.display()
 				#m.icm()
@@ -159,7 +159,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 		name=seed+str(nb)
 		nb+=1
 		m.privatize_module()
-		m.outline(module_name=name,label=k.label,smart_reference_computation=True,loop_bound_as_parameter=k.loops()[0].label)
+		m.outline(module_name=name,label=k.label,smart_reference_computation=True,loop_bound_as_parameter=k.loops(0).label)
 		launchers+=[w[name]]
 	if debug:m.display()
 	if debug:
@@ -168,11 +168,11 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	print "outlining to microcode"
 	microcodes=[]
 	for l in launchers:
-		theloop=l.loops()[0]
+		theloop=l.loops(0)
 		#l.loop_normalize(one_increment=True,lower_bound=0)
 		#l.redundant_load_store_elimination()
 		name=l.name+"_microcode"
-		loop_to_outline=theloop.loops()[0]
+		loop_to_outline=theloop.loops(0)
 		l.outline(module_name=name,label=loop_to_outline.label,smart_reference_computation=True)
 		mc=w[name]
 		if debug:l.display()

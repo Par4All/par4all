@@ -96,10 +96,11 @@ class loop:
 		"""display loop module"""
 		self._module.display()
 
-	def loops(self):
+	def loops(self,label=None):
 		"""get outer loops of this loop"""
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
-		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
+		if label!=None: return self.loops()[label]
+		else: return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
 
 class module(object): # deriving from object is needed for overloaded setter
 	"""A source code function"""
@@ -180,12 +181,12 @@ class module(object): # deriving from object is needed for overloaded setter
 	code = property(_get_code,_set_code)
 
 
-	def loops(self, label=""):
-		"""get desired loop if label given, an iterator over outermost loops otherwise"""
+	def loops(self, label=None):
+		"""get desired loop if label given, ith loop if label is an integer and an iterator over outermost loops otherwise"""
 		loops=self._ws.cpypips.module_loops(self.name,"")
-		if label:
-			if label in loops: return loop(self,label)
-			else: raise Exception("Loop label invalid")
+		if label != None:
+			if type(label) is int: return self.loops()[label]
+			else: return loop(self,label) # no check is done here ...
 		else:
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 

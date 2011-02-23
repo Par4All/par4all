@@ -293,7 +293,7 @@ static void print_entity_task_buffers(FILE *fp, set tasks,
 
   FOREACH(ENTITY, task, l_tasks)
     {
-      char * task_name = entity_user_name(task);
+      const char * task_name = entity_user_name(task);
       fprintf(fp, "\n%s%s%s\n", "#ifdef ", task_prefix, task_name);
       fprintf(fp, "#define %s%s_p 1\n", task_prefix, task_name);
       task_buffers bufs = apply_entity_task_buffers(tasks_to_buffers, task);
