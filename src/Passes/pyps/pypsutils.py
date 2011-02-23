@@ -143,7 +143,7 @@ def apply(m, phase, *args, **kwargs):
 def update_props(passe,props):
 	"""Change a property dictionary by appending the pass name to the property when needed """
 	for name,val in props.iteritems():
-		if name.upper() not in pyps.workspace.props.all:
+		if name.upper() not in pypsbase.workspace.props.all:
 			del props[name]
 			props[str.upper(passe+"_"+name)]=val
 			#print "warning, changing ", name, "into", passe+"_"+name
@@ -152,7 +152,7 @@ def update_props(passe,props):
 def build_module_list(ws):
 	""" update workspace module list """
 	for m in ws.info("modules"):
-		ws._modules[m]=pyps.module(ws,m,ws._sources[0])
+		ws._modules[m]=pypsbase.module(ws,m,ws._sources[0])
 
 # A regex matching compilation unit names ending with a "!":
 re_compilation_units = re.compile("^.*!$")
