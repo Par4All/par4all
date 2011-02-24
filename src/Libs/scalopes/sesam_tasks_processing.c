@@ -116,8 +116,10 @@ static entity sesam_buffer_to_server_entity(entity buffer)
   char *res_name = strndup(name_without_prefix, size_var_name);
 
   pips_debug(5, "found server variable name: %s\n", res_name);
-  entity res = FindEntity(get_current_module_name(), res_name);
-  pips_assert("Original entity found in current module", !entity_undefined_p(res));
+  entity res = FindEntity(get_current_module_name(), res_name); /* try to find it in the current module*/
+  if (entity_undefined_p(res))
+    res = FindEntity(TOP_LEVEL_MODULE_NAME, res_name); /* try to find a global variable */
+  pips_assert("Original entity found in current module or in global variables", !entity_undefined_p(res));
   return res;
 }
 
