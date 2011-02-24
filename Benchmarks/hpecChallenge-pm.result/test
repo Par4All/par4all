@@ -1,0 +1,1769 @@
+
+//  <log_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=16}>
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].MSE_scores-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].all_shifted_test_db-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].elsize-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].mag_shift_scores-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].minimum_MSE_score-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].num_templates-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].profile_size-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].shift_size-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].template_copy-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].template_exceed-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].template_profiles_db-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_exceed_means-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_exceed_means[PHI3]-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_exceed_means[PHI3]-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_noise_db_array-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_noise_db_array[PHI3]-R-MAY-{PHI1==0}>
+//  <pmdata[PHI1].test_noise_db_array[PHI3]-R-MAY-{PHI1==0}>
+//  <pmdata[PHI1].test_profile_db-R-EXACT-{PHI1==0}>
+//  <pmdata[PHI1].test_profile_db[PHI3]-R-EXACT-{PHI1==0, PHI3==0}>
+//  <pmdata[PHI1].test_profile_db[PHI3]-R-EXACT-{PHI1==0, PHI3==0}>
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+int pm(PmData *pmdata)
+{
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].elsize-R-EXACT-{PHI1==0}>
+
+   int elsize = pmdata->elsize;
+   /* size of a single fp number    */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].shift_size-R-EXACT-{PHI1==0}>
+
+   int shift_size = pmdata->shift_size;
+   /* number of shifting to the left and right of the test profile */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].profile_size-R-EXACT-{PHI1==0}>
+
+   int profile_size = pmdata->profile_size;
+   /* number of pixels in a pattern */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].num_templates-R-EXACT-{PHI1==0}>
+
+   int num_templates = pmdata->num_templates;
+   /* number of library patterns    */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].test_profile_db-R-EXACT-{PHI1==0}>
+//  <test_profile_db-W-EXACT-{}>
+
+   float *test_profile_db = pmdata->test_profile_db;
+   /* the test pattern              */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].template_profiles_db-R-EXACT-{PHI1==0}>
+//  <template_profiles_db-W-EXACT-{}>
+
+   float *template_profiles_db = pmdata->template_profiles_db;
+   /* the library of patterns       */
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].test_noise_db_array-R-EXACT-{PHI1==0}>
+//  <test_noise_db_array-W-EXACT-{}>
+
+   float *test_noise_db_array = pmdata->test_noise_db_array;
+   /* the noise in the test pattern in an array for fast copy */
+
+//  <all_shifted_test_db-W-EXACT-{}>
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].all_shifted_test_db-R-EXACT-{PHI1==0}>
+
+   float *all_shifted_test_db = pmdata->all_shifted_test_db;
+   /* the shifted test pattern      */
+   
+   uint match_index;
+   /* the index of the most likely template that matches the test pattern */
+   uint min_MSE_index = shift_size+1;
+   /* the index of the range shifts with the lowest mean square error */
+   uint num_template_exceed, num_test_exceed;
+   /* the number of pixels exceeded the test pattern and a library template */
+   
+   uchar mag_shift_scores_flag;
+   /* flag that tells if the magnitude scaling loop has been run (existed just to save ops) */
+   
+   float test_peak, template_peak;
+   /* the maximum pixels of the test pattern and a library template pattern */
+   float template_noise;
+   /* the noise level of a library template */
+   
+   float noise_shift, noise_shift2;
+   /* temporary storage for calculating the mse for range shifting */
+   
+   float min_MSE, match_score;
+   /* temporary storage for finding the minimum mse */
+   
+   float sumWeights_inv = 1.0f/profile_size;
+   /* the inverse of the weights used for calculating the mse */
+   /* Note: weights for the kernel would be application dependent. They are set to 1 for our purposes */
+   
+   float mag_db;
+   /* the magnitude shifts in dB */
+   float power_shift, ave_power_ratio;
+   /* the diff of the avg shifted test profile power to the avg template power */
+   float power_ratio;
+
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+//  <test_profile_db-R-EXACT-{}>
+//  <test_profile_db[PHI1]-R-MAY-{min_MSE_index==shift_size+1}>
+
+   float test_noise = (pow10fpm(test_profile_db[0]*0.1f)+pow10fpm(test_profile_db[profile_size-1]*0.1f))*0.5f;
+   int half_shift_size = (int) ceil((float) shift_size/2.0f);
+   /* since "shift_size/2" is used a lot, so we create a var to hold it */
+   int template_index, current_shift;
+   /* indices */
+   int patsize = profile_size*elsize;
+   /* number of bytes of a pattern */
+   
+
+//  <minimum_MSE_score-W-EXACT-{}>
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].minimum_MSE_score-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+
+   float *minimum_MSE_score = pmdata->minimum_MSE_score;
+
+//  <MSE_scores-W-EXACT-{}>
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].MSE_scores-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+
+   float *MSE_scores = pmdata->MSE_scores;
+
+//  <mag_shift_scores-W-EXACT-{}>
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].mag_shift_scores-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+
+   float *mag_shift_scores = pmdata->mag_shift_scores;
+
+//  <log_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=16}>
+
+   register float test_noise_db = test_noise==0.0f?-100.0f:10.0f*log10fpm(fabs(test_noise));
+   /* test noise in dB */
+   register float test_noise_db_plus_3 = test_noise_db+3.0f;
+   /* twice test noise in the power domain, approximately +3dB */
+   
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].template_copy-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+//  <template_copy-W-EXACT-{}>
+
+   register float *template_copy = pmdata->template_copy;
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].template_exceed-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+//  <template_exceed-W-EXACT-{}>
+
+   register uchar *template_exceed = pmdata->template_exceed;
+
+//  <pmdata-R-EXACT-{}>
+//  <pmdata[PHI1].test_exceed_means-R-EXACT-{PHI1==0,
+//    min_MSE_index==shift_size+1}>
+//  <test_exceed_means-W-EXACT-{}>
+
+   register float *test_exceed_means = pmdata->test_exceed_means;
+
+   register int i, j;
+   /* indices */
+   
+   register float tmp1, tmp2;
+   /* temporary storage for calculating the mse for range shifting */
+   register float sum_exceed;
+   /* the sum of the test pattern pixels exceeded twice test noise */
+   register float template_exceed_mean = 0;
+   /* the mean of a template pattern pixels exceeded twice test noise */
+   register float weighted_MSE;
+   /* temporary storage for computing the weighted MSE */
+   
+   /* These pointers are solely used for fast memory access */
+   register float *cur_tp, *fptr, *fptr2, *fptr3, *endptr;
+   register uchar *bptr;
+
+//  <test_noise_db_array-R-EXACT-{}>
+//  <test_noise_db_array[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=profile_size,
+//    min_MSE_index==shift_size+1}>
+
+   
+   /* Having an array of test noise for fast copying of noise returns */
+   for(i = 0; i <= profile_size-1; i += 1)
+
+//  <test_noise_db_array-R-EXACT-{}>
+//  <test_noise_db_array[PHI1]-W-EXACT-{PHI1==i,
+//    min_MSE_index==shift_size+1, 0<=i, i+1<=profile_size}>
+
+
+      test_noise_db_array[i] = test_noise_db;
+
+//  <fptr-W-EXACT-{}>
+//  <test_profile_db-R-EXACT-{}>
+
+   
+   /* Finding the maximum pixels of the test pattern */
+   fptr = test_profile_db;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, min_MSE_index==shift_size+1, 0<=i,
+//    profile_size<=i}>
+
+   test_peak = *fptr++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, min_MSE_index==shift_size+1,
+//    2<=profile_size}>
+
+   for(i = 1; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, min_MSE_index==shift_size+1, 1<=i,
+//    i+1<=profile_size}>
+
+      if (test_peak<*fptr)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, min_MSE_index==shift_size+1, 1<=i,
+//    i+1<=profile_size}>
+
+         test_peak = *fptr;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      fptr++;
+   }
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <all_shifted_test_db[PHI1]-W-MAY-{min_MSE_index==shift_size+1,
+//    1<=i, profile_size<=i}>
+//  <test_noise_db_array-R-EXACT-{}>
+//  <test_noise_db_array[PHI1]-R-MAY-{min_MSE_index==shift_size+1,
+//    1<=i, profile_size<=i}>
+
+   
+   /* Paddle array for all the possible range shifts. Essentially, we are 
+      * performing the following:
+      *
+      * Adding these two portions to the beginning and end of the test pattern
+      *      |                          |
+      *      V                          V
+      *  |<------>|                 |<------>| 
+      *            
+      *               __       __
+      *              |  |     |  |
+      *             |    |___|    |
+      *            |               |
+      *  _________|                 |_________   <- test noise in dB domain
+      * ---------------------------------------  <- zero
+      *
+      *           |<--------------->|
+      *           original test pattern
+      *
+      *
+      * The all_shifted_test_db will be accessed in a sliding window manner.
+      */
+   
+   memcpy((void *) all_shifted_test_db, (void *) test_noise_db_array, elsize*half_shift_size);
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <test_profile_db-R-EXACT-{}>
+//  <test_profile_db[PHI1]-R-MAY-{min_MSE_index==shift_size+1, 1<=i,
+//    profile_size<=i}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   memcpy((void *) (all_shifted_test_db+half_shift_size), (void *) test_profile_db, elsize*profile_size);
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <test_noise_db_array-R-EXACT-{}>
+//  <test_noise_db_array[PHI1]-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+   memcpy((void *) (all_shifted_test_db+half_shift_size+profile_size), (void *) test_noise_db_array, elsize*half_shift_size);
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+   
+   /* Set the pixels to test noise in dB domain if pixel is less than test noise in dB */
+   fptr = all_shifted_test_db+half_shift_size;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=profile_size}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 1<=profile_size}>
+
+   for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=i, i+1<=profile_size}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 0<=i, i+1<=profile_size}>
+
+      if (*fptr<test_noise_db)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, 0<=i, i+1<=profile_size}>
+
+         *fptr = test_noise_db;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      fptr++;
+   }
+
+//  <fptr2-W-EXACT-{}>
+//  <test_exceed_means-R-EXACT-{}>
+
+   
+   /* Calculating the mean of the pixels that exceeded twice test noise for each 
+      * possible shift of the test profile */
+   fptr2 = test_exceed_means;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <endptr-R-EXACT-{}>
+//  <endptr-W-EXACT-{}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, 0<=i, profile_size<=i, 1<=shift_size}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-W-EXACT-{PHI1==0, 0<=i, profile_size<=i,
+//    1<=shift_size}>
+
+   for(current_shift = 0; current_shift <= shift_size-1; current_shift += 1) {
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <endptr-W-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      /* Pointer arithmetics to find the start and end pointers */
+      if (current_shift<half_shift_size) {
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <endptr-W-EXACT-{}>
+
+         endptr = all_shifted_test_db+current_shift+profile_size;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr = all_shifted_test_db+half_shift_size;
+      }
+      else {
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <endptr-W-EXACT-{}>
+
+         endptr = all_shifted_test_db+half_shift_size+profile_size;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr = all_shifted_test_db+current_shift;
+      }
+      
+      /* Summing the pixels that exceed twice test noise for the current shifts */
+      sum_exceed = 0.0f;
+      num_test_exceed = 0;
+
+//  <endptr-R-EXACT-{}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i}>
+
+      while (fptr!=endptr) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i,
+//    0<=num_test_exceed}>
+
+         if (*fptr>test_noise_db_plus_3) {
+            num_test_exceed++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i,
+//    1<=num_test_exceed}>
+
+            sum_exceed += *fptr;
+         }
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr++;
+      }
+
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-W-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i,
+//    0<=num_test_exceed}>
+
+
+      *fptr2++ = num_test_exceed?sum_exceed/((float) num_test_exceed):0.0f;
+   }
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=shift_size,
+//    1<=num_templates}>
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, 1<=num_templates, 1<=profile_size}>
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp-W-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{1<=num_templates}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=num_templates}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 1<=num_templates, 1<=profile_size}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-MAY-{PHI1==0, 1<=num_templates, 1<=profile_size}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+//  <fptr3[PHI1]-R-MAY-{PHI1==0, 1<=num_templates, 1<=shift_size}>
+//  <log_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=16}>
+//  <mag_shift_scores-R-MAY-{}>
+//  <mag_shift_scores[PHI1]-W-MAY-{1<=num_templates}>
+//  <minimum_MSE_score-R-MAY-{}>
+//  <minimum_MSE_score[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=num_templates}>
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-MAY-{1<=num_templates}>
+//  <template_exceed-R-EXACT-{}>
+//  <template_exceed[PHI1]-W-MAY-{1<=num_templates}>
+//  <template_profiles_db-R-EXACT-{}>
+//  <test_exceed_means-R-EXACT-{}>
+//  <test_exceed_means[PHI1]-R-EXACT-{1<=num_templates}>
+
+   /* for (current_shift=0; current_shift<shift_size; current_shift++) */
+   
+   
+   /* Loop over all the templates. Determine the best shift distance, then 
+      * the best gain adjustment. */
+   for(template_index = 0; template_index <= num_templates-1; template_index += 1) {
+
+//  <cur_tp-W-EXACT-{}>
+//  <template_profiles_db-R-EXACT-{}>
+
+      cur_tp = template_profiles_db+template_index*profile_size;
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      
+      /* Scale the template profile we're currently working on so that its peak
+           * is equal to the peak of the test profile */
+      
+      /* --------------------------------------------------------------------
+           * template_peak = max( template_profile ) */
+      fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, template_index+1<=num_templates,
+//    0<=template_index}>
+
+      template_peak = *fptr++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, template_index+1<=num_templates,
+//    2<=profile_size, 0<=template_index}>
+
+      for(i = 1; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=i, i+1<=profile_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+         if (template_peak<*fptr)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=i, i+1<=profile_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            template_peak = *fptr;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr++;
+      }
+      
+      /* Additively adjust the noise level of this template profile in the
+           * raw power domain so that its noise level matches the noise level
+           * of the test profile */
+      
+      /* --------------------------------------------------------------------
+             Setting up all the constants */
+      
+      noise_shift = test_peak-template_peak;
+
+//  <template_exceed-R-EXACT-{}>
+//  <template_exceed[PHI1]-W-MAY-{1<=i, profile_size<=i,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+      memset((void *) template_exceed, 0, sizeof(char)*profile_size);
+      sum_exceed = 0.0f;
+      num_template_exceed = 0;
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      
+      /* -------------------------------------------------------------------- 
+           * The following blocks are optimized code that essentially 
+           * perform the operations immediately below. The calculation of the 
+           * template noise constants is done once the exponentials are complete
+           */
+      
+      /* template_profile = template_profile + test_peak - template_peak
+           * template = 10 ^ (template_profile / 10)
+           * template = template + test_noise - template_noise
+           * if (input < fp_epsilon) then clip the input to -100 dB
+           * template = log10( abs(template) )
+           * template_profile = 10 * template + test_noise_db */
+      
+      fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+
+      for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+
+         tmp1 = *fptr+noise_shift;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, num_template_exceed==0, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <pow_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=19}>
+
+         *fptr = pow10fpm(tmp1*0.1f);
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr++;
+      }
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{PHI1<=i, profile_size<=PHI1+i+1,
+//    num_template_exceed==0, 0<=i, profile_size<=i,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+      
+      /* Calculates noise levels from first and last elements of the current 
+             template */
+      
+      template_noise = (cur_tp[0]+cur_tp[profile_size-1])*0.5f;
+      noise_shift2 = test_noise-template_noise;
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+
+      fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=num_template_exceed+profile_size,
+//    num_template_exceed+1<=profile_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, 1<=num_template_exceed+profile_size,
+//    num_template_exceed+1<=profile_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <log_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=16}>
+//  <template_exceed-R-MAY-{}>
+//  <template_exceed[PHI1]-W-MAY-{0<=PHI1+num_template_exceed,
+//    num_template_exceed<=PHI1, PHI1+1<=profile_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+      for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+         tmp1 = *fptr+noise_shift2;
+
+         if (tmp1==0.0f)
+            tmp1 = 1e-10;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, num_template_exceed<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <log_coeff[PHI1]-R-MAY-{0<=PHI1, PHI1<=16}>
+
+
+         *fptr = 10.0f*log10fpm(fabs(tmp1))+test_noise_db;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+//  <template_exceed[PHI1]-W-MAY-{PHI1==i, num_template_exceed<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+         
+         /* Because many of the operations in the search for the best shift 
+                * amount depend on knowledge of which pixels in the template 
+                * have values exceeding twice test_noise (recall that 3db is roughly 
+                * equivalent to a doubling of raw power), we'll put those indices in
+                * template_exceed */
+         
+         if (*fptr>test_noise_db_plus_3) {
+
+//  <template_exceed-R-EXACT-{}>
+//  <template_exceed[PHI1]-W-EXACT-{PHI1==i, num_template_exceed<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            template_exceed[i] = 1;
+            num_template_exceed++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed<=i+1,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            sum_exceed += *fptr;
+         }
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+
+         fptr++;
+      }
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=shift_size,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-MAY-{PHI1==0, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+//  <fptr3[PHI1]-R-MAY-{PHI1==0, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+//  <test_exceed_means-R-EXACT-{}>
+
+      
+      /* Note: The following block has 4 different branches:
+             1. Both the current template and the test pattern have values exceeded 
+                twice test noise.
+             2. Only the current template has values exceeded twice test noise.
+             3. Only the test pattern has values exceeded twice test noise.
+             4. Neither the current template nor the test pattern has values 
+                exceeded twice test noise.
+          */
+      
+      /* If there is at least one pixel in the template we're
+           * currently working on whose value exceeds twice test_noise */
+      if (num_template_exceed) {
+         template_exceed_mean = sum_exceed/((float) num_template_exceed);
+
+//  <fptr3-W-EXACT-{}>
+//  <test_exceed_means-R-EXACT-{}>
+
+         fptr3 = test_exceed_means;
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=shift_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+//  <fptr3[PHI1]-R-EXACT-{PHI1==0, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-MAY-{1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+
+
+         for(current_shift = 0; current_shift <= shift_size-1; current_shift += 1) {
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            /* Work on a copy of the template we're currently working on */
+            memcpy((void *) template_copy, (void *) cur_tp, patsize);
+
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+
+            
+            /* If there is at least one pixel in the shifted test profile
+                     * whose value exceeds twice test noise. */
+            if (*fptr3!=0.0f) {
+
+//  <fptr3-R-EXACT-{}>
+//  <fptr3[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+               /* CASE 1 */
+               /* Considering only those pixels whose powers exceed twice 
+                          * test noise, compute the difference of the mean power in
+                          * template we're currently working on. */
+               power_ratio = *fptr3-template_exceed_mean;
+
+//  <fptr-W-EXACT-{}>
+//  <template_copy-R-EXACT-{}>
+
+               
+               /* Scale template values that exceed twice test noise by power ratio and
+                          * set the values that are less than test noise in db to test noise in db */
+               fptr = template_copy;
+
+//  <bptr-W-EXACT-{}>
+//  <template_exceed-R-EXACT-{}>
+
+               bptr = template_exceed;
+
+//  <bptr-R-EXACT-{}>
+//  <bptr-W-EXACT-{}>
+//  <bptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+
+               for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <bptr-R-EXACT-{}>
+//  <bptr-W-EXACT-{}>
+//  <bptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr-R-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                  if (*bptr++)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                     *fptr += power_ratio;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr[PHI1]-W-MAY-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+
+                  if (*fptr<test_noise_db)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-W-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                     *fptr = test_noise_db;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+                  fptr++;
+               }
+            }
+            else {
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+               /* CASE 2 */
+               /* Set those pixels in the template we're currently working on
+                          * whose values are less than test_noise to test_noise. */
+               fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+               for(i = 0; i <= profile_size-1; i += 1)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{PHI1==i, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                  if (*fptr++<test_noise_db)
+
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-EXACT-{PHI1==i, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                     template_copy[i] = test_noise_db;
+            }
+            /* else ... if (num_test_exceed) */
+            
+            /* Compute the weighted MSE */
+            weighted_MSE = 0.0f;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+            fptr = all_shifted_test_db+current_shift;
+
+//  <fptr2-W-EXACT-{}>
+//  <template_copy-R-EXACT-{}>
+
+            fptr2 = template_copy;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+
+            for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, i+1<=profile_size,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+               tmp1 = *fptr++-*fptr2++;
+               weighted_MSE += tmp1*tmp1;
+            }
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-EXACT-{PHI1==current_shift, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+            
+            /* ----------------------------------------------------------------
+                     * MSE_scores[current_shift] = weighted_MSE / sumWeights */
+            MSE_scores[current_shift] = weighted_MSE*sumWeights_inv;
+
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+
+            fptr3++;
+         }
+      }
+      else {
+
+//  <fptr3-W-EXACT-{}>
+//  <test_exceed_means-R-EXACT-{}>
+
+         fptr3 = test_exceed_means;
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=shift_size,
+//    num_template_exceed==0, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=profile_size, 1<=shift_size,
+//    0<=template_index}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+//  <fptr3[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{num_template_exceed==0,
+//    template_index+1<=num_templates, 1<=shift_size,
+//    0<=template_index}>
+
+
+         for(current_shift = 0; current_shift <= shift_size-1; current_shift += 1) {
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{num_template_exceed==0, 0<=current_shift,
+//    current_shift+1<=shift_size, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr-R-MAY-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr3-R-EXACT-{}>
+//  <fptr3-W-EXACT-{}>
+//  <fptr3[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            /* CASE 3 */
+            /* If there is at least one pixel that exceeds twice test noise */
+            if (*fptr3++!=0.0f)
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+
+               fptr2 = cur_tp;
+            else {
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{num_template_exceed==0, 0<=current_shift,
+//    current_shift+1<=shift_size, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-MAY-{num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+               /* CASE 4 */
+               /* Work on a copy of the template we're currently working on. */
+               memcpy((void *) template_copy, (void *) cur_tp, patsize);
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+
+               fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    num_template_exceed==0, 0<=current_shift,
+//    current_shift+1<=shift_size, template_index+1<=num_templates,
+//    0<=template_index}>
+
+               for(i = 0; i <= profile_size-1; i += 1)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{PHI1==i, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                  if (*fptr++<test_noise_db)
+
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-EXACT-{PHI1==i, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+
+                     template_copy[i] = test_noise_db;
+
+//  <fptr2-W-EXACT-{}>
+//  <template_copy-R-EXACT-{}>
+
+
+               fptr2 = template_copy;
+            }
+            
+            /* Compute the weighted MSE */
+            weighted_MSE = 0.0f;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+            fptr = all_shifted_test_db+current_shift;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size,
+//    template_index+1<=num_templates, 1<=profile_size,
+//    0<=template_index}>
+
+            for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, num_template_exceed==0,
+//    0<=current_shift, current_shift+1<=shift_size, 0<=i,
+//    i+1<=profile_size, template_index+1<=num_templates,
+//    0<=template_index}>
+
+               tmp1 = *fptr++-*fptr2++;
+               weighted_MSE += tmp1*tmp1;
+            }
+
+//  <MSE_scores-R-EXACT-{}>
+//  <MSE_scores[PHI1]-W-EXACT-{PHI1==current_shift,
+//    num_template_exceed==0, 0<=current_shift,
+//    current_shift+1<=shift_size, 0<=i, profile_size<=i,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+
+            MSE_scores[current_shift] = weighted_MSE*sumWeights_inv;
+         }
+      }
+
+//  <MSE_scores-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      /* else .. if (num_template_exceed) */
+      
+      /* Finding the minimum MSE for range shifting */
+      fptr = MSE_scores;
+      min_MSE_index = 0;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, min_MSE_index==0, 0<=current_shift,
+//    shift_size<=current_shift, 0<=i, profile_size<=i,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+      min_MSE = *fptr++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 2<=shift_size,
+//    0<=template_index}>
+
+      for(i = 1; i <= shift_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 1<=i, i+1<=shift_size,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+         if (min_MSE>*fptr) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 1<=i, i+1<=shift_size,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+            min_MSE = *fptr;
+            min_MSE_index = i;
+         }
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr++;
+      }
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-MAY-{i<=current_shift+1,
+//    shift_size<=current_shift, 1<=i, shift_size<=i,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-MAY-{i<=current_shift+1,
+//    shift_size<=current_shift, 1<=i, shift_size<=i,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+      
+      /* Work on a copy of the template we're currently working on. */
+      memcpy((void *) template_copy, (void *) cur_tp, patsize);
+
+      mag_shift_scores_flag = 1;
+
+//  <all_shifted_test_db-R-MAY-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr-R-MAY-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <fptr2-R-MAY-{}>
+//  <fptr2-W-MAY-{}>
+//  <fptr2[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <mag_shift_scores-R-MAY-{}>
+//  <mag_shift_scores[PHI1]-W-MAY-{mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <minimum_MSE_score-R-MAY-{}>
+//  <minimum_MSE_score[PHI1]-W-MAY-{PHI1==template_index,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+//  <test_exceed_means-R-EXACT-{}>
+//  <test_exceed_means[PHI1]-R-EXACT-{PHI1==min_MSE_index,
+//    mag_shift_scores_flag==1, i<=current_shift+1,
+//    shift_size<=current_shift, 1<=i, shift_size<=i,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+
+      if (test_exceed_means[min_MSE_index]!=0.0f)
+
+//  <all_shifted_test_db-R-MAY-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr-R-MAY-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <fptr2-R-MAY-{}>
+//  <fptr2-W-MAY-{}>
+//  <fptr2[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <mag_shift_scores-R-MAY-{}>
+//  <mag_shift_scores[PHI1]-W-MAY-{mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+//  <test_exceed_means-R-MAY-{}>
+//  <test_exceed_means[PHI1]-R-MAY-{PHI1==min_MSE_index,
+//    mag_shift_scores_flag==1, i<=current_shift+1,
+//    shift_size<=current_shift, 1<=i, shift_size<=i,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+         if (num_template_exceed) {
+
+//  <test_exceed_means-R-EXACT-{}>
+//  <test_exceed_means[PHI1]-R-EXACT-{PHI1==min_MSE_index,
+//    mag_shift_scores_flag==1, i<=current_shift+1,
+//    shift_size<=current_shift, 1<=i, shift_size<=i,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+            /* Compute the difference of the average shifted test profile
+                     * power to the average template power */
+            /* ave_power_ratio = (sum_exceed / (float)(num_test_exceed)) - template_exceed_mean; */
+            ave_power_ratio = test_exceed_means[min_MSE_index]-template_exceed_mean;
+            
+            /* Loop over all possible magnitude shifts */
+            j = 0, mag_db = -5.0f;
+
+//  <all_shifted_test_db-R-MAY-{}>
+//  <bptr-R-MAY-{}>
+//  <bptr-W-MAY-{}>
+//  <bptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr-R-MAY-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <fptr2-R-MAY-{}>
+//  <fptr2-W-MAY-{}>
+//  <fptr2[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <mag_shift_scores-R-MAY-{}>
+//  <mag_shift_scores[PHI1]-W-MAY-{mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_exceed-R-MAY-{}>
+
+            while (mag_db<=5.0f) {
+               power_shift = ave_power_ratio+mag_db;
+
+//  <bptr-W-EXACT-{}>
+//  <template_exceed-R-EXACT-{}>
+
+               
+               /* --------------------------------------------------------------
+                          * template_copy = template_profiles(template_exceed) + ave_power_ratio + mag_db */
+               bptr = template_exceed;
+
+//  <bptr-R-EXACT-{}>
+//  <bptr-W-EXACT-{}>
+//  <bptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <cur_tp[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+               for(i = 0; i <= profile_size-1; i += 1)
+
+//  <bptr-R-EXACT-{}>
+//  <bptr-W-EXACT-{}>
+//  <bptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <cur_tp-R-MAY-{}>
+//  <cur_tp[PHI1]-R-MAY-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+                  if (*bptr++)
+
+//  <cur_tp-R-EXACT-{}>
+//  <cur_tp[PHI1]-R-EXACT-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-EXACT-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+                     template_copy[i] = cur_tp[i]+power_shift;
+               
+               /* Compute the weighted MSE */
+               weighted_MSE = 0.0f;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+               fptr = all_shifted_test_db+min_MSE_index;
+
+//  <fptr2-W-EXACT-{}>
+//  <template_copy-R-EXACT-{}>
+
+               fptr2 = template_copy;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+
+               for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 1<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+                  tmp1 = *fptr++-*fptr2++;
+                  weighted_MSE += tmp1*tmp1;
+               }
+
+//  <mag_shift_scores-R-EXACT-{}>
+//  <mag_shift_scores[PHI1]-W-EXACT-{PHI1==j,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=i, profile_size<=i,
+//    1<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+
+               mag_shift_scores[j++] = weighted_MSE*sumWeights_inv;
+               mag_db += 0.5f;
+            }
+         }
+      else {
+
+//  <cur_tp-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         /* Set those pixels in the template we're currently working on
+                * whose values are less than test_noise to test_noise. */
+         fptr = cur_tp;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=profile_size,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+         for(i = 0; i <= profile_size-1; i += 1)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <template_copy-R-MAY-{}>
+//  <template_copy[PHI1]-W-MAY-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            if (*fptr++<test_noise_db)
+
+//  <template_copy-R-EXACT-{}>
+//  <template_copy[PHI1]-W-EXACT-{PHI1==i, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+               template_copy[i] = test_noise_db;
+         
+         /* Compute the weighted MSE */
+         weighted_MSE = 0.0f;
+
+//  <all_shifted_test_db-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+         fptr = all_shifted_test_db+min_MSE_index;
+
+//  <fptr2-W-EXACT-{}>
+//  <template_copy-R-EXACT-{}>
+
+         fptr2 = template_copy;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    1<=profile_size, 0<=template_index}>
+
+         for(i = 0; i <= profile_size-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+//  <fptr2-R-EXACT-{}>
+//  <fptr2-W-EXACT-{}>
+//  <fptr2[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    i+1<=profile_size, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+            tmp1 = *fptr++-*fptr2++;
+            weighted_MSE += tmp1*tmp1;
+         }
+
+//  <minimum_MSE_score-R-EXACT-{}>
+//  <minimum_MSE_score[PHI1]-W-EXACT-{PHI1==template_index,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=i, profile_size<=i,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+
+         minimum_MSE_score[template_index] = weighted_MSE*sumWeights_inv;
+
+         mag_shift_scores_flag = 0;
+      }
+
+//  <fptr-R-MAY-{}>
+//  <fptr-W-MAY-{}>
+//  <fptr[PHI1]-R-MAY-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+//  <mag_shift_scores-R-MAY-{}>
+//  <minimum_MSE_score-R-MAY-{}>
+//  <minimum_MSE_score[PHI1]-W-MAY-{PHI1==template_index,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+      /* if (num_test_exceed) */
+      
+      /* If magnitude shifting has performed above */
+      if (mag_shift_scores_flag) {
+
+//  <fptr-W-EXACT-{}>
+//  <mag_shift_scores-R-EXACT-{}>
+
+         /* Find the minimum MSE for magnitude scaling */
+         fptr = mag_shift_scores;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 0<=i,
+//    1<=i+num_template_exceed, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+         min_MSE = *fptr++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+         for(i = 1; i <= 20; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 1<=i, i<=20,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+            if (min_MSE>*fptr)
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, mag_shift_scores_flag==1,
+//    0<=current_shift, shift_size<=current_shift, 1<=i, i<=20,
+//    0<=num_template_exceed, template_index+1<=num_templates,
+//    0<=template_index}>
+
+               min_MSE = *fptr;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+            fptr++;
+         }
+
+//  <minimum_MSE_score-R-EXACT-{}>
+//  <minimum_MSE_score[PHI1]-W-EXACT-{PHI1==template_index, i==21,
+//    mag_shift_scores_flag==1, 0<=current_shift,
+//    shift_size<=current_shift, 0<=num_template_exceed,
+//    template_index+1<=num_templates, 0<=template_index}>
+
+
+         minimum_MSE_score[template_index] = min_MSE;
+      }
+   }
+
+//  <fptr-W-EXACT-{}>
+//  <minimum_MSE_score-R-EXACT-{}>
+
+   /* for template_index */
+   
+   /* Find the minimum mean square error */
+   fptr = minimum_MSE_score;
+   match_index = 0;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, match_index==0, 0<=current_shift,
+//    shift_size<=current_shift, 0<=i, num_templates<=template_index,
+//    0<=template_index}>
+
+   match_score = *fptr++;
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 2<=num_templates,
+//    num_templates<=template_index}>
+
+   for(i = 1; i <= num_templates-1; i += 1) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 1<=i, i+1<=num_templates,
+//    num_templates<=template_index}>
+
+      if (match_score>*fptr) {
+
+//  <fptr-R-EXACT-{}>
+//  <fptr[PHI1]-R-EXACT-{PHI1==0, 0<=current_shift,
+//    shift_size<=current_shift, 1<=i, i+1<=num_templates,
+//    num_templates<=template_index}>
+
+         match_score = *fptr;
+         match_index = i;
+      }
+
+//  <fptr-R-EXACT-{}>
+//  <fptr-W-EXACT-{}>
+
+      fptr++;
+   }
+
+   return match_index;
+}
+
