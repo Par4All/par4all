@@ -48,13 +48,12 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    FILE *s;                                                             /*0024*/
+//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+   char *fmt;                                                           /*0025*/
 //  {(fmt,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
-   char *fmt;                                                           /*0025*/
-//  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *ch;                                                            /*0026*/
 //  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}

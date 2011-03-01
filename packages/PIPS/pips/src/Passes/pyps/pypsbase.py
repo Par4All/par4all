@@ -96,10 +96,11 @@ class loop:
 		"""display loop module"""
 		self._module.display()
 
-	def loops(self):
+	def loops(self,label=None):
 		"""get outer loops of this loop"""
 		loops=self._ws.cpypips.module_loops(self._module.name,self._label)
-		return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
+		if label!=None: return self.loops()[label]
+		else: return [ loop(self._module,l) for l in str.split(loops," ") ] if loops else []
 
 class module(object): # deriving from object is needed for overloaded setter
 	"""A source code function"""
@@ -180,12 +181,12 @@ class module(object): # deriving from object is needed for overloaded setter
 	code = property(_get_code,_set_code)
 
 
-	def loops(self, label=""):
-		"""get desired loop if label given, an iterator over outermost loops otherwise"""
+	def loops(self, label=None):
+		"""get desired loop if label given, ith loop if label is an integer and an iterator over outermost loops otherwise"""
 		loops=self._ws.cpypips.module_loops(self.name,"")
-		if label:
-			if label in loops: return loop(self,label)
-			else: raise Exception("Loop label invalid")
+		if label != None:
+			if type(label) is int: return self.loops()[label]
+			else: return loop(self,label) # no check is done here ...
 		else:
 			return [ loop(self,l) for l in loops.split(" ") ] if loops else []
 
@@ -309,9 +310,9 @@ class workspace(object):
 			self.iparents.append(pws)
 
 		self._modules = {}
-		self.props = workspace.Props(self)
-		self.fun = workspace.Fun(self)
-		self.cu = workspace.Cu(self)
+		self.props = workspace.props(self)
+		self.fun = workspace.fun(self)
+		self.cu = workspace.cu(self)
 		self.tmpDirName= None # holds tmp dir for include recovery
 
 		# SG: it may be smarter to save /restore the env ?
@@ -691,7 +692,7 @@ class workspace(object):
 		return l
 
 
-	class Cu(object):
+	class cu(object):
 		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
@@ -734,7 +735,7 @@ class workspace(object):
 			return module_name in self._cuDict()
 
 
-	class Fun(object):
+	class fun(object):
 		'''Allow user to access a module by writing w.fun.modulename'''
 		def __init__(self,wp):
 			self.__dict__['_wp'] = wp
@@ -774,7 +775,7 @@ class workspace(object):
 			"""Test if the workspace contains a given module"""
 			return module_name in self._functionDict()
 
-	class Props(object):
+	class props(object):
 		"""Allow user to access a property by writing w.props.PROP,
 		this class contains a static dictionary of every properties
 		and default value

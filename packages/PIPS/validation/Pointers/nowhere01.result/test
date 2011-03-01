@@ -28,10 +28,9 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int **q;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -40,7 +39,7 @@ int main()
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
    *q = &i;
-//  {(*ANY_MODULE*:*ANYWHERE*,i,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    return 0;

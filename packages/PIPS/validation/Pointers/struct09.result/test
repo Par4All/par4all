@@ -188,9 +188,9 @@ int main()
       printf("\nstruct with pointer copy : \n");
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
       for(i = 0; i <= 9; i += 1) {
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
          (b.p)[i] = i*10;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
@@ -207,9 +207,9 @@ int main()
       printf("\nstruct with array copy : \n");
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
       for(i = 0; i <= 9; i += 1) {
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
          (d.array)[i] = i*10;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
       }
@@ -217,9 +217,9 @@ int main()
       
       // definition of e
       for(i = 0; i <= 4; i += 1) {
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
          (e.champ)[i].p = malloc(10*sizeof(int));
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
          for(j = 0; j <= 9; j += 1)
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
             ((e.champ)[i].p)[j] = i+j;
@@ -234,9 +234,9 @@ int main()
       for(i = 0; i <= 4; i += 1)
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
          for(j = 0; j <= 9; j += 1) {
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
             ((f.champ)[i].p)[j] = i*j;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
             
             
             printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
@@ -259,9 +259,9 @@ int main()
       for(i = 0; i <= 4; i += 1)
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
          for(j = 0; j <= 9; j += 1) {
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
             ((h.champ)[i].array)[j] = i*j;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
             
             
             printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);

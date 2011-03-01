@@ -7,29 +7,26 @@ int main()
 //  points to = {}
    int t[100][10][3];
 
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int (*p)[3];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *pu;
 
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-)}
    int (*q)[10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*qu)[3];
 
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*r)[100][10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ru,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-)}
    int (*ru)[10][3];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pu,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(qu,

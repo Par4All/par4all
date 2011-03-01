@@ -20,7 +20,8 @@ gpips_SOURCES=	directory_menu.c \
 		main_gpips.c
 
 gpips_LDADD=../../Libs/libpipslibs.la
-gpips_LDFLAGS=$(GTKp_2_0_LIBS)
+gpips_LDFLAGS=$(GTKp_2_0_LIBS)\
+	$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 
 AM_CPPFLAGS=\
 	-I$(top_srcdir)/src/Documentation/constants\

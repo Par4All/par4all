@@ -1,0 +1,22 @@
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS="randlc"
+delete $WS
+create $WS $WS.c ../SAC/include/SIMD.c
+
+echo
+echo Initial code
+echo
+
+module $WS
+display PRINTED_FILE
+
+source ../SAC/include/benchmark.tpips.h
+
+echo
+echo simdized code
+echo
+
+display PRINTED_FILE
+apply UNSPLIT
+close

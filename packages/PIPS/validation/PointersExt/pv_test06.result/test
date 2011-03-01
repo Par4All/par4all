@@ -1,8 +1,7 @@
 //  {}
 int main()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p, *q, *r;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
@@ -21,10 +20,10 @@ int main()
    r = &b;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
    if (1)
-//  {(p,a,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
       p = q;
    else
-//  {(p,b,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
       p = r;
 //  {(p,a,-MAY-);(p,b,-MAY-);(q,a,-Exact-);(r,b,-Exact-)}
 

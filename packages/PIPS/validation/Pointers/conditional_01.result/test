@@ -26,10 +26,9 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}

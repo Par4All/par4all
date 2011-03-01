@@ -3,8 +3,7 @@ int main()
 {
 //  points to = {}
    int i = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -15,18 +14,18 @@ int main()
 //  {(p,*HEAP*_l_7,-Exact-);(q,*HEAP*_l_7,-Exact-)}
 
    while (i<5) {
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
-//   *HEAP*_l_7,-MAY-)}
+//  points to = {}
       *q = i;
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
-//   *HEAP*_l_7,-MAY-)}
+//  points to = {}
       q++;
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  points to = {}
       i++;
    }
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
+//   *HEAP*_l_7,-MAY-)}
 
    free(p);
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
+//   *HEAP*_l_7,-MAY-)}
    return 0;
 }

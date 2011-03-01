@@ -1,0 +1,308 @@
+
+//  <A[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=rows, 1<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1+1<=rows, 1<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+
+void qr(int rows, int cols, ComplexFloat A[rows][cols], ComplexFloat Q[rows][cols], ComplexFloat R[cols][cols])
+{
+   /* Q data access pointers */
+   /* R data access pointers */
+   
+   /* Temporaries and loop variables. */
+   double theNorm;
+   int i, j, k;
+
+//  <A[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=rows, 1<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1+1<=rows, 1<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1<=PHI2, PHI2+1<=cols,
+//    cols+1<=rows}>
+
+   
+   /* Main loop:  Loop over the columns of the input matrix, A. */
+   for(i = 0; i <= cols-1; i += 1) {
+      
+      /* Calculate R(i,i) = norm(A(:,i))                             */
+      /* The result is a real number, i.e. the imaginary part is 0.  */
+      theNorm = 0.0;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=cols, cols+1<=rows}>
+
+      for(k = 0; k <= rows-1; k += 1)
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=cols, 0<=k,
+//    k+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=cols, 0<=k,
+//    k+1<=rows, cols+1<=rows}>
+
+         theNorm += (double) A[k][i].r*(double) A[k][i].r+(double) A[k][i].i*(double) A[k][i].i;
+      /* We've computed the inner product, A(:,i)'*A(:,i).  Now take    */
+      /* the square root of this value to calculate the norm of A(:,i). */
+      theNorm = sqrt(theNorm);
+
+//  <R[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==i, k==rows, 0<=i,
+//    i+1<=cols, cols+1<=k}>
+
+      R[i][i].r = (float) theNorm;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=k, k==rows,
+//    0<=i, i+1<=cols, cols+1<=k}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=k, k==rows,
+//    0<=i, i+1<=cols, cols+1<=k}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=k, k==rows,
+//    0<=i, i+1<=cols, cols+1<=k}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=k, k==rows,
+//    0<=i, i+1<=cols, cols+1<=k}>
+
+      
+      /* Calculate the update of column i of Q.                  */
+      /* matlab: Q(:,i) = A(:,i) / R (i,i)                       */
+      /* Loop over rows (or down the current column of Q and A). */
+      for(j = 0; j <= rows-1; j += 1) {
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==j, PHI2==i, k==rows, 0<=i,
+//    i+1<=cols, 0<=j, j+1<=k, cols+1<=k}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{PHI1==j, PHI2==i, k==rows, 0<=i,
+//    i+1<=cols, 0<=j, j+1<=k, cols+1<=k}>
+
+         /* Set the Q(j,i) value to A(j,i)/R(i,i). */
+         Q[j][i].r = A[j][i].r/theNorm;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==j, PHI2==i, k==rows, 0<=i,
+//    i+1<=cols, 0<=j, j+1<=k, cols+1<=k}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{PHI1==j, PHI2==i, k==rows, 0<=i,
+//    i+1<=cols, 0<=j, j+1<=k, cols+1<=k}>
+
+         Q[j][i].i = A[j][i].i/theNorm;
+      }
+
+//  <A[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-MAY-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-MAY-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-MAY-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-MAY-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-MAY-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-MAY-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+
+      if (i<cols-1) {
+
+//  <A[PHI1][PHI2].i-R-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+
+         
+         /* Calculate R(i,i+1:n) = Q(:,i)' * A(:,i+1:n)          */
+         /* Set the R value to one element next to the diagonal. */
+         /* Loop on columns of A, from column i+1 to the last column. */
+         for(j = i+1; j <= cols-1; j += 1) {
+
+//  <R[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+
+            
+            /* The following is performed only if this is NOT the last column. */
+            R[i][j].r = 0.0;
+
+//  <R[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+
+            R[i][j].i = 0.0;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI2==j, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=j, j+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI2==j, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=j, j+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=j, j+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+1<=j, j+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, cols+1<=rows}>
+
+            /* Calculate R value equal to Q(:,i)' * A(:,j). */
+            for(k = 0; k <= rows-1; k += 1) {
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==k, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==k, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+
+               R[i][j].r += A[k][j].r*Q[k][i].r+A[k][j].i*Q[k][i].i;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==k, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==k, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI1==k, PHI2==i, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=j,
+//    j+1<=cols, 0<=k, k+1<=rows, cols+1<=rows}>
+
+               R[i][j].i += A[k][j].i*Q[k][i].r-A[k][j].r*Q[k][i].i;
+            }
+         }
+
+//  <A[PHI1][PHI2].i-R-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, i+1<=PHI2,
+//    PHI2+1<=cols, 0<=i, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI2==i, 0<=PHI1, PHI1+1<=rows, 0<=i,
+//    i+2<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    cols+1<=rows}>
+
+         
+         /* Calculate A(:,i+1:n) = A(:,i+1:n) - Q(:,i) * R(i,i+1:n) */
+         for(j = 0; j <= rows-1; j += 1)
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==j, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==j, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==j, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==j, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+2<=cols, 0<=j,
+//    j+1<=rows, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+2<=cols, 0<=j,
+//    j+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, i+1<=PHI2, PHI2+1<=cols, 0<=i,
+//    0<=j, j+1<=rows, cols+1<=rows}>
+
+            for(k = i+1; k <= cols-1; k += 1) {
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==j, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==j, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+
+               A[j][k].r -= Q[j][i].r*R[i][k].r-Q[j][i].i*R[i][k].i;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==j, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==j, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].i-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <Q[PHI1][PHI2].r-R-EXACT-{PHI1==j, PHI2==i, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+//  <R[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, 0<=i, i+1<=k, 0<=j,
+//    j+1<=rows, k+1<=cols, cols+1<=rows}>
+
+               A[j][k].i -= Q[j][i].r*R[i][k].i+Q[j][i].i*R[i][k].r;
+            }
+      }
+   }
+   /* if (i < (cols-1)) */
+   
+   return;
+}
+

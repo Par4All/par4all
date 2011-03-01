@@ -130,11 +130,11 @@ void dereferencing02()
 {
 //  points to = {}
    double x = 1.;
-//  {(p,x,-Exact-)}
+//  points to = {}
    double *p = &x;
-//  {(p,x,-Exact-);(q,p,-Exact-)}
+//  {(p,x,-Exact-)}
    double **q = &p;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-)}
    double **w;
 //  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i = 1;

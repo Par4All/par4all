@@ -36,7 +36,7 @@ void dereferencing06()
 {
 //  points to = {}
    double x = 1.;
-//  {(p,x,-Exact-)}
+//  points to = {}
    double *p = &x;
 //  {(p,x,-Exact-)}
    

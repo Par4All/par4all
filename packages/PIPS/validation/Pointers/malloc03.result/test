@@ -4,17 +4,15 @@ POINTS TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *pi;
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    float *px;
 //  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-)}
    float *pz;
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int (*pt)[30];
 //  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,

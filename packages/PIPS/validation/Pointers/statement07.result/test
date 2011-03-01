@@ -19,8 +19,7 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *x, *a, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}

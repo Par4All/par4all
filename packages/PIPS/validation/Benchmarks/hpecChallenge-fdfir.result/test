@@ -1,0 +1,822 @@
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <filterPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+
+void elMul(int inputLength, float dataPtr[inputLength][2], float filterPtr[inputLength][2])
+{
+   int index;
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <filterPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+
+
+   for(index = 0; index <= inputLength-1; index += 1) {
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, 0<=PHI2, PHI2<=1,
+//    0<=0`index, 0`index+1<=inputLength}>
+
+      float data_r = dataPtr[index][0], data_i = dataPtr[index][1];
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{PHI1==0`index, PHI2==0, 0<=0`index,
+//    0`index+1<=inputLength}>
+//  <filterPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, 0<=PHI2, PHI2<=1,
+//    0<=0`index, 0`index+1<=inputLength}>
+
+      dataPtr[index][0] = data_r*filterPtr[index][0]-data_i*filterPtr[index][1];
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{PHI1==0`index, PHI2==1, 0<=0`index,
+//    0`index+1<=inputLength}>
+//  <filterPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, 0<=PHI2, PHI2<=1,
+//    0<=0`index, 0`index+1<=inputLength}>
+
+      dataPtr[index][1] = data_r*filterPtr[index][1]+data_i*filterPtr[index][0];
+   }
+}
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void fft(int filter, int inputLength, int phases, int butterflies, int stride, float *inputData, float *twiddlePtr)
+{
+   
+   /*int filter        which filter in the bank*/
+   /*int inputLength   input length */
+   /*int phases        number of phases in the fft */
+   /*int butterflies   number of butterflies per phase */
+   /*int stride        stride between elements in the butterfly */
+   /*float *twiddlePtr point to the start of the twiddle factors vector.  */
+   /*float *inputData  point to the start of the input.  */
+   
+   
+   int inc = inputLength;
+   /*number of elements to increment after each butterfly */
+   int reset = 1;
+   /* cntr determining how many butterflies to do before going 
+   			     to the second element of the input vector.  */
+   int resetSave = 1;
+   /*  reset needs to be saved as we decrement it's value.  */
+   int shift;
+
+//  <dataPtr1-W-EXACT-{}>
+//  <inputData-R-EXACT-{}>
+
+   float *dataPtr1 = inputData+inputLength*2*filter;
+   /* pointers */
+   
+   float ar, ai, br, bi, cr, ci, dr, di;
+   /*  butterfly input variables  */
+   
+   int phase;
+   /*  current phase variable */
+   int butterfly;
+   /*  current butterfly variable  */
+   int exp1, exp2, exp3;
+   /* exponent variables for twiddle factors */
+   
+   float twiddle1_r, twiddle1_i;
+   /*  twiddle  */
+   float twiddle2_r, twiddle2_i;
+   /*  factor   */
+   float twiddle3_r, twiddle3_i;
+   /* variables */
+   float twiddle4_r, twiddle4_i;
+   /*           */
+   
+   float res1r, res1i, res2r, res2i;
+   /* butterfly result */
+   float res3r, res3i, res4r, res4i;
+   /*   variables      */
+   
+   int tmp1, tmp2, tmp3;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-MAY-{1<=butterflies, 1<=phases}>
+//  <dataPtr1[PHI1]-W-MAY-{1<=butterflies, 1<=phases}>
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-MAY-{1<=butterflies, 1<=phases}>
+
+   /* temporary variables for utility use. */
+   /*  
+         Temporary variables for butterfly optimization below.  These are
+         not needed unless the optimizations found below are uncommented.
+     */
+   /* float t1r, t1i, t2r, t2i, t3r, t3i, t4r, t4i; */
+   
+   for(phase = 0; phase <= phases-1; phase += 1) {
+      int offset1 = 0, offset2 = 0;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 0<=phase, phase+1<=phases,
+//    1<=butterflies}>
+//  <dataPtr1[PHI1]-W-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 0<=phase, phase+1<=phases,
+//    1<=butterflies}>
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 0<=phase, phase+1<=phases,
+//    1<=butterflies}>
+
+
+      for(butterfly = 0; butterfly <= butterflies-1; butterfly += 1) {
+         if (reset==0) {
+            /*  Variable used to determine the exponent of the twiddle factors */
+            offset2 += 2;
+            offset1 = offset2;
+            reset = resetSave;
+         }
+         /*
+         	    Calculate the exponents for the twiddle factors.
+         	  */
+         
+         if (phase==0)
+            tmp1 = 1;
+         else {
+            shift = (phase-1)*2;
+            tmp1 = 4<<shift;
+         }
+
+         tmp2 = butterfly/tmp1;
+         tmp3 = tmp1*tmp2;
+         exp1 = 2*tmp3;
+         exp2 = 4*tmp3;
+         exp3 = 6*tmp3;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{PHI1==offset1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         
+         /*
+         	    The following elements a,b,c,d (r,i) are the four inputs
+         	    to the butterfly operation below.
+         	  */
+         ar = dataPtr1[offset1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{PHI1==offset1+1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         ai = dataPtr1[offset1+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         br = dataPtr1[offset1+stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         bi = dataPtr1[offset1+stride+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+2stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         cr = dataPtr1[offset1+2*stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+2stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         ci = dataPtr1[offset1+2*stride+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+3stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dr = dataPtr1[offset1+3*stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+3stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         di = dataPtr1[offset1+3*stride+1];
+         
+         /*
+         	    The following for twiddle factors (r,i) are the four twiddle
+         	    factors for the butterfly operation below.
+         	  */
+         twiddle1_r = 1;
+         twiddle1_i = 0;
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle2_r = twiddlePtr[exp1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp1+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle2_i = twiddlePtr[exp1+1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp2, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle3_r = twiddlePtr[exp2];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp2+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle3_i = twiddlePtr[exp2+1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp3, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle4_r = twiddlePtr[exp3];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp3+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         twiddle4_i = twiddlePtr[exp3+1];
+         
+         
+         /*
+         	    The following operations make up a Radix 4 butterfly.
+         	  */
+         
+         
+         res1r = ar+br+cr+dr;
+         res1i = ai+bi+ci+di;
+         res2r = ar+bi-cr-di;
+         res2i = ai-br-ci+dr;
+         res3r = ar-br+cr-dr;
+         res3i = ai-bi+ci-di;
+         res4r = ar-bi-cr+di;
+         res4i = ai+br-ci-dr;
+         {
+            float temp_r = res1r;
+            res1r = res1r*twiddle1_r-res1i*twiddle1_i;
+            res1i = temp_r*twiddle1_i+res1i*twiddle1_r;
+         }
+         {
+            float temp_r = res2r;
+            res2r = res2r*twiddle2_r-res2i*twiddle2_i;
+            res2i = temp_r*twiddle2_i+res2i*twiddle2_r;
+         }
+         {
+            float temp_r = res3r;
+            res3r = res3r*twiddle3_r-res3i*twiddle3_i;
+            res3i = temp_r*twiddle3_i+res3i*twiddle3_r;
+         }
+         {
+            float temp_r = res4r;
+            res4r = res4r*twiddle4_r-res4i*twiddle4_i;
+            res4i = temp_r*twiddle4_i+res4i*twiddle4_r;
+         }
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{PHI1==offset1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2, 0<=butterfly,
+//    butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         
+         
+         /*
+         	    store the results.
+         	  */
+         dataPtr1[offset1+0] = res1r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{PHI1==offset1+1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+1] = res1i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+stride] = res2r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+stride+1] = res2i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+2stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+2*stride] = res3r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+2stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+2*stride+1] = res3i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+3stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+3*stride] = res4r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+3stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    0<=butterfly, butterfly+1<=butterflies, 0<=phase, 1<=phase+tmp1,
+//    phase+1<=phases, 0<=tmp1}>
+
+         dataPtr1[offset1+3*stride+1] = res4i;
+         
+         
+         offset1 += inc*2;
+         reset--;
+      }
+      /*end butterflies*/
+      stride = stride/4;
+      /* 1/4 the stride for next phase */
+      inc = inc/4;
+      /* 1/4 the # of elements to increments 
+      					 after each butterfly    */
+      reset = resetSave*4;
+      /* reset 1/4 as often  */
+      resetSave = resetSave*4;
+   }
+}
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+void ifft(struct fdFirVariables *fdFirVars)
+{
+
+
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].currentFilter-R-EXACT-{PHI1==0}>
+
+   int filter = fdFirVars->currentFilter;
+   /*which filter in the bank*/
+
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].inputLength-R-EXACT-{PHI1==0}>
+
+   int inputLength = fdFirVars->inputLength;
+   /* input length */
+
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].phases-R-EXACT-{PHI1==0}>
+
+   int phases = fdFirVars->phases;
+   /* number of phases in the ifft */
+
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].butterflies-R-EXACT-{PHI1==0}>
+
+   int butterflies = fdFirVars->butterflies;
+   /* number of butterflies per phase */
+   int stride = 2;
+   /* stride between elements in the butterfly */
+   int inc = 4;
+   /*number of elements to increment after each butterfly */
+   int reset = inputLength/4;
+   /* cntr determining how many butterflies to 
+   					   do before going to the second element of 
+   					   the input vector.  */
+   int resetSave = reset;
+   /*  reset needs to be saved as we decrement it's value.  */
+   int shift;
+
+//  <dataPtr1-W-EXACT-{}>
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].input.data-R-EXACT-{PHI1==0, inc==4,
+//    reset==resetSave, stride==2, 4reset<=inputLength,
+//    inputLength<=4reset+3}>
+
+   float *dataPtr1 = fdFirVars->input.data+inputLength*2*filter;
+   /* pointers */
+
+//  <fdFirVars-R-EXACT-{}>
+//  <fdFirVars[PHI1].twiddleConjPtr-R-EXACT-{PHI1==0, inc==4,
+//    reset==resetSave, stride==2, 4reset<=inputLength,
+//    inputLength<=4reset+3}>
+//  <twiddlePtr-W-EXACT-{}>
+
+   float *twiddlePtr = fdFirVars->twiddleConjPtr;
+   /* point to the start of the twiddle 
+   						 factors vector.  */
+   
+   float ar, ai, br, bi, cr, ci, dr, di;
+   /*  butterfly input variables  */
+   int phase;
+   /*  current phase variable */
+   int butterfly;
+   /*  current butterfly variable  */
+   int exp1, exp2, exp3;
+   /* exponent variables for twiddle factors */
+   /*  int exp0;*/
+   float twiddle1_r, twiddle1_i;
+   /*  twiddle  */
+   float twiddle2_r, twiddle2_i;
+   /*  factor   */
+   float twiddle3_r, twiddle3_i;
+   /* variables */
+   float twiddle4_r, twiddle4_i;
+   /*           */
+   
+   float res1r, res1i, res2r, res2i;
+   /* butterfly result */
+   float res3r, res3i, res4r, res4i;
+   /*   variables      */
+   
+   int tmp1, tmp2, tmp3;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-MAY-{1<=butterflies, 1<=phases}>
+//  <dataPtr1[PHI1]-W-MAY-{1<=butterflies, 1<=phases}>
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-MAY-{1<=butterflies, 1<=phases}>
+
+   /* temporary variables for utility use. */
+   /*  
+         Temporary variables for butterfly optimization below.  These are
+         not needed unless the optimizations found below are uncommented.
+     */
+   /* float t1r, t1i, t2r, t2i, t3r, t3i, t4r, t4i;*/
+   
+   
+   for(phase = phases-1; phase >= 0; phase += -1) {
+      int offset1 = 0, offset2 = 0;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 1<=butterflies, 0<=phase,
+//    phase+1<=phases}>
+//  <dataPtr1[PHI1]-W-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 1<=butterflies, 0<=phase,
+//    phase+1<=phases}>
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-MAY-{0<=offset2+2butterflies,
+//    offset2<=2butterflies, 1<=butterflies, 0<=phase,
+//    phase+1<=phases}>
+
+
+      for(butterfly = 0; butterfly <= butterflies-1; butterfly += 1) {
+         if (reset==0) {
+            offset2 += 2;
+            offset1 = offset2;
+            reset = resetSave;
+         }
+         /*
+         	    Calculate the exponents for the twiddle factors.
+         	  */
+         
+         if (phase==0)
+            tmp1 = 1;
+         else {
+            shift = (phase-1)*2;
+            tmp1 = 4<<shift;
+         }
+
+         tmp2 = butterfly/tmp1;
+         tmp3 = tmp1*tmp2;
+         /*exp0 = 0;*/
+         exp1 = 2*tmp3;
+         exp2 = 4*tmp3;
+         exp3 = 6*tmp3;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{PHI1==offset1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         
+         /*
+         	    The following elements a,b,c,d (r,i) are the four inputs
+         	    to the butterfly operation below.
+         	  */
+         ar = dataPtr1[offset1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{PHI1==offset1+1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         ai = dataPtr1[offset1+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         br = dataPtr1[offset1+stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         bi = dataPtr1[offset1+stride+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+2stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         cr = dataPtr1[offset1+2*stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+2stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         ci = dataPtr1[offset1+2*stride+1];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+3stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dr = dataPtr1[offset1+3*stride];
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-R-EXACT-{offset1+3stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         di = dataPtr1[offset1+3*stride+1];
+         
+         
+         /*
+         	    The following for twiddle factors (r,i) are the four twiddle
+         	    factors for the butterfly operation below.
+         	  */
+         /*
+         	    note that these twiddle pointers actually point to the twiddle
+         	    factor's conjugate values in fdFirVars->twiddleConjPtr.
+         	  */
+         twiddle1_r = 1;
+         twiddle1_i = 0;
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle2_r = twiddlePtr[exp1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp1+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle2_i = twiddlePtr[exp1+1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp2, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle3_r = twiddlePtr[exp2];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp2+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle3_i = twiddlePtr[exp2+1];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp3, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle4_r = twiddlePtr[exp3];
+
+//  <twiddlePtr-R-EXACT-{}>
+//  <twiddlePtr[PHI1]-R-EXACT-{PHI1==exp3+1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         twiddle4_i = twiddlePtr[exp3+1];
+         {
+            float temp_r = ar;
+            ar = ar*twiddle1_r-ai*twiddle1_i;
+            ai = temp_r*twiddle1_i+ai*twiddle1_r;
+         }
+         {
+            float temp_r = br;
+            br = br*twiddle2_r-bi*twiddle2_i;
+            bi = temp_r*twiddle2_i+bi*twiddle2_r;
+         }
+         {
+            float temp_r = cr;
+            cr = cr*twiddle3_r-ci*twiddle3_i;
+            ci = temp_r*twiddle3_i+ci*twiddle3_r;
+         }
+         {
+            float temp_r = dr;
+            dr = dr*twiddle4_r-di*twiddle4_i;
+            di = temp_r*twiddle4_i+di*twiddle4_r;
+         }
+         
+         
+         /*
+         	    The following 8 operations make up a Radix 4 butterfly.
+         	  */
+         
+         res1r = ar+br+cr+dr;
+         res1i = ai+bi+ci+di;
+         res4r = ar+bi-cr-di;
+         res4i = ai-br-ci+dr;
+         res3r = ar-br+cr-dr;
+         res3i = ai-bi+ci-di;
+         res2r = ar-bi-cr+di;
+         res2i = ai+br-ci-dr;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{PHI1==offset1, exp1==2tmp3, exp2==4tmp3,
+//    exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         
+         
+         /*
+         	    The following code could be an optimization for the above 8
+         	    operations. Below performs 16 adds/subtracts versus the code 
+         	    above performing 24 add/subtracts.  Unfortunatly the code below
+         	    did perform slower than the above code; however, this is often 
+         	    an optimization made to various fft implementations.
+         	    
+         	    To use this code, the temporary variables (t1r, t1i...) must be
+         	    uncommented above)
+         	  */
+         /*
+         	    t1r = ar + cr;
+         	    t1i = ai + ci;
+         	    t2r = br + dr;
+         	    t2i = bi + di;
+         	    t3r = ar - cr;
+         	    t3i = ai - ci;
+         	    t4r = br - dr;
+         	    t4i = bi - di;
+         	    
+         	    res1r = t1r + t2r;
+         	    res1i = t1i + t2i;
+         	    res4r = t3r + t4i;
+         	    res4i = t3i - t4r;
+         	    res3r = t1r - t2r;
+         	    res3i = t1i - t2i;
+         	    res2r = t3r - t4i;
+         	    res2i = t3i + t4r;
+         	  */
+         
+         
+         /*  Normally, we do a divide by inputLength on each
+         	      element in the LAST Phase.  For optimization 
+         	      purposes, I've moved the elDivide into the elDiv
+         	      routine in FDFIR.
+         	  */
+         
+         
+         /*
+         	    store the results.
+         	  */
+         dataPtr1[offset1+0] = res1r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{PHI1==offset1+1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+1] = res1i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+stride] = res2r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+stride+1] = res2i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+2stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+2*stride] = res3r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+2stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+2*stride+1] = res3i;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+3stride==PHI1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+3*stride] = res4r;
+
+//  <dataPtr1-R-EXACT-{}>
+//  <dataPtr1[PHI1]-W-EXACT-{offset1+3stride==PHI1-1, exp1==2tmp3,
+//    exp2==4tmp3, exp3==6tmp3, 0<=offset2, offset2<=2butterfly+2,
+//    butterfly+1<=butterflies, 0<=butterfly, 0<=phase,
+//    phase+1<=phases, 1<=phase+tmp1, 0<=tmp1}>
+
+         dataPtr1[offset1+3*stride+1] = res4i;
+         
+         
+         offset1 += inc*2;
+         reset--;
+      }
+      /*end butterflies*/
+      stride = stride*4;
+      /* 4X the stride as previous phase*/
+      inc = inc*4;
+      /* increment 4X as many elements after
+      				       each butterfly     */
+      reset = resetSave/4;
+      /* reset 4X as often  */
+      resetSave = resetSave/4;
+   }
+}
+

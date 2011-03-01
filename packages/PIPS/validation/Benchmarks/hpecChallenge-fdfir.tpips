@@ -1,0 +1,14 @@
+setenv WS "hpecChallenge"
+setenv FLAVOR "fdfir"
+setenv PIPS_CPP_FLAGS "-I $WS-1.0/kernelBenchmarks/include"
+
+delete $WS-$FLAVOR
+create $WS-$FLAVOR $WS-1.0/kernelBenchmarks/$FLAVOR/elWise.c  $WS-1.0/kernelBenchmarks/$FLAVOR/fdFir.c $WS-1.0/kernelBenchmarks/$FLAVOR/fft.c  $WS-1.0/kernelBenchmarks/$FLAVOR/ifft.c
+activate MUST_REGIONS
+setproperty CONSTANT_PATH_EFFECTS FALSE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[elMul]
+display PRINTED_FILE[fft]
+display PRINTED_FILE[ifft]
+close
+delete $WS-$FLAVOR

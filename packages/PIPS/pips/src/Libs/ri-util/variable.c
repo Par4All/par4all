@@ -942,6 +942,12 @@ bool integer_scalar_entity_p(entity e)
     variable_dimensions(type_variable(ct)) == NIL;
 }
 
+/* return true if the entity is declared with the keyword static */
+bool entity_static_variable_p(entity e) {
+    storage s = entity_storage(e);
+    return storage_ram_p(s) && static_area_p(ram_section(storage_ram(s)));
+}
+
 /* Any reference r such that reference_variable(r)==e accesses all
    bytes (or bits) allocated to variable e. In other words, any write
    of e is a kill. At least, if the reference indices are NIL in the

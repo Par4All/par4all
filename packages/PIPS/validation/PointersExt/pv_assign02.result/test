@@ -13,6 +13,6 @@ int main()
    a[1] = &b;
 //  {(a[1],b,-Exact-);(a[0],b,-Exact-)}
    a[1] = &c;
-//  {(a[0],b,-Exact-);(a[1],c,-Exact-)}
+//  {(a[1],c,-Exact-);(a[0],b,-Exact-)}
    return 0;
 }
