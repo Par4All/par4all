@@ -11,9 +11,9 @@ int main(int argc, char *argv[])
 //  points to = {}
 
    for(i = 0; i <= 63; i += 1) {
-//  {(a[i],*HEAP*_l_13,-MAY-)}
+//  points to = {}
       a[i] = (float) malloc(64*sizeof(float));
-//  {(a[i],*HEAP*_l_13,-Exact-)}
+//  points to = {}
       for(j = 0; j <= 63; j += 1)
 //  {(a[i],*HEAP*_l_13,-Exact-)}
          a[i][j] = 0.;

@@ -4,7 +4,7 @@ POINTS TO for "make_s"
 //  {}
 s_t make_s(int i, float x)
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    s_t *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *malloc(int);

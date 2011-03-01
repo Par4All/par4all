@@ -1,0 +1,7 @@
+delete syntax_cast
+create syntax_cast syntax_cast_test.c
+activate C_PARSER
+apply ATOMIC_CHAINS[%ALLFUNC]
+display PRINTED_FILE[main]
+close
+quit

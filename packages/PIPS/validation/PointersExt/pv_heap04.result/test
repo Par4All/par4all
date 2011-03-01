@@ -1,10 +1,9 @@
 //  {}
 int main()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int **p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -18,10 +17,10 @@ int main()
    p = (int **) malloc(sizeof(int *));
 //  {(p,*HEAP*_l_10,-Exact-);(q,*HEAP*_l_8,-Exact-)}
    p[0] = q;
-//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,*HEAP*_l_10,
+//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(p,*HEAP*_l_10,
 //   -Exact-);(q,*HEAP*_l_8,-Exact-)}
    free(p);
-//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,*HEAP*_l_10,
+//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(p,*HEAP*_l_10,
 //   -Exact-);(q,*HEAP*_l_8,-Exact-)}
    return 0;
 }

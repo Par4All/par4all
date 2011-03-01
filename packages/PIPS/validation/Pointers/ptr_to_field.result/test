@@ -32,3 +32,47 @@ int ptr_to_field()
    // END BLOCK
 }
 POINTS TO
+//  {}
+int ptr_to_field()
+{
+//  points to = {}
+   // BEGIN BLOCK
+//  points to = {}
+   typedef struct {
+      int *q;
+      int *p;
+   } my_str;
+
+//  points to = {}
+   my_str *m, *n;
+//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   int i = 0, j = 1;
+//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   m = (my_str *) malloc(sizeof(my_str));
+//  {(m,*ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
+   n = (my_str *) malloc(sizeof(my_str));
+//  {(m,*ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}
+   m->q = &i;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(m,*ANY_MODULE*:*HEAP*,
+//   -Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}
+   m->p = &j;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,
+//   -Exact-);(*ANY_MODULE*:*ANYWHERE*_b0,j,-Exact-);(m,
+//   *ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}
+   n->q = m->p;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(*ANY_MODULE*:*ANYWHERE*_b0,i,
+//   -Exact-);(*ANY_MODULE*:*ANYWHERE*_b0,j,-Exact-);(m,
+//   *ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}
+   n->p = m->q;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(*ANY_MODULE*:*ANYWHERE*_b0,i,
+//   -Exact-);(*ANY_MODULE*:*ANYWHERE*_b0,j,-Exact-);(m,
+//   *ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}
+
+   return 0;
+   // END BLOCK
+}

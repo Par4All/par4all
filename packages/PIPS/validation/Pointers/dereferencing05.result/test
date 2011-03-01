@@ -38,7 +38,7 @@ POINTS TO
 //  {}
 void dereferencing05()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    double *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;

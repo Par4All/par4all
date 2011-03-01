@@ -4,7 +4,7 @@ POINTS TO
 //  {}
 void point_to04()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    struct s {
       int a;
       int b;

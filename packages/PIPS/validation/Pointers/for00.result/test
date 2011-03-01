@@ -26,8 +26,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *a, *b, c, d, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -41,17 +40,15 @@ int main()
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,c,-Exact-)}
 
    for (i = 1;i<5;i++) {
-//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
-//   -MAY-);(b,d,-MAY-)}
+//  points to = {}
       c = 5;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
-//   -MAY-);(b,d,-MAY-)}
+//  points to = {}
       a = b;
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,c,-MAY-);(b,d,-MAY-)}
+//  points to = {}
       b = &d;
    }
-//  {(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(a,d,-MAY-);(b,c,
-//   -MAY-);(b,d,-MAY-)}
+//  {(a,d,-MAY-);(a,*ANY_MODULE*:*NOWHERE*,-MAY-);(a,c,-MAY-);(b,d,
+//   -MAY-);(b,c,-MAY-)}
 
    return 0;
 }

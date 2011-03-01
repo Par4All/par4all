@@ -21,13 +21,12 @@ void comma01()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-)}
    int *r;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}

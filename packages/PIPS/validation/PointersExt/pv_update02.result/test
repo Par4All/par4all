@@ -31,18 +31,18 @@ int main()
 {
 //  points to = {}
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int b = 0, c = 1;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    if (b==c)
-//  {(p,a[0],-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = &a[0];
    else
-//  {(p,a[1],-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = &a[1];
-//  {(p,a[1],-MAY-);(p,a[0],-MAY-)}
+//  {(p,a[0],-MAY-);(p,a[1],-MAY-)}
    p++;
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    ++p;

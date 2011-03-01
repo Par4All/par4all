@@ -1,0 +1,232 @@
+
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <tdFirVars[PHI1].result.data[PHI4][PHI5][PHI6][PHI7]-W-MAY-{PHI1==
+//    0, PHI4==0, 0<=PHI5, 0<=PHI6, 0<=PHI7, PHI7<=1}>
+//  <tdFirVars[PHI1].result.data[PHI4][PHI5][PHI6][PHI7]-W-MAY-{PHI1==
+//    0, PHI4==0, 0<=PHI5, 0<=PHI6, 0<=PHI7, PHI7<=1}>
+//  <tdFirVars[PHI1].time.data[PHI4]-W-EXACT-{PHI1==0, PHI4==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+void tdFir(struct tdFirVariables *tdFirVars)
+{
+   
+   /*
+       I will need a timer to evaluate my functions performace.  The
+       pca_timer_t is located in PcaCTimer.h
+     */
+   int index;
+   int filter;
+
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].filterLength-R-EXACT-{PHI1==0}>
+
+   int filterLength = tdFirVars->filterLength;
+
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].inputLength-R-EXACT-{PHI1==0}>
+
+   int inputLength = tdFirVars->inputLength;
+   int resultLength = filterLength+inputLength-1;
+
+//  <inputPtr-W-EXACT-{}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].input.data-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1}>
+
+   float (*inputPtr)[tdFirVars->numFilters][inputLength][2] = (float (*)[filterLength][inputLength][2]) tdFirVars->input.data;
+
+//  <filterPtr-W-EXACT-{}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].filter.data-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1}>
+
+   float (*filterPtr)[tdFirVars->numFilters][filterLength][2] = (float (*)[filterLength][filterLength][2]) tdFirVars->filter.data;
+
+//  <resultPtr-W-EXACT-{}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].result.data-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1}>
+
+   float (*resultPtr)[tdFirVars->numFilters][resultLength][2] = (float (*)[tdFirVars->numFilters][resultLength][2]) tdFirVars->result.data;
+   pca_timer_t t;
+
+//  <t.tv_sec-W-EXACT-{filterLength+inputLength==resultLength+1}>
+//  <t.tv_usec-W-EXACT-{filterLength+inputLength==resultLength+1}>
+
+   t = startTimer();
+
+//  <resultPtr[PHI1][PHI2][PHI3][PHI4]-W-MAY-{PHI1==0, 0<=PHI2,
+//    0<=PHI3, 0<=PHI4, PHI4<=1,
+//    filterLength+inputLength==resultLength+1, 1<=filterLength}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+   
+   
+   
+   
+   
+   
+   
+   for(filter = 0; filter <= tdFirVars->numFilters-1; filter += 1)
+
+//  <resultPtr[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==filter,
+//    0<=PHI3, 0<=PHI4, PHI4<=1,
+//    filterLength+inputLength==resultLength+1, 0<=filter,
+//    1<=filterLength}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+      
+      /*
+      	elCplxMul does an element wise multiply of the current filter element by
+      	the entire input vector.
+      	Input Parameters:
+      	tdFirVars->input.data  - pointer to input
+      	tdFirVars->filter.data - pointer to filter
+      	tdFirVars->result.data - pointer to result space
+      	tdFirVars->inputLength - integer value representing length of input
+            */
+      
+      for(index = 0; index <= filterLength-1; index += 1)
+
+//  <filterPtr-R-EXACT-{}>
+//  <inputPtr-R-EXACT-{}>
+//  <resultPtr-R-EXACT-{}>
+//  <resultPtr[PHI1][PHI2][PHI3][PHI4]-R-EXACT-{PHI1==0, PHI2==filter,
+//    0`index<=PHI3, 0<=PHI4, PHI4<=1,
+//    filterLength+inputLength==resultLength+1, 0<=filter,
+//    0`index+1<=filterLength, 0<=0`index}>
+//  <resultPtr[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{PHI1==0, PHI2==filter,
+//    0`index<=PHI3, 0<=PHI4, PHI4<=1,
+//    filterLength+inputLength==resultLength+1, 0<=filter,
+//    0`index+1<=filterLength, 0<=0`index}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].inputLength-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1, 0<=filter,
+//    0`index+1<=filterLength, 0<=0`index}>
+//  <tdFirVars[PHI1].numFilters-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+         elCplxMul(tdFirVars->inputLength, (*inputPtr)[filter], ((*filterPtr)[filter])[index], &((*resultPtr)[filter])[index]);
+
+//  <t.tv_sec-R-EXACT-{filterLength+inputLength==resultLength+1,
+//    0<=filter}>
+//  <t.tv_usec-R-EXACT-{filterLength+inputLength==resultLength+1,
+//    0<=filter}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].time.data-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1, 0<=filter}>
+//  <tdFirVars[PHI1].time.data[PHI4]-W-EXACT-{PHI1==0, PHI4==0,
+//    filterLength+inputLength==resultLength+1, 0<=filter}>
+
+   /* end for each filter */
+   
+   
+   
+   
+   
+   
+   /*
+       Stop the timer.  Print out the
+       total time in Seconds it took to do the TDFIR.
+     */
+   
+   (tdFirVars->time.data)[0] = stopTimer(t);
+
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <tdFirVars-R-EXACT-{}>
+//  <tdFirVars[PHI1].time.data-R-EXACT-{PHI1==0,
+//    filterLength+inputLength==resultLength+1, 0<=filter}>
+//  <tdFirVars[PHI1].time.data[PHI4]-R-EXACT-{PHI1==0, PHI4==0,
+//    filterLength+inputLength==resultLength+1, 0<=filter}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+
+   printf("Done.  Latency: %f s.\n", (tdFirVars->time.data)[0]);
+}
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <filterPtr[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, 1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <resultPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+
+void elCplxMul(int inputLength, float dataPtr[inputLength][2], float filterPtr[2], float resultPtr[inputLength][2])
+{
+   int index;
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <filterPtr[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, 1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+//  <resultPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=inputLength,
+//    0<=PHI2, PHI2<=1}>
+
+
+   for(index = 0; index <= inputLength-1; index += 1) {
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, 0<=PHI2, PHI2<=1,
+//    0<=0`index, 0`index+1<=inputLength}>
+//  <filterPtr[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, 0<=0`index,
+//    0`index+1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, PHI2==0,
+//    0<=0`index, 0`index+1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-W-EXACT-{PHI1==0`index, PHI2==0,
+//    0<=0`index, 0`index+1<=inputLength}>
+
+      /*      COMPLEX MULTIPLY   */
+      /* real  */
+      resultPtr[index][0] += dataPtr[index][0]*filterPtr[0]-dataPtr[index][1]*filterPtr[1];
+
+//  <dataPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, 0<=PHI2, PHI2<=1,
+//    0<=0`index, 0`index+1<=inputLength}>
+//  <filterPtr[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, 0<=0`index,
+//    0`index+1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-R-EXACT-{PHI1==0`index, PHI2==1,
+//    0<=0`index, 0`index+1<=inputLength}>
+//  <resultPtr[PHI1][PHI2]-W-EXACT-{PHI1==0`index, PHI2==1,
+//    0<=0`index, 0`index+1<=inputLength}>
+
+      /* imag  */
+      resultPtr[index][1] += dataPtr[index][0]*filterPtr[1]+dataPtr[index][1]*filterPtr[0];
+   }
+}
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=filters, 0<=PHI2,
+//    PHI2+1<=2length}>
+
+void zeroData(int length, int filters, float dataPtr[filters][2*length])
+{
+   int index, filter;
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{0<=PHI1, PHI1+1<=filters, 0<=PHI2,
+//    PHI2+1<=2length}>
+
+
+   for(filter = 0; filter <= filters-1; filter += 1)
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{PHI1==filter, 0<=PHI2,
+//    PHI2+1<=2length, 0<=filter, filter+1<=filters}>
+
+      for(index = 0; index <= length-1; index += 1) {
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{PHI1==filter, PHI2==20`index,
+//    0<=filter, filter+1<=filters, 0<=0`index, 0`index+1<=length}>
+
+         dataPtr[filter][2*index] = 0;
+
+//  <dataPtr[PHI1][PHI2]-W-EXACT-{PHI1==filter, PHI2==20`index+1,
+//    0<=filter, filter+1<=filters, 0<=0`index, 0`index+1<=length}>
+
+         dataPtr[filter][2*index+1] = 0;
+      }
+}
+

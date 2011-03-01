@@ -8,6 +8,8 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 module main
 #activate PRINT_CODE_SIMPLE_POINTER_VALUES
+#activate PRINT_CODE_PROPER_EFFECTS
+
 activate PRINT_CODE_POINTS_TO_LIST
 display PRINTED_FILE
 

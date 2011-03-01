@@ -3,18 +3,18 @@ int main()
 {
 //  points to = {}
    int i = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int a[10];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    while (i<10) {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-)}
+//  points to = {}
       p = &a[i];
-//  {(p,a[i],-Exact-)}
+//  points to = {}
       i++;
    }
-//  {(p,a[i],-Exact-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
    return 0;
 }

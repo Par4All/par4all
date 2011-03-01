@@ -10,11 +10,11 @@ int main()
 //  points to = {}
 
    while (i<10) {
-//  {(p[i],a[i],-MAY-)}
+//  points to = {}
       p[i] = &a[i];
-//  {(p[i],a[i],-Exact-)}
+//  points to = {}
       i++;
    }
-//  {(p[i],a[i],-Exact-)}
+//  {(p[i],a[i],-MAY-)}
    return 0;
 }

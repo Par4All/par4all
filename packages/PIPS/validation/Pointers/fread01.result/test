@@ -26,7 +26,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    FILE *fp;
 //  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    size_t n;

@@ -46,9 +46,9 @@ void call03()
    *pi = 1;
 //  points to = {}
    pi++;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  points to = {}
    q->one = 1;
-//  {(pi,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  points to = {}
    (q->two)[4] = 2;
 }
 

@@ -18,7 +18,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *i, j, k;
 //  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    k = 0;

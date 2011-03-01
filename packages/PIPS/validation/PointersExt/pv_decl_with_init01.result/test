@@ -3,7 +3,7 @@ int main()
 {
 //  points to = {}
    int a;
-//  {(b,a,-Exact-)}
+//  points to = {}
    int *b = &a;
 //  {(b,a,-Exact-)}
    return 0;

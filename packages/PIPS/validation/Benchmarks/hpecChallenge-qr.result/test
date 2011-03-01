@@ -1,0 +1,967 @@
+
+//  <A[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI2+1<=PHI1+cols, PHI1+1<=rows,
+//    0<=PHI2, PHI2+2<=2cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI2+1<=PHI1+cols, PHI1+1<=rows,
+//    0<=PHI2, PHI2+2<=2cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI2+1<=PHI1+cols, PHI1+1<=rows,
+//    0<=PHI2, PHI2+2<=2cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI2+1<=PHI1+cols, PHI1+1<=rows,
+//    0<=PHI2, PHI2+2<=2cols, cols<=rows}>
+//  <D[PHI1]-R-MAY-{PHI1+1<=rows, cols<=rows}>
+//  <D[PHI1]-W-MAY-{PHI1+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+PHI2+2<=2rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <M[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+PHI2+2<=2rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+
+void qr(int rows, int cols, ComplexFloat A[rows][cols], ComplexFloat M[rows][cols], float D[rows], ComplexFloat Q[rows][rows])
+{
+   /* Loop counters */
+   int i, j, k;
+   
+   /* Fast givens transformation values and temporaries */
+   ComplexFloat alpha, beta, tau;
+   float gamma, temp;
+   
+   /* Transform type (1 or 2) */
+   int type;
+
+//  <A[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI2+1<=PHI1+cols,
+//    PHI1+PHI2+4<=cols+2rows, PHI1+PHI2+5<=3rows, PHI1+3<=2rows,
+//    PHI1+1<=rows, 0<=PHI2, PHI2+2<=2cols, 1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI2+1<=PHI1+cols,
+//    PHI1+PHI2+4<=cols+2rows, PHI1+PHI2+5<=3rows, PHI1+3<=2rows,
+//    PHI1+1<=rows, 0<=PHI2, PHI2+2<=2cols, 1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI2+1<=PHI1+cols,
+//    PHI1+PHI2+4<=cols+2rows, PHI1+PHI2+5<=3rows, PHI1+3<=2rows,
+//    PHI1+1<=rows, 0<=PHI2, PHI2+2<=2cols, 1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI2+1<=PHI1+cols,
+//    PHI1+PHI2+4<=cols+2rows, PHI1+PHI2+5<=3rows, PHI1+3<=2rows,
+//    PHI1+1<=rows, 0<=PHI2, PHI2+2<=2cols, 1<=cols, cols<=rows}>
+//  <D[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=rows, 1<=cols, cols<=rows}>
+//  <D[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=rows, 1<=cols, cols<=rows}>
+//  <M[PHI1][PHI2].i-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <M[PHI1][PHI2].i-W-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <M[PHI1][PHI2].r-R-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <M[PHI1][PHI2].r-W-MAY-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 1<=cols, cols<=rows, 2<=rows}>
+//  <alpha.i-R-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <alpha.i-W-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <alpha.r-R-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <alpha.r-W-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <beta.i-R-MAY-{1<=cols, cols<=rows, 2<=rows}>
+//  <beta.i-W-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <beta.r-R-MAY-{1<=cols, cols<=rows, 2<=rows}>
+//  <beta.r-W-EXACT-{1<=cols, cols<=rows, 2<=rows}>
+//  <tau.i-R-MAY-{1<=cols, cols<=rows, 2<=rows}>
+//  <tau.i-W-MAY-{1<=cols, cols<=rows, 2<=rows}>
+//  <tau.r-R-MAY-{1<=cols, cols<=rows, 2<=rows}>
+//  <tau.r-W-MAY-{1<=cols, cols<=rows, 2<=rows}>
+
+   
+   /* Loop over columns of A. */
+   for(j = 0; j <= cols-1; j += 1) {
+
+//  <A[PHI1][PHI2].i-R-MAY-{PHI1+PHI2+3<=j+2rows, j<=PHI1,
+//    PHI1+1<=rows, j<=PHI2, PHI2+1<=j+cols, 0<=j, j+1<=cols,
+//    j+2<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{PHI1+PHI2+3<=j+2rows, j<=PHI1,
+//    PHI1+1<=rows, j<=PHI2, PHI2+1<=j+cols, 0<=j, j+1<=cols,
+//    j+2<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{PHI1+PHI2+3<=j+2rows, j<=PHI1,
+//    PHI1+1<=rows, j<=PHI2, PHI2+1<=j+cols, 0<=j, j+1<=cols,
+//    j+2<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{PHI1+PHI2+3<=j+2rows, j<=PHI1,
+//    PHI1+1<=rows, j<=PHI2, PHI2+1<=j+cols, 0<=j, j+1<=cols,
+//    j+2<=rows, cols<=rows}>
+//  <D[PHI1]-R-MAY-{j<=PHI1, PHI1+1<=rows, 0<=j, j+1<=cols, j+2<=rows,
+//    cols<=rows}>
+//  <D[PHI1]-W-MAY-{j<=PHI1, PHI1+1<=rows, 0<=j, j+1<=cols, j+2<=rows,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-R-MAY-{j<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-W-MAY-{j<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-MAY-{j<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-W-MAY-{j<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, 0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <alpha.i-R-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <alpha.i-W-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <alpha.r-R-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <alpha.r-W-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <beta.i-R-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <beta.i-W-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <beta.r-R-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <beta.r-W-EXACT-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <tau.i-R-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <tau.i-W-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <tau.r-R-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+//  <tau.r-W-MAY-{0<=j, j+1<=cols, j+2<=rows, cols<=rows}>
+
+      
+      /* Loop from the last to the jth row of A (Up to the diagonal). */
+      for(i = rows-1; i >= j+1; i += -1) {
+
+//  <A[PHI1][PHI2].i-R-MAY-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <D[PHI1]-R-MAY-{i<=PHI1+1, PHI1<=i, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-MAY-{i<=PHI1+1, PHI1<=i, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.i-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.r-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.i-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.r-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+         
+         /* ============================================================= */
+         /* Compute the Fast Givens transformation matrix: Values alpha,  */
+         /* beta, and what type of transform we're doing (1 or 2).        */
+         /* ============================================================= */
+         
+         /* If the current value is zero, we have nothing to cancel out. */
+         /* Therefore, we set alpha and beta to zero and use a type 2    */
+         /* transformation...  Essentially we multiply by a 2x2          */
+         /* identity matrix                                              */
+         if (A[i][j].r==0&&A[i][j].i==0) {
+            type = 2;
+
+//  <alpha.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            alpha.r = 0.0;
+
+//  <alpha.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            alpha.i = 0.0;
+
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            beta = alpha;
+         }
+         else {
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, j+1<=i, i+1<=rows,
+//    0<=j, j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, j+1<=i, i+1<=rows,
+//    0<=j, j+1<=cols, cols<=rows}>
+
+            /* Compute alpha = -a1/a2 */
+            temp = A[i][j].r*A[i][j].r+A[i][j].i*A[i][j].i;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <alpha.r-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            alpha.r = -((A[i-1][j].r*A[i][j].r+A[i-1][j].i*A[i][j].i)/temp);
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI2==j, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=i, PHI2+1<=cols, i+1<=rows, cols<=rows}>
+//  <alpha.i-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            alpha.i = -((A[i-1][j].i*A[i][j].r-A[i-1][j].r*A[i][j].i)/temp);
+
+//  <D[PHI1]-R-EXACT-{i<=PHI1+1, PHI1<=i, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+            
+            /* Compute beta = -conj(alpha)*d2/d1 */
+            temp = D[i]/D[i-1];
+
+//  <alpha.r-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.r-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            beta.r = -(alpha.r*temp);
+
+//  <alpha.i-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.i-W-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            beta.i = alpha.i*temp;
+
+//  <alpha.i-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            
+            /* Compute gamma = -alpha*beta...  We'll simplify this to        */
+            /* -alpha*-conj(alpha)*(d2/d1) = (alpha.r^2 + alpha.i^2)*(d2/d1) */
+            gamma = (alpha.r*alpha.r+alpha.i*alpha.i)*temp;
+
+//  <D[PHI1]-R-EXACT-{i<=PHI1+1, PHI1<=i, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-EXACT-{i<=PHI1+1, PHI1<=i, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <alpha.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.i-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <alpha.r-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.i-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+//  <beta.r-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, cols<=rows}>
+
+            
+            /* Check the gamma value.  If it's over 1 we'll take the     */
+            /* reciprocal of our alpha, beta, and gamma values to retain */
+            /* numerical stability.                                      */
+            if (gamma<=1.0) {
+               type = 1;
+
+//  <D[PHI1]-R-EXACT-{PHI1==i-1, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+               
+               /* Update the D values */
+               temp = D[i-1];
+
+//  <D[PHI1]-R-EXACT-{PHI1==i, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-EXACT-{PHI1==i-1, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+               D[i-1] = (1+gamma)*D[i];
+
+//  <D[PHI1]-W-EXACT-{PHI1==i, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+               D[i] = (1+gamma)*temp;
+            }
+            else {
+               type = 2;
+
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               
+               /* Compute alpha = 1/alpha */
+               temp = alpha.r*alpha.r+alpha.i*alpha.i;
+
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               alpha.r = alpha.r/temp;
+
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               alpha.i = -(alpha.i/temp);
+
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               
+               /* Compute beta = 1/beta */
+               temp = beta.r*beta.r+beta.i*beta.i;
+
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               beta.r = beta.r/temp;
+
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+               beta.i = -(beta.i/temp);
+               
+               /* Compute 1/gamma */
+               gamma = 1/gamma;
+
+//  <D[PHI1]-R-EXACT-{PHI1==i-1, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-EXACT-{PHI1==i-1, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+               
+               /* Update the D values */
+               D[i-1] = (1+gamma)*D[i-1];
+
+//  <D[PHI1]-R-EXACT-{PHI1==i, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-EXACT-{PHI1==i, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+
+               D[i] = (1+gamma)*D[i];
+            }
+         }
+
+//  <A[PHI1][PHI2].i-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    1<=type, type<=2, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    1<=type, type<=2, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    1<=type, type<=2, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    1<=type, type<=2, cols<=rows}>
+//  <M[PHI1][PHI2].i-R-MAY-{i<=PHI1+1, PHI1<=i, 0<=PHI2, PHI2+1<=rows,
+//    j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type, type<=2,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-W-MAY-{i<=PHI1+1, PHI1<=i, 0<=PHI2, PHI2+1<=rows,
+//    j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type, type<=2,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-R-MAY-{i<=PHI1+1, PHI1<=i, 0<=PHI2, PHI2+1<=rows,
+//    j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type, type<=2,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-W-MAY-{i<=PHI1+1, PHI1<=i, 0<=PHI2, PHI2+1<=rows,
+//    j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type, type<=2,
+//    cols<=rows}>
+//  <alpha.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <alpha.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <beta.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <beta.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <tau.i-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <tau.i-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <tau.r-R-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+//  <tau.r-W-MAY-{j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 1<=type,
+//    type<=2, cols<=rows}>
+
+         /* if(*a2 == 0) */
+         
+         /* ================================================================== */
+         /* Perform update of matrices A and M (pre and post multiplications). */
+         /* In matlab notation:                                                */
+         /*                                                                    */
+         /*                     |beta   1  |                                   */
+         /*    A([i-1 i],j:n) = | 1   alpha| * A([i-1 i],j:n),                 */
+         /*                                                                    */
+         /* and...                                                             */
+         /*                     |beta   1  |'                                  */
+         /*    M(:,[i-1 i]) = [ | 1   alpha| * M(:,[i-1 i])' ]',               */
+         /*                                                                    */
+         /* for a type 1 transform.                                            */
+         /* For a type 2 transform use [1 beta; alpha 1] for an A update,      */
+         /* and [1 alpha; beta 1]' for the update to M.                        */
+         /* ================================================================== */
+         
+         /* Setup the data pointers.  a3 is set to a1 or A[i-1][j].  a4 is set */
+         /* to a2 or A[i][j].  m1 is set to M[0][j], and m2 to M[0][i].        */
+         
+         /* ------------- TYPE 1 TRANSFORMATION ---------------- */
+         if (type==1) {
+
+//  <A[PHI1][PHI2].i-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==1, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            /* Pre-multiplication (A update) */
+            for(k = j; k <= cols-1; k += 1) {
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <tau.i-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               /* Temporarily store a3. */
+               tau = A[i-1][j+k];
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+
+               
+               /* Update the rows of A. */
+               /* a3 = beta * a3 + a4 */
+               temp = A[i-1][j+k].r;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{i+j+k+1<=PHI1+PHI2+rows,
+//    PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i, j<=PHI2, PHI2<=j+k,
+//    type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+
+               A[i-1][j+k].r = A[i-1][j+k].r*beta.r-A[i-1][j+k].i*beta.i+A[i][j].r;
+
+//  <A[PHI1][PHI2].i-R-MAY-{i+j+k+1<=PHI1+PHI2+rows,
+//    PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i, j<=PHI2, PHI2<=j+k,
+//    type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i-1, j+k==PHI2, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+
+               A[i-1][j+k].i = temp*beta.i+A[i-1][j+k].i*beta.r+A[i][j].i;
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+
+               
+               /* a4 = tau + alpha*a4 */
+               temp = A[i][j].r;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <tau.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               A[i][j].r = tau.r+A[i][j].r*alpha.r-A[i][j].i*alpha.i;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <tau.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               A[i][j].i = tau.i+temp*alpha.i+A[i][j].i*alpha.r;
+            }
+
+//  <M[PHI1][PHI2].i-R-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            /* Post-multiplication (M update) */
+            for(k = 0; k <= rows-1; k += 1) {
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <tau.i-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+//  <tau.r-W-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               
+               /* Temporarily store m1 */
+               tau = M[i-1][k];
+
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+
+               
+               /* Update the columns of M. */
+               /* m1 = beta'*m1 + m2 */
+               temp = M[i-1][k].r;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI2==k, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+
+               M[i-1][k].r = beta.r*M[i-1][k].r+beta.i*M[i-1][k].i+M[i][k].r;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI2==k, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{PHI1==i-1, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <beta.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <beta.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+
+               M[i-1][k].i = beta.r*M[i-1][k].i-beta.i*temp+M[i][k].i;
+
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+
+               
+               /* m2 = tau + alpha'*m2 */
+               temp = M[i][k].r;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <tau.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               M[i][k].r = tau.r+alpha.r*M[i][k].r+alpha.i*M[i][k].i;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==k, type==1, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <tau.i-R-EXACT-{type==1, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               M[i][k].i = tau.i+alpha.r*M[i][k].i-alpha.i*temp;
+            }
+         }
+         else {
+
+//  <A[PHI1][PHI2].i-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-MAY-{PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i,
+//    j<=PHI2, PHI2+1<=j+cols, type==2, j+1<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            
+            /* Pre-multiplication (A update) */
+            for(k = j; k <= cols-1; k += 1) {
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, j+k==PHI2, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, j+k==PHI2, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <tau.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               /* Temporarily store a3. */
+               tau = A[i-1][j+k];
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-MAY-{i+j+k+1<=PHI1+PHI2+rows,
+//    PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i, j<=PHI2, PHI2<=j+k,
+//    type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i-1, j+k==PHI2, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+
+               
+               /* Update the rows of A. */
+               /* a3 = a3 + beta*a4 */
+               A[i-1][j+k].r = A[i-1][j+k].r+beta.r*A[i][j].r-beta.i*A[i][j].i;
+
+//  <A[PHI1][PHI2].i-R-MAY-{i+j+k+1<=PHI1+PHI2+rows,
+//    PHI1+PHI2+2<=i+j+rows, i<=PHI1+1, PHI1<=i, j<=PHI2, PHI2<=j+k,
+//    type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i-1, j+k==PHI2, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+
+               A[i-1][j+k].i = A[i-1][j+k].i+beta.r*A[i][j].i+beta.i*A[i][j].r;
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               
+               /* a4 = alpha*tau + a4 */
+               A[i][j].r = alpha.r*tau.r-alpha.i*tau.i+A[i][j].r;
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j<=k, k+1<=cols, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k,
+//    k+1<=cols, cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j<=k, k+1<=cols,
+//    cols<=rows}>
+
+               A[i][j].i = alpha.r*tau.i+alpha.i*tau.r+A[i][j].i;
+            }
+
+//  <M[PHI1][PHI2].i-R-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <tau.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+            /* Post-multiplication (M update) */
+            for(k = 0; k <= rows-1; k += 1) {
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i-1, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i-1, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <tau.i-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+//  <tau.r-W-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               
+               /* Temporarily store m1 */
+               tau = M[i-1][k];
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI2==k, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{PHI1==i-1, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+
+               
+               /* Update the columns of M. */
+               /* m1 = m1 + beta'*m2 */
+               M[i-1][k].r = M[i-1][k].r+beta.r*M[i][k].r+beta.i*M[i][k].i;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI2==k, i<=PHI1+1, PHI1<=i, 0<=PHI2,
+//    PHI2+1<=rows, type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{PHI1==i-1, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <beta.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <beta.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+
+               M[i-1][k].i = M[i-1][k].i+beta.r*M[i][k].i-beta.i*M[i][k].r;
+
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               
+               /* m2 = alpha'*tau + m2 */
+               M[i][k].r = alpha.r*tau.r+alpha.i*tau.i+M[i][k].r;
+
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==k, type==2, j+1<=i,
+//    i+1<=rows, 0<=j, j+1<=cols, 0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <alpha.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    0<=k, k+1<=rows, cols<=rows}>
+//  <tau.i-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+//  <tau.r-R-EXACT-{type==2, j+1<=i, i+1<=rows, 0<=j, j+1<=cols, 0<=k,
+//    k+1<=rows, cols<=rows}>
+
+               M[i][k].i = alpha.r*tau.i-alpha.i*tau.r+M[i][k].i;
+            }
+         }
+      }
+
+//  <D[PHI1]-R-EXACT-{PHI1==j, i==j, 0<=i, i+1<=cols, cols<=rows}>
+//  <D[PHI1]-W-EXACT-{PHI1==j, i==j, 0<=i, i+1<=cols, cols<=rows}>
+
+      /* for(j = 0; j < cols; j++) */
+      
+      /* Compute 1/square root of D[j][j].  Subsequent iterations will  */
+      /* not access this element.  We'll need the 1/square root of each */
+      /* diagonal element to compute the final Q and R values.          */
+      D[j] = 1.f/sqrtf(D[j]);
+   }
+
+//  <D[PHI1]-R-EXACT-{cols<=PHI1, PHI1+1<=rows, 0<=j, cols<=j}>
+//  <D[PHI1]-W-EXACT-{cols<=PHI1, PHI1+1<=rows, 0<=j, cols<=j}>
+
+   /* for(i = rows-1; i > j; i--) */
+   
+   /* Compute 1/square root of the remaining rows-cols D values. */
+   for(i = 0; i <= rows-cols-1; i += 1)
+
+//  <D[PHI1]-R-EXACT-{i+cols==PHI1, 0<=i, i+cols+1<=rows, 0<=j,
+//    cols<=j}>
+//  <D[PHI1]-W-EXACT-{i+cols==PHI1, 0<=i, i+cols+1<=rows, 0<=j,
+//    cols<=j}>
+
+      D[cols+i] = 1/sqrtf(D[cols+i]);
+
+//  <D[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI2==0, 0<=PHI1, PHI1+2<=2rows,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI2==0, 0<=PHI1, PHI1+2<=2rows,
+//    cols<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=rows, cols<=rows}>
+
+   
+   /* Compute Q = M * D^(-1/2) */
+   /* This will assign into the new matrix Q.  Recall that the matrix */
+   /* M is stored in column major order, while the matrix Q is stored */
+   /* in row major order.                                             */
+   for(i = 0; i <= rows-1; i += 1)
+
+//  <D[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=i, i+1<=rows,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-R-EXACT-{PHI2==0, i<=PHI1, PHI1+1<=i+rows, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{PHI2==0, i<=PHI1, PHI1+1<=i+rows, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=rows, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=rows, 0<=i,
+//    i+1<=rows, cols<=rows}>
+
+      for(j = 0; j <= rows-1; j += 1) {
+
+//  <D[PHI1]-R-EXACT-{PHI1==j, 0<=i, i+1<=rows, 0<=j, j+1<=rows,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].r-R-EXACT-{i+j==PHI1, PHI2==0, 0<=i, i+1<=rows,
+//    0<=j, j+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=rows, cols<=rows}>
+
+         Q[i][j].r = M[i+j][0].r*D[j];
+
+//  <D[PHI1]-R-EXACT-{PHI1==j, 0<=i, i+1<=rows, 0<=j, j+1<=rows,
+//    cols<=rows}>
+//  <M[PHI1][PHI2].i-R-EXACT-{i+j==PHI1, PHI2==0, 0<=i, i+1<=rows,
+//    0<=j, j+1<=rows, cols<=rows}>
+//  <Q[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=rows, cols<=rows}>
+
+         Q[i][j].i = M[i+j][0].i*D[j];
+      }
+
+//  <A[PHI1][PHI2].i-R-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{0<=PHI1, PHI1+1<=rows, 0<=PHI2,
+//    PHI2+1<=cols, cols<=rows}>
+//  <D[PHI1]-R-EXACT-{0<=PHI1, PHI1+1<=rows, 1<=cols, cols<=rows}>
+
+   /* Compute R = D^(-1/2) * T (where T is the upper triangularized     */
+   /* version of A).  This will still assign in-place into the original */
+   /* input matrix A.                                                   */
+   for(i = 0; i <= rows-1; i += 1)
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=cols, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=cols, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=cols, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=cols, 0<=i,
+//    i+1<=rows, cols<=rows}>
+//  <D[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=rows, 1<=cols, cols<=rows}>
+
+      for(j = 0; j <= cols-1; j += 1) {
+
+//  <A[PHI1][PHI2].r-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].r-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+         A[i][j].r = A[i][j].r*D[i];
+
+//  <A[PHI1][PHI2].i-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <A[PHI1][PHI2].i-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i+1<=rows, 0<=j,
+//    j+1<=cols, cols<=rows}>
+//  <D[PHI1]-R-EXACT-{PHI1==i, 0<=i, i+1<=rows, 0<=j, j+1<=cols,
+//    cols<=rows}>
+
+         A[i][j].i = A[i][j].i*D[i];
+      }
+
+   return;
+}
+

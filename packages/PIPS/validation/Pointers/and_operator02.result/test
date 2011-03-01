@@ -8,10 +8,7 @@ int main()
    int i = 0, j = 1, k = 2, l = 3;
 //  points to = {}
    _Bool b;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *p, *q, *r, *s, *t;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
@@ -36,12 +33,12 @@ int main()
 //  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    if ((p = q)&&(r = s))
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,j,-Exact-);(r,l,
-//   -Exact-);(s,l,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
       *p++;
    else if ((p = q)||(r = s))
-//  {(p,j,-Exact-);(q,j,-Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s,l,-Exact-);(t,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
       *r++;
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,j,-MAY-);(q,j,
 //   -Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(r,l,-MAY-);(s,l,

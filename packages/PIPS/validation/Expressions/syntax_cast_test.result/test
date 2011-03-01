@@ -1,0 +1,8 @@
+int main()
+{
+   func1(B, 0.2);
+   A[0][0][0].re = 5.;
+   A[0][0][0].im = 5.;
+   func2("SortiesAdapDop.txt", A);
+   return 0;
+}

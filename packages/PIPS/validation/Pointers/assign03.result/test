@@ -6,7 +6,7 @@ void assign03()
 {
 //  points to = {}
    char *malloc(int);
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
    double *p = (double *) malloc(10*sizeof(double));
 //  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    int j = 2;

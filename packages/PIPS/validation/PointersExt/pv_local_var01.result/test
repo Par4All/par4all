@@ -1,24 +1,47 @@
+int main()
+{
+//             <    is written>: i
+   int i = 3;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+
+   if (i>1) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+//             <    is written>: i
+      i = 0;
+   }
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
 //  points to = {}
    int i = 3;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int a[10];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    if (i>1) {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       int *q;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
+//   -Exact-)}
       q = &a[i];
-//  points to = {}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a[i],-Exact-)}
       p = q;
-//  points to = {}
+//  {(p,a[i],-Exact-);(q,a[i],-Exact-)}
       i = 0;
    }
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,a[i],-MAY-);(q,a[i],-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(q,a[i],-MAY-)}
    return 0;
 }

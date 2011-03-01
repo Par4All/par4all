@@ -4,7 +4,7 @@ POINTS TO
 //  {}
 void assign05()
 {
-//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *r;
 //  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;

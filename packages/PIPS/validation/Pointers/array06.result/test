@@ -6,7 +6,7 @@ int main()
 {
 //  points to = {}
    int t[100][10][3];
-//  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *pu;
 //  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 

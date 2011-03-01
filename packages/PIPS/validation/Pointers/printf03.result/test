@@ -46,7 +46,7 @@ int main()
    float x;
 //  points to = {}
    double y[10];
-//  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
    char *fmt = "i=%d, %d, %f\n";
 //  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
 

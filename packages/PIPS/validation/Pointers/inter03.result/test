@@ -128,7 +128,7 @@ int main()
    int *tab2[10];                                                       /*0030*/
 //  points to = {}
    int tab3[10][10];                                                    /*0031*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int **tab4;                                                          /*0032*/
 //  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int tab5[15];                                                        /*0033*/
