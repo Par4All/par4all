@@ -1,6 +1,7 @@
 bin_PROGRAMS=pips
 pips_SOURCES=pips.c revisions.c main_pips.c
 pips_LDADD=../../Libs/libpipslibs.la
+pips_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 
 TARGET	= pips
 BUILT_SOURCES=$(TARGET).h revisions.h
