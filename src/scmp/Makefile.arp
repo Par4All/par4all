@@ -1,0 +1,85 @@
+
+########## MAIN CONFIGURATION ##########
+#get application name from current folder name
+APPLI_NAME := $(shell basename $$PWD)
+
+########## TASK COMPILATION CONFIGURATION ##########
+BINPREFIX := mips-elf-
+CC	:= ${BINPREFIX}gcc
+LD	:= ${BINPREFIX}gcc
+
+SYSTEMDIR	:= ${INCLUDE_PLATFORM}/system
+LDSCRIPTFILE_MIPS	:= ${SYSTEMDIR}/ldscript
+LDSCRIPTFILE_DMA	:= ${SYSTEMDIR}/ldscript.dma
+
+INCDIR	:= -I${SYSTEMDIR}/include -I. -I${INCLUDE_PLATFORM}/shared
+LIBDIR	:= -L${SYSTEMDIR}/lib
+
+CFLAGS_MIPS		:= ${INCDIR} -Wall -specs=archc -G 0 -march=mips32r2
+CFLAGS_DMA		:= ${INCDIR} -fkeep-static-consts -Wall -specs=archc -G 0 -Werror -DDMATASK
+LDFLAGS_MIPS	:= ${LIBDIR} -specs=archc -T${LDSCRIPTFILE_MIPS}
+LDFLAGS_DMA		:= ${LIBDIR} -specs=archc -T${LDSCRIPTFILE_DMA}
+
+MIPSSRC := $(wildcard T*.mips.c)
+MIPSEXE := $(MIPSSRC:.mips.c=.exe)
+
+DMASRC := $(wildcard T*.dma.c)
+DMAEXE := $(DMASRC:.dma.c=.exe)
+
+########## CDFG COMPILATION CONFIGURATION ##########
+APP_FILE := ${INCLUDE_PLATFORM}/applis/${APPLI_NAME}.app
+
+EVENT_HEADER_FILE := ${APPLI_NAME}_event_val.h
+#PAR_FILE := ${INCLUDE_PLATFORM}/applis/${APPLI_NAME}.par
+CDFG_FILE := ${INCLUDE_PLATFORM}/applis/${APPLI_NAME}.cdfg
+CDFG_ANTX_FILE := ${INCLUDE_PLATFORM}/applis/${APPLI_NAME}.cdfg.antx
+
+CCP_ASM := ${PLATFORM_PATH}/bin/CCP_Asm/CCP_Asm_be
+OSOC_ASM := ${PLATFORM_PATH}/bin/OSoC_Asm/OSoC_Asm
+CCP_ASM_ANTX := ${PLATFORM_PATH}/bin/CCP_Asm/CCP_Asm_antx
+
+########## MAIN RULES ##########
+
+#		  mips tasks	 dma tasks		cdfg for ccp		cdfg for OSoC		cdfg for AntX
+FILES :=  ${MIPSEXE}     ${DMAEXE}		${CDFG_FILE}		${PAR_FILE}			${CDFG_ANTX_FILE}
+
+all:${FILES}
+
+clean:
+	rm -f *.o *~ ${FILES} ${EVENT_HEADER_FILE}
+
+
+########## TASK COMPILATION RULES ##########
+#mips32
+
+p4a_scmp.o : p4a_scmp.c
+	${CC} ${CFLAGS_MIPS} ${APP_CFLAGS} -c -o $@ $<
+
+%.mips.o : %.mips.s
+	${CC} -c -o $@ $<
+
+%.mips.o : %.mips.c ${EVENT_HEADER_FILE}
+	${CC} ${CFLAGS_MIPS} ${APP_CFLAGS} -c -o $@ $<
+
+%.exe : %.mips.o p4a_scmp.o
+	${LD} ${LDFLAGS_MIPS} -o $@ $< ./p4a_scmp.o -lcea -lsesam_com -lm
+
+#dma
+%.dma.o : %.dma.c ${EVENT_HEADER_FILE}
+	${CC} ${CFLAGS_DMA} -c -o $@ $<
+
+%.exe : %.dma.o
+	${LD} ${LDFLAGS_DMA} -o $@ $< -lcea -lsesam_com
+
+########## CDFG COMPILATION RULES ##########
+${EVENT_HEADER_FILE}: ${APP_FILE}
+	${CCP_ASM} --no-cdfg $<
+	
+${CDFG_FILE}: ${APP_FILE}
+	cd ${INCLUDE_PLATFORM}/applis && ${CCP_ASM} --no-event-header $<
+
+${CDFG_ANTX_FILE}: ${APP_FILE}
+	cd ${INCLUDE_PLATFORM}/applis && ${CCP_ASM_ANTX} --no-event-header $<
+	
+${PAR_FILE}: ${APP_FILE}
+	cd ${INCLUDE_PLATFORM}/applis && ${OSOC_ASM} $<

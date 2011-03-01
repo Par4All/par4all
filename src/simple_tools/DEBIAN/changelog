@@ -1,59 +1,78 @@
+2011-03-01  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.1
+
+        * C99 declarations anywhere in a block and in C99 for-loops are now
+          supported.
+
+        * Fixed code generation for C99 declarations.
+
+        * New --apply-before-parallelization option to apply phases before
+          parallelization.
+
+        * Improved compilation speed.
+
+        * No longer rely on Python 3.x since there where some issues on
+          some systems to cope with both 2.y and 3.x versions.
+
+        * Fixed encoding issues.
+
 2011-02-03  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-		* Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
-		  global variables.
+        * Par4All 1.0.5 fixes a bug when a code to be kernelized uses some
+          global variables.
 
-		  Thanks to Sarnath Kannan for this bug report. It should work now
-		  on common cases.
+          Thanks to Sarnath Kannan for this bug report. It should work now
+          on common cases.
 
-		* Prototype on lazy CUDA communication optimizations to remove
-		  redundant host-accelerator communications.
+        * Prototype on lazy CUDA communication optimizations to remove
+          redundant host-accelerator communications.
 
-		* Fixed a space iteration transposition bug in accelerator mode
-		  that was killing performances. But right now, better results are
-		  obtained with 2D kernels.
+        * Fixed a space iteration transposition bug in accelerator mode
+          that was killing performances. But right now, better results are
+          obtained with 2D kernels.
 
-		* C99 for(int i;...;...) are now accepted.
+        * C99 for(int i;...;...) are now accepted.
 
-		* Can generate kernels with less perfectly nested loops.
+        * Can generate kernels with less perfectly nested loops.
 
-		* Updated examples directory to new options and communication
-		  optimizations
+        * Updated examples directory to new options and communication
+          optimizations
 
-		* Better error and warning messages.
+        * Better error and warning messages.
 
-		* Script cleaning by using Python module names everywhere.
+        * Script cleaning by using Python module names everywhere.
 
 2010-11-22  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
-		* Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
+        * Par4All 1.0.4 introduces a new P4A Accel runtime for OpenMP and CUDA.
 
-		* In previous months, PIPS and PyPS has evolved a lot, specially
-		  in the code generation for various accelerators. This version
-		  try to cope with these evolutions.
+        * In previous months, PIPS and PyPS has evolved a lot, specially
+          in the code generation for various accelerators. This version
+          try to cope with these evolutions.
 
-		* Added the Stars-pm cosmological N-body simulation program as an
-		  example.
+        * Added the Stars-pm cosmological N-body simulation program as an
+          example.
 
-		* Now the runtime can deal with subarray transfers between the
-		  host and the accelerator, up to 4D arrays. Well right now the
-		  phases chosen in PIPS do not use them yet.
+        * Now the runtime can deal with subarray transfers between the
+          host and the accelerator, up to 4D arrays. Well right now the
+          phases chosen in PIPS do not use them yet.
 
-		* The code generation for non-C99 CUDA is more robust.
+        * The code generation for non-C99 CUDA is more robust.
 
 2010-11-05  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.0.3 is a base version to be used from Windows in a
-		  Wild Cruncher..
+          Wild Cruncher..
 
-		* NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
-		  code for nVidia GPU.
+        * NVIDIA_GPU_Computing_SDK is no longer needed to produce CUDA
+          code for nVidia GPU.
 
-		* Can now compile on Fedora.
+        * Can now compile on Fedora.
 
         * New option to use simpler #include recovery.
 
-		* Can move produced files to a given directory.
+        * Can move produced files to a given directory.
 
         * Improved documentation.
 

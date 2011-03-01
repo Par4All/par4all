@@ -2,7 +2,7 @@
 # An example used by Ronan Keryell
 
 # You can use the --publish and --release options, etc,
-# for example -z -j4 --publish --git-repository=.
+# for example -z -vvv -j4 --publish --git-repository=.
 
 # The 64 bit version on the local machine:
 src/simple_tools/p4a_coffee.py $@ &
