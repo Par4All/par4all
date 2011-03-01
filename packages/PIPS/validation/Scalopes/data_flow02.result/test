@@ -312,6 +312,7 @@ scmp_task_4:
 #define P4A__c__1_id 6
 
 #ifdef scmp_task_0
+#define scmp_task_0_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 1
 #define P4A__a__1_cons_p 0
@@ -326,9 +327,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define scmp_task_0_p 0
 #endif
 
 #ifdef scmp_task_1
+#define scmp_task_1_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 1
@@ -343,9 +347,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define scmp_task_1_p 0
 #endif
 
 #ifdef scmp_task_2
+#define scmp_task_2_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -360,9 +367,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 1
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define scmp_task_2_p 0
 #endif
 
 #ifdef scmp_task_3
+#define scmp_task_3_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -377,9 +387,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define scmp_task_3_p 0
 #endif
 
 #ifdef scmp_task_4
+#define scmp_task_4_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -394,9 +407,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 1
 #define P4A__c__1_prod_p 0
+#else
+#define scmp_task_4_p 0
 #endif
 
 #ifdef P4A_sesam_server_a
+#define P4A_sesam_server_a_p 1
 #define P4A__a__0_cons_p 1
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -411,9 +427,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define P4A_sesam_server_a_p 0
 #endif
 
 #ifdef P4A_sesam_server_b
+#define P4A_sesam_server_b_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -428,9 +447,12 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 0
+#else
+#define P4A_sesam_server_b_p 0
 #endif
 
 #ifdef P4A_sesam_server_c
+#define P4A_sesam_server_c_p 1
 #define P4A__a__0_cons_p 0
 #define P4A__a__0_prod_p 0
 #define P4A__a__1_cons_p 0
@@ -445,4 +467,6 @@ scmp_task_4:
 #define P4A__c__0_prod_p 0
 #define P4A__c__1_cons_p 0
 #define P4A__c__1_prod_p 1
+#else
+#define P4A_sesam_server_c_p 0
 #endif

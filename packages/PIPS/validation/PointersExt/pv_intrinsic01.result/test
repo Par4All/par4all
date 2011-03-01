@@ -1,29 +1,26 @@
 //  {}
 int main()
 {
-//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    FILE *fp;
 //  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    size_t n, nr;
 //  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char buf1[200];
-//  {(buf2,*HEAP*_l_10,-Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *buf2 = malloc(200*sizeof(char));
-//  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(buf2,*HEAP*_l_10,-Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *fmt;
 //  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    char *i_name;
 //  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i, r, c, max;
 //  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    fpos_t *fp_pos, pos;
 //  {(buf2,*HEAP*_l_10,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*,-Exact-);(fp_pos,

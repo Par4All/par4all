@@ -4,7 +4,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    FILE *pFile;
 //  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int n;
@@ -15,11 +15,11 @@ int main()
    pFile = fopen("myfile.txt", "w");
 //  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    for(n = 0; n <= 2; n += 1) {
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
       puts("please, enter a name: ");
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
       gets(name);
-//  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
       fprintf(pFile, "Name %d %s\n", n, name);
    }
 //  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}

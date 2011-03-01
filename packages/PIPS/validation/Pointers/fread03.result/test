@@ -67,17 +67,14 @@ byte * * LoadPGM_bmatrix(char *filename, int *nrl, int *nrh, int *ncl, int *nch)
 //  {(filename,_filename_3,-Exact-);(nch,_nch_7,-Exact-);(ncl,_ncl_6,
 //   -Exact-);(nrh,_nrh_5,-Exact-);(nrl,_nrl_4,-Exact-)}
    int height, width, gris;
+//  {(filename,_filename_3,-Exact-);(nch,_nch_7,-Exact-);(ncl,_ncl_6,
+//   -Exact-);(nrh,_nrh_5,-Exact-);(nrl,_nrl_4,-Exact-)}
+   byte **m;
 //  {(filename,_filename_3,-Exact-);(m,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(nch,_nch_7,-Exact-);(ncl,_ncl_6,-Exact-);(nrh,_nrh_5,
 //   -Exact-);(nrl,_nrl_4,-Exact-)}
-   byte **m;
-//  {(file,*ANY_MODULE*:*NOWHERE*,-Exact-);(filename,_filename_3,
-//   -Exact-);(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(nch,_nch_7,
-//   -Exact-);(ncl,_ncl_6,-Exact-);(nrh,_nrh_5,-Exact-);(nrl,_nrl_4,
-//   -Exact-)}
    FILE *file;
-//  {(buffer,*ANY_MODULE*:*NOWHERE*,-Exact-);(file,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(filename,_filename_3,
+//  {(file,*ANY_MODULE*:*NOWHERE*,-Exact-);(filename,_filename_3,
 //   -Exact-);(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(nch,_nch_7,
 //   -Exact-);(ncl,_ncl_6,-Exact-);(nrh,_nrh_5,-Exact-);(nrl,_nrl_4,
 //   -Exact-)}

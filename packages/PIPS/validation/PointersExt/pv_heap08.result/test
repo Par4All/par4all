@@ -1,16 +1,16 @@
 //  {}
 int main()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int a;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    if (a==1)
-//  {(p,*HEAP*_l_8,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = (int *) malloc(2*sizeof(int));
    else
-//  {(p,*HEAP*_l_10,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       p = (int *) malloc(3*sizeof(int));
 //  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
    p[0] = 0;

@@ -1,18 +1,36 @@
+int main()
+{
+   int i;
+   int *p;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+   p = (int *) malloc(10*sizeof(int));
+//             <    is read   >: i
+//             <    is written>: i
+
+   for (i = 0;i<10;i++)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i p
+      p[i] = i;
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
 //  points to = {}
    int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
    p = (int *) malloc(10*sizeof(int));
-//  {(p,*HEAP*_l_7,-Exact-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
 
-   for(i = 0; i <= 9; i += 1)
-//  {(p,*HEAP*_l_7,-Exact-)}
+   for (i = 0;i<10;i++)
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
       p[i] = i;
-//  {(p,*HEAP*_l_7,-Exact-)}
+//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    return 0;
 }

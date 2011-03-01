@@ -1,0 +1,16 @@
+setenv WS "hpecChallenge"
+setenv FLAVOR "tdfir"
+setenv PIPS_CPP_FLAGS "-I $WS-1.0/kernelBenchmarks/include"
+
+delete $WS-$FLAVOR
+create $WS-$FLAVOR $WS-1.0/kernelBenchmarks/$FLAVOR/tdFir.c
+activate MUST_REGIONS
+setproperty CONSTANT_PATH_EFFECTS FALSE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[tdFir]
+display PRINTED_FILE[elCplxMul]
+display PRINTED_FILE[zeroData]
+close
+delete $WS-$FLAVOR
+
+

@@ -34,8 +34,7 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *a, *b, c, d, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -51,18 +50,18 @@ int main()
    b = &c;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,c,-Exact-)}
    do {
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       // BEGIN BLOCK
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
+//  points to = {}
       i = i+1;
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
+//  points to = {}
       a = b;
-//  {(a,d,-Exact-);(b,d,-Exact-)}
+//  points to = {}
       b = &d;
       // END BLOCK
    }
    while (i<5);
-//  {(a,c,-MAY-);(a,d,-MAY-);(b,d,-Exact-)}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
 
    return 0;
    // END BLOCK

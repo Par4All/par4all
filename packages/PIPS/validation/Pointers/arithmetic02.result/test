@@ -42,8 +42,7 @@ int main()
 {
 //  points to = {}
    // BEGIN BLOCK
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pfin,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *pdeb, *pfin, *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(pfin,*ANY_MODULE*:*NOWHERE*,-Exact-)}
@@ -60,24 +59,22 @@ int main()
    p = pdeb;
 //  {(p,t[0],-Exact-);(pdeb,t[0],-Exact-);(pfin,t[10-1],-Exact-)}
    while (p<=pfin) {
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
 //   -Exact-);(pfin,t[10-1],-Exact-)}
       // BEGIN BLOCK
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  points to = {}
       if (*p==0)
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
 //   -Exact-);(pfin,t[10-1],-Exact-)}
          printf("%d ", p-pdeb);
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
-//   -Exact-);(pfin,t[10-1],-Exact-)}
+//  points to = {}
       p++;
       // END BLOCK
    }
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
 //   -Exact-);(pfin,t[10-1],-Exact-)}
    printf("\n");
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,t[0],-MAY-);(pdeb,t[0],
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
 //   -Exact-);(pfin,t[10-1],-Exact-)}
    return 0;
    // END BLOCK

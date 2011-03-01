@@ -73,9 +73,9 @@ void f3(int n_ptrs, int f4_after, ...)
    va_start(ap, f4_after);
 //  points to = {}
    for(ptr_no = 0; ptr_no <= n_ptrs-1; ptr_no += 1) {
-//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-MAY-)}
+//  points to = {}
       array[ptr_no] = va_arg(ap, char *);
-//  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
       if (ptr_no==f4_after)
 //  {(array[ptr_no],*ANY_MODULE*:*ANYWHERE*,-Exact-)}
          va_copy(ap_save, ap);

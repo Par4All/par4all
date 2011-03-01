@@ -23,7 +23,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(s,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  points to = {}
    char *s = "sortie de puts";
 //  {(s,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    puts(s);

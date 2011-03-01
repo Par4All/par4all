@@ -1,7 +1,7 @@
 //  {}
 int main()
 {
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *a;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int b = 0;

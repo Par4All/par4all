@@ -25,7 +25,7 @@ int main()
 {
 //  points to = {}
    float t;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    float *a;
 //  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    int i;

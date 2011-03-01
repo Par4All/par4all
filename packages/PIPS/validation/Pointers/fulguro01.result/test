@@ -116,72 +116,58 @@ void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Dat
 //   _datdest_1,-Exact-)}
    int j;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   _datdest_1,-Exact-)}
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc2,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(psrc2,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 *pdest = (fgINT32 *) datdest->array;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 v1;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 v2;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 result;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    int spp = datdest->spp;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    int length = datdest->length*spp;
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    for(j = 0; j <= length-1; j += 1) {
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//  points to = {}
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//  points to = {}
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//  points to = {}
       result = flgr_defop_add_fgINT32(v1, v2);
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//  points to = {}
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
 //  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
 //   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -MAY-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(psrc2,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    return;
 }
 //  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
@@ -316,53 +302,39 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-)}
    FLGR_Data1D **pdest = datdest->row;
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    FLGR_Data1D **p1 = data1->row;
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p2,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,
+//   -Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    FLGR_Data1D **p2 = data2->row;
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p2,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    int i;
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p2,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    i = 0;
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p2,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-)}
+//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    while (i<data1->size_y) {
-//  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p1,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b1,
-//   -MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-)}
+//  points to = {}
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
-//  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p1,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b1,
-//   -MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-)}
+//  points to = {}
       i++, pdest++, p1++, p2++;
    }
 //  {(data1,_data1_8,-Exact-);(data2,_data2_9,-Exact-);(datdest,
-//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(p1,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b1,
-//   -MAY-);(p2,*ANY_MODULE*:*ANYWHERE*_b2,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b1,-MAY-);(pdest,
-//   *ANY_MODULE*:*ANYWHERE*_b2,-MAY-)}
+//   _datdest_7,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    return;
 }
 //  {(array,_array_10,-Exact-)}

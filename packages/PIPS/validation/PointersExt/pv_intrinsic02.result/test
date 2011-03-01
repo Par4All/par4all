@@ -1,7 +1,7 @@
 //  {}
 int main()
 {
-//  {(end,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    char *end;
 //  {(end,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    long int li;

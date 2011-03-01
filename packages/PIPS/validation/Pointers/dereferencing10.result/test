@@ -39,9 +39,7 @@ POINTS TO
 //  {}
 int main()
 {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_1,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(p_2,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_3,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int ****p, ***p_1, **p_2, *p_3;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_1,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(p_2,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_3,
@@ -49,8 +47,6 @@ int main()
    int i, j;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_1,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(p_2,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_3,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(q_1,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(q_2,*ANY_MODULE*:*NOWHERE*,-Exact-);(q_3,
 //   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int ***q_1, **q_2, *q_3;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(p_1,*ANY_MODULE*:*NOWHERE*,

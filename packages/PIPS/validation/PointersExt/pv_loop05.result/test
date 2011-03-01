@@ -3,8 +3,7 @@ int main()
 {
 //  points to = {}
    int i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  points to = {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-)}
@@ -20,11 +19,11 @@ int main()
 //  points to = {}
       q++;
    }
-//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
-//   *HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
 
    free(p);
-//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,
-//   *HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
    return 0;
 }

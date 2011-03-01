@@ -30,9 +30,9 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int i;
-//  {(p,*NULL_POINTER*,-Exact-)}
+//  points to = {}
    int *p = 0;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+//  {(p,*NULL_POINTER*,-Exact-)}
    int **q = 0;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
 

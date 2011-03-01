@@ -6,9 +6,9 @@ int main()
 {
 //  points to = {}
    double x = 1.;
-//  {(p,x,-Exact-)}
+//  points to = {}
    double *p = &x;
-//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+//  {(p,x,-Exact-)}
    double *q = 0;
 //  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    printf("q = %p", q);

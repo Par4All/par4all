@@ -3,7 +3,7 @@ int main()
 {
 //  points to = {}
    my_list l1, l2, l3, l4;
-//  {(l,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    my_list *l;
 //  {(l,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
@@ -37,11 +37,11 @@ int main()
    l = l->next;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*NULL_POINTER*,
 //   -Exact-);(*ANY_MODULE*:*NOWHERE*_b0,l2,-Exact-);(l,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(l,l1,-Exact-)}
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    *l = l3;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*NULL_POINTER*,
 //   -Exact-);(*ANY_MODULE*:*NOWHERE*_b0,l2,-Exact-);(l,
-//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(l,l1,-Exact-)}
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    l = &l4;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*NULL_POINTER*,
 //   -Exact-);(*ANY_MODULE*:*NOWHERE*_b0,l2,-Exact-);(l,l4,-Exact-)}

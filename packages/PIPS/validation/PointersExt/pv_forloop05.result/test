@@ -1,3 +1,21 @@
+int main()
+{
+   float *p[10];
+   float a[10], t;
+   int i;
+//             <    is read   >: t
+//             <    is written>: t
+
+   for (t = 1.0;t<2.0;t += 0, 01)
+//             <    is read   >: i
+//             <    is written>: i
+      for (i = 0;i<10;i++)
+//             <    is read   >: i
+//             <    is written>: p[i]
+         p[i] = &a[i];
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -9,16 +27,11 @@ int main()
    int i;
 //  points to = {}
 
-   t = 1.0;
-//  points to = {}
-   while (t<2.0) {
+   for (t = 1.0;t<2.0;t += 0, 01)
 //  {(p[i],a[i],-MAY-)}
-      for(i = 0; i <= 9; i += 1)
+      for (i = 0;i<10;i++)
 //  {(p[i],a[i],-MAY-)}
          p[i] = &a[i];
-//  {(p[i],a[i],-MAY-)}
-      t += 0, 01;
-   }
 //  {(p[i],a[i],-MAY-)}
    return 0;
 }

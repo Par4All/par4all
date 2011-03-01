@@ -76,16 +76,11 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int a, b, c, d;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    int *pa, *pb, *pc, *pd;
 //  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
    int **ppa, **ppb, **ppc, **ppd;
 //  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
 //   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,

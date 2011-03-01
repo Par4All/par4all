@@ -1,7 +1,7 @@
 //  {}
 int main()
 {
-//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  points to = {}
    char *s;
 //  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    s = "hello\n";
