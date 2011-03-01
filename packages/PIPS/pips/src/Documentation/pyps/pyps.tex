@@ -179,75 +179,10 @@ Simple scripting with \PYPS{} doesn't require a strong knowledge of Python langu
 
 \section{Running Example}
 
-This tutorial will show the functionnality of \PYPS{} using the C code below:
-\begin{lstlisting}[language=c]
-void copy (int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w])
-{
-  int i,j;
-  for (i = 0; i < w; i++)  
-	for (j = 0; j < h; j++) {
-	  dest[j*w + i] = bytes[j*w + i];
-	}
-}
-
-void light (int w, int h, unsigned char bytes[h*w], unsigned char val)
-{
-  int i,j;
-  for (i = 0; i < w; i++)  
-	for (j = 0; j < h; j++) {
-	  unsigned char current = bytes[j*w + i];
-	  bytes[j*w + i] = (((int)current + val)>255)?255:current+val;
-	}
-}
-
-void curve (int w, int h, unsigned char bytes[h*w], unsigned char lut[h*w])
-{
-  int i,j;
-  for (i = 0; i < w; i++)  
-	for (j = 0; j < h; j++)	{
-	  unsigned char current = bytes[j*w + i];
-	  bytes[j*w + i] = lut[current];
-	}
-}
-
-void transfo (int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
-{
-  copy (w, h, bytes, dest);
-  curve (w, h, dest, lut);
-  light (w, h, dest, val);
-}
-
-int main(int ac, char *av[])
-{
-  FILE *in, *map, *out;
-  int height, width;
-  double t;
-  long i, size;
-
-  if (ac != 4) {
-	printf ("Usage: light infile.pgm mapfile.amp outfile.pgm\n");
-	exit (1);
-  }
-  /* some more init ... */
-  transfo (width, height, *bytes, *dest, *lut, 5);
-
-
-  out = fopen (av[3], "w");
-  if (out == NULL) {
-	perror ("fopen");
-	exit (1);
-  }
-  fprintf (out, "P5\n");
-  fprintf (out, "%d %d\n", height, width);
-  fprintf (out, "%d\n", maxval);
-  for (i = 0; i < size; i ++)	{
-	if (fwrite (*dest + i, 1, 1, out) == EOF) {
-	  perror ("fwrite");
-	  exit (1);
-	}
-  }
-  fclose (out);
-}
+This tutorial will show the functionality of \PYPS{} using the C code
+that can be retrieved  from the subversion repository:
+\begin{lstlisting}[language=sh]
+wget http://svn.cri.ensmp.fr/svn/validation/trunk/Pyps/silber.c
 \end{lstlisting}
 
 \section{First steps with \PYPS{}}
@@ -262,10 +197,10 @@ from pyps import !workspace!, !module! #iPyps takes care of this for you
 To begin, you should create a new \PIPS{} workspace. \PIPS{} workspace are represented by Python's \emph{workspace} class.
 To create a new workspace, you need the list of all source files that you want to handle.
 Note that you can't add source file to the project after its creation.
-In this example, we have only the [[gas.c]] source file.
+In this example, we have only the [[silber.c]] source file.
 
 \begin{lstlisting}
-ws = workspace("gas.c")
+ws = workspace("silber.c")
 # If you have more than one source file, you should use something like :
 # ws = workspace("somesource.c","someothersource.c","lastsource.c")
 \end{lstlisting}
@@ -277,14 +212,14 @@ Each functions and source files are represented in Python by an object of type \
 \begin{lstlisting}
 t=ws.fun.transfo #Retrieve function transfo and bind it to variable t
 m=ws.fun.main #Retrieve function main
-g=ws.cu.gas #Retrieve compilation unit gas.c
+g=ws.cu.silber #Retrieve compilation unit silber.c
 \end{lstlisting}
 
 For iPyps users, completion function and source name completion is available using TAB key after typing \lstinline|ws.fun.| and \lstinline|ws.cu.|
 
 You can print function information and documentation extracted from \LaTeX\  source file \file{properties\_rc.tex} by using ‘?’ :
 \begin{lstlisting}
-ws.fun.inlining? #Print documentation
+ws.fun.transfo.inlining? #Print documentation
 \end{lstlisting}
 
 This should output something like :
@@ -301,7 +236,7 @@ Docstring:
 
 In this brouhaha, the more relevant informations are \emph{Definition} and \emph{Docstring}. Looking at the definition of the function, we know that it takes two arguments. Each argument have a default value, so you can skip a parameter if you are pleased with the default value. For instance :
 \begin{lstlisting}
-ws.fun.copy.inlining(self,callers="transfo")
+ws.fun.copy.inlining(callers="transfo")
 #The call is threated as if USE_INITIALIZATION_LIST is set to True 
 #because of the default value
 \end{lstlisting}
@@ -311,7 +246,7 @@ Value of properties are automatically restored after transformation call to thei
 Sometimes, dependency between transformations and properties are not dectected because of missing or implicit relation in \file{properties-rc.tex}.
 It is still possible to pass a property as parameter even if Pyps don't know about the relation :
 \begin{lstlisting}
-ws.fun.light.inlining(self, callers="transfo", purge_labels=False);
+ws.fun.light.inlining(callers="transfo", purge_labels=False);
 \end{lstlisting}
 
 As you can see, we add an extra property purge\_labels which is not listed in Python inlining function prototype. Furthermore, the real Pips name of the property is \texttt{INLINING\_PURGE\_LABELS}. \PYPS{} automatically append transformation’s name at the begining of a property when needed and also automatically convert property name to upper case.

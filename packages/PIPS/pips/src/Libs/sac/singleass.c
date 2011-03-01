@@ -180,11 +180,13 @@ static void do_scalar_renaming_in_graph(graph g, entity e) {
 static void do_scalar_renaming(entity module, statement module_statement, graph dg) {
 
     FOREACH(ENTITY,e,entity_declarations(module)) {
-        /* only local scalar entities */
-        if(local_entity_of_module_p(e,module) && entity_scalar_p(e) )
+        /* only local non static scalar entities
+         * non static as a quick fix ...*/
+        if(local_entity_of_module_p(e,module) && entity_scalar_p(e) && !entity_static_variable_p(e))
             do_scalar_renaming_in_graph(dg,e);
     }
     module_clean_declarations(module,module_statement);
+    unnormalize_expression(module_statement); // overkill ? It's not a game of kick-the-orphe
 }
 
 /* recursievly computes the set of all chains involving e starting from v */
