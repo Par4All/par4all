@@ -48,6 +48,16 @@ def insert_kernel_launcher_declaration(m):
         print "Inserting", decl
     return decl
 
+#This function is used by re.sub(...) inside the function patch_to_use_p4a_methods() 
+#and builds the accel kernel call statement for
+#p4a_launcher_xxx() function (xxx is the name of the module(function))
+def p4a_call_accel_kernel_repl(match_object):
+	if match_object.group(3):
+		return match_object.group(3)+"\n P4A_call_accel_kernel_"+match_object.group(1)+\
+			"d("+match_object.group(4)+", "+match_object.group(2)+", "+match_object.group(5)+";\n}"
+	else:
+		return "P4A_call_accel_kernel_"+match_object.group(1)+"d("+match_object.group(4)+\
+			", "+match_object.group(2)+", "+match_object.group(5)+";\n}"
 
 def patch_to_use_p4a_methods(file_name, dir_name, includes):
     file_base_name = os.path.basename(file_name);
@@ -109,14 +119,14 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
 #   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
-    content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\)(?:.*(int \\w;).*)?(?#
-          to skip to the next "Loop nest P4A end", not the last one...
+    content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\)(?:.*?)(int \\w+;)?(?(3)(?:.*))(?#
+        to skip to the next "Loop nest P4A end", not the last one...
         )// Loop nest P4A end\n.*?(?#
-          to skip to "the p4a_wrapper", not the last one...
+        to skip to "the p4a_wrapper", not the last one...
         )(p4a_wrapper_\\w+)\\(([^;]*)\\;.*?(?#
-          no slurp to the next "}" at the begin of a line
+        no slurp to the next "}" at the begin of a line
         )\n}""",
-      "\\3\n  P4A_call_accel_kernel_\\1d(\\4, \\2, \\5;\n}", content)
+        p4a_call_accel_kernel_repl, content)
 
     # Get the virtual processor coordinates:
     ## Change
