@@ -38,6 +38,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 #include "genC.h"
 #include "newgen_set.h"
@@ -153,6 +154,30 @@ set set_add_element(set s1, const set s2, const void * e)
   }
 }
 
+
+/* @return s1 = s2 u { list of e }.
+ */
+set set_add_elements(set s1, const set s2, const void * e, ...)
+{
+  bool first = true;
+  va_list args;
+  /* The statement list */
+  /* Analyze in args the variadic arguments that may be after s2: */
+  va_start(args, e);
+ /* Since a variadic function in C must have at least 1 non variadic
+     argument (here the s), just skew the varargs analysis: */
+  e = va_arg(args, void *);
+  while(e) {
+    // may copy s2 on first time
+    s1 = set_add_element(s1, first? s2: s1, e);
+    first = false;
+    // get next element
+    e = va_arg(args, void *);
+  }
+  /* Release the variadic analyzis: */
+  va_end(args);
+  return s1;
+}
 /* @return whether e \in s.
  */
 bool set_belong_p(const set s, const void * e)
