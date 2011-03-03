@@ -64,7 +64,6 @@ typedef void * vertex_label;
 #define ITEM_NOT_IN_ARRAY -1
 
 
-static statement stmt_sauv ;
 static string pragma_begin;
 static string pragma_end;
 static list lists_to_outline ;

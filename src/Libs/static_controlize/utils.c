@@ -1132,11 +1132,11 @@ static void substitute_variable_by_expression(expression e, hash_table fst)
   }
 }
 
-void forward_substitute_in_loop(loop *pl, hash_table fst)
+void forward_substitute_in_anyloop(void *pl, hash_table fst)
 {
   /* Would it be better to loop over with HASH_MAP or to check every
      reference? */
-  gen_context_multi_recurse(*pl, fst,
+  gen_context_multi_recurse(pl, fst,
 			    expression_domain, gen_true, substitute_variable_by_expression,
 			    NULL);
 }

@@ -53,6 +53,7 @@
 #include "sg.h"
 #include "sc.h"
 #include "polyedre.h"
+#include "properties.h"
 #include "matrix.h"
 
 /* Pips includes	*/
@@ -92,16 +93,15 @@ statement_mapping	Gstatic_control_map;
 static_control static_controlize_call(call c)
 {
 	static_control sc;
-	bool b;
 
 	pips_debug( 3, "begin CALL\n");
 	pips_debug( 7,
 		    "call : %s\n", entity_local_name( call_function(c) ) );
 	entity e = call_function(c);
 	tag tt;
-	    if (tt = value_tag(entity_initial(e))== is_value_intrinsic)
+	    if ((tt = value_intrinsic_p(entity_initial(e))))
 	      {
-		sc = make_static_control(b,
+		sc = make_static_control(false,
 					 sc_list_of_entity_dup( Gstructure_parameters ),
 					 /* _list_of_loop_dup(
 					    Genclosing_loops ),*/
@@ -111,7 +111,7 @@ static_control static_controlize_call(call c)
 	      } 
 	    else
 	      {
-		b = splc_linear_access_to_arrays_p(call_arguments(c),
+		bool b = splc_linear_access_to_arrays_p(call_arguments(c),
 						   &Genclosing_loops);
 		
 		sc = make_static_control(b,
@@ -258,7 +258,7 @@ statement s;
     case is_instruction_loop :
       {
 	loop the_loop = instruction_loop( inst );
-	forward_substitute_in_loop( &instruction_loop( inst ),
+	forward_substitute_in_anyloop( instruction_loop( inst ),
 				    Gforward_substitute_table);
 	sc1 = static_controlize_loop( the_loop );
 	is_static = static_control_yes( sc1 );
@@ -267,7 +267,7 @@ statement s;
     case is_instruction_forloop :
       {
 	forloop forl = instruction_forloop( inst );
-	forward_substitute_in_loop( &instruction_forloop( inst ),
+	forward_substitute_in_anyloop( instruction_forloop( inst ),
 				    Gforward_substitute_table);
 	sc1 = static_controlize_forloop( forl );
 	is_static = static_control_yes( sc1 );
@@ -276,7 +276,7 @@ statement s;
     case  is_instruction_whileloop :
       {
 	whileloop whilel = instruction_whileloop( inst );
-	forward_substitute_in_loop( &instruction_whileloop( inst ),
+	forward_substitute_in_anyloop( instruction_whileloop( inst ),
 				    Gforward_substitute_table);
 	sc1 = static_controlize_whileloop( whilel );
 	is_static = static_control_yes( sc1 );
@@ -800,7 +800,7 @@ int *Gcount_nlc;
       }
     case is_instruction_loop :
       {
-	(void) forward_substitute_in_loop(&instruction_loop(inst), fst);
+	(void) forward_substitute_in_anyloop(instruction_loop(inst), fst);
 	ADD_ELEMENT_TO_LIST(*ell, LOOP, instruction_loop( inst ));
 	return_list = loop_normalize_of_loop(instruction_loop(inst), fst, ell,
 					     etl, swfl, Gcount_nlc);

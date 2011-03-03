@@ -76,7 +76,7 @@ static int gen_array_index(gen_array_t ar, int item){
   int i;
   for(i = 0; i<(int) gen_array_nitems(ar); i++){
     if(gen_array_item(ar, i) != NULL){
-      if(item == gen_array_item(ar, i)){
+      if(item == (int)gen_array_item(ar, i)){
 	return i;
       }
     }
@@ -164,7 +164,7 @@ static bool outer_loop(statement s)
     {
       if (in_loop_p == FALSE)
 	{
-	  gen_array_append (outer_loops_array,statement_ordering(s));
+	  gen_array_append (outer_loops_array,(void*)statement_ordering(s));
 	  in_loop_p = TRUE;
 	  statement end_outermost_loop = make_continue_statement(entity_empty_label());
 	  insert_statement(s, end_outermost_loop, false);
