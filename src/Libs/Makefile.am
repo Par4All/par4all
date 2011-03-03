@@ -88,4 +88,4 @@ libpipslibs_la_LIBADD=\
 	static_controlize/libstatic_controlize.la \
 	paf-util/libpaf-util.la \
 	gnulib/libgnu.la \
-	pocc-interface/pocc-interface.la
+	pocc-interface/libpocc-interface.la
