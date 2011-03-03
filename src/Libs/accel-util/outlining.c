@@ -530,9 +530,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* D.K
       add return to the new body
     */
-    list list_outl = gen_nconc(gen_full_copy_list(statements_to_outline), CONS(STATEMENT,  make_return_statement(new_fun), NIL));
-    statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(list_outl)));
-    //statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
+    statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
 
     /* Retrieve referenced entities */
@@ -744,6 +742,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
     else {
       cu_name = compilation_unit_of_module(get_current_module_name());
     }
+
+    /* add a return at the end of the body, in all cases */
+    insert_statement(new_body,make_return_statement(new_fun),false);
+
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);
