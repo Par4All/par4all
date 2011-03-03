@@ -84,13 +84,13 @@
 { DBR_CUMULATED_REDUCTIONS,	STATEMENT_FUNCTION_METHODS },
 { DBR_SUMMARY_REDUCTIONS,	NEWGEN_METHODS },
 
-  /*
+  
 { DBR_STATIC_CONTROL,
       (READER) pipsdbm_read_statement_mapping,
       (WRITER) pipsdbm_write_statement_mapping,
       (FREER) free_static_control_mapping,
       (CHECKER) pipsdbm_check_statement_mapping },
-*/
+
 
 /* PAF stuff...
  */
@@ -221,6 +221,8 @@
  */
 { DBR_PARSED_CODE,		NEWGEN_METHODS },
 { DBR_PARALLELIZED_CODE,	NEWGEN_METHODS },
+//{ DBR_SCOP_PRINTED,	        NEWGEN_METHODS },
+//{ DBR_SCOP_OUTLINED,    	NEWGEN_METHODS },
   /* { DBR_REINDEXED_CODE,		NEWGEN_METHODS }, */
 { DBR_CALLEES,			NEWGEN_METHODS },
 { DBR_CALLERS,			NEWGEN_METHODS },

@@ -527,7 +527,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name,copy_language(module_language(get_current_module_entity())));
-    statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
+    /* D.K
+      add return to the new body
+    */
+    list list_outl = gen_nconc(gen_full_copy_list(statements_to_outline), CONS(STATEMENT,  make_return_statement(new_fun), NIL));
+    statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(list_outl)));
+    //statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
 
     /* Retrieve referenced entities */

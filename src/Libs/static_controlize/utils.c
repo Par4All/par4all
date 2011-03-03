@@ -131,83 +131,96 @@ int
 stco_renumber_code(statement in_st,
 		   int in_ct)
 {
-	int		count;
-	instruction	inst;
-
-        pips_debug(7, "begin\n");
-	count = in_ct;
-	inst = statement_instruction( in_st );
-
-	/* Renumber all the statement but the sequence: */
-	if (instruction_tag(inst) != is_instruction_block)
-	    statement_number(in_st) = count++;
-	
-	switch(instruction_tag(inst)) {
-  		case is_instruction_block : {
-			MAPL( stmt_ptr, {
-        			statement st = STATEMENT(CAR( stmt_ptr ));
-				/*
-				   statement_number( st ) = count++;
-				   */
-        			count = stco_renumber_code( st, count );
-        		}, instruction_block( inst ) );
-			break;
-    		}
-		case is_instruction_test : {
-    			test t = instruction_test(inst);
-			statement tt, tf;
-
-			tt = test_true( t );
-			tf = test_false( t );
-			/*
-			   statement_number( tt ) = count++;
-			   statement_number( tf ) = count++;
-			   */
-			count = stco_renumber_code( tt, count );
-			count = stco_renumber_code( tf, count );
-			break;
-   		}
-  		case is_instruction_loop : {
-    			statement lb = loop_body( instruction_loop( inst ) );
-			/*
-			   statement_number( lb ) = count++;
-			*/
-    			count = stco_renumber_code( lb, count );
-    			break;
-    		}
-  		case is_instruction_call : {
-    			break;
-    		}
-  		case is_instruction_goto : {
-			statement gs = instruction_goto( inst );
-			/*
-			   statement_number( gs ) = count++;
-			   */
-			count = stco_renumber_code( gs, count );
-    			break;
-    		}
-  		case is_instruction_unstructured : {
-			list blocs = NIL;
-			unstructured u = instruction_unstructured( inst );
-
-        		control_map_get_blocs(unstructured_control(u), &blocs ) ;
-        		blocs = gen_nreverse( blocs ) ;
-        		MAPL( ctl_ptr,  {
-                		statement stmt = control_statement(
-						     CONTROL(CAR( ctl_ptr )));
-				/*
-				   statement_number( stmt ) = count++;
-				   */
-                		count = stco_renumber_code( stmt, count );
-                	}, blocs);
-        		gen_free_list(blocs);
-    			break;
-    		}
-  		default : pips_internal_error("Bad instruction tag");
-  	}
-
-        pips_debug(7, "return count : %d\n", count);
-        return( count );
+  int		count;
+  instruction	inst;
+  
+  pips_debug(7, "begin\n");
+  count = in_ct;
+  inst = statement_instruction( in_st );
+  
+  /* Renumber all the statement but the sequence: */
+  if (instruction_tag(inst) != is_instruction_block)
+    statement_number(in_st) = count++;
+  
+  switch(instruction_tag(inst)) {
+  case is_instruction_block : {
+    MAPL( stmt_ptr, {
+	statement st = STATEMENT(CAR( stmt_ptr ));
+	/*
+	  statement_number( st ) = count++;
+	*/
+	count = stco_renumber_code( st, count );
+      }, instruction_block( inst ) );
+    break;
+  }
+  case is_instruction_test : {
+    test t = instruction_test(inst);
+    statement tt, tf;
+    
+    tt = test_true( t );
+    tf = test_false( t );
+    /*
+      statement_number( tt ) = count++;
+      statement_number( tf ) = count++;
+    */
+    count = stco_renumber_code( tt, count );
+    count = stco_renumber_code( tf, count );
+    break;
+  }
+  case is_instruction_loop : {
+    statement lb = loop_body( instruction_loop( inst ) );
+    /*
+      statement_number( lb ) = count++;
+    */
+    count = stco_renumber_code( lb, count );
+    break;
+  }
+  case is_instruction_forloop :
+    {
+      break;
+    }
+  case  is_instruction_whileloop :
+    {
+      break;
+    }
+  case is_instruction_call : {
+    break;
+  }
+  case is_instruction_goto : {
+    statement gs = instruction_goto( inst );
+    /*
+      statement_number( gs ) = count++;
+    */
+    count = stco_renumber_code( gs, count );
+    break;
+  }
+  case is_instruction_expression :
+    {
+      break;
+    }
+  case is_instruction_unstructured : {
+    list blocs = NIL;
+    unstructured u = instruction_unstructured( inst );
+    
+    control_map_get_blocs(unstructured_control(u), &blocs ) ;
+    blocs = gen_nreverse( blocs ) ;
+    MAPL( ctl_ptr,  {
+	statement stmt = control_statement(
+					   CONTROL(CAR( ctl_ptr )));
+	/*
+	  statement_number( stmt ) = count++;
+	*/
+	count = stco_renumber_code( stmt, count );
+      }, blocs);
+    gen_free_list(blocs);
+    break;
+  }
+  default : pips_error("stco_renumber_code",
+		       "Bad instruction tag");
+  }
+  
+  pips_debug(7, "return count : %d\n", count);
+  return( count );
 }
 
 /*=================================================================*/
@@ -430,8 +443,8 @@ list *ell;
 	entity		fun  	 = call_function(syntax_call( s ));
 	list		args 	 = call_arguments(syntax_call( s ));
 	list		new_args = NIL;
-	expression	ret_exp  = expression_undefined;
-	expression 	e, ne, arg1, arg2;
+	expression	ret_exp  = expression_undefined , ret_exp1  = expression_undefined, ret_exp2  = expression_undefined;
+	expression 	e, ne, arg1, arg2, arg3, arg4;
 
 	if (exp == expression_undefined) return( exp );
 	pips_debug(7, "exp : %s\n",
@@ -453,108 +466,111 @@ list *ell;
 
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
+	arg3 = copy_expression( arg1 );
+	arg4 = copy_expression( arg2 );
 	if (ENTITY_EQUIV_P( fun )) {
-		exp = MakeBinaryCall( ENTITY_AND,
-			MakeBinaryCall( ENTITY_OR,
-				MakeUnaryCall( ENTITY_NOT, arg1),
-				arg2 ),
-			MakeBinaryCall( ENTITY_OR,
-				MakeUnaryCall( ENTITY_NOT, arg2),
-				arg1 ) );
+	  ret_exp1 = MakeBinaryCall( ENTITY_OR,
+				     MakeUnaryCall( ENTITY_NOT, arg1),
+				     arg2 );
+	  ret_exp2 = MakeBinaryCall( ENTITY_OR,
+				     MakeUnaryCall( ENTITY_NOT, arg4),
+				     arg3 ) ;
+	  exp = MakeBinaryCall( ENTITY_AND, ret_exp1, ret_exp2 );
 	}
 	else if (ENTITY_NON_EQUIV_P( fun )) {
-		exp = MakeBinaryCall( ENTITY_OR,
-			MakeBinaryCall( ENTITY_AND,
-				MakeUnaryCall( ENTITY_NOT, arg2),
-				arg1 ),
-			MakeBinaryCall( ENTITY_AND,
-				MakeUnaryCall( ENTITY_NOT, arg1),
-				arg2 ) );
+	  MakeBinaryCall( ENTITY_AND,
+			  MakeUnaryCall( ENTITY_NOT, arg2),
+			  arg1 );
+	  MakeBinaryCall( ENTITY_AND,
+			  MakeUnaryCall( ENTITY_NOT, arg3),
+			  arg4 ) ;
+	  exp = MakeBinaryCall( ENTITY_OR, ret_exp1, ret_exp2);
 	}
-
+	
 	s = expression_syntax( exp );
 	fun = call_function(syntax_call( s ));
 	args = call_arguments(syntax_call( s ));
 	arg1 = EXPRESSION(CAR(args));
 	arg2 = EXPRESSION(CAR(CDR(args)));
+	arg3 = copy_expression( arg1 );
+	arg4 = copy_expression( arg2 );
 	if (ENTITY_STRICT_LOGICAL_OPERATOR_P( fun )) {
-		MAPL( exp_ptr, {
-			e = EXPRESSION(CAR( exp_ptr ));
-			ne = normalize_test_leaves(e, ell);
-			if (ne == expression_undefined) return(ne);
-			ADD_ELEMENT_TO_LIST(new_args, EXPRESSION,
-					copy_expression( ne ));
-			}, args);
-		call_arguments(syntax_call( s )) = new_args;
-		ret_exp = copy_expression( exp );
-		pips_debug(7, "returning : %s\n",
-			   words_to_string(words_expression( ret_exp, NIL )) );
-		return( ret_exp );
+	  MAPL( exp_ptr, {
+	      e = EXPRESSION(CAR( exp_ptr ));
+	      ne = normalize_test_leaves(e, ell);
+	      if (ne == expression_undefined) return(ne);
+	      ADD_ELEMENT_TO_LIST(new_args, EXPRESSION,
+				  copy_expression( ne ));
+	    }, args);
+	  call_arguments(syntax_call( s )) = new_args;
+	  ret_exp = copy_expression( exp );
+	  pips_debug(7, "returning : %s\n",
+		     words_to_string(words_expression( ret_exp, NIL )) );
+	  return( ret_exp );
 	}
 	else if (	ENTITY_RELATIONAL_OPERATOR_P( fun ) &&
-		(!splc_linear_expression_p(arg1, ell) ||
-		 !splc_linear_expression_p(arg2, ell)) ) {
-
-		pips_debug(7, "returning : %s\n",
-					"expression_undefined" );
-		return( expression_undefined );
+			(!splc_linear_expression_p(arg1, ell) ||
+			 !splc_linear_expression_p(arg2, ell)) ) {
+	  
+	  pips_debug(7, "returning : %s\n",
+		     "expression_undefined" );
+	  return( expression_undefined );
 	}
-
 	if (ENTITY_LESS_THAN_P( fun )) {
-		ret_exp = MakeBinaryCall( ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					make_op_exp(
-						MINUS_OPERATOR_NAME,
-						arg2, arg1 ),
-					make_integer_constant_expression(1) ),
-				make_integer_constant_expression(0) );
+	  ret_exp = MakeBinaryCall( ENTITY_GE,
+				    make_op_exp( MINUS_OPERATOR_NAME,
+						 make_op_exp(
+							     MINUS_OPERATOR_NAME,
+							     arg2, arg1 ),
+						 make_integer_constant_expression(1) ),
+				    make_integer_constant_expression(0) );
 	}
 	else if (ENTITY_LESS_OR_EQUAL_P( fun )) {
-                ret_exp = MakeBinaryCall( ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					arg2, arg1 ),
-				make_integer_constant_expression(0) );
+	  ret_exp = MakeBinaryCall( ENTITY_GE,
+				    make_op_exp( MINUS_OPERATOR_NAME,
+						 arg2, arg1 ),
+				    make_integer_constant_expression(0) );
 	}
 	else if (ENTITY_GREATER_THAN_P( fun )) {
-                ret_exp = MakeBinaryCall( ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					make_op_exp(
-						MINUS_OPERATOR_NAME,
-						arg1, arg2 ),
-					make_integer_constant_expression(1) ),
-				make_integer_constant_expression(0) );
+	  ret_exp = MakeBinaryCall( ENTITY_GE,
+				    make_op_exp( MINUS_OPERATOR_NAME,
+						 make_op_exp(
+							     MINUS_OPERATOR_NAME,
+							     arg1, arg2 ),
+						 make_integer_constant_expression(1) ),
+				    make_integer_constant_expression(0) );
 	}
 	else if (ENTITY_GREATER_OR_EQUAL_P( fun )) {
-		ret_exp = MakeBinaryCall( (entity) ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					arg1, arg2 ),
-				make_integer_constant_expression(0) );
+	  ret_exp = MakeBinaryCall( (entity) ENTITY_GE,
+				    make_op_exp( MINUS_OPERATOR_NAME,
+						 arg1, arg2 ),
+				    make_integer_constant_expression(0) );
 	}
 	else if (ENTITY_EQUAL_P( fun )) {
-                ret_exp = MakeBinaryCall( ENTITY_AND,
-			    MakeBinaryCall( ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					arg1, arg2 ),
-				make_integer_constant_expression(0) ),
-			    MakeBinaryCall( ENTITY_GE,
-				make_op_exp( MINUS_OPERATOR_NAME,
-					arg2, arg1 ),
-				make_integer_constant_expression(0) ) );
+	  ret_exp1 = MakeBinaryCall( ENTITY_GE,
+				     make_op_exp( MINUS_OPERATOR_NAME,
+						  arg1, arg2 ),
+				     make_integer_constant_expression(0) );
+	  ret_exp2 = MakeBinaryCall( ENTITY_GE,
+				     make_op_exp( MINUS_OPERATOR_NAME,
+						  arg4, arg3 ),
+				     make_integer_constant_expression(0) ) ;
+	   ret_exp = MakeBinaryCall( ENTITY_AND, ret_exp1, ret_exp2);
 	}
 	else if (ENTITY_NON_EQUAL_P( fun )) {
-                ret_exp = MakeBinaryCall( ENTITY_OR,
-                            MakeBinaryCall( ENTITY_GE,
+	  ret_exp1 = MakeBinaryCall( ENTITY_GE,
                                 make_op_exp( MINUS_OPERATOR_NAME,
-				   make_op_exp( MINUS_OPERATOR_NAME,
+					     make_op_exp( MINUS_OPERATOR_NAME,
                                         arg1, arg2 ),
 				   make_integer_constant_expression(1) ),
-                                make_integer_constant_expression(0) ),
-                           MakeBinaryCall( ENTITY_GE,
+				 make_integer_constant_expression(0) );
+	  ret_exp2 =  MakeBinaryCall( ENTITY_GE,
                                 make_op_exp( MINUS_OPERATOR_NAME,
 				   make_op_exp( MINUS_OPERATOR_NAME,
-                                        arg2, arg1 ),
+                                        arg4, arg3 ),
 				   make_integer_constant_expression(1) ),
-                                make_integer_constant_expression(0) ) );
+				      make_integer_constant_expression(0) );
+	  ret_exp = MakeBinaryCall( ENTITY_OR, ret_exp1, ret_exp2);
 	}
 	else ret_exp = expression_undefined;
 
