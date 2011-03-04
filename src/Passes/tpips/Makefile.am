@@ -16,11 +16,8 @@ AM_LFLAGS=-p tp_
 revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
-ifdef VPATH
-here	= $(VPATH)
-else
-here	= .
-endif
+# work around a very "dumb" make
+here	=  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
 
 # regenerate everytime
 .PHONY: pips_version.h
