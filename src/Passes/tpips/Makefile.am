@@ -19,6 +19,11 @@ revisions.h:
 # regenerate everytime
 .PHONY: pips_version.h
 VERSION_SH = ../../../makes/version.sh
+
+# added deps
+$(ARCH)/revisions.o: pips_version.h
+tpips.h: pips_version.h
+
 # hmmm... not sure about the portability...
 pips_version.h:
 	{ \
