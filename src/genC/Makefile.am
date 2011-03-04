@@ -37,7 +37,8 @@ include_HEADERS=\
         newgen_stack.h \
 		newgen_array.h \
 		newgen_string_buffer.h \
-		newgen_include.h
+		newgen_include.h \
+		newgen_version.h
 
 nodist_include_HEADERS=newgen_auto_string.h
 
@@ -63,6 +64,15 @@ AM_CPPFLAGS=-Igenread -I$(srcdir)/genread -Igenspec -I$(srcdir)/genspec
 newgen_auto_string.h:string.c
 	$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" \
 		`(test -f string.c && echo string.c ) || echo $(srcdir)/string.c` > $@
+
+# regenerate everytime
+.PHONY: newgen_version.h
+VERSION_SH = ../../makes/version.sh
+newgen_version.h:
+	{ \
+	  echo '#define NEWGEN_REV "$(shell $(VERSION_SH) ../..)"' ; \
+	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
+	} > $@
 
 CLEANFILES=$(nodist_include_HEADERS)
 
