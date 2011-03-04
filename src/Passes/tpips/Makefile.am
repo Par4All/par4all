@@ -19,10 +19,13 @@ revisions.h:
 # regenerate everytime
 .PHONY: pips_version.h
 VERSION_SH = ../../../makes/version.sh
+# hmmm... not sure about the portability...
 pips_version.h:
 	{ \
 	  echo '#define PIPS_REV "$(shell $(VERSION_SH) ../../..)"' ; \
 	  echo '#define PIPS_MAKE_REV "$(shell $(VERSION_SH) ../../../makes)"' ; \
+	  echo '#define CC_VERSION "$(shell $(CC) --version | head -1)"' ; \
+	  echo '#define UTC_DATE "$(shell date -u)"' ; \
 	} > $@
 
 clean: clean-version

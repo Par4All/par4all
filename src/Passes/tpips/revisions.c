@@ -24,14 +24,17 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-#include "revisions.h"
+
+#include "newgen_version.h"
+#include "linear_version.h"
+#include "pips_version.h"
 
 /* could be shared somewhere? */
 char * soft_revisions = 
   "  newgen:  " NEWGEN_REV "\n"
   "  linear:  " LINEAR_REV "\n"
   "  pips:    " PIPS_REV "\n"
-  "  nlpmake: " NLPMAKE_REV "\n";
+  "  nlpmake: " PIPS_MAKE_REV "\n";
 
 char * soft_date = UTC_DATE;
 

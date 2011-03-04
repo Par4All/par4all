@@ -50,16 +50,18 @@ $(ARCH)/$(LIB_TARGET): completion_list.h
 
 # revision string...
 include $(MAKE.d)/version.mk
-$(ARCH)/revisions.o: .revisions_h
-tpips.h: .revisions_h
+$(ARCH)/revisions.o: pips_version.h
+tpips.h: pips_version.h
 
 # regenerate everytime
 .PHONY: pips_version.h
-VERSION_SH = ../../../makes/version.sh
+VERSION_SH = $(MAKE.d)/version.sh
 pips_version.h:
 	{ \
 	  echo '#define PIPS_REV "$(shell $(VERSION_SH) ../../..)"' ; \
 	  echo '#define PIPS_MAKE_REV "$(shell $(VERSION_SH) ../../../makes)"' ; \
+	  echo '#define CC_VERSION "$(shell $(CC_VERSION))"' ; \
+	  echo '#define UTC_DATE "$(shell date -u)"' ; \
 	} > $@
 
 clean: clean-version
