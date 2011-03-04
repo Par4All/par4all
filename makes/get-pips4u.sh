@@ -1,16 +1,16 @@
 #! /usr/bin/env bash
 ################################################################################
-# install-pips4u - Install PIPS (see http://pips4u.org/) 
+# install-pips4u - Install PIPS (see http://pips4u.org/)
 # Creation : 04 Mar 2010
 # Time-stamp: <Ven 2010-03-05 09:13 svarrette>
 #
 # Copyright (c) 2010 Sebastien Varrette <Sebastien.Varrette@uni.lu>
 #               http://varrette.gforge.uni.lu
-# $Id$ 
+# $Id$
 #
 # Description : see the print_help function or launch 'install-pips4u --help'
 # Based on the get-pips4u designed by Serge Guelton <Serge.Guelton@telecom-bretagne.eu>
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -22,7 +22,7 @@
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 
 ### Global variables
@@ -46,7 +46,8 @@ COLOR_BOLD="\033[1m"
 COLOR_BACK="\033[0m"
 
 ### Local variables
-# PIPS version (at least for the autotools version ;) 
+# PIPS version (at least for the autotools version ;)
+# ??? why this suffix? it does not make sense with --devel
 PIPS_AUTOTOOLS_VERSION=0.1
 # default flags for the configure script
 PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
@@ -66,7 +67,7 @@ TGZ_PIPS=http://ridee.enstb.org/pips/pips-${PIPS_AUTOTOOLS_VERSION}.tar.gz
 SVN_NEWGEN=http://svn.cri.ensmp.fr/svn/newgen/trunk
 SVN_LINEAR=http://svn.cri.ensmp.fr/svn/linear/trunk
 SVN_PIPS=http://svn.cri.ensmp.fr/svn/pips/trunk
-
+# what about the validation?
 
 #######################
 ### print functions ###
@@ -90,26 +91,26 @@ EOF
 print_help() {
 cat <<EOF
 NAME
-	$COMMAND -- Install PIPS (see http://pips4u.org/) using either the latest 
+	$COMMAND -- Install PIPS (see http://pips4u.org/) using either the latest
                     svn sources tree or remote tarballs
 
 SYNOPSIS
-	$COMMAND [-V | -h]	
+	$COMMAND [-V | -h]
 	$COMMAND [--debug] [-v] [-n]
-        $COMMAND [--prefix PREFIX] [--devel [USERNAME]] 
+        $COMMAND [--prefix PREFIX] [--devel [USERNAME]]
 
 DESCRIPTION
-	$COMMAND helps the automatic installation of PIPS using the nice port to 
-        Autotools done by Serge Guelton. 
-        Two modes are available: 
+	$COMMAND helps the automatic installation of PIPS using the nice port to
+        Autotools done by Serge Guelton.
+        Two modes are available:
            * by default tarballs of the main packages are retrieved
-           * in devel mode (using --devel), the package sources are retrieved from SVN.  
+           * in devel mode (using --devel), the package sources are retrieved from SVN.
 
 OPTIONS
 	--debug
 		Debug mode. Causes $COMMAND to print debugging messages.
         --devel [USERNAME]
-                install PIPS in devel mode i.e. from the latest version available on the 
+                install PIPS in devel mode i.e. from the latest version available on the
                 SVN repository of each package.
                 Eventually, precise the username to be used for the checkout operation.
         -f --force
@@ -117,18 +118,18 @@ OPTIONS
 	-h --help
 		Display a help screen and quit.
 	-n --dry-run
-		Simulation mode. 
+		Simulation mode.
         --prefix PREFIX
                 install architecture-independent files in PREFIX
 		Default: [${INSTALL_PREFIX}]
         --srcdir DIR
-                local working directory where the sources to be configured/compiled will 
+                local working directory where the sources to be configured/compiled will
                 be retrieved
                 Default: [${SRC_DIR}]
 	-v --verbose
-		Verbose mode. 
+		Verbose mode.
 	-V --version
-		Display the version number then quit. 
+		Display the version number then quit.
 
 SIGNIFICANT ENVIRONMENT VARIABLES
         PKG_CONFIG_PATH: additionnal pkg-config dirs
@@ -138,27 +139,27 @@ SIGNIFICANT ENVIRONMENT VARIABLES
 
         For instance, to activate the pyps module of PIPS, you will run:
 
-        PIPS_CONFIG="--enable-pyps" $COMMAND 
+        PIPS_CONFIG="--enable-pyps" $COMMAND
 
         Note: I run Mac OS X (snow leopard) and here is the command I used to compile PIPS
         (note the usage of stow which I (as always) strongly suggest):
 
         PIPS_CONFIG="--enable-pyps LDFLAGS=-L/usr/lib" $COMMAND --devel --prefix /usr/local/stow/pips-0.1
- 
+
 
 AUTHOR
 	Sebastien Varrette <Sebastien.Varrette@uni.lu>
-	Web page: http://varrette.gforge.uni.lu 
+	Web page: http://varrette.gforge.uni.lu
 
-REPORTING BUGS 
+REPORTING BUGS
 	Please report bugs to <Sebastien.Varrette@uni.lu>
 
 COPYRIGHT
 	This is free software; see the source for copying conditions.  There is
 	NO warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
 	PURPOSE.
-       
-SEE ALSO	
+
+SEE ALSO
 	Other scripts are available on my web site http://varrette.gforge.uni.lu
 EOF
 }
@@ -171,8 +172,8 @@ info() {
     [ -z "$1" ] && print_error_and_exit "[$FUNCNAME] missing text argument"
     local text=$1
     local title=$2
-    # add default title if not submitted but don't print anything 
-    [ -n "$text" ] && text="${title:==>} $text"    
+    # add default title if not submitted but don't print anything
+    [ -n "$text" ] && text="${title:==>} $text"
     echo -e $text
 }
 debug()   { [ -n "$DEBUG"   ] && info "$1" "[${COLOR_YELLOW}DEBUG${COLOR_BACK}]"; }
@@ -190,7 +191,7 @@ print_error_and_exit() {
 ##
 print_ok()     { echo -e "[   ${COLOR_GREEN}OK${COLOR_BACK}   ]"; }
 print_failed() { echo -e "[ ${COLOR_RED}FAILED${COLOR_BACK} ]"; }
-print_failed_and_exit() { 
+print_failed_and_exit() {
     print_failed
     [ ! -z "$1" ] && echo "$1"
     exit 1
@@ -201,7 +202,7 @@ print_failed_and_exit() {
 #########################
 
 #####
-# execute a local command 
+# execute a local command
 # usage: execute command
 ###
 execute() {
@@ -222,12 +223,12 @@ really_continue() {
     if [ -z "${FORCE_MODE}" ]; then
         echo -e -n "[${COLOR_VIOLET}WARNING${COLOR_BACK}] $1 Are you sure you want to continue? [Y|n] "
         read ans
-        case $ans in 
+        case $ans in
 	    n*|N*) exit 1;;
-        esac 
-    else 
+        esac
+    else
         [ -n "$1" ] && info "$1"
-    fi 
+    fi
 }
 
 #####
@@ -246,21 +247,21 @@ check_bin() {
 #####
 # Operate a 'svn checkout' or 'svn update' whether what is the most appropriate
 # Usage:  svn_co_or_up repo_name svn_url
-# ex:     
+# ex:
 ##
 svn_co_or_up() {
     [ $# -le 1 ] && print_error_and_exit "[$FUNCNAME] missing argument"
-    local repo=$1 
+    local repo=$1
     local svn_url=$2
     # Add eventual username
     [ -n "${USERNAME}" ] && SVN="${SVN} --username ${USERNAME}"
     debug "repo name = $repo"
     debug "svn_url = $svn_url"
-    if [ ! -d $repo ]; then 
+    if [ ! -d $repo ]; then
         info "retrieving ${COLOR_BOLD}$repo${COLOR_BACK} by svn (co)"
         execute "${SVN} co $svn_url $repo"
-    else 
-        info "updating svn repository ${COLOR_BOLD}$repo${COLOR_BACK}"       
+    else
+        info "updating svn repository ${COLOR_BOLD}$repo${COLOR_BACK}"
         execute "cd $repo"
         execute "svn up"
         execute "cd -"
@@ -277,16 +278,16 @@ get_remote_tgz() {
     local url=$1
     local archive=`basename $url`
     local basedir=`basename $url .tar.gz`
-    debug "[$FUNCNAME] wget on $url" 
+    debug "[$FUNCNAME] wget on $url"
     #{
-    if [ ! -r $archive ]; then 
+    if [ ! -r $archive ]; then
         info "retrieving $archive via wget"
         execute "wget -nd --quiet $url"
-    fi 
+    fi
     if [ ! -d $basedir ]; then
         info "uncompressing $archive "
         execute "tar xzf $archive"
-    fi 
+    fi
     #} &> ${INSTALL_LOGGER}
 }
 
@@ -327,38 +328,38 @@ while [ $# -ge 1 ]; do
 	-h | --help)     print_help;        exit 0;;
 	-V | --version)  print_version;     exit 0;;
 	-f | --force)    FORCE_MODE="--force";;
-	--debug)         DEBUG="--debug"; 
-	                 VERBOSE="--verbose";; 	   
-	-v | --verbose)  VERBOSE="--verbose";; 	    
+	--debug)         DEBUG="--debug";
+	                 VERBOSE="--verbose";;
+	-v | --verbose)  VERBOSE="--verbose";;
  	-n | --dry-run)  SIMULATION="--dry-run";;
-        --devel)        
+        --devel)
             DEVEL_MODE=1;
             # check first character of $2: should differ from '-'
-            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then 
+            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then
                  USERNAME=$2;
                  shift;
-            fi;; 
+            fi;;
         --srcdir)
             # check first character of $2: should differ from '-'
-            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then 
+            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then
                 SRC_DIR=$2;
                 shift;
-            else 
+            else
                 warning "src dir not given correctly and ignored"
-            fi;; 
+            fi;;
          --prefix)
             # check first character of $2: should differ from '-'
-            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then 
+            if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then
                 INSTALL_PREFIX=$2;
                 shift;
-            else 
+            else
                 warning "prefix not given correctly and ignored"
-            fi;; 
+            fi;;
     esac
     shift
 done
 
-if [ -z "${INSTALL_PREFIX}" ] || [ "${INSTALL_PREFIX:0:1}" == "-" ]; then 
+if [ -z "${INSTALL_PREFIX}" ] || [ "${INSTALL_PREFIX:0:1}" == "-" ]; then
     print_error_and_exit "prefix not given";
 fi
 [ -z "${SRC_DIR}"  ] && print_error_and_exit "source dir not given";
@@ -378,10 +379,10 @@ info "checking basic requirements"
 check_bin "wget svn pkg-config"
 WGET=`which wget`
 SVN=`which svn`
-if [ -n "${DEVEL_MODE}" ]; then 
+if [ -n "${DEVEL_MODE}" ]; then
     check_bin "autoreconf automake libtool"
-    AUTORECONF="`which autoreconf` --install" 
-    [ -n "${USERNAME}" ] && SVN="$SVN --username=$USERNAME" 
+    AUTORECONF="`which autoreconf` --install"
+    [ -n "${USERNAME}" ] && SVN="$SVN --username=$USERNAME"
 fi
 
 # INSTALL_LOGGER=`mktemp -t ${COMMAND}.logXXXXXXX`
@@ -400,13 +401,13 @@ execute "cd ${SRC_DIR}"
 get_remote_tgz ${TGZ_POLYLIB}
 build `basename ${TGZ_POLYLIB} .tar.gz`
 
-for package in newgen linear pips; do 
+for package in newgen linear pips; do
     upper_d=`echo $package | tr "[:lower:]" "[:upper:]"`
     svn_url_varname=SVN_$upper_d
     wget_url_varname=TGZ_$upper_d
-    if [ -n "${DEVEL_MODE}" ]; then 
+    if [ -n "${DEVEL_MODE}" ]; then
         svn_co_or_up $package-${PIPS_AUTOTOOLS_VERSION} ${!svn_url_varname}
-    else  
+    else
         get_remote_tgz ${!wget_url_varname}
     fi
 done
@@ -418,14 +419,14 @@ build linear-${PIPS_AUTOTOOLS_VERSION}
 PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} ${PIPS_CONFIG} PATH=${INSTALL_PREFIX}/bin:$PATH "
 build $package-${PIPS_AUTOTOOLS_VERSION}
 
-if [ $error -gt 1 ]; then 
+if [ $error -gt 1 ]; then
     warning "Errors occurs"
-else 
+else
 # that's all folks
 
-    if [ -z "${SIMULATION}" ]; then 
+    if [ -z "${SIMULATION}" ]; then
         cat << EOF
-========================================================================================
+================================================================================
 PIPS4U is ready
 everything got installed in:    ${INSTALL_PREFIX}
 all sources are available from: ${SRC_DIR}
@@ -438,7 +439,7 @@ to your .bashrc or whatever:
   export PKG_CONFIG_PATH=${INSTALL_PREFIX}/lib/pkgconfig
   export PYTHONPATH=${INSTALL_PREFIX}/lib/python2.6/site-packages/pips
 
-========================================================================================
+================================================================================
 EOF
     fi
 fi
