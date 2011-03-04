@@ -37,6 +37,7 @@ DEVEL_MODE=""
 error=0 ; trap "error=$((error|1))" ERR
 
 ### displayed colors
+# ??? is that portable?
 COLOR_GREEN="\033[0;32m"
 COLOR_RED="\033[0;31m"
 COLOR_YELLOW="\033[0;33m"
@@ -47,7 +48,10 @@ COLOR_BACK="\033[0m"
 
 ### Local variables
 # PIPS version (at least for the autotools version ;)
-# ??? why this suffix? it does not make sense with --devel
+# ??? why this suffix? it does not make sense with --devel at least.
+# ??? should it be named PIPS_VERSION instead?
+# ??? where does this version number come from?
+# ??? the real 0.9.0 tag created in 2005 is anterior to this version...
 PIPS_AUTOTOOLS_VERSION=0.1
 # default flags for the configure script
 PIPS_CONFIGURE_COMMON_FLAGS=" --disable-static"
@@ -64,10 +68,12 @@ TGZ_LINEAR=http://ridee.enstb.org/pips/linear-${PIPS_AUTOTOOLS_VERSION}.tar.gz
 TGZ_PIPS=http://ridee.enstb.org/pips/pips-${PIPS_AUTOTOOLS_VERSION}.tar.gz
 
 # devel mode (i.e. checkout from the SVN tree)
+# ??? https is prefered?
 SVN_NEWGEN=http://svn.cri.ensmp.fr/svn/newgen/trunk
 SVN_LINEAR=http://svn.cri.ensmp.fr/svn/linear/trunk
 SVN_PIPS=http://svn.cri.ensmp.fr/svn/pips/trunk
-# what about the validation?
+# ??? what about the validation?
+# ??? what about the user development branches?
 
 #######################
 ### print functions ###
@@ -333,6 +339,8 @@ while [ $# -ge 1 ]; do
 	-v | --verbose)  VERBOSE="--verbose";;
  	-n | --dry-run)  SIMULATION="--dry-run";;
         --devel)
+	    # ??? should include the validation!
+	    # ??? version should be "dev" instead of "0.1"
             DEVEL_MODE=1;
             # check first character of $2: should differ from '-'
             if [ $# -ne 1 ] && [ ${2:0:1} != "-" ]; then
@@ -365,12 +373,12 @@ fi
 [ -z "${SRC_DIR}"  ] && print_error_and_exit "source dir not given";
 
 cat << EOF
-========================================================================================
+================================================================================
            PIPS4U install script
 
 Prefix: ${INSTALL_PREFIX}
 Source dir: ${SRC_DIR}
-========================================================================================
+================================================================================
 EOF
 really_continue
 PIPS_CONFIGURE_COMMON_FLAGS="${PIPS_CONFIGURE_COMMON_FLAGS} --prefix=${INSTALL_PREFIX}"
