@@ -42,13 +42,18 @@ libarithmetique_la_SOURCES=abs.c \
 		errors.c \
 		$(other_headers)
 
+# work around a very "dumb" make
+here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
+
 # regenerate everytime
 .PHONY: linear_version.h
-VERSION_SH = ../../makes/version.sh
+VERSION_SH = $(here)../../makes/version.sh
 linear_version.h:
 	{ \
-	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) ../..)"' ; \
-	  echo '#define LINEAR_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
+	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) $(here)/../..)"' ; \
+	  echo '#define LINEAR_MAKE_REV "$(shell $(VERSION_SH) $(here)/../../makes)"' ; \
 	} > $@
+
+CLEANFILES	= linear_version.h
 
 include $(top_srcdir)/makes/cproto.mk
