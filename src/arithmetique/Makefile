@@ -33,13 +33,14 @@ LIB_CFILES =	abs.c \
 OTHER_HEADERS =	assert.h \
 		boolean.h \
 		arithmetic_errors.h \
-		linear.h
+		linear.h \
+		linear_version.h
 
 INC_TARGET	= $(TARGET).h
 
 LIB_TARGET	= lib$(TARGET).a
 
-INSTALL_INC	+= $(OTHER_HEADERS) linear_version.h
+INSTALL_INC	+= $(OTHER_HEADERS)
 
 # regenerate everytime
 .PHONY: linear_version.h
@@ -49,7 +50,10 @@ linear_version.h:
 	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) ../..)"' ; \
 	  echo '#define LINEAR_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
 	} > $@
-
+ 
+clean: clean-version
+clean-version:
+	$(RM) linear_version.h
 
 ################################################################## COMMON STUFF
 
