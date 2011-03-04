@@ -26,17 +26,17 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *x, *y, k[5], h;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    k = 1;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    h = 2;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    x = &k[2];
-//  {(x,k[2],-Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,k[2],-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    y = &h;
 //  {(x,k[2],-Exact-);(y,h,-Exact-)}
 

@@ -1,12 +1,11 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 int main(void)
 {
   int i, j;
   int **pp;
-  srand(time(NULL));
+  
   {
     int * pi = &i;
     pp = &pi;

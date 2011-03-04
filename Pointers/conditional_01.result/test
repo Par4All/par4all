@@ -28,15 +28,15 @@ int main()
 {
 //  points to = {}
    int *q;
-//  {(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i = 0, j = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,i,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,i,-Exact-)}
    p = i>0?&j:q;
 //  {(p,i,-MAY-);(p,j,-MAY-);(q,i,-Exact-)}
    printf("address of p =%p\n", p);

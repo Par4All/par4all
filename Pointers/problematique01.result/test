@@ -30,18 +30,18 @@ int main()
 {
 //  points to = {}
    int *p, *q, i, j;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    i = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    j = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    /* Initialisation des pointeurs*/
    p = &i;
-//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &j;
 //  {(p,i,-Exact-);(q,j,-Exact-)}
    

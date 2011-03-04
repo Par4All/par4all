@@ -39,21 +39,21 @@ int main()
    } my_str;
 //  points to = {}
    my_str *m, *n;
-//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int j;
-//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    j = 2;
-//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    m->i = 1;
-//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(m,*HEAP*_l_10,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    m->p = &j;
 //  {(*HEAP*_l_10[p],j,-Exact-);(m,*HEAP*_l_10,-Exact-);(n,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    n = m;
 //  {(*HEAP*_l_10[p],j,-Exact-);(m,*HEAP*_l_10,-Exact-);(n,
 //   *HEAP*_l_10,-Exact-)}

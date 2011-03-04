@@ -6,17 +6,17 @@ int main(int argc, char *argv[])
 {
 //  points to = {}
    int *p, i, j;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    j = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    for(i = 1; i <= 4; i += 1)
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,*HEAP*_l_11,-MAY-)}
+//  {(p,*HEAP*_l_11,-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
 
       p = (int *) malloc(sizeof(int));
-//  {(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(p,*HEAP*_l_11,-MAY-)}
+//  {(p,*HEAP*_l_11,-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    
    
    return 0;

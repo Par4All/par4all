@@ -78,99 +78,107 @@ int main()
    int a, b, c, d;
 //  points to = {}
    int *pa, *pb, *pc, *pd;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **ppa, **ppb, **ppc, **ppd;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    a = 1;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    b = 2;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    c = 3;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    d = 4;
-//  {(pa,*ANY_MODULE*:*NOWHERE*,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pc,*ANY_MODULE*:*NOWHERE*,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    pa = &a;
-//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppb,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    ppa = &pa;
-//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    *ppa = &b;
-//  {(pa,b,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*,-Exact-);(pc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,b,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    pb = &b;
-//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppc,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    ppb = &pb;
-//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    *ppb = &a;
-//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,
-//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    pc = &c;
 //  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    ppc = &pc;
 //  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    *ppc = &a;
 //  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
-//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
 
    pd = &d;
 //  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
 //   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    ppd = &pd;
 //  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
 //   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}

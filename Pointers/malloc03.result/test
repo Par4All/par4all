@@ -6,30 +6,31 @@ int main(int argc, char *argv[])
 {
 //  points to = {}
    int *pi;
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    float *px;
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    float *pz;
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(px,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    int (*pt)[30];
-//  {(pi,*ANY_MODULE*:*NOWHERE*,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pt,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    pi = (int *) malloc(sizeof(int));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*,-Exact-);(pz,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    px = (float *) malloc(sizeof(float));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,*ANY_MODULE*:*HEAP*_b1,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    pz = (float *) malloc(sizeof(float));
-//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,
-//   *ANY_MODULE*:*HEAP*_b1,-Exact-)}
+//  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,*ANY_MODULE*:*HEAP*_b1,
+//   -Exact-);(pz,*ANY_MODULE*:*HEAP*_b1,-Exact-)}
    pt = (int (*)[30]) malloc(sizeof(*pt));
 //  {(pi,*ANY_MODULE*:*HEAP*_b0,-Exact-);(pt,*ANY_MODULE*:*HEAP*_b0,
 //   -Exact-);(px,*ANY_MODULE*:*HEAP*_b1,-Exact-);(pz,

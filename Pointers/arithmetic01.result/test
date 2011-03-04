@@ -24,11 +24,11 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *i, j, k;
-//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    k = 0;
-//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    j = k;
-//  {(i,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = &j;
 //  {(i,j,-Exact-)}
    i++;

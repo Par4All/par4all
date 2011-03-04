@@ -9,17 +9,17 @@ int main(void)
    int *pi2 = &i2;
 //  {(pi1,i1,-Exact-);(pi2,i2,-Exact-)}
    int **pp;
-//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
    srand(time((void *) 0));
-//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
    if (alea())
-//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
       pp = &pi1;
    else
-//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
       pp = &pi2;
 //  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,pi1,-MAY-);(pp,pi2,-MAY-)}

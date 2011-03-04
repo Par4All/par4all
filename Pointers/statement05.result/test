@@ -35,40 +35,41 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int **x, **y, *z, *t;
-//  {(t,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-);(z,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(z,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    int i, j;
-//  {(t,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-);(z,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(z,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    i = 1;
-//  {(t,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-);(z,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(z,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    j = 2;
-//  {(t,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-);(z,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(z,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    z = &i;
-//  {(t,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-);(z,i,-Exact-)}
+//  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(z,i,-Exact-)}
    t = &j;
-//  {(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(z,i,-Exact-)}
+//  {(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(z,i,-Exact-)}
 
    z = t;
-//  {(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(z,j,-Exact-)}
+//  {(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(z,j,-Exact-)}
    *x = z;
 //  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(z,j,-Exact-)}
+//   -Exact-);(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(z,j,-Exact-)}
    printf(" x = %p\n", x);
 //  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-);(z,j,-Exact-)}
+//   -Exact-);(t,j,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(z,j,-Exact-)}
    return 0;
    // END BLOCK
 }

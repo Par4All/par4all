@@ -45,13 +45,13 @@ int ptr_to_field()
 
 //  points to = {}
    my_str *m, *n;
-//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i = 0, j = 1;
-//  {(m,*ANY_MODULE*:*NOWHERE*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(m,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    m = (my_str *) malloc(sizeof(my_str));
-//  {(m,*ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*,
+//  {(m,*ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
    n = (my_str *) malloc(sizeof(my_str));
 //  {(m,*ANY_MODULE*:*HEAP*,-Exact-);(n,*ANY_MODULE*:*HEAP*,-Exact-)}

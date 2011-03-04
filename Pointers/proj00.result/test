@@ -5,14 +5,14 @@ int main(void)
    int i;
 //  points to = {}
    int **pp;
-//  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    srand(time((void *) 0));
-//  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    if (alea()) {
-//  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       int *pi = &i;
-//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       pp = &pi;
 //  {(pi,i,-Exact-);(pp,pi,-Exact-)}
 

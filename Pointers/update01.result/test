@@ -23,7 +23,7 @@ void update01()
    int i;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = &i;
 //  {(p,i,-Exact-)}
