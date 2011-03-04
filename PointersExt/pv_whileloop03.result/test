@@ -5,9 +5,9 @@ int main()
    int i = 0;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    while (i<10) {
 //  points to = {}
@@ -15,6 +15,6 @@ int main()
 //  points to = {}
       i++;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    return 0;
 }

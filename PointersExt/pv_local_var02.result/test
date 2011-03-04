@@ -25,9 +25,9 @@ int main()
    int i;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    for (i = 0;i<10;i++) {
 //  points to = {}
@@ -37,6 +37,6 @@ int main()
 //  points to = {}
       p = q;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    return 0;
 }

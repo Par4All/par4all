@@ -3,16 +3,16 @@ int main()
 {
 //  points to = {}
    int *a;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b = 0;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int c = 1;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    if (b==c)
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       a = &b;
    else
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       a = &c;
 //  {(a,b,-MAY-);(a,c,-MAY-)}
 

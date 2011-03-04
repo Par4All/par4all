@@ -5,11 +5,11 @@ int main()
    int i = 0;
 //  points to = {}
    int *p, *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (int *) malloc(10*sizeof(int));
-//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*HEAP*_l_7,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = p;
 //  {(p,*HEAP*_l_7,-Exact-);(q,*HEAP*_l_7,-Exact-)}
    do {

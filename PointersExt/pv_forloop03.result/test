@@ -22,14 +22,14 @@ int main()
 {
 //  points to = {}
    float *a, *p;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(p,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(p,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    a = (float *) malloc(10*sizeof(float));
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
 
    for (p = a, i = 0;i<10;p++)

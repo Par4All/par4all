@@ -5,7 +5,7 @@ int main()
    int i = 0;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (int *) malloc(10*sizeof(int));
 //  {(p,*HEAP*_l_7,-Exact-)}

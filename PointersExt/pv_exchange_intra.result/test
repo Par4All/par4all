@@ -3,17 +3,20 @@ int main()
 {
 //  points to = {}
    int *p, *q, *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int a, b, c;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
 
    p = &a;
-//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &b;
-//  {(p,a,-Exact-);(q,b,-Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,a,-Exact-);(q,b,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
 
    r = q;
 //  {(p,a,-Exact-);(q,b,-Exact-);(r,b,-Exact-)}

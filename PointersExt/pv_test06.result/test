@@ -3,27 +3,34 @@ int main()
 {
 //  points to = {}
    int *p, *q, *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int a = 0;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int b = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int c = 2;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    q = &a;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    r = &b;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a,-Exact-);(r,b,
+//   -Exact-)}
    if (1)
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a,-Exact-);(r,b,
+//   -Exact-)}
       p = q;
    else
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a,-Exact-);(r,b,
+//   -Exact-)}
       p = r;
 //  {(p,a,-MAY-);(p,b,-MAY-);(q,a,-Exact-);(r,b,-Exact-)}
 
