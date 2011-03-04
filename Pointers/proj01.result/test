@@ -2,41 +2,30 @@
 int main(void)
 {
 //  points to = {}
-   int i;
+   int i, j;
 //  points to = {}
    int **pp;
 //  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
    srand(time((void *) 0));
-//  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
-
-   if (alea()) {
+   {
 //  {(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       int *pi = &i;
 //  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*,-Exact-)}
       pp = &pi;
 //  {(pi,i,-Exact-);(pp,pi,-Exact-)}
-
       **pp = 1;
    }
 //  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    
    // pp points to a dead value in the stack
    // should generate an error
-   // **pp = 0; // segfault?
-   
-   printf("%p\n", pp);
+   **pp = 0;
 //  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   // segfault?
+   *pp = &j;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,j,-Exact-);(pp,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
-}
-//  {}
-static int alea(void)
-{
-//  points to = {}
-   int r = rand();
-//  points to = {}
-   printf("%d\n", r);
-//  points to = {}
-   return rand()%2==1;
 }
 
 POINTS TO
