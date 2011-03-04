@@ -39,7 +39,17 @@ INC_TARGET	= $(TARGET).h
 
 LIB_TARGET	= lib$(TARGET).a
 
-INSTALL_INC	+= $(OTHER_HEADERS)
+INSTALL_INC	+= $(OTHER_HEADERS) linear_version.h
+
+# regenerate everytime
+.PHONY: linear_version.h
+VERSION_SH = ../../makes/version.sh
+linear_version.h:
+	{ \
+	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) ../..)"' ; \
+	  echo '#define LINEAR_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
+	} > $@
+
 
 ################################################################## COMMON STUFF
 
