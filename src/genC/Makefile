@@ -51,6 +51,10 @@ newgen_version.h:
 	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
 	} > $@
 
+clean: clean-version
+clean-version:
+	$(RM) newgen_version.h
+
 #
 # GENREAD
 #
