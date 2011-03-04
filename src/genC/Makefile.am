@@ -67,12 +67,15 @@ newgen_auto_string.h:string.c
 
 # regenerate everytime
 .PHONY: newgen_version.h
-VERSION_SH = ../../makes/version.sh
+# work around a very "dumb" make
+here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
+
+VERSION_SH = $(here)/../../makes/version.sh
 newgen_version.h:
 	{ \
-	  echo '#define NEWGEN_REV "$(shell $(VERSION_SH) ../..)"' ; \
-	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
+	  echo '#define NEWGEN_REV "$(shell $(VERSION_SH) $(here)/../..)"' ; \
+	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) $(here)/../../makes)"' ; \
 	} > $@
 
-CLEANFILES=$(nodist_include_HEADERS)
+CLEANFILES=$(nodist_include_HEADERS) newgen_version.h
 
