@@ -1,3 +1,33 @@
+int main()
+{
+   int i;
+   mystruct s1, s2;
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i
+   do {
+      mystruct tab_s[2];
+//             <may be read   >: s1.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.a s1.c
+      tab_s[0] = s1;
+//             <may be read   >: s1.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.a s1.c
+      tab_s[1] = s1;
+//             <may be read   >: s2.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s2.a s2.c
+      tab_s[1] = s2;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<10);
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {

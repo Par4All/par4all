@@ -42,6 +42,6 @@ int main()
 //  {(p,a[i],-Exact-);(q,a[i],-Exact-)}
       i = 0;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(q,a[i],-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
    return 0;
 }

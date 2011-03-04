@@ -1,3 +1,23 @@
+int main()
+{
+   int i;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+//             <    is written>: i
+
+   for (i = 0;i<10;i++) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+   }
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -9,7 +29,7 @@ int main()
    int a[10];
 //  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
 
-   for(i = 0; i <= 9; i += 1) {
+   for (i = 0;i<10;i++) {
 //  points to = {}
       int *q;
 //  points to = {}
@@ -17,6 +37,6 @@ int main()
 //  points to = {}
       p = q;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(q,a[i],-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
    return 0;
 }
