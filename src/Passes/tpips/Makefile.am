@@ -6,14 +6,28 @@ tpips_LDFLAGS=$(READLINE_LIBS) $(NCURSES_LIBS)\
 	$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 nodist_include_HEADERS=completion_list.h $(TARGET).h
 dist_noinst_SCRIPTS=make_completion_lists.sh
+include_HEADERS=pips_version.h
 
 
 AM_YFLAGS=-d -p tp_
 AM_LFLAGS=-p tp_
 
+# hmmm... this version string is pretty useless
 revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
+# regenerate everytime
+.PHONY: pips_version.h
+VERSION_SH = ../../../makes/version.sh
+pips_version.h:
+	{ \
+	  echo '#define PIPS_REV "$(shell $(VERSION_SH) ../../..)"' ; \
+	  echo '#define PIPS_MAKE_REV "$(shell $(VERSION_SH) ../../../makes)"' ; \
+	} > $@
+
+clean: clean-version
+clean-version:
+	$(RM) pips_version.h
 
 # tpips completion
 
