@@ -16,9 +16,15 @@ AM_LFLAGS=-p tp_
 revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
+ifdef VPATH
+here	= $(VPATH)
+else
+here	= .
+endif
+
 # regenerate everytime
 .PHONY: pips_version.h
-VERSION_SH = ../../../makes/version.sh
+VERSION_SH = $(here)/../../../makes/version.sh
 
 # added deps
 $(ARCH)/revisions.o: pips_version.h
@@ -27,15 +33,11 @@ tpips.h: pips_version.h
 # hmmm... not sure about the portability...
 pips_version.h:
 	{ \
-	  echo '#define PIPS_REV "$(shell $(VERSION_SH) ../../..)"' ; \
-	  echo '#define PIPS_MAKE_REV "$(shell $(VERSION_SH) ../../../makes)"' ; \
+	  echo '#define PIPS_REV "$(shell $(VERSION_SH) $(here)/../../..)"' ; \
+	  echo '#define PIPS_MAKE_REV "$(shell $(VERSION_SH) $(here)/../../../makes)"' ; \
 	  echo '#define CC_VERSION "$(shell $(CC) --version | head -1)"' ; \
 	  echo '#define UTC_DATE "$(shell date -u)"' ; \
 	} > $@
-
-clean: clean-version
-clean-version:
-	$(RM) pips_version.h
 
 # tpips completion
 
@@ -66,13 +68,8 @@ AM_CPPFLAGS=\
 	-I../../Libs/top-level\
 	-I../../Libs/preprocessor\
 	$(READLINE_CFLAGS) $(NCURSES_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
-	-DNEWGEN_REV='"unknown"' \
-	-DUTC_DATE='"unknown"' \
-	-DLINEAR_REV='"unknown"' \
-	-DNLPMAKE_REV='"unknown"' \
-	-DCC_VERSION='"unknown"'
+	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 
 include $(top_srcdir)/makes/cproto.mk
-DISTCLEANFILES=completion_list.h revisions.h
+DISTCLEANFILES=completion_list.h revisions.h pips_version.h
 CLEANFILES=tp_yacc.[ch] tp_lex.c
