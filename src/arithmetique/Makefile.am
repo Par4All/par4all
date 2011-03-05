@@ -47,7 +47,7 @@ here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
 
 # regenerate everytime
 .PHONY: linear_version.h
-VERSION_SH = $(here)../../makes/version.sh
+VERSION_SH = $(here)/../../makes/version.sh
 linear_version.h:
 	{ \
 	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) $(here)/../..)"' ; \
