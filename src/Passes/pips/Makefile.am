@@ -11,7 +11,7 @@ revisions.h:
 	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
 # work around a very "dumb" make
-+here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
+here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
 
 # regenerate everytime
 .PHONY: pips_version.h
