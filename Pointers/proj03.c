@@ -12,7 +12,7 @@ static int alea(void)
 int main(void)
 {
   int i = 1;
-  int * pi = &i
+  int * pi = &i;
   int **pp = &pi;
   int j = 2;
 
