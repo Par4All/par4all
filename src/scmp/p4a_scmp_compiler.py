@@ -26,6 +26,7 @@ default_scmp_properties = dict(
     KERNEL_LOAD_STORE_VAR_SUFFIX          = "__",
     ISOLATE_STATEMENT_VAR_PREFIX          = "P4A__",
     ISOLATE_STATEMENT_VAR_SUFFIX          = "__",
+    ISOLATE_STATEMENT_EVEN_NON_LOCAL      = True,
     SCALOPES_KERNEL_TASK_PREFIX           = "scmp_task_"
 )
 
@@ -412,13 +413,16 @@ class p4a_scmp_compiler(p4a_processor):
         print("done")
 
     def replace_printf(self, files):
-        print("Replacing printf with sesam_printf...")
+        print("Replacing printf and fprintf(stdout, with sesam_printf...")
+        printf_re = re.compile(r"\bprintf")
+        fprintf_re = re.compile(r"\bfprintf\(stdout,")
         for file in files:
              os.rename(file, file+".tmp")
              with open(file+".tmp", 'r') as f_orig:
                  ch = f_orig.read()
                  with open(file, 'w') as f:
-                     ch = ch.replace("printf", "sesam_printf")
+                     ch = printf_re.sub("sesam_printf", ch)
+                     ch = fprintf_re.sub("sesam_printf(", ch)
                      f.write(ch)
              os.remove(file+".tmp")
         print("done")
@@ -434,8 +438,8 @@ class p4a_scmp_compiler(p4a_processor):
 
         # recover a list of all task labels used in source code
         labels_re = re.compile(r"\n *("+self.get_scalopes_kernel_task_prefix()+"\w+):")
-	self.kernel_tasks_labels = labels_re.findall(main.code)
-	if self.kernel_tasks_labels:
+        self.kernel_tasks_labels = labels_re.findall(main.code)
+        if self.kernel_tasks_labels:
             for kernel_task in self.kernel_tasks_labels:
                 print("isolating kernel task "+ kernel_task + "...\n")
                 main.isolate_statement(kernel_task)
@@ -500,9 +504,9 @@ if __name__ == "__main__":
     try:
         # Create a workspace with PIPS:
         compiler = p4a_scmp_compiler(
-            project_name = "data_flow01",
+            project_name = "data_flow02",
             verbose = True,
-            files = ["data_flow01.c"]
+            files = ["data_flow02.c"]
             )
         compiler.go()
         print("That's all Folks...")
