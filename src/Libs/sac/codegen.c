@@ -448,7 +448,8 @@ expression distance_between_expression(const expression exp0, const expression e
                    str1 = binary_call_lhs(expression_call(exp1));
         expression lhs_distance = distance_between_expression(str0,str1);
         expression rhs_distance = distance_between_expression(binary_call_rhs(expression_call(exp1)),binary_call_rhs(expression_call(exp0)));
-        result = make_op_exp(MINUS_OPERATOR_NAME,lhs_distance,rhs_distance);
+        if(!expression_undefined_p(lhs_distance) && !expression_undefined_p(rhs_distance))
+            result = make_op_exp(MINUS_OPERATOR_NAME,lhs_distance,rhs_distance);
     }
     set_bool_property("EVAL_SIZEOF",eval_sizeof);
     //maxima_simplify(&result);
