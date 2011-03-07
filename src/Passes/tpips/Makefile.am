@@ -26,7 +26,7 @@ completion_list.h :	\
 		../../Documentation/pipsmake/properties.rc \
 		> $@
 
-BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h tp_yacc.h
+BUILT_SOURCES=$(TARGET).h completion_list.h tp_yacc.h
 AM_CPPFLAGS=\
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\
