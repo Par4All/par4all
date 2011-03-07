@@ -44,4 +44,39 @@ extern void P4A_copy_to_accel_1d(size_t element_size,
 			  void *accel_address,
 			  unsigned int accel_address_id,
                           int do_it);
+
+extern void P4A_copy_to_accel_2d_server(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address,
+			  unsigned int accel_address_id,
+				 int do_it);
+
+extern void P4A_copy_from_accel_2d_server(size_t element_size,
+				   size_t d1_size, size_t d2_size,
+				   size_t d1_block_size, size_t d2_block_size,
+				   size_t d1_offset, size_t d2_offset,
+				   void *host_address,
+				   const void *accel_address,
+				   unsigned int accel_address_id,
+				   int do_it);
+extern void P4A_copy_to_accel_2d(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address,
+			  unsigned int accel_address_id,
+                          int do_it);
+
+extern void P4A_copy_from_accel_2d(size_t element_size,
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address,
+			    unsigned int accel_address_id,
+			    int do_it);
 #endif

@@ -1,14 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct dtable{
-  int ** buffers;
-  int size;
-}dtable;
-
-dtable * buffertable=NULL;
-
-
 /*VERY QUICK AND VERY DIRTY!!*/
 
 void P4A_scmp_read(size_t element_size,
@@ -95,3 +87,5 @@ void P4A_copy_to_accel_2d(size_t element_size,
       cdest[i*element_size*d2_block_size + j] =
         csrc[(i + d1_offset)*element_size*d2_size + j];
 }
+
+
