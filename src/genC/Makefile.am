@@ -37,8 +37,7 @@ include_HEADERS=\
         newgen_stack.h \
 		newgen_array.h \
 		newgen_string_buffer.h \
-		newgen_include.h \
-		newgen_version.h
+		newgen_include.h
 
 nodist_include_HEADERS=newgen_auto_string.h
 
@@ -65,17 +64,5 @@ newgen_auto_string.h:string.c
 	$(CPROTO) -evcf2 -E "$(CPP) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" \
 		`(test -f string.c && echo string.c ) || echo $(srcdir)/string.c` > $@
 
-# regenerate everytime
-.PHONY: newgen_version.h
-# work around a very "dumb" make
-here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
-
-VERSION_SH = $(here)/../../makes/version.sh
-newgen_version.h:
-	{ \
-	  echo '#define NEWGEN_REV "$(shell $(VERSION_SH) $(here)/../..)"' ; \
-	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) $(here)/../../makes)"' ; \
-	} > $@
-
-CLEANFILES=$(nodist_include_HEADERS) newgen_version.h
+CLEANFILES=$(nodist_include_HEADERS)
 
