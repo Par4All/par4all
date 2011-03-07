@@ -26,10 +26,9 @@ noinst_LTLIBRARIES=libarithmetique.la
 other_headers =	assert.h \
 		boolean.h \
 		arithmetic_errors.h \
-		linear.h \
-		linear_version.h
+		linear.h
 
-BUILT_SOURCES=$(TARGET).h
+BUILT_SOURCES=$(TARGET).h 
 nodist_include_HEADERS=$(TARGET).h $(other_headers)
 
 libarithmetique_la_SOURCES=abs.c \
@@ -39,21 +38,6 @@ libarithmetique_la_SOURCES=abs.c \
 		pgcd.c \
 		ppcm.c \
 		io.c \
-		errors.c \
-		$(other_headers)
-
-# work around a very "dumb" make
-here   =  `[ "$(VPATH)" ] && echo $(VPATH) || echo '.'`
-
-# regenerate everytime
-.PHONY: linear_version.h
-VERSION_SH = $(here)/../../makes/version.sh
-linear_version.h:
-	{ \
-	  echo '#define LINEAR_REV "$(shell $(VERSION_SH) $(here)/../..)"' ; \
-	  echo '#define LINEAR_MAKE_REV "$(shell $(VERSION_SH) $(here)/../../makes)"' ; \
-	} > $@
-
-CLEANFILES	= linear_version.h
+		errors.c
 
 include $(top_srcdir)/makes/cproto.mk
