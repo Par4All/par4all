@@ -3,20 +3,25 @@ int main()
 {
 //  points to = {}
    mystruct s1, *s2;
-//  {(s2,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    int i = 1;
-//  {(s2,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    int j = 2;
-//  {(s2,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    s2 = &s1;
-//  {(s2,s1,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2,s1,-Exact-)}
    s2->a = &i;
 //  {(s1[a],i,-Exact-);(s2,s1,-Exact-)}
    s1.a = &j;
-//  {(*ANY_MODULE*:*NOWHERE*_b1,j,-Exact-);(s1[a],i,-Exact-);(s2,s1,
-//   -Exact-)}
+//  {(s1[a],j,-Exact-);(s2,s1,-Exact-)}
    (s2->b)[0] = &i;
-//  {(*ANY_MODULE*:*NOWHERE*_b1,j,-Exact-);(s1[a],i,
-//   -Exact-);(s2[0][b][0],i,-Exact-);(s2,s1,-Exact-)}
+//  {(s1[a],j,-Exact-);(s2[0][b][0],i,-Exact-);(s2,s1,-Exact-)}
    return 0;
 }
