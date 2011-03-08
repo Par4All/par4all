@@ -341,6 +341,8 @@ class workspace(object):
 			cpypips.create(name, self._sources)
 		except RuntimeError:
 			self.close()
+			raise
+
 
 		if not verbose:
 			self.props.NO_USER_WARNING = True
