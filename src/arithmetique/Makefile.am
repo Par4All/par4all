@@ -22,14 +22,12 @@
 TARGET=arithmetique
 noinst_LTLIBRARIES=libarithmetique.la
 
-
-other_headers =	assert.h \
+BUILT_SOURCES=$(TARGET).h 
+nodist_include_HEADERS=$(TARGET).h
+dist_include_HEADERS =	assert.h \
 		boolean.h \
 		arithmetic_errors.h \
 		linear.h
-
-BUILT_SOURCES=$(TARGET).h 
-nodist_include_HEADERS=$(TARGET).h $(other_headers)
 
 libarithmetique_la_SOURCES=abs.c \
 		divide.c \
