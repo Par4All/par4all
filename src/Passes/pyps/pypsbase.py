@@ -591,6 +591,7 @@ class workspace(object):
 		if self.deleteOnClose:
 			try : workspace.delete(self._name)
 			except RuntimeError: pass
+			except AttributeError: pass
 		if self.tmpDirName:
 			try : shutil.rmtree(self.tmpDirName)
 			except OSError: pass
