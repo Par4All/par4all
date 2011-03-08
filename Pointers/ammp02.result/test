@@ -1,0 +1,14 @@
+POINTS TO
+//  {}
+int a_number()
+{
+//  points to = {}
+   ATOM *ap;
+//  points to = {}
+l:   ap = first;
+//  points to = {}
+   if (ap->next==(void *) 0) goto l;
+//  points to = {}
+
+   return atomNUMBER;
+}

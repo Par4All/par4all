@@ -159,53 +159,69 @@ int main()
 {
 //  points to = {}
    s_with_pointer a, b;
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s_with_array c, d;
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s_with_array_of_struct_with_pointer e, f;
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s_with_array_of_struct_with_array g, h;
 
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i, j;
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    
    // just to create a block for prettyprinting
    if (1) {
-//  points to = {}
+//  {(a[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       
       // definition of a
       a.p = (int *) malloc(10*sizeof(int));
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       for(i = 0; i <= 9; i += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
          (a.p)[i] = i;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       
       // definition of b, also modifies a
       b = a;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       printf("\nstruct with pointer copy : \n");
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       for(i = 0; i <= 9; i += 1) {
 //  points to = {}
          (b.p)[i] = i*10;
 //  points to = {}
          printf("a.p[%d] = %d; b.p[%d] = %d \n", i, (a.p)[i], i, (b.p)[i]);
       }
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       
       // definition of c
       for(i = 0; i <= 9; i += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
          (c.array)[i] = i;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       
       // definition of d, does not modify c
       d = c;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       printf("\nstruct with array copy : \n");
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       for(i = 0; i <= 9; i += 1) {
 //  points to = {}
          (d.array)[i] = i*10;
@@ -213,7 +229,8 @@ int main()
 
          printf("c.array[%d] = %d; d.array[%d] = %d \n", i, (c.array)[i], i, (d.array)[i]);
       }
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a[p],*ANY_MODULE*:*HEAP*,-Exact-);(b[p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       
       // definition of e
       for(i = 0; i <= 4; i += 1) {
@@ -221,18 +238,28 @@ int main()
          (e.champ)[i].p = malloc(10*sizeof(int));
 //  points to = {}
          for(j = 0; j <= 9; j += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
             ((e.champ)[i].p)[j] = i+j;
       }
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       
       // definition of f, also modifies e
       f = e;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       printf("\nstruct with array of structs with pointer copy : \n");
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       for(i = 0; i <= 4; i += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
          for(j = 0; j <= 9; j += 1) {
 //  points to = {}
             ((f.champ)[i].p)[j] = i*j;
@@ -241,23 +268,37 @@ int main()
             
             printf("e.champ[%d].p[%d] = %d ; f.champ[%d].p[%d] = %d \n", i, j, ((e.champ)[i].p)[j], i, j, ((f.champ)[i].p)[j]);
          }
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       
       // definition of g
       for(i = 0; i <= 4; i += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
          for(j = 0; j <= 9; j += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
             ((g.champ)[i].array)[j] = i+j;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       
       // definition of h, does not modify g
       h = g;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       printf("\nstruct with array of structs with array copy : \n");
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
       for(i = 0; i <= 4; i += 1)
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-Exact-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
          for(j = 0; j <= 9; j += 1) {
 //  points to = {}
             ((h.champ)[i].array)[j] = i*j;
@@ -267,6 +308,8 @@ int main()
             printf("g.champ[%d].array[%d] = %d ; h.champ[%d].array[%d] = %d \n", i, j, ((g.champ)[i].array)[j], i, j, ((h.champ)[i].array)[j]);
          }
    }
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-)}
+//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-MAY-);(a[p],
+//   *ANY_MODULE*:*HEAP*,-MAY-);(a[p],*ANY_MODULE*:*NOWHERE*_b0,
+//   -MAY-);(b[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }
