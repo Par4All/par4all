@@ -86,6 +86,27 @@ def add_own_options(parser):
     proc_group.add_option("--apply-before-parallelization", "--abp", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
 		help = "Add PIPS phases to be applied before parallelization.")
 
+    proc_group.add_option("--apply-after-parallelization", "--aap", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied after parallelization.")
+
+    proc_group.add_option("--apply-kernel-after-gpuify", "--akag", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied to kernels after the gpuify execution, for the gpu code generation")
+
+    proc_group.add_option("--apply-kernel-launcher-gpuify", "--aklg", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied to kernel launchers inside gpuify, for the gpu code generation")
+
+    proc_group.add_option("--apply-wrapper-gpuify", "--awg", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied to wrappers inside gpuify, for the gpu code generation")
+
+    proc_group.add_option("--apply-after-gpuify", "--aag", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied after the gpuify execution, for the gpu code generation")
+
+    proc_group.add_option("--apply-before-ompify", "--abo", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied before the ompify execution, for the OpenMP code generation")
+
+    proc_group.add_option("--apply-after-ompify", "--aao", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied after the ompify execution, for the OpenMP code generation")
+
     parser.add_option_group(proc_group)
 
     cpp_group = optparse.OptionGroup(parser, "Preprocessing options")
@@ -488,13 +509,27 @@ def main():
             input.output_dir = options.output_dir
             input.output_prefix = options.output_prefix
             input.output_suffix = options.output_suffix
-
-            # Phases in --apply-before-parallelization can be specified by
-            # several options or by separating phase names by ",":
-            input.apply_before_parallelization = []
+            input.apply_phases = dict(abp=[], aap=[], akag=[], aklg=[], awg=[], aag=[], abo=[], aao=[])
+            
+            # Pips phases to be applied can be specified by
+            # several options or by separating phase names by ","
+            # Concatenate all the phases found in each option:            
             for phases in options.apply_before_parallelization:
-                # Concatenate all the phases found in each option:
-                input.apply_before_parallelization += phases.split(",")
+                input.apply_phases['abp'] += phases.split(",")
+            for phases in options.apply_after_parallelization:
+                input.apply_phases['aap'] += phases.split(",")
+            for phases in options.apply_kernel_after_gpuify:
+                input.apply_phases['akag'] += phases.split(",")
+            for phases in options.apply_kernel_launcher_gpuify:
+                input.apply_phases['aklg'] += phases.split(",")
+            for phases in options.apply_wrapper_gpuify:
+                input.apply_phases['awg'] += phases.split(",")                              
+            for phases in options.apply_after_gpuify:
+                input.apply_phases['aag'] += phases.split(",")
+            for phases in options.apply_before_ompify:
+                input.apply_phases['abo'] += phases.split(",")
+            for phases in options.apply_after_ompify:
+                input.apply_phases['aao'] += phases.split(",")
 
             # Interpret correctly the True/False strings, and integer strings,
             # for the --property option specifications:
