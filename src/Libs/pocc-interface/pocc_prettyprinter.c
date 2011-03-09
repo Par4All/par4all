@@ -72,11 +72,11 @@ static gen_array_t outer_loops_array;
 /**
  *search for an element in gen_array_t, if not found return -1
 */
-static int gen_array_index(gen_array_t ar, int item){
-  int i;
-  for(i = 0; i<(int) gen_array_nitems(ar); i++){
+static int gen_array_index(gen_array_t ar, intptr_t item){
+  size_t i;
+  for(i = 0; i< gen_array_nitems(ar); i++){
     if(gen_array_item(ar, i) != NULL){
-      if(item == (int)gen_array_item(ar, i)){
+      if(item == (intptr_t)gen_array_item(ar, i)){
 	return i;
       }
     }
@@ -158,7 +158,7 @@ static bool pragma_scop(statement s)
  */
 static bool outer_loop(statement s)
 { 
-  pips_debug(1,"statement_ordering = %d, stmt = %s\n",statement_ordering(s), text_to_string(statement_to_text(s)));
+  pips_debug(1,"statement_ordering = %"PRIdPTR", stmt = %s\n",statement_ordering(s), text_to_string(statement_to_text(s)));
   instruction  inst = statement_instruction(s);
   if ( instruction_tag(inst) ==  is_instruction_loop )
     {
