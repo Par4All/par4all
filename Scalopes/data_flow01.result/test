@@ -116,7 +116,7 @@ scmp_task_0:
 //             <    is read   >: P4A__a__0 i t
             (*P4A__a__0)[i-0] = i*t;
 //             <may be read   >: P4A__a__0[0][*]
-//             <may be written>: P4A__a__0[0][*] a[*]
+//             <may be written>: a[*]
 //             <    is read   >: P4A__a__0
          P4A_copy_from_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__0);
 //             <    is read   >: P4A__a__0
@@ -130,7 +130,7 @@ scmp_task_0:
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
          P4A_scmp_malloc((void **) &P4A__a__1, sizeof(int)*100);
-//             <may be read   >: P4A__a__1[0][*] a[*]
+//             <may be read   >: a[*]
 //             <may be written>: P4A__a__1[0][*]
 //             <    is read   >: P4A__a__1
          P4A_copy_to_accel_1d(sizeof(int), 100, 100, 0, &a[0], *P4A__a__1);
