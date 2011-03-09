@@ -9,6 +9,7 @@ import os
 import shutil
 import re
 from p4a_process import *
+from p4a_util import *
 import pyps
 
 # The default values of some PIPS propeties are ok for C but has to be
@@ -22,10 +23,13 @@ default_scmp_properties = dict(
     KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_scmp_dealloc",
     KERNEL_LOAD_STORE_LOAD_FUNCTION_1D    = "P4A_copy_to_accel_1d",
     KERNEL_LOAD_STORE_STORE_FUNCTION_1D   = "P4A_copy_from_accel_1d",
+    KERNEL_LOAD_STORE_LOAD_FUNCTION_2D    = "P4A_copy_to_accel_2d",
+    KERNEL_LOAD_STORE_STORE_FUNCTION_2D   = "P4A_copy_from_accel_2d",
     KERNEL_LOAD_STORE_VAR_PREFIX          = "P4A_",
     KERNEL_LOAD_STORE_VAR_SUFFIX          = "__",
     ISOLATE_STATEMENT_VAR_PREFIX          = "P4A__",
     ISOLATE_STATEMENT_VAR_SUFFIX          = "__",
+    ISOLATE_STATEMENT_EVEN_NON_LOCAL      = True,
     SCALOPES_KERNEL_TASK_PREFIX           = "scmp_task_"
 )
 
@@ -38,7 +42,7 @@ class p4a_scmp_compiler(p4a_processor):
     p4a_scmp_header_file = "p4a_scmp.h"
     p4a_scmp_source_file = "p4a_scmp.c"
     scmp_prefix = "scmp_"
-    scmp_default_stack_size = 4095
+    scmp_default_stack_size = 1024
     scmp_buffers_file_name = "scmp_buffers.h"
 
     def __init__(self, workspace = None, project_name = "",
@@ -152,7 +156,7 @@ class p4a_scmp_compiler(p4a_processor):
         # beware: regular expressions here are not really robust againts spacing changes.
         global default_scmp_properties
         print("updating calls to p4a_scmp_functions \n")
-        malloc_re = re.compile(r"\(\(void \*\*\) \&([a-zA-Z0-9_]*), (sizeof\(\w*\)\**\w*)\);")
+        malloc_re = re.compile(r"\(\(void \*\*\) \&([a-zA-Z0-9_]*), (sizeof\([ \w]*\)[ *\w]*)\);")
         copy_from_accel_re = re.compile(r"&(\w*)([a-zA-Z0-9_\[\]]*), \*(\w*)")
         copy_to_accel_re = re.compile(r"&(\w*)([a-zA-Z0-9_\[\]]*), \*(\w*)")
         dealloc_re = re.compile(r"\(([a-zA-Z0-9_]*)")
@@ -175,6 +179,10 @@ class p4a_scmp_compiler(p4a_processor):
                         elif re.search(default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_1D"], line) is not None:
                             other_line = copy_from_accel_re.sub(r"P4A_sesam_server_\1_p ? &\1\2 : NULL, *\3, \3_id, \3_prod_p || \3_cons_p", line)
                         elif  re.search(default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_1D"], line) is not None:
+                            other_line = copy_to_accel_re.sub(r"P4A_sesam_server_\1_p ? &\1\2 : NULL, *\3, \3_id, \3_prod_p || \3_cons_p", line)
+                        elif re.search(default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_2D"], line) is not None:
+                            other_line = copy_from_accel_re.sub(r"P4A_sesam_server_\1_p ? &\1\2 : NULL, *\3, \3_id, \3_prod_p || \3_cons_p", line)
+                        elif  re.search(default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_2D"], line) is not None:
                             other_line = copy_to_accel_re.sub(r"P4A_sesam_server_\1_p ? &\1\2 : NULL, *\3, \3_id, \3_prod_p || \3_cons_p", line)
                         else:
                             other_line = line
@@ -239,14 +247,18 @@ class p4a_scmp_compiler(p4a_processor):
         """
         global default_scmp_properties
         print("postfixing copy functions by _server in file " + file)
-        copy_to_ch = default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_1D"]
-        copy_from_ch = default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_1D"]
+        copy_to_1d_ch = default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_1D"]
+        copy_from_1d_ch = default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_1D"]
+        copy_to_2d_ch = default_scmp_properties["KERNEL_LOAD_STORE_LOAD_FUNCTION_2D"]
+        copy_from_2d_ch = default_scmp_properties["KERNEL_LOAD_STORE_STORE_FUNCTION_2D"]
         os.rename(file, file+".tmp")
         with open(file+".tmp", 'r') as f_orig:
             ch = f_orig.read()
             with open(file, 'w') as f:
-                ch = ch.replace(copy_to_ch, copy_to_ch + "_server")
-                ch = ch.replace(copy_from_ch, copy_from_ch + "_server")
+                ch = ch.replace(copy_to_1d_ch, copy_to_1d_ch + "_server")
+                ch = ch.replace(copy_from_1d_ch, copy_from_1d_ch + "_server")
+                ch = ch.replace(copy_to_2d_ch, copy_to_2d_ch + "_server")
+                ch = ch.replace(copy_from_2d_ch, copy_from_2d_ch + "_server")
                 f.write(ch)
         os.remove(file+".tmp")
         print ("done\n")
@@ -412,19 +424,32 @@ class p4a_scmp_compiler(p4a_processor):
         print("done")
 
     def replace_printf(self, files):
-        print("Replacing printf with sesam_printf...")
+        print("Replacing printf and fprintf(stdout, with sesam_printf...")
+        printf_re = re.compile(r"\bprintf")
+        fprintf_re = re.compile(r"\bfprintf\(stdout,")
         for file in files:
              os.rename(file, file+".tmp")
              with open(file+".tmp", 'r') as f_orig:
                  ch = f_orig.read()
                  with open(file, 'w') as f:
-                     ch = ch.replace("printf", "sesam_printf")
+                     ch = printf_re.sub("sesam_printf", ch)
+                     ch = fprintf_re.sub("sesam_printf(", ch)
                      f.write(ch)
              os.remove(file+".tmp")
         print("done")
 
     def get_scalopes_kernel_task_prefix (self):
         return self.workspace.props.SCALOPES_KERNEL_TASK_PREFIX
+
+    def export_application_header_files(self):
+        print("exporting user header files...")
+        source_dir="."
+        target_dir = os.path.join(self.scmp_applis_dir_name, p4a_scmp_compiler.scmp_applis_processing_dir_name, self.project_name)
+        header_files = [file for file in os.listdir( source_dir) if get_file_extension(file) == '.h']
+
+        for header_file in header_files:
+            shutil.copyfile(os.path.join(source_dir, header_file), os.path.join(target_dir, header_file))
+        print("done")
 
     def go(self):
         global default_scmp_properties
@@ -434,8 +459,8 @@ class p4a_scmp_compiler(p4a_processor):
 
         # recover a list of all task labels used in source code
         labels_re = re.compile(r"\n *("+self.get_scalopes_kernel_task_prefix()+"\w+):")
-	self.kernel_tasks_labels = labels_re.findall(main.code)
-	if self.kernel_tasks_labels:
+        self.kernel_tasks_labels = labels_re.findall(main.code)
+        if self.kernel_tasks_labels:
             for kernel_task in self.kernel_tasks_labels:
                 print("isolating kernel task "+ kernel_task + "...\n")
                 main.isolate_statement(kernel_task)
@@ -483,6 +508,9 @@ class p4a_scmp_compiler(p4a_processor):
             # copy p4a_scmp files to applis_processing directory
             self.export_p4a_scmp_files()
 
+            # copy original header files to the application directory
+            self.export_application_header_files()
+
             # apply dead_code_elimination on each new application
             # beware to use proper stubs so that all code is not eliminated
 
@@ -500,9 +528,9 @@ if __name__ == "__main__":
     try:
         # Create a workspace with PIPS:
         compiler = p4a_scmp_compiler(
-            project_name = "data_flow01",
+            project_name = "thales",
             verbose = True,
-            files = ["data_flow01.c"]
+            files = ["Main.c"]
             )
         compiler.go()
         print("That's all Folks...")
