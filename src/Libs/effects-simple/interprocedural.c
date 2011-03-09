@@ -1261,6 +1261,83 @@ list c_simple_effects_on_formal_parameter_backward_translation(list l_sum_eff,
 		free_effect(eff1);
 
 	      }
+	    else  if(ENTITY_DEREFERENCING_P(real_op))
+	      {
+		pips_debug(6, "dereferencing operator case \n");
+		/* if it's a pointer or a partially indexed array
+		 * We should do more testing here to check if types
+		 * are compatible...
+		 */
+		if (pointer_type_p(real_arg_t) ||
+		    !ENDP(variable_dimensions(type_variable(real_arg_t))))
+		  {
+		    pips_debug(8, "pointer type real arg\n");
+		    /* first compute the region corresponding to the
+		       real argument
+		    */
+		    effect real_eff = effect_undefined;
+		    list l_real_arg =
+		      generic_proper_effects_of_complex_address_expression
+		      (real_arg, &real_eff, true);
+
+		    pips_debug_effect(6, "base effect :\n", real_eff);
+		    bool anywhere_w_p = false;
+		    bool anywhere_r_p = false;
+
+		    FOREACH(EFFECT, eff, l_sum_eff)
+		      {
+			tag eff_act = effect_action_tag(eff);
+
+			if ((anywhere_r_p && eff_act == is_action_read) || (anywhere_w_p && eff_act == is_action_write))
+			  {
+			    pips_debug(6, "no need to translate, result is already anywhere\n");
+			  }
+			else
+			  {/* this could easily be made generic BC. */
+			    if(!anywhere_effect_p(real_eff) && store_effect_p(real_eff))
+			      {
+				reference n_eff_ref;
+				descriptor n_eff_d;
+				effect n_eff;
+				bool exact_translation_p;
+				effect init_eff = (*effect_dup_func)(eff);
+
+				/* and then perform the translation */
+				simple_cell_reference_with_value_of_cell_reference_translation(effect_any_reference(init_eff),
+											       effect_descriptor(init_eff),
+											       effect_any_reference(real_eff),
+											       effect_descriptor(real_eff),
+											       0,
+											       &n_eff_ref, &n_eff_d,
+											       &exact_translation_p);
+				if (entity_all_locations_p(reference_variable(n_eff_ref)))
+				  {
+				    if (eff_act == is_action_read)
+				      anywhere_r_p = true;
+				    else
+				      anywhere_w_p = true;
+				  }
+				n_eff = make_effect(make_cell(is_cell_reference, n_eff_ref),
+						    copy_action(effect_action(eff)),
+						    exact_translation_p? copy_approximation(effect_approximation(eff)):
+						    make_approximation_may(),
+						    make_descriptor(is_descriptor_none,UU));
+				l_eff = gen_nconc(l_eff, CONS(EFFECT, n_eff, NIL));
+
+				free_effect(init_eff);
+			      }
+			  }
+		      }
+		    gen_free_list(l_real_arg);
+		    free_effect(real_eff);
+
+		  } /*  if (pointer_type_p(real_arg_t)) */
+		else
+		  {
+		    pips_debug(8, "real arg reference is not a pointer and is not a partially indexed array -> NIL \n");
+		  } /* else */
+		break;
+	      }
 	    else if(ENTITY_MALLOC_SYSTEM_P(real_op))
 	      {
 		/* BC : do not generate effects on HEAP */
