@@ -155,6 +155,16 @@ different preprocessor symbols can be defined according to the expected target:
   compiled as \Aopenmp or sequential emulation code.
 \end{itemize}
 
+The native compilation scheme is to generate allocation on the \Agpu for
+each parallel loop nest, transfer to the \Agpu the data needed for the
+computation, launch the kernel and copy back the results from the \Agpu.
+For iterative algorithms for example, some data can often remain on the
+\Agpu between kernel calls because they are not touched by the host. For
+this, there is an optional optimization that can be used with the
+\verb|--com-optimization| option: a static interprocedural data-flow
+analysis keep track of data movement and allocation to remove redundant
+communications and allocation, leading to great performance improvements.
+
 Parallelization of some functions can be avoided by using
 \texttt{-{}-exclude-modules=\emph{regex}}. This is preferable when the
 parallel part is not compute-intensive enough to compensate for
@@ -172,6 +182,8 @@ interprocedural analysis can proceed correctly. For subsequent compilation
 in the back-end stage, this file is skipped with \verb|--exclude-file|, then
 the dummy calls are replaced with the real library functions by linking
 them with \texttt{-l} or compiling them with \verb|--extra-file|.
+
+Look at section~\ref{sec:options} for a full list of options.
 
 
 \subsubsection{P4A Accel runtime tweaking}
