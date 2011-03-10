@@ -131,10 +131,21 @@ __global__ void k_forcez( float *pot, float *fx )
 
   __syncthreads();
 
-  float x1 = spot[ ((unsigned int)(tx - 1 )) % NP ];
-  float x2 = spot[ (tx + 1 ) % NP ];
+  float x1 = spot[ ((unsigned int)(tx - 1 )) & (NP-1) ];
+  float x2 = spot[ (tx + 1 ) & (NP-1) ];
 
   fx[cellCoord]=(x2-x1)/(2.f*DX);
+}
+
+__global__ void k_naive_forcez( float *pot, float *fx )
+{
+  int tx=threadIdx.x;
+  int bx=blockIdx.x;
+  int by=blockIdx.y;
+
+  int cellCoord = bx * NP * NP + by*NP + tx;
+
+  fx[cellCoord]=(pot[(cellCoord+1) & (NP - 1)]-pot[(cellCoord-1) & (NP - 1)])/(2.f*DX);
 }
 
 void forcez(float pot[NP][NP][NP], float fx[NP][NP][NP]) {

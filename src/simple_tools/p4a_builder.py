@@ -548,6 +548,8 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
                 makeflags.append("VERBOSE=1")
             p4a_util.run([ "make" ] + makeflags, working_dir = dir)
 
+    def append_cpp_flags (self, flag):
+        self.cpp_flags.append (flag)
 
 if __name__ == "__main__":
     print(__doc__)
