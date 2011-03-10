@@ -63,10 +63,15 @@ if (( $verb >= 1)) ; then
 fi
 
 # Subdirectory where there is some documentation to build or publish:
-doc_dirs="doc/organization doc/simple_tools/p4a_article doc/simple_tools/p4a_slides"
+doc_dirs="doc/organization doc/simple_tools/p4a_article doc/simple_tools/p4a_slides src/p4a_accel"
 
 for d in $doc_dirs; do
     ad=$P4A_ROOT/$d
+    local_make_target=$make_target
     echo "Dealing with $ad..."
-    ( cd $ad; make $make_target )
+    if [ $d == 'src/p4a_accel' ]; then
+	# Deal with special case of Doxygen generation:
+	local_make_target=`echo $local_make_target | sed -e s/default/doxygen/ -e s/publish/doxygen-publish/`
+    fi
+    ( cd $ad; make $local_make_target )
 done
