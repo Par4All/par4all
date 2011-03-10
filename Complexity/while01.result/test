@@ -1,0 +1,34 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   while (x<5)
+
+//  P(x) {x<=4}
+
+      x = x+1;
+}
+
+Complexities
+
+//                                          5*COMPLEXITY:UNKNOWN_RANGE0 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   int x = 0;
+//                                          5*COMPLEXITY:UNKNOWN_RANGE0 (WHILE)
+   while (x<5)
+//                                          5*COMPLEXITY:UNKNOWN_RANGE0 (STMT)
+      x = x+1;
+}

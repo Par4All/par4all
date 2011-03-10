@@ -1,0 +1,30 @@
+C     7*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE1.M - 7*COMPLEXITY:UNKNOWN_VARIABLE0.M^2 - 21*COMPLEXITY:UNKNOWN_VARIABLE0.M - 646*COMPLEXITY:UNKNOWN_VARIABLE1.M + 646*M^2 + 1946*M + 2 (SUMMARY)
+c
+      SUBROUTINE SUB2(M)
+      INTEGER M, II, I, J, JJ
+C     7*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE1.M - 7*COMPLEXITY:UNKNOWN_VARIABLE0.M^2 - 21*COMPLEXITY:UNKNOWN_VARIABLE0.M - 646*COMPLEXITY:UNKNOWN_VARIABLE1.M + 646*M^2 + 1946*M + 2 (DO)
+      DO 10 I = 1, M                                                    0004
+C                                                                    3 (STMT)
+         II = I+1                                                       0005
+C     7*COMPLEXITY:UNKNOWN_VARIABLE0.II - 7*COMPLEXITY:UNKNOWN_VARIABLE0.M - 21*COMPLEXITY:UNKNOWN_VARIABLE0 - 646*II + 646*M + 1942 (DO)
+         DO 20 J = II, M+2                                              0006
+C                                                                    5 (STMT)
+            JJ = I+J-2                                                  0007
+C                                                          -7*JJ + 640 (DO)
+            DO 30 K = JJ+10, 100                                        0008
+C                                                                    3 (STMT)
+               T = T+1.0                                                0009
+C                                                                    3 (STMT)
+               U = U+1.0                                                0010
+C                                                                    0 (STMT)
+30             CONTINUE                                                 0011
+C                                                                    0 (STMT)
+20          CONTINUE                                                    0012
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0013
+      END
+C     49*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE1 - 490*COMPLEXITY:UNKNOWN_VARIABLE0 - 4522*COMPLEXITY:UNKNOWN_VARIABLE1 + 45278 (SUMMARY)
+      PROGRAM LZ2
+C     49*COMPLEXITY:UNKNOWN_VARIABLE0.COMPLEXITY:UNKNOWN_VARIABLE1 - 490*COMPLEXITY:UNKNOWN_VARIABLE0 - 4522*COMPLEXITY:UNKNOWN_VARIABLE1 + 45278 (STMT)
+      CALL SUB2(7)                                                      0002
+      END

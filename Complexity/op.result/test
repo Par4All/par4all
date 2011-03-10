@@ -1,0 +1,94 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a, b, c, z;
+
+//  P(a,b,c,z) {}
+
+   a = b+c;
+
+//  P(a,b,c,z) {b+c==a}
+
+   a--;
+
+//  P(a,b,c,z) {b+c==a+1}
+
+   b = a*c;
+
+//  P(a,b,c,z) {}
+
+   c = b-a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   c++;
+
+//  P(a,b,c,z) {a+c==b+1}
+
+   z = a+b*c;
+
+//  P(a,b,c,z) {a+c==b+1}
+
+   --a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   ++z;
+
+//  P(a,b,c,z) {a+c==b}
+
+   z *= a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   a /= b;
+
+//  P(a,b,c,z) {}
+
+   c -= a;
+
+//  P(a,b,c,z) {}
+
+   b += b;
+}
+
+Complexities
+
+//                                                                   38 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   int a, b, c, z;
+//                                                                    4 (STMT)
+   a = b+c;
+//                                                                    2 (STMT)
+   a--;
+//                                                                    4 (STMT)
+   b = a*c;
+//                                                                    4 (STMT)
+   c = b-a;
+//                                                                    2 (STMT)
+   c++;
+//                                                                    6 (STMT)
+   z = a+b*c;
+//                                                                    2 (STMT)
+   --a;
+//                                                                    2 (STMT)
+   ++z;
+//                                                                    3 (STMT)
+   z *= a;
+//                                                                    3 (STMT)
+   a /= b;
+//                                                                    3 (STMT)
+   c -= a;
+//                                                                    3 (STMT)
+   b += b;
+}
