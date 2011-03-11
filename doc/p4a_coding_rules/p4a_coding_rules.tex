@@ -1,0 +1,308 @@
+\documentclass[a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{a4wide}
+\usepackage{url}
+\usepackage{alltt}
+\usepackage{graphicx}
+\usepackage{abbrev_reactive}
+\usepackage{listings}%[hyper,procnames]
+\lstset{extendedchars=true, language=C++, basicstyle=\scriptsize\ttfamily, numbers=left,
+  numberstyle=\tiny, stepnumber=5, numberfirstline=true,
+  tabsize=8, tab=\rightarrowfill, keywordstyle=\bf,
+  stringstyle=\rmfamily, commentstyle=\rmfamily\itshape}
+
+\let\OldRightarrow=\Rightarrow
+\RequirePackage{marvosym}
+\let\MarvosymRightarrow=\Rightarrow
+\let\Rightarrow=\OldRightarrow
+\RequirePackage{wasysym}
+\let\Lightning\UnTrucIndefini% Because conflict between ifsym and marvosym
+\let\Sun\UnTrucIndefini%
+\RequirePackage[weather]{ifsym}
+
+
+\sloppy
+
+\begin{document}
+
+\title{Par4All programming rules\\
+  ---\\
+  HPC Project}
+
+\author{Béatrice \textsc{Creusillet} \& Ronan \textsc{Keryell}}
+
+\maketitle
+
+\tableofcontents{}
+
+% To automatically build reports from this content:
+%%ContentBegin
+
+
+\section{Introduction}
+\label{sec:introduction}
+
+Automatic parallelization is an intractable problem in the general case
+and it would be an illusion to rely on it in an case. Fortunately, well
+written programs can expose enough parallelism in a way automatic
+parallelizer can do a pretty good job. We advocate that to expose
+parallelism even before manual parallelization, programs should be cleaned
+enough from specific sequential processor optimizations.
+
+Here we present some coding rules specific to the \Apfa automatic
+parallelizer that is based on the \Apips source-to-source language
+transformation workbench but we think that these coding rules can be
+useful with other tools as interesting guidelines too.
+
+This document gives advices to write programs that are compliant with the
+current state of \Apips and that maximize the precision of analyses and
+thus help the tool in generating efficient code. As a preliminary clue,
+and not surprisingly, let us say that the more structured a program is,
+the easier it is to analyze.
+
+
+\section{C language}
+\label{sec:c-language}
+
+In the following we assume the reader is knowledgeable of the C99
+programming language and more specifically the ISO/IEC 9899:TC3 WG14
+norm\footnote{The last draft can be found here:
+  \url{http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf}}.
+
+
+\subsection{Program structure}
+\label{sec:program-structure}
+
+\Apips internal representation of a function body is a hierarchical
+control flow graph, which simply means that syntactic constructs fit
+into each other as Russian dolls. For instance, a \texttt{for} loop is
+made of a header, itself made of three expressions, and a body, which
+can itself include other loops, tests\ldots{} Most analyses and
+transformations rely on the good properties of these constructs to
+generate better results. On the contrary, a poorly structured program
+(which contains \texttt{goto}s, \texttt{break}s, multiple {return}s
+\ldots) leads to poor results and may prevent further code
+transformations.
+
+\Apips includes a code restructurer, but it has its own limitations. So a
+good programming practice is to avoid non-structured code. Sometimes
+however it may not be possible. In particular, this is the case when
+testing system calls return values. But, however important these tests
+are, they do not affect the program semantics when there is a correct
+execution, and they are sometimes implemented differently on the targeted
+architectures. So a good pratice would be to wrap system calls in
+dedicated macros or functions which would receive a simpler and
+non-blocking definition for \Apips, different from the real implementation
+that can be more complex. Figure~\ref{fig:wrapping_system_calls} gives an
+exemple for the \texttt{malloc()} function.
+
+\begin{figure}
+\begin{lstlisting}
+// malloc wrapper with error testing
+void * my_malloc(size_t size, int err_code,
+                 const char * restrict err_mess)
+{
+  void * res = malloc(size);
+  if (res == NULL) {
+    // This IO is an issue since it prevent parallelization:
+    fprinf(stderr, err_mess);
+    /* This exit is transformed as an unstructured control graph, reducing
+       parallelization opportunities... */
+    exit(err_code);
+  }
+  return(res);
+}
+
+/* wrapper provided to PIPS. Note that it is not this function that has to
+   be used in the compiled code by the backend */
+void * my_malloc(size_t size, int err_code,
+                 const char * restrict err_mess)
+{
+  // No more IO or exit()!
+  void * res = malloc(size);
+  return(res);
+}
+\end{lstlisting}
+
+  \caption{Wrapping system calls.}
+  \label{fig:wrapping_system_calls}
+\end{figure}
+
+Another solution is to wrap error code between %
+\lstinline|#ifdef ERROR_CONTROL ... #endif| pairs to be able remove to
+remove such code on demand.
+
+C99 offers the possibility of declaring data almost anywhere in the
+code. This feature is relatively new in \Apips and phases are unequally
+ready to accept this feature, which means that you may gather all data
+declarations at the beginning of a code block.
+
+One of the main other restrictions is that \Apips does not handle
+recursive functions.
+
+
+\subsection{Data Structures}
+\label{sec:data_structures}
+
+The C language provides several basic data structures, which can be
+combined to create more complicated ones. \Apips allows all combinations,
+but with some limitations in their usage.
+
+
+\subsection{Pointers}
+\label{sec:pointers}
+
+Pointers allow to designate a single memory location using several names:
+this is called aliasing. However practical it may be, it may render
+subsequent program analyses more complicated. To generate safe results,
+the default behaviour of \Apips is to generate imprecise results in case
+of pointer dereferencing. If you know that you very safely use
+pointers, you can turn off this default behaviour, by setting the right
+property (see the \texttt{pipsmake-rc} guide for more details). \Apfa, as
+a pragmatic tool, does this right for you.
+
+A pointer analysis phase, called \emph{Pointer Values}, is currently being
+integrated to \Apips to avoid these drawbacks\footnote{Expert users can
+  use it to check a function pointer usage. For example in \Apips by
+  activating the \texttt{PRINT\_CODE\_POINTER\_VALUES} and displaying the
+  \texttt{PRINTED\_FILE} resource.}.
+
+But if you want to make the most of \Apfa, just follow the next rules:
+\begin{itemize}
+\item always use the same expression to refer to a memory location
+  inside a function; for instance, avoid the following kind of code:
+  \begin{lstlisting}
+    parts = my_syst->domain[i]->parts;
+    parts[j] = ...;
+  \end{lstlisting}
+  since \lstinline|my_syst->domain[i]->parts| is designated by two
+  different expressions. This limitation does not hold for array
+  index: \lstinline|my_syst->domain[i]| and
+  \lstinline|my_syst->domain[j]| are rightly distinguished if
+  $\mathtt{i} \neq \mathtt{j}$.
+\item do not assign two different memory locations to a pointer; in
+  particular, do not use pointer arithmetic;
+\item reserve the use of pointers for the sole dynamic allocation of
+  arrays and to function parameter passing;
+\item avoid function pointers, they currently lead to imprecise results.
+\item do not use recursive data structures such as linked lists, trees\ldots
+\end{itemize}
+Several of these limitations will be removed in a near future, so stay tuned!
+
+
+\subsection{Arrays}
+\label{sec:arrays}
+
+As array manipulations are often the source of massive parallelism, \Apips
+program transformations rely on powerful analyses (convex array region
+analyses) of array element flows over the whole program.
+
+These analyses currently assume that all array usages conform to the
+declarations. In particular, no array bound check is performed, and
+linearization~\footnote{using a 2D array as a 1D array for instance}
+leads to false results.
+
+\begin{figure}
+  \centering
+  \begin{lstlisting}
+/* In the following statement sequences and expression, all reference to a
+   and b are made in a following way. So first the region with a[i-1] and
+   a[i] is built, which is compact, and the a[i+1] reference is added,
+   leading still to a compact region. */
+tmp = a[i-1] + a[i] + a[i+1];
+b[i-1] = ...;
+b[i]   = ...;
+b[i+1] = ...;
+  \end{lstlisting}
+  \caption{Consecutive array accesses.}
+  \label{fig:consecutive_array_accesses}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{lstlisting}
+/* The array region access is first computed from a[i-1] and a[i+1] which
+   is non compact and then the a[i] element is added */
+tmp = a[i-1] + a[i+1] + a[i];
+/* The same for b */
+b[i]   = ...;
+b[i+1] = ...;
+b[i-1] = ...;
+  \end{lstlisting}
+  \caption{Disjoint array accesses leading to imprecise array region
+    analysis.}
+  \label{fig:disjoint_array_accesses}
+\end{figure}
+
+To reduce their complexity, these analyses gather array elements in
+sets represented by convex polyhedra. This means that non-convex sets
+of array elements are approximated by sets that contain elements which
+do not belong to the actual set, and are thus imprecise. Of course,
+further analyses and transformations are more likely to succeed and
+produce efficient code if array region analyses are more precise. So,
+in case of successive accesses to array elements, it is recommended to
+group them as much as possible so that two consecutive accesses in the
+program flow can be represented by a convex set. As an example, you
+will prefer the version of figure~\ref{fig:consecutive_array_accesses}
+to the version of figure~\ref{fig:disjoint_array_accesses}.
+
+
+\section{Operators and standard libraries}
+\label{sec:operators_and_standard_libraries}
+
+A huge effort has been made to integrate all standard libraries
+functions. However, depending on your operating system and/or your
+compiler version, some of your favorite ones may be missing. Don't
+hesitate to contact us on \texttt{pipdev at cri dot ensmp dot fr} so
+that we can integrate them.
+
+The effects of the cast operators on the analyses is currently under
+study: please use it sparingly.
+
+\section{Fortran language}
+\label{sec:fortran-language}
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+\Apips/\Apfa is a powerful tool to generate code for a variety
+of architectures. To get the most of it, you should however follow
+some rules when building your application.
+
+The latter should be as structured as possible, and use
+\lstinline{for} loops like Fortran \lstinline|do| loops preferably to
+\lstinline{while} loops. Loop nest candidates for parallelization should
+not contain IOs or debug or error control code, or provide an easy way
+to switch them off.
+
+Minimize the use of pointers as explained before, and don't use
+recursive data structures and function pointers. Then use your data as they are
+declared: in particular avoid array linearization and casting.
+
+
+If some of these recommendations cannot be followed, then try to group
+the non-compliant code outside of loop nests which are good
+candidates for parallelization.  This is a good practice, for instance,
+for heap allocations.
+
+
+
+%%ContentEnd
+
+\end{document}
+
+#pragma
+
+comments
+
+cast
+
+compléter linearization
+
+complete Operators and standard librarie with stubs
+
+%%% Local Variables:
+%%% mode: latex
+%%% ispell-local-dictionary: "american"
+%%% End:
+
