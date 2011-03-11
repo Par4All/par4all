@@ -25,11 +25,12 @@
 
 \begin{document}
 
-\title{Par4All programming rules\\
-  ---\\
-  HPC Project}
+\title{Par4All \& PIPS programming rules}
 
-\author{Béatrice \textsc{Creusillet} \& Ronan \textsc{Keryell}}
+\author{Corinne \textsc{Ancourt} \and Béatrice \textsc{Creusillet} \and
+  François \textsc{Irigoin} \and Ronan \textsc{Keryell}\\
+  ---\\
+  HPC Project \& Mines ParisTech}
 
 \maketitle
 
@@ -180,8 +181,10 @@ But if you want to make the most of \Apfa, just follow the next rules:
   index: \lstinline|my_syst->domain[i]| and
   \lstinline|my_syst->domain[j]| are rightly distinguished if
   $\mathtt{i} \neq \mathtt{j}$.
-\item do not assign two different memory locations to a pointer; in
-  particular, do not use pointer arithmetic;
+\item do not assign two different memory locations to a pointer (that
+  means that a pointer could be considered rather as single assignment
+  variable);
+\item in particular, do not use pointer arithmetic;
 \item reserve the use of pointers for the sole dynamic allocation of
   arrays and to function parameter passing;
 \item avoid function pointers, they currently lead to imprecise results.
@@ -189,18 +192,91 @@ But if you want to make the most of \Apfa, just follow the next rules:
 \end{itemize}
 Several of these limitations will be removed in a near future, so stay tuned!
 
+For example avoid some code that use pointers to do some strength
+reduction on array accesses such as:
+\begin{lstlisting}
+double a[N], b[N];
+double *s = a, *d = b;
+for(int i = 0; i < N; i++)
+  *d++ = *s++;
+\end{lstlisting}
+but use a clearer version that reflect the original algorithm (or that can
+be seen as an inductive variable detection on the previous code):
+\begin{lstlisting}
+double a[N], b[N];
+for(int i = 0; i < N; i++)
+  b[i] = a[i];
+\end{lstlisting}
+which is detected as a parallel loop!
 
 \subsection{Arrays}
 \label{sec:arrays}
+
+\subsubsection{Declarations}
+\label{sec:declarations}
 
 As array manipulations are often the source of massive parallelism, \Apips
 program transformations rely on powerful analyses (convex array region
 analyses) of array element flows over the whole program.
 
 These analyses currently assume that all array usages conform to the
-declarations. In particular, no array bound check is performed, and
-linearization~\footnote{using a 2D array as a 1D array for instance}
-leads to false results.
+declarations (no array bound check is performed). Note that you can have
+variable size arrays in C99 (as available in Fortran for decades), such
+as:
+\begin{lstlisting}
+int n = f();
+int m = g();
+double a[3*n][m+7];
+\end{lstlisting}
+That removes many older linearization old cases as seen later.
+
+
+\subsubsection{References to array elements}
+\label{sec:refer-array-elem}
+
+Since array reference are represented in \Apips by using integer
+polyhedron lattice, array references should be affine so that the
+parallelizer can prove iteration independence. For example
+\lstinline|a[2*i-3+m][3*i-j+6*n]| is an affine array reference but
+\lstinline|a[2*i*j][m*n-i+j]| is not (it is a polynomial of several
+variables).
+
+This explain why you should not use array linearization to emulate
+access to multidimensional arrays as one-dimensional arrays, such as:
+\begin{lstlisting}
+double a[n][m][l];
+double * p = a;
+for(int i = 0; i < n; i++)
+  for(int j = 0; j < m; j++)
+    for(int k = 0; k < l; k++)
+      p[m*l*i + l*j + k] = ...;
+\end{lstlisting}
+instead of the cleaner understandable version:
+\begin{lstlisting}
+double a[n][m][l];
+for(int i = 0; i < n; i++)
+  for(int j = 0; j < m; j++)
+    for(int k = 0; k < l; k++)
+      a[i][j][k] = ...;
+\end{lstlisting}
+In the first cluttered version we have a polynomial expression which can
+not represented in the linear algebra framework of \Apips and this kind of
+loops can not be parallelized and communications on \Agpu cannot be
+generated.
+
+The following version:
+\begin{lstlisting}
+double a[n][m][l];
+double * p = a;
+for(int i = 0; i < n*m*l; i++)
+  p[i] = ...;
+\end{lstlisting}
+can be parallelized in the \Aopenmp output but the communications cannot
+be generated in the \Agpu version yet. So avoid array linearization if
+possible.
+
+In the future, we may implement transformations that delinearize this kind
+of array accesses.
 
 \begin{figure}
   \centering
@@ -247,6 +323,17 @@ will prefer the version of figure~\ref{fig:consecutive_array_accesses}
 to the version of figure~\ref{fig:disjoint_array_accesses}.
 
 
+\subsubsection{Declaration scope}
+\label{sec:declaration-scope}
+
+Even if \Apips is interprocedural and can deal with parameter passing
+through global variables, such global declarations should be avoided if
+possible and replace by explicit argument passing in functions.
+
+For example, the actual generation of \Agpu code may choke on some case of
+global arrays that are not well outlined and forgotten.
+
+
 \section{Operators and standard libraries}
 \label{sec:operators_and_standard_libraries}
 
@@ -259,8 +346,10 @@ that we can integrate them.
 The effects of the cast operators on the analyses is currently under
 study: please use it sparingly.
 
+
 \section{Fortran language}
 \label{sec:fortran-language}
+
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -291,6 +380,11 @@ for heap allocations.
 
 \end{document}
 
+do loops => simple for, without complex expressions
+
+Keep the algorithmic attitude non offuscated contest
+
+
 #pragma
 
 comments
@@ -300,6 +394,53 @@ cast
 compléter linearization
 
 complete Operators and standard librarie with stubs
+
+reductions
+
+Declarations of arrays with/without malloc.
+
+passing arrays to functions
+
+Commentaires de François :
+* pas d'appels recursifs (c'est actuellement detecte a posteriori par
+pipsmake)
+
+* pas d'arithmetique sur pointeurs
+
+* pas d'affectation multiples a un pointeur (ca doit faire sauter les
+codes exploitant des structures de donnees recursives); pour Ter@ops:
+assignation dynamique unique a chaque execution de la fonction
+
+* pas de tableaux de pointeurs
+
+* pas de pointeurs sur des fonctions
+
+* verification des intrinsics utilises: je ne sais comment traiter ce
+probleme
+
+* accepter ou non des subscript expressions non-affines?
+
+* absence d'aliasing entre parametres formels "a la Fortran" (je ne vois
+pas comment on pourrait verifier ca... sans faire d'analyse(s)
+compliquees; voir these de Nga Nguyen)
+
+* restriction sur l'utilisation directe et indirecte des variables
+globales?
+
+* pas de cast: "p = (void *) q;" par exemple
+
+* pas d'unsigned?
+
+* proscrire les effets de bord dans les expressions, y compris les
+conditions (ca evite les expressions hors norme comme i + i++)
+
+* ...
+
+Suggestions d'outils touvees dans la doc ter@ops: Artistic Style et Doxygen
+
+Autre suggestion: repartir de regles de codage existantes comme CERT C
+plutot que d'essayer de redefinir un nouveau jeu de regles?
+
 
 %%% Local Variables:
 %%% mode: latex
