@@ -3,6 +3,7 @@ int main()
 {
 //  points to = {}
    mysecond_struct s;
-//  points to = {}
+//  {(s[fs_p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s[fs_pt],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

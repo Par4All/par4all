@@ -3,18 +3,20 @@ int main()
 {
 //  points to = {}
    int *p, *q, *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int a = 0, b = 1, c = 2, d = 4;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
 
    p = &a;
-//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-);(r,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = a==b?&c:&d;
-//  {(p,a,-Exact-);(q,d,-MAY-);(q,c,-MAY-);(r,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,a,-Exact-);(q,d,-MAY-);(q,c,-MAY-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    r = a<b?&c:q;
 //  {(p,a,-Exact-);(q,d,-MAY-);(q,c,-MAY-);(r,d,-MAY-);(r,c,-MAY-)}
    return 0;

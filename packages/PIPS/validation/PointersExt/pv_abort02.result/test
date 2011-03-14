@@ -3,9 +3,9 @@ int main()
 {
 //  points to = {}
    int **a;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    a = (int **) NULL;
 //  {(a,*NULL_POINTER*,-Exact-)}

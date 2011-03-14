@@ -3,14 +3,37 @@ int main()
 {
 //  points to = {}
    mystruct s1, s2;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    mystruct tab_s[2];
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[0] = s1;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[1] = s1;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[1] = s2;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

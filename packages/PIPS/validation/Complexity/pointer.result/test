@@ -1,0 +1,62 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a = 2;
+
+
+//  P(a) {a==2}
+
+   char b;
+
+
+//  P(a,b) {a==2}
+
+   int *p1;
+
+
+//  P(a,b) {a==2}
+
+   char *p2;
+
+//  P(a,b) {a==2}
+
+
+   p1 = &a;
+
+//  P(a,b) {a==2}
+
+
+   p2 = &b;
+}
+
+Complexities
+
+//                                                                    6 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   int a = 2;
+
+//                                                                    0 (STMT)
+   char b;
+
+//                                                                    0 (STMT)
+   int *p1;
+
+//                                                                    0 (STMT)
+   char *p2;
+//                                                                    3 (STMT)
+
+   p1 = &a;
+//                                                                    3 (STMT)
+
+   p2 = &b;
+}

@@ -14121,6 +14121,68 @@ print_code_smalltalk        > MODULE.smalltalk_code_file
 \end{PipsMake}
 
 
+\section{Prettyprinter for PoCC}
+\label{subsection-prettyprinter-pocc}
+\index{Prettyprinter PoCC}
+\index{OpenGPU}
+
+\begin{PipsPass}{pocc_prettyprinter}
+This pass is used for printing pragmas scop and endscop which delimit
+the control static parts in the code.
+Instrumented code could be an entry for the PoCC compiler.
+\end{PipsPass}
+
+\begin{PipsMake}
+alias pocc_prettyprinter 'pocc_prettyprinter'
+
+pocc_prettyprinter      >    MODULE.code
+
+    < PROGRAM.entities
+    < MODULE.code
+    < MODULE.static_control
+    
+
+\end{PipsMake}
+
+
+\begin{PipsPass}{scop_outliner}
+This pass is used for outlining the static control parts computed by
+the previous pass.
+Instrumented code could be an entry for the PoCC compiler.
+\end{PipsPass}
+
+\begin{PipsMake}
+
+alias scop_outliner 'scop_outliner'
+
+scop_outliner      >     MODULE.code
+    > MODULE.callees
+    < PROGRAM.entities
+    < MODULE.code
+    < MODULE.cumulated_effects
+\end{PipsMake}
+
+
+For the outlinig of the control static parts, function prefix names to be used during the generation:
+\begin{PipsProp}{PoCC_PREFIX}
+Function_Prefix "SCoP"
+\end{PipsProp}
+To generalize the outlining for any pragmas: begin \& end we use that properties:
+\begin{PipsProp}{Pragma_Begin}
+Pragma_Begin "scop"
+\end{PipsProp}
+\begin{PipsProp}{Pragma_End}
+Pragma_End "endscop"
+\end{PipsProp}
+because of differences in definitions of static control part in pips
+and in pocc (for example, there is no function call in a static
+control code for pocc), we propose to set that property at true to
+generate a static control code that will be accepted by pocc.
+\begin{PipsProp}{POCC_COMPATIBILITY} 
+POCC_COMPATIBILITY FALSE
+\end{PipsProp}
+
+
 \section{Prettyprinter for CLAIRE}
 \label{subsection-prettyprinter-claire}
 \index{Prettyprinter Claire}

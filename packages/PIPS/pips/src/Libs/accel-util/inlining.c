@@ -106,8 +106,19 @@ typedef struct {
 static
 void inline_return_remover(statement s,inlining_parameters p)
 {
-    if( return_statement_p( s ) )
-        update_statement_instruction(s,make_instruction_goto(copy_statement(laststmt(p))));
+  /*
+    Delete pragmas scop & endscop after inlining to give back original structure to user's program
+  */
+  string pragma_begin = get_string_property("Pragma_Begin");
+  string pragma_end = get_string_property("Pragma_End");
+  list l_exts = extensions_extension (statement_extensions (s));
+  FOREACH (EXTENSION, ext, l_exts) {
+    pragma pr = extension_pragma (ext);
+    if(strcmp(pragma_string(pr),pragma_begin)==0 || strcmp(pragma_string(pr),pragma_end)==0)
+      free_extension(ext);
+  }
+  if( return_statement_p( s ) )
+    update_statement_instruction(s,make_instruction_goto(copy_statement(laststmt(p))));
 }
 
 /* replace return instruction by an assignment and a goto
@@ -359,6 +370,7 @@ statement inline_expression_call(inlining_parameters p, expression modified_expr
      * sg: not so true, beacuase of dependant types
      */
     expanded = copy_statement(inlined_module_statement(p));
+
     statement declaration_holder = make_empty_block_statement();
 
     /* add external declartions for all extern referenced entities it
@@ -797,6 +809,7 @@ void inline_statement_crawler(statement stmt, inlining_parameters p)
 static
 void inline_split_declarations(statement s, entity inlined_module)
 {
+
     if(statement_block_p(s))
     {
         list prelude = NIL;
@@ -973,6 +986,8 @@ run_inlining(string caller_name, string module_name, inlining_parameters p)
     /* Get the module ressource */
     inlined_module (p)= module_name_to_entity( module_name );
     inlined_module_statement (p)= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    
+
     if(statement_block_p(inlined_module_statement (p)) && ENDP(statement_block(inlined_module_statement (p))))
     {
         pips_user_warning("not inlining empty function, this should be a generated skeleton ...\n");

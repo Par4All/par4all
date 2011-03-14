@@ -28,17 +28,17 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *x, x1, x2, y;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x1 = 1;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x2 = 2;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    if (0==0)
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       x = &x1;
    else
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       x = &x2;
 //  {(x,x2,-MAY-);(x,x1,-MAY-)}
 

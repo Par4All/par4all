@@ -16,18 +16,21 @@ echo
 echo Parsed printed file for "a_m_serial"
 echo
 
-display PARSED_PRINTED_FILE[a_m_serial]
+#display PARSED_PRINTED_FILE[a_m_serial]
 
 echo
 echo Proper effects for "a_m_serial"
 echo
 
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE[a_m_serial]
+#activate PRINT_CODE_PROPER_POINTER_EFFECTS
+#display PRINTED_FILE[a_m_serial]
 
 echo POINTS TO
 activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+#display PRINTED_FILE[a_m_serial]
+display PRINTED_FILE[a_number]
+#display PRINTED_FILE[a_next]
+#display PRINTED_FILE[activate]
 
 close
 delete ammp01

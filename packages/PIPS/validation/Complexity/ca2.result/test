@@ -1,0 +1,56 @@
+
+Preconditions
+
+
+C  P() {}
+
+      PROGRAM CA
+      DIMENSION A(10)
+
+C  P() {}
+
+C
+      DO 101 N = 10, 20                                                 0004
+
+C  P(I,N) {10<=N, N<=20}
+
+C
+         DO 100 I = 15, N                                               0006
+
+C  P(I,N) {15<=I, I<=N, 10<=N, N<=20}
+
+C
+            PRINT *, A(I)                                               0008
+
+C  P(I,N) {15<=I, I<=N, 10<=N, N<=20}
+
+C
+100         CONTINUE                                                    0010
+
+C  P(I,N) {15<=I, N+1<=I, 5I<=3N+45}
+
+101      CONTINUE                                                       0011
+C
+      END
+
+Complexities
+
+C                                                                   67 (SUMMARY)
+      PROGRAM CA
+      DIMENSION A(10)
+C                                                                   67 (DO)
+C
+      DO 101 N = 10, 20                                                 0004
+C                                                             3*N - 40 (DO)
+C
+         DO 100 I = 15, N                                               0006
+C                                                                    2 (STMT)
+C
+            PRINT *, A(I)                                               0008
+C                                                                    0 (STMT)
+C
+100         CONTINUE                                                    0010
+C                                                                    0 (STMT)
+101      CONTINUE                                                       0011
+C
+      END

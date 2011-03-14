@@ -3,6 +3,7 @@ int main()
 {
 //  points to = {}
    mystruct s;
-//  points to = {}
+//  {(s[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

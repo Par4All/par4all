@@ -28,16 +28,17 @@ int main()
    int i = 0, j = 1, k = 2, l = 3;
 //  points to = {}
    int *p, *q, *r, *s;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    r = &i;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,i,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,i,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &j;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,j,-Exact-);(r,i,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    p = r, q, s = p;
 //  {(p,i,-Exact-);(q,j,-Exact-);(r,i,-Exact-);(s,i,-Exact-)}
    /* here the comma operator defines a sequence point.

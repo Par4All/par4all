@@ -1,3 +1,33 @@
+int main()
+{
+   int i;
+   mystruct s1, s2;
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i
+   do {
+      mystruct tab_s[2];
+//             <may be read   >: s1.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.a s1.c
+      tab_s[0] = s1;
+//             <may be read   >: s1.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.a s1.c
+      tab_s[1] = s1;
+//             <may be read   >: s2.b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s2.a s2.c
+      tab_s[1] = s2;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<10);
+   return 0;
+}
+POINTS TO
 //  {}
 int main()
 {
@@ -5,10 +35,16 @@ int main()
    int i;
 //  points to = {}
    mystruct s1, s2;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    i = 0;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    do {
 //  points to = {}
       mystruct tab_s[2];
@@ -22,6 +58,11 @@ int main()
       i++;
    }
    while (i<10);
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

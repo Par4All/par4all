@@ -527,6 +527,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
 {
     pips_assert("there are some statements to outline",!ENDP(statements_to_outline));
     entity new_fun = make_empty_subroutine(outline_module_name,copy_language(module_language(get_current_module_entity())));
+    /* D.K
+      add return to the new body
+    */
     statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
 
 
@@ -739,6 +742,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
     else {
       cu_name = compilation_unit_of_module(get_current_module_name());
     }
+
+    /* add a return at the end of the body, in all cases */
+    insert_statement(new_body,make_return_statement(new_fun),false);
+
 
     /* we can now begin the outlining */
     bool saved = get_bool_property(STAT_ORDER);

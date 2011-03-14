@@ -4,11 +4,9 @@ pips_LDADD=../../Libs/libpipslibs.la
 pips_LDFLAGS=$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 
 TARGET	= pips
-BUILT_SOURCES=$(TARGET).h revisions.h
-include_HEADERS=$(TARGET).h revisions.h
+BUILT_SOURCES=$(TARGET).h
+include_HEADERS=$(TARGET).h
 include $(top_srcdir)/makes/cproto.mk
-revisions.h:
-	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
 
 AM_CPPFLAGS=\
 	-I$(top_srcdir)/src/Documentation/constants \
@@ -22,14 +20,5 @@ AM_CPPFLAGS=\
 	-I../../Libs/pipsdbm\
 	-I../../Libs/properties\
 	$(LINEARLIBS_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS)\
-	-DNEWGEN_REV='"unknown"' \
-	-DUTC_DATE='"unknown"' \
-	-DLINEAR_REV='"unknown"' \
-	-DNLPMAKE_REV='"unknown"' \
-	-DCC_VERSION='"unknown"'
-
-CLEANFILES=revisions.h
-
-
+	$(NEWGENLIBS_CFLAGS)
 

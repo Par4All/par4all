@@ -11,10 +11,6 @@ dist_noinst_SCRIPTS=make_completion_lists.sh
 AM_YFLAGS=-d -p tp_
 AM_LFLAGS=-p tp_
 
-revisions.h:
-	echo '#define PIPS_REV "$(PACKAGE_STRING) - $(PACKAGE_BUGREPORT)"' > $@
-
-
 # tpips completion
 
 completion_list.h :	\
@@ -30,7 +26,7 @@ completion_list.h :	\
 		../../Documentation/pipsmake/properties.rc \
 		> $@
 
-BUILT_SOURCES=$(TARGET).h revisions.h completion_list.h tp_yacc.h
+BUILT_SOURCES=$(TARGET).h completion_list.h tp_yacc.h
 AM_CPPFLAGS=\
 	-I$(top_srcdir)/src/Documentation/constants\
 	-I../../Documentation/pipsmake\
@@ -44,13 +40,8 @@ AM_CPPFLAGS=\
 	-I../../Libs/top-level\
 	-I../../Libs/preprocessor\
 	$(READLINE_CFLAGS) $(NCURSES_CFLAGS)\
-	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)\
-	-DNEWGEN_REV='"unknown"' \
-	-DUTC_DATE='"unknown"' \
-	-DLINEAR_REV='"unknown"' \
-	-DNLPMAKE_REV='"unknown"' \
-	-DCC_VERSION='"unknown"'
+	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 
 include $(top_srcdir)/makes/cproto.mk
-DISTCLEANFILES=completion_list.h revisions.h
+DISTCLEANFILES=completion_list.h
 CLEANFILES=tp_yacc.[ch] tp_lex.c

@@ -1,0 +1,19 @@
+C                                   4*COMPLEXITY:UNKNOWN_VARIABLE0 + 6 (SUMMARY)
+c
+      SUBROUTINE SUB(A,M,N)
+      REAL A(M)
+C                                                                    4 (STMT)
+c      integer m,n
+      K = 3*N+2                                                         0005
+C                                                              4*K + 2 (DO)
+      DO 10 I = 1, K                                                    0006
+C                                                                    3 (STMT)
+         T = T+1.0                                                      0007
+C                                                                    0 (STMT)
+10       CONTINUE                                                       0008
+      END
+C                                   4*COMPLEXITY:UNKNOWN_VARIABLE0 + 6 (SUMMARY)
+      PROGRAM LZ1
+C                                   4*COMPLEXITY:UNKNOWN_VARIABLE0 + 6 (STMT)
+      CALL SUB(5.4, 5, 7)                                               0002
+      END

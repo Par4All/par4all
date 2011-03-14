@@ -27,21 +27,21 @@ int main()
    int i = 3;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    if (i>1) {
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       int *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       q = &a[i];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,a[i],-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a[i],-Exact-)}
       p = q;
 //  {(p,a[i],-Exact-);(q,a[i],-Exact-)}
       i = 0;
    }
-//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-);(q,a[i],-MAY-)}
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    return 0;
 }

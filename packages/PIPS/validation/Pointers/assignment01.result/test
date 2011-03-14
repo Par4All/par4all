@@ -22,13 +22,14 @@ void assignment01()
    int i;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int *r;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
 
    p = q = r = &i;
 //  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}

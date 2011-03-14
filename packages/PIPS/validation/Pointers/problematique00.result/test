@@ -25,9 +25,9 @@ int main()
 {
 //  points to = {}
    int *a, b, c, d;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    c = 3;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    /* S1 */
    a = &c;
 //  {(a,c,-Exact-)}

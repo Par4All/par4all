@@ -11,7 +11,7 @@ void point_to04()
       int c;
       int d;
    } c, *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = &c;
 //  {(p,c,-Exact-)}

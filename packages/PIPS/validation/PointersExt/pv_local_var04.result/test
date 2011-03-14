@@ -8,7 +8,7 @@ int main()
       static int *p = &a;
 //  {(p,a,-Exact-)}
       static int *q;
-//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       q = &b;
 //  {(p,a,-Exact-);(q,b,-Exact-)}
       a = a-1;
@@ -18,7 +18,7 @@ int main()
       static int *r = &a;
 //  {(r,a,-Exact-)}
       static int *s;
-//  {(r,a,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(r,a,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       s = &b;
 //  {(r,a,-Exact-);(s,b,-Exact-)}
       a = a+2;

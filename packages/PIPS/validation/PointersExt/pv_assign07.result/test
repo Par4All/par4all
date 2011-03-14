@@ -3,40 +3,51 @@ int main()
 {
 //  points to = {}
    mystruct s1, s2, *s1p, *s2p;
-//  {(s1p,*ANY_MODULE*:*NOWHERE*,-Exact-);(s2p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    int i = 1;
-//  {(s1p,*ANY_MODULE*:*NOWHERE*,-Exact-);(s2p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    int j = 2;
-//  {(s1p,*ANY_MODULE*:*NOWHERE*,-Exact-);(s2p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    int k = 3;
-//  {(s1p,*ANY_MODULE*:*NOWHERE*,-Exact-);(s2p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    s1p = &s1;
-//  {(s1p,s1,-Exact-);(s2p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,s1,
+//   -Exact-);(s2[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    s2p = &s1;
-//  {(s1p,s1,-Exact-);(s2p,s1,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,s1,
+//   -Exact-);(s2[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,s1,
+//   -Exact-)}
 
    s1.a = &i;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,i,-Exact-);(s1p,s1,-Exact-);(s2p,s1,
-//   -Exact-)}
+//  {(s1[a],i,-Exact-);(s1p,s1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,s1,-Exact-)}
    s2.a = &j;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,i,-Exact-);(*ANY_MODULE*:*NOWHERE*_b0,
-//   j,-Exact-);(s1p,s1,-Exact-);(s2p,s1,-Exact-)}
+//  {(s1[a],i,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
 
    s1p->a = s2.a;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,i,-Exact-);(*ANY_MODULE*:*NOWHERE*_b0,
-//   j,-Exact-);(s1[a],*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(s1p,s1,
-//   -Exact-);(s2p,s1,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(s1p,s1,
+//   -Exact-);(s2[a],j,-Exact-);(s2p,s1,-Exact-)}
    s2p->a = &k;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,i,-Exact-);(*ANY_MODULE*:*NOWHERE*_b0,
-//   j,-Exact-);(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2p,s1,-Exact-)}
+//  {(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
 
    s2p = &s2;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,i,-Exact-);(*ANY_MODULE*:*NOWHERE*_b0,
-//   j,-Exact-);(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2p,s2,-Exact-)}
+//  {(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s2,
+//   -Exact-)}
    return 0;
 }
