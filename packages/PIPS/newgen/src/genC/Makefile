@@ -42,6 +42,19 @@ $(addprefix $(ARCH)/,$(OTHER_CFILES:.c=.o)) $(LIB_OBJECTS): $(DERIVED_HEADERS)
 newgen_auto_%.h: %.c
 	$(RM) $@ ; $(PROTOIZE) $< > $@
 
+# regenerate everytime
+.PHONY: newgen_version.h
+VERSION_SH = ../../makes/version.sh
+newgen_version.h:
+	{ \
+	  echo '#define NEWGEN_REV "$(shell $(VERSION_SH) ../..)"' ; \
+	  echo '#define NEWGEN_MAKE_REV "$(shell $(VERSION_SH) ../../makes)"' ; \
+	} > $@
+
+clean: clean-version
+clean-version:
+	$(RM) newgen_version.h
+
 #
 # GENREAD
 #
