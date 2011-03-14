@@ -93,11 +93,11 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 
-	# This patch is a temporarily solution. It may not cover all possibles cases
-	# This replace a declaration that nvcc does not compile,
-	# for ex. 
-	# int = 100; double a [n];
-	# with :
+	# This patch is a temporary solution. It may not cover all possible cases
+	# It replaces some array declarations that nvcc do not compile.
+	# For ex. 
+	# int n = 100; double a [n];
+	# is replaced by :
 	# double a[100]
     fObj = re.findall("\s*(?:int|\,)\s*(\w+)\s*=\s*(\d+)", content)   
     for obj in fObj: 
