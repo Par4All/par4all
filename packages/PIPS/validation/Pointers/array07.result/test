@@ -9,11 +9,11 @@ int main()
 
 //  points to = {}
    int (*p)[3];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    for(i = 0; i <= 2; i += 1)
-//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
+//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
       p = t[i];
-//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*,-MAY-)}
+//  {(p,t[*][0],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
 
    return 0;
 }

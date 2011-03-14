@@ -21,13 +21,13 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *x, *a, i;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = 1;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    a = &i;
-//  {(a,i,-Exact-);(x,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,i,-Exact-);(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x = a;
 //  {(a,i,-Exact-);(x,i,-Exact-)}
 

@@ -126,12 +126,12 @@ int main()
 {
 //  points to = {}
    int x, tab1[10], tab2[10], *p;                                       /*0016*/
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x++;                                                                 /*0017*/
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x += 3;                                                              /*0018*/
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 1;                                                            /*0020*/
 }

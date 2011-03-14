@@ -6,9 +6,9 @@ void assign05()
 {
 //  points to = {}
    int *r;
-//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;
-//  {(r,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    r = bar(i);
 //  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}

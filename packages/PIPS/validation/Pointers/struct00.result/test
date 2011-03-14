@@ -23,12 +23,12 @@ int main()
    struct one {
       int *first;
    } x;
-//  points to = {}
+//  {(x[first],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int y[10];
-//  points to = {}
+//  {(x[first],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    x.first = &y[5];
-//  {(*ANY_MODULE*:*NOWHERE*_b0,y[5],-Exact-)}
+//  {(x[first],y[5],-Exact-)}
    
    
    return 0;

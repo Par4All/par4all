@@ -1,0 +1,52 @@
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i = 1;
+//  points to = {}
+   int *pi = &i;
+//  {(pi,i,-Exact-)}
+   int **pp = &pi;
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+   int j = 2;
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+   srand(time((void *) 0));
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+   if (alea()) {
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+      int *pj = &j;
+//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pi,-Exact-)}
+      pp = &pj;
+//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pj,-Exact-)}
+      **pp = 0;
+   }
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   
+   // pp may points to a dead value in the stack
+   printf("%p\n", pp);
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   return 0;
+}
+//  {}
+static int alea(void)
+{
+//  points to = {}
+   int r = rand();
+//  points to = {}
+   printf("%d\n", r);
+//  points to = {}
+   return rand()%2==1;
+}
+
+POINTS TO
+

@@ -1,0 +1,40 @@
+
+Preconditions
+
+
+C  P() {}
+
+      PROGRAM CA
+      DIMENSION A(10)
+      INTEGER I,J
+
+C  P() {}
+
+      DO I = 10, 20                                                     0004
+
+C  P(I,J) {10<=I, I<=20}
+
+         DO J = 15, I                                                   0005
+
+C  P(I,J) {10<=I, I<=20, J<=I, 15<=J}
+
+            PRINT *, A(J)                                               0006
+         ENDDO
+      ENDDO
+      END
+
+Complexities
+
+C                                                                   67 (SUMMARY)
+      PROGRAM CA
+      DIMENSION A(10)
+      INTEGER I,J
+C                                                                   67 (DO)
+      DO I = 10, 20                                                     0004
+C                                                             3*I - 39 (DO)
+         DO J = 15, I                                                   0005
+C                                                                    3 (STMT)
+            PRINT *, A(J)                                               0006
+         ENDDO
+      ENDDO
+      END

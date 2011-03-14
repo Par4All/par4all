@@ -52,7 +52,7 @@ void point_to03()
    a_t a;
 //  points to = {}
    a_t *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = &a;
 //  {(p,a,-Exact-)}

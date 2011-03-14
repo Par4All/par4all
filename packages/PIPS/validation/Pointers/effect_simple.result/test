@@ -23,13 +23,13 @@ int main()
 {
 //  points to = {}
    int *p, *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i, j;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    p = &i;
-//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &j;
 //  {(p,i,-Exact-);(q,j,-Exact-)}
    p = q;

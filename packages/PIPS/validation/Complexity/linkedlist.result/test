@@ -1,0 +1,64 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+   
+   
+
+//  P() {}
+
+   struct Liste *Nouveau;
+
+
+//  P() {}
+
+   struct Liste *Tete;
+
+//  P() {}
+
+
+   Tete = (void *) 0;
+
+//  P() {}
+
+   
+   // problem of sizeof instrinsic with structure 
+   // Nouveau = (struct Liste *)malloc(sizeof(struct Liste));
+   
+   Nouveau->pSuivant = Tete;
+
+//  P() {}
+
+
+   Tete = Nouveau;
+}
+
+Complexities
+
+//                                                                    7 (SUMMARY)
+int main()
+{
+   
+   
+//                                                                    0 (STMT)
+   struct Liste *Nouveau;
+
+//                                                                    0 (STMT)
+   struct Liste *Tete;
+//                                                                    1 (STMT)
+
+   Tete = (void *) 0;
+//                                                                    4 (STMT)
+   
+   // problem of sizeof instrinsic with structure 
+   // Nouveau = (struct Liste *)malloc(sizeof(struct Liste));
+   
+   Nouveau->pSuivant = Tete;
+//                                                                    2 (STMT)
+
+   Tete = Nouveau;
+}

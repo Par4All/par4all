@@ -3,14 +3,14 @@ int main()
 {
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    if (a==1)
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       p = (int *) malloc(2*sizeof(int));
    else
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       p = (int *) malloc(3*sizeof(int));
 //  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
    p[0] = 0;

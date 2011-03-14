@@ -1,0 +1,27 @@
+delete proj01
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create proj01 proj01.c
+
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+activate MUST_REGIONS
+
+
+
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALLFUNC]
+echo
+echo POINTS TO
+echo
+
+close
+delete proj01
+quit

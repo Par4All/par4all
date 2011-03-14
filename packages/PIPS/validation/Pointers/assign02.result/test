@@ -6,9 +6,9 @@ s_t make_s(int i, float x)
 {
 //  points to = {}
    s_t *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    char *malloc(int);
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (s_t *) malloc(sizeof(s_t));
 //  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}

@@ -3,11 +3,11 @@ int main()
 {
 //  points to = {}
    int **a;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    a[0] = &b;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }

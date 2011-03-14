@@ -25,17 +25,17 @@ int main()
    float f;
 //  points to = {}
    int *p, *q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b[10];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = &a[0];
-//  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &b[0];
 //  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
    for (f = 0.0;f<10.5;f += 1.0)

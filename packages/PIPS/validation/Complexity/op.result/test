@@ -1,0 +1,212 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int a, b, c, z;
+
+//  P(a,b,c,z) {}
+
+   a = b+c;
+
+//  P(a,b,c,z) {b+c==a}
+
+   a--;
+
+//  P(a,b,c,z) {b+c==a+1}
+
+   b = a*c;
+
+//  P(a,b,c,z) {}
+
+   c = b-a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   c++;
+
+//  P(a,b,c,z) {a+c==b+1}
+
+   z = a+b*c;
+
+//  P(a,b,c,z) {a+c==b+1}
+
+   --a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   ++z;
+
+//  P(a,b,c,z) {a+c==b}
+
+   z *= a;
+
+//  P(a,b,c,z) {a+c==b}
+
+   a /= b;
+
+//  P(a,b,c,z) {}
+
+   c -= a;
+
+//  P(a,b,c,z) {}
+
+   b += b;
+
+//  P(a,b,c,z) {}
+
+   a<<1;
+
+//  P(a,b,c,z) {}
+
+   b>>1;
+
+//  P(a,b,c,z) {}
+
+   a|b;
+
+//  P(a,b,c,z) {}
+
+   z |= a;
+
+//  P(a,b,c,z) {}
+
+   a&b;
+
+//  P(a,b,c,z) {}
+
+   a^b;
+
+//  P(a,b,c,z) {}
+
+
+   if (a!=b)
+
+//  P(a,b,c,z) {}
+
+      a = b;
+
+//  P(a,b,c,z) {a==b}
+
+   if ((z==a||z==b)&&z>1)
+
+//  P(a,b,c,z) {a==b, a==z, 2<=a}
+
+
+      z = z%c;
+
+//  P(a,b,c,z) {a==b}
+
+
+   a <<= b;
+
+//  P(a,b,c,z) {}
+
+   b >>= a;
+
+//  P(a,b,c,z) {}
+
+
+   if (!a)
+
+//  P(a,b,c,z) {a<=0}
+
+      a = z;
+
+//  P(a,b,c,z) {}
+
+
+   c ^= b;
+
+//  P(a,b,c,z) {}
+
+   b &= a;
+
+//  P(a,b,c,z) {}
+
+   a %= z;
+
+//  P(a,b,c,z) {}
+
+   ~a?(z = a):(z = b);
+}
+
+Complexities
+
+//                                                                   95 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   int a, b, c, z;
+//                                                                    4 (STMT)
+   a = b+c;
+//                                                                    2 (STMT)
+   a--;
+//                                                                    4 (STMT)
+   b = a*c;
+//                                                                    4 (STMT)
+   c = b-a;
+//                                                                    2 (STMT)
+   c++;
+//                                                                    6 (STMT)
+   z = a+b*c;
+//                                                                    2 (STMT)
+   --a;
+//                                                                    2 (STMT)
+   ++z;
+//                                                                    3 (STMT)
+   z *= a;
+//                                                                    3 (STMT)
+   a /= b;
+//                                                                    3 (STMT)
+   c -= a;
+//                                                                    3 (STMT)
+   b += b;
+//                                                                    2 (STMT)
+   a<<1;
+//                                                                    2 (STMT)
+   b>>1;
+//                                                                    3 (STMT)
+   a|b;
+//                                                                    3 (STMT)
+   z |= a;
+//                                                                    3 (STMT)
+   a&b;
+//                                                                    3 (STMT)
+   a^b;
+//                                                                    4 (TEST)
+
+   if (a!=b)
+//                                                                    2 (STMT)
+      a = b;
+//                                                                   12 (TEST)
+   if ((z==a||z==b)&&z>1)
+//                                                                    4 (STMT)
+
+      z = z%c;
+//                                                                    3 (STMT)
+
+   a <<= b;
+//                                                                    3 (STMT)
+   b >>= a;
+//                                                                    3 (TEST)
+
+   if (!a)
+//                                                                    2 (STMT)
+      a = z;
+//                                                                    3 (STMT)
+
+   c ^= b;
+//                                                                    3 (STMT)
+   b &= a;
+//                                                                    3 (STMT)
+   a %= z;
+//                                                                    7 (STMT)
+   ~a?(z = a):(z = b);
+}
