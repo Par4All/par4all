@@ -115,7 +115,7 @@ class p4a_processor_input(object):
     output_prefix=""
     # To store some arbitrary Python code to be executed inside p4a_process:
     execute_some_python_code_in_process = None
-    apply_before_parallelization=[]
+    apply_phases={}
 
 
 def add_module_options(parser):
@@ -162,24 +162,29 @@ def process(input):
             recover_includes = input.recover_includes,
             native_recover_includes = input.native_recover_includes,
             properties = input.properties,
-            apply_phases_before_parallelization = input.apply_before_parallelization
+            apply_phases = input.apply_phases
         )
 
         output.database_dir = processor.get_database_directory()
 
         # First apply some generic parallelization:
         processor.parallelize(fine = input.fine,
-                              apply_phases_before = input.apply_before_parallelization )
+                              apply_phases_before = input.apply_phases['abp'],
+                              apply_phases_after = input.apply_phases['aap'])
 
         if input.accel:
             # Generate code for a GPU-like accelerator. Note that we can
             # have an OpenMP implementation of it if OpenMP option is set
             # too:
-            processor.gpuify()
+            processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'], 
+					apply_phases_kernel_launcher = input.apply_phases['aklg'], 
+					apply_phases_wrapper = input.apply_phases['awg'], 
+					apply_phases_after = input.apply_phases['aag'])
 
         if input.openmp and not input.accel:
             # Parallelize the code in an OpenMP way:
-            processor.ompify()
+            processor.ompify(apply_phases_before = input.apply_phases['abo'],
+					apply_phases_after = input.apply_phases['aao'])
 
         # Write the output files.
         output.files = processor.save(input.output_dir,
@@ -279,7 +284,7 @@ class p4a_processor(object):
                  openmp = False, com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
                  c99 = False,
-                 properties = {}, apply_phases_before_parallelization=[], activates = []):
+                 properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
         self.native_recover_includes = native_recover_includes
@@ -289,7 +294,7 @@ class p4a_processor(object):
         self.com_optimization = com_optimization
         self.fftw3 = fftw3
         self.c99 = c99
-        self.apply_phases_before_parallelization = apply_phases_before_parallelization
+        self.apply_phases = apply_phases
 
         if workspace:
             # There is one provided: use it!
@@ -444,7 +449,7 @@ class p4a_processor(object):
 
 
     def parallelize(self, fine = False, filter_select = None,
-                    filter_exclude = None, apply_phases_before = []):
+                    filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
@@ -462,6 +467,10 @@ class p4a_processor(object):
         else:
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization(concurrent=True)
+
+        for ph in apply_phases_after:
+            # Apply requested phases after parallelization:
+			getattr(all_modules, ph)()
 
     def post_process_fortran_wrapper (self, file_name, subroutine_name):
         """ All the dirty thing about C and Fortran interoperability is hidden
@@ -643,7 +652,12 @@ class p4a_processor(object):
         m = fortran_wrapper_file_name_re.match (os.path.basename (file_name))
         return (m != None)
 
-    def gpuify(self, filter_select = None, filter_exclude = None):
+    def gpuify(self, filter_select = None,
+                filter_exclude = None,
+                apply_phases_kernel_after = [],
+                apply_phases_kernel_launcher = [],
+                apply_phases_wrapper = [],              
+                apply_phases_after = []):
         """Apply transformations to the parallel loop nested found in the
         workspace to generate GPU-oriented code
         """
@@ -686,6 +700,10 @@ class p4a_processor(object):
                 LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
                 concurrent=True)
 
+        for ph in apply_phases_kernel_launcher:
+            #Apply requested phases before parallelization to kernel launchers:
+			getattr(kernel_launchers, ph)(concurrent=True)
+
         # Since the privatization of a module does not change
         # privatization of other modules, use concurrent=True (capply) to
         # apply them without requiring pipsmake to carefully rebuild
@@ -716,6 +734,10 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
+        for ph in apply_phases_kernel_after:
+            # Apply requested phases before parallelization to generated kernels:
+			getattr(kernels, ph)(concurrent=True)		
+
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
@@ -725,7 +747,7 @@ class p4a_processor(object):
                                                )
         else :
             # Identify kernels first
-            kernels.flag_kernel()
+            kernels.flag_kernel()	
             #kernel for fftw3 runtime
             fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
             fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
@@ -737,6 +759,10 @@ class p4a_processor(object):
         wrapper_prefix = self.get_wrapper_prefix()
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
+
+        for ph in apply_phases_wrapper:
+            #Apply requested phases before parallelization to wrappers:
+			getattr(wrappers, ph)(concurrent=True)
 
         # Select fortran wrappers by using the fact that all the generated
         # fortran wrappers
@@ -808,6 +834,12 @@ class p4a_processor(object):
             wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
             wrappers.cast_at_call_sites()
 
+        for ph in apply_phases_after:
+            # Apply requested phases to kernels, wrappers and launcher:
+			getattr(kernels, ph)(concurrent=True)		
+			getattr(wrappers, ph)(concurrent=True)		
+			getattr(kernel_launchers, ph)(concurrent=True)		
+
         #self.workspace.all_functions.display()
 
         # To be able to inject Par4All accelerator run time initialization
@@ -829,14 +861,23 @@ class p4a_processor(object):
             ''')
 
 
-    def ompify(self, filter_select = None, filter_exclude = None):
+    def ompify(self, 
+            filter_select = None, 
+            filter_exclude = None, 
+            apply_phases_before = [], 
+            apply_phases_after = []):
         """Add OpenMP #pragma from loop-parallel flag internal
         representation to generate... OpenMP code!"""
 
         modules = self.filter_modules(filter_select, filter_exclude);
+        for ph in apply_phases_before:
+            # Apply requested phases before ompify to modules:
+			getattr(modules, ph)(concurrent=True)
         modules.ompify_code(concurrent=True)
         modules.omp_merge_pragma(concurrent=True)
-
+        for ph in apply_phases_after:
+            # Apply requested phases after ompify to modules:
+			getattr(modules, ph)(concurrent=True)
 
     def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''

@@ -132,7 +132,6 @@ void P4A_copy_to_accel_1d_server(size_t element_size,
 
 }
 
-
 void P4A_copy_from_accel_1d(size_t element_size,
 			    size_t d1_size,
 			    size_t d1_block_size,
@@ -166,5 +165,111 @@ void P4A_copy_to_accel_1d(size_t element_size,
      //P4A_sesam_debug("waiting\n");
     P4A_sesam_wait_all_pages(accel_address_id, element_size* d1_block_size, O_READ);
   }
-   //P4A_sesam_debug("P4A_copy_from_accel_1d, end\n");
+   //P4A_sesam_debug("P4A_copy_to_accel_1d, end\n");
+}
+
+
+/** Stub for copying a 2D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_2d_server(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address,
+			  unsigned int accel_address_id,
+                          int do_it) {
+   //P4A_sesam_debug("P4A_copy_to_accel_2d_server, data_id = %d, do_it = %d\n", accel_address_id, do_it);
+  if (do_it)
+    {
+      size_t i, j;
+      char * cdest = (char *)accel_address;
+      const char * csrc = d2_offset*element_size + (char *)host_address;
+      for(i = 0; i < d1_block_size; i++)
+	for(j = 0; j < d2_block_size*element_size; j++)
+	  cdest[i*element_size*d2_block_size + j] =
+	    csrc[(i + d1_offset)*element_size*d2_size + j];
+      //P4A_sesam_debug("sending\n");
+      P4A_sesam_send_all_pages(accel_address_id,
+			       d1_block_size*d2_block_size*element_size,
+			       O_READ);
+    }
+  //P4A_sesam_debug("P4A_copy_to_accel_2d_server, end\n");
+}
+
+
+/** Stub for copying memory from the hardware accelerator to a 2D array in
+    the host.
+*/
+void P4A_copy_from_accel_2d_server(size_t element_size,
+				   size_t d1_size, size_t d2_size,
+				   size_t d1_block_size, size_t d2_block_size,
+				   size_t d1_offset, size_t d2_offset,
+				   void *host_address,
+				   const void *accel_address,
+				   unsigned int accel_address_id,
+				   int do_it) {
+  //P4A_sesam_debug("P4A_copy_from_accel_2d_server, data_id = %d, do_it = %d\n", accel_address_id, do_it);
+  if (do_it)
+    {
+      //P4A_sesam_debug("waiting for read access\n");
+      P4A_sesam_wait_all_pages(accel_address_id,
+			       d1_block_size*d2_block_size*element_size,
+			       O_READ);
+
+      size_t i, j;
+      char * cdest = d2_offset*element_size + (char*)host_address;
+      char * csrc = (char*)accel_address;
+      for(i = 0; i < d1_block_size; i++)
+	for(j = 0; j < d2_block_size*element_size; j++)
+	  cdest[(i + d1_offset)*element_size*d2_size + j] =
+	    csrc[i*element_size*d2_block_size + j];
+    }
+  //P4A_sesam_debug("P4A_copy_from_accel_2d_server, end\n");
+ }
+
+/** Stub for copying a 2D memory zone from the host to a compact memory
+    zone in the hardware accelerator.
+*/
+void P4A_copy_to_accel_2d(size_t element_size,
+			  size_t d1_size, size_t d2_size,
+			  size_t d1_block_size, size_t d2_block_size,
+			  size_t d1_offset,   size_t d2_offset,
+			  const void *host_address,
+			  void *accel_address,
+			  unsigned int accel_address_id,
+                          int do_it) {
+   //P4A_sesam_debug("P4A_copy_to_accel_2d, data_id = %d, do_it = %d\n", accel_address_id, do_it);
+  if (do_it)
+  {
+     //P4A_sesam_debug("waiting\n");
+    P4A_sesam_wait_all_pages(accel_address_id,
+			     element_size*d1_block_size*d2_block_size,
+			     O_READ);
+  }
+   //P4A_sesam_debug("P4A_copy_to_accel_2d, end\n");
+}
+
+
+/** Stub for copying memory from the hardware accelerator to a 2D array in
+    the host.
+*/
+void P4A_copy_from_accel_2d(size_t element_size,
+			    size_t d1_size, size_t d2_size,
+			    size_t d1_block_size, size_t d2_block_size,
+			    size_t d1_offset, size_t d2_offset,
+			    void *host_address,
+			    const void *accel_address,
+			    unsigned int accel_address_id,
+			    int do_it) {
+   //P4A_sesam_debug("P4A_copy_from_accel_2d, data_id = %d, do_it = %d\n", accel_address_id, do_it);
+  if (do_it)
+    {
+     //P4A_sesam_debug("sending\n");
+      P4A_sesam_send_all_pages(accel_address_id,
+			       element_size*d1_block_size*d2_block_size,
+			       O_READ);
+    }
+   //P4A_sesam_debug("P4A_copy_from_accel_2d, end\n");
 }
