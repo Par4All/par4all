@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3.1
 
 # -*- coding: utf-8 -*-
 
@@ -431,10 +431,7 @@ def init_headers():
     for n in header_file_names:
         # Create a .c file that includes this header file:
         f = open(tmp_header_file_name, mode = 'w')
-        #with python 2.x
-        print >>f, '#include <' + n + '>'
-        #this is python 3.1
-        #print ('#include <' + n + '>', file = f)
+        print('#include <' + n + '>', file = f)
         #print('int p4a_#include <' + n + '>', file = f)
         f.close()
 
@@ -452,17 +449,11 @@ def init_headers():
                 # Just in case it already exists...
                 pass
             # And then the file:
-            
             proxy = open(pn, mode = 'w')
-            #python 2.X
-            print >>proxy, '/* This file includes ' + n + ' for PIPS */'
-            print >>proxy, '#include "' + os.path.join('/usr/include', n ) + '"'
-            
-            #python3.1
-            #print('/* This file includes ' + n + ' for PIPS */',
-            #      file = proxy)
-            #print('#include "' + os.path.join('/usr/include', n ) + '"',
-            #      file = proxy)
+            print('/* This file includes ' + n + ' for PIPS */',
+                  file = proxy)
+            print('#include "' + os.path.join('/usr/include', n ) + '"',
+                  file = proxy)
             proxy.close()
 
         #w = workspace(tmp_header_file_name);
@@ -478,11 +469,8 @@ def init_headers():
                         os.path.join('headers', n))
         except IOError:
             # Notice the .h that can not get through PIPS:
-            #python2.x
-            print >>errors, 'The parsing by PIPS seems to have failed on'
-            #python3.1
-            #print('The parsing by PIPS seems to have failed on', n,
-            #     file = errors)
+            print('The parsing by PIPS seems to have failed on', n,
+                  file = errors)
 
 
 def sort_key(declaration):
@@ -557,17 +545,14 @@ def recover_header(file_name, output_file_name):
         # in content:
         (line, content) = re.split(r'\n', content, 1)
         # Output the line to the destination file:
-        print >>f, line 
+        print(line, file = f)
 
     # Then write the recoverd includes:
     for h in found_headers:
-		#python2.X
-		print >>f, '#include <', h, '>',
-		#print3.1
-        #print('#include <', h, '>', sep = '', file = f)
+        print('#include <', h, '>', sep = '', file = f)
 
     # Finished with the remaining of the file:
-    print >>f, content
+    print(content, file = f)
     f.close()
 
 
@@ -585,10 +570,7 @@ def postpreprocess(output_string):
             print(tok)
         if tok.type == 'include':
             # Do not forget any pending other characters:
-            #python2.x
-            print l.lexer.content,
-            #pyhton 3.1
-            #print(l.lexer.content, end = '')
+            print(l.lexer.content, end = '')
             l.lexer.content = ""
             # Add a comment marking the begin of standard inclusion. Strip
             # the trailing \n of the include sentence.
@@ -596,18 +578,12 @@ def postpreprocess(output_string):
 
         # Display with any pending other characters before:
         l.lexer.content += tok.value
-        #python2.x
-        print l.lexer.content,
-        #python3.1
-        #print(l.lexer.content, end = '')
+        print(l.lexer.content, end = '')
 
         l.lexer.content = ""
 
     # Do not forget other pending characters if any:
-    #python2.x
-    print l.lexer.content,
-    #python3.1
-    #print(l.lexer.content, end = '')
+    print(l.lexer.content, end = '')
     # For later use of the lexer, if any, throw away useless characters:
     l.lexer.content = ""
 
@@ -632,10 +608,7 @@ def postpreprocess_simple(output_string):
         """Print l.lexer.content and content
         and reset l.lexer.content
        """
-        #python2.x
-        print l.lexer.content + content,
-        #python3.1
-        #print(l.lexer.content + content, end = '')
+        print(l.lexer.content + content, end = '')
         l.lexer.content = ""
 
 
@@ -657,12 +630,8 @@ def postpreprocess_simple(output_string):
                 # Preprocessor Output'
 
                 # To normalize standard include names:
-                #python2.6
                 file_name = re.sub(r'^"/usr/include/(.*)"$',
-                                   r'<\1>', file_name, 0)
-                #python2.7
-                #file_name = re.sub(r'^"/usr/include/(.*)"$',
-                #                   r'<\1>', file_name, 0, 0)
+                                   r'<\1>', file_name, 0, 0)
 
                 if m.group(3) == "1":
                     include_stack.append(file_name)
@@ -767,12 +736,8 @@ def recover_header_simple(file_name, output_file_name):
     if simple_method:
         #content = re.sub(r'/\* P4A include "/usr/include/([^"]+)" starts here \*/.+?/\* P4A include "/usr/include/\1" stops here \*/',
         #        r'#include <\1>', content, 0, re.DOTALL)
-        #python2.6
-        content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/(.|\n)+?/\* P4A include \1 stops here \*/',
-                r'#include \1', content, 0)
-        #python2.7
-        #content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/.+?/\* P4A include \1 stops here \*/',
-        #       r'#include \1', content, 0, re.DOTALL)
+        content = re.sub(r'/\* P4A include ([<"][^">]+[">]) starts here \*/.+?/\* P4A include \1 stops here \*/',
+                r'#include \1', content, 0, re.DOTALL)
 
         so += content
         if verbose:
@@ -826,25 +791,16 @@ def recover_header_simple(file_name, output_file_name):
             else:
                 # Normal content & output:
                 l.lexer.content += tok.value
-                #python2.x
-                print l.lexer.content,
-                #python3.1
-                #print(l.lexer.content, end = '')
+                print(l.lexer.content, end = '')
                 # Reset the content buffer:
                 l.lexer.content = ""
         # Flush the output
-        #python2.x
-        print l.lexer.content,
-        #python3.1
-        #print(l.lexer.content, end = '')
+        print(l.lexer.content, end = '')
         # For later use of the lexer, if any, throw away useless characters:
         l.lexer.content = ""
 
     # Output the result to the file:
-    #python2.x
-    print >>output, sanitize_recover_output(so),
-    #python3.1
-    #print(sanitize_recover_output(so), end = '', file = output)
+    print(sanitize_recover_output(so), end = '', file = output)
 
 
 def postpreprocess(output_string):
@@ -900,10 +856,7 @@ def postpreprocess(output_string):
             l.lexer.content = ""
 
     # Flush the output
-    #python2.x
-    print l.lexer.content,
-    #python3.1
-    #print(l.lexer.content, end = '')
+    print(l.lexer.content, end = '')
     # For later use of the lexer, if any, throw away useless characters:
     l.lexer.content = ""
 
@@ -925,25 +878,15 @@ def preprocess(args):
     # preprocess, if any:
     cpp_args += " ".join(args)
     # Mark all the arguments as having been consumed:
-    #python2.x
-    p = subprocess.Popen(["cpp" + cpp_args], shell=True, stdout=subprocess.PIPE)
-    output_string = p.communicate()[0]
-    #python3.1
-    #output_string = subprocess.check_output("cpp" + cpp_args, shell=True)
+    output_string = subprocess.check_output("cpp" + cpp_args, shell=True)
     if verbose:
         print('The output before', output_string)
     # Well, add a postprocess phase in the... preprocessor phase :-)
     # Transform the byte array into string before
     #postpreprocess(output_string.decode())
 
-    #python3.1
-    # In Python 3 everything is internally in UTF-8, so decode the string
-    # first:
-    # encoding = locale.getdefaultlocale()[1]
-    # postpreprocess_simple(output_string.decode(encoding))
-    #python2.x
-    # In Python 2.x encoding concept is still fuzzy...
-    postpreprocess_simple(output_string)
+    encoding = locale.getdefaultlocale()[1]
+    postpreprocess_simple(output_string.decode(encoding))
 
 
 def record_preprocess_options(option, opt_str, value, parser):

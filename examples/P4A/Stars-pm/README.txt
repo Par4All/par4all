@@ -2,7 +2,7 @@ Stars-pm is a particle-mesh N-body cosmological simulation, written by
 Dominique Aubert and Mehdi Amini.
 
 
-Here we present 3 different executions of the same C sequential code:
+Here we present 5 different executions of the same C sequential code:
 
 - the native one: sequential execution using the FFTW3 library for
   accelerated FFT on multiprocessors;
@@ -12,34 +12,44 @@ Here we present 3 different executions of the same C sequential code:
   already parallelized multithread FFTW3 library;
 
 - automatic parallelization with p4a --cuda for parallel execution on
-  nVidia GPU + multithread FFTW3 library that is already parallelized.
+  nVidia GPU + automatic wrapping of FFWT3 library to cuFFT on GPU
 
+- automatic parallelization with p4a --cuda --com-optimization which is
+the same as the previous one but with the optimization of communication
+between host and GPU.
 
-There is a simple Makefile used to launch the different phases.
+- the manually converted in Cuda code. This one use atomic operations and
+require a GPU with compute capability > 1.1
+
 
 You need to have the fftw3f library installed (the libfftw3-dev package on
 Debian/Ubuntu) to be able to link the code, and optionally OpenGL and/or
-GTK for visualization.
+GTK for visualization. You also need a recent Cuda SDK for cuda build.
 
 For the sequential execution
 
-  make seq : build the sequential program from the C sources
-
-  make run-seq : build first if needed, then run the sequential program
+  make stars-pm_seq : build the sequential program from the C sources
 
 For the OpenMP parallel execution on multicores:
 
-  (same as previously with -openmp instead of -seq)
+  (same as previously with _openmp instead of _seq)
 
 For the CUDA parallel execution on nVidia GPU:
 
-  (same as previously with -cuda instead of -seq or -openmp)
+  (same as previously with _autocuda instead of _seq or _openmp)
+
+For the CUDA parallel execution with communication optimization :
+
+  (same as previously with _autocuda_comm_optimization as suffix instead of autocuda)
+
+For the manually written CUDA version parallel execution on nVidia GPU:
+
+  (same as previously with _cuda instead of _seq or _openmp or ...)
 
 
 To get an output you might add opengl=1 and/or gtk=1 on cmd line, for instance
-"make run-seq opengl=1".
+"make stars-pm_seq opengl=1".
 You might also run "make clean" first to force rebuilding.
-
 
 You can set the P4A_OPTIONS variable to pass some options to p4a.
 
@@ -48,10 +58,10 @@ You can set the P4A_OPTIONS variable to pass some options to p4a.
   or locally with:
   make P4A_OPTIONS='--nvcc-flags="-DP4A_DEBUG"' run_cuda
 
+You can then execute the produced binary using files in "data/". There's bench
+for 3 size of datas (32,64, and 128). Default size if 128, the others can be obtained
+ by adding SIZE=32 or SIZE=64 to the makefile command line.
 
-To run this example on GPU that does not support double precision, you
-should compile it with make USE_FLOAT=1 or the results are just garbage
-(because if nvcc has a single precision fall-back, the communication
-correctly computed by Par4All are still in... double. So trouble begins...).
-Of course the results are slightly different in single precision compared
-to double precision anyway.
+The run is now done simply with ./stars-pm_{suffix}{_size}[_options] data/exp{size}.a.bin
+
+Have a look at *.sh file in current directory for example.

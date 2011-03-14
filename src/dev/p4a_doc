@@ -21,7 +21,8 @@ function usage()
   then
     echo -e \
       "$script [options] ...\n" \
-      "Build and install the p4a documentation\n" \
+      "Build and install the Par4All documentation.\n" \
+      "\$P4A_ROOT has to point to the Par4All development directory.\n" \
 	"options (displayed in a logical sequential order to apply):\n" \
 	"  -h|--help: display the usual help message\n" \
 	"  -v|--verbose: be verbose (repeat for more, over 2 is debug)\n" \

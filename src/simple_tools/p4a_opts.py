@@ -104,7 +104,7 @@ def process_common_options(options, args):
     # try to determine the git revision or look at the
     # p4a_version file somewhere:
     if options.script_version:
-        (revision, versiond) = p4a_version.make_full_revision(os.path.abspath(sys.argv[0]))
+        (revision, versiond) = p4a_version.make_full_revision(os.environ.get("P4A_ROOT"))
         sys.stdout.write(revision + "\n")
         return False
 

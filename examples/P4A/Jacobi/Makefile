@@ -1,6 +1,6 @@
-# A GNU makefile to run a demo of Par4All on Hyantes application excerpt
+# A GNU makefile to run a demo of Par4All on Jacobi application excerpt
 
-TARGET= hyantes-static-99
+TARGET= jacobi
 
 ifeq "$(USE_FLOAT)" "1"
 # Use single precision for the OpenMP and GPU version:
@@ -33,7 +33,7 @@ SOURCES= $(TARGET:=.c)
 #	echo Target $@ not implemented...
 
 # Keep intermediate files for the demo for further inspection:
-.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel)
+.PRECIOUS: $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
 
 
 #.INTERMEDIATE: $(TARGET:=_seq)
@@ -46,29 +46,26 @@ default:
 	more README.txt
 
 demo : display_seq display_openmp display_cuda display_accel ;
+demo : display_seq display_openmp display_cuda display_opt display_accel display_accel_opt ;
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
-	rm -rf $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu)
-	rm -rf $(TARGET:=.p4a-accel.cu)
-	rm -rf  *~ *.database *.build p4a_new_files
-	rm -rf  output_seq output_openmp output_cuda output_accel
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=_accel_opt) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq.pgm output_openmp.pgm output_cuda.pgm output_accel.pgm
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
-	time ./$< Rhone-alpesXYLongLat_pop.txt 1.1 32 4 35 0.01 40 > output$*
+	time ./$< Logo_HPC-Project-GTC.pgm
+	mv output.pgm output$*.pgm
 	# It was total time (starting time, I/O and computations)
 	# Compare the result with the reference. Note that there may be
 	# some slight differences because of non associativity of floating
 	# point computations or different implementations of floating
 	# point computations on GPUs:
-	-diff -q output$* output_ref
+	-diff -q output$*.pgm output-ref.pgm
 
 display% : run%
 	# Display graphically the results:
-	#gnuplot -persist -e "set pm3d map; set palette gray; set size ratio 1; splot 'output$*'"
-	gnuplot -persist -e "set pm3d map; set size ratio 1; splot 'output$*'"
+	eog output$*.pgm
 
 # To be able to display the reference too:
 run_ref:;
@@ -88,6 +85,14 @@ run_ref:;
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) --cuda -o $@ $< $(LDLIBS)
 
+%_cuda_opt : %.c
+	# Parallelize and build a CUDA version with communication optimizations:
+	p4a $(P4A_OPTIONS) --cuda --com-optimization -o $@ $< $(LDLIBS)
+
 %_accel : %.c
 	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
 	p4a $(P4A_OPTIONS) --accel -o $@ $< $(LDLIBS)
+
+%_accel_opt : %.c
+	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator with communication optimizations:
+	p4a $(P4A_OPTIONS) --accel --com-optimization -o $@ $< $(LDLIBS)
