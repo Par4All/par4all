@@ -30,17 +30,18 @@ int main()
    int i;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    *p = 1;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    *q = &i;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
 
    return 0;
    // END BLOCK

@@ -6,11 +6,11 @@ int main()
 {
 //  points to = {}
    FILE *pFile;
-//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int n;
-//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    char name[100];
-//  {(pFile,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    pFile = fopen("myfile.txt", "w");
 //  {(pFile,*ANY_MODULE*:*ANYWHERE*,-Exact-)}

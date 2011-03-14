@@ -50,22 +50,26 @@ int main()
 {
 //  points to = {}
    FILE *s;                                                             /*0024*/
-//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    char *fmt;                                                           /*0025*/
-//  {(fmt,*ANY_MODULE*:*NOWHERE*,-Exact-);(s,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(fmt,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    char *ch;                                                            /*0026*/
-//  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int tab[5];                                                          /*0027*/
-//  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int r;                                                               /*0028*/
-//  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    r = varargs03(s, fmt, ch, tab);                                      /*0029*/
-//  {(ch,*ANY_MODULE*:*NOWHERE*,-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    return r;                                                            /*0030*/
 }
 //  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}

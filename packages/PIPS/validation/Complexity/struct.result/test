@@ -1,0 +1,52 @@
+
+Preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   struct Person {
+      int Age;
+      char Gender;
+   };
+
+
+//  P() {}
+
+   struct Person Pierre;
+
+//  P() {}
+
+
+   Pierre.Age = 18;
+
+//  P() {}
+
+
+   Pierre.Gender = 'M';
+}
+
+Complexities
+
+//                                                                    6 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   struct Person {
+      int Age;
+      char Gender;
+   };
+
+//                                                                    0 (STMT)
+   struct Person Pierre;
+//                                                                    3 (STMT)
+
+   Pierre.Age = 18;
+//                                                                    3 (STMT)
+
+   Pierre.Gender = 'M';
+}

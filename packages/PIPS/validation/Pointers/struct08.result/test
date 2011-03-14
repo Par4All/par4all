@@ -177,21 +177,18 @@ void init2(mys *n)
    int i;                                                               /*0029*/
 //  {(n,_n_2,-Exact-)}
    mys m;                                                               /*0030*/
-//  {(n,_n_2,-Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
 
    m = *n;                                                              /*0032*/
-//  {(n,_n_2,-Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
    m.num = 5;                                                           /*0033*/
-//  {(n,_n_2,-Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
    m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,
-//   -Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
    (m.tab1)[0] = 10;                                                    /*0035*/
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,
-//   -Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
    (m.tab2)[0] = 20;                                                    /*0036*/
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,
-//   -Exact-)}
+//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
    for(i = 0; i <= 4; i += 1) {
 //  points to = {}
       (m.tab1)[i] = 1;                                                  /*0039*/

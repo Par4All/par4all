@@ -36,21 +36,21 @@ int main()
    int i;
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **q;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    p = 0;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    **q = 0;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    *p = 1;
-//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    *q = &i;
 //  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
-//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    return 0;
    // END BLOCK

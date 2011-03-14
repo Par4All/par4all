@@ -130,52 +130,52 @@ int main()
    int tab3[10][10];                                                    /*0031*/
 //  points to = {}
    int **tab4;                                                          /*0032*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int tab5[15];                                                        /*0033*/
 
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;                                                               /*0035*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    foo(tab);                                                            /*0037*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("%s\n", "tab");                                               /*0038*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(tab);                                                        /*0039*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    
    
    foo(tab2[4]);                                                        /*0042*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    foo(tab3[5]);                                                        /*0043*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    foo(tab4[6]);                                                        /*0044*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    foo(&tab[0]);                                                        /*0045*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    foo(&tab5[3]);                                                       /*0046*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    printf("%s:\n", "tab2[4]");                                          /*0048*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(tab2[4]);                                                    /*0049*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("%s\n", "tab3[5]");                                           /*0050*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(tab3[5]);                                                    /*0051*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("%s\n", "tab4[6]");                                           /*0052*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(tab4[6]);                                                    /*0053*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("%s\n", "tab");                                               /*0054*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(&tab[0]);                                                    /*0055*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("%s\n", "tab5");                                              /*0056*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    myprint(&tab5[3]);                                                   /*0057*/
-//  {(tab4,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(tab4,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 1;                                                            /*0058*/
 }
 

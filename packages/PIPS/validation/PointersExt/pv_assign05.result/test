@@ -3,34 +3,56 @@ int main()
 {
 //  points to = {}
    mystruct s1, s2;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    mystruct tab_s[2];
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i = 0, j = 1;
-//  points to = {}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s2.a = s1.a;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(s2[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    (s2.b)[0] = &i;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s2[b][0],i,-Exact-)}
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[b][0],i,
+//   -Exact-);(tab_s[*][a],*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(tab_s[*][c],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    (s1.b)[0] = &i;
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-)}
+//  {(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    printf("address = %p", (s2.b)[0]);
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-)}
+//  {(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    (s2.b)[0] = (s1.b)[0];
-//  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    tab_s[0].a = s1.a;
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],i,-Exact-);(tab_s[*][a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    (tab_s[0].b)[0] = (s1.b)[0];
 //  {(*ANY_MODULE*:*NOWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(tab_s[0][b][0],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//   -Exact-);(s1[b][0],i,-Exact-);(s2[b][0],i,
+//   -Exact-);(tab_s[0][b][0],i,-Exact-)}
    return 0;
 }

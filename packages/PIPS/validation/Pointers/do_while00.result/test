@@ -36,19 +36,19 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *a, *b, c, d, i;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    c = 0;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    d = 1;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = 2;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    b = &c;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,c,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,c,-Exact-)}
    do {
 //  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       // BEGIN BLOCK

@@ -29,34 +29,37 @@ int main()
 {
 //  points to = {}
    int **x, *x1, x2, *y, y1;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    x2 = 0;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    y1 = 1;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(y,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
    x1 = &x2;
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,x2,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,x2,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
    if (true) {
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,x2,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,x2,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
       x = &x1;
-//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,*ANY_MODULE*:*NOWHERE*,
+//  {(x,x1,-Exact-);(x1,x2,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,
 //   -Exact-)}
       y = &y1;
    }
    else
-//  {(x,*ANY_MODULE*:*NOWHERE*,-Exact-);(x1,x2,-Exact-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x1,x2,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
       *x = &y;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,y,-MAY-);(x,*ANY_MODULE*:*NOWHERE*,
-//   -MAY-);(x,x1,-MAY-);(x1,x2,-Exact-);(y,y1,-MAY-);(y,
-//   *ANY_MODULE*:*NOWHERE*,-MAY-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,y,-MAY-);(x,x1,-MAY-);(x,
+//   *ANY_MODULE*:*NOWHERE*_b0,-MAY-);(x1,x2,-Exact-);(y,y1,-MAY-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-MAY-)}
 
    return 0;
 }

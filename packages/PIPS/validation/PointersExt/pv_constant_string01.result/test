@@ -3,7 +3,7 @@ int main()
 {
 //  points to = {}
    char *s;
-//  {(s,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s = "hello\n";
 //  {(s,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
    return 0;

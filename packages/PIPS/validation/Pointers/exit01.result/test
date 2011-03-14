@@ -21,7 +21,7 @@ void exit01()
    int i;
 //  points to = {}
    int *j;
-//  {(j,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(j,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    j = &i;
 //  {(j,i,-Exact-)}

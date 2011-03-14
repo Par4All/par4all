@@ -8,7 +8,7 @@ int main()
    int t[100][10][3];
 //  points to = {}
    int *pu;
-//  {(pu,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(pu,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    pu = t[1][2];
 //  {(pu,t[1][2][0],-Exact-)}

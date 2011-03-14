@@ -44,15 +44,16 @@ int main()
    // BEGIN BLOCK
 //  points to = {}
    int *pdeb, *pfin, *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(pfin,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pfin,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    pdeb = &t[0];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,t[0],-Exact-);(pfin,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    /*   repère le premier élément de t   */
    pfin = &t[10-1];
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
 //   t[10-1],-Exact-)}
    /*   repère le dernier élément de t   */
    

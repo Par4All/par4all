@@ -55,21 +55,24 @@ int main()
 {
 //  points to = {}
    int *a, *b, *c;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int i;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    i = 0;
-//  {(a,*ANY_MODULE*:*NOWHERE*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    /* Allocation dynamiques des tableaux */
    a = (int *) malloc(20*sizeof(int));
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    b = (int *) malloc(20*sizeof(int));
 //  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
-//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   -Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    c = (int *) malloc(20*sizeof(int));
 //  {(a,*ANY_MODULE*:*HEAP*,-Exact-);(b,*ANY_MODULE*:*HEAP*,
 //   -Exact-);(c,*ANY_MODULE*:*HEAP*,-Exact-)}

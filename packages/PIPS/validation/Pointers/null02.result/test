@@ -91,7 +91,7 @@ int main()
 {
 //  points to = {}
    int *p;
-//  {(p,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    p = 0;
 //  {(p,*NULL_POINTER*,-Exact-)}
 

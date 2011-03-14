@@ -1,0 +1,47 @@
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i = 0, j = 0;
+//  points to = {}
+   int **pp = (void *) 0;
+//  {(pp,*NULL_POINTER*,-Exact-)}
+
+   srand(time((void *) 0));
+//  {(pp,*NULL_POINTER*,-Exact-)}
+   if (alea()) {
+//  {(pp,*NULL_POINTER*,-Exact-)}
+      int *pi = &i;
+//  {(pi,i,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+      pp = &pi;
+   }
+   else {
+//  {(pp,*NULL_POINTER*,-Exact-)}
+      int *pj = &j;
+//  {(pj,j,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+      pp = &pj;
+   }
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+
+   printf("pp=%p\n", pp);
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   return 0;
+}
+//  {}
+static int alea(void)
+{
+//  points to = {}
+   int r = rand();
+//  points to = {}
+   printf("%d\n", r);
+//  points to = {}
+   return rand()%2==1;
+}
+
+POINTS TO
+

@@ -136,21 +136,27 @@ void dereferencing02()
    double **q = &p;
 //  {(p,x,-Exact-);(q,p,-Exact-)}
    double **w;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    int i = 1;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    
    
    **q = 2.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    **(q+(i = 0)) = 3.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    **(w+(i = 2)) = 4.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    x = **q;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*,-Exact-)}
+//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
    q++;
 //  {(p,x,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(w,
-//   *ANY_MODULE*:*NOWHERE*,-Exact-)}
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    *q++;
 }
