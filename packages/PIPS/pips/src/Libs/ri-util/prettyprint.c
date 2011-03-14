@@ -1851,6 +1851,21 @@ words_goto_label(string tlabel)
 {
     list pc = NIL;
   if (strcmp(tlabel, RETURN_LABEL_NAME) == 0) {
+    /*<<<<<<< .working
+    switch (get_prettyprint_language_tag()) {
+    case is_language_fortran:
+    case is_language_fortran95:
+      pc = CHAIN_SWORD(pc, RETURN_FUNCTION_NAME);
+      break;
+    case is_language_c:
+      pc = CHAIN_SWORD(pc, C_RETURN_FUNCTION_NAME);
+      pc = CHAIN_SWORD(pc, ";");
+      break;
+    default:
+      pips_internal_error("Language unknown !");
+      break;
+    }
+    =======*/
     switch (get_prettyprint_language_tag()) {
     case is_language_fortran:
     case is_language_fortran95:
@@ -1887,6 +1902,7 @@ words_goto_label(string tlabel)
       pips_internal_error("Language unknown !");
       break;
     }
+    //>>>>>>> .merge-right.r18859
   } else {
     switch (get_prettyprint_language_tag()) {
       case is_language_fortran:
@@ -4306,6 +4322,9 @@ text text_statement_enclosed(entity module,
 	 || !last_statement_p(stmt)
 	 || (!void_function_p(module) && c_module_p(module)))
 	{
+	  /*<<<<<<< .working
+	  sentence s = MAKE_ONE_WORD_SENTENCE(nmargin, prettyprint_language_is_c_p()?C_RETURN_FUNCTION_NAME";":RETURN_FUNCTION_NAME);
+	  =======*/
 	  sentence s = sentence_undefined;
 	  if(entity_undefined_p(module)
 	     || void_function_p(module)
@@ -4326,6 +4345,7 @@ text text_statement_enclosed(entity module,
 	    unformatted u = make_unformatted((char *) NULL, 0, nmargin, pc);
 	    s = make_sentence_unformatted(u);
 	  }
+	  //>>>>>>> .merge-right.r18859
 	  temp = make_text(CONS(SENTENCE, s, NIL));
 	}
       else {

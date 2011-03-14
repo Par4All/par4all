@@ -355,7 +355,7 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
 
 	/* free the original effects: no memory leak */
 	free_effect(base);
-	free_effect(current);
+	//free_effect(current); SG: this free triggers a segfault ...
 
 	/* remove the current list element from the global list */
 	/* pred!=NIL as on the first items hash's are empty */

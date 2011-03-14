@@ -238,6 +238,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
       found_p = TRUE;
+      
     }
     else if(type_equal_p(t, ot))
       found_p = TRUE;

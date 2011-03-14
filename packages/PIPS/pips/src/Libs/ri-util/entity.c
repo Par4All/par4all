@@ -43,6 +43,9 @@
 
 #include "ri-util.h"
 
+
+static set io_functions_set = set_undefined;
+
 void print_entities(list l)
 {
   FOREACH(ENTITY, e, l) {
@@ -1318,15 +1321,64 @@ expression entity_ith_bounds(entity e, int i)
   return(make_expression(s, normalized_undefined));
 }
 
+
+/*true is a statement s is an io intrinsic*/
+/*bool statement_contains_io_intrinsic_call_p(statement s)
+{
+ IoElementDescriptor *pid = IoElementDescriptorTable;
+      bool found = FALSE;
+
+      while ((pid->name != NULL) && (!found)) {
+	if (strcmp(pid->name, s) == 0) 
+	  {
+	    found = TRUE;
+	    return TRUE;
+	  }
+      }
+      return FALSE;
+}*/
+
 /* true if e is an io instrinsic
  */
 bool io_intrinsic_p(entity e)
 {
-  return top_level_entity_p(e) &&
-    (ENTITY_WRITE_P(e) || ENTITY_REWIND_P(e) || ENTITY_OPEN_P(e) ||
-     ENTITY_CLOSE_P(e) || ENTITY_READ_P(e) || ENTITY_BUFFERIN_P(e) ||
-     ENTITY_BUFFEROUT_P(e) || ENTITY_ENDFILE_P(e) ||
-     ENTITY_IMPLIEDDO_P(e) || ENTITY_FORMAT_P(e));
+  if (set_undefined_p(io_functions_set)) {
+    io_functions_set = set_make(set_pointer);
+    set_add_elements(io_functions_set, io_functions_set, entity_intrinsic(SCANF_FUNCTION_NAME), 
+		     entity_intrinsic(PRINTF_FUNCTION_NAME),
+		     entity_intrinsic(SCANF_FUNCTION_NAME),
+		     entity_intrinsic(ISOC99_SCANF_FUNCTION_NAME),
+		     entity_intrinsic(FPRINTF_FUNCTION_NAME),
+		     entity_intrinsic(ISOC99_SCANF_USER_FUNCTION_NAME),
+		     entity_intrinsic(PUTS_FUNCTION_NAME),
+		     entity_intrinsic(GETS_FUNCTION_NAME),
+		     entity_intrinsic(FOPEN_FUNCTION_NAME),
+		     entity_intrinsic(FCLOSE_FUNCTION_NAME),
+		     entity_intrinsic(SNPRINTF_FUNCTION_NAME),
+		     entity_intrinsic(SSCANF_FUNCTION_NAME),
+		     entity_intrinsic(ISOC99_SSCANF_FUNCTION_NAME),
+		     entity_intrinsic(ISOC99_SSCANF_USER_FUNCTION_NAME),
+		     entity_intrinsic(VFPRINTF_FUNCTION_NAME),
+		     entity_intrinsic(VFSCANF_FUNCTION_NAME),
+
+		     /*Fortran*/
+		     entity_intrinsic(WRITE_FUNCTION_NAME),
+		     //entity_intrinsic(PRINT_FUNCTION_NAME),
+		     entity_intrinsic(REWIND_FUNCTION_NAME),
+		     entity_intrinsic(OPEN_FUNCTION_NAME),
+		     entity_intrinsic(CLOSE_FUNCTION_NAME),
+		     entity_intrinsic(INQUIRE_FUNCTION_NAME),
+		     entity_intrinsic(BACKSPACE_FUNCTION_NAME),
+		     entity_intrinsic(READ_FUNCTION_NAME),
+		     entity_intrinsic(BUFFERIN_FUNCTION_NAME),
+		     entity_intrinsic(ENDFILE_FUNCTION_NAME),
+		     entity_intrinsic(FORMAT_FUNCTION_NAME),
+		     NULL);
+  }
+  if(set_belong_p(io_functions_set, e)) 
+    return TRUE;
+  else 
+    return FALSE;
 }
 
 /* true if continue. See also macro ENTITY_CONTINUE_P

@@ -155,33 +155,38 @@ static_control sc;
 {
     text sc_text = make_text(NIL);
     char *t = NULL;
+    string comment;
     static char yes[MAX_STATIC_CONTROL_LINE_NUMBER];
     static char params[MAX_STATIC_CONTROL_LINE_NUMBER];
     static char loops[MAX_STATIC_CONTROL_LINE_NUMBER];
     static char tests[MAX_STATIC_CONTROL_LINE_NUMBER];
 
     /* pips_assert("store_text_line", sefs_list != NIL); */
+    if (get_prettyprint_language_tag() == is_language_c)
+      comment = "//";
+    else 
+      comment = "C";
 
     yes[0] 	= '\0';
     params[0] 	= '\0';
     loops[0] 	= '\0';
     tests[0]	= '\0';
 
-        t = concatenate("C\t\t< is static >",
+    t = concatenate(comment,"\t\t< is static >",
 		(static_control_yes(sc)?" TRUE":" FALSE"), "\n", NULL);
         ADD_SENTENCE_TO_TEXT( sc_text,
 			 make_sentence(is_sentence_formatted, strdup(t)));
-	t = concatenate("C\t\t< parameter >",
+	t = concatenate(comment,"\t\t< parameter >",
 		 words_to_string(words_entity_list(static_control_params(sc))),
 					 "\n", NULL);
 	ADD_SENTENCE_TO_TEXT( sc_text,
 			 make_sentence(is_sentence_formatted, strdup(t)));
-	t = concatenate("C\t\t<   loops   >",
+	t = concatenate(comment,"\t\t<   loops   >",
 		words_to_string(words_loop_list(static_control_loops(sc))),
 					  NULL);
 	ADD_SENTENCE_TO_TEXT( sc_text,
 			make_sentence(is_sentence_formatted, strdup(t)));
-	t = concatenate("C\t\t<   tests   >",
+	t = concatenate(comment,"\t\t<   tests   >",
 		words_to_string(words_test_list(static_control_tests(sc))),
 					  NULL);
 	ADD_SENTENCE_TO_TEXT( sc_text,
@@ -201,7 +206,11 @@ list obj;
 {
         cons*  ret_cons = NIL;
 	string before_string = strdup(" ");
-        string blank_string = strdup("C                             ");
+	string blank_string;
+	if (get_prettyprint_language_tag() == is_language_c)
+	  blank_string = strdup("//                            ");
+	else
+	  blank_string = strdup("C                             ");
 
         pips_debug(7, "doing \n");
         MAPL( exp_ptr, {
@@ -228,7 +237,12 @@ list obj;
 {
 	cons*  ret_cons = NIL;
 	string before_string = strdup(" ");
-	string blank_string = strdup("C                             ");
+	string blank_string;
+	if (get_prettyprint_language_tag() == is_language_c)
+	  blank_string = strdup("//                            ");
+	else
+	  blank_string = strdup("C                             ");
+
 
 	pips_debug(7, "doing \n");
 	MAPL( loop_ptr, {

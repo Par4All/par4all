@@ -389,7 +389,7 @@ clean: local-clean
 local-clean: 
 	$(RM) *~ $(LIB_OBJECTS) $(PVM_HEADERS) $(MPI_HEADERS)\
 		$(DDC_HEADERS) 	$(DDC_FFILES) $(DDC_CFILES) $(INSTALL_LIB)
-	test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
+	test "$(RT_ARCH)" && test ! -d $(RT_ARCH) || rmdir $(RT_ARCH)
 
 # common stuff
 ROOT    = ../../..
