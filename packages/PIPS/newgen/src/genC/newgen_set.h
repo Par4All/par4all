@@ -122,6 +122,7 @@ extern set set_assign(set, const set);
 extern set set_append_list(set, const list);
 extern set set_assign_list(set, const list);
 extern set set_add_element(set, const set, const void *);
+extern set set_add_elements(set, const set, const void * e, ...);
 extern set set_union(set, const set, const set);
 extern set set_intersection(set, const set, const set);
 extern set set_difference(set, const set, const set);

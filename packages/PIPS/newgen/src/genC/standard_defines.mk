@@ -77,7 +77,7 @@ OTHER_CFILES=\
 	genLisp.c \
 	genSML.c
 
-INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS)
+INSTALL_INC	= $(LIB_HEADERS) $(DERIVED_LIB_HEADERS) newgen_version.h
 
 LIB_TARGET	= libgenC.a
 
