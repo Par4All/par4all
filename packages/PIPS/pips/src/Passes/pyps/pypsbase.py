@@ -341,6 +341,8 @@ class workspace(object):
 			cpypips.create(name, self._sources)
 		except RuntimeError:
 			self.close()
+			raise
+
 
 		if not verbose:
 			self.props.NO_USER_WARNING = True
@@ -589,6 +591,7 @@ class workspace(object):
 		if self.deleteOnClose:
 			try : workspace.delete(self._name)
 			except RuntimeError: pass
+			except AttributeError: pass
 		if self.tmpDirName:
 			try : shutil.rmtree(self.tmpDirName)
 			except OSError: pass

@@ -1185,7 +1185,6 @@ void print_normalized(normalized n)
 	   ever added to linear library */
 	vect_debug((Pvecteur)normalized_linear(n));
 }
-
 bool expression_equal_p(expression e1, expression e2)
 {
   syntax s1, s2;
@@ -2250,6 +2249,7 @@ bool same_va_arg_name_p(list l1, list l2)
   return TRUE;
 }
 
+
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
   if (syntax_tag(s1)!=syntax_tag(s2))
@@ -2283,7 +2283,7 @@ bool same_expression_name_p(expression e1, expression e2)
 {
   return same_syntax_name_p(expression_syntax(e1), expression_syntax(e2));
 }
-
+
 /************************************************************* DAVINCI GRAPH */
 
 #define ALREADY_SEEN(node) (hash_defined_p(seen, (char*)node))

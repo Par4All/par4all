@@ -8,7 +8,8 @@ PIPS_SUBDIRS=\
 	pointer_values callgraph icfg ricedg \
 	chains rice hyperplane transformations accel-util hwac expressions \
 	locality instrumentation hpfc atomizer safescale sac phrase wp65 \
-	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util
+	preprocessor pipsmake step to_begin_with gpu scalopes static_controlize paf-util \
+	pocc-interface
 
 SUBDIRS=gnulib $(PIPS_SUBDIRS)
 
@@ -86,4 +87,5 @@ libpipslibs_la_LIBADD=\
 	newgen/libnewgen.la \
 	static_controlize/libstatic_controlize.la \
 	paf-util/libpaf-util.la \
-	gnulib/libgnu.la
+	gnulib/libgnu.la \
+	pocc-interface/libpocc-interface.la
