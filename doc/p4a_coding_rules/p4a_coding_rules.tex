@@ -368,12 +368,16 @@ Minimize the use of pointers as explained before, and don't use
 recursive data structures and function pointers. Then use your data as they are
 declared: in particular avoid array linearization and casting.
 
-
 If some of these recommendations cannot be followed, then try to group
 the non-compliant code outside of loop nests which are good
 candidates for parallelization.  This is a good practice, for instance,
 for heap allocations.
 
+Even if these programming rules seem constraining, they are often
+considered as sound programming rules even for classical sequential
+programming. That means that (re)writing application to ease
+parallelization can be a good opportunity for code cleaning and
+modernization, independently of \Apips or \Apfa.
 
 
 %%ContentEnd
