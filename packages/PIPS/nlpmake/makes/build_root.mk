@@ -114,14 +114,14 @@ ifndef EXTERN_ROOT
 EXTERN_ROOT	= $(HERE)/../extern
 endif
 
-.PHONY: auto-clean
+.PHONY: auto auto-comp auto-clean
 auto-clean:
 	$(RM) -r $(BUILD.dir) autom4te.cache
 	$(RM) configure depcomp config.guess config.sub ltmain.sh \
 	       config.h.in missing aclocal.m4 install-sh compile py-compile
 	find . -name .svn -prune -o -name Makefile.in -print0 | xargs -0 rm -f
 
-.PHONY: auto
+# clean & compile
 auto: auto-clean
 	autoreconf -vi
 	mkdir $(BUILD.dir) && cd $(BUILD.dir) ; \
@@ -129,11 +129,18 @@ auto: auto-clean
 		PATH=$(INSTALL.dir)/bin:$$PATH \
 		PKG_CONFIG_PATH=$(INSTALL.dir)/lib/pkgconfig:$(EXTERN_ROOT)/lib/pkgconfig \
 		--enable-hpfc --enable-pyps --enable-fortran95 --enable-gpips
+	$(MAKE) auto-comp
+
+# just compile
+auto-comp:
+	test -d $(BUILD.dir) || \
+	  { echo "missing directory: $(BUILD.dir)" ; exit 1 ; }
 	$(MAKE) -C $(BUILD.dir) DL.d=$(DOWNLOAD.dir)
 	$(MAKE) -C $(BUILD.dir) install
 	# manual fix...
 	-[ -d $(BUILD.dir)/src/Scripts/validation ] && \
 	  $(MAKE) -C $(BUILD.dir)/src/Scripts/validation install
+
 
 # force tags target
 tags: tags-clean
