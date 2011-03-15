@@ -8,53 +8,62 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    my_list *l;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    l1.n = 1;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l2.n = 2;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l3.n = 3;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l4.n = 4;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l1.next = &l2;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
 //   -Exact-);(l2[next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l2.next = (my_list) NULL;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
 //   -Exact-);(l2[next],*NULL_POINTER*,-Exact-);(l3[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l4[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    l3.next = (my_list) NULL;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
 //   -Exact-);(l2[next],*NULL_POINTER*,-Exact-);(l3[next],
 //   *NULL_POINTER*,-Exact-);(l4[next],*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
    l4.next = (my_list) NULL;
-//  {(l,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
+//  {(l[0][next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l1[next],l2,
 //   -Exact-);(l2[next],*NULL_POINTER*,-Exact-);(l3[next],
 //   *NULL_POINTER*,-Exact-);(l4[next],*NULL_POINTER*,-Exact-)}
 
