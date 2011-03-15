@@ -65,3 +65,7 @@ for 3 size of datas (32,64, and 128). Default size if 128, the others can be obt
 The run is now done simply with ./stars-pm_{suffix}{_size}[_options] data/exp{size}.a.bin
 
 Have a look at *.sh file in current directory for example.
+
+NB from Stéphanie Even : In case of segmentation fault, think that you
+probably need to change the limit of the stack size in your shell
+using the following command: "ulimit -s unlimited" in the command line.
