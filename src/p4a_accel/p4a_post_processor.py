@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+# -*- coding: utf-8 -*-
 
 """
 Convert the PIPS C output to a P4A output
@@ -103,6 +104,16 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     #                 "P4A_accel_kernel_wrapper \\1", content)
     #content = re.sub("(void p4a_kernel_[0-9]+[^\n]+)",
     #                 "P4A_accel_kernel \\1", content)
+
+    # Added by Stéphanie Even on the 15 March, 2011:
+    # Previous version of p4a had defined P4A_accel_kernel qualifier as 
+    # including the void return type by default. This was justified when using 
+    # pips to generate the code.
+    # Stéphanie Even suggest a manual use of p4a, allowing also return type
+    # to be different from void for the functions defined on the accelerator.
+    # The void return type must also be forced here, after the pips process.
+    content = re.sub("(P4A_accel_kernel )",
+                     "\\1void ", content)
 
     # Generate accelerated kernel calls:
     ## Replace
