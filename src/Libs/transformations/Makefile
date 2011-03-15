@@ -55,10 +55,11 @@ LIB_CFILES =	\
 		scalarization.c \
 		flatten_code.c \
 		induction_substitution.c \
-    loop_fusion.c \
+		loop_fusion.c \
 		set_return_type.c \
-    cast_at_call_sites.c \
-		manage_parallel_loops.c
+		cast_at_call_sites.c \
+		manage_parallel_loops.c \
+		control_counters.c
 
 INC_TARGET =    $(TARGET).h
 

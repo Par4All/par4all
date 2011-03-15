@@ -1,0 +1,150 @@
+/*
+
+  $Id$
+
+  Copyright 1989-2011 MINES ParisTech
+
+  This file is part of PIPS.
+
+  PIPS is free software: you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  any later version.
+
+  PIPS is distributed in the hope that it will be useful, but WITHOUT ANY
+  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+  FITNESS FOR A PARTICULAR PURPOSE.
+
+  See the GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
+
+*/
+#ifdef HAVE_CONFIG_H
+#include "pips_config.h"
+#endif
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "genC.h"
+#include "linear.h"
+#include "ri.h"
+#include "database.h"
+#include "ri-util.h"
+#include "top-level.h"
+#include "text-util.h"
+#include "properties.h"
+#include "pipsdbm.h"
+
+typedef struct {
+  entity module;
+  int n;
+} acc_ctx;
+
+static statement make_increment_statement(entity var)
+{
+  // var = var + 1
+  return make_assign_statement
+    (entity_to_expression(var),
+     MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                    entity_to_expression(var),
+                    int_to_expression(1)));
+}
+
+static entity create_counter(entity module, const string name, int n)
+{
+  // build name
+  // entity_local_name(module),
+  string full = strdup(concatenate("_", name, "_", itoa(n), NULL));
+  // create an integer counter
+  entity var =
+    make_new_scalar_variable_with_prefix(full, module, make_basic_int(4));
+  // cleanup
+  free(full), full=NULL;
+  // initialized to zero
+  free_value(entity_initial(var));
+  entity_initial(var) = make_value_expression(int_to_expression(0));
+  // add as a local variable
+  AddEntityToCurrentModule(var);
+  return var;
+}
+
+static void add_counter(acc_ctx * c, string name, statement s)
+{
+  entity counter = create_counter(c->module, name, c->n++);
+  instruction i = statement_instruction(s);
+  if (instruction_sequence_p(i))
+  {
+    // insert counter ahead of the sequence
+    sequence s = instruction_sequence(i);
+    sequence_statements(s) =
+      CONS(statement,
+           make_increment_statement(counter),
+           sequence_statements(s));
+  }
+  else
+  {
+    // insert a sequence in place
+    statement_instruction(s) =
+      make_instruction_sequence(make_sequence(
+          gen_make_list(statement_domain,
+                        make_increment_statement(counter),
+                        instruction_to_statement(statement_instruction(s)),
+                        NULL)));
+  }
+}
+
+static void test_rwt(test t, acc_ctx * c) {
+  add_counter(c, "if_then", test_true(t));
+  add_counter(c, "if_else", test_false(t));
+}
+
+static void loop_rwt(loop l, acc_ctx * c) {
+  add_counter(c, "do", loop_body(l));
+}
+
+static void whileloop_rwt(whileloop w, acc_ctx * c) {
+  add_counter(c, "while", whileloop_body(w));
+}
+
+static void forloop_rwt(forloop f, acc_ctx * c) {
+  add_counter(c, "for", forloop_body(f));
+}
+
+static void add_counters(entity module, statement root)
+{
+  acc_ctx c;
+  c.module = module, c.n = 0;
+  gen_context_multi_recurse
+    (root, &c,
+     test_domain, gen_true, test_rwt,
+     loop_domain, gen_true, loop_rwt,
+     whileloop_domain, gen_true, whileloop_rwt,
+     forloop_domain, gen_true, forloop_rwt,
+     NULL);
+}
+
+/*
+ */
+bool add_control_counters(char *module_name)
+{
+  entity module = module_name_to_entity(module_name);
+  statement stat =
+    (statement) db_get_memory_resource(DBR_CODE, module_name, true);
+
+  set_current_module_entity(module);
+  set_current_module_statement(stat);
+
+  add_counters(module, stat);
+
+  // update resource
+  DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
+
+  reset_current_module_entity();
+  reset_current_module_statement();
+  return true;
+}

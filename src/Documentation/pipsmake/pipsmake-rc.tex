@@ -8926,6 +8926,21 @@ current module) must be used for each FSMized statements.
 FSMIZE_WITH_GLOBAL_VARIABLE FALSE
 \end{PipsProp}
 
+\subsection{Control Counters}
+\index{Control Counters}
+
+A code instrumentation that adds local integer counters in tests and loops
+to know how many times a path is taken. This transformation may
+help some semantical analyses.
+
+\begin{PipsMake}
+alias add_control_counters 'Control counters
+
+add_control_counters    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
 %\subsection{Declaration Common Addition}
 %\label{subsection-declaration-common-addition}
 %\index{Declaration Common Addition}%
