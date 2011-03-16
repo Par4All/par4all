@@ -40,14 +40,18 @@
 #include "properties.h"
 #include "pipsdbm.h"
 
+/* Add Control Counter recursion context
+ */
 typedef struct {
   entity module;
   int n;
 } acc_ctx;
 
+/* generate: var = var + 1
+ */
 static statement make_increment_statement(entity var)
 {
-  // var = var + 1 // could generate var++ for C modules
+  // could generate var++ for C modules
   return make_assign_statement
     (entity_to_expression(var),
      MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -55,6 +59,8 @@ static statement make_increment_statement(entity var)
                     int_to_expression(1)));
 }
 
+/* create a new integer local variable in module using name as a prefix
+ */
 static entity create_counter(entity module, const string name, int n)
 {
   // build name (could also insert: entity_local_name(module))
@@ -72,13 +78,15 @@ static entity create_counter(entity module, const string name, int n)
   return var;
 }
 
+/* add a new counter at entry of statement s
+ */
 static void add_counter(acc_ctx * c, string name, statement s)
 {
   entity counter = create_counter(c->module, name, c->n++);
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
   {
-    // insert counter ahead of the sequence
+    // insert counter increment ahead of the sequence
     sequence s = instruction_sequence(i);
     sequence_statements(s) =
       CONS(statement,
@@ -114,6 +122,9 @@ static void forloop_rwt(forloop f, acc_ctx * c) {
   add_counter(c, "for", forloop_body(f));
 }
 
+/* add control counter instrumentation
+ * assumes current module entity & statement are okay.
+ */
 static void add_counters(entity module, statement root)
 {
   acc_ctx c = { module, 0 };
@@ -128,8 +139,9 @@ static void add_counters(entity module, statement root)
 
 /* instrument a module with control structure counters for test & loops
  */
-bool add_control_counters(char *module_name)
+bool add_control_counters(string module_name)
 {
+  // get resources from database
   entity module = module_name_to_entity(module_name);
   statement stat =
     (statement) db_get_memory_resource(DBR_CODE, module_name, true);
@@ -137,11 +149,13 @@ bool add_control_counters(char *module_name)
   set_current_module_entity(module);
   set_current_module_statement(stat);
 
+  // do the job
   add_counters(module, stat);
 
   // update resource
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
 
+  // cleanup
   reset_current_module_entity();
   reset_current_module_statement();
   return true;
