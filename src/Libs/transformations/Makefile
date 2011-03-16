@@ -58,8 +58,7 @@ LIB_CFILES =	\
 		loop_fusion.c \
 		set_return_type.c \
 		cast_at_call_sites.c \
-		manage_parallel_loops.c \
-		control_counters.c
+		manage_parallel_loops.c
 
 INC_TARGET =    $(TARGET).h
 
