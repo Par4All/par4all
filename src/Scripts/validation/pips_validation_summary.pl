@@ -10,6 +10,19 @@
 
 use strict;
 
+# whether to count cases aggregated per upper directory
+my $aggregate = 0;
+
+# get options
+use Getopt::Long;
+GetOptions(
+    "aggregate|a!" => \$aggregate,
+    "help|h" => sub {
+	print "$0 [--aggregate] current [previous]\n";
+	exit 0;
+    }
+) or die "unexpected option ($!)";
+
 # manage arguments
 die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
 my $summary = $ARGV[0];
@@ -189,6 +202,21 @@ $rate = $n{passed}*100.0/$count if $count;
 printf "success rate: %5.1f%%\n", $rate;
 print "elapsed time: $delay\n" if defined $delay;
 print "\n";
+
+# possibly aggregate counts on the first directory
+if ($aggregate)
+{
+  my %dc = ();
+  for my $dir (sort keys %d)
+  {
+    my $first = (split /\//, $dir)[0];
+    for my $s (split '\|', "$status|$others")
+    {
+	$dc{$first}{$s} += $d{$dir}{$s} if defined $d{$dir}{$s};
+    }
+  }
+  %d = %dc;
+}
 
 # print detailed per-directory summary
 print "directory                   cases  bads success (F+C+T|K) changes...\n";
