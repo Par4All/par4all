@@ -54,12 +54,12 @@ my ($start, $stop);
 # process input formatted as
 while (<>)
 {
-  # parse: <status>: dir/case duration
+  # parse: <status>: [some/]dir/case duration
   # "case" may be empty for some status about the whole directory
   # "duration" may be empty for some status and in a transition
-  if (/^($status|$others): ([-\w]+)(\/[-\w]+)?( \d*)?$/)
+  if (/^($status|$others): (([-\w\.]+\/)*?[-\w\.]+)(\/[-\w]+)?( \d*)?$/)
   {
-    my ($stat, $dir, $case) = ($1, $2, $3);
+    my ($stat, $dir, $case) = ($1, $2, $4);
     $d{$dir} = zeroed() unless exists $d{$dir};
     if ($summary eq $ARGV) # this is the current summary
     {
@@ -130,7 +130,7 @@ for my $c (sort keys %new)
   if (not exists $old{$c})
   {
     my $N = uc(substr($new{$c},0,1));
-    my $dir = (split /\//, $c)[0];
+    my $dir=$1 if $c =~ /(.*)\//;
     $changes{".$N"}++;
     $diff{$dir}{".$N"}++;
   }
