@@ -1,4 +1,7 @@
 # $Id$
+#
+# Run validation in a directory
+#
 
 # pips exes
 TPIPS	= tpips
@@ -36,8 +39,12 @@ F.f95	= $(wildcard *.f95)
 F.src	= $(F.c) $(F.f) $(F.F) $(F.f90) $(F.f95)
 
 # all potential result directories
-F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) \
-	$(F.F:%.F=%.result) $(F.f90:%.f90=%.result) $(F.f95:%.f95=%.result)
+F.res	= \
+	$(F.c:%.c=%.result) \
+	$(F.f:%.f=%.result) \
+	$(F.F:%.F=%.result) \
+	$(F.f90:%.f90=%.result) \
+	$(F.f95:%.f95=%.result)
 
 # actual result directory to validate
 F.result= $(wildcard $(PREFIX)*.result)
@@ -74,10 +81,12 @@ here	:= $(shell pwd)
 # get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
 # where to store validation results
+# this is the default, but may need to be overriden
 RESULTS	= RESULTS
 
 # shell environment to run validation scripts
 SHELL	= /bin/bash
+
 # setup run
 PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
@@ -153,7 +162,8 @@ unvalidate: check-vc
 # ??? does not work because of "svn diff"?
 .PHONY: validate-out
 validate-out:
-	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh LIST=: UNDO=: validate-dir
+	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh LIST=: UNDO=: \
+		validate-dir
 
 # generate "test" files
 .PHONY: validate-test
