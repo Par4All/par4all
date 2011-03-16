@@ -149,7 +149,7 @@ LOCAL_CLEAN	= clean-validate
 .PHONY: clean-validate
 clean-validate:
 	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out RESULTS
-	$(RM) -r *.database
+	$(RM) -r *.database .PYPS*.tmp
 
 .PHONY: rec-clean
 rec-clean:
