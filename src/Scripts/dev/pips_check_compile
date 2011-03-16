@@ -2,7 +2,7 @@
 #
 # $Id$
 #
-# Copyright 1989-2010 MINES ParisTech
+# Copyright 1989-2011 MINES ParisTech
 #
 # This file is part of PIPS.
 #
@@ -56,6 +56,7 @@ do
     -a|--autoconf) autoconf=1 ;;
     --nlpmake) autoconf= ;;
     --nlpmake=*) autoconf= ; build=${1#*=} ;;
+    # process priority. what about ionice?
     -n|--nice) nice=nice ;;
     # force compilation & validation & validation mail
     -f|--force) validate=mail-validate ; force=1 ;;
