@@ -177,6 +177,9 @@ validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(MAKE) sort-local-result
 endif
 
+# how to summarize results
+SUMUP	= pips_validation_summary.pl
+
 # on local validations, sort result & show summary
 .PHONY: sort-local-result
 sort-local-result:
@@ -184,7 +187,7 @@ sort-local-result:
 	  mv RESULTS RESULTS.tmp ; \
 	  sort -k 2 RESULTS.tmp > RESULTS ; \
 	  $(RM) RESULTS.tmp ; \
-	  pips_validation_summary.pl RESULTS ; \
+	  $(SUMUP) RESULTS ; \
 	fi
 
 # restore all initial "test" result files if you are unhappy with a validate
