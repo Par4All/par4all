@@ -300,13 +300,14 @@ else
   }
 fi
 
+# update working copies
 rm -f out err
-for valid in "$@" ; do
-  $nice svn up $prod $valid >> out 2>> err || {
+for dir in $prod "$@" ; do
+  $nice svn up $dir >> out 2>> err || {
     # possible failures: network dns svn...
     # hmmm... try to cleanup after svn up failure
-    svn cleanup $prod $valid >> out 2>> err
-    report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
+    svn cleanup $dir >> out 2>> err
+    report 'KO:svn-up' 'unchanged' 'cannot "svn up $dir"'
   }
 done
 
