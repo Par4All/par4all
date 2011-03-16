@@ -4,7 +4,7 @@
 PARALLEL_VALIDATION	= 1
 
 # explicit list of recursion directories
-override D.sub	= $(wildcard *.sub) vs_core
+override D.sub	= $(wildcard *.sub) vs_core oop
 
 include ../validate.mk
 include counts.mk
