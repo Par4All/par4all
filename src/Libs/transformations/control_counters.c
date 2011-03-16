@@ -47,7 +47,7 @@ typedef struct {
 
 static statement make_increment_statement(entity var)
 {
-  // var = var + 1
+  // var = var + 1 // could generate var++ for C modules
   return make_assign_statement
     (entity_to_expression(var),
      MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
@@ -57,8 +57,7 @@ static statement make_increment_statement(entity var)
 
 static entity create_counter(entity module, const string name, int n)
 {
-  // build name
-  // entity_local_name(module),
+  // build name (could also insert: entity_local_name(module))
   string full = strdup(concatenate("_", name, "_", itoa(n), NULL));
   // create an integer counter
   entity var =
@@ -117,8 +116,7 @@ static void forloop_rwt(forloop f, acc_ctx * c) {
 
 static void add_counters(entity module, statement root)
 {
-  acc_ctx c;
-  c.module = module, c.n = 0;
+  acc_ctx c = { module, 0 };
   gen_context_multi_recurse
     (root, &c,
      test_domain, gen_true, test_rwt,
@@ -128,7 +126,7 @@ static void add_counters(entity module, statement root)
      NULL);
 }
 
-/*
+/* instrument a module with control structure counters for test & loops
  */
 bool add_control_counters(char *module_name)
 {
