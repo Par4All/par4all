@@ -167,7 +167,7 @@ validate:
 ifdef PARALLEL_VALIDATION
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
-	$(MAKE) $(F.valid) $(D.rec)
+	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation, including subdir forward
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
