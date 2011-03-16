@@ -35,6 +35,8 @@ Just for one file:
 	sh> rm loopequiv.result/test
 	sh> make loopequiv.result/test
 
+A validation directory may contain subdirectories with further
+test cases to consider.
 
 To change the pips/tpips used for the validation, fix the PATH,
 and possibly LD_LIBRARY_PATH if you use dynamic linking:
