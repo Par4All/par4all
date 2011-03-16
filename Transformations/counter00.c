@@ -14,12 +14,19 @@ void counter00(int n)
     i++;
     fprintf(stdout, "%d\n", i);
   }
+  // empty while loop
+  i=0;
+  while (i++<n);
   // do loop
   for (i=0; i<n; i++)
     fprintf(stdout, "%d\n", i);
+  // empty do loop
+  for (i=0; i<n; i++);
   // for loop
   for (i=0; i<n && n<1000; i++)
     fprintf(stdout, "%d\n", i);
+  // empty for loop
+  for (i=0; i<n && n<1000; i++);
   // do-while loop
   i = 0;
   do {
@@ -42,4 +49,7 @@ void counter00(int n)
     i--;
     fprintf(stdout, "%d\n", i);
   }
+  // test with true branch only
+  if (n%2==0)
+    i++;
 }
