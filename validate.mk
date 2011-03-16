@@ -142,11 +142,9 @@ clean: rec-clean clean-validate
 LOCAL_CLEAN	= clean-validate
 
 .PHONY: clean-validate
-# do not remove upwards RESULTS file!
 clean-validate:
-	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
+	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out RESULTS
 	$(RM) -r *.database
-	[ "$(RESULTS)" = RESULTS ] && $(RM) $(RESULTS) || exit 0
 
 .PHONY: rec-clean
 rec-clean:
