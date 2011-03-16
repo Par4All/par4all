@@ -2,7 +2,7 @@
 #
 # Run validation in a directory and possibly its subdirectories
 #
-# relevant targets for the user:
+# relevant targets for the end-user:
 # - validate-test: validate to "test" result files directly
 # - unvalidate: cleanup before validate-test
 # - validate-out: validate to "out" files
@@ -12,6 +12,7 @@
 # relevant variables for the user:
 # - DO_BUG: also validate on cases tagged as "bugs"
 # - DO_LATER: idem with future "later" cases
+# - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
 # example:
 #   sh> make DO_LATER=1 validate-test
@@ -47,10 +48,6 @@ D.sub	= $(wildcard *.sub)
 
 # directory recursion
 D.rec	= $(D.sub:%=%.rec)
-
-# recursion into a subdirectory with target "FORWARD"
-%.rec: %
-	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ -C $^ $(FORWARD)
 
 # source files
 F.c	= $(wildcard *.c)
@@ -111,12 +108,20 @@ RESULTS	= RESULTS
 # shell environment to run validation scripts
 SHELL	= /bin/bash
 
+# skip bugs & future cases
+EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
+	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0
+
 # setup run
 PF	= @echo "processing $(SUBDIR)/$+" ; \
-	  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
-	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0 ; \
+	  $(EXCEPT) ; \
 	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
+
+# recursion into a subdirectory with target "FORWARD"
+%.rec: %
+	$(EXCEPT) ; \
+	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ -C $^ $(FORWARD)
 
 # extract validation result for summary
 # four possible outcomes: passed, changed, failed, timeout
