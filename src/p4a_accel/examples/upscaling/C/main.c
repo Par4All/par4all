@@ -74,7 +74,7 @@ int main ( int argc, char *argv[] )
   int nbframes;
 
   if (argc != 4 ) {
-    fprintf(stderr,"Usage: upscale infile outfile sizew sizeh nbframes\n" );
+    fprintf(stderr,"Usage: %s infile outfile nbframes\n",argv[0]);
     return EXIT_FAILURE;
   }
   

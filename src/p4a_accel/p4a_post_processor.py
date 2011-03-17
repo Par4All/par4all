@@ -105,7 +105,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     #content = re.sub("(void p4a_kernel_[0-9]+[^\n]+)",
     #                 "P4A_accel_kernel \\1", content)
 
-    # Added by Stéphanie Even on the 15 March, 2011:
     # Previous version of p4a had defined P4A_accel_kernel qualifier as 
     # including the void return type by default. This was justified when using 
     # pips to generate the code.

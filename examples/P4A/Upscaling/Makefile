@@ -53,7 +53,7 @@ clean :
 	rm -rf $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu)
 	rm -rf $(TARGET:=.p4a-accel.cu)
 	rm -rf  *~ *.database *.build p4a_new_files
-	rm -rf  output_seq output_openmp output_cuda output_accel
+	rm -rf  res.out
 
 run%: $(TARGET)%
 	# Run a version and display timing information:

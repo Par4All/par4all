@@ -212,9 +212,9 @@ included from the main file.
   \item[d1\_size] The number of elements in a row;
   \item[d2\_size] The number of rows;
   \item[d3\_size] The number of elements in the third dimension;
-  \item[d1\_block\_size] The number of element to transfer in a row;
+  \item[d1\_block\_size] The number of elements to transfer in a row;
   \item[d2\_block\_size] The number of rows to transfer;
-  \item[d3\_block\_size] The number of element in the third dimension
+  \item[d3\_block\_size] The number of elements in the third dimension
     to transfer;
   \item[d1\_offset] The element order to start the transfer to (host
     side);
@@ -229,8 +229,9 @@ included from the main file.
 
 \subsection{The call to the kernel}
 
-The core of the computation, typically a loop, will constitute the kernel.
-The call to the kernel must follows many rules :
+The core of the computation, typically a loop, will constitute the
+kernel.  To be used with OpenCL, the call to the kernel must follows
+many rules :
 
 \begin{enumerate}
 \item the kernel must be isolated is a separate file. For many kernel,
@@ -500,7 +501,7 @@ int main(int argc, char *argv[]) {
 \subsubsection{To compile}
 
 A specific \texttt{p4a\_accel.mk} file has been created to help
-compiling. The Makefile created from the user must contain the
+compiling. The Makefile created by the user must contain the
 definition of \texttt{TARGET, CFILES, KERNELFILES} and
 \texttt{P4A\_ACCEL\_DIR}.  \texttt{DUMMYFILE} is added to the make
 clean and can be used to define some output, non permanent, files.
@@ -519,7 +520,7 @@ KERNELFILES = kernel1_wrapper.c kernel2_wrapper.c
 DUMMYFILE = output.pgm
 
 P4A_ACCEL_DIR = ../../..
-include $(P4A_ACCEL_DIR)/p4a_accel.mk
+include \$(P4A_ACCEL_DIR)/p4a_accel.mk
 \end{lstlisting}
 
 The command \texttt{make} will make the seq, openmp, cuda and opencl binaries.

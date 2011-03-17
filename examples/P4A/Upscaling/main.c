@@ -31,6 +31,7 @@
 #include "yuv.h"
 #include "upscale.h"
 
+
 /* Realize the processing of the video */
 /* fpin: input file */
 /* fpout: output file */
@@ -42,16 +43,16 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
   type_yuv_frame_out frame_out[nbframes];
 
   printf("Begin reading input video\n");
-  // Reading ... data dependance
+  // Reading ... data dependence
   for(int i = 0; i < nbframes; i++) {
     if (read_yuv_frame(fpin,&frame_in[i])) {
       fprintf(stderr,"erreur read_yuv_frame No frame=%d\n",i);
-      break;
+      exit(0);
     }
   }
   printf("End of reading\n");
-  
-  printf("Begin computation\n");
+
+   printf("Begin computation\n");
   // Computation ... no dependance
   for(int i=0;i<nbframes;i++) { 
     upscale(&frame_in[i],&frame_out[i]);
@@ -63,7 +64,7 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
   for(int i = 0;i < nbframes;i++) {    
     if (write_yuv_frame(fpout,&frame_out[i])) {
       fprintf(stderr,"erreur write_yuv_frame No frame=%d\n",i);
-      break;
+      exit(0);
     }  
   }
 }
@@ -74,7 +75,7 @@ int main ( int argc, char *argv[] )
   int nbframes;
 
   if (argc != 4 ) {
-    fprintf(stderr,"Usage: upscale infile outfile sizew sizeh nbframes\n" );
+    fprintf(stderr,"Usage: %s infile outfile nbframes\n",argv[0]);
     return EXIT_FAILURE;
   }
   
