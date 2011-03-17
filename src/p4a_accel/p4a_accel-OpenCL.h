@@ -278,7 +278,8 @@ extern cl_command_queue p4a_queue;
   p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);		\
   P4A_test_execution_with_message("clGetPlatformIDs");			\
   /* Get the devices,could be a collection of device */			\
-  cl_device_id p4a_device_id = NULL;					\
+  extern cl_device_id p4a_device_id;					\
+  p4a_device_id = NULL;							\
   p4a_global_error=clGetDeviceIDs(p4a_platform_id,			\
 				  CL_DEVICE_TYPE_GPU,			\
 				  1,					\

@@ -956,6 +956,12 @@ void P4A_copy_to_accel_4d(size_t element_size,
 
 cl_int p4a_global_error=0;
 
+cl_device_id p4a_device_id=0;
+static cl_program p4a_program=0;
+
+#define P4A_DEBUG_BUFFER_SIZE 10000
+static char p4a_debug_buffer[P4A_DEBUG_BUFFER_SIZE];
+
 /** @author : Stéphanie Even
 
     In OpenCL, errorToString doesn't exists by default ...
@@ -988,7 +994,15 @@ char * p4a_error_to_string(int error)
     case CL_IMAGE_FORMAT_NOT_SUPPORTED:
       return (char *)"P4A : Image Format Not Supported";
     case CL_BUILD_PROGRAM_FAILURE:
-      return (char *)"P4A : Build Program Failure";
+	#define CL_BUILD_PROGRAM_FAILURE_MSG "P4A : Build Program Failure : "
+	strncat(p4a_debug_buffer,CL_BUILD_PROGRAM_FAILURE_MSG,P4A_DEBUG_BUFFER_SIZE);
+	clGetProgramBuildInfo( 	p4a_program,
+  				p4a_device_id,
+  				CL_PROGRAM_BUILD_LOG ,
+			  	P4A_DEBUG_BUFFER_SIZE,
+			  	p4a_debug_buffer+strlen(CL_BUILD_PROGRAM_FAILURE_MSG),
+			  	NULL);
+      return (char *)p4a_debug_buffer;
     case CL_MAP_FAILURE:
       return (char *)"P4A : Map Failure";
     case CL_INVALID_VALUE:
@@ -1299,7 +1313,7 @@ void p4a_load_kernel(const char *kernel,...)
     P4A_skip_debug(P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
     /*Create and compile the program : 1 for 1 kernel */
-    cl_program p4a_program=clCreateProgramWithSource(p4a_context,1,
+    p4a_program=clCreateProgramWithSource(p4a_context,1,
 					  (const char **)&cSourceCL,
 					  &kernelLength,
 					  &p4a_global_error);
