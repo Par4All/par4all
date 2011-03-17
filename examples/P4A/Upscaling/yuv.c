@@ -54,14 +54,17 @@ void buffer_copy_s(uint8 * buffer,uint8 *y)
 
 int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame)
 {  
-  uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
   
+  uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
+
+
   // Read the luminance
   int rd=fread(buffer,1,SIZE,fp);
   if(rd != SIZE) {
     fprintf(stderr,"erreur lecture y fichier rd=%d rd attendu=%d \n",rd,SIZE);
     return -1;
   }
+
   // Copy of the buffer in Y with offset
   buffer_copy_s(buffer,frame->y);
 
@@ -78,7 +81,9 @@ int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame)
     fprintf(stderr,"erreur lecture v fichier rd=%d rd attendu=%d \n",rd,SIZE_UV_IN);
     return -1;
   }
+
   free(buffer);
+  
   return 0;
 }
 
