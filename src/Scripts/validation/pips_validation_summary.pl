@@ -4,9 +4,11 @@
 #
 # further summarize detailed summary, including differential analysis
 #
-# Usage: $0 SUMMARY [previous-summary]
-
-# Bug: homonymous issue with bug & future
+# Usage: $0 [--aggregate] SUMMARY [PREVIOUS_SUMMARY]
+#
+# Bugs
+# - homonymous issue with bug & future
+# - aggregation should deal with the differential computation as well
 
 use strict;
 
