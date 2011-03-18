@@ -47,7 +47,6 @@ default:
 
 demo : display_seq display_openmp display_cuda display_accel ;
 
-
 clean :
 	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
 	rm -rf $(TARGET:=_accel) $(SOURCES:.c=.p4a.c) $(SOURCES:.c=.p4a.cu)
@@ -73,6 +72,7 @@ run_ref:;
 %_seq : $(SOURCES)
 	# Compilation of the sequential program:
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(SOURCES)
+	# $(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $(TARGET)_seq $(SOURCES)
 
 %_openmp : $(SOURCES)
 	# Parallelize and build an OpenMP version:
