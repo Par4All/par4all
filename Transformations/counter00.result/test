@@ -61,83 +61,83 @@ void counter00(int n)
 {
    int i;
    //PIPS generated variable
-   int _while_00 = 0, _while_10 = 0, _while_20 = 0, _do_30 = 0, _do_40 = 0, _while_50 = 0, _while_60 = 0, _while_70 = 0, _if_then_80 = 0, _if_else_90 = 0, _if_then_100 = 0, _if_else_110 = 0, _if_then_120 = 0, _if_else_130 = 0;
+   int _while_0 = 0, _while_1 = 0, _while_2 = 0, _do_0 = 0, _do_1 = 0, _while_3 = 0, _while_4 = 0, _while_5 = 0, _if_then_0 = 0, _if_else_0 = 0, _if_then_1 = 0, _if_else_1 = 0, _if_then_2 = 0, _if_else_2 = 0;
    // simple while
    i = 0;
    while (i<n) {
-      _while_00 = _while_00+1;
+      _while_0 = _while_0+1;
       i++;
    }
    // while with sequence
    i = 0;
    while (i<n) {
-      _while_10 = _while_10+1;
+      _while_1 = _while_1+1;
       i++;
       fprintf(stdout, "%d\n", i);
    }
    // empty while loop
    i = 0;
    while (i++<n) {
-      _while_20 = _while_20+1;
+      _while_2 = _while_2+1;
 
    }
    // do loop
    for(i = 0; i <= n-1; i += 1) {
-      _do_30 = _do_30+1;
+      _do_0 = _do_0+1;
       fprintf(stdout, "%d\n", i);
    }
    // empty do loop
    for(i = 0; i <= n-1; i += 1) {
-      _do_40 = _do_40+1;
+      _do_1 = _do_1+1;
 
    }
    // for loop
    i = 0;
    while (i<n&&n<1000) {
-      _while_50 = _while_50+1;
+      _while_3 = _while_3+1;
       fprintf(stdout, "%d\n", i);
       i++;
    }
    // empty for loop
    i = 0;
    while (i<n&&n<1000) {
-      _while_60 = _while_60+1;
+      _while_4 = _while_4+1;
       i++;
    }
    // do-while loop
    i = 0;
    do {
-      _while_70 = _while_70+1;
+      _while_5 = _while_5+1;
       i++;
       fprintf(stdout, "%d\n", i);
    }
    while (i<n);
    // simple test
    if (n%2==0) {
-      _if_then_80 = _if_then_80+1;
+      _if_then_0 = _if_then_0+1;
       i++;
    }
    else {
-      _if_else_90 = _if_else_90+1;
+      _if_else_0 = _if_else_0+1;
       i--;
    }
    // sequence test
    if (n%2==0) {
-      _if_then_100 = _if_then_100+1;
+      _if_then_1 = _if_then_1+1;
       i++;
       fprintf(stdout, "%d\n", i);
    }
    else {
-      _if_else_110 = _if_else_110+1;
+      _if_else_1 = _if_else_1+1;
       i--;
       fprintf(stdout, "%d\n", i);
    }
    // test with true branch only
    if (n%2==0) {
-      _if_then_120 = _if_then_120+1;
+      _if_then_2 = _if_then_2+1;
       i++;
    }
    else
-      _if_else_130 = _if_else_130+1;
+      _if_else_2 = _if_else_2+1;
 }
 
