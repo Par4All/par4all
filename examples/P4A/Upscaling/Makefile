@@ -70,18 +70,18 @@ run_ref:;
 # To have shortcut as seq for of typing hyantes-static-99_seq
 %:$(TARGET)_% ;
 
-%_seq : $(SOURCES)
+$(TARGET)_seq : $(SOURCES)
 	# Compilation of the sequential program:
 	$(CC) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@ $(SOURCES)
 
-%_openmp : $(SOURCES)
+$(TARGET)_openmp : $(SOURCES)
 	# Parallelize and build an OpenMP version:
 	p4a $(P4A_OPTIONS) -o $@ $(SOURCES) $(LDLIBS)
 
-%_cuda : $(SOURCES)
+$(TARGET)_cuda : $(SOURCES)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(LDLIBS)
 
-%_accel : $(SOURCES)
+$(TARGET)_accel : $(SOURCES)
 	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
 	p4a $(P4A_OPTIONS) --accel -o $@ $(SOURCES) $(LDLIBS)
