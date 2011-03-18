@@ -234,9 +234,6 @@ def add_own_options(parser):
     cmake_group.add_option("--cmake-gen", action = "store_true", default = False,
         help = "If output files are specified (with -o), setting this flag will make p4a try to locate a CMakeLists.txt file in current directory (or in any other directory specified by --cmake-dir), and generate Makefiles in a specific directory (--cmake-gen-dir).")
 
-    cmake_group.add_option("--cmake-gen-dir", metavar = "DIR", default = None,
-        help = "Generate Makefiles in this directory instead of <project name>.gen by default.")
-
     cmake_group.add_option("--cmake-build", action = "store_true", default = False,
         help = "Implies --cmake-gen. Generate Makefiles from the found CMakeLists.txt and run 'make' on them.")
 
@@ -673,7 +670,7 @@ def main():
                 builder.cmake_write(project_name, all_buildable_files + header_files,
                     output_files, extra_obj = options.extra_obj, dir = options.cmake_dir)
             if options.cmake_gen or options.cmake_build:
-                builder.cmake_gen(dir = options.cmake_dir, gen_dir = options.cmake_gen_dir,
+                builder.cmake_gen(dir = options.cmake_dir, 
                     cmake_flags = options.cmake_flags, build = options.cmake_build)
             return
 
