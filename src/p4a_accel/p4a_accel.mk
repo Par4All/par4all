@@ -1,16 +1,28 @@
-CC = gcc
-CUC = nvcc
-LINK       := gcc -fPIC
-CUDA_DIR=/usr/local/cuda
-STDDEFDIR=/usr/local/par4all/packages/pips-gfc/gcc/ginclude
+CC         = gcc
+CUC        = nvcc
+LINK       = $(CC) -fPIC
+CUDA_DIR   =/usr/local/cuda
+STDDEFDIR  =/usr/local/par4all/packages/pips-gfc/gcc/ginclude
 
-BASEFLAGS += -I$(P4A_ACCEL_DIR) -I.. -I. -DUNIX 
+BASEFLAGS += -I$(P4A_ACCEL_DIR) -I.. -I. -DUNIX -DP4A_DEBUG
 #Flags for openMP mode
-CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99
+CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99 
 
 #Flags for OpenCL mode 
-CLFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENCL -I$(CUDA_DIR)/include/CL -I$(CUDA_DIR)/include -std=c99 
-LDFLAGS = -fPIC -L/usr/lib 
+ifdef P4A_OPENCL_INCLUDE_FLAGS
+OPENCL_INC_FLAGS = $(P4A_OPENCL_INCLUDE_FLAGS)
+else
+OPENCL_INC_FLAGS = -I$(CUDA_DIR)/include/CL2 -I$(CUDA_DIR)/include
+endif
+
+ifdef P4A_OPENCL_LIBDIR_FLAGS
+OPENCL_LIBDIR_FLAGS = $(P4A_OPENCL_LIBDIR_FLAGS)
+else
+OPENCL_LIBDIR_FLAGS = -L$(CUDA_DIR)/lib/lib  -L$(CUDA_DIR)/lib/lib64
+endif
+
+CLFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENCL -std=c99 $(OPENCL_INC_FLAGS)
+LDFLAGS = -fPIC -L/usr/lib  $(OPENCL_LIBDIR_FLAGS)
 CLLIBS =  -lOpenCL 
 
 #Flags for Cuda mode (nvcc ~ g++)
