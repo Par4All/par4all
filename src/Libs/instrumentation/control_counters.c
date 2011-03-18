@@ -82,26 +82,7 @@ static entity create_counter(entity module, const string name)
 static void add_counter(acc_ctx * c, string name, statement s)
 {
   entity counter = create_counter(c->module, name);
-  instruction i = statement_instruction(s);
-  if (instruction_sequence_p(i))
-  {
-    // insert counter increment ahead of the sequence
-    sequence s = instruction_sequence(i);
-    sequence_statements(s) =
-      CONS(statement,
-           make_increment_statement(counter),
-           sequence_statements(s));
-  }
-  else
-  {
-    // insert a sequence in place
-    statement_instruction(s) =
-      make_instruction_sequence(make_sequence(
-          gen_make_list(statement_domain,
-                        make_increment_statement(counter),
-                        instruction_to_statement(statement_instruction(s)),
-                        NULL)));
-  }
+  insert_statement(s, make_increment_statement(counter), true);
 }
 
 static void test_rwt(test t, acc_ctx * c) {
