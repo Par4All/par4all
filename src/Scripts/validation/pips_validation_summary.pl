@@ -8,7 +8,6 @@
 #
 # Bugs
 # - homonymous issue with bug & future
-# - aggregation should deal with the differential computation as well
 
 use strict;
 
@@ -212,9 +211,18 @@ if ($aggregate)
   for my $dir (sort keys %d)
   {
     my $first = (split /\//, $dir)[0];
+    # do directory counts
     for my $s (split '\|', "$status|$others")
     {
-	$dc{$first}{$s} += $d{$dir}{$s} if defined $d{$dir}{$s};
+      $dc{$first}{$s} += $d{$dir}{$s} if defined $d{$dir}{$s};
+    }
+    # do differences
+    if ($first ne $dir)
+    {
+      for my $sc (keys %{$diff{$dir}})
+      {
+	  $diff{$first}{$sc} += $diff{$dir}{$sc};
+      }
     }
   }
   %d = %dc;
