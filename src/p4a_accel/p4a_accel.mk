@@ -4,7 +4,12 @@ LINK       = $(CC) -fPIC
 CUDA_DIR   =/usr/local/cuda
 STDDEFDIR  =/usr/local/par4all/packages/pips-gfc/gcc/ginclude
 
-BASEFLAGS += -I$(P4A_ACCEL_DIR) -I.. -I. -DUNIX -DP4A_DEBUG
+BASEFLAGS += -I$(P4A_ACCEL_DIR) -I.. -I. -DUNIX
+
+ifdef debug
+BASEFLAGS += -DP4A_DEBUG
+endif
+
 #Flags for openMP mode
 CFLAGS = $(BASEFLAGS) -DP4A_ACCEL_OPENMP -std=c99 
 
@@ -58,7 +63,7 @@ p4a_accel.c: $(P4A_ACCEL_DIR)/p4a_accel.c
 	ln -s $<
 
 %.cl:%.c
-	cpp $(CLFLAGS) -P -fdirectives-only $< -o $@
+	cpp $(CLFLAGS) -P $< -o $@
 
 %.cu:%.c
 	ln -s $< $@ 
