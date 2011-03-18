@@ -278,7 +278,8 @@ extern cl_command_queue p4a_queue;
   p4a_global_error=clGetPlatformIDs(1, &p4a_platform_id, NULL);		\
   P4A_test_execution_with_message("clGetPlatformIDs");			\
   /* Get the devices,could be a collection of device */			\
-  cl_device_id p4a_device_id = NULL;					\
+  extern cl_device_id p4a_device_id;					\
+  p4a_device_id = NULL;							\
   p4a_global_error=clGetDeviceIDs(p4a_platform_id,			\
 				  CL_DEVICE_TYPE_GPU,			\
 				  1,					\
@@ -696,21 +697,20 @@ parameters types are resolved.
   P4A_skip_debug(P4A_dump_block_descriptor(block_descriptor_name);)
 
 
-/** Dump a CL dim3 descriptor with an introduction message */
+/** Dump a CL dim2 descriptor with an introduction message */
 #define P4A_dump_descriptor(message, descriptor_name)			\
-  P4A_dump_message(message "\""  #descriptor_name "\" of size %dx%dx%d\n", \
-		   descriptor_name.x,					\
-		   descriptor_name.y,					\
-		   descriptor_name.z)
+  P4A_dump_message(message "\""  #descriptor_name "\" of size %zu x %zu\n", \
+		   descriptor_name[0],					\
+		   descriptor_name[1])
 
 /** Dump a CL dim3 block descriptor */
 #define P4A_dump_block_descriptor(descriptor_name)			\
-  P4A_dump_descriptor("Creating thread block descriptor ",#descriptor_name)
+  P4A_dump_descriptor("Creating thread block descriptor ",descriptor_name)
 
 
 /** Dump a CL dim3 grid descriptor */
 #define P4A_dump_grid_descriptor(descriptor_name)		\
-  P4A_dump_descriptor("Creating grid of block descriptor ",#descriptor_name)
+  P4A_dump_descriptor("Creating grid of block descriptor ",descriptor_name)
 
 
 /** 
