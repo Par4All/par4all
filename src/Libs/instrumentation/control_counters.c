@@ -44,7 +44,6 @@
  */
 typedef struct {
   entity module;
-  int n;
 } acc_ctx;
 
 /* generate: var = var + 1
@@ -61,10 +60,10 @@ static statement make_increment_statement(entity var)
 
 /* create a new integer local variable in module using name as a prefix
  */
-static entity create_counter(entity module, const string name, int n)
+static entity create_counter(entity module, const string name)
 {
   // build name (could also insert: entity_local_name(module))
-  string full = strdup(concatenate("_", name, "_", itoa(n), NULL));
+  string full = strdup(concatenate("_", name, "_", NULL));
   // create an integer counter
   entity var =
     make_new_scalar_variable_with_prefix(full, module, make_basic_int(4));
@@ -82,7 +81,7 @@ static entity create_counter(entity module, const string name, int n)
  */
 static void add_counter(acc_ctx * c, string name, statement s)
 {
-  entity counter = create_counter(c->module, name, c->n++);
+  entity counter = create_counter(c->module, name);
   instruction i = statement_instruction(s);
   if (instruction_sequence_p(i))
   {
@@ -127,7 +126,7 @@ static void forloop_rwt(forloop f, acc_ctx * c) {
  */
 static void add_counters(entity module, statement root)
 {
-  acc_ctx c = { module, 0 };
+  acc_ctx c = { module };
   gen_context_multi_recurse
     (root, &c,
      test_domain, gen_true, test_rwt,
