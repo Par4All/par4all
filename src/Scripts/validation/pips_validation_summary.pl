@@ -124,17 +124,18 @@ my $delay = '';
 if (defined $start and defined $stop)
 {
   $delay = $stop-$start;
-  if ($delay<100) {
+  if ($delay<100) { # 0 .. 99 s
     $delay .= 's';
   }
-  elsif ($delay < 6000) {
+  elsif ($delay < 6000) { # 1.6 .. 99.9 mn
     $delay /= 60.0;
     $delay .= 'mn';
   }
-  else {
+  else { # 1.6 .. NN h
     $delay /= 3600.0;
     $delay .= 'h';
   }
+  # keep one digit after dot
   $delay =~ s/(\.\d)\d+/$1/;
 }
 
