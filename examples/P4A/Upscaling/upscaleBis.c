@@ -70,7 +70,7 @@ uint8 interpolation_luminance(uint8 a, uint8 b,uint8 c,uint8 d,uint8 e,uint8 f)
   return (uint8)res;
 }
 
-void upscale_luminance_centre(type_yuv_frame_in frame_in, uint8 y_out[SIZE_Y_OUT])
+void upscale_luminance(type_yuv_frame_in frame_in,uint8 y_out[SIZE_Y_OUT])
 {
   int h = H_Y_IN;
   int w = W_Y_IN;
@@ -94,52 +94,25 @@ void upscale_luminance_centre(type_yuv_frame_in frame_in, uint8 y_out[SIZE_Y_OUT
       y_out[Wy+x+1]=interpolation_luminance(frame_in.y[indice-2],frame_in.y[indice-1],frame_in.y[indice],frame_in.y[indice+1],frame_in.y[indice+2],frame_in.y[indice+3]);
       //(x,y+1)
       y_out[x+Wy+W]=interpolation_luminance(frame_in.y[indice-w*2],frame_in.y[indice-w],frame_in.y[indice],frame_in.y[indice+w],frame_in.y[indice+2*w],frame_in.y[indice+3*w]);
+      // To compute (x+1,y+1) from (x-4:x-2:x:x+2:x+4:x+6,y+1)
+      int j = indice-2;
+      uint8 a = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      j = indice-1;
+      uint8 b = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      j = indice;
+      uint8 c = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      j = indice+1;
+      uint8 d = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      j = indice+2;
+      uint8 e = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      j = indice+3;
+      uint8 f = interpolation_luminance(frame_in.y[j-w*2],frame_in.y[j-w],frame_in.y[j],frame_in.y[j+w],frame_in.y[j+2*w],frame_in.y[j+3*w]);
+      
+      y_out[x+1+Wy+W]=interpolation_luminance(a,b,c,d,e,f);
+
+
     }
   }
-}
-
-void  upscale_luminance_xplus1yplus1(uint8 y_fout[SIZE_Y_OUT],int W,int H)
-{
-  const int offset_max = W-OFFSET-2;
-
-  for(int y=0;y<H;y=y+2){
-    int Wy = W*(y+1);
-
-    for(int x=0;x < OFFSET; x += 2) {
-      int indice = x+Wy;
-      y_fout[Wy+x+1]=interpolation_luminance(y_fout[Wy],y_fout[Wy],y_fout[indice],y_fout[indice+2],y_fout[indice+4],y_fout[indice+6]);
-    }
-
-    for(int x=OFFSET;x <= offset_max-2;x=x+2) {
-      int indice = x+Wy;
-      y_fout[Wy+x+1]=interpolation_luminance(y_fout[indice-4],y_fout[indice-2],y_fout[indice],y_fout[indice+2],y_fout[indice+4],y_fout[indice+6]);
-    }
-
-
-    int lim = W-2+W*(y+1);
-    int x = offset_max;
-    int indice = x+Wy;
-    y_fout[Wy+x+1]=interpolation_luminance(y_fout[indice-4],y_fout[indice-2],y_fout[indice],y_fout[indice+2],y_fout[indice+4],y_fout[lim]);
-
-    x = offset_max+2;
-    indice = x+Wy;
-    y_fout[Wy+x+1]=interpolation_luminance(y_fout[indice-4],y_fout[indice-2],y_fout[indice],y_fout[indice+2],y_fout[lim],y_fout[lim]);
-
-    x = offset_max+4;
-    indice = x+Wy;
-    y_fout[Wy+x+1]=interpolation_luminance(y_fout[indice-4],y_fout[indice-2],y_fout[indice],y_fout[lim],y_fout[lim],y_fout[lim]);
-  }
-}
-
-void upscale_luminance(type_yuv_frame_in frame_in,uint8 y_out[SIZE_Y_OUT])
-{
-  
-  int W=W_Y_OUT;
-  int H=H_Y_OUT;
-
-  // Tout à la fin (x+1,y+1)
-  upscale_luminance_centre(frame_in,y_out);
-  upscale_luminance_xplus1yplus1(y_out,W,H); 
 }
 
 void upscale(type_yuv_frame_in frame_in,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT])

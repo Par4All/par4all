@@ -25,7 +25,7 @@ LDLIBS+= -lm
 #export OMP_NESTED
 
 
-SOURCES= main.c yuv.c upscale.c
+SOURCES= main.c yuv.c upscaleBis.c
 
 #.PHONY: clean demo $(addprefix demo_, $(TARGET)) $(addprefix run_, $(TARGET) $(TARGET:=_omp) $(TARGET:=_p4a_omp) $(TARGET:=_p4a_cuda))
 
@@ -57,7 +57,9 @@ clean :
 run%: $(TARGET)%
 	# Run a version and display timing information:
 	time ./$< Home_Trailer.yuv res.out
-	# -diff -q output$* output_ref
+
+display :
+	mplayer res.out -demuxer rawvideo -rawvideo w=800:h=452
 
 display% : 
 	# Display graphically the results:
@@ -66,7 +68,7 @@ display% :
 # To be able to display the reference too:
 run_ref:;
 
-# To have shortcut as seq for of typing hyantes-static-99_seq
+# To have shortcut as seq insteed of typing upscaling_seq
 %:$(TARGET)_% ;
 
 $(TARGET)_seq : $(SOURCES)

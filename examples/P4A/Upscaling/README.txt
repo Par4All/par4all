@@ -7,6 +7,29 @@ with a factor 2 (doubling the size of the image) taken from the H264
 standard.  In takes a video in yuv format as input and displays the
 upscaled video in yuv format as output.
 
+Two versions : 
+
+1) The first version of upscale_luminance in upscale.c
+calculates y_out(i,j), y_out(i+1,j) and y_out(i,j+1) from y_in
+(upscale_lunimance_centre) and y_out(i+1,j+1) from y_out
+(upscale_lunimance_xplus1yplus1).
+
+In this first version : call upscale.c in the Makefile 
+
+2) The second version calculates all y_out(i,j), y_out(i+1,j),
+y_out(i,j+1) and y_out(i+1,j+1) from y_in (upscale_luminance). This
+version is more computation intensive but with more parallelism.
+
+In this second version : call upscaleBis.c in the Makefile 
+
+3) In current versions, the loops are over frame_out, that is with a 
++2 increment. Possibility to have a version with loops over frame_in
+ (?? ask to the contact).
+
+Which is the best ?
+
+Contact : Stephanie.Even@enstb.org
+
 To display the input video :
    mplayer Home_Trailer.yuv -demuxer rawvideo -rawvideo w=400:h=226
 
@@ -57,7 +80,10 @@ At that time :
 /home/even/par4all/examples/P4A/Upscaling/upscale.p4a.cu(155): error: identifier "v" is undefined
 
      In fact, I don't see where u and v are defined ???????
-							       
+		
+    3) Last, but not least, actually the message is
+
+    /home/even/par4all/examples/P4A/Upscaling/main.p4a.cu(101): error: calling a host function from a __device__/__global__ function is not allowed		    corresponding to the call of the upscale procedure.	       
 							      
 make clean for cleaning.
 

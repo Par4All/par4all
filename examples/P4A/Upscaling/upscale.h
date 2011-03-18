@@ -6,6 +6,6 @@
 #define clip0(a) ((a)<0 ? 0 : (a))
 #define clipMax(a,b) ((a)>=(b) ? ((b)-1) :(a))
 
-void upscale(type_yuv_frame_in *frame_in,type_yuv_frame_out *frame_out);
+void upscale(type_yuv_frame_in frame_in,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT]);
 
 #endif 

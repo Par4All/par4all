@@ -57,17 +57,18 @@ void video_processing(FILE* fpin,FILE* fpout)
    printf("Begin computation\n");
   // Computation ... no dependence
   for(int i=0;i<NBFRAMES;i++) { 
-    upscale(&frame_in[i],&frame_out[i]);
+    //frame_out[i] = upscale(frame_in[i],frame_out[i]);
+    upscale(frame_in[i],frame_out[i].y,frame_out[i].u,frame_out[i].v);
   }
   printf("End of computation\n");
 
   printf("Begin writing output video\n");
   // Writing ... data dependence
-  for(int i = 0;i < NBFRAMES;i++) {    
+  for(int i = 0;i < NBFRAMES;i++) {
     if (write_yuv_frame(fpout,&frame_out[i])) {
       fprintf(stderr,"erreur write_yuv_frame No frame=%d\n",i);
       exit(0);
-    }  
+    } 
   }
 }
 
