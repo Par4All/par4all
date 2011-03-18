@@ -1,6 +1,7 @@
-delete struct_segfault
-create struct_segfault struct_segfault.c
+delete struct
+create struct struct.c
 
+set CONSTANT_PATH_EFFECTS FALSE
 
 display PRINTED_FILE[outline_struct]
                                                                                                                                                                                                                                                                   
