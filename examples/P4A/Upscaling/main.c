@@ -31,20 +31,22 @@
 #include "yuv.h"
 #include "upscale.h"
 
+/* NBFRAMES: number of frames in the video  */
+#define NBFRAMES 3525
 
 /* Realize the processing of the video */
 /* fpin: input file */
 /* fpout: output file */
-/* nbframes: number of frames in the video  */
 
-void video_processing(FILE* fpin,FILE* fpout,int nbframes)
+void video_processing(FILE* fpin,FILE* fpout)
 {
-  type_yuv_frame_in frame_in[nbframes];
-  type_yuv_frame_out frame_out[nbframes];
+  type_yuv_frame_in frame_in[NBFRAMES];
+  type_yuv_frame_out frame_out[NBFRAMES];
 
   printf("Begin reading input video\n");
   // Reading ... data dependence
-  for(int i = 0; i < nbframes; i++) {
+  for(int i = 0; i < NBFRAMES; i++) {
+    //printf("Reading image %d\n",i);
     if (read_yuv_frame(fpin,&frame_in[i])) {
       fprintf(stderr,"erreur read_yuv_frame No frame=%d\n",i);
       exit(0);
@@ -53,15 +55,15 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
   printf("End of reading\n");
 
    printf("Begin computation\n");
-  // Computation ... no dependance
-  for(int i=0;i<nbframes;i++) { 
+  // Computation ... no dependence
+  for(int i=0;i<NBFRAMES;i++) { 
     upscale(&frame_in[i],&frame_out[i]);
   }
   printf("End of computation\n");
 
   printf("Begin writing output video\n");
-  // Writing ... data dependance
-  for(int i = 0;i < nbframes;i++) {    
+  // Writing ... data dependence
+  for(int i = 0;i < NBFRAMES;i++) {    
     if (write_yuv_frame(fpout,&frame_out[i])) {
       fprintf(stderr,"erreur write_yuv_frame No frame=%d\n",i);
       exit(0);
@@ -72,10 +74,9 @@ void video_processing(FILE* fpin,FILE* fpout,int nbframes)
 int main ( int argc, char *argv[] )
 {
   FILE *fpin,*fpout;
-  int nbframes;
 
-  if (argc != 4 ) {
-    fprintf(stderr,"Usage: %s infile outfile nbframes\n",argv[0]);
+  if (argc != 3) {
+    fprintf(stderr,"Usage: %s infile outfile\n",argv[0]);
     return EXIT_FAILURE;
   }
   
@@ -87,9 +88,7 @@ int main ( int argc, char *argv[] )
     fprintf(stderr,"Wrong output file name or path\n");
     return EXIT_FAILURE;
   }
-  nbframes=atoi(argv[3]);
-  
-  video_processing(fpin,fpout,nbframes);
+  video_processing(fpin,fpout);
  
   fclose(fpin);
   fclose(fpout);

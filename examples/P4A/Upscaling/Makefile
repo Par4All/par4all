@@ -50,14 +50,14 @@ demo : display_seq display_openmp display_cuda display_accel ;
 
 clean :
 	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
-	rm -rf $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu)
-	rm -rf $(TARGET:=.p4a-accel.cu)
+	rm -rf $(TARGET:=_accel) $(SOURCES:.c=.p4a.c) $(SOURCES:.c=.p4a.cu)
+	rm -rf $(SOURCES:.c=.p4a-accel.cu)
 	rm -rf  *~ *.database *.build p4a_new_files
 	rm -rf  res.out
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
-	time ./$< Home_Trailer.yuv res.out 3525
+	time ./$< Home_Trailer.yuv res.out
 	# -diff -q output$* output_ref
 
 display% : 
