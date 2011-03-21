@@ -173,7 +173,7 @@ else # sequential validation, including subdir forward
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
-	$(MAKE) $(D.rec)
+	[ "$(D.rec)" ] && $(MAKE) $(D.rec) || exit 0
 	$(MAKE) sort-local-result
 endif
 
