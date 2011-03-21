@@ -1051,90 +1051,6 @@ static string ppt_call(string in_c, list le)
     return scall;
 }
 
-/// Merge the basics properties in one basic. This basic will be used to
-/// determine which c function has to be used for a given fortran intrinsic. For
-/// example ABS can be one of this two libm c functions : abs or fabs.
-/// @param dst, the basic to merge in
-/// @param src, the basic to merge with dst
-static void merge_basics (basic dst, basic src) {
-  pips_debug (7, "updating basic\n");
-  pips_assert ("dst can not be undefined",
-			   dst != basic_undefined);
-  if (basic_tag (src) != basic_tag (dst)) {
-	pips_debug (7, "need type promotion\n");
-	switch (basic_tag(src)) {
-	case is_basic_int:
-	case is_basic_float:
-	case is_basic_complex:
-	  if (basic_tag (src) == is_basic_complex || basic_tag (dst) == is_basic_complex) {
-		basic_tag (src) = is_basic_complex;
-		if (basic_tag (dst) == is_basic_complex) {
-		  	basic_complex(src) = basic_complex(dst);
-		}
-	  }
-	  else if (basic_tag (src) == is_basic_float || basic_tag (dst)== is_basic_float) {
-		basic_tag (src) = is_basic_float;
-		if (basic_tag (dst) == is_basic_complex) {
-		  basic_float(src) = basic_float(dst);
-		}
-	  }
-	  break;
-	default:
-	  pips_user_error("dont know how to merge these two different types : %s and %s\n",
-					  basic_to_string (src), basic_to_string (dst));
-	  break;
-	}
-  }
-  else {
-	switch (basic_tag(src)) {
-	case is_basic_int:
-	  switch basic_int (src) {
-		case 1:    //char
-		case 2:    //short
-		case 4:    //int
-		case 6:    //long
-		case 8:    //long long
-		  if (basic_int(src) > basic_int(dst))
-			basic_int(dst) = basic_int(src);
-		  break;
-		case 21:    //signed char
-		case 22:    //signed short
-		case 24:    //signed int
-		case 26:    //signed long
-		case 28:    //signed long long
-		  if (basic_int(src) - 20 > basic_int(dst))
-			basic_int(dst) = basic_int(src);
-		  break;
-		case 11:
-		case 12:
-		case 14:
-		case 16:
-		case 18:
-		  // should nt happen
-		  pips_user_error("found an unsigned integer in fortran\n");
-		  break;
-		}
-	  break;
-	case is_basic_float:
-	  if (basic_float(src) > basic_float(dst))
-		basic_float(dst) = basic_float(src);
-	  break;
-	case is_basic_complex:
-	  if (basic_complex(src) > basic_complex(dst))
-		basic_complex(dst) = basic_complex(src);
-	  break;
-	case is_basic_logical:
-	case is_basic_string:
-	  // we don t care of the size
-	  break;
-	default:
-	  // What should be done?
-	  pips_user_error("the basic can not be a variable\n");
-	  break;
-	}
-  }
-}
-
 static c_full_name c_base_name_to_c_full_name [] = {
   {"abs"   , is_basic_int     , 1  , ""     , "" }, //char
   {"abs"   , is_basic_int     , 2  , ""     , "" }, //short
@@ -1199,7 +1115,11 @@ static string ppt_math(string in_c, list le)
 	  res_basic = copy_basic (cur_b);
 	}
 	else {
-	  merge_basics (res_basic, cur_b);
+	  basic old = res_basic;
+	  res_basic = basic_maximum (old, cur_b);
+	  free_basic (old);
+	  pips_assert ("expression_to_type returns a basic undefined",
+		       !basic_overloaded_p (res_basic));
 	}
 	free_type (tmp);
   }
