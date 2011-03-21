@@ -30,6 +30,9 @@ Which is the best ?
 
 Contact : Stephanie.Even@enstb.org
 
+Any publication of this application must acknowledge the transmedi@
+project from the Image and Networks french research cluster.
+
 To display the input video :
    mplayer Home_Trailer.yuv -demuxer rawvideo -rawvideo w=400:h=226
 
@@ -57,7 +60,7 @@ For the OpenMP parallel execution on multicores:
 For the CUDA parallel execution on nVidia GPU:
 
   make cuda : parallelize the code to CUDA source main.p4a.cu, 
-  yuv.p4a.cu and upscale.p4a.cu and build the program hyantes-static-99_cuda
+  yuv.p4a.cu and upscale.p4a.cu and build the program upscaling_cuda
 
 At that time :
    1) the variable nbframes was replaced by a #define NBFRAMES 3525 inside the

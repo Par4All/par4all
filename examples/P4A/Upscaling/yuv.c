@@ -52,7 +52,7 @@ void buffer_copy_s(uint8 * buffer,uint8 *y)
   }
 }
 
-int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame)
+int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZE_UV_IN])
 {  
   
   uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
@@ -66,17 +66,17 @@ int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame)
   }
 
   // Copy of the buffer in Y with offset
-  buffer_copy_s(buffer,frame->y);
+  buffer_copy_s(buffer,y);
 
   // Read the chrominance U
-  rd = fread(frame->u,1,SIZE_UV_IN,fp);
+  rd = fread(u,1,SIZE_UV_IN,fp);
   if(rd != SIZE_UV_IN) {
     fprintf(stderr,"erreur lecture u fichier rd=%d rd attendu=%d \n",rd,SIZE_UV_IN);
     return -1;
   }
 
   // Read the chrominance V
-  rd = fread(frame->v,1,SIZE_UV_IN,fp);
+  rd = fread(v,1,SIZE_UV_IN,fp);
   if(rd != SIZE_UV_IN) {
     fprintf(stderr,"erreur lecture v fichier rd=%d rd attendu=%d \n",rd,SIZE_UV_IN);
     return -1;
@@ -89,22 +89,22 @@ int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame)
 
 /* Write the output video to a file */
 
-int write_yuv_frame(FILE* fp,type_yuv_frame_out *frame)
+int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT])
 {
-  int wr = fwrite(frame->y,1,SIZE_Y_OUT,fp);
+  int wr = fwrite(y,1,SIZE_Y_OUT,fp);
   if(wr != SIZE_Y_OUT) {
     fprintf(stderr,"erreur ecriture y fichier wr=%d wr attendu=%d\n",wr,SIZE_Y_OUT);
     return -1; 
   } 
 
-  wr = fwrite(frame->u,1,SIZE_UV_OUT,fp);
+  wr = fwrite(u,1,SIZE_UV_OUT,fp);
   if(wr != SIZE_UV_OUT){ 
     fprintf(stderr,"erreur ecriture u fichier wr=%d wr attendu=%d\n",wr,SIZE_UV_OUT);
     return -1;
   }
 
   //v
-  wr=fwrite(frame->v,1,SIZE_UV_OUT,fp);
+  wr=fwrite(v,1,SIZE_UV_OUT,fp);
   if(wr != SIZE_UV_OUT) {
     fprintf(stderr,"erreur ecriture v fichier wr=%d wr attendu=%d\n",wr,SIZE_UV_OUT);
     return -1;

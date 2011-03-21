@@ -31,7 +31,6 @@ void upscale_chrominance(type_yuv_frame_in frame_in, uint8 u_out[SIZE_UV_OUT], u
   int sizeChrW = W_UV_IN;
   int sizeChrWout = W_UV_OUT;
   int sizeChrHout = H_UV_OUT;
-  int sizeChrH = H_UV_IN;
 
    // Respecte mieux la localité des données
   for (int j = 0;j < sizeChrHout;j+=2) {
@@ -72,7 +71,6 @@ uint8 interpolation_luminance(uint8 a, uint8 b,uint8 c,uint8 d,uint8 e,uint8 f)
 
 void upscale_luminance(type_yuv_frame_in frame_in,uint8 y_out[SIZE_Y_OUT])
 {
-  int h = H_Y_IN;
   int w = W_Y_IN;
 
   int H = H_Y_OUT;

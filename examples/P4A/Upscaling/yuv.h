@@ -40,8 +40,8 @@ struct type_yuv_frame_out {
 	uint8 v[SIZE_UV_OUT];
 };
 
-int read_yuv_frame(FILE* fp,type_yuv_frame_in *frame);
-int write_yuv_frame(FILE* fp,type_yuv_frame_out *frame);
+int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZE_UV_IN]);
+int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT]);
 
 
 
