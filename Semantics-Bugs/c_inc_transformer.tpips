@@ -1,0 +1,14 @@
+
+delete c_inc_transformer
+create c_inc_transformer c_inc_transformer.c
+
+
+activate TRANSFORMERS_INTER_FULL
+
+apply REFINE_TRANSFORMERS
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+
+delete c_inc_transformer
+
