@@ -50,7 +50,7 @@ demo : display_seq display_openmp display_cuda display_opt display_accel display
 
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq.pgm output_openmp.pgm output_cuda.pgm output_accel.pgm
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_accel) $(TARGET:=_accel_opt) $(TARGET:=.p4a.c) $(TARGET:=.p4a.cu) $(TARGET:=.p4a-accel.cu) *~ *.database *.build output_seq.pgm output_openmp.pgm output_cuda.pgm output_accel.pgm
 
 run%: $(TARGET)%
 	# Run a version and display timing information:

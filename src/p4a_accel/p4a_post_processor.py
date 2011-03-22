@@ -50,7 +50,7 @@ def insert_kernel_launcher_declaration(m):
 
 #This function is used by re.sub(...) inside the function patch_to_use_p4a_methods() 
 #and builds the accel kernel call statement for
-#p4a_launcher_xxx() function (xxx is the name of the module(function))
+#p4a_launcher_xxx() function (xxx is the name of the module/function)
 def p4a_call_accel_kernel_repl(match_object):
 	if match_object.group(3):
 		return match_object.group(3)+"\n P4A_call_accel_kernel_"+match_object.group(1)+\
@@ -92,6 +92,16 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # Inject run time initialization:
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
+
+	# This patch is a temporary solution. It may not cover all possible cases
+	# It replaces some array declarations that nvcc do not compile.
+	# For ex. 
+	# int n = 100; double a [n];
+	# is replaced by :
+	# double a[100]
+    fObj = re.findall("\s*(?:int|\,)\s*(\w+)\s*=\s*(\d+)", content)   
+    for obj in fObj: 
+		content = re.sub("\["+obj[0]+"\]","["+obj[1]+"]", content)    
 
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:
