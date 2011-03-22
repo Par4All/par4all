@@ -12,8 +12,11 @@ int main(int j, char **unused)
 
    int A[1];
 
-//  T(j) {i==0, j==j#init+1}
+//  T(j) {i==0, j==0}
 
+   j = 0;
+
+//  T(j) {i==0, j==j#init+1}
 
    A[1] = j++;
 
