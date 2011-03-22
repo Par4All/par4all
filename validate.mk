@@ -169,12 +169,16 @@ validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
-else # sequential validation, including subdir forward
+else # sequential validation, including subdir recursive forward
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
-	for f in $(F.valid) ; do $(MAKE) $$f ; done
-	[ "$(D.rec)" ] && $(MAKE) $(D.rec) || exit 0
+	$(MAKE) $(D.rec) sequential-validate-dir
 	$(MAKE) sort-local-result
+
+# local target to parallelize the "sequential" local directory
+# with test cases in its subdirectories
+sequential-validate-dir:
+	for f in $(F.valid) ; do $(MAKE) $$f ; done
 endif
 
 # how to summarize results
