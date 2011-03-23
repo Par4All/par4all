@@ -46,16 +46,21 @@ typedef struct {
   entity module;
 } acc_ctx;
 
-/* generate: var = var + 1
+/* generate: var = var + 1 (Fortran) or var++ (C)
  */
-static statement make_increment_statement(entity var)
+static statement make_increment_statement(entity module, entity var)
 {
-  // could generate var++ for C modules
-  return make_assign_statement
-    (entity_to_expression(var),
-     MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
-                    entity_to_expression(var),
-                    int_to_expression(1)));
+  if (fortran_module_p(module))
+    return make_assign_statement
+      (entity_to_expression(var),
+       MakeBinaryCall(entity_intrinsic(PLUS_OPERATOR_NAME),
+                      entity_to_expression(var),
+                      int_to_expression(1)));
+  else
+    return make_call_statement
+      (POST_INCREMENT_OPERATOR_NAME,
+       CONS(expression, entity_to_expression(var), NIL),
+       entity_undefined, empty_comments);
 }
 
 /* create a new integer local variable in module using name as a prefix
@@ -82,7 +87,7 @@ static entity create_counter(entity module, const string name)
 static void add_counter(acc_ctx * c, string name, statement s)
 {
   entity counter = create_counter(c->module, name);
-  insert_statement(s, make_increment_statement(counter), true);
+  insert_statement(s, make_increment_statement(c->module, counter), true);
 }
 
 static void test_rwt(test t, acc_ctx * c) {
