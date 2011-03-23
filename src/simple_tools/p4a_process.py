@@ -656,7 +656,7 @@ class p4a_processor(object):
                 filter_exclude = None,
                 apply_phases_kernel_after = [],
                 apply_phases_kernel_launcher = [],
-                apply_phases_wrapper = [],              
+                apply_phases_wrapper = [],
                 apply_phases_after = []):
         """Apply transformations to the parallel loop nested found in the
         workspace to generate GPU-oriented code
@@ -893,8 +893,6 @@ class p4a_processor(object):
         args = [ post_process_script ]
         if dest_dir:
             args += [ '--dest-dir', dest_dir ]
-        if self.new_file_generated ():
-            args += ['--includes', self.new_files_include]
         args.append(file)
 
         p4a_util.run(args,force_locale = None)
