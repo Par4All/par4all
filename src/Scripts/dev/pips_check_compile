@@ -160,7 +160,8 @@ function report()
   # out if locked
   [ $current = 'locked' ] && {
     echo "message: $msg" | \
-      mailx -s "$vname $arch compilation status is locked" $dest
+      mailx -a "Reply-To: $dest" \
+	-s "$vname $arch compilation status is locked" $dest
     exit 0
   }
 
