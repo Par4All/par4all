@@ -21,7 +21,6 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 # TODO
-# - doxygen?
 # - check documentation generation?
 #   I recall that latex errors are ignored in nlpmake.
 #
