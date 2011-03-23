@@ -27,7 +27,6 @@ def remove_libc_typedef (content):
     size_t_re = re.compile ("typedef.*size_t");
     match_l = size_t_re.findall (content)
     for m in match_l:
-        assert (len (match_l) == 1)
         content = content.replace (m, "")
     return content
 
