@@ -14,14 +14,14 @@ int compute(int n)
    //PIPS generated variable
    int _if_then_0 = 0, _if_else_0 = 0, _while_0 = 0;
    while (i<n) {
-      _while_0 = _while_0+1;
+      _while_0++;
       i <<= 1;
       if (rand()) {
-         _if_then_0 = _if_then_0+1;
+         _if_then_0++;
          i++;
       }
       else
-         _if_else_0 = _if_else_0+1;
+         _if_else_0++;
    }
    return i;
 }
