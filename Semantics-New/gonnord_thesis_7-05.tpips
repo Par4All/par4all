@@ -1,5 +1,5 @@
-delete gonnord_thesis_2-12
-create gonnord_thesis_2-12 gonnord_thesis_2-12.c
+delete gonnord_thesis_7-05
+create gonnord_thesis_7-05 gonnord_thesis_7-05.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
@@ -24,5 +24,5 @@ display PRINTED_FILE[ts_singlestate]
 display PRINTED_FILE[ts_restructured]
 
 close
-delete gonnord_thesis_2-12
+delete gonnord_thesis_7-05
 quit
