@@ -90,20 +90,32 @@ static void add_counter(acc_ctx * c, string name, statement s)
   insert_statement(s, make_increment_statement(c->module, counter), true);
 }
 
-static void test_rwt(test t, acc_ctx * c) {
+/* add a counter to each branch of the test
+ */
+static void test_rwt(test t, acc_ctx * c)
+{
   add_counter(c, "if_then", test_true(t));
   add_counter(c, "if_else", test_false(t));
 }
 
-static void loop_rwt(loop l, acc_ctx * c) {
+/* add a counter to the loop body
+ */
+static void loop_rwt(loop l, acc_ctx * c)
+{
   add_counter(c, "do", loop_body(l));
 }
 
-static void whileloop_rwt(whileloop w, acc_ctx * c) {
+/* add a counter to the loop body
+ */
+static void whileloop_rwt(whileloop w, acc_ctx * c)
+{
   add_counter(c, "while", whileloop_body(w));
 }
 
-static void forloop_rwt(forloop f, acc_ctx * c) {
+/* add a counter to the loop body
+ */
+static void forloop_rwt(forloop f, acc_ctx * c)
+{
   add_counter(c, "for", forloop_body(f));
 }
 
