@@ -928,7 +928,6 @@ class p4a_processor(object):
             # find the associated wrapper with the kernel
             wrapper  = self.kernel_to_wrapper_name  (kernel)
             launcher = self.kernel_to_launcher_name (kernel)
-            print "PIV PIV PIV PIV PIV " + wrapper + " " + launcher
             # merge the files in the kernel file
             # Where the files do well in the .database workspace:
             kernel_file = os.path.join(self.workspace.dirname(), "Src",
