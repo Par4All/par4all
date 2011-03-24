@@ -20,13 +20,13 @@ void ts_singlestate(void)
 //    i+2j#init+10k#init<=i#init+2j+10k, 2j<=i, 2j+20k<=11i,
 //    i<=2j+10k, 20k<=11i, j<=9}
 
-   while (flip())
+   while (rand_b())
 
 //  T(i,j,k) {i==i#init+2, i<=102, 20k<=11i, j<=j#init+1,
 //    j+9j#init<=81, j#init+5k#init+1<=j+5k,
 //    j+10k<=j#init+10k#init+11}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {i<=100, j<=8}
 
@@ -56,7 +56,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {i<=100, j<=8}
 
@@ -132,13 +132,13 @@ void ts_restructured(void)
 //    i+2j#init+10k#init<=i#init+2j+10k, 0<=2i+j, 2j<=i, 2j+20k<=11i,
 //    i<=2j+10k, 20k<=11i, j<=8}
 
-   while (flip())
+   while (rand_b())
 
 //  T(i,j,k) {9i+2j==9i#init+2j#init+20, i<=100, 20k<=11i,
 //    j#init<=j+8, j<=j#init+1, j+8j#init<=64,
 //    2j#init+9k#init+2<=2j+9k, 2j+9k<=2j#init+9k#init+11}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {i<=98, j<=7}
 
@@ -168,7 +168,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {i<=98, j<=7}
 
@@ -194,7 +194,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {j==8, i<=98}
 
@@ -313,7 +313,7 @@ void ts_restructured(void)
 //    20k<=11i, 199j#init<=208j+1592, j<=j#init+1,
 //    2j#init+9k#init+2<=2j+9k, 2j+9k<=2j#init+9k#init+11, j#init<=8}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  T() {99<=i, i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k, j<=8}
 
@@ -347,7 +347,7 @@ void ts_restructured(void)
 
          checking_error();
    }
-   else if (flip()) {
+   else if (rand_b()) {
 
 //  T() {99<=i, i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k, j<=8}
 
@@ -376,7 +376,7 @@ void ts_restructured(void)
 
          checking_error();
    }
-   else if (flip()) {
+   else if (rand_b()) {
 
 //  T() {j==8, 16<=i, i<=98, 20k+16<=11i, i<=10k+16}
 
@@ -508,11 +508,11 @@ void ts_singlestate(void)
 
 //  P(i,j,k) {i==0, j==0, k==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(i,j,k) {i<=102, 2j<=i, 2j+20k<=11i, i<=2j+10k, 20k<=11i, j<=9}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(i,j,k) {i<=102, 2j<=i, 2j+20k<=11i, i<=2j+10k, 20k<=11i, j<=9}
 
@@ -546,7 +546,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(i,j,k) {i<=102, 2j<=i, 2j+20k<=11i, i<=2j+10k, 20k<=11i, j<=9}
 
@@ -623,12 +623,12 @@ void ts_restructured(void)
 
 //  P(i,j,k) {i==0, j==0, k==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(i,j,k) {i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k,
 //    20k<=11i, j<=8}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k,
 //    20k<=11i, j<=8}
@@ -664,7 +664,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k,
 //    20k<=11i, j<=8}
@@ -695,7 +695,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=2i+j, 2j<=i, 2j+20k<=11i, i<=2j+10k,
 //    20k<=11i, j<=8}
@@ -815,7 +815,7 @@ void ts_restructured(void)
 //  P(i,j,k) {i<=100, 0<=39i+20j, 2j<=i, 3900k<=2145i+2j, 2j+20k<=11i,
 //    i<=2j+10k, j<=8}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=39i+20j, 2j<=i, 3900k<=2145i+2j, 2j+20k<=11i,
 //    i<=2j+10k, j<=8}
@@ -851,7 +851,7 @@ void ts_restructured(void)
 
          checking_error();
    }
-   else if (flip()) {
+   else if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=39i+20j, 2j<=i, 3900k<=2145i+2j, 2j+20k<=11i,
 //    i<=2j+10k, j<=8}
@@ -882,7 +882,7 @@ void ts_restructured(void)
 
          checking_error();
    }
-   else if (flip()) {
+   else if (rand_b()) {
 
 //  P(i,j,k) {i<=100, 0<=39i+20j, 2j<=i, 3900k<=2145i+2j, 2j+20k<=11i,
 //    i<=2j+10k, j<=8}

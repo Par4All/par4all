@@ -15,11 +15,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int flip(void) {
+int rand_b(void) {
 	return rand() % 2;
 }
-#define OR(t1, t2) {if (flip()) {t1} else {t2}}
-#define LOOP(t) {while (flip()) {t}}
+int rand_z(void) {
+	return rand() - rand();
+}
+
+#define OR(t1, t2) {if (rand_b()) {t1} else {t2}}
+#define LOOP(t) {while (rand_b()) {t}}
 
 void deadlock() {
 	printf("deadlock\n");

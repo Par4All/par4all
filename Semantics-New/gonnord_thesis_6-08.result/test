@@ -22,13 +22,13 @@ void ts_singlestate(void)
 //  T(s,x,y) {1<=s, s<=2, s#init<=s, x<=102, x#init+y<=x+y#init, y<=x,
 //    x+y<=202, 0<=y, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(s,x,y) {2s+x+y==x#init+y#init+4, s#init==1, x#init+y<=x+y#init,
 //    x+y<=x#init+y#init+2, y<=x, x+y<=202, x+y<=y#init+102, 0<=y,
 //    y#init<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {s==1, x<=100}
 
@@ -54,7 +54,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, x<=100}
 
@@ -119,12 +119,12 @@ void ts_restructured(void)
 
 //  T(x,y) {s==1, x<=100, x#init+y<=x+y#init, y<=x, 0<=y, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(x,y) {s==1, x+y==x#init+y#init+2, x<=100, y<=x, 0<=y, y#init<=y,
 //    y<=y#init+1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {s==1, x<=99}
 
@@ -176,7 +176,7 @@ void ts_restructured(void)
 //  T(x,y) {s==1, x+y==x#init+y#init+2, x#init<=100,
 //    y+99<=x#init+y#init, y#init<=x#init, y#init<=y, 0<=y#init}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  T() {s==1, x==100, 0<=y, y<=100}
 
@@ -268,11 +268,11 @@ void ts_singlestate(void)
 
 //  P(s,x,y) {s==1, x==0, y==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(s,x,y) {1<=s, s<=2, x<=102, y<=x, x+y<=202, 0<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(s,x,y) {1<=s, s<=2, x<=102, y<=x, x+y<=202, 0<=y}
 
@@ -298,7 +298,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {1<=s, s<=2, x<=102, y<=x, x+y<=202, 0<=y}
 
@@ -363,11 +363,11 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, x==0, y==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(s,x,y) {s==1, x<=100, y<=x, 0<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(s,x,y) {s==1, x<=100, y<=x, 0<=y}
 
@@ -418,7 +418,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, x<=100, y<=x, 0<=y}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  P(s,x,y) {s==1, x<=100, y<=x, 0<=y}
 

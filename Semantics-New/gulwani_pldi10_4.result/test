@@ -34,12 +34,12 @@ void ts_singlestate(void)
 //  T(f,i,n,s) {i#init+n#init<=i+n, i#init+n#init+s<=i+n+s#init,
 //    n0+s<=i+n+1, i<=n0+1, 0<=n, n<=n#init, n<=n0, 1<=s, s<=2}
 
-   while (flip())
+   while (rand_b())
 
 //  T(f,i,n,s) {i+n+s#init==i#init+n#init+2, i#init+s==i+1,
 //    i<=i#init+1, i#init+2<=i+s#init, i<=n0+1, 0<=n0, s#init<=2}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {f==1, s==1, 0<=n0}
 
@@ -69,7 +69,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==2, 1<=n, 0<=n0}
 
@@ -188,7 +188,7 @@ void ts_restructured(void)
 //  T(f,i,n,s) {f==s-1, f#init==0, i+n==n#init+1, i#init==1,
 //    n#init==n0, s#init==2, 0<=f, f<=1, 1<=f+n, f+n<=n#init}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {f==0, i==1, n==n0, s==2, 2<=n}
 
@@ -221,7 +221,7 @@ void ts_restructured(void)
 //  T(f,i,n) {f==1, i+n==i#init+n#init, i+n==n0+1, s==2, 2<=i, i<=n0,
 //    n<=n#init}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2, 2<=n, 2<=n0}
 
@@ -280,7 +280,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {f==0, i==1, n==1, n0==1, s==2}
 
@@ -419,11 +419,11 @@ void ts_singlestate(void)
 
 //  P(f,i,n,n0,s) {f==1, i==0, n==n0, s==1, 0<=n}
 
-   while (flip())
+   while (rand_b())
 
 //  P(f,i,n,n0,s) {n0+s<=i+n+1, i<=n0+1, 0<=n, n<=n0, 1<=s, s<=2}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(f,i,n,n0,s) {n0+s<=i+n+1, i<=n0+1, 0<=n, n<=n0, 1<=s, s<=2}
 
@@ -453,7 +453,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(f,i,n,n0,s) {n0+s<=i+n+1, i<=n0+1, 0<=n, n<=n0, 1<=s, s<=2}
 
@@ -571,7 +571,7 @@ void ts_restructured(void)
 
 //  P(f,i,n,n0,s) {f==0, i==1, n==n0, s==2, 1<=n}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(f,i,n,n0,s) {f==0, i==1, n==n0, s==2, 1<=n}
 
@@ -603,7 +603,7 @@ void ts_restructured(void)
 
 //  P(f,i,n,n0,s) {f==1, i==2, n==n0-1, s==2, 1<=n}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(f,i,n,n0,s) {f==1, i+n==n0+1, s==2, 1<=n, n+1<=n0}
 
@@ -662,7 +662,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(f,i,n,n0,s) {f==0, i==1, n==n0, s==2, 1<=n}
 

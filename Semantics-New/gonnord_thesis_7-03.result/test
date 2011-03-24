@@ -17,12 +17,12 @@ void ts_singlestate(void)
 
 //  T(x,z) {x#init<=x, x#init+z<=x+z#init, z<=x, 0<=z, z<=10}
 
-   while (flip())
+   while (rand_b())
 
 //  T(x,z) {11x+z#init==11x#init+z+10, z<=x, 0<=z, z<=z#init+1,
 //    z+10z#init<=100}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {z<=9}
 
@@ -88,12 +88,12 @@ void ts_restructured(void)
 //  T(x,z) {9x#init+z#init<=9x+z, x#init+z<=x+z#init, z<=x, 0<=z,
 //    z<=9}
 
-   while (flip())
+   while (rand_b())
 
 //  T(x,z) {x==x#init+1, z#init+1<=x, 0<=z, z<=z#init+1,
 //    z+9z#init<=81}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {z<=8}
 
@@ -185,11 +185,11 @@ void ts_singlestate(void)
 
 //  P(x,z) {x==0, z==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(x,z) {z<=x, 0<=z, z<=10}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(x,z) {z<=x, 0<=z, z<=10}
 
@@ -254,11 +254,11 @@ void ts_restructured(void)
 
 //  P(x,z) {x==0, z==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(x,z) {z<=x, 0<=z, z<=9}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(x,z) {z<=x, 0<=z, z<=9}
 

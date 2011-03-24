@@ -1,23 +1,30 @@
-// Denis Gopan, Thomas W. Reps: Guided Static Analysis. SAS 2007: 349-365
+// Sumit Gulwani, Krishna K. Mehra, Trishul M. Chilimbi: SPEED: precise and
+// efficient static estimation of program computational complexity.
+// POPL 2009: 127-139
+// figure 4a
 
 // $Id$
 
 // parameters
 
-#define DO_CONTROL 1
+#define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (s == 2 || (y <= x && y <= -x + 102))
+#define GOOD (c1 <= m && c2 <= n)
 
 // tools
 
 #include <stdlib.h>
 #include <stdio.h>
 
-int flip(void) {
+int rand_b(void) {
 	return rand() % 2;
 }
-#define OR(t1, t2) {if (flip()) {t1} else {t2}}
-#define LOOP(t) {while (flip()) {t}}
+int rand_z(void) {
+	return rand() - rand();
+}
+
+#define OR(t1, t2) {if (rand_b()) {t1} else {t2}}
+#define LOOP(j) {while (rand_b()) {j}}
 
 void deadlock() {
 	printf("deadlock\n");
@@ -58,50 +65,52 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s == 1 && x <= 50 && y >= 0)
-#define S2 CONTROL(s == 2 && x <= 50 && y >= 0)
-#define S3 CONTROL(s == 1 && x > 50 && y >= 0)
-#define S4 CONTROL(s == 2 && x > 50 && y >= 0)
-#define S5 CONTROL(s == 2 && x > 50 && y < 0)
+#define S1 CONTROL(x < n && y < m)
+#define S2 CONTROL(x < n && y >= m)
+#define S3 CONTROL(x >= n)
 
-#define G1 (s == 1 && x <= 50)
-#define A1 {s = 2; y++;}
+#define G1 (x < n && y < m)
+#define G1a (x < n && y < m - 1)
+#define G1b (x < n && y == m - 1)
+#define A1 {y++; c1++;}
 #define C1 COMMAND(G1, A1)
+#define C1a COMMAND(G1a, A1)
+#define C1b COMMAND(G1b, A1)
 
-#define G2 (s == 1 && x > 50)
-#define G2a (G2 && y == 0)
-#define G2b (G2 && y >= 1)
-#define A2 {s = 2; y--;}
+#define G2 (x < n && y >= m)
+#define G2a (x < n - 1 && y >= m)
+#define G2b (x == n - 1 && y >= m)
+#define A2 {x++; c2++;}
 #define C2 COMMAND(G2, A2)
 #define C2a COMMAND(G2a, A2)
 #define C2b COMMAND(G2b, A2)
 
-#define G3 (s == 2 && y >= 0)
-#define G3a (G3 && x <= 49)
-#define G3b (G3 && x == 50)
-#define A3 {s = 1; x++;}
-#define C3 COMMAND(G3, A3)
-#define C3a COMMAND(G3a, A3)
-#define C3b COMMAND(G3b, A3)
-
-#define INI {s = 1; x = y = 0;}
+#define INI {\
+	n = rand(); m = rand();\
+	x = y = c1 = c2 = 0;\
+}
 
 // transition system
 
 void ts_singlestate(void) {
-	int s, x, y;
+	int n, m, x, y, c1, c2;
 	INI;
-	LOOP(OR(C1, OR(C2, C3)));
+	LOOP(OR(C1, C2));
 }
 
 void ts_restructured(void) {
-	int s, x, y;
+	int n, m, x, y, c1, c2;
 	INI;
-	S1;
-	LOOP(C1; S2; C3a; S1);
-	C1; S2; C3b; S3;
-	LOOP(C2b; S4; C3; S3);
-	C2a; S5;
+	if (x < n)
+		if (y < m) goto L1;
+		else goto L2;
+	else goto L3;
+L1:
+	S1; LOOP(C1a; S1); C1b;
+L2:
+	S2; LOOP(C2a; S2); C2b;
+L3:
+	S3;
 }
 
 int main(void) {

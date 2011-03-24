@@ -17,11 +17,11 @@ void ts_singlestate(void)
 
 //  T(x,y) {x#init+y<=x+y#init, y<=x, 0<=y, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(x,y) {x==x#init+1, y#init<=y, y<=y#init+1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {y<=1}
 
@@ -86,11 +86,11 @@ void ts_restructured(void)
 
 //  T(x,y) {x#init+y<=x+y#init, y<=x, x<=y+1, 0<=y, y<=1, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(x,y) {x==x#init+1, x<=y+1, y<=1, y#init<=y, y<=y#init+1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {x<=y, y<=1}
 
@@ -142,7 +142,7 @@ void ts_restructured(void)
 //  T(x,y) {x#init+1<=x, x#init+y+1<=x+2y#init, 1<=x#init,
 //    2y#init+1<=x#init+y, x#init<=y#init+1, y#init<=1}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  T() {x==y+1, 1<=x, x<=2}
 
@@ -166,7 +166,7 @@ void ts_restructured(void)
 
 //  T(x) {x#init<=x, y+2<=x, 0<=y, y<=1}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  T() {0<=y, y<=1}
 
@@ -217,7 +217,7 @@ void ts_restructured(void)
 
 //  T(x,y) {x+y#init==x#init+y, x#init<=x, y<=x, x<=y+1, 2<=y}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  T() {x<=y+1}
 
@@ -264,11 +264,11 @@ void ts_singlestate(void)
 
 //  P(x,y) {x==0, y==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(x,y) {y<=x, 0<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(x,y) {y<=x, 0<=y}
 
@@ -333,11 +333,11 @@ void ts_restructured(void)
 
 //  P(x,y) {x==0, y==0}
 
-   while (flip())
+   while (rand_b())
 
 //  P(x,y) {y<=x, x<=y+1, 0<=y, y<=1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(x,y) {y<=x, x<=y+1, 0<=y, y<=1}
 
@@ -388,7 +388,7 @@ void ts_restructured(void)
 
 //  P(x,y) {y<=x, x<=y+1, 0<=y, y<=1}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  P(x,y) {y<=x, x<=y+1, 0<=y, y<=1}
 
@@ -412,7 +412,7 @@ void ts_restructured(void)
 
 //  P(x,y) {x==y+2, 2<=x, x<=3}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  P(x,y) {y+2<=x, 0<=y, y<=1}
 
@@ -463,7 +463,7 @@ void ts_restructured(void)
 
 //  P(x,y) {y==2, 2<=x, x<=3}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  P(x,y) {y<=x, x<=y+1, 2<=y}
 

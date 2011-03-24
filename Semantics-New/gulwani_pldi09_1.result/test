@@ -38,11 +38,11 @@ void ts_singlestate(void)
 //  T(j,t) {0<=i, t<=i+j+1, i<=n, 0<=j, j#init<=j, j#init+t<=j+t#init,
 //    j<=n+1, t<=n+1}
 
-   while (flip())
+   while (rand_b())
 
 //  T(j,t) {j==j#init+1, 0<=i, i<=n, j<=n+1, t<=n+1, t<=t#init+1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {0<=i, i<=n, t<=n}
 
@@ -136,7 +136,7 @@ void ts_restructured(void)
 //  T(j,t) {i+j==t-1, j+t#init==j#init+t, 0<=j, j+1<=t, t<=n,
 //    t#init<=t}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  T() {0<=i, i+1<=n, t+1<=n}
 
@@ -191,7 +191,7 @@ void ts_restructured(void)
 //  T(j,t) {i+j#init==j-1, j#init+t==j-1, j==n+1, j==t#init,
 //    j#init+1<=j, 0<=j#init}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  T() {i==0, j==n, j==t-1, 0<=n}
 
@@ -246,7 +246,7 @@ void ts_restructured(void)
 //  T(j,t) {i+j==n+t+1, j+t#init==j#init+t, n+1<=i+j, i<=n, j<=n,
 //    t#init<=t}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  T() {1<=i, i<=n, t+2<=i}
 
@@ -337,11 +337,11 @@ void ts_singlestate(void)
 
 //  P(i,j,n,t) {i==t-1, j==0, 0<=i, i<=n, 0<=n}
 
-   while (flip())
+   while (rand_b())
 
 //  P(i,j,n,t) {0<=i, t<=i+j+1, i<=n, 0<=j, j<=n+1, t<=n+1}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(i,j,n,t) {0<=i, t<=i+j+1, i<=n, 0<=j, j<=n+1, t<=n+1}
 
@@ -434,7 +434,7 @@ void ts_restructured(void)
 
 //  P(i,j,n,t) {i==t-1, j==0, 0<=i, i+1<=n, 0<=n}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  P(i,j,n,t) {i+j==t-1, 0<=i, i+1<=t, t<=n}
 
@@ -488,7 +488,7 @@ void ts_restructured(void)
 
 //  P(i,j,n,t) {i+j==n, i+j==t-1, 0<=i, 0<=j}
 
-   if (flip()) {
+   if (rand_b()) {
 
 //  P(i,j,n,t) {i+j==n, i+j==t-1, 0<=i, 0<=j}
 
@@ -542,7 +542,7 @@ void ts_restructured(void)
 
 //  P(i,j,n,t) {i+j==n+1, t==0, 1<=i, 1<=j, 0<=n}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  P(i,j,n,t) {i+j==n+t+1, n+1<=i+j, i<=n, j<=n}
 

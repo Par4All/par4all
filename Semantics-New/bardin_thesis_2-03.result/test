@@ -25,11 +25,11 @@ void ts_singlestate(void)
 
 //  T(s,x,y) {1<=s, s<=2, 0<=x, 0<=y, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(s,x,y) {s<=2, y+1<=s+y#init, 0<=x, y#init<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {s==1, 0<=x}
 
@@ -51,7 +51,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==2}
 
@@ -77,7 +77,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -154,7 +154,7 @@ void ts_restructured(void)
 
 //  T(x) {s==1, 0<=x, x#init<=x, x+1<=y}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  T() {s==1, 0<=x, x+3<=y, 1<=y}
 
@@ -200,12 +200,12 @@ void ts_restructured(void)
 
 //  T(s,x,y) {s==1, s#init==1, 0<=x, 0<=y, y#init<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  T(s,x,y) {s==1, s#init==1, x#init+y<=2x+y#init, 0<=x#init,
 //    y#init<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  T() {s==1, 0<=x}
 
@@ -227,7 +227,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -251,7 +251,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -302,7 +302,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -326,7 +326,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -379,7 +379,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -403,7 +403,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -477,7 +477,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -528,7 +528,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -552,7 +552,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -605,7 +605,7 @@ void ts_restructured(void)
 
 //  T(x) {s==1, 0<=x, x#init<=x, x+1<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==1, 0<=x, x+3<=y, 1<=y}
 
@@ -648,7 +648,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -672,7 +672,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -725,7 +725,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -749,7 +749,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -823,7 +823,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -876,7 +876,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -919,7 +919,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  T() {s==1, y<=x}
 
@@ -943,7 +943,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -1022,7 +1022,7 @@ void ts_restructured(void)
 
 //  T(x,y) {s==2, x+y#init==x#init+y, 0<=x, x#init<=x, y<=x}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {s==2}
 
@@ -1075,7 +1075,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -1099,7 +1099,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -1173,7 +1173,7 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  T() {0==-1}
 
@@ -1256,11 +1256,11 @@ void ts_singlestate(void)
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
 
@@ -1282,7 +1282,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
 
@@ -1308,7 +1308,7 @@ void ts_singlestate(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
 
@@ -1385,7 +1385,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, 0<=x, x+1<=y, 0<=y}
 
-      while (flip()) {
+      while (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, x+1<=y}
 
@@ -1431,11 +1431,11 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, y<=x, 0<=y}
 
-   while (flip())
+   while (rand_b())
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
-      if (flip()) {
+      if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -1457,7 +1457,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -1481,7 +1481,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -1532,7 +1532,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -1556,7 +1556,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -1609,7 +1609,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -1633,7 +1633,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -1707,7 +1707,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -1758,7 +1758,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -1782,7 +1782,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -1835,7 +1835,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, 0<=x, 0<=x+y, x+1<=y, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, x+1<=y}
 
@@ -1878,7 +1878,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -1902,7 +1902,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -1955,7 +1955,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -1979,7 +1979,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -2053,7 +2053,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -2106,7 +2106,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -2149,7 +2149,7 @@ void ts_restructured(void)
 
             checking_error();
       }
-      else if (flip()) {
+      else if (rand_b()) {
 
 //  P(s,x,y) {s==1, 0<=x, 0<=y}
 
@@ -2173,7 +2173,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -2252,7 +2252,7 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, 0<=x, y<=x, 0<=y}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P(s,x,y) {s==2, y<=x, 0<=y}
 
@@ -2305,7 +2305,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -2329,7 +2329,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-            while (flip()) {
+            while (rand_b()) {
 
 //  P() {0==-1}
 
@@ -2403,7 +2403,7 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         while (flip()) {
+         while (rand_b()) {
 
 //  P() {0==-1}
 
