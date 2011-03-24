@@ -98,13 +98,30 @@
 
 /* TYPE INDEPENDENT OPERATIONS */
 
-static transformer generic_reference_to_transformer(entity v, entity r, bool is_internal)
+/* May return an  undefined transformer */
+// static: no longer because used i ri_to_transformers.c because
+// assignments are handled there
+transformer generic_reference_to_transformer(entity v,
+						    reference r,
+						    transformer pre,
+						    bool is_internal)
 {
   transformer tf = transformer_undefined;
+  entity rv = reference_variable(r);
 
-  if((!is_internal && analyzable_scalar_entity_p(r)) || entity_has_values_p(r)) {
-    entity r_new = is_internal? entity_to_new_value(r) : external_entity_to_new_value(r);
-    tf =  simple_equality_to_transformer(v, r_new, FALSE);
+  if((!is_internal && analyzable_scalar_entity_p(rv))
+     || entity_has_values_p(rv)) {
+    entity rv_new = is_internal?
+    entity_to_new_value(rv) : external_entity_to_new_value(rv);
+    tf =  simple_equality_to_transformer(v, rv_new, FALSE);
+  }
+  else { /* If you are dealing with a C array reference, find
+	    transformers for each subscript expression in case of
+	    side effects. */
+    entity m = get_current_module_entity();
+    if(c_language_module_p(m)) {
+      tf = expressions_to_transformer(reference_indices(r), pre);
+    }
   }
   return tf;
 }
@@ -2052,8 +2069,9 @@ integer_expression_to_transformer(
     tf = integer_call_expression_to_transformer(v, expr, pre, is_internal);
   }
   else if(syntax_reference_p(sexpr)) {
-      entity e = reference_variable(syntax_reference(sexpr));
-      tf = generic_reference_to_transformer(v, e, is_internal);
+    //entity e = reference_variable(syntax_reference(sexpr));
+    reference r = syntax_reference(sexpr);
+    tf = generic_reference_to_transformer(v, r, pre, is_internal);
   }
   else {
     /* vect_rm(ve); */
@@ -2598,8 +2616,11 @@ transformer float_expression_to_transformer(entity v,
     break;
   case is_syntax_reference:
     {
-      entity e = reference_variable(syntax_reference(srhs));
-      tf = generic_reference_to_transformer(v, e, is_internal);
+      //entity e = reference_variable(syntax_reference(srhs));
+      // FI: some filtering needed if integer expressions should not
+      // be exploited...
+      reference r = syntax_reference(srhs);
+      tf = generic_reference_to_transformer(v, r, pre, is_internal);
       break;
     }
   case is_syntax_range:
@@ -3006,6 +3027,25 @@ transformer expression_to_transformer(
     entity tmpv = make_local_temporary_value_entity(et);
     /* FI: I do not remember the meaning of the last parameter */
     tf = any_expression_to_transformer(tmpv, exp, pre, FALSE);
+  }
+  else {
+    // FI: we should go down recursively anyway because of casts and
+    // side effects in C...
+    if(expression_reference_p(exp)) {
+      reference r = expression_reference(exp);
+      tf = generic_reference_to_transformer(entity_undefined, r, pre, FALSE);
+    }
+    else if(expression_call_p(exp)) {
+      call c = expression_call(exp);
+      tf = expressions_to_transformer(call_arguments(c), pre);
+    }
+    else if(expression_cast_p(exp)) {
+      cast c = expression_cast(exp);
+      expression sub_exp = cast_expression(c);
+      tf = safe_expression_to_transformer(sub_exp, pre);
+    }
+    // FI: Many other possible cases: range, sizeofexpression, subscript,
+    // application, va_arg
   }
 
   /* If everything else has failed. */
