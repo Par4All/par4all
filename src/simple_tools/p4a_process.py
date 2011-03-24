@@ -272,6 +272,8 @@ class p4a_processor(object):
 
     # the list of kernel names
     kernels = []
+    # the list of launcher names
+    launchers = []
 
     # some constant to be used for the pips generated files
     new_files_folder  = "p4a_new_files"
@@ -845,6 +847,7 @@ class p4a_processor(object):
 
         # save the list of kernels for later work
         self.kernels.extend (map(lambda x:x.name, kernels))
+        self.launchers.extend (map(lambda x:x.name, kernel_launchers))
 
         # To be able to inject Par4All accelerator run time initialization
         # later:
@@ -919,6 +922,25 @@ class p4a_processor(object):
         """
         return name.replace (self.get_kernel_prefix (), self.get_launcher_prefix ())
 
+    def launchers_insert_extern_C (self):
+        """Insert the extern C block construct to the whole file. The all
+        the file functions will be callable from a C code.
+        """
+        for launcher in self.launchers:
+            # Where the file does well in the .database workspace:
+            launcher_file = os.path.join(self.workspace.dirname(), "Src",
+                                         launcher + ".c")
+            # first open for read and get content
+            src = open (launcher_file, 'r')
+            lines = src.readlines ()
+            src.close ()
+            # then add the extern C block
+            dst = open (launcher_file, 'w')
+            dst.write ('#ifdef __cplusplus\nextern "C" {\n#endif\n')
+            for line in lines:
+                dst.write (line)
+            dst.write ("\n#ifdef __cplusplus\n}\n#endif\n")
+            dst.close ()
     def merge_lwk (self):
         """ merge launcher wrapper and kernel in one file. The order is
         important the launcher call the wrapper that call the kernel. So
@@ -1144,6 +1166,7 @@ class p4a_processor(object):
         # been generated in different files. This is forbidden by cuda.
         # Let's merge them in the same files
         if ((self.c99 == True) and (self.cuda == True)):
+            self.launchers_insert_extern_C ()
             self.merge_lwk ()
 
         # save the user files
