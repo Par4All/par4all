@@ -174,26 +174,19 @@ void ts_restructured(void)
 
    i = 0;
 
-//  T() {i==0, n==n0, s==1, 1<=m, 1<=n}
-
-   if (!(n>0&&m>0&&s==1))
-
-//  T() {0==-1}
-
-      control_error();
-
 //  T(i,m,n,s) {i==n#init, i==n0, i#init==0, n==0, s==2, s#init==1,
 //    m#init<=i+m, m+2<=i+m#init, 0<=m, 1<=m#init}
 
    if (rand_b()) {
 
-//  T(i,m,n,s) {i+n==i#init+n#init, i+n==n0, s==1, s#init==1, 0<=i,
-//    i#init+m#init<=i+m, i#init+m<=i+m#init, 1<=m, 1<=n}
+//  T(i,m,n,s) {i+n==i#init+n#init, i+n==n0, s==1, s#init==1,
+//    i#init+m#init<=i+m, i#init+m<=i+m#init, 1<=m, 2<=m+n, 0<=n,
+//    2<=n+n0, n<=n0}
 
       while (rand_b()) {
 
-//  T(i,m,n,s) {i+m#init==i#init+m+2, i+n==i#init+n#init, s==2,
-//    s#init==1, i#init+1<=i, i<=i#init+2, i<=n0, 1<=m, 1<=n, 1<=n0}
+//  T(i,m,n,s) {i+m#init==i#init+m+2, m+n==m#init+n#init-2, s==2,
+//    s#init==1, i<=n0, 1<=m, m#init<=m+1, m<=m#init, 1<=n, 1<=n0}
 
          if (rand_b()) {
 
@@ -228,14 +221,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
                checking_error();
-
-//  T() {s==2, i<=n0, 1<=m, 1<=n, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  T() {0==-1}
-
-               control_error();
          }
          else {
 
@@ -271,14 +256,6 @@ void ts_restructured(void)
 
                checking_error();
 
-//  T() {m==0, s==2, i<=n0, 1<=n, 1<=n0}
-
-            if (!(n>0&&m==0&&s==2))
-
-//  T() {0==-1}
-
-               control_error();
-
 //  T() {m==0, s==2, i<=n0, 2<=n, 1<=n0}
 
             if (!(n>0&&s==2&&n>1))
@@ -306,18 +283,10 @@ void ts_restructured(void)
 //  T() {0==-1}
 
                checking_error();
-
-//  T() {m==1, s==2, i<=n0, 1<=n, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  T() {0==-1}
-
-               control_error();
          }
 
-//  T(i,m,n) {i+m#init==i#init+m, i+n==i#init+n#init, s==2, i#init<=i,
-//    i<=n0, 1<=m, 1<=n, 1<=n0}
+//  T(i,m,n) {i+m#init==i#init+m, m+n==m#init+n#init, s==2, i<=n0,
+//    1<=m, m#init<=m, 1<=n, 1<=n0}
 
          while (rand_b()) {
 
@@ -348,14 +317,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
                checking_error();
-
-//  T() {s==2, i<=n0, 1<=m, 1<=n, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  T() {0==-1}
-
-               control_error();
          }
 
 //  T() {s==2, i+1<=m+n0, 1<=m, 2<=m+n, 1<=n0}
@@ -377,14 +338,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {s==1, i+1<=m+n0, i<=n0, 1<=m, 2<=m+n, 1<=n, 1<=n0}
-
-         if (!(n>0&&m>0&&s==1))
-
-//  T() {0==-1}
-
-            control_error();
       }
 
 //  T(i,m,n,s) {i+n==n0, i#init+n#init==n0, m+n==m#init+n#init-2,
@@ -463,14 +416,6 @@ void ts_restructured(void)
 
             checking_error();
 
-//  T() {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
-
-         if (!(n>0&&m==0&&s==2))
-
-//  T() {0==-1}
-
-            control_error();
-
 //  T() {i+n==n0, m==0, s==2, 2<=n, n+1<=n0, 1<=n0}
 
          if (!(n>0&&s==2&&n>1))
@@ -500,16 +445,8 @@ void ts_restructured(void)
             checking_error();
       }
 
-//  T() {i+n==n0, s==2, 1<=m, n+1<=m+n0, 1<=n, n+1<=n0, 1<=n0}
-
-      if (!(n>0&&m>0&&s==2))
-
-//  T() {0==-1}
-
-         control_error();
-
-//  T(i,m,n) {i+m#init==i#init+m, i+n==i#init+n#init, i+n==n0, s==2,
-//    1<=i, i#init<=i, 1<=m, 1<=n}
+//  T(i,m,n) {i+m#init==i#init+m, i+n==n0, m+n==m#init+n#init, s==2,
+//    1<=i, 1<=m, m#init<=m, 1<=n}
 
       while (rand_b()) {
 
@@ -540,14 +477,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {s==2, i<=n0, 1<=m, 1<=n, 2<=n0}
-
-         if (!(n>0&&m>0&&s==2))
-
-//  T() {0==-1}
-
-            control_error();
       }
 
 //  T() {i==n0-1, n==1, s==2, 1<=i, 1<=i+m, 1<=m}
@@ -577,14 +506,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
          checking_error();
-
-//  T() {i==n0, n==0, s==2, 2<=i, 3<=i+m, 2<=m}
-
-      if (!(n==0&&s==2))
-
-//  T() {0==-1}
-
-         control_error();
    }
    else if (rand_b()) {
 
@@ -620,14 +541,6 @@ void ts_restructured(void)
 
          checking_error();
 
-//  T() {i==1, m==0, n==n0-1, s==2, 1<=n}
-
-      if (!(n>0&&m==0&&s==2))
-
-//  T() {0==-1}
-
-         control_error();
-
 //  T(i,m,n) {i==2, i#init==1, m==1, m#init==0, n==0, n#init==1,
 //    n0==2, s==2}
 
@@ -652,14 +565,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {i==1, m==0, n==n0-1, s==1, 1<=n}
-
-         if (!(n>0&&m==0&&s==1))
-
-//  T() {0==-1}
-
-            control_error();
 
 //  T() {0==-1}
 
@@ -694,14 +599,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {i==2, m==1, n==0, n0==2, s==2}
-
-         if (!(n==0&&s==2))
-
-//  T() {0==-1}
-
-            control_error();
       }
    }
    else {
@@ -737,14 +634,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
          checking_error();
-
-//  T() {i==1, n==0, n0==1, s==2, 0<=m}
-
-      if (!(n==0&&s==2))
-
-//  T() {0==-1}
-
-         control_error();
    }
 
 //  T() {i==n0, n==0, s==2, 1<=i, 1<=i+m, 0<=m}
@@ -766,14 +655,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
       checking_error();
-
-//  T() {i==n0, n==0, s==1, 1<=i, 1<=i+m, 0<=m}
-
-   if (!(n==0&&s==1))
-
-//  T() {0==-1}
-
-      control_error();
 }
 
 PRECONDITIONS
@@ -959,91 +840,83 @@ void ts_restructured(void)
 
 //  P(i,m,n,n0,s) {i==0, n==n0, s==1, 1<=m, 1<=n}
 
-   if (!(n>0&&m>0&&s==1))
-
-//  P() {0==-1}
-
-      control_error();
-
-//  P(i,m,n,n0,s) {i==0, n==n0, s==1, 1<=m, 1<=n}
-
    if (rand_b()) {
 
 //  P(i,m,n,n0,s) {i==0, n==n0, s==1, 1<=m, 1<=n}
 
       while (rand_b()) {
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 1<=n, n<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 2<=m+n, 0<=n, 2<=n+n0, n<=n0}
 
          if (rand_b()) {
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 1<=n, n<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 2<=m+n, 0<=n, 2<=n+n0, n<=n0}
 
             if (!(n>0&&m>0&&s==1&&n>1&&m>1))
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 0<=i, i+1<=n0, 1<=m}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 0<=i, i+2<=m+n0, i+2<=2n0, i<=n0,
+//    1<=m}
 
                deadlock();
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 2<=m, 2<=n, n<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 2<=m, 2<=m+n, 2<=n, 2<=n+n0, n<=n0}
 
             n--;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, s==1, 2<=m, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, s==1, 2<=m, 1<=m+n, 1<=n, 1<=n+n0,
+//    n+1<=n0, 1<=n0}
 
             m--;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, s==1, 1<=m, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, s==1, 1<=m, 0<=m+n, 1<=n, 1<=n+n0,
+//    n+1<=n0, 1<=n0}
 
             i++;
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 0<=m+n, 1<=n, 1<=n+n0,
+//    n+1<=n0, 1<=n0}
 
             s = 2;
 
-//  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 0<=m+n, 1<=n, 1<=n+n0,
+//    n+1<=n0, 1<=n0}
 
             if (!(i<=n0))
 
 //  P() {0==-1}
 
                checking_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  P() {0==-1}
-
-               control_error();
          }
          else {
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 1<=n, n<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 2<=m+n, 0<=n, 2<=n+n0, n<=n0}
 
             if (!(n>0&&m>0&&s==1&&n>1&&m==1))
 
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 0<=i, i+1<=n0, 1<=m}
+//  P(i,m,n,n0,s) {i+n==n0, s==1, 0<=i, i+2<=m+n0, i+2<=2n0, i<=n0,
+//    1<=m}
 
                deadlock();
 
-//  P(i,m,n,n0,s) {i+n==n0, m==1, s==1, 2<=n, n<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==1, s==1, 2<=n, 2<=n+n0, n<=n0}
 
             n--;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, m==1, s==1, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, m==1, s==1, 1<=n, 1<=n+n0, n+1<=n0,
+//    1<=n0}
 
             m--;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, m==0, s==1, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, m==0, s==1, 1<=n, 1<=n+n0, n+1<=n0,
+//    1<=n0}
 
             i++;
 
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==1, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==0, s==1, 1<=n, 1<=n+n0, n+1<=n0, 1<=n0}
 
             s = 2;
 
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, 1<=n+n0, n+1<=n0, 1<=n0}
 
             if (!(i<=n0))
 
@@ -1051,15 +924,7 @@ void ts_restructured(void)
 
                checking_error();
 
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
-
-            if (!(n>0&&m==0&&s==2))
-
-//  P() {0==-1}
-
-               control_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, 1<=n+n0, n+1<=n0, 1<=n0}
 
             if (!(n>0&&s==2&&n>1))
 
@@ -1067,33 +932,27 @@ void ts_restructured(void)
 
                deadlock();
 
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 2<=n, n+1<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 2<=n, 1<=n+n0, n+1<=n0, 1<=n0}
 
             n--;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, m==0, s==2, 1<=n, n+2<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, m==0, s==2, 1<=n, 0<=n+n0, n+2<=n0,
+//    1<=n0}
 
             m++;
 
-//  P(i,m,n,n0,s) {i+n==n0-1, m==1, s==2, 1<=n, n+2<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0-1, m==1, s==2, 1<=n, 0<=n+n0, n+2<=n0,
+//    1<=n0}
 
             i++;
 
-//  P(i,m,n,n0,s) {i+n==n0, m==1, s==2, 1<=n, n+2<=n0, 1<=n0}
+//  P(i,m,n,n0,s) {i+n==n0, m==1, s==2, 1<=n, 0<=n+n0, n+2<=n0, 1<=n0}
 
             if (!(i<=n0))
 
 //  P() {0==-1}
 
                checking_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, m==1, s==2, 1<=n, n+2<=n0, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  P() {0==-1}
-
-               control_error();
          }
 
 //  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0}
@@ -1127,14 +986,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
                checking_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, s==2, 2<=m, 1<=n, n+2<=n0, 1<=n0}
-
-            if (!(n>0&&m>0&&s==2))
-
-//  P() {0==-1}
-
-               control_error();
          }
 
 //  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0}
@@ -1156,14 +1007,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 2<=m+n, 1<=n, n+1<=n0, 1<=n0}
-
-         if (!(n>0&&m>0&&s==1))
-
-//  P() {0==-1}
-
-            control_error();
       }
 
 //  P(i,m,n,n0,s) {i+n==n0, s==1, 1<=m, 1<=n, n<=n0}
@@ -1242,14 +1085,6 @@ void ts_restructured(void)
 
 //  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
 
-         if (!(n>0&&m==0&&s==2))
-
-//  P() {0==-1}
-
-            control_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, m==0, s==2, 1<=n, n+1<=n0, 1<=n0}
-
          if (!(n>0&&s==2&&n>1))
 
 //  P(i,m,n,n0,s) {i==n0-1, m==0, n==1, s==2, 2<=n0}
@@ -1276,14 +1111,6 @@ void ts_restructured(void)
 
             checking_error();
       }
-
-//  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0}
-
-      if (!(n>0&&m>0&&s==2))
-
-//  P() {0==-1}
-
-         control_error();
 
 //  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0}
 
@@ -1316,14 +1143,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i,m,n,n0,s) {i+n==n0, s==2, 2<=m, 1<=n, n+2<=n0, 2<=n0}
-
-         if (!(n>0&&m>0&&s==2))
-
-//  P() {0==-1}
-
-            control_error();
       }
 
 //  P(i,m,n,n0,s) {i+n==n0, s==2, 1<=m, 1<=n, n+1<=n0}
@@ -1353,14 +1172,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
          checking_error();
-
-//  P(i,m,n,n0,s) {i==n0, n==0, s==2, 2<=i, 3<=i+m, 2<=m}
-
-      if (!(n==0&&s==2))
-
-//  P() {0==-1}
-
-         control_error();
    }
    else if (rand_b()) {
 
@@ -1398,14 +1209,6 @@ void ts_restructured(void)
 
 //  P(i,m,n,n0,s) {i==1, m==0, n==n0-1, s==2, 1<=n}
 
-      if (!(n>0&&m==0&&s==2))
-
-//  P() {0==-1}
-
-         control_error();
-
-//  P(i,m,n,n0,s) {i==1, m==0, n==n0-1, s==2, 1<=n}
-
       if (rand_b()) {
 
 //  P(i,m,n,n0,s) {i==1, m==0, n==n0-1, s==2, 1<=n}
@@ -1427,14 +1230,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i,m,n,n0,s) {i==1, m==0, n==n0-1, s==1, 1<=n}
-
-         if (!(n>0&&m==0&&s==1))
-
-//  P() {0==-1}
-
-            control_error();
 
 //  P(i,m,n,n0,s) {i==1, m==0, n==n0-1, s==1, 1<=n}
 
@@ -1469,14 +1264,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i,m,n,n0,s) {i==2, m==1, n==0, n0==2, s==2}
-
-         if (!(n==0&&s==2))
-
-//  P() {0==-1}
-
-            control_error();
       }
    }
    else {
@@ -1512,14 +1299,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
          checking_error();
-
-//  P(i,m,n,n0,s) {i==1, n==0, n0==1, s==2, 0<=m}
-
-      if (!(n==0&&s==2))
-
-//  P() {0==-1}
-
-         control_error();
    }
 
 //  P(i,m,n,n0,s) {i==n0, n==0, s==2, 1<=i, 0<=m}
@@ -1541,12 +1320,4 @@ void ts_restructured(void)
 //  P() {0==-1}
 
       checking_error();
-
-//  P(i,m,n,n0,s) {i==n0, n==0, s==1, 1<=i, 1<=i+m, 0<=m}
-
-   if (!(n==0&&s==1))
-
-//  P() {0==-1}
-
-      control_error();
 }
