@@ -3285,7 +3285,8 @@ transformer expressions_to_transformer(list expl,
 				       transformer pre)
 {
   transformer tf = transformer_identity();
-  transformer cpre = copy_transformer(pre);
+  transformer cpre = transformer_undefined_p(pre)?
+    transformer_identity() : copy_transformer(pre);
 
   FOREACH(EXPRESSION, exp, expl) {
     /* el is an over-appoximation; should be replaced by a
