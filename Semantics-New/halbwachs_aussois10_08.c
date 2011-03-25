@@ -1,9 +1,7 @@
-// Nicolas Halbwachs: Détermination automatique de relations linéaires
-// vérifiées par les variables d'un programme
-// figure 3.1
-// Laure Gonnord: Accélération abstraite pour l'amélioration de la précision en
-// Analyse des Relations Linéaires
-// figure 2.12
+// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
+// talk at Aussois, 9/12/2010
+// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
+// slide 8
 
 // $Id$
 
@@ -11,7 +9,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define BAD (i < 2 * j || j < 0)
+#define GOOD (0 <= y && y <= x && x <= 102 && x + y <= 202)
 
 // tools
 
@@ -67,38 +65,39 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(i <= 100)
-#define S2 CONTROL(i > 100)
+#define S1 CONTROL(x <= 100)
+#define S2 CONTROL(x > 100)
 
-#define G1 (i <= 100)
-#define G1a (i <= 96)
-#define G1b (G1 && i > 96)
-#define U1 {i += 4;}
+#define G1 (x <= 100)
+#define G1a (x <= 98)
+#define G1b (G1 && x >= 99)
+#define U1 {x += 2;}
 #define C1 COMMAND(G1, U1)
 #define C1a COMMAND(G1a, U1)
 #define C1b COMMAND(G1b, U1)
 
-#define G2 (i <= 100)
-#define G2a (i <= 98)
-#define G2b (G2 && i > 98)
-#define U2 {i += 2; j++;}
+#define G2 (x <= 100)
+#define G2a (x <= 99)
+#define G2b (x == 100)
+#define U2 {x++; y++;}
 #define C2 COMMAND(G2, U2)
 #define C2a COMMAND(G2a, U2)
 #define C2b COMMAND(G2b, U2)
 
-#define INI {i = j = 0;}
+#define INI {x = y = 0;}
 
 // transition system
 
 void ts_singlestate(void) {
-	int i, j;
+	int x, y;
 	INI;
 	LOOP(OR(C1, C2));
 }
 
 void ts_restructured(void) {
-	int i, j;
+	int x, y;
 	INI;
+	S1;
 	LOOP(OR(C1a; S1, C2a; S1));
 	OR(C1b; S2, C2b; S2);
 }
