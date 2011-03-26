@@ -41,4 +41,5 @@ setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "omp"
 display PRINTED_FILE[%ALLFUNC]
 
 close
-
+delete is
+quit
