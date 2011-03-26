@@ -19,36 +19,6 @@ Intrinsic cost table:
                      /   |     1      1       1        1        1
                     --   |     1      1       1        1        1
                     **   |     1      1       1        1        1
-                     .   |     1      1       1        1        1
-                    ->   |     1      1       1        1        1
-          *indirection   |     1      1       1        1        1
-                post++   |     1      1       1        1        1
-                post--   |     1      1       1        1        1
-                 ++pre   |     1      1       1        1        1
-                 --pre   |     1      1       1        1        1
-                    *=   |     1      1       1        1        1
-                    /=   |     1      1       1        1        1
-                    +=   |     1      1       1        1        1
-                    -=   |     1      1       1        1        1
-                   <<=   |     1      1       1        1        1
-                   >>=   |     1      1       1        1        1
-                    |=   |     1      1       1        1        1
-                    <<   |     1      1       1        1        1
-                    >>   |     1      1       1        1        1
-        __address-of__   |     1      1       1        1        1
-           __bit-and__   |     1      1       1        1        1
-           __bit-not__   |     1      1       1        1        1
-             __C-xor__   |     1      1       1        1        1
-             __C-and__   |     1      1       1        1        1
-   __C-modulo-update__   |     1      1       1        1        1
-  __C-bit-and-update__   |     1      1       1        1        1
-  __C-bit-xor-update__   |     1      1       1        1        1
-     __C-conditional__   |     1      1       1        1        1
-     __C-logical-not__   |     1      1       1        1        1
-       __C-non-equal__   |     1      1       1        1        1
-          __C-modulo__   |     1      1       1        1        1
-                     |   |     1      1       1        1        1
-              TypeCast   |     1      1       1        1        1
                 IMA-OP   |     0      0       0        0        0
                 IMS-OP   |     0      0       0        0        0
     LOOP-INIT-OVERHEAD   |     1      1       1        1        1
@@ -171,8 +141,6 @@ Intrinsic cost table:
                  DCOSH   |     1      1       1        1        1
                   TANH   |     1      1       1        1        1
                  DTANH   |     1      1       1        1        1
-                    <<   |     0      0       0        0        0
-                    >>   |     0      0       0        0        0
                    LGE   |     0      0       0        0        0
                    LGT   |     0      0       0        0        0
                    LLE   |     0      0       0        0        0
