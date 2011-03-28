@@ -12,7 +12,6 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    s2 = s1;
 //  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;

@@ -17,10 +17,10 @@ int main()
    p = (int **) malloc(sizeof(int *));
 //  {(p,*HEAP*_l_10,-Exact-);(q,*HEAP*_l_8,-Exact-)}
    p[0] = q;
-//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(p,*HEAP*_l_10,
-//   -Exact-);(q,*HEAP*_l_8,-Exact-)}
+//  {(*HEAP*_l_10,*HEAP*_l_8,-Exact-);(p,*HEAP*_l_10,-Exact-);(q,
+//   *HEAP*_l_8,-Exact-)}
    free(p);
-//  {(*HEAP*_l_10,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(p,*HEAP*_l_10,
-//   -Exact-);(q,*HEAP*_l_8,-Exact-)}
+//  {(*HEAP*_l_10,*HEAP*_l_8,-Exact-);(p,*HEAP*_l_10,-Exact-);(q,
+//   *HEAP*_l_8,-Exact-)}
    return 0;
 }

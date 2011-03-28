@@ -24,7 +24,6 @@ int main()
    s2.a = s1.a;
 //  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2[a],
-//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(s2[c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(tab_s[*][c],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}

@@ -19,10 +19,10 @@ int main()
 //  {(*HEAP*_l_9,a,-Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,
 //   -Exact-)}
    p[0] = q;
-//  {(*HEAP*_l_11,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(*HEAP*_l_9,a,
-//   -Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+//  {(*HEAP*_l_11,*HEAP*_l_9,-Exact-);(*HEAP*_l_9,a,-Exact-);(p,
+//   *HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
    free(p);
-//  {(*HEAP*_l_11,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(*HEAP*_l_9,a,
-//   -Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+//  {(*HEAP*_l_11,*HEAP*_l_9,-Exact-);(*HEAP*_l_9,a,-Exact-);(p,
+//   *HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
    return 0;
 }

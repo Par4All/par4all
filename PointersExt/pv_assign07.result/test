@@ -40,8 +40,8 @@ int main()
 //   -Exact-)}
 
    s1p->a = s2.a;
-//  {(s1[a],*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(s1p,s1,
-//   -Exact-);(s2[a],j,-Exact-);(s2p,s1,-Exact-)}
+//  {(s1[a],j,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
    s2p->a = &k;
 //  {(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
 //   -Exact-)}
