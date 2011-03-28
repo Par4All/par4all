@@ -515,7 +515,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
       type t1 = basic_pointer(b1);
       type t2 = basic_pointer(b2);
 
-      return type_variable_p(t1) &&
+      return type_void_p(t1)&&type_void_p(t2) || type_variable_p(t1) &&
 	type_variable_p(t2) &&
 	basic_equal_p( variable_basic(type_variable(t1)) , variable_basic(type_variable(t2)) );
     }

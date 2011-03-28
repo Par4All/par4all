@@ -297,7 +297,8 @@ set basic_ref_ref(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
-
+  bool exact_p = false;
+  list lpt_in = NIL;
   // creation of the source
   effect e1 = effect_undefined, e2 = effect_undefined;
   /*init the effect's engine*/
@@ -316,6 +317,80 @@ set basic_ref_ref(set pts_to_set, expression lhs, expression rhs) {
   // by this assignment
   reference ref = copy_reference(effect_any_reference(e2));
   sink = make_cell_reference(ref);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+/* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p, points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
     if (locations_equal_p(points_to_source(i), sink))
@@ -368,6 +443,8 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) printf("\n cas x = y[i] \n");
 
   effect e1 = effect_undefined, e2 = effect_undefined;
@@ -393,6 +470,65 @@ set basic_ref_array(set pts_to_set, expression lhs, expression rhs) {
   free(l3);
   sink = make_cell_reference(copy_reference(ref2));
   new_sink = make_cell_reference(copy_reference(ref2));
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+
+/* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+
+   }
+     /* if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
   // access new_source = copy_access(source);
   rel = make_approximation_exact();
   pt_to = make_points_to(source, new_sink, rel,
@@ -428,6 +564,8 @@ set basic_ref_addr(set pts_to_set, expression lhs, expression rhs) {
   cell source = cell_undefined;
   cell sink = cell_undefined;
   approximation rel = approximation_undefined;
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) {
     pips_debug(1, " case x = &y\n");
   }
@@ -440,6 +578,7 @@ set basic_ref_addr(set pts_to_set, expression lhs, expression rhs) {
 								 true);
   list l2 = generic_proper_effects_of_complex_address_expression(rhs, &e2,
 								 false);
+ 
   effects_free(l1);
   effects_free(l2);
   generic_effects_reset_all_methods();
@@ -448,6 +587,82 @@ set basic_ref_addr(set pts_to_set, expression lhs, expression rhs) {
   // creation of the sink
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(copy_reference(ref2));
+
+ if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+ /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*   if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
+
   // creation of the approximation
   rel = make_approximation_exact();
   // creation of the points_to relation
@@ -488,7 +703,8 @@ set basic_ref_deref(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
-
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) {
     pips_debug(1, " case  x = *y\n");
   }
@@ -509,6 +725,40 @@ set basic_ref_deref(set pts_to_set, expression lhs, expression rhs) {
   // creation of the sink
   ref2 = copy_reference(effect_any_reference(e2));
   sink = make_cell_reference(ref2);
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
   // fetch the points to relations
   // where source = source 1
   // creation of the written set
@@ -569,6 +819,8 @@ set basic_deref_ref(set pts_to_set, expression lhs, expression rhs) {
   cell new_source = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
+  list lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) {
     pips_debug(1, " case *x = y\n");
   }
@@ -589,7 +841,40 @@ set basic_deref_ref(set pts_to_set, expression lhs, expression rhs) {
   ref2 = effect_any_reference(e2);
   // ent2 = reference_variable(copy_reference(ref2));
   sink = make_cell_reference(copy_reference(ref2));
-
+/* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
   /* creation of the set written_pts_to =
      {(x1,x2,rel)| (x, x1, EXACT), (x1, x2, rel) /in pts_to_set}*/
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -669,7 +954,8 @@ static set basic_deref_addr(set pts_to_set, expression lhs, expression rhs) {
   reference ref2 = reference_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
-
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) {
     pips_debug(1, " case *x = &y\n");
   }
@@ -687,6 +973,80 @@ static set basic_deref_addr(set pts_to_set, expression lhs, expression rhs) {
   source = make_cell_reference(copy_reference(ref1));
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(copy_reference(ref2));
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   SET_FOREACH(points_to, i, pts_to_set) {
     if(locations_equal_p(points_to_source(i), source) &&
        approximation_exact_p(points_to_approximation(i))) {
@@ -761,7 +1121,8 @@ set basic_deref_array(set pts_to_set, expression lhs, expression rhs) {
   reference ref2 = reference_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
-
+  list lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) {
     pips_debug(1, " case *x = &y[i] or *m.x = &y[i]\n");
   }
@@ -780,6 +1141,80 @@ set basic_deref_array(set pts_to_set, expression lhs, expression rhs) {
   source = make_cell_reference(ref1);
   ref2 = effect_any_reference(copy_effect(e2));
   sink = make_cell_reference(ref2);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   SET_FOREACH(points_to, i, pts_to_set) {
     if(locations_equal_p(points_to_source(i), source) &&
        approximation_exact_p(points_to_approximation(i))) {
@@ -961,6 +1396,8 @@ set basic_field_addr(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   approximation rel = approximation_undefined;
   list l = NIL;
+  list lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) {
     pips_debug(1, " case x.a = &y\n");
   }
@@ -983,6 +1420,80 @@ set basic_field_addr(set pts_to_set, expression lhs, expression rhs) {
   generic_effects_reset_all_methods();
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(copy_reference(ref2));
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   // creation of the approximation
   rel = make_approximation_exact();
   // creation of the points_to approximation
@@ -1026,6 +1537,8 @@ set basic_ref_field(set pts_to_set, expression lhs, expression rhs) {
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
   list l = NIL, l1 = NIL;
+  list lpt_in = NIL;
+  bool exact_p = false;
   pips_debug(1, " case x = y.a \n");
  
   effect e1 = effect_undefined, e2;
@@ -1045,6 +1558,80 @@ set basic_ref_field(set pts_to_set, expression lhs, expression rhs) {
   reference ref = effect_any_reference(copy_effect(e2));
   // print_reference(copy_reference(r));
   sink = make_cell_reference(ref);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1103,7 +1690,8 @@ set basic_ref_ptr_to_field(set pts_to_set, expression lhs, expression rhs) {
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
   list l = NIL, l1 = NIL;
-
+  list lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) printf("\n cas x = y->a \n");
  
   effect e1 = effect_undefined, e2;
@@ -1124,6 +1712,80 @@ set basic_ref_ptr_to_field(set pts_to_set, expression lhs, expression rhs) {
   ref2 = effect_any_reference(e2);
   // print_reference(copy_reference(r));
   sink = make_cell_reference(copy_reference(ref2));
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+ /*  if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1185,6 +1847,8 @@ set basic_deref_field(set pts_to_set, expression lhs, expression rhs) {
   cell new_source = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
+  list lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) {
     pips_debug(1, " case *x = m;y\n");
   }
@@ -1205,6 +1869,79 @@ set basic_deref_field(set pts_to_set, expression lhs, expression rhs) {
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(ref2);
 
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   /* creation of the set written_pts_to =
      {(x1,x2,rel)| (x, x1, EXACT), (x1, x2, rel) /in pts_to_set}*/
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1273,7 +2010,8 @@ set basic_deref_field(set pts_to_set, expression lhs, expression rhs) {
 
 /* one basic case of Emami: < m.x = y->a > */
 set basic_field_ptr_to_field(set pts_to_set, expression lhs __attribute__ ((__unused__)), expression rhs __attribute__ ((__unused__))) {
-  return pts_to_set;
+  pips_internal_error("case m.x = n->y not implemented yet\n");
+return pts_to_set;
 }
 
 /* one basic case of Emami: < m->x =&y > */
@@ -1288,6 +2026,8 @@ set basic_ptr_to_field_addr(set pts_to_set, expression lhs, expression rhs) {
   cell source = cell_undefined;
   cell sink = cell_undefined;
   approximation rel = approximation_undefined;
+  bool exact_p = false;
+  list lpt_in = NIL;
   list l = NIL;
   ifdebug(1) {
     pips_debug(1, " case m->x = &y\n");
@@ -1311,6 +2051,80 @@ set basic_ptr_to_field_addr(set pts_to_set, expression lhs, expression rhs) {
   generic_effects_reset_all_methods();
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(ref2);
+
+  if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   // creation of the approximation
   rel = make_approximation_exact();
   // creation of the points_to relation
@@ -1352,7 +2166,8 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set, expression lhs,
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
- 
+  list lpt_in = NIL;
+  bool exact_p = false;
   effect e1 = effect_undefined, e2 = effect_undefined;
   /* init the effect's engine.*/
   set_methods_for_proper_simple_effects();
@@ -1370,6 +2185,80 @@ set basic_ptr_to_field_ptr_to_field(set pts_to_set, expression lhs,
   // by this assignement
   reference ref = copy_reference(effect_any_reference(e2));
   sink = make_cell_reference(ref);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+ /*  if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1422,6 +2311,8 @@ set basic_deref_ptr_to_field(set pts_to_set, expression lhs, expression rhs) {
   cell new_source = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) {
     pips_debug(1, " case *x = m;y\n");
   }
@@ -1446,6 +2337,79 @@ set basic_deref_ptr_to_field(set pts_to_set, expression lhs, expression rhs) {
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(ref2);
 
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+ /*  if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   /* creation of the set written_pts_to =
      {(x1,x2,rel)| (x, x1, EXACT), (x1, x2, rel) /in pts_to_set}*/
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1525,7 +2489,8 @@ set basic_ptr_to_field_field(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
-
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) printf("\n cas x = y \n");
   
   effect e1 = effect_undefined, e2 = effect_undefined;
@@ -1545,6 +2510,80 @@ set basic_ptr_to_field_field(set pts_to_set, expression lhs, expression rhs) {
   // by this assignement
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(ref2);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1618,7 +2657,8 @@ set basic_ptr_to_field_ref(set pts_to_set, expression lhs, expression rhs) {
   cell sink = cell_undefined;
   cell new_sink = cell_undefined;
   approximation rel = approximation_undefined;
- 
+  bool exact_p = false;
+  list lpt_in = NIL;
   ifdebug(1) printf("\n cas m->x = y \n");
   
   effect e1 = effect_undefined, e2 = effect_undefined;
@@ -1638,6 +2678,80 @@ set basic_ptr_to_field_ref(set pts_to_set, expression lhs, expression rhs) {
   // by this assignement
   ref2 = effect_any_reference(e2);
   sink = make_cell_reference(ref2);
+
+if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+     list path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+     if (effect_reference_dereferencing_p(ref2, &exact_p))
+      {
+	pips_debug(8, "dereferencing case \n");
+	list path_sink = eval_cell_with_points_to(sink,
+					     lpt_in,
+					     &exact_p);
+	if (ENDP(lpt_in))
+	  {
+	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	  }
+	else
+	  {
+	    sink = CELL(CAR(path_sink));
+	  }
+      }
+
+  /* if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*      list path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+/*     } */
+/*      if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+
+   }
   set s = set_generic_make(set_private, points_to_equal_p,
 			   points_to_rank);
   SET_FOREACH(points_to, i, pts_to_set) {
@@ -1856,8 +2970,11 @@ set basic_ref_heap(set pts_to_set, expression lhs, expression rhs __attribute__ 
   reference ref2 = reference_undefined;
   cell source = cell_undefined;
   cell sink = cell_undefined;
-  approximation rel = approximation_undefined;
- 
+  approximation rel =  make_approximation_exact();
+  list path_source = NIL;
+  list path_sink = NIL;
+  list le = NIL, lpt_in = NIL;
+  bool exact_p = false;
   ifdebug(1) {
     pips_debug(1, " case  x =()malloc(sizeof()) \n");
   }
@@ -1880,9 +2997,68 @@ set basic_ref_heap(set pts_to_set, expression lhs, expression rhs __attribute__ 
 				     statement_number(current));
 
   source = make_cell_reference(copy_reference(ref1));
-
-  // creation of the sink
   sink = make_cell_reference(copy_reference(ref2));
+
+
+  if (!set_empty_p(pts_to_set) ) {
+    lpt_in = set_to_sorted_list(pts_to_set,
+				(int(*)(const void*, const void*)) compare_points_to_location);
+  }
+ if(get_use_points_to())
+   {
+  if (effect_reference_dereferencing_p(ref1, &exact_p))
+    {
+      pips_debug(8, "dereferencing case \n");
+      path_source = eval_cell_with_points_to(source,
+					     lpt_in,
+					     &exact_p);
+      if (ENDP(lpt_in))
+	{
+	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n");
+	}
+      else
+	{
+	   source = CELL(CAR(path_source));
+	}
+    }
+ /*  if (!set_empty_p(pts_to_set) ) { */
+/*     lpt_in = set_to_sorted_list(pts_to_set, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*       path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	} */
+
+    }
+    /* if (effect_reference_dereferencing_p(ref2, &exact_p)) */
+/*       { */
+/* 	pips_debug(8, "dereferencing case \n"); */
+/* 	list path_sink = eval_cell_with_points_to(sink, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/* 	if (ENDP(lpt_in)) */
+/* 	  { */
+/* 	    pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	  } */
+/* 	else */
+/* 	  { */
+/* 	    sink = CELL(CAR(path_sink)); */
+/* 	  } */
+/*       } */
+/*    }*/
+  
+  
   // fetch the points to relations
   // where source = source 1
   // creation of the written set
@@ -1896,7 +3072,11 @@ set basic_ref_heap(set pts_to_set, expression lhs, expression rhs __attribute__ 
 					 written_pts_to,(void*)elt);
     }
 
-  rel = make_approximation_exact();
+  /* We have to test if the option ABSTRACT_HEAP_LOCATIONS is set to
+     unique, then the approximation is changed to MAY. */
+  if(strcmp("unique",get_string_property("ABSTRACT_HEAP_LOCATIONS")) == 0)
+    rel = make_approximation_may();
+
   pt_to = make_points_to(source, sink, rel, make_descriptor_none());
   points_to_consistent_p(pt_to);
   set_add_element(gen_pts_to, gen_pts_to, (void *) pt_to);
@@ -1907,7 +3087,7 @@ set basic_ref_heap(set pts_to_set, expression lhs, expression rhs __attribute__ 
     print_points_to_set("Points To pour le cas 3 <x ==()malloc(sizeof()) > \n",
 			pts_to_set);
   }
- 
+
   return pts_to_set;
 }
 
@@ -2330,7 +3510,8 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
       l = call_arguments(c1);
       el = EXPRESSION(CAR(CDR(l)));
     
-      if (expression_reference_p(el) && expression_reference_p(rhs))
+      if (expression_reference_p(el) && expression_pointer_p(el)
+	  && expression_reference_p(rhs))
 	set_assign(pt_out, basic_ptr_to_field_ref(pt_in, lhs,
 							   rhs));
     }
@@ -2398,6 +3579,17 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
 								    pt_in, copy_expression(lhs), copy_expression(rhs)));
     }
       break;
+
+    case EMAMI_HEAP: {
+      /* x is pointer to field, y is a call to malloc, case m->x = ()malloc(). */
+      args = call_arguments(expression_call(lhs));
+      el = EXPRESSION(CAR(CDR(args)));
+     
+      if (expression_reference_p(el))
+	set_assign(pt_out, basic_ref_heap(pt_in, lhs, rhs, current));
+    }
+      break;
+
     default:
       ifdebug(1)
 	fprintf(stderr, "\n aucun pattern defini\n ");
@@ -2447,6 +3639,46 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
 set points_to_general_assignment(statement s __attribute__ ((__unused__)), expression lhs, expression rhs,
 				 set pt_cur, list el) {
   points_to npt = points_to_undefined;
+  list lpt_in = NIL, path_source = NIL;
+  bool exact_p = false;
+// creation of the source
+  effect e1 = effect_undefined, e2 = effect_undefined;
+  /*init the effect's engine.*/
+  set_methods_for_proper_simple_effects();
+  /* a new test should be added, we can't call
+     generic_proper_effects_of_complex_address_expression() to
+     analyze every type of expression...*/
+  /* list l2 = generic_proper_effects_of_complex_address_expression(rhs, &e2, */
+/* 								 false); */
+ 
+/*   effects_free(l1); */
+/*   effects_free(l2); */
+/*   generic_effects_reset_all_methods(); */
+ 
+
+  /* comment out this region because we don't want yet evaluate the
+     lhs. */
+  /* if (!set_empty_p(pt_cur) ) { */
+/*     lpt_in = set_to_sorted_list(pt_cur, */
+/* 				(int(*)(const void*, const void*)) compare_points_to_location); */
+/*   } */
+/*   if (effect_reference_dereferencing_p(ref1, &exact_p)) */
+/*     { */
+/*       pips_debug(8, "dereferencing case \n"); */
+/*       path_source = eval_cell_with_points_to(source, */
+/* 					     lpt_in, */
+/* 					     &exact_p); */
+/*       if (ENDP(lpt_in)) */
+/* 	{ */
+/* 	  pips_debug(8, "no equivalent constant path found -> anywhere points-to\n"); */
+/* 	} */
+/*       else */
+/* 	{ */
+/* 	   source = CELL(CAR(path_source)); */
+/* 	   reference r = cell_reference(source); */
+/* 	   print_reference(r); */
+/* 	} */
+/*     } */
 
   /* lhs is not of type pointer, we return the input poins-to set */
   if (!expression_pointer_p(lhs)) {
@@ -2455,10 +3687,18 @@ set points_to_general_assignment(statement s __attribute__ ((__unused__)), expre
   } else if (expression_reference_p(lhs)) {
     /* lhs can be converted into a cell in aim to  generate
      * points-to relations*/
+    list l1 = generic_proper_effects_of_complex_address_expression(lhs, &e1,
+								 true);
+    effects_free(l1);
+    generic_effects_reset_all_methods();
+    reference ref1 = effect_any_reference(e1);
+    cell source = make_cell_reference(copy_reference(ref1));
     reference r = expression_reference(lhs);
     entity p = reference_variable(r);
     cell c = make_cell_reference(r);
-    npt = points_to_anywhere(c);
+    type lhst = expression_to_type(lhs);
+    type lhspt = type_to_pointed_type(lhst);
+    npt = points_to_anywhere(c, lhspt);
     /*rhs is a call toa user function */
     if (user_function_call_p(rhs)) {
       SET_FOREACH(points_to, pt, pt_cur) {
@@ -2492,7 +3732,7 @@ set points_to_general_assignment(statement s __attribute__ ((__unused__)), expre
 	  pt_cur = set_add_element(pt_cur, pt_cur, (void*) npt);
 	}
       } else if (expression_reference_p(rhs)) {
-	/* May be we should also add a test if rhs and lhs are fields of a struct.*/
+	/* May be we should also add a test if rhs are fields of a struct.*/
 	pt_cur = set_assign(pt_cur, basic_ref_ref(pt_cur,copy_expression(lhs),copy_expression(rhs)));
 
       }
@@ -2609,9 +3849,10 @@ set points_to_intrinsic(statement s, call c __attribute__ ((__unused__)), entity
  * always is correct.
  */
 set points_to_filter_with_effects(set pts, list el) {
+  bool exact_p = false;
+  list lpt_in = NIL, le=NIL;
   FOREACH(EFFECT, e, el) {
     if(effect_pointer_type_p(e) && effect_write_p(e)) {
-
       cell c = effect_cell(e);
       /* Theheap problem with the future extension to GAP is hidden
 	 within cell_to_reference */
@@ -2631,9 +3872,11 @@ set points_to_filter_with_effects(set pts, list el) {
 	  if(sp==p)
 	    pts = set_del_element(pts, pts, (void*)pt);
 	}
-
+      
 	/* add the anywhere points-to*/
-	npt = points_to_anywhere(copy_cell(c));
+	type ct = cell_reference_to_type(r);
+	type cpt = type_to_pointed_type(ct);
+	npt = points_to_anywhere(copy_cell(c), cpt);
 	pts = set_add_element(pts, pts, (void*) npt);
       }
       else {
@@ -2642,6 +3885,45 @@ set points_to_filter_with_effects(set pts, list el) {
 	 * not thru nowhere, not thru NULL, and maybe not thru
 	 * anywhere...
 	 */
+	/* test eval_cell_with_points_to()*/
+	if (!set_empty_p(pts) ) {
+	  //  print_points_to_set(stderr,"",pts_to_set);
+	  lpt_in = set_to_sorted_list(pts,
+				 (int(*)(const void*, const void*)) compare_points_to_location);
+	}
+	if(get_use_points_to())
+	  {
+	    if (effect_reference_dereferencing_p(r, &exact_p))
+	      {
+		pips_debug(8, "dereferencing case \n");
+		//bool exact_p = false;
+		list path_source = eval_cell_with_points_to(c,
+					     lpt_in,
+					     &exact_p);
+	    if (ENDP(path_source))
+		    {
+		      pips_debug(8, "no equivalent constant path found -> anywhere effect\n");
+		      /* We have not found any equivalent constant path : it may point anywhere */
+		      /* We should maybe contract these effects later. Is it done by the callers ? */
+		      le = CONS(EFFECT, make_anywhere_effect(effect_action(e)), le);
+		    }
+	    else
+	      {
+		FOREACH(CELL, c, path_source)
+		  {
+		    le = CONS(EFFECT,
+			      make_effect(c, copy_action(effect_action(e)),
+					  make_approximation(exact_p? is_approximation_must:is_approximation_may,UU),
+					  make_descriptor_none()),
+			      le);
+		    
+		  }
+	      }
+	    cell c = CELL(CAR(path_source));
+	    print_effects(le);
+	  }
+	  }
+
 	points_to npt = points_to_undefined;
 
 	/* Remove previous targets */
@@ -2654,7 +3936,9 @@ set points_to_filter_with_effects(set pts, list el) {
 	}
 
 	/* add the anywhere points-to*/
-	npt = points_to_anywhere(copy_cell(c));
+	type ct = cell_reference_to_type(r);
+	type cpt = type_to_pointed_type(ct);
+	npt = points_to_anywhere(copy_cell(c), cpt);
 	pts = set_add_element(pts, pts, (void*) npt);
 	//pips_internal_error("Complex pointer write effect."
 	//" Not implemented yet\n");
@@ -2740,7 +4024,7 @@ set points_to_loop(loop fl, set pt_in, bool store) {
 }
 
 /*Computing the points to of a do while loop, we have to process the
-  body a least once, before iterating until reaching the fixed-point. */
+  body at least once, before iterating until reaching the fixed-point. */
 set points_to_do_whileloop(whileloop fl, set pt_in, bool store) {
   statement dowhile_body = whileloop_body(fl);
   set pt_out = set_generic_make(set_private, points_to_equal_p,
@@ -2798,8 +4082,7 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
 				points_to_rank);
   set_methods_for_proper_simple_effects();
   set_methods_for_simple_pointer_effects();
-  list el = call_to_proper_effects(c);
-  generic_effects_reset_all_methods();
+  
   switch (tt = value_tag(entity_initial(e))) {
   case is_value_code:{
     /* call to an external function; preliminary version*/
@@ -2820,6 +4103,8 @@ set points_to_call(statement s, call c, set pt_in, bool store __attribute__ ((__
     break;
   case is_value_intrinsic: {
     pips_debug(5, "intrinsic function %s\n", entity_name(e));
+    list el = call_to_proper_effects(c);
+    generic_effects_reset_all_methods();
     set_assign(pt_out,
 		   points_to_intrinsic(s, c, e, pc, pt_in, el));
   }
@@ -3043,9 +4328,9 @@ bool points_to_analysis(char * module_name) {
 					    module_name, TRUE);
   /* Transform the list of summary_points_to in set of points-to.*/
   points_to_list_consistent_p(summary_pts_to_list);
-  //pts_to_list = gen_points_to_list_cons(summary_pts_to_list, pts_to_list);
   pts_to_list = gen_full_copy_list(points_to_list_list(summary_pts_to_list));
   pt_in = set_assign_list(pt_in, pts_to_list);
+  print_points_to_set("summary points to",pt_in);
   /* Compute the points-to relations using the summary_points_to as input.*/
   points_to_statement(module_stat, pt_in);
 
