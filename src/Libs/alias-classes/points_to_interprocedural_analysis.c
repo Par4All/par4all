@@ -270,7 +270,7 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   pt_list = set_to_sorted_list(pts_to_set,
 			       (int(*)
 				(const void*,const void*))
-			       points_to_compare_location);
+			       points_to_compare_cells);
   points_to_list summary_pts_to_list = make_points_to_list(pt_list);
   points_to_list_consistent_p(summary_pts_to_list);
   DB_PUT_MEMORY_RESOURCE
