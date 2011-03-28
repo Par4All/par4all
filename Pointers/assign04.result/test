@@ -65,8 +65,7 @@ void assign04()
 //  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,
 //   -Exact-)}
    **p = r;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,
-//   i,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,q,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,-Exact-)}
    ***p = 0;
 }
