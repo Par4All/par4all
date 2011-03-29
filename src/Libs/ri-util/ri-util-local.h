@@ -381,6 +381,7 @@
 #define DEALLOCATE_FUNCTION_NAME        "DEALLOCATE"
 #define ETIME_FUNCTION_NAME             "ETIME"
 #define DTIME_FUNCTION_NAME             "DTIME"
+#define CPU_TIME_FUNCTION_NAME          "CPU_TIME"
 
 /* F2003 */
 #define C_LOC_FUNCTION_NAME             "C_LOC"
