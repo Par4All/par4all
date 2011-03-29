@@ -255,9 +255,7 @@ FLGR_NhbBox2D * flgr2d_create_neighbor_box(FLGR_Data2D *data)
    //PIPS generated variable
    int **P_5, **P_6;
    //PIPS generated variable
-   void **P_7;
-   //PIPS generated variable
-   void **P_8;
+   void **P_7, **P_8;
    //PIPS generated variable
    int *P_9;
    if (data==(void *) 0) {
@@ -462,9 +460,7 @@ void flgr2d_destroy_neighbor_box(FLGR_NhbBox2D *extr)
 {
    int k;
    //PIPS generated variable
-   void **P_16;
-   //PIPS generated variable
-   void **P_17;
+   void **P_16, **P_17;
    //PIPS generated variable
    int **P_18, **P_19;
    if (extr==(void *) 0) {
@@ -918,13 +914,7 @@ void flgr2d_get_neighborhood_fgUINT16(FLGR_NhbBox2D *extr, FLGR_Data2D *dat, FLG
    int *size = extr->size;
    fgUINT16 nhb_val, data_val;
    //PIPS generated variable
-   void **P_21;
-   //PIPS generated variable
-   void **P_22;
-   //PIPS generated variable
-   void **P_23;
-   //PIPS generated variable
-   void **P_24;
+   void **P_21, **P_22, **P_23, **P_24;
    //PIPS generated variable
    int **P_25, **P_26;
    nhbsize_xdiv2 = nhb->size_x>>1;
@@ -987,9 +977,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
    fgFLOAT64 a, b, sum;
    fgFLOAT64 tmp;
    //PIPS generated variable
-   void **P_27;
-   //PIPS generated variable
-   void **P_28;
+   void **P_27, **P_28;
    for(k = 0; k <= spp-1; k += 1) {
       P_27 = extr->list_data_val;
       list_data_val = (fgUINT16 *) P_27[k];
@@ -1155,13 +1143,7 @@ FLGR_Ret flgr2d_mirror_vertical_hmorph(FLGR_Data2D *dat)
    void *tmp;
    int i, j;
    //PIPS generated variable
-   void **P_29;
-   //PIPS generated variable
-   void **P_30;
-   //PIPS generated variable
-   void **P_31;
-   //PIPS generated variable
-   void **P_32;
+   void **P_29, **P_30, **P_31, **P_32;
    //PIPS generated variable
    FLGR_Data1D **P_33, **P_34, **P_35, **P_36, **P_37, **P_38;
    if (dat==(void *) 0) {
@@ -2501,13 +2483,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             int *size;
             fgUINT16 nhb_val, data_val;
             //PIPS generated variable
-            void **P_21;
-            //PIPS generated variable
-            void **P_22;
-            //PIPS generated variable
-            void **P_23;
-            //PIPS generated variable
-            void **P_24;
+            void **P_21, **P_22, **P_23, **P_24;
             //PIPS generated variable
             int **P_25, **P_26;
             spp = imgsrc->spp;
@@ -2664,13 +2640,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             int *size;
             fgUINT16 nhb_val, data_val;
             //PIPS generated variable
-            void **P_21;
-            //PIPS generated variable
-            void **P_22;
-            //PIPS generated variable
-            void **P_23;
-            //PIPS generated variable
-            void **P_24;
+            void **P_21, **P_22, **P_23, **P_24;
             //PIPS generated variable
             int **P_25, **P_26;
             spp = imgsrc->spp;
@@ -2694,9 +2664,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             P_21 = imgsrc->array;
             {
                //PIPS generated variable
-               void *P_46;
-               //PIPS generated variable
-               void *P_47;
+               void *P_46, *P_47;
                P_46 = extr->center_data_val->array;
                P_47 = P_21[i];
                {
@@ -2717,9 +2685,7 @@ void flgr2d_raster_slide_window_fgUINT16(FLGR_Data2D *imgdest, FLGR_Data2D *imgs
             P_22 = nhbrs->array;
             {
                //PIPS generated variable
-               void *P_48;
-               //PIPS generated variable
-               void *P_49;
+               void *P_48, *P_49;
                P_48 = extr->center_nhb_val->array;
                P_49 = P_22[nhbsize_ydiv2];
                {
@@ -2831,9 +2797,7 @@ void flgr2d_get_nhb_convolution_fgUINT16(FLGR_Vector *result, FLGR_NhbBox2D *ext
    fgFLOAT64 a, b, sum;
    fgFLOAT64 tmp;
    //PIPS generated variable
-   void **P_27;
-   //PIPS generated variable
-   void **P_28;
+   void **P_27, **P_28;
    for(k = 0; k <= spp-1; k += 1) {
       P_27 = extr->list_data_val;
       list_data_val = (fgUINT16 *) P_27[k];
@@ -2977,13 +2941,7 @@ int main(int argc, char *argv[])
                               int *size;
                               fgUINT16 nhb_val, data_val;
                               //PIPS generated variable
-                              void **P_21;
-                              //PIPS generated variable
-                              void **P_22;
-                              //PIPS generated variable
-                              void **P_23;
-                              //PIPS generated variable
-                              void **P_24;
+                              void **P_21, **P_22, **P_23, **P_24;
                               //PIPS generated variable
                               int **P_25, **P_26;
                               spp = imgsrc0->spp;
@@ -3007,9 +2965,7 @@ int main(int argc, char *argv[])
                               P_21 = imgsrc0->array;
                               {
                                  //PIPS generated variable
-                                 void *P_46;
-                                 //PIPS generated variable
-                                 void *P_47;
+                                 void *P_46, *P_47;
                                  P_46 = extr->center_data_val->array;
                                  P_47 = P_21[i];
                                  {
@@ -3030,9 +2986,7 @@ int main(int argc, char *argv[])
                               P_22 = nhbrs->array;
                               {
                                  //PIPS generated variable
-                                 void *P_48;
-                                 //PIPS generated variable
-                                 void *P_49;
+                                 void *P_48, *P_49;
                                  P_48 = extr->center_nhb_val->array;
                                  P_49 = P_22[nhbsize_ydiv2];
                                  {
