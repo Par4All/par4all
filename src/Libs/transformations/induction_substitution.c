@@ -367,6 +367,47 @@ static bool subtitute_induction_statement_in( statement s ) {
                     }
                 }
 
+
+                ifdebug(4) {
+                  if ( found_loop_index ) {
+                    pips_debug(0,"Loop index found !\n");
+                  } else {
+                    pips_debug(0,"No loop index found !\n");
+                  }
+                  if ( !entity_undefined_p( induction_variable_candidate )) {
+                    pips_debug(0,"Induction variable candidate found : %s\n",
+                               entity_local_name(induction_variable_candidate));
+                  } else {
+                    pips_debug(0,"No Induction variable candidate found !\n");
+                  }
+                  if ( induction_variable_candidate_coeff != 0) {
+                    pips_debug(0,"Variable is active !\n");
+                  } else {
+                    pips_debug(0,"Variable is not active !\n");
+                  }
+                  if ( !expression_undefined_p( substitute )) {
+                    pips_debug(0,"The substitute expression is ");
+                    print_syntax( expression_syntax( substitute ) );
+                    fprintf( stderr, "\n" );
+                  } else {
+                    pips_debug(0,"The substitute expression is undefined.\n");
+                  }
+                  if( is_modified_entity_in_transformer(
+                                          load_statement_transformer( s ), //
+                                          induction_variable_candidate ) ) {
+                    pips_debug(0,"Variable is modified by this statement\n");
+                  } else {
+                    pips_debug(0,"Variable is not modified by this statement\n");
+                  }
+
+                  if(is_left_part_of_assignment(statement_instruction( s ), //
+                                                induction_variable_candidate )) {
+                    pips_debug(0,"Variable is on left part of this statement\n");
+                  } else {
+                    pips_debug(0,"Variable is not on left part of this statement\n");
+                  }
+                }
+
                 if ( found_loop_index // The expression depends on loop index
                         // We have found an induction variable
                         && !entity_undefined_p( induction_variable_candidate ) //
