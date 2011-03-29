@@ -125,16 +125,8 @@ void ts_restructured(void)
 
    x = y = 0;
 
-//  T() {s==1, x==0, y==0}
-
-   if (!(s==1&&x<=50&&y>=0))
-
-//  T() {0==-1}
-
-      control_error();
-
 //  T(s,x,y) {s==1, s#init==1, x==y, x#init==y#init, 0<=x, x<=50,
-//    x#init<=x}
+//    y#init<=x}
 
    while (rand_b()) {
 
@@ -162,14 +154,6 @@ void ts_restructured(void)
 
          checking_error();
 
-//  T() {s==2, x<=50, 0<=y}
-
-      if (!(s==2&&x<=50&&y>=0))
-
-//  T() {0==-1}
-
-         control_error();
-
 //  T() {s==2, x<=49, 0<=y}
 
       if (!(s==2&&y>=0&&x<=49))
@@ -193,14 +177,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
          checking_error();
-
-//  T() {s==1, x<=50, y<=x, x+y<=102, 0<=y}
-
-      if (!(s==1&&x<=50&&y>=0))
-
-//  T() {0==-1}
-
-         control_error();
    }
 
 //  T() {s==1, x==y, 0<=x, x<=50}
@@ -227,14 +203,6 @@ void ts_restructured(void)
 
       checking_error();
 
-//  T() {s==2, x==y-1, 0<=x, x<=50}
-
-   if (!(s==2&&x<=50&&y>=0))
-
-//  T() {0==-1}
-
-      control_error();
-
 //  T() {s==2, x==50, y==51}
 
    if (!(s==2&&y>=0&&x==50))
@@ -259,16 +227,8 @@ void ts_restructured(void)
 
       checking_error();
 
-//  T() {s==1, x==51, y==51}
-
-   if (!(s==1&&x>50&&y>=0))
-
-//  T() {0==-1}
-
-      control_error();
-
 //  T(s,x,y) {s==1, s#init==1, x+y==102, x#init+y#init==102, 51<=x,
-//    x<=102, x#init<=x}
+//    x<=102, 102<=x+y#init}
 
    while (rand_b()) {
 
@@ -298,14 +258,6 @@ void ts_restructured(void)
 
 //  T() {s==2, 51<=x, 0<=y}
 
-      if (!(s==2&&x>50&&y>=0))
-
-//  T() {0==-1}
-
-         control_error();
-
-//  T() {s==2, 51<=x, 0<=y}
-
       if (!(s==2&&y>=0))
 
 //  T() {0==-1}
@@ -327,14 +279,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
          checking_error();
-
-//  T() {s==1, 52<=x, y<=x, x+y<=102, 0<=y}
-
-      if (!(s==1&&x>50&&y>=0))
-
-//  T() {0==-1}
-
-         control_error();
    }
 
 //  T() {s==1, x==102, y==0}
@@ -360,14 +304,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
       checking_error();
-
-//  T() {s==2, x==102, y==-1}
-
-   if (!(s==2&&x>50&&y<0))
-
-//  T() {0==-1}
-
-      control_error();
 }
 
 PRECONDITIONS
@@ -495,14 +431,6 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==1, x==0, y==0}
 
-   if (!(s==1&&x<=50&&y>=0))
-
-//  P() {0==-1}
-
-      control_error();
-
-//  P(s,x,y) {s==1, x==0, y==0}
-
    while (rand_b()) {
 
 //  P(s,x,y) {s==1, x==y, 0<=x, x<=50}
@@ -531,14 +459,6 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, x==y-1, 0<=x, x<=50}
 
-      if (!(s==2&&x<=50&&y>=0))
-
-//  P() {0==-1}
-
-         control_error();
-
-//  P(s,x,y) {s==2, x==y-1, 0<=x, x<=50}
-
       if (!(s==2&&y>=0&&x<=49))
 
 //  P(s,x,y) {s==2, x==50, y==51}
@@ -560,14 +480,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
          checking_error();
-
-//  P(s,x,y) {s==1, x==y, 1<=x, x<=50}
-
-      if (!(s==1&&x<=50&&y>=0))
-
-//  P() {0==-1}
-
-         control_error();
    }
 
 //  P(s,x,y) {s==1, x==y, 0<=x, x<=50}
@@ -596,14 +508,6 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, x==y-1, 0<=x, x<=50}
 
-   if (!(s==2&&x<=50&&y>=0))
-
-//  P() {0==-1}
-
-      control_error();
-
-//  P(s,x,y) {s==2, x==y-1, 0<=x, x<=50}
-
    if (!(s==2&&y>=0&&x==50))
 
 //  P(s,x,y) {s==2, x==y-1, 0<=x, x<=49}
@@ -625,14 +529,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
       checking_error();
-
-//  P(s,x,y) {s==1, x==51, y==51}
-
-   if (!(s==1&&x>50&&y>=0))
-
-//  P() {0==-1}
-
-      control_error();
 
 //  P(s,x,y) {s==1, x==51, y==51}
 
@@ -664,14 +560,6 @@ void ts_restructured(void)
 
 //  P(s,x,y) {s==2, x+y==101, 51<=x, x<=101}
 
-      if (!(s==2&&x>50&&y>=0))
-
-//  P() {0==-1}
-
-         control_error();
-
-//  P(s,x,y) {s==2, x+y==101, 51<=x, x<=101}
-
       if (!(s==2&&y>=0))
 
 //  P() {0==-1}
@@ -693,14 +581,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
          checking_error();
-
-//  P(s,x,y) {s==1, x+y==102, 52<=x, x<=102}
-
-      if (!(s==1&&x>50&&y>=0))
-
-//  P() {0==-1}
-
-         control_error();
    }
 
 //  P(s,x,y) {s==1, x+y==102, 51<=x, x<=102}
@@ -726,12 +606,4 @@ void ts_restructured(void)
 //  P() {0==-1}
 
       checking_error();
-
-//  P(s,x,y) {s==2, x==102, y==-1}
-
-   if (!(s==2&&x>50&&y<0))
-
-//  P() {0==-1}
-
-      control_error();
 }

@@ -1,3 +1,5 @@
+// Denis Gopan, Thomas W. Reps: Lookahead Widening. CAV 2006: 452-466
+// figure 1
 // Denis Gopan, Thomas W. Reps: Guided Static Analysis. SAS 2007: 349-365
 // figure 1
 
@@ -5,7 +7,7 @@
 
 // parameters
 
-#define DO_CONTROL 1
+#define DO_CONTROL 0
 #define DO_CHECKING 1
 #define GOOD (s == 2 || (y <= x && y <= -x + 102))
 
