@@ -89,10 +89,6 @@ points_to_statement
 #include "points_to_private.h"
 #include "alias-classes.h"
 
-/* Function storing points to information attached to a statement
- */
-GENERIC_GLOBAL_FUNCTION(pt_to_list, statement_points_to)
-
 /* operator fusion to calculate the relation of two points
    to. (should be at a higher level) */
 /* static approximation fusion_approximation(approximation app1, */
