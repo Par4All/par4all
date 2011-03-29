@@ -35,7 +35,8 @@ BUILT_SOURCES=resources.h printable_resources.h phases.h builder_map.h wpips_tra
 nodist_include_HEADERS=resources.h printable_resources.h phases.h builder_map.h wpips_transform_menu_layout.h wpips_view_menu_layout.h
 
 pipsmake_flt	= $(SED) -f $(srcdir)/pipsmake.sed
-pipsprop_flt	= $(SED) -f $(srcdir)/pipsprop.sed
+# hmmm... this is generated locally to the virtual directory
+pipsprop_flt	= $(SED) -f pipsprop.sed
 UPPER	= tr '[a-z]' '[A-Z]'
 
 pipsprop.sed:pipsmake.sed
