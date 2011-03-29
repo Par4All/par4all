@@ -1209,6 +1209,7 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {DEALLOCATE_FUNCTION_NAME,               any_heap_effects},
   {ETIME_FUNCTION_NAME,                    no_write_effects},
   {DTIME_FUNCTION_NAME,                    no_write_effects},
+  {CPU_TIME_FUNCTION_NAME,                 no_write_effects},
 
   /* F2003 */
   {C_LOC_FUNCTION_NAME,                    no_write_effects},
