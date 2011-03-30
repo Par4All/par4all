@@ -1,3 +1,14 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   mystruct s;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

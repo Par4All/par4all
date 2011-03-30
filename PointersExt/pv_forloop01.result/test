@@ -1,3 +1,27 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   float t;
+   float a;
+//             <    is written>: t
+
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
+//             <    is read   >: a t
+//             <    is written>: a
+      a = a+t*0, 5;
+//             <    is read   >: t
+//             <    is written>: t
+      t += 0, 01;
+   }
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

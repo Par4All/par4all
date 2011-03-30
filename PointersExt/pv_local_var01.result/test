@@ -1,3 +1,6 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
 //             <    is written>: i
@@ -19,7 +22,9 @@ int main()
    }
    return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {

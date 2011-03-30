@@ -1,3 +1,33 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int *a;
+//             <    is written>: b
+   int b = 0;
+//             <    is written>: c
+   int c = 1;
+//             <    is read   >: b c
+   if (b==c||b!=0)
+//             <    is written>: a
+      a = &b;
+   else
+//             <    is written>: a
+      a = &c;
+//             <    is read   >: b c
+
+   if (b!=c)
+//             <    is written>: a
+      a = &b;
+   else
+//             <    is written>: a
+      a = &b;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

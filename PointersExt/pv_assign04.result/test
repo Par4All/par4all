@@ -1,3 +1,30 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   mystruct s1, s2;
+   mystruct tab_s[2];
+//             <may be read   >: s1.b[*]
+//             <may be written>: tab_s[0].b[*]
+//             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[0].a tab_s[0].c
+   tab_s[0] = s1;
+//             <may be read   >: s1.b[*]
+//             <may be written>: tab_s[1].b[*]
+//             <    is read   >: s1.a s1.c
+//             <    is written>: tab_s[1].a tab_s[1].c
+   tab_s[1] = s1;
+//             <may be read   >: s2.b[*]
+//             <may be written>: tab_s[1].b[*]
+//             <    is read   >: s2.a s2.c
+//             <    is written>: tab_s[1].a tab_s[1].c
+   tab_s[1] = s2;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

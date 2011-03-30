@@ -1,3 +1,40 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   mystruct s1, s2, *s1p, *s2p;
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: k
+   int k = 3;
+//             <    is written>: s1p
+
+   s1p = &s1;
+//             <    is written>: s2p
+   s2p = &s1;
+//             <    is written>: s1.a
+
+   s1.a = &i;
+//             <    is written>: s2.a
+   s2.a = &j;
+//             <    is read   >: s1p s2.a
+//             <    is written>: s1p[0].a
+
+   s1p->a = s2.a;
+//             <    is read   >: s2p
+//             <    is written>: s2p[0].a
+   s2p->a = &k;
+//             <    is written>: s2p
+
+   s2p = &s2;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

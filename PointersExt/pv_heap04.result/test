@@ -1,3 +1,32 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int **p;
+   int *q;
+//             <    is written>: a
+   int a = 0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+   q = (int *) malloc(sizeof(int));
+//             <    is read   >: a q
+//             <    is written>: q[0]
+   q[0] = a;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = (int **) malloc(sizeof(int *));
+//             <    is read   >: p q
+//             <    is written>: p[0]
+   p[0] = q;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

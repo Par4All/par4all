@@ -1,3 +1,6 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
    float t;
@@ -7,19 +10,23 @@ int main()
 //             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
 
    a = (float *) malloc(10*sizeof(float));
-//             <    is read   >: t
 //             <    is written>: t
 
-   for (t = 1.0;t<2.0;t+0, 01)
-//             <    is read   >: i
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
 //             <    is written>: i
-      for (i = 0;i<10;i++)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      for(i = 0; i <= 9; i += 1)
+//             <    is read   >: a a[i] i t
+//             <    is written>: a[i]
          a[i] = a[i]+t*0, 5;
+      t+0, 01;
+   }
    return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
@@ -32,13 +39,18 @@ int main()
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    a = (float *) malloc(10*sizeof(float));
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(a,*HEAP*_l_9,-Exact-)}
 
-   for (t = 1.0;t<2.0;t+0, 01)
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
-      for (i = 0;i<10;i++)
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
+   t = 1.0;
+//  {(a,*HEAP*_l_9,-Exact-)}
+   while (t<2.0) {
+//  points to = {}
+      for(i = 0; i <= 9; i += 1)
+//  {(a,*HEAP*_l_9,-Exact-)}
          a[i] = a[i]+t*0, 5;
-//  {(a,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  points to = {}
+      t+0, 01;
+   }
+//  {(a,*HEAP*_l_9,-Exact-)}
    return 0;
 }
