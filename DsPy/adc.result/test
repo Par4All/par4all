@@ -1,0 +1,210 @@
+int _init_data(void *ptr, const ssize_t n)
+{
+   ssize_t nr;
+   ssize_t ntoread;
+
+   ntoread = n;
+   if (_f_data_file==0) {
+      fprintf(stderr, "Data file must be initialized !\n");
+      exit(1);
+   }
+   while (ntoread>0) {
+      nr = fread(ptr, 1, ntoread, _f_data_file);
+      if (nr==0&&ferror(_f_data_file)) {
+         perror("read data file");
+         clearerr(_f_data_file);
+         return *__errno_location();
+      }
+      if (nr<ntoread) {
+         //		fprintf(stderr, "%d bytes remaining...\n", ntoread-nr);
+         fseek(_f_data_file, 0L, 0);
+         fflush(_f_data_file);
+      }
+      ntoread -= nr;
+      ptr += nr;
+   }
+   
+   // Old implementation... :
+   //fprintf(stderr, "Warning: missing %d bytes in data file ! Filling with zeros...\n", n-nr);
+   // This makes pips crashes... !!
+   //memset(ptr + nr, 0, n-nr);
+   return nr;
+}
+int init_data_double(double *ptr, const unsigned int n)
+{
+   return init_data_gen(ptr, n, sizeof(double));
+}
+void init_args(int argc, char **argv)
+{
+   if (argc<3) {
+      fprintf(stderr, "Usage: %s kernel_size data_file\n", argv[0]);
+      exit(1);
+   }
+   init_data_file(argv[2]);
+}
+int init_data_float(float *ptr, const unsigned int n)
+{
+   int r;
+   r = init_data_gen(ptr, n, sizeof(float));
+   return r;
+}
+int init_data_cplx(float _Complex *ptr, const unsigned int n)
+{
+   return 0;
+}
+int init_data_int(int *ptr, const unsigned int n)
+{
+   return init_data_gen(ptr, n, sizeof(int));
+}
+int init_data_gen(void *ptr, const unsigned int n, const ssize_t stype)
+{
+   return _init_data(ptr, (ssize_t) n*stype);
+}
+void adc(double x, int B, int b[B], double R)
+{
+   int i;
+   double y, xQ, Q;
+
+   Q = R/pow(2, B);
+   /* quantization width \(Q=R/2\sp{B}\) */
+   y = x+Q/2;
+   /* rounding */
+   
+#pragma omp parallel for
+   for(i = 0; i <= B-1; i += 1)
+      /* initialize bit vector */
+      b[i] = 0;
+
+   b[0] = 1-u(y);
+   /* determine MSB */
+   
+   for(i = 1; i <= B-1; i += 1) {
+      /* loop starts with \(i=1\) */
+      b[i] = 1;
+      /* turn \(i\)th bit ON */
+      xQ = dac(B, b, R);
+      /* compute DAC output */
+      b[i] = u(y-xQ);
+   }
+}
+void print_array_long(const char *name, const long int *arr, const unsigned int n)
+{
+   int i;
+   char formatnl[10];
+   printf("%s :\n", name);
+   printf("----\n");
+   formatnl[7] = 0;
+   strncpy(formatnl, "%a", 7);
+   strncat(formatnl, "\n", 2);
+#pragma omp parallel for
+   for(i = 0; i <= n-1; i += 1)
+      printf(formatnl, *(arr+i));
+   printf("----\n");
+}
+int main(int argc, char **argv)
+{
+   int n;
+   n = argc>1?atoi(argv[1]):1000;
+   int (*in)[n];
+   in = (int (*)[n]) malloc(sizeof(int)*n);
+   init_args(argc, argv);
+   init_data_int(*in, n);
+   adc(4.2, n, *in, 3.14);
+   print_array_int("r", *in, n);
+   return 0;
+}
+void init_data_file(const char *data_file)
+{
+   if (_f_data_file!=0)
+      return;
+   _f_data_file = fopen(data_file, "r");
+   if (_f_data_file==0) {
+      perror("open data file");
+      exit(*__errno_location());
+   }
+}
+void print_array_cplx(const char *name, const float _Complex *arr, const unsigned int n)
+{
+   int i;
+#pragma omp parallel for
+   for(i = 0; i <= n-1; i += 1)
+      printf("%f %f\n", crealf(arr[i]), cimagf(arr[i]));
+}
+int init_data_long(long int *ptr, const unsigned int n)
+{
+   return init_data_gen(ptr, n, sizeof(long int));
+}
+double dac(int B, int b[B], double R)
+{
+   int i;
+   double dac;
+   dac = 0;
+
+   b[0] = 1-b[0];
+   /* complement MSB */
+   
+   for(i = B-1; i >= 0; i += -1)
+      /* H\"orner's rule */
+      dac = 0.5*(dac+b[i]);
+
+   dac = R*(dac-0.5);
+   /* shift and scale */
+   
+   b[0] = 1-b[0];
+   /* restore MSB */
+   
+   return dac;
+}
+void close_data_file()
+{
+   if (_f_data_file!=0)
+      fclose(_f_data_file);
+}
+void print_array_int(const char *name, const int *arr, const unsigned int n)
+{
+   int i;
+   char formatnl[10];
+   printf("%s :\n", name);
+   printf("----\n");
+   formatnl[7] = 0;
+   strncpy(formatnl, "%d", 7);
+   strncat(formatnl, "\n", 2);
+   for(i = 0; i <= n-1; i += 1)
+      printf(formatnl, *(arr+i));
+   printf("----\n");
+}
+void print_array_double(const char *name, const float *arr, const unsigned int n)
+{
+   int i;
+   char formatnl[10];
+   printf("%s :\n", name);
+   printf("----\n");
+   formatnl[7] = 0;
+   strncpy(formatnl, "%a", 7);
+   strncat(formatnl, "\n", 2);
+#pragma omp parallel for
+   for(i = 0; i <= n-1; i += 1)
+      printf(formatnl, *(arr+i));
+   printf("----\n");
+}
+int u(double x)
+{
+   if (x>=0)
+      return 1;
+   else
+      return 0;
+}
+void print_array_float(const char *name, const float *arr, const unsigned int n)
+{
+   int i;
+   char formatnl[10];
+   printf("%s :\n", name);
+   printf("----\n");
+   formatnl[7] = 0;
+   strncpy(formatnl, "%f", 7);
+   strncat(formatnl, "\n", 2);
+#pragma omp parallel for
+   for(i = 0; i <= n-1; i += 1)
+      printf(formatnl, *(arr+i));
+   printf("----\n");
+}
