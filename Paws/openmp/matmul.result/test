@@ -2,28 +2,13 @@
 int matmul(int a[100][100], int b[100][100], int c[100][100])
 {
    int i, j, k;
-   
-   //BEGIN_FPGA_matmul_to_export
+
 #pragma omp parallel for 
    for(i = 0; i <= 100; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 100; j += 1)
          for(k = 0; k <= 100; k += 1)
             a[i][j] = a[i][j]+b[i][k]*c[k][j];
-   //END_FPGA_matmul_to_export
-   
-   return 0;
-}
-int matmul(int a[100][100], int b[100][100], int c[100][100])
-{
-   int i, j, k;
-   
-   //BEGIN_FPGA_matmul_to_export
-   for(i = 0; i <= 100; i += 1)
-      for(j = 0; j <= 100; j += 1)
-         for(k = 0; k <= 100; k += 1)
-            a[i][j] = a[i][j]+b[i][k]*c[k][j];
-   //END_FPGA_matmul_to_export
-   
+
    return 0;
 }

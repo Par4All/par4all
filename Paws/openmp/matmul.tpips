@@ -32,7 +32,7 @@ display PARALLELPRINTED_FILE(matmul)
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
-display PRINTED_FILE(matmul)
+#display PRINTED_FILE(matmul)
 
 apply UNSPLIT
 #shell gcc -fopenmp -c array2.database/Src/array2.c -o array2.database/Src/array2.0
