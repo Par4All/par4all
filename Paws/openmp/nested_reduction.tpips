@@ -45,6 +45,6 @@ apply UNSPLIT
 shell gcc -fopenmp -c nested_reduction.database/Src/nested_reduction.c -o nested_reduction.database/Src/nested_reduction.o
 
 close
-#delete nested_reduction
+delete nested_reduction
 quit
 # EOF
