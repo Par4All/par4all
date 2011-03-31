@@ -56,6 +56,7 @@ typedef dg_vertex_label vertex_label;
 /* */
 #include "ricedg.h"
 #include "transformations.h"
+#include "properties.h"
 
 static graph dependence_graph;
 
@@ -595,6 +596,13 @@ use_def_elimination_on_a_statement(statement s)
 bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
+
+   bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
+   if(memory_effects_only_p) {
+     pips_user_warning("Dead_code_elimination should not be run with "
+                       "MEMORY_EFFECTS_ONLY set to TRUE ! Aborting...\n");
+     return FALSE; // Abort pass
+   }
 
    /* Get the true ressource, not a copy. */
    module_statement =
