@@ -645,6 +645,12 @@ bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
 
+
+   /*
+    * For C code, this pass requires that effects are calculated with property
+    * MEMORY_EFFECTS_ONLY set to FALSE because we need that the DG includes arcs
+    * for declarations as these latter are separate statements now.
+    */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
    if(memory_effects_only_p) {
      pips_user_warning("Dead_code_elimination should not be run with "
