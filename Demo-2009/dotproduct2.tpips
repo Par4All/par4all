@@ -33,6 +33,9 @@ apply NEW_ATOMIZER
 display PRINTED_FILE
 shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT04.f
 
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 apply USE_DEF_ELIMINATION
 display PRINTED_FILE
 shell cp dotproduct.database/DOTPRODUCT/DOTPRODUCT.pref DOTPRODUCT05.f

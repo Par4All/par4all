@@ -3,8 +3,12 @@ setenv WSPACE use_def_elim05
 setenv FILE $WSPACE.c
 delete $WSPACE
 create $WSPACE $FILE
-setproperty MEMORY_EFFECTS_ONLY=FALSE
-apply USE_DEF_ELIMINATION[%ALLFUNC]
+
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
+apply DEAD_CODE_ELIMINATION[%ALLFUNC]
 display PRINTED_FILE[%ALLFUNC]
 close
 delete $WSPACE

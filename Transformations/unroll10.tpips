@@ -4,6 +4,10 @@ create unroll10 unroll10.f
 
 setproperty PRETTYPRINT_ALL_DECLARATIONS TRUE
 
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 apply UNROLL[UNROLL10]
 20
 8
