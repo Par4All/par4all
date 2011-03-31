@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
-   // BEGIN BLOCK
    int **x, **y, *z, *t;
    int i, j;
 //             <    is written>: i
@@ -16,8 +18,8 @@ int main()
 //             <    is written>: z
 
    z = t;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: x z
+//             <    is written>: x[0]
    *x = z;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -25,14 +27,13 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf(" x = %p\n", x);
    return 0;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int **x, **y, *z, *t;
 //  {(t,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(x,
@@ -71,5 +72,4 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(z,j,-Exact-)}
    return 0;
-   // END BLOCK
 }

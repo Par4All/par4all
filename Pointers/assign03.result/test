@@ -1,16 +1,3 @@
 
-POINTS TO
+PROPER POINTER EFFECTS
 
-//  {}
-void assign03()
-{
-//  points to = {}
-   char *malloc(int);
-//  points to = {}
-   double *p = (double *) malloc(10*sizeof(double));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-   int j = 2;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-
-   p[j] = 1.;
-}

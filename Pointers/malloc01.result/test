@@ -1,5 +1,27 @@
 
-POINTS TO
+PROPER POINTER EFFECTS
+
+int main(int argc, char *argv[])
+{
+   int i, j;
+   int *a[64];
+//             <    is written>: i
+
+   for(i = 0; i <= 63; i += 1) {
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a[i] _MALLOC_EFFECTS:_MALLOC_
+      a[i] = (float) malloc(64*sizeof(float));
+//             <    is written>: j
+      for(j = 0; j <= 63; j += 1)
+//             <    is read   >: a[i] i j
+//             <    is written>: a[i][j]
+         a[i][j] = 0.;
+   }
+
+   return 0;
+}
+
+POINTS-TO
 
 //  {}
 int main(int argc, char *argv[])

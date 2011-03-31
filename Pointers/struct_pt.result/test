@@ -1,5 +1,5 @@
 
-Pointer proper effects
+PROPER POINTER EFFECTS
 
 int main()
 {
@@ -27,7 +27,7 @@ int main()
    return 0;
 }
 
-Points-to
+POINTS-TO
 
 //  {}
 int main()

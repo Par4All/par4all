@@ -1,5 +1,5 @@
 
-Proper effects for "main"
+PROPER POINTER EFFECTS
 
 int main()
 {
@@ -11,17 +11,17 @@ int main()
    b = &a;
 //             <    is written>: c
    c = &b;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: c c[0]
 //             <    is written>: bb
 
    bb = *c;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: c c[0] c[0][0]
 //             <    is written>: aa
    aa = **c;
    return 0;
 }
 
-POINTS TO for "main"
+POINTS-TO
 
 //  {}
 int main()

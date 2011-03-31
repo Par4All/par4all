@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 void assignment01()
 {
-   // BEGIN BLOCK
    int i;
    int *p;
    int *q;
@@ -10,14 +12,13 @@ void assignment01()
    p = q = r = &i;
 //             <    is written>: i
    i = 2;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 void assignment01()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int i;
 //  points to = {}
@@ -34,5 +35,4 @@ void assignment01()
    p = q = r = &i;
 //  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
    i = 2;
-   // END BLOCK
 }

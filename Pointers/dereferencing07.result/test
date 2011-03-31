@@ -1,137 +1,34 @@
 
-Proper pointer effects for "foo"
-
-void foo(int *col)
-{
-//             <    is read   >: col col[0]
-//             <    is written>: col
-   *col++;                                                              /*0009*/
-
-   return;                                                              /*0011*/
-}
-
-Proper pointer effects for "main"
+PROPER POINTER EFFECTS
 
 int main()
 {
-   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+   int x, tab1[10], tab2[10], *p;
 //             <    is read   >: x
 //             <    is written>: x
-   x++;                                                                 /*0017*/
+   x++;
 //             <    is read   >: x
 //             <    is written>: x
-   x += 3;                                                              /*0018*/
+   x += 3;
 //             <    is read   >: p tab1[tab2[x]] tab2[x] x
 //             <    is written>: p[tab1[tab2[x]]]
-   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
-   return 1;                                                            /*0020*/
+   *(p+tab1[tab2[x]]) = 0;
+   return 1;
 }
 
-Proper regions for "main"
-
-int main()
-{
-   int x, tab1[10], tab2[10], *p;                                       /*0016*/
-
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
-
-   x++;                                                                 /*0017*/
-
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
-
-   x += 3;                                                              /*0018*/
-
-//  <p-R-EXACT-{}>
-//  <p[PHI1]-W-MAY-{}>
-//  <tab1[PHI1]-R-MAY-{}>
-//  <tab2[PHI1]-R-EXACT-{PHI1==x}>
-//  <x-R-EXACT-{}>
-
-   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
-   return 1;                                                            /*0020*/
-}
-
-Proper effects for "foo"
-
-void foo(int *col)
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: col
-   *col++;                                                              /*0009*/
-
-   return;                                                              /*0011*/
-}
-
-Proper effects for "main"
-
-int main()
-{
-   int x, tab1[10], tab2[10], *p;                                       /*0016*/
-//             <    is read   >: x
-//             <    is written>: x
-   x++;                                                                 /*0017*/
-//             <    is read   >: x
-//             <    is written>: x
-   x += 3;                                                              /*0018*/
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p tab1[tab2[x]] tab2[x] x
-   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
-   return 1;                                                            /*0020*/
-}
-
-Proper regions for "main"
-
-int main()
-{
-   int x, tab1[10], tab2[10], *p;                                       /*0016*/
-
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
-
-   x++;                                                                 /*0017*/
-
-//  <x-R-EXACT-{}>
-//  <x-W-EXACT-{}>
-
-   x += 3;                                                              /*0018*/
-
-//  <p-R-EXACT-{}>
-//  <tab1[PHI1]-R-MAY-{}>
-//  <tab2[PHI1]-R-EXACT-{PHI1==x}>
-//  <x-R-EXACT-{}>
-//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
-
-   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
-   return 1;                                                            /*0020*/
-}
-
-POINTS TO
-
-//  {(col,_col_1,-Exact-)}
-void foo(int *col)
-{
-//  {(col,_col_1,-Exact-)}
-   *col++;                                                              /*0009*/
-//  {(col,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
-
-   return;                                                              /*0011*/
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()
 {
 //  points to = {}
-   int x, tab1[10], tab2[10], *p;                                       /*0016*/
+   int x, tab1[10], tab2[10], *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   x++;                                                                 /*0017*/
+   x++;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   x += 3;                                                              /*0018*/
+   x += 3;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   *(p+tab1[tab2[x]]) = 0;                                              /*0019*/
+   *(p+tab1[tab2[x]]) = 0;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   return 1;                                                            /*0020*/
+   return 1;
 }

@@ -1,3 +1,34 @@
+
+PROPER POINTER EFFECTS
+
+int main(void)
+{
+   int i, j;
+   int **pp;
+   {
+//             <    is written>: pi
+      int *pi = &i;
+//             <    is written>: pp
+      pp = &pi;
+//             <    is read   >: pp pp[0]
+//             <    is written>: pp[0][0]
+      **pp = 1;
+   }
+//             <    is read   >: pp pp[0]
+//             <    is written>: pp[0][0]
+   
+   // pp points to a dead value in the stack
+   // should generate an error
+   **pp = 0;
+//             <    is read   >: pp
+//             <    is written>: pp[0]
+   // segfault?
+   *pp = &j;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main(void)
 {
@@ -25,6 +56,3 @@ int main(void)
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
 }
-
-POINTS TO
-

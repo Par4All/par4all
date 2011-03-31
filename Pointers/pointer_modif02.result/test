@@ -1,9 +1,8 @@
 
-Proper pointer effects for "main"
+PROPER POINTER EFFECTS
 
 int main()
 {
-   // BEGIN BLOCK
    int *p, *q;
 //             <    is read   >: p
 //             <    is written>: p[0]
@@ -17,63 +16,14 @@ int main()
 //             <    is written>: q[0]
    *q = 2;
    return 0;
-   // END BLOCK
 }
 
-Cumulated pointer effects for "main"
-
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-int main()
-{
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   // BEGIN BLOCK
-   int *p, *q;
-//             <    is read   >: p
-//             <    is written>: p[0]
-
-   *p = 1;
-//             <    is read   >: p
-//             <    is written>: q
-
-   foo(&q, p);
-//             <    is read   >: q
-//             <    is written>: q[0]
-   *q = 2;
-   return 0;
-   // END BLOCK
-}
-
-Proper effects for "main"
-
-int main()
-{
-   // BEGIN BLOCK
-   int *p, *q;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   *p = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-
-   foo(&q, p);
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: q
-   *q = 2;
-   return 0;
-   // END BLOCK
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()
 {
 //  points to = {}
-   // BEGIN BLOCK
-//  points to = {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -89,5 +39,4 @@ int main()
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    return 0;
-   // END BLOCK
 }

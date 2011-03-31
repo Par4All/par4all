@@ -1,5 +1,5 @@
 
-Proper effetcs for "struct05"
+PROPER POINTER EFFECTS
 
 int struct05()
 {
@@ -22,7 +22,7 @@ int struct05()
          x[i].second = x[i].first;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int struct05()

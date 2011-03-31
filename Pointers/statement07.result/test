@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
-   // BEGIN BLOCK
    int *x, *a, i;
 //             <    is written>: i
    i = 1;
@@ -11,14 +13,13 @@ int main()
    x = a;
 
    return 0;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int *x, *a, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
@@ -32,5 +33,4 @@ int main()
 //  {(a,i,-Exact-);(x,i,-Exact-)}
 
    return 0;
-   // END BLOCK
 }

@@ -1,18 +1,3 @@
 
-POINTS TO
+PROPER POINTER EFFECTS
 
-//  {}
-void assign05()
-{
-//  points to = {}
-   int *r;
-//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   int i;
-//  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-
-   r = bar(i);
-//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
-   i = 1;
-//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
-   *r = 0;
-}

@@ -1,18 +1,5 @@
 
-Parsed printed file for "dereferencing05"
-
-void dereferencing05()
-{
-   double *p;
-   int i;
-
-   *p++ = 0.;
-   *p-- = 0.;
-   *++p = 0.;
-   *--p = 0.;
-}
-
-Proper pointer effects for "dereferencing05"
+PROPER POINTER EFFECTS
 
 void dereferencing05()
 {
@@ -33,7 +20,7 @@ void dereferencing05()
    *--p = 0.;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 void dereferencing05()

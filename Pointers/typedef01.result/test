@@ -1,33 +1,21 @@
-void compute()
-{
-   int i, j;
-//             <    is written>: i
 
-   for(i = 1; i <= 62; i += 1)
-//             <    is written>: j
-      for(j = 1; j <= 62; j += 1)
-//             <    is read   >: i j
-//             <    is written>: tab[i][j]
-         tab[i][j] = i*j;
+PROPER POINTER EFFECTS
+
+int main(int argc, char *argv[])
+{
+   int t;
+//             <    is written>: t
+   
+   
+   for(t = 0; t <= 63; t += 1)
+//             <may be written>: tab[*][*]
+      compute();
+   
+   
+   return 0;
 }
 
-POINTS TO
-
-//  {}
-void compute()
-{
-//  points to = {}
-   int i, j;
-//  points to = {}
-
-   for(i = 1; i <= 62; i += 1)
-//  points to = {}
-      for(j = 1; j <= 62; j += 1)
-//  points to = {}
-         tab[i][j] = i*j;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main(int argc, char *argv[])
