@@ -8376,8 +8376,6 @@ it is not yet stabilized. For C code, this pass requires that effects
 are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
 \verb/FALSE/.
 
-Known bug: FORMAT are found useless and eliminated.
-
 Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} p. 595,
 and~\cite{Much97} p. 592, a variable is {\it dead} if it is not used
 on any path from the location in the code where it is defined to the
@@ -8389,6 +8387,21 @@ fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
   elimination} pass and the {\em Suppress dead code} pass (see
 Section~\ref{sec:dead-code-elimination}) does not have a standard
 name. It could be {\em If and loop simplification} pass.
+
+The following properties are intended to force some functions to be kept by the
+algorithm, \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space 
+separated list of function names while 
+\PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space separated list
+of prefix for function name.
+
+\begin{PipsProp}{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS}
+DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS ""
+\end{PipsProp}
+
+\begin{PipsProp}{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX}
+DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX ""
+\end{PipsProp}
+
 
 \end{PipsPass}
 
