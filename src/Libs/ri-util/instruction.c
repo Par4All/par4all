@@ -115,6 +115,26 @@ instruction make_instruction_block(list statements) {
 */
 
 
+/* Test if a call is a native instruction of the language
+
+   @param c is the call to investigate
+   @param s is the name of the native instruction to investigate
+   @return true if the instruction is a native instruction of the language
+ */
+bool native_call_p(call c,
+        string op_name) {
+  bool call_s_p = FALSE;
+
+  // The called function
+  entity f = call_function(c);
+
+  if (strcmp(entity_user_name(f), op_name) == 0)
+    call_s_p = TRUE;
+
+  return call_s_p;
+}
+
+
 /* Test if an instruction is a native instruction of the language
 
    @param i is the instruction to investigate
@@ -126,20 +146,14 @@ bool native_instruction_p(instruction i,
 {
   bool call_s_p = FALSE;
 
+  // Call can be directly inside the instruction,
+  // or wrapped inside an expression
   if (instruction_call_p(i)) {
-    call c = instruction_call(i);
-    entity f = call_function(c);
-
-    if (strcmp(entity_user_name(f), op_name) == 0)
-      call_s_p = TRUE;
-  }
-  else if(instruction_expression_p(i)) {
+    call_s_p = native_call_p(instruction_call(i), op_name);
+  } else if(instruction_expression_p(i)) {
     syntax s = expression_syntax(instruction_expression(i));
     if(syntax_call_p(s)) {
-      entity f = call_function(syntax_call(s));
-
-      if (strcmp(entity_user_name(f), op_name) == 0)
-	call_s_p = TRUE;
+      call_s_p = native_call_p(syntax_call(s), op_name);
     }
   }
 
