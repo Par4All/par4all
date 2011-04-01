@@ -1,0 +1,52 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete induction_substitution04
+create induction_substitution04 induction_substitution04.c
+
+echo
+echo Initial code for "induction04"
+echo
+
+display PRINTED_FILE[induction04]
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Transformers for "induction04"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[induction04]
+
+echo
+echo Preconditions for "induction04"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[induction04]
+
+# necessary because stupid tpips won't produce the same transformer when lauched
+# tpips my_script.tpips
+# and
+# tpips < my_script.tpips
+#apply REFINE_TRANSFORMERS[induction04]
+
+# setenv INDUCTION_SUBSTITUTION_DEBUG_LEVEL 6
+apply INDUCTION_SUBSTITUTION[induction04]
+
+apply COARSE_GRAIN_PARALLELIZATION[induction04]
+apply OMPIFY_CODE[induction04]
+
+
+echo
+echo Code for "induction04" after induction substitution
+echo
+#activate PRINT_CODE
+display PRINTED_FILE[induction04]
+
+
+close induction_substitution04
+delete induction_substitution04
+quit
