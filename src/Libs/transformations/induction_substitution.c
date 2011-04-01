@@ -234,6 +234,111 @@ static expression get_right_part_of_assignment( instruction i ) {
 }
 
 
+
+/**
+ * This function replace the variable induction_variable_candidate by expression
+ * substitute in statement s.
+ * @param substitute is the replacement expression
+ * @param induction_variable_candidate is the variable to replace
+ * @param s is the statement on which the substitution will occur. It'll be
+ * modified by side effect
+ */
+bool expression_subtitution( expression substitute,
+                             entity induction_variable_candidate,
+                             statement s ) {
+  ifdebug( 1 ) {
+      pips_debug( 1, "Induction substitution : %s => ", //
+              entity_local_name( induction_variable_candidate ) );
+      print_syntax( expression_syntax( substitute ) );
+      fprintf( stderr, "\n" );
+  }
+
+  expression unsugarized = expression_undefined;
+  if( inc_or_de_crement_instruction_p(statement_instruction( s ) ) ) {
+    /* In the case of unary operator, prepare the assignment
+     * It's a separate case since there's no right hand side
+     */
+    if( native_instruction_p( statement_instruction( s ), POST_INCREMENT_OPERATOR_NAME )
+        || native_instruction_p( statement_instruction( s ), PRE_INCREMENT_OPERATOR_NAME ) ) {
+      unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+                                    substitute, //
+                                    int_to_expression(1) );
+    } else if( native_instruction_p( statement_instruction( s ), POST_DECREMENT_OPERATOR_NAME )
+               || native_instruction_p( statement_instruction( s ), PRE_DECREMENT_OPERATOR_NAME ) ) {
+      unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+                                    substitute, //
+                                    int_to_expression(1) );
+    }
+
+  } else {
+    /* Now recurse on expressions in current statement and
+     * replace induction_variable_candidate by substitute expression */
+    substitute_ctx ctx;
+    ctx.to_substitute = induction_variable_candidate;
+    ctx.substitute_by = substitute;
+
+    expression substitute_on = get_right_part_of_assignment( statement_instruction( s ) );
+    gen_context_recurse ( substitute_on, &ctx, expression_domain, gen_true, reference_substitute );
+
+    /* Force to generate again the normalized field of the expression */
+    expression_normalized(substitute_on) = NormalizeExpression( substitute_on );
+
+    /* Handle "update" affection (+=, -= , ...)
+     * Transform z += 1 in z = induction + 1
+     * */
+    if ( native_instruction_p( statement_instruction( s ), MULTIPLY_UPDATE_OPERATOR_NAME ) ) {
+        unsugarized = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
+        substitute, //
+        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+    } else if ( native_instruction_p( statement_instruction( s ), DIVIDE_UPDATE_OPERATOR_NAME ) ) {
+        unsugarized = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
+        substitute, //
+        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+    } else if ( native_instruction_p( statement_instruction( s ), PLUS_UPDATE_OPERATOR_NAME ) ) {
+        unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
+        substitute, //
+        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+    } else if ( native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME ) ) {
+        unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+        substitute, //
+        copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
+    }
+  }
+
+
+  if ( !expression_undefined_p( unsugarized ) ) {
+      /* substitute expression is no longer needed, but we used
+       * it when building unsugarized and we don't want it to
+       * be freed later, so unreference it now */
+      substitute = expression_undefined;
+
+      ifdebug( 1 ) {
+          pips_debug( 1, "Unsugar update assignment : " );
+          print_statement( s );
+      }
+
+      /* we will replace instruction inside statement, so free it first */
+      free_instruction( statement_instruction( s ) );
+
+      /* Force to generate again the normalized field of the expression */
+      expression_normalized(unsugarized) = NormalizeExpression( unsugarized );
+
+      /* Construct the unsugarized instruction */
+      statement_instruction( s ) = make_call_instruction( entity_intrinsic( ASSIGN_OPERATOR_NAME ), //
+      CONS( EXPRESSION, //
+              entity_to_expression( induction_variable_candidate ), //
+              CONS(EXPRESSION, unsugarized, NIL ) ) );
+
+      ifdebug( 1 ) {
+          pips_debug( 1, "Unsugar update assignment : " );
+          print_statement( s );
+      }
+  }
+
+  return TRUE;
+}
+
+
 /** \fn static bool subtitute_induction_statement_in( statement s )
  *  \brief Call during top-down phase while recursing on statements
  *  Will use precondition on each assignment statement to construct
@@ -428,107 +533,21 @@ static bool subtitute_induction_statement_in( statement s ) {
                     if ( induction_variable_candidate_coeff == -1 ) {
                         /* Instead of dividing by -1, we rather use
                          * unary minus in front of expression */
-                        substitute = MakeUnaryCall( entity_intrinsic( UNARY_MINUS_OPERATOR_NAME ), substitute );
+                        substitute = MakeUnaryCall( entity_intrinsic( UNARY_MINUS_OPERATOR_NAME ),
+                                                    substitute );
                     } else if ( induction_variable_candidate_coeff != 1 ) {
                         /* General case */
                         substitute = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
-                        substitute, //
-                        int_to_expression( induction_variable_candidate_coeff ) );
+                                                     substitute, //
+                                                     int_to_expression( induction_variable_candidate_coeff ) );
                     }
 
-                    ifdebug( 1 ) {
-                        pips_debug( 1, "Induction substitution : %s => ", //
-                                entity_local_name( induction_variable_candidate ) );
-                        print_syntax( expression_syntax( substitute ) );
-                        fprintf( stderr, "\n" );
-                    }
-
-                    expression unsugarized = expression_undefined;
-                    if( inc_or_de_crement_instruction_p(statement_instruction( s ) ) ) {
-                      /* In the case of unary operator, prepare the assignment
-                       * It's a separate case since there's no right hand side
-                       */
-                      if( native_instruction_p( statement_instruction( s ), POST_INCREMENT_OPERATOR_NAME )
-                          || native_instruction_p( statement_instruction( s ), PRE_INCREMENT_OPERATOR_NAME ) ) {
-                        unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
-                                                      substitute, //
-                                                      int_to_expression(1) );
-                      } else if( native_instruction_p( statement_instruction( s ), POST_DECREMENT_OPERATOR_NAME )
-                                 || native_instruction_p( statement_instruction( s ), PRE_DECREMENT_OPERATOR_NAME ) ) {
-                        unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
-                                                      substitute, //
-                                                      int_to_expression(1) );
-                      }
-
-                    } else {
-                      /* Now recurse on expressions in current statement and
-                       * replace induction_variable_candidate by substitute expression */
-                      substitute_ctx ctx;
-                      ctx.to_substitute = induction_variable_candidate;
-                      ctx.substitute_by = substitute;
-
-                      expression substitute_on = get_right_part_of_assignment( statement_instruction( s ) );
-                      gen_context_recurse ( substitute_on, &ctx, expression_domain, gen_true, reference_substitute );
-
-                      /* Force to generate again the normalized field of the expression */
-                      expression_normalized(substitute_on) = NormalizeExpression( substitute_on );
-
-                      /* Handle "update" affection (+=, -= , ...)
-                       * Transform z += 1 in z = induction + 1
-                       * */
-                      if ( native_instruction_p( statement_instruction( s ), MULTIPLY_UPDATE_OPERATOR_NAME ) ) {
-                          unsugarized = MakeBinaryCall( entity_intrinsic( MULTIPLY_OPERATOR_NAME ), //
-                          substitute, //
-                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                      } else if ( native_instruction_p( statement_instruction( s ), DIVIDE_UPDATE_OPERATOR_NAME ) ) {
-                          unsugarized = MakeBinaryCall( entity_intrinsic( DIVIDE_OPERATOR_NAME ), //
-                          substitute, //
-                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                      } else if ( native_instruction_p( statement_instruction( s ), PLUS_UPDATE_OPERATOR_NAME ) ) {
-                          unsugarized = MakeBinaryCall( entity_intrinsic( PLUS_OPERATOR_NAME ), //
-                          substitute, //
-                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                      } else if ( native_instruction_p( statement_instruction( s ), MINUS_UPDATE_OPERATOR_NAME ) ) {
-                          unsugarized = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
-                          substitute, //
-                          copy_expression( get_right_part_of_assignment( statement_instruction( s ) ) ) );
-                      }
-                    }
-
-
-                    if ( !expression_undefined_p( unsugarized ) ) {
-                        /* substitute expression is no longer needed, but we used
-                         * it when building unsugarized and we don't want it to
-                         * be freed later, so unreference it now */
-                        substitute = expression_undefined;
-
-                        ifdebug( 1 ) {
-                            pips_debug( 1, "Unsugar update assignment : " );
-                            print_statement( s );
-                        }
-
-                        /* we will replace instruction inside statement, so free it first */
-                        free_instruction( statement_instruction( s ) );
-
-                        /* Force to generate again the normalized field of the expression */
-                        expression_normalized(unsugarized) = NormalizeExpression( unsugarized );
-
-                        /* Construct the unsugarized instruction */
-                        statement_instruction( s ) = make_call_instruction( entity_intrinsic( ASSIGN_OPERATOR_NAME ), //
-                        CONS( EXPRESSION, //
-                                entity_to_expression( induction_variable_candidate ), //
-                                CONS(EXPRESSION, unsugarized, NIL ) ) );
-
-                        ifdebug( 1 ) {
-                            pips_debug( 1, "Unsugar update assignment : " );
-                            print_statement( s );
-                        }
-                    }
+                    expression_subtitution(substitute, induction_variable_candidate, s );
                 }
 
                 /* Free substitute expression */
                 if ( !expression_undefined_p( substitute ) ) {
-                    free_expression( substitute );
+                    // FIXME free_expression( substitute );
                 }
             }
             /* Try to avoid memory leak */
