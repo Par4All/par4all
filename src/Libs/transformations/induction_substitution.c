@@ -58,6 +58,7 @@ typedef struct {
     entity to_substitute; /* The induction variable */
     expression substitute_by; /* The substitution expression */
     bool substitution_occured_p; /* flag to detect a substitution */
+    instruction root_instruction; /* instruction holding all the stuff we're working on */
 } substitute_ctx;
 
 
@@ -325,18 +326,17 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
         /* if we have only k++; then no return value is needed. This occurs
          * when ancestor is an instruction
          */
-        instruction owner = (instruction)gen_get_ancestor(instruction_domain,c);
-        pips_assert("owner instruction can't be null !\n", owner);
+        instruction owner = ctx->root_instruction;
         if(!(instruction_call_p(owner) && instruction_call(owner)==c)) {
-
-        expression minus;
-        minus = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
-                                entity_to_expression( induction_variable_candidate), //
-                                int_to_expression(1) );
-        new_call = make_call(entity_intrinsic( COMMA_OPERATOR_NAME ),
-                             CONS(EXPRESSION,
-                                  call_to_expression(new_call),
-                                  CONS(EXPRESSION, minus, NIL)));
+          expression minus;
+          minus = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
+                                  entity_to_expression( induction_variable_candidate), //
+                                  int_to_expression(1) );
+          new_call = make_call(entity_intrinsic( COMMA_OPERATOR_NAME ),
+                               CONS(EXPRESSION,
+                                    call_to_expression(new_call),
+                                    CONS(EXPRESSION, minus, NIL)));
+        }
       }
 
 
@@ -365,7 +365,8 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
  */
 static bool expression_subtitution_on_call( expression substitute,
                                             entity induction_variable_candidate,
-                                            call c ) {
+                                            call c,
+                                            instruction root_instruction) {
   ifdebug( 1 ) {
       pips_debug(0, "Induction substitution : %s => ", //
               entity_local_name( induction_variable_candidate ) );
@@ -379,6 +380,7 @@ static bool expression_subtitution_on_call( expression substitute,
   ctx.to_substitute = induction_variable_candidate;
   ctx.substitute_by = substitute;
   ctx.substitution_occured_p = FALSE;
+  ctx.root_instruction = root_instruction;
 
   gen_context_recurse(c,&ctx,call_domain,substitute_in_call,gen_null);
 
@@ -591,7 +593,8 @@ static bool subtitute_induction_statement_in( statement s ) {
             // Variable is modified by this statement
             expression_subtitution_on_call(substitute,
                                            induction_variable_candidate,
-                                           the_call );
+                                           the_call,
+                                           stmt_instr);
           } else {
             // Variable is not modified by this statement
             substitute_ctx ctx;
