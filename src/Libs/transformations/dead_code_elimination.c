@@ -382,14 +382,15 @@ static bool entity_local_variable_p(entity var, entity func) {
       local=true;
     }
   } else if( storage_formal_p(entity_storage(var))) {
-    /* Formal parameter are local to module... except for Fortran !! */
+    /* Formal parameter are local to module only for scalar and not for Fortran !! */
     entity module = get_current_module_entity();
     /* it might be better to check the parameter passing mode itself,
        via the module type */
     bool fortran_p = fortran_module_p(module);
+    bool scalar_p = entity_scalar_p(var);
 
     formal r = storage_formal(entity_storage(var));
-    if(!fortran_p && same_entity_p(func,formal_function(r))) {
+    if(!fortran_p && scalar_p && same_entity_p(func,formal_function(r))) {
       local=true;
     }
   }
