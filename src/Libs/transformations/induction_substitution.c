@@ -86,11 +86,11 @@ static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
  * Use transformer associated to the loop to check that variable v is invariant
  */
 static bool loop_invariant_p( Variable v, list /* of statements */ loops ) {
-  bool result = false;
+  bool result = true;
   FOREACH(statement, s, loops) {
     transformer t = load_statement_transformer( s );
-    if( !is_modified_entity_in_transformer(t,(entity)v ) ) {
-      result = true;
+    if( is_modified_entity_in_transformer(t,(entity)v ) ) {
+      result = false;
     }
   }
 
@@ -321,6 +321,14 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
          * be sioux enough if it's a post increment :
          * i++ has to be replaced by (i=i+1,i-1) so that the old value is returned
          */
+
+        /* if we have only k++; then no return value is needed. This occurs
+         * when ancestor is an instruction
+         */
+        instruction owner = (instruction)gen_get_ancestor(instruction_domain,c);
+        pips_assert("owner instruction can't be null !\n", owner);
+        if(!(instruction_call_p(owner) && instruction_call(owner)==c)) {
+
         expression minus;
         minus = MakeBinaryCall( entity_intrinsic( MINUS_OPERATOR_NAME ), //
                                 entity_to_expression( induction_variable_candidate), //
