@@ -43,7 +43,7 @@ apply OMPIFY_CODE[induction04]
 echo
 echo Code for "induction04" after induction substitution
 echo
-#activate PRINT_CODE
+activate PRINT_CODE
 display PRINTED_FILE[induction04]
 
 

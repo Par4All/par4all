@@ -11,10 +11,12 @@ void induction04( double A[SIZE], double B[SIZE][SIZE] )
 {
   int i,j;
   int k = -1;
+  int sum;
   for(i=0 ; i < SIZE ; i++) {
     k = i;
     for(j=0 ; j < SIZE ; j++) {
-      A[k++] = B[j-k][k] + A[k];
+      sum = B[j-k][k] + A[k];
+      A[k++] = sum;
     }
   }
 }

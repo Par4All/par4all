@@ -63,7 +63,7 @@ void induction02(double A[SIZE], double B[SIZE][SIZE])
       k = i;
       for(j = 0; j <= SIZE-1; j += 1) {
          k = -((-i)+(-j))+1, k-1;
-         A[k] = B[j-k][k]+A[k];
+         A[-((-j)+(-i)+-1)] = B[j-(-((-j)+(-i)+-1))][-((-j)+(-i)+-1)]+A[-((-j)+(-i)+-1)];
       }
    }
 }
