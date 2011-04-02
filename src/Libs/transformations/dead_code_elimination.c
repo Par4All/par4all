@@ -684,6 +684,7 @@ bool dead_code_elimination_on_module(char * module_name)
 						module_name,
 						TRUE)); 
 
+
    set_current_module_statement(module_statement);
    set_current_module_entity(module_name_to_entity(module_name));
 
@@ -714,11 +715,22 @@ bool dead_code_elimination_on_module(char * module_name)
 
    pips_debug(2, "done for %s\n", module_name);
 
+   /* Apply clean declarations ! */
+   set_cumulated_rw_effects(
+       (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+                                                 module_name,
+                                                 TRUE));
+   module_clean_declarations(get_current_module_entity(),
+                             get_current_module_statement());
+
+
+
    debug_off();
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
 
    reset_proper_rw_effects();
+   reset_cumulated_rw_effects();
    reset_current_module_statement();
    reset_current_module_entity();
    reset_ordering_to_statement();

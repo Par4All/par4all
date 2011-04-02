@@ -8377,6 +8377,8 @@ are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
 \verb/FALSE/ because we need that the DG includes arcs for declarations as these
 latter are separate statements now.
 
+\PipsPropRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
+cumulated effects are needed.
 
 Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} p. 595,
 and~\cite{Much97} p. 592, a variable is {\it dead} if it is not used
@@ -8413,6 +8415,7 @@ dead_code_elimination          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.cumulated_effects
         < MODULE.chains
 \end{PipsMake}
 
