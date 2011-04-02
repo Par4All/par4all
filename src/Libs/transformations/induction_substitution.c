@@ -57,6 +57,7 @@
 typedef struct {
     entity to_substitute; /* The induction variable */
     expression substitute_by; /* The substitution expression */
+    bool substitution_occured_p; /* flag to detect a substitution */
 } substitute_ctx;
 
 
@@ -330,10 +331,11 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
                                   CONS(EXPRESSION, minus, NIL)));
       }
 
-// Fails badly :-(
-//call_assign_contents(c,new_call);
+
+//call_assign_contents(c,new_call); // Fails badly :-(
       *c = *new_call;
 
+      ctx->substitution_occured_p = TRUE;
 
       ifdebug( 1 ) {
           pips_debug( 1, "Unsugar update assignment : " );
@@ -368,11 +370,11 @@ static bool expression_subtitution_on_call( expression substitute,
   substitute_ctx ctx;
   ctx.to_substitute = induction_variable_candidate;
   ctx.substitute_by = substitute;
-
+  ctx.substitution_occured_p = FALSE;
 
   gen_context_recurse(c,&ctx,call_domain,substitute_in_call,gen_null);
 
-  return TRUE;
+  return ctx.substitution_occured_p;
 }
 
 
@@ -481,6 +483,11 @@ static bool subtitute_induction_statement_in( statement s ) {
             } else if ( !entity_undefined_p( induction_variable_candidate ) ) {
               /* We have a variable that is not a loop index,
                * but we already have one, so we abort substitution */
+              pips_debug(5,"We already have an induction candidate for this"
+                         "equation (%s) and encounter a new one (%s), so skip "
+                         "this equation...",
+                         entity_local_name(induction_variable_candidate ),
+                         entity_local_name(v));
               induction_variable_candidate = entity_undefined;
               break;
             } else {
@@ -556,9 +563,6 @@ static bool subtitute_induction_statement_in( statement s ) {
             && induction_variable_candidate_coeff != 0 //
             // We have a substitution expression to use :-)
             && !expression_undefined_p( substitute ) //
-            // Variable is modified by this statement
-            && is_modified_entity_in_transformer( load_statement_transformer( s ), //
-                                                  induction_variable_candidate ) //
            ) {
 
           /* Add final division using the coeff */
@@ -574,7 +578,26 @@ static bool subtitute_induction_statement_in( statement s ) {
                                          int_to_expression( induction_variable_candidate_coeff ) );
           }
 
-          expression_subtitution_on_call(substitute, induction_variable_candidate, the_call );
+          if(is_modified_entity_in_transformer(load_statement_transformer( s ),
+                                               induction_variable_candidate )) {
+            // Variable is modified by this statement
+            expression_subtitution_on_call(substitute,
+                                           induction_variable_candidate,
+                                           the_call );
+          } else {
+            // Variable is not modified by this statement
+            substitute_ctx ctx;
+            ctx.to_substitute = induction_variable_candidate;
+            ctx.substitute_by = substitute;
+            ctx.substitution_occured_p = FALSE;
+
+            gen_context_recurse ( the_call,
+                                  &ctx,
+                                  expression_domain,
+                                  gen_true,
+                                  reference_substitute );
+
+          }
         }
 
         /* Free substitute expression */
