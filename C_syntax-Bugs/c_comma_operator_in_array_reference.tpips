@@ -1,0 +1,6 @@
+delete c_comma_operator_in_array_reference
+create c_comma_operator_in_array_reference c_comma_operator_in_array_reference.c
+
+display PRINTED_FILE
+
+
