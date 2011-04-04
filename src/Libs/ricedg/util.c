@@ -456,18 +456,20 @@ static void prettyprint_dot_label( FILE *fd, statement s, bool print_statement )
     statement_comments(s) = i_comments;
 
     // Print the first sentence
-    sentence sent = SENTENCE(CAR( sentences ) );
-    if ( sentence_formatted_p(sent) ) {
-      string str = sentence_formatted(sent);
-      dot_print_label_string( fd, str );
-    } else {
-      unformatted u = sentence_unformatted(sent);
-      cons *lw = unformatted_words(u);
-      while ( lw ) {
-        string str = STRING(CAR(lw));
-        dot_print_label_string( fd, str )
-        lw = CDR(lw);
+    if(sentences) {
+      sentence sent = SENTENCE(CAR( sentences ));
+      if(sentence_formatted_p(sent)) {
+        string str = sentence_formatted(sent);
+        dot_print_label_string( fd, str );
+      } else {
+        unformatted u = sentence_unformatted(sent);
+        cons *lw = unformatted_words(u);
+        while(lw) {
+          string str = STRING(CAR(lw));
+          dot_print_label_string( fd, str )
+          lw = CDR(lw);
 
+        }
       }
     }
   }
