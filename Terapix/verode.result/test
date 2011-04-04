@@ -214,6 +214,7 @@ l99995:
          P4A_accel_free(img0);
       }
 }
+**** check ok ******
 outlining to launcher
 void runner(int n, int img_out[n+118+1][n+258+1], int img[MIN((127*n-127)/4, n+122)+1][MIN((263*n-263)/4, n+258)+1])
 {
