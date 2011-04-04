@@ -1,9 +1,8 @@
 
-Pointer proper effects
+PROPER POINTER EFFECTS
 
 int main()
 {
-   // BEGIN BLOCK
    int i;
    int *p;
    int **q;
@@ -16,16 +15,13 @@ int main()
    *q = &i;
 
    return 0;
-   // END BLOCK
 }
 
-Points-to
+POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int i;
 //  points to = {}
@@ -44,5 +40,4 @@ int main()
 //   -Exact-)}
 
    return 0;
-   // END BLOCK
 }

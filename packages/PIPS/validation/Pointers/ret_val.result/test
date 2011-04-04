@@ -1,66 +1,25 @@
-long long int get_result(int argc, char **argv)
-{
-//             <    is written>: result
-   long long int result = 0;
-//             <    is read   >: argv argv[1]
-//             <    is written>: result
-   result = atoll(argv[1]);
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("return value will be %lld\n", result);
-//             <    is read   >: result
-   return result;
-}
+
+PROPER POINTER EFFECTS
+
 int main(int argc, char **argv)
 {
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: argc argv __IO_EFFECTS:LUNS[1]
+//             <    is read   >: argc argv argv[1] stdout 
+//                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: size __IO_EFFECTS:LUNS[1]
    long long int size = get_result(argc, argv);
 //             <    is read   >: size
    return size;
 }
-long long int get_result(int argc, char **argv)
-{
-//             <    is written>: result
-   long long int result = 0;
-//             <    is read   >: argv argv[1]
-//             <    is written>: result
-   result = atoll(argv[1]);
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: result stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
-   printf("return value will be %lld\n", result);
-//             <    is read   >: result
-   return result;
-}
 
-POINTS TO
+POINTS-TO
 
 //  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
-long long int get_result(int argc, char **argv)
-{
-//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
-   long long int result = 0;
-//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
-   result = atoll(argv[1]);
-//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
-   printf("return value will be %lld\n", result);
-//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
-   return result;
-}
-
-POINTS TO
-
-//  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
 int main(int argc, char **argv)
 {
-//  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    long long int size = get_result(argc, argv);
-//  {(_argv_3,__argv_3_4,-Exact-);(argv,_argv_3,-Exact-)}
+//  {(_argv_1,__argv_1_2,-Exact-);(argv,_argv_1,-Exact-)}
    return size;
 }

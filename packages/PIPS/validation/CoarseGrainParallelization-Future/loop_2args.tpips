@@ -1,0 +1,33 @@
+#
+delete loop_2args
+
+#setenv OMPIFY_CODE_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_2args loop_2args.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+setenv OPMIFY_CODE_DEBUG_LEVEL 9
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+#apply INTERNALIZE_PARALLEL_CODE
+apply COARSE_GRAIN_PARALLELIZATION
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c loop_2args.database/Src/loop_2args.c -o loop_2args.database/Src/loop_2args.o
+
+close
+delete loop_2args
+quit
+# EOF

@@ -1,14 +1,5 @@
 
-Parsed printed file for "lhs04"
-
-void lhs04()
-{
-   float x;
-
-   *((int *) &x) &= 0x7fffffff;
-}
-
-Proper effects for "lhs04"
+PROPER POINTER EFFECTS
 
 void lhs04()
 {
@@ -19,7 +10,7 @@ void lhs04()
    *((int *) &x) &= 0x7fffffff;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 void lhs04()

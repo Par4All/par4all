@@ -1,162 +1,19 @@
 
-Parsed printed file for "dereferencing02"
+PROPER POINTER EFFECTS
 
-void dereferencing02()
+int main()
 {
-   double x = 1.;
-   double *p = &x;
-   double **q = &p;
-   double **w;
-   int i = 1;
-   
-   
-   **q = 2.;
-   **(q+(i = 0)) = 3.;
-   **(w+(i = 2)) = 4.;
-   x = **q;
-   q++;
-   *q++;
+   dereferencing02();
+   return 1;
 }
 
-Proper pointer effects for "dereferencing02"
-
-void dereferencing02()
-{
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
-//             <    is written>: q
-   double **q = &p;
-   double **w;
-//             <    is written>: i
-   int i = 1;
-//             <    is read   >: q q[0]
-//             <    is written>: q[0][0]
-   
-   
-   **q = 2.;
-//             <    is read   >: q q[0]
-//             <    is written>: q[0][0]
-   **(q+(i = 0)) = 3.;
-//             <    is read   >: w w[2]
-//             <    is written>: w[2][0]
-   **(w+(i = 2)) = 4.;
-//             <    is read   >: q q[0] q[0][0]
-//             <    is written>: x
-   x = **q;
-//             <    is read   >: q
-//             <    is written>: q
-   q++;
-//             <    is read   >: q q[0]
-//             <    is written>: q
-   *q++;
-}
-
-Cumulated pointer effects for "dereferencing02"
-
-void dereferencing02()
-{
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
-//             <    is written>: q
-   double **q = &p;
-   double **w;
-//             <    is written>: i
-   int i = 1;
-//             <    is read   >: q q[0]
-//             <    is written>: q[0][0]
-   
-   
-   **q = 2.;
-//             <    is read   >: q q[0]
-//             <    is written>: q[0][0]
-   **(q+(i = 0)) = 3.;
-//             <    is read   >: w w[2]
-//             <    is written>: w[2][0]
-   **(w+(i = 2)) = 4.;
-//             <    is read   >: q q[0] q[0][0]
-//             <    is written>: x
-   x = **q;
-//             <    is read   >: q
-//             <    is written>: q
-   q++;
-//             <    is read   >: q q[0]
-//             <    is written>: q
-   *q++;
-}
-
-Proper effects for "dereferencing02"
-
-void dereferencing02()
-{
-//             <    is written>: x
-   double x = 1.;
-//             <    is written>: p
-   double *p = &x;
-//             <    is written>: q
-   double **q = &p;
-   double **w;
-//             <    is written>: i
-   int i = 1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   
-   
-   **q = 2.;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **(q+(i = 0)) = 3.;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **(w+(i = 2)) = 4.;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: x
-   x = **q;
-//             <    is read   >: q
-//             <    is written>: q
-   q++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: q
-   *q++;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
-void dereferencing02()
+int main()
 {
 //  points to = {}
-   double x = 1.;
+   dereferencing02();
 //  points to = {}
-   double *p = &x;
-//  {(p,x,-Exact-)}
-   double **q = &p;
-//  {(p,x,-Exact-);(q,p,-Exact-)}
-   double **w;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   int i = 1;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   
-   
-   **q = 2.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   **(q+(i = 0)) = 3.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   **(w+(i = 2)) = 4.;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   x = **q;
-//  {(p,x,-Exact-);(q,p,-Exact-);(w,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-)}
-   q++;
-//  {(p,x,-Exact-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(w,
-//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   *q++;
+   return 1;
 }

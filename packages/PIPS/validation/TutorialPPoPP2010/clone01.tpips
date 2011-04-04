@@ -22,6 +22,9 @@ setproperty SEMANTICS_FIX_POINT TRUE
 # activate PRECONDITIONS_INTER_FULL
 # setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 echo
@@ -63,9 +66,9 @@ shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/c
 #display PRINTED_FILE[%ALLFUNC]
 
 echo # applying use-def elimination...
-apply USE_DEF_ELIMINATION[clone01_0]
-apply USE_DEF_ELIMINATION[clone01_1]
-apply USE_DEF_ELIMINATION[clone01_2]
+apply DEAD_CODE_ELIMINATION[clone01_0]
+apply DEAD_CODE_ELIMINATION[clone01_1]
+apply DEAD_CODE_ELIMINATION[clone01_2]
 display PRINTED_FILE[clone01_1]
 shell cp clone01.database/clone01_1/clone01_1.pre.c clone01.database/clone01_1/clone01_1.pre-use-def.c
 

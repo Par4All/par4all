@@ -1,17 +1,5 @@
 
-Parsed printed file for "lhs02"
-
-void lhs02()
-{
-   int i = 2;
-   int j = 2;
-
-   *(i>2?&i:&j) = 3;
-
-   j = i>2?i+1:j+2;
-}
-
-Proper effects for "lhs02"
+PROPER POINTER EFFECTS
 
 void lhs02()
 {
@@ -30,7 +18,7 @@ void lhs02()
    j = i>2?i+1:j+2;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 void lhs02()

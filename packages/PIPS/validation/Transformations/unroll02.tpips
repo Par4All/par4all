@@ -36,6 +36,10 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete unroll02
 create unroll02 unroll02.f
 
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 apply UNROLL[UNROLL02]
 10
 2

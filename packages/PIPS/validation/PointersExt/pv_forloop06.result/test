@@ -1,3 +1,6 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
    float f;
@@ -9,15 +12,22 @@ int main()
    p = &a[0];
 //             <    is written>: q
    q = &b[0];
+//             <    is written>: f
+   f = 0.0;
+//             <    is read   >: f
+   while (f<10.5) {
+//             <    is read   >: p q q[0]
+//             <    is written>: p p[0] q
+      *p++ = 2**q++;
 //             <    is read   >: f
 //             <    is written>: f
-   for (f = 0.0;f<10.5;f += 1.0)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      *p++ = 2**q++;
+      f += 1.0;
+   }
    return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
@@ -38,10 +48,14 @@ int main()
 //  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = &b[0];
 //  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
-   for (f = 0.0;f<10.5;f += 1.0)
-//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
-//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+   f = 0.0;
+//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+   while (f<10.5) {
+//  points to = {}
       *p++ = 2**q++;
+//  points to = {}
+      f += 1.0;
+   }
 //  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
 //   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
    return 0;

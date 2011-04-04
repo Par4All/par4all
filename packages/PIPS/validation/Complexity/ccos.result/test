@@ -1,0 +1,199 @@
+
+
+int main()
+{
+   double _Complex x, z;
+   x = ccos(z);
+}
+
+Complexities
+
+
+Intrinsic cost table:
+
+        Intrinsic name        int    float   double   complex   dcomplex
+------------------------------------------------------------------------
+                     +   |     1      1       1        1        1
+                     -   |     1      1       1        1        1
+                     *   |     1      1       1        1        1
+                     /   |     1      1       1        1        1
+                    --   |     1      1       1        1        1
+                    **   |     1      1       1        1        1
+                     .   |     1      1       1        1        1
+                    ->   |     1      1       1        1        1
+          *indirection   |     1      1       1        1        1
+                post++   |     1      1       1        1        1
+                post--   |     1      1       1        1        1
+                 ++pre   |     1      1       1        1        1
+                 --pre   |     1      1       1        1        1
+                    *=   |     1      1       1        1        1
+                    /=   |     1      1       1        1        1
+                    +=   |     1      1       1        1        1
+                    -=   |     1      1       1        1        1
+                   <<=   |     1      1       1        1        1
+                   >>=   |     1      1       1        1        1
+                    |=   |     1      1       1        1        1
+                    <<   |     1      1       1        1        1
+                    >>   |     1      1       1        1        1
+        __address-of__   |     1      1       1        1        1
+           __bit-and__   |     1      1       1        1        1
+           __bit-not__   |     1      1       1        1        1
+             __C-xor__   |     1      1       1        1        1
+             __C-and__   |     1      1       1        1        1
+   __C-modulo-update__   |     1      1       1        1        1
+  __C-bit-and-update__   |     1      1       1        1        1
+  __C-bit-xor-update__   |     1      1       1        1        1
+     __C-conditional__   |     1      1       1        1        1
+     __C-logical-not__   |     1      1       1        1        1
+       __C-non-equal__   |     1      1       1        1        1
+          __C-modulo__   |     1      1       1        1        1
+                     |   |     1      1       1        1        1
+              TypeCast   |     1      1       1        1        1
+                IMA-OP   |     0      0       0        0        0
+                IMS-OP   |     0      0       0        0        0
+    LOOP-INIT-OVERHEAD   |     1      1       1        1        1
+  LOOP-BRANCH-OVERHEAD   |     1      1       1        1        1
+    CONDITION-OVERHEAD   |     0      0       0        0        0
+    CALL-ZERO-OVERHEAD   |     1      1       1        1        1
+     CALL-ONE-OVERHEAD   |     1      1       1        1        1
+     CALL-TWO-OVERHEAD   |     1      1       1        1        1
+   CALL-THREE-OVERHEAD   |     1      1       1        1        1
+    CALL-FOUR-OVERHEAD   |     1      1       1        1        1
+    CALL-FIVE-OVERHEAD   |     1      1       1        1        1
+     CALL-SIX-OVERHEAD   |     1      1       1        1        1
+   CALL-SEVEN-OVERHEAD   |     1      1       1        1        1
+             ONE-INDEX   |     0      0       0        0        0
+             TWO-INDEX   |     1      1       1        1        1
+           THREE-INDEX   |     1      1       1        1        1
+            FOUR-INDEX   |     1      1       1        1        1
+            FIVE-INDEX   |     1      1       1        1        1
+             SIX-INDEX   |     1      1       1        1        1
+           SEVEN-INDEX   |     1      1       1        1        1
+           MEMORY-READ   |     1      1       1        1        1
+                     =   |     0      0       0        0        0
+                 .EQV.   |     0      0       0        0        0
+                .NEQV.   |     0      0       0        0        0
+                  .OR.   |     0      0       0        0        0
+                 .AND.   |     0      0       0        0        0
+                  .LT.   |     0      0       0        0        0
+                  .GT.   |     0      0       0        0        0
+                  .LE.   |     0      0       0        0        0
+                  .GE.   |     0      0       0        0        0
+                  .EQ.   |     0      0       0        0        0
+                  .NE.   |     0      0       0        0        0
+                    //   |     0      0       0        0        0
+                 .NOT.   |     0      0       0        0        0
+              CONTINUE   |     0      0       0        0        0
+                 ENDDO   |     0      0       0        0        0
+                RETURN   |     0      0       0        0        0
+                return   |     0      0       0        0        0
+                  STOP   |     0      0       0        0        0
+                   END   |     0      0       0        0        0
+                FORMAT   |     0      0       0        0        0
+                   INT   |     0      0       0        0        0
+                  IFIX   |     0      0       0        0        0
+                 IDINT   |     0      0       0        0        0
+                  REAL   |     0      0       0        0        0
+                 FLOAT   |     0      0       0        0        0
+                  SNGL   |     0      0       0        0        0
+                  DBLE   |     0      0       0        0        0
+                 CMPLX   |     0      0       0        0        0
+                 ICHAR   |     0      0       0        0        0
+                  CHAR   |     0      0       0        0        0
+                  AINT   |     0      0       0        0        0
+                  DINT   |     0      0       0        0        0
+                 ANINT   |     0      0       0        0        0
+                 DNINT   |     0      0       0        0        0
+                  NINT   |     0      0       0        0        0
+                IDNINT   |     0      0       0        0        0
+                  IABS   |     0      0       0        0        0
+                   ABS   |     0      0       0        0        0
+                  DABS   |     0      0       0        0        0
+                  CABS   |     0      0       0        0        0
+                   MOD   |     0      0       0        0        0
+                  AMOD   |     0      0       0        0        0
+                  DMOD   |     0      0       0        0        0
+                 ISIGN   |     0      0       0        0        0
+                  SIGN   |     0      0       0        0        0
+                 DSIGN   |     0      0       0        0        0
+                  IDIM   |     0      0       0        0        0
+                   DIM   |     0      0       0        0        0
+                  DDIM   |     0      0       0        0        0
+                 DPROD   |     0      0       0        0        0
+                   MAX   |     1      1       1        1        1
+                  MAX0   |     0      0       0        0        0
+                 AMAX1   |     0      0       0        0        0
+                 DMAX1   |     0      0       0        0        0
+                 AMAX0   |     0      0       0        0        0
+                  MAX1   |     0      0       0        0        0
+                   MIN   |     1      1       1        1        1
+                  MIN0   |     0      0       0        0        0
+                 AMIN1   |     0      0       0        0        0
+                 DMIN1   |     0      0       0        0        0
+                 AMIN0   |     0      0       0        0        0
+                  MIN1   |     0      0       0        0        0
+                   LEN   |     0      0       0        0        0
+                 INDEX   |     0      0       0        0        0
+                 AIMAG   |     0      0       0        0        0
+                 CONJG   |     0      0       0        0        0
+                  SQRT   |     1      1       1        1        1
+                 DSQRT   |     1      1       1        1        1
+                 CSQRT   |     1      1       1        1        1
+                   EXP   |     1      1       1        1        1
+                  DEXP   |     1      1       1        1        1
+                  CEXP   |     1      1       1        1        1
+                  ALOG   |     1      1       1        1        1
+                  DLOG   |     1      1       1        1        1
+                  CLOG   |     1      1       1        1        1
+                   LOG   |     1      1       1        1        1
+                ALOG10   |     1      1       1        1        1
+                DLOG10   |     1      1       1        1        1
+                 LOG10   |     1      1       1        1        1
+                   SIN   |     1      1       1        1        1
+                  DSIN   |     1      1       1        1        1
+                  CSIN   |     1      1       1        1        1
+                   COS   |     1      1       1        1        1
+                  DCOS   |     1      1       1        1        1
+                  CCOS   |     1      1       1        1        1
+                   TAN   |     1      1       1        1        1
+                  DTAN   |     1      1       1        1        1
+                  ASIN   |     1      1       1        1        1
+                 DASIN   |     1      1       1        1        1
+                  ACOS   |     1      1       1        1        1
+                 DACOS   |     1      1       1        1        1
+                  ATAN   |     1      1       1        1        1
+                 DATAN   |     1      1       1        1        1
+                 ATAN2   |     1      1       1        1        1
+                DATAN2   |     1      1       1        1        1
+                  SINH   |     1      1       1        1        1
+                 DSINH   |     1      1       1        1        1
+                  COSH   |     1      1       1        1        1
+                 DCOSH   |     1      1       1        1        1
+                  TANH   |     1      1       1        1        1
+                 DTANH   |     1      1       1        1        1
+                    <<   |     0      0       0        0        0
+                    >>   |     0      0       0        0        0
+                   LGE   |     0      0       0        0        0
+                   LGT   |     0      0       0        0        0
+                   LLE   |     0      0       0        0        0
+                   LLT   |     0      0       0        0        0
+         LIST-DIRECTED   |     0      0       0        0        0
+   UNBOUNDED-DIMENSION   |     0      0       0        0        0
+                 WRITE   |     0      0       0        0        0
+                REWIND   |     0      0       0        0        0
+                  OPEN   |     0      0       0        0        0
+                 CLOSE   |     0      0       0        0        0
+                  READ   |     0      0       0        0        0
+              BUFFERIN   |     0      0       0        0        0
+             BUFFEROUT   |     0      0       0        0        0
+               ENDFILE   |     0      0       0        0        0
+            IMPLIED-DO   |     0      0       0        0        0
+
+//                                                                    3 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   double _Complex x, z;
+//                                                                    3 (STMT)
+   x = ccos(z);
+}

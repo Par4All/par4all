@@ -1,72 +1,76 @@
-just check parsing
-towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
-{
-   size_t i, j;
-   size_t k;
-   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
-   int nb = 1+rangex*rangey;
-   towns tout = {nb, malloc(sizeof(town)*nb)};
-   fprintf(stderr, "begin computation ...\n");
-   fprintf(stderr, "%lf %lf %lf\n""xrange: ", xmin, xmax, rangex);
-   fprintf(stderr, "%lf %lf %lf\n""yrange: ", ymin, ymax, rangey);
 
-   for(i = 0; i <= rangex-1; i += 1)
-      for(j = 0; j <= rangey-1; j += 1) {
-         ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
-         ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
-         ((tout.data)[i*rangey+j])[2] = 0.;
-         for(k = 0; k <= t.nb-1; k += 1) {
-            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
-            if (tmp<range)
-               ((tout.data)[i*rangey+j])[2] += ((t.data)[k])[2]/(1+tmp);
-         }
-      }
-   fprintf(stderr, "end computation ...\n");
-   return tout;
+PROPER POINTER EFFECTS
+
+int main(int argc, char *argv[])
+{
+//             <    is read   >: argc
+   if (argc!=8)
+      return 1;
+   {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: argv[1] _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: t.data t.nb _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+      towns t = read_towns(argv[1]);
+      
+      
+      
+      
+      
+//             <    is read   >: argv[2] argv[3] argv[4] argv[5] 
+//                               argv[6] argv[7]
+//             <    is written>: range step xmax xmin ymax ymin
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
+//             <may be read   >: stderr[0] t.data[*][0] t.data[*][0] 
+//                               t.data[*][1] t.data[*][2]
+//             <may be written>: stderr[0]
+//             <    is read   >: range stderr step t.data t.nb xmax 
+//                               xmin ymax ymin 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+//             <    is written>: out.data out.nb 
+//                               _MALLOC_EFFECTS:_MALLOC_ 
+//                               __IO_EFFECTS:LUNS[2]
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
+//             <may be read   >: out.data[*][0] out.data[*][1] 
+//                               out.data[*][2] stdout stdout[0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <may be written>: stdout[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: out.data out.nb step xmax xmin ymax 
+//                               ymin
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
+   return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
-towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t step, data_t range)
+int main(int argc, char *argv[])
 {
 //  points to = {}
-   size_t i, j;
+   if (argc!=8)
 //  points to = {}
-   size_t k;
+      return 1;
+   {
 //  points to = {}
-   size_t rangex = (xmax-xmin)/step, rangey = (ymax-ymin)/step;
+      towns t = read_towns(argv[1]);
+      
+      
+      
+      
+      
 //  points to = {}
-   int nb = 1+rangex*rangey;
+      data_t xmin = atof(argv[2])*3.14159265358979323846/180., ymin = atof(argv[3])*3.14159265358979323846/180., xmax = atof(argv[4])*3.14159265358979323846/180., ymax = atof(argv[5])*3.14159265358979323846/180., step = atof(argv[6])*3.14159265358979323846/180., range = atof(argv[7]);
 //  points to = {}
-   towns tout = {nb, malloc(sizeof(town)*nb)};
+      towns out = run(t, xmin, ymin, xmax, ymax, step, range);
 //  points to = {}
-   fprintf(stderr, "begin computation ...\n");
+      display(out, xmin, ymin, xmax, ymax, step);
+   }
 //  points to = {}
-   fprintf(stderr, "%lf %lf %lf\n""xrange: ", xmin, xmax, rangex);
-//  points to = {}
-   fprintf(stderr, "%lf %lf %lf\n""yrange: ", ymin, ymax, rangey);
-//  points to = {}
-
-   for(i = 0; i <= rangex-1; i += 1)
-//  points to = {}
-      for(j = 0; j <= rangey-1; j += 1) {
-//  points to = {}
-         ((tout.data)[i*rangey+j])[0] = (xmin+step*i)*180/3.14159265358979323846;
-//  points to = {}
-         ((tout.data)[i*rangey+j])[1] = (ymin+step*j)*180/3.14159265358979323846;
-//  points to = {}
-         ((tout.data)[i*rangey+j])[2] = 0.;
-//  points to = {}
-         for(k = 0; k <= t.nb-1; k += 1) {
-//  points to = {}
-            data_t tmp = 6368.*acos(cos(xmin+step*i)*cos(((t.data)[k])[0])*cos(ymin+step*j-((t.data)[k])[1])+sin(xmin+step*i)*sin(((t.data)[k])[0]));
-//  points to = {}
-            if (tmp<range)
-//  points to = {}
-               ((tout.data)[i*rangey+j])[2] += ((t.data)[k])[2]/(1+tmp);
-         }
-      }
-//  points to = {}
-   fprintf(stderr, "end computation ...\n");
-//  points to = {}
-   return tout;
+   return 0;
 }

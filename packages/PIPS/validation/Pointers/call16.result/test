@@ -1,25 +1,39 @@
 
-Parsed code for "call16"
+PROPER EFFECTS
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    _a[_i] = _b[_i]+_c[_i];
 }
-
-Code for "call16"
-
-void call16(int _i, int *_a, int *_b, int *_c)
+void dotprod(int *a, int *b, int *c)
 {
-   _a[_i] = _b[_i]+_c[_i];
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 999999; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      call16(i, a, b, c);
+   
+   
+   return;
 }
 
-Proper effects for "call16"
+PROPER POINTER EFFECTS
 
-void call16(int _i, int *_a, int *_b, int *_c)
+void dotprod(int *a, int *b, int *c)
 {
-//             <    is read   >: _a _b _b[_i] _c _c[_i] _i
-//             <    is written>: _a[_i]
-   _a[_i] = _b[_i]+_c[_i];
+   int i;
+//             <    is written>: i
+   for(i = 0; i <= 999999; i += 1)
+//             <may be read   >: b[*] c[*]
+//             <may be written>: a[*]
+//             <    is read   >: a b c i
+      call16(i, a, b, c);
+   
+   
+   return;
 }
 
 POINTS TO
@@ -30,9 +44,6 @@ void call16(int _i, int *_a, int *_b, int *_c)
 //  {(_a,__a_1,-Exact-);(_b,__b_2,-Exact-);(_c,__c_3,-Exact-)}
    _a[_i] = _b[_i]+_c[_i];
 }
-
-POINTS TO
-
 //  {(a,_a_4,-Exact-);(b,_b_5,-Exact-);(c,_c_6,-Exact-)}
 void dotprod(int *a, int *b, int *c)
 {

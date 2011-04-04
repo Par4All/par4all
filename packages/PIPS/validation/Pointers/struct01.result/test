@@ -1,3 +1,6 @@
+
+PROPER POINTER EFFECTS
+
 int struct01()
 {
    struct one {
@@ -14,7 +17,9 @@ int struct01()
 
    y[0] = 1;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int struct01()
 {

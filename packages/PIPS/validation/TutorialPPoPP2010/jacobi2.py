@@ -10,7 +10,7 @@ w = workspace("jacobi.c","p4a_stubs.c",deleteOnClose=True)
 w.all.loop_normalize(one_increment=True,lower_bound=0,skip_index_side_effect=True)
 w.all.privatize_module()
 
-w.all.display(With="PRINT_CODE_REGIONS")
+w.all.display(activate=module.print_code_regions)
 
 w.all.coarse_grain_parallelization()
 w.all.display()

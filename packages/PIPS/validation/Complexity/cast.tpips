@@ -1,0 +1,32 @@
+delete cast
+create cast cast.c
+
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty COMPLEXITY_INTERMEDIATES TRUE
+#setproperty COMPLEXITY_PRINT_COST_TABLE TRUE
+
+
+#activate TRANSFORMERS_INTER_FULL
+#activate PRECONDITIONS_INTER_FULL
+#activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+echo
+#echo Preconditions
+echo
+
+#activate PRINT_CODE_PRECONDITIONS
+
+display PRINTED_FILE[main]
+
+echo
+echo Complexities
+echo
+
+activate PRINT_CODE_COMPLEXITIES
+
+display PRINTED_FILE[main]
+
+close
+delete cast
+quit

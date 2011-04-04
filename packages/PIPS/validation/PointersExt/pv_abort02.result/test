@@ -1,3 +1,21 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int **a;
+   int b;
+//             <    is read   >: NULL
+//             <    is written>: a
+   a = (int **) NULL;
+//             <    is read   >: a
+//             <    is written>: a[0]
+   a[0] = &b;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {
@@ -6,7 +24,6 @@ int main()
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-
    a = (int **) NULL;
 //  {(a,*NULL_POINTER*,-Exact-)}
    a[0] = &b;

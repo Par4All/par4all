@@ -1,4 +1,21 @@
 # $Id$
+#
+# Run validation in a directory and possibly its subdirectories
+#
+# relevant targets for the end-user:
+# - validate-test: validate to "test" result files directly
+# - unvalidate: cleanup before validate-test
+# - validate-out: validate to "out" files
+# - clean: clean directories
+# - generate-test: generate missing "test" files
+#
+# relevant variables for the user:
+# - DO_BUG: also validate on cases tagged as "bugs"
+# - DO_LATER: idem with future "later" cases
+# - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
+#
+# example:
+#   sh> make DO_LATER=1 validate-test
 
 # pips exes
 TPIPS	= tpips
@@ -25,6 +42,13 @@ LIST	= svn status
 # prefix of tests to be run, default is all
 PREFIX	=
 
+# automatic sub directories,
+# D.sub could be set explicitely to anywhere to recurse
+D.sub	= $(wildcard *.sub)
+
+# directory recursion
+D.rec	= $(D.sub:%=%.rec)
+
 # source files
 F.c	= $(wildcard *.c)
 F.f	= $(wildcard *.f)
@@ -36,8 +60,12 @@ F.f95	= $(wildcard *.f95)
 F.src	= $(F.c) $(F.f) $(F.F) $(F.f90) $(F.f95)
 
 # all potential result directories
-F.res	= $(F.c:%.c=%.result) $(F.f:%.f=%.result) \
-	$(F.F:%.F=%.result) $(F.f90:%.f90=%.result) $(F.f95:%.f95=%.result)
+F.res	= \
+	$(F.c:%.c=%.result) \
+	$(F.f:%.f=%.result) \
+	$(F.F:%.F=%.result) \
+	$(F.f90:%.f90=%.result) \
+	$(F.f95:%.f95=%.result)
 
 # actual result directory to validate
 F.result= $(wildcard $(PREFIX)*.result)
@@ -74,16 +102,26 @@ here	:= $(shell pwd)
 # get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
 # where to store validation results
+# this is the default, but may need to be overriden
 RESULTS	= RESULTS
 
 # shell environment to run validation scripts
 SHELL	= /bin/bash
+
+# skip bugs & future cases
+EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
+	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0
+
 # setup run
 PF	= @echo "processing $(SUBDIR)/$+" ; \
-	  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
-	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0 ; \
+	  $(EXCEPT) ; \
 	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
+
+# recursion into a subdirectory with target "FORWARD"
+%.rec: %
+	$(EXCEPT) ; \
+	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ -C $^ $(FORWARD)
 
 # extract validation result for summary
 # four possible outcomes: passed, changed, failed, timeout
@@ -104,13 +142,18 @@ OK	= status=$$? ; \
 	  fi >> $(RESULTS)
 
 # default target is to clean
-clean: clean-validate
+.PHONY: clean
+clean: rec-clean clean-validate
 LOCAL_CLEAN	= clean-validate
 
 .PHONY: clean-validate
 clean-validate:
-	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out
-	$(RM) -r *.database $(RESULTS)
+	$(RM) *~ *.o *.s *.tmp *.err *.diff *.result/out out err a.out RESULTS
+	$(RM) -r *.database .PYPS*.tmp
+
+.PHONY: rec-clean
+rec-clean:
+	[ "$(D.rec)" ] && $(MAKE) FORWARD=clean $(D.rec) || exit 0
 
 .PHONY: validate
 validate:
@@ -122,17 +165,24 @@ validate:
 .PHONY: validate-dir
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
-# regenerate files: svn diff show the diffs!
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
-	$(MAKE) $(F.valid)
+	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
-else # sequential validation
+else # sequential validation, including subdir recursive forward
 validate-dir: $(LOCAL_CLEAN) bug-list later-list
 	$(RM) $(F.valid)
+	$(MAKE) $(D.rec) sequential-validate-dir
+	$(MAKE) sort-local-result
+
+# local target to parallelize the "sequential" local directory
+# with test cases in its subdirectories
+sequential-validate-dir:
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
-	$(MAKE) sort-local-result
 endif
+
+# how to summarize results
+SUMUP	= pips_validation_summary.pl
 
 # on local validations, sort result & show summary
 .PHONY: sort-local-result
@@ -141,26 +191,33 @@ sort-local-result:
 	  mv RESULTS RESULTS.tmp ; \
 	  sort -k 2 RESULTS.tmp > RESULTS ; \
 	  $(RM) RESULTS.tmp ; \
-	  pips_validation_summary.pl RESULTS ; \
+	  $(SUMUP) RESULTS ; \
 	fi
 
 # restore all initial "test" result files if you are unhappy with a validate
 .PHONY: unvalidate
-unvalidate: check-vc
+unvalidate: do-unvalidate rec-unvalidate
+
+.PHONY: do-unvalidate
+do-unvalidate:: check-vc
 	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.valid)
 
+.PHONY: rec-unvalidate
+rec-unvalidate::
+	[ "$(D.rec)" ] && $(MAKE) FORWARD=unvalidate $(D.rec) || exit 0
+
 # generate "out" files
-# ??? does not work because of "svn diff"?
 .PHONY: validate-out
 validate-out:
-	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh LIST=: UNDO=: validate-dir
+	$(MAKE) TEST=out DIFF=pips_validation_diff_out.sh \
+		FORWARD=$@ LIST=: UNDO=: validate-dir
 
-# generate "test" files
+# generate "test" files: svn diff show the diffs!
 .PHONY: validate-test
 validate-test: check-vc
-	$(MAKE) TEST=test validate-dir
+	$(MAKE) FORWARD=$@ TEST=test validate-dir
 
-# hack: validate depending on prefix?
+# hack: validate depending on prefix, without forwarding?
 validate-%:
 	$(MAKE) F.result="$(wildcard $**.result)" validate-dir
 

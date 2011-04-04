@@ -1,5 +1,43 @@
 
-POINTS TO
+PROPER POINTER EFFECTS
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//             <    is read   >: c
+   if (c=='\n'||c=='\r')
+//             <    is read   >: col
+//             <    is written>: col[0]
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//             <    is read   >: col col[0] indent
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//             <    is read   >: nbout nbout[0]
+//             <    is written>: nbout[0]
+         (*nbout)++;
+//             <    is read   >: col col[0]
+//             <    is written>: col[0]
+         (*col)++;
+      }
+//             <    is read   >: col col[0]
+//             <    is written>: col[0]
+
+      (*col)++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//             <    is read   >: nbout nbout[0]
+//             <    is written>: nbout[0]
+   (*nbout)++;
+}
+
+POINTS-TO
 
 //  {(_stream,__stream_1,-Exact-);(col,_col_2,-Exact-);(nbout,
 //   _nbout_3,-Exact-)}

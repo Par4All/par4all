@@ -1,6 +1,10 @@
 # This test case is purposefully wrong to show that PIPS results may
 # be astonishing when the input is not correct...
 
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 delete intro_example02b
 create intro_example02b intro_example02b.c
 
@@ -33,7 +37,7 @@ display PARALLELPRINTED_FILE[foo]
 
 
 
-apply USE_DEF_ELIMINATION[foo]
+apply DEAD_CODE_ELIMINATION[foo]
 apply RESTRUCTURE_CONTROL[foo]
 #apply CLEAN_DECLARATIONS[foo]
 apply CLEAN_UNUSED_DYNAMIC_VARIABLES[foo]

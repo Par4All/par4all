@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
-   // BEGIN BLOCK
    int *x, x1, x2, y;
 //             <    is written>: x1
    x1 = 1;
@@ -13,20 +15,19 @@ int main()
    else
 //             <    is written>: x
       x = &x2;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: x x[0]
 //             <    is written>: y
 
    y = *x;
    return 0;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
 //  points to = {}
-   // BEGIN BLOCK
-//  points to = {}
    int *x, x1, x2, y;
 //  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x1 = 1;
@@ -45,59 +46,4 @@ int main()
    y = *x;
 //  {(x,x2,-MAY-);(x,x1,-MAY-)}
    return 0;
-   // END BLOCK
-}
-int main()
-{
-   // BEGIN BLOCK
-   int *x, x1, x2, y;
-//             <    is written>: x1
-   x1 = 1;
-//             <    is written>: x2
-   x2 = 2;
-
-   if (0==0)
-//             <    is written>: x
-      x = &x1;
-   else
-//             <    is written>: x
-      x = &x2;
-//             <may be read   >: x1 x2
-//             <    is read   >: x
-//             <    is written>: y
-
-   y = *x;
-   return 0;
-   // END BLOCK
-}
-int main()
-{
-   // BEGIN BLOCK
-   int *x, x1, x2, y;
-
-//  <x1-W-EXACT-{}>
-
-   x1 = 1;
-
-//  <x2-W-EXACT-{}>
-
-   x2 = 2;
-
-   if (0==0)
-
-//  <x-W-EXACT-{}>
-
-      x = &x1;
-   else
-      x = &x2;
-
-//  <x-R-EXACT-{}>
-//  <x1-R-MAY-{}>
-//  <x2-R-MAY-{}>
-//  <y-W-EXACT-{}>
-
-
-   y = *x;
-   return 0;
-   // END BLOCK
 }

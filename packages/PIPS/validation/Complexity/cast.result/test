@@ -1,0 +1,25 @@
+
+
+int main()
+{
+   float result;
+   int b;
+   
+   
+   result = (float) b*100;
+}
+
+Complexities
+
+//                                                                    4 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   float result;
+//                                                                    0 (STMT)
+   int b;
+//                                                                    4 (STMT)
+   
+   
+   result = (float) b*100;
+}

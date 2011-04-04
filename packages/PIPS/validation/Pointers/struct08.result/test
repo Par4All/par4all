@@ -1,279 +1,70 @@
 
-Proper effects for "init"
+PROPER POINTER EFFECTS
 
-void init(mys *m)
+int main()
 {
-   int i;                                                               /*0014*/
-//             <    is read   >: m
-//             <    is written>: m[0].num
-   m->num = 5;                                                          /*0015*/
-//             <    is read   >: m _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: m[0].tab2 _MALLOC_EFFECTS:_MALLOC_
-   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
-//             <    is read   >: m
-//             <    is written>: m[0].tab1[0]
-   (m->tab1)[0] = 10;                                                   /*0017*/
-//             <    is read   >: m m[0].tab2
-//             <    is written>: m[0].tab2[0]
-   (m->tab2)[0] = 20;                                                   /*0018*/
-//             <    is written>: i
-   for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: i m
-//             <    is written>: m[0].tab1[i]
-      (m->tab1)[i] = 1;                                                 /*0021*/
-//             <    is read   >: i m m[0].tab1[i] m[0].tab2
-//             <    is written>: m[0].tab2[i]
-      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
-   }
+   mys *p, *q, **r, *s[5];
+//             <may be read   >: p[0].tab1[*]
+//             <may be written>: p[0].tab1[*] p[0].tab2[*]
+//             <    is read   >: p p[0].tab2 _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[0].num p[0].tab1[0] p[0].tab2 
+//                               p[0].tab2[0] _MALLOC_EFFECTS:_MALLOC_
+
+   init(p);
+//             <may be read   >: q[0].tab1[*]
+//             <    is read   >: q q[0].num q[0].tab2 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   init2(q);
+//             <may be read   >: r[*] r[*][0].tab1[0] r[*][0].tab2
+//             <may be written>: r[*] r[*][0].num r[*][0].tab1[0] 
+//                               r[*][0].tab2 r[*][0].tab2[0]
+//             <    is read   >: r r[0] r[0][0].tab2 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: r[0][0].num r[0][0].tab1[0] 
+//                               r[0][0].tab2[0] 
+//                               _MALLOC_EFFECTS:_MALLOC_
+   init3(r);
+//             <may be read   >: s[*] s[*][0].tab1[0] s[*][0].tab2 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: s[*] s[*][0].num s[*][0].tab1[0] 
+//                               s[*][0].tab2 s[*][0].tab2[0] 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: s[0] s[0][0].tab2
+//             <    is written>: s[0][0].num s[0][0].tab1[0] 
+//                               s[0][0].tab2[0]
+   init4(s);
+
+   return 1;
 }
 
-Proper effects for "init2"
-
-void init2(mys *n)
-{
-   int i;                                                               /*0029*/
-   mys m;                                                               /*0030*/
-//             <may be read   >: n[0].tab1[*]
-//             <may be written>: m.tab1[*]
-//             <    is read   >: n n[0].num n[0].tab2
-//             <    is written>: m.num m.tab2
-
-   m = *n;                                                              /*0032*/
-//             <    is written>: m.num
-   m.num = 5;                                                           /*0033*/
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: m.tab2 _MALLOC_EFFECTS:_MALLOC_
-   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
-//             <    is written>: m.tab1[0]
-   (m.tab1)[0] = 10;                                                    /*0035*/
-//             <    is read   >: m.tab2
-//             <    is written>: m.tab2[0]
-   (m.tab2)[0] = 20;                                                    /*0036*/
-//             <    is written>: i
-   for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: i
-//             <    is written>: m.tab1[i]
-      (m.tab1)[i] = 1;                                                  /*0039*/
-//             <    is read   >: i m.tab1[i] m.tab2
-//             <    is written>: m.tab2[i]
-      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
-   }
-}
-
-Proper effects for "init3"
-
-void init3(mys **p)
-{
-   int i;                                                               /*0047*/
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-   p = malloc(5*sizeof(mys *));                                         /*0048*/
-//             <    is written>: i
-   for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: i p _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
-      p[i] = malloc(sizeof(mys));                                       /*0051*/
-//             <    is read   >: i p p[i] _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p[i][0].tab2 _MALLOC_EFFECTS:_MALLOC_
-      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
-   }
-//             <    is read   >: p p[0]
-//             <    is written>: p[0][0].num
-
-   p[0]->num = 11;                                                      /*0055*/
-//             <    is read   >: p p[0]
-//             <    is written>: p[0][0].tab1[0]
-   (p[0]->tab1)[0] = 20;                                                /*0056*/
-//             <    is read   >: p p[0] p[0][0].tab2
-//             <    is written>: p[0][0].tab2[0]
-   (p[0]->tab2)[0] = 30;                                                /*0057*/
-//             <    is written>: i
-
-   for(i = 1; i <= 4; i += 1) {
-//             <    is read   >: i p p[i]
-//             <    is written>: p[i][0].num
-      p[i]->num = 10;                                                   /*0061*/
-//             <    is read   >: i p p[i]
-//             <    is written>: p[i][0].tab1[0]
-      (p[i]->tab1)[0] = 21;                                             /*0062*/
-//             <    is read   >: i p p[i] p[i] p[i][0].tab1[0] 
-//                               p[i][0].tab2
-//             <    is written>: p[i][0].tab2[0]
-      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
-   }
-}
-
-Proper effects for "init4"
-
-void init4(mys *p[5])
-{
-   int i;                                                               /*0069*/
-//             <    is written>: i
-   for(i = 0; i <= 4; i += 1) {
-//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
-      p[i] = malloc(sizeof(mys));                                       /*0072*/
-//             <    is read   >: i p[i] _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p[i][0].tab2 _MALLOC_EFFECTS:_MALLOC_
-      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
-   }
-//             <    is read   >: p[0]
-//             <    is written>: p[0][0].num
-
-   p[0]->num = 11;                                                      /*0076*/
-//             <    is read   >: p[0]
-//             <    is written>: p[0][0].tab1[0]
-   (p[0]->tab1)[0] = 20;                                                /*0077*/
-//             <    is read   >: p[0] p[0][0].tab2
-//             <    is written>: p[0][0].tab2[0]
-   (p[0]->tab2)[0] = 30;                                                /*0078*/
-//             <    is written>: i
-   
-   
-   for(i = 1; i <= 4; i += 1) {
-//             <    is read   >: i p[i]
-//             <    is written>: p[i][0].num
-      p[i]->num = 10;                                                   /*0083*/
-//             <    is read   >: i p[i]
-//             <    is written>: p[i][0].tab1[0]
-      (p[i]->tab1)[0] = 21;                                             /*0084*/
-//             <    is read   >: i p[i] p[i] p[i][0].tab1[0] 
-//                               p[i][0].tab2
-//             <    is written>: p[i][0].tab2[0]
-      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
-   }
-}
-
-POINTS TO
-
-//  {(m,_m_1,-Exact-)}
-void init(mys *m)
-{
-//  {(m,_m_1,-Exact-)}
-   int i;                                                               /*0014*/
-//  {(m,_m_1,-Exact-)}
-   m->num = 5;                                                          /*0015*/
-//  {(m,_m_1,-Exact-)}
-   m->tab2 = malloc(5*sizeof(int));                                     /*0016*/
-//  {(_m_1[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(m,_m_1,-Exact-)}
-   (m->tab1)[0] = 10;                                                   /*0017*/
-//  {(_m_1[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(m,_m_1,-Exact-)}
-   (m->tab2)[0] = 20;                                                   /*0018*/
-//  {(_m_1[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(m,_m_1,-Exact-)}
-   for(i = 0; i <= 4; i += 1) {
-//  points to = {}
-      (m->tab1)[i] = 1;                                                 /*0021*/
-//  points to = {}
-      (m->tab2)[i] = (m->tab1)[i];                                      /*0022*/
-   }
-}
-
-POINTS TO
-
-//  {(n,_n_2,-Exact-)}
-void init2(mys *n)
-{
-//  {(n,_n_2,-Exact-)}
-   int i;                                                               /*0029*/
-//  {(n,_n_2,-Exact-)}
-   mys m;                                                               /*0030*/
-//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
-
-   m = *n;                                                              /*0032*/
-//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
-   m.num = 5;                                                           /*0033*/
-//  {(m[tab2],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,_n_2,-Exact-)}
-   m.tab2 = malloc(5*sizeof(int));                                      /*0034*/
-//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
-   (m.tab1)[0] = 10;                                                    /*0035*/
-//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
-   (m.tab2)[0] = 20;                                                    /*0036*/
-//  {(m[tab2],*ANY_MODULE*:*HEAP*,-Exact-);(n,_n_2,-Exact-)}
-   for(i = 0; i <= 4; i += 1) {
-//  points to = {}
-      (m.tab1)[i] = 1;                                                  /*0039*/
-//  points to = {}
-      (m.tab2)[i] = (m.tab1)[i];                                        /*0040*/
-   }
-}
-
-POINTS TO
-
-//  {(_p_3,__p_3_4,-Exact-);(p,_p_3,-Exact-)}
-void init3(mys **p)
-{
-//  {(_p_3,__p_3_4,-Exact-);(p,_p_3,-Exact-)}
-   int i;                                                               /*0047*/
-//  {(_p_3,__p_3_4,-Exact-);(p,_p_3,-Exact-)}
-   p = malloc(5*sizeof(mys *));                                         /*0048*/
-//  {(_p_3,__p_3_4,-Exact-);(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-   for(i = 0; i <= 4; i += 1) {
-//  points to = {}
-      p[i] = malloc(sizeof(mys));                                       /*0051*/
-//  points to = {}
-      p[i]->tab2 = malloc(5*sizeof(int));                               /*0052*/
-   }
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(_p_3,__p_3_4,-Exact-);(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-
-   p[0]->num = 11;                                                      /*0055*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(_p_3,__p_3_4,-Exact-);(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-   (p[0]->tab1)[0] = 20;                                                /*0056*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(_p_3,__p_3_4,-Exact-);(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-   (p[0]->tab2)[0] = 30;                                                /*0057*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,
-//   -MAY-);(_p_3,__p_3_4,-Exact-);(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-
-   for(i = 1; i <= 4; i += 1) {
-//  points to = {}
-      p[i]->num = 10;                                                   /*0061*/
-//  points to = {}
-      (p[i]->tab1)[0] = 21;                                             /*0062*/
-//  points to = {}
-      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0063*/
-   }
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
-void init4(mys *p[5])
+int main()
 {
 //  points to = {}
-   int i;                                                               /*0069*/
-//  points to = {}
-   for(i = 0; i <= 4; i += 1) {
-//  points to = {}
-      p[i] = malloc(sizeof(mys));                                       /*0072*/
-//  points to = {}
-      p[i]->tab2 = malloc(5*sizeof(int));                               /*0073*/
-   }
-//  {(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,-MAY-);(p[i],
-//   *ANY_MODULE*:*HEAP*,-MAY-)}
+   mys *p, *q, **r, *s[5];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
 
-   p[0]->num = 11;                                                      /*0076*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,-MAY-);(p[i],
-//   *ANY_MODULE*:*HEAP*,-MAY-)}
-   (p[0]->tab1)[0] = 20;                                                /*0077*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,-MAY-);(p[i],
-//   *ANY_MODULE*:*HEAP*,-MAY-)}
-   (p[0]->tab2)[0] = 30;                                                /*0078*/
-//  {(*ANY_MODULE*:*ANYWHERE*_b1,*ANY_MODULE*:*HEAP*,-MAY-);(p[i],
-//   *ANY_MODULE*:*HEAP*,-MAY-)}
-   
-   
-   for(i = 1; i <= 4; i += 1) {
-//  points to = {}
-      p[i]->num = 10;                                                   /*0083*/
-//  points to = {}
-      (p[i]->tab1)[0] = 21;                                             /*0084*/
-//  points to = {}
-      (p[i]->tab2)[0] = (p[i]->tab1)[0];                                /*0085*/
-   }
+   init(p);
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   init2(q);
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   init3(r);
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   init4(s);
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+
+   return 1;
 }

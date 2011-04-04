@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 void array02()
 {
-   // BEGIN BLOCK
    float x[11][2];
    int i;
 //             <    is written>: i
@@ -9,14 +11,13 @@ void array02()
 //             <    is read   >: i
 //             <    is written>: x[i][1]
       x[i][1] = 0.;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 void array02()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    float x[11][2];
 //  points to = {}
@@ -26,5 +27,4 @@ void array02()
    for(i = 1; i <= 9; i += 1)
 //  points to = {}
       x[i][1] = 0.;
-   // END BLOCK
 }
