@@ -1,4 +1,36 @@
 
+PROPER EFFECTS
+
+void assign03()
+{
+   char *malloc(int);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   double *p = (double *) malloc(10*sizeof(double));
+//             <    is written>: j
+   int j = 2;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: j p
+
+   p[j] = 1.;
+}
+void foo()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   assign03();
+}
+
+PROPER POINTER EFFECTS
+
+void foo()
+{
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   assign03();
+}
+
 POINTS TO
 
 //  {}
@@ -13,4 +45,10 @@ void assign03()
 //  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
 
    p[j] = 1.;
+}
+//  {}
+void foo()
+{
+//  points to = {}
+   assign03();
 }

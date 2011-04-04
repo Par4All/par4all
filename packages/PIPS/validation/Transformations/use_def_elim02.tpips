@@ -1,7 +1,10 @@
-setproperty MEMORY_EFFECTS_ONLY FALSE
 setproperty ABORT_ON_USER_ERROR TRUE
 delete use_def_elim02
 create use_def_elim02 use_def_elim02.c
+
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 
 echo
 echo Code for "use_def_elim02"

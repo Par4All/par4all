@@ -1,21 +1,30 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
    float *p[10];
    float a[10], t;
    int i;
-//             <    is read   >: t
 //             <    is written>: t
 
-   for (t = 1.0;t<2.0;t += 0, 01)
-//             <    is read   >: i
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
 //             <    is written>: i
-      for (i = 0;i<10;i++)
+      for(i = 0; i <= 9; i += 1)
 //             <    is read   >: i
 //             <    is written>: p[i]
          p[i] = &a[i];
+//             <    is read   >: t
+//             <    is written>: t
+      t += 0, 01;
+   }
    return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
@@ -27,11 +36,16 @@ int main()
    int i;
 //  points to = {}
 
-   for (t = 1.0;t<2.0;t += 0, 01)
-//  {(p[i],a[i],-MAY-)}
-      for (i = 0;i<10;i++)
+   t = 1.0;
+//  points to = {}
+   while (t<2.0) {
+//  points to = {}
+      for(i = 0; i <= 9; i += 1)
 //  {(p[i],a[i],-MAY-)}
          p[i] = &a[i];
+//  points to = {}
+      t += 0, 01;
+   }
 //  {(p[i],a[i],-MAY-)}
    return 0;
 }

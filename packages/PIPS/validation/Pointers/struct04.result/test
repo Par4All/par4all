@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int struct04()
 {
-   // BEGIN BLOCK
    struct one {
       int first;
       int second;
@@ -15,14 +17,13 @@ int struct04()
    //y[0] = 1;
    
    x.first = x.second+1;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int struct04()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    struct one {
       int first;
@@ -38,5 +39,4 @@ int struct04()
    //y[0] = 1;
    
    x.first = x.second+1;
-   // END BLOCK
 }

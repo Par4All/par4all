@@ -1,0 +1,32 @@
+
+//  T() {}
+
+int main(int j, char **unused)
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T() {}
+
+   int A[1];
+
+//  T(j) {j==j#init+1}
+
+
+   A[1] = j++;
+
+//  T(j) {j==j#init+1}
+
+   j++;
+
+//  T(j) {j==j#init+1}
+
+   j = j+1;
+
+//  T(i,j) {i==j-1, i==j#init}
+
+   i = j++;
+}
+

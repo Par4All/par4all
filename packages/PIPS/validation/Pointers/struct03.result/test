@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int struct03()
 {
-   // BEGIN BLOCK
    struct three {
       int first;
       int second;
@@ -11,27 +13,23 @@ int struct03()
    } x[10];
 //             <    is written>: i
    int i = 0;
-//             <    is read   >: i
 //             <    is written>: i
 
-   for (i = 0;i<10;i++) {
-      // BEGIN BLOCK
+   for(i = 0; i <= 9; i += 1) {
 //             <    is read   >: i
 //             <    is written>: x[i].un.first
       x[i].un.first = 1;
 //             <    is read   >: i
 //             <    is written>: x[i].deux.second
       x[i].deux.second = 0;
-      // END BLOCK
    }
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int struct03()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    struct three {
       int first;
@@ -46,14 +44,10 @@ int struct03()
    int i = 0;
 //  points to = {}
 
-   for (i = 0;i<10;i++) {
-//  points to = {}
-      // BEGIN BLOCK
+   for(i = 0; i <= 9; i += 1) {
 //  points to = {}
       x[i].un.first = 1;
 //  points to = {}
       x[i].deux.second = 0;
-      // END BLOCK
    }
-   // END BLOCK
 }

@@ -1,93 +1,11 @@
-int foo(float (*b)[3])
-{
-   float c;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b
-   (*b)[3] = 2.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: c
-   c = (*b)[3];
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: b
-   b[1][3] = 2.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is written>: c
-   c = b[1][3];
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   (*b)[3]++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   (*b)[3] += 5.0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   b[1][3]++;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   b[1][3] += 5.0;
-   return 1;
-}
-int foo2(float b[5][3])
-{
-   float c;
-//             <    is written>: b[0][3]
-   (*b)[3] = 2.0;
-//             <    is read   >: b[0][3]
-//             <    is written>: c
-   c = (*b)[3];
-//             <    is written>: b[1][3]
-   b[1][3] = 2.0;
-//             <    is read   >: b[1][3]
-//             <    is written>: c
-   c = b[1][3];
-//             <    is read   >: b[0][3]
-//             <    is written>: b[0][3]
-   (*b)[3]++;
-//             <    is read   >: b[0][3]
-//             <    is written>: b[0][3]
-   (*b)[3] += 5.0;
-//             <    is read   >: b[1][3]
-//             <    is written>: b[1][3]
-   b[1][3]++;
-//             <    is read   >: b[1][3]
-//             <    is written>: b[1][3]
-   b[1][3] += 5.0;
 
-   return 1;
-}
-int foo3()
-{
-   float c;
-//             <    is written>: d[0][3]
-   (*d)[3] = 2.0;
-//             <    is read   >: d[0][3]
-//             <    is written>: c
-   c = (*d)[3];
-//             <    is written>: d[1][3]
-   d[1][3] = 2.0;
-//             <    is read   >: d[1][3]
-//             <    is written>: c
-   c = d[1][3];
-//             <    is read   >: d[0][3]
-//             <    is written>: d[0][3]
-   (*d)[3]++;
-//             <    is read   >: d[0][3]
-//             <    is written>: d[0][3]
-   (*d)[3] += 5.0;
-//             <    is read   >: d[1][3]
-//             <    is written>: d[1][3]
-   d[1][3]++;
-//             <    is read   >: d[1][3]
-//             <    is written>: d[1][3]
-   d[1][3] += 5.0;
+PROPER POINTER EFFECTS
 
-   return 1;
-}
 int main()
 {
    float a[5][3], ret;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a[0][3] a[1][3]
+//             <    is written>: a[0][3] a[1][3] ret
 
    ret = foo(a);
 //             <    is read   >: a[0][3] a[1][3]
@@ -100,82 +18,8 @@ int main()
    return 1;
 }
 
-POINTS TO for "foo"
+POINTS-TO
 
-//  {(b,_b_1,-Exact-)}
-int foo(float (*b)[3])
-{
-//  {(b,_b_1,-Exact-)}
-   float c;
-//  {(b,_b_1,-Exact-)}
-   (*b)[3] = 2.0;
-//  {(b,_b_1,-Exact-)}
-   c = (*b)[3];
-//  {(b,_b_1,-Exact-)}
-   b[1][3] = 2.0;
-//  {(b,_b_1,-Exact-)}
-   c = b[1][3];
-//  {(b,_b_1,-Exact-)}
-   (*b)[3]++;
-//  {(b,_b_1,-Exact-)}
-   (*b)[3] += 5.0;
-//  {(b,_b_1,-Exact-)}
-   b[1][3]++;
-//  {(b,_b_1,-Exact-)}
-   b[1][3] += 5.0;
-//  {(b,_b_1,-Exact-)}
-   return 1;
-}
-//  {}
-int foo2(float b[5][3])
-{
-//  points to = {}
-   float c;
-//  points to = {}
-   (*b)[3] = 2.0;
-//  points to = {}
-   c = (*b)[3];
-//  points to = {}
-   b[1][3] = 2.0;
-//  points to = {}
-   c = b[1][3];
-//  points to = {}
-   (*b)[3]++;
-//  points to = {}
-   (*b)[3] += 5.0;
-//  points to = {}
-   b[1][3]++;
-//  points to = {}
-   b[1][3] += 5.0;
-//  points to = {}
-
-   return 1;
-}
-//  {}
-int foo3()
-{
-//  points to = {}
-   float c;
-//  points to = {}
-   (*d)[3] = 2.0;
-//  points to = {}
-   c = (*d)[3];
-//  points to = {}
-   d[1][3] = 2.0;
-//  points to = {}
-   c = d[1][3];
-//  points to = {}
-   (*d)[3]++;
-//  points to = {}
-   (*d)[3] += 5.0;
-//  points to = {}
-   d[1][3]++;
-//  points to = {}
-   d[1][3] += 5.0;
-//  points to = {}
-
-   return 1;
-}
 //  {}
 int main()
 {

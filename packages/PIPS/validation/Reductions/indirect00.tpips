@@ -1,0 +1,16 @@
+delete indirect00
+create indirect00 indirect00.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+
+# initial code
+display PRINTED_FILE
+
+# with reductions
+activate PRINT_CODE_CUMULATED_REDUCTIONS
+display PRINTED_FILE
+
+close
+delete indirect00
+quit

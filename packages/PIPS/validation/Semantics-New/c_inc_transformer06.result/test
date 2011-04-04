@@ -1,0 +1,21 @@
+
+//  T(main) {j==main-1}
+
+int main(int j, char **unused)
+{
+
+//  T() {}
+
+   int B[10];
+
+//  T(j) {j==j#init+1}
+
+
+   B[j++];
+
+//  T(main) {j==main}
+
+
+   return j;
+}
+

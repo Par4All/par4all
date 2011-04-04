@@ -1,3 +1,7 @@
+
+************************
+*** Module DOTPRODUCT **
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -11,6 +15,10 @@
 
       DOTPRODUCT = S
       END
+
+************************
+******** UNROLL ********
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -32,6 +40,10 @@
 
       DOTPRODUCT = S
       END
+
+************************
+**** PARTIAL EVAL ******
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -53,6 +65,10 @@
 
       DOTPRODUCT = S
       END
+
+************************
+**** NEW_ATOMIZER ******
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -94,6 +110,10 @@
 
       DOTPRODUCT = S
       END
+
+************************
+**** DEAD_CODE_ELIM ****
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -134,19 +154,9 @@
       DOTPRODUCT = S
       END
 
-      PROGRAM DEMO1
-
-      PARAMETER (IDIM = 90)
-      REAL  V1(IDIM), V2(IDIM), RESULT
-
-      DO I = 1, IDIM
-         V1(I) = FLOAT(I)
-         V2(I) = 2.
-      ENDDO
-
-      RESULT = DOTPRODUCT(IDIM, V1, V2)
-      PRINT *, "result =", RESULT
-      END
+************************
+**** PARTIAL EVAL ******
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -186,6 +196,10 @@
 
       DOTPRODUCT = S
       END
+
+************************
+** SUPPRESS_DEAD_CODE **
+************************
       REAL FUNCTION DOTPRODUCT(N,X,Y)
       
       REAL X(N), Y(N)
@@ -219,42 +233,14 @@
 
       DOTPRODUCT = S
       END
-      REAL FUNCTION DOTPRODUCT(N,X,Y)
-      
-      REAL X(N), Y(N)
-      REAL S
-      INTEGER I
 
-      S = 0.
-99999 CONTINUE
-      DO 99998 LU_IND0 = 0, 89, 3
-         I_2 = LU_IND0+1
-         F_3 = X(I_2)
-         I_3 = LU_IND0+1
-         F_4 = Y(I_3)
-         F_5 = F_3*F_4
-         S = S+F_5
-         I_4 = LU_IND0+2
-         F_6 = X(I_4)
-         I_5 = LU_IND0+2
-         F_7 = Y(I_5)
-         F_8 = F_6*F_7
-         S = S+F_8
-         I_6 = LU_IND0+3
-         F_9 = X(I_6)
-         I_7 = LU_IND0+3
-         F_10 = Y(I_7)
-         F_11 = F_9*F_10
-         S = S+F_11
-99998    CONTINUE
-
-      DOTPRODUCT = S
-      END
+************************
+**** DEAD_CODE_ELIM ****
+************************
       REAL*4 FUNCTION DOTPRODUCT(N, X, Y)
-      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, LU_IND0, LU_IB0
-     &, LU_NUB0, N, I
-      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, F_2, F_1
-     &, F_0, X(1:N), Y(1:N), S
+      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, LU_IND0, N
+      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, X(1:N), Y
+     &(1:N), S
 
       S = 0.
 99999 CONTINUE
@@ -281,14 +267,17 @@
 
       DOTPRODUCT = S
       END
+
+************************
+** WITH PRECONDITIONS **
+************************
 
 C  P() {N==90}
 
       REAL*4 FUNCTION DOTPRODUCT(N, X, Y)
-      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, I_1, I_0, LU_IND0, LU_IB0
-     &, LU_NUB0, N, I
-      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, F_2, F_1
-     &, F_0, X(1:N), Y(1:N), S
+      INTEGER I_7, I_6, I_5, I_4, I_3, I_2, LU_IND0, N
+      REAL*4 F_11, F_10, F_9, F_8, F_7, F_6, F_5, F_4, F_3, X(1:N), Y
+     &(1:N), S
 
 C  P() {N==90}
 

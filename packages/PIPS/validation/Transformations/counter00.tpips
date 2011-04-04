@@ -1,0 +1,7 @@
+delete counter00
+create counter00 counter00.c
+display PRINTED_FILE
+apply ADD_CONTROL_COUNTERS
+display PRINTED_FILE
+close
+delete counter00

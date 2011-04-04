@@ -1,24 +1,18 @@
-int main()
-{
-   char *s = "sortie de puts";
-   puts(s);
-}
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: stdout[0]
-//             <    is read   >: __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+PROPER POINTER EFFECTS
+
 int main()
 {
 //             <    is written>: s
    char *s = "sortie de puts";
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: s[*] stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is read   >: s stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(s);
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

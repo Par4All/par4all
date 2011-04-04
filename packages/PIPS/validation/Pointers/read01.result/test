@@ -1,15 +1,6 @@
-int main()
-{
-   char buf[20];
-   size_t nbytes;
-   ssize_t bytes_read;
-   int fd;
 
-   nbytes = sizeof(buf);
-   bytes_read = read(fd, buf, nbytes);
-}
-//             <may be read   >: __IO_EFFECTS:LUNS[*]
-//             <may be written>: __IO_EFFECTS:LUNS[*]
+PROPER POINTER EFFECTS
+
 int main()
 {
    char buf[20];
@@ -19,14 +10,13 @@ int main()
 //             <    is written>: nbytes
 
    nbytes = sizeof(buf);
-//             <may be read   >: __IO_EFFECTS:LUNS[*]
-//             <may be written>: buf[*] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: fd nbytes
-//             <    is written>: bytes_read
+//             <may be written>: buf[*]
+//             <    is read   >: fd nbytes __IO_EFFECTS:LUNS[fd]
+//             <    is written>: bytes_read __IO_EFFECTS:LUNS[fd]
    bytes_read = read(fd, buf, nbytes);
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

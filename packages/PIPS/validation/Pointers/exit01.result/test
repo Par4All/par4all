@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 void exit01()
 {
-   // BEGIN BLOCK
    int i;
    int *j;
 //             <    is written>: j
@@ -9,14 +11,13 @@ void exit01()
    exit(0);
 //             <    is written>: i
    i = 2;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 void exit01()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int i;
 //  points to = {}
@@ -28,5 +29,4 @@ void exit01()
    exit(0);
 //  {(j,i,-Exact-)}
    i = 2;
-   // END BLOCK
 }

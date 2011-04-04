@@ -1,11 +1,5 @@
-void call17(int *x)
-{
-   /* check aliases */
-   int *y = x;
-   y[0] = 1;
-}
 
-Proper effects for "call17"
+PROPER POINTER EFFECTS
 
 void call17(int *x)
 {
@@ -18,7 +12,7 @@ void call17(int *x)
    y[0] = 1;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {(x,_x_1,-Exact-)}
 void call17(int *x)

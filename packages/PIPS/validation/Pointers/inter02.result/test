@@ -1,16 +1,76 @@
 
-POINTS TO
+PROPER POINTER EFFECTS
 
-//  {(p,_p_1,-Exact-)}
-void foo(int *p)
+int main()
 {
-//  {(p,_p_1,-Exact-)}
-   *p = 4;
-//  {(p,_p_1,-Exact-)}
-   return;
+   int *x;
+   int tab[10];
+   int *tab2[10];
+   int tab3[10][10];
+   int **tab4;
+   int y;
+//             <    is read   >: x
+//             <    is written>: x[0]
+   
+   
+   foo(x);
+//             <    is written>: tab[0]
+   foo(tab);
+//             <    is read   >: tab2[4]
+//             <    is written>: tab2[4][0]
+   foo(tab2[4]);
+//             <    is written>: tab3[5][0]
+   foo(tab3[5]);
+//             <    is read   >: tab4 tab4[6]
+//             <    is written>: tab4[6][0]
+   foo(tab4[6]);
+//             <    is written>: y
+   foo(&y);
+//             <    is written>: tab[1]
+   foo(&tab[1]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout x x[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("%d\n", *x);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout tab[0] __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab[0]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout tab2[4] tab2[4][0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab2[4][0]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout tab3[5][0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab3[5][0]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout tab4 tab4[6] tab4[6][0] 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab4[6][0]);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout y __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", y);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout tab[1] __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", tab[1]);
+   return 1;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

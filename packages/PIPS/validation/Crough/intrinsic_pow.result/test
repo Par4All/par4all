@@ -22,11 +22,14 @@ Initial code
       O = (1, 1)                                                        0019
       P = (2, 2)                                                        0020
       Q = (3, 3)                                                        0021
-      I = J**K                                                          0022
-      F = G**H                                                          0023
-      X = Y**Z                                                          0024
-      L = M**N                                                          0025
-      O = P**Q                                                          0026
+      I = J**2                                                          0022
+      I = J**K                                                          0023
+      F = G**H                                                          0024
+      F = G**2                                                          0025
+      F = (J+F)**2                                                      0026
+      X = Y**Z                                                          0027
+      L = M**N                                                          0028
+      O = P**Q                                                          0029
       END
 /* C pretty print for module FOO. */
 //needed include to compile the C output
@@ -75,8 +78,11 @@ main (int argc, char *argv[])
   o = init_complex (1, 1);
   p = init_complex (2, 2);
   q = init_complex (3, 3);
+  i = crough_powi (j, 2);
   i = crough_powi (j, k);
   f = powf (g, h);
+  f = powf (g, 2);
+  f = powf (j + f, 2);
   x = pow (y, z);
   l = cpowf (m, n);
   o = cpow (p, q);

@@ -1,97 +1,50 @@
 
-Proper effects for "main"
+PROPER POINTER EFFECTS
 
 int main()
 {
-   FILE *s;                                                             /*0024*/
-   char *fmt;                                                           /*0025*/
-   char *ch;                                                            /*0026*/
-   int tab[5];                                                          /*0027*/
-   int r;                                                               /*0028*/
+   FILE *s;
+   char *fmt;
+   char *ch;
+   int tab[5];
+   int r;
 //             <may be read   >: ch[*] fmt[*] s[0] tab[*] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: ch[*] s[0] tab[*] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: ch fmt s
 //             <    is written>: r
-   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+   r = varargs03(s, fmt, ch, tab);
 //             <    is read   >: r
-   return r;                                                            /*0030*/
-}
-int varargs03(FILE *stream, const char *fmt, ...)
-{
-//             <    is read   >: stream
-   if (stream) {                                                        /*0007*/
-      va_list pa;                                                       /*0009*/
-      int r;                                                            /*0010*/
-//             <    is read   >: pa
-//             <    is written>: pa
-
-      va_start(pa, fmt);                                                /*0012*/
-//             <may be read   >: fmt[*] stream[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: stream[0] __IO_EFFECTS:LUNS[*]
-//             <    is read   >: fmt pa stream
-//             <    is written>: pa r
-      r = vfprintf(stream, fmt, pa);                                    /*0013*/
-//             <may be written>: pa
-//             <    is read   >: pa
-      va_end(pa);                                                       /*0014*/
-//             <    is read   >: r
-      return r;                                                         /*0016*/
-   }
-   else
-      return 0;                                                         /*0018*/
+   return r;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()
 {
 //  points to = {}
-   FILE *s;                                                             /*0024*/
+   FILE *s;
 //  {(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   char *fmt;                                                           /*0025*/
+   char *fmt;
 //  {(fmt,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   char *ch;                                                            /*0026*/
+   char *ch;
 //  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
-   int tab[5];                                                          /*0027*/
+   int tab[5];
 //  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
-   int r;                                                               /*0028*/
+   int r;
 //  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
-   r = varargs03(s, fmt, ch, tab);                                      /*0029*/
+   r = varargs03(s, fmt, ch, tab);
 //  {(ch,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(fmt,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
-   return r;                                                            /*0030*/
-}
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-int varargs03(FILE *stream, const char *fmt, ...)
-{
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-   if (stream) {                                                        /*0007*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      va_list pa;                                                       /*0009*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      int r;                                                            /*0010*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-
-      va_start(pa, fmt);                                                /*0012*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      r = vfprintf(stream, fmt, pa);                                    /*0013*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      va_end(pa);                                                       /*0014*/
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      return r;                                                         /*0016*/
-   }
-   else
-//  {(fmt,_fmt_2,-Exact-);(stream,_stream_1,-Exact-)}
-      return 0;                                                         /*0018*/
+   return r;
 }

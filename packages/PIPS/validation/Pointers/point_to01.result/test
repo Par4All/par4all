@@ -1,27 +1,5 @@
 
-Parsed printed file for "point_to01"
-
-void point_to01()
-{
-   struct s {
-      int a;
-      int b;
-      int c;
-      int d;
-   } c, *p;
-
-   p = &c;
-
-   if (1) {
-      p->a = 1;
-      p->b = 2;
-      p->c = 3;
-      p->d = p->a;
-      p->d = p->a = 4;
-   }
-}
-
-Proper pointer effects for "point_to01"
+PROPER POINTER EFFECTS
 
 void point_to01()
 {
@@ -54,75 +32,7 @@ void point_to01()
    }
 }
 
-Cumulated pointer effects for "point_to01"
-
-void point_to01()
-{
-   struct s {
-      int a;
-      int b;
-      int c;
-      int d;
-   } c, *p;
-//             <    is written>: p
-
-   p = &c;
-//             <may be read   >: p p[0].a
-//             <may be written>: p[0].a p[0].b p[0].c p[0].d
-
-   if (1) {
-//             <    is read   >: p
-//             <    is written>: p[0].a
-      p->a = 1;
-//             <    is read   >: p
-//             <    is written>: p[0].b
-      p->b = 2;
-//             <    is read   >: p
-//             <    is written>: p[0].c
-      p->c = 3;
-//             <    is read   >: p p[0].a
-//             <    is written>: p[0].d
-      p->d = p->a;
-//             <    is read   >: p
-//             <    is written>: p[0].a p[0].d
-      p->d = p->a = 4;
-   }
-}
-
-Proper effects for "point_to01"
-
-void point_to01()
-{
-   struct s {
-      int a;
-      int b;
-      int c;
-      int d;
-   } c, *p;
-//             <    is written>: p
-
-   p = &c;
-
-   if (1) {
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      p->a = 1;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      p->b = 2;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      p->c = 3;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-      p->d = p->a;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: p
-      p->d = p->a = 4;
-   }
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 void point_to01()

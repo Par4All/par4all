@@ -1,0 +1,143 @@
+void counter00(int n)
+{
+   int i;
+   // simple while
+   i = 0;
+   while (i<n)
+      i++;
+   // while with sequence
+   i = 0;
+   while (i<n) {
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   // empty while loop
+   i = 0;
+   while (i++<n)
+      ;
+   // do loop
+   for(i = 0; i <= n-1; i += 1)
+      fprintf(stdout, "%d\n", i);
+   // empty do loop
+   for(i = 0; i <= n-1; i += 1)
+      ;
+   // for loop
+   i = 0;
+   while (i<n&&n<1000) {
+      fprintf(stdout, "%d\n", i);
+      i++;
+   }
+   // empty for loop
+   i = 0;
+   while (i<n&&n<1000) {
+      i++;
+   }
+   // do-while loop
+   i = 0;
+   do {
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   while (i<n);
+   // simple test
+   if (n%2==0)
+      i++;
+   else
+      i--;
+   // sequence test
+   if (n%2==0) {
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   else {
+      i--;
+      fprintf(stdout, "%d\n", i);
+   }
+   // test with true branch only
+   if (n%2==0)
+      i++;
+}
+void counter00(int n)
+{
+   int i;
+   //PIPS generated variable
+   int _while_0 = 0, _while_1 = 0, _while_2 = 0, _do_0 = 0, _do_1 = 0, _while_3 = 0, _while_4 = 0, _while_5 = 0, _if_then_0 = 0, _if_else_0 = 0, _if_then_1 = 0, _if_else_1 = 0, _if_then_2 = 0, _if_else_2 = 0;
+   // simple while
+   i = 0;
+   while (i<n) {
+      _while_0++;
+      i++;
+   }
+   // while with sequence
+   i = 0;
+   while (i<n) {
+      _while_1++;
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   // empty while loop
+   i = 0;
+   while (i++<n) {
+      _while_2++;
+
+   }
+   // do loop
+   for(i = 0; i <= n-1; i += 1) {
+      _do_0++;
+      fprintf(stdout, "%d\n", i);
+   }
+   // empty do loop
+   for(i = 0; i <= n-1; i += 1) {
+      _do_1++;
+
+   }
+   // for loop
+   i = 0;
+   while (i<n&&n<1000) {
+      _while_3++;
+      fprintf(stdout, "%d\n", i);
+      i++;
+   }
+   // empty for loop
+   i = 0;
+   while (i<n&&n<1000) {
+      _while_4++;
+      i++;
+   }
+   // do-while loop
+   i = 0;
+   do {
+      _while_5++;
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   while (i<n);
+   // simple test
+   if (n%2==0) {
+      _if_then_0++;
+      i++;
+   }
+   else {
+      _if_else_0++;
+      i--;
+   }
+   // sequence test
+   if (n%2==0) {
+      _if_then_1++;
+      i++;
+      fprintf(stdout, "%d\n", i);
+   }
+   else {
+      _if_else_1++;
+      i--;
+      fprintf(stdout, "%d\n", i);
+   }
+   // test with true branch only
+   if (n%2==0) {
+      _if_then_2++;
+      i++;
+   }
+   else
+      _if_else_2++;
+}
+

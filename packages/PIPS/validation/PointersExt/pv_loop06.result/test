@@ -1,3 +1,27 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int i;
+   int *p, *q;
+   int a[10];
+   int b[10];
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: q
+   q = &b[0];
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: p q q[0]
+//             <    is written>: p p[0] q
+      *p++ = 2**q++;
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

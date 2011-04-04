@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 void update01()
 {
-   // BEGIN BLOCK
    int i;
    int *p;
 //             <    is written>: p
@@ -11,14 +13,13 @@ void update01()
    p++;
 //             <    is written>: i
    i = 2;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 void update01()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int i;
 //  points to = {}
@@ -30,5 +31,4 @@ void update01()
    p++;
 //  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    i = 2;
-   // END BLOCK
 }

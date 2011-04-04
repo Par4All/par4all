@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 void comma01()
 {
-   // BEGIN BLOCK
    int i;
    int *p;
    int *q;
@@ -11,14 +13,13 @@ void comma01()
    
    
    i = 2;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 void comma01()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int i;
 //  points to = {}
@@ -36,5 +37,4 @@ void comma01()
    
    
    i = 2;
-   // END BLOCK
 }

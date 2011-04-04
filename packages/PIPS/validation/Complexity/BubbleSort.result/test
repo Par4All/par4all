@@ -1,0 +1,54 @@
+
+
+int main()
+{
+   float n = 100.0;
+   float m = 1.0;
+   int dec = (int) n;
+   int A[dec];
+   int k, j, z;
+
+   for(k = dec; k >= 1; k += -1)
+      for(j = (int) m; j <= k-1; j += 1)
+         if (A[j]>A[j+1]) {
+            z = (int) A[j];
+            A[j] = A[j+1];
+            A[j+1] = z;
+         }
+
+   return A;
+}
+
+Complexities
+
+//     6.75*COMPLEXITY:UNKNOWN_VARIABLE0^2 - 13.50*COMPLEXITY:UNKNOWN_VARIABLE0.m - 3/4*COMPLEXITY:UNKNOWN_VARIABLE0 + 3 (SUMMARY)
+int main()
+{
+//                                                                    0 (STMT)
+   float n = 100.0;
+//                                                                    0 (STMT)
+   float m = 1.0;
+//                                                                    0 (STMT)
+   int dec = (int) n;
+//                                                                    0 (STMT)
+   int A[dec];
+//                                                                    0 (STMT)
+   int k, j, z;
+//                               6.75*dec^2 - 13.50*dec.m - 3/4*dec + 2 (DO)
+
+   for(k = dec; k >= 1; k += -1)
+//                                             13.50*k - 13.50*m - 7.50 (DO)
+      for(j = (int) m; j <= k-1; j += 1)
+//                                                                13.50 (TEST)
+         if (A[j]>A[j+1]) {
+//                                                                    4 (STMT)
+            z = (int) A[j];
+//                                                                    5 (STMT)
+            A[j] = A[j+1];
+//                                                                    4 (STMT)
+            A[j+1] = z;
+         }
+//                                                                    1 (STMT)
+
+   return A;
+}

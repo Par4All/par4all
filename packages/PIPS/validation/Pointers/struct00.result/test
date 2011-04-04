@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
-   // BEGIN BLOCK
    struct one {
       int *first;
    } x;
@@ -11,14 +13,13 @@ int main()
    
    
    return 0;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    struct one {
       int *first;
@@ -32,5 +33,4 @@ int main()
    
    
    return 0;
-   // END BLOCK
 }
