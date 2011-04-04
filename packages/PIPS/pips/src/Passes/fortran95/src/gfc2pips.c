@@ -1542,8 +1542,20 @@ entity gfc2pips_check_entity_module_exists(char *s) {
                           MODULE_SEP_STRING,
                           str2upper(strdup(s)),
                           NULL);
-  return gen_find_tabulated(full_name, entity_domain);
+
+  entity e = gen_find_tabulated(full_name, entity_domain);
+
+  ifdebug(5) {
+    if(e==entity_undefined) {
+      pips_debug(5,"'%s' doesn't exist.\n",full_name);
+    } else {
+      pips_debug(5,"'%s' found.\n",full_name);
+    }
+  }
+
+  return e;
 }
+
 entity gfc2pips_check_entity_block_data_exists(char *s) {
   string full_name;
   full_name = concatenate(TOP_LEVEL_MODULE_NAME,
@@ -1955,7 +1967,8 @@ type gfc2pips_symbol2type(gfc_symbol *s) {
   //beware the size of strings
   basic b = gfc2pips_getbasic(s);
   if(b == basic_undefined) {
-    return type_undefined;
+    gfc2pips_debug( 5, "WARNING: unknown type !\n" );
+    return MakeTypeUnknown();
   }
 
   if(basic_derived_p(b)) {
@@ -1963,9 +1976,6 @@ type gfc2pips_symbol2type(gfc_symbol *s) {
   } else {
     return MakeTypeVariable(b, gfc2pips_get_list_of_dimensions2(s));
   }
-  gfc2pips_debug( 5, "WARNING: no type\n" );
-  return type_undefined;
-  //return make_type_unknown();
 }
 
 type gfc2pips_symbol2specialType(gfc_symbol *s) {
@@ -4127,6 +4137,7 @@ expression gfc2pips_expr2expression(gfc_expr *expr) {
          * functions whose name begin with __ should be used by gfc only
          * therefore we put the old name back
          */
+        pips_debug(5,"Func name : %s\n",expr->value.function.name);
         if(strncmp(expr->value.function.name, "__", strlen("__")) == 0
             || strncmp(expr->value.function.name,
                        "_gfortran_",

@@ -8,8 +8,9 @@ libalias_classes_la_SOURCES=alias_pairs.c \
 		alias_classes.c \
 		points_to_set.c	\
                 points_to_prettyprint.c \
-		points_to_analysis.c \
+		points_to_analysis_general_algorithm.c \
 		points_to_interprocedural_analysis.c \
+		constant-path-utils.c \
 	 	prettyprint.c 
 
 include $(srcdir)/../pipslibs_includes.mk

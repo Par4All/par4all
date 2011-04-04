@@ -4,11 +4,25 @@
 #
 # further summarize detailed summary, including differential analysis
 #
-# Usage: $0 SUMMARY [previous-summary]
-
-# Bug: homonymous issue with bug & future
+# Usage: $0 [--aggregate] SUMMARY [PREVIOUS_SUMMARY]
+#
+# Bugs
+# - homonymous issue with bug & future
 
 use strict;
+
+# whether to count cases aggregated per upper directory
+my $aggregate = 0;
+
+# get options
+use Getopt::Long;
+GetOptions(
+    "aggregate|a!" => \$aggregate,
+    "help|h" => sub {
+	print "$0 [--aggregate] current [previous]\n";
+	exit 0;
+    }
+) or die "unexpected option ($!)";
 
 # manage arguments
 die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
@@ -54,12 +68,12 @@ my ($start, $stop);
 # process input formatted as
 while (<>)
 {
-  # parse: <status>: dir/case duration
+  # parse: <status>: [some/]dir/case duration
   # "case" may be empty for some status about the whole directory
   # "duration" may be empty for some status and in a transition
-  if (/^($status|$others): ([-\w]+)(\/[-\w]+)?( \d*)?$/)
+  if (/^($status|$others): (([-\w\.]+\/)*?[-\w\.]+)(\/[-\w]+)?( \d*)?$/)
   {
-    my ($stat, $dir, $case) = ($1, $2, $3);
+    my ($stat, $dir, $case) = ($1, $2, $4);
     $d{$dir} = zeroed() unless exists $d{$dir};
     if ($summary eq $ARGV) # this is the current summary
     {
@@ -110,17 +124,18 @@ my $delay = '';
 if (defined $start and defined $stop)
 {
   $delay = $stop-$start;
-  if ($delay<100) {
+  if ($delay<100) { # 0 .. 99 s
     $delay .= 's';
   }
-  elsif ($delay < 6000) {
+  elsif ($delay < 6000) { # 1.6 .. 99.9 mn
     $delay /= 60.0;
     $delay .= 'mn';
   }
-  else {
+  else { # 1.6 .. NN h
     $delay /= 3600.0;
     $delay .= 'h';
   }
+  # keep one digit after dot
   $delay =~ s/(\.\d)\d+/$1/;
 }
 
@@ -130,7 +145,7 @@ for my $c (sort keys %new)
   if (not exists $old{$c})
   {
     my $N = uc(substr($new{$c},0,1));
-    my $dir = (split /\//, $c)[0];
+    my $dir=$1 if $c =~ /(.*)\//;
     $changes{".$N"}++;
     $diff{$dir}{".$N"}++;
   }
@@ -189,6 +204,30 @@ $rate = $n{passed}*100.0/$count if $count;
 printf "success rate: %5.1f%%\n", $rate;
 print "elapsed time: $delay\n" if defined $delay;
 print "\n";
+
+# possibly aggregate counts on the first directory
+if ($aggregate)
+{
+  my %dc = ();
+  for my $dir (sort keys %d)
+  {
+    my $first = (split /\//, $dir)[0];
+    # do directory counts
+    for my $s (split '\|', "$status|$others")
+    {
+      $dc{$first}{$s} += $d{$dir}{$s} if defined $d{$dir}{$s};
+    }
+    # do differences
+    if ($first ne $dir)
+    {
+      for my $sc (keys %{$diff{$dir}})
+      {
+	  $diff{$first}{$sc} += $diff{$dir}{$sc};
+      }
+    }
+  }
+  %d = %dc;
+}
 
 # print detailed per-directory summary
 print "directory                   cases  bads success (F+C+T|K) changes...\n";
