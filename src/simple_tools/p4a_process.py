@@ -176,9 +176,9 @@ def process(input):
             # Generate code for a GPU-like accelerator. Note that we can
             # have an OpenMP implementation of it if OpenMP option is set
             # too:
-            processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'], 
-					apply_phases_kernel_launcher = input.apply_phases['aklg'], 
-					apply_phases_wrapper = input.apply_phases['awg'], 
+            processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'],
+					apply_phases_kernel_launcher = input.apply_phases['aklg'],
+					apply_phases_wrapper = input.apply_phases['awg'],
 					apply_phases_after = input.apply_phases['aag'])
 
         if input.openmp and not input.accel:
@@ -656,7 +656,7 @@ class p4a_processor(object):
                 filter_exclude = None,
                 apply_phases_kernel_after = [],
                 apply_phases_kernel_launcher = [],
-                apply_phases_wrapper = [],              
+                apply_phases_wrapper = [],
                 apply_phases_after = []):
         """Apply transformations to the parallel loop nested found in the
         workspace to generate GPU-oriented code
@@ -681,24 +681,14 @@ class p4a_processor(object):
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
         # Normalize all loops in kernels to suit hardware iteration spaces:
-        if (self.fortran == False):
-            kernel_launchers.loop_normalize(
-                # Loop normalize for the C language and GPU friendly
-                LOOP_NORMALIZE_ONE_INCREMENT = True,
-                # Arrays start at 0 in C, so the iteration loops:
-                LOOP_NORMALIZE_LOWER_BOUND = 0,
-                # It is legal in the following by construction (...Hmmm to verify)
-                LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
-                concurrent=True)
-        else:
-            kernel_launchers.loop_normalize(
-                # Loop normalize for the C language and GPU friendly
-                LOOP_NORMALIZE_ONE_INCREMENT = True,
-                # Arrays start at 0 in C, so the iteration loops:
-                LOOP_NORMALIZE_LOWER_BOUND = 1,
-                # It is legal in the following by construction (...Hmmm to verify)
-                LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
-                concurrent=True)
+        kernel_launchers.loop_normalize(
+            # Loop normalize to be GPU friendly, even if the step is already 1:
+            LOOP_NORMALIZE_ONE_INCREMENT = True,
+            # Arrays start at 0 in C, 1 in Fortran so the iteration loops:
+            LOOP_NORMALIZE_LOWER_BOUND = self.fortran == True ? 1 : 0,
+            # It is legal in the following by construction (...Hmmm to verify)
+            LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
+            concurrent=True)
 
         for ph in apply_phases_kernel_launcher:
             #Apply requested phases before parallelization to kernel launchers:
