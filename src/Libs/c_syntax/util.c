@@ -583,6 +583,10 @@ expression IdentifierToExpression(string s)
   return exp;
 }
 
+/* FI:  this function is called for a bracketed comma expression
+ *
+ * The two arguments are (should be) reused within the returned expression
+ */
 expression MakeArrayExpression(expression exp, list lexp)
 {
   /* There are two cases:
@@ -599,14 +603,22 @@ expression MakeArrayExpression(expression exp, list lexp)
 
   expression e = expression_undefined;
   syntax s = expression_syntax(exp);
+  list sl = lexp;
+
+  if(!ENDP(CDR(lexp))) {
+    expression se = MakeCommaExpression(lexp);
+    sl = CONS(EXPRESSION, se, NIL);
+  }
+
   switch(syntax_tag(s)) {
   case is_syntax_reference:
     {
+      /* FI: Memory leak with exp? */
       reference r = syntax_reference(s);
       entity ent = reference_variable(r);
       list l = reference_indices(r);
       pips_debug(6,"Normal reference expression\n");
-      e = reference_to_expression(make_reference(ent,gen_nconc(l,lexp)));
+      e = reference_to_expression(make_reference(ent,gen_nconc(l,sl)));
       break;
     }
   case is_syntax_call:
@@ -616,7 +628,9 @@ expression MakeArrayExpression(expression exp, list lexp)
   case is_syntax_subscript:
   case is_syntax_application:
     {
-      subscript a = make_subscript(exp,lexp);
+      /* FI: we might have preexisting subscript? No, in this
+	 context, only one index due to lack of type information? */
+      subscript a = make_subscript(exp,sl);
       syntax s = make_syntax_subscript(a);
       pips_debug(6,"Subscripting array expression\n");
       e = make_expression(s,normalized_undefined);
