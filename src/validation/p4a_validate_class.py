@@ -74,10 +74,12 @@ class ValidationClass:
 			elif (os.path.isfile(directory_test_path+"/default_test")):
 				# test_name=file
 				# upper=FILE
+				(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_test")
 				upper = os.path.basename(test_name_path).upper()
 				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_file_path)
 
 			elif (os.path.isfile(directory_test_path+"/default_tpips")):
+				(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_tpips")
 				(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
 		
 			else:
@@ -415,11 +417,11 @@ class ValidationClass:
 def main():
 	usage = "usage: python %prog [options]"
 	parser = optparse.OptionParser(usage=usage)
-	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate tests which are done by default file (in packages/PIPS/validation)")
-	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are done by par4all_validation.txt (which must be previously created in src/validation)")
-	parser.add_option("--diff", action="store_true", dest="diff", help = "Show test that it's not done by p4a options")
-	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are done in packages/PIPS/validation/directory_name")
-	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests in argument")
+	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate tests which are given by default file (in packages/PIPS/validation)")
+	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are given by par4all_validation.txt (which must be previously created in src/validation)")
+	parser.add_option("--diff", action="store_true", dest="diff", help = "List tests that are done with pips option but not with p4a option")
+	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are located in packages/PIPS/validation/directory_name")
+	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests given in argument")
 	(options, args) = parser.parse_args()
 
 	if options.pips:
