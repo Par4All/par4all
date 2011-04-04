@@ -1,0 +1,354 @@
+void compute(int p, int n, float a[n][n])
+{
+   float t[n];
+   int k = n;
+   int i, j;
+   for(i = 0; i <= n-1; i += 1) {
+      k--;
+      t[k] = a[i][i];
+      for(j = 0; j <= n-1; j += 1)
+         if (p>0)
+            a[i][j] /= t[k];
+   }
+}
+int main()
+{
+   float a[100][100];
+   int n = read_input(100, a);
+   int p = init_parameter(n, a);
+   compute(p, n, a);
+   write_output(n, a);
+}
+//  P() {n==100, 1<=p}
+void compute(int p, int n, float a[n][n])
+{
+//  P() {}
+   float t[n];
+//  P() {n==100}
+   int k = n;
+//  P() {}
+   int i, j;
+//  P(i,j,k) {k==100, n==100, 1<=p}
+   for(i = 0; i <= n-1; i += 1) {
+//  P(k) {i+k==100, n==100, 0<=i, i<=99}
+      k--;
+//  P(i,k) {i+k==99, n==100, 0<=i, i<=99}
+      t[k] = a[i][i];
+//  P(i,j,k) {i+k==99, n==100, 0<=i, i<=99, 1<=p}
+      for(j = 0; j <= n-1; j += 1)
+//  P(i,j,k) {i+k==99, n==100, 0<=i, i<=99, 0<=j, j<=99, 1<=p}
+         if (p>0)
+//  P(i,j,k) {i+k==99, n==100, 0<=i, i<=99, 0<=j, j<=99}
+            a[i][j] /= t[k];
+   }
+}
+//  P() {}
+int main()
+{
+//  P() {}
+   float a[100][100];
+//  P() {}
+   int n = read_input(100, a);
+//  P(n) {n==100}
+   int p = init_parameter(n, a);
+//  P(n,p) {n==100, 1<=p}
+   compute(p, n, a);
+//  P(n) {n==100}
+   write_output(n, a);
+}
+//  T(init_parameter) {1<=init_parameter}
+int init_parameter(int n, float a[n][n])
+{
+//  T(p) {}
+   int p;
+//  T(p) {p<=0, p#init<=p, p#init<=0}
+   while (p<=0)
+//  T(p) {p==p#init+1}
+      p++;
+//  T(init_parameter) {init_parameter==p}
+   return p;
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[n];
+   int k = n;
+   int i, j;
+   for(i = 0; i <= n-1; i += 1) {
+      k--;
+      t[k] = a[i][i];
+      for(j = 0; j <= n-1; j += 1)
+         a[i][j] /= t[k];
+   }
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[n];
+   int k = n;
+   int i, j;
+   for(i = 0; i <= n-1; i += 1) {
+      k = -(i+-100)-1;
+      t[-(-99+i)] = a[i][i];
+      for(j = 0; j <= n-1; j += 1)
+         a[i][j] /= t[-(-99+i)];
+   }
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+   int i, j;
+   for(i = 0; i <= 99; i += 1) {
+      k = -i+99;
+      t[-i+99] = a[i][i];
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= t[-i+99];
+   }
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+   int i, j;
+   for(i = 0; i <= 99; i += 1)
+      k = -i+99;
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+      t[-i+99] = a[i][i];
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= t[-i+99];
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+   int i, j;
+#pragma omp parallel for private(k)
+   for(i = 0; i <= 99; i += 1)
+      k = -i+99;
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+      t[-i+99] = a[i][i];
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= t[-i+99];
+}
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    n==100}>
+
+void compute(int p, int n, float a[n][n])
+{
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    n==100}>
+
+   // BEGIN BLOCK
+   float t[100];
+   int k = 100;
+   int i, j;
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
+//    n==100}>
+
+   for(i = 0; i <= 99; i += 1) {
+
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI1, PHI1<=99, 0<=PHI2,
+//    PHI2<=99, n==100}>
+
+      // BEGIN BLOCK
+      k = -i+99;
+
+//  <a-INE-EXACT-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==i, i+k==99, n==100, 0<=i,
+//    i<=99}>
+//  <t-INE-EXACT-{}>
+
+      t[-i+99] = a[i][i];
+
+//  <a-INE-EXACT-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, i+k==99,
+//    n==100, 0<=i, i<=99}>
+//  <t-INE-EXACT-{}>
+//  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99}>
+
+      for(j = 0; j <= 99; j += 1)
+
+//  <a-INE-EXACT-{}>
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, i+k==99, n==100, 0<=i,
+//    i<=99, 0<=j, j<=99}>
+//  <t-INE-EXACT-{}>
+//  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99, 0<=j,
+//    j<=99}>
+
+         a[i][j] /= t[-i+99];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+//  T() {}
+void compute(int p, int n, float a[n][n])
+{
+//  T() {}
+   // BEGIN BLOCK
+//  T() {}
+   float t[100];
+//  T(k) {k==100}
+   int k = 100;
+//  T(i,j) {}
+   int i, j;
+//  T(i,j,k) {0<=i}
+   for(i = 0; i <= 99; i += 1) {
+//  T(j,k) {i+k==99, j==100}
+      // BEGIN BLOCK
+//  T(k) {i+k==99}
+      k = -i+99;
+//  T() {}
+      t[-i+99] = a[i][i];
+//  T(j) {0<=j}
+      for(j = 0; j <= 99; j += 1)
+//  T() {}
+         a[i][j] /= t[-i+99];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
+
+void compute(int p, int n, float a[n][n])
+{
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
+
+   // BEGIN BLOCK
+   float t[100];
+   int k = 100;
+
+//  <i-OUTE-EXACT-{}>
+
+   int i, j;
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
+
+   for(i = 0; i <= 99; i += 1) {
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, n==100,
+//    1<=p}>
+
+      // BEGIN BLOCK
+      k = -i+99;
+
+//  <t[PHI1]-OUT-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99}>
+
+      t[-i+99] = a[i][i];
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, i+k==99,
+//    n==100, 1<=p}>
+
+      for(j = 0; j <= 99; j += 1)
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, PHI2==j,
+//    i+k==99, n==100, 1<=p}>
+
+         a[i][j] /= t[-i+99];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+   int i, j;
+   for(i = 0; i <= 99; i += 1)
+      k = -i+99;
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+      t[-i+99] = a[i][i];
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= t[-i+99];
+}
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+   int i, j;
+   //PIPS generated variable
+   float __scalar__0;
+#pragma omp parallel for private(k)
+   for(i = 0; i <= 99; i += 1)
+      k = -i+99;
+#pragma omp parallel for private(j,__scalar__0)
+   for(i = 0; i <= 99; i += 1) {
+      __scalar__0 = a[i][i];
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= __scalar__0;
+   }
+}
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
+
+void compute(int p, int n, float a[n][n])
+{
+   float t[100];
+   int k = 100;
+
+//  <i-OUTE-EXACT-{}>
+
+   int i, j;
+   //PIPS generated variable
+   float __scalar__0;
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
+
+   for(i = 0; i <= 99; i += 1) {
+      k = -i+99;
+
+//  <__scalar__0-OUT-EXACT-{}>
+
+      __scalar__0 = a[i][i];
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, i+k==99,
+//    n==100, 1<=p}>
+
+      for(j = 0; j <= 99; j += 1)
+
+//  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI1==i, PHI2==0, PHI2==j,
+//    i+k==99, n==100, 1<=p}>
+
+         a[i][j] /= __scalar__0;
+   }
+}
+void compute(int p, int n, float a[n][n])
+{
+   int i, j;
+   //PIPS generated variable
+   float __scalar__0;
+   for(i = 0; i <= 99; i += 1) {
+      __scalar__0 = a[i][i];
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= __scalar__0;
+   }
+}
+void compute(int p, int n, float a[n][n])
+{
+   int i, j;
+   //PIPS generated variable
+   float __scalar__0;
+#pragma omp parallel for private(j,__scalar__0)
+   for(i = 0; i <= 99; i += 1) {
+      __scalar__0 = a[i][i];
+#pragma omp parallel for 
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] /= __scalar__0;
+   }
+}
