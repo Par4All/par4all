@@ -65,7 +65,7 @@ echo
 echo Code after use-def elimination
 echo
 
-apply SUPPRESS_DEAD_CODE
+apply DEAD_CODE_ELIMINATION
 activate PRINT_CODE
 display PRINTED_FILE
 
