@@ -1681,9 +1681,9 @@ void get_data(char filename[])
    p4a_kernel_launcher_get_data(space);
    
    /* Read the pixel grey value: */
-#pragma omp for private(j)
+#pragma omp for private(i,j)
    for(j = 0; j <= ny-1; j += 1)
-#pragma omp for private(i)
+#pragma omp for private(c,i)
       for(i = 0; i <= nx-1; i += 1) {
          // BEGIN BLOCK
          c = fgetc(fp);
