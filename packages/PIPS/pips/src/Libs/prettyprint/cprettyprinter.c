@@ -107,8 +107,6 @@ static list l_rename  = NIL;
 static list l_entity  = NIL;
 static list l_written = NIL;
 
-static basic cur_basic = basic_undefined;
-
 /**************************************************************** MISC UTILS */
 
 #define current_module_is_a_function() \
@@ -1053,75 +1051,6 @@ static string ppt_call(string in_c, list le)
     return scall;
 }
 
-// Try to determine the type of the operands of a call. The
-// question is should we used abs or fabs for example. This should be used
-// in a gen_recurse, the goal is to determine the type of inputs to be used.
-static bool find_basic (reference r) {
-  pips_debug (7, "processing a reference\n");
-  bool result = true;
-  entity e = reference_variable (r);
-  basic b = variable_basic (type_variable (entity_type (e)));
-  if (cur_basic == basic_undefined) {
-	// initialize basic by copying it
-	cur_basic = copy_basic (b);
-  }
-  else if (basic_tag ((b)) != basic_tag (cur_basic)) {
-	pips_user_error("dont know how to merge two different types : %s and %s\n",
-					basic_to_string (b), basic_to_string (cur_basic));
-  }
-  else {
-	switch (basic_tag(b)) {
-	case is_basic_int:
-	  switch basic_int (b) {
-		case 1:    //char
-		case 2:    //short
-		case 4:    //int
-		case 6:    //long
-		case 8:    //long long
-		  if (basic_int(b) > basic_int(cur_basic))
-			basic_int(cur_basic) = basic_int(b);
-		  break;
-		case 21:    //signed char
-		case 22:    //signed short
-		case 24:    //signed int
-		case 26:    //signed long
-		case 28:    //signed long long
-		  if (basic_int(b) - 20 > basic_int(cur_basic))
-			basic_int(cur_basic) = basic_int(b);
-		  break;
-		case 11:
-		case 12:
-		case 14:
-		case 16:
-		case 18:
-		  // should nt happen
-		  pips_user_error("found an unsigned integer in fortran\n");
-		  break;
-		}
-	  break;
-	case is_basic_float:
-	  if (basic_float(b) > basic_float(cur_basic))
-		basic_float(cur_basic) = basic_float(b);
-	  break;
-	case is_basic_complex:
-	  if (basic_complex(b) > basic_complex(cur_basic))
-		basic_complex(cur_basic) = basic_complex(b);
-	  break;
-	case is_basic_logical:
-	case is_basic_string:
-	  // we don t care of the size
-	  break;
-	default:
-	  // What should be done?
-	  pips_user_error("the basic can not be a variable\n");
-	  break;
-	}
-  }
-  // we don't want to look at indices of an array
-  result &= (reference_indices (r) == NIL);
-  return result;
-}
-
 static c_full_name c_base_name_to_c_full_name [] = {
   {"abs"   , is_basic_int     , 1  , ""     , "" }, //char
   {"abs"   , is_basic_int     , 2  , ""     , "" }, //short
@@ -1146,7 +1075,9 @@ static c_full_name c_base_name_to_c_full_name [] = {
 
 /// @brief fill the c_base_name to get the c full name accorgind to its basic
 static void get_c_full_name (string* base_in_c, basic b) {
-  pips_debug (7, "find the C function according to the basic\n");
+  pips_debug (7, "find the C function for \"%s\" according to the basic\n",
+			  *base_in_c);
+  pips_assert ("cant deal with basic undefined", b != basic_undefined);
   // initialize some varaibles
   c_full_name * table = c_base_name_to_c_full_name;
   enum basic_utype type = basic_tag (b);
@@ -1171,20 +1102,32 @@ static void get_c_full_name (string* base_in_c, basic b) {
 // function, it calls the right c function according to its input types.
 static string ppt_math(string in_c, list le)
 {
-  cur_basic = basic_undefined;
+  basic res_basic = basic_undefined;
+  pips_assert ("need at least one argument", 0 != gen_length (le));
   FOREACH (EXPRESSION, exp, le) {
-	// gen_recurse on reference because entites are tabulated and thus
-	// not visited
-	pips_debug (7, "let's dig into the expression to find the involved basics\n");
-	//gen_recurse (exp, reference_domain, gen_true, gen_identity);
-	//	gen_recurse (exp, reference_domain, gen_true, find_basic);
-	gen_recurse (exp, reference_domain, find_basic, gen_identity);
+	pips_debug (7, "let's analyse the expression to find the involved types\n");
+	type tmp = expression_to_type (exp);
+	pips_assert ("type must be a variable", type_variable_p (tmp) == true);
+	basic cur_b = variable_basic (type_variable (tmp));
+	pips_assert ("expression_to_type returns a basic undefined",
+				 cur_b != basic_undefined);
+	if (res_basic == basic_undefined) {
+	  res_basic = copy_basic (cur_b);
+	}
+	else {
+	  basic old = res_basic;
+	  res_basic = basic_maximum (old, cur_b);
+	  free_basic (old);
+	  pips_assert ("expression_to_type returns a basic undefined",
+		       !basic_overloaded_p (res_basic));
+	}
+	free_type (tmp);
   }
   string str_copy = strdup (in_c);
-  get_c_full_name (&str_copy, cur_basic);
+  get_c_full_name (&str_copy, res_basic);
   string result = ppt_call (str_copy, le);
-  if (cur_basic != basic_undefined)
-	free_basic (cur_basic);
+  if (res_basic != basic_undefined)
+	free_basic (res_basic);
   free (str_copy);
   return result;
 }

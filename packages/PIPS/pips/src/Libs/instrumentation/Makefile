@@ -28,7 +28,8 @@ LIB_CFILES 	= \
 	array_bound_check_interprocedural.c \
 	alias_propagation.c \
 	alias_check.c \
-	used_before_set.c
+	used_before_set.c \
+	control_counters.c
 
 INC_TARGET =    $(TARGET).h
 

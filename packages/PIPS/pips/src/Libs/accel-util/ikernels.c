@@ -492,12 +492,14 @@ static void copy_to_block(statement st, list sts) {
     /* propagate "out" sets */
     set_assign(COPY_TO_OUT( one ), copy_to_out);
 
-    /* Compute the "copy from" for this statement */
+    /* Compute the "copy to" for this statement */
     copy_to_statement(one);
 
     /* Get the outs for next statement */
     set_assign(copy_to_out, COPY_TO_IN( one ));
-    set_difference(copy_to_out, copy_to_out, COPY_FROM_IN(one));
+
+    /* This is a non necessary optimisation, the set is just smaller with */
+//    set_difference(copy_to_out, copy_to_out, COPY_FROM_IN(one));
   }
 
   /* The outs for the whole block */

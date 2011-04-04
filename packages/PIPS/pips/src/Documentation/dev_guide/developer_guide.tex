@@ -1645,7 +1645,9 @@ look to \S~\ref{sec:devel-branch-valid}.
 
 Different phases are validated in distinct sub-directories.
 Running the validation uses the a set of makefiles which allow
-to parallelize the validation inter-directory or even intra-directory.
+to parallelize the validation inter-directory, or even intra-directory
+if you assure that there are no potential issues such as colliding
+temporary files or directories.
 
 See the \texttt{README} at the root of the \texttt{trunk} for details on
 how to run the validation. Basically, one must simply type
@@ -1724,6 +1726,8 @@ Several compilations and validations run at CRI:
 \item[NIGHT] compilation and validation on Ubuntu Karmic (canapville).
 
 \item[PRIVE] compilation and private validation on Debian Lenny (compiegne).
+
+\item[32BIT] compilation and validation on Debian Lenny i686 (riquet).
 \end{description}
 
 \subsection{Validation Makefile}
@@ -1741,6 +1745,15 @@ The validation can also be restricted to some directories by setting the
 \begin{verbatim}
 make TARGET=LoopRecovering validate
 \end{verbatim}
+
+Finally, the validation can be run directly in a subdirectory
+of the validation, with something like:
+\begin{verbatim}
+cd SubDirectory
+make validate-test
+\end{verbatim}
+
+
 
 \subsection{Validation output}
 \label{sec:validation-output}
@@ -1771,12 +1784,12 @@ the \texttt{SUMMARY\_Archive} directory.
 
 \textbf{Note that these scripts are more or less obsolete.
 They are superseded by local \texttt{Makefile} targets which do the same
-but also parallelize the process per directory or per file.}
+but also parallelize the process per directory or per file.
+See Section~\ref{sec:par-validate}}.
 
 Three validation scripts are available:
 \begin{description}
 \item[pips\_validate]: \index{Validate} Non-regression tests;
-
   The arguments are names of subdirectories in
   \texttt{\$PIPS\_ROOT/../../validation} or source files within these
   directories.  See \texttt{pips\_validate -h} for help and a list of
@@ -2060,8 +2073,9 @@ such as \verb/a.out/.
 There is a new provision for running the non regression tests in
 parallel, either at the directory level (distinct validation
 directories are run in parallel) or at the file level (distinct
-validation files within a directory are run in parallel). The former
-is useful for a full validation, the later is very useful for the
+validation files within a directory are run in parallel).
+%%
+The former is useful for a full validation, the later is very useful for the
 developer who wants to test specific new developments on specific test
 cases very quickly.
 
@@ -2080,6 +2094,34 @@ The typical (very short) \texttt{Makefile} is:
 
 There is a default timeout of 600 seconds per run.
 This may be changed by redefining the \texttt{TIMEOUT} make macro.
+
+A validation directory can contain subdirectories which will
+also be validated recursively.
+%%
+This is done automatically on \texttt{*.sub} subdirectories,
+but an explicit list of directories can also be provided as:
+%%
+\begin{verbatim}
+  PARALLEL_VALIDATION = 1
+  D.sub = subdir1 subdir2 subdir3
+  include ../validate.mk
+\end{verbatim}
+%%
+The validation will run test cases available in the current directory \texttt{.}
+and into the 3 subdirectories.
+%%
+These subdirectories are skipped if corresponding \texttt{*.later} or
+\texttt{*.bug} files exists to mark the directories as future or error cases.
+%%
+Note that all these subdirectories must include a similar \emph{Makefile}
+to have the necessary targets, something like:
+\begin{verbatim}
+  PARALLEL_VALIDATION = 1
+  include ../../validate.mk
+\end{verbatim}
+%%
+See the \texttt{HardwareAccelerator} validation directory for a working
+example of validation subdirectories.
 
 \subsection{Intra-directory parallel validation}
 

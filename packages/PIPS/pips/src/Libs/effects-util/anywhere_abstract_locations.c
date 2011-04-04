@@ -118,13 +118,13 @@ bool entity_nowhere_locations_p(entity e)
 }
 
 /* return the NULL/UNDEFINED POINTER...
- *
+ * The NULL pointer should be a global variable, unique for all modules
  * FI: why isn't it called entity_null_location()?
  */
 entity entity_null_locations()
 {
   entity null_pointer = entity_undefined;
-  string any_name = strdup(concatenate(ANY_MODULE_NAME,
+  string any_name = strdup(concatenate(TOP_LEVEL_MODULE_NAME,
 				       MODULE_SEP_STRING,
 				       NULL_POINTER_NAME,
 				       NULL));
@@ -146,8 +146,8 @@ bool entity_null_locations_p(entity e)
   bool null_pointer_p;
   null_pointer_p = same_string_p(entity_local_name(e), NULL_POINTER_NAME);
   if(null_pointer_p)
-    pips_assert("defined in any module name",
-		same_string_p(entity_module_name(e), ANY_MODULE_NAME));
+    pips_assert("defined in top-level module name",
+		same_string_p(entity_module_name(e),TOP_LEVEL_MODULE_NAME));
 
   return null_pointer_p;
 }
@@ -275,7 +275,7 @@ entity entity_all_xxx_locations(string xxx)
   string any_name = strdup(concatenate(ANY_MODULE_NAME,
 				       MODULE_SEP_STRING,
 				       xxx,
-				       ANYWHERE_LOCATION,
+				       //ANYWHERE_LOCATION,
 				       NULL));
   dynamic = find_or_create_entity(any_name);
   //dynamic = gen_find_tabulated(any_name, entity_domain);

@@ -5417,6 +5417,7 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {DEALLOCATE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {ETIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {DTIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
+  {CPU_TIME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
 
   /* F2003 */
   {C_LOC_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
