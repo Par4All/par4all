@@ -8272,6 +8272,8 @@ partial_redundancy_elimination             > MODULE.code
 \index{Unreachable Code Elimination}
 \index{If Simplification}
 \index{Loop Simplification}
+\index{Simplify Control}
+\index{Control Simplification}
 
 \begin{PipsPass}{suppress_dead_code}
 Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
@@ -8579,7 +8581,7 @@ Don't worry about the C-code output:
 the prettyprinter output do-loop as for-loop if the C-output is selected.
 The do-loop construct is interesting since the iteration set is computed
 at the loop entry (for example it is not sensible to the index
-modification from the inside of the loop) and this simplify abstract
+modification from the inside of the loop) and this simplifies abstract
 interpretation a lot.
 
 This transformation transform for example a
@@ -10194,7 +10196,7 @@ constant_array_scalarization > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Induction substitution}
+\subsection{Induction Variable Substitution}
 
 \begin{PipsPass}{induction_substitution}
 Induction substitution is the process of replacing scalar variables
@@ -10348,17 +10350,17 @@ The new type will be a typedef whose name is controlled by
 must exist in the symbol table.
 \end{PipsPass}
 
-This transformation loop over the symbol table, and for each of them which is
-a typedef, compare the local name to the property 
-\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure
-because there can be differents typedef with the same name in different
-compilation units,
-resulting in differents entries in the symbol table for a same local name. The
-return type can also be incoherent with the return statement, thus it's not sure
-to run it on a non void function.
+This transformation loops over the symbols in the symbol table, and
+for each of them which is a typedef, compare the local name to the
+property \PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This
+approach is unsafe because there can be differents typedef with the
+same name in different compilation units, resulting in differents
+entries in the symbol table for a same local name. The return type can
+also be incoherent with the return statement, thus it is not safe to
+run it on a non void function.
 
 However this pass has been created for special need in par4all, and considering
-previously described restrictions, it'll do the job !
+previously described restrictions, it does the job.
 
 \begin{PipsProp}{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}
 SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "P4A_accel_kernel_wrapper"
@@ -10671,12 +10673,12 @@ alias_check   > MODULE.code
         < ALL.code
 \end{PipsMake}
 
-This is a property to tell the alias propagation and alias checking phase to use
-information from MAIN program or not. If the current module is never
-called by the main program, we do no alias propagation and alias checking
-for this module if the property is on. However, we can
-do nothing with modules that have no callers at all, because this is a
-top-down approach !
+This is a property to control whether the alias propagation and alias checking
+phases use information from MAIN program or not. If the current
+module is never called by the main program, we do no alias propagation
+and alias checking for this module if the property is on. However, we
+can do nothing with modules that have no callers at all, because this
+is a top-down approach.
 
 \begin{PipsProp}{ALIAS_CHECKING_USING_MAIN_PROGRAM} 
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
@@ -11130,9 +11132,9 @@ PRAGMA_TYPE "expr"
 
 \begin{PipsPass}{omp_loop_parallel_threshold_set}
 The PIPS phase  OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET allows to add the OpenMP
-\verb|if| clause to all the OpenMP pragmas. Afterwodrs, the number of iteraion
-of the loop will be evaluated dynamically and compared to the defined threshold.
-The loop will be parallelized only if the threshold is reached.
+\verb|if| clause to all the OpenMP pragmas. Afterwards, the number of iterations
+in the loop is evaluated dynamically and compared to the defined threshold.
+The loop is parallelized only if the threshold is reached.
 \end{PipsPass}
 
 \begin{PipsMake}
