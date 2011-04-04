@@ -687,7 +687,7 @@ class p4a_processor(object):
             # Loop normalize to be GPU friendly, even if the step is already 1:
             LOOP_NORMALIZE_ONE_INCREMENT = True,
             # Arrays start at 0 in C, 1 in Fortran so the iteration loops:
-            LOOP_NORMALIZE_LOWER_BOUND = self.fortran == True ? 1 : 0,
+            LOOP_NORMALIZE_LOWER_BOUND = 1 if self.fortran else 0,
             # It is legal in the following by construction (...Hmmm to verify)
             LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
             concurrent=True)
