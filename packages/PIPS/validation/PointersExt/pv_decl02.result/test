@@ -1,3 +1,14 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int a[10];
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

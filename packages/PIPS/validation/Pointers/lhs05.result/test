@@ -1,14 +1,5 @@
 
-Parsed printed file for "lhs05"
-
-void lhs05()
-{
-   int x;
-
-   *&x = 1;
-}
-
-Proper effects for "lhs05"
+PROPER POINTER EFFECTS
 
 void lhs05()
 {
@@ -18,7 +9,7 @@ void lhs05()
    *&x = 1;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 void lhs05()

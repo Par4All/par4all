@@ -55,7 +55,7 @@ set formal_points_to_parameter(cell c)
 				     points_to_rank);
 	r = cell_reference(c);
 	e = reference_variable(r);
-	fpt = ultimate_type(entity_type(e));
+	fpt = basic_concrete_type(entity_type(e));
  	if(type_variable_p(fpt)){
 		/* We ignor dimensions for the being, descriptors are not
 		 * implemented yet...Amira Mensi*/
@@ -180,6 +180,9 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_derived:
+	pt_to = create_stub_points_to(c, upt);
+	pt_in = set_add_element(pt_in, pt_in,
+				(void*) pt_to );
 	break;
       case is_basic_bit:
 	break;
@@ -196,6 +199,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       default: pips_internal_error("unexpected tag %d", basic_tag(fpb));
+	break;
       }
     }
   }
@@ -231,12 +235,6 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
 
-  /*
-  set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE,
-						       module_name, TRUE));
-  module_stat = get_current_module_statement();
-  */
   t = entity_type(module);
 
   debug_on("POINTS_TO_DEBUG_LEVEL");
@@ -265,19 +263,6 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
 			       formal_points_to_parameter(c));
       }
     }
-    /*
-    functional f = type_functional(t);
-    params = functional_parameters(f);
-    FOREACH(PARAMETER, p, params){
-      dummy d = parameter_dummy(p);
-      if(dummy_identifier_p(d)){
-	entity e = dummy_identifier(d);
-	reference r = make_reference(e, NIL);
-	cell c = make_cell_reference(r);
-	pts_to_set = set_union(pts_to_set, pts_to_set,formal_points_to_parameter(c));
-      }
-    }
-    */
   }
   else
     pips_user_error("The module %s is not a function.\n", module_name);
@@ -285,15 +270,13 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   pt_list = set_to_sorted_list(pts_to_set,
 			       (int(*)
 				(const void*,const void*))
-			       compare_points_to_location);
+			       points_to_compare_cells);
   points_to_list summary_pts_to_list = make_points_to_list(pt_list);
   points_to_list_consistent_p(summary_pts_to_list);
   DB_PUT_MEMORY_RESOURCE
     (DBR_SUMMARY_POINTS_TO_LIST, module_name, summary_pts_to_list);
 
   reset_current_module_entity();
-  //reset_current_module_statement();
-
   debug_off();
 
   bool good_result_p = TRUE;

@@ -1,0 +1,23 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete total_preconditions
+create total_preconditions total_preconditions.c
+
+echo
+echo Initial code for "induction01"
+echo
+
+display PRINTED_FILE[induction01]
+
+
+
+
+echo
+echo Preconditions for "induction01"
+echo
+
+activate PRINT_CODE_TOTAL_PRECONDITIONS
+display PRINTED_FILE[induction01]
+
+
+close total_preconditions
+delete total_preconditions

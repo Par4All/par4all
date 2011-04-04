@@ -1,60 +1,31 @@
 
-Parsed code for "call12"
+PROPER POINTER EFFECTS
 
-void call12(int n, int m, int x[n][m])
+int main()
 {
+//             <    is written>: d1
+   int d1 = 10;
+//             <    is written>: d2
+   int d2 = 10;
+//             <    is written>: d3
+   int d3 = 10;
+//             <    is written>: d4
+   int d4 = 10;
+   int y[d1][d2][d3][d4];
    int i, j;
-
-   for (i = 0;i<n;i++)
-      for (j = 0;j<m;j++)
-         x[i][j] = 0;
-}
-
-Code for "call12"
-
-void call12(int n, int m, int x[n][m])
-{
-   int i, j;
-
-   for(i = 0; i <= n-1; i += 1)
-      for(j = 0; j <= m-1; j += 1)
-         x[i][j] = 0;
-}
-
-Proper effects for "call12"
-
-void call12(int n, int m, int x[n][m])
-{
-   int i, j;
-//             <    is read   >: n
+//             <    is read   >: d1
 //             <    is written>: i
 
-   for(i = 0; i <= n-1; i += 1)
-//             <    is read   >: m n
+   for(i = 0; i <= d1-1; i += 1)
+//             <    is read   >: d1 d2
 //             <    is written>: j
-      for(j = 0; j <= m-1; j += 1)
-//             <    is read   >: i j m n
-//             <    is written>: x[i][j]
-         x[i][j] = 0;
+      for(j = 0; j <= d2-1; j += 1)
+//             <may be written>: y[i][j][*][*]
+//             <    is read   >: d1 d2 d3 d4 i j
+         call12(d3, d4, y[i][j]);
 }
 
-POINTS TO
-
-//  {}
-void call12(int n, int m, int x[n][m])
-{
-//  points to = {}
-   int i, j;
-//  points to = {}
-
-   for(i = 0; i <= n-1; i += 1)
-//  points to = {}
-      for(j = 0; j <= m-1; j += 1)
-//  points to = {}
-         x[i][j] = 0;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

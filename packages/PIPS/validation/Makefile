@@ -127,7 +127,8 @@ mail-diff-validate: new-validate
 		-s "$(shell tail -1 SUMMARY.short)" \
 			$(EMAIL) < SUMMARY.short
 
-SUMUP	= pips_validation_summary.pl
+# how to summarize results
+SUMUP	= pips_validation_summary.pl --aggregate
 
 # generate summary header
 # hmmm... not sure that start date is before the validation

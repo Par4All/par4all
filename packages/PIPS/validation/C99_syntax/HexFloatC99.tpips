@@ -1,0 +1,21 @@
+setenv WS HexFloatC99
+delete $WS
+create $WS $WS.c
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   FALSE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+#setenv C_SYNTAX_DEBUG_LEVEL 7
+activate C_PARSER
+
+
+display PRINTED_FILE[main]
+
+close
+
+delete $WS
+
+quit
+

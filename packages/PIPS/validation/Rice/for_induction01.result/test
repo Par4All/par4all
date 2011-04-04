@@ -23,7 +23,7 @@ void for_induction01()
 
    for(i = 0; i <= 99; i += 1) {
       k = -(-2*i)+2;
-      x[k] = 0.;
+      x[-(-2*i+-2)] = 0.;
    }
 }
 
@@ -38,6 +38,6 @@ void for_induction01()
 #pragma omp parallel for private(k)
    for(i = 0; i <= 99; i += 1) {
       k = -(-2*i)+2;
-      x[k] = 0.;
+      x[-(-2*i+-2)] = 0.;
    }
 }

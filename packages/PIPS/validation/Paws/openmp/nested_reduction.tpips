@@ -1,0 +1,50 @@
+#
+delete nested_reduction
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested_reduction nested_reduction.c
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+setenv OPMIFY_CODE_DEBUG_LEVEL 9
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+#setproperty PRETTYPRINT_BLOCKS TRUE
+
+setproperty PRAGMA_TYPE "expr"
+
+apply SPLIT_INITIALIZATIONS(main)
+apply PRIVATIZE_MODULE(main)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+#display PARALLELPRINTED_FILE(main)
+#build PARALLELPRINTED_FILE(main)
+apply INTERNALIZE_PARALLEL_CODE
+#display PRINTED_FILE(main)
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
+
+#activate PRINT_CODE_CUMULATED_REDUCTIONS
+#display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c nested_reduction.database/Src/nested_reduction.c -o nested_reduction.database/Src/nested_reduction.o
+
+close
+delete nested_reduction
+quit
+# EOF

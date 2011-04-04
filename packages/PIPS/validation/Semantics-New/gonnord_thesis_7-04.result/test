@@ -1,0 +1,374 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(x,z) {}
+
+   int x, z;
+
+//  T(x,z) {x==0, z==0}
+
+   z = x = 0;
+
+//  T(x,z) {x#init<=x, z<=x, 2z<=x+1, 0<=z}
+
+   while (rand_b())
+
+//  T(x,z) {x#init<=x, x<=x#init+1, x#init+2z<=2x, z<=x, 0<=z}
+
+      if (rand_b()) {
+
+//  T() {2z<=x}
+
+         if (!(x>=2*z))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {x==x#init+1, 2z+1<=x}
+
+         x++;
+
+//  T(z) {z==z#init+1, 2z<=x+1}
+
+         z++;
+
+//  T() {0<=x, z<=x, 2z<=x+1, 0<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {}
+
+         if (!1)
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(z) {z==0}
+
+         z = 0;
+
+//  T() {z==0, 0<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(x,z) {}
+
+   int x, z;
+
+//  T(x,z) {x==0, z==0}
+
+   z = x = 0;
+
+//  T(x,z) {x#init<=x, 2z<=x, 0<=z}
+
+   while (rand_b())
+
+//  T(x,z) {x#init<=x, x<=x#init+1, 2z<=x, 0<=z}
+
+      if (rand_b()) {
+
+//  T() {2z+1<=x}
+
+         if (!(x>=2*z&&x+1>=2*z+2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {x==x#init+1, 2z+2<=x}
+
+         x++;
+
+//  T(z) {z==z#init+1, 2z<=x}
+
+         z++;
+
+//  T() {0<=x, z<=x, 2z<=x, 0<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  T() {}
+
+         if (!1)
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(z) {z==0}
+
+         z = 0;
+
+//  T() {z==0, 0<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {x==2z}
+
+         if (!(x>=2*z&&x+1<2*z+2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(x) {x==2z+1, x#init==2z}
+
+         x++;
+
+//  T(z) {x==2z-1, z==z#init+1}
+
+         z++;
+
+//  T() {x==2z-1, 1<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {x==2z-1, 1<=z}
+
+         if (!1)
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(z) {x==2z#init-1, z==0, 1<=z#init}
+
+         z = 0;
+
+//  T() {z==0, 1<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int x, z;
+
+//  P(x,z) {}
+
+   z = x = 0;
+
+//  P(x,z) {x==0, z==0}
+
+   while (rand_b())
+
+//  P(x,z) {z<=x, 2z<=x+1, 0<=z}
+
+      if (rand_b()) {
+
+//  P(x,z) {z<=x, 2z<=x+1, 0<=z}
+
+         if (!(x>=2*z))
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+            deadlock();
+
+//  P(x,z) {z<=x, 2z<=x, 0<=z}
+
+         x++;
+
+//  P(x,z) {z+1<=x, 2z+1<=x, 0<=z}
+
+         z++;
+
+//  P(x,z) {z<=x, 2z<=x+1, 1<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(x,z) {z<=x, 2z<=x+1, 0<=z}
+
+         if (!1)
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(x,z) {z<=x, 2z<=x+1, 0<=z}
+
+         z = 0;
+
+//  P(x,z) {z==0, 0<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int x, z;
+
+//  P(x,z) {}
+
+   z = x = 0;
+
+//  P(x,z) {x==0, z==0}
+
+   while (rand_b())
+
+//  P(x,z) {2z<=x, 0<=z}
+
+      if (rand_b()) {
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (!(x>=2*z&&x+1>=2*z+2))
+
+//  P(x,z) {x==2z, 0<=z}
+
+            deadlock();
+
+//  P(x,z) {2z+1<=x, 0<=z}
+
+         x++;
+
+//  P(x,z) {2z+2<=x, 0<=z}
+
+         z++;
+
+//  P(x,z) {2z<=x, 1<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else if (rand_b()) {
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (!1)
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         z = 0;
+
+//  P(x,z) {z==0, 0<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(x,z) {2z<=x, 0<=z}
+
+         if (!(x>=2*z&&x+1<2*z+2))
+
+//  P(x,z) {2z+1<=x, 0<=z}
+
+            deadlock();
+
+//  P(x,z) {x==2z, 0<=z}
+
+         x++;
+
+//  P(x,z) {x==2z+1, 0<=z}
+
+         z++;
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+         if (!1)
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(x,z) {x==2z-1, 1<=z}
+
+         z = 0;
+
+//  P(x,z) {z==0, 1<=x}
+
+         if (!(x>=2*z-1&&x>=0&&z>=0&&z<=x))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}

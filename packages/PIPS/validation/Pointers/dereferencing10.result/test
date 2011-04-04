@@ -1,5 +1,5 @@
 
-Proper effetcs for "dereferencing10"
+PROPER POINTER EFFECTS
 
 int main()
 {
@@ -24,8 +24,8 @@ int main()
    q_1 = &q_2;
 //             <    is written>: p
    p = &p_1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p p[0] p[0][0] q_3
+//             <    is written>: p[0][0][0]
    ***p = q_3;
    
    
@@ -34,7 +34,7 @@ int main()
    return 0;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

@@ -1,6 +1,8 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
-   // BEGIN BLOCK
    int a, b, c, d;
    int *pa, *pb, *pc, *pd;
    int **ppa, **ppb, **ppc, **ppd;
@@ -17,63 +19,62 @@ int main()
    pa = &a;
 //             <    is written>: ppa
    ppa = &pa;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppa
+//             <    is written>: ppa[0]
    *ppa = &b;
 //             <    is written>: pb
 
    pb = &b;
 //             <    is written>: ppb
    ppb = &pb;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppb
+//             <    is written>: ppb[0]
    *ppb = &a;
 //             <    is written>: pc
 
    pc = &c;
 //             <    is written>: ppc
    ppc = &pc;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppc
+//             <    is written>: ppc[0]
    *ppc = &a;
 //             <    is written>: pd
 
    pd = &d;
 //             <    is written>: ppd
    ppd = &pd;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppd
+//             <    is written>: ppd[0]
    *ppd = &c;
 //             <    is read   >: pd
 //             <    is written>: pc
 
    pc = pd;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppc
+//             <    is written>: ppc[0]
 
    *ppc = &b;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pc ppa
+//             <    is written>: ppa[0]
 
    *ppa = pc;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppd ppd[0]
 //             <    is written>: pa
 
    pa = *ppd;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: ppa ppd ppd[0]
+//             <    is written>: ppa[0]
 
    *ppa = *ppd;
 
    return 0;
-   // END BLOCK
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
-//  points to = {}
-   // BEGIN BLOCK
 //  points to = {}
    int a, b, c, d;
 //  points to = {}
@@ -207,5 +208,4 @@ int main()
 //   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
 
    return 0;
-   // END BLOCK
 }

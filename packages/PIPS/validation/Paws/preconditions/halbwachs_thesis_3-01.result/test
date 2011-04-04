@@ -1,0 +1,72 @@
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   i = j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+   while (flip())
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+      if (flip()) {
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+         if (!(i<=100))
+
+//  P(i,j) {101<=i, i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=100, 2j<=i, i+2j<=204, 0<=j}
+
+         i += 4;
+
+//  P(i,j) {i<=104, 2j+4<=i, i+2j<=208, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+         if (!(i<=100))
+
+//  P(i,j) {101<=i, i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=100, 2j<=i, i+2j<=204, 0<=j}
+
+         i += 2;
+
+//  P(i,j) {i<=102, 2j+2<=i, i+2j<=206, 0<=j}
+
+         j++;
+
+//  P(i,j) {i<=102, 2j<=i, i+2j<=208, 1<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}

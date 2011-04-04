@@ -1,5 +1,5 @@
 
-Proper effects for "decl01"
+PROPER POINTER EFFECTS
 
 int decl01()
 {
@@ -20,7 +20,7 @@ int decl01()
    return 0;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int decl01()

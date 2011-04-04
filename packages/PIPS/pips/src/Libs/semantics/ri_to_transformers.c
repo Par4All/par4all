@@ -1848,12 +1848,32 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
 
   pips_assert("2 args to assign", CDR(CDR(args))==NIL);
 
-  /* The lhs must be a scalar reference to perform an interesting analysis */
+  /* The lhs must be a scalar reference to perform an interesting
+     analysis in Fortran. In C, the condition can be relaxed to take
+     into account side effects in sub-expressions. */
   if(syntax_reference_p(slhs)) {
     reference rlhs = syntax_reference(slhs);
     if(ENDP(reference_indices(rlhs))) {
       entity v = reference_variable(rlhs);
       tf = any_scalar_assign_to_transformer(v, rhs, ef, pre);
+    }
+    else {
+      /* check scalar side effects in the subscript expressions and
+	 in the rhs (specific to C) */
+      // FI: I assume that the value is never useful because of the
+      // above condition
+      transformer st // subscript transformer
+	= generic_reference_to_transformer(entity_undefined, rlhs, pre, FALSE);
+      /* FI: not clear why this happens in Fortran and not in C */
+      if(!transformer_undefined_p(st)) {
+	transformer post = transformer_apply(st, pre);
+	transformer npre = transformer_range(post);
+	transformer rt = safe_expression_to_transformer(rhs, npre); // rhs
+	tf = transformer_combine(st, rt); // st is absorbed into tf
+	free_transformer(rt);
+	free_transformer(npre);
+	free_transformer(post);
+      }
     }
   }
 

@@ -56,6 +56,7 @@ typedef dg_vertex_label vertex_label;
 /* */
 #include "ricedg.h"
 #include "transformations.h"
+#include "properties.h"
 
 static graph dependence_graph;
 
@@ -74,6 +75,17 @@ static hash_table statements_use_def_dependence;
 /* Define a static stack and related functions to remember the current
    statement for build_statement_to_statement_father_mapping(): */
 DEFINE_LOCAL_STACK(current_statement, statement)
+
+
+/*
+ * A string list of user functions that we want to preserve from elimination
+ */
+static list keeped_functions = 0;
+
+/*
+ * A string list of user functions prefix that we want to preserve from elimination
+ */
+static list keeped_functions_prefix = 0;
 
 
 void use_def_elimination_error_handler()
@@ -370,29 +382,61 @@ static bool entity_local_variable_p(entity var, entity func) {
       local=true;
     }
   } else if( storage_formal_p(entity_storage(var))) {
-    /* Formal parameter are local to module... except for Fortran !! */
+    /* Formal parameter are local to module only for scalar and not for Fortran !! */
     entity module = get_current_module_entity();
     /* it might be better to check the parameter passing mode itself,
        via the module type */
     bool fortran_p = fortran_module_p(module);
+    bool scalar_p = entity_scalar_p(var);
 
     formal r = storage_formal(entity_storage(var));
-    if(!fortran_p && same_entity_p(func,formal_function(r))) {
+    if(!fortran_p && scalar_p && same_entity_p(func,formal_function(r))) {
       local=true;
     }
   }
   return local;
 }
 
-static void
-use_def_deal_if_useful(statement s)
-{
+
+static bool match_call_to_user_function(call c, bool *user_function_found) {
+  string match_name = entity_local_name(call_function(c));
+
+  FOREACH(STRING, func, keeped_functions) {
+    if(strcmp(match_name,func)==0) {
+      *user_function_found = TRUE;
+    }
+  }
+
+  FOREACH(STRING, func_prefix, keeped_functions_prefix) {
+    if(strncmp(match_name,func_prefix,strlen(func_prefix))==0) {
+      *user_function_found = TRUE;
+    }
+  }
+
+
+  return !user_function_found;
+}
+
+static bool statement_call_a_keep_function_p( statement s ) {
+  bool user_function_found = FALSE;
+  if(statement_call_p(s) || statement_expression_p(s)) {
+    gen_context_recurse(s,&user_function_found,call_domain, match_call_to_user_function,gen_true);
+  }
+
+  /* FIXME : LOOP header && so one... */
+
+  return user_function_found;
+}
+
+
+static void use_def_deal_if_useful(statement s) {
    bool this_statement_has_an_io_effect;
    bool this_statement_writes_a_procedure_argument;
    bool this_statement_is_a_format;
    bool this_statement_is_an_unstructured_test = FALSE;
    bool this_statement_is_a_c_return;
    bool outside_effect_p = FALSE;
+   bool this_statement_call_a_user_function;
 
    ifdebug(5) {
       int debugLevel = get_debug_level();
@@ -411,10 +455,11 @@ use_def_deal_if_useful(statement s)
    /* The possible reasons to have useful code: */
    /* - the statement does an I/O: */
    this_statement_has_an_io_effect = statement_io_effect_p(s);
-   /* - the statement writes a procedure argument or the return
+
+  /* - the statement writes a procedure argument or the return
       variable of the function, so the value may be used by another
       procedure: */
-   /* Regions out should be more precise: */
+    /* Regions out should be more precise: */
    this_statement_writes_a_procedure_argument =
        statement_has_a_formal_argument_write_effect_p(s);
    
@@ -451,6 +496,8 @@ use_def_deal_if_useful(statement s)
     }
   }
 
+   this_statement_call_a_user_function = statement_call_a_keep_function_p(s);
+
 
    ifdebug(6) {
       if (outside_effect_p)
@@ -466,13 +513,16 @@ use_def_deal_if_useful(statement s)
       if (this_statement_is_a_c_return)
         pips_debug(6, "Statement %p is a C return.\n", s);
    }
+
+
    
    if (this_statement_has_an_io_effect
        || outside_effect_p
        || this_statement_writes_a_procedure_argument
        || this_statement_is_a_format
        || this_statement_is_an_unstructured_test
-       || this_statement_is_a_c_return)
+       || this_statement_is_a_c_return
+       || this_statement_call_a_user_function)
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
@@ -596,6 +646,19 @@ bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
 
+
+   /*
+    * For C code, this pass requires that effects are calculated with property
+    * MEMORY_EFFECTS_ONLY set to FALSE because we need that the DG includes arcs
+    * for declarations as these latter are separate statements now.
+    */
+   bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
+   if(memory_effects_only_p) {
+     pips_user_warning("Dead_code_elimination should not be run with "
+                       "MEMORY_EFFECTS_ONLY set to TRUE ! Aborting...\n");
+     return FALSE; // Abort pass
+   }
+
    /* Get the true ressource, not a copy. */
    module_statement =
       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
@@ -621,6 +684,7 @@ bool dead_code_elimination_on_module(char * module_name)
 						module_name,
 						TRUE)); 
 
+
    set_current_module_statement(module_statement);
    set_current_module_entity(module_name_to_entity(module_name));
 
@@ -628,7 +692,20 @@ bool dead_code_elimination_on_module(char * module_name)
 
    debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
 
+   /* DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS is a property that can be defined
+    * by the user for telling that a space separated list of functions has to
+    * be considered as important and we have to keep them
+    */
+   keeped_functions = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS")," ");
+   keeped_functions_prefix = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX")," ");
+
    use_def_elimination_on_a_statement(module_statement);
+
+   gen_map(free,keeped_functions);gen_free_list(keeped_functions);
+   keeped_functions = 0;
+   gen_map(free,keeped_functions_prefix);gen_free_list(keeped_functions_prefix);
+   keeped_functions_prefix = 0;
+
 
    /* Reorder the module, because some statements have been deleted.
       Well, the order on the remaining statements should be the same,
@@ -638,11 +715,22 @@ bool dead_code_elimination_on_module(char * module_name)
 
    pips_debug(2, "done for %s\n", module_name);
 
+   /* Apply clean declarations ! */
+   set_cumulated_rw_effects(
+       (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
+                                                 module_name,
+                                                 TRUE));
+   module_clean_declarations(get_current_module_entity(),
+                             get_current_module_statement());
+
+
+
    debug_off();
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
 
    reset_proper_rw_effects();
+   reset_cumulated_rw_effects();
    reset_current_module_statement();
    reset_current_module_entity();
    reset_ordering_to_statement();

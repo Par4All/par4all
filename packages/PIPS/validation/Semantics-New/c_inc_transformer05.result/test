@@ -1,0 +1,24 @@
+
+//  T(main) {j==main-3}
+
+int main(int j, char **unused)
+{
+
+//  T() {}
+
+   double A[10];
+
+//  T(k) {k==2}
+
+   int k = 2;
+
+//  T(k) {k==k#init+1}
+
+
+   A[1] = (double) k++;
+
+//  T(main) {j+k==main}
+
+   return j+k;
+}
+

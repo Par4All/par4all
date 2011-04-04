@@ -1,22 +1,6 @@
-void call18(int i, ...)
-{
-//             <    is read   >: i
-//             <    is written>: i
-   i++;
-//             <    is read   >: i
-   if (i) {
-      va_list pa;
-      int r;
-//             <    is read   >: pa
-//             <    is written>: pa
 
-      va_start(pa, fmt);
-//             <may be written>: pa
-//             <    is read   >: pa
+PROPER POINTER EFFECTS
 
-      va_end(pa);
-   }
-}
 int main()
 {
 //             <    is written>: i
@@ -30,27 +14,8 @@ int main()
    call18(i, i, j, k, 0);
 }
 
-POINTS TO
+POINTS-TO
 
-//  {}
-void call18(int i, ...)
-{
-//  points to = {}
-   i++;
-//  points to = {}
-   if (i) {
-//  points to = {}
-      va_list pa;
-//  points to = {}
-      int r;
-//  points to = {}
-
-      va_start(pa, fmt);
-//  points to = {}
-
-      va_end(pa);
-   }
-}
 //  {}
 int main()
 {

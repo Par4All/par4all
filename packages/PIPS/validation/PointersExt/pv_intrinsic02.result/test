@@ -1,3 +1,21 @@
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   char *end;
+   long int li;
+//             <may be read   >: end[*]
+//             <may be written>: end[*]
+//             <    is read   >: end
+//             <    is written>: end li
+
+   li = strtol("32445667 is a number", &end, 0);
+   return 0;
+}
+
+POINTS-TO
+
 //  {}
 int main()
 {

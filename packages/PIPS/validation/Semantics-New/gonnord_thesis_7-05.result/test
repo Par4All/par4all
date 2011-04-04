@@ -1,0 +1,349 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(d,s,t) {}
+
+   int s, t, d;
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   s = t = d = 0;
+
+//  T(d,s,t) {d#init<=d, s<=4d, d<=s+4t, 0<=s, s<=4, 0<=t, t#init<=t}
+
+   while (rand_b())
+
+//  T(d,s,t) {d+t==d#init+t#init+1, 0<=d, d<=d#init+1, 4d#init+s<=4d,
+//    d<=s+4t, 0<=s, 0<=t}
+
+      if (rand_b()) {
+
+//  T() {s<=3}
+
+         if (!(s<=3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(d) {d==d#init+1, s<=3}
+
+         d++;
+
+//  T(s) {s==s#init+1, s<=4}
+
+         s++;
+
+//  T() {0<=d, d<=s+4t, 0<=s, s<=4, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {}
+
+         if (!1)
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==0}
+
+         s = 0;
+
+//  T(t) {s==0, t==t#init+1}
+
+         t++;
+
+//  T() {s==0, 0<=d, d<=4t, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(d,s,t) {}
+
+   int s, t, d;
+
+//  T(d,s,t) {d==0, s==0, t==0}
+
+   s = t = d = 0;
+
+//  T(d,s,t) {d+s#init+4t#init==d#init+s+4t, s+4t==d, 0<=s, s<=3,
+//    s#init+3t#init<=s+3t, 0<=t, t#init<=t}
+
+   while (rand_b())
+
+//  T(d,s,t) {d==d#init+1, s+4t==s#init+4t#init+1, 0<=d, d<=s+4t,
+//    0<=s, s<=s#init+1, s+3s#init<=9, s#init+1<=s+4t}
+
+      if (rand_b()) {
+
+//  T() {s<=2}
+
+         if (!(s<=2))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(d) {d==d#init+1, s<=2}
+
+         d++;
+
+//  T(s) {s==s#init+1, s<=3}
+
+         s++;
+
+//  T() {0<=d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {s==3}
+
+         if (!(s==3))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(d) {d==d#init+1, s==3}
+
+         d++;
+
+//  T(s) {s==4, s#init==3}
+
+         s++;
+
+//  T() {s==4, 0<=d, d<=4t+4, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  T() {0==-1}
+
+            checking_error();
+
+//  T() {s==4, 0<=d, d<=4t+4, 0<=t}
+
+         if (!1)
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(s) {s==0, s#init==4, 0<=d, d<=4t+4, 0<=t}
+
+         s = 0;
+
+//  T(t) {s==0, t==t#init+1, 0<=d, d<=4t, 1<=t}
+
+         t++;
+
+//  T() {s==0, 0<=d, d<=4t, 1<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int s, t, d;
+
+//  P(d,s,t) {}
+
+   s = t = d = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+   while (rand_b())
+
+//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=4, 0<=t}
+
+      if (rand_b()) {
+
+//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=4, 0<=t}
+
+         if (!(s<=3))
+
+//  P(d,s,t) {s==4, 1<=d, d<=4t+4, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=3, 0<=t}
+
+         d++;
+
+//  P(d,s,t) {s+4<=4d, d<=s+4t+1, 0<=s, s<=3, 0<=t}
+
+         s++;
+
+//  P(d,s,t) {s+3<=4d, d<=s+4t, 1<=s, s<=4, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=4, 0<=t}
+
+         if (!1)
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t) {s<=4d, d<=s+4t, 0<=s, s<=4, 0<=t}
+
+         s = 0;
+
+//  P(d,s,t) {s==0, 0<=d, 0<=3d+4t, d<=4t+4, 0<=t}
+
+         t++;
+
+//  P(d,s,t) {s==0, 0<=d, 4<=3d+4t, d<=4t, 1<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int s, t, d;
+
+//  P(d,s,t) {}
+
+   s = t = d = 0;
+
+//  P(d,s,t) {d==0, s==0, t==0}
+
+   while (rand_b())
+
+//  P(d,s,t) {s+4t==d, 0<=s, s<=3, 0<=t}
+
+      if (rand_b()) {
+
+//  P(d,s,t) {s+4t==d, 0<=s, s<=3, 0<=t}
+
+         if (!(s<=2))
+
+//  P(d,s,t) {d==4t+3, s==3, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t) {s+4t==d, 0<=s, s<=2, 0<=t}
+
+         d++;
+
+//  P(d,s,t) {s+4t==d-1, 0<=s, s<=2, 0<=t}
+
+         s++;
+
+//  P(d,s,t) {s+4t==d, 1<=s, s<=3, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(d,s,t) {s+4t==d, 0<=s, s<=3, 0<=t}
+
+         if (!(s==3))
+
+//  P(d,s,t) {s+4t==d, 0<=s, s<=2, 0<=t}
+
+            deadlock();
+
+//  P(d,s,t) {d==4t+3, s==3, 0<=t}
+
+         d++;
+
+//  P(d,s,t) {d==4t+4, s==3, 0<=t}
+
+         s++;
+
+//  P(d,s,t) {d==4t+4, s==4, 0<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  P() {0==-1}
+
+            checking_error();
+
+//  P(d,s,t) {d==4t+4, s==4, 0<=t}
+
+         if (!1)
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(d,s,t) {d==4t+4, s==4, 0<=t}
+
+         s = 0;
+
+//  P(d,s,t) {d==4t+4, s==0, 0<=t}
+
+         t++;
+
+//  P(d,s,t) {d==4t, s==0, 1<=t}
+
+         if (!(t>=0&&0<=s&&s<=4&&0<=d&&d<=4*t+s))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}

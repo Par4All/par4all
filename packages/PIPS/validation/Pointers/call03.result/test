@@ -1,58 +1,14 @@
 
-Parsed code for "call03"
+PROPER POINTER EFFECTS
 
-void call03()
+int main()
 {
-   *pi = 1;
-   pi++;
-   q->one = 1;
-   (q->two)[4] = 2;
+//             <    is read   >: pi q
+//             <    is written>: pi pi[0] q[0].one q[0].two[4]
+   call03();
 }
 
-Code for "call03"
-
-void call03()
-{
-   *pi = 1;
-   pi++;
-   q->one = 1;
-   (q->two)[4] = 2;
-}
-
-Proper effects for "call03"
-
-void call03()
-{
-//             <    is read   >: pi
-//             <    is written>: pi[0]
-   *pi = 1;
-//             <    is read   >: pi
-//             <    is written>: pi
-   pi++;
-//             <    is read   >: q
-//             <    is written>: q[0].one
-   q->one = 1;
-//             <    is read   >: q
-//             <    is written>: q[0].two[4]
-   (q->two)[4] = 2;
-}
-
-POINTS TO
-
-//  {}
-void call03()
-{
-//  points to = {}
-   *pi = 1;
-//  points to = {}
-   pi++;
-//  points to = {}
-   q->one = 1;
-//  points to = {}
-   (q->two)[4] = 2;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

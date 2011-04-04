@@ -1,86 +1,5 @@
 
-Parsed code for "call02"
-
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-   y[i] = 0;
-   p->one = 1;
-   (p->two)[j] = 2.;
-   *q[i] = 3;
-}
-
-Code for "call02"
-
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-   y[i] = 0;
-   p->one = 1;
-   (p->two)[j] = 2.;
-   *q[i] = 3;
-}
-
-Proper effects for "call02"
-
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-//             <    is read   >: j
-//             <    is written>: i
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-//             <    is read   >: i
-//             <    is written>: y[i]
-   y[i] = 0;
-//             <    is read   >: p
-//             <    is written>: p[0].one
-   p->one = 1;
-//             <    is read   >: j p
-//             <    is written>: p[0].two[j]
-   (p->two)[j] = 2.;
-//             <    is read   >: i q[i]
-//             <    is written>: q[i][0]
-   *q[i] = 3;
-}
-
-Cumulated effects for "call02"
-
-//             <may be read   >: q[*]
-//             <may be written>: p[0].two[*] q[*][0] y[*]
-//             <    is read   >: i j p
-//             <    is written>: p[0].one
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-//             <    is read   >: j
-//             <    is written>: i
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-//             <may be written>: y[*]
-//             <    is read   >: i
-   y[i] = 0;
-//             <    is read   >: p
-//             <    is written>: p[0].one
-   p->one = 1;
-//             <may be written>: p[0].two[*]
-//             <    is read   >: j p
-   (p->two)[j] = 2.;
-//             <may be read   >: q[*]
-//             <may be written>: q[*][0]
-//             <    is read   >: i
-   *q[i] = 3;
-}
-
-Cumulated effects for "main"
+PROPER POINTER EFFECTS
 
 int main()
 {
@@ -99,27 +18,7 @@ int main()
    call02(a, b, x, ap, sp);
 }
 
-POINTS TO
-
-//  {(p,_p_1,-Exact-)}
-void call02(int i, int j, int y[10], int *q[10], tf_t *p)
-{
-//  {(p,_p_1,-Exact-)}
-   /* i can be modified locally, but it won't show in the summary
-        effects... which creates a problem for transformer and
-        precondition computation. */
-   i = j+1;
-//  {(p,_p_1,-Exact-)}
-   y[i] = 0;
-//  {(p,_p_1,-Exact-)}
-   p->one = 1;
-//  {(p,_p_1,-Exact-)}
-   (p->two)[j] = 2.;
-//  {(p,_p_1,-Exact-)}
-   *q[i] = 3;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

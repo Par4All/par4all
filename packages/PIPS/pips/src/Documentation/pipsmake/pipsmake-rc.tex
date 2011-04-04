@@ -5169,7 +5169,16 @@ ABSTRACT_HEAP_LOCATIONS "unique"
 % \end{PipsProp}
 % }
 
-
+The property \PipsPropRef{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING}
+specifies that we are dereferencing an uninitialized pointer. The safe
+value is {\tt TRUE} and it stops the analysis with a
+pips\_user\_error. However the default value is {\tt FALSE} which 
+arises a pips\_user\_warning and we continue the analysis, it's due to
+dead code: we don't have to stop the analysis if a dereferencing will never
+be executed.
+\begin{PipsProp}{POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING}
+POINTS_TO_UNINITIALIZED_POINTER_DEREFERENCING FALSE
+\end{PipsProp}
 
 \subsection{Menu for Alias Views}
 
@@ -8365,9 +8374,11 @@ required.
 This pass was extended to C by Mehdi \textsc{Amini} in 2009-2010, but
 it is not yet stabilized. For C code, this pass requires that effects
 are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
-\verb/FALSE/.
+\verb/FALSE/ because we need that the DG includes arcs for declarations as these
+latter are separate statements now.
 
-Known bug: FORMAT are found useless and eliminated.
+\PipsPropRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
+cumulated effects are needed.
 
 Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} p. 595,
 and~\cite{Much97} p. 592, a variable is {\it dead} if it is not used
@@ -8381,6 +8392,21 @@ fact, the {\em Use-def elimination} pass in PIPS is a {\em Dead code
 Section~\ref{sec:dead-code-elimination}) does not have a standard
 name. It could be {\em If and loop simplification} pass.
 
+The following properties are intended to force some functions to be kept by the
+algorithm, \PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space 
+separated list of function names while 
+\PipsPropRef{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS} expect a space separated list
+of prefix for function name.
+
+\begin{PipsProp}{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS}
+DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS ""
+\end{PipsProp}
+
+\begin{PipsProp}{DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX}
+DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX ""
+\end{PipsProp}
+
+
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8389,6 +8415,7 @@ dead_code_elimination          > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
+        < MODULE.cumulated_effects
         < MODULE.chains
 \end{PipsMake}
 
@@ -8925,6 +8952,21 @@ current module) must be used for each FSMized statements.
 \begin{PipsProp}{FSMIZE_WITH_GLOBAL_VARIABLE}
 FSMIZE_WITH_GLOBAL_VARIABLE FALSE
 \end{PipsProp}
+
+\subsection{Control Counters}
+\index{Control Counters}
+
+A code instrumentation that adds local integer counters in tests and loops
+to know how many times a path is taken. This transformation may
+help some semantical analyses.
+
+\begin{PipsMake}
+alias add_control_counters 'Control counters
+
+add_control_counters    > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
 
 %\subsection{Declaration Common Addition}
 %\label{subsection-declaration-common-addition}

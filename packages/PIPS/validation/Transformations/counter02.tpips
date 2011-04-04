@@ -1,0 +1,7 @@
+delete counter02
+create counter02 counter02.f
+display PRINTED_FILE
+apply ADD_CONTROL_COUNTERS
+display PRINTED_FILE
+close
+delete counter02

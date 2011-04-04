@@ -8,6 +8,11 @@ set PRETTYPRINT_ALL_LABELS TRUE
 set PRETTYPRINT_EMPTY_BLOCKS TRUE
 set PRETTYPRINT_UNSTRUCTURED TRUE
 
+
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 activate PRINT_CODE_PRECONDITIONS
 
 # Because an intraprocedural mode is chosen, the lack of calls is not

@@ -1,21 +1,5 @@
 
-Parsed printed file for "assign04"
-
-void assign04()
-{
-   int ***p;
-   int **q;
-   int *r;
-   int i;
-
-   r = &i;
-   //q = &r;
-   p = &q;
-   **p = r;
-   ***p = 0;
-}
-
-Proper effetcs for "assign04"
+PROPER EFFECTS
 
 void assign04()
 {
@@ -29,12 +13,25 @@ void assign04()
 //             <    is written>: p
    //q = &r;
    p = &q;
-//             <    is read   >: p p[0] r
-//             <    is written>: p[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    **p = r;
-//             <    is read   >: p p[0] p[0][0]
-//             <    is written>: p[0][0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    ***p = 0;
+}
+void foo()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   assign04();
+}
+
+PROPER POINTER EFFECTS
+
+void foo()
+{
+   assign04();
 }
 
 POINTS TO
@@ -65,8 +62,13 @@ void assign04()
 //  {(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,
 //   -Exact-)}
    **p = r;
-//  {(*ANY_MODULE*:*ANYWHERE*_b0,*ANY_MODULE*:*ANYWHERE*_b0,
-//   -Exact-);(p,q,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,
-//   i,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,q,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(r,i,-Exact-)}
    ***p = 0;
+}
+//  {}
+void foo()
+{
+//  points to = {}
+   assign04();
 }

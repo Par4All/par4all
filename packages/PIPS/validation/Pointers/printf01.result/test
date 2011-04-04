@@ -1,12 +1,6 @@
-int main()
-{
-   int i = 5;
-   printf("i=%d", i);
-}
-//             <may be read   >: stdout[0]
-//             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+PROPER POINTER EFFECTS
+
 int main()
 {
 //             <    is written>: i
@@ -18,7 +12,7 @@ int main()
    printf("i=%d", i);
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

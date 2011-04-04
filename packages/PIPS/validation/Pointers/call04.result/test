@@ -1,43 +1,20 @@
 
-Parsed code for "call04"
+PROPER POINTER EFFECTS
 
-void call04(int n, int m, int x[n][m])
+int main()
 {
-   int i, j;
+//             <    is written>: d1
+   int d1 = 10;
+//             <    is written>: d2
+   int d2 = 10;
+   int y[d1][d2];
+//             <may be written>: y[*][*]
+//             <    is read   >: d1 d2
 
-   for (i = 0;i<n;i++)
-      for (j = 0;j<m;j++)
-         x[i][j] = 0;
+   call04(d1, d2, y);
 }
 
-Code for "call04"
-
-void call04(int n, int m, int x[n][m])
-{
-   int i, j;
-
-   for(i = 0; i <= n-1; i += 1)
-      for(j = 0; j <= m-1; j += 1)
-         x[i][j] = 0;
-}
-
-POINTS TO
-
-//  {}
-void call04(int n, int m, int x[n][m])
-{
-//  points to = {}
-   int i, j;
-//  points to = {}
-
-   for(i = 0; i <= n-1; i += 1)
-//  points to = {}
-      for(j = 0; j <= m-1; j += 1)
-//  points to = {}
-         x[i][j] = 0;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

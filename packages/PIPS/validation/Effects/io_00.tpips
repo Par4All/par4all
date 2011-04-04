@@ -1,0 +1,9 @@
+delete io_00
+setproperty ABORT_ON_USER_ERROR TRUE
+create io_00 io_00.c
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+close
+delete io_00
+quit

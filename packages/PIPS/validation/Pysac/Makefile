@@ -8,5 +8,5 @@ include ../validate.mk
 
 clean: local-clean
 local-clean:
-	$(RM) -r d.out .PYPS*.tmp .w0.tmp .loop_tiling.tmp .exception.tmp .effects.tmp \
+	$(RM) -r d.out .w0.tmp .loop_tiling.tmp .exception.tmp .effects.tmp \
 	PYPS[-_a-zA-Z0-9][-_a-zA-Z0-9][-_a-zA-Z0-9][-_a-zA-Z0-9][-_a-zA-Z0-9][-_a-zA-Z0-9]

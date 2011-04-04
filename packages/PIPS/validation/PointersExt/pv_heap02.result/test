@@ -1,3 +1,6 @@
+
+PROPER POINTER EFFECTS
+
 int main()
 {
    int *p, *q, *r;
@@ -13,7 +16,9 @@ int main()
    s = calloc(1, 15);
    return 0;
 }
-POINTS TO
+
+POINTS-TO
+
 //  {}
 int main()
 {
@@ -31,20 +36,18 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
    p = (int *) calloc(2, sizeof(int));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   q = (int *) calloc(2, sizeof(a));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
-//   -Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   r = (int *) calloc(1, sizeof(int));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
-//   -Exact-);(r,*ANY_MODULE*:*HEAP*,-Exact-);(s,
-//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   s = calloc(1, 15);
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-);(q,*ANY_MODULE*:*HEAP*,
-//   -Exact-);(r,*ANY_MODULE*:*HEAP*,-Exact-);(s,*ANY_MODULE*:*HEAP*,
+//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b1,
 //   -Exact-)}
+   q = (int *) calloc(2, sizeof(a));
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   r = (int *) calloc(1, sizeof(int));
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,*HEAP*_l_10,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   s = calloc(1, 15);
+//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_9,-Exact-);(r,*HEAP*_l_10,
+//   -Exact-);(s,*HEAP*_l_11,-Exact-)}
    return 0;
 }

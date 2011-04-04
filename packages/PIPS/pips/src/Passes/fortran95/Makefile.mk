@@ -53,7 +53,7 @@ CONFIGURE_OPT 	= --disable-bootstrap --enable-languages=fortran \
 	--enable-stage1-languages=fortran --disable-libssp --disable-libada \
 	--disable-libgomp --disable-stage1-checking --without-ppl \
 	--without-cloog --disable-multilib --disable-checking \
-	--with-build-config='bootstrap-O1' CFLAGS=""
+	--with-build-config='bootstrap-O1' CFLAGS="-O0 -g"
 
 #file to flag if sources have been patched
 PATCHED = $(SRC.d)/.patched
@@ -157,7 +157,7 @@ $(BUILD.d)/.configure-fortran: $(BUILD.d)/.stage1
 $(BUILD.d)/.stage1: $(BUILD.d)/.configure-core
 	$(MAKE) -C $(BUILD.d) \
 		STAGE1_LANGUAGES=fortran LANGUAGES=fortran \
-	        STAGE1_CFLAGS=-O1 CFLAGS=-O1 \
+	        STAGE1_CFLAGS="-O1 -g" CFLAGS="-O1 -g" \
 	        maybe-all-build-fixincludes \
 	        maybe-all-libdecnumber \
 	        maybe-all-libcpp

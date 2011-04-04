@@ -1,15 +1,5 @@
 
-Parsed printed file for "dereferencing04"
-
-void dereferencing04()
-{
-   double *p;
-   double *q;
-   double *r;
-   *(p+q-r) = 0.;
-}
-
-Proper pointer effects for "dereferencing04"
+PROPER POINTER EFFECTS
 
 void dereferencing04()
 {
@@ -21,7 +11,7 @@ void dereferencing04()
    *(p+q-r) = 0.;
 }
 
-POINTS TO
+POINTS-TO
 
 //  {}
 void dereferencing04()

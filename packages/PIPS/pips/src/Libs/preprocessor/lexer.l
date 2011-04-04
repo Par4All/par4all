@@ -235,8 +235,10 @@ exponent ([eE][\+\-]?{decdigit}+)
 fraction (\.{decdigit}+)
 decfloat (({intnum}?{fraction})|({intnum}{exponent})|({intnum}?{fraction}{exponent})|({intnum}\.)|({intnum}\.{exponent}))
 hexfraction (({hexdigit}*"."{hexdigit}+)|({hexdigit}+))
-binexponent ([pP]["+""-"]?{decdigit}+)
-hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent}))
+binexponent ([pP][\+\-]?{decdigit}+)
+floatonlynum ({decfloat}{floatsuffix}?)
+floatexponent ([pP][\+\-]?{floatonlynum})
+hexfloat (({hexprefix}{hexfraction}{binexponent})|({hexprefix}{hexdigit}+{binexponent})|({hexprefix}{hexdigit}{floatexponent}))
 floatsuffix [fFlL]
 complexsuffix [ij]
 floatnum (({decfloat}|{hexfloat}){floatsuffix}?)

@@ -1,0 +1,443 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(l,t,u,v) {}
+
+   int u, l, t, v;
+
+//  T(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+
+   u = l = t = v = 0;
+
+//  T(l,t,u,v) {l#init==0, t#init==0, u#init==0, v#init==0, 0<=l,
+//    l<=t, l+u<=t+v, v<=l, v<=u, 0<=v}
+
+   while (1) {
+
+//  T(u,v) {u==0, v==0}
+
+      u = v = 0;
+
+//  T(l,t,u,v) {l#init+v==l, t#init+u==t, u#init==0, v#init==0,
+//    l#init<=l, l+t#init<=l#init+t, u<=59}
+
+      while (u<60)
+
+//  T(l,t,u,v) {l+v#init==l#init+v, t+u#init==t#init+u, l#init<=l,
+//    l+t#init<=l#init+t, u#init<=59}
+
+         if (1) {
+
+//  T(l,t,u,v) {l+u#init==l#init+u, t+u#init==t#init+u,
+//    u+v#init==u#init+v, u<=59, u#init<=u, u#init<=59, v<=9,
+//    v#init<=9}
+
+            while (u<60&&v<=9&&alea())
+
+//  T(l,t,u,v) {l==l#init+1, t==t#init+1, u==u#init+1, v==v#init+1,
+//    u<=60, v<=10}
+
+               l++, v++, u++, t++;
+
+//  T(t,u) {t+u#init==t#init+u, t#init<=t, u<=59, u#init<=59}
+
+
+            while (u<60&&alea())
+
+//  T(t,u) {t==t#init+1, u==u#init+1, u<=60}
+
+               t++, u++;
+
+//  T() {}
+
+
+            if (6*l<=t+50)
+
+//  T() {6l<=t+50}
+
+               printf("property verified\n");
+            else
+
+//  T() {t+51<=6l}
+
+               printf("error\n");
+         }
+
+//  T() {60<=u, v<=u, 0<=v}
+
+      if (6*l<=t+50)
+
+//  T() {6l<=t+50, 60<=u, v<=u, 0<=v}
+
+         printf("property verified\n");
+      else
+
+//  T() {t+51<=6l, 60<=u, v<=u, 0<=v}
+
+         printf("error\n");
+   }
+
+//  T() {0==-1}
+
+   if (6*l<=t+50)
+
+//  T() {0==-1}
+
+      printf("property verified\n");
+   else
+
+//  T() {0==-1}
+
+      printf("error\n");
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int u, l, t, v;
+
+//  P(l,t,u,v) {}
+
+
+   u = l = t = v = 0;
+
+//  P(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+   while (1) {
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, v<=u, 0<=v}
+
+      u = v = 0;
+
+//  P(l,t,u,v) {u==0, v==0, 0<=l, l<=t, 0<=t}
+
+      while (u<60)
+
+//  P(l,t,u,v) {l+u<=t+v, l+5v<=t+50, v<=l, u<=59, 49v<=47u+20, v<=u,
+//    0<=v, v<=10}
+
+         if (1) {
+
+//  P(l,t,u,v) {l+u<=t+v, l+5v<=t+50, v<=l, u<=59, 49v<=47u+20, v<=u,
+//    0<=v, v<=10}
+
+            while (u<60&&v<=9&&alea())
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=59, v<=u, 0<=v, v<=9}
+
+               l++, v++, u++, t++;
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=60, v<=u, u<=v+59, 0<=v, v<=10}
+
+
+            while (u<60&&alea())
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=59, v<=u, 0<=v, v<=10}
+
+               t++, u++;
+
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+
+            if (6*l<=t+50)
+
+//  P(l,t,u,v) {6l<=t+50, l+u<=t+v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+               printf("property verified\n");
+            else
+
+//  P(l,t,u,v) {t+51<=6l, l+u<=t+v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+               printf("error\n");
+         }
+
+//  P(l,t,u,v) {u==60, l+60<=t+v, v<=l, 0<=v, v<=10}
+
+      if (6*l<=t+50)
+
+//  P(l,t,u,v) {u==60, 6l<=t+50, l+60<=t+v, v<=l, 0<=v, v<=10}
+
+         printf("property verified\n");
+      else
+
+//  P(l,t,u,v) {u==60, t+51<=6l, l+60<=t+v, v<=l, 0<=v, v<=10}
+
+         printf("error\n");
+   }
+
+//  P() {0==-1}
+
+   if (6*l<=t+50)
+
+//  P() {0==-1}
+
+      printf("property verified\n");
+   else
+
+//  P() {0==-1}
+
+      printf("error\n");
+}
+
+TRANSFORMERS after refinement
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T() {}
+
+   float z;
+
+//  T(l,t,u,v) {}
+
+   int u, l, t, v;
+
+//  T(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+
+   u = l = t = v = 0;
+
+//  T(l,t,u,v) {l#init==0, t#init==0, u#init==0, v#init==0, 0<=l,
+//    6l<=t, l+u<=t+v, 6l+u<=t+6v, v<=l, u<=60, 6v<=u, 0<=v}
+
+   while (1) {
+
+//  T(u,v) {u==0, v==0, l+u#init<=t+v#init, v#init<=l, v#init<=u#init,
+//    0<=v#init}
+
+      u = v = 0;
+
+//  T(l,t,u,v) {l#init+v==l, t#init+u==t, u#init==0, v#init==0,
+//    l#init<=l, l+t#init<=l#init+t, 0<=l#init, l#init<=t#init,
+//    0<=t#init, u<=59, v<=10}
+
+      while (u<60)
+
+//  T(l,t,u,v) {l+v#init==l#init+v, t+u#init==t#init+u, l#init<=l,
+//    l<=l#init+10, l#init+t<=l+t#init+60, l+t#init<=l#init+t,
+//    l#init+u#init<=t#init+v#init, l#init+5v#init<=t#init+50,
+//    v#init<=l#init, u<=60, v<=u, u#init<=59, 49v#init<=47u#init+20,
+//    v#init<=u#init, 0<=v, v<=10, 0<=v#init, v#init<=10}
+
+         if (1) {
+
+//  T(l,t,u,v) {l+u#init==l#init+u, t+u#init==t#init+u,
+//    u+v#init==u#init+v, l#init+u#init<=t#init+v#init,
+//    l#init+5v#init<=t#init+50, v#init<=l#init, u<=59, u#init<=u,
+//    u#init<=59, 49v#init<=47u#init+20, v#init<=u#init, 0<=v, v<=9,
+//    0<=v#init, v#init<=9}
+
+            while (u<60&&v<=9&&alea())
+
+//  T(l,t,u,v) {l==l#init+1, t==t#init+1, u==u#init+1, v==v#init+1,
+//    l+u<=t+v, v<=l, u<=60, v<=u, 1<=v, v<=10}
+
+               l++, v++, u++, t++;
+
+//  T(t,u) {t+u#init==t#init+u, l<=t#init+50, l+u#init<=t#init+v,
+//    l+5v<=t#init+100, v<=l, t#init<=t, u<=59, v<=u, u#init<=59,
+//    49v<=47u#init+40, v<=u#init, u#init<=v+59, 0<=v, v<=10}
+
+
+            while (u<60&&alea())
+
+//  T(t,u) {t==t#init+1, u==u#init+1, l+u<=t+v, v<=l, u<=60, v+1<=u,
+//    0<=v, v<=10}
+
+               t++, u++;
+
+//  T() {l+u<=t+v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+
+            if (6*l<=t+50)
+
+//  T() {l<=t+50, 6l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
+//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+
+               printf("property verified\n");
+            else
+
+//  T() {t+51<=6l, l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
+//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+
+               printf("error\n");
+         }
+
+//  T() {u==60, l+60<=t+v, v<=l, 0<=v, v<=10}
+
+      if (6*l<=t+50)
+
+//  T() {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
+//    l+6v<=t+120, l+10v<=t+400, 2l+47v<=2t+2940, 2l+59v<=2t+3060,
+//    47l+480v<=47t+19000, v<=l, 60<=t, 0<=v, v<=10}
+
+         printf("property verified\n");
+      else
+
+//  T() {u==60, t+51<=6l, l<=t+50, l+60<=t+v, l+5v<=t+100,
+//    l+6v<=t+120, l+10v<=t+400, 2l+47v<=2t+2940, 2l+59v<=2t+3060,
+//    47l+480v<=47t+19000, v<=l, 60<=t, 0<=v, v<=10}
+
+         printf("error\n");
+   }
+
+//  T() {0==-1}
+
+   if (6*l<=t+50)
+
+//  T() {0==-1}
+
+      printf("property verified\n");
+   else
+
+//  T() {0==-1}
+
+      printf("error\n");
+}
+
+PRECONDITIONS after refinement
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   float z;
+
+//  P() {}
+
+   int u, l, t, v;
+
+//  P(l,t,u,v) {}
+
+
+   u = l = t = v = 0;
+
+//  P(l,t,u,v) {l==0, t==0, u==0, v==0}
+
+   while (1) {
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=60, 6v<=u, 0<=v}
+
+      u = v = 0;
+
+//  P(l,t,u,v) {u==0, v==0, 0<=l, l<=t, 6l<=t, 12l<=7t, 0<=t}
+
+      while (u<60)
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=59, v<=u, 0<=v, v<=10}
+
+         if (1) {
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=59, v<=u, 0<=v, v<=10}
+
+            while (u<60&&v<=9&&alea())
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=59, v<=u, 0<=v, v<=9}
+
+               l++, v++, u++, t++;
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=60, v<=u, u<=v+59, 0<=v, v<=10}
+
+
+            while (u<60&&alea())
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=59, v<=u, 0<=v, v<=10}
+
+               t++, u++;
+
+//  P(l,t,u,v) {6l+u<=t+6v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+
+            if (6*l<=t+50)
+
+//  P(l,t,u,v) {6l<=t+50, 6l+u<=t+6v, v<=l, u<=60, v<=u, 0<=v, v<=10}
+
+               printf("property verified\n");
+            else
+
+//  P() {0==-1}
+
+               printf("error\n");
+         }
+
+//  P(l,t,u,v) {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
+//    6l+60<=t+6v, v<=l, 0<=v, v<=10}
+
+      if (6*l<=t+50)
+
+//  P(l,t,u,v) {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
+//    6l+60<=t+6v, v<=l, 0<=v, v<=10}
+
+         printf("property verified\n");
+      else
+
+//  P() {0==-1}
+
+         printf("error\n");
+   }
+
+//  P() {0==-1}
+
+   if (6*l<=t+50)
+
+//  P() {0==-1}
+
+      printf("property verified\n");
+   else
+
+//  P() {0==-1}
+
+      printf("error\n");
+}
+
+AFTER DEAD CODE ELIMINATION
+
+int main()
+{
+   float z;
+   int u, l, t, v;
+
+   u = l = t = v = 0;
+   while (1) {
+      u = v = 0;
+      while (u<60) {
+         while (u<60&&v<=9&&alea())
+            l++, v++, u++, t++;
+
+         while (u<60&&alea())
+            t++, u++;
+
+         printf("property verified\n");
+      }
+      printf("property verified\n");
+   }
+}

@@ -9,22 +9,38 @@
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <stdio.h>
 #include "genC.h"
 #include "linear.h"
 #include "ri.h"
 #include "effects.h"
+#include "database.h"
 #include "ri-util.h"
 #include "effects-util.h"
+#include "control.h"
+#include "constants.h"
+#include "misc.h"
+#include "parser_private.h"
+#include "syntax.h"
+#include "top-level.h"
 #include "text-util.h"
-#include "newgen_set.h"
-#include "points_to_private.h"
+#include "text.h"
+#include "properties.h"
+#include "pipsmake.h"
+#include "semantics.h"
 #include "effects-generic.h"
 #include "effects-simple.h"
 #include "effects-convex.h"
+#include "transformations.h"
+#include "preprocessor.h"
+#include "pipsdbm.h"
+#include "resources.h"
+#include "prettyprint.h"
+#include "newgen_set.h"
+#include "points_to_private.h"
 #include "alias-classes.h"
+#include "genC.h"
 
 #define INITIAL_SET_SIZE 10
 
@@ -96,46 +112,49 @@ int points_to_equal_p( const void * vpt1, const void*  vpt2)
 _uint points_to_rank( const void *  vpt, size_t size)
 {
   points_to pt= (points_to)vpt;
-  cell source = points_to_source(pt);
+   cell source = points_to_source(pt);
   cell sink = points_to_sink(pt);
   approximation rel = points_to_approximation(pt);
   tag rel_tag = approximation_tag(rel);
   string s = strdup(i2a(rel_tag));
-  string key = strdup(concatenate(entity_name(location_entity(source)),
+  reference sro = cell_to_reference(source);
+  reference sri = cell_to_reference(sink);
+  string s1 = strdup(words_to_string(words_reference(sro, NIL)));
+  string s2 = strdup(words_to_string(words_reference(sri, NIL)));
+ /*  string key = strdup(concatenate(entity_name(location_entity(source)), */
+/* 				  " ", */
+/* 				  entity_name(location_entity(sink)), */
+/* 				  s, */
+/* 				  NULL)); */
+ 
+  string key = strdup(concatenate(s1,
 				  " ",
-				  entity_name(location_entity(sink)),
+				  s2,
 				  s,
 				  NULL));
-
   return hash_string_rank(key,size);
 }
 
-points_to points_to_anywhere(cell source)
+set points_to_projection(set pts, list  l)
 {
-  points_to pt_to = points_to_undefined;
-  cell sink = cell_undefined;
-  approximation rel = make_approximation_may();
-  entity e = entity_all_locations();
-  reference r = make_reference(e, NIL);
-  sink = make_cell_reference(r);
-  pt_to = make_points_to(source, sink, rel, make_descriptor_none());
-  return pt_to;
+  FOREACH(entity, e, l){
+    reference r = make_reference(e, NIL);
+    cell c = make_cell_reference(r);
+    SET_FOREACH(points_to, pt, pts){
+      if(points_to_compare_cell(points_to_source(pt), c) && !variable_static_p(e))
+	set_del_element(pts, pts, (void*)pt);
+      if(points_to_compare_cell(points_to_sink(pt), c) && !variable_static_p(e) ){
+	reference r = cell_to_reference(points_to_source(pt));
+	entity e = reference_variable(r);
+	pips_user_warning("Dangling pointer %s \n", entity_user_name(e));
+	list lhs = CONS(CELL, points_to_source(pt), NIL);
+	pts = points_to_nowhere_typed(lhs, pts);
+      }
+    }
+  }
+  return pts;
 }
 
-
-/* FI->AM:nowuseless
-points_to_path access_points_to_path(access a )
-{
-  points_to_path p = points_to_path_undefined;
-  if(access_referencing_p(a))
-    p = access_referencing(a);
-  if(access_dereferencing_p(a))
-    p = access_dereferencing(a);
-  if(access_addressing_p(a))
-    p = access_addressing(a);
-  return copy_points_to_path(p);
-}
-*/
 
 /*print a points-to for debug*/
 void print_points_to(const points_to pt)

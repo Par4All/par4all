@@ -1,3 +1,4 @@
+usr/include/linear_version.h
 usr/include/sg.h
 usr/include/arithmetic_errors.h
 usr/include/vecteur.h
