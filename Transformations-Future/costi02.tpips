@@ -1,5 +1,5 @@
-delete costi
-create costi costi.f
+delete costi02
+create costi02 costi02.f
 
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
@@ -7,6 +7,7 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 setproperty SEMANTICS_K_FIX_POINT 1
 
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
 
 setenv SEMANTICS_DEBUG_LEVEL "0"
 
@@ -15,7 +16,7 @@ echo TRANSFORMERS
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[costi]
+display PRINTED_FILE[costi02]
 
 # quit
 
@@ -24,7 +25,7 @@ echo PRECONDITIONS
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[costi]
+display PRINTED_FILE[costi02]
 
 echo
 echo Dependence graph
@@ -37,7 +38,6 @@ echo Parallel code
 echo
 
 apply INDUCTION_SUBSTITUTION
-apply PARTIAL_EVAL
 activate PRINT_CODE
 display PRINTED_FILE
 
@@ -55,9 +55,9 @@ echo
 echo TRANSFORMERS AFTER REFINEMENT
 echo
 
-apply REFINE_TRANSFORMERS[costi]
+apply REFINE_TRANSFORMERS[costi02]
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[costi]
+display PRINTED_FILE[costi02]
 
 # quit
 
@@ -66,7 +66,7 @@ echo PRECONDITIONS AFTER REFINEMENT
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[costi]
+display PRINTED_FILE[costi02]
 
 quit
 echo
@@ -78,5 +78,5 @@ activate PRINT_CODE
 display PRINTED_FILE
 
 close
-# delete costi
+# delete costi02!
 quit
