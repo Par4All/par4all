@@ -23,6 +23,7 @@ display PARALLELPRINTED_FILE(reduction_parallelization)
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply INTERNALIZE_PARALLEL_CODE
 apply OMPIFY_CODE
+display PRINTED_FILE(reduction_parallelization)
 
 apply UNSPLIT
 #shell gcc -fopenmp -c array2.database/Src/array2.c -o array2.database/Src/array2.0
