@@ -19,6 +19,8 @@ main()
   double b[100][100];
   double c[100][100];
 
+#define KI (3)
+#define KJ (3)
   int i, j, ki, kj, n;
 
   scanf("%d", &n);
@@ -26,20 +28,20 @@ main()
   for(i=0; i<n;i++)
     for(j=0; j<n;j++)
       scanf("%f", &a[i][j]);
-  for(i=0; i<n-ki;i++)
+  for(i=0; i<n-KI;i++)
     for(j=0; j<n;j++) {
       b[i][j] = 0.;
-      for(ki=0;ki<3;ki++)
+      for(ki=0;ki<KI;ki++)
 	b[i][j] += a[i+ki][j];
     }
-  for(i=0; i<n-ki;i++)
-    for(j=0; j<n-kj;j++) {
+  for(i=0; i<n-KI;i++)
+    for(j=0; j<n-KJ;j++) {
       c[i][j] = 0.;
-      for(kj=0;kj<3;kj++)
+      for(kj=0;kj<KJ;kj++)
 	c[i][j] += b[i][j+kj];
     }
-  for(i=0; i<n-ki;i++)
-    for(j=0; j<n-kj;j++)
+  for(i=0; i<n-KI;i++)
+    for(j=0; j<n-KJ;j++)
       //printf("%f", &c[i][j]); -> issues with conflict computation
       c[i][j]++;
 }
