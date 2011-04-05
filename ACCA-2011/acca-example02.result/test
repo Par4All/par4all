@@ -265,12 +265,13 @@ void compute(int p, int n, float a[n][n])
    float t[100];
    int k = 100;
    int i, j;
+#pragma omp parallel for private(k)
    for(i = 0; i <= 99; i += 1)
       k = -i+99;
 #pragma omp parallel for 
    for(i = 0; i <= 99; i += 1)
       t[-i+99] = a[i][i];
-#pragma omp parallel for 
+#pragma omp parallel for private(j)
    for(i = 0; i <= 99; i += 1)
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
