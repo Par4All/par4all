@@ -1775,8 +1775,8 @@ static void proper_effects_of_expression_instruction(instruction i)
 	  /* A new function is needed to retrieve all functions with a
 	     given signature. Then the effects of all the candidates must
 	     be unioned. */
-	  pips_user_warning("call trhough a function pointer in a structure -> anywhere effects\n");
-	 
+	  pips_user_warning("call through a function pointer in a structure -> anywhere effects\n");
+
 	  break;
       }
     case is_syntax_reference:
@@ -2104,7 +2104,18 @@ effect make_declaration_effect(entity e, bool written_p)
 {
   effect eff = effect_undefined;
   /* FI: generate a declaration or a type write */
-  reference r = make_reference(e, NIL);
+
+  /* For array we want to generate an effects that affect all dimensions
+   * aka int **a; has to generate a[*][*]
+   */
+  extern size_t type_dereferencement_depth(type t);
+  int ndims = type_dereferencement_depth(entity_type(e));
+  list dim_args = NIL;
+  for(int i=0;i<ndims;i++) {
+    dim_args = CONS(EXPRESSION,make_unbounded_expression(),dim_args);
+  }
+
+  reference r = make_reference(e, dim_args);
   action a = action_undefined;
   action_kind ak = action_kind_undefined;
   /* FI: I'm not sure this is a very generic decision; I do not
@@ -2288,7 +2299,7 @@ expression_proper_effects_engine(
     debug_on("PROPER_EFFECTS_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 
-    proper_effects_of_module_statement(current); 
+    proper_effects_of_module_statement(current);
 
     pips_debug(1, "end\n");
     debug_off();
