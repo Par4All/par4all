@@ -1,0 +1,94 @@
+delete acca-example05-3
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+
+create acca-example05-3 acca-example05-3.c
+
+display PRINTED_FILE[compute]
+
+display PRINTED_FILE[main]
+
+activate PRINT_CODE_PRECONDITIONS
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+
+#display PRINTED_FILE[compute]
+
+# Discard the useless test
+
+#apply SIMPLIFY_CONTROL[compute]
+apply SUPPRESS_DEAD_CODE[compute]
+
+activate PRINT_CODE
+#display PRINTED_FILE[compute]
+
+# Remove recursive definition of k
+# FI->MA: but the uses of k are not replaced by its definition:-(
+
+#apply INDUCTION_VARIABLE_SUBSTITUTION[compute]
+apply INDUCTION_SUBSTITUTION[compute]
+
+activate PRINT_CODE
+#display PRINTED_FILE[compute]
+
+
+# Clean up the new definition of k
+
+#apply PARTIAL_EVALUATION[compute]
+apply PARTIAL_EVAL[compute]
+
+activate PRINT_CODE
+#display PRINTED_FILE[compute]
+
+
+# Look at the available parallelism
+
+#display PARALLEL_PRINTED_FILE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+#display PARALLELPRINTED_FILE[compute]
+
+
+# Go fo scalar privatixation
+
+apply PRIVATIZE_MODULE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+#display PARALLELPRINTED_FILE[compute]
+
+# Go for array privatization
+
+activate MUST_REGIONS
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+activate MUST_REGIONS
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_INV_REGIONS
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+activate PRINT_CODE_OUT_REGIONS
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+#apply ARRAY_PRIVATIZATION[compute]
+#setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+#setenv ARRAY_PRIVATIZATION_DEBUG_LEVEL 5
+apply ARRAY_PRIVATIZER[compute]
+apply COARSE_GRAIN_PARALLELIZATION[compute]
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+
+close
+quit

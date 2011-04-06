@@ -590,22 +590,27 @@ loop l;
     /* compute loop_locals from l_cand */
     if (store_as_loop_locals)
     {
-	gen_free_list(loop_locals(l));
-	l_locals = NIL;
-	MAP(EFFECT, reg,
-	    {		
-		l_locals = CONS(ENTITY, region_entity(reg), l_locals);
-	    },
-	    l_cand);
-	loop_locals(l) = l_locals;   
-	
-	/* add the loop index */
+      if (list_undefined_p(loop_locals(l)))
+	loop_locals(l) = NIL;
+      l_locals = NIL;
+      MAP(EFFECT, reg,
+	  {
+	    entity e = region_entity(reg);
+	    if (!entity_in_list_p(e, loop_locals(l)))
+	      l_locals = CONS(ENTITY, e, l_locals);
+	  },
+	  l_cand);
+
+      loop_locals(l) = gen_nconc(loop_locals(l), l_locals);
+
+      /* add the loop index */
+      if (!entity_in_list_p(loop_index(l), loop_locals(l)))
 	loop_locals(l) = CONS(ENTITY, loop_index(l), loop_locals(l));
-	
-	ifdebug(2)
+
+      ifdebug(2)
 	{
-	    pips_debug(2, "candidate entities: ");
-	    print_arguments(loop_locals(l));  
+	  pips_debug(2, "candidate entities: ");
+	  print_arguments(loop_locals(l));
 	}
     }
 

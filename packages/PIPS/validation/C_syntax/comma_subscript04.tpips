@@ -1,0 +1,10 @@
+delete comma_subscript04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create comma_subscript04 comma_subscript04.c
+
+display PRINTED_FILE
+
+close
+quit

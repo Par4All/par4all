@@ -196,6 +196,7 @@ distributable_statement_p(statement stat, set region)
     case is_instruction_goto:
     case is_instruction_unstructured:
     case is_instruction_test:
+    case is_instruction_expression:
 	return(FALSE);
     default:
 	pips_internal_error("unexpected tag %d", instruction_tag(i));
