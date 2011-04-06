@@ -37,7 +37,7 @@ class backendCompiler(object):
 		self.extrafiles = extrafiles
 		self.cmd = None
 		self.cc_stderr = None
-	
+
 	def link_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="link")
 
@@ -129,9 +129,15 @@ class module(object): # deriving from object is needed for overloaded setter
 			self.print_code()
 			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
 			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			# Well, this code is wrong because the resource is
+			# invalidated, even if for example we decide later in the
+			# editor not to edit the file...
 			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 			shutil.copy(printcode_rc,code_rc)
-			pid=Popen([editor,code_rc],stderr=PIPE)
+			# We use shell = True so that we can have complex EDITOR
+			# variable such as "emacsclient -c --alternate-editor emacs"
+			# :-)
+			pid = Popen(editor + " " + code_rc, stderr = PIPE, shell = True)
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
 
@@ -224,7 +230,7 @@ class module(object): # deriving from object is needed for overloaded setter
 	def saveas(self,path,activate="print_code"):
 		with file(path,"w") as fd:
 			fd.write(self._get_code(lower(activate if isinstance(activate, str) else activate.__name__ )))
-		
+
 
 class modules:
 	"""high level representation of a module set"""
@@ -363,14 +369,14 @@ class workspace(object):
 				pws.post_init(sources, **kwargs)
 			except AttributeError:
 				pass
-	
+
 	def __enter__(self):
 		"""handler for the with keyword"""
 		return self
 	def __exit__(self,exc_type, exc_val, exc_tb):
 		"""handler for the with keyword"""
 		if exc_type:# we want to keep info on why we aborted
-			self.deleteOnClose=False 
+			self.deleteOnClose=False
 		self.close()
 		return False
 
@@ -466,7 +472,7 @@ class workspace(object):
 		rc = p.returncode
 		if rc != 0:
 			raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
-		
+
 		print command
 		print out
 		# Parse the results :
@@ -478,7 +484,7 @@ class workspace(object):
 			headers.extend(l)
 		return headers
 
-		
+
 
 	def compile(self, compiler=backendCompiler(), link=True):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""

@@ -120,8 +120,13 @@ static void remove_unread_variables(statement s)
                         entity_scalar_p(e) ) /* and we cannot afford removing something that may implies aliasing */
                 {
                     bool effects_read_variable = entity_read_somewhere_p(e,s);
-                    if(!effects_read_variable)/* the entity is never read, it is disposable */
+                    if(!effects_read_variable) {
+                        /* the entity is never read, it is disposable */
+                        pips_debug(4,"Entity %s is never read, we can remove "
+                                   "statements that only produce it.\n",
+                                   entity_name(e));
                         gen_context_recurse(s,e,statement_domain,gen_true,remove_unread_variable);
+                    }
                 }
             }
         }
@@ -146,10 +151,13 @@ void module_clean_declarations(entity module, statement module_statement) {
 bool
 clean_declarations(string module_name)
 {
+
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+
+  debug_on("CLEAN_DECLARATIONS_DEBUG_LEVEL");
 
   /* first remove any statement that writes only variable that are never read */
   gen_recurse(get_current_module_statement(),statement_domain,gen_true,remove_unread_variables);
@@ -158,6 +166,8 @@ clean_declarations(string module_name)
   module_clean_declarations(get_current_module_entity(),get_current_module_statement());
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
+
+  debug_off();
 
   /*postlude */
   reset_cumulated_rw_effects();

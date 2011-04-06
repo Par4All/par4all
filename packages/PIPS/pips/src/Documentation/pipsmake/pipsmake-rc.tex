@@ -8272,6 +8272,8 @@ partial_redundancy_elimination             > MODULE.code
 \index{Unreachable Code Elimination}
 \index{If Simplification}
 \index{Loop Simplification}
+\index{Simplify Control}
+\index{Control Simplification}
 
 \begin{PipsPass}{suppress_dead_code}
 Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
@@ -8579,7 +8581,7 @@ Don't worry about the C-code output:
 the prettyprinter output do-loop as for-loop if the C-output is selected.
 The do-loop construct is interesting since the iteration set is computed
 at the loop entry (for example it is not sensible to the index
-modification from the inside of the loop) and this simplify abstract
+modification from the inside of the loop) and this simplifies abstract
 interpretation a lot.
 
 This transformation transform for example a
@@ -10194,7 +10196,7 @@ constant_array_scalarization > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Induction substitution}
+\subsection{Induction Variable Substitution}
 
 \begin{PipsPass}{induction_substitution}
 Induction substitution is the process of replacing scalar variables
@@ -10348,17 +10350,17 @@ The new type will be a typedef whose name is controlled by
 must exist in the symbol table.
 \end{PipsPass}
 
-This transformation loop over the symbol table, and for each of them which is
-a typedef, compare the local name to the property 
-\PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This approach is unsecure
-because there can be differents typedef with the same name in different
-compilation units,
-resulting in differents entries in the symbol table for a same local name. The
-return type can also be incoherent with the return statement, thus it's not sure
-to run it on a non void function.
+This transformation loops over the symbols in the symbol table, and
+for each of them which is a typedef, compare the local name to the
+property \PipsPropRef{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}. This
+approach is unsafe because there can be differents typedef with the
+same name in different compilation units, resulting in differents
+entries in the symbol table for a same local name. The return type can
+also be incoherent with the return statement, thus it is not safe to
+run it on a non void function.
 
 However this pass has been created for special need in par4all, and considering
-previously described restrictions, it'll do the job !
+previously described restrictions, it does the job.
 
 \begin{PipsProp}{SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE}
 SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE "P4A_accel_kernel_wrapper"
@@ -10671,12 +10673,12 @@ alias_check   > MODULE.code
         < ALL.code
 \end{PipsMake}
 
-This is a property to tell the alias propagation and alias checking phase to use
-information from MAIN program or not. If the current module is never
-called by the main program, we do no alias propagation and alias checking
-for this module if the property is on. However, we can
-do nothing with modules that have no callers at all, because this is a
-top-down approach !
+This is a property to control whether the alias propagation and alias checking
+phases use information from MAIN program or not. If the current
+module is never called by the main program, we do no alias propagation
+and alias checking for this module if the property is on. However, we
+can do nothing with modules that have no callers at all, because this
+is a top-down approach.
 
 \begin{PipsProp}{ALIAS_CHECKING_USING_MAIN_PROGRAM} 
 ALIAS_CHECKING_USING_MAIN_PROGRAM FALSE
@@ -10788,7 +10790,7 @@ TYPE_CHECKER_LONG_DOUBLE_COMPLEX_EXTENSION FALSE
 \begin{PipsProp}{TYPE_CHECKER_ADD_SUMMARY} 
 TYPE_CHECKER_ADD_SUMMARY FALSE
 \end{PipsProp}
-\begin{PipsProp}{TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS} 
+\begin{PipsProp}{TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS}
 TYPE_CHECKER_EXPLICIT_COMPLEX_CONSTANTS FALSE
 \end{PipsProp}
 
@@ -10807,7 +10809,15 @@ privatization is restricted to loop indices and is included in the
 dependence graph computation (see
 Section~\ref{subsection-dependence-graph}). The scalar privatization should
 be applied before any serious parallelization attempt. The array
-privatization is much more expensive and still is mainly experimental.
+privatization is much more expensive and is still mainly experimental.
+
+You should keep in mind that, although they modify the internal
+repesentation of the code, scalar and array privatizations are only
+latent program transformations, and no actual local variable
+declaration is generated. This is the responsibility of code
+generation phases, which may use this information differently
+depending on their target.
+
 
 \subsubsection{Scalar Privatization}
 \index{Scalar Privatization}
@@ -10876,41 +10886,35 @@ LOCALIZE_DECLARATION_SKIP_LOOP_INDICES FALSE
 \index{ARRAY\_SECTION\_PRIV\_COPY\_OUT}
 
 \begin{PipsPass}{array_privatizer}
-Array privatization aims at privatizing arrays (option
-\PipsPassRef{array_privatizer}) or sets of array elements
-(\PipsPassRef{array_section_privatizer}) instead of scalar variables only.
-The algorithm used, developed by B\'eatrice C{\sc reusillet}, is very
-different from the algorithm used for solely privatizing scalar
-variables. It uses IN and OUT regions. Of course, it can also
-privatize scalar variables, although the algorithm is much more
-expensive and as such should be used only when necessary.
-
-Moreover, {\em array section\/} privatization is still experimental and
-should be used with great care. In particular, it is not compatible with the
-next steps of the parallelization process, i.e. dependence tests and code
-generation.
-
-Scalar and entire array privatization is accessible via the Transform/Edit
-menu, while the results of scalar and array section privatization can be
-accessed via the option panel (sequential or user view). Private array
-sections are then displayed as array regions.
-
-Another transformation, which can also be called a \emph{privatization},
-consists in declaring as \emph{local} to a procedure or function the
-variables which are used only locally. This happens quite frequently in old
-codes where variables are declared as {\tt SAVE}d to avoid allocations at
-each invocation of the routine. However, this prevents parallelization of
-the loop surrounding the calls. The function which performs this
-transformation is called \PipsPassRef{declarations_privatizer}.
+  Array privatization aims at privatizing whole arrays
+  (\PipsPassRef{array_privatizer}) or sets of array elements
+  (\PipsPassRef{array_section_privatizer}) instead of scalar variables
+  only.  The algorithm, developed by B\'eatrice C{\sc reusillet}~\cite{C96}, is
+  very different from the algorithm used for solely privatizing scalar
+  variables and relies on IN and OUT regions analyses. Of course, it
+  also privatizes scalar variables, although the algorithm is much
+  more expensive and should be used only when necessary.
 \end{PipsPass}
+
 \begin{PipsPass}{array_section_privatizer}
-See \PipsPassRef{array_privatizer}
+  {\em Array sections\/} privatization is still experimental and
+  should be used with great care. In particular, it is not compatible
+  with the next steps of the parallelization process, i.e. dependence
+  tests and code generation, because it does not modify the code, but
+  solely produces a new region resource.
 \end{PipsPass}
-
 
 \begin{PipsPass}{declarations_privatizer}
-
+  Another transformation, which can also be called a
+  \emph{privatization}, consists in declaring as \emph{local} to a
+  procedure or function the variables which are used only
+  locally. This happens quite frequently in old Fortran codes where
+  variables are declared as {\tt SAVE}d to avoid allocations at each
+  invocation of the routine. However, this prevents parallelization of
+  the loop surrounding the calls. The function which performs this
+  transformation is called \PipsPassRef{declarations_privatizer}.
 \end{PipsPass}
+
 
 \begin{PipsMake}
 alias array_privatizer 'Privatize Scalars & Arrays'
@@ -10954,22 +10958,22 @@ declarations_privatizer              > MODULE.code
 
 \end{PipsMake}
 
-
-
-This transformation privatizes array sections. Several privatizability
-criterions could be applied, and its not clear which one should be used. The
+Several privatizability criterions can be applied for array
+section privatization, and its not yet clear which one should be used. The
 default case is to remove potential false dependences between
 iterations. The first option, when set to false, removes this
-constraint. It is useful for single assignment programs, to discover what
-section is really local to each iteration. When the second option is set to
-false, the copy-out problem is not considered, i.e. only array elements that
-are not further reused in the program continuation can be privatized.
+constraint. It is useful for single assignment programs, to discover
+what section is really local to each iteration.
 
-\begin{PipsProp}{ARRAY_PRIV_FALSE_DEP_ONLY} 
+When the second option is set to false, copy-out is not allowed,
+which means only array regions that are not further reused in the program
+continuation can be privatized.
+
+\begin{PipsProp}{ARRAY_PRIV_FALSE_DEP_ONLY}
 ARRAY_PRIV_FALSE_DEP_ONLY TRUE
 \end{PipsProp}
 
-\begin{PipsProp}{ARRAY_SECTION_PRIV_COPY_OUT} 
+\begin{PipsProp}{ARRAY_SECTION_PRIV_COPY_OUT}
 ARRAY_SECTION_PRIV_COPY_OUT TRUE
 \end{PipsProp}
 
@@ -11130,9 +11134,9 @@ PRAGMA_TYPE "expr"
 
 \begin{PipsPass}{omp_loop_parallel_threshold_set}
 The PIPS phase  OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET allows to add the OpenMP
-\verb|if| clause to all the OpenMP pragmas. Afterwodrs, the number of iteraion
-of the loop will be evaluated dynamically and compared to the defined threshold.
-The loop will be parallelized only if the threshold is reached.
+\verb|if| clause to all the OpenMP pragmas. Afterwards, the number of iterations
+in the loop is evaluated dynamically and compared to the defined threshold.
+The loop is parallelized only if the threshold is reached.
 \end{PipsPass}
 
 \begin{PipsMake}

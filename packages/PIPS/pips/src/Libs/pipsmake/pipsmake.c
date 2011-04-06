@@ -32,24 +32,24 @@
  * Remi Triolet, Francois Irigoin, Pierre Jouvelot, Bruno Baron,
  * Arnauld Leservot, Guillaume Oget, Fabien Coelho.
  *
- * Notes: 
+ * Notes:
  *  - pismake uses some RI fields explicitly
  *  - see Bruno Baron's DEA thesis for more details
- *  - do not forget the difference between *virtual* resources like 
- *    CALLERS.CODE and *real* resources like FOO.CODE; CALLERS is a 
- *    variable (or a function) whose value depends on the current module; 
+ *  - do not forget the difference between *virtual* resources like
+ *    CALLERS.CODE and *real* resources like FOO.CODE; CALLERS is a
+ *    variable (or a function) whose value depends on the current module;
  *    it is expanded into a list of real resources;
  *    the variables are CALLEES, CALLERS, ALL and MODULE (the current module
  *    itself);
  *    these variables are used to implement top-down and bottom-up traversals
- *    of the call tree; they make pipsmake different from 
+ *    of the call tree; they make pipsmake different from
  *
- *  - memoization added to make() to speed-up a sequence of interprocedural 
- *  requests on real applications; a resource r is up-to-date if it already 
+ *  - memoization added to make() to speed-up a sequence of interprocedural
+ *  requests on real applications; a resource r is up-to-date if it already
  *  has been
  *  proved up-to-date, or if all its arguments have been proved up-to-date and
  *  all its arguments are in the database and all its arguments are
- *  older than the requested resource r; this scheme is correct as soon as 
+ *  older than the requested resource r; this scheme is correct as soon as
  *  activate()
  *  destroys the resources produced by the activated (and de-activated) rule
  *  - include of an automatically generated builder_map
@@ -183,7 +183,7 @@ void reset_static_phase_variables()
 #undef DECLARE_ERROR_HANDLER
 }
 
-/* Apply an instantiated rule with a given ressource owner 
+/* Apply an instantiated rule with a given ressource owner
  */
 
 /* FI: uncomment if rmake no longer needed in callgraph.c */
@@ -340,12 +340,12 @@ static list build_real_resources(const char* oname, list lvr)
 	{
 	    /* some funny stuff here:
 	     * some modules may be added by the phases here...
-	     * then we might expect a later coredump if the new resource 
+	     * then we might expect a later coredump if the new resource
 	     * is not found.
 	     */
 	    gen_array_t modules = db_get_module_list();
 
-	    GEN_ARRAY_MAP(on, 
+	    GEN_ARRAY_MAP(on,
 	    {
 		pips_debug(8, "\t%s\n", (string) on);
 		add_res(vrn, on);
@@ -454,7 +454,7 @@ static bool apply_a_rule(const char* oname, rule ru)
       /* ??? FC 05/04/2002 quick fix because of a recursion loop:
 	 apply_a_rule -> checkpoint_workspace -> delete_obsolete_resources ->
 	 check_physical_resource_up_to_date -> build_real_resources -> rmake ->
-	 apply_a_rule ! 
+	 apply_a_rule !
 	 * maybe it would be better treater in checkpoint_workspace?
       */
       checkpoint_workspace_being_done = TRUE;
@@ -466,14 +466,14 @@ static bool apply_a_rule(const char* oname, rule ru)
     /* output the message somewhere...
      */
     lrp = build_real_resources(oname, rule_produced(ru));
-    MAP(REAL_RESOURCE, rr, 
+    MAP(REAL_RESOURCE, rr,
     {
 	list lr = build_real_resources(oname, rule_required(ru));
 	bool is_required = FALSE;
 	rname = real_resource_resource_name(rr);
 	rowner = real_resource_owner_name(rr);
 
-	MAP(REAL_RESOURCE, rrr, 
+	MAP(REAL_RESOURCE, rrr,
 	{
 	    if (same_string_p(rname, real_resource_resource_name(rrr)) &&
 		same_string_p(rowner, real_resource_owner_name(rrr)))
@@ -481,27 +481,27 @@ static bool apply_a_rule(const char* oname, rule ru)
 		is_required = TRUE;
 		break;
 	    }
-	}, 
+	},
 	    lr);
 
 	gen_full_free_list(lr);
 
-	user_log("  %-30.60s %8s   %s(%s)\n", 
+	user_log("  %-30.60s %8s   %s(%s)\n",
 		 first_time == TRUE ? (first_time = FALSE,run) : "",
 		 is_required == TRUE ? "updating" : "building",
 		 rname, rowner);
-    }, 
+    },
 	lrp);
 
     gen_full_free_list(lrp);
 
     if (check_res_use_p)
 	init_resource_usage_check();
-    
+
     if (print_timing_p)
 	init_log_timers();
-    
-    if (print_memory_usage_p) 
+
+    if (print_memory_usage_p)
 	initial_memory_size = get_process_gross_heap_size();
 
     /* DO IT HERE!
@@ -510,9 +510,9 @@ static bool apply_a_rule(const char* oname, rule ru)
 
     if (print_timing_p) {
 	string time_with_io,io_time;
-	
+
 	get_string_timers (&time_with_io, &io_time);
-	
+
 	user_log ("                                 time       ");
 	user_log (time_with_io);
 	user_log ("                                 IO time    ");
@@ -525,20 +525,20 @@ static bool apply_a_rule(const char* oname, rule ru)
 		 final_memory_size,
 		 final_memory_size-initial_memory_size);
     }
-    
+
     if (check_res_use_p)
 	do_resource_usage_check(oname, ru);
-    
+
     pips_malloc_debug();
-    
+
     update_preserved_resources(oname, ru);
 
     if (run_pipsmake_callback() == FALSE)
 	return FALSE;
-    
+
     if (interrupt_pipsmake_asap_p())
 	return FALSE;
-    
+
     return success_p;
 }
 
@@ -616,24 +616,26 @@ static bool make_pre_transformation(const char*, rule);
 static bool make_post_transformation(const char*, rule);
 static bool make_required(const char*, rule);
 
-/* Apply do NOT activate the rule applied. 
+/* Apply do NOT activate the rule applied.
+ *
  * In the case of an interprocedural rule, the rules applied to the
  * callees of the main will be the default rules. For instance,
  * "apply PRINT_CALL_GRAPH_WITH_TRANSFORMERS" applies the rule
  * PRINT_CALL_GRAPH to all callees of the main, leading to a core
- * dump. 
- * Safe apply checks if the rule applied is activated and produces ressources 
+ * dump.
+ *
+ * Safe apply checks if the rule applied is activated and produces ressources
  * that it requires (no transitive closure) --DB 8/96
  */
 static bool apply_without_reseting_up_to_date_resources(
-    const char* pname, 
+    const char* pname,
     const char* oname)
 {
     rule ru;
 
     pips_debug(2, "apply %s on %s\n", pname, oname);
 
-    /* we look for the rule describing this phase 
+    /* we look for the rule describing this phase
      */
     if ((ru = find_rule_by_phase(pname)) == rule_undefined) {
 	pips_user_warning("could not find rule %s\n", pname);
@@ -653,7 +655,7 @@ static bool apply_without_reseting_up_to_date_resources(
 }
 
 
-/* compute all post-transformations to apply a rule on an object 
+/* compute all post-transformations to apply a rule on an object
  */
 static bool make_pre_post_transformation(const char* oname, rule ru, list transformations)
 {
@@ -704,6 +706,7 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
     }
     return TRUE;
 }
+
 static bool make_pre_transformation(const char* oname, rule ru) {
     return make_pre_post_transformation(oname,ru,rule_pre_transformation(ru));
 }
@@ -734,7 +737,7 @@ static bool make(const char* rname, const char* oname)
     retrieve_active_phases();
     db_clean_all_required_resources();
 
-    pips_debug(1, "%s(%s) - %smade\n", 
+    pips_debug(1, "%s(%s) - %smade\n",
 	       rname, oname, success_p? "": "could not be ");
 
     return success_p;
@@ -749,10 +752,10 @@ bool rmake(const char* rname, const char* oname)
     debug(2, "rmake", "%s(%s) - requested\n", rname, oname);
 
     /* is it up to date ? */
-    if (db_resource_p(rname, oname)) 
+    if (db_resource_p(rname, oname))
     {
 	res = db_get_resource_id(rname, oname);
-	if(set_belong_p(up_to_date_resources, (char *) res)) 
+	if(set_belong_p(up_to_date_resources, (char *) res))
 	{
 	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
 		     rname, oname, db_time_of_resource(rname, oname));
@@ -767,7 +770,7 @@ bool rmake(const char* rname, const char* oname)
     else if (db_resource_is_required_p(rname, oname))
     {
       /* the resource is already being required... this is bad */
-      db_print_all_required_resources(stderr); 
+      db_print_all_required_resources(stderr);
       pips_user_error("recursion on resource %s of %s\n", rname, oname);
     }
     else
@@ -775,7 +778,7 @@ bool rmake(const char* rname, const char* oname)
       /* well, the resource does not exists, we have to build it */
        db_set_resource_as_required(rname, oname);
     }
-    
+
     /* we look for the active rule to produce this resource */
     if ((ru = find_rule_by_resource(rname)) == rule_undefined)
 	pips_internal_error("could not find a rule for %s", rname);
@@ -788,55 +791,55 @@ bool rmake(const char* rname, const char* oname)
     if (!make_required(oname, ru))
 	return FALSE;
 
-    if (check_resource_up_to_date (rname, oname)) 
+    if (check_resource_up_to_date (rname, oname))
     {
-      pips_debug(8, 
+      pips_debug(8,
 		 "Resource %s(%s) becomes up-to-date after applying\n"
 		 "  pre-transformations and building required resources\n",
 		  rname,oname);
-    } 
-    else 
+    }
+    else
     {
       bool success = FALSE;
       list lr;
-      
+
       /* we build the resource */
       db_set_resource_as_required(rname, oname);
 
       success = apply_a_rule(oname, ru);
       if (!success) return FALSE;
-      
+
       lr = build_real_resources(oname, rule_produced(ru));
-      
+
       /* set up-to-date all the produced resources for that rule */
       MAP(REAL_RESOURCE, rr,
       {
 	string rron = real_resource_owner_name(rr);
 	string rrrn = real_resource_resource_name(rr);
-	
-	if (db_resource_p(rrrn, rron)) 
+
+	if (db_resource_p(rrrn, rron))
 	{
 	  res = db_get_resource_id(rrrn, rron);
 	  pips_debug(5, "resource %s(%s) added to up_to_date "
 		     "with time stamp %d\n",
 		     rrrn, rron, db_time_of_resource(rrrn, rron));
-	  set_add_element(up_to_date_resources, 
+	  set_add_element(up_to_date_resources,
 			  up_to_date_resources, res);
 	}
 	else {
 	  pips_internal_error("resource %s[%s] just built not found!",
 			      rrrn, rron);
 	}
-      }, 
+      },
 	  lr);
-      
+
       gen_full_free_list(lr);
     }
 
     /* we recursively make the post transformations. */
     if (!make_post_transformation(oname, ru))
 	return FALSE;
-    
+
     return TRUE;
 }
 
@@ -960,7 +963,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
     return TRUE;
 
   /* Initial resources by definition are not associated to a rule.
-   * FI: and they always are up-to-date?!? Even if somebody touched the file? 
+   * FI: and they always are up-to-date?!? Even if somebody touched the file?
    * You mean you do not propagate modifications performed outside of the workspace?
    */
   if (same_string_p(rname, DBR_USER_FILE))
@@ -978,7 +981,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   real_required_resources = build_real_resources(oname, rule_required(ru));
   real_modified_resources = build_real_resources(oname, rule_modified(ru));
 
-  /* we are going to check if the required resources are 
+  /* we are going to check if the required resources are
      - in the database or in the rule_modified list
      - proved up to date (recursively)
      - have timestamps older than the tested one
@@ -986,15 +989,15 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   MAP(REAL_RESOURCE, rr, {
     string rron = real_resource_owner_name(rr);
     string rrrn = real_resource_resource_name(rr);
-      
+
     bool res_in_modified_list_p = FALSE;
-      
+
     /* we build the list of modified real_resources */
-      
+
     MAP(REAL_RESOURCE, mod_rr, {
       string mod_rron = real_resource_owner_name(mod_rr);
       string mod_rrrn = real_resource_resource_name(mod_rr);
-	  
+
       if ((same_string_p(mod_rron, rron)) &&
 	  (same_string_p(mod_rrrn, rrrn))) {
 	/* we found it */
@@ -1044,7 +1047,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
      siblings, if they are produced by the same rule. Think of callgraph
      with may produce literaly thousands of resources, three times the
      number of modules! */
-  if (result == TRUE) 
+  if (result == TRUE)
     {
       list real_produced_resources =  build_real_resources(oname, rule_produced(ru));
       bool res_found_p = FALSE;
@@ -1101,7 +1104,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
     {
       /* well, if it is not okay, let us delete it!???
        * okay, this might be done later, but in some case it is not.
-       * I'm not really sure this is the right fix, but at least it avoids 
+       * I'm not really sure this is the right fix, but at least it avoids
        * a coredump after touching some internal file (.f_initial) and
        * requesting the PRINTED_FILE for it.
        * FC, 22/07/1998
@@ -1110,7 +1113,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
        */
       db_delete_resource(rname, oname);
     }
-  
+
   return result;
 }
 
@@ -1134,7 +1137,7 @@ void delete_some_resources(void)
 
     user_log("Deletion of %s resources:\n", what);
 
-    if (same_string_p(what, "obsolete")) 
+    if (same_string_p(what, "obsolete"))
     {
 	int ndeleted = delete_obsolete_resources();
 	if (ndeleted>0) user_log("%d destroyed.\n", ndeleted);
@@ -1147,7 +1150,7 @@ void delete_some_resources(void)
 }
 
 /* To be used in a rule. use and update the up_to_dat list
- * created by makeapply 
+ * created by makeapply
  */
 bool check_resource_up_to_date(const char* rname, const char* oname)
 {
@@ -1163,7 +1166,7 @@ void delete_named_resources (const char* rn)
     db_unput_resources(rn);
 
     if (up_to_date_resources != set_undefined) {
-	/* In this case we are called from a Pips phase 
+	/* In this case we are called from a Pips phase
 	user_warning ("delete_named_resources",
 		      "called within a phase (i.e. by activate())\n"); */
 	SET_MAP(res, {
@@ -1201,7 +1204,7 @@ string get_first_main_module(void)
     /* Let's look for a Fortran main */
     main_name = strdup(concatenate(dir_name, "/.fsplit_main_list", NULL));
 
-    if (file_exists_p(main_name)) 
+    if (file_exists_p(main_name))
     {
 	FILE * tmp_file = safe_fopen(main_name, "r");
 	name = safe_readline(tmp_file);
@@ -1212,7 +1215,7 @@ string get_first_main_module(void)
     if(string_undefined_p(name)) {
       /* Let's now look for a C main */
       main_name = strdup(concatenate(dir_name, "/main/main.c", NULL));
-      if (file_exists_p(main_name)) 
+      if (file_exists_p(main_name))
 	name = strdup("main");
       free(main_name);
     }
@@ -1222,7 +1225,7 @@ string get_first_main_module(void)
     return name;
 }
 
-/* check the usage of resources 
+/* check the usage of resources
  */
 void do_resource_usage_check(const char* oname, rule ru)
 {
@@ -1296,7 +1299,7 @@ static void logs_on(void)
     if (get_bool_property("LOG_TIMINGS"))
 	init_request_timers();
 
-    if (get_bool_property("LOG_MEMORY_USAGE")) 
+    if (get_bool_property("LOG_MEMORY_USAGE"))
 	initial_memory_size = get_process_gross_heap_size();
 }
 
@@ -1315,7 +1318,7 @@ static void logs_off(void)
 	user_log (dbm_time);
     }
 
-    if (get_bool_property("LOG_MEMORY_USAGE")) 
+    if (get_bool_property("LOG_MEMORY_USAGE"))
     {
 	double final_memory_size = get_process_gross_heap_size();
 	user_log("\t\t\t\t memory size %10.3f, increase %10.3f\n",
