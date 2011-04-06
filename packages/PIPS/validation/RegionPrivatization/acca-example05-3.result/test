@@ -1,0 +1,318 @@
+void compute(int p, int n, float a[n][n])
+{
+   int t[n];
+   int k = n, i, s;
+   int j;
+   for(i = 0; i <= n-1; i += 1) {
+      for(j = 0; j <= n-1; j += 1)
+         t[j] = a[i][j]+j;
+
+      for(j = 0; j <= n-1; j += 1)
+         if (p>0)
+            a[i][j] = t[j];
+   }
+}
+int main()
+{
+   float a[100][100];
+   int n = read_input(100, a);
+   int p = init_parameter(n, a);
+   compute(p, n, a);
+   write_output(n, a);
+}
+
+//  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n,
+//    1<=p}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+void compute(int p, int n, float a[n][n])
+{
+
+//  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n,
+//    1<=p}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+   // BEGIN BLOCK
+   int t[n];
+
+//  <k-W-EXACT-{}>
+//  <n-R-EXACT-{}>
+
+   int k = n, i, s;
+   int j;
+
+//  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=k, 0<=PHI2, PHI2+1<=k,
+//    k==n}>
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=k, 0<=PHI2, PHI2+1<=k,
+//    k==n, 1<=p}>
+//  <i-W-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 1<=p}>
+//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n}>
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <a[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k}>
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k, 1<=p}>
+//  <i-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k, 1<=p}>
+//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k}>
+
+      // BEGIN BLOCK
+
+//  <a[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k}>
+//  <i-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k,
+//    0<=j, j+1<=k}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <t[PHI1]-W-EXACT-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k}>
+
+         t[j] = a[i][j]+j;
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k, 1<=p}>
+//  <i-R-MAY-{}>
+//  <j-W-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k, 1<=p}>
+
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k, 0<=j,
+//    j+1<=k, 1<=p}>
+//  <i-R-MAY-{}>
+//  <j-R-MAY-{}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k, 1<=p}>
+
+         if (p>0)
+
+//  <a[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k,
+//    0<=j, j+1<=k, 1<=p}>
+//  <i-R-EXACT-{}>
+//  <j-R-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <t[PHI1]-R-EXACT-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k,
+//    1<=p}>
+
+            a[i][j] = t[j];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+//  <a[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <a[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n,
+//    1<=p}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+
+void compute(int p, int n, float a[n][n])
+{
+   // BEGIN BLOCK
+   int t[n];
+   int k = n, i, s;
+   int j;
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <a[PHI1][PHI2]-R-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k}>
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k, 1<=p}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k, 1<=p}>
+//  <t[PHI1]-W-EXACT-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k}>
+
+      // BEGIN BLOCK
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k,
+//    0<=j, j+1<=k}>
+//  <i-R-EXACT-{}>
+//  <n-R-EXACT-{}>
+//  <t[PHI1]-W-EXACT-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k}>
+
+         t[j] = a[i][j]+j;
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-W-MAY-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k, 0<=j,
+//    j+1<=k, 1<=p}>
+//  <i-R-MAY-{}>
+//  <n-R-EXACT-{}>
+//  <p-R-EXACT-{}>
+//  <t[PHI1]-R-MAY-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k, 1<=p}>
+
+         if (p>0)
+            a[i][j] = t[j];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+
+void compute(int p, int n, float a[n][n])
+{
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=n, 0<=PHI2, PHI2+1<=n}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+
+   // BEGIN BLOCK
+   int t[n];
+
+//  <n-IN-EXACT-{}>
+
+   int k = n, i, s;
+   int j;
+
+//  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=k, 0<=PHI2, PHI2+1<=k,
+//    k==n}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k}>
+//  <i-IN-EXACT-{}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+
+      // BEGIN BLOCK
+
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2+1<=k, k==n, 0<=i,
+//    i+1<=k}>
+//  <i-IN-EXACT-{}>
+//  <n-IN-EXACT-{}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, k==n, 0<=i, i+1<=k,
+//    0<=j, j+1<=k}>
+//  <i-IN-EXACT-{}>
+//  <j-IN-EXACT-{}>
+//  <n-IN-EXACT-{}>
+
+         t[j] = a[i][j]+j;
+
+//  <i-IN-MAY-{}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+//  <t[PHI1]-IN-MAY-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k, 1<=p}>
+
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <i-IN-MAY-{}>
+//  <j-IN-MAY-{}>
+//  <n-IN-EXACT-{}>
+//  <p-IN-EXACT-{}>
+//  <t[PHI1]-IN-MAY-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k, 1<=p}>
+
+         if (p>0)
+
+//  <i-IN-EXACT-{}>
+//  <j-IN-EXACT-{}>
+//  <n-IN-EXACT-{}>
+//  <t[PHI1]-IN-EXACT-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k,
+//    1<=p}>
+
+            a[i][j] = t[j];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI1+1<=n, 1<=p}>
+
+void compute(int p, int n, float a[n][n])
+{
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI1+1<=n, 1<=p}>
+
+   // BEGIN BLOCK
+   int t[n];
+   int k = n, i, s;
+   int j;
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI2==0, PHI1+1<=k, k==n, 1<=p}>
+
+   for(i = 0; i <= n-1; i += 1) {
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, k==n, i+1<=k,
+//    1<=p}>
+
+      // BEGIN BLOCK
+
+//  <t[PHI1]-OUT-MAY-{0<=PHI1, PHI1+1<=k, k==n, 0<=i, i+1<=k, 1<=p}>
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <t[PHI1]-OUT-MAY-{PHI1==j, k==n, 0<=i, i+1<=k, 0<=j, j+1<=k,
+//    1<=p}>
+
+         t[j] = a[i][j]+j;
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2+1<=k,
+//    k==n, 1<=p}>
+
+
+      for(j = 0; j <= n-1; j += 1)
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2==j, k==n,
+//    i+1<=k, 1<=p}>
+
+         if (p>0)
+
+//  <a[PHI1][PHI2]-OUT-MAY-{PHI1==0, PHI1==i, PHI2==0, PHI2==j, k==n,
+//    1<=k, 1<=p}>
+
+            a[i][j] = t[j];
+      // END BLOCK
+   }
+   // END BLOCK
+}
+void compute(int p, int n, float a[n][n])
+{
+   int t[n];
+   int k = n, i, s;
+   int j;
+#pragma omp parallel for private(j,t[n])
+   for(i = 0; i <= n-1; i += 1) {
+#pragma omp parallel for 
+      for(j = 0; j <= n-1; j += 1)
+         t[j] = a[i][j]+j;
+
+#pragma omp parallel for 
+      for(j = 0; j <= n-1; j += 1)
+         if (p>0)
+            a[i][j] = t[j];
+   }
+}

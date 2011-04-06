@@ -1,0 +1,232 @@
+delete acca-example02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
+create acca-example02 acca-example02.c
+
+display PRINTED_FILE[compute]
+
+display PRINTED_FILE[main]
+
+#  shell cat acca-example02.database/compute/compute.pre.c >compute-initial02.c
+#  shell cat acca-example02.database/main/main.pre.c >main-initial02.c
+
+#  shell echo '\\begin{verbatim}' >main-initial02.tex
+#  shell cat main-initial02.c >>main-initial02.tex
+##  shell echo "" >>main-initial02.tex
+##  shell cat compute-initial02.c >>main-initial02.tex
+#  shell echo '\end{verbatim}' >>main-initial02.tex
+
+#  shell echo '\\begin{verbatim}' >compute-initial02.tex
+##  shell cat main-initial02.c >>compute-initial02.tex
+##  shell echo "" >>compute-initial02.tex
+#  shell cat compute-initial02.c >>compute-initial02.tex
+#  shell echo '\end{verbatim}' >>compute-initial02.tex
+
+# How many pass activations (very approximate)
+#  shell echo '\\begin{verbatim}' >acca-example02-phase-counter.tex
+#  shell echo -n "After database initialization: " >>acca-example02-phase-counter.tex
+#  shell acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+
+
+
+activate PRINT_CODE_PRECONDITIONS
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
+
+display PRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.prec.c >compute-initial_precondition02.c
+#  shell echo '\\begin{verbatim}' >compute-initial_precondition02.tex
+#  shell cat compute-initial_precondition02.c >>compute-initial_precondition02.tex
+#  shell echo '\end{verbatim}' >>compute-initial_precondition02.tex
+
+display PRINTED_FILE[main]
+
+#  shell cat acca-example02.database/main/main.prec.c >main-initial_precondition02.c
+#  shell echo '\\begin{verbatim}' >main-initial_precondition02.tex
+#  shell cat main-initial_precondition02.c >>main-initial_precondition02.tex
+#  shell echo '\end{verbatim}' >>main-initial_precondition02.tex
+
+activate PRINT_CODE_TRANSFORMERS
+setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
+setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
+
+display PRINTED_FILE[init_parameter]
+
+#  shell cat acca-example02.database/init_parameter/init_parameter.tran.c >init_parameter-initial_transformers02.c
+#  shell echo '\\begin{verbatim}' >init_parameter-initial_transformers02.tex
+#  shell cat init_parameter-initial_transformers02.c >>init_parameter-initial_transformers02.tex
+#  shell echo '\end{verbatim}' >>init_parameter-initial_transformers02.tex
+
+# Discard the useless test
+
+#apply SIMPLIFY_CONTROL[compute]
+apply SUPPRESS_DEAD_CODE[compute]
+
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.pre.c >compute-simplified_control02.c
+#  shell echo '\\begin{verbatim}' >compute-simplified_control02.tex
+#  shell cat compute-simplified_control02.c >>compute-simplified_control02.tex
+#  shell echo '\end{verbatim}' >>compute-simplified_control02.tex
+
+# Remove recursive definition of k
+# FI->MA: but the uses of k are not replaced by its definition:-(
+
+#apply INDUCTION_VARIABLE_SUBSTITUTION[compute]
+apply INDUCTION_SUBSTITUTION[compute]
+
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.pre.c >compute-induction_variable02.c
+#  shell echo '\\begin{verbatim}' >compute-induction_variable02.tex
+#  shell cat compute-induction_variable02.c >>compute-induction_variable02.tex
+#  shell echo '\end{verbatim}' >>compute-induction_variable02.tex
+
+# Clean up the new definition of k
+
+#apply PARTIAL_EVALUATION[compute]
+apply PARTIAL_EVAL[compute]
+
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.pre.c >compute-partial_evaluation02.c
+#  shell echo '\\begin{verbatim}' >compute-partial_evaluation02.tex
+#  shell cat compute-partial_evaluation02.c >>compute-partial_evaluation02.tex
+#  shell echo '\end{verbatim}' >>compute-partial_evaluation02.tex
+
+# How many pass activations (very approximate)
+#  shell echo -n "After partial evaluation: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+
+# Look at the available parallelism
+
+#display PARALLEL_PRINTED_FILE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.par.c >compute-inner_parallelism02.c
+#  shell echo '\\begin{verbatim}' >compute-inner_parallelism02.tex
+#  shell cat compute-inner_parallelism02.c >>compute-inner_parallelism02.tex
+#  shell echo '\end{verbatim}' >>compute-inner_parallelism02.tex
+
+# How many pass activations (very approximate)
+#  shell echo -n "After parallelization: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+
+# Go fo scalar privatixation
+
+apply PRIVATIZE_MODULE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.par.c >compute-outer_parallelism02.c
+#  shell echo '\\begin{verbatim}' >compute-outer_parallelism02.tex
+#  shell cat compute-outer_parallelism02.c >>compute-outer_parallelism02.tex
+#  shell echo '\end{verbatim}' >>compute-outer_parallelism02.tex
+
+# How many pass activations (very approximate)
+#  shell echo -n "After scalar privatization: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+
+# Go for array privatization
+
+# let's try to get rid of the futile ", k-1" generated by Mehdi: not working:-(
+#apply FORWARD_SUBSTITUTION[compute]
+#apply FORWARD_SUBSTITUTE[compute]
+#activate PRINT_CODE
+#display PRINTED_FILE
+##  shell cat acca-example02.database/compute/compute.par.c >compute-forward_substitution02.c
+
+##  shell sed 's/, k-1//' acca-example02.database/compute/compute.pre.c >acca-example02.database/compute/compute.c
+
+activate MUST_REGIONS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+activate PRINT_CODE_TRANSFORMERS
+setproperty PRETTYPRINT_BLOCKS TRUE
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+# BC: The OUT region for k is wrong for the outer loop body
+activate PRINT_CODE_OUT_REGIONS
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+display PRINTED_FILE[compute]
+setproperty PRETTYPRINT_BLOCKS FALSE
+
+#apply ARRAY_PRIVATIZATION[compute]
+apply ARRAY_PRIVATIZER[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+#activate REGION_CHAINS
+display PARALLELPRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.par.c >compute-array_privatization02.c
+#  shell echo '\\begin{verbatim}' >compute-array_privatization02.tex
+#  shell cat compute-array_privatization02.c >>compute-array_privatization.tex
+#  shell echo '\end{verbatim}' >>compute-array_privatization02.tex
+
+# How many pass activations (very approximate)
+#  shell echo -n "After array privatization: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l>>acca-example02-phase-counter.tex
+
+# OK, this fails, so let's try scalarization and privatization again
+apply SCALARIZATION[compute] 
+apply PRIVATIZE_MODULE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.par.c >compute-array_scalarization02.c
+#  shell echo '\\begin{verbatim}' >compute-array_scalarization02.tex
+#  shell cat compute-array_scalarization02.c >>compute-array_scalarization02.tex
+#  shell echo '\end{verbatim}' >>compute-array_scalarization02.tex
+
+# How many pass activations (very approximate)
+#  shell echo -n "After array scalarization: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+
+# Let's get rid of the spurious loop
+activate PRINT_CODE_OUT_REGIONS
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+display PRINTED_FILE[compute]
+##  shell echo '\\begin{verbatim}' >compute-outer_parallelism02.tex
+##  shell cat compute-outer_parallelism02.c >>compute-outer_parallelism02.tex
+##  shell echo '\end{verbatim}' >>compute-outer_parallelism02.tex
+
+apply DEAD_CODE_ELIMINATION[compute]
+#apply USE_DEF_ELIMINATION[compute]
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+#  shell cat acca-example02.database/compute/compute.par.c >compute-dead_code_elimination02.c
+#  shell echo '\\begin{verbatim}' >compute-dead_code_elimination02.tex
+#  shell cat compute-dead_code_elimination02.c >>compute-dead_code_elimination02.tex
+#  shell echo '\end{verbatim}' >>compute-dead_code_elimination02.tex
+
+# How many pass activations (very approximate)
+close
+#  shell echo -n "After dead code elimination: " >>acca-example02-phase-counter.tex
+#  shell cat acca-example02.database/Logfile |grep -i building|wc -l >>acca-example02-phase-counter.tex
+open acca-example02
+#  shell echo -n "\end{verbatim}" >>acca-example02-phase-counter.tex
+
+apply INTERNALIZE_PARALLEL_CODE[compute]
+activate PRINT_CODE
+
+close
+
+quit

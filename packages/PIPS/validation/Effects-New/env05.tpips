@@ -9,6 +9,9 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
+# Necessary for
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 # To check the environment and type declaration effects
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
@@ -62,7 +65,7 @@ echo
 echo Code after use-def elimination
 echo
 
-apply USE_DEF_ELIMINATION
+apply DEAD_CODE_ELIMINATION
 activate PRINT_CODE
 display PRINTED_FILE
 
