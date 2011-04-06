@@ -1170,7 +1170,12 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       int dout = gen_length( reference_indices(rout) );
       bool add_conflict_p = TRUE;
 
-      if ( pointer_type_p( tin ) && pointer_type_p( tout ) ) {
+      if(entity_abstract_location_p(ein)) {
+	entity alout = variable_to_abstract_location(eout);
+	if(abstract_locations_may_conflict_p(ein, alout))
+	  add_conflict_p = TRUE;
+      }
+      else if ( pointer_type_p( tin ) && pointer_type_p( tout ) ) {
 
 	/* Second version due to accuracy improvements in effect
 	   computation */
@@ -1203,18 +1208,24 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 	}
       }
 
-      if ( add_conflict_p ) {
-	bool remove_this_conflict_p = FALSE;
-
-	/* Here we filter effect on loop indices */
-	list loops = load_statement_enclosing_loops( stout );
-	FOREACH( statement, el, loops ) {
-	  entity il = loop_index(statement_loop(el));
-	  remove_this_conflict_p |= entities_may_conflict_p( ein, il );
-	}
-
-	if ( !remove_this_conflict_p )
+      if ( add_conflict_p) {
+	if(entity_abstract_location_p(ein)) {
 	  cs = pushnew_conflict( fin, fout, cs );
+	}
+	else {
+	  bool remove_this_conflict_p = FALSE;
+
+	  /* Here we filter effect on loop indices except for abstract
+	     locations */
+	  list loops = load_statement_enclosing_loops( stout );
+	  FOREACH( statement, el, loops ) {
+	    entity il = loop_index(statement_loop(el));
+	    remove_this_conflict_p |= entities_may_conflict_p( ein, il );
+	  }
+
+	  if ( !remove_this_conflict_p )
+	    cs = pushnew_conflict( fin, fout, cs );
+	}
       }
     }
   }
