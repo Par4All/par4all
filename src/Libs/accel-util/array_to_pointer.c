@@ -68,14 +68,18 @@ typedef struct {
  * counting pointers as a dimension
  * */
 size_t type_dereferencement_depth(type t) {
-    t = ultimate_type(t);
-    if(type_variable(t)) {
-        variable v = type_variable(t);
-        basic b = variable_basic(v);
-        return  gen_length(variable_dimensions(v)) +
-            (basic_pointer_p(b) ? 1+ type_dereferencement_depth(basic_pointer(b)) : 0) ;
+  t = ultimate_type(t);
+  if(type_variable_p(t)) {
+    ifdebug(8) {
+      pips_debug(0,"Type is : ");
+      print_type(t);
     }
-    return 0;
+    variable v = type_variable(t);
+    basic b = variable_basic(v);
+    return gen_length(variable_dimensions(v)) + (basic_pointer_p(b) ? 1
+        + type_dereferencement_depth(basic_pointer(b)) : 0);
+  }
+  return 0;
 }
 
 
