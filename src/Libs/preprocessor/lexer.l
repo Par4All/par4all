@@ -156,6 +156,10 @@ void reset_csplit_current_beginning()
     free(csplit_current_function_name);
   csplit_current_function_name = string_undefined;
 
+  if(!string_undefined_p(csplit_current_function_name2))
+    free(csplit_current_function_name2);
+  csplit_current_function_name2 = string_undefined;
+
   if(!string_undefined_p(csplit_definite_function_name))
     free(csplit_definite_function_name);
   csplit_definite_function_name = string_undefined;
