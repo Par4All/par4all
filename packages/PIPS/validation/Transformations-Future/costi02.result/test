@@ -1,0 +1,233 @@
+
+TRANSFORMERS
+
+
+C  T() {}
+
+C Looking for an example. Taken from apsi.f
+
+C     FI: copied from costi.f, Modified back to the apsi version I believe
+
+      SUBROUTINE COSTI02 (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+
+C  T() {}
+
+      IF (N.LE.3) RETURN                                                0009
+
+C  T(NM1) {N==NM1+1, 4<=N}
+
+      NM1 = N-1                                                         0012
+
+C  T(NP1) {N==NM1+1, N==NP1-1, 4<=N}
+
+      NP1 = N+1                                                         0013
+
+C  T(NS2) {N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+      NS2 = N/2                                                         0014
+
+C  T(DT) {N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+      DT = PI/FLOAT(NM1)                                                0015
+
+C  T(FK) {0.D0==FK, N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+      FK = 0.D0                                                         0016
+
+C  T(KC) {0.D0==FK, KC==N, KC==NM1+1, KC==NP1-1, 4<=KC, 2NS2<=KC,
+C    KC<=2NS2+1}
+
+      KC = NP1-1                                                        0017
+
+C  T(FK,K,KC) {0.D0==FK#init, KC#init==N, KC#init==NM1+1,
+C    KC#init==NP1-1, 2<=K, 4<=KC#init, 2NS2<=KC#init, KC#init<=2NS2+1}
+
+      DO 101 K = 2, NS2                                                 0018
+
+C  T(KC) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2, 4<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+         KC = NP1-K                                                     0019
+
+C  T(FK) {1.+FK#init==FK, K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2,
+C    4<=N, 2NS2<=N, N<=2NS2+1}
+
+         FK = FK+1.                                                     0020
+
+C  T() {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2, 4<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+         WSAVE(K) = 2.D0*DSIN(FK*DT)                                    0021
+
+C  T() {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2, 4<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+         WSAVE(KC) = 2.D0*DCOS(FK*DT)                                   0022
+
+C  T() {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K, K<=NS2, 4<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+101      CONTINUE                                                       0023
+C      CALL RFFTI (NM1,WSAVE(N+1))
+      END
+
+PRECONDITIONS
+
+
+C  P() {}
+
+C Looking for an example. Taken from apsi.f
+
+C     FI: copied from costi.f, Modified back to the apsi version I believe
+
+      SUBROUTINE COSTI02 (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+
+C  P() {}
+
+      IF (N.LE.3) RETURN                                                0009
+
+C  P() {4<=N}
+
+      NM1 = N-1                                                         0012
+
+C  P(NM1) {N==NM1+1, 4<=N}
+
+      NP1 = N+1                                                         0013
+
+C  P(NM1,NP1) {N==NM1+1, N==NP1-1, 4<=N}
+
+      NS2 = N/2                                                         0014
+
+C  P(NM1,NP1,NS2) {N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+      DT = PI/FLOAT(NM1)                                                0015
+
+C  P(DT,NM1,NP1,NS2) {N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+      FK = 0.D0                                                         0016
+
+C  P(DT,FK,NM1,NP1,NS2) {0.D0==FK, N==NM1+1, N==NP1-1, 4<=N, 2NS2<=N,
+C    N<=2NS2+1}
+
+      KC = NP1-1                                                        0017
+
+C  P(DT,FK,KC,NM1,NP1,NS2) {0.D0==FK, KC==N, KC==NM1+1, KC==NP1-1,
+C    4<=KC, 2NS2<=KC, KC<=2NS2+1}
+
+      DO 101 K = 2, NS2                                                 0018
+
+C  P(DT,FK,K,KC,NM1,NP1,NS2) {N==NM1+1, N==NP1-1, 2<=K, K<=NS2, 4<=N,
+C    2NS2<=N, N<=2NS2+1}
+
+         KC = NP1-K                                                     0019
+
+C  P(DT,FK,K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K,
+C    K<=NS2, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+         FK = FK+1.                                                     0020
+
+C  P(DT,FK,K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K,
+C    K<=NS2, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+         WSAVE(K) = 2.D0*DSIN(FK*DT)                                    0021
+
+C  P(DT,FK,K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K,
+C    K<=NS2, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+         WSAVE(KC) = 2.D0*DCOS(FK*DT)                                   0022
+
+C  P(DT,FK,K,KC,NM1,NP1,NS2) {K+KC==N+1, N==NM1+1, N==NP1-1, 2<=K,
+C    K<=NS2, 4<=N, 2NS2<=N, N<=2NS2+1}
+
+101      CONTINUE                                                       0023
+C      CALL RFFTI (NM1,WSAVE(N+1))
+      END
+
+Dependence graph
+
+
+ **************** Effective Dependence Graph ****************
+
+	22 --> 20 with conflicts
+		from <FK-R-EXACT> to <FK-W-EXACT> at levels  1
+	22 --> 19 with conflicts
+		from <KC-R-EXACT> to <KC-W-EXACT> at levels  1
+	21 --> 20 with conflicts
+		from <FK-R-EXACT> to <FK-W-EXACT> at levels  1
+	20 --> 22 with conflicts
+		from <FK-W-EXACT> to <FK-R-EXACT> at levels  1 2
+	20 --> 21 with conflicts
+		from <FK-W-EXACT> to <FK-R-EXACT> at levels  1 2
+	20 --> 20 with conflicts
+		from <FK-W-EXACT> to <FK-W-EXACT> at levels  1
+	20 --> 20 with conflicts
+		from <FK-W-EXACT> to <FK-R-EXACT> at levels  1
+	20 --> 20 with conflicts
+		from <FK-R-EXACT> to <FK-W-EXACT> at levels  1
+	19 --> 22 with conflicts
+		from <KC-W-EXACT> to <KC-R-EXACT> at levels  1 2
+	19 --> 19 with conflicts
+		from <KC-W-EXACT> to <KC-W-EXACT> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Parallel code
+
+C Looking for an example. Taken from apsi.f
+
+C     FI: copied from costi.f, Modified back to the apsi version I believe
+
+      SUBROUTINE COSTI02 (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+      IF (N.LE.3) RETURN                                                0009
+      NM1 = N-1                                                         0012
+      NP1 = N+1                                                         0013
+      NS2 = N/2                                                         0014
+      DT = PI/FLOAT(NM1)                                                0015
+      FK = 0.D0                                                         0016
+      KC = NP1-1                                                        0017
+      DO 101 K = 2, NS2                                                 0018
+         KC = NP1-K                                                     0019
+         FK = FK+1.                                                     0020
+         WSAVE(K) = 2.D0*DSIN(FK*DT)                                    0021
+         WSAVE(-(K+(-N)+-1)) = 2.D0*DCOS(FK*DT)                         0022
+101      CONTINUE                                                       0023
+C      CALL RFFTI (NM1,WSAVE(N+1))
+      END
+
+Parallel code
+
+C Looking for an example. Taken from apsi.f
+
+C     FI: copied from costi.f, Modified back to the apsi version I believe
+
+      SUBROUTINE COSTI02 (N,WSAVE)
+      IMPLICIT DOUBLE PRECISION (A-H, O-Z)
+      DIMENSION       WSAVE(*)
+      PARAMETER (PI = 3.14159265358979)
+      IF (N.LE.3) RETURN                                                0009
+      NM1 = N-1                                                         0012
+      NP1 = N+1                                                         0013
+      NS2 = N/2                                                         0014
+      DT = PI/FLOAT(NM1)                                                0015
+      FK = 0.D0                                                         0016
+      KC = NP1-1                                                        0017
+      DOALL K = 2, NS2                                                  0018
+         PRIVATE KC
+         KC = NP1-K                                                     0019
+      ENDDO
+      DO K = 2, NS2                                                     0018
+         FK = FK+1.                                                     0020
+         WSAVE(K) = 2.D0*DSIN(FK*DT)                                    0021
+         WSAVE(-(K+(-N)+-1)) = 2.D0*DCOS(FK*DT)                         0022
+      ENDDO
+C      CALL RFFTI (NM1,WSAVE(N+1))
+      END
