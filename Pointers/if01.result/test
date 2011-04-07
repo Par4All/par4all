@@ -15,7 +15,8 @@ int main()
    else
 //             <    is written>: x
       x = &x2;
-//             <    is read   >: x x[0]
+//             <may be read   >: x1 x2
+//             <    is read   >: x
 //             <    is written>: y
 
    y = *x;
@@ -41,9 +42,9 @@ int main()
    else
 //  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       x = &x2;
-//  {(x,x2,-MAY-);(x,x1,-MAY-)}
+//  {(x,x1,-MAY-);(x,x2,-MAY-)}
 
    y = *x;
-//  {(x,x2,-MAY-);(x,x1,-MAY-)}
+//  {(x,x1,-MAY-);(x,x2,-MAY-)}
    return 0;
 }

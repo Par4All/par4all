@@ -8,7 +8,7 @@ void call17(int *x)
 //             <    is written>: y
    int *y = x;
 //             <    is read   >: y
-//             <    is written>: y[0]
+//             <    is written>: _x_1
    y[0] = 1;
 }
 

@@ -11,11 +11,11 @@ int main()
    b = &a;
 //             <    is written>: c
    c = &b;
-//             <    is read   >: c c[0]
+//             <    is read   >: b c
 //             <    is written>: bb
 
    bb = *c;
-//             <    is read   >: c c[0] c[0][0]
+//             <    is read   >: a b c
 //             <    is written>: aa
    aa = **c;
    return 0;

@@ -15,11 +15,11 @@ int main()
    y1 = &y2;
 //             <    is written>: y
    y = &y1;
-//             <    is read   >: y y[0]
+//             <    is read   >: y y1
 //             <    is written>: x
    x = *y;
 //             <    is read   >: x y
-//             <    is written>: y[0]
+//             <    is written>: y1
    *y = x;
    return 0;
 }

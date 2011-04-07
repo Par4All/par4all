@@ -10,8 +10,8 @@ int main()
 //             <    is read   >: x
 //             <    is written>: x
    x += 3;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p tab1[tab2[x]] tab2[x] x
-//             <    is written>: p[tab1[tab2[x]]]
    *(p+tab1[tab2[x]]) = 0;
    return 1;
 }

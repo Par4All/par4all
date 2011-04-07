@@ -24,8 +24,8 @@ int main()
    q_1 = &q_2;
 //             <    is written>: p
    p = &p_1;
-//             <    is read   >: p p[0] p[0][0] q_3
-//             <    is written>: p[0][0][0]
+//             <    is read   >: p p_1 p_2 q_3
+//             <    is written>: p_3
    ***p = q_3;
    
    

@@ -6,8 +6,8 @@ int main()
    tf_t s;
 //             <    is written>: sp
    tf_t *sp = &s;
-//             <may be written>: s.two[*] sp[0].two[*]
-//             <    is read   >: s.one sp sp[0].one
+//             <    is read   >: s.one sp
+//             <    is written>: s.two[*]
 
    call10(s.one, s.two, sp->one, sp->two);
 }

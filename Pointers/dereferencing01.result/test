@@ -18,7 +18,7 @@ int main()
 //             <    is written>: q
    q = p;
 //             <    is read   >: p
-//             <    is written>: p[0]
+//             <    is written>: x
    *p = 2.;
    return 0;
 }

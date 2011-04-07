@@ -34,8 +34,8 @@ int main(void)
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("pp=%p\n", pp);
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    
    // possible segfault.
    // should generate an error while analyzing?
@@ -68,14 +68,14 @@ int main(void)
 //  {(pj,j,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
       pp = &pj;
    }
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+//  {(pp,*NULL_POINTER*,-MAY-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
 
    printf("pp=%p\n", pp);
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+//  {(pp,*NULL_POINTER*,-MAY-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    
    // possible segfault.
    // should generate an error while analyzing?
    **pp = 0;
-//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+//  {(pp,*NULL_POINTER*,-MAY-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
    return 0;
 }

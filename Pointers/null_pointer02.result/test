@@ -9,15 +9,15 @@ int main()
 //             <    is written>: p
 
    p = 0;
-//             <    is read   >: q q[0]
-//             <    is written>: q[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    **q = 0;
 //             <    is read   >: p
-//             <    is written>: p[0]
+//             <    is written>: *NULL_POINTER*
 
    *p = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-//             <    is written>: q[0]
    *q = &i;
 
    return 0;

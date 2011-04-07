@@ -26,8 +26,8 @@ int main(void)
       int *pj = &j;
 //             <    is written>: pp
       pp = &pj;
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <    is read   >: pj pp
+//             <    is written>: j
       **pp = 0;
    }
 //             <may be read   >: stdout[0]
@@ -37,8 +37,8 @@ int main(void)
    
    // pp may points to a dead value in the stack
    printf("%p\n", pp);
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    
    // possible segfault.
    // should generate an error while analyzing?

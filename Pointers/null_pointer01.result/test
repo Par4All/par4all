@@ -9,11 +9,11 @@ int main()
 //             <    is written>: q
    int **q = 0;
 //             <    is read   >: p
-//             <    is written>: p[0]
+//             <    is written>: *NULL_POINTER*
 
    *p = 1;
 //             <    is read   >: q
-//             <    is written>: q[0]
+//             <    is written>: *NULL_POINTER*
    *q = &i;
 
    return 0;

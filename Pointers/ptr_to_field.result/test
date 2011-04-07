@@ -18,16 +18,16 @@ int ptr_to_field()
 //             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
    n = (my_str *) malloc(sizeof(my_str));
 //             <    is read   >: m
-//             <    is written>: m[0].q
+//             <    is written>: *HEAP*_l_12.q
    m->q = &i;
 //             <    is read   >: m
-//             <    is written>: m[0].p
+//             <    is written>: *HEAP*_l_12.p
    m->p = &j;
-//             <    is read   >: m m[0].p n
-//             <    is written>: n[0].q
+//             <    is read   >: *HEAP*_l_12.p m n
+//             <    is written>: *HEAP*_l_13.q
    n->q = m->p;
-//             <    is read   >: m m[0].q n
-//             <    is written>: n[0].p
+//             <    is read   >: *HEAP*_l_12.q m n
+//             <    is written>: *HEAP*_l_13.p
    n->p = m->q;
 
    return 0;

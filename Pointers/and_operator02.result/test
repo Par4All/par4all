@@ -21,11 +21,11 @@ int main()
 //             <    is read   >: q s
 //             <    is written>: p r
    if ((p = q)&&(r = s))
-//             <    is read   >: p p[0]
+//             <    is read   >: j p
 //             <    is written>: p
       *p++;
    else if ((p = q)||(r = s))
-//             <    is read   >: r r[0]
+//             <    is read   >: l r
 //             <    is written>: r
       *r++;
 
@@ -73,7 +73,7 @@ int main()
 //  {(p,j,-Exact-);(q,j,-Exact-);(r,l,-Exact-);(s,l,-Exact-);(t,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       *r++;
-//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(p,j,-MAY-);(q,j,
+//  {(p,j,-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,j,
 //   -Exact-);(r,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(r,l,-MAY-);(s,l,
 //   -Exact-);(t,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 

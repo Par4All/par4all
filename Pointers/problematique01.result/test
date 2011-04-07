@@ -20,7 +20,7 @@ int main()
    /* Les deux pointeurs pointent vers la meme case memoire j */
    p = q;
 //             <    is read   >: p
-//             <    is written>: p[0]
+//             <    is written>: j
    
    /* Dereferencement du pointeur p -> acces à la variable j */
    *p = 1;

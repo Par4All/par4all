@@ -15,7 +15,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //             <    is read   >: nx ny
 //             <    is written>: ix
       for(ix = 0; ix <= nx-1; ix += 1) {
-//             <    is read   >: u u
+//             <    is read   >: u
 
          while (u==0||u>1)
 //             <    is read   >: nx ny _RANDOM_EFFECTS:GEN_SEED

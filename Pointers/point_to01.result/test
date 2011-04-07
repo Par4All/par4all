@@ -15,19 +15,19 @@ void point_to01()
 
    if (1) {
 //             <    is read   >: p
-//             <    is written>: p[0].a
+//             <    is written>: c.a
       p->a = 1;
 //             <    is read   >: p
-//             <    is written>: p[0].b
+//             <    is written>: c.b
       p->b = 2;
 //             <    is read   >: p
-//             <    is written>: p[0].c
+//             <    is written>: c.c
       p->c = 3;
-//             <    is read   >: p p[0].a
-//             <    is written>: p[0].d
+//             <    is read   >: c.a p
+//             <    is written>: c.d
       p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].a p[0].d
+//             <    is written>: c.a c.d
       p->d = p->a = 4;
    }
 }

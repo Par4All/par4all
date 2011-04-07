@@ -15,10 +15,10 @@ int main()
 //             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
    m = (my_str *) malloc(sizeof(my_str));
 //             <    is read   >: m
-//             <    is written>: m[0].i
+//             <    is written>: *HEAP*_l_10.i
    m->i = 1;
 //             <    is read   >: m
-//             <    is written>: m[0].p
+//             <    is written>: *HEAP*_l_10.p
    m->p = &j;
 //             <    is read   >: m
 //             <    is written>: n

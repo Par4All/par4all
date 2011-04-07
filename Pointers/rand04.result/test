@@ -23,8 +23,8 @@ int main(void)
    else
 //             <    is written>: pp
       pp = &pi2;
+//             <may be written>: pi1 pi2
 //             <    is read   >: pp
-//             <    is written>: pp[0]
    *pp = (void *) 0;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
@@ -61,12 +61,12 @@ int main(void)
 //  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-)}
       pp = &pi2;
-//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,pi1,-MAY-);(pp,pi2,-MAY-)}
+//  {(pi1,i1,-Exact-);(pi2,i2,-Exact-);(pp,pi2,-MAY-);(pp,pi1,-MAY-)}
    *pp = (void *) 0;
-//  {(pi1,*NULL_POINTER*,-MAY-);(pi1,i1,-MAY-);(pi2,i2,-MAY-);(pi2,
-//   *NULL_POINTER*,-MAY-);(pp,pi1,-MAY-);(pp,pi2,-MAY-)}
+//  {(pi1,*NULL_POINTER*,-MAY-);(pi1,i1,-MAY-);(pi2,*NULL_POINTER*,
+//   -MAY-);(pi2,i2,-MAY-);(pp,pi2,-MAY-);(pp,pi1,-MAY-)}
    printf("%p %p %p\n", pp, pi1, pi2);
-//  {(pi1,i1,-MAY-);(pi1,*NULL_POINTER*,-MAY-);(pi2,i2,-MAY-);(pi2,
-//   *NULL_POINTER*,-MAY-);(pp,pi2,-MAY-);(pp,pi1,-MAY-)}
+//  {(pi1,*NULL_POINTER*,-MAY-);(pi1,i1,-MAY-);(pi2,*NULL_POINTER*,
+//   -MAY-);(pi2,i2,-MAY-);(pp,pi2,-MAY-);(pp,pi1,-MAY-)}
    return 0;
 }

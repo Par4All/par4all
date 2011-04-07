@@ -20,7 +20,7 @@ int main()
 //             <    is written>: ppa
    ppa = &pa;
 //             <    is read   >: ppa
-//             <    is written>: ppa[0]
+//             <    is written>: pa
    *ppa = &b;
 //             <    is written>: pb
 
@@ -28,7 +28,7 @@ int main()
 //             <    is written>: ppb
    ppb = &pb;
 //             <    is read   >: ppb
-//             <    is written>: ppb[0]
+//             <    is written>: pb
    *ppb = &a;
 //             <    is written>: pc
 
@@ -36,7 +36,7 @@ int main()
 //             <    is written>: ppc
    ppc = &pc;
 //             <    is read   >: ppc
-//             <    is written>: ppc[0]
+//             <    is written>: pc
    *ppc = &a;
 //             <    is written>: pd
 
@@ -44,26 +44,26 @@ int main()
 //             <    is written>: ppd
    ppd = &pd;
 //             <    is read   >: ppd
-//             <    is written>: ppd[0]
+//             <    is written>: pd
    *ppd = &c;
 //             <    is read   >: pd
 //             <    is written>: pc
 
    pc = pd;
 //             <    is read   >: ppc
-//             <    is written>: ppc[0]
+//             <    is written>: pc
 
    *ppc = &b;
 //             <    is read   >: pc ppa
-//             <    is written>: ppa[0]
+//             <    is written>: pa
 
    *ppa = pc;
-//             <    is read   >: ppd ppd[0]
+//             <    is read   >: pd ppd
 //             <    is written>: pa
 
    pa = *ppd;
-//             <    is read   >: ppa ppd ppd[0]
-//             <    is written>: ppa[0]
+//             <    is read   >: pd ppa ppd
+//             <    is written>: pa
 
    *ppa = *ppd;
 

@@ -6,7 +6,7 @@ int main()
    tf_t s;
 //             <    is written>: sp
    tf_t *sp = &s;
-//             <    is read   >: s.one sp sp[0].one
+//             <    is read   >: s.one sp
 
    call09(s.one, sp->one);
 }

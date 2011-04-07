@@ -12,12 +12,12 @@ void point_to04()
 //             <    is written>: p
 
    p = &c;
-//             <    is read   >: p p[0].a
-//             <    is written>: p[0].d
+//             <    is read   >: c.a p
+//             <    is written>: c.d
 
    p->d = p->a;
 //             <    is read   >: p
-//             <    is written>: p[0].a p[0].d
+//             <    is written>: c.a c.d
    p->d = p->a = 4;
 }
 

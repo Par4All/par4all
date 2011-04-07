@@ -13,7 +13,7 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[d]
    /* S2 */
    read(d);
-//             <    is read   >: a a[0]
+//             <    is read   >: a c
 //             <    is written>: b
    /* S3 */
    b = *a;

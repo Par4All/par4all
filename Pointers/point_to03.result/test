@@ -10,7 +10,7 @@ void point_to03()
 
    p = &a;
 //             <    is read   >: p
-//             <    is written>: p[0][2][3]
+//             <    is written>: a[2][3]
    ((*p)[2])[3] = 1.5;
 }
 

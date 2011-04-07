@@ -1,31 +1,3 @@
 
 PROPER POINTER EFFECTS
 
-int a_number()
-{
-   ATOM *ap;
-//             <    is read   >: first
-//             <    is written>: ap
-l:   ap = first;
-//             <    is read   >: ap ap[0].next
-   if (ap->next==(void *) 0) goto l;
-//             <    is read   >: atomNUMBER
-
-   return atomNUMBER;
-}
-
-POINTS-TO
-
-//  {}
-int a_number()
-{
-//  points to = {}
-   ATOM *ap;
-//  points to = {}
-l:   ap = first;
-//  points to = {}
-   if (ap->next==(void *) 0) goto l;
-//  points to = {}
-
-   return atomNUMBER;
-}
