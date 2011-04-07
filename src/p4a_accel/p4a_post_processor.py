@@ -52,9 +52,10 @@ def p4a_launcher_clean_up(match_object):
     """Get a match object during a p4a_launcher and generate a
     P4A_call_accel_kernel_$x$d macro of the p4a_wrapper_... function"""
 
-    if verbose or True:
+    if verbose:
         for i in range(9):
             print i,'=', match_object.group(i), '|END|'
+
     # Get all the interesting pieces from the original PIPS code:
     launcher_definition_header = match_object.group(1)
     before_loop_nest = match_object.group(3)
@@ -69,8 +70,9 @@ def p4a_launcher_clean_up(match_object):
     variables_before = re.sub("(?s)\n\\s*{\\s*\n", "\n", before_loop_nest)
     # Remove blank lines:
     variables_before = re.sub("(?s)\n\\s*\n", "\n", variables_before).rstrip()
-    if verbose or True:
+    if verbose:
         print 'vb', variables_before, 'end'
+
     # Inside loop nest, just remove the for loops:
     variables_in_loop_nest = re.sub("(?s)\n\\s*for\\([^\n]*", "", loop_nest)
     # Remove also the '// To be assigned to a call to P4A_vp_...' that
@@ -78,7 +80,7 @@ def p4a_launcher_clean_up(match_object):
     variables_in_loop_nest = re.sub("(?s)\\s*// To be assigned to a call to P4A_vp_[^\n]*", "", variables_in_loop_nest)
     # Remove blank lines:
     variables_in_loop_nest = re.sub("(?s)\n\\s*\n", "\n", variables_in_loop_nest).rstrip()
-    if verbose or True:
+    if verbose:
         print 'viln', variables_in_loop_nest, 'end'
 
     # Now construct the final lancher construction:
@@ -87,8 +89,9 @@ def p4a_launcher_clean_up(match_object):
                + "\n   P4A_call_accel_kernel_" + iteration_dimension + "d(" \
                + wrapper_function_name +", " \
                + iteration_space + ", " + wrapper_function_parameters +";\n}"
-    if verbose or True:
+    if verbose:
         print 'launcher =', launcher, '|END|'
+
     return launcher
 
 
