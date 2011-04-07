@@ -3,7 +3,7 @@
 setenv WS=struct_return02
 delete $WS
 create $WS $WS.c
-quit
+
 display PRINTED_FILE[%ALL]
 
 apply UNSPLIT
