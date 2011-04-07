@@ -1,6 +1,7 @@
 # A GNU makefile to run a demo of Par4All on "stars-pm" application
 NVCC= nvcc
 CC= gcc
+PGCC= pgcc
 TARGET= stars-pm
 
 ifneq ($(do_not_cheat),1)
@@ -69,9 +70,13 @@ endif
 
 COMMON_SOURCES = common/io.c
 
-BASE_SOURCES= sequential/pm.c \
-							sequential/1-discretization.c sequential/2-histogramme.c sequential/3-potential.c \
-							sequential/4-updateforce.c sequential/4-updatevel.c sequential/6-updatepos.c
+SOURCES= pm.c 1-discretization.c 2-histogramme.c 3-potential.c \
+							4-updateforce.c 4-updatevel.c 6-updatepos.c
+
+BASE_SOURCES= $(SOURCES:%=sequential/%)
+
+PGI_SOURCES=  $(SOURCES:%=pgi/%)
+PGI_OBJS=  $(SOURCES:%.c=%.o)
 
 CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
 							cuda/1-discretization.cu cuda/2-histogramme.cu cuda/3-potential.cu \
@@ -148,6 +153,12 @@ run-%: $(TARGET)_%
 %_seq : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
 	# Compilation of the sequential program:
 	$(CC) $(CPPFLAGS) $(CPU_TIMING) $(CFLAGS) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS)
+
+%_pgi : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(PGI_SOURCES) $(GRAPHICS)
+	# Compilation of the sequential program:
+	$(PGCC) -ta=nvidia,time $(CPPFLAGS) $(CPU_TIMING) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(PGI_SOURCES) $(GRAPHICS)
+	$(PGCC) -ta=nvidia,time $(CPPFLAGS) $(CPU_TIMING) $(LDFLAGS) $(LDLIBS) -o $@$(BIN_SUFFIX:.c=.o) $(COMMON_SOURCES:common/%.c=%.o) $(PGI_OBJS) $(GRAPHICS:.c=.o)
+
 
 %_openmp : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 	# Parallelize and build an OpenMP version:
