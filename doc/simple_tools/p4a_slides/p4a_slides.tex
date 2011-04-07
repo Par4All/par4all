@@ -190,7 +190,7 @@ p4a matmul.f
     generates an OpenMP program in \texttt{matmul.p4a.f}
   \end{BoiteA}
   {\tiny
-\begin{lstlisting}
+\begin{lstlisting}[language=fortran]
 !$omp parallel do private(I, K, X)
 C multiply the two square matrices of ones
       DO J = 1, N                                                       0016
@@ -256,13 +256,14 @@ __global__ fct(int n , int array[n]) {
   \item There are limits on the size of blocks of threads and grids of
     blocks but PIPS may generate some size bigger than what \texttt{nvcc}
     and its run-time can cope
-  \item No code generation for shared memory
-  \item No communication optimization
+  \item No code generation for shared memory. But Fermi SM caches help a
+    lot!
   \end{itemize}
 \end{trans}
 
 
 \begin{trans}{Do and don't}
+  Look at the Par4All coding rules guide
   \begin{itemize}
   \item Program in clean C99
   \item Use array with dynamic sizes instead of \texttt{malloc()} spamming
