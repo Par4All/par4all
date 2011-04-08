@@ -1,0 +1,89 @@
+
+PROPER  EFFECTS
+
+int main(void)
+{
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: pi
+   int *pi = &i;
+//             <    is written>: pp
+   int **pp = &pi;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   srand(time((void *) 0));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+
+   if (alea()) {
+//             <    is written>: pj
+      int *pj = &j;
+//             <    is written>: pp
+      pp = &pj;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      **pp = 0;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // pp may points to a dead value in the stack
+   printf("%p\n", pp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i = 1;
+//  points to = {}
+   int *pi = &i;
+//  {(pi,i,-Exact-)}
+   int **pp = &pi;
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+   int j = 2;
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+   srand(time((void *) 0));
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+
+   if (alea()) {
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+      int *pj = &j;
+//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pi,-Exact-)}
+      pp = &pj;
+//  {(pi,i,-Exact-);(pj,j,-Exact-);(pp,pj,-Exact-)}
+      **pp = 0;
+   }
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   
+   // pp may points to a dead value in the stack
+   printf("%p\n", pp);
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+//  {(pi,i,-Exact-);(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,pi,
+//   -MAY-)}
+   return 0;
+}

@@ -1,0 +1,37 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   char buf[20];
+   size_t nbytes;
+   ssize_t bytes_read;
+   int fd;
+//             <    is written>: nbytes
+
+   nbytes = sizeof(buf);
+//             <may be written>: buf[*]
+//             <    is read   >: fd nbytes __IO_EFFECTS:LUNS[fd]
+//             <    is written>: bytes_read __IO_EFFECTS:LUNS[fd]
+   bytes_read = read(fd, buf, nbytes);
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   char buf[20];
+//  points to = {}
+   size_t nbytes;
+//  points to = {}
+   ssize_t bytes_read;
+//  points to = {}
+   int fd;
+//  points to = {}
+
+   nbytes = sizeof(buf);
+//  points to = {}
+   bytes_read = read(fd, buf, nbytes);
+}

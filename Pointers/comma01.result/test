@@ -1,0 +1,40 @@
+
+PROPER  EFFECTS
+
+void comma01()
+{
+   int i;
+   int *p;
+   int *q;
+   int *r;
+//             <    is written>: p q r
+   p = &i, q = &i, r = &i;
+//             <    is written>: i
+   
+   
+   i = 2;
+}
+
+POINTS-TO
+
+//  {}
+void comma01()
+{
+//  points to = {}
+   int i;
+//  points to = {}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int *r;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   p = &i, q = &i, r = &i;
+//  {(p,i,-Exact-);(q,i,-Exact-);(r,i,-Exact-)}
+   
+   
+   i = 2;
+}

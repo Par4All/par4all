@@ -1,0 +1,25 @@
+
+PROPER  EFFECTS
+
+void call17(int *x)
+{
+   /* check aliases */
+//             <    is read   >: x
+//             <    is written>: y
+   int *y = x;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: y
+   y[0] = 1;
+}
+
+POINTS-TO
+
+//  {(x,_x_1,-Exact-)}
+void call17(int *x)
+{
+   /* check aliases */
+//  {(x,_x_1,-Exact-)}
+   int *y = x;
+//  {(x,_x_1,-Exact-);(y,_x_1,-Exact-)}
+   y[0] = 1;
+}

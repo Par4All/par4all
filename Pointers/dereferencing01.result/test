@@ -1,0 +1,45 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: x
+   double x = 1.;
+//             <    is written>: p
+   double *p = &x;
+//             <    is written>: q
+   double *q = 0;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: q stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("q = %p", q);
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p = 2.;
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   double x = 1.;
+//  points to = {}
+   double *p = &x;
+//  {(p,x,-Exact-)}
+   double *q = 0;
+//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+   printf("q = %p", q);
+//  {(p,x,-Exact-);(q,*NULL_POINTER*,-Exact-)}
+   q = p;
+//  {(p,x,-Exact-);(q,x,-Exact-)}
+   *p = 2.;
+//  {(p,x,-Exact-);(q,x,-Exact-)}
+   return 0;
+}

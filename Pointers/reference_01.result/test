@@ -1,0 +1,23 @@
+
+PROPER  EFFECTS
+
+int main(void)
+{
+//             <    is written>: k
+   int k = reference_01();
+//             <    is read   >: k
+
+   return k;
+}
+
+POINTS-TO
+
+//  {}
+int main(void)
+{
+//  points to = {}
+   int k = reference_01();
+//  points to = {}
+
+   return k;
+}

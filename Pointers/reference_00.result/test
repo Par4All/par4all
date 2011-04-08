@@ -1,0 +1,28 @@
+
+PROPER  EFFECTS
+
+void reference_00(void)
+{
+//             <    is written>: i
+   int i = 0;
+   int a[10];
+   // effects on empty references...
+   i;
+   a[i];
+}
+
+POINTS-TO
+
+//  {}
+void reference_00(void)
+{
+//  points to = {}
+   int i = 0;
+//  points to = {}
+   int a[10];
+//  points to = {}
+   // effects on empty references...
+   i;
+//  points to = {}
+   a[i];
+}

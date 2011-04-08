@@ -1,0 +1,31 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: k
+   int k = 3;
+//             <    is read   >: i j k
+
+   call18(i, i, j, k, 0);
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 1;
+//  points to = {}
+   int j = 2;
+//  points to = {}
+   int k = 3;
+//  points to = {}
+
+   call18(i, i, j, k, 0);
+}
