@@ -786,7 +786,8 @@ static bool wipeout_entity(entity e) {
       !storage_return_p(entity_storage(e)) &&
       !entity_area_p(e)&&
       !entity_struct_p(e)&&
-      !entity_union_p(e);
+      !entity_union_p(e) &&
+      !typedef_entity_p(e);
 
   pips_debug(6,"return %d\n",return_val);
 
