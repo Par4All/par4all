@@ -2586,19 +2586,6 @@ static void do_get_referenced_entities_on_reference(reference r, get_referenced_
 }
 
 /**
- * helper looking in a reference @p r for referenced entities
- */
-static void do_get_referenced_entities_on_typedef(basic b, get_referenced_entities_t *p)
-{
-    if(p->chunk_filter(b) && basic_typedef_p(b)) {
-        entity e = basic_typedef(b);
-        do_get_referenced_entities_on_entity(e,p);
-    }
-}
-
-
-
-/**
  * helper looking in a call for referenced entities
  */
 static void do_get_referenced_entities_on_call(call c, get_referenced_entities_t* p)
@@ -2691,19 +2678,12 @@ set get_referenced_entities_filtered(void *elem,
       /* if elem is an entity it self, add it */
       if(INSTANCE_OF(entity,(gen_chunkp)elem)) {
         entity e = (entity)elem;
-        ifdebug(5) {
-          pips_debug(0,"Type for %s\n",entity_name(e));
-          print_type(entity_type(e));
-          fprintf(stderr,"\n");
-        }
-        if(chunk_filter(entity_type(e))) {
+        if(chunk_filter(entity_type(e)))
           gen_context_multi_recurse(entity_type(e),&p,
               reference_domain,gen_true,do_get_referenced_entities_on_reference,
-              basic_domain,gen_true,do_get_referenced_entities_on_typedef,
               call_domain,gen_true,do_get_referenced_entities_on_call,
               NULL
               );
-        }
         if(!value_undefined_p(entity_initial(e)) && // struct fields ave undefined initial
             chunk_filter(entity_initial(e)))
           gen_context_multi_recurse(entity_initial(e),&p,
