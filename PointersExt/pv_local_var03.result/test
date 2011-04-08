@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -12,19 +12,16 @@ int main()
    do {
       mystruct tab_s[2];
 //             <may be read   >: s1.b[*]
-//             <may be written>: tab_s[0].b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.a s1.c
-//             <    is written>: tab_s[0].a tab_s[0].c
       tab_s[0] = s1;
 //             <may be read   >: s1.b[*]
-//             <may be written>: tab_s[1].b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1.a s1.c
-//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s1;
 //             <may be read   >: s2.b[*]
-//             <may be written>: tab_s[1].b[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s2.a s2.c
-//             <    is written>: tab_s[1].a tab_s[1].c
       tab_s[1] = s2;
 //             <    is read   >: i
 //             <    is written>: i

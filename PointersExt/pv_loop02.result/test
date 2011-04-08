@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -12,8 +12,8 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= 9; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i p
-//             <    is written>: p[i]
       p[i] = i;
    return 0;
 }

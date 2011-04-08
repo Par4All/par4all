@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -20,12 +20,12 @@ int main()
    s1.a = &i;
 //             <    is written>: s2.a
    s2.a = &j;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s1p s2.a
-//             <    is written>: s1p[0].a
 
    s1p->a = s2.a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: s2p
-//             <    is written>: s2p[0].a
    s2p->a = &k;
 //             <    is written>: s2p
 

@@ -1,14 +1,12 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
    char *end;
    long int li;
-//             <may be read   >: end[*]
-//             <may be written>: end[*]
-//             <    is read   >: end
-//             <    is written>: end li
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    li = strtol("32445667 is a number", &end, 0);
    return 0;
