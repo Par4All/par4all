@@ -574,12 +574,14 @@ statement outliner(string outline_module_name, list statements_to_outline)
     list tmp_list=NIL;
     FOREACH(ENTITY,e,referenced_entities)
     {
-        basic b = entity_basic(e);
+        //basic b = entity_basic(e);
         /* function should be added to compilation unit */
         if(entity_function_p(e))
             ;//AddEntityToModuleCompilationUnit(e,get_current_module_entity());
         else if( !entity_constant_p(e) && !entity_field_p(e)
-                && (basic_undefined_p(b) || !basic_typedef_p(b)) //&&
+                // This doesn't catch the typedef statement
+                // but any entity that type is a typedef
+                //&& (basic_undefined_p(b) || !basic_typedef_p(b)) //&&
                 //!( formal_parameter_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
             )
             tmp_list=CONS(ENTITY,e,tmp_list);
