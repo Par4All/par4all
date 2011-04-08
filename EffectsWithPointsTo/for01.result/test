@@ -27,7 +27,7 @@ int main()
    return k;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

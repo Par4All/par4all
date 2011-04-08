@@ -21,7 +21,7 @@ int struct01()
    y[0] = 1;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int struct01()
 {

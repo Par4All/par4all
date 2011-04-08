@@ -21,7 +21,7 @@ void point_to04()
    p->d = p->a = 4;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void point_to04()
 {

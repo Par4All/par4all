@@ -23,7 +23,7 @@ int struct06()
       x[i].un.first = x[i].deux.second;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int struct06()
 {

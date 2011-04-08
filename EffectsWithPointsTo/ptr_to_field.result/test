@@ -53,7 +53,7 @@ int ptr_to_field()
    return 0;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int ptr_to_field()
 {

@@ -19,7 +19,7 @@ void formal_parameter00(int *pi)
    return 0;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void formal_parameter00(int *pi)
 {

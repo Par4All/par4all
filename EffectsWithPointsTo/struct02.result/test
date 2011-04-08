@@ -29,7 +29,7 @@ int struct02()
       }
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int struct02()
 {

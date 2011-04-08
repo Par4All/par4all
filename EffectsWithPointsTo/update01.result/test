@@ -17,7 +17,7 @@ void update01()
    i = 2;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void update01()
 {

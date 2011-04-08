@@ -23,7 +23,7 @@ int struct05()
          x[i].second = x[i].first;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int struct05()
 {

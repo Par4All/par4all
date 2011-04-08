@@ -21,7 +21,7 @@ int struct04()
    x.first = x.second+1;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int struct04()
 {

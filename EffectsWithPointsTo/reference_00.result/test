@@ -15,7 +15,7 @@ void reference_00(void)
    a[i];
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void reference_00(void)
 {

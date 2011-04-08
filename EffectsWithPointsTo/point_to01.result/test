@@ -30,7 +30,7 @@ void point_to01()
    }
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void point_to01()
 {

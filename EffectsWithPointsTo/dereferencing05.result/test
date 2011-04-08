@@ -19,7 +19,7 @@ void dereferencing05()
    *--p = 0.;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void dereferencing05()
 {

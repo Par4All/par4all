@@ -26,7 +26,7 @@ void struct07()
          x[i][j] = 0.;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void struct07()
 {

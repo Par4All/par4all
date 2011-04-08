@@ -13,7 +13,7 @@ int main()
    call15(&i, &s);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

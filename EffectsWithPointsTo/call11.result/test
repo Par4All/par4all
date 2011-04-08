@@ -25,7 +25,7 @@ int main()
          call11(d3, d4, &y[i][j][0]);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

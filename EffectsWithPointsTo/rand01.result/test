@@ -21,7 +21,7 @@ int main()
    entier = 1+rand();
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

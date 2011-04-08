@@ -16,7 +16,7 @@ void point_to02()
    (p->b)[2] = 3;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void point_to02()
 {

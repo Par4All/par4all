@@ -10,7 +10,7 @@ int main()
    printf("i=%d", i);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

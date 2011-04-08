@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
    return 0;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main(int argc, char *argv[])
 {

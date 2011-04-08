@@ -14,7 +14,7 @@ int main()
    printf("i=%d, %d, %f\n", i, i+j, x);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

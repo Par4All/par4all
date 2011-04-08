@@ -15,7 +15,7 @@ int main()
    call04(d1, d2, y);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

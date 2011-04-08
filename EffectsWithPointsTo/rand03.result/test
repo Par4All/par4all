@@ -17,7 +17,7 @@ int main()
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

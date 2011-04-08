@@ -10,7 +10,7 @@ void assert01()
    i>0?(void) 0:__assert_fail("i>0", "$VDIR/assert01.c", 15, (const char *) 0);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void assert01()
 {

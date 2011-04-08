@@ -13,7 +13,7 @@ int main()
    call10(s.one, s.two, sp->one, sp->two);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

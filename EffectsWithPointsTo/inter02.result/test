@@ -67,7 +67,7 @@ int main()
    return 1;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

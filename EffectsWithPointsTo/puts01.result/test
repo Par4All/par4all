@@ -10,7 +10,7 @@ int main()
    puts(s);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

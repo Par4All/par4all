@@ -17,7 +17,7 @@ void exit01()
    i = 2;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 void exit01()
 {

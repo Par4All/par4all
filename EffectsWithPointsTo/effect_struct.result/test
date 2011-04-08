@@ -20,7 +20,7 @@ float main(int argc, char *argv[])
    return imagein[2][1].re;
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 float main(int argc, char *argv[])
 {

@@ -19,7 +19,7 @@ int main()
    bytes_read = read(fd, buf, nbytes);
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {

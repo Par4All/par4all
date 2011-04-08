@@ -8,7 +8,7 @@ int main()
    inter01();
 }
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS WITH POINTS TO
 
 int main()
 {
