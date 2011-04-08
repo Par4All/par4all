@@ -533,7 +533,9 @@ static void use_def_deal_if_useful(statement s) {
 static void remove_this_statement_if_useless(statement s, set entities_to_remove) {
    if (! set_belong_p(the_useful_statements, (char *) s)) {
       pips_debug(6, "remove_this_statement_if_useless removes statement %p (%#zx).\n", s, statement_ordering(s));
-
+      ifdebug(7) {
+        print_statement(s);
+      }
       // If this is a "declaration statement" keep track of removed declarations
       if(empty_statement_or_continue_p(s)) {
         FOREACH(ENTITY,e, statement_declarations(s)) {
@@ -554,6 +556,7 @@ static void remove_this_statement_if_useless(statement s, set entities_to_remove
      // Get rid of removed entity in declarations
      if(statement_declarations(s) != NIL) {
        SET_FOREACH(entity,e,entities_to_remove) {
+         pips_debug(5,"Declaration removed for %s\n",entity_name(e));
          gen_remove(&statement_declarations(s),e);
        }
      }
@@ -581,6 +584,10 @@ static void remove_this_statement_if_useless(statement s, set entities_to_remove
          set_add_element(the_useful_statements,the_useful_statements,s);
        }
      }
+   }
+   pips_debug(6, "end\n");
+   ifdebug(7) {
+     print_statement(s);
    }
 }
 
@@ -715,7 +722,10 @@ bool dead_code_elimination_on_module(char * module_name)
 
    pips_debug(2, "done for %s\n", module_name);
 
+   debug_off();
+
    /* Apply clean declarations ! */
+   debug_on("CLEAN_DECLARATIONS_DEBUG_LEVEL");
    set_cumulated_rw_effects(
        (statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
                                                  module_name,
@@ -762,20 +772,25 @@ bool use_def_elimination(char * module_name)
 /**  @} */
 
 static bool filterout_statement(void *obj) {
-    return !INSTANCE_OF(statement,(gen_chunkp)obj);
+  bool return_val = !INSTANCE_OF(statement,(gen_chunkp)obj);
+  return return_val;
 }
 
 /* entities that match the following conditions are not
  * cleaned from declarations:
  */
 static bool wipeout_entity(entity e) {
-return
-    entity_not_constant_or_intrinsic_p(e) && // filters out constants and intrinsics
-    !formal_parameter_p(e) &&
-    !storage_return_p(entity_storage(e)) &&
-    !entity_area_p(e)&&
-    !entity_struct_p(e)&&
-    !entity_union_p(e);
+  pips_debug(6,"Wipeout entity evaluating %s\n",entity_name(e));
+  bool return_val = entity_not_constant_or_intrinsic_p(e) && // filters out constants and intrinsics
+      !formal_parameter_p(e) &&
+      !storage_return_p(entity_storage(e)) &&
+      !entity_area_p(e)&&
+      !entity_struct_p(e)&&
+      !entity_union_p(e);
+
+  pips_debug(6,"return %d\n",return_val);
+
+  return return_val;
 }
 
 /**
@@ -787,55 +802,58 @@ return
  * @param stmt statement where entities are used
  *
  */
-static void statement_clean_declarations_helper(list declarations, statement stmt)
-{
-    set referenced_entities = get_referenced_entities_filtered(
-            stmt,
-            filterout_statement,
-            wipeout_entity);
+static void statement_clean_declarations_helper(list declarations,
+                                                statement stmt) {
+  set referenced_entities =
+      get_referenced_entities_filtered(stmt,
+                                       filterout_statement,
+                                       wipeout_entity);
 
-    /* look for entity that are used in the statement
-     * SG: we need to work on  a copy of the declarations because of
-     * the RemoveLocalEntityFromDeclarations
-     */
-    list decl_cpy = gen_copy_seq(declarations);
-    FOREACH(ENTITY,e,decl_cpy)
-    {
-        /* filtered referenced entities are always used,
-         * some entity types listed in keep_entity cannot be wiped out*/
-        if(wipeout_entity(e) && !set_belong_p(referenced_entities,e))
+  /* look for entity that are used in the statement
+   * SG: we need to work on  a copy of the declarations because of
+   * the RemoveLocalEntityFromDeclarations
+   */
+  list decl_cpy = gen_copy_seq(declarations);
+  FOREACH(ENTITY,e,decl_cpy) {
+    /* filtered referenced entities are always used,
+     * some entity types listed in keep_entity cannot be wiped out*/
+    if(wipeout_entity(e) && !set_belong_p(referenced_entities, e)) {
+      /* entities whose declaration have a side effect are always used too */
+      bool has_side_effects_p = false;
+      value v = entity_initial(e);
+      list effects = NIL;
+      if(value_expression_p(v))
+        effects = gen_nconc(effects,
+                            expression_to_proper_effects(value_expression(v)));
+      /* one should check if dimensions do not have side effects either */
+      if(entity_variable_p(e)) {
+        FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
         {
-            /* entities whose declaration have a side effect are always used too */
-            bool has_side_effects_p = false;
-            value v = entity_initial(e);
-            list effects = NIL;
-            if( value_expression_p(v) )
-                effects = gen_nconc(effects,expression_to_proper_effects(value_expression(v)));
-            /* one should check if dimensions do not have side effects either */
-            if(entity_variable_p(e)) {
-                FOREACH(DIMENSION,dim,variable_dimensions(type_variable(entity_type(e))))
-                {
-                    expression upper = dimension_upper(dim),
-                               lower = dimension_lower(dim);
-                    effects=gen_nconc(effects,expression_to_proper_effects(upper));
-                    effects=gen_nconc(effects,expression_to_proper_effects(lower));
-                }
-            }
-            FOREACH(EFFECT, eff, effects)
-            {
-                if( action_write_p(effect_action(eff)) ) has_side_effects_p = true;
-            }
-            gen_full_free_list(effects);
-
-            /* do not keep the declaration, and remove it from any declaration_statement */
-            if( !has_side_effects_p ) {
-                RemoveLocalEntityFromDeclarations(e,get_current_module_entity(),stmt);
-            }
+          expression upper = dimension_upper(dim), lower = dimension_lower(dim);
+          effects = gen_nconc(effects, expression_to_proper_effects(upper));
+          effects = gen_nconc(effects, expression_to_proper_effects(lower));
         }
-    }
-    gen_free_list(decl_cpy);
+      }
+      pips_debug(5,"Evaluating effects on %s\n",entity_name(e));
+      FOREACH(EFFECT, eff, effects) {
+        ifdebug(6) {
+          print_effect(eff);
+        }
+        if(action_write_p(effect_action(eff)))
+          has_side_effects_p = true;
+      }
+      gen_full_free_list(effects);
 
-    set_free(referenced_entities);
+      /* do not keep the declaration, and remove it from any declaration_statement */
+      if(!has_side_effects_p) {
+        pips_debug(4,"Remove declaration for %s\n",entity_name(e));
+        RemoveLocalEntityFromDeclarations(e, get_current_module_entity(), stmt);
+      }
+    }
+  }
+  gen_free_list(decl_cpy);
+
+  set_free(referenced_entities);
 }
 
 /**
