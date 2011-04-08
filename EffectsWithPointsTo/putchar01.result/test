@@ -1,0 +1,20 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   putchar01();
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   putchar01();
+}

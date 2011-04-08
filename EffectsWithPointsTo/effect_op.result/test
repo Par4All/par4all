@@ -1,0 +1,103 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int b = 1;
+//  points to = {}
+   int i = 10;
+//  points to = {}
+
+   b = b+i;
+//  points to = {}
+   b = b*i;
+//  points to = {}
+   b = b/i;
+//  points to = {}
+   b = b&i;
+//  points to = {}
+   b = b^i;
+//  points to = {}
+   b = b|i;
+//  points to = {}
+   b += i;
+//  points to = {}
+   b *= i;
+//  points to = {}
+   b /= i;
+//  points to = {}
+   b -= i;
+//  points to = {}
+   b &= i;
+//  points to = {}
+   b |= i;
+//  points to = {}
+   b ^= i;
+//  points to = {}
+   b++;
+//  points to = {}
+   b--;
+//  points to = {}
+
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+//             <    is written>: b
+   int b = 1;
+//             <    is written>: i
+   int i = 10;
+//             <    is read   >: b i
+//             <    is written>: b
+
+   b = b+i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b*i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b/i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b&i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b^i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b|i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b += i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b *= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b /= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b -= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b &= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b |= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b ^= i;
+//             <    is read   >: b
+//             <    is written>: b
+   b++;
+//             <    is read   >: b
+//             <    is written>: b
+   b--;
+
+   return 0;
+}

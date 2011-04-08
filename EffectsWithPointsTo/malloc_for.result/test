@@ -1,0 +1,44 @@
+
+POINTS-TO
+
+//  {}
+int main(int argc, char *argv[])
+{
+//  points to = {}
+   int *p, i, j;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   i = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   j = 1;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   for(i = 1; i <= 4; i += 1)
+//  {(p,*HEAP*_l_11,-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+
+      p = (int *) malloc(sizeof(int));
+//  {(p,*HEAP*_l_11,-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+   
+   
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main(int argc, char *argv[])
+{
+   int *p, i, j;
+//             <    is written>: i
+   i = 0;
+//             <    is written>: j
+   j = 1;
+//             <    is written>: i
+
+   for(i = 1; i <= 4; i += 1)
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+      p = (int *) malloc(sizeof(int));
+   
+   
+   return 0;
+}

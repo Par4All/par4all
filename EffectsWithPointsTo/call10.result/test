@@ -1,0 +1,27 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   tf_t s;
+//  points to = {}
+   tf_t *sp = &s;
+//  {(sp,s,-Exact-)}
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <    is read   >: s.one sp
+//             <    is written>: s.two[*]
+
+   call10(s.one, s.two, sp->one, sp->two);
+}

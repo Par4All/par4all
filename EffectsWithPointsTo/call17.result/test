@@ -1,0 +1,25 @@
+
+POINTS-TO
+
+//  {(x,_x_1,-Exact-)}
+void call17(int *x)
+{
+   /* check aliases */
+//  {(x,_x_1,-Exact-)}
+   int *y = x;
+//  {(x,_x_1,-Exact-);(y,_x_1,-Exact-)}
+   y[0] = 1;
+}
+
+PROPER POINTER EFFECTS
+
+void call17(int *x)
+{
+   /* check aliases */
+//             <    is read   >: x
+//             <    is written>: y
+   int *y = x;
+//             <    is read   >: y
+//             <    is written>: _x_1
+   y[0] = 1;
+}

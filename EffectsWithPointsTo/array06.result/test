@@ -1,0 +1,28 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int t[100][10][3];
+//  points to = {}
+   int *pu;
+//  {(pu,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   pu = t[1][2];
+//  {(pu,t[1][2][0],-Exact-)}
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int t[100][10][3];
+   int *pu;
+//             <    is written>: pu
+
+   pu = t[1][2];
+   return 0;
+}

@@ -1,0 +1,34 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int *i, j, k;
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   k = 0;
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   j = k;
+//  {(i,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   i = &j;
+//  {(i,j,-Exact-)}
+
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int *i, j, k;
+//             <    is written>: k
+   k = 0;
+//             <    is read   >: k
+//             <    is written>: j
+   j = k;
+//             <    is written>: i
+   i = &j;
+
+   return 0;
+}

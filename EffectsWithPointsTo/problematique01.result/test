@@ -1,0 +1,62 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int *p, *q, i, j;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   i = 1;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   j = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   /* Initialisation des pointeurs*/
+   p = &i;
+//  {(p,i,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = &j;
+//  {(p,i,-Exact-);(q,j,-Exact-)}
+   
+   /* Les deux pointeurs pointent vers la meme case memoire j */
+   p = q;
+//  {(p,j,-Exact-);(q,j,-Exact-)}
+   
+   /* Dereferencement du pointeur p -> acces à la variable j */
+   *p = 1;
+//  {(p,j,-Exact-);(q,j,-Exact-)}
+
+   return 0;
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+   int *p, *q, i, j;
+//             <    is written>: i
+
+   i = 1;
+//             <    is written>: j
+   j = 0;
+//             <    is written>: p
+   /* Initialisation des pointeurs*/
+   p = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is read   >: q
+//             <    is written>: p
+   
+   /* Les deux pointeurs pointent vers la meme case memoire j */
+   p = q;
+//             <    is read   >: p
+//             <    is written>: j
+   
+   /* Dereferencement du pointeur p -> acces à la variable j */
+   *p = 1;
+
+   return 0;
+}

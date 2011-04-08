@@ -1,0 +1,17 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   inter01();
+}
+
+PROPER POINTER EFFECTS
+
+int main()
+{
+//             <may be written>: i j inter01:0`l k
+   inter01();
+}
