@@ -165,6 +165,11 @@ update_reduction_under_effect(
 	       effect_write_p(eff)? "W": "R",
 	       entity_name(effect_variable(eff)));
 
+    if(!store_effect_p(eff)) {
+      return TRUE;
+    }
+
+
     /* REDUCTION is dead if the reduction variable is affected
      */
     if (entities_may_conflict_p(reduction_variable(red),var))
@@ -311,6 +316,7 @@ update_compatible_reduction(
     if (!reduction_none_p(*pr)) /* some reduction */
       {
 	FOREACH (EFFECT, e, le) {
+    if(!store_effect_p(e)) continue;
 	  if (!update_reduction_under_effect(*pr, e)) {
 	    DEBUG_REDUCTION(8, "kill of ", *pr);
 	    pips_debug(8, "under effect to %s\n",
@@ -322,6 +328,7 @@ update_compatible_reduction(
     else
     {
       FOREACH (EFFECT, e, le) {
+        if(!store_effect_p(e)) continue;
 	if (entities_may_conflict_p(effect_variable(e), var))
 	  return FALSE;
 	else if (effect_write_p(e)) /* stores for latter cleaning */
@@ -349,6 +356,7 @@ bool pure_function_p(entity f)
     if (entity_module_p(f))
     {
       FOREACH (EFFECT, e, load_summary_effects(f)) {
+        if(!store_effect_p(e)) continue;
 	if (effect_write_p(e)) /* a side effect!? */
 	  return FALSE;
 	if (io_effect_entity_p(effect_variable(e))) /* LUNS */
@@ -604,10 +612,13 @@ no_other_effects_on_references (
     pips_debug(7,"entity name: %s\n", entity_name(var));
 
     FOREACH (EFFECT, e, le) {
+      if(!store_effect_p(e)) continue;
       reference r = effect_any_reference(e);
-      if (!gen_in_list_p(r, lr) &&
-	  entities_may_conflict_p(reference_variable(r), var))
-	return FALSE;
+      if (!gen_in_list_p(r, lr) && store_effect_p(e) &&
+          entities_may_conflict_p(reference_variable(r), var)) {
+        pips_debug(7,"Effect may touch variable : ");print_effect(e);
+        return FALSE;
+      }
       pips_debug(7,"refrence r: %p of entity: %s\n", r, entity_name (reference_variable(r)));
     }
 
@@ -652,8 +663,10 @@ call_proper_reduction_p (
       unary_op = extract_reduction_unary_update_operator (fct, &op);
 
   // if no suitable operator have been found : return false
-  if ((unary_op == FALSE) && (update_op == FALSE) && (assign_op == FALSE))
+  if ((unary_op == FALSE) && (update_op == FALSE) && (assign_op == FALSE)) {
+    pips_debug(5,"No unary, nor update, no assign !\n");
     return FALSE;
+  }
 
   // get the left and rigth operand
   le = call_arguments(c);
@@ -669,8 +682,10 @@ call_proper_reduction_p (
   // the lhs and rhs (if exits) must be functionnal
   // (same location on different evaluations)
   if (!functional_object_p((gen_chunk *) lhs)	||
-      ((unary_op == FALSE) && !functional_object_p((gen_chunk *) erhs)))
+      ((unary_op == FALSE) && !functional_object_p((gen_chunk *) erhs))) {
+    pips_debug(5,"Lhs or Rhs not functional !\n");
     return FALSE;
+  }
   pips_debug(8, "lhs and rhs are functional\n");
 
   // Check that the operation performed is valid for a reduction,
@@ -678,15 +693,19 @@ call_proper_reduction_p (
   // already done previously by "extract_reduction_update_operator" and
   // "extract_reduction_unary_update_operator"
   if ((unary_op == FALSE) && (update_op == FALSE) &&
-      (extract_reduction_operator(erhs, &op, &comm) == FALSE))
+      (extract_reduction_operator(erhs, &op, &comm) == FALSE)) {
+    pips_debug(5,"extract_reduction_operator returned false !!\n");
     return FALSE;
+  }
   pips_debug(8, "reduction operator %s\n", reduction_operator_tag_name(op));
 
   // there should be another direct reference to lhs if not unary
   // !!! syntax is a call if extract_reduction_operator returned TRUE
   if (unary_op == FALSE) {
-    if (!equal_reference_in_expression_p(lhs, erhs, op, update_op, &other))
+    if (!equal_reference_in_expression_p(lhs, erhs, op, update_op, &other)) {
+      pips_debug(5,"!equal_reference_in_expression_p !!\n");
       return FALSE;
+    }
     pips_debug(8, "matching reference found (%p)\n", other);
   }
 
@@ -698,6 +717,7 @@ call_proper_reduction_p (
   pips_debug(7,"list lr is: %p and %p\n", other, lhs);
   // there should be no extra effects on the reduced variable
   if (!no_other_effects_on_references (s, lr)) {
+    pips_debug(5,"Other effects on references !!\n");
     gen_free_list(lr);
     return FALSE;
   }
