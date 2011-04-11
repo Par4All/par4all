@@ -249,6 +249,17 @@ def flush_log():
     if log_file_handler:
         log_file_handler.flush()
 
+def merge_files (dst_name, src_name_l):
+    """ merge the sources file (given as a list) into the dst file. The content
+    of the sources is appended to the destination
+    """
+    dst = open (dst_name, 'a')
+    for name in src_name_l:
+        src = open (name, 'r')
+        for line in src:
+            dst.write (line)
+        src.close ()
+    dst.close ()
 
 class p4a_error(Exception):
     '''Generic base class for exceptions.'''

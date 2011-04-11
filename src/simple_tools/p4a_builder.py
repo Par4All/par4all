@@ -92,7 +92,7 @@ def get_cuda_ld_flags(m64 = True, cutil = False, cublas = False, cufft = False):
 class p4a_builder:
     """The p4a_builder is used for two main things.
     1 - It keeps track and arrange all the CPP, C, Fortran etc. flags.
-    2-  It can buil the program when all the files have been processed by
+    2-  It can build the program when all the files have been processed by
     PIPS.
     """
     # the lists of flags
@@ -400,7 +400,7 @@ class p4a_builder:
         # Make input files relative to the base directory.
         rel_files = []
         for file in files:
-            rel_files.append(p4a_util.relativize(file, base_dir))
+            rel_files.append(os.path.abspath(file))
 
         # Split input files between regular source files and .cu files,
         # add .cu.cpp files to regular source files for each .cu file.
@@ -411,7 +411,7 @@ class p4a_builder:
         for file in rel_files:
             if p4a_util.cuda_file_p(file):
                 cuda_files.append(file)
-                cucpp_file = p4a_util.relativize(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"), base_dir)
+                cucpp_file = os.path.abspath(make_safe_intermediate_file_path(file, base_dir, change_ext = ".cu.cpp"))
                 cuda_output_files.append(cucpp_file)
                 source_files.append(cucpp_file)
             elif p4a_util.header_file_p(file):
@@ -462,8 +462,8 @@ set(CMAKE_C_COMPILER $cc)
 set(CMAKE_CXX_COMPILER $cxx)
 set(CMAKE_LINKER $ld)
 set(CMAKE_AR $ar)
-set(CMAKE_C_FLAGS "$c_flags")
-set(CMAKE_CXX_FLAGS "$cxx_flags")
+set(CMAKE_C_FLAGS "$cpp_flags $c_flags")
+set(CMAKE_CXX_FLAGS "$cpp_flags $cxx_flags")
 set(CMAKE_LINKER_FLAGS "$ld_flags")
 
 set(${project}_HEADER_FILES
@@ -523,7 +523,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
         p4a_util.done("Generated " + cmakelists_file)
         p4a_util.write_file(cmakelists_file, cmakelists)
 
-    def cmake_gen(self, dir = None, gen_dir = None, cmake_flags = [], build = False):
+    def cmake_gen(self, dir = None, cmake_flags = [], build = False):
          # Determine the directory where the CMakeLists.txt file should be found.
         if dir:
             dir = os.path.abspath(dir)
@@ -534,14 +534,7 @@ add_library($output_filename_noext STATIC $${${project}_SOURCE_FILES})
             raise p4a_util.p4a_error("Could not find " + cmakelists_file)
         p4a_util.debug("Generating from " + cmakelists_file)
 
-        # Determine generation directory.
-        if not gen_dir:
-            gen_dir = os.path.join(os.getcwd(), ".cmake")
-        p4a_util.debug("Gen dir: " + gen_dir)
-        if not os.path.isdir(gen_dir):
-            os.makedirs(gen_dir)
-
-        p4a_util.run([ "cmake", "." ] + cmake_flags, working_dir = dir)
+        p4a_util.run([ "cmake", "." ] + cmake_flags, working_dir = dir)        
         if build:
             makeflags = []
             if p4a_util.get_verbosity() >= 2:

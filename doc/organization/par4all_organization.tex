@@ -178,10 +178,15 @@ In general, it is less dangerous to limit the number of commands
 executed as \texttt{root}, therefore, the latter approach to \Apfa
 installation is preferable.
 
-To install in another location, the \verb|--prefix| option can be
-used. To see more installation options (including specifying
-the locations for other packages), run \verb|p4a_setup.py -h|
-or see section~\ref{sec:p4a_s-comp-script}.
+To install in another location, the \verb|--prefix| option can be used,
+for example to choose \texttt{/opt/par4all}. Warning: do not use plain
+system directory names such as \texttt{/usr} or \texttt{/usr/local}
+because some system files such as \texttt{/usr/include/assert.h} may be
+overwritten and havoc may happen...
+
+To see more installation options (including specifying the locations for
+other packages), run \verb|p4a_setup.py -h| or see
+section~\ref{sec:p4a_s-comp-script}.
 
 To pull a new version, do:
 \begin{verbatim}
@@ -1061,8 +1066,8 @@ They are located in
   the \texttt{optparse} format) into La\TeX{} code for inclusion
   in articles or slides. See \S~\ref{sec:help-docum-tex} for more details;
 \item \verb|p4a_doc| in \verb|src/dev| is used to compile the \Apfa
-  documentation and publish it on the server. See
-  \texttt{p4a\_doc -h} for the instructions.
+  documentation, make a Doxygen version of \Apfa Accel run-time and
+  publish it on the server. See \texttt{p4a\_doc -h} for the instructions.
 \end{itemize}
 
 

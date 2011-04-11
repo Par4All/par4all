@@ -28,7 +28,6 @@ def remove_libc_typedef (content):
     size_t_re = re.compile ("typedef.*size_t");
     match_l = size_t_re.findall (content)
     for m in match_l:
-        assert (len (match_l) == 1)
         content = content.replace (m, "")
     return content
 
@@ -49,18 +48,58 @@ def insert_kernel_launcher_declaration(m):
         print "Inserting", decl
     return decl
 
-#This function is used by re.sub(...) inside the function patch_to_use_p4a_methods() 
-#and builds the accel kernel call statement for
-#p4a_launcher_xxx() function (xxx is the name of the module(function))
-def p4a_call_accel_kernel_repl(match_object):
-	if match_object.group(3):
-		return match_object.group(3)+"\n P4A_call_accel_kernel_"+match_object.group(1)+\
-			"d("+match_object.group(4)+", "+match_object.group(2)+", "+match_object.group(5)+";\n}"
-	else:
-		return "P4A_call_accel_kernel_"+match_object.group(1)+"d("+match_object.group(4)+\
-			", "+match_object.group(2)+", "+match_object.group(5)+";\n}"
+
+def p4a_launcher_clean_up(match_object):
+    """Get a match object during a p4a_launcher and generate a
+    P4A_call_accel_kernel_$x$d macro of the p4a_wrapper_... function"""
+
+    if verbose:
+        for i in range(9):
+            print i,'=', match_object.group(i), '|END|'
+
+    # Get all the interesting pieces from the original PIPS code:
+    launcher_definition_header = match_object.group(1)
+    before_loop_nest = match_object.group(3)
+    iteration_dimension = match_object.group(4)
+    iteration_space = match_object.group(5)
+    loop_nest = match_object.group(6)
+    wrapper_function_name = match_object.group(7)
+    wrapper_function_parameters = match_object.group(8)
+
+    # Extract any declaration variables:
+    # Variables are anything except plain '{' lines before the loop nest:
+    variables_before = re.sub("(?s)\n\\s*{\\s*\n", "\n", before_loop_nest)
+    # Remove blank lines:
+    variables_before = re.sub("(?s)\n\\s*\n", "\n", variables_before).rstrip()
+    if verbose:
+        print 'vb', variables_before, 'end'
+
+    # Inside loop nest, just remove the for loops:
+    variables_in_loop_nest = re.sub("(?s)\n\\s*for\\([^\n]*", "", loop_nest)
+    # Remove also the '// To be assigned to a call to P4A_vp_...' that
+    # should no be stay here:
+    variables_in_loop_nest = re.sub("(?s)\\s*// To be assigned to a call to P4A_vp_[^\n]*", "", variables_in_loop_nest)
+    # Remove blank lines:
+    variables_in_loop_nest = re.sub("(?s)\n\\s*\n", "\n", variables_in_loop_nest).rstrip()
+    if verbose:
+        print 'viln', variables_in_loop_nest, 'end'
+
+    # Now construct the final lancher construction:
+    launcher = launcher_definition_header + variables_before \
+               + variables_in_loop_nest \
+               + "\n   P4A_call_accel_kernel_" + iteration_dimension + "d(" \
+               + wrapper_function_name +", " \
+               + iteration_space + ", " + wrapper_function_parameters +";\n}"
+    if verbose:
+        print 'launcher =', launcher, '|END|'
+
+    return launcher
+
 
 def patch_to_use_p4a_methods(file_name, dir_name, includes):
+    """This post-process the PIPS generated source files to use the
+    Par4All Accel run-time"""
+
     file_base_name = os.path.basename(file_name);
 
     if file_base_name == 'p4a_stubs.c':
@@ -94,6 +133,17 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 
+	# This patch is a temporary solution. It may not cover all possible cases
+    # I guess all this should be done by applying partial_eval in PIPS ?
+	# It replaces some array declarations that nvcc do not compile.
+	# For ex.
+	# int n = 100; double a [n];
+	# is replaced by :
+	# double a[100]
+    fObj = re.findall("\s*(?:int|\,)\s*(\w+)\s*=\s*(\d+)", content)
+    for obj in fObj:
+		content = re.sub("\["+obj[0]+"\]","["+obj[1]+"]", content)
+
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:
     #content = re.sub(", (p4a_kernel[^0-9]+[0-9]+\\()",
@@ -126,17 +176,36 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     ## with
     ##   P4A_call_accel_kernel_2D(p4a_kernel_wrapper_2, 500, 500, i, j);
     ## }
+
+    ## There may be some C99 desugared for loop index desugaring to deal
+    ## with here too
+
 #   content = re.sub("(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\).*// Loop nest P4A end\n.*?(p4a_kernel_wrapper_\\d+)\\(([^)]*)\\);\n",
 #                     "P4A_call_accel_kernel_\\1d(\\3,\\2,\\4);\n", content)
 
-    content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\)(?:.*?)(int \\w+;)?(?(3)(?:.*))(?#
-        to skip to the next "Loop nest P4A end", not the last one...
-        )// Loop nest P4A end\n.*?(?#
-        to skip to "the p4a_wrapper", not the last one...
-        )(p4a_wrapper_\\w+)\\(([^;]*)\\;.*?(?#
-        no slurp to the next "}" at the begin of a line
-        )\n}""",
-        p4a_call_accel_kernel_repl, content)
+    ## content = re.sub("""(?s)// Loop nest P4A begin,(\\d+)D\\(([^)]+)\\)(?:.*?)(int \\w+;)?(?(3)(?:.*))(?#
+    ##     to skip to the next "Loop nest P4A end", not the last one...
+    ##     )// Loop nest P4A end\n.*?(?#
+    ##     to skip to "the p4a_wrapper", not the last one...
+    ##     )(p4a_wrapper_\\w+)\\(([^;]*)\\;.*?(?#
+    ##     no slurp to the next "}" at the begin of a line
+    ##     )\n}""",
+    ##     p4a_call_accel_kernel_repl, content)
+    content = re.sub("""(?s)(void p4a_launcher_(\\w+?)\\([^;]*?(?#
+    # Anchor on the declaration because I've not been able to work
+    # with a regular expression without it
+    )\n{)(.*?)(?#
+    # First capture any declaration at the begining up to the loop label:
+    )// Loop nest P4A begin,(\\d+?)D\\(([^)]+?)\\)(?#
+    # So now we have captured kernel iteration space.
+    # Next capture up to following 'Loop nest P4A end', not the last one...
+    )(.*?)// Loop nest P4A end.+?(?#
+    # Now get the p4a_wrapper_... call with its arguments:
+    )(p4a_wrapper_\\w+?)\\(([^;]*?)\\;(?#
+    # Then slurp to the next "}" at the begin of a line which is
+    # the end of function body:
+    ).*?\n}""",
+        p4a_launcher_clean_up, content)
 
     # Get the virtual processor coordinates:
     ## Change
