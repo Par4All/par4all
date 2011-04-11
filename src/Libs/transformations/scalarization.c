@@ -25,10 +25,28 @@
     #include "pips_config.h"
 #endif
 /* package scalarization
+ *
+ * Substitute array references by scalar references when legal and
+ * profitable in loop bodies. The key function is loop_scalarization().
+ *
+ * The legality condition is based on a linear algebra function to
+ * decide if a region function defined a function from any one
+ * iteration towards an array element.
+ *
+ * Because the C3 linear library cannot create new entities, i.e. new
+ * dimensions, the c_functional_graph_p() cannot have a clean
+ * interface.
+ *
+ * Nevertheless, some functions should be moved in linear.
  */
 
 #include <stdlib.h>
 #include <stdio.h>
+
+// FI: I did not include accel-util.h initialement
+// parser_private.h is surprising as is top-level.h
+//
+// svn blame shed some light on this includes...
 
 #include "genC.h"
 #include "linear.h"
@@ -89,7 +107,7 @@ static Psysteme sc_add_offset_variables(Psysteme g, Pbase b, Pbase db)
       Pbase cdb = BASE_NULLE;
       for (cb=b,cdb=db ; !BASE_NULLE_P(cb) ; cb = vecteur_succ(cb), cdb = vecteur_succ(cdb)) {
 	Variable v     = vecteur_var(cb);
- 	Variable dv    = vecteur_var(cdb);
+	Variable dv    = vecteur_var(cdb);
 	Value    coeff = vect_coeff(v, contrainte_vecteur(c));
 	vect_add_elem(&(contrainte_vecteur(c)), dv, coeff);
       }
@@ -195,8 +213,8 @@ static bool sc_functional_graph_p(Psysteme g, Pbase d, Pbase r, Pbase dr)
 
 
 /*
-   This function checks that graph g is a total function graph from
-   domain d to range r.
+   This function checks that graph g is a total function graph, i.e. a
+   mapping graph,from domain d to range r.
 */
 static bool sc_totally_functional_graph_p( Psysteme g, // function graph
 				    Pbase d,    // domain's basis
@@ -231,7 +249,8 @@ static Pbase loop_indices_b = BASE_NULLE;
 static reference scalarized_reference = reference_undefined;
 static entity scalarized_replacement_variable = entity_undefined;
 
-// gen_recurse callback function for statement_substitute_scalarized_array_references
+// gen_recurse callback function for
+// statement_substitute_scalarized_array_references
 static bool reference_substitute(reference r) {
   bool result = FALSE;
   entity v = reference_variable(r);
@@ -430,7 +449,7 @@ static bool loop_scalarization(loop l)
 	      statement co_s =
 		make_assign_statement(reference_to_expression(pvr),
 				      entity_to_expression(sv));
-	      insert_statement(s, co_s,false);
+	      insert_statement(s, co_s, false);
 	    }
 	    else {
 	      //free_reference(pvr);
