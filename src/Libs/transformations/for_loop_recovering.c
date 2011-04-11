@@ -26,8 +26,10 @@
 #endif
 
 /* 2 phases :
-   - recover for-loop in while-loop;
-   - for-loop to do-loop transformation.
+   - recover for loops hidden in while loops:
+     see comments before try_to_recover_for_loop_in_a_while()
+   - for-loop to do-loop transformation:
+     not found (FI)
 */
 
 #include "genC.h"
@@ -216,6 +218,8 @@ find_simple_for_like_variable(statement s,
      future_i = i + 1;
      a[future_i] = future_i;
    }
+   TODO: while(i-->0) {} might not be recognized, as well as
+   while(i++<n) {}
  */
 static void
 try_to_recover_for_loop_in_a_while(whileloop wl) {
@@ -259,8 +263,8 @@ try_to_recover_for_loop_in_a_while(whileloop wl) {
 	ifdebug(3) {
 	  pips_debug(3, "Variable %s (%p) is a nice loop-like index"
 		     " with relation\n", entity_global_name(rv), rv);
- 	  vect_dump(index_evolution);
- 	  vect_print(index_evolution,
+	  vect_dump(index_evolution);
+	  vect_print(index_evolution,
 		     (get_variable_name_t) pips_user_value_name);
 	}
 	entity new_index =
