@@ -25,7 +25,7 @@ LDLIBS+= -lm
 #export OMP_NESTED
 
 
-SOURCES= main.c yuv.c upscaleBis.c
+SOURCES= main.c yuv.c #upscaleBis.c
 
 #.PHONY: clean demo $(addprefix demo_, $(TARGET)) $(addprefix run_, $(TARGET) $(TARGET:=_omp) $(TARGET:=_p4a_omp) $(TARGET:=_p4a_cuda))
 

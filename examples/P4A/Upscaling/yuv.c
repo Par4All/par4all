@@ -19,19 +19,26 @@
     luminance data.
  */
 
-void buffer_copy_s(uint8 * buffer,uint8 *y)
+void buffer_copy(uint8 buffer[SIZE],uint8 y[SIZE_Y_IN])
 {
+  // Center
   for (int j = 0;j < HEIGHT;j++) {
     for (int i = 0;i < WIDTH;i++) {
       y[(j+OFFSET)*W_Y_IN+i+OFFSET]=buffer[j*WIDTH+i];
     }
   }
-  
+}
+
+void y_completion(uint8 y[SIZE_Y_IN])
+{
   for (int j = OFFSET;j < HEIGHT+OFFSET;j++) {
     // Left border
     for (int i = 0;i < OFFSET;i++) {
       y[j*W_Y_IN+i]=y[j*W_Y_IN+OFFSET];
     }
+  }
+  
+  for (int j = OFFSET;j < HEIGHT+OFFSET;j++) {
     // Rigth border
     for (int i = WIDTH+OFFSET;i < WIDTH+OFFSET*2;i++) {
       y[j*W_Y_IN+i]=y[j*W_Y_IN+(WIDTH+OFFSET)-1];
@@ -44,6 +51,7 @@ void buffer_copy_s(uint8 * buffer,uint8 *y)
       y[j*W_Y_IN+i]=y[OFFSET*W_Y_IN+i];
     }
   }
+
   // Bottom border
   for (int j = HEIGHT+OFFSET;j < HEIGHT+(OFFSET*2);j++) {
     for (int i = 0;i < WIDTH+(OFFSET*2);i++) {
@@ -52,10 +60,12 @@ void buffer_copy_s(uint8 * buffer,uint8 *y)
   }
 }
 
+
 int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZE_UV_IN])
 {  
   
-  uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
+  uint8 buffer[SIZE];
+  //uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
 
 
   // Read the luminance
@@ -66,7 +76,8 @@ int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZ
   }
 
   // Copy of the buffer in Y with offset
-  buffer_copy_s(buffer,y);
+  buffer_copy(buffer,y);
+  y_completion(y);
 
   // Read the chrominance U
   rd = fread(u,1,SIZE_UV_IN,fp);
@@ -82,7 +93,7 @@ int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZ
     return -1;
   }
 
-  free(buffer);
+  //free(buffer);
   
   return 0;
 }
