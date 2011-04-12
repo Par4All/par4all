@@ -682,6 +682,11 @@ class p4a_processor(object):
         kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
         kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
 
+        # Apply function unfolding on kernel launchers to avoid
+        # calling functions in the kernel that cause trouble to
+        # CUDA/OpenCL:
+        # kernel_launchers.unfolding()
+
         # Normalize all loops in kernels to suit hardware iteration spaces:
         kernel_launchers.loop_normalize(
             # Loop normalize to be GPU friendly, even if the step is already 1:
@@ -725,10 +730,17 @@ class p4a_processor(object):
         kernel_prefix = self.get_kernel_prefix ()
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
+        
 
         for ph in apply_phases_kernel_after:
             # Apply requested phases before parallelization to generated kernels:
 			getattr(kernels, ph)(concurrent=True)
+
+        # Unfolding is needed because kernels calling other function will get the bad cuda attribute otherwise
+        # (i.e. none).
+        # An alternative would be to flag them recursievly, but it is not safe: what if there is a host caller too ?
+        # RK suggests this should be done before ...
+        kernels.unfolding()
 
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
