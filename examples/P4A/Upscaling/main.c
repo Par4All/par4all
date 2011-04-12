@@ -54,15 +54,14 @@ void video_processing(FILE* fpin,FILE* fpout)
   }
   printf("End of reading\n");
 
-  /*
    printf("Begin computation\n");
   // Computation ... no dependence
   for(int i=0;i<NBFRAMES;i++) { 
     //frame_out[i] = upscale(frame_in[i],frame_out[i]);
-    upscale(frame_in[i],frame_out[i].y,frame_out[i].u,frame_out[i].v);
+    upscale(frame_in[i].y,frame_in[i].u,frame_in[i].v,frame_out[i].y,frame_out[i].u,frame_out[i].v);
   }
   printf("End of computation\n");
-  */
+  
 
   printf("Begin writing output video\n");
   // Writing ... data dependence
