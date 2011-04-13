@@ -2252,16 +2252,38 @@ type_spec:   /* ISO 6.7.2 */
 			}
 |   TK_SIGNED
                         {
-			  /* see the RI document or ri-util.h for explanation */
+			  /* see the IR document or ri-util.h for explanation */
+			  int size = DEFAULT_INTEGER_TYPE_SIZE;
+			  type t_old = c_parser_context_type(ycontext);
+			  if(!type_undefined_p(t_old)) {
+			    // FI: memory leak for t_old
+			    variable v_old = type_variable(t_old);
+			    basic b_old = variable_basic(v_old);
+			    if(basic_int_p(b_old))
+			      size = basic_int(b_old);
+			    else
+			      pips_internal_error();
+			  }
 			  variable v = make_variable(make_basic_int(DEFAULT_SIGNED_TYPE_SIZE*10+
-								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+								    size),NIL,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
 |   TK_UNSIGNED
                         {
+			  int size = DEFAULT_INTEGER_TYPE_SIZE;
+			  type t_old = c_parser_context_type(ycontext);
+			  if(!type_undefined_p(t_old)) {
+			    // FI: memory leak for t_old
+			    variable v_old = type_variable(t_old);
+			    basic b_old = variable_basic(v_old);
+			    if(basic_int_p(b_old))
+			      size = basic_int(b_old);
+			    else
+			      pips_internal_error();
+			  }
 			  variable v = make_variable(make_basic_int(DEFAULT_UNSIGNED_TYPE_SIZE*10+
-								    DEFAULT_INTEGER_TYPE_SIZE),NIL,NIL);
+								    size),NIL,NIL);
 			  c_parser_context_type(ycontext) = make_type_variable(v);
 			  $$ = NIL;
 			}
