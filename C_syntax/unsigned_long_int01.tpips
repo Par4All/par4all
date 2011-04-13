@@ -1,0 +1,12 @@
+delete unsigned_long_int01
+
+setproprety ABORT_ON_USER_ERROR TRUE
+
+create unsigned_long_int01 unsigned_long_int01.c
+
+display PARSED_PRINTED_FILE[main]
+display SYMBOL_TABLE_FILE[main]
+
+apply UNSPLIT
+close
+quit

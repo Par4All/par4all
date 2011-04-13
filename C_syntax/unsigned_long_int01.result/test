@@ -1,0 +1,70 @@
+int main(void)
+{
+   unsigned long int c1 = 1;
+   unsigned long int c2 = 1;
+   signed long int c3 = 1;
+   signed long int c4 = 1;
+   long int v = 2;
+   return 0;
+}
+main
+
+Declarations for module "main" with type "void -> int"
+
+Variable list:
+
+	Declared entity "TOP-LEVEL:*STATIC*" with type "area" with size 0
+	Declared entity "main:*DYNAMIC*" with type "area" with size 30
+	Declared entity "main:*HEAP*" with type "area" with size 0
+	Declared entity "main:*STACK*" with type "area" with size 0
+	Declared entity "main:*STATIC*" with type "area" with size 0
+	Declared entity "main:0`__FUNCTION__" with type "variable" "char *"
+	Declared entity "main:0`__func__" with type "variable" "char *"
+	Declared entity "main:0`c1" with type "variable" "unsigned long int"
+	Declared entity "main:0`c2" with type "variable" "unsigned long int"
+	Declared entity "main:0`c3" with type "variable" "signed long int"
+	Declared entity "main:0`c4" with type "variable" "signed long int"
+	Declared entity "main:0`v" with type "variable" "long int"
+	Declared entity "main:main" with type "variable" "int"
+	Declared entity "unsigned_long_int01!:*STATIC*" with type "area" with size 0
+
+* empty extern declaration list *
+
+
+Layout for return variable:
+
+	Variable "main:main"	size = 4
+
+Layouts for memory areas:
+
+Layout for memory area "TOP-LEVEL:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*DYNAMIC*" of size 30:
+	Variable "main:0`c1"	offset = 10	size = 4
+	Variable "main:0`c2"	offset = 14	size = 4
+	Variable "main:0`c3"	offset = 18	size = 4
+	Variable "main:0`c4"	offset = 22	size = 4
+	Variable "main:0`v"	offset = 26	size = 4
+	Variable "main:0`__func__"	offset = 0	size = 5
+	Variable "main:0`__FUNCTION__"	offset = 5	size = 5
+
+
+Layout for memory area "main:*HEAP*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STACK*" of size 0:
+	* empty area *
+
+
+Layout for memory area "main:*STATIC*" of size 0:
+	* empty area *
+
+
+Layout for memory area "unsigned_long_int01!:*STATIC*" of size 0:
+	* empty area *
+
+End of declarations for module main
+
