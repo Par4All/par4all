@@ -1,3 +1,22 @@
+2011-04-12  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.1.1
+
+		* Added support for CEA SCMP task dataflow machine (European
+		  project ARTEMIS SCALOPES)
+
+		* Improved GPU kernel generation for loop nests with complex
+		  declarations.
+
+		  Bug reported by Richard Membarth from Universität Erlangen.
+
+		* Added new options to apply PIPS transformations in the Par4All
+		  compilation transit (--apply-before-parallelization...)
+
+		* Added a programming guide describing best practices to get
+		  better performance with Par4All
+
+
 2011-03-01  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.1
