@@ -1,0 +1,35 @@
+
+First use the default properties
+
+C     Scalar replacement in the presence of conditional control flow
+C
+C     Steve Carr and Ken Kennedy
+C
+C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
+C
+C     Second example, which PIPS decides to be unprofitable
+
+      SUBROUTINE SCALARIZATION31(A, B, C, D, E, M, N)
+      REAL A(N), B(N), C(N), D(N), E(N), M(N)
+
+      DO I = 1, N
+         IF (M(I).LT.0.) A(I) = B(I)+C(I)
+         __scalar__0 = A(I)+E(I)
+      ENDDO
+
+      DO I = 1, N
+         IF (M(I).LT.0.) A(I) = B(I)+C(I)
+         D(I) = A(I)+E(I)
+      ENDDO
+
+      PRINT *, D
+
+      DO I = 1, N
+         __scalar__2 = E(I)
+         __scalar__1 = A(I)
+         IF (M(I).LT.0.) __scalar__1 = B(I)+C(I)
+         __scalar__3 = __scalar__1+__scalar__2
+         __scalar__3 = __scalar__3+__scalar__1*__scalar__2
+      ENDDO
+
+      END
