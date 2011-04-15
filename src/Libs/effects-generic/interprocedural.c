@@ -192,17 +192,25 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 			  }
 		      }
 
-		    l_res = gen_nconc
+		    /* l_res = gen_nconc
 		      (l_res,
 		       effect_to_effects_with_given_tag(real_arg_eff,
-							act));
+		       act)); */
 
 		    /* add effects on accessible paths */
 
-		    l_res = gen_nconc
+		    /*l_res = gen_nconc
 		      (l_res,
 		       generic_effect_generate_all_accessible_paths_effects
-		       (real_arg_eff, eff_type, act));
+		       (real_arg_eff, eff_type, act));*/
+
+		    l_res = gen_nconc
+		      (l_res,generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
+									 eff_type,
+									 act,
+									 true,
+									 10, /* to avoid too long paths until GAPS are handled */
+											     false));
 		  }
 		break;
 	      }
@@ -225,10 +233,17 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 	      }
 	    else
 	      {
-		l_res = gen_nconc
+		/* l_res = gen_nconc
 		  (l_res,
 		   generic_effect_generate_all_accessible_paths_effects
-		   (real_arg_eff, real_arg_t, act));
+		   (real_arg_eff, real_arg_t, act)); */
+		l_res = gen_nconc
+		      (l_res,generic_effect_generate_all_accessible_paths_effects_with_level(real_arg_eff,
+									 real_arg_t,
+									 act,
+									 false,
+									 10, /* to avoid too long paths until GAPS are handled */
+											     false));
 	      }
 
 	  }
@@ -262,6 +277,8 @@ list c_actual_argument_to_may_summary_effects(expression real_arg, tag act)
 
   if (!transformer_undefined_p(context))
     (*effects_precondition_composition_op)(l_res, context);
+
+  effects_to_may_effects(l_res);
 
   ifdebug(6)
     {
