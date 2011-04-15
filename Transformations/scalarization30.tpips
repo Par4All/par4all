@@ -1,3 +1,7 @@
+echo
+echo First use the default properties
+echo
+
 delete scalarization30
 
 setproperty ABORT_ON_USER_ERROR TRUE
@@ -9,6 +13,25 @@ setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 create scalarization30 scalarization30.f
 
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+apply SCALARIZATION[SCALARIZATION30]
+display PRINTED_FILE[SCALARIZATION30]
+
+close
+
+delete scalarization30
+
+echo
+echo Try again with a different property to exploit the array declarations
+echo
+
+create scalarization30 scalarization30.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
 
 ## Needed for substracting set approximations
 activate MUST_REGIONS

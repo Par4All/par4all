@@ -5,7 +5,7 @@ C
 C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
 C
 C     First example, which turns out to be wrong if the program
-C     behaviors must be rexpected
+C     behaviors must be respected
 
       subroutine scalarization30(a,b,m,n)
       real a(n), b(m)
@@ -13,6 +13,8 @@ C     behaviors must be rexpected
 C     a(i) is not scalarized because m<1 is a guard for it. Adding s =
 C     a(i) before do j = ... may generate out of bounds accesses that do
 C     not exist in the initial code
+C
+C     Except if declarations can be trusted
       do i = 1,n
          do j = 1,m
             a(i) = a(i) + b(j)
