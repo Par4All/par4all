@@ -1,3 +1,6 @@
+
+First use the default properties
+
 C     Scalar replacement in the presence of conditional control flow
 C
 C     Steve Carr and Ken Kennedy
@@ -5,7 +8,7 @@ C
 C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
 C
 C     First example, which turns out to be wrong if the program
-C     behaviors must be rexpected
+C     behaviors must be respected
 
       SUBROUTINE SCALARIZATION30(A,B,M,N)
       REAL A(N), B(M)
@@ -13,6 +16,8 @@ C     behaviors must be rexpected
 C     a(i) is not scalarized because m<1 is a guard for it. Adding s =
 C     a(i) before do j = ... may generate out of bounds accesses that do
 C     not exist in the initial code
+C
+C     Except if declarations can be trusted
       DO I = 1, N
          DO J = 1, M
             A(I) = A(I)+B(J)
@@ -41,6 +46,9 @@ C     No copy out because of the interprocedural analysis: no caller here
       ENDDO
 
       END
+
+Try again with a different property to exploit the array declarations
+
 C     Scalar replacement in the presence of conditional control flow
 C
 C     Steve Carr and Ken Kennedy
@@ -48,7 +56,7 @@ C
 C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
 C
 C     First example, which turns out to be wrong if the program
-C     behaviors must be rexpected
+C     behaviors must be respected
 
       SUBROUTINE SCALARIZATION30(A,B,M,N)
       REAL A(N), B(M)
@@ -56,6 +64,8 @@ C     behaviors must be rexpected
 C     a(i) is not scalarized because m<1 is a guard for it. Adding s =
 C     a(i) before do j = ... may generate out of bounds accesses that do
 C     not exist in the initial code
+C
+C     Except if declarations can be trusted
       DO I = 1, N
          __scalar__0 = A(I)
          DO J = 1, M
