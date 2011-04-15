@@ -42,3 +42,14 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
 }
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 12 with conflicts
+		from <fmt-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	06 --> 12 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	05 --> 12 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

@@ -44,3 +44,12 @@ int struct06()
 //             <    is written>: x[i].un.first
       x[i].un.first = x[i].deux.second;
 }
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 14 with conflicts
+		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
+	11 --> -1 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

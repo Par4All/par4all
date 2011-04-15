@@ -32,3 +32,12 @@ void point_to02()
 //             <    is read   >: p
    (p->b)[2] = 3;
 }
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 09 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************

@@ -28,3 +28,10 @@ void array02()
 //             <    is written>: x[i][1]
       x[i][1] = 0.;
 }
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 07 with conflicts
+		from <x[i][1]-W-EXACT> to <x[i][1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

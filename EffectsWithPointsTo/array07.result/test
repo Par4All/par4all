@@ -33,3 +33,10 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 10 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+
+****************** End of Dependence Graph ******************

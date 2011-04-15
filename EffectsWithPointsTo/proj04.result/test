@@ -79,3 +79,46 @@ int main(void)
    **pp = 0;
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	29 --> 33 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	26 --> 33 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	26 --> 29 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	25 --> 33 with conflicts
+		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 33 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 29 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	20 --> 33 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 33 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 18 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	15 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+	15 --> 21 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+	14 --> 33 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

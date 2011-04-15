@@ -31,3 +31,12 @@ int main()
    decl04(s);
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	16 --> 17 with conflicts
+		from <s.champ2-W-EXACT> to <s.champ2-R-EXACT>
+	15 --> 17 with conflicts
+		from <s.champ1-W-EXACT> to <s.champ1-R-EXACT>
+
+****************** End of Dependence Graph ******************

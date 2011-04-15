@@ -37,3 +37,13 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 07 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 05 with conflicts
+		from <k-W-EXACT> to <k-R-EXACT>
+
+****************** End of Dependence Graph ******************

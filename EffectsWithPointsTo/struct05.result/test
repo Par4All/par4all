@@ -45,3 +45,20 @@ int struct05()
 //             <    is written>: x[i].second
          x[i].second = x[i].first;
 }
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 14 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-W-EXACT>
+	14 --> 11 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-R-EXACT>
+		from <x[i].first-R-EXACT> to <x[i].first-W-EXACT>
+	11 --> 14 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-R-EXACT>
+		from <x[i].second-R-EXACT> to <x[i].second-W-EXACT>
+	11 --> 11 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-W-EXACT>
+	07 --> -1 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

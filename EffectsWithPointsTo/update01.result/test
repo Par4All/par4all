@@ -32,3 +32,11 @@ void update01()
 //             <    is written>: i
    i = 2;
 }
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

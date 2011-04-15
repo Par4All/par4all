@@ -56,3 +56,36 @@ int main(void)
    *pp = &j;
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	17 --> 18 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <pp-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	12 --> 18 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	12 --> 17 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	11 --> 18 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	11 --> 17 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	11 --> 12 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	10 --> 18 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	10 --> 17 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	10 --> 12 with conflicts
+		from <pi-W-EXACT> to <pi-R-EXACT>
+
+****************** End of Dependence Graph ******************

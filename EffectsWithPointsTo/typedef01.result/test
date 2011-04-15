@@ -33,3 +33,10 @@ int main(int argc, char *argv[])
    
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	29 --> 29 with conflicts
+		from <tab[*][*]-W-MAY> to <tab[*][*]-W-MAY>
+
+****************** End of Dependence Graph ******************

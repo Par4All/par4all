@@ -35,3 +35,12 @@ int main(int argc, char *argv[])
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -62,3 +62,25 @@ void point_to01()
       p->d = p->a = 4;
    }
 }
+
+ *********************** Use-Def Chains *********************
+
+	16 --> 17 with conflicts
+		from <c.d-W-EXACT> to <c.d-W-EXACT>
+		from <c.a-R-EXACT> to <c.a-W-EXACT>
+	13 --> 17 with conflicts
+		from <c.a-W-EXACT> to <c.a-W-EXACT>
+	13 --> 16 with conflicts
+		from <c.a-W-EXACT> to <c.a-R-EXACT>
+	10 --> 17 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 16 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 15 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	10 --> 13 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

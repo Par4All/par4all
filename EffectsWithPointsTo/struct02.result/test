@@ -59,3 +59,26 @@ int struct02()
          x[i].second = 1;
       }
 }
+
+ *********************** Use-Def Chains *********************
+
+	16 --> 16 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-W-EXACT>
+	16 --> 12 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-W-EXACT>
+	15 --> 15 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-W-EXACT>
+	15 --> 11 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-W-EXACT>
+	12 --> 16 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-W-EXACT>
+	12 --> 12 with conflicts
+		from <x[i].second-W-EXACT> to <x[i].second-W-EXACT>
+	11 --> 15 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-W-EXACT>
+	11 --> 11 with conflicts
+		from <x[i].first-W-EXACT> to <x[i].first-W-EXACT>
+	07 --> -1 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

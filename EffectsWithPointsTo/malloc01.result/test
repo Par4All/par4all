@@ -15,10 +15,10 @@ int main(int argc, char *argv[])
       a[i] = (float) malloc(64*sizeof(float));
 //  points to = {}
       for(j = 0; j <= 63; j += 1)
-//  {(a[i],*HEAP*_l_13,-Exact-)}
+//  {(a[i],*HEAP*_l_13[0],-Exact-)}
          a[i][j] = 0.;
    }
-//  {(a[i],*HEAP*_l_13,-MAY-)}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
 
    return 0;
 }
@@ -37,10 +37,30 @@ int main(int argc, char *argv[])
       a[i] = (float) malloc(64*sizeof(float));
 //             <    is written>: j
       for(j = 0; j <= 63; j += 1)
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a[i] i j
+//             <    is written>: *HEAP*_l_13[0+j]
          a[i][j] = 0.;
    }
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 15 with conflicts
+		from <*HEAP*_l_13[0+j]-W-EXACT> to <*HEAP*_l_13[0+j]-W-EXACT>
+	15 --> -1 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	15 --> 13 with conflicts
+		from <a[i]-R-EXACT> to <a[i]-W-EXACT>
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	13 --> 15 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-R-EXACT>
+	13 --> 13 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+
+****************** End of Dependence Graph ******************

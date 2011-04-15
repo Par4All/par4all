@@ -77,3 +77,49 @@ int main(void)
       **pp = 0;
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	26 --> 30 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 30 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	21 --> 30 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 30 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 22 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	20 --> 30 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	20 --> 22 with conflicts
+		from <pi-W-EXACT> to <pi-R-EXACT>
+	17 --> 30 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 18 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	15 --> 30 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	15 --> 30 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	15 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	15 --> 21 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+
+****************** End of Dependence Graph ******************

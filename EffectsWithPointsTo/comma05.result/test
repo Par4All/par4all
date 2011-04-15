@@ -60,3 +60,13 @@ int main()
    
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	10 --> -1 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
+	08 --> -1 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************

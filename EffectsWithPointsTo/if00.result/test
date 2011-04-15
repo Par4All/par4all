@@ -68,3 +68,14 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 15 with conflicts
+		from <x1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	05 --> 15 with conflicts
+		from <y1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	04 --> 15 with conflicts
+		from <x2-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************

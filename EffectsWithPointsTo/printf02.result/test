@@ -29,3 +29,12 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("i=%d, %d, %f\n", i, i+j, x);
 }
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 08 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	05 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

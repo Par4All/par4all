@@ -22,3 +22,10 @@ int main()
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    puts(s);
 }
+
+ *********************** Use-Def Chains *********************
+
+	05 --> 06 with conflicts
+		from <s-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

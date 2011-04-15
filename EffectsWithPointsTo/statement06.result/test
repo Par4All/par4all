@@ -209,3 +209,52 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	33 --> 35 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	31 --> 33 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	29 --> 31 with conflicts
+		from <pc-W-EXACT> to <pc-R-EXACT>
+	27 --> 29 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	25 --> 35 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	25 --> 33 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	25 --> 27 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	24 --> 35 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	24 --> 33 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	24 --> 25 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	23 --> 25 with conflicts
+		from <pd-W-EXACT> to <pd-W-EXACT>
+	21 --> 27 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	20 --> 29 with conflicts
+		from <ppc-W-EXACT> to <ppc-R-EXACT>
+	20 --> 21 with conflicts
+		from <ppc-W-EXACT> to <ppc-R-EXACT>
+	19 --> 21 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	16 --> 17 with conflicts
+		from <ppb-W-EXACT> to <ppb-R-EXACT>
+	15 --> 17 with conflicts
+		from <pb-W-EXACT> to <pb-W-EXACT>
+	13 --> 31 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	12 --> 35 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	12 --> 31 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	12 --> 13 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	11 --> 13 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+
+****************** End of Dependence Graph ******************

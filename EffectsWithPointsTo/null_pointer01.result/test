@@ -5,38 +5,44 @@ POINTS-TO
 int main()
 {
 //  points to = {}
-   int i;
+   int i;                                                               /*0006*/
 //  points to = {}
-   int *p = 0;
+   int *p = 0;                                                          /*0007*/
 //  {(p,*NULL_POINTER*,-Exact-)}
-   int **q = 0;
+   int **q = 0;                                                         /*0008*/
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
 
-   *p = 1;
+   *p = 1;                                                              /*0010*/
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
-   *q = &i;
+   *q = &i;                                                             /*0011*/
 //  {(*NULL_POINTER*,i,-Exact-);(p,*NULL_POINTER*,-Exact-);(q,
 //   *NULL_POINTER*,-Exact-)}
 
-   return 0;
+   return 0;                                                            /*0013*/
 }
-
-PROPER  EFFECTS WITH POINTS TO
-
 int main()
 {
-   int i;
+   int i;                                                               /*0006*/
 //             <    is written>: p
-   int *p = 0;
+   int *p = 0;                                                          /*0007*/
 //             <    is written>: q
-   int **q = 0;
+   int **q = 0;                                                         /*0008*/
 //             <    is read   >: p
 //             <    is written>: *NULL_POINTER*
 
-   *p = 1;
+   *p = 1;                                                              /*0010*/
 //             <    is read   >: q
 //             <    is written>: *NULL_POINTER*
-   *q = &i;
+   *q = &i;                                                             /*0011*/
 
-   return 0;
+   return 0;                                                            /*0013*/
 }
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 11 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	07 --> 10 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -34,3 +34,11 @@ int main()
 
    AddNoise(ny, nx, pt_in, Sigma2, pt_out);
 }
+
+ *********************** Use-Def Chains *********************
+
+	43 --> 48 with conflicts
+		from <ny-W-EXACT> to <ny-R-EXACT>
+		from <nx-W-EXACT> to <nx-R-EXACT>
+
+****************** End of Dependence Graph ******************

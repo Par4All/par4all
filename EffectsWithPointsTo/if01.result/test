@@ -48,3 +48,16 @@ int main()
    y = *x;
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 16 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	09 --> 16 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+	05 --> 16 with conflicts
+		from <x2-W-EXACT> to <x2-R-MAY>
+	04 --> 16 with conflicts
+		from <x1-W-EXACT> to <x1-R-MAY>
+
+****************** End of Dependence Graph ******************

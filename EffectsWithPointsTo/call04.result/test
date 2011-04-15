@@ -29,3 +29,12 @@ int main()
 
    call04(d1, d2, y);
 }
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 18 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	14 --> 18 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+
+****************** End of Dependence Graph ******************

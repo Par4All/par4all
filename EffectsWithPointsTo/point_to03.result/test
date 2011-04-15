@@ -31,3 +31,10 @@ void point_to03()
 //             <    is written>: a[2][3]
    ((*p)[2])[3] = 1.5;
 }
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 08 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

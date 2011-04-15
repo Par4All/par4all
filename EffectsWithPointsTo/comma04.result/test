@@ -60,3 +60,12 @@ int main()
    p = (r = &j, r = s);
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 16 with conflicts
+		from <s-W-EXACT> to <s-R-EXACT>
+	08 --> 16 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+
+****************** End of Dependence Graph ******************

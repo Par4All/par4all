@@ -35,3 +35,10 @@ int main()
 //             <    is written>: bytes_read __IO_EFFECTS:LUNS[fd]
    bytes_read = read(fd, buf, nbytes);
 }
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <nbytes-W-EXACT> to <nbytes-R-EXACT>
+
+****************** End of Dependence Graph ******************

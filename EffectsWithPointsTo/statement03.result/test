@@ -46,3 +46,12 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 10 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	07 --> 10 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+
+****************** End of Dependence Graph ******************

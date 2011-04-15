@@ -49,3 +49,18 @@ int main()
    aa = **c;
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	07 --> 10 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	07 --> 09 with conflicts
+		from <c-W-EXACT> to <c-R-EXACT>
+	06 --> 10 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	06 --> 09 with conflicts
+		from <b-W-EXACT> to <b-R-EXACT>
+	05 --> 10 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+
+****************** End of Dependence Graph ******************

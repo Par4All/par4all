@@ -40,3 +40,20 @@ float main(int argc, char *argv[])
 //             <    is read   >: imagein[2][1].re
    return imagein[2][1].re;
 }
+
+ *********************** Use-Def Chains *********************
+
+	17 --> 17 with conflicts
+		from <imagein[i][j].im-W-EXACT> to <imagein[i][j].im-W-EXACT>
+	17 --> -1 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	16 --> 19 with conflicts
+		from <imagein[i][j].re-W-EXACT> to <imagein[2][1].re-R-EXACT>
+	16 --> 16 with conflicts
+		from <imagein[i][j].re-W-EXACT> to <imagein[i][j].re-W-EXACT>
+	16 --> -1 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+
+****************** End of Dependence Graph ******************

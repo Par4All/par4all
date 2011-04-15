@@ -39,3 +39,10 @@ int main()
 
    return 0;
 }
+
+ *********************** Use-Def Chains *********************
+
+	04 --> 06 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

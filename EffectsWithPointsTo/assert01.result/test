@@ -18,3 +18,8 @@ void assert01()
 //             <    is read   >: i
    i>0?(void) 0:__assert_fail("i>0", "$VDIR/assert01.c", 15, (const char *) 0);
 }
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

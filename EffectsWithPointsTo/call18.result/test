@@ -29,3 +29,14 @@ int main()
 
    call18(i, i, j, k, 0);
 }
+
+ *********************** Use-Def Chains *********************
+
+	20 --> 22 with conflicts
+		from <k-W-EXACT> to <k-R-EXACT>
+	19 --> 22 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	18 --> 22 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************
