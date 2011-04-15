@@ -1,7 +1,5 @@
 
-void Run() {
-  
-  double a[10][10];
+void Run( double a[10][10], int *p) {
   {
     int lv1, lv2;
     for (lv1 = 0; lv1 < 10; lv1++) {
@@ -10,11 +8,13 @@ void Run() {
       }
     }
   };
-  double b;
-  int lv0;
 
-// This anywhere effect prevent lv2 privatisation, but not the parallelization !
-  lv0 = *&b;
+  {
+// This anywhere effect prevent lv2 privatisation in lv1 loop, 
+// (but not the parallelization of lv2 loop) !
+    int b = *p;
+  };
+  
   
 }
 
