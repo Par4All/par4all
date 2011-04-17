@@ -10139,11 +10139,12 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 
 \begin{PipsPass}{scalarization}
   Scalarization is the process of replacing array references with
-  scalar variables wherever appropriate. Expected benefits include
-  lower memory footprint and access time because registers can be used
-  instead of temporary stack variables or memory accesses, and hence,
-  shorter execution times, as long as the register pressure is not so
-  high that spill code is generated.
+  references to scalar copies of the array elements wherever
+  appropriate. Expected benefits include lower memory footprint and
+  access time because registers can be used instead of temporary stack
+  variables or memory accesses, and hence, shorter execution times, as
+  long as the register pressure is not so high that spill code is
+  generated.
 \end{PipsPass}
 
 Scalarizing a given array reference is subject to two successive
@@ -10171,9 +10172,20 @@ dependence arcs prevent scalarization by PIPS, although some can be
 processed by Carr's algorithm. See non-regression tests
 Transformations/scalarization30 to 36.
 
-The new scalar variables use the default prefix \verb/___scalar__/ and are
-thus easily identified, but a new prefix can be user defined with
-Property~\PipsPropRef{SCALARIZATION_PREFIX}.
+This transformation is useful 1) to improve the readability of the
+source code with constructs similar to {\em let x be ...}, 2) to
+improve the modelizations of the execution, time or energy, by using
+source instructions closer to the machine instruction, 3) to
+perform an optimization at the source level because the code generator
+does not include a powerful (partially) redundant load elimination,
+and 4) to be a useful pass in a fully source-to-source compiler. This
+transformation is useful to reduce the expansion caused by the
+different atomizer passes.
+
+The new scalar variables use the default prefix \verb/___scalar__/ and
+are thus easily identified, but a new prefix can be user defined with
+Property~\PipsPropRef{SCALARIZATION_PREFIX}. If\PipsPropRef{SCALARIZATION_PREFIX}
+is the empty string, the names of the scalarized variables are used.
 
 If needed according to the IN and OUT convex array regions, the new
 variables are initialized, e.g. \verb/__scalar0__ = A[i]/, and/or
@@ -10182,6 +10194,10 @@ copied back into the initial array, e.g. \verb/A[i] = __scalar0__/.
 Scalarization is currently applicable both to Fortran and C code.
 
 
+Pass \PipsPassRef{scalarization} uses the read and written convex
+array regions to decide if the scalarization is possible, the in and
+out regions to decide if it is useful to initialize the scalar copy or
+to restore the value of the array element.
 \begin{PipsMake}
 alias scalarization 'Scalarization'
 scalarization  > MODULE.code
@@ -10191,18 +10207,27 @@ scalarization  > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 \end{PipsMake}
+
+As explained above, Property \PipsPropRef{SCALARIZATION_PREFIX} is
+used to select the names of the new scalar variables.
 \begin{PipsProp}{SCALARIZATION_PREFIX}
 SCALARIZATION_PREFIX "__scalar__"
 \end{PipsProp}
+
+Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
+when it is useless according to the OUT region\marginpar{Serge: motivation?}.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
 \end{PipsProp}
 
+This pass was designed by Fran\c{c}ois Irigoin and implemented by
+Laurent Daverio and Fran\c{c}ois Irigoin.
 
 \begin{PipsPass}{constant_array_scalarization}
-Similar to \PipsPassRef{scalarization}, but with a different criterium:
-if the array is only accessed through constant indices, all its references are repalced by
-scalars.
+  Similar to \PipsPassRef{scalarization}, but with a different
+  criterion: if an array is only accessed with numerical constant subscript
+  expressions, it is replaced by a set of scalars and all its
+  references are replaced by references to the corresponding scalars.
 \end{PipsPass}
 \begin{PipsMake}
 constant_array_scalarization > MODULE.code
@@ -10210,6 +10235,13 @@ constant_array_scalarization > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+This pass may be useful to make C source code more palatable to C to
+VHDL converter\marginpar{Serge: more motivations?}. It is also useful
+to propagate constants contained in an array since the semantics
+passes only analyze scalar variables. 
+
+
+This pass was designed and implemented by Serge Guelton.
 
 \subsection{Induction Variable Substitution}
 
@@ -10228,6 +10260,8 @@ induction_substitution > MODULE.code
         < MODULE.preconditions
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+This pass was designed and implemented by Mehdi Amini.
 
 \subsection{Strength Reduction}
 
