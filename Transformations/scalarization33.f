@@ -23,4 +23,3 @@ C     statement could be avoided by using the last assignment
       print *, c, f
 
       end
-
