@@ -33,45 +33,45 @@ simdized code
          DO J10 = 1, 4, 2
             C(I0,J10) = 0
             DO K110 = 1, 4, 2
-               CALL SIMD_LOAD_V2SI(vec20, B(K110,J10))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec10, A(I0,K110), A(I0,1+
+               CALL SIMD_LOAD_V2SI(VEC20, B(K110,J10))
+               CALL SIMD_LOAD_GENERIC_V2SI(VEC10, A(I0,K110), A(I0,1+
      &         K110))
-               CALL SIMD_MULD(vec00, vec10, vec20)
-               CALL SIMD_STORE_V2SI(vec00, pdata0(0))
-               C(I0,J10) = pdata0(0)+C(I0,J10)
-               C(I0,J10) = pdata0(1)+C(I0,J10)
+               CALL SIMD_MULD(VEC00, VEC10, VEC20)
+               CALL SIMD_STORE_V2SI(VEC00, PDATA0(0))
+               C(I0,J10) = PDATA0(0)+C(I0,J10)
+               C(I0,J10) = PDATA0(1)+C(I0,J10)
             ENDDO
             C(I0,1+J10) = 0
             DO K010 = 1, 4, 2
-               CALL SIMD_LOAD_V2SI(vec50, B(K010,1+J10))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec40, A(I0,K010), A(I0,1+
+               CALL SIMD_LOAD_V2SI(VEC50, B(K010,1+J10))
+               CALL SIMD_LOAD_GENERIC_V2SI(VEC40, A(I0,K010), A(I0,1+
      &         K010))
-               CALL SIMD_MULD(vec30, vec40, vec50)
-               CALL SIMD_STORE_V2SI(vec30, pdata1(0))
-               C(I0,1+J10) = pdata1(0)+C(I0,1+J10)
-               C(I0,1+J10) = pdata1(1)+C(I0,1+J10)
+               CALL SIMD_MULD(VEC30, VEC40, VEC50)
+               CALL SIMD_STORE_V2SI(VEC30, PDATA1(0))
+               C(I0,1+J10) = PDATA1(0)+C(I0,1+J10)
+               C(I0,1+J10) = PDATA1(1)+C(I0,1+J10)
             ENDDO
          ENDDO
          DO J00 = 1, 4, 2
             C(1+I0,J00) = 0
             DO K100 = 1, 4, 2
-               CALL SIMD_LOAD_V2SI(vec80, B(K100,J00))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec70, A(1+I0,K100), A(1+
+               CALL SIMD_LOAD_V2SI(VEC80, B(K100,J00))
+               CALL SIMD_LOAD_GENERIC_V2SI(VEC70, A(1+I0,K100), A(1+
      &         I0,1+K100))
-               CALL SIMD_MULD(vec60, vec70, vec80)
-               CALL SIMD_STORE_V2SI(vec60, pdata2(0))
-               C(1+I0,J00) = pdata2(0)+C(1+I0,J00)
-               C(1+I0,J00) = pdata2(1)+C(1+I0,J00)
+               CALL SIMD_MULD(VEC60, VEC70, VEC80)
+               CALL SIMD_STORE_V2SI(VEC60, PDATA2(0))
+               C(1+I0,J00) = PDATA2(0)+C(1+I0,J00)
+               C(1+I0,J00) = PDATA2(1)+C(1+I0,J00)
             ENDDO
             C(1+I0,1+J00) = 0
             DO K000 = 1, 4, 2
-               CALL SIMD_LOAD_V2SI(vec110, B(K000,1+J00))
-               CALL SIMD_LOAD_GENERIC_V2SI(vec100, A(1+I0,K000), A(1+
+               CALL SIMD_LOAD_V2SI(VEC110, B(K000,1+J00))
+               CALL SIMD_LOAD_GENERIC_V2SI(VEC100, A(1+I0,K000), A(1+
      &         I0,1+K000))
-               CALL SIMD_MULD(vec90, vec100, vec110)
-               CALL SIMD_STORE_V2SI(vec90, pdata3(0))
-               C(1+I0,1+J00) = pdata3(0)+C(1+I0,1+J00)
-               C(1+I0,1+J00) = pdata3(1)+C(1+I0,1+J00)
+               CALL SIMD_MULD(VEC90, VEC100, VEC110)
+               CALL SIMD_STORE_V2SI(VEC90, PDATA3(0))
+               C(1+I0,1+J00) = PDATA3(0)+C(1+I0,1+J00)
+               C(1+I0,1+J00) = PDATA3(1)+C(1+I0,1+J00)
             ENDDO
          ENDDO
       ENDDO
