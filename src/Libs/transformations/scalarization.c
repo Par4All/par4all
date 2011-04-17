@@ -377,6 +377,11 @@ static bool loop_scalarization(loop l)
 
 	   - else: if there is neither copy-in nor copy-out,
            privatization is always useful.
+
+	   FI: we should also check if the reference is loop invariant
+	   and then decide that it is alsways profitable to scalarize
+	   it... See scalarization34 in Transformations. We should
+	   check is the region is a constant function.
 	*/
 
 	if (nd > 0
@@ -431,7 +436,13 @@ static bool loop_scalarization(loop l)
 
 	    // Create a new variable and add
 	    // its declaration to the current module
-	    entity sv = make_new_scalar_variable_with_prefix(get_string_property("SCALARIZATION_PREFIX"), get_current_module_entity(), svb);
+	    // If no default prefix is defined, use the variable name
+	    // as prefix
+	    string dpref = get_string_property("SCALARIZATION_PREFIX");
+	    string epref = strlen(dpref)==0?
+	      concatenate(entity_user_name(pv), "_", NULL)
+	      : dpref;
+	    entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);
 	    AddEntityToCurrentModule(sv);
 	    scalarized_variables =
 	      arguments_add_entity(scalarized_variables, pv);
