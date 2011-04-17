@@ -1,11 +1,12 @@
 C     Expected result: t(i) scalarized
 
-C     Same as scalarization01.f, but tpips different to exercise
-C     SCALARIZATION_PREFIX
+C     Same as scalarization38.f, but with a name conflict if the prefix
+C     specified in scalarization39.tpips is forced to uppercase
 
       subroutine scalarization(x,y,n)
       real x(n,n), y(n,n)
-      real t(100)    
+      real t(100), s_0
+      s_0 = 0.
       do i = 1,n
          do j = 1,n
             t(i)   = x(i,j)
@@ -13,9 +14,10 @@ C     SCALARIZATION_PREFIX
             y(i,j) = t(i)
          enddo
       enddo
+      print *, s_0
       end
 
-      program scalarization37
+      program scalarization39
       parameter(n=100)
       real x(n,n), y(n,n)      
       read *,x,y

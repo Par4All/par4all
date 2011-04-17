@@ -1,14 +1,16 @@
 # Same as scalarization01, but test property SCALARIZATION_PREFIX
 
-delete scalarization37
+# Check that the prefix is forced to uppercase for Fortran code
+
+delete scalarization39
 
 setproperty ABORT_ON_USER_ERROR TRUE
-setproperty SCALARIZATION_PREFIX "S_"
+setproperty SCALARIZATION_PREFIX "s_"
 
 ##TODO: explain
 setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
 
-create scalarization37 scalarization37.f
+create scalarization39 scalarization39.f
 
 ## Needed for substracting set approximations
 activate MUST_REGIONS
@@ -17,6 +19,6 @@ apply SCALARIZATION[SCALARIZATION]
 display PRINTED_FILE[SCALARIZATION]
 
 close
-delete scalarization37
+delete scalarization39
 quit
 

@@ -12,15 +12,15 @@ C     statement could be avoided by using the last assignment
       REAL A(N), B(N), C(N), D(N), E(N), F(N)
 
       DO I = 1, N
-         __scalar__1 = D(I)
-         __scalar__0 = C(I)
+         __SCALAR__1 = D(I)
+         __SCALAR__0 = C(I)
          IF (A(I).GT.0.) THEN
-            B(I) = __scalar__0+__scalar__1
+            B(I) = __SCALAR__0+__SCALAR__1
          ELSE
-            F(I) = __scalar__0+__scalar__1
+            F(I) = __SCALAR__0+__SCALAR__1
          ENDIF
-         __scalar__0 = E(I)+B(I)
-         C(I) = __scalar__0
+         __SCALAR__0 = E(I)+B(I)
+         C(I) = __SCALAR__0
       ENDDO
 
       PRINT *, C, F

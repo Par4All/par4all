@@ -12,11 +12,11 @@ C     regions fuse here two independent references
       REAL B(N,N), W(N)
 
       DO I = 2, N
-         __scalar__0 = W(I)
+         __SCALAR__0 = W(I)
          DO K = 1, I-1
-            __scalar__0 = __scalar__0+B(I,K)*W(I-K)
+            __SCALAR__0 = __SCALAR__0+B(I,K)*W(I-K)
          ENDDO
-         W(I) = __scalar__0
+         W(I) = __SCALAR__0
       ENDDO
 
       PRINT *, W

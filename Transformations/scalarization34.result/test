@@ -18,9 +18,9 @@ C     Also, we do not try to carry a value from one iteration to the next
       REAL A(N), B(N), C(N), D(N), E(N), M(N)
 
       DO I = 1, 100
-         __scalar__0 = C(I)
-         IF (M(I).LT.0.) E(I) = __scalar__0
-         A(I) = __scalar__0+D(I)
+         __SCALAR__0 = C(I)
+         IF (M(I).LT.0.) E(I) = __SCALAR__0
+         A(I) = __SCALAR__0+D(I)
          B(K) = B(K)+A(I-1)
       ENDDO
 

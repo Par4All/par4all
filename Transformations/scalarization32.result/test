@@ -13,13 +13,13 @@ C     matter much here
       REAL A(N), B(N), C(N), D(N), E(N)
 
       DO I = 1, N
-         __scalar__1 = D(I)
+         __SCALAR__1 = D(I)
          IF (B(I).LT.0.) THEN
-            __scalar__0 = A(I)+__scalar__1
+            __SCALAR__0 = A(I)+__SCALAR__1
          ELSE
-            __scalar__0 = A(I-1)+__scalar__1
+            __SCALAR__0 = A(I-1)+__SCALAR__1
          ENDIF
-         E(I) = __scalar__0+A(I)
+         E(I) = __SCALAR__0+A(I)
       ENDDO
 
       PRINT *, E
