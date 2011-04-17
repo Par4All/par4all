@@ -10138,10 +10138,12 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \subsection{Scalarization}
 
 \begin{PipsPass}{scalarization}
-Scalarization is the process of replacing array references with scalar
-variables wherever appropriate. Expected benefits include lower memory
-footprint (e.g. registers can be used instead of allocating heap
-space) and hence, better execution times.
+  Scalarization is the process of replacing array references with
+  scalar variables wherever appropriate. Expected benefits include
+  lower memory footprint and access time because registers can be used
+  instead of temporary stack variables or memory accesses, and hence,
+  shorter execution times, as long as the register pressure is not so
+  high that spill code is generated.
 \end{PipsPass}
 
 Scalarizing a given array reference is subject to two successive
@@ -10149,20 +10151,33 @@ criteria, a Legality criterion and a Profitability criterion:
 
 \begin{itemize}
 \item The Legality criterion is evaluated first. It tries and
-  determine if replacing the reference might lead to breaking
+  determines if replacing the reference might lead to breaking
   dependence arcs, due to hidden references to the element,
-  e.g. ``get(A,i)'' instead of ``A[i]''. In that case, no
-  scalarization takes place.
+  e.g. ``get(A,i)'' instead of ``A[i]''. Also, one and only one array
+  element must be accessed at each iteration. If these two conditions
+  are not met, no scalarization takes place.
 
 \item The Profitability criterion is then evaluated, to try and
   eliminate cases where scalarization would yield no satisfactory
   performance gains, e.g. when a scalarized reference has to be
-  immediately copied back into the original reference.
+  immediately copied back into the original reference. This is
+  performed at the source level and depends on the effective register
+  allocation and code generation.
 \end{itemize}
 
-Scalarized variables use the prefix \verb/___scalar__/ and are thus easily
-identified. Depending on the situation, they will be copied-in
-(\verb/__scalar0__ = A[i]/) and/or back into the array (\verb/A[i] = __scalar0__/).
+The legality test is based on convex array regions, and not on the
+dependence graph as is the Carr's algorithm. Currently, loop carried
+dependence arcs prevent scalarization by PIPS, although some can be
+processed by Carr's algorithm. See non-regression tests
+Transformations/scalarization30 to 36.
+
+The new scalar variables use the default prefix \verb/___scalar__/ and are
+thus easily identified, but a new prefix can be user defined with
+Property~\PipsPropRef{SCALARIZATION_PREFIX}.
+
+If needed according to the IN and OUT convex array regions, the new
+variables are initialized, e.g. \verb/__scalar0__ = A[i]/, and/or
+copied back into the initial array, e.g. \verb/A[i] = __scalar0__/.
 
 Scalarization is currently applicable both to Fortran and C code.
 
