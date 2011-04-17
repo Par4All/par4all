@@ -1,0 +1,19 @@
+C     Expected result: t(i) scalarized
+
+C     Same as scalarization01, but different name for the new variable
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100)    
+C     BEGIN BLOCK
+      DO I = 1, N                                                       0008
+         DO J = 1, N                                                    0009
+C           BEGIN BLOCK
+            T_0 = X(I,J)                                                0010
+            X(I,J) = Y(I,J)                                             0011
+            Y(I,J) = T_0                                                0012
+C           END BLOCK
+         ENDDO
+      ENDDO
+C     END BLOCK
+      END
