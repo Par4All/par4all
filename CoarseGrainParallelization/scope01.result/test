@@ -2,7 +2,7 @@ void Run(double a[10][10], int *p)
 {
    {
       int lv1, lv2;
-#pragma omp parallel for private(lv2) 
+#pragma omp parallel for private(lv2)
       for(lv1 = 0; lv1 <= 9; lv1 += 1)
 #pragma omp parallel for 
          for(lv2 = 0; lv2 <= 9; lv2 += 1)
