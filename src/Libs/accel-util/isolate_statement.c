@@ -488,8 +488,8 @@ statement effects_to_dma(statement stat,
     entity re = reference_variable(r);
 
     if(entity_abstract_location_p(re)) {
-      pips_user_error("We can't handle abstract location there. Please try to "
-          "avoid using pointer or active some pointer analyzes.\n");
+      pips_user_error("We can't handle abstract locations here. Please try to "
+          "avoid using pointer or activate some pointer analyzes.\n");
     }
 
 
