@@ -62,69 +62,6 @@
 #define STAT_ORDER "PRETTYPRINT_STATEMENT_NUMBER"
 
 static
-void patch_outlined_reference(expression x, entity e)
-{
-    if(expression_reference_p(x))
-    {
-        reference r =expression_reference(x);
-        entity e1 = reference_variable(r);
-        if(same_entity_p(e,e1))
-        {
-			variable v = type_variable(entity_type(e));
-			if( (!basic_pointer_p(variable_basic(v))) && (ENDP(variable_dimensions(v))) ) /* not an array / pointer */
-			{
-				expression X = make_expression(expression_syntax(x),normalized_undefined);
-				expression_syntax(x)=make_syntax_call(make_call(
-							CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
-							CONS(EXPRESSION,X,NIL)));
-			}
-        }
-    }
-
-}
-
-static
-void patch_outlined_reference_in_declarations(statement s, entity e)
-{
-    FOREACH(ENTITY, ent, statement_declarations(s))
-    {
-        value v = entity_initial(ent);
-        if(!value_undefined_p(v) && value_expression_p(v))
-            gen_context_recurse(value_expression(v),e,expression_domain,gen_true,patch_outlined_reference);
-    }
-}
-
-static
-void bug_in_patch_outlined_reference(loop l , entity e)
-{
-    if( same_entity_p(loop_index(l), e))
-    {
-        statement parent = (statement)gen_get_ancestor(statement_domain,l);
-        pips_assert("child's parent child is me",statement_loop_p(parent) && statement_loop(parent)==l);
-        statement body =loop_body(l);
-        range r = loop_range(l);
-        instruction new_instruction = make_instruction_forloop(
-                    make_forloop(
-                        make_assign_expression(
-                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
-                            range_lower(r)),
-                        MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
-                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
-                            range_upper(r)),
-                        MakeBinaryCall(entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME),
-                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
-                            range_increment(r)),
-                        body
-                        )
-                    );
-
-        statement_instruction(parent)=instruction_undefined;/*SG this is a small leak */
-        update_statement_instruction(parent,new_instruction);
-        pips_assert("statement consistent",statement_consistent_p(parent));
-    }
-}
-
-static
 void get_private_entities_walker(loop l, set s)
 {
     set_append_list(s,loop_locals(l));
@@ -530,7 +467,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     /* D.K
       add return to the new body
     */
-    statement new_body = instruction_to_statement(make_instruction_sequence(make_sequence(statements_to_outline)));
+    statement new_body = make_block_statement(statements_to_outline);
 
 
     /* Retrieve referenced entities */
@@ -546,6 +483,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
     }
     else
         entity_to_effective_parameter = hash_table_make(hash_pointer,1);
+
     /* pass loop bounds as parameters if required */
     string loop_label = get_string_property("OUTLINE_LOOP_BOUND_AS_PARAMETER");
     statement theloop = find_statement_from_label_name(get_current_module_statement(),get_current_module_name(),loop_label);
@@ -583,8 +521,9 @@ statement outliner(string outline_module_name, list statements_to_outline)
                 // but any entity that type is a typedef
                 //&& (basic_undefined_p(b) || !basic_typedef_p(b)) //&&
                 //!( formal_parameter_p(e) && (!same_string_p(entity_module_name(e),get_current_module_name()))) )
-            )
+            ) {
             tmp_list=CONS(ENTITY,e,tmp_list);
+        }
     }
     gen_free_list(referenced_entities);
     referenced_entities=tmp_list;
@@ -666,19 +605,32 @@ statement outliner(string outline_module_name, list statements_to_outline)
     hash_table_free(entity_to_effective_parameter);
 
 
+
     /* we need to patch parameters , effective parameters and body in C
-     * because of by copy function call
-	 * it's not needed if
-	 * - the parameter is only read
-	 * - it's an array / pointer
+     * because parameters are passed by copy in function call
+     * it's not needed if
+     * - the parameter is only read
+     * - it's an array / pointer
+     *
+     * Here a scalar will be passed by address and a prelude/postlude
+     * will be used in the outlined module as below :
+     *
+     * void new_module( int *scalar_0 ) {
+     *   int scalar = *scalar_0;
+     *   ...
+     *   // Work on scalar
+     *   ...
+     *   *scalar_0 = scalar;
+     * }
+     *
      */
     if(c_module_p(get_current_module_entity()))
     {
-		list iter = effective_parameters,
+        list iter  = effective_parameters,
              riter = referenced_entities;
         FOREACH(PARAMETER,p,formal_parameters)
         {
-			expression x = EXPRESSION(CAR(iter));
+            expression x = EXPRESSION(CAR(iter));
             entity re = ENTITY(CAR(riter));
             entity ex = entity_undefined;
             if(expression_reference_p(x))
@@ -688,15 +640,25 @@ statement outliner(string outline_module_name, list statements_to_outline)
             if(!entity_undefined_p(ex)&& type_variable_p(entity_type(ex)) ) {
                 variable v = type_variable(entity_type(ex));
                 bool entity_written=false;
-                FOREACH(STATEMENT,stmt,statements_to_outline)
-                    entity_written|=find_write_effect_on_entity(stmt,ex);
+                FOREACH(STATEMENT,stmt,statements_to_outline) {
+                  bool write_p = find_write_effect_on_entity(stmt,ex);
+                  ifdebug(5) {
+                    if(write_p) {
+                      pips_debug(0,"Entity %s written by statement (%d) : \n",entity_name(ex),the_current_debug_level);
+                      print_statement(stmt);
+                    }
+                  }
+                  entity_written|=write_p;
+                }
 
                 if( (!basic_pointer_p(variable_basic(v))) &&
                         ENDP(variable_dimensions(v)) &&
                         entity_written
                   )
                 {
-                    entity_type(e)=make_type_variable(
+                  // Change function prototype
+                    entity fp = make_entity_copy_with_new_name(e,entity_name(e),false);
+                    entity_type(fp)=make_type_variable(
                             make_variable(
                                 make_basic_pointer(copy_type(entity_type(e))),
                                 NIL,
@@ -704,14 +666,32 @@ statement outliner(string outline_module_name, list statements_to_outline)
                                 )
                             );
                     parameter_type(p)=copy_type(entity_type(e));
-                    syntax s = expression_syntax(x);
+                    dummy_identifier(parameter_dummy(p))=fp;
+
+                  //Change at call site (scalar=>&scalar)
+                    syntax s = expression_syntax(x); // FIXME Leak ?
                     expression X = make_expression(s,normalized_undefined);
                     expression_syntax(x)=make_syntax_call(make_call(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),CONS(EXPRESSION,X,NIL)));
-                    gen_context_multi_recurse(new_body,ex,
-                            statement_domain,gen_true,patch_outlined_reference_in_declarations,
-                            loop_domain,gen_true,bug_in_patch_outlined_reference,
-                            expression_domain,gen_true,patch_outlined_reference,
-                            0);
+
+
+                  //Create prelude && postlude
+                    expression dereferenced = MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(fp));
+
+                    // FIXME : is it ok to alias dereferenced expression in 2 statements ?
+                    statement in = make_assign_statement(entity_to_expression(e),dereferenced);
+                    statement out = make_assign_statement(dereferenced,entity_to_expression(e));
+
+                    // Cheat on effects
+                    store_cumulated_rw_effects_list(in,NIL);
+                    store_cumulated_rw_effects_list(out,NIL);
+
+
+                    insert_statement(new_body,in,true);
+                    insert_statement(new_body,out,false);
+
+                    pips_debug(4,"Add declaration for %s",entity_name(e));
+                    add_declaration_statement(new_body,e);
+
                 }
             }
             if(type_variable_p(entity_type(re))) {
@@ -722,10 +702,10 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
                 }
             }
-			POP(iter);
+            POP(iter);
             POP(riter);
         }
-		pips_assert("no effective parameter left", ENDP(iter));
+        pips_assert("no effective parameter left", ENDP(iter));
     }
 
     /* prepare parameters and body*/
@@ -749,6 +729,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* add a return at the end of the body, in all cases */
     insert_statement(new_body,make_return_statement(new_fun),false);
+
 
 
     /* we can now begin the outlining */
@@ -818,8 +799,10 @@ outline(char* module_name)
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
     set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
- 	set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
- 	set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    set_rw_effects((statement_effects)db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+
+    debug_on("OUTLINE_DEBUG_LEVEL");
 
     /* retrieve name of the outlined module */
     string outline_module_name = get_string_property_or_ask("OUTLINE_MODULE_NAME","outline module name ?\n");
@@ -849,6 +832,8 @@ outline(char* module_name)
     /* apply outlining */
     (void)outliner(outline_module_name,statements_to_outline);
 
+
+    debug_off();
 
     /* validate */
     module_reorder(get_current_module_statement());
