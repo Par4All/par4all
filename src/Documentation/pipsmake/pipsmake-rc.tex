@@ -10215,7 +10215,8 @@ SCALARIZATION_PREFIX "__scalar__"
 \end{PipsProp}
 
 Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
-when it is useless according to the OUT region\marginpar{Serge: motivation?}.
+when it is useless according to the OUT region, for instance when dealing
+with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
 \end{PipsProp}
@@ -10235,10 +10236,10 @@ constant_array_scalarization > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-This pass may be useful to make C source code more palatable to C to
-VHDL converter\marginpar{Serge: more motivations?}. It is also useful
-to propagate constants contained in an array since the semantics
-passes only analyze scalar variables. 
+This pass may be useful to make C source code more palatable to C to VHDL
+converter that prefer dealing with scalars than arrays. It is also useful
+to propagate constants contained in an array since the semantics passes
+only analyze scalar variables. 
 
 
 This pass was designed and implemented by Serge Guelton.
