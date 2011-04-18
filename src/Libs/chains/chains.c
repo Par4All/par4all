@@ -117,8 +117,14 @@ static graph dg;
 /* Vertex_statement maps each statement to its vertex in the dependency graph. */
 static hash_table Vertex_statement;
 
+
+// User properties
 static bool one_trip_do;
 static bool keep_read_read_dependences;
+static bool chains_dataflow_dependence_only_p;
+static bool mask_local_variable_p;
+static bool filter_scope_p;
+
 
 /* Access functions for debug only */
 
@@ -318,19 +324,18 @@ static void genkill_test( test t, statement s ) {
  * @param s the set of effects
  * @param l the locals to mask
  */
-static void mask_effects( set s, list l ) {
+static void mask_effects( set s, list l, bool read_only_p ) {
   cons *to_mask = NIL;
   /*
    * Loop over effect and check if they affect a local variable
-   * We mask only read effects (FIXME : why ?)
    */
   SET_FOREACH(effect, f, s) {
     action a = effect_action( f );
 
-    if ( action_read_p( a ) ) {
+    if ( !read_only_p || action_read_p( a ) ) {
       FOREACH( entity, e, l )
       {
-        if ( effect_may_conflict_with_entity_p( f, e ) ) {
+        if ( effect_entity(f) == e ) {
           /* Register which one we have to mask */
           to_mask = CONS( effect, f, to_mask );
         }
@@ -382,9 +387,10 @@ static void genkill_any_loop( statement body,
   }
 
   /* Filter effects on local variables */
-  if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
-    mask_effects( gen, locals );
-    mask_effects( ref, locals );
+  if ( mask_local_variable_p ) {
+    /* We mask only read effects (FIXME : why ?) */
+    mask_effects( gen, locals, true );
+    mask_effects( ref, locals, true );
   }
 
 }
@@ -485,9 +491,9 @@ static void genkill_block( cons *sts, statement st ) {
     set_free( ref );
 
     /* FIXME : This should be done after all recursion for performance... */
-    if ( get_bool_property( "CHAINS_MASK_EFFECTS" ) ) {
-      mask_effects( gen_st, statement_declarations(st) );
-      mask_effects( ref_st, statement_declarations(st) );
+    if ( mask_local_variable_p ) {
+      mask_effects( gen_st, statement_declarations(st), true );
+      mask_effects( ref_st, statement_declarations(st), true );
     }
 
   }
@@ -548,6 +554,32 @@ static void genkill_unstructured( unstructured u, statement st ) {
   gen_free_list( blocs );
 }
 
+
+/**
+ * Filter out effects on variable local to the block so they won't escape
+ */
+static void genkill_filter_scope(statement st,
+                                 list /* of entities */ local_variables) {
+  if(filter_scope_p) {
+    set kill_st = KILL( st );
+    set gen_st = GEN( st );
+    set ref_st = REF( st );
+
+    ifdebug(4) {
+      pips_debug(0,"Filter entities : ");
+      FOREACH(entity, e, local_variables) {
+        fprintf(stderr, "%s ", entity_name(e));
+      }
+      fprintf(stderr, "\n");
+    }
+
+    mask_effects(kill_st, local_variables, false);
+    mask_effects(gen_st, local_variables, false);
+    mask_effects(ref_st, local_variables, false);
+  }
+}
+
+
 /**
  * @brief Does the dispatch and recursion loop
  * @description
@@ -563,6 +595,7 @@ static void genkill_instruction( instruction i, statement st ) {
   switch ( instruction_tag(i) ) {
     case is_instruction_block:
       genkill_block( pc = instruction_block(i), st );
+      genkill_filter_scope(st,statement_declarations(st));
       break;
     case is_instruction_test:
       t = instruction_test(i);
@@ -860,6 +893,31 @@ static void inout_unstructured( statement st, unstructured u ) {
   }
 }
 
+
+/**
+ * Filter out effects on variable local to the block so they won't escape
+ */
+static void inout_filter_scope(statement st,
+                                 list /* of entities */ local_variables) {
+  if(filter_scope_p) {
+
+    ifdebug(4) {
+      pips_debug(0,"Filter entities : ");
+      FOREACH(entity, e, local_variables) {
+        fprintf(stderr, "%s ", entity_name(e));
+      }
+      fprintf(stderr, "\n");
+    }
+
+    mask_effects(DEF_IN( st ), local_variables, false);
+    mask_effects(DEF_OUT( st ), local_variables, false);
+    mask_effects(REF_IN( st ), local_variables, false);
+    mask_effects(REF_OUT( st ), local_variables, false);
+  }
+}
+
+
+
 /**
  * @brief Propagates in sets of ST (which is inherited) to compute the out sets.
  *
@@ -898,6 +956,7 @@ static void inout_statement( statement st ) {
   switch ( instruction_tag( i = statement_instruction( st )) ) {
     case is_instruction_block:
       inout_block( st, instruction_block( i ) );
+      inout_filter_scope(st,statement_declarations(st));
       break;
     case is_instruction_test:
       inout_test( st, instruction_test( i ) );
@@ -1088,7 +1147,7 @@ static cons *pushnew_conflict( effect fin, effect fout, cons *cfs ) {
 static bool dd_du( effect fin, effect fout ) {
   bool conflict_p = action_write_p( effect_action( fin ));
 
-  if ( get_bool_property( "CHAINS_DATAFLOW_DEPENDENCE_ONLY" ) ) {
+  if ( chains_dataflow_dependence_only_p) {
     conflict_p = conflict_p && action_read_p( effect_action( fout ) );
   }
 
@@ -1336,6 +1395,9 @@ graph statement_dependence_graph( statement s ) {
   /* Initialize some properties */
   one_trip_do = get_bool_property( "ONE_TRIP_DO" );
   keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
+  chains_dataflow_dependence_only_p = get_bool_property( "CHAINS_DATAFLOW_DEPENDENCE_ONLY" );
+  mask_local_variable_p = get_bool_property( "CHAINS_MASK_EFFECTS" );
+  filter_scope_p = get_bool_property("ATOMIC_CHAINS_FILTER_SCOPE");
 
   /* FIXME
    * OBSOLETE
@@ -1530,6 +1592,8 @@ bool chains( char * module_name, enum chain_type use ) {
   void print_graph();
 
   debug_on("CHAINS_DEBUG_LEVEL");
+
+
 
   ifdebug(1) {
     mem_spy_init( 0, 100000., NET_MEASURE, 0 );
