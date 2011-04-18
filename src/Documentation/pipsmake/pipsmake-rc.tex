@@ -10204,8 +10204,8 @@ Scalarization is currently applicable both to Fortran and C code.
 
 
 Pass \PipsPassRef{scalarization} uses the read and written convex
-array regions to decide if the scalarization is possible, the in and
-out regions to decide if it is useful to initialize the scalar copy or
+array regions to decide if the scalarization is possible, the IN and
+OUT regions to decide if it is useful to initialize the scalar copy or
 to restore the value of the array element.
 \begin{PipsMake}
 alias scalarization 'Scalarization'
@@ -10216,6 +10216,19 @@ scalarization  > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 \end{PipsMake}
+
+Since OUT regions are computed interprocedurally, strange code may
+result when a small or not so small function  without any real output
+is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a
+\verb/printf/ to force an OUT region.
+
+Also, it may be useful to use Property
+\PipsPropRef{TRUST_ARRAY_DECLARATIONS} and/or
+\PipsPropRef{TRUST_ARRAY_REFERENCES} to make sure that as many loops
+as possible are entered. If not, loop bounds may act like guards,
+which prevents PIPS from hoisting a reference out of a loop, although
+this is puzzling for programmers because they expect all loops to be
+entered at least once...
 
 As explained above, Property \PipsPropRef{SCALARIZATION_PREFIX} is
 used to select the names of the new scalar variables.
