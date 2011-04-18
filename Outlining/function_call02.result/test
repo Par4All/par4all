@@ -28,13 +28,15 @@ int b(int i)
 {
    return i*2;
 }
-void kernel(int *j)
+void kernel(int *j_0)
 {
    //PIPS generated variable
-   int i;
+   int i, j;
+   j = *j_0;
 kernel:
    for(i = 0; i <= 255; i += 1)
-      *j += b(i);
+      j += b(i);
+   *j_0 = j;
 }
 
 unsplit

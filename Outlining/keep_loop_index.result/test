@@ -16,12 +16,14 @@ int main()
 there:   outlined(2+1, &j);
    return j;
 }
-void outlined(int I_0, int *j)
+void outlined(int I_0, int *j_0)
 {
    //PIPS generated variable
-   int i;
+   int i, j;
+   j = *j_0;
 there:
    for(i = 0; i <= I_0-1; i += 1)
-      *j *= i;
+      j *= i;
+   *j_0 = j;
 }
 
