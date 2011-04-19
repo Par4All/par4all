@@ -14,8 +14,7 @@ w.activate("print_chains_graph")
 #w.activate("print_whole_dependence_graph")
 
 
-print "*********************** Without scope filtering ***********************"
-w.props.atomic_chains_filter_scope = False
+print "*********************** Without points-to analysis ***********************"
 r.atomic_chains()
 r.display("dg_file");
 
@@ -23,8 +22,8 @@ print ""
 print ""
 print ""
 print ""
-print "************************* With scope filtering ************************"
-w.props.atomic_chains_filter_scope = True
+print "************************* With points-to analysis ************************"
+w.activate("proper_effects_with_points_to")
 r.atomic_chains()
 r.display("dg_file");
 
