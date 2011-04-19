@@ -798,6 +798,15 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		   should be freed at exit. */
 		mr = nr1;
 		finished_p = TRUE;
+        }  else if(ENTITY_ADDRESS_OF_P(s_op)) {
+          // case *&a
+          // this is an effect on a
+          expression e1 = EXPRESSION(CAR(s_args));
+          le = generic_proper_effects_of_complex_address_expression(e1,
+                                                                    pme,
+                                                                    write_p);
+          finished_p = TRUE;
+          result_computed_p = TRUE;
 	      }
 	    else
 	      {
@@ -1081,7 +1090,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
   return le;
 }
 
-
+
 list generic_proper_effects_of_any_lhs(expression lhs)
 {
   return generic_proper_effects_of_address_expression(lhs, TRUE);
