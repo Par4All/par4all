@@ -4,6 +4,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
 create $WS  is/c_timers.c is/wtime.c is/c_print_results.c is/is.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
 
 #display PRINTED_FILE[%ALLFUNC]
 
@@ -26,8 +28,8 @@ echo by pass some subscripts
 #apply SIMPLIFY_SUBSCRIPTS[jcdctmgr!forward_DCT]
 
 echo restructuring
-apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
-apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
+#apply FOR_LOOP_TO_DO_LOOP[%ALLFUNC]
+#apply FOR_LOOP_TO_WHILE_LOOP[%ALLFUNC]
 
 echo privatize
 apply PRIVATIZE_MODULE[%ALLFUNC]

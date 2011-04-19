@@ -4,6 +4,9 @@ setenv ABORT_ON_USER_ERROR TRUE
 
 create nest07 nest07.f
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 #display PARALLELPRINTED_FILE
 #quit
 #apply DISTRIBUTER

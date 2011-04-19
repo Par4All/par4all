@@ -3,4 +3,5 @@ from pyps import *
 import openmp
 
 with workspace("merge04.c") as w:
+	w.props.memory_effects_only=False
 	w.all_functions.openmp(verbose=True)

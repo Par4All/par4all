@@ -4,10 +4,8 @@ setproperty ABORT_ON_USER_ERROR FALSE
 
 create empty_blocks2 empty_blocks2.c
 
-activate C_PARSER
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER TRUE
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
 
 activate TRANSFORMERS_INTER_FULL
 activate PRECONDITIONS_INTER_FULL

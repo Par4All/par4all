@@ -4,6 +4,9 @@ setenv ABORT_ON_USER_ERROR TRUE
 
 create nest05 nest05.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 apply INTERNALIZE_PARALLEL_CODE
 activate NEST_PARALLELIZATION
 

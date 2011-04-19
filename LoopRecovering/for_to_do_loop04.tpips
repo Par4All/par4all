@@ -1,13 +1,11 @@
 delete for_to_do_loop04
 create for_to_do_loop04 for_to_do_loop04.c
 
-setproperty CHECK_RESOURCE_USAGE TRUE
+#setproperty CHECK_RESOURCE_USAGE TRUE
 
-#setenv C_SYNTAX_DEBUG_LEVEL 9
-#setproperty GENERATE_MISSING_SOURCE_FILES TRUE
-activate C_PARSER
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
 
-setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE

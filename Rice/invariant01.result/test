@@ -60,6 +60,7 @@ void invariant01(int n, int ni, int nj)
 
 Warnings
 
+unknown[unknown] (parse_properties) property MEMORY_EFFECTS_ONLY redefined
 unknown[unknown] (parse_properties) property PRETTYPRINT_BLOCKS redefined
 unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
 unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined

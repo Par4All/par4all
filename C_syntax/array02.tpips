@@ -4,6 +4,10 @@ create $WS $WS.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 5
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 

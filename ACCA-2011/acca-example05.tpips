@@ -2,6 +2,9 @@ delete acca-example05
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
 
 create acca-example05 acca-example05.c
 
@@ -77,9 +80,6 @@ display PRINTED_FILE[compute]
 
 # Look at the available parallelism
 
-setproperty MEMORY_EFFECTS_ONLY FALSE
-setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
-
 #display PARALLEL_PRINTED_FILE[compute]
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE[compute]
@@ -147,7 +147,6 @@ display PRINTED_FILE[compute]
 ##  shell cat compute-outer_parallelism05.c >>compute-outer_parallelism05.tex
 ##  shell echo '\end{verbatim}' >>compute-outer_parallelism05.tex
 
-setproperty MEMORY_EFFECTS_ONLY FALSE
 apply DEAD_CODE_ELIMINATION[compute]
 #apply USE_DEF_ELIMINATION[compute]
 activate PRINT_CODE

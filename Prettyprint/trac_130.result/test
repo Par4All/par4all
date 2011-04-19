@@ -92,8 +92,12 @@ Dependence graph for "main"
 
 	14 --> 16 with conflicts
 		from <y-W-EXACT> to <y-R-EXACT> at levels  2
+	14 --> 16 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT> at levels  2
 	14 --> 15 with conflicts
 		from <y-W-EXACT> to <y-R-EXACT> at levels  2
+	14 --> 15 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT> at levels  2
 
 ****************** End of Dependence Graph ******************
 

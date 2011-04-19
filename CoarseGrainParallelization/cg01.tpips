@@ -1,13 +1,12 @@
 delete cg01
 create cg01 cg01.c
+
 echo Select some options to deal with the C Language:
-echo Parse as C:
-activate C_PARSER
-echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-echo Prettyprint the source as C, of course
-setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 
 echo Select the most precise analysis:
 activate MUST_REGIONS

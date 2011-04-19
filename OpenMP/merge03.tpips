@@ -18,6 +18,9 @@ create merge03 merge03.c
 #setenv OPMIFY_CODE_DEBUG_LEVEL 9
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 setproperty PRAGMA_TYPE "expr"
 setproperty OMP_LOOP_PARALLEL_THRESHOLD_VALUE 100
 setproperty OMP_IF_CLAUSE_RECURSIVE FALSE

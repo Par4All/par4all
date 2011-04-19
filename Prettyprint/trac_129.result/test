@@ -80,6 +80,8 @@ Dependence graph for "main"
 
 	15 --> 16 with conflicts
 		from <y-W-EXACT> to <y-R-EXACT> at levels  2
+	15 --> 16 with conflicts
+		from <y-WE-EXACT> to <y-RE-EXACT> at levels  2
 
 ****************** End of Dependence Graph ******************
 
