@@ -1,0 +1,22 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   inter01();
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <may be written>: i j inter01:0`l k
+   inter01();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

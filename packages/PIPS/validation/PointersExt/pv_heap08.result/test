@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -14,11 +14,11 @@ int main()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
       p = (int *) malloc(3*sizeof(int));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0]
    p[0] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[1]
    p[1] = 1;
 //             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_

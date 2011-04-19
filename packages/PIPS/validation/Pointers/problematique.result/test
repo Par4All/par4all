@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -31,21 +31,21 @@ int main()
    
    /* Initialisation du tableau b */
    for(i = 0; i <= 19; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: b i
-//             <    is written>: b[i]
       b[i] = i;
 //             <    is written>: i
    
    /* Initialisation du tableau c */
    for(i = 0; i <= 19; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: c i
-//             <    is written>: c[i]
       c[i] = 1;
 //             <    is written>: i
    /* Initialisation du tableau a */
    for(i = 0; i <= 19; i += 1)
-//             <    is read   >: a b b[i] i
-//             <    is written>: a[i]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       a[i] = b[i];
    return 0;
 }

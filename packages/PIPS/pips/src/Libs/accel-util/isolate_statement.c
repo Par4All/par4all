@@ -486,6 +486,13 @@ statement effects_to_dma(statement stat,
     statement the_dma = statement_undefined;
     reference r = effect_any_reference(eff);
     entity re = reference_variable(r);
+
+    if(entity_abstract_location_p(re)) {
+      pips_user_error("We can't handle abstract locations here. Please try to "
+          "avoid using pointer or activate some pointer analyzes.\n");
+    }
+
+
     struct dma_pair * val = (struct dma_pair *) hash_get(e2e, re);
 
     if( val == HASH_UNDEFINED_VALUE || (val->s != s) ) {

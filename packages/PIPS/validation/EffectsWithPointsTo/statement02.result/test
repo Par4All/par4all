@@ -1,0 +1,77 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int *x, x1, **y, *y1, y2;
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+
+   x1 = 0;
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   y2 = 1;
+//  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   x = &x1;
+//  {(x,x1,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   y1 = &y2;
+//  {(x,x1,-Exact-);(y,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,y2,
+//   -Exact-)}
+   y = &y1;
+//  {(x,x1,-Exact-);(y,y1,-Exact-);(y1,y2,-Exact-)}
+   x = *y;
+//  {(x,y2,-Exact-);(y,y1,-Exact-);(y1,y2,-Exact-)}
+   *y = x;
+//  {(x,y2,-Exact-);(y,y1,-Exact-);(y1,y2,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *x, x1, **y, *y1, y2;
+//             <    is written>: x1
+
+   x1 = 0;
+//             <    is written>: y2
+   y2 = 1;
+//             <    is written>: x
+   x = &x1;
+//             <    is written>: y1
+   y1 = &y2;
+//             <    is written>: y
+   y = &y1;
+//             <    is read   >: y y1
+//             <    is written>: x
+   x = *y;
+//             <    is read   >: x y
+//             <    is written>: y1
+   *y = x;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 11 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT>
+		from <y1-R-EXACT> to <y1-W-EXACT>
+	09 --> 11 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	09 --> 10 with conflicts
+		from <y-W-EXACT> to <y-R-EXACT>
+	08 --> 11 with conflicts
+		from <y1-W-EXACT> to <y1-W-EXACT>
+	08 --> 10 with conflicts
+		from <y1-W-EXACT> to <y1-R-EXACT>
+	07 --> 10 with conflicts
+		from <x-W-EXACT> to <x-W-EXACT>
+
+****************** End of Dependence Graph ******************

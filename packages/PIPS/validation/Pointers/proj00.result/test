@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main(void)
 {
@@ -19,8 +19,8 @@ int main(void)
       int *pi = &i;
 //             <    is written>: pp
       pp = &pi;
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
       **pp = 1;
    }
@@ -31,8 +31,8 @@ int main(void)
    
    // pp points to a dead value in the stack
    printf("%p\n", pp);
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    
    // possible segfault.
    // should generate an error while analyzing?

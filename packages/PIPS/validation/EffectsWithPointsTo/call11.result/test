@@ -1,0 +1,77 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int d1 = 10;
+//  points to = {}
+   int d2 = 10;
+//  points to = {}
+   int d3 = 10;
+//  points to = {}
+   int d4 = 10;
+//  points to = {}
+   int y[d1][d2][d3][d4];
+//  points to = {}
+   int i, j;
+//  points to = {}
+
+   for(i = 0; i <= d1-1; i += 1)
+//  points to = {}
+      for(j = 0; j <= d2-1; j += 1)
+//  points to = {}
+         call11(d3, d4, &y[i][j][0]);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: d1
+   int d1 = 10;
+//             <    is written>: d2
+   int d2 = 10;
+//             <    is written>: d3
+   int d3 = 10;
+//             <    is written>: d4
+   int d4 = 10;
+   int y[d1][d2][d3][d4];
+   int i, j;
+//             <    is read   >: d1
+//             <    is written>: i
+
+   for(i = 0; i <= d1-1; i += 1)
+//             <    is read   >: d1 d2
+//             <    is written>: j
+      for(j = 0; j <= d2-1; j += 1)
+//             <may be written>: y[i][j][*][*]
+//             <    is read   >: d1 d2 d3 d4 i j
+         call11(d3, d4, &y[i][j][0]);
+}
+
+ *********************** Use-Def Chains *********************
+
+	23 --> 23 with conflicts
+		from <y[i][j][*][*]-W-MAY> to <y[i][j][*][*]-W-MAY>
+	23 --> -1 with conflicts
+		from <j-R-EXACT> to <j-W-EXACT>
+	-1 --> -1 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	17 --> 23 with conflicts
+		from <d4-W-EXACT> to <d4-R-EXACT>
+	16 --> 23 with conflicts
+		from <d3-W-EXACT> to <d3-R-EXACT>
+	15 --> 23 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	15 --> -1 with conflicts
+		from <d2-W-EXACT> to <d2-R-EXACT>
+	14 --> 23 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> -1 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+	14 --> -1 with conflicts
+		from <d1-W-EXACT> to <d1-R-EXACT>
+
+****************** End of Dependence Graph ******************

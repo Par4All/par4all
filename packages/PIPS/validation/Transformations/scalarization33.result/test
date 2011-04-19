@@ -1,0 +1,28 @@
+C     Scalar replacement in the presence of conditional control flow
+C
+C     Steve Carr and Ken Kennedy
+C
+C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
+C
+C     Fourth example, page 10: PIPS profitability analysis not
+C     convincing although the result is kind of OK. The exportation
+C     statement could be avoided by using the last assignment
+
+      SUBROUTINE SCALARIZATION33(A, B, C, D, E, F, N)
+      REAL A(N), B(N), C(N), D(N), E(N), F(N)
+
+      DO I = 1, N
+         __SCALAR__1 = D(I)
+         __SCALAR__0 = C(I)
+         IF (A(I).GT.0.) THEN
+            B(I) = __SCALAR__0+__SCALAR__1
+         ELSE
+            F(I) = __SCALAR__0+__SCALAR__1
+         ENDIF
+         __SCALAR__0 = E(I)+B(I)
+         C(I) = __SCALAR__0
+      ENDDO
+
+      PRINT *, C, F
+
+      END

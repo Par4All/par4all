@@ -11,15 +11,16 @@ void p4a_kernel_give(int N, double array[N], int k)
 {
    array[k] = 0;
 }
-void p4a_launcher_give(int N, double array[N], int *k)
+void p4a_launcher_give(int N, double array[N], int *k_0)
 {
+   //PIPS generated variable
+   int k;
+   k = *k_0;
 
-   *k = 0;
-   while (*k<=99) {
+   for(k = 0; k <= 99; k += 1)
       // To be assigned to a call to P4A_vp_0: k
-      p4a_wrapper_give(N, array, *k);
-      *k += 1;
-   }
+      p4a_wrapper_give(N, array, k);
+   *k_0 = k;
 }
 void p4a_wrapper_give(int N, double array[N], int k)
 {
@@ -38,16 +39,17 @@ enum {N=100};
 
 void give();
 //PIPS generated variable
-void p4a_kernel_give(int N, double array[N], int k), p4a_wrapper_give(int N, double array[N], int k), p4a_launcher_give(int N, double array[N], int *k);
-void p4a_launcher_give(int N, double array[N], int *k)
+void p4a_kernel_give(int N, double array[N], int k), p4a_wrapper_give(int N, double array[N], int k), p4a_launcher_give(int N, double array[N], int *k_0);
+void p4a_launcher_give(int N, double array[N], int *k_0)
 {
+   //PIPS generated variable
+   int k;
+   k = *k_0;
 
-   *k = 0;
-   while (*k<=99) {
+   for(k = 0; k <= 99; k += 1)
       // To be assigned to a call to P4A_vp_0: k
-      p4a_wrapper_give(N, array, *k);
-      *k += 1;
-   }
+      p4a_wrapper_give(N, array, k);
+   *k_0 = k;
 }
 void p4a_wrapper_give(int N, double array[N], int k)
 {

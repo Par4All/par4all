@@ -2470,7 +2470,13 @@ void MakeFormalParameter(
 		    entity fp, /* formal parameter */
 		    int nfp) /* offset (i.e. rank) of formal parameter */
 {
-  pips_assert("type is undefined", entity_type(fp) == type_undefined);
+  // pips_assert("type is undefined", entity_type(fp) == type_undefined);
+  if(!type_undefined_p(entity_type(fp))) {
+    pips_user_warning("Formal parameter \"%s\" may be used several times\n",
+		      entity_local_name(fp));
+    ParserError("MakeFormalParameter",
+		"formal parameter should not be already typed");
+  }
 
   if(formal_label_replacement_p(fp)){
     entity_type(fp) = make_type(is_type_variable,

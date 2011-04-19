@@ -1,12 +1,12 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
    int **a;
    int b;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a
-//             <    is written>: a[0]
    a[0] = &b;
    return 0;
 }

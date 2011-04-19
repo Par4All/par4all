@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -9,28 +9,28 @@ int main()
    int tab3[10][10];
    int **tab4;
    int y;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: x
-//             <    is written>: x[0]
    
    
    foo(x);
-//             <    is written>: tab[0]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(tab);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: tab2[4]
-//             <    is written>: tab2[4][0]
    foo(tab2[4]);
-//             <    is written>: tab3[5][0]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(tab3[5]);
-//             <    is read   >: tab4 tab4[6]
-//             <    is written>: tab4[6][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(tab4[6]);
-//             <    is written>: y
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(&y);
-//             <    is written>: tab[1]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    foo(&tab[1]);
-//             <may be read   >: stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout x x[0] __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("%d\n", *x);
@@ -39,10 +39,9 @@ int main()
 //             <    is read   >: stdout tab[0] __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab[0]);
-//             <may be read   >: stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout tab2[4] tab2[4][0] 
-//                               __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab2[4][0]);
 //             <may be read   >: stdout[0]
@@ -51,10 +50,9 @@ int main()
 //                               __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab3[5][0]);
-//             <may be read   >: stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout tab4 tab4[6] tab4[6][0] 
-//                               __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf("%d\n", tab4[6][0]);
 //             <may be read   >: stdout[0]

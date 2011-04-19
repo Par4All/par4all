@@ -1,0 +1,44 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int ny = 10, nx = 10;
+//  points to = {}
+   Cplfloat pt_in[ny][nx];
+//  points to = {}
+   float Sigma2;
+//  points to = {}
+   Cplfloat pt_out[ny][nx];
+//  points to = {}
+
+   AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: nx ny
+   int ny = 10, nx = 10;
+   Cplfloat pt_in[ny][nx];
+   float Sigma2;
+   Cplfloat pt_out[ny][nx];
+//             <may be read   >: pt_in[*][*].im pt_in[*][*].re 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <may be written>: pt_out[*][*].im pt_out[*][*].re 
+//                               _RANDOM_EFFECTS:GEN_SEED
+//             <    is read   >: Sigma2 nx ny
+
+   AddNoise(ny, nx, pt_in, Sigma2, pt_out);
+}
+
+ *********************** Use-Def Chains *********************
+
+	43 --> 48 with conflicts
+		from <ny-W-EXACT> to <ny-R-EXACT>
+		from <nx-W-EXACT> to <nx-R-EXACT>
+
+****************** End of Dependence Graph ******************

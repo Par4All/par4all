@@ -1,0 +1,16 @@
+C     Expected result: t(i) scalarized
+
+C     Same as scalarization01.f, but tpips different to exercise
+C     SCALARIZATION_PREFIX
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100)    
+      DO I = 1, N                                                       0009
+         DO J = 1, N                                                    0010
+            S_0 = X(I,J)                                                0011
+            X(I,J) = Y(I,J)                                             0012
+            Y(I,J) = S_0                                                0013
+         ENDDO
+      ENDDO
+      END

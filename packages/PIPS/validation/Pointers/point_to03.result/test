@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 void point_to03()
 {
@@ -9,8 +9,8 @@ void point_to03()
 //             <    is written>: p
 
    p = &a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0][2][3]
    ((*p)[2])[3] = 1.5;
 }
 

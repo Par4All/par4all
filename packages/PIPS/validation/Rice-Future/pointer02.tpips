@@ -1,0 +1,17 @@
+delete pointer02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer02 pointer02.c
+activate PRINT_CODE_PROPER_EFFECTS
+
+display PRINTED_FILE
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
+
+display PARALLELPRINTED_FILE
+
+close
+delete pointer02
+quit

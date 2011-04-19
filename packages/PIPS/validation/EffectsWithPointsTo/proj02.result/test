@@ -1,0 +1,125 @@
+
+POINTS-TO
+
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i;
+//  points to = {}
+   int **pp = (void *) 0;
+//  {(pp,*NULL_POINTER*,-Exact-)}
+
+   srand(time((void *) 0));
+//  {(pp,*NULL_POINTER*,-Exact-)}
+   if (alea()) {
+//  {(pp,*NULL_POINTER*,-Exact-)}
+      int *pi = &i;
+//  {(pi,i,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+      pp = &pi;
+//  {(pi,i,-Exact-);(pp,pi,-Exact-)}
+      **pp = 1;
+   }
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   
+   // pp points to a dead value in the stack
+   printf("%p\n", pp);
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   if (pp)
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+      **pp = 0;
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+   int i;
+//             <    is written>: pp
+   int **pp = (void *) 0;
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   srand(time((void *) 0));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+   if (alea()) {
+//             <    is written>: pi
+      int *pi = &i;
+//             <    is written>: pp
+      pp = &pi;
+//             <    is read   >: pi pp
+//             <    is written>: i
+      **pp = 1;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // pp points to a dead value in the stack
+   printf("%p\n", pp);
+//             <    is read   >: pp
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   if (pp)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      **pp = 0;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	26 --> 30 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 30 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	21 --> 30 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 30 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	21 --> 22 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	20 --> 30 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	20 --> 22 with conflicts
+		from <pi-W-EXACT> to <pi-R-EXACT>
+	17 --> 30 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 18 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	15 --> 30 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	15 --> 30 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	15 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	15 --> 21 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+
+****************** End of Dependence Graph ******************

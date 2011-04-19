@@ -45,9 +45,9 @@ int main()
 
    printf("How long do you want the string? ");
 //             <may be read   >: stdin[0]
-//             <may be written>: stdin[0]
+//             <may be written>: i stdin[0]
 //             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
-//             <    is written>: i __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
    scanf("%d", &i);
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: buffer _MALLOC_EFFECTS:_MALLOC_

@@ -304,8 +304,16 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
             && statement_ordering2 != statement_ordering(sloop1)) {
           FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
           {
-            if(action_write_p(effect_action(conflict_sink(c)))
-                || action_write_p(effect_action(conflict_source(c)))) {
+            effect e_sink = conflict_sink(c);
+            effect e_source = conflict_source(c);
+            if(( effect_write_p(e_source) && store_effect_p(e_source))
+                || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
+              ifdebug(5) {
+                pips_debug(0,"Arc preventing fusion : from statement %d :",statement_ordering);
+                print_effect(conflict_source(c));
+                pips_debug(0," to statement %d :",statement_ordering2);
+                print_effect(conflict_sink(c));
+              }
               success = false;
             }
           }

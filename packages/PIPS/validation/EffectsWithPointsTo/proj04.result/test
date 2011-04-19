@@ -1,0 +1,124 @@
+
+POINTS-TO
+
+//  {}
+int main(void)
+{
+//  points to = {}
+   int i = 0, j = 0;
+//  points to = {}
+   int **pp = (void *) 0;
+//  {(pp,*NULL_POINTER*,-Exact-)}
+
+   srand(time((void *) 0));
+//  {(pp,*NULL_POINTER*,-Exact-)}
+   if (alea()) {
+//  {(pp,*NULL_POINTER*,-Exact-)}
+      int *pi = &i;
+//  {(pi,i,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+      pp = &pi;
+   }
+   else {
+//  {(pp,*NULL_POINTER*,-Exact-)}
+      int *pj = &j;
+//  {(pj,j,-Exact-);(pp,*NULL_POINTER*,-Exact-)}
+      pp = &pj;
+   }
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+
+   printf("pp=%p\n", pp);
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+//  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-MAY-);(pp,*NULL_POINTER*,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: i j
+   int i = 0, j = 0;
+//             <    is written>: pp
+   int **pp = (void *) 0;
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+
+   srand(time((void *) 0));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+   if (alea()) {
+//             <    is written>: pi
+      int *pi = &i;
+//             <    is written>: pp
+      pp = &pi;
+   }
+   else {
+//             <    is written>: pj
+      int *pj = &j;
+//             <    is written>: pp
+      pp = &pj;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("pp=%p\n", pp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	29 --> 33 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	26 --> 33 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	26 --> 29 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	25 --> 33 with conflicts
+		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pj-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 33 with conflicts
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	21 --> 29 with conflicts
+		from <pp-W-EXACT> to <pp-R-EXACT>
+	20 --> 33 with conflicts
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pi-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 33 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	17 --> 18 with conflicts
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-W-EXACT>
+		from <_RANDOM_EFFECTS:GEN_SEED-W-EXACT> to <_RANDOM_EFFECTS:GEN_SEED-R-EXACT>
+	15 --> 26 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+	15 --> 21 with conflicts
+		from <pp-W-EXACT> to <pp-W-EXACT>
+	14 --> 33 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

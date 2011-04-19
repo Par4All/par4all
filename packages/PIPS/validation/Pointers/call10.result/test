@@ -1,13 +1,13 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
    tf_t s;
 //             <    is written>: sp
    tf_t *sp = &s;
-//             <may be written>: s.two[*] sp[0].two[*]
-//             <    is read   >: s.one sp sp[0].one
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    call10(s.one, s.two, sp->one, sp->two);
 }

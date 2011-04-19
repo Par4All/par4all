@@ -425,7 +425,7 @@ fs_filter(statement stat, graph dg)
         for(list ls = statement_block(stat);!ENDP(ls);POP(ls)) 
         {
             statement first = STATEMENT(CAR(ls));
-            if(assign_statement_p(first))
+            if(assignment_statement_p(first))
             {
                 ifdebug(1) {
                     pips_debug(1, "considering assignment statement:\n");

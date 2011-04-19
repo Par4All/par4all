@@ -1,0 +1,7 @@
+int main()
+{
+   
+   // We want a declaration write effects on a[*][*]
+//             <    is declared>: a[*][*]
+   int a[10][10];
+}

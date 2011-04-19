@@ -1,0 +1,24 @@
+C     Scalar replacement in the presence of conditional control flow
+C
+C     Steve Carr and Ken Kennedy
+C
+C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
+C
+C     Sixth example, page 24: Livermore Loop 6 (or 11) cannot be handled
+C     by PIPS because we do not exploit dependence arcs and because
+C     regions fuse here two independent references
+
+      SUBROUTINE SCALARIZATION36(B, W, N)
+      REAL B(N,N), W(N)
+
+      DO I = 2, N
+         __SCALAR__0 = W(I)
+         DO K = 1, I-1
+            __SCALAR__0 = __SCALAR__0+B(I,K)*W(I-K)
+         ENDDO
+         W(I) = __SCALAR__0
+      ENDDO
+
+      PRINT *, W
+
+      END

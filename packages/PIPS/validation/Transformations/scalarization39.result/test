@@ -1,0 +1,18 @@
+C     Expected result: t(i) scalarized
+
+C     Same as scalarization38.f, but with a name conflict if the prefix
+C     specified in scalarization39.tpips is forced to uppercase
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100), S_0
+      S_0 = 0.                                                          0009
+      DO I = 1, N                                                       0010
+         DO J = 1, N                                                    0011
+            S_1 = X(I,J)                                                0012
+            X(I,J) = Y(I,J)                                             0013
+            Y(I,J) = S_1                                                0014
+         ENDDO
+      ENDDO
+      PRINT *, S_0                                                      0017
+      END

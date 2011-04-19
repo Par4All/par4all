@@ -65,7 +65,7 @@
 static bool
 statement_phi_function_p(statement s)
 {
-    if(assign_statement_p(s))
+    if(assignment_statement_p(s))
     {
         expression rhs = binary_call_rhs(statement_call(s));
         if(expression_call_p(rhs))

@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -17,59 +17,59 @@ int main()
    
    
    p = &t[1][2];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0][1]
    (*p)[1] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[1][1]
    p[1][1] = 0;
 //             <    is written>: pu
 
    pu = &t[1][2][0];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pu
-//             <    is written>: pu[0]
    *pu = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pu
-//             <    is written>: pu[2]
    pu[2] = 0;
 //             <    is written>: q
 
    q = &t[1];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-//             <    is written>: q[0][2][3]
    ((*q)[2])[3] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-//             <    is written>: q[1][2][3]
    q[1][2][3] = 0;
 //             <    is written>: qu
 
    qu = &t[1][0];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: qu
-//             <    is written>: qu[0][1]
    (*qu)[1] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: qu
-//             <    is written>: qu[1][1]
    qu[1][1] = 0;
 //             <    is written>: r
 
    r = &t;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: r
-//             <    is written>: r[0][0][0][0]
    (((*r)[0])[0])[0] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: r
-//             <    is written>: r[0][1][2][3]
    (((*r)[1])[2])[3] = 0;
 //             <    is written>: ru
 
    ru = &t[0];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ru
-//             <    is written>: ru[0][0][0]
    ((*ru)[0])[0] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ru
-//             <    is written>: ru[0][0][0]
    ru[0][0][0] = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ru
-//             <    is written>: ru[1][2][1]
    ru[1][2][1] = 0;
 
    return 0;

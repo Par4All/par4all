@@ -99,11 +99,15 @@ string csplit_current_function_name2 = string_undefined;
 string csplit_definite_function_name = string_undefined;
 string csplit_definite_function_signature = string_undefined;
 
- static void reset_csplit_current_function_name()
+static void reset_csplit_current_function_name()
    {
      if(!string_undefined_p(csplit_current_function_name)) {
        free(csplit_current_function_name);
-       csplit_current_function_name = string_undefined;
+       csplit_current_function_name =
+	 csplit_current_function_name2;
+     }
+     if(!string_undefined_p(csplit_current_function_name2)) {
+       csplit_current_function_name2 = string_undefined;
      }
    }
 /* static int enum_counter = 0; */
@@ -1460,6 +1464,14 @@ decl_spec_list:                         /* ISO 6.7 */
 			    pips_debug(5, "Type spec: \"%s\"\n", $1);
 			    $$ = build_signature($1, $2, NULL);
 			    pips_debug(5, "Partial signature: \"%s\"\n", $$);
+			    /* FI: might need a call to reset_csplit_current_function_name
+			    if(!string_undefined_p(csplit_current_function_name)
+			       && strcmp($2, csplit_current_function_name)==0) {
+			      csplit_current_function_name
+				= csplit_current_function_name2;
+			      csplit_current_function_name2 = string_undefined;
+			    }
+			    */
 			  }
 			}
                                         /* ISO 6.7.4 */
@@ -1593,6 +1605,14 @@ type_spec:   /* ISO 6.7.2 */
 			    reset_csplit_current_function_name();
 			  }
 			  $$ = build_signature(new_signature("struct"), $2, NULL);
+			  /* see reset_csplit_current_function_name()
+			    if(!string_undefined_p(csplit_current_function_name)
+			       && strcmp($2, csplit_current_function_name)==0) {
+			      csplit_current_function_name
+				= csplit_current_function_name2;
+			      csplit_current_function_name2 = string_undefined;
+			    }
+			  */
 			}
 |   TK_STRUCT id_or_typename TK_LBRACE /* { } */ struct_decl_list TK_RBRACE
                         {

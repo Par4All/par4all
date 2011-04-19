@@ -916,7 +916,7 @@ static void transfert_statement(statement st,
   set transferts_to = MAKE_SET();
   set_difference(transferts_to, COPY_TO_OUT(st), COPY_TO_IN(st));
 
-  set_difference(transferts_to, transferts_to, COPY_FROM_IN(st));
+  set_difference(transferts_to, transferts_to, COPY_FROM_OUT(st));
   set_difference(transferts_to, transferts_to, already_transfered_to);
   SET_FOREACH(entity, e, transferts_to) {
     if(!set_belong_p(already_transfered_to, e)) {

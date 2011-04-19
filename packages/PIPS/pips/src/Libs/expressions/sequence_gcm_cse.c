@@ -309,25 +309,11 @@ static bool entity_as_arguments(entity ent, statement stat)
   return FALSE;
 }
 
-bool assign_statement_p(statement s)
-{
-  instruction i = statement_instruction(s);
-  if (instruction_call_p(i))
-  {
-    call c = instruction_call(i);
-    if(ENTITY_ASSIGN_P(call_function(c)))
-    {
-      return TRUE;
-    }
-  }
-  return FALSE;
-}
-
 /* Return the expression in the left side of an assign statement
  */
 static expression expr_left_side_of_assign_statement(statement stat)
 {
-  if (assign_statement_p(stat))
+  if (assignment_statement_p(stat))
   {
     call assign = instruction_call(statement_instruction(stat));
     return EXPRESSION(CAR(call_arguments(assign)));
@@ -826,7 +812,7 @@ static void increase_number_of_use_by_1(entity ent, statement container)
         seq = instruction_sequence(i);
 
         step = +1;
-        if(assign_statement_p(container))
+        if(assignment_statement_p(container))
         {
             if (ent == left_side_of_assign_statement(container))
             {
@@ -1800,7 +1786,7 @@ atomize_cse_this_statement_expressions(statement s, list availables)
   current_availables = NIL;
 
   /* Update w_effects: add the variable modified by the current statement */
-  if (assign_statement_p(s))
+  if (assignment_statement_p(s))
   {
     /* Update contents */
     expression var_defined =
