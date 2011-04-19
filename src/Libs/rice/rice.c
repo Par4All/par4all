@@ -386,9 +386,9 @@ static bool rice(string mod_name)
      */
     bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
     if(c_module_p(module) && memory_effects_only_p) {
-      pips_user_warning("Rice parallelization should not be run with property "
-                        "MEMORY_EFFECTS_ONLY set to TRUE ! Aborting...\n");
-      return FALSE; // Abort pass
+      pips_user_warning("Rice parallelization should be run with property "
+                        "MEMORY_EFFECTS_ONLY set to FALSE.\n");
+      return FALSE; // return to pass manager with a failure code
     }
 
 
