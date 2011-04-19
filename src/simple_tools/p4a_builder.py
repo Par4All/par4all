@@ -224,6 +224,7 @@ class p4a_builder:
             cpp_flags += [ "-DDEBUG" ] # XXX: does the preprocessor need more definitions?
             c_flags = [ "-g" ] + c_flags
             fortran_flags = [ "-g" ] + fortran_flags
+            nvcc_flags = [ "-g" ] + [ "-G3" ] + nvcc_flags
 
         if not no_default_flags:
             c_flags = [ "-Wall", "-fno-strict-aliasing", "-fPIC" ] + c_flags
