@@ -686,7 +686,8 @@ class p4a_processor(object):
         # calling functions in the kernel that cause trouble to
         # CUDA/OpenCL:
         # kernel_launchers.unfolding()
-
+        # kernel_launchers.inlining()
+        
         # Normalize all loops in kernels to suit hardware iteration spaces:
         kernel_launchers.loop_normalize(
             # Loop normalize to be GPU friendly, even if the step is already 1:
@@ -741,6 +742,7 @@ class p4a_processor(object):
         # An alternative would be to flag them recursievly, but it is not safe: what if there is a host caller too ?
         # RK suggests this should be done before ...
         kernels.unfolding()
+        # kernels.inlining()
 
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
