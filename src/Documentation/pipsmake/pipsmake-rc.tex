@@ -2647,15 +2647,6 @@ problem, proper effects of DO loops do not include the index read effect
 due to the loop incrementation.
 
 Artificial arcs are added to... (Pierre Jouvelot, help!).
-
-Property \PipsPropRef{ATOMIC_CHAINS_FILTER_SCOPE} is used to filter out 
-arcs based on variable scope. It ensure that if a variable is limited to a 
-scope, no dependence arc involving this variable can escape from the scope.
-
-\begin{PipsProp}{ATOMIC_CHAINS_FILTER_SCOPE} 
-ATOMIC_CHAINS_FILTER_SCOPE TRUE
-\end{PipsProp}
-
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -13927,14 +13918,13 @@ impact_check    > MODULE.code
 
 \subsection{Chains Graph View}
 
-\begin{PipsPass}{print_chains_graph}
 \begin{PipsMake}
 print_chains_graph      > MODULE.dg_file
         < PROGRAM.entities
         < MODULE.code
         < MODULE.chains
 \end{PipsMake}
-\end{PipsPass}
+
 
 \subsection{Chains Graph Graphviz Dot View}
 
