@@ -87,11 +87,8 @@ void compute(int p, int n, float a[n][n])
 {
    int t[100];
    int k = 100, i, s;
-#pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
       int j;
-   }
-   for(i = 0; i <= 99; i += 1) {
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
          t[j] = a[i][j]+j;
@@ -104,11 +101,8 @@ void compute(int p, int n, float a[n][n])
 {
    int t[100];
    int k = 100, i, s;
-#pragma omp parallel for 
    for(i = 0; i <= 99; i += 1) {
       int j;
-   }
-   for(i = 0; i <= 99; i += 1) {
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
          t[j] = a[i][j]+j;
