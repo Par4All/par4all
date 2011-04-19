@@ -10211,7 +10211,8 @@ scalarization  > MODULE.code
 Since OUT regions are computed interprocedurally, strange code may
 result when a small or not so small function  without any real output
 is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a
-\verb/printf/ to force an OUT region.
+\verb/printf/ to force an OUT region, or by setting Property
+\PipsPropRef{SCALARIZATION_FORCE_OUT} to true.
 
 Also, it may be useful to use Property
 \PipsPropRef{TRUST_ARRAY_DECLARATIONS} and/or
