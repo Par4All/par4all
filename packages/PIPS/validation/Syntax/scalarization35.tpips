@@ -1,0 +1,18 @@
+delete scalarization35
+
+# Do no abort on user error because this test the detection of a user error
+#setproperty ABORT_ON_USER_ERROR TRUE
+
+create scalarization35 scalarization35.f
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+display PARSED_PRINTED_FILE
+
+close
+
+shell cat scalarization35.database/Warnings
+
+delete scalarization35
+quit
+

@@ -1,0 +1,83 @@
+echo c     Optimization by unrolling of loop 100 and 200,
+echo c     and by repetitive partial evaluation
+# Optimization by unrolling of loop 100 and 200,
+# and by repetitive partial evaluation
+
+delete convol-unroll
+create convol-unroll convol-unroll.f
+
+setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo c     Show convolution function
+echo 
+# Show convolution function
+
+module convol
+display PRINTED_FILE
+
+echo c     Show main program
+echo 
+# Show main program
+#
+module IMAGE_PROCESSING
+display PRINTED_FILE
+
+echo c     Show interprocedural preconditions for module convol
+echo 
+# Show interprocedural preconditions for module convol
+#
+module convol
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL 
+activate TRANSFORMERS_INTER_FULL  
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+activate PRINT_CODE
+
+echo c     After constant propagation
+echo 
+# Propagate constants (cloning could be used too)
+#
+apply PARTIAL_EVAL
+display PRINTED_FILE 
+
+echo c     After full unrolling of the two internal loops
+echo 
+# Unroll internal loops
+#
+apply FULL_UNROLL
+100
+
+apply FULL_UNROLL
+200
+display PRINTED_FILE
+
+echo c     After useless variables elimination
+
+# Eliminate useless variables
+#
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+apply DEAD_CODE_ELIMINATION
+display PRINTED_FILE
+
+echo c     Subscript expressions have been eliminated by partial evaluation
+echo 
+# Simplify subscript expressions
+#
+apply PARTIAL_EVAL
+display PRINTED_FILE 
+
+echo c     Parallelized ... locality with a loop interchange
+echo 
+#apply LOOP_INTERCHANGE
+#400
+#display PRINTED_FILE
+activate NEST_PARALLELIZATION
+display PARALLELPRINTED_FILE
+
+quit

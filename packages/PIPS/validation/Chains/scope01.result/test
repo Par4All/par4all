@@ -1,0 +1,18 @@
+*********************** Without points-to analysis ***********************
+
+ *********************** Use-Def Chains *********************
+
+	04 --> 08 with conflicts
+		from <lv1-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************
+
+
+
+
+************************* With points-to analysis ************************
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

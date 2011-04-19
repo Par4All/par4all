@@ -1,0 +1,11 @@
+void test(FILE *fp)
+{
+   fpos_t pos;
+//             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fp[0] pos.__pos pos.__state.__count 
+//                               pos.__state.__value.__wch 
+//                               pos.__state.__value.__wchb[*] 
+//                               __IO_EFFECTS:LUNS[*]
+//             <    is read   >: fp
+   (void) fgetpos(fp, &pos);
+}

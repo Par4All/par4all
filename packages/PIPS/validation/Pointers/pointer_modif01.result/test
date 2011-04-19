@@ -1,19 +1,19 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
    int *p, *q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0]
 
    *p = 1;
 //             <    is read   >: p
 //             <    is written>: q
 
    q = p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-//             <    is written>: q[0]
    *q = 2;
    return 0;
 }

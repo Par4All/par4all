@@ -99,7 +99,7 @@ void change(int *i, double array[N]);
 
 void give();
 //PIPS generated variable
-typedef unsigned int size_t;
+typedef unsigned long int size_t;
 //PIPS generated variable
 void P4A_accel_malloc(void **address, size_t size), P4A_copy_from_accel_1d(size_t element_size, size_t d1_size, size_t d1_block_size, size_t d1_offset, void *host_address, const void *accel_address), P4A_accel_free(void *address);
 void change(int *i, double array[N])

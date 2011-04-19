@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main(int argc, char *argv[])
 {
@@ -7,19 +7,20 @@ int main(int argc, char *argv[])
 //             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i tab3 _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: tab3[i] _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       tab3[i] = malloc(64*sizeof(float));
 //             <    is written>: t
    for(t = 0; t <= 63; t += 1)
 //             <may be read   >: tab3
-//             <may be written>: tab1[*][*] tab2[*][*] tab3[*][*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       compute();
 //             <    is written>: i
 
    for(i = 1; i <= 62; i += 1)
-//             <    is read   >: i tab3 tab3[i] 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       free(tab3[i]);
 

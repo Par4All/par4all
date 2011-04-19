@@ -1,0 +1,83 @@
+
+POINTS-TO
+
+//  {}
+int main(int argc, char *argv[])
+{
+//  points to = {}
+   int *pi;                                                             /*0007*/
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   float *px;                                                           /*0008*/
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   float *pz;                                                           /*0009*/
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   int (*pt)[30];                                                       /*0010*/
+//  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pt,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(px,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   pi = (int *) malloc(sizeof(int));                                    /*0012*/
+//  {(pi,*HEAP*_l_12,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(px,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(pz,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   px = (float *) malloc(sizeof(float));                                /*0013*/
+//  {(pi,*HEAP*_l_12,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(px,*HEAP*_l_13,-Exact-);(pz,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   pz = (float *) malloc(sizeof(float));                                /*0014*/
+//  {(pi,*HEAP*_l_12,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(px,*HEAP*_l_13,-Exact-);(pz,*HEAP*_l_14,-Exact-)}
+   pt = (int (*)[30]) malloc(sizeof(*pt));                              /*0015*/
+//  {(pi,*HEAP*_l_12,-Exact-);(pt,*HEAP*_l_15[0],-Exact-);(px,
+//   *HEAP*_l_13,-Exact-);(pz,*HEAP*_l_14,-Exact-)}
+
+   return 0;                                                            /*0017*/
+}
+int main(int argc, char *argv[])
+{
+   int *pi;                                                             /*0007*/
+   float *px;                                                           /*0008*/
+   float *pz;                                                           /*0009*/
+   int (*pt)[30];                                                       /*0010*/
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+
+   pi = (int *) malloc(sizeof(int));                                    /*0012*/
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
+   px = (float *) malloc(sizeof(float));                                /*0013*/
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pz _MALLOC_EFFECTS:_MALLOC_
+   pz = (float *) malloc(sizeof(float));                                /*0014*/
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pt _MALLOC_EFFECTS:_MALLOC_
+   pt = (int (*)[30]) malloc(sizeof(*pt));                              /*0015*/
+
+   return 0;                                                            /*0017*/
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 15 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	13 --> 15 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	13 --> 14 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	12 --> 15 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	12 --> 14 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	12 --> 13 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+
+****************** End of Dependence Graph ******************

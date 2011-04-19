@@ -1,0 +1,43 @@
+
+POINTS-TO
+
+//  {}
+void point_to02()
+{
+//  points to = {}
+   struct s {
+      int a;
+      int b[10];
+   } c, *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   p->a = 1;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   (p->b)[2] = 3;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void point_to02()
+{
+   struct s {
+      int a;
+      int b[10];
+   } c, *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   p->a = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   (p->b)[2] = 3;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 09 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************

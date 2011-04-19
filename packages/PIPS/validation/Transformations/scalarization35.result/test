@@ -1,0 +1,19 @@
+C     Scalar replacement in the presence of conditional control flow
+C
+C     Steve Carr and Ken Kennedy
+C
+C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
+C
+C     Sixth example, page 24: Livermore Loop 5 cannot be handled by PIPS
+C     because we do not try to carry a value from one iteration to the next
+
+      SUBROUTINE SCALARIZATION35(X, Y, Z, N)
+      REAL X(N), Y(N), Z(N)
+
+      DO I = 2, N
+         X(I) = Z(I)*(Y(I)-X(I-1))
+      ENDDO
+
+      PRINT *, X
+
+      END

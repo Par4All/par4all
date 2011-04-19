@@ -1,9 +1,9 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 char * conditional01(int i)
 {
-//             <may be written>: p[*] p[*][*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    char *p[3] = {"a", "b", "c"};
 //             <may be read   >: p[0] p[*]
 //             <    is read   >: i

@@ -1,0 +1,15 @@
+# This is a preprocessor validation case
+
+setenv WS=struct_return01
+delete $WS
+create $WS $WS.c
+#quit
+display PRINTED_FILE[%ALL]
+
+apply UNSPLIT
+shell cc -c $WS.database/Src/$WS.c -o $WS.database/Src/$WS.c
+close
+
+delete $WS
+
+quit

@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -15,8 +15,8 @@ int main()
    p = a, i = 0;
 //             <    is read   >: i
    while (i<10) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0]
       *p = 1.0;
 //             <    is read   >: p
 //             <    is written>: p

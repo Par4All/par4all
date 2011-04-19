@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main(void)
 {
@@ -34,8 +34,8 @@ int main(void)
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 
    printf("pp=%p\n", pp);
-//             <    is read   >: pp pp[0]
-//             <    is written>: pp[0][0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    
    // possible segfault.
    // should generate an error while analyzing?

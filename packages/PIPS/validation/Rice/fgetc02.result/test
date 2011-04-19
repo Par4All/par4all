@@ -60,12 +60,32 @@ Check the chains of "getimage"
 		from <c-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	29 --> -1 with conflicts
 		from <j-R-EXACT> to <j-W-EXACT>
+	28 --> 30 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <imagein_im[i][j]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <imagein_im[i][j]-W-EXACT>
+	28 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <imagein_re[i][j]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <c-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <imagein_re[i][j]-W-EXACT>
 	28 --> 28 with conflicts
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
 		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	28 --> -1 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <j-W-EXACT>
 	-1 --> -1 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	22 --> 28 with conflicts

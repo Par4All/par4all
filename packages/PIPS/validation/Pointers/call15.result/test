@@ -1,11 +1,11 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
    int i;
    tf_t s;
-//             <    is written>: i s.one
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    call15(&i, &s);
 }

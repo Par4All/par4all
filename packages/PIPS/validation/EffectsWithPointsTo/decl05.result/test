@@ -1,0 +1,35 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int tab[3] = {0, 1, 2};
+//  points to = {}
+
+   tab[0] = tab[0]+2;
+//  points to = {}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <may be written>: tab[*]
+   int tab[3] = {0, 1, 2};
+//             <    is read   >: tab[0]
+//             <    is written>: tab[0]
+
+   tab[0] = tab[0]+2;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	06 --> 08 with conflicts
+		from <tab[*]-W-MAY> to <tab[0]-W-EXACT>
+		from <tab[*]-W-MAY> to <tab[0]-R-EXACT>
+
+****************** End of Dependence Graph ******************

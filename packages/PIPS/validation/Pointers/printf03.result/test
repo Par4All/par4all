@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -14,9 +14,9 @@ int main()
 //             <    is written>: y[0]
 
    y[0] = 0.;
-//             <may be read   >: fmt[*] stdout[0]
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: fmt i j stdout x __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
    printf(fmt, i, i+j, x);
 }

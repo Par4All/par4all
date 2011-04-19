@@ -32,9 +32,9 @@ int main(char *fmt1, ...)
    
    (void) fread(buf1, 8, 50, fp);
 //             <may be read   >: fmt2[*] fp[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: fp[0] i_name[*] __IO_EFFECTS:LUNS[*]
+//             <may be written>: fp[0] i i_name[*] 
+//                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fmt2 fp i_name
-//             <    is written>: i
    (void) fscanf(fp, fmt2, i_name, &i);
 //             <may be read   >: fp[0] i_name[*] __IO_EFFECTS:LUNS[*]
 //             <may be written>: fp[0] __IO_EFFECTS:LUNS[*]
@@ -64,9 +64,9 @@ int main(char *fmt1, ...)
 //             <    is read   >: vl
    va_end(vl);
 //             <may be read   >: stdin[0]
-//             <may be written>: i_name[*] stdin[0]
+//             <may be written>: i i_name[*] stdin[0]
 //             <    is read   >: i_name stdin __IO_EFFECTS:LUNS[0]
-//             <    is written>: i __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
 
    (void) scanf("%s%d", i_name, &i);
 //             <may be read   >: fmt2[*] i_name[*] stdout[0]
@@ -99,9 +99,8 @@ int main(char *fmt1, ...)
 //             <    is read   >: vl
    va_end(vl);
 //             <may be read   >: buf1[*] fmt2[*]
-//             <may be written>: i_name[*]
+//             <may be written>: i i_name[*]
 //             <    is read   >: fmt2 i_name
-//             <    is written>: i
    
    
    (void) sscanf(buf1, fmt2, i_name, &i);
@@ -226,11 +225,11 @@ int main(char *fmt1, ...)
    // file positionning functions
    (void) fgetpos(fp, fp_pos);
 //             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
-//             <may be written>: fp[0] pos.__state.__value.__wchb[*] 
+//             <may be written>: fp[0] pos.__pos pos.__state.__count 
+//                               pos.__state.__value.__wch 
+//                               pos.__state.__value.__wchb[*] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <    is read   >: fp
-//             <    is written>: pos pos.__pos pos.__state.__count 
-//                               pos.__state.__value.__wch
    (void) fgetpos(fp, &pos);
 //             <may be read   >: fp[0] __IO_EFFECTS:LUNS[*]
 //             <may be written>: fp[0] __IO_EFFECTS:LUNS[*]

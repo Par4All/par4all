@@ -1,0 +1,33 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   tf_t s;
+//  points to = {}
+   tf_t *sp = &s;
+//  {(sp,s,-Exact-)}
+
+   call09(s.one, sp->one);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <    is read   >: s.one sp
+
+   call09(s.one, sp->one);
+}
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 17 with conflicts
+		from <sp-W-EXACT> to <sp-R-EXACT>
+
+****************** End of Dependence Graph ******************

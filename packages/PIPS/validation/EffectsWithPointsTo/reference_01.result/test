@@ -1,0 +1,30 @@
+
+POINTS-TO
+
+//  {}
+int main(void)
+{
+//  points to = {}
+   int k = reference_01();
+//  points to = {}
+
+   return k;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main(void)
+{
+//             <    is written>: k
+   int k = reference_01();
+//             <    is read   >: k
+
+   return k;
+}
+
+ *********************** Use-Def Chains *********************
+
+	19 --> 21 with conflicts
+		from <k-W-EXACT> to <k-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,76 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 0, j = 1, k = 2, l = 3;
+//  points to = {}
+   int *p, *q, *r, *s, *t;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   r = &i;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,i,-Exact-);(s,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   q = &j;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   s = &k;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,j,-Exact-);(r,i,
+//   -Exact-);(s,k,-Exact-);(t,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   /* we trat this instruction like :
+        s = r;
+        q;
+        s;
+        p = s;
+     */
+   p = (s = r, q, s);
+//  {(p,i,-Exact-);(q,j,-Exact-);(r,i,-Exact-);(s,i,-Exact-);(t,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i j k l
+   int i = 0, j = 1, k = 2, l = 3;
+   int *p, *q, *r, *s, *t;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is written>: s
+   s = &k;
+//             <    is read   >: q r s
+//             <    is written>: p s
+   /* we trat this instruction like :
+        s = r;
+        q;
+        s;
+        p = s;
+     */
+   p = (s = r, q, s);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 17 with conflicts
+		from <s-W-EXACT> to <s-W-EXACT>
+		from <s-W-EXACT> to <s-R-EXACT>
+	09 --> 17 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 17 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+
+****************** End of Dependence Graph ******************

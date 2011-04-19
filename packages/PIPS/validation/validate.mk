@@ -273,7 +273,7 @@ DFTPIPS	= default_tpips
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
 # default_test relies on FILE WSPACE NAME
-# Semantics & Regions create local "properties.rc":-(
+# warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
 %.result/$(TEST): %.c $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
@@ -286,6 +286,33 @@ DEFTEST	= default_test
 %.result/$(TEST): %.F $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
+
+
+# default_pyps relies on FILE & WSPACE
+PYTHON	= python
+DEFPYPS	= default_pyps
+ifdef PIPS_VALIDATION_NO_PYPS
+%.result/$(TEST): %.c $(DEFPYPS)
+	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.f $(DEFPYPS)
+	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.F $(DEFPYPS)
+	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+else # with pyps
+%.result/$(TEST): %.c $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.F $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+endif # PIPS_VALIDATION_NO_PYPS
 
 # bug & later handling
 .PHONY: bug-list

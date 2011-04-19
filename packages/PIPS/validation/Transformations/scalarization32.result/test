@@ -1,0 +1,27 @@
+C     Scalar replacement in the presence of conditional control flow
+C
+C     Steve Carr and Ken Kennedy
+C
+C     Software - Practive and Experience, Vol. 24, No. 1, pp. 51-77, 1994
+C
+C     Third example, page 6: the profitability analysis by PIPS is
+C     simplistic because the control is not taken into account; also
+C     references a(i) and a(i-1) prevent scalarization, which does not
+C     matter much here
+
+      SUBROUTINE SCALARIZATION32(A, B, C, D, E, N)
+      REAL A(N), B(N), C(N), D(N), E(N)
+
+      DO I = 1, N
+         __SCALAR__1 = D(I)
+         IF (B(I).LT.0.) THEN
+            __SCALAR__0 = A(I)+__SCALAR__1
+         ELSE
+            __SCALAR__0 = A(I-1)+__SCALAR__1
+         ENDIF
+         E(I) = __SCALAR__0+A(I)
+      ENDDO
+
+      PRINT *, E
+
+      END

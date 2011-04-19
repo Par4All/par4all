@@ -1,0 +1,22 @@
+# Same as scalarization01, but test property SCALARIZATION_PREFIX
+
+delete scalarization38
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SCALARIZATION_PREFIX "S_"
+
+##TODO: explain
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization38 scalarization38.f
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+apply SCALARIZATION[SCALARIZATION]
+display PRINTED_FILE[SCALARIZATION]
+
+close
+delete scalarization38
+quit
+
