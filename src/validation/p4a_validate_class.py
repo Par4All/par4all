@@ -99,7 +99,8 @@ class ValidationClass:
 
 			# filter out absolute path anyway, there may be some because of
   		# cpp or other stuff run by pips, even if relative path names are used.
-			output = output.replace(test_file_path,'./'+os.path.basename(test_file_path))
+			#output = output.replace(test_file_path,'./'+os.path.basename(test_file_path))
+			output = output.replace(directory_test_path,'.')
 
 			if (os.path.isfile(err_file_path) == True):
 				# copy error file on RESULT directories of par4all validation
@@ -173,8 +174,12 @@ class ValidationClass:
 					#status of the test
 					status = 'succeeded'
 
-		self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
-		self.file_result.close()
+		# Si status failed and no .bug or .later file in test folder, do not write results in summary
+		if ((status != 'succeeded') and (os.path.isfile(test_name_path+".bug") or os.path.isfile(test_name_path+".later"))):
+			self.file_result.close()
+		else: 
+			self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
+			self.file_result.close()
 	
 		# Return to validation Par4All
 		os.chdir(self.p4a_root)
