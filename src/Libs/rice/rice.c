@@ -377,7 +377,6 @@ static bool rice(string mod_name)
 {
     bool success = TRUE;
     entity module = local_name_to_top_level_entity(mod_name);
-    set_current_module_entity(module);
 
     /*
      * For C code, this pass requires that effects are calculated with property
@@ -391,6 +390,7 @@ static bool rice(string mod_name)
       return FALSE; // return to pass manager with a failure code
     }
 
+    set_current_module_entity(module);
 
     success = do_it( mod_name, FALSE, DBR_PARALLELIZED_CODE, &CodeGenerate);
 
