@@ -48,25 +48,35 @@ enum {M=64};
 
  main(int argc, char *argv[]);
 //PIPS generated variable
-void compute(int M, int *a, int *l, int *m);
+void compute(int M, int *a_0, int *l_0, int *m_0);
 // END BLOCK
-void compute(int M, int *a, int *l, int *m)
+void compute(int M, int *a_0, int *l_0, int *m_0)
 {
    // BEGIN BLOCK
+   // BEGIN BLOCK
+   //PIPS generated variable
+   int a, l, m;
+   m = *m_0;
+   l = *l_0;
+   a = *a_0;
 compute:   do {
       // BEGIN BLOCK
       // BEGIN BLOCK
-      *m = 0;
-      while (*m<M) {
+      m = 0;
+      while (m<M) {
          // BEGIN BLOCK
          // BEGIN BLOCK
-         *a = 0;
-         (*l)++;
+         a = 0;
+         l++;
          // END BLOCK
       }
       // END BLOCK
    }
    while (0);
+   *a_0 = a;
+   *l_0 = l;
+   *m_0 = m;
+   // END BLOCK
 }
 main(int argc, char *argv[])
 {

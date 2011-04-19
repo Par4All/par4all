@@ -1,11 +1,8 @@
+#include <stdlib.h>
+#include <stdio.h>
 
 #define DO_CHECKING 1
 #define GOOD (j1 <= n && j2 <= n)
-
-// tools
-
-#include <stdlib.h>
-#include <stdio.h>
 
 int flip(void) {
 	return rand() % 2;

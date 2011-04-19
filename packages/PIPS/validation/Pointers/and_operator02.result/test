@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -21,11 +21,11 @@ int main()
 //             <    is read   >: q s
 //             <    is written>: p r
    if ((p = q)&&(r = s))
-//             <    is read   >: p p[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: p
       *p++;
    else if ((p = q)||(r = s))
-//             <    is read   >: r r[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: r
       *r++;
 

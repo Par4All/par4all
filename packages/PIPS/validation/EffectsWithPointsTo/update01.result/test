@@ -1,0 +1,42 @@
+
+POINTS-TO
+
+//  {}
+void update01()
+{
+//  points to = {}
+   int i;
+//  points to = {}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   p = &i;
+//  {(p,i,-Exact-)}
+   p++;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   i = 2;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void update01()
+{
+   int i;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+//             <    is written>: i
+   i = 2;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

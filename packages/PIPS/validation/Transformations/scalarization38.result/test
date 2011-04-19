@@ -1,0 +1,15 @@
+C     Expected result: t(i) scalarized
+
+C     Same as scalarization37.f, but with a name conflict
+
+      SUBROUTINE SCALARIZATION(X,Y,N)
+      REAL X(N,N), Y(N,N)
+      REAL T(100), S_0
+      DO I = 1, N                                                       0008
+         DO J = 1, N                                                    0009
+            S_1 = X(I,J)                                                0010
+            X(I,J) = Y(I,J)                                             0011
+            Y(I,J) = S_1                                                0012
+         ENDDO
+      ENDDO
+      END

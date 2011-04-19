@@ -15,14 +15,14 @@
       INTEGER N, I
       READ *, N                                                         0003
       IF (N.LT.100) THEN                                                0004
-         _if_then_0 = _if_then_0+1
+         _IF_THEN_0 = _IF_THEN_0+1
          PRINT *, 'n < 100'                                             0005
       ELSE
-         _if_else_0 = _if_else_0+1
+         _IF_ELSE_0 = _IF_ELSE_0+1
          PRINT *, 'n >= 100'                                            0007
       ENDIF
       DO I = 1, N                                                       0009
-         _do_0 = _do_0+1
+         _DO_0 = _DO_0+1
          PRINT *, I                                                     0010
       ENDDO
       PRINT *, 'done'                                                   0012

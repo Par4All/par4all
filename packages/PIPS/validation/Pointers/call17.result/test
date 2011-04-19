@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 void call17(int *x)
 {
@@ -7,8 +7,8 @@ void call17(int *x)
 //             <    is read   >: x
 //             <    is written>: y
    int *y = x;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: y
-//             <    is written>: y[0]
    y[0] = 1;
 }
 

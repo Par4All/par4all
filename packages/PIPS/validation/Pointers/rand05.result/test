@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main(void)
 {
@@ -18,8 +18,8 @@ int main(void)
    if (alea())
 //             <    is written>: pp
       pp = &pi1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pp
-//             <    is written>: pp[0]
 
    *pp = (void *) 0;
 //             <may be read   >: stdout[0]

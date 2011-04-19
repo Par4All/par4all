@@ -1,10 +1,8 @@
-#define DO_CHECKING 1
-#define BAD (i < 2 * j || j < 0)
-
-// tools
-
 #include <stdlib.h>
 #include <stdio.h>
+
+#define DO_CHECKING 1
+#define BAD (i < 2 * j || j < 0)
 
 int flip(void) {
 	return rand() % 2;

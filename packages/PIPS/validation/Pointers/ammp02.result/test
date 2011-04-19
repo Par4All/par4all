@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int a_number()
 {
@@ -7,7 +7,7 @@ int a_number()
 //             <    is read   >: first
 //             <    is written>: ap
 l:   ap = first;
-//             <    is read   >: ap ap[0].next
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
    if (ap->next==(void *) 0) goto l;
 //             <    is read   >: atomNUMBER
 

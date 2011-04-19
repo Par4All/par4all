@@ -1,0 +1,260 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int a, b, c, d;
+//  points to = {}
+   int *pa, *pb, *pc, *pd;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int **ppa, **ppb, **ppc, **ppd;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   a = 1;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   b = 2;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   c = 3;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   d = 4;
+//  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   pa = &a;
+//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppb,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   ppa = &pa;
+//  {(pa,a,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   *ppa = &b;
+//  {(pa,b,-Exact-);(pb,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(ppa,pa,-Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   pb = &b;
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppc,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   ppb = &pb;
+//  {(pa,b,-Exact-);(pb,b,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   *ppb = &a;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-);(pd,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,
+//   -Exact-);(ppb,pb,-Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   pc = &c;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   ppc = &pc;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+   *ppc = &a;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(ppa,pa,-Exact-);(ppb,pb,
+//   -Exact-);(ppc,pc,-Exact-);(ppd,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-)}
+
+   pd = &d;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   ppd = &pd;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,d,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+   *ppd = &c;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,a,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   pc = pd;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,c,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   *ppc = &b;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   *ppa = pc;
+//  {(pa,b,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   pa = *ppd;
+//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   *ppa = *ppd;
+//  {(pa,c,-Exact-);(pb,a,-Exact-);(pc,b,-Exact-);(pd,c,-Exact-);(ppa,
+//   pa,-Exact-);(ppb,pb,-Exact-);(ppc,pc,-Exact-);(ppd,pd,-Exact-)}
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a, b, c, d;
+   int *pa, *pb, *pc, *pd;
+   int **ppa, **ppb, **ppc, **ppd;
+//             <    is written>: a
+   a = 1;
+//             <    is written>: b
+   b = 2;
+//             <    is written>: c
+   c = 3;
+//             <    is written>: d
+   d = 4;
+//             <    is written>: pa
+
+   pa = &a;
+//             <    is written>: ppa
+   ppa = &pa;
+//             <    is read   >: ppa
+//             <    is written>: pa
+   *ppa = &b;
+//             <    is written>: pb
+
+   pb = &b;
+//             <    is written>: ppb
+   ppb = &pb;
+//             <    is read   >: ppb
+//             <    is written>: pb
+   *ppb = &a;
+//             <    is written>: pc
+
+   pc = &c;
+//             <    is written>: ppc
+   ppc = &pc;
+//             <    is read   >: ppc
+//             <    is written>: pc
+   *ppc = &a;
+//             <    is written>: pd
+
+   pd = &d;
+//             <    is written>: ppd
+   ppd = &pd;
+//             <    is read   >: ppd
+//             <    is written>: pd
+   *ppd = &c;
+//             <    is read   >: pd
+//             <    is written>: pc
+
+   pc = pd;
+//             <    is read   >: ppc
+//             <    is written>: pc
+
+   *ppc = &b;
+//             <    is read   >: pc ppa
+//             <    is written>: pa
+
+   *ppa = pc;
+//             <    is read   >: pd ppd
+//             <    is written>: pa
+
+   pa = *ppd;
+//             <    is read   >: pd ppa ppd
+//             <    is written>: pa
+
+   *ppa = *ppd;
+
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	33 --> 35 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	31 --> 33 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	29 --> 31 with conflicts
+		from <pc-W-EXACT> to <pc-R-EXACT>
+	27 --> 29 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	25 --> 35 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	25 --> 33 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	25 --> 27 with conflicts
+		from <pd-W-EXACT> to <pd-R-EXACT>
+	24 --> 35 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	24 --> 33 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	24 --> 25 with conflicts
+		from <ppd-W-EXACT> to <ppd-R-EXACT>
+	23 --> 25 with conflicts
+		from <pd-W-EXACT> to <pd-W-EXACT>
+	21 --> 27 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	20 --> 29 with conflicts
+		from <ppc-W-EXACT> to <ppc-R-EXACT>
+	20 --> 21 with conflicts
+		from <ppc-W-EXACT> to <ppc-R-EXACT>
+	19 --> 21 with conflicts
+		from <pc-W-EXACT> to <pc-W-EXACT>
+	16 --> 17 with conflicts
+		from <ppb-W-EXACT> to <ppb-R-EXACT>
+	15 --> 17 with conflicts
+		from <pb-W-EXACT> to <pb-W-EXACT>
+	13 --> 31 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+	12 --> 35 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	12 --> 31 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	12 --> 13 with conflicts
+		from <ppa-W-EXACT> to <ppa-R-EXACT>
+	11 --> 13 with conflicts
+		from <pa-W-EXACT> to <pa-W-EXACT>
+
+****************** End of Dependence Graph ******************

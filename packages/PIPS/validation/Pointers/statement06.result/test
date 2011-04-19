@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -19,51 +19,51 @@ int main()
    pa = &a;
 //             <    is written>: ppa
    ppa = &pa;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppa
-//             <    is written>: ppa[0]
    *ppa = &b;
 //             <    is written>: pb
 
    pb = &b;
 //             <    is written>: ppb
    ppb = &pb;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppb
-//             <    is written>: ppb[0]
    *ppb = &a;
 //             <    is written>: pc
 
    pc = &c;
 //             <    is written>: ppc
    ppc = &pc;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppc
-//             <    is written>: ppc[0]
    *ppc = &a;
 //             <    is written>: pd
 
    pd = &d;
 //             <    is written>: ppd
    ppd = &pd;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppd
-//             <    is written>: ppd[0]
    *ppd = &c;
 //             <    is read   >: pd
 //             <    is written>: pc
 
    pc = pd;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: ppc
-//             <    is written>: ppc[0]
 
    *ppc = &b;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: pc ppa
-//             <    is written>: ppa[0]
 
    *ppa = pc;
-//             <    is read   >: ppd ppd[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: pa
 
    pa = *ppd;
-//             <    is read   >: ppa ppd ppd[0]
-//             <    is written>: ppa[0]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
    *ppa = *ppd;
 

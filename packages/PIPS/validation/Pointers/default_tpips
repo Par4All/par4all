@@ -10,9 +10,9 @@ setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 
 
 echo 
-echo PROPER POINTER EFFECTS
+echo PROPER  EFFECTS
 echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
+activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 

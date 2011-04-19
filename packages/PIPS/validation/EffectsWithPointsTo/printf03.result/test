@@ -1,0 +1,55 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int i = 5;
+//  points to = {}
+   int j = 6;
+//  points to = {}
+   float x;
+//  points to = {}
+   double y[10];
+//  points to = {}
+   char *fmt = "i=%d, %d, %f\n";
+//  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+
+   y[0] = 0.;
+//  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+   printf(fmt, i, i+j, x);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 5;
+//             <    is written>: j
+   int j = 6;
+   float x;
+   double y[10];
+//             <    is written>: fmt
+   char *fmt = "i=%d, %d, %f\n";
+//             <    is written>: y[0]
+
+   y[0] = 0.;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf(fmt, i, i+j, x);
+}
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 12 with conflicts
+		from <fmt-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	06 --> 12 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	05 --> 12 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

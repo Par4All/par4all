@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 void point_to01()
 {
@@ -14,20 +14,20 @@ void point_to01()
    p = &c;
 
    if (1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0].a
       p->a = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0].b
       p->b = 2;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0].c
       p->c = 3;
-//             <    is read   >: p p[0].a
-//             <    is written>: p[0].d
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       p->d = p->a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: p[0].a p[0].d
       p->d = p->a = 4;
    }
 }

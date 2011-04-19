@@ -1,0 +1,13 @@
+int main()
+{
+
+   int a, b;
+//             <    is written>: a
+   
+   
+   
+   *&a = 0;
+//             <    is read   >: a
+//             <    is written>: b
+   b = *&a;
+}

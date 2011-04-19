@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int ptr_to_field()
 {
@@ -17,17 +17,17 @@ int ptr_to_field()
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
    n = (my_str *) malloc(sizeof(my_str));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: m
-//             <    is written>: m[0].q
    m->q = &i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: m
-//             <    is written>: m[0].p
    m->p = &j;
-//             <    is read   >: m m[0].p n
-//             <    is written>: n[0].q
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    n->q = m->p;
-//             <    is read   >: m m[0].q n
-//             <    is written>: n[0].p
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    n->p = m->q;
 
    return 0;

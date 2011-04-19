@@ -1,7 +1,10 @@
-void kernel(int H, int R, _int W, float *sum, size_t x, size_t y, float Kernel[R], float Src[W][H])
+void kernel(int H, int R, _int W, float *sum_0, size_t x, size_t y, float Kernel[R], float Src[W][H])
 {
    //PIPS generated variable
    size_t k;
+   //PIPS generated variable
+   float sum;
+   sum = *sum_0;
 here:
    for(k = -R; k <= R; k += 1) {
       struct {
@@ -9,8 +12,9 @@ here:
       } _ = {0};
       int d = y+k+_._;
       if (d>=0&&d<H)
-         *sum += Src[y][x]*Kernel[R-k];
+         sum += Src[y][x]*Kernel[R-k];
    }
+   *sum_0 = sum;
 }
 void outline15(_int W, int H, int R, float Dst[W][H], float Src[W][H], float Kernel[R])
 {

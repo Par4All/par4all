@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
@@ -28,13 +28,13 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 //             <    is written>: k2
                for(k2 = 0; k2 <= nsa-1; k2 += 1) {
 //             <    is read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                               ptrin[i+k1][k2].im ptrin[i+j1][j2].im
-//                               ptrin[i+k1][k2].re ptrin[i+j1][j2].re
+//                               ptrin[i+j1][j2].im ptrin[i+k1][k2].im
+//                               ptrin[i+j1][j2].re ptrin[i+k1][k2].re
 //             <    is written>: R
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
 //             <    is read   >: i j1 j2 k1 k2 nrec nsa ntt 
-//                               ptrin[i+j1][j2].im ptrin[i+k1][k2].im
-//                               ptrin[i+k1][k2].re ptrin[i+j1][j2].re
+//                               ptrin[i+k1][k2].im ptrin[i+j1][j2].im
+//                               ptrin[i+j1][j2].re ptrin[i+k1][k2].re
 //             <    is written>: I
                   I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
 //             <    is read   >: R i j1 j2 k1 k2 nrec nsa ntt

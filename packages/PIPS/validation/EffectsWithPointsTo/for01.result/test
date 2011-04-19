@@ -1,0 +1,73 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  points to = {}
+   int i, j, k;
+//  points to = {}
+   int a[500];
+//  points to = {}
+
+   i = 0;
+//  points to = {}
+   j = 1;
+//  points to = {}
+   for(i = 0; i <= 499; i += 1) {
+//  points to = {}
+      j++;
+//  points to = {}
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+//  points to = {}
+   k = 2;
+//  points to = {}
+   return k;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int i, j, k;
+   int a[500];
+//             <    is written>: i
+
+   i = 0;
+//             <    is written>: j
+   j = 1;
+//             <    is written>: i
+   for(i = 0; i <= 499; i += 1) {
+//             <    is read   >: j
+//             <    is written>: j
+      j++;
+//             <    is read   >: i
+//             <    is written>: a[i]
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+//             <    is written>: k
+   k = 2;
+//             <    is read   >: k
+   return k;
+}
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 14 with conflicts
+		from <k-W-EXACT> to <k-R-EXACT>
+	11 --> 11 with conflicts
+		from <a[i]-W-EXACT> to <a[i]-W-EXACT>
+	09 --> 09 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+		from <j-R-EXACT> to <j-W-EXACT>
+	07 --> 09 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-EXACT>
+	06 --> -1 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+
+****************** End of Dependence Graph ******************

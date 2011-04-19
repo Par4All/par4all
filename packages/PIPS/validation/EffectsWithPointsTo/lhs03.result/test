@@ -1,0 +1,27 @@
+
+POINTS-TO
+
+//  {}
+void lhs03()
+{
+//  points to = {}
+   int i;
+//  points to = {}
+
+   i = 2;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void lhs03()
+{
+   int i;
+//             <    is written>: i
+
+   i = 2;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -13,8 +13,8 @@ int main()
 //             <    is written>: i
 
    for(i = 0; i <= d1-1; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: d1 d2 i
-//             <    is written>: y[i][5]
       call08(i, d2, &y[i][1]);
 }
 

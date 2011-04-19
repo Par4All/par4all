@@ -1,3 +1,6 @@
+# require for DEAD_CODE_ELIMINATION
+set MEMORY_EFFECTS_ONLY FALSE
+
 activate MUST_REGIONS
 activate REGION_CHAINS
 activate RICE_REGIONS_DEPENDENCE_GRAPH
@@ -68,7 +71,7 @@ display PRINTED_FILE
 
 apply DEATOMIZER
 apply PARTIAL_EVAL
-apply USE_DEF_ELIMINATION
+apply DEAD_CODE_ELIMINATION
 apply UNSPAGHETTIFY
 
 display PRINTED_FILE
@@ -76,6 +79,9 @@ display PRINTED_FILE
 apply SCALAR_RENAMING
 
 display PRINTED_FILE
+
+# further transformations are only useful if something 
+# is printed in the script that include this one
 
 apply SIMDIZER
 apply UNSPAGHETTIFY
@@ -86,8 +92,10 @@ apply USE_DEF_ELIMINATION
 apply DELAY_COMMUNICATIONS
 apply UNSPAGHETTIFY
 
-apply UNSPAGHETTIFY
-#apply USE_DEF_ELIMINATION
+#one time is enough :)
+#apply UNSPAGHETTIFY
 
 apply REDUNDANT_LOAD_STORE_ELIMINATION
+
 apply CLEAN_DECLARATIONS
+

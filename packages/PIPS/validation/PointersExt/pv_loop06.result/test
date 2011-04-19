@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -14,8 +14,8 @@ int main()
    q = &b[0];
 //             <    is written>: i
    for(i = 0; i <= 9; i += 1)
-//             <    is read   >: p q q[0]
-//             <    is written>: p p[0] q
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
       *p++ = 2**q++;
    return 0;
 }

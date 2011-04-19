@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main()
 {
@@ -10,8 +10,8 @@ int main()
    h = 2;
 //             <    is written>: y
    y = &h;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: x y
-//             <    is written>: x[0]
    *x = y;
 //             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]

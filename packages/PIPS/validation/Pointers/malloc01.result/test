@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS
 
 int main(int argc, char *argv[])
 {
@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
       a[i] = (float) malloc(64*sizeof(float));
 //             <    is written>: j
       for(j = 0; j <= 63; j += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a[i] i j
-//             <    is written>: a[i][j]
          a[i][j] = 0.;
    }
 
