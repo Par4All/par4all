@@ -1159,86 +1159,90 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       fprintf(stderr,"\n");
     }
 
-    if ( effects_may_conflict_p( fin, fout ) && ( *which )( fin, fout ) ) {
-      entity ein = effect_entity( fin );
-      entity eout = effect_entity( fout );
-      type tin = ultimate_type( entity_type(ein) );
-      type tout = ultimate_type( entity_type(eout) );
+    if(effects_may_conflict_p(fin, fout) && (*which)(fin, fout)) {
+      entity ein = effect_entity(fin);
+      entity eout = effect_entity(fout);
+      type tin = ultimate_type(entity_type(ein));
+      type tout = ultimate_type(entity_type(eout));
       reference rin = effect_any_reference(fin);
-      int din = gen_length( reference_indices(rin) );
+      int din = gen_length(reference_indices(rin));
       reference rout = effect_any_reference(fout);
-      int dout = gen_length( reference_indices(rout) );
+      int dout = gen_length(reference_indices(rout));
       bool add_conflict_p = TRUE;
 
-      if ( pointer_type_p( tin ) && pointer_type_p( tout ) ) {
-
-	/* Second version due to accuracy improvements in effect
-	   computation */
-	if ( din == dout ) {
-	  /* This is the standard case */
-	  add_conflict_p = TRUE;
-	} else if ( din < dout ) {
-	  /* a write on the shorter memory access path conflicts
+      if(entity_abstract_location_p(ein)) {
+        entity alout = variable_to_abstract_location(eout);
+        if(abstract_locations_may_conflict_p(ein, alout))
+          add_conflict_p = TRUE;
+      } else if(pointer_type_p(tin) && pointer_type_p(tout)) {
+        /* Second version due to accuracy improvements in effect
+         computation */
+        if(din == dout) {
+          /* This is the standard case */
+          add_conflict_p = TRUE;
+        } else if(din < dout) {
+          /* a write on the shorter memory access path conflicts
            with the longer one. If a[i] is written, then a[i][j]
            depends on it. If a[i] is read, no conflict */
-	  add_conflict_p = action_write_p(effect_action(fin));
-	} else /* dout < din */{
-	  /* same explanation as above */
-	  add_conflict_p = action_write_p(effect_action(fout));
-	}
+          add_conflict_p = action_write_p(effect_action(fin));
+        } else /* dout > din */{
+          /* same explanation as above */
+          add_conflict_p = action_write_p(effect_action(fout));
+        }
       } else {
-	/* Why should we limit this test to pointers? Structures,
-	   structures of arrays and arrays of structures with
-	   pointers embedded somewhere must behave in the very same
-	   way. Why not unify the two cases? Because we have not
-	   spent enough time thinking about memory access paths. */
-	if ( din < dout ) {
-	  /* a write on the shorter memory access path conflicts
-	     with the longer one. If a[i] is written, then a[i][j]
-	     depends on it. If a[i] is read, no conflict */
-	  add_conflict_p = action_write_p(effect_action(fin));
-	} else if ( dout < din ) {
-	  /* same explanation as above */
-	  add_conflict_p = action_write_p(effect_action(fout));
-	}
+        /* Why should we limit this test to pointers? Structures,
+         structures of arrays and arrays of structures with
+         pointers embedded somewhere must behave in the very same
+         way. Why not unify the two cases? Because we have not
+         spent enough time thinking about memory access paths. */
+        if(din < dout) {
+          /* a write on the shorter memory access path conflicts
+           with the longer one. If a[i] is written, then a[i][j]
+           depends on it. If a[i] is read, no conflict */
+          add_conflict_p = action_write_p(effect_action(fin));
+        } else if(dout < din) {
+          /* same explanation as above */
+          add_conflict_p = action_write_p(effect_action(fout));
+        }
       }
 
-      if ( add_conflict_p ) {
-	bool remove_this_conflict_p = FALSE;
-
-	/* Here we filter effect on loop indices */
-	list loops = load_statement_enclosing_loops( stout );
-	FOREACH( statement, el, loops ) {
-	  entity il = loop_index(statement_loop(el));
-	  remove_this_conflict_p |= entities_may_conflict_p( ein, il );
-	}
-
-	if ( !remove_this_conflict_p )
-	  cs = pushnew_conflict( fin, fout, cs );
+      if(add_conflict_p) {
+        bool remove_this_conflict_p = FALSE;
+        if(!entity_abstract_location_p(ein)) {
+          /* Here we filter effect on loop indices except for abstract
+           locations */
+          list loops = load_statement_enclosing_loops(stout);
+          FOREACH( statement, el, loops ) {
+            entity il = loop_index(statement_loop(el));
+            remove_this_conflict_p |= entities_may_conflict_p(ein, il);
+          }
+        }
+        if(!remove_this_conflict_p) {
+          cs = pushnew_conflict(fin, fout, cs);
+        }
       }
     }
   }
 
   /* Add conflicts */
-  if ( !ENDP( cs ) ) {
+  if(!ENDP( cs )) {
 
     /* The sink vertex in the graph */
     successor sout = successor_undefined;
-    /* Try first to find an existing vertex for this statement */
-    FOREACH( successor, s, vertex_successors( vin ) ) {
-      if ( successor_vertex(s) == vout ) {
-	sout = s;
-	break;
+    /* Try first to find an existing vertex for this statement */FOREACH( successor, s, vertex_successors( vin ) ) {
+      if(successor_vertex(s) == vout) {
+        sout = s;
+        break;
       }
     }
-    if ( successor_undefined_p(sout) ) {
+    if(successor_undefined_p(sout)) {
       /* There is no sink vertex for this statement, create one */
-      sout = make_successor( make_dg_arc_label( cs ), vout );
+      sout = make_successor(make_dg_arc_label(cs), vout);
       vertex_successors( vin )
-	= CONS( SUCCESSOR, sout, vertex_successors( vin ));
+          = CONS( SUCCESSOR, sout, vertex_successors( vin ));
     } else {
       /* Use existing vertex for this statement */
-      gen_nconc( successor_arc_label(sout), cs );
+      gen_nconc(successor_arc_label(sout), cs);
 
     }
   }

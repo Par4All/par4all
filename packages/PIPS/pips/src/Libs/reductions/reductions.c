@@ -59,30 +59,22 @@ reductions load_summary_reductions(entity f)
 	(DBR_SUMMARY_REDUCTIONS, module_local_name(f), TRUE);
 }
 
-/* ??? should rather check conflicts? (what about equivalences?) */
-static bool entity_in_effect_list_p(entity v, list /* of effect */ le)
-{
-    MAP(EFFECT, e, if (effect_variable(e)==v) return TRUE, le);
-    return FALSE;
-}
-
 static reduction
 compute_one_summary_reduction(reduction model, list /* of effect */ le)
 {
-    reduction r = copy_reduction(model);
+  reduction r = copy_reduction(model);
 
-    /* keep the entities that are exported...
-     */
-    MAP(ENTITY, e,
-	if (!entity_in_effect_list_p(e, le))
-	    remove_variable_from_reduction(r, e),
-	reduction_dependences(model));
+  /* keep the entities that are exported... */
+  FOREACH(ENTITY, e,reduction_dependences(model)) {
+    if (!effects_read_or_write_entity_p(le,e))
+	    remove_variable_from_reduction(r, e);
+  }
 
-    gen_free_list(reduction_dependences(r));
-    reduction_dependences(r) = NIL;
+  gen_free_list(reduction_dependences(r));
+  reduction_dependences(r) = NIL;
 
-    DEBUG_REDUCTION(3, "result\n", r);
-    return r;
+  DEBUG_REDUCTION(3, "result\n", r);
+  return r;
 }
 
 static reductions
@@ -97,13 +89,11 @@ compute_summary_reductions(entity f)
     pips_debug(3, "module %s: %td cumulated reductions\n",
 	       entity_name(f), gen_length(lc));
 
-    MAP(REDUCTION, r,
-    {
-	DEBUG_REDUCTION(4, "considering\n", r);
-	if (entity_in_effect_list_p(reduction_variable(r), le))
-	    lr = CONS(REDUCTION, compute_one_summary_reduction(r, le), lr);
-    },
-	lc);
+    FOREACH(REDUCTION, r,lc) {
+      DEBUG_REDUCTION(4, "considering\n", r);
+      if (effects_read_or_write_entity_p(le, reduction_variable(r)))
+        lr = CONS(REDUCTION, compute_one_summary_reduction(r, le), lr);
+    }
 
     return make_reductions(lr);
 }
@@ -250,20 +240,17 @@ static bool safe_effects_for_reductions(statement s, reductions rs)
     list /* of effect */ le = effects_effects(load_proper_references(s)),
          /* of reference */ lr = list_of_trusted_references(rs);
 
-    MAP(EFFECT, e,
-    {
-	if ((effect_write_p(e) && !gen_in_list_p(effect_any_reference(e), lr)) ||
-	    io_effect_entity_p(effect_variable(e)))
-	{
-	    pips_debug(8, "effect on %s (ref %p) not trusted\n",
-		       entity_name(effect_variable(e)),
-		       effect_any_reference(e));
+    FOREACH(EFFECT, e,le) {
+      if ((effect_write_p(e) && store_effect_p(e) && !gen_in_list_p(effect_any_reference(e), lr)) ||
+          io_effect_entity_p(effect_variable(e)))	{
+        pips_debug(8, "effect on %s (ref %p) not trusted\n",
+                   entity_name(effect_variable(e)),
+                   effect_any_reference(e));
 
-	    gen_free_list(lr);
-	    return FALSE;
-	}
-    },
-	le);
+        gen_free_list(lr);
+        return FALSE;
+      }
+    }
 
     gen_free_list(lr);
     return TRUE;

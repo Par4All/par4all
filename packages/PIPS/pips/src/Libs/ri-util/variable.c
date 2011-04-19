@@ -450,20 +450,29 @@ clone_variable_with_unique_name(entity old_variable,
    prefix is the empty string, some standard prefixes are used, based on
    the type.
 
+   In Fortran, the prefix is forced to upper case to be consistent
+   with PIPS Fortran internal representation. All the default prefixes
+   are assumed to be uppercase strings.
+
    In C this function is added to current module only.
 
    @return the variable entity.
+
+   It is not clear why the default prefix is (re)computed in the repeat
+   until loop rather than before entering it.
 */
 entity make_new_scalar_variable_with_prefix(const char* prefix,
 					    entity module,
 					    basic b)
 {
   string module_name = module_local_name(module);
+  string ep = strdup(prefix);
   entity e;
   char * variable_name = NULL;
   int number = 0;
   bool empty_prefix = (strlen(prefix) == 0);
   const string format = fortran_module_p(module)?"%s%d":"0" BLOCK_SEP_STRING "%s%d";
+  ep = fortran_module_p(module)? strupper(ep,ep) : ep;
 
   /* Find the first matching non-already existent variable name: */
   do {
@@ -530,7 +539,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
       }
     }
     else
-      asprintf(&variable_name, format, prefix, number++);
+      asprintf(&variable_name, format, ep, number++);
   }
   while(!unique_entity_name_p(variable_name,module));
 
@@ -538,6 +547,7 @@ entity make_new_scalar_variable_with_prefix(const char* prefix,
 
   e = make_scalar_entity(variable_name, module_name, b);
   free(variable_name);
+  free(ep);
 
   return e;
 }

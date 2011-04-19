@@ -831,16 +831,21 @@ bool type_declaration_effect_p(effect e)
 
   return store_p;
 }
-
+
+
+
 bool effects_write_variable_p(list el, entity v)
 {
   bool result = FALSE;
-  FOREACH(EFFECT, e, el) {
-    action a  = effect_action(e);
-    entity ev = effect_entity(e);
-    if (action_write_p(a) && ev == v) {
-      result = TRUE;
-      break;
+  if(v) {
+    FOREACH(EFFECT, e, el) {
+      action a  = effect_action(e);
+      entity ev = effect_entity(e);
+      if (action_write_p(a) && store_effect_p(e)
+          && entities_may_conflict_p(ev,v) ) {
+        result = TRUE;
+        break;
+      }
     }
   }
   return result;
@@ -849,12 +854,15 @@ bool effects_write_variable_p(list el, entity v)
 bool effects_read_variable_p(list el, entity v)
 {
   bool result = FALSE;
-  FOREACH(EFFECT, e, el) {
-    action a  = effect_action(e);
-    entity ev = effect_entity(e);
-    if (action_read_p(a) && ev == v) {
-      result = TRUE;
-      break;
+  if(v) {
+    FOREACH(EFFECT, e, el) {
+      action a  = effect_action(e);
+      entity ev = effect_entity(e);
+      if (action_read_p(a) && store_effect_p(e)
+          && entities_may_conflict_p(ev,v) ) {
+        result = TRUE;
+        break;
+      }
     }
   }
   return result;
