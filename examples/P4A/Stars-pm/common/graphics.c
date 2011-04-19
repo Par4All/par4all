@@ -61,11 +61,11 @@ void graphic_draw(int argc, char **argv, int histo[NP][NP][NP]) {
   }
 
   guchar pixbuf[3 * NP * NP];
-
-  for (int x = 0; x < NP; x++) {
-    for (int y = 0; y < NP; y++) {
+  int x,y,z;
+  for (x = 0; x < NP; x++) {
+    for (y = 0; y < NP; y++) {
       int sum = 0;
-      for (int z = 0; z < NP; z++) {
+      for (z = 0; z < NP; z++) {
         sum += histo[x][y][z];
       }
       pixbuf[x * NP * 3 + y * 3] = sum & 0xFF0000 >> 16;

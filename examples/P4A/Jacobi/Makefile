@@ -45,8 +45,9 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo : display_seq display_openmp display_cuda display_accel ;
-demo : display_seq display_openmp display_cuda display_opt display_accel display_accel_opt ;
+#demo : display_seq display_openmp display_cuda display_accel ;
+#demo : display_seq display_openmp display_cuda display_opt display_accel display_accel_opt ;
+demo : display_seq display_openmp display_cuda display_cuda_opt display_accel display_accel_opt ;
 
 
 clean :

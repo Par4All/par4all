@@ -134,17 +134,35 @@ void potential(int histo[NP][NP][NP],
 
   P4A_launch_kernel(dimGridC2R,dimBlockC2R,k_real2Complex,(cufftReal *)dens,(cufftComplex *)cdens);
 
+
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
   cufftExecC2C(plan,
                (cufftComplex *)cdens,
                (cufftComplex *)cdens,
                CUFFT_FORWARD);
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("FFT FORWARD on GPU  took %.1fms \n",p4a_timing_elapsedTime);
+#endif
+
 
   P4A_launch_kernel(dimGrid,dimBlock,k_fft_laplacian7,(cufftComplex *)cdens);
 
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_start;
+#endif
   cufftExecC2C(plan,
                (cufftComplex *)cdens,
                (cufftComplex *)cdens,
                CUFFT_INVERSE);
+#ifdef P4A_TIMING
+  P4A_TIMING_accel_timer_stop;
+  P4A_TIMING_elapsed_time(p4a_timing_elapsedTime);
+  P4A_dump_message("FFT INVERSE on GPU  took %.1fms \n",p4a_timing_elapsedTime);
+#endif
 
   P4A_launch_kernel(dimGridC2R,dimBlockC2R,k_complex2Real_correctionPot,(cufftComplex *)cdens,(float *)dens, mp[0][0][0]);
 /*
