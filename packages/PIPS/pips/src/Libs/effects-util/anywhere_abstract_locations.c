@@ -503,7 +503,9 @@ entity variable_to_abstract_location(entity v)
 {
   entity al = entity_undefined;
 
-  if(entity_variable_p(v)
+  if(entity_abstract_location_p(v))
+    al = v;
+  else if(entity_variable_p(v)
      && !dummy_parameter_entity_p(v)
      && !variable_return_p(v)) {
     bool typed_p = get_bool_property("ALIASING_ACROSS_TYPES");

@@ -255,40 +255,35 @@ cons * fx;
  *
  * FI: this is almost always true because of array subscript expressions
  */
-bool some_integer_scalar_read_or_write_effects_p(fx)
-cons * fx;
-{
-    MAPL(ceffect,
-     {entity e =
-	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
-	  if(integer_scalar_entity_p(e)) return TRUE;},
-	 fx);
-    return FALSE;
+bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
+  bool r_or_w_p = FALSE;
+  FOREACH(EFFECT, ef,fx) {
+    entity e = reference_variable(effect_any_reference(ef));
+	  if( store_effect_p(ef) && integer_scalar_entity_p(e)) {
+	    r_or_w_p = TRUE;
+	    break;
+	  }
+  }
+  return r_or_w_p;
 }
 
 /* bool effects_write_entity_p(cons * effects, entity e): check whether e
  * is certainly (MUST/EXACT) written by effects "effects" or not
  */
-bool effects_write_entity_p(fx, e)
-cons * fx;
-entity e;
-{
-    bool write = FALSE;
-    MAP(EFFECT, ef,
-    {
-	action a = effect_action(ef);
-	entity e_used = reference_variable(effect_any_reference(ef));
+bool effects_write_entity_p(cons * fx, entity e) {
+  bool write = FALSE;
+  FOREACH(EFFECT, ef,fx) {
+    entity e_used = reference_variable(effect_any_reference(ef));
 
-	/* Note: to test aliasing == should be replaced below by
-	 * entities_may_conflict_p()
-	 */
-	if(e==e_used && action_write_p(a)) {
-	    write = TRUE;
-	    break;
-	}
-    },
-	fx);
-    return write;
+    /* Note: to test aliasing == should be replaced below by
+     * entities_may_conflict_p()
+     */
+    if(e == e_used  && store_effect_p(ef) && effect_write_p(ef)) {
+      write = TRUE;
+      break;
+    }
+  }
+  return write;
 }
 
 /* bool effects_read_or_write_entity_p(cons * effects, entity e): check whether e
@@ -305,9 +300,9 @@ bool effects_read_or_write_entity_p(cons * fx, entity e)
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
-      if(entities_may_conflict_p(e, e_used)) {
-	read_or_write = TRUE;
-	break;
+      if(store_effect_p(ef) && entities_may_conflict_p(e, e_used)) {
+        read_or_write = TRUE;
+        break;
       }
     }
   }
@@ -326,13 +321,11 @@ bool effects_must_read_or_write_entity_p(cons * fx, entity e)
 
   if(entity_variable_p(e)) {
     FOREACH(EFFECT, ef, fx) {
-      if(store_effect_p(ef)) {
-	entity e_used = reference_variable(effect_any_reference(ef));
-	/* Used to be a simple pointer equality test */
-	if(entities_must_conflict_p(e, e_used)) {
-	  read_or_write = TRUE;
-	  break;
-	}
+      entity e_used = reference_variable(effect_any_reference(ef));
+      /* Used to be a simple pointer equality test */
+      if(store_effect_p(ef) && entities_must_conflict_p(e, e_used)) {
+        read_or_write = TRUE;
+        break;
       }
     }
   }
@@ -353,21 +346,15 @@ bool effect_may_conflict_with_entity_p( effect eff, entity e) {
 }
 
 
-entity effects_conflict_with_entity(fx, e)
-cons * fx;
-entity e;
-{
+entity effects_conflict_with_entity(cons * fx,entity e) {
   entity conflict_e = entity_undefined;
-  MAPL(cef,
-      {
-        effect ef = EFFECT(CAR(cef));
-        if(effect_may_conflict_with_entity_p(ef, e)) {
-          entity e_used = reference_variable(effect_any_reference(ef));
-          conflict_e = e_used;
-          break;
-        }
-      },
-      fx);
+  FOREACH(effect,ef,fx){
+    if(effect_may_conflict_with_entity_p(ef, e)) {
+      entity e_used = reference_variable(effect_any_reference(ef));
+      conflict_e = e_used;
+      break;
+    }
+  }
   return conflict_e;
 }
 
@@ -381,16 +368,15 @@ entity e;
  */
 list generic_effects_conflict_with_entities(list fx,
 					    entity e,
-					    bool concrete_p)
-{
+					    bool concrete_p) {
   list lconflict_e = NIL;
 
   FOREACH(EFFECT, ef, fx) {
     entity e_used = reference_variable(effect_any_reference(ef));
     if(!(entity_abstract_location_p(e_used) && concrete_p)) {
       if(entities_may_conflict_p(e, e_used)) {
-	lconflict_e = gen_nconc(lconflict_e,
-				CONS(ENTITY, e_used, NIL));
+        lconflict_e = gen_nconc(lconflict_e,
+                                CONS(ENTITY, e_used, NIL));
       }
     }
   }
@@ -398,8 +384,7 @@ list generic_effects_conflict_with_entities(list fx,
   return lconflict_e;
 }
 
-list effects_conflict_with_entities(list fx, entity e)
-{
+list effects_conflict_with_entities(list fx, entity e) {
   return generic_effects_conflict_with_entities(fx, e, FALSE);
 }
 
@@ -559,16 +544,16 @@ void dump_effects(list le)
 /* Check if a reference appears more than once in the effect list. If
    persistant_p is true, do not go thru persistant arcs. Else, use all
    references. */
-bool effects_reference_sharing_p(list el, bool persistant_p)
-{
+bool effects_reference_sharing_p(list el, bool persistant_p) {
   bool sharing_p = FALSE;
   list srl = NIL; /* store reference list */
   list erl = NIL; /* environment reference list */
   list tdrl = NIL; /* type declaration reference list */
-  list ce = list_undefined; /* current effect */
 
-  for(ce=el; !ENDP(ce); POP(ce)) {
-    effect e = EFFECT(CAR(ce));
+  //list ce = list_undefined; /* current effect */
+  //for (ce = el; !ENDP(ce); POP(ce)) {
+  //effect e = EFFECT(CAR(ce));
+  FOREACH(EFFECT,e,el) {
     cell c = effect_cell(e);
     reference r = reference_undefined;
 
@@ -576,48 +561,44 @@ bool effects_reference_sharing_p(list el, bool persistant_p)
 
     if(persistant_p) {
       if(cell_reference_p(c))
-	r = cell_reference(c);
-    }
-    else
+        r = cell_reference(c);
+    } else
       r = effect_any_reference(e);
 
     if(!reference_undefined_p(r)) {
       /* FI: I though about parametrizing thru a list, but this
-	 requires to conditional affectation, before and after each
-	 loop body. Hence the cut-and-paste. */
+       requires to conditional affectation, before and after each
+       loop body. Hence the cut-and-paste. */
       if(store_effect_p(e)) {
-	if(gen_in_list_p((void *) r, srl)) {
-	  fprintf(stderr, "this effect shares its reference with "
-		  "another effect in list srl\n");
-	  (*effect_prettyprint_func)(e);
-	  sharing_p = TRUE;
-	  break;
-	}
-	else {
-	  srl = CONS(REFERENCE, r, srl);
-	}
-      } else if (environment_effect_p(e)) {
-	if(gen_in_list_p((void *) r, erl)) {
-	  fprintf(stderr, "this effect shares its reference with "
-		  "another effect in list srl\n");
-	  (*effect_prettyprint_func)(e);
-	  sharing_p = TRUE;
-	  break;
-	}
-	else {
-	  erl = CONS(REFERENCE, r, erl);
-	}
-      } else if (type_declaration_effect_p(e)) {
-	if(gen_in_list_p((void *) r, tdrl)) {
-	  fprintf(stderr, "this effect shares its reference with "
-		  "another effect in list srl\n");
-	  (*effect_prettyprint_func)(e);
-	  sharing_p = TRUE;
-	  break;
-	}
-	else {
-	  tdrl = CONS(REFERENCE, r, tdrl);
-	}
+        if(gen_in_list_p((void *)r, srl)) {
+          fprintf(stderr, "this effect shares its reference with "
+            "another effect in list srl\n");
+          (*effect_prettyprint_func)(e);
+          sharing_p = TRUE;
+          break;
+        } else {
+          srl = CONS(REFERENCE, r, srl);
+        }
+      } else if(environment_effect_p(e)) {
+        if(gen_in_list_p((void *)r, erl)) {
+          fprintf(stderr, "this effect shares its reference with "
+            "another effect in list srl\n");
+          (*effect_prettyprint_func)(e);
+          sharing_p = TRUE;
+          break;
+        } else {
+          erl = CONS(REFERENCE, r, erl);
+        }
+      } else if(type_declaration_effect_p(e)) {
+        if(gen_in_list_p((void *)r, tdrl)) {
+          fprintf(stderr, "this effect shares its reference with "
+            "another effect in list srl\n");
+          (*effect_prettyprint_func)(e);
+          sharing_p = TRUE;
+          break;
+        } else {
+          tdrl = CONS(REFERENCE, r, tdrl);
+        }
       } else {
       }
     }

@@ -8262,7 +8262,7 @@ partial_redundancy_elimination             > MODULE.code
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% CONTROL FLOW
 
-\section{Control-flow Optimizations}
+\section{Control-Flow Optimizations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DEAD CODE ELIMINATION
 
@@ -8338,9 +8338,9 @@ suppress_dead_code          > MODULE.code
 \index{Dead Code}
 \index{DEAD\_CODE\_DISPLAY\_STATISTICS}
 
-Since it is useful to display statistics on what has been found
-useless and removed in a program, this property is used to ask for
-statistics displaying:
+It is sometimes useful to display statistics on what has been found
+useless and removed in a function, this property controls the
+statistics display:
 \begin{PipsProp}{DEAD_CODE_DISPLAY_STATISTICS}
 DEAD_CODE_DISPLAY_STATISTICS TRUE
 \end{PipsProp}
@@ -10138,10 +10138,13 @@ ARRAY_RESIZING_BOTTOM_UP_OPTION 0
 \subsection{Scalarization}
 
 \begin{PipsPass}{scalarization}
-Scalarization is the process of replacing array references with scalar
-variables wherever appropriate. Expected benefits include lower memory
-footprint (e.g. registers can be used instead of allocating heap
-space) and hence, better execution times.
+  Scalarization is the process of replacing array references with
+  references to scalar copies of the array elements wherever
+  appropriate. Expected benefits include lower memory footprint and
+  access time because registers can be used instead of temporary stack
+  variables or memory accesses, and hence, shorter execution times, as
+  long as the register pressure is not so high that spill code is
+  generated.
 \end{PipsPass}
 
 Scalarizing a given array reference is subject to two successive
@@ -10149,24 +10152,52 @@ criteria, a Legality criterion and a Profitability criterion:
 
 \begin{itemize}
 \item The Legality criterion is evaluated first. It tries and
-  determine if replacing the reference might lead to breaking
+  determines if replacing the reference might lead to breaking
   dependence arcs, due to hidden references to the element,
-  e.g. ``get(A,i)'' instead of ``A[i]''. In that case, no
-  scalarization takes place.
+  e.g. ``get(A,i)'' instead of ``A[i]''. Also, one and only one array
+  element must be accessed at each iteration. If these two conditions
+  are not met, no scalarization takes place.
 
 \item The Profitability criterion is then evaluated, to try and
   eliminate cases where scalarization would yield no satisfactory
   performance gains, e.g. when a scalarized reference has to be
-  immediately copied back into the original reference.
+  immediately copied back into the original reference. This is
+  performed at the source level and depends on the effective register
+  allocation and code generation.
 \end{itemize}
 
-Scalarized variables use the prefix \verb/___scalar__/ and are thus easily
-identified. Depending on the situation, they will be copied-in
-(\verb/__scalar0__ = A[i]/) and/or back into the array (\verb/A[i] = __scalar0__/).
+The legality test is based on convex array regions, and not on the
+dependence graph as is the Carr's algorithm. Currently, loop carried
+dependence arcs prevent scalarization by PIPS, although some can be
+processed by Carr's algorithm. See non-regression tests
+Transformations/scalarization30 to 36.
+
+This transformation is useful 1) to improve the readability of the
+source code with constructs similar to {\em let x be ...}, 2) to
+improve the modelizations of the execution, time or energy, by using
+source instructions closer to the machine instruction, 3) to
+perform an optimization at the source level because the code generator
+does not include a powerful (partially) redundant load elimination,
+and 4) to be a useful pass in a fully source-to-source compiler. This
+transformation is useful to reduce the expansion caused by the
+different atomizer passes.
+
+The new scalar variables use the default prefix \verb/___scalar__/ and
+are thus easily identified, but a new prefix can be user defined with
+Property~\PipsPropRef{SCALARIZATION_PREFIX}. If\PipsPropRef{SCALARIZATION_PREFIX}
+is the empty string, the names of the scalarized variables are used.
+
+If needed according to the IN and OUT convex array regions, the new
+variables are initialized, e.g. \verb/__scalar0__ = A[i]/, and/or
+copied back into the initial array, e.g. \verb/A[i] = __scalar0__/.
 
 Scalarization is currently applicable both to Fortran and C code.
 
 
+Pass \PipsPassRef{scalarization} uses the read and written convex
+array regions to decide if the scalarization is possible, the IN and
+OUT regions to decide if it is useful to initialize the scalar copy or
+to restore the value of the array element.
 \begin{PipsMake}
 alias scalarization 'Scalarization'
 scalarization  > MODULE.code
@@ -10176,18 +10207,42 @@ scalarization  > MODULE.code
         < MODULE.in_regions
         < MODULE.out_regions
 \end{PipsMake}
+
+Since OUT regions are computed interprocedurally, strange code may
+result when a small or not so small function  without any real output
+is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a
+\verb/printf/ to force an OUT region, or by setting Property
+\PipsPropRef{SCALARIZATION_FORCE_OUT} to true.
+
+Also, it may be useful to use Property
+\PipsPropRef{TRUST_ARRAY_DECLARATIONS} and/or
+\PipsPropRef{TRUST_ARRAY_REFERENCES} to make sure that as many loops
+as possible are entered. If not, loop bounds may act like guards,
+which prevents PIPS from hoisting a reference out of a loop, although
+this is puzzling for programmers because they expect all loops to be
+entered at least once...
+
+As explained above, Property \PipsPropRef{SCALARIZATION_PREFIX} is
+used to select the names of the new scalar variables.
 \begin{PipsProp}{SCALARIZATION_PREFIX}
 SCALARIZATION_PREFIX "__scalar__"
 \end{PipsProp}
+
+Property \PipsPropRef{SCALARIZATION_FORCE_OUT} forces the generation of a copy-out statement
+when it is useless according to the OUT region, for instance when dealing
+with a library function.
 \begin{PipsProp}{SCALARIZATION_FORCE_OUT}
 SCALARIZATION_FORCE_OUT FALSE
 \end{PipsProp}
 
+This pass was designed by Fran\c{c}ois Irigoin and implemented by
+Laurent Daverio and Fran\c{c}ois Irigoin.
 
 \begin{PipsPass}{constant_array_scalarization}
-Similar to \PipsPassRef{scalarization}, but with a different criterium:
-if the array is only accessed through constant indices, all its references are repalced by
-scalars.
+  Similar to \PipsPassRef{scalarization}, but with a different
+  criterion: if an array is only accessed with numerical constant subscript
+  expressions, it is replaced by a set of scalars and all its
+  references are replaced by references to the corresponding scalars.
 \end{PipsPass}
 \begin{PipsMake}
 constant_array_scalarization > MODULE.code
@@ -10195,6 +10250,13 @@ constant_array_scalarization > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+This pass may be useful to make C source code more palatable to C to VHDL
+converter that prefer dealing with scalars than arrays. It is also useful
+to propagate constants contained in an array since the semantics passes
+only analyze scalar variables. 
+
+
+This pass was designed and implemented by Serge Guelton.
 
 \subsection{Induction Variable Substitution}
 
@@ -10213,6 +10275,8 @@ induction_substitution > MODULE.code
         < MODULE.preconditions
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+This pass was designed and implemented by Mehdi Amini.
 
 \subsection{Strength Reduction}
 
@@ -14822,6 +14886,12 @@ Disponible comme rapport CAI-E93
 {\em Computing Dependence Direction Vectors and Dependence Cones with
 Linear Systems}, Rapport CAI-E94, September 1987
 
+%
+% FI: all the references below have been checked for the introduction
+% of pips.bib derived from the renpar-polyedres.bib
+%
+
+% IT88
   \bibitem{IT88a} F. Irigoin, R. Triolet,
 {\em Supernode Partitioning},
 POPL'88 - Fifteenth Annual ACM
@@ -14837,11 +14907,13 @@ PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
 Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
 Ecole de Printemps du LITP, mai 1992
 
+% AI92
   \bibitem{IA92b} F. Irigoin, C. Ancourt,
 {\em Automatic Code Distribution},
 Third International Workshop on Compilers for Parallel Computers, Vienne,
 July, 1992
 
+% Iri92
   \bibitem{Ir92} F. Irigoin,
 {\em Interprocedural Analyses for Programming Environments},
 J.J.~Dongarra and B.~Tourancheau Eds, Elsevier,
@@ -14852,6 +14924,7 @@ Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
 Rapport interne EMP-CRI-E146, novembre 1994. This report is available
 on-line and regularly updated.
 
+% ACI10
 \bibitem{I05} F. Irigoin,
 {\em Detecting Affine Loop Invariants using a Modular Static Analysis*
   - Version préliminaire}, Tech. report A/368/CRI, 2005
@@ -14872,7 +14945,7 @@ on-line and regularly updated.
 % publisher = {ACM},
 % address = {New York, NY, USA},
 %} 
-\bibitem{JG89} P. Jouvellot, D. Gifford, {\em Reasoning about
+\bibitem{JG89} P. Jouvelot, D. Gifford, {\em Reasoning about
     continuations with control effects}, in Proceedings of the ACM
   SIGPLAN 1989 Conference on Programming language design and
   implementation, PLDI'89, pp. 218-226.
@@ -14882,6 +14955,7 @@ on-line and regularly updated.
 Rapport interne EMP-CRI-E191, July 1989. This report is available
 on-line and regularly updated.
 
+% Kar76
 \bibitem{Karr76} M. Karr, Affine Relationships among Variables of a Program,
 {\em Acta Informatica}, (1976).
 
@@ -14899,15 +14973,18 @@ on-line and regularly updated.
 %   note = {10.1007/BF00128178},
 %   year = {1988}
 %}
+% LY88c
 \bibitem{Li88} Zhiyuan Li, Pen-Chung Yew, {\em Program parallelization
     with interprocedural analysis}, The Journal of Supercomputing,
   Vol. 2, N. 2, pp. 225-244, Springer, 1988.
 
+% Muc97
 \bibitem{Much97} Steven S. Muchnick,
   {\it Advanced Compiler Design Implementation}
   Morgan Kaufmann Publishers, 1997
 
-\bibitem{Nguyen2002} Thi Viet Nga Nguyen, {\em Effeicient and
+% Ngu02
+\bibitem{Nguyen2002} Thi Viet Nga Nguyen, {\em Efficient and
     Effective Software verifications for Scientific Applications Using
     Static analysis and Code Instrumentation}, PhD Ecole nationale
   Superieure des Mines de Paris, 2002.
@@ -14916,6 +14993,7 @@ on-line and regularly updated.
     Development Environment Research Project,
 {\em IEEE TOSE}, Vol. 9, No. 6, pp.673-685 (1983).
 
+% Pol88
 \bibitem{toolpack} A.~A.~Pollicini, Using Toolpack Software Tools, in {\em
   ISPRA Courses on Information Sciences 1986}, ISPRA, Kluwer Academic,
   1989
@@ -14932,6 +15010,7 @@ on-line and regularly updated.
   Parallel Computers, in {\em 5th International Workshop on Compilers for
   Parallel Computers}, Malaga, Spain, June 1995.
 
+% Tri84
   \bibitem{T84} R. Triolet,
 {\em Contribution à la parallélisation automatique de programmes
 Fortran comportant des appels de procédure},
@@ -14943,11 +15022,13 @@ décembre 1984
 ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
 Alto, June 23-27, 1986
 
+% Yan93
   \bibitem{Y93} Y. Yang,
 {\em Tests des dépendances et transformations de programme},
 Thèse de doctorat de l'Université Pierre et Marie Curie,
 15 Novembre 1993, rapport A/242.
 
+% Zho94
   \bibitem{Z94} L. Zhou,
 {\em Analyse
 statique et dynamique de la complexité des programmes
@@ -14955,6 +15036,7 @@ scientifiques},
 Thèse de doctorat de l'Université Pierre et Marie Curie,
 14 Septembre 1994, technical report A/255.
 
+% GFL00
   \bibitem{rieblFL00} Martin Griebl, Paul Feautrier and Christian Lengauer
 {\em Index Set Splitting},
 International Journal of Parallel Programming, 2000.

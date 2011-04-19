@@ -108,7 +108,7 @@ empty_comments_p(const char* s)
 {
   /* Could be replaced by a macro. See macro empty_comments */
   pips_assert("comments cannot be NULL", s!=NULL);
-  return (s == NULL || string_undefined_p(s) || strcmp(s,"")==0);
+  return (string_undefined_p(s) || strcmp(s,"")==0);
 }
 
 
