@@ -627,6 +627,11 @@ def cuda_file_p(file):
     ext = get_file_extension(file)
     return ext == '.cu'
 
+def opencl_file_p(file):
+    '''Tests if a file has a OPENCL name.'''
+    ext = get_file_extension(file)
+    return ext == '.cl'
+
 def sharedlib_file_p(file):
     '''Tests if a file has a shared library name.'''
     ext = get_file_extension(file)

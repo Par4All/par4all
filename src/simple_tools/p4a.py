@@ -53,8 +53,11 @@ def add_own_options(parser):
     proc_group.add_option("--cuda", "-C", action = "store_true", default = False,
         help = "Enable CUDA generation. Implies --accel.")
 
+    proc_group.add_option("--opencl", action = "store_true", default = False,
+        help = "Enable OPENCL generation. Implies --accel.")
+
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
-        help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
+        help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda or --opencl are not specified, this option is set by default.")
 
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
@@ -63,7 +66,7 @@ def add_own_options(parser):
         help = "This option is usefull when generating some cuda code from C99 sources. Indeed nvcc doesn't support the folowing C99 syntax : foo (int n, int a[n]), then if the c99 option is enable, p4a will automaticly generates the cuda code in new files that will be compiled by nvcc. A simple call to the kernel will be inserted into the original file that can be compiled with your usual compiler.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
+        help = "This cancels --openmp, --cuda or --opencl and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
@@ -334,15 +337,19 @@ def main():
         if len(args) == 0:
             p4a_util.die("Missing input files")
 
-        if options.simple and (options.cuda or options.openmp):
-            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp")
+        if options.simple and (options.cuda or options.openmp or options.opencl):
+            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --opencl")
 
-        if not options.simple and not options.cuda and not options.openmp:
+        if not options.simple and not options.cuda and not options.openmp and not options.opencl:
             p4a_util.info("Defaulting to --openmp")
             options.openmp = True
 
         if options.cuda and not options.accel:
             p4a_util.info("Enabling --accel because of --cuda")
+            options.accel = True
+
+        if options.opencl and not options.accel:
+            p4a_util.info("Enabling --accel because of --opencl")
             options.accel = True
 
         if options.com_optimization and not options.accel:
@@ -378,7 +385,7 @@ def main():
             if p4a_util.c_file_p(file) or p4a_util.fortran_file_p(file):
                 files.append(abs_file)
                 p4a_util.debug("Input file: " + abs_file)
-            elif p4a_util.cxx_file_p(file) or p4a_util.cuda_file_p(file):
+            elif p4a_util.cxx_file_p(file) or p4a_util.cuda_file_p(file) or p4a_util.opencl_file_p(file):
                 other_files.append(abs_file)
                 p4a_util.info("File format not supported by parallelizer, will not be parallelized: " + abs_file)
             elif p4a_util.header_file_p(file):
@@ -455,6 +462,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            opencl = options.opencl,
             com_optimization = options.com_optimization,
             fftw3 = options.fftw3,
             add_debug_flags = options.debug,
@@ -492,6 +500,7 @@ def main():
             input.project_name = project_name
             input.accel = options.accel
             input.cuda = options.cuda
+            input.opencl = options.opencl
             input.com_optimization = options.com_optimization
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
