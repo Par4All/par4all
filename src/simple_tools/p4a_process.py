@@ -273,6 +273,8 @@ class p4a_processor(object):
     header_files = []
     # the set of cuda modules
     cuda_modules = set ()
+    # the set of cuda modules
+    opencl_modules = set ()
     # the set of c modules
     c_modules = set ()
     # the list of fortran modules
@@ -303,6 +305,7 @@ class p4a_processor(object):
         self.native_recover_includes = native_recover_includes
         self.accel = accel
         self.cuda = cuda
+        self.opencl = opencl
         self.openmp = openmp
         self.com_optimization = com_optimization
         self.fftw3 = fftw3
@@ -943,7 +946,7 @@ class p4a_processor(object):
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
-                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = False,
+                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = True,
                                  concurrent=True)
 
         # Select kernels by using the fact that all the generated kernels
@@ -952,7 +955,6 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
         
-
         for ph in apply_phases_kernel_after:
             # Apply requested phases before parallelization to generated kernels:
 			getattr(kernels, ph)(concurrent=True)
@@ -1010,68 +1012,10 @@ class p4a_processor(object):
             kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
-        # Update the list of cuda modules
-        p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
-                                  self.cuda_modules)
-        p4a_util.add_list_to_set (map(lambda x:x.name, wrappers),
-                                  self.cuda_modules)
-
-        # set return type for wrappers && kernel
-        if (self.fortran == False):
-            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
-            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
-            if (self.c99 == True):
-                self.generated_modules.extend (map(lambda x:x.name, kernel_launchers))
-                self.generated_modules.extend (map(lambda x:x.name, wrappers))
-                self.generated_modules.extend (map(lambda x:x.name, kernels))
-        else:
-            # generate the C version of kernels, wrappers and launchers.
-            # kernel and wrappers need to be prettyprinted with arrays as
-            # pointers because they will be .cu files
-            kernels.display ("c_printed_file",
-                             CROUGH_INCLUDE_FILE_LIST="p4a_accel.h",
-                             DO_RETURN_TYPE_AS_TYPEDEF=True,
-                             CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
-                             SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
-            wrappers.display ("c_printed_file",
-                              CROUGH_INCLUDE_FILE_LIST="p4a_accel.h",
-                              DO_RETURN_TYPE_AS_TYPEDEF=True,
-                              CROUGH_ARRAY_PARAMETER_AS_POINTER=True,
-                              SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
-            # Do the phase set_return_type_as_typedef using regular expressions
-            # because the phase is not available in fortran
-            # kernel_launchers will be .c file so c99 is allowed
-            kernel_launchers.display ("c_printed_file",
-                                      DO_RETURN_TYPE_AS_TYPEDEF=False,
-                                      CROUGH_ARRAY_PARAMETER_AS_POINTER=False)
-
-            # those newly generated modules has to be append to the dedicated list
-            # for later processing
-            self.crough_modules.extend (map(lambda x:x.name, kernels))
-            self.crough_modules.extend (map(lambda x:x.name, wrappers))
-            self.crough_modules.extend (map(lambda x:x.name, kernel_launchers))
-            # Generate the interface of the wrappers. This will be used to call
-            # the C functions of the wrappers from the fortran_wrapper
-            # subroutines
-            kernel_launchers.print_interface ()
-            self.interface_modules.extend (map(lambda x:x.name, kernel_launchers))
-            self.generated_modules.extend (map(lambda x:x.name, f_wrappers))
-
-        if self.com_optimization :
-            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
-            wrappers.cast_at_call_sites()
-
-        for ph in apply_phases_after:
-            # Apply requested phases to kernels, wrappers and launcher:
-			getattr(kernels, ph)(concurrent=True)
-			getattr(wrappers, ph)(concurrent=True)
-			getattr(kernel_launchers, ph)(concurrent=True)
-
-        #self.workspace.all_functions.display()
-
         # save the list of kernels for later work
+        # for example, retrieving the kernel files when saving
+        # in merge_wk
         self.kernels.extend (map(lambda x:x.name, kernels))
-        self.launchers.extend (map(lambda x:x.name, kernel_launchers))
 
         # To be able to inject Par4All accelerator run time initialization
         # later:
@@ -1090,8 +1034,6 @@ class p4a_processor(object):
             and add at the beginning of main() a line with:
                P4A_init_accel;
             ''')
-
-
 
     def ompify(self,
             filter_select = None,
@@ -1166,6 +1108,7 @@ class p4a_processor(object):
                 dst.write (line)
             dst.write ("\n#ifdef __cplusplus\n}\n#endif\n")
             dst.close ()
+
     def merge_lwk (self):
         """ merge launcher wrapper and kernel in one file. The order is
         important the launcher call the wrapper that call the kernel. So
@@ -1189,6 +1132,32 @@ class p4a_processor(object):
             self.generated_modules.remove (wrapper)
             self.generated_modules.remove (launcher)
 
+    def merge_wk (self, dest_dir):
+        """ merge wrapper and kernel in one file. The order is
+        important the wrapper that call the kernel. So they have to be
+        in the inverse order into the file.  Files are merged in the
+        wrapper file since by convention in P4A, the name of the
+        procedure called from the main and the name of the file must
+        be identical, if not considered the extension. The wrapper is
+        the procedure that is called from the main."""
+        for kernel in self.kernels:
+            # find the associated wrapper with the kernel
+            wrapper  = self.kernel_to_wrapper_name  (kernel)
+            # merge the files in the wrapper file
+            # Where the files do well in the .database workspace:
+            kernel_file = os.path.join(self.workspace.dirname(), "Src",
+                                       kernel + ".c")
+            wrapper_file = os.path.join(self.workspace.dirname(), "Src",
+                                        wrapper + ".c")
+
+
+            output_file = os.path.join(dest_dir , wrapper + ".p4a.cl")
+            #output_file = os.path.join(self.workspace.dirname(), "Src",
+            #                           wrapper + ".cl")
+            
+            p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
+
+
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
         for header in self.header_files:
@@ -1210,11 +1179,13 @@ class p4a_processor(object):
             if name in self.cuda_modules:
                 if self.cuda:
                     output_name = p4a_util.change_file_ext(output_name, ".cu")
+                
                 # generate the header file
                 header_file = os.path.join(output_dir, name + ".h")
                 self.header_files.append (name + ".h")
                 p4a_util.generate_c_header (pips_file, header_file,
                                             self.get_p4a_accel_defines ())
+
             # The final destination
             output_file = os.path.join(output_dir, output_name)
             # Copy the PIPS production to its destination:
@@ -1328,7 +1299,7 @@ class p4a_processor(object):
                 # the output:
                 self.accel_post(pips_file,
                                 os.path.join(self.workspace.dirname(), "P4A"))
-                # Where the P4A output file does dwell in the .database
+                # Where the P4A output file does well in the .database
                 # workspace:
                 p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
                 # Update the normal location then:
@@ -1394,6 +1365,18 @@ class p4a_processor(object):
             self.launchers_insert_extern_C ()
             self.merge_lwk ()
 
+        # During the opencl generation process, kernels and wrappers
+        # have been generated in different files. 
+        # Let's merge them in the same files
+        merge_dir = os.getcwd()
+        if dest_dir:
+            merge_dir = dest_dir
+        if (not (os.path.isdir(merge_dir))):
+            os.makedirs (merge_dir)
+
+        if (self.opencl == True):
+            self.merge_wk (merge_dir)
+
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
         # save pips generated files in the dedicated folder
@@ -1404,6 +1387,8 @@ class p4a_processor(object):
         # generate one header to warp all the generated header files
         if (new_file_flag == True):
             self.save_header (output_dir, self.new_files_include)
+
+
 
         return output_files
 
