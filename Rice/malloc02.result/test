@@ -63,8 +63,7 @@ void malloc02()
 
 Cumulated effects
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_
 void malloc02()
