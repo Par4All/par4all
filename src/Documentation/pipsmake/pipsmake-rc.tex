@@ -2151,6 +2151,7 @@ graph (CFG).
 \index{Proper Effects}
 \index{Effects (Proper)}
 
+\begin{PipsPass}{proper_effects}
 The proper memory effects of a statement basically are a list of variables
 that may be read or written by the statement. They are used to build use-def
 chains (see~\cite{Aho86} or a later edition) and then the dependence graph.
@@ -2187,6 +2188,17 @@ arguments are provided, a user error is issued because the effects of
 the call are not defined.
 
 Variables private to loops are handled like regular variable.
+\end{PipsPass}
+
+
+\begin{PipsPass}{proper_pointer_effects}
+ See \PipsPassRef{proper_effects}
+\end{PipsPass}
+
+\begin{PipsPass}{proper_effects_with_points_to}
+ See \PipsPassRef{proper_effects} 
+\end{PipsPass}
+
 
 \begin{PipsMake}
 proper_pointer_effects                  > MODULE.proper_pointer_effects
