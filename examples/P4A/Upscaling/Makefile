@@ -1,6 +1,6 @@
 # A GNU makefile to run a demo of Par4All on Hyantes application excerpt
 
-TARGET= upscaling
+TARGET= main
 
 ifeq "$(USE_FLOAT)" "1"
 # Use single precision for the OpenMP and GPU version:
@@ -25,7 +25,7 @@ LDLIBS+= -lm
 #export OMP_NESTED
 
 
-SOURCES= main.c yuv.c upscaleBis.c
+SOURCES= main.c yuv.c
 
 #.PHONY: clean demo $(addprefix demo_, $(TARGET)) $(addprefix run_, $(TARGET) $(TARGET:=_omp) $(TARGET:=_p4a_omp) $(TARGET:=_p4a_cuda))
 
@@ -48,7 +48,7 @@ default:
 demo : display_seq display_openmp display_cuda display_accel ;
 
 clean :
-	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda)
+	rm -rf $(TARGET:=_seq) $(TARGET:=_openmp) $(TARGET:=_cuda) $(TARGET:=_opencl)
 	rm -rf $(TARGET:=_accel) $(SOURCES:.c=.p4a.c) $(SOURCES:.c=.p4a.cu)
 	rm -rf $(SOURCES:.c=.p4a-accel.cu)
 	rm -rf  *~ *.database *.build p4a_new_files
@@ -56,14 +56,14 @@ clean :
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
-	time ./$< Home_Trailer.yuv res.out
+	time ./$< BUS_176x144_15_orig_01.yuv res.out
 
 display :
-	mplayer res.out -demuxer rawvideo -rawvideo w=800:h=452
+	mplayer res.out -demuxer rawvideo -rawvideo w=352:h=288
 
 display% : 
 	# Display graphically the results:
-	mplayer res.out -demuxer rawvideo -rawvideo w=800:h=452
+	mplayer res.out -demuxer rawvideo -rawvideo w=352:h=288
 
 # To be able to display the reference too:
 run_ref:;
@@ -87,3 +87,7 @@ $(TARGET)_cuda : $(SOURCES)
 $(TARGET)_accel : $(SOURCES)
 	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
 	p4a $(P4A_OPTIONS) --accel -o $@ $(SOURCES) $(LDLIBS)
+
+$(TARGET)_opencl : $(SOURCES)
+	# Parallelize and build an OpenCL parallel emulation:
+	p4a $(P4A_OPTIONS) --opencl -k -o $@ $(SOURCES) $(LDLIBS)

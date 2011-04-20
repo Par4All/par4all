@@ -1,23 +1,6 @@
-/** @addtogroup CUpscaling Classic C version
-
-    @{
-*/
-
-/** @defgroup yuvUpscaling Read and Write.
-
-    @{
-    Functions to manipulate the video (read an write).
-*/
 #include <stdlib.h>
 #include <stdio.h>
 #include "yuv.h"
-
-/** The luminance is read in a buffer.
-    The luminance data as input is increased by an OFFSET for a better
-    parallelization of the interpolation function.
-    This function copies and initializes the input
-    luminance data.
- */
 
 void buffer_copy(uint8 buffer[SIZE],uint8 y[SIZE_Y_IN])
 {
@@ -65,7 +48,6 @@ int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZ
 {  
   
   uint8 buffer[SIZE];
-  //uint8 * buffer=(uint8*)malloc(SIZE*sizeof(uint8));
 
 
   // Read the luminance
@@ -93,11 +75,9 @@ int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZ
     return -1;
   }
 
-  //free(buffer);
-  
+
   return 0;
 }
-
 /* Write the output video to a file */
 
 int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT])
@@ -123,5 +103,3 @@ int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[
   return 0;
 }
 
-/** @} */
-/** @} */
