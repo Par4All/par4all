@@ -652,7 +652,7 @@ use_def_elimination_on_a_statement(statement s)
 bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
-
+   entity module = module_name_to_entity(module_name);
 
    /*
     * For C code, this pass requires that effects are calculated with property
@@ -693,7 +693,7 @@ bool dead_code_elimination_on_module(char * module_name)
 
 
    set_current_module_statement(module_statement);
-   set_current_module_entity(module_name_to_entity(module_name));
+   set_current_module_entity(module);
 
    set_ordering_to_statement(module_statement);
 
