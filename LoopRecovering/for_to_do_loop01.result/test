@@ -21,7 +21,7 @@ int main()
    int i, j;                                                            /*0003*/
    
    // A do loop ! Should be parallel
-   for(i = 2; i <= 99; i += 1)
+   for(i = 2; i <= 99; i += 1)                                          /*0006*/
       a[i] = 2;                                                         /*0007*/
    
    /* The following code should not prevent the previous loop to be
@@ -38,7 +38,7 @@ int main()
    int i, j;                                                            /*0003*/
    
    // A do loop ! Should be parallel
-   for(i = 2; i <= 99; i += 1)
+   for(i = 2; i <= 99; i += 1)                                          /*0006*/
       a[i] = 2;                                                         /*0007*/
    
    /* The following code should not prevent the previous loop to be

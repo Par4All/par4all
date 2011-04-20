@@ -6,7 +6,7 @@ void malloc02()
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0006*/
       p[i] = malloc(sizeof(int));                                       /*0007*/
       p[i] = i;                                                         /*0008*/
    }
@@ -31,7 +31,7 @@ void malloc02()
 //  P(i) {}
 
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0006*/
 
 //  P(i) {0<=i, i<=9}
 
@@ -51,7 +51,7 @@ void malloc02()
    int i;                                                               /*0004*/
 //             <    is written>: i
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0006*/
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
       p[i] = malloc(sizeof(int));                                       /*0007*/
@@ -74,7 +74,7 @@ void malloc02()
 //             <may be written>: p[*] _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: i
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0006*/
 //             <may be written>: p[*]
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: _MALLOC_EFFECTS:_MALLOC_
@@ -102,7 +102,7 @@ void malloc02()
 //  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
 
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0006*/
 
 //  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
@@ -136,10 +136,10 @@ void malloc02()
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
-   for(i = 0; i <= 9; i += 1)
+   for(i = 0; i <= 9; i += 1)                                           /*0006*/
       p[i] = malloc(sizeof(int));                                       /*0007*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)
+   for(i = 0; i <= 9; i += 1)                                           /*0006*/
       p[i] = i;                                                         /*0008*/
 }
 
@@ -150,10 +150,10 @@ void malloc02()
    int *p[10];                                                          /*0003*/
    int i;                                                               /*0004*/
 
-   for(i = 0; i <= 9; i += 1)
+   for(i = 0; i <= 9; i += 1)                                           /*0006*/
       p[i] = malloc(sizeof(int));                                       /*0007*/
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1)
+   for(i = 0; i <= 9; i += 1)                                           /*0006*/
       p[i] = i;                                                         /*0008*/
 }
 

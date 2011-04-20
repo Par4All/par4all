@@ -20,7 +20,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
       i = col*I_0;
 //             <    is read   >: I_0
 //             <    is written>: k
-      for(k = 0; k <= I_0-1; k += 1) {
+      for(k = 0; k <= I_0-1; k += 1) {                                  /*0023*/
 //             <    is read   >: I_0 array_s array_s[k] k
 //             <    is written>: _return0
          _return0 = array_s[k];                                         /*0024*/
@@ -65,7 +65,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 //             <may be written>: _return0 array_d[*] i val
 //             <    is read   >: I_0
 //             <    is written>: k
-      for(k = 0; k <= I_0-1; k += 1) {
+      for(k = 0; k <= I_0-1; k += 1) {                                  /*0023*/
 //             <may be read   >: array_s[*]
 //             <    is read   >: I_0 array_s k
 //             <    is written>: _return0

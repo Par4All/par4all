@@ -16,7 +16,7 @@ int main()
       x += z;                                                           /*0012*/
    }
 //             <    is written>: i
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0014*/
 //             <    is written>: y
       float y = 2.0;                                                    /*0015*/
 //             <    is read   >: i x y
@@ -61,7 +61,7 @@ int main()
 
 //  P(i,j) {}
 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0014*/
 
 //  P(i,j) {0<=i, i<=9}
 
@@ -98,7 +98,7 @@ int main()
       x += z;                                                           /*0012*/
    }
 #pragma omp parallel for 
-   for(i = 0; i <= 9; i += 1) {
+   for(i = 0; i <= 9; i += 1) {                                         /*0014*/
       float y = 2.0;                                                    /*0015*/
       a[i] = x*y;                                                       /*0016*/
    }

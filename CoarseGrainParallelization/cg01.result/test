@@ -15,8 +15,8 @@ int main(int argc, char *argv[])
 {
    int i, j;                                                            /*0005*/
 
-   for(i = 0; i <= 63; i += 1)
-      for(j = 0; j <= 63; j += 1)
+   for(i = 0; i <= 63; i += 1)                                          /*0007*/
+      for(j = 0; j <= 63; j += 1)                                       /*0008*/
          imagein_re[i][j] = 2*i;                                        /*0009*/
    
    
@@ -27,9 +27,9 @@ int main(int argc, char *argv[])
    int i, j;                                                            /*0005*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 63; i += 1)
+   for(i = 0; i <= 63; i += 1)                                          /*0007*/
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)
+      for(j = 0; j <= 63; j += 1)                                       /*0008*/
          imagein_re[i][j] = 2*i;                                        /*0009*/
    
    
@@ -43,9 +43,9 @@ int main(int argc, char *argv[])
    int i, j;                                                            /*0005*/
 
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 63; i += 1)
+   for(i = 0; i <= 63; i += 1)                                          /*0007*/
 #pragma omp parallel for 
-      for(j = 0; j <= 63; j += 1)
+      for(j = 0; j <= 63; j += 1)                                       /*0008*/
          imagein_re[i][j] = 2*i;                                        /*0009*/
    
    

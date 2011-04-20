@@ -20,9 +20,9 @@ int main()
    int j;                                                               /*0004*/
    
    // A do loop ! Should be parallel.
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
       a[j] = j;                                                         /*0008*/
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
       a[j] = j;                                                         /*0010*/
 
    return 0;                                                            /*0012*/
@@ -37,12 +37,12 @@ int main()
 //             <    is written>: j
    
    // A do loop ! Should be parallel.
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
 //             <    is read   >: j
 //             <    is written>: a[j]
       a[j] = j;                                                         /*0008*/
 //             <    is written>: j
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
 //             <    is read   >: j
 //             <    is written>: a[j]
       a[j] = j;                                                         /*0010*/
@@ -61,14 +61,14 @@ int main()
 //             <    is written>: j
    
    // A do loop ! Should be parallel.
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
 //             <may be written>: a[*]
 //             <    is read   >: j
       a[j] = j;                                                         /*0008*/
 //             <may be read   >: j
 //             <may be written>: a[*]
 //             <    is written>: j
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
 //             <may be written>: a[*]
 //             <    is read   >: j
       a[j] = j;                                                         /*0010*/
@@ -96,7 +96,7 @@ int main()
 
    
    // A do loop ! Should be parallel.
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
 
 //  T() {0<=j, j<=999}
 
@@ -104,7 +104,7 @@ int main()
 
 //  T(j) {j#init==1000, 0<=j}
 
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
 
 //  T() {0<=j, j<=999}
 
@@ -136,7 +136,7 @@ int main()
 
    
    // A do loop ! Should be parallel.
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
 
 //  P(j) {0<=j, j<=999}
 
@@ -144,7 +144,7 @@ int main()
 
 //  P(j) {j==1000}
 
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
 
 //  P(j) {0<=j, j<=999}
 
@@ -162,10 +162,10 @@ int main()
    
    // A do loop ! Should be parallel.
 #pragma omp parallel for 
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0007*/
       a[j] = j;                                                         /*0008*/
 #pragma omp parallel for 
-   for(j = 0; j <= 999; j += 1)
+   for(j = 0; j <= 999; j += 1)                                         /*0009*/
       a[j] = j;                                                         /*0010*/
 
    return 0;                                                            /*0012*/

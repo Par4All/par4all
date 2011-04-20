@@ -21,8 +21,8 @@ void getimage(char *filename)
    FILE *fp;                                                            /*0028*/
    
    /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 63; i += 1)
-      for(j = 0; j <= 63; j += 1) {
+   for(i = 0; i <= 63; i += 1)                                          /*0031*/
+      for(j = 0; j <= 63; j += 1) {                                     /*0032*/
          imagein[i][j].re = 0.0;                                        /*0033*/
          imagein[i][j].im = 0.0;                                        /*0034*/
       }
