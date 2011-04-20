@@ -175,10 +175,18 @@ Use-def chains
 		from <x-WE-EXACT> to <x-RE-EXACT>
 	07 --> 08 with conflicts
 		from <x-WE-EXACT> to <x-RE-EXACT>
+	06 --> 24 with conflicts
+		from <m-WE-EXACT> to <m-RE-EXACT>
+		from <l-WE-EXACT> to <l-RE-EXACT>
+		from <k-WE-EXACT> to <k-RE-EXACT>
+		from <j-WE-EXACT> to <j-RE-EXACT>
+		from <i-WE-EXACT> to <i-RE-EXACT>
 	06 --> -1 with conflicts
 		from <m-WE-EXACT> to <m-RE-EXACT>
 	06 --> -1 with conflicts
 		from <l-WE-EXACT> to <l-RE-EXACT>
+	06 --> 16 with conflicts
+		from <k-WE-EXACT> to <k-RE-EXACT>
 	06 --> -1 with conflicts
 		from <k-WE-EXACT> to <k-RE-EXACT>
 	06 --> -1 with conflicts

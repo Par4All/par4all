@@ -21,6 +21,12 @@ setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
 # Let's repeat if to overcome the property parser weaknesses...
 setproperty PRETTYPRINT_ANALYSES_WITH_LF FALSE
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
+
+
+
 echo
 echo Parsed printed file for "func1"
 echo
