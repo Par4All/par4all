@@ -55,7 +55,7 @@ void decl41(int size)
 // (2,3)
       int x;                                                            /*0004*/
 // (2,4)
-      for(i = 1; i <= (size-1); i += 1)
+      for(i = 1; i <= (size-1); i += 1)                                 /*0005*/
 // (2,5)
          x = i;                                                         /*0006*/
       // END BLOCK
