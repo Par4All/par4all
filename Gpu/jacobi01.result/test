@@ -3,7 +3,7 @@ void compute(float_t space[501][501], float_t save[501][501])
    int t;                                                               /*0106*/
    
    /* Apply the relaxation T times: */
-   for(t = 0; t <= 399; t += 1)
+   for(t = 0; t <= 399; t += 1)                                         /*0109*/
       iteration(space, save);                                           /*0110*/
 }
 void get_data(char filename[])
@@ -37,13 +37,13 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 500; i += 1)
-      for(j = 0; j <= 500; j += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0047*/
+      for(j = 0; j <= 500; j += 1)                                      /*0048*/
          space[i][j] = 0;                                               /*0049*/
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
-      for(i = 0; i <= nx-1; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
+      for(i = 0; i <= nx-1; i += 1) {                                   /*0053*/
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
@@ -58,13 +58,13 @@ void iteration(float_t space[501][501], float_t save[501][501])
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   for(i = 1; i <= 499; i += 1)
-      for(j = 1; j <= 499; j += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0091*/
+      for(j = 1; j <= 499; j += 1)                                      /*0092*/
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
-   for(i = 1; i <= 499; i += 1)
-      for(j = 1; j <= 499; j += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0097*/
+      for(j = 1; j <= 499; j += 1)                                      /*0098*/
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
@@ -81,8 +81,8 @@ void write_data(char filename[])
    /* Write the PGM header: */
    fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
-   for(j = 0; j <= 500; j += 1)
-      for(i = 0; i <= 500; i += 1) {
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
          c = space[i][j];                                               /*0079*/
          fputc(c, fp);                                                  /*0080*/
       }
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0128*/
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
    compute(space, save);                                                /*0131*/
@@ -140,7 +140,7 @@ void compute(float_t space[501][501], float_t save[501][501])
 
    
    /* Apply the relaxation T times: */
-   for(t = 0; t <= 399; t += 1)
+   for(t = 0; t <= 399; t += 1)                                         /*0109*/
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
 //    PHI2<=PHI1+499, PHI1<=PHI2+499, PHI1+PHI2<=999, 0<=PHI2,
@@ -282,12 +282,12 @@ void get_data(char filename[])
 
    
    /* Erase the memory, in case the image is not big enough: */
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0047*/
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 0<=PHI2, PHI2<=500, 0<=i,
 //    i<=500}>
 
-      for(j = 0; j <= 500; j += 1)
+      for(j = 0; j <= 500; j += 1)                                      /*0048*/
 
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
 //    j<=500}>
@@ -304,7 +304,7 @@ void get_data(char filename[])
 
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
+   for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
 
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny}>
@@ -314,7 +314,7 @@ void get_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
-      for(i = 0; i <= nx-1; i += 1) {
+      for(i = 0; i <= nx-1; i += 1) {                                   /*0053*/
 
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0}>
@@ -370,7 +370,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   for(i = 1; i <= 499; i += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0091*/
 
 //  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
 //    i<=499}>
@@ -378,7 +378,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
 //    i<=499}>
 
-      for(j = 1; j <= 499; j += 1)
+      for(j = 1; j <= 499; j += 1)                                      /*0092*/
 
 //  <save[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, 1<=i, i<=499, 1<=j,
 //    j<=499}>
@@ -395,7 +395,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //    PHI2<=499, j==500}>
 
 
-   for(i = 1; i <= 499; i += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0097*/
 
 //  <save[PHI1][PHI2]-R-MAY-{i<=PHI1+PHI2, PHI2+i<=PHI1+500,
 //    PHI1<=PHI2+i, PHI1+PHI2<=i+500, i<=PHI1+1, PHI1<=i+1, 1<=i,
@@ -403,7 +403,7 @@ void iteration(float_t space[501][501], float_t save[501][501])
 //  <space[PHI1][PHI2]-W-EXACT-{PHI1==i, 1<=PHI2, PHI2<=499, 1<=i,
 //    i<=499}>
 
-      for(j = 1; j <= 499; j += 1)
+      for(j = 1; j <= 499; j += 1)                                      /*0098*/
 
 //  <save[PHI1][PHI2]-R-MAY-{i+j<=PHI1+PHI2+1, PHI2+i<=PHI1+j+1,
 //    PHI1+j<=PHI2+i+1, PHI1+PHI2<=i+j+1, 1<=i, i<=499, 1<=j, j<=499}>
@@ -468,7 +468,7 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
 
-   for(j = 0; j <= 500; j += 1)
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
 
 //  <fp-R-EXACT-{}>
 //  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j<=500}>
@@ -478,7 +478,7 @@ void write_data(char filename[])
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
 
-      for(i = 0; i <= 500; i += 1) {
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
 
 //  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
 //    j<=500}>
@@ -573,7 +573,7 @@ int main(int argc, char *argv[])
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0128*/
 
 //  <save[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, i<=PHI1+PHI2,
 //    PHI1+PHI2<=i+500, 0<=PHI2, PHI2<=500, argc==2, 0<=i, i<=500}>
@@ -612,7 +612,7 @@ void compute(float_t space[501][501], float_t save[501][501])
    int t;                                                               /*0106*/
    
    /* Apply the relaxation T times: */
-   for(t = 0; t <= 399; t += 1)
+   for(t = 0; t <= 399; t += 1)                                         /*0109*/
       iteration(space, save);                                           /*0110*/
 }
 void get_data(char filename[])
@@ -647,14 +647,14 @@ void get_data(char filename[])
    
    /* Erase the memory, in case the image is not big enough: */
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0047*/
 #pragma omp parallel for 
-      for(j = 0; j <= 500; j += 1)
+      for(j = 0; j <= 500; j += 1)                                      /*0048*/
          space[i][j] = 0;                                               /*0049*/
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
-      for(i = 0; i <= nx-1; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
+      for(i = 0; i <= nx-1; i += 1) {                                   /*0053*/
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
@@ -670,16 +670,16 @@ void iteration(float_t space[501][501], float_t save[501][501])
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
 #pragma omp parallel for private(j)
-   for(i = 1; i <= 499; i += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0091*/
 #pragma omp parallel for 
-      for(j = 1; j <= 499; j += 1)
+      for(j = 1; j <= 499; j += 1)                                      /*0092*/
 
          save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);  /*0094*/
 
 #pragma omp parallel for private(j)
-   for(i = 1; i <= 499; i += 1)
+   for(i = 1; i <= 499; i += 1)                                         /*0097*/
 #pragma omp parallel for 
-      for(j = 1; j <= 499; j += 1)
+      for(j = 1; j <= 499; j += 1)                                      /*0098*/
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
@@ -696,8 +696,8 @@ void write_data(char filename[])
    /* Write the PGM header: */
    fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
-   for(j = 0; j <= 500; j += 1)
-      for(i = 0; i <= 500; i += 1) {
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
          c = space[i][j];                                               /*0079*/
          fputc(c, fp);                                                  /*0080*/
       }
@@ -717,7 +717,7 @@ int main(int argc, char *argv[])
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0128*/
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
    compute(space, save);                                                /*0131*/
@@ -758,14 +758,14 @@ void get_data(char filename[])
    
    /* Erase the memory, in case the image is not big enough: */
 #pragma omp parallel for private(j)
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0047*/
 #pragma omp parallel for 
-      for(j = 0; j <= 500; j += 1)
+      for(j = 0; j <= 500; j += 1)                                      /*0048*/
          space[i][j] = 0;                                               /*0049*/
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
-      for(i = 0; i <= nx-1; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
+      for(i = 0; i <= nx-1; i += 1) {                                   /*0053*/
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
@@ -779,7 +779,7 @@ void compute(float_t space[501][501], float_t save[501][501])
    int t;                                                               /*0106*/
    
    /* Apply the relaxation T times: */
-   for(t = 0; t <= 399; t += 1)
+   for(t = 0; t <= 399; t += 1)                                         /*0109*/
       iteration(space, save);                                           /*0110*/
 }
 void get_data(char filename[])
@@ -813,11 +813,11 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);             /*0044*/
    
    /* Erase the memory, in case the image is not big enough: */
-   p4a_launcher_get_data(space);
+   p4a_launcher_get_data(space);                                        /*0047*/
    
    /* Read the pixel grey value: */
-   for(j = 0; j <= ny-1; j += 1)
-      for(i = 0; i <= nx-1; i += 1) {
+   for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
+      for(i = 0; i <= nx-1; i += 1) {                                   /*0053*/
          c = fgetc(fp);                                                 /*0054*/
          /* Truncate the image if too big: */
          if (i<501&&j<501)                                              /*0056*/
@@ -832,9 +832,9 @@ void iteration(float_t space[501][501], float_t save[501][501])
    
    /* Use 2 arrays in flip-flop to have dataparallel forall semantics. I
         could use also a flip-flop dimension instead... */
-   p4a_launcher_iteration(save, space);
+   p4a_launcher_iteration(save, space);                                 /*0091*/
 
-   p4a_launcher_iteration_1(save, space);
+   p4a_launcher_iteration_1(save, space);                               /*0097*/
 }
 void write_data(char filename[])
 {
@@ -849,8 +849,8 @@ void write_data(char filename[])
    /* Write the PGM header: */
    fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
 
-   for(j = 0; j <= 500; j += 1)
-      for(i = 0; i <= 500; i += 1) {
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
          c = space[i][j];                                               /*0079*/
          fputc(c, fp);                                                  /*0080*/
       }
@@ -870,7 +870,7 @@ int main(int argc, char *argv[])
    
    /* Initialize the border of the destination image, since it is used but
         never written to: */
-   for(i = 0; i <= 500; i += 1)
+   for(i = 0; i <= 500; i += 1)                                         /*0128*/
       save[i][0] = save[0][i] = save[i][501-1] = save[501-1][i] = 0;    /*0129*/
 
    compute(space, save);                                                /*0131*/
