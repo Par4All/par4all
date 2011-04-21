@@ -1,0 +1,50 @@
+delete loop_private_simple01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create loop_private_simple01 loop_private_simple01.c
+
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+
+#activate some debug mode
+#setenv TEXT_DEBUG_LEVEL 9
+#setenv PARSER_DEBUG_LEVEL 9
+#setenv RICEDG_DEBUG_LEVEL 9
+#setenv SYNTAX_DEBUG_LEVEL 9
+#setenv C_SYNTAX_DEBUG_LEVEL 9
+#setenv SEMANTICS_DEBUG_LEVEL 9
+#setenv PRETTYPRINT_DEBUG_LEVEL 9
+
+apply PRIVATIZE_MODULE(main)
+
+echo
+echo Code for "main" after privatization
+echo
+
+display PRINTED_FILE(main)
+
+echo
+echo Parallel code for "main"
+echo
+
+display PARALLELPRINTED_FILE[main]
+quit
+
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(main)
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+apply UNSPLIT
+shell gcc -fopenmp -c loop_private.database/Src/loop_private.c -o loop_private.database/Src/loop_private.o
+
+close
+delete loop_private_simple01
+quit
+# EOF
