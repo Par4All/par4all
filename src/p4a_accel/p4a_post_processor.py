@@ -74,6 +74,10 @@ def p4a_launcher_clean_up(match_object):
     if verbose:
         print 'vb', variables_before, 'end'
 
+    # A comment was added in launchers to mark where the wrapper declaration
+    # should be placed. The wrapper is declared as a string
+    variables_before = re.sub("//Opencl wrapper declaration\n","char * " + wrapper_function_name + ";\n",variables_before)
+
     # Inside loop nest, just remove the for loops:
     variables_in_loop_nest = re.sub("(?s)\n\\s*for\\([^\n]*", "", loop_nest)
     # Remove also the '// To be assigned to a call to P4A_vp_...' that
@@ -158,7 +162,7 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # Previous version of p4a had defined P4A_accel_kernel qualifier as 
     # including the void return type by default. This was justified when using 
     # pips to generate the code.
-    # Stéphanie Even suggest a manual use of p4a, allowing also return type
+    # In case of manual use of p4a, allowing also return type
     # to be different from void for the functions defined on the accelerator.
     # The void return type must also be forced here, after the pips process.
     content = re.sub("(P4A_accel_kernel )",

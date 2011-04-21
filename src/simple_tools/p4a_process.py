@@ -1008,13 +1008,32 @@ class p4a_processor(object):
         if (self.fortran == False):
             kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
+            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
         else:
             kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
+        if self.com_optimization :
+            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
+            wrappers.cast_at_call_sites()
+
+        for ph in apply_phases_after:
+            # Apply requested phases to kernels, wrappers and launcher:
+			getattr(kernels, ph)(concurrent=True)
+			getattr(wrappers, ph)(concurrent=True)
+			getattr(kernel_launchers, ph)(concurrent=True)
+
+        # Comment the place where the opencl wrapper declaration must be placed
+        # from the post-process
+        for launcher in kernel_launchers:
+            # self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "char * " + self.launcher_to_wrapper_name (launcher.name))
+            self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration")
+        
         # save the list of kernels for later work
         # for example, retrieving the kernel files when saving
         # in merge_wk
+        # kernel_launchers.prepend_comment("// Opencl wrapper prototype")
         self.kernels.extend (map(lambda x:x.name, kernels))
 
         # To be able to inject Par4All accelerator run time initialization
@@ -1082,6 +1101,12 @@ class p4a_processor(object):
         good pips property.
         """
         return name.replace (self.get_kernel_prefix (), self.get_wrapper_prefix ())
+
+    def launcher_to_wrapper_name (self, name):
+        """ Return the wrapper name according to the launcher name using the
+        good pips property.
+        """
+        return name.replace (self.get_launcher_prefix (), self.get_wrapper_prefix ())
 
     def kernel_to_launcher_name (self, name):
         """ Return the launcher name according to the kernel name using the
@@ -1312,6 +1337,7 @@ class p4a_processor(object):
                     # will only be the wrappers and the kernel (cf save_generated).
                     output_file = p4a_util.change_file_ext(output_file, ".cu")
 
+            
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append (output_file)
@@ -1387,8 +1413,6 @@ class p4a_processor(object):
         # generate one header to warp all the generated header files
         if (new_file_flag == True):
             self.save_header (output_dir, self.new_files_include)
-
-
 
         return output_files
 
