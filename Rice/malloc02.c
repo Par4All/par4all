@@ -1,3 +1,7 @@
+/**/
+
+#include <stdlib.h>
+
 void malloc02()
 {
   int *p[10];
@@ -5,6 +9,6 @@ void malloc02()
 
   for(i=0; i<10; i++) {
     p[i] = malloc(sizeof(int));
-    p[i] = i;
+    *p[i] = i;
   }
 }
