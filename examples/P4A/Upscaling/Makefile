@@ -53,6 +53,7 @@ clean :
 	rm -rf $(SOURCES:.c=.p4a-accel.cu)
 	rm -rf  *~ *.database *.build p4a_new_files
 	rm -rf  res.out
+	rm *.cl
 
 run%: $(TARGET)%
 	# Run a version and display timing information:
