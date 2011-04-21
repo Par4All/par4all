@@ -1181,7 +1181,9 @@ class p4a_processor(object):
             #                           wrapper + ".cl")
             
             p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
-
+            text = "/*\n * Header included by P4A\n*/\n"
+            text = text + "#include \"p4a_accel_wrapper.h\"\n"
+            p4a_util.prepend_text(output_file,text)
 
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"

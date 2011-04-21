@@ -249,6 +249,13 @@ def flush_log():
     if log_file_handler:
         log_file_handler.flush()
 
+def prepend_text(o_file,text):
+    """ Append some text at the head of a file"""
+    src = open (o_file, 'r')
+    content = text + src.read()
+    src.close ()
+    write_file(o_file,content,True)
+
 def merge_files (dst_name, src_name_l):
     """ merge the sources file (given as a list) into the dst file. The content
     of the sources is appended to the destination
