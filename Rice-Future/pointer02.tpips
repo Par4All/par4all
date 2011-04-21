@@ -6,6 +6,7 @@ create pointer02 pointer02.c
 
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
+activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 
 display PRINTED_FILE
