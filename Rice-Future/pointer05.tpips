@@ -25,10 +25,24 @@ activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 echo
+echo Dependence graph
+echo
+
+display DG_FILE
+
+echo
 echo Parallel code
 echo
 
-#activate PRINT_CODE_PROPER_EFFECTS
+# activate what's needed for OpenMP output?
+display PARALLELPRINTED_FILE
+
+echo
+echo Parallel code after privatization (although it is useless in this context)
+echo
+
+apply PRIVATIZE_MODULE
+# activate what's needed for OpenMP output?
 display PARALLELPRINTED_FILE
 
 close
