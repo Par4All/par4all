@@ -1,10 +1,15 @@
 delete malloc02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
 create malloc02 malloc02.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
 # mandatory for A&K (Rice) parallization on C files
 setproperty MEMORY_EFFECTS_ONLY FALSE
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
 
 activate C_PARSER
 

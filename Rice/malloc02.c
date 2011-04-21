@@ -11,4 +11,9 @@ void malloc02()
     p[i] = malloc(sizeof(int));
     *p[i] = i;
   }
+
+  for(i=0; i<10; i++) {
+    p[i] = malloc(sizeof(int));
+    p[i] = &i;
+  }
 }
