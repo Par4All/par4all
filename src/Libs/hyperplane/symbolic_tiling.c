@@ -21,52 +21,6 @@
 
 #include "transformations.h"
 
-static void convert_min_max_to_tests_in_loop(loop l)
-{
-    expression ub = range_upper(loop_range(l));
-    if(expression_call_p(ub))
-    {
-        call c = expression_call(ub);
-        entity op = call_function(c);
-        if(ENTITY_MIN_P(op)) {
-            expression lhs = copy_expression(binary_call_lhs(c));
-            expression rhs = copy_expression(binary_call_rhs(c));
-            free_expression(range_upper(loop_range(l)));
-            range_upper(loop_range(l))=lhs;
-            loop_body(l)=instruction_to_statement(
-                    make_instruction_test(
-                        make_test(
-                            binary_intrinsic_expression(
-                                LESS_OR_EQUAL_OPERATOR_NAME,
-                                entity_to_expression(loop_index(l)),
-                                rhs),
-                            loop_body(l),
-                            make_empty_block_statement()
-                            )
-                        )
-                    );
-        }
-    }
-}
-
-static void convert_min_max_to_tests(statement s)
-{
-    gen_recurse(s,loop_domain, gen_true, convert_min_max_to_tests_in_loop);
-}
-
-#if 0
-static statement do_symbolic_tiling_rec_junction(statement root, list tests) {
-    if(ENDP(tests)) return copy_statement(root);
-    else return instruction_to_statement(
-            make_instruction_test(
-                make_test(EXPRESSION(CAR(tests)),
-                    do_symbolic_tiling_rec_junction(root,CDR(tests)),
-                    do_symbolic_tiling_rec_junction(root,CDR(tests))
-                    )
-                )
-            );
-}
-#endif
 
 void do_symbolic_tiling(statement base, list vector)
 {
@@ -74,13 +28,12 @@ void do_symbolic_tiling(statement base, list vector)
     list tiled_loops_outer = NIL;
     list tiled_loops_inner = NIL;
     list prelude = NIL;
-    list allmins = NIL;
     statement sloop=copy_statement(base);
     FOREACH(EXPRESSION,tile_size,vector)
     {
         loop l = statement_loop(sloop);
         list tile_expression_effects = proper_effects_of_expression(tile_size);
-        /* check if tile_size is modified by sloop and generate an a temporary variable if needed */
+        /* check if tile_size is modified by sloop and generate a temporary variable if needed */
         /* we should also check tile_size has no write effect
          * but currently, string_to_expression asserts this */
         FOREACH(EFFECT,teff,tile_expression_effects) {
@@ -120,10 +73,6 @@ generate_tile:;
                     upperbound_lhs,
                     upperbound_rhs
                     );
-        allmins=CONS(EXPRESSION,binary_intrinsic_expression(GREATER_THAN_OPERATOR_NAME,
-                    copy_expression(upperbound_lhs),
-                    copy_expression(upperbound_rhs)
-                    ),allmins);
 
         /* inner loop */
         statement inner = instruction_to_statement(
@@ -172,24 +121,6 @@ generate_tile:;
     FOREACH(STATEMENT,curr,tiled_loops_inner) {
         loop_body(statement_loop(curr))=prev;
         prev=curr;
-        if(!ENDP(allmins) && get_bool_property("SYMBOLIC_TILING_PERFECT_TILES")) {
-          expression guard = EXPRESSION(CAR(allmins));
-          set s = get_referenced_entities(guard);
-          if(set_belong_p(s,loop_index(statement_loop(curr)))) {
-            loop_body(statement_loop(curr))=
-              instruction_to_statement(
-                  make_instruction_test(
-                    make_test(
-                      guard,
-                      copy_statement(loop_body(statement_loop(curr))),
-                      copy_statement(loop_body(statement_loop(curr)))
-                      )
-                    )
-                  );
-            POP(allmins);
-          }
-          set_free(s);
-        }
     }
 
     /* update */
@@ -197,8 +128,6 @@ generate_tile:;
     statement_instruction(base)=instruction_undefined;
     update_statement_instruction(base,make_instruction_block(gen_nreverse(CONS(STATEMENT,prev,prelude))));
 
-    if(get_bool_property("SYMBOLIC_TILING_NO_MIN"))
-        convert_min_max_to_tests(base);/* << this one is here to wait for better preconditions computations */
 }
 
 

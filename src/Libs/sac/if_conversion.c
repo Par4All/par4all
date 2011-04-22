@@ -305,3 +305,89 @@ bool if_conversion(char * mod_name)
 
     return true;
 }
+
+static instruction do_loop_nest_unswitching_purge(statement adam, list conditions) {
+    if(ENDP(conditions)) return copy_instruction(statement_instruction(adam));
+    return make_instruction_test(
+            make_test(
+                copy_expression(EXPRESSION(CAR(conditions))),
+                instruction_to_statement(do_loop_nest_unswitching_purge(adam,CDR(conditions))),
+                instruction_to_statement(do_loop_nest_unswitching_purge(adam,CDR(conditions)))
+                )
+            );
+}
+
+static void do_loop_nest_unswitching(statement st,list *conditions) {
+    if(statement_loop_p(st)) {
+        loop l =statement_loop(st);
+        range r = loop_range(l);
+        expression u = range_upper(r);
+        if(expression_minmax_p(u)) {//only handle the case of two args right now ... */
+            call c = expression_call(u);
+            if(gen_length(call_arguments(c)) > 2 ) pips_internal_error("do not handle more than 2 args");
+            expression hs[]= {
+                binary_call_lhs(c),
+                binary_call_rhs(c)
+                    };
+            for(int i=0;i<sizeof(hs)/sizeof(hs[0]);i++) {
+                expression hss = hs[i];
+                hs[i]=copy_expression(hs[i]);
+                NORMALIZE_EXPRESSION(hs[i]);
+                if(normalized_complex_p(expression_normalized(hs[i]))) {
+                    /* will help for partial eval later */
+                    entity etmp = make_new_scalar_variable(get_current_module_entity(),basic_of_expression(hs[i]));
+                    AddEntityToCurrentModule(etmp);
+                    hs[i]=make_assign_expression(entity_to_expression(etmp),hs[i]);
+                    update_expression_syntax(hss,expression_syntax(entity_to_expression(etmp)));
+                }
+            }
+
+            *conditions=
+                CONS(EXPRESSION,
+                        binary_intrinsic_expression(GREATER_THAN_OPERATOR_NAME,hs[0],hs[1]),
+                        *conditions);
+        }
+
+        statement sparent = (statement)gen_get_ancestor(statement_domain,st);
+        /* some conditions left */
+        if(!ENDP(*conditions) && (!statement_loop_p(sparent) || !sparent)) {
+            update_statement_instruction(
+                    st,do_loop_nest_unswitching_purge(st,*conditions));
+            gen_full_free_list(*conditions);
+            *conditions=NIL;
+        }
+        /* parent is a loop : check for a conflict */
+        else {
+            list toremove=NIL;
+            list tconditions=gen_copy_seq(*conditions);
+            FOREACH(EXPRESSION,cond,tconditions) {
+                set s = get_referenced_entities(cond);
+                if(set_belong_p(s,loop_index(statement_loop(sparent)))) {
+                    toremove=CONS(EXPRESSION,cond,toremove);
+                    gen_remove_once(conditions,cond);
+                }
+                set_free(s);
+            }
+            gen_free_list(tconditions);
+            if(!ENDP(toremove))
+                update_statement_instruction(
+                        st,do_loop_nest_unswitching_purge(st,toremove));
+            gen_full_free_list(toremove);
+        }
+    }
+    else pips_assert("everything is ok",ENDP(*conditions));
+}
+
+bool loop_nest_unswitching(const char *module_name) {
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name,true));
+    set_current_module_entity(module_name_to_entity(module_name));
+
+    list l=NIL;
+    gen_context_recurse(get_current_module_statement(),&l,
+            statement_domain,gen_true,do_loop_nest_unswitching);
+    pips_assert("everything went well\n",ENDP(l));
+
+    reset_current_module_statement();
+    reset_current_module_entity();
+    return true;
+}

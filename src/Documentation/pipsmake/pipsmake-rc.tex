@@ -5844,6 +5844,16 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.code
 % +        < MODULE.dg
 % +        < MODULE.proper_effects
+\begin{PipsPass}{loop_nest_unswitching}
+  Converts max in loop bounds into tests. Also sets variable so that
+  \PipsPassRef{suppress_dead_code} works afterward
+\end{PipsPass}
+
+\begin{PipsMake}
+loop_nest_unswitching                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
 
 
 \begin{PipsPass}{scalar_renaming}
@@ -8000,6 +8010,8 @@ The tiling only works for parallelepiped tiles.
 Use \PipsPropRef{LOOP_LABEL} to specify the loop to tile.
 Use \PipsPropRef{SYMBOLIC_TILING_VECTOR} as a comma-separated list to specify tile sizes.
 Use \PipsPropRef{SYMBOLIC_TILING_FORCE} to bypass condition checks.
+Consider using \PipsPassRef{loop_nest_unswitching} if generated max
+disturbs further analyses
 \end{PipsPass}
 \begin{PipsMake}
 symbolic_tiling > MODULE.code
@@ -8012,10 +8024,6 @@ symbolic_tiling > MODULE.code
 SYMBOLIC_TILING_VECTOR ""
 \end{PipsProp}
 
-As a work-around to precondition computation limitations, you can set following property to true, it will generate tests instead of min.
-\begin{PipsProp}{SYMBOLIC_TILING_NO_MIN}
-SYMBOLIC_TILING_NO_MIN FALSE
-\end{PipsProp}
 \begin{PipsProp}{SYMBOLIC_TILING_FORCE}
 SYMBOLIC_TILING_FORCE FALSE
 \end{PipsProp}
