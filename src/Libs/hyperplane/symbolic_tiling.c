@@ -205,7 +205,7 @@ generate_tile:;
 /* checks if sloop is a perfectly nested loop of depth @depth */
 static bool symbolic_tiling_valid_p(statement sloop, size_t depth)
 {
-    int l;
+    intptr_t l;
     if(depth == 0 ) return true;
     else {
         if(statement_loop_p(sloop) && 
