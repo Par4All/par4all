@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os,sys
 import re
 import tempfile
@@ -6,6 +7,16 @@ import pypsutils
 import fileinput
 import subprocess
 import pyps
+from subprocess import Popen, PIPE
+
+simd_c = "SIMD.c"
+simd_h = "SIMD_types.h"
+sse_h = "sse.h"
+threednow_h = "3dnow.h"
+avx_h = "avx.h"
+neon_h = "neon.h"
+patterns_c = "patterns.c"
+patterns_h = "patterns.h"
 
 class sacbase(object):
 	@staticmethod
@@ -163,8 +174,10 @@ class sacbase(object):
 			for pattern, repl in replacements:
 				line = re.sub(pattern, repl, line)
 			print line,
+
 class sacsse(sacbase):
 	register_width = 128
+	hfile = sse_h
 	@staticmethod
 	def sac(module, **kwargs):
 		global curr_sse_h
@@ -205,6 +218,7 @@ class sacsse(sacbase):
 
 class sac3dnow(sacbase):
 	register_width = 64
+	hfile = threednow_h
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sac3dnow.register_width
@@ -236,6 +250,7 @@ class sac3dnow(sacbase):
 
 class sacavx(sacbase):
 	register_width = 256
+	hfile = avx_h
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacavx.register_width
@@ -255,6 +270,7 @@ class sacavx(sacbase):
 
 class sacneon(sacbase):
 	register_width = 128
+	hfile = neon_h
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacneon.register_width
@@ -271,15 +287,6 @@ class sacneon(sacbase):
 		pass
 
 	CFLAGS = "-mfpu=neon -mfloat-abi=softfp -O3"
-
-simd_c = "SIMD.c"
-simd_h = "SIMD_types.h"
-sse_h = "sse.h"
-threednow_h = "3dnow.h"
-avx_h = "avx.h"
-neon_h = "neon.h"
-patterns_c = "patterns.c"
-patterns_h = "patterns.h"
 
 class workspace(pyps.workspace):
 	"""The SAC subsystem, in Python.
@@ -340,24 +347,49 @@ class workspace(pyps.workspace):
 		shutil.copy(pypsutils.get_runtimefile(patterns_h,"sac"),rep)
 		return files
 
-	def simd_compile(self, ccexecp, *args, **kwargs):
-		"""Compile the workspace with sse.h."""
-		self.use_generic_simd = False
-		CFLAGS = self.driver.CFLAGS
-		ccexecp.CFLAGS += " " + CFLAGS
-		r = self.ws.compile(ccexecp, *args, **kwargs)
-		self.use_generic_simd = True
-		return r
-
 	def post_memalign(self, *args, **kwargs):
 		self.driver.post_memalign(self, *args, **kwargs)
 
 	def get_sacCompiler(self,backendCompiler):
+		"""Calls sacCompiler to return a compiler class using the driver set in the workspace"""
 		return sacCompiler(backendCompiler,self.driver)
 
 def sacCompiler(backendCompiler,driver):
+	"""Returns a compiler class inheriting from the backendCompiler class given in the arguments and using the driver given in the arguments"""
 	class C(backendCompiler):
+		"""compiler class inheriting from backendCompiler and using its own compile method to comply with the sac driver"""
 		def __init__(self,CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
 			super(C,self).__init__(CC, " ".join([CFLAGS,driver.CFLAGS]),LDFLAGS,compilemethod,rep,outfile,args,extrafiles)
+
+		def compile(self, filename, extraCFLAGS="", verbose=False):
+			filepath = os.path.dirname(filename)
+			filetruename = os.path.basename(filename)
+			#change the includes
+			filestring = pypsutils.file2string(filename)
+			filestring= re.sub('#include "SIMD.h"','#include "'+driver.hfile+'"',filestring)
+			newcfile = os.path.join(filepath,"sac_"+filetruename)
+			pypsutils.string2file(filestring,newcfile)
+			#create symlink .h file
+			linkpath = os.path.join(filepath,driver.hfile)
+			if not os.path.exists(linkpath):
+				os.symlink(pypsutils.get_runtimefile(driver.hfile,"sac"),linkpath)
+			
+			#start the fun
+			outfilename = os.path.splitext(filename)[0]+".o"
+			command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", newcfile, "-o", outfilename]
+			commandline = " ".join(command)
+			if verbose:
+				print >> sys.stderr , "Compiling a workspace file with", commandline
+			p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+			(out,err) = p.communicate()
+			self.cc_stderr = err
+			ret = p.returncode
+			if ret != 0:
+				os.remove(filename)
+				print >> sys.stderr, err
+				raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+			self.cc_cmd = commandline
+			return [outfilename]
+
 	return C
 

@@ -11,5 +11,5 @@ with workspace(filename+".c", "tools.c", driver="sse", deleteOnClose=False,name=
 	m.display()
 	m.sac()
 	m.display()
-	#a_out=w.compile(compiler=w.get_sacCompiler(pyps.gccCompiler)())
-	a_out2=w.compile()
+	a_out=w.compile(compiler=w.get_sacCompiler(pyps.gccCompiler)())
+	#a_out2=w.compile()

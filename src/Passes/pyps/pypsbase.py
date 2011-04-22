@@ -469,7 +469,7 @@ class workspace(object):
 			
 			user_headers = self.user_headers()
 			for uh in user_headers:
-				shutils.copy(uh,rep)
+				shutil.copy(uh,rep)
 		return saved
 
 	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
@@ -498,7 +498,8 @@ class workspace(object):
 
 
 	def compile(self, compiler=backendCompiler(), link=True):
-		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
+		"""calls the compile and (if told to) link method of the compiler given in the arguments. Uses `CC', `CFLAGS', `LDFLAGS' given by the compiler and the `cppflags' given by the workspace. Works in directory `rep', adds sources from `extrafiles' and outputs to `outputs'""" 
+		
 		CC=compiler.CC
 		CFLAGS=compiler.CFLAGS
 		LDFLAGS=compiler.LDFLAGS
@@ -511,20 +512,15 @@ class workspace(object):
 			compiler.rep=self.tmpdirname()+"d.out"
 		rep=compiler.rep
 		otmpfiles=self.save(rep=compiler.rep)+extrafiles
-		command = compiler.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else compiler.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
-		commandline = " ".join(command)
-		if self.verbose:
-			print >> sys.stderr , "Compiling the workspace with", commandline
-		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
-		(out,err) = p.communicate()
-		compiler.cc_stderr = err
-		ret = p.returncode
-		if ret != 0:
-			if not link: map(os.remove,otmpfiles)
-			print >> sys.stderr, err
-			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		compiler.cc_cmd = commandline
-		return compiler.outfile
+		
+		of = []
+		for f in otmpfiles:
+			of += compiler.compile(filename=f,extraCFLAGS=self.cppflags,verbose=self.verbose)
+		if link:
+			ob = compiler.link(files=of,verbose=self.verbose)
+			return ob
+		
+		return of
 
 	def compile_and_run(self, compiler=backendCompiler()):
 		if compiler.compilemethod == None:
