@@ -45,7 +45,6 @@ typedef int8x16_t	v16qi;
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=vaddq_f32(vec2,vec3)
 #define SIMD_SUBPS(vec1, vec2, vec3) vec1=vsubq_f32(vec2, vec3)
 #define SIMD_MULADDPS(vec1, vec2, vec3, vec4) vec1=vmlaq_f32(vec2,vec3,vec4)
-/* umin as in unary minus */
 #define SIMD_UMINPS(vec1, vec2)	vec1=vnegq_f32(vec2)
 #define SIMD_STORE_V4SF(vec,arr) vst1q_f32(arr,vec)
 #define SIMD_STOREA_V4SF(vec,arr) vst1q_f32(arr,vec)

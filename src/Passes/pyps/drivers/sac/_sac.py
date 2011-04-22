@@ -131,6 +131,8 @@ class sacbase(object):
 		if cond.get("suppress_dead_code", True):
 			module.suppress_dead_code()
 		# module.print_dot_dependence_graph()
+
+
 		if cond.get("enhanced_reduction",False):
 			module.simd_remove_reductions(prelude="SIMD_ZERO_V4SF")
 		else:
@@ -158,6 +160,10 @@ class sacbase(object):
 
 		if cond.get("verbose"):
 			module.display()
+
+		if cond.get("verbose"):
+			module.display()
+
 		try:
 			module.print_dot_dependence_graph()
 			module.delay_communications()

@@ -13,6 +13,8 @@ void sum_f(int n ,float* a, float *b, float *r)
 void mul_f(int n ,float* a, float *b, float *r)
 {
 	int i;
+#pragma ivdep
+#pragma vector aligned
 	for (i=0;i<n;i++)
 		r[i]=a[i]*b[i];
 }
@@ -71,9 +73,9 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	n = atoi(argv[2]);
-	a = malloc(n*sizeof(float));
-	b = malloc(n*sizeof(float));
-	r = malloc(n*sizeof(float));
+	a = (float*) ((char*)malloc((n+1)*sizeof(float))+1);
+	b = (float*) ((char*)malloc((n+1)*sizeof(float))+1);
+	r = (float*) ((char*)malloc((n+1)*sizeof(float))+1);
 
 	if (a == 0 || b == 0 || r == 0)
 	{

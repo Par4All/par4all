@@ -32,8 +32,8 @@
 #define LSTYPE_PS SF
 #define LSTYPE_DI DI
 #define LSTYPE_D  SI
-#define LSTYPE_W  QI 
-#define LSTYPE_B  HI 
+#define LSTYPE_W  HI 
+#define LSTYPE_B  QI 
 
 // This is a precomputed version of VW(T), needed for LOAD/STORE function names
 // VM_##RWBITS##_##T
@@ -277,6 +277,7 @@
 	F(A, W, DI)\
 	F(A, B, DI)\
 	F(A, W, D)\
+	F(A, D, W)\
 	F(A, B, D)\
 	F(A, B, W)
 
@@ -316,3 +317,4 @@ SIMD_LOAD_CONVS(_ALIGNED)
 
 SIMD_STORE_CONVS(_UNALIGNED)
 SIMD_STORE_CONVS(_ALIGNED)
+
