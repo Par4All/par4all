@@ -39,12 +39,11 @@ class Maker(object):
 		l = pypsutils.file2string(pypsutils.get_runtimefile(makefile,makefiledir)).split("##pipsrules##")
 		return (l[0],l[1])
 
-	def generate(self,path,sources):
-		mk="SOURCES="+\
-			" ".join(sources) +\
-			"\n"+\
-			self.headers+\
-			"\n"+\
+	def generate(self,path,sources,cppflags="",ldflags=""):
+		mk="SOURCES="+" ".join(sources)+"\n"+\
+			self.headers+"\n"+\
+			"CPPFLAGS+="+cppflags+"\n"+\
+			"LDFLAGS+="+ldflags+"\n"+\
 			self.rules
 		return os.path.basename(pypsutils.string2file(mk,os.path.join(path,"Makefile"+self.ext)))
 
@@ -402,6 +401,7 @@ class workspace(object):
 		name		   = kwargs.setdefault("name",		   "")
 		verbose		= kwargs.setdefault("verbose",		True)
 		cppflags	   = kwargs.setdefault("cppflags",	   "")
+		ldflags		   = kwargs.setdefault("ldflags",	   "")
 		cpypips		   = kwargs.setdefault("cpypips",		pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
@@ -434,6 +434,7 @@ class workspace(object):
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
 		self.cppflags = cppflags
+		self.ldflags = ldflags
 
 		self._modules = {}
 		self.props = workspace.props(self)
@@ -570,11 +571,12 @@ class workspace(object):
 		"""save workspace back into source form in directory rep if given.
 		By default, keep it into the .database/Src PIPS default"""
 		self.cpypips.apply("UNSPLIT","%ALL")
-		if rep:
-			if not os.path.exists(rep):
-				os.makedirs(rep)
-			if not os.path.isdir(rep):
-				raise ValueError("'%s' is not a directory" % rep)
+		if rep == None:
+			rep = self.tmpdirname()
+		if not os.path.exists(rep):
+			os.makedirs(rep)
+		if not os.path.isdir(rep):
+			raise ValueError("'%s' is not a directory" % rep)
 
 		saved=[]
 		for s in os.listdir(self.dirname()+"Src"):
@@ -600,44 +602,21 @@ class workspace(object):
 		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
 		return saved
 
-	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
-		""" List the user headers used in self._sources with the compiler configuration given in compiler """
-		if extrafiles == None:
-			extrafiles = []
-		command = compiler.user_headers_cmd(self._org_sources, extraCFLAGS=self.cppflags)
-		command = " ".join(command) + ' |sed \':a;N;$!ba;s/\(.*\).o: \\\\\\n/:/g\' |sed \'s/ \\\\$//\' |cut -d\':\' -f2'
-		p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
-		(out,err) = p.communicate()
-		rc = p.returncode
-		if rc != 0:
-			raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
-		
-		# Parse the results :
-		# each line is split thanks to shlex.split, and we only keep the header files
-		lines = map(shlex.split,out.split('\n'))
-		headers = list()
-		for l in lines:
-			l = filter(lambda s: s.endswith('.h'), l)
-			headers.extend(l)
-		return headers
+	def make(self, rep=None, maker=Maker()):
+		if rep == None:
+			rep = self.tmpdirname()
+		saved = self.save(rep)
+		return maker.generate(rep,map(os.path.basename,saved),cppflags=self.cppflags,ldflags=self.ldflags)
 
 
-
-	def compile(self, compiler=backendCompiler(), link=True):
-		"""calls the compile and (if told to) link method of the compiler given in the arguments. Uses `CC', `CFLAGS', `LDFLAGS' given by the compiler and the `cppflags' given by the workspace. Works in directory `rep', adds sources from `extrafiles' and outputs to `outputs'""" 
-		
-		CC=compiler.CC
-		CFLAGS=compiler.CFLAGS
-		LDFLAGS=compiler.LDFLAGS
-		outfile=compiler.outfile
-		extrafiles=compiler.extrafiles
-
-		if link and not outfile:
-			compiler.outfile=self._name
-		if compiler.rep==None:
-			compiler.rep=self.tmpdirname()+"d.out"
-		rep=compiler.rep
-		otmpfiles=self.save(rep=compiler.rep)+extrafiles
+	def compile(self, rep=None, makefile="Makefile", outfile="a.out"):
+		""" uses the fabulous makefile generated to compile the workspace """	
+		if rep == None:
+			rep = self.tmpdirname()
+		commandline = ["make",]
+		commandline+=["-C",rep]
+		commandline+=["-f",makefile]
+		commandline.append("TARGET="+outfile)
 		
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
@@ -655,10 +634,10 @@ class workspace(object):
 		compiler.compilemethod(compiler)
 		return self.run_output(compiler)
 
-	def run_output(self, compiler=backendCompiler()):
+	def run(self, binary, args=[]):
 		# Command to execute our binary
-		compiler.cmd = [os.path.join("./",compiler.outfile)] + compiler.args
-		p = Popen(compiler.cmd, stdout = PIPE, stderr = PIPE)
+		cmd = [os.path.join("./",binary)] + args
+		p = Popen(cmd, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
 		return (rc,out,err)

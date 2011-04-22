@@ -234,6 +234,9 @@ class workspace(pyps.workspace):
 	def save(self, rep=None):
 		"""Add $driver.h, which replaces general purpose SIMD instructions
 		with machine-specific ones."""
+		if rep == None:
+			rep = self.tmpdirname()
+		
 		files = super(workspace,self).save(rep)
 		
 
