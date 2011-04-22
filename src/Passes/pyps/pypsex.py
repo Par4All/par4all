@@ -21,9 +21,32 @@ def view_dg(module,format="png"):
 		print >> sys.stderr, err
 		raise RuntimeError("%s failed with return code %d" % (dot_cmd, ret))
 	return (of,out,err)
-
 pyps.module.view_dg=view_dg
 
+
+def loop_distribution(module,**kwargs):
+	module.rice_all_dependence(**kwargs)
+	module.internalize_parallel_code(**kwargs)
+pyps.module.loop_distribution=loop_distribution
+
+def improve_locality(module,**kwargs):
+	module.nest_parallelization(**kwargs)
+	module.internalize_parallel_code(**kwargs)
+pyps.module.improve_locality=improve_locality
+
+_simdizer_auto_tile=pyps.loop.simdizer_auto_tile
+def simdizer_auto_tile(loop,**kwargs):
+	loop.module.split_update_operator(**kwargs)
+	_simdizer_auto_tile(loop,**kwargs)
+pyps.loop.simdizer_auto_tile=simdizer_auto_tile
+
+_simdizer=pyps.module.simdizer
+def simdizer(module,**kwargs):
+	module._ws.activate(module.must_regions)
+	module._ws.activate(module.region_chains)
+	module._ws.activate(module.rice_regions_dependence_graph)
+	_simdizer(module,**kwargs)
+pyps.module.simdizer=simdizer
 
 
 

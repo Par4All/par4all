@@ -205,7 +205,7 @@ static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_
                     words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
         }
         else {
-
+#if 0
             list inter = region_intersection(conflict_sink(c),conflict_source(c));
             if(ENDP(inter)) // why is this conflict generated ?!?
             {
@@ -216,6 +216,7 @@ static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_
                 continue;
             }
             gen_full_free_list(inter);
+#endif
             /* regions tell us there is a conflict.
              * check if the dependence is loop carried or not
              * */

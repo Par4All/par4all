@@ -8,8 +8,10 @@ class ompCompiler(backendCompiler):
 		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
 		if issubclass(self.__class__,pyps.gccCompiler):
 			self.CFLAGS += " -fopenmp"
+			self.LDFLAGS += " -fopenmp"
 		elif issubclass(self.__class__,pyps.iccCompiler):
 			self.CFLAGS += " -openmp"
+			self.LDFLAGS += " -openmp"
 		else:
 			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
 
