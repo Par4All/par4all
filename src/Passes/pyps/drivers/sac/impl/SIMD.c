@@ -192,22 +192,50 @@
 		va_end(ap);\
 	}
 
-// inversion function
+// SIMD zero macros definitions
+#define SIMD_ZERO_TYPE(A,T) _SIMD_ZERO_TYPE(T,RWBITS,A)
+#define _SIMD_ZERO_TYPE(T,RWB,A) __SIMD_ZERO_TYPE(T,RWB,A) // Process the "A" macro
+#define __SIMD_ZERO_TYPE(T,RWB,A) ___SIMD_ZERO_TYPE(T,LSTYPE_##T,VW_##RWB##_##T,A) // Define the VM_XX_XX macro (defined above)
+#define ___SIMD_ZERO_TYPE(T,LST,VW,A) ____SIMD_ZERO_TYPE(T,LST,VW,A) // Process the "VW" and "LST" macros
+#define ____SIMD_ZERO_TYPE(T,LST,VW,A)\
+	void SIMD_ZERO_##A##VW##LST(CTYPE_##T vec[VW])\
+	{\
+		int i;\
+		for (i = 0; i < (VW); i++)\
+			vec[i] = 0;\
+	}
+
+// Shuffle function
+#define SIMD_SHUFFLE_TYPE(A,T) _SIMD_SHUFFLE_TYPE(T,RWBITS,A)
+#define _SIMD_SHUFFLE_TYPE(T,RWB,A) __SIMD_SHUFFLE_TYPE(T,RWB,A)
+#define __SIMD_SHUFFLE_TYPE(T,RWB,A) ___SIMD_SHUFFLE_TYPE(T,LSTYPE_##T,VW_##RWB##_##T,A)
+#define ___SIMD_SHUFFLE_TYPE(T,LST,VW,A) ____SIMD_SHUFFLE_TYPE(T,LST,VW,A)
+#define ____SIMD_SHUFFLE_TYPE(T,LST,VW,A) \
+	void SIMD_SHUFFLE_V##VW##LST(CTYPE_##T res[VW], CTYPE_##T vec[VW], ...)\
+	{\
+		int i;\
+		int p;\
+		va_list ap;\
+		va_start(ap, vec);\
+		for (i = 0; i < (VW); i++)\
+		{\
+			p = va_arg(ap, int);\
+			res[p] = vec[i];\
+		}\
+	}
+
+// Invert function
 #define SIMD_INVERT_TYPE(A,T) _SIMD_INVERT_TYPE(T,RWBITS,A)
 #define _SIMD_INVERT_TYPE(T,RWB,A) __SIMD_INVERT_TYPE(T,RWB,A)
 #define __SIMD_INVERT_TYPE(T,RWB,A) ___SIMD_INVERT_TYPE(T,LSTYPE_##T,VW_##RWB##_##T,A)
 #define ___SIMD_INVERT_TYPE(T,LST,VW,A) ____SIMD_INVERT_TYPE(T,LST,VW,A)
 #define ____SIMD_INVERT_TYPE(T,LST,VW,A) \
-    void SIMD_INVERT_V##VW##LST(CTYPE_##T vec[VW])\
+	void SIMD_INVERT_V##VW##LST(CTYPE_##T res[VW], CTYPE_##T vec[VW])\
 	{\
 		int i;\
-        CTYPE_##T tmp[VW];\
 		for (i = 0; i < (VW); i++)\
-			tmp[(VW)-i-1] = vec[i];\
-		for (i = 0; i < (VW); i++)\
-			vec[i] = tmp[i];\
-	}\
-
+			res[VW-i-1] = vec[i];\
+	}
 
 // Conversion functions
 
@@ -233,7 +261,7 @@
 		va_list ap;\
 		CTYPE_##TO n;\
 		va_start(ap, vec);\
-		for (i = 0; i < (VW); i++)\
+		for (i = 0; i < (VWD); i++)\
 		{\
 			n = (CTYPE_##TO) va_arg(ap, CTYPEP_##TO);\
 			vec[i] = n;\
@@ -246,16 +274,24 @@
 #define __SIMD_STORE_CONV(A,TO,TD,RWB) ___SIMD_STORE_CONV(A,TO,TD,VW_##RWB##_##TD,LSTYPE_##TO,LSTYPE_##TD)
 #define ___SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST) ____SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST)
 #define ____SIMD_STORE_CONV(A,TD,TO,VWD,TDLST,TOLST)\
-	void SIMD_STORE_##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TO src[VWD], CTYPE_##TD dst[VWD])\
+	void SIMD_STORE_##A##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TO src[VWD], CTYPE_##TD dst[VWD])\
+	{\
+		int i;\
+		for (i = 0; i < VWD; i++)\
+			dst[i] = src[i];\
+	}\
+	void SIMD_STORE_##A##VWD##TDLST##_TO_##A##VWD##TOLST(CTYPE_##TD src[VWD], CTYPE_##TO dst[VWD])\
 	{\
 		int i;\
 		for (i = 0; i < VWD; i++)\
 			dst[i] = src[i];\
 	}
 
-#define SIMD_LOADS(A)	_DEF_FOR_TYPES(SIMD_LOAD_TYPE,A)
-#define SIMD_STORES(A) 	_DEF_FOR_TYPES(SIMD_STORE_TYPE,A)
-#define SIMD_INVERTS(A) _DEF_FOR_TYPES(SIMD_INVERT_TYPE,A)
+#define SIMD_LOADS(A)	 _DEF_FOR_TYPES(SIMD_LOAD_TYPE,A)
+#define SIMD_STORES(A) 	 _DEF_FOR_TYPES(SIMD_STORE_TYPE,A)
+#define SIMD_ZEROS(A) 	 _DEF_FOR_TYPES(SIMD_ZERO_TYPE,A)
+#define SIMD_SHUFFLES(A) _DEF_FOR_TYPES(SIMD_SHUFFLE_TYPE,A)
+#define SIMD_INVERTS(A)  _DEF_FOR_TYPES(SIMD_INVERT_TYPE,A)
 
 #define CTYPE_PD double
 #define CTYPE_PS float
@@ -308,7 +344,14 @@ SIMD_LOADS(_UNALIGNED)
 SIMD_STORES(_ALIGNED)
 SIMD_STORES(_UNALIGNED)
 
-// INVERT operations (_aligned unused)
+// ZERO operations
+SIMD_ZEROS(_ALIGNED)
+SIMD_ZEROS(_UNALIGNED)
+
+// Shuffle operations (_aligned unused)
+SIMD_SHUFFLES(_ALIGNED) 
+
+// Invert operations (_aligned unused)
 SIMD_INVERTS(_ALIGNED) 
 
 // Define all possible conversions
