@@ -627,8 +627,7 @@ class workspace(object):
 				headersbasename)
 		
 		for f in saved:
-			user_headers = self.user_headers()
-			for uh in user_headers:
+			for uh in user_headers(self):
 				shutil.copy(uh,rep)
 			pypsutils.addBeginnning(f, '#include "'+pipsdef_h+'"\n')
 		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
@@ -659,11 +658,7 @@ class workspace(object):
 			print >> sys.stderr, err
 			raise RuntimeError("%s failed with return code %d" % (commandline, rc))
 
-	def compile_and_run(self, compiler=backendCompiler()):
-		if compiler.compilemethod == None:
-			compiler.compilemethod = self.compile
-		compiler.compilemethod(compiler)
-		return self.run_output(compiler)
+		return os.path.join(rep,outfile),rc,out,err
 
 	def run(self, binary, args=[]):
 		# Command to execute our binary

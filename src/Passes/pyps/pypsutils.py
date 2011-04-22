@@ -69,6 +69,7 @@ def string2file(string, fname):
     f = open(fname, "w")
     f.write(string)
     f.close()
+    return fname
 
 def file2string(fname):
 	with open(fname, "r") as f:
