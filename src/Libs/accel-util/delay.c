@@ -561,12 +561,12 @@ static void delay_communications_init() {
     __delay_communications_patch_properties = delay_communications_interprocedurally_p &&
         ENDP(callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true))); 
     if(__delay_communications_patch_properties)
-        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",false);
+        delay_communications_interprocedurally_p=false;
 }
 static void delay_communications_reset() {
     pips_assert("init called",!graph_undefined_p(dependence_graph));
     if(__delay_communications_patch_properties)
-        set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",true);
+        delay_communications_interprocedurally_p=true;
     dependence_graph=graph_undefined;
 
 }
