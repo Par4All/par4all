@@ -48,7 +48,6 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "pipsdbm.h"
-#include "pipsmake.h"
 #include "preprocessor.h"
 
 #include "effects-generic.h"

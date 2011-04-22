@@ -45,7 +45,6 @@
 
 #include "resources.h"
 #include "properties.h"
-#include "transformations.h"
 
 static expression pattern = expression_undefined;
 static string pattern_module_name = string_undefined;

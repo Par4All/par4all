@@ -50,7 +50,6 @@
 #include "effects-simple.h"
 #include "effects-convex.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
 #include "preprocessor.h"
 #include "accel-util.h"
