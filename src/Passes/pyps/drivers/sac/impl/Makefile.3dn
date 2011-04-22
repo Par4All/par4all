@@ -1,0 +1,2 @@
+CFLAGS+=-m3dnow -march=opteron -O3
+##pipsrules##

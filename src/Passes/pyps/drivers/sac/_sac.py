@@ -168,48 +168,21 @@ class sacbase(object):
 				module.display()
 
 
-	@staticmethod
-	def addintrinsics(fname, header, replacements):
-		finput = fileinput.FileInput([fname], inplace = True)
-		for line in finput:
-			if finput.isfirstline():
-				print header
-			for pattern, repl in replacements:
-				line = re.sub(pattern, repl, line)
-			print line,
-
 class sacsse(sacbase):
 	register_width = 128
 	hfile = "sse.h"
+	makefile = "Makefile.sse"
+	ext = "sse"
 	@staticmethod
 	def sac(module, **kwargs):
 		kwargs["register_width"] = sacsse.register_width
 		sacbase.sac(module, **kwargs)
 
-	@staticmethod
-	def addintrinsics(fname):
-		replacements = [
-				# drop the alignement attribute on the __m128 registers
-				(r"(v4s[if]_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
-				# drop the v4s[if] prefix from the declaration; use the type __m128
-				# instead of float[4]
-				(r"float (v4sf_[^[]+)", r"__m128 \1"),
-				(r"int (v4si_[^[]+)", r"__m128i \1"),
-				(r"double (v2df_[^[]+)", r"__m128d \1"),
-				(r"double (v2di_[^[]+)", r"__m128i \1"),
-				# drop the v4s[if] prefix for the usage
-				(r"v4s[if]_([^,[]+)\[[^]]*\]", r"\1"),
-				(r"v4s[if]_([^ ,[]+)", r"\1"),
-				(r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1"),
-				(r"v2d[if]_([^ ,[]+)", r"\1"),
-				]
-		sacbase.addintrinsics(fname, self.hfile, replacements)
-
-	CFLAGS = "-msse4.2 -march=native -O3"
-
 class sac3dnow(sacbase):
 	register_width = 64
 	hfile = "threednow.h"
+	makefile = "Makefile.3dn"
+	ext = "3dn"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sac3dnow.register_width
@@ -219,53 +192,25 @@ class sac3dnow(sacbase):
 				raise RuntimeError("Can't vectorize double operations with 3DNow!")
 		sacbase.sac(module, *args, **kwargs)
 
-	@staticmethod
-	def addintrinsics(fname):
-		replacements = [
-				# drop the alignement attribute on the __m64 registers
-				(r"(v2sf_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
-				# drop the v2sf prefix from the declaration; use the type __m64
-				# instead of float[2]
-				(r"float (v2sf_[^[]+)", r"__m64 \1"),
-				# drop the v2sf prefix for the usage
-				(r"v2sf_([^,[]+)\[[^]]*\]", r"\1"),
-				(r"v2sf_([^ ,[]+)", r"\1"),
-				]
-		sacbase.addintrinsics(fname, self.hfile, replacements)
-
-	CFLAGS = "-m3dnow -march=opteron -O3"
-
 class sacavx(sacbase):
 	register_width = 256
 	hfile = "avx.h"
+	makefile = "Makefile.avx"
+	ext = "avx"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacavx.register_width
 		sacbase.sac(module, *args, **kwargs)
 
-	@staticmethod
-	def addintrinsics(fname):
-		replacements = [
-			]
-		sacbase.addintrinsics(fname, self.hfile, replacements)
-
-	CFLAGS = "-mavx -O3"
-
 class sacneon(sacbase):
 	register_width = 128
 	hfile = "neon.h"
+	makefile = "Makefile.neon"
+	ext = "neon"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacneon.register_width
 		sacbase.sac(module, *args, **kwargs)
-
-	@staticmethod
-	def addintrinsics(fname):
-		replacements = [
-			]
-		sacbase.addintrinsics(fname, self.hfile, replacements)
-
-	CFLAGS = "-mfpu=neon -mfloat-abi=softfp -O3"
 
 class workspace(pyps.workspace):
 	"""The SAC subsystem, in Python.
@@ -326,50 +271,47 @@ class workspace(pyps.workspace):
 		for fname in files:
 			if not fname.endswith("patterns.c"):
 				pypsutils.addBeginnning(fname, '#include "'+self.patterns_h+'"\n')
+		
 		# Add header to the save rep
 		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
 		shutil.copy(pypsutils.get_runtimefile(self.patterns_h,"sac"),rep)
 		return files
 
-	def get_sac_compiler(self,backendCompiler):
-		"""Calls sacCompiler to return a compiler class using the driver set in the workspace"""
-		return sacCompiler(backendCompiler,self.driver)
 
-def sacCompiler(backendCompiler,driver):
-	"""Returns a compiler class inheriting from the backendCompiler class given in the arguments and using the driver given in the arguments"""
-	class C(backendCompiler):
-		"""compiler class inheriting from backendCompiler and using its own compile method to comply with the sac driver"""
-		def __init__(self,CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-			super(C,self).__init__(CC, " ".join([CFLAGS,driver.CFLAGS]),LDFLAGS,compilemethod,rep,outfile,args,extrafiles)
+	def get_sac_maker(self,Maker):
+		"""Calls sacMaker to return a maker class using the driver set in the workspace"""
+		return sacMaker(Maker,self.driver)
 
-		def compile(self, filename, extraCFLAGS="", verbose=False):
-			filepath = os.path.dirname(filename)
-			filetruename = os.path.basename(filename)
-			#change the includes
-			filestring = pypsutils.file2string(filename)
-			filestring= re.sub('#include "'+simd_h+'"','#include "'+driver.hfile+'"',filestring)
-			newcfile = os.path.join(filepath,"sac_"+filetruename)
-			pypsutils.string2file(filestring,newcfile)
+
+
+def sacMaker(Maker,driver):
+	"""Returns a maker class inheriting from the Maker class given in the arguments and using the driver given in the arguments"""
+	class C(Maker):
+		"""Maker class inheriting from Maker"""
+
+		def get_ext(self):
+			return "."+driver.ext+super(C,self).get_ext()
+
+		def get_makefile(self):
+			return [driver.makefile]+super(C,self).get_makefile()
+
+		def get_makefiledir(self):
+			return ["sac"]+super(C,self).get_makefiledir()
+	
+		def generate(self,path,sources):
+			newsources = []	
+			for fname in sources:
+				#change the includes
+				filestring = pypsutils.file2string(os.path.join(path,fname))
+				filestring= re.sub('#include "'+simd_h+'"','#include "'+driver.hfile+'"',filestring)
+				newcfile = "sac_"+fname
+				pypsutils.string2file(filestring,os.path.join(path,newcfile))
+				newsources.append(newcfile)
 			#create symlink .h file
-			linkpath = os.path.join(filepath,driver.hfile)
+			linkpath = os.path.join(path,driver.hfile)
 			if not os.path.exists(linkpath):
 				os.symlink(pypsutils.get_runtimefile(driver.hfile,"sac"),linkpath)
-			
-			#start the fun
-			outfilename = os.path.splitext(filename)[0]+".o"
-			command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", newcfile, "-o", outfilename]
-			commandline = " ".join(command)
-			if verbose:
-				print >> sys.stderr , "Compiling a workspace file with", commandline
-			p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
-			(out,err) = p.communicate()
-			self.cc_stderr = err
-			ret = p.returncode
-			if ret != 0:
-				print >> sys.stderr, err
-				raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-			self.cc_cmd = commandline
-			return [outfilename]
 
-	return C
+			return super(C,self).generate(path,newsources)
 
+	return C	
