@@ -466,7 +466,10 @@ class workspace(object):
 
 			with open(f,"w") as source:
 				source.writelines(lines)
-		
+			
+			user_headers = self.user_headers()
+			for uh in user_headers:
+				shutils.copy(uh,rep)
 		return saved
 
 	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
