@@ -18,7 +18,7 @@ import inspect
 
 pypips.atinit()
 
-pipsdef_h = pypsutils.get_runtimefile("pipsdef.h","pypsbase")
+pipsdef_h = os.path.basename(pypsutils.get_runtimefile("pipsdef.h","pypsbase"))
 
 class Maker(object):
 	''' Makefile generator '''
@@ -627,8 +627,6 @@ class workspace(object):
 				headersbasename)
 		
 		for f in saved:
-			for uh in user_headers(self):
-				shutil.copy(uh,rep)
 			pypsutils.addBeginnning(f, '#include "'+pipsdef_h+'"\n')
 		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
 		return saved,headers+[os.path.join(rep,pipsdef_h)]
@@ -666,6 +664,9 @@ class workspace(object):
 		p = Popen(cmd, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
 		rc = p.returncode
+		if rc != 0:
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (cmd, rc))
 		return (rc,out,err)
 
 	def activate(self,phase):
