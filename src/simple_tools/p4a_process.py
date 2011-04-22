@@ -1186,7 +1186,7 @@ class p4a_processor(object):
             output_file = os.path.join(self.workspace.dirname(), "Src",
                                        wrapper + ".cl")
             
-            p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
+            # p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
             
             h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
             if os.path.isfile(h_file):
