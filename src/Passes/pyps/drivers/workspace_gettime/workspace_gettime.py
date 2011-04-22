@@ -1,5 +1,6 @@
 from __future__ import with_statement # to cope with python2.5
 import pyps
+import pypsutils
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -7,56 +8,14 @@ from workspace_remote import workspace as workspace_rt
 import random
 import string
 import re
+import tempfile
+import shutil
 
-hfile= r"""#ifndef PYPS_GETTIME_H
-#define PYPS_GETTIME_H
-
-#include <sys/time.h>
-
-void __pyps_bench_start(struct timeval *timestart);
-void __pyps_bench_stop(const char* module, const struct timeval *timestart);
-
-#endif //PYPS_GETTIME_H
-"""
-
-cfile= r"""
-#include <sys/time.h>
-#include <stdio.h>
-
-// Warning: these functions aren't thread-safe !!
-
-static FILE *__pyps_timefile = 0;
-
-void __pyps_bench_start(struct timeval *timestart)
-{
-	gettimeofday(timestart, NULL);
-}
-
-void __pyps_bench_stop(const char* module, const struct timeval *timestart)
-{
-	struct timeval timeend;
-	gettimeofday(&timeend, NULL);
-	
-	long diff = (timeend.tv_sec-timestart->tv_sec)*1000000 + (timeend.tv_usec-timestart->tv_usec);
-	
-	if (__pyps_timefile == 0)
-		__pyps_timefile = fopen("${timefile}", "w");
-	if (__pyps_timefile)
-	{
-		fprintf(__pyps_timefile, "%s: %ld\n", module, diff);
-		fflush(__pyps_timefile);
-	}
-}
-
-void __pyps_bench_close(void)
-{
-	if (__pyps_timefile != 0)
-		fclose(__pyps_timefile);
-}
-atexit(__pyps_bench_close);
-"""
+pyps_gettime_c = "pyps_gettime.c"
+pyps_gettime_h = "pyps_gettime.h"
 
 c_bench_start = r"""
+{
 struct timeval __pyps_time_start;
 __pyps_bench_start(&__pyps_time_start);
 {
@@ -65,6 +24,7 @@ __pyps_bench_start(&__pyps_time_start);
 c_bench_stop = r"""
 }
 __pyps_bench_stop("${mn}", &__pyps_time_start);
+}
 """
 
 def benchmark_module(module, **kwargs):
@@ -76,36 +36,25 @@ pyps.module.benchmark_module=benchmark_module
 
 """ When going to compile, edit all the c files to add the macros
     allowing us to measure the time taken by the program"""
-class workspace:
-	def __init__(self, ws, *args, **kwargs):
-		self.ws = ws
-		self._timefile = self._gen_timefile_name()
-		if "parents" in kwargs and workspace_rt in kwargs["parents"]:
-			self.remote = kwargs.get("remoteExec", None)
-		else:
-			self.remote = None
+class workspace(pyps.workspace):
+	def __init__(self, *sources, **kwargs):
+		self._timefile = tempfile.mktemp()
+		
+		#if workspace_rt in kwargs["parents"]:
+		#	self.remote = kwargs.get("remoteExec", None)
+		#else:
+		self.remote = None
+		kwargs['cppflags'] = kwargs.get('cppflags',"")+' -DPYPS_TIME_FILE=\\"'+self._timefile+'\\"'
+		super(workspace,self).__init__(*sources, **kwargs)
 
-	def _gen_timefile_name(self):
-		bExists = True
-		while bExists:
-			randstr = ''.join(random.choice(string.ascii_uppercase + string.ascii_lowercase + string.digits) for x in range(10))
-			path = os.path.join("/tmp", "pipstime"+randstr)
-			bExists = os.path.islink(path) or os.path.exists(path)
-		return path
+	def save(self, rep=None):
+		
+		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_c,"pyps_gettime"),rep)
+	
+		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_h,"pyps_gettime"),rep)
 
-	def pre_goingToRunWith(self, files, outdir):
-		"""Editing the source files to add the include in them"""
-
-		""" Creating the file containing the functions __pyps_bench_(start|stop) """
-		gettime_c = os.path.join(outdir, "_pyps_gettime.c")
-		with open(gettime_c, 'w') as f:
-			f.write(string.Template(cfile).substitute(timefile=self._timefile))
-
-		""" Creating the file containing the macro """
-		gettime_h = "_pyps_gettime.h"
-		with open(os.path.join(outdir, gettime_h), 'w') as f:
-			f.write(hfile)
-
+		files = super(workspace,self).save(rep)
+		
 		for file in files:
 			with open(file, 'r') as f:
 				read_data = f.read()
@@ -116,20 +65,14 @@ class workspace:
 					lambda m: string.Template(c_bench_stop).substitute(mn=m.group(1)),
 					read_data)
 			#Don't put the include more than once
-			add_include = read_data.find('\n#include "'+gettime_h+'"\n') == -1;
+			add_include = read_data.find('\n#include "'+pyps_gettime_h+'"\n') == -1;
 			with open(file, 'w') as f:
 				if add_include:
-						f.write('/* Header automatically inserted by PYPS*/\n#include "'+gettime_h+'"\n\n')
+						f.write('/* Header automatically inserted by PYPS*/\n#include "'+pyps_gettime_h+'"\n\n')
 				f.write(read_data)
-		files.append(gettime_c)
-
-	def post_compile(self, *args, **kwargs):
-		try:
-			os.unlink("_pyps_gettime.c")
-			os.unlink("_pyps_gettime.h")
-		except OSError:
-			pass
-		outfile = kwargs.get("outfile", self.ws._name)
+		files.append(os.path.join(rep,pyps_gettime_c))
+		
+		return files
 
 	def _get_timefile_and_parse(self):
 		if self.remote != None:
@@ -158,14 +101,12 @@ class workspace:
 		return self._final_runtimes[module.name]
 
 	def benchmark(self, compiler, iterations = 1):
-		compiler.rep = self.ws.dirname() +"Tmp"
-		
-		self.ws.compile_and_run(compiler)
-
+		compiler.rep = self.dirname() +"Tmp"
+		self.compile_and_run(compiler)
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
 			print >>sys.stderr, "Launch execution of %s %s..." % (compiler.outfile," ".join(compiler.args))
-			rc,out,err = self.ws.run_output(compiler)
+			rc,out,err = self.run_output(compiler)
 			print >>sys.stderr, "Program done."
 			if rc != 0:
 				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(str(compiler.cmd), rc, out,err)
