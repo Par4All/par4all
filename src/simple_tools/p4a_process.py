@@ -176,7 +176,7 @@ def process(input):
             # Generate code for a GPU-like accelerator. Note that we can
             # have an OpenMP implementation of it if OpenMP option is set
             # too:
-            processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'],
+            processor.gpuify(apply_phases_kernel = input.apply_phases['akg'],
 					apply_phases_kernel_launcher = input.apply_phases['aklg'],
 					apply_phases_wrapper = input.apply_phases['awg'],
 					apply_phases_after = input.apply_phases['aag'])
@@ -656,7 +656,7 @@ class p4a_processor(object):
 
     def gpuify(self, filter_select = None,
                 filter_exclude = None,
-                apply_phases_kernel_after = [],
+                apply_phases_kernel = [],
                 apply_phases_kernel_launcher = [],
                 apply_phases_wrapper = [],
                 apply_phases_after = []):
@@ -726,8 +726,8 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
-        for ph in apply_phases_kernel_after:
-            # Apply requested phases before parallelization to generated kernels:
+        for ph in apply_phases_kernel:
+            # Apply user requested phases to generated kernels
 			getattr(kernels, ph)(concurrent=True)
 
         if not self.com_optimization :

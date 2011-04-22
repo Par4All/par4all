@@ -89,8 +89,8 @@ def add_own_options(parser):
     proc_group.add_option("--apply-after-parallelization", "--aap", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
 		help = "Add PIPS phases to be applied after parallelization.")
 
-    proc_group.add_option("--apply-kernel-after-gpuify", "--akag", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
-		help = "Add PIPS phases to be applied to kernels after the gpuify execution, for the gpu code generation")
+    proc_group.add_option("--apply-kernel-gpuify", "--akg", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
+		help = "Add PIPS phases to be applied to kernels inside the gpuify execution, for the gpu code generation")
 
     proc_group.add_option("--apply-kernel-launcher-gpuify", "--aklg", action = "append", metavar = "PIPS_PHASE1,PIPS_PHASE2,...", default = [],
 		help = "Add PIPS phases to be applied to kernel launchers inside gpuify, for the gpu code generation")
@@ -506,7 +506,7 @@ def main():
             input.output_dir = options.output_dir
             input.output_prefix = options.output_prefix
             input.output_suffix = options.output_suffix
-            input.apply_phases = dict(abp=[], aap=[], akag=[], aklg=[], awg=[], aag=[], abo=[], aao=[])
+            input.apply_phases = dict(abp=[], aap=[], akg=[], aklg=[], awg=[], aag=[], abo=[], aao=[])
             
             # Pips phases to be applied can be specified by
             # several options or by separating phase names by ","
@@ -515,8 +515,8 @@ def main():
                 input.apply_phases['abp'] += phases.split(",")
             for phases in options.apply_after_parallelization:
                 input.apply_phases['aap'] += phases.split(",")
-            for phases in options.apply_kernel_after_gpuify:
-                input.apply_phases['akag'] += phases.split(",")
+            for phases in options.apply_kernel_gpuify:
+                input.apply_phases['akg'] += phases.split(",")
             for phases in options.apply_kernel_launcher_gpuify:
                 input.apply_phases['aklg'] += phases.split(",")
             for phases in options.apply_wrapper_gpuify:
