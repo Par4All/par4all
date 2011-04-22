@@ -214,17 +214,17 @@ class module(object): # deriving from object is needed for overloaded setter
 	def modify(self,func):
 		"""edits module using return value of function 'func'.
 			'func' takes one argument, the code source of the
-		    module.
+			module.
 		"""
 		if not pypsutils.re_compilation_units.match(self.name):
 			self.print_code()
-            printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-		    code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
-			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._na    me)
+			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 			shutil.copy(printcode_rc,code_rc)
  
-            newcode = func(pypsutils.file2string(code_rc))
-            with open(code_rc, "w") as f:
+			newcode = func(pypsutils.file2string(code_rc))
+			with open(code_rc, "w") as f:
 				f.write(newcode)
 
 
@@ -261,7 +261,7 @@ class module(object): # deriving from object is needed for overloaded setter
 				print sys.stderr > pid.stderr.readlines()
 
 
-    def prepend_code(self, lines):
+	def prepend_code(self, lines):
 		""" Prepend lines to the code of the module.
 			This is a quick and dirty way based on self.run().
 			We should maybe take example on prepend_comment in Libs/to_begin_with/add_stuff_to_module.c !
@@ -495,7 +495,7 @@ class workspace(object):
 			self.sources += [newfname]
 			pypsutils.guardincludes(newfname)
 		else:
-		    self.sources += [fname]
+			self.sources += [fname]
 
 	#SACAGUINET : to recheck
 

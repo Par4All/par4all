@@ -27,9 +27,9 @@ def gen_simd_zeros(code):
 	occurences = re.findall(compiled_pattern,code)
 	if occurences != []: 
 		for item in occurences:
-		code = re.sub(item[3]+"\[[0-"+item[1]+"]\] = (.*);\n","",code)
-		code = re.sub(re.escape(item[0]),"SIMD_ZERO_V"+item[1]+"SF(vec"+item[2]+");",code)
-		return code
+			code = re.sub(item[3]+"\[[0-"+item[1]+"]\] = (.*);\n","",code)
+			code = re.sub(re.escape(item[0]),"SIMD_ZERO_V"+item[1]+"SF(vec"+item[2]+");",code)
+	return code
 
 def autotile(m,verb):
 	''' Function that autotile a module's loops '''
@@ -88,14 +88,13 @@ class sacbase(object):
 		# Here are the transformations made by benchmark.tpips.h, blindy
 		# translated in pyps.
 
-		ws.activate("precondition intra fast")
-		ws.activate("transformes_intra_fast")
+		ws.activate("preconditions_intra")
+		ws.activate("transformers_intra_fast")
 
 		ws.props.loop_unroll_with_prologue = False
 		ws.props.constant_path_effects = False
 		#ws.props.ricedg_statistics_all_arrays = True
 		ws.props.c89_code_generation = True
-		ws.props.delay_communications_interprocedural = False
 
 
 		ws.props.simd_fortran_mem_organisation = False
@@ -118,26 +117,17 @@ class sacbase(object):
 				module.display()
 
 
-		#if cond.get("reduction_detection", False):
-		#	try:
-		#		ws.set_property(KEEP_READ_READ_DEPENDENCE = True)
-		#		while True:
-		#			module.reduction_detection()
-		#			if cond.get("verbose"):
-		#				module.display()
-		#	except:
-		#		pass
+		ws.activate("MUST_REGIONS")
+		ws.activate("REGION_CHAINS")
+		ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
+		ws.activate("PRECONDITIONS_INTER_FULL")
+		ws.activate("TRANSFORMERS_INTER_FULL")
 
-		#	if cond.get("verbose"):
-		#		module.display()
-
-		if cond.get("auto_unroll", True):
-			module.simdizer_auto_unroll(minimize_unroll=False,simple_calculation=True)
-		module.partial_eval()
-		if cond.get("full_unroll", False):
-			for l in module.inner_loops():
-				try:l.full_unroll()
-				except RuntimeError:pass
+		# Perform auto-loop tiling
+		allm=autotile(module,cond.get("verbose"))
+		for module in allm:
+		
+			module.simd_remove_reductions()
 			if cond.get("verbose"):
 				module.display()
 			module.flatten_code(unroll = False)
@@ -365,13 +355,13 @@ class workspace(pyps.workspace):
 			if p.returncode != 0:
 				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 
-			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simdz_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			(simdz_cus_header,serr) = p.communicate()
 			if p.returncode != 0:
 				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 			
 			pypsutils.string2file('#include "'+simd_h+'"\n'+simd_cus_header, simd_h_fname)
-			pypsutils.string2file(simdz_h+"\n"+simdz_cus_header, simdz_h_fname)
+			pypsutils.string2file(simd_h+"\n"+simdz_cus_header, simd_h_fname)
 
 			for fname in files:
 				if not fname.endswith("SIMD.c"):
