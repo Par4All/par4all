@@ -43,7 +43,7 @@ class workspace(pyps.workspace):
 		#if workspace_rt in kwargs["parents"]:
 		#	self.remote = kwargs.get("remoteExec", None)
 		#else:
-		self.remote = None
+		self.remote = kwargs.get("remoteExec", None)
 		kwargs['cppflags'] = kwargs.get('cppflags',"")+' -DPYPS_TIME_FILE=\\"'+self._timefile+'\\"'
 		super(workspace,self).__init__(*sources, **kwargs)
 
