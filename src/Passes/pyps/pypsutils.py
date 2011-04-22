@@ -34,49 +34,6 @@ def guardincludes(fname):
         if is_include:
             print mkguard(guard_end, l),
 
-define_generic_intrinsics = """
-/* Header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
-#ifndef MAX0
-# define MAX0(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-# define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef MOD
-# define MOD(a, b) ((a) % (b))
-#endif
-
-#ifndef DBLE
-# define DBLE(a) ((double)(a))
-#endif
-
-#ifndef INT
-# define INT(a) ((int)(a))
-#endif
-
-#ifdef WITH_TRIGO
-#  include <math.h>
-#  ifndef COS
-#    define COS(a) (cos(a))
-#  endif
-
-#  ifndef SIN
-#    define SIN(a) (sin(a))
-#  endif
-#endif
-/* End header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
-"""
-
-def addGenericIntrinsics(fname):
-    """ Adds #define's for MAX0 and MOD."""
-    addBeginnning(fname, define_generic_intrinsics)
-
 def addBeginnning(fname, text):
     """Adds a line of text at the beginning of fname"""
     fi = fileinput.FileInput([fname], inplace = True)
@@ -97,14 +54,12 @@ def unincludes(fname):
             included = match.group(1)
             inside_include = True
             end_included = mkguard(guard_end, included)
-            print l,
             print included
             continue
         if l == end_included:
             inside_include = False
             included = None
             end_included = None
-            print l,
             continue
         if inside_include:
             continue

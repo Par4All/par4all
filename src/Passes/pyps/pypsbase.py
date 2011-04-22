@@ -18,6 +18,8 @@ import inspect
 
 pypips.atinit()
 
+pipsdef_h = "pipsdef.h"
+
 class backendCompiler(object):
 	''' Parameters for workspace.compile_and_run . Used for convenience. '''
 	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
@@ -481,27 +483,11 @@ class workspace(object):
 				saved.append(f)
 
 		for f in saved:
-			pypsutils.addGenericIntrinsics(f)
-			# fix bad pragma pretty print
-			lines=[]
-			with open(f,"r") as source:
-				pragma=""
-				for line in source:
-					if re.match(r'^#pragma .*',line):
-						pragma=line
-					elif re.match(r'^\w+:',line) and pragma:
-						lines.append(line)
-						lines.append(pragma)
-						pragma=""
-					else:
-						lines.append(line)
-
-			with open(f,"w") as source:
-				source.writelines(lines)
-			
 			user_headers = self.user_headers()
 			for uh in user_headers:
 				shutil.copy(uh,rep)
+			pypsutils.addBeginnning(f, '#include "'+pipsdef_h+'"\n')
+		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
 		return saved
 
 	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
