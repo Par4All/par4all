@@ -673,7 +673,9 @@ class p4a_processor(object):
                             GPU_USE_KERNEL = False,
                             GPU_USE_FORTRAN_WRAPPER = self.fortran,
                             GPU_USE_LAUNCHER = True,
-                            OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
