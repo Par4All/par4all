@@ -123,25 +123,11 @@ class sacbase(object):
 			module.simd_remove_reductions()
 			if cond.get("verbose"):
 				module.display()
-			module.flatten_code(unroll = False)
-			module.partial_eval()
-		if cond.get("verbose"):
-			module.display()
-		module.clean_declarations()
-		if cond.get("suppress_dead_code", True):
-			module.suppress_dead_code()
-		# module.print_dot_dependence_graph()
 
+			for p in ( "__PIPS_SAC_MULADD" , ):
+				module.expression_substitution(pattern=p)
 
-		if cond.get("enhanced_reduction",False):
-			module.simd_remove_reductions(prelude="SIMD_ZERO_V4SF")
-		else:
-			module.simd_remove_reductions()
-		if cond.get("verbose"):
-			module.display()
-
-		for p in ( "__PIPS_SAC_MULADD" , ):
-			module.expression_substitution(pattern=p)
+			module.simd_atomizer()
 			if cond.get("verbose"):
 				module.display()
 
@@ -158,17 +144,19 @@ class sacbase(object):
 
 			module.redundant_load_store_elimination()
 
-		if cond.get("verbose"):
-			module.display()
+			try:
+				module.delay_communications_intra()
+				module.flatten_code(unroll = False)
+			except RuntimeError: pass
 
-		if cond.get("verbose"):
-			module.display()
+			module.redundant_load_store_elimination()
+			module.clean_declarations()
 
-		try:
-			module.print_dot_dependence_graph()
-			module.delay_communications()
-			module.flatten_code(unroll = False)
-		except RuntimeError: pass
+			# In the end, uses the real SIMD_ZERO_* functions if necessary
+			# This would have been "perfect" (as much as perfect this
+			# method is...), but PIPS isn't aware of (a|v)4sf and
+			# other vector types...
+			#module.modify(gen_simd_zeros)
 
 			if cond.get("verbose"):
 				module.display()
@@ -210,7 +198,9 @@ class sacavx(sacbase):
 
 class sacneon(sacbase):
 	register_width = 128
-	hfile = neon_h
+	hfile = "neon.h"
+	makefile = "Makefile.neon"
+	ext = "neon"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacneon.register_width
