@@ -10338,8 +10338,8 @@ is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a
 \PipsPropRef{SCALARIZATION_FORCE_OUT} to true.
 
 Also, it may be useful to use Property
-\PipsPropRef{TRUST_ARRAY_DECLARATIONS} and/or
-\PipsPropRef{TRUST_ARRAY_REFERENCES} to make sure that as many loops
+\PipsPropRef{SEMANTICS_TRUST_ARRAY_DECLARATIONS} and/or
+\PipsPropRef{SEMANTICS_TRUST_ARRAY_REFERENCES} to make sure that as many loops
 as possible are entered. If not, loop bounds may act like guards,
 which prevents PIPS from hoisting a reference out of a loop, although
 this is puzzling for programmers because they expect all loops to be
