@@ -83,10 +83,6 @@ class sacbase(object):
 		if cond.get("verbose"):
 			module.display()
 
-		module.reduction_atomization()
-		if cond.get("verbose"):
-			module.display()
-
 		for p in ( "__PIPS_SAC_MULADD" , ):
 			module.expression_substitution(pattern=p)
 			if cond.get("verbose"):
@@ -110,6 +106,8 @@ class sacbase(object):
 		if cond.get("verbose"):
 			module.display()
 
+
+		#module.common_subexpression_elimination()
 		module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
 		if cond.get("verbose"):
 			module.display()
@@ -326,12 +324,12 @@ class workspace:
 		for fname in files:
 			pypsutils.addBeginnning(fname, patterns_h)
 
-	def simd_compile(self, compiler, *args, **kwargs):
+	def simd_compile(self, ccexecp, *args, **kwargs):
 		"""Compile the workspace with sse.h."""
 		self.use_generic_simd = False
 		CFLAGS = self.driver.CFLAGS
-		compiler.CFLAGS += " " + CFLAGS
-		r = self.ws.compile(compiler, *args, **kwargs)
+		ccexecp.CFLAGS += " " + CFLAGS
+		r = self.ws.compile(ccexecp, *args, **kwargs)
 		self.use_generic_simd = True
 		return r
 

@@ -69,7 +69,7 @@ class gccCompiler(backendCompiler):
 class iccCompiler(backendCompiler):
 	"""icc backend compiler to use icc"""
 	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(gccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+		super(iccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
 
 
 
