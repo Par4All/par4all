@@ -1181,6 +1181,9 @@ class p4a_processor(object):
             wrapper_file = os.path.join(self.workspace.dirname(), "Src",
                                         wrapper + ".c")
 
+            # To skip all the definitions that have been added in the
+            # wrapper file and will be redundant with those in the kernel files
+            # Opencl doesn't like this
             p4a_util.skip_file_up_to_word(wrapper_file,"P4A_accel_kernel_wrapper",2)
 
             #output_file = os.path.join(dest_dir , wrapper + ".p4a.cl")

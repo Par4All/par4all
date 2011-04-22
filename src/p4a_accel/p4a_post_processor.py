@@ -143,16 +143,21 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 
-	# This patch is a temporary solution. It may not cover all possible cases
+    if (p4a_util.opencl_file_p(file_base_name)):
+        content = re.sub("\s*\(\s*(\w*)\s*\*\s*(\w*)\,","(P4A_accel_global_address \\1 *\\2,", content)
+        content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\,",",P4A_accel_global_address \\1 *\\2,", content)
+        content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\)",",P4A_accel_global_address \\1 *\\2)", content)
+
+    # This patch is a temporary solution. It may not cover all possible cases
     # I guess all this should be done by applying partial_eval in PIPS ?
-	# It replaces some array declarations that nvcc do not compile.
-	# For ex.
-	# int n = 100; double a [n];
-	# is replaced by :
-	# double a[100]
+    # It replaces some array declarations that nvcc do not compile.
+    # For ex.
+    # int n = 100; double a [n];
+    # is replaced by :
+    # double a[100]
     fObj = re.findall("\s*(?:int|\,)\s*(\w+)\s*=\s*(\d+)", content)
     for obj in fObj:
-		content = re.sub("\["+obj[0]+"\]","["+obj[1]+"]", content)
+        content = re.sub("\["+obj[0]+"\]","["+obj[1]+"]", content)
 
     # Now the outliner output all the declarations in one line, so put
     # only one function per line for further replacement:

@@ -257,7 +257,11 @@ def prepend_text(o_file,text):
     write_file(o_file,content,True)
 
 def skip_file_up_to_word(o_file,word,fold):
-    """ ... """
+    """ Skip all the file lines until the <fold> occurence of <word>
+    For instance, in the wrapper file, the signature is omitted thus
+    it the file will be skipped until the second occurence of 
+    word="P4A_accel_kernel_wrapper"
+    """
     n = 0
     src = open (o_file, 'r')
     content = ""
