@@ -217,6 +217,20 @@
 		int i;\
 		for (i = 0; i < VWD; i++)\
 			dst[i] = src[i];\
+	}\
+	\
+	void SIMD_LOAD_GENERIC_##A##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TD vec[VWD], ...)\
+	{\
+		int i;\
+		va_list ap;\
+		CTYPE_##TO n;\
+		va_start(ap, vec);\
+		for (i = 0; i < (VW); i++)\
+		{\
+			n = (CTYPE_##TO) va_arg(ap, CTYPEP_##TO);\
+			vec[i] = n;\
+		}\
+		va_end(ap);\
 	}
 
 #define SIMD_STORE_CONV(A,TO,TD) _SIMD_STORE_CONV(A,TO,TD,RWBITS)
@@ -230,7 +244,6 @@
 		for (i = 0; i < VWD; i++)\
 			dst[i] = src[i];\
 	}
-
 
 #define SIMD_LOADS(A)	_DEF_FOR_TYPES(SIMD_LOAD_TYPE,A)
 #define SIMD_STORES(A) 	_DEF_FOR_TYPES(SIMD_STORE_TYPE,A)

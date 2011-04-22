@@ -347,8 +347,12 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
                 }
 
                 basic bas = basic_of_expression(arg);
+                enum basic_utype bas_pattern = get_basic_from_opcode(oc, count);
 
-                if(!basic_overloaded_p(bas) && get_basic_from_opcode(oc, count)!=basic_tag(bas))
+                if(!basic_overloaded_p(bas) && bas_pattern!=basic_tag(bas)
+				&& !(bas_pattern == is_basic_float && basic_int_p(bas))) /* allow the promotion of an int
+											    to a float */
+
                 {
                     bTagDiff = TRUE;
                     free_basic(bas);
@@ -668,6 +672,22 @@ static bool sac_aligned_expression_p(expression e)
     return false;
 }
 
+/* This function change the "load/store type" to XX_TO_XX if a conversion
+ * is needed. It returns true if a changement is made, and the pointer
+ * *lsType must be freed after being used. */
+static bool loadstore_type_conversion_string(int argc, list args, string* lsType, bool isLoad)
+{
+    string lsTypeTmp = local_name(get_simd_vector_type(args));
+    string realVectName = get_vect_name_from_data(argc, CDR(args));
+    if (!same_string_p(realVectName, lsTypeTmp))
+    {
+	    asprintf(lsType,"%s_TO_%s",
+			    isLoad?realVectName:lsTypeTmp,
+			    isLoad?lsTypeTmp:realVectName);
+	    return true;
+    }
+    return false;
+}
 
 static statement make_loadsave_statement(int argc, list args, bool isLoad, list padded)
 {
@@ -889,16 +909,10 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
         case MASKED_CONSEC_REFS:
             {
 
-                string realVectName = get_vect_name_from_data(argc, CDR(args));
-
-                if(!same_string_p(realVectName, lsType))
-                {
-                    asprintf(&lsType,"%s_TO_%s",
-                            isLoad?realVectName:lsType,
-                            isLoad?lsType:realVectName);
+		if (loadstore_type_conversion_string(argc, args, &lsType, isLoad))
                     tofree=lsType;
-                }
-                if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
+                
+		if(get_bool_property("SIMD_FORTRAN_MEM_ORGANISATION"))
                 {
                     current_args = make_expression_list(
                             copy_expression(EXPRESSION(CAR(args))),
@@ -923,7 +937,11 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
             }
 
         case OTHER:
-            current_args=gen_full_copy_list(args);
+	    {
+		if (loadstore_type_conversion_string(argc, args, &lsType, isLoad))
+                    tofree=lsType;
+		current_args=gen_full_copy_list(args);
+	    }
         default:
             break;
     }
