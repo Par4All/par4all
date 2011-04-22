@@ -194,8 +194,8 @@ class module(object): # deriving from object is needed for overloaded setter
 		"""
 		if not pypsutils.re_compilation_units.match(self.name):
 			self.print_code()
-			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			printcode_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("C_SOURCE_FILE",self.name))
 			# Well, this code is wrong because the resource is
 			# invalidated, even if for example we decide later in the
 			# editor not to edit the file...
@@ -217,8 +217,8 @@ class module(object): # deriving from object is needed for overloaded setter
 		"""
 		if not pypsutils.re_compilation_units.match(self.name):
 			self.print_code()
-			printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-			code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			printcode_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("PRINTED_FILE",self.name))
+			code_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("C_SOURCE_FILE",self.name))
 			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 			shutil.copy(printcode_rc,code_rc)
  
@@ -244,8 +244,8 @@ class module(object): # deriving from object is needed for overloaded setter
 		""" [internal] Prepare everything so that the source code of the module can be modified
 		"""
 		self.print_code()
-		printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
-		code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+		printcode_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("PRINTED_FILE",self.name))
+		code_rc=os.path.join(self._ws.dirname,self._ws.cpypips.show("C_SOURCE_FILE",self.name))
 		self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._name)
 		return (code_rc,printcode_rc)
 
@@ -306,7 +306,7 @@ class module(object): # deriving from object is needed for overloaded setter
 		"""get module code as a string"""
 		getattr(self,lower(activate if isinstance(activate, str) else activate.__name__ ))()
 		rcfile=self.show("printed_file")
-		return file(self._ws.dirname()+rcfile).read()
+		return file(self._ws.dirname+rcfile).read()
 
 	code = property(_get_code,_set_code)
 
@@ -542,19 +542,21 @@ class workspace(object):
 	def info(self,topic):
 		return split(self.cpypips.info(topic))
 
+	@property
 	def dirname(self):
 		"""retrieve workspace database directory"""
 		return self._name+".database/"
 
+	@property
 	def tmpdirname(self):
 		"""retrieve workspace database directory"""
-		return self.dirname()+"Tmp/"
+		return self.dirname+"Tmp/"
 
 	def checkpoint(self):
 		"""checkpoints the workspace and returns a workspace id"""
 		self.cpypips.close_workspace(0)
-		chkdir=".%s.chk%d" % (self.dirname()[0:-1], len(self.checkpoints))
-		shutil.copytree(self.dirname(), chkdir)
+		chkdir=".%s.chk%d" % (self.dirname[0:-1], len(self.checkpoints))
+		shutil.copytree(self.dirname, chkdir)
 		self.checkpoints.append(chkdir)
 		self.cpypips.open_workspace(self.name)
 		return chkdir
@@ -562,8 +564,8 @@ class workspace(object):
 	def restore(self,chkdir):
 		self.props.PIPSDBM_RESOURCES_TO_DELETE = "all"
 		self.cpypips.close_workspace(0)
-		shutil.rmtree(self.dirname())
-		shutil.copytree(chkdir, self.dirname())
+		shutil.rmtree(self.dirname)
+		shutil.copytree(chkdir, self.dirname)
 		self.cpypips.open_workspace(self.name)
 
 
@@ -572,15 +574,15 @@ class workspace(object):
 		By default, keep it into the .database/Src PIPS default"""
 		self.cpypips.apply("UNSPLIT","%ALL")
 		if rep == None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
 		if not os.path.exists(rep):
 			os.makedirs(rep)
 		if not os.path.isdir(rep):
 			raise ValueError("'%s' is not a directory" % rep)
 
 		saved=[]
-		for s in os.listdir(self.dirname()+"Src"):
-			f = os.path.join(self.dirname(),"Src",s)
+		for s in os.listdir(self.dirname+"Src"):
+			f = os.path.join(self.dirname,"Src",s)
 			if self.recoverInclude:
 				# Recover includes on all the files.
 				# Guess that nothing is done on Fortran files... :-/
@@ -633,7 +635,7 @@ class workspace(object):
 
 	def make(self, rep=None, maker=Maker()):
 		if rep == None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
 		saved = self.save(rep)[0]
 		return maker.generate(rep,map(os.path.basename,saved),cppflags=self.cppflags,ldflags=self.ldflags)
 
@@ -641,7 +643,9 @@ class workspace(object):
 	def compile(self, rep=None, makefile="Makefile", outfile="a.out", rule="all", **opts):
 		""" uses the fabulous makefile generated to compile the workspace """	
 		if rep == None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
+		if not os.path.isfile(os.path.join(rep,makefile)):
+			raise RuntimeError("no makefile found, you should consider running make(...) before\n")
 		commandline = pypsutils.gen_compile_command(rep,makefile,outfile,rule,**opts)
 
 		if self.verbose:

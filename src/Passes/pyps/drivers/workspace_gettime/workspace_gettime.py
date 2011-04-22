@@ -102,7 +102,7 @@ class workspace(pyps.workspace):
 		return self._final_runtimes[module.name]
 
 	def benchmark(self, makefile="Makefile", iterations = 1, args=[],**opt):
-		rep = self.tmpdirname()
+		rep = self.tmpdirname
 		outfile = self.compile(rep=rep,makefile=makefile,rule="clean",**opt)[0]
 		outfile = self.compile(rep=rep,makefile=makefile,**opt)[0]
 		

@@ -12,7 +12,7 @@ def view_dg(module,format="png"):
 	"""view module's dependence graph in the format specified by ``format''"""
 	module.print_dot_dependence_graph()
 	of=module.name+"."+format
-	dot_cmd = ["dot","-T"+format, module._ws.dirname()+module.show("DOTDG_FILE"),"-o"+of]
+	dot_cmd = ["dot","-T"+format, module._ws.dirname+module.show("DOTDG_FILE"),"-o"+of]
 	if module._ws.verbose:
 		print >> sys.stderr , "Generating image with", dot_cmd
 	p = Popen(dot_cmd, stdout = PIPE, stderr = PIPE)

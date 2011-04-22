@@ -87,7 +87,7 @@ class workspace(pyps.workspace):
 
 	def save(self,rep=None):
 		if rep == None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
 		files,headers = super(workspace,self).save(rep)	
 		#setting otmpfiles for remote
 		otmpfilesrem = []
@@ -129,7 +129,7 @@ class workspace(pyps.workspace):
 
 	def make(self,rep=None, maker=pyps.Maker()):
 		if rep ==None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
 		makefile,others = super(workspace,self).make(rep,maker)
 		#rtmp = os.path.split(rep)[0]
 		self.remoteExec.copy(os.path.join(rep,makefile),rep)
@@ -140,7 +140,7 @@ class workspace(pyps.workspace):
 	def compile(self,rep=None, makefile="Makefile", outfile="a.out", rule="all" ,**opts):
 		""" Uses makefiles on the remote host to compile the workspace"""
 		if rep == None:
-			rep = self.tmpdirname()
+			rep = self.tmpdirname
 		rep = os.path.join(self.remoteExec.working_dir(),rep)
 		commandline = pypsutils.gen_compile_command(rep,makefile,outfile,rule,**opts)
 

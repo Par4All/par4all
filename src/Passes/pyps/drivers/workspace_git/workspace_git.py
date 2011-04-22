@@ -11,7 +11,7 @@ class workspace(pyps.workspace):
 		super(workspace,self).__init__(*args, **kwargs)
 		self.set_phase_log_buffer(True)
 		self._excluded_phases = kwargs.get("excluded_phases", list())
-		self._dirbase = os.path.join(self.dirname(), "Src")
+		self._dirbase = os.path.join(self.dirname, "Src")
 		for p in self.default_excluded_phases:
 			if p not in self._excluded_phases:
 				self._excluded_phases.append(p)
