@@ -49,7 +49,7 @@ class workspace(pyps.workspace):
 
 	def save(self, rep=None):
 		
-		files = super(workspace,self).save(rep)
+		(files,headers) = super(workspace,self).save(rep)
 		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_c,"pyps_gettime"),rep)
 		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_h,"pyps_gettime"),rep)
 
@@ -71,10 +71,10 @@ class workspace(pyps.workspace):
 				f.write(read_data)
 		files.append(os.path.join(rep,pyps_gettime_c))
 		
-		return files
+		return files,headers+[os.path.join(rep,pyps_gettime_h)]
 
 	def _get_timefile_and_parse(self):
-		if self.remote != None:
+		if self.remote:
 			self.remote.copyRemote(self._timefile,self._timefile)
 		with open(self._timefile, "r") as f:
 			rtimes = f.readlines()
@@ -115,7 +115,7 @@ class workspace(pyps.workspace):
 			try:
 				self._get_timefile_and_parse()
 			except IOError:
-				message = "binary: " + outfile + "\n"
+				message = "command: " + outfile + " ".join(args)+"\n"
 				message += "out: " + out + "\n"
 				message += "err: " + err + "\n"
 				message += "return code: " + str(rc) + "\n"

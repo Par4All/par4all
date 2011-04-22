@@ -26,11 +26,13 @@ def benchrun(s,calms=None,calibrate_out=None):
 	def do_benchmark(ws, wcfg, cc_cfg, compile_f, args, n_iter, name_custom):
 		times = {wcfg.module: [0]}
 		benchname = cc_cfg.name() + "+" + name_custom
-		ccp = pyps.backendCompiler(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
+		ccp = ws.get_sac_maker(pyps.Maker)()
+		#ccp = ws.get_sac_compiler(pyps.backendCompiler)(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
 		try:
 			if doBench:
-				times = ws.benchmark(compiler=ccp,iterations=n_iter)
-				benchtimes[benchname] = {'time': times[wcfg.module][0], 'cc_cmd': ccp.cc_cmd, 'cc_stderr': ccp.cc_stderr}
+				makefile = ws.make(maker=ccp)[0]
+				times = ws.benchmark(makefile=makefile,iterations=n_iter,args=args)
+				benchtimes[benchname] = {'time': times[wcfg.module][0], 'makefile': makefile, 'cc_stderr': "ccp.cc_stderr"}
 			else:
 				good,out = ws.check_output(compiler=ccp)
 				if not good:
@@ -305,7 +307,7 @@ if session.default_mode == "benchmark":
 		outfile.write("---------------------\n")
 		for benchname, res in benchtimes.iteritems():
 			outfile.write("Compiler configuration: "+benchname+"\n")
-			outfile.write("CC command: "+res['cc_cmd']+"\n")
+			outfile.write("used makefile: "+res['makefile']+"\n")
 			outfile.write("CC stderr output: "+res['cc_stderr']+"\n\n")
 		outfile.write("\n")
 

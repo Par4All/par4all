@@ -315,7 +315,7 @@ def sacMaker(Maker,driver):
 			if not os.path.exists(hpath):
 				shutil.copy(pypsutils.get_runtimefile(driver.hfile,"sac"),hpath)
 			
-			makefile,others = super(C,self).generate(path,newsources)
+			makefile,others = super(C,self).generate(path,newsources,cppflags,ldflags)
 			return makefile,others+[driver.hfile]
 
 	return C	
