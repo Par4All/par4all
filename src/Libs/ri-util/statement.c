@@ -3458,19 +3458,22 @@ void statement_remove_extensions(statement s) {
  */
 void statement_remove_useless_label(statement s)
 {
-  instruction i = statement_instruction(s);
-  if(!instruction_unstructured_p(i) &&
-        c_module_p(get_current_module_entity())
-     ) {
-    if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
-      /* SG should free_entity ? */
-      statement_label(s)=entity_empty_label();
+    instruction i = statement_instruction(s);
+    if(!instruction_unstructured_p(i) &&
+            c_module_p(get_current_module_entity())
+      ) {
+        // under pyps, do not remove loop label like this */
+        if(!(get_bool_property("PYPS") && instruction_loop_p(i))) {
+            if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
+                /* SG should free_entity ? */
+                statement_label(s)=entity_empty_label();
 
-      /* OK but guarded by previous test */
-      if( instruction_loop_p(i) )
-	loop_label(instruction_loop(i))=entity_empty_label();
-      if( instruction_whileloop_p(i) )
-	whileloop_label(instruction_whileloop(i))=entity_empty_label();
+                /* OK but guarded by previous test */
+                if( instruction_loop_p(i) )
+                    loop_label(instruction_loop(i))=entity_empty_label();
+                if( instruction_whileloop_p(i) )
+                    whileloop_label(instruction_whileloop(i))=entity_empty_label();
+            }
+        }
     }
-  }
 }
