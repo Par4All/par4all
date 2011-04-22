@@ -30,6 +30,7 @@ _pypips_la_CPPFLAGS = \
 	-I../../Libs/misc\
 	-I../../Libs/newgen\
 	-I../../Libs/ri-util\
+	-I../../Libs/text-util\
 	-I../../Libs/top-level\
 	-I../../Libs/pipsmake\
 	-I../../Libs/pipsdbm\
