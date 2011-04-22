@@ -751,6 +751,11 @@ controls whether \Tpips{} should behave as an extended shell and
 consider any input command that is not a \Tpips{} command a Shell
 command.
 
+This property is automatically set to TRUE when pyps is running.
+\begin{PipsProp}{PYPS}
+PYPS FALSE
+\end{PipsProp}
+
 
 
 
@@ -5721,6 +5726,18 @@ simdizer_auto_unroll        > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+\begin{PipsPass}{simdizer_auto_tile}
+Tries to tile the code to make the simdizing process more efficient.
+\end{PipsPass}
+
+Sensible to \PipsPropRef{LOOP_LABEL} to select the loop nest to tile.
+
+\begin{PipsMake}
+simdizer_auto_tile        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.cumulated_effects
+        < MODULE.code
+\end{PipsMake}
 
 \begin{PipsPass}{simd_remove_reductions}
 This phase tries to pre-process reductions, so that they can be
@@ -8031,6 +8048,9 @@ SYMBOLIC_TILING_VECTOR ""
 
 \begin{PipsProp}{SYMBOLIC_TILING_FORCE}
 SYMBOLIC_TILING_FORCE FALSE
+\end{PipsProp}
+\begin{PipsProp}{SYMBOLIC_TILING_PERFECT_TILES}
+SYMBOLIC_TILING_PERFECT_TILES FALSE
 \end{PipsProp}
 
 \subsection{Loop Normalize}

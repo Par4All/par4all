@@ -38,12 +38,42 @@ class backendCompiler(object):
 		self.extrafiles = extrafiles
 		self.cmd = None
 		self.cc_stderr = None
+	
+	def compile(self, filename, extraCFLAGS="",verbose=False):
+		"""compiles one given .c file. Called by the workspace method compile"""
+		outfilename = os.path.basename(os.path.splitext(filename)[0]+".o")
+		command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", filename, "-o", outfilename]
+		commandline = " ".join(command)
+		if verbose:
+			print >> sys.stderr , "Compiling a workspace file with", commandline
+		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		self.cc_stderr = err
+		ret = p.returncode
+		if ret != 0:
+			os.remove(filename)
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+		self.cc_cmd = commandline
+		return [outfilename]
 
-	def link_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="link")
-
-	def compile_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="compile")
+	def link(self,files,verbose=False):
+		"""links a given list of .o files. Called by the workspace method compile""" 
+		command = [self.CC]+files+[self.LDFLAGS]
+		if self.outfile:
+			command+=["-o", self.outfile]
+		commandline = " ".join(command)
+		if verbose:
+			print >> sys.stderr , "Linking the workspace with", commandline
+		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		self.cc_stderr = err
+		ret = p.returncode
+		if ret != 0:
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+		self.cc_cmd = commandline
+		return self.outfile
 
 	def user_headers_cmd(self, files, extraCFLAGS=""):
 		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
@@ -353,6 +383,8 @@ class workspace(object):
 		pypsutils.build_module_list(self)
 		# Get the workspace name, if any:
 		self._name = self.info("workspace")
+		# yes we are running pyps
+		self.props.pyps=True
 		if len(self._name) > 0:
 			# The name is indeed the first element of the returned list:
 			self._name = self._name[0]
@@ -483,9 +515,7 @@ class workspace(object):
 		rc = p.returncode
 		if rc != 0:
 			raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
-
-		print command
-		print out
+		
 		# Parse the results :
 		# each line is split thanks to shlex.split, and we only keep the header files
 		lines = map(shlex.split,out.split('\n'))
