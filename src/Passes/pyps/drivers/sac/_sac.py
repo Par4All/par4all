@@ -17,6 +17,9 @@ avx_h = "avx.h"
 neon_h = "neon.h"
 patterns_c = "patterns.c"
 patterns_h = "patterns.h"
+simd-eq_c = "SIMD-eqs.c"
+patterns-eq_def = "patterns-eq.def"
+
 
 class sacbase(object):
 	@staticmethod
@@ -301,7 +304,7 @@ class workspace(pyps.workspace):
 		pyps.module.sac=self.driver.sac
 		# Add -DRWBITS=self.driver.register_width to the cppflags of the workspace
 		kwargs['cppflags'] = kwargs.get('cppflags',"")+" -DRWBITS=%d " % (self.driver.register_width)
-		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), *sources, **kwargs)
+		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), pypsutils.get_runtimefile(simd-eq_c,"sac"), pypsutils.get_runtimefile(patterns-eq_def,"sac"), *sources, **kwargs)
 
 	def post_init(self, sources, **args):
 		"""Clean the temporary directory used for holding 'SIMD.c' and 'patterns.c'."""
@@ -329,7 +332,9 @@ class workspace(pyps.workspace):
 			# thanks to gcc -E and cproto (ugly, need something
 			# better)
 			simd_h_fname = os.path.abspath(rep + "/SIMD.h")
+			simdz_h_fname = os.path.abspath(rep + "/SIMD-eqs.h")
 			simd_c_fname = os.path.abspath(rep + "/SIMD.c")
+			simdz_c_fname = os.path.abspath(rep + "/SIMD-eqs.c")
 			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			(simd_cus_header,serr) = p.communicate()
 			if p.returncode != 0:
