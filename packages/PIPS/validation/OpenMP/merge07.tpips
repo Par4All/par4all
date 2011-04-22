@@ -18,6 +18,9 @@ create merge07 merge07.c
 #setenv OPMIFY_CODE_DEBUG_LEVEL 9
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 setproperty PRAGMA_TYPE "expr"
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 setproperty OMP_MERGE_POLICY "inner"

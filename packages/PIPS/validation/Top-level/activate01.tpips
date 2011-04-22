@@ -4,6 +4,9 @@ setproperty ACTIVE_PHASES "PRINT_PARALLELIZEDOMP_CODE TRANSFORMERS_INTER_FULL IN
 
 create activate01 activate01.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 display PARALLELPRINTED_FILE
 close
 # shell cat activate01.database/Warnings

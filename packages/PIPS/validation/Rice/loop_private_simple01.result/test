@@ -1,0 +1,30 @@
+
+Code for "main" after privatization
+
+int main()
+{
+   float a[10];
+   int i;
+
+   for(i = 0; i <= 9; i += 1) {
+      float z = 0.0;
+      z = 0.0;
+      a[i] = z;
+   }
+   return 0;
+}
+
+Parallel code for "main"
+
+int main()
+{
+   float a[10];
+   int i;
+
+   forall(i = 0; i <= 9; i += 1) {
+      float z = 0.0;
+      z = 0.0;
+      a[i] = z;
+   }
+   return 0;
+}

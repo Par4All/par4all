@@ -24,13 +24,13 @@ int main()
    int i, j;                                                            /*0003*/
    
    // A do loop ! Should be parallel
-   for(i = 2; i <= 50; i += 1)
+   for(i = 2; i <= 50; i += 1)                                          /*0006*/
       a[i] = 2;                                                         /*0007*/
    
    /* The following code should not prevent the previous loop to be
         parallel: */
    // Should be parallel but for->do here not implemented yet...
-   for(j = 60; j >= 11; j += -3)
+   for(j = 60; j >= 11; j += -3)                                        /*0012*/
       a[j] = 2;                                                         /*0013*/
 
    for (i = 2;i<=50;i = 2*i)                                            /*0015*/
@@ -44,14 +44,14 @@ int main()
    int i, j;                                                            /*0003*/
    
    // A do loop ! Should be parallel
-   for(i = 2; i <= 50; i += 1)
+   for(i = 2; i <= 50; i += 1)                                          /*0006*/
       a[i] = 2;                                                         /*0007*/
    
    /* The following code should not prevent the previous loop to be
         parallel: */
    // Should be parallel but for->do here not implemented yet...
 #pragma omp parallel for 
-   for(j = 60; j >= 11; j += -3)
+   for(j = 60; j >= 11; j += -3)                                        /*0012*/
       a[j] = 2;                                                         /*0013*/
 
    for (i = 2;i<=50;i = 2*i)                                            /*0015*/

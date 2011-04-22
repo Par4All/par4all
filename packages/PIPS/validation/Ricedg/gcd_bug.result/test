@@ -7,15 +7,15 @@ Privatize scalar variables
 
  **************** Effective Dependence Graph ****************
 
-	18 --> -1 with conflicts
+	18 --> 16 with conflicts
 		from <Matrix[i][j]-W-EXACT> to <j-W-EXACT> at levels  1
-	18 --> -1 with conflicts
+	18 --> 16 with conflicts
 		from <Matrix[i]-R-EXACT> to <j-W-EXACT> at levels  1
 	18 --> 15 with conflicts
 		from <Matrix[i][j]-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
 	18 --> 15 with conflicts
 		from <Matrix[i]-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
-	-1 --> 15 with conflicts
+	16 --> 15 with conflicts
 		from <j-W-EXACT> to <Matrix[i]-W-EXACT> at levels  1
 	15 --> 18 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <Matrix[i][j]-W-EXACT> at levels  1 2
@@ -25,7 +25,7 @@ Privatize scalar variables
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <Matrix[i]-R-EXACT> at levels  1 2
 	15 --> 18 with conflicts
 		from <Matrix[i]-W-EXACT> to <Matrix[i]-R-EXACT> at levels  2
-	15 --> -1 with conflicts
+	15 --> 16 with conflicts
 		from <Matrix[i]-W-EXACT> to <j-W-EXACT> at levels  1 2
 	15 --> 15 with conflicts
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
@@ -47,10 +47,10 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1) {
+   for(i = 0; i <= N-1; i += 1) {                                       /*0013*/
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for 
-      for(j = 0; j <= Z-1; j += 1)
+      for(j = 0; j <= Z-1; j += 1)                                      /*0016*/
          Matrix[i][j] = i*j;                                            /*0018*/
    }
    return 0;                                                            /*0021*/
@@ -63,10 +63,10 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1) {
+   for(i = 0; i <= N-1; i += 1) {                                       /*0013*/
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for 
-      for(j = 0; j <= Z-1; j += 1)
+      for(j = 0; j <= Z-1; j += 1)                                      /*0016*/
          Matrix[i][j] = i*j;                                            /*0018*/
    }
    return 0;                                                            /*0021*/
@@ -79,10 +79,10 @@ int main(void)
    int i, j;                                                            /*0010*/
 
    Matrix = (int **) malloc(N*sizeof(int *));                           /*0012*/
-   for(i = 0; i <= N-1; i += 1) {
+   for(i = 0; i <= N-1; i += 1) {                                       /*0013*/
       Matrix[i] = (int *) malloc(Z*sizeof(int));                        /*0015*/
 #pragma omp parallel for
-      for(j = 0; j <= Z-1; j += 1)
+      for(j = 0; j <= Z-1; j += 1)                                      /*0016*/
          Matrix[i][j] = i*j;                                            /*0018*/
    }
    return 0;                                                            /*0021*/

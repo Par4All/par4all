@@ -2,6 +2,9 @@ delete nest04
 
 setenv ABORT_ON_USER_ERROR TRUE
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 create nest04 nest04.c
 
 apply INTERNALIZE_PARALLEL_CODE

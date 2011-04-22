@@ -119,7 +119,7 @@ static bool whole_loop_parallelize(loop l)
     reference r = effect_any_reference(reg);
     int d = gen_length(reference_indices(r));
 
-    if (region_write_p(reg) && !(thread_safe_p && thread_safe_variable_p(e))) {
+    if (region_write_p(reg) && store_effect_p(reg) && !(thread_safe_p && thread_safe_variable_p(e))) {
       conflict conf = conflict_undefined;
 
       /* Add a write-write conflict to the list: */
@@ -139,7 +139,7 @@ static bool whole_loop_parallelize(loop l)
 	   access paths.
 	*/
 
-	if (same_entity_p(e,region_entity(reg2)) && region_read_p(reg2) && d<=d2) {
+	if (same_entity_p(e,region_entity(reg2)) && store_effect_p(reg2) && region_read_p(reg2) && d<=d2) {
 	  /* Add a write-read conflict */
 	  conf = make_conflict(reg, reg2, cone_undefined);
 	  l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));

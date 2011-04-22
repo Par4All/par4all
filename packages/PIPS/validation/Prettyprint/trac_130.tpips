@@ -6,14 +6,11 @@ create trac_130 trac_130.c
 
 #setproperty CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS TRUE
 
-#SELECT C LANGUAGE
-#activate C_PARSER
-#setproperty PRETTYPRINT_LANGUAGE "C"
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
+
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
-#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 
 echo
 echo Proper effects for "main"

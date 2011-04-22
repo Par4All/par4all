@@ -586,8 +586,8 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                         /* try hard to reproduce statement content */
                         statement sl = make_statement(
                                 statement_label(parent),
-                                STATEMENT_ORDERING_UNDEFINED,
                                 statement_number(parent),
+                                STATEMENT_ORDERING_UNDEFINED,
                                 statement_comments(parent),
                                 make_instruction_loop(l),
                                 statement_declarations(parent),
