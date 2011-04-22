@@ -652,18 +652,18 @@ use_def_elimination_on_a_statement(statement s)
 bool dead_code_elimination_on_module(char * module_name)
 {
    statement module_statement;
-
+   entity module = module_name_to_entity(module_name);
 
    /*
     * For C code, this pass requires that effects are calculated with property
-    * MEMORY_EFFECTS_ONLY set to FALSE because we need that the DG includes arcs
-    * for declarations as these latter are separate statements now.
+    * MEMORY_EFFECTS_ONLY set to FALSE because we need that the Chains includes
+    * arcs for declarations as these latter are separate statements now.
     */
    bool memory_effects_only_p = get_bool_property("MEMORY_EFFECTS_ONLY");
-   if(memory_effects_only_p) {
-     pips_user_warning("Dead_code_elimination should not be run with "
-                       "MEMORY_EFFECTS_ONLY set to TRUE ! Aborting...\n");
-     return FALSE; // Abort pass
+   if(c_module_p(module) && memory_effects_only_p) {
+     pips_user_warning("Rice parallelization should be run with property "
+                       "MEMORY_EFFECTS_ONLY set to FALSE.\n");
+     return FALSE; // return to pass manager with a failure code
    }
 
    /* Get the true ressource, not a copy. */
@@ -693,7 +693,7 @@ bool dead_code_elimination_on_module(char * module_name)
 
 
    set_current_module_statement(module_statement);
-   set_current_module_entity(module_name_to_entity(module_name));
+   set_current_module_entity(module);
 
    set_ordering_to_statement(module_statement);
 
