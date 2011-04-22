@@ -18,9 +18,17 @@ class workspace(pyps.workspace):
 
 		self._gitdir = os.path.join(self._dirbase,".git")
 		self._g = git.repo.Repo.create(self._gitdir)
+
+		self.cpypips.apply("UNSPLIT","%ALL")
+		self._git_do_commit("Initial workspace")
 	
 	def _get_module_file(self, module):
 		return os.path.join(self._dirbase, module.name+".c")
+
+	def _git_do_commit(self,msg):
+		# We should do something better, but I can't understand how this version of python-git really works...
+		os.system("git --git-dir=%s --work-tree=%s add *.c" % (self._gitdir,self._dirbase))
+		os.system("git --git-dir=%s --work-tree=%s commit -m \"%s\"" % (self._gitdir, self._dirbase, msg))
 
 	def pre_phase(self, phase, module):
 		super(workspace,self).pre_phase(phase,module)
@@ -36,5 +44,4 @@ class workspace(pyps.workspace):
 			source = self._get_module_file(module)
 			commit_msg = "Phase %s on module %s.\n%s" % (phase,module.name,log)
 			self.cpypips.apply("UNSPLIT","%ALL")
-			os.system("git --git-dir=%s --work-tree=%s add *.c" % (self._gitdir,self._dirbase))
-			os.system("git --git-dir=%s --work-tree=%s commit -m \"%s\"" % (self._gitdir, self._dirbase, commit_msg))
+			self._git_do_commit(commit_msg)

@@ -3,8 +3,9 @@
 
 int main()
 {
+	int i=5;
 	printf("Hi !\n");
-	printf("%d\n", TESTDEF);
+	printf("%d\n", i);
 	
 	return 0;
 }
