@@ -311,51 +311,24 @@ static statement generate_prelude(reductionInfo ri)
             initval = bool_to_expression(FALSE);
             break;
     }
-    string sprelude = get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE");
-    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))|| reductionInfo_count(ri)==1) {
-        // For each reductionInfo_vector reference, make an initialization
-        // assign statement and add it to the prelude
-        // do nothing if no init val exist
-        for(i=0; i<reductionInfo_count(ri); i++)
-        {
-            instruction is;
 
-            is = make_assign_instruction(
-                    reference_to_expression(make_reference(
-                            reductionInfo_vector(ri), CONS(EXPRESSION, 
-                                int_to_expression(reductionInfo_count(ri)-i-1),
-                                NIL))),
-                    copy_expression(initval));
-
-            prelude = CONS(STATEMENT, 
-                    instruction_to_statement(is),
-                    prelude);
-        }
-    }
-    else{
-        entity eprelude = FindEntity(TOP_LEVEL_MODULE_NAME,sprelude);
-        if(entity_undefined_p(eprelude)) {
-            pips_user_warning("%s not found, using a dummy one",sprelude);
-            eprelude=make_empty_subroutine(sprelude,copy_language(module_language(get_current_module_entity())));
-        }
-        prelude = make_statement_list(
-                call_to_statement(
-                    make_call(
-                        eprelude,
-                        make_expression_list(
-                            MakeUnaryCall(
-                                entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                                reference_to_expression(
-                                    make_reference(
-                                        reductionInfo_vector(ri),
-                                        CONS(EXPRESSION,int_to_expression(0),NIL)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
+    // For each reductionInfo_vector reference, make an initialization
+    // assign statement and add it to the prelude
+    // do nothing if no init val exist
+    for(i=0; i<reductionInfo_count(ri); i++)
+    {
+        instruction is;
+    
+        is = make_assign_instruction(
+    	    reference_to_expression(make_reference(
+    		    reductionInfo_vector(ri), CONS(EXPRESSION, 
+    			int_to_expression(reductionInfo_count(ri)-i-1),
+    			NIL))),
+    	    copy_expression(initval));
+    
+        prelude = CONS(STATEMENT, 
+    	    instruction_to_statement(is),
+    	    prelude);
     }
 
     free_expression(initval);

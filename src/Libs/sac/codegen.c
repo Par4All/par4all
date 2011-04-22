@@ -318,7 +318,7 @@ opcode generate_opcode(string name, list types, float cost)
 
 /* Computes the optimal opcode for simdizing 'argc' statements of the
  * 'kind' operation, applied to the 'args' arguments
- * it is a greedy matchinbg, so it supposes the list of args is in the best order for us
+ * it is a greedy matching, so it supposes the list of args is in the best order for us
  */
 static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 {
@@ -1305,7 +1305,6 @@ static statement generate_save_statement(simdstatement si)
 
 list generate_simd_code(simdstatement ssi, float * simdCost)
 {
-    list out = NIL;
     gSimdCost = 0;
 
     pips_debug(3,"generate_simd_code 1\n");
@@ -1313,23 +1312,55 @@ list generate_simd_code(simdstatement ssi, float * simdCost)
     /* this is the classical generation process:
      * several load, an exec and a store
      */
-    /* SIMD statement (will generate more than one statement) */
-    int i;
-    
     //First, the load statement(s)
-    for(i = 0; i < simdstatement_nbArgs(ssi)-1; i++)
+    list loads=NIL;
+    for(int i = 0; i < simdstatement_nbArgs(ssi)-1; i++)
     {
         statement s = generate_load_statement(ssi, i);
         if (! statement_undefined_p(s))
-            out = CONS(STATEMENT, s, out);
+            loads = CONS(STATEMENT, s, loads);
     }
 
     //Then, the exec statement
-    out=CONS(STATEMENT, generate_exec_statement(ssi), out);
+    statement exec= generate_exec_statement(ssi);
 
     //Finally, the save statement (always generated. It is up to 
     //latter phases (USE-DEF elimination....) to remove it, if needed
-    out= CONS(STATEMENT, generate_save_statement(ssi), out);
+    statement save = generate_save_statement(ssi);
+
+    list out = NIL;
+    if(get_bool_property("SIMDIZER_GENERATE_DATA_TRANSFERS")) {
+        out=CONS(STATEMENT,save,CONS(STATEMENT,exec,loads));
+    }
+    else {
+        /* we'll modify the exec statement using our special device, the pips scalpel */
+        call cexec = statement_call(exec); string sexec=entity_name(call_function(cexec));
+        call csave = statement_call(save); string sname=entity_name(call_function(csave));
+        /* first the name: append an identifier */
+        string exec_name;
+        asprintf(&exec_name,"%s_%s",global_name_to_user_name(sexec),sname+strlen(sname)-4);
+        call_function(cexec) = module_name_to_runtime_entity(exec_name);
+        /* then replace each argument by the vector content */
+        list nargs = NIL;
+        list proxy = CONS(STATEMENT,save,loads);
+        FOREACH(EXPRESSION,exp,call_arguments(cexec)) {
+            /* is it from the load or the store ? can't tell yet */
+            reference vec = expression_reference(exp);
+            bool fail = false;
+            FOREACH(STATEMENT,sp, proxy) {
+                call c = statement_call(sp);
+                reference lref = expression_reference(EXPRESSION(CAR(call_arguments(c))));
+                if(reference_equal_p(vec,lref)) {
+                    fail=false;
+                    nargs=CONS(EXPRESSION,EXPRESSION(CAR(CDR(call_arguments(c)))),nargs);
+                    break;
+                }
+            }
+            if(fail) pips_internal_error("pips should not fail");
+        }
+        call_arguments(cexec)=gen_nreverse(nargs);
+        out=CONS(STATEMENT,exec,NIL);
+    }
 
     *simdCost += gSimdCost;
     pips_debug(3,"generate_simd_code 2 that costs %lf\n",gSimdCost);

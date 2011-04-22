@@ -5950,6 +5950,10 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
 
+Skip generation of load and stores, using generic functions instead.
+\begin{PipsProp}{SIMDIZER_GENERATE_DATA_TRANSFERS}
+SIMDIZER_GENERATE_DATA_TRANSFERS TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{simd_memory_packing}
 This phase is to be called after simdization of affectation operator.
