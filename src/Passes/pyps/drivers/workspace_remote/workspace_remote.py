@@ -76,6 +76,65 @@ class remoteExec:
 	def host(self): return self._host
 
 
+class remoteCompiler(pyps.backendCompiler):
+	def __init__(self,CC="cc",CFLAGS="",LDFLAGS="",compilemethod=None,rep=None,outfile="", args=[], remoteExec=None):
+		self.remoteExec = remoteExec
+		
+		#setting rep for remote and cleaning it
+		self.rdir = os.path.join(self.remoteExec.working_dir(), compiler.rep)
+		self.remoteExec.do("rm -rf \"%s\"" % rdir)
+		self.remoteExec.do("mkdir -p \"%s\"" % rdir)
+				
+		super(remoteCompiler,self).__init__(CC, CFLAGS,LDFLAGS,compilemethod,rep,outfile,args)
+
+	def compile(self, filename, extraCFLAGS="", verbose=False)
+		"""compiles one given .c file. Called by the workspace method compile"""
+		outfilename = os.path.basename(os.path.splitext(filename)[0]+".o")
+		outfilename = os.path.join(self.remoteExec.working_dir(),outfile)
+		command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", filename, "-o", outfilename]
+		commandline = " ".join(command)
+		if verbose:
+			print >> sys.stderr, "Copying file %s to remote host %s..." % filename % self.remoteExec.host()
+		self.remoteExec.copy(f, rdir)
+
+		if verbose:
+			print >> sys.stderr , "Compiling a workspace file with", commandline
+		
+		p = self.remoteExec.doPopen(command)
+		(out,err) = p.communicate()
+		compiler.cc_stderr = err
+		ret = p.returncode
+		if ret != 0:
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+
+		self.cc_cmd = commandline
+		return [outfilename]
+
+	def link(self,files, verbose=False)
+		"""links a given list of .o files. Called by the workspace method compile"""
+		command = [self.CC]+files+[self.LDFLAGS]
+		if self.outfile:
+			command+=["-o", self.outfile]
+		commandline = " ".join(command)
+		if verbose:
+			print >> sys.stderr , "Linking the workspace with", commandline
+		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		self.cc_stderr = err
+		ret = p.returncode
+		if ret != 0:
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+		self.cc_cmd = commandline
+		return self.outfile
+
+
+
+
+
+
+
 class workspace:
 	def __init__(self, ws, *args, **kwargs):
 		self.ws = ws
@@ -85,24 +144,27 @@ class workspace:
 	def compile(self,compiler,*args,**kwargs):
 		"""try to compile current workspace with compiler `CC', compilation flags `CFLAGS', linker flags `LDFLAGS' in directory `rep' as binary `outfile' and adding sources from `extrafiles'"""
 
+		#setting flags in workspace
 		CC = compiler.CC
 		CFLAGS = compiler.CFLAGS
 		LDFLAGS = compiler.LDFLAGS
 		link = kwargs.get("link", True)
 		outfile = compiler.outfile
-		extrafiles = compiler.extrafiles
-
+		#setting rep in workspace
 		if compiler.rep==None:
 			compiler.rep=self.ws.tmpdirname()+"d.out"
-
-		otmpfiles=self.ws.save(rep=compiler.rep)+extrafiles
+		
+		#setting otmpfiles in workspace
+		otmpfiles=self.ws.save(rep=compiler.rep)
+		#setting otmpfiles for remote
 		otmpfilesrem = []
 		
-
+		#setting rep for remote and cleaning it
 		rdir = os.path.join(self.remoteExec.working_dir(), compiler.rep)
 		self.remoteExec.do("rm -rf \"%s\"" % rdir)
 		self.remoteExec.do("mkdir -p \"%s\"" % rdir)
-
+	
+		#copy all headers in remote
 		print >>sys.stderr, "Copying user headers to remote host %s..." % self.remoteExec.host()
 		user_headers = self.ws.user_headers()
 		for uh in user_headers:
@@ -110,7 +172,8 @@ class workspace:
 			#rrep_inc = os.path.join(rdir, os.path.dirname(uh))
 			#self.remoteExec.do("mkdir -p \"%s\"" % rrep_inc)
 			self.remoteExec.copy(uh, rdir)
-
+	
+		#setting command 
 		command=[CC, self.ws.cppflags, CFLAGS]
 		if link:
 			if not outfile:
@@ -124,7 +187,6 @@ class workspace:
 			command+=[LDFLAGS]
 			command+=["-o",outfile]
 		else:
-			self.ws.goingToRunWith(otmpfiles, compiler.rep)
 			for f in otmpfiles:
 				dst = os.path.join(rdir, f[len(compiler.rep)+1:])
 				otmpfilesrem.append(dst)
@@ -135,9 +197,6 @@ class workspace:
 		# Copy files to remote host
 		if self.ws.verbose:
 			print >> sys.stderr, "Copying files to remote host %s..." % self.remoteExec.host()
-		for f in extrafiles:
-			self.remoteExec.copy(f, rdir)
-
 		rtmp = os.path.split(rdir)[0]
 		print >>sys.stderr, "Copy recursive %s to remote %s..." % (compiler.rep, rtmp)
 		self.remoteExec.copyRec(compiler.rep, rtmp)
