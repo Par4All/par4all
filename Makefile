@@ -176,7 +176,7 @@ SUMMARY: $(HEAD) parallel-validate future-list bugs-list
 	  unset LANG LC_COLLATE ; \
 	  sort -k 2 $(RESULTS) ; \
 	  echo ; \
-	  status=$$(egrep '^(SUCCESS|FAILED) ' $@) ; \
+	  status=$$(egrep '^(SUCCESS|ISSUES) ' $@) ; \
 	  echo $(VNAME) "$(DIRNAME) $$status" ; \
 	} >> $@
 
