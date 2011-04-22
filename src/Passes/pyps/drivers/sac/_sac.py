@@ -336,6 +336,18 @@ class workspace:
 	def post_memalign(self, *args, **kwargs):
 		self.driver.post_memalign(self, *args, **kwargs)
 
+	def get_sacCompiler(self,backendCompiler):
+		return sacCompiler(backendCompiler,self.driver)
+
+def sacCompiler(backendCompiler,driver):
+	class C(backendCompiler):
+		def __init__(self,CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
+			super(C,self).__init__()
+			self.CFLAGS += " "+driver.CFLAGS
+	
+	return C
+
+
 simd_c = """
 %%include impl/SIMD.c%%
 """
