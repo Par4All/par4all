@@ -190,7 +190,8 @@ void loop_normalize_statement(statement s) {
     /* Replace all references to index in loop_body(l) by new_index_exp */
     replace_entity_by_expression(loop_body(l),index,new_index_exp);
 
-    if (!get_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT")) {
+    if (!entity_in_list_p(index,loop_locals(l)) && //SG: no side effect if index is private ...
+            !get_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT")) {
       /* We want to compute the real side effect of the loop on its index:
       its final value after the loop. */
       expression nub3 = copy_expression(nub);

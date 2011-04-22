@@ -965,15 +965,18 @@ void full_loop_unroll(statement loop_statement)
     }
 
     /* Generate a statement to reinitialize old index */
-    rhs_expr = int_to_expression(iter);
-    expr = make_ref_expr(ind, NIL);
-    stmt = make_assign_statement(expr, rhs_expr);
-    ifdebug(9) {
-      print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
-	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
+    /* SG: only needed if index is not private */
+    if(entity_in_list_p(ind,loop_locals(il))) {
+        rhs_expr = int_to_expression(iter);
+        expr = make_ref_expr(ind, NIL);
+        stmt = make_assign_statement(expr, rhs_expr);
+        ifdebug(9) {
+            print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
+            pips_assert("full_loop_unroll", statement_consistent_p(stmt));
+        }
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT, stmt, NIL ));
     }
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));
 
 
     /* Free old instruction and replace with block */
