@@ -8,7 +8,7 @@ Ronan.Keryell@hpc-project.com
 """
 
 #import string, re, sys, os, types, optparse
-
+import p4a_util
 import sys, re, os, optparse, subprocess
 
 verbose = False
@@ -76,7 +76,7 @@ def p4a_launcher_clean_up(match_object):
 
     # A comment was added in launchers to mark where the wrapper declaration
     # should be placed. The wrapper is declared as a string
-    variables_before = re.sub("//Opencl wrapper declaration\n","char * " + wrapper_function_name + ";\n",variables_before)
+    variables_before = re.sub("//Opencl wrapper declaration\n","const char * " + wrapper_function_name + " = \"" + wrapper_function_name + "\";\n",variables_before)
 
     # Inside loop nest, just remove the for loops:
     variables_in_loop_nest = re.sub("(?s)\n\\s*for\\([^\n]*", "", loop_nest)
@@ -121,10 +121,16 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = f.read()
     f.close()
 
-    # Inject P4A accel header definitions:
-    header = """/* Use the Par4All accelerator run time: */
+    header = ""
+    # Inject P4A accel header definitions except in opencl files:
+    if (not p4a_util.opencl_file_p(file_base_name)):
+        header += """/* Use the Par4All accelerator run time: */
 #include <p4a_accel.h>
 """
+
+    # if (p4a_util.opencl_file_p(file_base_name)):
+    #     header += '\n"Un autre petit commentaire"\n'
+
     for include in includes:
         header += '#include "' + include + '"\n'
     content = header + content
