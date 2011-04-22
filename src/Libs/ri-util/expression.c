@@ -2830,13 +2830,26 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
         case is_syntax_reference:
             {
 		    reference r = syntax_reference(spattern);
-		    /* scalar reference always matches. allows to match
-		     * malloc(a) with more complex expressions like malloc(1 +
-		     * strlen("...")). Interferes incorrectly with commutativity. */
+		    /* scalar reference always matches.
+             * SG: in fact, you have to check for type compatibility too ...
+             * Allows to match malloc(a) with more complex expressions like malloc(1 +
+		     * strlen("...")).
+             * Interferes incorrectly with commutativity. */
 		    if (! expression_scalar_p(pattern))
 			    similar = false;
-		    else
-			    hash_put(symbols,entity_name(reference_variable(r)), target);
+		    else {
+                basic bpattern = basic_of_expression(pattern),
+                      btarget = basic_of_expression(target);
+                basic bmax = basic_maximum(bpattern,btarget);
+                if(basic_overloaded_p(bmax) || basic_equal_p(bmax,bpattern)) {
+                    hash_put(symbols,entity_name(reference_variable(r)), target);
+                }
+                else
+                    similar = false;
+                free_basic(bmax);
+                free_basic(bpattern);
+                free_basic(btarget);
+            }
             } break;
             /* recursively compare each arguments if call do not differ */
         case is_syntax_call:
