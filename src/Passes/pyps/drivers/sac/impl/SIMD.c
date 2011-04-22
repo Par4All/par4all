@@ -156,7 +156,15 @@
 			vec[i] = n;\
 		}\
 		va_end(ap);\
-	}
+	}\
+    \
+    void SIMD_LOAD_BROADCAST_##A##VW##LST(CTYPE_##T vec[VW], CTYPE_##T base)\
+    {\
+		int i;\
+		for (i = 0; i < (VW); i++)\
+			vec[i] = base;\
+	}\
+    
 
 #define SIMD_STORE_TYPE(A,T) _SIMD_STORE_TYPE(T,RWBITS,A)
 #define _SIMD_STORE_TYPE(T,RWB,A) __SIMD_STORE_TYPE(T,RWB,A) // Process the "A" macro
