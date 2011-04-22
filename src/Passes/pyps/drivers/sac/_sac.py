@@ -20,9 +20,10 @@ patterns_h = "patterns.h"
 
 class sacbase(object):
 	@staticmethod
-	def sac(module, **cond):
+	def sac(module, **cond):		
 		ws = module._ws
-		
+		if not cond.has_key("verbose"):
+			cond["verbose"] = ws.verbose
 		# Here are the transformations made by benchmark.tpips.h, blindy
 		# translated in pyps.
 
