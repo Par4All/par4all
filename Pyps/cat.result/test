@@ -10,10 +10,3 @@ int main()
    printf("I like dogs\n");
    return 0;
 }
-make[4]: Entering directory `$VDIR/PYPSENUK1G.database/Tmp'
-cc -g -O2 -I.  -c -o cat.o cat.c
-cc   cat.o -o a.out
-make[4]: Leaving directory `$VDIR/PYPSENUK1G.database/Tmp'
-cat.c: In function 'main':
-cat.c:9:4: warning: incompatible implicit declaration of built-in function 'printf'
-

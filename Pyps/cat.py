@@ -16,7 +16,6 @@ with workspace("cat.c",deleteOnClose=False) as w:
 	w.compile(rule="mrproper")
 	(binary,rc,out,err) = w.compile()
 	call("./"+binary)
-	print out,err
 
 
 

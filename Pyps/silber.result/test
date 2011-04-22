@@ -404,12 +404,6 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    
    ;
 }
-!!! make[4]: Entering directory `$VDIR/PYPSzqmMeZ.database/Tmp'
-cc -g -O2 -I.  -c -o adds.o adds.c
-cc -g -O2 -I.  -c -o silber.o silber.c
-cc   adds.o silber.o -o a.out
-make[4]: Leaving directory `$VDIR/PYPSzqmMeZ.database/Tmp'
-
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable

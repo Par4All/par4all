@@ -49,7 +49,6 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		t.display()
 		w.make()
 		(o,rc,out,err)=w.compile()
-		print "!!!",out
 		w.run(o, args=["include/input.pgm","include/mapfile.amp", "/dev/null"])
 
 		w.props.constant_path_effects=False
