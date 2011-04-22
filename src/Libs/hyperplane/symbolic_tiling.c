@@ -21,6 +21,44 @@
 
 #include "transformations.h"
 
+bool fix_loop_index_sign(loop l) {
+    set ent = get_referenced_entities(loop_range(l));
+    set_add_element(ent,ent,loop_index(l));
+    SET_FOREACH(entity,e,ent) {
+        if(local_entity_of_module_p(e,get_current_module_entity())) {
+            if(entity_formal_p(e)) {
+                type t = ultimate_type(entity_type(e));
+                if(unsigned_type_p(t)) {
+                    entity newe=make_new_scalar_variable_with_prefix(entity_user_name(e),
+                            get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+                    AddEntityToCurrentModule(newe);
+                    free_value(entity_initial(newe));
+                    entity_initial(newe)=make_value_expression(entity_to_expression(e));
+                    replace_entity(l,e,newe);
+                    pips_assert("type consistent",type_consistent_p(entity_type(e)));
+                }
+            }
+            else {
+                type t = ultimate_type(entity_type(e));
+                if(unsigned_type_p(t)) {
+                    free_type(entity_type(e));
+                    entity_type(e)=
+                        make_type_variable(
+                                make_variable(
+                                    make_basic_int(DEFAULT_INTEGER_TYPE_SIZE),
+                                    NIL,
+                                    NIL
+                                    )
+                                );
+                    pips_assert("type consistent",type_consistent_p(entity_type(e)));
+                }
+            }
+        }
+        pips_assert("entity is fine",entity_consistent_p(e));
+    }
+    set_free(ent);
+    return true;
+}
 
 void do_symbolic_tiling(statement base, list vector)
 {
@@ -52,7 +90,8 @@ void do_symbolic_tiling(statement base, list vector)
         }
 generate_tile:;
         /* outer loop new index */
-        entity index = make_new_index_entity(loop_index(l),"t");
+        entity index = make_new_scalar_variable(get_current_module_entity(),make_basic_int(DEFAULT_INTEGER_TYPE_SIZE));
+        AddEntityToCurrentModule(index);
         expression lower_bound = 
             binary_intrinsic_expression(MULTIPLY_OPERATOR_NAME,
                     entity_to_expression(index),
@@ -127,7 +166,10 @@ generate_tile:;
     statement_label(base)=entity_empty_label();/*the label have been duplicated by copy_statement */
     statement_instruction(base)=instruction_undefined;
     update_statement_instruction(base,make_instruction_block(gen_nreverse(CONS(STATEMENT,prev,prelude))));
+    clean_up_sequences(base);
 
+    /* fix signed / unsigned types for further processing otherwise we could end with integer overflow */
+    gen_recurse(base,loop_domain,gen_true, fix_loop_index_sign);
 }
 
 
