@@ -43,6 +43,7 @@ def autotile(m,verb):
 				kernels.append(l)
 		return kernels
 	kernels=tile_or_dive(m,m.loops())
+	m.partial_eval()
 	extram=list()
 	for l in kernels:
 		mn=m.name+"_"+l.label
