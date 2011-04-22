@@ -1,4 +1,4 @@
-SUBDIRS  = doc drivers
+SUBDIRS  = doc drivers impl
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
 
 dist_noinst_DATA=pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
@@ -10,8 +10,6 @@ dist_pipsmakeenv_SCRIPTS = gcc ar
 
 dist_pkgpython_PYTHON = pypsbase.py pypsex.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
 dist_python_DATA = pips.pth
-
-dist_pypsruntime_DATA=pipsdef.h
 
 if WITH_PYPS_EXTRA
 	dist_pkgpython_PYTHON += pyrops.py
