@@ -1208,7 +1208,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
       if(add_conflict_p) {
         bool remove_this_conflict_p = FALSE;
-        if(!entity_abstract_location_p(ein)) {
+        if(!entity_abstract_location_p(ein) && store_effect_p(fin)) {
           /* Here we filter effect on loop indices except for abstract
            locations */
           list loops = load_statement_enclosing_loops(stout);

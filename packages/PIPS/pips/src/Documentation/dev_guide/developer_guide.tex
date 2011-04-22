@@ -1746,13 +1746,26 @@ The validation can also be restricted to some directories by setting the
 make TARGET=LoopRecovering validate
 \end{verbatim}
 
-Finally, the validation can be run directly in a subdirectory
+The validation can be run directly in a subdirectory
 of the validation, with something like:
 \begin{verbatim}
 cd SubDirectory
 make validate-test
 \end{verbatim}
 
+Subdirectories can be used recursively to store test cases under
+a validation directory.
+%%
+They are automatically included in the validation run if they are
+named \texttt{*.sub}.
+%%
+If another name without this suffix is used, the \texttt{D.sub}
+makefile macro can be overriden to specify the subdirectory list.
+%%
+See the \texttt{HardwareAccelerator/Makefile} for an example.
+%%
+These subdirectories are ignored if a \texttt{.later} or \texttt{.bug}
+tag file exist of the same prefix, just like ordinary test cases.
 
 
 \subsection{Validation output}
@@ -2041,14 +2054,21 @@ explain what you are doing before you display this file.
 Some test cases may become obsolete, but we do not have resources to
 maintain them properly.
 
-Test cases can be factorized using \verb/default_tpips/ and/or
-\verb/default_test/, but the same rules should be applied. Of course,
-it is less flexible to show information about a specific function
+Test cases can be factorized using \verb/default_tpips/,
+\verb/default_test/ or \verb/default_pyps/,
+but the same rules should be applied.
+Of course, it is less flexible to show information about a specific function
 among hundreds.
+
+%% FC->RK: I have not found any example of that in the validation
+Another way suggested by Erka for sharing test scripts between cases
+is to create a link to a script which uses its zeros argument for the
+test case name.
 
 Scripting used to be shell based when PIPS was started. It is now
 mostly \verb/tpips/ based. Such scripts should end with a close, a
 delete of the current workspace, and a quit.
+For advanced stuff, consider python programming with PyPS.
 
 When multiple source files are used, it is better to keep them in a
 subdirectory. The maintenance of the validation library is easier and
@@ -2172,7 +2192,7 @@ On can run a subset of tests based on a file prefix:
 
 \subsection{Inter-directory parallel validation}
 
-For the inter-directory parallel validation, on defaults oronly some
+For the inter-directory parallel validation, on defaults or only some
 directories by defining the \texttt{TARGET} make macro:
 \begin{verbatim}
   sh> cd validation
