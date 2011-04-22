@@ -104,7 +104,19 @@ static void simd_loop_unroll(statement loop_statement, intptr_t rate)
   expression erange = range_to_expression(r,range_to_nbiter);
   intptr_t irange;
   if(expression_integer_value(erange,&irange) && irange <=rate) {
-    full_loop_unroll(loop_statement);
+      bool saved[] = {
+          get_bool_property("LOOP_NORMALIZE_ONE_INCREMENT"),
+          get_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT")
+      };
+      set_bool_property("LOOP_NORMALIZE_ONE_INCREMENT",true);
+      set_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT",true);
+      loop_normalize_statement(loop_statement);
+      range r = loop_range(statement_loop(loop_statement));
+      simplify_expression(&range_upper(r));
+      simplify_expression(&range_lower(r));
+      set_bool_property("LOOP_NORMALIZE_ONE_INCREMENT",saved[0]);
+      set_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT",saved[1]);
+      full_loop_unroll(loop_statement);
   }
   else
     do_loop_unroll(loop_statement,rate,NULL);
@@ -240,6 +252,45 @@ static void simd_unroll_as_needed(statement module_stmt)
         reset_simd_operator_mappings();
     }
 }
+bool loop_auto_unroll(const char* mod_name) {
+    // get the resources
+    statement mod_stmt = (statement)
+        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+    set_current_module_statement(mod_stmt);
+    set_current_module_entity(module_name_to_entity(mod_name));
+
+    debug_on("SIMDIZER_DEBUG_LEVEL");
+
+    /* do the job */
+    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    entity elabel = find_label_entity(mod_name,slabel);
+
+    if(entity_undefined_p(elabel)) {
+        pips_user_error("label %s does not exist !\n", slabel);
+    }
+    else {
+        statement theloopstatement = find_loop_from_label(get_current_module_statement(),elabel);
+        if(!statement_undefined_p(theloopstatement)) {
+            simple_simd_unroll_loop_filter(theloopstatement);
+        }
+    }
+
+    pips_assert("Statement is consistent after SIMDIZER_AUTO_UNROLL", 
+            statement_consistent_p(mod_stmt));
+
+    // Reorder the module, because new statements have been added
+    module_reorder(mod_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+
+    // update/release resources
+    reset_current_module_statement();
+    reset_current_module_entity();
+
+    debug_off();
+
+    return true;
+}
 
 bool simdizer_auto_unroll(char * mod_name)
 {
@@ -306,13 +357,8 @@ static statement do_simdizer_auto_tile_generate_all_tests(statement root, int ma
     }
     else {
         int npath = path << 1 ;
-        string spragma;
         statement trueb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath+1, tests+1);
-        asprintf(&spragma,"%d",npath +1 );
-        add_pragma_str_to_statement(trueb,spragma,false);
         statement falseb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath,  tests+1);
-        asprintf(&spragma,"%d",npath );
-        add_pragma_str_to_statement(falseb,spragma,false);
         return
         instruction_to_statement(
                 make_instruction_test(

@@ -127,7 +127,6 @@
  * @param s statement to normalize
  *
  */
-static
 void loop_normalize_statement(statement s) {
   if( statement_loop_p(s) ) {
     // OK, it's a loop, go on

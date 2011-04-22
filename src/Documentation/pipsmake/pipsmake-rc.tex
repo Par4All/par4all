@@ -5726,6 +5726,19 @@ simdizer_auto_unroll        > MODULE.code
         < PROGRAM.entities
         < MODULE.code
 \end{PipsMake}
+
+\begin{PipsPass}{loop_auto_unroll}
+  Similiar to \PipsPassRef{simdizer_auto_unroll} but at the loop level.
+\end{PipsPass}
+
+Sensible to \PipsPropRef{LOOP_LABEL}.
+\begin{PipsMake}
+loop_auto_unroll        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
 \begin{PipsPass}{simdizer_auto_tile}
 Tries to tile the code to make the simdizing process more efficient.
 \end{PipsPass}
