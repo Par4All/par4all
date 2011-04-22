@@ -1,2 +1,2 @@
-CFLAGS+="-msse4.2 -march=native -O3"
+CFLAGS+="-mavx -march=native -O3"
 ##pipsrules##
