@@ -7372,8 +7372,23 @@ GPU_USE_WRAPPER TRUE
 GPU_USE_KERNEL TRUE
 \end{PipsProp}
 
-When the original code is in Fortran it might be usefull to wrap the kernel
-launcher in an indepedant C file. The
+Each generated function can go in its own source file according to the
+following properties:
+\begin{PipsProp}{GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT}
+GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT FALSE
+\end{PipsProp}
+\begin{PipsProp}{GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT}
+GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT FALSE
+\end{PipsProp}
+\begin{PipsProp}{GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT}
+GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT FALSE
+\end{PipsProp}
+By default they are set to \texttt{FALSE} for languages like CUDA that
+allow kernel and host codes mixed in a same file but for OpenCL it is not
+the case.
+
+When the original code is in Fortran it might be useful to wrap the kernel
+launcher in an independent C file. The
 \PipsPropRef{GPU_USE_FORTRAN_WRAPPER} can be used for that purpose. The name of
 the function wrapper can be configured using the property
 \PipsPropRef{GPU_FORTRAN_WRAPPER_PREFIX}. As specified before it is safe to use
