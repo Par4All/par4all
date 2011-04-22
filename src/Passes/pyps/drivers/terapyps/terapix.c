@@ -7,62 +7,29 @@
 
 /* To copy scalars */
 void P4A_copy_from_accel(size_t element_size,
-<<<<<<< HEAD
 			 int *host_address,
 			 int *accel_address) {
     host_address[0] = accel_address[0];
-=======
-			 void *host_address,
-			 void *accel_address) {
-  size_t i;
-  char * cdest = host_address;
-  char * csrc = accel_address;
-  for(i = 0; i < element_size; i++)
-    cdest[i] = csrc[i];
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 }
 
 
 void P4A_copy_to_accel(size_t element_size,
-<<<<<<< HEAD
 		       int *host_address,
 		       int *accel_address) {
   for(size_t i = 0; i < element_size; i++)
     accel_address[i] = host_address[i];
 }
 
-=======
-		       void *host_address,
-		       void *accel_address) {
-  size_t i;
-  char * cdest = accel_address;
-  char * csrc = host_address;
-  for(i = 0; i < element_size; i++)
-    cdest[i] = csrc[i];
-}
-
-
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 /* To copy parts of 1D arrays */
 void P4A_copy_from_accel_1d(size_t element_size,
 			    size_t d1_size,
 			    size_t d1_block_size,
 			    size_t d1_offset,
-<<<<<<< HEAD
 			    int *host_address,
 			    int *accel_address) {
   size_t i;
   for(i = 0; i < d1_block_size; i++)
     host_address[i+d1_offset] = accel_address[i];
-=======
-			    void *host_address,
-			    void *accel_address) {
-  size_t i;
-  char * cdest = d1_offset*element_size + (char *)host_address;
-  char * csrc = accel_address;
-  for(i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 }
 
 
@@ -70,7 +37,6 @@ void P4A_copy_to_accel_1d(size_t element_size,
 			  size_t d1_size,
 			  size_t d1_block_size,
 			  size_t d1_offset,
-<<<<<<< HEAD
 			  int *host_address,
 			  int *accel_address) {
   size_t i;
@@ -80,24 +46,11 @@ void P4A_copy_to_accel_1d(size_t element_size,
 
 
 
-=======
-			  void *host_address,
-			  void *accel_address) {
-  size_t i;
-  char * cdest = accel_address;
-  char * csrc = d1_offset*element_size + (char *)host_address;
-  for(i = 0; i < d1_block_size*element_size; i++)
-    cdest[i] = csrc[i];
-}
-
-
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 /* To copy parts of 2D arrays */
 void P4A_copy_from_accel_2d(size_t element_size,
 			    size_t d1_size, size_t d2_size,
 			    size_t d1_block_size, size_t d2_block_size,
 			    size_t d1_offset, size_t d2_offset,
-<<<<<<< HEAD
 			    int host_address[d2_size],
 			    int accel_address[d1_block_size][d2_block_size]) {
   size_t i, j;
@@ -105,17 +58,6 @@ void P4A_copy_from_accel_2d(size_t element_size,
     for(j = 0; j < d2_block_size; j++)
       host_address[d2_offset+(i+d1_offset)*d2_size+j] =
         accel_address[i][j];
-=======
-			    void *host_address,
-			    void *accel_address) {
-  size_t i, j;
-  char * cdest = d2_offset*element_size + (char*)host_address;
-  char * csrc = (char*)accel_address;
-  for(i = 0; i < d1_block_size; i++)
-    for(j = 0; j < d2_block_size*element_size; j++)
-      cdest[(i + d1_offset)*element_size*d2_size + j] =
-        csrc[i*element_size*d2_block_size + j];
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 }
 
 
@@ -123,7 +65,6 @@ void P4A_copy_to_accel_2d(size_t element_size,
 			  size_t d1_size, size_t d2_size,
 			  size_t d1_block_size, size_t d2_block_size,
 			  size_t d1_offset,   size_t d2_offset,
-<<<<<<< HEAD
 			  int host_address [d2_size],
 			  int accel_address [d1_block_size][d2_block_size]) {
   size_t i, j;
@@ -145,17 +86,6 @@ void P4A_copy_to_accel_3d(size_t element_size,
         for(k = 0; k < d3_block_size; k++)
             accel_address[i][j][k] =
                 host_address[d3_offset+( (i + d1_offset)*d2_size + j + d2_offset)*d3_size+j];
-=======
-			  void *host_address,
-			  void *accel_address) {
-  size_t i, j;
-  char * cdest = (char *)accel_address;
-  char * csrc = d2_offset*element_size + (char *)host_address;
-  for(i = 0; i < d1_block_size; i++)
-    for(j = 0; j < d2_block_size*element_size; j++)
-      cdest[i*element_size*d2_block_size + j] =
-        csrc[(i + d1_offset)*element_size*d2_size + j];
->>>>>>> ad1f02c... renovation the way to add sources from runtime
 }
 
 /* Allocate memory on the accelerator */
