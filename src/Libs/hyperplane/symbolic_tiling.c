@@ -186,7 +186,10 @@ static bool symbolic_tiling_valid_p(statement sloop, size_t depth)
             statement body = loop_body(statement_loop(sloop));
             return symbolic_tiling_valid_p(body,depth-1);
         }
-        else return false;
+        else {
+            pips_user_error("given loop is either not normalized or not parallel or not nested\n");
+            return false;
+        }
     }
 }
 
