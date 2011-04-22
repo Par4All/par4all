@@ -2,6 +2,7 @@
 from __future__ import with_statement # to cope with python2.5
 import pypips
 import pypsutils
+import pypsconfig
 import os
 import sys
 import tempfile
