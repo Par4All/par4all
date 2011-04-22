@@ -1443,7 +1443,6 @@ switch_2_case_JDCT_IFAST:         ;
 //                               cinfo[0].num_components dtbl i qtbl 
 //                               qtbl[0].quantval[i]
 //             <    is written>: dtbl[i]
-
                dtbl[i] = (DCTELEM) ((INT32) (qtbl->quantval)[i]*(INT32) aanscales[i]+((INT32) 1<<14-3-1)>>14-3);
          }
       }
@@ -3460,6 +3459,7 @@ static void initial_setup(j_compress_ptr cinfo)
 //             <    is read   >: cinfo
 //             <    is written>: cinfo[0].max_h_samp_factor
    
+   
    /* Compute maximum sampling factors; check factor validity */
    cinfo->max_h_samp_factor = 1;
 //             <    is read   >: cinfo
@@ -3663,6 +3663,7 @@ static void per_scan_setup(j_compress_ptr cinfo)
 //             <    is read   >: cinfo cinfo[0].image_width 
 //                               cinfo[0].max_h_samp_factor
 //             <    is written>: cinfo[0].MCUs_per_row
+      
       
       /* Overall image size in MCUs */
       
@@ -3987,6 +3988,7 @@ static void select_scan_parameters(j_compress_ptr cinfo)
          cinfo->err->msg_code = JERR_COMPONENT_COUNT, (cinfo->err->msg_parm.i)[0] = cinfo->num_components, (cinfo->err->msg_parm.i)[1] = 4, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: cinfo[0].comps_in_scan
+
       cinfo->comps_in_scan = cinfo->num_components;
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: ci
@@ -5866,6 +5868,7 @@ static void create_context_buffer(j_compress_ptr cinfo)
 //             <    is read   >: cinfo cinfo[0].num_components 
 //                               rgroup_height
 //             <    is written>: i
+      
       /* Fill in the above and below wraparound pointers */
       for(i = 0; i <= rgroup_height-1; i += 1) {
 //             <    is read   >: cinfo cinfo[0].num_components 
@@ -9327,6 +9330,7 @@ static void ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf, JDIMEN
 //                               range_limit range_limit[y+Cbbtab[cb]]
 //                               y
 //             <    is written>: outptr[2]
+
          outptr[2] = range_limit[y+Cbbtab[cb]];
 //             <    is read   >: num_cols outptr
 //             <    is written>: outptr
@@ -9417,6 +9421,7 @@ static void ycck_cmyk_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf, JDIM
 //                               range_limit 
 //                               range_limit[255-(y+Cbbtab[cb])] y
 //             <    is written>: outptr[2]
+
          outptr[2] = range_limit[255-(y+Cbbtab[cb])];
 //             <    is read   >: col inptr3 inptr3[col] num_cols 
 //                               outptr
@@ -9653,7 +9658,6 @@ switch_4_case_JDCT_IFAST:               ;
 //                               cinfo[0].num_components i ifmtbl qtbl
 //                               qtbl[0].quantval[i]
 //             <    is written>: ifmtbl[i]
-
                      ifmtbl[i] = (IFAST_MULT_TYPE) ((INT32) (qtbl->quantval)[i]*(INT32) aanscales[i]+((INT32) 1<<14-2-1)>>14-2);
                }
             }
@@ -10538,6 +10542,7 @@ static void initial_setup(j_decompress_ptr cinfo)
 //             <    is read   >: cinfo
 //             <    is written>: cinfo[0].max_h_samp_factor
    
+   
    /* Compute maximum sampling factors; check factor validity */
    cinfo->max_h_samp_factor = 1;
 //             <    is read   >: cinfo
@@ -10811,6 +10816,7 @@ static void per_scan_setup(j_decompress_ptr cinfo)
 //             <    is read   >: cinfo cinfo[0].image_width 
 //                               cinfo[0].max_h_samp_factor
 //             <    is written>: cinfo[0].MCUs_per_row
+      
       
       /* Overall image size in MCUs */
       
@@ -16303,6 +16309,7 @@ static void start_pass_phuff_decoder(j_decompress_ptr cinfo)
       cinfo->err->msg_code = JERR_BAD_PROGRESSION, (cinfo->err->msg_parm.i)[0] = cinfo->Ss, (cinfo->err->msg_parm.i)[1] = cinfo->Se, (cinfo->err->msg_parm.i)[2] = cinfo->Ah, (cinfo->err->msg_parm.i)[3] = cinfo->Al, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].comps_in_scan
 //             <    is written>: ci
+   
    /* Update progression status, and verify that scan order is legal.
       * Note that inter-scan inconsistencies are treated as warnings
       * not fatal errors ... not clear if this is right way to behave.
@@ -22061,10 +22068,11 @@ void jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dsti
 //             <    is read   >: qtblptr qtblptr[0] srcinfo 
 //                               srcinfo[0].quant_tbl_ptrs[tblno] 
 //                               tblno
-
          memcpy((void *) (*qtblptr)->quantval, (void *) (srcinfo->quant_tbl_ptrs)[tblno]->quantval, (size_t) (size_t) sizeof((*qtblptr)->quantval));
 //             <    is read   >: qtblptr qtblptr[0]
 //             <    is written>: qtblptr[0][0].sent_table
+         
+         
          (*qtblptr)->sent_table = 0;
       }
 //             <    is read   >: dstinfo srcinfo 
@@ -22091,6 +22099,7 @@ void jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dsti
    incomp = srcinfo->comp_info;
 //             <    is read   >: dstinfo dstinfo[0].num_components
 //             <    is written>: ci
+
    for(ci = 0; ci <= dstinfo->num_components-1; ci += 1) {
 //             <    is read   >: dstinfo dstinfo[0].num_components 
 //                               incomp incomp[0].component_id outcomp
@@ -22831,6 +22840,7 @@ void jpeg_fdct_islow(DCTELEM *data)
 //             <    is read   >: tmp4 tmp7
 //             <    is written>: z1
       
+      
       /* Odd part per figure 8 --- note paper omits factor of sqrt(2).
            * cK represents cos(K*pi/16).
            * i0..i3 in the paper are tmp4..tmp7 here.
@@ -22968,6 +22978,7 @@ void jpeg_fdct_islow(DCTELEM *data)
 //             <    is read   >: tmp4 tmp7
 //             <    is written>: z1
       
+      
       /* Odd part per figure 8 --- note paper omits factor of sqrt(2).
            * cK represents cos(K*pi/16).
            * i0..i3 in the paper are tmp4..tmp7 here.
@@ -23032,7 +23043,8 @@ void jpeg_fdct_islow(DCTELEM *data)
       dataptr[8*1] = (DCTELEM) (tmp7+z1+z4+((INT32) 1<<13+2-1)>>13+2);
 //             <    is read   >: dataptr
 //             <    is written>: dataptr
-
+      
+      
       dataptr++;
    }
 }
@@ -26222,6 +26234,7 @@ switch_1_case_JCS_UNKNOWN:      ;
          cinfo->err->msg_code = JERR_COMPONENT_COUNT, (cinfo->err->msg_parm.i)[0] = cinfo->num_components, (cinfo->err->msg_parm.i)[1] = 10, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: ci
+
       for(ci = 0; ci <= cinfo->num_components-1; ci += 1)
 //             <    is read   >: ci cinfo cinfo[0].comp_info 
 //                               cinfo[0].num_components compptr
@@ -27764,6 +27777,7 @@ static void quantize3_ord_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, J
          pixcode += (int) colorindex2[(int) *input_ptr++ +dither2[col_index]];
 //             <    is read   >: num_rows output_ptr pixcode width
 //             <    is written>: output_ptr output_ptr[0]
+
          *output_ptr++ = (JSAMPLE) pixcode;
 //             <    is read   >: col_index num_rows width
 //             <    is written>: col_index

@@ -253,11 +253,6 @@ void ts_restructured(void)
 
 //  T() {i1==n-1, v1==1, 0<=i1, v2<=i1, 1<=m, v2+1<=m}
 
-   
-   
-   
-   
-   
    if (!(v1==1&&v2<m))
 
 //  T() {0==-1}
@@ -583,11 +578,6 @@ void ts_restructured(void)
 //  P(i1,i2,m,n,v1,v2) {i1+v1==n, 0<=i2, i2<=m, i2+v2<=m, i2+v1<=n,
 //    i2+v1+v2<=n, 1<=m, v2+1<=m, 1<=v1}
 
-   
-   
-   
-   
-   
    if (!(v1==1&&v2<m))
 
 //  P(i1,i2,m,n,v1,v2) {i1+v1==n, 0<=i2, i2<=m, i2+v2<=m, i2+v1<=n,

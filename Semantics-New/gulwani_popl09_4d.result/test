@@ -433,13 +433,6 @@ void ts_restructured(void)
 //  T(c1,c2,s,x,y) {c1==c1#init+1, c1==n, c1==x, c1==x#init+1, c2==y,
 //    s==1, s#init==1, 1<=c1, 0<=c2, c2<=m}
 
-      
-      
-      
-      
-      
-      
-      
       if (rand_b()) {
 
 //  T() {c1==n-1, c1==x, s==1, 0<=c1, 1<=m}
@@ -640,14 +633,6 @@ void ts_restructured(void)
 
             checking_error();
       }
-
-//  T() {c1==n, c1==x, c2==y, s==1, 1<=c1, 0<=c2, c2<=m, 0<=m}
-
-      
-      
-      
-      
-      ;
    }
 }
 
@@ -1142,13 +1127,6 @@ void ts_restructured(void)
 //  P(c1,c2,m,n,s,x,y) {c1==x, s==1, 0<=c1, c1+1<=n, 0<=c2, c2<=m,
 //    c2<=y}
 
-      
-      
-      
-      
-      
-      
-      
       if (rand_b()) {
 
 //  P(c1,c2,m,n,s,x,y) {c1==x, s==1, 0<=c1, c1+1<=n, 0<=c2, c2<=m,
@@ -1375,14 +1353,5 @@ void ts_restructured(void)
 
             checking_error();
       }
-
-//  P(c1,c2,m,n,s,x,y) {c1==n, c1==x, c2==y, s==1, 1<=c1, 0<=c2,
-//    c2<=m}
-
-      
-      
-      
-      
-      ;
    }
 }

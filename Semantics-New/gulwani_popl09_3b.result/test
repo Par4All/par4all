@@ -307,13 +307,6 @@ void ts_restructured(void)
 
             checking_error();
       }
-
-//  T() {c==n, c==x, s==2, 1<=c}
-
-      
-      
-      
-      ;
    }
 }
 
@@ -622,12 +615,5 @@ void ts_restructured(void)
 
             checking_error();
       }
-
-//  P(c,n,s,x) {c==n, c==x, s==2, 1<=c}
-
-      
-      
-      
-      ;
    }
 }
