@@ -50,7 +50,6 @@ class workspace(pyps.workspace):
 	def save(self, rep=None):
 		
 		files = super(workspace,self).save(rep)
-
 		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_c,"pyps_gettime"),rep)
 		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_h,"pyps_gettime"),rep)
 
