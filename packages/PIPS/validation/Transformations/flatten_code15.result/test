@@ -20,7 +20,7 @@ void flatten_code15(int foo)
    foo_0 += foo;                                                        /*0018*/
 // (0,4)
 
-   for(i = i; i <= 6; i += 1) {
+   for(i = i; i <= 6; i += 1) {                                         /*0020*/
 // (0,5)
       // BEGIN BLOCK
 // (0,6)
@@ -52,7 +52,7 @@ void flatten_code15(int foo)
    foo_0 += foo;                                                        /*0018*/
 // (0,5)
 
-   for(i = i; i <= 6; i += 1) {
+   for(i = i; i <= 6; i += 1) {                                         /*0020*/
 // (0,6)
       // BEGIN BLOCK
 // (0,7)

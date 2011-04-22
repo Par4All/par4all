@@ -1,6 +1,11 @@
 delete intro_example02
 create intro_example02 intro_example02.c
 
+
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE "do"
 
 apply PRIVATIZE_MODULE[foo]

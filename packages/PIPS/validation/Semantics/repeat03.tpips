@@ -4,6 +4,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create repeat03 repeat03.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 echo Select some options to deal with the C Language:
 echo Parse as C:
 activate C_PARSER

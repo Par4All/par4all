@@ -1,0 +1,57 @@
+
+****** Proper effects ******
+
+void cumu()
+{
+   int *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   p[0] = 0;
+}
+
+****** Cumulated effects ******
+
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+void cumu()
+{
+   int *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   p[0] = 0;
+}
+
+
+****** With non memory effects ******
+
+
+
+****** Proper effects ******
+
+void cumu()
+{
+//             <    is declared>: p[*]
+   int *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+//             <    is referenced>: p[*]
+
+   p[0] = 0;
+}
+
+****** Cumulated effects ******
+****** We expect them to be the same as before ******
+
+
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+void cumu()
+{
+//             <    is declared>: p[*]
+   int *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+//             <    is referenced>: p[*]
+
+   p[0] = 0;
+}

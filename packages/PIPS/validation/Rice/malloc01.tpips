@@ -3,6 +3,9 @@ create malloc01 malloc01.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 setproperty CONSTANT_PATH_EFFECTS FALSE
 
 activate C_PARSER

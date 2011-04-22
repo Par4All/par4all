@@ -15,6 +15,9 @@ create label label.c
 #setenv PRETTYPRINT_DEBUG_LEVEL 9
 setenv OMPIFY_CODE_DEBUG_LEVEL 9
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 

@@ -3,6 +3,10 @@ delete pointer02
 setproperty ABORT_ON_USER_ERROR TRUE
 
 create pointer02 pointer02.c
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
 
 display PRINTED_FILE

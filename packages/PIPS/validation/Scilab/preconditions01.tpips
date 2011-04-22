@@ -22,6 +22,10 @@ create $WS Scilab2C-2/src/c/dimplicitLists.c \
        $WS/d0d0d0d0d0d0d0mandelbrotd2.c \
        par4all/share/p4a_accel/p4a_stubs.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
 set FOR_TO_DO_LOOP_IN_CONTROLIZER TRUE
 set UNSPAGHETTIFY_TEST_RESTRUCTURING TRUE
 set SEMANTICS_FIX_POINT_OPERATOR "derivative"

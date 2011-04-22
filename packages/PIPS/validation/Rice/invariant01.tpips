@@ -2,6 +2,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete invariant01
 create invariant01 invariant01.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 #setproperty GENERATE_MISSING_SOURCE_FILES TRUE
 

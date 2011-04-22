@@ -8,6 +8,9 @@ setproperty CONSTANT_PATH_EFFECTS FALSE
 
 create test02 test02.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 echo Select some options to deal with the C Language:
 echo Parse as C:
 

@@ -5,12 +5,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create struct03 struct03.c
 
-activate C_PARSER
-
-setproperty PRETTYPRINT_LANGUAGE "C"
-setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
-setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
 
 echo
 echo Parsed printed file for "struct03"

@@ -1,9 +1,3 @@
-Select some options to deal with th C Language:
-Parse as C:
-Prettyprint the source as C, of course
-Do not display original number lines as comment:
-If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
-Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
 Select the most precise analysis:
 Compute the intraprocedural preconditions at the same time as
 transformers and use them to improve the accuracy of expression

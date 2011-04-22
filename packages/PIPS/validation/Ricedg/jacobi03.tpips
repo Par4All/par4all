@@ -5,6 +5,10 @@
 delete jacobi03
 create jacobi03 jacobi03.c
 echo Select some options to deal with the C Language:
+
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 echo Parse as C:
 activate C_PARSER
 echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:

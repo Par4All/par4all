@@ -17,6 +17,9 @@ echo
 echo The loop should be distributed but not parallelized
 echo
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 display PARALLELPRINTED_FILE[old_property01]
 
 close

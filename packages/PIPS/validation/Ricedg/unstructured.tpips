@@ -4,6 +4,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create unstructured unstructured.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 #SELECT C LANGUAGE
 activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
