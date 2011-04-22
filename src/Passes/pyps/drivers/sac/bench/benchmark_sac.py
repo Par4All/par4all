@@ -7,6 +7,7 @@ import pyps
 import workspace_gettime as gt
 import workspace_remote as rt
 import workspace_check as ck
+import binary_size as binsize
 import memalign
 import sac
 import sys
@@ -96,19 +97,26 @@ def benchrun(s,calms=None,calibrate_out=None):
 
 		return make_args(size_kernel)
 
+	def binary_size(module, cc_cfg, compile_f):
+		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args="",outfile=module._name+cc.name())
+		return m.binary_size(ccp)
+
 	doBench = s.default_mode=="benchmark"
 	doCalibrate = calms != None
+	doSize = s.default_mode=="size"
+	doValidate = s.default_mode=="validation"
 	#wk_parents = [sac.workspace,memalign.workspace]
 	wk_parents = [sac.workspace]
 	if doBench:
 		wk_parents.append(gt.workspace)
-	else:
+	if doValidate:
 		wk_parents.append(ck.workspace)
 	if s.remoteExec:
 		wk_parents.append(rt.workspace)
 	for wcfg in s.workspaces:
 		wcfg.load()
 		benchtimes = {}
+		wssizes[wcfg.name()] = dict()
 		srcs = map(lambda s: str(s), wcfg.files)
 		wcfg.module = str(wcfg.module)
 		if doBench:
@@ -155,8 +163,12 @@ def benchrun(s,calms=None,calibrate_out=None):
 					cc.load()
 					do_benchmark(ws, wcfg, cc, ws.compile, args, n_iter, "nosac")
 
+			if doSize:
+				for cc in s.ccs_nosac:
+					wssizes[wcfg.name()][cc.name()+"+nosac"] = binary_size(m, cc, ws.compile)[0]
+
 			m.sac()
-			if not doBench:
+			if doValidate:
 				# If we are in validation mode, validate the generic SIMD implementation thanks
 				# to s.cc_reference
 				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref+sac")
@@ -164,7 +176,10 @@ def benchrun(s,calms=None,calibrate_out=None):
 			if "ccs_sac" in s:
 				for cc in s.ccs_sac:
 					cc.load()
-					do_benchmark(ws, wcfg, cc, ws.simd_compile, args, n_iter, "sac")
+					if doSize:
+						wssizes[wcfg.name()][cc.name()+"+sac"] = binary_size(m, cc, ws.simd_compile)[0]
+					else:
+						do_benchmark(ws, wcfg, cc, ws.simd_compile, args, n_iter, "sac")
 
 
 		wstimes[wcfg.name()] = benchtimes
@@ -176,7 +191,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 
 parser = OptionParser(usage = "%prog")
 parser.add_option("-m", "--mode", dest = "mode",
-				  help = "benchmark mode: validation or benchmark")
+				  help = "benchmark mode: validation, benchmark or size")
 parser.add_option("-s", "--session", dest = "session_name",
 				  help = "session to use (defined in sessions.cfg")
 parser.add_option("-d", "--driver", dest = "driver",
@@ -206,6 +221,7 @@ parser.add_option("--with-etc-wk", dest="etc_wk_file",
 (opts, _) = parser.parse_args()
 
 wstimes = {}
+wssizes = {}
 errors = []
 
 etc_dir = "etc/"
@@ -293,7 +309,26 @@ if session.default_mode == "benchmark":
 			outfile.write("CC stderr output: "+res['cc_stderr']+"\n\n")
 		outfile.write("\n")
 
+if session.default_mode == "size":
+	outfile.write("\t")
+	columns = []
+	for cc in session.ccs_nosac: columns.append(cc.name()+"+nosac")
+	if "ccs_sac" in session:
+		for cc in session.ccs_sac: columns.append(cc.name()+"+sac")
+	for c in columns:
+		outfile.write(c+"\t")
+	outfile.write("\n")
 
+	for wsname, sizetimes in wssizes.iteritems():
+		outfile.write(wsname + "\t")
+		for benchname in columns:
+			if benchname not in sizetimes:
+				outfile.write("NA\t")
+				continue
+			res = sizetimes[benchname]
+			outfile.write(str(res))
+			outfile.write("\t")
+	outfile.write("\n")
 
 if len(errors) > 0:
 	outfile.write("\nErrors:\n")

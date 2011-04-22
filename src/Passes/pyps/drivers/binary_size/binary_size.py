@@ -11,7 +11,10 @@ def binary_size(module, compiler = pyps.backendCompiler()):
 	Be carefull. The symbol used by the compiler in the binary object for the given module must be guessed by the binary_size function. Given a function “foo”, the symbol can be “foo”, “foo.”, “_foo” or many others forms, thus we cannot ensure that this function will work in every situations. A wrong guess can lead to a ValueError exception or in a few cases to wrongs results."""
 	outfile = module._ws.compile(compiler)
 	
-	return __funcsize(module.name, outfile)
+	ret =__funcsize(module.name, outfile)
+	os.unlink(outfile)
+
+	return ret
 
 
 def __getLinePos(line):
