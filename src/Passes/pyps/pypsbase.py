@@ -292,6 +292,7 @@ class workspace(object):
 		self.checkpoints=[]
 		self._sources=list(sources)
 		self._org_sources = sources
+		self.set_phase_log_buffer(False)
 
 		if not name :
 			#  generate a random place in $PWS
@@ -564,6 +565,11 @@ class workspace(object):
 		the_modules=[m for m in self._modules.values() if matching(m)]
 		return modules(the_modules)
 
+	def phase_log_buffer(self): return self._log_buffer
+	def set_phase_log_buffer(self, log_buffer): self._log_buffer=log_buffer
+
+	def pre_phase(self, phase, module): pass
+	def post_phase(self, phase, module, log): pass
 
 	# Create an "all" pseudo-variable that is in fact the execution of
 	# filter with the default filtering rule: True

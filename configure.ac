@@ -271,6 +271,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/workspace_gettime/Makefile
 				 src/Passes/pyps/drivers/workspace_check/Makefile
 				 src/Passes/pyps/drivers/workspace_remote/Makefile
+				 src/Passes/pyps/drivers/workspace_git/Makefile
 				 src/Passes/pyps/drivers/pypsearch/Makefile
 				 src/Passes/pyps/drivers/memalign/Makefile
 				 src/Passes/pyps/drivers/sacexplore/Makefile

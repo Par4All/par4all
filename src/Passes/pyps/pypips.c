@@ -50,6 +50,7 @@
 #include "top-level.h"
 
 static FILE * logstream = NULL;
+static char* log_buffer = NULL;
 static void pyps_log_handler(const char *fmt, va_list args)
 {
 	FILE * log_file = get_log_file();
@@ -59,16 +60,28 @@ static void pyps_log_handler(const char *fmt, va_list args)
 
 	/* To be C99 compliant, a va_list can be used only once...
 		 Also to avoid exploding on x86_64: */
-	va_list args_copy;
+	va_list args_copy,args_copy2;
 	va_copy (args_copy, args);
+	va_copy (args_copy2, args);
 
-	vfprintf(logstream, fmt, args);
+	vfprintf(logstream, fmt, args_copy);
 	fflush(logstream);
+	if (log_buffer != NULL)
+	{
+		char* tmp;
+		vasprintf(&tmp, fmt, args_copy2);
+		char* new_buf = (char*) malloc(strlen(tmp)+strlen(log_buffer)+1);
+		strcpy(new_buf, log_buffer);
+		strcat(new_buf, tmp);
+		free(log_buffer);
+		free(tmp);
+		log_buffer = new_buf;
+	}
 
 	if (!log_file || !get_bool_property("USER_LOG_P"))
 		return;
 
-	if (vfprintf(log_file, fmt, args_copy) <= 0) {
+	if (vfprintf(log_file, fmt, args) <= 0) {
 		perror("user_log");
 		abort();
 	}
@@ -103,6 +116,29 @@ static void pyps_error_handler(const char * calling_function_name,
       /* throw according to linear exception stack! */
       THROW(user_exception_error);
    }
+}
+
+void save_log_to_buffer()
+{
+	if (log_buffer != NULL)
+		clean_log_buffer();
+	// Ugly, temporary...
+	log_buffer = (char*) malloc(1);
+	log_buffer[0] = 0;
+}
+
+char* get_log_buffer()
+{
+	return log_buffer;
+}
+
+void clean_log_buffer()
+{
+	if (log_buffer != NULL)
+	{
+		free(log_buffer);
+		log_buffer = NULL;
+	}
 }
 
 DEFINE_LOCAL_STACK(properties,property);
