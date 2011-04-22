@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "yuv.h"
 
-void buffer_copy(uint8 buffer[SIZE],uint8 y[SIZE_Y_IN])
+void buffer_copy(upsc_uint8 buffer[SIZE],upsc_uint8 y[SIZE_Y_IN])
 {
   // Center
   for (int j = 0;j < HEIGHT;j++) {
@@ -12,7 +12,7 @@ void buffer_copy(uint8 buffer[SIZE],uint8 y[SIZE_Y_IN])
   }
 }
 
-void y_completion(uint8 y[SIZE_Y_IN])
+void y_completion(upsc_uint8 y[SIZE_Y_IN])
 {
   for (int j = OFFSET;j < HEIGHT+OFFSET;j++) {
     // Left border
@@ -43,11 +43,10 @@ void y_completion(uint8 y[SIZE_Y_IN])
   }
 }
 
-
-int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZE_UV_IN])
+int read_yuv_frame(FILE* fp,upsc_uint8 y[SIZE_Y_IN], upsc_uint8 u[SIZE_UV_IN], upsc_uint8 v[SIZE_UV_IN])
 {  
   
-  uint8 buffer[SIZE];
+  upsc_uint8 buffer[SIZE];
 
 
   // Read the luminance
@@ -79,8 +78,7 @@ int read_yuv_frame(FILE* fp,uint8 y[SIZE_Y_IN], uint8 u[SIZE_UV_IN], uint8 v[SIZ
   return 0;
 }
 /* Write the output video to a file */
-
-int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[SIZE_UV_OUT])
+int write_yuv_frame(FILE* fp,upsc_uint8 y[SIZE_Y_OUT], upsc_uint8 u[SIZE_UV_OUT], upsc_uint8 v[SIZE_UV_OUT])
 {
   int wr = fwrite(y,1,SIZE_Y_OUT,fp);
   if(wr != SIZE_Y_OUT) {
@@ -102,4 +100,3 @@ int write_yuv_frame(FILE* fp,uint8 y[SIZE_Y_OUT], uint8 u[SIZE_UV_OUT], uint8 v[
   }
   return 0;
 }
-

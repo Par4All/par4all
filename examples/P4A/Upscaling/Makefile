@@ -91,4 +91,4 @@ $(TARGET)_accel : $(SOURCES)
 
 $(TARGET)_opencl : $(SOURCES)
 	# Parallelize and build an OpenCL parallel emulation:
-	p4a $(P4A_OPTIONS) --opencl -k -o $@ $(SOURCES) $(LDLIBS)
+	p4a $(P4A_OPTIONS) --opencl -k -g -o $@ $(SOURCES) $(LDLIBS)

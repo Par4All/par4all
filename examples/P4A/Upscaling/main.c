@@ -4,25 +4,27 @@
 
 #define _clip(a) (((a)<0) ? 0 : (((a)>255) ? 255 : (a)))
 
-const short _normalisation=5;
-const short _bias=16;
-uint8 _interpolation_luminance(uint8 a, uint8 b,uint8 c,uint8 d,uint8 e,uint8 f)
+upsc_uint8 _interpolation_luminance(upsc_uint8 a, upsc_uint8 b,upsc_uint8 c,upsc_uint8 d,upsc_uint8 e,upsc_uint8 f)
 {
+  short _normalisation=5;
+  short _bias=16;
   short res = (short)a + (short)f -5*((short)b+(short)e - (((short)c+(short)d)<<2));
   res = (res+_bias)>>_normalisation;
   res=_clip((res));
-  return (uint8)res;
+  return (upsc_uint8)res;
 }
 
 void video_processing(FILE* fpin,FILE* fpout)
 {
+  short _normalisation=5;
+  short _bias=16;
   type_yuv_frame_in frame_in[NBFRAMES];
   type_yuv_frame_out frame_out[NBFRAMES];
 
   printf("Begin reading input video\n");
   // Reading ... data dependence
   for(int i = 0; i < NBFRAMES; i++) {
-    //printf("Reading image %d\n",i);
+    printf("Reading image %d\n",i);
     if (read_yuv_frame(fpin,frame_in[i].y,frame_in[i].u,frame_in[i].v)) {
       fprintf(stderr,"erreur read_yuv_frame No frame=%d\n",i);
       exit(0);
@@ -30,8 +32,8 @@ void video_processing(FILE* fpin,FILE* fpout)
   }
   printf("End of reading\n");  
 
-  
    printf("Begin computation\n");
+   
   // Computation ... no dependence
    for(int n=0;n<NBFRAMES;n++) {
      for (int indice = 0;indice < SIZE_UV_IN;indice++) {
@@ -56,6 +58,8 @@ void video_processing(FILE* fpin,FILE* fpout)
        frame_out[n].v[jj+W_UV_OUT+ii+1] = frame_in[n].v[indice];
      }
    }
+   
+  
 for(int n=0;n<NBFRAMES;n++) {
      for (int index = 0;index < SIZE;index++) {
        //Line in
@@ -85,7 +89,7 @@ for(int n=0;n<NBFRAMES;n++) {
        frame_out[n].y[jj+ii+1+W_Y_OUT] += 20*_interpolation_luminance(frame_in[n].y[(indice+1)-W_Y_IN*2],frame_in[n].y[(indice+1)-W_Y_IN],frame_in[n].y[indice+1],frame_in[n].y[(indice+1)+W_Y_IN],frame_in[n].y[(indice+1)+2*W_Y_IN],frame_in[n].y[(indice+1)+3*W_Y_IN]);
        frame_out[n].y[jj+ii+1+W_Y_OUT] -= 5*_interpolation_luminance(frame_in[n].y[(indice+2)-W_Y_IN*2],frame_in[n].y[(indice+2)-W_Y_IN],frame_in[n].y[indice+2],frame_in[n].y[(indice+2)+W_Y_IN],frame_in[n].y[(indice+2)+2*W_Y_IN],frame_in[n].y[(indice+2)+3*W_Y_IN]);
        frame_out[n].y[jj+ii+1+W_Y_OUT] += _interpolation_luminance(frame_in[n].y[(indice+3)-W_Y_IN*2],frame_in[n].y[(indice+3)-W_Y_IN],frame_in[n].y[indice+3],frame_in[n].y[(indice+3)+W_Y_IN],frame_in[n].y[(indice+3)+2*W_Y_IN],frame_in[n].y[(indice+3)+3*W_Y_IN]);
-       frame_out[n].y[jj+ii+1+W_Y_OUT] = (uint8)_clip((((short)frame_out[n].y[jj+ii+1+W_Y_OUT])+_bias)>>_normalisation);
+       frame_out[n].y[jj+ii+1+W_Y_OUT] = (upsc_uint8)_clip((((short)frame_out[n].y[jj+ii+1+W_Y_OUT])+_bias)>>_normalisation);
        
      }
    }
@@ -99,7 +103,6 @@ for(int n=0;n<NBFRAMES;n++) {
       exit(0);
     } 
   }
-
 }
 
 int main (int argc, char *argv[])
