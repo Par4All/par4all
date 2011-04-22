@@ -291,6 +291,7 @@ static statement generate_prelude(reductionInfo ri)
     basic bas = basic_of_reference(reduction_reference(reductionInfo_reduction(ri)));
 
     // According to the operator, get the correct initialization value
+    // should use operator_neutral_element
     switch(reduction_operator_tag(reduction_op(reductionInfo_reduction(ri))))
     {
         default:
