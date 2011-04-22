@@ -306,15 +306,23 @@ bool if_conversion(char * mod_name)
     return true;
 }
 
-static instruction do_loop_nest_unswitching_purge(statement adam, list conditions) {
-    if(ENDP(conditions)) return copy_instruction(statement_instruction(adam));
-    return make_instruction_test(
-            make_test(
-                copy_expression(EXPRESSION(CAR(conditions))),
-                instruction_to_statement(do_loop_nest_unswitching_purge(adam,CDR(conditions))),
-                instruction_to_statement(do_loop_nest_unswitching_purge(adam,CDR(conditions)))
-                )
+static statement do_loop_nest_unswitching_purge(statement adam, list conditions) {
+    if(ENDP(conditions)) {
+	    clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),NIL,get_current_module_statement());
+	    statement eve = clone_statement(adam,cc);
+	    free_clone_context(cc);
+	    return eve;
+    }
+    statement eve =  instruction_to_statement(
+		    make_instruction_test(
+			    make_test(
+				    copy_expression(EXPRESSION(CAR(conditions))),
+				    do_loop_nest_unswitching_purge(adam,CDR(conditions)),
+				    do_loop_nest_unswitching_purge(adam,CDR(conditions))
+				    )
+			    )
             );
+    return eve;
 }
 
 static void do_loop_nest_unswitching(statement st,list *conditions) {
@@ -351,8 +359,8 @@ static void do_loop_nest_unswitching(statement st,list *conditions) {
         statement sparent = (statement)gen_get_ancestor(statement_domain,st);
         /* some conditions left */
         if(!ENDP(*conditions) && (!statement_loop_p(sparent) || !sparent)) {
-            update_statement_instruction(
-                    st,do_loop_nest_unswitching_purge(st,*conditions));
+            *st = *(do_loop_nest_unswitching_purge(st,*conditions));
+            //add_pragma_str_to_statement(st,get_string_property("OUTLINE_PRAGMA"),true);
             gen_full_free_list(*conditions);
             *conditions=NIL;
         }
@@ -369,9 +377,10 @@ static void do_loop_nest_unswitching(statement st,list *conditions) {
                 set_free(s);
             }
             gen_free_list(tconditions);
-            if(!ENDP(toremove))
-                update_statement_instruction(
-                        st,do_loop_nest_unswitching_purge(st,toremove));
+            if(!ENDP(toremove)) {
+                *st = *(do_loop_nest_unswitching_purge(st,toremove));
+                //add_pragma_str_to_statement(st,get_string_property("OUTLINE_PRAGMA"),true);
+            }
             gen_full_free_list(toremove);
         }
     }
@@ -386,6 +395,11 @@ bool loop_nest_unswitching(const char *module_name) {
     gen_context_recurse(get_current_module_statement(),&l,
             statement_domain,gen_true,do_loop_nest_unswitching);
     pips_assert("everything went well\n",ENDP(l));
+
+
+    // Reorder the module, because new statements have been added 
+    module_reorder(get_current_module_statement());
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement());
 
     reset_current_module_statement();
     reset_current_module_entity();

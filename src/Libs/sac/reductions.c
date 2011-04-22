@@ -459,8 +459,9 @@ bool simd_gather_reduction(statement body, list reductions, list *reductions_inf
 /*
    This function attempts to find reductions for each loop
    */
-static void reductions_rewrite(statement s)
+static void reductions_rewrite(statement s, set skip)
 {
+    if(set_belong_p(skip,s)) return;
     instruction i = statement_instruction(s);
     statement body;
     bool is_loop=true;
@@ -534,6 +535,12 @@ static void reductions_rewrite(statement s)
     if(is_loop) gen_recurse_stop(statement_instruction(s));
 }
 
+static bool reduction_rewrite_filter(statement s,set skip)
+{
+	if (statement_loop_p(s))
+        set_add_element(skip,skip,loop_body(statement_loop(s)));
+	return true;
+}
 
 /** 
  * remove reductions by expanding reduced scalar to an array
@@ -553,7 +560,9 @@ bool simd_remove_reductions(char * mod_name)
     debug_on("SIMDREDUCTION_DEBUG_LEVEL");
 
     /* Now do the job */
-    gen_recurse(get_current_module_statement(), statement_domain, gen_true, reductions_rewrite);
+    set skip = set_make(set_pointer);
+    gen_context_recurse(get_current_module_statement(),skip, statement_domain, reduction_rewrite_filter, reductions_rewrite);
+    set_free(skip);
 
     pips_assert("Statement is consistent after remove reductions", statement_consistent_p(get_current_module_statement()));
 

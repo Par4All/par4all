@@ -119,7 +119,22 @@ static void simd_loop_unroll(statement loop_statement, intptr_t rate)
       full_loop_unroll(loop_statement);
   }
   else
-    do_loop_unroll(loop_statement,rate,NULL);
+  {  
+	  expression lower = range_lower(r);
+	  NORMALIZE_EXPRESSION(lower);
+	  entity new = entity_undefined;
+	  if (normalized_complex_p(expression_normalized(lower))){
+			new = make_new_index_entity(loop_index(statement_loop(loop_statement)),"i");
+			AddEntityToCurrentModule(new);
+			range_lower(r) = entity_to_expression(new);
+	  }	  
+	  do_loop_unroll(loop_statement,rate,NULL);
+	  if (! entity_undefined_p(new)){
+			insert_statement(loop_statement,
+					make_assign_statement(entity_to_expression(new),lower),
+					true);
+	  } 
+  }
   free_expression(erange);
 }
 
@@ -331,8 +346,9 @@ static void gather_local_indices(reference r, set s) {
     }
 }
 
-static void keep_loop_indices(loop l, list *L) {
-    *L=CONS(LOOP,l,*L);
+static void keep_loop_indices(statement s, list *L) {
+	if(statement_loop_p(s))
+		*L=CONS(STATEMENT,s,*L);
 }
 
 static list do_simdizer_auto_tile_int_to_list(int maxdepth, int path,loop l) {
@@ -348,14 +364,22 @@ static list do_simdizer_auto_tile_int_to_list(int maxdepth, int path,loop l) {
 
 static statement do_simdizer_auto_tile_generate_all_tests(statement root, int maxdepth, int path, expression * tests) {
     if(expression_undefined_p(*tests)) {
-        statement cp = copy_statement(root);
+        clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),NIL,get_current_module_statement());
+        statement cp = clone_statement(root, cc);
         /* duplicate effects for the copied statement */
         store_cumulated_rw_effects(cp,copy_effects(load_cumulated_rw_effects(root)));
         list l = do_simdizer_auto_tile_int_to_list(maxdepth, path,statement_loop(root));
         do_symbolic_tiling(cp,l);
+        statement siter = cp;
+        FOREACH(LOOP,li,l)
+            siter = loop_body(statement_loop(siter));
+        free_clone_context(cc);
         return cp;
     }
     else {
+        int npath = path << 1 ;
+        return do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath+1, tests+1);
+        /*
         int npath = path << 1 ;
         statement trueb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath+1, tests+1);
         statement falseb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath,  tests+1);
@@ -369,6 +393,7 @@ static statement do_simdizer_auto_tile_generate_all_tests(statement root, int ma
                         )
                     )
                 );
+                */
     }
 }
 
@@ -397,12 +422,15 @@ bool simdizer_auto_tile(const char * module_name) {
                 set indices = set_make(set_pointer);
                 gen_context_recurse(theloopstatement,indices,reference_domain,gen_true,gather_local_indices);
                 list tloops = NIL;
-                gen_context_recurse(theloopstatement,&tloops, loop_domain,gen_true,keep_loop_indices);
+                gen_context_recurse(theloopstatement,&tloops, statement_domain,gen_true,keep_loop_indices);
                 list allloops =gen_copy_seq(tloops);
-                FOREACH(LOOP,l,allloops) {
-                    if(!set_belong_p(indices,loop_index(l)))
+                FOREACH(STATEMENT,l,allloops) {
+                    if(!set_belong_p(indices,loop_index(statement_loop(l))))
                         gen_remove_once(&tloops,l);
                 }
+				theloopstatement=STATEMENT(CAR((tloops)));
+				//allloops=gen_nreverse(allloops);
+				while(theloopstatement!=STATEMENT(CAR(allloops))) POP(allloops);
                 set_free(indices);
                 set loops = set_make(set_pointer);set_assign_list(loops,tloops);gen_free_list(tloops);
 
@@ -413,10 +441,10 @@ bool simdizer_auto_tile(const char * module_name) {
                 expression alltests[1+nloops];
                 alltests[nloops] = expression_undefined ;
                 int j=0;
-                FOREACH(LOOP,l,allloops) {
+                FOREACH(STATEMENT,sl,allloops) {
                     alltests[j++]=MakeBinaryCall(
                             entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
-                            range_to_expression(loop_range(l),range_to_nbiter),
+                            range_to_expression(loop_range(statement_loop(sl)),range_to_nbiter),
                             int_to_expression(2*max_unroll_rate)
                             );
                 }
@@ -426,7 +454,9 @@ bool simdizer_auto_tile(const char * module_name) {
                         theloopstatement,
                         nloops,
                         alltests);
+                gen_recurse(root, statement_domain, gen_true, statement_remove_useless_label);
                 *theloopstatement=*root;
+                loop_label(statement_loop(theloopstatement))=elabel;
                 success=true;
 
                 /* validate */

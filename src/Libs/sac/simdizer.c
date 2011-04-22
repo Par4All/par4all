@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
+#include "effects-convex.h"
 #include "effects-simple.h"
 #include "accel-util.h"
 
@@ -204,6 +205,17 @@ static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_
                     words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
         }
         else {
+
+            list inter = region_intersection(conflict_sink(c),conflict_source(c));
+            if(ENDP(inter)) // why is this conflict generated ?!?
+            {
+                pips_debug(3,
+                        "conflict skipped between %s and %s\n",
+                        words_to_string(words_reference(effect_any_reference(conflict_sink(c)),NIL)),
+                        words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
+                continue;
+            }
+            gen_full_free_list(inter);
             /* regions tell us there is a conflict.
              * check if the dependence is loop carried or not
              * */
@@ -424,7 +436,10 @@ static int compare_statements_on_distance_to_origin(const void* ps0, const void*
             free_expression(distance0);
 
         }
-        else dist0+=dinf*dinf;
+        else if(expression_scalar_p(e0) && expression_scalar_p(e1))
+            dist0+=1;
+        else
+            dist0+=dinf*dinf;
         if(!expression_undefined_p(distance1))
         {
             if(expression_integer_value(distance1,&val1)) {
@@ -434,7 +449,10 @@ static int compare_statements_on_distance_to_origin(const void* ps0, const void*
             free_expression(distance1);
 
         }
-        else dist1+=dinf*dinf;
+        else if(expression_scalar_p(e0) && expression_scalar_p(e1))
+            dist1+=1;
+        else
+            dist1+=dinf*dinf;
         POP(iter0);
         POP(iter1);
     }
@@ -455,6 +473,7 @@ static int compare_list_from_length(const void *v0, const void *v1)
 
 static list order_isomorphic_statements_list(list ordered)
 {
+    gen_sort_list(ordered,compare_statements_on_ordering);
     list heads = NIL;
     while(!ENDP(ordered)) {
         statement head = STATEMENT(CAR(ordered));
@@ -675,10 +694,8 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                         newseq=gen_append(generate_simd_code(ss,simdCost),newseq);
                         for(intptr_t i= opcode_vectorSize(simdstatement_opcode(ss));i!=0;i--)
                         {
-                            if(!ENDP(iso_iter)) { /*endp can occur when padded statements are added */
-                                set_add_element(visited,visited,STATEMENT(CAR(iso_iter)));
-                                POP(iso_iter);
-                            }
+                            set_add_element(visited,visited,STATEMENT(CAR(iso_iter)));
+                            POP(iso_iter);
                         }
                         iso_iter=order_isomorphic_statements_list(iso_iter);
                     }
@@ -787,6 +804,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
     }
 }
 
+
 /*
  * simple filter for `simdizer'
  * Do not recurse through simple calls, for better performance 
@@ -845,7 +863,6 @@ bool simdizer(char * mod_name)
     remove_preferences(se);
     set_proper_rw_effects(se);
     push_generated_variable_commenter(sac_commenter);
-    init_padding_entities();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
 
@@ -866,7 +883,6 @@ bool simdizer(char * mod_name)
     //DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, dependence_graph);
 
     /* update/release resources */
-    reset_padding_entities();
     reset_proper_rw_effects();
     reset_simd_operator_mappings();
     reset_simd_treematch();
