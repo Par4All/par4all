@@ -371,7 +371,6 @@ def sacCompiler(backendCompiler,driver):
 			self.cc_stderr = err
 			ret = p.returncode
 			if ret != 0:
-				os.remove(filename)
 				print >> sys.stderr, err
 				raise RuntimeError("%s failed with return code %d" % (commandline, ret))
 			self.cc_cmd = commandline
