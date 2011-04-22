@@ -490,6 +490,16 @@ SIMD_DIVW (short DEST[8], short SRC1[8], short SRC2[8])
     DEST[7] = SRC1[7] / SRC2[7];
 }
 
+void SIMD_LOAD_BROADCAST_V8HI(short vec[8], short val) {
+    vec[0] = val;
+    vec[1] = val;
+    vec[2] = val;
+    vec[3] = val;
+    vec[4] = val;
+    vec[5] = val;
+    vec[6] = val;
+    vec[7] = val;
+}
 void
 SIMD_LOAD_GENERIC_V8HI(short VEC[8], short BASE0, short BASE1, short BASE2, short BASE3, short BASE4, short BASE5, short BASE6, short BASE7)
 {  
