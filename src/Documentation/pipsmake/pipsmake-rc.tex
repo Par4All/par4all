@@ -6936,9 +6936,9 @@ ISOLATE_STATEMENT_EVEN_NON_LOCAL FALSE
 \end{PipsProp}
 
 \subsubsection{Delay Communications}
-\begin{PipsPass}{delay_communications}
+\begin{PipsPass}{delay_communications_inter}
 Optimize the load/store dma by delaying the stores and 
-performing the stores as soon as possible.
+performing the stores as soon as possible. Interprocedural version.
 \end{PipsPass}
 
 It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
@@ -6947,11 +6947,11 @@ to distinguish loads and stores from other calls.
 The communication elimination makes the assumption that a load/store pair can always be removed.
 
 \begin{PipsMake}
-delay_communications                    > MODULE.code
+delay_communications_inter                    > MODULE.code
         > MODULE.callees
-        ! CALLEES.delay_communications
-        ! MODULE.delay_load_communications
-        ! MODULE.delay_store_communications
+        ! CALLEES.delay_communications_inter
+        ! MODULE.delay_load_communications_inter
+        ! MODULE.delay_store_communications_inter
         < PROGRAM.entities
         < MODULE.code
         < MODULE.regions
@@ -6961,7 +6961,7 @@ delay_communications                    > MODULE.code
         %> COMPILATION_UNIT.code
         %< COMPILATION_UNIT.code
 \begin{PipsMake}
-delay_load_communications                    > MODULE.code
+delay_load_communications_inter                    > MODULE.code
         > MODULE.callees
         > CALLERS.code
         > CALLERS.callees
@@ -6976,7 +6976,7 @@ delay_load_communications                    > MODULE.code
         %> COMPILATION_UNIT.code
         %< COMPILATION_UNIT.code
 \begin{PipsMake}
-delay_store_communications                    > MODULE.code
+delay_store_communications_inter                    > MODULE.code
         > MODULE.callees
         > CALLERS.code
         > CALLERS.callees
@@ -6988,11 +6988,52 @@ delay_store_communications                    > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-This property can be used to suppress inter-procedural propagation,
-for example when data are not persistent across calls.
-\begin{PipsProp}{DELAY_COMMUNICATIONS_INTERPROCEDURAL}
-DELAY_COMMUNICATIONS_INTERPROCEDURAL TRUE
-\end{PipsProp}
+\begin{PipsPass}{delay_communications_intra}
+Optimize the load/store dma by delaying the stores and 
+performing the stores as soon as possible.
+Intra Procedural version.
+\end{PipsPass}
+
+It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
+to distinguish loads and stores from other calls.
+
+The communication elimination makes the assumption that a load/store pair can always be removed.
+
+\begin{PipsMake}
+delay_communications_intra                    > MODULE.code
+        > MODULE.callees
+        ! MODULE.delay_load_communications_intra
+        ! MODULE.delay_store_communications_intra
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_load_communications_intra                    > MODULE.code
+        > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_store_communications_intra                    > MODULE.code
+        > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+
 
 \subsubsection{Hardware Constraints Solver}
 \begin{PipsPass}{solve_hardware_constraints}

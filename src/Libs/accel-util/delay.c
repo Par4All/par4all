@@ -70,6 +70,8 @@ typedef dg_vertex_label vertex_label;
 #include "effects-simple.h"
 #include "accel-util.h"
 
+static bool delay_communications_interprocedurally_p ;
+
 /* helper to transform preferences in references */
 static void do_remove_preference(cell c){
     if(cell_preference_p(c)) {
@@ -157,7 +159,7 @@ static bool dma_conflict_p(conflict c)
  */
 static bool statements_conflict_p(statement s0, statement s1) {
     /* in intra procedural, a store always conflicts with a return */
-    if(!get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
+    if(!delay_communications_interprocedurally_p &&
             ( simd_store_stat_p(s0) || simd_store_stat_p(s1) ) &&
             ( return_statement_p(s0) || return_statement_p(s1) ) )
         return true;
@@ -188,7 +190,7 @@ static bool statements_conflict_p(statement s0, statement s1) {
  * R-* conflicts are ignored if not load_p */
 static bool statements_conflict_relaxed_p(statement s0, statement s1, bool load_p) {
     /* in intra procedural, a store always conflicts with a return */
-    if(!get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
+    if(!delay_communications_interprocedurally_p &&
             ( simd_store_stat_p(s0) || simd_store_stat_p(s1) ) &&
             ( return_statement_p(s0) || return_statement_p(s1) ) )
         return true;
@@ -556,7 +558,7 @@ static void delay_communications_interprocedurally(context *c) {
 static bool __delay_communications_patch_properties;
 static void delay_communications_init() {
     pips_assert("reset called",graph_undefined_p(dependence_graph));
-    __delay_communications_patch_properties = get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL") &&
+    __delay_communications_patch_properties = delay_communications_interprocedurally_p &&
         ENDP(callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true))); 
     if(__delay_communications_patch_properties)
         set_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL",false);
@@ -600,7 +602,7 @@ bool delay_load_communications(char * module_name)
     delay_communications_statement(module_stat,&c);
 
     /* propagate inter procedurally , except if we have no caller*/
-    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
+    if(delay_communications_interprocedurally_p)
         delay_communications_interprocedurally(&c);
     else
         delay_communications_intraprocedurally(module_stat,&c);
@@ -630,6 +632,15 @@ bool delay_load_communications(char * module_name)
 
     return c.result;
 }
+bool delay_load_communications_inter(char * module_name) {
+  delay_communications_interprocedurally_p = true;
+  return delay_load_communications(module_name);
+}
+bool delay_load_communications_intra(char * module_name) {
+  delay_communications_interprocedurally_p = false;
+  return delay_load_communications(module_name);
+}
+
 bool delay_store_communications(char * module_name)
 {
     /* Get the code of the module. */
@@ -660,7 +671,7 @@ bool delay_store_communications(char * module_name)
     delay_communications_statement(module_stat,&c);
 
     /* propagate inter procedurally , except if we have no caller*/
-    if(get_bool_property("DELAY_COMMUNICATIONS_INTERPROCEDURAL"))
+    if(delay_communications_interprocedurally_p)
         delay_communications_interprocedurally(&c);
     else
         delay_communications_intraprocedurally(module_stat,&c);
@@ -688,6 +699,14 @@ bool delay_store_communications(char * module_name)
     reset_proper_rw_effects();
 
     return c.result;
+}
+bool delay_store_communications_inter(char * module_name) {
+  delay_communications_interprocedurally_p = true;
+  return delay_store_communications(module_name);
+}
+bool delay_store_communications_intra(char * module_name) {
+  delay_communications_interprocedurally_p = false;
+  return delay_store_communications(module_name);
 }
 
 static bool dmas_invert_p(statement s0, statement s1) {
@@ -871,7 +890,7 @@ static bool remove_redundant_communications(statement s) {
             NULL);
     return need_flatten;
 }
-bool delay_communications(char * module_name)
+static bool delay_communications(const char * module_name)
 {
     /* Get the code of the module. */
     entity module = module_name_to_entity(module_name);
@@ -916,4 +935,12 @@ bool delay_communications(char * module_name)
     reset_ordering_to_statement();
 
     return true;
+}
+bool delay_communications_inter(const char *module_name) {
+  delay_communications_interprocedurally_p = true;
+  return delay_communications(module_name);
+}
+bool delay_communications_intra(const char *module_name) {
+  delay_communications_interprocedurally_p = false;
+  return delay_communications(module_name);
 }
