@@ -1,4 +1,4 @@
-import os,git
+import os,git,glob
 import pyps,pypips
 
 class workspace(pyps.workspace):
@@ -27,7 +27,8 @@ class workspace(pyps.workspace):
 
 	def _git_do_commit(self,msg):
 		# We should do something better, but I can't understand how this version of python-git really works...
-		os.system("git --git-dir=%s --work-tree=%s add *.c" % (self._gitdir,self._dirbase))
+		cfiles = " ".join(map(os.path.basename, glob.glob(os.path.join(self._dirbase, "*.c"))))
+		os.system("git --git-dir=%s --work-tree=%s add %s" % (self._gitdir,self._dirbase, cfiles))
 		os.system("git --git-dir=%s --work-tree=%s commit -m \"%s\"" % (self._gitdir, self._dirbase, msg))
 
 	def pre_phase(self, phase, module):
