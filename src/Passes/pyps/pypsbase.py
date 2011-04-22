@@ -686,7 +686,7 @@ class workspace(object):
 	def set_phase_log_buffer(self, log_buffer): self._log_buffer=log_buffer
 
 	def pre_phase(self, phase, module): pass
-	def post_phase(self, phase, module, log): pass
+	def post_phase(self, phase, module): pass
 
 	# Create an "all" pseudo-variable that is in fact the execution of
 	# filter with the default filtering rule: True

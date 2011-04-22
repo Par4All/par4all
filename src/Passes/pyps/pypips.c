@@ -46,11 +46,13 @@
 #include "phases.h"
 #include "properties.h"
 #include "pipsmake.h"
+#include "text-util.h" // for words_to_string
 
 #include "top-level.h"
 
 static FILE * logstream = NULL;
-static char* log_buffer = NULL;
+static list log_list = list_undefined;
+
 static void pyps_log_handler(const char *fmt, va_list args)
 {
 	FILE * log_file = get_log_file();
@@ -66,16 +68,11 @@ static void pyps_log_handler(const char *fmt, va_list args)
 
 	vfprintf(logstream, fmt, args_copy);
 	fflush(logstream);
-	if (log_buffer != NULL)
+	if (!list_undefined_p(log_list))
 	{
 		char* tmp;
 		vasprintf(&tmp, fmt, args_copy2);
-		char* new_buf = (char*) malloc(strlen(tmp)+strlen(log_buffer)+1);
-		strcpy(new_buf, log_buffer);
-		strcat(new_buf, tmp);
-		free(log_buffer);
-		free(tmp);
-		log_buffer = new_buf;
+		log_list = CONS(STRING,tmp,log_list);
 	}
 
 	if (!log_file || !get_bool_property("USER_LOG_P"))
@@ -118,26 +115,30 @@ static void pyps_error_handler(const char * calling_function_name,
    }
 }
 
-void save_log_to_buffer()
+void open_log_buffer()
 {
-	if (log_buffer != NULL)
-		clean_log_buffer();
-	// Ugly, temporary...
-	log_buffer = (char*) malloc(1);
-	log_buffer[0] = 0;
+	if (!list_undefined_p(log_list))
+		close_log_buffer();
+	log_list = NIL;
+
 }
 
 char* get_log_buffer()
 {
-	return log_buffer;
+	assert(!list_undefined_p(log_list));
+	list log_list_tmp=gen_copy_seq(log_list);
+	log_list_tmp = gen_nreverse(log_list_tmp);
+	char* ret = words_to_string(log_list_tmp);
+	gen_free_list(log_list_tmp);
+	return ret;
 }
 
-void clean_log_buffer()
+void close_log_buffer()
 {
-	if (log_buffer != NULL)
+	if (!list_undefined_p(log_list))
 	{
-		free(log_buffer);
-		log_buffer = NULL;
+		gen_free_string_list(log_list);
+		log_list = list_undefined;
 	}
 }
 

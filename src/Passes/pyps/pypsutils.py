@@ -96,14 +96,8 @@ def apply(m, phase, *args, **kwargs):
 	""" apply a phase to a module. The method pre_phase and post_phase
 	of the originate workspace will be called. """
 	m._ws.pre_phase(phase,m)
-	log = None
-	if (m._ws.phase_log_buffer()):
-		m._ws.cpypips.save_log_to_buffer()
 	m._ws.cpypips.apply(phase.upper(),m._name)
-	if (m._ws.phase_log_buffer()):
-		log = m._ws.cpypips.get_log_buffer()
-		m._ws.cpypips.clean_log_buffer()
-	m._ws.post_phase(phase,m,log)
+	m._ws.post_phase(phase,m)
 
 def update_props(passe,props):
 	"""Change a property dictionary by appending the pass name to the property when needed """
