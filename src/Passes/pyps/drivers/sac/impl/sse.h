@@ -17,7 +17,7 @@ typedef __m128i v8hi;
 #define SIMD_LOADA_V4SF(vec,arr) vec=_mm_load_ps(arr)
 #define SIMD_LOAD_BROADCAST_V4SF(vec,val) vec=_mm_set1_ps(val)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
-#define SIMD_DIVPS(vec1,vec2,vec3) vec1=_mm_div_ps(vec2,vec3)
+#define SIMD_DIVPS(vec1,vec2,vec3) vec1=_mm_div_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
 #define SIMD_SUBPS(vec1, vec2, vec3) vec1 = _mm_sub_ps(vec2, vec3)
 #define SIMD_MULADDPS(vec1, vec2, vec3, vec4) \

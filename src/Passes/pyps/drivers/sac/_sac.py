@@ -210,9 +210,7 @@ class sacavx(sacbase):
 
 class sacneon(sacbase):
 	register_width = 128
-	hfile = "neon.h"
-	makefile = "Makefile.neon"
-	ext = "neon"
+	hfile = neon_h
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacneon.register_width
