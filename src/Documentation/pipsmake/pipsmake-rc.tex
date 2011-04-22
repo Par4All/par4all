@@ -2308,7 +2308,11 @@ cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops.
+Fortran parallel DO loops. \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
+can be set to FALSE to prevent this behavior.
+\begin{PipsProp}{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
+MASK_EFFECTS_ON_PRIVATE_VARIABLES TRUE
+\end{PipsProp}
 
 
 
@@ -9554,7 +9558,7 @@ additional opportunities for (4a) invariant code motion (ICM) and (4b)
 common subexpression elimination (CSE).
 
 Large arithmetic expressions are first built up via forward substitution
-when the programmer has already applied ICM and CES by hand.
+when the programmer has already applied ICM and CSE by hand.
 
 The optimal restructuring of expressions depends on the target defined by
 a combination of the computer architecture and the compiler. The target is
@@ -9666,6 +9670,8 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \begin{PipsPass}{icm}
 Performs invariant code motion over sub expressions
 \end{PipsPass}
+It is required to set \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES} to
+FALSE when computing effects needed by this pass.
 
 %-----------End of Expression Transformations -------------------------
 
