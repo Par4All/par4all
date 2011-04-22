@@ -895,6 +895,46 @@ static void do_split_block_statements(statement s) {
     }
 }
 
+static void do_split_decl_block_statements(statement s) {
+  if(statement_block_p(s)) {
+    list iter,prev=NIL;
+    for(iter=statement_block(s);!ENDP(iter) && declaration_statement_p(STATEMENT(CAR(iter))); POP(iter) ) {
+      prev=iter;
+    }
+    if(!ENDP(iter) && !ENDP(prev) ) {
+      CDR(prev)=NIL;
+      statement tail = make_block_statement(iter);
+      /* is there a tail return ? */
+      list iter2,prev2=NIL;
+      for(iter2=iter;!ENDP(iter2) && !return_statement_p(STATEMENT(CAR(iter2))); POP(iter2) ) {
+        prev2=iter2;
+      }
+      if(!ENDP(iter2) && !ENDP(prev2) ) { /* yes there is */
+        CDR(prev2)=NIL;
+        statement rtail = make_block_statement(iter2);
+        insert_statement(STATEMENT(CAR(prev)),tail,false);
+        insert_statement(STATEMENT(CAR(prev)),rtail,false);
+      }
+      else {
+        insert_statement(STATEMENT(CAR(prev)),tail,false);
+      }
+    }
+    else {
+      /* is there a tail return ? */
+      list iter2,prev2=NIL;
+      for(iter2=iter=statement_block(s);!ENDP(iter2) && !return_statement_p(STATEMENT(CAR(iter2))); POP(iter2) ) {
+        prev2=iter2;
+      }
+      if(!ENDP(iter2) && !ENDP(prev2) ) { /* yes there is */
+        CDR(prev2)=NIL;
+        statement rtail = make_block_statement(iter2);
+        /* not using insert_statement because it is too smart ! we want to keep a block*/
+        gen_append(statement_block(s),make_statement_list(rtail));
+      }
+    }
+  }
+}
+
 bool simdizer_init(const char * module_name)
 {
     /* get the resources */
@@ -904,9 +944,11 @@ bool simdizer_init(const char * module_name)
     /* normalize blocks */
     clean_up_sequences(get_current_module_statement());
 
+    /* then split blocks containing declarations statement */
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, do_split_decl_block_statements);
+
     /* then split blocks containing labeled statement */
-    gen_recurse(get_current_module_statement(), statement_domain,
-            gen_true, do_split_block_statements);
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, do_split_block_statements);
 
     /* sort commutative operators */
     gen_recurse(get_current_module_statement(),call_domain,gen_true,do_simdizer_init);

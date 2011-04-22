@@ -74,29 +74,6 @@ static entity make_reduction_vector_entity(reduction r)
     list lis = CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)), NIL);
     new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
     AddLocalEntityToDeclarations(new_ent,mod_ent,get_current_module_statement());
-#if 0
-    /* The new entity is stored in the list of entities of the same type. */
-    switch(basic_tag(base))
-    {
-        case is_basic_int:
-            {
-                integer_entities = CONS(ENTITY, new_ent, integer_entities);
-                break;
-            }
-        case is_basic_float:
-            {
-                if(basic_float(base) == DOUBLE_PRECISION_SIZE)
-                    double_entities = CONS(ENTITY, new_ent, double_entities);
-                else
-                    real_entities = CONS(ENTITY, new_ent, real_entities);
-                break;
-            }
-        default:
-            break;
-    }
-    //free_basic(base);
-#endif
-
     return new_ent;
 }
 
@@ -513,6 +490,7 @@ static void reductions_rewrite(statement s)
 {
     instruction i = statement_instruction(s);
     statement body;
+    bool is_loop=true;
 
     //We are only interested in loops
     switch(instruction_tag(i))
@@ -527,6 +505,11 @@ static void reductions_rewrite(statement s)
 
         case is_instruction_forloop:
             body = forloop_body(instruction_forloop(i));
+            break;
+
+        case is_instruction_sequence:
+            body = s;
+            is_loop=false;
             break;
 
         default:
@@ -572,15 +555,12 @@ static void reductions_rewrite(statement s)
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
-        statement scp = copy_statement(s);
-        statement_label(s)=entity_empty_label();
-        sequence seq = make_sequence(
-                gen_concatenate(
-                    preludes,
-                    CONS(STATEMENT, scp,compacts)));
-        update_statement_instruction(s,make_instruction_sequence(seq));
+        insert_statement(s,make_block_statement(compacts),false);
+        insert_statement(s,make_block_statement(preludes),true);
     }
+    if(is_loop) gen_recurse_stop(statement_instruction(s));
 }
+
 
 /** 
  * remove reductions by expanding reduced scalar to an array
@@ -605,6 +585,7 @@ bool simd_remove_reductions(char * mod_name)
     pips_assert("Statement is consistent after remove reductions", statement_consistent_p(get_current_module_statement()));
 
     /* Reorder the module, because new statements have been added */  
+    clean_up_sequences(get_current_module_statement());
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(get_current_module_statement()));

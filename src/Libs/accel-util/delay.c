@@ -519,31 +519,37 @@ static void do_delay_communications_interprocedurally(call ca, context *c) {
   }
 }
 
+
 /* transform each caller into a load / call /store sequence */
-static void delay_communications_interprocedurally(context *c) {
-    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true));
-    list callers_statement = callers_to_statements(callers);
-
-    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter)) {
-      c->caller=module_name_to_entity( STRING(CAR(citer)) );
-      c->caller_statement = STATEMENT(CAR(siter));
-      gen_context_recurse(c->caller_statement,c,call_domain,gen_true,do_delay_communications_interprocedurally);
-      clean_up_sequences(c->caller_statement);
-    }
-
-    for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter)) {
-      string caller_name = STRING(CAR(citer));
-      statement caller_statement = STATEMENT(CAR(siter));
-      module_reorder(caller_statement);
-      DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,caller_statement);
-      DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name,compute_callees(caller_statement));
-    }
-}
-
 static void delay_communications_intraprocedurally(statement module_stat, context *c) {
     FOREACH(STATEMENT,s,c->stats)
         insert_statement(module_stat,s,c->backward);
     gen_free_list(c->stats);c->stats=NIL;
+}
+static void delay_communications_interprocedurally(context *c) {
+    list callers = callees_callees((callees)db_get_memory_resource(DBR_CALLERS,module_local_name(get_current_module_entity()), true));
+    if(ENDP(callers)) {
+        pips_user_warning("no caller for function `%s', falling back to intra-procedural delaying\n",get_current_module_name());
+        delay_communications_intraprocedurally(get_current_module_statement(),c);
+    }
+    else {
+        list callers_statement = callers_to_statements(callers);
+
+        for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter)) {
+            c->caller=module_name_to_entity( STRING(CAR(citer)) );
+            c->caller_statement = STATEMENT(CAR(siter));
+            gen_context_recurse(c->caller_statement,c,call_domain,gen_true,do_delay_communications_interprocedurally);
+            clean_up_sequences(c->caller_statement);
+        }
+
+        for(list citer=callers,siter=callers_statement;!ENDP(citer);POP(citer),POP(siter)) {
+            string caller_name = STRING(CAR(citer));
+            statement caller_statement = STATEMENT(CAR(siter));
+            module_reorder(caller_statement);
+            DB_PUT_MEMORY_RESOURCE(DBR_CODE, caller_name,caller_statement);
+            DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, caller_name,compute_callees(caller_statement));
+        }
+    }
 }
 
 

@@ -108,7 +108,15 @@ class sacbase(object):
 
 
 		#module.common_subexpression_elimination()
-		module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
+		try:
+			module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
+		except RuntimeError:
+			ws.activate("RICE_FAST_DEPENDENCE_GRAPH")
+			ws.activate("ATOMIC_CHAINS")
+			module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
+			ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
+			ws.activate("REGION_CHAINS")
+
 		if cond.get("verbose"):
 			module.display()
 		try:
