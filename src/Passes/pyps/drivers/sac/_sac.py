@@ -9,15 +9,7 @@ import subprocess
 import pyps
 from subprocess import Popen, PIPE
 
-simd_c = "SIMD.c"
 simd_h = "SIMD_types.h"
-sse_h = "sse.h"
-threednow_h = "3dnow.h"
-avx_h = "avx.h"
-neon_h = "neon.h"
-patterns_c = "patterns.c"
-patterns_h = "patterns.h"
-curr_sse_h=sse_h
 
 def gen_simd_zeros(code):
 	""" This function will match the pattern SIMD_ZERO*_* + SIMD_LOAD_*
@@ -187,17 +179,14 @@ class sacbase(object):
 
 class sacsse(sacbase):
 	register_width = 128
-	hfile = sse_h
+	hfile = "sse.h"
 	@staticmethod
 	def sac(module, **kwargs):
-		global curr_sse_h
 		kwargs["register_width"] = sacsse.register_width
 		sacbase.sac(module, **kwargs)
-		curr_sse_h=sse_h
 
 	@staticmethod
 	def addintrinsics(fname):
-		global curr_sse_h
 		replacements = [
 				# drop the alignement attribute on the __m128 registers
 				(r"(v4s[if]_[^[]*\[[^]]*?\]) __attribute__ \(\(aligned \(\d+\)\)\)", r"\1"),
@@ -213,13 +202,13 @@ class sacsse(sacbase):
 				(r"v2d[if]_([^,[]+)\[[^]]*\]", r"\1"),
 				(r"v2d[if]_([^ ,[]+)", r"\1"),
 				]
-		sacbase.addintrinsics(fname, curr_sse_h, replacements)
+		sacbase.addintrinsics(fname, self.hfile, replacements)
 
 	CFLAGS = "-msse4.2 -march=native -O3"
 
 class sac3dnow(sacbase):
 	register_width = 64
-	hfile = threednow_h
+	hfile = "threednow.h"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sac3dnow.register_width
@@ -241,13 +230,13 @@ class sac3dnow(sacbase):
 				(r"v2sf_([^,[]+)\[[^]]*\]", r"\1"),
 				(r"v2sf_([^ ,[]+)", r"\1"),
 				]
-		sacbase.addintrinsics(fname, Threednow_h, replacements)
+		sacbase.addintrinsics(fname, self.hfile, replacements)
 
 	CFLAGS = "-m3dnow -march=opteron -O3"
 
 class sacavx(sacbase):
 	register_width = 256
-	hfile = avx_h
+	hfile = "avx.h"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacavx.register_width
@@ -257,13 +246,13 @@ class sacavx(sacbase):
 	def addintrinsics(fname):
 		replacements = [
 			]
-		sacbase.addintrinsics(fname, avx_h, replacements)
+		sacbase.addintrinsics(fname, self.hfile, replacements)
 
 	CFLAGS = "-mavx -O3"
 
 class sacneon(sacbase):
 	register_width = 128
-	hfile = neon_h
+	hfile = "neon.h"
 	@staticmethod
 	def sac(module, *args, **kwargs):
 		kwargs["register_width"] = sacneon.register_width
@@ -273,7 +262,7 @@ class sacneon(sacbase):
 	def addintrinsics(fname):
 		replacements = [
 			]
-		sacbase.addintrinsics(fname, neon_h, replacements)
+		sacbase.addintrinsics(fname, self.hfile, replacements)
 
 	CFLAGS = "-mfpu=neon -mfloat-abi=softfp -O3"
 
@@ -282,14 +271,19 @@ class workspace(pyps.workspace):
 
 	Add a new transformation, for adapting code to SIMD instruction
 	sets (SSE, 3Dnow, AVX and ARM NEON)"""
+
+	patterns_h = "patterns.h"
+	patterns_c = "patterns.c"
+	simd_c = "SIMD.c"
+
 	def __init__(self, *sources, **kwargs):
 		drivers = {"sse": sacsse, "3dnow": sac3dnow, "avx": sacavx, "neon": sacneon}
 		self.driver = drivers[kwargs.get("driver", "sse")]
-		#Warning: this patches every modules, not only those of this worspace 
+		#Warning: this patches every modules, not only those of this workspace 
 		pyps.module.sac=self.driver.sac
 		# Add -DRWBITS=self.driver.register_width to the cppflags of the workspace
 		kwargs['cppflags'] = kwargs.get('cppflags',"")+" -DRWBITS=%d " % (self.driver.register_width)
-		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), *sources, **kwargs)
+		super(workspace,self).__init__(pypsutils.get_runtimefile(self.simd_c,"sac"), pypsutils.get_runtimefile(self.patterns_c,"sac"), *sources, **kwargs)
 
 	def save(self, rep=None):
 		"""Add $driver.h, which replaces general purpose SIMD instructions
@@ -315,7 +309,7 @@ class workspace(pyps.workspace):
 		if p.returncode != 0:
 			raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 
-		p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, self.simd_c), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		(simdz_cus_header,serr) = p.communicate()
 		if p.returncode != 0:
 			raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
@@ -330,10 +324,10 @@ class workspace(pyps.workspace):
 		# Add the contents of patterns.h
 		for fname in files:
 			if not fname.endswith("patterns.c"):
-				pypsutils.addBeginnning(fname, '#include "'+patterns_h+'"\n')
+				pypsutils.addBeginnning(fname, '#include "'+self.patterns_h+'"\n')
 		# Add header to the save rep
 		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
-		shutil.copy(pypsutils.get_runtimefile(patterns_h,"sac"),rep)
+		shutil.copy(pypsutils.get_runtimefile(self.patterns_h,"sac"),rep)
 		return files
 
 	def get_sac_compiler(self,backendCompiler):
@@ -352,7 +346,7 @@ def sacCompiler(backendCompiler,driver):
 			filetruename = os.path.basename(filename)
 			#change the includes
 			filestring = pypsutils.file2string(filename)
-			filestring= re.sub('#include "SIMD.h"','#include "'+driver.hfile+'"',filestring)
+			filestring= re.sub('#include "'+simd_h+'"','#include "'+driver.hfile+'"',filestring)
 			newcfile = os.path.join(filepath,"sac_"+filetruename)
 			pypsutils.string2file(filestring,newcfile)
 			#create symlink .h file
