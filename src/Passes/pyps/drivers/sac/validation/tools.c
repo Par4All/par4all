@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <complex.h>
 
-// These macros must not be used directy !
+// These macros must not be used directly !
 #ifdef __PYPS_SAC_VALIDATE
 #define _print_array(name, ptr, n, format, stype) \
 	fwrite(ptr, n, stype, stdout); \
@@ -30,7 +30,7 @@
 #endif
 
 static FILE* _f_data_file = 0;
-int _init_data(void* ptr, const ssize_t n);
+int _init_data(char* ptr, const ssize_t n);
 
 
 void init_data_file(const char* data_file)
@@ -80,7 +80,7 @@ void print_array_cplx(const char* name, const float complex* arr, const unsigned
 	}
 }
 
-int _init_data(void* ptr, const ssize_t n)
+int _init_data(char* ptr, const ssize_t n)
 {
 	ssize_t nr;
 	ssize_t ntoread;
