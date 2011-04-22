@@ -80,6 +80,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	w.activate(module.preconditions_inter_full)
 	w.activate(module.region_chains)
 	w.props.semantics_trust_array_declarations=True
+	w.props.prettyprint_sequential_style="do"
 
 	if debug:print "tidy the code just in case of"
 	m.partial_eval()
@@ -100,46 +101,55 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	for l in m.loops():
 		if l.loops():
 				# this take care of expanding the loop in order to match number of processor constraint
-				m.smart_loop_expansion(l,tiling_vector[0],debug)
+				#m.smart_loop_expansion(l,tiling_vector[0],debug)
 				# this take care of expanding the loop in order to match memory size constraint
-				m.smart_loop_expansion(l.loops(0),tiling_vector[1],debug)
+				#m.smart_loop_expansion(l.loops(0),tiling_vector[1],debug)
 				l.symbolic_tiling(force=True,vector=vconv(tiling_vector))
+				m.common_subexpression_elimination()
+				m.invariant_code_motion()
 				if debug:m.display()
-				#m.icm()
+				#if debug:m.display()
+				m.loop_nest_unswitching()
+				m.partial_eval()
+				if debug:m.display()
+
+				#m.optimize_expressions("ICMCSE",MASK_EFFECTS_ON_PRIVATE_VARIABLES=False)
+				if debug:m.display()
+				#if debug:m.display(activate=module.print_code_preconditions)
 
 	print "group constants and isolate"
 	kernels=[]
 	for l0 in m.loops():
 		for l1 in l0.loops():
-			for l2 in l1.loops():
-				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[0],limit=nbPE,type="NB_PROC")
-				m.partial_eval()
-				if debug:m.display()
-				m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=memoryPE*nbPE,type="VOLUME")
-				if debug:m.display()
-				m.partial_eval()
-				m.forward_substitute()
-				m.redundant_load_store_elimination()
-				m.clean_declarations()
-				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
-				if debug:m.display()
-				#m.smart_loop_expansion(l2,str(nbPE),debug,center=False)
-				m.array_expansion()
-				if debug:m.display()
-				for k in all_callers(m):
-					k.array_expansion()
-					if debug:k.display()
-				w.check(debug)
+			l2=l1.loops(0) # we re only interested in the first tile
+			m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[0],limit=nbPE,type="NB_PROC")
+			m.partial_eval()
+			if debug:m.display()
+			m.solve_hardware_constraints(label=l2.label,unknown=tiling_vector[1],limit=memoryPE*nbPE,type="VOLUME")
+			if debug:m.display()
+			m.partial_eval()
+			m.forward_substitute()
+			m.redundant_load_store_elimination()
+			m.clean_declarations()
+			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+			if debug:m.display()
+			#m.smart_loop_expansion(l2,str(nbPE),debug,center=False)
+			#m.array_expansion()
+			#if debug:m.display()
+			#for k in all_callers(m):
+			#	k.array_expansion()
+			#	if debug:k.display()
+			w.check(debug)
 
 
 	for l0 in m.loops():
 		for l1 in l0.loops():
-			for l2 in l1.loops():
-				kernels+=[l2]
-				m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
-				if debug:m.display()
-				m.isolate_statement(label=l2.label)
-				if debug:m.display()
+			l2 = l1.loops(0)
+			kernels+=[l2]
+			m.group_constants(layout="terapix",statement_label=l2.label,skip_loop_range=True)
+			if debug:m.display()
+			m.isolate_statement(label=l2.label)
+			if debug:m.display()
 	m.loop_normalize(one_increment=True,skip_index_side_effect=True,lower_bound=0)
 	m.partial_eval()
 	w.check(debug)
