@@ -103,7 +103,7 @@ class workspace(pyps.workspace):
 
 	def benchmark(self, makefile="Makefile", iterations = 1, args=[],**opt):
 		rep = self.tmpdirname
-		outfile = self.compile(rep=rep,makefile=makefile,rule="clean",**opt)[0]
+		outfile = self.compile(rep=rep,makefile=makefile,rule="mrproper",**opt)[0]
 		outfile = self.compile(rep=rep,makefile=makefile,**opt)[0]
 		
 		self._module_rtimes = dict()
