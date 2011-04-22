@@ -353,6 +353,8 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
 
 
   loop_stmt1 = instruction_to_statement(loop_inst1);
+  statement_label(loop_stmt1)=statement_label(loop_statement);
+  statement_label(loop_statement)=entity_empty_label();
   instruction_block(block)= gen_nconc(instruction_block(block),
 				      CONS(STATEMENT, loop_stmt1, NIL));
 
