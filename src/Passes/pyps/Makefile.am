@@ -8,7 +8,7 @@ dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar
 
-dist_pkgpython_PYTHON = pypsbase.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
+dist_pkgpython_PYTHON = pypsbase.py pypsex.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
 dist_python_DATA = pips.pth
 
 dist_pypsruntime_DATA=pipsdef.h
