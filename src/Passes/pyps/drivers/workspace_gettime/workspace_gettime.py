@@ -76,8 +76,10 @@ class workspace(pyps.workspace):
 	def _get_timefile_and_parse(self):
 		if self.remote:
 			self.remote.copyRemote(self._timefile,self._timefile)
+		print >>sys.stderr, "reading",self._timefile
 		with open(self._timefile, "r") as f:
 			rtimes = f.readlines()
+			print >>sys.stderr, "read",rtimes
 		reTime = re.compile(r"^(.*): *([0-9]+)$")
 		nmodule = dict()
 		for l in rtimes:
@@ -99,9 +101,10 @@ class workspace(pyps.workspace):
 			raise RuntimeError("self.benchmark() must have been run !")
 		return self._final_runtimes[module.name]
 
-	def benchmark(self, makefile="Makefile", iterations = 1, args=[]):
+	def benchmark(self, makefile="Makefile", iterations = 1, args=[],**opt):
 		rep = self.tmpdirname()
-		outfile = self.compile(rep=rep,makefile=makefile)[0]
+		outfile = self.compile(rep=rep,makefile=makefile,rule="clean",**opt)[0]
+		outfile = self.compile(rep=rep,makefile=makefile,**opt)[0]
 		
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
@@ -111,7 +114,6 @@ class workspace(pyps.workspace):
 			if rc != 0:
 				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(outfile+" ".join(args), rc, out,err)
 				raise RuntimeError(message)
-			time = 0
 			try:
 				self._get_timefile_and_parse()
 			except IOError:

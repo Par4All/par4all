@@ -609,7 +609,7 @@ class workspace(object):
 		return maker.generate(rep,map(os.path.basename,saved),cppflags=self.cppflags,ldflags=self.ldflags)
 
 
-	def compile(self, rep=None, makefile="Makefile", outfile="a.out"):
+	def compile(self, rep=None, makefile="Makefile", outfile="a.out", rule="all", **opts):
 		""" uses the fabulous makefile generated to compile the workspace """	
 		if rep == None:
 			rep = self.tmpdirname()
@@ -617,12 +617,17 @@ class workspace(object):
 		commandline+=["-C",rep]
 		commandline+=["-f",makefile]
 		commandline.append("TARGET="+outfile)
-		
+		for (k,v) in opts.iteritems():
+			commandline.append(k+"="+str(v))
+		commandline.append(rule)
+
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline
 		#We need to set shell to False or it messes up with the make command
 		p = Popen(commandline, shell=False, stdout = PIPE, stderr = PIPE)
 		(out,err) = p.communicate()
+		if self.verbose:
+			print >> sys.stderr, out
 		rc = p.returncode
 		if rc != 0:
 			print >> sys.stderr, err

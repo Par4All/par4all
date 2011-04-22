@@ -126,7 +126,7 @@ class workspace(pyps.workspace):
 			self.remoteExec.copy(os.path.join(rep,f),rep)
 		return makefile,others
 		
-	def compile(self,rep=None, makefile="Makefile", outfile="a.out"):
+	def compile(self,rep=None, makefile="Makefile", outfile="a.out",**opt):
 		""" Uses makefiles on the remote host to compile the workspace"""
 		if rep == None:
 			rep = self.tmpdirname()
@@ -135,6 +135,8 @@ class workspace(pyps.workspace):
 		commandline+=["-C",rep]
 		commandline+=["-f",makefile]
 		commandline.append("TARGET="+outfile)
+		for (k,v) in opt.iteritems():
+			commandline.append(k+"="+str(v))
 		
 		if self.verbose:
 			print >> sys.stderr , "Compiling the remote workspace with", commandline
