@@ -142,10 +142,9 @@ mark_loop_to_outline(const statement s) {
 
 
 
+/* Transform a loop nest into a GPU or accelerator-like kernel
 
-/* Transform a loop nest into a GPU kernel
-
-   @param s is the loop-nest statement
+   @param s is the parallel loop-nest statement
 
    @param depth is the number of loop in the loop nest to be taken out as
    the GPU iterators
@@ -185,7 +184,14 @@ mark_loop_to_outline(const statement s) {
      save[i][j] = 0.25*(space[i-1][j]+space[i+1][j]+space[i][j-1]+space[i][j+1]);
    }
 
-*/
+   Other properties modify the behaviour:
+   GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT,
+   GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT,
+   GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT,
+   GPU_COORDINATE_INTRINSICS_FORMAT, GPU_USE_FORTRAN_WRAPPER
+
+   Look at pipsmake-rc documentation.
+ */
 static void
 gpu_ify_statement(statement s, int depth, const char* mod_name) {
   ifdebug(1) {
@@ -195,6 +201,10 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
   // Get the statement inside the loop-nest:
   statement inner = perfectly_nested_loop_to_body_at_depth(s, depth);
 
+  // Save the value of a property we are going to change locally:
+  bool old_outline_independent_compilation_unit =
+    get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT");
+
   /* If we want to oultine a kernel: */
   if (get_bool_property("GPU_USE_KERNEL")) {
     /* First outline the innermost code (the kernel itself) to avoid
@@ -202,6 +212,9 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
        first. The kernel name with a prefix defined in the
        GPU_KERNEL_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
+    // Choose if we want the kernel in its own file:
+    set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
+		      get_bool_property("GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT"));
     outliner(build_outline_name(kernel_prefix, mod_name),sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel:");
   }
@@ -263,6 +276,9 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        the kernel call. The kernel wrapper name with a prefix defined in the
        GPU_WRAPPER_PREFIX property: */
     list sk = CONS(STATEMENT, inner, NIL);
+    // Choose if we want the wrapper in its own file:
+    set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
+		      get_bool_property("GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT"));
     outliner(build_outline_name(wrapper_prefix, mod_name), sk);
     //insert_comments_to_statement(inner, "// Call the compute kernel wrapper:");
   }
@@ -272,6 +288,9 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
        GPU_LAUNCHER_PREFIX property: */
     list sl = CONS(STATEMENT, s, NIL);
     statement st;
+    // Choose if we want the launcher in its own file:
+    set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
+		      get_bool_property("GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT"));
     st = outliner(build_outline_name(launcher_prefix, mod_name), sl);
     if (get_bool_property("GPU_USE_FORTRAN_WRAPPER")) {
       string fwp = strdup(concatenate(fwrapper_prefix,"_",mod_name,NULL));
@@ -283,7 +302,11 @@ user error in rmake: recursion on resource SUMMARY_EFFECTS of p4a_kernel_wrapper
     }
     //insert_comments_to_statement(inner, "// Call the compute kernel launcher:");
   }
+  // Restore the original property value:
+  set_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT",
+		    old_outline_independent_compilation_unit);
 }
+
 
 /* Transform all the parallel loop nests of a module into smaller
    independent functions suitable for GPU-style accelerators.
