@@ -18,8 +18,69 @@ neon_h = "neon.h"
 patterns_c = "patterns.c"
 patterns_h = "patterns.h"
 simd-eq_c = "SIMD-eqs.c"
+simd-eq_h = "SIMD-eqs.h"
 patterns-eq_def = "patterns-eq.def"
+curr_sse_h=sse_h
 
+def gen_simd_zeros(code):
+	""" This function will match the pattern SIMD_ZERO*_* + SIMD_LOAD_*
+	and replaces it by the real corresponding SIMD_ZERO function. """
+	pattern=r'(SIMD_LOAD_V([4 8])SF\(vec(.*), &(RED[0-9]+)\[0\]\);)'
+	compiled_pattern = re.compile(pattern)
+	occurences = re.findall(compiled_pattern,code)
+	if occurences != []: 
+		for item in occurences:
+		code = re.sub(item[3]+"\[[0-"+item[1]+"]\] = (.*);\n","",code)
+		code = re.sub(re.escape(item[0]),"SIMD_ZERO_V"+item[1]+"SF(vec"+item[2]+");",code)
+		return code
+
+def autotile(m,verb):
+	''' Function that autotile a module's loops '''
+	#m.rice_all_dependence()
+	#m.internalize_parallel_code()
+	#m.nest_parallelization()
+	#m.internalize_parallel_code()
+	m.split_update_operator()
+	def tile_or_dive(m,loops):
+		kernels=list()
+		for l in loops:
+			if l.loops():
+				try:
+					l.simdizer_auto_tile()
+					kernels.append(l)
+				except:
+					kernels+=tile_or_dive(m,l.loops())
+			else:
+				kernels.append(l)
+		return kernels
+	kernels=tile_or_dive(m,m.loops())
+	extram=list()
+	for l in kernels:
+		mn=m.name+"_"+l.label
+		m.outline(module_name=mn,label=l.label)
+		lm=m._ws[mn]
+		extram.append(lm)
+		if lm.loops() and lm.loops()[0].loops():
+			lm.loop_nest_unswitching()
+			if verb:
+				lm.display()
+			lm.suppress_dead_code()
+			if verb:
+				lm.display()
+			lm.loop_normalize(one_increment=True,skip_index_side_effect=True)
+			lm.partial_eval()
+			lm.partial_eval()
+			lm.partial_eval()
+			lm.flatten_code()
+			if verb:
+				lm.display()
+		else:
+			lm.loops()[0].loop_auto_unroll()
+
+	if verb:
+		m.display()
+	extram.append(m)
+	return extram
 
 class sacbase(object):
 	@staticmethod
@@ -30,15 +91,12 @@ class sacbase(object):
 		# Here are the transformations made by benchmark.tpips.h, blindy
 		# translated in pyps.
 
-		ws.activate("MUST_REGIONS")
-		ws.activate("REGION_CHAINS")
-		ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
-		ws.activate("PRECONDITIONS_INTER_FULL")
-		ws.activate("TRANSFORMERS_INTER_FULL")
+		ws.activate("precondition intra fast")
+		ws.activate("transformes_intra_fast")
 
 		ws.props.loop_unroll_with_prologue = False
 		ws.props.constant_path_effects = False
-		ws.props.ricedg_statistics_all_arrays = True
+		#ws.props.ricedg_statistics_all_arrays = True
 		ws.props.c89_code_generation = True
 		ws.props.delay_communications_interprocedural = False
 
@@ -105,70 +163,31 @@ class sacbase(object):
 			if cond.get("verbose"):
 				module.display()
 
-		module.simd_atomizer()
-		module.partial_eval()
-		if cond.get("verbose"):
-			module.display()
-			module.print_dot_dependence_graph()
+			module.scalar_renaming()
 
+			try:
+				module.simdizer(generate_data_transfers=True)
+			except Exception,e:
+				print >>sys.stderr, "Module %s simdizer exeception:",str(e)
 
-		# module.deatomizer()
-		# module.partial_eval()
-		# module.use_def_elimination()
-		# module.display()
+			if cond.get("verbose"):
+				#module.print_dot_dependence_graph()
+				module.display()
 
-		# module.print_dot_dependence_graph()
-		module.scalar_renaming()
-
-		if cond.get("verbose"):
-			module.display()
-
-
-		#module.common_subexpression_elimination()
-		try:
-			module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
-		except RuntimeError:
-			ws.activate("RICE_FAST_DEPENDENCE_GRAPH")
-			ws.activate("ATOMIC_CHAINS")
-			module.simdizer(allow_padding = cond.get("simdizer_allow_padding", False))
-			ws.activate("RICE_REGIONS_DEPENDENCE_GRAPH")
-			ws.activate("REGION_CHAINS")
-
-		if cond.get("verbose"):
-			module.display()
-		try:
-			module.print_dot_dependence_graph()
-			module.delay_communications()
-			module.flatten_code(unroll = False)
-		except RuntimeError: pass
-
-		# module.use_def_elimination()
-
-		# module.use_def_elimination()
-		if cond.get("suppress_dead_code", True):
-			module.suppress_dead_code()
-		module.flatten_code(unroll = False)
-		if cond.get("enhanced_reduction",False):
-			module.redundant_load_store_elimination(SIMD_REMOVE_REDUCTIONS_PRELUDE="SIMD_ZERO_V4SF")
-		else:
 			module.redundant_load_store_elimination()
-		if cond.get("suppress_dead_code", True):
-			module.suppress_dead_code()
-		module.clean_declarations()
 
+		if cond.get("verbose"):
+			module.display()
 		try:
 			module.print_dot_dependence_graph()
 			module.delay_communications()
 			module.flatten_code(unroll = False)
 		except RuntimeError: pass
-		# ws.set_property(EOLE_OPTIMIZATION_STRATEGY = "ICM")
-		# module.optimize_expressions()
-		# module.partial_redundancy_elimination()
-		# module.common_subexpression_elimination()
-		if cond.get("verbose"):
-			module.display()
 
-		# module.use_def_elimination()
+			if cond.get("verbose"):
+				module.display()
+
+
 	@staticmethod
 	def addintrinsics(fname, header, replacements):
 		finput = fileinput.FileInput([fname], inplace = True)
@@ -304,6 +323,7 @@ class workspace(pyps.workspace):
 		pyps.module.sac=self.driver.sac
 		# Add -DRWBITS=self.driver.register_width to the cppflags of the workspace
 		kwargs['cppflags'] = kwargs.get('cppflags',"")+" -DRWBITS=%d " % (self.driver.register_width)
+		self.use_generic_simd = True
 		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), pypsutils.get_runtimefile(simd-eq_c,"sac"), pypsutils.get_runtimefile(patterns-eq_def,"sac"), *sources, **kwargs)
 
 	def post_init(self, sources, **args):
@@ -316,7 +336,17 @@ class workspace(pyps.workspace):
 		"""Add $driver.h, which replaces general purpose SIMD instructions
 		with machine-specific ones."""
 		files = super(workspace,self).save(rep)
-		if False:
+		
+
+		#run gen_simd_zeros on every file
+		for file in files:
+			with open(file, 'r') as f:
+				read_data = f.read()
+			read_data = gen_simd_zeros(read_data)
+			with open(file, 'w') as f:
+			    f.write(read_data)
+		
+		if not self.use_generic_simd:
 			# We need to add $driver.h to the compiled files, and to remove SIMD.c
 			# (ICC breaks quite badly when using the sequential versions mixed
 			# with SSE intrinsics).
@@ -340,14 +370,23 @@ class workspace(pyps.workspace):
 			if p.returncode != 0:
 				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 
+			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simdz_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+			(simdz_cus_header,serr) = p.communicate()
+			if p.returncode != 0:
+				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
+			
 			pypsutils.string2file('#include "'+simd_h+'"\n'+simd_cus_header, simd_h_fname)
+			pypsutils.string2file(simdz_h+"\n"+simdz_cus_header, simdz_h_fname)
+
 			for fname in files:
-				if not fname.endswith("SIMD.c"):
-					pypsutils.addBeginnning(fname, '#include "SIMD.h"')
+				if not fname.endswith("SIMD.c") and not fnmae.endswith("SIMD-eq.c"):
+					pypsutils.addBeginnning(fname, '#include "'+simd_h+'"')
+					pypsutils.addBeginnning(fname, '#include "'+simd-eq_h+'')
 
 		# Add the contents of patterns.h
 		for fname in files:
-			pypsutils.addBeginnning(fname, '#include "'+patterns_h+'"\n')
+			if not fname.endswith("patterns.c"):
+				pypsutils.addBeginnning(fname, '#include "'+patterns_h+'"\n')
 		# Add header to the save rep
 		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
 		shutil.copy(pypsutils.get_runtimefile(patterns_h,"sac"),rep)

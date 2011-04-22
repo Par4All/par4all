@@ -209,6 +209,38 @@ class module(object): # deriving from object is needed for overloaded setter
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
 
+
+	#SACAGUINET : to recheck
+	def modify(self,func):
+		"""edits module using return value of function 'func'.
+			'func' takes one argument, the code source of the
+		    module.
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			self.print_code()
+            printcode_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("PRINTED_FILE",self.name))
+		    code_rc=os.path.join(self._ws.dirname(),self._ws.cpypips.show("C_SOURCE_FILE",self.name))
+			self._ws.cpypips.db_invalidate_memory_resource("C_SOURCE_FILE",self._na    me)
+			shutil.copy(printcode_rc,code_rc)
+ 
+            newcode = func(pypsutils.file2string(code_rc))
+            with open(code_rc, "w") as f:
+				f.write(newcode)
+
+
+	#SACAGUINET : to recheck
+	def modify_regexps(self, regexps):
+		def f(code):
+			for (p,r) in regexps:
+				code = re.sub(p, r, code)
+			return code
+		self.modify(f)
+
+	#SACAGUINET : to recheck
+	def load_from_file(self, f):
+		with open(f, "r") as f:
+			self.modify(lambda s: f.read())
+
 	def __prepare_modification(self):
 		""" [internal] Prepare everything so that the source code of the module can be modified
 		"""
@@ -227,6 +259,31 @@ class module(object): # deriving from object is needed for overloaded setter
 			pid=Popen(cmd,stdout=file(code_rc,"w"),stdin=file(printcode_rc,"r"),stderr=PIPE)
 			if pid.wait() != 0:
 				print sys.stderr > pid.stderr.readlines()
+
+
+    def prepend_code(self, lines):
+		""" Prepend lines to the code of the module.
+			This is a quick and dirty way based on self.run().
+			We should maybe take example on prepend_comment in Libs/to_begin_with/add_stuff_to_module.c !
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			(code_rc,printcode_rc) = self._prepare_modification()
+			strtoadd = "\n".join(lines)
+			orgcode = pypsutils.file2string(printcode_rc)
+			newcode = orgcode.replace('{', '{\n'+strtoadd+"\n{\n", 1) + "\n}\n"
+			pypsutils.string2file(newcode, code_rc)
+
+	def append_code(self, lines):
+		""" Append lines to the code of the module.
+			See prepend_code for some remarks.
+		"""
+		if not pypsutils.re_compilation_units.match(self.name):
+			(code_rc,printcode_rc) = self._prepare_modification()
+			lines = map(lambda s: s+"\n",lines)
+			orgcode = pypsutils.file2string(printcode_rc)
+			ocodespl = orgcode.rsplit('}', 1)
+			newcode = ''.join([ocodespl[0]]+lines+['\n}\n'])
+			pypsutils.string2file(newcode, code_rc)
 
 	def show(self,rc):
 		"""get name of `rc' resource"""
@@ -427,6 +484,24 @@ class workspace(object):
 			self._name = self._name[0]
 		else:
 			self._name = name
+	
+	#SACAGUINET : to recheck
+
+	def add_source(self, fname):
+		""" Add a source file to the workspace, using PIPS guard includes if necessary """
+		if self.recoverInclude:
+			newfname = os.path.join(self.tmpDirName,os.path.basename(fname))
+			shutil.copy2(fname, newfname)
+			self.sources += [newfname]
+			pypsutils.guardincludes(newfname)
+		else:
+		    self.sources += [fname]
+
+	#SACAGUINET : to recheck
+
+	def add_sources(self, files):
+		""" Add source files to the workspace thanks to add_source """
+		map(self.source_file, files)
 
 	def __enter__(self):
 		"""handler for the with keyword"""
