@@ -1,0 +1,2 @@
+CFLAGS+="-fopenmp"
+##pipsrules##

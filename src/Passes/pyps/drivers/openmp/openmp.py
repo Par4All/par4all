@@ -1,20 +1,16 @@
 import re
 import pyps
-from pyps import module, workspace, backendCompiler
+from pyps import module, workspace, Maker
 
-class ompCompiler(backendCompiler):
-	"""openmp backend compiler to use openmp"""
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
-		if issubclass(self.__class__,pyps.gccCompiler):
-			self.CFLAGS += " -fopenmp"
-			self.LDFLAGS += " -fopenmp"
-		elif issubclass(self.__class__,pyps.iccCompiler):
-			self.CFLAGS += " -openmp"
-			self.LDFLAGS += " -openmp"
-		else:
-			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
-
+class ompMaker(Maker):
+	makefile="Makefile.omp"
+	makefiledir="openmp"
+	def __init__(self,header="",rules="",ext=""):
+		atr = self.get_makefile_attributes("Makefile.omp","makefiledir")
+		header = header + atr[0]
+		rules = rules + atr[1]
+		ext = ext + ".omp"
+		super(ompMaker,self).__init__(header,rules,ext)
 
 def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
 	"""parallelize module with opennmp"""
