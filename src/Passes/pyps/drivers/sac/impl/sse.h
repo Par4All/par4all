@@ -24,6 +24,8 @@ typedef __m128i v8hi;
 		SIMD_ADDPS(vec1, __pips_tmp, vec2); \
 		} while(0)
 
+#define SIMD_SHUFFLE_V4SF(dist,src,i0,i1,i2,i3) dist=_mm_shuffle_ps(src,src,_MM_SHUFFLE(i3,i2,i1,i0)
+
 /* umin as in unary minus */
 #define SIMD_UMINPS(vec1, vec2)				\
 		do {						\
