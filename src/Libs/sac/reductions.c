@@ -545,6 +545,7 @@ static void reductions_rewrite(statement s, set skip)
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
+    gen_recurse_stop(compacts);
 	insert_statement(s,make_block_statement(compacts),false);
 	insert_statement(s,make_block_statement(preludes),true);
 
