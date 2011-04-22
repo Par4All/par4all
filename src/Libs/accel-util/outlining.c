@@ -656,12 +656,13 @@ statement outliner(string outline_module_name, list statements_to_outline)
                         entity_written
                   )
                 {
-                    variable_dimensions(type_variable(entity_type(e)))=
-                        gen_append(variable_dimensions(type_variable(entity_type(e))),
+                    entity fp = make_entity_copy_with_new_name(e,entity_name(e),false);
+                    variable_dimensions(type_variable(entity_type(fp)))=
+                        gen_append(variable_dimensions(type_variable(entity_type(fp))),
                         CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)),NIL)
                         );
 
-                    parameter_type(p)=copy_type(entity_type(e));
+                    parameter_type(p)=copy_type(entity_type(fp));
                     dummy_identifier(parameter_dummy(p))=fp;
 
                   //Change at call site (scalar=>&scalar)
