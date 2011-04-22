@@ -5,6 +5,7 @@ import shutil
 import pypsutils
 import fileinput
 import subprocess
+import pyps
 
 class sacbase(object):
 	@staticmethod
@@ -271,27 +272,28 @@ class sacneon(sacbase):
 
 	CFLAGS = "-mfpu=neon -mfloat-abi=softfp -O3"
 
-class workspace:
+simd_c = "SIMD.c"
+simd_h = "SIMD_types.h"
+sse_h = "sse.h"
+threednow_h = "3dnow.h"
+avx_h = "avx.h"
+neon_h = "neon.h"
+patterns_c = "patterns.c"
+patterns_h = "patterns.h"
+
+class workspace(pyps.workspace):
 	"""The SAC subsystem, in Python.
 
 	Add a new transformation, for adapting code to SIMD instruction
 	sets (SSE, 3Dnow, AVX and ARM NEON)"""
-	def __init__(self, ws, **args):
-		# Add SIMD.c and patterns.c to the project
-		self.tmpdir = tempfile.mkdtemp()
-		tmpSIMD = self.tmpdir + "/SIMD.c"
-		tmpPatterns = self.tmpdir + "/patterns.c"
-		pypsutils.string2file(simd_c, tmpSIMD)
-		pypsutils.string2file(patterns_c, tmpPatterns)
-		ws._sources.append(tmpSIMD)
-		ws._sources.append(tmpPatterns)
-		self.ws = ws
-		# Do we want not to compile with $driver.h by default?
-		self.use_generic_simd = True
+	def __init__(self, *sources, **kwargs):
 		drivers = {"sse": sacsse, "3dnow": sac3dnow, "avx": sacavx, "neon": sacneon}
-		self.driver = drivers[args.get("driver", "sse")]
+		self.driver = drivers[kwargs.get("driver", "sse")]
+		#Warning: this patches every modules, not only those of this worspace 
+		pyps.module.sac=self.driver.sac
 		# Add -DRWBITS=self.driver.register_width to the cppflags of the workspace
-		self.ws.cppflags += " -DRWBITS=%d " % (self.driver.register_width)
+		kwargs['cppflags'] = kwargs.get('cppflags',"")+" -DRWBITS=%d " % (self.driver.register_width)
+		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), *sources, **kwargs)
 
 	def post_init(self, sources, **args):
 		"""Clean the temporary directory used for holding 'SIMD.c' and 'patterns.c'."""
@@ -299,10 +301,11 @@ class workspace:
 		for m in self.ws:
 			m.__class__.sac = self.driver.sac
 
-	def pre_goingToRunWith(self, files, outdir):
+	def save(self, rep=None):
 		"""Add $driver.h, which replaces general purpose SIMD instructions
 		with machine-specific ones."""
-		if not self.use_generic_simd:
+		files = super(workspace,self).save(rep)
+		if False:
 			# We need to add $driver.h to the compiled files, and to remove SIMD.c
 			# (ICC breaks quite badly when using the sequential versions mixed
 			# with SSE intrinsics).
@@ -317,21 +320,25 @@ class workspace:
 			# Generate SIMD.h according to the register width
 			# thanks to gcc -E and cproto (ugly, need something
 			# better)
-			simd_h_fname = os.path.abspath(outdir + "/SIMD.h")
-			simd_c_fname = os.path.abspath(outdir + "/SIMD.c")
+			simd_h_fname = os.path.abspath(rep + "/SIMD.h")
+			simd_c_fname = os.path.abspath(rep + "/SIMD.c")
 			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 			(simd_cus_header,serr) = p.communicate()
 			if p.returncode != 0:
 				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 
-			pypsutils.string2file(simd_h+"\n"+simd_cus_header, simd_h_fname)
+			pypsutils.string2file('#include "'+simd_h+'"\n'+simd_cus_header, simd_h_fname)
 			for fname in files:
 				if not fname.endswith("SIMD.c"):
 					pypsutils.addBeginnning(fname, '#include "SIMD.h"')
 
 		# Add the contents of patterns.h
 		for fname in files:
-			pypsutils.addBeginnning(fname, patterns_h)
+			pypsutils.addBeginnning(fname, '#include "'+patterns_h+'"\n')
+		# Add header to the save rep
+		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
+		shutil.copy(pypsutils.get_runtimefile(patterns_h,"sac"),rep)
+		return files
 
 	def simd_compile(self, ccexecp, *args, **kwargs):
 		"""Compile the workspace with sse.h."""
@@ -351,43 +358,6 @@ class workspace:
 def sacCompiler(backendCompiler,driver):
 	class C(backendCompiler):
 		def __init__(self,CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-			super(C,self).__init__()
-			self.CFLAGS += " "+driver.CFLAGS
-	
+			super(C,self).__init__(CC, " ".join([CFLAGS,driver.CFLAGS]),LDFLAGS,compilemethod,rep,outfile,args,extrafiles)
 	return C
 
-
-simd_c = """
-%%include impl/SIMD.c%%
-"""
-
-simd_h = """
-#include <stdarg.h>
-#include <stdint.h>
-
-%%include impl/SIMD_types.h%%
-"""
-
-sse_h = """
-%%include impl/sse.h%%
-"""
-
-Threednow_h = """
-%%include impl/3dnow.h%%
-"""
-
-avx_h = """
-%%include impl/avx.h%%
-"""
-
-neon_h = """
-%%include impl/neon.h%%
-"""
-
-patterns_c = """
-%%include impl/patterns.c%%
-"""
-
-patterns_h = """
-%%gen_header impl/patterns.c%%
-"""

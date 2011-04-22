@@ -271,7 +271,6 @@ class workspace(object):
 			use the string `name' to set workspace name
 			use the boolean `verbose' turn messaging on/off
 			use the string `cppflags' to provide extra preprocessor flags
-			use the list `parents' to customize the workspace
 			use the boolean `recoverInclude' to turn include recoverning on/off
 			use the boolean `deleteOnClose' to turn full workspace deletion on/off
 		"""
@@ -279,7 +278,6 @@ class workspace(object):
 		name		   = kwargs.setdefault("name",		   "")
 		verbose		= kwargs.setdefault("verbose",		True)
 		cppflags	   = kwargs.setdefault("cppflags",	   "")
-		parents		= kwargs.setdefault("parents",		[])
 		cpypips		   = kwargs.setdefault("cpypips",		pypips)
 		recoverInclude = kwargs.setdefault("recoverInclude", True)
 		deleteOnClose  = kwargs.setdefault("deleteOnClose",  False)
@@ -312,10 +310,6 @@ class workspace(object):
 		# Do this first as other workspaces may want to modify sources
 		# (sac.workspace does).
 		self.cppflags = cppflags
-		self.iparents = []
-		for p in parents:
-			pws = p(self, **kwargs)
-			self.iparents.append(pws)
 
 		self._modules = {}
 		self.props = workspace.props(self)
@@ -364,13 +358,6 @@ class workspace(object):
 			self._name = self._name[0]
 		else:
 			self._name = name
-
-		"""Call all the functions 'post_init' of the given parents"""
-		for pws in reversed(self.iparents):
-			try:
-				pws.post_init(sources, **kwargs)
-			except AttributeError:
-				pass
 
 	def __enter__(self):
 		"""handler for the with keyword"""
@@ -461,6 +448,25 @@ class workspace(object):
 			else:
 				saved.append(f)
 
+		for f in saved:
+			pypsutils.addGenericIntrinsics(f)
+			# fix bad pragma pretty print
+			lines=[]
+			with open(f,"r") as source:
+				pragma=""
+				for line in source:
+					if re.match(r'^#pragma .*',line):
+						pragma=line
+					elif re.match(r'^\w+:',line) and pragma:
+						lines.append(line)
+						lines.append(pragma)
+						pragma=""
+					else:
+						lines.append(line)
+
+			with open(f,"w") as source:
+				source.writelines(lines)
+		
 		return saved
 
 	def user_headers(self, compiler=backendCompiler(), extrafiles=None):
@@ -502,7 +508,6 @@ class workspace(object):
 			compiler.rep=self.tmpdirname()+"d.out"
 		rep=compiler.rep
 		otmpfiles=self.save(rep=compiler.rep)+extrafiles
-		self.goingToRunWith(otmpfiles, rep)
 		command = compiler.link_cmd(files=otmpfiles, extraCFLAGS=self.cppflags) if link else compiler.compile_cmd(files=otmpfiles, extraCFLAGS=self.cppflags)
 		commandline = " ".join(command)
 		if self.verbose:
@@ -531,27 +536,6 @@ class workspace(object):
 		(out,err) = p.communicate()
 		rc = p.returncode
 		return (rc,out,err)
-
-	def goingToRunWith(self, files, rep):
-		""" hook that happens just before compilation of `files' in `rep'"""
-		for f in files:
-			pypsutils.addGenericIntrinsics(f)
-			# fix bad pragma pretty print
-			lines=[]
-			with open(f,"r") as source:
-				pragma=""
-				for line in source:
-					if re.match(r'^#pragma .*',line):
-						pragma=line
-					elif re.match(r'^\w+:',line) and pragma:
-						lines.append(line)
-						lines.append(pragma)
-						pragma=""
-					else:
-						lines.append(line)
-
-			with open(f,"w") as source:
-				source.writelines(lines)
 
 	def activate(self,phase):
 		"""activate a given phase"""
@@ -609,104 +593,6 @@ class workspace(object):
 			try : shutil.rmtree(self.tmpDirName)
 			except OSError: pass
 		self.hasBeenClosed = True
-
-	def __getattribute__(self, name):
-		"""Method overriding the normal attribute access."""
-
-		def get(name):
-			# can't use self.name !
-			return object.__getattribute__(self, name)
-		def search(instance, iname):
-			try:
-				return instance.__class__.__dict__[iname]
-			except KeyError:
-				return None
-
-		# Get rid of attribute (non-method) access
-		try:
-			a = get(name)
-			if not callable(a) or inspect.isclass(a):
-				return a
-		except AttributeError:
-			pass
-
-		#Functions with '__' before can't be overloaded (for example
-		# __dir__), but they can still have pre_ and post_ hooks.
-		if name[0:2] == '__':
-			overloadable = False
-		else:
-			overloadable = True
-
-
-		# Build a new function
-		pre_hooks = []
-		method = lambda *args, **kwargs: None
-		post_hooks = []
-
-		# List the pre_name hooks
-		for p in get("iparents"):
-			pre_hook = search(p, "pre_" + name)
-			if callable(pre_hook):
-				pre_hooks.append((p, pre_hook))
-
-		# Find the correct "main" function.
-
-		# First, try the redefinition from one of the parents, and if all fail,
-		# try the initial one. The return value is that of the method really
-		# called.
-
-		# XXX: I may want to do the following in one of the parent class:
-		# class foo_workspace:
-		# 	def compile(self, **args):
-		#		"""a method that compiles then launches gdb"""
-		#		args["CFLAGS"] += "-g"
-		#		FIXME: call pyps.workspace.compile with **args
-		#		os.system("gdb ....")
-
-		# I don't know how to do the line marked with FIXME. Ideally, if there
-		# are several workspaces defining compile(), they would stack correctly.
-		# OTOH, I haven't found (yet?) a compelling use case...
-		foundMain = False
-		if overloadable:
-			for p in get("iparents"):
-				m = search(p, name)
-				if callable(m):
-					method = types.MethodType(m, p, type(p))
-					foundMain = True
-					break
-		if not foundMain:
-			try:
-				method = get(name)
-				foundMain = True
-			except AttributeError:
-				pass
-
-		# List the post_name hooks
-		for p in reversed(get("iparents")):
-			post_hook = search(p, "post_" + name)
-			if callable(post_hook):
-				post_hooks.append((p, post_hook))
-
-		# If we didn't find anything, raise an error
-		if (not foundMain) and pre_hooks == [] and post_hooks == []:
-			raise AttributeError
-
-		def ret(self, *args, **kwargs):
-			for p, f in pre_hooks:
-				f(p, *args, **kwargs)
-			val = method(*args, **kwargs)
-			for p, f in post_hooks:
-				f(p, *args, **kwargs)
-			return val
-		ret.__doc__ = method.__doc__
-		return  types.MethodType(ret, self, type(self))
-
-	def __dir__(self):
-		l = self.__class__.__dict__.keys()
-		for p in self.iparents:
-			l += dir(p)
-		return l
-
 
 	class cu(object):
 		'''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
