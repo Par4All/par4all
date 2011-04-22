@@ -48,6 +48,8 @@ class workspace(pyps.workspace):
 		super(workspace,self).__init__(*sources, **kwargs)
 
 	def save(self, rep=None):
+		if rep == None:
+			rep=self.tmpdirname
 		
 		(files,headers) = super(workspace,self).save(rep)
 		shutil.copy(pypsutils.get_runtimefile(pyps_gettime_c,"pyps_gettime"),rep)
@@ -76,10 +78,8 @@ class workspace(pyps.workspace):
 	def _get_timefile_and_parse(self):
 		if self.remote:
 			self.remote.copyRemote(self._timefile,self._timefile)
-		print >>sys.stderr, "reading",self._timefile
 		with open(self._timefile, "r") as f:
 			rtimes = f.readlines()
-			print >>sys.stderr, "read",rtimes
 		reTime = re.compile(r"^(.*): *([0-9]+)$")
 		nmodule = dict()
 		for l in rtimes:
@@ -110,7 +110,6 @@ class workspace(pyps.workspace):
 		for i in range(0, iterations):
 			print >>sys.stderr, "Launch execution of %s %s..." % (outfile," ".join(args))
 			rc,out,err = self.run(outfile,args)
-			print >>sys.stderr, "Program done."
 			if rc != 0:
 				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(outfile+" ".join(args), rc, out,err)
 				raise RuntimeError(message)
