@@ -688,6 +688,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
+l99997:
    for(re2 = 0; re2 <= N0; re2 += 1)
       *(im1+re2+1-1) = (*(ma0+2)**(im2+re2+1-1)+*(ma0+3)**(im3+re2+1-1))*(*(ma0+0)<<*(ma0+1))>>*(ma0+1);
 }
@@ -739,6 +740,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
+l99997:
    for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0+2;
       I_1 = re2+1;
@@ -810,6 +812,7 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    im2 = FIFO2;
    im1 = FIFO1;
    ma0 = FIFO0;
+l99997:
    for(re2 = 0; re2 <= N0; re2 += 1) {
       P_0 = ma0;
       P_0 = P_0+2;
@@ -889,49 +892,50 @@ void launcher_0_microcode(short *FIFO3, short *FIFO2, short *FIFO1, int *FIFO0)
    int I_10, I_11;
    //PIPS generated variable
    short *P_7;
-   seti(im3, FIFO3);
-   seti(im2, FIFO2);
-   seti(im1, FIFO1);
-   seti(ma0, FIFO0);
+   im3 = FIFO3;
+   im2 = FIFO2;
+   im1 = FIFO1;
+   ma0 = FIFO0;
+l99997:
    for(re2 = 0; re2 <= N0; re2 += 1) {
-      seti(P_0, ma0);
-      seti(P_0, P_0+2);
+      P_0 = ma0;
+      P_0 = P_0+2;
       seti(I_1, re2);
       addi(I_1, I_1, 1);
       seti(I_2, I_1);
       subi(I_2, 1);
-      seti(P_1, im2);
-      seti(P_1, P_1+I_2);
+      P_1 = im2;
+      P_1 = P_1+I_2;
       seti(I_3, *P_0);
       muli(I_3, *P_1);
-      seti(P_2, ma0);
-      seti(P_2, P_2+3);
+      P_2 = ma0;
+      P_2 = P_2+3;
       seti(I_4, re2);
       addi(I_4, I_4, 1);
       seti(I_5, I_4);
       subi(I_5, 1);
-      seti(P_3, im3);
-      seti(P_3, P_3+I_5);
+      P_3 = im3;
+      P_3 = P_3+I_5;
       seti(I_6, *P_2);
       muli(I_6, *P_3);
       seti(I_7, I_3);
       addi(I_7, I_7, I_6);
-      seti(P_4, ma0);
-      seti(P_4, P_4+0);
-      seti(P_5, ma0);
-      seti(P_5, P_5+1);
+      P_4 = ma0;
+      P_4 = P_4+0;
+      P_5 = ma0;
+      P_5 = P_5+1;
       seti(I_8, *P_4);
       seti(I_8, I_8<<*P_5);
       seti(I_9, I_7);
       muli(I_9, I_8);
-      seti(P_6, ma0);
-      seti(P_6, P_6+1);
+      P_6 = ma0;
+      P_6 = P_6+1;
       seti(I_10, re2);
       addi(I_10, I_10, 1);
       seti(I_11, I_10);
       subi(I_11, 1);
-      seti(P_7, im1);
-      seti(P_7, P_7+I_11);
+      P_7 = im1;
+      P_7 = P_7+I_11;
       seti(*P_7, I_9);
       seti(*P_7, *P_7>>*P_6);
    }

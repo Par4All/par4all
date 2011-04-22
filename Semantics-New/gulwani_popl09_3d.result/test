@@ -219,7 +219,6 @@ l99999:   ;
    
    
    
-   
 L2:   ;
 
 //  T(c,x,y) {c==x, c==y, c#init==y#init, x#init==y#init, m<=c,
@@ -782,7 +781,6 @@ l99999:   ;
 
 //  P(c,m,n,x,y) {c==m, c==x, c==y, 0<=c, c+1<=n}
 
-   
    
    
    

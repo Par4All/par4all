@@ -11,7 +11,7 @@ int pof();
 
 Code after outlining
 
-void kernel(int *a_0)
+void kernel(int a_0[1])
 {
    //PIPS generated variable
    int a;
@@ -27,7 +27,7 @@ int pof()
 }
 int pof();
 //PIPS generated variable
-void kernel(int *a_0);
+void kernel(int a_0[1]);
 
 unsplit
 

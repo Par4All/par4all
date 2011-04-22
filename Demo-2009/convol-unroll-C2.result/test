@@ -120,16 +120,12 @@ l200:            ;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+0-1]*kernel[0][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+1-1]*kernel[0][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+0-1][j+2-1]*kernel[0][2];
-            kj = 3;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+0-1]*kernel[1][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+1-1]*kernel[1][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1-1][j+2-1]*kernel[1][2];
-            kj = 3;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+0-1]*kernel[2][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+1-1]*kernel[2][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+2-1][j+2-1]*kernel[2][2];
-            kj = 3;
-            ki = 3;
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
@@ -147,16 +143,12 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
             new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j-1]*kernel[0][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j]*kernel[0][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1-1][j+1]*kernel[0][2];
-            kj = 3;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1][j-1]*kernel[1][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1][j]*kernel[1][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1][j+1]*kernel[1][2];
-            kj = 3;
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j-1]*kernel[2][0];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j]*kernel[2][1];
             new_image[i_1][j] = new_image[i_1][j]+image[i_1+1][j+1]*kernel[2][2];
-            kj = 3;
-            ki = 3;
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
@@ -182,22 +174,18 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float image[isi][isj],
             new_image[i_1][j] = new_image[i_1][j]+F_1;
             F_2 = image[i_1-1][j+1]*kernel[0][2];
             new_image[i_1][j] = new_image[i_1][j]+F_2;
-            kj = 3;
             F_3 = image[i_1][j-1]*kernel[1][0];
             new_image[i_1][j] = new_image[i_1][j]+F_3;
             F_4 = image[i_1][j]*kernel[1][1];
             new_image[i_1][j] = new_image[i_1][j]+F_4;
             F_5 = image[i_1][j+1]*kernel[1][2];
             new_image[i_1][j] = new_image[i_1][j]+F_5;
-            kj = 3;
             F_6 = image[i_1+1][j-1]*kernel[2][0];
             new_image[i_1][j] = new_image[i_1][j]+F_6;
             F_7 = image[i_1+1][j]*kernel[2][1];
             new_image[i_1][j] = new_image[i_1][j]+F_7;
             F_8 = image[i_1+1][j+1]*kernel[2][2];
             new_image[i_1][j] = new_image[i_1][j]+F_8;
-            kj = 3;
-            ki = 3;
             new_image[i_1][j] = new_image[i_1][j]/9;
          }
    }
@@ -267,22 +255,18 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_1;
             F_2 = *(image+j+1+(i_1-1)*isj)**(kernel+2);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_2;
-            kj = 3;
             F_3 = *(image+j-1+i_1*isj)**(kernel+ksj);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_3;
             F_4 = *(image+j+i_1*isj)**(kernel+ksj+1);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_4;
             F_5 = *(image+j+1+i_1*isj)**(kernel+ksj+2);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_5;
-            kj = 3;
             F_6 = *(image+j-1+(i_1+1)*isj)**(kernel+2*ksj);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_6;
             F_7 = *(image+j+(i_1+1)*isj)**(kernel+2*ksj+1);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_7;
             F_8 = *(image+j+1+(i_1+1)*isj)**(kernel+2*ksj+2);
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_8;
-            kj = 3;
-            ki = 3;
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
          }
    }
@@ -574,13 +558,9 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
 
 //  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            kj = 3;
-
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
-
             F_3 = *(image+j+i_1*isj-1)**(kernel+ksj);
 
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_3;
 
@@ -602,13 +582,9 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
 
 //  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
-            kj = 3;
-
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
-
             F_6 = *(image+j+(i_1+1)*isj-1)**(kernel+2*ksj);
 
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
+//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
 
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_6;
 
@@ -629,14 +605,6 @@ void microcode(int isi, int isj, int ksi, int ksj, int i, float *image, float *k
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)+F_8;
 
 //  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {}
-
-            kj = 3;
-
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {kj==3}
-
-            ki = 3;
-
-//  P(i,i_1,isi,isj,j,ki,kj,ksi,ksj) {ki==3, kj==3}
 
             *(new_image+j+i_1*isj) = *(new_image+j+i_1*isj)/9;
          }

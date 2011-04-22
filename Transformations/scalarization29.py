@@ -1,4 +1,3 @@
-Je hu
 from pyps import workspace, module
 name="scalarization29"
 

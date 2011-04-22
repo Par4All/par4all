@@ -43,7 +43,6 @@ int main(void)
    freia_aipo_dilate_8c(imout_dilate, imout_dilate, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imout_dilate, imout_dilate, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imout_dilate, imout_dilate, freia_morpho_kernel_8c);
-   i_0 = 10;
    
    
    _return0 = 0;
@@ -63,7 +62,6 @@ int main(void)
    freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imtmp, imtmp, freia_morpho_kernel_8c);
-   i_1 = 10;
    
    
    _return0_0 = 0;
@@ -80,7 +78,6 @@ int main(void)
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
    freia_aipo_erode_8c(imout_gradient, imout_gradient, freia_morpho_kernel_8c);
-   i_2 = 10;
    
    
    _return1_0 = 0;

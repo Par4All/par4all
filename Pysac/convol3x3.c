@@ -53,7 +53,7 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
     //     The convolution kernel is not applied on the outer part
     //     of the image
 
-    int i, j;
+    int i, j,k,l;
 
     for(i = 0; i< isi; i++) {
         for(j = 0; j< isj; j++) {
@@ -64,17 +64,10 @@ void convol3x3(int isi, int isj, float new_image[isi][isj], float image[isi][isj
     for(i =  kernel_size/2; i<isi - kernel_size/2; i++) {
         for(j =  kernel_size/2; j<isj - kernel_size/2; j++) {
             new_image[i][j] = 0.;
-            new_image[i][j] += image[i+0-kernel_size/2][j+0-kernel_size/2]* kernel[0][0];
-            new_image[i][j] += image[i+0-kernel_size/2][j+1-kernel_size/2]* kernel[0][1];
-            new_image[i][j] += image[i+0-kernel_size/2][j+2-kernel_size/2]* kernel[0][2];
-            new_image[i][j] += image[i+1-kernel_size/2][j+0-kernel_size/2]* kernel[1][0];
-            new_image[i][j] += image[i+1-kernel_size/2][j+1-kernel_size/2]* kernel[1][1];
-            new_image[i][j] += image[i+1-kernel_size/2][j+2-kernel_size/2]* kernel[1][2];
-            new_image[i][j] += image[i+2-kernel_size/2][j+0-kernel_size/2]* kernel[2][0];
-            new_image[i][j] += image[i+2-kernel_size/2][j+1-kernel_size/2]* kernel[2][1];
-            new_image[i][j] += image[i+2-kernel_size/2][j+2-kernel_size/2]* kernel[2][2];
+            for(k=0;k<kernel_size;k++)
+            for(l=0;l<kernel_size;l++)
+            new_image[i][j] += image[i+k-kernel_size/2][j+l-kernel_size/2]* kernel[k][l];
             new_image[i][j] = new_image[i][j]/(kernel_size*kernel_size);
-            //new_image[i][j] = new_image[i][j]*0.111111;
         }
     }
 }

@@ -1,4 +1,42 @@
+# 17
+int main
 
+                         (int S,char**T){
+
+
+XEvent O ; for( p=E/5; --S&~1?
+XSetForeground (K, N,(y/v*!w+((S+1)>>0&255)*(D+y/(z|w-2))/D)<<0|(y/v*!w+((S+1)>>8&255)*(D+y/(z|w-2))/D)<<8|(y/v*!w+((S+1)>>16&255)*(D+y/(z|w-2))/D)<<16|0),XDrawLine (K, M,N,D+l - m,o,D+l - n,o),XDrawLine (K, M,N,D+l + m,o,D+l + n,o),gettimeofday((struct timeval*)H,0):S?z=97
+                         == ** ++ T,w=A==z[*T],B-=w[z+*T]%3,S:++S;
+XCopyArea (K, M,L,N,0,0,e,D,0,0),
+XSync (K, 0),
+XFlush (K),select(0,0,0,0,(struct timeval*)H+1)){ ; for( 3[H]=F; p==++r?K=
+XOpenDisplay (0),N=
+XCreateGC (K, L=
+XCreateSimpleWindow (K, ((&((_XPrivDisplay)K)->screens[0])->root),0,0,e=D*2,D,0,0,0),0,0),
+XSelectInput (K, L,(1L<<0)|(1L<<1)),
+XMapWindow (K, L),M=
+XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q=E:r<p?a=r/D%6,r[C
+                         +p]=(l+=!a|a%2?g:a-3)/4,r[C]=2*r<=p?(n+=(i-=(i+34&&r
+                         /149%B)-(i-34&&r/353%3)))/55:C[p-r],v=4-3*z:
+XPending (K)?C[F+
+XLookupKeysym (&O.xkey,0&
+XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
+# 48 "./vik1.c"
+                            /* Some more code */
+
+
+ ); for( k=C[F+0xff53]-C[F+0xff51],j=k?j+v*k*(j*k<8):j*.9,u+=(s=(C[F+0x0020]* 3+s-!!s<a?C[F+0x0020]* 3+s-!!s:a))/9,c=u>p?q=(h<q?h:q),u%=p,main(c=0,T):c,t+=j*(s+A)/e-s/i*(C[u+4]-C[u]),s=t
+
+ *t>p?t*=.97,s*.8:g>a&&b*b<D*9?i:s,i=k=l=0,o=n=e; i-5; main((k/17?o++==y?m=n=D,f -=A,o=30+9*i++:0,n-=2,m+=3,l=f/.7,y*F+A-i*k:k|!o?f=l=C[u]/-2-t,k+=17*w,o=k+++ 20,n=k+k-k*k/9,F*p:o--<a?y=135,A*F|D:0),T)); for( x=g=m=f=0,a=i=u+D,d+=9; o<f?n=2*e,
+
+
+ main(z?r+k*F*8:E-k*A*A,T),n=9+x/D,main(!k+z?r=D*F+9:A<<17,T),n-=x/9/D,main(i%p>6?h=r*(3+z) /5:r,T),n=x/13/e,main(k?h:r,T),o++:(f=x/D+70+C[i+p]-C[u+p],o=x?o:f,k=2*i/41%2,l=C[--
+
+ i]-C[u]-t,x+=D-(y=i-u),g=(d-i)%410?g:(a=o,b=l+B*x/e,x)/A,i>u); ); for( k=i=0,x=g,
+ l=b; ++i==41+!f&&k?f=k=i=l=0,x=190,a=163:i==42?i=9,k=r:!k|i-41; n=((((75<A -i?75:A -i)/3<95-2*i?(75<A -i?75:A -i)/3:95-2*i)<r-k+2*i?((75<A -i?75:A -i)/3<95-2*i?(75<A -i?75:A -i)/3:95-2*i):r-k+2*i)-k/r)*x/D,m=i<9?x*14/D:k?(i-31)/5*(i%12)?0:n-1:0,o=a-i*
+
+ x/D,y=D-o,h=main(k*r+k*f/F,T)); for( B=g?B:1-h%3,i=60,y=n=m,XDrawString (K, M,N,30,x,P,
+ sprintf(P,"Time"": %1d'%02d\"%02d          ""High"": %1d'%02d\"%02d          ""Speed: %03dmph",h/A/i,h/A%i,h%A,q/A/i,q/A%i,q%A,s,main(A<<17,T))),x=h; ++f<2*z*e; l=(x*=3)%e,o=x*x%a,main(-1,T)); } return A**H+1[H]/p-c; }
 /* Define ISO C stdio on top of C++ iostreams.
    Copyright (C) 1991, 1994-2007, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -21,7 +59,6 @@
 /*
  *	ISO C99 Standard: 7.19 Input/output	<stdio.h>
  */
-
 
 
 
@@ -201,7 +238,6 @@
 
 
 /* This is here only because every header file already includes this one.  */
-
 
 
 /* Copyright (C) 1992-2001, 2002, 2004, 2005, 2006, 2007
@@ -407,7 +443,6 @@
 
 
 
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
 # 331 "/usr/include/features.h" 2 3 4
@@ -434,14 +469,11 @@
    Get the definitions of all the appropriate `__stub_FUNCTION' symbols.
    <gnu/stubs.h> contains `#define __stub_FUNCTION' when FUNCTION is a stub
    that will always return failure (and set errno to ENOSYS).  */
-
 /* This file selects the right generated file of `__stub_FUNCTION' macros
    based on the architecture being compiled for.  */
 
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 5 "/usr/include/gnu/stubs.h" 2 3 4
-
 
 
 
@@ -453,7 +485,6 @@
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
 # 355 "/usr/include/features.h" 2 3 4
 # 29 "/usr/include/stdio.h" 2 3 4
-
 
 
 
@@ -562,7 +593,6 @@ typedef long unsigned int size_t;
 /* A null pointer constant.  */
 # 35 "/usr/include/stdio.h" 2 3 4
 
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -589,7 +619,6 @@ typedef long unsigned int size_t;
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -608,7 +637,6 @@ typedef long unsigned int size_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/types.h" 2 3 4
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/types.h" 2 3 4
 
@@ -668,7 +696,6 @@ typedef unsigned long int __u_quad_t;
    and int is always 32 bits.  */
 # 126 "/usr/include/bits/types.h" 3 4
 /* No need to mark the typedef with __extension__.   */
-
 
 
 
@@ -776,7 +803,6 @@ typedef struct _IO_FILE FILE;
 /* The opaque type of streams.  This is the definition used elsewhere.  */
 typedef struct _IO_FILE __FILE;
 # 75 "/usr/include/stdio.h" 3 4
-
 /* Copyright (C) 1991-1995,1997-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Per Bothner <bothner@cygnus.com>.
@@ -808,7 +834,6 @@ typedef struct _IO_FILE __FILE;
 
 
 
-
 /* This file is needed by libio to define various configuration parameters.
    These are always the same in the GNU C library.  */
 
@@ -816,7 +841,6 @@ typedef struct _IO_FILE __FILE;
 
 
 /* Define types for libio in terms of the standard internal type names.  */
-
 
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
@@ -841,7 +865,6 @@ typedef struct _IO_FILE __FILE;
  * Never include this file directly; use <sys/types.h> instead.
  */
 # 10 "/usr/include/_G_config.h" 2 3 4
-
 
 
 
@@ -951,7 +974,6 @@ Boston, MA 02110-1301, USA.  */
 
 
 
-
 /* Copyright (C) 1995-2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1031,7 +1053,6 @@ typedef unsigned int _G_uint32_t ;
 /* ALL of these should be defined in _G_config.h */
 # 51 "/usr/include/libio.h" 3 4
 /* This define avoids name pollution if we're using GNU stdarg.h */
-
 
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
@@ -1288,7 +1309,6 @@ typedef _G_fpos_t fpos_t;
    L_cuserid	How long an array to pass to `cuserid'.
    FOPEN_MAX	Minimum number of files that can be open at once.
    FILENAME_MAX	Maximum length of a filename.  */
-
 /* Copyright (C) 1994, 1997, 1998, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1711,7 +1731,6 @@ extern void perror (const char *__s);
    are available on this system.  Even if available, these variables
    should not be used directly.  The `strerror' function provides
    all the necessary functionality.  */
-
 /* Declare sys_errlist and sys_nerr, or don't.  Compatibility (do) version.
    Copyright (C) 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1790,7 +1809,6 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 # 2 "./vik1.c" 2
-
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1813,7 +1831,6 @@ extern void funlockfile (FILE *__stream) ;
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -1832,7 +1849,6 @@ extern void funlockfile (FILE *__stream) ;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 24 "/usr/include/sys/time.h" 2 3 4
-
 
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
@@ -1858,7 +1874,6 @@ extern void funlockfile (FILE *__stream) ;
  */
 # 26 "/usr/include/sys/time.h" 2 3 4
 
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1882,7 +1897,6 @@ extern void funlockfile (FILE *__stream) ;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 73 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1912,7 +1926,6 @@ extern void funlockfile (FILE *__stream) ;
 typedef __time_t time_t;
 # 28 "/usr/include/sys/time.h" 2 3 4
 
-
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1936,7 +1949,6 @@ typedef __time_t time_t;
  * Never include this file directly; use <time.h> instead.
  */
 # 65 "/usr/include/bits/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1970,7 +1982,6 @@ struct timeval
   };
 # 30 "/usr/include/sys/time.h" 2 3 4
 
-
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -1995,7 +2006,6 @@ struct timeval
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2016,7 +2026,6 @@ struct timeval
 # 26 "/usr/include/sys/select.h" 2 3 4
 
 /* Get definition of needed basic types.  */
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2042,7 +2051,6 @@ struct timeval
 # 29 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __FD_* definitions.  */
-
 /* Copyright (C) 1997, 1998, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2071,7 +2079,6 @@ struct timeval
 # 32 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __sigset_t.  */
-
 /* __sig_atomic_t, __sigset_t, and related definitions.  Linux version.
    Copyright (C) 1991, 1992, 1994, 1996, 1997, 2007
    Free Software Foundation, Inc.
@@ -2123,7 +2130,6 @@ typedef __sigset_t sigset_t;
 /* Get definition of timer specification structures.  */
 
 
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2147,7 +2153,6 @@ typedef __sigset_t sigset_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 117 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2180,7 +2185,6 @@ struct timespec
     long int tv_nsec; /* Nanoseconds.  */
   };
 # 45 "/usr/include/sys/select.h" 2 3 4
-
 
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
@@ -2379,7 +2383,6 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 # 3 "./vik1.c" 2
-
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
 /*
@@ -2416,7 +2419,6 @@ in this Software without prior written authorization from The Open Group.
  *	Structures and symbols starting with "_" are private to the library.
  */
 # 52 "/usr/include/X11/Xlib.h" 3 4
-
 /* Copyright (C) 1991,1992,1994,1995,1996,1997,1998,1999,2000,2001,2002,2006
    	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2443,7 +2445,6 @@ in this Software without prior written authorization from The Open Group.
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2462,7 +2463,6 @@ in this Software without prior written authorization from The Open Group.
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/sys/types.h" 2 3 4
-
 
 
 
@@ -2562,7 +2562,6 @@ typedef __caddr_t caddr_t;
 
 typedef __key_t key_t;
 # 133 "/usr/include/sys/types.h" 3 4
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2586,7 +2585,6 @@ typedef __key_t key_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 90 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2614,7 +2612,6 @@ typedef __key_t key_t;
 /* Clock ID used in clock and timer functions.  */
 typedef __clockid_t clockid_t;
 # 102 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2643,7 +2640,6 @@ typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
 # 134 "/usr/include/sys/types.h" 2 3 4
 # 147 "/usr/include/sys/types.h" 3 4
-
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -2782,7 +2778,6 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-
 /* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -2800,7 +2795,6 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -2837,7 +2831,6 @@ typedef int register_t;
 
 
 /* This file defines `__BYTE_ORDER' for the particular machine.  */
-
 /* x86_64 is little-endian.  */
 # 38 "/usr/include/endian.h" 2 3 4
 
@@ -2845,7 +2838,6 @@ typedef int register_t;
    values.  */
 # 60 "/usr/include/endian.h" 3 4
 /* Conversion interfaces.  */
-
 /* Macros to swap the order of bytes in integer values.
    Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
    Free Software Foundation, Inc.
@@ -2866,7 +2858,6 @@ typedef int register_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/byteswap.h" 3 4
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/byteswap.h" 2 3 4
 
@@ -2884,7 +2875,6 @@ typedef int register_t;
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
-
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -2908,7 +2898,6 @@ typedef int register_t;
 # 221 "/usr/include/sys/types.h" 2 3 4
 
 /* BSD defines these symbols, so we follow.  */
-
 /* Definitions of macros to access `dev_t' values.
    Copyright (C) 1996, 1997, 1999, 2003, 2004, 2007
    Free Software Foundation, Inc.
@@ -2928,7 +2917,6 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -2972,7 +2960,6 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
 # 268 "/usr/include/sys/types.h" 3 4
 /* Now add the thread types.  */
 
-
 /* Copyright (C) 2002,2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -2991,7 +2978,6 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -3138,7 +3124,13 @@ typedef union
 } pthread_barrierattr_t;
 # 271 "/usr/include/sys/types.h" 2 3 4
 # 53 "/usr/include/X11/Xlib.h" 2 3 4
-# 61 "/usr/include/X11/Xlib.h" 3 4
+
+
+
+
+
+
+
 /*
  *	$Xorg: X.h,v 1.4 2001/02/09 02:03:22 xorgcvs Exp $
  */
@@ -3545,7 +3537,6 @@ are reserved in the protocol for errors and replies. */
 # 61 "/usr/include/X11/Xlib.h" 2 3 4
 
 /* applications should not depend on these two headers being included! */
-
 /* Xfuncproto.h.  Generated from Xfuncproto.h.in by configure.  */
 /* $Xorg: Xfuncproto.h,v 1.4 2001/02/09 02:03:22 xorgcvs Exp $ */
 /*
@@ -3579,7 +3570,6 @@ in this Software without prior written authorization from The Open Group.
 # 53 "/usr/include/X11/Xfuncproto.h" 3 4
 /* Function prototype configuration (see configure for more info) */
 # 64 "/usr/include/X11/Xlib.h" 2 3 4
-
 /*
  * O/S-dependent (mis)feature macro definitions
  *
@@ -3623,7 +3613,6 @@ in this Software without prior written authorization from The Open Group.
  */
 # 65 "/usr/include/X11/Xlib.h" 2 3 4
 # 75 "/usr/include/X11/Xlib.h" 3 4
-
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -7543,7 +7532,6 @@ extern int _Xwctomb(
     wchar_t /* wc */
 );
 # 4 "./vik1.c" 2
-
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -7596,7 +7584,6 @@ SOFTWARE.
 
 /* default keysyms */
 # 75 "/usr/include/X11/keysym.h" 3 4
-
 /* $Xorg: keysymdef.h,v 1.4 2001/02/09 02:03:23 $ */
 
 /***********************************************************
@@ -7957,46 +7944,6 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 
  x/D,y=D-o,h=main(k*r+k*f/F,T)); for( B=g?B:1-h%3,i=60,y=n=m,XDrawString (K, M,N,30,x,P,
  sprintf(P,"Time"": %1d'%02d\"%02d          ""High"": %1d'%02d\"%02d          ""Speed: %03dmph",h/A/i,h/A%i,h%A,q/A/i,q/A%i,q%A,s,main(A<<17,T))),x=h; ++f<2*z*e; l=(x*=3)%e,o=x*x%a,main(-1,T)); } return A**H+1[H]/p-c; }
-# 17
-int main
-
-                         (int S,char**T){
-
-
-XEvent O ; for( p=E/5; --S&~1?
-XSetForeground (K, N,(y/v*!w+((S+1)>>0&255)*(D+y/(z|w-2))/D)<<0|(y/v*!w+((S+1)>>8&255)*(D+y/(z|w-2))/D)<<8|(y/v*!w+((S+1)>>16&255)*(D+y/(z|w-2))/D)<<16|0),XDrawLine (K, M,N,D+l - m,o,D+l - n,o),XDrawLine (K, M,N,D+l + m,o,D+l + n,o),gettimeofday((struct timeval*)H,0):S?z=97
-                         == ** ++ T,w=A==z[*T],B-=w[z+*T]%3,S:++S;
-XCopyArea (K, M,L,N,0,0,e,D,0,0),
-XSync (K, 0),
-XFlush (K),select(0,0,0,0,(struct timeval*)H+1)){ ; for( 3[H]=F; p==++r?K=
-XOpenDisplay (0),N=
-XCreateGC (K, L=
-XCreateSimpleWindow (K, ((&((_XPrivDisplay)K)->screens[0])->root),0,0,e=D*2,D,0,0,0),0,0),
-XSelectInput (K, L,(1L<<0)|(1L<<1)),
-XMapWindow (K, L),M=
-XCreatePixmap (K, L,e,d=D,((&((_XPrivDisplay)K)->screens[0])->root_depth)),u=h=q=E:r<p?a=r/D%6,r[C
-                         +p]=(l+=!a|a%2?g:a-3)/4,r[C]=2*r<=p?(n+=(i-=(i+34&&r
-                         /149%B)-(i-34&&r/353%3)))/55:C[p-r],v=4-3*z:
-XPending (K)?C[F+
-XLookupKeysym (&O.xkey,0&
-XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
-# 48 "./vik1.c"
-                            /* Some more code */
-
-
- ); for( k=C[F+0xff53]-C[F+0xff51],j=k?j+v*k*(j*k<8):j*.9,u+=(s=(C[F+0x0020]* 3+s-!!s<a?C[F+0x0020]* 3+s-!!s:a))/9,c=u>p?q=(h<q?h:q),u%=p,main(c=0,T):c,t+=j*(s+A)/e-s/i*(C[u+4]-C[u]),s=t
-
- *t>p?t*=.97,s*.8:g>a&&b*b<D*9?i:s,i=k=l=0,o=n=e; i-5; main((k/17?o++==y?m=n=D,f -=A,o=30+9*i++:0,n-=2,m+=3,l=f/.7,y*F+A-i*k:k|!o?f=l=C[u]/-2-t,k+=17*w,o=k+++ 20,n=k+k-k*k/9,F*p:o--<a?y=135,A*F|D:0),T)); for( x=g=m=f=0,a=i=u+D,d+=9; o<f?n=2*e,
-
-
- main(z?r+k*F*8:E-k*A*A,T),n=9+x/D,main(!k+z?r=D*F+9:A<<17,T),n-=x/9/D,main(i%p>6?h=r*(3+z) /5:r,T),n=x/13/e,main(k?h:r,T),o++:(f=x/D+70+C[i+p]-C[u+p],o=x?o:f,k=2*i/41%2,l=C[--
-
- i]-C[u]-t,x+=D-(y=i-u),g=(d-i)%410?g:(a=o,b=l+B*x/e,x)/A,i>u); ); for( k=i=0,x=g,
- l=b; ++i==41+!f&&k?f=k=i=l=0,x=190,a=163:i==42?i=9,k=r:!k|i-41; n=((((75<A -i?75:A -i)/3<95-2*i?(75<A -i?75:A -i)/3:95-2*i)<r-k+2*i?((75<A -i?75:A -i)/3<95-2*i?(75<A -i?75:A -i)/3:95-2*i):r-k+2*i)-k/r)*x/D,m=i<9?x*14/D:k?(i-31)/5*(i%12)?0:n-1:0,o=a-i*
-
- x/D,y=D-o,h=main(k*r+k*f/F,T)); for( B=g?B:1-h%3,i=60,y=n=m,XDrawString (K, M,N,30,x,P,
- sprintf(P,"Time"": %1d'%02d\"%02d          ""High"": %1d'%02d\"%02d          ""Speed: %03dmph",h/A/i,h/A%i,h%A,q/A/i,q/A%i,q%A,s,main(A<<17,T))),x=h; ++f<2*z*e; l=(x*=3)%e,o=x*x%a,main(-1,T)); } return A**H+1[H]/p-c; }
-
 /* Define ISO C stdio on top of C++ iostreams.
    Copyright (C) 1991, 1994-2007, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -8019,7 +7966,6 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 /*
  *	ISO C99 Standard: 7.19 Input/output	<stdio.h>
  */
-
 
 
 
@@ -8199,7 +8145,6 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 
 
 /* This is here only because every header file already includes this one.  */
-
 
 
 /* Copyright (C) 1992-2001, 2002, 2004, 2005, 2006, 2007
@@ -8405,7 +8350,6 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 
 
 
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 349 "/usr/include/sys/cdefs.h" 2 3 4
 # 331 "/usr/include/features.h" 2 3 4
@@ -8432,14 +8376,11 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
    Get the definitions of all the appropriate `__stub_FUNCTION' symbols.
    <gnu/stubs.h> contains `#define __stub_FUNCTION' when FUNCTION is a stub
    that will always return failure (and set errno to ENOSYS).  */
-
 /* This file selects the right generated file of `__stub_FUNCTION' macros
    based on the architecture being compiled for.  */
 
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 5 "/usr/include/gnu/stubs.h" 2 3 4
-
 
 
 
@@ -8451,7 +8392,6 @@ XNextEvent (K,&O))]^=O.type==2||O.type==3,p:0;
 # 10 "/usr/include/gnu/stubs.h" 2 3 4
 # 355 "/usr/include/features.h" 2 3 4
 # 29 "/usr/include/stdio.h" 2 3 4
-
 
 
 
@@ -8560,7 +8500,6 @@ typedef long unsigned int size_t;
 /* A null pointer constant.  */
 # 35 "/usr/include/stdio.h" 2 3 4
 
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -8587,7 +8526,6 @@ typedef long unsigned int size_t;
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -8606,7 +8544,6 @@ typedef long unsigned int size_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/types.h" 2 3 4
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/types.h" 2 3 4
 
@@ -8666,7 +8603,6 @@ typedef unsigned long int __u_quad_t;
    and int is always 32 bits.  */
 # 126 "/usr/include/bits/types.h" 3 4
 /* No need to mark the typedef with __extension__.   */
-
 
 
 
@@ -8774,7 +8710,6 @@ typedef struct _IO_FILE FILE;
 /* The opaque type of streams.  This is the definition used elsewhere.  */
 typedef struct _IO_FILE __FILE;
 # 75 "/usr/include/stdio.h" 3 4
-
 /* Copyright (C) 1991-1995,1997-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Per Bothner <bothner@cygnus.com>.
@@ -8806,7 +8741,6 @@ typedef struct _IO_FILE __FILE;
 
 
 
-
 /* This file is needed by libio to define various configuration parameters.
    These are always the same in the GNU C library.  */
 
@@ -8814,7 +8748,6 @@ typedef struct _IO_FILE __FILE;
 
 
 /* Define types for libio in terms of the standard internal type names.  */
-
 
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
@@ -8839,7 +8772,6 @@ typedef struct _IO_FILE __FILE;
  * Never include this file directly; use <sys/types.h> instead.
  */
 # 10 "/usr/include/_G_config.h" 2 3 4
-
 
 
 
@@ -8949,7 +8881,6 @@ Boston, MA 02110-1301, USA.  */
 
 
 
-
 /* Copyright (C) 1995-2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -9029,7 +8960,6 @@ typedef unsigned int _G_uint32_t ;
 /* ALL of these should be defined in _G_config.h */
 # 51 "/usr/include/libio.h" 3 4
 /* This define avoids name pollution if we're using GNU stdarg.h */
-
 
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
@@ -9286,7 +9216,6 @@ typedef _G_fpos_t fpos_t;
    L_cuserid	How long an array to pass to `cuserid'.
    FOPEN_MAX	Minimum number of files that can be open at once.
    FILENAME_MAX	Maximum length of a filename.  */
-
 /* Copyright (C) 1994, 1997, 1998, 1999 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -9709,7 +9638,6 @@ extern void perror (const char *__s);
    are available on this system.  Even if available, these variables
    should not be used directly.  The `strerror' function provides
    all the necessary functionality.  */
-
 /* Declare sys_errlist and sys_nerr, or don't.  Compatibility (do) version.
    Copyright (C) 2002 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9788,7 +9716,6 @@ extern void funlockfile (FILE *__stream) ;
    several optimizing inline functions and macros.  */
 # 912 "/usr/include/stdio.h" 3 4
 # 2 "./vik1.c" 2
-
 /* Copyright (C) 1991-1994,1996-2002,2003,2005,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9811,7 +9738,6 @@ extern void funlockfile (FILE *__stream) ;
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -9830,7 +9756,6 @@ extern void funlockfile (FILE *__stream) ;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 24 "/usr/include/sys/time.h" 2 3 4
-
 
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
@@ -9856,7 +9781,6 @@ extern void funlockfile (FILE *__stream) ;
  */
 # 26 "/usr/include/sys/time.h" 2 3 4
 
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9880,7 +9804,6 @@ extern void funlockfile (FILE *__stream) ;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 73 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9910,7 +9833,6 @@ extern void funlockfile (FILE *__stream) ;
 typedef __time_t time_t;
 # 28 "/usr/include/sys/time.h" 2 3 4
 
-
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9934,7 +9856,6 @@ typedef __time_t time_t;
  * Never include this file directly; use <time.h> instead.
  */
 # 65 "/usr/include/bits/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9968,7 +9889,6 @@ struct timeval
   };
 # 30 "/usr/include/sys/time.h" 2 3 4
 
-
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -9993,7 +9913,6 @@ struct timeval
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -10014,7 +9933,6 @@ struct timeval
 # 26 "/usr/include/sys/select.h" 2 3 4
 
 /* Get definition of needed basic types.  */
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10040,7 +9958,6 @@ struct timeval
 # 29 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __FD_* definitions.  */
-
 /* Copyright (C) 1997, 1998, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -10069,7 +9986,6 @@ struct timeval
 # 32 "/usr/include/sys/select.h" 2 3 4
 
 /* Get __sigset_t.  */
-
 /* __sig_atomic_t, __sigset_t, and related definitions.  Linux version.
    Copyright (C) 1991, 1992, 1994, 1996, 1997, 2007
    Free Software Foundation, Inc.
@@ -10121,7 +10037,6 @@ typedef __sigset_t sigset_t;
 /* Get definition of timer specification structures.  */
 
 
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10145,7 +10060,6 @@ typedef __sigset_t sigset_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 117 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10178,7 +10092,6 @@ struct timespec
     long int tv_nsec; /* Nanoseconds.  */
   };
 # 45 "/usr/include/sys/select.h" 2 3 4
-
 
 /* System-dependent timing definitions.  Generic version.
    Copyright (C) 1996,1997,1999-2002,2003 Free Software Foundation, Inc.
@@ -10377,7 +10290,6 @@ extern int futimes (int __fd, const struct timeval __tvp[2]) ;
    NOTE: `timercmp' does not work for >= or <=.  */
 # 191 "/usr/include/sys/time.h" 3 4
 # 3 "./vik1.c" 2
-
 /* $XdotOrg: lib/X11/include/X11/Xlib.h,v 1.6 2005-11-08 06:33:25 jkj Exp $ */
 /* $Xorg: Xlib.h,v 1.6 2001/02/09 02:03:38 xorgcvs Exp $ */
 /*
@@ -10414,7 +10326,6 @@ in this Software without prior written authorization from The Open Group.
  *	Structures and symbols starting with "_" are private to the library.
  */
 # 52 "/usr/include/X11/Xlib.h" 3 4
-
 /* Copyright (C) 1991,1992,1994,1995,1996,1997,1998,1999,2000,2001,2002,2006
    	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10441,7 +10352,6 @@ in this Software without prior written authorization from The Open Group.
 
 
 
-
 /* Copyright (C) 1991,1992,1993,1995-2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -10460,7 +10370,6 @@ in this Software without prior written authorization from The Open Group.
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/sys/types.h" 2 3 4
-
 
 
 
@@ -10560,7 +10469,6 @@ typedef __caddr_t caddr_t;
 
 typedef __key_t key_t;
 # 133 "/usr/include/sys/types.h" 3 4
-
 /* Copyright (C) 1991-1999,2000,2001,2002,2003,2006
 	Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10584,7 +10492,6 @@ typedef __key_t key_t;
  *	ISO C99 Standard: 7.23 Date and time	<time.h>
  */
 # 90 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10612,7 +10519,6 @@ typedef __key_t key_t;
 /* Clock ID used in clock and timer functions.  */
 typedef __clockid_t clockid_t;
 # 102 "/usr/include/time.h" 3 4
-
 /* bits/types.h -- definitions of __*_t types underlying *_t types.
    Copyright (C) 2002, 2003, 2004, 2005, 2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10641,7 +10547,6 @@ typedef __clockid_t clockid_t;
 typedef __timer_t timer_t;
 # 134 "/usr/include/sys/types.h" 2 3 4
 # 147 "/usr/include/sys/types.h" 3 4
-
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -10780,7 +10685,6 @@ typedef unsigned long int u_int64_t;
 typedef int register_t;
 # 216 "/usr/include/sys/types.h" 3 4
 /* In BSD <sys/types.h> is expected to define BYTE_ORDER.  */
-
 /* Copyright (C) 1992, 1996, 1997, 2000, 2008 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
@@ -10798,7 +10702,6 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -10835,7 +10738,6 @@ typedef int register_t;
 
 
 /* This file defines `__BYTE_ORDER' for the particular machine.  */
-
 /* x86_64 is little-endian.  */
 # 38 "/usr/include/endian.h" 2 3 4
 
@@ -10843,7 +10745,6 @@ typedef int register_t;
    values.  */
 # 60 "/usr/include/endian.h" 3 4
 /* Conversion interfaces.  */
-
 /* Macros to swap the order of bytes in integer values.
    Copyright (C) 1997, 1998, 2000, 2002, 2003, 2007, 2008
    Free Software Foundation, Inc.
@@ -10864,7 +10765,6 @@ typedef int register_t;
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 # 28 "/usr/include/bits/byteswap.h" 3 4
-
 /* Determine the wordsize from the preprocessor defines.  */
 # 29 "/usr/include/bits/byteswap.h" 2 3 4
 
@@ -10882,7 +10782,6 @@ typedef int register_t;
 # 218 "/usr/include/sys/types.h" 2 3 4
 
 /* It also defines `fd_set' and the FD_* macros for `select'.  */
-
 /* `fd_set' type and related macros, and `select'/`pselect' declarations.
    Copyright (C) 1996,97,98,99,2000,01,02,2003 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
@@ -10906,7 +10805,6 @@ typedef int register_t;
 # 221 "/usr/include/sys/types.h" 2 3 4
 
 /* BSD defines these symbols, so we follow.  */
-
 /* Definitions of macros to access `dev_t' values.
    Copyright (C) 1996, 1997, 1999, 2003, 2004, 2007
    Free Software Foundation, Inc.
@@ -10926,7 +10824,6 @@ typedef int register_t;
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -10970,7 +10867,6 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
 # 268 "/usr/include/sys/types.h" 3 4
 /* Now add the thread types.  */
 
-
 /* Copyright (C) 2002,2003,2004,2005,2006,2007 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Ulrich Drepper <drepper@redhat.com>, 2002.
@@ -10989,7 +10885,6 @@ typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
-
 
 
 
@@ -11136,7 +11031,13 @@ typedef union
 } pthread_barrierattr_t;
 # 271 "/usr/include/sys/types.h" 2 3 4
 # 53 "/usr/include/X11/Xlib.h" 2 3 4
-# 61 "/usr/include/X11/Xlib.h" 3 4
+
+
+
+
+
+
+
 /*
  *	$Xorg: X.h,v 1.4 2001/02/09 02:03:22 xorgcvs Exp $
  */
@@ -11543,7 +11444,6 @@ are reserved in the protocol for errors and replies. */
 # 61 "/usr/include/X11/Xlib.h" 2 3 4
 
 /* applications should not depend on these two headers being included! */
-
 /* Xfuncproto.h.  Generated from Xfuncproto.h.in by configure.  */
 /* $Xorg: Xfuncproto.h,v 1.4 2001/02/09 02:03:22 xorgcvs Exp $ */
 /*
@@ -11577,7 +11477,6 @@ in this Software without prior written authorization from The Open Group.
 # 53 "/usr/include/X11/Xfuncproto.h" 3 4
 /* Function prototype configuration (see configure for more info) */
 # 64 "/usr/include/X11/Xlib.h" 2 3 4
-
 /*
  * O/S-dependent (mis)feature macro definitions
  *
@@ -11621,7 +11520,6 @@ in this Software without prior written authorization from The Open Group.
  */
 # 65 "/usr/include/X11/Xlib.h" 2 3 4
 # 75 "/usr/include/X11/Xlib.h" 3 4
-
 /* Copyright (C) 1989, 1997, 1998, 1999, 2000, 2002, 2004
    Free Software Foundation, Inc.
 
@@ -15541,7 +15439,6 @@ extern int _Xwctomb(
     wchar_t /* wc */
 );
 # 4 "./vik1.c" 2
-
 /* $Xorg: keysym.h,v 1.4 2001/02/09 02:03:23 xorgcvs Exp $ */
 
 /***********************************************************
@@ -15594,7 +15491,6 @@ SOFTWARE.
 
 /* default keysyms */
 # 75 "/usr/include/X11/keysym.h" 3 4
-
 /* $Xorg: keysymdef.h,v 1.4 2001/02/09 02:03:23 $ */
 
 /***********************************************************

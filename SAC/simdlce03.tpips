@@ -12,7 +12,7 @@ make PRINTED_FILE[%ALL]
 module convol
 display PRINTED_FILE 
 
-apply DELAY_COMMUNICATIONS
+apply DELAY_COMMUNICATIONS_INTRA
 display PRINTED_FILE
 
 close

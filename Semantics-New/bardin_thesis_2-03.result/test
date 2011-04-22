@@ -125,6 +125,13 @@ void ts_singlestate(void)
 
             checking_error();
       }
+
+//  T() {0<=y}
+
+   
+   
+   
+   ;
 }
 
 //  T() {}
@@ -1356,6 +1363,13 @@ void ts_singlestate(void)
 
             checking_error();
       }
+
+//  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
+
+   
+   
+   
+   ;
 }
 
 //  P() {}

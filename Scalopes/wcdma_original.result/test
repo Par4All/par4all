@@ -39,7 +39,7 @@ void P4A_scmp_dealloc(void *dest)
 void * P4A_scmp_flow(void **flow)
 {
 }
-void P4A_scmp_kernel_0(int32_t *channel_delay1_0, int32_t *channel_delay2_0, int32_t *channel_delay3_0, int32_t *channel_delay4_0, int32_t *data_0, unsigned char image_in[512*1024], int32_t img_index, int32_t ovsf_code_user1[8], int32_t pilot[8*sizeof(int32_t)], int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t symbole_flow_user1[8*sizeof(int32_t)], int32_t t)
+void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1], int32_t channel_delay3_0[1], int32_t channel_delay4_0[1], int32_t data_0[1], unsigned char image_in[512*1024], int32_t img_index, int32_t ovsf_code_user1[8], int32_t pilot[8*sizeof(int32_t)], int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t symbole_flow_user1[8*sizeof(int32_t)], int32_t t)
 {
    //PIPS generated variable
    int32_t data_bit, i, j, write, channel_delay1, channel_delay2, channel_delay3, channel_delay4, data;
@@ -111,7 +111,7 @@ void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       channel_I[u] = 0;
 }
-void P4A_scmp_kernel_11(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_11(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -126,7 +126,7 @@ void P4A_scmp_kernel_11(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -152,7 +152,7 @@ void P4A_scmp_kernel_13(float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       channel_Q[u] = 0;
 }
-void P4A_scmp_kernel_14(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_14(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -167,7 +167,7 @@ void P4A_scmp_kernel_14(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -203,7 +203,7 @@ void P4A_scmp_kernel_17(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       FIR2_Q_user1[u] = 0;
 }
-void P4A_scmp_kernel_18(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_18(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -219,7 +219,7 @@ void P4A_scmp_kernel_18(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -245,7 +245,7 @@ void P4A_scmp_kernel_2(int32_t spreading_signals[8*8*sizeof(int32_t)+6])
    for(i = 8*8*sizeof(int32_t); i <= 261; i += 1)
       spreading_signals[i] = 0;
 }
-void P4A_scmp_kernel_20(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_20(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -261,7 +261,7 @@ void P4A_scmp_kernel_20(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -276,7 +276,7 @@ void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t *j_0, int32_t t)
+void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t j_0[1], int32_t t)
 {
    //PIPS generated variable
    int32_t i, j;
@@ -312,7 +312,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    }
    *j_0 = j;
 }
-void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[8*sizeof(int32_t)], int32_t coeff[6], int32_t coeff2[6], int32_t finger_mat[8*sizeof(int32_t)][6], int *flag_0, int *j_bkp_0, int32_t *max_0, int32_t *retro_loop_count_0, int32_t t)
+void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[8*sizeof(int32_t)], int32_t coeff[6], int32_t coeff2[6], int32_t finger_mat[8*sizeof(int32_t)][6], int flag_0[1], int j_bkp_0[1], int32_t max_0[1], int32_t retro_loop_count_0[1], int32_t t)
 {
    //PIPS generated variable
    int32_t c, d, i;
@@ -403,7 +403,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
    *max_0 = max;
    *retro_loop_count_0 = retro_loop_count;
 }
-void P4A_scmp_kernel_24(int32_t coeff[6], int32_t *data_0, int32_t finger[6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t ovsf_code_user1[8], int32_t symbole_flow[8*sizeof(int32_t)], int32_t t)
+void P4A_scmp_kernel_24(int32_t coeff[6], int32_t data_0[1], int32_t finger[6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t ovsf_code_user1[8], int32_t symbole_flow[8*sizeof(int32_t)], int32_t t)
 {
    //PIPS generated variable
    int32_t c, d, data_bit, fingers, i, j, data;
@@ -476,7 +476,7 @@ void P4A_scmp_kernel_6(int32_t channel_delay4, int32_t spreading_signal1[8*8*siz
    for(i = channel_delay4; i <= 8*8*sizeof(int32_t)+channel_delay4-1; i += 1)
       spreading_signals[i] += spreading_signal1[i-channel_delay4];
 }
-void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], int32_t *j_0, int32_t spreading_signals[8*8*sizeof(int32_t)+6])
+void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], int32_t j_0[1], int32_t spreading_signals[8*8*sizeof(int32_t)+6])
 {
    //PIPS generated variable
    int32_t i, j;
@@ -756,7 +756,7 @@ void P4A_scmp_dealloc(void *dest)
 void * P4A_scmp_flow(void **flow)
 {
 }
-void P4A_scmp_kernel_0(int32_t *channel_delay1_0, int32_t *channel_delay2_0, int32_t *channel_delay3_0, int32_t *channel_delay4_0, int32_t *data_0, unsigned char image_in[512*1024], int32_t img_index, int32_t ovsf_code_user1[8], int32_t pilot[8*sizeof(int32_t)], int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t symbole_flow_user1[8*sizeof(int32_t)], int32_t t)
+void P4A_scmp_kernel_0(int32_t channel_delay1_0[1], int32_t channel_delay2_0[1], int32_t channel_delay3_0[1], int32_t channel_delay4_0[1], int32_t data_0[1], unsigned char image_in[512*1024], int32_t img_index, int32_t ovsf_code_user1[8], int32_t pilot[8*sizeof(int32_t)], int32_t spreading_signal1[8*8*sizeof(int32_t)+6], int32_t symbole_flow_user1[8*sizeof(int32_t)], int32_t t)
 {
    //PIPS generated variable
    int32_t data_bit, i, j, write, channel_delay1, channel_delay2, channel_delay3, channel_delay4, data;
@@ -828,7 +828,7 @@ void P4A_scmp_kernel_10(float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       channel_I[u] = 0;
 }
-void P4A_scmp_kernel_11(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_11(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -843,7 +843,7 @@ void P4A_scmp_kernel_11(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_12(float FIR_COEFF[8], float Signal_I[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -869,7 +869,7 @@ void P4A_scmp_kernel_13(float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       channel_Q[u] = 0;
 }
-void P4A_scmp_kernel_14(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_14(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -884,7 +884,7 @@ void P4A_scmp_kernel_14(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_15(float FIR_COEFF[8], float Signal_Q[(8/2*8*sizeof(int32_t)+6/2)*4], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -920,7 +920,7 @@ void P4A_scmp_kernel_17(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4])
    for(u = 0; u <= 523; u += 1)
       FIR2_Q_user1[u] = 0;
 }
-void P4A_scmp_kernel_18(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_18(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -936,7 +936,7 @@ void P4A_scmp_kernel_18(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_19(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_I[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -962,7 +962,7 @@ void P4A_scmp_kernel_2(int32_t spreading_signals[8*8*sizeof(int32_t)+6])
    for(i = 8*8*sizeof(int32_t); i <= 261; i += 1)
       spreading_signals[i] = 0;
 }
-void P4A_scmp_kernel_20(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_20(int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t u, ptr_x_buffer_user1;
@@ -978,7 +978,7 @@ void P4A_scmp_kernel_20(int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t *ptr_x_buffer_user1_0, float x_buffer_user1[8])
+void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR_COEFF[8], float channel_Q[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t ptr_x_buffer_user1_0[1], float x_buffer_user1[8])
 {
    //PIPS generated variable
    int32_t i, n, ptr_x_buffer_user1;
@@ -993,7 +993,7 @@ void P4A_scmp_kernel_21(float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    }
    *ptr_x_buffer_user1_0 = ptr_x_buffer_user1;
 }
-void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t *j_0, int32_t t)
+void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float FIR2_Q_user1[(8/2*8*sizeof(int32_t)+6/2)*4], int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t j_0[1], int32_t t)
 {
    //PIPS generated variable
    int32_t i, j;
@@ -1029,7 +1029,7 @@ void P4A_scmp_kernel_22(float FIR2_I_user1[(8/2*8*sizeof(int32_t)+6/2)*4], float
    }
    *j_0 = j;
 }
-void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[8*sizeof(int32_t)], int32_t coeff[6], int32_t coeff2[6], int32_t finger_mat[8*sizeof(int32_t)][6], int *flag_0, int *j_bkp_0, int32_t *max_0, int32_t *retro_loop_count_0, int32_t t)
+void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[8*sizeof(int32_t)], int32_t coeff[6], int32_t coeff2[6], int32_t finger_mat[8*sizeof(int32_t)][6], int flag_0[1], int j_bkp_0[1], int32_t max_0[1], int32_t retro_loop_count_0[1], int32_t t)
 {
    //PIPS generated variable
    int32_t c, d, i;
@@ -1120,7 +1120,7 @@ void P4A_scmp_kernel_23(int32_t R_pilot[8*8*sizeof(int32_t)+6], int32_t S_pilot[
    *max_0 = max;
    *retro_loop_count_0 = retro_loop_count;
 }
-void P4A_scmp_kernel_24(int32_t coeff[6], int32_t *data_0, int32_t finger[6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t ovsf_code_user1[8], int32_t symbole_flow[8*sizeof(int32_t)], int32_t t)
+void P4A_scmp_kernel_24(int32_t coeff[6], int32_t data_0[1], int32_t finger[6], int32_t inv_qpsk_user1[8*8*sizeof(int32_t)+6], int32_t ovsf_code_user1[8], int32_t symbole_flow[8*sizeof(int32_t)], int32_t t)
 {
    //PIPS generated variable
    int32_t c, d, data_bit, fingers, i, j, data;
@@ -1193,7 +1193,7 @@ void P4A_scmp_kernel_6(int32_t channel_delay4, int32_t spreading_signal1[8*8*siz
    for(i = channel_delay4; i <= 8*8*sizeof(int32_t)+channel_delay4-1; i += 1)
       spreading_signals[i] += spreading_signal1[i-channel_delay4];
 }
-void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], int32_t *j_0, int32_t spreading_signals[8*8*sizeof(int32_t)+6])
+void P4A_scmp_kernel_7(int32_t I_user[8/2*8*sizeof(int32_t)+6/2], int32_t Q_user[8/2*8*sizeof(int32_t)+6/2], int32_t j_0[1], int32_t spreading_signals[8*8*sizeof(int32_t)+6])
 {
    //PIPS generated variable
    int32_t i, j;

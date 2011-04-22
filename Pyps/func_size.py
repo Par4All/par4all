@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from pyps import workspace
+from pyps import workspace, Maker
 import binary_size
 
 w = workspace("func_size.c", verbose=False, deleteOnClose=True) 

@@ -200,23 +200,19 @@ c     of the image
      &      (1,2)
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+1-2,J+3-2)*KERNEL
      &      (1,3)
-            KJ = 4
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+1-2)*KERNEL
      &      (2,1)
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+2-2)*KERNEL
      &      (2,2)
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+2-2,J+3-2)*KERNEL
      &      (2,3)
-            KJ = 4
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+1-2)*KERNEL
      &      (3,1)
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+2-2)*KERNEL
      &      (3,2)
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)+IMAGE(I+3-2,J+3-2)*KERNEL
      &      (3,3)
-            KJ = 4
 200         CONTINUE
-            KI = 4
             NEW_IMAGE(I,J) = NEW_IMAGE(I,J)/9
 300         CONTINUE
 400      CONTINUE

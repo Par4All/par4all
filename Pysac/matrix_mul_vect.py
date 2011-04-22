@@ -6,8 +6,7 @@ filename="matrix_mul_vect"
 with workspace(filename+".c", parents=[sac_workspace], driver="sse", deleteOnClose=True) as w:
 	m=w[filename]
 	m.display()
-	m.sac()
+	m.sac(verbose=True)
 	m.display()
-	a_out=w.simd_compile(rep="d.out")
-	remove(a_out)
+	w.goingToRunWith(w.save(rep="save-geekou2"),"save-geekou2")
 

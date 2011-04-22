@@ -78,12 +78,12 @@ void threshold(float data[128], float val)
       for(i = 0; i <= 127; i += 4) {
          I_0[i] = data[i]>val;
          data[i] = I_0[i]?val:data[i];
-         I_0[i+1] = data[i+1]>val;
-         data[i+1] = I_0[i+1]?val:data[i+1];
-         I_0[i+2] = data[i+2]>val;
-         data[i+2] = I_0[i+2]?val:data[i+2];
-         I_0[i+3] = data[i+3]>val;
-         data[i+3] = I_0[i+3]?val:data[i+3];
+         I_0[1+i] = data[1+i]>val;
+         data[1+i] = I_0[1+i]?val:data[1+i];
+         I_0[2+i] = data[2+i]>val;
+         data[2+i] = I_0[2+i]?val:data[2+i];
+         I_0[3+i] = data[3+i]>val;
+         data[3+i] = I_0[3+i]?val:data[3+i];
       }
       i = 128;
    }
@@ -99,12 +99,12 @@ void threshold(float data[128], float val)
       for(i = 0; i <= 127; i += 4) {
          I_0[i] = data[i]>val;
          data[i] = I_0[i]?val:data[i];
-         I_0[i+1] = data[i+1]>val;
-         data[i+1] = I_0[i+1]?val:data[i+1];
-         I_0[i+2] = data[i+2]>val;
-         data[i+2] = I_0[i+2]?val:data[i+2];
-         I_0[i+3] = data[i+3]>val;
-         data[i+3] = I_0[i+3]?val:data[i+3];
+         I_0[1+i] = data[1+i]>val;
+         data[1+i] = I_0[1+i]?val:data[1+i];
+         I_0[2+i] = data[2+i]>val;
+         data[2+i] = I_0[2+i]?val:data[2+i];
+         I_0[3+i] = data[3+i]>val;
+         data[3+i] = I_0[3+i]?val:data[3+i];
       }
       i = 128;
    }
@@ -120,12 +120,12 @@ void threshold(float data[128], float val)
       for(i = 0; i <= 127; i += 4) {
          I_0[i] = data[i]>val;
          data[i] = I_0[i]?val:data[i];
-         I_0[i+1] = data[i+1]>val;
-         data[i+1] = I_0[i+1]?val:data[i+1];
-         I_0[i+2] = data[i+2]>val;
-         data[i+2] = I_0[i+2]?val:data[i+2];
-         I_0[i+3] = data[i+3]>val;
-         data[i+3] = I_0[i+3]?val:data[i+3];
+         I_0[1+i] = data[1+i]>val;
+         data[1+i] = I_0[1+i]?val:data[1+i];
+         I_0[2+i] = data[2+i]>val;
+         data[2+i] = I_0[2+i]?val:data[2+i];
+         I_0[3+i] = data[3+i]>val;
+         data[3+i] = I_0[3+i]?val:data[3+i];
       }
       i = 128;
    }
@@ -135,8 +135,6 @@ void threshold(float data[128], float val)
    int i;
    //PIPS generated variable
    int I_0;
-   //SAC generated temporary array
-   a4sf pdata0 = {val, val, val, val};
    {
       //PIPS generated variable
       int I_0[128];
@@ -149,7 +147,7 @@ void threshold(float data[128], float val)
          v4si vec40;
          //PIPS:SAC generated v4sf vector(s)
          v4sf vec50;
-         SIMD_LOAD_V4SF(vec20, &pdata0[0]);
+         SIMD_LOAD_BROADCAST_V4SF(vec20, val);
          SIMD_LOAD_V4SF(vec10, &data[i]);
          SIMD_GTPS(vec00, vec10, vec20);
          SIMD_STORE_V4SI(vec00, &I_0[i]);
@@ -172,9 +170,7 @@ void threshold(float data[128], float val)
    v4si vec40_0;
    //PIPS generated variable
    v4sf vec50_0;
-   //SAC generated temporary array
-   a4sf pdata0 = {val, val, val, val};
-   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   SIMD_LOAD_BROADCAST_V4SF(vec20_0, val);
    {
       //PIPS generated variable
       for(i = 0; i <= 127; i += 4) {
@@ -197,9 +193,7 @@ void threshold(float data[128], float val)
    v4si vec00_0;
    //PIPS generated variable
    v4sf vec10_0, vec20_0, vec30_0;
-   //SAC generated temporary array
-   a4sf pdata0 = {val, val, val, val};
-   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   SIMD_LOAD_BROADCAST_V4SF(vec20_0, val);
    //PIPS generated variable
    for(i = 0; i <= 127; i += 4) {
       //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)
@@ -223,9 +217,7 @@ void threshold(float data[128], float val)
    v4si vec00_0;
    //PIPS generated variable
    v4sf vec10_0, vec20_0, vec30_0;
-   //SAC generated temporary array
-   a4sf pdata0 = {val, val, val, val};
-   SIMD_LOAD_V4SF(vec20_0, &pdata0[0]);
+   SIMD_LOAD_BROADCAST_V4SF(vec20_0, val);
    //PIPS generated variable
    for(i = 0; i <= 127; i += 4) {
       //PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)PIPS:SAC generated v4si vector(s)PIPS:SAC generated v4sf vector(s)

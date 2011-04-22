@@ -304,6 +304,11 @@ void ts_restructured(void)
 //    x==y+1, 1<=i1, n<=i1+i2#init, x<=i1+i2#init+1, i1+i2#init<=x,
 //    i1<=n, x<=i1+n}
 
+      
+      
+      
+      
+      
       if (rand_b()) {
 
 //  T() {i1+i2==y+1, s==2, 1<=i1, 0<=i2, 1<=n, n<=y+1}
@@ -407,6 +412,14 @@ void ts_restructured(void)
 
             control_error();
       }
+
+//  T() {i1+i2==x, s==1, x==y+1, 1<=i1, i1<=n, x<=i1+n, i1<=x, 1<=n,
+//    n<=x}
+
+      
+      
+      
+      ;
    }
 }
 
@@ -721,6 +734,11 @@ void ts_restructured(void)
 
 //  P(i1,i2,n,s,x,y) {i1+i2==y+1, s==2, 1<=i1, i1+i2<=n, 0<=i2}
 
+      
+      
+      
+      
+      
       if (rand_b()) {
 
 //  P(i1,i2,n,s,x,y) {i1+i2==y+1, s==2, 1<=i1, i1+i2<=n, 0<=i2}
@@ -827,5 +845,13 @@ void ts_restructured(void)
 
             control_error();
       }
+
+//  P(i1,i2,n,s,x,y) {i1+i2==x, i1+i2==y+1, s==1, 1<=i1, n<=i1+i2,
+//    i1+i2<=n+1, i1<=n}
+
+      
+      
+      
+      ;
    }
 }

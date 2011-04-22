@@ -6,12 +6,8 @@ typedef float t_real;
 // real, dimension(-L:L) :: c
 
 //  parameter(L=4, n1=100, n2=100, n3=100)
-const int L = 4;
-const int n1 = 100;
-const int n2 = 100;
-const int n3 = 100;
 
-void stencil8 (t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1],
+void stencil8 (int L, int n1, int n2, int n3, t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1],
 	       int is1, int ie1, int is2, int ie2,
 	       int is3, int ie3) {
   // Stencil length : 2*L
@@ -34,7 +30,7 @@ void stencil8 (t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1],
 	  + c_3 * (v[i1-3][i2][i3] + v[i1][i2-3][i3] + v[i1][i2][i3-3])
 	  + c_2 * (v[i1-2][i2][i3] + v[i1][i2-2][i3] + v[i1][i2][i3-2])
 	  + c_1 * (v[i1-1][i2][i3] + v[i1][i2-1][i3] + v[i1][i2][i3-1])
-	  + c0  *  v[i1][  i2][i3] * 3
+	  + c0  *  v[i1][  i2][i3] * 3.f
 	  + c1  * (v[i1+1][i2][i3] + v[i1][i2+1][i3] + v[i1][i2][i3+1])
 	  + c2  * (v[i1+2][i2][i3] + v[i1][i2+2][i3] + v[i1][i2][i3+2])
 	  + c3  * (v[i1+3][i2][i3] + v[i1][i2+3][i3] + v[i1][i2][i3+3])
@@ -45,7 +41,7 @@ void stencil8 (t_real u[n1][n2][n3], t_real v[n1][n2][n3], t_real c[2L+1],
 }
 
 // initialize the array, with the give value
-void init (t_real u[n1][n2][n3], t_real val) {
+void init ( int n1, int n2, int n3,t_real u[n1][n2][n3], t_real val) {
   int i = 0, j = 0, k = 0;
   for (i=0; i<n1 ; i++) {
     for (j=0; j<n2 ; j++) {
@@ -58,7 +54,7 @@ void init (t_real u[n1][n2][n3], t_real val) {
 }
 
 // sum all the elements of the array
-t_real sum  (t_real u[n1][n2][n3]) {
+t_real sum  ( int n1, int n2, int n3,t_real u[n1][n2][n3]) {
   t_real result = 0;
   int i = 0, j = 0, k = 0;
   for (i=0; i<n1 ; i++) {
@@ -71,9 +67,15 @@ t_real sum  (t_real u[n1][n2][n3]) {
   return result;
 }
 
-int main (void) {
+int main (int argc, char * argv[]) {
 
   int is1,ie1,is2,ie2,is3,ie3,i;
+    int L = 4;
+    int n1 = 100;
+    int n2 = 100;
+    int n3 = 100;
+    if(argc >100000) n1=n2=n3=L=78;
+    {
   t_real v[n1][n2][n3];
   t_real u[n1][n2][n3];
   t_real c[2*L+1];
@@ -82,14 +84,14 @@ int main (void) {
   is3=0;ie3=n3;
 
   for (i=0; i<2*L+1; i++) {
-    c[i] = 3.0;
+    c[i] = 3.0f;
   }
 
   // Simple case
-  init (u , 1.0);
-  init (v , 1.0);
-  stencil8(u,v,c,is1,ie1,is2,ie2,is3,ie3);
+  init (n1,n2,n3,u , 1.0f);
+  init (n1,n2,n3,v , 1.0f);
+  stencil8(L,n1,n2,n3,u,v,c,is1,ie1,is2,ie2,is3,ie3);
 
-  printf ("the sum is : %f\n", sum (u));
-  return 0;
+  printf ("the sum is : %f\n", sum (n1,n2,n3,u));
+    } return 0;
 }

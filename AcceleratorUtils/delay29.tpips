@@ -11,8 +11,7 @@ module a
 display PRINTED_FILE
 setproperty ACCEL_LOAD="load"
 setproperty ACCEL_STORE="store"
-setproperty DELAY_COMMUNICATIONS_INTERPROCEDURAL=FALSE
-apply DELAY_COMMUNICATIONS
+apply DELAY_COMMUNICATIONS_INTRA
 display PRINTED_FILE[a,main]
 
 apply UNSPLIT

@@ -103,7 +103,6 @@ int main(void)
    ret_0 |= freia_aipo_copy(imtmp_0, imopen);
    ret_0 |= freia_aipo_erode_8c(imopen, imtmp_0, kernel1x3);
    ret_0 |= freia_aipo_copy(imtmp_0, imopen);
-   i_0 = 15;
 
    ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);
    ret_0 |= freia_aipo_copy(imtmp_0, imopen);
@@ -135,7 +134,6 @@ int main(void)
    ret_0 |= freia_aipo_copy(imtmp_0, imopen);
    ret_0 |= freia_aipo_dilate_8c(imopen, imtmp_0, kernel1x3);
    ret_0 |= freia_aipo_copy(imtmp_0, imopen);
-   i_0 = 15;
 
    freia_common_destruct_data(imtmp_0);
    
@@ -162,7 +160,6 @@ int main(void)
    ret_1 |= freia_aipo_copy(imtmp_1, imclose);
    ret_1 |= freia_aipo_dilate_8c(imclose, imtmp_1, kernel1x3);
    ret_1 |= freia_aipo_copy(imtmp_1, imclose);
-   i_1 = 8;
 
    ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);
    ret_1 |= freia_aipo_copy(imtmp_1, imclose);
@@ -180,7 +177,6 @@ int main(void)
    ret_1 |= freia_aipo_copy(imtmp_1, imclose);
    ret_1 |= freia_aipo_erode_8c(imclose, imtmp_1, kernel1x3);
    ret_1 |= freia_aipo_copy(imtmp_1, imclose);
-   i_1 = 8;
 
    freia_common_destruct_data(imtmp_1);
    
@@ -205,7 +201,6 @@ int main(void)
    ret_2 |= freia_aipo_copy(imtmp_2, imfilt);
    ret_2 |= freia_aipo_erode_8c(imfilt, imtmp_2, kernel3x1);
    ret_2 |= freia_aipo_copy(imtmp_2, imfilt);
-   i_2 = 4;
 
    ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);
    ret_2 |= freia_aipo_copy(imtmp_2, imfilt);
@@ -215,7 +210,6 @@ int main(void)
    ret_2 |= freia_aipo_copy(imtmp_2, imfilt);
    ret_2 |= freia_aipo_dilate_8c(imfilt, imtmp_2, kernel3x1);
    ret_2 |= freia_aipo_copy(imtmp_2, imfilt);
-   i_2 = 4;
 
    freia_common_destruct_data(imtmp_2);
    
@@ -235,7 +229,6 @@ int main(void)
    ret_3 |= freia_aipo_copy(imtmp_3, imout);
    ret_3 |= freia_aipo_erode_8c(imout, imtmp_3, kernel1x3);
    ret_3 |= freia_aipo_copy(imtmp_3, imout);
-   i_3 = 4;
 
    ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);
    ret_3 |= freia_aipo_copy(imtmp_3, imout);
@@ -245,7 +238,6 @@ int main(void)
    ret_3 |= freia_aipo_copy(imtmp_3, imout);
    ret_3 |= freia_aipo_dilate_8c(imout, imtmp_3, kernel1x3);
    ret_3 |= freia_aipo_copy(imtmp_3, imout);
-   i_3 = 4;
 
    freia_common_destruct_data(imtmp_3);
    
@@ -256,7 +248,6 @@ int main(void)
    freia_aipo_dilate_8c(imoutrepl, imout, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imoutrepl, imoutrepl, freia_morpho_kernel_8c);
    freia_aipo_dilate_8c(imoutrepl, imoutrepl, freia_morpho_kernel_8c);
-   i_4 = 3;
    
    
    _return0 = 0;

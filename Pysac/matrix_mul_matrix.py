@@ -8,6 +8,5 @@ with workspace(filename+".c", parents=[sac_workspace], driver="sse", deleteOnClo
 	m.display()
 	m.sac()
 	m.display()
-	a_out=w.simd_compile(rep="d.out")
-	remove(a_out)
+	w.goingToRunWith(w.save(rep="save-geekou"),"save-geekou")
 

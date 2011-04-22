@@ -1,11 +1,12 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace, module, backendCompiler
+from pyps import workspace, module
 from os import system
 
 with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
 	# print out all functions
 	w.all_functions.display()
-	a_out=w.compile()
+	w.make()
+	(a_out,r,e,d)=w.compile()
 	system("./"+a_out+" include/input.pgm include/mapfile.amp /dev/null")
 
 	# print all function with both callers and callees
@@ -46,7 +47,10 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		t.coarse_grain_parallelization()
 		# great ! OMP pragmas
 		t.display()
-		(rc,out,err)=w.compile_and_run(backendCompiler(CFLAGS='-g -O2 -fopenmp', args=["include/input.pgm","include/mapfile.amp", "/dev/null"]))
+		w.make()
+		(o,rc,out,err)=w.compile()
+		print "!!!",out
+		w.run(o, args=["include/input.pgm","include/mapfile.amp", "/dev/null"])
 
 		w.props.constant_path_effects=False
 		lbl=t.loops(0).loops(0).label
@@ -58,5 +62,6 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 
 		t.run(["sed","s/current/voltage/g"])
 		t.display()
-		a_out=w.compile(backendCompiler(CC="gcc"))
+		w.make()
+		a_out=w.compile()
 		#a_out

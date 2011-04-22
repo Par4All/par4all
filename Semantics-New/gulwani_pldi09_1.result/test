@@ -297,6 +297,13 @@ void ts_restructured(void)
 
          checking_error();
    }
+
+//  T() {i==t, j==n+1, 0<=i, i+1<=j, 1<=j}
+
+   
+   
+   
+   ;
 }
 
 PRECONDITIONS
@@ -593,4 +600,11 @@ void ts_restructured(void)
 
          checking_error();
    }
+
+//  P(i,j,n,t) {i==t, j==n+1, 0<=i, i+1<=j}
+
+   
+   
+   
+   ;
 }

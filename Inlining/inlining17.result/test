@@ -766,7 +766,6 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_0);
-      i_0 = 4;
       ret_1 = 0;
    }
    
@@ -836,7 +835,6 @@ int main()
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
       freia_aipo_dilate_8c(imout, imout, kernel_8c_1);
-      i_1 = 4;
       ret_3 = 0;
    }
    
