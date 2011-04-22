@@ -237,7 +237,7 @@ class workspace(pyps.workspace):
 		if rep == None:
 			rep = self.tmpdirname()
 		
-		files = super(workspace,self).save(rep)
+		(files,headers) = super(workspace,self).save(rep)
 		
 
 		#run gen_simd_zeros on every file
@@ -278,7 +278,7 @@ class workspace(pyps.workspace):
 		# Add header to the save rep
 		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
 		shutil.copy(pypsutils.get_runtimefile(self.patterns_h,"sac"),rep)
-		return files
+		return files,headers+[os.path.join(rep,simd_h)]
 
 
 	def get_sac_maker(self,Maker):
@@ -301,7 +301,7 @@ def sacMaker(Maker,driver):
 		def get_makefiledir(self):
 			return ["sac"]+super(C,self).get_makefiledir()
 	
-		def generate(self,path,sources):
+		def generate(self,path,sources,cppflags="",ldflags=""):
 			newsources = []	
 			for fname in sources:
 				#change the includes
@@ -311,10 +311,11 @@ def sacMaker(Maker,driver):
 				pypsutils.string2file(filestring,os.path.join(path,newcfile))
 				newsources.append(newcfile)
 			#create symlink .h file
-			linkpath = os.path.join(path,driver.hfile)
-			if not os.path.exists(linkpath):
-				os.symlink(pypsutils.get_runtimefile(driver.hfile,"sac"),linkpath)
-
-			return super(C,self).generate(path,newsources)
+			hpath = os.path.join(path,driver.hfile)
+			if not os.path.exists(hpath):
+				shutil.copy(pypsutils.get_runtimefile(driver.hfile,"sac"),hpath)
+			
+			makefile,others = super(C,self).generate(path,newsources)
+			return makefile,others+[driver.hfile]
 
 	return C	

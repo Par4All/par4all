@@ -45,7 +45,7 @@ class Maker(object):
 			"CPPFLAGS+="+cppflags+"\n"+\
 			"LDFLAGS+="+ldflags+"\n"+\
 			self.rules
-		return os.path.basename(pypsutils.string2file(mk,os.path.join(path,"Makefile"+self.ext)))
+		return os.path.basename(pypsutils.string2file(mk,os.path.join(path,"Makefile"+self.ext))),[]
 
 	def get_ext(self):
 		return ""
@@ -600,12 +600,12 @@ class workspace(object):
 				shutil.copy(uh,rep)
 			pypsutils.addBeginnning(f, '#include "'+pipsdef_h+'"\n')
 		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
-		return saved
+		return saved,headers+[os.path.join(rep,pipsdef_h)]
 
 	def make(self, rep=None, maker=Maker()):
 		if rep == None:
 			rep = self.tmpdirname()
-		saved = self.save(rep)
+		saved = self.save(rep)[0]
 		return maker.generate(rep,map(os.path.basename,saved),cppflags=self.cppflags,ldflags=self.ldflags)
 
 

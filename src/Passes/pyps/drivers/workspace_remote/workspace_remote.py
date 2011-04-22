@@ -119,10 +119,12 @@ class workspace(pyps.workspace):
 	def make(self,rep=None, maker=pyps.Maker()):
 		if rep ==None:
 			rep = self.tmpdirname()
-		makefile = super(workspace,self).make(rep,maker)
+		makefile,others = super(workspace,self).make(rep,maker)
 		#rtmp = os.path.split(rep)[0]
 		self.remoteExec.copy(os.path.join(rep,makefile),rep)
-		return makefile
+		for f in others:
+			self.remoteExec.copy(os.path.join(rep,f),rep)
+		return makefile,others
 		
 	def compile(self,rep=None, makefile="Makefile", outfile="a.out"):
 		""" Uses makefiles on the remote host to compile the workspace"""
