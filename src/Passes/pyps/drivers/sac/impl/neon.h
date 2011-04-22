@@ -59,7 +59,7 @@ typedef int8x16_t	v16qi;
 		*(v3)=__pips_tmp[3];					\
 		} while (0)
 
-#define SIMD_ZERO_V4SF(vec) vec = veorq_f32(vec,vec)
+#define SIMD_ZERO_V4SF(vec) vec = vsubq_f32(vec,vec)
 
 #define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)				\
 		do {								\

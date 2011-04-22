@@ -57,14 +57,14 @@ class workspace(pyps.workspace):
 		for file in files:
 			with open(file, 'r') as f:
 				read_data = f.read()
-			# Change #pragma __pyps_bench_start by our source code
-			read_data = re.sub(r"\#pragma __pyps_benchmark_start", c_bench_start, read_data)
-			# Change #pragma __pyps_bench_end_$module by our source code
-			read_data = re.sub(r"\#pragma __pyps_benchmark_stop_([a-zA-Z0-9_-]+)",
+				# Change #pragma __pyps_bench_start by our source code
+				read_data = re.sub(r"\#pragma __pyps_benchmark_start", c_bench_start, read_data)
+				# Change #pragma __pyps_bench_end_$module by our source code
+				read_data = re.sub(r"\#pragma __pyps_benchmark_stop_([a-zA-Z0-9_-]+)",
 					lambda m: string.Template(c_bench_stop).substitute(mn=m.group(1)),
 					read_data)
-			#Don't put the include more than once
-			add_include = read_data.find('\n#include "'+pyps_gettime_h+'"\n') == -1;
+				#Don't put the include more than once
+				add_include = read_data.find('\n#include "'+pyps_gettime_h+'"\n') == -1;
 			with open(file, 'w') as f:
 				if add_include:
 						f.write('/* Header automatically inserted by PYPS*/\n#include "'+pyps_gettime_h+'"\n\n')

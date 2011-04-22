@@ -85,9 +85,10 @@ class workspace(pyps.workspace):
 	def save(self,rep=None):
 		if rep == None:
 			rep = self.tmpdirname()
-		files = super(workspace,self).save(rep)	
+		files,headers = super(workspace,self).save(rep)	
 		#setting otmpfiles for remote
 		otmpfilesrem = []
+		otmpheadsrem = []
 		
 		#setting rep for remote and cleaning it
 		rdir = os.path.join(self.remoteExec.working_dir(), rep)
@@ -107,14 +108,21 @@ class workspace(pyps.workspace):
 			print >> sys.stderr, "Copying files to remote host %s..." % self.remoteExec.host()
 		#rtmp = os.path.split(rep)[0]
 		
-		print files
 		for f in files:
 			dst = os.path.join(rdir, os.path.basename(f))
 			otmpfilesrem.append(dst)
 			print >>sys.stderr, "Copy %s to remote %s..." % (f, rep)
 			self.remoteExec.copy(f, rep)
 
-		return otmpfilesrem
+		if self.verbose:
+			print >> sys.stderr, "Copying headers to remote host %s..." % self.remoteExec.host()
+		for f in headers:
+			dst = os.path.join(rdir, os.path.basename(f))
+			otmpheadsrem.append(dst)
+			print >>sys.stderr, "Copy %s to remote %s..." % (f, rep)
+			self.remoteExec.copy(f, rep)
+		
+		return otmpfilesrem,otmpheadsrem
 
 	def make(self,rep=None, maker=pyps.Maker()):
 		if rep ==None:

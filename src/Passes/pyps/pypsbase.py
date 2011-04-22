@@ -594,6 +594,38 @@ class workspace(object):
 			else:
 				saved.append(f)
 
+		def user_headers(self):
+			""" List the user headers used in self._sources with the compiler configuration given in compiler """
+			command = ["gcc","-MM", self.cppflags ] + list(self._org_sources)
+			command = " ".join(command) + " | sed -n -r '/^.*\.h$/ p'"
+			#' |sed \':a;N;$!ba;s/\(.*\).o: \\\\\\n/:/g\' |sed \'s/ \\\\$//\' |cut -d\':\' -f2'
+			if self.verbose:
+				print >> sys.stderr, command
+			p = Popen(command, shell=True, stdout = PIPE, stderr = PIPE)
+			(out,err) = p.communicate()
+			if self.verbose:
+				print >> sys.stderr, out
+			rc = p.returncode
+			if rc != 0:
+				raise RuntimeError("Error while retrieving user headers: gcc returned %d.\n%s" % (rc,str(out+"\n"+err)))
+			
+			# Parse the results :
+			# each line is split thanks to shlex.split, and we only keep the header files
+			lines = map(shlex.split,out.split('\n'))
+			headers = list()
+			for l in lines:
+				l = filter(lambda s: s.endswith('.h'), l)
+				headers.extend(l)
+			return headers
+
+		headersbasename = user_headers(self)
+		for uh in headersbasename:
+			shutil.copy(uh,rep)
+		
+		headers = map(
+				lambda x:os.path.join(rep,x),
+				headersbasename)
+		
 		for f in saved:
 			user_headers = self.user_headers()
 			for uh in user_headers:

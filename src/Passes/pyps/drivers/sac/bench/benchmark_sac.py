@@ -107,14 +107,24 @@ def benchrun(s,calms=None,calibrate_out=None):
 	doCalibrate = calms != None
 	doSize = s.default_mode=="size"
 	doValidate = s.default_mode=="validation"
-	#wk_parents = [sac.workspace,memalign.workspace]
-	wk_parents = [sac.workspace]
+	onlySac = s.default_mode=="sac"
+	
+	class myworkspace():
+		pass
+
+	if s.remoteExec:
+		class myworkspace(rt.workspace):
+			pass	
+	
+	class myworkspace(myworkspace,sac.workspace):
+		pass
+	
 	if doBench:
 		wk_parents.append(gt.workspace)
 	if doValidate:
-		wk_parents.append(ck.workspace)
-	if s.remoteExec:
-		wk_parents.append(rt.workspace)
+		class myworkspace(myworkspace,ck.workspace):
+			pass
+	
 	for wcfg in s.workspaces:
 		wcfg.load()
 		benchtimes = {}

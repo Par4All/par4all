@@ -278,7 +278,7 @@ class workspace(pyps.workspace):
 		# Add header to the save rep
 		shutil.copy(pypsutils.get_runtimefile(simd_h,"sac"),rep)
 		shutil.copy(pypsutils.get_runtimefile(self.patterns_h,"sac"),rep)
-		return files,headers+[os.path.join(rep,simd_h)]
+		return files,headers+[os.path.join(rep,simd_h),os.path.join(rep,self.patterns_h)]
 
 
 	def get_sac_maker(self,Maker):
@@ -316,6 +316,6 @@ def sacMaker(Maker,driver):
 				shutil.copy(pypsutils.get_runtimefile(driver.hfile,"sac"),hpath)
 			
 			makefile,others = super(C,self).generate(path,newsources,cppflags,ldflags)
-			return makefile,others+[driver.hfile]
+			return makefile,others+newsources+[driver.hfile]
 
 	return C	
