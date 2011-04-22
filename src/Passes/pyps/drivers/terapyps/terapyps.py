@@ -1,5 +1,5 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import module, backendCompiler
+from pyps import module
 import pyps
 import terapyps_asm
 import pypsutils
@@ -8,7 +8,10 @@ import os,sys,shutil,tempfile
 
 def generate_check_ref(self):
 	"""Generate a reference run for workspace"""
-	(rc,out,err)=self.compile_and_run(backendCompiler(CC="gcc"))
+	self.make()
+	self.compile(rule="mrproper")
+	(o,rc,out,err)=self.compile()
+	(rc,out,err)=self.run(o)
 	if rc == 0:
 		self.ref=out
 	else :
@@ -18,7 +21,9 @@ pyps.workspace.generate_check_ref=generate_check_ref
 
 def check(self,debug):
 	if debug:
-		(rc,out,err)=self.compile_and_run(backendCompiler(CC="gcc"))
+		self.compile(rule="mrproper")
+		(o,rc,out,err)=self.compile()
+		(rc,out,err)=self.run(o)
 		if rc == 0:
 			if self.ref!=out:
 				print "**** check failed *****"
@@ -224,7 +229,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 			if asm.cu == runtime[1]:
 				m.expression_substitution(asm.name)
 		if debug:m.display()
-		terapyps_asm.conv(w.dirname()+m.show("printed_file"),sys.stdout)
+		terapyps_asm.conv(w.dirname+m.show("printed_file"),sys.stdout)
 
 module.terapix_code_generation=terapix_code_generation
 
