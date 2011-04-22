@@ -215,15 +215,6 @@ class sacsse(sacbase):
 				]
 		sacbase.addintrinsics(fname, curr_sse_h, replacements)
 
-	@staticmethod
-	def post_memalign(*args, **kwargs):
-		# XXX Adrien : looks like a hack to see the benefits of alignement
-		# (SAC does not seem to use aligned store/load instruction after the
-		# use of memalign, and even if posix_memalign is already used)
-		global curr_sse_h
-		curr_sse_h = re.sub("_mm_loadu", "_mm_load", sse_h)
-		curr_sse_h = re.sub("_mm_storeu", "_mm_store", sse_h)
-
 	CFLAGS = "-msse4.2 -march=native -O3"
 
 class sac3dnow(sacbase):
@@ -252,10 +243,6 @@ class sac3dnow(sacbase):
 				]
 		sacbase.addintrinsics(fname, Threednow_h, replacements)
 
-	@staticmethod
-	def post_memalign(*args, **kwargs):
-		pass
-
 	CFLAGS = "-m3dnow -march=opteron -O3"
 
 class sacavx(sacbase):
@@ -271,10 +258,6 @@ class sacavx(sacbase):
 		replacements = [
 			]
 		sacbase.addintrinsics(fname, avx_h, replacements)
-
-	@staticmethod
-	def post_memalign(*args, **kwargs):
-		pass
 
 	CFLAGS = "-mavx -O3"
 
@@ -292,10 +275,6 @@ class sacneon(sacbase):
 			]
 		sacbase.addintrinsics(fname, neon_h, replacements)
 
-	@staticmethod
-	def post_memalign(*args, **kwargs):
-		pass
-
 	CFLAGS = "-mfpu=neon -mfloat-abi=softfp -O3"
 
 class workspace(pyps.workspace):
@@ -310,14 +289,7 @@ class workspace(pyps.workspace):
 		pyps.module.sac=self.driver.sac
 		# Add -DRWBITS=self.driver.register_width to the cppflags of the workspace
 		kwargs['cppflags'] = kwargs.get('cppflags',"")+" -DRWBITS=%d " % (self.driver.register_width)
-		self.use_generic_simd = True
 		super(workspace,self).__init__(pypsutils.get_runtimefile(simd_c,"sac"), pypsutils.get_runtimefile(patterns_c,"sac"), *sources, **kwargs)
-
-	def post_init(self, sources, **args):
-		"""Clean the temporary directory used for holding 'SIMD.c' and 'patterns.c'."""
-		shutil.rmtree(self.tmpdir)
-		for m in self.ws:
-			m.__class__.sac = self.driver.sac
 
 	def save(self, rep=None):
 		"""Add $driver.h, which replaces general purpose SIMD instructions
@@ -333,39 +305,27 @@ class workspace(pyps.workspace):
 			with open(file, 'w') as f:
 			    f.write(read_data)
 		
-		if not self.use_generic_simd:
-			# We need to add $driver.h to the compiled files, and to remove SIMD.c
-			# (ICC breaks quite badly when using the sequential versions mixed
-			# with SSE intrinsics).
-			newfiles = []
-			for fname in files:
-				if not re.search(r"SIMD\.c$", fname):
-					self.driver.addintrinsics(fname)
-					newfiles.append(fname)
-			files[:] = []
-			files.extend(newfiles)
-		else:
-			# Generate SIMD.h according to the register width
-			# thanks to gcc -E and cproto (ugly, need something
-			# better)
-			simd_h_fname = os.path.abspath(rep + "/SIMD.h")
-			simd_c_fname = os.path.abspath(rep + "/SIMD.c")
-			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			(simd_cus_header,serr) = p.communicate()
-			if p.returncode != 0:
-				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
+		# Generate SIMD.h according to the register width
+		# thanks to gcc -E and cproto (ugly, need something
+		# better)
+		simd_h_fname = os.path.abspath(rep + "/SIMD.h")
+		simd_c_fname = os.path.abspath(rep + "/SIMD.c")
+		p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c_fname), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		(simd_cus_header,serr) = p.communicate()
+		if p.returncode != 0:
+			raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
 
-			p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			(simdz_cus_header,serr) = p.communicate()
-			if p.returncode != 0:
-				raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
-			
-			pypsutils.string2file('#include "'+simd_h+'"\n'+simd_cus_header, simd_h_fname)
-			pypsutils.string2file(simd_h+"\n"+simdz_cus_header, simd_h_fname)
+		p = subprocess.Popen("gcc -DRWBITS=%d -E %s |cproto" % (self.driver.register_width, simd_c), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		(simdz_cus_header,serr) = p.communicate()
+		if p.returncode != 0:
+			raise RuntimeError("Error while creating SIMD.h: command returned %d.\nstdout:\n%s\nstderr:\n%s\n" % (p.returncode, simd_cus_header, serr))
+		
+		pypsutils.string2file('#include "'+simd_h+'"\n'+simd_cus_header, simd_h_fname)
+		pypsutils.string2file(simd_h+"\n"+simdz_cus_header, simd_h_fname)
 
-			for fname in files:
-				if not fname.endswith("SIMD.c"):
-					pypsutils.addBeginnning(fname, '#include "'+simd_h+'"')
+		for fname in files:
+			if not fname.endswith("SIMD.c"):
+				pypsutils.addBeginnning(fname, '#include "'+simd_h+'"')
 
 		# Add the contents of patterns.h
 		for fname in files:
@@ -376,10 +336,7 @@ class workspace(pyps.workspace):
 		shutil.copy(pypsutils.get_runtimefile(patterns_h,"sac"),rep)
 		return files
 
-	def post_memalign(self, *args, **kwargs):
-		self.driver.post_memalign(self, *args, **kwargs)
-
-	def get_sacCompiler(self,backendCompiler):
+	def get_sac_compiler(self,backendCompiler):
 		"""Calls sacCompiler to return a compiler class using the driver set in the workspace"""
 		return sacCompiler(backendCompiler,self.driver)
 
