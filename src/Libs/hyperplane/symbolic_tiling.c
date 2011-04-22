@@ -54,6 +54,7 @@ static void convert_min_max_to_tests(statement s)
     gen_recurse(s,loop_domain, gen_true, convert_min_max_to_tests_in_loop);
 }
 
+#if 0
 static statement do_symbolic_tiling_rec_junction(statement root, list tests) {
     if(ENDP(tests)) return copy_statement(root);
     else return instruction_to_statement(
@@ -65,6 +66,7 @@ static statement do_symbolic_tiling_rec_junction(statement root, list tests) {
                 )
             );
 }
+#endif
 
 void do_symbolic_tiling(statement base, list vector)
 {
@@ -158,45 +160,43 @@ generate_tile:;
         sloop=loop_body(l);
     }
     /* once we are done, regenerate the whole thing */
-    tiled_loops_outer=gen_nreverse(tiled_loops_outer);
-    tiled_loops_inner=gen_nreverse(tiled_loops_inner);
-    list iter;
-    /* chain outer */
-    for(iter = tiled_loops_outer;!ENDP(CDR(iter));POP(iter)) {
-        statement curr = STATEMENT(CAR(iter));
-        loop_body(statement_loop(curr))=STATEMENT(CAR(CDR(iter)));
-    }
-    /* prepare junction */
-    statement curr = STATEMENT(CAR(iter));
-    iter=tiled_loops_inner;
-    statement junction=STATEMENT(CAR(iter));
 
-    /* chain inner */
-    for(;!ENDP(CDR(iter));POP(iter)) {
-        statement curr = STATEMENT(CAR(iter));
-        loop_body(statement_loop(curr))=STATEMENT(CAR(CDR(iter)));
+    /* prepare chain all */
+    tiled_loops_inner=gen_append(tiled_loops_inner,tiled_loops_outer);
+    statement last = STATEMENT(CAR(tiled_loops_inner));
+    statement prev = last;
+    POP(tiled_loops_inner);
+    /* set tail */
+    loop_body(statement_loop(last))=sloop;
+    /* chain all */
+    FOREACH(STATEMENT,curr,tiled_loops_inner) {
+        loop_body(statement_loop(curr))=prev;
+        prev=curr;
+        if(!ENDP(allmins) && get_bool_property("SYMBOLIC_TILING_PERFECT_TILES")) {
+          expression guard = EXPRESSION(CAR(allmins));
+          set s = get_referenced_entities(guard);
+          if(set_belong_p(s,loop_index(statement_loop(curr)))) {
+            loop_body(statement_loop(curr))=
+              instruction_to_statement(
+                  make_instruction_test(
+                    make_test(
+                      guard,
+                      copy_statement(loop_body(statement_loop(curr))),
+                      copy_statement(loop_body(statement_loop(curr)))
+                      )
+                    )
+                  );
+            POP(allmins);
+          }
+          set_free(s);
+        }
     }
-    /* tail */
-    loop_body(statement_loop(STATEMENT(CAR(iter))))=sloop;
 
     /* update */
     statement_label(base)=entity_empty_label();/*the label have been duplicated by copy_statement */
     statement_instruction(base)=instruction_undefined;
-    update_statement_instruction(base,make_instruction_block(gen_nreverse(CONS(STATEMENT,STATEMENT(CAR(tiled_loops_outer)),prelude))));
+    update_statement_instruction(base,make_instruction_block(gen_nreverse(CONS(STATEMENT,prev,prelude))));
 
-    /* final junction */
-    if(get_bool_property("SYMBOLIC_TILING_PERFECT_TILES")) {
-        junction=do_symbolic_tiling_rec_junction(junction,allmins);
-        gen_free_list(allmins);
-    }
-    else {
-        gen_full_free_list(allmins);
-    }
-    loop_body(statement_loop(curr))=junction;
-
-    /* and clean */
-    gen_free_list(tiled_loops_inner);
-    gen_free_list(tiled_loops_outer);
     if(get_bool_property("SYMBOLIC_TILING_NO_MIN"))
         convert_min_max_to_tests(base);/* << this one is here to wait for better preconditions computations */
 }
