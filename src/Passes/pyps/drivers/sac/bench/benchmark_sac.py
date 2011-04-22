@@ -3,11 +3,11 @@
 from __future__ import with_statement # to cope with python2.5
 
 #import pyrops
-import pyps
+import pyps, pyrops
 import workspace_gettime as gt
 import workspace_remote as rt
 import workspace_check as ck
-import binary_size as binsize
+#import binary_size as binsize
 import memalign
 import sac
 import sys
@@ -22,19 +22,21 @@ from subprocess import *
 from optparse import OptionParser
 import re
 
+def dummy_get_maker(c):return pyps.Maker
+def sac_get_maker(c): return sac.sacMaker(pyps.Maker,c)
+
 def benchrun(s,calms=None,calibrate_out=None):
-	def do_benchmark(ws, wcfg, cc_cfg, compile_f, args, n_iter, name_custom):
+	def do_benchmark(ws, wcfg, get_maker, cc_cfg,  args, n_iter, name_custom):
 		times = {wcfg.module: [0]}
 		benchname = cc_cfg.name() + "+" + name_custom
-		ccp = ws.get_sac_maker(pyps.Maker)()
-		#ccp = ws.get_sac_compiler(pyps.backendCompiler)(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args=args,outfile=benchname)
+		ccp = get_maker(cc_cfg.maker)()
 		try:
 			if doBench:
 				makefile = ws.make(maker=ccp)[0]
-				times = ws.benchmark(makefile=makefile,iterations=n_iter,args=args)
+				times = ws.benchmark(makefile=makefile,iterations=n_iter,args=args,CC=cc_cfg.cc, CFLAGS=cc_cfg.cflags)
 				benchtimes[benchname] = {'time': times[wcfg.module][0], 'makefile': makefile, 'cc_stderr': "ccp.cc_stderr"}
 			else:
-				good,out = ws.check_output(compiler=ccp)
+				good,out = ws.check_output(ccexecp=ccp)
 				if not good:
 					msg = "Validation case %s-%s failed !" % (wcfg.name(),benchname)
 					errors.append(msg)
@@ -47,7 +49,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 	
 	def do_calibrate(ws, cc_cfg_ref, args, arg_n, calms, module_name):
 		''' Calibrate the args of a workspace using the reference compiler, such as it takes a given running time. '''
-		ccp = pyps.backendCompiler(compilemethod=ws.compile,CC=cc_cfg_ref.cc,CFLAGS=cc_cfg_ref.cflags,args=args,outfile=cc_cfg_ref.name()+"+calibrate")
+		ccp = pyps.ccexecParams(compilemethod=ws.compile,CC=cc_cfg_ref.cc,CFLAGS=cc_cfg_ref.cflags,args=args,outfile=cc_cfg_ref.name()+"+calibrate")
 		size_kernel = int(args[arg_n])
 
 		# First, it looks at the time taken by the workspace with the default argument.
@@ -65,7 +67,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 		def get_run_time(size_kernel):
 			''' Return the running time with the current kernel size in ms '''
 			ccp.args = make_args(size_kernel)
-			times = ws.benchmark(compiler=ccp,iterations=5) # Return time in us
+			times = ws.benchmark(ccexecp=ccp,iterations=5) # Return time in us
 			return float(times[module_name][0])/1000.0
 
 		cur_runtime = get_run_time(size_kernel)
@@ -100,7 +102,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 		return make_args(size_kernel)
 
 	def binary_size(module, cc_cfg, compile_f):
-		ccp = pyps.ccexecParams(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args="",outfile=module._name+cc.name())
+		ccp = pyps.backendCompiler(compilemethod=compile_f,CC=cc_cfg.cc,CFLAGS=cc_cfg.cflags,args="",outfile=module._name+cc.name())
 		return m.binary_size(ccp)
 
 	doBench = s.default_mode=="benchmark"
@@ -120,7 +122,8 @@ def benchrun(s,calms=None,calibrate_out=None):
 		pass
 	
 	if doBench:
-		wk_parents.append(gt.workspace)
+		class myworkspace(myworkspace,gt.workspace):
+			pass
 	if doValidate:
 		class myworkspace(myworkspace,ck.workspace):
 			pass
@@ -141,16 +144,17 @@ def benchrun(s,calms=None,calibrate_out=None):
 		ccp_ref=None
 		if not doBench:
 			args = shlex.split(str(wcfg.args_validate))
-			ccp_ref = pyps.backendCompiler(CC=s.cc_reference.cc,CFLAGS=s.cc_reference.cflags,args=args)
-		with pyps.workspace(*srcs,
-				       parents = wk_parents,
+			ccp_ref = pyps.ccexecParams(CC=s.cc_reference.cc,CFLAGS=s.cc_reference.cflags,args=args)
+		pyps.workspace.delete(wcfg.name())
+		ws=myworkspace(*srcs,
 				       driver = s.default_driver,
 				       remoteExec = s.remoteExec,
 				       cppflags = cflags,
 				       deleteOnClose=False,
 				       recoverIncludes=True,
-				       compiler_ref=ccp_ref) as ws:
-			m = ws[wcfg.module]
+				       ccexecp_ref=ccp_ref)
+		m = ws[wcfg.module]
+		if not onlySac:
 			if doBench:
 				args = wcfg.args_benchmark
 				n_iter = wcfg.iterations_bench
@@ -165,34 +169,51 @@ def benchrun(s,calms=None,calibrate_out=None):
 
 			if doCalibrate:
 				new_args = do_calibrate(ws, s.cc_reference, args, wcfg.arg_kernel_size, calms, wcfg.module)
-				print new_args
 				wcfg.args_benchmark = " ".join(new_args)
 				continue 
 
 			if doBench:
-				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref")
+				do_benchmark(ws, wcfg, dummy_get_maker, s.cc_reference, args, n_iter, "ref")
 				for cc in s.ccs_nosac:
 					cc.load()
-					do_benchmark(ws, wcfg, cc, ws.compile, args, n_iter, "nosac")
+					do_benchmark(ws, wcfg, dummy_get_maker, cc, args, n_iter, "nosac")
 
 			if doSize:
 				for cc in s.ccs_nosac:
 					wssizes[wcfg.name()][cc.name()+"+nosac"] = binary_size(m, cc, ws.compile)[0]
 
-			m.sac()
+		sac_gen_path = wcfg.name()+"-sac-generated"
+#		if not onlySac and os.path.exists(sac_gen_path):
+#			ws.close()
+#			files=srcs
+#			files=map(lambda s: os.path.join(sac_gen_path,os.path.basename(s)),files)
+#			ws=pyps.workspace(*files, parents=wk_parents,
+#					driver = s.default_driver,
+#					remoteExec = s.remoteExec,
+#					cppflags = cflags+" -I"+sac_gen_path,
+#					deleteOnClose=True,
+#					recoverIncludes=True,
+#					ccexecp_ref=ccp_ref)
+#			ws[wcfg.name()].benchmark_module()
+#		else:
+		m.sac()
+		if onlySac:
+			rep=wcfg.name()+"-sac-generated"
+			ws.goingToRunWith(ws.save(rep=rep),rep)
+		else:
 			if doValidate:
 				# If we are in validation mode, validate the generic SIMD implementation thanks
 				# to s.cc_reference
-				do_benchmark(ws, wcfg, s.cc_reference, ws.compile, args, n_iter, "ref+sac")
+				do_benchmark(ws, wcfg, s.cc_reference, args, n_iter, "ref+sac")
 
 			if "ccs_sac" in s:
 				for cc in s.ccs_sac:
 					cc.load()
 					if doSize:
-						wssizes[wcfg.name()][cc.name()+"+sac"] = binary_size(m, cc, ws.simd_compile)[0]
+						wssizes[wcfg.name()][cc.name()+"+sac"] = binary_size(m, cc, ws.compile)[0]
 					else:
-						do_benchmark(ws, wcfg, cc, ws.simd_compile, args, n_iter, "sac")
-
+						do_benchmark(ws, wcfg, sac_get_maker, cc, args, n_iter, "sac")
+		ws.close()
 
 		wstimes[wcfg.name()] = benchtimes
 	
@@ -203,7 +224,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 
 parser = OptionParser(usage = "%prog")
 parser.add_option("-m", "--mode", dest = "mode",
-				  help = "benchmark mode: validation, benchmark or size")
+				  help = "benchmark mode: validation, benchmark, sac or size")
 parser.add_option("-s", "--session", dest = "session_name",
 				  help = "session to use (defined in sessions.cfg")
 parser.add_option("-d", "--driver", dest = "driver",
