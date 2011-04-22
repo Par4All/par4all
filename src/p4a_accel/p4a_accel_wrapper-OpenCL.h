@@ -72,6 +72,17 @@
 */
 #define P4A_vp_2 get_global_id(2)
 
+/*
+The OpenCL extension cl_khr_byte_addressable_store removes certain
+restrictions on built-in types char, uchar, char2, uchar2, short, and
+half. An application that wants to be able to write to elements of a
+pointer (or struct) that are of type char, uchar, char2, uchar2,
+short, ushort, and half will need to include the #pragma OPENCL
+EXTENSION cl_khr_byte_addressable_store : enable directive before any
+code that performs writes that may not be supported. 
+*/
+#pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
+
 /**
    @}
 */

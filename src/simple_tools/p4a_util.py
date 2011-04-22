@@ -256,6 +256,19 @@ def prepend_text(o_file,text):
     src.close ()
     write_file(o_file,content,True)
 
+def skip_file_up_to_word(o_file,word,fold):
+    """ ... """
+    n = 0
+    src = open (o_file, 'r')
+    content = ""
+    for line in src:
+        if re.search(word,line):
+            n = n + 1
+        if n == fold:
+            content = content + str(line)
+    src.close ()
+    write_file(o_file,content)
+
 def merge_files (dst_name, src_name_l):
     """ merge the sources file (given as a list) into the dst file. The content
     of the sources is appended to the destination

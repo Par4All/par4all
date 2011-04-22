@@ -1181,21 +1181,23 @@ class p4a_processor(object):
             wrapper_file = os.path.join(self.workspace.dirname(), "Src",
                                         wrapper + ".c")
 
+            p4a_util.skip_file_up_to_word(wrapper_file,"P4A_accel_kernel_wrapper",2)
 
             #output_file = os.path.join(dest_dir , wrapper + ".p4a.cl")
             output_file = os.path.join(self.workspace.dirname(), "Src",
                                        wrapper + ".cl")
             
-            # p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
+            p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
             
-            h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
-            if os.path.isfile(h_file):
-                p4a_util.merge_files (output_file, [h_file, kernel_file, wrapper_file])
-            else:
-                p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
-                text = "/*\n * Header included by P4A\n * " + h_file + "\n */\n"
-                text = text + "#include \"p4a_accel_wrapper.h\"\n"
-                p4a_util.prepend_text(output_file,text)
+            # h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+            # if os.path.isfile(h_file):
+            #     p4a_util.merge_files (output_file, [h_file, kernel_file, wrapper_file])
+            # else:
+            #     p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
+            #     text = "/*\n * Header included by P4A\n * " + h_file + "\n */\n"
+            #     text = text + "#include \"p4a_accel_wrapper.h\"\n"
+            #     p4a_util.prepend_text(output_file,text)
+
 
     def save_header (self, output_dir, name):
         content = "/*All the generated includes are summarized here*/\n\n"
@@ -1238,16 +1240,12 @@ class p4a_processor(object):
         """
         result = []
 
-        final_output_dir = output_dir
         if (self.fortran == True):
             extension_in = ".f"
             extension_out = ".f08"
         elif (self.opencl == True):
             extension_in = ".cl"
             extension_out = ".cl"
-            # save the opencl files in the user_file place and not in
-            # the p4a_new_folder for convenience at the dynamic compile time
-            final_output_dir =  subs_dir
         else:
             extension_in = ".c"
             if (self.cuda == True):
@@ -1271,18 +1269,22 @@ class p4a_processor(object):
 
             output_name = name + extension_out
             # The final destination
-            output_file = os.path.join(final_output_dir, output_name)
+            output_file = os.path.join(output_dir, output_name)
             if (self.fortran_wrapper_p (pips_file) == True):
                 self.post_process_fortran_wrapper (pips_file, name)
-                
-
+            
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append(output_file)
 
+            if (self.opencl == True):
+                end_file =  os.path.join(subs_dir, output_name)
+                h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
+                p4a_util.merge_files (end_file, [h_file, output_file])
+
             if (self.fortran == False) and (not p4a_util.opencl_file_p(pips_file)):
                 # for C generate the header file
-                header_file = os.path.join(final_output_dir, name + ".h")
+                header_file = os.path.join(output_dir, name + ".h")
                 self.header_files.append (name + ".h")
                 p4a_util.generate_c_header (pips_file, header_file,
                                             self.get_p4a_accel_defines ())
