@@ -308,7 +308,7 @@ static list sac_statement_to_expressions(statement s)
     return out;
 }
 
-
+#if 0
 static void sac_sort_expressions_reductions_last(list *l)
 {
     list tail = NIL;
@@ -323,6 +323,7 @@ static void sac_sort_expressions_reductions_last(list *l)
     gen_free_list(*l);
     *l=gen_nconc(head,tail);
 }
+#endif
 
 static bool comparable_statements_on_distance_p(statement s0, statement s1)
 {
@@ -354,6 +355,7 @@ static int compare_statements_on_ordering(const void * v0, const void * v1)
     return 0;
 }
 
+#if 0
 static int compare_statements_on_distance(const void * v0, const void * v1)
 {
     const statement s0 = *(const statement*)v0;
@@ -388,6 +390,60 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
     gen_free_list(exp1);
     return res?res:compare_statements_on_ordering(v0,v1);
 }
+#endif
+
+static statement origin=NULL;
+static void set_statement_origin(statement s) {origin=s;}
+static void reset_statement_origin() {origin=NULL;}
+
+static int compare_statements_on_distance_to_origin(const void* ps0, const void* ps1) {
+    
+    const statement s0 = *(const statement*)ps0;
+    const statement s1 = *(const statement*)ps1;
+    list expo=sac_statement_to_expressions(origin),
+         exp0=sac_statement_to_expressions(s0),
+         exp1=sac_statement_to_expressions(s1);
+    size_t dist0=0,
+           dist1=0;
+    static const int dinf=1000;
+
+    list iter0 = exp0,iter1=exp1;
+    FOREACH(EXPRESSION,eo,expo)
+    {
+        expression e0 = ENDP(iter0)? expression_undefined:EXPRESSION(CAR(iter0)),
+                   e1 = ENDP(iter1)? expression_undefined:EXPRESSION(CAR(iter1));
+        expression distance0 = expression_undefined_p(e0) ? expression_undefined : distance_between_expression(eo,e0),
+                   distance1 = expression_undefined_p(e1) ? expression_undefined : distance_between_expression(eo,e1);
+        intptr_t val0=0, val1;
+        if(!expression_undefined_p(distance0))
+        {
+            if(expression_integer_value(distance0,&val0)) {
+                dist0+=val0*val0;
+            }
+            else dist0+=dinf*dinf;
+            free_expression(distance0);
+
+        }
+        else dist0+=dinf*dinf;
+        if(!expression_undefined_p(distance1))
+        {
+            if(expression_integer_value(distance1,&val1)) {
+                dist1+=val1*val1;
+            }
+            else dist1+=dinf*dinf;
+            free_expression(distance1);
+
+        }
+        else dist1+=dinf*dinf;
+        POP(iter0);
+        POP(iter1);
+    }
+    gen_free_list(expo);
+    gen_free_list(exp0);
+    gen_free_list(exp1);
+    return dist0>dist1? 1 : dist0 == dist1 ? 0 : -1;
+}
+
 static int compare_list_from_length(const void *v0, const void *v1)
 {
     const list l0=*(const list*)v0;
@@ -397,11 +453,10 @@ static int compare_list_from_length(const void *v0, const void *v1)
     return n0==n1 ? 0 : n0 > n1 ? 1 : -1;
 }
 
-static list order_isomorphic_statements(set s)
+static list order_isomorphic_statements_list(list ordered)
 {
-    list ordered = set_to_sorted_list(s,compare_statements_on_ordering);
     list heads = NIL;
-    do {
+    while(!ENDP(ordered)) {
         statement head = STATEMENT(CAR(ordered));
         list firsts = CONS(STATEMENT,head,NIL);
         list lasts = NIL;
@@ -413,17 +468,23 @@ static list order_isomorphic_statements(set s)
                 lasts=CONS(STATEMENT,st,lasts);
         }
         gen_free_list(ordered);
-        gen_sort_list(firsts,compare_statements_on_distance);
+        set_statement_origin(head);
+        gen_sort_list(firsts,compare_statements_on_distance_to_origin);
+        reset_statement_origin();
         gen_sort_list(lasts,compare_statements_on_ordering);
         heads=CONS(LIST,firsts,heads);
         ordered=lasts;
-    } while(!ENDP(ordered));
+    }
     gen_sort_list(heads,compare_list_from_length);
     list out = NIL;
     FOREACH(LIST,l,heads)
         out=gen_nconc(l,out);
     gen_free_list(heads);
     return out;
+}
+static list order_isomorphic_statements(set s) {
+    list ordered = set_to_sorted_list(s,compare_statements_on_ordering);
+    return order_isomorphic_statements_list(ordered);
 }
 
 /*
@@ -619,10 +680,11 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                                 POP(iso_iter);
                             }
                         }
+                        iso_iter=order_isomorphic_statements_list(iso_iter);
                     }
                 }
                 set_free(group_matches);
-                gen_free_list(iso_stats);
+                //gen_free_list(iso_stats);
             }
             simd_reset_finalArgType();
         }

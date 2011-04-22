@@ -31,6 +31,7 @@ class sacbase(object):
 		ws.props.sac_simd_register_width = cond["register_width"]
 		ws.props.prettyprint_all_declarations = True
 		ws.props.compute_all_dependences = True
+		module.forward_substitute()
 
 		if cond.get("verbose"):
 			module.display()

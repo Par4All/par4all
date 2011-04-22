@@ -85,8 +85,7 @@ void reset_vector_to_expressions()
     vector_to_expressions=hash_table_undefined;
 }
 
-static entity expressions_to_vector(list expressions)
-{
+static entity do_expressions_to_vector(list expressions) {
     void * hiter = NULL;
     entity key;
     list value;
@@ -97,6 +96,7 @@ static entity expressions_to_vector(list expressions)
     }
     return entity_undefined;
 }
+
 static void update_vector_to_expressions(entity e, list exps)
 {
     pips_assert("entity is ok",entity_consistent_p(e));
@@ -115,6 +115,24 @@ static void update_vector_to_expressions(entity e, list exps)
         }
     } 
     hash_put_or_update(vector_to_expressions,e,gen_full_copy_list(exps));
+}
+static entity expressions_to_vector(list expressions,statement* shuffle)
+{
+    /* try all possible permutations, well only invert from now on */
+    entity out = do_expressions_to_vector(expressions);
+    if(!entity_undefined_p(out)) return out;
+    else {
+        list reverted = gen_nreverse(gen_copy_seq(expressions));
+        out=do_expressions_to_vector(reverted);
+        if(!entity_undefined_p(out)) {
+            *shuffle= make_revert_statement(out,reverted);
+            update_vector_to_expressions(out,reverted);
+        gen_free_list(reverted);
+            return out;
+        }
+        gen_free_list(reverted);
+        return entity_undefined;
+    }
 }
 
 void invalidate_expressions_in_statement(statement s)
@@ -919,6 +937,14 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad, list 
     return es;
 
 }
+statement make_revert_statement(entity from,list expressions) {
+    statement outs =  instruction_to_statement(
+            make_instruction_call(
+                make_call(module_name_to_runtime_entity(strdup(concatenate("SIMD_INVERT_",get_vect_name_from_data(gen_length(expressions),expressions),NULL))),
+            make_expression_list(entity_to_expression(from)))));
+    return outs;
+}
+
 
 static statement make_load_statement(int argc, list args, list padded)
 {
@@ -1229,10 +1255,11 @@ statement generate_load_statement(simdstatement si, int line)
                     simdstatement_arguments(si)[i + offset],
                     args);
         }
-        entity vector = expressions_to_vector(args);
+        statement shuffle=statement_undefined;
+        entity vector = expressions_to_vector(args,&shuffle);
         if(!entity_undefined_p(vector)){
             simdstatement_vectors(si)[line] = vector;
-            return statement_undefined;
+            return shuffle;
         }
         else {
             args = CONS(EXPRESSION,

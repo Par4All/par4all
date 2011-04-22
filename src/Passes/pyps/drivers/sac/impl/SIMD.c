@@ -184,6 +184,22 @@
 		va_end(ap);\
 	}
 
+// inversion function
+#define SIMD_INVERT_TYPE(A,T) _SIMD_INVERT_TYPE(T,RWBITS,A)
+#define _SIMD_INVERT_TYPE(T,RWB,A) __SIMD_INVERT_TYPE(T,RWB,A)
+#define __SIMD_INVERT_TYPE(T,RWB,A) ___SIMD_INVERT_TYPE(T,LSTYPE_##T,VW_##RWB##_##T,A)
+#define ___SIMD_INVERT_TYPE(T,LST,VW,A) ____SIMD_INVERT_TYPE(T,LST,VW,A)
+#define ____SIMD_INVERT_TYPE(T,LST,VW,A) \
+    void SIMD_INVERT_V##VW##LST(CTYPE_##T vec[VW])\
+	{\
+		int i;\
+        CTYPE_##T tmp[VW];\
+		for (i = 0; i < (VW); i++)\
+			tmp[(VW)-i-1] = vec[i];\
+		for (i = 0; i < (VW); i++)\
+			vec[i] = tmp[i];\
+	}\
+
 
 // Conversion functions
 
@@ -208,7 +224,7 @@
 #define __SIMD_STORE_CONV(A,TO,TD,RWB) ___SIMD_STORE_CONV(A,TO,TD,VW_##RWB##_##TD,LSTYPE_##TO,LSTYPE_##TD)
 #define ___SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST) ____SIMD_STORE_CONV(A,TO,TD,VWD,TOLST,TDLST)
 #define ____SIMD_STORE_CONV(A,TD,TO,VWD,TDLST,TOLST)\
-	void SIMD_STORE_##A##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TO src[VWD], CTYPE_##TD dst[VWD])\
+	void SIMD_STORE_##VWD##TOLST##_TO_##A##VWD##TDLST(CTYPE_##TO src[VWD], CTYPE_##TD dst[VWD])\
 	{\
 		int i;\
 		for (i = 0; i < VWD; i++)\
@@ -218,6 +234,7 @@
 
 #define SIMD_LOADS(A)	_DEF_FOR_TYPES(SIMD_LOAD_TYPE,A)
 #define SIMD_STORES(A) 	_DEF_FOR_TYPES(SIMD_STORE_TYPE,A)
+#define SIMD_INVERTS(A) _DEF_FOR_TYPES(SIMD_INVERT_TYPE,A)
 
 #define CTYPE_PD double
 #define CTYPE_PS float
@@ -268,6 +285,9 @@ SIMD_LOADS(_UNALIGNED)
 // STORE operations
 SIMD_STORES(_ALIGNED)
 SIMD_STORES(_UNALIGNED)
+
+// INVERT operations (_aligned unused)
+SIMD_INVERTS(_ALIGNED) 
 
 // Define all possible conversions
 SIMD_LOAD_CONVS(_UNALIGNED)

@@ -45,6 +45,7 @@ typedef __m128i v8hi;
 		} while (0)
 
 #define SIMD_ZERO_V4SF(vec) vec = _mm_setzero_ps()
+#define SIMD_INVERT_V4SF(vec) vec = _mm_shuffle_ps(vec,vec,_MM_SHUFFLE(4,3,2,1))
 
 #define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)				\
 		do {								\
