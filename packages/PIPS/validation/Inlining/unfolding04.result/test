@@ -52,7 +52,8 @@ void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Dat
             /*0067*/
             int length = P_0->length*spp;                               /*0026*/
             /*0068*/
-            for(j = 0; j <= length-1; j += 1) {
+            for(j = 0; j <= length-1; j += 1) {                         /*0027*/
+               /*0069*/
                _return3 = psrc1[j];                                     /*0028*/
                _return0 = _return3;                                     /*0031*/
                v1 = _return0;                                           /*0034*/

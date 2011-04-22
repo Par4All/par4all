@@ -12,7 +12,7 @@ int main()
    j = 1;                                                               /*0007*/
 //             <    is written>: i
 
-   for(i = 0; i <= 499; i += 1) {
+   for(i = 0; i <= 499; i += 1) {                                       /*0009*/
 //             <    is read   >: j
 //             <    is written>: j
       j++;                                                              /*0010*/
@@ -45,7 +45,7 @@ int main()
 //             <may be written>: a[*] j
 //             <    is written>: i
 
-   for(i = 0; i <= 499; i += 1) {
+   for(i = 0; i <= 499; i += 1) {                                       /*0009*/
 //             <    is read   >: j
 //             <    is written>: j
       j++;                                                              /*0010*/
@@ -80,7 +80,7 @@ Dependence graph
 	07 --> 10 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 		from <j-W-EXACT> to <j-R-EXACT>
-	06 --> -1 with conflicts
+	06 --> 09 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************
@@ -113,7 +113,7 @@ int main()
 //  T(i,j) {}
 
 
-   for(i = 0; i <= 499; i += 1) {
+   for(i = 0; i <= 499; i += 1) {                                       /*0009*/
 
 //  T(j) {j==j#init+1}
 
@@ -165,7 +165,7 @@ int main()
 //  P(i,j,k) {i==0, j==1}
 
 
-   for(i = 0; i <= 499; i += 1) {
+   for(i = 0; i <= 499; i += 1) {                                       /*0009*/
 
 //  P(i,j,k) {0<=i, i<=499}
 

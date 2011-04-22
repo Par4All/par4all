@@ -4,6 +4,9 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create mix5 mix5.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 apply PRIVATIZE_MODULE(%ALL)
 
 apply COARSE_GRAIN_PARALLELIZATION

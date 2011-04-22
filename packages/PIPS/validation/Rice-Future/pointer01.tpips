@@ -4,6 +4,8 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create pointer01 pointer01.c
 
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 activate PROPER_EFFECTS
 
 activate PRINT_CODE_POINTS_TO_LIST
@@ -26,7 +28,7 @@ echo
 echo Parallel code
 echo
 
-activate PRINT_CODE_PROPER_EFFECTS
+#activate PRINT_CODE_PROPER_EFFECTS
 display PARALLELPRINTED_FILE
 
 close

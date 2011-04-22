@@ -7,7 +7,7 @@ void pointer02(int n, float *p)
 //             <    is read   >: n
 //             <    is written>: i
 
-   for(i = 0; i <= n-1; i += 1)
+   for(i = 0; i <= n-1; i += 1)                                         /*0008*/
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       p[i] = r[i];                                                      /*0009*/
@@ -19,7 +19,7 @@ void pointer02(int n, float *p)
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
-	-1 --> 09 with conflicts
+	08 --> 09 with conflicts
 		from <n-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	06 --> 09 with conflicts
 		from <r-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

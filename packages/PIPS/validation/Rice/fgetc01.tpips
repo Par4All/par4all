@@ -5,6 +5,9 @@ setproprety ABORT_ON_USER_ERROR TRUE
 
 create fgetc01 fgetc01.c
 
+# mandatory for A&K (Rice) parallization on C files
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
 module main
 
 echo Select some options to deal with the C Language:

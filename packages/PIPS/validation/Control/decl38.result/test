@@ -76,7 +76,7 @@ void decl38(int size)
       float x;                                                          /*0006*/
 // (2,6)
 
-      for(i = 1; i <= (size-1); i += 1)
+      for(i = 1; i <= (size-1); i += 1)                                 /*0008*/
 // (2,7)
          ;                                                              /*0009*/
       // END BLOCK
@@ -101,7 +101,7 @@ void decl38(int size)
 break_2:      ;
 // (8,3)
 
-      for(k = 1; k <= (size-1); k += 1)
+      for(k = 1; k <= (size-1); k += 1)                                 /*0018*/
 // (8,4)
          ;                                                              /*0019*/
 // (8,5)
@@ -118,7 +118,7 @@ switch_2_case_0:      ;
 // (7,1)
       // BEGIN BLOCK
 // (7,2)
-      for(j = 1; j <= (size-1); j += 1)
+      for(j = 1; j <= (size-1); j += 1)                                 /*0014*/
 // (7,3)
          ;                                                              /*0015*/
       // END BLOCK

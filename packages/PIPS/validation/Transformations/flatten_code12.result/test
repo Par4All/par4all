@@ -20,7 +20,7 @@ void flatten_code12(void)
    foo_0++;                                                             /*0017*/
 // (0,4)
 
-   for(i = i; i <= 6; i += 1) {
+   for(i = i; i <= 6; i += 1) {                                         /*0019*/
 // (0,5)
       // BEGIN BLOCK
 // (0,6)
@@ -54,7 +54,7 @@ void flatten_code12(void)
    foo_0++;                                                             /*0017*/
 // (0,5)
 
-   for(i = i; i <= 6; i += 1) {
+   for(i = i; i <= 6; i += 1) {                                         /*0019*/
 // (0,6)
       // BEGIN BLOCK
 // (0,7)

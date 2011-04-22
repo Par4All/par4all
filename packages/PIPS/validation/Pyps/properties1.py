@@ -3,6 +3,8 @@ from pyps import workspace
 
 w = workspace("properties1.c",deleteOnClose=True)
 
+# mandatory for A&K (Rice) parallization on C files
+w.props.memory_effects_only=False
 
 print str (w.props.OMP_MERGE_POLICY)
 print str (w.props.PRETTYPRINT_SEQUENTIAL_STYLE)
