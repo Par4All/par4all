@@ -945,7 +945,7 @@ static statement make_loadsave_statement(int argc, list args, bool isLoad)
 }
 statement make_shuffle_statement(entity *from,list expressions,int *perms) {
 	list shuffle=NIL;
-	while(*perms)
+    FOREACH(EXPRESSION,_,expressions)
 		shuffle=CONS(EXPRESSION,int_to_expression(*perms++),shuffle);
 	shuffle=gen_nreverse(shuffle);
 	entity out = make_entity_copy(*from);
