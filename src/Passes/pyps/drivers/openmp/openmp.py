@@ -3,14 +3,16 @@ import pyps
 from pyps import module, workspace, Maker
 
 class ompMaker(Maker):
-	makefile="Makefile.omp"
-	makefiledir="openmp"
-	def __init__(self,header="",rules="",ext=""):
-		atr = self.get_makefile_attributes("Makefile.omp","makefiledir")
-		header = header + atr[0]
-		rules = rules + atr[1]
-		ext = ext + ".omp"
-		super(ompMaker,self).__init__(header,rules,ext)
+	''' A makefile builder for openmp '''
+	def get_ext(self):
+		return ".omp"+super(ompMaker,self).get_ext()
+
+	def get_makefile(self):
+		return ["Makefile.omp"]+super(ompMaker,self).get_makefile()
+
+	def get_makefiledir(self):
+		return ["openmp"]+super(ompMaker,self).get_makefiledir()
+
 
 def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
 	"""parallelize module with opennmp"""

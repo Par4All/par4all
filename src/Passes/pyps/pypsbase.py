@@ -18,92 +18,127 @@ import inspect
 
 pypips.atinit()
 
-pipsdef_h = "pipsdef.h"
+pipsdef_h = pypsutils.get_runtimefile("pipsdef.h","pypsbase")
 
-class backendCompiler(object):
-	''' Parameters for workspace.compile_and_run . Used for convenience. '''
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		'''
-		CC, CFLAGS, LDFLAGS: same as usual
-		compilemethod: bound method used for compilation
-		rep: output directory*
-		outfile: name of the output file
-		args: list of arguments
-		'''
-		self.CC = CC
-		self.CFLAGS = CFLAGS
-		self.LDFLAGS = LDFLAGS
-		self.compilemethod = compilemethod
-		self.rep = rep
-		self.outfile = outfile
-		self.args = args
-		self.extrafiles = extrafiles
-		self.cmd = None
-		self.cc_stderr = None
-	
-	def compile(self, filename, extraCFLAGS="",verbose=False):
-		"""compiles one given .c file. Called by the workspace method compile"""
-		outfilename = os.path.basename(os.path.splitext(filename)[0]+".o")
-		command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", filename, "-o", outfilename]
-		commandline = " ".join(command)
-		if verbose:
-			print >> sys.stderr , "Compiling a workspace file with", commandline
-		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
-		(out,err) = p.communicate()
-		self.cc_stderr = err
-		ret = p.returncode
-		if ret != 0:
-			os.remove(filename)
-			print >> sys.stderr, err
-			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		self.cc_cmd = commandline
-		return [outfilename]
+class Maker(object):
+	''' Makefile generator '''
 
-	def link(self,files,verbose=False):
-		"""links a given list of .o files. Called by the workspace method compile""" 
-		command = [self.CC]+files+[self.LDFLAGS]
-		if self.outfile:
-			command+=["-o", self.outfile]
-		commandline = " ".join(command)
-		if verbose:
-			print >> sys.stderr , "Linking the workspace with", commandline
-		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
-		(out,err) = p.communicate()
-		self.cc_stderr = err
-		ret = p.returncode
-		if ret != 0:
-			print >> sys.stderr, err
-			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
-		self.cc_cmd = commandline
-		return self.outfile
+	def __init__(self):
+		''' Loading atribute header and rules '''
+		self.headers=""
+		self.rules=""
+		self.ext = self.get_ext()
+		makefiles = self.get_makefile()
+		makefiledirs = self.get_makefiledir()
+		for i in xrange(0,len(makefiles)):
+			atr = self.get_makefile_attributes(makefiles[i],makefiledirs[i])
+			self.headers += atr[0]
+			self.rules += atr[1]
 
-	def user_headers_cmd(self, files, extraCFLAGS=""):
-		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
+	def get_makefile_attributes(self,makefile,makefiledir):
+		l = pypsutils.file2string(pypsutils.get_runtimefile(makefile,makefiledir)).split("##pipsrules##")
+		return (l[0],l[1])
 
-	def _cc_cmd(self, files, extraCFLAGS, mode):
-		command=[self.CC, extraCFLAGS, self.CFLAGS]
-		if mode=="link":
-			command+=files
-			command+=[self.LDFLAGS]
-			if self.outfile: command+=["-o", self.outfile]
-		elif mode=="compile":
-			command+=["-c"]
-			command+=files
-		elif mode=="userHeaders":
-			command+=["-MM"]
-			command+=files
-		return command
+	def generate(self,path,sources):
+		mk="SOURCES="+\
+			" ".join(sources) +\
+			"\n"+\
+			self.headers+\
+			"\n"+\
+			self.rules
+		return os.path.basename(pypsutils.string2file(mk,os.path.join(path,"Makefile"+self.ext)))
 
-class gccCompiler(backendCompiler):
-	"""gcc backend compiler to use gcc"""
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(gccCompiler,self).__init__("gcc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+	def get_ext(self):
+		return ""
 
-class iccCompiler(backendCompiler):
-	"""icc backend compiler to use icc"""
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(iccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
+	def get_makefile(self):
+		return ["Makefile.base"]
 
+	def get_makefiledir(self):
+		return ["pypsbase"]
+
+#class backendCompiler(object):
+#	''' Parameters for workspace.compile_and_run . Used for convenience. '''
+#	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[]):
+#		'''
+#		CC, CFLAGS, LDFLAGS: same as usual
+#		compilemethod: bound method used for compilation
+#		rep: output directory*
+#		outfile: name of the output file
+#		args: list of arguments
+#		'''
+#		self.CC = CC
+#		self.CFLAGS = CFLAGS
+#		self.LDFLAGS = LDFLAGS
+#		self.compilemethod = compilemethod
+#		self.rep = rep
+#		self.outfile = outfile
+#		self.args = args
+#		self.cmd = None
+#		self.cc_stderr = None
+#	
+#	def compile(self, filename, extraCFLAGS="",verbose=False):
+#		"""compiles one given .c file. Called by the workspace method compile"""
+#		outfilename = os.path.basename(os.path.splitext(filename)[0]+".o")
+#		command = [self.CC, extraCFLAGS, self.CFLAGS, "-c", filename, "-o", outfilename]
+#		commandline = " ".join(command)
+#		if verbose:
+#			print >> sys.stderr , "Compiling a workspace file with", commandline
+#		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+#		(out,err) = p.communicate()
+#		self.cc_stderr = err
+#		ret = p.returncode
+#		if ret != 0:
+#			print >> sys.stderr, err
+#			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+#		self.cc_cmd = commandline
+#		return [outfilename]
+#
+#	def link(self,files,verbose=False):
+#		"""links a given list of .o files. Called by the workspace method compile""" 
+#		command = [self.CC]+files+[self.LDFLAGS]
+#		if self.outfile:
+#			command+=["-o", self.outfile]
+#		commandline = " ".join(command)
+#		if verbose:
+#			print >> sys.stderr , "Linking the workspace with", commandline
+#		p = Popen(commandline, shell=True, stdout = PIPE, stderr = PIPE)
+#		(out,err) = p.communicate()
+#		self.cc_stderr = err
+#		ret = p.returncode
+#		if ret != 0:
+#			print >> sys.stderr, err
+#			raise RuntimeError("%s failed with return code %d" % (commandline, ret))
+#		self.cc_cmd = commandline
+#		return self.outfile
+#
+#	def user_headers_cmd(self, files, extraCFLAGS=""):
+#		return self._cc_cmd(files, extraCFLAGS, mode="userHeaders")
+#
+#	def _cc_cmd(self, files, extraCFLAGS, mode):
+#		command=[self.CC, extraCFLAGS, self.CFLAGS]
+#		if mode=="link":
+#			command+=files
+#			command+=[self.LDFLAGS]
+#			if self.outfile: command+=["-o", self.outfile]
+#		elif mode=="compile":
+#			command+=["-c"]
+#			command+=files
+#		elif mode=="userHeaders":
+#			command+=["-MM"]
+#			command+=files
+#		return command
+#
+#class gccCompiler(backendCompiler):
+#	"""gcc backend compiler to use gcc"""
+#	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[]):
+#		super(gccCompiler,self).__init__("gcc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args)
+#
+#class iccCompiler(backendCompiler):
+#	"""icc backend compiler to use icc"""
+#	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[]):
+#		super(iccCompiler,self).__init__("icc",CFLAGS,LDFLAGS,compilemethod, rep, outfile, args)
+#
 
 
 class loop:
@@ -529,14 +564,15 @@ class workspace(object):
 		rep=compiler.rep
 		otmpfiles=self.save(rep=compiler.rep)+extrafiles
 		
-		of = []
-		for f in otmpfiles:
-			of += compiler.compile(filename=f,extraCFLAGS=self.cppflags,verbose=self.verbose)
-		if link:
-			ob = compiler.link(files=of,verbose=self.verbose)
-			return ob
-		
-		return of
+		if self.verbose:
+			print >> sys.stderr , "Compiling the workspace with", commandline
+		#We need to set shell to False or it messes up with the make command
+		p = Popen(commandline, shell=False, stdout = PIPE, stderr = PIPE)
+		(out,err) = p.communicate()
+		rc = p.returncode
+		if rc != 0:
+			print >> sys.stderr, err
+			raise RuntimeError("%s failed with return code %d" % (commandline, rc))
 
 	def compile_and_run(self, compiler=backendCompiler()):
 		if compiler.compilemethod == None:
