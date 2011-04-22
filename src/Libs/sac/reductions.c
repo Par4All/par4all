@@ -92,7 +92,7 @@ static reductionInfo add_reduction(list* reds, reduction r)
     {
         if (same_reduction_p(r, reductionInfo_reduction(ri)))
         {
-            //The reduction has already been encountered: update the coun
+            //The reduction has already been encountered: update the counter
             reductionInfo_count(ri)++;
 
             free_expression(dimension_upper(DIMENSION(CAR((variable_dimensions(type_variable(entity_type(reductionInfo_vector(ri)))))))));
@@ -109,6 +109,17 @@ static reductionInfo add_reduction(list* reds, reduction r)
     *reds=CONS(REDUCTIONINFO,ri,*reds);
 
     return ri;
+}
+
+static void undo_rename_reference(reference r, reductionInfo ri) {
+    if(same_entity_p(
+                reference_variable(r),
+                reductionInfo_vector(ri))) {
+        reference rred = reduction_reference(reductionInfo_reduction(ri));
+        gen_full_free_list(reference_indices(r));
+        reference_indices(r)=gen_full_copy_list(reference_indices(rred));
+        reference_variable(r)=reference_variable(rred);
+    }
 }
 
 static void rename_reduction_ref_walker(expression e, reductionInfo ri)
@@ -165,7 +176,7 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
             pips_debug(3,"can do nothing with star reductions ...\n");
         else if(reduction_in_statement_p(r,s))
         {
-            pips_debug(3,"found in the statement ! rewriting ...\n");
+            pips_debug(3,"found in the statement ! Rewriting ...\n");
             basic b = basic_of_reference(reduction_reference(r));
             if(!basic_undefined_p(b))
             {
@@ -176,7 +187,7 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
             }
         }
         else
-            pips_debug(3,"not found in the statement ! skipping ...\n");
+            pips_debug(3,"not found in the statement ! Skipping ...\n");
     }
 }
 
@@ -516,15 +527,19 @@ static void reductions_rewrite(statement s, set skip)
         //Generate prelude and compact code for each of the reductions
         FOREACH(REDUCTIONINFO, ri,reductions_info)
         {
-            statement curStat;
-
-            curStat = generate_prelude(ri);
+            if(entity_memory_size(reductionInfo_vector(ri))*8 >= get_int_property("SAC_SIMD_REGISTER_WIDTH")) {
+            statement curStat = generate_prelude(ri);
             if (curStat != statement_undefined)
                 preludes = CONS(STATEMENT, curStat, preludes);
 
             curStat = generate_compact(ri);
             if (curStat != statement_undefined)
                 compacts = CONS(STATEMENT, curStat, compacts);
+            }
+            /* not enough elements: undo the change */
+            else {
+                gen_context_recurse(body,ri,reference_domain,gen_true, undo_rename_reference);
+            }
         };
         gen_full_free_list(reductions_info);
 
