@@ -16,7 +16,7 @@ here:
          Dst[y][x] = sum;
       }
 }
-void kernel(int H, int R, int W, float *sum_0, int x, int y, float Kernel[R], float Src[W][H])
+void kernel(int H, int R, int W, float sum_0[1], int x, int y, float Kernel[R], float Src[W][H])
 {
    //PIPS generated variable
    int k;
