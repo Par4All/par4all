@@ -176,6 +176,9 @@ static void get_type_max_width(call ca, int* maxWidth)
                     type t = cast_type(ca);
                     *maxWidth=MAX(*maxWidth ,type_memory_size(t));
                 } break;
+			case is_syntax_sizeofexpression:
+				*maxWidth=MAX(*maxWidth ,DEFAULT_INTEGER_TYPE_SIZE);
+				break;
 
             default:pips_internal_error("syntax_tag %u not supported yet",syntax_tag(s));
 

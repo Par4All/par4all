@@ -155,7 +155,7 @@ static int simple_simd_unroll_rate(loop l) {
     int regWidth = get_int_property("SAC_SIMD_REGISTER_WIDTH");
 
     if ((varwidth > regWidth/2) || (varwidth <= 0)) 
-        return FALSE;
+        return 1;
 
     for(int j = 8; j <= regWidth/2; j*=2)
     {
