@@ -189,6 +189,6 @@ def gen_compile_command(rep,makefile,outfile,rule,**opts):
 		commandline+=["-f",makefile]
 		commandline.append("TARGET="+outfile)
 		for (k,v) in opts.iteritems():
-			commandline.append(k+'="'+str(v)+'"')
+			commandline.append(k+'='+str(v))
 		commandline.append(rule)
 		return commandline

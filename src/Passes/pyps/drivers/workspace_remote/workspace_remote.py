@@ -51,7 +51,9 @@ class remoteExec:
 		if not (len(opts) == 1 and opts[0] == ""):
 			nargs.extend(opts)
 		nargs.append(self._host)
-		nargs.extend(args)
+		#need one more level of quotes
+		nargs.extend(map(lambda x: '"'+x+'"',args))
+		print >> sys.stderr, nargs
 		return Popen(nargs, shell=shell, stdout = PIPE, stderr = PIPE) 
 
 
