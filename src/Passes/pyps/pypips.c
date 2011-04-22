@@ -165,21 +165,28 @@ void create(char* workspace_name, char ** filenames)
 
 void set_property(const char* propname, const char* value)
 {
+    // thank's to rk, this hack is no longer needed
+#if 0
     /* nice hack to temporarly redirect stderr */
     int saved_stderr = dup(STDERR_FILENO);
     char *buf;
     freopen("/dev/null","w",stderr);
     asprintf(&buf, "/dev/fd/%d", saved_stderr);
+#endif
     if (!safe_set_property(propname, value)) {
+#if 0
         freopen(buf,"w",stderr);
         free(buf);
+#endif
         pips_user_error("error in setting property %s to %s\n",
 			propname, value);
     }
+#if 0
     else {
         freopen(buf,"w",stderr);
         free(buf);
     }
+#endif
 }
 
 char* info(char * about)
