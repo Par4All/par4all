@@ -1,5 +1,6 @@
 from __future__ import with_statement # to cope with python2.5
 import pyps
+import pypsutils
 import os
 import sys
 from subprocess import Popen, PIPE
@@ -134,18 +135,13 @@ class workspace(pyps.workspace):
 			self.remoteExec.copy(os.path.join(rep,f),rep)
 		return makefile,others
 		
-	def compile(self,rep=None, makefile="Makefile", outfile="a.out",**opt):
+	def compile(self,rep=None, makefile="Makefile", outfile="a.out", rule="all" ,**opts):
 		""" Uses makefiles on the remote host to compile the workspace"""
 		if rep == None:
 			rep = self.tmpdirname()
 		rep = os.path.join(self.remoteExec.working_dir(),rep)
-		commandline = ["make",]
-		commandline+=["-C",rep]
-		commandline+=["-f",makefile]
-		commandline.append("TARGET="+outfile)
-		for (k,v) in opt.iteritems():
-			commandline.append(k+"="+str(v))
-		
+		commandline = pypsutils.gen_compile_command(rep,makefile,outfile,rule,**opts)
+
 		if self.verbose:
 			print >> sys.stderr , "Compiling the remote workspace with", commandline
 		#We need to set shell to False or it messes up with the make command

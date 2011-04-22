@@ -645,13 +645,7 @@ class workspace(object):
 		""" uses the fabulous makefile generated to compile the workspace """	
 		if rep == None:
 			rep = self.tmpdirname()
-		commandline = ["make",]
-		commandline+=["-C",rep]
-		commandline+=["-f",makefile]
-		commandline.append("TARGET="+outfile)
-		for (k,v) in opts.iteritems():
-			commandline.append(k+"="+str(v))
-		commandline.append(rule)
+		commandline = pypsutils.gen_compile_command(rep,makefile,outfile,rule,**opts)
 
 		if self.verbose:
 			print >> sys.stderr , "Compiling the workspace with", commandline

@@ -181,3 +181,13 @@ def get_runtimefile(fname,subdir=None):
 			if os.path.isfile(f):return f
 		raise RuntimeError, "Cannot find runtime file : " + fname + "\nsearch path: "+":".join(searchdirs)
 
+def gen_compile_command(rep,makefile,outfile,rule,**opts):
+		#Moved here because of code duplication
+		commandline = ["make",]
+		commandline+=["-C",rep]
+		commandline+=["-f",makefile]
+		commandline.append("TARGET="+outfile)
+		for (k,v) in opts.iteritems():
+			commandline.append(k+'="'+str(v)+'"')
+		commandline.append(rule)
+		return commandline
