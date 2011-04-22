@@ -38,7 +38,7 @@ pyps.module.benchmark_module=benchmark_module
     allowing us to measure the time taken by the program"""
 class workspace(pyps.workspace):
 	def __init__(self, *sources, **kwargs):
-		self._timefile = tempfile.mktemp()
+		self._timefile = tempfile.mkstemp()[1]
 		
 		#if workspace_rt in kwargs["parents"]:
 		#	self.remote = kwargs.get("remoteExec", None)
@@ -100,22 +100,23 @@ class workspace(pyps.workspace):
 			raise RuntimeError("self.benchmark() must have been run !")
 		return self._final_runtimes[module.name]
 
-	def benchmark(self, compiler, iterations = 1):
-		compiler.rep = self.dirname() +"Tmp"
-		self.compile_and_run(compiler)
+	def benchmark(self, makefile="Makefile", iterations = 1, args=[]):
+		rep = self.tmpdirname()
+		outfile = self.compile(rep=rep,makefile=makefile)[0]
+		
 		self._module_rtimes = dict()
 		for i in range(0, iterations):
-			print >>sys.stderr, "Launch execution of %s %s..." % (compiler.outfile," ".join(compiler.args))
-			rc,out,err = self.run_output(compiler)
+			print >>sys.stderr, "Launch execution of %s %s..." % (outfile," ".join(args))
+			rc,out,err = self.run(outfile,args)
 			print >>sys.stderr, "Program done."
 			if rc != 0:
-				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(str(compiler.cmd), rc, out,err)
+				message = "Program %s failed with return code %d.\nOutput:\n%s\nstderr:\n%s\n" %(outfile+" ".join(args), rc, out,err)
 				raise RuntimeError(message)
 			time = 0
 			try:
 				self._get_timefile_and_parse()
 			except IOError:
-				message = "cmd: " + str(compiler.cmd) + "\n"
+				message = "binary: " + outfile + "\n"
 				message += "out: " + out + "\n"
 				message += "err: " + err + "\n"
 				message += "return code: " + str(rc) + "\n"
