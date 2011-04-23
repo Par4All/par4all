@@ -1,0 +1,47 @@
+delete skimo02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create skimo02 skimo02.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
+
+# setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[skimo02]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[skimo02]
+
+apply REFINE_TRANSFORMERS[skimo02]
+
+echo
+echo TRANSFORMERS AFTER REFINEMENT
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[skimo02]
+
+#apply UNSPLIT
+
+close
+# delete skimo02
+quit
