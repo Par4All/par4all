@@ -8336,7 +8336,7 @@ check section~\ref{subsection-expression-optimizations} which does a
 pretty nice job too.
 
 The original algorithm used is described in Chapters 12, 13 and 14 of
-Julien Zory's PhD dissertation.
+Julien Zory's PhD dissertation~\cite{Zor99}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9626,7 +9626,7 @@ LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \label{sec:expr-optim-using}
 
 \begin{PipsPass}{optimize_expressions}
-This is an experimental section developed by Julien \textsc{Zory} as PhD work.
+This is an experimental section developed by Julien \textsc{Zory} as PhD work~\cite{Zor99}.
 This phase aims at optimizing expression evaluation using algebraic
 properties such as associativity, commutativity, neutral elements and so
 forth.
@@ -9679,7 +9679,7 @@ instruction_selection > MODULE.code
 \end{PipsMake}
 
 EOLE: Evaluation Optimization of Loops and Expressions.
-Julien Zory stuff integrated within pips. It relies on an external tool
+Julien Zory stuff integrated within pips~\cite{Zor99}. It relies on an external tool
 named \texttt{eole}. The version and options set can be controlled from
 the following properties. The status is experimental. See the
 \PipsPassRef{optimize_expressions} pass for more details about the advanced
@@ -9714,7 +9714,7 @@ One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} t
 \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
 
 The heuristic used for common subexpression elimination is described
-in Chapter 15 of Julien Zory's PhD dissertation.
+in Chapter 15 of Julien Zory's PhD dissertation~\cite{Zor99}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14894,286 +14894,9 @@ caller.
 \end{enumerate}
 
 
-\begin{thebibliography}{99}
+%% BIBLIOGRAPHY
 
-% ASU86
-\bibitem{ASU86} Aho, Sethi, Ullman,
-{\it Compilers. Principles, techniques, and Tools},
-Addison-Wesley, (1986)
-
-\bibitem{AK87} J. Allen, K. Kennedy,
-{\em Automatic Translation of {FORTRAN} Programs to Vector Form},
-TOPLAS, V. 9, n. 4, 1987
-
-\bibitem{ACI10} Corinne Ancourt, Fabien Coelho, Francois Irigoin,
-{\em A Modular Static Analysis Approach to Affine Loop Invariants
-  Detection},
- Numerical and Symbolic Abstract Domains 2010 (NSAD 2010),
-Electronic Notes in Theoretical Computer Science, ENTCS17986
-
-
-  \bibitem{AI91} C. Ancourt, F. Irigoin,
-{\em Scanning Polyhedra With DO Loops},
-PPoPP'91 Principle and Practice of Parallel Programming, Williamsburg, USA,
-April 1991
-
-   \bibitem{AIY94} C. Ancourt, F. Irigoin, Y. Yang,
-{\em Minimal Data Dependence Abstractions for Loop Transformations},
-Seventh Annual Workshop on Languages and Compilers for Parallel
-Computing, Ithaca (NY), August 1994
-
-% Bar91
-  \bibitem{Bar91} B. Baron,
-{\em Construction flexible et cohérente pour la compilation interprocédurale},
-Rapport interne EMP-CRI-E157, juillet 1991
-
-  \bibitem{BIJ91} B. Baron, F. Irigoin, P. Jouvelot,
-{\em Projet PIPS. Manuel utilisateur du pa\-ral\-l\'e\-liseur batch},
-Rapport interne EMP-CRI-E144, janvier 1991
-
-% Ber90
-  \bibitem{Ber90} P. Berthomier,
-{\em Static Comparison of Different Program versions},
-Rapport interne EMP-CRI-E130, septembre 1990
-
-% Cha90
-  \bibitem{Cha90} P. Chassany,
-{\em Les m\'ethodes de parall\'elisation interproc\'edurales},
-Rapport interne EMP-CRI-E129, septembre 1990
-
-% Coe93
-  \bibitem{Coe93} F. Coelho,
-{\em Étude et réalisation d'un compilateur pour le {\em High
-Performance Fortran}},
-Rapport interne EMP-CRI-A238, juin 1993
-
-% Cre96
-  \bibitem{Cre96} Béatrice Creusillet {\em
-Analyses de régions de tableaux et applications},
-Thèse de doctorat de l'Ecolde des Mines de Paris,
-Décembre 1996 (available as A/295/CRI).
-
-  \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
-Interprocedural Array Region Analyses}, Workshop on Languages and
-Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
-Août 1995 (also available as TR A/270).
-
-  \bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
-    Array Region Analyses}, International Journal on Parallel Programming
-  (special issue on Languages and Compilers for Parallel Computing, LCPC'95),
-  24(6), (also available as TR A/282).
-
-% CCK86
-  \bibitem{CCK86} C. D. Callahan, K. D. Cooper, K. Kennedy and L. Torczon,
-Interprocedural Constant Propagation,
-in the {\em Proceedings of the ACM
-Symposium on Compiler Construction}, (1986).
-
-\bibitem{Col93} J.-F. Collard, Code generation in automatic
-  parallelizers, Technical Report 93-21, LIP-IMAG, July 1993.
-
-\bibitem{Fea91} P. Feautrier, {Dataflow Analysis of Array and Scalar
-    References}, {\em Int. Journal of Parallel Programming}, 20(1):23--53,
-    February 1991.
-
-\bibitem{Fea92a} P. Feautrier, {Some Efficient Solutions to the Affine
-  Scheduling Problem, Part I : One-dimensional Time}, {\em Int. J. of
-  Parallel Programming}, 21(5):313--348, October 1992.
-
-\bibitem{Fea92b} P. Feautrier, {Some Efficient Solutions to the Affine
-  Scheduling Problem, Part II : Multidimensional Time}, {\em Int. J. of
-  Parallel Programming}, 21(6):389--420, December 1992.
-
-\bibitem{Fea93} P. Feautrier, {Toward Automatic Partitioning of Arrays on
-  Distributed Memory Computers}, In {\em ACM ICS'93}, pages 175--184,
-  Tokyo, July 1993.
-
-% CH78
-  \bibitem{CH78} N. Halbwachs and P. Cousot, Automatic Discovery of Linear
-Restraints Among Variables of a Program, in the {\em Conference Record
-of the Tenth ACM Annual Symposium on Principles of Programming
-Languages}, (1978).
-
-  \bibitem{IJT91} F. Irigoin, P. Jouvelot, R. Triolet,  {\em Semantical
-Interprocedural Parallelization: An Overview of the PIPS Project},
-1991 International Conference on Supercomputing, Cologne, June 1991
-
-  \bibitem{IJT92} F. Irigoin, P. Jouvelot, R. Triolet, {\em PIPS:
-Internal Representation of Fortran Code}, Technical Report E/166, May
-1992. This report is constantly updated and available on-line.
-
-% Iri87
-  \bibitem{Iri87} F. Irigoin,
-{\em Partitionnement des boucles imbrique'es. Une tech\-nique
-d'opti\-mi\-sation des programmes scientifiques},
-Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
-
-  \bibitem{IT87a} F. Irigoin, R. Triolet,
-{\em Automatic DO-Loop Partitioning for Improving
-Data Locality in Scientific Programs}, Vector and Parallel Processors
-for Scientific Computation 2, Rome, Sept.~21-23, Italie, 1987 (invite') \\
-Disponible comme rapport CAI-E93
-
-  \bibitem{IT87b} F. Irigoin, R. Triolet,
-{\em Computing Dependence Direction Vectors and Dependence Cones with
-Linear Systems}, Rapport CAI-E94, September 1987
-
-%
-% FI: all the references below have been checked for the introduction
-% of pips.bib derived from the renpar-polyedres.bib
-%
-
-% IT88
-  \bibitem{IT88} F. Irigoin, R. Triolet,
-{\em Supernode Partitioning},
-POPL'88 - Fifteenth Annual ACM
-Symposium on Principles of Programming Languages, San Diego, California,
-January 13-15, pp. 319-329, 1988
-
-  \bibitem{IA91} F. Irigoin, C. Ancourt,
-{\em Final Report on Software Caching for Simulated Global Memory},
-PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
-
-  \bibitem{IA92a} F. Irigoin, C. Ancourt,
-{\em Compilation pour machines à mémoire répartie},
-Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
-Ecole de Printemps du LITP, mai 1992
-
-% IA92b
-  \bibitem{IA92b} F. Irigoin, C. Ancourt,
-{\em Automatic Code Distribution},
-Third International Workshop on Compilers for Parallel Computers, Vienne,
-July, 1992
-
-% Iri92
-  \bibitem{Iri92} F. Irigoin,
-{\em Interprocedural Analyses for Programming Environments},
-J.J.~Dongarra and B.~Tourancheau Eds, Elsevier,
-Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
-
-  \bibitem{Iri94} F. Irigoin, \& al.,
-{\em Projet PIPS. Environnement de développement},
-Rapport interne EMP-CRI-E146, novembre 1994. This report is available
-on-line and regularly updated.
-
-% Iri05
-\bibitem{Iri05} F. Irigoin,
-{\em Detecting Affine Loop Invariants using a Modular Static Analysis*
-  - Version préliminaire}, Tech. report A/368/CRI, 2005
-
-%@inproceedings{Jouvelot:1989:RCC:73141.74837,
-% author = {Jouvelot, P. and Gifford, D. K.},
-% title = {Reasoning about continuations with control effects},
-% booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming language design and implementation},
-% series = {PLDI '89},
-% year = {1989},
-% isbn = {0-89791-306-X},
-% location = {Portland, Oregon, United States},
-% pages = {218--226},
-% numpages = {9},
-% url = {http://doi.acm.org/10.1145/73141.74837},
-% doi = {http://doi.acm.org/10.1145/73141.74837},
-% acmid = {74837},
-% publisher = {ACM},
-% address = {New York, NY, USA},
-%} 
-\bibitem{JG89} P. Jouvelot, D. Gifford, {\em Reasoning about
-    continuations with control effects}, in Proceedings of the ACM
-  SIGPLAN 1989 Conference on Programming language design and
-  implementation, PLDI'89, pp. 218-226.
-
-\bibitem{JT89} P. Jouvelot, R. Triolet,
-	{\em NewGen : A Langage-Independent Program Generator},
-Rapport interne EMP-CRI-E191, July 1989. This report is available
-on-line and regularly updated.
-
-% Kar76
-\bibitem{Kar76} M. Karr, Affine Relationships among Variables of a Program,
-{\em Acta Informatica}, (1976).
-
-%@article {springerlink:10.1007/BF00128178,
-%  author = {Li, Zhiyuan and Yew, Pen-Chung},
-%   title = {Program parallelization with interprocedural analysis},
-%   journal = {The Journal of Supercomputing},
-%   publisher = {Springer Netherlands},
-%   issn = {0920-8542},
-%   keyword = {Computer Science},
-%   pages = {225-244},
-%   volume = {2},
-%   issue = {2},
-%   url = {http://dx.doi.org/10.1007/BF00128178},
-%   note = {10.1007/BF00128178},
-%   year = {1988}
-%}
-% LY88c
-\bibitem{LY88c} Zhiyuan Li, Pen-Chung Yew, {\em Program parallelization
-    with interprocedural analysis}, The Journal of Supercomputing,
-  Vol. 2, N. 2, pp. 225-244, Springer, 1988.
-
-% Muc97
-\bibitem{Muc97} Steven S. Muchnick,
-  {\it Advanced Compiler Design Implementation}
-  Morgan Kaufmann Publishers, 1997
-
-% Ngu02
-\bibitem{Ngu02} Thi Viet Nga Nguyen, {\em Efficient and
-    Effective Software verifications for Scientific Applications Using
-    Static analysis and Code Instrumentation}, PhD Ecole nationale
-  Superieure des Mines de Paris, 2002.
-
-\bibitem{Ost83} L.~J.~Osterweil, TOOLPACK - An Experimental Software
-    Development Environment Research Project,
-{\em IEEE TOSE}, Vol. 9, No. 6, pp.673-685 (1983).
-
-% Pol88
-\bibitem{Pol88} A.~A.~Pollicini, Using Toolpack Software Tools, in {\em
-  ISPRA Courses on Information Sciences 1986}, ISPRA, Kluwer Academic,
-  1989
-
-\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procédures au
-  moyen des régions}, Rapport interne EMP-CAII-I132, juin 1990
-
-\bibitem{Pla95a} A. Platonoff, {\em Contribution à la Distribution
-  Automatique des Données pour Machines Massivement Parallèles},
-  Thèse de doctorat de l'université Pierre et Marie Curie, 9 mars
-  1995.
-
-\bibitem{Pla95b} A. Platonoff, Automatic Data Distribution for Massively
-  Parallel Computers, in {\em 5th International Workshop on Compilers for
-  Parallel Computers}, Malaga, Spain, June 1995.
-
-% Tri84
-  \bibitem{Tri84} R. Triolet,
-{\em Contribution à la parallélisation automatique de programmes
-Fortran comportant des appels de procédure},
-Thèse de docteur-ingénieur, Université Pierre et Marie Curie,
-décembre 1984
-
-  \bibitem{TIF86} R. Triolet, F. Irigoin, P. Feautrier,
-{\em Direct Parallelization of Call Statements},
-ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
-Alto, June 23-27, 1986
-
-% Yan93
-  \bibitem{Yan93} Y. Yang,
-{\em Tests des dépendances et transformations de programme},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
-15 Novembre 1993, rapport A/242.
-
-% Zho94
-  \bibitem{Zho94} L. Zhou,
-{\em Analyse
-statique et dynamique de la complexité des programmes
-scientifiques},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
-14 Septembre 1994, technical report A/255.
-
-% GFL00
-  \bibitem{GFL00} Martin Griebl, Paul Feautrier and Christian Lengauer
-{\em Index Set Splitting},
-International Journal of Parallel Programming, 2000.
-
-\end{thebibliography}
+\bibliography{../pips.bib}
 
 \newpage
 
