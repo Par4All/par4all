@@ -9757,7 +9757,7 @@ FALSE when computing effects needed by this pass.
 %-----------End of Expression Transformations -------------------------
 
 
-\section{Function Level transformations}
+\section{Function Level Transformations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INLINING
 
@@ -9850,7 +9850,8 @@ INLINING_CALLERS ""
   If you run it recursievly, you should set \PipsPropRef{INLINING_USE_INITIALIZATION_LIST} to false.
 \end{PipsPass}
 
-\textbf{Only for C because of pipsmake output declaration !}
+\textbf{Only for C because of output declaration in pipsmake rule!}
+
 \begin{PipsMake}
 unfolding      > MODULE.c_source_file
                > MODULE.callees
@@ -9867,10 +9868,11 @@ unfolding      > MODULE.c_source_file
 
 \begin{PipsPass}{unfolding_simple}
 Same as unfolding, but cumulated effects are not used, and the
-resulting code always simulates the by-copy argument passing:
+resulting code always simulates the by-copy argument passing.
 \end{PipsPass}
 
-\textbf{Only for C because of pipsmake output declaration !}
+\textbf{Only for C because of output declaration in pipsmake rule!}
+
 \begin{PipsMake}
 unfolding_simple      > MODULE.c_source_file
                       > MODULE.callees
@@ -9884,7 +9886,7 @@ unfolding_simple      > MODULE.c_source_file
 		* ALL.remove_useless_label
 \end{PipsMake}
 
-Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which modules
+Use \PipsPropRef{UNFOLDING_CALLEES}, to specify which modules
 you want to inline in the unfolded module. The unfolding will be
 performed as long as one of the module in
 \PipsPropRef{UNFOLDING_CALLEES} is called. More than one module can
@@ -9893,36 +9895,41 @@ be specified, they are separated by blank spaces.
 UNFOLDING_CALLEES ""
 \end{PipsProp}
 
-The default behavior of unfolding is to recursively inline all callees
-from given module, as long as a callee remains. Use
+The default behavior of the \PipsPassRef{unfolding} pass is to recursively inline all callees
+from the current module or from the argument modules of the pass, as long as a
+callee remains. You can use
 \PipsPropRef{UNFOLDING_FILTER} to inline all call sites to a module
 not present in the space
-separated module list defined by the property:
+separated module list defined by the string property:
 \begin{PipsProp}{UNFOLDING_FILTER}
 UNFOLDING_FILTER ""
 \end{PipsProp}
-
+By default this list is empty and hence all call sites are inlined.
 
 \subsection{Outlining}
 \label{subsection-outlining}
 
 \begin{PipsPass}{outline}
-This documentation is a work in progress, as well as the documented topic.
+This documentation is a work in progress, as well as the documented
+topic\marginpar{Serge? Still ture? What do you mean?}.
 
 
 Outlining is the opposite transformation of \PipsPassRef{inlining}.
-It creates a new module based on some statements from an existing module.
-The new module body is similar to the piece of code outlined from the existing modules.
-The old statements are replaced by a call to the new module.
-The user will be prompted for various question in order to perform the outlining
+It replaces some statements in an
+existing module by a call site to a new function whose execution is
+equivalent to the execution of the replaced statements.
+The body of the new function is similar to the piece of code replaced in the existing module.
+The user is prompted for various pieces of information in order to perform the outlining:
 \begin{itemize}
-    \item new module name
-    \item statement number of the first outlined statement
-    \item number of statement to outline
+    \item a new module name,
+    \item the statement number of the first outlined statement,
+    \item number of statements to outline.
 \end{itemize}
-
+The statements are a subset of a sequence. They are counted in the
+sequence\marginpar{Serge: I invent...(FI)}.
 
 \end{PipsPass}
+
 \begin{PipsMake}
 
 outline      > MODULE.code
@@ -9934,25 +9941,35 @@ outline      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used if you want to limit the amount of entities passed
-through reference calls.
-With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]| entity, without it it is passed as an \lstinline|int| or  \lstinline|int*| depending on the read/write effect.
-If you want to pass the upper bound expression of a particular loop as a parameter (used in Ter@pix code generation),
-set \PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
+The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used
+to limit the number of entities passed by reference.
+With it, \lstinline|a[0][0]| is passed as an
+\lstinline|a[n][m]| entity, without it it is passed as an
+\lstinline|int| or \lstinline|int*| depending on the read/write
+effect. 
 
-The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
-the user is prompted if not set.
-But first the pass scans the code for any statement flagged with the pragma defined in
+If you want to pass the upper bound expression of a particular loop as
+a parameter, which is used in Ter@pix code generation, set
+\PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
+
+The property \PipsPropRef{OUTLINE_MODULE_NAME} is used to specify the new module
+name, and the user is prompted if it not set.  
+
+But first the pass scans
+the code for any statement flagged with the pragma defined in
 \PipsPropRef{OUTLINE_PRAGMA}.
 
-If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the statement to
-outline.
+If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the
+statement to outline.
 
 The property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
-variables which initial values are not used are passed as parameters or
-not. Normally, this should be addressed by a previous privatization.
+variables whose initial values are not used are passed as parameters or
+not. Normally, this should be addressed by a previous privatization pass.
 
-Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT} make it possible to outline into a newly created compilation unit, adding all necessary types to this new compilation unit, named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
+Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
+make it possible to outline into a newly created compilation unit,
+adding all necessary types to this new compilation unit, named after
+the \PipsPropRef{OUTLINE_MODULE_NAME}.
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
