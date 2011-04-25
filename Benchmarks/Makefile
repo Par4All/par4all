@@ -1,7 +1,10 @@
 # $Id$
 
-include ../validate.mk
+# run validation in parallel
+PARALLEL_VALIDATION	= 1
 
-clean: local-clean
-local-clean:
-	$(RM) stap_bench_trans PlotsOut.txt
+# explicit list of recursion directories
+override D.sub	= $(wildcard *.sub) TSVC
+
+include ../validate.mk
+include counts.mk
