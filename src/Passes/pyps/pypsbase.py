@@ -18,8 +18,6 @@ import inspect
 
 pypips.atinit()
 
-pipsdef_h = os.path.basename(pypsutils.get_runtimefile("pipsdef.h","pypsbase"))
-
 class Maker(object):
 	''' Makefile generator '''
 
@@ -629,9 +627,9 @@ class workspace(object):
 				headersbasename)
 		
 		for f in saved:
-			pypsutils.addBeginnning(f, '#include "'+pipsdef_h+'"\n')
-		shutil.copy(pypsutils.get_runtimefile(pipsdef_h),rep)
-		return saved,headers+[os.path.join(rep,pipsdef_h)]
+			pypsutils.addBeginnning(f, '#include "pipsdef.h"\n')
+		shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
+		return saved,headers+[os.path.join(rep,"pipsdef.h")]
 
 	def make(self, rep=None, maker=Maker()):
 		if rep == None:
