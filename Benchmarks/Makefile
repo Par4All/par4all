@@ -7,4 +7,4 @@ PARALLEL_VALIDATION	= 1
 override D.sub	= $(wildcard *.sub) TSVC
 
 include ../validate.mk
-include counts.mk
+#include counts.mk

@@ -92,6 +92,7 @@ apply PRINT_PARALLELIZED77_CODE[$modules]
 close
 
 # Count the number of parallel loops in every module (FI: $modules should be used instead of *)
+# Because of loop distribution, the total number of parallel loops is not significant; to be improved
 
 shell (cd tsvc.database; for i in *; do echo -n "";if test $i = Warnings -o $i = Logfile -o $i = Tmp -o $i = Program -o $i = Src -o $i = Metadata -o $i = NINDEX; then echo -n "" ; else echo $i " " `grep -i doall $i/$i.par.f| wc -l` ; fi; done; echo; echo Total number of parallel loops `cat */*.par.f| grep -i  doall | wc -l`)
 
