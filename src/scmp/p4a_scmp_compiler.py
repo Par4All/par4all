@@ -91,7 +91,7 @@ class p4a_scmp_compiler(p4a_processor):
                 continue
             (dir, name) = os.path.split(file)
             # Where the file is in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), "Src", name)
+            pips_file = os.path.join(self.workspace.dirname, "Src", name)
 
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
@@ -135,7 +135,7 @@ class p4a_scmp_compiler(p4a_processor):
 
     def save_scmp_buffers_file(self):
         # Where the file is in the .database workspace:
-        pips_file = os.path.join(self.workspace.dirname(), "main", "main_buffers.h")
+        pips_file = os.path.join(self.workspace.dirname, "main", "main_buffers.h")
 
         # where we have to place it
         dir = os.path.join(self.scmp_applis_dir_name, p4a_scmp_compiler.scmp_applis_processing_dir_name, self.project_name)
@@ -146,7 +146,7 @@ class p4a_scmp_compiler(p4a_processor):
 
     def recover_server_tasks(self):
         # Where the file is in the .database workspace:
-        pips_file = os.path.join(self.workspace.dirname(), "main", "main.servers")
+        pips_file = os.path.join(self.workspace.dirname, "main", "main.servers")
 
         with open(pips_file, "r") as f:
             ch = f.read()
