@@ -9911,7 +9911,7 @@ By default this list is empty and hence all call sites are inlined.
 
 \begin{PipsPass}{outline}
 This documentation is a work in progress, as well as the documented
-topic\marginpar{Serge? Still ture? What do you mean?}.
+topic\marginpar{Serge? Still true? What do you mean?}.
 
 
 Outlining is the opposite transformation of \PipsPassRef{inlining}.
@@ -9945,31 +9945,40 @@ The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used
 to limit the number of entities passed by reference.
 With it, \lstinline|a[0][0]| is passed as an
 \lstinline|a[n][m]| entity, without it it is passed as an
-\lstinline|int| or \lstinline|int*| depending on the read/write
-effect. 
+\lstinline|int| or \lstinline|int*| depending on the cumulated read/write memory
+effects of the outlined statements\marginpar{Serge: but cumulated
+  effects are always required?}.
 
-If you want to pass the upper bound expression of a particular loop as
-a parameter, which is used in Ter@pix code generation, set
-\PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
+If you need to pass the upper bound expression of a particular loop as
+a parameter, which is used in Ter@pix code generation (see Section~???), set
+\PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop
+label\marginpar{Serge: a few words of motivation?}.
 
 The property \PipsPropRef{OUTLINE_MODULE_NAME} is used to specify the new module
-name, and the user is prompted if it not set.  
+name. The user is prompted if it is set to its default value, the
+empty string.  
 
-But first the pass scans
-the code for any statement flagged with the pragma defined in
-\PipsPropRef{OUTLINE_PRAGMA}.
+But first the pass scans\marginpar{Serge: unconditionally?}
+the code for any statement flagged with the pragma defined by the
+string property \PipsPropRef{OUTLINE_PRAGMA}\marginpar{Serge: What
+  happens when it is set to the empty strin?}.
 
-If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the
-statement to outline.
+If set, the string property \PipsPropRef{OUTLINE_LABEL} is used to
+choose the statement\marginpar{Serge: you outline a set of statements;
+is it reduced to a singleton in that case?} to outline.
 
-The property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
+The boolean property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
 variables whose initial values are not used are passed as parameters or
-not. Normally, this should be addressed by a previous privatization pass.
+not\marginpar{Serge: why is it called ``globals''? It seems that this
+  makes sense for any local variable...}. It is suggested to addressed this issue with a previous privatization pass.
 
-Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
-make it possible to outline into a newly created compilation unit,
-adding all necessary types to this new compilation unit, named after
-the \PipsPropRef{OUTLINE_MODULE_NAME}.
+Finally, the boolean property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
+can be set to true to outline the new module into a newly created
+compilation unit. It is named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
+All necessary types, global variables and functions\marginpar{Serge?}
+are declared into this new compilation unit\marginpar{Serge: Consistency
+  betweeen properties? Name conflicts?}.
+
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
