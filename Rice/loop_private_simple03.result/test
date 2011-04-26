@@ -25,7 +25,7 @@ int main()
    float a[10];
    int i;
 
-   for(i = 0; i <= 9; i += 1) {
+   forall(i = 0; i <= 9; i += 1) {
       float z;
       z = 0.0;
       a[i] = z;
