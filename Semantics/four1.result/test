@@ -1,5 +1,211 @@
 --- Preconditions for module FOUR1
 
+C  T() {}
+
+C     Bug (?): the index  I for loop 12 was not constrained by the loop bounds because
+C     of the symbolic increment. This was changed because the precondition implies that
+C     ISTEP is positive here.
+
+*****|******************************************************************|
+      SUBROUTINE FOUR1(DATA,N,IX)
+*****|******************************************************************|
+*     Replaces DATA by its discrete Fourier transform
+*     IX      : >0 Fourier Analysis
+*               <0 Fourier Synthesis
+*     DATA    : Complex array of length N.
+*               N must be an integer power of 2 (non verifie)
+*-----------------------------------------------------------------------|
+      INTEGER  N,IX
+      REAL DATA(2*N)
+*
+      INTEGER  I,J,IXX,NN,M,MMAX,ISTEP
+      REAL     TEMPI,TEMPR
+      DOUBLE PRECISION WR,WI,WPR,WPI,WTEMP,THETA
+
+C  T(IXX) {}
+
+*-----------------------------------------------------------------------|
+      IXX = ISIGN(1, IX)                                                0021
+
+C  T(NN) {2N==NN}
+
+      NN = 2*N                                                          0022
+
+C  T(J) {J==1}
+
+*
+*     Bit reversal
+*     ------------
+      J = 1                                                             0026
+
+C  T(I,J,M) {1<=I}
+
+      DO 11 I = 1, NN, 2                                                0027
+
+C  T() {}
+
+         IF (J.GT.I) THEN                                               0028
+
+C  T() {}
+
+            TEMPR = DATA(J)                                             0029
+
+C  T() {}
+
+            TEMPI = DATA(J+1)                                           0030
+
+C  T() {}
+
+            DATA(J) = DATA(I)                                           0031
+
+C  T() {}
+
+            DATA(J+1) = DATA(I+1)                                       0032
+
+C  T() {}
+
+            DATA(I) = TEMPR                                             0033
+
+C  T() {}
+
+            DATA(I+1) = TEMPI                                           0034
+         ENDIF
+
+C  T(M) {NN<=2M+1, 2M<=NN}
+
+         M = NN/2                                                       0036
+
+C  T() {}
+
+1        IF (M.GE.2.AND.J.GT.M) THEN                                    0037
+         ELSE
+            GOTO 99999
+         ENDIF
+
+C  T(J) {J+M==J#init}
+
+         J = J-M                                                        0038
+
+C  T(M) {M#init<=2M+1, 2M<=M#init}
+
+         M = M/2                                                        0039
+         GOTO 1
+99999    CONTINUE
+
+C  T(J) {J#init+M==J}
+
+         J = J+M                                                        0042
+
+C  T() {}
+
+11       CONTINUE                                                       0043
+
+C  T(MMAX) {MMAX==2}
+
+*
+*     Danielson-Lanczos algorithm
+*     ---------------------------
+      MMAX = 2                                                          0047
+
+C  T() {}
+
+2     IF (NN.GT.MMAX) THEN                                              0048
+      ELSE
+         RETURN
+      ENDIF
+
+C  T(I,ISTEP,J,M,MMAX) {MMAX#init<=MMAX}
+
+      IF (NN.GT.MMAX.AND.MMAX.GE.2) THEN                                0049
+
+C  T(ISTEP) {ISTEP==2MMAX}
+
+         ISTEP = 2*MMAX                                                 0050
+
+C  T() {}
+
+         THETA = 6.28318530717959D0/(IXX*MMAX)                          0051
+
+C  T() {}
+
+         WPR = -2.D0*DSIN(0.5D0*THETA)**2                               0052
+
+C  T() {}
+
+         WPI = DSIN(THETA)                                              0053
+
+C  T() {}
+
+         WR = 1.D0                                                      0054
+
+C  T() {}
+
+         WI = 0.D0                                                      0055
+
+C  T(I,J,M) {1<=M}
+
+         DO 13 M = 1, MMAX, 2                                           0056
+
+C  T(I,J) {}
+
+            DO 12 I = M, NN, ISTEP                                      0057
+
+C  T(J) {I+MMAX==J}
+
+               J = I+MMAX                                               0058
+
+C  T() {}
+
+               TEMPR = SNGL(WR)*DATA(J)-SNGL(WI)*DATA(J+1)              0059
+
+C  T() {}
+
+               TEMPI = SNGL(WR)*DATA(J+1)+SNGL(WI)*DATA(J)              0060
+
+C  T() {}
+
+               DATA(J) = DATA(I)-TEMPR                                  0061
+
+C  T() {}
+
+               DATA(J+1) = DATA(I+1)-TEMPI                              0062
+
+C  T() {}
+
+               DATA(I) = DATA(I)+TEMPR                                  0063
+
+C  T() {}
+
+               DATA(I+1) = DATA(I+1)+TEMPI                              0064
+
+C  T() {}
+
+12             CONTINUE                                                 0065
+
+C  T() {}
+
+            WTEMP = WR                                                  0066
+
+C  T() {}
+
+            WR = WR*WPR-WI*WPI+WR                                       0067
+
+C  T() {}
+
+            WI = WI*WPR+WTEMP*WPI+WI                                    0068
+
+C  T() {}
+
+13          CONTINUE                                                    0069
+
+C  T(MMAX) {ISTEP==MMAX}
+
+         MMAX = ISTEP                                                   0070
+      ENDIF
+      GOTO 2
+*
+      END
+
 C  P() {}
 
 C     Bug (?): the index  I for loop 12 was not constrained by the loop bounds because
