@@ -101,6 +101,8 @@
 /********************************************************** static variables */
 extern bool tpips_execution_mode;
 
+
+static string pips_cpp_flags = "";
 static string default_props = "";
 static string loop_label= "tpips2pyps undefined label";
 
@@ -176,7 +178,11 @@ static void perform( string action, bool res_as_action_p, res_or_rule * res) {
 }
 
 static void print_putenv(string key, string value){
-  printf("os.environ['''%s''']='''%s'''" JUMPL,key, value);
+  if(strcmp(key,"PIPS_CPP_FLAGS")==0) {
+    pips_cpp_flags = strdup(value);
+  } else {
+    printf("os.environ['''%s''']='''%s'''" JUMPL,key, value);
+  }
 }
 
 
@@ -419,7 +425,14 @@ i_create: TK_CREATE workspace_name /* workspace name */
       string filename = gen_array_item( files, i );
       printf("\"%s\",",filename);
     }
+
+    if(pips_cpp_flags[0]!='\0') {
+      printf("cppflags=\'\'\'%s\'\'\',",pips_cpp_flags);
+    }
+
+
     printf("name=\"%s\")" JUMPL, $2);
+
 		gen_array_full_free($3);
 		workspace_exist_p = true;
 
