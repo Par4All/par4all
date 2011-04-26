@@ -112,7 +112,7 @@ SHELL	= /bin/bash
 EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
 	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0
 
-# setup run
+# setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
 	  set -o pipefail ; unset CDPATH ; \
@@ -181,7 +181,7 @@ sequential-validate-dir:
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
 endif
 
-# how to summarize results
+# how to summarize results to a human
 SUMUP	= pips_validation_summary.pl
 
 # on local validations, sort result & show summary
@@ -250,7 +250,7 @@ generate-result: $(F.future_result)
 # python scripts
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.py
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # else we have pyps
 %.result/$(TEST): %.py
 	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
@@ -293,13 +293,13 @@ PYTHON	= python
 DEFPYPS	= default_pyps
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.c $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.result/$(TEST): %.f $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.result/$(TEST): %.F $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # with pyps
 %.result/$(TEST): %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
@@ -314,7 +314,7 @@ else # with pyps
 	2> $*.err | $(FLT) > $@ ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
 
-# bug & later handling
+# bug & later (future) handling
 .PHONY: bug-list
 ifdef DO_BUG
 bug-list:
