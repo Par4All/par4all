@@ -30,13 +30,13 @@ close
 
 # Count the number of parallel loops in every module
 
-shell (cd tsvc.database; for i in *; do echo -n "";if test $i = Warnings -o $i = Logfile -o $i = Tmp -o $i = Program -o $i = Src -o $i = Metadata -o $i = NINDEX; then echo -n "" ; else echo $i " " `grep -i doall $i/$i.par.f| wc -l` ; fi; done; echo; echo Total number of parallel loops `cat */*.par.f| grep -i doall|wc -l`)
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f | wc -l` ;done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/faa
 
 # Special cases that do not parallelize with default options
-# S123: inductionvariable recognition
-# S124: inductionvariable recognition
-# S151S: inductionvariable recognition
-# S161: restructure control; coarse grain
+# S123: conditional induction variable recognition; use transformer in dependence test, but that will not be enough 
+# S124: induction variable recognition: messed up by non affine upper bound (!)
+# S151S: induction variable recognition
+# S161: restructure control; coarse grain does not work because it is vectorizable not parallelizable with C(I+1) and C(I)
 # S152S: no loop in this module
 # S161: no loop in this module
 # S162: vector loop is not parallel
@@ -94,7 +94,7 @@ close
 # Count the number of parallel loops in every module (FI: $modules should be used instead of *)
 # Because of loop distribution, the total number of parallel loops is not significant; to be improved
 
-shell (cd tsvc.database; for i in *; do echo -n "";if test $i = Warnings -o $i = Logfile -o $i = Tmp -o $i = Program -o $i = Src -o $i = Metadata -o $i = NINDEX; then echo -n "" ; else echo $i " " `grep -i doall $i/$i.par.f| wc -l` ; fi; done; echo; echo Total number of parallel loops `cat */*.par.f| grep -i  doall | wc -l`)
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f  | wc -l` ; done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/fbb
 
 open tsvc
 
@@ -106,7 +106,8 @@ close
 
 # Count the number of parallel loops in every module
 
-shell (cd tsvc.database; for i in *; do echo -n "";if test $i = Warnings -o $i = Logfile -o $i = Tmp -o $i = Program -o $i = Src -o $i = Metadata -o $i = NINDEX; then echo -n "" ; else echo $i " " `grep -i doall $i/$i.par.f| wc -l` ; fi; done; echo; echo Total number of parallel loops `cat */*.par.f| grep -i  doall | wc -l`)
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f | wc -l` ; done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/fcc
 
+shell (cd tsvc.database/Tmp; join faa fbb | join - fcc)
 
 quit
