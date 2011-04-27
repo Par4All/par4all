@@ -121,7 +121,7 @@ void display(town pt[rangex][rangey])
 
 int main(int argc, char * argv[])
 {
-    if(argc != 8) return 1;
+  if(argc != 8) return 1;
     {
 	town pt[rangex][rangey];
         towns t = read_towns(argv[1]);
