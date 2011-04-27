@@ -276,7 +276,7 @@ if ($n{passed} == $count)
 }
 else
 {
-  print "FAILED $not_passed/$count " .
+  print "ISSUES $not_passed/$count " .
         "($n{failed}+$n{changed}+$n{timeout}|" .
 	"$n{keptout}+$n{bug}+$n{later}+$n{slow})$status_changes $delay\n";
 }
