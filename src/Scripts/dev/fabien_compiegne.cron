@@ -3,7 +3,7 @@
 # Debian Lenny x86_64
 #
 # check on commit runs on every minute
-* * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh --validation-option DO_SLOW= pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
+* * * * * /home/fabien/CHECK/pips_check_compile --source /home/fabien/CHECK/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # force check once a day
 7 0 * * * /home/fabien/CHECK/pips_check_compile --wait --force --report --source /home/fabien/CHECK/pipsrc.sh pips-validation@cri.ensmp.fr /home/fabien/CHECK/prod /home/fabien/CHECK/validation
 # test autoconf version
