@@ -1,0 +1,7 @@
+error caught
+error caught
+properties3!
+void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3]);
+void convol(int n, int a[n][n], int b[n][n], int kernel[3][3]);
+no
+yes

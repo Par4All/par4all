@@ -2,13 +2,13 @@ from __future__ import with_statement # this is to work with python2.5
 #!/usr/bin/env python
 
 # import everything so that a session looks like tpips one
-from pyps import workspace
+from workspace_check import workspace
 import shutil,os
 
 
 # a worspace ID is automagically created ... may be not a good feature
 # the with statements ensure correct code cleaning
-with workspace("basics0.c",deleteOnClose=True) as w:
+with workspace("check.c",deleteOnClose=True) as w:
 
 	# you can get module object from the modules table
 	foo=w.fun.foo

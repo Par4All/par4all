@@ -1,0 +1,28 @@
+basics3
+basics3.database
+basics3.database/Tmp
+main
+basics3!
+main
+yes
+int main()
+{
+   puts("goodbye\n");
+   return 0;
+}
+int main()
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   puts("h""e""l""l""o""\n");
+   
+   
+   return 0;
+}

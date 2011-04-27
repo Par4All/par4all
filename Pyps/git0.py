@@ -1,8 +1,11 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace, module
+from pyps import module
+from workspace_git import workspace
 from os import system
 
-with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
+workspace.delete("git0")
+with workspace("silber.c","include/adds.c",
+        verbose=False,deleteOnClose=False,name="git0" ) as w:
 	# print out all functions
 	w.all_functions.display()
 	a_out=w.compile()

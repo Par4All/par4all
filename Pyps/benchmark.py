@@ -6,7 +6,6 @@ workspace.delete('benchmark')
 with bworkspace('benchmark.c',name='benchmark',deleteOnClose=False) as ws:
 	ws.fun.run.benchmark_module()
 	ws.fun.run.display()
-	ws.make()
 	a=ws.benchmark(iterations=10,args=["200000"])["run"]
 
 

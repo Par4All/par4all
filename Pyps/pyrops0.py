@@ -29,7 +29,7 @@ with pworkspace("basics0.c",deleteOnClose=True) as w:
 	bar.print_code()
 	
 	# you can also preform operations on loops
-	mb.display("loops_file")
+	mb.display(rc="loops_file")
 	for l in mb.loops():
 	    l.unroll(rate=2)
 	mb.display()
@@ -54,8 +54,7 @@ with pworkspace("basics0.c",deleteOnClose=True) as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	w.make()
-	(a_out,a,v,d)=w.compile()
+	a_out=w.compile()
 
 
 pyrops.Launcher.shutdown()
