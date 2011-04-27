@@ -373,7 +373,7 @@ bool simd_atomizer(char * mod_name)
     return TRUE;
 }
 
-static void do_expression_reduction(statement s, reduction r, expression e) {
+static bool do_expression_reduction(statement s, reduction r, expression e) {
     reference redref = reduction_reference(r);
     entity redop = reduction_operator_entity(reduction_op(r));
 
@@ -406,39 +406,41 @@ static void do_expression_reduction(statement s, reduction r, expression e) {
             insert_statement(s, snew, false);
             store_cumulated_reductions(STATEMENT(CAR(statement_block(s))),copy_reductions(load_cumulated_reductions(s)));
         }
+        return true;
       }
     }
+    return false;
 }
 
 
 static bool do_reduction_atomization(statement s) {
     list reductions = reductions_list(load_cumulated_reductions(s));
     if(!ENDP(reductions)) {
-      FOREACH(REDUCTION,r,reductions) {
-        /* the reduction must be of the pattern red = red op exp1 op exp2 */
-        reference redref = reduction_reference(r);
-        entity redop = reduction_operator_entity(reduction_op(r));
-        if(statement_call_p(s)) {
-          call c = statement_call(s);
-          entity assign = call_function(c);
-          if(ENTITY_ASSIGN_P(assign)) {
-            expression lhs = binary_call_lhs(c);
-            if(expression_reference_p(lhs)) {
-              reference  rlhs = expression_reference(lhs);
-              if(reference_equal_p(rlhs,redref)) {
-                expression rhs = binary_call_rhs(c);
-                do_expression_reduction(s, r, rhs);
-                update_expression_syntax(rhs, expression_syntax(
-                                        MakeBinaryCall(redop,
+        FOREACH(REDUCTION,r,reductions) {
+            /* the reduction must be of the pattern red = red op exp1 op exp2 */
+            reference redref = reduction_reference(r);
+            entity redop = reduction_operator_entity(reduction_op(r));
+            if(statement_call_p(s)) {
+                call c = statement_call(s);
+                entity assign = call_function(c);
+                if(ENTITY_ASSIGN_P(assign)) {
+                    expression lhs = binary_call_lhs(c);
+                    if(expression_reference_p(lhs)) {
+                        reference  rlhs = expression_reference(lhs);
+                        if(reference_equal_p(rlhs,redref)) {
+                            expression rhs = binary_call_rhs(c);
+                            if(do_expression_reduction(s, r, rhs))
+                                update_expression_syntax(rhs, expression_syntax(
+                                            MakeBinaryCall(redop,
                                                 reference_to_expression(copy_reference(redref)),
                                                 copy_expression(rhs))));
-              }
+                        }
+                    }
+                }
             }
         }
-      }
     }
-  }
-  return true;
+    return true;
 }
 
 bool reduction_atomization(const char * module_name) {
