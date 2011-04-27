@@ -288,25 +288,25 @@ Variable v;
 
 /* this function returns the system resulting of the successive  integer
  * projection of the system sc along all the variables contain in vecteur pv
- */ 
-
+ */
 Psysteme sc_integer_projection_along_variables
-  (fsc,sc,index_base,pv,tab_info,dim,n)
-Psysteme fsc,sc;
-Pbase index_base;
-Pvecteur pv;
-int tab_info[][3],dim,n;
+  (Psysteme fsc,
+   Psysteme sc,
+   Pbase index_base,
+   Pvecteur pv,
+   int tab_info[][4],
+   int dim,
+   int n)
 {
-    Pvecteur pv1;
+  Pvecteur pv1;
 
-    for (pv1 = pv;!VECTEUR_NUL_P(pv1); pv1=pv1->succ) {
-
+  for (pv1 = pv;!VECTEUR_NUL_P(pv1); pv1=pv1->succ)
+  {
   	sc = sc_integer_projection_along_variable(fsc,sc,vecteur_var(pv1));
-	sc= sc_normalize(sc);
-	sc_integer_projection_information(sc,index_base,tab_info,dim,n);
-	sc=build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
-    }
-    return(sc);
+    sc = sc_normalize(sc);
+    sc_integer_projection_information(sc,index_base,tab_info,dim,n);
+    sc = build_integer_sc_nredund(sc,index_base,tab_info,dim,dim,n);
+  }
+  return sc;
 }
-
 
