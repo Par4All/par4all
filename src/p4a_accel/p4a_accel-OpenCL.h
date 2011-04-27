@@ -295,7 +295,7 @@ extern cl_command_queue p4a_queue;
 			      &p4a_global_error);			\
   P4A_test_execution_with_message("clCreateContext");			\
   /* ... could query many device, we retain only the first one */	\
-  /* Create a file allocated to the first device ...   */		\
+  /* Create a file allocated to the first device ...   */               \
   p4a_queue=clCreateCommandQueue(p4a_context,p4a_device_id,		\
 				 p4a_queue_properties,			\
 				 &p4a_global_error);			\
@@ -799,17 +799,24 @@ struct p4a_cl_kernel {
 
 extern std::map<std::string, struct p4a_cl_kernel * > p4a_kernels_map ;
 #else
+/* To avoid some issue with memory allocation ??? */
+/* Static allocation in place of dynamic */
+#define MAX_CAR 50
+#define MAX_K 20
+
 struct p4a_cl_kernel {
   cl_kernel kernel;
-  char *name;
-  char *file_name;
+  char name[MAX_CAR];
+  //char *file_name;
+  char file_name[MAX_CAR];
   struct p4a_cl_kernel *next;
   //The constructor new_p4a_kernel is defined in the p4a_accel.c file
 };
 
 /** In C, pointer to the first element of the kernel list
  */
-extern struct p4a_cl_kernel *p4a_kernels;
+//extern struct p4a_cl_kernel *p4a_kernels;
+extern struct p4a_cl_kernel p4a_kernels_list[MAX_K];
 struct p4a_cl_kernel* new_p4a_kernel(const char *kernel);
 struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel);
 #endif

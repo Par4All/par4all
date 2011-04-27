@@ -1006,8 +1006,8 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         if (self.fortran == False):
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
+            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
             wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
             kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
         else:
@@ -1028,7 +1028,7 @@ class p4a_processor(object):
         # from the post-process
         for launcher in kernel_launchers:
             # self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "char * " + self.launcher_to_wrapper_name (launcher.name))
-            self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration")
+            self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")
         
         # save the list of kernels for later work
         # for example, retrieving the kernel files when saving

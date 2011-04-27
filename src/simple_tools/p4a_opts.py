@@ -20,9 +20,6 @@ Par4All common option parsing and report email generation routines
 '''
 
 
-
-
-
 # A copy of the program options as parsed with optparse:
 static_options = None
 

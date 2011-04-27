@@ -121,6 +121,15 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = f.read()
     f.close()
 
+    # size_t is not a standard in OpenCL ...
+    # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
+    # compiler does not accept variable types that are
+    # implementation-dependent.
+    if (p4a_util.opencl_file_p(file_base_name)):
+        content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
+        content = re.sub("size_t","unsigned long int",content)
+        # content = re.sub("size_t","cl_ulong",content)
+
     header = ""
     # Inject P4A accel header definitions except in opencl files:
     if (not p4a_util.opencl_file_p(file_base_name)):
@@ -133,6 +142,7 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
 
     for include in includes:
         header += '#include "' + include + '"\n'
+
     content = header + content
 
     # Clean-up headers and inject standard headers:
@@ -143,10 +153,21 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
 
+    # Opencl pointers and array variable must be explicitely declared
+    # in the global memory space
     if (p4a_util.opencl_file_p(file_base_name)):
+        # any (... * ..., substituted by (P4A_accel_global_address ... * ...,
         content = re.sub("\s*\(\s*(\w*)\s*\*\s*(\w*)\,","(P4A_accel_global_address \\1 *\\2,", content)
+        # any ,... * ..., substituted by ,P4A_accel_global_address ... * ...,
         content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\,",",P4A_accel_global_address \\1 *\\2,", content)
+        # any ,... * ...) substituted by ,P4A_accel_global_address ... * ...,
         content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\)",",P4A_accel_global_address \\1 *\\2)", content)
+        # ,...  ...[...], substituted by ,P4A_accel_global_address ... * ...[...],
+        content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,",",P4A_accel_global_address \\1 \\2[\\3],", content)
+        # (...  ...[...], substituted by (P4A_accel_global_address ... * ...[...],
+        content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
+        # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
+        content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
 
     # This patch is a temporary solution. It may not cover all possible cases
     # I guess all this should be done by applying partial_eval in PIPS ?

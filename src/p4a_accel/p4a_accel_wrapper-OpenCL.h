@@ -83,6 +83,13 @@ code that performs writes that may not be supported.
 */
 #pragma OPENCL EXTENSION cl_khr_byte_addressable_store : enable 
 
+/* size_t is not a standard in OpenCL ...
+   size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
+   compiler does not accept variable types that are
+   implementation-dependent.
+ */
+//#define size_t unsigned int
+
 /**
    @}
 */

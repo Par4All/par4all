@@ -1078,9 +1078,7 @@ char * p4a_error_to_string(int error)
     }
 } 
 
-/** @author : Stéphanie Even
-
-    To quit properly OpenCL.
+/** To quit properly OpenCL.
  */
 void p4a_clean(int exitCode)
 {
@@ -1189,9 +1187,11 @@ cl_kernel p4a_kernel = NULL;
 #ifdef __cplusplus
 std::map<std::string,struct p4a_cl_kernel *> p4a_kernels_map;
 #else
-struct p4a_cl_kernel *p4a_kernels=NULL;
+//struct p4a_cl_kernel *p4a_kernels=NULL;
 // Only used when creating the kernel list
-struct p4a_cl_kernel *last_kernel=NULL;
+//struct p4a_cl_kernel *last_kernel=NULL;
+
+struct p4a_cl_kernel p4a_kernels_list[MAX_K];
 
 
 /** @addtogroup P4A_call_parameters Parameters invocation.
@@ -1202,7 +1202,7 @@ struct p4a_cl_kernel *last_kernel=NULL;
 */
 void p4a_setArguments(int i,char *s,size_t size,void * ref_arg) 
 {
-  //printf("Argument %d : size = %u\n",i,size);
+  //fprintf(stderr,"Argument %d : size = %u\n",i,size);
   p4a_global_error = clSetKernelArg(p4a_kernel,i,size,ref_arg);
   P4A_test_execution_with_message("clSetKernelArg");
 }
@@ -1210,51 +1210,44 @@ void p4a_setArguments(int i,char *s,size_t size,void * ref_arg)
     @}
 */
 
-/** @author : Stéphanie Even
-
-    Creation of a new kernel, initialisation and insertion in the kernel list.
+/** Creation of a new kernel, initialisation and insertion in the kernel list.
  */
-struct p4a_cl_kernel* new_p4a_kernel(const char *kernel)
+struct p4a_cl_kernel *new_p4a_kernel(const char *kernel)
 {
-  struct p4a_cl_kernel *new_kernel = (struct p4a_cl_kernel *)malloc(sizeof(struct p4a_cl_kernel));
-
-  if (p4a_kernels == NULL) {
-    last_kernel = p4a_kernels = new_kernel;
+  if (nKernel >= MAX_K) {
+    printf("Over max kernel number: %d\n",MAX_K);
+    exit(EXIT_FAILURE);
   }
-  else {
-    last_kernel->next = new_kernel;
-    last_kernel = new_kernel;
+  if (strlen(kernel) >= MAX_CAR-10) {
+    printf("Kernel name toolong: %d\n",MAX_CAR);
+    exit(EXIT_FAILURE);
   }
-  new_kernel->next = NULL;
-  new_kernel->name = (char *)strdup(kernel);
-  new_kernel->kernel = NULL;
+    
+  strcpy(p4a_kernels_list[nKernel].name,kernel);
+  p4a_kernels_list[nKernel].kernel = NULL;
   char* kernelFile;
   asprintf(&kernelFile,"./%s.cl",kernel);
-  new_kernel->file_name = (char *)strdup(kernelFile);
-  return new_kernel;
+  strcpy(p4a_kernels_list[nKernel].file_name,kernelFile);
 }
 
-/** @author : Stéphanie Even
-
-    Search if the <kernel> is already in the list.
+/** Search if the <kernel> is already in the list.
  */
 
 struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
 {
-  struct p4a_cl_kernel *kernel_in_the_list=p4a_kernels;
-  while (kernel_in_the_list != NULL) {
-    if (strcmp(kernel_in_the_list->name,kernel) == 0)
-      return kernel_in_the_list;
-    kernel_in_the_list = kernel_in_the_list->next;
+  int i = 0;
+  while (i < nKernel && strcmp(p4a_kernels_list[i].name,kernel) != 0) {
+    i++;
   }
-  return NULL;
+  if (i < nKernel)
+    return &p4a_kernels_list[i];
+  else
+    return NULL;
 }
 
 #endif //!__cplusplus
 
-/** @author : Stéphanie Even
-
-    When launching the kernel
+/** When launching the kernel
     - need to create the program from sources
     - select the kernel call within the program source
 
@@ -1274,6 +1267,7 @@ struct p4a_cl_kernel *p4a_search_current_kernel(const char *kernel)
 
 void p4a_load_kernel(const char *kernel,...)
 {
+    
 #if defined(P4A_PROFILING) || defined(P4A_TIMING)
   P4A_TIMING_fromHost = true;
 #endif
@@ -1285,30 +1279,32 @@ void p4a_load_kernel(const char *kernel,...)
 #else
   struct p4a_cl_kernel *k = p4a_search_current_kernel(kernel);
 #endif
+
   // If not found ...
   if (!k) {
     P4A_skip_debug(P4A_dump_message("The kernel %s is loaded for the first time\n",kernel));
-    nKernel++;
 
 #ifdef __cplusplus
     k = new p4a_cl_kernel(kernel);
     p4a_kernels_map[scpy] = k;
 #else
-    k = new_p4a_kernel(kernel);
+    new_p4a_kernel(kernel);
+    k = &p4a_kernels_list[nKernel];
 #endif
-
+    
+    nKernel++; 
     char* kernelFile =  k->file_name;
-    P4A_skip_debug(P4A_dump_message("Program and Kernel creation from %s\n",kernelFile));
-    size_t kernelLength;
+    P4A_skip_debug(P4A_dump_message("Program and Kernel creation from %s\n",kernel));
+    size_t kernelLength=0;
     const char *comment = "// This kernel was generated for P4A\n";
-    // Same design as the NVIDIA oclLoadProgSource
-    char* cSourceCL = p4a_load_prog_source(kernelFile,
+  // Same design as the NVIDIA oclLoadProgSource
+   char* cSourceCL = p4a_load_prog_source(kernelFile,
 					   comment,
 					   &kernelLength);
     if (cSourceCL == NULL)
       P4A_skip_debug(P4A_dump_message("source du program null\n"));
-    else
-      P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
+    //else
+    // P4A_skip_debug(P4A_dump_message("%s\n",cSourceCL));
       
     P4A_skip_debug(P4A_dump_message("Kernel length = %lu\n",kernelLength));
     
@@ -1326,7 +1322,7 @@ void p4a_load_kernel(const char *kernel,...)
     free(cSourceCL);
   }
   p4a_kernel = k->kernel;
-}
+ }
 
 /** @author : Stéphanie Even
 
