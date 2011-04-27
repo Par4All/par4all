@@ -12,10 +12,16 @@
 # relevant variables for the user:
 # - DO_BUG: also validate on cases tagged as "bugs"
 # - DO_LATER: idem with future "later" cases
+# - DO_SLOW: idem for lengthy to validate cases
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
 # example:
 #   sh> make DO_LATER=1 validate-test
+
+# what special cases are included
+DO_BUG	=
+DO_LATER=
+DO_SLOW	= 1
 
 # pips exes
 TPIPS	= tpips
@@ -110,7 +116,8 @@ SHELL	= /bin/bash
 
 # skip bugs & future cases
 EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
-	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0
+	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0 ; \
+	  [ ! "$(DO_SLOW)" -a -f $*.slow ] && exit 0
 
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
@@ -165,12 +172,12 @@ validate:
 .PHONY: validate-dir
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
-validate-dir: $(LOCAL_CLEAN) bug-list later-list
+validate-dir: $(LOCAL_CLEAN) bug-list later-list slow-list
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation, including subdir recursive forward
-validate-dir: $(LOCAL_CLEAN) bug-list later-list
+validate-dir: $(LOCAL_CLEAN) bug-list later-list slow-list
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) sequential-validate-dir
 	$(MAKE) sort-local-result
@@ -314,7 +321,7 @@ else # with pyps
 	2> $*.err | $(FLT) > $@ ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
 
-# bug & later (future) handling
+# bug & later (future) & slow handling
 .PHONY: bug-list
 ifdef DO_BUG
 bug-list:
@@ -336,6 +343,17 @@ later-list:
 	  echo "later: $(SUBDIR)/$${f%.*}" ; \
 	done >> $(RESULTS)
 endif # DO_LATER
+
+.PHONY: slow-list
+ifdef DO_SLOW
+slow-list:
+	@echo "# slow-list: nothing to do" >&2
+else # include slow list
+slow-list:
+	for f in $(wildcard *.slow) ; do \
+	  echo "slow: $(SUBDIR)/$${f%.*}" ; \
+	done >> $(RESULTS)
+endif # DO_SLOW
 
 # detect skipped stuff
 .PHONY: skipped
