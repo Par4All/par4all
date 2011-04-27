@@ -377,7 +377,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 
     if ( v1 != v2 ) {
       /* We do not bother with the offset and the array types in case
-       of static aliasing */
+	 of static aliasing */
       /* We do not bother with the abstract locations */
       conflict_p = TRUE;
     } else {
@@ -400,10 +400,18 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        */
       if ( !entity_abstract_location_p( reference_variable(r1) )
 	   && !entity_abstract_location_p( reference_variable(r2) ) ) {
-	type t1 = cell_reference_to_type( r1 );
-	type t2 = cell_reference_to_type( r2 );
 
-	conflict_p = type_equal_p( t1, t2 );
+	/* Are we dealing with NULL POINTER ? */
+	if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
+	  conflict_p = TRUE;
+	else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
+	  conflict_p = FALSE;
+	else{
+	  type t1 = cell_reference_to_type( r1 );
+	  type t2 = cell_reference_to_type( r2 );
+	  
+	  conflict_p = type_equal_p( t1, t2 );
+	}
       }
     }
 
@@ -417,6 +425,12 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 	conflict_p = FALSE;
       }
     }
+
+    /* Are we dealing with NULL POINTER ? */
+    if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
+      conflict_p = TRUE;
+    else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
+      conflict_p = FALSE;
 
     /* There still could be a conflict in C because the two references
        might point to the same memory location. It might be more
@@ -560,6 +574,9 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
   if ( entity_abstract_location_p( e1 ) )
     if ( entity_abstract_location_p( e2 ) )
       conflict_p = abstract_locations_conflict_p( e1, e2 );
+    else if ( entity_null_locations_p(e2) ) {
+      conflict_p = entity_all_locations_p(e1);
+    }
     else if ( entity_variable_p(e2) ) {
       if ( variable_return_p( e2 ) )
 	conflict_p = FALSE;
@@ -579,7 +596,10 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
     }
   else {
     if ( entity_abstract_location_p( e2 ) ) {
-      if ( entity_variable_p(e1) ) {
+      if ( entity_null_locations_p(e1)) {
+	conflict_p = entity_all_locations_p(e2);
+	}
+      else if ( entity_variable_p(e1) ) {
 	if ( variable_return_p( e1 ) )
 	  conflict_p = FALSE;
 	else if ( entity_formal_p( e1 ) ) {
@@ -599,6 +619,8 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	return e1 == e2;
       }
       else if ( entity_formal_p( e1 ) && entity_formal_p( e2 ) ) {
+	return e1 == e2;
+      }else if( entity_null_locations_p(e1) || entity_null_locations_p(e2) ){
 	return e1 == e2;
       }
       else if ( entity_variable_p(e1) && entity_variable_p(e2) ) {

@@ -311,9 +311,26 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
   if(statement_unstructured_p(s) || statement_goto_p(s))
     store = false;
   if (!set_empty_p(pts_to_set) && store == true) {
+    instruction i = statement_instruction(s);
+    if(instruction_sequence_p(i)){
+      sequence seq = instruction_sequence(i);
+      FOREACH(statement, stm, sequence_statements(seq)){
+	pt_list = set_to_sorted_list(pts_to_set,
+				     (int(*)(const void*, const void*))
+				     points_to_compare_cells);
+	points_to_list new_pt_list = make_points_to_list(pt_list);
+	store_or_update_pt_to_list(stm, new_pt_list);
+      }
+    }
+    else{
     pt_list = set_to_sorted_list(pts_to_set,
 				 (int(*)(const void*, const void*))
 				 points_to_compare_cells);
+    points_to_list new_pt_list = make_points_to_list(pt_list);
+    store_or_update_pt_to_list(s, new_pt_list);
+    }
+  }
+  else if(set_empty_p(pts_to_set)){
     points_to_list new_pt_list = make_points_to_list(pt_list);
     store_pt_to_list(s, new_pt_list);
   }
@@ -790,26 +807,31 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
   else if(expression_call_p(rhs)){
     if(ENTITY_MALLOC_SYSTEM_P(expression_to_entity(rhs)) ||
        ENTITY_CALLOC_SYSTEM_P(expression_to_entity(rhs))){
+      expression sizeof_exp = EXPRESSION (CAR(call_arguments(expression_call(rhs))));
       type t = expression_to_type(lhs);
-      reference nr = original_malloc_to_abstract_location(reference_undefined,
+      reference nr = original_malloc_to_abstract_location(lhs,
 							  t,
 							  type_undefined,
-							  expression_undefined,
+							  sizeof_exp,
 							  get_current_module_entity(),
-							  statement_number(current));
+							  current);
       cell nc = make_cell_reference(nr);
       R = CONS(CELL, nc, NIL);
       address_of_p = true;
     }
     else if(user_function_call_p(rhs)){
-      entity ne = entity_all_locations();
+      type t = entity_type(call_function(expression_call(rhs)));
+      entity ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
+     /*  entity ne = entity_all_locations(); */
       reference nr = make_reference(ne, NIL);
       cell nc = make_cell_reference(nr);
       R = CONS(CELL, nc, NIL);
       address_of_p = true;
     }
     else{
-      entity ne = entity_all_locations();
+     /*  entity ne = entity_all_locations(); */
+      type t = entity_type(call_function(expression_call(rhs)));
+      entity ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
       reference nr = make_reference(ne, NIL);
       cell nc = make_cell_reference(nr);
       R = CONS(CELL, nc, NIL);
@@ -817,7 +839,9 @@ set points_to_assignment(statement current, expression lhs, expression rhs,
     }
   }
   else{
-    entity ne = entity_all_locations();
+    type t = expression_to_type(rhs);
+    entity ne = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
+   /*  entity ne = entity_all_locations(); */
     reference nr = make_reference(ne, NIL);
     cell nc = make_cell_reference(nr);
     R = CONS(CELL, nc, NIL);
@@ -1045,52 +1069,7 @@ cell add_array_dimension(cell c)
   return c1;
 }
 
-set emami_ref_array(set lhs_set, set rhs_set, set pts_in)
-{
-/* lhs_path matches the kill set.*/
-  set kill = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen =  set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res =  set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  approximation a = make_approximation_exact();
-  SET_FOREACH(points_to, p, pts_in)
-    {
-      SET_FOREACH(cell, c, lhs_set)
-	{
-	  if(cell_equal_p(points_to_source(p),c))
-	    set_add_element(kill,kill,(void*) p);
-	}
-    }
 
-  /* input - kill */
-  set_difference(input_kill_diff, pts_in, kill);
-
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAT. */
-  if(set_size(lhs_set) > 1 || set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set*/
-  SET_FOREACH(cell, c, lhs_set)
-    {
-      SET_FOREACH(cell, c1, rhs_set)
-	{
-	  /* create a new points to with as source the current
-	     element of lhs_set and sink the current element of rhs_set.*/
-	  points_to pt_to = make_points_to(c, c1, a, make_descriptor_none());
-	  set_add_element(gen,gen,(void*) pt_to);
-	}
-    }
-  /* gen + input_kill_diff*/
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-
-}
 
 
 /* iterate over the lhs_set, if it contains more than an element
@@ -1147,162 +1126,8 @@ set points_to_null_pointer(list lhs_list, set input)
 }
 
 
-/* iterate over the lhs_set, if it contains more than an element
-   approximations are set to MAY, otherwise it's set to EXACT
-   Set the sink to nowhere .*/
-set points_to_anywhere(list lhs_list, set input)
-{
-  /* lhs_path matches the kill set.*/
-  set kill = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  approximation a = make_approximation_exact();
-
-  SET_FOREACH(points_to, p, input)
-    {
-      FOREACH(cell, c, lhs_list)
-	{
-	  if(cell_equal_p(points_to_source(p),c))
-	    set_add_element(kill,kill,(void*) p);
-	}
-    }
-
-  /* input - kill */
-  set_difference(input_kill_diff, input, kill);
-
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAY. */
-  if(gen_length(lhs_list) > 1 )//|| set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set*/
-  FOREACH(cell, c, lhs_list){
-      /* we test if lhs is an array, so we change a[i] into a[*] */
-      /* if(array_type_p(cell_to_type(c))) */
-/* 	c = array_to_store_independent(c); */
-
-      /* create a new points to with as source the current
-	 element of lhs_set and sink the null value .*/
-      //entity e =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,cell_to_type(c));
-    entity e =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,make_type_unknown());
-      reference r = make_reference(e, NIL);
-      cell sink = make_cell_reference(r);
-      points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
-      set_add_element(gen, gen, (void*) pt_to);
-
-    }
-  /* gen + input_kill_diff*/
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-}
 
 
-
-/* iterate over the lhs_set, if it contains more than an element
-   approximations are set to MAY, otherwise it's set to EXACT.*/
-set emami_ref_addr_case(set lhs_set, set rhs_set, set input)
-{
-  /* lhs_path matches the kill set.*/
-  set kill = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  approximation a = make_approximation_exact();
-
-  SET_FOREACH(points_to, p, input) {
-      SET_FOREACH(cell, c, lhs_set) {
-	  if(cell_equal_p(points_to_source(p), c))
-	    set_add_element(kill,kill, (void*) p);
-	}
-    }
-
-  /* input - kill */
-  set_difference(input_kill_diff, input, kill);
-
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAT. */
-  if(set_size(lhs_set) > 1 )//|| set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set*/
-  SET_FOREACH(cell, l, lhs_set) {
-      SET_FOREACH(cell, r, rhs_set) {
-	  /* create a new points to with as source the current
-	     element of lhs_set and sink the current element of rhs_set.*/
-	  points_to pt_to = make_points_to(l, r, a, make_descriptor_none());
-	  set_add_element(gen, gen, (void*) pt_to);
-	}
-    }
-  /* gen + input_kill_diff*/
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-}
-
-/* iterate over the lhs_set, if it contains more than an element
-   approximations are set to MAY, otherwise it's set to EXACT.*/
-set emami_ref_ref_case(set lhs_set, set rhs_set, set input)
-{
-  /* lhs_path matches the kill set.*/
-  set kill = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set gen =  set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set res = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set input_kill_diff = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  set sink_set = set_generic_make(set_private, points_to_equal_p,
-				    points_to_rank);
-  approximation a = make_approximation_exact();
-
-  SET_FOREACH(points_to, p, input) {
-      SET_FOREACH(cell, c, lhs_set) {
-	  if(cell_equal_p(points_to_source(p), c))
-	    set_add_element(kill,kill,(void*) p);
-	}
-    }
-
-  /* input - kill */
-  set_difference(input_kill_diff, input, kill);
-
-  /* if the lhs_set or the rhs set contains more than an element, we
-     set the approximation to MAT. */
-  if(set_size(lhs_set) > 1 || set_size(rhs_set)>1)
-    a = make_approximation_may();
-
-  /* Computing the gen set*/
-  SET_FOREACH(points_to, pt, input) {
-     SET_FOREACH(cell, s, rhs_set ) {
-       if(cell_equal_p(points_to_source(pt), s))
-	 set_add_element(sink_set, sink_set,(void*)points_to_sink(pt));
-	 }
-  }
-  
-  SET_FOREACH(cell, l, lhs_set){
-      SET_FOREACH(cell, r, sink_set){
-	  /* create a new points to with as source the current
-	     element of lhs_set and sink the current element of rhs_set.*/
-	  points_to pt_to = make_points_to(l, r, a, make_descriptor_none());
-	  set_add_element(gen, gen, (void*) pt_to);
-	}
-    }
-
-  /* gen + input_kill_diff*/
-  set_union(res, gen, input_kill_diff);
-
-  return res;
-}
 
 set points_to_general_assignment(__attribute__ ((__unused__)) statement s,
 				 expression lhs,
@@ -2228,7 +2053,8 @@ list points_to_init_typedef(entity e){
 					    ef);
 	    cell c = get_memory_path(ex1, &eval);
 	    l = gen_nconc(CONS(CELL, c, NIL),l);
-	  }
+	  }else if(array_argument_p(ef))
+	    print_expression(ef);
 	}
       }else if(type_enum_p(t))
 	pips_user_warning("enum case not handled yet \n");
@@ -2287,6 +2113,27 @@ list  points_to_init_struct(entity e, entity ee){
 					  ef);
 	  cell c = get_memory_path(ex1, &eval);
 	  l = gen_nconc(CONS(CELL, c, NIL),l);
+	}
+	else if(array_argument_p(ef)){
+	  basic b = variable_basic(type_variable(entity_type(i)));
+	  /* arrays of pointers are changed into independent store arrays
+	     and initialized to nowhere_b0 */
+	  if(basic_pointer_p(b)){
+	    effect eff = effect_undefined;
+	    expression ind = make_unbounded_expression();
+	    expression ex1 = MakeBinaryCall(entity_intrinsic(FIELD_OPERATOR_NAME),
+					    ex,
+					    ef);
+	    set_methods_for_proper_simple_effects();
+	    list l1 = generic_proper_effects_of_complex_address_expression(ex1, &eff,
+								       true);
+	    reference r2 = effect_any_reference(eff);
+	    effects_free(l1);
+	    generic_effects_reset_all_methods();
+	    reference_indices(r2)= gen_nconc(reference_indices(r2), CONS(EXPRESSION, ind, NIL));
+	    cell c = make_cell_reference(r2);
+	    l = gen_nconc(CONS(CELL, c, NIL),l);
+	  }
 	}
       }
     }

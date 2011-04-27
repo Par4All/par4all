@@ -150,8 +150,14 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 
   if (entity_abstract_location_p(input_ent))
     {
+      descriptor build_desc = descriptor_undefined;
       /* If the input path is an abstract location, the result is the same abstract location */
-      l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL);
+     /*  l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL); */
+      l = CONS(EFFECT, make_effect( make_cell(is_cell_reference, make_reference(input_ent, NIL)),
+				  make_action_write_memory(),
+				  make_approximation(*exact_p? is_approximation_exact : is_approximation_may, UU),
+				  build_desc),
+	       NIL);
       *exact_p = false;
     }
   else
