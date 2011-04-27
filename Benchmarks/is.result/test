@@ -533,7 +533,7 @@ break_10:         ;
          if (failed==1)
             
             
-            printf("iteration %d, test key %d\n""Failed partial verification: ", iteration, (int) i);
+            printf("Failed partial verification: ""iteration %d, test key %d\n", iteration, (int) i);
       }
    }
    
