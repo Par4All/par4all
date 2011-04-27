@@ -155,7 +155,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
      /*  l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL); */
       l = CONS(EFFECT, make_effect( make_cell(is_cell_reference, make_reference(input_ent, NIL)),
 				  make_action_write_memory(),
-				  make_approximation(*exact_p? is_approximation_exact : is_approximation_may, UU),
+				  make_approximation(is_approximation_may, UU),
 				  build_desc),
 	       NIL);
       *exact_p = false;
