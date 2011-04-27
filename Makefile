@@ -1,6 +1,11 @@
 # $Id$
 
-default: clean
+# name of the validation setup
+# update if you use this Makefile for other test cases
+DIRNAME	= validation
+
+# default is to do a "simple" clean
+default: cleanup
 
 # use new validation without implicit accept
 validate: validate-out
@@ -22,8 +27,8 @@ ifndef VNAME
 # used to start the mail subject line
 VNAME	= $(ARCH)
 endif
-DIRNAME	= validation
 
+# this target also remove the archive
 .PHONY: full-clean
 full-clean: clean
 	$(FIND) -name 'SUMMARY_Archive' -type d -print0 \
@@ -31,8 +36,8 @@ full-clean: clean
 	  xargs -0 $(RM) -r
 	$(RM) SUMMARY SUMMARY.short
 
-.PHONY: clean
-clean:
+.PHONY: cleanup
+cleanup:
 	$(MAKE) TARGET=. clean-target
 
 # subdirectories to consider
@@ -217,6 +222,9 @@ parallel-validate: $(TARGET:%=parallel-validate-%)
 
 .PHONY: parallel-unvalidate
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
+
+.PHONY: clean
+clean: cleanup parallel-clean
 
 # generic subdir parallel targets
 parallel-clean-%:
