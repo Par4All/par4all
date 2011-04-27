@@ -19,14 +19,14 @@ freia_error freia_cipo_dilate(freia_data2d *imout, freia_data2d *imin, int32_t c
    freia_error ret;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret = 1;
    }
@@ -807,14 +807,14 @@ int main()
          kernel_4c[8] = 0;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
-            fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+            fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
             freia_common_print_backtrace();
             ret = 1;
          }
          else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
             
             
-            fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+            fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
             freia_common_print_backtrace();
             ret = 1;
          }
@@ -887,14 +887,14 @@ int main()
          kernel_4c[8] = 0;
          if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
-            fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+            fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
             freia_common_print_backtrace();
             ret = 1;
          }
          else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
             
             
-            fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+            fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
             freia_common_print_backtrace();
             ret = 1;
          }
@@ -980,14 +980,14 @@ int main()
    kernel_4c_0[8] = 0;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret_1 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret_1 = 1;
    }
@@ -1049,14 +1049,14 @@ int main()
    kernel_4c_1[8] = 0;
    if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
 
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 90, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret_3 = 1;
    }
    else if (freia_common_check_image_bpp_compat(imout, imin, (void *) 0)!=1) {
       
       
-      fprintf(stderr, "bpp of images are not compatibles\n""ERROR: file %s, line %d, function %s: ", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
+      fprintf(stderr, "ERROR: file %s, line %d, function %s: ""bpp of images are not compatibles\n", "./freia.src/cipo/src/freiaComplexOpMorpho.c", 95, "freia_cipo_dilate");
       freia_common_print_backtrace();
       ret_3 = 1;
    }
