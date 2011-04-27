@@ -64,12 +64,12 @@ def printPythonMethod(name,doc):
 
 			if prop == "loop_label":
 				has_loop_label = True;
-				extraparamsetter = '\tif self._ws:pypsutils._set_property(self._ws,"' + prop.upper() + '", self._label)\n' + extraparamsetter
+				extraparamsetter = '\tif self.workspace:pypsutils.set_property(self.workspace,"' + prop.upper() + '", self.label)\n' + extraparamsetter
 			else:
 				props.append(arg)
-				extraparamsetter += '\tif '+short_prop+' == None and self._ws:'+short_prop+'=self._ws.props.'+prop + '\n'
-				extraparamsetter += '\tif self._ws:self._ws.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop)
-				extraparamresetter = '\tif self._ws:self._ws.cpypips.pop_property("%s")\n' % (prop.upper()) + extraparamresetter
+				extraparamsetter += '\tif '+short_prop+' == None and self.workspace:'+short_prop+'=self.workspace.props.'+prop + '\n'
+				extraparamsetter += '\tif self.workspace:self.workspace.cpypips.push_property("%s",pypsutils.formatprop(%s))\n' % ( prop.upper(), short_prop)
+				extraparamresetter = '\tif self.workspace:self.workspace.cpypips.pop_property("%s")\n' % (prop.upper()) + extraparamresetter
 
 		if len(props) > 0:
 			extraparams = ",".join(props) + ","
@@ -88,7 +88,7 @@ def printPythonMethod(name,doc):
 
 	mself = "self"
 	if has_loop_label and generator == "-loop":
-		mself = "self._module"
+		mself = "self.module"
 	
 	if (has_loop_label and generator == "-loop") or (not has_loop_label and generator != "-loop"):
 		if generator == "-modules":
@@ -97,15 +97,15 @@ def printPythonMethod(name,doc):
 		print '\ndef '+name+'(self,'+extraparams+' **props):'
 		print '\t"""'+doc+'"""'
 		print extraparamsetter
-		print '\tif '+mself+'._ws: old_props = pypsutils.set_properties(self._ws,pypsutils.update_props("'+name.upper()+'",props))'
+		print '\tif '+mself+'.workspace: old_props = pypsutils.set_properties(self.workspace,pypsutils.update_props("'+name.upper()+'",props))'
 
 		if generator != "-modules":
 			print '\tpypsutils.apply('+mself+',\"'+name+'\")'
 		else:
 			print '\tif concurrent: pypsutils.capply(self,\"'+name+'\")'
 			print '\telse:'
-			print '\t\tfor m in self._modules: pypsutils.apply(m,\"'+name+'\")'
-		print '\tif '+mself+'._ws: pypsutils.set_properties('+mself+'._ws,old_props)'
+			print '\t\tfor m in self: pypsutils.apply(m,\"'+name+'\")'
+		print '\tif '+mself+'.workspace: pypsutils.set_properties('+mself+'.workspace,old_props)'
 		print '\n' + extraparamresetter
 		print generator[1:] + "." + name + "=" + name
 

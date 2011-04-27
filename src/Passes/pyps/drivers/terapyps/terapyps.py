@@ -8,9 +8,8 @@ import os,sys,shutil,tempfile
 
 def generate_check_ref(self):
 	"""Generate a reference run for workspace"""
-	self.make()
 	self.compile(rule="mrproper")
-	(o,rc,out,err)=self.compile()
+	o=self.compile()
 	(rc,out,err)=self.run(o)
 	if rc == 0:
 		self.ref=out
@@ -22,7 +21,7 @@ pyps.workspace.generate_check_ref=generate_check_ref
 def check(self,debug):
 	if debug:
 		self.compile(rule="mrproper")
-		(o,rc,out,err)=self.compile()
+		o=self.compile()
 		(rc,out,err)=self.run(o)
 		if rc == 0:
 			if self.ref!=out:
@@ -75,7 +74,7 @@ def all_callers(m):
 def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 	"""Generate terapix code for m if it's not part of the runtime """
 	if m.cu in runtime:return
-	w=m._ws
+	w=m.workspace
 	w.generate_check_ref()
 	# choose the proper analyses and properties
 	w.props.constant_path_effects=False
@@ -229,7 +228,7 @@ def terapix_code_generation(m,nbPE=128,memoryPE=512,debug=False):
 			if asm.cu == runtime[1]:
 				m.expression_substitution(asm.name)
 		if debug:m.display()
-		terapyps_asm.conv(w.dirname+m.show("printed_file"),sys.stdout)
+		terapyps_asm.conv(os.path.join(w.dirname,m.show("printed_file")),sys.stdout)
 
 module.terapix_code_generation=terapix_code_generation
 

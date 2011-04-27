@@ -101,10 +101,10 @@ class workspace(pyps.workspace):
 			raise RuntimeError("self.benchmark() must have been run !")
 		return self._final_runtimes[module.name]
 
-	def benchmark(self, makefile="Makefile", iterations = 1, args=[],**opt):
+	def benchmark(self, maker=pyps.Maker(), iterations = 1, args=[],**opt):
 		rep = self.tmpdirname
-		outfile = self.compile(rep=rep,makefile=makefile,rule="mrproper",**opt)[0]
-		outfile = self.compile(rep=rep,makefile=makefile,**opt)[0]
+		outfile = self.compile(rep=rep,maker=maker,rule="mrproper",**opt)
+		outfile = self.compile(rep=rep,maker=maker,**opt)
 		
 		self._module_rtimes = dict()
 		for i in range(0, iterations):

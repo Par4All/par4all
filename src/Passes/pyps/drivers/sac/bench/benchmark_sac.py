@@ -32,8 +32,7 @@ def benchrun(s,calms=None,calibrate_out=None):
 		ccp = get_maker(cc_cfg.maker)()
 		try:
 			if doBench:
-				makefile = ws.make(maker=ccp)[0]
-				times = ws.benchmark(makefile=makefile,iterations=n_iter,args=args,CC=cc_cfg.cc, CFLAGS=cc_cfg.cflags)
+				times = ws.benchmark(maker=maker,iterations=n_iter,args=args,CC=cc_cfg.cc, CFLAGS=cc_cfg.cflags)
 				benchtimes[benchname] = {'time': times[wcfg.module][0], 'makefile': makefile, 'cc_stderr': "ccp.cc_stderr"}
 			else:
 				good,out = ws.check_output(ccexecp=ccp)

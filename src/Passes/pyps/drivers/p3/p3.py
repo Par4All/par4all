@@ -28,4 +28,4 @@ def p3(m):
 	m.code=pragma_re.sub("",m.code)
 
 pyps.module.p3=p3
-pyps.modules.p3=lambda m:map(p3,m._modules)
+pyps.modules.p3=lambda m:map(p3,m)

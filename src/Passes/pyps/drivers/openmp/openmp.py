@@ -7,16 +7,13 @@ class ompMaker(Maker):
 	def get_ext(self):
 		return ".omp"+super(ompMaker,self).get_ext()
 
-	def get_makefile(self):
-		return ["Makefile.omp"]+super(ompMaker,self).get_makefile()
-
-	def get_makefiledir(self):
-		return ["openmp"]+super(ompMaker,self).get_makefiledir()
+	def get_makefile_info(self):
+		return [("openmp","Makefile.omp")]+super(ompMaker,self).get_makefile_info()
 
 
 def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
 	"""parallelize module with opennmp"""
-	w = m._ws
+	w = m.workspace
 	#select most precise analysis
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
@@ -50,5 +47,5 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
 		m.display(**props)
 
 pyps.module.openmp=openmp
-pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m._modules)
+pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m)
 
