@@ -29,7 +29,7 @@ die "expecting one or two arguments" unless @ARGV <= 2 and @ARGV >= 1;
 my $summary = $ARGV[0];
 my $differential = @ARGV==2;
 
-# all possible validation status
+# all possible validation status, with distinct first letters
 my $status = 'failed|changed|passed|timeout|keptout|bug|later|slow';
 
 # other miscellaneous issues
@@ -88,6 +88,7 @@ while (<>)
       {
 	# record previous state
 	$old{"$dir$case"} = $stat;
+	# first letter of the state is used to display state changes
 	my $O = uc(substr($stat,0,1));
 	if (exists $new{"$dir$case"})
 	{
