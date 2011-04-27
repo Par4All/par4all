@@ -9,7 +9,7 @@ void convol3x3();
 
 int main(int argc, char **argv) //      program image_processing
 {
-    int image_size = atoi(argv[1]);
+    int image_size = argc > 1 ? atoi(argv[1]): 100;
     float (*image)[image_size][image_size];
     float (*new_image)[image_size][image_size];
     float kernel[kernel_size][kernel_size];

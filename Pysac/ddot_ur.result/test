@@ -6,7 +6,7 @@ float ddot_ur(int n, float dx[n], float dy[n])
    if (m!=0) {
       for(i = 0; i <= m-1; i += 1)
          dtemp = dtemp+dx[i]*dy[i];
-      if (n<5) 
+      if (n<5)
          return dtemp;
    }
    for(i = m; i <= n-1; i += 5)
@@ -18,107 +18,470 @@ float ddot_ur(int n, float dx[n], float dy[n])
 }
 float ddot_ur(int n, float dx[n], float dy[n])
 {
+   int i, m;
    float dtemp = 0;
+   m = n%5;
+   if (n%5!=0) {
+      for(i = 0; i <= n%5-1; i += 1)
+         dtemp = dtemp+dx[i]*dy[i];
+      if (n<5)
+         return dtemp;
+   }
+   for(i = n%5; i <= n-1; i += 5)
+      
+      
+      dtemp = dtemp+dx[i]*dy[i]+dx[i+1]*dy[i+1]+dx[i+2]*dy[i+2]+dx[i+3]*dy[i+3]+dx[i+4]*dy[i+4];
+
+   return dtemp;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   int i, m;
+   float dtemp = 0;
+   m = n%5;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
+
+   return dtemp;
+}
+void ddot_ur_l99999(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
    //PIPS generated variable
-   float F_0, F_2, F_4, F_6, F_8, F_9;
+   int i;
    //PIPS generated variable
    float RED0[4], RED1[1];
    //PIPS generated variable
-   int LU_IND00, LU_IND01, LU_IB00, LU_NUB00;
-   //PIPS generated variable
-   float F_80, F_81, F_82, F_83, F_60, F_61, F_62, F_63, F_40, F_41, F_42, F_43, F_20, F_21, F_22, F_23;
-   //PIPS generated variable
-   int i0, i1, m0;
-   //PIPS generated variable
-   float dtemp0, dtemp1, dtemp2, dtemp3;
-   //SAC generated temporary array
-   a4sf pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0}, pdata5 = {0, 0, 0, 0}, pdata6 = {0, 0, 0, 0};
-   //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0, vec180_0, vec190_0, vec200_0, vec210_0, vec220_0;
-   m0 = n%5;
-   if (m0!=0) {
-      RED0[0] = 0.000000;
-      RED0[1] = 0.000000;
-      RED0[2] = 0.000000;
-      RED0[3] = 0.000000;
-      SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
-      for(i0 = 0; i0 <= 4*(m0/4)-1; i0 += 4) {
-         //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &dy[i0]);
-         SIMD_LOAD_V4SF(vec10_0, &dx[i0]);
-         SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-         SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
-      }
-      SIMD_STORE_V4SF(vec30_0, &RED0[0]);
-      dtemp = RED0[3]+RED0[2]+RED0[1]+RED0[0]+dtemp;
-      RED1[0] = 0.000000;
-      for(i1 = 4*(m0/4); i1 <= m0-1; i1 += 1) {
-         F_0 = dx[i1]*dy[i1];
-         RED1[0] = RED1[0]+F_0;
-      }
-      dtemp = RED1[0]+dtemp;
-      if (n<5) 
-         return dtemp;
+   float dtemp;
+   dtemp = *dtemp_0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(i = 0; i <= 0+4*((1+n%5-1-0)/4)-1; i += 4) {
+      RED0[0] = RED0[0]+dx[i]*dy[i];
+      RED0[1] = RED0[1]+dx[1+i]*dy[1+i];
+      RED0[2] = RED0[2]+dx[2+i]*dy[2+i];
+      RED0[3] = RED0[3]+dx[3+i]*dy[3+i];
    }
-   LU_NUB00 = (4+n-m0)/5;
+   dtemp = RED0[3]+RED0[2]+RED0[1]+RED0[0]+dtemp;
+   for(i = 0+4*((1+n%5-1-0)/4); i <= n%5-1; i += 1)
+      dtemp = dtemp+dx[i]*dy[i];
+   *dtemp_0 = dtemp;
+}
+void ddot_ur_l99999(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   float RED0[4], RED1[1];
+   //PIPS generated variable
+   float dtemp;
+   //PIPS generated variable
+   float F_0, F_1, F_2;
+   dtemp = *dtemp_0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(i = 0; i <= 0+4*((1+n%5-1-0)/4)-1; i += 4) {
+      RED0[0] = __PIPS_SAC_MULADD(RED0[0], dx[i], dy[i]);
+      RED0[1] = __PIPS_SAC_MULADD(RED0[1], dx[1+i], dy[1+i]);
+      RED0[2] = __PIPS_SAC_MULADD(RED0[2], dx[2+i], dy[2+i]);
+      RED0[3] = __PIPS_SAC_MULADD(RED0[3], dx[3+i], dy[3+i]);
+   }
+   F_0 = RED0[0]+dtemp;
+   F_1 = RED0[1]+F_0;
+   F_2 = RED0[2]+F_1;
+   dtemp = RED0[3]+F_2;
+   for(i = 0+4*((1+n%5-1-0)/4); i <= n%5-1; i += 1)
+      dtemp = __PIPS_SAC_MULADD(dtemp, dx[i], dy[i]);
+   *dtemp_0 = dtemp;
+}
+void ddot_ur_l99999(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   float RED0[4];
+   //PIPS generated variable
+   float F_20, F_10, F_00;
+   //PIPS generated variable
+   int i0, i1;
+   //PIPS generated variable
+   float dtemp0, dtemp1;
+   dtemp0 = *dtemp_0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(i0 = 0; i0 <= 0+4*((1+n%5-1-0)/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      v4sf vec00, vec10, vec20;
+      SIMD_LOAD_V4SF(vec20, &dy[i0]);
+      SIMD_LOAD_V4SF(vec10, &dx[i0]);
+      SIMD_LOAD_V4SF(vec00, &RED0[0]);
+      SIMD_MULADDPS(vec00, vec00, vec10, vec20);
+      SIMD_STORE_V4SF(vec00, &RED0[0]);
+   }
+   F_00 = RED0[0]+dtemp0;
+   F_10 = RED0[1]+F_00;
+   F_20 = RED0[2]+F_10;
+   dtemp1 = RED0[3]+F_20;
+   for(i1 = 0+4*((1+n%5-1-0)/4); i1 <= n%5-1; i1 += 1)
+      dtemp1 = __PIPS_SAC_MULADD(dtemp1, dx[i1], dy[i1]);
+   *dtemp_0 = dtemp1;
+}
+void ddot_ur_l99999(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   float RED0[4];
+   //PIPS generated variable
+   float F_20, F_10, F_00;
+   //PIPS generated variable
+   int i0, i1;
+   //PIPS generated variable
+   float dtemp0, dtemp1;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0;
+   dtemp0 = *dtemp_0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+   SIMD_LOAD_V4SF(vec00_0, &RED0[0]);
+l99999:
+   for(i0 = 0; i0 <= 0+4*((1+n%5-1-0)/4)-1; i0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec10_0, &dx[i0]);
+      SIMD_LOAD_V4SF(vec20_0, &dy[i0]);
+      SIMD_MULADDPS(vec00_0, vec00_0, vec10_0, vec20_0);
+   }
+   SIMD_STORE_V4SF(vec00_0, &RED0[0]);
+   F_00 = RED0[0]+dtemp0;
+   F_10 = RED0[1]+F_00;
+   F_20 = RED0[2]+F_10;
+   dtemp1 = RED0[3]+F_20;
+   for(i1 = 0+4*((1+n%5-1-0)/4); i1 <= n%5-1; i1 += 1)
+      dtemp1 = __PIPS_SAC_MULADD(dtemp1, dx[i1], dy[i1]);
+   *dtemp_0 = dtemp1;
+}
+void ddot_ur_l99998(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   float dtemp;
+   //PIPS generated variable
+   int ii, LU_NUB0, LU_IB0, LU_IND0;
+   dtemp = *dtemp_0;
+   ii = n%5;
+l99998:   LU_NUB0 = (5+n-1-ii)/5;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      dtemp = dtemp+dx[ii+5*LU_IND0]*dy[ii+5*LU_IND0]+dx[1+ii+5*LU_IND0]*dy[1+ii+5*LU_IND0]+dx[2+ii+5*LU_IND0]*dy[2+ii+5*LU_IND0]+dx[3+ii+5*LU_IND0]*dy[3+ii+5*LU_IND0]+dx[4+ii+5*LU_IND0]*dy[4+ii+5*LU_IND0];
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      dtemp = dtemp+dx[ii+5*(0+LU_IND0)]*dy[ii+5*(0+LU_IND0)]+dx[1+ii+5*(0+LU_IND0)]*dy[1+ii+5*(0+LU_IND0)]+dx[2+ii+5*(0+LU_IND0)]*dy[2+ii+5*(0+LU_IND0)]+dx[3+ii+5*(0+LU_IND0)]*dy[3+ii+5*(0+LU_IND0)]+dx[4+ii+5*(0+LU_IND0)]*dy[4+ii+5*(0+LU_IND0)];
+      dtemp = dtemp+dx[ii+5*(1+LU_IND0)]*dy[ii+5*(1+LU_IND0)]+dx[1+ii+5*(1+LU_IND0)]*dy[1+ii+5*(1+LU_IND0)]+dx[2+ii+5*(1+LU_IND0)]*dy[2+ii+5*(1+LU_IND0)]+dx[3+ii+5*(1+LU_IND0)]*dy[3+ii+5*(1+LU_IND0)]+dx[4+ii+5*(1+LU_IND0)]*dy[4+ii+5*(1+LU_IND0)];
+      dtemp = dtemp+dx[ii+5*(2+LU_IND0)]*dy[ii+5*(2+LU_IND0)]+dx[1+ii+5*(2+LU_IND0)]*dy[1+ii+5*(2+LU_IND0)]+dx[2+ii+5*(2+LU_IND0)]*dy[2+ii+5*(2+LU_IND0)]+dx[3+ii+5*(2+LU_IND0)]*dy[3+ii+5*(2+LU_IND0)]+dx[4+ii+5*(2+LU_IND0)]*dy[4+ii+5*(2+LU_IND0)];
+      dtemp = dtemp+dx[ii+5*(3+LU_IND0)]*dy[ii+5*(3+LU_IND0)]+dx[1+ii+5*(3+LU_IND0)]*dy[1+ii+5*(3+LU_IND0)]+dx[2+ii+5*(3+LU_IND0)]*dy[2+ii+5*(3+LU_IND0)]+dx[3+ii+5*(3+LU_IND0)]*dy[3+ii+5*(3+LU_IND0)]+dx[4+ii+5*(3+LU_IND0)]*dy[4+ii+5*(3+LU_IND0)];
+l99997:      ;
+   }
+   i = ii+5*MAX0(LU_NUB0, 0);
+   *dtemp_0 = dtemp;
+}
+void ddot_ur_l99998(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   int i;
+   //PIPS generated variable
+   float dtemp;
+   //PIPS generated variable
+   int ii, LU_NUB0, LU_IB0, LU_IND0, I_0, I_1, I_2;
+   //PIPS generated variable
+   float F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14, F_15, F_16, F_17, F_18, F_19, F_20, F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28, F_29, F_30, F_31, F_32, F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40, F_41, F_42;
+   //PIPS generated variable
+   int I_3;
+   dtemp = *dtemp_0;
+   ii = n%5;
+l99998:   I_0 = n-1;
+   I_1 = I_0-ii;
+   I_2 = 5+I_1;
+   LU_NUB0 = I_2/5;
+   LU_IB0 = MOD(LU_NUB0, 4);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      F_3 = dx[ii+5*LU_IND0]*dy[ii+5*LU_IND0];
+      F_4 = dtemp+F_3;
+      F_5 = dx[1+ii+5*LU_IND0]*dy[1+ii+5*LU_IND0];
+      F_6 = F_4+F_5;
+      F_7 = dx[2+ii+5*LU_IND0]*dy[2+ii+5*LU_IND0];
+      F_8 = F_6+F_7;
+      F_9 = dx[3+ii+5*LU_IND0]*dy[3+ii+5*LU_IND0];
+      F_10 = F_8+F_9;
+      dtemp = __PIPS_SAC_MULADD(F_10, dx[4+ii+5*LU_IND0], dy[4+ii+5*LU_IND0]);
+l99999:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 4) {
+      F_11 = dx[ii+5*(0+LU_IND0)]*dy[ii+5*(0+LU_IND0)];
+      F_12 = dtemp+F_11;
+      F_13 = dx[1+ii+5*(0+LU_IND0)]*dy[1+ii+5*(0+LU_IND0)];
+      F_14 = F_12+F_13;
+      F_15 = dx[2+ii+5*(0+LU_IND0)]*dy[2+ii+5*(0+LU_IND0)];
+      F_16 = F_14+F_15;
+      F_17 = dx[3+ii+5*(0+LU_IND0)]*dy[3+ii+5*(0+LU_IND0)];
+      F_18 = F_16+F_17;
+      dtemp = __PIPS_SAC_MULADD(F_18, dx[4+ii+5*(0+LU_IND0)], dy[4+ii+5*(0+LU_IND0)]);
+      F_19 = dx[ii+5*(1+LU_IND0)]*dy[ii+5*(1+LU_IND0)];
+      F_20 = dtemp+F_19;
+      F_21 = dx[1+ii+5*(1+LU_IND0)]*dy[1+ii+5*(1+LU_IND0)];
+      F_22 = F_20+F_21;
+      F_23 = dx[2+ii+5*(1+LU_IND0)]*dy[2+ii+5*(1+LU_IND0)];
+      F_24 = F_22+F_23;
+      F_25 = dx[3+ii+5*(1+LU_IND0)]*dy[3+ii+5*(1+LU_IND0)];
+      F_26 = F_24+F_25;
+      dtemp = __PIPS_SAC_MULADD(F_26, dx[4+ii+5*(1+LU_IND0)], dy[4+ii+5*(1+LU_IND0)]);
+      F_27 = dx[ii+5*(2+LU_IND0)]*dy[ii+5*(2+LU_IND0)];
+      F_28 = dtemp+F_27;
+      F_29 = dx[1+ii+5*(2+LU_IND0)]*dy[1+ii+5*(2+LU_IND0)];
+      F_30 = F_28+F_29;
+      F_31 = dx[2+ii+5*(2+LU_IND0)]*dy[2+ii+5*(2+LU_IND0)];
+      F_32 = F_30+F_31;
+      F_33 = dx[3+ii+5*(2+LU_IND0)]*dy[3+ii+5*(2+LU_IND0)];
+      F_34 = F_32+F_33;
+      dtemp = __PIPS_SAC_MULADD(F_34, dx[4+ii+5*(2+LU_IND0)], dy[4+ii+5*(2+LU_IND0)]);
+      F_35 = dx[ii+5*(3+LU_IND0)]*dy[ii+5*(3+LU_IND0)];
+      F_36 = dtemp+F_35;
+      F_37 = dx[1+ii+5*(3+LU_IND0)]*dy[1+ii+5*(3+LU_IND0)];
+      F_38 = F_36+F_37;
+      F_39 = dx[2+ii+5*(3+LU_IND0)]*dy[2+ii+5*(3+LU_IND0)];
+      F_40 = F_38+F_39;
+      F_41 = dx[3+ii+5*(3+LU_IND0)]*dy[3+ii+5*(3+LU_IND0)];
+      F_42 = F_40+F_41;
+      dtemp = __PIPS_SAC_MULADD(F_42, dx[4+ii+5*(3+LU_IND0)], dy[4+ii+5*(3+LU_IND0)]);
+l99997:      ;
+   }
+   I_3 = MAX0(LU_NUB0, 0);
+   i = __PIPS_SAC_MULADD(ii, 5, I_3);
+   *dtemp_0 = dtemp;
+}
+void ddot_ur_l99998(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   float dtemp;
+   //PIPS generated variable
+   float F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14, F_15, F_16, F_17, F_18, F_19, F_20, F_21, F_22, F_23, F_24, F_25, F_26, F_27, F_28, F_29, F_30, F_31, F_32, F_33, F_34, F_35, F_36, F_37, F_38, F_39, F_40, F_41, F_42;
+   //PIPS generated variable
+   int I_30, I_20, I_10, I_00, LU_IND00, LU_IND01, LU_IB00, LU_NUB00, ii0, i0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
+   //PIPS generated variable
+   float dtemp0, dtemp1, dtemp2, dtemp3, dtemp4;
+   dtemp0 = *dtemp_0;
+   ii0 = n%5;
+l99998:   I_00 = n-1;
+   I_10 = I_00-ii0;
+   I_20 = 5+I_10;
+   LU_NUB00 = I_20/5;
    LU_IB00 = MOD(LU_NUB00, 4);
    for(LU_IND00 = 0; LU_IND00 <= LU_IB00-1; LU_IND00 += 1) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec70_0, &dy[m0+5*LU_IND00]);
-      SIMD_LOAD_V4SF(vec60_0, &dx[m0+5*LU_IND00]);
-      SIMD_MULPS(vec50_0, vec60_0, vec70_0);
-      SIMD_STORE_V4SF(vec50_0, &pdata1[0]);
-      pdata1[0] = dx[m0+5*LU_IND00]*dy[m0+5*LU_IND00];
-      F_9 = dx[4+m0+5*LU_IND00]*dy[4+m0+5*LU_IND00];
-      F_2 = dtemp+pdata1[0];
-      F_4 = F_2+pdata1[1];
-      F_6 = F_4+pdata1[2];
-      F_8 = F_6+pdata1[3];
-      dtemp = F_8+F_9;
+      v4sf vec30, vec40, vec50;
+      SIMD_LOAD_V4SF(vec50, &dy[ii0+5*LU_IND00]);
+      SIMD_LOAD_V4SF(vec40, &dx[ii0+5*LU_IND00]);
+      SIMD_MULPS(vec30, vec40, vec50);
+      SIMD_STORE_V4SF(vec30, &pdata0[0]);
+      F_4 = dtemp0+pdata0[0];
+      F_6 = F_4+pdata0[1];
+      F_8 = F_6+pdata0[2];
+      F_10 = F_8+pdata0[3];
+      dtemp = __PIPS_SAC_MULADD(F_10, dx[4+ii0+5*LU_IND00], dy[4+ii0+5*LU_IND00]);
+l99999:      ;
    }
    for(LU_IND01 = LU_IB00; LU_IND01 <= LU_NUB00-1; LU_IND01 += 4) {
       //PIPS:SAC generated v4sf vector(s)
-      SIMD_LOAD_V4SF(vec100_0, &dy[m0+5*LU_IND01]);
-      SIMD_LOAD_V4SF(vec90_0, &dx[m0+5*LU_IND01]);
-      SIMD_MULPS(vec80_0, vec90_0, vec100_0);
-      SIMD_STORE_V4SF(vec80_0, &pdata2[0]);
-      SIMD_LOAD_V4SF(vec130_0, &dy[4+m0+5*LU_IND01]);
-      SIMD_LOAD_V4SF(vec120_0, &dx[4+m0+5*LU_IND01]);
-      SIMD_MULPS(vec110_0, vec120_0, vec130_0);
-      SIMD_STORE_V4SF(vec110_0, &pdata3[0]);
-      SIMD_LOAD_V4SF(vec160_0, &dy[8+m0+5*LU_IND01]);
-      SIMD_LOAD_V4SF(vec150_0, &dx[8+m0+5*LU_IND01]);
-      SIMD_MULPS(vec140_0, vec150_0, vec160_0);
-      SIMD_STORE_V4SF(vec140_0, &pdata4[0]);
-      SIMD_LOAD_V4SF(vec190_0, &dy[12+m0+5*LU_IND01]);
-      SIMD_LOAD_V4SF(vec180_0, &dx[12+m0+5*LU_IND01]);
-      SIMD_MULPS(vec170_0, vec180_0, vec190_0);
-      SIMD_STORE_V4SF(vec170_0, &pdata5[0]);
-      SIMD_LOAD_V4SF(vec220_0, &dy[16+m0+5*LU_IND01]);
-      SIMD_LOAD_V4SF(vec210_0, &dx[16+m0+5*LU_IND01]);
-      SIMD_MULPS(vec200_0, vec210_0, vec220_0);
-      SIMD_STORE_V4SF(vec200_0, &pdata6[0]);
-      F_20 = dtemp3+pdata2[0];
-      F_40 = F_20+pdata2[1];
-      F_60 = F_40+pdata2[2];
-      F_80 = F_60+pdata2[3];
-      dtemp0 = F_80+pdata3[0];
-      F_21 = dtemp0+pdata3[1];
-      F_41 = F_21+pdata3[2];
-      F_61 = F_41+pdata3[3];
-      F_81 = F_61+pdata4[0];
-      dtemp1 = F_81+pdata4[1];
-      F_22 = dtemp1+pdata4[2];
-      F_42 = F_22+pdata4[3];
-      F_62 = F_42+pdata5[0];
-      F_82 = F_62+pdata5[1];
-      dtemp2 = F_82+pdata5[2];
-      F_23 = dtemp2+pdata5[3];
-      F_43 = F_23+pdata6[0];
-      F_63 = F_43+pdata6[1];
-      F_83 = F_63+pdata6[2];
-      dtemp3 = F_83+pdata6[3];
+      v4sf vec60, vec70, vec80, vec90, vec100, vec110, vec120, vec130, vec140, vec150, vec160, vec170;
+      SIMD_LOAD_V4SF(vec80, &dy[ii0+5*(0+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec70, &dx[ii0+5*(0+LU_IND01)]);
+      SIMD_MULPS(vec60, vec70, vec80);
+      SIMD_STORE_V4SF(vec60, &pdata1[0]);
+      SIMD_LOAD_V4SF(vec110, &dy[ii0+5*(1+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec100, &dx[ii0+5*(1+LU_IND01)]);
+      SIMD_MULPS(vec90, vec100, vec110);
+      SIMD_STORE_V4SF(vec90, &pdata2[0]);
+      SIMD_LOAD_V4SF(vec140, &dy[ii0+5*(2+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec130, &dx[ii0+5*(2+LU_IND01)]);
+      SIMD_MULPS(vec120, vec130, vec140);
+      SIMD_STORE_V4SF(vec120, &pdata3[0]);
+      SIMD_LOAD_V4SF(vec170, &dy[ii0+5*(3+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec160, &dx[ii0+5*(3+LU_IND01)]);
+      SIMD_MULPS(vec150, vec160, vec170);
+      SIMD_STORE_V4SF(vec150, &pdata4[0]);
+      F_12 = dtemp0+pdata1[0];
+      F_14 = F_12+pdata1[1];
+      F_16 = F_14+pdata1[2];
+      F_18 = F_16+pdata1[3];
+      dtemp1 = __PIPS_SAC_MULADD(F_18, dx[4+ii0+5*(0+LU_IND01)], dy[4+ii0+5*(0+LU_IND01)]);
+      F_20 = dtemp1+pdata2[0];
+      F_22 = F_20+pdata2[1];
+      F_24 = F_22+pdata2[2];
+      F_26 = F_24+pdata2[3];
+      dtemp2 = __PIPS_SAC_MULADD(F_26, dx[4+ii0+5*(1+LU_IND01)], dy[4+ii0+5*(1+LU_IND01)]);
+      F_28 = dtemp2+pdata3[0];
+      F_30 = F_28+pdata3[1];
+      F_32 = F_30+pdata3[2];
+      F_34 = F_32+pdata3[3];
+      dtemp3 = __PIPS_SAC_MULADD(F_34, dx[4+ii0+5*(2+LU_IND01)], dy[4+ii0+5*(2+LU_IND01)]);
+      F_36 = dtemp3+pdata4[0];
+      F_38 = F_36+pdata4[1];
+      F_40 = F_38+pdata4[2];
+      F_42 = F_40+pdata4[3];
+      dtemp4 = __PIPS_SAC_MULADD(F_42, dx[4+ii0+5*(3+LU_IND01)], dy[4+ii0+5*(3+LU_IND01)]);
+      dtemp0 = dtemp4;
+l99997:      ;
    }
+   I_30 = MAX0(LU_NUB00, 0);
+   *dtemp_0 = dtemp0;
+   i0 = __PIPS_SAC_MULADD(ii0, 5, I_30);
+}
+void ddot_ur_l99998(int n, float dtemp_0[1], float dx[n], float dy[n])
+{
+   //PIPS generated variable
+   float F_12, F_14, F_16, F_18, F_20, F_22, F_24, F_26, F_28, F_30, F_32, F_34, F_36, F_38, F_40, F_42;
+   //PIPS generated variable
+   int I_20, I_10, I_00, LU_IND00, LU_IND01, LU_IB00, LU_NUB00, ii0;
+   //SAC generated temporary array
+   a4sf pdata1 = {0, 0, 0, 0}, pdata2 = {0, 0, 0, 0}, pdata3 = {0, 0, 0, 0}, pdata4 = {0, 0, 0, 0};
+   //PIPS generated variable
+   float dtemp0, dtemp1, dtemp2, dtemp3, dtemp4;
+   //PIPS generated variable
+   v4sf vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0, vec120_0, vec130_0, vec140_0, vec150_0, vec160_0, vec170_0;
+   dtemp0 = *dtemp_0;
+   ii0 = n%5;
+l99998:   I_00 = n-1;
+   I_10 = I_00-ii0;
+   I_20 = 5+I_10;
+   LU_NUB00 = I_20/5;
+   LU_IB00 = MOD(LU_NUB00, 4);
+   for(LU_IND00 = 0; LU_IND00 <= LU_IB00-1; LU_IND00 += 1) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec40_0, &dx[ii0+5*LU_IND00]);
+      SIMD_LOAD_V4SF(vec50_0, &dy[ii0+5*LU_IND00]);
+      SIMD_MULPS(vec30_0, vec40_0, vec50_0);
+l99999:      ;
+   }
+   for(LU_IND01 = LU_IB00; LU_IND01 <= LU_NUB00-1; LU_IND01 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec160_0, &dx[ii0+5*(3+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec170_0, &dy[ii0+5*(3+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec130_0, &dx[ii0+5*(2+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec140_0, &dy[ii0+5*(2+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec100_0, &dx[ii0+5*(1+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec110_0, &dy[ii0+5*(1+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec70_0, &dx[ii0+5*(0+LU_IND01)]);
+      SIMD_LOAD_V4SF(vec80_0, &dy[ii0+5*(0+LU_IND01)]);
+      SIMD_MULPS(vec60_0, vec70_0, vec80_0);
+      SIMD_MULPS(vec90_0, vec100_0, vec110_0);
+      SIMD_MULPS(vec120_0, vec130_0, vec140_0);
+      SIMD_MULPS(vec150_0, vec160_0, vec170_0);
+      SIMD_STORE_V4SF(vec60_0, &pdata1[0]);
+      F_12 = dtemp0+pdata1[0];
+      F_14 = F_12+pdata1[1];
+      F_16 = F_14+pdata1[2];
+      F_18 = F_16+pdata1[3];
+      dtemp1 = __PIPS_SAC_MULADD(F_18, dx[4+ii0+5*(0+LU_IND01)], dy[4+ii0+5*(0+LU_IND01)]);
+      SIMD_STORE_V4SF(vec90_0, &pdata2[0]);
+      F_20 = dtemp1+pdata2[0];
+      F_22 = F_20+pdata2[1];
+      F_24 = F_22+pdata2[2];
+      F_26 = F_24+pdata2[3];
+      dtemp2 = __PIPS_SAC_MULADD(F_26, dx[4+ii0+5*(1+LU_IND01)], dy[4+ii0+5*(1+LU_IND01)]);
+      SIMD_STORE_V4SF(vec120_0, &pdata3[0]);
+      F_28 = dtemp2+pdata3[0];
+      F_30 = F_28+pdata3[1];
+      F_32 = F_30+pdata3[2];
+      F_34 = F_32+pdata3[3];
+      dtemp3 = __PIPS_SAC_MULADD(F_34, dx[4+ii0+5*(2+LU_IND01)], dy[4+ii0+5*(2+LU_IND01)]);
+      SIMD_STORE_V4SF(vec150_0, &pdata4[0]);
+      F_36 = dtemp3+pdata4[0];
+      F_38 = F_36+pdata4[1];
+      F_40 = F_38+pdata4[2];
+      F_42 = F_40+pdata4[3];
+      dtemp4 = __PIPS_SAC_MULADD(F_42, dx[4+ii0+5*(3+LU_IND01)], dy[4+ii0+5*(3+LU_IND01)]);
+      dtemp0 = dtemp4;
+l99997:      ;
+   }
+   *dtemp_0 = dtemp0;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   int i, m;
+   float dtemp = 0;
+   m = n%5;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
 
-   return dtemp3;
+   return dtemp;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   int i, m;
+   float dtemp = 0;
+   m = n%5;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
+
+   return dtemp;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   float dtemp = 0;
+   //PIPS generated variable
+   int m0;
+   m0 = n%5;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
+
+   return dtemp;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   float dtemp = 0;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
+
+   return dtemp;
+}
+float ddot_ur(int n, float dx[n], float dy[n])
+{
+   float dtemp = 0;
+   if (n%5!=0) {
+l99999:      ddot_ur_l99999(n, &dtemp, dx, dy);
+      if (n<5)
+         return dtemp;
+   }
+l99998:   ddot_ur_l99998(n, &dtemp, dx, dy);
+
+   return dtemp;
 }

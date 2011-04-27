@@ -9,35 +9,173 @@ void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 }
 void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
 {
+   size_t i, j;
+   for(i = 0; i <= n-ksize+1-1; i += 1) {
+      out[i] = 0.0;
+      for(j = 0; j <= ksize-1; j += 1)
+         out[i] += in[i+j]*kernel[j];
+   }
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   size_t i, j;
+l99998:
+   for(i = 0; i <= n-ksize; i += 1) {
+      out[i] = 0.0;
+l99999:      fir_l99999(n, i, in, kernel, ksize, out);
+   }
+}
+void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
+{
+   //PIPS generated variable
+   float RED0[4], RED1[1];
+   //PIPS generated variable
+   size_t j;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(j = 0; j <= 0+4*((1+ksize-1-0)/4)-1; j += 4) {
+      RED0[0] = RED0[0]+in[i+j]*kernel[j];
+      RED0[1] = RED0[1]+in[i+1+j]*kernel[1+j];
+      RED0[2] = RED0[2]+in[i+2+j]*kernel[2+j];
+      RED0[3] = RED0[3]+in[i+3+j]*kernel[3+j];
+   }
+   out[i] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i];
+   for(j = 0+4*((1+ksize-1-0)/4); j <= ksize-1; j += 1)
+      out[i] = out[i]+in[i+j]*kernel[j];
+}
+void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
+{
+   //PIPS generated variable
+   float RED0[4], RED1[1];
+   //PIPS generated variable
    size_t j;
    //PIPS generated variable
-   float F_0, RED0[4], RED1[1];
+   float F_0, F_1, F_2;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(j = 0; j <= 0+4*((1+ksize-1-0)/4)-1; j += 4) {
+      RED0[0] = __PIPS_SAC_MULADD(RED0[0], in[i+j], kernel[j]);
+      RED0[1] = __PIPS_SAC_MULADD(RED0[1], in[i+1+j], kernel[1+j]);
+      RED0[2] = __PIPS_SAC_MULADD(RED0[2], in[i+2+j], kernel[2+j]);
+      RED0[3] = __PIPS_SAC_MULADD(RED0[3], in[i+3+j], kernel[3+j]);
+   }
+   F_0 = RED0[0]+out[i];
+   F_1 = RED0[1]+F_0;
+   F_2 = RED0[2]+F_1;
+   out[i] = RED0[3]+F_2;
+   for(j = 0+4*((1+ksize-1-0)/4); j <= ksize-1; j += 1)
+      out[i] = __PIPS_SAC_MULADD(out[i], in[i+j], kernel[j]);
+}
+void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
+{
    //PIPS generated variable
-   size_t i0, j0;
+   float RED0[4];
    //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
+   float F_20, F_10, F_00;
+   //PIPS generated variable
+   size_t j0, j1;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+l99999:
+   for(j0 = 0; j0 <= 0+4*((1+ksize-1-0)/4)-1; j0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      v4sf vec00, vec10, vec20;
+      SIMD_LOAD_V4SF(vec20, &kernel[j0]);
+      SIMD_LOAD_V4SF(vec10, &in[i+j0]);
+      SIMD_LOAD_V4SF(vec00, &RED0[0]);
+      SIMD_MULADDPS(vec00, vec00, vec10, vec20);
+      SIMD_STORE_V4SF(vec00, &RED0[0]);
+   }
+   F_00 = RED0[0]+out[i];
+   F_10 = RED0[1]+F_00;
+   F_20 = RED0[2]+F_10;
+   out[i] = RED0[3]+F_20;
+   for(j1 = 0+4*((1+ksize-1-0)/4); j1 <= ksize-1; j1 += 1)
+      out[i] = __PIPS_SAC_MULADD(out[i], in[i+j1], kernel[j1]);
+}
+void fir_l99999(size_t n, size_t i, float in[n], float kernel[n], size_t ksize, float out[n])
+{
+   //PIPS generated variable
+   float RED0[4];
+   //PIPS generated variable
+   float F_20, F_10, F_00;
+   //PIPS generated variable
+   size_t j0, j1;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0;
+   RED0[0] = 0.000000;
+   RED0[1] = 0.000000;
+   RED0[2] = 0.000000;
+   RED0[3] = 0.000000;
+   SIMD_LOAD_V4SF(vec00_0, &RED0[0]);
+l99999:
+   for(j0 = 0; j0 <= 0+4*((1+ksize-1-0)/4)-1; j0 += 4) {
+      //PIPS:SAC generated v4sf vector(s)
+      SIMD_LOAD_V4SF(vec10_0, &in[i+j0]);
+      SIMD_LOAD_V4SF(vec20_0, &kernel[j0]);
+      SIMD_MULADDPS(vec00_0, vec00_0, vec10_0, vec20_0);
+   }
+   SIMD_STORE_V4SF(vec00_0, &RED0[0]);
+   F_00 = RED0[0]+out[i];
+   F_10 = RED0[1]+F_00;
+   F_20 = RED0[2]+F_10;
+   out[i] = RED0[3]+F_20;
+   for(j1 = 0+4*((1+ksize-1-0)/4); j1 <= ksize-1; j1 += 1)
+      out[i] = __PIPS_SAC_MULADD(out[i], in[i+j1], kernel[j1]);
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   size_t i, j;
+l99998:
+   for(i = 0; i <= n-ksize; i += 1) {
+      out[i] = 0.0;
+l99999:      fir_l99999(n, i, in, kernel, ksize, out);
+   }
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   size_t i, j;
+l99998:
+   for(i = 0; i <= n-ksize; i += 1) {
+      out[i] = 0.0;
+l99999:      fir_l99999(n, i, in, kernel, ksize, out);
+   }
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   //PIPS generated variable
+   size_t i0;
+l99998:
    for(i0 = 0; i0 <= n-ksize; i0 += 1) {
       out[i0] = 0.0;
-      RED0[0] = 0.000000;
-      RED0[1] = 0.000000;
-      RED0[2] = 0.000000;
-      RED0[3] = 0.000000;
-      SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
-      for(j0 = 0; j0 <= 4*(ksize/4)-1; j0 += 4) {
-         //PIPS:SAC generated v4sf vector(s)
-         SIMD_LOAD_V4SF(vec20_0, &kernel[j0]);
-         SIMD_LOAD_V4SF(vec10_0, &in[i0+j0]);
-         SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-         SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
-      }
-      SIMD_STORE_V4SF(vec30_0, &RED0[0]);
-      out[i0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+out[i0];
-      RED1[0] = 0.000000;
-      for(j = 4*(ksize/4); j <= ksize-1; j += 1) {
-         F_0 = in[i0+j]*kernel[j];
-         RED1[0] = RED1[0]+F_0;
-      }
-      out[i0] = RED1[0]+out[i0];
+l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
    }
-   ;
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   //PIPS generated variable
+   size_t i0;
+l99998:
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
+l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
+   }
+}
+void fir(size_t n, float in[n], float out[n], float kernel[n], size_t ksize)
+{
+   //PIPS generated variable
+   size_t i0;
+l99998:
+   for(i0 = 0; i0 <= n-ksize; i0 += 1) {
+      out[i0] = 0.0;
+l99999:      fir_l99999(n, i0, in, kernel, ksize, out);
+   }
 }
