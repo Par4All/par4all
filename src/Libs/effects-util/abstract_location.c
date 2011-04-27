@@ -392,8 +392,8 @@ reference original_malloc_to_abstract_location(expression lhs,
     make_sensitivity_information(stmt,
 				 f,
 				 NIL);
-  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  //string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
   e = malloc_to_abstract_location(sizeof_exp, &si);
   if(!entity_array_p(e))
