@@ -8499,7 +8499,7 @@ are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
 \verb/FALSE/ because we need that the DG includes arcs for declarations as these
 latter are separate statements now.
 
-\PipsPropRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
+\PipsPassRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
 cumulated effects are needed.
 
 Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} p. 595,
@@ -11404,7 +11404,7 @@ it only changes the program perfomances.
 Then three policies are offered to manage the if clause merging. The if clause
 can simply be ignored. Or the if clauses can be merged alltogether using the
 boolean opertaion \verb|or| or \verb|and|. When ignored, the if clause can be
-later regenrated using the appropriated PIPS phase :
+later regenerated using the appropriated PIPS phase :
 OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. To summarize, remenber that the property
 can be set to \verb|ignore| \verb|or| or \verb|and|
 \begin{PipsProp}{OMP_IF_MERGE_POLICY}
