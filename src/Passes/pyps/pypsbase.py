@@ -385,12 +385,23 @@ class workspace(object):
         return module_name in self.__modules
 
     def __build_module_list(self):
-	""" update workspace module list """
+        """ update workspace module list """
         def info(ws,topic):
             return ws.cpypips.info(topic).split()
         for m in info(self,"modules"):
-		    self.__modules[m]=module(self,m,self.__sources[0])
-
+            self.__modules[m]=module(self,m,self.__sources[0])
+    
+    def add_source(self, fname):
+        """ Add a source file to the workspace, using PIPS guard includes if necessary """
+        newfname = fname
+        if self.recoverInclude:
+            newfname = os.path.join(pypsutils.nameToTmpDirName(self.name),os.path.basename(fname))
+            shutil.copy2(fname, newfname)
+            pypsutils.guardincludes(newfname)
+        self.__sources += [newfname]
+        self.cpypips.add_a_file(newfname)    
+        self.__build_module_list()
+        
     def checkpoint(self):
         """checkpoints the workspace and returns a workspace id"""
         self.cpypips.close_workspace(0)

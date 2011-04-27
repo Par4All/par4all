@@ -292,13 +292,19 @@ void capply(char * phasename, char ** targets)
 
 void display(char *rname, char *mname)
 {
-    bool has_current_module_name = db_get_current_module_name()!=NULL;
-    if(has_current_module_name)
-        db_reset_current_module_name();
+    string old_current_module_name = db_get_current_module_name();
+    if(old_current_module_name) {
+      old_current_module_name = strdup(old_current_module_name);
+      db_reset_current_module_name();
+    }
 
     db_set_current_module_name(mname);
     string fname = build_view_file(rname);
     db_reset_current_module_name();
+    if(old_current_module_name) {
+      db_set_current_module_name(old_current_module_name);
+      free(old_current_module_name);
+    }
 
     if (!fname)
     {
@@ -325,7 +331,7 @@ char* show(char * rname, char *mname)
 
     /* now returns the name of the file.
     */
-    return strdup(db_get_memory_resource(rname, mname, TRUE));
+    return strdup(db_get_memory_resource(rname, mname, true));
 }
 
 /* Returns the list of the modules that call that specific module,
@@ -384,3 +390,24 @@ void pop_property(const char* name) {
 }
 
 
+
+/* Add a source file to the workspace
+ * We wrap process_user_file() here with a hack
+ * to define the workspace language so that some
+ * pipsmake activate specific to the language
+ * will be defined.
+ * This function will be removed when pipsmake
+ * will be improved to handle multilanguage workspace !
+ */
+bool add_a_file( string file ) {
+  gen_array_t filename_list = gen_array_make(0);
+  gen_array_append(filename_list,file);
+  language workspace_language(gen_array_t files);
+  language l = workspace_language(filename_list);
+  activate_language(l);
+  printf("Language %d\n",language_tag(l));
+  free_language(l);
+  gen_array_free(filename_list);
+  bool process_user_file(string file);
+  return process_user_file(file);
+}
