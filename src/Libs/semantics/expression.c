@@ -2176,6 +2176,7 @@ static transformer logical_binary_operation_to_transformer(entity v,
   Pvecteur eq1 = VECTEUR_NUL;
   Pvecteur eq2 = VECTEUR_NUL;
   Pvecteur eq3 = VECTEUR_NUL;
+  Pvecteur eq4 = VECTEUR_NUL;
   expression arg1 = EXPRESSION(CAR(call_arguments(c)));
   expression arg2 = EXPRESSION(CAR(CDR(call_arguments(c))));
   entity tmp1 = make_local_temporary_value_entity(entity_type(v));
@@ -2222,25 +2223,54 @@ static transformer logical_binary_operation_to_transformer(entity v,
       vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
     }
     else if(ENTITY_EQUAL_P(op)) {
-      /* v >= 1-tmp1-tmp2, v >= tmp1+tmp2-1 */
+      /* v >= 1-tmp1-tmp2, v >= tmp1+tmp2-1, i.e.
+       * -v -tmp1 -tmp2 + 1 <= 0, -v+tmp1+tmp2-1<=0
+       * v <= 1-tmp1+tmp2, v <= 1+tmp1-tmp2, i.e.
+       * v + tmp1 - tmp2 - 1 <= 0, v - tmp1 + tmp2 - 1 <=0
+       */
       eq1 = vect_new((Variable) v, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp1, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp2, VALUE_MONE);
       vect_add_elem(&eq1, TCST , VALUE_ONE);
+
       eq2 = vect_new((Variable) v, VALUE_MONE);
       vect_add_elem(&eq2, (Variable) tmp1, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp2, VALUE_ONE);
       vect_add_elem(&eq2, TCST , VALUE_MONE);
+
+      eq3 = vect_new((Variable) v, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp1, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
+      vect_add_elem(&eq3, TCST , VALUE_MONE);
+
+      eq4 = vect_new((Variable) v, VALUE_ONE);
+      vect_add_elem(&eq4, (Variable) tmp1, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp2, VALUE_ONE);
+      vect_add_elem(&eq4, TCST , VALUE_MONE);
     }
-    else if(ENTITY_NON_EQUAL_P(op)) {
-      /* v <= tmp1+tmp2, v <= 2-tmp1-tmp2 */
+    else if(ENTITY_NON_EQUAL_P(op) || ENTITY_BITWISE_XOR_P(op)) {
+      /* v <= tmp1+tmp2, v <= 2-tmp1-tmp2, i.e.
+       * v - tmp 1 - tmp 2 <= 0, v -tmp1-tmp2 -2 <= 0
+       * v >= tmp1 - tmp2, v >= -tmp1+tmp2, i.e.
+       * -v + tmp1 - tmp2 <=0, -v - tmp1 + tmp2 <=0
+       */
       eq1 = vect_new((Variable) v, VALUE_ONE);
       vect_add_elem(&eq1, (Variable) tmp1, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp2, VALUE_MONE);
+
       eq2 = vect_new((Variable) v, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp1, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp2, VALUE_ONE);
       vect_add_elem(&eq2, TCST , VALUE_MONE+VALUE_MONE);
+
+      eq3 = vect_new((Variable) v, VALUE_MONE);
+      vect_add_elem(&eq3, (Variable) tmp1, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
+
+      eq4 = vect_new((Variable) v, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp1, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp2, VALUE_ONE);
+
     }
     else {
       pips_internal_error("Unexpected binary logical operator %s",
@@ -2249,6 +2279,9 @@ static transformer logical_binary_operation_to_transformer(entity v,
     tf = transformer_inequality_add(tf, eq1);
     tf = transformer_inequality_add(tf, eq2);
     if(!VECTEUR_NUL_P(eq3)) {
+      if(!VECTEUR_NUL_P(eq4)) {
+	tf = transformer_inequality_add(tf, eq4);
+      }
       tf = transformer_inequality_add(tf, eq3);
     }
     tf = transformer_logical_inequalities_add(tf, v);
@@ -2270,7 +2303,9 @@ static transformer logical_binary_function_to_transformer(entity v,
   transformer tf = transformer_undefined;
   entity op = call_function(c);
 
-  if(ENTITY_AND_P(op)||ENTITY_OR_P(op)) {
+  if(ENTITY_AND_P(op)||ENTITY_OR_P(op)||ENTITY_EQUAL_P(op)
+     ||ENTITY_NON_EQUAL_P(op)||ENTITY_BITWISE_XOR_P(op)
+     ||ENTITY_BITWISE_AND_P(op)||ENTITY_BITWISE_OR_P(op)) {
     tf = logical_binary_operation_to_transformer(v, c, pre, is_internal);
   }
   else if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
