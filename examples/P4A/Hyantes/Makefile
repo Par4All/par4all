@@ -92,7 +92,8 @@ run_ref:;
 
 %_opencl : %.c
 	# Parallelize and build a CUDA version:
-	p4a $(P4A_OPTIONS) --opencl -k -g -o $@ $< $(LDLIBS)
+	# p4a $(P4A_OPTIONS) --opencl -k -g -o $@ $< $(LDLIBS)
+	p4a $(P4A_OPTIONS) --opencl -o $@ $< $(LDLIBS)
 
 %_accel : %.c
 	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
