@@ -32,8 +32,8 @@ with workspace("check.c",deleteOnClose=True) as w:
 	mb.display()
 	
 	# access all functions
-	w.all.partial_eval()
-	w.all.display()
+	w.all_functions.partial_eval()
+	w.all_functions.display()
 	
 	# recover a list of all labels in the source code ... without pipsing
 	##
