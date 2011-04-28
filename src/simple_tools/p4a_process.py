@@ -178,17 +178,11 @@ def process(input):
             # Generate code for a GPU-like accelerator. Note that we can
             # have an OpenMP implementation of it if OpenMP option is set
             # too:
-            if not input.opencl:
-                processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'],
-                                 apply_phases_kernel_launcher = input.apply_phases['aklg'],
-                                 apply_phases_wrapper = input.apply_phases['awg'],
-                                 apply_phases_after = input.apply_phases['aag'])
-            else:
-                processor.openclify(apply_phases_kernel_after = input.apply_phases['akag'],
-                                    apply_phases_kernel_launcher = input.apply_phases['aklg'],
-                                    apply_phases_wrapper = input.apply_phases['awg'],
-                                    apply_phases_after = input.apply_phases['aag'])
-
+            processor.gpuify(apply_phases_kernel_after = input.apply_phases['akag'],
+                             apply_phases_kernel_launcher = input.apply_phases['aklg'],
+                             apply_phases_wrapper = input.apply_phases['awg'],
+                             apply_phases_after = input.apply_phases['aag'])
+            
         if input.openmp and not input.accel:
             # Parallelize the code in an OpenMP way:
             processor.ompify(apply_phases_before = input.apply_phases['abo'],
@@ -672,7 +666,8 @@ class p4a_processor(object):
                 apply_phases_wrapper = [],
                 apply_phases_after = []):
         """Apply transformations to the parallel loop nested found in the
-        workspace to generate GPU-oriented code
+        workspace to generate GPU-oriented code. In OpenCL case, Kernels and
+        and wrappers are saved in separate computation unit.
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
@@ -734,7 +729,8 @@ class p4a_processor(object):
         # End to generate the wrappers and kernel contents, but not the
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
-                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                                 # self.c99 if cuda, True if OpenCL
+                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99 if self.cuda else True,
                                  concurrent=True)
 
         # Select kernels by using the fact that all the generated kernels
@@ -794,27 +790,35 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
+        # In Opencl, avoid the pointer reference.
         if (self.fortran == False):
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.cuda,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=self.cuda)
+            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.cuda,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=self.cuda)
         else:
             kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
         # Update the list of cuda modules
-        p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
-                                  self.cuda_modules)
-        p4a_util.add_list_to_set (map(lambda x:x.name, wrappers),
-                                  self.cuda_modules)
+        if (self.cuda):
+            p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
+                                      self.cuda_modules)
+            p4a_util.add_list_to_set (map(lambda x:x.name, wrappers),
+                                      self.cuda_modules)
 
         # set return type for wrappers && kernel
         if (self.fortran == False):
             wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
             kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
-            if (self.c99 == True):
+            if (self.c99 == True and self.cuda == True):
                 self.generated_modules.extend (map(lambda x:x.name, kernel_launchers))
                 self.generated_modules.extend (map(lambda x:x.name, wrappers))
                 self.generated_modules.extend (map(lambda x:x.name, kernels))
+            if self.opencl:
+                # The kernel and wrapper are saved in the separated wrapper
+                #  file (explained in the merge_wk procedure)
+                # This must be saved as generated module to be post_process via
+                # save_generated
+                self.generated_modules.extend (map(lambda x:x.name, wrappers))
         else:
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
@@ -862,185 +866,15 @@ class p4a_processor(object):
 
         # save the list of kernels for later work
         self.kernels.extend (map(lambda x:x.name, kernels))
-        self.launchers.extend (map(lambda x:x.name, kernel_launchers))
+        if self.cuda:
+            self.launchers.extend (map(lambda x:x.name, kernel_launchers))
+        if self.opencl:
+            # Comment the place where the opencl wrapper declaration must be placed
+            # from the post-process
+            for launcher in kernel_launchers:
+                # self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "char * " + self.launcher_to_wrapper_name (launcher.name))
+                self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")
 
-        # To be able to inject Par4All accelerator run time initialization
-        # later:
-        if "main" in self.workspace:
-            self.workspace["main"].prepend_comment(PREPEND_COMMENT = "// Prepend here P4A_init_accel")
-        else:
-            p4a_util.warn('''
-            There is no "main()" function in the given sources.
-            That means the P4A Accel runtime initialization can not be
-            inserted and that the compiled application may not work.
-
-            If you build a P4A executable from partial p4a output, you
-            should add a
-               #include <p4a_accel.h>
-            at the beginning of the .c file containing the main()
-            and add at the beginning of main() a line with:
-               P4A_init_accel;
-            ''')
-
-    def openclify(self, filter_select = None,
-                filter_exclude = None,
-                apply_phases_kernel_after = [],
-                apply_phases_kernel_launcher = [],
-                apply_phases_wrapper = [],
-                apply_phases_after = []):
-        """Apply transformations to the parallel loop nested found in the
-        workspace to generate OPENCL-oriented code
-        """
-
-        all_modules = self.filter_modules(filter_select, filter_exclude)
-
-        # First, only generate the launchers to work on them later. They are
-        # generated by outlining all the parallel loops. If in the fortran case
-        # we want the launcher to be wrapped in an independant fortran function
-        # to ease future post processing.
-        all_modules.gpu_ify(GPU_USE_WRAPPER = False,
-                            GPU_USE_KERNEL = False,
-                            GPU_USE_FORTRAN_WRAPPER = self.fortran,
-                            GPU_USE_LAUNCHER = True,
-                            OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
-                            concurrent=True)
-
-        # Select kernel launchers by using the fact that all the generated
-        # functions have their names beginning with the launcher prefix:
-        launcher_prefix = self.get_launcher_prefix ()
-        kernel_launcher_filter_re = re.compile(launcher_prefix + "_.*[^!]$")
-        kernel_launchers = self.workspace.filter(lambda m: kernel_launcher_filter_re.match(m.name))
-
-        # Normalize all loops in kernels to suit hardware iteration spaces:
-        kernel_launchers.loop_normalize(
-            # Loop normalize to be GPU friendly, even if the step is already 1:
-            LOOP_NORMALIZE_ONE_INCREMENT = True,
-            # Arrays start at 0 in C, 1 in Fortran so the iteration loops:
-            LOOP_NORMALIZE_LOWER_BOUND = 1 if self.fortran else 0,
-            # It is legal in the following by construction (...Hmmm to verify)
-            LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
-            concurrent=True)
-
-        for ph in apply_phases_kernel_launcher:
-            #Apply requested phases before parallelization to kernel launchers:
-			getattr(kernel_launchers, ph)(concurrent=True)
-
-        # Since the privatization of a module does not change
-        # privatization of other modules, use concurrent=True (capply) to
-        # apply them without requiring pipsmake to carefully rebuild
-        # dependent resources:
-        kernel_launchers.privatize_module(concurrent=True)
-        # Idem for this phase:
-        kernel_launchers.coarse_grain_parallelization(concurrent=True)
-
-        # In CUDA there is a limitation on 2D grids of thread blocks, in
-        # OpenCL there is a 3D limitation, so limit parallelism at 2D
-        # top-level loops inside parallel loop nests:
-        kernel_launchers.limit_nested_parallelism(NESTED_PARALLELISM_THRESHOLD = 2, concurrent=True)
-        #kernel_launchers.localize_declaration()
-
-        # Add iteration space decorations and insert iteration clamping
-        # into the launchers onto the outer parallel loop nests:
-        kernel_launchers.gpu_loop_nest_annotate(concurrent=True)
-
-        # End to generate the wrappers and kernel contents, but not the
-        # launchers that have already been generated:
-        kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
-                                 OUTLINE_INDEPENDENT_COMPILATION_UNIT = True,
-                                 concurrent=True)
-
-        # Select kernels by using the fact that all the generated kernels
-        # have their names of this form:
-        kernel_prefix = self.get_kernel_prefix ()
-        kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
-        kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
-        
-        for ph in apply_phases_kernel_after:
-            # Apply requested phases before parallelization to generated kernels:
-			getattr(kernels, ph)(concurrent=True)
-
-        # Unfolding is needed because kernels calling other function will get the bad cuda attribute otherwise
-        # (i.e. none).
-        # An alternative would be to flag them recursievly, but it is not safe: what if there is a host caller too ?
-        # RK suggests this should be done before ...
-        kernels.unfolding()
-        # kernels.inlining()
- 
-        if not self.com_optimization :
-            # Add communication around all the call site of the kernels. Since
-            # the code has been outlined, any non local effect is no longer an
-            # issue:
-            kernel_launchers.kernel_load_store(concurrent=True,
-                                               ISOLATE_STATEMENT_EVEN_NON_LOCAL = True
-                                               )
-        else :
-            # Identify kernels first
-            kernels.flag_kernel()
-            #kernel for fftw3 runtime
-            fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
-            fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
-            fftw3_kernels.flag_kernel()
-            self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
-
-        # Select wrappers by using the fact that all the generated wrappers
-        # have their names of this form:
-        wrapper_prefix = self.get_wrapper_prefix()
-        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
-        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
-
-        for ph in apply_phases_wrapper:
-            #Apply requested phases before parallelization to wrappers:
-			getattr(wrappers, ph)(concurrent=True)
-
-        # Select fortran wrappers by using the fact that all the generated
-        # fortran wrappers
-        # have their names of this form:
-        f_wrapper_prefix = self.get_fortran_wrapper_prefix ()
-        f_wrapper_filter_re = re.compile(f_wrapper_prefix  + "_\\w+$")
-        f_wrappers = self.workspace.filter(lambda m: f_wrapper_filter_re.match(m.name))
-#        f_wrappers.print_call_graph ()
-
-        # Unfortunately CUDA 3.0 does not accept C99 array declarations
-        # with sizes also passed as parameters in kernels. So we degrade
-        # the quality of the generated code by generating array
-        # declarations as pointers and by accessing them as
-        # array[linearized expression]:
-        if (self.fortran == False):
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
-            wrappers.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.wrapper_return_type)
-            kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
-        else:
-            kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-
-        if self.com_optimization :
-            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
-            wrappers.cast_at_call_sites()
-
-        for ph in apply_phases_after:
-            # Apply requested phases to kernels, wrappers and launcher:
-			getattr(kernels, ph)(concurrent=True)
-			getattr(wrappers, ph)(concurrent=True)
-			getattr(kernel_launchers, ph)(concurrent=True)
-
-        # Comment the place where the opencl wrapper declaration must be placed
-        # from the post-process
-        for launcher in kernel_launchers:
-            # self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "char * " + self.launcher_to_wrapper_name (launcher.name))
-            self.workspace[launcher.name].prepend_comment(PREPEND_COMMENT = "Opencl wrapper declaration\n")
-        
-        # save the list of kernels for later work
-        # for example, retrieving the kernel files when saving
-        # in merge_wk
-        # kernel_launchers.prepend_comment("// Opencl wrapper prototype")
-        self.kernels.extend (map(lambda x:x.name, kernels))
-
-        # The kernel and wrapper are saved in the wrapper file 
-        # (explained in the merge_wk procedure)
-        # This must be saved as generated module to be post_process via
-        # save_generated
-        self.generated_modules.extend (map(lambda x:x.name, wrappers))
 
         # To be able to inject Par4All accelerator run time initialization
         # later:
@@ -1121,7 +955,7 @@ class p4a_processor(object):
         return name.replace (self.get_kernel_prefix (), self.get_launcher_prefix ())
 
     def launchers_insert_extern_C (self):
-        """Insert the extern C block construct to the whole file. The all
+        """ Insert the extern C block construct to the whole file. The all
         the file functions will be callable from a C code.
         """
         for launcher in self.launchers:
@@ -1157,49 +991,23 @@ class p4a_processor(object):
                                         wrapper + ".c")
             launcher_file = os.path.join(self.workspace.dirname(), "Src",
                                          launcher + ".c")
-            p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
-            # remove the wrapper from the modules to be processed since already
-            #in the kernel
-            self.generated_modules.remove (wrapper)
-            self.generated_modules.remove (launcher)
 
-    def merge_wk (self, dest_dir):
-        """ merge wrapper and kernel in one file. The order is
-        important the wrapper that call the kernel. So they have to be
-        in the inverse order into the file.  Files are merged in the
-        wrapper file since by convention in P4A, the name of the
-        procedure called from the main and the name of the file must
-        be identical, if not considered the extension. The wrapper is
-        the procedure that is called from the main."""
-        for kernel in self.kernels:
-            # find the associated wrapper with the kernel
-            wrapper  = self.kernel_to_wrapper_name  (kernel)
-            # merge the files in the wrapper file
-            # Where the files do well in the .database workspace:
-            kernel_file = os.path.join(self.workspace.dirname(), "Src",
-                                       kernel + ".c")
-            wrapper_file = os.path.join(self.workspace.dirname(), "Src",
-                                        wrapper + ".c")
+            if self.cuda:
+                p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
+                # remove the wrapper from the modules to be processed since
+                #  already in the kernel
+                self.generated_modules.remove (wrapper)
+                self.generated_modules.remove (launcher)
+            else:
+                # OpenCL:
+                # To skip all the definitions that have been added in the
+                # wrapper file and will be redundant with those in the kernel
+                #  files. Opencl doesn't like this
+                p4a_util.skip_file_up_to_word(wrapper_file,"P4A_accel_kernel_wrapper",2)
 
-            # To skip all the definitions that have been added in the
-            # wrapper file and will be redundant with those in the kernel files
-            # Opencl doesn't like this
-            p4a_util.skip_file_up_to_word(wrapper_file,"P4A_accel_kernel_wrapper",2)
-
-            #output_file = os.path.join(dest_dir , wrapper + ".p4a.cl")
-            output_file = os.path.join(self.workspace.dirname(), "Src",
-                                       wrapper + ".cl")
-            
-            p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
-            
-            # h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
-            # if os.path.isfile(h_file):
-            #     p4a_util.merge_files (output_file, [h_file, kernel_file, wrapper_file])
-            # else:
-            #     p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
-            #     text = "/*\n * Header included by P4A\n * " + h_file + "\n */\n"
-            #     text = text + "#include \"p4a_accel_wrapper.h\"\n"
-            #     p4a_util.prepend_text(output_file,text)
+                output_file = os.path.join(self.workspace.dirname(), "Src",
+                                            wrapper + ".cl")
+                p4a_util.merge_files (output_file, [kernel_file, wrapper_file])
 
 
     def save_header (self, output_dir, name):
@@ -1281,7 +1089,17 @@ class p4a_processor(object):
             result.append(output_file)
 
             if (self.opencl == True):
+                # Merging the content of the p4a_accel_wrapper-OpenCL.h
+                # in the .cl kernel file
                 end_file =  os.path.join(subs_dir, output_name)
+                # In the merge operation, the output file is only open in 
+                # append mode. When multiple compilation are launched,
+                # without cleaning, the resulting file cumulates all
+                # the versions. Removing the file before, prevent from this
+                try:
+                    os.remove(end_file)
+                except os.error:
+                    pass
                 h_file = os.path.join(os.environ["P4A_ROOT"],"share","p4a_accel","p4a_accel_wrapper-OpenCL.h")
                 p4a_util.merge_files (end_file, [h_file, output_file])
 
@@ -1427,18 +1245,11 @@ class p4a_processor(object):
         if ((self.c99 == True) and (self.cuda == True)):
             self.launchers_insert_extern_C ()
             self.merge_lwk ()
-
         # During the opencl generation process, kernels and wrappers
         # have been generated in different files. 
         # Let's merge them in the same files
-        merge_dir = os.getcwd()
-        if dest_dir:
-            merge_dir = dest_dir
-        if (not (os.path.isdir(merge_dir))):
-            os.makedirs (merge_dir)
-
-        if (self.opencl == True):
-            self.merge_wk (merge_dir)
+        if self.opencl:
+            self.merge_lwk ()
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))

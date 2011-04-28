@@ -126,9 +126,10 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # compiler does not accept variable types that are
     # implementation-dependent.
     if (p4a_util.opencl_file_p(file_base_name)):
+        # Don't know where has been generated, but the opposite of what we want
+        # Comment this line in the opencl kernel file
         content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
         content = re.sub("size_t","unsigned long int",content)
-        # content = re.sub("size_t","cl_ulong",content)
 
     header = ""
     # Inject P4A accel header definitions except in opencl files:
@@ -136,9 +137,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
         header += """/* Use the Par4All accelerator run time: */
 #include <p4a_accel.h>
 """
-
-    # if (p4a_util.opencl_file_p(file_base_name)):
-    #     header += '\n"Un autre petit commentaire"\n'
 
     for include in includes:
         header += '#include "' + include + '"\n'
