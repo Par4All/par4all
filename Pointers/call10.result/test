@@ -17,9 +17,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    tf_t s;
-//  points to = {}
+//  {}
    tf_t *sp = &s;
 //  {(sp,s,-Exact-)}
 

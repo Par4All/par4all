@@ -32,23 +32,23 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int t, i;
-//  points to = {}
+//  {}
 
    for(i = 1; i <= 62; i += 1)
-//  points to = {}
+//  {}
       tab3[i] = malloc(64*sizeof(float));
-//  points to = {}
+//  {}
    for(t = 0; t <= 63; t += 1)
-//  points to = {}
+//  {}
       compute();
-//  points to = {}
+//  {}
 
    for(i = 1; i <= 62; i += 1)
-//  points to = {}
+//  {}
       free(tab3[i]);
-//  points to = {}
+//  {}
 
    return 0;
 }

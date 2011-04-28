@@ -19,7 +19,7 @@ POINTS-TO
 //  {}
 void dereferencing03()
 {
-//  points to = {}
+//  {}
    double *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;

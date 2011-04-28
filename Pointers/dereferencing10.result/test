@@ -39,7 +39,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int ****p, ***p_1, **p_2, *p_3;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(p_1,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(p_2,

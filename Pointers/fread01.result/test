@@ -34,7 +34,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    FILE *fp;
 //  {(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    size_t n;
@@ -42,12 +42,12 @@ int main()
    char buf[200];
 //  {(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    fp = fopen("file.txt", "rb");
-//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    n = fread(buf, 8, 50, fp);
-//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    if (n==-1)
-//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       printf("fread failed");
-//  {(fp,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fp,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fclose(fp);
 }
