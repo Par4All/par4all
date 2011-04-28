@@ -332,7 +332,7 @@ void points_to_storage(set pts_to_set, statement s, bool store) {
   }
   else if(set_empty_p(pts_to_set)){
     points_to_list new_pt_list = make_points_to_list(pt_list);
-    store_pt_to_list(s, new_pt_list);
+    store_or_update_pt_to_list(s, new_pt_list);
   }
 }
 
