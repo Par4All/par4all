@@ -275,6 +275,7 @@ class workspace(object):
         self.cpypips            = kwargs.setdefault("cpypips",        pypips)
         self.recoverInclude     = kwargs.setdefault("recoverInclude", True)
         self.deleteOnClose      = kwargs.setdefault("deleteOnClose",  False)
+        deleteOnCreate          = kwargs.setdefault("deleteOnCreate",  False)
 
         # initialize calls
         self.cpypips.verbose(int(self.verbose))
@@ -288,7 +289,10 @@ class workspace(object):
 
         # sanity check to fail with a python exception
         if os.path.exists(".".join([self.name,"database"])):
-            raise RuntimeError("Cannot create two workspaces with same database")
+            if deleteOnCreate :
+                self.delete(self.name)
+            else:
+                raise RuntimeError("Cannot create two workspaces with same database")
 
         # because of the way we recover include, relative paths are changed, which could be a problem for #includes
         if self.recoverInclude:
