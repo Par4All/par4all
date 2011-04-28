@@ -4,16 +4,16 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int i, j;
-//  points to = {}
+//  {}
    int *a[64];
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 63; i += 1) {
-//  points to = {}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
       a[i] = (float) malloc(64*sizeof(float));
-//  points to = {}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
       for(j = 0; j <= 63; j += 1)
 //  {(a[i],*HEAP*_l_13[0],-Exact-)}
          a[i][j] = 0.;
@@ -49,11 +49,11 @@ int main(int argc, char *argv[])
 
 	15 --> 15 with conflicts
 		from <*HEAP*_l_13[0+j]-W-EXACT> to <*HEAP*_l_13[0+j]-W-EXACT>
-	15 --> -1 with conflicts
+	15 --> 14 with conflicts
 		from <j-R-EXACT> to <j-W-EXACT>
 	15 --> 13 with conflicts
 		from <a[i]-R-EXACT> to <a[i]-W-EXACT>
-	-1 --> -1 with conflicts
+	14 --> 14 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	13 --> 15 with conflicts
 		from <a[i]-W-EXACT> to <a[i]-R-EXACT>

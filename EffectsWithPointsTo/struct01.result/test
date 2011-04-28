@@ -4,19 +4,19 @@ POINTS-TO
 //  {}
 int struct01()
 {
-//  points to = {}
+//  {}
    struct one {
       int first;
       int second;
    } x;
-//  points to = {}
+//  {}
    int y[10];
-//  points to = {}
+//  {}
 
    x.first = 1;
-//  points to = {}
+//  {}
    x.second = 2;
-//  points to = {}
+//  {}
 
    y[0] = 1;
 }

@@ -4,7 +4,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *x, *a, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(x,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}

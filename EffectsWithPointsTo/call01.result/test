@@ -4,11 +4,11 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    tf_t s;
-//  points to = {}
+//  {}
 
    call01(&i, &s);
 }
@@ -19,6 +19,7 @@ int main()
 {
    int i;
    tf_t s;
+//             <    is written>: i s.one s.two[4]
 
    call01(&i, &s);
 }

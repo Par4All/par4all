@@ -4,13 +4,13 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int d1 = 10;
-//  points to = {}
+//  {}
    int d2 = 10;
-//  points to = {}
+//  {}
    int y[d1][d2];
-//  points to = {}
+//  {}
 
    call04(d1, d2, y);
 }

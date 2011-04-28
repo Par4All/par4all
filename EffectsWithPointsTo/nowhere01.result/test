@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **q;

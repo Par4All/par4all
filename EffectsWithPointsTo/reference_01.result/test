@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main(void)
 {
-//  points to = {}
+//  {}
    int k = reference_01();
-//  points to = {}
+//  {}
 
    return k;
 }

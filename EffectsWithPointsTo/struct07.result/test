@@ -4,25 +4,25 @@ POINTS-TO
 //  {}
 void struct07()
 {
-//  points to = {}
+//  {}
    extern complex imagein[256][256], imageout[256][256];
-//  points to = {}
+//  {}
    int i, j, k, l;
-//  points to = {}
+//  {}
    float z1, z2;
-//  points to = {}
+//  {}
    float x[256][256];
-//  points to = {}
+//  {}
 
    for(k = 0; k <= 255; k += 1)
-//  points to = {}
+//  {}
       imageout[k][1].re = z1;
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 255; i += 1)
-//  points to = {}
+//  {}
       for(j = 0; j <= 255; j += 1)
-//  points to = {}
+//  {}
          x[i][j] = 0.;
 }
 
@@ -54,9 +54,9 @@ void struct07()
 
 	25 --> 25 with conflicts
 		from <x[i][j]-W-EXACT> to <x[i][j]-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 24 with conflicts
 		from <j-R-EXACT> to <j-W-EXACT>
-	-1 --> -1 with conflicts
+	24 --> 24 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 	20 --> 20 with conflicts
 		from <imageout[k][1].re-W-EXACT> to <imageout[k][1].re-W-EXACT>

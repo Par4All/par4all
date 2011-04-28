@@ -4,34 +4,34 @@ POINTS-TO
 //  {}
 void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptrout[nrec-ntt+1][ntt][nsa][ntt][nsa])
 {
-//  points to = {}
+//  {}
    int i, j1, j2, k1, k2;
-//  points to = {}
+//  {}
    float R, I;
-//  points to = {}
+//  {}
 
    R = 0.0;
-//  points to = {}
+//  {}
    I = 0.0;
-//  points to = {}
+//  {}
 
    for(i = 0; i <= nrec-ntt+1-1; i += 1)
-//  points to = {}
+//  {}
       //    MOTIF     
       for(j1 = 0; j1 <= ntt-1; j1 += 1)
-//  points to = {}
+//  {}
          for(j2 = 0; j2 <= nsa-1; j2 += 1)
-//  points to = {}
+//  {}
             for(k1 = 0; k1 <= ntt-1; k1 += 1)
-//  points to = {}
+//  {}
                for(k2 = 0; k2 <= nsa-1; k2 += 1) {
-//  points to = {}
+//  {}
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
-//  points to = {}
+//  {}
                   I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
-//  points to = {}
+//  {}
                   ptrout[i][j1][j2][k1][k2].re = R;
-//  points to = {}
+//  {}
                   ptrout[i][j1][j2][k1][k2].im = I;
                }
 }
@@ -89,57 +89,57 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 		from <ptrout[i][j1][j2][k1][k2].im-W-EXACT> to <ptrout[i][j1][j2][k1][k2].im-W-EXACT>
 	28 --> 26 with conflicts
 		from <I-R-EXACT> to <I-W-EXACT>
-	28 --> -1 with conflicts
+	28 --> 23 with conflicts
 		from <k2-R-EXACT> to <k2-W-EXACT>
-	28 --> -1 with conflicts
+	28 --> 21 with conflicts
 		from <k1-R-EXACT> to <k1-W-EXACT>
-	28 --> -1 with conflicts
+	28 --> 19 with conflicts
 		from <j2-R-EXACT> to <j2-W-EXACT>
-	28 --> -1 with conflicts
+	28 --> 17 with conflicts
 		from <j1-R-EXACT> to <j1-W-EXACT>
 	27 --> 27 with conflicts
 		from <ptrout[i][j1][j2][k1][k2].re-W-EXACT> to <ptrout[i][j1][j2][k1][k2].re-W-EXACT>
 	27 --> 25 with conflicts
 		from <R-R-EXACT> to <R-W-EXACT>
-	27 --> -1 with conflicts
+	27 --> 23 with conflicts
 		from <k2-R-EXACT> to <k2-W-EXACT>
-	27 --> -1 with conflicts
+	27 --> 21 with conflicts
 		from <k1-R-EXACT> to <k1-W-EXACT>
-	27 --> -1 with conflicts
+	27 --> 19 with conflicts
 		from <j2-R-EXACT> to <j2-W-EXACT>
-	27 --> -1 with conflicts
+	27 --> 17 with conflicts
 		from <j1-R-EXACT> to <j1-W-EXACT>
 	26 --> 28 with conflicts
 		from <I-W-EXACT> to <I-R-EXACT>
 	26 --> 26 with conflicts
 		from <I-W-EXACT> to <I-W-EXACT>
-	26 --> -1 with conflicts
+	26 --> 23 with conflicts
 		from <k2-R-EXACT> to <k2-W-EXACT>
-	26 --> -1 with conflicts
+	26 --> 21 with conflicts
 		from <k1-R-EXACT> to <k1-W-EXACT>
-	26 --> -1 with conflicts
+	26 --> 19 with conflicts
 		from <j2-R-EXACT> to <j2-W-EXACT>
-	26 --> -1 with conflicts
+	26 --> 17 with conflicts
 		from <j1-R-EXACT> to <j1-W-EXACT>
 	25 --> 27 with conflicts
 		from <R-W-EXACT> to <R-R-EXACT>
 	25 --> 25 with conflicts
 		from <R-W-EXACT> to <R-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 23 with conflicts
 		from <k2-R-EXACT> to <k2-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 21 with conflicts
 		from <k1-R-EXACT> to <k1-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 19 with conflicts
 		from <j2-R-EXACT> to <j2-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 17 with conflicts
 		from <j1-R-EXACT> to <j1-W-EXACT>
-	-1 --> -1 with conflicts
+	23 --> 23 with conflicts
 		from <k2-W-EXACT> to <k2-W-EXACT>
-	-1 --> -1 with conflicts
+	21 --> 21 with conflicts
 		from <k1-W-EXACT> to <k1-W-EXACT>
-	-1 --> -1 with conflicts
+	19 --> 19 with conflicts
 		from <j2-W-EXACT> to <j2-W-EXACT>
-	-1 --> -1 with conflicts
+	17 --> 17 with conflicts
 		from <j1-W-EXACT> to <j1-W-EXACT>
 	12 --> 26 with conflicts
 		from <I-W-EXACT> to <I-W-EXACT>

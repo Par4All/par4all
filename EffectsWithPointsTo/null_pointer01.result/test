@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;                                                               /*0006*/
-//  points to = {}
+//  {}
    int *p = 0;                                                          /*0007*/
 //  {(p,*NULL_POINTER*,-Exact-)}
    int **q = 0;                                                         /*0008*/
@@ -15,8 +15,8 @@ int main()
    *p = 1;                                                              /*0010*/
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    *q = &i;                                                             /*0011*/
-//  {(*NULL_POINTER*,i,-Exact-);(p,*NULL_POINTER*,-Exact-);(q,
-//   *NULL_POINTER*,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
+//   -Exact-);(q,*NULL_POINTER*,-Exact-)}
 
    return 0;                                                            /*0013*/
 }
@@ -27,12 +27,12 @@ int main()
    int *p = 0;                                                          /*0007*/
 //             <    is written>: q
    int **q = 0;                                                         /*0008*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: *NULL_POINTER*
 
    *p = 1;                                                              /*0010*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-//             <    is written>: *NULL_POINTER*
    *q = &i;                                                             /*0011*/
 
    return 0;                                                            /*0013*/
@@ -40,9 +40,19 @@ int main()
 
  *********************** Use-Def Chains *********************
 
+	10 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	08 --> 11 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 10 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	07 --> 11 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	07 --> 10 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p-W-EXACT> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -4,19 +4,19 @@ POINTS-TO
 //  {}
 float main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int i, j, k;
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 8; i += 1)
-//  points to = {}
+//  {}
       for(j = 0; j <= 8; j += 1) {
-//  points to = {}
+//  {}
          imagein[i][j].re = 0.0;
-//  points to = {}
+//  {}
          imagein[i][j].im = 0.0;
       }
-//  points to = {}
+//  {}
    return imagein[2][1].re;
 }
 
@@ -45,15 +45,15 @@ float main(int argc, char *argv[])
 
 	17 --> 17 with conflicts
 		from <imagein[i][j].im-W-EXACT> to <imagein[i][j].im-W-EXACT>
-	17 --> -1 with conflicts
+	17 --> 15 with conflicts
 		from <j-R-EXACT> to <j-W-EXACT>
 	16 --> 19 with conflicts
 		from <imagein[i][j].re-W-EXACT> to <imagein[2][1].re-R-EXACT>
 	16 --> 16 with conflicts
 		from <imagein[i][j].re-W-EXACT> to <imagein[i][j].re-W-EXACT>
-	16 --> -1 with conflicts
+	16 --> 15 with conflicts
 		from <j-R-EXACT> to <j-W-EXACT>
-	-1 --> -1 with conflicts
+	15 --> 15 with conflicts
 		from <j-W-EXACT> to <j-W-EXACT>
 
 ****************** End of Dependence Graph ******************

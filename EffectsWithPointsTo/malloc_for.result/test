@@ -4,7 +4,7 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int *p, i, j;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = 0;
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	06 --> -1 with conflicts
+	06 --> 09 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

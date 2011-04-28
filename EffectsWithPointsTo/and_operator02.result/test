@@ -4,11 +4,11 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i = 0, j = 1, k = 2, l = 3;
-//  points to = {}
+//  {}
    _Bool b;
-//  points to = {}
+//  {}
    int *p, *q, *r, *s, *t;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,

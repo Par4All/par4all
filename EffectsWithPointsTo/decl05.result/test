@@ -4,12 +4,12 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int tab[3] = {0, 1, 2};
-//  points to = {}
+//  {}
 
    tab[0] = tab[0]+2;
-//  points to = {}
+//  {}
    return 0;
 }
 

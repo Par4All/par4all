@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    char *s = "sortie de puts";
-//  {(s,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(s,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    puts(s);
 }
 

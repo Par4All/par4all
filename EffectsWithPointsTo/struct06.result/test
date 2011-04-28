@@ -4,22 +4,22 @@ POINTS-TO
 //  {}
 int struct06()
 {
-//  points to = {}
+//  {}
    struct three {
       int first;
       int second;
    };
-//  points to = {}
+//  {}
    struct four {
       struct three un;
       struct three deux;
    } x[10];
-//  points to = {}
+//  {}
    int i = 0;
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 9; i += 1)
-//  points to = {}
+//  {}
       x[i].un.first = x[i].deux.second;
 }
 
@@ -49,7 +49,7 @@ int struct06()
 
 	14 --> 14 with conflicts
 		from <x[i].un.first-W-EXACT> to <x[i].un.first-W-EXACT>
-	11 --> -1 with conflicts
+	11 --> 13 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

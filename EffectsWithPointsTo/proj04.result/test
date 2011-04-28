@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main(void)
 {
-//  points to = {}
+//  {}
    int i = 0, j = 0;
-//  points to = {}
+//  {}
    int **pp = (void *) 0;
 //  {(pp,*NULL_POINTER*,-Exact-)}
 

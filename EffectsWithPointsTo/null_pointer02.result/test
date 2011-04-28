@@ -4,9 +4,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;                                                               /*0007*/
-//  points to = {}
+//  {}
    int *p;                                                              /*0008*/
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **q;                                                             /*0009*/
@@ -37,8 +37,8 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    **q = 0;                                                             /*0012*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: *NULL_POINTER*
 
    *p = 1;                                                              /*0014*/
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -51,16 +51,21 @@ int main()
  *********************** Use-Def Chains *********************
 
 	14 --> 15 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 15 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 15 with conflicts
 		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 14 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p-W-EXACT> to <p-R-EXACT>
 	11 --> 12 with conflicts
 		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
