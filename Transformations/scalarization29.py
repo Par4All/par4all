@@ -1,3 +1,4 @@
+from __future__ import with_statement
 from pyps import workspace, module
 name="scalarization29"
 
