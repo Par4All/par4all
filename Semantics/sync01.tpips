@@ -19,6 +19,13 @@ echo
 
 display SYMBOL_TABLE_FILE[main]
 
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
 # because of the flip-flop on "b" in the source code
 setproperty SEMANTICS_K_FIX_POINT 2
 
@@ -31,6 +38,24 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
+
+echo
+echo Transformers for "main" after transformer refinement
+echo
+
+apply REFINE_TRANSFORMERS[main]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main" after transformer refinement
+echo
+
+apply REFINE_TRANSFORMERS[main]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+
 close
 delete $WSPACE
 quit

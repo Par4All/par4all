@@ -23,6 +23,8 @@ int main(void)
     // flip-flop
     b = !b;
     ok = ok && (x>=y);
+    //if(x<y)
+    //  ok = false;
     // assert(ok);
     // we want ok==1
     fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
