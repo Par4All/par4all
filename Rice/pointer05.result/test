@@ -4,14 +4,14 @@ POINTS TO
 //  {}
 void pointer05(int n, float p[n], float q[n])
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
 
    for(i = 0; i <= n-1; i += 1) {
-//  points to = {}
+//  {}
       float x = q[i];
-//  points to = {}
+//  {}
       p[i] = x;
    }
 }
