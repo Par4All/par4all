@@ -17,7 +17,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    char *end;
 //  {(end,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    long int li;

@@ -47,7 +47,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    my_list l1, l2, l3, l4;
 //  {(l1[next],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l2[next],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(l3[next],

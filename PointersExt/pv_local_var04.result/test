@@ -31,10 +31,10 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
 
    if (a>1) {
-//  points to = {}
+//  {}
       static int *p = &a;
 //  {(p,a,-Exact-)}
       static int *q;
@@ -44,7 +44,7 @@ int main()
       a = a-1;
    }
    else {
-//  points to = {}
+//  {}
       static int *r = &a;
 //  {(r,a,-Exact-)}
       static int *s;

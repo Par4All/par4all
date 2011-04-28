@@ -19,7 +19,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int **a;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int b;
@@ -27,6 +27,7 @@ int main()
    a = (int **) NULL;
 //  {(a,*NULL_POINTER*,-Exact-)}
    a[0] = &b;
-//  {(*NULL_POINTER*,b,-Exact-);(a,*NULL_POINTER*,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,*NULL_POINTER*,
+//   -Exact-)}
    return 0;
 }

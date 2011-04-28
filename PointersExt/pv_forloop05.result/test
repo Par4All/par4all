@@ -28,22 +28,22 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    float *p[10];
-//  points to = {}
+//  {}
    float a[10], t;
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
 
    t = 1.0;
-//  points to = {}
+//  {}
    while (t<2.0) {
-//  points to = {}
+//  {(p[i],a[i],-MAY-)}
       for(i = 0; i <= 9; i += 1)
 //  {(p[i],a[i],-MAY-)}
          p[i] = &a[i];
-//  points to = {}
+//  {(p[i],a[i],-MAY-)}
       t += 0, 01;
    }
 //  {(p[i],a[i],-MAY-)}

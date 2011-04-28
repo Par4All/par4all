@@ -14,9 +14,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int a;
-//  points to = {}
+//  {}
    int *b = &a;
 //  {(b,a,-Exact-)}
    return 0;

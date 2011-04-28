@@ -26,7 +26,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    mystruct s1, *s2;
 //  {(s1[b][*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[a],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1[c],

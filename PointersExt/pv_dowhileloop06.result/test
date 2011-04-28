@@ -32,9 +32,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -52,9 +52,11 @@ int main()
    i = 0;
 //  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
    do {
-//  points to = {}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       *p++ = 2**q++;
-//  points to = {}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       i++;
    }
    while (i<10);

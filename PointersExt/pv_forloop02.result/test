@@ -30,27 +30,27 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    float t;
-//  points to = {}
+//  {}
    float *a;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    a = (float *) malloc(10*sizeof(float));
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
 
    t = 1.0;
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
    while (t<2.0) {
-//  points to = {}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
       for(i = 0; i <= 9; i += 1)
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
          a[i] = a[i]+t*0, 5;
-//  points to = {}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
       t+0, 01;
    }
-//  {(a,*HEAP*_l_9,-Exact-)}
+//  {(a,*HEAP*_l_9[0],-Exact-)}
    return 0;
 }

@@ -32,9 +32,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int a[10];
-//  points to = {}
+//  {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i, j;
@@ -46,12 +46,12 @@ int main()
    p = &a[0];
 //  {(p,a[0],-Exact-)}
    p = p+i;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    p = p+j;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    p = p-i;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    p = p-j;
-//  {(p,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    return 0;
 }
