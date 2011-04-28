@@ -24,7 +24,6 @@ void video_processing(FILE* fpin,FILE* fpout)
   printf("Begin reading input video\n");
   // Reading ... data dependence
   for(int i = 0; i < NBFRAMES; i++) {
-    printf("Reading image %d\n",i);
     if (read_yuv_frame(fpin,frame_in[i].y,frame_in[i].u,frame_in[i].v)) {
       fprintf(stderr,"erreur read_yuv_frame No frame=%d\n",i);
       exit(0);
