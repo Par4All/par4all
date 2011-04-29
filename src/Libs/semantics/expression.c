@@ -2319,7 +2319,7 @@ static transformer logical_binary_function_to_transformer(entity v,
     }
     else if(!transformer_undefined_p(pre)) {
       /* Non internal overloaded functions such as EQ, NEQ, GE, GT, LE, LT,... */
-      entity tmp = make_local_temporary_value_entity(entity_type(v));
+      //entity tmp = make_local_temporary_value_entity(entity_type(v));
       transformer tfe = transformer_add_any_relation_information(copy_transformer(pre),
 								 op,
 								 expr1,
@@ -2329,13 +2329,34 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 TRUE);
 
       /* if the transformer is not feasible, return FALSE */
-      if(!transformer_empty_p(tfe)) {
-	Pvecteur eq = vect_new((Variable) tmp, VALUE_ONE);
+      if(transformer_empty_p(tfe)) {
+	Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
 	Pcontrainte c;
 
 	c = contrainte_make(eq);
 	tf = make_transformer(NIL,
 			      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+      }
+      else {
+	transformer tfne = transformer_add_any_relation_information(copy_transformer(pre),
+								   op,
+								   expr1,
+								   expr2,
+								   pre,
+								   FALSE,
+								   TRUE);
+
+	/* if the transformer is not feasible, return TRUE */
+	if(transformer_empty_p(tfne)) {
+	  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+	  Pcontrainte c;
+
+	  vect_add_elem(&eq, TCST, VALUE_MONE);
+	  c = contrainte_make(eq);
+	  tf = make_transformer(NIL,
+				make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+	}
+	free_transformer(tfne);
       }
       free_transformer(tfe);
     }
