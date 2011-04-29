@@ -528,16 +528,19 @@ static transformer transformer_general_intersection(transformer t1,
   return t;
 }
 
-/* tf receives the constraints in t1 and t2. For implicit equalities
-   carried by args, this implies that the args for tf is the intersection
-   of the args. And that the resulting transformer may be empty: for
-   instance, a variable may be untouched in t1 and incremented in t2,
-   which is impossible. */
+/* tf is a new transformer that receives the constraints in t1 and
+   t2. For implicit equalities carried by args, this implies that the
+   args for tf is the intersection of the args. And that the resulting
+   transformer may be empty: for instance, a variable may be untouched
+   in t1 and incremented in t2, which is impossible. */
 transformer transformer_intersection(transformer t1, transformer t2)
 {
   transformer t = transformer_general_intersection(t1, t2, FALSE);
   return t;
 }
+
+/* allocate a new transformer based on transformer t1 and
+   postcondition t2 */
 transformer transformer_image_intersection(transformer t1, transformer t2)
 {
   transformer t = transformer_undefined;
@@ -551,6 +554,7 @@ transformer transformer_image_intersection(transformer t1, transformer t2)
   return t;
 }
 
+/* Allocate a new transformer */
 static transformer transformer_safe_general_intersection(transformer t1,
 							 transformer t2,
 							 bool image_only)
@@ -567,6 +571,7 @@ static transformer transformer_safe_general_intersection(transformer t1,
   return tf;
 }
 
+/* Allocate a new transformer */
 transformer transformer_safe_intersection(transformer t1, transformer t2)
 {
   transformer tf = transformer_safe_general_intersection(t1, t2, FALSE);
@@ -574,6 +579,7 @@ transformer transformer_safe_intersection(transformer t1, transformer t2)
   return tf;
 }
 
+/* Allocate a new transformer */
 transformer transformer_safe_image_intersection(transformer t1, transformer t2)
 {
   transformer tf = transformer_safe_general_intersection(t1, t2, TRUE);
@@ -752,7 +758,8 @@ transformer transformer_safe_domain(transformer tf)
   return dtf;
 }
 
-/* Restrict the range of relation tf with the range r.
+/* Allocate a new transformer rtf that is tf with its range restricted
+ * by the range r.
  *
  * As a range, r is assumed to have no arguments.
  */
@@ -760,9 +767,9 @@ transformer transformer_range_intersection(transformer tf, transformer r)
 {
   pips_assert("r does not involve old values and has no arguments",
 	      ENDP(transformer_arguments(r)));
-  tf = transformer_image_intersection(tf, r);
+  transformer rtf = transformer_image_intersection(tf, r);
 
-  return tf;
+  return rtf;
 }
 
 /* When tf is used repeatedly in a loop, the range is part of the
