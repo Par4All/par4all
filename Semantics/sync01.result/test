@@ -229,9 +229,8 @@ int main(void)
 
       exit(1);
 
-//  T(b,ok,x,y) {b+y==b#init+x, b+y==x, ok#init==1, x#init==0,
-//    y#init==0, b+1<=b#init+ok+2x, b<=b#init+x, 0<=ok, ok<=1,
-//    1<=ok+x, 0<=x, y<=x, x<=y+1}
+//  T(b,ok,x,y) {b+y==b#init+x, b+y==x, ok==1, ok#init==1, x#init==0,
+//    y#init==0, b<=b#init+x, 0<=x, y<=x, x<=y+1}
 
    while (1) {
 
@@ -255,12 +254,12 @@ int main(void)
       // flip-flop
       b = !b;
 
-//  T(ok) {b+y==x, 0<=b, b<=1, b+1<=ok#init+x, 0<=ok, ok<=1,
-//    ok<=ok#init, 0<=ok#init, ok#init<=1, 1<=x}
+//  T(ok) {b+y==x, ok==ok#init, 0<=b, b<=1, b+1<=ok+x, 0<=ok, ok<=1,
+//    1<=x}
 
       ok = ok&&x>=y;
 
-//  T() {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=x}
+//  T() {b+y==x, 0<=b, b<=1, b+1<=ok+x, 0<=ok, ok<=1, 1<=x, 0<=y}
 
       // If the previous boolean assignment is changed into
       //if(x<y)
@@ -304,29 +303,29 @@ int main(void)
 
    while (1) {
 
-//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=ok+x}
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
 
       if (b)
 
-//  P(b,ok,x,y) {b==1, x==y+1, 0<=ok, ok<=1, 1<=ok+x, 1<=x}
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
 
          y = y+1;
       else
 
-//  P(b,ok,x,y) {b==0, x==y, 0<=ok, ok<=1, 1<=ok+x, 0<=x}
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 0<=x}
 
          x = x+1;
 
-//  P(b,ok,x,y) {b+x==y+1, 0<=ok, ok<=1, 1<=ok+y, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+x==y+1, ok==1, 1<=x, y<=x, x<=y+1}
 
       // flip-flop
       b = !b;
 
-//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=ok+y, 1<=x, y<=x, x<=y+1}
+//  P(b,ok,x,y) {b+y==x, ok==1, 1<=x, y<=x, x<=y+1}
 
       ok = ok&&x>=y;
 
-//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, 0<=ok, ok<=1, 1<=x, 0<=y}
+//  P(b,ok,x,y) {b+y==x, ok==1, b<=x, 1<=x, y<=x, x<=y+1}
 
       // If the previous boolean assignment is changed into
       //if(x<y)
