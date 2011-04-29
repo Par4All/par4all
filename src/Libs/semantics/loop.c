@@ -621,21 +621,18 @@ static transformer add_index_bound_conditions(transformer pre,
       br = transformer_add_inequality(br, bv, index, FALSE);
 
     br = transformer_temporary_value_projection(br);
-    br = safe_transformer_projection(br, transformer_arguments(tfb));
-    pips_assert("br is consistent", transformer_general_consistency_p(br, TRUE));
     reset_temporary_value_counter();
 
     /* FI: Fixt the result of the intersection in case of side
        effects in loop range*/
     npre = transformer_range_intersection(pre, br);
-    pips_assert("npre is consistent", transformer_general_consistency_p(npre, TRUE));
     //transformer_arguments(npre) = arguments_union(transformer_arguments(pre),
     //					 transformer_arguments(npre));
     /* Make sure the loop body does not modify the loop bounds */
     // FI: ipre is not a range, invariant_wrt_transformer() cannot be used
     //npre = invariant_wrt_transformer(ipre, tfb);
-    // FI: removes too many variables of ipre
-    //npre = safe_transformer_projection(npre, transformer_arguments(tfb));
+    // FI: removes to many variables of ipre
+    npre = safe_transformer_projection(npre, transformer_arguments(tfb));
     /* FI: we need a side effect on pre... */
     //gen_free_list(transformer_arguments(pre));
     free_predicate(transformer_relation(pre));
@@ -659,11 +656,6 @@ static transformer add_index_bound_conditions(transformer pre,
   return(pre);
 }
 
-/* add to pre affine conditions about variable i belonging to range r under
-   context pre as long as these conditions are invariant with respect
-   to transformer tfb. Transformer fb is useful if the range is a
-   loop range because the loop body may modify the values of the loop
-   bounds. */
 transformer add_index_range_conditions(transformer pre,
 				       entity i,
 				       range r,
@@ -721,11 +713,10 @@ transformer add_index_range_conditions(transformer pre,
 	pre = new_pre;
       }
       else {
-	/* try to add the lower bound: the side effects of lb are not
-	   taken into account... */
+	/* try to add the lower bound */
 	add_index_bound_conditions(pre, i, lb, IS_LOWER_BOUND, tfb);
 
-	/* try to add the upper bound, assuming pre has been updated */
+	/* try to add the upper bound */
 	add_index_bound_conditions(pre, i, ub, IS_UPPER_BOUND, tfb);
       }
     }
@@ -2640,7 +2631,6 @@ transformer loop_to_postcondition(transformer pre,
        loop postcondition independently using the loop transformer */
     /* preb = precondition for loop body; includes a lousy fix-point */
     transformer preb = transformer_dup(pre);
-    transformer tfb = load_statement_transformer(s);
 
     /* Get rid of information related to variables modified in
      * iterations of the loop body (including loop indices).
@@ -2653,23 +2643,7 @@ transformer loop_to_postcondition(transformer pre,
     preb = transformer_combine(preb, tf);
 
     /* Triolet's good loop algorithm */
-    /* FI: this should already be part of tf, unless the loop
-     * precondition make it possible to gather more information;
-     * however it kills information brought by preb; see S124.f: the
-     * induction variable is not found because of this call to
-     * add_good_loop_conditions() which is also used to compute
-     * transformers; the whole function loop_to_postcondition() is
-     * obsolete...
-     */
-    //preb = add_good_loop_conditions(preb, l);
-    // Use tf insted of tfb...
-    preb = add_index_range_conditions(preb,loop_index(l),r,tfb);
-
-    // Other options have failed
-    //transformer lbt = add_good_loop_conditions(copy_transformer(preb), l);
-    //transformer lbt = loop_bound_evaluation_to_transformer(l, transformer_range(pre));
-    //preb = transformer_combine(preb, lbt);
-    //free_transformer(lbt);
+    preb = add_good_loop_conditions(preb, l);
 
     /* It might be useful to normalize preb and to detect unfeasibility.
      * I choose not to do it because:
