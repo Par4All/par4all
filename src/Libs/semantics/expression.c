@@ -2328,6 +2328,9 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 TRUE,
 								 TRUE);
 
+      // The normalization of tfe and tfne below is key because
+      // transformer_empty_p() is quite weak (but fast)
+      tfe = transformer_normalize(tfe, 2);
       /* if the transformer is not feasible, return FALSE */
       if(transformer_empty_p(tfe)) {
 	Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
@@ -2346,6 +2349,7 @@ static transformer logical_binary_function_to_transformer(entity v,
 								   FALSE,
 								   TRUE);
 
+	tfne = transformer_normalize(tfne, 2);
 	/* if the transformer is not feasible, return TRUE */
 	if(transformer_empty_p(tfne)) {
 	  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
