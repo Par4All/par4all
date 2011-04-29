@@ -1,0 +1,8 @@
+//             <    is read   >: q _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+void eerf_fwtff(void *q)
+{
+//             <    is read   >: q _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   fftwf_free(q);
+}
