@@ -2,7 +2,6 @@ from __future__ import with_statement
 import re
 import os
 import fileinput
-import sys
 import pypsbase
 import pypsconfig
 
@@ -167,6 +166,7 @@ def get_runtimefile(fname,subdir=None):
 			f=os.path.join(d,fname)
 			if os.path.isfile(f):return f
 		raise RuntimeError, "Cannot find runtime file : " + fname + "\nsearch path: "+":".join(searchdirs)
+
 
 def gen_compile_command(rep,makefile,outfile,rule,**opts):
 		#Moved here because of code duplication

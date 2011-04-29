@@ -12,7 +12,7 @@ libcomplexity_la_SOURCES=\
 include $(srcdir)/../pipslibs_includes.mk
 EXTRA_DIST+=complexity_cost_tables
 dist-hook:
-	    rm -rf `find $(distdir)/complexity_cost_tables -name .svn`
+	rm -rf `find $(distdir)/complexity_cost_tables -name .svn`
 install-data-hook:
 	test -d $(DESTDIR)$(sysconfdir)/complexity_cost_tables || mkdir $(DESTDIR)$(sysconfdir)/complexity_cost_tables
 	chmod -R u+rw $(DESTDIR)$(sysconfdir)/complexity_cost_tables

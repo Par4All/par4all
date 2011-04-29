@@ -2,13 +2,10 @@
 from __future__ import with_statement 
 import os,sys
 import re
-import tempfile
 import shutil
 import pypsutils
-import fileinput
 import subprocess
 import pyps
-from subprocess import Popen, PIPE
 
 simd_h = "SIMD_types.h"
 
