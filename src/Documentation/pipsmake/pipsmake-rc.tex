@@ -913,10 +913,20 @@ behavior from the point of view of the analysis or transformations you
 want to apply on the whole program. The user modified synthetic files
 should then be saved and used to generate a new workspace.
 
+If \PipsPropRef{PREPROCESSOR_MISSING_FILE_HANDLING} is set to
+\verb|"query"|, a script can optionally be set to handle the interactive
+request using \PipsPropRef{PREPROCESSOR_MISSING_FILE_GENERATOR}. This
+script is passed the function name and prints the filename on standard
+output. When empty, it uses an internal one.
+
 Valid settings: \verb|error generate query|.
 
 \begin{PipsProp}{PREPROCESSOR_MISSING_FILE_HANDLING}
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
+\end{PipsProp}
+
+\begin{PipsProp}{PREPROCESSOR_MISSING_FILE_GENERATOR}
+PREPROCESSOR_MISSING_FILE_GENERATOR ""
 \end{PipsProp}
 
 

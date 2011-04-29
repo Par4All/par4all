@@ -541,14 +541,36 @@ ask_a_missing_file(string module, bool is_fortran)
   string file;
   bool ok, cont;
   string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
+  string missing_file_generator = get_string_property("PREPROCESSOR_MISSING_FILE_GENERATOR");
+  string generator_cmd = NULL;
+  if(!empty_string_p(missing_file_generator)) {
+      asprintf(&generator_cmd,"%s %s",missing_file_generator,module);
+  }
 
   /* Should be simplified... Maybe, but not bugged... */
   do {
+      if(!generator_cmd) {
     file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);
     if(file && strcmp(file, "quit")==0) {
       free(file);
       break;
     }
+    }
+      else {
+          FILE* pout = popen(generator_cmd,"r");
+          if(pout) {
+              file=strdup("");
+              char buffer[256];
+              while(fgets(&buffer[0],sizeof(buffer),pout)) {
+                  char * tmp = file;
+                  asprintf(&file,"%s%s",tmp,buffer);
+                  free(tmp);
+              } 
+              *strchrnul(file,'\n')=0;
+              pclose(pout);
+          }
+          else pips_user_error("Failed to launch command %s\n",missing_file_generator);
+      }
     if (file)
       {
 	if (same_string_p(file, "generate"))
@@ -564,7 +586,9 @@ ask_a_missing_file(string module, bool is_fortran)
 			"Please type \"quit\" or another file name.\n",
 			module, file);
     if (file) free(file);
+    cont&=!generator_cmd;
   } while (cont);
+  if(generator_cmd) free(generator_cmd);
   return db_resource_p(res, module);
 }
 
@@ -573,7 +597,7 @@ ask_a_missing_file(string module, bool is_fortran)
  * corresponding file; so the initializer was introduced by Remi Triolet
  * to deal with source and user files as with any other kind of resources.
  *
- * Acording to the PREPROCESSOR_MISSING_FILE_HANDLING property, a stub
+ * According to the PREPROCESSOR_MISSING_FILE_HANDLING property, a stub
  * definition for the module can be generated or list of file names can be
  * asked.
  */
