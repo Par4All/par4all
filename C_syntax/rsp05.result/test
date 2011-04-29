@@ -120,12 +120,12 @@ int main()
 
    init_coeff(COEFF);
 
-//  T(i,j) {0<=i}
+//  T(i,j) {0<=i, i<=12}
 
 
    for(i = 0; i <= 12; i += 1)
 
-//  T(j) {0<=i, i<=12, 0<=j}
+//  T(j) {0<=i, i<=12, 0<=j, j<=12}
 
       for(j = 0; j <= 12; j += 1)
 
@@ -133,12 +133,12 @@ int main()
 
          X[i][j] = j*(j+i)/2;
 
-//  T(i,j) {i#init==13, j#init==13, 0<=i}
+//  T(i,j) {i#init==13, j#init==13, 0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
 
-//  T(j) {0<=i, i<=7, 0<=j}
+//  T(j) {0<=i, i<=7, 0<=j, j<=12}
 
       for(j = 0; j <= 12; j += 1)
 
@@ -146,12 +146,12 @@ int main()
 
          H[i][j] = convold1(X, COEFF, i, j);
 
-//  T(i,j) {i#init==8, j#init==13, 0<=i}
+//  T(i,j) {i#init==8, j#init==13, 0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
 
-//  T(j) {0<=i, i<=7, 0<=j}
+//  T(j) {0<=i, i<=7, 0<=j, j<=7}
 
       for(j = 0; j <= 7; j += 1)
 
@@ -159,12 +159,12 @@ int main()
 
          K[i][j] = convold2(H, COEFF, i, j);
 
-//  T(i,j) {i#init==8, j#init==8, 0<=i}
+//  T(i,j) {i#init==8, j#init==8, 0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
 
-//  T(j) {0<=i, i<=7, 0<=j}
+//  T(j) {0<=i, i<=7, 0<=j, j<=7}
 
       for(j = 0; j <= 7; j += 1)
 
@@ -172,12 +172,12 @@ int main()
 
          Y[i][j] = filtre(H, K, i, j);
 
-//  T(i,j) {i#init==8, j#init==8, 0<=i}
+//  T(i,j) {i#init==8, j#init==8, 0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
 
-//  T(j) {0<=i, i<=7, 0<=j}
+//  T(j) {0<=i, i<=7, 0<=j, j<=7}
 
       for(j = 0; j <= 7; j += 1)
 
