@@ -429,6 +429,12 @@ def main():
 	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests given in argument")
 	(options, args) = parser.parse_args()
 
+	#set all locale categories to C (English), to make the test results consistent to match
+	#the references. This is needed because the test references have been defined using 
+	#this environment variable, so some shell commands used in the tests
+	#such as 'cat */*.c' will be done in the same order as the references
+	os.putenv('LC_ALL', 'C')
+
 	if options.pips:
 		vc = ValidationClass().valid_pips()
 		print('Result of the tests are in pips_log.txt')
