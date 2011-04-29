@@ -9,7 +9,7 @@ C     If not, i >= 1 && i >=n+1.
 
       REAL X(N, M), Y(M, N)
 
-C  T(I) {}
+C  T(I) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0009
@@ -19,12 +19,12 @@ C  T() {1<=I, I<=M, I<=N}
          X(I,I) = 0.                                                    0010
       ENDDO
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0013
 
-C  T(J) {}
+C  T(J) {1<=J, J<=M}
 
          DO J = 1, M                                                    0014
 

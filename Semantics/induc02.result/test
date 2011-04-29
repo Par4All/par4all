@@ -9,7 +9,7 @@ C     to recompute the loop fixpoints with precondition information.
 
       REAL A(N)
 
-C  T(IJ,IX,IY) {1<=IX}
+C  T(IJ,IX,IY) {1<=IX, IX<=NX2}
 
 
       DO IX = 1, NX2                                                    0009
@@ -18,7 +18,7 @@ C  T(IJ) {IJ==IX}
 
          IJ = IX                                                        0010
 
-C  T(IJ,IY) {IJ#init<=IJ, 1<=IY}
+C  T(IJ,IY) {IJ#init<=IJ, 1<=IY, IY<=NY2}
 
          DO IY = 1, NY2                                                 0011
 
@@ -37,7 +37,7 @@ C  T(IJ) {IJ#init+NX2==IJ}
          ENDDO
       ENDDO
 
-C  T(IJ,IX,IY) {1<=IX}
+C  T(IJ,IX,IY) {1<=IX, IX<=NX2}
 
 
       DO IX = 1, NX2                                                    0019
@@ -46,7 +46,7 @@ C  T(IJ) {IJ==IX}
 
          IJ = IX                                                        0020
 
-C  T(IJ,IY) {1<=IY}
+C  T(IJ,IY) {1<=IY, IY<=NY2}
 
          DO IY = 1, NY2                                                 0021
 

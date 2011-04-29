@@ -11,7 +11,7 @@ C     unchanged and j = 5 is j can have any value
 
       J = 4                                                             0006
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0008
@@ -26,7 +26,7 @@ C  T() {}
 
       PRINT *, J                                                        0014
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0016

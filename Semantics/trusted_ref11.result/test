@@ -17,7 +17,7 @@ C  T(M) {1<=N}
 
       READ *, M                                                         0008
 
-C  T(I,J) {1<=I, 1<=N}
+C  T(I,J) {1<=I, I<=M, 1<=N}
 
 
       DO I = 1, M                                                       0010
@@ -26,7 +26,7 @@ C  T(J) {J==M+1, 1<=I, I+1<=J, I<=N, 2<=J, J<=N+1, 1<=N}
 
 C        BEGIN BLOCK
 
-C  T(J) {1<=I, I<=M, 1<=J, 1<=N}
+C  T(J) {1<=I, I<=M, 1<=J, J<=M, 1<=N}
 
          DO J = 1, M                                                    0011
 

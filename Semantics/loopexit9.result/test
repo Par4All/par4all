@@ -12,7 +12,7 @@ C  T(I) {I==1, N<=0}
 C (0,1)
 C     BEGIN BLOCK
 
-C  T(I) {I==1}
+C  T(I) {I==1, 1<=N}
 
 C (0,2)
 

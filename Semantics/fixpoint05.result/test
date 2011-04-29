@@ -18,7 +18,7 @@ C     be computed for the subset defined by p.
 
       IF (J.GE.5) THEN                                                  0013
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=5}
 
 
          DO I = 1, 5                                                    0015

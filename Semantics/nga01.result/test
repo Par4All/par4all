@@ -9,12 +9,12 @@ C
  
       REAL FC(2)
 
-C  T(R,T) {1<=R}
+C  T(R,T) {1<=R, R<=13}
 
 
       DO 2 R = 1, 13                                                    0009
 
-C  T(T) {1<=T}
+C  T(T) {1<=T, T<=13}
 
          DO 2 T = 1, 13                                                 0010
 
@@ -26,12 +26,12 @@ C  T() {}
 
 2           CONTINUE                                                    0012
 
-C  T(R,T) {RMIN<=R}
+C  T(R,T) {R<=RMAX, RMIN<=R}
 
 
       DO 3 R = RMIN, RMAX                                               0014
 
-C  T(T) {1<=T}
+C  T(T) {1<=T, T<=13}
 
          DO 3 T = 1, 13                                                 0015
 
@@ -43,7 +43,7 @@ C  T() {}
 
 3           CONTINUE                                                    0019
 
-C  T(R,T) {RMIN<=R}
+C  T(R,T) {R<=RMAX, RMIN<=R}
 
 
       DO 4 R = RMIN, RMAX                                               0021

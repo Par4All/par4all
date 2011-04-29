@@ -28,11 +28,11 @@ C  T(K) {0<=K}
 
       K = M*M                                                           0005
 
-C  T(I,J,K) {I+K#init==K+1, K#init<=K}
+C  T(I,J,K) {I+K#init==K+1, I<=N, K#init<=K}
 
       DO I = 1, N                                                       0006
 
-C  T(J) {1<=J}
+C  T(J) {1<=J, J<=N}
 
          DO J = 1, N                                                    0007
 
@@ -46,7 +46,7 @@ C  T(K) {K==K#init+1}
 
          CALL INC1(K)                                                   0011
 
-C  T(J) {1<=J}
+C  T(J) {1<=J, J<=N}
 
 
          DO J = 1, N                                                    0013
@@ -159,7 +159,7 @@ C    PHI2<=K, 1<=I, I<=K, I<=N}>
       DO I = 1, N                                                       0006
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I,
-C    I<=K+1, I<=N}>
+C    I<=K+1, I<=N, 1<=N}>
 
          DO J = 1, N                                                    0007
 
