@@ -29,7 +29,7 @@ void induction05(double A[SIZE], double B[SIZE][SIZE])
 
    int k = SIZE;
 
-//  T(i,k) {2i+k==k#init, 0<=i}
+//  T(i,k) {2i+k==k#init, i+1<=SIZE, 0<=i}
 
    for(i = 0; i <= SIZE-1; i += 1) {
 

@@ -35,7 +35,7 @@ void induction04(double A[SIZE], double B[SIZE][SIZE])
 
    int sum;
 
-//  T(i,j,k,sum) {0<=i}
+//  T(i,j,k,sum) {i+1<=SIZE, 0<=i}
 
    for(i = 0; i <= SIZE-1; i += 1) {
 
@@ -43,7 +43,7 @@ void induction04(double A[SIZE], double B[SIZE][SIZE])
 
       k = i;
 
-//  T(j,k,sum) {j+k#init==k, k#init<=k}
+//  T(j,k,sum) {j+k#init==k, j+1<=SIZE, k#init<=k}
 
       for(j = 0; j <= SIZE-1; j += 1) {
 
