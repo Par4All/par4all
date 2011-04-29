@@ -5251,7 +5251,7 @@ void putbits(int val, int n)
 //  T(bytecnt,i,mask,outbfr,outcnt)
 //    {i+outcnt+8putbits!:bytecnt#init==8bytecnt+putbits!:outcnt#init,
 //    outcnt+7putbits!:bytecnt#init<=7bytecnt+putbits!:outcnt#init,
-//    putbits!:bytecnt#init<=bytecnt}
+//    putbits!:bytecnt#init<=bytecnt, 0<=i, i+1<=n}
 
    /* selects first (leftmost) bit */
    
@@ -5437,8 +5437,8 @@ void putnonintrablk(short *blk)
    first = 1;
 
 //  T(first,n,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,run,
-//    signed_level)
-//    {n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
+//    signed_level) {0<=n, n<=63,
+//    n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
 //    putbits!:bytecnt+64putbits!:outcnt#init+run, run#init<=63n+run,
 //    run<=n+run#init, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -6446,7 +6446,7 @@ void putpict(unsigned char *frame)
 
             putbits(0, 1);
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
             /* extra_bit_slice */
             
@@ -6688,7 +6688,7 @@ l99996:         ;
 
          if (!(mb_type&1))
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
             for(cc = 0; cc <= 2; cc += 1)
 
@@ -6792,7 +6792,7 @@ l99997:         ;
          goto loop_end_2;
 l99998:         ;
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
          /* P picture, no motion vectors -> skip */
          
@@ -7461,12 +7461,14 @@ void dct_type_estimation(unsigned char *pred, unsigned char *cur, struct mbinfo 
 
    k = 0;
 
-//  T(0`j0,i,i0,j,k,offs,s0,s01,s1,sq0,sq1) {0<=0`j0, k#init<=k}
+//  T(0`j0,i,i0,j,k,offs,s0,s01,s1,sq0,sq1) {0<=0`j0, 0`j0+1<=height2,
+//    k#init<=k}
 
 
    for(j0 = 0; j0 <= height2-1; j0 += 16)
 
-//  T(i,i0,j,k,offs,s0,s01,s1,sq0,sq1) {i0+16k#init==16k, k#init<=k}
+//  T(i,i0,j,k,offs,s0,s01,s1,sq0,sq1) {i0+16k#init==16k, i0+1<=width,
+//    k#init<=k}
 
       for(i0 = 0; i0 <= width-1; i0 += 16) {
 
@@ -7479,7 +7481,7 @@ void dct_type_estimation(unsigned char *pred, unsigned char *cur, struct mbinfo 
             mbi[k].dct_type = 0;
          else {
 
-//  T(i,j,offs) {0<=j}
+//  T(i,j,offs) {0<=j, j<=7}
 
             /* interlaced frame picture */
             /*
@@ -7492,7 +7494,7 @@ void dct_type_estimation(unsigned char *pred, unsigned char *cur, struct mbinfo 
 
                offs = width*((j<<1)+j0)+i0;
 
-//  T(i,offs) {i+offs#init==offs, offs#init<=offs}
+//  T(i,offs) {i+offs#init==offs, i<=15, offs#init<=offs}
 
                for(i = 0; i <= 15; i += 1) {
 
@@ -7515,7 +7517,8 @@ void dct_type_estimation(unsigned char *pred, unsigned char *cur, struct mbinfo 
             /* correlate fields */
             s0 = s1 = sq0 = sq1 = s01 = 0;
 
-//  T(i,s0,s01,s1,sq0,sq1) {0<=i, sq0#init<=sq0, sq1#init<=sq1}
+//  T(i,s0,s01,s1,sq0,sq1) {0<=i, i<=127, sq0#init<=sq0,
+//    sq1#init<=sq1}
 
 
             for(i = 0; i <= 127; i += 1) {
@@ -7615,12 +7618,12 @@ void fdct(short *block)
 
    double tmp[64];
 
-//  T(i,j,k) {0<=i}
+//  T(i,j,k) {0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
 
-//  T(j,k) {0<=j}
+//  T(j,k) {0<=j, j<=7}
 
       for(j = 0; j <= 7; j += 1) {
 
@@ -7628,7 +7631,7 @@ void fdct(short *block)
 
          s = 0.0;
 
-//  T(k) {0<=k}
+//  T(k) {0<=k, k<=7}
 
 
          for(k = 0; k <= 7; k += 1)
@@ -7643,12 +7646,12 @@ void fdct(short *block)
          tmp[8*i+j] = s;
       }
 
-//  T(i,j,k) {0<=j}
+//  T(i,j,k) {0<=j, j<=7}
 
 
    for(j = 0; j <= 7; j += 1)
 
-//  T(i,k) {0<=i}
+//  T(i,k) {0<=i, i<=7}
 
       for(i = 0; i <= 7; i += 1) {
 
@@ -7656,7 +7659,7 @@ void fdct(short *block)
 
          s = 0.0;
 
-//  T(k) {0<=k}
+//  T(k) {0<=k, k<=7}
 
 
          for(k = 0; k <= 7; k += 1)
@@ -7681,7 +7684,7 @@ void idct(short *block)
 
    int i;
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
@@ -7690,7 +7693,7 @@ void idct(short *block)
 
       idctrow(block+8*i);
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1)
@@ -8019,7 +8022,7 @@ void init_fdct(void)
 
    double s;
 
-//  T(i,j) {0<=i}
+//  T(i,j) {0<=i, i<=7}
 
 
    for(i = 0; i <= 7; i += 1) {
@@ -8028,7 +8031,7 @@ void init_fdct(void)
 
       s = i==0?sqrt(0.125):0.5;
 
-//  T(j) {0<=j}
+//  T(j) {0<=j, j<=7}
 
 
       for(j = 0; j <= 7; j += 1)
@@ -8053,7 +8056,7 @@ void init_idct(void)
 
    iclp = iclip+512;
 
-//  T(i) {0<=i+512}
+//  T(i) {0<=i+512, i<=511}
 
    for(i = -512; i <= 511; i += 1)
 
@@ -8099,7 +8102,7 @@ void iquant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat,
 
       sum = dst[0] = src[0]<<3-dc_prec;
 
-//  T(i,sum,val) {1<=i}
+//  T(i,sum,val) {1<=i, i<=63}
 
       for(i = 1; i <= 63; i += 1) {
 
@@ -8147,7 +8150,7 @@ void iquant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mqua
 
       sum = 0;
 
-//  T(i,sum,val) {0<=i}
+//  T(i,sum,val) {0<=i, i<=63}
 
       for(i = 0; i <= 63; i += 1) {
 
@@ -8433,12 +8436,12 @@ static int bdist1(unsigned char *pf, unsigned char *pb, unsigned char *p2, int l
 
    s = 0;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
 
    for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
       for(i = 0; i <= 15; i += 1) {
 
@@ -8551,12 +8554,12 @@ static int bdist2(unsigned char *pf, unsigned char *pb, unsigned char *p2, int l
 
    s = 0;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
 
    for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
       for(i = 0; i <= 15; i += 1) {
 
@@ -8873,11 +8876,11 @@ break_1:      ;
    }
    else if (hx&&!hy)
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -8913,11 +8916,11 @@ break_1:      ;
 
       p1a = p1+lx;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -8958,11 +8961,11 @@ break_1:      ;
 
       p1a = p1+lx;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -9038,11 +9041,11 @@ static int dist2(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
 
    if (!hx&&!hy)
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -9065,11 +9068,11 @@ static int dist2(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
       }
    else if (hx&&!hy)
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -9096,11 +9099,11 @@ static int dist2(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
 
       p1a = p1+lx;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -9132,11 +9135,11 @@ static int dist2(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
 
       p1a = p1+lx;
 
-//  T(i,j,s,v) {0<=j, s#init<=s}
+//  T(i,j,s,v) {j+1<=h, 0<=j, s#init<=s}
 
       for(j = 0; j <= h-1; j += 1) {
 
-//  T(i,s,v) {0<=i, s#init<=s}
+//  T(i,s,v) {0<=i, i<=15, s#init<=s}
 
          for(i = 0; i <= 15; i += 1) {
 
@@ -9267,13 +9270,13 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    vmc_dp = 1<<30;
 
 //  T(delta_x,delta_y,imindmv,imino,io,jmindmv,jmino,jo,local_dist,
-//    vmc_dp) {0<=delta_y+1, vmc_dp<=vmc_dp#init}
+//    vmc_dp) {0<=delta_y+1, delta_y<=1, vmc_dp<=vmc_dp#init}
 
 
    for(delta_y = -1; delta_y <= 1; delta_y += 1)
 
 //  T(delta_x,imindmv,imino,io,jmindmv,jmino,jo,local_dist,vmc_dp)
-//    {0<=delta_x+1, vmc_dp<=vmc_dp#init}
+//    {0<=delta_x+1, delta_x<=1, vmc_dp<=vmc_dp#init}
 
       for(delta_x = -1; delta_x <= 1; delta_x += 1) {
 
@@ -9386,14 +9389,14 @@ static void dpframe_estimate(unsigned char *ref, unsigned char *mb, int i, int j
 
 //  T(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=pref, vmc<=vmc#init}
+//    vmc) {0<=pref, pref<=1, vmc<=vmc#init}
 
 
    for(pref = 0; pref <= 1; pref += 1)
 
 //  T(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,vmc)
-//    {0<=ppred, vmc<=vmc#init}
+//    {0<=ppred, ppred<=1, vmc<=vmc#init}
 
       for(ppred = 0; ppred <= 1; ppred += 1) {
 
@@ -9488,12 +9491,13 @@ l99998:         ;
 
 //  T(delta_x,delta_y,ib,iminb,imindmv,imins,imint,it,jb,jminb,
 //    jmindmv,jmins,jmint,jt,local_dist,vmc) {0<=delta_y+1,
-//    vmc<=vmc#init}
+//    delta_y<=1, vmc<=vmc#init}
 
             for(delta_y = -1; delta_y <= 1; delta_y += 1)
 
 //  T(delta_x,ib,iminb,imindmv,imins,imint,it,jb,jminb,jmindmv,jmins,
-//    jmint,jt,local_dist,vmc) {0<=delta_x+1, vmc<=vmc#init}
+//    jmint,jt,local_dist,vmc) {0<=delta_x+1, delta_x<=1,
+//    vmc<=vmc#init}
 
                for(delta_x = -1; delta_x <= 1; delta_x += 1) {
 
@@ -11366,7 +11370,7 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 
    sxy = sx>sy?sx:sy;
 
-//  T(d,dmin,i,imin,j,jmin,k,l) {dmin<=dmin#init, 1<=l}
+//  T(d,dmin,i,imin,j,jmin,k,l) {dmin<=dmin#init, 1<=l, l<=sxy}
 
 
    for(l = 1; l <= sxy; l += 1) {
@@ -11381,7 +11385,7 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 
 //  T(d,dmin,i,imin,j,jmin,k) {dmin<=dmin#init, i#init+j#init<=i+j+k,
 //    i#init+j<=i+j#init+k, i+j#init<=i#init+j+k,
-//    i+j<=i#init+j#init+k}
+//    i+j<=i#init+j#init+k, 0<=k, k+1<=8l}
 
       for(k = 0; k <= 8*l-1; k += 1) {
 
@@ -11469,12 +11473,12 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 
    jhigh = jmin+(jmin<ymax-h<<1);
 
-//  T(d,dmin,i,imin,j,jmin) {dmin<=dmin#init, jlow<=j}
+//  T(d,dmin,i,imin,j,jmin) {dmin<=dmin#init, j<=jhigh, jlow<=j}
 
 
    for(j = jlow; j <= jhigh; j += 1)
 
-//  T(d,dmin,i,imin,jmin) {dmin<=dmin#init, ilow<=i}
+//  T(d,dmin,i,imin,jmin) {dmin<=dmin#init, i<=ihigh, ilow<=i}
 
       for(i = ilow; i <= ihigh; i += 1) {
 
@@ -11534,12 +11538,12 @@ static int variance(unsigned char *p, int lx)
 
    s = s2 = 0;
 
-//  T(i,j,s,s2,v) {0<=j, s2#init<=s2}
+//  T(i,j,s,s2,v) {0<=j, j<=15, s2#init<=s2}
 
 
    for(j = 0; j <= 15; j += 1) {
 
-//  T(i,s,s2,v) {0<=i, s2#init<=s2}
+//  T(i,s,s2,v) {0<=i, i<=15, s2#init<=s2}
 
       for(i = 0; i <= 15; i += 1) {
 
@@ -11726,7 +11730,7 @@ static void init()
 
    clp += 384;
 
-//  T(i) {0<=i+384}
+//  T(i) {0<=i+384, i<=639}
 
    for(i = -384; i <= 639; i += 1)
 
@@ -11734,7 +11738,7 @@ static void init()
 
       clp[i] = i<0?0:i>255?255:i;
 
-//  T(i,size) {0<=i}
+//  T(i,size) {0<=i, i<=2}
 
 
    for(i = 0; i <= 2; i += 1) {
@@ -12355,7 +12359,7 @@ static void readparmfile(char *fname)
 
       error("malloc failed\n");
 
-//  T(i) {0<=i}
+//  T(i) {i+1<=M, 0<=i}
 
 
    for(i = 0; i <= M-1; i += 1) {
@@ -12418,7 +12422,7 @@ static void readparmfile(char *fname)
 
    topfirst = !!topfirst;
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=2}
 
 
    for(i = 0; i <= 2; i += 1) {
@@ -12690,7 +12694,7 @@ break_3:         ;
          dc_prec = 0;
       }
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=2}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -12712,7 +12716,7 @@ break_3:         ;
             qscale_tab[i] = 0;
          }
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=2}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -12734,7 +12738,7 @@ break_3:         ;
             intravlc_tab[i] = 0;
          }
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=2}
 
 
       for(i = 0; i <= 2; i += 1)
@@ -12834,7 +12838,7 @@ break_3:         ;
 
    if (prog_frame)
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=2}
 
       for(i = 0; i <= 2; i += 1)
 
@@ -12873,7 +12877,7 @@ break_3:         ;
       topfirst = 0;
    }
 
-//  T(i) {0<=i}
+//  T(i) {i+1<=M, 0<=i}
 
    
    /* search windows */
@@ -12987,7 +12991,7 @@ static void readquantmat()
       /* use default intra matrix */
       load_iquant = 0;
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=63}
 
       for(i = 0; i <= 63; i += 1)
 
@@ -13015,7 +13019,7 @@ static void readquantmat()
          error(errortext);
       }
 
-//  T(i,v) {0<=i}
+//  T(i,v) {0<=i, i<=63}
 
 
       for(i = 0; i <= 63; i += 1) {
@@ -13053,7 +13057,7 @@ static void readquantmat()
       /* use default non-intra matrix */
       load_niquant = 0;
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=63}
 
       for(i = 0; i <= 63; i += 1)
 
@@ -13081,7 +13085,7 @@ static void readquantmat()
          error(errortext);
       }
 
-//  T(i,v) {0<=i}
+//  T(i,v) {0<=i, i<=63}
 
 
       for(i = 0; i <= 63; i += 1) {
@@ -13207,13 +13211,13 @@ void predict(unsigned char *reff[], unsigned char *refb[], unsigned char *cur[3]
 
    k = 0;
 
-//  T(i,j,k) {0<=j, k#init<=k}
+//  T(i,j,k) {j+1<=height2, 0<=j, k#init<=k}
 
    
    /* loop through all macroblocks of the picture */
    for(j = 0; j <= height2-1; j += 16)
 
-//  T(i,k) {i+16k#init==16k, k#init<=k}
+//  T(i,k) {i+16k#init==16k, i+1<=width, k#init<=k}
 
       for(i = 0; i <= width-1; i += 16) {
 
@@ -13321,12 +13325,12 @@ static void clearblock(unsigned char *cur[], int i0, int j0)
 
    p = cur[0]+(pict_struct==2?width:0)+i0+width2*j0;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {0<=j, j<=15}
 
 
    for(j = 0; j <= 15; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=15}
 
       for(i = 0; i <= 15; i += 1)
 
@@ -13376,12 +13380,12 @@ static void clearblock(unsigned char *cur[], int i0, int j0)
 
    p = cur[1]+(pict_struct==2?chrom_width:0)+i0+chrom_width2*j0;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
 
    for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
       for(i = 0; i <= w-1; i += 1)
 
@@ -13398,12 +13402,12 @@ static void clearblock(unsigned char *cur[], int i0, int j0)
 
    p = cur[2]+(pict_struct==2?chrom_width:0)+i0+chrom_width2*j0;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
 
    for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
       for(i = 0; i <= w-1; i += 1)
 
@@ -13426,7 +13430,7 @@ static void pred(unsigned char *src[], int sfield, unsigned char *dst[], int dfi
 
    int cc;
 
-//  T(cc,dx,dy,h,lx,w,x,y) {0<=cc}
+//  T(cc,dx,dy,h,lx,w,x,y) {0<=cc, cc<=2}
 
 
    for(cc = 0; cc <= 2; cc += 1) {
@@ -13538,11 +13542,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 
       if (addflag)
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13560,11 +13564,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
          }
       else
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13586,11 +13590,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 
       if (addflag)
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13608,11 +13612,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
          }
       else
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13634,11 +13638,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
 
       if (addflag)
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13656,11 +13660,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
          }
       else
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13683,11 +13687,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
       /* if (xh && yh) */
       if (addflag)
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -13705,11 +13709,11 @@ static void pred_comp(unsigned char *src, unsigned char *dst, int lx, int w, int
          }
       else
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
          for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
             for(i = 0; i <= w-1; i += 1)
 
@@ -14223,7 +14227,7 @@ void profile_and_level_checks()
 
       error("Picture rate greater than permitted in specified Level");
 
-//  T(i) {0<=i}
+//  T(i) {i+1<=M, 0<=i}
 
 
    for(i = 0; i <= M-1; i += 1) {
@@ -14673,7 +14677,7 @@ void putbits(int val, int n)
 //  T(bytecnt,i,mask,outbfr,outcnt)
 //    {i+outcnt+8putbits!:bytecnt#init==8bytecnt+putbits!:outcnt#init,
 //    outcnt+7putbits!:bytecnt#init<=7bytecnt+putbits!:outcnt#init,
-//    putbits!:bytecnt#init<=bytecnt}
+//    putbits!:bytecnt#init<=bytecnt, 0<=i, i+1<=n}
 
    /* selects first (leftmost) bit */
    
@@ -14998,8 +15002,8 @@ void putintrablk(short *blk, int cc)
    run = 0;
 
 //  T(n,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,run,
-//    signed_level)
-//    {n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
+//    signed_level) {1<=n, n<=63,
+//    n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
 //    putbits!:bytecnt+64putbits!:outcnt#init+run+1,
 //    run#init+63<=63n+run, run+1<=n+run#init,
 //    putbits!:bytecnt#init<=putbits!:bytecnt,
@@ -15275,8 +15279,8 @@ void putnonintrablk(short *blk)
    first = 1;
 
 //  T(first,n,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt,run,
-//    signed_level)
-//    {n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
+//    signed_level) {0<=n, n<=63,
+//    n+512putbits!:bytecnt#init+64putbits!:outcnt+run#init<=512
 //    putbits!:bytecnt+64putbits!:outcnt#init+run, run#init<=63n+run,
 //    run<=n+run#init, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -15777,7 +15781,7 @@ void putpict(unsigned char *frame)
 
             putbits(0, 1);
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
             /* extra_bit_slice */
             
@@ -16019,7 +16023,7 @@ l99996:         ;
 
          if (!(mb_type&1))
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
             for(cc = 0; cc <= 2; cc += 1)
 
@@ -16123,7 +16127,7 @@ l99997:         ;
          goto loop_end_2;
 l99998:         ;
 
-//  T(cc) {0<=cc}
+//  T(cc) {0<=cc, cc<=2}
 
          /* P picture, no motion vectors -> skip */
          
@@ -16720,7 +16724,7 @@ void putseq(void)
 
       if (i==0||(i-1)%M==0) {
 
-//  T(j) {0<=j}
+//  T(j) {0<=j, j<=2}
 
          /* I or P frame */
          for(j = 0; j <= 2; j += 1) {
@@ -16858,7 +16862,7 @@ void putseq(void)
       }
       else {
 
-//  T(j) {0<=j}
+//  T(j) {0<=j, j<=2}
 
          /* B frame */
          for(j = 0; j <= 2; j += 1) {
@@ -17773,6 +17777,7 @@ void putseqhdr(void)
    if (load_iquant)
 
 //  T(i,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt) {0<=i,
+//    i<=63,
 //    8i+8putbits!:bytecnt#init+putbits!:outcnt<=8putbits!:bytecnt+
 //    putbits!:outcnt#init, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -17810,6 +17815,7 @@ void putseqhdr(void)
    if (load_niquant)
 
 //  T(i,putbits!:bytecnt,putbits!:outbfr,putbits!:outcnt) {0<=i,
+//    i<=63,
 //    8i+8putbits!:bytecnt#init+putbits!:outcnt<=8putbits!:bytecnt+
 //    putbits!:outcnt#init, putbits!:bytecnt#init<=putbits!:bytecnt,
 //    7putbits!:bytecnt#init+putbits!:outcnt<=7putbits!:bytecnt+
@@ -18000,7 +18006,7 @@ int quant_intra(short *src, short *dst, int dc_prec, unsigned char *quant_mat, i
 
    dst[0] = x>=0?(x+(d>>1))/d:-(((-x)+(d>>1))/d);
 
-//  T(d,i,x,y) {1<=i}
+//  T(d,i,x,y) {1<=i, i<=63}
 
    /* round(x/d) */
    
@@ -18081,7 +18087,7 @@ int quant_non_intra(short *src, short *dst, unsigned char *quant_mat, int mquant
 
    nzflag = 0;
 
-//  T(d,i,nzflag,x,y) {0<=i}
+//  T(d,i,nzflag,x,y) {0<=i, i<=63}
 
 
    for(i = 0; i <= 63; i += 1) {
@@ -18151,7 +18157,7 @@ static void iquant1_intra(short *src, short *dst, int dc_prec, unsigned char *qu
 
    dst[0] = src[0]<<3-dc_prec;
 
-//  T(i,val) {1<=i}
+//  T(i,val) {1<=i, i<=63}
 
    for(i = 1; i <= 63; i += 1) {
 
@@ -18182,7 +18188,7 @@ static void iquant1_non_intra(short *src, short *dst, unsigned char *quant_mat, 
 
    int i, val;
 
-//  T(i,val) {0<=i}
+//  T(i,val) {0<=i, i<=63}
 
 
    for(i = 0; i <= 63; i += 1) {
@@ -18462,7 +18468,7 @@ void range_checks(void)
 
       error("intra_dc_precision must be in range 0...3");
 
-//  T(i) {0<=i}
+//  T(i) {i+1<=M, 0<=i}
 
 
    for(i = 0; i <= M-1; i += 1) {
@@ -18734,12 +18740,12 @@ static double var_sblk(unsigned char *p, int lx)
 
    s = s2 = 0;
 
-//  T(i,j,s,s2,v) {0<=j, s2#init<=s2}
+//  T(i,j,s,s2,v) {0<=j, j<=7, s2#init<=s2}
 
 
    for(j = 0; j <= 7; j += 1) {
 
-//  T(i,s,s2,v) {0<=i, s2#init<=s2}
+//  T(i,s,s2,v) {0<=i, i<=7, s2#init<=s2}
 
       for(i = 0; i <= 7; i += 1) {
 
@@ -19458,7 +19464,7 @@ static void border_extend(unsigned char *frame, int w1, int h1, int w2, int h2)
 
    unsigned char *fp;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h1, 0<=j}
 
    
    /* horizontal pixel replication (right border) */
@@ -19469,7 +19475,7 @@ static void border_extend(unsigned char *frame, int w1, int h1, int w2, int h2)
 
       fp = frame+j*w2;
 
-//  T(i) {w1<=i}
+//  T(i) {w1<=i, i+1<=w2}
 
       for(i = w1; i <= w2-1; i += 1)
 
@@ -19478,7 +19484,7 @@ static void border_extend(unsigned char *frame, int w1, int h1, int w2, int h2)
          fp[i] = fp[i-1];
    }
 
-//  T(i,j) {h1<=j}
+//  T(i,j) {h1<=j, j+1<=h2}
 
    
    /* vertical pixel replication (bottom border) */
@@ -19489,7 +19495,7 @@ static void border_extend(unsigned char *frame, int w1, int h1, int w2, int h2)
 
       fp = frame+j*w2;
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w2}
 
       for(i = 0; i <= w2-1; i += 1)
 
@@ -19523,12 +19529,13 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
 
    if (prog_frame)
 
-//  T(i,j,jm1,jm2,jm3,jm4,jm5,jp1,jp2,jp3,jp4,jp5,jp6) {0<=i}
+//  T(i,j,jm1,jm2,jm3,jm4,jm5,jp1,jp2,jp3,jp4,jp5,jp6) {0<=i, i+1<=w}
 
       /* intra frame */
       for(i = 0; i <= w-1; i += 1) {
 
-//  T(j,jm1,jm2,jm3,jm4,jm5,jp1,jp2,jp3,jp4,jp5,jp6) {0<=j}
+//  T(j,jm1,jm2,jm3,jm4,jm5,jp1,jp2,jp3,jp4,jp5,jp6) {j+1<=height,
+//    0<=j}
 
          for(j = 0; j <= height-1; j += 2) {
 
@@ -19591,12 +19598,14 @@ static void conv422to420(unsigned char *src, unsigned char *dst)
       }
    else
 
-//  T(i,j,jm1,jm2,jm3,jm4,jm5,jm6,jp1,jp2,jp3,jp4,jp5,jp6) {0<=i}
+//  T(i,j,jm1,jm2,jm3,jm4,jm5,jm6,jp1,jp2,jp3,jp4,jp5,jp6) {0<=i,
+//    i+1<=w}
 
       /* intra field */
       for(i = 0; i <= w-1; i += 1) {
 
-//  T(j,jm1,jm2,jm3,jm4,jm5,jm6,jp1,jp2,jp3,jp4,jp5,jp6) {0<=j}
+//  T(j,jm1,jm2,jm3,jm4,jm5,jm6,jp1,jp2,jp3,jp4,jp5,jp6) {j+1<=height,
+//    0<=j}
 
          for(j = 0; j <= height-1; j += 4) {
 
@@ -19749,11 +19758,13 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
 
    if (mpeg1)
 
-//  T(i,im1,im2,im3,im4,im5,ip1,ip2,ip3,ip4,ip5,ip6,j) {0<=j}
+//  T(i,im1,im2,im3,im4,im5,ip1,ip2,ip3,ip4,ip5,ip6,j) {j+1<=height,
+//    0<=j}
 
       for(j = 0; j <= height-1; j += 1) {
 
-//  T(i,im1,im2,im3,im4,im5,ip1,ip2,ip3,ip4,ip5,ip6) {0<=i}
+//  T(i,im1,im2,im3,im4,im5,ip1,ip2,ip3,ip4,ip5,ip6) {0<=i,
+//    i+1<=width}
 
          for(i = 0; i <= width-1; i += 2) {
 
@@ -19816,12 +19827,12 @@ static void conv444to422(unsigned char *src, unsigned char *dst)
       }
    else
 
-//  T(i,im1,im3,im5,ip1,ip3,ip5,j) {0<=j}
+//  T(i,im1,im3,im5,ip1,ip3,ip5,j) {j+1<=height, 0<=j}
 
       /* MPEG-2 */
       for(j = 0; j <= height-1; j += 1) {
 
-//  T(i,im1,im3,im5,ip1,ip3,ip5) {0<=i}
+//  T(i,im1,im3,im5,ip1,ip3,ip5) {0<=i, i+1<=width}
 
          for(i = 0; i <= width-1; i += 2) {
 
@@ -20042,7 +20053,7 @@ static void read_ppm(char *fname, unsigned char *frame[])
 
    pbm_getint(fd);
 
-//  T(b,g,i,j,r) {0<=i}
+//  T(b,g,i,j,r) {0<=i, i+1<=vertical_size}
 
    /* width height maxcolors */
    
@@ -20060,7 +20071,7 @@ static void read_ppm(char *fname, unsigned char *frame[])
 
       vp = v444+i*width;
 
-//  T(b,g,j,r) {0<=j}
+//  T(b,g,j,r) {j+1<=horizontal_size, 0<=j}
 
 
       for(j = 0; j <= horizontal_size-1; j += 1) {
@@ -20434,10 +20445,11 @@ void stats(void)
    n_skipped = n_intra = n_ncoded = n_blocks = n_interp = n_forward = n_backward = 0;
 
 //  T(i,k,n_backward,n_blocks,n_forward,n_interp,n_intra,n_ncoded,
-//    n_skipped) {n_backward+n_forward+n_interp<=k+n_backward#init+
-//    n_forward#init+n_interp#init,
+//    n_skipped) {0<=k,
+//    n_backward+n_forward+n_interp<=k+n_backward#init+n_forward#init+
+//    n_interp#init,
 //    n_intra+n_ncoded+n_skipped<=k+n_intra#init+n_ncoded#init+
-//    n_skipped#init, n_backward#init<=n_backward,
+//    n_skipped#init, k+1<=nmb, n_backward#init<=n_backward,
 //    n_blocks#init<=n_blocks, n_forward#init<=n_forward,
 //    n_interp#init<=n_interp, n_intra#init<=n_intra,
 //    n_ncoded#init<=n_ncoded, n_skipped#init<=n_skipped}
@@ -20470,7 +20482,8 @@ void stats(void)
 
          n_ncoded++;
 
-//  T(i,n_blocks) {n_blocks<=i+n_blocks#init, n_blocks#init<=n_blocks}
+//  T(i,n_blocks) {i+1<=block_count, 0<=i, n_blocks<=i+n_blocks#init,
+//    n_blocks#init<=n_blocks}
 
 
       for(i = 0; i <= block_count-1; i += 1)
@@ -20562,12 +20575,12 @@ void stats(void)
 
    k = 0;
 
-//  T(i,j,k,mb_type) {0<=j, k#init<=k}
+//  T(i,j,k,mb_type) {0<=j, j+1<=mb_height2, k#init<=k}
 
 
    for(j = 0; j <= mb_height2-1; j += 1) {
 
-//  T(i,k,mb_type) {i+k#init==k, k#init<=k}
+//  T(i,k,mb_type) {i+k#init==k, i+1<=mb_width, k#init<=k}
 
       for(i = 0; i <= mb_width-1; i += 1) {
 
@@ -20694,11 +20707,11 @@ break_5:            ;
 
    k = 0;
 
-//  T(i,j,k) {0<=j, k#init<=k}
+//  T(i,j,k) {0<=j, j+1<=mb_height2, k#init<=k}
 
    for(j = 0; j <= mb_height2-1; j += 1) {
 
-//  T(i,k) {i+k#init==k, k#init<=k}
+//  T(i,k) {i+k#init==k, i+1<=mb_width, k#init<=k}
 
       for(i = 0; i <= mb_width-1; i += 1) {
 
@@ -20745,12 +20758,12 @@ static void calcSNR1(unsigned char *org, unsigned char *rec, int lx, int w, int 
 
    s1 = s2 = e2 = 0.0;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {j+1<=h, 0<=j}
 
 
    for(j = 0; j <= h-1; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i+1<=w}
 
       for(i = 0; i <= w-1; i += 1) {
 
@@ -20958,12 +20971,12 @@ static void add_pred(unsigned char *pred, unsigned char *cur, int lx, short *blk
 
    int i, j;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {0<=j, j<=7}
 
 
    for(j = 0; j <= 7; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=7}
 
       for(i = 0; i <= 7; i += 1)
 
@@ -20994,12 +21007,12 @@ static void sub_pred(unsigned char *pred, unsigned char *cur, int lx, short *blk
 
    int i, j;
 
-//  T(i,j) {0<=j}
+//  T(i,j) {0<=j, j<=7}
 
 
    for(j = 0; j <= 7; j += 1) {
 
-//  T(i) {0<=i}
+//  T(i) {0<=i, i<=7}
 
       for(i = 0; i <= 7; i += 1)
 
@@ -36781,11 +36794,11 @@ void putseq(void)
 
          for(k = 0; k <= mb_height2*mb_width-1; k += 1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
             if (mbinfo[k].mb_type&1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 
@@ -36796,7 +36809,7 @@ void putseq(void)
                   iquant_intra(blocks[k*block_count+j], blocks[k*block_count+j], dc_prec, intra_q, mbinfo[k].mquant);
             else
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 
@@ -36925,11 +36938,11 @@ void putseq(void)
 
          for(k = 0; k <= mb_height2*mb_width-1; k += 1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
             if (mbinfo[k].mb_type&1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 
@@ -36940,7 +36953,7 @@ void putseq(void)
                   iquant_intra(blocks[k*block_count+j], blocks[k*block_count+j], dc_prec, intra_q, mbinfo[k].mquant);
             else
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 
@@ -37009,11 +37022,11 @@ void putseq(void)
 
          for(k = 0; k <= mb_height*mb_width-1; k += 1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
             if (mbinfo[k].mb_type&1)
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 
@@ -37024,7 +37037,7 @@ void putseq(void)
                   iquant_intra(blocks[k*block_count+j], blocks[k*block_count+j], dc_prec, intra_q, mbinfo[k].mquant);
             else
 
-//  P(f,f0,i,ipflag,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
+//  P(f,f0,i,ipflag,j,k,n,nb,np,sxb,sxf,syb,syf) {0<=f0, 0<=i, 0<=k}
 
                for(j = 0; j <= block_count-1; j += 1)
 

@@ -36,7 +36,7 @@ int main()
 
    scanf("%d", &m);
 
-//  T(i) {i#init==0, 0<=i}
+//  T(i) {i#init==0, 0<=i, i<=m, i<=n}
 
 
    for(i = 0; i <= n<=m?n:m; i += 1)
