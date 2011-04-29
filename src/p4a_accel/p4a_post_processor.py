@@ -41,6 +41,36 @@ def gather_kernel_launcher_declarations(file_name):
         kernel_launcher_declarations[result.group(1)] = result.group(0)
 
 
+def replace_by_opencl_own_declarations(content):
+    # Replace sinf by the opencl intrinsic sin function
+    content = re.sub("sinf","sin",content)
+    # size_t is not a standard in OpenCL ...
+    # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
+    # compiler does not accept variable types that are
+    # implementation-dependent.
+
+    # Don't know where has been generated, but the opposite of what we want
+    # Comment this line in the opencl kernel file
+    content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
+    content = re.sub("size_t","unsigned long int",content)
+
+    # Opencl pointers and array variable must be explicitely declared
+    # in the global memory space
+    # any (... * ..., substituted by (P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\(\s*(\w*)\s*\*\s*(\w*)\,","(P4A_accel_global_address \\1 *\\2,", content)
+    # any ,... * ..., substituted by ,P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\,",",P4A_accel_global_address \\1 *\\2,", content)
+    # any ,... * ...) substituted by ,P4A_accel_global_address ... * ...,
+    content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\)",",P4A_accel_global_address \\1 *\\2)", content)
+    # ,...  ...[...], substituted by ,P4A_accel_global_address ... * ...[...],
+    content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,",",P4A_accel_global_address \\1 \\2[\\3],", content)
+    # (...  ...[...], substituted by (P4A_accel_global_address ... * ...[...],
+    content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
+    # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
+    content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
+
+    return content
+
 def insert_kernel_launcher_declaration(m):
     "Insert a kernel_launcher declaration just before its use"
     decl = "\n\t extern " + kernel_launcher_declarations[m.group(1)] + ";\n" + m.group(0)
@@ -121,15 +151,8 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     content = f.read()
     f.close()
 
-    # size_t is not a standard in OpenCL ...
-    # size_t can be a 32-bit or a 64-bit unsigned integer, and the OpenCL
-    # compiler does not accept variable types that are
-    # implementation-dependent.
     if (p4a_util.opencl_file_p(file_base_name)):
-        # Don't know where has been generated, but the opposite of what we want
-        # Comment this line in the opencl kernel file
-        content = re.sub("typedef unsigned int size_t;","//typedef unsigned int size_t;",content)
-        content = re.sub("size_t","unsigned long int",content)
+        content = replace_by_opencl_own_declarations(content)
 
     header = ""
     # Inject P4A accel header definitions except in opencl files:
@@ -150,22 +173,6 @@ def patch_to_use_p4a_methods(file_name, dir_name, includes):
     # Inject run time initialization:
     content = re.sub("// Prepend here P4A_init_accel\n",
                      "P4A_init_accel;\n", content)
-
-    # Opencl pointers and array variable must be explicitely declared
-    # in the global memory space
-    if (p4a_util.opencl_file_p(file_base_name)):
-        # any (... * ..., substituted by (P4A_accel_global_address ... * ...,
-        content = re.sub("\s*\(\s*(\w*)\s*\*\s*(\w*)\,","(P4A_accel_global_address \\1 *\\2,", content)
-        # any ,... * ..., substituted by ,P4A_accel_global_address ... * ...,
-        content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\,",",P4A_accel_global_address \\1 *\\2,", content)
-        # any ,... * ...) substituted by ,P4A_accel_global_address ... * ...,
-        content = re.sub("\s*\,\s*(\w*)\s*\*\s*(\w*)\)",",P4A_accel_global_address \\1 *\\2)", content)
-        # ,...  ...[...], substituted by ,P4A_accel_global_address ... * ...[...],
-        content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,",",P4A_accel_global_address \\1 \\2[\\3],", content)
-        # (...  ...[...], substituted by (P4A_accel_global_address ... * ...[...],
-        content = re.sub("\(\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\,","(P4A_accel_global_address \\1 \\2[\\3],", content)
-        # ,...  ...[...]) substituted by ,P4A_accel_global_address ... * ...[...])
-        content = re.sub(",\s*(\w*)\s*(\w*)\s*\[([\w+*\)\(]*)\]\s*\)",",P4A_accel_global_address \\1 \\2[\\3])", content)
 
     # This patch is a temporary solution. It may not cover all possible cases
     # I guess all this should be done by applying partial_eval in PIPS ?
