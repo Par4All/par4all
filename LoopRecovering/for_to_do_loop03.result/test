@@ -76,7 +76,7 @@ int main()
 
    int i, j;                                                            /*0003*/
 
-//  T(j) {j<=10}
+//  T(j) {1<=j, j<=10}
 
    
    // A do loop ! Should be parallel.
