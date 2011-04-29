@@ -129,6 +129,7 @@ typedef struct intrinsic_cost_rec {
 #define CALL_SIX_OVERHEAD       "CALL-SIX-OVERHEAD"       
 #define CALL_SEVEN_OVERHEAD     "CALL-SEVEN-OVERHEAD"   
 
+/* TYPE_CAST_COST added to handle cast case ; Molka Becher  */
 #define TYPE_CAST_COST  "TypeCast"  
 
 /* the above two lines are added for 6th cost file, overhead. LZ 280993 */
