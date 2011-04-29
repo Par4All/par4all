@@ -23,8 +23,11 @@ int main(void)
     // flip-flop
     b = !b;
     ok = ok && (x>=y);
+    // If the previous boolean assignment is changed into
     //if(x<y)
     //  ok = false;
+    // the condition is found.
+
     // assert(ok);
     // we want ok==1
     fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);

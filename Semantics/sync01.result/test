@@ -125,8 +125,11 @@ int main(void)
 
 //  T() {}
 
+      // If the previous boolean assignment is changed into
       //if(x<y)
       //  ok = false;
+      // the condition is found.
+      
       // assert(ok);
       // we want ok==1
       fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
@@ -188,8 +191,11 @@ int main(void)
 
 //  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=x, y<=x, x<=y+1, 0<=y}
 
+      // If the previous boolean assignment is changed into
       //if(x<y)
       //  ok = false;
+      // the condition is found.
+      
       // assert(ok);
       // we want ok==1
       fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
@@ -256,8 +262,11 @@ int main(void)
 
 //  T() {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=x}
 
+      // If the previous boolean assignment is changed into
       //if(x<y)
       //  ok = false;
+      // the condition is found.
+      
       // assert(ok);
       // we want ok==1
       fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
@@ -319,8 +328,11 @@ int main(void)
 
 //  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, 0<=ok, ok<=1, 1<=x, 0<=y}
 
+      // If the previous boolean assignment is changed into
       //if(x<y)
       //  ok = false;
+      // the condition is found.
+      
       // assert(ok);
       // we want ok==1
       fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
