@@ -79,7 +79,7 @@ COMMON_SOURCES = common/io.c
 #	sequential/6-updatepos.c
 
 SOURCES= pm.c 1-discretization.c 2-histogramme.c 3-potential.c \
-							4-updateforce.c 4-updatevel.c 6-updatepos.c
+	4-updateforce.c 4-updatevel.c 6-updatepos.c
 
 BASE_SOURCES= $(SOURCES:%=sequential/%)
 
@@ -87,7 +87,8 @@ PGI_SOURCES=  $(SOURCES:%=pgi/%)
 PGI_OBJS=  $(SOURCES:%.c=%.o)
 
 
-CUDA_SOURCES= cuda/pm.cu cuda/kernel_tools.cu \
+CUDA_SOURCES= cuda/pm.cu \
+	cuda/kernel_tools.cu \
 	cuda/1-discretization.cu \
 	cuda/2-histogramme.cu \
 	cuda/3-potential.cu \
@@ -147,11 +148,13 @@ build-all: $(TARGET:=_seq) \
 	$(TARGET:=_openmp) \
 	$(TARGET:=_autocuda) \
 	$(TARGET:=_autocuda_comm_optimization) \
+	$(TARGET:=_opencl) \
 	$(TARGET:=_cuda)
 
 clean :
 	rm -rf $(TARGET:=_seq)$(BIN_SUFFIX) \
 	$(TARGET:=_openmp)$(BIN_SUFFIX) \
+	$(TARGET:=_opencl)$(BIN_SUFFIX) \
 	$(TARGET:=_cuda)$(BIN_SUFFIX) \
 	$(TARGET:=_seq)$(BIN_SUFFIX)_opengl \
 	$(TARGET:=_openmp)$(BIN_SUFFIX)_opengl \
@@ -165,7 +168,7 @@ clean :
 	$(COMMON_SOURCES:.c=.p4a.cu) \
 	$(BASE_SOURCES:.c=.p4a.cu) $(GRAPHICS:.c=.p4a.cu) \
 	$(CPROTO_GRAPHICS_SRC:.c=.o) \
-	*~ *.database *.build *.o include/stars-pm-generated*.h
+	*~ *.database *.build *.o include/stars-pm-generated*.h *.cl
 
 run_%: $(TARGET)_%$(BIN_SUFFIX)
 # Run a version and display timing information:
@@ -190,6 +193,11 @@ run_%: $(TARGET)_%$(BIN_SUFFIX)
 # Parallelize and build an OpenMP version:
 	p4a -DFFTW3_THREADED -lfftw3f_threads $(P4A_OPTIONS) $(CPU_TIMING) $(CPPFLAGS)  -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
 # P4A openmp end !
+
+%_opencl : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
+# Parallelize and build an OpenCL version:
+	p4a $(P4A_OPTIONS) $(CPPFLAGS)  --opencl  -o $@$(BIN_SUFFIX) $(COMMON_SOURCES) $(BASE_SOURCES) $(STUBS) --exclude-file=$(STUBS:.c=.p4a.c) $(LDLIBS)
+# P4A opencl end !
 
 %_autocuda : include/stars-pm-generated_$(SIZE).h $(COMMON_SOURCES) $(BASE_SOURCES) $(GRAPHICS) $(STUBS)
 
