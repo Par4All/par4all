@@ -100,20 +100,65 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 
 	if (nblanks<1)
 	    nblanks = 1;
-	if ( instruction_block_p(ins) )
-	  it = "(BLOCK)";
-	else if ( instruction_test_p(ins) )
-	  it = "(TEST)";
-	else if ( instruction_loop_p(ins) )
-	  it = "(DO)";
-	else if ( instruction_call_p(ins) )
-	  it = "(STMT)";
-	else if ( instruction_unstructured_p(ins) )
-	  it = "(UNSTR)";
-	else if ( instruction_expression_p(ins) )
-	  it = "(EXPR)";
-	else
-	    pips_internal_error("Never occur!");
+
+	//Becher Molka : Replacing the control structure 'if' by selective structure 'switch case' +  Updating of instruction's tags.
+    switch (instruction_tag(ins))
+    {
+        case is_instruction_sequence:
+            {
+	        it = "(SEQ)";
+                break;
+            }
+        case is_instruction_test:
+            {
+	        it = "(TEST)";
+                break;
+            }
+        case is_instruction_loop:
+            {
+                it = "(DO)";
+                break;
+            }
+        case is_instruction_whileloop:
+            {
+                it = "(WHILE)";
+                break;
+            }
+        case is_instruction_goto:
+            {
+                it = "(GOTO)";
+                break;           
+	    }
+        case is_instruction_call:
+            {
+                it = "(STMT)";
+                break;
+            }
+        case is_instruction_unstructured:
+            {
+                it = "(UNSTR)";
+                break;
+            }
+        case is_instruction_forloop:
+            {
+                it = "(FOR)";
+                break;
+            }
+        case is_instruction_expression:
+	    {
+	        it = "(EXPR)";
+		break;
+	    }
+        case is_instruction_multitest:
+	    {
+	        it = "(MTEST)";
+		break;
+	    }
+        default:
+            pips_internal_error("Never occur!");
+            break;
+    }
+
 
 	asprintf(&s, "%s    %*s%s %s\n", get_comment_sentinel(), nblanks, "", r, it);
 
