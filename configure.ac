@@ -280,6 +280,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/p3/Makefile
 				 src/Passes/pyps/drivers/openmp/Makefile
 				 src/Passes/pyps/drivers/terapyps/Makefile
+				 src/Passes/pyps/drivers/broker/Makefile
 				 src/Passes/tpips/Makefile
 
 				 src/Runtimes/Makefile
