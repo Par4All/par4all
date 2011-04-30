@@ -533,63 +533,162 @@ static bool missing_file_initializer(string module_name, bool is_fortran)
 }
 
 
-/* Generate a new module by asking some files to the user. Can also
-   generate a stub if replied as so by the user. */
-static bool
-ask_a_missing_file(string module, bool is_fortran)
-{
-  string file;
-  bool ok, cont;
+/*
+ *
+ */
+static bool module_in_user_file_p(string module, bool is_fortran) {
   string res= is_fortran? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-  string missing_file_generator = get_string_property("PREPROCESSOR_MISSING_FILE_GENERATOR");
-  string generator_cmd = NULL;
-  if(!empty_string_p(missing_file_generator)) {
-      asprintf(&generator_cmd,"%s %s",missing_file_generator,module);
+  return db_resource_p(res, module);
+}
+
+
+static string (* internal_resolver)(const char *) = 0;
+void set_internal_missing_module_resolver_handler(string(* _internal_resolver)(const char *)) {
+  internal_resolver = _internal_resolver;
+}
+
+/*
+ */
+static bool retrieve_a_missing_file_using_internal_resolver(string module,
+                                                            bool is_fortran) {
+  bool module_found = false;
+
+  // Sanity check
+  if(!internal_resolver) {
+    pips_user_error("An internal resolver has to be defined !\n");
+    return false;
   }
 
-  /* Should be simplified... Maybe, but not bugged... */
-  do {
-      if(!generator_cmd) {
-    file = user_request("Please enter a file for module %s\n or \"quit\" to abort or \"generate\" to generate a stub\n", module);
-    if(file && strcmp(file, "quit")==0) {
-      free(file);
-      break;
+  string file = (* internal_resolver)(module);
+  if(file) {
+    // We got a correct answer from the resolver, let's use it !
+    if(!process_user_file(file)) {
+      pips_user_error("We didn't manage to process file "
+                      "given by the resolver : %s\n",
+                      file);
+    } else {
+      // Check that the module was found in the given file as expected
+      module_found = module_in_user_file_p(module, is_fortran);
     }
+  }
+
+  return module_found;
+}
+/*
+*/
+static bool retrieve_a_missing_file_using_external_resolver(string module,
+                                                            bool is_fortran) {
+  bool module_found = false;
+
+  // User gave the resolver command in a property
+  string missing_file_generator =
+      get_string_property("PREPROCESSOR_MISSING_FILE_GENERATOR");
+
+  // Full generator cmdline : append requested module name
+  string generator_cmd = NULL;
+  if(!empty_string_p(missing_file_generator)) {
+    asprintf(&generator_cmd, "%s %s", missing_file_generator, module);
+  }
+
+  // Call resolver !
+  FILE* pout = popen(generator_cmd, "r");
+  if(!pout) {
+    pips_user_error("Failed to launch command %s\n",missing_file_generator);
+  } else {
+    // Read output from resolver
+    string file = strdup("");
+    char buffer[256];
+    while(fgets(&buffer[0], sizeof(buffer), pout)) {
+      char * tmp = file;
+      if(asprintf(&file, "%s%s", tmp, buffer)==-1) {
+        pips_internal_error("asprintf returned -1 !");
+        return false; // never reached
+      }
+      free(tmp);
     }
-      else {
-          FILE* pout = popen(generator_cmd,"r");
-          if(pout) {
-              file=strdup("");
-              char buffer[256];
-              while(fgets(&buffer[0],sizeof(buffer),pout)) {
-                  char * tmp = file;
-                  asprintf(&file,"%s%s",tmp,buffer);
-                  free(tmp);
-              } 
-              *strchrnul(file,'\n')=0;
-              pclose(pout);
-          }
-          else pips_user_error("Failed to launch command %s\n",missing_file_generator);
+    *strchrnul(file, '\n') = 0;
+    int ret = pclose(pout);
+    if(ret != 0) {
+      // oh oh... we got an error...
+      pips_user_error("Command %s returned an error(%s)\n",generator_cmd,ret);
+      return false; // never reached ?
+    }
+
+    // We got a correct answer from the resolver, let's use it !
+    if(!process_user_file(file)) {
+      pips_user_error("We didn't manage to process file "
+                      "given by the resolver : %s\n",
+                      file);
+    }
+
+    // Check that the module was found in the given file as expected
+    module_found = module_in_user_file_p(module, is_fortran);
+    free(file);
+    free(generator_cmd);
+  }
+
+  return module_found;
+}
+
+
+
+
+/* Generate a new module by asking some files to the user. Can also
+   generate a stub if replied as so by the user. */
+static bool ask_a_missing_file(string module, bool is_fortran) {
+  string file = 0;
+  bool request_the_module = true;
+  bool module_found = false;
+
+  /* Loop until we get the module, or the user abort (quit) */
+  while(request_the_module) {
+    file = user_request("Please enter a file for module %s\n or \"quit\" "
+      "to abort or \"generate\" to generate a stub\n", module);
+
+    if(!file) {
+      pips_internal_error("user_request should never return NULL !\n");
+    }
+
+    // We are optimistic and bet that we won't loop !
+    request_the_module = false;
+
+    if(same_string_p(file, "generate")) {
+      // user requested to generate an empty stub
+      bool check = missing_file_initializer(module,is_fortran);
+      if(!check) {
+        pips_user_warning("Module \"%s\" wasn't generated :-(\n",module);
+        // Loop over and ask again the user what to do
+        request_the_module = true;
+      } else {
+        module_found = true;
       }
-    if (file)
-      {
-	if (same_string_p(file, "generate"))
-	  ok = missing_file_initializer(module,
-					string_fortran_filename_p(module));
-	else
-	  ok = process_user_file(file);
+    } else if(!same_string_p(file, "quit")) {
+      // We got a file name ! Try to process it and get the missing module
+      bool check = process_user_file(file);
+
+      if(!check) {
+        pips_user_warning("Error while processing file %s\n",file);
+        // Loop over and ask again the user what to do
+        request_the_module = true;
       }
-    cont = file && !same_string_p(file, "quit") &&
-      !db_resource_p(res, module);
-    if(cont)
-      pips_user_warning("Module \"%s\" not found in \"%s\".\n"
-			"Please type \"quit\" or another file name.\n",
-			module, file);
-    if (file) free(file);
-    cont&=!generator_cmd;
-  } while (cont);
-  if(generator_cmd) free(generator_cmd);
-  return db_resource_p(res, module);
+      // Check that the module was found in the file
+      if(!module_in_user_file_p(module, is_fortran)) {
+        pips_user_warning("Module \"%s\" not found in \"%s\".\n"
+            "Please type \"quit\" or another file name.\n",
+            module, file);
+        // Loop over and ask again the user what to do
+        request_the_module = true;
+      } else {
+        module_found = true;
+      }
+    }
+  }
+
+  // Cleaning if necessary
+  if(file)
+    free(file);
+
+  return module_found;
 }
 
 
@@ -597,29 +696,37 @@ ask_a_missing_file(string module, bool is_fortran)
  * corresponding file; so the initializer was introduced by Remi Triolet
  * to deal with source and user files as with any other kind of resources.
  *
- * According to the PREPROCESSOR_MISSING_FILE_HANDLING property, a stub
- * definition for the module can be generated or list of file names can be
- * asked.
+ * According to the PREPROCESSOR_MISSING_FILE_HANDLING property :
+ * - an empty stub definition for the module can be automatically generated,
+ * - a list of file names can be asked to the user
+ * - an external command can be run to retrieve the file containing the module
+ * - an internal command can be run instead, it has to be registered first
  */
-bool generic_initializer(string module_name, bool is_fortran)
-{
-    bool success_p = FALSE;
-    string missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
+bool generic_initializer(string module_name, bool is_fortran) {
+  bool success_p = FALSE;
+  string missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
 
-    if (same_string_p(missing, "error"))
-	pips_user_error("no source file for %s (might be an ENTRY point)\n"
-			"set PREPROCESSOR_MISSING_FILE_HANDLING"
-			" to \"query\" or \"generate\"...\n", module_name);
-    else if (same_string_p(missing, "generate")) 
-	success_p = missing_file_initializer(module_name, is_fortran);
-    else if (same_string_p(missing, "query"))
-	success_p = ask_a_missing_file(module_name, is_fortran);
-    else 
-	pips_user_error("invalid value of property "
-			"PREPROCESSOR_MISSING_FILE_HANDLING = \"%s\"",
-			missing);
+  if(same_string_p(missing, "error")) {
+    pips_user_error("no source file for %s (might be an ENTRY point)\n"
+        "set PREPROCESSOR_MISSING_FILE_HANDLING"
+        " to \"query\" or \"generate\"...\n", module_name);
+  } else if(same_string_p(missing, "generate")) {
+    success_p = missing_file_initializer(module_name, is_fortran);
+  } else if(same_string_p(missing, "query")) {
+    success_p = ask_a_missing_file(module_name, is_fortran);
+  } else if(same_string_p(missing, "internal_resolver")) {
+    success_p = retrieve_a_missing_file_using_internal_resolver(module_name,
+                                                                is_fortran);
+  } else if(same_string_p(missing, "external_resolver")) {
+    success_p = retrieve_a_missing_file_using_external_resolver(module_name,
+                                                                is_fortran);
+  } else {
+    pips_user_error("invalid value of property "
+        "PREPROCESSOR_MISSING_FILE_HANDLING = \"%s\"",
+        missing);
+  }
 
-    return success_p;
+  return success_p;
 }
 
 
