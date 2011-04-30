@@ -40,6 +40,7 @@
 #include "ri-util.h"
 #include "effects-util.h"
 #include "pipsdbm.h"
+#include "c_syntax.h"
 
 #include "resources.h"
 #include "phases.h"
@@ -725,6 +726,14 @@ bool generic_initializer(string module_name, bool is_fortran) {
         "PREPROCESSOR_MISSING_FILE_HANDLING = \"%s\"",
         missing);
   }
+
+
+  if(success_p && !is_fortran) {
+    // Force building of compilation unit declarations
+    // Not really pipsmake friendly but no choice here ... :-(
+    compilation_unit_parser(compilation_unit_of_module(module_name));
+  }
+
 
   return success_p;
 }

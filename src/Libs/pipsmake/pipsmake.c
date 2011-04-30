@@ -367,25 +367,25 @@ static list build_real_resources(const char* oname, list lvr)
 	    string compilation_unit_name = compilation_unit_of_module(oname);
 
 	    if(string_undefined_p(compilation_unit_name)) {
-	      /* Source code for module oname is not available */
-	      if(compilation_unit_p(oname)) {
-		/* The user can make typos in tpips scripts about
-		   compilation unit names */
-		/* pips_internal_error("Synthetic compilation units cannot be missing"
-				    " because they are synthesized"
-				    " with the corresponding file\n",
-				    oname);
-		*/
-		pips_user_error("No source code for compilation unit \"%s\"\n."
-				"Compilation units cannot be synthesized.\n",
-				oname);
-	      }
-	      pips_user_warning("No source code for module %s.\n", oname);
-	      compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));
-	    }
-
-	    add_res(vrn, compilation_unit_name);
-	    free(compilation_unit_name);
+        /* Source code for module oname is not available */
+        if(compilation_unit_p(oname)) {
+          /* The user can make typos in tpips scripts about compilation unit names */
+          /* pips_internal_error("Synthetic compilation units cannot be missing"
+                                 " because they are synthesized"
+                                 " with the corresponding file\n",
+                                 oname);
+           */
+          pips_user_error("No source code for compilation unit \"%s\"\n."
+                          "Compilation units cannot be synthesized.\n",
+                          oname);
+        }
+        pips_user_warning("No source code for module %s.\n", oname);
+        // this is a really bad hack !
+        // compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));
+      } else {
+        add_res(vrn, compilation_unit_name);
+        free(compilation_unit_name);
+      }
 	    break;
 	  }
 
