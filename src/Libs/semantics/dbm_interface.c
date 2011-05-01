@@ -90,6 +90,51 @@ DEFINE_CURRENT_MAPPING(transformer, transformer)
 DEFINE_CURRENT_MAPPING(precondition, transformer)
 DEFINE_CURRENT_MAPPING(total_precondition, transformer)
 
+/* Returns the entry to exit transformer associated to a statement,
+ * since all statements in PIPS internal representation have a unique
+ * exit.
+ *
+ * The transformers associated to loops are the transformers linking
+ * the loop precondition to the loop body precondition. When dealing
+ * with sequences or test or... the transformer linking the loop
+ * precondition to its postcondition, i.e. the precondition hodling
+ * at the loop exit, is needed.
+ *
+ * To complete the statement transformer, a precondition is
+ * required. Different preconditions can be used:
+ *
+ * - transformer_identity(): provides no information
+ *
+ * - load_statement_precondition(): provides as much information as
+ *   possible
+ *
+ * - the transformer domain: provides information available when the
+ *   transformers are computed, i.e. preconditions do not have to be
+ *   available; this is unsafe as the loop entrance transition domain
+ *   may be a subset of the precocndition, unless the loop is always
+ *   entered.
+ *
+ * Unlike load_statement_transformer(), this function allocates a new
+ * transformer. See comments associated to:
+ *
+ * generic_complete_statement_transformer()
+ */
+transformer load_completed_statement_transformer(statement s)
+{
+  transformer t = load_statement_transformer(s);
+
+  // Unsafe if s is a loop, unless you check that the loop is always
+  //entered
+  //transformer pre = transformer_to_domain(t);
+  transformer pre = transformer_identity();
+
+  transformer te = complete_statement_transformer(t, pre, s);
+
+  free_transformer(pre);
+
+  return te;
+}
+
 
 static void select_fix_point_operator()
 {
