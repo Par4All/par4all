@@ -1,0 +1,32 @@
+# $Id$
+# minimum rc file for sh-compatible shells
+
+# default architecture
+export PIPS_ARCH=LINUX_x86_64_LL
+
+# subversion repositories
+export NEWGEN_SVN=https://svn.cri.ensmp.fr/svn/newgen
+export LINEAR_SVN=https://svn.cri.ensmp.fr/svn/linear
+export PIPS_SVN=https://svn.cri.ensmp.fr/svn/pips
+
+# software roots
+export EXTERN_ROOT=/home/fabien/AUTOC/prod/extern
+#export NEWGEN_ROOT=/home/fabien/CHECK/prod/newgen
+#export LINEAR_ROOT=/home/fabien/CHECK/prod/linear
+# compiling or running pips "basically" does not require PIPS_ROOT
+#export PIPS_ROOT=/home/fabien/MYPIPS/prod/pips
+
+export PYTHON_VERSION=2.5
+export PIPS_F77=gfortran
+export PIPS_F90=gfortran
+PATH=/usr/local/bin:/usr/bin:/bin
+export LD_LIBRARY_PATH=/usr/local/lib64
+
+install=/home/fabien/AUTOC/install
+
+export PKG_CONFIG_PATH=$install/lib/pkgconfig
+export PYTHONPATH=$install/lib/python2.5/site-packages/pips
+
+# fix path
+PATH=$install/bin:$PATH
+LD_LIBRARY_PATH=$install/lib:$install/lib/python2.5/site-packages/pips:$LD_LIBRARY_PATH
