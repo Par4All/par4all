@@ -1,4 +1,4 @@
-dist_pkgpython_PYTHON = broker.py fftwbroker.py
+dist_pkgpython_PYTHON = broker.py simpleExampleBroker.py simpleStubBroker.py
 
 EXTRA_DIST=impl
 dist-hook:

@@ -24,3 +24,5 @@ extern char *module_loops(const char*,const char*);
 extern void user_log(const char *, ...);
 
 extern string compilation_unit_of_module(const char*);
+
+#include <Python.h>

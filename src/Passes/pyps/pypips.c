@@ -411,3 +411,58 @@ bool add_a_file( string file ) {
   bool process_user_file(string file);
   return process_user_file(file);
 }
+
+
+
+// Broker registering python callback to C
+
+#include <Python.h>
+
+
+// Store the python object that will provide stub for missing module on the fly
+static PyObject *stub_broker = NULL;
+
+/*
+ * This is the callback interface for PIPS missing module to python
+ * It'll be called by pips to retrieve a file name when a module wasn't found
+ * by PIPS.
+ */
+static string get_stub_from_broker( string str )
+{
+   string result = "";
+
+   // Assert that a broker is defined !
+   if(stub_broker) {
+
+      // Get the stub file
+      PyObject *pyStubFile =  PyEval_CallMethod(stub_broker, "stub_file_for_module", "(s)", str);
+
+      // Sanity check
+      if(pyStubFile) {
+        // Convert to a regular C string
+        result = PyString_AsString(pyStubFile);
+        Py_XDECREF(pyStubFile);
+      } else {
+        fprintf(stderr,"Callback failed !\n");
+        PyErr_Print();
+      }
+   }
+
+   return result;
+}
+
+
+/*
+ *  Register the workspace (or any other object) as a resolver for missing
+ *  modules. Method "stub_file_for_module" will be called and have to be defined
+ */
+void set_python_missing_module_resolver_handler(PyObject *PyObj)
+{
+    Py_XDECREF(stub_broker);          /* Dispose of previous callback */
+    stub_broker = PyObj;         /* Remember new callback */
+    Py_XINCREF(stub_broker);          /* Record of new callback */
+
+    void set_internal_missing_module_resolver_handler(string (*)(string));
+set_internal_missing_module_resolver_handler(get_stub_from_broker);
+}
+
