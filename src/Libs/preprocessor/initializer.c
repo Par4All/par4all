@@ -611,7 +611,7 @@ static bool retrieve_a_missing_file_using_external_resolver(string module,
     int ret = pclose(pout);
     if(ret != 0) {
       // oh oh... we got an error...
-      pips_user_error("Command %s returned an error(%s)\n",generator_cmd,ret);
+      pips_user_error("Command %s returned an error(%d)\n",generator_cmd,ret);
       return false; // never reached ?
     }
 
