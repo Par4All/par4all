@@ -1566,7 +1566,7 @@ void get_data(char filename[])
    /* Get grey levels */
    fscanf(fp, "%d", &i);
 
-//  <fp[PHI1]-OUT-MAY-{PHI1==0, 1<=ny}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    /* Get ONE carriage return */
@@ -1577,7 +1577,7 @@ void get_data(char filename[])
    printf("Input image  : x=%d y=%d grey=%d\n", nx, ny, i);
 
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500, 1<=ny}>
+//    PHI2<=500}>
 
    
    /* Erase the memory, in case the image is not big enough: */
@@ -1585,7 +1585,7 @@ void get_data(char filename[])
 
 //  <fp[PHI1]-OUT-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx,
-//    0<=PHI2, PHI2<=500, PHI2+1<=ny, 1<=ny}>
+//    0<=PHI2, PHI2<=500, PHI2+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    
