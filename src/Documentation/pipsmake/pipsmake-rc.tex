@@ -143,7 +143,7 @@
 \author{Remi Triolet and Fran\c{c}ois Irigoin\\
   with many other contributors\\
         MINES ParisTech \\
-        Mathématiques et Systèmes \\
+        Mathï¿½matiques et Systï¿½mes \\
         Centre de Recherche en Informatique \\
         77305 Fontainebleau Cedex \\
         France \\}
@@ -247,7 +247,7 @@
 %% \newcommand{\Delete}{\LINK{\texttt{Delete}}{http://www.cri.ensmp.fr/pips/Delete.html}}
 \newcommand{\Delete}{{\em Delete}}
 
-%% Pour Béatrice :
+%% Pour Bï¿½atrice :
 \newcommand{\exact}[0]{{\tt EXACT}}
 \newcommand{\incluseg}{\subseteq}
 \newcommand{\phik}[1]{\ifmmode\phi_{#1}\else$\phi_{#1}$\fi}
@@ -269,7 +269,7 @@
 
 %\begin{PipsExample}
 %petit essai
-%à mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
+%ï¿½ mettre ailleurs ! @!#%!#&@*I#(**()\\$$ pour tester
 %\end{PipsExample}
 
 %% The environment used to mark up the menus layout :
@@ -2869,7 +2869,7 @@ algorithms. A dependence graph is a refinement of use-def chains
 
 There are several ways to compute a dependence graph. Some of them are
 fast (\textsc{Banerjee}'s one for instance) but provide poor results, others
-might be slower (Rémi Triolet's one for instance) but produce better
+might be slower (Rï¿½mi Triolet's one for instance) but produce better
 results.
 
 Three different dependence tests are available, all based on
@@ -2923,9 +2923,9 @@ dependence graph. If they were removed instead of being ignored,
 use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
-analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
+analysis are Rï¿½mi \textsc{Triolet}, Franï¿½ois \textsc{Irigoin} and Yi-qing
 \textsc{Yang}~\cite{Yan93}. The code was improved by Corinne
-\textsc{Ancourt} and Béatrice \textsc{Creusillet}.
+\textsc{Ancourt} and Bï¿½atrice \textsc{Creusillet}.
 \end{PipsPass}
 
 \subsection{Menu for Dependence Tests}
@@ -3287,7 +3287,7 @@ polynomial} equations between scalar integer variables. SUIF~\cite{}
 also performs some kind of semantics analysis.
 
 The semantics analysis part of \Pips{} was designed and developed by
-François \textsc{Irigoin}.
+Franï¿½ois \textsc{Irigoin}.
 
 \subsection{Transformers}
 \label{subsubsection-transformers}
@@ -3329,7 +3329,7 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{à la} K{\sc arr}~\cite{Kar76}) or one based on
+subspace (i.e. \emph{ï¿½ la} K{\sc arr}~\cite{Kar76}) or one based on
 the discrete derivatives~\cite{Iri05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
 ousot}~\cite{CH78} is implemented but not used because the results
@@ -4287,7 +4287,7 @@ The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
 SPARC-2 machines by Lei Z{\sc hou}~\cite{Zho94}. Since, it has been modified
-slightly by François I{\sc rigoin}. For simple programs, complexity
+slightly by Franï¿½ois I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
 
@@ -4644,11 +4644,11 @@ body, and which appears in the loop body region polyhedron, does not appear
 anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by Rémi \textsc{Triolet}~\cite{Tri84} and then revisited by François
+by Rï¿½mi \textsc{Triolet}~\cite{Tri84} and then revisited by Franï¿½ois
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
-modules. François \textsc{Irigoin} and, mainly, Béatrice
+modules. Franï¿½ois \textsc{Irigoin} and, mainly, Bï¿½atrice
 \textsc{Creusillet}~\cite{CI95,CI96,Cre96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.  
@@ -5399,7 +5399,7 @@ PARALLELIZE_AGAIN_PARALLEL_CODE FALSE
 \end{PipsProp}
 The motivation is we may want to parallelize with a coarse grain method
 first, and finish with a fine grain method here to try to parallelize what
-has not been parallelized.  When applying \emph{à la} Rice parallelizing
+has not been parallelized.  When applying \emph{ï¿½ la} Rice parallelizing
 to parallelize some (still) sequential code, we may not want loop
 distribution on already parallel code to preserve cache resources, etc.
 
@@ -6126,7 +6126,7 @@ generated code, e.g. to propagate constant or eliminate dead code.
 Note that use-use dependencies are used to allocate temporary arrays in
 local memory (i.e. in the software cache).
 
-This compilation scheme was designed by Corinne \textsc{Ancourt} and François
+This compilation scheme was designed by Corinne \textsc{Ancourt} and Franï¿½ois
 \textsc{Irigoin}. It uses theoretical results in~\cite{AI91}. Its input is a very
 small subset of Fortran program (e.g. procedure calls are not supported).
 It was implemented by the designers, with help from Lei \textsc{Zhou}.
@@ -6540,6 +6540,12 @@ directive_filter            > MODULE.directive_filtered_file
    < MODULE.source_file
 \end{PipsMake}
 
+\begin{PipsMake}
+directive_filter_c          > MODULE.directive_filtered_file
+   < MODULE.c_source_file
+   < COMPILATION_UNIT.declarations
+\end{PipsMake}
+
 \begin{PipsPass}{directive_parser}
 The \PipsPassRef{directive_parser} phase invoke the PIPS parser on
 pre-proceed source file \texttt{MODULES.directive\_filtered\_file}
@@ -6601,7 +6607,7 @@ step_atomize                > MODULE.code
 
 \begin{PipsPass}{step_analyse}
 The \PipsPassRef{step_analyse} phase triggers the convex array regions analyses to
-compute SEND regions leading to MPI messages.
+compute SEND and RECV regions leading to MPI messages.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -6615,11 +6621,41 @@ step_analyse                > PROGRAM.step_analyses
    < MODULE.out_summary_regions
 \end{PipsMake}
 
+\begin{PipsPass}{step_analyse_com}
+The \PipsPassRef{step_analyse_com} phase checks whether a given SEND
+region corresponding to a directive module is consumed by a RECV
+region corresponding to a directive module. In this case,
+communications can be optimized.
+\end{PipsPass}
+
+\begin{PipsMake}
+step_unatomize              > MODULE.code
+                            > MODULE.step_atomized
+   < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
+   < MODULE.code
+\end{PipsMake}
+
+\begin{PipsMake}
+step_analyse_com2            > PROGRAM.step_analyses
+                             > MODULE.step_analyses_com
+   < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
+   < CALLEES.step_analyses_com
+   < MODULE.callees
+   < MODULE.code
+   < MODULE.dg
+\end{PipsMake}
+
+
 \begin{PipsPass}{step_unatomize}
 The\PipsPassRef{step_unatomize} phase perfome the reverse
 transformation of the \PipsPassRef{step_atomize} phase in order to
 source-to-source transformation.
 \end{PipsPass}
+
 \begin{PipsMake}
 step_unatomize              > MODULE.code
                             > MODULE.step_atomized
@@ -6634,7 +6670,7 @@ step_unatomize              > MODULE.code
 Based on the OpenMP construct and analyses, new modules are generated
 to translate the original code with OpenMP directives. The default
 code transformation for OpenMP construct is driven by the
-\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} property. the deferent value
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} property. The different values 
 allowed are :
 \begin{itemize}
 \item \verb+"HYBRID"+ : for OpenMP and MPI parallel code
@@ -6642,7 +6678,7 @@ allowed are :
 \item \verb+"OMP"+ : for OpenMP parallel code
 \end{itemize}
 
-The \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
+The property \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
 with the generated sources. The allowed value are :
 \begin{itemize}
 \item \verb+"c"+
@@ -6656,12 +6692,21 @@ STEP_DEFAULT_TRANSFORMATION "HYBRID"
 STEP_RUNTIME "c"
 \end{PipsProp}
 
+The property \PipsPropRef{STEP_OPTIMIZED_COMMUNICATIONS} set to
+\texttt{FALSE} by \PipsPassRef{step_analyse} and set to \texttt{TRUE}
+by \PipsPassRef{step_analyse_com}
+
+\begin{PipsProp}{STEP_OPTIMIZED_COMMUNICATIONS} 
+STEP_OPTIMIZED_COMMUNICATIONS TRUE
+\end{PipsProp}
+
+
 \begin{PipsPass}{step_compile}
 The \PipsPassRef{step_compile} phase generates source code for OpenMP
 constructs depending of the transformation desired. Each OpenMP
 construct could have a specific transformation define by STEP
 clauses (without specific clauses, the
-\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} is used)
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} is used).
 The specific STEP clauses allowed are :
 \begin{itemize}
 \item \verb+"!\$step hybrid"+ : for OpenMP and MPI parallel code
@@ -7511,7 +7556,7 @@ of wrapper is the normal behaviour but for simulation of an accelerator
 code, not using a wrapper is useful.
 
 The intrinsics function names to get an $i^{th}$ coordinate in the
-iteration space are defined by this GNU \emph{à la} \texttt{printf}
+iteration space are defined by this GNU \emph{ï¿½ la} \texttt{printf}
 format:
 \begin{PipsProp}{GPU_COORDINATE_INTRINSICS_FORMAT}
 GPU_COORDINATE_INTRINSICS_FORMAT "P4A_vp_%d"
@@ -8963,7 +9008,7 @@ logic (such as FPGAs or DataPaths).
 
 This library provides phases allowing to build and modify "Finite State
 Machine"-like code portions which will be later synthesized in
-reconfigurable units. This was implemented by Sylvain \textsc{Guérin}.
+reconfigurable units. This was implemented by Sylvain \textsc{Guï¿½rin}.
 
 \subsubsection{FSM Generation}
 \label{paragraph-fsm-generation}
@@ -10497,7 +10542,7 @@ accelerator is performed by another phase, see for instance
 Section~\ref{hardware-accelerator}.
 
 Initially developed in August 2009 by Laurent \textsc{Daverio}, with help from
-Fabien \textsc{Coelho} and François \textsc{Irigoin}.
+Fabien \textsc{Coelho} and Franï¿½ois \textsc{Irigoin}.
 
 \begin{PipsMake}
 alias flatten_code 'Flatten Code'
@@ -14555,8 +14600,8 @@ print_xml_application      > MODULE.xml_printed_file
 \chapter{Feautrier Methods (a.k.a. Polyhedral Method)}
 \label{section-feautrier-methods}
 
-This part of \Pips{} was implemented at Centre d'Études Atomiques,
-Limeil-Brévannes, by Benoît de \textsc{Dinechin}, Arnauld
+This part of \Pips{} was implemented at Centre d'ï¿½tudes Atomiques,
+Limeil-Brï¿½vannes, by Benoï¿½t de \textsc{Dinechin}, Arnauld
 \textsc{Leservot} and Alexis \textsc{Platonoff}.
 
 Unfortunately, this part is no longer used in PIPS right now because of

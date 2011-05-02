@@ -7,8 +7,9 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
+
 #include "defines-local.h"
 
 GENERIC_LOCAL_FUNCTION(reduction_entities,map_entity_entity)
@@ -74,6 +75,11 @@ static map_entity_string get_reductions_clause(entity module)
 
   return reductions;
 }
+bool array_reduction_p (entity directive_module, entity array)
+{
+  map_entity_string reductions = get_reductions_clause(directive_module);
+  return bound_map_entity_string_p(reductions, array);
+}
 
 list step_reduction_before(entity directive_module, entity mpi_module)
 {
@@ -98,8 +104,7 @@ list step_reduction_before(entity directive_module, entity mpi_module)
       variable_reduc=entity_to_expression(load_reduction_entities(e));
       operator=entity_to_expression(MakeConstant(op_to_step_op(op),is_basic_string));
       arglist=CONS(EXPRESSION,variable,
-		   CONS(EXPRESSION,variable_reduc,
-      			CONS(EXPRESSION,operator,NIL)));
+		   CONS(EXPRESSION,operator,NIL));
       lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_InitReduction, arglist, entity_type(e)), lstmt);
       pips_debug(1,"reduction %s : %s\n",entity_name(e),op);
     }
@@ -126,10 +131,8 @@ list step_reduction_after(entity directive_module)
       variable=entity_to_expression(e);
       variable_reduc=entity_to_expression(load_reduction_entities(e));
       operator=entity_to_expression(MakeConstant(op_to_step_op(op),is_basic_string));
-      arglist=CONS(EXPRESSION,variable,
-		   CONS(EXPRESSION,variable_reduc,
-      			CONS(EXPRESSION,operator,NIL)));
-      lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_Reduction, arglist, entity_type(e)), lstmt);
+      arglist=CONS(EXPRESSION,variable,NIL);
+      lstmt=CONS(STATEMENT,call_STEP_subroutine(RT_STEP_Reduction, arglist, type_undefined), lstmt);
       pips_debug(1,"reduction %s : %s\n",entity_name(e),op);
     }
   gen_free_list(entity_reduction);

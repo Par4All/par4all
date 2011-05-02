@@ -21,6 +21,7 @@ STEP_HEADER=STEP.h
 
 #filtrage des includes $DEFAULT_STEP_HEADER et deplacement des fichiers générés
 step_filtre_include $DEST_DIR $DEFAULT_STEP_HEADER $STEP_HEADER $SRC_DIR/*
+cp @datadir@/step/STEP_C.h $SRC_DIR
 
 #installation des fichiers de la runtime
 mkdir -p $DEST_DIR/$STEP_RT

@@ -4,8 +4,9 @@
 *   \author           Abdellah Kouadri.
 *                     Daniel Millot.
 *                     Frédérique Silber-Chaussumier.
-*   \date             22/10/2009
-*   \version          1.1
+*                     Alain Muller
+*   \date             04/02/2010
+*   \version          2.0
 *   \brief            Some useful declarations and definitions 
 *
 */
@@ -23,6 +24,10 @@
 #define	MAX_SIZE						2048*1024
 #define STEP_MAX_TYPES                                          16
 #define STEP_TAG_DEFAULT                                         0
+#define MAX_NB_ARRAYS                                            32
+#define MAX_REGIONS                                              16
+
+
 /**
 * Data types actually handled by the runtime 
 */
@@ -87,8 +92,6 @@
 
 #undef 	STEP_DEBUG_REGIONS
 #undef 	STEP_DEBUG_LOOP
-#define MAX(X,Y) ((X)>(Y)) ? X:Y
-#define MIN(X,Y) ((X)<(Y)) ? X:Y
 
 
 /**

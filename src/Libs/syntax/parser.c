@@ -298,10 +298,23 @@ bool hpfc_parser(string module)
 {
     return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
 }
+
 // pour STEP
+#include "preprocessor.h"
 bool directive_parser(string module)
 {
-  return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
+  string dir = db_get_current_workspace_directory();
+  string name = strdup(concatenate(dir, "/", db_get_file_resource(DBR_USER_FILE,module,TRUE), NULL));
+  if (dot_f_file_p(name)|| dot_F_file_p(name) )
+    {
+      return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
+    }
+  else if (dot_c_file_p(name))
+    {
+      return directive_c_parser(module);
+    }
+  else
+    return FALSE;
 }
 
 bool parser(string module)

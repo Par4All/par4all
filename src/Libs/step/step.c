@@ -5,12 +5,14 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
+
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
 #include "defines-local.h"
 #include "step_private.h"
 #include "preprocessor.h"
+#include "makefile.h"
 #include "pipsmake.h"
 #include <strings.h>
 #include <string.h>
@@ -62,9 +64,10 @@ bool step_install(string program_name)
   unsplit(NULL);
 
   // suppression du fichier regroupant les modules directives
-  string directives_file_name = step_directives_USER_FILE_name();
-  safe_system(concatenate("rm ", src_dir, "/$(basename ",directives_file_name ,")",  NULL));
-  free(directives_file_name);
+  safe_system(concatenate("rm -f ", src_dir, "/directives.f",  NULL));
+  safe_system(concatenate("rm -f ", src_dir, "/directives.c",  NULL));
+
+  //  free(directives_file_name);
 
   // installation des fichiers générés
   safe_system(concatenate("step_install ", runtime ," ", dest_dir, " ", src_dir,  NULL));
