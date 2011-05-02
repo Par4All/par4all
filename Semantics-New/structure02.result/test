@@ -1,0 +1,26 @@
+
+Codes with TRANSFORMERS for functions
+
+
+//  T() {}
+
+void structure02()
+{
+
+//  T() {}
+
+   Cplfloat c, *p;
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(i) {i==1, i#init==0}
+
+
+   (c.re)[i++] = 0.;
+
+//  T(i) {i==2, i#init==1}
+
+   (p->re)[i++] = 0.;
+}
