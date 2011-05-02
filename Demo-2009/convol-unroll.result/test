@@ -94,17 +94,17 @@ C  P(I,J) {I==513, ISI==512, ISJ==512, J==513, KSI==3, KSJ==3}
 
       DO 400 I = 1+KSI/2, ISI-KSI/2
 
-C  P(I) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511}
 
          DO 300 J = 1+KSJ/2, ISJ-KSJ/2
 
-C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511, 2<=J,
-C    J<=511}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=511}
 
             NEW_IMAGE(I,J) = 0.
 
-C  P(I,J) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511, 2<=J,
-C    J<=511}
+C  P(I,J,KI,KJ) {ISI==512, ISJ==512, KSI==3, KSJ==3, 2<=I, I<=511,
+C    2<=J, J<=511}
 
             DO 200 KI = 1, KSI
 
