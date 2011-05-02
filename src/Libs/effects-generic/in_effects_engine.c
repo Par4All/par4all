@@ -176,7 +176,7 @@ r_in_effects_of_sequence(list l_inst)
 		(*effects_prettyprint_func)(s1_lr);
 	    }
 
-	t1 = (*load_transformer_func)(first_statement);
+	t1 = (*load_completed_transformer_func)(first_statement);
 
 	/* Nga Nguyen, 25/04/2002. Bug found in fct.f about the transformer of loops
 	   Preconditions added to regions take into account the loop exit preconditions
