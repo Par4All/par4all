@@ -323,6 +323,36 @@ cast expression_cast(expression e)
   return(syntax_cast(expression_syntax(e)));
 }
 
+bool expression_sizeofexpression_p(expression e)
+{
+  return(syntax_sizeofexpression_p(expression_syntax(e)));
+}
+
+sizeofexpression expression_sizeofexpression(expression e)
+{
+  return(syntax_sizeofexpression(expression_syntax(e)));
+}
+/* Duplicate
+bool expression_subscript_p(expression e)
+{
+  return(syntax_subscript_p(expression_syntax(e)));
+}
+
+subscript expression_subscript(expression e)
+{
+  return(syntax_subscript(expression_syntax(e)));
+}
+*/
+bool expression_application_p(expression e)
+{
+  return(syntax_application_p(expression_syntax(e)));
+}
+
+application expression_application(expression e)
+{
+  return(syntax_application(expression_syntax(e)));
+}
+
 bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
