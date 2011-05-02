@@ -85,9 +85,9 @@ C             <    is read   >: N
 C
       END
 
-C  <A(PHI1,PHI2)-R-EXACT-{0==-1}>
-C  <B(PHI1,PHI2)-R-EXACT-{0==-1}>
-C  <C(PHI1,PHI2)-R-EXACT-{0==-1}>
+C  <A(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <B(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
+C  <C(PHI1,PHI2)-R-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
 C  <C(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N}>
 
 C     
