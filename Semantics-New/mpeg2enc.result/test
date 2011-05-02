@@ -6499,7 +6499,7 @@ void putpict(unsigned char *frame)
 
                quant_intra(blocks[k*block_count+comp], blocks[k*block_count+comp], dc_prec, intra_q, mbinfo[k].mquant);
 
-//  T(cbp) {}
+//  T(cbp) {0<=cbp+1}
 
             mbinfo[k].cbp = cbp = (1<<block_count)-1;
          }
@@ -15834,7 +15834,7 @@ void putpict(unsigned char *frame)
 
                quant_intra(blocks[k*block_count+comp], blocks[k*block_count+comp], dc_prec, intra_q, mbinfo[k].mquant);
 
-//  T(cbp) {}
+//  T(cbp) {0<=cbp+1}
 
             mbinfo[k].cbp = cbp = (1<<block_count)-1;
          }
@@ -18715,7 +18715,7 @@ static void calc_actj(unsigned char *frame)
 
          actj += 1.0;
 
-//  T(k) {}
+//  T(k) {k==k#init+1}
 
 
          mbinfo[k++].act = actj;
