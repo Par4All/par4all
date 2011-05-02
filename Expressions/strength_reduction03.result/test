@@ -33,7 +33,7 @@ int main()
 
       for(i = 0; i <= 9; i += 1)
 
-//  T(i) {0<=i#init, i#init<=9}
+//  T(i) {0<=i, i<=9, 0<=i#init, i#init<=9}
 
          *(a+i) = 2+*(c+i);
 

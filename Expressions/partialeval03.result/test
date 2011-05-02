@@ -1,7 +1,0 @@
-int main()
-{
-   int i;
-   i = 5;
-   f(&i);
-   return 5;
-}
