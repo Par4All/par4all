@@ -3097,7 +3097,18 @@ transformer expression_to_transformer(
     }
     else if(expression_call_p(exp)) {
       call c = expression_call(exp);
-      tf = expressions_to_transformer(call_arguments(c), pre);
+      entity f = call_function(c);
+      /* FI: there may be (many) other exceptions with intrinsics...
+       *
+       * Fortran intrinsics, such as IOs, are not taken into account
+       * because these code should not be executed for Fortran code.
+       */
+      if(ENTITY_FIELD_P(f)) {
+	tf = safe_expression_to_transformer(EXPRESSION(CAR(call_arguments(c))),
+					    pre);
+      }
+      else
+	tf = expressions_to_transformer(call_arguments(c), pre);
     }
     else if(expression_cast_p(exp)) {
       cast c = expression_cast(exp);
