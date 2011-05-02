@@ -1878,8 +1878,14 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
   }
 
   /* if some condition was not met and transformer derivation failed */
-  if(tf==transformer_undefined)
-    tf = effects_to_transformer(ef);
+  if(tf==transformer_undefined) {
+    transformer tf1 = safe_expression_to_transformer(lhs, pre);
+    transformer tf2 = safe_expression_to_transformer(rhs, pre);
+    tf = transformer_combine (tf1, tf2);
+    free_transformer(tf2); // tf1 is exported in tf
+    // FI: previous solution, much safer!
+    // tf = effects_to_transformer(ef);
+  }
 
   pips_debug(6,"return tf=%p\n", tf);
   ifdebug(6) (void) print_transformer(tf);

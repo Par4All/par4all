@@ -3103,7 +3103,7 @@ transformer expression_to_transformer(
        * Fortran intrinsics, such as IOs, are not taken into account
        * because these code should not be executed for Fortran code.
        */
-      if(ENTITY_FIELD_P(f)) {
+      if(ENTITY_FIELD_P(f)||ENTITY_POINT_TO_P(f)) {
 	tf = safe_expression_to_transformer(EXPRESSION(CAR(call_arguments(c))),
 					    pre);
       }
@@ -3114,6 +3114,31 @@ transformer expression_to_transformer(
       cast c = expression_cast(exp);
       expression sub_exp = cast_expression(c);
       tf = safe_expression_to_transformer(sub_exp, pre);
+    }
+    else if(expression_sizeofexpression_p(exp)) {
+      sizeofexpression soe = expression_sizeofexpression(exp);
+      if(sizeofexpression_expression_p(soe)) {
+	expression sub_exp = sizeofexpression_expression(soe);
+	tf = safe_expression_to_transformer(sub_exp, pre);
+      }
+    }
+    else if(expression_subscript_p(exp)) {
+      subscript sub = expression_subscript(exp);
+      expression base = subscript_array(sub);
+      transformer tf1 = safe_expression_to_transformer(base, pre);
+      transformer tf2
+	= expressions_to_transformer(subscript_indices(sub), pre);
+      tf = transformer_combine(tf1, tf2);
+      free_transformer(tf2); // tf1 is exported in tf
+    }
+    else if(expression_application_p(exp)) {
+      application a = expression_application(exp);
+      expression func = application_function(a);
+      transformer tf1 = safe_expression_to_transformer(func, pre);
+      transformer tf2
+	= expressions_to_transformer(application_arguments(a), pre);
+      tf = transformer_combine(tf1, tf2);
+      free_transformer(tf2); // tf1 is exported in tf
     }
     // FI: Many other possible cases: range, sizeofexpression, subscript,
     // application, va_arg
