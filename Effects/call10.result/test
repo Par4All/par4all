@@ -94,6 +94,66 @@ int main()
    call10(s.one, s.two, sp->one, sp->two);
 }
 
+Transformers for "call10"
+
+
+//  T() {}
+
+void call10(int i, int x[10], int j, int y[10])
+{
+
+//  T(k,l) {}
+
+   int k, l;
+
+//  T(k) {k+1<=i, 0<=k}
+
+
+   for(k = 0; k <= i-1; k += 1)
+
+//  T() {}
+
+      x[i] = 0;
+
+//  T(l) {l+1<=j, 0<=l}
+
+   for(l = 0; l <= j-1; l += 1)
+
+//  T() {}
+
+      y[i] = 0;
+}
+
+Preconditions for "call10"
+
+
+//  P() {}
+
+void call10(int i, int x[10], int j, int y[10])
+{
+
+//  P() {}
+
+   int k, l;
+
+//  P(k,l) {}
+
+
+   for(k = 0; k <= i-1; k += 1)
+
+//  P(k,l) {k+1<=i, 0<=k}
+
+      x[i] = 0;
+
+//  P(k,l) {i<=k, 0<=k}
+
+   for(l = 0; l <= j-1; l += 1)
+
+//  P(k,l) {i<=k, l+1<=j, 0<=k, 0<=l}
+
+      y[i] = 0;
+}
+
 Regions for "call10"
 
 

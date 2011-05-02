@@ -97,7 +97,7 @@ void flatten_code12(void)
 // (0,2)
    int i = foo_0;                                                       /*0011*/
 
-//  T(foo,i) {}
+//  T(foo,i) {0<=i, i<=3}
 
 // (0,3)
 
