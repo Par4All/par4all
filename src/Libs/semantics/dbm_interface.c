@@ -130,6 +130,8 @@ transformer load_completed_statement_transformer(statement s)
 
   transformer te = complete_statement_transformer(t, pre, s);
 
+  //pips_assert("te is defined", !transformer_undefined_p(te));
+
   free_transformer(pre);
 
   return te;

@@ -1372,7 +1372,7 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
    pips_debug(5, "begin\n");
 
-   t = (*load_transformer_func)(s);
+   t = (*load_completed_transformer_func)(s);
 
    if (l_eff !=NIL)
      {
@@ -1448,8 +1448,10 @@ list generic_effects_store_update(list l_eff, statement s, bool backward_p)
 
 	 } /* if (get_bool_property("EFFECTS_POINTER_MODIFICATION_CHECKING"))*/
        else
-	 l_res = l_eff; 
+	 l_res = l_eff;
      } /* if (l_eff !=NIL) */
+
+   free_transformer(t);
 
    return l_res;
 }

@@ -153,8 +153,8 @@ set_methods_for_convex_effects()
     // FI: sometimes in sequences, you need the completed transformer,
     // some other times, for instance when moving from the loop body
     // to the loop, you need the non-completed statement transformer
-    //load_transformer_func = load_completed_statement_transformer;
     load_transformer_func = load_statement_transformer;
+    load_completed_transformer_func = load_completed_statement_transformer;
     empty_context_test = empty_convex_context_p;
 
     proper_to_summary_effect_func = effect_nop;
@@ -253,6 +253,7 @@ void set_methods_for_convex_rw_pointer_effects()
 
     load_context_func = load_statement_precondition;
     load_transformer_func = load_statement_transformer;
+    load_completed_transformer_func = load_completed_statement_transformer;
     empty_context_test = empty_convex_context_p;
 
     proper_to_summary_effect_func = effect_nop;
