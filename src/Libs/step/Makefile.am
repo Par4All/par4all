@@ -8,7 +8,9 @@ libstep_la_SOURCES=step.c \
 		atomizer.c \
 		outlining.c \
 		directives.c \
-		directive_parallel.c \
+    directive_critical.c \
+    directive_transformation.c \
+    directive_parallel.c \
 		directive_do.c \
 		directive_section.c \
 		directive_reduction.c \
