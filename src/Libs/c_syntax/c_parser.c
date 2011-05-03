@@ -565,11 +565,15 @@ bool compilation_unit_parser(string module_name)
 {
   return actual_c_parser(module_name,DBR_C_SOURCE_FILE,TRUE);
 }
-// pour STEP
-bool directive_c_parser(string module)
+
+
+/*
+ * Within step, a preprocessing has been done on user source file, so we
+ * parse DBR_DIRECTIVE_FILTERED_FILE
+ * !! This is not a pipsmake declared pass,
+ * !! it's called by a Step pass : directive_parser
+ */
+bool step_c_parser(string module)
 {
-  if (actual_c_parser(module, DBR_DIRECTIVE_FILTERED_FILE, FALSE))
-    return step_pragma_to_call(module);
-  else
-    return FALSE;
+  return actual_c_parser(module, DBR_DIRECTIVE_FILTERED_FILE, FALSE);
 }

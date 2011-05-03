@@ -10,7 +10,12 @@ License.
 #include "pips_config.h"
 #endif
 #include "defines-local.h"
+#include "step.h"
 #include "preprocessor.h"
+#include "syntax.h"
+#include "c_syntax.h"
+
+
 int count_critical=0;
 GENERIC_GLOBAL_FUNCTION(global_directives,directives);
 
@@ -1098,8 +1103,6 @@ static void pragma_to_call(statement stmt, string pragma_str)
   string d_txt_end=strdup("'end ");
   entity cst_string_begin, cst_string_end;
   statement stmt_begin, stmt_end, stmt_body, stmt_new;
-  instruction inst;
-  bool end=true;
   
   if (strcasestr(pragma_str, "parallel"))
     {
@@ -1148,7 +1151,7 @@ static bool dir_pragma_filter(statement stmt)
 	      printf("pragma expression :%s",pragma_to_string(p));
 	      break;
 	    case is_pragma_entity:
-	      printf("pragma entity :s", entity_name(pragma_entity(p)));
+	      printf("pragma entity : %s", entity_name(pragma_entity(p)));
 	      break;
 	    default:
 	      printf("unknow pragma\n");
@@ -1163,7 +1166,7 @@ static bool dir_pragma_filter(statement stmt)
 }
 
 
-bool step_pragma_to_call(string module_name)
+static bool step_pragma_to_call(string module_name)
 { 
   debug_on("STEP_DEBUG_LEVEL");
   pips_debug(1, "%d module_name = %s\n", __LINE__, module_name);
@@ -1189,3 +1192,33 @@ bool step_pragma_to_call(string module_name)
   debug_off();
   return TRUE;
 }
+
+
+/*
+ * Main entry point for STEP parsing, it's basically a switch that will call
+ * classical fortran parser for fortran file and C directive parser for C files
+ * The switch is based on file extension
+ */
+bool directive_parser(string module) {
+  string dir = db_get_current_workspace_directory();
+  string filename = strdup(concatenate(dir, "/", db_get_file_resource(DBR_USER_FILE,module,TRUE), NULL));
+  bool return_value = FALSE;
+
+  // FIXME : we do not handle fortran95 files here...
+  if (dot_f_file_p(filename) || dot_F_file_p(filename) ) {
+    // Fortran files
+    return_value = step_parser(module);
+  } else if (dot_c_file_p(filename)) {
+    // C files
+    if(step_c_parser(module)) {
+      return_value = step_pragma_to_call(module);
+    }
+  } else {
+    pips_user_error("We don't know how to handle this file extension, only "
+        " .c .f and .F are allowed : %s\n",filename);
+  }
+
+  free(filename);
+  return return_value;
+}
+
