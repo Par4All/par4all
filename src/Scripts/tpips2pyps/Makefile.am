@@ -5,6 +5,7 @@ tpips2pyps_LDADD=../../Libs/libpipslibs.la
 tpips2pyps_LDFLAGS=$(READLINE_LIBS) $(NCURSES_LIBS)\
 	$(NEWGENLIBS_LIBS) $(LINEARLIBS_LIBS)
 
+dist_noinst_DATA=pipsmakerc-extract-loop-phase.py
 
 
 AM_YFLAGS=-d -p tp_
@@ -23,12 +24,19 @@ AM_CPPFLAGS=\
 	-I../../Libs/properties\
 	-I../../Libs/top-level\
 	-I../../Libs/preprocessor\
+	-I../../Passes/tpips\
 	$(READLINE_CFLAGS) $(NCURSES_CFLAGS)\
 	$(NEWGENLIBS_CFLAGS) $(LINEARLIBS_CFLAGS)
 
 p2p_cmd= $(srcdir)/pipsmakerc-extract-loop-phase.py $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
 loop_phases.h:$(p2p_cmd) Makefile
 	$(PYTHON) $(p2p_cmd) > loop_phases.h
+
+tp_lex.o:$(srcdir)/../../Passes/tpips/tpips.h
+
+$(srcdir)/../../Passes/tpips/tpips.h:
+	$(MAKE) -C ../../Passes/tpips tpips.h
+
 
 
 include $(top_srcdir)/makes/cproto.mk
