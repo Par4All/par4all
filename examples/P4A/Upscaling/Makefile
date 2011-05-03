@@ -85,6 +85,10 @@ $(TARGET)_cuda : $(SOURCES)
 	# Parallelize and build a CUDA version:
 	p4a $(P4A_OPTIONS) --cuda -o $@ $(SOURCES) $(LDLIBS)
 
+$(TARGET)_comm_optimization : $(SOURCES)
+	# Parallelize and build a CUDA version:
+	p4a $(P4A_OPTIONS) --com-optimization --cuda -o $@ $(SOURCES) $(LDLIBS)
+
 $(TARGET)_accel : $(SOURCES)
 	# Parallelize and build an OpenMP parallel emulation of a GPU-like accelerator:
 	p4a $(P4A_OPTIONS) --accel -o $@ $(SOURCES) $(LDLIBS)
