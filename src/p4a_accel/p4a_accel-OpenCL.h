@@ -440,6 +440,14 @@ number of paramters.
  */
 #define P4A_CONCAT(a,b) a ## b
 
+/** 22 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+21 last parameters are passed to P4A_arg22().*/
+#define P4A_arg23(n,x,...)  P4A_arg1(n,x,...) P4A_arg22(n+1,__VA_ARGS__) 	
+/** 22 parameters interpreter in OpenCl. The first parameter x is
+interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
+20 last parameters are passed to P4A_arg21().*/
+#define P4A_arg22(n,x,...)  P4A_arg1(n,x,...) P4A_arg21(n+1,__VA_ARGS__) 	
 /** 21 parameters interpreter in OpenCl. The first parameter x is
 interpreted via P4A_arg1(n,x,...); n is the rank of the parameter. The
 20 last parameters are passed to P4A_arg20().*/
