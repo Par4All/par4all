@@ -206,7 +206,6 @@ statement step_compile_critical_update(int step_transformation, entity mpi_modul
 
   step_analyses critical_analyse = load_global_step_analyses(directive_module);
   pips_debug(1, "mpi_module = %p\n", mpi_module);
-  list flush_list = NIL;
   FOREACH(REGION, r, step_analyses_send(critical_analyse))
     {
       //statement stmt;

@@ -334,7 +334,7 @@ static statement build_mpi_loop(entity new_module, list loop_data_l, statement w
   pips_assert("length(loop_data_l)=1", gen_length(loop_data_l) == 1);
   entity loop_index = loop_data_index(LOOP_DATA(CAR(loop_data_l)));
   
-  step_local_loop_index(new_module, entity_user_name(loop_index));
+  step_local_loop_index(new_module, (string)entity_user_name(loop_index));
 
   // substitution des bornes de boucles
   loop l = instruction_loop(statement_instruction(stat));

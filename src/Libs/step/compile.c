@@ -60,7 +60,6 @@ void step_add_formal_copy(entity mpi_module, list declaration)
   int ith;
   functional ft;
   list formal=NIL;
-  entity module=get_current_module_entity();
   pips_debug(1, "mpi_module = %p, declaration = %p\n", mpi_module, declaration);
   
   FOREACH(ENTITY, e,declaration) 
