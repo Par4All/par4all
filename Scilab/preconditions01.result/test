@@ -206,7 +206,7 @@ void d0d0d0d0d0d0d0mandelbrotd2(float xstart, float xstep, int Xsize, float ysta
 
    __resultsSize[1] = 100;
 
-//  T(i,j) {0<=i}
+//  T(i,j) {0<=i, i<=99}
 
    
    
@@ -231,7 +231,7 @@ void d0d0d0d0d0d0d0mandelbrotd2(float xstart, float xstep, int Xsize, float ysta
    
    for(i = 0; i <= 100-1; i += 1)
 
-//  T(j) {0<=i, i<=99, 0<=j}
+//  T(j) {0<=i, i<=99, 0<=j, j<=99}
 
       
       /*SCI2C: ##################################################################
