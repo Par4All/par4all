@@ -37,7 +37,7 @@ c      FK = 0.D0
       KC = NP1-1                                                        0015
 
 C  T(K,KC) {K+KC==KC#init+2, KC#init==N, KC#init==NM1+1,
-C    KC#init==NP1-1, KC<=KC#init, 4<=KC#init, 2NS2<=KC#init,
+C    KC#init==NP1-1, K<=NS2, KC<=KC#init, 4<=KC#init, 2NS2<=KC#init,
 C    KC#init<=2NS2+1}
 
       DO 101 K = 2, NS2                                                 0016
