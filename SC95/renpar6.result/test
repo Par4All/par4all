@@ -159,7 +159,7 @@ C    PHI2<=K, 1<=I, I<=K, I<=N}>
       DO I = 1, N                                                       0006
 
 C  <WORK(PHI1,PHI2)-OUT-EXACT-{PHI2==K, 1<=PHI1, PHI1<=N, 1<=I,
-C    I<=K+1, I<=N, 1<=N}>
+C    I<=K+1, I<=N}>
 
          DO J = 1, N                                                    0007
 
