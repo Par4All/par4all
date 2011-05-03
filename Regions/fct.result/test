@@ -1,3 +1,9 @@
+
+Transformers for "FCT"
+
+
+C  T() {}
+
 C     Nga Nguyen 
 C     This example is extracted from hydro2d.f (SPEC CFP95)
 C     False result: IN EXACT for B at module statement
@@ -10,7 +16,255 @@ C     Reason : preconditions have loop exit conditions but transformers do not.
       DIMENSION UTRA(MP,NP)
       DIMENSION B(NP),A(MP)
 
-C  <B(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=NQ, 1<=MQ}>
+C  T(I,J) {1<=J, NQ+1<=J}
+
+C     BEGIN BLOCK
+
+C  T(I) {1<=I, I<=MQ}
+
+
+      DO 20 I = 1, MQ                                                   0013
+
+C  T() {}
+
+C        BEGIN BLOCK
+
+C  T() {}
+
+         A(I) = 1.0D0                                                   0014
+
+C  T() {}
+
+20       CONTINUE                                                       0015
+C        END BLOCK
+
+C  T(J) {1<=J, J<=NQ}
+
+
+      DO 40 J = 1, NQ                                                   0017
+
+C  T() {}
+
+C        BEGIN BLOCK
+
+C  T() {}
+
+         B(J) = 1.0D0                                                   0018
+
+C  T() {}
+
+40       CONTINUE                                                       0019
+C        END BLOCK
+
+C  T(I,J) {1<=J, J<=NQ}
+
+
+      DO 200 J = 1, NQ                                                  0021
+
+C  T(I) {1<=I, I<=MQ}
+
+         DO 200 I = 1, MQ                                               0022
+
+C  T() {}
+
+C           BEGIN BLOCK
+
+C  T() {}
+
+            UTRA(I,J) = B(J)+A(I)                                       0023
+
+C  T() {}
+
+200         CONTINUE                                                    0024
+C           END BLOCK
+
+C     END BLOCK
+      END
+
+Preconditions for "FCT"
+
+
+C  P() {}
+
+C     Nga Nguyen 
+C     This example is extracted from hydro2d.f (SPEC CFP95)
+C     False result: IN EXACT for B at module statement
+C     Reason : preconditions have loop exit conditions but transformers do not. 
+
+      SUBROUTINE FCT (UTRA)
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      COMMON /ADVC/  MQ,NQ
+      DIMENSION UTRA(MP,NP)
+      DIMENSION B(NP),A(MP)
+
+C  P() {}
+
+C     BEGIN BLOCK
+
+C  P() {}
+
+
+      DO 20 I = 1, MQ                                                   0013
+
+C  P(I) {1<=I, I<=MQ}
+
+C        BEGIN BLOCK
+
+C  P(I) {1<=I, I<=MQ}
+
+         A(I) = 1.0D0                                                   0014
+
+C  P(I) {1<=I, I<=MQ}
+
+20       CONTINUE                                                       0015
+C        END BLOCK
+
+C  P(I) {1<=I, MQ+1<=I}
+
+
+      DO 40 J = 1, NQ                                                   0017
+
+C  P(I,J) {1<=I, MQ+1<=I, 1<=J, J<=NQ}
+
+C        BEGIN BLOCK
+
+C  P(I,J) {1<=I, MQ+1<=I, 1<=J, J<=NQ}
+
+         B(J) = 1.0D0                                                   0018
+
+C  P(I,J) {1<=I, MQ+1<=I, 1<=J, J<=NQ}
+
+40       CONTINUE                                                       0019
+C        END BLOCK
+
+C  P(I,J) {1<=I, MQ+1<=I, 1<=J, NQ+1<=J}
+
+
+      DO 200 J = 1, NQ                                                  0021
+
+C  P(I,J) {1<=J, J<=NQ}
+
+         DO 200 I = 1, MQ                                               0022
+
+C  P(I,J) {1<=I, I<=MQ, 1<=J, J<=NQ}
+
+C           BEGIN BLOCK
+
+C  P(I,J) {1<=I, I<=MQ, 1<=J, J<=NQ}
+
+            UTRA(I,J) = B(J)+A(I)                                       0023
+
+C  P(I,J) {1<=I, I<=MQ, 1<=J, J<=NQ}
+
+200         CONTINUE                                                    0024
+C           END BLOCK
+
+C     END BLOCK
+      END
+
+RW regions for "FCT"
+
+
+C  <UTRA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=MQ, 1<=PHI2, PHI2<=NQ}>
+
+C     Nga Nguyen 
+C     This example is extracted from hydro2d.f (SPEC CFP95)
+C     False result: IN EXACT for B at module statement
+C     Reason : preconditions have loop exit conditions but transformers do not. 
+
+      SUBROUTINE FCT (UTRA)
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      COMMON /ADVC/  MQ,NQ
+      DIMENSION UTRA(MP,NP)
+      DIMENSION B(NP),A(MP)
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=MQ, 1<=NQ}>
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=MQ}>
+C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=NQ, 1<=MQ}>
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=NQ}>
+C  <UTRA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=MQ, 1<=PHI2, PHI2<=NQ}>
+
+C     BEGIN BLOCK
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=MQ}>
+
+
+      DO 20 I = 1, MQ                                                   0013
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=MQ}>
+
+C        BEGIN BLOCK
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=MQ}>
+
+         A(I) = 1.0D0                                                   0014
+20       CONTINUE                                                       0015
+C        END BLOCK
+
+C  <B(PHI1)-W-EXACT-{1<=PHI1, PHI1<=NQ, 1<=I, MQ+1<=I}>
+
+
+      DO 40 J = 1, NQ                                                   0017
+
+C  <B(PHI1)-W-EXACT-{PHI1==J, 1<=I, MQ+1<=I, 1<=J, J<=NQ}>
+
+C        BEGIN BLOCK
+
+C  <B(PHI1)-W-EXACT-{PHI1==J, 1<=I, MQ+1<=I, 1<=J, J<=NQ}>
+
+         B(J) = 1.0D0                                                   0018
+40       CONTINUE                                                       0019
+C        END BLOCK
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=MQ, 1<=NQ}>
+C  <B(PHI1)-R-EXACT-{1<=PHI1, PHI1<=NQ, 1<=MQ}>
+C  <UTRA(PHI1,PHI2)-W-EXACT-{1<=PHI1, PHI1<=MQ, 1<=PHI2, PHI2<=NQ}>
+
+
+      DO 200 J = 1, NQ                                                  0021
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=MQ, 1<=J, J<=NQ}>
+C  <B(PHI1)-R-EXACT-{PHI1==J, 1<=J, J<=NQ, 1<=MQ}>
+C  <UTRA(PHI1,PHI2)-W-EXACT-{PHI2==J, 1<=PHI1, PHI1<=MQ, 1<=J, J<=NQ}>
+
+         DO 200 I = 1, MQ                                               0022
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=MQ, 1<=J, J<=NQ}>
+C  <B(PHI1)-R-EXACT-{PHI1==J, 1<=I, I<=MQ, 1<=J, J<=NQ}>
+C  <UTRA(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=MQ, 1<=J,
+C    J<=NQ}>
+
+C           BEGIN BLOCK
+
+C  <A(PHI1)-R-EXACT-{PHI1==I, 1<=I, I<=MQ, 1<=J, J<=NQ}>
+C  <B(PHI1)-R-EXACT-{PHI1==J, 1<=I, I<=MQ, 1<=J, J<=NQ}>
+C  <UTRA(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=MQ, 1<=J,
+C    J<=NQ}>
+
+            UTRA(I,J) = B(J)+A(I)                                       0023
+200         CONTINUE                                                    0024
+C           END BLOCK
+
+C     END BLOCK
+      END
+
+IN regions for "FCT"
+
+C     Nga Nguyen 
+C     This example is extracted from hydro2d.f (SPEC CFP95)
+C     False result: IN EXACT for B at module statement
+C     Reason : preconditions have loop exit conditions but transformers do not. 
+
+      SUBROUTINE FCT (UTRA)
+      IMPLICIT REAL*8 (A-H, O-Z)
+      PARAMETER  ( MP   =      402 ,    NP   =       160 )
+      COMMON /ADVC/  MQ,NQ
+      DIMENSION UTRA(MP,NP)
+      DIMENSION B(NP),A(MP)
+
+C  <B(PHI1)-IN-EXACT-{0==-1}>
 
 C     BEGIN BLOCK
 
