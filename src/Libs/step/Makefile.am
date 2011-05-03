@@ -23,7 +23,12 @@ libstep_la_SOURCES=step.c \
 		compile_reduction.c \
 		compile_master.c \
 		compile_barrier.c \
-		compile_private.c
+		compile_private.c \
+    compile_parallel.c \
+    compile_RT.c \
+    compile_region.c \
+    compile_share.c \
+    compile_critical.c
 
 AM_CPPFLAGS=-DPIPS_RUNTIME_DIR=\"$(datadir)\"
 
