@@ -21,6 +21,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <sys/resource.h>
+#include <p4a_stacksize_test.h>
 
 extern struct timeval p4a_time_begin, p4a_time_end;
 
@@ -52,8 +54,10 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
     Initialized the use of the hardware accelerator: nothing to do since
     there is no accelerator, only OpenMP with local processors...
 */
-#define P4A_init_accel
-
+#define P4A_init_accel \
+  do {	\
+    checkStackSize(); \
+  } while (0);
 
 /** Release the hardware accelerator as OpenMP
 
