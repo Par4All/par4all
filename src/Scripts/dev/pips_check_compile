@@ -355,6 +355,8 @@ then
     # check exe, script & lib
     test -x ../install/bin/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    # test -x ../install/bin/gfc2pips \
+    # || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
     # get python directory, which depends on python version
