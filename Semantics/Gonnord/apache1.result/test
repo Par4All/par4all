@@ -1,0 +1,36 @@
+
+//  P() {}
+
+int apache1()
+{
+
+
+//  P() {}
+
+   int c, tk_sz;
+
+//  P(c,tk_sz) {}
+
+   tk_sz>0?(void) 0:__assert_fail("tk_sz>0", "./apache1.foo.c", 12, (const char *) 0);
+
+//  P(c,tk_sz) {1<=tk_sz}
+
+   c = 0;
+
+//  P(c,tk_sz) {c==0, 1<=tk_sz}
+
+
+   while (1)
+
+//  P(c,tk_sz) {0<=c, c+1<=tk_sz}
+
+      if (random()&&c<tk_sz-1)
+
+//  P(c,tk_sz) {0<=c, c+2<=tk_sz}
+
+         c = c+1;
+
+//  P() {0==-1}
+
+   return 0;
+}

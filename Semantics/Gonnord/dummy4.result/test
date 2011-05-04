@@ -1,0 +1,43 @@
+ dummy4
+
+//  P() {}
+
+int dummy4()
+{
+
+
+//  P() {}
+
+   int t, t0, z;
+
+//  P(t,t0,z) {}
+
+   t0>0?(void) 0:__assert_fail("t0>0", "./dummy4.foo.c", 10, (const char *) 0);
+
+//  P(t,t0,z) {1<=t0}
+
+   t = t0;
+
+//  P(t,t0,z) {t==t0, 1<=t}
+
+   z = 0;
+
+//  P(t,t0,z) {t==t0, z==0, 1<=t}
+
+
+   while (z<=53) {
+
+//  P(t,t0,z) {3t0+z==3t, z+3<=3t, 0<=z, z<=53}
+
+      ++t;
+
+//  P(t,t0,z) {3t0+z==3t-3, z+6<=3t, 0<=z, z<=53}
+
+      z += 3;
+   }
+
+//  P(t,t0,z) {3t0+z==3t, z+3<=3t, 54<=z, z<=56}
+
+
+   return 0;
+}
