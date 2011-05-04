@@ -1,6 +1,10 @@
 # $Id$
 #
 # minimum rc file for sh-compatible shells
+#
+# prod/pips/makes/config.mk:
+#   PIPS_NO_GPIPS = 1
+#   PIPS_ENABLE_FORTRAN95 = 1
 
 # default architecture
 export PIPS_ARCH=LINUX_x86_64_LL
