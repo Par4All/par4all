@@ -418,7 +418,7 @@ class p4a_processor(object):
 
     def get_database_directory(self):
         "Return the directory of the current PIPS database"
-        return os.path.abspath(self.workspace.dirname())
+        return os.path.abspath(self.workspace.dirname)
 
 
     def filter_modules(self, filter_select = None, filter_exclude = None, other_filter = lambda x: True):
@@ -920,7 +920,7 @@ class p4a_processor(object):
         """
         for launcher in self.launchers:
             # Where the file does well in the .database workspace:
-            launcher_file = os.path.join(self.workspace.dirname(), "Src",
+            launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
             # first open for read and get content
             src = open (launcher_file, 'r')
@@ -944,11 +944,11 @@ class p4a_processor(object):
             launcher = self.kernel_to_launcher_name (kernel)
             # merge the files in the kernel file
             # Where the files do well in the .database workspace:
-            kernel_file = os.path.join(self.workspace.dirname(), "Src",
+            kernel_file = os.path.join(self.workspace.dirname, "Src",
                                        kernel + ".c")
-            wrapper_file = os.path.join(self.workspace.dirname(), "Src",
+            wrapper_file = os.path.join(self.workspace.dirname, "Src",
                                         wrapper + ".c")
-            launcher_file = os.path.join(self.workspace.dirname(), "Src",
+            launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
             p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
             # remove the wrapper from the modules to be processed since already
@@ -970,7 +970,7 @@ class p4a_processor(object):
         result = []
         for name in self.crough_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(),
+            pips_file = os.path.join(self.workspace.dirname,
                                      name, name + ".c")
             # set the destination file
             output_name = name + ".c"
@@ -1005,16 +1005,16 @@ class p4a_processor(object):
                 extension_out = ".c"
         for name in self.generated_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), "Src",
+            pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
             if self.accel and p4a_util.c_file_p(pips_file):
                 # We generate code for P4A Accel, so first post process
                 # the output and produce the result in the P4A subdiretory
                 # of the .database
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.dirname(), "P4A"))
+                                os.path.join(self.workspace.dirname, "P4A"))
                 # update the pips file to the postprocess one
-                pips_file = os.path.join(self.workspace.dirname(), "P4A", name + extension_in)
+                pips_file = os.path.join(self.workspace.dirname, "P4A", name + extension_in)
 
             output_name = name + extension_out
             # The final destination
@@ -1042,7 +1042,7 @@ class p4a_processor(object):
         flag = True
         for name in self.interface_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), name,
+            pips_file = os.path.join(self.workspace.dirname, name,
                                      name + "_interface.f08")
             output_name = name + "_interface.f08"
             # The final destination
@@ -1069,7 +1069,7 @@ class p4a_processor(object):
                 continue
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), "Src", name)
+            pips_file = os.path.join(self.workspace.dirname, "Src", name)
 
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
@@ -1094,10 +1094,10 @@ class p4a_processor(object):
                 # We generate code for P4A Accel, so first post process
                 # the output:
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.dirname(), "P4A"))
+                                os.path.join(self.workspace.dirname, "P4A"))
                 # Where the P4A output file does dwell in the .database
                 # workspace:
-                p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
+                p4a_file = os.path.join(self.workspace.dirname, "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
                 if (self.cuda == True) and (self.c99 == False):
