@@ -14,7 +14,7 @@ export PIPS_ARCH=LINUX_x86_64_LL
 # is it needed?
 export EXTERN_ROOT=/home/fabien/AUTOC/prod/extern
 
-export PYTHON_VERSION=2.5
+export PYTHON_VERSION=2.6
 export PIPS_F77=gfortran
 export PIPS_F90=gfortran
 #export PATH=/usr/local/bin:/usr/bin:/bin
