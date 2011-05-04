@@ -57,7 +57,7 @@ extern __thread int P4A_vp_coordinate[P4A_vp_dim_max];
 #define P4A_init_accel \
   do {	\
     checkStackSize(); \
-  } while (0);
+  } while (0)
 
 /** Release the hardware accelerator as OpenMP
 

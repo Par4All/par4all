@@ -146,7 +146,7 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
     toolTestExec(cudaEventCreate(&p4a_start_event));	\
     toolTestExec(cudaEventCreate(&p4a_stop_event));	\
     checkStackSize(); \
-  } while (0);
+  } while (0)
 
 
 /** Release the hardware accelerator in CUDA
