@@ -28,4 +28,4 @@ export PYTHONPATH=$install/lib/python$PYTHON_VERSION/site-packages/pips
 
 # fix path
 PATH=$install/bin:$PATH
-LD_LIBRARY_PATH=$install/lib:$install/lib/python$PYTHON_VERSION/site-packages/pips:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$install/lib:$install/lib/python$PYTHON_VERSION/site-packages/pips:$LD_LIBRARY_PATH
