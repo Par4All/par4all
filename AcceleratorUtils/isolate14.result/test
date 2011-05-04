@@ -103,34 +103,34 @@ int main(int argc, char **argv)
 }
 with r-w regions
 
-//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isi, 1<=PHI2,
 //    PHI2<=isj, isi==isj}>
 //  <new_image[PHI1][PHI2]-W-EXACT-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
-//    PHI2+3<=isi, isi==isj}>
+//    PHI2+3<=isj, isi==isj}>
 
 void erode(int isi, int isj, int new_image[isi][isj], int image[isi][isj])
 {
 
    int i, j, k, l;
 
-//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isi, 1<=PHI2,
 //    PHI2<=isj, isi==isj}>
 //  <new_image[PHI1][PHI2]-W-EXACT-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
-//    PHI2+3<=isi, isi==isj}>
+//    PHI2+3<=isj, isi==isj}>
 
    for(l = 0; l <= 4; l += 1)
 
-//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//  <image[PHI1][PHI2]-R-EXACT-{2<=PHI1, PHI1+3<=isi, 1<=PHI2,
 //    PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4}>
 //  <new_image[PHI1][PHI2]-W-EXACT-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
-//    PHI2+3<=isi, isi==isj, 0<=0`l, 0`l<=4}>
+//    PHI2+3<=isj, isi==isj, 0<=0`l, 0`l<=4}>
 
 
       for(i = 2; i <= isi-3; i += 1)
 
 //  <image[PHI1][PHI2]-R-EXACT-{PHI1==i, 2<=PHI1, PHI1+3<=isj,
 //    1<=PHI2, PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4}>
-//  <new_image[PHI1][PHI2]-W-EXACT-{PHI1==i, 2<=PHI2, PHI2+3<=isi,
+//  <new_image[PHI1][PHI2]-W-EXACT-{PHI1==i, 2<=PHI2, PHI2+3<=isj,
 //    isi==isj, 2<=i, i+3<=isi, 0<=0`l, 0`l<=4}>
 
          for(j = 2; j <= isj-3; j += 1) {
@@ -163,11 +163,11 @@ void erode(int isi, int isj, int new_image[isi][isj], int image[isi][isj])
    int i, j, k, l;
    {
       //PIPS generated variable
-      int (*image0)[isj-5+1][isj] = (int (*)[isj-5+1][isj]) 0, (*new_image0)[isi-5+1][isi-5+1] = (int (*)[isi-5+1][isi-5+1]) 0;
-      if (isj-5>0&&isj-1>0&&isi-5>0&&isi-5>0) {
-         P4A_accel_malloc((void **) &new_image0, sizeof(int)*(isi-4)*(isi-4));
-         P4A_accel_malloc((void **) &image0, sizeof(int)*(isj-4)*isj);
-         P4A_copy_to_accel_2d(sizeof(int), isi, isj, isj-4, isj, 2, 1, &image[0][0], *image0);
+      int (*image0)[isi-5+1][isj] = (int (*)[isi-5+1][isj]) 0, (*new_image0)[isi-5+1][isj-5+1] = (int (*)[isi-5+1][isj-5+1]) 0;
+      if (isi-5>0&&isj-1>0&&isi-5>0&&isj-5>0) {
+         P4A_accel_malloc((void **) &new_image0, sizeof(int)*(isi-4)*(isj-4));
+         P4A_accel_malloc((void **) &image0, sizeof(int)*(isi-4)*isj);
+         P4A_copy_to_accel_2d(sizeof(int), isi, isj, isi-4, isj, 2, 1, &image[0][0], *image0);
 
 l99996:
          for(l = 0; l <= 4; l += 1)
@@ -182,7 +182,7 @@ l99999:
                      l = MIN(l, (*image0)[i-2][j+k-1-1]);
                   (*new_image0)[i-2][j-2] = l;
                }
-         P4A_copy_from_accel_2d(sizeof(int), isi, isj, isi-4, isi-4, 2, 2, &new_image[0][0], *new_image0);
+         P4A_copy_from_accel_2d(sizeof(int), isi, isj, isi-4, isj-4, 2, 2, &new_image[0][0], *new_image0);
          P4A_accel_free(new_image0);
          P4A_accel_free(image0);
       }
