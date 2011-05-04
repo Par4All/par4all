@@ -1704,7 +1704,7 @@ Several compilations and validations run at CRI:
 \begin{description}
 \item[CHECK] on every commit (down to the few minute scale\ldots)
   compilation and validation based on the old but fast
-  \texttt{nlpmake} makefiles on Debian Lenny (compiegne).
+  \texttt{nlpmake} makefiles on Debian Squeeze (compiegne).
 
   If a commit changes the result of the validation or break the compilation,
   the author of the commit is in charge of fixing it quickly.
@@ -1718,15 +1718,15 @@ Several compilations and validations run at CRI:
 
 \item[AUTOC] on every hour,
   compilation and validation with the \texttt{autoconf} infrastructure,
-  including python and fortran95, on Debian Lenny (compiegne).
+  including python and fortran95, on Debian Squeeze (compiegne).
 
   This compilation and validation requires about 20 minutes. %% (12+9).
 
-\item[CROSS] 32-bit cross-compilation, on Debian Lenny (compiegne).
+\item[CROSS] 32-bit cross-compilation, on Debian Squeeze (compiegne).
 
 \item[NIGHT] compilation and validation on Ubuntu Karmic (canapville).
 
-\item[PRIVE] compilation and private validation on Debian Lenny (compiegne).
+\item[PRIVE] compilation and private validation on Debian Squeeze (compiegne).
 
 \item[32BIT] compilation and validation on Debian Lenny i686 (riquet).
 \end{description}
