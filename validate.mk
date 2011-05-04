@@ -377,6 +377,7 @@ orphan:
 	       -f $$base.test -o \
 	       -f $$base.py -o \
 	       -f default_tpips -o \
+	       -f default_pyps -o \
 	       -f default_test || \
 	  echo "orphan: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
