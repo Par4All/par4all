@@ -449,6 +449,13 @@ class p4a_processor(object):
         # Select the interesting modules:
         return self.workspace.filter(filter)
 
+    def apply_user_requested_phases(self, modules=None, phases_to_apply=[]):
+        """Apply user requested phases to modules
+        """		 
+        for ph in phases_to_apply:
+            # Apply requested phases to modules:
+            getattr(modules, ph)()
+		 
 
     def parallelize(self, fine = False, filter_select = None,
                     filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
@@ -456,9 +463,8 @@ class p4a_processor(object):
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
-        for ph in apply_phases_before:
-            # Apply requested phases before parallelization:
-			getattr(all_modules, ph)()
+		#Apply requested phases before parallezation
+        self.apply_user_requested_phases(all_modules, apply_phases_before)
 
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
@@ -470,9 +476,9 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization(concurrent=True)
 
-        for ph in apply_phases_after:
-            # Apply requested phases after parallelization:
-			getattr(all_modules, ph)()
+		#Apply requested phases after parallezation
+        self.apply_user_requested_phases(all_modules, apply_phases_after)
+
 
     def post_process_fortran_wrapper (self, file_name, subroutine_name):
         """ All the dirty thing about C and Fortran interoperability is hidden
@@ -694,9 +700,8 @@ class p4a_processor(object):
             LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
             concurrent=True)
 
-        for ph in apply_phases_kernel_launcher:
-            #Apply requested phases before parallelization to kernel launchers:
-			getattr(kernel_launchers, ph)(concurrent=True)
+        #Apply requested phases to kernel_launchers
+        self.apply_user_requested_phases(kernel_launchers, apply_phases_kernel_launcher)
 
         # Since the privatization of a module does not change
         # privatization of other modules, use concurrent=True (capply) to
@@ -728,9 +733,8 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
-        for ph in apply_phases_kernel:
-            # Apply user requested phases to generated kernels
-			getattr(kernels, ph)(concurrent=True)
+		#Apply requested phases to kernel
+        self.apply_user_requested_phases(kernels, apply_phases_kernel)
 
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
@@ -754,9 +758,8 @@ class p4a_processor(object):
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
-        for ph in apply_phases_wrapper:
-            #Apply requested phases before parallelization to wrappers:
-			getattr(wrappers, ph)(concurrent=True)
+		#Apply requested phases to wrappers
+        self.apply_user_requested_phases(wrappers, apply_phases_wrapper)
 
         # Select fortran wrappers by using the fact that all the generated
         # fortran wrappers
@@ -829,11 +832,10 @@ class p4a_processor(object):
             wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
             wrappers.cast_at_call_sites()
 
-        for ph in apply_phases_after:
-            # Apply requested phases to kernels, wrappers and launcher:
-			getattr(kernels, ph)(concurrent=True)
-			getattr(wrappers, ph)(concurrent=True)
-			getattr(kernel_launchers, ph)(concurrent=True)
+		#Apply requested phases to kernels, wrappers and kernel_launchers after gpuify
+        self.apply_user_requested_phases(kernels, apply_phases_after)
+        self.apply_user_requested_phases(wrappers, apply_phases_after)
+        self.apply_user_requested_phases(kernel_launchers, apply_phases_after)       
 
         #self.workspace.all_functions.display()
 
@@ -869,14 +871,14 @@ class p4a_processor(object):
         representation to generate... OpenMP code!"""
 
         modules = self.filter_modules(filter_select, filter_exclude);
-        for ph in apply_phases_before:
-            # Apply requested phases before ompify to modules:
-			getattr(modules, ph)(concurrent=True)
+        
+		#Apply requested phases before ompify to modules
+        self.apply_user_requested_phases(modules, apply_phases_before)        
         modules.ompify_code(concurrent=True)
         modules.omp_merge_pragma(concurrent=True)
-        for ph in apply_phases_after:
-            # Apply requested phases after ompify to modules:
-			getattr(modules, ph)(concurrent=True)
+        
+		#Apply requested phases after ompify to modules
+        self.apply_user_requested_phases(modules, apply_phases_after)    
 
     def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''
