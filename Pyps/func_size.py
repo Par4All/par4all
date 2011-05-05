@@ -7,7 +7,7 @@ t= w.fun.muladd
 
 (s,c) = t.binary_size()
 th_c = 31;
-if c < th_c - 10 or c > th_c + 10:
+if c < th_c - 10 or c > th_c + 30:
 	#This can happen for many reasons (including good ones).
 	raise RuntimeError("Instruction count " + str(c) + " is far from the reference instruction count " + str(th_c))
 
