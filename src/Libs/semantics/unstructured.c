@@ -504,7 +504,7 @@ static transformer load_arc_precondition(control pred, control c,
 	if(i%2==1) { /* One of the true successors */
 	  pre = precondition_add_condition_information(pre, e,
 						       transformer_undefined, TRUE);
-      
+
 	}
 	else{ /* One of the false successors */
 	  pre = precondition_add_condition_information(pre, e,
@@ -529,7 +529,7 @@ static transformer load_arc_precondition(control pred, control c,
  *
  *  - load_cycle_fix_point(c, fix_point_map)
  *
- *  - 
+ *  -
  *
  * */
 
@@ -634,13 +634,13 @@ static void process_ready_node(control c,
   statement stmt = control_statement(c);
   list preds = control_predecessors(c);
   transformer pre = transformer_undefined;
-  
+
   ifdebug(2) {
     pips_debug(2, "Begin for control %p with pre_entry=%p:\n", c, pre_entry);
     print_transformer(pre_entry);
     pips_debug(2, "Begin with n_pre=%p:\n", n_pre);
     print_transformer(n_pre);
-    pips_debug(5, "to process node %s\n", statement_identification(control_statement(c))); 
+    pips_debug(5, "to process node %s\n", statement_identification(control_statement(c)));
   }
 
   /* Compute its precondition pre from the postconditions of its predecessor
@@ -671,7 +671,7 @@ static void process_ready_node(control c,
     free_transformer(npre);
     lpre = pre;
   }, preds);
-  
+
   ifdebug(2) {
     pips_debug(2, "Precondition %p for control %p:\n", pre, c);
     print_transformer(pre);
@@ -730,7 +730,7 @@ static void process_ready_node(control c,
 	 n_pre_u, /* precondition true for any node of scc_u. */
 	 control_postcondition_map, /* */
 	 FALSE); /* Compute transformers */
-  
+
       ifdebug(2) {
 	pips_debug(2, "Fixpoint transformer %p for control %p:\n", fptf, c);
 	print_transformer(fptf);
@@ -761,7 +761,7 @@ static void process_ready_node(control c,
     }
     free_transformer(pre);
     pre = transformer_convex_hull(pre_cycle, pre_no_cycle);
-  
+
     ifdebug(2) {
       pips_debug(2, "Precondition after cycle execution %p for control %p:\n", pre, c);
       print_transformer(pre);
@@ -796,7 +796,7 @@ static void process_ready_node(control c,
     pips_assert("The statement transformer is defined",
 		!transformer_undefined_p(tf));
     post = transformer_apply(tf, pre);
-  
+
     ifdebug(2) {
       pips_debug(2, "Postcondition %p for control %p:\n", post, c);
       print_transformer(post);
@@ -844,7 +844,7 @@ static void process_ready_node(control c,
   }
 
   store_control_postcondition(c, post, control_postcondition_map);
-  
+
   ifdebug(2) {
     pips_debug(2, "Postcondition %p stored for control %p:\n", post, c);
     print_transformer(post);
@@ -897,7 +897,7 @@ static bool process_unreachable_node(control c,
       transformer post = statement_to_postcondition(pre, s);
 
       pips_assert("the new postcondition is empty", transformer_empty_p(post));
-      pips_assert("the previous postcondition is empty", 
+      pips_assert("the previous postcondition is empty",
 		  transformer_empty_p(load_control_postcondition(c, control_postcondition_map)));
 
       pips_user_warning("After restructuration (?),"
@@ -1072,9 +1072,9 @@ transformer load_statement_temporary_precondition(statement s,
 static void cycle_to_flow_sensitive_preconditions
 (list partition,           /* Is it relevant? */
  unstructured c_u,         /* The cycle unstructured */
- hash_table ancestor_map, 
- hash_table scc_map, 
- control_mapping fix_point_map, 
+ hash_table ancestor_map,
+ hash_table scc_map,
+ control_mapping fix_point_map,
  control_mapping cycle_temporary_precondition_map, /* To be updated when a cycle head is encountered */
  statement_mapping statement_temporary_precondition_map, /* To be updated each time a statement is encountered */
  transformer c_pre,        /* precondition of cycle c_u, already processed with the fix point */
@@ -1096,14 +1096,14 @@ static void cycle_to_flow_sensitive_preconditions
   pips_assert("Please the compiler",
 	      cycle_temporary_precondition_map==cycle_temporary_precondition_map);
   pips_assert("Please the compiler", pre==pre);
-  
+
   /* wide_forward_control_map_get_blocs(unstructured_control(u), &to_be_processed); */
   forward_control_map_get_blocs(unstructured_control(c_u), &to_be_processed);
   still_to_be_processed = gen_copy_seq(to_be_processed);
 
   /* Take care of the entry node whose precondition does not rely on its
      predecessors */
-  /* post = statement_to_postcondition(c_pre, es); */ /* c_pre is USED */ 
+  /* post = statement_to_postcondition(c_pre, es); */ /* c_pre is USED */
   post = transformer_apply(load_statement_transformer(es), c_pre);
   update_control_postcondition(e, post, control_postcondition_map);
   gen_remove(&still_to_be_processed, e);
@@ -1124,7 +1124,7 @@ static void cycle_to_flow_sensitive_preconditions
       for(l=still_to_be_processed; !ENDP(l); ) {
 	control c = CONTROL(CAR(l));
 	POP(l); /* right away because c's cdr might be modified */
-	if(meaningless_control_p(c) 
+	if(meaningless_control_p(c)
 	   || ready_to_be_processed_p(c, to_be_processed,
 				      still_to_be_processed,
 				      already_processed,
@@ -1136,7 +1136,7 @@ static void cycle_to_flow_sensitive_preconditions
 			       ancestor_map, scc_map, partition, fix_point_map, postcondition_p);
 	    */
 	    statement c_s = control_statement(c);
-	    transformer pre = 
+	    transformer pre =
 	      get_control_precondition(c, control_postcondition_map, c_u, c_pre);
 	    transformer e_pre = transformer_undefined;
 	    transformer f_e_pre = transformer_undefined;
@@ -1198,7 +1198,7 @@ static void cycle_to_flow_sensitive_preconditions
 	    if(cycle_head_p(c, ancestor_map, scc_map)) {
 	      transformer ctf = load_control_fix_point(c, fix_point_map,
 						       ancestor_map, scc_map);
-	      c_e_pre = transformer_apply(ctf, f_e_pre); 
+	      c_e_pre = transformer_apply(ctf, f_e_pre);
 	    }
 	    else {
 	      c_e_pre = transformer_dup(f_e_pre);
@@ -1224,12 +1224,12 @@ static void cycle_to_flow_sensitive_preconditions
 }
 
 static void dag_to_flow_sensitive_preconditions
-(list partition, 
- unstructured ndu, 
- hash_table ancestor_map, 
- hash_table scc_map, 
- control_mapping fix_point_map, 
- transformer pre_u, 
+(list partition,
+ unstructured ndu,
+ hash_table ancestor_map,
+ hash_table scc_map,
+ control_mapping fix_point_map,
+ transformer pre_u,
  transformer pre,
  control_mapping control_postcondition_map)
 {
@@ -1249,7 +1249,7 @@ static void dag_to_flow_sensitive_preconditions
     print_control_postcondition_map(control_postcondition_map);
   }
 
-  /* 
+  /*
    * Process first the nodes in the embedding graph, in any order since
    * node postconditions are assumed available.
    *
@@ -1295,7 +1295,7 @@ static void dag_to_flow_sensitive_preconditions
 	e_pre = transformer_convex_hull(pre_cycle, pre_no_cycle);
 	free_transformer(pre_cycle);
 	free_transformer(pre_no_cycle);
- 
+
 	/* END OF DUPLICATED CODE */
 
 	/* e_pre = transformer_apply(fp_tf, pre); */
@@ -1515,7 +1515,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
   list still_to_be_processed = NIL;
   list already_processed = NIL;
   list cannot_be_reached = NIL;
-  
+
   ifdebug(2) {
     pips_debug(2, "Begin for unstructured %p with e_pre=%p:\n", ndu, e_pre);
     print_transformer(e_pre);
@@ -1599,7 +1599,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
       for(l=still_to_be_processed; !ENDP(l); ) {
 	control c = CONTROL(CAR(l));
 	POP(l); /* right away because c's cdr might be modified */
-	if(meaningless_control_p(c) 
+	if(meaningless_control_p(c)
 	   || ready_to_be_processed_p(c, to_be_processed,
 				      still_to_be_processed,
 				      already_processed,
@@ -1686,7 +1686,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
   already_processed = list_undefined;
 
   ifdebug(2) {
-    pips_debug(2, "End for %s of %s %p with entry node %s and with transformer %p\n", 
+    pips_debug(2, "End for %s of %s %p with entry node %s and with transformer %p\n",
 	       postcondition_p? "postcondition" : "transformer",
 	       is_dag? "dag" : "cycle", ndu,
 	       statement_identification(control_statement(unstructured_control(ndu))), tf);
@@ -1748,7 +1748,7 @@ transformer cycle_to_flow_sensitive_postconditions_or_transformers
  *
  */
 
-typedef struct  { 
+typedef struct  {
     bool pcond;
     control_mapping smap;
 } recursive_context;
@@ -1757,7 +1757,7 @@ static void local_process_unreachable_node(control c, recursive_context * pconte
 {
   process_unreachable_node(c, pcontext->smap, pcontext->pcond);
 }
-  
+
 /* A debug function to prettyprint the result */
 static void node_to_path_transformer_or_postcondition(control c, recursive_context * pcontext)
 {
@@ -1773,7 +1773,7 @@ static void node_to_path_transformer_or_postcondition(control c, recursive_conte
     print_transformer(tf);
   }
 }
-  
+
 /* A debug function to prettyprint the fix points */
 static void print_cycle_head_to_fixpoint(control c, recursive_context * pcontext)
 {
@@ -1796,7 +1796,7 @@ static void print_cycle_head_to_fixpoint(control c, recursive_context * pcontext
 transformer unstructured_to_flow_sensitive_postconditions_or_transformers
 (transformer pre_u, /* precondition at entry: e_pre */
  transformer pre,   /* precondition true for every node: n_pre */
- unstructured u, 
+ unstructured u,
  bool postcondition_p)
 {
   transformer post = transformer_undefined;
@@ -1810,7 +1810,7 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
   transformer pre_r = transformer_range(pre);
 
   recursive_context context = { postcondition_p, control_postcondition_map };
-  
+
   recursive_context fcontext = { postcondition_p, fix_point_map };
 
   ifdebug(2) {
@@ -1835,7 +1835,7 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
     (partition, ndu, ancestor_map, scc_map, fix_point_map,
      postcondition_p? pre_u : pre_u_r, postcondition_p? pre : pre_r,
      control_postcondition_map, postcondition_p);
-  
+
   if(postcondition_p) {
     /* Compute the real precondition for each statement and propagate
        postconditions in it. */
@@ -2182,14 +2182,14 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
      nodes can be discarded because they do not modify the store such as
      IF statements (always) and CONTINUE statements (if they do not link
      the entry and the exit nodes). */
-  
+
   list nodes = NIL;
   /* Entry node */
   control entry_node = unstructured_control(u);
   control exit_node = unstructured_exit(u);
   transformer tf_u = transformer_empty();
   transformer fp_tf_u = transformer_undefined;
-  
+
   pips_debug(8,"begin\n");
 
   FORWARD_CONTROL_MAP(c, {
@@ -2199,7 +2199,7 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
     /* transformer tf_st = copy_transformer(load_statement_transformer(st)); */
     transformer tf_st = load_statement_transformer(st);
     transformer tf_old = tf_u;
-    
+
     if(statement_test_p(st)) {
       /* Any side effect? */
       if(!ENDP(transformer_arguments(tf_st))) {
@@ -2227,13 +2227,13 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
       pips_assert("tf_u is internally consistent",
 		  transformer_internal_consistency_p(tf_u));
     }
-    
+
   }, entry_node, nodes) ;
-  
+
   gen_free_list(nodes) ;
-  
+
   fp_tf_u = (*transformer_fix_point_operator)(tf_u);
-  
+
   ifdebug(8) {
     pips_debug(8,"Result for one step tf_u:\n");
     print_transformer(tf_u);
@@ -2244,9 +2244,9 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
     pips_assert("fp_tf_u is internally consistent",
 		transformer_internal_consistency_p(fp_tf_u));
   }
-  
+
   pips_debug(8,"end\n");
-  
+
   return fp_tf_u;
 }
 
@@ -2262,7 +2262,7 @@ static void unstructured_to_transformers(
   control ct = unstructured_control(u) ;
 
   pips_debug(5,"begin\n");
-  
+
   /* There is no need to compute transformers for unreachable code,
    * using CONTROL_MAP, but this may create storage and prettyprinter
    * problems because of the data structure inconsistency.
@@ -2271,9 +2271,9 @@ static void unstructured_to_transformers(
     statement st = control_statement(c) ;
     (void) statement_to_transformer(st, pre) ;
   }, ct, blocs) ;
-  
+
   gen_free_list(blocs) ;
-  
+
   pips_debug(5,"end\n");
 }
 
@@ -2363,7 +2363,7 @@ transformer unstructured_to_transformer(unstructured u,
       else {
 	tf = unstructured_to_flow_insensitive_transformer(u);
       }
-    }  
+    }
     else if(!get_bool_property("SEMANTICS_FIX_POINT")) {
       /* Not really linked to fix point issue, but a way to know we are
          using a FAST option. */
