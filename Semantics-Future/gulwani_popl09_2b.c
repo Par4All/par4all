@@ -119,7 +119,7 @@ L1:
 	LOOP(
 		OR(
 			C1a; S1,
-			
+
 			C1b; S2; LOOP(C2a; S2); C2b; S1
 		)
 	);

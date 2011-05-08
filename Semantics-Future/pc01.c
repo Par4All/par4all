@@ -3,6 +3,8 @@
  * for each control location instead of a unique program counter.
  *
  * Does not get the invariant s0+s1+s2==1, but 1<=s0+s1+s2<=2
+ * The invariant is found with property SEMANTICS_USE_DERIVATIVE_LIST
+ * set to true.
  *
  * Note that the transfer function has period 3, where as the maximum
  * encoded periodicity is 2.

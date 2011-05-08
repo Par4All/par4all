@@ -2,7 +2,9 @@
  *
  * Same as pc01, but encoded with ++ and -- instead of settings to 0
  * and 1; here you get the invariant s0+s1+s2==1, but you lose the
- * upper bound 1 for s0, s1 and s2
+ * upper bound 1 for s0, s1 and s2.
+ *
+ * The upper bounds are found after transformer refinement
  */
 
 int main()

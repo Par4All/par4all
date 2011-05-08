@@ -56,23 +56,23 @@ int main(void)
 
    while (1) {
 
-//  P(d,s,t) {0<=d, s<=d, 0<=s, s<=4, 0<=t}
+//  P(d,s,t) {0<=d, s<=d, d<=s+4t, 0<=s, s<=4, 0<=t}
 
       while (alea()&&s<=3)
 
-//  P(d,s,t) {s<=d, 0<=s, s<=3, 0<=t}
+//  P(d,s,t) {s<=d, d<=s+4t, 0<=s, s<=3}
 
          s++, d++;
 
-//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+//  P(d,s,t) {s<=d, d<=s+4t, 0<=s, s<=4}
 
       while (alea())
 
-//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+//  P(d,s,t) {s<=d, d<=s+4t, 0<=s, s<=4}
 
          t++, s = 0;
 
-//  P(d,s,t) {s<=d, 0<=s, s<=4, 0<=t}
+//  P(d,s,t) {s<=d, d<=s+4t, 0<=s, s<=4}
 
       
       // The expected invariant is given as a 3-D figure in d, s and t
