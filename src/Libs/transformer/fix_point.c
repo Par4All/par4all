@@ -1009,9 +1009,12 @@ bool invariant_vector_p(Pvecteur v)
 }
 
 /* Specific for the derivative fix point: each constant term in the
-   constraints is multiplied by ik which is not in sc's basis, and ik
-   is added to the basis is necessary */
-static Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
+ * constraints is multiplied by ik which is not in sc's basis, and ik
+ * is added to the basis is necessary.
+ *
+ * Also used in transformer_list.c
+ */
+Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
 {
   Pcontrainte c;
 

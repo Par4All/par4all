@@ -56,7 +56,7 @@
   *
   * It is possible to store the star or the plus fix points. I first
   * stored the star fix points. It is often needed. It is safe because it
-  * can be applied several times withtout impacting the result. However,
+  * can be applied several times without impacting the result. However,
   * it does not retain information about the cycle body
   * transformer. Because the convex hull operator looses information, it
   * is more accurate to use the plus fix point and to apply a convex hull
@@ -71,6 +71,15 @@
   * it is the entry node because, then, it has an extra-predecessor.
   *
   * Francois Irigoin, July 2002 (First version: October 2000)
+  *
+  * Note: Bourdoncle's heuristics minimizes the number of cycles under
+  * the assumption that most information is lost when performing a
+  * widening. We do not use widening but direct computation of an
+  * upper approximation of the transition closure. And sometimes, a
+  * lot of information is lost when performing convex hulls of
+  * transformers. So, using transformers, it would be better to
+  * maximize the number of cycles to minimize the number of paths in
+  * each cycle.
   */
 
 #include <stdio.h>
@@ -114,7 +123,7 @@ static void print_control_node(control c)
 {
   fprintf(stderr,
 	  "ctr %p, %zd preds, %zd succs: %s",
-          c,
+	  c,
 	  gen_length(control_predecessors(c)),
 	  gen_length(control_successors(c)),
 	  safe_statement_identification(control_statement(c)));
@@ -145,13 +154,13 @@ static void print_control_nodes(list l)
   fprintf(stderr, "\n");
 }
 
-/* 
+/*
  * STORAGE AND RETRIEVAL OF INTERMEDIATE POSTCONDITIONS
  *
  * Node postconditions cannot be recomputed several times because
  * preconditions are stored. Since they have to be used several times in
  * an unknown order, it is necessary to store them.
- * 
+ *
  * A static variable was initially used which reduced the number of
  * parameters passed but this was not compatible with recursive calls, the
  * embedding of unstructured within unstructured, and so on.
@@ -311,7 +320,7 @@ static control_mapping free_control_postcondition_map(control_mapping control_po
   return NULL;
 }
 
-/* 
+/*
  * STORAGE AND RETRIEVAL OF FIX POINT TRANSFORMERS
  *
  *  */
@@ -375,10 +384,10 @@ static void store_control_fix_point(control c, transformer fptf,
     print_transformer(fptf);
   }
 
-  pips_assert("The fix_point to insert is consistent", 
+  pips_assert("The fix_point to insert is consistent",
 	      transformer_consistency_p(fptf));
 
-  pips_assert("The fix_point is not defined yet", 
+  pips_assert("The fix_point is not defined yet",
 	      hash_get((hash_table) control_fix_point_map, (void *) c)
 	      == HASH_UNDEFINED_VALUE);
   hash_put((hash_table) (control_fix_point_map),
