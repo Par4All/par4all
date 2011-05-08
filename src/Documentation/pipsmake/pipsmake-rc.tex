@@ -3268,7 +3268,7 @@ loop_statistics > MODULE.stats_file
 \index{Semantics Analysis}
 \index{Analysis (Semantics)}
 
-\Pips{} semantics analysis targets integer scalar variables. It is a
+\Pips{} semantics analysis targets mostly integer scalar variables. It is a
 two-pass process, with a bottom-up pass computing \PipsPassRef{transformers}, and
 a top-down pass propagating \PipsPassRef{preconditions}. Transformers and
 preconditions are specially powerful case of return and jump
@@ -4178,6 +4178,17 @@ default.
 
 \begin{PipsProp}{SEMANTICS_USE_TRANSFORMER_LISTS}
 SEMANTICS_USE_TRANSFORMER_LISTS FALSE
+\end{PipsProp}
+
+The next property is only useful if the previous one is set to true.
+Instead of computing the fix point of the convex hull of the
+transformer list, it computes the convex hull of the derivative
+constraints. Since it is a new feature, it is set to false by default,
+but it should become the default option because it is always more
+accurate. This development is experimental and turned off by default.
+
+\begin{PipsProp}{SEMANTICS_USE_DERIVATIVE_LIST}
+SEMANTICS_USE_DERIVATIVE_LIST FALSE
 \end{PipsProp}
 
 \subsubsection{Normalization level}
@@ -10473,7 +10484,7 @@ by a linear expression of the loop indices.
 
 
 \begin{PipsMake}
-alias induction_substitution 'Induction substitution'
+alias induction_substitution 'Induction variable substitution'
 induction_substitution > MODULE.code
         < PROGRAM.entities
         < MODULE.code
