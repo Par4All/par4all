@@ -149,6 +149,9 @@ bool add_control_counters(string module_name)
   // do the job
   add_counters(module, stat);
 
+  // reset unique identifier for each statement
+  module_reorder(stat);
+
   // update resource
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, stat);
 
