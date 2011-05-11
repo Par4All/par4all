@@ -1,0 +1,48 @@
+delete use_def_elim04
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create use_def_elim04 use_def_elim04.c
+
+activate MUST_REGIONS
+
+#required for DEAD_CODE_ELIMINATION
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+
+echo
+echo Convex RW array regions for "use_def_elim04"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[use_def_elim04]
+
+echo
+echo Convex IN array regions for "use_def_elim04"
+echo
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[use_def_elim04]
+
+echo
+echo Convex OUT array regions for "use_def_elim04"
+echo
+
+activate PRINT_CODE_OUT_REGIONS
+display PRINTED_FILE[use_def_elim04]
+
+echo
+echo Code for "use_def_elim04" after dead code elimination
+echo
+
+apply DEAD_CODE_ELIMINATION[use_def_elim04]
+#apply USE_DEF_ELIMINATION[use_def_elim04]
+
+activate PRINT_CODE
+display PRINTED_FILE[use_def_elim04]
+
+close
+#delete use_def_elim04
+quit

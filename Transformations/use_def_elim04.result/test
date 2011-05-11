@@ -1,0 +1,85 @@
+
+Convex RW array regions for "use_def_elim04"
+
+
+//  <i-R-EXACT-{}>
+//  <i-W-EXACT-{}>
+
+int use_def_elim04(int i)
+{
+   int j;
+   int k;
+
+//  <i-R-EXACT-{}>
+//  <j-W-EXACT-{}>
+
+
+   j = i+1;
+
+//  <i-W-EXACT-{}>
+
+   i = 2;
+
+//  <i-R-EXACT-{}>
+//  <k-W-EXACT-{}>
+
+   k = i+1;
+
+//  <j-R-EXACT-{}>
+
+   return j;
+}
+
+Convex IN array regions for "use_def_elim04"
+
+
+//  <i-IN-EXACT-{}>
+
+int use_def_elim04(int i)
+{
+   int j;
+   int k;
+
+//  <i-IN-EXACT-{}>
+
+
+   j = i+1;
+   i = 2;
+
+//  <i-IN-EXACT-{}>
+
+   k = i+1;
+
+//  <j-IN-EXACT-{}>
+
+   return j;
+}
+
+Convex OUT array regions for "use_def_elim04"
+
+int use_def_elim04(int i)
+{
+   int j;
+   int k;
+
+//  <j-OUT-EXACT-{}>
+
+
+   j = i+1;
+
+//  <i-OUT-EXACT-{}>
+
+   i = 2;
+   k = i+1;
+   return j;
+}
+
+Code for "use_def_elim04" after dead code elimination
+
+int use_def_elim04(int i)
+{
+   int j;
+
+   j = i+1;
+   return j;
+}
