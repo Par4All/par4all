@@ -105,19 +105,30 @@ F.list	= $(F.result:%.result=%)
 # where are we?
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
+
 # get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
+
 # where to store validation results
 # this is the default, but may need to be overriden
 RESULTS	= RESULTS
 
 # shell environment to run validation scripts
+# this is a requirement!
 SHELL	= /bin/bash
 
-# skip bugs & future cases
-EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
-	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0 ; \
-	  [ ! "$(DO_SLOW)" -a -f $*.slow ] && exit 0
+# whether we are recurring in a specially "marked" directory
+RECWHAT	=
+
+# skip bug/later/slow cases depending on options
+EXCEPT =  [ "$(RECWHAT)" ] && \
+	    { echo "$(RECWHAT): $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_BUG)" -a -f $*.bug -a -d $*.result ] && \
+	    { echo "bug: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_LATER)" -a -f $*.later -a -d $*.result ] && \
+	    { echo "later: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
+	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
@@ -126,11 +137,19 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # recursion into a subdirectory with target "FORWARD"
+# a whole directory can be marked as bug/later/slow,
+# in which case while recurring this mark take precedence about
+# local information made available within the directory
 %.rec: %
-	$(EXCEPT) ; \
-	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ -C $^ $(FORWARD)
+	recwhat= ; d=$* ; d=$${d%.sub} ; \
+	[ ! "$(DO_BUG)" -a -f $$d.bug ] && recwhat=bug ; \
+	[ ! "$(DO_LATER)" -a -f $$d.later ] && recwhat=later ; \
+	[ ! "$(DO_SLOW)" -a -f $$d.slow ] && recwhat=slow ; \
+	[ "$(RECWHAT)" ] && recwhat=$(RECWHAT) ; \
+	$(MAKE) RECWHAT=$$recwhat RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ \
+		-C $^ $(FORWARD)
 
-# extract validation result for summary
+# extract validation result for summary when the case was run
 # four possible outcomes: passed, changed, failed, timeout
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
@@ -172,12 +191,12 @@ validate:
 .PHONY: validate-dir
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
-validate-dir: $(LOCAL_CLEAN) bug-list later-list slow-list
+validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
 else # sequential validation, including subdir recursive forward
-validate-dir: $(LOCAL_CLEAN) bug-list later-list slow-list
+validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) sequential-validate-dir
 	$(MAKE) sort-local-result
@@ -320,40 +339,6 @@ else # with pyps
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
-
-# bug & later (future) & slow handling
-.PHONY: bug-list
-ifdef DO_BUG
-bug-list:
-	@echo "# bug-list: nothing to do" >&2
-else # include bug list
-bug-list:
-	for f in $(wildcard *.bug) ; do \
-	  echo "bug: $(SUBDIR)/$${f%.*}" ; \
-	done >> $(RESULTS)
-endif # DO_BUG
-
-.PHONY: later-list
-ifdef DO_LATER
-later-list:
-	@echo "# later-list: nothing to do" >&2
-else # include later list
-later-list:
-	for f in $(wildcard *.later) ; do \
-	  echo "later: $(SUBDIR)/$${f%.*}" ; \
-	done >> $(RESULTS)
-endif # DO_LATER
-
-.PHONY: slow-list
-ifdef DO_SLOW
-slow-list:
-	@echo "# slow-list: nothing to do" >&2
-else # include slow list
-slow-list:
-	for f in $(wildcard *.slow) ; do \
-	  echo "slow: $(SUBDIR)/$${f%.*}" ; \
-	done >> $(RESULTS)
-endif # DO_SLOW
 
 # detect skipped stuff
 .PHONY: skipped
