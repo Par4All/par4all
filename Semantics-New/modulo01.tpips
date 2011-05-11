@@ -34,7 +34,12 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
+
+# some issue?
+close
+delete modulo01
 quit
+
 apply UNSPLIT[%PROGRAM]
 
 close
