@@ -1,6 +1,6 @@
 setproperty ABORT_ON_USER_ERROR TRUE
-delete use_def_elim04
-create use_def_elim04 use_def_elim04.f
+delete use_def_elim07
+create use_def_elim07 use_def_elim07.f
 
 echo
 echo Code for "EMPILE"
@@ -18,5 +18,5 @@ activate PRINT_CODE
 display PRINTED_FILE[EMPILE]
 
 close
-delete use_def_elim04
+delete use_def_elim07
 quit
