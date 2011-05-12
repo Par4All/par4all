@@ -29,6 +29,7 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
 	w.props.aliasing_across_io_streams = False
 	w.props.constant_path_effects = False
 	w.props.prettyprint_sequential_style = "do"
+	w.props.memory_effects_only = False
 
 	if loop_parallel_threshold_set:
 		m.omp_loop_parallel_threshold_set(**props)
