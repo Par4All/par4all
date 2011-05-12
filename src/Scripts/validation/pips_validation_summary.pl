@@ -185,10 +185,10 @@ print
 
 print
   "number of warnings: $warned\n" .
+  " * keptout: $n{keptout} (cannot run test)\n" .
   " * bug: $n{bug} (bugged case)\n" .
   " * later: $n{later} (future test case)\n" .
   " * slow: $n{slow} (cases keptout because they take too much time to run)\n" .
-  " * keptout: $n{keptout} (cannot run test)\n" .
   " * skipped: $n{skipped} (source without validation scripts)\n" .
   " * missing: $n{missing} (empty result directory)\n" .
   " * multi-script: $n{'multi-script'} (more than one validation script)\n" .
@@ -233,7 +233,7 @@ if ($aggregate)
 }
 
 # print detailed per-directory summary
-print "directory                   cases  bads success (F+C+T|K) changes...\n";
+print "directory", " " x 19,"cases  bads success (F+C+T|K+B+L+S) changes...\n";
 for my $dir (sort keys %d)
 {
   my $failures = $d{$dir}{failed} + $d{$dir}{changed} + $d{$dir}{timeout};
