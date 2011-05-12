@@ -55,6 +55,7 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "properties.h"
 
 #include "misc.h"
 /* Must not be used, beware of library cycles: #include "semantics.h" */

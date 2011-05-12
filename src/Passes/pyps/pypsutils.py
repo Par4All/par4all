@@ -160,7 +160,7 @@ def patchIncludes(s):
 
 def get_runtimefile(fname,subdir=None):
 		"""Returns runtime file path"""
-		searchdirs=[".",pypsconfig.pypsruntime]
+		searchdirs=[pypsconfig.pypsruntime] # removed "." from the search dir because it leads to complicated situations
 		if subdir: searchdirs.insert(1,os.path.join(pypsconfig.pypsruntime,subdir))
 		for d in searchdirs:
 			f=os.path.join(d,fname)

@@ -35,6 +35,7 @@
 #include "ri.h"
 #include "database.h"
 #include "ri-util.h"
+#include "control.h"
 #include "top-level.h"
 #include "text-util.h"
 #include "properties.h"
