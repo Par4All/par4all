@@ -267,7 +267,7 @@ class p4a_builder:
             self.cudafy_flags()
 
     def cu2cpp(self, file, output_file):
-        p4a_util.run([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file ],
+        p4a_util.run([ self.nvcc, "--cuda" ] + self.cpp_flags + self.nvcc_flags + [ "-o", output_file, file],
             #extra_env = dict(CPP = self.cpp) # Necessary?
         )
 
@@ -322,18 +322,18 @@ class p4a_builder:
         for file in first_pass_files:
             if p4a_util.c_file_p(file):
                 has_c = True
-                obj_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".o")
-                self.c2o(file, obj_file)
+                obj_file = p4a_util.quote_fname(make_safe_intermediate_file_path(file, build_dir, change_ext = ".o"))
+                self.c2o(p4a_util.quote_fname(file),obj_file)
                 second_pass_files += [ obj_file ]
             elif p4a_util.cpp_file_p(file):
                 has_cxx = True
-                obj_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".o")
-                self.cpp2o(file, obj_file)
+                obj_file = p4a_util.quote_fname(make_safe_intermediate_file_path(file, build_dir, change_ext = ".o"))
+                self.cpp2o(p4a_util.quote_fname(file), obj_file)
                 second_pass_files += [ obj_file ]
             elif p4a_util.fortran_file_p(file):
                 has_fortran = True
-                obj_file = make_safe_intermediate_file_path(file, build_dir, change_ext = ".o")
-                self.f2o(file, obj_file)
+                obj_file = p4a_util.quote_fname(make_safe_intermediate_file_path(file, build_dir, change_ext = ".o"))
+                self.f2o(p4a_util.quote_fname(file), obj_file)
                 second_pass_files += [ obj_file ]
             else:
                 raise p4a_util.p4a_error("Unsupported extension for input file: " + file)
@@ -362,8 +362,12 @@ class p4a_builder:
             elif has_cxx:
                 final_command = self.cxx
 
+            # Quote extra_obj
+            quoted_extra_obj=[]
+            for obj in extra_obj:
+				quoted_extra_obj+=[p4a_util.quote_fname(obj)]
             # Create the final binary.
-            p4a_util.run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", output_file ] + second_pass_files + extra_obj,
+            p4a_util.run([ final_command ] + self.ld_flags + more_ld_flags + [ "-o", p4a_util.quote_fname(output_file) ] + second_pass_files + quoted_extra_obj,
                 extra_env = dict(LD = self.ld, AR = self.ar)
             )
 
