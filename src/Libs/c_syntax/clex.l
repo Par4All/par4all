@@ -467,7 +467,7 @@ universal-character-name ({escape}(u{hexdigit}{4}|U{hexdigit}{8}))
                                 update_C_comment(yytext);
                         }
 
-^"#"("\\\n"|[ \t])*"pragma"           {
+^"#"("\\\n"|[ \t])*"pragma"([ \t])* {
                 /* Look for a # followed by any whitespace and any
 		   backslashed end-of line, followed by "pragma" up to the
 		   end of line, dealing with any backslashed new lines: */
