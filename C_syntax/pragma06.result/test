@@ -53,7 +53,7 @@ Parsed printed file
 void pragma06()
 {
    // BEGIN BLOCK
-#pragma  gnih
+#pragma gnih
 
    // END BLOCK
 }
@@ -62,6 +62,6 @@ Printed file
 
 void pragma06()
 {
-#pragma  gnih
+#pragma gnih
 
 }
