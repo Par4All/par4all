@@ -1,7 +1,7 @@
 void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
-#pragma  pyps unfolding()
-#pragma  pyps flatten_code()
+#pragma pyps unfolding()
+#pragma pyps flatten_code()
    copy(w, h, bytes, dest);
    curve(w, h, dest, lut);
    light(w, h, dest, val);
