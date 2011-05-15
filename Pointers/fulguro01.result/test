@@ -49,7 +49,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 //             <may be written>: stderr[0]
 //             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
-      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
       return FLGR_RET_NULL_OBJECT;
    }
 //             <    is read   >: data1 datdest
@@ -122,7 +122,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 //             <may be written>: stderr[0]
 //             <    is read   >: __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
-   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
    return FLGR_RET_TYPE_UNKNOWN;
 }
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
@@ -276,7 +276,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
    if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
 //  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
 //   _datdest_4[0],-Exact-)}
-      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
 //  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
 //   _datdest_4[0],-Exact-)}
       return FLGR_RET_NULL_OBJECT;
@@ -386,7 +386,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
    }
 //  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
 //   _datdest_4[0],-Exact-)}
-   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
 //  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
 //   _datdest_4[0],-Exact-)}
    return FLGR_RET_TYPE_UNKNOWN;
