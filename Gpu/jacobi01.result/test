@@ -295,8 +295,8 @@ void get_data(char filename[])
          space[i][j] = 0;                                               /*0049*/
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0, i==501, 1<=ny}>
-//  <fp[PHI1]-W-MAY-{PHI1==0, i==501, 1<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, i==501, 1<=nx, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, i==501, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny, i==501}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -307,8 +307,8 @@ void get_data(char filename[])
    for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny}>
-//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny, 1<=nx}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny, 1<=nx}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
