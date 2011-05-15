@@ -1,0 +1,22 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   lhs01();
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   lhs01();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

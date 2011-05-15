@@ -1,0 +1,109 @@
+
+POINTS-TO
+
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+   if (c=='\n'||c=='\r')
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+         my_fputc(' ', _stream);
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+         (*nbout)++;
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+         (*col)++;
+      }
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+
+      (*col)++;
+   }
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//  {(_stream,__stream_1[0],-Exact-);(col,_col_2[0],-Exact-);(nbout,
+//   _nbout_3[0],-Exact-)}
+   (*nbout)++;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void fpointer01(char c, void *_stream, void (*my_fputc)(const char c, void *_stream), int *col, int indent, int *nbout)
+{
+//             <    is read   >: c
+   if (c=='\n'||c=='\r')
+//             <    is read   >: col
+//             <    is written>: _col_2[0]
+      /* on change de ligne */
+      
+      *col = 0;
+   else {
+//             <    is read   >: col indent _col_2[0]
+      /* indentation ok ? */
+      
+      while (*col<indent) {
+         my_fputc(' ', _stream);
+//             <    is read   >: nbout _nbout_3[0]
+//             <    is written>: _nbout_3[0]
+         (*nbout)++;
+//             <    is read   >: col _col_2[0]
+//             <    is written>: _col_2[0]
+         (*col)++;
+      }
+//             <    is read   >: col _col_2[0]
+//             <    is written>: _col_2[0]
+
+      (*col)++;
+   }
+   
+   /* dans tous les cas il faut afficher le caractere passe */
+   
+   my_fputc(c, _stream);
+//             <    is read   >: nbout _nbout_3[0]
+//             <    is written>: _nbout_3[0]
+   (*nbout)++;
+}
+
+ *********************** Use-Def Chains *********************
+
+	22 --> 25 with conflicts
+		from <_col_2[0]-W-EXACT> to <_col_2[0]-W-EXACT>
+		from <_col_2[0]-W-EXACT> to <_col_2[0]-R-EXACT>
+		from <_col_2[0]-R-EXACT> to <_col_2[0]-W-EXACT>
+	22 --> 22 with conflicts
+		from <_col_2[0]-W-EXACT> to <_col_2[0]-W-EXACT>
+		from <_col_2[0]-W-EXACT> to <_col_2[0]-R-EXACT>
+		from <_col_2[0]-R-EXACT> to <_col_2[0]-W-EXACT>
+	21 --> 31 with conflicts
+		from <_nbout_3[0]-W-EXACT> to <_nbout_3[0]-W-EXACT>
+		from <_nbout_3[0]-W-EXACT> to <_nbout_3[0]-R-EXACT>
+		from <_nbout_3[0]-R-EXACT> to <_nbout_3[0]-W-EXACT>
+	21 --> 21 with conflicts
+		from <_nbout_3[0]-W-EXACT> to <_nbout_3[0]-W-EXACT>
+		from <_nbout_3[0]-W-EXACT> to <_nbout_3[0]-R-EXACT>
+		from <_nbout_3[0]-R-EXACT> to <_nbout_3[0]-W-EXACT>
+	18 --> 25 with conflicts
+		from <_col_2[0]-R-EXACT> to <_col_2[0]-W-EXACT>
+	18 --> 22 with conflicts
+		from <_col_2[0]-R-EXACT> to <_col_2[0]-W-EXACT>
+
+****************** End of Dependence Graph ******************

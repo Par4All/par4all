@@ -1,0 +1,27 @@
+
+POINTS-TO
+
+//  {}
+void lhs05()
+{
+//  {}
+   int x;
+//  {}
+
+   *&x = 1;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void lhs05()
+{
+   int x;
+//             <    is written>: x
+
+   *&x = 1;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

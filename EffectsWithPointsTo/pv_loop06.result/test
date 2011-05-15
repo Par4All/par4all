@@ -1,0 +1,67 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i;
+//  {}
+   int *p, *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int b[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   p = &a[0];
+//  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = &b[0];
+//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+   for(i = 0; i <= 9; i += 1)
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      *p++ = 2**q++;
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int i;
+   int *p, *q;
+   int a[10];
+   int b[10];
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: q
+   q = &b[0];
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      *p++ = 2**q++;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 13 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	11 --> 13 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	10 --> 13 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

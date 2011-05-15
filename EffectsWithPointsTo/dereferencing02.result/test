@@ -1,0 +1,26 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   dereferencing02();
+//  {}
+   return 1;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   dereferencing02();
+   return 1;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

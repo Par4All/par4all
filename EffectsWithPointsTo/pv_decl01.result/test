@@ -1,0 +1,24 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int a;
+//  {}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

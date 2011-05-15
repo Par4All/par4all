@@ -1,0 +1,91 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int a[10];
+//  {}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int i, j;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   i = 3;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   j = 2;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   p = &a[0];
+//  {(p,a[0],-Exact-)}
+   p = p+i;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   p = p+j;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   p = p-i;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   p = p-j;
+//  {(p,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a[10];
+   int *p;
+   int i, j;
+//             <    is written>: i
+   i = 3;
+//             <    is written>: j
+   j = 2;
+//             <    is written>: p
+   p = &a[0];
+//             <    is read   >: i p
+//             <    is written>: p
+   p = p+i;
+//             <    is read   >: j p
+//             <    is written>: p
+   p = p+j;
+//             <    is read   >: i p
+//             <    is written>: p
+   p = p-i;
+//             <    is read   >: j p
+//             <    is written>: p
+   p = p-j;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	12 --> 13 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
+	11 --> 13 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	11 --> 12 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
+	10 --> 13 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	10 --> 12 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	10 --> 11 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
+	09 --> 10 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 13 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	08 --> 11 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	07 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	07 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

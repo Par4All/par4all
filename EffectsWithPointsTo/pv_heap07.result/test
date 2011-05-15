@@ -1,0 +1,66 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *p, *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int a;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   p = (int *) malloc(2*sizeof(int));
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   p[0] = 0;
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   p[1] = 1;
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = p;
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-Exact-)}
+   free(q);
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *p, *q;
+   int a;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = (int *) malloc(2*sizeof(int));
+//             <    is read   >: p
+//             <    is written>: *HEAP*_l_8[0]
+   p[0] = 0;
+//             <    is read   >: p
+//             <    is written>: *HEAP*_l_8[1]
+   p[1] = 1;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is read   >: q _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(q);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	08 --> 12 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	08 --> 11 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 10 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,55 @@
+
+POINTS-TO
+
+//  {}
+void lhs02()
+{
+//  {}
+   int i = 2;
+//  {}
+   int j = 2;
+//  {}
+
+   *(i>2?&i:&j) = 3;
+//  {}
+
+   j = i>2?i+1:j+2;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void lhs02()
+{
+//             <    is written>: i
+   int i = 2;
+//             <    is written>: j
+   int j = 2;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
+
+   *(i>2?&i:&j) = 3;
+//             <may be read   >: j
+//             <    is read   >: i
+//             <    is written>: j
+
+   j = i>2?i+1:j+2;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 10 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+	06 --> 10 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+		from <j-W-EXACT> to <j-R-MAY>
+	06 --> 08 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	05 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	05 --> 08 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,26 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   mysecond_struct s;
+//  {(s[fs_tp][*],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s[fs_p],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s[fs_pt],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   mysecond_struct s;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

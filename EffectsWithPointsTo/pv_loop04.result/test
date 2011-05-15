@@ -1,0 +1,43 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i;
+//  {}
+   int *p[10];
+//  {}
+   int a[10];
+//  {}
+
+   for(i = 0; i <= 9; i += 1)
+//  {(p[i],a[i],-MAY-)}
+      p[i] = &a[i];
+//  {(p[i],a[i],-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int i;
+   int *p[10];
+   int a[10];
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: p[i]
+      p[i] = &a[i];
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	09 --> 09 with conflicts
+		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,103 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i;
+//  {}
+   int *p, *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int b[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   p = &a[0];
+//  {(p,a[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = &b[0];
+//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+   i = 0;
+//  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
+   while (i<10) {
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      *p++ = 2**q++;
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      i++;
+   }
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int i;
+   int *p, *q;
+   int a[10];
+   int b[10];
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: q
+   q = &b[0];
+//             <    is written>: i
+   i = 0;
+//             <    is read   >: i
+   while (i<10) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      *p++ = 2**q++;
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	17 --> 17 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	17 --> 16 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	16 --> 17 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
+	16 --> 16 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	14 --> 17 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	14 --> 16 with conflicts
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	13 --> 17 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	13 --> 16 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	13 --> 14 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 16 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	11 --> 16 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+
+****************** End of Dependence Graph ******************

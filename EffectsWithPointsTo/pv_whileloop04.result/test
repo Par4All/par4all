@@ -1,0 +1,68 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i = 0;
+//  {}
+   int *p[10];
+//  {}
+   int a[10];
+//  {}
+
+   while (i<10) {
+//  {(p[i],a[i],-MAY-)}
+      p[i] = &a[i];
+//  {(p[i],a[i],-MAY-)}
+      i++;
+   }
+//  {(p[i],a[i],-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p[10];
+   int a[10];
+//             <    is read   >: i
+
+   while (i<10) {
+//             <    is read   >: i
+//             <    is written>: p[i]
+      p[i] = &a[i];
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	10 --> 10 with conflicts
+		from <p[i]-W-EXACT> to <p[i]-W-EXACT>
+	08 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	04 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

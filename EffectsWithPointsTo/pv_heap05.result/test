@@ -1,0 +1,79 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int ***p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int **q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   int a = 0;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   q = (int **) malloc(sizeof(int *));
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+   q[0] = &a;
+//  {(*HEAP*_l_9,a,-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *HEAP*_l_9,-Exact-)}
+   p = (int ***) malloc(sizeof(int * *));
+//  {(*HEAP*_l_9,a,-Exact-);(p,*HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,
+//   -Exact-)}
+   p[0] = q;
+//  {(*HEAP*_l_11,*HEAP*_l_9,-Exact-);(*HEAP*_l_9,a,-Exact-);(p,
+//   *HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+   free(p);
+//  {(*HEAP*_l_11,*HEAP*_l_9,-Exact-);(*HEAP*_l_9,a,-Exact-);(p,
+//   *HEAP*_l_11,-Exact-);(q,*HEAP*_l_9,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int ***p;
+   int **q;
+//             <    is written>: a
+   int a = 0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+   q = (int **) malloc(sizeof(int *));
+//             <    is read   >: q
+//             <    is written>: *HEAP*_l_9
+   q[0] = &a;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = (int ***) malloc(sizeof(int * *));
+//             <    is read   >: p q
+//             <    is written>: *HEAP*_l_11
+   p[0] = q;
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(p);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 13 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	11 --> 12 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	09 --> 13 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	09 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	09 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	09 --> 10 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+
+****************** End of Dependence Graph ******************

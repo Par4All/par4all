@@ -1,0 +1,24 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   mystruct s;
+//  {}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   mystruct s;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

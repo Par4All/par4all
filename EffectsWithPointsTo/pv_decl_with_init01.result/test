@@ -1,0 +1,28 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int a;
+//  {}
+   int *b = &a;
+//  {(b,a,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a;
+//             <    is written>: b
+   int *b = &a;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

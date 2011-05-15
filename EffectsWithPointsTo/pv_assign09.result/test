@@ -1,0 +1,50 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int *b[10];
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int i = 5;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   a = b[i];
+//  {(a,b[*][0],-Exact-)}
+   b[++i] = a;
+//  {(a,b[*][0],-Exact-);(b[++i],b[*][0],-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *a;
+   int *b[10];
+//             <    is written>: i
+   int i = 5;
+//             <    is read   >: b[i] i
+//             <    is written>: a
+   a = b[i];
+//             <    is read   >: a i
+//             <    is written>: b[++i] i
+   b[++i] = a;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	13 --> 14 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+		from <b[i]-R-EXACT> to <b[++i]-W-EXACT>
+	12 --> 14 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	12 --> 13 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

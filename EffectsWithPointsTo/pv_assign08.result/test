@@ -1,0 +1,24 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   a = foo();
+//  {(a,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *a;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+   a = foo();
+   return 0;
+}

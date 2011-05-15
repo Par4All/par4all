@@ -1,0 +1,34 @@
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   char *end;
+//  {(end,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   long int li;
+//  {(end,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   li = strtol("32445667 is a number", &end, 0);
+//  {(end,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   char *end;
+   long int li;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   li = strtol("32445667 is a number", &end, 0);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

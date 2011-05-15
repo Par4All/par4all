@@ -1,0 +1,40 @@
+
+PROPER  EFFECTS
+
+int main()
+{
+   int **a;
+   int b;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a
+   a[0] = &b;
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int **a;
+   int b;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a
+   a[0] = &b;
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int **a;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int b;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   a[0] = &b;
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,b,-Exact-);(a,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   return 0;
+}
