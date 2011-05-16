@@ -60,6 +60,8 @@ typedef void * vertex_label;
 #include "paf-util.h"
 #include "static_controlize.h"
 
+#define ITEM_NOT_IN_ARRAY -1
+
 /* Global variables */
 static statement_mapping	Gsc_map;
 static statement save_stmt;
