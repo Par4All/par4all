@@ -61,8 +61,6 @@ typedef void * vertex_label;
 #include "accel-util.h"
 #include "callgraph.h"
 
-#define ITEM_NOT_IN_ARRAY -1
-
 
 static string pragma_begin;
 static string pragma_end;
@@ -91,7 +89,7 @@ static bool outlining_scop(sequence s)
 	  lists_to_outline = gen_nreverse(lists_to_outline);
 	  /*Outline SCoPs
 	   */ 
-	  (void )outliner(build_new_top_level_module_name(get_string_property("Function_Prefix"), false), lists_to_outline);
+	  outliner(build_new_top_level_module_name(get_string_property("SCOP_PREFIX"), false), lists_to_outline);
 	  return TRUE;
 	}
     }
@@ -137,8 +135,8 @@ bool scop_outliner(char * module_name)
   module_stat = get_current_module_statement();
   set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE)); 
 
-  pragma_begin = get_string_property("Pragma_Begin");
-  pragma_end = get_string_property("Pragma_End");
+  pragma_begin = get_string_property("PRAGMA_BEGIN");
+  pragma_end = get_string_property("PRAGMA_END");
    
   begin= FALSE;
   gen_recurse(module_stat, sequence_domain/*pragma_domain*/, outlining_scop , gen_null);

@@ -1731,6 +1731,7 @@ c_parser                        > MODULE.parsed_code
         < COMPILATION_UNIT.declarations
 \end{PipsMake}
 
+\begin{PipsPass}{c_parser}
 If you want to parse some C code using \texttt{tpips}, it is possible to
 select the C parser with
 \begin{alltt}
@@ -1745,6 +1746,7 @@ PRETTYPRINT_C_CODE TRUE
 PRETTYPRINT_STATEMENT_NUMBER FALSE
 PRETTYPRINT_BLOCK_IF_ONLY TRUE
 \end{alltt}
+\end{PipsPass}
 
 \begin{PipsPass}{c_symbol_table}
 A prettyprint of the symbol table for a C module can be generated with
@@ -14491,15 +14493,15 @@ scop_outliner      >     MODULE.code
 
 
 For the outlinig of the control static parts, function prefix names to be used during the generation:
-\begin{PipsProp}{PoCC_PREFIX}
-Function_Prefix "SCoP"
+\begin{PipsProp}{SCOP_PREFIX}
+SCOP_PREFIX "SCoP"
 \end{PipsProp}
 To generalize the outlining for any pragmas: begin \& end we use that properties:
-\begin{PipsProp}{Pragma_Begin}
-Pragma_Begin "scop"
+\begin{PipsProp}{PRAGMA_BEGIN}
+PRAGMA_BEGIN "scop"
 \end{PipsProp}
-\begin{PipsProp}{Pragma_End}
-Pragma_End "endscop"
+\begin{PipsProp}{PRAGMA_END}
+PRAGMA_END "endscop"
 \end{PipsProp}
 because of differences in definitions of static control part in pips
 and in pocc (for example, there is no function call in a static
