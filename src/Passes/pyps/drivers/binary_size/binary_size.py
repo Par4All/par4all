@@ -8,7 +8,7 @@ def binary_size(module, maker = pyps.Maker()):
 
     A call to the binary_size function of a given module attempts to compile the program and then to extract the compiled size and the instruction count of the given module using objdump.  The compiled size and the instruction count are returned by the function in a tuple. A ValueError exception is thrown if the function is not found in the binary (see below). A RuntimeError is thrown when the objdump call failed.
 
-    Be careful. The symbol used by the compiler in the binary object for the given module must be guessed by the binary_size function. Given a function “foo”, the symbol can be “foo”, “foo.”, “_foo” or many others forms, thus we cannot ensure that this function will work in every situations. A wrong guess can lead to a ValueError exception or in a few cases to wrongs results."""
+    Be careful. The symbol used by the compiler in the binary object for the given module must be guessed by the binary_size function. Given a function "foo", the symbol can be "foo", "foo.", "_foo" or many others forms, thus we cannot ensure that this function will work in every situations. A wrong guess can lead to a ValueError exception or in a few cases to wrongs results."""
     outfile= module.workspace.compile(maker=maker, CFLAGS="-O2") # we should strip it instead
     
     ret =__funcsize(module.name, outfile)
