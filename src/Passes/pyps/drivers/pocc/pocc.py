@@ -51,6 +51,3 @@ pyps.modules.poccify = poccify
 
 
 
-class workspace(pyps.workspace):
-    ''' This is a workspace for interacting with pocc '''
-    
