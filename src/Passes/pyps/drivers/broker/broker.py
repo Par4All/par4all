@@ -13,11 +13,11 @@ class workspace(pyps.workspace):
     and fetch missing module using brokers, it'll also record stub file given to 
     PIPS and interact with Maker for a proper compilation """ 
     
-    # Record which files where given to pips as stub file
-    stub_files = []
     
     
     def __init__(self, *sources, **kwargs):
+        # Record which files where given to pips as stub file
+        self.stub_files = []
 
         # Brokers have been initialized by the user
         self.brokers=kwargs.get("brokers",None)
@@ -41,9 +41,11 @@ class workspace(pyps.workspace):
 
 class brokers(object):
 
-    # list of loaded brokers
-    brokers = []
-    stub_files = []
+    def __init__(self):
+        # list of loaded brokers
+        self.brokers = []
+        self.stub_files = []
+
 
     def load_brokers_from_list(self,brokers_list):
         for broker_name in brokers_list:

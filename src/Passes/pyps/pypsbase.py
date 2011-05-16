@@ -253,10 +253,6 @@ class workspace(object):
        files and provides methods to manipulate them.
         """
 
-    __checkpoints=[]
-    __modules={}
-    __sources=[]
-    log_buffer=False
 
     def __init__(self, *sources, **kwargs):
         """init a workspace from sources
@@ -276,6 +272,12 @@ class workspace(object):
         self.recoverInclude     = kwargs.setdefault("recoverInclude", True)
         self.deleteOnClose      = kwargs.setdefault("deleteOnClose",  False)
         deleteOnCreate          = kwargs.setdefault("deleteOnCreate",  False)
+
+        # init some values
+        self.__checkpoints=[]
+        self.__modules={}
+        self.__sources=[]
+        self.log_buffer=False
 
         # initialize calls
         self.cpypips.verbose(int(self.verbose))
@@ -302,7 +304,7 @@ class workspace(object):
 
         # setup some inner objects
         self.props = workspace.props(self)
-        self.fun = workspace.fun(self)
+        self.fun = workspace.Fun(self)
         self.cu = workspace.cu(self)
         self.__recover_include_dir = None # holds tmp dir for include recovery
 
@@ -392,6 +394,7 @@ class workspace(object):
         """ update workspace module list """
         def info(ws,topic):
             return ws.cpypips.info(topic).split()
+        self.__modules=dict() # reinit the dictionary to remove old state
         for m in info(self,"modules"):
             self.__modules[m]=module(self,m,self.__sources[0])
     
@@ -633,11 +636,11 @@ class workspace(object):
             return module_name in self.__cuDict()
 
 
-    class fun(object):
+    class Fun(object):
         '''Allow user to access a module by writing w.fun.modulename'''
         def __init__(self, wp):
-            self.__dict__['_fun__wp'] = wp
-            self.__dict__['_fun__functionDict'] = self.__functionDict
+            self.__dict__['_Fun__wp'] = wp
+            self.__dict__['_Fun__functionDict'] = self.__functionDict
 
         def __setattr__(self, name, val):
             raise AttributeError("Module assignment is not allowed.")

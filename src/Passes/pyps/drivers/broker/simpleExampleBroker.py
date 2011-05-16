@@ -6,11 +6,11 @@ class simpleExampleBroker(simpleStubBroker):
     using simpleStubBroker class, which imply that it is located in a file name
     simpleExampleDynamicLoadedFunction.c """
 
-    __lookupDirs = []
     def __init__(self):
         super(simpleExampleBroker,self).__init__()
         
         # initialize lookup dir, which is a subdir install dir of this broker
+        self.__lookupDirs = []
         self.__lookupDirs.append(os.path.join(pypsconfig.pypsruntime,"broker",self.__class__.__name__,"stub"))
         
     def get_broker_dirs(self):
