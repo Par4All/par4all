@@ -8,11 +8,14 @@ def poccify(self,**props):
     them in separated functions, pass pocc (polycc) on it, and get it back in 
     PIPS'''
 
-    # Find scop and print pragma
+    # Static control detection must be done specially for pocc (no function call)
+    self.static_controlize(pocc_compatibility=True)
+
+    # Print pragmas
     self.pocc_prettyprinter()
 
-    # outline scop in new modules
-    self.scop_outliner(SCOP_PREFIX="PYPS_SCOP")
+    # Outline scop parts in new modules
+    self.scop_outliner(scop_prefix="PYPS_SCOP")
     
     # FIXME should only poccify previously outlined modules !! 
     # need work on pips side
@@ -31,7 +34,6 @@ def poccify(self,**props):
         basename, extension = os.path.splitext(code_rc)
         pocc_file = basename + ".par" + extension
         p = subprocess.call("grep -v '^#include' %s | grep -v '^#define' | grep -v '^/\*' > %s" % (pocc_file,code_rc),shell=True)
-        p = subprocess.call("cat %s" % (code_rc),shell=True)
         
         # Inline back the result
         m.inlining()
