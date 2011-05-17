@@ -1,4 +1,62 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: b
+   int b = 1;
+//             <    is written>: i
+   int i = 10;
+//             <    is read   >: b i
+//             <    is written>: b
+
+   b = b+i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b*i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b/i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b&i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b^i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b = b|i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b += i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b *= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b /= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b -= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b &= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b |= i;
+//             <    is read   >: b i
+//             <    is written>: b
+   b ^= i;
+//             <    is read   >: b
+//             <    is written>: b
+   b++;
+//             <    is read   >: b
+//             <    is written>: b
+   b--;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

@@ -1,4 +1,14 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   char *s;
+//             <    is written>: s
+   s = "hello\n";
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

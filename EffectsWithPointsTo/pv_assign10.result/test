@@ -1,4 +1,47 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   my_list l1, l2, l3, l4;
+   my_list *l;
+//             <    is written>: l1.n
+
+   l1.n = 1;
+//             <    is written>: l2.n
+   l2.n = 2;
+//             <    is written>: l3.n
+   l3.n = 3;
+//             <    is written>: l4.n
+   l4.n = 4;
+//             <    is written>: l1.next
+   l1.next = &l2;
+//             <    is read   >: NULL
+//             <    is written>: l2.next
+   l2.next = (my_list) NULL;
+//             <    is read   >: NULL
+//             <    is written>: l3.next
+   l3.next = (my_list) NULL;
+//             <    is read   >: NULL
+//             <    is written>: l4.next
+   l4.next = (my_list) NULL;
+//             <    is written>: l
+
+   l = &l1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: l
+   l = l->next;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: l l3.n l3.next
+   *l = l3;
+//             <    is written>: l
+   l = &l4;
+//             <    is read   >: NULL
+//             <    is written>: l3.next
+   l3.next = (my_list) NULL;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

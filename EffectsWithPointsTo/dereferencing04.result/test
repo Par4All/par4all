@@ -1,4 +1,16 @@
 
+PROPER  EFFECTS 
+
+void dereferencing04()
+{
+   double *p;
+   double *q;
+   double *r;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p q r
+   *(p+q-r) = 0.;
+}
+
 POINTS-TO
 
 //  {}

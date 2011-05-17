@@ -1,4 +1,14 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int a;
+//             <    is written>: b
+   int *b = &a;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

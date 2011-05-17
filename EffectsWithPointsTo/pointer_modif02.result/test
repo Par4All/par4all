@@ -1,4 +1,23 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p, *q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   foo(&q, p);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   *q = 2;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

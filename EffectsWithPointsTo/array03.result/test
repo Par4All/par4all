@@ -1,4 +1,23 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   float a[5][3], ret;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   ret = foo(a);
+//             <    is read   >: a[0][3] a[1][3]
+//             <    is written>: a[0][3] a[1][3] ret
+   ret = foo2(a);
+//             <    is read   >: d[0][3] d[1][3]
+//             <    is written>: d[0][3] d[1][3] ret
+   ret = foo3();
+
+   return 1;
+}
+
 POINTS-TO
 
 //  {}

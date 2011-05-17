@@ -1,4 +1,32 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int **x, *x1, x2, *y, y1;
+//             <    is written>: x2
+   x2 = 0;
+//             <    is written>: y1
+   y1 = 1;
+//             <    is written>: x1
+   x1 = &x2;
+//             <    is read   >: true
+
+   if (true) {
+//             <    is written>: x
+
+      x = &x1;
+//             <    is written>: y
+      y = &y1;
+   }
+   else
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: x
+      *x = &y;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

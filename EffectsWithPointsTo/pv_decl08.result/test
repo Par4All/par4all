@@ -1,4 +1,12 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   mysecond_struct s;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

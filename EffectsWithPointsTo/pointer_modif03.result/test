@@ -1,4 +1,29 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   s_t s;
+   int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   s = make_s(1, 2.);
+//             <    is written>: s.entier
+   s.entier = 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   j = make_s(1, 2.).entier;
+//             <    is read   >: j
+
+   return j;
+}
+
 POINTS-TO
 
 //  {}

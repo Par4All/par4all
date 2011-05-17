@@ -1,4 +1,13 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: pi q
+   call03();
+}
+
 POINTS-TO
 
 //  {}

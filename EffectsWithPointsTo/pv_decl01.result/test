@@ -1,4 +1,12 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int a;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

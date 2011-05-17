@@ -1,4 +1,23 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   float *p;
+   float a[10];
+   int i;
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i
+   while (i<10) {
+//             <    is read   >: i
+//             <    is written>: p
+      p = &a[i];
+   }
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

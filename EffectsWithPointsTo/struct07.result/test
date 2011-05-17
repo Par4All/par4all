@@ -1,4 +1,28 @@
 
+PROPER  EFFECTS 
+
+void struct07()
+{
+   extern complex imagein[256][256], imageout[256][256];
+   int i, j, k, l;
+   float z1, z2;
+   float x[256][256];
+//             <    is written>: k
+
+   for(k = 0; k <= 255; k += 1)
+//             <    is read   >: k z1
+//             <    is written>: imageout[k][1].re
+      imageout[k][1].re = z1;
+//             <    is written>: i
+
+   for(i = 0; i <= 255; i += 1)
+//             <    is written>: j
+      for(j = 0; j <= 255; j += 1)
+//             <    is read   >: i j
+//             <    is written>: x[i][j]
+         x[i][j] = 0.;
+}
+
 POINTS-TO
 
 //  {}

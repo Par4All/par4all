@@ -1,4 +1,29 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i j k l
+   int i = 0, j = 1, k = 2, l = 3;
+   int *p, *q, *r, *s, *t;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is written>: s
+   s = &k;
+//             <    is read   >: s
+//             <    is written>: p r
+   /* we treat this instruction as:
+        r = &j;
+        r = s;
+        p = r;
+     */
+   p = (r = &j, r = s);
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

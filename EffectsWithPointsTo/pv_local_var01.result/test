@@ -1,4 +1,28 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 3;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+
+   if (i>1) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+//             <    is written>: i
+      i = 0;
+   }
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

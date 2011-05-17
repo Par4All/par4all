@@ -1,4 +1,38 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   mystruct s1, s2, *s1p, *s2p;
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: k
+   int k = 3;
+//             <    is written>: s1p
+
+   s1p = &s1;
+//             <    is written>: s2p
+   s2p = &s1;
+//             <    is written>: s1.a
+
+   s1.a = &i;
+//             <    is written>: s2.a
+   s2.a = &j;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1p s2.a
+
+   s1p->a = s2.a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s2p
+   s2p->a = &k;
+//             <    is written>: s2p
+
+   s2p = &s2;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

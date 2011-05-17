@@ -1,4 +1,20 @@
 
+PROPER  EFFECTS 
+
+int main(int argc, char *argv[])
+{
+   int t;
+//             <    is written>: t
+   
+   
+   for(t = 0; t <= 63; t += 1)
+//             <may be written>: tab[*][*]
+      compute();
+   
+   
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

@@ -1,4 +1,39 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int ****p, ***p_1, **p_2, *p_3;
+   int i, j;
+   int ***q_1, **q_2, *q_3;
+//             <    is written>: i
+   i = 0;
+//             <    is written>: j
+   j = 1;
+//             <    is written>: p_3
+   p_3 = &i;
+//             <    is written>: q_3
+   q_3 = &j;
+//             <    is written>: p_2
+   p_2 = &p_3;
+//             <    is written>: q_2
+   q_2 = &q_3;
+//             <    is written>: p_1
+   p_1 = &p_2;
+//             <    is written>: q_1
+   q_1 = &q_2;
+//             <    is written>: p
+   p = &p_1;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   ***p = q_3;
+   
+   
+   
+   
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

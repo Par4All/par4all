@@ -1,4 +1,32 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p, *q, *r;
+   int a, b, c;
+//             <    is written>: p
+
+   p = &a;
+//             <    is written>: q
+   q = &b;
+//             <    is read   >: q
+//             <    is written>: r
+
+   r = q;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is read   >: r
+//             <    is written>: p
+   p = r;
+//             <    is read   >: NULL
+//             <    is written>: r
+   r = (int *) NULL;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

@@ -1,4 +1,14 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   dereferencing02();
+   return 1;
+}
+
 POINTS-TO
 
 //  {}

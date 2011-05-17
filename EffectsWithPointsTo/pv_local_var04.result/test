@@ -1,4 +1,31 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is read   >: a
+
+   if (a>1) {
+      static int *p = &a;
+      static int *q;
+//             <    is written>: q
+      q = &b;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a-1;
+   }
+   else {
+      static int *r = &a;
+      static int *s;
+//             <    is written>: s
+      s = &b;
+//             <    is read   >: a
+//             <    is written>: a
+      a = a+2;
+   }
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

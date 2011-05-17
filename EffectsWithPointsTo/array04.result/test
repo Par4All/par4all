@@ -1,4 +1,63 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int t[100][10][3];
+
+   int (*p)[3];
+   int *pu;
+
+   int (*q)[10][3];
+   int (*qu)[3];
+
+   int (*r)[100][10][3];
+   int (*ru)[10][3];
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+
+   printf("sizeof(t) = %zd\n", sizeof(t));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1]) = %zd\n", sizeof(t[1]));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1][2]) = %zd\n", sizeof(t[1][2]));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("sizeof(t[1][2][3]) = %zd\n", sizeof(t[1][2][3]));
+//             <    is written>: p
+
+   p = &t[1][2];
+//             <    is written>: pu
+   pu = t[1][2];
+//             <    is written>: pu
+   pu = &t[1][2][0];
+//             <    is written>: q
+
+   q = &t[1];
+//             <    is written>: qu
+   qu = t[1];
+//             <    is written>: qu
+   qu = &t[1][0];
+//             <    is written>: r
+
+   r = &t;
+//             <    is written>: ru
+   ru = t;
+//             <    is written>: ru
+   ru = &t[0];
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

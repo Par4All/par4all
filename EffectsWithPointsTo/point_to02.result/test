@@ -1,4 +1,21 @@
 
+PROPER  EFFECTS 
+
+void point_to02()
+{
+   struct s {
+      int a;
+      int b[10];
+   } c, *p;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   p->a = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   (p->b)[2] = 3;
+}
+
 POINTS-TO
 
 //  {}

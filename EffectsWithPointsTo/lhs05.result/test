@@ -1,4 +1,14 @@
 
+PROPER  EFFECTS 
+
+void lhs05()
+{
+   int x;
+//             <    is written>: x
+
+   *&x = 1;
+}
+
 POINTS-TO
 
 //  {}

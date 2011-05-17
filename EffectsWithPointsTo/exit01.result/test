@@ -1,4 +1,18 @@
 
+PROPER  EFFECTS 
+
+void exit01()
+{
+   int i;
+   int *j;
+//             <    is written>: j
+
+   j = &i;
+   exit(0);
+//             <    is written>: i
+   i = 2;
+}
+
 POINTS-TO
 
 //  {}

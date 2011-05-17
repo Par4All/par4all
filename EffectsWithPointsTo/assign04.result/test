@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS 
 
 void assign04()
 {
@@ -20,6 +20,11 @@ void assign04()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    ***p = 0;
 }
+/* To be out of Emami's patterns */
+
+void assign04();
+
+void foo();
 void foo()
 {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
@@ -27,14 +32,7 @@ void foo()
    assign04();
 }
 
-PROPER POINTER EFFECTS
-
-void foo()
-{
-   assign04();
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 void assign04()
@@ -67,8 +65,54 @@ void assign04()
    ***p = 0;
 }
 //  {}
+/* To be out of Emami's patterns */
+
+//  {}
+void assign04();
+
+//  {}
+void foo();
+//  {}
 void foo()
 {
 //  {}
    assign04();
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
+void assign04()
+{
+   int ***p;
+   int **q;
+   int *r;
+   int i;
+//             <    is written>: r
+
+   r = &i;
+//             <    is written>: p
+   //q = &r;
+   p = &q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p q r
+   **p = r;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   ***p = 0;
+}
+/* To be out of Emami's patterns */
+
+void assign04();
+
+void foo();
+void foo()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   assign04();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

@@ -1,4 +1,24 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p, *q;
+//             <    is written>: a
+   int a = 1;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   p = (int *) malloc(2*sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: q _MALLOC_EFFECTS:_MALLOC_
+   q = (int *) malloc(2*sizeof(int));
+//             <may be read   >: p q
+//             <    is read   >: a _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+   free(a==0?p:q);
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

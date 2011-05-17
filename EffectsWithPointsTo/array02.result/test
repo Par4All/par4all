@@ -1,4 +1,18 @@
 
+PROPER  EFFECTS 
+
+void array02()
+{
+   float x[11][2];
+   int i;
+//             <    is written>: i
+
+   for(i = 1; i <= 9; i += 1)
+//             <    is read   >: i
+//             <    is written>: x[i][1]
+      x[i][1] = 0.;
+}
+
 POINTS-TO
 
 //  {}

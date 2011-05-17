@@ -1,89 +1,126 @@
 
+PROPER  EFFECTS 
+
+int ptr_to_field()
+{
+   typedef struct {
+      int *q;
+      int *p;
+   } my_str;
+
+   my_str *m, *n;
+//             <    is written>: i j
+   int i = 0, j = 1;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+   m = (my_str *) malloc(sizeof(my_str));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
+   n = (my_str *) malloc(sizeof(my_str));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: m
+   m->q = &i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: m
+   m->p = &j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   n->q = m->p;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   n->p = m->q;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int ptr_to_field()
 {
 //  {}
-   typedef struct {                                                     /*0008*/
+   typedef struct {
       int *q;
       int *p;
    } my_str;
 
 //  {(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   my_str *m, *n;                                                       /*0010*/
+   my_str *m, *n;
 //  {(m,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(my_str[p],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b1,
 //   -Exact-)}
-   int i = 0, j = 1;                                                    /*0011*/
+   int i = 0, j = 1;
 //  {(m,*ANY_MODULE*:*NOWHERE*_b1,-Exact-);(my_str[p],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*ANY_MODULE*:*NOWHERE*_b1,
 //   -Exact-)}
-   m = (my_str *) malloc(sizeof(my_str));                               /*0012*/
+   m = (my_str *) malloc(sizeof(my_str));
 //  {(m,*HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   n = (my_str *) malloc(sizeof(my_str));                               /*0013*/
+   n = (my_str *) malloc(sizeof(my_str));
 //  {(m,*HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
 //   *HEAP*_l_13,-Exact-)}
-   m->q = &i;                                                           /*0014*/
+   m->q = &i;
 //  {(*HEAP*_l_12[q],i,-Exact-);(m,*HEAP*_l_12,-Exact-);(my_str[p],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*HEAP*_l_13,-Exact-)}
-   m->p = &j;                                                           /*0015*/
+   m->p = &j;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,-Exact-);(m,
 //   *HEAP*_l_12,-Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
 //   *HEAP*_l_13,-Exact-)}
-   n->q = m->p;                                                         /*0016*/
+   n->q = m->p;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,
 //   -Exact-);(*HEAP*_l_13[q],j,-Exact-);(m,*HEAP*_l_12,
 //   -Exact-);(my_str[p],*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(my_str[q],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,
 //   *HEAP*_l_13,-Exact-)}
-   n->p = m->q;                                                         /*0017*/
+   n->p = m->q;
 //  {(*HEAP*_l_12[p],j,-Exact-);(*HEAP*_l_12[q],i,
 //   -Exact-);(*HEAP*_l_13[p],i,-Exact-);(*HEAP*_l_13[q],j,
 //   -Exact-);(m,*HEAP*_l_12,-Exact-);(my_str[p],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(my_str[q],
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(n,*HEAP*_l_13,-Exact-)}
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
 int ptr_to_field()
 {
-   typedef struct {                                                     /*0008*/
+   typedef struct {
       int *q;
       int *p;
    } my_str;
 
-   my_str *m, *n;                                                       /*0010*/
+   my_str *m, *n;
 //             <    is written>: i j
-   int i = 0, j = 1;                                                    /*0011*/
+   int i = 0, j = 1;
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
-   m = (my_str *) malloc(sizeof(my_str));                               /*0012*/
+   m = (my_str *) malloc(sizeof(my_str));
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
 //             <    is written>: n _MALLOC_EFFECTS:_MALLOC_
-   n = (my_str *) malloc(sizeof(my_str));                               /*0013*/
+   n = (my_str *) malloc(sizeof(my_str));
 //             <    is read   >: m
 //             <    is written>: *HEAP*_l_12.q
-   m->q = &i;                                                           /*0014*/
+   m->q = &i;
 //             <    is read   >: m
 //             <    is written>: *HEAP*_l_12.p
-   m->p = &j;                                                           /*0015*/
+   m->p = &j;
 //             <    is read   >: *HEAP*_l_12.p m n
 //             <    is written>: *HEAP*_l_13.q
-   n->q = m->p;                                                         /*0016*/
+   n->q = m->p;
 //             <    is read   >: *HEAP*_l_12.q m n
 //             <    is written>: *HEAP*_l_13.p
-   n->p = m->q;                                                         /*0017*/
+   n->p = m->q;
 
-   return 0;                                                            /*0019*/
+   return 0;
 }
 
  *********************** Use-Def Chains *********************

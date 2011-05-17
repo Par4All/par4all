@@ -1,4 +1,25 @@
 
+PROPER  EFFECTS 
+
+float main(int argc, char *argv[])
+{
+   int i, j, k;
+//             <    is written>: i
+
+   for(i = 0; i <= 8; i += 1)
+//             <    is written>: j
+      for(j = 0; j <= 8; j += 1) {
+//             <    is read   >: i j
+//             <    is written>: imagein[i][j].re
+         imagein[i][j].re = 0.0;
+//             <    is read   >: i j
+//             <    is written>: imagein[i][j].im
+         imagein[i][j].im = 0.0;
+      }
+//             <    is read   >: imagein[2][1].re
+   return imagein[2][1].re;
+}
+
 POINTS-TO
 
 //  {}

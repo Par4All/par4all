@@ -1,4 +1,19 @@
 
+PROPER  EFFECTS 
+
+void point_to03()
+{
+   typedef double a_t[10][20];
+   a_t a;
+   a_t *p;
+//             <    is written>: p
+
+   p = &a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   ((*p)[2])[3] = 1.5;
+}
+
 POINTS-TO
 
 //  {}

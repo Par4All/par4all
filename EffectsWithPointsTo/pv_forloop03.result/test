@@ -1,4 +1,30 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   float *a, *p;
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+
+   a = (float *) malloc(10*sizeof(float));
+//             <    is read   >: a
+//             <    is written>: i p
+
+   p = a, i = 0;
+//             <    is read   >: i
+   while (i<10) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+      *p = 1.0;
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+   }
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

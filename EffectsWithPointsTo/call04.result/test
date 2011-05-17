@@ -1,4 +1,19 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: d1
+   int d1 = 10;
+//             <    is written>: d2
+   int d2 = 10;
+   int y[d1][d2];
+//             <may be written>: y[*][*]
+//             <    is read   >: d1 d2
+
+   call04(d1, d2, y);
+}
+
 POINTS-TO
 
 //  {}

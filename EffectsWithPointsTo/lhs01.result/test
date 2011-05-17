@@ -1,4 +1,12 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   lhs01();
+}
+
 POINTS-TO
 
 //  {}

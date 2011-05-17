@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS 
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
@@ -7,6 +7,9 @@ void call16(int _i, int *_a, int *_b, int *_c)
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    _a[_i] = _b[_i]+_c[_i];
 }
+void call16(int _i, int *_a, int *_b, int *_c);
+
+void dotprod(int *a, int *b, int *c);
 void dotprod(int *a, int *b, int *c)
 {
    int i;
@@ -20,15 +23,54 @@ void dotprod(int *a, int *b, int *c)
    return;
 }
 
-PROPER POINTER EFFECTS
+POINTS-TO
 
+//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
+//   -Exact-)}
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
+//   -Exact-)}
+   _a[_i] = _b[_i]+_c[_i];
+}
+//  {}
+//  {}
+void call16(int _i, int *_a, int *_b, int *_c);
+
+//  {}
+void dotprod(int *a, int *b, int *c);
+//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+void dotprod(int *a, int *b, int *c)
+{
+//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+   int i;
+//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+   for(i = 0; i <= 999999; i += 1)
+//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+      call16(i, a, b, c);
+//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
+   
+   
+   return;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void call16(int _i, int *_a, int *_b, int *_c)
+{
+//             <    is read   >: _a _b _c _i __b_2[0+_i] __c_3[0+_i]
+//             <    is written>: __a_1[0+_i]
+   _a[_i] = _b[_i]+_c[_i];
+}
+void call16(int _i, int *_a, int *_b, int *_c);
+
+void dotprod(int *a, int *b, int *c);
 void dotprod(int *a, int *b, int *c)
 {
    int i;
 //             <    is written>: i
    for(i = 0; i <= 999999; i += 1)
-//             <may be read   >: b[*] c[*]
-//             <may be written>: a[*]
+//             <may be read   >: _a_4[*] _b_5[*]
 //             <    is read   >: a b c i
       call16(i, a, b, c);
    
@@ -36,27 +78,7 @@ void dotprod(int *a, int *b, int *c)
    return;
 }
 
-POINTS TO
+ *********************** Use-Def Chains *********************
 
-//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
-//   -Exact-)}
-void call16(int _i, int *_a, int *_b, int *_c)
-{
-//  {(_a,__a_1[0],-Exact-);(_b,__b_2[0],-Exact-);(_c,__c_3[0],
-//   -Exact-)}
-   _a[_i] = _b[_i]+_c[_i];
-}
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
-void dotprod(int *a, int *b, int *c)
-{
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
-   int i;
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
-   for(i = 0; i <= 999999; i += 1)
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
-      call16(i, a, b, c);
-//  {(a,_a_4[0],-Exact-);(b,_b_5[0],-Exact-);(c,_c_6[0],-Exact-)}
-   
-   
-   return;
-}
+
+****************** End of Dependence Graph ******************

@@ -1,4 +1,16 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+
+   call09(s.one, sp->one);
+}
+
 POINTS-TO
 
 //  {}

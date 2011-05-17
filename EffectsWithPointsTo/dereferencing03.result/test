@@ -1,4 +1,19 @@
 
+PROPER  EFFECTS 
+
+void dereferencing03()
+{
+   double *p;
+   int i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *(p+1) = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i p
+   *(p+i) = 0.;
+}
+
 POINTS-TO
 
 //  {}

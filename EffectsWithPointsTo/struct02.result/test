@@ -1,4 +1,35 @@
 
+PROPER  EFFECTS 
+
+int struct02()
+{
+   struct two {
+      int first;
+      int second;
+   } x[10];
+//             <    is written>: i
+   int i = 0;
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1)
+      if (1) {
+//             <    is read   >: i
+//             <    is written>: x[i].first
+         x[i].first = 1;
+//             <    is read   >: i
+//             <    is written>: x[i].second
+         x[i].second = 0;
+      }
+      else {
+//             <    is read   >: i
+//             <    is written>: x[i].first
+         x[i].first = 0;
+//             <    is read   >: i
+//             <    is written>: x[i].second
+         x[i].second = 1;
+      }
+}
+
 POINTS-TO
 
 //  {}

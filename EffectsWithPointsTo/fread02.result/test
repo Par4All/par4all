@@ -1,4 +1,34 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   FILE *fp;
+   size_t n;
+   char buf[200];
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fp
+   fp = fopen("file.txt", "rb");
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   n = fread(&buf[0], sizeof(double), 50, fp);
+//             <    is read   >: n
+   if (n==-1)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      printf("fread failed");
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   fclose(fp);
+}
+
 POINTS-TO
 
 //  {}

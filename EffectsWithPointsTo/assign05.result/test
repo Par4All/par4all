@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS 
 
 void assign05()
 {
@@ -15,6 +15,13 @@ void assign05()
 //             <    is read   >: r
    *r = 0;
 }
+/* To be out of Emami's patterns with a user call */
+
+int *bar(int j);
+
+void assign05();
+
+void foo();
 int * bar(int j)
 {
    return &j;
@@ -25,14 +32,7 @@ void foo()
    assign05();
 }
 
-PROPER POINTER EFFECTS
-
-void foo()
-{
-   assign05();
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 void assign05()
@@ -50,6 +50,17 @@ void assign05()
    *r = 0;
 }
 //  {}
+/* To be out of Emami's patterns with a user call */
+
+//  {}
+int *bar(int j);
+
+//  {}
+void assign05();
+
+//  {}
+void foo();
+//  {}
 int * bar(int j)
 {
 //  {}
@@ -61,3 +72,41 @@ void foo()
 //  {}
    assign05();
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
+void assign05()
+{
+   int *r;
+   int i;
+//             <    is read   >: i
+//             <    is written>: r
+
+   r = bar(i);
+//             <    is written>: i
+   i = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: r
+   *r = 0;
+}
+/* To be out of Emami's patterns with a user call */
+
+int *bar(int j);
+
+void assign05();
+
+void foo();
+int * bar(int j)
+{
+   return &j;
+}
+void foo()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   assign05();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

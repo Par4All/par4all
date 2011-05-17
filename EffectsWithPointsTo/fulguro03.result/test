@@ -1,4 +1,44 @@
 
+PROPER  EFFECTS 
+
+void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Vector *vct)
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: array_s
+   fgUINT16 *array_s = (fgUINT16 *) vct->array;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: array_d
+   fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: I_0
+   int I_0 = vct->spp;
+   {
+      register fgUINT16 val;
+      register int i;
+      register int k;
+      unsigned short _return0;
+//             <    is read   >: I_0 col
+//             <    is written>: i
+      i = col*I_0;
+//             <    is read   >: I_0
+//             <    is written>: k
+      for(k = 0; k <= I_0-1; k += 1) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: _return0
+         _return0 = array_s[k];
+//             <    is read   >: I_0 _return0
+//             <    is written>: val
+         val = _return0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: I_0 array_d i val
+         array_d[i] = val;
+//             <    is read   >: I_0 i
+//             <    is written>: i
+         i++;
+      }
+   }
+}
+
 POINTS-TO
 
 //  {(dat,_dat_1[0],-Exact-);(vct,_vct_2[0],-Exact-)}

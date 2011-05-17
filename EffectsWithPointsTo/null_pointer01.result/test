@@ -1,41 +1,64 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int i;
+//             <    is written>: p
+   int *p = 0;
+//             <    is written>: q
+   int **q = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   *q = &i;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
 //  {}
-   int i;                                                               /*0006*/
+   int i;
 //  {}
-   int *p = 0;                                                          /*0007*/
+   int *p = 0;
 //  {(p,*NULL_POINTER*,-Exact-)}
-   int **q = 0;                                                         /*0008*/
+   int **q = 0;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
 
-   *p = 1;                                                              /*0010*/
+   *p = 1;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
-   *q = &i;                                                             /*0011*/
+   *q = &i;
 //  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
 //   -Exact-);(q,*NULL_POINTER*,-Exact-)}
 
-   return 0;                                                            /*0013*/
+   return 0;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
 int main()
 {
-   int i;                                                               /*0006*/
+   int i;
 //             <    is written>: p
-   int *p = 0;                                                          /*0007*/
+   int *p = 0;
 //             <    is written>: q
-   int **q = 0;                                                         /*0008*/
+   int **q = 0;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
 
-   *p = 1;                                                              /*0010*/
+   *p = 1;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-   *q = &i;                                                             /*0011*/
+   *q = &i;
 
-   return 0;                                                            /*0013*/
+   return 0;
 }
 
  *********************** Use-Def Chains *********************

@@ -1,4 +1,20 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   struct one {
+      int *first;
+   } x;
+   int y[10];
+//             <    is written>: x.first
+
+   x.first = &y[5];
+   
+   
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

@@ -1,4 +1,21 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a;
+   int *b[10];
+//             <    is written>: i
+   int i = 5;
+//             <    is read   >: b[i] i
+//             <    is written>: a
+   a = b[i];
+//             <    is read   >: a i
+//             <    is written>: b[++i] i
+   b[++i] = a;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

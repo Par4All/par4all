@@ -1,5 +1,5 @@
 
-PROPER POINTER EFFECTS
+PROPER  EFFECTS 
 
 int main()
 {
@@ -13,8 +13,8 @@ int main()
    a.p = (int *) malloc(10*sizeof(int));
 //             <    is written>: i
    for(i = 0; i <= 9; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: a.p i
-//             <    is written>: a.p[i]
       (a.p)[i] = i;
 //             <    is read   >: a.p
 //             <    is written>: b.p
@@ -23,24 +23,25 @@ int main()
    b = a;
 //             <    is written>: i
    for(i = 0; i <= 9; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: b.p i
-//             <    is written>: b.p[i]
       (b.p)[i] = i*10;
 //             <    is written>: i
    
    /* definition of e */
    for(i = 0; i <= 4; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: e.champ[i].p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
       (e.champ)[i].p = malloc(10*sizeof(int));
 //             <    is written>: j
       for(j = 0; j <= 9; j += 1)
-//             <    is read   >: e.champ[i].p i j
-//             <    is written>: e.champ[i].p[j]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
          ((e.champ)[i].p)[j] = i+j;
    }
-//             <may be read   >: e.champ[*].p
-//             <may be written>: f.champ[*].p
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
    
    /* definition of f, also modifies e */
    f = e;
@@ -48,8 +49,8 @@ int main()
    for(i = 0; i <= 4; i += 1)
 //             <    is written>: j
       for(j = 0; j <= 9; j += 1)
-//             <    is read   >: f.champ[i].p i j
-//             <    is written>: f.champ[i].p[j]
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
          ((f.champ)[i].p)[j] = i*j;
 
    return 0;
@@ -121,3 +122,264 @@ int main()
 
    return 0;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   s_with_pointer a, b;
+   s_with_array_of_struct_with_pointer e, f;
+   int i, j;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a.p _MALLOC_EFFECTS:_MALLOC_
+   
+   /* definition of a */
+   a.p = (int *) malloc(10*sizeof(int));
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: a.p i
+//             <    is written>: *HEAP*_l_17[0+i]
+      (a.p)[i] = i;
+//             <    is read   >: a.p
+//             <    is written>: b.p
+   
+   /* definition of b */
+   b = a;
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <    is read   >: b.p i
+//             <    is written>: *HEAP*_l_17[0+i]
+      (b.p)[i] = i*10;
+//             <    is written>: i
+   
+   /* definition of e */
+   for(i = 0; i <= 4; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      (e.champ)[i].p = malloc(10*sizeof(int));
+//             <    is written>: j
+      for(j = 0; j <= 9; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         ((e.champ)[i].p)[j] = i+j;
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   
+   /* definition of f, also modifies e */
+   f = e;
+//             <    is written>: i
+   for(i = 0; i <= 4; i += 1)
+//             <    is written>: j
+      for(j = 0; j <= 9; j += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         ((f.champ)[i].p)[j] = i*j;
+
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	38 --> 38 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	38 --> 37 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <j-W-EXACT>
+	37 --> 37 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	35 --> 38 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	35 --> 37 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <j-W-EXACT>
+	35 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
+	31 --> 38 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	31 --> 37 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <j-W-EXACT>
+	31 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <i-W-EXACT>
+	31 --> 35 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	31 --> 31 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	31 --> 30 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <j-W-EXACT>
+	31 --> 29 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	30 --> 37 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	30 --> 35 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	30 --> 30 with conflicts
+		from <j-W-EXACT> to <j-W-EXACT>
+	30 --> 29 with conflicts
+		from <j-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 38 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 37 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+	29 --> 36 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-W-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	29 --> 35 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 31 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	29 --> 30 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <j-W-EXACT>
+	29 --> 29 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	27 --> 36 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	27 --> 35 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	24 --> 38 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <b.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	24 --> 36 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	24 --> 35 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <b.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	24 --> 31 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <b.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	24 --> 29 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <b.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	24 --> 27 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	24 --> 24 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*HEAP*_l_17[0+i]-W-EXACT>
+	23 --> 36 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	23 --> 35 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	23 --> 27 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	22 --> 38 with conflicts
+		from <b.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 35 with conflicts
+		from <b.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 31 with conflicts
+		from <b.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 29 with conflicts
+		from <b.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	22 --> 24 with conflicts
+		from <b.p-W-EXACT> to <b.p-R-EXACT>
+	19 --> 38 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	19 --> 36 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	19 --> 35 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <i-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	19 --> 31 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	19 --> 29 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <a.p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	19 --> 27 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	19 --> 24 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*HEAP*_l_17[0+i]-W-EXACT>
+	19 --> 23 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	19 --> 19 with conflicts
+		from <*HEAP*_l_17[0+i]-W-EXACT> to <*HEAP*_l_17[0+i]-W-EXACT>
+	18 --> 36 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	18 --> 35 with conflicts
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <i-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	18 --> 27 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	18 --> 23 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	17 --> 38 with conflicts
+		from <a.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 35 with conflicts
+		from <a.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 31 with conflicts
+		from <a.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 29 with conflicts
+		from <a.p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	17 --> 22 with conflicts
+		from <a.p-W-EXACT> to <a.p-R-EXACT>
+	17 --> 19 with conflicts
+		from <a.p-W-EXACT> to <a.p-R-EXACT>
+
+****************** End of Dependence Graph ******************

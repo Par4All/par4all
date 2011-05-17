@@ -1,4 +1,14 @@
 
+PROPER  EFFECTS 
+
+void assign01()
+{
+   int i, j;
+//             <    is written>: i j
+
+   i = j = 1;
+}
+
 POINTS-TO
 
 //  {}

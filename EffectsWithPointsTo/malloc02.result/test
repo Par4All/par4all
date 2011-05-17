@@ -1,4 +1,21 @@
 
+PROPER  EFFECTS 
+
+int main(int argc, char *argv[])
+{
+   int *pi;
+   float *px;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: pi _MALLOC_EFFECTS:_MALLOC_
+
+   pi = (int *) malloc(sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: px _MALLOC_EFFECTS:_MALLOC_
+   px = (float *) malloc(sizeof(int));
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

@@ -1,4 +1,25 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int i;
+   int *p, *q;
+   int a[10];
+   int b[10];
+//             <    is written>: p
+
+   p = &a[0];
+//             <    is written>: q
+   q = &b[0];
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      *p++ = 2**q++;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

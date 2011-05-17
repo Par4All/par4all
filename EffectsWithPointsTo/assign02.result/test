@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS 
 
 void assign02()
 {
@@ -24,6 +24,14 @@ void assign02()
    /* But this is OK in rhs */
    j = make_s(1, 2.).entier;
 }
+typedef struct {
+   int entier;
+   float reel;
+} s_t;
+
+s_t make_s(int i, float x);
+
+void assign02();
 s_t make_s(int i, float x)
 {
    s_t *p;
@@ -42,27 +50,7 @@ s_t make_s(int i, float x)
    return *p;
 }
 
-PROPER POINTER EFFECTS
-
-s_t make_s(int i, float x)
-{
-   s_t *p;
-   char *malloc(int);
-//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
-
-   p = (s_t *) malloc(sizeof(s_t));
-//             <    is read   >: i p
-//             <    is written>: p[0].entier
-   p->entier = i;
-//             <    is read   >: p x
-//             <    is written>: p[0].reel
-   p->reel = x;
-//             <    is read   >: p p[0].entier p[0].reel
-   return *p;
-}
-
-POINTS TO
+POINTS-TO
 
 //  {}
 void assign02()
@@ -85,6 +73,18 @@ void assign02()
    j = make_s(1, 2.).entier;
 }
 //  {}
+//  {}
+typedef struct {
+   int entier;
+   float reel;
+} s_t;
+
+//  {}
+s_t make_s(int i, float x);
+
+//  {}
+void assign02();
+//  {}
 s_t make_s(int i, float x)
 {
 //  {}
@@ -94,10 +94,74 @@ s_t make_s(int i, float x)
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (s_t *) malloc(sizeof(s_t));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(p,*HEAP*_l_8,-Exact-)}
    p->entier = i;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(p,*HEAP*_l_8,-Exact-)}
    p->reel = x;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
+//  {(p,*HEAP*_l_8,-Exact-)}
    return *p;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
+void assign02()
+{
+   s_t s;
+   int j;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: s.entier s.reel 
+//                               _MALLOC_EFFECTS:_MALLOC_
+
+   s = make_s(1, 2.);
+//             <    is written>: s.entier
+   s.entier = 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
+   
+   /* invalid lvalue in assignment */
+   /* make_s(1, 2.).entier = 4; */
+   
+   /* But this is OK in rhs */
+   j = make_s(1, 2.).entier;
+}
+typedef struct {
+   int entier;
+   float reel;
+} s_t;
+
+s_t make_s(int i, float x);
+
+void assign02();
+s_t make_s(int i, float x)
+{
+   s_t *p;
+   char *malloc(int);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+   p = (s_t *) malloc(sizeof(s_t));
+//             <    is read   >: i p
+//             <    is written>: *HEAP*_l_8.entier
+   p->entier = i;
+//             <    is read   >: p x
+//             <    is written>: *HEAP*_l_8.reel
+   p->reel = x;
+//             <    is read   >: *HEAP*_l_8.entier *HEAP*_l_8.reel p
+   return *p;
+}
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 11 with conflicts
+		from <*HEAP*_l_8.reel-W-EXACT> to <*HEAP*_l_8.reel-R-EXACT>
+	09 --> 11 with conflicts
+		from <*HEAP*_l_8.entier-W-EXACT> to <*HEAP*_l_8.entier-R-EXACT>
+	08 --> 11 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 10 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

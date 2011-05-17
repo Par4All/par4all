@@ -1,4 +1,31 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int i, j, k;
+   int a[500];
+//             <    is written>: i
+
+   i = 0;
+//             <    is written>: j
+   j = 1;
+//             <    is written>: i
+   for(i = 0; i <= 499; i += 1) {
+//             <    is read   >: j
+//             <    is written>: j
+      j++;
+//             <    is read   >: i
+//             <    is written>: a[i]
+      // Cumulated effects should be a[i] here and not a[*]
+      a[i] = i;
+   }
+//             <    is written>: k
+   k = 2;
+//             <    is read   >: k
+   return k;
+}
+
 POINTS-TO
 
 //  {}

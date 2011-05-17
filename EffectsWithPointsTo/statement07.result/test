@@ -1,4 +1,20 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *x, *a, i;
+//             <    is written>: i
+   i = 1;
+//             <    is written>: a
+   a = &i;
+//             <    is read   >: a
+//             <    is written>: x
+   x = a;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}

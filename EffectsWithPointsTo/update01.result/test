@@ -1,4 +1,20 @@
 
+PROPER  EFFECTS 
+
+void update01()
+{
+   int i;
+   int *p;
+//             <    is written>: p
+
+   p = &i;
+//             <    is read   >: p
+//             <    is written>: p
+   p++;
+//             <    is written>: i
+   i = 2;
+}
+
 POINTS-TO
 
 //  {}

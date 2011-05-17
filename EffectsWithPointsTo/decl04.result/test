@@ -1,4 +1,19 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   mystruct s;
+//             <    is written>: s.champ1
+
+   s.champ1 = 3;
+//             <    is written>: s.champ2
+   s.champ2 = 4;
+//             <    is read   >: s.champ1 s.champ2
+   decl04(s);
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
