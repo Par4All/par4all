@@ -611,7 +611,7 @@ static void freia_terapix_call
          "\n"
          "  // subimage operation\n"
          "  param.size = -1; // not used\n"
-         "  param.raw = (void*) mcu_instr;\n"
+         "  param.raw = (void*) &mcu_instr;\n"
          "\n"
          "  // dyn_param contents"
          "  dyn_param.raw = &gram;\n"
@@ -818,7 +818,7 @@ static void freia_terapix_call
              (char*)entity_user_name(vtxcontent_out(dagvtx_content(out))),
              "\n");
       sb_cat(dbio, "  tile_out[0][", sn, "].x = " IMG_PTR"io_", so, "_0;\n");
-      sb_cat(dbio, "  tile_out[0][", sn, "].u = 0;\n");
+      sb_cat(dbio, "  tile_out[0][", sn, "].y = 0;\n");
       sb_cat(dbio, "  tile_out[1][", sn, "].x = " IMG_PTR"io_", so, "_1;\n");
       sb_cat(dbio, "  tile_out[1][", sn, "].y = 0;\n");
       free(sn);
