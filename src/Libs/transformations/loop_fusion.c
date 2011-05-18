@@ -187,6 +187,29 @@ static bool loop_has_same_header_p(loop loop1, loop loop2) {
 
 
 /**
+ * DIRTY HACK
+ * Replace entity in effects associated to a statement
+ */
+struct entity_pair
+{
+    entity old;
+    entity new;
+};
+void replace_entity_effects_walker(statement s, void *_thecouple ) {
+  struct entity_pair *thecouple = _thecouple;
+  list effs = load_proper_rw_effects_list( s );
+  ifdebug(5) {
+    pips_debug(0,"Handling effects :");
+    print_effects(effs);
+    fprintf(stderr,"\n");
+  }
+
+  FOREACH(effect, eff, effs) {
+    replace_entity(eff, thecouple->old, thecouple->new);
+  }
+}
+
+/**
  * @brief Try to fuse the two loop. Dependences are check against the new body
  * but other constraints such as some statement between the two loops are not
  * handled and must be enforced outside.
@@ -233,6 +256,10 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
     // that index2 is dead on exit of loop2 and that index1 does not
     // appear in the memory effects of loop2
     replace_entity((void *)body_loop2, index2, index1);
+
+    struct entity_pair thecouple = { index2, index1 };
+    gen_context_recurse(body_loop2, &thecouple,
+            statement_domain, gen_true, replace_entity_effects_walker);
   }
 
   //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
@@ -357,7 +384,10 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
     // loop2 as a temporary; so the memory effects of loops 2 should
     // be checked before attempting the first subtitution
     if(index1!=index2) {
-      replace_entity((void *)loop2, index1, index2);
+      replace_entity((void *)body_loop2, index1, index2);
+      struct entity_pair thecouple = { index1, index2 };
+      gen_context_recurse(body_loop2, &thecouple,
+              statement_domain, gen_true, replace_entity_effects_walker);
     }
     loop_body(loop1) = body_loop1;
     // Cleaning FIXME
