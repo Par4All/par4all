@@ -197,6 +197,7 @@ validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
+
 else # sequential validation, including subdir recursive forward
 validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
@@ -212,7 +213,7 @@ endif
 # how to summarize results to a human
 SUMUP	= pips_validation_summary.pl
 
-# on local validations, sort result & show summary
+# on local validations only, sort result & show summary
 .PHONY: sort-local-result
 sort-local-result:
 	@if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
