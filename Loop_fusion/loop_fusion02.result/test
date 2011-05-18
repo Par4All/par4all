@@ -31,4 +31,3 @@ void loop_fusion02(int a[100], int b[100])
       a[i] = b[i];
    }
 }
-

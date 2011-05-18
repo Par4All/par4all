@@ -32,4 +32,3 @@ void loop_fusion06(int a[100], int b[100])
    for(i = 0; i <= 99; i += 1)
       a[i] += a[i-1];
 }
-

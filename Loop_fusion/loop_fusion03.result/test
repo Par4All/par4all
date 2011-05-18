@@ -34,4 +34,3 @@ void loop_fusion03(int a[100][100], int b[100][100])
       k += a[i][j-1];
    }
 }
-

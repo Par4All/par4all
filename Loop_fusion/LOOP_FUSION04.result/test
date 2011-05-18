@@ -30,4 +30,3 @@
          S = S+A(I)                                                     0011
       ENDDO
       END
-
