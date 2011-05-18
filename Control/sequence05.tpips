@@ -1,0 +1,37 @@
+delete sequence05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sequence05 sequence05.c
+
+echo
+echo Parsed printed file
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo Printed file
+echo
+
+# Actually, C89 code is preserved by CONTROLIZER
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+echo
+echo Output of controlizer
+echo
+
+display PRINTED_FILE
+
+apply RESTRUCTURE_CONTROL[sequence05]
+
+echo
+echo Output of control restructurer
+echo
+
+display PRINTED_FILE
+
+close
+quit
