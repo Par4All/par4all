@@ -1,0 +1,1 @@
+fix_point.c, fix_point02.c, linked_list.c, linked_list_if.c: to help understainding how we should compute fix point for a while loop with a malloc call inside
