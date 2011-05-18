@@ -1467,7 +1467,7 @@ hash_table used_labels;
 
    If there are conflict names on declarations, they are renamed.
 
-   It relies on correct calls to push_declarations()/push_declarations()
+   It relies on correct calls to push_declarations()/pop_declarations()
    before to track where to put the declarations.
 */
 static void
@@ -1512,19 +1512,24 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
     if (conflict) {
       pips_debug(2, "Conflict on variable %s\n", entity_name(e));
 
-      /* Create a new variable with a non conflicting name: */
-      v = clone_variable_with_unique_name(e,
-					  s_above,
-					  "",
-					  "_",
-					  entity_to_module_entity(e));
+      /* Create a new variable with a non conflicting name without
+	 inserting a new statement declaration which is likely to be
+	 lost because s_above is currently represented as a list of
+	 control nodes not as a standard sequence. */
+      v = generic_clone_variable_with_unique_name(e,
+						  s_above,
+						  "",
+						  "_",
+						  entity_to_module_entity(e),
+						  FALSE);
       new_variables = gen_entity_cons(v , new_variables);
       hash_put_or_update(old_to_new_variables, e, v);
     }
-    else
+    else {
       v = e;
-    /* Add the inner declaration to the upper statement later */
-    new_declarations = gen_entity_cons(v , new_declarations);
+      /* Add the inner declaration to the upper statement later */
+      new_declarations = gen_entity_cons(v , new_declarations);
+    }
   }
 
   /* Remove the inner declaration from the inner statement block:
@@ -1869,7 +1874,7 @@ static bool controlize_sequence(control c_res,
       // You may have to fix C89 declarations if some unstructured has
       // been created below in the recursion
       //if(get_bool_property("C89_CODE_GENERATION")) {
-      //fix_block_statement_declarations(st);
+      fix_block_statement_declarations(st);
       //}
       /* From outside of this block statement, everything is hierarchized,
 	 so we claim it: */
