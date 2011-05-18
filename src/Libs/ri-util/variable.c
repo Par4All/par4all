@@ -405,9 +405,13 @@ generate_variable_with_unique_name_to_module(const char * seed_name,
 }
 
 
-/* Clone a variable with a new name.
+/* Clone a variable with a new user name.
 
    @param old_variable is the variable to clone
+
+   @param declaration_statement is the enclosing sequence (block)
+   defining the scope where the new variable is visible. It must be a
+   statement of kind sequence.
 
    @param prefix is the prefix to prepend to the variable name
 
@@ -415,12 +419,19 @@ generate_variable_with_unique_name_to_module(const char * seed_name,
 
    @param module is the entity of the module the variable will belong to
 
-   Is there is already a variable with this name, a new one is tried with
-   some numerical suffixes.
+   Is there is already a variable with this name, new names are tried with
+   numerical suffixes.
 
    @return the entity of the new variable. Its fields are copies from the
    old one. That means that there may be some aliasing since the old one
-   and the new one have the same offset (in the sense of RI ram).
+   and the new one have the same offset (in the sense of IR RAM) and
+   that use-def chains and dependence graphs are going to be wrong.
+
+   The clone variable is added to the declaration list of
+   "statement_declaration" and to the code declarations of module
+   "module". A new declaration statement is inserted in the sequence
+   of "declaration_statement". This maintains the consistency of PIPS
+   internal representation for C code.
  */
 entity
 clone_variable_with_unique_name(entity old_variable,

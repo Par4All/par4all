@@ -2358,9 +2358,30 @@ string generated_variable_comment(entity e)
 
 
 
-/* Declarations are not only lists of entities, but also statement to
-   carry the line number, comments,... For the time begin, a
-   declaration statement is a continue statement. */
+/* Add a new declaration statement
+ *
+ * Declarations are not only lists of entities at the block level and
+ * in the symbol table, but also declaration statement to
+ * carry the line number, comments, and the declarations local to the
+ * declaration statement. This function is low-level and does not
+ * maintain the consistency of the PIPS internal representation.
+ *
+ * @param s Statement s must be a sequence. A new declaration statement is
+ * generated to declare e. This statement is inserted after the
+ * existing declaration statements in s, or, if no declaration statement
+ * is present, at the beginning of the sequence in s.
+ *
+ * @param e Variable to declare.
+ * The declaration of e at s level is not checked. The existence of a
+ * previous declaration statement for e is not checked either. The
+ * caller is responsible for the consistency management between the
+ * declaration statements in s and the list of declaration at s level.
+ *
+ * @return statement s modified by side-effects.
+ *
+ * For the time being, a declaration statement is a continue
+ * statement.
+ */
 statement add_declaration_statement(statement s, entity e)
 {
     if(statement_block_p(s)) {
