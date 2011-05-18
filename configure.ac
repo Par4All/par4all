@@ -282,6 +282,7 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/pyps/drivers/terapyps/Makefile
 				 src/Passes/pyps/drivers/broker/Makefile
 				 src/Passes/pyps/drivers/pocc/Makefile
+				 src/Passes/pyps/drivers/validation/Makefile
 				 src/Passes/tpips/Makefile
 
 				 src/Runtimes/Makefile
