@@ -118,7 +118,7 @@
 /* #define effect_reference(e)					\
    preference_reference(cell_preference(effect_cell(e))) */
 #define effect_reference(e) \
-  pips_internal_error("effect_reference not defined anymore \n")
+    effect_reference_not_defined_anymore()
 
 /* FI: cannot be used as a left hand side */
 #define effect_any_reference(e) \
