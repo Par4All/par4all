@@ -258,7 +258,7 @@ freia_status my_global_max_coord_helper_0_0(
 
   // subimage operation
   param.size = -1; // not used
-  param.raw = (void*) mcu_instr;
+  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);

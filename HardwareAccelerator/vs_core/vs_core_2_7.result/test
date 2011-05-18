@@ -1252,7 +1252,7 @@ freia_status vs_core_2_helper_0_0(
 
   // subimage operation
   param.size = -1; // not used
-  param.raw = (void*) mcu_instr;
+  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -1478,7 +1478,7 @@ freia_status vs_core_2_helper_0_0(
   // outputs:
   // - imagelet 1 is o0 for mv
   tile_out[0][0].x = imagelet_io_1_0;
-  tile_out[0][0].u = 0;
+  tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
 
@@ -1576,7 +1576,7 @@ freia_status vs_core_2_helper_0_1(
 
   // subimage operation
   param.size = -1; // not used
-  param.raw = (void*) mcu_instr;
+  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -1754,12 +1754,12 @@ freia_status vs_core_2_helper_0_1(
   // outputs:
   // - imagelet 2 is o0 for mv
   tile_out[0][0].x = imagelet_io_2_0;
-  tile_out[0][0].u = 0;
+  tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_2_1;
   tile_out[1][0].y = 0;
   // - imagelet 1 is o1 for bg
   tile_out[0][1].x = imagelet_io_1_0;
-  tile_out[0][1].u = 0;
+  tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
 

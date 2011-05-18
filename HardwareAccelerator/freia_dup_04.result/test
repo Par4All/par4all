@@ -337,7 +337,7 @@ freia_status freia_dup_04_helper_0_0(
 
   // subimage operation
   param.size = -1; // not used
-  param.raw = (void*) mcu_instr;
+  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -381,7 +381,7 @@ freia_status freia_dup_04_helper_0_0(
   // outputs:
   // - imagelet 1 is o0 for o0
   tile_out[0][0].x = imagelet_io_1_0;
-  tile_out[0][0].u = 0;
+  tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
 
