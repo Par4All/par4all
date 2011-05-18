@@ -202,6 +202,8 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
 
   loop loop1 = statement_loop(sloop1);
   loop loop2 = statement_loop(sloop2);
+  statement body_loop1 = loop_body(loop1);
+  statement body_loop2 = loop_body(loop2);
 
   // Check if loops have fusion compatible headers, else abort
   if(!loops_have_same_bounds_p(loop1, loop2)) {
@@ -225,14 +227,14 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
   entity index1 = loop_index(loop1);
   entity index2 = loop_index(loop2);
   if(index1!=index2) {
+    pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
+               entity_name(index2), entity_name(index1));
     // FI: we should check that index1 is dead on exit of loop1 and
     // that index2 is dead on exit of loop2 and that index1 does not
     // appear in the memory effects of loop2
-    replace_entity((void *)loop2, index2, index1);
+    replace_entity((void *)body_loop2, index2, index1);
   }
 
-  statement body_loop1 = loop_body(loop1);
-  statement body_loop2 = loop_body(loop2);
   //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
   list seq1;
   list fused;
@@ -299,6 +301,7 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
         arc_label an_arc_label = successor_arc_label(a_successor);
         int statement_ordering2 = dg_vertex_label_statement(dvl2);
 
+
         // FIXME ordering check is no longer valid !!
         if(statement_ordering2 < statement_ordering(sloop2)
             && statement_ordering2 != statement_ordering(sloop1)) {
@@ -308,6 +311,23 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
             effect e_source = conflict_source(c);
             if(( effect_write_p(e_source) && store_effect_p(e_source))
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
+
+              // Inner loop indices conflicts aren't preventing fusion
+              statement stmt1,stmt2;
+              stmt1 = ordering_to_statement(statement_ordering);
+
+              if(statement_loop_p(stmt1) && effect_variable(e_source)
+                  == loop_index(statement_loop(stmt1))) {
+                continue;
+              }
+
+              stmt2 = ordering_to_statement(statement_ordering2);
+              if(statement_loop_p(stmt2) && effect_variable(e_sink)
+                  == loop_index(statement_loop(stmt2))) {
+                continue;
+              }
+
+
               ifdebug(5) {
                 pips_debug(0,"Arc preventing fusion : from statement %d :",statement_ordering);
                 print_effect(conflict_source(c));
@@ -395,6 +415,8 @@ static fusion_block make_block_from_statement(statement s, int num) {
     set_del_element(b->statements, b->statements, b->s);
   }
 
+  pips_debug(3,"Block created : num %d ; is_a_loop : %d\n",
+             b->num,b->is_a_loop);
   return b;
 }
 
@@ -503,7 +525,8 @@ static set prune_successors_tree(fusion_block b) {
  * Merge two blocks (successors, predecessors, statements).
  */
 static void merge_blocks(fusion_block block1, fusion_block block2) {
-  pips_assert("block1->num < block2->num expected",block1->num < block2->num);
+//FIXME not always the case
+//pips_assert("block1->num < block2->num expected",block1->num < block2->num);
 
   ifdebug(3) {
     pips_debug(3,"Merging blocks :\n");
