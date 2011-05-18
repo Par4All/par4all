@@ -2456,6 +2456,7 @@ void fix_block_statement_declarations(statement s)
   list bdvl = gen_copy_seq(statement_declarations(s)); // block declarations
 
   pips_assert("s is a block statement", statement_block_p(s));
+  pips_assert("No multiple declarations in declarations of s", gen_once_p(bdvl));
 
   if(!ENDP(bdvl)) {
     list sl = statement_block(s);
@@ -2754,17 +2755,62 @@ list statements_to_declarations(list sl)
         dl=gen_nconc(dl,statement_to_declarations(st));
     return dl;
 }
-
-/* Returns the declarations contained directly in a list of statement. */
-list statements_to_direct_declarations(list sl)
+
+list statement_to_direct_declarations(statement st)
 {
-    list  dl = NIL;
-    FOREACH(STATEMENT,st,sl)
-      if(declaration_statement_p(st))
-	dl=gen_nconc(dl,gen_copy_seq(statement_declarations(st)));
-    return dl;
+  list sdl = NIL;
+
+  if(declaration_statement_p(st))
+    sdl = gen_copy_seq(statement_declarations(st));
+  else if(statement_unstructured_p(st)) {
+    unstructured u = statement_unstructured(st);
+    sdl = unstructured_to_direct_declarations(u);
+  }
+  return sdl;
 }
 
+list unstructured_to_direct_declarations(unstructured u)
+{
+  list blocks = NIL; // list of statements
+  control c_in = unstructured_control(u); // entry point of u
+  list dl = NIL; // declaration list
+
+  CONTROL_MAP(c,
+	      {
+		statement s = control_statement(c);
+		list sdl = statement_to_direct_declarations(s);
+		dl = gen_nconc(dl, sdl);
+	      },
+	      c_in,
+	      blocks);
+
+  gen_free_list(blocks);
+  return dl;
+}
+
+/* Returns the declarations contained directly in the declaration
+   statements of a list of statement.
+
+   @param sl
+   List of statements
+
+   @return a newly allocated list of entities appearing the statement
+   declarations of the list. No recursive descent in loops or tests
+   because only variables of the current scope are returned. Recursive
+   descent in unstructured statements because their statements are in
+   the same scope as the statements in list sl
+*/
+list statements_to_direct_declarations(list sl)
+{
+  list  dl = NIL;
+  FOREACH(STATEMENT,st,sl) {
+    list sdl = statement_to_direct_declarations(st);
+    dl = gen_nconc(dl, sdl);
+  }
+
+  return dl;
+}
+
 
 /************************************************************ STAT VARIABLES */
 
