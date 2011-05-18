@@ -1,0 +1,46 @@
+
+Parsed printed file
+
+void sequence06()
+{
+   int l = -1;
+   {
+      int i = 4;
+      if (i%2==0)
+         goto l100;
+
+      i = i+10;
+      {
+         int i = 0;
+
+l100:         i = i+20;
+      }
+      printf("i=%d\n", i);
+      return;
+   }
+}
+
+Printed file
+
+void sequence06()
+{
+   int l = -1;
+   {
+      //PIPS generated variable
+      int i_ = 0;
+      int i = 4;
+      if (i%2==0) goto l100;
+
+      i = i+10;
+      i_ = 0;
+
+l100:      ;
+      i_ = i_+20;
+      printf("i=%d\n", i);
+      return;
+   }
+}
+
+Execute result
+
+i=4
