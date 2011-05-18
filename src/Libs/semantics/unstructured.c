@@ -1622,46 +1622,63 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
 
   /* Compute fix point transformer for cycle */
   if(!is_dag && !postcondition_p) {
-    /* Compute the convex hull of the paths associated to each predecessor
-       of the entry. Since this is a cycle, preds cannot be empty. */
+    transformer fp_tf = transformer_undefined;
     control e = unstructured_control(ndu);
     list preds = control_predecessors(e);
-    control pred = CONTROL(CAR(preds));
-    transformer path_tf =
-      load_arc_precondition(pred, e, control_postcondition_map);
-    transformer fp_tf = transformer_undefined;
-    /* transformer fp_tf_plus = transformer_undefined; */
     control e_a = control_undefined;
-
-    POP(preds);
-    MAP(CONTROL, pred, {
-      transformer pred_tf =
+    // FI: we also need SEMANTICS_USE_DERIVATIVE_LIST = TRUE
+    // but this should be soon the default option
+    if(!get_bool_property("SEMANTICS_USE_TRANSFORMER_LISTS")) {
+      /* Compute the convex hull of the paths associated to each predecessor
+	 of the entry. Since this is a cycle, preds cannot be empty. */
+      control pred = CONTROL(CAR(preds));
+      transformer path_tf =
 	load_arc_precondition(pred, e, control_postcondition_map);
-      transformer old_path_tf = path_tf;
+      /* transformer fp_tf_plus = transformer_undefined; */
 
-      pips_assert("Partial path transformer pred_tf is defined",
-		  !transformer_undefined_p(pred_tf));
-      path_tf = transformer_convex_hull(old_path_tf, pred_tf);
-      free_transformer(old_path_tf);
-    }, preds);
+      POP(preds);
+      FOREACH(CONTROL, pred, preds) {
+	transformer pred_tf =
+	  load_arc_precondition(pred, e, control_postcondition_map);
+	transformer old_path_tf = path_tf;
 
-    fp_tf =  (*transformer_fix_point_operator)(path_tf);
-    /* If an entry range is known, do not use it as there may be more than
-       one occurence of the cycle and more than one entry range. Keep this
-       refinement to the precondition computation phase? It might be too
-       late. The the data structure should be change to store more than
-       one fix point per cycle.  */
-    /* Not convincing anyway: you should apply fp_tf_plus to e_pre for the
-       next two lines to make sense. */
-    /* Use the + fix point to preserve more information about the output
-       and do not forget to perform a convex hull when you need a * fix
-       point in process_ready_node() */
-    fp_tf = transformer_combine(fp_tf, path_tf);
-    /*
-    fp_tf = transformer_convex_hull(fp_tf_plus, e_pre);
-    */
+	pips_assert("Partial path transformer pred_tf is defined",
+		    !transformer_undefined_p(pred_tf));
+	path_tf = transformer_convex_hull(old_path_tf, pred_tf);
+	free_transformer(old_path_tf);
+      }
 
-    free_transformer(path_tf);
+      fp_tf =  (*transformer_fix_point_operator)(path_tf);
+      /* If an entry range is known, do not use it as there may be more than
+	 one occurence of the cycle and more than one entry range. Keep this
+	 refinement to the precondition computation phase? It might be too
+	 late. The the data structure should be change to store more than
+	 one fix point per cycle.  */
+      /* Not convincing anyway: you should apply fp_tf_plus to e_pre for the
+	 next two lines to make sense. */
+      /* Use the + fix point to preserve more information about the output
+	 and do not forget to perform a convex hull when you need a * fix
+	 point in process_ready_node() */
+      fp_tf = transformer_combine(fp_tf, path_tf);
+      /*
+	fp_tf = transformer_convex_hull(fp_tf_plus, e_pre);
+      */
+      free_transformer(path_tf);
+    }
+    else {
+      /* Instead of computing the convex hull over all paths before
+	 computing the fix point, compute the fix point of a list of
+	 transformers. */
+      list tl = NIL;
+      FOREACH(CONTROL, pred, preds) {
+	transformer pred_tf =
+	  load_arc_precondition(pred, e, control_postcondition_map);
+	tl = CONS(TRANSFORMER, pred_tf, tl);
+      }
+      fp_tf = transformer_list_transitive_closure_plus(tl);
+      gen_free_list(tl);
+    }
+
     /* e may have many synonyms */
 
     if(!get_bool_property("SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT")) {
@@ -2173,7 +2190,10 @@ static void unreachable_node_to_transformer(control c)
  * node is not reached (?). It assumes that transformers for all
  * statements in the unstructured have already been computed.
  *
- * */
+ * Two modes are possible: the transitive closure of the convex hull
+ * of all elementary transformers, or the transitive closure of the
+ * transformer list.
+ */
 
 transformer unstructured_to_flow_insensitive_transformer(unstructured u)
 {
@@ -2189,6 +2209,8 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
   control exit_node = unstructured_exit(u);
   transformer tf_u = transformer_empty();
   transformer fp_tf_u = transformer_undefined;
+  bool tfl_p = get_bool_property("SEMANTICS_USE_TRANSFORMER_LISTS");
+  list tfl = NIL;
 
   pips_debug(8,"begin\n");
 
@@ -2203,36 +2225,58 @@ transformer unstructured_to_flow_insensitive_transformer(unstructured u)
     if(statement_test_p(st)) {
       /* Any side effect? */
       if(!ENDP(transformer_arguments(tf_st))) {
-	tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
-	free_transformer(tf_old);
+	if(tfl_p) {
+	  tfl = CONS(TRANSFORMER, tf_st, tfl);
+	}
+	else {
+	  tf_u = transformer_convex_hull(tf_old, tf_st); /* test */
+	  free_transformer(tf_old);
+	}
       }
     }
     else {
       if(continue_statement_p(st)) {
 	if(gen_find_eq(entry_node, control_predecessors(c))!=chunk_undefined
 	   && gen_find_eq(exit_node, control_successors(c))!=chunk_undefined) {
+	if(tfl_p) {
+	  tfl = CONS(TRANSFORMER, tf_st, tfl);
+	}
+	else {
 	  tf_u = transformer_convex_hull(tf_old, tf_st); /* continue */
 	  free_transformer(tf_old);
 	}
+	}
       }
       else {
+	if(tfl_p) {
+	  tfl = CONS(TRANSFORMER, tf_st, tfl);
+	}
+	else {
 	tf_u = transformer_convex_hull(tf_old, tf_st); /* other */
 	free_transformer(tf_old);
+	}
       }
     }
 
     ifdebug(1) {
       pips_assert("tf_st is internally consistent",
 		  transformer_internal_consistency_p(tf_st));
-      pips_assert("tf_u is internally consistent",
-		  transformer_internal_consistency_p(tf_u));
+      if(!tfl_p)
+	pips_assert("tf_u is internally consistent",
+		    transformer_internal_consistency_p(tf_u));
     }
 
   }, entry_node, nodes) ;
 
   gen_free_list(nodes) ;
 
-  fp_tf_u = (*transformer_fix_point_operator)(tf_u);
+  if(tfl_p) {
+    // FI: apparently, we need T* rather than T+
+      fp_tf_u = transformer_list_transitive_closure(tfl);
+      gen_free_list(tfl);
+  }
+  else
+    fp_tf_u = (*transformer_fix_point_operator)(tf_u);
 
   ifdebug(8) {
     pips_debug(8,"Result for one step tf_u:\n");

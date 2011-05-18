@@ -794,7 +794,7 @@ Psysteme transformer_derivative_constraints(transformer t)
    transformer_derivative_fix_point() but is more general and subsume
    it */
 /* transformer transformer_derivative_fix_point(transformer tf)*/
-transformer transformer_list_transitive_closure(list tfl)
+transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 {
   transformer tc_tf = transformer_identity();
 
@@ -877,7 +877,7 @@ transformer transformer_list_transitive_closure(list tfl)
     entity ik = make_local_temporary_integer_value_entity();
     //Psysteme sc_t_prime_k = sc_dup(sc);
     //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
-    sc = sc_multiply_constant_terms(sc, (Variable) ik);
+    sc = sc_multiply_constant_terms(sc, (Variable) ik, star_p);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
     sc->base = base_remove_variable(sc->base, (Variable) ik);
@@ -960,4 +960,16 @@ transformer transformer_list_transitive_closure(list tfl)
   }
 
   return tc_tf;
+}
+
+/* Compute (U tfl)* */
+transformer transformer_list_transitive_closure(list tfl)
+{
+  return transformer_list_generic_transitive_closure(tfl, TRUE);
+}
+
+/* Compute (U tfl)+ */
+transformer transformer_list_transitive_closure_plus(list tfl)
+{
+  return transformer_list_generic_transitive_closure(tfl, FALSE);
 }
