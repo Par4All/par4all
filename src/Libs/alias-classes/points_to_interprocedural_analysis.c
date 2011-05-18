@@ -99,7 +99,7 @@ points_to create_stub_points_to(cell c, type t, basic b)
   reference r = cell_to_reference(copy_cell(c));
   entity e = reference_variable(r);
   string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
-  string formal_name = strdup(concatenate(POINTS_TO_MODULE_NAME,MODULE_SEP_STRING, s, NULL));
+  string formal_name = strdup(concatenate(/* get_current_module_name() */ POINTS_TO_MODULE_NAME ,MODULE_SEP_STRING, s, NULL));
   entity formal_parameter = gen_find_entity(formal_name);
   type tt = make_type_variable(
 			       make_variable(copy_basic(b),
@@ -108,7 +108,12 @@ points_to create_stub_points_to(cell c, type t, basic b)
 					     NIL));
   if(entity_undefined_p(formal_parameter)) {
     formal_parameter = make_entity(formal_name,
-				   tt, make_storage_formal(make_formal(get_current_module_entity(),pointer_index)), make_value_unknown());
+				   tt,
+				   make_storage_formal(
+						       make_formal(
+								   get_current_module_entity()/* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
+								   pointer_index)),
+				   make_value_unknown());
   }
   reference sink_ref = copy_reference(make_reference(formal_parameter, NIL));
 /*   expression ind = make_unbounded_expression(); */

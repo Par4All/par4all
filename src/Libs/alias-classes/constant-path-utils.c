@@ -709,6 +709,7 @@ bool opkill_must_vreference(cell c1, cell c2)
 	  int i1 = expression_to_int(se1);
 	  int i2 = expression_to_int(se2);
 	  i = i2>i1? 1 : (i2<i1? -1 : 0);
+	}
 	  if(i==0){
 	    string s1 = words_to_string(words_expression(se1, NIL));
 	    string s2 = words_to_string(words_expression(se2, NIL));
@@ -716,7 +717,6 @@ bool opkill_must_vreference(cell c1, cell c2)
 	}
       }
     }
-  }
 
   return (i==0? true: false);
 }
