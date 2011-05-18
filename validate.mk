@@ -318,7 +318,7 @@ DEFTEST	= default_test
 
 # default_pyps relies on FILE & WSPACE
 PYTHON	= python
-DEFPYPS	= default_pyps
+DEFPYPS	= default_pyps.py
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.c $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
@@ -364,7 +364,7 @@ orphan:
 	       -f $$base.test -o \
 	       -f $$base.py -o \
 	       -f default_tpips -o \
-	       -f default_pyps -o \
+	       -f default_pyps.py -o \
 	       -f default_test || \
 	  echo "orphan: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)
