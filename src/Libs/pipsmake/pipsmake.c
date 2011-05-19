@@ -408,23 +408,24 @@ static void update_preserved_resources(const char* oname, rule ru)
     reals = build_real_resources(oname, rule_modified(ru));
 
     /* we delete them from the uptodate set */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
+    FOREACH(real_resource, rr, reals)
+    {
+      string rron = real_resource_owner_name(rr);
+      string rrrn = real_resource_resource_name(rr);
 
-	/* is it up to date ? */
-	if(set_belong_p(up_to_date_resources, (char *) rr))
-	{
-	    pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
-		       rrrn, rron);
-	    set_del_element (up_to_date_resources,
-			     up_to_date_resources,
-			     (char *) rr);
-	    /* GO 11/7/95: we need to del the resource from the data base
-	       for a next call of pipsmake to find it unavailable */
-	    db_unput_a_resource (rrrn, rron);
-	}
-    }, reals);
+      /* is it up to date ? */
+      if(set_belong_p(up_to_date_resources, (char *) rr))
+      {
+        pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
+                   rrrn, rron);
+        set_del_element (up_to_date_resources,
+                         up_to_date_resources,
+                         (char *) rr);
+        /* GO 11/7/95: we need to del the resource from the data base
+           for a next call of pipsmake to find it unavailable */
+        db_unput_a_resource (rrrn, rron);
+      }
+    }
 
     gen_full_free_list (reals);
 }
