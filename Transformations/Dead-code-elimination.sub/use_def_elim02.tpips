@@ -4,6 +4,7 @@ create use_def_elim02 use_def_elim02.c
 
 #required for DEAD_CODE_ELIMINATION
 setproperty MEMORY_EFFECTS_ONLY FALSE
+setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
 
 
 echo

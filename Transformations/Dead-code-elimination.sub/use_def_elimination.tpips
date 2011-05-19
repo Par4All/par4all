@@ -3,7 +3,6 @@ delete use_def_elimination
 create use_def_elimination use_def_elimination.f
 
 set PRETTYPRINT_FINAL_RETURN TRUE
-set PRETTYPRINT_INTERNAL_RETURN TRUE
 set PRETTYPRINT_ALL_LABELS TRUE
 set PRETTYPRINT_EMPTY_BLOCKS TRUE
 set PRETTYPRINT_UNSTRUCTURED TRUE
@@ -11,9 +10,10 @@ set PRETTYPRINT_UNSTRUCTURED TRUE
 
 #required for DEAD_CODE_ELIMINATION
 setproperty MEMORY_EFFECTS_ONLY FALSE
+setproperty PRETTYPRINT_MEMORY_EFFECTS_ONLY TRUE
 
 
-activate PRINT_CODE_PRECONDITIONS
+#activate PRINT_CODE_PRECONDITIONS
 
 # Because an intraprocedural mode is chosen, the lack of calls is not
 # taken into account. The empty preconditions are not propagated down the
