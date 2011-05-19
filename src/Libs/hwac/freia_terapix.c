@@ -632,6 +632,8 @@ static void freia_terapix_call
 
   if (n_ins)
   {
+    // ??? they should be given in the order of the arguments
+    // when calling the runtime function.
     int n = 0;
     sb_cat(dbio, "  // inputs:\n");
     FOREACH(dagvtx, in, dag_inputs(thedag))
