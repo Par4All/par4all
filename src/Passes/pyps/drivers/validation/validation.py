@@ -1,5 +1,12 @@
 import pyps,os,sys
 
+def getSourceFileFromBaseName(basename,*extensions):
+    for ext in list(extensions):
+        if os.path.isfile(basename + '.' + ext):
+            return file
+    return None
+        
+
 class vworkspace(pyps.workspace): 
     ''' This workspace is intended to handle some special PIPS validation 
     suff'''
@@ -17,21 +24,17 @@ class vworkspace(pyps.workspace):
         if file == None :
             # Try to recover source corresponding to script filename
            basename = os.path.splitext(sys.argv[0])[0]
-           file = basename + '.c'
-           if not os.path.isfile(file):
-               file = basename + '.f'
-           if not os.path.isfile(file):
-               file = basename + '.f95'
-           if not os.path.isfile(file):
+           file = getSourceFileFromBaseName(basename,'c','f','f90','f95')
+           if file == None :
                raise RuntimeError('''No source files ! Please define FILE environment 
-                                    variable or provide %s.{c,f,f95}''' % (file) )
+                                    variable or provide %s.{c,f,f95}''' % (basename) )
             
         # this workspace is intended to be run with WSPACE and FILE 
         # environment variable defined
         wspace = os.getenv("WSPACE")
         if wspace == None :
-           sys.stderr.write("WSPACE environment variable has to be defined\n")
-           wspace = os.path.splitext(sys.argv[0])[0]
+           wspace = os.path.splitext(file)[0]
+           sys.stderr.write("WSPACE environment variable isn't defined, will use '%s' \n" % (wspace))
 
         super(vworkspace, self).__init__(file,
                                          *sources,
