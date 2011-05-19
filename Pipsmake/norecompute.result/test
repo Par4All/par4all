@@ -1,0 +1,32 @@
+-- show proper effects (1)
+int main(void)
+{
+   int i;
+//             <    is read   >: true
+   if (true)
+//             <    is written>: i
+      i = 0;
+   else
+//             <    is written>: i
+      i = 1;
+//             <    is read   >: i
+   return i;
+}
+-- apply a transformation which preserves proper effects
+-- show proper effects (2)
+int main(void)
+{
+   int i;
+//             <    is read   >: true
+   if (true)
+//             <    is written>: i
+      i = 0;
+   else
+//             <    is written>: i
+      i = 1;
+//             <    is read   >: i
+   return i;
+}
+-- number of computations of PROPER_EFFECTS
+1
+
