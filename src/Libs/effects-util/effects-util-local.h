@@ -118,6 +118,9 @@
 /* #define effect_reference(e)					\
    preference_reference(cell_preference(effect_cell(e))) */
 #define effect_reference(e) \
+  /* DO NOT REMOVE, PREVENT REDEFINITION :)
+   * use effect_any_reference instead !
+  */ \
     effect_reference_not_defined_anymore()
 
 /* FI: cannot be used as a left hand side */
