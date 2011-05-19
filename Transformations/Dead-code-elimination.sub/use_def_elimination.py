@@ -1,8 +1,6 @@
 from __future__ import with_statement # this is to work with python2.5
 
 from validation import vworkspace
-import validate_dead_code_elimination
-import os
 
 
 with vworkspace() as w:

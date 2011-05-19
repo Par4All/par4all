@@ -1,38 +1,13 @@
-
-Code for "use_def_elim02"
-
-int use_def_elim02(int i)
+//
+// Code after dead_code_elimination for module main
+//
+int main()
 {
-   int j;
-   int k;
-
-   j = i+1;
-   i = 2;
-   k = 3;
-   return j;
+   return use_def_elim02(2);
 }
-
-Code with cumulated effects for "use_def_elim02"
-
-//             <    is read   >: i
-int use_def_elim02(int i)
-{
-   int j;
-   int k;
-//             <    is read   >: i
-//             <    is written>: j
-
-   j = i+1;
-//             <    is written>: i
-   i = 2;
-//             <    is written>: k
-   k = 3;
-//             <    is read   >: j
-   return j;
-}
-
-Code for "use_def_elim02" after use-def elimination
-
+//
+// Code after dead_code_elimination for module use_def_elim02
+//
 int use_def_elim02(int i)
 {
    int j;

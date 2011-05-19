@@ -1,36 +1,14 @@
+//
+// Code after dead_code_elimination for module MAIN
+//
 
-Code for "USE_DEF_ELIM03"
+      PROGRAM MAIN
 
-      INTEGER FUNCTION USE_DEF_ELIM03( I)
-      INTEGER I, J, K
-
-      J = I+1                                                           0004
-      I = 2                                                             0005
-      K = 3                                                             0006
-      USE_DEF_ELIM03 = J                                                0007
+      PRINT *, USE_DEF_ELIM03(2)                                        0004
       END
-
-Code with cumulated effects for "use_def_elim03"
-
-C             <    is read   >: I
-C             <    is written>: I
-      INTEGER FUNCTION USE_DEF_ELIM03( I)
-      INTEGER I, J, K
-C             <    is read   >: I
-C             <    is written>: J
-
-      J = I+1                                                           0004
-C             <    is written>: I
-      I = 2                                                             0005
-C             <    is written>: K
-      K = 3                                                             0006
-C             <    is read   >: J
-C             <    is written>: USE_DEF_ELIM03
-      USE_DEF_ELIM03 = J                                                0007
-      END
-
-Code for "use_def_elim03" after use-def elimination
-
+//
+// Code after dead_code_elimination for module USE_DEF_ELIM03
+//
       INTEGER FUNCTION USE_DEF_ELIM03( I)
       INTEGER I, J, K
 
