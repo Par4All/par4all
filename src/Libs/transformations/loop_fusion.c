@@ -199,7 +199,9 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
   struct entity_pair *thecouple = _thecouple;
   list effs = load_proper_rw_effects_list( s );
   ifdebug(5) {
-    pips_debug(0,"Handling effects :");
+    pips_debug(0,"Handling statement :");
+    print_statement(s);
+    pips_debug(0,"Effects :");
     print_effects(effs);
     fprintf(stderr,"\n");
   }
@@ -207,6 +209,12 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
   FOREACH(effect, eff, effs) {
     replace_entity(eff, thecouple->old, thecouple->new);
   }
+  ifdebug(6) {
+    pips_debug(0,"Effects after :");
+    print_effects(effs);
+    fprintf(stderr,"\n");
+  }
+
 }
 
 /**
@@ -298,15 +306,18 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
   graph chains = statement_dependence_graph(sloop1);
   debug_off();
 
+
   // Build DG
   debug_on("RICEDG_DEBUG_LEVEL");
   graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
   debug_off();
 
-  ifdebug(6) {
-    pips_debug(6, "Candidate DG :\n");
+  ifdebug(5) {
+    pips_debug(0, "Candidate CHAINS :\n");
+    print_graph(chains);
+    pips_debug(0, "Candidate DG :\n");
     print_graph(candidate_dg);
-    pips_debug(6, "Candidate fused loop :\n");
+    pips_debug(0, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
 
@@ -336,6 +347,12 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
           {
             effect e_sink = conflict_sink(c);
             effect e_source = conflict_source(c);
+            ifdebug(6) {
+              pips_debug(0,"Considering arc : from statement %d :",statement_ordering);
+              print_effect(conflict_source(c));
+              pips_debug(0," to statement %d :",statement_ordering2);
+              print_effect(conflict_sink(c));
+            }
             if(( effect_write_p(e_source) && store_effect_p(e_source))
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
 
@@ -355,7 +372,7 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
               }
 
 
-              ifdebug(5) {
+              ifdebug(6) {
                 pips_debug(0,"Arc preventing fusion : from statement %d :",statement_ordering);
                 print_effect(conflict_source(c));
                 pips_debug(0," to statement %d :",statement_ordering2);
@@ -363,6 +380,13 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
               }
               success = false;
             }
+          }
+        } else {
+          ifdebug(6) {
+            pips_debug(0,"Arc ignored : from statement %d :",statement_ordering);
+            print_statement(ordering_to_statement(statement_ordering));
+            pips_debug(0," to statement %d :",statement_ordering2);
+            print_statement(ordering_to_statement(statement_ordering2));
           }
         }
       }
