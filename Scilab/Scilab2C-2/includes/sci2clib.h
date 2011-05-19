@@ -4,24 +4,42 @@
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
-/* #include "SCI2CMacroInterface.h" */
-/* #include "notFound.h" */
-/* #include "doubleComplex.h" */
-/* #include "floatComplex.h" */
-/* #include "RealToComplex.h" */
-/* #include "OpEqual.h" */
-/* #include "OpIns.h" */
-/* #include "OpExt.h" */
-/* #include "FileManagement.h" */
-/* #include "OpLogNe.h" */
-/* #include "OpLogGt.h" */
-/* #include "OpLogLt.h" */
-/* #include "OpLogGe.h" */
-/* #include "OpLogLe.h" */
-/* #include "OpLogEq.h" */
-/* #include "OpLogOr.h" */
-/* #include "OpLogAnd.h" */
-/* #include "OpLogNot.h" */
+/* #include "SCI2CMacroInterface.h"
+ */
+/* #include "notFound.h"
+ */
+/* #include "doubleComplex.h"
+ */
+/* #include "floatComplex.h"
+ */
+/* #include "RealToComplex.h"
+ */
+/* #include "OpEqual.h"
+ */
+/* #include "OpIns.h"
+ */
+/* #include "OpExt.h"
+ */
+/* #include "FileManagement.h"
+ */
+/* #include "OpLogNe.h"
+ */
+/* #include "OpLogGt.h"
+ */
+/* #include "OpLogLt.h"
+ */
+/* #include "OpLogGe.h"
+ */
+/* #include "OpLogLe.h"
+ */
+/* #include "OpLogEq.h"
+ */
+/* #include "OpLogOr.h"
+ */
+/* #include "OpLogAnd.h"
+ */
+/* #include "OpLogNot.h"
+ */
 /* #include "ConvertPrecision.h" */
 
 /* CONSTANT */
@@ -223,7 +241,8 @@
 #include "matrixInversion.h"
 #include "int_invert.h"
 /* interfacing infinite norm */
-#include "infiniteNorm.h"/* interfacing ones */
+#include "infiniteNorm.h"
+/* interfacing ones */
 #include "ones.h"
 #include "int_ones.h"
 /* interfacing spec */
@@ -235,7 +254,8 @@
 /* interfacing tranpose */
 #include "matrixTranspose.h"
 #include "int_OpApex.h"
-#include "int_OpDotApex.h"/* interfacing zeros */
+#include "int_OpDotApex.h"
+/* interfacing zeros */
 #include "zeros.h"
 #include "int_zeros.h"
 
