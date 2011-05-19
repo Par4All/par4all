@@ -2656,7 +2656,7 @@ graph compute_dg_on_statement_from_chains( statement s, graph chains ) {
   int i,j;
   dg = copy_graph( chains );
 
-  dg_type = DG_SEMANTICS; //FIXME
+  dg_type = DG_FAST; //FIXME
 
   debug_on("QUICK_PRIVATIZER_DEBUG_LEVEL");
   quick_privatize_graph( dg );
