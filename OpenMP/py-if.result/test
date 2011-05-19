@@ -1,3 +1,6 @@
+//
+// Code after openmp for module main
+//
 int main()
 {
    int b[size][size];

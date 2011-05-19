@@ -1,3 +1,6 @@
+//
+// Code after openmp for module fct_lib
+//
 void fct_lib(const long int size, t_real x[size])
 {
    long int i;
