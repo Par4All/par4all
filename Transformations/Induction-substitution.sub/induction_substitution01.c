@@ -21,13 +21,4 @@ void induction01( double A[SIZE], double B[SIZE][SIZE] )
   }
 }
 
-int main(int argc, char **argv)
-{
-  double A[SIZE], B[SIZE][SIZE];
-  int i;
-  for(i=0 ; i < SIZE ; i++)
-    A[i] = 0.;
-  induction01(A, B);
-  printf ("%f\n", A[0]);
-}
 
