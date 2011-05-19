@@ -144,8 +144,8 @@ void init_make_cache(void)
 
 void reinit_make_cache_if_necessary(void)
 {
-    if (!set_undefined_p(up_to_date_resources))
-	reset_make_cache(), init_make_cache();
+  if (!set_undefined_p(up_to_date_resources))
+    reset_make_cache(), init_make_cache();
 }
 
 /* Static variables used by phases must be reset on error although
@@ -189,9 +189,9 @@ void reset_static_phase_variables()
 /* FI: uncomment if rmake no longer needed in callgraph.c */
 /* static bool rmake(string, string); */
 
-#define add_res(vrn, on)					\
-  result = CONS(REAL_RESOURCE, \
-		make_real_resource(strdup(vrn), strdup(on)), result);
+#define add_res(vrn, on)                                              \
+  result = CONS(REAL_RESOURCE,                                        \
+                make_real_resource(strdup(vrn), strdup(on)), result);
 
 /* Logically, this should be implemented in preprocessor, but the
    preprocessor library is at a upper level than the pipsmake
@@ -213,11 +213,13 @@ string compilation_unit_of_module(const char* module_name)
 
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
   if(db_resource_p(DBR_USER_FILE, module_name)) {
-    string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
+    string source_file_name =
+      db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
     string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
-    /* It is not clear how robust it is going to be when file name conflicts occur. */
-    asprintf(&compilation_unit_name,"%s" FILE_SEP_STRING,simpler_file_name);
+    /* It is not clear how robust it is going to be when file name conflicts
+       occur. */
+    asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING, simpler_file_name);
     free(simpler_file_name);
   }
 
@@ -397,6 +399,36 @@ static list build_real_resources(const char* oname, list lvr)
     return gen_nreverse(result);
 }
 
+/* touch the resource if it exits
+ * this is currently an experimental and partial implementation
+ */
+static void preserve_virtual_resource(const char * oname, virtual_resource vr)
+{
+  switch (owner_tag(virtual_resource_owner(vr)))
+  {
+  case is_owner_module:
+    // touch only available resources
+    if (db_resource_p(virtual_resource_name(vr), oname))
+      db_touch_resource(virtual_resource_name(vr), oname);
+    // ??? we should now touch the transitive closure of dependent resources
+    // forall all resources in the database
+    //   if it is up to date because the resource is either preserved
+    //     or up to date, then touch it, otherwise delete it?
+    // the problem is linked to the lazyness of pipsmake which keeps
+    // obsolete resources if no one asks about them.
+    break;
+  case is_owner_program:
+  case is_owner_main:
+  case is_owner_callees:
+  case is_owner_callers:
+  case is_owner_all:
+  case is_owner_select:
+  case is_owner_compilation_unit:
+  default:
+    pips_internal_error("not implemented");
+  }
+}
+
 static void update_preserved_resources(const char* oname, rule ru)
 {
     list reals;
@@ -428,6 +460,11 @@ static void update_preserved_resources(const char* oname, rule ru)
     }
 
     gen_full_free_list (reals);
+
+    /* handle resources that are marked as "preserved", with "="
+     */
+    FOREACH(virtual_resource, vr, rule_preserved(ru))
+      preserve_virtual_resource(oname, vr);
 }
 
 static bool apply_a_rule(const char* oname, rule ru)
