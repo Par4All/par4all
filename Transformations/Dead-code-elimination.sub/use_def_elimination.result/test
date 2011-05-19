@@ -1,3 +1,44 @@
+//
+// Initial code for module TESTIF4
+//
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+      J = 5                                                             0006
+      B = J                                                             0007
+      X(1) = Y(2)                                                       0008
+      Y(2) = B                                                          0009
+
+      RETURN
+      END
+//
+// Initial code for module TESTIF5
+//
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+      J = 5                                                             0007
+100   B = J                                                             0009
+C     BEGIN UNSTRUCTURED
+      IF (A.NE.0) GOTO 200                                              0010
+      PRINT *, 'Well...'                                                0011
+200   CONTINUE                                                          0012
+C     END UNSTRUCTURED
+      TOBEDISCARDED = 1                                                 0012
+      YACCTOO = 2                                                       0013
+      X(1) = Y(2)                                                       0014
+      Y(2) = B                                                          0015
+
+      RETURN
+      END
+//
+// Initial code for module TESTIF1
+//
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -35,6 +76,106 @@ C     BEGIN UNSTRUCTURED
       ENDIF
 C     END UNSTRUCTURED
       END
+//
+// Initial code for module TESTIF2
+//
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+      J = 3                                                             0004
+
+      B = J                                                             0006
+C     BEGIN UNSTRUCTURED
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0009
+      PRINT *, 'salut'                                                  0010
+31    CONTINUE                                                          0011
+C     END UNSTRUCTURED
+      A = 9                                                             0011
+
+c      endif
+
+
+      RETURN
+      END
+//
+// Initial code for module TESTIF3
+//
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+      J = 3                                                             0005
+
+      B = J                                                             0007
+      AVIRER = J                                                        0008
+
+      DO I = 3, 10                                                      0010
+         PRINT *, 'une boucle !'                                        0011
+      ENDDO
+C     BEGIN UNSTRUCTURED
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0015
+      PRINT *, 'salut'                                                  0016
+31    A = 9                                                             0017
+
+c      endif
+      AVIRERENCORE = B                                                  0020
+
+      IF (A.EQ.I) THEN                                                  0022
+         PRINT *, 'vrai'                                                0023
+      ELSE
+         PRINT *, 'faux'                                                0025
+      ENDIF
+
+100   CONTINUE
+200   CONTINUE                                                          0029
+      GOTO 100
+C     END UNSTRUCTURED
+      END
+//
+// Code after unspaghettify for module TESTIF4
+//
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+      J = 5                                                             0006
+      B = J                                                             0007
+      X(1) = Y(2)                                                       0008
+      Y(2) = B                                                          0009
+
+      RETURN
+      END
+//
+// Code after unspaghettify for module TESTIF5
+//
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+
+      J = 5                                                             0007
+100   B = J                                                             0009
+C     BEGIN UNSTRUCTURED
+      IF (A.NE.0) GOTO 200                                              0010
+      PRINT *, 'Well...'                                                0011
+200   CONTINUE                                                          0012
+C     END UNSTRUCTURED
+      TOBEDISCARDED = 1                                                 0012
+      YACCTOO = 2                                                       0013
+      X(1) = Y(2)                                                       0014
+      Y(2) = B                                                          0015
+
+      RETURN
+      END
+//
+// Code after unspaghettify for module TESTIF1
+//
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -72,6 +213,87 @@ C     BEGIN UNSTRUCTURED
       ENDIF
 C     END UNSTRUCTURED
       END
+//
+// Code after unspaghettify for module TESTIF2
+//
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+
+      J = 3                                                             0004
+
+      B = J                                                             0006
+C     BEGIN UNSTRUCTURED
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0009
+      PRINT *, 'salut'                                                  0010
+31    CONTINUE                                                          0011
+C     END UNSTRUCTURED
+      A = 9                                                             0011
+
+c      endif
+
+
+      RETURN
+      END
+//
+// Code after unspaghettify for module TESTIF3
+//
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+
+      J = 3                                                             0005
+
+      B = J                                                             0007
+      AVIRER = J                                                        0008
+
+      DO I = 3, 10                                                      0010
+         PRINT *, 'une boucle !'                                        0011
+      ENDDO
+C     BEGIN UNSTRUCTURED
+
+c      if(.true.) then
+      IF (J.EQ.5) GOTO 31                                               0015
+      PRINT *, 'salut'                                                  0016
+31    A = 9                                                             0017
+
+c      endif
+      AVIRERENCORE = B                                                  0020
+
+      IF (A.EQ.I) THEN                                                  0022
+         PRINT *, 'vrai'                                                0023
+      ELSE
+         PRINT *, 'faux'                                                0025
+      ENDIF
+
+100   CONTINUE
+200   CONTINUE                                                          0029
+      GOTO 100
+C     END UNSTRUCTURED
+      END
+//
+// Code after suppress_dead_code for module TESTIF4
+//
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+      RETURN
+      END
+//
+// Code after suppress_dead_code for module TESTIF5
+//
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+      RETURN
+      END
+//
+// Code after suppress_dead_code for module TESTIF1
+//
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -95,6 +317,43 @@ C     BEGIN UNSTRUCTURED
 C     END UNSTRUCTURED
       RETURN
       END
+//
+// Code after suppress_dead_code for module TESTIF2
+//
+      SUBROUTINE TEST IF 2(B)
+      INTEGER A, B, J
+      RETURN
+      END
+//
+// Code after suppress_dead_code for module TESTIF3
+//
+
+      SUBROUTINE TEST IF 3(B)
+      INTEGER A, B, J
+      RETURN
+      END
+//
+// Code after dead_code_elimination for module TESTIF4
+//
+
+      SUBROUTINE TEST IF 4(B)
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+      RETURN
+      END
+//
+// Code after dead_code_elimination for module TESTIF5
+//
+
+      SUBROUTINE TEST IF 5(B)
+c test the propagation of control usefulness through the predecesors      
+      INTEGER A, B, J
+      REAL X(10), Y(10)
+      RETURN
+      END
+//
+// Code after dead_code_elimination for module TESTIF1
+//
       PROGRAM TEST IF 1
       INTEGER A, B, J
 
@@ -118,217 +377,18 @@ C     BEGIN UNSTRUCTURED
 C     END UNSTRUCTURED
       RETURN
       END
-      SUBROUTINE TEST IF 2(B)
-      INTEGER A, B, J
-
-      J = 3                                                             0004
-
-      B = J                                                             0006
-C     BEGIN UNSTRUCTURED
-
-c      if(.true.) then
-      IF (J.EQ.5) GOTO 31                                               0009
-      PRINT *, 'salut'                                                  0010
-31    CONTINUE                                                          0011
-C     END UNSTRUCTURED
-      A = 9                                                             0011
-
-c      endif
-
-
-      RETURN
-      END
-      SUBROUTINE TEST IF 2(B)
-      INTEGER A, B, J
-
-      J = 3                                                             0004
-
-      B = J                                                             0006
-C     BEGIN UNSTRUCTURED
-
-c      if(.true.) then
-      IF (J.EQ.5) GOTO 31                                               0009
-      PRINT *, 'salut'                                                  0010
-31    CONTINUE                                                          0011
-C     END UNSTRUCTURED
-      A = 9                                                             0011
-
-c      endif
-
-
-      RETURN
-      END
+//
+// Code after dead_code_elimination for module TESTIF2
+//
       SUBROUTINE TEST IF 2(B)
       INTEGER A, B, J
       RETURN
       END
-      SUBROUTINE TEST IF 2(B)
-      INTEGER A, B, J
-      RETURN
-      END
+//
+// Code after dead_code_elimination for module TESTIF3
+//
 
       SUBROUTINE TEST IF 3(B)
       INTEGER A, B, J
-
-      J = 3                                                             0005
-
-      B = J                                                             0007
-      AVIRER = J                                                        0008
-
-      DO I = 3, 10                                                      0010
-         PRINT *, 'une boucle !'                                        0011
-      ENDDO
-C     BEGIN UNSTRUCTURED
-
-c      if(.true.) then
-      IF (J.EQ.5) GOTO 31                                               0015
-      PRINT *, 'salut'                                                  0016
-31    A = 9                                                             0017
-
-c      endif
-      AVIRERENCORE = B                                                  0020
-
-      IF (A.EQ.I) THEN                                                  0022
-         PRINT *, 'vrai'                                                0023
-      ELSE
-         PRINT *, 'faux'                                                0025
-      ENDIF
-
-100   CONTINUE
-200   CONTINUE                                                          0029
-      GOTO 100
-C     END UNSTRUCTURED
-      END
-
-      SUBROUTINE TEST IF 3(B)
-      INTEGER A, B, J
-
-      J = 3                                                             0005
-
-      B = J                                                             0007
-      AVIRER = J                                                        0008
-
-      DO I = 3, 10                                                      0010
-         PRINT *, 'une boucle !'                                        0011
-      ENDDO
-C     BEGIN UNSTRUCTURED
-
-c      if(.true.) then
-      IF (J.EQ.5) GOTO 31                                               0015
-      PRINT *, 'salut'                                                  0016
-31    A = 9                                                             0017
-
-c      endif
-      AVIRERENCORE = B                                                  0020
-
-      IF (A.EQ.I) THEN                                                  0022
-         PRINT *, 'vrai'                                                0023
-      ELSE
-         PRINT *, 'faux'                                                0025
-      ENDIF
-
-100   CONTINUE
-200   CONTINUE                                                          0029
-      GOTO 100
-C     END UNSTRUCTURED
-      END
-
-      SUBROUTINE TEST IF 3(B)
-      INTEGER A, B, J
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 3(B)
-      INTEGER A, B, J
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 4(B)
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-
-      J = 5                                                             0006
-      B = J                                                             0007
-      X(1) = Y(2)                                                       0008
-      Y(2) = B                                                          0009
-
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 4(B)
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-
-      J = 5                                                             0006
-      B = J                                                             0007
-      X(1) = Y(2)                                                       0008
-      Y(2) = B                                                          0009
-
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 4(B)
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 4(B)
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 5(B)
-c test the propagation of control usefulness through the predecesors      
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-
-      J = 5                                                             0007
-100   B = J                                                             0009
-C     BEGIN UNSTRUCTURED
-      IF (A.NE.0) GOTO 200                                              0010
-      PRINT *, 'Well...'                                                0011
-200   CONTINUE                                                          0012
-C     END UNSTRUCTURED
-      TOBEDISCARDED = 1                                                 0012
-      YACCTOO = 2                                                       0013
-      X(1) = Y(2)                                                       0014
-      Y(2) = B                                                          0015
-
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 5(B)
-c test the propagation of control usefulness through the predecesors      
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-
-      J = 5                                                             0007
-100   B = J                                                             0009
-C     BEGIN UNSTRUCTURED
-      IF (A.NE.0) GOTO 200                                              0010
-      PRINT *, 'Well...'                                                0011
-200   CONTINUE                                                          0012
-C     END UNSTRUCTURED
-      TOBEDISCARDED = 1                                                 0012
-      YACCTOO = 2                                                       0013
-      X(1) = Y(2)                                                       0014
-      Y(2) = B                                                          0015
-
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 5(B)
-c test the propagation of control usefulness through the predecesors      
-      INTEGER A, B, J
-      REAL X(10), Y(10)
-      RETURN
-      END
-
-      SUBROUTINE TEST IF 5(B)
-c test the propagation of control usefulness through the predecesors      
-      INTEGER A, B, J
-      REAL X(10), Y(10)
       RETURN
       END
