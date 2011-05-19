@@ -5,6 +5,3 @@ PROGRAM MAIN
       A(I) = 0
    ENDDO
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-
