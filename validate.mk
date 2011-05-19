@@ -327,6 +327,15 @@ DFTPIPS	= default_tpips
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
+%.result/$(TEST): %.f90 $(DFTPIPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DFTPIPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+
 # default_test relies on FILE WSPACE NAME
 # warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
@@ -339,6 +348,14 @@ DEFTEST	= default_test
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.F $(DEFTEST)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f90 $(DEFTEST)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
@@ -355,6 +372,12 @@ ifdef PIPS_VALIDATION_NO_PYPS
 
 %.result/$(TEST): %.F $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.f90 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.f95 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # with pyps
 %.result/$(TEST): %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
@@ -365,6 +388,14 @@ else # with pyps
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
 %.result/$(TEST): %.F $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f90 $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
