@@ -13,15 +13,17 @@
 # - DO_BUG: also validate on cases tagged as "bugs"
 # - DO_LATER: idem with future "later" cases
 # - DO_SLOW: idem for lengthy to validate cases
+# - DO_DEFAULT: other test cases
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
-# example:
-#   sh> make DO_LATER=1 validate-test
+# example to do only later cases:
+#   sh> make DO_DEFAULT= DO_SLOW= DO_LATER=1 validate-test
 
 # what special cases are included
 DO_BUG	=
 DO_LATER=
 DO_SLOW	= 1
+DO_DEFAULT = 1
 
 # pips exes
 TPIPS	= tpips
@@ -130,7 +132,10 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 	  [ ! "$(DO_LATER)" -a -f $*.later -a -d $*.result ] && \
 	    { echo "later: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
 	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
-	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_DEFAULT)" -a -d $*.result -a \
+	    ! \( -f $*.bug -o -f $*.later  -o -f $*.slow \) ] && \
+	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
 
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
@@ -147,6 +152,8 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	[ ! "$(DO_BUG)" -a -f $$d.bug ] && recwhat=bug ; \
 	[ ! "$(DO_LATER)" -a -f $$d.later ] && recwhat=later ; \
 	[ ! "$(DO_SLOW)" -a -f $$d.slow ] && recwhat=slow ; \
+	[ ! "$(DO_DEFAULT)" -a ! -f $$d.slow -a ! -f $$d.later -a \
+	  ! -f $$d.bug ] && recwhat=skipped ; \
 	[ "$(RECWHAT)" ] && recwhat=$(RECWHAT) ; \
 	$(MAKE) RECWHAT=$$recwhat RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ \
 		-C $^ $(FORWARD)
@@ -189,6 +196,25 @@ validate:
 	# run "make validate-test" to generate "test" files.
 	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
+
+# convenient shortcuts to validate subsets (later, bug, slow, default)
+later-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG= DO_LATER=1 validate-test
+later-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG= DO_LATER=1 validate-out
+bug-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG=1 DO_LATER= validate-test
+bug-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG=1 DO_LATER= validate-out
+slow-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW=1 DO_BUG= DO_LATER= validate-test
+slow-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW=1 DO_BUG= DO_LATER= validate-out
+default-validate-test:
+	$(MAKE) DO_DEFAULT=1 DO_SLOW= DO_BUG= DO_LATER= validate-test
+default-validate-out:
+	$(MAKE) DO_DEFAULT=1 DO_SLOW= DO_BUG= DO_LATER= validate-out
+
 
 .PHONY: validate-dir
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
