@@ -465,6 +465,11 @@ static void update_preserved_resources(const char* oname, rule ru)
      */
     FOREACH(virtual_resource, vr, rule_preserved(ru))
       preserve_virtual_resource(oname, vr);
+
+    /* We increment the logical time again... (kept by pipsdbm)
+     * this seems necessary??? BC & FC
+     */
+    db_inc_logical_time();
 }
 
 static bool apply_a_rule(const char* oname, rule ru)
