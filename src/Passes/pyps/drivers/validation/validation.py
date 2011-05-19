@@ -50,12 +50,18 @@ def validate_phases(self,*phases,**kwargs):
         print "//"
         self.display()
     for phase in list(phases):
-        getattr(self,phase)()
-        if display_after:
+        if "print_code_" in phase:
             print "//"
-            print "// Code after " + phase + " for module " + self.name
+            print "// Display " + phase + " for module " + self.name
             print "//"
-            self.display()
+            self.display(phase);
+        else:
+            getattr(self,phase)()
+            if display_after:
+                print "//"
+                print "// Code after " + phase + " for module " + self.name
+                print "//"
+                self.display()
         
 pyps.module.validate_phases = validate_phases
         
