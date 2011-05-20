@@ -28,5 +28,6 @@ int main(void)
    return i;
 }
 -- number of computations of PROPER_EFFECTS
-1
+-- could be 1 if preservation is implemented
+2
 
