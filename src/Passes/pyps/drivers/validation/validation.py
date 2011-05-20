@@ -3,7 +3,7 @@ import pyps,os,sys
 def getSourceFileFromBaseName(basename,*extensions):
     for ext in list(extensions):
         if os.path.isfile(basename + '.' + ext):
-            return file
+            return basename + '.' + ext
     return None
         
 
