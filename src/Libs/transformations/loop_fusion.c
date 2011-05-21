@@ -195,10 +195,12 @@ struct entity_pair
     entity old;
     entity new;
 };
+
+
 void replace_entity_effects_walker(statement s, void *_thecouple ) {
   struct entity_pair *thecouple = _thecouple;
   list effs = load_proper_rw_effects_list( s );
-  ifdebug(5) {
+  ifdebug(7) {
     pips_debug(0,"Handling statement :");
     print_statement(s);
     pips_debug(0,"Effects :");
@@ -209,13 +211,15 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
   FOREACH(effect, eff, effs) {
     replace_entity(eff, thecouple->old, thecouple->new);
   }
-  ifdebug(6) {
+  ifdebug(7) {
     pips_debug(0,"Effects after :");
     print_effects(effs);
     fprintf(stderr,"\n");
   }
 
 }
+
+
 
 /**
  * @brief Try to fuse the two loop. Dependences are check against the new body
@@ -569,6 +573,7 @@ static set prune_successors_tree(fusion_block b) {
   }
   SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
     set_del_element(b->successors, b->successors, succ_of_succ);
+    set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
   }
 
   full_succ = set_union(full_succ, full_succ, b->successors);
@@ -773,6 +778,7 @@ static bool fusion_in_sequence(sequence s) {
       int block_count = gen_length(block_list);
       while(block_count > 0) {
         block_count = 0;
+        bool at_least_one_block_scheduled = false;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
         {
@@ -789,6 +795,7 @@ static bool fusion_in_sequence(sequence s) {
             // Schedule block
             new_stmts = CONS(statement,block->s,new_stmts);
             block->num = -1; // Disable block
+            at_least_one_block_scheduled = true;
 
             // Release precedence constraint on successors
             SET_FOREACH(fusion_block,succ,block->successors)
@@ -804,6 +811,10 @@ static bool fusion_in_sequence(sequence s) {
             // Number of block alive
             block_count++;
           }
+        }
+        if(!at_least_one_block_scheduled) {
+          pips_internal_error("No block scheduled, we have interdependence "
+              "in the block tree, which means it's not a tree ! Abort...\n");
         }
       }
 
