@@ -9,11 +9,9 @@ int main() {
    }
 
    for(int i=0; i<10; i++) {
-/**
- * array a can't be scalarized because use in inner loop isn't "i" indexed
- */
      a[i] = 0;
      for(int j=i;j<10;j++) {
+       // Scalarization of a[] make this affectation wrong !
        b[j] = a[j];
      }
    }
