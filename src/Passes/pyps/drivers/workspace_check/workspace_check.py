@@ -8,7 +8,7 @@ class workspace(pyps.workspace):
         self.__ref_maker = kwargs.get('ref_maker',pyps.Maker())
         self.__ref_argv = kwargs.get('ref_argv',[])
         self.__ref_output=None
-        self.__enable_check = True
+        self._enable_check = True
 
     def __compile_and_run(self):
         if "main" in self.fun:
@@ -18,14 +18,14 @@ class workspace(pyps.workspace):
 
     def pre_phase(self,phase,module):
         """ generate reference if needed """
-        if self.__enable_check and self.__ref_output == None:
+        if self._enable_check and self.__ref_output == None:
             self.__ref_output=self.__compile_and_run()
         super(workspace,self).pre_phase(phase,module)
 
     def post_phase(self,phase,module):
         """ check resulting code after the apply """
         super(workspace,self).post_phase(phase,module)
-        if self.__enable_check:
+        if self._enable_check:
             output=self.__compile_and_run()
             if output != self.__ref_output:
                 raise RuntimeError("check by workspace check failed after %s on %s\n" % (phase , module ))
