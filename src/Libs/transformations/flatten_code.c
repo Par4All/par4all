@@ -491,13 +491,8 @@ bool statement_flatten_declarations(entity module, statement s)
             pips_user_warning("Code flattening fails because the statement does"
                     " not contain any local declaration\n");
         }
-        return true;
     }
-    else {
-	//sg: just because there is no block to carry declarations ?!?
-        pips_user_warning("Input assumptions not met, skipping flatten code\n");
-        return false;
-    }
+    return true;
 }
 
 
