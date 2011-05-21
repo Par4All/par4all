@@ -1,4 +1,4 @@
-import pyps,os,sys
+import pyps,workspace_check,os,sys
 
 def getSourceFileFromBaseName(basename,*extensions):
     for ext in list(extensions):
@@ -7,7 +7,7 @@ def getSourceFileFromBaseName(basename,*extensions):
     return None
         
 
-class vworkspace(pyps.workspace): 
+class vworkspace(workspace_check.workspace): 
     ''' This workspace is intended to handle some special PIPS validation 
     suff'''
     
@@ -15,7 +15,7 @@ class vworkspace(pyps.workspace):
         """init a workspace from (optional) sources for validation
            name will be gather from WSPACE and sources from FILE environment variables 
         """
-
+        
         file = os.getenv('FILE')
         if file != None and not os.path.isfile(file):
             sys.stderr.write("Error, file " + file + " doesn't exists !!")
@@ -36,12 +36,44 @@ class vworkspace(pyps.workspace):
            wspace = os.path.splitext(file)[0]
            sys.stderr.write("WSPACE environment variable isn't defined, will use '%s' \n" % (wspace))
 
+
+        kwargs.setdefault("deleteOnClose",  True)
+        kwargs.setdefault("deleteOnCreate",  True)
+        kwargs.setdefault("name",  wspace)
+        
         super(vworkspace, self).__init__(file,
                                          *sources,
-                                         name=wspace,
-                                         deleteOnClose=True, 
-                                         deleteOnCreate=True,
                                          **kwargs)
+
+        def str2bool(v):
+            ''' helper to convert a string to a boolean '''
+            return v.lower() in ("yes", "true", "t", "1")
+        
+        self.__should_compile = str2bool(kwargs.setdefault("compile", os.getenv('VALIDATION_COMPILE','')))
+        self.__should_run     = str2bool(kwargs.setdefault("run", os.getenv('VALIDATION_RUN','')))
+        # Defined that we will check the output after each phase
+        self._enable_check   = str2bool(kwargs.setdefault("check", os.getenv('VALIDATION_CHECK','')))
+        
+
+        
+    def compile_and_run(self,*args,**kwargs):
+        a_out = self.compile(*args,**kwargs)
+        out = "// No main() found, cannot executing test case"
+        if self.fun.main:
+            (rc,out,err) = self.run(a_out)
+        return out
+        
+
+    def post_phase(self,phase,module):
+        super(vworkspace,self).post_phase(phase,module)
+        """ check resulting code after the apply """
+        if "main" in self.fun:
+            if self.__should_run :
+                print '// Execution after ' + phase
+                print self.compile_and_run()
+            elif self.__should_compile :
+                self.compile()
+
 
 
 def validate_phases(self,*phases,**kwargs):
