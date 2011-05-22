@@ -447,7 +447,7 @@ static bool loop_scalarization(loop l)
 	    scalarized_variables =
 	      arguments_add_entity(scalarized_variables, pv);
 
-	    pips_user_warning("Creating variable %s for variable %s\n",
+	    pips_debug(1,"Creating variable %s for variable %s\n",
 			      entity_name(sv), entity_name(pv));
 
 	    // Substitute all references to pv with references to new variable
