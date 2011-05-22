@@ -196,6 +196,7 @@ validate:
 	# run "make validate-test" to generate "test" files.
 	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
+	# run "make {later,bug,slow,default}-validate-{test,out}" for testing subsets
 
 # convenient shortcuts to validate subsets (later, bug, slow, default)
 later-validate-test:
