@@ -156,7 +156,8 @@ PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  ! -f $$d.bug ] && recwhat=skipped ; \
 	[ "$(RECWHAT)" ] && recwhat=$(RECWHAT) ; \
 	$(MAKE) RECWHAT=$$recwhat RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ \
-		-C $^ $(FORWARD)
+		-C $^ $(FORWARD) || \
+	  echo "broken-directory: $(SUBDIR)/$^" >> $(RESULTS)
 
 # extract validation result for summary when the case was run
 # four possible outcomes: passed, changed, failed, timeout
