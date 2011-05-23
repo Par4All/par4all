@@ -14,7 +14,7 @@ setenv P4A_ROOT '$root'
 setenv P4A_DIST '$dist'
 
 # Location of the Par4All_accelerator files.
-setenv P4A_ACCEL_DIR '$accel'
+setenv P4A_ACCEL_DIR $$P4A_DIST/$accel
 
 # Location of the Par4All configuration files.
 setenv P4A_ETC $$P4A_DIST/etc
@@ -59,6 +59,11 @@ endif
 
 # Update Python module search path for pyps
 set PYPS_PATH=`pkg-config pips --variable=pkgpythondir`
+# To make par4all relocatable, PYPS_PATH has to be updated to the new installation path
+set PYPS_PATH_PREFIX=`echo $$PYPS_PATH |sed -e 's,\(.*\)\/lib\/python.*,\1,'`
+if ( "$$PYPS_PATH_PREFIX" != "$$P4A_DIST" ) then
+	set PYPS_PATH=`echo $$PYPS_PATH |sed -e 's,.*\(lib\/python.*\),'$$P4A_DIST'/\1,'`
+endif
 if ( -d $$PYPS_PATH ) then
     if ( $$?PYTHONPATH ) then
 	setenv PYTHONPATH $${PYPS_PATH}:$${PYTHONPATH}
@@ -73,32 +78,6 @@ if ( -d $$PYPS_PATH ) then
 	setenv PYTHONPATH $${PYPS_PATH}:$${PYTHONPATH}
     else
 	setenv PYTHONPATH $$PYPS_PATH
-    endif
-endif
-
-# Update the Python module search path so python can find ply
-set PLY_PATH=/usr/lib/python2.6/site-packages
-if ( -d $$PLY_PATH/ply ) then
-    if ( $$?PYTHONPATH ) then
-	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
-    else
-	setenv PYTHONPATH $$PLY_PATH
-    endif
-endif
-set PLY_PATH=/usr/lib/python2.7/site-packages
-if ( -d $$PLY_PATH/ply ) then
-    if ( $$?PYTHONPATH ) then
-	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
-    else
-	setenv PYTHONPATH $$PLY_PATH
-    endif
-endif
-set PLY_PATH=/usr/lib/python3.1/site-packages
-if ( -d $$PLY_PATH/ply ) then
-    if ( $$?PYTHONPATH ) then
-	setenv PYTHONPATH $${PLY_PATH}:$${PYTHONPATH}
-    else
-	setenv PYTHONPATH $$PLY_PATH
     endif
 endif
 
