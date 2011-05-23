@@ -419,7 +419,7 @@ class p4a_processor(object):
         # apply the properties to the workspace
         for k in all_properties:
             p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
-            self.workspace.k = all_properties[k]
+            setattr(self.workspace.props,k, all_properties[k])
         return
 
     def get_database_directory(self):
