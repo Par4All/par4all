@@ -47,6 +47,7 @@ validate=mail-diff-validate
 vopts=
 vname=
 build=compile
+try=2
 
 # get options
 while [[ $1 == -* ]]
@@ -74,6 +75,9 @@ do
     # trace length to include on compilation error
     -t|--tail) tail=$2 ; shift ;;
     --tail=*) tail=${1#*=} ;;
+    # possibly do retry some connections
+    --try) try=$2 ; shift ;;
+    --try=*) try=${1#*=} ;;
     # compilation & validation name for report
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) vname=${1#*=} ;;
@@ -312,12 +316,23 @@ fi
 
 # update working copies (prod & validations)
 rm -f out err
-$nice svn up $prod "$@" >> out 2>> err || {
-  # possible failures: network dns svn...
-  # hmmm... try to cleanup after svn up failure
-  svn cleanup $prod "$@" >> out 2>> err
-  report 'KO:svn-up' 'unchanged' 'cannot "svn up"'
-}
+ntry=$try
+while let ntry--
+do
+  if $nice svn up $prod "$@" >> out 2>> err
+  then
+    # svn up was okay, let us get out
+    ntry=0
+  elif [ $ntry -gt 0 ] ; then
+    # retry loop, let us wait a little bit
+    sleep 60
+  else
+    # possible repeated failures: network dns svn...
+    # hmmm... try to cleanup after svn up failure
+    svn cleanup $prod "$@" >> out 2>> err
+    report 'KO:svn-up' 'unchanged' 'cannot "svn up" ($try)'
+  fi
+done
 
 # source state
 [ -f CURRENT ] || touch CURRENT
