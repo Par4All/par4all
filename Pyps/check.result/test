@@ -33,10 +33,6 @@ l99997:      ;
    i = 0+MAX0(LU_NUB0, 0)*1;
    return j;
 }
-int foo(int a)
-{
-   return a;
-}
 void bar(int *c)
 {
    //PIPS generated variable
@@ -44,6 +40,19 @@ void bar(int *c)
 
    _return0 = 2;
    *c = _return0;
+}
+int foo(int a)
+{
+   return a;
+}
+int main()
+{
+   printf("%d\n", megablast(2));
+   return 0;
+}
+void malabar(int *c)
+{
+   *c = foo(3);
 }
 int megablast(int n)
 {
@@ -63,15 +72,6 @@ l99997:      ;
    }
    i = 2;
    return j;
-}
-int main()
-{
-   printf("%d\n", megablast(2));
-   return 0;
-}
-void malabar(int *c)
-{
-   *c = foo(3);
 }
 found labels:
 l99999

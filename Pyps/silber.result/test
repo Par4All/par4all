@@ -1,4 +1,8 @@
 w=1024, h=1024, max=255
+int adds(char i0, char i1)
+{
+   return (int) i0+i1>255?255:i0+i1;
+}
 void copy(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w])
 {
    int i, j;
@@ -6,16 +10,6 @@ void copy(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w])
    for(i = 0; i <= w-1; i += 1)
       for(j = 0; j <= h-1; j += 1)
          dest[j*w+i] = bytes[j*w+i];
-}
-void light(int w, int h, unsigned char bytes[h*w], unsigned char val)
-{
-   int i, j;
-
-   for(i = 0; i <= w-1; i += 1)
-      for(j = 0; j <= h-1; j += 1) {
-         unsigned char current = bytes[j*w+i];
-         bytes[j*w+i] = (int) current+val>255?255:current+val;
-      }
 }
 void curve(int w, int h, unsigned char bytes[h*w], unsigned char lut[h*w])
 {
@@ -27,9 +21,15 @@ void curve(int w, int h, unsigned char bytes[h*w], unsigned char lut[h*w])
          bytes[j*w+i] = lut[current];
       }
 }
-int adds(char i0, char i1)
+void light(int w, int h, unsigned char bytes[h*w], unsigned char val)
 {
-   return (int) i0+i1>255?255:i0+i1;
+   int i, j;
+
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
+         unsigned char current = bytes[j*w+i];
+         bytes[j*w+i] = (int) current+val>255?255:current+val;
+      }
 }
 int main(int ac, char *av[])
 {
