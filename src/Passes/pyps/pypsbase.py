@@ -706,13 +706,8 @@ class workspace(object):
             else:
                 raise NameError("Unknown property : " + name)
 
-        def __getitem__(self,prop_name):
-            """retrieve a property of the workspace from its name"""
-            return self.__getattr__(prop_name)
-
-        def __setitem__(self,prop_name, prop_value):
-            """sets a property of the workspace from its name"""
-            return self.__setattr__(prop_name,prop_value)
+        __setitem__=__setattr__
+        __getitem__=__getattr__
 
         def __dir__(self):
             "We should use the updated values, not the default ones..."
