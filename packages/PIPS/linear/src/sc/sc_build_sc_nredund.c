@@ -343,7 +343,7 @@ Pcontrainte pc2;
 Pbase index_base;
 Pcontrainte ineq;
 Variable var_hr;
-int tab_info[][3];
+int tab_info[][4];
 int *rank_max;
 {
     int rank_hr = rank_of_variable(index_base,var_hr);
@@ -423,7 +423,7 @@ int *rank_max;
 Psysteme build_integer_sc_nredund(ps,index_base,tab_info,loop_level,dim_h,n)
 Psysteme ps;
 Pbase index_base;
-int tab_info[][3];
+int tab_info[][4];
 int loop_level;
 int dim_h __attribute__ ((unused));
 int n __attribute__ ((unused));
