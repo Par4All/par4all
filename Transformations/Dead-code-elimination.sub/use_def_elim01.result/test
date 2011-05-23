@@ -1,14 +1,4 @@
 //
-// Initial code for module main
-//
-int main()
-{
-   int i;
-   use_def_elim01(&i);
-   printf("i = %d\n", i);
-   exit(i);
-}
-//
 // Initial code for module use_def_elim01
 //
 void use_def_elim01(int *x)
@@ -18,7 +8,7 @@ void use_def_elim01(int *x)
    y[0] = 123;
 }
 //
-// Code after split_initializations for module main
+// Initial code for module main
 //
 int main()
 {
@@ -38,13 +28,14 @@ void use_def_elim01(int *x)
    y[0] = 123;
 }
 //
-// Code after dead_code_elimination for module main
+// Code after split_initializations for module main
 //
 int main()
 {
    int i;
    use_def_elim01(&i);
    printf("i = %d\n", i);
+   exit(i);
 }
 //
 // Code after dead_code_elimination for module use_def_elim01
@@ -55,4 +46,13 @@ void use_def_elim01(int *x)
    int *y;
    y = x;
    y[0] = 123;
+}
+//
+// Code after dead_code_elimination for module main
+//
+int main()
+{
+   int i;
+   use_def_elim01(&i);
+   printf("i = %d\n", i);
 }

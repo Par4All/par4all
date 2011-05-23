@@ -1,12 +1,4 @@
 //
-// Code after dead_code_elimination for module MAIN
-//
-
-      PROGRAM MAIN
-
-      PRINT *, USE_DEF_ELIM03(2)                                        0004
-      END
-//
 // Code after dead_code_elimination for module USE_DEF_ELIM03
 //
       INTEGER FUNCTION USE_DEF_ELIM03( I)

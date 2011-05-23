@@ -1,28 +1,10 @@
 //
-// Code after dead_code_elimination for module data_stuff
+// Code after dead_code_elimination for module data_add
 //
-int data_stuff(data_t *o, data_t *i, data_t *j)
+int data_add(data_t *o, data_t *i, data_t *j)
 {
-   data_t *t = data_create();
-   data_add(t, i, j);
-   data_or(o, t, j);
-   data_free(t);
+   o->x = i->x+j->x;
    return 0;
-}
-//
-// Code after dead_code_elimination for module data_or
-//
-int data_or(data_t *o, data_t *i, data_t *j)
-{
-   o->x = i->x|j->x;
-   return 0;
-}
-//
-// Code after dead_code_elimination for module data_free
-//
-void data_free(data_t *d)
-{
-   free(d);
 }
 //
 // Code after dead_code_elimination for module data_create
@@ -34,10 +16,28 @@ data_t * data_create(void)
    return d;
 }
 //
-// Code after dead_code_elimination for module data_add
+// Code after dead_code_elimination for module data_free
 //
-int data_add(data_t *o, data_t *i, data_t *j)
+void data_free(data_t *d)
 {
-   o->x = i->x+j->x;
+   free(d);
+}
+//
+// Code after dead_code_elimination for module data_or
+//
+int data_or(data_t *o, data_t *i, data_t *j)
+{
+   o->x = i->x|j->x;
+   return 0;
+}
+//
+// Code after dead_code_elimination for module data_stuff
+//
+int data_stuff(data_t *o, data_t *i, data_t *j)
+{
+   data_t *t = data_create();
+   data_add(t, i, j);
+   data_or(o, t, j);
+   data_free(t);
    return 0;
 }
