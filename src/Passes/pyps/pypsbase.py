@@ -307,9 +307,9 @@ class workspace(object):
 
 
         # setup some inner objects
-        self.props = workspace.props(self)
+        self.props = workspace.Props(self)
         self.fun = workspace.Fun(self)
-        self.cu = workspace.cu(self)
+        self.cu = workspace.Cu(self)
         self.__recover_include_dir = None # holds tmp dir for include recovery
 
         # SG: it may be smarter to save /restore the env ?
@@ -595,11 +595,11 @@ class workspace(object):
             try : shutil.rmtree(self.__recover_include_dir )
             except OSError: pass
 
-    class cu(object):
+    class Cu(object):
         '''Allow user to access a compilation unit by writing w.cu.compilation_unit_name'''
         def __init__(self,wp):
-            self.__dict__['_cu__wp'] = wp
-            self.__dict__['_cu__cuDict'] = self.__cuDict
+            self.__dict__['_Cu__wp'] = wp
+            self.__dict__['_Cu__cuDict'] = self.__cuDict
 
         def __setattr__(self, name, val):
             raise AttributeError("Compilation Unit assignment is not allowed.")
@@ -682,7 +682,7 @@ class workspace(object):
             """Test if the workspace contains a given module"""
             return module_name in self.__functionDict()
 
-    class props(object):
+    class Props(object):
         """Allow user to access a property by writing w.props.PROP,
         this class contains a static dictionary of every properties
         and default value
@@ -691,7 +691,7 @@ class workspace(object):
         values. It is generated externally.
         """
         def __init__(self, wp):
-            self.__dict__['_props__wp'] = wp
+            self.__dict__['_Props__wp'] = wp
 
         def __setattr__(self, name, val):
             if name.upper() in self.all:
