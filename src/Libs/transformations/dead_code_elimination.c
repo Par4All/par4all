@@ -376,12 +376,14 @@ propagate_the_usefulness_through_the_predecessor_graph()
  */
 static bool entity_local_variable_p(entity var, entity func) {
   bool local = false;
-  pips_debug(4,"Looking if variable %s is local to function %s\n",
-             entity_name(var),entity_name(func));
+
   if(storage_ram_p(entity_storage(var))) {
     ram r = storage_ram(entity_storage(var));
     if(same_entity_p(func,ram_function(r))) {
-      local=true;
+      entity section = ram_section(r);
+      if(same_string_p(entity_module_name(section),entity_user_name(func))) {
+        local=true;
+      }
     }
   } else if( storage_formal_p(entity_storage(var))) {
     /* Formal parameter are local to module only for scalar and not for Fortran !! */
@@ -396,6 +398,8 @@ static bool entity_local_variable_p(entity var, entity func) {
       local=true;
     }
   }
+  pips_debug(4,"Looked if variable %s is local to function %s, result is %d\n",
+             entity_name(var),entity_name(func), local);
   return local;
 }
 
