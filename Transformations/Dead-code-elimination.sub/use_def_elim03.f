@@ -8,7 +8,3 @@
       return
       end
 
-      program main
-
-      print *, use_def_elim03(2)
-      end
