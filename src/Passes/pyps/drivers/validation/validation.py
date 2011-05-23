@@ -58,9 +58,12 @@ class vworkspace(workspace_check.workspace):
         
     def compile_and_run(self,*args,**kwargs):
         a_out = self.compile(*args,**kwargs)
-        out = "// No main() found, cannot executing test case"
+        out = ""
         if self.fun.main:
             (rc,out,err) = self.run(a_out)
+        else: 
+            sys.stderr.write("** No main() found, cannot executing test case **\n")
+
         return out
         
 
