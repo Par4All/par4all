@@ -223,7 +223,8 @@ class modules:
     """high level representation of a module set"""
     def __init__(self,modules):
         """init from a list of module `the_modules'"""
-        self.__modules=sorted(modules)
+        self.__modules=modules
+        self.__modules.sort(key = lambda m: m.name)
         self.__ws= modules[0].workspace if modules else None
 
     @property
