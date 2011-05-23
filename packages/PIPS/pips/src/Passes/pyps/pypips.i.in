@@ -62,7 +62,7 @@
     $result = PyString_FromString($1);
 }
 
-extern char* activate(char* );
+extern char* activate(const char* );
 extern int delete_workspace(char* );
 extern int open_workspace(char* );
 extern int close_workspace(int );

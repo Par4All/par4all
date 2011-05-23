@@ -43,10 +43,8 @@
 #include "effects-convex.h"
 #include "text-util.h"
 #include "database.h"
-#include "misc.h"
 #include "pipsdbm.h"
 #include "resources.h"
-#include "control.h"
 
 #include "properties.h"
 

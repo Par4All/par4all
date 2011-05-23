@@ -96,9 +96,8 @@ static void add_pragma_endscop(statement s)
  /**
   *insert the pragma (endscop) as a string at the end of the precedent statement(SCoP)
   */
-  string str = strdup("endscop");
-  add_pragma_str_to_statement (s, str, FALSE);
-  pragma_added_p = false; 
+  add_pragma_str_to_statement (s, "endscop", TRUE);
+  pragma_added_p = false;
   wehaveloop = false;
 }
 
@@ -113,17 +112,16 @@ static bool pragma_scop(statement s)
       sc = (static_control) GET_STATEMENT_MAPPING(Gsc_map, loop_body(l));
       if (static_control_yes( sc ) == TRUE && !wehaveloop )
 	{
-	  string str = strdup("scop");	   
 	  /**
 	   *insert the pragma (scop) as a string to the current statement
 	   */
 	  if (gen_array_index(outer_loops_array, statement_ordering(s)) != ITEM_NOT_IN_ARRAY)
 	    {
-	      add_pragma_str_to_statement (s, str, FALSE);
+	      add_pragma_str_to_statement (s, "scop", TRUE);
 	      pragma_added_p = true;
 	    }
 	}
-    } 
+    }
   else
     {
       if ( instruction_tag(inst) == is_instruction_call)
@@ -148,7 +146,8 @@ static bool pragma_scop(statement s)
 	    }
 	}
     }
-  pips_assert("statement s is consistent", statement_consistent_p(s));
+  ifdebug(1)
+    pips_assert("statement s is consistent", statement_consistent_p(s));
   return TRUE;
 }
 
@@ -157,48 +156,41 @@ static bool pragma_scop(statement s)
  * compute outer_loops
  */
 static bool outer_loop(statement s)
-{ 
+{
   pips_debug(1,"statement_ordering = %"PRIdPTR", stmt = %s\n",statement_ordering(s), text_to_string(statement_to_text(s)));
-  instruction  inst = statement_instruction(s);
-  if ( instruction_tag(inst) ==  is_instruction_loop )
-    {
-      if (in_loop_p == FALSE)
-	{
-	  gen_array_append (outer_loops_array,(void*)statement_ordering(s));
-	  in_loop_p = TRUE;
-	  statement end_outermost_loop = make_continue_statement(entity_empty_label());
-	  insert_statement(s, end_outermost_loop, false);
-	}
+  if(statement_loop_p(s)) {
+    if(in_loop_p == FALSE) {
+      gen_array_append(outer_loops_array, (void*)statement_ordering(s));
+      in_loop_p = TRUE;
+      statement end_outermost_loop = make_continue_statement(entity_empty_label());
+      insert_statement(s, end_outermost_loop, false);
     }
-   else
-    {
-      if ( instruction_tag(inst) == is_instruction_call)
-	{
-	  if (continue_statement_p(s) &&  !declaration_statement_p(s))
-	    in_loop_p = FALSE;
-	}
-    }
-     
+  } else if(statement_call_p(s)) {
+    // Is the statement_call_p(s) test really needed ??
+    if(continue_statement_p(s) && !declaration_statement_p(s))
+      in_loop_p = FALSE;
+  }
+
   return TRUE;
 }
 
-#define  SCOPPRETTY ".scop.c"
+
 bool pocc_prettyprinter(char * module_name)
-{ 
+{
   entity	module;
   statement	module_stat;
-     
+
   module = local_name_to_top_level_entity(module_name);
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   set_current_module_statement((statement)
 	 db_get_memory_resource(DBR_CODE, module_name, TRUE));
 
 
- 
-  module_stat = get_current_module_statement();
- 
 
- 
+  module_stat = get_current_module_statement();
+
+
+
   Gsc_map = (statement_mapping)
     db_get_memory_resource( DBR_STATIC_CONTROL, module_name, TRUE);
   
@@ -210,7 +202,7 @@ bool pocc_prettyprinter(char * module_name)
 
   gen_recurse(module_stat, statement_domain, outer_loop, gen_null);
   gen_recurse(module_stat, statement_domain, pragma_scop, gen_null);
- 
+
   /* case of, a function which doesn't contain a statement after the
    *SCoP, we have to test if we have added pragma scop without its endscop
    */
@@ -224,6 +216,6 @@ bool pocc_prettyprinter(char * module_name)
   reset_current_module_entity();
   reset_current_module_statement();
   gen_array_free(outer_loops_array);
- 
-  return TRUE;  
+
+  return TRUE;
 }

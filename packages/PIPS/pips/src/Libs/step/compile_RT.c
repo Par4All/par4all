@@ -1,6 +1,3 @@
-#ifdef HAVE_CONFIG_H
-#include "pips_config.h"
-#endif
 #include "defines-local.h"
 
 /*
@@ -34,6 +31,20 @@ typedef struct {
 #define DECLARE_STEP_H 2
 #define DECLARE_STEPRT_F_H 3
 
+static list local_declaration=NIL;
+
+void step_RT_set_local_declarations(entity module, statement body)
+{
+
+  FOREACH(ENTITY, e, local_declaration)
+    {
+      AddLocalEntityToDeclarations(e, module, body);
+    }
+
+  local_declaration=NIL;
+}
+
+
 static SymbolicDescriptor SymbolicDescriptorTable[] = {
   {DECLARE_LOCAL,      STEP_RT_NB_WORKCHUNK_INTEGER, -1, STEP_MAX_NB_REQUEST_NAME},
   {DECLARE_STEP_H,     STEP_RT_SYMBOLIC_INTEGER,      1, STEP_INDEX_SLICE_LOW_NAME},
@@ -41,6 +52,11 @@ static SymbolicDescriptor SymbolicDescriptorTable[] = {
   {DECLARE_STEP_H,     STEP_RT_NB_WORKCHUNK_INTEGER, 16, STEP_MAX_NB_LOOPSLICES_NAME},
   {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      0, STEP_NONBLOCKING_NAME},
   {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      0, STEP_TAG_DEFAULT_NAME},
+  {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      0, STEP_PARALLEL_NAME},
+  {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      1, STEP_DO_NAME},
+  {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      2, STEP_PARALLELDO_NAME},
+  {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      3, STEP_MASTER_NAME},
+  {DECLARE_STEPRT_F_H, STEP_RT_SYMBOLIC_INTEGER,      3, STEP_CRITICAL_NAME},
   /*must be the last*/
   {DECLARE_NO, 0, 0, ""}
 };
@@ -54,32 +70,67 @@ static SymbolicDescriptor find_SymbolicDescriptor_by_name(string name)
 	 (strncmp(name, SymbolicDescriptorTable[id].name, len) != 0))
     id++;
   pips_assert("know symbol", SymbolicDescriptorTable[id].declaration_file != DECLARE_NO);
-
+ 
   return SymbolicDescriptorTable[id];
 }
 
 entity step_parameter(string name_, entity module, expression expr)
 {
+  entity e;
   string name = strdup(name_);
-  entity e = FindOrCreateEntity(entity_user_name(module), name);
-  pips_assert("not null", e != NULL);
-  pips_assert("entity defined", !entity_undefined_p(e));
+  SymbolicDescriptor sym_desc = find_SymbolicDescriptor_by_name(name);
 
-  if (type_undefined_p(entity_type(e)))
-    {
-      SymbolicDescriptor sym_desc = find_SymbolicDescriptor_by_name(name);
-
-      entity_type(e)=MakeTypeVariable(make_basic_int(sym_desc.size_of_integer), NIL);
-      if(expression_undefined_p(expr))
-	e = MakeParameter(e, int_to_expression(sym_desc.value));
-      else
-	e = MakeParameter(e, expr);
+  if (fortran_module_p(get_current_module_entity()))
+    { 
+      /* Fortran
+	 PARAMETER (TEST = expr)
+       */
+      e = FindOrCreateEntity(entity_user_name(module), name);
+      pips_assert("not null", e != NULL);
+      pips_assert("entity defined", !entity_undefined_p(e));
       
-      if (sym_desc.declaration_file == DECLARE_LOCAL)
-	code_declarations(EntityCode(module)) = gen_nconc(code_declarations(EntityCode(module)), CONS(ENTITY, e, NIL));
+      if (type_undefined_p(entity_type(e)))
+	{
+	  entity_type(e)=MakeTypeVariable(make_basic_int(sym_desc.size_of_integer), NIL);
+	  if(expression_undefined_p(expr))
+	    e = MakeParameter(e, int_to_expression(sym_desc.value));
+	  else
+	    e = MakeParameter(e, expr);
+	  
+	  if (sym_desc.declaration_file == DECLARE_LOCAL)
+	    local_declaration = gen_nconc(local_declaration, CONS(ENTITY, e, NIL));
+	}
+      pips_assert("symbolic", entity_symbolic_p(e));
+    }
+  else 
+    {
+      /* C 
+     const int TEST=1 
+  
+     DT74 "TOP-LEVEL:TEST"T77 2 T80 T31 0 4 )()(T63 0 U))))T70 1 T64 R74 "TOP-LEVEL:TOP-LEVEL" R74 "TOP-LEVEL:*STATIC*" 0 ()))T79 5 T44 T73 2 T33 R74 "TOP-LEVEL:1"
+
+     T77: type T80: variable 
+                    T31: basic 0: int
+                    T63: qualifier 0: const
+     T70: storage 1: ram T64: ram 
+     T79: value 5: expression T44:Expression T73: syntax 2: call T33:call R74: entity"TOP-LEVEL:1"
+*/
+      e = FindOrCreateEntity(entity_user_name(module), name);
+      pips_assert("not null", e != NULL);
+      pips_assert("entity defined", !entity_undefined_p(e));
+
+      local_declaration = gen_nconc(local_declaration, CONS(ENTITY, e, NIL));
+      if (type_undefined_p(entity_type(e)))
+	{
+	  entity_type(e)=make_type(is_type_variable, make_variable(make_basic_int(sym_desc.size_of_integer), NIL, NIL));
+	  entity_storage(e) = make_storage_rom(); // ROM ou RAM ???
+	  if(expression_undefined_p(expr))
+	    entity_initial(e) = make_value_expression(int_to_expression(sym_desc.value));
+	  else
+	    entity_initial(e) = make_value_expression(expr);
+	}
     }
   free(name);
-  pips_assert("symbolic", entity_symbolic_p(e));
   return e;
 }
 
@@ -125,34 +176,58 @@ static entity step_local_RT_Integer(int size_of_integer, entity mpi_module, stri
       entity area = FindOrCreateEntity(entity_user_name(mpi_module), DYNAMIC_AREA_LOCAL_NAME);
       entity_type(e) = MakeTypeVariable(make_basic_int(size_of_integer), dims);
       entity_storage(e) = make_storage_ram(make_ram(mpi_module,area,add_variable_to_area(area,e),NIL));
-      if(!header)
-	code_declarations(EntityCode(mpi_module))=gen_nconc(code_declarations(EntityCode(mpi_module)),CONS(ENTITY,e,NIL));
+      if(!header && mpi_module != get_current_module_entity())
+	local_declaration=gen_nconc(local_declaration,CONS(ENTITY,e,NIL));
     }
   pips_assert("variable",entity_variable_p(e));
   free(name);
   return e;
 }
 
-
 /*
-  A partir d'un module, d'un tableau, creation d'un tableau SR stockant pour chaque noeud les bornes d'indices du tableau traites
+  A partir d'un module, d'un tableau, creation d'un tableau des regions SEND (ou RECV) pour chaque workchunk
 */
-entity step_local_SR(entity module, entity array, expression expr_nb_region)
+entity step_local_arrayRegions(string array_regions_name ,entity module, entity array, expression expr_nb_region)
 {
-  string name = strdup(STEP_SR_NAME(array));
-  dimension dim_array = make_dimension(int_to_expression(1), int_to_expression(NumberOfDimension(array)));
-  dimension bounds = make_dimension(step_symbolic(STEP_INDEX_SLICE_LOW_NAME, module),
-				    step_symbolic(STEP_INDEX_SLICE_UP_NAME, module));
+  bool is_fortran=fortran_module_p(get_current_module_entity());
+
+  string name = strdup(array_regions_name);
   list dims = NIL;
-  if(!expression_undefined_p(expr_nb_region))
-    dims = CONS(DIMENSION, make_dimension(int_to_expression(0), expr_nb_region), dims);
-  dims = CONS(DIMENSION, bounds, CONS(DIMENSION, dim_array, dims));
+  if(is_fortran)
+    {
+      dimension dim_array = make_dimension(int_to_expression(1), int_to_expression(NumberOfDimension(array)));
+      if(!expression_undefined_p(expr_nb_region))
+	dims = CONS(DIMENSION, make_dimension(int_to_expression(1), expr_nb_region), dims);
+      dimension bounds = make_dimension(step_symbolic(STEP_INDEX_SLICE_LOW_NAME, module),
+					step_symbolic(STEP_INDEX_SLICE_UP_NAME, module));
+      dims = CONS(DIMENSION, bounds, CONS(DIMENSION, dim_array, dims));
+    }
+  else
+    {
+      dimension bounds = make_dimension(int_to_expression(0), MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME),
+									     step_symbolic(STEP_INDEX_SLICE_UP_NAME, module),
+									     int_to_expression(1)));
+      dims = CONS(DIMENSION, bounds, dims);
+      
+      dimension dim_array = make_dimension(int_to_expression(0), MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME),
+										int_to_expression(NumberOfDimension(array)),
+										int_to_expression(1)));
+      dims = CONS(DIMENSION, dim_array, dims);
+
+      if(!expression_undefined_p(expr_nb_region))
+	dims = CONS(DIMENSION, make_dimension(int_to_expression(0), MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME),
+										   expr_nb_region,
+										   int_to_expression(1))), dims);
+    }
+
+
 
   entity e = step_local_RT_Integer(STEP_RT_ARRAY_INDEX_INTEGER, module, name, dims, false);
   free(name);
   pips_assert("variable", entity_variable_p(e));
   return e;
 }
+
 
 entity step_local_slice_index(entity module)
 {
@@ -192,13 +267,15 @@ expression step_local_nb_request(entity module)
 
 expression step_local_rank(entity module)
 {
-  entity e = step_local_RT_Integer(STEP_RT_NB_WORKCHUNK_INTEGER, module, STEP_COMM_RANK_NAME, NIL, true);
+  bool in_header=fortran_module_p(get_current_module_entity());
+  entity e = step_local_RT_Integer(STEP_RT_NB_WORKCHUNK_INTEGER, module, STEP_COMM_RANK_NAME, NIL, in_header);
   return entity_to_expression(e);
 }
 
 expression step_local_size(entity module)
 {
-  entity e = step_local_RT_Integer(STEP_RT_NB_WORKCHUNK_INTEGER, module, STEP_COMM_SIZE_NAME, NIL, true);
+  bool in_header=fortran_module_p(get_current_module_entity());
+  entity e = step_local_RT_Integer(STEP_RT_NB_WORKCHUNK_INTEGER, module, STEP_COMM_SIZE_NAME, NIL, in_header);
   return entity_to_expression(e);
 }
 
@@ -209,7 +286,7 @@ entity step_local_loop_index(entity module, string name)
 
 
 /*
-  Génération de statement 
+  Generation de statement 
 */
 static entity step_type(type t)
 {
@@ -302,5 +379,144 @@ statement call_STEP_subroutine(string name, list args, type t)
   STEP_DEBUG_STATEMENT(3, "call STEP_subroutine", statmt);
 
   pips_debug(1, "statmt = %p\n", statmt);
+  return statmt;
+}
+
+
+
+/*
+  void step_init_arrayregions(void *array, int *type, int *dims, index_t L1, index_t U1,...)
+*/
+statement build_call_STEP_init_arrayregions(entity array)
+{
+  type t = entity_type(array);
+  list dims = variable_dimensions(type_variable(t));
+
+  expression expr_array = entity_to_expression(array);
+  expression expr_type = entity_to_expression(step_type(t));
+  
+  expression expr_dims = int_to_expression(gen_length(dims));
+
+  list args = CONS(EXPRESSION, expr_dims,
+		   CONS(EXPRESSION, expr_type,
+			CONS(EXPRESSION, expr_array, NIL)));
+
+  FOREACH(DIMENSION, bounds_d, dims)
+    {
+      expression bounds_lower = copy_expression(dimension_lower(bounds_d));
+      expression bounds_upper = copy_expression(dimension_upper(bounds_d));
+      args = CONS(EXPRESSION, bounds_upper,
+		  CONS(EXPRESSION, bounds_lower, args));
+    }
+
+  statement statmt = make_call_statement(RT_STEP_InitArrayRegions, gen_nreverse(args), entity_undefined, string_undefined);
+  return statmt;
+}
+
+
+/*
+  void step_alltoall_full(void *array, int *algorithm, int *tag)
+  void step_alltoall_full_interlaced(void *array, int *algorithm, int *tag)
+  void step_alltoall_partial(void *array, int *algorithm, int *tag)
+  void step_alltoall_partial_interlaced(void *array, int *algorithm, int *tag)
+
+*/
+statement build_call_STEP_AllToAll(entity module, entity array, bool is_optimized, bool is_interlaced)
+{
+  statement statmt;
+  string subroutine;
+
+  if (is_optimized)
+    {
+      if(is_interlaced)
+	subroutine=strdup(RT_STEP_AllToAll_PartialInterlaced);
+      else
+	subroutine=strdup(RT_STEP_AllToAll_Partial);
+    }
+  else
+    {
+      if(is_interlaced)
+	subroutine=strdup(RT_STEP_AllToAll_FullInterlaced);
+      else
+	subroutine=strdup(RT_STEP_AllToAll_Full);
+    }
+
+  expression expr_array = entity_to_expression(array);
+  expression expr_algorithm = step_symbolic(STEP_NONBLOCKING_NAME, module);
+  expression expr_tag = step_symbolic(STEP_TAG_DEFAULT_NAME, module);
+  list args = CONS(EXPRESSION, expr_array,
+		   CONS(EXPRESSION, expr_algorithm,
+			CONS(EXPRESSION, expr_tag, NIL)));
+
+  statmt = make_call_statement(subroutine, args, entity_undefined, string_undefined);
+  free(subroutine);
+
+  return statmt;
+}
+
+statement build_call_STEP_WaitAll(list comm_stmt)
+{
+  if(ENDP(comm_stmt))
+    return make_continue_statement(entity_undefined);
+  else
+    {
+      statement block = make_block_statement(gen_nconc(comm_stmt,
+						       CONS(STATEMENT, call_STEP_subroutine(RT_STEP_WaitAll, NIL, type_undefined),NIL)));
+      string comment = strdup(concatenate("\nC     Communicating data to other nodes",
+					  "\nC     3 communication shemes for all-to-all personalized broadcast :",
+					  "\nC     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.\n",NULL));
+      put_a_comment_on_a_statement(block, comment);
+      return block;
+    }
+}
+statement critical_build_call_STEP_WaitAll(list comm_stmt)
+{
+  if(ENDP(comm_stmt))
+    return make_continue_statement(entity_undefined);
+  else
+    {
+      statement block = make_block_statement(gen_nconc(comm_stmt,
+						       CONS(STATEMENT, call_STEP_subroutine(RT_STEP_WaitAll, NIL, type_undefined),NIL)));
+      return block;
+    }
+}
+
+/*
+  void step_set_sendregions(void *array, int *nb_workchunks, index_t *regions)
+  void step_set_interlaced_sendregions(void *array, int *nb_workchunks, index_t *regions)
+*/
+statement build_call_STEP_set_send_region(entity array, expression expr_nb_workchunk, entity regions, bool is_interlaced, bool is_reduction)
+{
+  statement statmt;
+  string subroutine;
+  expression expr_array = entity_to_expression(array);
+  expression expr_regions = entity_to_expression(regions);
+  list args = CONS(EXPRESSION, expr_array,
+		   CONS(EXPRESSION, expr_nb_workchunk,
+			CONS(EXPRESSION, expr_regions,NIL)));
+  if (is_reduction)
+    subroutine=strdup(RT_STEP_Set_ReductionSendRegions);
+  else  if(is_interlaced)
+    subroutine=strdup(RT_STEP_Set_InterlacedSendRegions);
+  else
+    subroutine=strdup(RT_STEP_Set_SendRegions);
+  statmt = make_call_statement(subroutine, args, entity_undefined, string_undefined);
+  free(subroutine);
+
+  return statmt;
+}
+
+/*
+  void step_set_recvregions(void *array, int *nb_workchunks, index_t *regions)
+*/
+statement build_call_STEP_set_recv_region(entity array, expression expr_nb_workchunk, entity regions)
+{
+  statement statmt;
+  expression expr_array = entity_to_expression(array);
+  expression expr_regions = entity_to_expression(regions);
+  list args = CONS(EXPRESSION, expr_array,
+		   CONS(EXPRESSION, expr_nb_workchunk,
+			CONS(EXPRESSION, expr_regions,NIL)));
+  statmt = make_call_statement(RT_STEP_Set_RecvRegions, args, entity_undefined, string_undefined);
   return statmt;
 }

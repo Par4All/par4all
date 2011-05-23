@@ -45,7 +45,6 @@
 
 #include "resources.h"
 #include "properties.h"
-#include "transformations.h"
 
 static expression pattern = expression_undefined;
 static string pattern_module_name = string_undefined;
@@ -165,6 +164,8 @@ bool expression_substitution(string module_name)
     {
         gen_multi_recurse(
             get_current_module_statement(),
+            reference_domain, gen_false, gen_null,
+            range_domain, gen_false, gen_null,
             expression_domain, replace_expression_similar_to_pattern, gen_null,
             instruction_domain, replace_instruction_similar_to_pattern, gen_null,
             0

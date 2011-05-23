@@ -1,0 +1,2 @@
+CFLAGS+="-mavx -march=native -O3"
+##pipsrules##

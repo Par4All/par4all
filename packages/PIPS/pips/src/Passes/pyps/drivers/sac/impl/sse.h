@@ -4,15 +4,18 @@ typedef float  a2sf[2] __attribute__ ((aligned (16)));
 typedef float  a4sf[4] __attribute__ ((aligned (16)));
 typedef double a2df[2] __attribute__ ((aligned (16)));
 typedef int	a4si[4] __attribute__ ((aligned (16)));
+typedef int	a8si[4] __attribute__ ((aligned (16)));
 
 typedef __m128  v4sf;
 typedef __m128d v2df;
 typedef __m128i v4si;
+typedef __m128i v8si;
 typedef __m128i v8hi;
 
 /* float */
 #define SIMD_LOAD_V4SF(vec,arr) vec=_mm_loadu_ps(arr)
 #define SIMD_LOADA_V4SF(vec,arr) vec=_mm_load_ps(arr)
+#define SIMD_LOAD_BROADCAST_V4SF(vec,val) vec=_mm_set1_ps(val)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
 #define SIMD_DIVPS(vec1,vec2,vec3) vec1=_mm_div_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
@@ -23,6 +26,8 @@ typedef __m128i v8hi;
 		SIMD_MULPS(__pips_tmp, vec3, vec4);\
 		SIMD_ADDPS(vec1, __pips_tmp, vec2); \
 		} while(0)
+
+#define SIMD_SHUFFLE_V4SF(dist,src,i0,i1,i2,i3) dist=_mm_shuffle_ps(src,src,_MM_SHUFFLE(i3,i2,i1,i0)
 
 /* umin as in unary minus */
 #define SIMD_UMINPS(vec1, vec2)				\
@@ -45,6 +50,7 @@ typedef __m128i v8hi;
 		} while (0)
 
 #define SIMD_ZERO_V4SF(vec) vec = _mm_setzero_ps()
+#define SIMD_INVERT_V4SF(vec) vec = _mm_shuffle_ps(vec,vec,_MM_SHUFFLE(4,3,2,1))
 
 #define SIMD_LOAD_GENERIC_V4SF(vec,v0,v1,v2,v3)				\
 		do {								\

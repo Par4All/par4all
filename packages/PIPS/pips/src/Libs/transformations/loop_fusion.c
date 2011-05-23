@@ -187,6 +187,41 @@ static bool loop_has_same_header_p(loop loop1, loop loop2) {
 
 
 /**
+ * DIRTY HACK
+ * Replace entity in effects associated to a statement
+ */
+struct entity_pair
+{
+    entity old;
+    entity new;
+};
+
+
+void replace_entity_effects_walker(statement s, void *_thecouple ) {
+  struct entity_pair *thecouple = _thecouple;
+  list effs = load_proper_rw_effects_list( s );
+  ifdebug(7) {
+    pips_debug(0,"Handling statement :");
+    print_statement(s);
+    pips_debug(0,"Effects :");
+    print_effects(effs);
+    fprintf(stderr,"\n");
+  }
+
+  FOREACH(effect, eff, effs) {
+    replace_entity(eff, thecouple->old, thecouple->new);
+  }
+  ifdebug(7) {
+    pips_debug(0,"Effects after :");
+    print_effects(effs);
+    fprintf(stderr,"\n");
+  }
+
+}
+
+
+
+/**
  * @brief Try to fuse the two loop. Dependences are check against the new body
  * but other constraints such as some statement between the two loops are not
  * handled and must be enforced outside.
@@ -202,6 +237,8 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
 
   loop loop1 = statement_loop(sloop1);
   loop loop2 = statement_loop(sloop2);
+  statement body_loop1 = loop_body(loop1);
+  statement body_loop2 = loop_body(loop2);
 
   // Check if loops have fusion compatible headers, else abort
   if(!loops_have_same_bounds_p(loop1, loop2)) {
@@ -225,14 +262,18 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
   entity index1 = loop_index(loop1);
   entity index2 = loop_index(loop2);
   if(index1!=index2) {
+    pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
+               entity_name(index2), entity_name(index1));
     // FI: we should check that index1 is dead on exit of loop1 and
     // that index2 is dead on exit of loop2 and that index1 does not
     // appear in the memory effects of loop2
-    replace_entity((void *)loop2, index2, index1);
+    replace_entity((void *)body_loop2, index2, index1);
+
+    struct entity_pair thecouple = { index2, index1 };
+    gen_context_recurse(body_loop2, &thecouple,
+            statement_domain, gen_true, replace_entity_effects_walker);
   }
 
-  statement body_loop1 = loop_body(loop1);
-  statement body_loop2 = loop_body(loop2);
   //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
   list seq1;
   list fused;
@@ -269,15 +310,18 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
   graph chains = statement_dependence_graph(sloop1);
   debug_off();
 
+
   // Build DG
   debug_on("RICEDG_DEBUG_LEVEL");
   graph candidate_dg = compute_dg_on_statement_from_chains(sloop1, chains);
   debug_off();
 
-  ifdebug(6) {
-    pips_debug(6, "Candidate DG :\n");
+  ifdebug(5) {
+    pips_debug(0, "Candidate CHAINS :\n");
+    print_graph(chains);
+    pips_debug(0, "Candidate DG :\n");
     print_graph(candidate_dg);
-    pips_debug(6, "Candidate fused loop :\n");
+    pips_debug(0, "Candidate fused loop :\n");
     print_statement(sloop1);
   }
 
@@ -299,6 +343,7 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
         arc_label an_arc_label = successor_arc_label(a_successor);
         int statement_ordering2 = dg_vertex_label_statement(dvl2);
 
+
         // FIXME ordering check is no longer valid !!
         if(statement_ordering2 < statement_ordering(sloop2)
             && statement_ordering2 != statement_ordering(sloop1)) {
@@ -306,9 +351,32 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
           {
             effect e_sink = conflict_sink(c);
             effect e_source = conflict_source(c);
+            ifdebug(6) {
+              pips_debug(0,"Considering arc : from statement %d :",statement_ordering);
+              print_effect(conflict_source(c));
+              pips_debug(0," to statement %d :",statement_ordering2);
+              print_effect(conflict_sink(c));
+            }
             if(( effect_write_p(e_source) && store_effect_p(e_source))
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
-              ifdebug(5) {
+
+              // Inner loop indices conflicts aren't preventing fusion
+              statement stmt1,stmt2;
+              stmt1 = ordering_to_statement(statement_ordering);
+
+              if(statement_loop_p(stmt1) && effect_variable(e_source)
+                  == loop_index(statement_loop(stmt1))) {
+                continue;
+              }
+
+              stmt2 = ordering_to_statement(statement_ordering2);
+              if(statement_loop_p(stmt2) && effect_variable(e_sink)
+                  == loop_index(statement_loop(stmt2))) {
+                continue;
+              }
+
+
+              ifdebug(6) {
                 pips_debug(0,"Arc preventing fusion : from statement %d :",statement_ordering);
                 print_effect(conflict_source(c));
                 pips_debug(0," to statement %d :",statement_ordering2);
@@ -316,6 +384,13 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
               }
               success = false;
             }
+          }
+        } else {
+          ifdebug(6) {
+            pips_debug(0,"Arc ignored : from statement %d :",statement_ordering);
+            print_statement(ordering_to_statement(statement_ordering));
+            pips_debug(0," to statement %d :",statement_ordering2);
+            print_statement(ordering_to_statement(statement_ordering2));
           }
         }
       }
@@ -337,7 +412,10 @@ static bool fusion_loops(statement sloop1, statement sloop2) {
     // loop2 as a temporary; so the memory effects of loops 2 should
     // be checked before attempting the first subtitution
     if(index1!=index2) {
-      replace_entity((void *)loop2, index1, index2);
+      replace_entity((void *)body_loop2, index1, index2);
+      struct entity_pair thecouple = { index1, index2 };
+      gen_context_recurse(body_loop2, &thecouple,
+              statement_domain, gen_true, replace_entity_effects_walker);
     }
     loop_body(loop1) = body_loop1;
     // Cleaning FIXME
@@ -395,6 +473,8 @@ static fusion_block make_block_from_statement(statement s, int num) {
     set_del_element(b->statements, b->statements, b->s);
   }
 
+  pips_debug(3,"Block created : num %d ; is_a_loop : %d\n",
+             b->num,b->is_a_loop);
   return b;
 }
 
@@ -493,6 +573,7 @@ static set prune_successors_tree(fusion_block b) {
   }
   SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
     set_del_element(b->successors, b->successors, succ_of_succ);
+    set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
   }
 
   full_succ = set_union(full_succ, full_succ, b->successors);
@@ -503,7 +584,8 @@ static set prune_successors_tree(fusion_block b) {
  * Merge two blocks (successors, predecessors, statements).
  */
 static void merge_blocks(fusion_block block1, fusion_block block2) {
-  pips_assert("block1->num < block2->num expected",block1->num < block2->num);
+//FIXME not always the case
+//pips_assert("block1->num < block2->num expected",block1->num < block2->num);
 
   ifdebug(3) {
     pips_debug(3,"Merging blocks :\n");
@@ -696,6 +778,7 @@ static bool fusion_in_sequence(sequence s) {
       int block_count = gen_length(block_list);
       while(block_count > 0) {
         block_count = 0;
+        bool at_least_one_block_scheduled = false;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
         {
@@ -712,6 +795,7 @@ static bool fusion_in_sequence(sequence s) {
             // Schedule block
             new_stmts = CONS(statement,block->s,new_stmts);
             block->num = -1; // Disable block
+            at_least_one_block_scheduled = true;
 
             // Release precedence constraint on successors
             SET_FOREACH(fusion_block,succ,block->successors)
@@ -727,6 +811,10 @@ static bool fusion_in_sequence(sequence s) {
             // Number of block alive
             block_count++;
           }
+        }
+        if(!at_least_one_block_scheduled) {
+          pips_internal_error("No block scheduled, we have interdependence "
+              "in the block tree, which means it's not a tree ! Abort...\n");
         }
       }
 

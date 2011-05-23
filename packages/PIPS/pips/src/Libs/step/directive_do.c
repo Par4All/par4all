@@ -5,15 +5,17 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
+
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
 #include "defines-local.h"
 
 #define RANGENAME_LOW_SUFFIX "_L"
 #define RANGENAME_UP_SUFFIX "_U"
+#define RANGENAME_DUMMY_SUFFIX "_DUMMY"
 
-static entity clone_scalar(string name,entity module,entity scalar)
+entity clone_scalar(string name,entity module,entity scalar)
 {
   entity e;
 
@@ -70,8 +72,8 @@ static statement do_outlining(directive d)
   statement call; 
   list body;
   loop loop_l;
-  string new_module_name, id_suffix, lower, upper;
-  entity new_module, index, low_e, up_e;
+  string new_module_name, id_suffix, lower, upper, dummy;
+  entity new_module, index, low_e, up_e, dummy_index;
   expression low_range_expr, up_range_expr;
   loop_data data;
 
@@ -79,6 +81,8 @@ static statement do_outlining(directive d)
 
   pips_assert("do",type_directive_omp_parallel_do_p(directive_type(d))
 	      ||  type_directive_omp_do_p(directive_type(d)));
+
+  bool is_fortran = fortran_module_p(get_current_module_entity());
   
   body = directive_body(d);
 
@@ -94,9 +98,21 @@ static statement do_outlining(directive d)
   id_suffix = step_find_loop_range_suffix_id(strdup(concatenate(new_module_name, MODULE_SEP_STRING,module_local_name(loop_index(loop_l)),NULL)));
   lower=strdup(concatenate(entity_user_name(loop_index(loop_l)), RANGENAME_LOW_SUFFIX, id_suffix, NULL));
   upper=strdup(concatenate(entity_user_name(loop_index(loop_l)), RANGENAME_UP_SUFFIX, id_suffix, NULL));
+  if(!is_fortran)
+    {
+      dummy=strdup(concatenate(entity_user_name(loop_index(loop_l)), RANGENAME_DUMMY_SUFFIX, id_suffix, NULL));
+    }
   free(id_suffix);
 
-  index = outlining_add_declaration(loop_index(loop_l));
+  if(is_fortran)
+    {
+      index = outlining_add_declaration(loop_index(loop_l));
+    }
+  else
+    {
+      index = outlining_local_declaration(loop_index(loop_l));
+      dummy_index = clone_scalar(dummy, new_module, index);
+    }
   low_e = outlining_add_declaration(clone_scalar(lower, new_module, index));
   up_e = outlining_add_declaration(clone_scalar(upper, new_module, index));
 
@@ -106,10 +122,29 @@ static statement do_outlining(directive d)
   range_upper(loop_range(loop_l))=entity_to_expression(up_e);
 
   outlining_scan_block(gen_full_copy_list(body));
-  
-  outlining_add_argument(index,entity_to_expression(index));
-  outlining_add_argument(low_e,low_range_expr);
-  outlining_add_argument(up_e,up_range_expr);
+
+  if(is_fortran)
+  {
+   outlining_add_argument(index, expression_undefined);
+  }
+  else
+  {
+    expression x = entity_to_expr(index);
+    variable v = type_variable(entity_type(index));
+
+    if (!basic_pointer_p(variable_basic(v)) && 
+	ENDP(variable_dimensions(v)))
+      {
+	x = make_call_expression(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), CONS(EXPRESSION, x, NIL));
+	entity_type(dummy_index)=make_type_variable(make_variable(make_basic_pointer(copy_type(entity_type(dummy_index))),
+								  NIL,
+								  NIL)
+						    );
+      }
+    outlining_add_argument(dummy_index, x);
+  }
+  outlining_add_argument(low_e, low_range_expr);
+  outlining_add_argument(up_e, up_range_expr);
 
   call = outlining_close(step_directives_USER_FILE_name());
 

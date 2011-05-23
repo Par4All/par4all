@@ -22,47 +22,10 @@ mkdir -p $INSTAL_DIR;
 
 while [[ $# -gt 0 ]];
 do
-    exec 4< $1
-    exec 5> $INSTAL_DIR/step.tmp
-    cut=0
-
-    while read -u 4; do
-	case $REPLY in
-	    "! include \"$DEFAULT_STEP_HEADER\"" )
-		if (($cut == 0)) 
-		then
-		    cut=1
-		else
-		    echo >&5 "$REPLY"
-		fi
-	    ;;
-	    "! end include \"$DEFAULT_STEP_HEADER\"" )
-		if (($cut == 1))
-		then
-		    cut=0
-		else
-		    echo >&5 "$REPLY"
-		fi
-		;;
-	    "!       include \"$DEFAULT_STEP_HEADER\"" )
-		echo >&5 "      include \"$STEP_HEADER\"";
-		;;
-	    "! MIL-STD-1753 Fortran extension not in PIPS" )
-		;;
-	    "!       implicit none" )
-		echo >&5 "      implicit none";
-		;;
-	    * )
-		if (($cut == 0))
-		then
-		    echo >&5 "$REPLY"
-		fi
-	esac
-    done
-
-    exec 4<&-
-    exec 5>&-
-
+    awk 'BEGIN {cut=0} cut == 0 && /! include "STEP.h"/ {cut=1} cut == 0 {print $0;} cut == 1 && /! end include "STEP.h"/ {cut=0}' $1 | \
+	sed 's,!       include "STEP.h",      include "STEP.h",g' | \
+	sed 's,!       implicit none,      implicit none,g' | \
+	sed 's,! MIL-STD-1753 Fortran extension not in PIPS\n,,' >$INSTAL_DIR/step.tmp
     mv $INSTAL_DIR/step.tmp $INSTAL_DIR/$(basename $1)
     shift
 done

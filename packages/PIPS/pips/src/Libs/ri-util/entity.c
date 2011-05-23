@@ -1179,7 +1179,7 @@ entity module_name_to_runtime_entity(string name)
     entity e = module_name_to_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
+        pips_user_warning("entity %s not defined, pips is likely to crash soon\n"
                 "Please feed pips with its definition and source\n",name);
         e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
     }
@@ -2116,7 +2116,6 @@ entity make_entity_copy(entity e)
 
     AddEntityToDeclarations(ne, m);
   }
-  free(variable_name);
 
   return ne;
 }

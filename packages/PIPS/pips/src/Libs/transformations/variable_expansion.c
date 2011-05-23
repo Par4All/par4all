@@ -146,7 +146,7 @@ bool prepare_expansion(loop l, scalar_expansion_context* ctxt)
     expression init;
     if(should_copy)
     {
-        entity I = make_new_scalar_variable(get_current_module_entity(), expression_basic(range_lower(r)));
+        entity I = make_new_scalar_variable(get_current_module_entity(), basic_of_expression(range_lower(r)));
         statement parent = (statement)gen_get_ancestor(statement_domain,l);
         AddLocalEntityToDeclarations(I,get_current_module_entity(),parent);
         insert_statement(parent,
@@ -283,6 +283,7 @@ static bool scalar_expansion(char *module_name)
      */
     scalar_expansion_context ctxt = DEFAULT_SCALAR_EXPANSION_CONTEXT;
     gen_context_recurse(get_current_module_statement(),&ctxt, loop_domain, prepare_expansion, perform_expansion_and_unstack_index_and_dimension);
+    module_reorder(get_current_module_statement());
 
     /* validate */
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, get_current_module_statement() );

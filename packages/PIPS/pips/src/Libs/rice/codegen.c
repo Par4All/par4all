@@ -120,6 +120,40 @@ static bool AK_ignore_this_successor(vertex __attribute__ ((unused)) v,
 }
 
 
+/* Check if a variable is private to loop nest */
+static bool variable_private_to_loop_p( list /* of loop statement */ loops,
+                                        entity var) {
+  FOREACH(STATEMENT, st, loops) {
+    // We filter-out local declarations and loop locals
+    list l = loop_locals(instruction_loop(statement_instruction(st)));
+    list d = statement_declarations(loop_body(instruction_loop(statement_instruction(st))));
+
+    // There is usually no declaration at this level,
+    // but if we find some, warn the user
+    if(statement_declarations(st)!=NIL) {
+      pips_user_warning("We don't expect declarations there... (sn : %d)\n",
+                        statement_number(st));
+      print_entities(statement_declarations(st));
+    }
+
+    ifdebug(8) {
+      print_statement(st);
+      fprintf(stderr,"The list of privatized/private variables : \n");
+      print_entities(l);
+      fprintf(stderr,"\nThe list of locally declared variables : \n");
+      print_entities(d);
+      fprintf(stderr,"\n");
+    }
+
+    if (gen_find_eq(var, l) != entity_undefined
+        || gen_find_eq(var, d) != entity_undefined
+        ) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
 
 /* This function checks if conflict c between vertices v1 and v2 should
 be ignored at level l.
@@ -180,33 +214,9 @@ bool ignore_this_conflict(vertex v1, vertex v2, conflict c, int l)
     fprintf(stderr, "\n");
   }
 
-  FOREACH(STATEMENT, st, loops1) {
-    list l = loop_locals(instruction_loop(statement_instruction(st)));
-    ifdebug(8) {
-      print_statement(st);
-      fprintf(stderr,"The list of privatized/private variables : \n");
-      print_entities(l);
-      fprintf(stderr,"\n");
-    }
 
-    if (gen_find_eq(var1, l) != entity_undefined) {
-      return(TRUE);
-    }
-  }
-
-  FOREACH(STATEMENT, st, loops2) {
-    list l = loop_locals(instruction_loop(statement_instruction(st)));
-    ifdebug(8) {
-      print_statement(st);
-      fprintf(stderr,"The list of privatized/private variables : \n");
-      print_entities(l);
-      fprintf(stderr,"\n");
-    }
-    if (gen_find_eq(var1, l) != entity_undefined)  {
-      return(TRUE);
-    }
-  }
-  return(FALSE);
+  return variable_private_to_loop_p(loops1,var1) ||
+        variable_private_to_loop_p(loops2,var2);
 }
 
 

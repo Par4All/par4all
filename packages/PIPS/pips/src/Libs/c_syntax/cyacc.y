@@ -1180,7 +1180,7 @@ string_constant:
                         {
 			  /* Hmmm... Looks like a memory leak on all the
 			     strings... */
-			  $$ = list_to_string($1);
+			  $$ = list_to_string(gen_nreverse($1));
 			}
 ;
 one_string_constant:

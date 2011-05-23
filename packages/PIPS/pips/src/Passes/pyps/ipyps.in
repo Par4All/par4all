@@ -48,9 +48,9 @@ def load_pyps(self, filename):
     try:
         exec(open(filename).read())
     # To avoid crashing iPython if something goes wrong:
-    except Exception, e:
-        # Display the error message:
-        print e
+    except:
+        # We cannot get the exception because of 2.5 compliancy:
+        print("Error while loading PyPS file" )
 
 # Add a new magic function:
 ip = IPython.ipapi.get()

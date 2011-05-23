@@ -713,9 +713,9 @@ static void loop_rwt(loop l)
   bounds = loop_range(l);
   level = current_level();
   /* Atomize the loop bound expressions: */
-  do_atomize_if_different_level(range_lower(bounds), level);
-  do_atomize_if_different_level(range_upper(bounds), level);
-  do_atomize_if_different_level(range_increment(bounds), level);
+  do_atomize_if_different_level(range_lower(bounds), 1+level);
+  do_atomize_if_different_level(range_upper(bounds), 1+level);
+  do_atomize_if_different_level(range_increment(bounds), 1+level);
 }
 
 /* PDSon: I use the field 'comments' of statement for counting its number of
@@ -1468,7 +1468,7 @@ static void atom_cse_expression(expression e,list * skip_list)
     int quality;
     available_scalar_pt aspt;
 
-    /* only left and rigth side of the subscript are splittable */
+    /* only left and right side of the subscript are splittable */
     if(syntax_subscript_p(s)) return;
     if(gen_find_eq(e,*skip_list)!=gen_chunk_undefined) return;
     if(gen_find_eq(e,*skip_list)!=gen_chunk_undefined) return;
@@ -1492,7 +1492,7 @@ static void atom_cse_expression(expression e,list * skip_list)
                         call c = syntax_call(s);
                         if (quality==MAX_SIMILARITY)
                         {
-                            /* identicals, just make a reference to the scalar.
+                            /* identical, just make a reference to the scalar.
                                whatever the stuff stored inside.
                                */
 
@@ -1831,7 +1831,6 @@ static bool seq_flt(sequence s)
     gen_full_free_list(*top_of_w_effects);
     return true;
 }
-
 
 /* handle all calls not in a sequence */
 static bool call_flt(call c)

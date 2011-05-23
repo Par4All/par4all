@@ -109,8 +109,8 @@ void inline_return_remover(statement s,inlining_parameters p)
   /*
     Delete pragmas scop & endscop after inlining to give back original structure to user's program
   */
-  string pragma_begin = get_string_property("Pragma_Begin");
-  string pragma_end = get_string_property("Pragma_End");
+  string pragma_begin = get_string_property("PRAGMA_BEGIN");
+  string pragma_end = get_string_property("PRAGMA_END");
   list l_exts = extensions_extension (statement_extensions (s));
   FOREACH (EXTENSION, ext, l_exts) {
     pragma pr = extension_pragma (ext);

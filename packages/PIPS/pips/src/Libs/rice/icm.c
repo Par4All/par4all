@@ -1518,6 +1518,7 @@ invariant_code_motion(string module_name)
     }
 
     // Uselessly reinitialize ordering_to_statement, even if it not set...
+    clean_up_sequences(mod_stat);
     module_reorder(mod_stat);
 
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, mod_stat);

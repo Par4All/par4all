@@ -2,7 +2,6 @@ from __future__ import with_statement
 import re
 import os
 import fileinput
-import sys
 import pypsbase
 import pypsconfig
 
@@ -34,49 +33,6 @@ def guardincludes(fname):
         if is_include:
             print mkguard(guard_end, l),
 
-define_generic_intrinsics = """
-/* Header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
-#ifndef MAX0
-# define MAX0(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MAX
-# define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-# define MIN(a, b) ((a) < (b) ? (a) : (b))
-#endif
-
-#ifndef MOD
-# define MOD(a, b) ((a) % (b))
-#endif
-
-#ifndef DBLE
-# define DBLE(a) ((double)(a))
-#endif
-
-#ifndef INT
-# define INT(a) ((int)(a))
-#endif
-
-#ifdef WITH_TRIGO
-#  include <math.h>
-#  ifndef COS
-#    define COS(a) (cos(a))
-#  endif
-
-#  ifndef SIN
-#    define SIN(a) (sin(a))
-#  endif
-#endif
-/* End header automatically inserted by PYPS for defining MAX, MIN, MOD and others */
-"""
-
-def addGenericIntrinsics(fname):
-    """ Adds #define's for MAX0 and MOD."""
-    addBeginnning(fname, define_generic_intrinsics)
-
 def addBeginnning(fname, text):
     """Adds a line of text at the beginning of fname"""
     fi = fileinput.FileInput([fname], inplace = True)
@@ -97,14 +53,12 @@ def unincludes(fname):
             included = match.group(1)
             inside_include = True
             end_included = mkguard(guard_end, included)
-            print l,
             print included
             continue
         if l == end_included:
             inside_include = False
             included = None
             end_included = None
-            print l,
             continue
         if inside_include:
             continue
@@ -114,6 +68,7 @@ def string2file(string, fname):
     f = open(fname, "w")
     f.write(string)
     f.close()
+    return fname
 
 def file2string(fname):
 	with open(fname, "r") as f:
@@ -133,26 +88,25 @@ def formatprop(value):
 
 def capply(ms,phase):
 	""" concurrently apply a phase to all contained modules"""
-	if ms._modules:
-		ms._ws.cpypips.capply(phase.upper(),map(lambda m:m.name,ms._modules))
+	if len(ms) > 0:
+		ms.workspace.cpypips.capply(phase.upper(),map(lambda m:m.name,ms))
 
 def apply(m, phase, *args, **kwargs):
-	""" apply a phase to a module"""
-	m._ws.cpypips.apply(phase.upper(),m._name)
+	""" apply a phase to a module. The method pre_phase and post_phase
+	of the originate workspace will be called. """
+	m.workspace.pre_phase(phase,m)
+	m.workspace.cpypips.apply(phase.upper(),m.name)
+	m.workspace.post_phase(phase,m)
 
 def update_props(passe,props):
 	"""Change a property dictionary by appending the pass name to the property when needed """
 	for name,val in props.iteritems():
-		if name.upper() not in pypsbase.workspace.props.all:
+		if name.upper() not in pypsbase.workspace.Props.all:
 			del props[name]
 			props[str.upper(passe+"_"+name)]=val
 			#print "warning, changing ", name, "into", passe+"_"+name
 	return props
 
-def build_module_list(ws):
-	""" update workspace module list """
-	for m in ws.info("modules"):
-		ws._modules[m]=pypsbase.module(ws,m,ws._sources[0])
 
 # A regex matching compilation unit names ending with a "!":
 re_compilation_units = re.compile("^.*!$")
@@ -182,7 +136,7 @@ def get_properties(ws, props):
 		res.append(get_property(ws, prop))
 	return res
 
-def _set_property(ws, prop,value):
+def set_property(ws, prop,value):
 	"""change property value and return the old one"""
 	prop = prop.upper()
 	old = get_property(ws,prop)
@@ -196,12 +150,8 @@ def set_properties(ws,props):
 	"""set properties based on the dictionary props and returns a dictionary containing the old state"""
 	old = dict()
 	for prop,value in props.iteritems():
-		old[prop] = _set_property(ws,prop, value)
+		old[prop] = set_property(ws,prop, value)
 	return old
-
-def set_property(ws, **props):
-	"""set properties and return a dictionary containing the old state"""
-	return ws.set_properties(props)
 
 def patchIncludes(s):
 	if not re.search(r"-I.\s",s) and not re.search(r"-I.$",s):
@@ -210,10 +160,21 @@ def patchIncludes(s):
 
 def get_runtimefile(fname,subdir=None):
 		"""Returns runtime file path"""
-		searchdirs=[".",pypsconfig.pypsruntime]
+		searchdirs=[pypsconfig.pypsruntime] # removed "." from the search dir because it leads to complicated situations
 		if subdir: searchdirs.insert(1,os.path.join(pypsconfig.pypsruntime,subdir))
 		for d in searchdirs:
 			f=os.path.join(d,fname)
 			if os.path.isfile(f):return f
 		raise RuntimeError, "Cannot find runtime file : " + fname + "\nsearch path: "+":".join(searchdirs)
 
+
+def gen_compile_command(rep,makefile,outfile,rule,**opts):
+		#Moved here because of code duplication
+		commandline = ["make",]
+		commandline+=["-C",rep]
+		commandline+=["-f",makefile]
+		commandline.append("TARGET="+outfile)
+		for (k,v) in opts.iteritems():
+			commandline.append(k+'='+str(v))
+		commandline.append(rule)
+		return commandline

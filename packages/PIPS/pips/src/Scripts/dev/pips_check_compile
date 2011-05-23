@@ -44,6 +44,7 @@ source=
 autoconf=
 parallel=1
 validate=mail-diff-validate
+vopts=
 vname=
 build=compile
 
@@ -59,24 +60,27 @@ do
     -n|--nice) nice=nice ;;
     # force compilation & validation & validation mail
     -f|--force) validate=mail-validate ; force=1 ;;
-    # force compilation status report even if unchanged
+    # force compilation status report even if unchanged (for night validation)
     -r|--report) report=1 ;;
-    # how long to wait for lock
+    # how long to wait for the lock
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1#*=} ;;
-    # whether to run in parallel
+    # whether to run make in parallel
     -p|--parallel) parallel=1 ;;
     -s|--sequential) parallel= ;;
+    # make options for validation (TIMEOUT DO_SLOW...)
+    -vo|--validation-option) vopts="$vopts $2" ; shift ;;
+    --validation-option=*) vopts="$vopts ${1#*=}" ;;
     # trace length to include on compilation error
     -t|--tail) tail=$2 ; shift ;;
     --tail=*) tail=${1#*=} ;;
-    # compilation & validation name
+    # compilation & validation name for report
     -v|--vname) vname=$2 ; shift ;;
     --vname=*) vname=${1#*=} ;;
-    # environment setup
+    # file to source for environment setup
     -S|--source) source=$2; shift ;;
     --source=*) source=${1#*=} ;;
-    # make command
+    # make command to use for compiling and validating
     -m|--make) make=$2; shift ;;
     --make=*) make=${1#*=} ;;
     # execute on success
@@ -87,11 +91,15 @@ do
       echo -e \
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation ...]\n" \
         "check pips compilation and validation health\n" \
+	"arguments:\n" \
+	"  em@ail: summary email recipient, defaults is current user\n" \
+	"  /path/to/prod: path to an svn working copy of pips, default is .\n" \
+	"  /path/to/validation: path to an svn working copy of a validation\n" \
 	"available options:\n" \
 	"  -a: compile with autoconf\n" \
         "  -e exec: execute with eval on success\n" \
 	"  -f: force even if not needed\n" \
-	"  -h: show this help and exit\n"
+	"  -h: show this help and exit\n" \
 	"  -m make: make command\n" \
 	"  -n: run with nice\n" \
 	"  -p: run in parallel (the default)\n" \
@@ -100,7 +108,8 @@ do
 	"  -S file: source file for environment\n" \
         "  -t len: trace length on compilation error\n" \
 	"  -v name: validation name\n" \
-	"  -w: wait for lock\n" \
+        "  -vo opt: validation make option, can be repeated for more\n" \
+	"  -w: wait for lock\n"
       exit 0
       ;;
     *) echo "$0 unexpected option: $1" >&2 ; exit 1 ;;
@@ -346,6 +355,8 @@ then
     # check exe, script & lib
     test -x ../install/bin/tpips \
       || report 'KO:make' 'executable' 'no "tpips" executable found!'
+    # test -x ../install/bin/gfc2pips \
+    # || report 'KO:make' 'executable' 'no "tpips" executable found!'
     test -x ../install/bin/pips_validation_summary.pl \
       || report 'KO:make' 'script' 'missing script...'
     # get python directory, which depends on python version
@@ -384,7 +395,8 @@ then
   for valid in "$@" ; do
     {
       $nice $make -C $valid parallel-clean
-      $nice $make -C $valid VNAME="$vname $arch" EMAIL=$dest $validate
+      $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
+	  $validate
       $nice $make -C $valid parallel-clean
     } > out 2> err
   done
@@ -402,7 +414,8 @@ else
       # run the validation
       {
         $nice $make -C $valid parallel-clean
-        $nice $make -C $valid VNAME="$vname $arch" EMAIL=$dest mail-diff-validate
+        $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
+	    mail-diff-validate
         # cleanup to help next "svn up" run smoothly
         $nice $make -C $valid parallel-clean
       } > out 2> err

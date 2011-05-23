@@ -340,7 +340,7 @@ bound_generation(
     Psysteme *lsystem,
     Pbase index_base,
     int n,
-    int sc_info[][3])
+    int sc_info[][4])
 {
  
     Psysteme ps,*sc_pos,*sc_neg,sc_test;

@@ -7,7 +7,7 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -22,7 +22,7 @@ static directive _make_directive_omp_section(string directive_txt)
   
   drt = make_directive(strdup(directive_txt), new_name, make_type_directive_omp_section(), NIL, NIL);
 
-  pips_debug(1,"d = %p\n", drt);
+  pips_debug(1,"drt = %p\n", drt);
   return drt;
 }
 
@@ -43,7 +43,7 @@ void handle_directive_sections_push(list remaining, directive drt)
       
       new_drt = _make_directive_omp_section("'section'");
       
-      STEP_DEBUG_DIRECTIVE(2,"Automatical PUSH current_directives", new_drt);
+      STEP_DEBUG_DIRECTIVE(2,"Automatical PUSH of optional 'section' directive", new_drt);
       current_directives_push(new_drt);
     }
 
@@ -367,6 +367,7 @@ instruction handle_omp_section(directive begin, directive end)
 	{
 	  /* add the new section (like sect2) */
 	  directive_module_name(end) = step_make_new_directive_module_name(SUFFIX_OMP_SECTION,"");
+	  STEP_DEBUG_DIRECTIVE(2,"PUSH current_directives (next section)", end);
 	  current_directives_push(end);
 	  instr = make_continue_instruction();
 	}

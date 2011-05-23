@@ -1,25 +1,32 @@
 from __future__ import with_statement # to cope with python2.5
 import pyps
 
-class workspace:
-	def __init__(self, ws, *args, **kwargs):
-		self._cc_ref = kwargs['compiler_ref']
-		self._ws = ws
+class workspace(pyps.workspace):
+    """ A workspace that checks program output after each phase"""
+    def __init__(self, *sources, **kwargs):
+        super(workspace,self).__init__(*sources, **kwargs)
+        self.__ref_maker = kwargs.get('ref_maker',pyps.Maker())
+        self.__ref_argv = kwargs.get('ref_argv',[])
+        self.__ref_output=None
+        self._enable_check = True
 
-	def post_init(self, sources, **args):
-		self._run_ref()
+    def __compile_and_run(self):
+        if "main" in self.fun:
+            a_out = self.compile(self.__ref_maker)
+            (_,cout,_) = self.run(a_out,self.__ref_argv)
+            return cout
 
-	def _run_ref(self):
-		''' Get the output reference using self._cc_ref '''
-		rc,out,err = self._ws.compile_and_run(self._cc_ref)
-		if rc != 0:
-			raise RuntimeError("workspace_check: reference program returned %d: %s" % (rc,err))
-		self._out_ref = out
+    def pre_phase(self,phase,module):
+        """ generate reference if needed """
+        if self._enable_check and self.__ref_output == None:
+            self.__ref_output=self.__compile_and_run()
+        super(workspace,self).pre_phase(phase,module)
 
-	def check_output(self, compiler):
-		rc,out,err = self._ws.compile_and_run(compiler)
-		if rc != 0:
-			raise RuntimeError("workspace_check: program returned %d: %s" % (rc,err))
-		return (out == self._out_ref, out)
+    def post_phase(self,phase,module):
+        """ check resulting code after the apply """
+        super(workspace,self).post_phase(phase,module)
+        if self._enable_check:
+            output=self.__compile_and_run()
+            if output != self.__ref_output:
+                raise RuntimeError("check by workspace check failed after %s on %s\n" % (phase , module ))
 
-	def get_ref(self): return self._out_ref

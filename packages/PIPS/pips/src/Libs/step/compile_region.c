@@ -6,9 +6,6 @@ The program is distributed under the terms of the GNU General Public
 License.
 */
 
-#ifdef HAVE_CONFIG_H
-#include "pips_config.h"
-#endif
 #include "defines-local.h"
 #include "effects-generic.h"
 #include "effects-convex.h"
@@ -23,9 +20,24 @@ static statement bound_to_statement(entity mpi_module, list expr_bound, entity a
   pips_assert("expression", !ENDP(expr_bound));
   entity op=entity_undefined;  
   statement s;
-  expression expr= reference_to_expression(make_reference(array_region,
-							  CONS(EXPRESSION,step_symbolic(bound_name, mpi_module),
-							       CONS(EXPRESSION,int_to_expression(dim),gen_full_copy_list(index))))); 
+  list dims=CONS(EXPRESSION,step_symbolic(bound_name, mpi_module),
+		 CONS(EXPRESSION,int_to_expression(dim),gen_full_copy_list(index)));
+
+  bool is_fortran=fortran_module_p(get_current_module_entity());
+  if (!is_fortran)
+    {
+      list l=NIL;
+      FOREACH(EXPRESSION,e,dims)
+	{
+	  l=CONS(EXPRESSION, MakeBinaryCall(CreateIntrinsic(MINUS_C_OPERATOR_NAME),
+					  e,
+					  int_to_expression(1)),l);
+	}
+      dims=l;
+    }
+
+  expression expr = reference_to_expression(make_reference(array_region, dims));
+  
   if ( gen_length(expr_bound) != 1 )
     {
       if(strncmp(bound_name,STEP_INDEX_SLICE_LOW_NAME,strlen(bound_name))==0)
@@ -131,28 +143,37 @@ static statement build_regionBounds(entity mpi_module, dimension bounds_d, entit
 				   CONS(STATEMENT,bound_to_statement(mpi_module, expr_u,array_region,STEP_INDEX_SLICE_UP_NAME,index_dim,index_slice),NIL)));
 }
 
-
-static statement step_build_assigne_region0(entity mpi_module, list regions, entity (*array_region_)(entity, region), entity loop_index)
+statement step_build_arraybounds(entity mpi_module, list regions, entity (*array_region_)(entity, region), bool send)
 {
-  list l_block=NIL;
-  list index0 = entity_undefined_p(loop_index)?NIL:CONS(EXPRESSION,int_to_expression(0),NIL);
+  list l_block = NIL;
+  list set_R = NIL;
 
-  // generation des statements pour la region d'indice 0 specifiant l'espace des indices du tableau d'origine
+  // generation des statements specifiant l'espace des indices du tableau d'origine
   FOREACH(REGION, reg, regions)
     {
-      entity array_region=(*array_region_)(mpi_module,reg);
-      list bounds_array = variable_dimensions(type_variable(entity_type(region_entity(reg))));
-      int dim=1;
-      FOREACH(DIMENSION, bounds_dim, bounds_array)
+      entity array = region_entity(reg);
+      if (!io_effect_entity_p(array))
 	{
-	  l_block=CONS(STATEMENT, build_regionBounds(mpi_module, bounds_dim,array_region,dim++,index0,NIL,NIL), l_block);
+	  entity array_region=(*array_region_)(mpi_module,reg);
+	  list bounds_array = variable_dimensions(type_variable(entity_type(region_entity(reg))));
+	  int dim=1;
+	  statement s;
+	  
+	  FOREACH(DIMENSION, bounds_dim, bounds_array)
+	    {
+	      l_block=CONS(STATEMENT, build_regionBounds(mpi_module, bounds_dim,array_region,dim++,NIL,NIL,NIL), l_block);
+	    }
+	  if (send)
+	    s=build_call_STEP_set_send_region(array, int_to_expression(1), array_region, false, false);
+	  else
+	    s=build_call_STEP_set_recv_region(array, int_to_expression(1), array_region);
+
+	  set_R=CONS(STATEMENT, s, set_R);
 	}
     }
-  gen_full_free_list(index0);
 
-  return make_block_statement(gen_nreverse(l_block));
+  return make_block_statement(gen_nreverse(gen_nconc(set_R,l_block)));
 }
-
 
 /*
   Transformation d'un système de contrainte (une region de tableau) en statements
@@ -175,7 +196,9 @@ static statement step_build_compute_region(entity mpi_module,region reg,entity (
   //ajout de la region en commentaire au body
   reset_action_interpretation();
   string commentaire = text_to_string(text_region(reg));
-  list l_body=CONS(STATEMENT, make_call_statement(CONTINUE_FUNCTION_NAME, NIL, entity_empty_label(),commentaire), NIL);
+  statement statmt = make_continue_statement(entity_empty_label());
+  put_a_comment_on_a_statement(statmt, commentaire);
+  list l_body=CONS(STATEMENT, statmt, NIL);
   pips_debug(2,"region : %s\n",commentaire);
 
   /* 
@@ -203,62 +226,55 @@ static statement step_build_compute_region(entity mpi_module,region reg,entity (
   return make_block_statement(gen_nreverse(l_body));
 }
 
-
 statement step_build_arrayRegion(entity mpi_module, list regions, entity (*array_region_)(entity, region), entity loop_index)
 {
-  statement assigne_dim = step_build_assigne_region0(mpi_module, regions, array_region_, loop_index);
+  pips_assert("loop index",!entity_undefined_p(loop_index));
 
-  if(!entity_undefined_p(loop_index) && !empty_statement_p(assigne_dim))
+  /*
+    Generation des statements traduisant le systeme de contraintes (region reg) pour different work_chunk
+  */
+  list l_body_region = NIL;
+  statement body_region;
+  FOREACH(REGION, reg, regions)
+    {
+      l_body_region = CONS(STATEMENT, step_build_compute_region(mpi_module, reg, array_region_), l_body_region);
+    }
+  
+  if (!ENDP(l_body_region))
     {
       /*
 	Generation de :
-	I_LOW = STEP_I_LOOPSLICES(I_SLICE_LOW, IDX) 
-	I_UP = STEP_I_LOOPSLICES(I_SLICE_UP, IDX)
+	CALL STEP_GETLOOPBOUNDS(IDX-1, J_LOW, J_UP)
       */
-      entity loopSliceArray = step_local_loopSlices(mpi_module,loop_index);
       entity slice_index = step_local_slice_index(mpi_module);
-      expression index_low = entity_to_expression(step_local_loop_index(mpi_module, STEP_INDEX_LOW_NAME(loop_index)));
-      expression index_up = entity_to_expression(step_local_loop_index(mpi_module, STEP_INDEX_UP_NAME(loop_index)));
-      
-      expression low_expr = reference_to_expression(make_reference(loopSliceArray,
-								   CONS(EXPRESSION, step_symbolic(STEP_INDEX_SLICE_LOW_NAME, mpi_module),
-									CONS(EXPRESSION, entity_to_expression(slice_index), NIL))));
-      expression up_expr = reference_to_expression(make_reference(loopSliceArray,
-								  CONS(EXPRESSION, step_symbolic(STEP_INDEX_SLICE_UP_NAME, mpi_module),
-								       CONS(EXPRESSION, entity_to_expression(slice_index), NIL))));
-      /*
-	Generation des statements traduisant le systeme de contraintes (region reg) pour different work_chunk
-      */
-      list l_body_region = NIL;
-      statement body_region;
-      FOREACH(REGION, reg, regions)
+      expression expr_id_workchunk = make_op_exp(PLUS_OPERATOR_NAME, int_to_expression(-1), entity_to_expression(slice_index));
+      expression expr_index_low = entity_to_expression(step_local_loop_index(mpi_module, STEP_INDEX_LOW_NAME(loop_index)));
+      expression expr_index_up = entity_to_expression(step_local_loop_index(mpi_module, STEP_INDEX_UP_NAME(loop_index)));
+      if (!fortran_module_p(get_current_module_entity()))
 	{
-	  l_body_region = CONS(STATEMENT, step_build_compute_region(mpi_module, reg, array_region_), l_body_region);
+	  expr_index_low = make_call_expression(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), CONS(EXPRESSION, expr_index_low, NIL));
+	  expr_index_up = make_call_expression(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), CONS(EXPRESSION, expr_index_up, NIL));
 	}
-      body_region = make_block_statement(CONS(STATEMENT, make_assign_statement(index_low,low_expr),
-					      CONS(STATEMENT, make_assign_statement(index_up,up_expr),
-						   gen_nreverse(l_body_region)))); 
+      list args = CONS(EXPRESSION, expr_id_workchunk,
+		       CONS(EXPRESSION, expr_index_low,
+			    CONS(EXPRESSION, expr_index_up, NIL)));
+      statement statmt = call_STEP_subroutine(RT_STEP_GetLoopBounds, args, type_undefined);
+      
+      body_region = make_block_statement(CONS(STATEMENT, statmt,
+					      gen_nreverse(l_body_region))); 
       /*
 	Generation de la boucle parcourant les differents work_chunk
       */
-      range rng = make_range(int_to_expression(1), step_local_size(mpi_module), int_to_expression(1));
+      range rng = make_range(int_to_expression(1), step_local_size( mpi_module), int_to_expression(1));
       instruction loop_instr = make_instruction_loop(make_loop(slice_index, rng, body_region, entity_empty_label(), make_execution_sequential(), NIL));
 
-      insert_comments_to_statement(assigne_dim,
-				   concatenate("\nC     Put array boundaries into region arrays (SR: Send region)",
-					       "\nC     First dimension: lower and upper bounds of each slice",
-					       "\nC     Second dimension: for each dimension of the original array",
-					       "\nC     Third dimension: store the boundaries of the local chunk.\n",
-					       "\nC     The first element stores initial boundaries,",
-					       "\nC     then one element for each process\n",NULL));
-      return make_block_statement(CONS(STATEMENT,assigne_dim,
-				       CONS(STATEMENT, make_statement(entity_empty_label(),
-								      STATEMENT_NUMBER_UNDEFINED,
-								      STATEMENT_ORDERING_UNDEFINED,
-								      strdup("\nC     Region computation\n"),
-								      loop_instr, NIL, string_undefined,
-								      empty_extensions()), NIL)));
+      return make_block_statement(CONS(STATEMENT, make_statement(entity_empty_label(),
+								 STATEMENT_NUMBER_UNDEFINED,
+								 STATEMENT_ORDERING_UNDEFINED,
+								 strdup("\n"),
+								 loop_instr, NIL, string_undefined,
+								 empty_extensions()), NIL));
     }
   else
-    return assigne_dim;
+    return make_continue_statement(entity_undefined);
 }

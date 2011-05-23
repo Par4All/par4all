@@ -65,7 +65,7 @@ void
 bound_distribution(pps,index_base,sc_info,nb_loop,sc_neg,sc_pos,sc_test)
 Psysteme *pps;
 Pbase index_base;
-int sc_info[][3];
+int sc_info[][4];
 int nb_loop;
 Psysteme *sc_neg,*sc_pos,sc_test;
 {
@@ -168,12 +168,11 @@ Psysteme *sc_neg,*sc_pos,sc_test;
  *
 */
 
-
-void 
-constraint_distribution(sc,bound_systems,index_base,sc_info)
-Psysteme sc, *bound_systems;
-Pbase index_base;
-int sc_info[][3];
+void constraint_distribution(
+  Psysteme sc,
+  Psysteme *bound_systems,
+  Pbase index_base,
+  int sc_info[][4])
 {
     Pcontrainte pc1,pc2;
     int rank,rank_hr,rank_pc1,rank_pc2;
@@ -246,10 +245,10 @@ int sc_info[][3];
     debug_off();
 }
 
-void 
-egalite_distribution(sc,bound_systems,index_base)
-Psysteme sc, *bound_systems;
-Pbase index_base;
+void egalite_distribution(
+  Psysteme sc,
+  Psysteme *bound_systems,
+  Pbase index_base)
 {
     Pcontrainte pc1,pc2;
     int rank;

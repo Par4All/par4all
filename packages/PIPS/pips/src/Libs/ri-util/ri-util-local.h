@@ -59,105 +59,105 @@
 
 /*  special characters
  */
-#define MODULE_SEP                      ':'
+#define MODULE_SEP                       ':'
 
-#define MODULE_SEP_STRING               ":"
-#define LABEL_PREFIX                    "@" // Often assumed to be one character long
-#define MAIN_PREFIX                     "%"
-#define COMMON_PREFIX                   "~"
-#define BLOCKDATA_PREFIX                "&"
-#define F95MODULE_PREFIX                "¤"
+#define MODULE_SEP_STRING                ":"
+#define LABEL_PREFIX                     "@" // Often assumed to be one character long
+#define MAIN_PREFIX                      "%"
+#define COMMON_PREFIX                    "~"
+#define BLOCKDATA_PREFIX                 "&"
+#define F95MODULE_PREFIX                 "¤"
 
-#define FILE_SEP_CHAR                   '!'
+#define FILE_SEP_CHAR                    '!'
 #define FILE_SEP                         FILE_SEP_CHAR
 
-#define FILE_SEP_STRING                 "!"
+#define FILE_SEP_STRING                  "!"
 /* Scope separator */
-#define BLOCK_SEP_STRING                "`"
-#define BLOCK_SEP_CHAR                  '`'
+#define BLOCK_SEP_STRING                 "`"
+#define BLOCK_SEP_CHAR                   '`'
 
-#define MEMBER_SEP_STRING               "^"
-#define MEMBER_SEP_CHAR                 '^'
+#define MEMBER_SEP_STRING                "^"
+#define MEMBER_SEP_CHAR                  '^'
 
-#define STRUCT_PREFIX                   "#" // Conflict with value naming in transformer
-#define STRUCT_PREFIX_CHAR              '#'
-#define UNION_PREFIX                    "'" /* Conflict with C character constants */
-#define UNION_PREFIX_CHAR               '\''
-#define ENUM_PREFIX                     "?"
-#define ENUM_PREFIX_CHAR                '?'
-#define TYPEDEF_PREFIX                  "$"
-#define TYPEDEF_PREFIX_CHAR             '$'
+#define STRUCT_PREFIX                    "#" // Conflict with value naming in transformer
+#define STRUCT_PREFIX_CHAR               '#'
+#define UNION_PREFIX                     "'" /* Conflict with C character constants */
+#define UNION_PREFIX_CHAR                '\''
+#define ENUM_PREFIX                      "?"
+#define ENUM_PREFIX_CHAR                 '?'
+#define TYPEDEF_PREFIX                   "$"
+#define TYPEDEF_PREFIX_CHAR              '$'
 
 /*  constant names
  */
-#define F95_USE_LOCAL_NAME              "*USE*"
-#define BLANK_COMMON_LOCAL_NAME         "*BLANK*"
-#define DYNAMIC_AREA_LOCAL_NAME         "*DYNAMIC*"
-#define STATIC_AREA_LOCAL_NAME          "*STATIC*"
-#define HEAP_AREA_LOCAL_NAME            "*HEAP*"
-#define STACK_AREA_LOCAL_NAME           "*STACK*"
-#define ALLOCATABLE_AREA_LOCAL_NAME "*ALLOCATABLE*"
+#define F95_USE_LOCAL_NAME               "*USE*"
+#define BLANK_COMMON_LOCAL_NAME          "*BLANK*"
+#define DYNAMIC_AREA_LOCAL_NAME          "*DYNAMIC*"
+#define STATIC_AREA_LOCAL_NAME           "*STATIC*"
+#define HEAP_AREA_LOCAL_NAME             "*HEAP*"
+#define STACK_AREA_LOCAL_NAME            "*STACK*"
+#define ALLOCATABLE_AREA_LOCAL_NAME      "*ALLOCATABLE*"
 /* The set of all memory areas. FI: this macro is now obsolete and
    should be removed when a new version of alias-classes is
    introduced. Too bad ri-util/effects.c is going to depend on
    alias-classes*/
-#define ALL_MEMORY_ENTITY_NAME          "TOP-LEVEL:*MEMORY*"
+#define ALL_MEMORY_ENTITY_NAME           "TOP-LEVEL:*MEMORY*"
 
 /* For enum and struct and union without names (see c_syntax/cyacc.y) */
-#define DUMMY_ENUM_PREFIX               "_PIPS_ENUM_"
-#define DUMMY_STRUCT_PREFIX             "_PIPS_STRUCT_"
-#define DUMMY_UNION_PREFIX              "_PIPS_UNION_"
-#define DUMMY_ABSTRACT_PREFIX           "_PIPS_ABSTRACT_"
-#define DUMMY_MEMBER_PREFIX             "_PIPS_MEMBER_" /* For bit fields */
+#define DUMMY_ENUM_PREFIX                "_PIPS_ENUM_"
+#define DUMMY_STRUCT_PREFIX              "_PIPS_STRUCT_"
+#define DUMMY_UNION_PREFIX               "_PIPS_UNION_"
+#define DUMMY_ABSTRACT_PREFIX            "_PIPS_ABSTRACT_"
+#define DUMMY_MEMBER_PREFIX              "_PIPS_MEMBER_" /* For bit fields */
 
 /* For dmmmy parameters in functions declarations */
 #define DUMMY_PARAMETER_PREFIX         "DUMMY-PARAMETER-"
 
 /* Its value is "@", the label prefix followed by nothing */
-#define EMPTY_LABEL_NAME                LABEL_PREFIX
-#define LIST_DIRECTED_FORMAT_NAME       "LIST-DIRECTED"
+#define EMPTY_LABEL_NAME                 LABEL_PREFIX
+#define LIST_DIRECTED_FORMAT_NAME        "LIST-DIRECTED"
 
 
 /* Module containing the global variables in Fortran and C */
-#define TOP_LEVEL_MODULE_NAME           "TOP-LEVEL"
+#define TOP_LEVEL_MODULE_NAME            "TOP-LEVEL"
 /* Module containing stub variables used to initialize intraprocedural
    points-to in C */
-#define POINTS_TO_MODULE_NAME "*POINTS-TO-MODULE*"
+#define POINTS_TO_MODULE_NAME            "*POINTS-TO-MODULE*"
 
-#define UNBOUNDED_DIMENSION_NAME        "UNBOUNDED-DIMENSION"
-#define IMPLIED_DO_NAME                 "IMPLIED-DO"
-#define IMPLIED_DO_FUNCTION_NAME        "IMPLIED-DO"
-#define REPEAT_VALUE_NAME               "REPEAT-VALUE"
-#define REPEAT_VALUE_FUNCTION_NAME      "REPEAT-VALUE"
-#define STATIC_INITIALIZATION_NAME      "STATIC-INITIALIZATION"
+#define UNBOUNDED_DIMENSION_NAME         "UNBOUNDED-DIMENSION"
+#define IMPLIED_DO_NAME                  "IMPLIED-DO"
+#define IMPLIED_DO_FUNCTION_NAME         "IMPLIED-DO"
+#define REPEAT_VALUE_NAME                "REPEAT-VALUE"
+#define REPEAT_VALUE_FUNCTION_NAME       "REPEAT-VALUE"
+#define STATIC_INITIALIZATION_NAME       "STATIC-INITIALIZATION"
 #define STATIC_INITIALIZATION_FUNCTION_NAME     "STATIC-INITIALIZATION"
-#define DATA_LIST_FUNCTION_NAME         "DATA-LIST="
-#define IO_LIST_STRING_NAME             "IOLIST="
-#define RETURN_LABEL_NAME               "00000"
+#define DATA_LIST_FUNCTION_NAME          "DATA-LIST="
+#define IO_LIST_STRING_NAME              "IOLIST="
+#define RETURN_LABEL_NAME                "00000"
 
 
-#define BRACE_INTRINSIC                 "BRACE_INTRINSIC"
-#define NULL_STATEMENT_INTRINSIC        "NULL_STATEMENT_INTRINSIC"
+#define BRACE_INTRINSIC                  "BRACE_INTRINSIC"
+#define NULL_STATEMENT_INTRINSIC         "NULL_STATEMENT_INTRINSIC"
 
-#define IMPLIED_COMPLEX_NAME            "CMPLX_"
-#define IMPLIED_DCOMPLEX_NAME           "DCMPLX_"
+#define IMPLIED_COMPLEX_NAME             "CMPLX_"
+#define IMPLIED_DCOMPLEX_NAME            "DCMPLX_"
 
-#define FIELD_OPERATOR_NAME             "."
-#define POINT_TO_OPERATOR_NAME          "->"
-#define DEREFERENCING_OPERATOR_NAME     "*indirection"
+#define FIELD_OPERATOR_NAME              "."
+#define POINT_TO_OPERATOR_NAME           "->"
+#define DEREFERENCING_OPERATOR_NAME      "*indirection"
 
-#define ASSIGN_OPERATOR_NAME            "="
-#define ASSIGN_OPERATOR_PRECEDENCE      (2)
-#define POST_INCREMENT_OPERATOR_NAME    "post++"
-#define POST_DECREMENT_OPERATOR_NAME    "post--"
-#define PRE_INCREMENT_OPERATOR_NAME     "++pre"
-#define PRE_DECREMENT_OPERATOR_NAME     "--pre"
-#define MULTIPLY_UPDATE_OPERATOR_NAME   "*="
-#define DIVIDE_UPDATE_OPERATOR_NAME     "/="
-#define PLUS_UPDATE_OPERATOR_NAME       "+="
-#define MINUS_UPDATE_OPERATOR_NAME      "-="
-#define LEFT_SHIFT_UPDATE_OPERATOR_NAME "<<="
-#define RIGHT_SHIFT_UPDATE_OPERATOR_NAME        ">>="
+#define ASSIGN_OPERATOR_NAME             "="
+#define ASSIGN_OPERATOR_PRECEDENCE       (2)
+#define POST_INCREMENT_OPERATOR_NAME     "post++"
+#define POST_DECREMENT_OPERATOR_NAME     "post--"
+#define PRE_INCREMENT_OPERATOR_NAME      "++pre"
+#define PRE_DECREMENT_OPERATOR_NAME      "--pre"
+#define MULTIPLY_UPDATE_OPERATOR_NAME    "*="
+#define DIVIDE_UPDATE_OPERATOR_NAME      "/="
+#define PLUS_UPDATE_OPERATOR_NAME        "+="
+#define MINUS_UPDATE_OPERATOR_NAME       "-="
+#define LEFT_SHIFT_UPDATE_OPERATOR_NAME  "<<="
+#define RIGHT_SHIFT_UPDATE_OPERATOR_NAME ">>="
 #define BITWISE_OR_UPDATE_OPERATOR_NAME  "|="
 
 #define COMMA_OPERATOR_NAME             ","
@@ -330,6 +330,7 @@
 #define STOP_FUNCTION_NAME              "STOP"
 #define PAUSE_FUNCTION_NAME             "PAUSE"
 #define END_FUNCTION_NAME               "END"
+#define ENDDO_FUNCTION_NAME             "ENDDO"
 
 #define BREAK_FUNCTION_NAME             "break"
 #define CASE_FUNCTION_NAME              "case"
@@ -421,7 +422,7 @@
 #define GETSUBOPT_FUNCTION_NAME         "getsubopt"
 #define GRANTPT_FUNCTION_NAME           "grantpt"
 #define INITSTATE_FUNCTION_NAME         "initstate"
-#define C_164A_FUNCTION_NAME              "l64a"
+#define C_164A_FUNCTION_NAME            "l64a"
 #define MKTEMP_FUNCTION_NAME            "mktemp"
 #define PTSNAME_FUNCTION_NAME           "ptsname"
 #define REALPATH_FUNCTION_NAME          "realpath"

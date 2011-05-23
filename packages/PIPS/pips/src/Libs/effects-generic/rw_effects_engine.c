@@ -370,10 +370,14 @@ static void rw_effects_of_loop(loop l)
 			label_local_name(loop_label(l)));
     }
 
-    /* effects on locals are unconditionnaly masked */
-    list tmp = effects_dup_without_variables(l_body, loop_locals(l));
-    l_body = effects_dup_without_variables(tmp, statement_declarations(b));
-    gen_free_list(tmp);
+    /* SG: effects on locals used to be  unconditionnaly masked */
+    if(get_bool_property("MASK_EFFECTS_ON_PRIVATE_VARIABLES")) {
+      list tmp = effects_dup_without_variables(l_body, loop_locals(l));
+      l_body = effects_dup_without_variables(tmp, statement_declarations(b));
+      gen_free_list(tmp);
+    }
+    else
+      l_body = effects_dup(l_body);
 
     /* COMPUTATION OF INVARIANT RW EFFECTS */
 

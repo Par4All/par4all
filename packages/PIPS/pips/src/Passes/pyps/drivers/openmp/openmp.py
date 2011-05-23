@@ -1,22 +1,19 @@
 import re
 import pyps
-from pyps import module, workspace, backendCompiler
+from pyps import module, workspace, Maker
 
-class ompCompiler(backendCompiler):
-	"""openmp backend compiler to use openmp"""
-	def __init__(self, CC="cc", CFLAGS="", LDFLAGS="", compilemethod=None, rep=None, outfile="", args=[], extrafiles=[]):
-		super(ompCompiler,self).__init__(CC,CFLAGS,LDFLAGS,compilemethod, rep, outfile, args, extrafiles)
-		if issubclass(self.__class__,pyps.gccCompiler):
-			self.CFLAGS += " -fopenmp"
-		elif issubclass(self.__class__,pyps.iccCompiler):
-			self.CFLAGS += " -openmp"
-		else:
-			raise RuntimeError, "Doesn't know which Cflag to use for OpenMP"
+class ompMaker(Maker):
+	''' A makefile builder for openmp '''
+	def get_ext(self):
+		return ".omp"+super(ompMaker,self).get_ext()
+
+	def get_makefile_info(self):
+		return [("openmp","Makefile.omp")]+super(ompMaker,self).get_makefile_info()
 
 
 def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_threshold_set=False, **props):
 	"""parallelize module with opennmp"""
-	w = m._ws
+	w = m.workspace
 	#select most precise analysis
 	w.activate(module.must_regions)
 	w.activate(module.transformers_inter_full)
@@ -32,6 +29,7 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
 	w.props.aliasing_across_io_streams = False
 	w.props.constant_path_effects = False
 	w.props.prettyprint_sequential_style = "do"
+	w.props.memory_effects_only = False
 
 	if loop_parallel_threshold_set:
 		m.omp_loop_parallel_threshold_set(**props)
@@ -50,5 +48,5 @@ def openmp(m, verbose = False, internalize_parallel_code=True, loop_parallel_thr
 		m.display(**props)
 
 pyps.module.openmp=openmp
-pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m._modules)
+pyps.modules.openmp=lambda m,verbose=False,internalize_parallel_code=True,loop_parallel_threshold_set=False,**props:map(lambda x:openmp(x,verbose,internalize_parallel_code,loop_parallel_threshold_set,**props),m)
 

@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\usepackage[latin1]{inputenc}
+\usepackage{newgen_domain}
+
+%%\input{/usr/share/local/lib/tex/macroslocales/Dimensions.tex}
+
+\title{STEP \\ structure des données}
+\author{Alain Muller\\
+                \\
+        INT}
+
+\begin{document}
+\maketitle
+\sloppy
+
+\section*{Introduction}
+
+
+\domain{import entity from "ri.newgen"}
+{}
+\domain{import expression from "ri.newgen"}
+{}
+\domain{import effect from "ri.newgen"}
+{}
+\domain{import statement from "ri.newgen"}
+{}
+
+\domain{step_reduction = entity->string}
+{}
+\domain{step_private = entity *}
+{}
+\domain{clause = step_reduction + step_private}
+{}
+
+\domain{loop_data = index:entity x lower:entity x upper:entity x step:int}
+{}
+
+\domain{step_region_analyse = recv: effect* x send:effect* x interlaced:effect* x used:effect*}
+{}
+
+\domain{step_entity_map = entity->entity}
+{}
+\domain{step_atomized_map = entity->expression}
+{}
+\domain{analyse_map = entity->step_region_analyse}
+{}
+
+\domain{type_directive = omp_parallel_do:loop_data* + omp_end_parallel_do:unit + omp_parallel:unit + omp_end_parallel:unit + omp_do:loop_data* + omp_end_do:unit + omp_parallel_sections:statement* + omp_end_parallel_sections: unit + omp_sections:statement* + omp_end_sections:unit + omp_section:unit + omp_master:unit + omp_end_master:unit + omp_barrier:unit + none:unit}
+{}
+\domain{directive = txt:string x module_name : string x type : type_directive x body : statement* x clauses : clause*}
+{}
+\domain{directives = entity->directive}
+{}
+
+\domain{outlined = list:string*}
+{}
+\domain{step_status = analyses:analyse_map x mpi_module:step_entity_map x omp_module:step_entity_map}
+{}
+
+\end{document}

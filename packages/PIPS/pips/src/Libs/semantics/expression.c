@@ -2176,6 +2176,7 @@ static transformer logical_binary_operation_to_transformer(entity v,
   Pvecteur eq1 = VECTEUR_NUL;
   Pvecteur eq2 = VECTEUR_NUL;
   Pvecteur eq3 = VECTEUR_NUL;
+  Pvecteur eq4 = VECTEUR_NUL;
   expression arg1 = EXPRESSION(CAR(call_arguments(c)));
   expression arg2 = EXPRESSION(CAR(CDR(call_arguments(c))));
   entity tmp1 = make_local_temporary_value_entity(entity_type(v));
@@ -2222,25 +2223,54 @@ static transformer logical_binary_operation_to_transformer(entity v,
       vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
     }
     else if(ENTITY_EQUAL_P(op)) {
-      /* v >= 1-tmp1-tmp2, v >= tmp1+tmp2-1 */
+      /* v >= 1-tmp1-tmp2, v >= tmp1+tmp2-1, i.e.
+       * -v -tmp1 -tmp2 + 1 <= 0, -v+tmp1+tmp2-1<=0
+       * v <= 1-tmp1+tmp2, v <= 1+tmp1-tmp2, i.e.
+       * v + tmp1 - tmp2 - 1 <= 0, v - tmp1 + tmp2 - 1 <=0
+       */
       eq1 = vect_new((Variable) v, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp1, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp2, VALUE_MONE);
       vect_add_elem(&eq1, TCST , VALUE_ONE);
+
       eq2 = vect_new((Variable) v, VALUE_MONE);
       vect_add_elem(&eq2, (Variable) tmp1, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp2, VALUE_ONE);
       vect_add_elem(&eq2, TCST , VALUE_MONE);
+
+      eq3 = vect_new((Variable) v, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp1, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
+      vect_add_elem(&eq3, TCST , VALUE_MONE);
+
+      eq4 = vect_new((Variable) v, VALUE_ONE);
+      vect_add_elem(&eq4, (Variable) tmp1, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp2, VALUE_ONE);
+      vect_add_elem(&eq4, TCST , VALUE_MONE);
     }
-    else if(ENTITY_NON_EQUAL_P(op)) {
-      /* v <= tmp1+tmp2, v <= 2-tmp1-tmp2 */
+    else if(ENTITY_NON_EQUAL_P(op) || ENTITY_BITWISE_XOR_P(op)) {
+      /* v <= tmp1+tmp2, v <= 2-tmp1-tmp2, i.e.
+       * v - tmp 1 - tmp 2 <= 0, v -tmp1-tmp2 -2 <= 0
+       * v >= tmp1 - tmp2, v >= -tmp1+tmp2, i.e.
+       * -v + tmp1 - tmp2 <=0, -v - tmp1 + tmp2 <=0
+       */
       eq1 = vect_new((Variable) v, VALUE_ONE);
       vect_add_elem(&eq1, (Variable) tmp1, VALUE_MONE);
       vect_add_elem(&eq1, (Variable) tmp2, VALUE_MONE);
+
       eq2 = vect_new((Variable) v, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp1, VALUE_ONE);
       vect_add_elem(&eq2, (Variable) tmp2, VALUE_ONE);
       vect_add_elem(&eq2, TCST , VALUE_MONE+VALUE_MONE);
+
+      eq3 = vect_new((Variable) v, VALUE_MONE);
+      vect_add_elem(&eq3, (Variable) tmp1, VALUE_ONE);
+      vect_add_elem(&eq3, (Variable) tmp2, VALUE_MONE);
+
+      eq4 = vect_new((Variable) v, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp1, VALUE_MONE);
+      vect_add_elem(&eq4, (Variable) tmp2, VALUE_ONE);
+
     }
     else {
       pips_internal_error("Unexpected binary logical operator %s",
@@ -2249,6 +2279,9 @@ static transformer logical_binary_operation_to_transformer(entity v,
     tf = transformer_inequality_add(tf, eq1);
     tf = transformer_inequality_add(tf, eq2);
     if(!VECTEUR_NUL_P(eq3)) {
+      if(!VECTEUR_NUL_P(eq4)) {
+	tf = transformer_inequality_add(tf, eq4);
+      }
       tf = transformer_inequality_add(tf, eq3);
     }
     tf = transformer_logical_inequalities_add(tf, v);
@@ -2270,7 +2303,9 @@ static transformer logical_binary_function_to_transformer(entity v,
   transformer tf = transformer_undefined;
   entity op = call_function(c);
 
-  if(ENTITY_AND_P(op)||ENTITY_OR_P(op)) {
+  if(ENTITY_AND_P(op)||ENTITY_OR_P(op)||ENTITY_EQUAL_P(op)
+     ||ENTITY_NON_EQUAL_P(op)||ENTITY_BITWISE_XOR_P(op)
+     ||ENTITY_BITWISE_AND_P(op)||ENTITY_BITWISE_OR_P(op)) {
     tf = logical_binary_operation_to_transformer(v, c, pre, is_internal);
   }
   else if(ENTITY_RELATIONAL_OPERATOR_P(op)) {
@@ -2284,7 +2319,7 @@ static transformer logical_binary_function_to_transformer(entity v,
     }
     else if(!transformer_undefined_p(pre)) {
       /* Non internal overloaded functions such as EQ, NEQ, GE, GT, LE, LT,... */
-      entity tmp = make_local_temporary_value_entity(entity_type(v));
+      //entity tmp = make_local_temporary_value_entity(entity_type(v));
       transformer tfe = transformer_add_any_relation_information(copy_transformer(pre),
 								 op,
 								 expr1,
@@ -2293,14 +2328,39 @@ static transformer logical_binary_function_to_transformer(entity v,
 								 TRUE,
 								 TRUE);
 
+      // The normalization of tfe and tfne below is key because
+      // transformer_empty_p() is quite weak (but fast)
+      tfe = transformer_normalize(tfe, 2);
       /* if the transformer is not feasible, return FALSE */
-      if(!transformer_empty_p(tfe)) {
-	Pvecteur eq = vect_new((Variable) tmp, VALUE_ONE);
+      if(transformer_empty_p(tfe)) {
+	Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
 	Pcontrainte c;
 
 	c = contrainte_make(eq);
 	tf = make_transformer(NIL,
 			      make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+      }
+      else {
+	transformer tfne = transformer_add_any_relation_information(copy_transformer(pre),
+								   op,
+								   expr1,
+								   expr2,
+								   pre,
+								   FALSE,
+								   TRUE);
+
+	tfne = transformer_normalize(tfne, 2);
+	/* if the transformer is not feasible, return TRUE */
+	if(transformer_empty_p(tfne)) {
+	  Pvecteur eq = vect_new((Variable) v, VALUE_ONE);
+	  Pcontrainte c;
+
+	  vect_add_elem(&eq, TCST, VALUE_MONE);
+	  c = contrainte_make(eq);
+	  tf = make_transformer(NIL,
+				make_predicate(sc_make(c, CONTRAINTE_UNDEFINED)));
+	}
+	free_transformer(tfne);
       }
       free_transformer(tfe);
     }
@@ -3037,12 +3097,48 @@ transformer expression_to_transformer(
     }
     else if(expression_call_p(exp)) {
       call c = expression_call(exp);
-      tf = expressions_to_transformer(call_arguments(c), pre);
+      entity f = call_function(c);
+      /* FI: there may be (many) other exceptions with intrinsics...
+       *
+       * Fortran intrinsics, such as IOs, are not taken into account
+       * because these code should not be executed for Fortran code.
+       */
+      if(ENTITY_FIELD_P(f)||ENTITY_POINT_TO_P(f)) {
+	tf = safe_expression_to_transformer(EXPRESSION(CAR(call_arguments(c))),
+					    pre);
+      }
+      else
+	tf = expressions_to_transformer(call_arguments(c), pre);
     }
     else if(expression_cast_p(exp)) {
       cast c = expression_cast(exp);
       expression sub_exp = cast_expression(c);
       tf = safe_expression_to_transformer(sub_exp, pre);
+    }
+    else if(expression_sizeofexpression_p(exp)) {
+      sizeofexpression soe = expression_sizeofexpression(exp);
+      if(sizeofexpression_expression_p(soe)) {
+	expression sub_exp = sizeofexpression_expression(soe);
+	tf = safe_expression_to_transformer(sub_exp, pre);
+      }
+    }
+    else if(expression_subscript_p(exp)) {
+      subscript sub = expression_subscript(exp);
+      expression base = subscript_array(sub);
+      transformer tf1 = safe_expression_to_transformer(base, pre);
+      transformer tf2
+	= expressions_to_transformer(subscript_indices(sub), pre);
+      tf = transformer_combine(tf1, tf2);
+      free_transformer(tf2); // tf1 is exported in tf
+    }
+    else if(expression_application_p(exp)) {
+      application a = expression_application(exp);
+      expression func = application_function(a);
+      transformer tf1 = safe_expression_to_transformer(func, pre);
+      transformer tf2
+	= expressions_to_transformer(application_arguments(a), pre);
+      tf = transformer_combine(tf1, tf2);
+      free_transformer(tf2); // tf1 is exported in tf
     }
     // FI: Many other possible cases: range, sizeofexpression, subscript,
     // application, va_arg

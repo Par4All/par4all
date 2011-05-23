@@ -6,8 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <complex.h>
 
-// These macros must not be used directy !
+// These macros must not be used directly !
 #ifdef __PYPS_SAC_VALIDATE
 #define _print_array(name, ptr, n, format, stype) \
 	fwrite(ptr, n, stype, stdout); \
@@ -29,7 +30,7 @@
 #endif
 
 static FILE* _f_data_file = 0;
-int _init_data(void* ptr, const ssize_t n);
+int _init_data(char* ptr, const ssize_t n);
 
 
 void init_data_file(const char* data_file)
@@ -55,6 +56,11 @@ void print_array_float(const char* name, const float* arr, const unsigned int n)
 	_print_array(name, arr, n, "%f", sizeof(float));
 }
 
+void print_array_int(const char* name, const int* arr, const unsigned int n)
+{
+	_print_array(name, arr, n, "%d", sizeof(int));
+}
+
 void print_array_double(const char* name, const float* arr, const unsigned int n)
 {
 	_print_array(name, arr, n, "%a", sizeof(double));
@@ -65,8 +71,16 @@ void print_array_long(const char* name, const long* arr, const unsigned int n)
 	_print_array(name, arr, n, "%a", sizeof(long));
 }
 
+void print_array_cplx(const char* name, const float complex* arr, const unsigned int n)
+{
+	int i;
+	for (i=0; i<n;i++)
+	{
+		printf("%f %f\n",crealf(arr[i]),cimagf(arr[i]));
+	}
+}
 
-int _init_data(void* ptr, const ssize_t n)
+int _init_data(char* ptr, const ssize_t n)
 {
 	ssize_t nr;
 	ssize_t ntoread;
@@ -127,4 +141,19 @@ int init_data_long(long* ptr, const unsigned int n)
 int init_data_int(int* ptr, const unsigned int n)
 {
 	return init_data_gen(ptr, n, sizeof(int));
+}
+
+int init_data_cplx(float complex* ptr, const unsigned int n)
+{
+	return 0;
+}
+
+void init_args(int argc, char** argv)
+{
+	if (argc < 3)
+	{
+		fprintf(stderr, "Usage: %s kernel_size data_file\n", argv[0]);
+		exit(1);
+	}
+	init_data_file(argv[2]);
 }

@@ -353,6 +353,8 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
 
 
   loop_stmt1 = instruction_to_statement(loop_inst1);
+  statement_label(loop_stmt1)=statement_label(loop_statement);
+  statement_label(loop_statement)=entity_empty_label();
   instruction_block(block)= gen_nconc(instruction_block(block),
 				      CONS(STATEMENT, loop_stmt1, NIL));
 
@@ -965,15 +967,18 @@ void full_loop_unroll(statement loop_statement)
     }
 
     /* Generate a statement to reinitialize old index */
-    rhs_expr = int_to_expression(iter);
-    expr = make_ref_expr(ind, NIL);
-    stmt = make_assign_statement(expr, rhs_expr);
-    ifdebug(9) {
-      print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
-	pips_assert("full_loop_unroll", statement_consistent_p(stmt));
+    /* SG: only needed if index is not private */
+    if(entity_in_list_p(ind,loop_locals(il))) {
+        rhs_expr = int_to_expression(iter);
+        expr = make_ref_expr(ind, NIL);
+        stmt = make_assign_statement(expr, rhs_expr);
+        ifdebug(9) {
+            print_text(stderr,text_statement(entity_undefined,0,stmt,NIL));
+            pips_assert("full_loop_unroll", statement_consistent_p(stmt));
+        }
+        instruction_block(block)= gen_nconc(instruction_block(block),
+                CONS(STATEMENT, stmt, NIL ));
     }
-    instruction_block(block)= gen_nconc(instruction_block(block),
-					CONS(STATEMENT, stmt, NIL ));
 
 
     /* Free old instruction and replace with block */

@@ -138,6 +138,7 @@ set_methods_for_proper_references()
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
+    load_completed_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
 
     effects_descriptor_normalize_func = simple_effects_descriptor_normalize;
@@ -213,6 +214,7 @@ set_methods_for_cumulated_references()
 
     load_context_func = load_undefined_context;
     load_transformer_func = load_undefined_transformer;
+    load_completed_transformer_func = load_undefined_transformer;
     empty_context_test = empty_context_test_false;
 
     proper_to_summary_effect_func = effect_nop; /* FC */
@@ -293,6 +295,7 @@ set_default_methods_for_proper_simple_effects()
 
   load_context_func = load_undefined_context;
   load_transformer_func = load_undefined_transformer;
+  load_completed_transformer_func = load_undefined_transformer;
   empty_context_test = empty_context_test_false;
 
   proper_to_summary_effect_func = effect_nop;
@@ -420,6 +423,7 @@ set_methods_for_simple_effects()
 
   load_context_func = load_undefined_context;
   load_transformer_func = load_undefined_transformer;
+  load_completed_transformer_func = load_undefined_transformer;
   empty_context_test = empty_context_test_false;
   proper_to_summary_effect_func = proper_to_summary_simple_effect;
 
@@ -518,6 +522,7 @@ set_methods_for_simple_pointer_effects()
 
   load_context_func = load_undefined_context;
   load_transformer_func = load_undefined_transformer;
+  load_completed_transformer_func = load_undefined_transformer;
   empty_context_test = empty_context_test_false;
   proper_to_summary_effect_func = proper_to_summary_simple_effect;
 
