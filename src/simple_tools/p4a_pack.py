@@ -122,7 +122,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
         dict(
             root = abs_prefix,
             dist = abs_prefix,
-            accel = os.path.join(abs_prefix, "share/p4a_accel"),
+            accel = "share/p4a_accel",
             fortran = "gfortran" # ???
         )
     )
@@ -279,8 +279,8 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
 
 
 def work(options, args = []):
-    '''Do the real work. The main goal of this function is to make it possible 
-    to be called from another tool (p4a_coffee.py) that has already
+    '''Do the real work. The main goal of this function is to be able to
+    call p4a_setup from another tool (p4a_coffee.py) that has already
     parsed the arguments and options of the command.
     '''
 

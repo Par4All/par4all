@@ -703,8 +703,6 @@ def work(options, args = None):
     # Install various files.
     p4a_util.info("Installing release notes")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
-    p4a_util.info("Installing license")
-    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "LICENSE.txt"), install_dir ])
     p4a_util.info("Installing examples")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
@@ -717,8 +715,9 @@ def work(options, args = None):
         fortran = "g77"
     else:
         fortran = "false"
+    accel_suffix=os.path.relpath(install_dir_share_accel,install_dir)
     p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
-        accel = install_dir_share_accel, fortran = fortran))
+        accel = accel_suffix, fortran = fortran))
 
     # Write version file.
     p4a_version.write_VERSION(install_dir, p4a_version.VERSION(root))
