@@ -223,8 +223,7 @@ class modules:
     """high level representation of a module set"""
     def __init__(self,modules):
         """init from a list of module `the_modules'"""
-        self.__modules=modules
-        self.__modules.sort()
+        self.__modules=sorted(modules)
         self.__ws= modules[0].workspace if modules else None
 
     @property
@@ -495,6 +494,11 @@ class workspace(object):
         
         for f in saved:
             pypsutils.addBeginnning(f, '#include "pipsdef.h"\n')
+            # force an update of the modification time, because previous 
+            # operation might have caused rounded to the second and have broken
+            # makefile dependences
+            os.utime(f,None)
+            
         shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
         return saved,headers+[os.path.join(rep,"pipsdef.h")]
 
