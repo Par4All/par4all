@@ -88,7 +88,7 @@ static list keeped_functions = 0;
 static list keeped_functions_prefix = 0;
 
 
-void use_def_elimination_error_handler()
+void dead_code_elimination_error_handler()
 {
   error_reset_current_statement_stack();
 }
@@ -376,6 +376,8 @@ propagate_the_usefulness_through_the_predecessor_graph()
  */
 static bool entity_local_variable_p(entity var, entity func) {
   bool local = false;
+  pips_debug(4,"Looking if variable %s is local to function %s\n",
+             entity_name(var),entity_name(func));
   if(storage_ram_p(entity_storage(var))) {
     ram r = storage_ram(entity_storage(var));
     if(same_entity_p(func,ram_function(r))) {
@@ -441,7 +443,7 @@ static void use_def_deal_if_useful(statement s) {
    ifdebug(5) {
       int debugLevel = get_debug_level();
       set_debug_level(0);
-      fprintf(stderr, "use_def_deal_if_useful: statement %p (%#zx)\n",
+      fprintf(stderr, "statement %p (%#zx)\n",
               s, statement_ordering(s));
       print_text(stderr, text_statement(get_current_module_entity(), 0, s, NIL));
       set_debug_level(debugLevel);
@@ -526,7 +528,7 @@ static void use_def_deal_if_useful(statement s) {
       /* Mark this statement as useful: */
       set_add_element(the_useful_statements, the_useful_statements, (char *) s);
 
-   pips_debug(5, "end use_def_deal_if_useful\n");
+   pips_debug(5, "end\n");
 }
 
 
@@ -619,13 +621,12 @@ remove_all_the_non_marked_statements(statement s)
 
 
 static void
-use_def_elimination_on_a_statement(statement s)
+dead_code_elimination_on_a_statement(statement s)
 {
    the_useful_statements = set_make(set_pointer);
    init_control_father();
    init_statement_father();
    
-   /* pips_assert("use_def_elimination_on_a_statement", */
    ordering_to_dg_mapping = compute_ordering_to_dg_mapping(dependence_graph);
 
    build_statement_to_statement_father_mapping(s);
@@ -697,7 +698,7 @@ bool dead_code_elimination_on_module(char * module_name)
 
    set_ordering_to_statement(module_statement);
 
-   debug_on("USE_DEF_ELIMINATION_DEBUG_LEVEL");
+   debug_on("DEAD_CODE_ELIMINATION_DEBUG_LEVEL");
 
    /* DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS is a property that can be defined
     * by the user for telling that a space separated list of functions has to
@@ -706,7 +707,7 @@ bool dead_code_elimination_on_module(char * module_name)
    keeped_functions = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS")," ");
    keeped_functions_prefix = strsplit(get_string_property("DEAD_CODE_ELIMINATION_KEEP_FUNCTIONS_PREFIX")," ");
 
-   use_def_elimination_on_a_statement(module_statement);
+   dead_code_elimination_on_a_statement(module_statement);
 
    gen_map(free,keeped_functions);gen_free_list(keeped_functions);
    keeped_functions = 0;
