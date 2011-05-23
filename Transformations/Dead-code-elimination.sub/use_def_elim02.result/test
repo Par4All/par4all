@@ -1,4 +1,11 @@
 //
+// Code after dead_code_elimination for module main
+//
+int main()
+{
+   return use_def_elim02(2);
+}
+//
 // Code after dead_code_elimination for module use_def_elim02
 //
 int use_def_elim02(int i)
@@ -7,11 +14,4 @@ int use_def_elim02(int i)
 
    j = i+1;
    return j;
-}
-//
-// Code after dead_code_elimination for module main
-//
-int main()
-{
-   return use_def_elim02(2);
 }
