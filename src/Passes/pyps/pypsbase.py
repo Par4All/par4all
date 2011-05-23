@@ -75,6 +75,10 @@ class loop:
         return self.__module
 
     @property
+    def pragma(self):
+        return self.__ws.cpypips.loop_pragma(self.__module.name,self.__label)
+
+    @property
     def workspace(self):
         """workspace containing the loop"""
         return self.__ws
