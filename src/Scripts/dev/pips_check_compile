@@ -323,7 +323,7 @@ do
   then
     # svn up was okay, let us get out
     ntry=0
-  elif [ $ntry -gt 0 ]
+  elif [ $ntry -gt 0 ] ; then
     # retry loop, let us wait a little bit
     sleep 60
   else
