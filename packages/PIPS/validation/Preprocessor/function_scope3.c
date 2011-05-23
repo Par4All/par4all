@@ -1,5 +1,0 @@
-static foo();
-
-extern foo()
-{
-}

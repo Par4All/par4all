@@ -1,9 +1,0 @@
-delete ferrand01
-create ferrand01 ferrand01.f
-module FERRAND01
-activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[FERRAND01]
-close
-delete ferrand01
-quit
-# EOF

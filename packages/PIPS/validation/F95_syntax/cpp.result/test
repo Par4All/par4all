@@ -1,3 +1,0 @@
-PROGRAM CPP
-   WRITE (*, '(a)') 'World !'
-END PROGRAM CPP

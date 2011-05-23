@@ -1,7 +1,0 @@
-delete pretty
-create pretty pretty.f
-activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[PRETTY]
-close
-delete pretty
-quit

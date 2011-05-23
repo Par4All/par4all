@@ -1,5 +1,0 @@
-Testing direct .tpips validation
-      PROGRAM TEST
-      PRINT *, "coucou"                                                 0002
-      END
-Done

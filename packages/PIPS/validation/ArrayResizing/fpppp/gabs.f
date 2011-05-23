@@ -1,9 +1,0 @@
-      FUNCTION GABS (ARG)
-C
-C     ABSOLUTE VALUE
-C
-      REAL*8 GABS,DABS,ARG
-C
-      GABS = DABS (ARG)
-      RETURN
-      END

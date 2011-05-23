@@ -1,6 +1,0 @@
-      PROGRAM EXTERNAL
-      INTEGER F
-      EXTERNAL F
-      INTEGER I
-      I = 1                                                             0005
-      END

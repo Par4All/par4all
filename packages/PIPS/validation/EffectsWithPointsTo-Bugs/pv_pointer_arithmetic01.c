@@ -1,1 +1,0 @@
-../PointerValues/pv_pointer_arithmetic01.c

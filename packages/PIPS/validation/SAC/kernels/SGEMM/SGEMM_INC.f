@@ -1,1 +1,0 @@
-      PARAMETER(SIZE=10)

@@ -1,5 +1,0 @@
-echo ! sourcing...
-open source
-display PRINTED_FILE
-close
-echo ! source done.

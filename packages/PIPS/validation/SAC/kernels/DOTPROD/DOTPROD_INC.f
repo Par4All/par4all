@@ -1,2 +1,0 @@
-        INTEGER*2 SIZE
-        PARAMETER (SIZE=10000)

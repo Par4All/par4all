@@ -1,9 +1,0 @@
-pyps
-on
-tenant
-int main()
-{
-   tenant();
-   on();
-   pyps();
-}

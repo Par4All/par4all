@@ -1,7 +1,0 @@
-# Generate an error if a self-recursive call is found
-delete rec
-create rec rec.f
-display PRINTED_FILE 
-close
-delete rec
-quit

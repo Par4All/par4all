@@ -1,4 +1,0 @@
-      PROGRAM DATA01
-      DATA I / 4 /
-      PRINT *, I                                                        0003
-      END

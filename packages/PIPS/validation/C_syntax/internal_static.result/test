@@ -1,5 +1,0 @@
-int main()
-{
-   static int i;
-}
-

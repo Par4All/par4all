@@ -1,4 +1,0 @@
-main()
-{
-  register int i;
-}

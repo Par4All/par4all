@@ -1,9 +1,0 @@
-delete checktype
-create checktype checktype.f
-module CHECKTYPE
-setproperty PARSER_TYPE_CHECK_CALL_SITES   TRUE
-display PRINTED_FILE(CHECKTYPE)
-close
-delete checktype
-quit
-

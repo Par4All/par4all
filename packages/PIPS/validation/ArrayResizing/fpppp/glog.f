@@ -1,9 +1,0 @@
-      FUNCTION GLOG (ARG)
-C
-      REAL*8 GLOG,DLOG,ARG
-C
-C     BASE E (NATURAL) LOGARITHM
-C
-      GLOG = DLOG (ARG)
-      RETURN
-      END

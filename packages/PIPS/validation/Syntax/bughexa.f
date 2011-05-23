@@ -1,5 +1,0 @@
-      program bughexa
-
-      I = 
-
-      end

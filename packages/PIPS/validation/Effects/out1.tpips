@@ -1,7 +1,0 @@
-delete out1
-create out1 out1.f
-activate PRINT_CODE_OUT_EFFECTS
-display PRINTED_FILE
-close
-delete out1
-quit

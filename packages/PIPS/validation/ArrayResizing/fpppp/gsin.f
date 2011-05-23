@@ -1,9 +1,0 @@
-      FUNCTION GSIN (ARG)
-C
-C     SINE
-C
-      REAL*8 GSIN,DSIN,ARG
-C
-      GSIN = DSIN (ARG)
-      RETURN
-      END

@@ -1,7 +1,0 @@
-
-parsed printed file
-
-void complex01()
-{
-   _Complex x;
-}

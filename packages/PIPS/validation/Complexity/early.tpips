@@ -1,8 +1,0 @@
-delete early
-create early early.f
-module EARLY
-activate PRINT_CODE_COMPLEXITIES # Statements & Complexities
-display PRINTED_FILE(EARLY)
-close
-delete early
-quit

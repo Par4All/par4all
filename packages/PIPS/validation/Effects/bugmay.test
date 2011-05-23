@@ -1,3 +1,0 @@
-#!/bin/sh
-tpips=${tpips_version:-tpips}
-$tpips bugmay.tpips 2>&1 |  egrep  '(EFFECTS|called by module|write effect)'

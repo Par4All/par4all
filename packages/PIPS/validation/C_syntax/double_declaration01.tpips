@@ -1,5 +1,0 @@
-delete double_declaration01
-create double_declaration01 double_declaration01.c
-display PRINTED_FILE[double_declaration01!]
-close
-quit

@@ -1,3 +1,0 @@
-!
-! fichier presque vide.
-!

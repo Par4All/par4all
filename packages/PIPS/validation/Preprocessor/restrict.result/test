@@ -1,5 +1,0 @@
-main()
-{
-  restrict int i;
-}
-extern main();

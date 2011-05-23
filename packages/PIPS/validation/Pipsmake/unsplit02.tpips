@@ -1,5 +1,0 @@
-create unsplit02 unsplit02.F
-apply UNSPLIT[ONE]
-shell cat unsplit02.database/Src/unsplit02.f
-close
-delete unsplit02

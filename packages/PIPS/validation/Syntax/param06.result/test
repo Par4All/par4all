@@ -1,8 +1,0 @@
-      SUBROUTINE PARAM06
-      CHARACTER*60 CBLANC,CR1,CR2
-      PARAMETER (CBLANC = '                              '
-     1                  //'                              ')
-
-      PRINT *, CBLANC                                                   0006
-
-      END

@@ -1,6 +1,0 @@
-	PROGRAM FOO
-	INTEGER T(100)
-      DOALL I = 1, 100                                                  0003
-         T(I) = 0                                                       0004
-      ENDDO
-      END

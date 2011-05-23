@@ -1,9 +1,0 @@
-#
-# entry with initialization (saved variable which must be saved)
-#
-delete entry13
-create entry13 entry13.f
-display PRINTED_FILE[%ALL]
-apply UNSPLIT[ENTRY13]
-close
-delete entry13

@@ -1,9 +1,0 @@
-typedef const int ic_t;
-typedef const int *icp_t;
-typedef int *const ipc_t;
-
-int main();
-int main()
-{
-   ic_t i = 1;
-}

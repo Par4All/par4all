@@ -1,6 +1,0 @@
-int main()
-{
-
-   int z;
-   int x = (myint *) z;
-}

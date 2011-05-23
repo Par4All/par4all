@@ -1,6 +1,0 @@
-delete continuation01
-create continuation01 continuation01.f
-display PRINTED_FILE[%ALL]
-close
-delete continuation01
-quit

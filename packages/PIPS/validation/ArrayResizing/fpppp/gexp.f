@@ -1,9 +1,0 @@
-      FUNCTION GEXP (ARG)
-C
-C     EXPONENTIAL
-C
-      REAL*8 GEXP,DEXP,ARG
-C
-      GEXP = DEXP (ARG)
-      RETURN
-      END

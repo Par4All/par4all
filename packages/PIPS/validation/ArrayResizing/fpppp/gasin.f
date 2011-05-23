@@ -1,9 +1,0 @@
-      FUNCTION GASIN (ARG)
-C
-C     ARC SINE
-C
-      REAL*8 GASIN,DASIN,ARG
-C
-      GASIN = DASIN (ARG)
-      RETURN
-      END

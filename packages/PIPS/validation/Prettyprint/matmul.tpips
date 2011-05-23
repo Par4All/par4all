@@ -1,8 +1,0 @@
-delete foo
-create foo matmul.f
-apply PRIVATIZE_MODULE
-activate PRINT_PARALLELIZEDHPF_CODE
-display PARALLELPRINTED_FILE 
-close
-delete foo
-quit

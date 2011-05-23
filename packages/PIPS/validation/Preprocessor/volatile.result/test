@@ -1,5 +1,0 @@
-main()
-{
-  volatile int i;
-}
-extern main();

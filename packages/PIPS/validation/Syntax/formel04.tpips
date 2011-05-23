@@ -1,6 +1,0 @@
-delete formel04
-create formel04 formel04.f
-display PRINTED_FILE
-close
-delete formel04
-

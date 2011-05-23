@@ -1,7 +1,0 @@
-delete goto01
-create goto01 goto01.c
-
-display PRINTED_FILE[foo]
-
-close
-delete goto01

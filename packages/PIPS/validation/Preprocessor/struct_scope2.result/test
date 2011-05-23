@@ -1,5 +1,0 @@
-bar ()
-{
-  extern struct s x;
-}
-extern bar();

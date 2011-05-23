@@ -1,5 +1,0 @@
-delete b
-create b bang.f
-display PRINTED_FILE
-close
-delete b

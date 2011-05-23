@@ -1,7 +1,0 @@
-PROGRAM MAIN
-  INTEGER, PARAMETER :: SIZE = 10
-  INTEGER :: ARRAY (SIZE)
-END PROGRAM MAIN
-
-"compile sources produced by pips"
-

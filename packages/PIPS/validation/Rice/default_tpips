@@ -1,8 +1,0 @@
-delete ${WSPACE}
-create ${WSPACE} ${FILE}
-
-display PARALLELPRINTED_FILE[%ALL]
-
-close
-delete ${WSPACE}
-quit

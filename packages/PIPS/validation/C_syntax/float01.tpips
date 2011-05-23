@@ -1,5 +1,0 @@
-delete float01
-create float01 float01.c
-display PARSED_PRINTED_FILE
-close
-delete float01

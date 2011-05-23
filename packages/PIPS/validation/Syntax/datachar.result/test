@@ -1,7 +1,0 @@
-      PROGRAM DATACHAR
-
-      DATA I/'Hell'/
-
-      PRINT *, I                                                        0005
-
-      END

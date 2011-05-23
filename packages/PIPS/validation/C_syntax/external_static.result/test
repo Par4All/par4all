@@ -1,7 +1,0 @@
-static int i;
-int foo();
-int foo()
-{
-   i = 1;
-}
-

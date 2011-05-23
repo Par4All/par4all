@@ -1,3 +1,0 @@
-// declaration of va_list on BSD
-typedef __builtin_va_list va_list;
-

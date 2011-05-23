@@ -1,5 +1,0 @@
-assign {
-	SIMD_CPY: SF_REF SF_REF,-3;
-}
-assign: =  REFERENCE REFERENCE;
-

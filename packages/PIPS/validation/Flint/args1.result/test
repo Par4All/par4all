@@ -1,7 +1,0 @@
-      PROGRAM ARGS1
-!ERROR: Too few argument(s) to 'FOO' (1<2)!
-      CALL FOO(X)                                                       0002
-      END
-      SUBROUTINE FOO(X,Y)
-      X = Y                                                             0002
-      END

@@ -1,6 +1,0 @@
-delete while02
-create while02 while02.f
-display PRINTED_FILE
-close
-delete while02
-quit

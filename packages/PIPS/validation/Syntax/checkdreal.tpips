@@ -1,9 +1,0 @@
-# Check that DREAL is recognized as an intrinsic
-
-delete checkdreal
-create checkdreal checkdreal.f
-module CHECKDREAL
-display CALLGRAPH_FILE[CHECKDREAL]
-close
-delete checkdreal
-quit

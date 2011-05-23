@@ -1,9 +1,0 @@
-#
-# fun with hollerith;-)
-#
-create holle hollerith.f
-display PRINTED_FILE
-close
-delete holle
-quit
-# EOF

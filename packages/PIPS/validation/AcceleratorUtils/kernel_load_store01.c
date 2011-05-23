@@ -1,1 +1,0 @@
-isolate10.c

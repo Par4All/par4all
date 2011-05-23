@@ -1,9 +1,0 @@
-setproperty ABORT_ON_USER_ERROR TRUE
-delete loop_normalize01
-create loop_normalize01 loop_normalize01.f
-
-apply LOOP_NORMALIZE
-display PRINTED_FILE
-close
-delete loop_normalize01
-quit

@@ -1,7 +1,0 @@
-
-parsed printed file
-
-void string01()
-{
-   char *c = "string02";
-}

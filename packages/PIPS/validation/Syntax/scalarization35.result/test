@@ -1,9 +1,0 @@
-unknown[unknown] (parse_properties) property PRETTYPRINT_STATEMENT_NUMBER redefined
-PARSER[SCALARIZATION35] (MakeFormalParameter) Formal parameter "X" may be used several times
-PARSER[SCALARIZATION35] (MakeFormalParameter) user error
-PARSER[SCALARIZATION35] (MakeFormalParameter) Parser error between lines 3 and 3
-formal parameter should not be already typed
-PARSER[SCALARIZATION35] (set_debug_stack_pointer) debug level stack is set to 2
-unknown[unknown] (safe_do_something) Request aborted under pipsmake: build resource PARSED_PRINTED_FILE for module SCALARIZATION35.
-unknown[unknown] (display_a_resource) user error
-unknown[unknown] (display_a_resource) Cannot build view file PARSED_PRINTED_FILE
