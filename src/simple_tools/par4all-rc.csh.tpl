@@ -22,6 +22,9 @@ setenv P4A_ETC $$P4A_DIST/etc
 # The Fortran 77 compiler to use.
 setenv PIPS_F77 $fortran
 
+# Location of PIPS, needed in case of relocation
+setenv PIPS_ROOT $$P4A_DIST
+
 # Update PATH.
 setenv PATH $$P4A_DIST/bin:$$PATH
 

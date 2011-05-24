@@ -22,6 +22,9 @@ export P4A_ETC=$$P4A_DIST/etc
 # The Fortran 77 compiler to use.
 export PIPS_F77=$fortran
 
+# Location of PIPS, needed in case of relocation
+export PIPS_ROOT=$$P4A_DIST
+
 prepend_to_path_var()
 {
     perl -e "exit unless '$$2'; @p = grep { \$$_ and \$$_ ne '$$2' } split ':', \$$ENV{'$$1'}; print join ':', ('$$2', @p);";
@@ -52,7 +55,7 @@ update_libs_search_paths lib64
 # Update the Python module search path for pyps.
 PYPS_PATH=$$(pkg-config pips --variable=pkgpythondir)
 # To make par4all relocatable, PYPS_PATH has to be updated to the new installation path
-PYPS_PATH_PREFIX=$$(echo $$PYPS_PATH |sed -e 's,\(.*\)\/lib\/python.*,\1,');
+PYPS_PATH_PREFIX=$$(echo $$PYPS_PATH |sed -e 's,\(.*\)\/lib\/python.*,\1,')
 if [ "$$PYPS_PATH_PREFIX" != "$$P4A_DIST" ]; then
 	PYPS_PATH=$$(echo $$PYPS_PATH |sed -e 's,.*\(lib\/python.*\),'$$P4A_DIST'/\1,')
 fi
