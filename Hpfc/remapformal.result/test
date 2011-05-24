@@ -57,8 +57,6 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "FORMALREMAPPEDNOTUSED_parameters.h"
-      INTEGER*4 N
-      PARAMETER (N = 10)
       INTEGER I_0
       REAL*4 SOL(1:5)
       CALL HPFC INIT NODE
@@ -313,8 +311,6 @@
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "NOREMAP_parameters.h"
-      INTEGER*4 N
-      PARAMETER (N = 10)
       INTEGER*4 N
       PARAMETER (N = 10)
       INTEGER I_2, NOREMAP SOL UP1, NOREMAP SOL LO1, PSIp1, LALPHA1, 
