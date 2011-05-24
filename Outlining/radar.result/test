@@ -77,7 +77,7 @@ void p4a_kernel_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int i
    *I_0 = I;
    *R_0 = R;
 }
-void p4a_kernel_trt(int tf, int tv, float filtre[16], int j, int k, float in_pulse[5][32][95], float out_pulse[5][32][80])
+void p4a_kernel_trt(float filtre[16], int j, int k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
 {
 
    STAP_PulseComp(tv, in_pulse[j][k], tf, filtre, out_pulse[j][k]);
@@ -95,7 +95,7 @@ void p4a_launcher_STAP_PulseComp(int tf, int tv, float ptrfiltre[tf], float ptri
          // To be assigned to a call to P4A_vp_0: i
          p4a_wrapper_STAP_PulseComp(tf, tv, &I, &R, i, ptrfiltre, ptrin, ptrout);
 }
-void p4a_launcher_trt(int tf, int tv, float in_pulse[5][32][95], float out_pulse[5][32][80])
+void p4a_launcher_trt(float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
 {
    //int tv=95; int tf=16; 
    int lv = 20;
@@ -111,7 +111,7 @@ void p4a_launcher_trt(int tf, int tv, float in_pulse[5][32][95], float out_pulse
             // To be assigned to a call to P4A_vp_1: j
             // To be assigned to a call to P4A_vp_0: k
             
-            p4a_wrapper_trt(tf, tv, filtre, j, k, in_pulse, out_pulse);
+            p4a_wrapper_trt(filtre, j, k, in_pulse, out_pulse, tf, tv);
 }
 void p4a_wrapper_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int i, float ptrfiltre[tf], float ptrin[tv], float ptrout[tv-tf+1])
 {
@@ -125,15 +125,15 @@ void p4a_wrapper_STAP_PulseComp(int tf, int tv, float I_0[1], float R_0[1], int 
    *I_0 = I;
    *R_0 = R;
 }
-void p4a_wrapper_trt(int tf, int tv, float filtre[16], int j, int k, float in_pulse[5][32][95], float out_pulse[5][32][80])
+void p4a_wrapper_trt(float filtre[16], int j, int k, float in_pulse[5][32][95], float out_pulse[5][32][80], int tf, int tv)
 {
    // To be assigned to a call to P4A_vp_2: i
    // To be assigned to a call to P4A_vp_1: j
    // To be assigned to a call to P4A_vp_0: k
    
-   p4a_kernel_trt(tf, tv, filtre, j, k, in_pulse, out_pulse);
+   p4a_kernel_trt(filtre, j, k, in_pulse, out_pulse, tf, tv);
 }
 void trt(int tv, int tf, float in_pulse[5][32][95], float out_pulse[5][32][80])
 {
-   p4a_launcher_trt(tf, tv, in_pulse, out_pulse);
+   p4a_launcher_trt(in_pulse, out_pulse, tf, tv);
 }
