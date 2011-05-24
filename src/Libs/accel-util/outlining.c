@@ -347,6 +347,14 @@ static list statements_referenced_entities(list statements)
     FOREACH(STATEMENT, s, statements)
     {
         set tmp = get_referenced_entities(s);
+        ifdebug(7) {
+          pips_debug(0,"Statement :");
+          print_statement(s);
+          pips_debug(0,"referenced entities :");
+          print_entities(set_to_list(tmp));
+          fprintf(stderr,"\n");
+        }
+
         set_union(sreferenced_entities,tmp,sreferenced_entities);
         set_free(tmp);
     }
@@ -472,6 +480,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
 
     /* Retrieve referenced entities */
     list referenced_entities = statements_referenced_entities(statements_to_outline);
+
+    ifdebug(5) {
+      pips_debug(0,"Referenced entities :\n");
+      print_entities(referenced_entities);
+    }
+
     /* try to be smart concerning array references */
     hash_table entity_to_effective_parameter = hash_table_undefined;
     if(get_bool_property("OUTLINE_SMART_REFERENCE_COMPUTATION"))
@@ -571,6 +585,8 @@ statement outliner(string outline_module_name, list statements_to_outline)
         bool is_parameter_p = /* != formal parameter */ (entity_symbolic_p(e) && storage_rom_p(entity_storage(e)) && type_functional_p(t));
         if( type_variable_p(t) || is_parameter_p )
         {
+            pips_debug(6,"Add %s to outlined function parameters\n",entity_name(e));
+
             /* this create the dummy parameter */
             entity dummy_entity = FindOrCreateEntity(
                     outline_module_name,
@@ -604,6 +620,12 @@ statement outliner(string outline_module_name, list statements_to_outline)
     effective_parameters=gen_nreverse(effective_parameters);
     hash_table_free(entity_to_effective_parameter);
 
+    ifdebug(5) {
+      pips_debug(0,"Formals : \n");
+      print_parameters(formal_parameters);
+      pips_debug(0,"Effectives : \n");
+      print_expressions(effective_parameters);
+     }
 
 
     /* we need to patch parameters , effective parameters and body in C
