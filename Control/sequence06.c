@@ -8,18 +8,18 @@ void sequence06()
 {
   int l = -1;
   {
-  int i = 4;
+    int i = 4;
 
-  if((i%2)==0) goto l100;
-  i = i + 10;
-  {
-    int i = 0;
-  l100:
+    if((i%2)==0) goto l100;
+    i = i + 10;
+    {
+      int i = 0;
+    l100:
 
-    i = i + 20;
-  }
-  printf("i=%d\n", i);
-  return;
+      i = i + 20;
+    }
+    printf("i=%d\n", i);
+    return;
   }
 }
 

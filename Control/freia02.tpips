@@ -52,7 +52,7 @@ display PRINTED_FILE[main]
 
 apply UNSPLIT
 
-shell gcc freia02.database/Src/freia02.c -o freia02.database/a.out
+shell gcc -g freia02.database/Src/freia02.c -o freia02.database/a.out
 shell freia02.database/a.out
 
 close

@@ -27,8 +27,7 @@ Output of controlizer
 
 void sequence05()
 {
-   {
-   }
+   // BEGIN BLOCK
    int i = 4;
    if (i%2==0) goto l100;
 
@@ -36,31 +35,41 @@ void sequence05()
 
 l100:   ;
    i = i+20;
-   int j = 3;
-   i += j;
-here:   ;
+   {
+      // BEGIN BLOCK
+      int j = 3;
+      i += j;
+here:      ;
+      // END BLOCK
+   }
    i += 30;
    return;
+   // END BLOCK
 }
 
 Output of control restructurer
 
 void sequence05()
 {
-   {
-   }
+   // BEGIN BLOCK
    int i = 4;
    if (i%2==0)
-      ;
+      // BEGIN BLOCK
+      // END BLOCK
    else
 
       i = i+10;
 
 l100:   ;
    i = i+20;
-   int j = 3;
-   i += j;
-here:   ;
+   {
+      // BEGIN BLOCK
+      int j = 3;
+      i += j;
+here:      ;
+      // END BLOCK
+   }
    i += 30;
    return;
+   // END BLOCK
 }
