@@ -257,6 +257,8 @@ static void rw_effects_of_while(whileloop w)
     */
 
     l_prop = effects_dup(load_proper_rw_effects_list(current_stat)); /* R[C] */
+    if (contract_p)
+	l_prop = proper_to_summary_effects(l_prop);
 
     /* The condition is executed at least once : let's keep exact effects if we can */
     l_cond_first = effects_dup(l_prop);
