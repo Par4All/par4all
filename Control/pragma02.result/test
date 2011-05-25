@@ -1,0 +1,20 @@
+
+Parsed code
+
+int main(void)
+{
+   int i;
+#pragma toto
+   i = 0;
+   return i;
+}
+
+Controlized code
+
+int main(void)
+{
+   int i;
+#pragma toto
+   i = 0;
+   return i;
+}
