@@ -4790,7 +4790,6 @@ void output_a_graph_view_of_the_unstructured_successors(text r,
 							int margin,
 							control c)
 {
-  _int so = statement_ordering(control_statement(c));
   list pdl = NIL; // FI: I have no idea how to initialize it in this context...
 
   add_one_unformated_printf_to_text(r, "%s ",
@@ -4801,7 +4800,6 @@ void output_a_graph_view_of_the_unstructured_successors(text r,
   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
     add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
     MAP(CONTROL, a_successor,
-	so = statement_ordering(control_statement(a_successor));
 	add_one_unformated_printf_to_text(r, " %p", a_successor),
 	control_successors(c));
     add_one_unformated_printf_to_text(r,"\n");
