@@ -9,5 +9,6 @@ with  vworkspace() as w:
 	w.all_functions.static_controlize()
 	w.all_functions.pocc_prettyprinter()
 	w.all_functions.display()
+	w.all_functions.static_controlize() # used to segfault
 	#w.all_functions.poccify() # pocc is not installed in the validation
 
