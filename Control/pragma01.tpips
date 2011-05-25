@@ -1,0 +1,21 @@
+delete pragma01
+
+setproperty ABORT_ON_USER_ERROR
+
+create pragma01 pragma01.c
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlized code
+echo
+
+display PRINTED_FILE[main]
+
+close
+quit
+
