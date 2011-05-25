@@ -14,13 +14,16 @@ export P4A_ROOT='$root'
 export P4A_DIST='$dist'
 
 # Location of the Par4All_accelerator files.
-export P4A_ACCEL_DIR='$accel'
+export P4A_ACCEL_DIR=$$P4A_DIST/$accel
 
 # Location of the Par4All configuration files.
 export P4A_ETC=$$P4A_DIST/etc
 
 # The Fortran 77 compiler to use.
 export PIPS_F77=$fortran
+
+# Location of PIPS, needed in case of relocation
+export PIPS_ROOT=$$P4A_DIST
 
 prepend_to_path_var()
 {
@@ -51,6 +54,11 @@ update_libs_search_paths lib64
 
 # Update the Python module search path for pyps.
 PYPS_PATH=$$(pkg-config pips --variable=pkgpythondir)
+# To make par4all relocatable, PYPS_PATH has to be updated to the new installation path
+PYPS_PATH_PREFIX=$$(echo $$PYPS_PATH |sed -e 's,\(.*\)\/lib\/python.*,\1,')
+if [ "$$PYPS_PATH_PREFIX" != "$$P4A_DIST" ]; then
+	PYPS_PATH=$$(echo $$PYPS_PATH |sed -e 's,.*\(lib\/python.*\),'$$P4A_DIST'/\1,')
+fi
 if [ -d $$PYPS_PATH ]; then
     export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PYPS_PATH)
 fi
@@ -58,22 +66,6 @@ fi
 PYPS_PATH=`echo $$PYPS_PATH | sed -e 's/lib/lib64/'`
 if [ -d $$PYPS_PATH ]; then
     export PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PYPS_PATH)
-fi
-# Update the Python module search path so python can find ply
-PLY_PATH=/usr/lib/python2.6/site-packages
-if [ -d $$PLY_PATH/ply ]; then
-    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
-    export PYTHONPATH
-fi
-PLY_PATH=/usr/lib/python2.7/site-packages
-if [ -d $$PLY_PATH/ply ]; then
-    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
-    export PYTHONPATH
-fi
-PLY_PATH=/usr/lib/python3.1/site-packages
-if [ -d $$PLY_PATH/ply ]; then
-    PYTHONPATH=$$(prepend_to_path_var PYTHONPATH $$PLY_PATH)
-    export PYTHONPATH
 fi
 
 # Do not leave our functions defined in user namespace.
