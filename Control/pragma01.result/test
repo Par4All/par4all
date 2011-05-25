@@ -5,8 +5,8 @@ int main(void)
 {
    // BEGIN BLOCK
    int i;
-   {
 #pragma toto
+   {
       // BEGIN BLOCK
       int j;
       i = 0;
@@ -22,8 +22,8 @@ int main(void)
 {
    // BEGIN BLOCK
    int i;
-   {
 #pragma toto
+   {
       // BEGIN BLOCK
       int j;
       i = 0;

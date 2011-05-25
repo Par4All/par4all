@@ -6,9 +6,11 @@ int main(void)
    // BEGIN BLOCK
    int i;
 #pragma toto
-   // BEGIN BLOCK
-   i = 0;
-   // END BLOCK
+   {
+      // BEGIN BLOCK
+      i = 0;
+      // END BLOCK
+   }
    return i;
    // END BLOCK
 }
@@ -20,9 +22,11 @@ int main(void)
    // BEGIN BLOCK
    int i;
 #pragma toto
-   // BEGIN BLOCK
-   i = 0;
-   // END BLOCK
+   {
+      // BEGIN BLOCK
+      i = 0;
+      // END BLOCK
+   }
    return i;
    // END BLOCK
 }
