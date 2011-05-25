@@ -3,6 +3,7 @@ delete pragma01
 setproperty ABORT_ON_USER_ERROR
 
 create pragma01 pragma01.c
+setproperty PRETTYPRINT_BLOCKS TRUE
 
 echo
 echo Parsed code
