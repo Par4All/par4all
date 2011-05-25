@@ -14,8 +14,10 @@ echo
 echo Controlized code
 echo
 
+#setenv CONTROL_DEBUG_LEVEL=8
+activate NEW_CONTROLIZER
+
 display PRINTED_FILE[main]
 
 close
 quit
-
