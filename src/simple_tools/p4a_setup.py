@@ -632,6 +632,9 @@ def work(options, args = None):
     install_dir_makes = os.path.join(install_dir, "makes")
     if not os.path.isdir(install_dir_makes):
         os.makedirs(install_dir_makes)
+    install_dir_stubs = os.path.join(install_dir, "stubs")
+    if not os.path.isdir(install_dir_stubs):
+        os.makedirs(install_dir_stubs)
 
     # Install a few scripts.
     p4a_util.info("Installing scripts")
@@ -674,6 +677,12 @@ def work(options, args = None):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
             p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
+
+
+    # installing stubs !
+    dir = os.path.join(root, "src/p4a_accel/stubs")
+    for file in os.listdir(dir):
+        p4a_util.run([ "cp", "-a", "--remove-destination", os.path.join(dir, file), install_dir_stubs ])
 
     # Create a shortcut name for binaries to the Python file, so that
     # we can type p4a instead of p4a.py. We need the .py versions
