@@ -60,8 +60,8 @@ int main(void)
     _return2;
     {
       freia_status ret = FREIA_OK;
-      int32_t volcurrent;
-      int32_t volprevious;
+      int32_t volcurrent=0;
+      int32_t volprevious=0;
       if (1!=1) {
 	;
 	while (0)

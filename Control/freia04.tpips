@@ -1,8 +1,8 @@
-delete freia03
+delete freia04
 
 setproperty ABORT_ON_USER_ERROR TRUE
 
-create freia03 freia03.c
+create freia04 freia04.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
@@ -20,7 +20,7 @@ setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 #echo Symbol table for block_scope13
 #echo
 
-#display SYMBOL_TABLE_FILE[freia03!]
+#display SYMBOL_TABLE_FILE[freia04!]
 #echo
 #display SYMBOL_TABLE_FILE[main]
 # quit
@@ -29,7 +29,7 @@ echo
 echo Parser output
 echo
 
-#display PARSED_PRINTED_FILE[freia03!]
+#display PARSED_PRINTED_FILE[freia04!]
 echo
 display PARSED_PRINTED_FILE[main]
 #quit
@@ -38,7 +38,7 @@ display PARSED_PRINTED_FILE[main]
 #echo Parser output
 #echo
 #
-#display PARSED_PRINTED_FILE[freia03!]
+#display PARSED_PRINTED_FILE[freia04!]
 #echo
 #display PARSED_PRINTED_FILE[main]
 
@@ -52,11 +52,11 @@ display PRINTED_FILE[main]
 
 apply UNSPLIT
 
-shell gcc -g freia03.database/Src/freia03.c -o freia03.database/a.out
-shell freia03.database/a.out
+shell gcc -g freia04.database/Src/freia04.c -o freia04.database/a.out
+shell freia04.database/a.out
 
 close
 
-#delete freia03
+#delete freia04
 
 
