@@ -13,6 +13,8 @@ setproperty POCC_COMPATIBILITY TRUE
 
 apply POCC_PRETTYPRINTER [main]
 display PRINTED_FILE[main]
+apply STATIC_CONTROLIZE[main]
+
 
 close
 
