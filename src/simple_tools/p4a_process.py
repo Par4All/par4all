@@ -360,8 +360,10 @@ class p4a_processor(object):
             # Late import of pyps to avoid importing it until
             # we really need it.
             global pyps
+            global broker
             try:
                 pyps = __import__("pyps")
+                broker = __import__("broker")
             except:
                 raise
 
@@ -370,11 +372,12 @@ class p4a_processor(object):
             # one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
-            self.workspace = pyps.workspace(*self.files,
-                                            name = self.project_name,
-                                            verbose = verbose,
-                                            cppflags = cpp_flags,
-                                            recoverInclude = recover_Include)
+            self.workspace = broker.workspace(*self.files,
+                                              name = self.project_name,
+                                              verbose = verbose,
+                                              cppflags = cpp_flags,
+                                              recoverInclude = recover_Include,
+                                              brokersList="p4a_stubs_broker")
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
