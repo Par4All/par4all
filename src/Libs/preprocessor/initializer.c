@@ -443,7 +443,7 @@ add_new_module_from_text(string module_name,
     user_log("Registering synthesized file %s\n", file_name );
     DB_PUT_FILE_RESOURCE(res, module_name, strdup(init_name));
     /* The user file dwells in the WORKSPACE_TMP_SPACE */
-    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, strdup(string_undefined_p(compilation_unit_name)?src_name:full_name));
+    DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_name, src_name);
 
     if(!is_fortran && string_undefined_p(compilation_unit_name) ) { // C is assumed
       /* Add the compilation unit files */
