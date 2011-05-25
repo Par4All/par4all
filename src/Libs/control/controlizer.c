@@ -2031,6 +2031,8 @@ static bool controlize_test(control c_res,
     /* c_then & c_else are no longer useful: */
     remove_a_control_from_an_unstructured_without_relinking(c_then);
     remove_a_control_from_an_unstructured_without_relinking(c_else);
+    // You do not want to relink too much, but you should relink a minimum
+    link_2_control_nodes(c_res, succ);
 
     /* The test statement is a structured test: */
     controlized = FALSE;
