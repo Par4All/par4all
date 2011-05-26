@@ -1,0 +1,34 @@
+# $Id$
+# minimum rc file for sh-compatible shells
+
+# default architecture is not necessary
+#export PIPS_ARCH=LINUXI86LL
+
+# for manually installed gcc
+PATH=/usr/local/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/lib
+
+# subversion repositories
+export NEWGEN_SVN=https://svn.cri.ensmp.fr/svn/newgen
+export LINEAR_SVN=https://svn.cri.ensmp.fr/svn/linear
+export PIPS_SVN=https://svn.cri.ensmp.fr/svn/pips
+
+# production directory
+prod=/home/fabien/32BIT/prod
+
+# software roots are not needed
+#export EXTERN_ROOT=$prod/extern
+#export NEWGEN_ROOT=$prod/newgen
+#export LINEAR_ROOT=$prod/linear
+#export PIPS_ROOT=$prod/pips
+
+# fix path
+PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH
+
+# The Fortran compiler to use:
+export PIPS_F77=gfortran
+export PIPS_F90=gfortran
+
+# skip pyps validation
+export PIPS_VALIDATION_NO_PYPS=1
+export PIPS_VALIDATION_SKIP=F95_syntax

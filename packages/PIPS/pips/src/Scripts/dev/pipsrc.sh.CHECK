@@ -1,0 +1,28 @@
+# $Id$
+#
+# minimum rc file for sh-compatible shells
+#
+# prod/pips/makes/config.mk:
+#   PIPS_NO_GPIPS = 1
+#   PIPS_ENABLE_FORTRAN95 = 1
+
+# default architecture
+export PIPS_ARCH=LINUX_x86_64_LL
+
+# subversion repositories
+# export NEWGEN_SVN=https://svn.cri.ensmp.fr/svn/newgen
+# export LINEAR_SVN=https://svn.cri.ensmp.fr/svn/linear
+# export PIPS_SVN=https://svn.cri.ensmp.fr/svn/pips
+
+prod=/home/fabien/CHECK/prod
+
+#export PIPS_VALIDATION_SKIP=F95_syntax
+export PIPS_VALIDATION_NO_PYPS=1
+export PIPS_F77=gfortran
+export PIPS_F90=gfortran
+#export PATH=/usr/local/bin:/usr/bin:/bin
+export PATH=/usr/bin:/bin
+#export LD_LIBRARY_PATH=/usr/local/lib64
+
+# fix path
+PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH

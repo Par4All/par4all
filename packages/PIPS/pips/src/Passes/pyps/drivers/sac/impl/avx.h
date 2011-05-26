@@ -19,6 +19,8 @@ typedef __m256i	v32qi;
 
 /* float */
 #define SIMD_LOAD_V8SF(vec,arr) vec=_mm256_loadu_ps(arr)
+#define SIMD_LOAD_BROADCAST_V8SF(vec,arr) vec=_mm256_set1_ps(arr)
+#define SIMD_LOAD_BROADCAST_V4DF(vec,arr) vec=_mm256_set1_pd(arr)
 #define SIMD_LOADA_V8SF(vec,arr) vec=_mm256_load_ps(arr)
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm256_mul_ps(vec2,vec3)
 #define SIMD_DIVPS(vec1,vec2,vec3) vec1=_mm256_div_ps(vec2,vec3)
@@ -30,6 +32,11 @@ typedef __m256i	v32qi;
 		SIMD_MULPS(__pips_tmp,vec3,vec4); \
 		SIMD_ADDPS(vec1,__pips_tmp,vec2); \
 		} while(0)
+
+#define SIMD_SHUFFLE_V8SF(dist,src,i0,i1,i2,i3) _mm256_shuffle_pd(src,src,_MM_SHUFFLE(i3,i2,i1,i0))
+#define SIMD_SHUFFLE_V4SF(dist,src,i0,i1,i2,i3) _mm256_shuffle_ps(src,src,_MM_SHUFFLE(i3,i2,i1,i0))
+
+
 /* umin as in unary minus */
 #define SIMD_UMINPS(vec1, vec2)				\
 		do {						\
@@ -141,58 +148,62 @@ typedef __m256i	v32qi;
 		(f)[3] = __pips_tmp[3];			\
 		} while(0)
 
-#define SIMD_LOAD_V4SF_TO_V4DF(vec,f)		\
-		SIMD_LOAD_GENERIC_V4DF(vec,(f)[0],(f)[1],(f)[2],(f)[3])
+#define SIMD_LOAD_V4SF_TO_V4DF(vec,f)      \
+    do {\
+        __m128 vecsf = _mm_load_ps(f);\
+        vec=_mm256_cvtps_pd(vecsf) ; \
+    } while(0)
 
 /* long long */
 #define SIMD_LOADA_V4DI(vec,arr) \
-		vec=_mm256_load_si256(arr) \
+		vec=_mm256_load_si256(arr)
 
 #define SIMD_STOREA_V4DI(vec,arr)\
-		vec=_mm256_store_si256(arr) \
+		vec=_mm256_store_si256(arr)
 
 #define SIMD_LOAD_V4DI(vec,arr) \
-		vec=_mm256_loadu_si256(arr) \
+		vec=_mm256_loadu_si256(arr)
 
 #define SIMD_STORE_V4DI(vec,arr) \
-		vec=_mm256_storeu_si256(arr) \
+		vec=_mm256_storeu_si256(arr)
 
 
 /* int */
 #define SIMD_LOADA_V8SI(vec,arr) \
-		vec=_mm256_load_si256(arr) \
+		vec=_mm256_load_si256(arr)
 
 #define SIMD_STOREA_V8SI(vec,arr)\
-		vec=_mm256_store_si256(arr) \
+		vec=_mm256_store_si256(arr)
 
 #define SIMD_LOAD_V8SI(vec,arr) \
-		vec=_mm256_loadu_si256(arr) \
+		vec=_mm256_loadu_si256(arr)
 
 #define SIMD_STORE_V8SI(vec,arr) \
-		vec=_mm256_storeu_si256(arr) \
+		vec=_mm256_storeu_si256(arr)
 
 /* short */
 #define SIMD_LOADA_V16HI(vec,arr) \
-		vec=_mm256_load_si256(arr) \
+		vec=_mm256_load_si256(arr)
 
 #define SIMD_STOREA_V16HI(vec,arr)\
-		vec=_mm256_store_si256(arr) \
+		vec=_mm256_store_si256(arr)
 
 #define SIMD_LOAD_V16HI(vec,arr) \
-		vec=_mm256_loadu_si256(arr) \
+		vec=_mm256_loadu_si256(arr)
 
 #define SIMD_STORE_V16HI(vec,arr) \
-		vec=_mm256_storeu_si256(arr) \
+		vec=_mm256_storeu_si256(arr)
 
 /* char */
 #define SIMD_LOADA_V32QI(vec,arr) \
-		vec=_mm256_load_si256(arr) \
+		vec=_mm256_load_si256(arr)
 
 #define SIMD_STOREA_V32QI(vec,arr)\
-		vec=_mm256_store_si256(arr) \
+		vec=_mm256_store_si256(arr)
 
 #define SIMD_LOAD_V32QI(vec,arr) \
-		vec=_mm256_loadu_si256(arr) \
+		vec=_mm256_loadu_si256(arr)
 
 #define SIMD_STORE_V32QI(vec,arr) \
-		vec=_mm256_storeu_si256(arr) \
+		vec=_mm256_storeu_si256(arr)
+

@@ -1,0 +1,2 @@
+CFLAGS+=-mfpu=neon -mfloat-abi=softfp -O3
+##pipsrules##

@@ -39,6 +39,7 @@
 #include "pipsdbm.h"
 
 #include "effects-generic.h"
+#include "effects-convex.h"
 #include "effects-simple.h"
 #include "accel-util.h"
 
@@ -204,6 +205,18 @@ static bool successor_only_has_rr_conflict_p(vertex v,successor su, size_t loop_
                     words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
         }
         else {
+#if 0
+            list inter = region_intersection(conflict_sink(c),conflict_source(c));
+            if(ENDP(inter)) // why is this conflict generated ?!?
+            {
+                pips_debug(3,
+                        "conflict skipped between %s and %s\n",
+                        words_to_string(words_reference(effect_any_reference(conflict_sink(c)),NIL)),
+                        words_to_string(words_reference(effect_any_reference(conflict_source(c)),NIL)));
+                continue;
+            }
+            gen_full_free_list(inter);
+#endif
             /* regions tell us there is a conflict.
              * check if the dependence is loop carried or not
              * */
@@ -308,7 +321,7 @@ static list sac_statement_to_expressions(statement s)
     return out;
 }
 
-
+#if 0
 static void sac_sort_expressions_reductions_last(list *l)
 {
     list tail = NIL;
@@ -323,6 +336,7 @@ static void sac_sort_expressions_reductions_last(list *l)
     gen_free_list(*l);
     *l=gen_nconc(head,tail);
 }
+#endif
 
 static bool comparable_statements_on_distance_p(statement s0, statement s1)
 {
@@ -354,6 +368,7 @@ static int compare_statements_on_ordering(const void * v0, const void * v1)
     return 0;
 }
 
+#if 0
 static int compare_statements_on_distance(const void * v0, const void * v1)
 {
     const statement s0 = *(const statement*)v0;
@@ -388,6 +403,66 @@ static int compare_statements_on_distance(const void * v0, const void * v1)
     gen_free_list(exp1);
     return res?res:compare_statements_on_ordering(v0,v1);
 }
+#endif
+
+static statement origin=NULL;
+static void set_statement_origin(statement s) {origin=s;}
+static void reset_statement_origin() {origin=NULL;}
+
+static int compare_statements_on_distance_to_origin(const void* ps0, const void* ps1) {
+    
+    const statement s0 = *(const statement*)ps0;
+    const statement s1 = *(const statement*)ps1;
+    list expo=sac_statement_to_expressions(origin),
+         exp0=sac_statement_to_expressions(s0),
+         exp1=sac_statement_to_expressions(s1);
+    size_t dist0=0,
+           dist1=0;
+    static const int dinf=1000;
+
+    list iter0 = exp0,iter1=exp1;
+    FOREACH(EXPRESSION,eo,expo)
+    {
+        expression e0 = ENDP(iter0)? expression_undefined:EXPRESSION(CAR(iter0)),
+                   e1 = ENDP(iter1)? expression_undefined:EXPRESSION(CAR(iter1));
+        expression distance0 = expression_undefined_p(e0) ? expression_undefined : distance_between_expression(eo,e0),
+                   distance1 = expression_undefined_p(e1) ? expression_undefined : distance_between_expression(eo,e1);
+        intptr_t val0=0, val1;
+        if(!expression_undefined_p(distance0))
+        {
+            if(expression_integer_value(distance0,&val0)) {
+                dist0+=val0*val0;
+            }
+            else dist0+=dinf*dinf;
+            free_expression(distance0);
+
+        }
+        else if(expression_scalar_p(e0) && expression_scalar_p(e1))
+            dist0+=1;
+        else
+            dist0+=dinf*dinf;
+        if(!expression_undefined_p(distance1))
+        {
+            if(expression_integer_value(distance1,&val1)) {
+                dist1+=val1*val1;
+            }
+            else dist1+=dinf*dinf;
+            free_expression(distance1);
+
+        }
+        else if(expression_scalar_p(e0) && expression_scalar_p(e1))
+            dist1+=1;
+        else
+            dist1+=dinf*dinf;
+        POP(iter0);
+        POP(iter1);
+    }
+    gen_free_list(expo);
+    gen_free_list(exp0);
+    gen_free_list(exp1);
+    return dist0>dist1? 1 : dist0 == dist1 ? 0 : -1;
+}
+
 static int compare_list_from_length(const void *v0, const void *v1)
 {
     const list l0=*(const list*)v0;
@@ -397,11 +472,11 @@ static int compare_list_from_length(const void *v0, const void *v1)
     return n0==n1 ? 0 : n0 > n1 ? 1 : -1;
 }
 
-static list order_isomorphic_statements(set s)
+static list order_isomorphic_statements_list(list ordered)
 {
-    list ordered = set_to_sorted_list(s,compare_statements_on_ordering);
+    gen_sort_list(ordered,compare_statements_on_ordering);
     list heads = NIL;
-    do {
+    while(!ENDP(ordered)) {
         statement head = STATEMENT(CAR(ordered));
         list firsts = CONS(STATEMENT,head,NIL);
         list lasts = NIL;
@@ -413,17 +488,23 @@ static list order_isomorphic_statements(set s)
                 lasts=CONS(STATEMENT,st,lasts);
         }
         gen_free_list(ordered);
-        gen_sort_list(firsts,compare_statements_on_distance);
+        set_statement_origin(head);
+        gen_sort_list(firsts,compare_statements_on_distance_to_origin);
+        reset_statement_origin();
         gen_sort_list(lasts,compare_statements_on_ordering);
         heads=CONS(LIST,firsts,heads);
         ordered=lasts;
-    } while(!ENDP(ordered));
+    }
     gen_sort_list(heads,compare_list_from_length);
     list out = NIL;
     FOREACH(LIST,l,heads)
         out=gen_nconc(l,out);
     gen_free_list(heads);
     return out;
+}
+static list order_isomorphic_statements(set s) {
+    list ordered = set_to_sorted_list(s,compare_statements_on_ordering);
+    return order_isomorphic_statements_list(ordered);
 }
 
 /*
@@ -614,15 +695,14 @@ static list simdize_simple_statements_pass2(list seq, float * simdCost)
                         newseq=gen_append(generate_simd_code(ss,simdCost),newseq);
                         for(intptr_t i= opcode_vectorSize(simdstatement_opcode(ss));i!=0;i--)
                         {
-                            if(!ENDP(iso_iter)) { /*endp can occur when padded statements are added */
-                                set_add_element(visited,visited,STATEMENT(CAR(iso_iter)));
-                                POP(iso_iter);
-                            }
+                            set_add_element(visited,visited,STATEMENT(CAR(iso_iter)));
+                            POP(iso_iter);
                         }
+                        iso_iter=order_isomorphic_statements_list(iso_iter);
                     }
                 }
                 set_free(group_matches);
-                gen_free_list(iso_stats);
+                //gen_free_list(iso_stats);
             }
             simd_reset_finalArgType();
         }
@@ -725,6 +805,7 @@ static void simdize_simple_statements(statement s, simdizer_context *sc)
     }
 }
 
+
 /*
  * simple filter for `simdizer'
  * Do not recurse through simple calls, for better performance 
@@ -783,7 +864,6 @@ bool simdizer(char * mod_name)
     remove_preferences(se);
     set_proper_rw_effects(se);
     push_generated_variable_commenter(sac_commenter);
-    init_padding_entities();
 
     debug_on("SIMDIZER_DEBUG_LEVEL");
 
@@ -804,7 +884,6 @@ bool simdizer(char * mod_name)
     //DB_PUT_MEMORY_RESOURCE(DBR_DG, mod_name, dependence_graph);
 
     /* update/release resources */
-    reset_padding_entities();
     reset_proper_rw_effects();
     reset_simd_operator_mappings();
     reset_simd_treematch();
@@ -895,6 +974,46 @@ static void do_split_block_statements(statement s) {
     }
 }
 
+static void do_split_decl_block_statements(statement s) {
+  if(statement_block_p(s)) {
+    list iter,prev=NIL;
+    for(iter=statement_block(s);!ENDP(iter) && declaration_statement_p(STATEMENT(CAR(iter))); POP(iter) ) {
+      prev=iter;
+    }
+    if(!ENDP(iter) && !ENDP(prev) ) {
+      CDR(prev)=NIL;
+      statement tail = make_block_statement(iter);
+      /* is there a tail return ? */
+      list iter2,prev2=NIL;
+      for(iter2=iter;!ENDP(iter2) && !return_statement_p(STATEMENT(CAR(iter2))); POP(iter2) ) {
+        prev2=iter2;
+      }
+      if(!ENDP(iter2) && !ENDP(prev2) ) { /* yes there is */
+        CDR(prev2)=NIL;
+        statement rtail = make_block_statement(iter2);
+        insert_statement(STATEMENT(CAR(prev)),tail,false);
+        insert_statement(STATEMENT(CAR(prev)),rtail,false);
+      }
+      else {
+        insert_statement(STATEMENT(CAR(prev)),tail,false);
+      }
+    }
+    else {
+      /* is there a tail return ? */
+      list iter2,prev2=NIL;
+      for(iter2=iter=statement_block(s);!ENDP(iter2) && !return_statement_p(STATEMENT(CAR(iter2))); POP(iter2) ) {
+        prev2=iter2;
+      }
+      if(!ENDP(iter2) && !ENDP(prev2) ) { /* yes there is */
+        CDR(prev2)=NIL;
+        statement rtail = make_block_statement(iter2);
+        /* not using insert_statement because it is too smart ! we want to keep a block*/
+        gen_append(statement_block(s),make_statement_list(rtail));
+      }
+    }
+  }
+}
+
 bool simdizer_init(const char * module_name)
 {
     /* get the resources */
@@ -904,9 +1023,11 @@ bool simdizer_init(const char * module_name)
     /* normalize blocks */
     clean_up_sequences(get_current_module_statement());
 
+    /* then split blocks containing declarations statement */
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, do_split_decl_block_statements);
+
     /* then split blocks containing labeled statement */
-    gen_recurse(get_current_module_statement(), statement_domain,
-            gen_true, do_split_block_statements);
+    gen_recurse(get_current_module_statement(), statement_domain, gen_true, do_split_block_statements);
 
     /* sort commutative operators */
     gen_recurse(get_current_module_statement(),call_domain,gen_true,do_simdizer_init);

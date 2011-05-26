@@ -369,7 +369,7 @@ movement_computation(
     unsigned	space;
 #define maxscinfosize 100
     /* int sc_info[sc_image->dimension+1][3]; // this is NOT ANSI C */
-    int sc_info[maxscinfosize][3];
+    int sc_info[maxscinfosize][4];
     int i;
     Pvecteur pv1= NULL;
     Pbase btmp = BASE_NULLE;

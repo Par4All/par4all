@@ -298,11 +298,6 @@ bool hpfc_parser(string module)
 {
     return the_actual_parser(module, DBR_HPFC_FILTERED_FILE);
 }
-// pour STEP
-bool directive_parser(string module)
-{
-  return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
-}
 
 bool parser(string module)
 {
@@ -313,3 +308,14 @@ void init_parser_properties()
 {
   init_parser_reader_properties();
 }
+
+/*
+ * Within step, a preprocessing has been done on user source file, so we
+ * parse DBR_DIRECTIVE_FILTERED_FILE
+ * !! This is not a pipsmake declared pass,
+ * !! it's called by a Step pass : directive_parser
+ */
+bool step_parser(string module) {
+  return the_actual_parser(module, DBR_DIRECTIVE_FILTERED_FILE);
+}
+

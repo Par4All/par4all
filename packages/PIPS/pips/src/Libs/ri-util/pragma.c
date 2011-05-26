@@ -441,15 +441,19 @@ pragma_to_string (pragma p) {
  *  @param  s, the pragma string.
  *  @param  copy_flag, to be set to true to duplicate the string
  */
-void
-add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
+void add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
+
+  /* Duplicate string if requested */
+  if (copy_flag == TRUE) s=strdup(s);
+
+  /* Make a new pragma */
+  pragma p = make_pragma_string(s);
+
+  /* Will be save as an extension attached to
+   * the statement's extension list
+   */
   extensions es = statement_extensions(st);
-  /* Make a new pragma: */
-  pragma p = pragma_undefined;
-  if (copy_flag == TRUE) p = make_pragma(is_pragma_string, strdup(s));
-  else p = make_pragma_string(s);
   extension e = make_extension(p);
-  /* Add the new pragma to the extension list: */
   list el = extensions_extension(es);
   el = gen_extension_cons(e, el);
   extensions_extension(es) = el;
@@ -457,15 +461,11 @@ add_pragma_str_to_statement(statement st, string s, bool copy_flag) {
 
 
 /** Add a list of strings as as many pragmas to a statement
-
     @param  st, the statement on which we want to add a pragma
-
     @param  l, a list of pragma string(s)
-
     @param  copy_flag, to be set to true to duplicate the string
  */
-void
-add_pragma_strings_to_statement(statement st, list l, bool copy_flag) {
+void add_pragma_strings_to_statement(statement st, list l, bool copy_flag) {
   FOREACH(STRING, p, l)
     add_pragma_str_to_statement(st, p, copy_flag);
 }

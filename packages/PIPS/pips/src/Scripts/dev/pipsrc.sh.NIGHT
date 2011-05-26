@@ -1,0 +1,21 @@
+# $Id$
+# minimum rc file for sh-compatible shells
+
+# default architecture
+export PIPS_ARCH=LINUX_x86_64_LL
+
+# subversion repositories
+export NEWGEN_SVN=http://svn.cri.ensmp.fr/svn/newgen
+export LINEAR_SVN=http://svn.cri.ensmp.fr/svn/linear
+export PIPS_SVN=http://svn.cri.ensmp.fr/svn/pips
+
+# software prods
+prod=/home/local/fabien/NIGHT/prod
+
+# fix path
+PATH=$prod/pips/bin:$prod/pips/utils:$prod/newgen/bin:$PATH
+
+# The Fortran compiler to use:
+export PIPS_F77=gfortran
+export PIPS_F90=gfortran
+export PIPS_VALIDATION_NO_PYPS=1

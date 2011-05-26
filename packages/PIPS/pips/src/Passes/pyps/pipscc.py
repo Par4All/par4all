@@ -117,8 +117,8 @@ class pipscc:
 
 	def changes(self,ws):
 		"""apply any change to the workspace, should be overloaded by the user"""
-		map(module.display,ws.fun)
-		map(module.display,ws.cu)
+		for f in ws.fun: f.display()
+		for c in ws.cu: c.display()
 
 	def get_wd(self):
 		"""selects a working directory for pipscc"""

@@ -55,6 +55,7 @@
 #include "linear.h"
 #include "ri.h"
 #include "ri-util.h"
+#include "properties.h"
 
 #include "misc.h"
 /* Must not be used, beware of library cycles: #include "semantics.h" */
@@ -519,9 +520,14 @@ transformer transformer_list_closure_to_precondition(list tl,
   list p_3_l = transformers_apply(itcl_plus, p_0);
   transformer p_3 = transformer_list_to_transformer(gen_full_copy_list(p_3_l));
 
+  transformer t_star = transformer_undefined;
+  if(!get_bool_property("SEMANTICS_USE_DERIVATIVE_LIST")) {
   // Not satisfying: works only for the whole space, not for subpaces
   // left untouched
-  transformer t_star = active_transformer_list_to_transformer(itcl);
+    t_star = active_transformer_list_to_transformer(itcl);
+  }
+  else
+    t_star = transformer_list_transitive_closure(itcl);
   transformer p_4_1 = transformer_apply(t_star, p_1); // one + * iteration
   list p_4_2_l = transformers_apply_and_keep_all(ntl, p_4_1); // another iteration
   pips_assert("itcl_plus and p_4_2_l have the same numer of elements",
@@ -667,6 +673,9 @@ list transformer_list_preserved_variables(list vl, list tl, list tl_v)
 
    The preconditions obtained with the different projections are
    intersected.
+
+   FI: this may be useless when derivatives are computed before the
+   convex union.
  */
 transformer transformer_list_multiple_closure_to_precondition(list tl,
 							      transformer c_t,
@@ -710,4 +719,257 @@ transformer transformer_list_multiple_closure_to_precondition(list tl,
   gen_free_list(vl);
   pips_assert("prec is consistent", transformer_consistency_p(prec));
   return prec;
+}
+
+/* Allocate a new constraint system sc(dx) with dx=x'-x and t(x,x')
+ *
+ * FI: this function should/might be located in fix_point.c
+ */
+Psysteme transformer_derivative_constraints(transformer t)
+{
+  Psysteme sc = sc_copy(predicate_system(transformer_relation(t)));
+  /* sc is going to be modified and returned */
+  /* Do not handle variable which do not appear explicitly in constraints! */
+  Pbase b = sc_to_minimal_basis(sc);
+  Pbase bv = BASE_NULLE; /* basis vector */
+
+  /* Compute constraints with difference equations */
+
+  for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
+    entity oldv = (entity) vecteur_var(bv);
+
+    /* Only generate difference equations if the old value is used */
+    if(old_value_entity_p(oldv)) {
+      entity var = value_to_variable(oldv);
+      entity newv = entity_to_new_value(var);
+      entity diffv = entity_to_intermediate_value(var);
+      Pvecteur diff = VECTEUR_NUL;
+      Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+      diff = vect_make(diff,
+		       (Variable) diffv, VALUE_ONE,
+		       (Variable) newv,  VALUE_MONE,
+		       (Variable) oldv, VALUE_ONE,
+		       TCST, VALUE_ZERO);
+
+      eq = contrainte_make(diff);
+      sc = sc_equation_add(sc, eq);
+    }
+  }
+
+  ifdebug(8) {
+    pips_debug(8, "with difference equations=\n");
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+  }
+
+  /* Project all variables but differences to get T' */
+
+  sc = sc_projection_ofl_along_variables(sc, b);
+
+  ifdebug(8) {
+    pips_debug(8, "Non-homogeneous constraints on derivatives=\n");
+    sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+  }
+
+  return sc;
+}
+
+/* Computation of an upper approximation of a transitive closure using
+ * constraints on the discrete derivative for a list of
+ * transformers. Each transformer is used to compute its derivative
+ * and the derivatives are unioned by convex hull.
+ *
+ * The reason for doing this is D(T1) U D(T2) <= D(T1 U T2) where <=
+ * denotes the subset comparison operator.
+ *
+ * See http://www.cri.ensmp.fr/classement/doc/A-429.pdf
+ *
+ * Implicit equations, n#new - n#old = 0, are added because they are
+ * necessary for the convex hull.
+ *
+ * Intermediate values are used to encode the differences. For instance,
+ * i#int = i#new - i#old
+ */
+/* This code was cut-and-pasted from
+   transformer_derivative_fix_point() but is more general and subsume
+   it */
+/* transformer transformer_derivative_fix_point(transformer tf)*/
+transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
+{
+  transformer tc_tf = transformer_identity();
+
+  ifdebug(8) {
+    pips_debug(8, "Begin for transformer list %p:\n", tfl);
+    print_transformers(tfl);
+  }
+
+  if(ENDP(tfl)) {
+    /* Since we compute the * transitive closure and not the +
+       transitive closure, the fix point is the identity. */
+    tc_tf = transformer_identity();
+  }
+  else {
+    // Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
+    Pbase ib = BASE_NULLE;
+    Pbase diffb = BASE_NULLE; /* basis of difference vectors */
+    Pbase bv = BASE_NULLE;
+    Pbase b = BASE_NULLE;
+
+    /* Compute the global argument list and the global base b */
+    list gal = NIL;
+    FOREACH(TRANSFORMER, t, tfl) {
+      list al = transformer_arguments(t);
+      /* Cannot use arguments_union() because a new list is allocated */
+      FOREACH(ENTITY, e, al)
+	gal = arguments_add_entity(gal, e);
+
+      Psysteme sc = sc_copy(predicate_system(transformer_relation(t)));
+      // redundant with call to transformer_derivative_constraints(t)
+      Pbase tb = sc_to_minimal_basis(sc);
+      Pbase nb = base_union(b, tb);
+      base_rm(b); // base_union() allocates a new base
+      b = nb;
+    }
+
+    /* For each transformer t in list tl
+     *
+     *   compute its derivative constraint system
+     *
+     *   add the equations for the unchanged variables
+     *
+     *   compute its convex hull with the current value of sc if sc is
+     *   already defined
+     */
+    Psysteme sc = SC_UNDEFINED;
+    FOREACH(TRANSFORMER, t, tfl) {
+      Psysteme tsc = transformer_derivative_constraints(t);
+      FOREACH(ENTITY,e,gal) {
+	if(!entity_is_argument_p(e, transformer_arguments(t))) {
+	  /* Add corresponding equation */
+	  entity diffv = entity_to_intermediate_value(e);
+	  Pvecteur diff = VECTEUR_NUL;
+	  Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+	  diff = vect_make(diff,
+			   (Variable) diffv, VALUE_ONE,
+			   TCST, VALUE_ZERO);
+
+	  eq = contrainte_make(diff);
+	  sc = sc_equation_add(sc, eq);
+	}
+	if(SC_UNDEFINED_P(sc))
+	  sc = tsc;
+	else {
+	  /* This could be optimized by using the convex hull of a
+	     Psystemes list and by keeping the dual representation of
+	     the result instead of converting it several time back
+	     and forth. */
+	  Psysteme nsc = cute_convex_union(sc, tsc);
+	  sc_free(sc);
+	  sc = nsc;
+	}
+      }
+    }
+
+    /* Multiply the constant terms by the iteration number ik and add a
+       positivity constraint for the iteration number ik and then
+       eliminate the iteration number ik to get T*(dx). */
+    entity ik = make_local_temporary_integer_value_entity();
+    //Psysteme sc_t_prime_k = sc_dup(sc);
+    //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
+    sc = sc_multiply_constant_terms(sc, (Variable) ik, star_p);
+    //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
+    sc = sc_projection_ofl(sc, (Variable) ik);
+    sc->base = base_remove_variable(sc->base, (Variable) ik);
+    sc->dimension--;
+    // FI: I do not remember nor find how to get rid of local values...
+    //sc_rm(sc);
+    //sc = sc_t_prime_star;
+
+    ifdebug(8) {
+      pips_debug(8, "All invariants on derivatives=\n");
+      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+    }
+
+    /* Difference variables must substituted back to differences
+     * between old and new values.
+     */
+
+    for(bv = b; !BASE_NULLE_P(bv); bv = bv->succ) {
+      entity oldv = (entity) vecteur_var(bv);
+
+      /* Only generate difference equations if the old value is used */
+      if(old_value_entity_p(oldv)) {
+	entity var = value_to_variable(oldv);
+	entity newv = entity_to_new_value(var);
+	entity diffv = entity_to_intermediate_value(var);
+	Pvecteur diff = VECTEUR_NUL;
+	Pcontrainte eq = CONTRAINTE_UNDEFINED;
+
+	diff = vect_make(diff,
+			 (Variable) diffv, VALUE_ONE,
+			 (Variable) newv,  VALUE_MONE,
+			 (Variable) oldv, VALUE_ONE,
+			 TCST, VALUE_ZERO);
+
+	eq = contrainte_make(diff);
+	sc = sc_equation_add(sc, eq);
+	diffb = base_add_variable(diffb, (Variable) diffv);
+	ib = base_add_variable(ib, (Variable) oldv);
+	ib = base_add_variable(ib, (Variable) newv);
+      }
+    }
+
+    ifdebug(8) {
+      pips_debug(8,
+		 "All invariants on derivatives with difference variables=\n");
+      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+    }
+
+    /* Project all difference variables */
+
+    sc = sc_projection_ofl_along_variables(sc, diffb);
+
+    ifdebug(8) {
+      pips_debug(8, "All invariants on differences=\n");
+      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+    }
+
+    /* The full basis must be used again */
+    base_rm(sc_base(sc)), sc_base(sc) = BASE_NULLE;
+    sc_base(sc) = ib;
+    sc_dimension(sc) = vect_size(ib);
+    base_rm(b), b = BASE_NULLE;
+
+    ifdebug(8) {
+      pips_debug(8, "All invariants with proper basis =\n");
+      sc_fprint(stderr, sc, (char * (*)(Variable)) external_value_name);
+    }
+
+    /* Plug sc back into tc_tf */
+    predicate_system(transformer_relation(tc_tf)) = sc;
+
+  }
+  /* That's all! */
+
+  ifdebug(8) {
+    pips_debug(8, "Transitive closure tc_tf=\n");
+    fprint_transformer(stderr, tc_tf, (get_variable_name_t) external_value_name);
+    transformer_consistency_p(tc_tf);
+    pips_debug(8, "end\n");
+  }
+
+  return tc_tf;
+}
+
+/* Compute (U tfl)* */
+transformer transformer_list_transitive_closure(list tfl)
+{
+  return transformer_list_generic_transitive_closure(tfl, TRUE);
+}
+
+/* Compute (U tfl)+ */
+transformer transformer_list_transitive_closure_plus(list tfl)
+{
+  return transformer_list_generic_transitive_closure(tfl, FALSE);
 }

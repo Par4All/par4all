@@ -309,7 +309,7 @@ abundance is confusing for casual and experiences users as well, and
 it was deemed necessary to assist them by providing default
 computation rules and automatic consistency management similar to {\tt
   make}. The rule interpretor is called \PIPSMAKE{} and described
-in~\cite{B91}. Its key concepts are the {\em phase}, which correspond
+in~\cite{Bar91}. Its key concepts are the {\em phase}, which correspond
 to a \Pips{} function made user-visible, for instance, a parser, the
 {\em resources}, which correspond to objects used or defined by the
 phases, for instance, a source file or an AST (parsed code), and the
@@ -751,6 +751,11 @@ controls whether \Tpips{} should behave as an extended shell and
 consider any input command that is not a \Tpips{} command a Shell
 command.
 
+This property is automatically set to TRUE when pyps is running.
+\begin{PipsProp}{PYPS}
+PYPS FALSE
+\end{PipsProp}
+
 
 
 
@@ -908,10 +913,20 @@ behavior from the point of view of the analysis or transformations you
 want to apply on the whole program. The user modified synthetic files
 should then be saved and used to generate a new workspace.
 
+If \PipsPropRef{PREPROCESSOR_MISSING_FILE_HANDLING} is set to
+\verb|"query"|, a script can optionally be set to handle the interactive
+request using \PipsPropRef{PREPROCESSOR_MISSING_FILE_GENERATOR}. This
+script is passed the function name and prints the filename on standard
+output. When empty, it uses an internal one.
+
 Valid settings: \verb|error generate query|.
 
 \begin{PipsProp}{PREPROCESSOR_MISSING_FILE_HANDLING}
 PREPROCESSOR_MISSING_FILE_HANDLING "error"
+\end{PipsProp}
+
+\begin{PipsProp}{PREPROCESSOR_MISSING_FILE_GENERATOR}
+PREPROCESSOR_MISSING_FILE_GENERATOR ""
 \end{PipsProp}
 
 
@@ -1716,6 +1731,7 @@ c_parser                        > MODULE.parsed_code
         < COMPILATION_UNIT.declarations
 \end{PipsMake}
 
+\begin{PipsPass}{c_parser}
 If you want to parse some C code using \texttt{tpips}, it is possible to
 select the C parser with
 \begin{alltt}
@@ -1730,6 +1746,7 @@ PRETTYPRINT_C_CODE TRUE
 PRETTYPRINT_STATEMENT_NUMBER FALSE
 PRETTYPRINT_BLOCK_IF_ONLY TRUE
 \end{alltt}
+\end{PipsPass}
 
 \begin{PipsPass}{c_symbol_table}
 A prettyprint of the symbol table for a C module can be generated with
@@ -2076,6 +2093,11 @@ remove_useless_label > MODULE.code
   < MODULE.code
 \end{PipsMake}
 
+Loop labels can be kept thanks to this property:
+\begin{PipsProp}{REMOVE_USELESS_LABEL_KEEP_LOOP_LABEL}
+REMOVE_USELESS_LABEL_KEEP_LOOP_LABEL FALSE
+\end{PipsProp}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% ANALYSES
 
@@ -2154,7 +2176,7 @@ graph (CFG).
 \begin{PipsPass}{proper_effects}
 The proper memory effects of a statement basically are a list of variables
 that may be read or written by the statement. They are used to build use-def
-chains (see~\cite{Aho86} or a later edition) and then the dependence graph.
+chains (see~\cite{ASU86} or a later edition) and then the dependence graph.
 
 Proper means that the effects of a compound statement do not include the
 effects of lower level statements. For instance, the body of a loop, true and
@@ -2308,7 +2330,11 @@ cumulated_effects_with_pointer_values   > MODULE.cumulated_effects
 
 Cumulated memory effects do not take into account local effects on
 private variables, such as variables declared in C blocks or in
-Fortran parallel DO loops.
+Fortran parallel DO loops. \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
+can be set to FALSE to prevent this behavior.
+\begin{PipsProp}{MASK_EFFECTS_ON_PRIVATE_VARIABLES}
+MASK_EFFECTS_ON_PRIVATE_VARIABLES TRUE
+\end{PipsProp}
 
 
 
@@ -2318,7 +2344,7 @@ Fortran parallel DO loops.
 
 Summary data flow information is the simplest interprocedural
 information needed to take procedure into account in a
-parallelizer. It was introduced in Parafrase (see~\cite{Li88}) under
+parallelizer. It was introduced in Parafrase (see~\cite{LY88c}) under
 this name, but should be called summary memory effects in PIPS context.
 
 \begin{PipsPass}{summary_effects}
@@ -2610,7 +2636,7 @@ reduction_detection > MODULE.code
 
 \begin{PipsPass}{chains}
 Use-def and def-use chains are a standard data structure in optimizing
-compilers~\cite{Aho86}. These chains are used as a first approximation of
+compilers~\cite{ASU86}. These chains are used as a first approximation of
 the dependence graph. Chains based on convex array regions (see
 Section~\ref{subsection-array-regions}) are more effective for
 interprocedural parallelization.
@@ -2868,10 +2894,10 @@ usually, the main differences are in the labels that decorate arcs;
 for instance, \textsc{Kennedy}'s algorithm requires dependence levels (which
 loop actually creates the dependence) while algorithms originated from
 CSRD prefer DDVs (relations between loop indices when the dependence
-occurs). Dependence cones introduced in~\cite{I87,IT87a,IT87b,IT88a}
+occurs). Dependence cones introduced in~\cite{Iri87,IT87a,IT87b,IT88}
 are even more precise~\cite{AIY94}.
 
-The computations of dependence level and dependence cone~\cite{Y93} are
+The computations of dependence level and dependence cone~\cite{Yan93} are
 both implemented in \Pips{}. DDV's are not computed. Currently, only
 dependence levels are exploited by parallelization algorithms.
 
@@ -2900,7 +2926,7 @@ use-def elimination would remove all \verb/free/ statements.
 
 The main contributors for the design and development of dependence
 analysis are Rémi \textsc{Triolet}, François \textsc{Irigoin} and Yi-qing
-\textsc{Yang}~\cite{Y93}. The code was improved by Corinne
+\textsc{Yang}~\cite{Yan93}. The code was improved by Corinne
 \textsc{Ancourt} and Béatrice \textsc{Creusillet}.
 \end{PipsPass}
 
@@ -3244,19 +3270,19 @@ loop_statistics > MODULE.stats_file
 \index{Semantics Analysis}
 \index{Analysis (Semantics)}
 
-\Pips{} semantics analysis targets integer scalar variables. It is a
+\Pips{} semantics analysis targets mostly integer scalar variables. It is a
 two-pass process, with a bottom-up pass computing \PipsPassRef{transformers}, and
 a top-down pass propagating \PipsPassRef{preconditions}. Transformers and
 preconditions are specially powerful case of return and jump
-functions~\cite{CCKT86}. They abstract relations between program states
+functions~\cite{CCK86}. They abstract relations between program states
 with polyhedra and encompass most standard interprocedural constant
 propagations as well as most interval analyses. It is a powerful {\em
   relational} symbolic analysis.
 
-Unlike~\cite{HC78} their computations are based on \Pips{}
+Unlike~\cite{CH78} their computations are based on \Pips{}
 Hierarchical Control Flow Graph and on syntactic constructs instead of a
 standard flow graph. The best presentation of this part of \Pips{} is
-in~\cite{Ir92}.
+in~\cite{Iri92}.
 
 A similar analysis is available in Parafrase-2~\cite{}. It handles {\em
 polynomial} equations between scalar integer variables. SUIF~\cite{}
@@ -3275,7 +3301,7 @@ François \textsc{Irigoin}.
 \begin{PipsPass}{transformers}
 A transformer is an approximate relation between the symbolic initial
 values of scalar variables and their values after the execution of a
-statement, simple or compound (see~\cite{IJT92} and~\cite{Ir92}). In abstract
+statement, simple or compound (see~\cite{IJT92} and~\cite{Iri92}). In abstract
 interpretation terminology, a transformer is an abstract command
 linking the input abstract state of a statement and its output
 abstract state.
@@ -3305,10 +3331,10 @@ since call statements are accepted. Interprocedural algorithms use the
 Fast algorithms use a very primitive non-iterative transitive closure
 algorithm (two possible versions: flow sensitive or flow insensitive).
 Full algorithms use a transitive closure algorithm based on vector
-subspace (i.e. \emph{à la} K{\sc arr}~\cite{Karr76}) or one based on
-the discrete derivatives~\cite{I05,ACI10}. The iterative fix point
+subspace (i.e. \emph{à la} K{\sc arr}~\cite{Kar76}) or one based on
+the discrete derivatives~\cite{Iri05,ACI10}. The iterative fix point
 algorithm for transformers (i.e. H{\sc albwachs}/C{\sc
-ousot}~\cite{HC78} is implemented but not used because the results
+ousot}~\cite{CH78} is implemented but not used because the results
 obtained with transitive closure algorithms are faster and up-to-now
 sufficient. Property \PipsPropRef{SEMANTICS_FIX_POINT_OPERATOR}
 is set to select the transitive closure algorithm used.
@@ -4156,6 +4182,17 @@ default.
 SEMANTICS_USE_TRANSFORMER_LISTS FALSE
 \end{PipsProp}
 
+The next property is only useful if the previous one is set to true.
+Instead of computing the fix point of the convex hull of the
+transformer list, it computes the convex hull of the derivative
+constraints. Since it is a new feature, it is set to false by default,
+but it should become the default option because it is always more
+accurate. This development is experimental and turned off by default.
+
+\begin{PipsProp}{SEMANTICS_USE_DERIVATIVE_LIST}
+SEMANTICS_USE_DERIVATIVE_LIST FALSE
+\end{PipsProp}
+
 \subsubsection{Normalization level}
 \index{SEMANTICS\_NORMALIZATION\_LEVEL\_BEFORE\_STORAGE}
 
@@ -4245,7 +4282,7 @@ to the program variables. Thus non-polynomial expressions are equivalent
 to polynomial expressions over a larger set of variables.
 
 Probabilities for tests should also result in
-unknown variables (still to be implemented). See~\cite{Z94}.
+unknown variables (still to be implemented). See~\cite{Zho94}.
 
 A \verb+summary_complexity+ is the approximation of a module execution
 times. It is translated and used at call sites.
@@ -4262,7 +4299,7 @@ really use local states.
 The first version of the complexity estimator was designed and
 developed by Pierre \textsc{Berthomier}. It was restricted to intra-procedural
 analysis. This first version was enlarged and validated on real code for
-SPARC-2 machines by Lei Z{\sc hou}~\cite{Z94}. Since, it has been modified
+SPARC-2 machines by Lei Z{\sc hou}~\cite{Zho94}. Since, it has been modified
 slightly by François I{\sc rigoin}. For simple programs, complexity
 estimation are strongly correlated with execution times. The estimations
 can be used to see if program transformations are beneficial.
@@ -4432,7 +4469,7 @@ COMPLEXITY_PRINT_STATISTICS 0
 
 This property is used to select a set of basic execution times. These
 times depend on the target machine, the compiler and the compilation
-options used. It is shown in \cite{Z94} that fixed basic times can be
+options used. It is shown in \cite{Zho94} that fixed basic times can be
 used to obtain accurate execution times, if enough basic times are
 considered, and if the target machine has a simple RISC processor. For
 instance, it is not possible to use only one time for a register
@@ -4537,7 +4574,7 @@ modules or statements. Hence, they are expressed with respect to the
 initial store of the module or to the store immediately preceding the
 execution of the statement they are associated with. The latter is now
 standard in PIPS. Comprehensive information about convex array regions
-and their associated algorithms is available in Creusillet's PhD Dissertation~\cite{C96}.
+and their associated algorithms is available in Creusillet's PhD Dissertation~\cite{Cre96}.
 
 Apart from the array name and its dimension descriptors (or
 $\phi$ variables), an array region contains three additional informations:
@@ -4620,12 +4657,12 @@ body, and which appears in the loop body region polyhedron, does not appear
 anymore in the invariant region polyhedron.
 
 \verb+MAY+ \verb+READ+ and \verb+WRITE+ region analysis was first designed
-by Rémi \textsc{Triolet}~\cite{T84} and then revisited by François
+by Rémi \textsc{Triolet}~\cite{Tri84} and then revisited by François
 \textsc{Irigoin}~\cite{TIF86}. Alexis \textsc{Platonoff}~\cite{Pla90}
 implemented the first version of region analysis in \Pips{}. These
 regions were computed with respect to the initial stores of the
 modules. François \textsc{Irigoin} and, mainly, Béatrice
-\textsc{Creusillet}~\cite{CI95,CI96,C96}, added new functionalities to
+\textsc{Creusillet}~\cite{CI95,CI96,Cre96}, added new functionalities to
 this first version as well as functions to compute \verb+MUST+
 regions, and \verb+IN+ and \verb+OUT+ regions.  
 
@@ -4905,7 +4942,7 @@ various patterns an provides the ability to exploit context
 information at a reasonable expense. However, some very common
 patterns such as nine-point stencils used in seismic computations or
 red-black patterns cannot be represented. It has been a long lasting
-temptation to try other representations~\cite{C96}. 
+temptation to try other representations~\cite{Cre96}. 
 
 A Complementary sections (see Section~\ref{subsection-complementary-sections})
 implementation was formerly began as a set of new phases by
@@ -5718,6 +5755,31 @@ simdizer_auto_unroll        > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
+\begin{PipsPass}{loop_auto_unroll}
+  Similiar to \PipsPassRef{simdizer_auto_unroll} but at the loop level.
+\end{PipsPass}
+
+Sensible to \PipsPropRef{LOOP_LABEL}.
+\begin{PipsMake}
+loop_auto_unroll        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+
+\begin{PipsPass}{simdizer_auto_tile}
+Tries to tile the code to make the simdizing process more efficient.
+\end{PipsPass}
+
+Sensible to \PipsPropRef{LOOP_LABEL} to select the loop nest to tile.
+
+\begin{PipsMake}
+simdizer_auto_tile        > MODULE.code
+        < PROGRAM.entities
+        < MODULE.cumulated_effects
+        < MODULE.code
+\end{PipsMake}
+
 \begin{PipsPass}{simd_remove_reductions}
 This phase tries to pre-process reductions, so that they can be
 vectorized efficiently by the \PipsPassRef{simdizer} phase. When multiple
@@ -5732,6 +5794,7 @@ alias simd_remove_reductions 'SIMD Remove Reductions'
 
 simd_remove_reductions      > MODULE.code
                             > MODULE.callees
+        ! MODULE.simdizer_init
         < PROGRAM.entities
         < MODULE.cumulated_reductions
         < MODULE.code
@@ -5844,6 +5907,16 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.code
 % +        < MODULE.dg
 % +        < MODULE.proper_effects
+\begin{PipsPass}{loop_nest_unswitching}
+  Converts max in loop bounds into tests. Also sets variable so that
+  \PipsPassRef{suppress_dead_code} works afterward
+\end{PipsPass}
+
+\begin{PipsMake}
+loop_nest_unswitching                  > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
 
 
 \begin{PipsPass}{scalar_renaming}
@@ -5905,6 +5978,10 @@ When set to true, following property tells the simdizer to try to padd arrays wh
 SIMDIZER_ALLOW_PADDING FALSE
 \end{PipsProp}
 
+Skip generation of load and stores, using generic functions instead.
+\begin{PipsProp}{SIMDIZER_GENERATE_DATA_TRANSFERS}
+SIMDIZER_GENERATE_DATA_TRANSFERS TRUE
+\end{PipsProp}
 
 \begin{PipsPass}{simd_memory_packing}
 This phase is to be called after simdization of affectation operator.
@@ -6476,6 +6553,17 @@ directive_filter            > MODULE.directive_filtered_file
    < MODULE.source_file
 \end{PipsMake}
 
+\begin{PipsPass}{directive_filter_c}
+The \PipsPassRef{directive_filter_c} phase preproces an original
+source file just as \PipsPassRef{directive_filter} but for C file.
+\end{PipsPass}
+
+\begin{PipsMake}
+directive_filter_c          > MODULE.directive_filtered_file
+   < MODULE.c_source_file
+   < COMPILATION_UNIT.declarations
+\end{PipsMake}
+
 \begin{PipsPass}{directive_parser}
 The \PipsPassRef{directive_parser} phase invoke the PIPS parser on
 pre-proceed source file \texttt{MODULES.directive\_filtered\_file}
@@ -6537,7 +6625,7 @@ step_atomize                > MODULE.code
 
 \begin{PipsPass}{step_analyse}
 The \PipsPassRef{step_analyse} phase triggers the convex array regions analyses to
-compute SEND regions leading to MPI messages.
+compute SEND and RECV regions leading to MPI messages.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -6549,6 +6637,34 @@ step_analyse                > PROGRAM.step_analyses
    < MODULE.summary_regions
    < MODULE.in_summary_regions
    < MODULE.out_summary_regions
+\end{PipsMake}
+
+\begin{PipsPass}{step_analyse_com}
+The \PipsPassRef{step_analyse_com} phase checks whether a given SEND
+region corresponding to a directive module is consumed by a RECV
+region corresponding to a directive module. In this case,
+communications can be optimized.
+\end{PipsPass}
+
+\begin{PipsMake}
+step_unatomize              > MODULE.code
+                            > MODULE.step_atomized
+   < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
+   < MODULE.code
+\end{PipsMake}
+
+\begin{PipsMake}
+step_analyse_com2            > PROGRAM.step_analyses
+                             > MODULE.step_analyses_com
+   < PROGRAM.entities
+   < PROGRAM.directives
+   < PROGRAM.step_analyses
+   < CALLEES.step_analyses_com
+   < MODULE.callees
+   < MODULE.code
+   < MODULE.dg
 \end{PipsMake}
 
 \begin{PipsPass}{step_unatomize}
@@ -6570,7 +6686,7 @@ step_unatomize              > MODULE.code
 Based on the OpenMP construct and analyses, new modules are generated
 to translate the original code with OpenMP directives. The default
 code transformation for OpenMP construct is driven by the
-\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} property. the deferent value
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} property. The different value
 allowed are :
 \begin{itemize}
 \item \verb+"HYBRID"+ : for OpenMP and MPI parallel code
@@ -6578,7 +6694,7 @@ allowed are :
 \item \verb+"OMP"+ : for OpenMP parallel code
 \end{itemize}
 
-The \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
+The property \PipsPropRef{STEP_RUNTIME} define which runtime will be provided
 with the generated sources. The allowed value are :
 \begin{itemize}
 \item \verb+"c"+
@@ -6592,12 +6708,20 @@ STEP_DEFAULT_TRANSFORMATION "HYBRID"
 STEP_RUNTIME "c"
 \end{PipsProp}
 
+The property \PipsPropRef{STEP_OPTIMIZED_COMMUNICATIONS} set to
+\texttt{FALSE} by \PipsPassRef{step_analyse} and set to \texttt{TRUE}
+by \PipsPassRef{step_analyse_com}
+
+\begin{PipsProp}{STEP_OPTIMIZED_COMMUNICATIONS} 
+STEP_OPTIMIZED_COMMUNICATIONS TRUE
+\end{PipsProp}
+
 \begin{PipsPass}{step_compile}
 The \PipsPassRef{step_compile} phase generates source code for OpenMP
 constructs depending of the transformation desired. Each OpenMP
 construct could have a specific transformation define by STEP
 clauses (without specific clauses, the
-\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} is used)
+\PipsPropRef{STEP_DEFAULT_TRANSFORMATION} is used).
 The specific STEP clauses allowed are :
 \begin{itemize}
 \item \verb+"!\$step hybrid"+ : for OpenMP and MPI parallel code
@@ -6887,9 +7011,9 @@ ISOLATE_STATEMENT_EVEN_NON_LOCAL FALSE
 \end{PipsProp}
 
 \subsubsection{Delay Communications}
-\begin{PipsPass}{delay_communications}
+\begin{PipsPass}{delay_communications_inter}
 Optimize the load/store dma by delaying the stores and 
-performing the stores as soon as possible.
+performing the stores as soon as possible. Interprocedural version.
 \end{PipsPass}
 
 It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
@@ -6898,11 +7022,11 @@ to distinguish loads and stores from other calls.
 The communication elimination makes the assumption that a load/store pair can always be removed.
 
 \begin{PipsMake}
-delay_communications                    > MODULE.code
+delay_communications_inter                    > MODULE.code
         > MODULE.callees
-        ! CALLEES.delay_communications
-        ! MODULE.delay_load_communications
-        ! MODULE.delay_store_communications
+        ! CALLEES.delay_communications_inter
+        ! MODULE.delay_load_communications_inter
+        ! MODULE.delay_store_communications_inter
         < PROGRAM.entities
         < MODULE.code
         < MODULE.regions
@@ -6912,7 +7036,7 @@ delay_communications                    > MODULE.code
         %> COMPILATION_UNIT.code
         %< COMPILATION_UNIT.code
 \begin{PipsMake}
-delay_load_communications                    > MODULE.code
+delay_load_communications_inter                    > MODULE.code
         > MODULE.callees
         > CALLERS.code
         > CALLERS.callees
@@ -6927,7 +7051,7 @@ delay_load_communications                    > MODULE.code
         %> COMPILATION_UNIT.code
         %< COMPILATION_UNIT.code
 \begin{PipsMake}
-delay_store_communications                    > MODULE.code
+delay_store_communications_inter                    > MODULE.code
         > MODULE.callees
         > CALLERS.code
         > CALLERS.callees
@@ -6939,11 +7063,52 @@ delay_store_communications                    > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-This property can be used to suppress inter-procedural propagation,
-for example when data are not persistent across calls.
-\begin{PipsProp}{DELAY_COMMUNICATIONS_INTERPROCEDURAL}
-DELAY_COMMUNICATIONS_INTERPROCEDURAL TRUE
-\end{PipsProp}
+\begin{PipsPass}{delay_communications_intra}
+Optimize the load/store dma by delaying the stores and 
+performing the stores as soon as possible.
+Intra Procedural version.
+\end{PipsPass}
+
+It uses \PipsPropRef{ACCEL_LOAD} and \PipsPropRef{ACCEL_STORE}
+to distinguish loads and stores from other calls.
+
+The communication elimination makes the assumption that a load/store pair can always be removed.
+
+\begin{PipsMake}
+delay_communications_intra                    > MODULE.code
+        > MODULE.callees
+        ! MODULE.delay_load_communications_intra
+        ! MODULE.delay_store_communications_intra
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.regions
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_load_communications_intra                    > MODULE.code
+        > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+        % must do this behind the back of pipsmake because of fortran
+        %> COMPILATION_UNIT.code
+        %< COMPILATION_UNIT.code
+\begin{PipsMake}
+delay_store_communications_intra                    > MODULE.code
+        > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.dg
+\end{PipsMake}
+
 
 \subsubsection{Hardware Constraints Solver}
 \begin{PipsPass}{solve_hardware_constraints}
@@ -7707,7 +7872,6 @@ loop_fusion            > MODULE.code
         < PROGRAM.entities
         < MODULE.code
         < MODULE.proper_effects
-        < MODULE.chains
         < MODULE.dg
 \end{PipsMake}
 
@@ -7727,7 +7891,7 @@ LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
 \label{subsection-index-set-splitting}
 \index{Index Set Splitting}
 \begin{PipsPass}{index_set_splitting}
-Index Set Splitting~\cite{rieblFL00}  splits the loop referenced by
+Index Set Splitting~\cite{GFL00}  splits the loop referenced by
 property \PipsPropRef{LOOP_LABEL} into two loops.  The
 first loop ends at an iteration designated by property
 \PipsPropRef{INDEX_SET_SPLITTING_BOUND} and the second start thereafter.  It
@@ -8000,6 +8164,8 @@ The tiling only works for parallelepiped tiles.
 Use \PipsPropRef{LOOP_LABEL} to specify the loop to tile.
 Use \PipsPropRef{SYMBOLIC_TILING_VECTOR} as a comma-separated list to specify tile sizes.
 Use \PipsPropRef{SYMBOLIC_TILING_FORCE} to bypass condition checks.
+Consider using \PipsPassRef{loop_nest_unswitching} if generated max
+disturbs further analyses
 \end{PipsPass}
 \begin{PipsMake}
 symbolic_tiling > MODULE.code
@@ -8012,10 +8178,6 @@ symbolic_tiling > MODULE.code
 SYMBOLIC_TILING_VECTOR ""
 \end{PipsProp}
 
-As a work-around to precondition computation limitations, you can set following property to true, it will generate tests instead of min.
-\begin{PipsProp}{SYMBOLIC_TILING_NO_MIN}
-SYMBOLIC_TILING_NO_MIN FALSE
-\end{PipsProp}
 \begin{PipsProp}{SYMBOLIC_TILING_FORCE}
 SYMBOLIC_TILING_FORCE FALSE
 \end{PipsProp}
@@ -8243,7 +8405,7 @@ check section~\ref{subsection-expression-optimizations} which does a
 pretty nice job too.
 
 The original algorithm used is described in Chapters 12, 13 and 14 of
-Julien Zory's PhD dissertation.
+Julien Zory's PhD dissertation~\cite{Zor99}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -8263,7 +8425,7 @@ Note: this pass deals with loop invariant code motion while the
 
 \begin{PipsPass}{partial_redundancy_elimination}
 
-In essence, a {\it partial redundancy} \cite{Much97} is a computation that is
+In essence, a {\it partial redundancy} \cite{Muc97} is a computation that is
 done more than once on some path through a flowgraph. We implement here a
 partial redundancy elimination transformation for logical
 expressions such as bound checks by using informations given by
@@ -8334,18 +8496,18 @@ control flow graph of the module is computed.
 
 The cumulated effects are used in debug mode to display information.
 
-Note that according to~\cite{Aho86}
-and~\cite{Much97} , there is confusion between Dead-code elimination
+Note that according to~\cite{ASU86}
+and~\cite{Muc97} , there is confusion between Dead-code elimination
 and Unreachable-code elimination. {\em Unreachable code} is code that
 cannot possibly be executed, regardless of the input data. {\em Dead code}
 elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
-$18.10$ of~\cite{Much97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
+$18.10$ of~\cite{Muc97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
 phase \PipsPassRef{dead_code_elimination}.
 
 The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
-  Simplifications} and {\em Loop Simplifications}~\cite{Much97}.
+  Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
 
 This function was designed and implemented by Ronan K{\sc eryell}.
 
@@ -8406,11 +8568,11 @@ are calculated with property \verb/MEMORY_EFFECTS_ONLY/ set to
 \verb/FALSE/ because we need that the DG includes arcs for declarations as these
 latter are separate statements now.
 
-\PipsPropRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
+\PipsPassRef{CLEAN_DECLARATIONS} is automatically done at the end, this is why 
 cumulated effects are needed.
 
-Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} p. 595,
-and~\cite{Much97} p. 592, a variable is {\it dead} if it is not used
+Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} p. 595,
+and~\cite{Muc97} p. 592, a variable is {\it dead} if it is not used
 on any path from the location in the code where it is defined to the
 exit point of the routine in the question; an instruction is {\it
   dead} if it computes only values that are not used on any executable
@@ -8807,7 +8969,7 @@ full_spaghettify          > MODULE.code
 \begin{PipsPass}{stf}
 Transformation \PipsPassRef{stf} is a C interface to a Shell script used to
 restructure a Fortran program using ISTST (via the combined tool
-fragment ISTLY = ISTLX/ISTYP and then ISTST) from TOOLPACK~\cite{toolpack,Ost83}.
+fragment ISTLY = ISTLX/ISTYP and then ISTST) from TOOLPACK~\cite{Pol88,Ost83}.
 
 Be careful, since TOOLPACK is written in Fortran, you need the Fortran
 runtime libraries to run STF if is has not been statically compiled...
@@ -9184,7 +9346,7 @@ more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
 Club benchmark {\tt ocean} is a case in point.
 
-Comments from Nga \textsc{Nguyen}: According to~\cite{Aho86} and~\cite{Much97}, the
+Comments from Nga \textsc{Nguyen}: According to~\cite{ASU86} and~\cite{Muc97}, the
 name of this optimization should be Constant-Expression Evaluation or
 Constant Folding for integer values. This transformation produces well
 error message at compile time indicating potential error such as division
@@ -9533,7 +9695,7 @@ LINEARIZE_ARRAY_CAST_AT_CALL_SITE FALSE
 \label{sec:expr-optim-using}
 
 \begin{PipsPass}{optimize_expressions}
-This is an experimental section developed by Julien \textsc{Zory} as PhD work.
+This is an experimental section developed by Julien \textsc{Zory} as PhD work~\cite{Zor99}.
 This phase aims at optimizing expression evaluation using algebraic
 properties such as associativity, commutativity, neutral elements and so
 forth.
@@ -9546,7 +9708,7 @@ additional opportunities for (4a) invariant code motion (ICM) and (4b)
 common subexpression elimination (CSE).
 
 Large arithmetic expressions are first built up via forward substitution
-when the programmer has already applied ICM and CES by hand.
+when the programmer has already applied ICM and CSE by hand.
 
 The optimal restructuring of expressions depends on the target defined by
 a combination of the computer architecture and the compiler. The target is
@@ -9586,7 +9748,7 @@ instruction_selection > MODULE.code
 \end{PipsMake}
 
 EOLE: Evaluation Optimization of Loops and Expressions.
-Julien Zory stuff integrated within pips. It relies on an external tool
+Julien Zory stuff integrated within pips~\cite{Zor99}. It relies on an external tool
 named \texttt{eole}. The version and options set can be controlled from
 the following properties. The status is experimental. See the
 \PipsPassRef{optimize_expressions} pass for more details about the advanced
@@ -9621,7 +9783,7 @@ One can use \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_ADDED_CONSTANT} t
 \PipsPropRef{COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS} to prevent elimination of left hand side of assignment.
 
 The heuristic used for common subexpression elimination is described
-in Chapter 15 of Julien Zory's PhD dissertation.
+in Chapter 15 of Julien Zory's PhD dissertation~\cite{Zor99}.
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -9658,11 +9820,13 @@ COMMON_SUBEXPRESSION_ELIMINATION_SKIP_LHS TRUE
 \begin{PipsPass}{icm}
 Performs invariant code motion over sub expressions
 \end{PipsPass}
+It is required to set \PipsPropRef{MASK_EFFECTS_ON_PRIVATE_VARIABLES} to
+FALSE when computing effects needed by this pass.
 
 %-----------End of Expression Transformations -------------------------
 
 
-\section{Function Level transformations}
+\section{Function Level Transformations}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INLINING
 
@@ -9755,7 +9919,8 @@ INLINING_CALLERS ""
   If you run it recursievly, you should set \PipsPropRef{INLINING_USE_INITIALIZATION_LIST} to false.
 \end{PipsPass}
 
-\textbf{Only for C because of pipsmake output declaration !}
+\textbf{Only for C because of output declaration in pipsmake rule!}
+
 \begin{PipsMake}
 unfolding      > MODULE.c_source_file
                > MODULE.callees
@@ -9772,10 +9937,11 @@ unfolding      > MODULE.c_source_file
 
 \begin{PipsPass}{unfolding_simple}
 Same as unfolding, but cumulated effects are not used, and the
-resulting code always simulates the by-copy argument passing:
+resulting code always simulates the by-copy argument passing.
 \end{PipsPass}
 
-\textbf{Only for C because of pipsmake output declaration !}
+\textbf{Only for C because of output declaration in pipsmake rule!}
+
 \begin{PipsMake}
 unfolding_simple      > MODULE.c_source_file
                       > MODULE.callees
@@ -9789,7 +9955,7 @@ unfolding_simple      > MODULE.c_source_file
 		* ALL.remove_useless_label
 \end{PipsMake}
 
-Using \PipsPropRef{UNFOLDING_CALLEES}, you can specify which modules
+Use \PipsPropRef{UNFOLDING_CALLEES}, to specify which modules
 you want to inline in the unfolded module. The unfolding will be
 performed as long as one of the module in
 \PipsPropRef{UNFOLDING_CALLEES} is called. More than one module can
@@ -9798,36 +9964,41 @@ be specified, they are separated by blank spaces.
 UNFOLDING_CALLEES ""
 \end{PipsProp}
 
-The default behavior of unfolding is to recursively inline all callees
-from given module, as long as a callee remains. Use
+The default behavior of the \PipsPassRef{unfolding} pass is to recursively inline all callees
+from the current module or from the argument modules of the pass, as long as a
+callee remains. You can use
 \PipsPropRef{UNFOLDING_FILTER} to inline all call sites to a module
 not present in the space
-separated module list defined by the property:
+separated module list defined by the string property:
 \begin{PipsProp}{UNFOLDING_FILTER}
 UNFOLDING_FILTER ""
 \end{PipsProp}
-
+By default this list is empty and hence all call sites are inlined.
 
 \subsection{Outlining}
 \label{subsection-outlining}
 
 \begin{PipsPass}{outline}
-This documentation is a work in progress, as well as the documented topic.
+This documentation is a work in progress, as well as the documented
+topic\marginpar{Serge? Still true? What do you mean?}.
 
 
 Outlining is the opposite transformation of \PipsPassRef{inlining}.
-It creates a new module based on some statements from an existing module.
-The new module body is similar to the piece of code outlined from the existing modules.
-The old statements are replaced by a call to the new module.
-The user will be prompted for various question in order to perform the outlining
+It replaces some statements in an
+existing module by a call site to a new function whose execution is
+equivalent to the execution of the replaced statements.
+The body of the new function is similar to the piece of code replaced in the existing module.
+The user is prompted for various pieces of information in order to perform the outlining:
 \begin{itemize}
-    \item new module name
-    \item statement number of the first outlined statement
-    \item number of statement to outline
+    \item a new module name,
+    \item the statement number of the first outlined statement,
+    \item number of statements to outline.
 \end{itemize}
-
+The statements are a subset of a sequence. They are counted in the
+sequence\marginpar{Serge: I invent...(FI)}.
 
 \end{PipsPass}
+
 \begin{PipsMake}
 
 outline      > MODULE.code
@@ -9839,25 +10010,44 @@ outline      > MODULE.code
         < MODULE.code
 \end{PipsMake}
 
-The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used if you want to limit the amount of entities passed
-through reference calls.
-With it, \lstinline|a[0][0]| is passed as an \lstinline|a[n][m]| entity, without it it is passed as an \lstinline|int| or  \lstinline|int*| depending on the read/write effect.
-If you want to pass the upper bound expression of a particular loop as a parameter (used in Ter@pix code generation),
-set \PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop label.
+The property \PipsPropRef{OUTLINE_SMART_REFERENCE_COMPUTATION} is used
+to limit the number of entities passed by reference.
+With it, \lstinline|a[0][0]| is passed as an
+\lstinline|a[n][m]| entity, without it it is passed as an
+\lstinline|int| or \lstinline|int*| depending on the cumulated read/write memory
+effects of the outlined statements\marginpar{Serge: but cumulated
+  effects are always required?}.
 
-The property \PipsPropRef{OUTLINE_MODULE_NAME} is used as new module name, and
-the user is prompted if not set.
-But first the pass scans the code for any statement flagged with the pragma defined in
-\PipsPropRef{OUTLINE_PRAGMA}.
+If you need to pass the upper bound expression of a particular loop as
+a parameter, which is used in Ter@pix code generation (see Section~???), set
+\PipsPropRef{OUTLINE_LOOP_BOUND_AS_PARAMETER} to the loop
+label\marginpar{Serge: a few words of motivation?}.
 
-If set, property \PipsPropRef{OUTLINE_LABEL} is used to choose the statement to
-outline.
+The property \PipsPropRef{OUTLINE_MODULE_NAME} is used to specify the new module
+name. The user is prompted if it is set to its default value, the
+empty string.  
 
-The property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
-variables which initial values are not used are passed as parameters or
-not. Normally, this should be addressed by a previous privatization.
+But first the pass scans\marginpar{Serge: unconditionally?}
+the code for any statement flagged with the pragma defined by the
+string property \PipsPropRef{OUTLINE_PRAGMA}\marginpar{Serge: What
+  happens when it is set to the empty strin?}.
 
-Finally, property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT} make it possible to outline into a newly created compilation unit, adding all necessary types to this new compilation unit, named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
+If set, the string property \PipsPropRef{OUTLINE_LABEL} is used to
+choose the statement\marginpar{Serge: you outline a set of statements;
+is it reduced to a singleton in that case?} to outline.
+
+The boolean property \PipsPropRef{OUTLINE_ALLOW_GLOBALS} controls whether global
+variables whose initial values are not used are passed as parameters or
+not\marginpar{Serge: why is it called ``globals''? It seems that this
+  makes sense for any local variable...}. It is suggested to addressed this issue with a previous privatization pass.
+
+Finally, the boolean property \PipsPropRef{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
+can be set to true to outline the new module into a newly created
+compilation unit. It is named after the \PipsPropRef{OUTLINE_MODULE_NAME}.
+All necessary types, global variables and functions\marginpar{Serge?}
+are declared into this new compilation unit\marginpar{Serge: Consistency
+  betweeen properties? Name conflicts?}.
+
 
 \begin{PipsProp}{OUTLINE_MODULE_NAME}
 OUTLINE_MODULE_NAME ""
@@ -10056,7 +10246,7 @@ rules. New array declarations in the called procedure are
 computed with respect to the declarations in the calling procedures.
 It is  faster than the first one because convex array regions are not needed.
 
-This phase is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+This phase is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10080,7 +10270,7 @@ array in each module are merged and a new value for the upper bound of the last
 dimension is calculated and then it will replace the 1 or *.
 
 This function is firstly implemented by Trinh Quoc \textsc{Anh}, and
-ameliorated by Corinne \textsc{Ancourt} and Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+ameliorated by Corinne \textsc{Ancourt} and Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10243,8 +10433,8 @@ is scalarized. The problem can be fixed by adding a \verb/PRINT/ or a
 \PipsPropRef{SCALARIZATION_FORCE_OUT} to true.
 
 Also, it may be useful to use Property
-\PipsPropRef{TRUST_ARRAY_DECLARATIONS} and/or
-\PipsPropRef{TRUST_ARRAY_REFERENCES} to make sure that as many loops
+\PipsPropRef{SEMANTICS_TRUST_ARRAY_DECLARATIONS} and/or
+\PipsPropRef{SEMANTICS_TRUST_ARRAY_REFERENCES} to make sure that as many loops
 as possible are entered. If not, loop bounds may act like guards,
 which prevents PIPS from hoisting a reference out of a loop, although
 this is puzzling for programmers because they expect all loops to be
@@ -10295,7 +10485,7 @@ by a linear expression of the loop indices.
 
 
 \begin{PipsMake}
-alias induction_substitution 'Induction substitution'
+alias induction_substitution 'Induction variable substitution'
 induction_substitution > MODULE.code
         < PROGRAM.entities
         < MODULE.code
@@ -10507,7 +10697,7 @@ regions. They are used to prove that all accessed in a compound
 statement are correct.
 
 These two dynamic analyses are implemented for Fortran. They are
-described in Nga Nguyen's PhD (see~\cite{Nguyen2002}). They
+described in Nga Nguyen's PhD (see~\cite{Ngu02}). They
 may work for C code, but this has not been validated.
 
 
@@ -10613,7 +10803,7 @@ array_bound_check_interprocedural             > MODULE.code
 We provide here a tool to calculate the number of dynamic bound checks
 from both initial and PIPS generated code.
 
-These transformations are implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+These transformations are implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10711,7 +10901,7 @@ offsets of actual parameters to formal parameters following a certain call
 path. Precise alias information are computed for both scalar and array
 variables. The analysis is called alias propagation.
 
-This analysis is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+This analysis is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10750,7 +10940,7 @@ not. If these informations are not known at compile-time, we instrument
 the code with tests that check the violation dynamically during
 execution of program.
 
-This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 % Attention : will we use the preconditions, regions, effects ?
@@ -10799,7 +10989,7 @@ check for the formal parameters in the current module or not. In addition,
 we produce information in the resource MODULE.ubs to tell if the formal
 parameters of the called procedures have to be checked or not.
 
-This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Nguyen2002}).
+This verification is implemented by Thi Viet Nga \textsc{Nguyen} (see~\cite{Ngu02}).
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10981,7 +11171,7 @@ LOCALIZE_DECLARATION_SKIP_LOOP_INDICES FALSE
   Array privatization aims at privatizing whole arrays
   (\PipsPassRef{array_privatizer}) or sets of array elements
   (\PipsPassRef{array_section_privatizer}) instead of scalar variables
-  only.  The algorithm, developed by B\'eatrice C{\sc reusillet}~\cite{C96}, is
+  only.  The algorithm, developed by B\'eatrice C{\sc reusillet}~\cite{Cre96}, is
   very different from the algorithm used for solely privatizing scalar
   variables and relies on IN and OUT regions analyses. Of course, it
   also privatizes scalar variables, although the algorithm is much
@@ -11283,7 +11473,7 @@ it only changes the program perfomances.
 Then three policies are offered to manage the if clause merging. The if clause
 can simply be ignored. Or the if clauses can be merged alltogether using the
 boolean opertaion \verb|or| or \verb|and|. When ignored, the if clause can be
-later regenrated using the appropriated PIPS phase :
+later regenerated using the appropriated PIPS phase :
 OMP\_LOOP\_PARALLEL\_THRESHOLD\_SET. To summarize, remenber that the property
 can be set to \verb|ignore| \verb|or| or \verb|and|
 \begin{PipsProp}{OMP_IF_MERGE_POLICY}
@@ -14302,15 +14492,15 @@ scop_outliner      >     MODULE.code
 
 
 For the outlinig of the control static parts, function prefix names to be used during the generation:
-\begin{PipsProp}{PoCC_PREFIX}
-Function_Prefix "SCoP"
+\begin{PipsProp}{SCOP_PREFIX}
+SCOP_PREFIX "SCoP"
 \end{PipsProp}
 To generalize the outlining for any pragmas: begin \& end we use that properties:
-\begin{PipsProp}{Pragma_Begin}
-Pragma_Begin "scop"
+\begin{PipsProp}{PRAGMA_BEGIN}
+PRAGMA_BEGIN "scop"
 \end{PipsProp}
-\begin{PipsProp}{Pragma_End}
-Pragma_End "endscop"
+\begin{PipsProp}{PRAGMA_END}
+PRAGMA_END "endscop"
 \end{PipsProp}
 because of differences in definitions of static control part in pips
 and in pocc (for example, there is no function call in a static
@@ -14776,7 +14966,7 @@ new C modules.
 
 It is much more difficult to add a new type of resources, because \Pips{}
 database manager, \texttt{pipsdbm}, is not as automatized as
-\Pipsmake{}. This is explained in~\cite{I94}.
+\Pipsmake{}. This is explained in~\cite{Iri94}.
 
 
 
@@ -14799,286 +14989,9 @@ caller.
 \end{enumerate}
 
 
-\begin{thebibliography}{99}
+%% BIBLIOGRAPHY
 
-% ASU86
-\bibitem{Aho86} Aho, Sethi, Ullman,
-{\it Compilers. Principles, techniques, and Tools},
-Addison-Wesley, (1986)
-
-\bibitem{AK87} J. Allen, K. Kennedy,
-{\em Automatic Translation of {FORTRAN} Programs to Vector Form},
-TOPLAS, V. 9, n. 4, 1987
-
-\bibitem{ACI10} Corinne Ancourt, Fabien Coelho, Francois Irigoin,
-{\em A Modular Static Analysis Approach to Affine Loop Invariants
-  Detection},
- Numerical and Symbolic Abstract Domains 2010 (NSAD 2010),
-Electronic Notes in Theoretical Computer Science, ENTCS17986
-
-
-  \bibitem{AI91} C. Ancourt, F. Irigoin,
-{\em Scanning Polyhedra With DO Loops},
-PPoPP'91 Principle and Practice of Parallel Programming, Williamsburg, USA,
-April 1991
-
-   \bibitem{AIY94} C. Ancourt, F. Irigoin, Y. Yang,
-{\em Minimal Data Dependence Abstractions for Loop Transformations},
-Seventh Annual Workshop on Languages and Compilers for Parallel
-Computing, Ithaca (NY), August 1994
-
-% Bar91
-  \bibitem{B91} B. Baron,
-{\em Construction flexible et cohérente pour la compilation interprocédurale},
-Rapport interne EMP-CRI-E157, juillet 1991
-
-  \bibitem{BIJ91} B. Baron, F. Irigoin, P. Jouvelot,
-{\em Projet PIPS. Manuel utilisateur du pa\-ral\-l\'e\-liseur batch},
-Rapport interne EMP-CRI-E144, janvier 1991
-
-% Ber90
-  \bibitem{B90} P. Berthomier,
-{\em Static Comparison of Different Program versions},
-Rapport interne EMP-CRI-E130, septembre 1990
-
-% Cha90
-  \bibitem{C90} P. Chassany,
-{\em Les m\'ethodes de parall\'elisation interproc\'edurales},
-Rapport interne EMP-CRI-E129, septembre 1990
-
-% Coe93
-  \bibitem{C93} F. Coelho,
-{\em Étude et réalisation d'un compilateur pour le {\em High
-Performance Fortran}},
-Rapport interne EMP-CRI-A238, juin 1993
-
-% Cre96
-  \bibitem{C96} Béatrice Creusillet {\em
-Analyses de régions de tableaux et applications},
-Thèse de doctorat de l'Ecolde des Mines de Paris,
-Décembre 1996 (available as A/295/CRI).
-
-  \bibitem{CI95} Béatrice Creusillet, François Irigoin, {\em
-Interprocedural Array Region Analyses}, Workshop on Languages and
-Compilers for Parallel Computing, LCPC'95, Colombus, OHIO, USA, 10-12
-Août 1995 (also available as TR A/270).
-
-  \bibitem{CI96} Béatrice Creusillet, François Irigoin, {\em Interprocedural
-    Array Region Analyses}, International Journal on Parallel Programming
-  (special issue on Languages and Compilers for Parallel Computing, LCPC'95),
-  24(6), (also available as TR A/282).
-
-% CCK86
-  \bibitem{CCKT86} C. D. Callahan, K. D. Cooper, K. Kennedy and L. Torczon,
-Interprocedural Constant Propagation,
-in the {\em Proceedings of the ACM
-Symposium on Compiler Construction}, (1986).
-
-\bibitem{Col93} J.-F. Collard, Code generation in automatic
-  parallelizers, Technical Report 93-21, LIP-IMAG, July 1993.
-
-\bibitem{Fea91} P. Feautrier, {Dataflow Analysis of Array and Scalar
-    References}, {\em Int. Journal of Parallel Programming}, 20(1):23--53,
-    February 1991.
-
-\bibitem{Fea92a} P. Feautrier, {Some Efficient Solutions to the Affine
-  Scheduling Problem, Part I : One-dimensional Time}, {\em Int. J. of
-  Parallel Programming}, 21(5):313--348, October 1992.
-
-\bibitem{Fea92b} P. Feautrier, {Some Efficient Solutions to the Affine
-  Scheduling Problem, Part II : Multidimensional Time}, {\em Int. J. of
-  Parallel Programming}, 21(6):389--420, December 1992.
-
-\bibitem{Fea93} P. Feautrier, {Toward Automatic Partitioning of Arrays on
-  Distributed Memory Computers}, In {\em ACM ICS'93}, pages 175--184,
-  Tokyo, July 1993.
-
-% CH78
-  \bibitem{HC78} N. Halbwachs and P. Cousot, Automatic Discovery of Linear
-Restraints Among Variables of a Program, in the {\em Conference Record
-of the Tenth ACM Annual Symposium on Principles of Programming
-Languages}, (1978).
-
-  \bibitem{IJT91} F. Irigoin, P. Jouvelot, R. Triolet,  {\em Semantical
-Interprocedural Parallelization: An Overview of the PIPS Project},
-1991 International Conference on Supercomputing, Cologne, June 1991
-
-  \bibitem{IJT92} F. Irigoin, P. Jouvelot, R. Triolet, {\em PIPS:
-Internal Representation of Fortran Code}, Technical Report E/166, May
-1992. This report is constantly updated and available on-line.
-
-% Iri87
-  \bibitem{I87} F. Irigoin,
-{\em Partitionnement des boucles imbrique'es. Une tech\-nique
-d'opti\-mi\-sation des programmes scientifiques},
-Thèse de doctorat de l'université Pierre et Marie Curie, juin 1987
-
-  \bibitem{IT87a} F. Irigoin, R. Triolet,
-{\em Automatic DO-Loop Partitioning for Improving
-Data Locality in Scientific Programs}, Vector and Parallel Processors
-for Scientific Computation 2, Rome, Sept.~21-23, Italie, 1987 (invite') \\
-Disponible comme rapport CAI-E93
-
-  \bibitem{IT87b} F. Irigoin, R. Triolet,
-{\em Computing Dependence Direction Vectors and Dependence Cones with
-Linear Systems}, Rapport CAI-E94, September 1987
-
-%
-% FI: all the references below have been checked for the introduction
-% of pips.bib derived from the renpar-polyedres.bib
-%
-
-% IT88
-  \bibitem{IT88a} F. Irigoin, R. Triolet,
-{\em Supernode Partitioning},
-POPL'88 - Fifteenth Annual ACM
-Symposium on Principles of Programming Languages, San Diego, California,
-January 13-15, pp. 319-329, 1988
-
-  \bibitem{IA91} F. Irigoin, C. Ancourt,
-{\em Final Report on Software Caching for Simulated Global Memory},
-PUMA ESPRIT 2701, Deliberable 6.5.1, Tech. Report EMP-CRI-E155, November 1991
-
-  \bibitem{IA92a} F. Irigoin, C. Ancourt,
-{\em Compilation pour machines à mémoire répartie},
-Algorithmique Parallèle, Cosnard, Nivat, Robert Eds, Masson,
-Ecole de Printemps du LITP, mai 1992
-
-% AI92
-  \bibitem{IA92b} F. Irigoin, C. Ancourt,
-{\em Automatic Code Distribution},
-Third International Workshop on Compilers for Parallel Computers, Vienne,
-July, 1992
-
-% Iri92
-  \bibitem{Ir92} F. Irigoin,
-{\em Interprocedural Analyses for Programming Environments},
-J.J.~Dongarra and B.~Tourancheau Eds, Elsevier,
-Workshop CNRS-NSF, Saint-Hilaire du Touvet, Sept. 1992
-
-  \bibitem{I94} F. Irigoin, \& al.,
-{\em Projet PIPS. Environnement de développement},
-Rapport interne EMP-CRI-E146, novembre 1994. This report is available
-on-line and regularly updated.
-
-% ACI10
-\bibitem{I05} F. Irigoin,
-{\em Detecting Affine Loop Invariants using a Modular Static Analysis*
-  - Version préliminaire}, Tech. report A/368/CRI, 2005
-
-%@inproceedings{Jouvelot:1989:RCC:73141.74837,
-% author = {Jouvelot, P. and Gifford, D. K.},
-% title = {Reasoning about continuations with control effects},
-% booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming language design and implementation},
-% series = {PLDI '89},
-% year = {1989},
-% isbn = {0-89791-306-X},
-% location = {Portland, Oregon, United States},
-% pages = {218--226},
-% numpages = {9},
-% url = {http://doi.acm.org/10.1145/73141.74837},
-% doi = {http://doi.acm.org/10.1145/73141.74837},
-% acmid = {74837},
-% publisher = {ACM},
-% address = {New York, NY, USA},
-%} 
-\bibitem{JG89} P. Jouvelot, D. Gifford, {\em Reasoning about
-    continuations with control effects}, in Proceedings of the ACM
-  SIGPLAN 1989 Conference on Programming language design and
-  implementation, PLDI'89, pp. 218-226.
-
-\bibitem{JT89} P. Jouvelot, R. Triolet,
-	{\em NewGen : A Langage-Independent Program Generator},
-Rapport interne EMP-CRI-E191, July 1989. This report is available
-on-line and regularly updated.
-
-% Kar76
-\bibitem{Karr76} M. Karr, Affine Relationships among Variables of a Program,
-{\em Acta Informatica}, (1976).
-
-%@article {springerlink:10.1007/BF00128178,
-%  author = {Li, Zhiyuan and Yew, Pen-Chung},
-%   title = {Program parallelization with interprocedural analysis},
-%   journal = {The Journal of Supercomputing},
-%   publisher = {Springer Netherlands},
-%   issn = {0920-8542},
-%   keyword = {Computer Science},
-%   pages = {225-244},
-%   volume = {2},
-%   issue = {2},
-%   url = {http://dx.doi.org/10.1007/BF00128178},
-%   note = {10.1007/BF00128178},
-%   year = {1988}
-%}
-% LY88c
-\bibitem{Li88} Zhiyuan Li, Pen-Chung Yew, {\em Program parallelization
-    with interprocedural analysis}, The Journal of Supercomputing,
-  Vol. 2, N. 2, pp. 225-244, Springer, 1988.
-
-% Muc97
-\bibitem{Much97} Steven S. Muchnick,
-  {\it Advanced Compiler Design Implementation}
-  Morgan Kaufmann Publishers, 1997
-
-% Ngu02
-\bibitem{Nguyen2002} Thi Viet Nga Nguyen, {\em Efficient and
-    Effective Software verifications for Scientific Applications Using
-    Static analysis and Code Instrumentation}, PhD Ecole nationale
-  Superieure des Mines de Paris, 2002.
-
-\bibitem{Ost83} L.~J.~Osterweil, TOOLPACK - An Experimental Software
-    Development Environment Research Project,
-{\em IEEE TOSE}, Vol. 9, No. 6, pp.673-685 (1983).
-
-% Pol88
-\bibitem{toolpack} A.~A.~Pollicini, Using Toolpack Software Tools, in {\em
-  ISPRA Courses on Information Sciences 1986}, ISPRA, Kluwer Academic,
-  1989
-
-\bibitem{Pla90} A. Platonoff, {\em Calcul des effets des procédures au
-  moyen des régions}, Rapport interne EMP-CAII-I132, juin 1990
-
-\bibitem{Pla95a} A. Platonoff, {\em Contribution à la Distribution
-  Automatique des Données pour Machines Massivement Parallèles},
-  Thèse de doctorat de l'université Pierre et Marie Curie, 9 mars
-  1995.
-
-\bibitem{Pla95b} A. Platonoff, Automatic Data Distribution for Massively
-  Parallel Computers, in {\em 5th International Workshop on Compilers for
-  Parallel Computers}, Malaga, Spain, June 1995.
-
-% Tri84
-  \bibitem{T84} R. Triolet,
-{\em Contribution à la parallélisation automatique de programmes
-Fortran comportant des appels de procédure},
-Thèse de docteur-ingénieur, Université Pierre et Marie Curie,
-décembre 1984
-
-  \bibitem{TIF86} R. Triolet, F. Irigoin, P. Feautrier,
-{\em Direct Parallelization of Call Statements},
-ACM SIGPLAN'86 Symposium on Compiler Construction, Hyatt Rickeys Hotel, Palo
-Alto, June 23-27, 1986
-
-% Yan93
-  \bibitem{Y93} Y. Yang,
-{\em Tests des dépendances et transformations de programme},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
-15 Novembre 1993, rapport A/242.
-
-% Zho94
-  \bibitem{Z94} L. Zhou,
-{\em Analyse
-statique et dynamique de la complexité des programmes
-scientifiques},
-Thèse de doctorat de l'Université Pierre et Marie Curie,
-14 Septembre 1994, technical report A/255.
-
-% GFL00
-  \bibitem{rieblFL00} Martin Griebl, Paul Feautrier and Christian Lengauer
-{\em Index Set Splitting},
-International Journal of Parallel Programming, 2000.
-
-\end{thebibliography}
+\bibliography{../pips.bib}
 
 \newpage
 

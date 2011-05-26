@@ -52,16 +52,16 @@ GENERIC_GLOBAL_FUNCTION(ctrl_graph, controlmap)
  */
 void clean_ctrl_graph()
 {
-    CONTROLMAP_MAP(s, c, 
+    CONTROLMAP_MAP(s, c,
       {
-	  pips_debug(7, "statement (%td,%td)\n", 
+	  pips_debug(7, "statement (%td,%td)\n",
 		     ORDERING_NUMBER(statement_ordering(s)),
 		     ORDERING_STATEMENT(statement_ordering(s)));
 
 	  control_statement(c) = statement_undefined;
-	  gen_free_list(control_successors(c)); 
+	  gen_free_list(control_successors(c));
 	  control_successors(c) = NIL;
-	  gen_free_list(control_predecessors(c)); 
+	  gen_free_list(control_predecessors(c));
 	  control_predecessors(c) = NIL;
       },
 	  get_ctrl_graph());
@@ -69,19 +69,19 @@ void clean_ctrl_graph()
     close_ctrl_graph(); /* now it can be freed safely */
 }
 
-/*  add (s1) --> (s2), 
+/*  add (s1) --> (s2),
  *  that is s2 as successor of s1 and s1 as predecessor of s2.
- *  last added put in first place. 
+ *  last added put in first place.
  *  this property is used for a depth first enumeration.
  */
-static void 
+static void
 add_arrow_in_ctrl_graph(statement s1, statement s2)
 {
-    control 
-	c1 = load_ctrl_graph(s1), 
+    control
+	c1 = load_ctrl_graph(s1),
 	c2 = load_ctrl_graph(s2);
 
-    pips_debug(7, "(%td,%td:%td) -> (%td,%td;%td)\n", 
+    pips_debug(7, "(%td,%td:%td) -> (%td,%td;%td)\n",
 	       ORDERING_NUMBER(statement_ordering(s1)),
 	       ORDERING_STATEMENT(statement_ordering(s1)),
 	       statement_number(s1),
@@ -99,7 +99,7 @@ static void add_arrows_in_ctrl_graph(statement s, /* statement */ list l)
 	add_arrow_in_ctrl_graph(s, STATEMENT(CAR(l)));
 }
 
-list /* of statement */ 
+list /* of statement */
 control_list_to_statement_list(/* control */ list lc)
 {
     list /* of statements */ ls = NIL;
@@ -120,8 +120,8 @@ static void statement_arrows(statement s, /* statement */ list next)
 	list /* of statements */
 	    l = instruction_block(i),
 	    just_next;
-	
-	if (ENDP(l)) 
+
+	if (ENDP(l))
 	{
 	    add_arrows_in_ctrl_graph(s, next);
 	    return;
@@ -129,20 +129,20 @@ static void statement_arrows(statement s, /* statement */ list next)
 	/* else
 	 */
 	add_arrow_in_ctrl_graph(s, STATEMENT(CAR(l)));
-	
+
 	for(current = STATEMENT(CAR(l)),
-	        l = CDR(l), 
-	        succ = ENDP(l) ? statement_undefined : STATEMENT(CAR(l)),
-	        just_next = CONS(STATEMENT, succ, NIL);
+	      l = CDR(l),
+	      succ = ENDP(l) ? statement_undefined : STATEMENT(CAR(l)),
+	      just_next = CONS(STATEMENT, succ, NIL);
 	    !ENDP(l);
-	    current = succ, 
- 	        l = CDR(l),
-	        succ = ENDP(l) ? statement_undefined : STATEMENT(CAR(l)),
-	        STATEMENT_(CAR(just_next)) = succ)
+	    current = succ,
+	      l = CDR(l),
+	      succ = ENDP(l) ? statement_undefined : STATEMENT(CAR(l)),
+	      STATEMENT_(CAR(just_next)) = succ)
 	{
 	    statement_arrows(current, just_next);
 	}
-	
+
 	gen_free_list(just_next), just_next=NIL;
 
 	statement_arrows(current, next);
@@ -152,10 +152,10 @@ static void statement_arrows(statement s, /* statement */ list next)
     {
 	test
 	    x = instruction_test(i);
-	statement 
+	statement
 	    strue = test_true(x),
 	    sfalse = test_false(x);
-	
+
 	add_arrow_in_ctrl_graph(s, sfalse),
 	statement_arrows(sfalse, next);
 
@@ -168,7 +168,7 @@ static void statement_arrows(statement s, /* statement */ list next)
     case is_instruction_loop:
     {
 	statement b;
-	list /* of statements */ just_next = 
+	list /* of statements */ just_next =
 	    gen_nconc(gen_copy_seq(next), CONS(STATEMENT, s, NIL));
 
 	if(instruction_loop_p(i)) {
@@ -179,7 +179,7 @@ static void statement_arrows(statement s, /* statement */ list next)
 	    whileloop l = instruction_whileloop(i);
 	    b = whileloop_body(l);
 	}
-	
+
 	add_arrows_in_ctrl_graph(s, next); /* no iteration */
 	add_arrow_in_ctrl_graph(s, b);     /* some iterations, first */
 
@@ -197,7 +197,7 @@ static void statement_arrows(statement s, /* statement */ list next)
 	unstructured u = instruction_unstructured(i);
 	list /* of statements */
 	    blocks = NIL,
-	    lstat = NIL;	
+	    lstat = NIL;
 	statement x;
 	control c_in = unstructured_control(u);
 
@@ -237,8 +237,8 @@ static void stmt_rewrite(statement s)
 
 void build_full_ctrl_graph(statement s)
 {
-    pips_debug(3, "statement (%td,%td:%td)\n", 
-	       ORDERING_NUMBER(statement_ordering(s)), 
+    pips_debug(3, "statement (%td,%td:%td)\n",
+	       ORDERING_NUMBER(statement_ordering(s)),
 	       ORDERING_STATEMENT(statement_ordering(s)),
 	       statement_number(s));
 
@@ -260,15 +260,15 @@ void full_control_graph(string name)
 {
     statement s = (statement) db_get_memory_resource(DBR_CODE, name, TRUE);
     build_full_ctrl_graph(s);
-    
+
     /*  should put something in the db if made as a pass
      */
 }
 
 /* TRAVELLING on the control graph
- * 
+ *
  * init, next, close functions.
- * - the init function is given a starting point (statement) s and a 
+ * - the init function is given a starting point (statement) s and a
  *   decision function decision. The function should say whether to
  *   go on with the successors of its arguments.
  * - the next function gives the next visited statement.
@@ -302,7 +302,7 @@ static void push_if_necessary(statement s)
  */
 static void push(/* control */ list l)
 {
-    if (!ENDP(l)) 
+    if (!ENDP(l))
 	push(CDR(l)),
 	push_if_necessary(control_statement(CONTROL(CAR(l))));
 }

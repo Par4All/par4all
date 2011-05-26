@@ -537,6 +537,7 @@ transformer add_loop_skip_condition(transformer tf, loop l, transformer pre)
 }
 
 /* FI: could be moved somewhere else, e.g. in transformer library. */
+/* lower_or_upper: 0 for lower, 1 for upper, i.e. upper_p */
 static transformer add_affine_bound_conditions(transformer pre,
 					       entity index,
 					       Pvecteur v_bound,
@@ -580,6 +581,7 @@ static transformer add_affine_bound_conditions(transformer pre,
 }
 
 /* Side effect on pre */
+/* lower_or_upper: 0 for lower, 1 for upper, i.e. upper_p */
 static transformer add_index_bound_conditions(transformer pre,
 					      entity index,
 					      expression bound,
@@ -622,6 +624,7 @@ static transformer add_index_bound_conditions(transformer pre,
 
     br = transformer_temporary_value_projection(br);
     reset_temporary_value_counter();
+    br = safe_transformer_projection(br, transformer_arguments(tfb));
 
     /* FI: Fixt the result of the intersection in case of side
        effects in loop range*/
@@ -631,16 +634,26 @@ static transformer add_index_bound_conditions(transformer pre,
     /* Make sure the loop body does not modify the loop bounds */
     // FI: ipre is not a range, invariant_wrt_transformer() cannot be used
     //npre = invariant_wrt_transformer(ipre, tfb);
-    // FI: removes to many variables of ipre
-    npre = safe_transformer_projection(npre, transformer_arguments(tfb));
+    // FI: removes to many variables of ipre or npre; induction
+    // variables are lost when computing the preconditions
+    //npre = safe_transformer_projection(npre, transformer_arguments(tfb));
     /* FI: we need a side effect on pre... */
     //gen_free_list(transformer_arguments(pre));
     free_predicate(transformer_relation(pre));
     /* Likely memory leak here: arguments_union may allocate a new list*/
+    /* This might or not make sense, depending on the caller
     transformer_arguments(pre) =
       arguments_difference(arguments_union(transformer_arguments(pre),
 					   transformer_arguments(npre)),
 			   transformer_arguments(tfb));
+    */
+    /* When dealing with the loop body precondition, there is no
+       reasons to remove the arguments of tfb, as tfb is part of the
+       definition of pre */
+    transformer_arguments(pre)
+      = arguments_union(transformer_arguments(pre),
+			transformer_arguments(npre));
+
     transformer_relation(pre) = transformer_relation(npre);
     free_transformer(bt);
     free_transformer(br);
@@ -1332,6 +1345,8 @@ transformer loop_to_transformer(loop l, transformer pre, list e)
   t_init = loop_initialization_to_transformer(l, pre);
   old_tf = tf;
   tf = transformer_combine(t_init, tf);
+  tf = add_index_range_conditions(tf, loop_index(l), loop_range(l),
+				  load_statement_transformer(b));
   free_transformer(old_tf);
 
   /* we have a problem here: to compute preconditions within the

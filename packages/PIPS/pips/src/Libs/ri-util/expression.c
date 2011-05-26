@@ -323,6 +323,36 @@ cast expression_cast(expression e)
   return(syntax_cast(expression_syntax(e)));
 }
 
+bool expression_sizeofexpression_p(expression e)
+{
+  return(syntax_sizeofexpression_p(expression_syntax(e)));
+}
+
+sizeofexpression expression_sizeofexpression(expression e)
+{
+  return(syntax_sizeofexpression(expression_syntax(e)));
+}
+/* Duplicate
+bool expression_subscript_p(expression e)
+{
+  return(syntax_subscript_p(expression_syntax(e)));
+}
+
+subscript expression_subscript(expression e)
+{
+  return(syntax_subscript(expression_syntax(e)));
+}
+*/
+bool expression_application_p(expression e)
+{
+  return(syntax_application_p(expression_syntax(e)));
+}
+
+application expression_application(expression e)
+{
+  return(syntax_application(expression_syntax(e)));
+}
+
 bool expression_field_p(expression e)
 {
     return expression_call_p(e) && ENTITY_FIELD_P(call_function(expression_call(e)));
@@ -2830,13 +2860,26 @@ static bool _expression_similar_p(expression target, expression pattern,hash_tab
         case is_syntax_reference:
             {
 		    reference r = syntax_reference(spattern);
-		    /* scalar reference always matches. allows to match
-		     * malloc(a) with more complex expressions like malloc(1 +
-		     * strlen("...")). Interferes incorrectly with commutativity. */
+		    /* scalar reference always matches.
+             * SG: in fact, you have to check for type compatibility too ...
+             * Allows to match malloc(a) with more complex expressions like malloc(1 +
+		     * strlen("...")).
+             * Interferes incorrectly with commutativity. */
 		    if (! expression_scalar_p(pattern))
 			    similar = false;
-		    else
-			    hash_put(symbols,entity_name(reference_variable(r)), target);
+		    else {
+                basic bpattern = basic_of_expression(pattern),
+                      btarget = basic_of_expression(target);
+                basic bmax = basic_maximum(bpattern,btarget);
+                if(basic_overloaded_p(bmax) || basic_equal_p(bmax,bpattern)) {
+                    hash_put(symbols,entity_name(reference_variable(r)), target);
+                }
+                else
+                    similar = false;
+                free_basic(bmax);
+                free_basic(bpattern);
+                free_basic(btarget);
+            }
             } break;
             /* recursively compare each arguments if call do not differ */
         case is_syntax_call:

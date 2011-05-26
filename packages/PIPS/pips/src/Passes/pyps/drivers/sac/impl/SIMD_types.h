@@ -1,3 +1,6 @@
+#include <stdarg.h>
+#include <stdint.h>
+
 typedef float  a2sf[2];
 typedef float  a4sf[4];
 typedef double a2df[2];

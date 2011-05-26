@@ -614,65 +614,72 @@ static void add_reference_information(transformer pre, statement s, bool renamin
 {
   list efs = load_proper_rw_effects_list(s);
 
-  MAP(EFFECT, e, {
+  FOREACH(EFFECT, e, efs) {
     reference r = effect_any_reference(e);
     list li = reference_indices(r);
 
     if(!ENDP(li)){
       entity v = reference_variable(r);
-      variable tv = type_variable(entity_type(v));
+      variable tv = type_variable(ultimate_type(entity_type(v)));
+      basic b = variable_basic(tv);
       list ld = NIL;
 
       pips_assert("Variable must be of type 'variable'",
 		  type_variable_p(entity_type(v)));
-      ld = variable_dimensions(tv);
-      pips_assert("Reference dimension = array dimension",
-		  gen_length(li)==gen_length(ld));
-      MAP(EXPRESSION, i, {
-	normalized ni = NORMALIZE_EXPRESSION(i);
-	if(normalized_linear_p(ni)) {
-	  Pvecteur vi = normalized_linear(ni);
-	  dimension d = DIMENSION(CAR(ld));
-	  normalized nl = NORMALIZE_EXPRESSION(dimension_lower(d));
-	  normalized nu = NORMALIZE_EXPRESSION(dimension_upper(d));
-	  if(normalized_linear_p(nl) && normalized_linear_p(nu)) {
-	    Pvecteur vl = normalized_linear(nl);
-	    Pvecteur vu = normalized_linear(nu);
+      if(!basic_pointer_p(b)) {
+	ld = variable_dimensions(tv);
+	/* This assert is too strong in argument lists in Fortran and
+	   everywhere in C */
+	//pips_assert("Reference dimension = array dimension",
+	//	  gen_length(li)==gen_length(ld));
+	pips_assert("Reference dimension = array dimension",
+		    gen_length(li)<=gen_length(ld));
+	FOREACH(EXPRESSION, i, li) {
+	  normalized ni = NORMALIZE_EXPRESSION(i);
+	  if(normalized_linear_p(ni)) {
+	    Pvecteur vi = normalized_linear(ni);
+	    dimension d = DIMENSION(CAR(ld));
+	    normalized nl = NORMALIZE_EXPRESSION(dimension_lower(d));
+	    normalized nu = NORMALIZE_EXPRESSION(dimension_upper(d));
+	    if(normalized_linear_p(nl) && normalized_linear_p(nu)) {
+	      Pvecteur vl = normalized_linear(nl);
+	      Pvecteur vu = normalized_linear(nu);
 
-	    if(value_mappings_compatible_vector_p(vi)) {
-	      if(value_mappings_compatible_vector_p(vl)) {
-		Pvecteur cv = vect_substract(vl, vi);
+	      if(value_mappings_compatible_vector_p(vi)) {
+		if(value_mappings_compatible_vector_p(vl)) {
+		  Pvecteur cv = vect_substract(vl, vi);
 
-		if(renaming)
-		  upwards_vect_rename(cv, pre);
-		if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
-		  transformer_inequality_add(pre, cv);
+		  if(renaming)
+		    upwards_vect_rename(cv, pre);
+		  if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
+		    transformer_inequality_add(pre, cv);
+		  }
+		  else {
+		    vect_rm(cv);
+		  }
 		}
-		else {
-		  vect_rm(cv);
+
+		if(value_mappings_compatible_vector_p(vu)) {
+		  Pvecteur cv = vect_substract(vi, vu);
+
+		  if(renaming)
+		    upwards_vect_rename(cv, pre);
+		  if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
+		    transformer_inequality_add(pre, cv);
+		  }
+		  else {
+		    vect_rm(cv);
+		  }
 		}
 	      }
 
-	      if(value_mappings_compatible_vector_p(vu)) {
-		Pvecteur cv = vect_substract(vi, vu);
-
-		if(renaming)
-		  upwards_vect_rename(cv, pre);
-		if(!vect_constant_p(cv) || vect_coeff(TCST, cv) > 0) {
-		  transformer_inequality_add(pre, cv);
-		}
-		else {
-		  vect_rm(cv);
-		}
-	      }
 	    }
-
 	  }
+	  POP(ld);
 	}
-	POP(ld);
-      }, li);
+      }
     }
-  }, efs);
+  }
 }
 
 void precondition_add_reference_information(transformer pre, statement s)

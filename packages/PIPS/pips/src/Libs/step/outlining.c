@@ -25,6 +25,7 @@ static int outline_to=0;
 static int outline_step=0;
 static entity outlined_module=entity_undefined;
 static list outline_list=list_undefined;
+static list outline_local=list_undefined;
 static char target_label[TARGET_LABEL_NAME_LEN];
 
 //######################## OUTLINE INIT ########################
@@ -53,11 +54,12 @@ void outlining_save()
 entity outlining_start(string new_module_name)
 {
   int i=0;
-
+  debug_on("STEP_TUTORIAL_LEVEL");
   pips_debug(1, "new_module_name = %s\n", new_module_name);
 
   pips_assert("step", outline_step==0);
   pips_assert("list", list_undefined_p(outline_list));
+  pips_assert("local", list_undefined_p(outline_local));
   pips_assert("outlined_module", entity_undefined_p(outlined_module));
   pips_assert("outline_outlining", outline_data_undefined_p(outline_outlining));
 
@@ -70,10 +72,12 @@ entity outlining_start(string new_module_name)
   if (entity_undefined_p(outlined_module)) return FALSE;
 
   outline_list = NIL;
+  outline_local = NIL;
   outline_outlining = make_outline_data(get_current_module_entity(),NIL,NIL,NIL);
   outline_step = 1;
-
   pips_debug(1, "outlined_module = %p\n", outlined_module);
+	debug_off();
+
   return outlined_module;
 }
 
@@ -89,7 +93,30 @@ entity outlining_add_declaration(entity e)
   return e;
 }
 
+entity outlining_local_declaration(entity e)
+{
+  outline_local=CONS(ENTITY,e,outline_local);
+  return e;
+}
+
 //####################### OUTLINE STEP 2 #######################
+
+expression entity_to_expr(e)
+     entity e;
+{
+  switch (type_tag(entity_type(e))){
+  case is_type_variable:
+    return reference_to_expression(make_reference(e,NIL));
+    break;
+  case is_type_functional:
+    return call_to_expression(make_call(e,NIL));
+    break;
+  default:
+    pips_internal_error("unexpected entity tag: %d", type_tag(entity_type(e)));
+    return expression_undefined; 
+  }
+}
+
 static bool outlining_entity_filter(entity e);
 
 static bool outlining_reference_filter(reference r)
@@ -119,6 +146,11 @@ static bool outlining_entity_filter(entity e)
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(get_current_module_entity())))))
     {
       pips_debug(5,"entity %s not in %s declaration\n", entity_global_name(e), entity_global_name(get_current_module_entity()));
+      return TRUE;
+    }
+  if (gen_in_list_p(e,outline_local))
+    {
+      pips_debug(5,"entity %s local in %s declaration\n", entity_global_name(e), entity_global_name(outlined_module));
       return TRUE;
     }
   if(entity_variable_p(e)) // scan entity in type
@@ -156,6 +188,56 @@ list outlining_scan_block(list block_list)
   return outline_list;
 }
 
+static void patch_outlined_reference(expression x, entity e)
+{
+  if(expression_reference_p(x))
+    {
+        reference r =expression_reference(x);
+        entity e1 = reference_variable(r);
+	if(same_entity_p(e, e1))
+	  {
+	    variable v = type_variable(entity_type(e));
+	    if( (!basic_pointer_p(variable_basic(v))) && (ENDP(variable_dimensions(v))) ) /* not an array / pointer */
+	      {
+		expression X = make_expression(expression_syntax(x),normalized_undefined);
+		expression_syntax(x)=make_syntax_call(make_call(
+								CreateIntrinsic(DEREFERENCING_OPERATOR_NAME),
+								CONS(EXPRESSION,X,NIL)));
+	      }
+	    
+	  }
+    }
+}
+
+static
+void bug_in_patch_outlined_reference(loop l , entity e)
+{
+    if( same_entity_p(loop_index(l), e))
+    {
+        statement parent = (statement)gen_get_ancestor(statement_domain,l);
+        pips_assert("child's parent child is me",statement_loop_p(parent) && statement_loop(parent)==l);
+        statement body =loop_body(l);
+        range r = loop_range(l);
+        instruction new_instruction = make_instruction_forloop(
+                    make_forloop(
+                        make_assign_expression(
+                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
+                            range_lower(r)),
+                        MakeBinaryCall(entity_intrinsic(LESS_OR_EQUAL_OPERATOR_NAME),
+                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
+                            range_upper(r)),
+                        MakeBinaryCall(entity_intrinsic(PLUS_UPDATE_OPERATOR_NAME),
+                            MakeUnaryCall(entity_intrinsic(DEREFERENCING_OPERATOR_NAME),entity_to_expression(e)),
+                            range_increment(r)),
+                        body
+                        )
+                    );
+
+        statement_instruction(parent)=instruction_undefined;/*SG this is a small leak */
+        update_statement_instruction(parent,new_instruction);
+        pips_assert("statement consistent",statement_consistent_p(parent));
+    }
+}
 static void outlining_make_argument(entity e, expression expr)
 {
   pips_debug(3, "e = %p, expr = %p\n", e, expr);
@@ -165,29 +247,59 @@ static void outlining_make_argument(entity e, expression expr)
 
   bool outline_symbolic_p=get_bool_property("OUTLINING_SYMBOLIC");
   functional ft = type_functional(entity_type(outlined_module));
-  entity new_entity=FindOrCreateEntity(entity_local_name(outlined_module),entity_local_name(e));
+  entity new_entity=FindOrCreateEntity(entity_local_name(outlined_module),entity_user_name(e));
+  expression x = expr;
+  bool is_fortran = fortran_module_p(get_current_module_entity());
+
   entity_initial(new_entity) = copy_value(entity_initial(e));
+
   if (outline_symbolic_p && value_symbolic_p(entity_initial(e)))
     entity_type(new_entity) = copy_type(functional_result(type_functional(entity_type(e))));
   else
     entity_type(new_entity) = copy_type(entity_type(e));
   
+  if (expression_undefined_p(x))
+    {
+      variable v = type_variable(entity_type(e));
+      x = entity_to_expr(e);
+      if (!is_fortran && 
+	  !basic_pointer_p(variable_basic(v)) && 
+	  ENDP(variable_dimensions(v)))
+	{
+	  x = make_call_expression(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME), CONS(EXPRESSION, x, NIL));
+	  entity_type(new_entity) = make_type_variable(make_variable(
+								     make_basic_pointer(copy_type(entity_type(new_entity))),
+								     NIL,
+								     NIL
+								     )
+						       );
+	  /* remplacement dans le body des references a l'entity e par un pointeur vers l'entity e
+	   */
+	  gen_context_multi_recurse(make_sequence(outline_data_block(outline_outlining)), e,
+				    //statement_domain,gen_true,patch_outlined_reference_in_declarations,
+				    loop_domain,gen_true,bug_in_patch_outlined_reference,
+				    expression_domain,gen_true,patch_outlined_reference,
+				    0);
+	}
+    }
+
   if (entity_variable_p(e)||(outline_symbolic_p && value_symbolic_p(entity_initial(e))))
     {
       entity_storage(new_entity)=make_storage(is_storage_formal, make_formal(outlined_module,gen_length(outline_data_formal(outline_outlining))+1));
       functional_parameters(ft) =
-	CONS(PARAMETER,make_parameter(entity_type(new_entity),MakeModeReference(),make_dummy_unknown()),
+	CONS(PARAMETER,make_parameter(entity_type(new_entity),MakeModeReference(),make_dummy_identifier(new_entity)),
 		 functional_parameters(ft));
       outline_data_formal(outline_outlining)=CONS(ENTITY,new_entity,outline_data_formal(outline_outlining));
-      outline_data_arguments(outline_outlining)=CONS(EXPRESSION,expr,outline_data_arguments(outline_outlining));
+      outline_data_arguments(outline_outlining)=CONS(EXPRESSION, x, outline_data_arguments(outline_outlining));
       pips_debug(3,"add argument %s\n", entity_global_name(e));
     }
-      else
-	entity_storage(new_entity) = copy_storage(entity_storage(e));
+  else
+    entity_storage(new_entity) = copy_storage(entity_storage(e));
   
   pips_debug(3,"add entity %s\n", entity_global_name(new_entity));
-  code_declarations(value_code(entity_initial(outlined_module)))=CONS(ENTITY,new_entity,code_declarations(value_code(entity_initial(outlined_module))));
 
+  code_declarations(value_code(entity_initial(outlined_module)))=CONS(ENTITY,new_entity,code_declarations(value_code(entity_initial(outlined_module))));
+  
   pips_debug(3, "fin\n");
 }
 
@@ -204,29 +316,13 @@ void outlining_add_argument(entity e,expression expr)
 
 //####################### OUTLINE STEP 3 #######################
 
-
-static expression entity_to_expr(e)
-     entity e;
-{
-  switch (type_tag(entity_type(e))){
-  case is_type_variable:
-    return reference_to_expression(make_reference(e,NIL));
-    break;
-  case is_type_functional:
-    return call_to_expression(make_call(e,NIL));
-    break;
-  default:
-    pips_internal_error("unexpected entity tag: %d", type_tag(entity_type(e)));
-    return expression_undefined; 
-  }
-}
-
-
 statement outlining_close(string new_user_file)
 {
+  bool saved;
   entity label = entity_undefined;
   statement call = statement_undefined;
   statement source_body = statement_undefined;
+  bool is_fortran=fortran_module_p(get_current_module_entity());
 
   pips_debug(1, "begin\n");
 
@@ -236,9 +332,9 @@ statement outlining_close(string new_user_file)
   outline_list = gen_nreverse(outline_list);
   FOREACH(ENTITY, e, outline_list)
     {
-      outlining_make_argument(e,entity_to_expr(e));
+      outlining_make_argument(e, expression_undefined);
     }
-
+  functional_parameters(type_functional(entity_type(outlined_module)))=gen_nreverse(functional_parameters(type_functional(entity_type(outlined_module))));
   code_declarations(value_code(entity_initial(outlined_module))) = gen_nreverse(code_declarations(value_code(entity_initial(outlined_module))));
   outline_data_formal(outline_outlining) = gen_nreverse(outline_data_formal(outline_outlining));
   outline_data_arguments(outline_outlining) = gen_nreverse(outline_data_arguments(outline_outlining));
@@ -265,19 +361,47 @@ statement outlining_close(string new_user_file)
     outline source generating
   */
   source_body = make_block_statement(gen_nconc(gen_full_copy_list(outline_data_block(outline_outlining)), CONS(STATEMENT, make_return_statement(outlined_module), NIL)));
-  add_new_module(entity_local_name(outlined_module), outlined_module, source_body, TRUE);
+
+  FOREACH(ENTITY, e, outline_local)
+    {
+      AddLocalEntityToDeclarations(e,outlined_module,source_body);
+    }
+ 
+  saved = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
+  set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", false);
+   
+  if (is_fortran)
+    { 
+      set_prettyprint_language_tag(is_language_fortran);
+    }
+  else 
+    {
+      set_prettyprint_language_tag(is_language_c);
+    }
+  add_new_module(entity_local_name(outlined_module), outlined_module, source_body, is_fortran);
+
+
+  set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", saved);
   free_statement(source_body);
 
-  if(new_user_file && !string_undefined_p(new_user_file))
+  if(new_user_file && !string_undefined_p(new_user_file) && is_fortran)
     DB_PUT_FILE_RESOURCE(DBR_USER_FILE, module_local_name(outlined_module), new_user_file);
 
   store_outline(outlined_module,outline_outlining);
   pips_debug(1,"New outlined module : %s\n", entity_user_name(outlined_module));
   
+  if (!is_fortran)
+    { 
+      /* pour eviter une double declaration des entites lorsque le code produit est parse. */
+      code_declarations(value_code(entity_initial(outlined_module)))=NIL;
+    }
+
   outline_outlining = outline_data_undefined;
   outlined_module = entity_undefined;
   gen_free_list(outline_list);
   outline_list = list_undefined;
+  gen_free_list(outline_local);
+  outline_local = list_undefined;
   outline_step = 0;
 
   pips_debug(1,"call = %p\n", call);

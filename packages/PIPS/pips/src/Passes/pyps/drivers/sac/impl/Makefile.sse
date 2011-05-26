@@ -1,0 +1,2 @@
+CFLAGS+=-msse4.2 -O3
+##pipsrules##

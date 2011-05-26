@@ -61,12 +61,26 @@
 static void rename_reference(reference r, hash_table renamings)
 {
   entity var = reference_variable(r);
+  bool replaced = false; // Keep track of any replacement
   if (hash_defined_p(renamings, var)) {
     entity nvar = (entity)hash_get(renamings, var);
     if(nvar!=var) {
       pips_debug(1, "Reference %s renamed as %s\n",
 		 entity_local_name(var), entity_local_name(nvar));
       reference_variable(r) = nvar;
+      replaced = true;
+    }
+  }
+
+  if(replaced) {
+    /* we need to unormalize the uppermost parent of this expression
+     * otherwise its normalized field gets incorrect */
+    expression next=(expression)r,parent = NULL;
+    while((next=(expression) gen_get_ancestor(expression_domain,next))) {
+      parent=next;
+    }
+    if(parent) {
+      unnormalize_expression(parent); /* otherwise field normalized get wrong */
     }
   }
 }
@@ -491,13 +505,8 @@ bool statement_flatten_declarations(entity module, statement s)
             pips_user_warning("Code flattening fails because the statement does"
                     " not contain any local declaration\n");
         }
-        return true;
     }
-    else {
-	//sg: just because there is no block to carry declarations ?!?
-        pips_user_warning("Input assumptions not met, skipping flatten code\n");
-        return false;
-    }
+    return true;
 }
 
 

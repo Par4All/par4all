@@ -233,10 +233,10 @@ static void parse_properties(void)
 	    }
 	    else
 	    {
+	      hash_update(pl, n, (char *) pr);
 	      if(!property_equal_p(pr, opr))
 		pips_user_warning("property %s redefined\n", n);
 	      free_property(opr);
-	      hash_update(pl, n, (char *) pr);
 	    }
         }
         else

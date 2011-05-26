@@ -1009,9 +1009,16 @@ bool invariant_vector_p(Pvecteur v)
 }
 
 /* Specific for the derivative fix point: each constant term in the
-   constraints is multiplied by ik which is not in sc's basis, and ik
-   is added to the basis is necessary */
-static Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
+ * constraints is multiplied by ik which is not in sc's basis, and ik
+ * is added to the basis is necessary.
+ *
+ * This possible only if ik is positive. Constraint ik>=0 is added if
+ * star_p is true because the function is used to compute T*. Else,
+ * contraint ik>=1 is added because the function is used to compute T+.
+ *
+ * Also used in transformer_list.c
+ */
+Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik, bool star_p)
 {
   Pcontrainte c;
 
@@ -1043,7 +1050,12 @@ static Psysteme sc_multiply_constant_terms(Psysteme sc, Variable ik)
 
   /* add constraint ik >= 0 to compute T*. Would be ik>=1 if T+ were
      sought. */
-  c = contrainte_make(vect_new(ik, VALUE_MONE));
+  Pvecteur v = vect_new(ik, VALUE_MONE);
+  if(!star_p) {
+    // add the constant term for T+
+    vect_add_elem(&v, TCST, VALUE_ONE);
+  }
+  c = contrainte_make(v);
   sc_add_inegalite(sc, c);
   base_add_dimension(&(sc->base), ik);
   sc->dimension++;
@@ -1131,7 +1143,7 @@ transformer transformer_derivative_fix_point(transformer tf)
     entity ik = make_local_temporary_integer_value_entity();
     //Psysteme sc_t_prime_k = sc_dup(sc);
     //sc_t_prime_k = sc_multiply_constant_terms(sc_t_prime_k, (Variable) ik);
-    sc = sc_multiply_constant_terms(sc, (Variable) ik);
+    sc = sc_multiply_constant_terms(sc, (Variable) ik, TRUE);
     //Psysteme sc_t_prime_star = sc_projection_ofl(sc_t_prime_k, (Variable) ik);
     sc = sc_projection_ofl(sc, (Variable) ik);
     sc->base = base_remove_variable(sc->base, (Variable) ik);

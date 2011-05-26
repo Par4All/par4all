@@ -29,7 +29,7 @@
  * File: in_effects_engine.c
  * ~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * This File contains the generic functions necessary for the computation of 
+ * This File contains the generic functions necessary for the computation of
  * all types of in effects.
  *
  */
@@ -62,7 +62,7 @@
 #include "effects-convex.h"
 
 
-/* ============================================================================= 
+/* =============================================================================
  *
  * GENERIC INTERPROCEDURAL IN EFFECTS ANALYSIS
  *
@@ -70,23 +70,23 @@
  */
 
 
-/* bool summary_in_effects_engine(char *module_name) 
+/* bool summary_in_effects_engine(char *module_name)
  * input    : the name of the current module.
  * output   : the list of summary in effects
  * modifies : nothing.
  * comment  : computes the summary in effects of the current module, using the
- *            in effects of its embedding statement.	
+ *	      in effects of its embedding statement.
  */
 bool
 summary_in_effects_engine(char *module_name)
 {
 
-    list l_glob = NIL, l_loc = NIL; 
+    list l_glob = NIL, l_loc = NIL;
     statement module_stat;
 
-    set_current_module_entity(module_name_to_entity(module_name)); 
+    set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+db_get_memory_resource(DBR_CODE, module_name, TRUE) );
     module_stat = get_current_module_statement();
 
     (*effects_computation_init_func)(module_name);
@@ -95,7 +95,7 @@ summary_in_effects_engine(char *module_name)
 
     l_loc = load_in_effects_list(module_stat);
     l_glob = (*effects_local_to_global_translation_op)(l_loc);
-    
+
     (*db_put_summary_in_effects_func)(module_name, l_glob);
 
     reset_current_module_entity();
@@ -121,8 +121,7 @@ static void list_gen_consistent_p(list l)
 */
 #define debug_consistent(l) /* ifdebug(9) list_gen_consistent_p(l) */
 
-static bool 
-in_effects_stmt_filter(statement s)
+static bool in_effects_stmt_filter(statement s)
 {
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
@@ -130,8 +129,7 @@ in_effects_stmt_filter(statement s)
     return TRUE;
 }
 
-static void
-in_effects_of_statement(statement s)
+static void in_effects_of_statement(statement s)
 {
     store_invariant_in_effects_list(s, NIL);
     debug_consistent(NIL);
@@ -140,8 +138,7 @@ in_effects_of_statement(statement s)
     pips_debug(1, "End statement %03zd :\n", statement_ordering(s));
 }
 
-static list
-r_in_effects_of_sequence(list l_inst)
+static list r_in_effects_of_sequence(list l_inst)
 {
     statement first_statement;
     list remaining_block = NIL;
@@ -157,9 +154,9 @@ r_in_effects_of_sequence(list l_inst)
     first_statement = STATEMENT(CAR(l_inst));
     ifdebug(3)
       {
-	pips_debug(3," first statement is (ordering %03zd): \n",
-		   statement_ordering(first_statement));
-	print_statement(first_statement);
+pips_debug(3," first statement is (ordering %03zd): \n",
+   statement_ordering(first_statement));
+print_statement(first_statement);
       }
     remaining_block = CDR(l_inst);
 
@@ -170,13 +167,13 @@ r_in_effects_of_sequence(list l_inst)
     {
 
 	s1_lr = load_rw_effects_list(first_statement);
-	ifdebug(6) 
+	ifdebug(6)
 	    {
 		pips_debug(6," rw effects for first statement:\n");
 		(*effects_prettyprint_func)(s1_lr);
 	    }
 
-	t1 = (*load_transformer_func)(first_statement);
+	t1 = (*load_completed_transformer_func)(first_statement);
 
 	/* Nga Nguyen, 25/04/2002. Bug found in fct.f about the transformer of loops
 	   Preconditions added to regions take into account the loop exit preconditions
@@ -230,7 +227,7 @@ in_effects_of_sequence(sequence block)
     list l_inst = sequence_statements(block);
 
     pips_debug(2, "Effects for statement %03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
     if (ENDP(l_inst))
     {
@@ -245,12 +242,12 @@ in_effects_of_sequence(sequence block)
     ifdebug(2)
 	{
 	    pips_debug(2, "IN effects for statement%03zd:\n",
-		       statement_ordering(current_stat));  
+		       statement_ordering(current_stat));
 	    (*effects_prettyprint_func)(l_in);
 	    pips_debug(2, "end\n");
 	}
 
-    store_in_effects_list(current_stat, l_in);    
+    store_in_effects_list(current_stat, l_in);
     debug_consistent(l_in);
 }
 
@@ -264,7 +261,7 @@ in_effects_of_test(test t)
     list l_in = NIL;
 
     pips_debug(2, "Effects for statement %03zd:\n",
-	       statement_ordering(current_stat)); 
+	       statement_ordering(current_stat));
 
       /* IN effects of the true branch */
     lt = effects_dup(load_in_effects_list(test_true(t))); /* FC: dup */
@@ -285,12 +282,12 @@ in_effects_of_test(test t)
     ifdebug(2)
     {
 	pips_debug(2, "IN effects for statement %03zd:\n",
-		   statement_ordering(current_stat));  
+		   statement_ordering(current_stat));
 	(*effects_prettyprint_func)(l_in);
 	pips_debug(2, "end\n");
     }
 
-    store_in_effects_list(current_stat, l_in);      
+    store_in_effects_list(current_stat, l_in);
     debug_consistent(l_in);
 }
 
@@ -307,7 +304,7 @@ static void in_effects_of_forloop(forloop f)
   lin = load_rw_effects_list(current);
   lin = effects_read_effects_dup(lin);
   /* switch to MAY... */
-  MAP(EFFECT, e, 
+  MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lin);
   store_in_effects_list(current, lin);
@@ -327,7 +324,7 @@ static void in_effects_of_whileloop(whileloop w)
   lin = load_rw_effects_list(current);
   lin = effects_read_effects_dup(lin);
   /* switch to MAY... */
-  MAP(EFFECT, e, 
+  MAP(EFFECT, e,
       approximation_tag(effect_approximation(e)) = is_approximation_may,
       lin);
   store_in_effects_list(current, lin);
@@ -343,11 +340,11 @@ static void in_effects_of_whileloop(whileloop w)
 static void in_effects_of_loop(loop l)
 {
     statement current_stat = effects_private_current_stmt_head();
-    
+
     range r;
     statement b;
     entity i, i_prime = entity_undefined, new_i = entity_undefined;
-    
+
     list lbody_in; /* in regions of the loop body */
     list global_in, global_in_read_only;/* in regions of non local variables */
     list global_write; /* invariant write regions of non local variables */
@@ -356,7 +353,7 @@ static void in_effects_of_loop(loop l)
     transformer loop_trans = transformer_undefined;
 
     pips_debug(1, "begin\n");
-    
+
     i = loop_index(l);
     r = loop_range(l);
     b = loop_body(l);
@@ -368,13 +365,13 @@ static void in_effects_of_loop(loop l)
      * thus the IN effects of the header are similar to its proper effects.
      */
     l_prop = load_proper_rw_effects_list(current_stat);
-    l_prop = proper_to_summary_effects(l_prop);    
+    l_prop = proper_to_summary_effects(l_prop);
     l_prop_read = effects_read_effects_dup(l_prop);
     l_prop_write = effects_write_effects_dup(l_prop);
     /* END - IN EFFECTS OF HEADER */
-    
+
     /* INVARIANT WRITE EFFECTS OF LOOP BODY STATEMENT. */
-    global_write = 
+    global_write =
 	effects_write_effects_dup(load_invariant_rw_effects_list(b));
 
     ifdebug(4){
@@ -394,25 +391,25 @@ static void in_effects_of_loop(loop l)
 	pips_debug(4, "initial IN(i)= \n");
 	(*effects_prettyprint_func)(global_in);
     }
-	        
-    
+
+
     /* COMPUTATION OF INVARIANT IN EFFECTS */
-        
+
     /* We get the loop transformer, which gives the loop invariant */
     /* We must remove the loop index from the list of modified variables */
     loop_trans = (*load_transformer_func)(current_stat);
     loop_trans = transformer_remove_variable_and_dup(loop_trans, i);
-    
+
     /* And we compute the invariant IN effects. */
     (*effects_transformer_composition_op)(global_in, loop_trans);
     update_invariant_in_effects_list(b, effects_dup(global_in));
-    
+
     ifdebug(4){
 	pips_debug(4, "invariant IN(i)= \n");
 	(*effects_prettyprint_func)(global_in);
     }
-	        
-     
+
+
     /* OPTIMIZATION : */
     /* If there is no write effect on a variable imported by the loop body,
      * then, the same effect is imported by the whole loop.
@@ -421,88 +418,88 @@ static void in_effects_of_loop(loop l)
 	effects_entities_inf_difference(effects_dup(global_in),
 					effects_dup(global_write),
 					r_w_combinable_p);
-    global_in = 
+    global_in =
 	effects_entities_intersection(global_in,
 				      effects_dup(global_write),
 				      r_w_combinable_p);
-    
+
     ifdebug(4){
 	pips_debug(4, "reduced IN(i)= \n");
 	(*effects_prettyprint_func)(global_in);
     }
-    
+
 
     if (!ENDP(global_in))
     {
 	/* If the loop range cannot be represented in the chosen representation
 	 * then, no useful computation can be performed.
 	 */
-	
+
 	if (! normalizable_and_linear_loop_p(i, r))
 	{
 	    pips_debug(7, "non linear loop range.\n");
 	    effects_to_may_effects(global_in);
 	}
 	else
-	{	    
-	    descriptor range_descriptor  = descriptor_undefined;
+	{
+	    descriptor range_descriptor	 = descriptor_undefined;
 	    Value incr;
 	    Pvecteur v_i_i_prime = VECTEUR_UNDEFINED;
 	    bool saved_add_precondition_to_scalar_convex_regions =
 	      add_precondition_to_scalar_convex_regions;
 
 	    pips_debug(7, "linear loop range.\n");
-	   
+
 	    add_precondition_to_scalar_convex_regions = true;
 
-	    
+
 	    /* OPTIMIZATION: */
-	    /* keep only in global_write the write regions corresponding to 
+	    /* keep only in global_write the write regions corresponding to
 	     * regions in global_in. */
 	    global_write =
 		effects_entities_intersection(global_write,
 					      effects_dup(global_in),
-					      w_r_combinable_p);	
+					      w_r_combinable_p);
 	    ifdebug(4){
 		pips_debug(4, "reduced W(i)= \n");
 		(*effects_prettyprint_func)(global_write);
 	    }
-	    
-	    
-	    /* VIRTUAL NORMALIZATION OF LOOP (the new increment is equal 
-	     * to +/-1). 
-	     * This may result in a new loop index, new_i, with an updated 
-	     * range descriptor. Effects are updated at the same time. 
+
+
+	    /* VIRTUAL NORMALIZATION OF LOOP (the new increment is equal
+	     * to +/-1).
+	     * This may result in a new loop index, new_i, with an updated
+	     * range descriptor. Effects are updated at the same time.
 	     */
-	    range_descriptor = (*loop_descriptor_make_func)(l); 
+	    range_descriptor = (*loop_descriptor_make_func)(l);
 
 	    /* first work around the fact that loop precondtions have not been
 	       added to scalar regions
 	    */
-	    global_write = scalar_regions_sc_append(global_write, 
-				     descriptor_convex(range_descriptor), 
+	    global_write = scalar_regions_sc_append(global_write,
+				     descriptor_convex(range_descriptor),
 				     TRUE);
-	    global_in = scalar_regions_sc_append(global_in, 
-				     descriptor_convex(range_descriptor), 
+	    global_in = scalar_regions_sc_append(global_in,
+				     descriptor_convex(range_descriptor),
 				     TRUE);
 
 	    (*effects_loop_normalize_func)(global_write, i, r,
 					   &new_i, range_descriptor, TRUE);
 	    (*effects_loop_normalize_func)(global_in, i, r,
 					   &new_i, range_descriptor, FALSE);
-	    
+
 	    if (!entity_undefined_p(new_i) && !same_entity_p(i,new_i)) {
 	      add_intermediate_value(new_i);
-	      i = new_i; 
+	      i = new_i;
 	    }
 
-       	    /* COMPUTATION OF IN EFFECTS. We must remove the effects written 
-	     * in previous iterations i.e. IN(i) - U_i'(i'<i)[W(i')] for a 
-	     * positive increment, and  IN(i) - U_i'(i < i')[W(i')]
+	    /* COMPUTATION OF IN EFFECTS. We must remove the effects written
+	     * in previous iterations i.e. IN(i) - U_i'(i'<i)[W(i')] for a
+	     * positive increment, and	IN(i) - U_i'(i < i')[W(i')]
 	     * for a negative one.
 	     */
-	    
-	    /* computation of W(i') */     
+
+	    /* computation of W(i') */
 	    /* i' is here an integer scalar value */
 	    if (get_descriptor_range_p()) {
 	      i_prime = entity_to_intermediate_value(i);
@@ -514,18 +511,18 @@ static void in_effects_of_loop(loop l)
 		pips_debug(4, "W(i')= \n");
 		(*effects_prettyprint_func)(global_write);
 	    }
-    
+
 
 	    /* We must take into account the fact that i<i' or i'<i. */
 	    /* This is somewhat implementation dependent. BC. */
-	    
+
 	    if (get_descriptor_range_p())
 	    {
 		incr = vect_coeff
 		    (TCST, (Pvecteur) normalized_linear(
 			NORMALIZE_EXPRESSION(range_increment(r))));
 		v_i_i_prime = vect_make(
-		    VECTEUR_NUL, 
+		    VECTEUR_NUL,
 		    (Variable) (value_pos_p(incr) ? i_prime : i), VALUE_ONE,
 		    (Variable) (value_pos_p(incr) ? i : i_prime), VALUE_MONE,
 		    TCST, VALUE_ONE);
@@ -541,33 +538,33 @@ static void in_effects_of_loop(loop l)
 		pips_debug(4, "U_i'[W(i')] = \n");
 		(*effects_prettyprint_func)(global_write);
 	    }
-	    
+
 	    /* IN = IN(i) - U_i'[W(i')] */
-	    global_in = (*effects_sup_difference_op)(global_in, global_write, 
-						     r_w_combinable_p);	    
+	    global_in = (*effects_sup_difference_op)(global_in, global_write,
+						     r_w_combinable_p);
 	    ifdebug(4){
 		pips_debug(4, "IN(i) - U_i'[W(i')] = \n");
 		(*effects_prettyprint_func)(global_in);
 	    }
-	    
+
 	    /* We eliminate the loop index */
-	    (*effects_union_over_range_op)(global_in, i, range_undefined, 
+	    (*effects_union_over_range_op)(global_in, i, range_undefined,
 					   descriptor_undefined);
 	    add_precondition_to_scalar_convex_regions =
 	      saved_add_precondition_to_scalar_convex_regions;
 	}
     }
-    
-    /* we project the read_only regions along the actual loop index i */    
-    (*effects_union_over_range_op)(global_in_read_only, loop_index(l), 
+
+    /* we project the read_only regions along the actual loop index i */
+    (*effects_union_over_range_op)(global_in_read_only, loop_index(l),
 				   r, descriptor_undefined);
 
     global_in = gen_nconc(global_in, global_in_read_only);
-    
+
     /* we remove the write effects from the proper regions of the loop */
     l_in = (*effects_sup_difference_op)
 	(global_in, l_prop_write, r_w_combinable_p);
- 
+
     /* we merge these regions with the proper in regions of the loop */
     l_in = (*effects_union_op)(l_in, l_prop_read, effects_same_action_p);
 
@@ -587,16 +584,16 @@ in_effects_of_external(entity func, list real_args)
 
     pips_debug(4, "translating effects for %s\n", func_name);
 
-    if (! entity_module_p(func)) 
+    if (! entity_module_p(func))
     {
 	pips_internal_error("%s: bad function", func_name);
     }
-    else 
+    else
     {
 	list func_eff;
 	transformer context;
 
-        /* Get the in summary effects of "func". */	
+	/* Get the in summary effects of "func". */
 	func_eff = (*db_get_summary_in_effects_func)(func_name);
 	/* Translate them using context information. */
 	context = (*load_context_func)(current_stat);
@@ -627,14 +624,14 @@ static bool written_before_read_p(entity ent,list args)
 	    }
 	  return FALSE;
 	}
-    },l);    
+    },l);
   },args);
 
   return FALSE;
 }
 
 
-static void 
+static void
 in_effects_of_call(call c)
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -654,19 +651,19 @@ in_effects_of_call(call c)
       }
     switch (t) {
       case is_value_constant:
-        pips_debug(5, "constant %s\n", n);
-        /* consnant have no in effects, do they ? */
-        break;
+	pips_debug(5, "constant %s\n", n);
+	/* consnant have no in effects, do they ? */
+	break;
       case is_value_code:
-        pips_debug(5, "external function %s\n", n);
-        l_in = in_effects_of_external(e, pc);
+	pips_debug(5, "external function %s\n", n);
+	l_in = in_effects_of_external(e, pc);
 	debug_consistent(l_in);
 	l_in = proper_to_summary_effects(l_in);
 	debug_consistent(l_in);
-        break;
+	break;
 
       case is_value_intrinsic:
-        pips_debug(5, "intrinsic function %s\n", n);
+	pips_debug(5, "intrinsic function %s\n", n);
 	debug_consistent(l_in);
 	l_in = load_rw_effects_list(current_stat);
 	debug_consistent(l_in);
@@ -697,10 +694,10 @@ in_effects_of_call(call c)
 	  }
 
 	debug_consistent(l_in);
-        break;
+	break;
 
       default:
-        pips_internal_error("unknown tag %d", t);
+	pips_internal_error("unknown tag %d", t);
     }
 
     ifdebug(2){
@@ -741,7 +738,7 @@ static void in_effects_of_expression_instruction(instruction i)
 }
 
 
-static void 
+static void
 in_effects_of_unstructured(unstructured u)
 {
     statement current_stat = effects_private_current_stmt_head();
@@ -760,10 +757,10 @@ in_effects_of_unstructured(unstructured u)
 	l_in = effects_dup(load_in_effects_list(control_statement(ct)));
     }
     else
-    {	
+    {
 	transformer t_unst = (*load_transformer_func)(current_stat);
 	CONTROL_MAP(c,{
-	    l_tmp = load_in_effects_list(control_statement(c));	
+	    l_tmp = load_in_effects_list(control_statement(c));
 	    l_in = (*effects_test_union_op) (l_in, effects_dup(l_tmp),
 					     effects_same_action_p);
 	}, ct, blocs) ;
@@ -771,7 +768,7 @@ in_effects_of_unstructured(unstructured u)
 	effects_to_may_effects(l_in);
 
 	gen_free_list(blocs) ;
-    }    
+    }
 
     store_in_effects_list(current_stat, l_in);
     debug_consistent(l_in);
@@ -781,13 +778,13 @@ in_effects_of_unstructured(unstructured u)
 
 static void
 in_effects_of_module_statement(statement module_stat)
-{    
+{
   make_effects_private_current_stmt_stack();
-  
+
   pips_debug(1,"begin\n");
-  
+
   gen_multi_recurse(
-	module_stat, 
+	module_stat,
 	statement_domain, in_effects_stmt_filter, in_effects_of_statement,
 	sequence_domain, gen_true, in_effects_of_sequence,
 	test_domain, gen_true, in_effects_of_test,
@@ -800,27 +797,27 @@ in_effects_of_module_statement(statement module_stat)
 	   expression since they are ruled out by the next clause */
 	instruction_domain, gen_true, in_effects_of_expression_instruction,
 	expression_domain, gen_false, gen_null, /* NOT THESE CALLS */
-	NULL);     
+	NULL);
 
   pips_debug(1,"end\n");
   free_effects_private_current_stmt_stack();
 }
 
 
-/* bool in_regions(char *module_name): 
+/* bool in_regions(char *module_name):
  * input    : the name of the current module.
  * requires : that transformers and precondition maps be set if needed.
- *            (it depends on the chosen instanciation of *load_context_func
- *             and *load_transformer_func).
+ *	      (it depends on the chosen instanciation of *load_context_func
+ *	       and *load_transformer_func).
  * output   : nothing !
- * modifies : 
- * comment  : computes the in effects of the current module.	
+ * modifies :
+ * comment  : computes the in effects of the current module.
  */
 bool in_effects_engine(char * module_name)
 {
     statement module_stat;
     make_effects_private_current_context_stack();
-    set_current_module_entity(module_name_to_entity(module_name)); 
+    set_current_module_entity(module_name_to_entity(module_name));
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
@@ -841,10 +838,10 @@ bool in_effects_engine(char * module_name)
     init_in_effects();
     init_invariant_in_effects();
     init_cumulated_in_effects();
-  
+
     /* Compute the effects of the module. */
-    in_effects_of_module_statement(module_stat);      
-    
+    in_effects_of_module_statement(module_stat);
+
     /* Put computed resources in DB. */
     (*db_put_in_effects_func)
 	(module_name, get_in_effects());
@@ -862,8 +859,8 @@ bool in_effects_engine(char * module_name)
 
     reset_rw_effects();
     reset_invariant_rw_effects();
-    reset_proper_rw_effects();   
- 
+    reset_proper_rw_effects();
+
     reset_in_effects();
     reset_invariant_in_effects();
     reset_cumulated_in_effects();

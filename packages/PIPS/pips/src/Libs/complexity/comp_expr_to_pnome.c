@@ -185,6 +185,12 @@ int maximize;
 	comp = call_to_polynome(syntax_call(synt),
 				precond, effects_list, keep_symbols, maximize);
 	break;
+
+	/* cases below are added by Molka Becher, 17 March 2011 */
+    case is_syntax_cast:
+        comp = cast_to_polynome(syntax_cast(synt), 
+       				 precond, effects_list, keep_symbols, maximize); 
+        break;
     default:
 	pips_internal_error("This tag:%d is not in 28->30", syntax_tag(synt));
     }
@@ -382,19 +388,19 @@ int maximize;
 	complexity_float_add(&comp, constant_entity_to_float(f));
 	break;
     case is_value_intrinsic:
-	if (same_string_p(name, PLUS_OP))
+	if (same_string_p(name, PLUS_OPERATOR_NAME))
 	    comp = plus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, MINUS_OP))
+	else if (same_string_p(name, MINUS_OPERATOR_NAME))
 	    comp = minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, MULTIPLY_OP))
+	else if (same_string_p(name, MULTIPLY_OPERATOR_NAME))
 	    comp = multiply_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, DIVIDE_OP))
+	else if (same_string_p(name, DIVIDE_OPERATOR_NAME))
 	    comp = divide_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, POWER_OP))
+	else if (same_string_p(name, POWER_OPERATOR_NAME))
 	    comp = power_op_handler(args, precond, effects_list, keep_symbols, maximize);
-	else if (same_string_p(name, UNARY_MINUS_OP))
+	else if (same_string_p(name, UNARY_MINUS_OPERATOR_NAME))
 	    comp = unary_minus_op_handler(args, precond, effects_list, keep_symbols, maximize);
-    else if (same_string_p(name,FIELD_OP))
+    else if (same_string_p(name,FIELD_OPERATOR_NAME))
         comp = field_op_handler(args, precond, effects_list, keep_symbols, maximize);
     else
         pips_user_warning("operator '%s' skipped\n",name);
@@ -410,6 +416,29 @@ int maximize;
 
     trace_off();
     return (comp);
+}
+/* 4th element of syntax : Molka Becher */
+complexity cast_to_polynome(cast_instr, precond, effects_list, keep_symbols, maximize)
+cast cast_instr;
+transformer precond;
+list effects_list;
+boolean keep_symbols;
+int maximize;
+{
+  expression exp = cast_expression(cast_instr);
+
+  trace_on("CAST");
+  
+  complexity comp = expression_to_complexity_polynome(exp, precond, effects_list, 
+						      keep_symbols, maximize);
+  
+    if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
+        fprintf(stderr, "cast->pnome");
+	complexity_fprint(stderr, comp, TRUE, TRUE);
+    }
+
+  trace_off();
+  return (comp);
 }
 
 complexity plus_op_handler(args, precond, effects_list, keep_symbols, maximize)

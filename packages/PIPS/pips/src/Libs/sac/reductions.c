@@ -74,29 +74,6 @@ static entity make_reduction_vector_entity(reduction r)
     list lis = CONS(DIMENSION,make_dimension(int_to_expression(0),int_to_expression(0)), NIL);
     new_ent = make_new_array_variable_with_prefix(buffer,mod_ent,base,lis);
     AddLocalEntityToDeclarations(new_ent,mod_ent,get_current_module_statement());
-#if 0
-    /* The new entity is stored in the list of entities of the same type. */
-    switch(basic_tag(base))
-    {
-        case is_basic_int:
-            {
-                integer_entities = CONS(ENTITY, new_ent, integer_entities);
-                break;
-            }
-        case is_basic_float:
-            {
-                if(basic_float(base) == DOUBLE_PRECISION_SIZE)
-                    double_entities = CONS(ENTITY, new_ent, double_entities);
-                else
-                    real_entities = CONS(ENTITY, new_ent, real_entities);
-                break;
-            }
-        default:
-            break;
-    }
-    //free_basic(base);
-#endif
-
     return new_ent;
 }
 
@@ -115,7 +92,7 @@ static reductionInfo add_reduction(list* reds, reduction r)
     {
         if (same_reduction_p(r, reductionInfo_reduction(ri)))
         {
-            //The reduction has already been encountered: update the coun
+            //The reduction has already been encountered: update the counter
             reductionInfo_count(ri)++;
 
             free_expression(dimension_upper(DIMENSION(CAR((variable_dimensions(type_variable(entity_type(reductionInfo_vector(ri)))))))));
@@ -132,6 +109,17 @@ static reductionInfo add_reduction(list* reds, reduction r)
     *reds=CONS(REDUCTIONINFO,ri,*reds);
 
     return ri;
+}
+
+static void undo_rename_reference(reference r, reductionInfo ri) {
+    if(same_entity_p(
+                reference_variable(r),
+                reductionInfo_vector(ri))) {
+        reference rred = reduction_reference(reductionInfo_reduction(ri));
+        gen_full_free_list(reference_indices(r));
+        reference_indices(r)=gen_full_copy_list(reference_indices(rred));
+        reference_variable(r)=reference_variable(rred);
+    }
 }
 
 static void rename_reduction_ref_walker(expression e, reductionInfo ri)
@@ -188,7 +176,7 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
             pips_debug(3,"can do nothing with star reductions ...\n");
         else if(reduction_in_statement_p(r,s))
         {
-            pips_debug(3,"found in the statement ! rewriting ...\n");
+            pips_debug(3,"found in the statement ! Rewriting ...\n");
             basic b = basic_of_reference(reduction_reference(r));
             if(!basic_undefined_p(b))
             {
@@ -199,7 +187,7 @@ static void rename_statement_reductions(statement s, list * reductions_info, lis
             }
         }
         else
-            pips_debug(3,"not found in the statement ! skipping ...\n");
+            pips_debug(3,"not found in the statement ! Skipping ...\n");
     }
 }
 
@@ -303,6 +291,7 @@ static statement generate_prelude(reductionInfo ri)
     basic bas = basic_of_reference(reduction_reference(reductionInfo_reduction(ri)));
 
     // According to the operator, get the correct initialization value
+    // should use operator_neutral_element
     switch(reduction_operator_tag(reduction_op(reductionInfo_reduction(ri))))
     {
         default:
@@ -334,51 +323,24 @@ static statement generate_prelude(reductionInfo ri)
             initval = bool_to_expression(FALSE);
             break;
     }
-    string sprelude = get_string_property("SIMD_REMOVE_REDUCTIONS_PRELUDE");
-    if(empty_string_p(sprelude)||!(reduction_operator_sum_p(reduction_op(reductionInfo_reduction(ri))))|| reductionInfo_count(ri)==1) {
-        // For each reductionInfo_vector reference, make an initialization
-        // assign statement and add it to the prelude
-        // do nothing if no init val exist
-        for(i=0; i<reductionInfo_count(ri); i++)
-        {
-            instruction is;
 
-            is = make_assign_instruction(
-                    reference_to_expression(make_reference(
-                            reductionInfo_vector(ri), CONS(EXPRESSION, 
-                                int_to_expression(reductionInfo_count(ri)-i-1),
-                                NIL))),
-                    copy_expression(initval));
-
-            prelude = CONS(STATEMENT, 
-                    instruction_to_statement(is),
-                    prelude);
-        }
-    }
-    else{
-        entity eprelude = FindEntity(TOP_LEVEL_MODULE_NAME,sprelude);
-        if(entity_undefined_p(eprelude)) {
-            pips_user_warning("%s not found, using a dummy one",sprelude);
-            eprelude=make_empty_subroutine(sprelude,copy_language(module_language(get_current_module_entity())));
-        }
-        prelude = make_statement_list(
-                call_to_statement(
-                    make_call(
-                        eprelude,
-                        make_expression_list(
-                            MakeUnaryCall(
-                                entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                                reference_to_expression(
-                                    make_reference(
-                                        reductionInfo_vector(ri),
-                                        CONS(EXPRESSION,int_to_expression(0),NIL)
-                                        )
-                                    )
-                                )
-                            )
-                        )
-                    )
-                );
+    // For each reductionInfo_vector reference, make an initialization
+    // assign statement and add it to the prelude
+    // do nothing if no init val exist
+    for(i=0; i<reductionInfo_count(ri); i++)
+    {
+        instruction is;
+    
+        is = make_assign_instruction(
+    	    reference_to_expression(make_reference(
+    		    reductionInfo_vector(ri), CONS(EXPRESSION, 
+    			int_to_expression(reductionInfo_count(ri)-i-1),
+    			NIL))),
+    	    copy_expression(initval));
+    
+        prelude = CONS(STATEMENT, 
+    	    instruction_to_statement(is),
+    	    prelude);
     }
 
     free_expression(initval);
@@ -509,10 +471,12 @@ bool simd_gather_reduction(statement body, list reductions, list *reductions_inf
 /*
    This function attempts to find reductions for each loop
    */
-static void reductions_rewrite(statement s)
+static void reductions_rewrite(statement s, set skip)
 {
+    if(set_belong_p(skip,s)) return;
     instruction i = statement_instruction(s);
     statement body;
+    bool is_loop=true;
 
     //We are only interested in loops
     switch(instruction_tag(i))
@@ -527,6 +491,11 @@ static void reductions_rewrite(statement s)
 
         case is_instruction_forloop:
             body = forloop_body(instruction_forloop(i));
+            break;
+
+        case is_instruction_sequence:
+            body = s;
+            is_loop=false;
             break;
 
         default:
@@ -559,27 +528,36 @@ static void reductions_rewrite(statement s)
         //Generate prelude and compact code for each of the reductions
         FOREACH(REDUCTIONINFO, ri,reductions_info)
         {
-            statement curStat;
-
-            curStat = generate_prelude(ri);
+            if(entity_memory_size(reductionInfo_vector(ri))*8 >= get_int_property("SAC_SIMD_REGISTER_WIDTH")) {
+            statement curStat = generate_prelude(ri);
             if (curStat != statement_undefined)
                 preludes = CONS(STATEMENT, curStat, preludes);
 
             curStat = generate_compact(ri);
             if (curStat != statement_undefined)
                 compacts = CONS(STATEMENT, curStat, compacts);
+            }
+            /* not enough elements: undo the change */
+            else {
+                gen_context_recurse(body,ri,reference_domain,gen_true, undo_rename_reference);
+            }
         };
         gen_full_free_list(reductions_info);
 
         // Replace the old statement instruction by the new one
-        statement scp = copy_statement(s);
-        statement_label(s)=entity_empty_label();
-        sequence seq = make_sequence(
-                gen_concatenate(
-                    preludes,
-                    CONS(STATEMENT, scp,compacts)));
-        update_statement_instruction(s,make_instruction_sequence(seq));
+    gen_recurse_stop(compacts);
+	insert_statement(s,make_block_statement(compacts),false);
+	insert_statement(s,make_block_statement(preludes),true);
+
     }
+    if(is_loop) gen_recurse_stop(statement_instruction(s));
+}
+
+static bool reduction_rewrite_filter(statement s,set skip)
+{
+	if (statement_loop_p(s))
+        set_add_element(skip,skip,loop_body(statement_loop(s)));
+	return true;
 }
 
 /** 
@@ -600,11 +578,14 @@ bool simd_remove_reductions(char * mod_name)
     debug_on("SIMDREDUCTION_DEBUG_LEVEL");
 
     /* Now do the job */
-    gen_recurse(get_current_module_statement(), statement_domain, gen_true, reductions_rewrite);
+    set skip = set_make(set_pointer);
+    gen_context_recurse(get_current_module_statement(),skip, statement_domain, reduction_rewrite_filter, reductions_rewrite);
+    set_free(skip);
 
     pips_assert("Statement is consistent after remove reductions", statement_consistent_p(get_current_module_statement()));
 
     /* Reorder the module, because new statements have been added */  
+    clean_up_sequences(get_current_module_statement());
     module_reorder(get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, get_current_module_statement());
     DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name, compute_callees(get_current_module_statement()));

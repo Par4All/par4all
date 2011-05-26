@@ -5,8 +5,9 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
+
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -90,7 +91,7 @@ clause step_check_reduction(entity module, string directive_txt)
 	      erreur=TRUE;
 	      break;
 	    }
-	  /* verifier la non existance d'une réduction précédente pour la variable*/
+	  /* verifier la non existance d'une rï¿½duction prï¿½cï¿½dente pour la variable*/
 	  if (bound_map_entity_string_p(reductions,e))
 	    {
 	      msg_err="several reduction for the same variable.";

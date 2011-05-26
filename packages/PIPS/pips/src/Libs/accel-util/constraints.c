@@ -121,37 +121,28 @@ static bool do_solve_hardware_constraints_on_nb_proc(entity e, statement s) {
     int max_volume= get_int_property("SOLVE_HARDWARE_CONSTRAINTS_LIMIT");
     if(max_volume<=0) pips_user_error("constraint limit must be greater than 0\n");
     /* solve the equation if it is linear */
+    max_dim=make_op_exp(MINUS_OPERATOR_NAME,max_dim,int_to_expression(max_volume));
     NORMALIZE_EXPRESSION(max_dim);
     normalized n = expression_normalized(max_dim);
-    expression soluce = expression_undefined;
     if(normalized_linear_p(n)) {
-        Pvecteur pv = VECTEUR_NUL;
-        Value coeff = VALUE_ZERO;
-        for(Pvecteur v = normalized_linear(n);!VECTEUR_NUL_P(v); v=vecteur_succ(v)) {
-            if(vecteur_var(v) == e ) {
-                coeff = vecteur_val(v);
-            }
-            else {
-                pv = vect_chain(pv,vecteur_var(v),vecteur_val(v));
-            }
+        /* create a system with preconditions information and the constraint limit*/
+        Psysteme sc = sc_dup(predicate_system(transformer_relation(tr)));
+        sc_add_egalite(sc,contrainte_make(normalized_linear(n)));
+        /* find numerical constraints over unknown e */
+        Value min,max;
+        if(sc_minmax_of_variable(sc,e,&min,&max)) {
+            expression soluce = Value_to_expression(min);
+            /* SG: this is over optimistic, 
+             * we should verify all elements of soluce are store-independant
+             */
+            free_value(entity_initial(e));
+            entity_initial(e)=make_value_expression(
+                    soluce);
         }
-        soluce=Pvecteur_to_expression(pv);
-        soluce=make_op_exp(
-                MINUS_OPERATOR_NAME,
-                int_to_expression(max_volume),
-                soluce);
-        soluce=make_op_exp(
-                DIVIDE_OPERATOR_NAME,
-                soluce,
-                int_to_expression((_int)coeff)
-                );
-        /* SG: this is over optimistic, 
-         * we should verify all elements of soluce are store-independant
-         */
-        free_value(entity_initial(e));
-        entity_initial(e)=make_value_expression(
-                soluce);
+        else /* welcome in the real life (RK(C) we cannot solve this equation at commile time ... never mind let's do it at runtime ! */
+            pips_user_error("unable to solve the equation at compile time\n");
     }
+    else pips_user_error("unable to get a linear expression for nbproc\n");
 
     set_free(visited_entities);
     gen_free_list(read_regions);

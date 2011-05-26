@@ -165,9 +165,10 @@ list (*effects_local_to_global_translation_op)(list);
 
 
 
-/* functions to provide context and transformer information */
+/* functions to provide context, a.k.a. precondition, and transformer information */
 transformer (*load_context_func)(statement);
 transformer (*load_transformer_func)(statement);
+transformer (*load_completed_transformer_func)(statement);
 
 bool (*empty_context_test)(transformer);
 
