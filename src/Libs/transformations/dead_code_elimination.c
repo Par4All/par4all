@@ -43,6 +43,7 @@
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "callgraph.h"
 #include "dg.h"
 /* Instantiation of the dependence graph: */
 typedef dg_arc_label arc_label;
