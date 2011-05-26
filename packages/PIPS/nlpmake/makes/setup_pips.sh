@@ -33,11 +33,9 @@
 SVN_CRI='https://svn.cri.ensmp.fr/svn'
 PIPS_SVN=$SVN_CRI/pips
 
-#POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
 #POLYLIB_SITE='http://www.cri.ensmp.fr/pips'
-#POLYLIB='polylib-5.22.1'
 POLYLIB_SITE='http://icps.u-strasbg.fr/polylib/polylib_src'
-POLYLIB='polylib-5.22.3'
+POLYLIB='polylib-5.22.5'
 
 # help
 command=${0/*\//}
