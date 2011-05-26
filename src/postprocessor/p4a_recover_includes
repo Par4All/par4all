@@ -57,7 +57,7 @@ Ronan.Keryell@hpc-project.com
 
 #import string, re, sys, os, types, optparse
 
-import re, optparse, pickle, os, shutil, subprocess, locale
+import re, optparse, pickle, os, shutil, subprocess, locale, p4a_util, shlex
 import ply.lex as lex
 
 #from pyps import *
@@ -914,20 +914,23 @@ def preprocess(args):
     inclusion.
 
     This is an optparse-callback to be able to get trailing arguments"""
-    #print (args)
+                
     # Pick the default values from
     # pips/src/Libs/preprocessor/preprocessor-local.h:
-    cpp_args = " -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ "
+    cpp_args = shlex.split(" -C  -D__PIPS__ -D__HPFC__ -U__GNUC__ ")
+    
     # Add other options from the PIPS_CPP_FLAGS environment variable if defined:
     if 'PIPS_CPP_FLAGS' in os.environ:
-        cpp_args += os.environ['PIPS_CPP_FLAGS'] + " "
+        cpp_args += shlex.split(os.environ['PIPS_CPP_FLAGS'] + " ")
+    
     # Addded the trailing arguments of this program as options or files to
     # preprocess, if any:
-    cpp_args += " ".join(args)
+    cpp_args += args
+
     # Mark all the arguments as having been consumed:
     #python2.x
-    p = subprocess.Popen(["cpp" + cpp_args], shell=True, stdout=subprocess.PIPE)
-    output_string = p.communicate()[0]
+    output_string = subprocess.Popen(['cpp']+cpp_args, stdout=subprocess.PIPE).communicate()[0]
+
     #python3.1
     #output_string = subprocess.check_output("cpp" + cpp_args, shell=True)
     if verbose:
@@ -953,7 +956,7 @@ def record_preprocess_options(option, opt_str, value, parser):
 
     This is an optparse-callback to be able to get trailing arguments"""
 
-    # print (option, opt_str, value, parser, parser.rargs)
+    #print (option, opt_str, value, parser, parser.rargs)
 
     # Add all the remaining parser arguments into
     # parser.options. Duplicate parser.rargs since we delete its elements

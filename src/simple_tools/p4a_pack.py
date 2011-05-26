@@ -122,7 +122,7 @@ def create_dist(pack_dir, install_prefix, version, gitrev):
         dict(
             root = abs_prefix,
             dist = abs_prefix,
-            accel = os.path.join(abs_prefix, "share/p4a_accel"),
+            accel = "share/p4a_accel",
             fortran = "gfortran" # ???
         )
     )

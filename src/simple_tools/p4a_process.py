@@ -84,7 +84,13 @@ default_fortran_cuda_properties = dict(
 # Module instance will be held in following variable.
 pyps = None
 
-
+def apply_user_requested_phases(modules=None, phases_to_apply=[]):
+    """Apply user requested phases to modules
+    """		 
+    for ph in phases_to_apply:
+        # Apply requested phases to modules:
+        getattr(modules, ph)()
+		 
 class p4a_processor_output(object):
     files = []
     database_dir = ""
@@ -354,8 +360,10 @@ class p4a_processor(object):
             # Late import of pyps to avoid importing it until
             # we really need it.
             global pyps
+            global broker
             try:
                 pyps = __import__("pyps")
+                broker = __import__("broker")
             except:
                 raise
 
@@ -364,11 +372,12 @@ class p4a_processor(object):
             # one:
             recover_Include = self.recover_includes and self.native_recover_includes
             # Create the PyPS workspace:
-            self.workspace = pyps.workspace(*self.files,
-                                            name = self.project_name,
-                                            verbose = verbose,
-                                            cppflags = cpp_flags,
-                                            recoverInclude = recover_Include)
+            self.workspace = broker.workspace(*self.files,
+                                              name = self.project_name,
+                                              verbose = verbose,
+                                              cppflags = cpp_flags,
+                                              recoverInclude = recover_Include,
+                                              brokersList="p4a_stubs_broker")
 
             # Array regions are a must! :-) Ask for most precise array
             # regions:
@@ -413,12 +422,12 @@ class p4a_processor(object):
         # apply the properties to the workspace
         for k in all_properties:
             p4a_util.debug("Property " + k + " = " + str(all_properties[k]))
-            self.workspace.props[k] = all_properties[k]
+            setattr(self.workspace.props,k, all_properties[k])
         return
 
     def get_database_directory(self):
         "Return the directory of the current PIPS database"
-        return os.path.abspath(self.workspace.dirname())
+        return os.path.abspath(self.workspace.dirname)
 
 
     def filter_modules(self, filter_select = None, filter_exclude = None, other_filter = lambda x: True):
@@ -449,16 +458,14 @@ class p4a_processor(object):
         # Select the interesting modules:
         return self.workspace.filter(filter)
 
-
     def parallelize(self, fine = False, filter_select = None,
                     filter_exclude = None, apply_phases_before = [], apply_phases_after = []):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
 
-        for ph in apply_phases_before:
-            # Apply requested phases before parallelization:
-			getattr(all_modules, ph)()
+		#Apply requested phases before parallezation
+        apply_user_requested_phases(all_modules, apply_phases_before)
 
         # Try to privatize all the scalar variables in loops:
         all_modules.privatize_module()
@@ -470,9 +477,9 @@ class p4a_processor(object):
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization(concurrent=True)
 
-        for ph in apply_phases_after:
-            # Apply requested phases after parallelization:
-			getattr(all_modules, ph)()
+		#Apply requested phases after parallezation
+        apply_user_requested_phases(all_modules, apply_phases_after)
+
 
     def post_process_fortran_wrapper (self, file_name, subroutine_name):
         """ All the dirty thing about C and Fortran interoperability is hidden
@@ -694,9 +701,8 @@ class p4a_processor(object):
             LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT = True,
             concurrent=True)
 
-        for ph in apply_phases_kernel_launcher:
-            #Apply requested phases before parallelization to kernel launchers:
-			getattr(kernel_launchers, ph)(concurrent=True)
+        #Apply requested phases to kernel_launchers
+        apply_user_requested_phases(kernel_launchers, apply_phases_kernel_launcher)
 
         # Since the privatization of a module does not change
         # privatization of other modules, use concurrent=True (capply) to
@@ -728,9 +734,8 @@ class p4a_processor(object):
         kernel_filter_re = re.compile(kernel_prefix + "_\\w+$")
         kernels = self.workspace.filter(lambda m: kernel_filter_re.match(m.name))
 
-        for ph in apply_phases_kernel:
-            # Apply user requested phases to generated kernels
-			getattr(kernels, ph)(concurrent=True)
+		#Apply requested phases to kernel
+        apply_user_requested_phases(kernels, apply_phases_kernel)
 
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
@@ -754,9 +759,8 @@ class p4a_processor(object):
         wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
         wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
-        for ph in apply_phases_wrapper:
-            #Apply requested phases before parallelization to wrappers:
-			getattr(wrappers, ph)(concurrent=True)
+		#Apply requested phases to wrappers
+        apply_user_requested_phases(wrappers, apply_phases_wrapper)
 
         # Select fortran wrappers by using the fact that all the generated
         # fortran wrappers
@@ -829,11 +833,10 @@ class p4a_processor(object):
             wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
             wrappers.cast_at_call_sites()
 
-        for ph in apply_phases_after:
-            # Apply requested phases to kernels, wrappers and launcher:
-			getattr(kernels, ph)(concurrent=True)
-			getattr(wrappers, ph)(concurrent=True)
-			getattr(kernel_launchers, ph)(concurrent=True)
+		#Apply requested phases to kernels, wrappers and kernel_launchers after gpuify
+        apply_user_requested_phases(kernels, apply_phases_after)
+        apply_user_requested_phases(wrappers, apply_phases_after)
+        apply_user_requested_phases(kernel_launchers, apply_phases_after)       
 
         #self.workspace.all_functions.display()
 
@@ -869,14 +872,14 @@ class p4a_processor(object):
         representation to generate... OpenMP code!"""
 
         modules = self.filter_modules(filter_select, filter_exclude);
-        for ph in apply_phases_before:
-            # Apply requested phases before ompify to modules:
-			getattr(modules, ph)(concurrent=True)
+        
+		#Apply requested phases before ompify to modules
+        apply_user_requested_phases(modules, apply_phases_before)        
         modules.ompify_code(concurrent=True)
         modules.omp_merge_pragma(concurrent=True)
-        for ph in apply_phases_after:
-            # Apply requested phases after ompify to modules:
-			getattr(modules, ph)(concurrent=True)
+        
+		#Apply requested phases after ompify to modules
+        apply_user_requested_phases(modules, apply_phases_after)    
 
     def accel_post(self, file, dest_dir = None):
         '''Method for post processing "accelerated" files'''
@@ -920,7 +923,7 @@ class p4a_processor(object):
         """
         for launcher in self.launchers:
             # Where the file does well in the .database workspace:
-            launcher_file = os.path.join(self.workspace.dirname(), "Src",
+            launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
             # first open for read and get content
             src = open (launcher_file, 'r')
@@ -944,11 +947,11 @@ class p4a_processor(object):
             launcher = self.kernel_to_launcher_name (kernel)
             # merge the files in the kernel file
             # Where the files do well in the .database workspace:
-            kernel_file = os.path.join(self.workspace.dirname(), "Src",
+            kernel_file = os.path.join(self.workspace.dirname, "Src",
                                        kernel + ".c")
-            wrapper_file = os.path.join(self.workspace.dirname(), "Src",
+            wrapper_file = os.path.join(self.workspace.dirname, "Src",
                                         wrapper + ".c")
-            launcher_file = os.path.join(self.workspace.dirname(), "Src",
+            launcher_file = os.path.join(self.workspace.dirname, "Src",
                                          launcher + ".c")
             p4a_util.merge_files (kernel_file, [wrapper_file, launcher_file])
             # remove the wrapper from the modules to be processed since already
@@ -970,7 +973,7 @@ class p4a_processor(object):
         result = []
         for name in self.crough_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(),
+            pips_file = os.path.join(self.workspace.dirname,
                                      name, name + ".c")
             # set the destination file
             output_name = name + ".c"
@@ -1005,16 +1008,16 @@ class p4a_processor(object):
                 extension_out = ".c"
         for name in self.generated_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), "Src",
+            pips_file = os.path.join(self.workspace.dirname, "Src",
                                      name + extension_in)
             if self.accel and p4a_util.c_file_p(pips_file):
                 # We generate code for P4A Accel, so first post process
                 # the output and produce the result in the P4A subdiretory
                 # of the .database
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.dirname(), "P4A"))
+                                os.path.join(self.workspace.dirname, "P4A"))
                 # update the pips file to the postprocess one
-                pips_file = os.path.join(self.workspace.dirname(), "P4A", name + extension_in)
+                pips_file = os.path.join(self.workspace.dirname, "P4A", name + extension_in)
 
             output_name = name + extension_out
             # The final destination
@@ -1042,7 +1045,7 @@ class p4a_processor(object):
         flag = True
         for name in self.interface_modules:
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), name,
+            pips_file = os.path.join(self.workspace.dirname, name,
                                      name + "_interface.f08")
             output_name = name + "_interface.f08"
             # The final destination
@@ -1069,7 +1072,7 @@ class p4a_processor(object):
                 continue
             (dir, name) = os.path.split(file)
             # Where the file does well in the .database workspace:
-            pips_file = os.path.join(self.workspace.dirname(), "Src", name)
+            pips_file = os.path.join(self.workspace.dirname, "Src", name)
 
             # Recover the includes in the given file only if the flags have
             # been previously set and this is a C program:
@@ -1094,10 +1097,10 @@ class p4a_processor(object):
                 # We generate code for P4A Accel, so first post process
                 # the output:
                 self.accel_post(pips_file,
-                                os.path.join(self.workspace.dirname(), "P4A"))
+                                os.path.join(self.workspace.dirname, "P4A"))
                 # Where the P4A output file does dwell in the .database
                 # workspace:
-                p4a_file = os.path.join(self.workspace.dirname(), "P4A", name)
+                p4a_file = os.path.join(self.workspace.dirname, "P4A", name)
                 # Update the normal location then:
                 pips_file = p4a_file
                 if (self.cuda == True) and (self.c99 == False):

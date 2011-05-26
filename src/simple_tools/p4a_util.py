@@ -795,7 +795,20 @@ def generate_c_header (in_c_file, out_h_file, additional_args= []):
     args.append (out_h_file)
     args.append (in_c_file)
     run (args, force_locale = None)
-
+    
+def quote_fname(fname):
+    """quote file name or any string to avoid problems with file/directory names 
+	that contain spaces or any other kind of nasty characters
+	"""
+    return '"%s"' % (
+		fname
+		.replace('\\', '\\\\')
+		.replace('"', '\"')
+		.replace('$', '\$')
+		.replace('`', '\`')
+		.replace('!', '\!')
+		)
+    
 if __name__ == "__main__":
     print(__doc__)
     print("This module is not directly executable")

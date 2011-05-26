@@ -23,6 +23,8 @@
 //#include <cutil_inline.h>
 #include <cuda_runtime_api.h>
 #include <cuda.h>
+#include <p4a_stacksize_test.h>
+
 #define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
 #define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
 
@@ -41,6 +43,7 @@ inline void checkErrorMessageInline(const char *errorMessage, const char *curren
         fprintf(stderr, "File %s - Line %i - %s : %s\n", currentFile, currentLine, errorMessage, cudaGetErrorString(error));
         exit(-1);
     }
+
 #ifdef P4A_DEBUG
     error = cudaThreadSynchronize();
     if(cudaSuccess != error){
@@ -142,7 +145,8 @@ extern cudaEvent_t p4a_start_event, p4a_stop_event;
   do {							\
     toolTestExec(cudaEventCreate(&p4a_start_event));	\
     toolTestExec(cudaEventCreate(&p4a_stop_event));	\
-  } while (0);
+    checkStackSize(); \
+  } while (0)
 
 
 /** Release the hardware accelerator in CUDA

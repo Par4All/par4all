@@ -632,6 +632,9 @@ def work(options, args = None):
     install_dir_makes = os.path.join(install_dir, "makes")
     if not os.path.isdir(install_dir_makes):
         os.makedirs(install_dir_makes)
+    install_dir_stubs = os.path.join(install_dir, "stubs")
+    if not os.path.isdir(install_dir_stubs):
+        os.makedirs(install_dir_stubs)
 
     # Install a few scripts.
     p4a_util.info("Installing scripts")
@@ -675,6 +678,12 @@ def work(options, args = None):
         if ext == ".py" or ext == ".tpl":
             p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
 
+
+    # installing stubs !
+    dir = os.path.join(root, "src/p4a_accel/stubs")
+    for file in os.listdir(dir):
+        p4a_util.run([ "cp", "-a", "--remove-destination", os.path.join(dir, file), install_dir_stubs ])
+
     # Create a shortcut name for binaries to the Python file, so that
     # we can type p4a instead of p4a.py. We need the .py versions
     # anyway since they can be imported by other Python programs
@@ -703,6 +712,8 @@ def work(options, args = None):
     # Install various files.
     p4a_util.info("Installing release notes")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
+    p4a_util.info("Installing license")
+    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "LICENSE.txt"), install_dir ])
     p4a_util.info("Installing examples")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
@@ -715,8 +726,9 @@ def work(options, args = None):
         fortran = "g77"
     else:
         fortran = "false"
+    accel_suffix=os.path.relpath(install_dir_share_accel,install_dir)
     p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
-        accel = install_dir_share_accel, fortran = fortran))
+        accel = accel_suffix, fortran = fortran))
 
     # Write version file.
     p4a_version.write_VERSION(install_dir, p4a_version.VERSION(root))
