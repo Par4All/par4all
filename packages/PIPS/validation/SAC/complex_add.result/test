@@ -61,12 +61,12 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       for(j = 0; j <= 4*(dim2/4)-1; j += 4) {
          b[i][j].re = b[i][j].re+a[i][j].re;
          b[i][j].im = b[i][j].im+a[i][j].im;
-         b[i][j+1].re = b[i][j+1].re+a[i][j+1].re;
-         b[i][j+1].im = b[i][j+1].im+a[i][j+1].im;
-         b[i][j+2].re = b[i][j+2].re+a[i][j+2].re;
-         b[i][j+2].im = b[i][j+2].im+a[i][j+2].im;
-         b[i][j+3].re = b[i][j+3].re+a[i][j+3].re;
-         b[i][j+3].im = b[i][j+3].im+a[i][j+3].im;
+         b[i][1+j].re = b[i][1+j].re+a[i][1+j].re;
+         b[i][1+j].im = b[i][1+j].im+a[i][1+j].im;
+         b[i][2+j].re = b[i][2+j].re+a[i][2+j].re;
+         b[i][2+j].im = b[i][2+j].im+a[i][2+j].im;
+         b[i][3+j].re = b[i][3+j].re+a[i][3+j].re;
+         b[i][3+j].im = b[i][3+j].im+a[i][3+j].im;
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
          b[i][j].re = b[i][j].re+a[i][j].re;
@@ -83,12 +83,12 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       for(j0 = 0; j0 <= 4*(dim2/4)-1; j0 += 4) {
          b[i0][j0].re = b[i0][j0].re+a[i0][j0].re;
          b[i0][j0].im = b[i0][j0].im+a[i0][j0].im;
-         b[i0][j0+1].re = b[i0][j0+1].re+a[i0][j0+1].re;
-         b[i0][j0+1].im = b[i0][j0+1].im+a[i0][j0+1].im;
-         b[i0][j0+2].re = b[i0][j0+2].re+a[i0][j0+2].re;
-         b[i0][j0+2].im = b[i0][j0+2].im+a[i0][j0+2].im;
-         b[i0][j0+3].re = b[i0][j0+3].re+a[i0][j0+3].re;
-         b[i0][j0+3].im = b[i0][j0+3].im+a[i0][j0+3].im;
+         b[i0][1+j0].re = b[i0][1+j0].re+a[i0][1+j0].re;
+         b[i0][1+j0].im = b[i0][1+j0].im+a[i0][1+j0].im;
+         b[i0][2+j0].re = b[i0][2+j0].re+a[i0][2+j0].re;
+         b[i0][2+j0].im = b[i0][2+j0].im+a[i0][2+j0].im;
+         b[i0][3+j0].re = b[i0][3+j0].re+a[i0][3+j0].re;
+         b[i0][3+j0].im = b[i0][3+j0].im+a[i0][3+j0].im;
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
          b[i0][j].re = b[i0][j].re+a[i0][j].re;
@@ -115,12 +115,8 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_STORE_V4SF(vec20, &b[i0][2+j0].re);
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
-         //PIPS:SAC generated v2df vector(s)
-         v2df vec40, vec50;
-         SIMD_LOAD_V2SF_TO_V2DF(vec50, &a[i0][j].re);
-         SIMD_LOAD_V2SF_TO_V2DF(vec40, &b[i0][j].re);
-         SIMD_ADDPD(vec40, vec40, vec50);
-         SIMD_STORE_V2DF_TO_V2SF(vec40, &b[i0][j].re);
+         b[i0][j].re = b[i0][j].re+a[i0][j].re;
+         b[i0][j].im = b[i0][j].im+a[i0][j].im;
       }
    }
 }
@@ -143,12 +139,8 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_STORE_V4SF(vec20, &b[i0][2+j0].re);
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
-         //PIPS:SAC generated v2df vector(s)
-         v2df vec40, vec50;
-         SIMD_LOAD_V2SF_TO_V2DF(vec50, &a[i0][j].re);
-         SIMD_LOAD_V2SF_TO_V2DF(vec40, &b[i0][j].re);
-         SIMD_ADDPD(vec40, vec40, vec50);
-         SIMD_STORE_V2DF_TO_V2SF(vec40, &b[i0][j].re);
+         b[i0][j].re = b[i0][j].re+a[i0][j].re;
+         b[i0][j].im = b[i0][j].im+a[i0][j].im;
       }
    }
 }
@@ -171,12 +163,8 @@ void cadd(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
          SIMD_STORE_V4SF(vec20, &b[i0][2+j0].re);
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
-         //PIPS:SAC generated v2df vector(s)
-         v2df vec40, vec50;
-         SIMD_LOAD_V2SF_TO_V2DF(vec50, &a[i0][j].re);
-         SIMD_LOAD_V2SF_TO_V2DF(vec40, &b[i0][j].re);
-         SIMD_ADDPD(vec40, vec40, vec50);
-         SIMD_STORE_V2DF_TO_V2SF(vec40, &b[i0][j].re);
+         b[i0][j].re = b[i0][j].re+a[i0][j].re;
+         b[i0][j].im = b[i0][j].im+a[i0][j].im;
       }
    }
 }

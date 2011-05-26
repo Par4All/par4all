@@ -1,5 +1,5 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS 
 
 void assign03()
 {
@@ -14,6 +14,9 @@ void assign03()
 
    p[j] = 1.;
 }
+void assign03();
+
+void foo();
 void foo()
 {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -22,8 +25,52 @@ void foo()
    assign03();
 }
 
-PROPER POINTER EFFECTS
+POINTS-TO
 
+//  {}
+void assign03()
+{
+//  {}
+   char *malloc(int);
+//  {}
+   double *p = (double *) malloc(10*sizeof(double));
+//  {(p,*HEAP*_l_4[0],-Exact-)}
+   int j = 2;
+//  {(p,*HEAP*_l_4[0],-Exact-)}
+
+   p[j] = 1.;
+}
+//  {}
+//  {}
+void assign03();
+
+//  {}
+void foo();
+//  {}
+void foo()
+{
+//  {}
+   assign03();
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+void assign03()
+{
+   char *malloc(int);
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+   double *p = (double *) malloc(10*sizeof(double));
+//             <    is written>: j
+   int j = 2;
+//             <    is read   >: j p
+//             <    is written>: *HEAP*_l_4[0+j]
+
+   p[j] = 1.;
+}
+void assign03();
+
+void foo();
 void foo()
 {
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
@@ -31,24 +78,7 @@ void foo()
    assign03();
 }
 
-POINTS TO
+ *********************** Use-Def Chains *********************
 
-//  {}
-void assign03()
-{
-//  points to = {}
-   char *malloc(int);
-//  points to = {}
-   double *p = (double *) malloc(10*sizeof(double));
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
-   int j = 2;
-//  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
 
-   p[j] = 1.;
-}
-//  {}
-void foo()
-{
-//  points to = {}
-   assign03();
-}
+****************** End of Dependence Graph ******************

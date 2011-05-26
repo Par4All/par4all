@@ -21,7 +21,7 @@ int main()
 
 Complexities
 
-//     6.75*COMPLEXITY:UNKNOWN_VARIABLE0^2 - 13.50*COMPLEXITY:UNKNOWN_VARIABLE0.m - 3/4*COMPLEXITY:UNKNOWN_VARIABLE0 + 3 (SUMMARY)
+//     6.75*COMPLEXITY:UNKNOWN_VARIABLE0^2 - 13.50*COMPLEXITY:UNKNOWN_VARIABLE0.m + 12.75*COMPLEXITY:UNKNOWN_VARIABLE0 + 3 (SUMMARY)
 int main()
 {
 //                                                                    0 (STMT)
@@ -34,10 +34,10 @@ int main()
    int A[dec];
 //                                                                    0 (STMT)
    int k, j, z;
-//                               6.75*dec^2 - 13.50*dec.m - 3/4*dec + 2 (DO)
+//                             6.75*dec^2 - 13.50*dec.m + 12.75*dec + 2 (DO)
 
    for(k = dec; k >= 1; k += -1)
-//                                             13.50*k - 13.50*m - 7.50 (DO)
+//                                                13.50*k - 13.50*m + 6 (DO)
       for(j = (int) m; j <= k-1; j += 1)
 //                                                                13.50 (TEST)
          if (A[j]>A[j+1]) {

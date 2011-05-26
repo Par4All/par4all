@@ -25,7 +25,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 {
    FLGR_Ret ret;
    if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
-      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
       return FLGR_RET_NULL_OBJECT;
    }
    if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
@@ -69,7 +69,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
       flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
       return FLGR_RET_OK;
    }
-   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
    return FLGR_RET_TYPE_UNKNOWN;
 }
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)

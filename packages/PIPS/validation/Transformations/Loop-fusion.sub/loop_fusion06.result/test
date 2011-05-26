@@ -1,0 +1,34 @@
+//
+// Code before fusion
+//
+void loop_fusion06(int a[100], int b[100])
+{
+   int i, j;
+   
+   // This loop is parallel
+   // if we fuse we'll lose parallelism !
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+   
+   /* This loop is not parallel !! */
+   for(i = 0; i <= 99; i += 1)
+      a[i] += a[i-1];
+}
+//
+// Code after fusion
+//
+void loop_fusion06(int a[100], int b[100])
+{
+   int i, j;
+   
+   // This loop is parallel
+   // if we fuse we'll lose parallelism !
+#pragma omp parallel for 
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+   
+   /* This loop is not parallel !! */
+   for(i = 0; i <= 99; i += 1)
+      a[i] += a[i-1];
+}

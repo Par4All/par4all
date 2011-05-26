@@ -1,0 +1,6 @@
+delete regions
+create regions regions.c
+activate MUST_REGIONS
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[%ALLFUNC]
+close

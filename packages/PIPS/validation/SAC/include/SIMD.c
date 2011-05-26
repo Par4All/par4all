@@ -1,5 +1,11 @@
 #define LOGICAL int
 #define DMAX(A,B) (A)>(B)?(A):(B)
+void SIMD_SHUFFLE_V4SF(float a[4], float b [4], int p0, int p1, int p2, int p3) {
+    a[p0]=b[0];
+    a[p1]=b[1];
+    a[p2]=b[2];
+    a[p3]=b[3];
+}
 void SIMD_LOAD_BROADCAST_V4SF(float a[4],float f)
 {
     a[0]=f;
@@ -12,6 +18,13 @@ void SIMD_LOAD_BROADCAST_V2DF(double a[2],double d)
     a[0]=d;
     a[1]=d;
 } 
+void SIMD_LOAD_V4HI_TO_V4SF(float a[4], unsigned int b[4])
+{
+    a[0]=b[0];
+    a[1]=b[1];
+    a[2]=b[2];
+    a[3]=b[3];
+}
 void SIMD_LOAD_V4SI_TO_V4SF(float a[4], int b[4])
 {
     a[0]=b[0];
@@ -477,6 +490,16 @@ SIMD_DIVW (short DEST[8], short SRC1[8], short SRC2[8])
     DEST[7] = SRC1[7] / SRC2[7];
 }
 
+void SIMD_LOAD_BROADCAST_V8HI(short vec[8], short val) {
+    vec[0] = val;
+    vec[1] = val;
+    vec[2] = val;
+    vec[3] = val;
+    vec[4] = val;
+    vec[5] = val;
+    vec[6] = val;
+    vec[7] = val;
+}
 void
 SIMD_LOAD_GENERIC_V8HI(short VEC[8], short BASE0, short BASE1, short BASE2, short BASE3, short BASE4, short BASE5, short BASE6, short BASE7)
 {  

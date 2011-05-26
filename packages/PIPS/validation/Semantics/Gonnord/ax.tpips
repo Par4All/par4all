@@ -1,0 +1,23 @@
+setenv WS=ax
+
+delete $WS
+#shell rm -f $WS.foo.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+shell echo "#include \"assert.h\"" >$WS.foo.c
+shell echo "#define assume(c) assert(c)" >>$WS.foo.c
+shell cat $WS.c >>$WS.foo.c
+
+create $WS $WS.foo.c
+
+# Transformer lists are necessary for this simple case 
+# setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+close
+delete $WS
+shell rm -f $WS.foo.c
+quit

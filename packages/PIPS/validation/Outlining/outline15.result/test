@@ -1,4 +1,4 @@
-void kernel(int H, int R, _int W, float *sum_0, size_t x, size_t y, float Kernel[R], float Src[W][H])
+void kernel(int H, int R, _int W, float sum_0[1], size_t x, size_t y, float Kernel[R], float Src[W][H])
 {
    //PIPS generated variable
    size_t k;

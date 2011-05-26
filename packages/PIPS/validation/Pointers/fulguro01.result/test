@@ -49,7 +49,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 //             <may be written>: stderr[0]
 //             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
-      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
       return FLGR_RET_NULL_OBJECT;
    }
 //             <    is read   >: data1 datdest
@@ -122,7 +122,7 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
 //             <may be written>: stderr[0]
 //             <    is read   >: __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
-   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
    return FLGR_RET_TYPE_UNKNOWN;
 }
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
@@ -189,268 +189,303 @@ static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 
 POINTS TO
 
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-)}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-)}
 void flgr1d_arith_add_fgINT32(FLGR_Data1D *datdest, FLGR_Data1D *data1, FLGR_Data1D *data2)
 {
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-)}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-)}
    int j;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-)}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-)}
    fgINT32 *psrc1 = (fgINT32 *) data1->array;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-)}
    fgINT32 *psrc2 = (fgINT32 *) data2->array;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc2,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 *pdest = (fgINT32 *) datdest->array;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 v1;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 v2;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    fgINT32 result;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    int spp = datdest->spp;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    int length = datdest->length*spp;
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    for(j = 0; j <= length-1; j += 1) {
-//  points to = {}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       v1 = flgr1d_get_data_array_fgINT32(psrc1, j);
-//  points to = {}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       v2 = flgr1d_get_data_array_fgINT32(psrc2, j);
-//  points to = {}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       result = flgr_defop_add_fgINT32(v1, v2);
-//  points to = {}
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
       flgr1d_set_data_array_fgINT32(pdest, j, result);
    }
-//  {(data1,_data1_2,-Exact-);(data2,_data2_3,-Exact-);(datdest,
-//   _datdest_1,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
+//  {(data1,_data1_2[0],-Exact-);(data2,_data2_3[0],-Exact-);(datdest,
+//   _datdest_1[0],-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b0,
 //   -Exact-);(psrc1,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-);(psrc2,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    return;
 }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
 FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    FLGR_Ret ret;
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest==(void *) 0||data1==(void *) 0||data2==(void *) 0) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
-      fprintf(stderr, "ERROR: File %s, Line %d, Function : ""Null objects!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
+      fprintf(stderr, "Null objects!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5102);
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_NULL_OBJECT;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if ((ret = flgr2d_is_data_same_attributes(datdest, data1))!=FLGR_RET_OK)
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return ret;
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if ((ret = flgr2d_is_data_same_attributes(data2, data1))!=FLGR_RET_OK)
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return ret;
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
 
    if (datdest->type==FLGR_BIT) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgBIT(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_UINT8) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgUINT8(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_UINT16) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgUINT16(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_UINT32) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgUINT32(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_INT8) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgINT8(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_INT16) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgINT16(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_INT32) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgINT32(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_FLOAT32) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgFLOAT32(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    if (datdest->type==FLGR_FLOAT64) {
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
       return FLGR_RET_OK;
    }
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
-   fprintf(stderr, "ERROR: File %s, Line %d, Function : ""type <%s> unknown!\n", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
-//  {(data1,_data1_5,-Exact-);(data2,_data2_6,-Exact-);(datdest,
-//   _datdest_4,-Exact-)}
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
+   fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
+//  {(data1,_data1_5[0],-Exact-);(data2,_data2_6[0],-Exact-);(datdest,
+//   _datdest_4[0],-Exact-)}
    return FLGR_RET_TYPE_UNKNOWN;
 }
-//  {(f1,_f1_7,-Exact-);(f2,_f2_8,-Exact-);(f3,_f3_9,-Exact-)}
+//  {(f1,_f1_7[0],-Exact-);(f2,_f2_8[0],-Exact-);(f3,_f3_9[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgBIT(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_10,-Exact-);(f2,_f2_11,-Exact-);(f3,_f3_12,-Exact-)}
+//  {(f1,_f1_10[0],-Exact-);(f2,_f2_11[0],-Exact-);(f3,_f3_12[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgFLOAT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_13,-Exact-);(f2,_f2_14,-Exact-);(f3,_f3_15,-Exact-)}
+//  {(f1,_f1_13[0],-Exact-);(f2,_f2_14[0],-Exact-);(f3,_f3_15[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgFLOAT64(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_16,-Exact-);(f2,_f2_17,-Exact-);(f3,_f3_18,-Exact-)}
+//  {(f1,_f1_16[0],-Exact-);(f2,_f2_17[0],-Exact-);(f3,_f3_18[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-)}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-)}
 void flgr2d_arith_add_fgINT32(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D *data2)
 {
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-)}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-)}
    FLGR_Data1D **pdest = datdest->row;
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    FLGR_Data1D **p1 = data1->row;
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,
-//   -Exact-);(pdest,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    FLGR_Data1D **p2 = data2->row;
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    int i;
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    i = 0;
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    while (i<data1->size_y) {
-//  points to = {}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
       flgr1d_arith_add_fgINT32(*pdest, *p1, *p2);
-//  points to = {}
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
       i++, pdest++, p1++, p2++;
    }
-//  {(data1,_data1_20,-Exact-);(data2,_data2_21,-Exact-);(datdest,
-//   _datdest_19,-Exact-);(p1,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
+//  {(data1,_data1_20[0],-Exact-);(data2,_data2_21[0],
+//   -Exact-);(datdest,_datdest_19[0],-Exact-);(p1,
+//   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(p2,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(pdest,
 //   *ANY_MODULE*:*ANYWHERE*_b1,-Exact-)}
    return;
 }
-//  {(f1,_f1_22,-Exact-);(f2,_f2_23,-Exact-);(f3,_f3_24,-Exact-)}
+//  {(f1,_f1_22[0],-Exact-);(f2,_f2_23[0],-Exact-);(f3,_f3_24[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_25,-Exact-);(f2,_f2_26,-Exact-);(f3,_f3_27,-Exact-)}
+//  {(f1,_f1_25[0],-Exact-);(f2,_f2_26[0],-Exact-);(f3,_f3_27[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgUINT16(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_28,-Exact-);(f2,_f2_29,-Exact-);(f3,_f3_30,-Exact-)}
+//  {(f1,_f1_28[0],-Exact-);(f2,_f2_29[0],-Exact-);(f3,_f3_30[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgUINT32(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_31,-Exact-);(f2,_f2_32,-Exact-);(f3,_f3_33,-Exact-)}
+//  {(f1,_f1_31[0],-Exact-);(f2,_f2_32[0],-Exact-);(f3,_f3_33[0],
+//   -Exact-)}
 int flgr2d_arith_add_fgUINT8(FLGR_Data2D *f1, FLGR_Data2D *f2, FLGR_Data2D *f3)
 {
 }
-//  {(f1,_f1_34,-Exact-);(f2,_f2_35,-Exact-)}
+//  {(f1,_f1_34[0],-Exact-);(f2,_f2_35[0],-Exact-)}
 int flgr2d_is_data_same_attributes(FLGR_Data2D *f1, FLGR_Data2D *f2)
 {
 }
@@ -458,33 +493,33 @@ int flgr2d_is_data_same_attributes(FLGR_Data2D *f1, FLGR_Data2D *f2)
 int flgr_get_type_string(enum FLGR_TYPE f1)
 {
 }
-//  {(array,_array_36,-Exact-)}
+//  {(array,_array_36[0],-Exact-)}
 static fgINT32 flgr1d_get_data_array_fgINT32(fgINT32 *array, int pos)
 {
-//  {(array,_array_36,-Exact-)}
+//  {(array,_array_36[0],-Exact-)}
    return flgr_get_array_fgINT32(array, pos);
 }
-//  {(array,_array_37,-Exact-)}
+//  {(array,_array_37[0],-Exact-)}
 static void flgr1d_set_data_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
-//  {(array,_array_37,-Exact-)}
+//  {(array,_array_37[0],-Exact-)}
    flgr_set_array_fgINT32(array, pos, value);
 }
 //  {}
 static fgINT32 flgr_defop_add_fgINT32(fgINT32 a, fgINT32 b)
 {
-//  points to = {}
+//  {}
    return a+b;
 }
-//  {(array,_array_38,-Exact-)}
+//  {(array,_array_38[0],-Exact-)}
 static fgINT32 flgr_get_array_fgINT32(fgINT32 *array, int pos)
 {
-//  {(array,_array_38,-Exact-)}
+//  {(array,_array_38[0],-Exact-)}
    return array[pos];
 }
-//  {(array,_array_39,-Exact-)}
+//  {(array,_array_39[0],-Exact-)}
 static void flgr_set_array_fgINT32(fgINT32 *array, int pos, fgINT32 value)
 {
-//  {(array,_array_39,-Exact-)}
+//  {(array,_array_39[0],-Exact-)}
    array[pos] = value;
 }

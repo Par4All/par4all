@@ -24,8 +24,8 @@ Request: build resource CALLGRAPH_FILE for module FOO01.
                                  building   CALLEES(FOO03)
   CONTROLIZER                    building   CODE(FOO03)
 resource CALLGRAPH_FILE[FOO01] is in 'required' status since 1
-resource CALLGRAPH_FILE[FOO02] is in 'required' status since 5
-resource CALLGRAPH_FILE[FOO03] is in 'required' status since 8
+resource CALLGRAPH_FILE[FOO02] is in 'required' status since 9
+resource CALLGRAPH_FILE[FOO03] is in 'required' status since 15
 user error in rmake: recursion on resource CALLGRAPH_FILE of FOO01
 user warning in safe_do_something: Request aborted in pipsmake: build resource CALLGRAPH_FILE for module FOO01.
 user error in display_a_resource: Cannot build view file CALLGRAPH_FILE

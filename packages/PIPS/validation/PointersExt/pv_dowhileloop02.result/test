@@ -28,21 +28,21 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i = 0;
-//  points to = {}
+//  {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (int *) malloc(10*sizeof(int));
-//  {(p,*HEAP*_l_7,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-)}
    do {
-//  points to = {}
+//  {(p,*HEAP*_l_7[0],-Exact-)}
       p[i] = i;
-//  points to = {}
+//  {(p,*HEAP*_l_7[0],-Exact-)}
       i++;
    }
    while (i<10);
-//  {(p,*HEAP*_l_7,-Exact-)}
+//  {(p,*HEAP*_l_7[0],-Exact-)}
    return 0;
 }

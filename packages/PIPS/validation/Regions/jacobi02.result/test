@@ -317,8 +317,8 @@ void get_data(char filename[])
          space[i][j] = 0;
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 1<=nx, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -329,8 +329,8 @@ void get_data(char filename[])
    for(j = 0; j <= ny-1; j += 1)
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 1<=nx}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 1<=nx}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -1010,8 +1010,8 @@ void get_data(char filename[])
    p4a_kernel_launcher_get_data(space);
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 1<=nx, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -1022,8 +1022,8 @@ void get_data(char filename[])
    for(j = 0; j <= ny-1; j += 1)
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 1<=nx}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 1<=nx}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -1583,7 +1583,7 @@ void get_data(char filename[])
    /* Erase the memory, in case the image is not big enough: */
    p4a_kernel_launcher_get_data(space);
 
-//  <fp[PHI1]-OUT-MAY-{PHI1==0}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-OUT-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=PHI2, PHI2<=500, PHI2+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
@@ -1592,7 +1592,7 @@ void get_data(char filename[])
    /* Read the pixel grey value: */
    for(j = 0; j <= ny-1; j += 1)
 
-//  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <fp[PHI1]-OUT-MAY-{PHI1==0, 0<=j, j+1<=ny, 1<=nx}>
 //  <space[PHI1][PHI2]-OUT-MAY-{PHI2==j, 0<=PHI1, PHI1<=500,
 //    PHI1+1<=nx, 0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{0<=j, j+1<=ny}>

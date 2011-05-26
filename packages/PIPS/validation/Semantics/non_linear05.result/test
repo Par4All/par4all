@@ -52,7 +52,7 @@ C  T(NX2NY2) {}
 C (0,6)
       NX2NY2 = NX2*NY2                                                  0024
 
-C  T(I,J,KSP,L) {2<=I}
+C  T(I,J,KSP,L) {2<=I, I<=NX1}
 
 C (0,7)
 
@@ -68,7 +68,7 @@ C  T() {}
 C (0,9)
          Q1 = 0.D0                                                      0027
 
-C  T(J,KSP,L) {2<=J}
+C  T(J,KSP,L) {2<=J, J<=NY1}
 
 C (0,10)
          DO 200 J = 2, NY1                                              0028
@@ -93,7 +93,7 @@ C  T(L) {}
 C (0,14)
             L = I+(J-1)*NX2                                             0031
 
-C  T(KSP) {1<=KSP}
+C  T(KSP) {1<=KSP, KSP<=NSP}
 
 C (0,15)
             DO 200 KSP = 1, NSP                                         0032

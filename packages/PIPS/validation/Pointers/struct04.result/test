@@ -24,14 +24,14 @@ POINTS-TO
 //  {}
 int struct04()
 {
-//  points to = {}
+//  {}
    struct one {
       int first;
       int second;
    } x;
-//  points to = {}
+//  {}
    int y[10];
-//  points to = {}
+//  {}
    
    //  x.first = 1;
    //x.second = 2;

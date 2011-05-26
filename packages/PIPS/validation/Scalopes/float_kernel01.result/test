@@ -39,7 +39,7 @@ void P4A_scmp_dealloc(void *dest)
 void * P4A_scmp_flow(void **flow)
 {
 }
-void P4A_scmp_kernel_0(float a[100], int b[100], int *j_0)
+void P4A_scmp_kernel_0(float a[100], int b[100], int j_0[1])
 {
    //PIPS generated variable
    int i, j;

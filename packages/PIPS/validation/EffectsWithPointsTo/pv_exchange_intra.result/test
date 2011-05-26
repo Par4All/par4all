@@ -1,0 +1,113 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p, *q, *r;
+   int a, b, c;
+//             <    is written>: p
+
+   p = &a;
+//             <    is written>: q
+   q = &b;
+//             <    is read   >: q
+//             <    is written>: r
+
+   r = q;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is read   >: r
+//             <    is written>: p
+   p = r;
+//             <    is read   >: NULL
+//             <    is written>: r
+   r = (int *) NULL;
+
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *p, *q, *r;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   int a, b, c;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+
+   p = &a;
+//  {(p,a,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = &b;
+//  {(p,a,-Exact-);(q,b,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+
+   r = q;
+//  {(p,a,-Exact-);(q,b,-Exact-);(r,b,-Exact-)}
+   q = p;
+//  {(p,a,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+   p = r;
+//  {(p,b,-Exact-);(q,a,-Exact-);(r,b,-Exact-)}
+   r = (int *) NULL;
+//  {(p,b,-Exact-);(q,a,-Exact-);(r,*NULL_POINTER*,-Exact-)}
+
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *p, *q, *r;
+   int a, b, c;
+//             <    is written>: p
+
+   p = &a;
+//             <    is written>: q
+   q = &b;
+//             <    is read   >: q
+//             <    is written>: r
+
+   r = q;
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is read   >: r
+//             <    is written>: p
+   p = r;
+//             <    is read   >: NULL
+//             <    is written>: r
+   r = (int *) NULL;
+
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 12 with conflicts
+		from <r-R-EXACT> to <r-W-EXACT>
+	10 --> 11 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	09 --> 12 with conflicts
+		from <r-W-EXACT> to <r-W-EXACT>
+	09 --> 11 with conflicts
+		from <r-W-EXACT> to <r-R-EXACT>
+	09 --> 10 with conflicts
+		from <q-R-EXACT> to <q-W-EXACT>
+	07 --> 10 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+	07 --> 09 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	06 --> 11 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+	06 --> 10 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

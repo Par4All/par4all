@@ -1,66 +1,98 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int i;
+   int *p;
+   int **q;
+//             <    is written>: p
+
+   p = 0;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   **q = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   *q = &i;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
-   int i;                                                               /*0007*/
-//  points to = {}
-   int *p;                                                              /*0008*/
+//  {}
+   int i;
+//  {}
+   int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
-   int **q;                                                             /*0009*/
+   int **q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
-   p = 0;                                                               /*0011*/
+   p = 0;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   **q = 0;                                                             /*0012*/
+   **q = 0;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
-   *p = 1;                                                              /*0014*/
+   *p = 1;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
-   *q = &i;                                                             /*0015*/
+   *q = &i;
 //  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
 //   -Exact-);(q,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
 
-   return 0;                                                            /*0017*/
+   return 0;
 }
+
+PROPER  EFFECTS WITH POINTS TO
+
 int main()
 {
-   int i;                                                               /*0007*/
-   int *p;                                                              /*0008*/
-   int **q;                                                             /*0009*/
+   int i;
+   int *p;
+   int **q;
 //             <    is written>: p
 
-   p = 0;                                                               /*0011*/
+   p = 0;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-   **q = 0;                                                             /*0012*/
+   **q = 0;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is written>: *NULL_POINTER*
 
-   *p = 1;                                                              /*0014*/
+   *p = 1;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: q
-   *q = &i;                                                             /*0015*/
+   *q = &i;
 
-   return 0;                                                            /*0017*/
+   return 0;
 }
 
  *********************** Use-Def Chains *********************
 
 	14 --> 15 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 15 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 15 with conflicts
 		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	11 --> 14 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <p-W-EXACT> to <p-R-EXACT>
 	11 --> 12 with conflicts
 		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>

@@ -1,1 +1,0 @@
-../PointerValues/pv_decl06.c

@@ -19,15 +19,15 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    mystruct s;
-//  points to = {}
+//  {}
 
    s.champ1 = 3;
-//  points to = {}
+//  {}
    s.champ2 = 4;
-//  points to = {}
+//  {}
    decl04(s);
-//  points to = {}
+//  {}
    return 0;
 }

@@ -1,5 +1,5 @@
 from __future__ import with_statement # this is to work with python2.5
-from pyps import workspace, module, backendCompiler
+from pyps import workspace, module
 from os import system
 
 with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as w:
@@ -46,7 +46,8 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 		t.coarse_grain_parallelization()
 		# great ! OMP pragmas
 		t.display()
-		(rc,out,err)=w.compile_and_run(backendCompiler(CFLAGS='-g -O2 -fopenmp', args=["include/input.pgm","include/mapfile.amp", "/dev/null"]))
+		o=w.compile()
+		w.run(o, args=["include/input.pgm","include/mapfile.amp", "/dev/null"])
 
 		w.props.constant_path_effects=False
 		lbl=t.loops(0).loops(0).label
@@ -58,5 +59,5 @@ with workspace("silber.c","include/adds.c",verbose=False,deleteOnClose=True) as 
 
 		t.run(["sed","s/current/voltage/g"])
 		t.display()
-		a_out=w.compile(backendCompiler(CC="gcc"))
+		a_out=w.compile()
 		#a_out

@@ -1,10 +1,39 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a, *b, c, d, i;
+//             <    is written>: c
+   c = 0;
+//             <    is written>: d
+   d = 1;
+//             <    is written>: i
+   i = 2;
+//             <    is written>: b
+   b = &c;
+//             <    is read   >: i
+   do {
+//             <    is read   >: i
+//             <    is written>: i
+      i = i+1;
+//             <    is read   >: b
+//             <    is written>: a
+      a = b;
+//             <    is written>: b
+      b = &d;
+   }
+   while (i<5);
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *a, *b, c, d, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -20,11 +49,11 @@ int main()
    b = &c;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,c,-Exact-)}
    do {
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       i = i+1;
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       a = b;
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       b = &d;
    }
    while (i<5);

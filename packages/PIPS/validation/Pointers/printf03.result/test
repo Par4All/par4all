@@ -26,19 +26,19 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i = 5;
-//  points to = {}
+//  {}
    int j = 6;
-//  points to = {}
+//  {}
    float x;
-//  points to = {}
+//  {}
    double y[10];
-//  points to = {}
+//  {}
    char *fmt = "i=%d, %d, %f\n";
-//  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fmt,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
 
    y[0] = 0.;
-//  {(fmt,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(fmt,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    printf(fmt, i, i+j, x);
 }

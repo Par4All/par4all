@@ -1,0 +1,24 @@
+delete pragma02
+
+setproperty ABORT_ON_USER_ERROR
+
+create pragma02 pragma02.c
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlized code
+echo
+
+#setenv CONTROL_DEBUG_LEVEL=8
+activate NEW_CONTROLIZER
+
+display PRINTED_FILE[main]
+
+close
+quit

@@ -1,10 +1,21 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p;
+//             <    is written>: p
+   p = (void *) 0;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    p = (void *) 0;

@@ -1,0 +1,42 @@
+delete S124
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create S124 S124.f
+
+echo
+echo Transformers for "S124"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[S124]
+
+echo
+echo Preconditions for "S124"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[S124]
+# display PRINTED_FILE[S124]
+
+echo
+echo Induction variable substitution for "S124"
+echo
+
+
+apply INDUCTION_SUBSTITUTION[S124]
+activate PRINT_CODE
+display PRINTED_FILE[S124]
+
+echo
+echo Parallelization of "S124"
+echo
+
+
+apply PRIVATIZE_MODULE[S124]
+apply COARSE_GRAIN_PARALLELIZATION[S124]
+display PRINTED_FILE[S124]
+#display PARALLELPRINTED_FILE[S124]
+#apply PRINT_PARALLELIZED77_CODE[S124]
+
+quit

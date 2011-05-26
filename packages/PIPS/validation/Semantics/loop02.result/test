@@ -14,7 +14,7 @@ C     body.
  
       REAL FC(2)
 
-C  T(R,T) {RMIN<=R}
+C  T(R,T) {R<=RMAX, RMIN<=R}
 
 
       DO 4 R = RMIN, RMAX                                               0014
@@ -32,7 +32,7 @@ C  T() {}
 
 4           CONTINUE                                                    0018
 
-C  T(T) {1<=T}
+C  T(T) {T<=N, 1<=T}
 
 
       DO T = 1, N                                                       0020
@@ -42,7 +42,7 @@ C  T() {}
          FC(I) = WLOOP(I,I)                                             0021
       ENDDO
 
-C  T(T) {1<=T}
+C  T(T) {1<=T, T<=2}
 
 
       DO T = 1, 2                                                       0024

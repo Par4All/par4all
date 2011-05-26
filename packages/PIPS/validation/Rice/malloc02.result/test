@@ -1,0 +1,280 @@
+
+Controlizer output
+
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+      *p[i] = i;                                                        /*0012*/
+   }
+
+   i = 0;
+   while (i<10) {
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+      p[i] = &i;                                                        /*0017*/
+      i++;
+   }
+}
+
+Preconditions
+
+
+//  P() {}
+
+void malloc02()
+{
+
+//  P() {}
+
+   int *p[10];                                                          /*0007*/
+
+//  P() {}
+
+   int i;                                                               /*0008*/
+
+//  P(i) {}
+
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+
+//  P(i) {0<=i, i<=9}
+
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+
+//  P(i) {0<=i, i<=9}
+
+      *p[i] = i;                                                        /*0012*/
+   }
+
+//  P(i) {i==10}
+
+
+   i = 0;
+
+//  P(i) {i==0}
+
+   while (i<10) {
+
+//  P(i) {i<=9}
+
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+
+//  P(i) {i<=9}
+
+      p[i] = &i;                                                        /*0017*/
+
+//  P(i) {i<=9}
+
+      i++;
+   }
+}
+
+Proper effects
+
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+//             <    is written>: i
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i p[i]
+      *p[i] = i;                                                        /*0012*/
+   }
+//             <    is written>: i
+
+   i = 0;
+//             <    is read   >: i
+   while (i<10) {
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p[i] _MALLOC_EFFECTS:_MALLOC_
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+//             <    is read   >: i
+//             <    is written>: p[i]
+      p[i] = &i;                                                        /*0017*/
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+}
+
+Cumulated effects
+
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+//             <may be read   >: i p[*] _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               _MALLOC_EFFECTS:_MALLOC_
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+//             <may be written>: p[*]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+//             <may be read   >: p[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i
+      *p[i] = i;                                                        /*0012*/
+   }
+//             <    is written>: i
+
+   i = 0;
+//             <may be read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <may be written>: i p[*] _MALLOC_EFFECTS:_MALLOC_
+//             <    is read   >: i
+   while (i<10) {
+//             <may be written>: p[*]
+//             <    is read   >: i _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+//             <may be written>: p[*]
+//             <    is read   >: i
+      p[i] = &i;                                                        /*0017*/
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+}
+
+Regions
+
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+
+//  <p[PHI1]-R-EXACT-{0<=PHI1, PHI1<=9}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+
+//  <p[PHI1]-R-EXACT-{PHI1==i, 0<=i, i<=9}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      *p[i] = i;                                                        /*0012*/
+   }
+
+   i = 0;
+
+//  <p[PHI1]-W-MAY-{PHI1<=9, i<=9}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
+
+   while (i<10) {
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, i<=9}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+
+//  <p[PHI1]-W-EXACT-{PHI1==i, i<=9}>
+
+      p[i] = &i;                                                        /*0017*/
+      i++;
+   }
+}
+
+ **************** Effective Dependence Graph ****************
+
+	12 --> 12 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY> at levels  1
+	12 --> 12 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p[i]-R-EXACT> at levels  1
+	12 --> 12 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT> at levels  1
+	12 --> 12 with conflicts
+		from <p[i]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY> at levels  1
+	12 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p[i]-W-EXACT> at levels  1
+	12 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
+	12 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT> at levels  1
+	12 --> 11 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> at levels  1
+	11 --> 12 with conflicts
+		from <p[i]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY> at levels  1 2
+	11 --> 12 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY> at levels  1 2
+	11 --> 12 with conflicts
+		from <p[i]-W-EXACT> to <p[i]-R-EXACT> at levels  2
+	11 --> 12 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY> at levels  1 2
+	11 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
+	11 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> at levels  1
+	11 --> 11 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> at levels  1
+
+****************** End of Dependence Graph ******************
+
+Parallelization
+
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+      *p[i] = i;                                                        /*0012*/
+   }
+
+   i = 0;
+   while (i<10) {
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+      p[i] = &i;                                                        /*0017*/
+      i++;
+   }
+}
+
+Parallelization in Fortran (if one of the resources can be made obsolete)
+
+void malloc02()
+{
+   int *p[10];                                                          /*0007*/
+   int i;                                                               /*0008*/
+
+   for(i = 0; i <= 9; i += 1) {                                         /*0010*/
+      p[i] = malloc(sizeof(int));                                       /*0011*/
+      *p[i] = i;                                                        /*0012*/
+   }
+
+   i = 0;
+   while (i<10) {
+      p[i] = malloc(sizeof(int));                                       /*0016*/
+      p[i] = &i;                                                        /*0017*/
+      i++;
+   }
+}
+

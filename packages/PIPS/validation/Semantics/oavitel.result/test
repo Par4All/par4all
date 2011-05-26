@@ -112,7 +112,7 @@ C  T() {}
 
       GRD(IFAC,3) = DM1*A3+DM2*A6                                       0038
 
-C  T(IFAC,J) {IFAC#init+J==IFAC+2}
+C  T(IFAC,J) {IFAC#init+J==IFAC+2, 2<=J, J<=JM1O2M1}
 
 C
       DO 19 J = 2, JM1O2M1                                              0040
@@ -369,7 +369,7 @@ C  T() {}
 
       GRD(IFAC,3) = DM1*A3+DM2*A6                                       0115
 
-C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J}
+C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J, JM1O2P3<=J, J<=JMFM1}
 
 C
       DO 18 J = JM1O2P3, JMFM1                                          0117
@@ -540,7 +540,7 @@ C  T() {}
 
       GRD(IFAC,3) = DM1*A3+DM2*A6                                       0166
 
-C  T(I,IFAC,IM1,IP1,J,JM1,JP1) {}
+C  T(I,IFAC,IM1,IP1,J,JM1,JP1) {2<=I, I<=IMFM1}
 
 C
       DO 39 I = 2, IMFM1                                                0168
@@ -626,7 +626,7 @@ C  T() {}
 
          GRD(IFAC,3) = DM1*A3+DM2*A6                                    0192
 
-C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC#init+J==IFAC+2}
+C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC#init+J==IFAC+2, 2<=J, J<=JM1O2M1}
 
 C
 C POINT COURANT
@@ -901,7 +901,8 @@ C  T() {}
 
          GRD(IFAC,3) = DM1*A3+DM2*A6                                    0275
 
-C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC+JM1O2P3==IFAC#init+J}
+C  T(IFAC,IM1,IP1,J,JM1,JP1) {IFAC+JM1O2P3==IFAC#init+J, JM1O2P3<=J,
+C    J<=JMFM1}
 
 C
          DO 28 J = JM1O2P3, JMFM1                                       0277
@@ -1174,7 +1175,7 @@ C  T() {}
 
       GRD(IFAC,3) = DM1*A3+DM2*A6                                       0356
 
-C  T(IFAC,J) {IFAC#init+J==IFAC+2}
+C  T(IFAC,J) {IFAC#init+J==IFAC+2, 2<=J, J<=JM1O2M1}
 
 C
       DO 49 J = 2, JM1O2M1                                              0358
@@ -1431,7 +1432,7 @@ C  T() {}
 
       GRD(IFAC,3) = DM1*A3+DM2*A6                                       0433
 
-C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J}
+C  T(IFAC,J) {IFAC+JM1O2P3==IFAC#init+J, JM1O2P3<=J, J<=JMFM1}
 
 C
       DO 48 J = JM1O2P3, JMFM1                                          0435

@@ -1,0 +1,27 @@
+void another_func()
+{
+   int tv = 10;
+   int k, n = 10;
+   int some_array[n][n];
+   
+   
+kernel:   kernel(n, some_array);
+}
+void kernel(int n, int some_array[n][n])
+{
+   //PIPS generated variable
+   int k;
+   
+   
+kernel:
+   for(k = 0; k <= n-1; k += 1)
+      my_func(n, some_array[n]);
+}
+int main()
+{
+   another_func();
+   return 1;
+}
+void my_func(int toto, int titi[toto])
+{
+}

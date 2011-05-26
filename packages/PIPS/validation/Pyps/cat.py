@@ -4,17 +4,16 @@ from subprocess import call
 from os import remove
 from shutil import rmtree
 
-with workspace("cat.c",deleteOnClose=True) as w:
+with workspace("cat.c",deleteOnClose=False) as w:
 	w.fun.main.display()
-	binary=w.compile(backendCompiler(CC="gcc",rep="toto"))
-	call("./"+binary)
-	rmtree("toto")
+	binary=w.compile()
+	call(binary)
 	
 	w.fun.main.run(["sed","-e",'s/cats/dogs/'])
 	w.fun.main.display()
-	(rc,out,err) = w.compile_and_run(backendCompiler(CC="gcc",rep="toto"))
-	print out,err
-	rmtree("toto")
+	w.compile(rule="mrproper")
+	binary = w.compile()
+	call(binary)
 
 
 

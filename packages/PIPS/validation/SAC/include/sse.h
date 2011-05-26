@@ -9,6 +9,8 @@
 #define SIMD_MULPS(vec1,vec2,vec3) vec1=_mm_mul_ps(vec2,vec3)
 #define SIMD_ADDPS(vec1,vec2,vec3) vec1=_mm_add_ps(vec2,vec3)
 #define SIMD_STORE_V4SF(vec,arr) _mm_storeu_ps(arr,vec)
+#define SIMD_LOAD_BROADCAST_V4SF(vec,val) vec=_mm_set1_ps(val)
+#define SIMD_SHUFFLE_V4SF(dist,src,i0,i1,i2,i3) dist=_mm_shuffle_ps(src,src,_MM_SHUFFLE(i3,i2,i1,i0))
 #define SIMD_STORE_GENERIC_V4SF(vec,v0,v1,v2,v3) \
 do { \
     float __tmp[4]; \

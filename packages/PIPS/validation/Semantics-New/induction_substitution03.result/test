@@ -34,7 +34,7 @@ int induction03(int a)
 
    scanf("%d", &a);
 
-//  T(a,b,j) {a==a#init, 1<=j}
+//  T(a,b,j) {a==a#init, 1<=j, j<=9}
 
 
    for(j = 1; j <= 9; j += 1) {

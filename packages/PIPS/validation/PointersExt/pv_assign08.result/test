@@ -15,10 +15,10 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *a;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    a = foo();
-//  {(a,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(a,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    return 0;
 }

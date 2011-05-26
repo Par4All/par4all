@@ -13,12 +13,12 @@ C     To understand results for nga01 better: what do transformers show?
 
       READ *, N, M                                                      0008
 
-C  T(I,J) {K<=I}
+C  T(I,J) {K<=I, I<=L}
 
 
       DO I = K, L                                                       0010
 
-C  T(J) {1<=J}
+C  T(J) {1<=J, J<=M}
 
          DO J = 1, M                                                    0011
 

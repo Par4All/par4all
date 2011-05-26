@@ -1,0 +1,91 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   float t;
+   float a;
+//             <    is written>: t
+
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
+//             <    is read   >: a t
+//             <    is written>: a
+      a = a+t*0, 5;
+//             <    is read   >: t
+//             <    is written>: t
+      t += 0, 01;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   float t;
+//  {}
+   float a;
+//  {}
+
+   t = 1.0;
+//  {}
+   while (t<2.0) {
+//  {}
+      a = a+t*0, 5;
+//  {}
+      t += 0, 01;
+   }
+//  {}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   float t;
+   float a;
+//             <    is written>: t
+
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
+//             <    is read   >: a t
+//             <    is written>: a
+      a = a+t*0, 5;
+//             <    is read   >: t
+//             <    is written>: t
+      t += 0, 01;
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> -1 with conflicts
+		from <a-W-EXACT> to <a-W-EXACT>
+		from <a-W-EXACT> to <a-R-EXACT>
+		from <a-R-EXACT> to <a-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-R-EXACT> to <t-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+
+****************** End of Dependence Graph ******************

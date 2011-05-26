@@ -8,7 +8,7 @@ activate C_PARSER
 setproperty PRETTYPRINT_LANGUAGE "C"
 setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
 
-shell cat comments.database/*/*.c|sed -e '/^# 1[^0-9][^0-9]*/d'
+shell ls comments.database/*/*.c | xargs cat | sed -e '/^# 1[^0-9][^0-9]*/d'
 
 display PRINTED_FILE[%ALL]
 quit

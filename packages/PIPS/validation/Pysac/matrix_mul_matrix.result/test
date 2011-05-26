@@ -1,45 +1,263 @@
-void matrix_mul_matrix(size_t N, float C[N][N], float A[N][N], float B[N][N])
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
 {
    size_t i, j, k;
-   for(i = 0; i <= N-1; i += 1)
-      for(j = 0; j <= N-1; j += 1) {
-         C[i][j] = 0;
-         for(k = 0; k <= N-1; k += 1)
+   for(i = 0; i <= 4*N-1; i += 1)
+      for(j = 0; j <= 4*N-1; j += 1)
+         for(k = 0; k <= 4*N-1; k += 1)
             C[i][j] += A[i][k]*B[k][j];
-      }
 }
-void matrix_mul_matrix(size_t N, float C[N][N], float A[N][N], float B[N][N])
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
 {
-   size_t j, k;
+   size_t i, j, k;
+   for(i = 0; i <= 4*N-1; i += 1)
+      for(j = 0; j <= 4*N-1; j += 1)
+         for(k = 0; k <= 4*N-1; k += 1)
+            C[i][j] += A[i][k]*B[k][j];
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
    //PIPS generated variable
-   float F_0, RED0[4], RED1[1];
+   int I_0, I_1;
    //PIPS generated variable
-   size_t i0, k0;
+   size_t i;
    //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
-   for(i0 = 0; i0 <= N-1; i0 += 1)
-      for(j = 0; j <= N-1; j += 1) {
-         C[i0][j] = 0;
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         SIMD_LOAD_V4SF(vec30_0, &RED0[0]);
-         for(k0 = 0; k0 <= 4*(N/4)-1; k0 += 4) {
+   int j, k;
+l99997:
+   for(i = 0; i <= 4*N-1; i += 1)
+l99996:
+      for(I_0 = 0; I_0 <= (4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 0; I_1 <= (4*N2-1)/4; I_1 += 1)
+l99998:
+            for(j = 4*I_0; j <= 4*I_0+3; j += 1)
+l99999:
+               for(k = 4*I_1; k <= 4*I_1+3; k += 1)
+                  C[i][j] = C[i][j]+A[i][k]*B[k][j];
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i;
+   //PIPS generated variable
+   int j, k;
+l99997:
+   for(i = 0; i <= 4*N-1; i += 1)
+l99996:
+      for(I_0 = 0; I_0 <= (4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 0; I_1 <= (4*N2-1)/4; I_1 += 1)
+l99998:
+            for(j = 4*I_0; j <= 4*I_0+3; j += 1)
+l99999:
+               for(k = 4*I_1; k <= 4*I_1+3; k += 1)
+                  C[i][j] = C[i][j]+A[i][k]*B[k][j];
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i;
+   //PIPS generated variable
+   int j, k;
+l99997:
+   for(i = 1; i <= 4*N; i += 1)
+l99996:
+      for(I_0 = 1; I_0 <= (4*N3-1)/4+1; I_0 += 1)
+l99995:
+         for(I_1 = 1; I_1 <= (4*N2-1)/4+1; I_1 += 1) {
+l99998:            ;
+            C[i-1][4*I_0+1-5] = C[i-1][4*I_0+1-5]+A[i-1][4*I_1+1-5]*B[4*I_1+1-5][4*I_0+1-5];
+            C[i-1][4*I_0+1-5] = C[i-1][4*I_0+1-5]+A[i-1][4*I_1+2-5]*B[4*I_1+2-5][4*I_0+1-5];
+            C[i-1][4*I_0+1-5] = C[i-1][4*I_0+1-5]+A[i-1][4*I_1+3-5]*B[4*I_1+3-5][4*I_0+1-5];
+            C[i-1][4*I_0+1-5] = C[i-1][4*I_0+1-5]+A[i-1][4*I_1+4-5]*B[4*I_1+4-5][4*I_0+1-5];
+            C[i-1][4*I_0+2-5] = C[i-1][4*I_0+2-5]+A[i-1][4*I_1+1-5]*B[4*I_1+1-5][4*I_0+2-5];
+            C[i-1][4*I_0+2-5] = C[i-1][4*I_0+2-5]+A[i-1][4*I_1+2-5]*B[4*I_1+2-5][4*I_0+2-5];
+            C[i-1][4*I_0+2-5] = C[i-1][4*I_0+2-5]+A[i-1][4*I_1+3-5]*B[4*I_1+3-5][4*I_0+2-5];
+            C[i-1][4*I_0+2-5] = C[i-1][4*I_0+2-5]+A[i-1][4*I_1+4-5]*B[4*I_1+4-5][4*I_0+2-5];
+            C[i-1][4*I_0+3-5] = C[i-1][4*I_0+3-5]+A[i-1][4*I_1+1-5]*B[4*I_1+1-5][4*I_0+3-5];
+            C[i-1][4*I_0+3-5] = C[i-1][4*I_0+3-5]+A[i-1][4*I_1+2-5]*B[4*I_1+2-5][4*I_0+3-5];
+            C[i-1][4*I_0+3-5] = C[i-1][4*I_0+3-5]+A[i-1][4*I_1+3-5]*B[4*I_1+3-5][4*I_0+3-5];
+            C[i-1][4*I_0+3-5] = C[i-1][4*I_0+3-5]+A[i-1][4*I_1+4-5]*B[4*I_1+4-5][4*I_0+3-5];
+            C[i-1][4*I_0+4-5] = C[i-1][4*I_0+4-5]+A[i-1][4*I_1+1-5]*B[4*I_1+1-5][4*I_0+4-5];
+            C[i-1][4*I_0+4-5] = C[i-1][4*I_0+4-5]+A[i-1][4*I_1+2-5]*B[4*I_1+2-5][4*I_0+4-5];
+            C[i-1][4*I_0+4-5] = C[i-1][4*I_0+4-5]+A[i-1][4*I_1+3-5]*B[4*I_1+3-5][4*I_0+4-5];
+            C[i-1][4*I_0+4-5] = C[i-1][4*I_0+4-5]+A[i-1][4*I_1+4-5]*B[4*I_1+4-5][4*I_0+4-5];
+         }
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   size_t i, j, k;
+   //PIPS generated variable
+   int I_0, I_1, N0 = N, N1 = N, N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i;
+   //PIPS generated variable
+   int j, k;
+l99997:
+   for(i = 1; i <= 4*N; i += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 1; I_1 <= 1+(4*N2-1)/4; I_1 += 1) {
+l99998:            ;
+            C[i-1][1+4*I_0-5] = C[i-1][1+4*I_0-5]+A[i-1][1+4*I_1-5]*B[1+4*I_1-5][1+4*I_0-5];
+            C[i-1][1+4*I_0-5] = C[i-1][1+4*I_0-5]+A[i-1][2+4*I_1-5]*B[2+4*I_1-5][1+4*I_0-5];
+            C[i-1][1+4*I_0-5] = C[i-1][1+4*I_0-5]+A[i-1][3+4*I_1-5]*B[3+4*I_1-5][1+4*I_0-5];
+            C[i-1][1+4*I_0-5] = C[i-1][1+4*I_0-5]+A[i-1][4+4*I_1-5]*B[4+4*I_1-5][1+4*I_0-5];
+            C[i-1][2+4*I_0-5] = C[i-1][2+4*I_0-5]+A[i-1][1+4*I_1-5]*B[1+4*I_1-5][2+4*I_0-5];
+            C[i-1][2+4*I_0-5] = C[i-1][2+4*I_0-5]+A[i-1][2+4*I_1-5]*B[2+4*I_1-5][2+4*I_0-5];
+            C[i-1][2+4*I_0-5] = C[i-1][2+4*I_0-5]+A[i-1][3+4*I_1-5]*B[3+4*I_1-5][2+4*I_0-5];
+            C[i-1][2+4*I_0-5] = C[i-1][2+4*I_0-5]+A[i-1][4+4*I_1-5]*B[4+4*I_1-5][2+4*I_0-5];
+            C[i-1][3+4*I_0-5] = C[i-1][3+4*I_0-5]+A[i-1][1+4*I_1-5]*B[1+4*I_1-5][3+4*I_0-5];
+            C[i-1][3+4*I_0-5] = C[i-1][3+4*I_0-5]+A[i-1][2+4*I_1-5]*B[2+4*I_1-5][3+4*I_0-5];
+            C[i-1][3+4*I_0-5] = C[i-1][3+4*I_0-5]+A[i-1][3+4*I_1-5]*B[3+4*I_1-5][3+4*I_0-5];
+            C[i-1][3+4*I_0-5] = C[i-1][3+4*I_0-5]+A[i-1][4+4*I_1-5]*B[4+4*I_1-5][3+4*I_0-5];
+            C[i-1][4+4*I_0-5] = C[i-1][4+4*I_0-5]+A[i-1][1+4*I_1-5]*B[1+4*I_1-5][4+4*I_0-5];
+            C[i-1][4+4*I_0-5] = C[i-1][4+4*I_0-5]+A[i-1][2+4*I_1-5]*B[2+4*I_1-5][4+4*I_0-5];
+            C[i-1][4+4*I_0-5] = C[i-1][4+4*I_0-5]+A[i-1][3+4*I_1-5]*B[3+4*I_1-5][4+4*I_0-5];
+            C[i-1][4+4*I_0-5] = C[i-1][4+4*I_0-5]+A[i-1][4+4*I_1-5]*B[4+4*I_1-5][4+4*I_0-5];
+         }
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i;
+   //PIPS generated variable
+   int j, k;
+l99997:
+   for(i = 1; i <= 4*N; i += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 1; I_1 <= 1+(4*N2-1)/4; I_1 += 1) {
+l99998:            ;
+            C[i-1][1+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][1+4*I_0-5], A[i-1][1+4*I_1-5], B[1+4*I_1-5][1+4*I_0-5]);
+            C[i-1][1+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][1+4*I_0-5], A[i-1][2+4*I_1-5], B[2+4*I_1-5][1+4*I_0-5]);
+            C[i-1][1+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][1+4*I_0-5], A[i-1][3+4*I_1-5], B[3+4*I_1-5][1+4*I_0-5]);
+            C[i-1][1+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][1+4*I_0-5], A[i-1][4+4*I_1-5], B[4+4*I_1-5][1+4*I_0-5]);
+            C[i-1][2+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][2+4*I_0-5], A[i-1][1+4*I_1-5], B[1+4*I_1-5][2+4*I_0-5]);
+            C[i-1][2+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][2+4*I_0-5], A[i-1][2+4*I_1-5], B[2+4*I_1-5][2+4*I_0-5]);
+            C[i-1][2+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][2+4*I_0-5], A[i-1][3+4*I_1-5], B[3+4*I_1-5][2+4*I_0-5]);
+            C[i-1][2+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][2+4*I_0-5], A[i-1][4+4*I_1-5], B[4+4*I_1-5][2+4*I_0-5]);
+            C[i-1][3+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][3+4*I_0-5], A[i-1][1+4*I_1-5], B[1+4*I_1-5][3+4*I_0-5]);
+            C[i-1][3+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][3+4*I_0-5], A[i-1][2+4*I_1-5], B[2+4*I_1-5][3+4*I_0-5]);
+            C[i-1][3+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][3+4*I_0-5], A[i-1][3+4*I_1-5], B[3+4*I_1-5][3+4*I_0-5]);
+            C[i-1][3+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][3+4*I_0-5], A[i-1][4+4*I_1-5], B[4+4*I_1-5][3+4*I_0-5]);
+            C[i-1][4+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][4+4*I_0-5], A[i-1][1+4*I_1-5], B[1+4*I_1-5][4+4*I_0-5]);
+            C[i-1][4+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][4+4*I_0-5], A[i-1][2+4*I_1-5], B[2+4*I_1-5][4+4*I_0-5]);
+            C[i-1][4+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][4+4*I_0-5], A[i-1][3+4*I_1-5], B[3+4*I_1-5][4+4*I_0-5]);
+            C[i-1][4+4*I_0-5] = __PIPS_SAC_MULADD(C[i-1][4+4*I_0-5], A[i-1][4+4*I_1-5], B[4+4*I_1-5][4+4*I_0-5]);
+         }
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i0;
+l99997:
+   for(i0 = 1; i0 <= 4*N; i0 += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 1; I_1 <= 1+(4*N2-1)/4; I_1 += 1) {
             //PIPS:SAC generated v4sf vector(s)
-            SIMD_LOAD_GENERIC_V4SF(vec20_0, B[k0][j], B[1+k0][j], B[2+k0][j], B[3+k0][j]);
-            SIMD_LOAD_V4SF(vec10_0, &A[i0][k0]);
-            SIMD_MULPS(vec00_0, vec10_0, vec20_0);
-            SIMD_ADDPS(vec30_0, vec30_0, vec00_0);
+            v4sf vec00, vec10, vec20, vec30, vec40, vec50, vec60, vec70, vec80, vec90, vec100, vec110;
+l99998:            ;
+            SIMD_LOAD_V4SF(vec20, &B[1+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec10, A[i0-1][1+4*I_1-5]);
+            SIMD_LOAD_V4SF(vec00, &C[i0-1][1+4*I_0-5]);
+            SIMD_MULADDPS(vec00, vec00, vec10, vec20);
+            SIMD_STORE_V4SF(vec00, &C[i0-1][1+4*I_0-5]);
+            SIMD_LOAD_V4SF(vec50, &B[2+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec40, A[i0-1][2+4*I_1-5]);
+            SIMD_MULADDPS(vec30, vec00, vec40, vec50);
+            SIMD_STORE_V4SF(vec30, &C[i0-1][1+4*I_0-5]);
+            SIMD_LOAD_V4SF(vec80, &B[3+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec70, A[i0-1][3+4*I_1-5]);
+            SIMD_MULADDPS(vec60, vec30, vec70, vec80);
+            SIMD_STORE_V4SF(vec60, &C[i0-1][1+4*I_0-5]);
+            SIMD_LOAD_V4SF(vec110, &B[4+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec100, A[i0-1][4+4*I_1-5]);
+            SIMD_MULADDPS(vec90, vec60, vec100, vec110);
+            SIMD_STORE_V4SF(vec90, &C[i0-1][1+4*I_0-5]);
          }
-         SIMD_STORE_V4SF(vec30_0, &RED0[0]);
-         C[i0][j] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+C[i0][j];
-         RED1[0] = 0.000000;
-         for(k = 4*(N/4); k <= N-1; k += 1) {
-            F_0 = A[i0][k]*B[k][j];
-            RED1[0] = RED1[0]+F_0;
+}
+void matrix_mul_matrix_l99997(size_t N, int N2, int N3, float A[4*N][4*N], float B[4*N][4*N], float C[4*N][4*N])
+{
+   //PIPS generated variable
+   int I_0, I_1;
+   //PIPS generated variable
+   size_t i0;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0, vec80_0, vec90_0, vec100_0, vec110_0;
+l99997:
+   for(i0 = 1; i0 <= 4*N; i0 += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(4*N3-1)/4; I_0 += 1)
+l99995:
+         for(I_1 = 1; I_1 <= 1+(4*N2-1)/4; I_1 += 1) {
+            //PIPS:SAC generated v4sf vector(s)
+            SIMD_LOAD_BROADCAST_V4SF(vec100_0, A[i0-1][4+4*I_1-5]);
+            SIMD_LOAD_V4SF(vec110_0, &B[4+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec70_0, A[i0-1][3+4*I_1-5]);
+            SIMD_LOAD_V4SF(vec80_0, &B[3+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec40_0, A[i0-1][2+4*I_1-5]);
+            SIMD_LOAD_V4SF(vec50_0, &B[2+4*I_1-5][1+4*I_0-5]);
+            SIMD_LOAD_V4SF(vec00_0, &C[i0-1][1+4*I_0-5]);
+            SIMD_LOAD_BROADCAST_V4SF(vec10_0, A[i0-1][1+4*I_1-5]);
+            SIMD_LOAD_V4SF(vec20_0, &B[1+4*I_1-5][1+4*I_0-5]);
+l99998:            ;
+            SIMD_MULADDPS(vec00_0, vec00_0, vec10_0, vec20_0);
+            SIMD_STORE_V4SF(vec00_0, &C[i0-1][1+4*I_0-5]);
+            SIMD_MULADDPS(vec30_0, vec00_0, vec40_0, vec50_0);
+            SIMD_STORE_V4SF(vec30_0, &C[i0-1][1+4*I_0-5]);
+            SIMD_MULADDPS(vec60_0, vec30_0, vec70_0, vec80_0);
+            SIMD_STORE_V4SF(vec60_0, &C[i0-1][1+4*I_0-5]);
+            SIMD_MULADDPS(vec90_0, vec60_0, vec100_0, vec110_0);
+            SIMD_STORE_V4SF(vec90_0, &C[i0-1][1+4*I_0-5]);
          }
-         C[i0][j] = RED1[0]+C[i0][j];
-      }
-   ;
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   size_t i, j, k;
+   //PIPS generated variable
+   int I_0, I_1, N0 = N, N1 = N, N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   size_t i, j, k;
+   //PIPS generated variable
+   int I_0, I_1, N0 = N, N1 = N, N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   //PIPS generated variable
+   int N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   //PIPS generated variable
+   int N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
+}
+void matrix_mul_matrix(size_t N, float C[4*N][4*N], float A[4*N][4*N], float B[4*N][4*N])
+{
+   //PIPS generated variable
+   int N2 = N, N3 = N;
+l99997:   matrix_mul_matrix_l99997(N, N2, N3, A, B, C);
 }

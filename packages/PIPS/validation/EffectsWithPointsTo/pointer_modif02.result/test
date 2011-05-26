@@ -1,10 +1,29 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *p, *q;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   foo(&q, p);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: q
+   *q = 2;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -32,6 +51,7 @@ int main()
 
    *p = 1;
 //             <    is read   >: p
+//             <    is written>: q
 
    foo(&q, p);
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -43,12 +63,15 @@ int main()
  *********************** Use-Def Chains *********************
 
 	14 --> 15 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <q-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 15 with conflicts
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
 		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
 	12 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-W-EXACT>
 		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
 
 ****************** End of Dependence Graph ******************

@@ -1,7 +1,7 @@
 C                                                                  444 (SUMMARY)
       PROGRAM DO
       REAL A(100)
-C                                                                  444 (BLOCK)
+C                                                                  444 (SEQ)
 C     BEGIN BLOCK
 C                                                                    1 (STMT)
 c
@@ -12,11 +12,11 @@ C                                                                    1 (STMT)
       Y = 82.2                                                          0006
 C                                                                  441 (DO)
       DO I = 1, 20                                                      0007
-C                                                                   22 (BLOCK)
+C                                                                   22 (SEQ)
 C        BEGIN BLOCK
 C                                                                    6 (TEST)
          IF (SIN(X).GT.1.) THEN                                         0008
-C                                                                    8 (BLOCK)
+C                                                                    8 (SEQ)
 C           BEGIN BLOCK
 C                                                                    4 (STMT)
             X = X*X                                                     0009
@@ -28,7 +28,7 @@ C                                                                    3 (STMT)
          CALL P(X)                                                      0012
 C                                                                    8 (TEST)
          IF (X.GT.Y) THEN                                               0013
-C                                                                    6 (BLOCK)
+C                                                                    6 (SEQ)
 C           BEGIN BLOCK
 C                                                                    3 (STMT)
             X = X-0.5                                                   0014
@@ -36,7 +36,7 @@ C                                                                    3 (STMT)
             Y = Y-0.1                                                   0015
 C           END BLOCK
          ELSE
-C                                                                    6 (BLOCK)
+C                                                                    6 (SEQ)
 C           BEGIN BLOCK
 C                                                                    3 (STMT)
             X = X+0.5                                                   0017

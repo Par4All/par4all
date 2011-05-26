@@ -1,0 +1,65 @@
+delete pc02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pc02 pc02.c
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Source code with preconditions
+echo
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+# Not useful in this case
+# setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo After transformer refinement
+echo
+
+apply REFINE_TRANSFORMERS[main]
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+quit
+apply UNSPLIT[%PROGRAM]
+
+
+close
+
+echo
+echo Warnings
+echo
+
+shell cat pc02.database/Warnings
+
+quit
+
+
+#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_INTERPROCEDURAL TRUE
+setproperty SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
+setproperty SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES TRUE
+
+
+
+
+setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
+setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
+

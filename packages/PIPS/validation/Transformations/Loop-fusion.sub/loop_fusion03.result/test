@@ -1,0 +1,36 @@
+//
+// Code before fusion
+//
+void loop_fusion03(int a[100][100], int b[100][100])
+{
+   int i, j;
+   int k;
+   
+   /* These loop nests can be fused together, even with the reduction on k */
+   k = 0;
+   for(i = 0; i <= 99; i += 1) {
+      for(j = 0; j <= 99; j += 1)
+         a[i][j] = i+j;
+      k += a[i][j-1];
+      for(j = 0; j <= 99; j += 1)
+         b[i][j] += a[i][j];
+   }
+}
+//
+// Code after fusion
+//
+void loop_fusion03(int a[100][100], int b[100][100])
+{
+   int i, j;
+   int k;
+   
+   /* These loop nests can be fused together, even with the reduction on k */
+   k = 0;
+   for(i = 0; i <= 99; i += 1) {
+      for(j = 0; j <= 99; j += 1) {
+         a[i][j] = i+j;
+         b[i][j] += a[i][j];
+      }
+      k += a[i][j-1];
+   }
+}

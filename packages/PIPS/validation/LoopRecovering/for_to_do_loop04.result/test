@@ -92,7 +92,7 @@ int main()
 
    int j;                                                               /*0004*/
 
-//  T(j) {0<=j}
+//  T(j) {0<=j, j<=999}
 
    
    // A do loop ! Should be parallel.
@@ -102,7 +102,7 @@ int main()
 
       a[j] = j;                                                         /*0008*/
 
-//  T(j) {j#init==1000, 0<=j}
+//  T(j) {j#init==1000, 0<=j, j<=999}
 
    for(j = 0; j <= 999; j += 1)                                         /*0009*/
 

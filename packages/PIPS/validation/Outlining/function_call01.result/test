@@ -26,7 +26,7 @@ int b(int i)
 {
    return i*2;
 }
-void kernel(int *j_0)
+void kernel(int j_0[1])
 {
    //PIPS generated variable
    int i, j;

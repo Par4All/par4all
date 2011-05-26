@@ -36,9 +36,9 @@ POINTS TO
 //  {}
 void assign03()
 {
-//  points to = {}
+//  {}
    char *malloc(int);
-//  points to = {}
+//  {}
    double *p = (double *) malloc(10*sizeof(double));
 //  {(p,*ANY_MODULE*:*HEAP*,-Exact-)}
    int j = 2;
@@ -49,6 +49,6 @@ void assign03()
 //  {}
 void foo()
 {
-//  points to = {}
+//  {}
    assign03();
 }

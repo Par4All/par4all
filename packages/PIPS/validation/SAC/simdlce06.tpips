@@ -14,7 +14,7 @@ setproperty ACCEL_STORE "memstore"
 module caram
 display PRINTED_FILE 
 
-apply DELAY_COMMUNICATIONS
+apply DELAY_COMMUNICATIONS_INTRA
 display PRINTED_FILE
 
 close

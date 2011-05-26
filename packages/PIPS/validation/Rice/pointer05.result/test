@@ -1,0 +1,59 @@
+
+POINTS TO
+
+//  {}
+void pointer05(int n, float p[n], float q[n])
+{
+//  {}
+   int i;
+//  {}
+
+   for(i = 0; i <= n-1; i += 1) {
+//  {}
+      float x = q[i];
+//  {}
+      p[i] = x;
+   }
+}
+
+Proper effects with points-to
+
+void pointer05(int n, float p[n], float q[n])
+{
+   int i;
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1) {
+//             <    is read   >: i q[i]
+//             <    is written>: x
+      float x = q[i];
+//             <    is read   >: i n x
+//             <    is written>: p[i]
+      p[i] = x;
+   }
+}
+
+Dependence graph
+
+
+ **************** Effective Dependence Graph ****************
+
+	08 --> 09 with conflicts
+		from <x-W-EXACT> to <x-R-EXACT> at levels  2
+	08 --> 09 with conflicts
+		from <x-WE-EXACT> to <x-RE-EXACT> at levels  2
+
+****************** End of Dependence Graph ******************
+
+Parallel code
+
+void pointer05(int n, float p[n], float q[n])
+{
+   int i;
+
+   forall(i = 0; i <= n-1; i += 1) {
+      float x = q[i];
+      p[i] = x;
+   }
+}

@@ -15,19 +15,37 @@ activate MUST_REGIONS
 
 setproperty PRETTYPRINT_BLOCKS TRUE
 
-#activate PRINT_CODE_TRANSFORMERS
-#display PRINTED_FILE
+echo
+echo Transformers for "FCT"
+echo
 
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
 
-#activate PRINT_CODE_REGIONS
-#display PRINTED_FILE
+echo
+echo Preconditions for "FCT"
+echo
 
-#setenv IN_EFFECTS_DEBUG_LEVEL 4
-#setenv REGIONS_OPERATORS_DEBUG_LEVEL 4
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo RW regions for "FCT"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+echo
+echo IN regions for "FCT"
+echo
+
+setenv IN_EFFECTS_DEBUG_LEVEL 8
+setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
 
 activate PRINT_CODE_IN_REGIONS
 display PRINTED_FILE
-
+quit
 apply UNSPLIT 
 
 close

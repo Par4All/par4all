@@ -14,7 +14,3 @@ END SUBROUTINE ALLOCATABLE
 PROGRAM MAIN
    CALL ALLOCATABLE
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-
-

@@ -1,0 +1,62 @@
+// Execution after scalarization
+Scalarization 1 : 1
+Scalarization 2 : 1
+
+//
+// Code after scalarization for module scalarization2
+//
+void scalarization2()
+{
+   //PIPS generated variable
+   int __scalar__0, __scalar__1;
+   b[0] = 0;
+   for(j = 0; j <= 0; j += 1) {
+      __scalar__0 = b[j];
+      __scalar__1 = 1;
+      for(k = 0; k <= 0; k += 1)
+         __scalar__0 = __scalar__1;
+      b[j] = __scalar__0;
+   }
+   printf("%d", b[0]);
+}
+// Execution after scalarization
+Scalarization 1 : 1
+Scalarization 2 : 1
+
+//
+// Code after scalarization for module main
+//
+int main()
+{
+   printf("Scalarization 1 : ");
+   scalarization1();
+   printf("\nScalarization 2 : ");
+   scalarization2();
+   printf("\n");
+   return 0;
+}
+// Execution after scalarization
+Scalarization 1 : 0
+Scalarization 2 : 1
+
+//
+// Code after scalarization for module scalarization1
+//
+void scalarization1()
+{
+   //PIPS generated variable
+   int __scalar__0, __scalar__1;
+
+   b[0] = 0;
+   for(j = 0; j <= 0; j += 1) {
+      __scalar__0 = b[j];
+      __scalar__1 = 1;
+      for(k = 0; k <= 0; k += 1)
+         __scalar__0 = __scalar__1;
+      b[k] = __scalar__0;
+   }
+   printf("%d", b[0]);
+   
+   /* This printf used to prevent copy out for b[] when scalarized */
+   printf("%s", name);
+}

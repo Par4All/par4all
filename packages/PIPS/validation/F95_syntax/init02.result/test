@@ -5,6 +5,3 @@ PROGRAM INIT01
    ALLOCATE (ARRAY(10), STAT=IERR) 
    ARRAY(:) = 0
 END PROGRAM INIT01
-
-"compile sources produced by pips"
-

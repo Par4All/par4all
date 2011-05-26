@@ -25,7 +25,7 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int *p, i, j;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    i = 0;

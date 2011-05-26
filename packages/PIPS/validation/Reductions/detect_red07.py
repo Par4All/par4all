@@ -1,12 +1,11 @@
+from __future__ import with_statement # this is to work with python2.5
 from pyps import *
-with workspace(["detect_red06.c"],deleteOnClose=True) as ws:
-	m=ws.fun.main
-	m.simd_atomizer()
-	m.display()
-	try: 
-		while True:
-			m.reduction_detection()
-			m.display(With="PRINT_CODE_PROPER_REDUCTIONS")
-	except:pass
-	m.display()
+ws= workspace("detect_red07.c",deleteOnClose=True)
+m=ws.fun.main
+m.display()
+m.reduction_atomization()
+m.display(activate="PRINT_CODE_PROPER_REDUCTIONS")
+r=ws.compile()
+ws.run(r)
+ws.close()
 

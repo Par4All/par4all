@@ -1,1 +1,0 @@
-../PointerValues/pv_conditional_operator02.c

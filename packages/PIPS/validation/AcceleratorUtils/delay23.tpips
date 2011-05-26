@@ -10,7 +10,7 @@ activate RICE_REGIONS_DEPENDENCE_GRAPH
 display PRINTED_FILE[main,a]
 setproperty ACCEL_LOAD="load"
 setproperty ACCEL_STORE="store"
-apply DELAY_COMMUNICATIONS[main]
+apply DELAY_COMMUNICATIONS_INTER[main]
 display PRINTED_FILE[main,a]
 
 apply UNSPLIT

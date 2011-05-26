@@ -1,0 +1,157 @@
+
+Transformers for SUB
+
+
+C  T(I) {I==11}
+
+C     Derived from muller01.f
+
+C     Used to debug the translation of OUT effects through a loop
+C
+C     The print region is A, but under the condition I=11
+C
+C     If the loop transformer used indicates 1<=I<=10, the application
+C     of the reverse transformer leads to an empty OUT region for the loop
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  T(I) {1<=I, I<=10}
+
+
+      DO I = 1, 10                                                      0014
+
+C  T() {}
+
+         A(I) = I                                                       0015
+      ENDDO
+
+C  T() {}
+
+      PRINT *, A                                                        0017
+      END
+
+Preconditions for SUB
+
+
+C  P() {}
+
+C     Derived from muller01.f
+
+C     Used to debug the translation of OUT effects through a loop
+C
+C     The print region is A, but under the condition I=11
+C
+C     If the loop transformer used indicates 1<=I<=10, the application
+C     of the reverse transformer leads to an empty OUT region for the loop
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  P() {}
+
+
+      DO I = 1, 10                                                      0014
+
+C  P(I) {1<=I, I<=10}
+
+         A(I) = I                                                       0015
+      ENDDO
+
+C  P(I) {I==11}
+
+      PRINT *, A                                                        0017
+      END
+
+RW regions for SUB
+
+
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6}>
+
+C     Derived from muller01.f
+
+C     Used to debug the translation of OUT effects through a loop
+C
+C     The print region is A, but under the condition I=11
+C
+C     If the loop transformer used indicates 1<=I<=10, the application
+C     of the reverse transformer leads to an empty OUT region for the loop
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  <A(PHI1)-W-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      DO I = 1, 10                                                      0014
+
+C  <A(PHI1)-W-EXACT-{PHI1==I, 1<=I, I<=10}>
+
+         A(I) = I                                                       0015
+      ENDDO
+
+C  <A(PHI1)-R-EXACT-{1<=PHI1, PHI1<=10, I==11}>
+C  <__IO_EFFECTS:LUNS(PHI1)-R-EXACT-{PHI1==6, I==11}>
+C  <__IO_EFFECTS:LUNS(PHI1)-W-EXACT-{PHI1==6, I==11}>
+
+      PRINT *, A                                                        0017
+      END
+
+IN regions for SUB
+
+
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6}>
+
+C     Derived from muller01.f
+
+C     Used to debug the translation of OUT effects through a loop
+C
+C     The print region is A, but under the condition I=11
+C
+C     If the loop transformer used indicates 1<=I<=10, the application
+C     of the reverse transformer leads to an empty OUT region for the loop
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+      DO I = 1, 10                                                      0014
+         A(I) = I                                                       0015
+      ENDDO
+
+C  <A(PHI1)-IN-EXACT-{1<=PHI1, PHI1<=10, I==11}>
+C  <__IO_EFFECTS:LUNS(PHI1)-IN-EXACT-{PHI1==6, I==11}>
+
+      PRINT *, A                                                        0017
+      END
+
+OUT regions for SUB
+
+C     Derived from muller01.f
+
+C     Used to debug the translation of OUT effects through a loop
+C
+C     The print region is A, but under the condition I=11
+C
+C     If the loop transformer used indicates 1<=I<=10, the application
+C     of the reverse transformer leads to an empty OUT region for the loop
+
+      SUBROUTINE SUB(I)
+      INTEGER  I
+      INTEGER A(10)
+
+C  <A(PHI1)-OUT-EXACT-{1<=PHI1, PHI1<=10}>
+
+
+      DO I = 1, 10                                                      0014
+
+C  <A(PHI1)-OUT-EXACT-{PHI1==I, 1<=I, I<=10}>
+
+         A(I) = I                                                       0015
+      ENDDO
+      PRINT *, A                                                        0017
+      END

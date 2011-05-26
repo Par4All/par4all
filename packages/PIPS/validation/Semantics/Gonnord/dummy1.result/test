@@ -1,0 +1,34 @@
+ dummy1
+
+//  P() {}
+
+int dummy1()
+{
+
+
+//  P() {}
+
+   int t, t0;
+
+//  P(t,t0) {}
+
+   t0>0?(void) 0:__assert_fail("t0>0", "./dummy1.foo.c", 10, (const char *) 0);
+
+//  P(t,t0) {1<=t0}
+
+   t = t0;
+
+//  P(t,t0) {t==t0, 1<=t}
+
+
+   while (t<=9)
+
+//  P(t,t0) {t<=9, t0<=t, 1<=t0}
+
+      ++t;
+
+//  P(t,t0) {10<=t, t0<=t, t<=t0+9}
+
+
+   return 0;
+}

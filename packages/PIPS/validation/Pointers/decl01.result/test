@@ -25,19 +25,19 @@ POINTS-TO
 //  {}
 int decl01()
 {
-//  points to = {}
+//  {}
    int i = 2;
-//  points to = {}
+//  {}
    int j = i;
-//  points to = {}
+//  {}
    int a[sizeof(i)];
-//  points to = {}
+//  {}
 
    i = 2;
-//  points to = {}
+//  {}
    j = i;
-//  points to = {}
+//  {}
    j = sizeof(i);
-//  points to = {}
+//  {}
    return 0;
 }

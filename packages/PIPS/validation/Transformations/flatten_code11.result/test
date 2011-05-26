@@ -90,7 +90,6 @@ void flatten_code11(void)
    fprintf(stdout, "foo=%d\n", foo);
    foo++;
    fprintf(stdout, "foo=%d\n", foo);
-   i = 4;
    // END BLOCK
 }
 

@@ -127,7 +127,7 @@ int main()
    int y[d1][d2][d3][d4];
    int i, j;
 
-//  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2,
+//  <y[PHI1][PHI2][PHI3][PHI4]-W-EXACT-{0<=PHI1, PHI1+1<=d1, 0<=PHI2,
 //    PHI2<=9, 0<=PHI3, PHI3+1<=d3, 0<=PHI4, PHI4+1<=d4, d1==10,
 //    d2==10, d3==10, d4==10}>
 

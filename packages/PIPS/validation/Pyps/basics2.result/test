@@ -1,11 +1,7 @@
-void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3])
-{
-   int k, l;
-   b[i][j] = 0;
-   for(k = 0; k <= 2; k += 1)
-      for(l = 0; l <= 2; l += 1)
-         b[i][j] += a[i+k-1][j+l-1]*kernel[k][l];
-}
+void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3]);
+void convol(int n, int a[n][n], int b[n][n], int kernel[3][3]);
+//PIPS generated variable
+void convol_outlined(int n, int i, int a[n][n], int b[n][n], int kernel[3][3]);
 void convol(int n, int a[n][n], int b[n][n], int kernel[3][3])
 {
    int i, j;
@@ -28,7 +24,11 @@ l99998:
             b[i][j] += a[i+k-1][j+l-1]*kernel[k][l];
    }
 }
-void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3]);
-void convol(int n, int a[n][n], int b[n][n], int kernel[3][3]);
-//PIPS generated variable
-void convol_outlined(int n, int i, int a[n][n], int b[n][n], int kernel[3][3]);
+void do_convol(int i, int j, int n, int a[n][n], int b[n][n], int kernel[3][3])
+{
+   int k, l;
+   b[i][j] = 0;
+   for(k = 0; k <= 2; k += 1)
+      for(l = 0; l <= 2; l += 1)
+         b[i][j] += a[i+k-1][j+l-1]*kernel[k][l];
+}

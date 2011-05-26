@@ -11,7 +11,7 @@ C     may be entered or not but when initial values are known
 
       J = 3                                                             0006
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0008
@@ -26,7 +26,7 @@ C  T() {}
 
       PRINT *, J                                                        0012
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
       DO I = 1, N                                                       0014

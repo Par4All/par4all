@@ -78,12 +78,12 @@ void checking_error(void) {
 #define T3 {trans(G3, U3);}
 
 void run(void) {
-	
+
 	int x, y;
 	x = rand();
 	y = rand();
 	if (x >= 5 && x <= 8 && y >= 0 && y <= 3) {
-	
+
 		while (1) {
 			check_not(BAD);
 			if (flip()) {
@@ -98,7 +98,7 @@ void run(void) {
 		}
 
 	}
-	
+
 }
 
 int main(void) {

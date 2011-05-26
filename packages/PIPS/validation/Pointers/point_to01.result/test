@@ -37,7 +37,7 @@ POINTS-TO
 //  {}
 void point_to01()
 {
-//  points to = {}
+//  {}
    struct s {
       int a;
       int b;

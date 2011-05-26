@@ -19,7 +19,8 @@ C  T(W) {W==0}
 
       W = 0                                                             0008
 
-C  T(I,R,W) {R+W==R#init+W#init, R#init+1<=I+R, R+1<=I+R#init}
+C  T(I,R,W) {R+W==R#init+W#init, 1<=I, I<=L, R#init+1<=I+R,
+C    R+1<=I+R#init}
 
 
       DO I = 1, L                                                       0010
@@ -129,7 +130,8 @@ C  T(W) {W==0}
 
       W = 0                                                             0008
 
-C  T(I,R,W) {R+W==R#init+W#init, R#init+1<=I+R, R+1<=I+R#init}
+C  T(I,R,W) {R+W==R#init+W#init, 1<=I, I<=L, R#init+1<=I+R,
+C    R+1<=I+R#init}
 
 
       DO I = 1, L                                                       0010

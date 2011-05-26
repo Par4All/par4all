@@ -1,0 +1,86 @@
+
+TRANSFORMERS
+
+
+//  T(skimo03) {2<=n, skimo03<=x+y}
+
+int skimo03(int x, int y, int n)
+{
+
+//  T(z) {z==0}
+
+   int z = 0;
+
+//  T() {z==0, 2<=n}
+
+   if (n<2)
+
+//  T() {0==-1}
+
+      exit(1);
+
+//  T(x,y) {z==0, 2<=n, x#init<=x, x+y<=x#init+y#init}
+
+
+   while (alea()) {
+
+//  T(x) {x==x#init+1, z==0, 2<=n}
+
+      x++;
+
+//  T(y) {n+y==y#init+1, z==0, 2<=n}
+
+      y += 1-n;
+   }
+
+//  T(z) {x+y==z, z#init==0, 2<=n}
+
+   z += x+y;
+
+//  T(skimo03) {x+y==skimo03, skimo03==z, 2<=n}
+
+   return z;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int skimo03(int x, int y, int n)
+{
+
+//  P() {}
+
+   int z = 0;
+
+//  P(z) {z==0}
+
+   if (n<2)
+
+//  P(z) {z==0, n<=1}
+
+      exit(1);
+
+//  P(z) {z==0, 2<=n}
+
+
+   while (alea()) {
+
+//  P(x,y,z) {z==0, 2<=n}
+
+      x++;
+
+//  P(x,y,z) {z==0, 2<=n}
+
+      y += 1-n;
+   }
+
+//  P(x,y,z) {z==0, 2<=n}
+
+   z += x+y;
+
+//  P(x,y,z) {x+y==z, 2<=n}
+
+   return z;
+}

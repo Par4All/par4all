@@ -1,0 +1,84 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   s_t s;
+   int j;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   s = make_s(1, 2.);
+//             <    is written>: s.entier
+   s.entier = 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   j = make_s(1, 2.).entier;
+//             <    is read   >: j
+
+   return j;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   s_t s;
+//  {}
+   int j;
+//  {}
+
+   s = make_s(1, 2.);
+//  {}
+   s.entier = 4;
+//  {}
+
+   j = make_s(1, 2.).entier;
+//  {}
+
+   return j;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   s_t s;
+   int j;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: s.entier s.reel 
+//                               _MALLOC_EFFECTS:_MALLOC_
+
+   s = make_s(1, 2.);
+//             <    is written>: s.entier
+   s.entier = 4;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
+
+   j = make_s(1, 2.).entier;
+//             <    is read   >: j
+
+   return j;
+}
+
+ *********************** Use-Def Chains *********************
+
+	23 --> 25 with conflicts
+		from <j-W-EXACT> to <j-R-EXACT>
+	20 --> 23 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	20 --> 21 with conflicts
+		from <s.entier-W-EXACT> to <s.entier-W-EXACT>
+
+****************** End of Dependence Graph ******************
