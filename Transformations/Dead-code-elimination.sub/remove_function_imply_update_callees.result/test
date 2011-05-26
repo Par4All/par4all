@@ -1,0 +1,28 @@
+//
+// Code after dead_code_elimination for module main
+//
+int main()
+{
+
+}
+//
+// Code after dead_code_elimination for module toto
+//
+void toto()
+{
+
+}
+//
+// Code after coarse_grain_parallelization for module main
+//
+int main()
+{
+
+}
+//
+// Code after coarse_grain_parallelization for module toto
+//
+void toto()
+{
+
+}
