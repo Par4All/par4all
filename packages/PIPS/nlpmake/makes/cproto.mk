@@ -59,3 +59,10 @@ clean-local:
 	rm -f $(TARGET).h $(CPROTO_STAMP_FILE) $(CPROTO_STAMP_FILE)_init
 
 EXTRA_DIST=$(TARGET)-local.h
+
+# Add a "fast" target so that nlpmake user find again what they were used to :-)
+# Basically, in a subdir of src/Libs it equivalent to run "make && make -C .. install-exec-am"
+# it'll only build the current directory and rebuild and install pipslib.{so,a} library
+# dependences between src/Libs/* directories aren't taken into account
+fast: all
+	make -C ../ install-exec-am
