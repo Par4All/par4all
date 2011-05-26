@@ -134,9 +134,14 @@ function do_fetch_remote_git() {
 
 # Pull one module into Par4All:
 function pull_remote_1_git() {
+    # The branch storing the package module, such as p4a-validation:
     MODULE=$1
-    TRACKING_BRANCH=$2
-    REMOTE_NAME=$3
+    # Where the module is to be store, to help git to merge things:
+    SUBTREE_DIR=$2
+    # The tracking branch of the imported stuff:
+    TRACKING_BRANCH=$3
+    # The remote name to import the informations from:
+    REMOTE_NAME=$4
 
     # First update the tracking branch:
     git checkout $TRACKING_BRANCH
@@ -147,8 +152,17 @@ function pull_remote_1_git() {
     git checkout $MODULE
     # Pull the master branch of the remote git. Use a subtree merge
     # strategy since the root directory of the remote git is relocated
-    # in a subdirectory of the Par4All git:
-    git merge --log --strategy=subtree $TRACKING_BRANCH
+    # in a subdirectory of the Par4All git
+
+    # There were a bug with git merge --strategy=subtree in merging
+    # CRI-validation (b4032177c70326eea9ac310e31be2d5a9a4568ea) into
+    # p4a-validation (60a590fd9d8e1b150322abf1c9bdd57f4bbfdb5c) because
+    # git were lost, resulting in only one 'test' file a the top
+    # directory. :-(
+
+    # Fortunately there is now in the recursive strategy a new
+    # suboption to enforce the subtree directory instead of guessing it... :-/
+    git merge --log --strategy=recursive -Xsubtree=$SUBTREE_DIR $TRACKING_BRANCH
 }
 
 
@@ -164,10 +178,10 @@ function do_pull_remote_git() {
 
 	echo Assuming the correct remotes are set in this par4all git copy...
 	for i in $PIPS_MODULES; do
-	    pull_remote_1_git p4a-$i CRI-$i CRI/$i
+	    pull_remote_1_git p4a-$i packages/PIPS/$i CRI-$i CRI/$i
 	done
         # Same for the polylib:
-        pull_remote_1_git p4a-polylib ICPS-polylib ICPS/polylib
+        pull_remote_1_git p4a-polylib packages/polylib ICPS-polylib ICPS/polylib
 
 	echo Update the global p4a hierarchy to keep in sync:
 	do_merge_remote_branches p4a
