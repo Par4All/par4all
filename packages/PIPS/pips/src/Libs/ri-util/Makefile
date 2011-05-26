@@ -55,6 +55,7 @@ LIB_CFILES =	contrainte_to_text.c \
 		clean.c \
 		clone_statement.c \
 		allocatable.c \
+		parameter.c \
 		replace.c
 
 INC_TARGET =	$(TARGET).h

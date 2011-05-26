@@ -171,7 +171,7 @@ void reset_static_phase_variables()
     DECLARE_ERROR_HANDLER(proper_effects_error_handler);
 
     /* Error handlers for the transformation library */
-    DECLARE_ERROR_HANDLER(use_def_elimination_error_handler);
+    DECLARE_ERROR_HANDLER(dead_code_elimination_error_handler);
     DECLARE_ERROR_HANDLER(simple_atomize_error_handler);
     DECLARE_ERROR_HANDLER(clone_error_handler);
     DECLARE_ERROR_HANDLER(array_privatization_error_handler);

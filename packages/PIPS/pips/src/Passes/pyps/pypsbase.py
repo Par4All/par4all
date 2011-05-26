@@ -224,6 +224,7 @@ class modules:
     def __init__(self,modules):
         """init from a list of module `the_modules'"""
         self.__modules=modules
+        self.__modules.sort(key = lambda m: m.name)
         self.__ws= modules[0].workspace if modules else None
 
     @property
@@ -494,6 +495,11 @@ class workspace(object):
         
         for f in saved:
             pypsutils.addBeginnning(f, '#include "pipsdef.h"\n')
+            # force an update of the modification time, because previous 
+            # operation might have caused rounded to the second and have broken
+            # makefile dependences
+            os.utime(f,None)
+            
         shutil.copy(pypsutils.get_runtimefile("pipsdef.h","pypsbase"),rep)
         return saved,headers+[os.path.join(rep,"pipsdef.h")]
 
@@ -705,13 +711,8 @@ class workspace(object):
             else:
                 raise NameError("Unknown property : " + name)
 
-        def __getitem__(self,prop_name):
-            """retrieve a property of the workspace from its name"""
-            return self.__getattr__(prop_name)
-
-        def __setitem__(self,prop_name, prop_value):
-            """sets a property of the workspace from its name"""
-            return self.__setattr__(prop_name,prop_value)
+        __setitem__=__setattr__
+        __getitem__=__getattr__
 
         def __dir__(self):
             "We should use the updated values, not the default ones..."

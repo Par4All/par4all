@@ -1829,17 +1829,17 @@ entity gfc2pips_logical2entity(bool b) {
  * The function only calculate the number of ' to escape and give the information to gfc2pips_gfc_char_t2string_
  * TODO: optimize to know if we should put " or ' quotes
  */
-char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int nb) {
-  if(nb) {
+char* gfc2pips_gfc_char_t2string(gfc_char_t *c, int length) {
+  if(length) {
     gfc_char_t *p = c;
     while(*p) {
       if(*p == '\'')
-        nb++;
+        length++;
       p++;
     }
-    return gfc2pips_gfc_char_t2string_(c, nb);
+    return gfc2pips_gfc_char_t2string_(c, length);
   } else {
-    return NULL;
+    return strdup("");
   }
 }
 

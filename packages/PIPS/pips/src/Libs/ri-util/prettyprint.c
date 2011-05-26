@@ -4248,6 +4248,21 @@ text text_statement_enclosed(entity module,
 
   comments = ensure_comment_consistency(i_comments,get_prettyprint_language());
 
+  if(prettyprint_language_is_c_p() && 
+     statement_block_p(stmt) &&
+     !empty_extensions_p(statement_extensions(stmt)))
+    {
+      string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
+      if (ext != string_undefined) {
+	ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
+	braces_added = TRUE;
+	ADD_SENTENCE_TO_TEXT(r,
+			     MAKE_ONE_WORD_SENTENCE(imargin, "{"));
+	nmargin += INDENTATION;
+	
+      }
+    }
+
   /* Generate text for local declarations
    *
    * 31/07/2003 Nga Nguyen : This code is added for C, because a
@@ -4257,7 +4272,7 @@ text text_statement_enclosed(entity module,
 
   if (!ENDP(dl) && prettyprint_language_is_c_p()) {
     if(statement_block_p(stmt)) {
-      if(!braces_p) {
+      if(!braces_p && !braces_added) {
 	braces_added = TRUE;
 	ADD_SENTENCE_TO_TEXT(r,
 			     MAKE_ONE_WORD_SENTENCE(imargin, "{"));
@@ -4463,10 +4478,12 @@ text text_statement_enclosed(entity module,
 							   0,
 							   NULL)));
 
-  /* Append the extensions after comments: */
-  string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
-  if (ext != string_undefined) {
-    ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
+  if(!(prettyprint_language_is_c_p() && statement_block_p(stmt))) {
+    /* Append the extensions after comments: */
+    string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
+    if (ext != string_undefined) {
+      ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_formatted, ext));
+    }
   }
 
   /* Then add any instruction text: */
@@ -4790,7 +4807,6 @@ void output_a_graph_view_of_the_unstructured_successors(text r,
 							int margin,
 							control c)
 {
-  _int so = statement_ordering(control_statement(c));
   list pdl = NIL; // FI: I have no idea how to initialize it in this context...
 
   add_one_unformated_printf_to_text(r, "%s ",
@@ -4801,7 +4817,6 @@ void output_a_graph_view_of_the_unstructured_successors(text r,
   if (get_bool_property("PRETTYPRINT_UNSTRUCTURED_AS_A_GRAPH_VERBOSE")) {
     add_one_unformated_printf_to_text(r, "C Unstructured node %p ->", c);
     MAP(CONTROL, a_successor,
-	so = statement_ordering(control_statement(a_successor));
 	add_one_unformated_printf_to_text(r, " %p", a_successor),
 	control_successors(c));
     add_one_unformated_printf_to_text(r,"\n");
