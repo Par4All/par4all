@@ -4478,7 +4478,7 @@ text text_statement_enclosed(entity module,
 							   0,
 							   NULL)));
 
-  if(!statement_block_p(stmt)) {
+  if(!(prettyprint_language_is_c_p() && statement_block_p(stmt))) {
     /* Append the extensions after comments: */
     string ext =  extensions_to_string(statement_extensions (stmt), TRUE);
     if (ext != string_undefined) {
