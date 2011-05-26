@@ -1,10 +1,31 @@
 
+PROPER  EFFECTS 
+
+void dereferencing05()
+{
+   double *p;
+   int i;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+
+   *p++ = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *p-- = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *++p = 0.;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   *--p = 0.;
+}
+
 POINTS-TO
 
 //  {}
 void dereferencing05()
 {
-//  points to = {}
+//  {}
    double *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;

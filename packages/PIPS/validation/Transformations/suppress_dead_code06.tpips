@@ -1,0 +1,18 @@
+delete suppress_dead_code06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create suppress_dead_code06 suppress_dead_code06.c
+
+apply SUPPRESS_DEAD_CODE(%ALL)
+
+display PRINTED_FILE [%ALL]
+
+apply UNSPLIT
+
+shell gcc -fopenmp -c suppress_dead_code06.database/Src/suppress_dead_code06.c -o suppress_dead_code06.database/Src/suppress_dead_code06.o
+
+close
+delete suppress_dead_code06
+quit
+# EOF

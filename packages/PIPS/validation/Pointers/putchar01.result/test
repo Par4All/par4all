@@ -15,6 +15,6 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    putchar01();
 }

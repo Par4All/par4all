@@ -1,0 +1,101 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   float t;
+   float *a;
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+
+   a = (float *) malloc(10*sizeof(float));
+//             <    is written>: t
+
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
+//             <    is written>: i
+      for(i = 0; i <= 9; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+         a[i] = a[i]+t*0, 5;
+      t+0, 01;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   float t;
+//  {}
+   float *a;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int i;
+//  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   a = (float *) malloc(10*sizeof(float));
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+
+   t = 1.0;
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+   while (t<2.0) {
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+      for(i = 0; i <= 9; i += 1)
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+         a[i] = a[i]+t*0, 5;
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+      t+0, 01;
+   }
+//  {(a,*HEAP*_l_9[0],-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   float t;
+   float *a;
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+
+   a = (float *) malloc(10*sizeof(float));
+//             <    is written>: t
+
+   t = 1.0;
+//             <    is read   >: t
+   while (t<2.0) {
+//             <    is written>: i
+      for(i = 0; i <= 9; i += 1)
+//             <    is read   >: *HEAP*_l_9[0+i] a i t
+//             <    is written>: *HEAP*_l_9[0+i]
+         a[i] = a[i]+t*0, 5;
+      t+0, 01;
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <*HEAP*_l_9[0+i]-W-EXACT> to <*HEAP*_l_9[0+i]-W-EXACT>
+		from <*HEAP*_l_9[0+i]-W-EXACT> to <*HEAP*_l_9[0+i]-R-EXACT>
+		from <*HEAP*_l_9[0+i]-R-EXACT> to <*HEAP*_l_9[0+i]-W-EXACT>
+	-1 --> 12 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	12 --> 12 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	-1 --> -1 with conflicts
+		from <t-W-EXACT> to <t-R-EXACT>
+	09 --> -1 with conflicts
+		from <a-W-EXACT> to <a-R-EXACT>
+
+****************** End of Dependence Graph ******************

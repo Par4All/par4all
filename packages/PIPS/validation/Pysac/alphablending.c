@@ -8,7 +8,7 @@ int main(int argc, char **argv)
 	unsigned int n;
 	float *src1, *src2, *result;
 	float alpha;
-	n = atoi(argv[1]);
+	n = argc >1 ?atoi(argv[1]):100;
 	printf(">>>> %d <<<<\n", n);
 	alpha = 0.7;
 

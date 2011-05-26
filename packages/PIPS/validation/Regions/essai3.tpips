@@ -1,0 +1,38 @@
+setenv WSPACE=essai3
+delete $WSPACE
+create $WSPACE $WSPACE.f
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate MUST_REGIONS
+
+echo
+echo Transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[ESSAI3]
+
+echo
+echo Preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[ESSAI3]
+
+echo
+echo Regions for "FUNC"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[FUNC]
+
+echo
+echo Regions for "ESSAI3"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE[ESSAI3]
+close
+delete $WSPACE
+quit

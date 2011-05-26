@@ -1,4 +1,5 @@
 I like cats
+I like dogs
 int main()
 {
    printf("I like cats\n");
@@ -9,5 +10,3 @@ int main()
    printf("I like dogs\n");
    return 0;
 }
-I like dogs
-

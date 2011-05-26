@@ -11,7 +11,7 @@ C     11-9
 
       N = 0                                                             0006
 
-C  T(I,J,K,L,N) {5I+N#init==N+5, 1<=I}
+C  T(I,J,K,L,N) {5I+N#init==N+5, 1<=I, I<=10}
 
       DO 100 I = 1, 10                                                  0007
 
@@ -19,7 +19,7 @@ C  T(J) {I==J}
 
          J = I                                                          0008
 
-C  T(K,L,N) {K+N#init==N+1, N#init<=N}
+C  T(K,L,N) {K+N#init==N+1, K<=5, N#init<=N}
 
          DO 100 K = 1, 5                                                0009
 
@@ -42,7 +42,7 @@ C  T(N) {N==0}
 
       N = 0                                                             0016
 
-C  T(I,J,K) {1<=I}
+C  T(I,J,K) {1<=I, I<=10}
 
       DO 200 I = 1, 10                                                  0017
 
@@ -50,7 +50,7 @@ C  T(J) {I==J}
 
          J = I                                                          0018
 
-C  T(K,L,N) {K+N#init==N+5, N#init<=N}
+C  T() {0==-1}
 
          DO 200 K = 5, 1                                                0019
 

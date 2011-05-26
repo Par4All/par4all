@@ -1,0 +1,1 @@
+rm *.log *.dot *~ *.o.txt *.dbg *.xml

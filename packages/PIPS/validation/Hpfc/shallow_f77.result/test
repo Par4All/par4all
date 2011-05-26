@@ -170,10 +170,6 @@ C
       PARAMETER (M = 320)
       INTEGER*4 N
       PARAMETER (N = 200)
-      INTEGER*4 M
-      PARAMETER (M = 320)
-      INTEGER*4 N
-      PARAMETER (N = 200)
       INTEGER ALPHA1, ALPHA2, LALPHA1, LALPHA2, PSI1, PSI2, I_0, I_1
      &, I_10, I_11, I_12, I_13, I_14, I_15, I_2, I_3, I_4, I_5, I_6, 
      &I_7, I_8, I_9, PLOT FIELD UP2, PLOT FIELD LO2, PLOT FIELD UP1, 
@@ -1039,10 +1035,6 @@ C *** PERIODIC CONTINUATION
       include "hpfc_commons.h"
       include "hpfc_includes.h"
       include "SHALLOW_parameters.h"
-      INTEGER*4 M
-      PARAMETER (M = 320)
-      INTEGER*4 N
-      PARAMETER (N = 200)
       INTEGER*4 M
       PARAMETER (M = 320)
       INTEGER*4 N

@@ -64,8 +64,23 @@ activate PRINT_CODE_CUMULATED_POINTER_EFFECTS
 display PRINTED_FILE[main]
 
 echo
+echo Transformers for "call10"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[call10]
+
+echo
+echo Preconditions for "call10"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[call10]
+
+echo
 echo Regions for "call10"
 echo
+
 activate PRINT_CODE_POINTER_REGIONS
 display PRINTED_FILE[call10]
 

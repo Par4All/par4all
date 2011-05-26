@@ -1,0 +1,126 @@
+/* C pretty print for module FOO1. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+void
+foo1 (void)
+{
+  int i;
+
+  i = 1;
+  return;
+}
+/* C pretty print for module FOO2. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+plouch
+foo2 (void)
+{
+  int i;
+
+  i = 2;
+  return;
+}
+/* C pretty print for module FOO3. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+plouch
+foo3 (void)
+{
+  int i;
+
+  i = 3;
+  return;
+}
+/* C pretty print for module FOO4. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+void
+foo4 (void)
+{
+  int i;
+
+  i = 4;
+  return;
+}
+/* C pretty print for module FOO5. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+void
+foo5 (void)
+{
+  int i;
+
+  i = 5;
+  return;
+}
+/* C pretty print for module FOO6. */
+//needed include to compile the C output
+#include "math.h"
+#include "stdlib.h"
+#include "complex.h"
+
+// The macros to support some fortran intrinsics
+// and complex declaration
+#define crough_max(a,b) (((a)>(b))?(a):(b))
+#define crough_min(a,b) (((a)<(b))?(a):(b))
+#define crough_powi(a,b) ((a)^(b))
+#define init_complex(a,b) (a + b*I)
+
+plouch
+foo6 (void)
+{
+  int i;
+
+  i = 6;
+  return;
+}

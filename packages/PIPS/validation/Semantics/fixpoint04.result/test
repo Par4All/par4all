@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM FIXPOINT04
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=N}
 
 
 C     Information about j should not be lost because the convex closure of j
@@ -28,7 +28,7 @@ C  T() {}
 
       PRINT *, J                                                        0019
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=5}
 
 
 C     The loop is entered: the fix point is not improved (alas) but the
@@ -56,7 +56,7 @@ C     information is lost!
 
       IF (J.GE.5) THEN                                                  0037
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=5}
 
 
          DO I = 1, 5                                                    0039

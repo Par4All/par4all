@@ -23,7 +23,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    float *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    float a[10];

@@ -1,0 +1,208 @@
+
+Transformers for "S124"
+
+
+C  T() {}
+
+!     Induction variable j not found because of non-affine upper boud of
+!     loop 10
+
+c%1.2
+      SUBROUTINE S124 (NTIMES,LD,N,CTIME,DTIME,A,B,C,D,E,AA,BB,CC)
+c
+c     induction variable recognition
+c     induction variable under both sides of if (same value)
+c
+      INTEGER NTIMES, LD, N, I, NL, J
+      REAL A(N), B(N), C(N), D(N), E(N), AA(LD,N), BB(LD,N), CC(LD,N)
+      REAL T1, T2, SECOND, CHKSUM, CTIME, DTIME, CS1D
+
+C  T(I,J,NL) {1<=NL, NL<=2NTIMES}
+
+
+!      call init(ld,n,a,b,c,d,e,aa,bb,cc,'s124 ')
+!      t1 = second()
+      DO 1 NL = 1, 2*NTIMES                                             0016
+
+C  T(J) {J==0}
+
+         J = 0                                                          0017
+
+C  T(I,J) {I+J#init==J+1, 2I<=N, J#init<=J}
+
+         DO 10 I = 1, N/2                                               0018
+
+C  T(J) {J==J#init+1}
+
+            IF (B(I).GT.0.) THEN                                        0019
+
+C  T(J) {J==J#init+1}
+
+               J = J+1                                                  0020
+
+C  T() {}
+
+               A(J) = B(I)+D(I)*E(I)                                    0021
+            ELSE
+
+C  T(J) {J==J#init+1}
+
+               J = J+1                                                  0023
+
+C  T() {}
+
+               A(J) = C(I)+D(I)*E(I)                                    0024
+            ENDIF
+
+C  T() {}
+
+10          CONTINUE                                                    0026
+
+C  T() {}
+
+!      call dummy(ld,n,a,b,c,d,e,aa,bb,cc,1.)
+1        CONTINUE                                                       0028
+!      t2 = second() - t1 - ctime - ( dtime * float(2*ntimes) )
+!      chksum = cs1d(n,a)
+!      call check (chksum,2*ntimes*(n/2),n,t2,'s124 ')
+      END
+
+Preconditions for "S124"
+
+
+C  P() {}
+
+!     Induction variable j not found because of non-affine upper boud of
+!     loop 10
+
+c%1.2
+      SUBROUTINE S124 (NTIMES,LD,N,CTIME,DTIME,A,B,C,D,E,AA,BB,CC)
+c
+c     induction variable recognition
+c     induction variable under both sides of if (same value)
+c
+      INTEGER NTIMES, LD, N, I, NL, J
+      REAL A(N), B(N), C(N), D(N), E(N), AA(LD,N), BB(LD,N), CC(LD,N)
+      REAL T1, T2, SECOND, CHKSUM, CTIME, DTIME, CS1D
+
+C  P() {}
+
+
+!      call init(ld,n,a,b,c,d,e,aa,bb,cc,'s124 ')
+!      t1 = second()
+      DO 1 NL = 1, 2*NTIMES                                             0016
+
+C  P(I,J,NL) {1<=NL, NL<=2NTIMES}
+
+         J = 0                                                          0017
+
+C  P(I,J,NL) {J==0, 1<=NL, NL<=2NTIMES}
+
+         DO 10 I = 1, N/2                                               0018
+
+C  P(I,J,NL) {I==J+1, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+            IF (B(I).GT.0.) THEN                                        0019
+
+C  P(I,J,NL) {I==J+1, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+               J = J+1                                                  0020
+
+C  P(I,J,NL) {I==J, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+               A(J) = B(I)+D(I)*E(I)                                    0021
+            ELSE
+
+C  P(I,J,NL) {I==J+1, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+               J = J+1                                                  0023
+
+C  P(I,J,NL) {I==J, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+               A(J) = C(I)+D(I)*E(I)                                    0024
+            ENDIF
+
+C  P(I,J,NL) {I==J, 1<=I, 2I<=N, 1<=NL, NL<=2NTIMES}
+
+10          CONTINUE                                                    0026
+
+C  P(I,J,NL) {I==J+1, 1<=I, 1<=NL, NL<=2NTIMES}
+
+!      call dummy(ld,n,a,b,c,d,e,aa,bb,cc,1.)
+1        CONTINUE                                                       0028
+!      t2 = second() - t1 - ctime - ( dtime * float(2*ntimes) )
+!      chksum = cs1d(n,a)
+!      call check (chksum,2*ntimes*(n/2),n,t2,'s124 ')
+      END
+
+Induction variable substitution for "S124"
+
+!     Induction variable j not found because of non-affine upper boud of
+!     loop 10
+
+c%1.2
+      SUBROUTINE S124 (NTIMES,LD,N,CTIME,DTIME,A,B,C,D,E,AA,BB,CC)
+c
+c     induction variable recognition
+c     induction variable under both sides of if (same value)
+c
+      INTEGER NTIMES, LD, N, I, NL, J
+      REAL A(N), B(N), C(N), D(N), E(N), AA(LD,N), BB(LD,N), CC(LD,N)
+      REAL T1, T2, SECOND, CHKSUM, CTIME, DTIME, CS1D
+
+!      call init(ld,n,a,b,c,d,e,aa,bb,cc,'s124 ')
+!      t1 = second()
+      DO 1 NL = 1, 2*NTIMES                                             0016
+         J = 0                                                          0017
+         DO 10 I = 1, N/2                                               0018
+            IF (B(I).GT.0.) THEN                                        0019
+               J = I+-1+1                                               0020
+               A(I) = B(I)+D(I)*E(I)                                    0021
+            ELSE
+               J = I+-1+1                                               0023
+               A(I) = C(I)+D(I)*E(I)                                    0024
+            ENDIF
+10          CONTINUE                                                    0026
+!      call dummy(ld,n,a,b,c,d,e,aa,bb,cc,1.)
+1        CONTINUE                                                       0028
+!      t2 = second() - t1 - ctime - ( dtime * float(2*ntimes) )
+!      chksum = cs1d(n,a)
+!      call check (chksum,2*ntimes*(n/2),n,t2,'s124 ')
+      END
+
+Parallelization of "S124"
+
+!     Induction variable j not found because of non-affine upper boud of
+!     loop 10
+
+c%1.2
+      SUBROUTINE S124 (NTIMES,LD,N,CTIME,DTIME,A,B,C,D,E,AA,BB,CC)
+c
+c     induction variable recognition
+c     induction variable under both sides of if (same value)
+c
+      INTEGER NTIMES, LD, N, I, NL, J
+      REAL A(N), B(N), C(N), D(N), E(N), AA(LD,N), BB(LD,N), CC(LD,N)
+      REAL T1, T2, SECOND, CHKSUM, CTIME, DTIME, CS1D
+
+!      call init(ld,n,a,b,c,d,e,aa,bb,cc,'s124 ')
+!      t1 = second()
+      DO 1 NL = 1, 2*NTIMES                                             0016
+         J = 0                                                          0017
+
+!$OMP    PARALLEL DO PRIVATE(J)
+         DO 10 I = 1, N/2                                               0018
+            IF (B(I).GT.0.) THEN                                        0019
+               J = I+-1+1                                               0020
+               A(I) = B(I)+D(I)*E(I)                                    0021
+            ELSE
+               J = I+-1+1                                               0023
+               A(I) = C(I)+D(I)*E(I)                                    0024
+            ENDIF
+10          CONTINUE                                                    0026
+!      call dummy(ld,n,a,b,c,d,e,aa,bb,cc,1.)
+1        CONTINUE                                                       0028
+!      t2 = second() - t1 - ctime - ( dtime * float(2*ntimes) )
+!      chksum = cs1d(n,a)
+!      call check (chksum,2*ntimes*(n/2),n,t2,'s124 ')
+      END

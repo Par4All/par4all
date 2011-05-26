@@ -167,7 +167,7 @@ int main()
 
    x.second = 2;
 
-//  T(i) {}
+//  T(i) {0<=i, i<=9}
 
 
    for(i = 0; i <= 9; i += 1) {
@@ -181,7 +181,7 @@ int main()
       y[i].second = x.second;
    }
 
-//  T(i) {}
+//  T(i) {0<=i, i<=9}
 
 
    for(i = 0; i <= 9; i += 1)

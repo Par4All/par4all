@@ -5,6 +5,8 @@ create $WS $WS.c
 
 display PRINTED_FILE
 
+apply PRIVATIZE_MODULE
+apply LOOP_NORMALIZE
 setproperty LOOP_LABEL "donne"
 setproperty SYMBOLIC_TILING_VECTOR "N"
 apply SYMBOLIC_TILING

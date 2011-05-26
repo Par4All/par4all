@@ -1,0 +1,7 @@
+//
+// Code after flatten_code for module empty
+//
+void empty(char *name, double a)
+{
+   printf("%s %g\n", name, a);
+}

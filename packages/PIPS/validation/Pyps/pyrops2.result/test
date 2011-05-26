@@ -1,8 +1,3 @@
-int main();
-int foo(int a)
-{
-   return a;
-}
 void bar(int *c)
 {
    //PIPS generated variable
@@ -11,12 +6,30 @@ void bar(int *c)
    _return0 = 2;
    *c = _return0;
 }
+int main();
+int foo(int a)
+{
+   return a;
+}
 void foobar(int *c)
 {
    //PIPS generated variable
    int _return0;
 
    _return0 = 1;
+   *c = _return0;
+}
+int main()
+{
+   printf("I like cats\n");
+   return 0;
+}
+void malabar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 3;
    *c = _return0;
 }
 /*
@@ -48,19 +61,6 @@ void foobar(int *c);
 
 void bar(int *c);
 void malabar(int *c);
-int main()
-{
-   printf("I like cats\n");
-   return 0;
-}
-void malabar(int *c)
-{
-   //PIPS generated variable
-   int _return0;
-
-   _return0 = 3;
-   *c = _return0;
-}
 Prop INLINING_USE_INITIALIZATION_LIST  is True
 Prop INLINING_USE_INITIALIZATION_LIST  is True
 Prop INLINING_USE_INITIALIZATION_LIST  is False

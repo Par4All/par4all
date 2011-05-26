@@ -39,16 +39,16 @@ C     Check bug in controlizer when controlize_test() is called from controlize_
 
       REAL P(10,10,10), A0(10,10,10)
 
-C  T(I,J) {NIM1+1<=I}
+C  T(I,J) {1<=I, NIM1+1<=I}
 
 C     BEGIN BLOCK
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=NIM1}
 
 
       DO 31 I = 1, NIM1                                                 0007
 
-C  T(J) {}
+C  T(J) {1<=J, J<=NJM1}
 
          DO 31 J = 1, NJM1                                              0008
 

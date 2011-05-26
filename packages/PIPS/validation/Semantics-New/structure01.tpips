@@ -1,0 +1,27 @@
+delete structure01
+
+setproperty ABORT_ON_USER_ERROR
+
+create structure01 structure01.c
+
+activate C_PARSER
+setproperty PRETTYPRINT_C_CODE TRUE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+
+
+echo
+echo Codes with TRANSFORMERS for functions
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[%ALLFUNC]
+
+
+close
+quit

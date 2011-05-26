@@ -1,3 +1,467 @@
 
 PROPER  EFFECTS
 
+int main()
+{
+   FILE *fp;
+   size_t n, nr;
+   char buf1[200];
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: buf2 _MALLOC_EFFECTS:_MALLOC_
+   char *buf2 = malloc(200*sizeof(char));
+   char *fmt;
+   char *i_name;
+   int i, r, c, max;
+   fpos_t *fp_pos, pos;
+   long int fp_pos_indic;
+   va_list vl;
+//             <    is written>: fmt
+   
+   // formatted IO functions
+   fmt = "%s%d";
+//             <    is written>: max
+   max = 100;
+//             <    is written>: n
+   n = 200;
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: fp
+   fp = fopen("file.txt", "rb");
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fscanf(fp, fmt, i_name, &i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fprintf(fp, "%s%d", i_name, i);
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0] *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i_name stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+   
+   
+   (void) scanf("%s%d", i_name, &i);
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   (void) printf(fmt, i_name, i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   
+   
+   (void) sscanf(buf1, fmt, i_name, &i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   (void) sprintf(buf2, fmt, i_name, i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   (void) snprintf(buf2, 100, fmt, i_name, i);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fgets(buf1, max, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fputc(c, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fputs(buf1, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   c = _IO_getc(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) _IO_putc(c, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) ungetc(c, fp);
+//             <may be read   >: stdin[0]
+//             <may be written>: stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: c __IO_EFFECTS:LUNS[0]
+
+   c = getchar();
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: c stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   (void) putchar(c);
+//             <may be read   >: stdin[0]
+//             <may be written>: buf1[*] stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+
+   (void) gets(buf1);
+//             <may be read   >: buf1[*] stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   (void) puts(buf1);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   nr = fwrite(buf2, sizeof(char), n, fp);
+//             <    is written>: fp_pos
+   
+   // file positionning functions
+   fp_pos = &pos;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fgetpos(fp, fp_pos);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   (void) fgetpos(fp, &pos);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   (void) fseek(fp, 0L, 0);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   (void) fsetpos(fp, fp_pos);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   fp_pos_indic = ftell(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   rewind(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   
+   // error handling functions
+   
+   clearerr(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   r = feof(fp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   r = ferror(fp);
+//             <may be read   >: buf1[*] stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+   perror(buf1);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+
+   fclose(fp);
+//             <may be read   >: stderr[0]
+//             <may be written>: stderr[0]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
+//             <    is written>: __IO_EFFECTS:LUNS[2]
+
+   fprintf(stderr, "The END\n");
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   FILE *fp;
+//  {(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   size_t n, nr;
+//  {(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   char buf1[200];
+//  {(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   char *buf2 = malloc(200*sizeof(char));
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,
+//   -Exact-)}
+   char *fmt;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   char *i_name;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   int i, r, c, max;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   fpos_t *fp_pos, pos;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   long int fp_pos_indic;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   va_list vl;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*NOWHERE*_b1,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   // formatted IO functions
+   fmt = "%s%d";
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   max = 100;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   n = 200;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   fp = fopen("file.txt", "rb");
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   
+   (void) fread(buf1, 8, 50, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fscanf(fp, fmt, i_name, &i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fprintf(fp, "%s%d", i_name, i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   
+   (void) scanf("%s%d", i_name, &i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) printf(fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   
+   (void) sscanf(buf1, fmt, i_name, &i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) sprintf(buf2, fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) snprintf(buf2, 100, fmt, i_name, i);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   
+   // character IO functions
+   
+   c = fgetc(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fgets(buf1, max, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fputc(c, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fputs(buf1, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   c = _IO_getc(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) _IO_putc(c, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) ungetc(c, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   c = getchar();
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) putchar(c);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   (void) gets(buf1);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) puts(buf1);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   // direct IO functions
+   
+   nr = fread(buf2, sizeof(char), n, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   nr = fwrite(buf2, sizeof(char), n, fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,
+//   *ANY_MODULE*:*NOWHERE*_b2,-Exact-);(i_name,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   // file positionning functions
+   fp_pos = &pos;
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fgetpos(fp, fp_pos);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   (void) fgetpos(fp, &pos);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   (void) fseek(fp, 0L, 0);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   (void) fsetpos(fp, fp_pos);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   fp_pos_indic = ftell(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   rewind(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   
+   // error handling functions
+   
+   clearerr(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   r = feof(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   r = ferror(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   perror(buf1);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   fclose(fp);
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   fprintf(stderr, "The END\n");
+//  {(buf2,*HEAP*_l_10[0],-Exact-);(fmt,*ANY_MODULE*:*ANYWHERE*_b0,
+//   -Exact-);(fp,*ANY_MODULE*:*ANYWHERE*_b1,-Exact-);(fp_pos,pos,
+//   -Exact-);(i_name,*ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   return 0;
+}

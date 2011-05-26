@@ -1,0 +1,91 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 3;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+
+   if (i>1) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+//             <    is written>: i
+      i = 0;
+   }
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i = 3;
+//  {}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   if (i>1) {
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+      int *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+      q = &a[i];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,a[i],-Exact-)}
+      p = q;
+//  {(p,a[i],-Exact-);(q,a[i],-Exact-)}
+      i = 0;
+   }
+//  {(p,a[i],-MAY-);(p,*ANY_MODULE*:*NOWHERE*_b0,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 3;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+
+   if (i>1) {
+      int *q;
+//             <    is read   >: i
+//             <    is written>: q
+      q = &a[i];
+//             <    is read   >: q
+//             <    is written>: p
+      p = q;
+//             <    is written>: i
+      i = 0;
+   }
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 13 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 12 with conflicts
+		from <q-W-EXACT> to <q-R-EXACT>
+	04 --> 13 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+	04 --> 11 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 08 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

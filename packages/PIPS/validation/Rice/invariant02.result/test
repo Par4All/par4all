@@ -23,7 +23,6 @@ void invariant02(int ni, int nj)
    int i, j;
    float s, a, b;
 
-
    i = MAX(INT(ni), 0);
    s = a*b;
 #pragma omp parallel for 

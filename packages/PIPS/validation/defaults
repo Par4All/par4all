@@ -30,7 +30,6 @@ Ricedg
 CoarseGrainParallelization
 #PHRASE # out as not maintained, 2010-05-10 FC
 Callgraph
-# Transformations, using PIPS initial default options
 Transformations
 DemoStd
 Hyperplane
@@ -39,7 +38,6 @@ Pipsmake
 Examples
 Prettyprint
 LoopRecovering
-Loop_fusion
 OpenMP
 Outlining
 # ngspice_bug:
@@ -64,9 +62,6 @@ Gpu
 Hpfc
 HardwareAccelerator
 Scilab
-# Same kinds of validations as Transformations,
-# but using 2009 PIPS default option
-Transformations-New
 # should be added?
 # AliasChecking
 # ArrayBoundCheck

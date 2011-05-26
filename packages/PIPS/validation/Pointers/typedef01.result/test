@@ -20,15 +20,15 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int t;
-//  points to = {}
+//  {}
    
    
    for(t = 0; t <= 63; t += 1)
-//  points to = {}
+//  {}
       compute();
-//  points to = {}
+//  {}
    
    
    return 0;

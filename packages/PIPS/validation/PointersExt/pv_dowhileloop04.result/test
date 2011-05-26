@@ -25,17 +25,17 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i = 0;
-//  points to = {}
+//  {}
    int *p[10];
-//  points to = {}
+//  {}
    int a[10];
-//  points to = {}
+//  {}
    do {
-//  points to = {}
+//  {(p[i],a[i],-Exact-)}
       p[i] = &a[i];
-//  points to = {}
+//  {(p[i],a[i],-Exact-)}
       i++;
    }
    while (i<10);

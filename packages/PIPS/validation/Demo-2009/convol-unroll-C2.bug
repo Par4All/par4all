@@ -1,0 +1,2 @@
+the ksi & ksj variables are not used anymore in the source code,
+hence should not appear in the precondition arguments.

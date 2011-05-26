@@ -1,10 +1,32 @@
 
+PROPER  EFFECTS 
+
+void point_to04()
+{
+   struct s {
+      int a;
+      int b;
+      int c;
+      int d;
+   } c, *p;
+//             <    is written>: p
+
+   p = &c;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   p->d = p->a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p
+   p->d = p->a = 4;
+}
+
 POINTS-TO
 
 //  {}
 void point_to04()
 {
-//  points to = {}
+//  {}
    struct s {
       int a;
       int b;

@@ -70,12 +70,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       for(j = 0; j <= 4*(dim2/4)-1; j += 4) {
          b[i][j].re = a[j][i].re;
          b[i][j].im = a[j][i].im;
-         b[i][j+1].re = a[j+1][i].re;
-         b[i][j+1].im = a[j+1][i].im;
-         b[i][j+2].re = a[j+2][i].re;
-         b[i][j+2].im = a[j+2][i].im;
-         b[i][j+3].re = a[j+3][i].re;
-         b[i][j+3].im = a[j+3][i].im;
+         b[i][1+j].re = a[1+j][i].re;
+         b[i][1+j].im = a[1+j][i].im;
+         b[i][2+j].re = a[2+j][i].re;
+         b[i][2+j].im = a[2+j][i].im;
+         b[i][3+j].re = a[3+j][i].re;
+         b[i][3+j].im = a[3+j][i].im;
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
          b[i][j].re = a[j][i].re;
@@ -92,12 +92,12 @@ void X_5(int dim1, int dim2, Cplfloat a[dim1][dim2], Cplfloat b[dim2][dim1])
       for(j0 = 0; j0 <= 4*(dim2/4)-1; j0 += 4) {
          b[i0][j0].re = a[j0][i0].re;
          b[i0][j0].im = a[j0][i0].im;
-         b[i0][j0+1].re = a[j0+1][i0].re;
-         b[i0][j0+1].im = a[j0+1][i0].im;
-         b[i0][j0+2].re = a[j0+2][i0].re;
-         b[i0][j0+2].im = a[j0+2][i0].im;
-         b[i0][j0+3].re = a[j0+3][i0].re;
-         b[i0][j0+3].im = a[j0+3][i0].im;
+         b[i0][1+j0].re = a[1+j0][i0].re;
+         b[i0][1+j0].im = a[1+j0][i0].im;
+         b[i0][2+j0].re = a[2+j0][i0].re;
+         b[i0][2+j0].im = a[2+j0][i0].im;
+         b[i0][3+j0].re = a[3+j0][i0].re;
+         b[i0][3+j0].im = a[3+j0][i0].im;
       }
       for(j = 4*(dim2/4); j <= dim2-1; j += 1) {
          b[i0][j].re = a[j][i0].re;

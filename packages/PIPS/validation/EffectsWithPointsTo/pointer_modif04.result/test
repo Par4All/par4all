@@ -1,0 +1,69 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   s_t s;
+   int j;
+//             <    is read   >: s.max s.tab _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   init_s(s, 10);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s.max s.tab
+
+   compute_s(s, 10);
+   
+   
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   s_t s;
+//  {(s[tab],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int j;
+//  {(s[tab],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   init_s(s, 10);
+//  {(s[tab],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   compute_s(s, 10);
+//  {(s[tab],*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   
+   
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   s_t s;
+   int j;
+//             <    is read   >: s.max s.tab _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   init_s(s, 10);
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s.max s.tab
+
+   compute_s(s, 10);
+   
+   
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	28 --> 30 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <s.tab-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <s.max-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+
+****************** End of Dependence Graph ******************

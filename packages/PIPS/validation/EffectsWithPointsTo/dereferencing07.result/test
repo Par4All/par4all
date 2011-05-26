@@ -1,10 +1,27 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int x, tab1[10], tab2[10], *p;
+//             <    is read   >: x
+//             <    is written>: x
+   x++;
+//             <    is read   >: x
+//             <    is written>: x
+   x += 3;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: p tab1[tab2[x]] tab2[x] x
+   *(p+tab1[tab2[x]]) = 0;
+   return 1;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int x, tab1[10], tab2[10], *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    x++;

@@ -21,7 +21,7 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int *pi;
 //  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    float *px;

@@ -33,7 +33,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *a, *b, c, d, i;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -49,11 +49,11 @@ int main()
    b = &c;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,c,-Exact-)}
    do {
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       i = i+1;
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       a = b;
-//  points to = {}
+//  {(a,d,-MAY-);(a,c,-MAY-);(b,d,-Exact-)}
       b = &d;
    }
    while (i<5);

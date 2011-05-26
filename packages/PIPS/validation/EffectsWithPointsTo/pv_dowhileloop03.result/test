@@ -1,0 +1,89 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+   do {
+//             <    is read   >: i
+//             <    is written>: p
+      p = &a[i];
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<10);
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i = 0;
+//  {}
+   int *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int a[10];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   do {
+//  {(p,a[i],-Exact-)}
+      p = &a[i];
+//  {(p,a[i],-Exact-)}
+      i++;
+   }
+   while (i<10);
+//  {(p,a[i],-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <    is written>: i
+   int i = 0;
+   int *p;
+   int a[10];
+//             <    is read   >: i
+   do {
+//             <    is read   >: i
+//             <    is written>: p
+      p = &a[i];
+//             <    is read   >: i
+//             <    is written>: i
+      i++;
+   }
+   while (i<10);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	11 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+		from <i-R-EXACT> to <i-W-EXACT>
+	11 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	10 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	10 --> 10 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+	12 --> 11 with conflicts
+		from <i-R-EXACT> to <i-W-EXACT>
+	04 --> 11 with conflicts
+		from <i-W-EXACT> to <i-W-EXACT>
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 10 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+	04 --> 12 with conflicts
+		from <i-W-EXACT> to <i-R-EXACT>
+
+****************** End of Dependence Graph ******************

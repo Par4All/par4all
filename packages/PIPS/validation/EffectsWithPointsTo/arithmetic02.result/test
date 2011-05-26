@@ -1,0 +1,173 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *pdeb, *pfin, *p;
+//             <    is written>: pdeb
+
+   pdeb = &t[0];
+//             <    is written>: pfin
+   /*   repère le premier élément de t   */
+   pfin = &t[10-1];
+//             <    is read   >: pdeb
+//             <    is written>: p
+   /*   repère le dernier élément de t   */
+   
+   p = pdeb;
+//             <    is read   >: p pfin
+   while (p<=pfin) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (*p==0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p pdeb stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%d ", p-pdeb);
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("\n");
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *pdeb, *pfin, *p;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pfin,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   pdeb = &t[0];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   /*   repère le premier élément de t   */
+   pfin = &t[10-1];
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pdeb,t[0],-Exact-);(pfin,
+//   t[10-1],-Exact-)}
+   /*   repère le dernier élément de t   */
+   
+   p = pdeb;
+//  {(p,t[0],-Exact-);(pdeb,t[0],-Exact-);(pfin,t[10-1],-Exact-)}
+   while (p<=pfin) {
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+      if (*p==0)
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+         printf("%d ", p-pdeb);
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+      p++;
+   }
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+   printf("\n");
+//  {(p,t[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(pdeb,t[0],
+//   -Exact-);(pfin,t[10-1],-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *pdeb, *pfin, *p;
+//             <    is written>: pdeb
+
+   pdeb = &t[0];
+//             <    is written>: pfin
+   /*   repère le premier élément de t   */
+   pfin = &t[10-1];
+//             <    is read   >: pdeb
+//             <    is written>: p
+   /*   repère le dernier élément de t   */
+   
+   p = pdeb;
+//             <    is read   >: p pfin
+   while (p<=pfin) {
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+      if (*p==0)
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: p pdeb stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+         printf("%d ", p-pdeb);
+//             <    is read   >: p
+//             <    is written>: p
+      p++;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("\n");
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <p-R-EXACT> to <p-W-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	14 --> 15 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	14 --> -1 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	14 --> 14 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	14 --> 15 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	14 --> -1 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <p-W-EXACT>
+	14 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	-1 --> -1 with conflicts
+		from <p-R-EXACT> to <p-W-EXACT>
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	-1 --> 14 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	-1 --> -1 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+	11 --> 14 with conflicts
+		from <pfin-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	11 --> -1 with conflicts
+		from <pfin-W-EXACT> to <pfin-R-EXACT>
+	10 --> 14 with conflicts
+		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
+	10 --> 14 with conflicts
+		from <pdeb-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	10 --> -1 with conflicts
+		from <pdeb-W-EXACT> to <pdeb-R-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -1,0 +1,33 @@
+//
+// Code before fusion
+//
+void loop_fusion02(int a[100], int b[100])
+{
+   int i, j;
+   
+   /* The first loop can't be fused */
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+
+   for(i = 0; i <= 99; i += 1)
+      b[i] += a[i+1];
+
+   for(i = 0; i <= 99; i += 1)
+      a[i] = b[i];
+}
+//
+// Code after fusion
+//
+void loop_fusion02(int a[100], int b[100])
+{
+   int i, j;
+   
+   /* The first loop can't be fused */
+   for(i = 0; i <= 99; i += 1)
+      a[i] = i;
+
+   for(i = 0; i <= 99; i += 1) {
+      b[i] += a[i+1];
+      a[i] = b[i];
+   }
+}

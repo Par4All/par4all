@@ -1,0 +1,14 @@
+delete norecompute
+create norecompute norecompute.c
+echo -- show proper effects (1)
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+echo -- apply a transformation which preserves proper effects
+apply PRIVATIZE_MODULE
+echo -- show proper effects (2)
+display PRINTED_FILE
+echo -- number of computations of PROPER_EFFECTS
+echo -- could be 1 if preservation is implemented
+shell grep '^  PROPER_EFFECTS ' norecompute.database/Logfile | wc -l
+close
+delete norecompute

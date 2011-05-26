@@ -7,4 +7,6 @@ PARALLEL_VALIDATION	= 1
 override D.sub	= $(wildcard *.sub) vs_core oop anr999
 
 include ../validate.mk
+
+# add-on to check freia-spoc optimality
 include counts.mk

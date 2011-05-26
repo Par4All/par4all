@@ -37,27 +37,27 @@ POINTS TO
 //  {}
 void assign05()
 {
-//  points to = {}
+//  {}
    int *r;
 //  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int i;
 //  {(r,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    r = bar(i);
-//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(r,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    i = 1;
-//  {(r,*ANY_MODULE*:*ANYWHERE*,-Exact-)}
+//  {(r,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
    *r = 0;
 }
 //  {}
 int * bar(int j)
 {
-//  points to = {}
+//  {}
    return &j;
 }
 //  {}
 void foo()
 {
-//  points to = {}
+//  {}
    assign05();
 }

@@ -380,14 +380,14 @@ c 20   PRINT *, 'bef'
          LU_IND0 = 0
 99999    CONTINUE
          DO 99998 LU_IND0 = 0, 999, 4
-            F_0 = SA*SX(LU_IND0+1)
-            SY(LU_IND0+1) = SY(LU_IND0+1)+F_0
-            F_0 = SA*SX(LU_IND0+2)
-            SY(LU_IND0+2) = SY(LU_IND0+2)+F_0
-            F_0 = SA*SX(LU_IND0+3)
-            SY(LU_IND0+3) = SY(LU_IND0+3)+F_0
-            F_0 = SA*SX(LU_IND0+4)
-            SY(LU_IND0+4) = SY(LU_IND0+4)+F_0
+            F_0 = SA*SX(1+LU_IND0)
+            SY(1+LU_IND0) = SY(1+LU_IND0)+F_0
+            F_0 = SA*SX(2+LU_IND0)
+            SY(2+LU_IND0) = SY(2+LU_IND0)+F_0
+            F_0 = SA*SX(3+LU_IND0)
+            SY(3+LU_IND0) = SY(3+LU_IND0)+F_0
+            F_0 = SA*SX(4+LU_IND0)
+            SY(4+LU_IND0) = SY(4+LU_IND0)+F_0
 99998       CONTINUE
          I = 1001
 c      PRINT *, 'aft'
@@ -543,7 +543,6 @@ saxpy (float sx[1000], float sy[1000])
     }
   else
     {
-      simd_load_generic_v4sf (vec10, &sa0, &sa0, &sa0, &sa0);
       ;
       ;
       for (lu_ind00 = 0; lu_ind00 <= 999; lu_ind00 += 4)
@@ -557,6 +556,5 @@ saxpy (float sx[1000], float sy[1000])
 	}
       ;
     }
-  return;
 }
 

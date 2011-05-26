@@ -1,0 +1,31 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   dereferencing06();
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   dereferencing06();
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   dereferencing06();
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

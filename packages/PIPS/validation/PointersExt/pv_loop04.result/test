@@ -20,13 +20,13 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int *p[10];
-//  points to = {}
+//  {}
    int a[10];
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 9; i += 1)
 //  {(p[i],a[i],-MAY-)}

@@ -8,7 +8,6 @@ display PRINTED_FILE
 apply PRIVATIZE_MODULE
 setproperty LOOP_LABEL "here"
 setproperty SYMBOLIC_TILING_VECTOR "N,N"
-setproperty SYMBOLIC_TILING_NO_MIN TRUE
 apply SYMBOLIC_TILING
 
 display PRINTED_FILE

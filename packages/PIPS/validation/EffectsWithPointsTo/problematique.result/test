@@ -1,10 +1,61 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a, *b, *c;
+   int i;
+//             <    is written>: i
+   i = 0;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: a _MALLOC_EFFECTS:_MALLOC_
+   /* Allocation dynamiques des tableaux */
+   a = (int *) malloc(20*sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: b _MALLOC_EFFECTS:_MALLOC_
+   b = (int *) malloc(20*sizeof(int));
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: c _MALLOC_EFFECTS:_MALLOC_
+   c = (int *) malloc(20*sizeof(int));
+//             <    is read   >: b
+//             <    is written>: a
+   /* Creation d'alias entre a et b */
+   a = b;
+//             <    is read   >: c
+//             <    is written>: a
+   
+   /* Suppression de l'ancien alias entre a et b, creation d'un nouveau
+    * entre a et c */
+   a = c;
+//             <    is written>: i
+   
+   /* Initialisation du tableau b */
+   for(i = 0; i <= 19; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: b i
+      b[i] = i;
+//             <    is written>: i
+   
+   /* Initialisation du tableau c */
+   for(i = 0; i <= 19; i += 1)
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: c i
+      c[i] = 1;
+//             <    is written>: i
+   /* Initialisation du tableau a */
+   for(i = 0; i <= 19; i += 1)
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+      a[i] = b[i];
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *a, *b, *c;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(b,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(c,*ANY_MODULE*:*NOWHERE*_b0,
@@ -120,23 +171,23 @@ int main()
 		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
 	25 --> 28 with conflicts
 		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
-	25 --> -1 with conflicts
+	25 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	25 --> 25 with conflicts
 		from <*HEAP*_l_11[0+i]-W-EXACT> to <*HEAP*_l_11[0+i]-W-EXACT>
-	-1 --> -1 with conflicts
+	24 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	21 --> 28 with conflicts
 		from <*HEAP*_l_10[0+i]-W-EXACT> to <*HEAP*_l_10[0+i]-R-EXACT>
-	21 --> -1 with conflicts
+	21 --> 27 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
-	21 --> -1 with conflicts
+	21 --> 24 with conflicts
 		from <i-R-EXACT> to <i-W-EXACT>
 	21 --> 21 with conflicts
 		from <*HEAP*_l_10[0+i]-W-EXACT> to <*HEAP*_l_10[0+i]-W-EXACT>
-	-1 --> -1 with conflicts
+	20 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	-1 --> -1 with conflicts
+	20 --> 24 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 	17 --> 28 with conflicts
 		from <a-W-EXACT> to <a-R-EXACT>
@@ -164,11 +215,11 @@ int main()
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
 		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
-	07 --> -1 with conflicts
+	07 --> 27 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	07 --> -1 with conflicts
+	07 --> 24 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
-	07 --> -1 with conflicts
+	07 --> 20 with conflicts
 		from <i-W-EXACT> to <i-W-EXACT>
 
 ****************** End of Dependence Graph ******************

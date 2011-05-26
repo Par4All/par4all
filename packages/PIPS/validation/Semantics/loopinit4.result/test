@@ -29,7 +29,7 @@ C  T(N) {J==2, N==0}
 
       N = 0                                                             0020
 
-C  T(I,J) {J#init==1, N==0}
+C  T(I,J) {J#init==1, N==0, I<=0}
 
 
       DO I = INC(J), N                                                  0022

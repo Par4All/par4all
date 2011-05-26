@@ -12,8 +12,8 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int a;
-//  points to = {}
+//  {}
    return 0;
 }

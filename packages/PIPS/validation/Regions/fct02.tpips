@@ -1,0 +1,108 @@
+delete fct02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create fct02 fct02.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+#apply RESTRUCTURE_CONTROL[%ALL]
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate MUST_REGIONS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+echo
+echo Transformers for "FCT02"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions for "FCT02"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo RW regions for "FCT02"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+echo
+echo IN regions for "FCT02"
+echo
+
+setenv IN_EFFECTS_DEBUG_LEVEL 8
+setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+close
+delete fct02
+
+# Second run: compute transformers in context
+
+create fct02 fct02.f
+
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+#apply RESTRUCTURE_CONTROL[%ALL]
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+
+activate MUST_REGIONS
+
+setproperty PRETTYPRINT_BLOCKS TRUE
+
+echo
+echo Transformers for "FCT02"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE
+
+echo
+echo Preconditions for "FCT02"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo
+echo RW regions for "FCT02"
+echo
+
+activate PRINT_CODE_REGIONS
+display PRINTED_FILE
+
+echo
+echo IN regions for "FCT02"
+echo
+
+setenv IN_EFFECTS_DEBUG_LEVEL 8
+setenv REGIONS_OPERATORS_DEBUG_LEVEL 8
+
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE
+
+quit

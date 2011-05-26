@@ -16,44 +16,351 @@ void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfl
 }
 void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
 {
-   int rg;
+
+   float PP;
+   int th, v, rg;
+
+   for(th = 0; th <= Nth-1; th += 1) {
+      PP = 0.;
+      for(rg = 0; rg <= Nrg-1; rg += 1)
+         for(v = 0; v <= Nv-1; v += 1)
+
+            PP += ptrin[th][rg][v].re*ptrin[th][rg][v].re+ptrin[th][rg][v].im*ptrin[th][rg][v].im;
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
+      Pow[th].im = 0.;
+   }
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
    //PIPS generated variable
-   float RED0[4], RED1[1], PP0;
+   int I_0, rg, v;
    //PIPS generated variable
-   int th0, v0;
+   float PP;
+   //PIPS generated variable
+   int v0, v1;
+   PP = *PP_0;
+l99998:
+   for(rg = 0; rg <= Nrg-1; rg += 1)
+l99996:
+      for(I_0 = 0; I_0 <= (Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0+3)
+l99995:
+            for(v1 = 4*I_0; v1 <= MIN(Nv-1, 4*I_0+3); v1 += 1)
+               PP = PP+ptrin[th][rg][v1].re*ptrin[th][rg][v1].re+ptrin[th][rg][v1].im*ptrin[th][rg][v1].im;
+         else
+l99997:
+            for(v0 = 4*I_0; v0 <= MIN(Nv-1, 4*I_0+3); v0 += 1)
+               PP = PP+ptrin[th][rg][v0].re*ptrin[th][rg][v0].re+ptrin[th][rg][v0].im*ptrin[th][rg][v0].im;
+   *PP_0 = PP;
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0, rg, v;
+   //PIPS generated variable
+   float PP;
+   //PIPS generated variable
+   int v0, v1;
+   PP = *PP_0;
+l99998:
+   for(rg = 0; rg <= Nrg-1; rg += 1)
+l99996:
+      for(I_0 = 0; I_0 <= (Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0+3)
+l99995:
+            for(v1 = 4*I_0; v1 <= MIN(Nv-1, 4*I_0+3); v1 += 1)
+               PP = PP+ptrin[th][rg][v1].re*ptrin[th][rg][v1].re+ptrin[th][rg][v1].im*ptrin[th][rg][v1].im;
+         else
+l99997:
+            for(v0 = 4*I_0; v0 <= MIN(Nv-1, 4*I_0+3); v0 += 1)
+               PP = PP+ptrin[th][rg][v0].re*ptrin[th][rg][v0].re+ptrin[th][rg][v0].im*ptrin[th][rg][v0].im;
+   *PP_0 = PP;
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0, rg, v;
+   //PIPS generated variable
+   float PP;
+   //PIPS generated variable
+   int v0, v1;
+   PP = *PP_0;
+l99998:
+   for(rg = 1; rg <= Nrg; rg += 1)
+l99996:
+      for(I_0 = 1; I_0 <= (Nv-1)/4+1; I_0 += 1)
+         if (Nv-1>4*I_0-1) {
+l99995:            ;
+            PP = PP+ptrin[th][rg-1][4*I_0+1-5].re*ptrin[th][rg-1][4*I_0+1-5].re+ptrin[th][rg-1][4*I_0+1-5].im*ptrin[th][rg-1][4*I_0+1-5].im;
+            PP = PP+ptrin[th][rg-1][4*I_0+2-5].re*ptrin[th][rg-1][4*I_0+2-5].re+ptrin[th][rg-1][4*I_0+2-5].im*ptrin[th][rg-1][4*I_0+2-5].im;
+            PP = PP+ptrin[th][rg-1][4*I_0+3-5].re*ptrin[th][rg-1][4*I_0+3-5].re+ptrin[th][rg-1][4*I_0+3-5].im*ptrin[th][rg-1][4*I_0+3-5].im;
+            PP = PP+ptrin[th][rg-1][4*I_0+4-5].re*ptrin[th][rg-1][4*I_0+4-5].re+ptrin[th][rg-1][4*I_0+4-5].im*ptrin[th][rg-1][4*I_0+4-5].im;
+         }
+         else
+l99997:
+            for(v0 = 1; v0 <= Nv-4*I_0+4; v0 += 1)
+               PP = PP+ptrin[th][rg-1][4*I_0+v0-5].re*ptrin[th][rg-1][4*I_0+v0-5].re+ptrin[th][rg-1][4*I_0+v0-5].im*ptrin[th][rg-1][4*I_0+v0-5].im;
+   *PP_0 = PP;
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+
+   float PP;
+   int th, v, rg;
+   //PIPS generated variable
+   int I_0;
+
+l99997:
+   for(th = 0; th <= Nth-1; th += 1) {
+      PP = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP, th, ptrin);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
+      Pow[th].im = 0.;
+   }
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0, rg, v;
+   //PIPS generated variable
+   float PP;
+   //PIPS generated variable
+   int v0, v1;
+   PP = *PP_0;
+l99998:
+   for(rg = 1; rg <= Nrg; rg += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0-1) {
+l99995:            ;
+            PP = PP+ptrin[th][rg-1][1+4*I_0-5].re*ptrin[th][rg-1][1+4*I_0-5].re+ptrin[th][rg-1][1+4*I_0-5].im*ptrin[th][rg-1][1+4*I_0-5].im;
+            PP = PP+ptrin[th][rg-1][2+4*I_0-5].re*ptrin[th][rg-1][2+4*I_0-5].re+ptrin[th][rg-1][2+4*I_0-5].im*ptrin[th][rg-1][2+4*I_0-5].im;
+            PP = PP+ptrin[th][rg-1][3+4*I_0-5].re*ptrin[th][rg-1][3+4*I_0-5].re+ptrin[th][rg-1][3+4*I_0-5].im*ptrin[th][rg-1][3+4*I_0-5].im;
+            PP = PP+ptrin[th][rg-1][4+4*I_0-5].re*ptrin[th][rg-1][4+4*I_0-5].re+ptrin[th][rg-1][4+4*I_0-5].im*ptrin[th][rg-1][4+4*I_0-5].im;
+         }
+         else
+l99997:
+            for(v0 = 1; v0 <= 4+Nv-4*I_0; v0 += 1)
+               PP = PP+ptrin[th][rg-1][v0+4*I_0-5].re*ptrin[th][rg-1][v0+4*I_0-5].re+ptrin[th][rg-1][v0+4*I_0-5].im*ptrin[th][rg-1][v0+4*I_0-5].im;
+   *PP_0 = PP;
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0, rg, v;
+   //PIPS generated variable
+   float PP;
+   //PIPS generated variable
+   int v0, v1;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14;
+   PP = *PP_0;
+l99998:
+   for(rg = 1; rg <= Nrg; rg += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0-1) {
+l99995:            ;
+            F_0 = ptrin[th][rg-1][1+4*I_0-5].re*ptrin[th][rg-1][1+4*I_0-5].re;
+            F_1 = PP+F_0;
+            F_2 = ptrin[th][rg-1][1+4*I_0-5].im*ptrin[th][rg-1][1+4*I_0-5].im;
+            PP = F_1+F_2;
+            F_3 = ptrin[th][rg-1][2+4*I_0-5].re*ptrin[th][rg-1][2+4*I_0-5].re;
+            F_4 = PP+F_3;
+            F_5 = ptrin[th][rg-1][2+4*I_0-5].im*ptrin[th][rg-1][2+4*I_0-5].im;
+            PP = F_4+F_5;
+            F_6 = ptrin[th][rg-1][3+4*I_0-5].re*ptrin[th][rg-1][3+4*I_0-5].re;
+            F_7 = PP+F_6;
+            F_8 = ptrin[th][rg-1][3+4*I_0-5].im*ptrin[th][rg-1][3+4*I_0-5].im;
+            PP = F_7+F_8;
+            F_9 = ptrin[th][rg-1][4+4*I_0-5].re*ptrin[th][rg-1][4+4*I_0-5].re;
+            F_10 = PP+F_9;
+            F_11 = ptrin[th][rg-1][4+4*I_0-5].im*ptrin[th][rg-1][4+4*I_0-5].im;
+            PP = F_10+F_11;
+         }
+         else
+l99997:
+            for(v0 = 1; v0 <= 4+Nv-4*I_0; v0 += 1) {
+               F_12 = ptrin[th][rg-1][v0+4*I_0-5].re*ptrin[th][rg-1][v0+4*I_0-5].re;
+               F_13 = PP+F_12;
+               F_14 = ptrin[th][rg-1][v0+4*I_0-5].im*ptrin[th][rg-1][v0+4*I_0-5].im;
+               PP = F_13+F_14;
+            }
+   *PP_0 = PP;
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0;
+   //PIPS generated variable
+   int v0;
+   //PIPS generated variable
+   float F_0, F_1, F_2, F_3, F_4, F_5, F_6, F_7, F_8, F_9, F_10, F_11, F_12, F_13, F_14;
+   //PIPS generated variable
+   int rg0;
    //SAC generated temporary array
    a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
    //PIPS generated variable
-   v4sf vec00_0, vec10_0, vec20_0, vec30_0, vec40_0, vec50_0, vec60_0, vec70_0;
-
-   for(th0 = 0; th0 <= 255; th0 += 1) {
-      PP0 = 0.;
-      RED1[0] = 0.000000;
-      for(rg = 0; rg <= 255; rg += 1) {
-         RED0[0] = 0.000000;
-         RED0[1] = 0.000000;
-         RED0[2] = 0.000000;
-         RED0[3] = 0.000000;
-         SIMD_LOAD_GENERIC_V4SF(vec60_0, pdata0[1], pdata0[3], pdata1[1], pdata1[3]);
-         SIMD_LOAD_GENERIC_V4SF(vec50_0, pdata0[0], pdata0[2], pdata1[0], pdata1[2]);
-         SIMD_LOAD_V4SF(vec70_0, &RED0[0]);
-         for(v0 = 0; v0 <= 255; v0 += 4) {
+   float PP0, PP1, PP2, PP3, PP4;
+   PP0 = *PP_0;
+l99998:
+   for(rg0 = 1; rg0 <= Nrg; rg0 += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0-1) {
             //PIPS:SAC generated v4sf vector(s)
-            SIMD_LOAD_V4SF(vec10_0, &ptrin[th0][rg][v0].re);
-            SIMD_MULPS(vec00_0, vec10_0, vec10_0);
-            SIMD_LOAD_V4SF(vec30_0, &ptrin[th0][rg][2+v0].re);
-            SIMD_MULPS(vec20_0, vec30_0, vec30_0);
-            SIMD_ADDPS(vec40_0, vec50_0, vec60_0);
-            SIMD_ADDPS(vec70_0, vec70_0, vec40_0);
+            v4sf vec00, vec10, vec20, vec30;
+l99995:            ;
+            SIMD_LOAD_V4SF(vec10, &ptrin[th][rg0-1][1+4*I_0-5].re);
+            SIMD_MULPS(vec00, vec10, vec10);
+            SIMD_STORE_V4SF(vec00, &pdata0[0]);
+            SIMD_LOAD_V4SF(vec30, &ptrin[th][rg0-1][3+4*I_0-5].re);
+            SIMD_MULPS(vec20, vec30, vec30);
+            SIMD_STORE_V4SF(vec20, &pdata1[0]);
+            F_1 = PP0+pdata0[0];
+            PP1 = F_1+pdata0[1];
+            F_4 = PP1+pdata0[2];
+            PP2 = F_4+pdata0[3];
+            F_7 = PP2+pdata1[0];
+            PP3 = F_7+pdata1[1];
+            F_10 = PP3+pdata1[2];
+            PP4 = F_10+pdata1[3];
+            PP0 = PP4;
          }
-         SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
-         SIMD_STORE_V4SF(vec20_0, &pdata1[0]);
-         SIMD_STORE_V4SF(vec70_0, &RED0[0]);
-         RED1[0] = RED0[3]+RED0[2]+RED0[1]+RED0[0]+RED1[0];
-      }
-      PP0 = RED1[0]+PP0;
-      Pow[th0].im = 0.;
-      Pow[th0].re = (float) (PP0/((float) 65536));
+         else
+l99997:
+            for(v0 = 1; v0 <= 4+Nv-4*I_0; v0 += 1) {
+               F_12 = ptrin[th][rg0-1][v0+4*I_0-5].re*ptrin[th][rg0-1][v0+4*I_0-5].re;
+               F_14 = ptrin[th][rg0-1][v0+4*I_0-5].im*ptrin[th][rg0-1][v0+4*I_0-5].im;
+               F_13 = PP0+F_12;
+               PP0 = F_13+F_14;
+            }
+   *PP_0 = PP0;
+}
+void average_power_l99998(int Nrg, int Nth, int Nv, float PP_0[1], int th, Cplfloat ptrin[Nth][Nrg][Nv])
+{
+   //PIPS generated variable
+   int I_0;
+   //PIPS generated variable
+   int v0;
+   //PIPS generated variable
+   float F_1, F_4, F_7, F_10, F_12, F_13, F_14;
+   //PIPS generated variable
+   int rg0;
+   //SAC generated temporary array
+   a4sf pdata0 = {0, 0, 0, 0}, pdata1 = {0, 0, 0, 0};
+   //PIPS generated variable
+   float PP0, PP1, PP2, PP3, PP4;
+   //PIPS generated variable
+   v4sf vec00_0, vec10_0, vec20_0, vec30_0;
+   PP0 = *PP_0;
+l99998:
+   for(rg0 = 1; rg0 <= Nrg; rg0 += 1)
+l99996:
+      for(I_0 = 1; I_0 <= 1+(Nv-1)/4; I_0 += 1)
+         if (Nv-1>4*I_0-1) {
+            //PIPS:SAC generated v4sf vector(s)
+            SIMD_LOAD_V4SF(vec10_0, &ptrin[th][rg0-1][1+4*I_0-5].re);
+l99995:            ;
+            SIMD_MULPS(vec00_0, vec10_0, vec10_0);
+            SIMD_STORE_V4SF(vec00_0, &pdata0[0]);
+            SIMD_LOAD_V4SF(vec30_0, &ptrin[th][rg0-1][3+4*I_0-5].re);
+            SIMD_MULPS(vec20_0, vec30_0, vec30_0);
+            F_1 = PP0+pdata0[0];
+            PP1 = F_1+pdata0[1];
+            F_4 = PP1+pdata0[2];
+            PP2 = F_4+pdata0[3];
+            SIMD_STORE_V4SF(vec20_0, &pdata1[0]);
+            F_7 = PP2+pdata1[0];
+            PP3 = F_7+pdata1[1];
+            F_10 = PP3+pdata1[2];
+            PP4 = F_10+pdata1[3];
+            PP0 = PP4;
+         }
+         else
+l99997:
+            for(v0 = 1; v0 <= 4+Nv-4*I_0; v0 += 1) {
+               F_12 = ptrin[th][rg0-1][v0+4*I_0-5].re*ptrin[th][rg0-1][v0+4*I_0-5].re;
+               F_14 = ptrin[th][rg0-1][v0+4*I_0-5].im*ptrin[th][rg0-1][v0+4*I_0-5].im;
+               F_13 = PP0+F_12;
+               PP0 = F_13+F_14;
+            }
+   *PP_0 = PP0;
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+
+   float PP;
+   int th, v, rg;
+   //PIPS generated variable
+   int I_0;
+
+l99997:
+   for(th = 0; th <= Nth-1; th += 1) {
+      PP = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP, th, ptrin);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
+      Pow[th].im = 0.;
    }
-   ;
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+
+   float PP;
+   int th, v, rg;
+   //PIPS generated variable
+   int I_0;
+
+l99997:
+   for(th = 0; th <= Nth-1; th += 1) {
+      PP = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP, th, ptrin);
+      Pow[th].re = (float) (PP/((float) (Nv*Nrg)));
+      Pow[th].im = 0.;
+   }
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+   //PIPS generated variable
+   float PP0;
+   //PIPS generated variable
+   int th0;
+
+l99997:
+   for(th0 = 0; th0 <= Nth-1; th0 += 1) {
+      PP0 = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP0, th0, ptrin);
+      Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
+      Pow[th0].im = 0.;
+   }
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+   //PIPS generated variable
+   float PP0;
+   //PIPS generated variable
+   int th0;
+
+l99997:
+   for(th0 = 0; th0 <= Nth-1; th0 += 1) {
+      PP0 = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP0, th0, ptrin);
+      Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
+      Pow[th0].im = 0.;
+   }
+}
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], Cplfloat Pow[Nth])
+{
+   //PIPS generated variable
+   float PP0;
+   //PIPS generated variable
+   int th0;
+
+l99997:
+   for(th0 = 0; th0 <= Nth-1; th0 += 1) {
+      PP0 = 0.;
+l99998:      average_power_l99998(Nrg, Nth, Nv, &PP0, th0, ptrin);
+      Pow[th0].re = (float) (PP0/((float) (Nv*Nrg)));
+      Pow[th0].im = 0.;
+   }
 }

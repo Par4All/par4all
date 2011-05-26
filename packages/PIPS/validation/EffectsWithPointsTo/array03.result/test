@@ -1,0 +1,72 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   float a[5][3], ret;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   ret = foo(a);
+//             <    is read   >: a[0][3] a[1][3]
+//             <    is written>: a[0][3] a[1][3] ret
+   ret = foo2(a);
+//             <    is read   >: d[0][3] d[1][3]
+//             <    is written>: d[0][3] d[1][3] ret
+   ret = foo3();
+
+   return 1;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   float a[5][3], ret;
+//  {}
+
+   ret = foo(a);
+//  {}
+   ret = foo2(a);
+//  {}
+   ret = foo3();
+//  {}
+
+   return 1;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   float a[5][3], ret;
+//             <    is read   >: a[0][3] a[1][3]
+//             <    is written>: a[0][3] a[1][3] ret
+
+   ret = foo(a);
+//             <    is read   >: a[0][3] a[1][3]
+//             <    is written>: a[0][3] a[1][3] ret
+   ret = foo2(a);
+//             <    is read   >: d[0][3] d[1][3]
+//             <    is written>: d[0][3] d[1][3] ret
+   ret = foo3();
+
+   return 1;
+}
+
+ *********************** Use-Def Chains *********************
+
+	64 --> 65 with conflicts
+		from <ret-W-EXACT> to <ret-W-EXACT>
+	63 --> 64 with conflicts
+		from <ret-W-EXACT> to <ret-W-EXACT>
+		from <a[1][3]-W-EXACT> to <a[1][3]-W-EXACT>
+		from <a[0][3]-W-EXACT> to <a[0][3]-W-EXACT>
+		from <a[1][3]-W-EXACT> to <a[1][3]-R-EXACT>
+		from <a[0][3]-W-EXACT> to <a[0][3]-R-EXACT>
+		from <a[1][3]-R-EXACT> to <a[1][3]-W-EXACT>
+		from <a[0][3]-R-EXACT> to <a[0][3]-W-EXACT>
+
+****************** End of Dependence Graph ******************

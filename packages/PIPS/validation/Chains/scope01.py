@@ -16,7 +16,7 @@ w.activate("print_chains_graph")
 
 print "*********************** Without points-to analysis ***********************"
 r.atomic_chains()
-r.display("dg_file");
+r.display(rc="dg_file");
 
 print ""
 print ""
@@ -25,6 +25,6 @@ print ""
 print "************************* With points-to analysis ************************"
 w.activate("proper_effects_with_points_to")
 r.atomic_chains()
-r.display("dg_file");
+r.display(rc="dg_file");
 
 

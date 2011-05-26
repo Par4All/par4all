@@ -1,0 +1,242 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   FILE *pFile;
+   int n;
+   char name[100];
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: pFile
+
+   pFile = fopen("myfile.txt", "w");
+//             <    is written>: n
+   for(n = 0; n <= 2; n += 1) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      puts("please, enter a name: ");
+//             <may be read   >: stdin[0]
+//             <may be written>: name[*] stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      gets(name);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   fclose(pFile);
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   FILE *pFile;
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int n;
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   char name[100];
+//  {(pFile,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   pFile = fopen("myfile.txt", "w");
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   for(n = 0; n <= 2; n += 1) {
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+      puts("please, enter a name: ");
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+      gets(name);
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+//  {(pFile,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   fclose(pFile);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   FILE *pFile;
+   int n;
+   char name[100];
+//             <may be read   >: __IO_EFFECTS:LUNS[*]
+//             <may be written>: __IO_EFFECTS:LUNS[*]
+//             <    is written>: pFile
+
+   pFile = fopen("myfile.txt", "w");
+//             <    is written>: n
+   for(n = 0; n <= 2; n += 1) {
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+      puts("please, enter a name: ");
+//             <may be read   >: stdin[0]
+//             <may be written>: name[*] stdin[0]
+//             <    is read   >: stdin __IO_EFFECTS:LUNS[0]
+//             <    is written>: __IO_EFFECTS:LUNS[0]
+      gets(name);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+      fprintf(pFile, "Name %d %s\n", n, name);
+   }
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//                               __IO_EFFECTS:LUNS[*]
+   fclose(pFile);
+}
+
+ *********************** Use-Def Chains *********************
+
+	15 --> 17 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	15 --> 15 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	15 --> 14 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <name[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin[0]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdin-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdin[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <name[*]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+	15 --> 13 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout[0]-R-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <stdout-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <stdout[0]-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	14 --> 17 with conflicts
+		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <name[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	14 --> 15 with conflicts
+		from <stdin[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <name[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <stdin[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdin-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	14 --> 14 with conflicts
+		from <stdin[0]-W-MAY> to <stdin[0]-W-MAY>
+		from <name[*]-W-MAY> to <name[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <stdin[0]-W-MAY> to <stdin[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[0]-W-EXACT> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <stdin[0]-R-MAY> to <stdin[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[0]-R-EXACT> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+	14 --> 13 with conflicts
+		from <stdin[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <stdin[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <stdin[0]-R-MAY> to <stdout[0]-W-MAY>
+	13 --> 17 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	13 --> 15 with conflicts
+		from <stdout[0]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <stdout[0]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <stdout-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	13 --> 14 with conflicts
+		from <stdout[0]-W-MAY> to <stdin[0]-W-MAY>
+		from <stdout[0]-W-MAY> to <stdin[0]-R-MAY>
+		from <stdout[0]-R-MAY> to <stdin[0]-W-MAY>
+	13 --> 13 with conflicts
+		from <stdout[0]-W-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <stdout[0]-W-MAY> to <stdout[0]-R-MAY>
+		from <__IO_EFFECTS:LUNS[1]-W-EXACT> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <stdout[0]-R-MAY> to <stdout[0]-W-MAY>
+		from <__IO_EFFECTS:LUNS[1]-R-EXACT> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+	11 --> 17 with conflicts
+		from <n-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <n-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+	10 --> 17 with conflicts
+		from <pFile-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pFile-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	10 --> 15 with conflicts
+		from <pFile-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <pFile-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[*]-R-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[*]-W-MAY>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	10 --> 14 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[0]-R-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[0]-W-EXACT>
+	10 --> 13 with conflicts
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-W-MAY> to <__IO_EFFECTS:LUNS[1]-R-EXACT>
+		from <__IO_EFFECTS:LUNS[*]-R-MAY> to <__IO_EFFECTS:LUNS[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

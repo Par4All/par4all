@@ -1,0 +1,50 @@
+void matrix_mul_matrix(size_t N, float C[N][N], float A[N][N], float B[N][N])
+{
+   size_t i, j, k;
+a:
+   for(i = 0; i <= N-1; i += 1)
+      for(j = 0; j <= N-1; j += 1) {
+         C[i][j] = 0;
+         for(k = 0; k <= N-1; k += 1)
+            C[i][j] += A[i][k]*B[k][j];
+      }
+}
+void matrix_mul_matrix(size_t N, float C[N][N], float A[N][N], float B[N][N])
+{
+   int i, j, k;
+   //PIPS generated variable
+   int I_0, I_1, N0 = N, N1 = N, N2 = N, N3 = N, N4 = N;
+#pragma omp parallel for private(i,j,k)
+a:
+   for(I_0 = 0; I_0 <= (N4-1)/3; I_0 += 1)
+#pragma omp parallel for private(j,k)
+      for(I_1 = 0; I_1 <= (N3-1)/10; I_1 += 1)
+#pragma omp parallel for 
+         for(i = I_0*3; i <= MIN(N2-1, I_0*3+3-1); i += 1)
+#pragma omp parallel for 
+            for(j = I_1*10; j <= MIN(N1-1, I_1*10+10-1); j += 1) {
+               C[i][j] = 0;
+               for(k = 0; k <= N0-1; k += 1)
+                  C[i][j] += A[i][k]*B[k][j];
+            }
+}
+void matrix_mul_matrix(size_t N, float C[N][N], float A[N][N], float B[N][N])
+{
+   int i, j, k;
+   //PIPS generated variable
+   int I_0, I_1, N0 = N, N1 = N, N2 = N, N3 = N, N4 = N;
+#pragma omp parallel for private(i,j,k)
+a:
+   for(I_0 = 0; I_0 <= (N4-1)/3; I_0 += 1)
+#pragma omp parallel for private(j,k)
+      for(I_1 = 0; I_1 <= (N3-1)/10; I_1 += 1)
+#pragma omp parallel for 
+         for(i = 3*I_0; i <= MIN(N2-1, 3*I_0+2); i += 1)
+#pragma omp parallel for 
+            for(j = 10*I_1; j <= MIN(N1-1, 10*I_1+9); j += 1) {
+               C[i][j] = 0;
+               for(k = 0; k <= N0-1; k += 1)
+                  C[i][j] += A[i][k]*B[k][j];
+            }
+}
+

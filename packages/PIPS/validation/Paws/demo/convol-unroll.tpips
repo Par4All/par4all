@@ -1,5 +1,5 @@
-echo c     Optimization by unrolling of loop 100 and 200,
-echo c     and by repetitive partial evaluation
+echo c     OPTIMIZATION BY UNROLLING OF LOOP 100 AND 200,
+echo c     AND BY REPETITIVE PARTIAL EVALUATION
 # Optimization by unrolling of loop 100 and 200,
 # and by repetitive partial evaluation
 
@@ -8,21 +8,21 @@ create convol-unroll convol-unroll.f
 
 setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
 
-echo c     Show convolution function
+echo c     SHOW convolution FUNCTION
 echo 
 # Show convolution function
 
 module convol
 display PRINTED_FILE
 
-echo c     Show main program
+echo c     SHOW main PROGRAM
 echo 
 # Show main program
 #
 module IMAGE_PROCESSING
 display PRINTED_FILE
 
-echo c     Show interprocedural preconditions for module convol
+echo c     SHOW INTERPROCEDURAL PRECONDITIONS FOR MODULE convol
 echo 
 # Show interprocedural preconditions for module convol
 #
@@ -37,14 +37,14 @@ display PRINTED_FILE
 
 activate PRINT_CODE
 
-echo c     After constant propagation
+echo c     AFTER CONSTANT PROPAGATION
 echo 
 # Propagate constants (cloning could be used too)
 #
 apply PARTIAL_EVAL
 display PRINTED_FILE 
 
-echo c     After full unrolling of the two internal loops
+echo c     AFTER FULL UNROLLING OF THE TWO INTERNAL LOOPS
 echo 
 # Unroll internal loops
 #
@@ -55,7 +55,9 @@ apply FULL_UNROLL
 200
 display PRINTED_FILE
 
-echo c     After useless variables elimination
+apply PRINT_DOT_DEPENDENCE_GRAPH[CONVOL]
+
+echo c     AFTER USELESS VARIABLES ELIMINATION
 
 # Eliminate useless variables
 #
@@ -65,18 +67,16 @@ setproperty MEMORY_EFFECTS_ONLY FALSE
 apply DEAD_CODE_ELIMINATION
 display PRINTED_FILE
 
-echo c     Subscript expressions have been eliminated by partial evaluation
+echo c     SUBSCRIPTED EXPRESSIONS HAVE BEEN ELIMINATED BY PARTIAL EVALUATION
 echo 
 # Simplify subscript expressions
 #
 apply PARTIAL_EVAL
 display PRINTED_FILE 
 
-echo c     Parallelized ... locality with a loop interchange
+echo c     PARALLELIZED LOCALITY WITH A LOOP INTERCHANGE
 echo 
-#apply LOOP_INTERCHANGE
-#400
-#display PRINTED_FILE
+
 activate NEST_PARALLELIZATION
 display PARALLELPRINTED_FILE
 

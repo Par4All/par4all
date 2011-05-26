@@ -31,9 +31,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    float f;
-//  points to = {}
+//  {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -51,9 +51,11 @@ int main()
    f = 0.0;
 //  {(p,a[0],-Exact-);(q,b[0],-Exact-)}
    while (f<10.5) {
-//  points to = {}
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       *p++ = 2**q++;
-//  points to = {}
+//  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],
+//   -MAY-);(q,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       f += 1.0;
    }
 //  {(p,a[0],-MAY-);(p,*ANY_MODULE*:*ANYWHERE*_b0,-MAY-);(q,b[0],

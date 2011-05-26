@@ -7,8 +7,8 @@ towns run(towns t, data_t xmin, data_t ymin, data_t xmax, data_t ymax, data_t st
    int nb = 1+rangex*rangey;
    towns tout = {nb, malloc(sizeof(town)*nb)};
    fprintf(stderr, "begin computation ...\n");
-   fprintf(stderr, "%lf %lf %lf\n""xrange: ", xmin, xmax, rangex);
-   fprintf(stderr, "%lf %lf %lf\n""yrange: ", ymin, ymax, rangey);
+   fprintf(stderr, "xrange: ""%lf %lf %lf\n", xmin, xmax, rangex);
+   fprintf(stderr, "yrange: ""%lf %lf %lf\n", ymin, ymax, rangey);
 
    for(i = 0; i <= rangex-1; i += 1)
       for(j = 0; j <= rangey-1; j += 1) {

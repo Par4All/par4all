@@ -84,7 +84,7 @@ int convold1(int X[13][13], int coeff[6], int i, int j)
    
    res = 0;
 
-//  T(m,res) {res#init==0, 0<=m}
+//  T(m,res) {res#init==0, 0<=m, m<=5}
 
    for(m = 0; m <= 5; m += 1)
 

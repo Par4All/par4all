@@ -9,6 +9,3 @@ PROGRAM MAIN
    PRINT *, B
    PRINT *, C
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-

@@ -8,8 +8,7 @@ C
       PARAMETER (N=100)
       REAL T(N+1)
 C
-100   CONTINUE                                                          0008
-      DO I = 1, 1+2*((N-1+1)/2)-1, 2
+100   DO I = 1, 1+2*((N-1+1)/2)-1, 2
          T(I) = -2*I
          T(I+1) = -2*(I+1)
       ENDDO
@@ -36,8 +35,7 @@ C
       PARAMETER (N=100)
       REAL T(N+1)
 C
-100   CONTINUE                                                          0008
-      DO I = 1, 100, 2
+100   DO I = 1, 100, 2
          T(I) = -2*I
          T(I+1) = -2*I-2
       ENDDO
@@ -64,8 +62,7 @@ C
       PARAMETER (N=100)
       REAL T(N+1)
 C
-100   CONTINUE                                                          0008
-      DO I = 1, 100, 2
+100   DO I = 1, 100, 2
          T(I) = -2*I
          T(I+1) = -2*I-2
       ENDDO

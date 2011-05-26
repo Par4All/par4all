@@ -211,7 +211,7 @@ int main()
       }
    }
 
-//  T(i) {}
+//  T(i) {i+1<=Nraf, 0<=i}
 
    for(i = 0; i <= Nraf-1; i += 1)
 
@@ -232,7 +232,7 @@ int main()
 
       float Trmin = Tr[0];
 
-//  T(i) {}
+//  T(i) {i+1<=Nraf, 0<=i}
 
       for(i = 0; i <= Nraf-1; i += 1)
 

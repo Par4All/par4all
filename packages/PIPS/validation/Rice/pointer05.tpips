@@ -1,0 +1,42 @@
+delete pointer05
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer05 pointer05.c
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+activate PROPER_EFFECTS
+
+activate PRINT_CODE_POINTS_TO_LIST
+
+echo
+echo POINTS TO
+echo
+
+display PRINTED_FILE
+
+echo
+echo Proper effects with points-to
+echo
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Dependence graph
+echo
+
+display DG_FILE
+
+echo
+echo Parallel code
+echo
+
+# activate what's needed for OpenMP output?
+display PARALLELPRINTED_FILE
+
+close
+delete pointer05
+quit

@@ -4,19 +4,19 @@ Initial code
 int pof()
 {
    int a;
-#pragma  pips outline
+#pragma pips outline
    a = 1;
 }
 int pof();
 
 Code after outlining
 
-void kernel(int *a_0)
+void kernel(int a_0[1])
 {
    //PIPS generated variable
    int a;
    a = *a_0;
-#pragma   pips outline
+#pragma pips outline
    a = 1;
    *a_0 = a;
 }
@@ -27,7 +27,7 @@ int pof()
 }
 int pof();
 //PIPS generated variable
-void kernel(int *a_0);
+void kernel(int a_0[1]);
 
 unsplit
 

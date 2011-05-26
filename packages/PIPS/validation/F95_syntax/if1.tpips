@@ -1,8 +1,0 @@
-delete if1
-create if1 if1.f90
-
-display PRINTED_FILE[%ALL]
-apply UNSPLIT[%ALL]
-
-close
-quit

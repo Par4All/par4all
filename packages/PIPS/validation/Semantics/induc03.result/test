@@ -14,7 +14,7 @@ C  T(IJ,IX,IY) {1<=IX, NX2+1<=IX, 1<=N}
 C (0,1)
 C     BEGIN BLOCK
 
-C  T(IJ,IX,IY) {1<=IX, 1<=N}
+C  T(IJ,IX,IY) {1<=IX, IX<=NX2, 1<=N}
 
 C (0,2)
 
@@ -32,7 +32,7 @@ C (0,4)
          IJ = IX                                                        0010
 
 C  T(IJ,IY) {IJ#init==IX, IJ#init+IY<=IJ+1, 1<=IJ#init, IJ#init<=NX2,
-C    1<=IY, 1<=N}
+C    1<=IY, IY<=NY2, 1<=N}
 
 C (0,5)
          DO IY = 1, NY2                                                 0011

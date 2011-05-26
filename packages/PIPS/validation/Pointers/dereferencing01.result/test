@@ -28,9 +28,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    double x = 1.;
-//  points to = {}
+//  {}
    double *p = &x;
 //  {(p,x,-Exact-)}
    double *q = 0;

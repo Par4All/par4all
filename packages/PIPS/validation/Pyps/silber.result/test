@@ -1,4 +1,8 @@
 w=1024, h=1024, max=255
+int adds(char i0, char i1)
+{
+   return (int) i0+i1>255?255:i0+i1;
+}
 void copy(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w])
 {
    int i, j;
@@ -6,16 +10,6 @@ void copy(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w])
    for(i = 0; i <= w-1; i += 1)
       for(j = 0; j <= h-1; j += 1)
          dest[j*w+i] = bytes[j*w+i];
-}
-void light(int w, int h, unsigned char bytes[h*w], unsigned char val)
-{
-   int i, j;
-
-   for(i = 0; i <= w-1; i += 1)
-      for(j = 0; j <= h-1; j += 1) {
-         unsigned char current = bytes[j*w+i];
-         bytes[j*w+i] = (int) current+val>255?255:current+val;
-      }
 }
 void curve(int w, int h, unsigned char bytes[h*w], unsigned char lut[h*w])
 {
@@ -27,9 +21,15 @@ void curve(int w, int h, unsigned char bytes[h*w], unsigned char lut[h*w])
          bytes[j*w+i] = lut[current];
       }
 }
-int adds(char i0, char i1)
+void light(int w, int h, unsigned char bytes[h*w], unsigned char val)
 {
-   return (int) i0+i1>255?255:i0+i1;
+   int i, j;
+
+   for(i = 0; i <= w-1; i += 1)
+      for(j = 0; j <= h-1; j += 1) {
+         unsigned char current = bytes[j*w+i];
+         bytes[j*w+i] = (int) current+val>255?255:current+val;
+      }
 }
 int main(int ac, char *av[])
 {
@@ -225,7 +225,9 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    unsigned char current_1;
 
+l99995:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
+l99996:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          dest[j_0*w+i_0] = bytes[j_0*w+i_0];
          current_0 = dest[j_0*w+i_0];
@@ -233,7 +235,9 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
       }
    
    
+l99991:
    for(i_2 = 0; i_2 <= w-1; i_2 += 1)
+l99992:
       for(j_2 = 0; j_2 <= h-1; j_2 += 1) {
          current_1 = dest[j_2*w+i_2];
          dest[j_2*w+i_2] = (int) current_1+val>255?255:current_1+val;
@@ -250,7 +254,9 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    unsigned char current_1;
 
+l99995:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
+l99996:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          dest[j_0*w+i_0] = bytes[j_0*w+i_0];
          current_0 = dest[j_0*w+i_0];
@@ -273,9 +279,9 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    //PIPS generated variable
    unsigned char current_1;
 
-l99985:
+l99995:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99986:
+l99996:
       for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
          ;
          current_0 = bytes[j_0*w+i_0];
@@ -420,14 +426,14 @@ void transfo(int w, int h, unsigned char bytes[h*w], unsigned char dest[h*w], un
    int I_10;
 
 #pragma omp parallel for private(j_0)
-l99983:
+l99989:
    for(i_0 = 0; i_0 <= w-1; i_0 += 1)
-l99984:      inner(h, w, &i_0, bytes, dest, lut, val);
+l99990:      inner(h, w, &i_0, bytes, dest, lut, val);
    
    
    ;
 }
-void inner(int h, int w, int *i_0_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
+void inner(int h, int w, int i_0_0[1], unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
    int I_3;
@@ -436,7 +442,7 @@ void inner(int h, int w, int *i_0_0, unsigned char bytes[h*w], unsigned char des
    //PIPS generated variable
    int j_0, i_0;
    i_0 = *i_0_0;
-l99984:
+l99990:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
       I_3 = j_0*w+i_0;
       current_0 = bytes[I_3];
@@ -445,7 +451,7 @@ l99984:
    }
    *i_0_0 = i_0;
 }
-void inner(int h, int w, int *i_0_0, unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
+void inner(int h, int w, int i_0_0[1], unsigned char bytes[h*w], unsigned char dest[h*w], unsigned char lut[h*w], unsigned char val)
 {
    //PIPS generated variable
    int I_3;
@@ -454,7 +460,7 @@ void inner(int h, int w, int *i_0_0, unsigned char bytes[h*w], unsigned char des
    //PIPS generated variable
    int j_0, i_0;
    i_0 = *i_0_0;
-l99984:
+l99990:
    for(j_0 = 0; j_0 <= h-1; j_0 += 1) {
       I_3 = j_0*w+i_0;
       voltage_0 = bytes[I_3];

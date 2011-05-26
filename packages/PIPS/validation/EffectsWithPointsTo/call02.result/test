@@ -1,0 +1,66 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: ap[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a b sp
+
+   call02(a, b, x, ap, sp);
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int a;
+//  {}
+   int b;
+//  {}
+   int x[10];
+//  {}
+   int *ap[10];
+//  {}
+   tf_t s;
+//  {}
+   tf_t *sp = &s;
+//  {(sp,s,-Exact-)}
+
+   call02(a, b, x, ap, sp);
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int a;
+   int b;
+   int x[10];
+   int *ap[10];
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: ap[*]
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: a b sp
+
+   call02(a, b, x, ap, sp);
+}
+
+ *********************** Use-Def Chains *********************
+
+	26 --> 28 with conflicts
+		from <sp-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <sp-W-EXACT> to <sp-R-EXACT>
+
+****************** End of Dependence Graph ******************

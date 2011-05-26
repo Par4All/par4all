@@ -159,7 +159,7 @@ int main()
 
       j = i;
 
-//  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, i<=j}
+//  T(foo:0`l,j,n) {BlockEnd==3, i+n==j, i==j#init, i<=15, i<=j, n<=2}
 
       for(n = 0; n <= BlockEnd-1; n += 1) {
 

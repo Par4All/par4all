@@ -64,18 +64,18 @@ int main(int argc, char *argv[])
    int b = atoi(argv[1]);
    //PIPS generated variable
    int *__a;
-   //PIPS generated variable
-   int __c[4];
    //SAC generated temporary array
    a4si pdata0 = {2, 3, 4, 5};
+   //PIPS generated variable
+   int __c[4];
    __a = malloc(4*sizeof(int));
    do {
-      //PIPS:SAC generated v4si vector(s)
-      v4si vec00, vec10, vec20;
-      SIMD_LOAD_GENERIC_V4SI(vec20, b, b, b, b);
-      SIMD_LOAD_V4SI(vec10, &pdata0[0]);
-      SIMD_MULD(vec00, vec10, vec20);
-      SIMD_STORE_V4SI(vec00, &__a[0]);
+      //PIPS:SAC generated v4sf vector(s)
+      v4sf vec00, vec10, vec20;
+      SIMD_LOAD_BROADCAST_V4SF(vec20, b);
+      SIMD_LOAD_V4SI_TO_V4SF(vec10, &pdata0[0]);
+      SIMD_MULPS(vec00, vec10, vec20);
+      SIMD_STORE_V4SF_TO_V4SI(vec00, &__a[0]);
    }
    while (0);
    do {

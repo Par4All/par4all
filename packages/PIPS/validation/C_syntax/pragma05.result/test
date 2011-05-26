@@ -52,9 +52,9 @@ Parsed printed file
 
 void pragma05()
 {
-#pragma  gnih
+#pragma gnih
 
-#pragma  endscop
+#pragma endscop
 
 }
 
@@ -62,8 +62,8 @@ Printed file
 
 void pragma05()
 {
-#pragma  gnih
+#pragma gnih
 
-#pragma  endscop
+#pragma endscop
 
 }

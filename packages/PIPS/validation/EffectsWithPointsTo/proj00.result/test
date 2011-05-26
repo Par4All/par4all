@@ -1,12 +1,53 @@
 
+PROPER  EFFECTS 
+
+int main(void)
+{
+   int i;
+   int **pp;
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED
+   srand(time((void *) 0));
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: _RANDOM_EFFECTS:GEN_SEED 
+//                               __IO_EFFECTS:LUNS[1]
+
+   if (alea()) {
+//             <    is written>: pi
+      int *pi = &i;
+//             <    is written>: pp
+      pp = &pi;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+      **pp = 1;
+   }
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: pp stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   
+   // pp points to a dead value in the stack
+   printf("%p\n", pp);
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+   
+   // possible segfault.
+   // should generate an error while analyzing?
+   **pp = 0;
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main(void)
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int **pp;
 //  {(pp,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    srand(time((void *) 0));

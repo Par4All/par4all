@@ -16,9 +16,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    flatten_code12();
-//  points to = {}
+//  {}
 
    return 0;
 }

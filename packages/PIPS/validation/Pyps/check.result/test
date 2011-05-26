@@ -1,0 +1,79 @@
+int foo(int a)
+{
+   return a;
+}
+void bar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 2;
+   *c = _return0;
+}
+void malabar(int *c)
+{
+   *c = foo(3);
+}
+int megablast(int n)
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+l99999:   LU_NUB0 = (n-1-0+1)/1;
+   LU_IB0 = MOD(LU_NUB0, 2);
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      j = foo(LU_IND0*1+0);
+l99998:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= LU_NUB0-1; LU_IND0 += 2) {
+      j = foo((LU_IND0+0)*1+0);
+      j = foo((LU_IND0+1)*1+0);
+l99997:      ;
+   }
+   i = 0+MAX0(LU_NUB0, 0)*1;
+   return j;
+}
+void bar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 2;
+   *c = _return0;
+}
+int foo(int a)
+{
+   return a;
+}
+int main()
+{
+   printf("%d\n", megablast(2));
+   return 0;
+}
+void malabar(int *c)
+{
+   *c = foo(3);
+}
+int megablast(int n)
+{
+   int i, j;
+   //PIPS generated variable
+   int LU_NUB0, LU_IB0, LU_IND0;
+l99999:   LU_NUB0 = 2;
+   LU_IB0 = 0;
+   for(LU_IND0 = 0; LU_IND0 <= LU_IB0-1; LU_IND0 += 1) {
+      j = foo(0);
+l99998:      ;
+   }
+   for(LU_IND0 = LU_IB0; LU_IND0 <= 1; LU_IND0 += 2) {
+      j = foo(LU_IND0);
+      j = foo(LU_IND0+1);
+l99997:      ;
+   }
+   i = 2;
+   return j;
+}
+found labels:
+l99999
+l99998
+l99997

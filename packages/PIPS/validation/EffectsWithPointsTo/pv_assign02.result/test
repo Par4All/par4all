@@ -1,0 +1,64 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int *a[2];
+//             <    is written>: b
+   int b = 0;
+//             <    is written>: c
+   int c = 1;
+//             <    is written>: a[0]
+   a[0] = &b;
+//             <    is written>: a[1]
+   a[1] = &b;
+//             <    is written>: a[1]
+   a[1] = &c;
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int *a[2];
+//  {}
+   int b = 0;
+//  {}
+   int c = 1;
+//  {}
+   a[0] = &b;
+//  {(a[0],b,-Exact-)}
+   a[1] = &b;
+//  {(a[1],b,-Exact-);(a[0],b,-Exact-)}
+   a[1] = &c;
+//  {(a[1],c,-Exact-);(a[0],b,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int *a[2];
+//             <    is written>: b
+   int b = 0;
+//             <    is written>: c
+   int c = 1;
+//             <    is written>: a[0]
+   a[0] = &b;
+//             <    is written>: a[1]
+   a[1] = &b;
+//             <    is written>: a[1]
+   a[1] = &c;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	08 --> 09 with conflicts
+		from <a[1]-W-EXACT> to <a[1]-W-EXACT>
+
+****************** End of Dependence Graph ******************

@@ -9,6 +9,3 @@ PROGRAM MAIN
    B = 20
    CALL ADD(A, B)
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-

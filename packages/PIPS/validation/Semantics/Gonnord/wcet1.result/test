@@ -1,0 +1,48 @@
+ wcet1
+
+//  P() {}
+
+int wcet1()
+{
+
+
+//  P() {}
+
+   int i, j, k, a;
+
+//  P(a,i,j,k) {}
+
+   0<=i&&0<=a&&a<=5&&j==0&&k==0?(void) 0:__assert_fail("0 <= i && 0 <=a && a<=5 && j==0 && k==0", "./wcet1.foo.c", 12, (const char *) 0);
+
+//  P(a,i,j,k) {j==0, k==0, 0<=a, a<=5, 0<=i}
+
+
+   while (i<=2&&j<=9)
+
+//  P(a,i,j,k) {2k<=a, a<=2k+5, 0<=i, i<=2, j<=9, k<=j, 0<=k}
+
+      if (random())
+
+//  P(a,i,j,k) {2k<=a, a<=2k+5, 0<=i, i<=2, j<=9, k<=j, 0<=k}
+
+         j = j+1;
+      else {
+
+//  P(a,i,j,k) {2k<=a, a<=2k+5, 0<=i, i<=2, j<=9, k<=j, 0<=k}
+
+         a = a+2;
+
+//  P(a,i,j,k) {2k+2<=a, a<=2k+7, 0<=i, i<=2, j<=9, k<=j, 0<=k}
+
+         j = j+1;
+
+//  P(a,i,j,k) {2k+2<=a, a<=2k+7, 0<=i, i<=2, j<=10, k+1<=j, 0<=k}
+
+         k = k+1;
+      }
+
+//  P(a,i,j,k) {2k<=a, a<=2k+5, 30<=10i+3j, j<=10, k<=j, 0<=k}
+
+
+   return 0;
+}
