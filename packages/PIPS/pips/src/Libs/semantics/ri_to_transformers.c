@@ -66,13 +66,20 @@
 
 #include "semantics.h"
 
-transformer effects_to_transformer(list e) /* list of effects */
+/* Make sure that all variables modified according to the effect list
+ * e and taken into account by the semantics analysis is an argument
+ * of tf and that the corresponding variables are declared in the
+ * basis.
+ *
+ * Non allocation, just a side effect on tf.
+ */
+transformer add_effects_to_transformer(transformer tf, list e)
 {
-  /* algorithm: keep only write effects on variables with values */
-  list args = NIL;
-  Pbase b = VECTEUR_NUL;
-  Psysteme s = sc_new();
+  list args = transformer_arguments(tf);
+  Psysteme sc = predicate_system(transformer_relation(tf));
+  Pbase b = sc_base(sc);
 
+  /* algorithm: keep only write effects on variables with values */
   FOREACH(EFFECT, ef, e) {
     reference r = effect_any_reference(ef);
     action a = effect_action(ef);
@@ -95,7 +102,7 @@ transformer effects_to_transformer(list e) /* list of effects */
       FOREACH(ENTITY, wv, wvl) {
 	if(entities_may_conflict_p(v,wv) && entity_has_values_p(wv)) {
 	  /* FI->FI: I do not understand why these three lines copied
-	     from above are sufficient, not why they were not pacted
+	     from above are sufficient, nor why they were not packed
 	     together. */
 	  entity new_val = entity_to_new_value(wv);
 	  args = arguments_add_entity(args, new_val);
@@ -105,11 +112,33 @@ transformer effects_to_transformer(list e) /* list of effects */
     }
   }
 
+  transformer_arguments(tf) = args;
+  sc->base = b;
+  sc->dimension = vect_size(b);
+
+  return tf;
+}
+
+transformer effects_to_transformer(list e) /* list of effects */
+{
+  transformer tf = transformer_identity();
+  tf =  add_effects_to_transformer(tf, e);
+  return tf;
+}
+
+/* Previous version of effects_to_transformer()
+transformer effects_to_transformer(list e)
+{
+  list args = NIL;
+  Pbase b = VECTEUR_NUL;
+  Psysteme s = sc_new();
+
   s->base = b;
   s->dimension = vect_size(b);
 
   return make_transformer(args, make_predicate(s));
 }
+*/
 
 transformer filter_transformer(transformer t, list e)
 {
@@ -1878,8 +1907,15 @@ transformer any_assign_to_transformer(list args, /* arguments for assign */
   }
 
   /* if some condition was not met and transformer derivation failed */
-  if(tf==transformer_undefined)
-    tf = effects_to_transformer(ef);
+  if(tf==transformer_undefined) {
+    transformer tf1 = safe_expression_to_transformer(lhs, pre);
+    transformer tf2 = safe_expression_to_transformer(rhs, pre);
+    tf = transformer_combine (tf1, tf2);
+    free_transformer(tf2); // tf1 is exported in tf
+    // FI: previous solution, only based on effects, was much safer
+    // and simpler !
+    tf = add_effects_to_transformer(tf, ef);
+  }
 
   pips_debug(6,"return tf=%p\n", tf);
   ifdebug(6) (void) print_transformer(tf);

@@ -1,0 +1,32 @@
+
+Parsed code
+
+int main(void)
+{
+   // BEGIN BLOCK
+   int i;
+#pragma toto
+   {
+      // BEGIN BLOCK
+      i = 0;
+      // END BLOCK
+   }
+   return i;
+   // END BLOCK
+}
+
+Controlized code
+
+int main(void)
+{
+   // BEGIN BLOCK
+   int i;
+#pragma toto
+   {
+      // BEGIN BLOCK
+      i = 0;
+      // END BLOCK
+   }
+   return i;
+   // END BLOCK
+}

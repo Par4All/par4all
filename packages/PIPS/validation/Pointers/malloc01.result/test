@@ -26,21 +26,21 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int i, j;
-//  points to = {}
+//  {}
    int *a[64];
-//  points to = {}
+//  {}
 
    for(i = 0; i <= 63; i += 1) {
-//  points to = {}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
       a[i] = (float) malloc(64*sizeof(float));
-//  points to = {}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
       for(j = 0; j <= 63; j += 1)
-//  {(a[i],*HEAP*_l_13,-Exact-)}
+//  {(a[i],*HEAP*_l_13[0],-Exact-)}
          a[i][j] = 0.;
    }
-//  {(a[i],*HEAP*_l_13,-MAY-)}
+//  {(a[i],*HEAP*_l_13[0],-MAY-)}
 
    return 0;
 }

@@ -1,0 +1,138 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   int i;
+   int *p, *q;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+   p = (int *) malloc(10*sizeof(int));
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is written>: i
+
+   for(i = 0; i <= 4; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i q
+      *q = i;
+//             <    is read   >: q
+//             <    is written>: q
+      q++;
+   }
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(p);
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   int i;
+//  {}
+   int *p, *q;
+//  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   p = (int *) malloc(10*sizeof(int));
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   q = p;
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-Exact-)}
+
+   for(i = 0; i <= 4; i += 1) {
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      *q = i;
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+      q++;
+   }
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+
+   free(p);
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   int i;
+   int *p, *q;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: p _MALLOC_EFFECTS:_MALLOC_
+
+   p = (int *) malloc(10*sizeof(int));
+//             <    is read   >: p
+//             <    is written>: q
+   q = p;
+//             <    is written>: i
+
+   for(i = 0; i <= 4; i += 1) {
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: i q
+      *q = i;
+//             <    is read   >: q
+//             <    is written>: q
+      q++;
+   }
+//             <    is read   >: p _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+
+   free(p);
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	14 --> 14 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <q-R-EXACT> to <q-W-EXACT>
+	14 --> 13 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	13 --> 17 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <p-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+	13 --> 14 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-W-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
+		from <q-R-EXACT> to <q-W-EXACT>
+	13 --> 13 with conflicts
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <q-R-EXACT>
+		from <*ANY_MODULE*:*ANYWHERE*-W-MAY> to <i-R-EXACT>
+		from <q-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	09 --> 14 with conflicts
+		from <q-W-EXACT> to <q-W-EXACT>
+		from <q-W-EXACT> to <q-R-EXACT>
+	09 --> 13 with conflicts
+		from <q-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <q-W-EXACT> to <q-R-EXACT>
+		from <p-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 17 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <p-W-EXACT> to <p-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	08 --> 13 with conflicts
+		from <p-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <*ANY_MODULE*:*ANYWHERE*-W-MAY>
+	08 --> 09 with conflicts
+		from <p-W-EXACT> to <p-R-EXACT>
+
+****************** End of Dependence Graph ******************

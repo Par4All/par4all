@@ -30,6 +30,9 @@
  * Modifications:
  *  - deletion of includes in this include file; Francois Irigoin,
  *    13 March 1991
+ *
+ *  - deletion of #define for operators ;
+ *    (all the operators and the instrinsics are defined inside of ri-util-local.h); Molka Becher, 08.03.2011
  */
 #include "matrice.h"
 
@@ -100,14 +103,6 @@
 #define TAKE_MIN(m) ((m) == MINIMUM_VALUE)
 #define KEEP_EXACT(m) ((m) == EXACT_VALUE)
 
-#define PLUS_OP "+"
-#define MINUS_OP "-"
-#define MULTIPLY_OP "*"
-#define DIVIDE_OP "/"
-#define UNARY_MINUS_OP "--"
-#define POWER_OP "**"
-#define FIELD_OP "."
-
 /* Intrinsics costs defines */
 
 typedef struct intrinsic_cost_rec {
@@ -132,7 +127,10 @@ typedef struct intrinsic_cost_rec {
 #define CALL_FOUR_OVERHEAD      "CALL-FOUR-OVERHEAD"      
 #define CALL_FIVE_OVERHEAD      "CALL-FIVE-OVERHEAD"      
 #define CALL_SIX_OVERHEAD       "CALL-SIX-OVERHEAD"       
-#define CALL_SEVEN_OVERHEAD     "CALL-SEVEN-OVERHEAD"     
+#define CALL_SEVEN_OVERHEAD     "CALL-SEVEN-OVERHEAD"   
+
+/* TYPE_CAST_COST added to handle cast case ; Molka Becher  */
+#define TYPE_CAST_COST  "TypeCast"  
 
 /* the above two lines are added for 6th cost file, overhead. LZ 280993 */
 /* overhead is divided into two. init and branch 081093 */

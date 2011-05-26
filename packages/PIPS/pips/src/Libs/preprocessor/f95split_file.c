@@ -150,7 +150,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
     // in the child
 
 
-    debug( 2, "the_actual_gfc_parser", "build module %s\n", file_name );
+    pips_debug( 2, "build module %s\n", file_name );
 
     // MAIN CALL TO GFC
     char** arg = gfc2pips_args;

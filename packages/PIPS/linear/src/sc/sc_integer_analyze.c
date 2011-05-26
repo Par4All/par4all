@@ -71,24 +71,25 @@ Variable var;
 }
 
 /* This function gives information about the variables and the constraints of
- * the system. These informations are stored in the array sc_info. 
- * 
- * the first information: if the variable must be kept as loop index 
+ * the system. These informations are stored in the array sc_info.
+ *
+ * the first information: if the variable must be kept as loop index
  * then sc_info[rank of the variable][1] is greater than 1.
  *
- * the second information:  sc_info[rank of the variable][2] is the number 
+ * the second information:  sc_info[rank of the variable][2] is the number
  * of constraints constraining the variable as upper bound.
  *
- * ths third information: sc_info[rank of the variable][3] is the number 
+ * ths third information: sc_info[rank of the variable][3] is the number
  * of constraints constraining the variable as lower bound.
  *
 */
 
-void sc_integer_projection_information(sc,index_base,sc_info,dim_h,n)
-Psysteme sc;
-Pbase index_base;
-int sc_info[][3];
-int dim_h,n;
+void sc_integer_projection_information(
+  Psysteme sc,
+  Pbase index_base,
+  int sc_info[][4],
+  int dim_h,
+  int n)
 {
 
     Pcontrainte ineq,pc;
@@ -100,20 +101,19 @@ int dim_h,n;
     register int i;
     register int j;
 
-   
     /* Initialisation of the array sc_info */
-    
-    for (i=1;i<=n;i++)
-	for (j=2;j<=3;j++)
-	    sc_info[i][j]=0;
+    // ??? should it be from 0 to n-1
+    for (i=1; i<=n; i++)
+      for (j=2; j<=3; j++)
+        sc_info[i][j]=0;
 
-    for (i=1;i<=dim_h;i++)
-	sc_info[i][1]=1;
+    for (i=1; i<=dim_h; i++)
+      sc_info[i][1]=1;
 
-    for (i=dim_h+ 1;i<=n;i++)
-	sc_info[i][1]=0;
+    for (i=dim_h+1; i<=n; i++)
+      sc_info[i][1]=0;
 
-    /* Computation of variables that must be kept as loop indices. */ 
+    /* Computation of variables that must be kept as loop indices. */
 
     for (ineq = sc->inegalites;
 	 !CONTRAINTE_UNDEFINED_P(ineq); ineq=ineq->succ) {

@@ -1,0 +1,83 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "symbolic_tiling06"
+delete $WS
+create $WS $WS.c
+
+module matrix_mul_matrix
+display PRINTED_FILE
+
+#apply INTERNALIZE_PARALLEL_CODE
+#display PRINTED_FILE
+#
+#setproperty LOOP_LABEL "a"
+#setproperty LOOP_TILING_MATRIX "3 0, 0 10"
+#apply LOOP_TILING
+#apply PARTIAL_EVAL
+#display PRINTED_FILE
+#
+#close
+#delete $WS
+#exit
+
+
+apply PRIVATIZE_MODULE
+setproperty LOOP_LABEL "a"
+setproperty SYMBOLIC_TILING_VECTOR "3,10"
+apply SYMBOLIC_TILING
+
+display PRINTED_FILE
+
+apply UNSPLIT
+
+shell sed -i -e '1 i #define MIN(a,b) ((a)>(b)?(b):(a))' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/$WS.ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/$WS.out
+shell test "`$WS.database/Tmp/$WS.ref 2`" = "`$WS.database/Tmp/$WS.out 2`"
+shell test "`$WS.database/Tmp/$WS.ref 3`" = "`$WS.database/Tmp/$WS.out 3`"
+shell test "`$WS.database/Tmp/$WS.ref 4`" = "`$WS.database/Tmp/$WS.out 4`"
+shell test "`$WS.database/Tmp/$WS.ref 5`" = "`$WS.database/Tmp/$WS.out 5`"
+shell test "`$WS.database/Tmp/$WS.ref 6`" = "`$WS.database/Tmp/$WS.out 6`"
+shell test "`$WS.database/Tmp/$WS.ref 7`" = "`$WS.database/Tmp/$WS.out 7`"
+shell test "`$WS.database/Tmp/$WS.ref 8`" = "`$WS.database/Tmp/$WS.out 8`"
+shell test "`$WS.database/Tmp/$WS.ref 9`" = "`$WS.database/Tmp/$WS.out 9`"
+shell test "`$WS.database/Tmp/$WS.ref 10`" = "`$WS.database/Tmp/$WS.out 10`"
+shell test "`$WS.database/Tmp/$WS.ref 11`" = "`$WS.database/Tmp/$WS.out 11`"
+shell test "`$WS.database/Tmp/$WS.ref 12`" = "`$WS.database/Tmp/$WS.out 12`"
+shell test "`$WS.database/Tmp/$WS.ref 13`" = "`$WS.database/Tmp/$WS.out 13`"
+shell test "`$WS.database/Tmp/$WS.ref 14`" = "`$WS.database/Tmp/$WS.out 14`"
+shell test "`$WS.database/Tmp/$WS.ref 15`" = "`$WS.database/Tmp/$WS.out 15`"
+shell test "`$WS.database/Tmp/$WS.ref 16`" = "`$WS.database/Tmp/$WS.out 16`"
+shell test "`$WS.database/Tmp/$WS.ref 17`" = "`$WS.database/Tmp/$WS.out 17`"
+shell test "`$WS.database/Tmp/$WS.ref 18`" = "`$WS.database/Tmp/$WS.out 18`"
+shell test "`$WS.database/Tmp/$WS.ref 19`" = "`$WS.database/Tmp/$WS.out 19`"
+
+apply PARTIAL_EVAL
+display PRINTED_FILE
+
+apply UNSPLIT
+
+shell sed -i -e '1 i #define MIN(a,b) ((a)>(b)?(b):(a))' $WS.database/Src/$WS.c
+shell cc $WS.c -o $WS.database/Tmp/$WS.ref
+shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/$WS.out
+shell test "`$WS.database/Tmp/$WS.ref 2`" = "`$WS.database/Tmp/$WS.out 2`"
+shell test "`$WS.database/Tmp/$WS.ref 3`" = "`$WS.database/Tmp/$WS.out 3`"
+shell test "`$WS.database/Tmp/$WS.ref 4`" = "`$WS.database/Tmp/$WS.out 4`"
+shell test "`$WS.database/Tmp/$WS.ref 5`" = "`$WS.database/Tmp/$WS.out 5`"
+shell test "`$WS.database/Tmp/$WS.ref 6`" = "`$WS.database/Tmp/$WS.out 6`"
+shell test "`$WS.database/Tmp/$WS.ref 7`" = "`$WS.database/Tmp/$WS.out 7`"
+shell test "`$WS.database/Tmp/$WS.ref 8`" = "`$WS.database/Tmp/$WS.out 8`"
+shell test "`$WS.database/Tmp/$WS.ref 9`" = "`$WS.database/Tmp/$WS.out 9`"
+shell test "`$WS.database/Tmp/$WS.ref 10`" = "`$WS.database/Tmp/$WS.out 10`"
+shell test "`$WS.database/Tmp/$WS.ref 11`" = "`$WS.database/Tmp/$WS.out 11`"
+shell test "`$WS.database/Tmp/$WS.ref 12`" = "`$WS.database/Tmp/$WS.out 12`"
+shell test "`$WS.database/Tmp/$WS.ref 13`" = "`$WS.database/Tmp/$WS.out 13`"
+shell test "`$WS.database/Tmp/$WS.ref 14`" = "`$WS.database/Tmp/$WS.out 14`"
+shell test "`$WS.database/Tmp/$WS.ref 15`" = "`$WS.database/Tmp/$WS.out 15`"
+shell test "`$WS.database/Tmp/$WS.ref 16`" = "`$WS.database/Tmp/$WS.out 16`"
+shell test "`$WS.database/Tmp/$WS.ref 17`" = "`$WS.database/Tmp/$WS.out 17`"
+shell test "`$WS.database/Tmp/$WS.ref 18`" = "`$WS.database/Tmp/$WS.out 18`"
+shell test "`$WS.database/Tmp/$WS.ref 19`" = "`$WS.database/Tmp/$WS.out 19`"
+
+close
+
+delete $WS

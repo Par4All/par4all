@@ -24,9 +24,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int *p = 0;
 //  {(p,*NULL_POINTER*,-Exact-)}
    int **q = 0;
@@ -35,8 +35,8 @@ int main()
    *p = 1;
 //  {(p,*NULL_POINTER*,-Exact-);(q,*NULL_POINTER*,-Exact-)}
    *q = &i;
-//  {(*NULL_POINTER*,i,-Exact-);(p,*NULL_POINTER*,-Exact-);(q,
-//   *NULL_POINTER*,-Exact-)}
+//  {(*ANY_MODULE*:*ANYWHERE*_b0,i,-Exact-);(p,*NULL_POINTER*,
+//   -Exact-);(q,*NULL_POINTER*,-Exact-)}
 
    return 0;
 }

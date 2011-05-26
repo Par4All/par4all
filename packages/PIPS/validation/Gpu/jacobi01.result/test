@@ -68,26 +68,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
-void write_data(char filename[])
-{
-   int i, j;                                                            /*0065*/
-   unsigned char c;                                                     /*0066*/
-   FILE *fp;                                                            /*0067*/
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
-      perror("Error opening file");                                     /*0070*/
-      exit(0);                                                          /*0071*/
-   }
-   
-   /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
-
-   for(j = 0; j <= 500; j += 1)                                         /*0077*/
-      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
-         c = space[i][j];                                               /*0079*/
-         fputc(c, fp);                                                  /*0080*/
-      }
-   fclose(fp);                                                          /*0082*/
-}
 int main(int argc, char *argv[])
 {
    int i;                                                               /*0116*/
@@ -110,6 +90,26 @@ int main(int argc, char *argv[])
    write_data("output.pgm");                                            /*0133*/
 
    return 0;                                                            /*0135*/
+}
+void write_data(char filename[])
+{
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
+
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
+      }
+   fclose(fp);                                                          /*0082*/
 }
 
 //  <save[PHI1][PHI2]-R-MAY-{0<=PHI1, PHI1<=500, 1<=PHI1+PHI2,
@@ -295,8 +295,8 @@ void get_data(char filename[])
          space[i][j] = 0;                                               /*0049*/
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0, i==501, 1<=ny}>
-//  <fp[PHI1]-W-MAY-{PHI1==0, i==501, 1<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, i==501, 1<=nx, 1<=ny}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, i==501, 1<=nx, 1<=ny}>
 //  <space[PHI1][PHI2]-W-MAY-{0<=PHI1, PHI1<=500, PHI1+1<=nx, 0<=PHI2,
 //    PHI2<=500, PHI2+1<=ny, i==501}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -307,8 +307,8 @@ void get_data(char filename[])
    for(j = 0; j <= ny-1; j += 1)                                        /*0052*/
 
 //  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny}>
-//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j+1<=ny, 1<=nx}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j+1<=ny, 1<=nx}>
 //  <space[PHI1][PHI2]-W-MAY-{PHI2==j, 0<=PHI1, PHI1<=500, PHI1+1<=nx,
 //    0<=j, j<=500, j+1<=ny}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -412,95 +412,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
-}
-
-//  <filename[PHI1]-R-MAY-{}>
-//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500}>
-//  <stderr-R-MAY-{}>
-//  <stderr[PHI1]-R-MAY-{PHI1==0}>
-//  <stderr[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-void write_data(char filename[])
-{
-   int i, j;                                                            /*0065*/
-   unsigned char c;                                                     /*0066*/
-   FILE *fp;                                                            /*0067*/
-
-//  <filename[PHI1]-R-MAY-{}>
-//  <fp-W-EXACT-{}>
-//  <stderr-R-MAY-{}>
-//  <stderr[PHI1]-R-MAY-{PHI1==0}>
-//  <stderr[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
-
-//  <stderr-R-EXACT-{}>
-//  <stderr[PHI1]-R-MAY-{PHI1==0}>
-//  <stderr[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
-
-      perror("Error opening file");                                     /*0070*/
-      exit(0);                                                          /*0071*/
-   }
-
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-   
-   /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
-
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
-//    PHI2<=500}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-
-   for(j = 0; j <= 500; j += 1)                                         /*0077*/
-
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j<=500}>
-//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j<=500}>
-//  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
-//    j<=500}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
-
-//  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
-//    j<=500}>
-
-         c = space[i][j];                                               /*0079*/
-
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-         fputc(c, fp);                                                  /*0080*/
-      }
-
-//  <fp-R-EXACT-{}>
-//  <fp[PHI1]-R-MAY-{PHI1==0}>
-//  <fp[PHI1]-W-MAY-{PHI1==0}>
-//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
-//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
-
-   fclose(fp);                                                          /*0082*/
 }
 
 //  <argv[PHI1]-R-MAY-{0<=PHI1, PHI1<=1}>
@@ -607,6 +518,95 @@ int main(int argc, char *argv[])
 
    return 0;                                                            /*0135*/
 }
+
+//  <filename[PHI1]-R-MAY-{}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+void write_data(char filename[])
+{
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+
+//  <filename[PHI1]-R-MAY-{}>
+//  <fp-W-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+
+//  <stderr-R-EXACT-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
+//  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==2}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==2}>
+
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
+   }
+
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
+
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <space[PHI1][PHI2]-R-EXACT-{0<=PHI1, PHI1<=500, 0<=PHI2,
+//    PHI2<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <fp[PHI1]-W-MAY-{PHI1==0, 0<=j, j<=500}>
+//  <space[PHI1][PHI2]-R-EXACT-{PHI2==j, 0<=PHI1, PHI1<=500, 0<=j,
+//    j<=500}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
+
+//  <space[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=500, 0<=j,
+//    j<=500}>
+
+         c = space[i][j];                                               /*0079*/
+
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+         fputc(c, fp);                                                  /*0080*/
+      }
+
+//  <fp-R-EXACT-{}>
+//  <fp[PHI1]-R-MAY-{PHI1==0}>
+//  <fp[PHI1]-W-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{}>
+
+   fclose(fp);                                                          /*0082*/
+}
 void compute(float_t space[501][501], float_t save[501][501])
 {
    int t;                                                               /*0106*/
@@ -683,26 +683,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
          space[i][j] = 0.25*(save[i-1][j]+save[i+1][j]+save[i][j-1]+save[i][j+1]);     /*0100*/
 }
-void write_data(char filename[])
-{
-   int i, j;                                                            /*0065*/
-   unsigned char c;                                                     /*0066*/
-   FILE *fp;                                                            /*0067*/
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
-      perror("Error opening file");                                     /*0070*/
-      exit(0);                                                          /*0071*/
-   }
-   
-   /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
-
-   for(j = 0; j <= 500; j += 1)                                         /*0077*/
-      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
-         c = space[i][j];                                               /*0079*/
-         fputc(c, fp);                                                  /*0080*/
-      }
-   fclose(fp);                                                          /*0082*/
-}
 int main(int argc, char *argv[])
 {
    int i;                                                               /*0116*/
@@ -725,6 +705,26 @@ int main(int argc, char *argv[])
    write_data("output.pgm");                                            /*0133*/
 
    return 0;                                                            /*0135*/
+}
+void write_data(char filename[])
+{
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
+
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
+      }
+   fclose(fp);                                                          /*0082*/
 }
 void get_data(char filename[])
 {
@@ -836,26 +836,6 @@ void iteration(float_t space[501][501], float_t save[501][501])
 
    p4a_launcher_iteration_1(save, space);                               /*0097*/
 }
-void write_data(char filename[])
-{
-   int i, j;                                                            /*0065*/
-   unsigned char c;                                                     /*0066*/
-   FILE *fp;                                                            /*0067*/
-   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
-      perror("Error opening file");                                     /*0070*/
-      exit(0);                                                          /*0071*/
-   }
-   
-   /* Write the PGM header: */
-   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
-
-   for(j = 0; j <= 500; j += 1)                                         /*0077*/
-      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
-         c = space[i][j];                                               /*0079*/
-         fputc(c, fp);                                                  /*0080*/
-      }
-   fclose(fp);                                                          /*0082*/
-}
 int main(int argc, char *argv[])
 {
    int i;                                                               /*0116*/
@@ -878,4 +858,24 @@ int main(int argc, char *argv[])
    write_data("output.pgm");                                            /*0133*/
 
    return 0;                                                            /*0135*/
+}
+void write_data(char filename[])
+{
+   int i, j;                                                            /*0065*/
+   unsigned char c;                                                     /*0066*/
+   FILE *fp;                                                            /*0067*/
+   if ((fp = fopen(filename, "w"))==(void *) 0) {                       /*0069*/
+      perror("Error opening file");                                     /*0070*/
+      exit(0);                                                          /*0071*/
+   }
+   
+   /* Write the PGM header: */
+   fprintf(fp, "P5\n%d %d\n255\n", 501, 501);                           /*0075*/
+
+   for(j = 0; j <= 500; j += 1)                                         /*0077*/
+      for(i = 0; i <= 500; i += 1) {                                    /*0078*/
+         c = space[i][j];                                               /*0079*/
+         fputc(c, fp);                                                  /*0080*/
+      }
+   fclose(fp);                                                          /*0082*/
 }

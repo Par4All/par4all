@@ -12,7 +12,7 @@ int main()
 
    int i = 0, a = 1;
 
-//  T(a,i) {a#init==1, i#init==0, 1<=a, a<=9i+1}
+//  T(a,i) {a#init==1, i#init==0, 1<=a, a<=9i+1, 0<=i, i<=9}
 
    for(i = 0; i <= 9; i += 1)
 

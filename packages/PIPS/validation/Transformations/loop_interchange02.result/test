@@ -34,4 +34,6 @@ l2:
 
 Warnings
 
-unknown[unknown] (parse_properties) property SEMANTICS_FIX_POINT_OPERATOR redefined
+unknown[unknown] (activate_phase) Rule `INTERPROCEDURAL_SUMMARY_PRECONDITION' already active
+unknown[unknown] (activate_phase) Rule `TRANSFORMERS_INTER_FULL' already active
+unknown[unknown] (activate_phase) Rule `PRECONDITIONS_INTER_FULL' already active

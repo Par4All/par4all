@@ -37,18 +37,14 @@ delete tps
 
 echo ## phase 2
 
-# the link creates a simpler path where tpips is running.
-ln -s tpips_shell.src src_tmp
-
 # now filters out foo.f
-create tps `echo src_tmp/*.f | \
-		sed 's,src_tmp/foo.f,,'`
+create tps `echo tpips_shell.src/*.f | \
+		sed 's,tpips_shell.src/foo.f,,'`
 
 # there should be only BLA there.
 display PRINTED_FILE($ALL)
 
 close
-rm src_tmp
 delete tps
 
 echo ## done

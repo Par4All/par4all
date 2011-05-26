@@ -1,6 +1,3 @@
 PROGRAM MAIN
    INTEGER :: ARRAY(1:10)
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-

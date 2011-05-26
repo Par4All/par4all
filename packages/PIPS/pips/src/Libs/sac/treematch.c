@@ -92,8 +92,8 @@ bool simd_check_argType()
 		if(ENDP(pCurBas) )
 			return false;
 		basic curBas = BASIC(CAR(pCurBas));
-        if(!basic_equal_p(curBas, finBas))
-            return false;
+		if(!basic_equal_p(curBas, finBas))
+			return false;
 		pCurBas = CDR(pCurBas);
 	}
 

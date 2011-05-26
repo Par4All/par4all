@@ -1,1575 +1,1271 @@
-/**
-*                                                                             
-*   \file             steprt.c
-*   \author           Abdellah Kouadri.
-*                     Daniel Millot.
-*                     Frédérique Silber-Chaussumier.
-*   \date             22/10/2009
-*   \version          1.1
-*   \brief            This file contains core routines of the runtime
-*                     (C or Fortran)                           
-*/
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <assert.h>
+#define INLINE static inline
+#include "step_private.h"
+#include "communications.h"
+#include "regions.h"
+#include "trace.h"
 
+/*##############################################################################
 
+  Step_internals
 
+##############################################################################*/
+Step_internals steprt_params = {0, 0, 0, 0, 0, NULL};
+Array steprt_userArrayTable;
+Array steprt_worksharingTable;
 
+static void uptodate_regions_reset_for_communications(Descriptor_userArray *desc_array);
+static void steprt_print_worksharing(Descriptor_worksharing *desc_worksharing);
 
-#include "steprt.h"
-
-extern struct step_internals step_;
-extern MPI_Comm step_comm;
-extern MPI_Datatype step_types_table[STEP_MAX_TYPES];
-
-
-/**
-* \fn int step_init_fortran_order()
-* \brief  Fortran specific initialization routine (must be called from Fortran 
-   code)
-* \param none 
-* \return STEP_OK or STEP_ALREADY_INITIALIZED if success 
-*/
-int
-step_init_fortran_order ()
+void util_print_rank(int rank, char *input_format, ...)
 {
-  return step_init (STEP_FORTRAN);
+  va_list args;
+
+  va_start (args, input_format);
+
+  if (MYRANK == rank)
+  {
+    vprintf(input_format, args);
+  }
+
+  fflush(stdout);
+  va_end (args);
 }
 
-/**
-* \fn int step_init_c_order()
-* \brief  C specific initialization routine (must be called from C code)
-* \param none 
-* \return STEP_OK or STEP_ALREADY_INITIALIZED if success 
-*/
-int
-step_init_c_order ()
+void __attribute__((unused)) steprt_print(void)
 {
-  return step_init (STEP_C);
-}
-
-/**
-* \fn step_init(int lang)
-* \brief Generic Initialization routine 
-* \param[in] lang must be either STEP_C or STEP_FORTRAN
-* \return STEP_OK or STEP_ALREADY_INITIALIZED if success 
-*/
-int
-step_init (int lang)
-{
-  int ig, ps;
-  IN_TRACE ("%d\n", lang);
-  MPI_Initialized (&ig);
-
-  if ((!step_.intialized) && (!ig))
+  int i;
+  static int id;
+  printf("Print#%d : NB_NODES %u rank %u language %u parallel_level %u initialized %u\n", id++, NB_NODES, steprt_params.rank, steprt_params.language, steprt_params.parallel_level, steprt_params.initialized);
+  printf("\tSize steprt_userArrayTable = %u\n", (uint32_t)steprt_userArrayTable.len);
+  printf("\tSize steprt_worksharingTable = %u\n", (uint32_t)steprt_worksharingTable.len);
+  printf("\tCURRENTWORKSHARING=%p\n", CURRENTWORKSHARING);
+  for (i = 0; i < steprt_worksharingTable.len; i++)
     {
-      assert (MPI_Init_thread (NULL, NULL, MPI_THREAD_FUNNELED, &ps) ==
-	      MPI_SUCCESS);
-      if ((ps != MPI_THREAD_FUNNELED) && (ps != MPI_THREAD_MULTIPLE))
-	fprintf (stdout,
-	 "Warnning in step_init() : FUNNELED thread support not available\n");
-      MPI_Comm_size (MPI_COMM_WORLD, &step_.size_);
-      MPI_Comm_rank (MPI_COMM_WORLD, &step_.rank_);
-      step_.language = lang;
-      step_.parallel_level = 0;
-      step_.intialized = 1;
-      OUT_TRACE ("Initialization OK\n");
-      return STEP_OK;
+      Descriptor_worksharing *desc;
+      desc = &(array_get_data_from_index(&steprt_worksharingTable, Descriptor_worksharing, i));
+      printf("\tWorksharing#%d: ", i);
+      steprt_print_worksharing(desc);
+    }
+}
+
+void steprt_init(int language)
+{
+
+  IN_TRACE("language = %d", language);
+
+  communications_init();
+
+  if(!IS_INITIALIZED)
+    {
+      communications_get_commsize(&steprt_params.commsize);
+      communications_get_rank(&steprt_params.rank);
+      steprt_params.language = language;
+      steprt_params.parallel_level = 0;
+      steprt_params.initialized = 1;
+      steprt_params.current_worksharing = NULL;
+      array_set(&steprt_userArrayTable, Descriptor_userArray);
+      array_set(&steprt_worksharingTable, Descriptor_worksharing);
+    }
+
+  OUT_TRACE("end");
+  return;
+}
+
+/*##############################################################################
+
+  Descriptor_userArray
+
+##############################################################################*/
+static Descriptor_userArray *steprt_set_userArrayDescriptor(Descriptor_userArray *desc_userArray, void *userArray, uint32_t type, uint nbdims, INDEX_TYPE *bounds)
+{
+  Array *uptodateArray;
+  Array *interlacedArray;
+  composedRegion *userArrayBounds;
+
+  IN_TRACE("desc_userArray = %p, userArray = %p, type = %d, nbdims = %d, bounds = %p", desc_userArray, userArray, type, nbdims, bounds);
+  assert(desc_userArray && userArray && bounds);
+
+  uptodateArray = &(desc_userArray->uptodateArray);
+  interlacedArray = &(desc_userArray->interlacedArray);
+  userArrayBounds = &desc_userArray->boundsRegions;
+
+  desc_userArray->userArray = userArray;
+  desc_userArray->savedUserArray = NULL;
+  desc_userArray->type = type;
+  rg_composedRegion_set(userArrayBounds, nbdims);
+  rg_composedRegion_reset(userArrayBounds, bounds, 1);
+  array_set(uptodateArray, composedRegion);
+  array_set(interlacedArray, composedRegion);
+
+  /*
+    UPTODATE(id_node) = ALL_ARRAY
+    INTERLACED(id_node) = EMPTY
+  */
+  uptodate_regions_reset_for_communications(desc_userArray);
+
+  OUT_TRACE("desc_userArray = %p", desc_userArray);
+  return desc_userArray;
+}
+
+Descriptor_userArray *steprt_find_in_userArrayTable(void *userArray)
+{
+  size_t i;
+  Descriptor_userArray *desc_userArray;
+  bool stop = false;
+
+  IN_TRACE("userArray = %p", userArray);
+  assert(IS_INITIALIZED);
+  assert(userArray != NULL);
+
+  STEP_DEBUG({array_print(&steprt_userArrayTable);});
+
+  for(i=0; !stop && i<steprt_userArrayTable.len; i++)
+    {
+      desc_userArray = &(array_get_data_from_index(&steprt_userArrayTable, Descriptor_userArray, i));
+      stop = desc_userArray->userArray == userArray;
+    }
+  if (!stop)
+    desc_userArray = NULL;
+
+  OUT_TRACE("desc_userArray = %p", desc_userArray);
+  return desc_userArray;
+}
+void steprt_userArrayDescriptor_unset(Descriptor_userArray *desc)
+{
+  uint32_t id_node; 
+  Array *uptodateArray = &(desc->uptodateArray);
+  Array *interlacedArray = &(desc->interlacedArray);
+
+  rg_composedRegion_unset(&(desc->boundsRegions));
+
+  if (desc->savedUserArray)
+    free(desc->savedUserArray);
+
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    {
+      rg_composedRegion_unset(&(array_get_data_from_index(uptodateArray, composedRegion, id_node)));
+      rg_composedRegion_unset(&(array_get_data_from_index(interlacedArray, composedRegion, id_node)));
+    }
+  array_unset(uptodateArray);
+  array_unset(interlacedArray);
+
+}
+static void steprt_save_userArray(Descriptor_userArray *desc_userArray)
+{
+  size_t alloc;
+
+  desc_userArray->savedUserArray = communications_alloc_buffer(desc_userArray, &alloc);
+  memcpy(desc_userArray->savedUserArray, desc_userArray->userArray, alloc);
+}
+
+/*##############################################################################
+
+  Descriptor_shared
+
+##############################################################################*/
+static void steprt_set_sharedDescriptor(Descriptor_shared *desc_shared, Descriptor_userArray *desc_userArray)
+{
+  uint32_t nbdims;
+  
+  IN_TRACE("desc_shared = %p, desc_userArray =%p", desc_shared, desc_userArray);
+
+  nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+  desc_shared->userArray = desc_userArray->userArray;
+  rg_composedRegion_set(&(desc_shared->receiveRegions), nbdims);
+  rg_composedRegion_set(&(desc_shared->sendRegions), nbdims);
+  desc_shared->interlaced_p = false;
+
+  OUT_TRACE("end");
+}
+
+
+Descriptor_shared *steprt_find_in_sharedTable(void *userArray)
+{
+  size_t i;
+  bool stop = false;
+  Descriptor_shared *desc;
+  Array *sharedTable;
+
+  IN_TRACE("userArray = %p", userArray);
+
+  TRACE_P("CURRENTWORKSHARING = %p", CURRENTWORKSHARING);
+
+  assert(CURRENTWORKSHARING != NULL);
+
+  if (CURRENTWORKSHARING == NULL)
+    {
+      fprintf(stderr, "CURRENTWORKSHARING == NULL\n");
+      exit(EXIT_FAILURE);
+    }
+
+  
+  sharedTable = &(CURRENTWORKSHARING->sharedArray);
+
+  if (sharedTable == NULL)
+    {
+      fprintf(stderr, "sharedTable == NULL\n");
+      exit(EXIT_FAILURE);
+    }
+
+  for(i=0; !stop && i<sharedTable->len; i++)
+    {
+      desc = &(array_get_data_from_index(sharedTable, Descriptor_shared, i));
+      stop = desc->userArray == userArray;
+    }
+  
+  if (!stop)
+    desc = NULL;
+  
+  OUT_TRACE("desc = %p", desc);
+  return desc;
+}
+static void steprt_shared_unset(Descriptor_shared *desc)
+{
+  rg_composedRegion_unset(&(desc->receiveRegions));
+  rg_composedRegion_unset(&(desc->sendRegions));
+}
+
+
+/* FSC a quoi sert le parametre nb_workchunks (a part le assert) ? */
+
+void steprt_set_sharedTable(void *userArray, uint32_t nb_workchunks, STEP_ARG *receiveBounds,
+			       STEP_ARG *sendBounds, bool is_interlaced)
+{
+  Descriptor_userArray *desc_userArray;
+  Descriptor_shared *desc_shared;
+
+  IN_TRACE("userArray = %p, nb_workchunks = %d, receiveBounds = %p, sendBounds = %p, is_interlaced = %d", userArray, nb_workchunks, receiveBounds, sendBounds, is_interlaced);
+  
+  desc_userArray = steprt_find_in_userArrayTable(userArray);
+  desc_shared = steprt_find_in_sharedTable(userArray);
+  assert(desc_userArray);  
+
+  TRACE_P("desc_shared = %p", desc_shared);
+  STEP_DEBUG({steprt_print_worksharing(CURRENTWORKSHARING);});
+
+  TRACE_P("NB_WORKCHUNKS = %d nb_workchunks = %d\n",  NB_WORKCHUNKS, nb_workchunks);
+
+  assert((CURRENTWORKSHARING->type == do_work && nb_workchunks == NB_WORKCHUNKS) ||
+	 (CURRENTWORKSHARING->type == parallel_work && nb_workchunks == 0) ||
+	 (CURRENTWORKSHARING->type == critical_work && nb_workchunks == 1) ||
+	 (CURRENTWORKSHARING->type == master_work && nb_workchunks == 1)); 
+
+  if(!desc_shared)
+    {
+      Descriptor_shared desc_newshared;
+      steprt_set_sharedDescriptor(&desc_newshared, desc_userArray);
+      if(receiveBounds)
+	{
+#if (INDEX_TYPE == STEP_ARG)
+	  rg_composedRegion_reset(&(desc_newshared.receiveRegions), receiveBounds, nb_workchunks);
+#else
+	  INDEX_TYPE tmp[2*nbdims*nb_workchunks];
+	  uint32_t i, nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+	  for(i=0; i<2*nbdims*nb_workchunks; i++)
+	    tmp[i]=(INDEX_TYPE)receiveBounds[i];
+	  rg_composedRegion_reset(&(desc_newshared.receiveRegions), tmp, nb_workchunks);
+#endif
+	}
+      
+      TRACE_P("Set region SEND desc_newshared.sendRegions = %p, sendBounds=%p", desc_newshared.sendRegions, sendBounds);
+     
+      if(sendBounds)
+	{
+#if (INDEX_TYPE == STEP_ARG)
+	  rg_composedRegion_reset(&(desc_newshared.sendRegions), sendBounds, nb_workchunks);
+	  TRACE_P("After RESET region SEND desc_newshared.sendRegions = %p, sendBounds=%p", desc_newshared.sendRegions, sendBounds);
+#else
+	  INDEX_TYPE tmp[2*nbdims*nb_workchunks];
+	  uint32_t i, nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+	  for(i=0; i<2*nbdims*nb_workchunks; i++)
+	    tmp[i]=(INDEX_TYPE)sendBounds[i];
+	  rg_composedRegion_reset(&(desc_newshared.sendRegions), tmp, nb_workchunks);
+#endif 
+	  desc_newshared.interlaced_p = is_interlaced;
+	  if (is_interlaced)
+	    steprt_save_userArray(desc_userArray);
+	}
+      TRACE_P("&(CURRENTWORKSHARING->sharedArray) = %p, &desc_newshared = %p", &(CURRENTWORKSHARING->sharedArray), &desc_newshared);
+      array_append_vals(&(CURRENTWORKSHARING->sharedArray), &desc_newshared, 1);
     }
   else
     {
-      step_.language = lang;
-      step_.parallel_level = 0;
-      if (step_.intialized == 1)
+      if(receiveBounds)
 	{
-	  OUT_TRACE ("Initialization OK [Runtime alreday initialized]\n");
-	  return (STEP_ALREADY_INITIALIZED);
+#if (INDEX_TYPE == STEP_ARG)
+	  rg_composedRegion_reset(&(desc_shared->receiveRegions), receiveBounds, nb_workchunks);
+#else
+	  INDEX_TYPE tmp[2*nbdims*nb_workchunks];
+	  uint32_t i, nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+	  for(i=0; i<2*nbdims*nb_workchunks; i++)
+	    tmp[i]=(INDEX_TYPE)receiveBounds[i];
+	  rg_composedRegion_reset(&(desc_shared->receiveRegions), tmp, nb_workchunks);
+#endif
+	  
 	}
-      else
+      if(sendBounds)
 	{
-	  step_.intialized = 1;
-	  OUT_TRACE ("Initialization OK\n");
-	  return STEP_OK;
+#if (INDEX_TYPE == STEP_ARG)
+	  rg_composedRegion_reset(&(desc_shared->sendRegions), sendBounds, nb_workchunks);
+#else
+	  INDEX_TYPE tmp[2*nbdims*nb_workchunks];
+	  uint32_t i, nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+	  for(i=0; i<2*nbdims*nb_workchunks; i++)
+	    tmp[i]=(INDEX_TYPE)sendBounds[i];
+	  rg_composedRegion_reset(&(desc_shared->sendRegions), tmp, nb_workchunks);
+#endif
+	  desc_shared->interlaced_p = is_interlaced;
+	  if (is_interlaced)
+	    steprt_save_userArray(desc_userArray);
+	}
+    }
+  OUT_TRACE("end");
+}
+
+/*##############################################################################
+
+  Descriptor_worksharing
+
+##############################################################################*/
+static void steprt_print_worksharing(Descriptor_worksharing *desc_worksharing)
+{
+  printf("Worksharing %p ", desc_worksharing);
+  if (desc_worksharing != NULL)
+    {
+      switch(desc_worksharing->type)
+	{
+	case parallel_work:
+	  printf(": parallel_work\n");
+	  break;
+	case do_work:
+	  printf(": do_work\n");
+	  break;
+	case master_work:
+	  printf(": master_work\n");
+	  break;
+	case critical_work:
+	  printf(": critical_work\n");
+	  break;
+	default:
+	  printf(": UNKNOWN\n");
+	  break;
 	}
     }
 }
 
-/**
-* \fn step_finalize()
-* \brief Finalization routine must be called at the very end of the execution
-* \param none 
-* \return void
-*/
-void
-step_finalize ()
+static Descriptor_worksharing *steprt_worksharing_current(void)
 {
-  IN_TRACE ("Finalization...\n");
-  MPI_Finalize ();
-  OUT_TRACE ("");
+  Descriptor_worksharing * desc_worksharing;
+
+  if (steprt_worksharingTable.len == 0)
+    desc_worksharing = NULL;
+  else
+    desc_worksharing = &(array_get_data_from_index(&steprt_worksharingTable, Descriptor_worksharing, steprt_worksharingTable.len -1));
+
+  return desc_worksharing;
+}
+void steprt_worksharing_set(worksharing_type type)
+{
+  Descriptor_worksharing desc_worksharing;
+  uint32_t nbdims = 1;
+
+  assert(IS_INITIALIZED);
+
+  desc_worksharing.type = type;
+  rg_composedRegion_set(&(desc_worksharing.workchunkRegions), nbdims);
+  array_set(&(desc_worksharing.scheduleArray), uint32_t);
+  array_set(&(desc_worksharing.sharedArray), Descriptor_shared);
+  array_set(&(desc_worksharing.privateArray), void *);
+  array_set(&(desc_worksharing.reductionsArray), Descriptor_reduction);
+  array_set(&(desc_worksharing.communicationsArray), MPI_Request);
+
+  array_append_vals(&steprt_worksharingTable, &desc_worksharing, 1);
+  CURRENTWORKSHARING = steprt_worksharing_current();
 }
 
-/**
-* \fn void step_barrier()
-* \brief Puts a synchronization barrier on all processes of step_comm 
-* \param none 
-* \return void
-*/
-void
-step_barrier ()
+void steprt_worksharing_unset(void)
 {
-  IN_TRACE ("");
-  MPI_Barrier (MPI_COMM_WORLD);
-  OUT_TRACE ("");
+  size_t i;
+
+  IN_TRACE("begin");
+  assert(CURRENTWORKSHARING != NULL);
+
+  for(i=0; i<CURRENTWORKSHARING->sharedArray.len; i++)
+    steprt_shared_unset(&(array_get_data_from_index(&(CURRENTWORKSHARING->sharedArray), Descriptor_shared, i)));
+
+  array_unset(&(CURRENTWORKSHARING->sharedArray));
+  array_unset(&(CURRENTWORKSHARING->scheduleArray));
+  array_unset(&(CURRENTWORKSHARING->privateArray));
+  array_unset(&(CURRENTWORKSHARING->reductionsArray));
+  array_unset(&(CURRENTWORKSHARING->communicationsArray));
+  rg_composedRegion_unset(&(CURRENTWORKSHARING->workchunkRegions));
+
+  array_remove_index_fast(&steprt_worksharingTable, steprt_worksharingTable.len -1);
+  CURRENTWORKSHARING = steprt_worksharing_current();
+  OUT_TRACE("end");
 }
 
-/**
-* \fn int step_get_size(int *size)
-* \brief Returns the number of processes belonging  to step_comm
-* \param[out] *size the number of processes of step_comm  
-* \return STEP_OK 
-*/
-int
-step_get_size (int *size)
+/* Compute workchunks and update the workchunk list of the current worksharing */
+composedRegion *steprt_compute_workchunks(INDEX_TYPE begin, INDEX_TYPE end, INDEX_TYPE incr, STEP_ARG nb_workchunks)
 {
-  IN_TRACE ("%8.8X\n", size);
-  MPI_Comm_size (MPI_COMM_WORLD, size);
-  OUT_TRACE ("");
-  return STEP_OK;
-}
+  INDEX_TYPE workchunks[nb_workchunks][2];
+  INDEX_TYPE id_work;
+  INDEX_TYPE nb_work;
+  STEP_ARG id_workchunk;
+    
+  IN_TRACE("begin = %d, end = %d, incr = %d, nb_workchunks = %d", begin, end, incr, nb_workchunks);
 
-/**
-* \fn int step_get_rank(int *rank)
-* \brief Returns the rank within step_comm of the calling process
-* \param[out] *rank the rank of caller
-* \return STEP_OK 
-*/
-int
-step_get_rank (int *rank)
-{
-  IN_TRACE ("%8.8X\n", rank);
-  *rank = step_.rank_;
-  OUT_TRACE ("rank=%d\n", *rank);
-  return STEP_OK;
-}
+  assert(nb_workchunks != 0);
+  assert(incr != 0);
 
-/**
-* \fn void step_computeloopslices (int *from, int *to, 
-*       int *incr, int *nb_regions,int *nb_proc, int *bounds)
-* \brief Distributes iterations of a loop amongs all processes 
-*        of step_comm the resulting distribution is returned in 
-*        bounds array
-* \param[in] *from   loop's start
-* \param[in] *to     loop's end
-* \param[in] *incr   loop's increment
-* \param[in] *nb_regions the number of loop slices (actually equal to nb_proc)
-* \param[in] *nb_proc the number of processes
-* \param[out] *bounds the resulting distribition  
-*             bounds[0][0] = *from
-*             bounds[0][1] = *to
-*             bounds[i][0] = the loop start for the  process having rank (i-1)
-*             bounds[i][1] = the loop end for the  process having rank (i-1)
-* \return    none 
-* \remarks   Bounds[*][*] is organized either in a row-major or a 
-*            column major order depending on the calling language
-* \remarks   Bounds must be declared as INTEGER bounds(2,MAX_PROCESSES) in 
-             FORTRAN and int bounds[MAX_PROCESSES][2] in C (user's code side)
-*/
-void
-step_computeloopslices (int *from, int *to, int *incr, int *nb_regions,
-			int *nb_proc, int *bounds)
-{
+  id_work =  begin;
+  nb_work = (end - begin) / (incr) + 1; /* nb_work < 0 if no work to do*/
+  id_workchunk = 0;
 
-  int i;
-  int nb_indices, nb_i, nb_e;
-  IN_TRACE
-    ("id = %d\t from = %d\t to = %d\tincr = %d\tnb_region = %d\tnb_proc = %d\t",
-     step_.rank_, *from, *to, *incr, *nb_regions, *nb_proc);
-  if (step_.language == STEP_FORTRAN)
+  if (nb_work > nb_workchunks) /* at least 1 workchunk with 2 works */
     {
-      for (i = 0; i < *nb_regions; i++)
+      INDEX_TYPE id_max_work = nb_work % nb_workchunks;
+      INDEX_TYPE nb_max_work = (nb_work - id_max_work) / nb_workchunks;
+      
+      if(id_max_work == 0) /* same workchunk length */
 	{
-	  bounds[i * 2] = -1;
-	  bounds[i * 2 + 1] = -1;
+	  id_max_work = nb_workchunks;
+	  nb_max_work -= 1;
 	}
 
-      if (((*incr > 0) && (*to - *from < *incr))	/* no iterations */
-	  || ((*incr < 0) && (*from - *to < -*incr)))
+      /* each first id_max_work workchunks have nb_max_work works */
+      for (; id_workchunk < id_max_work; id_workchunk++)
 	{
-	  for (i = 0; i < *nb_regions; i++)
-	    {
-	      bounds[i * 2] = *to;
-	      bounds[1 + i * 2] = *from;
-	    }
+	  workchunks[id_workchunk][LOW(0)] = id_work;
+	  id_work += nb_max_work * incr;
+	  workchunks[id_workchunk][UP(0)] = id_work;
+	  id_work += incr;
 	}
-      else
+      
+      /* remaining workchunks have nb_max_work-1 */
+      nb_max_work -= 1;
+      for (; id_workchunk < nb_workchunks; id_workchunk++)
 	{
-	  nb_indices = (*to - *from) / (*incr) + 1;
-	  if (nb_indices < *nb_regions)	/*Less iterations than processes */
-	    {
-	      bounds[0] = *from;
-	      bounds[1] = *from;
-	      for (i = 1; i < nb_indices; i++)
-		{
-		  bounds[i * 2] = bounds[(i - 1) * 2] + *incr;
-		  bounds[i * 2 + 1] = bounds[i * 2];
-		}
-	      for (i = nb_indices; i < *nb_regions; i++)
-		{
-		  bounds[i * 2] = *to;
-		  bounds[i * 2 + 1] = *from;
-		}
-	    }
-	  else			/*Distribute extra iterations */
-	    {
-	      nb_i = nb_indices % (*nb_regions);
-	      nb_e = (nb_indices - nb_i) / (*nb_regions);
-	      if (nb_i == 0)
-		{
-		  nb_i = *nb_regions;
-		  nb_e = nb_e - 1;
-		}
-	      bounds[0] = *from;
-	      bounds[1] = *from + nb_e * (*incr);
-	      for (i = 1; i < nb_i; i++)
-		{
-		  bounds[i * 2] = bounds[(i - 1) * 2 + 1] + (*incr);
-		  bounds[i * 2 + 1] = bounds[i * 2] + nb_e * (*incr);
-		}
-	      for (i = nb_i; i < *nb_regions; i++)
-		{
-		  bounds[i * 2] = bounds[(i - 1) * 2 + 1] + (*incr);
-		  bounds[i * 2 + 1] = bounds[i * 2] + (nb_e - 1) * (*incr);
-		}
-	    }
+	  workchunks[id_workchunk][LOW(0)] = id_work;
+	  id_work += nb_max_work * incr;
+	  workchunks[id_workchunk][UP(0)] = id_work;
+	  id_work += incr;
 	}
-
     }
-  else				/*C language not implemented yet*/
+  else /* at most 1 work by workchunk */
     {
-      assert (0);
+      for (; id_workchunk < nb_work; id_workchunk++)
+	{
+	  workchunks[id_workchunk][LOW(0)] = workchunks[id_workchunk][UP(0)] = id_work;
+	  id_work += incr;
+	}
     }
-  OUT_TRACE ("id = %d\t loop start = %d\t loop_end = %d", step_.rank_,
-	     bounds[2 * step_.rank_], bounds[1 + 2 * step_.rank_]);
-#ifdef STEP_DEBUG_LOOP
-  int j;
-  if (step_.rank_ == 0)
+
+  /* fill remaining workchunk with no work */
+  for (; id_workchunk < nb_workchunks; id_workchunk++)
     {
-      fprintf (stdout, "\n from = %d \t to = %d\n", *from, *to);
-      for (i = 0; i < *nb_regions; i++)
-	for (j = 0; j < 2; j++)
+      workchunks[id_workchunk][LOW(0)] = incr;
+      workchunks[id_workchunk][UP(0)] = 0;
+    }
+
+  rg_composedRegion_reset(&(CURRENTWORKSHARING->workchunkRegions), *workchunks, nb_workchunks); 
+
+  OUT_TRACE("&(CURRENTWORKSHARING->workchunkRegions) = %p", &(CURRENTWORKSHARING->workchunkRegions));
+  return &(CURRENTWORKSHARING->workchunkRegions);
+}
+
+void steprt_set_userArrayTable(void *userArray, uint32_t type, uint32_t nbdims, INDEX_TYPE *bounds)
+{
+  Descriptor_userArray *desc_userArray;
+
+  IN_TRACE("userArray = %p, type = %d, nbdims = %d, bounds = %p", userArray, type, nbdims, bounds);
+  
+  STEP_DEBUG({rg_simpleRegion_print(nbdims, bounds);});
+
+  desc_userArray = steprt_find_in_userArrayTable(userArray);
+
+  TRACE_P("desc_userArray = %p", desc_userArray);
+  if (!desc_userArray)
+    {
+      Descriptor_userArray new_desc;
+
+      array_append_vals(&steprt_userArrayTable, &new_desc, 1);
+      desc_userArray = &(array_get_data_from_index(&steprt_userArrayTable, Descriptor_userArray, steprt_userArrayTable.len -1));
+      steprt_set_userArrayDescriptor(desc_userArray, userArray, type, nbdims, bounds);
+    }
+  steprt_set_sharedTable(userArray, 0, NULL, NULL, false);
+
+  STEP_DEBUG({
+      Descriptor_userArray *desc_userArray = steprt_find_in_userArrayTable(userArray);
+      
+      assert(desc_userArray);
+      rg_composedRegion_print(&(desc_userArray->boundsRegions));
+    })
+
+    OUT_TRACE("end");
+}
+
+Descriptor_reduction *steprt_find_reduction(void *scalar)
+{
+  size_t i;
+  Descriptor_reduction *desc;
+  bool stop = false;
+
+  IN_TRACE("scalar = %p", scalar);
+
+  assert(CURRENTWORKSHARING);
+
+  for(i=0; !stop && i<CURRENTWORKSHARING->reductionsArray.len; i++)
+    {
+      desc = &(array_get_data_from_index(&(CURRENTWORKSHARING->reductionsArray), Descriptor_reduction, i));
+      stop = desc->variable == scalar;
+    }
+  if (!stop)
+    desc = NULL;
+
+  OUT_TRACE("desc = %p", desc);
+  return desc;
+
+}
+/*##############################################################################
+
+  Compute Region Communicated
+
+##############################################################################*/
+
+/*
+  UPTODATE(id_node) = ALL_ARRAY 
+  INTERLACED(id_node) = EMPTY
+*/
+static void uptodate_regions_reset_for_communications(Descriptor_userArray *desc_userArray)
+{
+  uint32_t id_node;
+  INDEX_TYPE *bounds;
+  Array *uptodateArray;
+  Array *interlacedArray;
+
+  IN_TRACE("desc_userArray = %p", desc_userArray);
+  
+  assert(rg_get_nb_simpleRegions(&(desc_userArray->boundsRegions)) == 1);
+
+  bounds = rg_get_simpleRegion(&(desc_userArray->boundsRegions), 0);
+  uptodateArray = &(desc_userArray->uptodateArray);
+  interlacedArray = &(desc_userArray->interlacedArray);
+
+  assert(uptodateArray->len == interlacedArray->len);
+  if(uptodateArray->len == 0 || interlacedArray->len == 0)
+    {
+      uint32_t nbdims;
+      composedRegion emptyRegions;
+
+      nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
+
+      rg_composedRegion_set(&emptyRegions, nbdims);  
+      array_reset(uptodateArray, NULL, NB_NODES);
+      array_reset(interlacedArray, NULL, NB_NODES);
+      for (id_node=0; id_node<NB_NODES; id_node++)
+	{
+	  array_append_vals(uptodateArray, &emptyRegions, 1);
+	  array_append_vals(interlacedArray, &emptyRegions, 1);
+	}
+    }
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    {
+      composedRegion *uptodateRegions = &(array_get_data_from_index(uptodateArray, composedRegion, id_node));
+      composedRegion *interlacedRegions = &(array_get_data_from_index(&(desc_userArray->interlacedArray), composedRegion, id_node));
+	
+      rg_composedRegion_reset(interlacedRegions, NULL, 0);
+      rg_composedRegion_reset(uptodateRegions, bounds, 1);
+    }
+  OUT_TRACE("end");
+}
+/*
+  LOCAL(id_node) = LOCAL(id_node) union SEND(id_node)
+*/
+static void local_recompute_regions_for_communications(Array *local, Array *toSend)
+{
+  uint32_t id_node;
+  
+  IN_TRACE("local = %p, toSend = %p", local, toSend);
+
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    {
+      composedRegion *r_local;
+      composedRegion *r_send;
+
+      r_local = &(array_get_data_from_index(local, composedRegion, id_node));
+      r_send = &(array_get_data_from_index(toSend, composedRegion, id_node));
+      rg_composedRegion_union(r_local, r_send);
+    }
+  OUT_TRACE("end");
+}
+/*
+  UPTODATE(id_node) = UPTODATE(id_node) union SEND(id_node)
+  INTERLACED(id_node) = INTERLACED(id_node) union SEND(id_node)
+  UPTODATE(id_node) = UPTODATE(id_node) minus { union(n != id_node) SEND(n) }
+*/
+static void local_uptodate_recompute_for_communications(Descriptor_userArray *desc_userArray, Array *toSend)
+{
+  composedRegion other_send;
+  composedRegion *userArrayBounds;
+  Array *uptodateArray;
+  Array *interlacedArray;
+  uint32_t id_node, id_node_rk;
+
+  IN_TRACE("desc_userArray = %p, toSend = %p", desc_userArray, toSend);
+
+  userArrayBounds = &(desc_userArray->boundsRegions);
+  uptodateArray = &(desc_userArray->uptodateArray);
+  interlacedArray = &(desc_userArray->interlacedArray);
+
+  /*
+    UPTODATE(id_node) = UPTODATE(id_node) union SEND(id_node)
+    INTERLACED(id_node) = INTERLACED(id_node) union SEND(id_node)
+  */
+  local_recompute_regions_for_communications(uptodateArray, toSend);
+  local_recompute_regions_for_communications(interlacedArray, toSend);
+
+  /*
+    UPTODATE(id_node) = UPTODATE(id_node) minus { union(n != id_node) SEND(n) }
+  */
+  rg_composedRegion_set(&other_send, rg_get_userArrayDims(userArrayBounds));
+  for (id_node_rk=0; id_node_rk<NB_NODES; id_node_rk++)
+    {
+      composedRegion *uptodateRegions;
+      
+      uptodateRegions = &(array_get_data_from_index(uptodateArray, composedRegion, id_node_rk));
+      
+      rg_composedRegion_reset(&other_send, NULL, 0);
+      for (id_node=0; id_node<NB_NODES; id_node++)
+	if (id_node != id_node_rk)
 	  {
-	    fprintf (stdout, "\n bounds[%d][%d] = %d ", j, i,
-		     bounds[j + 2 * i]);
+	    composedRegion *r_send;
+	    
+	    r_send = &(array_get_data_from_index(toSend, composedRegion, id_node));
+
+	    rg_composedRegion_union(&other_send, r_send);
 	  }
+      
+      rg_composedRegion_difference(uptodateRegions, &other_send);
+      rg_composedRegion_simplify(uptodateRegions, userArrayBounds);
     }
-#endif
-}
+  rg_composedRegion_unset(&other_send);
 
-/**
-* \fn int step_sizeregion(int *dim, int *region)
-* \brief Returns the size for region *region in the ith dimension
-* \param[in] *dim the dimension identifier 
-* \param[in] *region the region descriptor
-* \return the ith size for region *region
+  OUT_TRACE("end");
+}
+/*
+  INTERLACED(id_node) = INTERLACED(id_node) minus UPTODATE(id_node)
 */
-int
-step_sizeregion (int *dim, int *region)
+static void communications_regions_interlaced_recompute(Descriptor_userArray *desc_userArray)
 {
-  int i;
-  int ret = 1;
-  for (i = 0; i < *dim; i++)
-    {
-      ret = ret * (region[i * (*dim) + 1] - region[i * (*dim)] + 1);
-    }
-  return ret;
-}
+  composedRegion *userArrayBounds;
+  Array *uptodateArray;
+  Array *interlacedArray;
+  uint32_t id_node;
 
-/**
-* \fn void step_waitall (int *NbReq, MPI_Request * Request)
-* \brief Waits for all requests in *Request array to complete  
-* \param[in] *NbReq Number of request to wait on
-* \param[in] *Request An array of MPI_Request
-* \return none
+  IN_TRACE("desc_userArray = %p", desc_userArray);
+
+  userArrayBounds = &(desc_userArray->boundsRegions);
+  uptodateArray = &(desc_userArray->uptodateArray);
+  interlacedArray = &(desc_userArray->interlacedArray);
+
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    {
+      composedRegion *interlacedRegions = &(array_get_data_from_index(interlacedArray, composedRegion, id_node));
+      composedRegion *uptodateRegions = &(array_get_data_from_index(uptodateArray, composedRegion, id_node));
+
+      rg_composedRegion_difference(interlacedRegions, uptodateRegions);
+      rg_composedRegion_simplify(interlacedRegions, userArrayBounds);
+    }
+
+  OUT_TRACE("end");
+}
+/*
+  UPTODATE(id_node) = UPTODATE(id_node) union RECV(id_node)
 */
-void
-step_waitall (int *NbReq, MPI_Request * Request)
-{
-  MPI_Waitall (*NbReq, Request, MPI_STATUS_IGNORE);
-}
+static void communications_regions_partial_uptodate_recompute(Descriptor_userArray *desc_userArray, Array *toReceive)
+{ 
+  composedRegion *userArrayBounds;
+  Array *uptodateArray;
+  uint32_t id_node;
 
-/**
-* \fn void step_alltoallregion (int *dim, int *nb_regions, int *regions, 
-                     int *comm_size,
-		     void *data_array, int *comm_tag, int *max_nb_request,
-		     MPI_Request * requests, int *nb_request, int *algorithm,
-		     STEP_Datatype * type)
-* \brief This routine performs all necessary data exchange in order to 
-          recover data consistency for *array in the case where all regions 
-          are disjoint (i.e no overlap)
-* \param[in] *dim  number of dimensions of the array
-* \param[in] *nb_regions  number of regions 
-* \param[in] *regions  the region descriptor for each process
-* \param[in] *comm_size   the number of processes
-* \param[in,out] *data_array the data array
-* \param[in] *comm_tag value used as tag for MPI communications
-* \param[in] *max_nb_request  the maximum number of MPI requests
-* \param[out] *requests array of MPI requests
-* \param[out] *nb_request the actual number of requests 
-* \param[in] *algorithm the communication algorithm to be used
-* \param[in] *type the data type of *data_array
-* \return none
-* \remarks here is a list of supported algorithms
-* \n	STEP_NBLOCKING_ALG  => Non blocking Send and  non blocking Recv
-* \n	STEP_BLOCKING_ALG_1 => Non blocking Send and  blocking Recv
-* \n	STEP_BLOCKING_ALG_2 =>  blocking Send and  blocking Recv
-* \n	STEP_BLOCKING_ALG_3 =>  blocking Send and  blocking Recv (MPI_Sendrecv)
-* \n	STEP_BLOCKING_ALG_4 =>  not implemented
+  IN_TRACE("desc_userArray = %p, toReceive = %p", desc_userArray, toReceive);
+
+  assert(desc_userArray);
+  
+  userArrayBounds = &(desc_userArray->boundsRegions);
+  uptodateArray = &(desc_userArray->uptodateArray);
+
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    {
+      composedRegion *uptodateRegions = &(array_get_data_from_index(uptodateArray, composedRegion, id_node));
+      composedRegion *r_receive = &(array_get_data_from_index(toReceive, composedRegion, id_node));
+      
+      rg_composedRegion_union(uptodateRegions, r_receive);
+      rg_composedRegion_simplify(uptodateRegions, userArrayBounds);
+    }
+
+  OUT_TRACE("end");
+}
+/*
+  Repartition des NB_WORKCHUNKS regions "workchunksRegions" (region SEND ou RECV) entre les NB_NODES regions "regionsToExchange"
+
+  Le schedule par defaut impose NB_WORKCHUNKS==NB_NODES et retourne : regionsToExchange(i)<-workchunksRegions(i)
 */
-void
-step_alltoallregion (int *dim, int *nb_regions, int *regions, int *comm_size,
-		     void *data_array, int *comm_tag, int *max_nb_request,
-		     MPI_Request * requests, int *nb_request, int *algorithm,
-		     STEP_Datatype * type)
+static void communications_schedule_regions(Descriptor_userArray *desc_userArray, composedRegion *workchunksRegions, Array *regionsToExchange)
 {
-  int i, j, k, req_count, target, my_id;
-  int dim_sizes[MAX_DIMS];
-  int dim_sub_sizes[MAX_PROCESSES][MAX_DIMS];
-  int dim_starts[MAX_PROCESSES][MAX_DIMS];
-  MPI_Datatype region_mpidesc[MAX_PROCESSES];
-  my_id = step_.rank_;
-  int have_iteration[MAX_PROCESSES];
+  uint32_t id_node, nbdims;
+  composedRegion emptyRegions;
 
-  IN_TRACE ("rank = %d, algorithm = %d, base_type_size = %d, dims_count = %d",
-	    my_id, *algorithm, *type, *dim);
-  if (step_.language == STEP_FORTRAN)
-    {
-      for (i = 0; i < *dim; i++)
-	dim_sizes[i] = regions[1 + 2 * i] - regions[2 * i] + 1;
-      for (i = 1; i < *nb_regions + 1; i++)	//for all processes     
-	{
-	  have_iteration[i - 1] = 0;
-	  for (j = 0; j < *dim; j++)	// for all dims
-	    {
-	      dim_sub_sizes[i - 1][j] =
-		regions[1 + j * 2 + 2 * *dim * i] - regions[j * 2 +
-							    2 * *dim * i] + 1;
-	      dim_starts[i - 1][j] = regions[j * 2 + 2 * *dim * i] - regions[2 * j];
+  IN_TRACE("desc_userArray = %p, workchunksRegions = %p, regionsToExchange = %p", desc_userArray, workchunksRegions, regionsToExchange);
 
-	      if (dim_sub_sizes[i - 1][j] > 0)
-		have_iteration[i - 1]++;
-	    }
-	  if (have_iteration[i - 1] >= *dim)
-	    have_iteration[i - 1] = 1;
-	  else
-	    have_iteration[i - 1] = 0;
-	}
-    }
-  else				/*C language */
-    {
-      assert (0);
-    }
-#ifdef STEP_DEBUG_REGIONS
-  if (step_.rank_ == 0)
-    {
-      fprintf (stdout,
-	       "\n_______________[ALLTOALL]____________________________\n");
-      for (j = 0; j < step_.size_; j++)
-	{
-	  fprintf (stdout,
-		   "\n PROCESS N°%d  DIMS_COUNT = %d HAVE_ITERATION = %d\n",
-		   j, *dim, have_iteration[j]);
-	  for (i = 0; i < *dim; i++)
-	    {
-	      fprintf (stdout,
-		       "\n\t\tDIMS N°%d \t SIZE = %d\t START = %d \t END = %d",
-		       i, dim_sizes[i], dim_starts[j][i],
-		       dim_starts[j][i] + dim_sub_sizes[j][i]);
-	    }
-	}
-      fprintf (stdout,
-	       "\n_____________________________________________________\n");
-    }
-#endif
-  for (i = 0; i < *nb_regions; i++)
-    {
-      if (have_iteration[i] == 1)
-	{
+  assert(desc_userArray);
 
-	  MPI_Type_create_subarray (*dim, &(dim_sizes[0]),
-				    &(dim_sub_sizes[i][0]),
-				    &(dim_starts[i][0]),
-				    step_.language,
-				    step_types_table[*type],
-				    &region_mpidesc[i]);
-	  MPI_Type_commit (&region_mpidesc[i]);
-	}
-    }
-  switch (*algorithm)
-    {
-    case STEP_NBLOCKING_ALG:	/*tested */
-      step_alltoallregion_NBlocking_1 (data_array, region_mpidesc,
-				       have_iteration, nb_request, requests);
-      break;
-    case STEP_BLOCKING_ALG_1:
+  nbdims = rg_get_userArrayDims(&(desc_userArray->boundsRegions));
 
-      step_alltoallregion_Blocking_1 (data_array, region_mpidesc,
-				      have_iteration, nb_request, requests);
-      break;
-    case STEP_BLOCKING_ALG_2:	/*tested : same! */
-      step_alltoallregion_Blocking_2 (data_array, region_mpidesc,
-				      have_iteration, nb_request, requests);
-      break;
-    case STEP_BLOCKING_ALG_3:	/*tested : same! */
-      step_alltoallregion_Blocking_3 (data_array, region_mpidesc,
-				      have_iteration, nb_request, requests);
-      break;
-    case STEP_BLOCKING_ALG_4:	/*Snow ball algorithm not implemented yet */
-      printf ("This algorithm is not implemented yet ...");
-      assert (0);
-    default:
-      assert (0);
+  // initialisation : regionsToExchange(id_node) = EMPTY
+  rg_composedRegion_set(&emptyRegions, nbdims);
+  array_set(regionsToExchange, composedRegion);
+  array_reset(regionsToExchange, NULL, NB_NODES);
+
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    array_append_vals(regionsToExchange, &emptyRegions, 1);
+
+  // repartition des workchunksRegions selon le scheduling par defaut : le noeud i traite le workchunk i
+  for(id_node=0; id_node<rg_get_nb_simpleRegions(workchunksRegions); id_node++)    
+    {
+      composedRegion *node_send = &(array_get_data_from_index(regionsToExchange, composedRegion, id_node));
+      INDEX_TYPE *workchunk_region_bounds = rg_get_simpleRegion(workchunksRegions, id_node);
+      array_append_vals(&(node_send->simpleRegionArray), workchunk_region_bounds, 1);
     }
-  if (*algorithm != STEP_NBLOCKING_ALG)
-    for (i = 0; i < *nb_regions; i++)
-      {
-	if (have_iteration[i] == 1)
-	  MPI_Type_free (&region_mpidesc[i]);
-      }
-  OUT_TRACE ("");
+
+  // workchunksRegions n'est plus utile les regions sont maintenant defini par regionsToExchange
+  rg_composedRegion_reset(workchunksRegions, NULL, 0);
+
+  OUT_TRACE("end");
+}
+static void communications_allToAll_local(Descriptor_userArray *desc_userArray,
+					  Descriptor_shared *desc_shared)
+{
+  Array regionSend;
+  uint32_t id_node;
+
+  IN_TRACE("desc_userArray = %p, desc_shared = %p", desc_userArray, desc_shared);
+
+  communications_schedule_regions(desc_userArray, &(desc_shared->sendRegions), &regionSend);
+
+  /*
+    UPTODATE(id_node) = UPTODATE(id_node) union SEND(id_node)
+    INTERLACED(id_node) = INTERLACED(id_node) union SEND(id_node)
+    UPTODATE(id_node) = UPTODATE(id_node) minus { union(n != id_node) SEND(n) }
+    
+    INTERLACED(id_node) = INTERLACED(id_node) minus UPTODATE(id_node)
+  */
+  local_uptodate_recompute_for_communications(desc_userArray, &regionSend);
+  communications_regions_interlaced_recompute(desc_userArray);
+  
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    rg_composedRegion_unset(&(array_get_data_from_index(&regionSend, composedRegion, id_node)));
+  array_unset(&regionSend);
+
+  OUT_TRACE("end");
+}
+static void communications_allToAll_partial(Descriptor_userArray *desc_userArray,
+					    Descriptor_shared *desc_shared,
+					    uint32_t algorithm, int_MPI tag)
+{
+  Array regionReceive; 
+  uint32_t id_node;
+
+  IN_TRACE("desc_userArray = %p, desc_shared = %p, algorithm = %d, tag = %d", desc_userArray, desc_shared, algorithm, tag);
+
+  communications_schedule_regions(desc_userArray, &(desc_shared->receiveRegions), &regionReceive);
+
+  /* Communication */
+  communications_allToAll(desc_userArray, &regionReceive, algorithm, tag);
+  
+  /*
+    UPTODATE(id_node) = UPTODATE(id_node) union RECV(id_node)
+    INTERLACED(id_node) = INTERLACED(id_node) minus UPTODATE(id_node)
+  */
+  communications_regions_partial_uptodate_recompute(desc_userArray, &regionReceive);
+  communications_regions_interlaced_recompute(desc_userArray);
+  
+  for (id_node=0; id_node<NB_NODES; id_node++)
+    rg_composedRegion_unset(&(array_get_data_from_index(&regionReceive, composedRegion, id_node)));
+  array_unset(&regionReceive);
+
+  OUT_TRACE("end");
 }
 
-/**
-* \fn void step_alltoallregion_merge(int *dim, int *nb_regions, int *regions,
-			   int *comm_size, void *data_array, void *initial,
-			   void *buffer, int *comm_tag, int *max_nb_request,
-			   MPI_Request * requests, int *nb_request,
-			   int *algorithm, STEP_Datatype * type)
-* \brief This routine performs all necessary data exchange in order to 
-          recover data consistency for *array in the case where regions 
-          overlap
-* \param[in] *dim  number of dimension of the array
-* \param[in] *nb_regions  number fo regions 
-* \param[in] *regions  the region descriptor for each process
-* \param[in] *comm_size   the number of processes
-* \param[in,out] *data_array the data array
-* \param[in]  *initial copy of *array before the parallel processing has occured
-* \param[in]  *buffer a scratchpad buffer used to receive local copies from 
-               other processes
-* \param[in] *comm_tag value used as tag for MPI communications
-* \param[in] *max_nb_request  the maximum number of MPI requests
-* \param[in] *requests array of MPI requests
-* \param[out] *nb_request the actual number of requests 
-* \param[in] *algorithm the communication algorithm to be used
-* \param[in] *type the data type of *data_array
-* \return none
+static void communications_allToAll_full(Descriptor_userArray *desc_userArray,
+					 Descriptor_shared *desc_shared,
+					 uint32_t algorithm, int_MPI tag)
+{
+  IN_TRACE("desc_userArray = %p, desc_shared = %p, algorithm = %d, tag = %d", desc_userArray, desc_shared, algorithm, tag);
+
+  TRACE_P("&(desc_shared->receiveRegions) = %p", &(desc_shared->receiveRegions));
+  rg_composedRegion_reset(&(desc_shared->receiveRegions), NULL, 0); // no more nedded.
+  communications_allToAll(desc_userArray, NULL, algorithm, tag);
+  
+  /*
+    UPTODATE(id_node) = ALL_ARRAY
+    INTERLACED(id_node) = EMPTY
+  */
+  uptodate_regions_reset_for_communications(desc_userArray);
+  OUT_TRACE("end");
+}
+
+void steprt_alltoall(void * userArray, bool full_p, uint32_t algorithm, int_MPI tag)
+{ 
+  Descriptor_shared *desc_shared;
+  Descriptor_userArray *desc_userArray;
+
+
+  IN_TRACE("userArray = %p, full_p = %d, algorithm = %d, tag = %d", userArray, full_p, algorithm, tag);
+
+  desc_shared = steprt_find_in_sharedTable(userArray);
+  desc_userArray = steprt_find_in_userArrayTable(userArray);
+
+  assert(desc_shared);
+  assert(desc_userArray);
+
+  TRACE_P("userArray nbdims = %d\n", rg_get_userArrayDims(&(desc_userArray->boundsRegions)));
+  TRACE_P("shared sendRegions nbdims = %d\n", rg_get_userArrayDims(&(desc_shared->sendRegions)));
+
+  if(rg_get_nb_simpleRegions(&(desc_shared->sendRegions)) != 0 )
+    {
+      /* Locally no communications, will update uptodateArray */
+      communications_allToAll_local(desc_userArray, desc_shared);
+    }
+  if(full_p)
+    {
+      communications_allToAll_full(desc_userArray, desc_shared, algorithm, tag);
+    }
+  else if(rg_get_nb_simpleRegions(&(desc_shared->receiveRegions)) != 0 )
+    { 
+      communications_allToAll_partial(desc_userArray, desc_shared, algorithm, tag);
+    }
+  
+  OUT_TRACE("end");
+}
+
+void steprt_finalize()
+{
+  size_t i;
+
+  /* FSC creer une fonction communications_critical_stop_pcoord */ 
+  communications_critical_stop_pcoord();
+  
+  communications_finalize();
+  
+  steprt_params.commsize = 0;
+  steprt_params.rank = 0;
+  steprt_params.parallel_level = 0;
+  steprt_params.initialized = 0;
+
+  for (i=0; i<steprt_userArrayTable.len; i++) 
+    steprt_userArrayDescriptor_unset(&(array_get_data_from_index(&steprt_userArrayTable, Descriptor_userArray, i)));
+  array_unset(&steprt_userArrayTable);
+
+  for (i=0; i<steprt_worksharingTable.len; i++)
+    steprt_worksharing_unset();
+  array_unset(&steprt_worksharingTable);
+}
+
+void steprt_initreduction(void *variable, uint32_t op, uint32_t type)
+{
+  Descriptor_reduction desc_reduction;
+
+  desc_reduction.variable = variable;
+  desc_reduction.type = type;
+  desc_reduction.operator = op;
+
+  Descriptor_userArray *desc_userArray = steprt_find_in_userArrayTable(variable);
+  if (desc_userArray == NULL) /* scalar reduction */
+    communications_initreduction(&desc_reduction, desc_userArray);
+  /* for array reduction : communications_initreduction called from STEP_SET_REDUCTION_SENDREGIONS */
+
+  array_append_vals(&(CURRENTWORKSHARING->reductionsArray), &desc_reduction, 1);
+
+}
+
+
+/*
+  For array reduction, the SEND_REGIONS are ignored : the reduction is performed on the whole array
 */
-
-void
-step_alltoallregion_merge (int *dim, int *nb_regions, int *regions,
-			   int *comm_size, void *data_array, void *initial,
-			   void *buffer, int *comm_tag, int *max_nb_request,
-			   MPI_Request * requests, int *nb_request,
-			   int *algorithm, STEP_Datatype * type)
+void steprt_set_reduction_sendregions(Descriptor_reduction *desc_reduction, uint32_t nb_workchunks, STEP_ARG *regions)
 {
-  int i, j, k, req_count, target, my_id;
-  int dim_sizes[MAX_DIMS];
-  int dim_sub_sizes[MAX_PROCESSES][MAX_DIMS];
-  int dim_starts[MAX_PROCESSES][MAX_DIMS];
-  MPI_Datatype region_mpidesc[MAX_PROCESSES];
-  my_id = step_.rank_;
-  int have_iteration[MAX_PROCESSES];
-  IN_TRACE ("rank = %d, algorithm = %d, base_type_size = %d, dims_count = %d",
-	    my_id, *algorithm, *type, *dim);
+  void *userArray=desc_reduction->variable;
 
-  for (i = 0; i < *dim; i++)
-    dim_sizes[i] = regions[1 + 2 * i] - regions[2 * i] + 1;
-  for (i = 1; i < *nb_regions + 1; i++)	//for all processes     
-    {
-      have_iteration[i - 1] = 0;
-      for (j = 0; j < *dim; j++)	// for all dims
-	{
-	  dim_sub_sizes[i - 1][j] =
-	    regions[1 + j * 2 + 2 * *dim * i] - regions[j * 2 +
-							2 * *dim * i] + 1;
-	  dim_starts[i - 1][j] = regions[j * 2 + 2 * *dim * i] - regions[2 * j];
-	  if (dim_sub_sizes[i - 1][j] > 0)
-	    have_iteration[i - 1]++;
-	}
-      if (have_iteration[i - 1] >= *dim)
-	have_iteration[i - 1] = 1;
-      else
-	have_iteration[i - 1] = 0;
-    }
+  /* enregistremant des regions SEND + sauvegarde des valeurs initiales */
+  steprt_set_sharedTable(userArray, nb_workchunks, NULL, regions, true);
 
-#ifdef STEP_DEBUG_REGIONS
-  if (step_.rank_ == 0)
-    {
-      fprintf (stdout,
-	       "\n_____________________________________________________\n");
-      for (j = 0; j < step_.size_; j++)
-	{
-	  fprintf (stdout, "\n PROCESS N°%d  DIMS_COUNT = %d\n", j, *dim);
-	  for (i = 0; i < *dim; i++)
-	    {
-	      fprintf (stdout,
-		       "\n\t\tDIMS N°%d \t SIZE = %d\t START = %d \t END = %d",
-		       i, dim_sizes[i], dim_starts[j][i],
-		       dim_starts[j][i] + dim_sub_sizes[j][i]);
-	    }
-	}
-      fprintf (stdout,
-	       "\n_____________________________________________________\n");
-    }
-#endif
-  for (i = 0; i < *nb_regions; i++)
-    {
-      if (have_iteration[i] == 1)
-	{
-
-	  MPI_Type_create_subarray (*dim, &(dim_sizes[0]),
-				    &(dim_sub_sizes[i][0]),
-				    &(dim_starts[i][0]),
-				    step_.language,
-				    step_types_table[*type],
-				    &region_mpidesc[i]);
-	  MPI_Type_commit (&region_mpidesc[i]);
-	}
-    }
-  switch (*algorithm)
-    {
-    case STEP_NBLOCKING_ALG:
-
-      step_alltoallregion_merge_NBlocking_1 (data_array, initial, buffer,
-					     *type, region_mpidesc,
-					     have_iteration, nb_request,
-					     requests, *dim, dim_sizes,
-					     dim_starts, dim_sub_sizes,
-					     step_.language);
-      break;
-    case STEP_BLOCKING_ALG_1:
-
-      step_alltoallregion_merge_Blocking_1 (data_array, initial, buffer,
-					    *type, region_mpidesc,
-					    have_iteration, nb_request,
-					    requests, *dim, dim_sizes,
-					    dim_starts, dim_sub_sizes,
-					    step_.language);
-      break;
-    case STEP_BLOCKING_ALG_2:
-      step_alltoallregion_merge_Blocking_2 (data_array, initial, buffer,
-					    *type, region_mpidesc,
-					    have_iteration, nb_request,
-					    requests, *dim, dim_sizes,
-					    dim_starts, dim_sub_sizes,
-					    step_.language);
-
-      break;
-
-    case STEP_BLOCKING_ALG_3:
-      step_alltoallregion_merge_Blocking_3 (data_array, initial, buffer,
-					    *type, region_mpidesc,
-					    have_iteration, nb_request,
-					    requests, *dim, dim_sizes,
-					    dim_starts, dim_sub_sizes,
-					    step_.language);
-      break;
-    case STEP_BLOCKING_ALG_4:	/*Snow ball algorithm not implemented yet */
-      step_alltoallregion_merge_Blocking_4 (data_array, initial, buffer,
-					    *type, region_mpidesc,
-					    have_iteration, nb_request,
-					    requests, *dim, dim_sizes,
-					    dim_starts, dim_sub_sizes,
-					    step_.language);
-
-      break;
-    default:
-      assert (0);
-    }
-  for (i = 0; i < *nb_regions; i++)
-    {
-      if (have_iteration[i] == 1)
-	MPI_Type_free (&region_mpidesc[i]);
-    }
-
-  OUT_TRACE ("");
+  /* initialisation à l'element neutre */
+  Descriptor_userArray *desc_userArray = steprt_find_in_userArrayTable(userArray);
+  communications_initreduction(desc_reduction, desc_userArray);
 }
 
-/**
-* \fn void step_initreduction (void *variable, void *variable_reduc, int *op,
-		    STEP_Datatype * type)
-
-* \brief Initializes a reduction and save the initial value of *variable
-* \param[in] *variable the variable to save
-* \param[in,out] *variable_reduc where to save the copy
-* \param[in] *op the reduction's operator
-* \param[in] *type the data type of *variable
-* \return none
-*/
-void
-step_initreduction (void *variable, void *variable_reduc, int *op,
-		    STEP_Datatype * type)
+void steprt_reduction(void *variable)
 {
-
-  IN_TRACE ("var =0x%8.8X var_reduc = 0x%8.8X, op = %d, type=%d", variable,
-	    variable_reduc, *op, *type);
-  if (*type == STEP_INTEGER1)
+  Descriptor_reduction *desc_reduction = steprt_find_reduction(variable);
+  communications_reduction(desc_reduction);
+  Descriptor_userArray *desc_userArray = steprt_find_in_userArrayTable(variable);
+  if (desc_userArray != NULL)
     {
-      memcpy (variable_reduc, variable, sizeof (int8_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((int8_t *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((int8_t *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((int8_t *) variable) = INT8_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((int8_t *) variable) = INT8_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
+      /*
+	UPTODATE(id_node) = ALL_ARRAY
+	INTERLACED(id_node) = EMPTY
+      */
+      uptodate_regions_reset_for_communications(desc_userArray);
     }
-  if (*type == STEP_INTEGER2)
-    {
-      memcpy (variable_reduc, variable, sizeof (int16_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((int16_t *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((int16_t *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((int16_t *) variable) = INT16_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((int16_t *) variable) = INT16_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_INTEGER4))
-    {
-      memcpy (variable_reduc, variable, sizeof (int32_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((int32_t *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((int32_t *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((int32_t *) variable) = INT32_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((int32_t *) variable) = INT32_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if (*type == STEP_INTEGER8)
-    {
-      memcpy (variable_reduc, variable, sizeof (int64_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((int64_t *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((int64_t *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((int64_t *) variable) = INT64_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((int64_t *) variable) = INT64_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_REAL4) || (*type == STEP_REAL))
-    {
-      memcpy (variable_reduc, variable, sizeof (float));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((float *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((float *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((float *) variable) = FLT_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((float *) variable) = FLT_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_REAL8) || (*type == STEP_DOUBLE_PRECISION))
-    {
-      memcpy (variable_reduc, variable, sizeof (double));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((double *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((double *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((double *) variable) = DBL_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((double *) variable) = DBL_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-
-  if ((*type == STEP_COMPLEX8) || (*type == STEP_COMPLEX))
-    {
-      memcpy (variable_reduc, variable, sizeof (complexe8_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  ((complexe8_t *) variable)->rp = 0;
-	  ((complexe8_t *) variable)->ip = 0;
-	  break;
-	case STEP_PROD:
-	  ((complexe8_t *) variable)->rp = 1;
-	  ((complexe8_t *) variable)->ip = 0;
-	  break;
-	case STEP_MAX_:
-	  assert (0);
-	case STEP_MIN_:
-	  assert (0);
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-
-  if (*type == STEP_COMPLEX16)
-    {
-      memcpy (variable_reduc, variable, sizeof (complexe16_t));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  ((complexe16_t *) variable)->rp = 0;
-	  ((complexe16_t *) variable)->ip = 0;
-	  break;
-	case STEP_PROD:
-	  ((complexe16_t *) variable)->rp = 1;
-	  ((complexe16_t *) variable)->ip = 0;
-	  break;
-	case STEP_MAX_:
-	  assert (0);
-	case STEP_MIN_:
-	  assert (0);
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-
-  if (*type == STEP_INTEGER)
-    {
-      memcpy (variable_reduc, variable, sizeof (int));
-      switch (*op)
-	{
-	case STEP_SUM:
-	  *((int *) variable) = 0;
-	  break;
-	case STEP_PROD:
-	  *((int *) variable) = 1;
-	  break;
-	case STEP_MAX_:
-	  *((int *) variable) = INT_MIN;
-	  break;
-	case STEP_MIN_:
-	  *((int *) variable) = INT_MAX;
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  /*No more data types are supported */
-  assert (0);
 }
 
-/**
-* \fn void step_reduction (void *variable, void *variable_reduc, 
-                          int *op, STEP_Datatype * type)
+#ifdef TEST_STEPRT
 
-* \brief Performs a reduction  and puts the result in *variable
-* \param[in,out] *variable where to put the result
-* \param[in] *variable_reduc the initial value of *variable
-* \param[in] *op the reduction's operator
-* \param[in] *type the data type of *variable
-* \return none
-*/
-void
-step_reduction (void *variable, void *variable_reduc, int *op, STEP_Datatype
-		* type)
+#include <stdlib.h>
+#include <stdio.h>
+
+void test_compute_workchunks()
 {
-  IN_TRACE ("var =0x%8.8X var_reduc = 0x%8.8X, op = %d, type=%d", variable,
-	    variable_reduc, *op, *type);
+  composedRegion *workchunk_regionlist;
+  INDEX_TYPE begin, end, incr;
+  STEP_ARG nb_workchunks;
 
-  if (*type == STEP_INTEGER1)	
-    {
-      int8_t tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_CHAR, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(int8_t *) variable = *(int8_t *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_CHAR, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(int8_t *) variable = *(int8_t *) variable_reduc *tmp_buffer;
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_CHAR, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(int8_t *) variable = MAX (*(int8_t *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_CHAR, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(int8_t *) variable = MIN (*(int8_t *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if (*type == STEP_INTEGER2)
-    {
-      int16_t tmp_buffer;
+  steprt_worksharing_set(do_work);
 
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER2, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(int16_t *) variable = *(int16_t *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER2, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(int16_t *) variable = *(int16_t *) variable_reduc *tmp_buffer;
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER2, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(int16_t *) variable =
-	    MAX (*(int16_t *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER2, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(int16_t *) variable =
-	    MIN (*(int16_t *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
+  util_print_rank(0, "TEST COMPUTE_WORKCHUNKS\n");
+  util_print_rank(0, "-----------------------\n");
 
-  if (*type == STEP_INTEGER4)
-    {
-      int32_t tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER4, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(int32_t *) variable = *(int32_t *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER4, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(int32_t *) variable = *(int32_t *) variable_reduc *tmp_buffer;
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER4, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(int32_t *) variable =
-	    MAX (*(int32_t *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER4, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(int32_t *) variable =
-	    MIN (*(int32_t *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-
-  if (*type == STEP_INTEGER8)
-    {
-      int64_t tmp_buffer = 0;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER8, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(int64_t *) variable = *(int64_t *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER8, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(int64_t *) variable = *(int64_t *) variable_reduc *tmp_buffer;
-
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER8, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(int64_t *) variable =
-	    MAX (*(int64_t *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER8, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(int64_t *) variable =
-	    MIN (*(int64_t *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if (*type == STEP_INTEGER)
-    {
-      int tmp_buffer = 0;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(int *) variable = *(int *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(int *) variable = *(int *) variable_reduc *tmp_buffer;
-
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(int *) variable = MAX (*(int *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_INTEGER, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(int *) variable = MIN (*(int *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_REAL4) || (*type == STEP_REAL))
-    {
-      float tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL4, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(float *) variable = *(float *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL4, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(float *) variable = *(float *) variable_reduc *tmp_buffer;
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL4, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(float *) variable = MAX (*(float *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL4, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(float *) variable = MIN (*(float *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_REAL8) || (*type == STEP_DOUBLE_PRECISION))
-    {
-      double tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL8, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  *(double *) variable = *(double *) variable_reduc + tmp_buffer;
-	  break;
-	case STEP_PROD:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL8, MPI_PROD,
-			 MPI_COMM_WORLD);
-	  *(double *) variable = *(double *) variable_reduc *tmp_buffer;
-	  break;
-	case STEP_MAX_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL8, MPI_MAX,
-			 MPI_COMM_WORLD);
-	  *(double *) variable = MAX (*(double *) variable_reduc, tmp_buffer);
-	  break;
-	case STEP_MIN_:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_REAL8, MPI_MIN,
-			 MPI_COMM_WORLD);
-	  *(double *) variable = MIN (*(double *) variable_reduc, tmp_buffer);
-	  break;
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if ((*type == STEP_COMPLEX8) || (*type == STEP_COMPLEX))
-    {
-      complexe8_t tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_COMPLEX, MPI_SUM,
-			 MPI_COMM_WORLD);
-	  ((complexe8_t *) variable)->rp =
-	    ((complexe8_t *) variable_reduc)->rp + tmp_buffer.rp;
-	  ((complexe8_t *) variable)->ip =
-	    ((complexe8_t *) variable_reduc)->ip + tmp_buffer.ip;
-	  break;
-	case STEP_PROD:
-	  assert (0);
-	case STEP_MAX_:
-	  assert (0);
-	case STEP_MIN_:
-	  assert (0);
-	default:
-	  assert (0);
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  if (*type == STEP_COMPLEX16)
-    {
-
-      complexe16_t tmp_buffer;
-      switch (*op)
-	{
-	case STEP_SUM:
-	  MPI_Allreduce (variable, &tmp_buffer, 1, MPI_DOUBLE_COMPLEX,
-			 MPI_SUM, MPI_COMM_WORLD);
-	  ((complexe16_t *) variable)->rp =
-	    ((complexe16_t *) variable_reduc)->rp + tmp_buffer.rp;
-	  ((complexe16_t *) variable)->ip =
-	    ((complexe16_t *) variable_reduc)->ip + tmp_buffer.ip;
-	  break;
-	case STEP_PROD:
-	  assert (0);
-	case STEP_MAX_:
-	  assert (0);
-	case STEP_MIN_:
-	  assert (0);
-	default:
-	  break;
-	}
-      OUT_TRACE ("");
-      return;
-    }
-  assert (0);
-}
-
-/**
-* \fn void step_mastertoallscalar (void *scalar, int *max_nb_request,
-			MPI_Request * requests, int *nb_request,
-			int *algorithm, STEP_Datatype * type)
-
-
-* \brief Propagates the value of *sacalar from the master process 
-         to all other processes
-* \param[in,out]  *scalar the value to propagate/to receive
-* \param[in]  *max_nb_request the maximum number of requests
-* \param[out] *requests array of MPI_Request
-* \param[out] *nb_request the number of request in requests
-* \param[in]  *algorithm the algorithm to be used for data propagation 
-* \param[in]  *type the data type of *scalar
-* \return none
-*/
-void
-step_mastertoallscalar (void *scalar, int *max_nb_request,
-			MPI_Request * requests, int *nb_request,
-			int *algorithm, STEP_Datatype * type)
-{
-  IN_TRACE
-  ("scalar=0x%8.8X \t max_nb_request = %d\t nb_request = %d, algorithm = %d ,type= %d",
-   scalar, max_nb_request, *nb_request, *algorithm, *type);
-  MPI_Bcast (scalar, 1, step_types_table[*type], 0, MPI_COMM_WORLD);
-  OUT_TRACE ("");
-}
-
-/**
-* \fn void step_initinterlaced (int *size, void *array, void *array_initial,
-		     void *array_buffer, STEP_Datatype * type)
-* \brief This routine must be used in conjonction with the merge version of 
-         alltoall_region.\n It makes a copy of *array in *array_initial
-* \param[in]  *size            For backward compatibility
-* \param[in]  *array           The array to be saved
-* \param[out] *array_initial   Where to save the array
-* \param[in]  *array_buffer    For backward compatibility
-* \param[in]  *type            the datatype of *array
-* \return none
-*/
-void
-step_initinterlaced (int *size, void *array, void *array_initial,
-		     void *array_buffer, STEP_Datatype * type)
-{
-  int copy_size;;
-  IN_TRACE
-    ("size = %d array = 0x%8.8X array_initial = 0x%8.8X array_buffer = 0x%8.8X type = %d",
-    *size, array, array_buffer, type);
-  MPI_Type_size (step_types_table[*type], &copy_size);
-  memcpy (array_initial, array, copy_size * (*size));
-  OUT_TRACE ("");
-}
-
-/**
-* \fn void step_mastertoallregion(void *array, int *dim, int *regions, 
-                        int *size, int *max_nb_request, MPI_Request * requests,
-			int *nb_request, int *algorithm, STEP_Datatype * type)
-
-* \brief Propagate an array's region from the master process to the all others
-* \param[in,out]  *array the data array 
-* \param[in]  *dim number of dimensions in *array
-* \param[in]  *region regions descriptor 
-* \param[in]  *size unused
-* \param[in]  *max_nb_request the maximum number of requests
-* \param[out] *requests array of MPI_Request
-* \param[out] *nb_request the number of request in *requests
-* \param[in]  *algorithm the algorithm to be used for data propagation 
-* \param[in]  *type the data type of *array
-* \return none
-*/
-void
-step_mastertoallregion (void *array, int *dim, int *regions, int *size,
-			int *max_nb_request, MPI_Request * requests,
-			int *nb_request, int *algorithm, STEP_Datatype * type)
-{
-  int i, j, k, req_count;
-  int dim_sizes[MAX_DIMS];
-  int dim_sub_sizes[1][MAX_DIMS];
-  int dim_starts[1][MAX_DIMS];
-  MPI_Datatype region_mpidesc;
-  int have_iteration[MAX_PROCESSES];
-  IN_TRACE
-    ("array = 0x%8.8X dim = %d regions = 0x%8.8X size = %d max_nb_request=%d nb_request=%d algorithm =%d type = %d",
-       array, *dim, regions, *size, 
-      *max_nb_request, *nb_request, *algorithm,*type);
-
-  if (step_.language == STEP_FORTRAN)
-    {
-
-      for (i = 0; i < *dim; i++)
-	dim_sizes[i] = regions[1 + 2 * i] - regions[2 * i] + 1;
-
-      have_iteration[0] = 0;
-      for (j = 0; j < *dim; j++)	// for all dims
-	{
-	  dim_sub_sizes[0][j] = regions[1 + j * 2] - regions[j * 2] + 1;
-
-	  dim_starts[0][j] = regions[2 * j] - 1;
-
-	  if (dim_sub_sizes[0][j] > 0)
-	    have_iteration[0]++;
-	}
-      if (have_iteration[0] >= *dim)
-	have_iteration[0] = 1;
-      else
-	have_iteration[0] = 0;
-
-      if (have_iteration[0])
-	{
-	  MPI_Type_create_subarray (*dim, &(dim_sizes[0]),
-				    &(dim_sub_sizes[0][0]),
-				    &(dim_starts[0][0]), MPI_ORDER_FORTRAN,
-				    step_types_table[*type], &region_mpidesc);
-	  MPI_Type_commit (&region_mpidesc);
-	}
-
-
-    }
-  else				/*C language */
-    {
-      assert (0);
-    }
-  /* Default algorithm uses MPI_Bcast but we may have other implementations */
-  switch (*algorithm)
-    {
-    default:
-      MPI_Bcast (array, 1, region_mpidesc, 0, MPI_COMM_WORLD);
-    }
-  MPI_Type_free (&region_mpidesc);
-  OUT_TRACE ("");
-}
-
-#ifdef TEST
-#include "timings.h"
-#define master_print(...)  if (my_id==1) fprintf(stdout,__VA_ARGS__)
-#define process_print(...) fprintf(stdout,__VA_ARGS__)
-#define STYLE_DISJOINT    0
-#define STYLE_OVERLAP     1
-char alg_name[][20] =
-  { "STEP_NBLOCKING_ALG", "STEP_BLOCKING_ALG_1", "STEP_BLOCKING_ALG_2",
-  "STEP_BLOCKING_ALG_3", "STEP_BLOCKING_ALG_4"
-};
-
-int data_array[16 * MAX_PROCESSES][16 * MAX_PROCESSES];
-int *recv_buffer, *initial;
-int bounds[MAX_PROCESSES][2];
-int my_id;
-int start, end, incr, dim;
-int comm_tag, max_nb_request, nb_request;
-int regions_desc[MAX_PROCESSES][2][2];
-int i, j, k, l;
-int process_nb;
-int lang;
-int dims_count, algorithme, type;
-MPI_Request requests[MAX_PROCESSES];
-
-void
-init_tests ()
-{
-  step_init_fortran_order ();
-  step_get_rank (&my_id);
-  step_get_size (&process_nb);
-  start = 0;
-  end = 16 * MAX_PROCESSES;
+  util_print_rank(0, "Creating a loop from begin=1 to end=10 (incr=1)\n");
+  begin = 1;
+  end = 10;
   incr = 1;
-  dim = 2;
-  comm_tag = 0;
-  max_nb_request = MAX_PROCESSES;
-  algorithme = STEP_BLOCKING_ALG_1;
-  type = STEP_INTEGER4;
 
-}
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  nb_workchunks = 5;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+  util_print_rank(0, "\n");
 
+  util_print_rank(0, "Computing the workchunk region list with 4 workchunks\n");
+  nb_workchunks = 4;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+  util_print_rank(0, "\n");
 
-void
-build_disjoint_regions ()
-{
-  /*MINs & MAXs values for each dim */
-  regions_desc[0][0][0] = 1;
-  regions_desc[0][0][1] = 16 * MAX_PROCESSES;
-  regions_desc[0][1][0] = 1;
-  regions_desc[0][1][1] = 16 * MAX_PROCESSES;
-  /*Region descriptors */
-  for (j = 1; j <= process_nb; j++)
-    {
-      regions_desc[j][0][0] = bounds[j - 1][0] + 1;
-      regions_desc[j][0][1] = bounds[j - 1][1];
-      regions_desc[j][1][0] = 1;
-      regions_desc[j][1][1] = 16 * MAX_PROCESSES;
-    }
-}
+  util_print_rank(0, "Computing the workchunk region list with 10 workchunks\n");
+  nb_workchunks = 10;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+  util_print_rank(0, "\n");
 
+  util_print_rank(0, "Computing the workchunk region list with 11 workchunks\n");
+  nb_workchunks = 11;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+  util_print_rank(0, "\n");
 
-void
-build_overlapping_regions ()
-{
-  /*MINs & MAXs values for each dim */
-  regions_desc[0][0][0] = 1;
-  regions_desc[0][0][1] = 16 * MAX_PROCESSES;
-  regions_desc[0][1][0] = 1;
-  regions_desc[0][1][1] = 16 * MAX_PROCESSES;
-  /*Region descriptors */
-  for (j = 1; j <= process_nb; j++)
-    {
-      regions_desc[j][0][0] = 1;
-      regions_desc[j][0][1] = 16 * MAX_PROCESSES;
-      regions_desc[j][1][0] = 1;
-      regions_desc[j][1][1] = 16 * MAX_PROCESSES;
-    }
-}
+  util_print_rank(0, "Creating a loop from begin=10 to end=1 (incr=1)\n");
+  begin = 10;
+  end = 1;
+  util_print_rank(0, "Computing the workchunk region list with 11 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
+  util_print_rank(0, "Creating a loop from begin=10 to end=1 (incr=-1)\n");
+  incr = -1;
+  util_print_rank(0, "Computing the workchunk region list with 11 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-void
-init_data (int style)
-{
-  /*Put somthing particular in the data array we will use those values later in 
-     the test process */
+  util_print_rank(0, "Computing the workchunk region list with 11 workchunks\n");
+  nb_workchunks = 10;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-  if (style == STYLE_DISJOINT)	//disjoint 
-    {
-      for (i = bounds[my_id][0]; i <= bounds[my_id][1]; i++)
-	for (j = 0; j < 16 * MAX_PROCESSES; j++)
-	  {
-	    data_array[j][i] = my_id + 1;
-	  }
-    }
-  else				//STYLE_OVERLAP
-    {
-      for (i = 0; i < 16 * MAX_PROCESSES; i++)
-	for (j = 0; j < 16 * MAX_PROCESSES; j++)
-	  {
-	    if (i % process_nb == my_id)
-	      data_array[j][i] = my_id + 1;
-	    else
-	      data_array[j][i] = 0;
-	  }
-    }
+  util_print_rank(0, "Computing the workchunk region list with 4 workchunks\n");
+  nb_workchunks = 4;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-}
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  nb_workchunks = 5;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
+  util_print_rank(0, "Creating a loop from begin=10 to end=1 (incr=-2)\n");
+  incr = -2;
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  nb_workchunks = 5;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-void
-all_to_all_test ()
-{
-  for (algorithme = STEP_NBLOCKING_ALG; algorithme <= STEP_BLOCKING_ALG_3;
-       algorithme++)
-    {
-      init_data (STYLE_DISJOINT);
-      nb_request = 0;
-      step_alltoallregion (&dim, &process_nb, &regions_desc[0][0][0],
-			   &process_nb, &data_array[0][0], &comm_tag,
-			   &max_nb_request, &requests[0], &nb_request,
-			   &algorithme, &type);
-      step_waitall (&nb_request, &requests[0]);
-      /*check data */
-      for (l = 0; l < process_nb; l++)
-	for (i = bounds[l][0]; i < bounds[l][1]; i++)
-	  for (j = 0; j < 16 * MAX_PROCESSES; j++)
-	    {
-	      if (data_array[j][i] != l + 1)
-		{
-		  process_print ("\n[PROCESS %d] Test failed\n", my_id);
-		  step_finalize ();
-		  exit (1);
-		}
-	      else
-		{
-		  if (l != my_id)
-		    data_array[j][i] = 0;	//reset data for the next test
-		}
-	    }
-      master_print ("Test with algorithm %s\t...\tsucceeded\n",
-		    alg_name[algorithme]);
-      step_barrier ();
-    }
-}
+  util_print_rank(0, "Computing the workchunk region list with 4 workchunks\n");
+  nb_workchunks = 4;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
+  util_print_rank(0, "Creating a loop from begin=1 to end=10 (incr=2)\n");
+  incr = 2;
+  begin = 1;
+  end = 10;
+  util_print_rank(0, "Computing the workchunk region list with 4 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-void
-all_to_all_bench ()
-{
-  int inx, itr;
-  int array_size = 10;
-  int d_array[1024][1024];
-  double stats_1[50], stats_2[50];
-  start = 0;
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  nb_workchunks = 5;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+
+  util_print_rank(0, "Creating a loop from begin=10 to end=1 (incr=2)\n");
+  begin = 10;
+  end = 1;
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+
+  util_print_rank(0, "Creating a loop from begin=1 to end=1 (incr=2)\n");
+  begin = 1;
+  end = 1;
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
+
+  util_print_rank(0, "Creating a loop from begin=1 to end=1 (incr=2)\n");
   incr = 1;
-  dim = 2;
-  comm_tag = 0;
-  max_nb_request = MAX_PROCESSES;
-  algorithme = STEP_BLOCKING_ALG_1;
-  type = STEP_INTEGER4;
-  for (inx = 0; inx < 50; inx++)
-    {
-      end = array_size;
-      step_computeloopslices (&start, &end, &incr, &process_nb, &process_nb,
-			      &bounds[0][0]);
-      /*All_to_All */
-      /*MINs & MAXs values for each dim */
-      regions_desc[0][0][0] = 1;
-      regions_desc[0][0][1] = array_size;
-      regions_desc[0][1][0] = 1;
-      regions_desc[0][1][1] = array_size;
-      /*Region descriptors */
-      for (j = 1; j <= process_nb; j++)
-	{
-	  regions_desc[j][0][0] = bounds[j - 1][0] + 1;
-	  regions_desc[j][0][1] = bounds[j - 1][1];
-	  regions_desc[j][1][0] = 1;
-	  regions_desc[j][1][1] = array_size;
-	}
-      timings_init ();
-      for (itr = 0; itr < 10; itr++)
-	{
-	  step_alltoallregion (&dim, &process_nb, &regions_desc[0][0][0],
-			       &process_nb, &d_array[0][0], &comm_tag,
-			       &max_nb_request, &requests[0], &nb_request,
-			       &algorithme, &type);
-	  step_waitall (&nb_request, &requests[0]);
-	}
-      stats_1[inx] = timings_event () / 10;
+  util_print_rank(0, "Computing the workchunk region list with 5 workchunks\n");
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-      /* AlltoAll with Diff&Merge */
-      for (j = 1; j <= process_nb; j++)
-	{
-	  regions_desc[j][0][0] = 1;
-	  regions_desc[j][0][1] = array_size;
-	  regions_desc[j][1][0] = 1;
-	  regions_desc[j][1][1] = array_size;
-	}
-      timings_init ();
-      for (itr = 0; itr < 10; itr++)
-	{
-	  step_alltoallregion_merge (&dim, &process_nb,
-				     &regions_desc[0][0][0], &process_nb,
-				     &d_array[0][0], d_array, d_array,
-				     &comm_tag, &max_nb_request, &requests[0],
-				     &nb_request, &algorithme, &type);
-	  step_waitall (&nb_request, &requests[0]);
-	}
-      stats_2[inx] = timings_event () / 10;
+  util_print_rank(0, "Creating a loop from begin=1 to end=10 (incr=1)\n");
+  begin = 1;
+  end = 10;
+  incr = 1;
+  util_print_rank(0, "Computing the workchunk region list with 2 workchunks\n");
+  nb_workchunks = 2;
+  workchunk_regionlist = steprt_compute_workchunks(begin, end, incr, nb_workchunks);
+  if (MYRANK == 0) rg_composedRegion_print(workchunk_regionlist);
 
-      array_size += 20;
-    }
-  master_print
-    ("\n+-----------------------------------------------------------------+\n");
-  master_print
- ("|\tData size (Kb)\t|\tAlltoAll time(µsec)\t|\tAlltoAll_merge time(µsec) \t|");
-  master_print
-    ("\n+-----------------------------------------------------------------+\n");
-  for (inx = 0; inx < 50; inx++)
-    {
-      master_print ("|\t%f\t|\t%f\t|\t%f\t|\n",
-		    8 * (10 +
-			 20 * (double) inx * (double) sizeof (int)) / 1024,
-		    stats_1[inx], stats_2[inx]);
-    }
-  master_print
-    ("+--------------------------------------------------------------------+\n");
-
+  steprt_worksharing_unset();
 }
 
+#define N 10
+#define MAX_NB_WORKCHUNKS 16
 
-void
-all_to_all_merge_test ()
+#define LOW1 0
+#define UP1 N
+#define LOW2 0
+#define UP2 4
+
+void test_steprt_1D() {
+
+  int p;
+  int nbdims;
+  STEP_ARG type;
+  int A[UP1];
+  INDEX_TYPE bounds[BOUNDS(1)];
+  Descriptor_userArray *desc;
+  int incr, nb_workchunks;
+  INDEX_TYPE shared_r[MAX_NB_WORKCHUNKS][1][2];
+  Descriptor_shared *shared_desc_list;
+  INDEX_TYPE *receiveBounds, *sendBounds;
+  int interlaced_p;
+  int low1, up1;
+
+  util_print_rank(0, "Testing STEPRT with a 1D array\n");
+  util_print_rank(0, "------------------------------\n");
+  util_print_rank(0, "1) Creating bounds userArray\n");
+
+  util_print_rank(0, "1) Creating bounds userArray\n");
+  low1 = LOW1;
+  up1 = UP1 - 1 ;
+  bounds[LOW(0)] = low1;
+  bounds[UP(0)] = up1;
+
+  util_print_rank(0, "2) Initializing a PARALLEL DO construct\n");
+  steprt_worksharing_set(parallel_work);
+
+  steprt_worksharing_set(do_work);
+
+  util_print_rank(0, "3) Initializing array table with A and bounds array, type == STEP_INTEGER, nbdims == 1\n");
+  nbdims = 1;
+  type = STEP_INTEGER;
+  steprt_set_userArrayTable(A, type, nbdims, bounds);
+
+  desc = steprt_find_in_userArrayTable(A);
+  util_print_rank(0, "\n3.1) descriptor de A = %p\n",desc);
+  if (desc)
+    rg_composedRegion_print(&(desc->boundsRegions));
+
+  util_print_rank(0, "\n4) Computing workchunks for the DO loop\n");
+  incr = 1;
+  nb_workchunks = NB_NODES;
+  steprt_compute_workchunks(low1, up1, incr, nb_workchunks);
+
+  util_print_rank(0, "5) Creating shared_r array\n");
+
+  for (p = 0; p < NB_NODES; p++)
+    {
+      int *bounds;
+      int i_low1, i_up1;
+      
+      bounds = rg_get_simpleRegion(&(CURRENTWORKSHARING->workchunkRegions), p);
+      i_low1 = bounds[LOW(0)];
+      i_up1 = bounds[UP(0)];
+
+      /* WARNING: FORTRAN and C order of dimensions are different */
+      /* p: process rank, 0: first (and only) dimension, 0: low index */
+      shared_r[p][0][0]= i_low1;
+      /* p: process rank, 0: first (and only) dimension, 1: up index */
+      shared_r[p][0][1]= i_up1;
+      
+      util_print_rank(0, "\tshared_r[%d][0][%d] = %d, shared_r[%d][0][%d] = %d\n", p, 0, shared_r[p][0][0], p, 1, shared_r[p][0][1]);
+    }
+
+  nb_workchunks = NB_NODES;
+  receiveBounds = NULL;
+  sendBounds = (STEP_ARG *)shared_r;
+  interlaced_p = true;
+  util_print_rank(0, "6) Setting A with %d workchunks as shared SEND interlaced\n", nb_workchunks);
+  
+  steprt_set_sharedTable(A, nb_workchunks, receiveBounds, sendBounds, interlaced_p);
+
+  util_print_rank(0, "6.1) Retrieve shared_desc_list from A\n");
+  shared_desc_list = steprt_find_in_sharedTable(A);
+  util_print_rank(0, "6.2) is share interlaced ? interlaced_p=%d\n", shared_desc_list->interlaced_p);
+  util_print_rank(0, "6.3) Printing send regions from shared_desc_list:\n");
+  if (MYRANK == 0) rg_composedRegion_print(&shared_desc_list->sendRegions);
+  util_print_rank(0, "6.4) Printing receive regions from shared_desc_list:\n");
+  if (MYRANK == 0) rg_composedRegion_print(&shared_desc_list->receiveRegions);
+
+  steprt_worksharing_unset();
+  steprt_worksharing_unset();
+}
+
+void test_steprt_2D() {
+  int p;
+  int nbdims;
+  int B[UP1][UP2];
+  STEP_ARG type;
+  INDEX_TYPE bounds[BOUNDS(2)];
+  Descriptor_userArray *desc;
+  int incr, nb_workchunks;
+  INDEX_TYPE shared_r[MAX_NB_WORKCHUNKS][2][2];
+  Descriptor_shared *shared_desc_list;
+  INDEX_TYPE *receiveBounds, *sendBounds;
+  int interlaced_p;
+  int low1, up1, low2, up2;
+
+  util_print_rank(0, "Testing STEPRT with a 2D array\n");
+  util_print_rank(0, "------------------------------\n");
+  util_print_rank(0, "1) Creating bounds userArray\n");
+  low1 = LOW1;
+  up1 = UP1 - 1 ;
+  low2 = LOW2;
+  up2  = UP2 - 1;
+  bounds[LOW(0)] = low1;
+  bounds[UP(0)] = up1;
+  bounds[LOW(1)] = low2;
+  bounds[UP(1)] = up2;
+
+  util_print_rank(0, "2) Initializing a PARALLEL DO construct\n");
+  steprt_worksharing_set(parallel_work);
+
+  steprt_worksharing_set(do_work);
+
+  util_print_rank(0, "3) Initializing array table with B and bounds array, type == STEP_INTEGER, nbdims == 2\n");
+  nbdims = 2;
+  type = STEP_INTEGER;
+  steprt_set_userArrayTable(B, type, nbdims, bounds);
+
+  util_print_rank(0, "4) Computing workchunks for the DO loop\n");
+  incr = 1;
+  nb_workchunks = NB_NODES;
+  steprt_compute_workchunks(low1, up1, incr, nb_workchunks);
+
+  desc = steprt_find_in_userArrayTable(B);
+  util_print_rank(0, "4.1) descriptor de B=%p\n",desc);
+  if (desc)
+    rg_composedRegion_print(&(desc->boundsRegions));
+  steprt_print();
+
+
+  util_print_rank(0, "5) Creating shared_r array\n");
+
+  for (p = 0; p < NB_NODES; p++)
+    {
+      int *bounds;
+      int i_low, i_up;
+      
+      bounds = rg_get_simpleRegion(&(CURRENTWORKSHARING->workchunkRegions), p);
+      i_low = bounds[LOW(0)];
+      i_up = bounds[UP(0)];
+
+      /* WARNING: FORTRAN and C order of dimensions are different */
+      /* p: process rank, 0: first dimension, 0: low index */
+      shared_r[p][0][0] = i_low;
+      /* p: process rank, 0: first dimension, 1: up index */
+      shared_r[p][0][1] = i_up;
+      /* p: process rank, 1: second dimension, 0: low index */
+      shared_r[p][1][0] = low2;
+      /* p: process rank, 1: second dimension, 1: up index */
+      shared_r[p][1][1] = up2;
+      util_print_rank(0, "\tshared_r[%d][0][%d] = %d, shared_r[%d][0][%d] = %d\n", p, 0, shared_r[p][0][0], p, 1, shared_r[p][0][1]);
+      util_print_rank(0, "\tshared_r[%d][1][%d] = %d, shared_r[%d][1][%d] = %d\n", p, 0, shared_r[p][1][0], p, 1, shared_r[p][1][1]);
+    }
+
+  nb_workchunks = NB_NODES;
+  receiveBounds = (STEP_ARG *)shared_r;
+  sendBounds = NULL;
+  interlaced_p = false;
+  util_print_rank(0, "6) Setting B with %d workchunks as shared_desc_list RECEIVE (not interlaced)\n", nb_workchunks);
+  steprt_set_sharedTable(B, nb_workchunks, receiveBounds, sendBounds, interlaced_p);
+  util_print_rank(0, "6.1)Retrieve shared from B\n");
+  shared_desc_list = steprt_find_in_sharedTable(B);
+  util_print_rank(0, "6.2) send interlaced : %d\n", shared_desc_list->interlaced_p);
+  util_print_rank(0, "6.3) Printing send regions from shared_desc_list:\n");
+  rg_composedRegion_print(&shared_desc_list->sendRegions);
+  util_print_rank(0, "6.4) Printing receive regions from shared_desc_list:\n");
+  if (MYRANK == 0) rg_composedRegion_print(&shared_desc_list->receiveRegions);
+  if (MYRANK == 0) steprt_print();
+
+  steprt_worksharing_unset();
+  steprt_worksharing_unset();
+}
+
+#define TEST_STEPRT_COMPUTE_WORKCHUNKS
+
+#define TEST_STEPRT_1D
+
+#define TEST_STEPRT_2D
+
+int main(int argc, char **argv)
 {
-  recv_buffer =
-    malloc (sizeof (int) * 16 * MAX_PROCESSES * 16 * MAX_PROCESSES);
-  initial = malloc (sizeof (int) * 16 * MAX_PROCESSES * 16 * MAX_PROCESSES);
-  assert (initial != NULL);
-  assert (recv_buffer != NULL);
+  steprt_init(STEP_FORTRAN);
 
-  for (algorithme = STEP_NBLOCKING_ALG; algorithme <= STEP_BLOCKING_ALG_3;
-       algorithme++)
-    {
-      init_data (STYLE_OVERLAP);
-      memset (initial, 0,
-	      sizeof (int) * 16 * MAX_PROCESSES * 16 * MAX_PROCESSES);
-      nb_request = 0;
-      step_alltoallregion_merge (&dim, &process_nb, &regions_desc[0][0][0],
-				 &process_nb, &data_array[0][0], initial,
-				 recv_buffer, &comm_tag, &max_nb_request,
-				 &requests[0], &nb_request, &algorithme,
-				 &type);
-      step_waitall (&nb_request, &requests[0]);
-      /*check data */
-      for (i = 0; i < 16 * MAX_PROCESSES; i++)
-	for (j = 0; j < 16 * MAX_PROCESSES; j++)
-	  {
+  SET_TRACES("traces", NULL, 1, 0);
 
-	    if ((data_array[j][i]) != (i % process_nb + 1))
-	      {
-		process_print
-		  ("\n[PROCESS %d] Test failed (%d,%d,[%d!=%d])\n", my_id, j,
-		   i, data_array[j][i], (i % process_nb + 1));
-		step_finalize ();
-		exit (1);
-	      }
-	  }
-      master_print ("Test with algorithm %s\t...\tsucceeded\n",
-		    alg_name[algorithme]);
-      step_barrier ();
-    }
-
-  free (recv_buffer);
-  free (initial);
-}
-
-
-int
-main ()
-{
-  init_tests ();
-  step_barrier ();
-  master_print ("\nRunning test with %d processes.....\n\n\n", process_nb);
-  step_computeloopslices (&start, &end, &incr, &process_nb, &process_nb,
-			  &bounds[0][0]);
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  master_print
-    ("|        Performing tests for alltoall communications           |\n");
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  /* alltoall */
-  build_disjoint_regions ();
-  all_to_all_test ();
-  /* alltoall_merge */
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  master_print
-    ("|        Performing tests for alltoall communications (merge)   |\n");
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  build_overlapping_regions ();
-  all_to_all_merge_test ();
-  /* benchmarking alltoall */
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  master_print
-    ("|        Performing performances test for alltoall              |\n");
-  master_print
-    ("+---------------------------------------------------------------+\n");
-  all_to_all_bench ();
-  /*test finished */
-  step_finalize ();
-  return 0;
-}
+#ifdef TEST_STEPRT_COMPUTE_WORKCHUNKS
+  test_compute_workchunks();
 #endif
 
+#ifdef TEST_STEPRT_1D
+  util_print_rank(0, "\n\n");
+  test_steprt_1D();
+#endif
+
+#ifdef TEST_STEPRT_2D
+  util_print_rank(0, "\n\n");
+  test_steprt_2D();
+#endif
+
+  steprt_finalize();
+  return EXIT_SUCCESS;
+}
+#endif

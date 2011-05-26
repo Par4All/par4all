@@ -16,7 +16,7 @@ int main()
 there:   outlined(2+1, &j);
    return j;
 }
-void outlined(int I_0, int *j_0)
+void outlined(int I_0, int j_0[1])
 {
    //PIPS generated variable
    int i, j;

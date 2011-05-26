@@ -1,10 +1,38 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   typedef struct my_struct {
+      int i;
+      int *p;
+   } my_str;
+   my_str *m, *n;
+   int j;
+//             <    is written>: j
+   j = 2;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: m _MALLOC_EFFECTS:_MALLOC_
+   m = (my_str *) malloc(sizeof(my_str));
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: m
+   m->i = 1;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: m
+   m->p = &j;
+//             <    is read   >: m
+//             <    is written>: n
+   n = m;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    typedef struct my_struct {
       int i;
       int *p;

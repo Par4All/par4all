@@ -1,0 +1,35 @@
+setenv WS=wcet1
+
+delete $WS
+#shell rm -f $WS.foo.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+shell echo "#include \"assert.h\"" >$WS.foo.c
+shell echo "#define assume(c) assert(c)" >>$WS.foo.c
+shell cat $WS.c >>$WS.foo.c
+
+create $WS $WS.foo.c
+
+# Problem with undet()
+# setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+display CALLGRAPH_FILE
+
+# Transformer lists might be useful
+# setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+# Redundancy not eliminated
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+# FI: nnot checked if it is of any use
+# apply REFINE_TRANSFORMERS
+
+# activate PRINT_CODE_PRECONDITIONS
+# display PRINTED_FILE
+
+close
+shell rm -f $WS.foo.c
+delete $WS
+quit

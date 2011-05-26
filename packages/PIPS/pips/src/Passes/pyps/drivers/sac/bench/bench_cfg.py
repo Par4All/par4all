@@ -3,6 +3,7 @@
 # python object.
 
 import os
+import sac,pyps
 import ConfigParser, copy
 from ConfigParser import SafeConfigParser
 ConfigParser.DEFAULTSECT='global'
@@ -100,9 +101,17 @@ def make_list(T):
 		return map(lambda x: T(x), v.split(LIST_SEP))
 	return f
 
+def make_maker(v):
+	try:
+		return getattr(pyps,v)
+	except:
+		return getattr(sac,v)
+
+
 class cc(BenchSectionCfg):
 	_attrs = {'cc': (unicode, True),
-		  'cflags': (unicode, False)}
+		  'cflags': (unicode, False),
+		  'maker':(make_maker,True)}
 
 class workspace(BenchSectionCfg):
 	_attrs = {'files': (make_list(unicode), True),

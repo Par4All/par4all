@@ -1179,7 +1179,7 @@ entity module_name_to_runtime_entity(string name)
     entity e = module_name_to_entity(name); 
     if ( entity_undefined_p( e ) )
     {
-        pips_user_warning("entity %s not defined, sac is likely to crash soon\n"
+        pips_user_warning("entity %s not defined, pips is likely to crash soon\n"
                 "Please feed pips with its definition and source\n",name);
         e = make_empty_subroutine(name,copy_language(module_language(get_current_module_entity())));
     }
@@ -2116,7 +2116,6 @@ entity make_entity_copy(entity e)
 
     AddEntityToDeclarations(ne, m);
   }
-  free(variable_name);
 
   return ne;
 }
@@ -2678,20 +2677,21 @@ set get_referenced_entities_filtered(void *elem,
       /* if elem is an entity it self, add it */
       if(INSTANCE_OF(entity,(gen_chunkp)elem)) {
         entity e = (entity)elem;
-        if(chunk_filter(entity_type(e)))
-          gen_context_multi_recurse(entity_type(e),&p,
-              reference_domain,gen_true,do_get_referenced_entities_on_reference,
-              call_domain,gen_true,do_get_referenced_entities_on_call,
-              NULL
-              );
-        if(!value_undefined_p(entity_initial(e)) && // struct fields ave undefined initial
-            chunk_filter(entity_initial(e)))
-          gen_context_multi_recurse(entity_initial(e),&p,
-              call_domain,gen_true,do_get_referenced_entities_on_call,
-              reference_domain,gen_true,do_get_referenced_entities_on_reference,
-              area_domain,gen_true,do_get_referenced_entities_on_area,
-              ram_domain,gen_true,do_get_referenced_entities_on_ram,
-              NULL);
+        if(!entity_module_p(e)) {
+          if(chunk_filter(entity_type(e)))
+            gen_context_multi_recurse(entity_type(e),&p,
+                                      reference_domain,gen_true,do_get_referenced_entities_on_reference,
+                                      call_domain,gen_true,do_get_referenced_entities_on_call,
+                                      NULL);
+          if(!value_undefined_p(entity_initial(e)) && // struct fields have undefined initial
+              chunk_filter(entity_initial(e)))
+            gen_context_multi_recurse(entity_initial(e),&p,
+                                      call_domain,gen_true,do_get_referenced_entities_on_call,
+                                      reference_domain,gen_true,do_get_referenced_entities_on_reference,
+                                      area_domain,gen_true,do_get_referenced_entities_on_area,
+                                      ram_domain,gen_true,do_get_referenced_entities_on_ram,
+                                      NULL);
+        }
       }
       else {
         /* gather entities from elem */

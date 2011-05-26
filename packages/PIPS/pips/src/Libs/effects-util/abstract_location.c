@@ -379,73 +379,81 @@ entity calloc_to_abstract_location(expression n, expression size,
 /* the list of callers will be added to ensure the context sensitive
    property. We should keep in mind that context and sensitive
    properties are orthogonal and we should modify them in pipsmake.*/
-reference original_malloc_to_abstract_location(reference __attribute__ ((unused)) lhs,
-					       type var_t,
+reference original_malloc_to_abstract_location(expression lhs,
+					       type  __attribute__ ((unused)) var_t,
 					       type __attribute__ ((unused)) cast_t,
-					       expression __attribute__ ((unused)) sizeof_exp,
+					       expression sizeof_exp,
 					       entity f,
-					       int stmt_number)
+					       statement stmt)
 {
   reference r = reference_undefined;
   entity e = entity_undefined;
-  //string st, s;
-  string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
-  bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
+  sensitivity_information si =
+    make_sensitivity_information(stmt,
+				 f,
+				 NIL);
+  //string opt = get_string_property("ABSTRACT_HEAP_LOCATIONS");
+  //bool type_sensitive_p = !get_bool_property("ALIASING_ACROSS_TYPES");
 
-  /* in case we want an anywhere abstract heap location : the property
-     ABSTRACT_HEAP_LOCATIONS is set to "unique" and a unique abstract
-     location is used for all heap buckets. */
-  if(strcmp(opt, "unique")==0){
-    if(type_sensitive_p) {
-      e = entity_all_heap_locations_typed(var_t);
-      r = make_reference(e , NIL);
-    }
-    else {
-      e = entity_all_heap_locations();
-      r = make_reference(e , NIL);
-    }
-  }
-
-  /* in case the property ABSTRACT_HEAP_LOCATIONS is set to
-     "insensitive": an abstract location is used for each function. */
-  else if(strcmp(opt, "insensitive")==0){
-    if(type_sensitive_p) {
-      e = entity_all_module_heap_locations_typed(get_current_module_entity(),
-						 var_t);
-      r = make_reference(e , NIL);
-    }
-    else {
-      e = entity_all_module_heap_locations(f);
-      r = make_reference(e , NIL);
-    }
-  }
-
-  /* in case the property ABSTRACT_HEAP_LOCATIONS is set to
-     "flow-sensitive" or "context-sensitive".
-
-     No difference here between the two values. The diffferent
-     behavior will show when points-to and effects are translated at
-     call sites
-
-     At this level, we want to use the statement number or the
-     statement ordering. The statement ordering is safer because two
-     statements or more can be put on the same line. The statement
-     number is more user-friendly.
-
-     There is no need to distinguish between types since the statement
-     ordering is at least as effective.
-  */
-  else if(strcmp(opt, "flow-sensitive")==0
-	  || strcmp(opt, "context-sensitive")==0 ){
-    e = entity_flow_or_context_sentitive_heap_location(stmt_number, var_t);
+  e = malloc_to_abstract_location(sizeof_exp, &si);
+  if(!entity_array_p(e))
     r = make_reference(e , NIL);
-  }
-  else {
-    pips_user_error("Unrecognized value for property ABSTRACT_HEAP_LOCATION:"
-		    " \"%s\"", opt);
-  }
+  else
+  r = make_reference(e , CONS(EXPRESSION, int_to_expression(0), NIL));
+  /* /\* in case we want an anywhere abstract heap location : the property */
+/*      ABSTRACT_HEAP_LOCATIONS is set to "unique" and a unique abstract */
+/*      location is used for all heap buckets. *\/ */
+/*   if(strcmp(opt, "unique")==0){ */
+/*     if(type_sensitive_p) { */
+/*       e = entity_all_heap_locations_typed(var_t); */
+/*       r = make_reference(e , NIL); */
+/*     } */
+/*     else { */
+/*       e = entity_all_heap_locations(); */
+/*       r = make_reference(e , NIL); */
+/*     } */
+/*   } */
 
-  pips_debug(8, "Reference to ");
+/*   /\* in case the property ABSTRACT_HEAP_LOCATIONS is set to */
+/*      "insensitive": an abstract location is used for each function. *\/ */
+/*   else if(strcmp(opt, "insensitive")==0){ */
+/*     if(type_sensitive_p) { */
+/*       e = entity_all_module_heap_locations_typed(get_current_module_entity(), */
+/* 						 var_t); */
+/*       r = make_reference(e , NIL); */
+/*     } */
+/*     else { */
+/*       e = entity_all_module_heap_locations(f); */
+/*       r = make_reference(e , NIL); */
+/*     } */
+/*   } */
+
+/*   /\* in case the property ABSTRACT_HEAP_LOCATIONS is set to */
+/*      "flow-sensitive" or "context-sensitive". */
+
+/*      No difference here between the two values. The diffferent */
+/*      behavior will show when points-to and effects are translated at */
+/*      call sites */
+
+/*      At this level, we want to use the statement number or the */
+/*      statement ordering. The statement ordering is safer because two */
+/*      statements or more can be put on the same line. The statement */
+/*      number is more user-friendly. */
+
+/*      There is no need to distinguish between types since the statement */
+/*      ordering is at least as effective. */
+/*   *\/ */
+/*   else if(strcmp(opt, "flow-sensitive")==0 */
+/* 	  || strcmp(opt, "context-sensitive")==0 ){ */
+/*     e = entity_flow_or_context_sentitive_heap_location(stmt_number, var_t); */
+/*     r = make_reference(e , NIL); */
+/*   } */
+/*   else { */
+/*     pips_user_error("Unrecognized value for property ABSTRACT_HEAP_LOCATION:" */
+/* 		    " \"%s\"", opt); */
+/*   } */
+
+/*   pips_debug(8, "Reference to "); */
 
   return r;
 }

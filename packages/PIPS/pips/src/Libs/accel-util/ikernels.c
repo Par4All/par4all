@@ -50,7 +50,6 @@
 #include "effects-simple.h"
 #include "effects-convex.h"
 #include "text-util.h"
-#include "transformations.h"
 #include "parser_private.h"
 #include "preprocessor.h"
 #include "accel-util.h"
@@ -490,6 +489,7 @@ static void copy_to_block(statement st, list sts) {
   /* loop over statements inside the block */
   FOREACH( statement, one, sts_reverse ) {
     /* propagate "out" sets */
+    set_difference(copy_to_out, copy_to_out, COPY_FROM_IN(one)); // ! important
     set_assign(COPY_TO_OUT( one ), copy_to_out);
 
     /* Compute the "copy to" for this statement */
@@ -915,24 +915,22 @@ static void transfert_statement(statement st,
 
   set transferts_to = MAKE_SET();
   set_difference(transferts_to, COPY_TO_OUT(st), COPY_TO_IN(st));
-
   set_difference(transferts_to, transferts_to, COPY_FROM_OUT(st));
   set_difference(transferts_to, transferts_to, already_transfered_to);
-  SET_FOREACH(entity, e, transferts_to) {
-    if(!set_belong_p(already_transfered_to, e)) {
-      set_add_element(already_transfered_to, already_transfered_to, e);
-      statement new_one = make_dma_transfert(e, dma_load);
-      set_add_element(stmt_to_insert_after, stmt_to_insert_after, new_one);
 
-      ifdebug(2) {
-        string str = strdup(concatenate("Transfert to accel : ",
-                                        entity_local_name(e),
-                                        "\n",
-                                        NULL));
-        pips_debug(4,"(%zd) %s",statement_number(st),concatenate("Inserting :",str,"\n",NULL));
-        insert_comments_to_statement(st, str);
-        free(str);
-      }
+  SET_FOREACH(entity, e, transferts_to) {
+    set_add_element(already_transfered_to, already_transfered_to, e);
+    statement new_one = make_dma_transfert(e, dma_load);
+    set_add_element(stmt_to_insert_after, stmt_to_insert_after, new_one);
+
+    ifdebug(2) {
+      string str = strdup(concatenate("Transfert to accel : ",
+                                      entity_local_name(e),
+                                      "\n",
+                                      NULL));
+      pips_debug(4,"(%zd) %s",statement_number(st),concatenate("Inserting :",str,"\n",NULL));
+      insert_comments_to_statement(st, str);
+      free(str);
     }
   }
 
@@ -941,38 +939,21 @@ static void transfert_statement(statement st,
   set_difference(transferts_from, transferts_from, COPY_TO_IN(st));
   set_difference(transferts_from, transferts_from, already_transfered_from);
 
-  // We remove from "transfer from" what is not used by this statement
-  set touched_entity = MAKE_SET();
-  FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
-    entity e_used = reference_variable(effect_any_reference(eff));
-    if(entity_array_p(e_used)) {
-      pips_debug(6,"Removing %s from transferts_from\n",entity_name(e_used));
-      set_add_element(touched_entity, touched_entity, e_used);
-    }
-  }
-  /*
-   transferts_from = set_intersection(transferts_from,
-   transferts_from,
-   touched_entity);*/
-  set_free(touched_entity);
-
   {
     SET_FOREACH(entity, e, transferts_from)
     {
-      if(!set_belong_p(already_transfered_to, e)) {
-        set_add_element(already_transfered_from, already_transfered_from, e);
-        set_add_element(stmt_to_insert_before,
-                        stmt_to_insert_before,
-                        make_dma_transfert(e, dma_store));
-        ifdebug(2) {
-          string str = strdup(concatenate("Transfert from accel : ",
-                                          entity_local_name(e),
-                                          "\n",
-                                          NULL));
-          pips_debug(4,"%s",concatenate("Inserting :",str,"\n",NULL));
-          insert_comments_to_statement(st, str);
-          free(str);
-        }
+      set_add_element(already_transfered_from, already_transfered_from, e);
+      set_add_element(stmt_to_insert_before,
+                      stmt_to_insert_before,
+                      make_dma_transfert(e, dma_store));
+      ifdebug(2) {
+        string str = strdup(concatenate("Transfert from accel : ",
+                                        entity_local_name(e),
+                                        "\n",
+                                        NULL));
+        pips_debug(4,"Inserting : %s\n",str);
+        insert_comments_to_statement(st, str);
+        free(str);
       }
     }
   }

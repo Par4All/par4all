@@ -3,24 +3,24 @@ Prop INLINING_USE_INITIALIZATION_LIST  is True
 Prop INLINING_USE_INITIALIZATION_LIST  is False
 Prop INLINING_USE_INITIALIZATION_LIST  is True
 True
-void foobar(int *c)
-{
-   //PIPS generated variable
-   int _return0;
-
-   _return0 = 1;
-   *c = _return0;
-}
-int foo(int a)
-{
-   return a;
-}
 void bar(int *c)
 {
    //PIPS generated variable
    int _return0;
 
    _return0 = 2;
+   *c = _return0;
+}
+int foo(int a)
+{
+   return a;
+}
+void foobar(int *c)
+{
+   //PIPS generated variable
+   int _return0;
+
+   _return0 = 1;
    *c = _return0;
 }
 void malabar(int *c)

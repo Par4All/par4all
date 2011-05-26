@@ -10,10 +10,32 @@ BIN=a.out
 FC=mpif77
 CC=mpicc
 
-OpenMP_FLAG = -fopenmp
 
 FLAGS = -g -O2
-LDFLAGS = 
+
+export COMPILER = gnu
+export STEP_KIND = 4
+
+ifeq ($(COMPILER) , gnu)
+   OpenMP_FLAG = -fopenmp
+   export CFLAGS = $(FLAGS) -Wall
+   export FFLAGS = $(FLAGS) -Wall -Wno-line-truncation -Wno-unused-variable
+   ifeq ($(STEP_KIND), 8)
+      FFLAGS += -fdefault-integer-8
+   endif
+   LDFLAGS = 
+endif
+
+ifeq ($(COMPILER) , intel)
+   OpenMP_FLAG = -openmp
+   export CFLAGS = $(FLAGS) -Wall
+   export FFLAGS = $(FLAGS) -warn all -warn notruncated_source -warn nounused
+   ifeq ($(STEP_KIND), 8)
+      FFLAGS += -i8
+   endif
+   LDFLAGS = 
+endif
+
 
 
 CSOURCES= *.c
@@ -21,110 +43,148 @@ FSOURCES= *.f
 OBJFILES= *.o
 
 LIB_STEP=libstep.a
+HEADER_F=steprt_f.h
+HEADER_C=steprt_c.h
 RUNTIME=c
 DIR_STEP=step_rt
 
+all: gnu 
 
-$(BIN) : $(DIR_STEP)/$(LIB_STEP) $(OBJFILES)
+$(BIN) : $(DIR_STEP)/$(LIB_STEP) $(OBJFILES) BIN_CRITICAL_PCOORD
 	if ls  >/dev/null 2>&1 *.o ; then $(FC) $(OBJFILES) $(OpenMP_FLAG) $(LDFLAGS) -lstep -L$(DIR_STEP) -o $@; fi
 
+BIN_CRITICAL_PCOORD: $(DIR_STEP)/critical_pcoord_program.c
+	$(CC) -o $(DIR_STEP)/critical_pcoord_program  $^ 	
+
+
 $(OBJFILES):
-	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(FLAGS) -c $(CSOURCES); fi
-	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FLAGS) -fno-underscoring -c $(FSOURCES); fi
+	ln -sf $(DIR_STEP)/$(HEADER_F) $(HEADER_F)
+	ln -sf $(DIR_STEP)/$(HEADER_C) $(HEADER_C)
+	for f in `ls *_MPI.c` ; do \
+		echo $$f; \
+		echo >tmp "#include \"STEP_C.h\""; \
+		cat >>tmp $$f; \
+		mv tmp $$f; \
+	done;
+	if ls  >/dev/null 2>&1 *.c ; then $(CC) $(OpenMP_FLAG) $(CFLAGS) -c $(CSOURCES); fi
+	if ls  >/dev/null 2>&1 *.f ; then $(FC) $(OpenMP_FLAG) $(FFLAGS) -c $(FSOURCES); fi
 
 $(DIR_STEP)/$(LIB_STEP):
 	$(MAKE) -C $(DIR_STEP) $(LIB_STEP)
 
 clean:
 	$(MAKE) -C $(DIR_STEP) $@
-	rm -f *.o *~
+	rm -f $(HEADER_F) *.o *~ *__genmod.*
 
+clear: clean
+	rm -f $(BIN)
 
-.IGNORE: clean###################### sum/src/STEP.h ######################
+gnu:	clear 
+	export OMPI_F77=gfortran; export OMPI_FC=gfortran; export OMPI_CC=gcc; export LANG=C;  $(MAKE) $(BIN) COMPILER=gnu
+
+intel:	clear
+	export OMPI_F77=ifort; export OMPI_FC=ifort; export OMPI_CC=icc; export LANG=C;  make $(BIN) COMPILER=intel
+
+.IGNORE: clean clear
+###################### sum/src/STEP.h ######################
       INCLUDE 'steprt_f.h'
-
-      INTEGER STEP_MAX_NBNODE
-      PARAMETER (STEP_MAX_NBNODE = 16)
-
-      INTEGER max_nb_loopslices
-      INTEGER step_nbrequest
 
       INTEGER STEP_COMM_SIZE, STEP_COMM_RANK
 
-      PARAMETER (MAX_NB_LOOPSLICES = STEP_MAX_NBNODE)
+      INTEGER MAX_NB_LOOPSLICES
+      PARAMETER (MAX_NB_LOOPSLICES = 16)
       
-      ! Globals
-       INTEGER STEP_SizeRegion
-       INTEGER IDX_SLICE_LOW,IDX_SLICE_UP,STEP_IDX
-       PARAMETER (IDX_SLICE_LOW = 1,IDX_SLICE_UP=2)
+      INTEGER IDX_SLICE_LOW,IDX_SLICE_UP,STEP_IDX
+      PARAMETER (IDX_SLICE_LOW = 1,IDX_SLICE_UP=2)
 
 ###################### sum/src/SUM_PARDO10_HYBRID.f ######################
 !!
 !! file for SUM_PARDO10_HYBRID.f
 !!
-      SUBROUTINE SUM_PARDO10_HYBRID(I_DUMMY, I_L, I_U, N, A, B, C)
+      SUBROUTINE SUM_PARDO10_HYBRID(I, I_L, I_U, N, A, B, C)
+! MIL-STD-1753 Fortran extension not in PIPS
       implicit none
       include "STEP.h"
-      INTEGER*4 MAX_NB_REQUEST
-      PARAMETER (MAX_NB_REQUEST = 96)
-      INTEGER I_DUMMY, I, I_L, I_U, N, IDX, I_LOW, I_UP, STEP_I_LOW, 
-     &STEP_I_UP
-      INTEGER A(1:N, 1:2), B(1:N), C(1:N), STEP_I_LOOPSLICES(
-     &IDX_SLICE_LOW:IDX_SLICE_UP, 1:MAX_NB_LOOPSLICES), STEP_SR_A(
-     &IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 0:MAX_NB_LOOPSLICES), 
-     &STEP_SR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 0:MAX_NB_LOOPSLICES)
-     &, STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 0:
-     &MAX_NB_LOOPSLICES), STEP_REQUESTS(1:MAX_NB_REQUEST)
-      CALL STEP_GET_SIZE(STEP_COMM_SIZE)                                0128
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0129
+      INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, N
+      INTEGER STEP_RR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
+     &MAX_NB_LOOPSLICES), STEP_RR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 
+     &1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1
+     &, 1:MAX_NB_LOOPSLICES), STEP_SR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1
+     &:1, 1:MAX_NB_LOOPSLICES), STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP
+     &, 1:2, 1:MAX_NB_LOOPSLICES), A(1:N, 1:2), B(1:N), C(1:N)
 
-      CALL STEP_COMPUTELOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE,          0131
-     &MAX_NB_LOOPSLICES, STEP_I_LOOPSLICES)                             0131
+!$omp master
+      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)                       0112
+      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 2, 1, N, 1, 2)      0113
+      CALL STEP_INIT_ARRAYREGIONS(B, STEP_INTEGER4, 1, 1, N)            0114
+      CALL STEP_INIT_ARRAYREGIONS(C, STEP_INTEGER4, 1, 1, N)            0115
+      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)                            0116
+      CALL STEP_COMPUTE_LOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE)         0117
 
-C     Put array boundaries into region arrays (SR: Send region)
+C     Put array boundaries into RECV region arrays
 C     First dimension: lower and upper bounds of each slice
 C     Second dimension: for each dimension of the original array
 C     Third dimension: store the boundaries of the local chunk.
 
-C     The first element stores initial boundaries,
-C     then one element for each process
-      STEP_SR_A(IDX_SLICE_LOW,1,0) = 1                                  0141
-      STEP_SR_A(IDX_SLICE_UP,1,0) = N                                   0142
-      STEP_SR_A(IDX_SLICE_LOW,2,0) = 1                                  0143
-      STEP_SR_A(IDX_SLICE_UP,2,0) = 2                                   0144
-      STEP_SR_B(IDX_SLICE_LOW,1,0) = 1                                  0145
-      STEP_SR_B(IDX_SLICE_UP,1,0) = N                                   0146
-      STEP_SR_C(IDX_SLICE_LOW,1,0) = 1                                  0147
-      STEP_SR_C(IDX_SLICE_UP,1,0) = N                                   0148
+      DO IDX = 1, STEP_COMM_SIZE                                        0124
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0125
+C  <C(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_RR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0127
+         STEP_RR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0128
+C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_RR_B(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0130
+         STEP_RR_B(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0131
+      ENDDO
+      CALL STEP_SET_RECVREGIONS(C, STEP_COMM_SIZE, STEP_RR_C)           0133
+      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)           0134
 
-C     Region computation
-      DO IDX = 1, STEP_COMM_SIZE                                        0151
-         I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0152
-         I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0153
+C     Communicating data to other nodes
+C     3 communication shemes for all-to-all personalized broadcast :
+C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
+      CALL STEP_ALLTOALL_PARTIAL(C, STEP_NBLOCKING_ALG,                 0139
+     &STEP_TAG_DEFAULT)                                                 0139
+      CALL STEP_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG,                 0141
+     &STEP_TAG_DEFAULT)                                                 0141
+      CALL STEP_WAITALL                                                 0143
+
+C     Put array boundaries into SEND region arrays
+C     First dimension: lower and upper bounds of each slice
+C     Second dimension: for each dimension of the original array
+C     Third dimension: store the boundaries of the local chunk.
+
+      DO IDX = 1, STEP_COMM_SIZE                                        0150
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0151
 C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=10, I_LOW<=PHI1,
 C    PHI1<=I_UP, 1<=PHI2, PHI2<=2}>
-         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0156
-         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0157
-         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 1                             0158
-         STEP_SR_A(IDX_SLICE_UP,2,IDX) = 2                              0159
+         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0154
+         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0155
+         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 1                             0156
+         STEP_SR_A(IDX_SLICE_UP,2,IDX) = 2                              0157
 C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0161
-         STEP_SR_B(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0162
+         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0159
+         STEP_SR_B(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0160
 C  <C(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0164
-         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0165
+         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0162
+         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0163
       ENDDO
+      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0165
+      CALL STEP_SET_SENDREGIONS(B, STEP_COMM_SIZE, STEP_SR_B)           0166
+      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0167
+
+!$omp end master
+!$omp barrier
+
 
 C     Where work is done...
-      STEP_I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,STEP_COMM_RANK+1)    0169
-      STEP_I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,STEP_COMM_RANK+1)      0170
+      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0174
+      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_I_LOW, STEP_I_UP)   0175
 !$OMP parallel do
-      DO 10 I = STEP_I_LOW, STEP_I_UP                                   0172
-         A(I,1) = I                                                     0173
-         A(I,2) = 2*I                                                   0174
-         B(I) = I*10                                                    0175
-         C(I) = 0                                                       0176
-10       CONTINUE                                                       0177
+      DO 10 I = STEP_I_LOW, STEP_I_UP                                   0177
+         A(I,1) = I                                                     0178
+         A(I,2) = 2*I                                                   0179
+         B(I) = I*10                                                    0180
+         C(I) = 0                                                       0181
+10       CONTINUE                                                       0182
 !$OMP end parallel do
 
 !$omp master
@@ -132,22 +192,14 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-C     A nonblocking algo increment STEP_Nb_Request.
-      STEP_NBREQUEST = 0                                                0186
-      CALL STEP_ALLTOALLREGION(2, STEP_COMM_SIZE, STEP_SR_A,            0187
-     &STEP_SIZEREGION(2, STEP_SR_A(IDX_SLICE_LOW,1,0)), A,              0187
-     &STEP_TAG_DEFAULT, MAX_NB_REQUEST, STEP_REQUESTS, STEP_NBREQUEST   0187
-     &, STEP_NBLOCKING_ALG, STEP_INTEGER4)                              0187
-      CALL STEP_ALLTOALLREGION(1, STEP_COMM_SIZE, STEP_SR_B,            0191
-     &STEP_SIZEREGION(1, STEP_SR_B(IDX_SLICE_LOW,1,0)), B,              0191
-     &STEP_TAG_DEFAULT, MAX_NB_REQUEST, STEP_REQUESTS, STEP_NBREQUEST   0191
-     &, STEP_NBLOCKING_ALG, STEP_INTEGER4)                              0191
-      CALL STEP_ALLTOALLREGION(1, STEP_COMM_SIZE, STEP_SR_C,            0195
-     &STEP_SIZEREGION(1, STEP_SR_C(IDX_SLICE_LOW,1,0)), C,              0195
-     &STEP_TAG_DEFAULT, MAX_NB_REQUEST, STEP_REQUESTS, STEP_NBREQUEST   0195
-     &, STEP_NBLOCKING_ALG, STEP_INTEGER4)                              0195
-C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
-      CALL STEP_WAITALL(STEP_NBREQUEST, STEP_REQUESTS)                  0200
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0190
+     &)                                                                 0190
+      CALL STEP_ALLTOALL_FULL(B, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0192
+     &)                                                                 0192
+      CALL STEP_ALLTOALL_FULL(C, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0194
+     &)                                                                 0194
+      CALL STEP_WAITALL                                                 0196
+      CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)                         0197
 
 !$omp end master
 !$omp barrier
@@ -157,49 +209,77 @@ C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
 !!
 !! file for SUM_PARDO20_HYBRID.f
 !!
-      SUBROUTINE SUM_PARDO20_HYBRID(I_DUMMY, I_L, I_U, N, C, A, B)
+      SUBROUTINE SUM_PARDO20_HYBRID(I, I_L, I_U, N, C, A, B)
+! MIL-STD-1753 Fortran extension not in PIPS
       implicit none
       include "STEP.h"
-      INTEGER*4 MAX_NB_REQUEST
-      PARAMETER (MAX_NB_REQUEST = 32)
-      INTEGER I_DUMMY, I, I_L, I_U, N, IDX, I_LOW, I_UP, STEP_I_LOW, 
-     &STEP_I_UP
-      INTEGER C(1:N), A(1:N, 1:2), B(1:N), STEP_I_LOOPSLICES(
-     &IDX_SLICE_LOW:IDX_SLICE_UP, 1:MAX_NB_LOOPSLICES), STEP_SR_C(
-     &IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 0:MAX_NB_LOOPSLICES), 
-     &STEP_REQUESTS(1:MAX_NB_REQUEST)
-      CALL STEP_GET_SIZE(STEP_COMM_SIZE)                                0126
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0127
+      INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, N
+      INTEGER STEP_RR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
+     &MAX_NB_LOOPSLICES), STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 
+     &1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1
+     &, 1:MAX_NB_LOOPSLICES), C(1:N), A(1:N, 1:2), B(1:N)
 
-      CALL STEP_COMPUTELOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE,          0129
-     &MAX_NB_LOOPSLICES, STEP_I_LOOPSLICES)                             0129
+!$omp master
+      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)                       0110
+      CALL STEP_INIT_ARRAYREGIONS(C, STEP_INTEGER4, 1, 1, N)            0111
+      CALL STEP_INIT_ARRAYREGIONS(A, STEP_INTEGER4, 2, 1, N, 1, 2)      0112
+      CALL STEP_INIT_ARRAYREGIONS(B, STEP_INTEGER4, 1, 1, N)            0113
+      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)                            0114
+      CALL STEP_COMPUTE_LOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE)         0115
 
-C     Put array boundaries into region arrays (SR: Send region)
+C     Put array boundaries into RECV region arrays
 C     First dimension: lower and upper bounds of each slice
 C     Second dimension: for each dimension of the original array
 C     Third dimension: store the boundaries of the local chunk.
 
-C     The first element stores initial boundaries,
-C     then one element for each process
-      STEP_SR_C(IDX_SLICE_LOW,1,0) = 1                                  0139
-      STEP_SR_C(IDX_SLICE_UP,1,0) = N                                   0140
-
-C     Region computation
-      DO IDX = 1, STEP_COMM_SIZE                                        0143
-         I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0144
-         I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0145
-C  <C(PHI1)-write-EXACT-{2<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 2)                 0147
-         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0148
+      DO IDX = 1, STEP_COMM_SIZE                                        0122
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0123
+C  <A(PHI1,PHI2)-read-EXACT-{PHI2==1, I_LOW<=PHI1+1, PHI1<=I_UP,
+C    I_LOW<=I_UP}>
+         STEP_RR_A(IDX_SLICE_LOW,1,IDX) = I_LOW-1                       0126
+         STEP_RR_A(IDX_SLICE_UP,1,IDX) = I_UP                           0127
+         STEP_RR_A(IDX_SLICE_LOW,2,IDX) = 1                             0128
+         STEP_RR_A(IDX_SLICE_UP,2,IDX) = 1                              0129
+C  <B(PHI1)-read-EXACT-{I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_RR_B(IDX_SLICE_LOW,1,IDX) = I_LOW                         0131
+         STEP_RR_B(IDX_SLICE_UP,1,IDX) = I_UP                           0132
       ENDDO
+      CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)           0134
+      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)           0135
+
+C     Communicating data to other nodes
+C     3 communication shemes for all-to-all personalized broadcast :
+C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
+      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0140
+     &STEP_TAG_DEFAULT)                                                 0140
+      CALL STEP_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG,                 0142
+     &STEP_TAG_DEFAULT)                                                 0142
+      CALL STEP_WAITALL                                                 0144
+
+C     Put array boundaries into SEND region arrays
+C     First dimension: lower and upper bounds of each slice
+C     Second dimension: for each dimension of the original array
+C     Third dimension: store the boundaries of the local chunk.
+
+      DO IDX = 1, STEP_COMM_SIZE                                        0151
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0152
+C  <C(PHI1)-write-EXACT-{2<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 2)                 0154
+         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0155
+      ENDDO
+      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0157
+
+!$omp end master
+!$omp barrier
+
 
 C     Where work is done...
-      STEP_I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,STEP_COMM_RANK+1)    0152
-      STEP_I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,STEP_COMM_RANK+1)      0153
+      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0164
+      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_I_LOW, STEP_I_UP)   0165
 !$OMP parallel do
-      DO 20 I = STEP_I_LOW, STEP_I_UP                                   0155
-         C(I) = A(I-1,1)+A(I,1)+B(I)                                    0156
-20       CONTINUE                                                       0157
+      DO 20 I = STEP_I_LOW, STEP_I_UP                                   0167
+         C(I) = A(I-1,1)+A(I,1)+B(I)                                    0168
+20       CONTINUE                                                       0169
 !$OMP end parallel do
 
 !$omp master
@@ -207,14 +287,10 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-C     A nonblocking algo increment STEP_Nb_Request.
-      STEP_NBREQUEST = 0                                                0166
-      CALL STEP_ALLTOALLREGION(1, STEP_COMM_SIZE, STEP_SR_C,            0167
-     &STEP_SIZEREGION(1, STEP_SR_C(IDX_SLICE_LOW,1,0)), C,              0167
-     &STEP_TAG_DEFAULT, MAX_NB_REQUEST, STEP_REQUESTS, STEP_NBREQUEST   0167
-     &, STEP_NBLOCKING_ALG, STEP_INTEGER4)                              0167
-C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
-      CALL STEP_WAITALL(STEP_NBREQUEST, STEP_REQUESTS)                  0172
+      CALL STEP_ALLTOALL_FULL(C, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0177
+     &)                                                                 0177
+      CALL STEP_WAITALL                                                 0179
+      CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)                         0180
 
 !$omp end master
 !$omp barrier
@@ -224,52 +300,67 @@ C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
 !!
 !! file for SUM_PARDO30_HYBRID.f
 !!
-      SUBROUTINE SUM_PARDO30_HYBRID(I_DUMMY, I_L, I_U, N, B)
+      SUBROUTINE SUM_PARDO30_HYBRID(I, I_L, I_U, N, B)
+! MIL-STD-1753 Fortran extension not in PIPS
       implicit none
       include "STEP.h"
-      INTEGER*4 MAX_NB_REQUEST
-      PARAMETER (MAX_NB_REQUEST = 32)
-      INTEGER I_DUMMY, I, I_L, I_U, N, IDX, I_LOW, I_UP, STEP_I_LOW, 
-     &STEP_I_UP
-      INTEGER B(1:N), STEP_INITIAL_B(1:N), STEP_BUFFER_B(1:N), 
-     &STEP_I_LOOPSLICES(IDX_SLICE_LOW:IDX_SLICE_UP, 1:
+      INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, N
+      INTEGER STEP_RR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
      &MAX_NB_LOOPSLICES), STEP_SR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 
-     &0:MAX_NB_LOOPSLICES), STEP_REQUESTS(1:MAX_NB_REQUEST)
-      CALL STEP_GET_SIZE(STEP_COMM_SIZE)                                0126
-      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0127
-      CALL STEP_INITINTERLACED(1*(N-1+1), B, STEP_INITIAL_B,            0128
-     &STEP_BUFFER_B, STEP_INTEGER4)                                     0128
+     &1:MAX_NB_LOOPSLICES), B(1:N)
 
-      CALL STEP_COMPUTELOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE,          0131
-     &MAX_NB_LOOPSLICES, STEP_I_LOOPSLICES)                             0131
+!$omp master
+      CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)                       0109
+      CALL STEP_INIT_ARRAYREGIONS(B, STEP_INTEGER4, 1, 1, N)            0110
+      CALL STEP_GET_COMMSIZE(STEP_COMM_SIZE)                            0111
+      CALL STEP_COMPUTE_LOOPSLICES(I_L, I_U, 1, STEP_COMM_SIZE)         0112
 
-C     Put array boundaries into region arrays (SR: Send region)
+C     Put array boundaries into RECV region arrays
 C     First dimension: lower and upper bounds of each slice
 C     Second dimension: for each dimension of the original array
 C     Third dimension: store the boundaries of the local chunk.
 
-C     The first element stores initial boundaries,
-C     then one element for each process
-      STEP_SR_B(IDX_SLICE_LOW,1,0) = 1                                  0141
-      STEP_SR_B(IDX_SLICE_UP,1,0) = N                                   0142
-
-C     Region computation
-      DO IDX = 1, STEP_COMM_SIZE                                        0145
-         I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,IDX)                   0146
-         I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,IDX)                     0147
+      DO IDX = 1, STEP_COMM_SIZE                                        0119
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0120
 C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10}>
-         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = 1                             0149
-         STEP_SR_B(IDX_SLICE_UP,1,IDX) = 10                             0150
+         STEP_RR_B(IDX_SLICE_LOW,1,IDX) = 1                             0122
+         STEP_RR_B(IDX_SLICE_UP,1,IDX) = 10                             0123
       ENDDO
+      CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)           0125
+
+C     Communicating data to other nodes
+C     3 communication shemes for all-to-all personalized broadcast :
+C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
+      CALL STEP_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG,                 0130
+     &STEP_TAG_DEFAULT)                                                 0130
+      CALL STEP_WAITALL                                                 0132
+
+C     Put array boundaries into SEND region arrays
+C     First dimension: lower and upper bounds of each slice
+C     Second dimension: for each dimension of the original array
+C     Third dimension: store the boundaries of the local chunk.
+
+      DO IDX = 1, STEP_COMM_SIZE                                        0139
+         CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0140
+C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10}>
+         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = 1                             0142
+         STEP_SR_B(IDX_SLICE_UP,1,IDX) = 10                             0143
+      ENDDO
+      CALL STEP_SET_INTERLACED_SENDREGIONS(B, STEP_COMM_SIZE,           0145
+     &STEP_SR_B)                                                        0145
+
+!$omp end master
+!$omp barrier
+
 
 C     Where work is done...
-      STEP_I_LOW = STEP_I_LOOPSLICES(IDX_SLICE_LOW,STEP_COMM_RANK+1)    0154
-      STEP_I_UP = STEP_I_LOOPSLICES(IDX_SLICE_UP,STEP_COMM_RANK+1)      0155
+      CALL STEP_GET_RANK(STEP_COMM_RANK)                                0153
+      CALL STEP_GET_LOOPBOUNDS(STEP_COMM_RANK, STEP_I_LOW, STEP_I_UP)   0154
 !$OMP parallel do
-      DO 30 I = STEP_I_LOW, STEP_I_UP                                   0157
-         B(I) = I                                                       0158
-         B(N+1-I) = I                                                   0159
-30       CONTINUE                                                       0160
+      DO 30 I = STEP_I_LOW, STEP_I_UP                                   0156
+         B(I) = I                                                       0157
+         B(N+1-I) = I                                                   0158
+30       CONTINUE                                                       0159
 !$OMP end parallel do
 
 !$omp master
@@ -277,112 +368,129 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-C     A nonblocking algo increment STEP_Nb_Request.
-      STEP_NBREQUEST = 0                                                0169
-      CALL STEP_ALLTOALLREGION_MERGE(1, STEP_COMM_SIZE, STEP_SR_B,      0170
-     &STEP_SIZEREGION(1, STEP_SR_B(IDX_SLICE_LOW,1,0)), B,              0170
-     &STEP_INITIAL_B, STEP_BUFFER_B, STEP_TAG_DEFAULT, MAX_NB_REQUEST   0170
-     &, STEP_REQUESTS, STEP_NBREQUEST, STEP_NBLOCKING_ALG,              0170
-     &STEP_INTEGER4)                                                    0170
-C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
-      CALL STEP_WAITALL(STEP_NBREQUEST, STEP_REQUESTS)                  0176
+      CALL STEP_ALLTOALL_FULL_INTERLACED(B, STEP_NBLOCKING_ALG,         0167
+     &STEP_TAG_DEFAULT)                                                 0167
+      CALL STEP_WAITALL                                                 0169
+      CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)                         0170
 
 !$omp end master
 !$omp barrier
 
       END
+###################### sum/src/step_directives.f ######################
+!!
+!! file for step_directives.f
+!!
+      SUBROUTINE SUM_PARDO30(I, I_L, I_U, N, B)
+      INTEGER I, I_L, I_U, N
+      INTEGER B(1:N)
+      DO 30 I = I_L, I_U                                                0004
+         B(I) = I                                                       0005
+         B(N+1-I) = I                                                   0006
+30       CONTINUE                                                       0007
+      END
+      SUBROUTINE SUM_PARDO20(I, I_L, I_U, N, C, A, B)
+      INTEGER I, I_L, I_U, N
+      INTEGER C(1:N), A(1:N, 1:2), B(1:N)
+      DO 20 I = I_L, I_U                                                0004
+         C(I) = A(I-1,1)+A(I,1)+B(I)                                    0005
+20       CONTINUE                                                       0006
+      END
+      SUBROUTINE SUM_PARDO10(I, I_L, I_U, N, A, B, C)
+      INTEGER I, I_L, I_U, N
+      INTEGER A(1:N, 1:2), B(1:N), C(1:N)
+      DO 10 I = I_L, I_U                                                0004
+         A(I,1) = I                                                     0005
+         A(I,2) = 2*I                                                   0006
+         B(I) = I*10                                                    0007
+         C(I) = 0                                                       0008
+10       CONTINUE                                                       0009
+      END
 ###################### sum/src/step_rt ######################
 ###################### sum/src/steprt_f.h ######################
-!*******************************************************************************
-!*                                                                             *
-!*   Authors 	        :       Abdellah. Kouadri                              *
-!*				Daniel Millot                          	       *
-!*                              Frederique Silber-Chaussumier                  *
-!*				                                               *
-!*   Date		:       25/06/2009                                     *
-!*						                               *
-!*   File		:	steprt_f.h                                     *
-!*							                       *
-!*   Version		:       1.1				               *
-!*   Description	:	Fortran runtime interface                      *
-! ******************************************************************************
-
-
-
-! Datatype
-      INTEGER STEP_INTEGER1
-      INTEGER STEP_INTEGER2
-      INTEGER STEP_INTEGER4
-      INTEGER STEP_INTEGER8
-      INTEGER STEP_REAL4
-      INTEGER STEP_REAL8
-      INTEGER STEP_REAL16
-      INTEGER STEP_COMPLEX8
-      INTEGER STEP_COMPLEX16
-      INTEGER STEP_COMPLEX32
-      INTEGER STEP_INTEGER
-      INTEGER STEP_REAL
-      INTEGER STEP_COMPLEX
-      INTEGER STEP_DOUBLE_PRECISION
 !
-      PARAMETER (STEP_INTEGER1 = 1)
-      PARAMETER (STEP_INTEGER2 = 2)
-      PARAMETER (STEP_INTEGER4 = 3)
-      PARAMETER (STEP_INTEGER8 = 4)
-      PARAMETER (STEP_REAL4 = 5)
-      PARAMETER (STEP_REAL8 = 6)
-      PARAMETER (STEP_REAL16 = 7)
-      PARAMETER (STEP_COMPLEX8 = 8)
-      PARAMETER (STEP_COMPLEX16 = 9)
-      PARAMETER (STEP_COMPLEX32 = 10)
-      PARAMETER (STEP_INTEGER = 11)
-      PARAMETER (STEP_REAL = 12)
-      PARAMETER (STEP_COMPLEX = 13)
-      PARAMETER (STEP_DOUBLE_PRECISION = 14)
+!   Genereted file from c/step_common.h
+! 
+       INTEGER STEP_C
+       PARAMETER (STEP_C = 0)
 
-! Communication tag
-      INTEGER   STEP_TAG_DEFAULT
-!
-      PARAMETER (STEP_TAG_DEFAULT = 0)
+       INTEGER STEP_FORTRAN
+       PARAMETER (STEP_FORTRAN = 1)
 
-! Communication algorithms
-      INTEGER 	STEP_NBLOCKING_ALG 
-      INTEGER	STEP_BLOCKING_ALG_1
-      INTEGER	STEP_BLOCKING_ALG_2
-      INTEGER	STEP_BLOCKING_ALG_3
-      INTEGER	STEP_BLOCKING_ALG_4
-! reduction operators 
-      INTEGER STEP_SUM	
-      INTEGER STEP_MAX_
-      INTEGER STEP_MIN_
-      INTEGER STEP_PROD
-      INTEGER STEP_LAND	
-      INTEGER STEP_BAND
-      INTEGER STEP_LOR	
-      INTEGER STEP_BOR	
-      INTEGER STEP_LXOR	
-      INTEGER STEP_BXOR	
-      INTEGER STEP_MINLOC
-      INTEGER STEP_MAXLOC
-!
-      PARAMETER (STEP_NBLOCKING_ALG  = 0)
-      PARAMETER (STEP_BLOCKING_ALG_1 = 1)
-      PARAMETER (STEP_BLOCKING_ALG_2 = 2)
-      PARAMETER (STEP_BLOCKING_ALG_3 = 3)
-      PARAMETER (STEP_BLOCKING_ALG_4 = 4)
-!
-      PARAMETER (STEP_SUM  =	3)
-      PARAMETER (STEP_MAX_ =	1)
-      PARAMETER (STEP_MIN_ =	2)
-      PARAMETER (STEP_PROD =	0)
-      PARAMETER (STEP_LAND =	4)
-      PARAMETER (STEP_BAND =	5)
-      PARAMETER (STEP_LOR  =	6)
-      PARAMETER (STEP_BOR  =	7)
-      PARAMETER (STEP_LXOR =	8)
-      PARAMETER (STEP_BXOR =	9)
-      PARAMETER (STEP_MINLOC =	10)
-      PARAMETER (STEP_MAXLOC =	11)
+       INTEGER STEP_PARALLEL
+       PARAMETER (STEP_PARALLEL = 0)
+
+       INTEGER STEP_DO
+       PARAMETER (STEP_DO = 1)
+
+       INTEGER STEP_PARALLEL_DO
+       PARAMETER (STEP_PARALLEL_DO = 2)
+
+       INTEGER STEP_NOWAIT
+       PARAMETER (STEP_NOWAIT = 0)
+
+       INTEGER STEP_WAIT
+       PARAMETER (STEP_WAIT = 1)
+
+       INTEGER STEP_INTEGER
+       PARAMETER (STEP_INTEGER = 0)
+
+       INTEGER STEP_REAL
+       PARAMETER (STEP_REAL = 1)
+
+       INTEGER STEP_DOUBLE_PRECISION
+       PARAMETER (STEP_DOUBLE_PRECISION = 2)
+
+       INTEGER STEP_COMPLEX
+       PARAMETER (STEP_COMPLEX = 3)
+
+       INTEGER STEP_INTEGER1
+       PARAMETER (STEP_INTEGER1 = 4)
+
+       INTEGER STEP_INTEGER2
+       PARAMETER (STEP_INTEGER2 = 5)
+
+       INTEGER STEP_INTEGER4
+       PARAMETER (STEP_INTEGER4 = 6)
+
+       INTEGER STEP_INTEGER8
+       PARAMETER (STEP_INTEGER8 = 7)
+
+       INTEGER STEP_REAL4
+       PARAMETER (STEP_REAL4 = 8)
+
+       INTEGER STEP_REAL8
+       PARAMETER (STEP_REAL8 = 9)
+
+       INTEGER STEP_REAL16
+       PARAMETER (STEP_REAL16 = 10)
+
+       INTEGER STEP_COMPLEX8
+       PARAMETER (STEP_COMPLEX8 = 11)
+
+       INTEGER STEP_COMPLEX16
+       PARAMETER (STEP_COMPLEX16 = 12)
+
+       INTEGER STEP_TYPE_UNDEFINED
+       PARAMETER (STEP_TYPE_UNDEFINED = 13)
+
+       INTEGER STEP_TAG_DEFAULT
+       PARAMETER (STEP_TAG_DEFAULT = 0)
+
+       INTEGER STEP_NBLOCKING_ALG
+       PARAMETER (STEP_NBLOCKING_ALG = 0)
+
+       INTEGER STEP_PROD
+       PARAMETER (STEP_PROD = 0)
+
+       INTEGER STEP_MAX
+       PARAMETER (STEP_MAX = 1)
+
+       INTEGER STEP_MIN
+       PARAMETER (STEP_MIN = 2)
+
+       INTEGER STEP_SUM
+       PARAMETER (STEP_SUM = 3)
 
 ###################### sum/src/sum.f ######################
 !!
@@ -398,6 +506,7 @@ C     If STEP_Nb_Request equals 0, STEP_WAITALL does nothing
 ! Modification: F. Silber-Chaussumier
 
       PROGRAM SUM
+! MIL-STD-1753 Fortran extension not in PIPS
       implicit none
       INTEGER N
       PARAMETER (N=10)

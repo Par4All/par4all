@@ -1,3 +1,6 @@
+//
+// Code after openmp for module dotp_ptr
+//
 t_real dotp_ptr(const long int size, const t_real *x)
 {
    long int i;
@@ -10,6 +13,9 @@ t_real dotp_ptr(const long int size, const t_real *x)
       result += x[i]*x[i];
    return result;
 }
+//
+// Code after openmp for module main
+//
 int main()
 {
    long int i;

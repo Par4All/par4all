@@ -44,19 +44,19 @@ void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 IN regions
 
 
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
 void scalarization21(double A[SIZE][SIZE], double B[SIZE][SIZE])
 {
 
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
    // BEGIN BLOCK
    int i, j;
 
-//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=9, 0<=PHI2, PHI2<=9,
+//  <B[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1+1<=SIZE, 0<=PHI2, PHI2<=9,
 //    SIZE==10}>
 
    for(i = 0; i <= SIZE-1; i += 1)

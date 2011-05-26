@@ -616,7 +616,7 @@ out_effects_from_block_to_statements(sequence seq)
 
     ifdebug(1){
 	pips_debug(1,"begin\n");
-	debug(1,"","OUT effects of the current block :\n");
+	pips_debug(1,"OUT effects of the current block :\n");
 	(*effects_prettyprint_func)(l_out_seq);
     }
 
@@ -648,6 +648,8 @@ out_effects_from_block_to_statements(sequence seq)
 	list l_out_stat = NIL;
 	list l_in_prime = NIL;
 	list l_tmp = NIL;
+	// FI: no need for a completed transformer when dealing with a
+	// sequence
 	transformer seq_trans = (*load_transformer_func)(seq_stat);
 
 	l_out_seq = effects_dup(l_out_seq);
@@ -655,7 +657,7 @@ out_effects_from_block_to_statements(sequence seq)
 	/* OUT'_{n+1} = T_B(OUT(B)) */
 	(*effects_transformer_inverse_composition_op)(l_out_seq, seq_trans);
 	l_out_prime = l_out_seq;
-	
+
 	ifdebug(1)
 	{
 	    pips_debug(1,"OUT effects of block after translation into store"
@@ -666,7 +668,7 @@ out_effects_from_block_to_statements(sequence seq)
 	/* We go through each statement (S_k) in reverse order */
 	MAP(STATEMENT, c_stat,
 	{
-	    transformer c_stat_trans = (*load_transformer_func)(c_stat);
+	    transformer c_stat_trans = (*load_completed_transformer_func)(c_stat);
 	    list l_c_stat_w_eff = 
 		effects_write_effects(load_rw_effects_list(c_stat)); 
 	    

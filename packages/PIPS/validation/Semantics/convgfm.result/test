@@ -34,7 +34,8 @@ C  T(IWKS) {IWKS==0}
 
       IWKS = 0                                                          0017
 
-C  T(I,IWKE,IWKS) {I+IWKS#init==IWKS, IWKE+IWKS#init==IWKE#init+IWKS}
+C  T(I,IWKE,IWKS) {I+IWKS#init==IWKS, IWKE+IWKS#init==IWKE#init+IWKS,
+C    0<=I, I+1<=NX}
 
       DO I = 0, NX-1                                                    0018
 

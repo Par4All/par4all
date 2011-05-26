@@ -47,6 +47,7 @@
 #include "text.h"
 #include "ri.h"
 #include "effects.h"
+#include "control.h"
 #include "database.h"
 #include "pipsdbm.h"
 #include "resources.h"
@@ -66,6 +67,7 @@ bool internalize_parallel_code(char mod_name[])
   // Get the parallelized code and tell PIPS_DBM we do not want to modify it
   mod_stmt = (statement) db_get_memory_resource(DBR_PARALLELIZED_CODE,
 						mod_name, FALSE);
+  clean_up_sequences(mod_stmt);
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
   debug(2,"internalize_parallel_code","done for %s\n", mod_name);
   debug_off();

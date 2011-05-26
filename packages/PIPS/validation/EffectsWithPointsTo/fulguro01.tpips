@@ -1,31 +1,41 @@
 delete fulguro01
-create fulguro01 fulguro01.c
-setproperty ABORT_ON_USER_ERROR TRUE
+create fulguro01 fulguro01.c 
+activate C_PARSER
 
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
 setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
 setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
-##TODO: explain
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv POINTER_VALUES_DEBUG_LEVEL 2
 
 echo 
-echo PROPER EFFECTS
+echo PROPER  EFFECTS 
 echo
-
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALLFUNC]
+display PRINTED_FILE[%ALL]
+
+
+#module main
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE[%ALL]
 
 echo 
-echo PROPER POINTER EFFECTS
+echo PROPER  EFFECTS WITH POINTS TO
 echo
-activate PRINT_CODE_PROPER_POINTER_EFFECTS
-display PRINTED_FILE
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[%ALL]
 
-echo
-echo POINTS TO
-echo
 
-activate PRINT_CODE_POINTS_TO_LIST
-display PRINTED_FILE[%ALLFUNC]
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
 
 
 close

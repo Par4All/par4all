@@ -93,30 +93,37 @@ set formal_points_to_parameter(cell c)
 
 /* To create the points-to stub assiciated to the formal parameter,
  * the sink name is a concatenation of the formal parmater and the POINTS_TO_MODULE_NAME */
-points_to create_stub_points_to(cell c, type t)
+points_to create_stub_points_to(cell c, type t, basic b)
 {
-	cell sink = cell_undefined;
-	reference r = reference_undefined;
-	entity e = entity_undefined;
-	reference sink_ref = reference_undefined;
-	approximation rel = approximation_undefined;
-	points_to pt_to = points_to_undefined;
-	r = cell_reference(copy_cell(c));
-	e = reference_variable(r);
-	string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
-	string formal_name = strdup(concatenate(POINTS_TO_MODULE_NAME,MODULE_SEP_STRING, s, NULL));
-	entity formal_parameter = gen_find_entity(formal_name);
-	if(entity_undefined_p(formal_parameter)) {
-	  formal_parameter = make_entity(formal_name,
-					 t, make_storage_rom(), make_value_unknown());
-	}
-	sink_ref = copy_reference(make_reference(formal_parameter, NIL));
-	sink = make_cell_reference(sink_ref);
-	rel = make_approximation_exact();
-	pt_to = make_points_to(copy_cell(c), sink, rel,
-			       make_descriptor_none());
-	pointer_index ++;
-	return pt_to;
+  expression ex = make_unbounded_expression();
+  reference r = cell_to_reference(copy_cell(c));
+  entity e = reference_variable(r);
+  string s = strdup(concatenate("_", entity_user_name(e),"_", i2a(pointer_index), NULL));
+  string formal_name = strdup(concatenate(/* get_current_module_name() */ POINTS_TO_MODULE_NAME ,MODULE_SEP_STRING, s, NULL));
+  entity formal_parameter = gen_find_entity(formal_name);
+  type tt = make_type_variable(
+			       make_variable(copy_basic(b),
+					     CONS(DIMENSION,
+						  make_dimension(int_to_expression(0),ex),NIL),
+					     NIL));
+  if(entity_undefined_p(formal_parameter)) {
+    formal_parameter = make_entity(formal_name,
+				   tt,
+				   make_storage_formal(
+						       make_formal(
+								   get_current_module_entity()/* module_name_to_entity(POINTS_TO_MODULE_NAME) */,
+								   pointer_index)),
+				   make_value_unknown());
+  }
+  reference sink_ref = copy_reference(make_reference(formal_parameter, NIL));
+/*   expression ind = make_unbounded_expression(); */
+  reference_indices_(sink_ref)= CONS(EXPRESSION, int_to_expression(0), NIL); //;CONS(EXPRESSION, ind, NIL);
+  cell sink = make_cell_reference(sink_ref);
+  approximation rel = make_approximation_exact();
+  points_to pt_to = make_points_to(copy_cell(c), sink, rel,
+				   make_descriptor_none());
+  pointer_index ++;
+  return pt_to;
 }
 
 
@@ -152,13 +159,13 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
       basic fpb = variable_basic(type_variable(upt));
       switch(basic_tag(fpb)){
       case is_basic_int:{
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_float:{
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -171,7 +178,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       case is_basic_pointer:{
 	//pt = type_to_pointed_type(pt);
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	cell sink = points_to_sink(pt_to);
@@ -180,20 +187,20 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
 	break;
       }
       case is_basic_derived:
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       case is_basic_bit:
 	break;
       case is_basic_string:{
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
       }
       case is_basic_typedef:{
-	pt_to = create_stub_points_to(c, upt);
+	pt_to = create_stub_points_to(c, upt, fpb);
 	pt_in = set_add_element(pt_in, pt_in,
 				(void*) pt_to );
 	break;
@@ -208,7 +215,7 @@ set  pointer_formal_parameter_to_stub_points_to(type pt, cell c)
        be done for points-to analysis. */
   else if(type_void_p(upt)) {
     /* Create a target of unknown type */
-    pt_to = create_stub_points_to(c, make_type_unknown() /*memory leak?*/);
+    pt_to = create_stub_points_to(c, make_type_unknown(), basic_undefined /*memory leak?*/);
     pt_in = set_add_element(pt_in, pt_in, (void*) pt_to );
   }
   else

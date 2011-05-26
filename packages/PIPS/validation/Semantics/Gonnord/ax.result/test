@@ -1,0 +1,44 @@
+
+//  P() {}
+
+int ax()
+{
+
+//  P() {}
+
+   int i, j, n;
+
+//  P(i,j,n) {}
+
+   n>0?(void) 0:__assert_fail("n>0", "./ax.foo.c", 9, (const char *) 0);
+
+//  P(i,j,n) {1<=n}
+
+   i = 0;
+
+//  P(i,j,n) {i==0, 1<=n}
+
+   do {
+
+//  P(i,j,n) {0<=i, i+1<=n}
+
+      j = 0;
+
+//  P(i,j,n) {j==0, 0<=i, i+1<=n}
+
+      while (j<n-1)
+
+//  P(i,j,n) {0<=i, i+1<=n, 0<=j, j+2<=n}
+
+         j++;
+
+//  P(i,j,n) {j==n-1, 0<=i, i<=j}
+
+      i++;
+   }
+   while (j>=n-1&&i<n-1);
+
+//  P(i,j,n) {1<=i, n<=j+1, 1<=n}
+
+   return 0;
+}

@@ -481,6 +481,10 @@ bool entity_abstract_location_p(entity al)
       found = strstr(ln, HEAP_AREA_LOCAL_NAME);
       abstract_p = (found!=NULL);
     }
+    if(!abstract_p) {
+      found = strstr(ln,NULL_POINTER_NAME);
+      abstract_p = (found!=NULL);
+    }
   }
 
   return abstract_p;
@@ -505,6 +509,9 @@ entity variable_to_abstract_location(entity v)
 
   if(entity_abstract_location_p(v))
     al = v;
+  /* NULL is an abstract location  */
+  else if(entity_null_locations_p(v))
+    al = v;
   else if(entity_variable_p(v)
      && !dummy_parameter_entity_p(v)
      && !variable_return_p(v)) {
@@ -520,6 +527,9 @@ entity variable_to_abstract_location(entity v)
 	al = entity_all_locations();
       else
 	al = entity_all_locations();
+
+    
+
     else { // must be a standard variable
       storage s = entity_storage(v);
       ram r = storage_ram(s);

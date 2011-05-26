@@ -1,0 +1,25 @@
+int main(void)
+{
+   int j = 1, k = 2, l = 3;
+   j = j*(k-l)*k;
+   k = j+l+k;
+   l = l-k-j;
+   printf("%d|%d|%d\n", j, k, l);
+   return 0;
+}
+int main(void)
+{
+   int j = 1, k = 2, l = 3;
+//  call prod[j],
+   j = j*(k-l);
+//  call prod[j],
+   j = j*k;
+//  call sum[k],
+   k = k+j;
+//  call sum[k],
+   k = k+l;
+//  call sum[l],
+   l = l-k-j;
+   printf("%d|%d|%d\n", j, k, l);
+   return 0;
+}

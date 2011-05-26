@@ -1,5 +1,6 @@
-SUBDIRS  = doc drivers
+SUBDIRS  = doc drivers impl
 BUILT_SOURCES = pypips_wrap.c  pypips_aux.c
+
 dist_noinst_DATA=pypips.i.in pypips.c pipsmakerc2python.py pypips.h.in pips-make.in
 
 dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
@@ -7,7 +8,7 @@ dist_bin_SCRIPTS = pips-gcc pips-ar pips-make ipyps
 pipsmakeenvdir = $(libdir)/pips-make
 dist_pipsmakeenv_SCRIPTS = gcc ar
 
-dist_pkgpython_PYTHON = pypsbase.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
+dist_pkgpython_PYTHON = pypsbase.py pypsex.py pyps.py pipscc.py pii.py pipsgcc.py pypsutils.py pyrops.py apypips.py pypsconfig.py
 dist_python_DATA = pips.pth
 
 if WITH_PYPS_EXTRA
@@ -29,6 +30,7 @@ _pypips_la_CPPFLAGS = \
 	-I../../Libs/misc\
 	-I../../Libs/newgen\
 	-I../../Libs/ri-util\
+	-I../../Libs/text-util\
 	-I../../Libs/top-level\
 	-I../../Libs/pipsmake\
 	-I../../Libs/pipsdbm\

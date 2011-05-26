@@ -15,7 +15,7 @@ void main()
       x2++;
       y = foo();
     }
-  // Expected result: 1<=x1+x2, x1<=x2+2, x2<=x1+1, x1<=2x2+1, x2<=3, 2x1+x2<=10
+  // Expected result: 1<=x1+x2, x2<=x1+1, x1<=2x2+1, x1<=x2+2, x2<=3, 2x1+x2<=10
   y = y;
 }
 

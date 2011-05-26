@@ -1,0 +1,113 @@
+# Test Suite for Vectorizing Compilers
+#
+# Callahan, Dongarra and levine
+#
+# http://www.netlib.org/benchmark/vectors
+#
+# Source code for "SECOND" is not included
+
+delete tsvc
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty PREPROCESSOR_MISSING_FILE_HANDLING "generate"
+
+create tsvc mains.f loops.f
+
+# The SECOND source code is generated while pipsmake is running using
+# an outdated version of %ALL
+
+apply PRINT_CODE[%ALL]
+apply INITIAL_PRECONDITION[SECOND]
+
+setenv modules=`(cd tsvc.database; for i in S[1-9]*; do echo -n $i ""; done)`
+#echo $modules
+
+
+#apply PRINT_PARALLELIZEDOMP_CODE[$module]
+apply PRINT_PARALLELIZED77_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module
+
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f | wc -l` ;done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/faa
+
+# Special cases that do not parallelize with default options
+# S123: conditional induction variable recognition; use transformer in dependence test, but that will not be enough 
+# S124: induction variable recognition: messed up by non affine upper bound (!)
+# S151S: induction variable recognition
+# S161: restructure control; coarse grain does not work because it is vectorizable not parallelizable with C(I+1) and C(I)
+# S152S: no loop in this module
+# S161: no loop in this module
+# S162: vector loop is not parallel
+# S234: retructure control + induction variable recognition
+# S253: vector with guards; or coarse grain parallelization
+# S258: scalar and array expansion wrap-around scalar under an if
+# S271: conditional vector coode; or coarse grain parallelization 
+# S2710: guarded vector code
+# S2711: semantic if removal; or guarded vector code; or coarse
+# S2712: guarded vector code; or idiom recognition; or coarse
+# S272: guarded vector code; or coarse
+# S273: guarded vector code; or coarse
+# S274: guarded vector code; or coarse
+# S275: if around inner loop, interchanging needed; or coarse
+# S276: index set splitting; multiple version; or guards; or coarse
+# S277: simplify control; guarded vector code; or coarse
+# S278: simplify control; guarded vector code; or coarse
+# S279: simplify control; guarded vector code; or coarse
+# S3110: if to max with index reduction, 2 dimensions
+# S3111: conditional sum reduction
+# S3113: maximum of absolute value; reduction
+# S314: max reduction
+# S315: max reduction + index reduction
+# S316: min reduction
+# S318: isamax, max absolute value, increments not equal to 1; simplify control
+# S331: search loop, if to last-1
+# S332: search loops, first value greater than threshold; loop exit
+# S341: pack positive values
+# S342: unpacking
+# S343: pack 2-d array into one dimension
+# S411: loop recognition/recovery
+# S412: loop recognition/recovery
+# S412: loop recognition/recovery
+# S413: loop recognition/recovery
+# S414: loop recognition/recovery + loop interchanging
+# S415: while loop recognition/recovery
+# S441: simplify control; guarded vector code; coarse grain
+# S442: simplify control; guarded vector code; coarse grain
+# S443: simplify control; guarded vector code; coarse grain
+# S471S: empty
+# S481: STOP within loop
+# S482: loop with exit
+
+open tsvc
+
+apply RESTRUCTURE_CONTROL[$modules]
+capply RECOVER_FOR_LOOP[$modules]
+#apply SUPPRESS_DEAD_CODE[$modules]
+
+#apply PRINT_PARALLELIZEDOMP_CODE[$modules]
+apply PRINT_PARALLELIZED77_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module (FI: $modules should be used instead of *)
+# Because of loop distribution, the total number of parallel loops is not significant; to be improved
+
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f  | wc -l` ; done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/fbb
+
+open tsvc
+
+capply COARSE_GRAIN_PARALLELIZATION[$modules]
+#apply PRINT_PARALLELIZEDOMP_CODE[$modules]
+apply PRINT_PARALLELIZED77_CODE[$modules]
+
+close
+
+# Count the number of parallel loops in every module
+
+shell (cd tsvc.database; for i in $modules; do echo $i " " `grep -i doall $i/$i.par.f | wc -l` ; done; echo; echo Total `cat */*.par.f| grep -i  doall | wc -l`) >tsvc.database/Tmp/fcc
+
+shell (cd tsvc.database/Tmp; join faa fbb | join - fcc)
+
+quit

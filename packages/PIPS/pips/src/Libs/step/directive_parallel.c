@@ -5,8 +5,9 @@ This file is part of STEP.
 The program is distributed under the terms of the GNU General Public
 License.
 */
+
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
 #include "defines-local.h"
 
@@ -61,6 +62,18 @@ bool is_end_directive_omp_end_parallel(directive current,directive next)
   return b1 && b2;
 }
 
+
+static void clause_handling(entity directive_module, directive d)
+{
+  pips_debug(1,"d = %p", d);
+  // reduction handling
+  directive_clauses(d) = gen_nconc(directive_clauses(d),
+				       CONS(CLAUSE,step_check_reduction(directive_module,directive_txt(d)),NIL));
+  // private handling
+  directive_clauses(d) = gen_nconc(directive_clauses(d),
+				       CONS(CLAUSE,step_check_private(directive_module,directive_txt(d)),NIL));
+}
+
 instruction handle_omp_parallel(directive begin, directive end)
 {
   statement call;
@@ -84,6 +97,8 @@ instruction handle_omp_parallel(directive begin, directive end)
   instr = statement_instruction(call);
   statement_instruction(call) = instruction_undefined;
   free_statement(call);
+
+  clause_handling(directive_module, begin);
 
   store_global_directives(directive_module, begin);
   free_directive(end);

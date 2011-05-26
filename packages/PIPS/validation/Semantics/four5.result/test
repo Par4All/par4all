@@ -38,7 +38,7 @@ C  T(J) {J==1, 2N==NN, 1<=N}
 *     ------------
       J = 1                                                             0026
 
-C  T(I,J,M) {J#init==1, 2N==NN, 1<=I, 1<=N}
+C  T(I,J,M) {J#init==1, 2N==NN, 1<=I, I<=2N, 1<=N}
 
       DO 11 I = 1, NN, 2                                                0027
 
@@ -144,11 +144,12 @@ C  T() {ISTEP==2MMAX, 2N==NN, 2<=MMAX, MMAX+1<=2N, 1<=N}
 
          WI = 0.D0                                                      0055
 
-C  T(I,J,M) {ISTEP==2MMAX, 2N==NN, 1<=M, 2<=MMAX, MMAX+1<=2N, 1<=N}
+C  T(I,J,M) {ISTEP==2MMAX, 2N==NN, 1<=M, M<=MMAX, 2<=MMAX, MMAX+1<=2N,
+C    1<=N}
 
          DO 13 M = 1, MMAX, 2                                           0056
 
-C  T(I,J) {ISTEP==2MMAX, 2N==NN, M<=I, 1<=M, M<=MMAX, 2<=MMAX,
+C  T(I,J) {ISTEP==2MMAX, 2N==NN, M<=I, I<=2N, 1<=M, M<=MMAX, 2<=MMAX,
 C    MMAX+1<=2N, 1<=N}
 
             DO 12 I = M, NN, ISTEP                                      0057

@@ -19,11 +19,11 @@ POINTS-TO
 //  {}
 void point_to03()
 {
-//  points to = {}
+//  {}
    typedef double a_t[10][20];
-//  points to = {}
+//  {}
    a_t a;
-//  points to = {}
+//  {}
    a_t *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 

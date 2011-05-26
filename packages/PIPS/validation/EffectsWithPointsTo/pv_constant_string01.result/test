@@ -1,0 +1,38 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   char *s;
+//             <    is written>: s
+   s = "hello\n";
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   char *s;
+//  {(s,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   s = "hello\n";
+//  {(s,*ANY_MODULE*:*ANYWHERE*_b0,-Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   char *s;
+//             <    is written>: s
+   s = "hello\n";
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+
+****************** End of Dependence Graph ******************

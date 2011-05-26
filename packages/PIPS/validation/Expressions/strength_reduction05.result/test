@@ -20,19 +20,19 @@ int main()
 
       return 1;
 
-//  T(i) {i#init==0, 0<=i}
+//  T(i) {i#init==0, 0<=i, i<=4}
 
    for(i = 0; i <= 4; i += 2) {
 
-//  T(i) {0<=i#init, i#init<=4}
+//  T(i) {0<=i, i<=4, 0<=i#init, i#init<=4}
 
       // BEGIN BLOCK
 
-//  T(i) {0<=i#init, i#init<=4}
+//  T(i) {0<=i, i<=4, 0<=i#init, i#init<=4}
 
       *(a+i) = 3;
 
-//  T(i) {}
+//  T(i) {0<=i, i<=4, 0<=i#init, i#init<=4}
 
       *(a+2*i+1) = 4;
       // END BLOCK

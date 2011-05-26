@@ -1,12 +1,25 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+   tf_t s;
+//             <    is written>: sp
+   tf_t *sp = &s;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+
+   call10(s.one, s.two, sp->one, sp->two);
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    tf_t s;
-//  points to = {}
+//  {}
    tf_t *sp = &s;
 //  {(sp,s,-Exact-)}
 

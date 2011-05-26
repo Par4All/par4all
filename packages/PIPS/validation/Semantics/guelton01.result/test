@@ -12,7 +12,7 @@ int FIR()
 
    int ifr;
 
-//  T(ifr) {0<=ifr}
+//  T(ifr) {ifr==0}
 
    for(ifr = 0; ifr <= 0; ifr += 1)
 

@@ -3,7 +3,7 @@ C  T() {}
 
       PROGRAM FIXPOINT01
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=10}
 
 
 C     Check that constant assignments are taken into account when loops
@@ -21,7 +21,7 @@ C  T() {}
 
       PRINT *, J                                                        0010
 
-C  T(I,J) {}
+C  T(I,J) {1<=I, I<=10}
 
 
       DO I = 1, 10                                                      0012

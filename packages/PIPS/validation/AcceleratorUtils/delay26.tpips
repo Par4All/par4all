@@ -11,7 +11,7 @@ module a
 display PRINTED_FILE
 setproperty ACCEL_LOAD="load"
 setproperty ACCEL_STORE="store"
-apply DELAY_COMMUNICATIONS
+apply DELAY_COMMUNICATIONS_INTER
 display PRINTED_FILE
 
 apply UNSPLIT

@@ -30,7 +30,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    float *a, *p;
 //  {(a,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(p,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
@@ -39,17 +39,19 @@ int main()
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    a = (float *) malloc(10*sizeof(float));
-//  {(a,*HEAP*_l_8,-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(a,*HEAP*_l_8[0],-Exact-);(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = a, i = 0;
-//  {(a,*HEAP*_l_8,-Exact-);(p,*HEAP*_l_8,-Exact-)}
+//  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-Exact-)}
    while (i<10) {
-//  points to = {}
+//  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       *p = 1.0;
-//  points to = {}
+//  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       p++;
    }
-//  {(a,*HEAP*_l_8,-Exact-);(p,*HEAP*_l_8,-MAY-);(p,
+//  {(a,*HEAP*_l_8[0],-Exact-);(p,*HEAP*_l_8[0],-MAY-);(p,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
    return 0;
 }

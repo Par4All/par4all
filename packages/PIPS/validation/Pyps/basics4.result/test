@@ -1,0 +1,79 @@
+basics3
+basics4
+main
+int main()
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   puts("b""e""l""l""o""\n");
+   
+   
+   return 0;
+}
+int main()
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   puts("c""e""l""l""o""\n");
+   
+   
+   return 0;
+}
+int main()
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   puts("c""e""l""l""o""\n");
+   
+   
+   return 0;
+}
+
+int main()
+{
+   
+   
+   
+   
+   
+   
+   
+   
+   
+   puts("c""e""l""l""o""\n");
+   
+   
+   return 0;
+}
+int main()
+{
+   int j;
+   for(j = 0; j <= 9; j += 1) {
+      int k;
+      for(k = 0; k >= -5; k += -1)
+         puts("ah");
+   }
+}
+l99998
+l99999

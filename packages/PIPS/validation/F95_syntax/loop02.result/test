@@ -12,6 +12,3 @@ PROGRAM MAIN
 99999    CONTINUE
    CONTINUE
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-

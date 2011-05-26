@@ -19,6 +19,3 @@ PROGRAM MAIN
    C = ADD1(A, B)
    C = ADD2(A, B)
 END PROGRAM MAIN
-
-"compile sources produced by pips"
-

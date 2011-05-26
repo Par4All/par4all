@@ -44,6 +44,7 @@
 
 
 #include "sac.h"
+#include "hyperplane.h"
 
 #include "properties.h"
 
@@ -103,22 +104,77 @@ static void simd_loop_unroll(statement loop_statement, intptr_t rate)
   expression erange = range_to_expression(r,range_to_nbiter);
   intptr_t irange;
   if(expression_integer_value(erange,&irange) && irange <=rate) {
-    full_loop_unroll(loop_statement);
+      bool saved[] = {
+          get_bool_property("LOOP_NORMALIZE_ONE_INCREMENT"),
+          get_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT")
+      };
+      set_bool_property("LOOP_NORMALIZE_ONE_INCREMENT",true);
+      set_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT",true);
+      loop_normalize_statement(loop_statement);
+      range r = loop_range(statement_loop(loop_statement));
+      simplify_expression(&range_upper(r));
+      simplify_expression(&range_lower(r));
+      set_bool_property("LOOP_NORMALIZE_ONE_INCREMENT",saved[0]);
+      set_bool_property("LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT",saved[1]);
+      full_loop_unroll(loop_statement);
   }
   else
-    do_loop_unroll(loop_statement,rate,NULL);
+  {  
+	  expression lower = range_lower(r);
+	  NORMALIZE_EXPRESSION(lower);
+	  entity new = entity_undefined;
+	  if (normalized_complex_p(expression_normalized(lower))){
+			new = make_new_index_entity(loop_index(statement_loop(loop_statement)),"i");
+			AddEntityToCurrentModule(new);
+			range_lower(r) = entity_to_expression(new);
+	  }	  
+	  do_loop_unroll(loop_statement,rate,NULL);
+	  if (! entity_undefined_p(new)){
+			insert_statement(loop_statement,
+					make_assign_statement(entity_to_expression(new),lower),
+					true);
+	  } 
+  }
   free_expression(erange);
+}
+
+static int simple_simd_unroll_rate(loop l) {
+    /* Compute variable size */
+    MinMaxVar varwidths = { INT_MAX , 0 };
+    int varwidth;
+    gen_context_recurse(loop_body(l), &varwidths, statement_domain, gen_true, 
+            compute_variable_size);
+
+    /* Decide between min and max unroll factor */
+    if (get_bool_property("SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL"))
+        varwidth = varwidths.max;
+    else
+        varwidth = varwidths.min;
+
+    /* Round up varwidth to a power of 2 */
+    int regWidth = get_int_property("SAC_SIMD_REGISTER_WIDTH");
+
+    if ((varwidth > regWidth/2) || (varwidth <= 0)) 
+        return 1;
+
+    for(int j = 8; j <= regWidth/2; j*=2)
+    {
+        if (varwidth <= j)
+        {
+            varwidth = j; 
+            break;
+        }
+    }
+
+    /* Unroll as many times as needed by the variables width */
+    return regWidth / varwidth;
 }
 
 static bool simple_simd_unroll_loop_filter(statement s)
 {
-    MinMaxVar varwidths;
-    int varwidth;
     instruction i;
     loop l;
     instruction iBody;
-    int regWidth;
-    int j;
 
     /* If this is not a loop, keep on recursing */
     i = statement_instruction(s);
@@ -131,35 +187,8 @@ static bool simple_simd_unroll_loop_filter(statement s)
     if (!should_unroll_p(iBody))
         return TRUE;  /* can't do anything */
 
-    /* Compute variable size */
-    varwidths.min = INT_MAX;
-    varwidths.max = 0;
-    gen_context_recurse(loop_body(l), &varwidths, statement_domain, gen_true, 
-            compute_variable_size);
-
-    /* Decide between min and max unroll factor */
-    if (get_bool_property("SIMDIZER_AUTO_UNROLL_MINIMIZE_UNROLL"))
-        varwidth = varwidths.max;
-    else
-        varwidth = varwidths.min;
-
-    /* Round up varwidth to a power of 2 */
-    regWidth = get_int_property("SAC_SIMD_REGISTER_WIDTH");
-
-    if ((varwidth > regWidth/2) || (varwidth <= 0)) 
-        return FALSE;
-
-    for(j = 8; j <= regWidth/2; j*=2)
-    {
-        if (varwidth <= j)
-        {
-            varwidth = j; 
-            break;
-        }
-    }
-
     /* Unroll as many times as needed by the variables width */
-    simd_loop_unroll(s, regWidth / varwidth);
+    simd_loop_unroll(s, simple_simd_unroll_rate(l) );
 
     /* Do not recursively analyse the loop */
     return FALSE;
@@ -238,6 +267,45 @@ static void simd_unroll_as_needed(statement module_stmt)
         reset_simd_operator_mappings();
     }
 }
+bool loop_auto_unroll(const char* mod_name) {
+    // get the resources
+    statement mod_stmt = (statement)
+        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+
+    set_current_module_statement(mod_stmt);
+    set_current_module_entity(module_name_to_entity(mod_name));
+
+    debug_on("SIMDIZER_DEBUG_LEVEL");
+
+    /* do the job */
+    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    entity elabel = find_label_entity(mod_name,slabel);
+
+    if(entity_undefined_p(elabel)) {
+        pips_user_error("label %s does not exist !\n", slabel);
+    }
+    else {
+        statement theloopstatement = find_loop_from_label(get_current_module_statement(),elabel);
+        if(!statement_undefined_p(theloopstatement)) {
+            simple_simd_unroll_loop_filter(theloopstatement);
+        }
+    }
+
+    pips_assert("Statement is consistent after SIMDIZER_AUTO_UNROLL", 
+            statement_consistent_p(mod_stmt));
+
+    // Reorder the module, because new statements have been added
+    module_reorder(mod_stmt);
+    DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
+
+    // update/release resources
+    reset_current_module_statement();
+    reset_current_module_entity();
+
+    debug_off();
+
+    return true;
+}
 
 bool simdizer_auto_unroll(char * mod_name)
 {
@@ -266,6 +334,144 @@ bool simdizer_auto_unroll(char * mod_name)
     debug_off();
 
     return TRUE;
+}
+
+static void gather_local_indices(reference r, set s) {
+    list indices = reference_indices(r);
+    if(!ENDP(indices)) {
+        expression x = EXPRESSION(CAR(gen_last(indices)));
+        set xs = get_referenced_entities(x);
+        set_union(s,s,xs);
+        set_free(xs);
+    }
+}
+
+static void keep_loop_indices(statement s, list *L) {
+	if(statement_loop_p(s))
+		*L=CONS(STATEMENT,s,*L);
+}
+
+static list do_simdizer_auto_tile_int_to_list(int maxdepth, int path,loop l) {
+    list out = NIL;
+    int rw = simple_simd_unroll_rate(l);
+    while(maxdepth--) {
+        int a = 1;
+        if(path & 1) a=rw;
+        out=CONS(EXPRESSION,int_to_expression(a),out);
+    }
+    return out;
+}
+
+static statement do_simdizer_auto_tile_generate_all_tests(statement root, int maxdepth, int path, expression * tests) {
+    if(expression_undefined_p(*tests)) {
+        clone_context cc = make_clone_context(get_current_module_entity(),get_current_module_entity(),NIL,get_current_module_statement());
+        statement cp = clone_statement(root, cc);
+        /* duplicate effects for the copied statement */
+        store_cumulated_rw_effects(cp,copy_effects(load_cumulated_rw_effects(root)));
+        list l = do_simdizer_auto_tile_int_to_list(maxdepth, path,statement_loop(root));
+        do_symbolic_tiling(cp,l);
+        statement siter = cp;
+        FOREACH(LOOP,li,l)
+            siter = loop_body(statement_loop(siter));
+        free_clone_context(cc);
+        return cp;
+    }
+    else {
+        int npath = path << 1 ;
+        return do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath+1, tests+1);
+        /*
+        int npath = path << 1 ;
+        statement trueb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath+1, tests+1);
+        statement falseb = do_simdizer_auto_tile_generate_all_tests(root, maxdepth, npath,  tests+1);
+        return
+        instruction_to_statement(
+                make_instruction_test(
+                    make_test(
+                        *tests,
+                        trueb,
+                        falseb
+                        )
+                    )
+                );
+                */
+    }
+}
+
+static statement simdizer_auto_tile_generate_all_tests(statement root, int maxdepth, expression tests[1+maxdepth]) {
+    return do_simdizer_auto_tile_generate_all_tests(root,maxdepth,0,&tests[0]);
+}
+
+bool simdizer_auto_tile(const char * module_name) {
+    bool success = false;
+    set_current_module_entity(module_name_to_entity( module_name ));
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
+
+    /* do the job */
+    string slabel = get_string_property_or_ask("LOOP_LABEL","enter the label of a loop !");
+    entity elabel = find_label_entity(module_name,slabel);
+
+    if(entity_undefined_p(elabel)) {
+        pips_user_error("label %s does not exist !\n", slabel);
+    }
+    else {
+        statement theloopstatement = find_loop_from_label(get_current_module_statement(),elabel);
+        if(!statement_undefined_p(theloopstatement)) {
+            if(perfectly_nested_loop_p(theloopstatement)) {
+                /* retrieve loop indices that are referenced as last element */
+                set indices = set_make(set_pointer);
+                gen_context_recurse(theloopstatement,indices,reference_domain,gen_true,gather_local_indices);
+                list tloops = NIL;
+                gen_context_recurse(theloopstatement,&tloops, statement_domain,gen_true,keep_loop_indices);
+                list allloops =gen_copy_seq(tloops);
+                FOREACH(STATEMENT,l,allloops) {
+                    if(!set_belong_p(indices,loop_index(statement_loop(l))))
+                        gen_remove_once(&tloops,l);
+                }
+				theloopstatement=STATEMENT(CAR((tloops)));
+				//allloops=gen_nreverse(allloops);
+				while(theloopstatement!=STATEMENT(CAR(allloops))) POP(allloops);
+                set_free(indices);
+                set loops = set_make(set_pointer);set_assign_list(loops,tloops);gen_free_list(tloops);
+
+                /* build tests */
+                int max_unroll_rate = simple_simd_unroll_rate(statement_loop(theloopstatement));
+                int nloops=gen_length(allloops);
+                /* iterate over all possible combination of tests */
+                expression alltests[1+nloops];
+                alltests[nloops] = expression_undefined ;
+                int j=0;
+                FOREACH(STATEMENT,sl,allloops) {
+                    alltests[j++]=MakeBinaryCall(
+                            entity_intrinsic(GREATER_THAN_OPERATOR_NAME),
+                            range_to_expression(loop_range(statement_loop(sl)),range_to_nbiter),
+                            int_to_expression(2*max_unroll_rate)
+                            );
+                }
+                /* create the if's recursively */
+                statement root =
+                    simdizer_auto_tile_generate_all_tests(
+                        theloopstatement,
+                        nloops,
+                        alltests);
+                gen_recurse(root, statement_domain, gen_true, statement_remove_useless_label);
+                *theloopstatement=*root;
+                loop_label(statement_loop(theloopstatement))=elabel;
+                success=true;
+
+                /* validate */
+                module_reorder(get_current_module_statement());
+                DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name,get_current_module_statement());
+            }
+            else pips_user_error("loop is not perfectly nested !\n");
+        }
+        else pips_user_error("label is not on a loop!\n");
+    }
+
+    reset_cumulated_rw_effects();
+    reset_current_module_statement();
+    reset_current_module_entity();
+    return success;
 }
 
 

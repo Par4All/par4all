@@ -237,6 +237,28 @@ static bool module_loops_walker(statement s, list *l)
   return true;
 }
 
+char* loop_pragma(const char* module_name, const char* parent_loop)
+{
+  /* ensure pipsmake is ok with what we ask for */
+  safe_make(DBR_LOOPS,module_name);
+
+  /* prelude */
+  set_current_module_entity(module_name_to_entity( module_name ));
+  set_current_module_statement
+    ((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+
+  entity label = find_label_entity(module_name,parent_loop);
+  if(entity_undefined_p(label))
+  pips_user_error("label '%s' does not exist\n",parent_loop);
+  statement stmt = find_loop_from_label(get_current_module_statement(),label);
+  if(statement_undefined_p(stmt))
+  pips_user_error("label '%s' is not on a loop\n",parent_loop);
+  string s = extensions_to_string(statement_extensions(stmt),false);
+  if(string_undefined_p(s)) s = strdup("");
+  reset_current_module_entity();
+  reset_current_module_statement();
+  return s;
+}
 /**
  * gather the list of enclosing loops
  * expect flag_loops has been called before

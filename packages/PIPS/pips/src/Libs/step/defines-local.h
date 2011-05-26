@@ -7,13 +7,14 @@ License.
 */
 
 #ifdef HAVE_CONFIG_H
-#include "pips_config.h"
+    #include "pips_config.h"
 #endif
+
 /*
 
 Module STEP
 
-regroupement de la majorité des includes
+regroupement de la majoritï¿½ des includes
 
 */
 // includes C standard
@@ -66,6 +67,7 @@ extern int the_current_debug_level;
 #define STEP_MPI_SUFFIX "_MPI"
 #define STEP_OMP_SUFFIX "_OMP"
 #define STEP_HYB_SUFFIX "_HYBRID"
+
 
 #ifdef PIPS_RUNTIME_DIR
     #define STEP_DEFAULT_RT_H "step"
@@ -121,6 +123,10 @@ enum {DO_DIRECTIVE,
 #define MASTER_TXT "master"
 #define END_MASTER_TXT "end master"
 
+#define CRITICAL_TXT "critical"
+#define END_CRITICAL_TXT "end critical"
+
+
 #define BARRIER_TXT "barrier"
 
 /* Suffix for generated OMP directives routines
@@ -139,5 +145,9 @@ enum {DO_DIRECTIVE,
 
 #define SUFFIX_OMP_MASTER "master"
 #define SUFFIX_OMP_END_MASTER "master_"
+
+#define SUFFIX_OMP_CRITICAL "critical"
+#define SUFFIX_OMP_END_CRITICAL "critical_"
+
 
 #define SUFFIX_OMP_BARRIER "barrier"

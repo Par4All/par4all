@@ -154,21 +154,10 @@ RemoveLocalEntityFromDeclarations(entity e, entity module, statement s)
 
 }
 
-/**
- Add the variable entity e to the list of variables of the function
- module.
-
- For a C module, the variable is also added as local to the given
- statement s. A global variable to a module should be added to the global
- statement module (given by get_current_module_statement() for example.
-
- @param e variable entity to add
- @param module entity
- @param s statement where entity must be added. It can be
- statement_undefined in the case of a Fortran module
- */
-void
-AddLocalEntityToDeclarations(entity e, entity module, statement s) {
+/* See the two user interfaces below */
+static void
+GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
+				    bool add_declaration_statement_p) {
   /* SG: fix the entity storage if undefined
    * it basically recompute the offset of a scalar variable
    * I have not found how to do it for a variable size array, so I just dropped the case
@@ -210,7 +199,7 @@ AddLocalEntityToDeclarations(entity e, entity module, statement s) {
       /* The C prettyprinter is not based on code_declarations or
 	 statement_declarations but on declaration statements, which
 	 happen to be continue statment for the time being. */
-      if(!continue_statement_p(s)) {
+      if(!continue_statement_p(s) && add_declaration_statement_p) {
 	/* To preserve the source layout, declarations are
 	   statements */
 	add_declaration_statement(s, e);
@@ -218,6 +207,46 @@ AddLocalEntityToDeclarations(entity e, entity module, statement s) {
     }
   }
 }
+
+/**
+ Add the variable entity e to the list of variables of the function
+ module.
+
+ For a C module, the variable is also added as local to the given
+ statement s. A global variable to a module should be added to the global
+ statement module (given by get_current_module_statement() for
+ example. The consistency of the internal representation is maintained.
+
+ @param e variable entity to add
+ @param module entity
+ @param s statement where entity must be added. A new declaraton
+ statement for e is added. It can be
+ statement_undefined in the case of a Fortran module
+ */
+void AddLocalEntityToDeclarations(entity e, entity module, statement s) {
+  GenericAddLocalEntityToDeclarations(e, module, s, TRUE);
+}
+
+/**
+ Add the variable entity e to the list of variables of the function
+ module.
+
+ For a C module, the variable is also added as local to the given
+ statement s. A global variable to a module should be added to the global
+ statement module (given by get_current_module_statement() for
+ example. The consistency of the internal representation is not
+ maintained, but this is useful for the controlizer.
+
+ @param e variable entity to add
+ @param module entity
+ @param s statement where entity must be added. No new declaration
+ ststement is added. It can be
+ statement_undefined in the case of a Fortran module
+ */
+void AddLocalEntityToDeclarationsOnly(entity e, entity module, statement s) {
+  GenericAddLocalEntityToDeclarations(e, module, s, FALSE);
+}
+
 
 /* Add a variable entity to the current module declarations. */
 void
@@ -405,29 +434,27 @@ generate_variable_with_unique_name_to_module(const char * seed_name,
 }
 
 
-/* Clone a variable with a new name.
+/* clone a variable with a new name.
 
-   @param old_variable is the variable to clone
+   The new variable is added in the different declaration lists.
 
-   @param prefix is the prefix to prepend to the variable name
+   @param insert_p If true, for C code, a new declaration statement is
+   inserted in "declaration_statement" to maintain the internal
+   representation consistency. Else, no new declaration statement is
+   inserted and the internal representation is no longer consistent
+   for C code.
 
-   @param suffix is the suffix to append to the variable name
+   @return the new cloned entity
 
-   @param module is the entity of the module the variable will belong to
+   See useful interface below
 
-   Is there is already a variable with this name, a new one is tried with
-   some numerical suffixes.
-
-   @return the entity of the new variable. Its fields are copies from the
-   old one. That means that there may be some aliasing since the old one
-   and the new one have the same offset (in the sense of RI ram).
- */
-entity
-clone_variable_with_unique_name(entity old_variable,
-				statement declaration_statement,
-				string prefix,
-				string suffix,
-				entity module) {
+*/
+entity generic_clone_variable_with_unique_name(entity old_variable,
+					       statement declaration_statement,
+					       string prefix,
+					       string suffix,
+					       entity module,
+					       bool insert_p) {
   const char * seed_name = entity_user_name(old_variable);
   entity new_variable = generate_variable_with_unique_name_to_module(seed_name,
 								     prefix,
@@ -439,10 +466,54 @@ clone_variable_with_unique_name(entity old_variable,
   entity_storage(new_variable) = copy_storage(entity_storage(old_variable));
   entity_initial(new_variable) = copy_value(entity_initial(old_variable));
 
-  AddLocalEntityToDeclarations(new_variable, module, declaration_statement);
+  if(insert_p)
+    AddLocalEntityToDeclarations(new_variable, module, declaration_statement);
+  else
+    AddLocalEntityToDeclarationsOnly(new_variable, module, declaration_statement);
+
   return new_variable;
 }
 
+/* Clone a variable with a new user name.
+
+   @param old_variable is the variable to clone
+
+   @param declaration_statement is the enclosing sequence (block)
+   defining the scope where the new variable is visible. It must be a
+   statement of kind sequence.
+
+   @param prefix is the prefix to prepend to the variable name
+
+   @param suffix is the suffix to append to the variable name
+
+   @param module is the entity of the module the variable will belong to
+
+   Is there is already a variable with this name, new names are tried with
+   numerical suffixes.
+
+   @return the entity of the new variable. Its fields are copies from the
+   old one. That means that there may be some aliasing since the old one
+   and the new one have the same offset (in the sense of IR RAM) and
+   that use-def chains and dependence graphs are going to be wrong.
+
+   The clone variable is added to the declaration list of
+   "statement_declaration" and to the code declarations of module
+   "module". A new declaration statement is inserted in the sequence
+   of "declaration_statement". This maintains the consistency of PIPS
+   internal representation for C and Fortran code.
+ */
+entity clone_variable_with_unique_name(entity old_variable,
+				       statement declaration_statement,
+				       string prefix,
+				       string suffix,
+				       entity module) {
+  return generic_clone_variable_with_unique_name( old_variable,
+						  declaration_statement,
+						  prefix,
+						  suffix,
+						  module,
+						  TRUE);
+}
 
 /* Create a new scalar variable of type b in the given module.
 

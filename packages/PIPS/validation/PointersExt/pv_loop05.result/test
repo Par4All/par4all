@@ -34,29 +34,31 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i;
-//  points to = {}
+//  {}
    int *p, *q;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
 
    p = (int *) malloc(10*sizeof(int));
-//  {(p,*HEAP*_l_8,-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    q = p;
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-Exact-)}
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-Exact-)}
 
    for(i = 0; i <= 4; i += 1) {
-//  points to = {}
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       *q = i;
-//  points to = {}
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
+//   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
       q++;
    }
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-MAY-);(q,
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
 
    free(p);
-//  {(p,*HEAP*_l_8,-Exact-);(q,*HEAP*_l_8,-MAY-);(q,
+//  {(p,*HEAP*_l_8[0],-Exact-);(q,*HEAP*_l_8[0],-MAY-);(q,
 //   *ANY_MODULE*:*ANYWHERE*_b0,-MAY-)}
    return 0;
 }

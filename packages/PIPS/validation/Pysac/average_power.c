@@ -30,7 +30,8 @@ int main(int argc, char *argv[])
 {
     int i,j,k;
     int th,rg,v;
-    th=256,rg=256,v=256;
+    if(argc < 42)
+        th=256,rg=256,v=256;
     {
         Cplfloat (*in)[th][rg][v], (*pow)[th];
         in = malloc(th * rg * v *sizeof(Cplfloat));

@@ -29,7 +29,7 @@ POINTS-TO
 //  {}
 int main(int argc, char *argv[])
 {
-//  points to = {}
+//  {}
    int *pi;
 //  {(pi,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    float *px;
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 //  {(pi,*HEAP*_l_12,-Exact-);(pt,*ANY_MODULE*:*NOWHERE*_b0,
 //   -Exact-);(px,*HEAP*_l_13,-Exact-);(pz,*HEAP*_l_14,-Exact-)}
    pt = (int (*)[30]) malloc(sizeof(*pt));
-//  {(pi,*HEAP*_l_12,-Exact-);(pt,*HEAP*_l_15,-Exact-);(px,
+//  {(pi,*HEAP*_l_12,-Exact-);(pt,*HEAP*_l_15[0],-Exact-);(px,
 //   *HEAP*_l_13,-Exact-);(pz,*HEAP*_l_14,-Exact-)}
 
    return 0;

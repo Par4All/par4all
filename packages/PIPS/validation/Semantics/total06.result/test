@@ -16,7 +16,7 @@ C  T(I) {I==10}
 C (0,1)
 C     BEGIN BLOCK
 
-C  T(I) {10<=I}
+C  T() {0==-1}
 
 C (0,2)
 

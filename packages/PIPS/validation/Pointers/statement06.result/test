@@ -75,9 +75,9 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int a, b, c, d;
-//  points to = {}
+//  {}
    int *pa, *pb, *pc, *pd;
 //  {(pa,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pb,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(pc,*ANY_MODULE*:*NOWHERE*_b0,

@@ -29,34 +29,34 @@ void foo(char *f, int a)
 {
 }
 
-//  P() {}
+//  P() {n==10}
 
 void onetriploop03(int n)
 {
 
-//  P() {}
+//  P() {n==10}
 
    int i;
 
-//  P(i) {}
+//  P(i) {n==10}
 
    int m;
 
-//  P(i,m) {}
+//  P(i,m) {n==10}
 
 
    m = n;
 
-//  P(i,m) {m==n}
+//  P(i,m) {m==10, n==10}
 
 
    for(i = n; i <= m; i += 1)
 
-//  P(i,m) {i==m, m==n}
+//  P(i,m) {i==10, m==10, n==10}
 
       foo("i = %d\n", i);
 
-//  P(i,m) {i==m+1, i==n+1}
+//  P(i,m) {i==11, m==10, n==10}
 
    printf("i = %d\n", i);
 }

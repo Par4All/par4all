@@ -37,6 +37,5 @@ C
          T(4+N) = -2*4
       ENDIF
 10    CONTINUE
-      I = 5
 C
       END

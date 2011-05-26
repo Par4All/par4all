@@ -114,7 +114,7 @@ entity e;
 }
 
 /* cons * arguments_union(cons * a1, cons * a2): returns a = union(a1, a2)
- * where a1 and a2 are lists of entities.
+ * where a1 and a2 are lists of entities. A new list is allocated.
  *
  * Entities in a1 have the same rank wrt a1 and a. Entities in a2 are likely
  * to have different ranks wrt a and a2. This might imply a transformer

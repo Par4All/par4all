@@ -29,7 +29,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *x, x1, **y, *y1, y2;
 //  {(x,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(y,
 //   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(y1,*ANY_MODULE*:*NOWHERE*_b0,

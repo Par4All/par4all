@@ -12,10 +12,18 @@
 # relevant variables for the user:
 # - DO_BUG: also validate on cases tagged as "bugs"
 # - DO_LATER: idem with future "later" cases
+# - DO_SLOW: idem for lengthy to validate cases
+# - DO_DEFAULT: other test cases
 # - D.sub: subdirectories in which to possibly recurse, defaults to *.sub
 #
-# example:
-#   sh> make DO_LATER=1 validate-test
+# example to do only later cases:
+#   sh> make DO_DEFAULT= DO_SLOW= DO_LATER=1 validate-test
+
+# what special cases are included
+DO_BUG	=
+DO_LATER=
+DO_SLOW	= 1
+DO_DEFAULT = 1
 
 # pips exes
 TPIPS	= tpips
@@ -99,31 +107,59 @@ F.list	= $(F.result:%.result=%)
 # where are we?
 SUBDIR	= $(notdir $(PWD))
 here	:= $(shell pwd)
+
 # get rid of absolute file names in output...
 FLT	= sed -e 's,$(here),$$VDIR,g'
+
 # where to store validation results
 # this is the default, but may need to be overriden
 RESULTS	= RESULTS
 
 # shell environment to run validation scripts
+# this is a requirement!
 SHELL	= /bin/bash
 
-# skip bugs & future cases
-EXCEPT =  [ ! "$(DO_BUG)" -a -f $*.bug ] && exit 0 ; \
-	  [ ! "$(DO_LATER)" -a -f $*.later ] && exit 0
+# whether we are recurring in a specially "marked" directory
+RECWHAT	=
 
-# setup run
+# skip bug/later/slow cases depending on options
+# a case requires a result directory, so a "bug/later/slow"
+# tag is not counted if there is no corresponding result.
+EXCEPT =  [ "$(RECWHAT)" ] && \
+	    { echo "$(RECWHAT): $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_BUG)" -a -f $*.bug -a -d $*.result ] && \
+	    { echo "bug: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_LATER)" -a -f $*.later -a -d $*.result ] && \
+	    { echo "later: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_SLOW)" -a -f $*.slow -a -d $*.result ] && \
+	    { echo "slow: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; } ; \
+	  [ ! "$(DO_DEFAULT)" -a -d $*.result -a \
+	    ! \( -f $*.bug -o -f $*.later  -o -f $*.slow \) ] && \
+	    { echo "skipped: $(SUBDIR)/$*" >> $(RESULTS) ; exit 0 ; }
+
+# setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
 	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
 # recursion into a subdirectory with target "FORWARD"
+# a whole directory can be marked as bug/later/slow,
+# in which case while recurring this mark take precedence about
+# local information made available within the directory
 %.rec: %
-	$(EXCEPT) ; \
-	$(MAKE) RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ -C $^ $(FORWARD)
+	recwhat= ; d=$* ; d=$${d%.sub} ; \
+	[ ! "$(DO_BUG)" -a -f $$d.bug ] && recwhat=bug ; \
+	[ ! "$(DO_LATER)" -a -f $$d.later ] && recwhat=later ; \
+	[ ! "$(DO_SLOW)" -a -f $$d.slow ] && recwhat=slow ; \
+	[ ! "$(DO_DEFAULT)" -a ! -f $$d.slow -a ! -f $$d.later -a \
+	  ! -f $$d.bug ] && recwhat=skipped ; \
+	[ "$(RECWHAT)" ] && recwhat=$(RECWHAT) ; \
+	$(MAKE) RECWHAT=$$recwhat RESULTS=../$(RESULTS) SUBDIR=$(SUBDIR)/$^ \
+		-C $^ $(FORWARD) || \
+	  echo "broken-directory: $(SUBDIR)/$^" >> $(RESULTS)
 
-# extract validation result for summary
+# extract validation result for summary when the case was run
 # four possible outcomes: passed, changed, failed, timeout
 # 134 is for pips_internal_error, could allow to distinguish voluntary aborts.
 OK	= status=$$? ; \
@@ -161,16 +197,37 @@ validate:
 	# run "make validate-test" to generate "test" files.
 	# run "make validate-out" to generate usual "out" files.
 	# run "make unvalidate" to revert test files to their initial status.
+	# run "make {later,bug,slow,default}-validate-{test,out}" for testing subsets
+
+# convenient shortcuts to validate subsets (later, bug, slow, default)
+later-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG= DO_LATER=1 validate-test
+later-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG= DO_LATER=1 validate-out
+bug-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG=1 DO_LATER= validate-test
+bug-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW= DO_BUG=1 DO_LATER= validate-out
+slow-validate-test:
+	$(MAKE) DO_DEFAULT= DO_SLOW=1 DO_BUG= DO_LATER= validate-test
+slow-validate-out:
+	$(MAKE) DO_DEFAULT= DO_SLOW=1 DO_BUG= DO_LATER= validate-out
+default-validate-test:
+	$(MAKE) DO_DEFAULT=1 DO_SLOW= DO_BUG= DO_LATER= validate-test
+default-validate-out:
+	$(MAKE) DO_DEFAULT=1 DO_SLOW= DO_BUG= DO_LATER= validate-out
+
 
 .PHONY: validate-dir
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
-validate-dir: $(LOCAL_CLEAN) bug-list later-list
+validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	$(MAKE) sort-local-result
+
 else # sequential validation, including subdir recursive forward
-validate-dir: $(LOCAL_CLEAN) bug-list later-list
+validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) sequential-validate-dir
 	$(MAKE) sort-local-result
@@ -181,10 +238,10 @@ sequential-validate-dir:
 	for f in $(F.valid) ; do $(MAKE) $$f ; done
 endif
 
-# how to summarize results
+# how to summarize results to a human
 SUMUP	= pips_validation_summary.pl
 
-# on local validations, sort result & show summary
+# on local validations only, sort result & show summary
 .PHONY: sort-local-result
 sort-local-result:
 	@if [ $(RESULTS) = RESULTS -a -f RESULTS ] ; then \
@@ -250,7 +307,7 @@ generate-result: $(F.future_result)
 # python scripts
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.py
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # else we have pyps
 %.result/$(TEST): %.py
 	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
@@ -272,6 +329,15 @@ DFTPIPS	= default_tpips
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
+%.result/$(TEST): %.f90 $(DFTPIPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DFTPIPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+
 # default_test relies on FILE WSPACE NAME
 # warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
@@ -287,19 +353,33 @@ DEFTEST	= default_test
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
 
+%.result/$(TEST): %.f90 $(DEFTEST)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DEFTEST)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
 
 # default_pyps relies on FILE & WSPACE
 PYTHON	= python
-DEFPYPS	= default_pyps
+DEFPYPS	= default_pyps.py
 ifdef PIPS_VALIDATION_NO_PYPS
 %.result/$(TEST): %.c $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.result/$(TEST): %.f $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
 %.result/$(TEST): %.F $(DEFPYPS)
-	echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.f90 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
+
+%.result/$(TEST): %.f95 $(DEFPYPS)
+	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # with pyps
 %.result/$(TEST): %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
@@ -312,30 +392,15 @@ else # with pyps
 %.result/$(TEST): %.F $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f90 $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
+
+%.result/$(TEST): %.f95 $(DEFPYPS)
+	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
+	2> $*.err | $(FLT) > $@ ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
-
-# bug & later handling
-.PHONY: bug-list
-ifdef DO_BUG
-bug-list:
-	@echo "# bug-list: nothing to do" >&2
-else # include bug list
-bug-list:
-	for f in $(wildcard *.bug) ; do \
-	  echo "bug: $(SUBDIR)/$${f%.*}" ; \
-	done >> $(RESULTS)
-endif # DO_BUG
-
-.PHONY: later-list
-ifdef DO_LATER
-later-list:
-	@echo "# later-list: nothing to do" >&2
-else # include later list
-later-list:
-	for f in $(wildcard *.later) ; do \
-	  echo "later: $(SUBDIR)/$${f%.*}" ; \
-	done >> $(RESULTS)
-endif # DO_LATER
 
 # detect skipped stuff
 .PHONY: skipped
@@ -359,6 +424,7 @@ orphan:
 	       -f $$base.test -o \
 	       -f $$base.py -o \
 	       -f default_tpips -o \
+	       -f default_pyps.py -o \
 	       -f default_test || \
 	  echo "orphan: $(SUBDIR)/$$base" ; \
 	done >> $(RESULTS)

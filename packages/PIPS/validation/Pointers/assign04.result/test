@@ -39,7 +39,7 @@ POINTS TO
 //  {}
 void assign04()
 {
-//  points to = {}
+//  {}
    int ***p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int **q;
@@ -69,6 +69,6 @@ void assign04()
 //  {}
 void foo()
 {
-//  points to = {}
+//  {}
    assign04();
 }

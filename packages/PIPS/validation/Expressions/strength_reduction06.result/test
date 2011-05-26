@@ -24,7 +24,7 @@ int main()
 
    b = a;
 
-//  T(i) {i#init==0, i<=8}
+//  T(i) {i#init==0, 1<=i, i<=8}
 
    for(i = 8; i >= 1; i += -2)
 

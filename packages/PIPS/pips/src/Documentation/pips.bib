@@ -1,0 +1,3021 @@
+%
+% Bibliography for the PIPS project
+%
+% Standardization:
+%
+% * use last two digits for the publication year
+%
+% * one author: use first three letters, e.g. Irigoin 1992 is Iri92
+%
+% * multiple authors: use first letter of eahc author name:
+%   e.g. Irigoin and Ancourt 1992, IA92
+%
+% * in case of ambiguity, use lower case a, b, c... as a suffix
+%
+% * to avoid problem with French, do not overspecify the month information:
+%   it should be jan or feb, but not {January} or {February}
+%
+% * to avoid problem with accents, use \'e, \c{c},... instead of more 
+%   advanced encodings
+%
+% * to obtain a French bibliography: \bibliographystyle{plain-fr}
+%
+% This file is not as clean as it should be. It has not been designed
+% but accumulated till it was tired of duplicating references and
+% rebuilding bib files (FI). Feel free to add new relevant entries.
+%
+% This file is supposed to be used for all PIPS related documentation
+% and possibly papers
+
+
+% PUBLISHERS
+%
+@STRING( AW = "Addison-Wesley Publishing Company" )
+@STRING( BC = "The Benjamin/Cummings Publishing Company, Inc" )
+@STRING( ACM = "Association for Computing Machinery" )
+@STRING( ACMPRESS = "ACM Press" )
+@STRING( ACMPFS = {ACM Press Frontier Series})
+@STRING( CAMBPRESS = "Cambridge University Press" )
+@STRING( MKPINC = "Morgan Kaufmann Publishers, Inc." )
+@STRING( PHI = "Prentice-Hall, Inc." )
+@STRING( UNKNOWN = "Unknown" )
+@STRING( WILEY = "John Wiley \& Sons")
+@STRING( MCGH = {McGraw-Hill})
+@STRING( AMS = {American Mathematical Society} )
+@STRING( ESP = {Elsevier Science Publisher} )
+@STRING( SPRINGER = {Springer-Verlag})
+@STRING( KAP = {Kluwer Academic Publishers})
+@STRING( NH = {North-Holland})
+
+%
+% INSTITUTIONS
+%
+
+% FRANCE
+
+@STRING( ESE = {{\'E}cole Sup{\'e}rieure d'{\'E}lectricit{\'e}})
+@STRING( POLY = "{\'E}cole Polytechnique " )
+@STRING( LIX = {{\'E}cole Polytechnique, Laboratoire d'Informatique} )
+@STRING( MINES = "{\'E}cole des Mines de Paris" )
+@STRING( ENSMP = "{\'E}cole des Mines de Paris" )
+@STRING( CRI-ENSMP = "CRI, {\'E}cole des Mines de Paris" )
+@STRING( ULM = {{\'E}cole Normale Sup{\'e}rieure, Paris})
+@STRING( ENS-LYON = "ENS-Lyon" )
+@STRING( LIP = {LIP, ENS-Lyon} )
+@STRING( ARTS = {Conservatoire National des Arts et M{\'e}tiers})
+@STRING( PARIS-6 = "Universit{\'e} Paris VI " )
+@STRING( INPG = "Institut National Polytechnique de Grenoble " )
+@STRING( IMAG = {Informatique et Math{\'e}matiques Appliqu{\'e}es Grenoble })
+@STRING( INRIA = "INRIA " )
+@STRING( IRISA = "IRISA " )
+@STRING( CEA = "Commissariat \`{a} l'{\'E}nergie Atomique " )
+@STRING( PRISM = {Laboratoire {PRiSM}, Universit{\'e} de Versailles} ) 
+@STRING( RENNES1 = {Universit{\'e} de Rennes 1})
+
+% ETRANGER
+
+
+@STRING( BELLCORE = "Bellcore " )
+@STRING( SEI-CMU = "Software Engineering Institute, Carnegie Mellon University{
+}" )
+@STRING( SCS-CMU = "School of Computer Science, Carnegie Mellon University{}" )
+@STRING( HPCC-GNRISC = {High Performance Computing Center, German National
+                Research Institute for Computer Science} )
+@STRING( NAS-NASA = "Numerical Aerodynamique Simulation Systems Division, NASA 
+")
+@STRING( OGIST = "Oregon Graduate Institute of Science and Technology" )
+@STRING( ORNL = "Oak Ridge National Laboratory, Oak Ridge, Tennessee " )
+@STRING( PURDUE = "Purdue University " )
+@STRING( RICE = "Rice University, Houston, Texas" )
+@STRING( SOUTHAMPTON = "University of Southampton" )
+@STRING( STANFORD = "Stanford University" )
+@STRING( SYRACUSE = "Syracuse University, Syracuse, New-york" )
+@STRING( VIENNA = "University of Vienna " )
+@STRING( YALE = "Yale University" )
+% @STRING( CSRD = {Center for Supercomputing Research and Development,}) 
+@STRING( CSRD = {CSRD, University of Illinois} )
+@STRING( ILLINOIS = "University of Illinois at Urbana-Champaign" )
+@STRING( CWI = {Centrum voor Wiskunde en Informatica, Amsterdam} )
+@STRING( MARYLAND = {University of Maryland, College Park} )
+@STRING( PASSAU = {Fakult{\"a}t f{\"u}r Mathematik und Informatik, Universit{\"
+a}t Passau})
+@STRING( RUTGERS-LCSR = {Rutgers University, Laboratory of Computer Science Res
+earch})
+%
+% PUBLIS DE L'ACM:
+%
+
+@STRING(ACMCS = { ACM Computing Surveys})
+@STRING(JACM = { Journal of the ACM})
+@STRING(TOCS = { ACM Transactions on Computer Systems})
+@STRING(TODS = { ACM Transactions on Database Systems})
+@STRING(TODAES = { ACM Transactions on Design Automation of Electronic Systems})
+@STRING(TOG = { ACM Transactions on Graphics})
+@STRING(TOMS = { ACM Transactions on Mathematical Software})
+@STRING(TOSEM = { ACM Transactions on Software Engineering and Methodology})
+@STRING(TOOIS = { ACM Transactions on Office Information Systems})
+@STRING(TOPLAS = { ACM Transactions on Programming Languages and Systems})
+@STRING(LOPLAS = { ACM Letters on Programming Languages and Systems})
+@STRING(SIGARCHN = { ACM SIGARCH Computer Architecture Newsletter})
+@STRING(SIGMICRON = { ACM SIG Micro Newsletter})
+@STRING(SIGPLAN = { ACM SIGPLAN Notices})
+@STRING(CACM = {Communications of the ACM})
+@STRING(ACMCS = { ACM Computing Surveys})
+@STRING(ACMOSR = { ACM Operating System Review})
+
+%
+% PUBLIS D'IEEE:
+%
+
+@STRING(COMP = {Computer})
+@STRING(PIEEE = { Proceedings of the IEEE})
+@STRING(IEEECOM = { IEEE Transactions on Communications})
+@STRING(IEEECGA = { IEEE Computer Graphics and Applications})
+@STRING(IEEEDT = { IEEE Design \& Test})
+@STRING(IEEETOSE = { IEEE Transactions on Software Engineering})
+@STRING(IEEES = { IEEE Software})
+@STRING(IEEETOC = { IEEE Transactions on Computers})
+@STRING(IEEEMICRO = { IEEE Micro})
+@STRING(IEEESPECTRUM = { IEEE Spectrum})
+@STRING(IEEETPDS = { IEEE Transactions on Parallel and Distributed Systems})
+@STRING(CSPIEEE = { Computer Society Press of the IEEE})
+@STRING(IEEECSP = { IEEE Computer Society Press})
+@STRING(IEEEPDTSA = { IEEE Parallel and Distributed Technology Systems
+                        and Applications})
+@STRING(IEEESOFT = {IEEE Software})
+
+%
+% AUTRES PUBLICATIONS
+%
+
+@STRING(JCSS = {J. Comput. Syst. Sci.})
+@STRING(ACTINF = {Acta Informatica})
+@STRING(PARCOMP = {Parallel Computing})
+@STRING(SCPROG = {Scientific Programming})
+@STRING(COMPJ = {The Computer Journal})
+@STRING(JPDC = {Journal of Parallel and Distributed Computing})
+@STRING(JSUPCOMP = {The Journal of Supercomputing})
+@STRING(CPE = {Concurrency : Practice and Experience})
+@STRING(SPE = {Software : Practice and Experience})
+@STRING(IJPP = {International Journal of Parallel Programming})
+@STRING(TSI = {Techniques et Sciences Informatiques})
+@STRING(SCP = {Science of Computer Programming})
+@STRING(PCR = {Parallel Computing Research})
+@STRING(PPL = {Parallel Processing Letters})
+@STRING(JPL = {Journal of Programming Languages})
+
+%
+% WORKSHOPS ET CONFERENCES ET SYMPOSIUMS
+%
+
+@STRING(PLDI = {International Conference on Programming 
+                Language Design and Implementation})
+@STRING(ACM-SCC ={ACM SIGPLAN Symposium on Compiler Construction})
+@STRING(ICPP = {International Conference on Parallel Processing})
+@STRING(ICS = {International Conference on Supercomputing})
+@STRING(JSPP = {Joint Symposium on Parallel Processing})
+@STRING(LCPC = {Languages and Compilers for Parallel Computing})
+@STRING(POPL = {Symposium on Principles of Programming Languages} )
+@STRING(PPOPP = {Symposium on Principles and Practice of Parallel Programming})
+@STRING(SHPCC = {Scalable High Performance Computing Conference})
+@STRING(SOUTH93 = {Workshop on Portability and Performance for Parallel
+                Computers, Southampton})
+@STRING(ICSE = {International Conference on Software Engineering})
+@STRING(WCACTFMGP = { Working Conference on Architectures and 
+        Compilation Techniques for Fine and Medium Grain Parallelism})
+@STRING(MPCOMP90 = {Third Symposium on the Frontiers of Massively
+        Parallel Computation})
+@STRING(WETPSC = {Workshop on Environments and Tools for Parallel Scientific
+        Computing})
+@STRING(CC = {International Conference on Compiler Construction})
+@STRING(ICCI = {International Conference on Computing and Information})
+@STRING(WLCDMM = {Workshop on Languages and Compilers for Distributed Memory Ma
+chines})
+@STRING(ICDCS = {International Conference on Distributed Computing Systems})
+@STRING(ICSS = {International Conference on System Sciences})
+@STRING(CSC = {ACM Computer Science Conference})
+@STRING(VIENNA92 = {Third Workshop on Compilers for Parallel Computers})
+@STRING(PORTLAND93 = {Sixth International Workshop on Languages and Compilers f
+or Parallel Computing})
+@STRING(DELFT93 = {Fourth International Workshop on Compilers for Parallel Comp
+uters})
+@STRING(MALAGA95 = {Fifth International Workshop on Compilers for Parallel Comp
+uters})
+@STRING(AACHEN96 = {Sixth International Workshop on Compilers for Parallel Comp
+uters})
+@STRING(ICCL = {IEEE International Conference on Computer Language})
+@STRING(HPCN = {High Performance Computing and Networking Conference})
+@STRING(RENPAR = {Rencontres Francophones du Parall{\'e}lisme})
+@STRING(JSEH = {Journ{\'e}es du Site Exp{\'e}rimental en Hyperparall{\'e}lisme}
+)
+@STRING(SAS = {Static Analysis Symposium})
+@STRING(PPSC = {Siam Conference on Parallel Processing for Scientific Computing
+})
+@STRING(IPPS = {International Parallel Processing Symposium})
+@STRING(ASPLOS = {International Conference on Architectural Support for
+                  Programming  Languages and Operating Systems})
+@STRING(HPCS = {High Performance Computing Symposium})
+@STRING(LCTRTS = {Workshop on Languages, Compilers and Tools for Real-Time
+                  Systems})
+@STRING(SC = {Supercomputing})
+@STRING(ASAP = {International Conference on Application Specific Array Processo
+rs})
+@STRING(PACT = {Conference on Parallel Architectures and Compilation
+                  Techniques})
+@STRING(ISCA = {International Symposium on Computer Architecture})
+@STRING(LCTES = {Conference on Languages, Compilers and Tools for Embedded Systems})
+
+% DIVERS
+@STRING(LNCS = {Lecture Notes in Computer Science})               
+
+@PhdThesis{Museux:01,
+  author = 	 {Museux Nicolas},
+  title = 	 {Aide au placement d'applications de traitement du signal sur machines paralleles multi-SPMD},
+  school = 	 {Ecole des Mines de Paris},
+  year = 	 {2001},
+}
+
+
+
+@PhdThesis{Mer05,
+  author = 	 {David Merchat},
+  title = 	 {R{\'e}duction du nombre de variables en analyse de relations lin\'eaires},
+  school = 	 {Universit{\'e} Joseph Fourier},
+  year = 	 {2005},
+}
+
+@PhdThesis{Ngu02,
+  author = 	 {Nga Nguyen},
+  title = 	 {Efficient and Effective Software Verification for Scientific Applications Using Static Analysis and Code Instrumentation},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 {2002},
+}
+
+
+
+@PhdThesis{Guettier:97,
+  author = 	 {Christophe Guettier},
+  title = 	 {Optimisation globale du placement d'applications de traitement
+  du signal sur architectures parall\`eles utilisant la programmation logique
+  avec contraintes},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 { 1997},
+  month = 	 {D\'ecembre},
+}
+
+
+
+
+@PhdThesis{Bouchebaba:02,
+  author = 	 {Youcef Bouchebaba},
+  title = 	 {Optimisation des transferts de donn\'ees pour le traitement du signal: pavage, fusion et r\'eallocation de tableaux},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 { 2002},
+  month = 	 {Novembre},
+}
+
+
+
+
+@PhdThesis{Chamski:93,
+  author = 	 {Zbignew Chamski},
+  title = 	 {Environnement logiciel d'un acc\'el\'erateur de
+                  calcul parall\`ele},
+  school = 	 {Universit\'e de Rennes I},
+  year = 	 { 1993},
+  month = 	 {Novembre},
+}
+
+
+@PhdThesis{Bou92,
+  author = 	 {Fran\c{c}ois Bourdoncle},
+  title = 	 {S\'emantiques des langages d'ordre sup\'erieur et interpr\'etation abstraite},
+  school = 	 {\'Ecole polytechnique},
+  year = 	 {1992},
+  month = 	 nov,
+}
+
+
+
+@PhdThesis{Hal79,
+  author = 	 {N. Halbwachs},
+  title = 	 {D\'etermination automatique de relations lin\'eaires v\'erifi\'ees par les variables d'un programme},
+  school = 	 {Universit\'e Scientifique et M\'edicale de Grenoble},
+  year = 	 {1979},
+  month = 	 {March},
+}
+
+%
+% Theses du CRI
+%
+
+%
+% These de Remi Triolet
+%
+
+@PhdThesis{Tri84,
+  author = 	 {Triolet, R\'emi},
+  title = 	 {{Contribution \`a la parall\'elisation automatique de programmes Fortran comportant des appels de proc\'edure}},
+  school = 	 {Universit\'e Pierre et Marie Curie (Paris 6)},
+  year = 	 {1984},
+  month = 	 {June},
+}
+
+@inproceedings{TFI86,
+ author = {Triolet, R\'{e}mi and Feautrier, Paul and Irigoin, Fran\c{c}ois},
+ title = {Automatic Parallelization of Fortran Programs in the Presence of Procedure Calls},
+ booktitle = {Proceedings of the European Symposium on Programming},
+ series = {ESOP '86},
+ year = {1986},
+ isbn = {3-540-16442-1},
+ pages = {210--222},
+ numpages = {13},
+ url = {http://portal.acm.org/citation.cfm?id=645386.651533},
+ acmid = {651533},
+ publisher = {Springer-Verlag},
+ address = {London, UK},
+} 
+
+
+@inproceedings{IJT91,
+ author = {Irigoin, Fran\c{c}ois and Jouvelot, Pierre and Triolet, R\'{e}mi},
+ title = {{Semantical interprocedural parallelization: an overview of the PIPS project}},
+ booktitle = {Proceedings of the 5th international conference on Supercomputing},
+ series = {ICS '91},
+ year = {1991},
+ isbn = {0-89791-434-1},
+ location = {Cologne, West Germany},
+ pages = {244--251},
+ numpages = {8},
+ url = {http://doi.acm.org/10.1145/109025.109086},
+ doi = {http://doi.acm.org/10.1145/109025.109086},
+ acmid = {109086},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+@inproceedings{TIF86,
+  author    = {R{\'e}mi Triolet and
+               Fran\c{c}ois Irigoin and
+               Paul Feautrier},
+  title     = {Direct parallelization of call statements},
+  booktitle = {SIGPLAN Symposium on Compiler Construction},
+  year      = {1986},
+  pages     = {176-185},
+  ee        = {http://doi.acm.org/10.1145/12276.13329},
+  crossref  = {DBLP:conf/sigplan/1986},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@TechReport{JT89,
+  author = 	 {Triolet, R\'emi and Jouvelot, Pierre},
+  title = 	 {NewGen : A Langage-Independent Program Generator},
+  institution =  {CRI, \'Ecole des mines de Paris},
+  year = 	 {1989},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {A-191},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+%
+% These de Pierre Jouvelot
+%
+
+@article{JG89b,
+ author = {Jouvelot, P. and Gifford, D. K.},
+ title = {Reasoning about continuations with control effects},
+ journal = {SIGPLAN Not.},
+ volume = {24},
+ issue = {7},
+ month = {June},
+ year = {1989},
+ issn = {0362-1340},
+ pages = {218--226},
+ numpages = {9},
+ url = {http://doi.acm.org/10.1145/74818.74837},
+ doi = {http://doi.acm.org/10.1145/74818.74837},
+ acmid = {74837},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@inproceedings{JG89,
+ author = {Jouvelot, P. and Gifford, D. K.},
+ title = {Reasoning about continuations with control effects},
+ booktitle = {Proceedings of the ACM SIGPLAN 1989 Conference on Programming language design and implementation},
+ series = {PLDI '89},
+ year = {1989},
+ isbn = {0-89791-306-X},
+ location = {Portland, Oregon, United States},
+ pages = {218--226},
+ numpages = {9},
+ url = {http://doi.acm.org/10.1145/73141.74837},
+ doi = {http://doi.acm.org/10.1145/73141.74837},
+ acmid = {74837},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+
+%
+% These de Francois Irigoin
+%
+
+@PhdThesis{Iri87,
+  author = 	 {Irigoin, Fran\c{c}ois},
+  title = 	 {Partitionnement des boucles imbriqu\'ees. Une
+                  technique d'optimisation pour les programmes
+                  scientifiques},
+  school = 	 {Universit\'e Pierre et Marie Curie (Paris 6)},
+  year = 	 {1987},
+  month = 	 jun,
+}
+
+@inproceedings{IT88,
+ author = {Irigoin, F. and Triolet, R.},
+ title = {Supernode partitioning},
+ booktitle = {Proceedings of the 15th ACM SIGPLAN-SIGACT symposium on Principles of programming languages},
+ series = {POPL '88},
+ year = {1988},
+ isbn = {0-89791-252-7},
+ location = {San Diego, California, United States},
+ pages = {319--329},
+ numpages = {11},
+ url = {http://doi.acm.org/10.1145/73560.73588},
+ doi = {http://doi.acm.org/10.1145/73560.73588},
+ acmid = {73588},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@inproceedings{Iri88,
+ author = {Irigoin, F.},
+ title = {Loop Reordering with Dependence Direction Vectors},
+ booktitle = {Journ\'ees Firtech syst\`emes et t\'el\'ematique, Architectures futures: programmation parall\`ele et int\'egration VLSI},
+ year = {1988},
+ isbn = {},
+ location = {Paris},
+ pages = {},
+ numpages = {},
+} 
+
+@inproceedings{Iri92,
+ author = {Irigoin, Fran\c{c}ois},
+ title = {Interprocedural Analyses for Programming Environments},
+ booktitle = {Workshop on Environments and Tools For Parallel
+                  Scientific Computing, CNRS-NSF},
+ year = {1992},
+ month = sep,
+ isbn = {},
+ location = {Saint-Hilaire du Touvier, France},
+ pages = {},
+ numpages = {},
+  optpublisher = {Elsevier},
+} 
+
+@TechReport{Iri94,
+  author = 	 {Irigoin, Fran\c{c}ois},
+  title = 	 {Projet PIPS. Environnement de développement},
+  institution =  {CRI, \'Ecole des mines de Paris},
+  year = 	 {1994},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {E-146},
+  OPTaddress = 	 {},
+  OPTmonth = 	 nov,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@TechReport{IJT92,
+  author = 	 {Irigoin, Fran\c{c}ois and Jouvelot, Pierre and Triolet, R\'emi},
+  title = 	 {PIPS: Internal Representation of Fortran Code},
+  institution =  {\'Ecole des mines de Paris},
+  year = 	 {1992},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {CAI E-166},
+  OPTaddress = 	 {},
+  OPTmonth = 	 may,
+  note = 	 {This report is constantly updated and available on-line.},
+  OPTannote = 	 {}
+}
+
+@TechReport{IT87b,
+  author = 	 {Irigoin, Fran\c{c}ois and Triolet, R\'emi},
+  title = 	 {Computing Dependence Direction Vectors and
+                  Dependence Cones with Linear Systems},
+  institution =  {\'Ecole des mines de Paris},
+  year = 	 {1987},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {CAI E-94},
+  OPTaddress = 	 {},
+  OPTmonth = 	 nov,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@inproceedings{IT87a,
+  author = {Irigoin, Fran\c{c}ois and Triolet, R\'emi},
+  title = {Automatic DO-Loop Partitioning for Improving Data Locality
+                  in Scientific Programs},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {Vector and Parallel Processors for Scientific
+                  Computation 2},
+  optpages = {},
+  year = 1987,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Rome},
+  month = sept,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {CAI-E93},
+  optannote = {}
+}
+
+@inproceedings{FIK96,
+  author = {Fiorini, Pierre and Irigoin, Fran\c{c}ois and Keryell, Ronan},
+  title = {Modèle de Compilation d'HPF pour la Machine MIMD à Bancs
+                  Mémoire et Réseau Distribué Programmable Phénix},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {8\`eme Rencontres Francophones du Parall\'elisme (RenPar'8)},
+  optpages = {},
+  year = 1996,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Bordeaux, France},
+  month = may,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {TR CRI A/283},
+  optannote = {}
+}
+
+@misc{ICC11,
+  optkey = {},
+  author = {Irigoin, Fran\c{c}ois and Coelho, Fabien and Creusillet, B\'eatrice},
+  title = {{Dependencies between Analyses and Transformations
+            in the Middle-End of a Compiler}},
+  howpublished = {{Workshop "Analyse to Compile, Compile to Analyse" (ACCA)}},
+  month = apr,
+  year = 2011,
+  note = {Chamonix, France},
+  optannote = {}
+}
+
+@inproceedings{CJIA11,
+  author = {Coelho, Fabien and Jouvelot, Pierre and Irigoin, Fran\c{c}ois and
+                  Ancourt, Corinne},
+  title = {{Data and Process Abstraction in PIPS Internal Representation}},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {{Workshop on Internal Representations (WIR)}},
+  optpages = {},
+  year = 2011,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Chamonix, France},
+  month = apr,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {TR MINES ParisTech A/447/CRI},
+  optannote = {}
+}
+
+@inproceedings{ACI10,
+  author = {Ancourt, Corinne and Coelho, Fabien and Irigoin, Fran\c{c}ois},
+  title = {{A Modular Static Analysis Approach
+    to Affine Loop Invariants Detection}},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {{NSAD:} {2nd International Workshop on Numerical and Symbolic Abstract Domains}},
+  optpages = {},
+  year = 2010,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  series = {{ENCTS}},
+  address = {Perpignan, France},
+  month = sep,
+  optorganization = {},
+  publisher = {Elsevier},
+  note = {},
+  optannote = {}
+}
+
+%
+% These de Corinne Ancourt
+%
+
+@PhdThesis{Anc91,
+  author = 	 {Ancourt, Corinne},
+  title = 	 {G\'en\'eration automatique de code de transfert pour
+                  multiprocesseurs \`a m\'emoires locales},
+  school = 	 {Universit\'e Pierre et Marie Curie (Paris 6)},
+  year = 	 {1991},
+  month = 	 march,
+}
+
+@inproceedings{AI91,
+  author    = {Corinne Ancourt and
+               Fran\c{c}ois Irigoin},
+  title     = {Scanning Polyhedra with DO Loops},
+  booktitle = {PPOPP},
+  year      = {1991},
+  pages     = {39-50},
+  ee        = {http://doi.acm.org/10.1145/109625.109631},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@techreport{IA91,
+	AUTHOR = {Fran\c{c}ois Irigoin and Corinne Ancourt},
+	TITLE ={Final Report on Software Caching for Simulated Global
+                  Memory, PUMA ESPRIT 2701, Deliberable 6.5.1},
+	INDEX ={},
+	YEAR = 1991,
+	MONTH = nov,
+	INSTITUTION = ENSMP,
+	TYPE = {EMP-CAII-I155},
+	SUMMARY = {}
+}
+
+                  %AI92
+@inproceedings{IA92a,
+  author    = {Irigoin, Fran\c{c}ois and Ancourt, Corinne},
+  title     = {Automatic Code Distribution},
+  booktitle = {CPC},
+  year      = {1992},
+  location = {Vienna, Austria},
+}
+
+                  %IA92
+@incollection {IA92b,
+   author = {Irigoin, Fran\c{c}ois and Ancourt, Corinne},
+   affiliation = {\'Ecole Nationale Sup\'erieure des Mines de Paris,
+                  Centre de Recherche en Informatique},
+   title = {Compilation pour machines \`a m\'emoire r\'epartie},
+   booktitle = {Algorithmique Parall\`ele},
+   series = {\'Ecole de Printemps du LITP},
+   editor = {Cosnard, Michel and Nivat and Robert, Yves},
+   publisher = {Masson},
+   isbn = {},
+   pages = {},
+   volume = {},
+   url = {},
+   note = {},
+   year = {1992}
+}
+
+@TechReport{ACI10b,
+  author = 	 {Ancourt, Corinne and Coelho, Fabien and Irigoin, Fran\c{c}ois},
+  title = 	 {A Modular Static Analysis Approach to Affine Loop
+                  Invariants Detection (extended version)},
+  institution =  {CRI, MINES ParisTech},
+  year = 	 {2010},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {A-419},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  note = 	 {Parts published in NSAD 2010},
+  OPTannote = 	 {}
+}
+
+%
+% These de Yi-Qing Yang
+%
+
+% School to be checked
+@PhdThesis{Yan93,
+  author = 	 {Yang, Yi-Qing},
+  title = 	 {Tests des d\'ependances et transformations de programme},
+  school = 	 {Universit\'e Pierre et Marie Curie (Paris 6)},
+  year = 	 {1993},
+  month = 	 nov,
+}
+
+@inproceedings{YAI94,
+ author = {Yang, Yi-Qing and Ancourt, Corinne and Irigoin, Fran\c{c}ois},
+ title = {Minimal Data Dependence Abstractions for Loop Transformations},
+ booktitle = {Proceedings of the 7th International Workshop on Languages and Compilers for Parallel Computing},
+ series = {LCPC '94},
+ year = {1995},
+ isbn = {3-540-58868-X},
+ pages = {201--216},
+ numpages = {16},
+ url = {http://portal.acm.org/citation.cfm?id=645672.665551},
+ acmid = {665551},
+ publisher = {Springer-Verlag},
+ address = {London, UK},
+}
+
+@article{YAI95,
+ author = {Yang, Yi-Qing and Ancourt, Corinne and Irigoin, Fran\c{c}ois},
+ title = {Minimal data dependence abstractions for loop
+                  transformations: extended version},
+ journal = {IJPP},
+ volume = {23},
+ issue = {4},
+ month = {August},
+ year = {1995},
+ issn = {0885-7458},
+ pages = {359--388},
+ numpages = {30},
+ url = {http://portal.acm.org/citation.cfm?id=210804.210814},
+ doi = {10.1007/BF02577771},
+ acmid = {210814},
+ publisher = {Plenum Press},
+ address = {New York, NY, USA},
+ keywords = {data dependence abstraction, parallelizing compiler, program transformation},
+}
+
+% article {YAI95,
+%   author = {Yang, Yi-Qing and Ancourt, Corinne and Irigoin, Fran\c{c}ois},
+%   affiliation = {\'Ecole Nationale Sup\'erieure des Mines de Paris Centre
+%                  de Recherche en Informatique Paris France Paris
+%                  France},
+%   title = {Minimal data dependence abstractions for loop
+%                  transformations: Extended version},
+%   journal = {International Journal of Parallel Programming},
+%   publisher = {Springer Netherlands},
+%   issn = {0885-7458},
+%   keyword = {Computer Science},
+%   pages = {359-388},
+%   volume = {23},
+%   issue = {4},
+%   url = {http://dx.doi.org/10.1007/BF02577771},
+%   note = {10.1007/BF02577771},
+%   year = {1995}
+%}
+
+%
+% These de Lei Zhou
+%
+
+% School to be checked
+@PhdThesis{Zho94,
+  author = 	 {Zhou, Lei},
+  title = 	 {Analyse statique et dynamique de la complexit\'e des programmes scientifiques},
+  school = 	 {Universit\'e Pierre et Marie Curie (Paris 6)},
+  year = 	 {1994},
+  month = 	 sep,
+}
+
+@incollection {Zho92,
+   author = {Zhou, Lei},
+   affiliation = {\'Ecole Nationale Sup\'erieure des Mines de Paris,
+                  Centre de Recherche en Informatique},
+   title = {Complexity estimation in the pips parallel programming environment},
+   booktitle = {Parallel Processing: CONPAR 92âVAPP V},
+   series = {Lecture Notes in Computer Science},
+   editor = {Boug\'e, Luc and Cosnard, Michel and Robert, Yves and
+                  Trystram, Denis},
+   publisher = {Springer Berlin / Heidelberg},
+   isbn = {},
+   pages = {845-846},
+   volume = {634},
+   url = {http://dx.doi.org/10.1007/3-540-55895-0_518},
+   note = {10.1007/3-540-55895-0_518},
+   year = {1992}
+}
+
+%
+% These d'Alexis Platonoff
+%
+
+@PhdThesis{Pla95a,
+  author = 	 {Platonoff, Alexis},
+  title = 	 {Contribution à la Distribution Automatique des
+                  Données pour Machines Massivement Parallèles},
+  school = 	 {Universit\'e Pierre et Marie Curie},
+  year = 	 {1995},
+  month = 	 march,
+}
+
+@INPROCEEDINGS{Pla95b,
+    author = {Alexis Platonoff},
+    title = {Automatic Data Distribution for Massively Parallel Computers},
+    booktitle = {In Workshop on Compilers for Parallel Computers, Malaga},
+    year = {1995},
+    pages = {555--570}
+}
+
+@techreport{Pla90,
+	AUTHOR = {Platonoff, Alexis},
+	TITLE ={Calcul des effets des proc\'edures au moyen des
+                  r\'egions},
+	INDEX ={\indexbib{poly\`{e}dres}},
+	YEAR = 1990,
+	MONTH = june,
+	INSTITUTION = ENSMP,
+	TYPE = {EMP-CAII-I132},
+	SUMMARY = {}
+}
+
+%
+% These de Fabien Coelho
+%
+
+@PhdThesis{Coe96,
+  author = 	 {Coelho, Fabien},
+  title = 	 {Contributions \`a la compilation du High Performance Fortran},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 {1996},
+  month = 	 oct,
+}
+
+@article{CA96,
+  author = {Coelho, Fabien
+        and Ancourt, Corinne },
+  title = {{Optimal Compilation of HPF Remappings}},
+  index = {\indexbib{compilation!hpf}},
+  year = 1996,
+  month = nov,
+  journal = {Journal of Parallel and Distributed Computing},
+  volume = 38,
+  number = 2,
+  pages = {229--236},
+  summary = {Also TR EMP CRI A-277 (October 1995)},
+  counts = {\references{24},\pages{8}}
+}
+
+@inproceedings{Coel95,
+  author = {Coelho, Fabien},
+  title = {Compilation of {I/O} {C}ommunications for {HPF}},
+  index = {\indexbib{I/O!parallel}
+          \indexbib{polyhedron}},
+  booktitle = {5th Symposium on the Frontiers of Massively Parallel
+                  Computation},
+  year = 1995,
+  month = feb,
+  pages = {102--109},
+  optnote = {Also available as TR-CRI A/264},
+  counts = {\references{40},\pages{8}}
+}
+
+@inproceedings{CI11,
+  author = {Coelho, Fabien and Irigoin, Fran\c{c}ois},
+  title = {Compiling for a Heterogeneous Vector Image Processor},
+  booktitle = {{Workhop on Optimizations for DSP and Embedded Systems
+               (ODES'9)}},
+  year = 2011,
+  month = apr,
+  optkey = {},
+  opttype = {},
+  optnote = {{Report {A/430/CRI}, MINES ParisTech, Sept 2010}},
+  address = {Chamonix, France},
+  optannote = {}
+}
+
+@inproceedings{ACCK96,
+  author = {Ancourt, Corinne and Coelho, Fabien and Creusillet, B\'eatrice
+                  and Keryell, Ronan},
+  title = {{How to Add a New Phase in PIPS:
+                  the Case of Dead Code Elimination}},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {Sixth Workshop on Compilers for Parallel Computers (CPC)},
+  pages = {19--30},
+  year = 1996,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Aachen, Germany},
+  month = dec,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {Also TR CRI/A/300},
+  optannote = {}
+}
+
+@techreport{Coe93,
+	AUTHOR = {Coelho, Fabien},
+	TITLE ={{Étude et réalisation d'un compilateur pour le {\em High
+Performance Fortran}}},
+	INDEX ={},
+	YEAR = 1993,
+	MONTH = jan,
+	INSTITUTION = ENSMP,
+	TYPE = {EMP-CRI-A238},
+	SUMMARY = {}
+}
+
+%
+% These de Beatrice Apvrille Creusillet
+%
+
+@PhdThesis{Cre96,
+  author = 	 {Creusillet-Apvrille, B\'eatrice},
+  title = 	 {Analyses de r\'egions de tableaux et applications},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 1996,
+  month = 	 dec,
+}
+
+@article{Cous92a,
+	AUTHOR = {Cousot, Patrick and Cousot, Radhia},
+	TITLE = {Abstract Interpretation Framework},
+	INDEX ={\indexbib{}},
+	YEAR = 1992,
+	MONTH = aug,
+	JOURNAL = {Journal of Logic and Computation},
+	VOLUME = 2,
+	NUMBER = 5,
+	PAGES = {511--547},
+	SUMMARY = {\references{}}
+}
+
+@inproceedings{CI95,
+	AUTHOR = {Creusillet, B{\'e}atrice and Irigoin, Fran\c{c}ois},
+	TITLE ={Interprocedural Array Region Analyses},
+	INDEX ={\indexbib{}},
+	BOOKTITLE = lcpc,
+	YEAR = 1995,
+	SERIES = lncs,
+	PUBLISHER = springer,
+	NUMBER = 1033,
+	PAGES= {46--60},
+	MONTH = aug,
+	SUMMARY = {\references{17}}
+}
+
+
+@inproceedings{Creu95b,
+	AUTHOR = {Creusillet, B{\'e}atrice},
+	TITLE ={{IN} and {OUT} Array Region Analyses},
+	INDEX ={\indexbib{}},
+	BOOKTITLE = malaga95,
+	YEAR = 1995,
+	PAGES= {233--246},
+	MONTH = jun,
+	SUMMARY = {\references{16}}
+}
+
+@article{Creu96aa,
+	AUTHOR = {Creusillet, B{\'e}atrice and Irigoin, Fran\c{c}ois},
+	TITLE ={Interprocedural Array Region Analyses},
+	INDEX ={\indexbib{}},
+	YEAR = 1996,
+	JOURNAL = ijpp # { (special issue on LCPC)},
+	VOLUME = {24},
+	NUMBER = {6},
+        PAGES = {513--546},
+	SUMMARY = {\Extended version of \cite{Creu95a}. references{34}}
+}
+
+@inproceedings{Creu96bb,
+	AUTHOR = {Creusillet, B{\'e}atrice and Irigoin, Fran\c{c}ois},
+	TITLE ={Exact vs. Approximate Array Region Analyses},
+	BOOKTITLE = lcpc,
+	SERIES = lncs,
+	PUBLISHER = springer,
+	NUMBER = 1239,
+	PAGES= {86--100},
+	INDEX ={\indexbib{analyse!s{\'e}mantique}},
+	YEAR = 1996,
+	MONTH = aug,
+	SUMMARY = {\references{33}}
+}
+
+
+@phdthesis{Creu96c,
+	AUTHOR = {Creusillet, B{\'e}atrice},
+	TITLE ={Array Region Analyses and Applications},
+	INDEX ={\indexbib{}},
+	SCHOOL = ensmp,
+	YEAR = 1996,
+	MONTH = dec,
+        NOTE = {Available at {\tt http://www.cri.ensmp.fr/doc/A-295.ps.gz}},
+	SUMMARY = {\references{181}}
+}
+
+@article{CI96,
+ author = {Creusillet, B\'{e}atrice and Irigoin, Francois},
+ title = {Interprocedural array region analyses},
+ journal = {IJPP},
+ volume = {24},
+ issue = {6},
+ month = {December},
+ year = {1996},
+ issn = {0885-7458},
+ pages = {513--546},
+ numpages = {34},
+ url = {http://portal.acm.org/citation.cfm?id=247013.247023},
+ acmid = {247023},
+ publisher = {Kluwer Academic Publishers},
+ address = {Norwell, MA, USA},
+ keywords = {array data flow analysis, array regions, array reshaping, interprocedural analysis},
+} 
+
+%
+% These de Arnaud Leservot
+%
+
+@techreport{Lese94,
+	AUTHOR = {Leservot, Arnauld},
+	TITLE ={Extension de {C3} aux unions de Poly\`{e}dres},
+	INDEX ={\indexbib{poly\`{e}dres}},
+	YEAR = 1994,
+	MONTH = {janvier},
+	INSTITUTION = cea,
+	TYPE = {Rapport Technique},
+	SUMMARY = {Pr{\'e}sentation des disjonctions et des chemins. \references{3}}
+}
+
+@PhdThesis{Lese96a,
+	AUTHOR = {Leservot, Arnauld},
+	TITLE ={Analyses interproc{\'e}durales du flot des donn{\'e}es},
+	INDEX ={\indexbib{}},
+	SCHOOL = paris-6,
+	YEAR = 1996,
+	MONTH = mar,
+	
+}
+
+
+%
+% These de Julien Zory
+%
+
+@PhdThesis{Zor99,
+  author = 	 {Zory, Julien},
+  title = 	 {Contributions \`a l'optimisation de programmes scientifiques},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 {1999},
+  month = 	 dec,
+}
+
+@inproceedings{ZC98b,
+  author = {Zory, Julien and Coelho, Fabien},
+  title = {Using Algebraic Transformations to Optimize Expression
+            Evaluation in Scientific Codes},
+  index = {\indexbib{Optimization!Arithmetic Expressions}
+                \indexbib{Algebraic Transformations!Evaluation}},
+  booktitle = {Proceeding of International Conference on Parallel Architectures and Compiler Techniques (IEEE PACT)},
+  year = 1998,
+  month = oct,
+  pages = {376--384},
+  summary = {Optimisation d'expressions \`a l'aide de transformations
+           alg\'ebriques},
+  ee = {http://computer.org/proceedings/pact/8591/85910376abs.htm},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+%
+% These de Youcef Bouchebaba
+%
+
+@phdthesis{Bou02,
+  author = {Bouchebaba, Youcef},
+  title = {Optimisation des transferts de donn\'ees pour le traitement
+                  du signal~: pavage, fusion et r\'eallocation des tableaux},
+  school = {\'Ecole des mines de Paris},
+  year = 2002,
+  optkey = {},
+  opttype = {},
+  optaddress = {},
+  month = nov,
+  optnote = {},
+  optannote = {}
+}
+
+@inproceedings{Bouchebaba2006,
+  author = {Bouchebaba, Youcef and
+                  Nicolescu, Gabriela and
+                  Aboulhamid, El Mostapha and
+                  Coelho, Fabien},
+  title = {Buffer and register allocation for memory space optimization},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {Application-Specific Systems, Architecture and Processors (ASAP)},
+  pages = {283--290},
+  year = 2006,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  optaddress = {},
+  month = sep,
+  optorganization = {},
+  publisher = {IEEE Computer Society},
+  isbn = {0-7695-2682-9},
+  note = {11-13 September 2006, Steamboat Springs, Colorado, USA},
+  optannote = {}
+}
+
+@article{BouGiCoNoElM2007,
+  author = {Bouchebaba, Youcef and Girodias, Bruno and Coelho, Fabien and Nicolescu, Gabriela and El Mostapha, Aboulhamid},
+  title = {Buffer and Register Allocation for Memory Space Optimization},
+  journal = {The Journal of VLSI Signal Processing},
+  year = 2007,
+  optkey = {},
+  optvolume = {},
+  optnumber = {},
+  optpages = {},
+  note = {Springer Netherlands},
+  month = may,
+  issn = {0922-5773},
+  doi = {\url{http://dx.doi.org/10.1007/s11265-006-0001-1}},
+  optannote = {}
+}
+
+%
+% These de Nga Nguyen
+%
+
+@PhdThesis{Ngu02,
+  author = 	 {Nguyen, Nga Thi Viet},
+  title = 	 {V\'erifications efficaces des applications
+                  scientifiques par analyse statique et
+                  instrumentation de code. Efficient and effective
+                  software verifications for scientific applications
+                  using static analysis and code instrumentation},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 {2002},
+  month = 	 {November},
+}
+
+@inproceedings{TELECOM_BRETAGNE-696,
+author = {Thi Viet Nga Nguyen and Fran{\c{c}}ois Irigoin and Corinne
+                  Ancourt and Ronan Keryell},
+title = {{Efficient intraprocedural array bound checking}},
+booktitle = {Second International Workshop on Automated Program
+                  Analysis, Testing and Verification, WAPATV01,
+                  Toronto, Canada, mai 2001},
+year = {2001},
+organization = {}
+}
+
+@article{NI05,
+ author = {Nguyen, Thi Viet Nga and Irigoin, Fran\c{c}ois},
+ title = {Efficient and effective array bound checking},
+ journal = {ACM Trans. Program. Lang. Syst.},
+ volume = {27},
+ issue = {3},
+ month = {May},
+ year = {2005},
+ issn = {0164-0925},
+ pages = {527--570},
+ numpages = {44},
+ url = {http://doi.acm.org/10.1145/1065887.1065893},
+ doi = {http://doi.acm.org/10.1145/1065887.1065893},
+ acmid = {1065893},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+ keywords = {Array bound checking, interprocedural analysis},
+} 
+
+@inproceedings{NIAC03,
+ author = {Nguyen, Thi Viet Nga and Irigoin, Fran\c{c}ois and Ancourt, Corinne and Coelho, Fabien},
+ title = {Automatic detection of uninitialized variables},
+ booktitle = {Proceedings of the 12th international conference on Compiler construction},
+ series = {CC'03},
+ year = {2003},
+ isbn = {3-540-00904-3},
+ location = {Warsaw, Poland},
+ pages = {217--231},
+ numpages = {15},
+ url = {http://portal.acm.org/citation.cfm?id=1765931.1765953},
+ acmid = {1765953},
+ publisher = {Springer-Verlag},
+ address = {Berlin, Heidelberg},
+} 
+
+%
+% These de Youcef Bouchebaba
+%
+
+@PhdThesis{Bou02,
+  author = 	 {Bouchebaba, Youcef},
+  title = 	 {Optimisation des transferts de donn\'ees pour le
+                  traitement du signal: pavage, fusion et r\'eallocation
+                  des tableaux},
+  school = 	 {MINES},
+  year = 	 {2002},
+  month = 	 {November},
+}
+
+@inproceedings{BC02,
+  author = {Youcef Bouchebaba and
+               Fabien Coelho},
+  title = {Tiling and Memory Reuse for Sequences of Nested Loops.},
+  booktitle = {Euro-Par},
+  year = {2002},
+  pages = {255-264},
+  ee = {http://link.springer.de/link/service/series/0558/bibs/2400/24000255.htm},
+  crossref = {DBLP:conf/europar/2002},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@inproceedings{BC01,
+  author = {Bouchebaba, Youcef and Coelho, Fabien},
+  title = {Tiling pour une s\'equence de nids de boucles},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {Rencontres Francophones du Parall\'elisme (RenPar)},
+  optpages = {},
+  year = 2001,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Cit\'e des Sciences et de l'Industrie, Paris, France},
+  month = apr,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {TR CRI A/319},
+  optannote = {}
+}
+
+@article{BC02,
+  author = {Bouchebaba, Youcef and Coelho, Fabien},
+  title = {Pavage pour une s\'equence de nids de boucles.},
+  journal = {Technique et Science Informatiques},
+  volume = {21},
+  number = {5},
+  year = {2002},
+  pages = {579-603},
+  ee = {http://tsi.revuesonline.com/article.jsp?articleId=3841},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+%
+% These de Duong Nguyen
+%
+
+@PhdThesis{Ngu10,
+  author = 	 {Nguyen, Duong},
+  title = 	 {Robust and Generic Abstract Domain for Static
+                  Program Analyses: The Polyhedral Case},
+  school = 	 {\'Ecole des mines de Paris},
+  year = 	 {2010},
+  month = 	 {November},
+}
+
+                  %
+%
+% These de Serge Guelton
+%
+
+
+@inproceedings{GKI11,
+  author = {Guelton, Serge and Keryell, Ronan and Irigoin, Fran\c{c}ois},
+  title = {Compilation pour cibles h\'et\'erog\`enes : automatisation des
+                  analyses, transformations, et d\'ecisions n\'ecessaires},
+  booktitle = {{Rencontres Francophones du Parall\'elisme (RenPar)}},
+  address = {Saint-Malo, France},
+  institution = {{MINES ParisTech}},
+  year = 2011,
+  optkey = {},
+  opttype = {},
+  number = {},
+  optaddress = {},
+  month = may,
+  optnote = {},
+  optannote = {}
+}
+
+
+%
+% Mehdi Amini
+% 
+
+@inproceedings{Amini2011b,
+  author = {Amini, Mehdi and Ancourt, Corinne and Coelho, Fabien
+        and Irigoin, Fran\c{c}ois and Jouvelot, Pierre and Keryell, Ronan
+        and Villalon, Pierre and Creusillet, B\'eatrice and Guelton, Serge},
+  title = {{PIPS Is not (just) Polyhedral Software}},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {{International Workshop on Polyhedral Compilation Techniques}
+               (IMPACT'11)},
+  optpages = {},
+  year = 2011,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Chamonix, France},
+  month = apr,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {TR MINES ParisTech A/453/CRI},
+  optannote = {}
+}
+
+@inproceedings{AIK11,
+  author = {Amini, Mehdi and Irigoin, Fran\c{c}ois and
+                  Keryell, Ronan},
+  title = {Compilation et optimisation statique des communications
+                  h\^ote-acc\'el\'erateur},
+  booktitle = {{Rencontres Francophones du Parall\'elisme (RenPar)}},
+  address = {Saint-Malo, France},
+  institution = {{MINES ParisTech}},
+  year = 2011,
+  optkey = {},
+  opttype = {},
+  number = {},
+  optaddress = {},
+  month = may,
+  optnote = {},
+  optannote = {}
+}
+
+@inproceedings{Coelho2011d,
+  author = {Coelho, Fabien and Jouvelot, Pierre and Irigoin, Fran\c{c}ois and
+                  Ancourt, Corinne},
+  title = {{Data and Process Abstraction in PIPS Internal Representation}},
+  optcrossref = {},
+  optkey = {},
+  booktitle = {{Workshop on Internal Representations (WIR)}},
+  optpages = {},
+  year = 2011,
+  opteditor = {},
+  optvolume = {},
+  optnumber = {},
+  optseries = {},
+  address = {Chamonix, France},
+  month = apr,
+  optorganization = {},
+  optpublisher = {},
+  optnote = {TR MINES ParisTech A/447/CRI},
+  optannote = {}
+}
+
+@PhdThesis{Car92,
+  author = 	 {S. Carr},
+  title = 	 {Memory Hierarchy Management},
+  school = 	 {Rice University},
+  year = 	 {1992},
+  month = 	 sep,
+}
+
+@article{CK94,
+ author = {Carr, Steve and Kennedy, Ken},
+ title = {Scalar replacement in the presence of conditional control flow},
+ journal = {Softw. Pract. Exper.},
+ volume = {24},
+ issue = {1},
+ month = {January},
+ year = {1994},
+ issn = {0038-0644},
+ pages = {51--77},
+ numpages = {27},
+ url = {http://dx.doi.org/10.1002/spe.4380240104},
+ doi = {http://dx.doi.org/10.1002/spe.4380240104},
+ acmid = {180235},
+ publisher = {John Wiley \& Sons, Inc.},
+ address = {New York, NY, USA},
+ keywords = {compilers, optimization, register allocation},
+} 
+
+@PhdThesis{,
+  author = 	 {},
+  title = 	 {},
+  school = 	 {},
+  year = 	 {},
+  month = 	 {},
+}
+
+@inproceedings{Hal93,
+ author = {Nicolas Halbwachs},
+ title = {Delay Analysis in Synchronous Programs},
+ booktitle = {Fifth Conference on Computer Aided Verification},
+ year = {1993},
+ isbn = {LNCS 697},
+ pages = {4--13},
+ location = {Elounda, Greece},
+ doi = {},
+ publisher = {Springer Verlag},
+ }
+
+@inproceedings{DV96,
+ author = {Darte, Alain and Vivien, Fr\'ed\'eric},
+ title = {{On the Optimality of Allen and Kennedy's Algorithm for
+                  Parallelism Detection in Nested Loops}},
+ booktitle = {Europar'96},
+ year = {1993},
+ isbn = {LNCS 1123},
+ pages = {379--388},
+ location = {},
+ doi = {},
+ publisher = {Springer Verlag},
+ }
+
+@inproceedings{Dar99,
+ author = {Darte, Alain},
+ title = {On the Complexity of Loop Fusion},
+ booktitle = {Proceedings of the 1999 International Conference on Parallel Architectures and Compilation Techniques},
+ series = {PACT '99},
+ year = {1999},
+ isbn = {0-7695-0425-6},
+ pages = {149--},
+ url = {http://portal.acm.org/citation.cfm?id=520793.825721},
+ acmid = {825721},
+ publisher = {IEEE Computer Society},
+ address = {Washington, DC, USA},
+ keywords = {parallelization, loop fusion, loop distribution, complexity},
+} 
+
+@article{Hal97,
+ author = {Halbwachs, Nicolas and Proy, Yann-Erick and Roumanoff, Patrick},
+ title = {Verification of Real-Time Systems using Linear Relation Analysis},
+ journal = {Form. Methods Syst. Des.},
+ volume = {11},
+ number = {2},
+ year = {1997},
+ pages = {157--185},
+ }
+
+
+@inproceedings{Pug91,
+ author = {Pugh, William},
+ title = {{The Omega Test: a fast and practical integer programming algorithm for dependence analysis}},
+ booktitle = {Supercomputing '91: Proceedings of the 1991 ACM/IEEE conference on Supercomputing},
+ year = {1991},
+ isbn = {0-89791-459-7},
+ pages = {4--13},
+ location = {Albuquerque, New Mexico, United States},
+ doi = {http://doi.acm.org/10.1145/125826.125848},
+ publisher = {ACM Press},
+ }
+
+
+
+%% Course by Tevfik Bultan
+%% http://www.cs.ucsb.edu/~bultan/courses/267/cavnotes.pdf
+
+@inproceedings{BGP97,
+ author = {Bultan, Tevfik and Gerber, Richard and Pugh, William},
+ title = {Symbolic model checking of infinite state systems using Presburger arithmetic},
+ booktitle = {Proc. 9th International Conference on Computer-Aided Verification, volume 1254, Lecture Notes in Computer Science},
+ month = {June},
+ year = {1997},
+ isbn = {3-540-63166-6},
+ pages = {400--411},
+ location = {Haifa, Israel},
+ doi = {unknown},
+ publisher = {Springer-Verlag},
+ }
+
+
+
+@inproceedings{Darte:02,
+ author = {Darte, Alain and Huard, Guillaume},
+ title = {New Results on Array Contraction},
+ booktitle = {IEEE Intl' Conference on Application-Specific Systems,
+                  Architectures and Processors},
+ year = {2002},
+ isbn = {unknown},
+ pages = {359--370},
+ location = {unknown},
+ doi = {unknown},
+ publisher = {unknown},
+ }
+
+
+
+% FI: looks funny....                  
+@inproceedings{Iri97,
+ author = {Irigoin, Fran\c{c}ois},
+ title = {Applications des analyses automatiques de programmes \`a leur v},
+ booktitle = {IEEE Intl' Conference on Application-Specific Systems, Architectures and Processors},
+ year = {2002},
+ isbn = {unknown},
+ pages = {359--370},
+ location = {unknown},
+ doi = {unknown},
+ publisher = {unknown},
+ }
+
+
+
+@inproceedings{BJT99,
+ author = {Besson, Fr\'ed\'eric and Jensen, Thomas and Talpin, Jean-Pierre},
+ title = {Polyhedral Analysis for Synchronous Languages},
+ booktitle = {SAS'99, Venice, Italy},
+ year = {1999},
+ isbn = {unknown},
+ pages = {51--68},
+ location = {unknown},
+ doi = {unknown},
+ publisher = {LNCS 1694, Springer-Verlag},
+ }
+
+
+
+@inproceedings{BBR97,
+ author = {Boigelot, Bernard and Bronne, Louis and Rassart, St\'ephane},
+ title = {Symbolic verification with periodic sets},
+ booktitle = {Proc. 9th International Conference on Computer-Aided Verification, volume 1254, Lecture
+       Notes in Computer Science},
+ year = {1997},
+ isbn = {unknown},
+ pages = {167--177},
+ location = {Haifa, Israel},
+ doi = {unknown},
+ publisher = {Springer-Verlag},
+ }
+
+@inproceedings{BW94,
+ author = {Boigelot, Bernard and Wolper, Pierre},
+ title = {Symbolic verification with periodic sets},
+ booktitle = {6th International Conference on Computer Aided Verification, number 808 in LNCS},
+ year = {1994},
+ isbn = {unknown},
+ pages = {55--67},
+ location = {unknown},
+ doi = {unknown},
+ publisher = {Springer-Verlag},
+ }
+
+@inproceedings{Pugh:99,
+ author = {Pugh, William and Rosser, E.},
+ title = {Iteration Space Slicing for Locality},
+ booktitle = {LCPC'99},
+ year = {1999},
+ isbn = {unknown},
+ pages = {165--194},
+ location = {San Diego, California, United States},
+ doi = {unknown},
+ publisher = {unknown},
+ }
+
+@inproceedings{WCHP01,
+ author = {Wu, Peng and Cohen, Albert and Hoeflinger, Jay and Padua, David},
+ title = {Monotonic evolution: an alternative to induction variable substitution for dependence analysis},
+ booktitle = {ICS'01},
+ year = {2001},
+ month = {June},
+ isbn = {unknown},
+ pages = {78--91},
+ location = {Sorrento, Italy},
+ doi = {unknown},
+ publisher = {ACM Press},
+ }
+
+%% FI->CA,FC: do we want to check this CRI publication?
+%% Pop (S.), Cohen (A.) et Silber (G.-A.). Induction variable analysis with delayed abstractions. In : Intl. Conf. on High Performance Embedded Architectures and Compilers (HiPEACâ05). pp. 218â232. Barcelona, Spain, novembre 2005.
+
+@inproceedings{QK06,
+ author = {Qasem, Apan and Kennedy, Ken},
+ title = {Profitable Loop Fusion and Tiling Using Model-driven Empirical Search},
+ booktitle = {ICS'06},
+ year = {2006},
+ month = {June},
+ isbn = {unknown},
+ pages = {249--258},
+ location = {Cairns, Queensland, Australia},
+ doi = {unknown},
+ publisher = {ACM Press},
+ }
+
+
+
+@article{KPRS94,
+ author = {Kelly, Wayne and Pugh, William and Rosser, Evan and Shpeisman, Tatiana},
+ title = {Transitive closure of infinite graphs and its applications},
+ journal = {Int. J. Parallel Program.},
+ volume = {24},
+ number = {6},
+ year = {1996},
+ pages = {579--598}
+ }
+
+
+@TechReport{BHRZ,
+  author = 	 {Bagnara, Roberto and Hill Patricia M. and Ricci, Elisa and Zaffanella, Enea},
+  title = 	 {Precise Widening Operators for Convex Polyhedra},
+  institution =  {University of Parma, Italy},
+  year = 	 {2005},
+}
+
+@TechReport{VCB11,
+  author = 	 {Verdoolaege, S. and Cohen, A. and Beletska, A.},
+  title = 	 {Transitive closures of affine integer tuple relations and their overapproximations},
+  institution =  {RR-7560, INRIA},
+  year = 	 {2011},
+  month =        mar,
+}
+
+
+@TechReport{APOTRES,
+  author = 	 {N. Museux},
+  title = 	 {PLC2 1.1 Reference Manual. CLAIRE/ECLAIR 3.13},
+  institution =  {THALES},
+  year = 	 {2005},
+  OPTtype = 	 {Confidentiel},
+}
+
+@TechReport{DREAM-UP-T12,
+  author = 	 {C. Ancourt and M. Barreterau and B. Lescure and F. Irigoin and L. Jeannin and J. Mattioli and N. Museux and F. Pasquier and P. Romenteau and G.A. Silber},
+  title = 	 { SP1  - T1.2 Sp\'ecification des contraintes architecturales et op\'erationnelles},
+  institution =  { THOMSON - Ecole des Mines - THALES},
+  year = 	 {2004},
+  OPTtype = 	 {Confidentiel},
+}
+
+@TechReport{DREAM-UP-T22,
+  author = 	 {C. Ancourt and M. Barreterau and I. Hurbain and F. Irigoin and L. Jeannin and J. Mattioli and N. Museux and F. Pasquier and P. Romenteau and G.A. Silber},
+  title = 	 { SP2  - T2.2 Formalisme de description fonctionnelle et r\'ealisation de l'interface utilisateur},
+  institution =  { THOMSON - Ecole des Mines - THALES},
+  year = 	 {2004},
+  OPTtype = 	 {Confidentiel},
+}
+
+@TechReport{CRI258,
+  author = 	 {C. Ancourt and I. Hurbain and F. Irigoin and N. Museux},
+  title = 	 {Ensemble et polytope de d\'ependance, systÃÂ¨me g\'en\'erateur et ordonnancement },
+  institution =  {ÃÂcole des Mines - THALES, E/258/CRI},
+  year = 	 {2004},
+  OPTtype = 	 {Confidentiel},
+}
+
+@TechReport{CRIA361,
+  author = 	 {I. Hurbain and C. Ancourt and F. Irigoin and M. Barreteau and J. Mattioli and F. Pasquier},
+  title = 	 {A case study of design space exploration for embedded multimedia applications in SoCs.},
+  institution =  {Thomson - \'Ecole des Mines - THALES, A/361/CRI},
+  year = 	 {2005},
+}
+
+@TechReport{CRI265,
+  author = 	 {C. Ancourt and F. Irigoin and N. Museux},
+  title = 	 {Mod\`eles m\'emoire},
+  institution =  {\'Ecole des Mines - THALES, E/265/CRI},
+  year = 	 {2005},
+  OPTtype = 	 {Confidentiel},
+}
+
+@TechReport{CRI268,
+  author = 	 {C. Ancourt and F. Irigoin and N. Museux},
+  title = 	 {ModÃÂ¨les de partitionnement  \\
+({\em tiling})},
+  institution =  {ÃÂcole des Mines - THALES, E/268/CRI},
+  year = 	 {2005},
+  OPTtype = 	 {Confidentiel},
+}
+
+@Book{EDM,
+  author = 	 {Mathematical Society of Japan},
+  title = 	 {Encyclopedic Dictionary of Mathematics},
+  institution =  {MIT Press},
+  year = 	 {1993},
+}
+
+@TechReport{PCS05,
+  author = 	 {Pop, Sebastian and Cohen, Albert and Silber, Georges-Andre},
+  title = 	 {Induction Variable Analysis with Delayed Abstractions},
+  institution =  {Ecole des mines de Paris, CRI A/367},
+  year = 	 {2005},
+}
+
+@TechReport{NR00,
+  author = 	 {Nookala, Sunder and Risset, Tanguy},
+  title = 	 {A Library for Z-polyhedral Operations},
+  institution =  {IRISA, TR 1346},
+  year = 	 {2000},
+}
+
+@TechReport{KNT99,
+  author = 	 {Kerb{\oe}uf, MickaÃ¯l and Nowak, David and Talpin, Jean-Pierre},
+  title = 	 {The Steam Boiler Controller Problem in Signal-Coq},
+  institution =  {INRIA, TR 3773},
+  year = 	 {1999},
+}
+
+@InProceedings{Ancourt:91,
+  author = 	 {Ancourt, Corinne and Irigoin, Fran\c{c}ois},
+  title = 	 {{Scanning Polyhedra with Do Loops}},
+  booktitle = 	 {PPoPP},
+  year = 	 {1991},
+  month = 	 {April},
+}
+
+
+                  % Duplicate
+% InProceedings{IJT91,
+%  author = 	 {Irigoin, Fran\c{c}ois and Jouvelot, Pierre and Triolet, R\'emi},
+%  title = 	 {Semantical interprocedural parallelization: an overview of the PIPS project},
+%  booktitle = 	 {ICS},
+%  year = 	 {1991},
+%  month = 	 {June},
+%  pages =        {144--151},
+%}
+
+
+@InProceedings{Iri93,
+  author = 	 {Irigoin, Fran\c{c}ois},
+  title = 	 {Interprocedural analyses for programmig environments},
+  booktitle = 	 {Environments and Tools for Parallel Scientific Computing},
+  year = 	 {1993},
+  month = 	 {September},
+  pages =        {333--350},
+  publisher =    {Elsevier},
+}
+
+@InProceedings{BCC03,
+  author = 	 {Blancher, Bruno and Cousot, Patrick and Cousot, Radhia and Feret, J\'erÃ´me and Mauborgne, Laurent and Min\'e, Antoine and Monniaux, David and Rival, Xavier},
+  title = 	 {A static analyzer for large safety-critical software},
+  booktitle = 	 {PLDI},
+  year = 	 {2003},
+  month = 	 {June},
+  pages =        {196--207},
+  publisher =    {ACM Press}
+}
+
+@InProceedings{FVP05,
+  author = 	 {Franchetti, Franz and Voronenko, Yevgen and PÃÂ¼schel, Markus},
+  title = 	 {Formal Loop Merging for Signal Transforms},
+  booktitle = 	 {PLDI},
+  year = 	 {2005},
+  month = 	 {June},
+  location =     {Chicago (IL), USA},
+  pages =        {315--326},
+  publisher =    {ACM Press}
+}
+
+
+@InProceedings{BWZ94,
+  author =       {Olaf Bachmann and Paul S. Wang and Eugene V. Zima},
+  title =        {Chains of recurrences a method to expedite
+                  the evaluation of closed-form functions},
+  booktitle =    {Proceedings of the international symposium
+                  on Symbolic and algebraic computation},
+  year =         {1994},
+  pages =        {242--249},
+  location =     {Oxford, UK},
+  publisher =    {ACM Press}
+}
+
+@InProceedings{DDL99,
+   Author = "Dellacherie, Samuel and Devulder, Samuel and Lambert, Jean-Luc",
+   Title = "Software verification based on linear programming",
+   booktitle = {World Congress on Formal Method, FM'99, LNCS 1708},
+   Year = 1999,
+   month = {Sep},
+   location = "Toulouse, France",
+   publisher = "Springer-Verlag",
+   Pages = {1147--1165}
+}
+
+@InProceedings{KK05,
+   Author = "Kudriatsev, Alexei and Kogge, Peter",
+   Title = "Generation of Permutations for SIMD Processors",
+   booktitle = {LCTES},
+   Year = 2005,
+   month = {Jun},
+   location = "Chicago (IL), USA",
+   publisher = "ACM SIGPLAN",
+   Pages = {147--156},
+   summary = {data re-arrangement, data permutation, scheduling; 
+              SIMD code generation, ILP for permutation selection,
+              permutation decomposition, up to 35\% speed-up;
+              INTEL SSE, icc compiler, SIMDization; 
+              FIR, bit-reverse, matrix transpose;
+              Could also be useful for FPGA-based accelerators?}
+}
+
+@InProceedings{KOA05,
+   Author = "Kyo, Shorin and Okazaki, Shin'ichiro and Arai, Tamio",
+   Title = "An Integrated Memory Array Processor Architecture for Embedded Image Recognition Systems",
+   booktitle = {ISCA},
+   Year = 2005,
+   month = {Jun},
+   location = "Madison (WI), USA",
+   publisher = "ACM SIGPLAN",
+   Pages = {134--145},
+   summary = {image processing, SOC, SIMD processor, VLIW}
+}
+
+
+@Article{BK05,
+        AUTHOR = {Behera, Chandan Kumar and Kumar, Pawan},
+        TITLE = {An Improved Algorithm for Loop Dead Optimization},
+        INDEX ={\indexbib{transformation de programme}},
+        YEAR = 2005,
+        MONTH = Nov,
+        JOURNAL = {sigplan},
+        VOLUME = 40,
+        NUMBER = 11,
+        PAGES = {18--28},
+}
+
+@Article{BJW05,
+        AUTHOR = {Boigelot, Bernard and Jodogne, S\'ebastien and Wolper, Pierre},
+        TITLE = {An Effective Decision Procedure for Linear Arithmetic over the Integers and the Reals},
+        INDEX ={\indexbib{preuve automatique}},
+        YEAR = 2005,
+        MONTH = Jul,
+        JOURNAL = {ACM Transactions on Computational Logic},
+        VOLUME = 6,
+        NUMBER = 3,
+        PAGES = {614--633},
+}
+
+
+
+@Article{PCR01,
+        AUTHOR = {Pastor, Enric and Cortadella, Jordi and Roig, Oriol},
+        TITLE = {Symbolic Analysis of Bounded Petri Nets},
+        INDEX ={\indexbib{Petri net}},
+        YEAR = 2001,
+        MONTH = May,
+        JOURNAL = {IEEE Transactions on Computers},
+        VOLUME = 50,
+        NUMBER = 5,
+        PAGES = {432--448},
+        SUMMARY = {bni8970}
+}
+
+
+
+@Article{BBM97,
+        AUTHOR = {Bjorner, Nikolaj and Browne, Anca and Manna, Zohar},
+        TITLE = {Automatic generation of invariants and intermediate assertions},
+        INDEX ={\indexbib{Petri net}},
+        YEAR = 1997,
+        MONTH = May,
+        JOURNAL = {Theoretical Computer Science},
+        VOLUME = 173,
+        NUMBER = 1,
+        PAGES = {49--87},
+        SUMMARY = {temporal property - mutual exclusion}
+}
+
+
+@Article{Mash04,
+        AUTHOR = {Mashey, John R.},
+        TITLE = {Languages, Levels, Libraries, and Longevity},
+        INDEX ={\indexbib{langage de programmation}},
+        YEAR = {2004-2005},
+        MONTH = {Dec, Jan},
+        JOURNAL = {ACM Queue},
+        VOLUME = 2,
+        NUMBER = 9,
+        PAGES = {32--38},
+        SUMMARY = {histoire des langages de programmation}
+}
+
+
+@Article{AL05,
+        AUTHOR = {Aguilar, Jose and Leiss, Ernst},
+        TITLE = {Parallel loop scheduling approaches for distributed and shared memory systems},
+        INDEX ={\indexbib{transformation de programme},\indexbib{parallelisation automatique},\indexbib{ordonnancement}},
+        YEAR = 2005,
+        MONTH = {Mar, Jun},
+        JOURNAL = {PPL},
+        VOLUME = 15,
+        NUMBER = {1-2},
+        PAGES = {131--152},
+        SUMMARY = {chunk size, ordonnancement adaptatif}
+}
+
+
+@Article{ARTZ03,
+        AUTHOR = {Anderson, Paul and Reps, Thomas and Teitelbaum, Tin and Zarins, Mark},
+        TITLE = {Tool Support for Fine-Grained Software Inspection},
+        INDEX ={\indexbib{analyse semantique},\indexbib{visualisation},\indexbib{graphe de controle},\indexbib{logiciel codesurfer}},
+        YEAR = 2003,
+        MONTH = {Jul, Aug},
+        JOURNAL = {IEEE Software},
+        VOLUME = 20,
+        NUMBER = 4,
+        PAGES = {42--50},
+        SUMMARY = {genie logiciel, software inspection, code review}
+}
+
+
+
+@Article{SG95,
+        AUTHOR = {Spezialetti, Madalene and Gupta,Rajiv},
+        TITLE = {Loop Monotonic Statement},
+        INDEX ={\indexbib{Loop analysis}},
+        YEAR = 1995,
+        MONTH = {Jun},
+        JOURNAL = {IEEETOSE},
+        VOLUME = 21,
+        NUMBER = 6,
+        PAGES = {497--505},
+        SUMMARY = {program analysis},
+        DOI = {10.1109/32.391376}
+}
+
+% Better definition upwards
+% Article{NI05,
+%        AUTHOR = {Nguyen, Thi Viet Nga and Irigoin,  Fran\c{c}ois},
+%        TITLE = {Efficient and effective array bound checking},
+%        INDEX ={\indexbib{Array bound checking}},
+%        YEAR = 2005,
+%        MONTH = May,
+%        JOURNAL = {TOPLAS},
+%        VOLUME = 27,
+%        NUMBER = 3,
+%        PAGES = {527--570},
+% }
+
+%
+% Paul Feautrier
+%
+
+@article {Fea91,
+   author = {Feautrier, Paul},
+   affiliation = {Laboratoire MASI Université P. et M. Curie 75252 Paris Cedex 05 France},
+   title = {Dataflow analysis of array and scalar references},
+   journal = {International Journal of Parallel Programming},
+   publisher = {Springer Netherlands},
+   issn = {0885-7458},
+   keyword = {Computer Science},
+   pages = {23-53},
+   volume = {20},
+   issue = {1},
+   url = {http://dx.doi.org/10.1007/BF01407931},
+   note = {10.1007/BF01407931},
+   year = {1991}
+}
+
+@article{Fea92a,
+ author = {Feautrier, Paul},
+ title = {{Some efficient solutions to the affine scheduling problem: I. One-dimensional time}},
+ journal = IJPP,
+ volume = {21},
+ issue = {5},
+ month = oct,
+ year = {1992},
+ issn = {0885-7458},
+ pages = {313--348},
+ numpages = {36},
+ url = {http://portal.acm.org/citation.cfm?id=171447.171448},
+ doi = {10.1007/BF01407835},
+ acmid = {171448},
+ publisher = {Kluwer Academic Publishers},
+ address = {Norwell, MA, USA},
+ keywords = {automatic parallelization, automatic systolic array design, scheduling},
+} 
+
+@article {Fea92b,
+   author = {Feautrier, Paul},
+   affiliation = {Laboratoire MASI Universit\'e de Versailles
+                  St-Quentin 45 Avenue des Etats-Unis 78035 Versailles
+                  Cedex France},
+   title = {{Some efficient solutions to the affine scheduling problem. Part II. Multidimensional time}},
+   journal = IJPP,
+   publisher = {Springer Netherlands},
+   issn = {0885-7458},
+   keyword = {Computer Science},
+   pages = {389-420},
+   volume = {21},
+   issue = {6},
+   url = {http://dx.doi.org/10.1007/BF01379404},
+   note = {10.1007/BF01379404},
+   year = {1992}
+}
+@inproceedings{Fea93,
+ author = {Feautrier, Paul},
+ title = {Toward automatic partitioning of arrays on distributed
+                  memory computers},
+ booktitle = {Proceedings of the 7th international conference on Supercomputing},
+ series = {ICS '93},
+ year = {1993},
+ isbn = {0-89791-600-X},
+ location = {Tokyo, Japan},
+ pages = {175--184},
+ numpages = {10},
+ url = {http://doi.acm.org/10.1145/165939.165968},
+ doi = {http://doi.acm.org/10.1145/165939.165968},
+ acmid = {165968},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+% P. Feautrier. Parall\'elisation automatique, Histoire et Perspectives. In D. Trystram, Y. Slimani, and M. Jemni, editors, Informatique r\'epartie, Hors serie TSI, chapter 6, pages 161-182. Hermes, 2005.
+@article {F05,
+   author = {Feautrier, Paul},
+   title = {Parall\'elisation automatique, Histoire et Perspectives},
+   journal = {TSI},
+   publisher = {Hermes},
+   issn = {},
+   keyword = {},
+   pages = {161-182},
+   volume = {},
+   issue = {Hors s\'erie},
+   url = {},
+   note = {},
+   year = {2005}
+}
+
+@article{ACIK97,
+    author = {Corinne Ancourt and Fabien Coelho and Fran\c{c}ois Irigoin and Ronan Keryell},
+    title = {{A Linear Algebra Framework for Static HPF Code Distribution}},
+    journal = {Scientific Programming},
+    pages = {3-27},
+    volume = {6},
+    year = {1997}
+}
+@article {,
+   author = {},
+   title = {},
+   journal = {},
+   publisher = {},
+   issn = {},
+   keyword = {},
+   pages = {},
+   volume = {},
+   issue = {},
+   url = {},
+   note = {},
+   year = {}
+}
+
+T. Bultan, R. Gerber, and W. Pugh. Model-checking concurrent systems
+with unbounded integer variables: Symbolic representations, approximations,
+and experimental results. ACM Transactions on Programming Languages
+and Systems, 21(4):747{789, July 1999.
+
+@Article{BGP99,
+        AUTHOR = {Bultan, Tevfik and Gerber, Richard and Pugh, William },
+        TITLE = {Model-checking concurrent systems
+with unbounded integer variables: Symbolic representations, approximations,
+and experimental results},
+        INDEX ={\indexbib{Array bound checking}},
+        YEAR = {1999},
+        MONTH = {Jul},
+        JOURNAL = {TOPLAS},
+        VOLUME = 21,
+        NUMBER = 4,
+        PAGES = {747--789},
+}
+
+@Article{PK82,
+        AUTHOR = { Paige, Robert and Koenig, Shaye},
+        TITLE = {Finite Differencing of Computable Expressions},
+        INDEX ={\indexbib{program transformation}},
+        YEAR = 1982,
+        MONTH = July,
+        JOURNAL = {TOPLAS},
+        VOLUME = 4,
+        NUMBER = 3,
+        PAGES = {402--454},
+}
+
+@Article{SRK06,
+        AUTHOR = {Snelting, Gregor and Robschink, Torsten and Krinke, Jens},
+        TITLE = {Efficient path condition in dependence graphs for software safety analysis},
+        YEAR = 2006,
+        MONTH = Oct,
+        JOURNAL = {TOSEM},
+        VOLUME = 15,
+        NUMBER = 4,
+        PAGES = {410--457},
+}
+
+@Article{NG06,
+        AUTHOR = {NÃÂ¡cul, AndrÃÂ© C. and Givargis, Tony},
+        TITLE = {Synthesis of Time-Constrained Multitasking Embedded Software},
+        YEAR = 2006,
+        MONTH = Oct,
+        JOURNAL = {TOSEM},
+        VOLUME = 11,
+        NUMBER = 4,
+        PAGES = {822--847},
+}
+
+@Article{JB06,
+        AUTHOR = { Joisha, Pramod G. and Banerjee, Prithviraj},
+        TITLE = {An Algebraic Array Shape Inference System for MATLAB},
+        INDEX ={\indexbib{Array analysis}},
+        YEAR = 2006,
+        MONTH = Sep,
+        JOURNAL = {TOPLAS},
+        VOLUME = 28,
+        NUMBER = 5,
+        PAGES = {848--907},
+}
+
+@Article{RR05,
+        AUTHOR = { Rugina, Radu and Rinard, Martin },
+        TITLE = {Symbolic Bounds Analysis of Pointers, Array Indices, 
+                 and Accessed Memory Regions},
+        INDEX ={\indexbib{Array bound checking}},
+        YEAR = 2005,
+        MONTH = Mar,
+        JOURNAL = {TOPLAS},
+        VOLUME = 27,
+        NUMBER = 2,
+        PAGES = {185--235},
+}
+ 
+@Article{PHP02,
+        AUTHOR = {Peak, Yunheung and Hoeflinger, Jay and Padua, David},
+        TITLE = {Efficient and Precise Array Access Analysis},
+        INDEX ={\indexbib{Array region}},
+        YEAR = 2002,
+        MONTH = Jan,
+        JOURNAL = {TOPLAS},
+        VOLUME = 24,
+        NUMBER = 1,
+        PAGES = {65--109},
+}
+ 
+@Article{HAMLL05,
+        AUTHOR = {Hall, Mary W. and Amarasinghe, Saman P. and Murphy, Brian R. and Liao, Shih-Wei and Lam, Monica S.},
+        TITLE = {Interprocedural Parallelization Analysis in SUIF},
+        INDEX ={\indexbib{Automatic Parallelization}},
+        YEAR = 2005,
+        MONTH = Jul,
+        JOURNAL = {TOPLAS},
+        VOLUME = 27,
+        NUMBER = 4,
+        PAGES = {662--731},
+}
+  
+@Article{ZG05,
+        AUTHOR = {Zhang, Xiangyu and Gupta, Rajiv},
+        TITLE = {Cost and Precision Tradeoffs of Dynamic Data Slicing Algorithms},
+        INDEX ={\indexbib{Program Transformation, Slicing}},
+        YEAR = 2005,
+        MONTH = Jul,
+        JOURNAL = {TOPLAS},
+        VOLUME = 27,
+        NUMBER = 4,
+        PAGES = {631--661},
+}
+  
+@Article{RMH06,
+        AUTHOR = {Rosenkrantz, Daniel J. and Mullin, Leonore R. and Hunt III, Harry B.},
+        TITLE = {On Minimizing Materializations of Array-Valued Temporaries},
+        INDEX ={\indexbib{Memory Allocation}},
+        YEAR = 2006,
+        MONTH = Nov,
+        JOURNAL = {TOPLAS},
+        VOLUME = 28,
+        NUMBER = 6,
+        PAGES = {1145--1177},
+}
+               
+@Book{Hagh96,
+  AUTHOR =      {Haghighat, Mohammad},
+  TITLE =       {Symbolic analysis for parallelizing compilers},
+  PUBLISHER =   {Boston Kluwer Academic},
+  YEAR =        {1996},
+  ISBN =        {0-7923-9623-5},
+  SUMMARY = { polynoms}  
+}
+
+@book{Sch86,
+ author = {Schrijver, Alexander},
+ title = {Theory of linear and integer programming},
+ year = {1986},
+ isbn = {0-471-90854-1},
+ publisher = {John Wiley \& Sons, Inc.},
+ address = {New York, NY, USA},
+} 
+
+@book{AU77,
+ author = {Aho, Alfred V. and Ullman, Jeffrey D.},
+ title = {Principles of Compiler Design (Addison-Wesley series in computer science and information processing)},
+ year = {1977},
+ isbn = {0201000229},
+ publisher = {Addison-Wesley Longman Publishing Co., Inc.},
+ address = {Boston, MA, USA},
+} 
+
+@book{ASU86,
+ author = {Aho, Alfred V. and Sethi, Ravi and Ullman, Jeffrey D.},
+ title =  {Compilers: Principles, Techniques, and Tools},
+ year = {1986},
+ isbn = {},
+ publisher = {Addison-Wesley},
+ address = {},
+}
+Compilers: Principles, Techniques, and Tools (2nd Edition)
+
+@book{ALSU06,
+ author = {Aho, Alfred V. and Lam, Monica and Sethi, Ravi and Ullman, Jeffrey D.},
+ title =  {Compilers: Principles, Techniques, and Tools (2nd Edition)},
+ year = {2006},
+ isbn = {},
+ publisher = {Addison-Wesley},
+ address = {},
+}
+
+@Inproceedings{BHRZ03,
+   Author = "R. Bagnara and P. M. Hill and E. Ricci and E. Zaffanella",
+   Title = "Precise Widening Operators for Convex Polyhedra",
+   Booktitle = "Static Analysis:
+                Proceedings of the 10th International Symposium",
+   Address = "San Diego, California, USA",
+   Editor = "R. Cousot",
+   Publisher = "Springer-Verlag, Berlin",
+   Series = "Lecture Notes in Computer Science",
+   Volume = 2694,
+   Year = 2003,
+   Pages = "337--354",
+   Abstract = "Convex polyhedra constitute the most used abstract
+               domain among those capturing numerical relational
+               information.  Since the domain of convex polyhedra
+               admits infinite ascending chains, it has to be used in
+               conjunction with appropriate mechanisms for enforcing
+               and accelerating convergence of the fixpoint
+               computation.  Widening operators provide a simple and
+               general characterization for such mechanisms.  For the
+               domain of convex polyhedra, the original widening
+               operator proposed by Cousot and Halbwachs amply deserves
+               the name of \emph{standard widening} since most analysis
+               and verification tools that employ convex polyhedra also
+               employ that operator.  Nonetheless, there is an
+               unfulfilled demand for more precise widening operators.
+               In this paper, after a formal introduction to the
+               standard widening where we clarify some aspects that are
+               often overlooked, we embark on the challenging task of
+               improving on it.  We present a framework for the
+               systematic definition of new and precise widening
+               operators for convex polyhedra.  The framework is then
+               instantiated so as to obtain a new widening operator
+               that combines several heuristics and uses the standard
+               widening as a last resort so that it is never less
+               precise.  A preliminary experimental evaluation has
+               yielded promising results.",
+   URL = "http://www.cs.unipr.it/ppl/Documentation/BagnaraHRZ03.pdf"
+}
+
+@Article{BHRZ05SCP,
+   Author = "R. Bagnara and P. M. Hill and E. Ricci and E. Zaffanella",
+   Title = "Precise Widening Operators for Convex Polyhedra",
+   Journal = "Science of Computer Programming",
+   Year = 2005,
+   Note = "To appear",
+   Abstract = "In the context of static analysis via abstract
+               interpretation, convex polyhedra constitute the most
+               used abstract domain among those capturing numerical
+               relational information.  Since the domain of convex
+               polyhedra admits infinite ascending chains, it has to be
+               used in conjunction with appropriate mechanisms for
+               enforcing and accelerating the convergence of fixpoint
+               computations.  Widening operators provide a simple and
+               general characterization for such mechanisms.  For the
+               domain of convex polyhedra, the original widening
+               operator proposed by Cousot and Halbwachs amply deserves
+               the name of \emph{standard widening} since most analysis
+               and verification tools that employ convex polyhedra also
+               employ that operator.  Nonetheless, there is an
+               unfulfilled demand for more precise widening operators.
+               In this paper, after a formal introduction to the
+               standard widening where we clarify some aspects that are
+               often overlooked, we embark on the challenging task of
+               improving on it.  We present a framework for the
+               systematic definition of new widening operators that are
+               never less precise than a given widening.  The framework
+               is then instantiated on the domain of convex polyhedra
+               so as to obtain a new widening operator that improves on
+               the standard widening by combining several heuristics.
+               A preliminary experimental evaluation has yielded
+               promising results.  We also suggest an improvement to
+               the well-known widening delay technique that allows to
+               gain precision while preserving its overall
+               simplicity.",
+   URL = "http://www.cs.unipr.it/ppl/Documentation/BagnaraHRZ05SCP.pdf"
+}
+
+@Article{QRR97,
+   Author = "Quinton, Patrice and Rajopadhye, Sanjay and Risset, Tanguy",
+   Title = "On Manipulating Z-polyhedra using a Canonical Representation",
+   Journal = {PPL},
+   Year = 1997,
+   Month = Jun,
+   Volume = 7,
+   Number = 2,
+   Pages = {181--194}
+}
+
+@Article{MACE05,
+   Author = "Mock, Markus and Atkinson, Darren C. and Chambers, Craig and Eggers, Susan J.",
+   Title = "Program Slicing with Dynamic Points-to Sets",
+   Journal = {IEEETOSE},
+   Year = 2005,
+   Month = Aug,
+   Volume = 31,
+   Number = 8,
+   Pages = {657--678}
+}
+
+@Article{Gonz06,
+   Author = "Gonzales, Ricardo E.",
+   Title = "A Software-Configurable Processor Architecture",
+   Journal = {IEEEMICRO},
+   Year = 2006,
+   Month = Sep,
+   Volume = 26,
+   Number = 5,
+   Pages = {42--51}
+}
+
+@Article{OH05,
+   Author = "Olukutun, Kunle and Hammond, Lance",
+   Title = "The Future of Microprocessors",
+   Journal = {ACM Queue},
+   Year = 2005,
+   Month = Sep,
+   Volume = 3,
+   Number = 7,
+   Pages = {26--34}
+}
+
+@Article{VALG05,
+   Author = "Vera, Xavier and Abella, Jaume and Llosa, Josep and GonzÃÂ¡lez, Antonio",
+   Title = "An Accurate Cost Model for Guiding Data Locality Transformations",
+   Journal = {JACM},
+   Year = 2005,
+   Month = Sep,
+   Volume = 27,
+   Number = 5,
+   Pages = {946--987}
+}
+
+@Article{ZG05,
+   Author = "Zhang, Xiangyu and Gupta, Rajiv",
+   Title = "Whole Execution Traces and Their Applications",
+   Journal = {TACO},
+   Year = 2005,
+   Month = Sep,
+   Volume = 2,
+   Number = 3,
+   Pages = {301--334}
+}
+
+@PhdThesis{jeannet00b,
+   Author = {Jeannet, B.},
+   Title = {Partitionnement Dynamique dans l'Analyse de Relations LinÃÂ©aires et Application ÃÂ  la VÃÂ©rification de Programmes Synchrones},
+   School = {Institut National Polytechnique de Grenoble},
+   Month = {September},
+   Year = {2000}
+}
+
+@inproceedings{Gul06,
+ author = {Gulavani, Bhargav S. and Henzinger, Thomas A. and Kannan, Yamini and Nori, Aditya V. and Rajamani, Sriram K.},
+ title = {SYNERGY: a new algorithm for property checking},
+ booktitle = {SIGSOFT '06},
+ year = {2006},
+ pages = {117--127},
+ location = {Portland, Oregon, USA},
+ }
+
+@inproceedings{Gop07,
+  author    = {Denis Gopan and
+               Thomas W. Reps},
+  title     = {Guided Static Analysis},
+  booktitle = {Static Analysis, 14th International Symposium, SAS 2007},
+  year      = {2007},
+  pages     = {349-365},
+}
+
+@article{Gul07,
+  author = {Gulwani, Sumit and Jojic, Nebojsa},
+  title = {Program verification as probabilistic inference},
+  journal = {SIGPLAN Not.},
+  volume = {42},
+  number = {1},
+  year = {2007},
+  pages = {277--289},
+}
+
+@inproceedings{HP08,
+  author = {Halbwachs, Nicolas and P{\'e}ron, Mathias},
+  title = {Discovering properties about arrays in simple programs},
+  booktitle = {PLDI '08},
+  month = {06},
+  year = {2008},
+  pages = {339--348},
+  location = {Tuczon, AZ},
+}
+
+@inproceedings{Gul09,
+  author = {Gulwani, Sumit and Jain, Sagar and Koskinen, Eric},
+  title = {Control-flow refinement and progress invariants for bound analysis},
+  booktitle = {PLDI '09},
+  year = {2009},
+  pages = {375--385},
+  location = {Dublin, Ireland},
+}
+
+@phdthesis{Gon07,
+    title = {Acc\'el\'eration abstraite pour l'amelioration de la
+                  precision en analyse des relations lineaires },
+    author = {Gonnord, Laure},
+    year = {2007},
+    school = {Universit\'e Joseph Fourier, Grenoble, France},
+    team = {SYNC},
+}
+
+@InProceedings{CJ98old,
+  author = 	 {Comon, Hubert and Jurski, Yan},
+  title = {Multiple Counters Automata, Safety Analysis and Presburger Arithmetic},
+  OPTcrossref =  {},
+  OPTkey = 	 {},
+  booktitle = {CAV'98},
+  pages = 	 {268Ã¢ÂÂ279},
+  year = 	 1998,
+  editor = 	 {Springer-Verlag},
+  OPTvolume = 	 {},
+  number = 	 1427,
+  series = 	 {{LNCS}},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  OPTorganization = {},
+  OPTpublisher = {},
+  OPTnote = 	 {},
+  OPTannote = 	 {}
+}
+                  
+%% From ACM Portal
+
+@inproceedings{CJ98,
+ author = {Comon, Hubert and Jurski, Yan},
+ title = {Multiple Counters Automata, Safety Analysis and Presburger Arithmetic},
+ booktitle = {CAV '98: Proceedings of the 10th International Conference on Computer Aided Verification},
+ year = {1998},
+ isbn = {3-540-64608-6},
+ pages = {268--279},
+ publisher = {Springer-Verlag},
+ address = {London, UK},
+ }
+
+
+@Article{Cha91,
+  author = 	 {Zhou, Chaochen and  Hoare, C. A. R. and Ravn, Anders P.},
+  title = 	 {A Calculus of Durations},
+  journal = 	 {Information Processing Letters},
+  year = 	 {1991},
+   month = 	 {December},
+}
+
+@inproceedings{Gon06,
+  author={Gonnord, Laure and Halbwachs, Nicolas},
+  title={Combining widening and acceleration in linear relation analysis},
+  booktitle={13th International Static Analysis Symposium, SAS'06},
+  address={Seoul, Korea},
+  month=aug,
+  year=2006
+}
+
+@inproceedings{CH78,
+ author = {Cousot, Patrick and Halbwachs, Nicolas},
+ title = {Automatic discovery of linear restraints among variables of a program},
+ booktitle = {Proceedings of the 5th ACM SIGACT-SIGPLAN symposium on Principles of programming languages},
+ series = {POPL '78},
+ year = {1978},
+ location = {Tucson, Arizona},
+ pages = {84--96},
+ numpages = {13},
+ url = {http://doi.acm.org/10.1145/512760.512770},
+ doi = {http://doi.acm.org/10.1145/512760.512770},
+ acmid = {512770},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+% InProceedings{CH78,
+%  author = 	 {Cousot, Patrick and Halbwachs, Nicolas},
+%  title = 	 {Automatic discovery of linear restraints among variables of a program},
+%  booktitle = 	 {POPL},
+%  year = 	 {1978},
+%  month = 	 {January},
+%  pages =        {84--96},
+%  publisher =    {ACM Press}
+%}
+
+% Same as BTK09, but less detailed
+
+@article{Bie09,
+  author = {W. Bielecki and T. Klimek and K. Trifunovic},
+  journal = {Electronic Notes in Discrete Mathematics},
+  note = {{I}nternational Conference on Graph Theory and its Applications},
+  pages = {7 - 14},
+  title = {Calculating Exact Transitive Closure for a Normalized Affine Integer Tuple Relation},
+  volume = 33,
+  year = 2009,
+}
+
+% Same as Bie09, but more detailed
+
+@article{BKT09,
+  title = "Calculating Exact Transitive Closure for a Normalized Affine Integer Tuple Relation",
+  journal = "Electronic Notes in Discrete Mathematics",
+  volume = "33",
+  number = "",
+  pages = "7 - 14",
+  year = "2009",
+  note = {{I}nternational Conference on Graph Theory and its Applications},
+  issn = "1571-0653",
+  doi = "DOI: 10.1016/j.endm.2009.03.002",
+  URLopt = "http://www.sciencedirect.com/science/article/B75GV-4VXMFSW-2/2/f59224de90b9ab3b1b3620f0617252b6",
+  author = "W. Bielecki and T. Klimek and K. Trifunovic",
+  keywords = "affine integer tuple relation",
+  keywords = "exact transitive closure",
+  keywords = "Presburger Arithmetic",
+  keywords = "recurrence equation"
+}
+
+% Yet another bibtex entry for the same paper
+@article{DBLP:journals/endm/BieleckiKT09,
+  author    = {W. Bielecki and
+               T. Klimek and
+               Konrad Trifunovic},
+  title     = {Calculating Exact Transitive Closure for a Normalized Affine
+               Integer Tuple Relation},
+  journal   = {Electronic Notes in Discrete Mathematics},
+  volume    = {33},
+  year      = {2009},
+  pages     = {7-14},
+  ee        = {http://dx.doi.org/10.1016/j.endm.2009.03.002},
+  bibsource = {DBLP, http://dblp.uni-trier.de}
+}
+
+@article{Cou96,
+ author = {Cousot, Patrick},
+ title = {Abstract interpretation},
+ journal = {ACM Comput. Surv.},
+ volume = {28},
+ issue = {2},
+ month = {June},
+ year = {1996},
+ issn = {0360-0300},
+ pages = {324--328},
+ numpages = {5},
+ url = {http://doi.acm.org/10.1145/234528.234740},
+ doi = {http://doi.acm.org/10.1145/234528.234740},
+ acmid = {234740},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+}
+
+
+% Swimming pool example
+
+ @INPROCEEDINGS{FO97,
+    author = {Laurent Fribourg and Hans Olsen},
+    title = {Proving Safety Properties of Infinite State Systems by Compilation into Presburger Arithmetic},
+    booktitle = {CONCUR'97, LNCS 1243},
+    year = {1997},
+    pages = {213--227},
+    publisher = {Springer}
+}
+
+@INPROCEEDINGS{Min01,
+    author = {Antoine Min\'e},
+    title = {The octagon abstract domain},
+    booktitle = {AST 2001 in WCRE 2001, IEEE},
+    year = {2001},
+    pages = {310--319},
+    publisher = {IEEE CS Press}
+}
+
+@TechReport{ACI10b,
+  author = 	 {Ancourt, Corinne and Coelho, Fabien and Irigoin, Fran\c{c}ois},
+  title = 	 {A Modular Static Analysis Approach to Affine Loop
+                  Invariants Detection (extended version)},
+  institution =  {CRI, MINES ParisTech},
+  year = 	 {2010},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {A-419},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  note = 	 {Parts published in NSAD 2010},
+  OPTannote = 	 {}
+}
+
+@Misc{pips-project,
+  OPTkey = 	 {},
+  author = 	 {{MINES-ParisTech}},
+  title = 	 {{PIPS}},
+  howpublished = {\url{http://pips4u.org}},
+  OPTmonth = 	 {},
+  year = 	 {1989--2009},
+  note = 	 {Open source, under GPLv3},
+  OPTannote = 	 {}
+}
+
+@Misc{linearC3,
+  OPTkey = 	 {},
+  author = 	 {{MINES-ParisTech}},
+  title = 	 {{Linear C3 Library of PIPS}},
+  howpublished = {http://pips4u.org},
+  OPTmonth = 	 {},
+  note = 	 {Open source, under GPLv3},
+  OPTannote = 	 {}
+}
+
+@inproceedings{JM,
+    author = {Bertrand Jeannet and Antoine Min\'e},
+    title = {Apron: A Library of Numerical Abstract Domains for Static Analysis },
+     booktitle = {Computer Aided Verification},
+year = 2009,
+pages = {661-667},	
+SERIES = lncs,
+	PUBLISHER = springer,
+volume = 5643,
+ url = {http://apron.cri.ensmp.fr/library},
+}
+
+
+
+@Misc{ppl,
+  OPTkey = 	 {},
+  author = 	 {{University of Parma, Italy}},
+  title = 	 {{The PPL: A Library for Representing Numerical Abstractions}},
+  howpublished = {{http://www.cs.unipr.it/ppl}},
+  OPTmonth = 	 {},
+  year = 	 {2004},
+  OPTannote = 	 {}
+}
+ 
+@Misc{omega,
+  OPTkey = 	 {},
+  author = 	 {Pugh, William and the entire Omega Project Team},
+  title = 	 {{The Omega library}},
+  howpublished = {{http://www.cs.umd.edu/projects/omega}},
+  OPTmonth = 	 {},
+  OPTannote = 	 {}
+}
+
+@Misc{polylib,
+  OPTkey = 	 {},
+ author = {Wilde, Doran and ICPS},
+  title = 	 {{The Polylib library}},
+  howpublished = {{http://icps.u-strasbg.fr/polylib}},
+  OPTmonth = 	 {},
+  OPTannote = 	 {}
+}
+
+@Misc{isl,
+  author = 	 {Verdoolaege, Sven},
+  title = 	 {{ISL: An Integer Set Library for the Polyhedral Model}},
+  howpublished = {{http://freshmeat.net/projects/isl}},
+  OPTmonth = 	 {},
+  year = 	 {2010},
+  OPTannote = 	 {}
+}
+
+@inproceedings{Lam74,
+ author = {Lamport, Leslie},
+ title = {The Hyperplane Method for an Array Computer},
+ booktitle = {Proceedings of the Sagamore Computer Conference on Parallel Processing},
+ year = {1975},
+ isbn = {3-540-07135-0},
+ pages = {113--131},
+ numpages = {19},
+ url = {http://portal.acm.org/citation.cfm?id=647406.724265},
+ acmid = {724265},
+ publisher = {Springer-Verlag},
+ address = {London, UK},
+} 
+
+@InProceedings{Bas04,
+  author =        {Bastoul, C\'{e}dric},
+  title =         {Code Generation in the Polyhedral Model Is Easier Than You Think},
+  booktitle =     {{PACT'13 IEEE} International Conference on Parallel Architecture and Compilation Techniques},
+  year =          2004,
+  pages =         {7--16},
+  month =         sep,
+  address =       {Juan-les-Pins, France},
+}
+
+
+
+@inproceedings{Cla96,
+ author = {Clauss, Philippe},
+ title = {{Counting solutions to linear and nonlinear constraints through Ehrhart polynomials: applications to analyze and transform scientific programs}},
+ booktitle = {Proceedings of the 10th international conference on Supercomputing},
+ series = {ICS '96},
+ year = {1996},
+ isbn = {0-89791-803-7},
+ location = {Philadelphia, Pennsylvania, United States},
+ pages = {278--285},
+ numpages = {8},
+ url = {http://doi.acm.org/10.1145/237578.237617},
+ doi = {http://doi.acm.org/10.1145/237578.237617},
+ acmid = {237617},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+
+@article{Cla98,
+ author = {Clauss, Philippe and Loechner, Vincent},
+ title = {{Parametric Analysis of Polyhedral Iteration Spaces}},
+ journal = {J. VLSI Signal Process. Syst.},
+ volume = {19},
+ issue = {2},
+ month = {July},
+ year = {1998},
+ issn = {0922-5773},
+ pages = {179--194},
+ numpages = {16},
+ url = {http://portal.acm.org/citation.cfm?id=293959.293966},
+ doi = {10.1023/A:1008069920230},
+ acmid = {293966},
+ publisher = {Kluwer Academic Publishers},
+ address = {Hingham, MA, USA},
+} 
+
+@inproceedings{MMPSC08,
+  author = {Daniel Millot and Alain Muller and Christian Parrot and Fr\'ed\'erique Silber-Chaussumier},
+  title = {{STEP: a distributed OpenMP for coarse-grain parallelism tool}},
+  booktitle = {Proceedings of the 4th international conference on OpenMP in a new era of parallelism},
+  series = {IWOMP'08},
+  year = {2008},
+  location = {West Lafayette, IN, USA},
+  pages = {83--99},
+  numpages = {17},
+  url = {http://portal.acm.org/citation.cfm?id=1789826.1789836},
+  acmid = {1789836},
+  _publisher = {Springer-Verlag},
+  _address = {Berlin, Heidelberg},
+} 
+
+@inproceedings{MMPSC09,
+  author = {Daniel Millot and Alain Muller and Christian Parrot and Fr\'ed\'erique Silber-Chaussumier},
+  title = {{From OpenMP to MPI: first experiments of the STEP source-to-source transformation}},
+  booktitle = {Mini-symposium in International Conference on
+Parallel Computing (ParCO) - Parallel Programming Tools for Multi-core Architectures},
+  year = {2009},
+
+}
+
+@inproceedings{Sog96,
+ author = {Sogno, Jean-Claude},
+ title = {The Janus Test: A Hierarchical Algorithm for Computing Direction and Distance Vectors},
+ booktitle = {Proceedings of the 29th Hawaii International Conference on System Sciences Volume 1: Software Technology and Architecture},
+ series = {HICSS '96},
+ year = {1996},
+ isbn = {0-8186-7324-9},
+ pages = {203--},
+ url = {http://portal.acm.org/citation.cfm?id=795698.798346},
+ acmid = {798346},
+ publisher = {IEEE Computer Society},
+ address = {Washington, DC, USA},
+} 
+
+@ARTICLE{GFL99,
+    author = {Martin Griebl and Paul Feautrier and Christian Lengauer},
+    title = {Index Set Splitting},
+    journal = {International Journal of Parallel Programming},
+    year = {1999},
+    volume = {28},
+    pages = {607--631}
+}
+
+@inproceedings{Ost82,
+ author = {Osterweil, Leon J.},
+ title = {Toolpack - an experimental software development environment research project},
+ booktitle = {Proceedings of the 6th international conference on Software engineering},
+ series = {ICSE '82},
+ year = {1982},
+ location = {Tokyo, Japan},
+ pages = {166--175},
+ numpages = {10},
+ url = {http://portal.acm.org/citation.cfm?id=800254.807759},
+ acmid = {807759},
+ publisher = {IEEE Computer Society Press},
+ address = {Los Alamitos, CA, USA},
+} 
+
+@incollection {Ost11,
+   author = {Osterweil, Leon J.},
+   affiliation = {Department of Computer Science, University of Colorado, Boulder, CO 80309, USA},
+   title = {Toolpack—An Experimental Software Development Environment Research Project},
+   booktitle = {Engineering of Software},
+   editor = {Tarr, Peri L. and Wolf, Alexander L.},
+   publisher = {Springer Berlin Heidelberg},
+   isbn = {978-3-642-19823-6},
+   keyword = {Computer Science},
+   pages = {179-206},
+   url = {http://dx.doi.org/10.1007/978-3-642-19823-6_11},
+   note = {10.1007/978-3-642-19823-6_11},
+   year = {2011}
+}
+
+@article{Ost83,
+author = {L.J. Osterweil},
+title = {Toolpack-An Experimental Software Development Environment Research Project},
+journal ={IEEE Transactions on Software Engineering},
+volume = {9},
+issn = {0098-5589},
+year = {1983},
+pages = {673-685},
+doi = {http://doi.ieeecomputersociety.org/10.1109/TSE.1983.235432},
+publisher = {IEEE Computer Society},
+address = {Los Alamitos, CA, USA},
+}
+
+@book{Pol88,
+ author = {Pollicini, A. A.},
+ title = {Using Toolpack Software Tools},
+ year = {1988},
+ isbn = {0792300335},
+ edition = {1st},
+ publisher = {Kluwer Academic Publishers},
+ address = {Norwell, MA, USA},
+} 
+
+@book{Muc97,
+ author = {Muchnick, Steven S.},
+ title = {Advanced compiler design and implementation},
+ year = {1997},
+ isbn = {1-55860-320-4},
+ publisher = {Morgan Kaufmann Publishers Inc.},
+ address = {San Francisco, CA, USA},
+} 
+
+@article{LY88a,
+ author = {Li, Zhiyuan and Yew, Pen-Chung},
+ title = {Efficient interprocedural analysis for program
+                  parallelization and restructuring},
+ journal = {SIGPLAN Not.},
+ volume = {23},
+ issue = {9},
+ month = {January},
+ year = {1988},
+ issn = {0362-1340},
+ pages = {85--99},
+ numpages = {15},
+ url = {http://doi.acm.org/10.1145/62116.62125},
+ doi = {http://doi.acm.org/10.1145/62116.62125},
+ acmid = {62125},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@inproceedings{LY88b,
+ author = {Li, Zhiyuan and Yew, Pen-Chung},
+ title = {Efficient interprocedural analysis for program
+                  parallelization and restructuring},
+ booktitle = {Proceedings of the ACM/SIGPLAN conference on Parallel programming: experience with applications, languages and systems},
+ series = {PPEALS '88},
+ year = {1988},
+ isbn = {0-89791-276-4},
+ location = {New Haven, Connecticut, United States},
+ pages = {85--99},
+ numpages = {15},
+ url = {http://doi.acm.org/10.1145/62115.62125},
+ doi = {http://doi.acm.org/10.1145/62115.62125},
+ acmid = {62125},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@article {LY88c,
+   author = {Li, Zhiyuan and Yew, Pen-Chung},
+   title = {Program parallelization with interprocedural analysis},
+   journal = {The Journal of Supercomputing},
+   publisher = {Springer Netherlands},
+   issn = {0920-8542},
+   keyword = {Computer Science},
+   pages = {225-244},
+   volume = {2},
+   issue = {2},
+   url = {http://dx.doi.org/10.1007/BF00128178},
+   note = {10.1007/BF00128178},
+   year = {1988}
+}
+
+@ARTICLE{Kar76,
+  author = {Karr, Michael},
+  title = {{Affine Relationships Among Variables of a Program}},
+  journal = {Acta Informatica},
+  pages = {133-151},
+ `year = {1976}  
+}
+
+@TechReport{Col93,
+  author = 	 {Collard, Jean-Fran\c{c}ois},
+  title = 	 {Code generation in automatic parallelizers},
+  institution =  {LIP-IMAG},
+  year = 	 {1993},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {93-21},
+  OPTaddress = 	 {},
+  OPTmonth = 	 {},
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@TechReport{Cha90,
+  author = 	 {Chassany, Philippe},
+  title = 	 {Les m\'ethodes de parall\'elisation interproc\'edurales},
+  institution =  {ENSMP},
+  year = 	 {1990},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {EMP-CRI-E129},
+  OPTaddress = 	 {},
+  OPTmonth = 	 sep,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@TechReport{Ber90,
+  author = 	 {Berthomier, Pierre},
+  title = 	 {Static Comparison of Different Program versions},
+  institution =  {ENSMP},
+  year = 	 {1990},
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {EMP-CRI-E130},
+  OPTaddress = 	 {},
+  OPTmonth = 	 sep,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@TechReport{BIJ91,
+  author = 	 {Baron, Bruno and Irigoin, Fran\c{c}ois and Jouvelot, Pierre},
+  title = 	 {Projet PIPS. Manuel utilisateur du
+                  pa\-ral\-l\'e\-liseur batch},
+  institution =  {ENSMP},
+  year = 	 1991,
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {EMP-CRI-E144},
+  OPTaddress = 	 {},
+  OPTmonth = 	 jan,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@TechReport{BIJ91,
+  author = 	 {Baron, Bruno},
+  title = 	 {Construction flexible et coh\'erente pour la
+                  compilation interproc\'edurale},
+  institution =  {ENSMP},
+  year = 	 1991,
+  OPTkey = 	 {},
+  OPTtype = 	 {},
+  number = 	 {EMP-CRI-E157},
+  OPTaddress = 	 {},
+  OPTmonth = 	 jul,
+  note = 	 {},
+  OPTannote = 	 {}
+}
+
+@article{Callahan:2004:ICP:989393.989412,
+ author = {Callahan, David and Cooper, Keith D. and Kennedy, Ken and
+                  Torczon, Linda},
+ title = {Interprocedural constant propagation},
+ journal = {SIGPLAN Not.},
+ volume = {39},
+ issue = {4},
+ month = {April},
+ year = {2004},
+ issn = {0362-1340},
+ pages = {155--166},
+ numpages = {12},
+ url = {http://doi.acm.org/10.1145/989393.989412},
+ doi = {http://doi.acm.org/10.1145/989393.989412},
+ acmid = {989412},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+
+@INPROCEEDINGS{CCK86,
+    author = {David Callahan and Keith D. Cooper and Ken Kennedy},
+    title = {Interprocedural constant propagation},
+    booktitle = {In Proceedings of the SIGPLAN '86 Symposium on Compiler Construction},
+    year = {1986},
+    pages = {152--161}
+}
+
+@article{AK87,
+ author = {Allen, Randy and Kennedy, Ken},
+ title = {Automatic translation of FORTRAN programs to vector form},
+ journal = {TOPLAS},
+ volume = {9},
+ issue = {4},
+ month = oct,
+ year = {1987},
+ issn = {0164-0925},
+ pages = {491--542},
+ numpages = {52},
+ url = {http://doi.acm.org/10.1145/29873.29875},
+ doi = {http://doi.acm.org/10.1145/29873.29875},
+ acmid = {29875},
+ publisher = {ACM},
+ address = {New York, NY, USA},
+} 
+

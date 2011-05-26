@@ -280,9 +280,14 @@ void clean_up_sequences_rewrite(statement s)
 	  clean_up_empty_block_removed++;
 	}
 	else {
-	  if (instruction_sequence_p(statement_instruction(st)) &&
-			  !empty_statement_p(st) && // there can be statements with only extensions
-	       ENDP(statement_declarations(st))) {
+	  if (instruction_sequence_p(statement_instruction(st))
+	      && !empty_statement_p(st)
+	      // The next two tests should be useless
+	      // The sequence can be cleaned up even when declarations
+	      // and extensions are present
+	      && ENDP(statement_declarations(st))
+	      // there can be statements with only extensions
+	      && ENDP(extensions_extension(statement_extensions(st)))) {
 	    /* A sequence without declarations in a sequence: they can be fused: */
 	    list statements = sequence_statements(instruction_sequence(statement_instruction(st)));
 	    statement first = STATEMENT(CAR(statements));
@@ -337,7 +342,8 @@ void clean_up_sequences_rewrite(statement s)
       sequence_statements(instruction_sequence(i)) = useful_sts;
 
       if (gen_length(useful_sts) == 1
-	  && ENDP(statement_declarations(s))) {
+	  && ENDP(statement_declarations(s))
+	  && ENDP(extensions_extension(statement_extensions(s)))) {
 	/* A sequence of only 1 instruction can be replaced by
 	   this instruction, if it has not declarations */
 	statement st = STATEMENT(CAR(useful_sts));

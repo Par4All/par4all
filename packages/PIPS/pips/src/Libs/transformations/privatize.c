@@ -60,6 +60,8 @@
 #include "effects-generic.h"
 #include "effects-simple.h"
 
+#include "properties.h"
+
 /* instantiation of the dependence graph */
 typedef dg_arc_label arc_label;
 typedef dg_vertex_label vertex_label;

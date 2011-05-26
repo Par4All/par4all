@@ -12,7 +12,7 @@ C  T() {}
 
       CALL RESET(BUFFER)                                                0007
 
-C  T(I,J,K,MLEN) {}
+C  T(I,J,K,MLEN) {1<=I, I<=LEN}
 
 
       DO I = 1, LEN, BUFFER_SIZE                                        0009
@@ -21,7 +21,7 @@ C  T(MLEN) {I+1023<=MLEN, LEN<=MLEN}
 
          MLEN = MAX(I+BUFFER_SIZE-1, LEN)                               0010
 
-C  T(J) {}
+C  T(J) {I<=J, J<=MLEN}
 
          DO J = I, MLEN                                                 0011
 

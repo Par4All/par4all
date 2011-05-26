@@ -1,0 +1,13 @@
+TARGET=a.out
+OBJS=$(patsubst %.c,%.o,$(filter %.c,$(SOURCES)))
+##pipsrules##
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(LDFLAGS) $(LIBS) $(OBJS) -o $(TARGET)
+
+clean: 
+	$(RM) $(OBJS)
+
+mrproper: clean
+	$(RM) $(TARGET)

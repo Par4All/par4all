@@ -159,29 +159,28 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
       LU_IND0 = 0
 99999 CONTINUE
       DO 99998 LU_IND0 = 0, 49999, 4
-         F_0 = ALPHA*SRC(LU_IND0+1)
+         F_0 = ALPHA*SRC(1+LU_IND0)
          F_1 = -ALPHA
          F_2 = F_1+1
-         F_3 = F_2*DEST(LU_IND0+1)
-         RESULT(LU_IND0+1) = F_0+F_3
-         F_0 = ALPHA*SRC(LU_IND0+2)
+         F_3 = F_2*DEST(1+LU_IND0)
+         RESULT(1+LU_IND0) = F_0+F_3
+         F_0 = ALPHA*SRC(2+LU_IND0)
          F_1 = -ALPHA
          F_2 = F_1+1
-         F_3 = F_2*DEST(LU_IND0+2)
-         RESULT(LU_IND0+2) = F_0+F_3
-         F_0 = ALPHA*SRC(LU_IND0+3)
+         F_3 = F_2*DEST(2+LU_IND0)
+         RESULT(2+LU_IND0) = F_0+F_3
+         F_0 = ALPHA*SRC(3+LU_IND0)
          F_1 = -ALPHA
          F_2 = F_1+1
-         F_3 = F_2*DEST(LU_IND0+3)
-         RESULT(LU_IND0+3) = F_0+F_3
-         F_0 = ALPHA*SRC(LU_IND0+4)
+         F_3 = F_2*DEST(3+LU_IND0)
+         RESULT(3+LU_IND0) = F_0+F_3
+         F_0 = ALPHA*SRC(4+LU_IND0)
          F_1 = -ALPHA
          F_2 = F_1+1
-         F_3 = F_2*DEST(LU_IND0+4)
-         RESULT(LU_IND0+4) = F_0+F_3
+         F_3 = F_2*DEST(4+LU_IND0)
+         RESULT(4+LU_IND0) = F_0+F_3
 99998    CONTINUE
       I = 50001
-
       END
       SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
       INTEGER*4 SIZE
@@ -215,7 +214,6 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          F_3 = F_2*DEST(LU_IND0+4)
          RESULT(LU_IND0+4) = F_0+F_3
 99998    CONTINUE
-
       END
       SUBROUTINE ALPHABLENDING(RESULT, SRC, DEST, ALPHA)
       INTEGER*4 SIZE
@@ -250,7 +248,6 @@ c      INCLUDE 'ALPHABLENDING_INC2.f'
          F_33 = F_23*DEST(LU_IND00+4)
          RESULT(LU_IND00+4) = F_03+F_33
 99998    CONTINUE
-
       END
 /* C pretty print for module ALPHABLENDING. */
 //needed include to compile the C output
@@ -273,27 +270,21 @@ alphablending (float result[50000], float src[50000], float dest[50000],
   v4sf vec110;
   v4sf vec100;
   v4sf vec80;
-  a4si pdata3;
+  a4si pdata2;
   v4sf vec70;
   v4sf vec50;
   v4sf vec30;
-  a4sf pdata0;
   v4sf vec20;
   v4sf vec10;
   v4sf vec00;
   int lu_ind00;
   float alpha = *alpha_p4a_copy;
 
-  pdata3[3] = 1;
-  pdata3[2] = 1;
-  pdata3[1] = 1;
-  pdata3[0] = 1;
-  simd_load_v4si_to_v4sf (vec70, pdata3[0]);
-  pdata0[3] = alpha;
-  pdata0[2] = alpha;
-  pdata0[1] = alpha;
-  pdata0[0] = alpha;
-  simd_load_v4sf (vec10, pdata0[0]);
+  pdata2[3] = 1;
+  pdata2[2] = 1;
+  pdata2[1] = 1;
+  pdata2[0] = 1;
+  simd_load_v4si_to_v4sf (vec70, pdata2[0]);
   ;
   for (lu_ind00 = 0; lu_ind00 <= 49999; lu_ind00 += 4)
     {
@@ -307,6 +298,5 @@ alphablending (float result[50000], float src[50000], float dest[50000],
       continue;
       simd_store_v4sf (vec110, result[(1 + lu_ind00) - 1]);
     }
-  return;
 }
 

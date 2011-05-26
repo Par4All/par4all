@@ -16,7 +16,7 @@ POINTS-TO
 //  {}
 int global01()
 {
-//  points to = {}
+//  {}
    i = &k;
 //  {(i,k,-Exact-)}
    j = i;

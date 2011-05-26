@@ -6,7 +6,7 @@ C  T(N) {N==0, 1<=N#init}
       REAL A(N)
       REAL B(1, 4)
 
-C  T(I) {1<=N}
+C  T(I) {1<=I, I<=N, 1<=N}
 
 
       DO I = 1, N                                                       0006

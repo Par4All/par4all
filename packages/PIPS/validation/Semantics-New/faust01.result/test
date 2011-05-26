@@ -47,7 +47,7 @@ void compute(int fullcount, float input[0][0], float output[1][256])
 
    float output0[256];
 
-//  T(fYec0_idx,i,index) {0<=index}
+//  T(fYec0_idx,i,index) {index+32<=fullcount, 0<=index}
 
    
    
@@ -67,7 +67,7 @@ void compute(int fullcount, float input[0][0], float output[1][256])
       
       fYec0_idx = fYec0_idx+fYec0_idx_save&1023;
 
-//  T(i) {0<=i}
+//  T(i) {i+1<=count, 0<=i}
 
 
       for(i = 0; i <= count-1; i += 1)

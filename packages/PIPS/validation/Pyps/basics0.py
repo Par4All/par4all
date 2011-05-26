@@ -2,7 +2,7 @@ from __future__ import with_statement # this is to work with python2.5
 #!/usr/bin/env python
 
 # import everything so that a session looks like tpips one
-from pyps import workspace, backendCompiler
+from pyps import workspace
 import shutil,os
 
 
@@ -26,7 +26,7 @@ with workspace("basics0.c",deleteOnClose=True) as w:
 	bar.print_code()
 	
 	# you can also preform operations on loops
-	mb.display("loops_file")
+	mb.display(rc="loops_file")
 	for l in mb.loops():
 	    l.unroll(rate=2)
 	mb.display()
@@ -51,9 +51,5 @@ with workspace("basics0.c",deleteOnClose=True) as w:
 	
 	# new feature ! save the source code somewhere, so that it can be used after
 	# the workspace is deleted
-	a_out=w.compile(backendCompiler(rep="basics0"), link=False)
+	a_out=w.compile()
 
-
-# tidy ..
-shutil.rmtree("basics0")
-os.remove("basics0.o")

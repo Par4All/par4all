@@ -68,6 +68,74 @@ Layout for memory area "sync01!:*STATIC*" of size 0:
 End of declarations for module main
 
 
+Transformers for "main"
+
+
+//  T() {0==-1}
+
+int main(void)
+{
+   //bool b = false, ok = true;
+   //int x=0, y=0;
+
+//  T(b,ok) {}
+
+   _Bool b, ok;
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T() {b==0, ok==1, x==0, y==0}
+
+   if (!(!b&&ok&&x==0&&y==0))
+
+//  T() {0==-1}
+
+
+      exit(1);
+
+//  T(b,ok,x,y) {b+x#init+y==b#init+x+y#init,
+//    b#init+ok#init+2y#init<=b+ok+2y, b#init+y#init<=b+y,
+//    ok<=ok#init, y#init<=y}
+
+   while (1) {
+
+//  T(x,y) {b+y#init==y, x+y==x#init+y#init+1, y#init<=y, y<=y#init+1}
+
+      if (b)
+
+//  T(y) {y==y#init+1}
+
+         y = y+1;
+      else
+
+//  T(x) {x==x#init+1}
+
+         x = x+1;
+
+//  T(b) {b+b#init==1, 0<=b, b<=1}
+
+      // flip-flop
+      b = !b;
+
+//  T(ok) {0<=ok, ok<=1, ok<=ok#init, 0<=ok#init, ok#init<=1}
+
+      ok = ok&&x>=y;
+
+//  T() {}
+
+      // If the previous boolean assignment is changed into
+      //if(x<y)
+      //  ok = false;
+      // the condition is found.
+      
+      // assert(ok);
+      // we want ok==1
+      fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
+   }
+}
+
 Preconditions for "main"
 
 
@@ -123,6 +191,147 @@ int main(void)
 
 //  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=x, y<=x, x<=y+1, 0<=y}
 
+      // If the previous boolean assignment is changed into
+      //if(x<y)
+      //  ok = false;
+      // the condition is found.
+      
+      // assert(ok);
+      // we want ok==1
+      fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
+   }
+}
+
+Transformers for "main" after transformer refinement
+
+
+//  T() {0==-1}
+
+int main(void)
+{
+   //bool b = false, ok = true;
+   //int x=0, y=0;
+
+//  T(b,ok) {}
+
+   _Bool b, ok;
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T() {b==0, ok==1, x==0, y==0}
+
+   if (!(!b&&ok&&x==0&&y==0))
+
+//  T() {0==-1}
+
+
+      exit(1);
+
+//  T(b,ok,x,y) {b+y==b#init+x, b+y==x, ok==1, ok#init==1, x#init==0,
+//    y#init==0, b<=b#init+x, 0<=x, y<=x, x<=y+1}
+
+   while (1) {
+
+//  T(x,y) {b+x==x#init+1, b+y#init==x#init, x#init==y, 0<=b, b<=1,
+//    b<=x#init, 0<=ok, ok<=1, 1<=ok+x#init}
+
+      if (b)
+
+//  T(y) {b==1, x==y, x==y#init+1, 0<=ok, ok<=1, 1<=ok+x, 1<=x}
+
+         y = y+1;
+      else
+
+//  T(x) {b==0, x==x#init+1, x==y+1, 0<=ok, ok<=1, 2<=ok+x, 1<=x}
+
+         x = x+1;
+
+//  T(b) {b+b#init==1, b+y==x, 0<=b, b<=1, b+1<=ok+x, 0<=ok, ok<=1,
+//    1<=x}
+
+      // flip-flop
+      b = !b;
+
+//  T(ok) {b+y==x, ok==ok#init, 0<=b, b<=1, b+1<=ok+x, 0<=ok, ok<=1,
+//    1<=x}
+
+      ok = ok&&x>=y;
+
+//  T() {b+y==x, 0<=b, b<=1, b+1<=ok+x, 0<=ok, ok<=1, 1<=x, 0<=y}
+
+      // If the previous boolean assignment is changed into
+      //if(x<y)
+      //  ok = false;
+      // the condition is found.
+      
+      // assert(ok);
+      // we want ok==1
+      fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);
+   }
+}
+
+Preconditions for "main" after transformer refinement
+
+
+//  P() {}
+
+int main(void)
+{
+   //bool b = false, ok = true;
+   //int x=0, y=0;
+
+//  P() {}
+
+   _Bool b, ok;
+
+//  P(b,ok) {}
+
+   int x, y;
+
+//  P(b,ok,x,y) {}
+
+   if (!(!b&&ok&&x==0&&y==0))
+
+//  P(b,ok,x,y) {}
+
+
+      exit(1);
+
+//  P(b,ok,x,y) {b==0, ok==1, x==0, y==0}
+
+   while (1) {
+
+//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
+
+      if (b)
+
+//  P(b,ok,x,y) {b==1, ok==1, x==y+1, 1<=x}
+
+         y = y+1;
+      else
+
+//  P(b,ok,x,y) {b==0, ok==1, x==y, 0<=x}
+
+         x = x+1;
+
+//  P(b,ok,x,y) {b+x==y+1, ok==1, 1<=x, y<=x, x<=y+1}
+
+      // flip-flop
+      b = !b;
+
+//  P(b,ok,x,y) {b+y==x, ok==1, 1<=x, y<=x, x<=y+1}
+
+      ok = ok&&x>=y;
+
+//  P(b,ok,x,y) {b+y==x, ok==1, b<=x, 1<=x, y<=x, x<=y+1}
+
+      // If the previous boolean assignment is changed into
+      //if(x<y)
+      //  ok = false;
+      // the condition is found.
+      
       // assert(ok);
       // we want ok==1
       fprintf(stdout, "b=%d ok=%d x=%d y=%d\n", b, ok, x, y);

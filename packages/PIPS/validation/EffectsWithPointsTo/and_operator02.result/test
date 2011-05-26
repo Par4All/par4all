@@ -1,14 +1,47 @@
 
+PROPER  EFFECTS 
+
+int main()
+{
+//             <    is written>: i j k l
+   int i = 0, j = 1, k = 2, l = 3;
+   _Bool b;
+   int *p, *q, *r, *s, *t;
+//             <    is written>: p
+   p = &k;
+//             <    is written>: r
+   r = &i;
+//             <    is written>: q
+   q = &j;
+//             <    is written>: s
+   s = &l;
+//             <    is read   >: q s
+//             <    is written>: b p r
+   b = (p = q)&&(r = s);
+//             <    is read   >: q s
+//             <    is written>: p r
+   if ((p = q)&&(r = s))
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: p
+      *p++;
+   else if ((p = q)||(r = s))
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: r
+      *r++;
+
+   return 0;
+}
+
 POINTS-TO
 
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int i = 0, j = 1, k = 2, l = 3;
-//  points to = {}
+//  {}
    _Bool b;
-//  points to = {}
+//  {}
    int *p, *q, *r, *s, *t;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(q,
 //   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(r,*ANY_MODULE*:*NOWHERE*_b0,

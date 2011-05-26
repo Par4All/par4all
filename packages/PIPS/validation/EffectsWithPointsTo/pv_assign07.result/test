@@ -1,0 +1,145 @@
+
+PROPER  EFFECTS 
+
+int main()
+{
+   mystruct s1, s2, *s1p, *s2p;
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: k
+   int k = 3;
+//             <    is written>: s1p
+
+   s1p = &s1;
+//             <    is written>: s2p
+   s2p = &s1;
+//             <    is written>: s1.a
+
+   s1.a = &i;
+//             <    is written>: s2.a
+   s2.a = &j;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1p s2.a
+
+   s1p->a = s2.a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s2p
+   s2p->a = &k;
+//             <    is written>: s2p
+
+   s2p = &s2;
+   return 0;
+}
+
+POINTS-TO
+
+//  {}
+int main()
+{
+//  {}
+   mystruct s1, s2, *s1p, *s2p;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   int i = 1;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   int j = 2;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   int k = 3;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+
+   s1p = &s1;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,s1,
+//   -Exact-);(s2[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,
+//   *ANY_MODULE*:*NOWHERE*_b1,-Exact-)}
+   s2p = &s1;
+//  {(s1[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s1p,s1,
+//   -Exact-);(s2[a],*ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,s1,
+//   -Exact-)}
+
+   s1.a = &i;
+//  {(s1[a],i,-Exact-);(s1p,s1,-Exact-);(s2[a],
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-);(s2p,s1,-Exact-)}
+   s2.a = &j;
+//  {(s1[a],i,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
+
+   s1p->a = s2.a;
+//  {(s1[a],j,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
+   s2p->a = &k;
+//  {(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s1,
+//   -Exact-)}
+
+   s2p = &s2;
+//  {(s1[a],k,-Exact-);(s1p,s1,-Exact-);(s2[a],j,-Exact-);(s2p,s2,
+//   -Exact-)}
+   return 0;
+}
+
+PROPER  EFFECTS WITH POINTS TO
+
+int main()
+{
+   mystruct s1, s2, *s1p, *s2p;
+//             <    is written>: i
+   int i = 1;
+//             <    is written>: j
+   int j = 2;
+//             <    is written>: k
+   int k = 3;
+//             <    is written>: s1p
+
+   s1p = &s1;
+//             <    is written>: s2p
+   s2p = &s1;
+//             <    is written>: s1.a
+
+   s1.a = &i;
+//             <    is written>: s2.a
+   s2.a = &j;
+//             <    is read   >: s1p s2.a
+//             <    is written>: s1.a
+
+   s1p->a = s2.a;
+//             <    is read   >: s2p
+//             <    is written>: s1.a
+   s2p->a = &k;
+//             <    is written>: s2p
+
+   s2p = &s2;
+   return 0;
+}
+
+ *********************** Use-Def Chains *********************
+
+	20 --> 22 with conflicts
+		from <s2p-R-EXACT> to <s2p-W-EXACT>
+	19 --> 20 with conflicts
+		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
+	17 --> 19 with conflicts
+		from <s2.a-W-EXACT> to <s2.a-R-EXACT>
+	16 --> 20 with conflicts
+		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
+	16 --> 19 with conflicts
+		from <s1.a-W-EXACT> to <s1.a-W-EXACT>
+	14 --> 22 with conflicts
+		from <s2p-W-EXACT> to <s2p-W-EXACT>
+	14 --> 20 with conflicts
+		from <s2p-W-EXACT> to <s2p-R-EXACT>
+	13 --> 19 with conflicts
+		from <s1p-W-EXACT> to <s1p-R-EXACT>
+
+****************** End of Dependence Graph ******************

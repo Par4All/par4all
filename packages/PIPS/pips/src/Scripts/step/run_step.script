@@ -29,20 +29,23 @@ usage()
 
 	OPTIONS:
             -i file: include file
-	    -g generated: genereted source files path
+	    -g generatedpath: path of the generated source files
 	    -c: clean database
 	    -f: if destination exist force remove
-            -s file: stubs files for pips analysis (file.stubs.f file.fix file.f)
-            -d destination: destination directory
+            -s file: name of stubs files (without the extension suffix)
+            -d destinationpath: path of PIPS database
             -v: verbose
-            -t transformation: default transformation OMP,MPI or HYBRID (default OMP)
+            -t transformation: default transformation OMP, MPI or HYBRID (default HYBRID)
+            -u: un-optimized communications (no partial communications)
 
 	END
   exit ${1:-1}
 }
 
+OPTIMIZED=TRUE
+
 # options
-while getopts i:g:cfs:d:vt:r: OPT
+while getopts i:g:cfs:d:vt:r:u OPT
 do
   case $OPT in
     i) INCLUDE=$OPTARG;;
@@ -54,6 +57,7 @@ do
     v) VERBOSE="verbose";;
     t) TRANSFORMATION=$OPTARG;;
     r) RUNTIME=$OPTARG;;
+    u) OPTIMIZED=FALSE;;
     *) usage 4
   esac
 done
@@ -157,10 +161,19 @@ create $workspace $source_files
 activate MUST_REGIONS
 activate INTRAPROCEDURAL_SUMMARY_PRECONDITION
 activate TRANSFORMERS_INTER_FULL
+
+setproperty CHAINS_DATAFLOW_DEPENDENCE_ONLY FALSE
+activate REGION_CHAINS
+
+setproperty COMPUTE_ALL_DEPENDENCES TRUE
+activate RICE_REGIONS_DEPENDENCE_GRAPH
+
 setproperty STEP_DEFAULT_TRANSFORMATION "$TRANSFORMATION"
 $RUNTIME
 apply STEP_DIRECTIVES[%ALL]
 apply STEP_ANALYSE[%ALL]
+apply STEP_ANALYSE_COM2[%MAIN]
+setproperty STEP_OPTIMIZED_COMMUNICATIONS $OPTIMIZED
 apply STEP_COMPILE[%MAIN]
 setproperty STEP_INSTALL_PATH "$PATH_GENERATED_FILE"
 apply STEP_INSTALL

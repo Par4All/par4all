@@ -47,8 +47,6 @@
 #include "effects-simple.h"
 #include "properties.h"
 
-#include "expressions.h"
-
 #include "sac.h"
 #include "ricedg.h"
 

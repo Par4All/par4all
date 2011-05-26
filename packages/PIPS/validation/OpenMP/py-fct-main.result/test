@@ -1,3 +1,6 @@
+//
+// Code after openmp for module fct_lib
+//
 void fct_lib(const long int size, t_real x[size])
 {
    long int i;
@@ -8,6 +11,9 @@ void fct_lib(const long int size, t_real x[size])
       x[i] = x[i-1]+x[i]+x[i+1];
    return;
 }
+//
+// Code after openmp for module main
+//
 int main()
 {
    long int i;

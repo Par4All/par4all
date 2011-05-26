@@ -1,0 +1,20 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+
+delete linearize_indices01
+create linearize_indices01 linearize_indices01.c
+
+apply LOOP_NORMALIZE[%ALLFUNC]
+apply PRIVATIZE_MODULE[%ALLFUNC]
+
+setproperty CONSTANT_PATH_EFFECTS FALSE
+
+setproperty POCC_COMPATIBILITY TRUE
+
+
+apply POCC_PRETTYPRINTER [main]
+display PRINTED_FILE[main]
+apply STATIC_CONTROLIZE[main]
+
+
+close
+

@@ -144,8 +144,8 @@ void init_make_cache(void)
 
 void reinit_make_cache_if_necessary(void)
 {
-    if (!set_undefined_p(up_to_date_resources))
-	reset_make_cache(), init_make_cache();
+  if (!set_undefined_p(up_to_date_resources))
+    reset_make_cache(), init_make_cache();
 }
 
 /* Static variables used by phases must be reset on error although
@@ -171,7 +171,7 @@ void reset_static_phase_variables()
     DECLARE_ERROR_HANDLER(proper_effects_error_handler);
 
     /* Error handlers for the transformation library */
-    DECLARE_ERROR_HANDLER(use_def_elimination_error_handler);
+    DECLARE_ERROR_HANDLER(dead_code_elimination_error_handler);
     DECLARE_ERROR_HANDLER(simple_atomize_error_handler);
     DECLARE_ERROR_HANDLER(clone_error_handler);
     DECLARE_ERROR_HANDLER(array_privatization_error_handler);
@@ -189,9 +189,9 @@ void reset_static_phase_variables()
 /* FI: uncomment if rmake no longer needed in callgraph.c */
 /* static bool rmake(string, string); */
 
-#define add_res(vrn, on)					\
-  result = CONS(REAL_RESOURCE, \
-		make_real_resource(strdup(vrn), strdup(on)), result);
+#define add_res(vrn, on)                                              \
+  result = CONS(REAL_RESOURCE,                                        \
+                make_real_resource(strdup(vrn), strdup(on)), result);
 
 /* Logically, this should be implemented in preprocessor, but the
    preprocessor library is at a upper level than the pipsmake
@@ -213,11 +213,13 @@ string compilation_unit_of_module(const char* module_name)
 
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
   if(db_resource_p(DBR_USER_FILE, module_name)) {
-    string source_file_name = db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
+    string source_file_name =
+      db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
     string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
-    /* It is not clear how robust it is going to be when file name conflicts occur. */
-    asprintf(&compilation_unit_name,"%s" FILE_SEP_STRING,simpler_file_name);
+    /* It is not clear how robust it is going to be when file name conflicts
+       occur. */
+    asprintf(&compilation_unit_name, "%s" FILE_SEP_STRING, simpler_file_name);
     free(simpler_file_name);
   }
 
@@ -367,25 +369,25 @@ static list build_real_resources(const char* oname, list lvr)
 	    string compilation_unit_name = compilation_unit_of_module(oname);
 
 	    if(string_undefined_p(compilation_unit_name)) {
-	      /* Source code for module oname is not available */
-	      if(compilation_unit_p(oname)) {
-		/* The user can make typos in tpips scripts about
-		   compilation unit names */
-		/* pips_internal_error("Synthetic compilation units cannot be missing"
-				    " because they are synthesized"
-				    " with the corresponding file\n",
-				    oname);
-		*/
-		pips_user_error("No source code for compilation unit \"%s\"\n."
-				"Compilation units cannot be synthesized.\n",
-				oname);
-	      }
-	      pips_user_warning("No source code for module %s.\n", oname);
-	      compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));
-	    }
-
-	    add_res(vrn, compilation_unit_name);
-	    free(compilation_unit_name);
+        /* Source code for module oname is not available */
+        if(compilation_unit_p(oname)) {
+          /* The user can make typos in tpips scripts about compilation unit names */
+          /* pips_internal_error("Synthetic compilation units cannot be missing"
+                                 " because they are synthesized"
+                                 " with the corresponding file\n",
+                                 oname);
+           */
+          pips_user_error("No source code for compilation unit \"%s\"\n."
+                          "Compilation units cannot be synthesized.\n",
+                          oname);
+        }
+        pips_user_warning("No source code for module %s.\n", oname);
+        // this is a really bad hack !
+        // compilation_unit_name = strdup(concatenate(oname, FILE_SEP_STRING, NULL));
+      } else {
+        add_res(vrn, compilation_unit_name);
+        free(compilation_unit_name);
+      }
 	    break;
 	  }
 
@@ -395,6 +397,36 @@ static list build_real_resources(const char* oname, list lvr)
     }
 
     return gen_nreverse(result);
+}
+
+/* touch the resource if it exits
+ * this is currently an experimental and partial implementation
+ */
+static void preserve_virtual_resource(const char * oname, virtual_resource vr)
+{
+  switch (owner_tag(virtual_resource_owner(vr)))
+  {
+  case is_owner_module:
+    // touch only available resources
+    if (db_resource_p(virtual_resource_name(vr), oname))
+      db_touch_resource(virtual_resource_name(vr), oname);
+    // ??? we should now touch the transitive closure of dependent resources
+    // forall all resources in the database
+    //   if it is up to date because the resource is either preserved
+    //     or up to date, then touch it, otherwise delete it?
+    // the problem is linked to the lazyness of pipsmake which keeps
+    // obsolete resources if no one asks about them.
+    break;
+  case is_owner_program:
+  case is_owner_main:
+  case is_owner_callees:
+  case is_owner_callers:
+  case is_owner_all:
+  case is_owner_select:
+  case is_owner_compilation_unit:
+  default:
+    pips_internal_error("not implemented");
+  }
 }
 
 static void update_preserved_resources(const char* oname, rule ru)
@@ -408,25 +440,36 @@ static void update_preserved_resources(const char* oname, rule ru)
     reals = build_real_resources(oname, rule_modified(ru));
 
     /* we delete them from the uptodate set */
-    MAP(REAL_RESOURCE, rr, {
-	string rron = real_resource_owner_name(rr);
-	string rrrn = real_resource_resource_name(rr);
+    FOREACH(real_resource, rr, reals)
+    {
+      string rron = real_resource_owner_name(rr);
+      string rrrn = real_resource_resource_name(rr);
 
-	/* is it up to date ? */
-	if(set_belong_p(up_to_date_resources, (char *) rr))
-	{
-	    pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
-		       rrrn, rron);
-	    set_del_element (up_to_date_resources,
-			     up_to_date_resources,
-			     (char *) rr);
-	    /* GO 11/7/95: we need to del the resource from the data base
-	       for a next call of pipsmake to find it unavailable */
-	    db_unput_a_resource (rrrn, rron);
-	}
-    }, reals);
+      /* is it up to date ? */
+      if(set_belong_p(up_to_date_resources, (char *) rr))
+      {
+        pips_debug(3, "resource %s(%s) deleted from up_to_date\n",
+                   rrrn, rron);
+        set_del_element (up_to_date_resources,
+                         up_to_date_resources,
+                         (char *) rr);
+        /* GO 11/7/95: we need to del the resource from the data base
+           for a next call of pipsmake to find it unavailable */
+        db_unput_a_resource (rrrn, rron);
+      }
+    }
 
     gen_full_free_list (reals);
+
+    /* handle resources that are marked as "preserved", with "="
+     */
+    FOREACH(virtual_resource, vr, rule_preserved(ru))
+      preserve_virtual_resource(oname, vr);
+
+    /* We increment the logical time again... (kept by pipsdbm)
+     * this seems necessary??? BC & FC
+     */
+    db_inc_logical_time();
 }
 
 static bool apply_a_rule(const char* oname, rule ru)

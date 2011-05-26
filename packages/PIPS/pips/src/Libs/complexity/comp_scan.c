@@ -295,7 +295,7 @@ list effects_list;
 	comp = loop_to_complexity(instruction_loop(instr), precond, effects_list);
 	break;
     case is_instruction_whileloop:
-    comp= whileloop_to_complexity(instruction_whileloop(instr), precond, effects_list);
+        comp= whileloop_to_complexity(instruction_whileloop(instr), precond, effects_list);
 	break;
     case is_instruction_goto:
 	comp = goto_to_complexity(instruction_goto(instr), precond, effects_list);
@@ -707,9 +707,9 @@ complexity whileloop_to_complexity(whileloop while_instr, transformer precond, l
         complexity_fprint(stderr, ctest, FALSE, TRUE);
     }
 
-    complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
-    complexity_add(&cbody,ctest);
-    complexity_mult(&cbody,range);
+     complexity range = make_complexity_unknown(UNKNOWN_RANGE_NAME);
+     complexity_add(&cbody,ctest);
+     complexity_mult(&cbody,range);
 
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "YYY  while total complexity: ");
@@ -892,7 +892,13 @@ list effects_list;
     cast c = syntax_cast(s);
     /* A cost for casting could be added, although casting is mostly
        used for typing issue. However, (float) 2 has a cost.  */
+	/* TypeCast operation added by Molka Becher to complexity_cost_tables 
+	   for handling the cost of cast when it is necessary, 24 March 2011 */
+    basic ib = MAKE_INT_BASIC;
     comp = expression_to_complexity(cast_expression(c), pbasic, precond, effects_list);
+    complexity c1 = make_constant_complexity((float)intrinsic_cost(TYPE_CAST_COST, &ib));
+    complexity_add(&comp, c1);
+    complexity_rm(&c1);
     break;
   }
   case is_syntax_sizeofexpression: {

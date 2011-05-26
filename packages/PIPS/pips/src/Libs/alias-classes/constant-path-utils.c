@@ -175,16 +175,19 @@ set points_to_anywhere_typed(list lhs_list, set input)
 
       /* create a new points to with as source the current
 	 element of lhs_set and sink the null value .*/
-      entity e =entity_all_xxx_locations_typed(ANYWHERE_LOCATION,
-					       cell_reference_to_type(cell_reference(c)));
-      reference r = make_reference(e, NIL);
-      cell sink = make_cell_reference(r);
-      points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
-      set_add_element(gen, gen, (void*)pt_to);
+    reference cr = cell_to_reference(c);
+    entity er = reference_variable(cr);
+    type t = entity_type(er);
+    entity e = entity_all_xxx_locations_typed(ANYWHERE_LOCATION,t);
+					     /* cell_reference_to_type(cell_reference(c) )); */
+    reference r = make_reference(e, NIL);
+    cell sink = make_cell_reference(r);
+    points_to pt_to = make_points_to(c, sink, a, make_descriptor_none());
+    set_add_element(gen, gen, (void*)pt_to);
     }
   /* gen + input_kill_diff*/
   set_union(res, gen, input_kill_diff);
-
+  
   return res;
 }
 
@@ -706,6 +709,7 @@ bool opkill_must_vreference(cell c1, cell c2)
 	  int i1 = expression_to_int(se1);
 	  int i2 = expression_to_int(se2);
 	  i = i2>i1? 1 : (i2<i1? -1 : 0);
+	}
 	  if(i==0){
 	    string s1 = words_to_string(words_expression(se1, NIL));
 	    string s2 = words_to_string(words_expression(se2, NIL));
@@ -713,7 +717,6 @@ bool opkill_must_vreference(cell c1, cell c2)
 	}
       }
     }
-  }
 
   return (i==0? true: false);
 }
@@ -753,8 +756,14 @@ bool opkill_must_constant_path(cell c1, cell c2)
   bool type_equal_p = true;
 
   if(! type_area_p(entity_type(v1)) && !type_area_p(entity_type(v2))){
-    t1 = simple_effect_reference_type(r1);
-    t2 = simple_effect_reference_type(r2);
+    if(entity_abstract_location_p(v1))
+      t1 = entity_type(v1);
+    else
+      t1 = simple_effect_reference_type(r1);
+    if(entity_abstract_location_p(v2))
+      t2 = entity_type(v2);
+    else
+      t2 = simple_effect_reference_type(r2);
     type_equal_p = opkill_must_type(t1,t2);
   }
   kill_must_p =opkill_must_module(c1,c2) && opkill_must_name(c1,c2) &&

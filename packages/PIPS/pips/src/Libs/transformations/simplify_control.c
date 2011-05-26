@@ -303,7 +303,7 @@ remove_loop_statement(statement s, instruction i, loop l)
 				       copy_expression(init_val),
 				       copy_expression(rincr));
   expression index;
-  statement as;
+  statement as1,as2;
 
   /* Assume here that index is a scalar variable... :-) */
   pips_assert("dead_statement_filter", entity_scalar_p(loop_index(l)));
@@ -311,14 +311,18 @@ remove_loop_statement(statement s, instruction i, loop l)
   index = make_factor_expression(1, loop_index(l));
   statement_instruction(s) =
       make_instruction_block(
-              make_statement_list(as = make_assign_statement(index, init_val),
+              make_statement_list(as1 = make_assign_statement(index, init_val),
 				  loop_body(l),
-				  make_assign_statement(copy_expression(index),
+				  as2=make_assign_statement(copy_expression(index),
 							last_val))
 			     );
-  statement_label(as) = statement_label(s);
+  statement_label(as1) = statement_label(s);
   statement_label(s) = entity_empty_label();
   fix_sequence_statement_attributes(s);
+  
+  /* fix some extra attributes */
+  store_cumulated_rw_effects_list(as1,gen_full_copy_list(load_cumulated_rw_effects_list(s)));
+  store_cumulated_rw_effects_list(as2,gen_full_copy_list(load_cumulated_rw_effects_list(s)));
 
   stdebug(4, "remove_loop_statement", s);
 

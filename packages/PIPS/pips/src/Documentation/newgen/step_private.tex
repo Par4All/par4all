@@ -44,18 +44,22 @@
 {}
 \domain{clause = reduction:map_entity_string  + private:entity* + transformation:int}
 {}
-\domain{type_directive = omp_parallel_do:loop_data* + omp_end_parallel_do:unit + omp_parallel:unit + omp_end_parallel:unit + omp_do:loop_data* + omp_end_do:unit + omp_parallel_sections:statement* + omp_end_parallel_sections: unit + omp_sections:statement* + omp_end_sections:unit + omp_section:unit + omp_master:unit + omp_end_master:unit + omp_barrier:unit + none:unit}
+\domain{type_directive = omp_parallel_do:loop_data* + omp_end_parallel_do:unit + omp_parallel:unit + omp_end_parallel:unit + omp_do:loop_data* + omp_end_do:unit + omp_parallel_sections:statement* + omp_end_parallel_sections: unit + omp_sections:statement* + omp_end_sections:unit + omp_section:unit + omp_master:unit + omp_end_master:unit + omp_critical:unit + omp_end_critical:unit + omp_barrier:unit + none:unit}
 {}
 \domain{loop_data = index:entity x lower:entity x upper:entity x step:int}
 {}
 
 \domain{map_entity_step_analyses = entity->step_analyses}
 {}
-\domain{step_analyses = recv: effect* x send:effect* x interlaced:effect* x used:effect*}
+\domain{step_analyses = recv: effect* x send:effect* x interlaced:entity* x used:effect* x optimizable:map_entity_bool}
+{}
+
+\domain{step_comm_entities = real:entity x formal:entity}
+{}
+\domain{step_analyses_com = recv: step_comm_entities* x send: step_comm_entities*}
 {}
 
 \domain{step_status = compiled: entity* x generated: entity *}
 {}
-\domain{step_atomized = entity->expression}
-{}
+
 \end{document}

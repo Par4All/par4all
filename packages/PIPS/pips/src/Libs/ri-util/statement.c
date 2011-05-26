@@ -2358,9 +2358,30 @@ string generated_variable_comment(entity e)
 
 
 
-/* Declarations are not only lists of entities, but also statement to
-   carry the line number, comments,... For the time begin, a
-   declaration statement is a continue statement. */
+/* Add a new declaration statement
+ *
+ * Declarations are not only lists of entities at the block level and
+ * in the symbol table, but also declaration statement to
+ * carry the line number, comments, and the declarations local to the
+ * declaration statement. This function is low-level and does not
+ * maintain the consistency of the PIPS internal representation.
+ *
+ * @param s Statement s must be a sequence. A new declaration statement is
+ * generated to declare e. This statement is inserted after the
+ * existing declaration statements in s, or, if no declaration statement
+ * is present, at the beginning of the sequence in s.
+ *
+ * @param e Variable to declare.
+ * The declaration of e at s level is not checked. The existence of a
+ * previous declaration statement for e is not checked either. The
+ * caller is responsible for the consistency management between the
+ * declaration statements in s and the list of declaration at s level.
+ *
+ * @return statement s modified by side-effects.
+ *
+ * For the time being, a declaration statement is a continue
+ * statement.
+ */
 statement add_declaration_statement(statement s, entity e)
 {
     if(statement_block_p(s)) {
@@ -2435,6 +2456,7 @@ void fix_block_statement_declarations(statement s)
   list bdvl = gen_copy_seq(statement_declarations(s)); // block declarations
 
   pips_assert("s is a block statement", statement_block_p(s));
+  pips_assert("No multiple declarations in declarations of s", gen_once_p(bdvl));
 
   if(!ENDP(bdvl)) {
     list sl = statement_block(s);
@@ -2733,17 +2755,62 @@ list statements_to_declarations(list sl)
         dl=gen_nconc(dl,statement_to_declarations(st));
     return dl;
 }
-
-/* Returns the declarations contained directly in a list of statement. */
-list statements_to_direct_declarations(list sl)
+
+list statement_to_direct_declarations(statement st)
 {
-    list  dl = NIL;
-    FOREACH(STATEMENT,st,sl)
-      if(declaration_statement_p(st))
-	dl=gen_nconc(dl,gen_copy_seq(statement_declarations(st)));
-    return dl;
+  list sdl = NIL;
+
+  if(declaration_statement_p(st))
+    sdl = gen_copy_seq(statement_declarations(st));
+  else if(statement_unstructured_p(st)) {
+    unstructured u = statement_unstructured(st);
+    sdl = unstructured_to_direct_declarations(u);
+  }
+  return sdl;
 }
 
+list unstructured_to_direct_declarations(unstructured u)
+{
+  list blocks = NIL; // list of statements
+  control c_in = unstructured_control(u); // entry point of u
+  list dl = NIL; // declaration list
+
+  CONTROL_MAP(c,
+	      {
+		statement s = control_statement(c);
+		list sdl = statement_to_direct_declarations(s);
+		dl = gen_nconc(dl, sdl);
+	      },
+	      c_in,
+	      blocks);
+
+  gen_free_list(blocks);
+  return dl;
+}
+
+/* Returns the declarations contained directly in the declaration
+   statements of a list of statement.
+
+   @param sl
+   List of statements
+
+   @return a newly allocated list of entities appearing the statement
+   declarations of the list. No recursive descent in loops or tests
+   because only variables of the current scope are returned. Recursive
+   descent in unstructured statements because their statements are in
+   the same scope as the statements in list sl
+*/
+list statements_to_direct_declarations(list sl)
+{
+  list  dl = NIL;
+  FOREACH(STATEMENT,st,sl) {
+    list sdl = statement_to_direct_declarations(st);
+    dl = gen_nconc(dl, sdl);
+  }
+
+  return dl;
+}
+
 
 /************************************************************ STAT VARIABLES */
 
@@ -3458,19 +3525,22 @@ void statement_remove_extensions(statement s) {
  */
 void statement_remove_useless_label(statement s)
 {
-  instruction i = statement_instruction(s);
-  if(!instruction_unstructured_p(i) &&
-        c_module_p(get_current_module_entity())
-     ) {
-    if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
-      /* SG should free_entity ? */
-      statement_label(s)=entity_empty_label();
+    instruction i = statement_instruction(s);
+    if(!instruction_unstructured_p(i) &&
+            c_module_p(get_current_module_entity())
+      ) {
+        // under pyps, do not remove loop label like this */
+        if(!(get_bool_property("PYPS") && instruction_loop_p(i))) {
+            if( !entity_empty_label_p( statement_label(s)) && !fortran_return_statement_p(s) ) {
+                /* SG should free_entity ? */
+                statement_label(s)=entity_empty_label();
 
-      /* OK but guarded by previous test */
-      if( instruction_loop_p(i) )
-	loop_label(instruction_loop(i))=entity_empty_label();
-      if( instruction_whileloop_p(i) )
-	whileloop_label(instruction_whileloop(i))=entity_empty_label();
+                /* OK but guarded by previous test */
+                if( instruction_loop_p(i) )
+                    loop_label(instruction_loop(i))=entity_empty_label();
+                if( instruction_whileloop_p(i) )
+                    whileloop_label(instruction_whileloop(i))=entity_empty_label();
+            }
+        }
     }
-  }
 }

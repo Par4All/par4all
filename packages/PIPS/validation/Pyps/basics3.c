@@ -1,0 +1,19 @@
+#include <stdio.h>
+main
+(
+)
+{
+puts
+(
+"h"
+"e"
+"l"
+"l"
+"o"
+"\n"
+)
+;
+return
+0
+;
+}

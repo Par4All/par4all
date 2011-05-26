@@ -9,7 +9,7 @@ C  T() {}
       INTEGER*1 BI
       INTEGER*1 CI
 
-C  T(BI,CI,I) {}
+C  T(BI,CI,I) {0<=I, I<=199}
 
 
       DO 20 I = 0, 199                                                  0009

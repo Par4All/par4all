@@ -31,7 +31,7 @@ POINTS-TO
 //  {}
 int main()
 {
-//  points to = {}
+//  {}
    int *p;
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
    int a;
@@ -42,12 +42,12 @@ int main()
    else
 //  {(p,*ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
       p = (int *) malloc(3*sizeof(int));
-//  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
    p[0] = 0;
-//  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
    p[1] = 1;
-//  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
    free(p);
-//  {(p,*HEAP*_l_10,-MAY-);(p,*HEAP*_l_8,-MAY-)}
+//  {(p,*HEAP*_l_8[0],-MAY-);(p,*HEAP*_l_10[0],-MAY-)}
    return 0;
 }

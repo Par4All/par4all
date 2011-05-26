@@ -105,7 +105,7 @@ int struct02()
 
    int i = 0;
 
-//  T(i) {i#init==0, 0<=i}
+//  T(i) {i#init==0, 0<=i, i<=9}
 
 
    for(i = 0; i <= 9; i += 1)
