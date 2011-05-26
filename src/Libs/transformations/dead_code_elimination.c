@@ -571,12 +571,12 @@ static void remove_this_statement_if_useless(statement s, set entities_to_remove
       *  cleaner than keeping empty statement when there's not label or comment
       */
      if(statement_block_p(s)) {
-       pips_debug(0,"Checking sequence\n");
+       pips_debug(6,"Checking sequence\n");
        list statement_to_remove = NIL;
        FOREACH(statement,st,statement_block(s)) {
          if (! set_belong_p(the_useful_statements, (char *) st)
              && empty_statement_or_continue_without_comment_p(st) ) {
-           pips_debug(0,"Register %p to be removed\n",st);
+           pips_debug(4,"Register %p to be removed\n",st);
            statement_to_remove = CONS(STATEMENT,st,statement_to_remove);
          }
        }
@@ -624,6 +624,10 @@ remove_all_the_non_marked_statements(statement s)
 }
 
 
+/**
+ * Caution : callees may be changed and should be updated for the module
+ * owning this statement !
+ */
 static void
 dead_code_elimination_on_a_statement(statement s)
 {
@@ -743,6 +747,11 @@ bool dead_code_elimination_on_module(char * module_name)
    debug_off();
 
    DB_PUT_MEMORY_RESOURCE(DBR_CODE, module_name, module_statement);
+
+   // We may have removed some function call, thus recompute the callees
+   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, module_name,
+        compute_callees(get_current_module_statement()));
+
 
    reset_proper_rw_effects();
    reset_cumulated_rw_effects();
