@@ -23,6 +23,7 @@
 # TODO
 # - check documentation generation?
 #   I recall that latex errors are ignored in nlpmake.
+# - keep out/err on errors?
 #
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
@@ -49,7 +50,7 @@ vname=
 build=compile
 try=2
 
-# get options
+# get options manually
 while [[ $1 == -* ]]
 do
   case $1 in
@@ -111,6 +112,7 @@ do
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
         "  -t len: trace length on compilation error\n" \
+        "  --try n: possibly retry svn up, default is twice\n" \
 	"  -v name: validation name\n" \
         "  -vo opt: validation make option, can be repeated for more\n" \
 	"  -w: wait for lock\n"
