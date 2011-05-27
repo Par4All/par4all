@@ -49,6 +49,9 @@ class ValidationClass:
 		#check that .result and reference of the test are present. If not, status is "skipped" 
 		if (os.path.isdir(test_result_path) != True or (os.path.isfile(test_ref_path) != True and os.path.isfile(test_ref_path+'.'+self.arch) != True)):
 			status ='skipped'
+
+		elif (os.path.isfile(test_name_path+".bug") or os.path.isfile(test_name_path+".later")):
+			status ='bug-later'
 		else:
 			# output of the test and error of the tests
 			output_file_path = test_result_path+'/'+os.path.basename(test_name_path)+'.out'
@@ -174,16 +177,22 @@ class ValidationClass:
 					#status of the test
 					status = 'succeeded'
 
-		# Si status failed and no .bug or .later file in test folder, do not write results in summary
-		if ((status != 'succeeded') and (os.path.isfile(test_name_path+".bug") or os.path.isfile(test_name_path+".later"))):
-			self.file_result.close()
-		else: 
-			self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
-			self.file_result.close()
+		# Write status	
+		self.file_result.write ('%s: %s/%s%s\n' % (status,os.path.basename(directory_test_path),os.path.basename(test_name_path),extension_file))
+		self.file_result.close()
 	
 		# Return to validation Par4All
 		os.chdir(self.p4a_root)
 		return status
+
+###### Number of failed/succeeded ########
+  def count_failed_suc(self,status,nb_warning,nb_failed):
+	if (status != 'bug-later'):
+		if (status == "skipped"):
+          	  nb_warning = nb_warning+1
+         	elif (status != "succeeded"):
+          	  nb_failed = nb_failed+1
+        return (nb_warning,nb_failed)
 
 ###### Validate only test what we want ######
   def valid_par4all(self):
@@ -230,10 +239,7 @@ class ValidationClass:
 					# Run test
 					nb_test = nb_test+1
 					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt',ext)
-					if (status == "skipped"):
-						nb_warning = nb_warning+1
-					elif (status != "succeeded"):
-						nb_failed = nb_failed+1
+					(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
 				else:
 					print ('%s not accessible' % (directory_test))
 			else:
@@ -274,10 +280,7 @@ class ValidationClass:
 							nb_test = nb_test+1
 							file_tested = directory_test + '/' + file_test
 							status = self.test_par4all(directory_test, file_tested,'pips_log.txt',ext)
-							if (status == "skipped"):
-								nb_warning = nb_warning+1
-							elif (status != "succeeded"):
-								nb_failed = nb_failed+1
+							(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
 
 		print('%s failed and %s warning (skipped) in %s tests.'%(nb_failed,nb_warning,nb_test))
 		default_file.close()
@@ -375,10 +378,7 @@ class ValidationClass:
 						file_tested = directory_test + '/' + file_test
 						print (file_tested)
 						status = self.test_par4all(directory_test, file_tested,'directory_log.txt',ext)
-						if (status == "skipped"):
-							nb_warning = nb_warning+1
-						elif (status != "succeeded"):
-							nb_failed = nb_failed+1
+						(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
 
 		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
 
