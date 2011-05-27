@@ -139,6 +139,18 @@ static void merge_on_outer (list l_outer) {
     // collect the pragma
     gen_context_recurse  (stmt, &l_pragma, extensions_domain, gen_true, build_pragma_list);
     list l_expr = pragma_omp_merge_expr (l_pragma);
+
+    // We have to removed locally declared variables from the pragma clause,
+    // else generated code won't compile !
+    list locally_decls = statement_to_declarations(stmt);
+    ifdebug(4) {
+      pips_debug(4,"Filter out local variables from pragma : ");
+      print_entities(locally_decls);
+      fprintf(stderr,"\n");
+    }
+    l_expr= filter_variables_in_pragma_expr(l_expr,locally_decls);
+
+    // The pragma can now be added to the statement
     add_pragma_expr_to_statement (stmt, l_expr);
     gen_free_list (l_pragma);
   }
