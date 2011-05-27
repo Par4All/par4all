@@ -747,8 +747,8 @@ static void copy_to_statement(statement st) {
 static void transfert_statement(statement st,
                                 set already_transfered_to,
                                 set already_transfered_from,
-                                set stmt_to_insert_after,
-                                set stmt_to_insert_before);
+                                set array_to_transfer_to_after,
+                                set array_to_transfer_from_before);
 
 static void transfert_block(statement st,
                             list sts,
@@ -765,6 +765,8 @@ static void transfert_block(statement st,
   for (list current = (sts); !ENDP(current); POP(current)) {
     statement one = STATEMENT(CAR(current));
 
+    // These are here to record what a statement require to transfer
+    // We generate transfers only in sequence
     set transfert_to = MAKE_SET();
     set transfert_from = MAKE_SET();
 
@@ -774,19 +776,22 @@ static void transfert_block(statement st,
                         already_transfered_from,
                         transfert_to,
                         transfert_from);
-    pips_debug(0,"t_to len : %d\n",set_size(transfert_to));
-    SET_FOREACH(statement, new_st_from, transfert_from) {
-      printf("INSERT STATEMENT !!\n");
+    // Really insert the transfers statement
+    list t_from = set_to_sorted_list(transfert_from,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e_from, t_from) {
+      statement new_st_from = make_dma_transfert(e_from, dma_store);
       CDR(current) = CONS(statement,one,CDR(current));
       CAR(current).e = new_st_from;
       POP(current);
     }
-    SET_FOREACH(statement, new_st_to, transfert_to)
-    {
-      pips_debug(0,"INSERT STATEMENT !!\n");
+    gen_free_list(t_from);
+    list t_to = set_to_sorted_list(transfert_to,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e_to, t_to) {
+      statement new_st_to = make_dma_transfert(e_to, dma_load);
       CDR(current) = CONS(statement,new_st_to,CDR(current));
       POP(current);
     }
+    gen_free_list(t_to);
   }
   /*
    HASH_MAP(st, st_tr_to,
@@ -908,8 +913,8 @@ static void transfert_unstructured(statement st,
 static void transfert_statement(statement st,
                                 set already_transfered_to,
                                 set already_transfered_from,
-                                set stmt_to_insert_after,
-                                set stmt_to_insert_before) {
+                                set array_to_transfer_to_after,
+                                set array_to_transfer_from_before) {
 
   instruction i = statement_instruction( st );
 
@@ -920,8 +925,7 @@ static void transfert_statement(statement st,
 
   SET_FOREACH(entity, e, transferts_to) {
     set_add_element(already_transfered_to, already_transfered_to, e);
-    statement new_one = make_dma_transfert(e, dma_load);
-    set_add_element(stmt_to_insert_after, stmt_to_insert_after, new_one);
+    set_add_element(array_to_transfer_to_after, array_to_transfer_to_after, e);
 
     ifdebug(2) {
       string str = strdup(concatenate("Transfert to accel : ",
@@ -943,9 +947,9 @@ static void transfert_statement(statement st,
     SET_FOREACH(entity, e, transferts_from)
     {
       set_add_element(already_transfered_from, already_transfered_from, e);
-      set_add_element(stmt_to_insert_before,
-                      stmt_to_insert_before,
-                      make_dma_transfert(e, dma_store));
+      set_add_element(array_to_transfer_from_before,
+                      array_to_transfer_from_before,
+                      e);
       ifdebug(2) {
         string str = strdup(concatenate("Transfert from accel : ",
                                         entity_local_name(e),
@@ -971,32 +975,32 @@ static void transfert_statement(statement st,
                      instruction_test( i ),
                      already_transfered_to,
                      already_transfered_from,
-                     stmt_to_insert_after,
-                     stmt_to_insert_before);
+                     array_to_transfer_to_after,
+                     array_to_transfer_from_before);
       break;
     case is_instruction_loop:
       transfert_loop(st,
                      instruction_loop( i ),
                      already_transfered_to,
                      already_transfered_from,
-                     stmt_to_insert_after,
-                     stmt_to_insert_before);
+                     array_to_transfer_to_after,
+                     array_to_transfer_from_before);
       break;
     case is_instruction_whileloop:
       transfert_whileloop(st,
                           instruction_whileloop( i ),
                           already_transfered_to,
                           already_transfered_from,
-                          stmt_to_insert_after,
-                          stmt_to_insert_before);
+                          array_to_transfer_to_after,
+                          array_to_transfer_from_before);
       break;
     case is_instruction_forloop:
       transfert_forloop(st,
                         instruction_forloop( i ),
                         already_transfered_to,
                         already_transfered_from,
-                        stmt_to_insert_after,
-                        stmt_to_insert_before);
+                        array_to_transfer_to_after,
+                        array_to_transfer_from_before);
       break;
     case is_instruction_call:
       transfert_call(st,
