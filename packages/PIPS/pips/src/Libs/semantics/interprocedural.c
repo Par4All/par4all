@@ -1393,6 +1393,12 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   current_precondition = transformer_undefined;
   summary_effects_of_callee = list_undefined;
 
+  if( ! transformer_defined_p(current_summary_precondition)) {
+    pips_internal_error("We don't have the summary precondition for module "
+        "%s ; the callgraph is probably broken, no choice but abort here.",
+        entity_name(caller));
+  }
+
   /* This normalization seems pretty uneffective for fraer01.tpips */
   t = transformer_normalize(current_summary_precondition, 4);
   current_summary_precondition = transformer_undefined;
