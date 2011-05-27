@@ -1,0 +1,32 @@
+//
+// Code after dead_code_elimination for module main
+//
+int main()
+{
+   // This function call can be removed, but we have to update callees for main
+   // if we don't do it, the callgraph is broken and it might lead to abort later in PIPS
+   ;
+}
+//
+// Code after dead_code_elimination for module toto
+//
+void toto()
+{
+
+}
+//
+// Code after coarse_grain_parallelization for module main
+//
+int main()
+{
+   // This function call can be removed, but we have to update callees for main
+   // if we don't do it, the callgraph is broken and it might lead to abort later in PIPS
+   ;
+}
+//
+// Code after coarse_grain_parallelization for module toto
+//
+void toto()
+{
+
+}
