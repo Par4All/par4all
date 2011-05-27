@@ -55,7 +55,7 @@ static void build_pragma_list (extensions exts, list *l_pragma) {
   FOREACH (EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
-    // FIXME : a test should be done to keep
+    // FIXME : a test should be done to merge only omp pragma
     // if (extension_is_pragma_p ())
     tmp = gen_extension_cons (ext, tmp);
     *l_pragma = gen_pragma_cons (extension_pragma (ext), *l_pragma);
