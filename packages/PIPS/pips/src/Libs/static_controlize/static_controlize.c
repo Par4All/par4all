@@ -92,7 +92,7 @@ statement_mapping	Gstatic_control_map;
  */
 static_control static_controlize_call(call c)
 {
-	static_control sc;
+ 	static_control sc;
 
 	pips_debug( 3, "begin CALL\n");
 	pips_debug( 7,
@@ -107,7 +107,8 @@ static_control static_controlize_call(call c)
 					    Genclosing_loops ),*/
 					 copy_loops( Genclosing_loops ),
 					 sc_list_of_exp_dup( Genclosing_tests ));
-		static_control_yes( sc ) = TRUE;
+		static_control_yes( sc ) = splc_linear_access_to_arrays_p
+		  (call_arguments(c),&Genclosing_loops);
 	      } 
 	    else
 	      {
@@ -233,7 +234,8 @@ statement s;
 	/* We put condition under a normal disjunctive form */
 	if ((exp = sc_conditional(test_condition(t), &Genclosing_loops)) !=
 	    expression_undefined) {
-	  test_condition( t ) = exp ;
+	  //DK, don't change the structure of conditions
+	  //test_condition( t ) = exp ;
 	  static_test = TRUE;
 	}
 	ADD_ELEMENT_TO_LIST( Genclosing_tests, EXPRESSION, test_condition(t) );
@@ -284,19 +286,16 @@ statement s;
       }
     case is_instruction_call :
       { 
+	if (!continue_statement_p(s) || declaration_statement_p(s))
+	  {
+	    call the_call = instruction_call( inst);
+	    forward_substitute_in_call( &the_call, Gforward_substitute_table );
+	    is_static = static_control_yes(static_controlize_call( the_call ));
+	  }
 	if (get_bool_property("POCC_COMPATIBILITY"))
 	  {
-	  if (statement_contains_user_call_p(s) || io_intrinsic_p((call_function(instruction_call( inst)))))
-	    is_static = FALSE;
-	  }
-	else
-	  {
-	    if (!continue_statement_p(s) || declaration_statement_p(s))
-	      {
-		call the_call = instruction_call( inst);
-		forward_substitute_in_call( &the_call, Gforward_substitute_table );
-		is_static = static_control_yes(static_controlize_call( the_call ));
-	      }
+	    if (statement_contains_user_call_p(s) || io_intrinsic_p((call_function(instruction_call( inst)))))
+	      is_static = FALSE;
 	  }
 	break;
       }
@@ -336,8 +335,9 @@ statement s;
 	       gen_length( Genclosing_loops ),
 	       gen_length( Genclosing_tests ) );
     pips_debug(3, "end STATEMENT\n");
-    
+           
     return sc;
+
 }
 
 
