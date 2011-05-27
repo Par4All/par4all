@@ -498,6 +498,13 @@ bool statement_flatten_declarations(entity module, statement s)
                     statement_domain, gen_true, rename_statement_declarations,
                     NULL );
 
+            // This look like a bad hack, partially redundant with previous replacement
+            // but... only partially ! For instance extensions was not handled previously.
+            // Probably that there's need for factoring, but it'll be another time !
+            HASH_FOREACH(entity,old,entity,new,renamings) {
+              replace_entity(s,old,new);
+            }
+
             gen_free_list(declarations), declarations = NIL;
             hash_table_free(renamings), renamings = NULL;
         }
