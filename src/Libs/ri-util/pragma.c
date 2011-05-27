@@ -102,46 +102,46 @@ static if_clause_policy get_if_clause_policy (void) {
 }
 
 // merge all if conditions
-static expression merge_conditions (list l_cond, if_clause_policy policy) {
+static expression merge_conditions(list l_cond, if_clause_policy policy) {
   expression result = expression_undefined;
   entity op = entity_undefined;
-  switch (policy) {
-  case IGNORE_IF_POLICY:
-    break;
-  case AND_IF_POLICY:
-    switch(get_prettyprint_language_tag()) {
-    case is_language_fortran:
-    case is_language_fortran95:
-      op = CreateIntrinsic(AND_OPERATOR_NAME);
+  switch(policy) {
+    case IGNORE_IF_POLICY:
       break;
-    case is_language_c:
-      op = CreateIntrinsic(C_AND_OPERATOR_NAME);
+    case AND_IF_POLICY:
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          op = CreateIntrinsic(AND_OPERATOR_NAME);
+          break;
+        case is_language_c:
+          op = CreateIntrinsic(C_AND_OPERATOR_NAME);
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
+      }
+      break;
+    case OR_IF_POLICY:
+      switch(get_prettyprint_language_tag()) {
+        case is_language_fortran:
+        case is_language_fortran95:
+          op = CreateIntrinsic(OR_OPERATOR_NAME);
+          break;
+        case is_language_c:
+          op = CreateIntrinsic(C_OR_OPERATOR_NAME);
+          break;
+        default:
+          pips_assert ("This case should have been handled before", FALSE);
+          break;
+      }
       break;
     default:
-      pips_assert ("This case should have been handled before", FALSE);
+      pips_assert ("update switch case", FALSE);
       break;
-    }
-    break;
-  case OR_IF_POLICY:
-    switch(get_prettyprint_language_tag()) {
-    case is_language_fortran:
-    case is_language_fortran95:
-      op = CreateIntrinsic(OR_OPERATOR_NAME);
-      break;
-    case is_language_c:
-      op = CreateIntrinsic(C_OR_OPERATOR_NAME);
-      break;
-    default:
-      pips_assert ("This case should have been handled before", FALSE);
-      break;
-    }
-    break;
-  default:
-    pips_assert ("update switch case", FALSE);
-    break;
   }
   // now we have a list of condition and an operator -> merge them
-  result = expressions_to_operation (l_cond, op);
+  result = expressions_to_operation(l_cond, op);
   return result;
 }
 
@@ -155,25 +155,25 @@ static expression merge_conditions (list l_cond, if_clause_policy policy) {
    @return the condition compared to the threshold as an expression
    @param cond, the condition to be compared to the threshold
 **/
-expression pragma_build_if_condition (expression cond) {
+expression pragma_build_if_condition(expression cond) {
   entity op = entity_undefined;
   switch(get_prettyprint_language_tag()) {
-  case is_language_fortran:
-  case is_language_fortran95:
-    op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
-    break;
-  case is_language_c:
-    op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
-    break;
-  default:
-    pips_assert ("This case should have been handled before", FALSE);
-    break;
+    case is_language_fortran:
+    case is_language_fortran95:
+      op = CreateIntrinsic(GREATER_OR_EQUAL_OPERATOR_NAME);
+      break;
+    case is_language_c:
+      op = CreateIntrinsic(C_GREATER_OR_EQUAL_OPERATOR_NAME);
+      break;
+    default:
+      pips_assert ("This case should have been handled before", FALSE);
+      break;
   }
-  int threshold = get_int_property ("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
-  list args_if =  gen_expression_cons (int_to_expression(threshold), NIL);
-  args_if = gen_expression_cons (cond, args_if);
-  call c = make_call (op, args_if);
-  return call_to_expression (c);
+  int threshold = get_int_property("OMP_LOOP_PARALLEL_THRESHOLD_VALUE");
+  list args_if = gen_expression_cons(int_to_expression(threshold), NIL);
+  args_if = gen_expression_cons(cond, args_if);
+  call c = make_call(op, args_if);
+  return call_to_expression(c);
 }
 
 /** @return "if (cond)" as an expression
@@ -269,72 +269,67 @@ list pragma_omp_merge_expr (list l_pragma) {
   // look into each pragma for private, reduction and if clauses
   FOREACH (PRAGMA, p, l_pragma) {
     pips_assert ("Can only merge a list of pragma as expression",
-		 pragma_expression_p (p));
+        pragma_expression_p (p));
     FOREACH (EXPRESSION, e, pragma_expression (p)) {
       // check each expression and save what need to be saved to generate
       // the new omp pragma
-      call c = expression_call (e);
+      call c = expression_call(e);
       list args = call_arguments (c);
       // bind the args to the right list
-      if (is_expression_omp_private_p (e)) {
-	// each private var has to be uniquely declared
-	list add = NIL;
-	FOREACH (EXPRESSION, exp, args) {
-	  if (expression_equal_in_list_p (exp, priv_var) == FALSE)
-	    add = gen_expression_cons (exp, add);
-	}
-	priv_var = gen_nconc (priv_var, add);
-      }
-      else if (is_expression_omp_if_p (e)) {
-	// if clause : check the policy
-	switch (policy) {
-	case IGNORE_IF_POLICY:
-	  // do nothing
-	  break;
-	case AND_IF_POLICY:
-	case OR_IF_POLICY:
-	  if_cond = gen_nconc (if_cond, args);
-	  break;
-	default:
-	  pips_assert ("Should not happend",FALSE);
-	  break;
-	}
-      }
-      else if (is_expression_omp_reduction_p (e)) {
-	// Only the reductions clause on the outer loop need to be saved
-	if (flag == TRUE) {
-	  red = gen_expression_cons (e, red);
-	}
-      }
-      else if ( is_expression_omp_omp_p (e) ||
-		is_expression_omp_for_p (e) ||
-		is_expression_omp_parallel_p (e) ) {
-	// nothing to do the omp parallel for will be automaticly generated
-      }
-      else {
-	print_expression (e);
-	pips_assert ("pips cannot merge this pragma clause",FALSE);
+      if(is_expression_omp_private_p(e)) {
+        // each private var has to be uniquely declared
+        list add = NIL;
+        FOREACH (EXPRESSION, exp, args) {
+          if(expression_equal_in_list_p(exp, priv_var) == FALSE)
+            add = gen_expression_cons(exp, add);
+        }
+        priv_var = gen_nconc(priv_var, add);
+      } else if(is_expression_omp_if_p(e)) {
+        // if clause : check the policy
+        switch(policy) {
+          case IGNORE_IF_POLICY:
+            // do nothing
+            break;
+          case AND_IF_POLICY:
+          case OR_IF_POLICY:
+            if_cond = gen_nconc(if_cond, args);
+            break;
+          default:
+            pips_assert ("Should not happend",FALSE);
+            break;
+        }
+      } else if(is_expression_omp_reduction_p(e)) {
+        // Only the reductions clause on the outer loop need to be saved
+        if(flag == TRUE) {
+          red = gen_expression_cons(e, red);
+        }
+      } else if(is_expression_omp_omp_p(e) || is_expression_omp_for_p(e)
+          || is_expression_omp_parallel_p(e)) {
+        // nothing to do the omp parallel for will be automaticly generated
+      } else {
+        print_expression(e);
+        pips_assert ("pips cannot merge this pragma clause",FALSE);
       }
     }
     flag = FALSE;
   }
   // build the private clause if needed
-  if (priv_var != NIL) {
-    expression priv = pragma_private_as_expr_with_args (priv_var);
+  if(priv_var != NIL) {
+    expression priv = pragma_private_as_expr_with_args(priv_var);
     // append the private clause to the omp parallel for
-    result = gen_expression_cons (priv, result);
+    result = gen_expression_cons(priv, result);
   }
   // append the reduction clauses if any
-  if (red != NIL) {
-    result = gen_nconc (red, result);
+  if(red != NIL) {
+    result = gen_nconc(red, result);
   }
   // merge the if condition if needed
-  if (policy != IGNORE_IF_POLICY) {
-    expression expr_if = merge_conditions (if_cond, policy);
+  if(policy != IGNORE_IF_POLICY) {
+    expression expr_if = merge_conditions(if_cond, policy);
     // encapsulate the condition into the if clause
-    expr_if = pragma_if_as_expr (expr_if);
+    expr_if = pragma_if_as_expr(expr_if);
     // append the if clause to the omp parallel for
-    result = gen_expression_cons (expr_if, result);
+    result = gen_expression_cons(expr_if, result);
   }
   return result;
 }
@@ -370,52 +365,56 @@ pragma_to_string (pragma p) {
   string s = string_undefined;
   string_buffer sb = string_buffer_make(FALSE);
 
-  switch (pragma_tag (p)) {
-  case is_pragma_string:
-    s = pragma_string(p);
-    break;
-  case is_pragma_expression:
-    l_expr = gen_nreverse (pragma_expression (p));
-    FOREACH (EXPRESSION, e, l_expr) {
-      if (flg == TRUE) {
-	string_buffer_append (sb, strdup (" "));
-	line_sz +=1;
+  switch(pragma_tag (p)) {
+    case is_pragma_string:
+      s = pragma_string(p);
+      break;
+    case is_pragma_expression:
+      l_expr = gen_nreverse(pragma_expression (p));
+      FOREACH (EXPRESSION, e, l_expr)
+      {
+        if(flg == TRUE) {
+          string_buffer_append(sb, strdup(" "));
+          line_sz += 1;
+        }
+        flg = TRUE;
+        l_str = words_expression(e, NIL);
+        //      l_str = gen_nreverse (l_str);
+        if(prettyprint_language_is_fortran_p()) {
+          // In fortran line size can not be more than 72
+          FOREACH (STRING, str, l_str)
+          {
+            pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH - 7);
+            size_t size = strlen(str);
+            pips_assert ("not handled case need to split the str between two lines",
+                size < (MAX_LINE_LENGTH - 7));
+            line_sz += size;
+            if(line_sz >= MAX_LINE_LENGTH - 8) {
+              l_str = gen_insert_before(strdup(FORTRAN_OMP_CONTINUATION),
+                                        str,
+                                        l_str);
+              line_sz = size;
+            }
+          }
+        }
+        string_buffer_append_list(sb, l_str);
+        gen_free_list(l_str);
       }
-      flg = TRUE;
-      l_str = words_expression(e, NIL);
-      //      l_str = gen_nreverse (l_str);
-      if (prettyprint_language_is_fortran_p()) {
-	// In fortran line size can not be more than 72
-	FOREACH (STRING, str, l_str) {
-	  pips_assert ("algo bug", line_sz < MAX_LINE_LENGTH - 7);
-	  size_t size = strlen (str);
-	  pips_assert ("not handled case need to split the str between two lines",
-		       size < (MAX_LINE_LENGTH - 7));
-	  line_sz += size;
-	  if (line_sz >= MAX_LINE_LENGTH - 8) {
-	    l_str = gen_insert_before (strdup (FORTRAN_OMP_CONTINUATION), str,
-				       l_str);
-	    line_sz = size;
-	  }
-	}
-      }
-      string_buffer_append_list (sb, l_str);
-      gen_free_list (l_str);
-    }
-    s = string_buffer_to_string (sb);
-    // Free the buffer with its strings
-    string_buffer_free_all(&sb);
-    // restore the list as it was at the begining
-    gen_nreverse (l_expr);
-    break;
-  case is_pragma_entity:
-    return directive_to_string(load_global_directives(pragma_entity(p)),false);
-    break;
-  default:
-    pips_internal_error("Unknown pragama type");
-    break;
+      s = string_buffer_to_string(sb);
+      // Free the buffer with its strings
+      string_buffer_free_all(&sb);
+      // restore the list as it was at the begining
+      gen_nreverse(l_expr);
+      break;
+    case is_pragma_entity:
+      return directive_to_string(load_global_directives(pragma_entity(p)),
+                                 false);
+      break;
+    default:
+      pips_internal_error("Unknown pragama type");
+      break;
   }
-  if (s != string_undefined) {
+  if(s != string_undefined) {
     switch(get_prettyprint_language_tag()) {
       case is_language_fortran:
       case is_language_fortran95:
