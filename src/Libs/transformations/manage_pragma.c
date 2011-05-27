@@ -46,29 +46,19 @@
 #include "properties.h"
 #include "control.h"
 
-// The list of outer loop as a list of statements
-static list l_outer = NIL;
-
-// The list of pragma to be merged
-static list l_pragma = NIL;
-
-// The list of number of iteration (as expression) to be used in the if clause
-static list l_iters = NIL;
-
-// The inner flag
-static bool inner_flag = TRUE;
 
 // build a list of pragma to be merged. Also remove them from the
 // list they currently belongs to.
-static void build_pragma_list (extensions exts) {
+static void build_pragma_list (extensions exts, list *l_pragma) {
   list tmp = NIL;
   list l_exts = extensions_extension (exts);
   FOREACH (EXTENSION, ext, l_exts) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
+    // FIXME : a test should be done to keep
     // if (extension_is_pragma_p ())
     tmp = gen_extension_cons (ext, tmp);
-    l_pragma = gen_pragma_cons (extension_pragma (ext), l_pragma);
+    *l_pragma = gen_pragma_cons (extension_pragma (ext), *l_pragma);
     pips_debug (5, "adding pragma : %s for merging\n",
 		pragma_to_string (extension_pragma (ext)));
   }
@@ -80,15 +70,15 @@ static void build_pragma_list (extensions exts) {
 
 //@brief we need to go through all the extensions and reset
 //the flag to true
-static bool inner_filter (loop l) {
+static bool inner_filter (loop l, bool *inner_flag) {
   pips_debug (5, "processing loop : %p.\n", (void*) l);
-  inner_flag = TRUE;
+  *inner_flag = TRUE;
   return TRUE;
 }
 
 //@brief keep the inner pragma and remove the others. This is the bottum up part
 //of the gen_recuse to merge pragma at the inner level
-static void inner_rewrite (loop l) {
+static void inner_rewrite (loop l, bool *inner_flag) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   extensions exts = statement_extensions (stmt);
   list l_exts = extensions_extension (exts);
@@ -98,12 +88,12 @@ static void inner_rewrite (loop l) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
     // if (extension_is_pragma_p ())
-    if (inner_flag == TRUE) {
+    if (*inner_flag == TRUE) {
       // this is the inner pragma we have to keep it so set the flag to false
       // to remove next extensions and exit
       pips_debug (5, "keeping pragma : %s from extensions %p.\n",
 		  pragma_to_string (extension_pragma (ext)), (void*) exts);
-      inner_flag = FALSE;
+      *inner_flag = FALSE;
       return;
     } else {
       // we need to remove that extension because it is not an inner one
@@ -120,7 +110,7 @@ static void inner_rewrite (loop l) {
 }
 
 // keep track of outer loop with pragma and return false
-static bool build_outer (loop l) {
+static bool build_outer (loop l, list *l_outer) {
   statement stmt = (statement) gen_get_ancestor(statement_domain, l);
   list l_exts = extensions_extension (statement_extensions (stmt));
 
@@ -132,7 +122,7 @@ static bool build_outer (loop l) {
     pips_debug (5, "processing pragma : %s\n", pragma_to_string (pr));
     // only the pragma as expressions are managed
     if (pragma_expression_p (pr) == TRUE) {
-      l_outer = gen_statement_cons (stmt, l_outer);
+      *l_outer = gen_statement_cons (stmt, *l_outer);
       pips_debug (5, "outer pragma as expression found\n");
       return FALSE;
     }
@@ -142,56 +132,57 @@ static bool build_outer (loop l) {
 
 /// @brief merge the omp pragma on the most outer parallel loop
 /// @return void
-static void merge_on_outer () {
+static void merge_on_outer (list l_outer) {
   FOREACH (STATEMENT, stmt, l_outer) {
+    // The list of pragma to be merged
+    list l_pragma = NIL;
     // collect the pragma
-    gen_recurse  (stmt, extensions_domain, gen_true, build_pragma_list);
+    gen_context_recurse  (stmt, &l_pragma, extensions_domain, gen_true, build_pragma_list);
     list l_expr = pragma_omp_merge_expr (l_pragma);
     add_pragma_expr_to_statement (stmt, l_expr);
     gen_free_list (l_pragma);
-    l_pragma = NIL;
   }
   return;
 }
 
-static void build_iteration_list (range r) {
+static void build_iteration_list (range r, list *l_iters) {
   expression iter = range_to_expression(r , range_to_nbiter);
-  l_iters = gen_expression_cons (iter, l_iters);
+  *l_iters = gen_expression_cons (iter, *l_iters);
 }
 
 /// @brief add a if condition to the omp pragma
 /// @return void
 /// @param pr, the pragma to process
-static void add_loop_parallel_threshold (pragma pr) {
+static void add_loop_parallel_threshold(pragma pr) {
   // only the pragma as expressions are managed
-  if (pragma_expression_p (pr) == TRUE) {
+  if(pragma_expression_p (pr) == TRUE) {
     // we need to get the loop index
-    statement stmt = (statement) gen_get_ancestor(statement_domain, pr);
+    statement stmt = (statement)gen_get_ancestor(statement_domain, pr);
     instruction inst = statement_instruction (stmt);
-    if (instruction_tag (inst) == is_instruction_loop) {
+    if(instruction_tag (inst) == is_instruction_loop) {
+      // The list of number of iteration (as expression) to be used in the if clause
+      list l_iters = NIL;
       loop l = instruction_loop (inst);
       // evaluate the number of iteration according to the property value
-      if (get_bool_property ("OMP_IF_CLAUSE_RECURSIVE") == TRUE) {
-	// collect the number of iteration of current loop and inner loops
-	gen_recurse  (stmt, range_domain, gen_true, build_iteration_list);
-      }
-      else {
-	// get the number of iteration of the current loop only
-	expression iter = range_to_expression(loop_range (l), range_to_nbiter);
-	l_iters = gen_expression_cons (iter, l_iters);
+      if(get_bool_property("OMP_IF_CLAUSE_RECURSIVE") == TRUE) {
+        // collect the number of iteration of current loop and inner loops
+        gen_context_recurse (stmt, &l_iters, range_domain, gen_true, build_iteration_list);
+      } else {
+        // get the number of iteration of the current loop only
+        expression iter = range_to_expression(loop_range (l), range_to_nbiter);
+        l_iters = gen_expression_cons(iter, l_iters);
       }
       // now we have a list of number of iteration we need to multiply them
-      entity mul = CreateIntrinsic (MULTIPLY_OPERATOR_NAME);
-      expression cond = expressions_to_operation (l_iters, mul);
+      entity mul = CreateIntrinsic(MULTIPLY_OPERATOR_NAME);
+      expression cond = expressions_to_operation(l_iters, mul);
       // compare the nb iteration to the threshold
-      cond = pragma_build_if_condition (cond);
+      cond = pragma_build_if_condition(cond);
       // encapsulate the condition into the if clause
-      expression expr_if = pragma_if_as_expr (cond);
+      expression expr_if = pragma_if_as_expr(cond);
       // bind the clause to the pragma
-      add_expr_to_pragma_expr_list (pr, expr_if);
+      add_expr_to_pragma_expr_list(pr, expr_if);
       // free list
-      gen_free_list (l_iters);
-      l_iters = NIL;
+      gen_free_list(l_iters);
     }
   }
   return;
@@ -222,25 +213,31 @@ bool omp_merge_pragma (const string module_name) {
   string merge_policy = get_string_property ("OMP_MERGE_POLICY");
   bool outer = (strcmp (merge_policy, "outer") == 0);
 
+
+  // The list of outer loop as a list of statements
+  list l_outer = NIL;
+
+
   // build the list of outer loop with pragma this is also needed by the
   // inner mode
-  gen_recurse(mod_stmt, loop_domain, build_outer, gen_identity);
+  gen_context_recurse(mod_stmt, &l_outer, loop_domain, build_outer, gen_identity);
 
   if (outer == true) {
     pips_debug (3, "outer mode\n");
     // merge the pragma on the outer loop
-    merge_on_outer ();
+    merge_on_outer (l_outer);
   }
   else { //inner
     pips_debug (3, "inner mode\n");
+    // The inner flag
+    bool inner_flag = TRUE;
     FOREACH (statement, stmt, l_outer) {
-      gen_recurse (stmt, loop_domain, inner_filter, inner_rewrite);
+      gen_context_recurse (stmt, &inner_flag, loop_domain, inner_filter, inner_rewrite);
     }
   }
 
   // freeing memory
   gen_free_list (l_outer);
-  l_outer = NIL;
 
   //Put back the new statement module
   PIPS_PHASE_POSTLUDE(mod_stmt);
