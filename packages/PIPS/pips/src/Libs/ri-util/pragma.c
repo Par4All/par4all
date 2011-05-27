@@ -245,6 +245,73 @@ list pragma_omp_parallel_for_as_exprs (void) {
   return result;
 }
 
+
+/**
+ * @brief filter out a pragma (expression list) removing all requested variables
+ * @params l_expr is the list of expressions to filter
+ * @params to_filter is the list of entities to remove from l_pragma
+ */
+list filter_variables_in_pragma_expr(list /* of expr */ l_expr,
+                                     list /* of entities */to_filter) {
+
+  // If all variable in exp are removed, we remove the expr from the list
+  list expr_to_remove = NIL;
+
+  FOREACH (EXPRESSION, expr, l_expr) {
+    // Get the list of arguments, to filter out
+    call c = expression_call(expr);
+    list args = call_arguments (c);
+
+    // The list where we will record arg to remove from args
+    list entity_to_remove = NIL;
+
+    ifdebug(5) {
+      pips_debug(0,"Handling expression : ");
+      print_expression(expr);
+    }
+    if(is_expression_omp_private_p(expr)) {
+      // Handle private omp clause
+      // Lookup each requested entities
+      FOREACH(ENTITY, e, to_filter)
+      {
+        FOREACH (EXPRESSION, exp, args)
+        {
+          pips_debug(6,"Matching %s against %s\n",entity_name(e),
+              entity_name(expression_to_entity(exp)));
+          if(expression_to_entity(exp) == e) {
+            entity_to_remove = gen_expression_cons(exp, entity_to_remove);
+            break;
+          }
+        }
+      }
+      FOREACH(EXPRESSION,exp,entity_to_remove)
+      {
+        gen_remove(&call_arguments(c), exp);
+      }
+      if(ENDP(call_arguments(c))) {
+        expr_to_remove = gen_expression_cons(expr, expr_to_remove);
+      }
+    } else if(is_expression_omp_if_p(expr)) {
+      // FIXME : todo, merge with previous case ?
+    } else if(is_expression_omp_reduction_p(expr)) {
+      // FIXME : shouldn't be a problem ! (handled before)
+    } else if(is_expression_omp_omp_p(expr) || is_expression_omp_for_p(expr)
+        || is_expression_omp_parallel_p(expr)) {
+      // FIXME : is there anything to do here ?
+    } else {
+      pips_debug(0,"Unsupported case : ");
+      print_expression(expr);
+      pips_internal_error("We don't know how to handle this omp clause !");
+    }
+  }
+  //Remove expression that are now empty
+  FOREACH(EXPRESSION,expr,expr_to_remove) {
+    gen_remove(&l_expr, expr);
+  }
+
+  return l_expr;
+}
+
 /**
    @brief merge omp pragma.
    @return the merged pragma as a list of expression
@@ -308,7 +375,7 @@ list pragma_omp_merge_expr (list l_pragma) {
         // nothing to do the omp parallel for will be automaticly generated
       } else {
         print_expression(e);
-        pips_assert ("pips cannot merge this pragma clause",FALSE);
+        pips_internal_error("pips cannot merge this pragma clause");
       }
     }
     flag = FALSE;
