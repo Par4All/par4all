@@ -1,11 +1,8 @@
-from optparse import OptionParser
 import sys
 import pyps
-from pypsutils import get_runtimefile
 import os.path
 import broker
 import re
-from mako.exceptions import RuntimeException
 
 class p4a_stubs_broker(broker.broker):
     """ broker that automatically gather stub files for the par4all runtime

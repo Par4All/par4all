@@ -116,6 +116,8 @@ int main(int argc, char **argv) {
   }
   //************************************  END LOOP  ********************************
 
+  // Force synchro when using async launch on the GPU
+  coord unused = pos[0][0][0];
 
   /*** TIMING ***/
   end_time = get_time();
