@@ -1,0 +1,61 @@
+//
+// Code after coarse_grain_parallelization for module main
+//
+int main()
+{
+   int k;
+   int n = 10;
+   int a[n][n][n];
+   int b[n][n][n];
+   
+   // Use to generate a pragma openmp with private(j) ; but j is declared inside the loop !
+   for(k = 0; k <= 7; k += 1) {
+      int i, j;
+      for(i = 0; i <= n-1; i += 1)
+         for(j = 0; j <= n-1; j += 1)
+            b[k][i][j] = a[k][i][j]+42;
+   }
+   return 0;
+}
+//
+// Code after ompify_code for module main
+//
+int main()
+{
+   int k;
+   int n = 10;
+   int a[n][n][n];
+   int b[n][n][n];
+   
+   // Use to generate a pragma openmp with private(j) ; but j is declared inside the loop !
+#pragma omp parallel for
+   for(k = 0; k <= 7; k += 1) {
+      int i, j;
+#pragma omp parallel for private(j)
+      for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for
+         for(j = 0; j <= n-1; j += 1)
+            b[k][i][j] = a[k][i][j]+42;
+   }
+   return 0;
+}
+//
+// Code after omp_merge_pragma for module main
+//
+int main()
+{
+   int k;
+   int n = 10;
+   int a[n][n][n];
+   int b[n][n][n];
+   
+   // Use to generate a pragma openmp with private(j) ; but j is declared inside the loop !
+#pragma omp parallel for
+   for(k = 0; k <= 7; k += 1) {
+      int i, j;
+      for(i = 0; i <= n-1; i += 1)
+         for(j = 0; j <= n-1; j += 1)
+            b[k][i][j] = a[k][i][j]+42;
+   }
+   return 0;
+}
