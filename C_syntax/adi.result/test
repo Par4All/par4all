@@ -205,7 +205,7 @@ void adi(double **a, double **b, double **c, double **d, double **e, double **f,
    for (j = 2;j<=jmax-1;j++)
       for (l = 2;l<=jmax-1;l++) {
          anormg += fabs(g[j][l]);
-         psi[j][l] = -(d[j][l]*u[j][l-1])+(r[1]-e[j][l])*u[j][l]-f[j][l]*u[j][l+1];
+         psi[j][l] = -d[j][l]*u[j][l-1]+(r[1]-e[j][l])*u[j][l]-f[j][l]*u[j][l+1];
       }
    nits = 100/nr;
    for (kits = 1;kits<=nits;kits++) {
