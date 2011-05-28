@@ -6,14 +6,14 @@ For instance to enforce a property value, an activate etc before calling a pass
 
 from subprocess import Popen, PIPE
 import pyps
-import sys
+import sys, os
 
 def view_dg(module,format="png"):
 	"""view module's dependence graph in the format specified by ``format''"""
 	module.print_dot_dependence_graph()
 	of=module.name+"."+format
-	dot_cmd = ["dot","-T"+format, os.path.join(module._ws.dirname,module.show("DOTDG_FILE")),"-o"+of]
-	if module._ws.verbose:
+	dot_cmd = ["dot","-T"+format, os.path.join(module.workspace.dirname,module.show("DOTDG_FILE")),"-o"+of]
+	if module.workspace.verbose:
 		print >> sys.stderr , "Generating image with", dot_cmd
 	p = Popen(dot_cmd, stdout = PIPE, stderr = PIPE)
 	(out,err) = p.communicate()
