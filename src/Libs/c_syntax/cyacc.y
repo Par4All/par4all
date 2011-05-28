@@ -547,7 +547,8 @@ static void ResetDerivedEntityDeclarations()
 %left TK_INF_INF TK_SUP_SUP
 %left TK_PLUS TK_MINUS
 %left TK_STAR TK_SLASH TK_PERCENT TK_CONST TK_RESTRICT TK_VOLATILE
-%right TK_EXCLAM TK_TILDE TK_PLUS_PLUS TK_MINUS_MINUS TK_CAST TK_RPAREN TK_ADDROF TK_SIZEOF TK_ALIGNOF
+%right TK_CAST
+%right TK_EXCLAM TK_TILDE TK_PLUS_PLUS TK_MINUS_MINUS TK_RPAREN TK_ADDROF TK_SIZEOF TK_ALIGNOF
 %left TK_LBRACKET
 %left TK_DOT TK_ARROW TK_LPAREN TK_LBRACE
 %right TK_NAMED_TYPE
@@ -879,11 +880,11 @@ expression:
 		        {
 			  CParserError("ALIGNOF not implemented\n");
 			}
-|   TK_PLUS expression
+|   TK_PLUS expression                          %prec TK_CAST
 		        {
 			  $$ = MakeUnaryCall(CreateIntrinsic(UNARY_PLUS_OPERATOR_NAME), $2);
 			}
-|   TK_MINUS expression
+|   TK_MINUS expression                          %prec TK_CAST
 		        {
 			  $$ = MakeUnaryCall(CreateIntrinsic(UNARY_MINUS_OPERATOR_NAME), $2);
 			}
