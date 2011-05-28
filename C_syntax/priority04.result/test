@@ -1,7 +1,7 @@
 int main()
 {
-   // The precedence is for the unary and then the cast and finally the /
-   printf("Should output the same result : %d %d\n", (unsigned char) -(1/255), (unsigned char) -1/255);
+   // The precedence is for the unary and then the cast and finally the division
+   printf("Should output the same result : %d %d\n", (unsigned char) -1/255, (unsigned char) -1/255);
    return 0;
 }
 Result of the execution : Should output the same result : 1 1
