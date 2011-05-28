@@ -42,8 +42,14 @@ echo
 
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 
+activate NEW_CONTROLIZER
+
 #setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[test]
+
+echo
+echo Output after restructuration
+echo
 
 apply RESTRUCTURE_CONTROL[test]
 display PRINTED_FILE[test]

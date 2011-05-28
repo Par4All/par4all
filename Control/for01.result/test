@@ -1,3 +1,6 @@
+
+Parsed code
+
 void for01()
 {
    int c;
@@ -8,9 +11,11 @@ void for01()
    c++;
 end:   return;
 }
+
+Controlized code
+
 void for01()
 {
-   // BEGIN BLOCK
    int c;
    int k = 0;
    c = 10;
@@ -22,5 +27,4 @@ l99998:   ;
 l99999:   ;
    c++;
 end:   return;
-   // END BLOCK
 }

@@ -1,0 +1,41 @@
+
+Parser output
+
+{{
+   /* Test a goto on the successor: */
+   void go_to();
+}}
+
+void go_to()
+{
+{{
+   int x = 6;
+   goto below;
+below:   x = 2;
+}}
+}
+
+Controlizer output
+
+void go_to()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+below:   x = 2;
+}}
+}
+
+Restructured output
+
+void go_to()
+{
+{{
+// (0,2)
+   int x = 6;
+// (0,3)
+below:   x = 2;
+}}
+}
+
