@@ -523,8 +523,8 @@ void flgr2d_draw_filled_ellipse_fgUINT16(FLGR_Data2D *dat, int cx, int cy, int a
    long int crit1 = -(a2/4+a%2+b2);
    long int crit2 = -(b2/4+b%2+a2);
    long int crit3 = -(b2/4+b%2);
-   long int t = -(a2*y);
-   long int dxt = 2*b2*x, dyt = -(2*a2*y);
+   long int t = -a2*y;
+   long int dxt = 2*b2*x, dyt = -2*a2*y;
    long int d2xt = 2*b2, d2yt = 2*a2;
    while (y>=0&&x<=a)
       if (t+b2*x<=crit1||t+a2*y<=crit3) {
@@ -1659,7 +1659,7 @@ void * flgr_malloc(size_t size)
 }
 int flgr_normalize_coordinate(int axis_coord, int axis_length)
 {
-   int axis_true = -(1*axis_coord)-1;
+   int axis_true = -1*axis_coord-1;
    int axis_false;
    int axis_test;
    axis_coord = axis_coord<0?axis_true:axis_coord;
