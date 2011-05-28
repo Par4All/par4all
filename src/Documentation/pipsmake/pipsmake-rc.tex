@@ -7850,13 +7850,19 @@ array_expansion > PROGRAM.entities
 \index{Loop fusion}
 
 \begin{PipsPass}{loop_fusion}
-  This pass fuses as many loop as possible in a greedy manner. The
+  This pass fuses as many loops as possible in a greedy manner. The
   loops must appear in a sequence and have exactly the same loop
-  bounds and if possible the same loop indices. We'll try to fuse
-  loops where there is a dependence between their body. We expect
-  that it'll maximize possibilities for further optimizations. A 
-  property will soon allow to control the exact heuristics used in
-  the selection process.
+  bounds and if possible the same loop indices. We'll always try first to fuse
+  loops where there is a dependence between their body. We expect that this 
+  policy will maximize possibilities for further optimizations. 
+
+  Property \PipsPropRef{LOOP_FUSION_GREEDY} allows to control whether it'll 
+  try to fuse as many loop as possible even without any reuse. This will be done 
+  in a second pass.
+
+  Property \PipsPropRef{LOOP_FUSION_MAXIMIZE_PARALLELISM} is used to control if
+  loop fusion has to preserve parallelism while fusing. If this property
+  is true, a parallel loop is never fused with a sequential loop.
 
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
@@ -7875,12 +7881,13 @@ loop_fusion            > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-Property \PipsPropRef{LOOP_FUSION_MAXIMIZE_PARALLELISM} is used to control if
-loop fusion has to preserve parallelism while fusing. If this property
-is true, a parallel loop is never fused with a sequential loop.
 
 \begin{PipsProp}{LOOP_FUSION_MAXIMIZE_PARALLELISM}
 LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
+\end{PipsProp}
+
+\begin{PipsProp}{LOOP_FUSION_GREEDY}
+LOOP_FUSION_GREEDY FALSE
 \end{PipsProp}
 
 
