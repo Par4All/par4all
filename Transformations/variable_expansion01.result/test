@@ -39,7 +39,3 @@ int foo(int c[10])
    }
    return c[10];
 }
-
-Unsplit resulting code
-
-ok
