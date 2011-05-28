@@ -855,6 +855,4 @@ float vint2Vfloat_1(int v, int Nv, float Vmax)
       V = V-2.*Vmax;
    return V;
 }
-STAP - end of program.
-# file 'PlotsOut.txt' generated.
 
