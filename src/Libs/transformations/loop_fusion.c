@@ -76,7 +76,9 @@ typedef struct fusion_block {
   // statements inside the block (in case of loop, header won't belong to)
   set statements;
   set successors; // set of blocks that depend from this one. Precedence constraint
+  set rr_successors; // set of blocks that reuse data used in this one, false dep
   set predecessors; // set of blocks this one depends from. Precedence constraint
+  set rr_predecessors; // set of blocks that use data reused in this one, false dep
   bool is_a_loop;
 }*fusion_block;
 
@@ -148,6 +150,14 @@ static void print_block(fusion_block block) {
   fprintf(stderr, " | successors : ");
   SET_FOREACH(fusion_block,succ,block->successors) {
     fprintf(stderr, "%d, ", succ->num);
+  }
+  fprintf(stderr, " | rr_predecessors : ");
+  SET_FOREACH(fusion_block,rr_pred,block->rr_predecessors) {
+    fprintf(stderr, "%d, ", rr_pred->num);
+  }
+  fprintf(stderr, " | rr_successors : ");
+  SET_FOREACH(fusion_block,rr_succ,block->rr_successors) {
+    fprintf(stderr, "%d, ", rr_succ->num);
   }
   fprintf(stderr, "\n");
 }
@@ -441,7 +451,9 @@ static fusion_block make_empty_block(int num) {
   block->s = NULL;
   block->statements = set_make(set_pointer);
   block->successors = set_make(set_pointer);
+  block->rr_successors = set_make(set_pointer);
   block->predecessors = set_make(set_pointer);
+  block->rr_predecessors = set_make(set_pointer);
   block->is_a_loop = false;
 
   return block;
@@ -500,7 +512,7 @@ static fusion_block get_block_from_ordering(int ordering, list block_list) {
  */
 static void compute_successors(fusion_block b, list block_list) {
   pips_assert("Expect successors list to be initially empty",
-      set_empty_p(b->successors));
+      set_empty_p(b->successors) && set_empty_p(b->rr_successors));
   // Loop over statements that belong to this block
   SET_FOREACH(statement,s,b->statements)
   {
@@ -523,8 +535,9 @@ static void compute_successors(fusion_block b, list block_list) {
           // dealing with precedence
           if(store_effect_p(conflict_sink(a_conflict))
               && store_effect_p(conflict_source(a_conflict))
-              && (action_write_p(effect_action(conflict_sink(a_conflict)))
-                  || action_write_p(effect_action(conflict_source(a_conflict))))) {
+              //&& (action_write_p(effect_action(conflict_sink(a_conflict)))
+              //    || action_write_p(effect_action(conflict_source(a_conflict))))
+              ) {
 
             int sink_ordering =
                 vertex_ordering(successor_vertex(a_successor));
@@ -545,13 +558,27 @@ static void compute_successors(fusion_block b, list block_list) {
               // with ordering higher to current one
               if(sink_block->num > b->num) {
                 // We have a successor !
-                set_add_element(b->successors,
-                                b->successors,
-                                (void *)sink_block);
-                // Mark current block as a predecessor ;-)
-                set_add_element(sink_block->predecessors,
-                                sink_block->predecessors,
-                                (void *)b);
+                if(action_write_p(effect_action(conflict_sink(a_conflict)))
+                   || action_write_p(effect_action(conflict_source(a_conflict)))) {
+                  // There's a real dependence here
+                  set_add_element(b->successors,
+                                  b->successors,
+                                  (void *)sink_block);
+                  // Mark current block as a predecessor ;-)
+                  set_add_element(sink_block->predecessors,
+                                  sink_block->predecessors,
+                                  (void *)b);
+                } else {
+                  // Read-read dependence is interesting to fuse, but is not a
+                  // precedence constraint
+                  set_add_element(b->rr_successors,
+                                  b->rr_successors,
+                                  (void *)sink_block);
+                  // Mark current block as a rr_predecessor ;-)
+                  set_add_element(sink_block->rr_predecessors,
+                                  sink_block->rr_predecessors,
+                                  (void *)b);
+                }
 
                 break; // One conflict with each successor is enough
               }
@@ -561,6 +588,9 @@ static void compute_successors(fusion_block b, list block_list) {
       }
     }
   }
+  // Optimization, do not try two time the same fusion !
+  set_difference(b->rr_successors, b->rr_successors, b->successors);
+  set_difference(b->rr_predecessors, b->rr_predecessors, b->predecessors);
 }
 
 /**
@@ -577,7 +607,9 @@ static set prune_successors_tree(fusion_block b) {
   }
   SET_FOREACH(fusion_block, succ_of_succ, full_succ ) {
     set_del_element(b->successors, b->successors, succ_of_succ);
+    set_del_element(b->rr_successors, b->rr_successors, succ_of_succ);
     set_del_element(succ_of_succ->predecessors, succ_of_succ->predecessors, b);
+    set_del_element(succ_of_succ->rr_predecessors, succ_of_succ->rr_predecessors, b);
   }
 
   full_succ = set_union(full_succ, full_succ, b->successors);
@@ -600,15 +632,27 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
   // merge predecessors
   set_union(block1->predecessors, block1->predecessors, block2->predecessors);
 
+  // merge rr_predecessors
+  set_union(block1->rr_predecessors, block1->rr_predecessors, block2->rr_predecessors);
+
   // merge successors
   set_union(block1->successors, block1->successors, block2->successors);
 
+  // merge rr_successors
+  set_union(block1->rr_successors, block1->rr_successors, block2->rr_successors);
+
   // merge statement
   set_union(block1->statements, block1->statements, block2->statements);
+
   // Replace block2 with block1 as a predecessor of his successors
   SET_FOREACH(fusion_block,succ,block2->successors) {
     set_add_element(succ->predecessors, succ->predecessors, block1);
     set_del_element(succ->predecessors, succ->predecessors, block2);
+  }
+  // Replace block2 with block1 as a predecessor of his rr_successors
+  SET_FOREACH(fusion_block,rr_succ,block2->rr_successors) {
+    set_add_element(rr_succ->rr_predecessors, rr_succ->rr_predecessors, block1);
+    set_del_element(rr_succ->rr_predecessors, rr_succ->rr_predecessors, block2);
   }
   // Replace block2 with block1 as a successor of his predecessors
   SET_FOREACH(fusion_block,pred,block2->predecessors) {
@@ -617,9 +661,19 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
     }
     set_del_element(pred->successors, pred->successors, block2);
   }
+  // Replace block2 with block1 as a successor of his rr_predecessors
+  SET_FOREACH(fusion_block,rr_pred,block2->rr_predecessors) {
+    if(pred != block1) {
+      set_add_element(rr_pred->rr_successors, rr_pred->rr_successors, block1);
+    }
+    set_del_element(rr_pred->rr_successors, rr_pred->rr_successors, block2);
+  }
 
   // Remove block1 from predecessors of ... block1
   set_del_element(block1->predecessors, block1->predecessors, block1);
+  // Remove block1 from rr_predecessors of ... block1
+  set_del_element(block1->rr_predecessors, block1->rr_predecessors, block1);
+  set_del_element(block1->rr_successors, block1->rr_successors, block1);
 
   block2->num = -1; // Disable block, will be garbage collected
 
@@ -690,6 +744,40 @@ static void try_to_fuse_with_successors(fusion_block b,
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
     try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
+  }
+
+  return;
+}
+
+
+/**
+ * This function first try to fuse b with its rr_successors (if b is a loop and
+ * if there's any loop in the rr_successor list)
+ *
+ * @param b is the current block
+ * @param fuse_count is the number of successful fusion done
+ */
+static void try_to_fuse_with_rr_successors(fusion_block b,
+                                        int *fuse_count,
+                                        bool maximize_parallelism) {
+  if(b->is_a_loop) {
+    pips_debug(5,"Block %d is a loop, try to fuse with rr_successors !\n",b->num);
+    SET_FOREACH(fusion_block, succ, b->rr_successors)
+    {
+      if(fuse_block(b, succ, maximize_parallelism)) {
+        /* predecessors and successors set have been modified for the current
+         * block... we can no longer continue in this loop, let's restart
+         * current function at the beginning and end this one.
+         *
+         * FIXME : performance impact may be high ! Should not try to fuse
+         * again with the same block
+         *
+         */
+        (*fuse_count)++;
+        try_to_fuse_with_rr_successors(b, fuse_count, maximize_parallelism);
+        return;
+      }
+    }
   }
 
   return;
@@ -801,11 +889,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
     ifdebug(3) {
       FOREACH(fusion_block, block, block_list)
       {
-        pips_debug(3,"Block %d, predecessors : ",block->num);
-        SET_FOREACH(fusion_block,pred,block->predecessors) {
-          fprintf(stderr, "%d, ", pred->num);
-        }
-        fprintf(stderr, "\n");
+        print_block(block);
       }
     }
     // Loop over blocks and find fusion candidate (loop with compatible header)
@@ -826,6 +910,15 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
       }
     }
 
+    /* Here we try to fuse each block with its rr_successors, this is to benefit
+     * from reuse (read-read) !
+     */
+    FOREACH(fusion_block, block, block_list) {
+      if(block->num>=0) { // Block is active
+        try_to_fuse_with_rr_successors(block, &fuse_count,params->maximize_parallelism);
+      }
+    }
+
     if(params->greedy) {
       /*
        * We allow the user to request a greedy fuse, which mean that we fuse as
@@ -833,6 +926,8 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
        */
       fuse_all_possible_blocks(block_list, &fuse_count,params->maximize_parallelism);
     }
+
+
 
     if(fuse_count > 0) {
       /*
