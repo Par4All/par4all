@@ -1143,8 +1143,17 @@ bool simplify_control(string mod_name)
 {
   statement mod_stmt;
 
+  if(compilation_unit_p(mod_name)) {
+    // bad idea to run simplify control on compilation unit
+    pips_user_warning("Simplify control isn't intended to run on compilation"
+        " unit ! Abort...");
+    return false;
+  }
+
+
   /* Get the true ressource, not a copy. */
   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
+
   set_current_module_statement(mod_stmt);
 
   set_current_module_entity(module_name_to_entity(mod_name));
