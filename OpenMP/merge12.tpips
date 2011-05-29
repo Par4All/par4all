@@ -16,13 +16,15 @@ create merge03 merge03.c
 #setproperty PRETTYPRINT_BLOCKS TRUE
 
 setproperty PRAGMA_TYPE "expr"
-#setproperty NESTED_PARALLELISM_THRESHOLD 2
+setproperty NESTED_PARALLELISM_THRESHOLD 1
+
+set MEMORY_EFFECTS_ONLY FALSE
 
 apply PRIVATIZE_MODULE(main)
 echo // OMP style
 setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
 apply INTERNALIZE_PARALLEL_CODE(main)
-#apply LIMIT_NESTED_PARALLELISM(main)
+apply LIMIT_NESTED_PARALLELISM(main)
 apply OMPIFY_CODE(main)
 display PRINTED_FILE(main)
 
