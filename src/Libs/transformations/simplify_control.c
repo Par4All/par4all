@@ -1219,7 +1219,7 @@ bool simplify_control(string mod_name)
 bool suppress_dead_code(string mod_name)
 {
   pips_user_warning("This phase has been renamed, please use 'simplify_control'"
-      " from now. The old alias 'suppress_dead_code' might be remove soon." );
+      " from now. The old alias 'suppress_dead_code' might be removed soon.\n" );
   return simplify_control(mod_name);
 }
 
