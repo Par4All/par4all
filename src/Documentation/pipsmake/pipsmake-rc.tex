@@ -3569,7 +3569,7 @@ clear. Intra-procedural preconditions may be computed with {\em
 inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination}.
+transformations like \PipsPassRef{partial_eval}, \PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -5893,7 +5893,7 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.proper_effects
 \begin{PipsPass}{loop_nest_unswitching}
   Converts max in loop bounds into tests. Also sets variable so that
-  \PipsPassRef{suppress_dead_code} works afterward
+  \PipsPassRef{simplify_control} works afterward
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7927,7 +7927,7 @@ INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
-\PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
+\PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination} after this
 transformation. When the number of iterations cannot be proven to be a
 multiple of the unrolling factor, the extra iterations can be executed
 first or last (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}). 
@@ -8456,11 +8456,14 @@ partial_redundancy_elimination             > MODULE.code
 \index{Control Simplification}
 
 \begin{PipsPass}{suppress_dead_code}
-Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
+Alias for \PipsPassRef{simplify_control}.
+\end{PipsPass}
+
+\begin{PipsPass}{simplify_control}
+
+Function \PipsPassRef{simplify_control} is used to delete non-executed code,
 such as empty loop nests or zero-trip loops, for example after
 strip-mining or partial evaluation. 
-\end{PipsPass}
-FI says it should be named simplify\_control.
 
 Preconditions are used to find always
 true conditions in tests and to eliminate such tests. In some cases,
@@ -8487,24 +8490,37 @@ control flow graph of the module is computed.
 
 The cumulated effects are used in debug mode to display information.
 
+%% FIXME : is the following still applicable ? We renamed dead_code_elimination 
+%% as expected
 Note that according to~\cite{ASU86}
 and~\cite{Muc97} , there is confusion between Dead-code elimination
 and Unreachable-code elimination. {\em Unreachable code} is code that
 cannot possibly be executed, regardless of the input data. {\em Dead code}
 elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
-$18.10$ of~\cite{Muc97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
+$18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
 phase \PipsPassRef{dead_code_elimination}.
 
-The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
+The \PipsPassRef{simplify_control} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
 
 This function was designed and implemented by Ronan K{\sc eryell}.
+\end{PipsPass}
 
 
 \begin{PipsMake}
-alias suppress_dead_code 'Dead Code Elimination'
+alias simplify_control 'Simplify Control'
+simplify_control          > MODULE.code
+                          > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.preconditions
+\end{PipsMake}
+
+\begin{PipsMake}
 suppress_dead_code          > MODULE.code
                             > MODULE.callees
         < PROGRAM.entities
@@ -9332,7 +9348,7 @@ sometimes replaced in the middle of an expression but not when the whole
 expression was a reference to a symbolic constant. Symbolic integer
 constants are now replaced by their values systematically.
 
-Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} should be
+Transformations \PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination} should be
 performed after partial evaluation. It is sometimes important to run
 more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
@@ -14930,7 +14946,7 @@ The transformation menu is displayed as here:
 
   restructure_control
   unspaghettify
-  suppress_dead_code
+  simplify_control
   partial_eval
   dead_code_elimination
   stf

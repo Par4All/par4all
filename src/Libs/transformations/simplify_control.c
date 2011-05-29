@@ -382,7 +382,7 @@ static bool loop_executed_once_p(statement s, loop l)
     if (retour) return true;
   }
   if (normalized_linear_p(n_m3)) { 
-    /* Teste le signe de l'incrément en fonction des préconditions : */
+    /* Teste le signe de l'incrï¿½ment en fonction des prï¿½conditions : */
     pv3 = vect_dup(normalized_linear(n_m3));
     pc3 = contrainte_make(pv3);
     ps = sc_dup(precondition_ps);
@@ -406,7 +406,7 @@ static bool loop_executed_once_p(statement s, loop l)
   if ((m3_positif ^ m3_negatif) && normalized_linear_p(n_m3) && 
       normalized_linear_p(n_m1) && normalized_linear_p(n_m2))
   {
-    /* Si l'incrément a un signe « connu » et différent de 0 et que
+    /* Si l'incrï¿½ment a un signe ï¿½ connu ï¿½ et diffï¿½rent de 0 et que
        les bornes sont connues : */
     Pvecteur pv1, pv2, pv3, pvx, pv;
     Pcontrainte ca, cb;
@@ -422,7 +422,7 @@ static bool loop_executed_once_p(statement s, loop l)
     pvx = vect_add(pv, pv3);
 
     if (m3_positif) {
-      /* L'incrément est positif. */
+      /* L'incrï¿½ment est positif. */
        (void) vect_chg_sgn(pvx);
       /* m1 - m2 <= 0 && m2 - m1 - m3 <= -1 */
     }
@@ -442,7 +442,7 @@ static bool loop_executed_once_p(statement s, loop l)
     retour = ineq_redund_with_sc_p(precondition_ps, ca) &&
              ineq_redund_with_sc_p(precondition_ps, cb);
 
-    /* Vire du même coup pv et pvx : */
+    /* Vire du mï¿½me coup pv et pvx : */
     contrainte_free(ca), contrainte_free(cb);
   }
 
@@ -1137,11 +1137,9 @@ static void suppress_dead_code_statement(statement mod_stmt)
 
 
 /*
- * Dead code elimination
- * mod_name : MODule NAME, nom du programme Fortran
- * mod_stmt : MODule STateMenT
+ * Simply Control
  */
-bool suppress_dead_code(string mod_name)
+bool simplify_control(string mod_name)
 {
   statement mod_stmt;
 
@@ -1215,7 +1213,15 @@ bool suppress_dead_code(string mod_name)
 }
 
 
-
+/*
+ * Simply Control old alias
+ */
+bool suppress_dead_code(string mod_name)
+{
+  pips_user_warning("This phase has been renamed, please use 'simplify_control'"
+      " from now. The old alias 'suppress_dead_code' might be remove soon." );
+  return simplify_control(mod_name);
+}
 
 /**
  * recursievly remove all labels from a module
