@@ -1337,12 +1337,6 @@ graph statement_dependence_graph( statement s ) {
   one_trip_do = get_bool_property( "ONE_TRIP_DO" );
   keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
 
-  /* FIXME
-   * OBSOLETE
-   * disambiguate_constant_subscripts
-   *   = get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" );
-   */
-
   ifdebug(1) {
     mem_spy_begin( );
     mem_spy_begin( );

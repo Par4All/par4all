@@ -2838,22 +2838,6 @@ These last two properties are not consistent with PIPS current development
 dependence graph. Phases using the latter should be able to filter out
 irrelevant arcs, e.g. pertaining to privatized variables.
 
-\subsubsection{Disambiguation Test}
-\index{Alias}
-\index{CHAINS\_DISAMBIGUATE\_CONSTANT\_SUBSCRIPTS}
-
-THIS PROPERTY IS OBSOLETE. It will be removed in a near future. Please don't
-use it.
-
-The default disambiguation test is based on variables names. Array and
-scalar variables are handled in the same way. However it is possible to
-refine the chain graph by using {\em constant} subscript expressions.
-
-\begin{PipsProp}{CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS} 
-CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
-\end{PipsProp}
-
-
 
 \section{Dependence Graph (DG)}
 \label{subsection-dependence-graph}
