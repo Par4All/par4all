@@ -1,59 +1,25 @@
-
-Code for "suppress_dead_code03"
-
-int suppress_dead_code03(int i)
+//
+// Code after simplify_control for module foo
+//
+void foo(int i)
 {
-// (0,2)
-   int k;                                                               /*0012*/
-// (0,3)
-
-   foo(1);                                                              /*0014*/
-// (0,4)
-   k = 3;                                                               /*0015*/
-// (0,5)
-
-   return i;                                                            /*0017*/
 }
-
-Code with cumulated effects for "suppress_dead_code03"
-
-//             <    is read   >: i
-int suppress_dead_code03(int i)
+//
+// Code after simplify_control for module main
+//
+int main()
 {
-// (0,2)
-   int k;                                                               /*0012*/
-// (0,3)
-
-   foo(1);                                                              /*0014*/
-//             <    is written>: k
-// (0,4)
-   k = 3;                                                               /*0015*/
-//             <    is read   >: i
-// (0,5)
-
-   return i;                                                            /*0017*/
+   return suppress_dead_code03(2);
 }
-
-Dependence graph for "suppress_dead_code03"
-
-
- *********************** Use-Def Chains *********************
-
-
-****************** End of Dependence Graph ******************
-
-Code for "suppress_dead_code03" after dead code elimination
-
+//
+// Code after simplify_control for module suppress_dead_code03
+//
 int suppress_dead_code03(int i)
 {
-// (0,2)
-   int k;                                                               /*0012*/
-// (0,3)
+   int k;
 
-   foo(1);                                                              /*0014*/
-// (0,4)
-   k = 3;                                                               /*0015*/
-// (0,5)
+   foo(1);
+   k = 3;
 
-   return i;                                                            /*0017*/
+   return i;
 }
