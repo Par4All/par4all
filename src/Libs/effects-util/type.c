@@ -77,7 +77,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
   pips_debug(8, "input type : %s\n", type_to_string(current_type));
   pips_debug(8, "current_basic : %s, and number of dimensions %d\n", basic_to_string(current_basic), (int) current_nb_dim);
 
-  pips_assert("there should be no effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
+  pips_assert("there should be no store effect on variable names\n", gen_length(current_l_ind) >= current_nb_dim);
   
 
   switch (basic_tag(current_basic)) 
@@ -161,7 +161,7 @@ static int effect_indices_first_pointer_dimension_rank(list current_l_ind, type 
    @return -1 if no index corresponds to a pointer dimension, the rank of the least index that may correspond to
       a pointer dimension in current_l_ind otherwise. If this information is exact, *exact_p is set to true.
  */
-int effect_reference_first_pointer_dimension_rank(reference ref, bool *exact_p)
+static int effect_reference_first_pointer_dimension_rank(reference ref, bool *exact_p)
 { 
   entity ent = reference_variable(ref);
   list current_l_ind = reference_indices(ref);
@@ -203,6 +203,7 @@ bool effect_reference_contains_pointer_dimension_p(reference ref, bool *exact_p)
    @param ref is an effect reference
    @param exact_p is a pointer to a bool, which is set to true if the result is not an approximation.
    @return true if the effect reference may dereference a pointer, false otherwise.
+
  */
 bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
 {
@@ -217,8 +218,11 @@ bool effect_reference_dereferencing_p(reference ref, bool * exact_p)
     }
   else
     {
-      p_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
-  
+      if (ENDP(l_ind)) /* no dereferencement if scalar reference, in particular, gets rid
+			  of non store effect references */
+	  p_rank = -1;
+      else
+	p_rank = effect_reference_first_pointer_dimension_rank(ref, exact_p);
 
       if (p_rank == -1)
 	result = false;
@@ -293,28 +297,28 @@ static type r_variable_cell_reference_to_type(list ref_l_ind, type current_type)
 	    else
 	      pips_internal_error("the current basic tag is derived, but corresponding index is not a reference");
 	    break;
-	  }      
+	  }
 	default:
 	  {
 	    pips_internal_error("unexpected basic tag");
 	  }
 	}
     }
-      
+
   ifdebug(8)
     {
       variable v = type_variable(t);
       pips_debug(8, "output type is: %s\n",  type_to_string(t));
-      pips_debug(8, "with basic : %s, and number of dimensions %d\n", 
-		 basic_to_string(variable_basic(v)), 
+      pips_debug(8, "with basic : %s, and number of dimensions %d\n",
+		 basic_to_string(variable_basic(v)),
 		 (int) gen_length(variable_dimensions(v)));
     }
   return t;
 }
 
 /**
- @brief computes the type of a cell reference representing a memory access path. 
-        Cell references are not compatible with entity typing: spurious dimensions 
+ @brief computes the type of a cell reference representing a memory access path.
+        Cell references are not compatible with entity typing: spurious dimensions
         are added to handle struct fields and the dereferencing operator.
 	BEWARE : does not work if field entity indices have been converted to ranks.
  @param ref is a reference from a cell.
@@ -327,27 +331,32 @@ type cell_reference_to_type(reference ref)
 
   pips_debug(6, "input reference: %s \n",  words_to_string(words_reference(ref,NIL)));
 
-  if(type_variable_p(ref_type))
-    {
-      t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type);
-    }
-  else if(type_functional_p(ref_type))
-    {
-      /* A reference to a function returns a pointer to a function
-	 of the very same time */
-      t = make_type(is_type_variable,
-		    make_variable
-		    (make_basic(is_basic_pointer, copy_type(ref_type)),
-		     NIL, NIL));
-    }
+  if (ENDP(reference_indices(ref))) /* in particular, gets rid of non-store effect references */
+    t = ref_type;
   else
     {
-      pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
-			  type_tag(ref_type),
-			  type_to_string(ref_type),
-			  entity_name(reference_variable(ref)));
+      if(type_variable_p(ref_type))
+	{
+	  t = r_variable_cell_reference_to_type(reference_indices(ref), ref_type);
+	  free_type(ref_type);
+	}
+      else if(type_functional_p(ref_type))
+	{
+	  /* A reference to a function returns a pointer to a function
+	     of the very same time */
+	  t = make_type(is_type_variable,
+			make_variable
+			(make_basic(is_basic_pointer, ref_type),
+			 NIL, NIL));
+	}
+      else
+	{
+	  pips_internal_error("Bad reference type tag %d \"%s\" for reference %s",
+			      type_tag(ref_type),
+			      type_to_string(ref_type),
+			      entity_name(reference_variable(ref)));
+	}
     }
-  free_type(ref_type);
 
   return t;
 }

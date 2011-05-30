@@ -682,6 +682,9 @@ static list rw_effects_of_declarations(list rb_lrw, list l_decl)
 			  pips_debug(8, "same entity\n");
 			  // there is no need to keep the effect if it's an effect on the sole declared variable (length of path = 0)
 			  if( !ENDP(reference_indices(eff_ref)))
+			    /* as a consequence, it is a store effect which is needed for the call to
+			       effect_reference_contains_pointer_dimension_p
+			    */
 			    {
 			      bool exact_p;
 			      // no need to keep the effect if there is no pointer in the path of the effect
