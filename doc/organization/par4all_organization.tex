@@ -1122,6 +1122,45 @@ at once.
 
 \input{p4a_coffee-help}
 
+\subsubsection{Relocating binary installation}
+\label{sec:relocation}
+If needed a \Apfa binary installation can be relocated. There are a few ways to relocate it:
+
+\begin{enumerate}
+\item Copy or move all \Apfa binary installation to another directory, 
+for example to copy 
+from \texttt{/usr/local/par4all} to \texttt{/opt} :
+
+\begin{alltt}
+cp -av \emph{/usr/local/par4all} \emph{/opt}
+\end{alltt}
+
+\item Extract from a debian pakage, for example to install
+\Apfa in \texttt{/opt} directory:
+
+\begin{alltt}
+sudo dpkg -x par4all-1.1.1-xxx.deb \emph{/opt}
+\end{alltt}
+
+\end{enumerate}
+
+After having installed \Apfa in a new installation directory (not the default one), 
+\verb|par4all-rc.sh| should be updated.
+\verb|P4A_DIST| and \verb|P4A_ROOT| variables in the \verb|par4all-rc.sh| 
+should be changed according to this new installation directory.
+The following examples are for the cases 1 and 2. 
+
+Relocation has been done by copying all the binary installation (case 1):
+\begin{alltt}
+P4A_DIST='/opt/par4all'
+P4A_ROOT='/opt/par4all'
+\end{alltt}
+
+Relocation has been done using \texttt{dpkg -x} command (case 2) :
+\begin{alltt}
+P4A_DIST='/opt/usr/local/par4all'
+P4A_ROOT='/opt/usr/local/par4all'
+\end{alltt}
 
 \section{Examples and demos}
 \label{sec:examples-demos}
