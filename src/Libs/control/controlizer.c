@@ -1799,7 +1799,9 @@ static bool controlize_sequence(control c_res,
 		      && statement_test_p(control_statement(c)) )
 		    ||
 		    ( gen_length(control_successors(c))==1
-		      && !statement_test_p(control_statement(c)) )
+		      // FI: the test may not be unstructured; a
+		      // structured test has only one successor
+		      /* && !statement_test_p(control_statement(c))*/ )
 		    );
     }
     /* Each control node of the sequence is indeed well structured, that
