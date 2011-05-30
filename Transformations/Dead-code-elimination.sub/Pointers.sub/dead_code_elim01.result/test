@@ -1,0 +1,29 @@
+//
+// Code after dead_code_elimination for module dead_code_elim01
+//
+int dead_code_elim01()
+{
+   int i, *x, *y;
+
+   i = 2;
+   x = &i;
+   y = x;
+   *y = 1;
+
+   return *y;
+}
+// With points-to
+//
+// Code after dead_code_elimination for module dead_code_elim01
+//
+int dead_code_elim01()
+{
+   int i, *x, *y;
+
+
+   x = &i;
+   y = x;
+   *y = 1;
+
+   return *y;
+}

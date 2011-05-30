@@ -1,4 +1,3 @@
-#include<stdio.h>
 /* test case for use-def elimination suggested by François for Mehdi.*/
 int dead_code_elim01()
 {
