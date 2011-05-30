@@ -1,0 +1,28 @@
+delete pointer03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create pointer03 pointer03.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+setproperty ALIASING_ACROSS_TYPES FALSE
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
+#setenv PROPER_EFFECTS_DEBUG_LEVEL 8
+
+echo 
+echo POINTS-TO
+echo
+activate PRINT_CODE_POINTS_TO_LIST
+display PRINTED_FILE
+
+activate PROPER_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_PROPER_EFFECTS
+
+display PRINTED_FILE
+
+activate PRINT_CHAINS_GRAPH
+display DG_FILE 
+
+close
+delete pointer03
+quit
