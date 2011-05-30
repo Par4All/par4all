@@ -1714,6 +1714,7 @@ static bool controlize_sequence(control c_res,
      succ: */
   bool must_be_controlized_p = FALSE;
   //bool previous_control_preexisting_p = FALSE;
+
   FOREACH(STATEMENT, s, sts) {
     /* Create a new control node for this statement, or retrieve one
        if it as a label: */
@@ -1877,6 +1878,18 @@ static bool controlize_sequence(control c_res,
 	 since it was built in reverse order. Note that ctls cannot be
 	 empty here because it an empty statement sequence should be
 	 structured by definition and caught by the previous test. */
+      /* FI: when the last statement is controlized, there is no
+	 guarantee any longer that the control corrresponding to the
+	 last statement of the sequence is the exit note. Also, an
+	 exit note should have no successor by definition. To avoid
+	 the issue, we could systematically add a nop statement to the
+	 sequence. Or we could check that the last control node has no
+	 successors, else look for the node connected to succ (might
+	 be dangerous because succ may not really be part of the code)
+	 and, if no such node is found because the sequence loops
+	 forever, create a new unreachable control node with a NOP
+	 statement. */
+      // control exit = CONTROL(CAR(ctls));
       control exit = CONTROL(CAR(ctls));
       control entry = CONTROL(CAR(gen_last(ctls)));
       pips_debug(5, "Create a local unstructured with entry node %p and exit node %p\n", entry, exit);
@@ -2014,7 +2027,7 @@ static bool controlize_test(control c_res,
   link_2_control_nodes(c_res, c_then);
   link_2_control_nodes(c_then, succ);
 
-  /* Now we can contolize each branch statement to deal with some control
+  /* Now we can controlize each branch statement to deal with some control
      flow fun: */
   controlize_statement(c_then, succ, t_used_labels);
   controlize_statement(c_else, succ, f_used_labels);
