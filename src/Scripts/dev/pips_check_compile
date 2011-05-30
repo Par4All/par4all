@@ -48,7 +48,7 @@ validate=mail-diff-validate
 vopts=
 vname=
 build=compile
-try=2
+try=3
 
 # get options manually
 while [[ $1 == -* ]]
