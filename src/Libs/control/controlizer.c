@@ -1652,6 +1652,69 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 }
 
 
+/* ctls is built backwwards: hence its exit node is the first node in
+   the list. */
+static control find_exit_control_node(list ctls, control succ)
+{
+  control exit = CONTROL(CAR(ctls));
+
+  ifdebug(8) {
+    FOREACH(CONTROL, c, ctls) {
+      check_control_coherency(c);
+    }
+  }
+
+  if(!(ENDP(control_successors(exit))
+       || (gen_length(control_successors(exit))==1
+	   && CONTROL(CAR(control_successors(exit)))==succ))) {
+    /* look for a successor of exit that is a predecessor of succ */
+    list visited = NIL;
+    list to_be_visited = gen_copy_seq(control_successors(exit));
+    bool found_p = FALSE;
+
+    while(!ENDP(to_be_visited) && !found_p) {
+      FOREACH(CONTROL, c, to_be_visited) {
+	if(c==succ) {
+	  control p = CONTROL(CAR(control_predecessors(succ)));
+	  // FI: Not a good idea because succ is used otherwise above
+	  // exit = succ;
+	  exit = make_control(make_plain_continue_statement(), NIL, NIL);
+	  pips_assert("succ has only one predecessor",
+		      gen_length(control_predecessors(c))==1);
+	  insert_control_in_arc(exit, p, succ);
+	  found_p = TRUE;
+	  break;
+	}
+	else {
+	  visited = CONS(CONTROL, c, visited);
+	  gen_remove(&to_be_visited, c);
+	  FOREACH(CONTROL, s, control_successors(c)) {
+	    if(!gen_in_list_p(s, visited) && !gen_in_list_p(s, to_be_visited))
+	      to_be_visited = CONS(CONTROL, s, to_be_visited);
+	  }
+	}
+      }
+    }
+
+    gen_free_list(visited);
+    gen_free_list(to_be_visited);
+
+    if(!found_p) {
+    /* succ may be unreachable because ctls loops on itself*/
+      exit = make_control(make_plain_continue_statement(), NIL, NIL);
+    }
+  }
+
+  ifdebug(8) {
+    FOREACH(CONTROL, c, ctls) {
+      check_control_coherency(c);
+    }
+    check_control_coherency(exit);
+  }
+
+return exit;
+}
+
 /* Computes the control graph of a sequence statement
 
    We try to minimize the number of graphs by looking for graphs with one
@@ -1867,6 +1930,7 @@ static bool controlize_sequence(control c_res,
     /* Remove the sequence list but not the statements themselves since
        each one has been moved into a control node: */
     gen_free_list(sequence_statements(statement_sequence(st)));
+    sequence_statements(statement_sequence(st)) = NIL;
 
     // FI: this fails because st has been gutted out... covers_p must
     // be computed earlier
@@ -1880,8 +1944,8 @@ static bool controlize_sequence(control c_res,
 	 structured by definition and caught by the previous test. */
       /* FI: when the last statement is controlized, there is no
 	 guarantee any longer that the control corrresponding to the
-	 last statement of the sequence is the exit note. Also, an
-	 exit note should have no successor by definition. To avoid
+	 last statement of the sequence is the exit node. Also, an
+	 exit node should have no successor by definition. To avoid
 	 the issue, we could systematically add a nop statement to the
 	 sequence. Or we could check that the last control node has no
 	 successors, else look for the node connected to succ (might
@@ -1890,12 +1954,13 @@ static bool controlize_sequence(control c_res,
 	 forever, create a new unreachable control node with a NOP
 	 statement. */
       // control exit = CONTROL(CAR(ctls));
-      control exit = CONTROL(CAR(ctls));
+      control exit = find_exit_control_node(ctls, succ);
       control entry = CONTROL(CAR(gen_last(ctls)));
       pips_debug(5, "Create a local unstructured with entry node %p and exit node %p\n", entry, exit);
 
       /* First detach the local graph: */
       unlink_2_control_nodes(c_res, entry);
+      /* FI: Not such a good idea to return succ as exit control node... */
       unlink_2_control_nodes(exit, succ);
       /* Reconnect around the unstructured: */
       link_2_control_nodes(c_res, succ);
@@ -2035,6 +2100,9 @@ static bool controlize_test(control c_res,
   /* If all the label jumped to from the THEN/ELSE statements are in their
      respective statement, we can replace the unstructured test by a
      structured one back: */
+  /* FI: this test returns a wrong result for if02.c. The reason
+     might be again controlize_goto() or a consequence of the two
+     calls to controlize_statement() above. */
   if(covers_labels_p(s_t, t_used_labels)
      && covers_labels_p(s_f, f_used_labels)) {
     pips_debug(5, "Restructure the IF at control %p\n", c_res);
