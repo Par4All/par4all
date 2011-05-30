@@ -1,0 +1,62 @@
+
+Parser output
+
+int block_scope2()
+{
+   int x = 6;                                                           /*0004*/
+lab1:   x--;                                                                 /*0007*/
+   {
+      int x;                                                            /*0009*/
+      x++;                                                              /*0010*/
+   }
+   {
+      int x = -1;                                                       /*0014*/
+      goto lab1;                                                        /*0015*/
+   }
+   return x;                                                            /*0017*/
+}
+
+Controlizer output
+
+int block_scope2()
+{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,2)
+lab1:   x--;                                                                 /*0007*/
+   {
+// (1,4)
+      int x;                                                            /*0009*/
+// (1,5)
+      x++;                                                              /*0010*/
+   }
+// (1,6)
+   int x_ = -1;                                                         /*0014*/
+   goto lab1;
+//:   END UNSTRUCTURED
+}
+
+Output after control restructuring
+
+int block_scope2()
+{
+// (0,2)
+   int x = 6;                                                           /*0004*/
+// (0,3)
+//:   BEGIN UNSTRUCTURED
+// (1,2)
+lab1:   x--;                                                                 /*0007*/
+   {
+// (1,4)
+      int x;                                                            /*0009*/
+// (1,5)
+      x++;                                                              /*0010*/
+   }
+// (1,6)
+   int x_ = -1;                                                         /*0014*/
+   goto lab1;
+//:   END UNSTRUCTURED
+}
+
