@@ -162,6 +162,14 @@ static void print_block(fusion_block block) {
   fprintf(stderr, "\n");
 }
 
+/**
+ * Debug function that print a list of blocks
+ */
+static void print_blocks(list /* of fusion_block */ blocks) {
+  FOREACH(fusion_block, block, blocks) {
+    print_block(block);
+  }
+}
 
 /**
  * @brief Check that two loop statements have the same bounds
@@ -599,6 +607,7 @@ static void compute_successors(fusion_block b, list block_list) {
  * longest path, no shortcut :-)
  */
 static set prune_successors_tree(fusion_block b) {
+  pips_debug(8,"visiting %d\n",b->num);
   set full_succ = set_make(set_pointer);
   SET_FOREACH(fusion_block, succ, b->successors) {
     set full_succ_of_succ = prune_successors_tree(succ);
@@ -669,9 +678,10 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
     set_del_element(rr_pred->rr_successors, rr_pred->rr_successors, block2);
   }
 
-  // Remove block1 from predecessors of ... block1
+  // Remove block1 from predecessors and successors of ... block1
   set_del_element(block1->predecessors, block1->predecessors, block1);
-  // Remove block1 from rr_predecessors of ... block1
+  set_del_element(block1->successors, block1->successors, block1);
+  // Remove block1 from rr_predecessors and rr_successors of ... block1
   set_del_element(block1->rr_predecessors, block1->rr_predecessors, block1);
   set_del_element(block1->rr_successors, block1->rr_successors, block1);
 
@@ -789,20 +799,27 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
  */
 static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
   bool fusable_p = false;
-  if(b1!=b2 && b1->num>=0 && b2->num>=0) {
+  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
     // Blocks are active
     if(set_belong_p(b1->successors,b2)
-       || !set_belong_p(b2->successors,b1)) {
+       || set_belong_p(b2->successors,b1)) {
       // Adjacent blocks are fusable
+      ifdebug(6) {
+        pips_debug(6,"blocks are fusable because directly connected\n");
+        print_block(b1);
+        print_block(b2);
+      }
       fusable_p = true;
     } else {
       // If there's some constraint, we won't be able to fuse them
       // here is a heavy way to check that, better not to think about
       // algorithm complexity :-(
+      pips_debug(6,"Getting full successors for b1 (%d)\n",b1->num);
       set full_succ_b1 = prune_successors_tree(b1);
       if(!set_belong_p(full_succ_b1,b2)) {
         // b2 is not a successors of a successor of a .... of b1
         // look at the opposite !
+        pips_debug(6,"Getting full successors for b2 (%d)\n",b2->num);
         set full_succ_b2 = prune_successors_tree(b2);
         if(!set_belong_p(full_succ_b2,b1)) {
           fusable_p = true;
@@ -827,10 +844,12 @@ static void fuse_all_possible_blocks(list blocks,
                                      int *fusion_count,
                                      bool maximize_parallelism) {
   FOREACH(fusion_block, b1, blocks) {
-    FOREACH(fusion_block, b2, blocks) {
-      if(fusable_blocks_p(b1,b2)) {
-        if(fuse_block(b1, b2, maximize_parallelism)) {
-          (*fusion_count)++;
+    if(b1->is_a_loop) {
+      FOREACH(fusion_block, b2, blocks) {
+        if(fusable_blocks_p(b1,b2)) {
+          if(fuse_block(b1, b2, maximize_parallelism)) {
+            (*fusion_count)++;
+          }
         }
       }
     }
@@ -887,10 +906,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
     }
 
     ifdebug(3) {
-      FOREACH(fusion_block, block, block_list)
-      {
-        print_block(block);
-      }
+      print_blocks(block_list);
     }
     // Loop over blocks and find fusion candidate (loop with compatible header)
     /*
@@ -924,6 +940,9 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
        * We allow the user to request a greedy fuse, which mean that we fuse as
        * much as we can, even if there's no reuse !
        */
+      ifdebug(3) {
+        print_blocks(block_list);
+      }
       fuse_all_possible_blocks(block_list, &fuse_count,params->maximize_parallelism);
     }
 
