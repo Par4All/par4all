@@ -1,0 +1,53 @@
+
+
+Parser output
+
+
+      SUBROUTINE CREATE
+
+
+      IF (I.EQ.1) THEN                                                  0004
+         GOTO 9999
+      ELSE
+         IF (I.EQ.2) THEN                                               0006
+            I = 3                                                       0007
+         ELSE
+         ENDIF
+      ENDIF
+8888  RETURN
+9999  I = 4                                                             0010
+      END
+
+
+Controlizer output
+
+
+      SUBROUTINE CREATE
+
+
+      IF (I.EQ.1) GOTO 99999                                            0004
+      IF (I.EQ.2) I = 3                                                 0006
+8888  CONTINUE
+      RETURN
+99999 CONTINUE
+9999  I = 4                                                             0010
+      RETURN
+      END
+
+
+New controlizer output
+
+
+      SUBROUTINE CREATE
+
+
+      IF (I.EQ.1) GOTO 99999                                            0004
+      IF (I.EQ.2) THEN                                                  0006
+         I = 3                                                          0007
+      ELSE
+      ENDIF
+8888  CONTINUE
+      RETURN
+99999 CONTINUE
+9999  I = 4                                                             0010
+      END

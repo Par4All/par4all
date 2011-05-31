@@ -30,7 +30,7 @@ int main()
 }
 int main()
 {
-//             <    is declared>: a[*][*][*][*][*]
+//             <    is declared>: a
    float a[10][10][10][10][10];
 //             <    is declared>: i j k l m
    int i, j, k, l, m;
@@ -80,7 +80,7 @@ int main()
                   y = 3.5+x+z;
 //             <    is read   >: i j k l m x y
 //             <    is written>: a[i][j][k][l][m]
-//             <    is referenced>: a[*][*][*][*][*] i j k l m x y
+//             <    is referenced>: a i j k l m x y
                   a[i][j][k][l][m] = x*y;
                }
          }
@@ -194,7 +194,7 @@ Use-def chains
 	06 --> 10 with conflicts
 		from <i-WE-EXACT> to <i-RE-EXACT>
 	05 --> 24 with conflicts
-		from <a[*][*][*][*][*]-WE-EXACT> to <a[*][*][*][*][*]-RE-EXACT>
+		from <a-WE-EXACT> to <a-RE-EXACT>
 
 ****************** End of Dependence Graph ******************
 // OMP style

@@ -1,5 +1,5 @@
 
-int block_scope()
+int block_scope2()
 {
   int x = 6;
   {

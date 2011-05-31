@@ -17,14 +17,14 @@ echo
 apply VARIABLE_EXPANSION[foo]
 display PRINTED_FILE[foo]
 
-echo
-echo Unsplit resulting code
-echo
+#echo
+#echo Unsplit resulting code
+#echo
 
-apply UNSPLIT
-shell cc  $WS.c -o  $WS.database/Tmp/seq
-shell cc  $WS.database/Src/$WS.c -o $WS.database/Tmp/out
-shell if test `./$WS.database/Tmp/seq` = `./$WS.database/Tmp/out` ; then echo "ok"; else echo "ko" ; fi
+#apply UNSPLIT
+#shell cc  $WS.c -o  $WS.database/Tmp/seq
+#shell cc  $WS.database/Src/$WS.c -o $WS.database/Tmp/out
+#shell if test `./$WS.database/Tmp/seq` = `./$WS.database/Tmp/out` ; then echo "ok"; else echo "ko" ; fi
 
 close
 delete $WS

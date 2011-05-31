@@ -1,3 +1,6 @@
+
+Parsed code
+
 ! Debug the destructuration of a Fortran DO loop by the new controlizer
 
       PROGRAM LOOOP01
@@ -13,10 +16,12 @@
 100   CONTINUE                                                          0011
 
       END
+
+Controlized code
+
 ! Debug the destructuration of a Fortran DO loop by the new controlizer
 
       PROGRAM LOOOP01
-C     BEGIN BLOCK
       I = 1
 99998 CONTINUE
       IF (I.GT.N) GOTO 99999
@@ -29,5 +34,4 @@ C     BEGIN BLOCK
 
 100   CONTINUE                                                          0011
 
-C     END BLOCK
       END

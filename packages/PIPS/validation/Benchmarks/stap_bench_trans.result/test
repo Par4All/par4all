@@ -12,7 +12,7 @@ void Apply_Filter(int Nrec, int Ntt, int Na, Cplfloat Sig[Nrec][Na], Cplfloat Fi
 
             R += Sig[i+r][a].re*Fil[a+Na*r].re+Sig[i+r][a].im*Fil[a+Na*r].im;
 
-            I += -(Sig[i+r][a].re*Fil[a+Na*r].im)+Sig[i+r][a].im*Fil[a+Na*r].re;
+            I += -Sig[i+r][a].re*Fil[a+Na*r].im+Sig[i+r][a].im*Fil[a+Na*r].re;
          }
       Out[i].re = R;
       Out[i].im = I;
@@ -38,7 +38,7 @@ void Calc_Filter(int ntt, int nsa, int Nv, Cplfloat CovInv[ntt*nsa][ntt*nsa], Cp
             Y.re = CovInv[j][i].re;
             Y.im = CovInv[j][i].im;
             Z.re += X.re*Y.re+X.im*Y.im;
-            Z.im += -(X.im*Y.re)+X.re*Y.im;
+            Z.im += -X.im*Y.re+X.re*Y.im;
          }
          W[i].re = Z.re;
          W[i].im = Z.im;
@@ -78,7 +78,7 @@ void Calc_steervect(int nth, int nv, int ntt, int nsa, float SubarraySpacing, fl
             for(ant = 0; ant <= nsa-1; ant += 1) {
 
                angldir = AngleCarrier_rad+theta+(SubarraySpacing*ant-CarrierSpeed*Tr*rec)*sin(AngleCarrier_rad)/TargetDistance;
-               delta_dist = -(V*Tr*rec);
+               delta_dist = -V*Tr*rec;
                deph_a = Kdeph*SubarraySpacing*ant*cos(angldir);
                deph_v = Kdeph*2*delta_dist;
                deph = deph_a+deph_v;
@@ -206,7 +206,7 @@ void Int_Dop(int nv, int ndop, Cplfloat ptrin1[nv][ndop], Cplfloat ptrin2[nv][nd
 
          X = ptrin1[i][j].re*ptrin2[i][j].re+ptrin1[i][j].im*ptrin2[i][j].im;
 
-         Y = -(ptrin1[i][j].re*ptrin2[i][j].im)+ptrin1[i][j].im*ptrin2[i][j].re;
+         Y = -ptrin1[i][j].re*ptrin2[i][j].im+ptrin1[i][j].im*ptrin2[i][j].re;
          R += X;
          I += Y;
       }
@@ -412,7 +412,7 @@ void RemAmbiguity(int nbplots, int Nraf, Cplfloat In[Nraf][nbplots], float pTr[N
                th = (int) (PLOT.re-10000.*rg-100.*v+.1);
                V = vint2Vfloat(v, Nv, lambda, Trec);
                for(i = -2; i <= 2; i += 1)
-                  if (V+2*i*Vmax>-(2*Vmax0)&&V+2*i*Vmax<2*Vmax0) {
+                  if (V+2*i*Vmax>-2*Vmax0&&V+2*i*Vmax<2*Vmax0) {
                      newv0 = Vfloat2vint(V+2*i*Vmax, 2*Nv, lambda, Trmin/2.);
                      TAB_RGVTH[rg][newv0][th] += PLOT.im;
                      TAB_NBHIT[rg][newv0][th] += 1;
@@ -855,6 +855,4 @@ float vint2Vfloat_1(int v, int Nv, float Vmax)
       V = V-2.*Vmax;
    return V;
 }
-STAP - end of program.
-# file 'PlotsOut.txt' generated.
 

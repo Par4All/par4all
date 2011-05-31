@@ -6,8 +6,9 @@ display PRINTED_FILE[%ALLFUNC]
 apply UNSPLIT
 close
 
-shell cc $WS.database/Src/$WS.c -lm -o $WS
-shell ./$WS
-shell rm -f $WS PlotsOut.txt
+# only for design !
+#shell cc $WS.database/Src/$WS.c -lm -o $WS
+#shell ./$WS
+#shell rm -f $WS PlotsOut.txt
 
 delete $WS

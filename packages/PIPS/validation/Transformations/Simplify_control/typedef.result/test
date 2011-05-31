@@ -1,0 +1,11 @@
+//
+// Code after simplify_control for module main
+//
+int main(void)
+{
+   // ok if following line is uncommented
+   //int i = 0;
+   
+   
+   return 0;
+}

@@ -1,0 +1,46 @@
+
+Parser output
+
+void block_scope4n()
+{
+   int x = 6;                                                           /*0005*/
+   {
+      int x;                                                            /*0007*/
+lab1:      x--;                                                              /*0009*/
+   }
+   x++;                                                                 /*0011*/
+   goto lab1;                                                           /*0012*/
+}
+
+Controlizer output
+
+void block_scope4n()
+{
+// (0,2)
+   int x = 6;                                                           /*0005*/
+// (0,3)
+   int x_;                                                              /*0007*/
+// (0,4)
+// (1,2)
+lab1:   x_--;                                                                /*0009*/
+// (1,3)
+   x++;                                                                 /*0011*/
+   goto lab1;
+}
+
+After restructuring
+
+void block_scope4n()
+{
+// (0,2)
+   int x = 6;                                                           /*0005*/
+// (0,3)
+   int x_;                                                              /*0007*/
+// (0,4)
+// (1,2)
+lab1:   x_--;                                                                /*0009*/
+// (1,3)
+   x++;                                                                 /*0011*/
+   goto lab1;
+}
+
