@@ -1845,6 +1845,13 @@ fix_sequence_statement_attributes(statement s)
 	statement_number(continue_s) = statement_number(s);
 	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
 
+	/* FI: at least in for loop to while loop conversion, the
+	   extensions is moved down to the while loop. I'm not sure
+	   this is the best source code location to fix the
+	   problem. I do not know if the extensions have been reused
+	   directly and so do not need to be freed here or not. */
+	statement_extensions(s) = make_extensions(NIL);
+
 	instructions = CONS(STATEMENT, continue_s, instructions);
 	instruction_block(statement_instruction(s)) = instructions;
     }
