@@ -6,7 +6,7 @@ setproperty ABORT_ON_USER_ERROR TRUE
 create pointer12 pointer12.c
 
 setproperty MEMORY_EFFECTS_ONLY FALSE
-
+setproperty ABSTRACT_HEAP_LOCATIONS "context-sensitive"
 activate PROPER_EFFECTS
 
 activate PRINT_CODE_POINTS_TO_LIST
