@@ -332,7 +332,7 @@ do
     # possible repeated failures: network dns svn...
     # hmmm... try to cleanup after svn up failure
     svn cleanup $prod "$@" >> out 2>> err
-    report 'KO:svn-up' 'unchanged' 'cannot "svn up" ($try)'
+    report 'KO:svn-up' 'unchanged' "cannot \"svn up\" ($try)"
   fi
 done
 
