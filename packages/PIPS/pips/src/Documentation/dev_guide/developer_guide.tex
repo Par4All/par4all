@@ -2284,6 +2284,32 @@ definitions at the beginning of the file too, to keep the comments and
 display the list of included files.
 
 
+\subsection{Launching gdb}
+
+GDB is launched the usual way on \texttt{tpips}
+\begin{verbatim}
+  sh> gdb /path/to/binary/of/tpips
+  gdb> run
+  ...
+\end{verbatim}
+or on a process, using the process number.
+
+When a validation default \texttt{tpips} script is used:
+\begin{verbatim}
+  sh> WSPACE=foo FILE=foo.f gdb /path/to/binary/of/tpips
+  gdb> run default_tpips
+  ...
+\end{verbatim}
+
+When the PyPS Python pass manager is used: 
+\begin{verbatim}
+gdb --arg python my.py to debug pips parts
+\end{verbatim}
+or:
+\begin{verbatim}
+pdb my.py to debug pyps parts
+\end{verbatim}
+
 \subsection{Debugging PIPS C source code dynamically}
 \label{sec:pips_dynamic_debug}
 

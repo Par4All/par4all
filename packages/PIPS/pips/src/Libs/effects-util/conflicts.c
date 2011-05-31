@@ -74,6 +74,46 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
   return conflict_p;
 }
 
+
+/**
+ * @brief Check if two effect might conflict, even if they are read only
+ * @description Two effects may conflict if their abstract two location sets has
+ * a non-empty intersection
+ *
+ * This function is conservative: it is always correct to declare a conflict.
+ */
+bool effects_might_conflict_even_read_only_p(effect eff1, effect eff2) {
+  action ac1 = effect_action(eff1);
+  action ac2 = effect_action(eff2);
+  bool conflict_p = TRUE;
+
+  action_kind ak1 = action_to_action_kind(ac1);
+  action_kind ak2 = action_to_action_kind(ac2);
+
+  if(action_kind_tag(ak1) != action_kind_tag(ak2)) {
+    // A store mutation cannot conflict with an environment or type
+    // declaration mutation
+    conflict_p = FALSE;
+  } else {
+    if(action_kind_store_p(ak1)) {
+      cell cell1 = effect_cell(eff1);
+      cell cell2 = effect_cell(eff2);
+      if(!cells_may_conflict_p(cell1, cell2)) {
+        conflict_p = FALSE;
+      }
+    } else {
+      /* For environment and type declarations, the references are
+       empty and the conflict is only based on the referenced
+       entity */
+      entity v1 = effect_variable(eff1);
+      entity v2 = effect_variable(eff2);
+      conflict_p = v1 == v2;
+    }
+  }
+  return conflict_p;
+}
+
+
 /**
  * @brief Check if two effect may conflict
  * @description Two effects may conflict if their abstract two location sets has
@@ -90,32 +130,11 @@ bool effects_may_conflict_p( effect eff1, effect eff2 ) {
     // Two read won't conflict
     conflict_p = FALSE;
   } else {
-    action_kind ak1 = action_to_action_kind(ac1);
-    action_kind ak2 = action_to_action_kind(ac2);
-
-    if(action_kind_tag(ak1) != action_kind_tag(ak2)) {
-      // A store mutation cannot conflict with an environment or type
-      // declaration mutation
-      conflict_p = FALSE;
-    } else {
-      if(action_kind_store_p(ak1)) {
-	cell cell1 = effect_cell(eff1);
-	cell cell2 = effect_cell(eff2);
-	if ( !cells_may_conflict_p( cell1, cell2 ) ) {
-	  conflict_p = FALSE;
-	}
-      } else {
-	/* For environment and type declarations, the references are
-	   empty and the conflict is only based on the referenced
-	   entity */
-	entity v1 = effect_variable(eff1);
-	entity v2 = effect_variable(eff2);
-	conflict_p = v1==v2;
-      }
-    }
+    conflict_p = effects_might_conflict_even_read_only_p(eff1,eff2);
   }
   return conflict_p;
 }
+
 
 /**
  *  @brief OBSOLETE, was never used !!

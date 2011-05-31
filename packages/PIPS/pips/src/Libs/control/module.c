@@ -171,9 +171,26 @@ bool new_controlizer(string module_name)
     if (get_bool_property("UNSPAGHETTIFY_IN_CONTROLIZER"))
       unspaghettify_statement(module_stat);
 
+    if (get_bool_property("FOR_TO_DO_LOOP_IN_CONTROLIZER")) {
+      gen_recurse(module_stat,
+		  // Since for-loop statements can be nested,
+		  // only restructure in a bottom-up way, :
+		  forloop_domain, gen_true,
+		  try_to_transform_a_for_loop_into_a_do_loop);
+
+    }
+
+    if (get_bool_property("FOR_TO_WHILE_LOOP_IN_CONTROLIZER")) {
+      gen_recurse(module_stat,
+		  // Since for-loop statements can be nested,
+		  // only restructure in a bottom-up way, :
+		  forloop_domain, gen_true,
+		  transform_a_for_loop_into_a_while_loop);
+    }
 
     /* With C code, some local declarations may have been lost by the
-       (current) restructurer */
+       (current) restructurer. FI: not investigated; should be
+       useless by now.. */
     if(c_module_p(m))
       module_stat = update_unstructured_declarations(module_stat);
 

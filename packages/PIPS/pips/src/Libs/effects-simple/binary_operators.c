@@ -154,15 +154,60 @@ list effects_must_union(effect eff1, effect eff2)
 /* Preserve store independent information as long as you can. I should
    have some order on references to absorb, for instance, x[1] by
    x[*]. */
+
+/**
+    @brief computes the may union of two combinable effects
+    @param[in] eff1 effect
+    @param[in] eff2
+    @see effects_combinable_p
+    @return a new effect with no sharing with the input effects
+ */
 effect effect_may_union(effect eff1, effect eff2)
 {
     effect eff;
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
 
-    if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
-      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
+    bool al1_p = effect_abstract_location_p(eff1);
+    bool al2_p = effect_abstract_location_p(eff2);
 
+    /* Abstract locations cases */
+    /* In fact, we could have :
+       if (al1_p || al_2_p)
+       {
+         entity e1 = effect_entity(e1);
+	 entity e2 = effect_entity(e2);
+
+	 new_ent = entity_locations_max(e1, e2);
+
+	 eff = make_simple_effect(make_reference(new_ent, NIL),
+			  copy_action(effect_action(eff1)),
+			  make_approximation(approximation_and(app1,app2), UU));
+       }
+
+       but entity_locations_max involves string manipulations, which are always costly.
+       So we treat apart the cases where (al1_p and ! al2_p) and (al2_p and ! al1_p) because
+       we already know that the abstract location is the max of both locations
+       (because they are combinable (see effects_combinable_p))
+
+     */
+    if (al1_p && al2_p)
+      {
+	entity e1 = effect_entity(eff1);
+	entity e2 = effect_entity(eff2);
+
+	entity new_ent = entity_locations_max(e1, e2);
+
+	eff = make_simple_effect(make_reference(new_ent, NIL),
+			  copy_action(effect_action(eff1)),
+			  make_approximation(approximation_and(app1,app2), UU));
+      }
+    else if (al1_p)
+      eff = (*effect_dup_func)(eff1);
+    else if (al2_p)
+      eff = (*effect_dup_func)(eff2);
+
+    /* concrete locations cases */
     else if (effect_scalar_p(eff1))
     {
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
@@ -171,27 +216,65 @@ effect effect_may_union(effect eff1, effect eff2)
     }
     else
     {
-      /*
-	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),
-			  copy_action(effect_action(eff1)),
-			  make_approximation(is_approximation_may, UU));
-      */
       eff = (*effect_dup_func)(eff1);
       approximation_tag(effect_approximation(eff)) = approximation_and(app1,app2);
     }
     return(eff);
 }
 
-/* FI: this very simple function assumed that the two effect are fully comparable */
-/* FI: memoy management is unclear to me, but a new sharing free effect is produced */
+/**
+    @brief computes the must union of two combinable effects
+    @param[in] eff1 effect
+    @param[in] eff2
+    @see effects_combinable_p
+    @return a new effect with no sharing with the input effects
+ */
 effect effect_must_union(effect eff1, effect eff2)
 {
     effect eff;
     tag app1 = effect_approximation_tag(eff1);
     tag app2 = effect_approximation_tag(eff2);
 
-    if (anywhere_effect_p(eff1) || anywhere_effect_p(eff2))
-      eff = make_anywhere_effect(copy_action(effect_action(eff1)));
+    bool al1_p = effect_abstract_location_p(eff1);
+    bool al2_p = effect_abstract_location_p(eff2);
+
+    /* Abstract locations cases */
+    /* In fact, we could have :
+       if (al1_p || al_2_p)
+       {
+         entity e1 = effect_entity(e1);
+	 entity e2 = effect_entity(e2);
+
+	 new_ent = entity_locations_max(e1, e2);
+
+	 eff = make_simple_effect(make_reference(new_ent, NIL),
+			  copy_action(effect_action(eff1)),
+			  make_approximation(approximation_and(app1,app2), UU));
+       }
+
+       but entity_locations_max involves string manipulations, which are always costly.
+       So we treat apart the cases where (al1_p and ! al2_p) and (al2_p and ! al1_p) because
+       we already know that the abstract location is the max of both locations
+       (because they are combinable (see effects_combinable_p))
+
+     */
+    if (al1_p && al2_p)
+      {
+	entity e1 = effect_entity(eff1);
+	entity e2 = effect_entity(eff2);
+
+	entity new_ent = entity_locations_max(e1, e2);
+
+	eff = make_simple_effect(make_reference(new_ent, NIL),
+			  copy_action(effect_action(eff1)),
+			  make_approximation(approximation_and(app1,app2), UU));
+      }
+    else if (al1_p)
+      eff = (*effect_dup_func)(eff1);
+    else if (al2_p)
+      eff = (*effect_dup_func)(eff2);
+
+    /* concrete locations cases */
     else if (effect_scalar_p(eff1))
     {
 	eff = make_simple_effect(make_reference(effect_entity(eff1), NIL),

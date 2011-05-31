@@ -452,7 +452,8 @@ static void compute_renamings(statement s, string sc, string mn, hash_table rena
   - rename loop indexes
 
   - replace declaration statements
-  return false if the initial condition are not met, i.e. no parent block
+  @return false if the initial condition are not met, i.e. no parent block
+  FIXME : the return false is not implemented !
 */
 bool statement_flatten_declarations(entity module, statement s)
 {
@@ -491,12 +492,19 @@ bool statement_flatten_declarations(entity module, statement s)
             //char *(*key_to_string)(void*),
             //char *(*value_to_string)(void*),
 
-            pips_debug(1, "gen_context_multi_recurse\n");
             gen_context_multi_recurse( statement_instruction(s), renamings,
                     reference_domain, gen_true, rename_reference,
                     loop_domain, gen_true, rename_loop_index,
                     statement_domain, gen_true, rename_statement_declarations,
                     NULL );
+
+            // This look like a bad hack, partially redundant with previous replacement
+            // but... only partially ! For instance extensions was not handled previously.
+            // Probably that there's need for factoring, but it'll be another time !
+            HASH_FOREACH(entity,old,entity,new,renamings) {
+              pips_debug(2,"Replace entity %s with %s\n",entity_name(old),entity_name(new));
+              replace_entity(s,old,new);
+            }
 
             gen_free_list(declarations), declarations = NIL;
             hash_table_free(renamings), renamings = NULL;
@@ -595,8 +603,8 @@ bool flatten_code(string module_name)
           gen_recurse( module_stat,
                   statement_domain, gen_true, unroll_loops_in_statement
                   );
+          clean_up_sequences(module_stat); // again
       }
-      clean_up_sequences(module_stat); // again
 
       // This might not really be necessary, probably thanks to clean_up_sequences
       module_reorder(module_stat);

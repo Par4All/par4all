@@ -232,6 +232,9 @@ cons **l ;
 
 /* Test if a control node is in a list of control nodes
 
+   FI: is this different from gen_in_list_p(), but for the c type and
+   the qualifiers?
+
    @param c control node to look for
 
    @param cs is the list of control to search through
@@ -1116,7 +1119,9 @@ generate_a_statement_list_from_a_control_sequence(control begin,
 /* Add an edge between 2 control nodes.
 
    Assume that this edge does not already exist or the source should be an
-   unstructured IF.
+   unstructured IF. FI: I am still puzzled how this can work when
+   tests are involved since the semantics of the first and second
+   successor is not paid attention at at all.
 
    @param source is the control node the edge starts from
 
@@ -1140,6 +1145,9 @@ link_2_control_nodes(control source,
 
 
 /* Remove all edged between 2 control nodes.
+
+   Note: if the source is a test, the false branch may be come the
+   true branch if the true branch is unlinked
 
    @param source is the control node the edges start from
 
@@ -1165,6 +1173,9 @@ unlink_2_control_nodes(control source,
 
    Assume that @p c is not already connected and that @p after is the
    successor of @p before.
+
+   Note: statements associated to nodes are not tested in case they
+   are undefined.
 */
 void insert_control_in_arc(control c, control before, control after) {
   pips_assert("c is not a successor of before",
@@ -1176,9 +1187,30 @@ void insert_control_in_arc(control c, control before, control after) {
   pips_assert("before is a predecessor of after",
 	      is_control_in_list_p(before, control_predecessors(after)));
 
-  unlink_2_control_nodes(before, after);
-  link_2_control_nodes(before, c);
-  link_2_control_nodes(c, after);
+  // FI: when before is a test, how do you know if c must be in the
+  // true or in the false branch?
+  /* If there is no ambiguity about the linking, use Ronan's technique */
+  if(gen_length(control_successors(before))==1
+     && gen_length(control_successors(c))==0) {
+    unlink_2_control_nodes(before, after);
+    link_2_control_nodes(before, c);
+    link_2_control_nodes(c, after);
+  }
+  else if(gen_length(control_successors(c))==0) {
+    /* Let's try to preserve the true and false branch */
+    bool success1 = gen_replace_in_list(control_successors(before), after, c);
+    bool success2 = gen_replace_in_list(control_predecessors(after), before, c);
+    // The order is meaning less, but it is easier to debug if the
+    // order is preserved
+    control_predecessors(c)
+      = gen_nconc(control_predecessors(c), CONS(CONTROL, before, NIL));
+    control_predecessors(c) = CONS(CONTROL, before, NIL);
+    pips_assert("after and before were linked", success1 && success2);
+    pips_debug(8, "control %p inserted between before=%p and after=%p\n",
+	       c, before, after);
+  }
+  else
+    pips_internal_error("No semantics, no implementation...\n");
 }
 
 

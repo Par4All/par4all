@@ -416,59 +416,137 @@ list proper_effects_combine(list l_effects, bool scalars_only_p)
  */
 bool effects_combinable_p(effect eff1, effect eff2)
 {
-  bool same_p = false;
-  reference r1 = effect_any_reference(eff1);
-  reference r2 = effect_any_reference(eff2);
-  action a1 = effect_action(eff1);
-  action a2 = effect_action(eff2);
-  action_kind ak1 = action_to_action_kind(a1);
-  action_kind ak2 = action_to_action_kind(a2);
+  bool combinable_p = false;
+  action_kind ak1 = effect_action_kind(eff1);
+  action_kind ak2 = effect_action_kind(eff2);
 
-  if(action_kind_tag(ak1)==action_kind_tag(ak2)) {
-    if (anywhere_effect_p(eff1))
-      {
-	pips_debug(8, "eff1 is an anywhere effect\n");
-	if (malloc_effect_p(eff2) || io_effect_p(eff2)
-	    || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
-		&& std_file_effect_p(eff2)))
-	  same_p = false;
-	else
-	  same_p = true;
-	pips_debug(8, "eff2 is %s a malloc or io effect\n",
-		   same_p? "not": "");
+  pips_debug_effect(1,"eff1 = ", eff1);
+  pips_debug_effect(1,"eff2 = ", eff2);
 
-      }
-    else if (anywhere_effect_p(eff2))
-      {
-	pips_debug(8, "eff2 is an anywhere effect\n");
 
-	if (malloc_effect_p(eff1) || io_effect_p(eff1)
-	    || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
-		&& std_file_effect_p(eff1)))
-	  same_p = false;
-	else
-	  same_p = true;
-	pips_debug(8, "eff1 is %s a malloc or io effect\n",
-		   same_p? "not": "");
-      }
-    else if (same_entity_p(reference_variable(r1), reference_variable(r2)))
-      {
-	string n1 = words_to_string(effect_words_reference(r1));
-	string n2 = words_to_string(effect_words_reference(r2));
+  if(action_kind_tag(ak1)==action_kind_tag(ak2))
+    combinable_p = cells_combinable_p(effect_cell(eff1), effect_cell(eff2));
 
-	same_p = same_string_p(n1,n2);
-	free(n1);
-	free(n2);
-      }
-    else
-      same_p = false;
-  }
-  else
-    same_p = false; // redundant but clearer
+  pips_debug(1, "-> %s combinable\n", combinable_p? "": "not");
 
-  return same_p;
+  return combinable_p;
 }
 
+bool cells_combinable_p(cell c1, cell c2)
+{
+  bool combinable_p = true;
+  pips_assert("cell c1 is not a GAP", !cell_gap_p(c1));
+  pips_assert("cell c2 is not a GAP", !cell_gap_p(c2));
+
+  reference r1 = cell_any_reference(c1);
+  reference r2 = cell_any_reference(c2);
+
+  entity e1 = reference_variable(r1);
+  entity e2 = reference_variable(r2);
+
+  if (same_entity_p(e1, e2))
+    {
+      /* let us check the indices */
+      list l1 = reference_indices(r1);
+      list l2 = reference_indices(r2);
+
+      bool finished_p = false;
+
+      while(combinable_p && !finished_p)
+	{
+	  if (ENDP(l1) && ENDP(l2))
+	    {
+	      finished_p = true;
+	    }
+	  else if (ENDP(l1) || ENDP(l2))
+	    {
+	      combinable_p = false;
+	      finished_p = true;
+	    }
+	  else
+	    {
+	      expression e1 = EXPRESSION(CAR(l1));
+	      expression e2 = EXPRESSION(CAR(l2));
+
+	      /* check if the expressions are the same;
+	         former test was based on  string comparison;
+		 try expression_equal_p to lessen comparison cost,
+		 especially for regions, where expressions are
+		 references to PHI entities.
+	      */
+
+	      if (!expression_equal_p(e1, e2))
+		{
+		  combinable_p = false;
+		  finished_p = true;
+		}
+	      else
+		{
+		  POP(l1);
+		  POP(l2);
+		}
+	    }
+	}
+
+    }
+  else
+    {
+
+      if (c_module_p(get_current_module_entity()))
+	/* don't do unecessary and costly things for fortran 77 codes*/
+	{
+	  bool al1_p = entity_abstract_location_p(e1);
+	  bool al2_p = entity_abstract_location_p(e2);
+	  /* if one of them is an abstract location, they may be combinable */
+	  if ( al1_p || al2_p)
+	    {
+	      /* this is only a temporary hack before we avoid generating anywhere effects
+		 each time we lose some information
+	      */
+	      if (al1_p && (malloc_cell_p(c2) || io_cell_p(c2)
+			    || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+				&& std_file_cell_p(c2))))
+		{
+		  pips_debug(8, "eff1 is an effect on an abstract location "
+			     "and eff2 is a malloc or io effect\n");
+		  combinable_p = false;
+		}
+	      else if (al2_p && (malloc_cell_p(c1) || io_cell_p(c1)
+				 || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
+				     && std_file_cell_p(c1))))
+		{
+		  pips_debug(8, "eff2 is an effect on an abstract location "
+			     "and eff1 is a malloc or io effect\n");
+		  combinable_p = false;
+		}
+	      else
+		/* special easy case, and most frequent one */
+		if ((al1_p && entity_all_locations_p(e1)) || (al2_p && entity_all_locations_p(e2)))
+		  combinable_p = true;
+		else
+		  if ( (al1_p && al2_p)
+		       || (al1_p && ENDP(reference_indices(r2)))
+		       || (al2_p && ENDP(reference_indices(r1))))
+		    /*two abstract locations or one abstract location and a scalar */
+		    combinable_p = entities_may_conflict_p(e1,e2);
+		  else
+		    /* here we should consider the type of the non abstract location reference,
+		       whether there is a dereferencement or not to guess the memory area, ... */
+		    pips_internal_error("case not handled yet\n");
+	    }
+
+	  else combinable_p = false; /* two concrete location paths beginning from different entities
+					are not combinable by binary operators.
+					well this is true for constant path effects/regions...
+					for pointer regions this is true for union
+					I still have to check for intersection and difference. BC.
+				     */
+	}
+      else combinable_p = false;
+    }
+
+  return combinable_p;
+}
 
 /* FI: same action, but also same variable and same indexing
  *

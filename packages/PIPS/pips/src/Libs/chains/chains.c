@@ -1159,7 +1159,9 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
       fprintf(stderr,"\n");
     }
 
-    if(effects_may_conflict_p(fin, fout) && (*which)(fin, fout)) {
+    // We want to check the conflict even with read/read, because we already
+    // asserted what we want before (ud/du/dd)
+    if(effects_might_conflict_even_read_only_p(fin, fout) && (*which)(fin, fout)) {
       entity ein = effect_entity(fin);
       entity eout = effect_entity(fout);
       type tin = ultimate_type(entity_type(ein));
@@ -1336,12 +1338,6 @@ graph statement_dependence_graph( statement s ) {
   /* Initialize some properties */
   one_trip_do = get_bool_property( "ONE_TRIP_DO" );
   keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
-
-  /* FIXME
-   * OBSOLETE
-   * disambiguate_constant_subscripts
-   *   = get_bool_property( "CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS" );
-   */
 
   ifdebug(1) {
     mem_spy_begin( );

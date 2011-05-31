@@ -380,65 +380,114 @@ list RegionsEntitiesInfDifference(
 effect regions_must_convex_hull(region f1, region f2);
 static effect regions_may_convex_hull(region f1, region f2);
 
+/**
+    @brief computes the must union of two combinable array regions
+    @param[in] r1 input array region
+    @param[in] r2 input array region
+    @see effects_combinable_p
+    @return a new region with no sharing with the input regions
+ */
 list region_must_union(region r1, region r2)
 {
-    list l_res = NIL;
-    effect r_res;
+  return region_union(r1, r2, true);
+}
 
-    if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
-      /* Should be a bit more complicated with typed anywhere */
-      /* Should be more generic? */
-      r_res = make_anywhere_effect(effect_action(r1));
-    else if(store_effect_p(r1)) {
-      /* we could check effect_store(r2) */
+/**
+    @brief computes the may union of two combinable array regions
+    @param[in] r1 input array region
+    @param[in] r2 input array region
+    @see effects_combinable_p
+    @return a new region with no sharing with the input regions
+ */
+list region_may_union(region r1, region r2)
+{
+  return region_union(r1, r2, false);
+}
+
+/**
+    @brief computes the must or may union of two combinable array regions depending
+           on the value of must_p
+    @param[in] r1 input array region
+    @param[in] r2 input array region
+    @param[in] must_p boolean to control the must/may behavior of the function
+    @see effects_combinable_p
+    @return a new region with no sharing with the input regions
+ */
+list region_union(region r1, region r2, bool must_p)
+{
+  list l_res = NIL;
+  effect r_res;
+  tag app1 = effect_approximation_tag(r1);
+  tag app2 = effect_approximation_tag(r2);
+
+  if(store_effect_p(r1))
+    {
       pips_assert("r2 is a store effect", store_effect_p(r2));
-      r_res = regions_must_convex_hull(r1, r2);
+      bool al1_p = effect_abstract_location_p(r1);
+      bool al2_p = effect_abstract_location_p(r2);
+
+      /* Abstract locations cases */
+      /* In fact, we could have :
+	 if (al1_p || al_2_p)
+	 {
+	 entity e1 = effect_entity(e1);
+	 entity e2 = effect_entity(e2);
+	 new_ent = entity_locations_max(e1, e2);
+
+	 eff = make_simple_effect(make_reference(new_ent, NIL),
+	 copy_action(effect_action(eff1)),
+	 make_approximation(approximation_and(app1,app2), UU));
+	 }
+
+	 but entity_locations_max involves string manipulations, which are always costly.
+	 So we treat apart the cases where (al1_p and ! al2_p) and (al2_p and ! al1_p) because
+	 we already know that the abstract location is the max of both locations
+	 (because they are combinable (see effects_combinable_p))
+
+      */
+      if (al1_p && al2_p)
+	{
+	  entity e1 = effect_entity(r1);
+	  entity e2 = effect_entity(r2);
+
+	  entity new_ent = entity_locations_max(e1, e2);
+
+	  r_res = make_simple_effect(make_reference(new_ent, NIL),
+				     copy_action(effect_action(r1)),
+				     make_approximation(must_p?approximation_and(app1,app2):
+							approximation_or(app1,app2), UU));
+	}
+      else if (al1_p)
+	r_res = (*effect_dup_func)(r1);
+      else if (al2_p)
+	r_res = (*effect_dup_func)(r2);
+
+      /* concrete locations cases */
+      else
+	{
+	  r_res = must_p ? regions_must_convex_hull(r1, r2)
+	    : regions_may_convex_hull(r1,r2);
+	  if(region_empty_p(r_res))
+	    {
+	      region_free(r_res);
+	      r_res = effect_undefined;
+	    }
+	}
     }
-    else {
-      /* we could check r2 */
+  else
+    {
       pips_assert("r2 is not a store effect", !store_effect_p(r2));
       r_res = copy_effect(r1);
     }
 
-    debug_region_consistency(r_res);
-
-    /* FI: does work with anywhere effects? */
-    if (store_effect_p(r_res)) {
-	if(!region_empty_p(r_res))
-	  l_res = region_to_list(r_res);
-	else
-	  /* no memory leak */
-	  region_free(r_res);
+  if (!effect_undefined_p(r_res))
+    {
+      debug_region_consistency(r_res);
+      l_res = region_to_list(r_res);
     }
 
-    return(l_res);
-}
-
-list region_may_union(region r1, region r2)
-{
-  list l_res = NIL;
-  effect r_res;
-
-  ifdebug(1) pips_assert("Effects r1 and r2 are union compatible",
-			 union_compatible_effects_p(r1,r2));
-
-  if(store_effect_p(r1) && store_effect_p(r2)) {
-    if (anywhere_effect_p(r1) || anywhere_effect_p(r2))
-      r_res = make_anywhere_effect(effect_action(r1));
-    else
-      r_res = regions_may_convex_hull(r1, r2);
-
-    if (!region_empty_p(r_res))
-      l_res = region_to_list(r_res);
-    else
-      /* no memory leak */
-      region_free(r_res);
-  }
-  else {
-    r_res = copy_effect(r1);
-  }
-
   return(l_res);
+
 }
 
 

@@ -2114,17 +2114,7 @@ effect make_declaration_effect(entity e, bool written_p)
   effect eff = effect_undefined;
   /* FI: generate a declaration or a type write */
 
-  /* For array we want to generate an effects that affect all dimensions
-   * aka int **a; has to generate a[*][*]
-   */
-  extern size_t type_dereferencement_depth(type t);
-  int ndims = type_dereferencement_depth(entity_type(e));
-  list dim_args = NIL;
-  for(int i=0;i<ndims;i++) {
-    dim_args = CONS(EXPRESSION,make_unbounded_expression(),dim_args);
-  }
-
-  reference r = make_reference(e, dim_args);
+  reference r = make_reference(e, NIL);
   action a = action_undefined;
   action_kind ak = action_kind_undefined;
   /* FI: I'm not sure this is a very generic decision; I do not

@@ -205,7 +205,7 @@ gpu_ify_statement(statement s, int depth, const char* mod_name) {
   bool old_outline_independent_compilation_unit =
     get_bool_property("OUTLINE_INDEPENDENT_COMPILATION_UNIT");
 
-  /* If we want to oultine a kernel: */
+  /* If we want to outline a kernel: */
   if (get_bool_property("GPU_USE_KERNEL")) {
     /* First outline the innermost code (the kernel itself) to avoid
        spoiling its memory effects if we start with the outermost code
