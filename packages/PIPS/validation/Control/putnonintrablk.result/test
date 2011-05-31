@@ -1,3 +1,6 @@
+
+Parser output
+
 void putnonintrablk(short *blk)
 {
    int n, run, signed_level, first;
@@ -27,6 +30,9 @@ void putnonintrablk(short *blk)
    /* End of Block -- normative block punctuation  */
    putbits(2, 2);
 }
+
+Controlizer output
+
 void putnonintrablk(short *blk)
 {
    int n, run, signed_level, first;

@@ -1,3 +1,6 @@
+
+Parsed code
+
 void while01()
 {
    int c = 10;
@@ -9,9 +12,11 @@ void while01()
    c++;
 end:   return;
 }
+
+Controlized code
+
 void while01()
 {
-   // BEGIN BLOCK
    int c = 10;
 l99998:   ;
    if (c>0) goto l99999;
@@ -25,5 +30,4 @@ l99999:   ;
       goto l99998;
    }
 end:   return;
-   // END BLOCK
 }

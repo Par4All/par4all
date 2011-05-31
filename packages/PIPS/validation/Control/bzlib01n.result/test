@@ -1,0 +1,497 @@
+
+Parser output
+
+static Bool unRLE_obuf_to_output_FAST(DState *s)
+{
+   UChar k1;                                                            /*0007*/
+
+   if (s->blockRandomised)                                              /*0009*/
+      while ((Bool) 1) {                                                /*0011*/
+
+         while ((Bool) 1) {                                             /*0016*/
+            if (s->strm->avail_out==0)                                  /*0013*/
+               return (Bool) 0;                                         /*0013*/
+            if (s->state_out_len==0)                                    /*0014*/
+               goto break_2;                                            /*0014*/
+            *((UChar *) s->strm->next_out) = s->state_out_ch;           /*0015*/
+         }
+break_2:         ;
+         
+         /* can a new run be started? */
+         if (s->nblock_used==s->save_nblock+1)                          /*0019*/
+            return (Bool) 0;                                            /*0019*/
+         
+         /* Only caused by corrupt data stream? */
+         if (s->nblock_used>s->save_nblock+1)                           /*0022*/
+            return (Bool) 1;                                            /*0023*/
+
+         s->state_out_len = 1;                                          /*0025*/
+         s->state_out_ch = s->k0;                                       /*0026*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0027*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0027*/
+         s->tPos >>= 8;                                                 /*0027*/
+
+         if (s->rNToGo==0) {                                            /*0027*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0027*/
+            s->rTPos++;                                                 /*0027*/
+            if (s->rTPos==512)                                          /*0027*/
+               s->rTPos = 0;                                            /*0027*/
+         }
+         s->rNToGo--;                                                   /*0027*/
+
+         k1 ^= s->rNToGo==1?1:0;                                        /*0028*/
+         s->nblock_used++;                                              /*0028*/
+         if (s->nblock_used==s->save_nblock+1)                          /*0029*/
+            goto loop_end_1;                                            /*0029*/
+         if (k1!=s->k0) {                                               /*0030*/
+            s->k0 = k1;                                                 /*0030*/
+            goto loop_end_1;                                            /*0030*/
+         }
+
+
+         s->state_out_len = 2;                                          /*0032*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0033*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0033*/
+         s->tPos >>= 8;                                                 /*0033*/
+
+         if (s->rNToGo==0) {                                            /*0033*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0033*/
+            s->rTPos++;                                                 /*0033*/
+            if (s->rTPos==512)                                          /*0033*/
+               s->rTPos = 0;                                            /*0033*/
+         }
+         s->rNToGo--;                                                   /*0033*/
+
+         k1 ^= s->rNToGo==1?1:0;                                        /*0034*/
+         s->nblock_used++;                                              /*0034*/
+         if (s->nblock_used==s->save_nblock+1)                          /*0035*/
+            goto loop_end_1;                                            /*0035*/
+         if (k1!=s->k0) {                                               /*0036*/
+            s->k0 = k1;                                                 /*0036*/
+            goto loop_end_1;                                            /*0036*/
+         }
+
+
+         s->state_out_len = 3;                                          /*0038*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0039*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0039*/
+         s->tPos >>= 8;                                                 /*0039*/
+
+         if (s->rNToGo==0) {                                            /*0039*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0039*/
+            s->rTPos++;                                                 /*0039*/
+            if (s->rTPos==512)                                          /*0039*/
+               s->rTPos = 0;                                            /*0039*/
+         }
+         s->rNToGo--;                                                   /*0039*/
+
+         k1 ^= s->rNToGo==1?1:0;                                        /*0040*/
+         s->nblock_used++;                                              /*0040*/
+         if (s->nblock_used==s->save_nblock+1)                          /*0041*/
+            goto loop_end_1;                                            /*0041*/
+         if (k1!=s->k0) {                                               /*0042*/
+            s->k0 = k1;                                                 /*0042*/
+            goto loop_end_1;                                            /*0042*/
+         }
+
+
+         s->tPos = (s->tt)[s->tPos];                                    /*0044*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0044*/
+         s->tPos >>= 8;                                                 /*0044*/
+
+         if (s->rNToGo==0) {                                            /*0044*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0044*/
+            s->rTPos++;                                                 /*0044*/
+            if (s->rTPos==512)                                          /*0044*/
+               s->rTPos = 0;                                            /*0044*/
+         }
+         s->rNToGo--;                                                   /*0044*/
+
+         k1 ^= s->rNToGo==1?1:0;                                        /*0045*/
+         s->nblock_used++;                                              /*0045*/
+         s->state_out_len = (Int32) k1+4;                               /*0046*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0047*/
+         s->k0 = (UChar) (s->tPos&0xff);                                /*0047*/
+         s->tPos >>= 8;                                                 /*0047*/
+
+         if (s->rNToGo==0) {                                            /*0047*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0047*/
+            s->rTPos++;                                                 /*0047*/
+            if (s->rTPos==512)                                          /*0047*/
+               s->rTPos = 0;                                            /*0047*/
+         }
+         s->rNToGo--;                                                   /*0047*/
+
+         s->k0 ^= s->rNToGo==1?1:0;                                     /*0048*/
+         s->nblock_used++;                                              /*0048*/
+loop_end_1:         ;
+      }
+   else {
+      
+      /* restore */
+      UInt32 c_calculatedBlockCRC = s->calculatedBlockCRC;              /*0054*/
+      UChar c_state_out_ch = s->state_out_ch;                           /*0055*/
+      Int32 c_state_out_len = s->state_out_len;                         /*0056*/
+      Int32 c_nblock_used = s->nblock_used;                             /*0057*/
+      Int32 c_k0 = s->k0;                                               /*0058*/
+      UInt32 *c_tt = s->tt;                                             /*0059*/
+      UInt32 c_tPos = s->tPos;                                          /*0060*/
+      char *cs_next_out = s->strm->next_out;                            /*0061*/
+      unsigned int cs_avail_out = s->strm->avail_out;                   /*0062*/
+      /* end restore */
+      
+      UInt32 avail_out_INIT = cs_avail_out;                             /*0065*/
+      Int32 s_save_nblockPP = s->save_nblock+1;                         /*0066*/
+      unsigned int total_out_lo32_old;                                  /*0067*/
+      while ((Bool) 1) {                                                /*0069*/
+         
+         /* try to finish existing run */
+         if (c_state_out_len>0) {                                       /*0072*/
+
+            while ((Bool) 1) {                                          /*0081*/
+               if (cs_avail_out==0)                                     /*0074*/
+                  goto return_notr;                                     /*0074*/
+               if (c_state_out_len==1)                                  /*0075*/
+                  goto break_4;                                         /*0075*/
+               *((UChar *) cs_next_out) = c_state_out_ch;               /*0076*/
+               c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];      /*0077*/
+
+               c_state_out_len--;                                       /*0078*/
+               cs_next_out++;                                           /*0079*/
+               cs_avail_out--;                                          /*0080*/
+            }
+break_4:            ;
+s_state_out_len_eq_one:            ;
+            if (cs_avail_out==0) {                                      /*0084*/
+               c_state_out_len = 1;                                     /*0085*/
+               goto return_notr;                                        /*0085*/
+            }
+
+            *((UChar *) cs_next_out) = c_state_out_ch;                  /*0087*/
+            c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];         /*0088*/
+
+            cs_next_out++;                                              /*0089*/
+            cs_avail_out--;                                             /*0090*/
+         }
+         /* Only caused by corrupt data stream? */
+         if (c_nblock_used>s_save_nblockPP)                             /*0094*/
+            return (Bool) 1;                                            /*0095*/
+         
+         /* can a new run be started? */
+         if (c_nblock_used==s_save_nblockPP) {                          /*0098*/
+            c_state_out_len = 0;                                        /*0099*/
+            goto return_notr;                                           /*0099*/
+         }
+
+         c_state_out_ch = c_k0;                                         /*0101*/
+         c_tPos = c_tt[c_tPos];                                         /*0102*/
+         k1 = (UChar) (c_tPos&0xff);                                    /*0102*/
+         c_tPos >>= 8;                                                  /*0102*/
+
+         c_nblock_used++;                                               /*0102*/
+         if (k1!=c_k0) {                                                /*0103*/
+            c_k0 = k1;                                                  /*0104*/
+            goto s_state_out_len_eq_one;                                /*0104*/
+         }
+
+         if (c_nblock_used==s_save_nblockPP)                            /*0106*/
+            goto s_state_out_len_eq_one;                                /*0107*/
+
+         c_state_out_len = 2;                                           /*0109*/
+         c_tPos = c_tt[c_tPos];                                         /*0110*/
+         k1 = (UChar) (c_tPos&0xff);                                    /*0110*/
+         c_tPos >>= 8;                                                  /*0110*/
+
+         c_nblock_used++;                                               /*0110*/
+         if (c_nblock_used==s_save_nblockPP)                            /*0111*/
+            goto loop_end_3;                                            /*0111*/
+         if (k1!=c_k0) {                                                /*0112*/
+            c_k0 = k1;                                                  /*0112*/
+            goto loop_end_3;                                            /*0112*/
+         }
+
+
+         c_state_out_len = 3;                                           /*0114*/
+         c_tPos = c_tt[c_tPos];                                         /*0115*/
+         k1 = (UChar) (c_tPos&0xff);                                    /*0115*/
+         c_tPos >>= 8;                                                  /*0115*/
+
+         c_nblock_used++;                                               /*0115*/
+         if (c_nblock_used==s_save_nblockPP)                            /*0116*/
+            goto loop_end_3;                                            /*0116*/
+         if (k1!=c_k0) {                                                /*0117*/
+            c_k0 = k1;                                                  /*0117*/
+            goto loop_end_3;                                            /*0117*/
+         }
+
+
+         c_tPos = c_tt[c_tPos];                                         /*0119*/
+         k1 = (UChar) (c_tPos&0xff);                                    /*0119*/
+         c_tPos >>= 8;                                                  /*0119*/
+
+         c_nblock_used++;                                               /*0119*/
+         c_state_out_len = (Int32) k1+4;                                /*0120*/
+         c_tPos = c_tt[c_tPos];                                         /*0121*/
+         c_k0 = (UChar) (c_tPos&0xff);                                  /*0121*/
+         c_tPos >>= 8;                                                  /*0121*/
+
+         c_nblock_used++;                                               /*0121*/
+loop_end_3:         ;
+      }
+
+return_notr:      total_out_lo32_old = s->strm->total_out_lo32;
+      s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;           /*0126*/
+      if (s->strm->total_out_lo32<total_out_lo32_old)                   /*0127*/
+         s->strm->total_out_hi32++;                                     /*0128*/
+      
+      /* save */
+      s->calculatedBlockCRC = c_calculatedBlockCRC;                     /*0131*/
+      s->state_out_ch = c_state_out_ch;                                 /*0132*/
+      s->state_out_len = c_state_out_len;                               /*0133*/
+      s->nblock_used = c_nblock_used;                                   /*0134*/
+      s->k0 = c_k0;                                                     /*0135*/
+      s->tt = c_tt;                                                     /*0136*/
+      s->tPos = c_tPos;                                                 /*0137*/
+      s->strm->next_out = cs_next_out;                                  /*0138*/
+      s->strm->avail_out = cs_avail_out;                                /*0139*/
+   }
+   return (Bool) 0;                                                     /*0142*/
+}
+
+Controlizer output
+
+static Bool unRLE_obuf_to_output_FAST(DState *s)
+{
+   UChar k1;                                                            /*0007*/
+
+   if (s->blockRandomised)                                              /*0009*/
+      while ((Bool) 1) {                                                /*0011*/
+l99999:         ;
+         if ((Bool) 1) {
+         }
+         else {
+            goto break_2;
+         }
+         if (s->strm->avail_out==0)                                     /*0013*/
+            return (Bool) 0;                                            /*0013*/
+         if (s->state_out_len==0) goto break_2;                         /*0014*/
+         *((UChar *) s->strm->next_out) = s->state_out_ch;              /*0015*/
+         goto l99999;
+break_2:         ;
+         
+         /* can a new run be started? */
+         if (s->nblock_used==s->save_nblock+1)                          /*0019*/
+            return (Bool) 0;                                            /*0019*/
+         
+         /* Only caused by corrupt data stream? */
+         if (s->nblock_used>s->save_nblock+1)                           /*0022*/
+            return (Bool) 1;                                            /*0023*/
+
+         s->state_out_len = 1;                                          /*0025*/
+         s->state_out_ch = s->k0;                                       /*0026*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0027*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0027*/
+         s->tPos >>= 8;                                                 /*0027*/
+         if (s->rNToGo==0) {                                            /*0027*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0027*/
+            s->rTPos++;                                                 /*0027*/
+            if (s->rTPos==512)                                          /*0027*/
+               s->rTPos = 0;                                            /*0027*/
+         }
+         s->rNToGo--;                                                   /*0027*/
+         k1 ^= s->rNToGo==1?1:0;                                        /*0028*/
+         s->nblock_used++;                                              /*0028*/
+         if (s->nblock_used==s->save_nblock+1) goto loop_end_1;         /*0029*/
+         if (k1!=s->k0) goto l99998;                                    /*0030*/
+
+         s->state_out_len = 2;                                          /*0032*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0033*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0033*/
+         s->tPos >>= 8;                                                 /*0033*/
+         if (s->rNToGo==0) {                                            /*0033*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0033*/
+            s->rTPos++;                                                 /*0033*/
+            if (s->rTPos==512)                                          /*0033*/
+               s->rTPos = 0;                                            /*0033*/
+         }
+         s->rNToGo--;                                                   /*0033*/
+         k1 ^= s->rNToGo==1?1:0;                                        /*0034*/
+         s->nblock_used++;                                              /*0034*/
+         if (s->nblock_used==s->save_nblock+1) goto loop_end_1;         /*0035*/
+         if (k1!=s->k0) goto l99997;                                    /*0036*/
+
+         s->state_out_len = 3;                                          /*0038*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0039*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0039*/
+         s->tPos >>= 8;                                                 /*0039*/
+         if (s->rNToGo==0) {                                            /*0039*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0039*/
+            s->rTPos++;                                                 /*0039*/
+            if (s->rTPos==512)                                          /*0039*/
+               s->rTPos = 0;                                            /*0039*/
+         }
+         s->rNToGo--;                                                   /*0039*/
+         k1 ^= s->rNToGo==1?1:0;                                        /*0040*/
+         s->nblock_used++;                                              /*0040*/
+         if (s->nblock_used==s->save_nblock+1) goto loop_end_1;         /*0041*/
+         if (k1!=s->k0) goto l99996;                                    /*0042*/
+
+         s->tPos = (s->tt)[s->tPos];                                    /*0044*/
+         k1 = (UChar) (s->tPos&0xff);                                   /*0044*/
+         s->tPos >>= 8;                                                 /*0044*/
+         if (s->rNToGo==0) {                                            /*0044*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0044*/
+            s->rTPos++;                                                 /*0044*/
+            if (s->rTPos==512)                                          /*0044*/
+               s->rTPos = 0;                                            /*0044*/
+         }
+         s->rNToGo--;                                                   /*0044*/
+         k1 ^= s->rNToGo==1?1:0;                                        /*0045*/
+         s->nblock_used++;                                              /*0045*/
+         s->state_out_len = (Int32) k1+4;                               /*0046*/
+         s->tPos = (s->tt)[s->tPos];                                    /*0047*/
+         s->k0 = (UChar) (s->tPos&0xff);                                /*0047*/
+         s->tPos >>= 8;                                                 /*0047*/
+         if (s->rNToGo==0) {                                            /*0047*/
+            s->rNToGo = BZ2_rNums[s->rTPos];                            /*0047*/
+            s->rTPos++;                                                 /*0047*/
+            if (s->rTPos==512)                                          /*0047*/
+               s->rTPos = 0;                                            /*0047*/
+         }
+         s->rNToGo--;                                                   /*0047*/
+         s->k0 ^= s->rNToGo==1?1:0;                                     /*0048*/
+         s->nblock_used++;                                              /*0048*/
+         goto loop_end_1;
+l99996:         ;
+         s->k0 = k1;                                                    /*0042*/
+         goto loop_end_1;
+l99997:         ;
+         s->k0 = k1;                                                    /*0036*/
+         goto loop_end_1;
+l99998:         ;
+         s->k0 = k1;                                                    /*0030*/
+loop_end_1:         ;
+      }
+   else {
+      
+      /* restore */
+      UInt32 c_calculatedBlockCRC = s->calculatedBlockCRC;              /*0054*/
+      UChar c_state_out_ch = s->state_out_ch;                           /*0055*/
+      Int32 c_state_out_len = s->state_out_len;                         /*0056*/
+      Int32 c_nblock_used = s->nblock_used;                             /*0057*/
+      Int32 c_k0 = s->k0;                                               /*0058*/
+      UInt32 *c_tt = s->tt;                                             /*0059*/
+      UInt32 c_tPos = s->tPos;                                          /*0060*/
+      char *cs_next_out = s->strm->next_out;                            /*0061*/
+      unsigned int cs_avail_out = s->strm->avail_out;                   /*0062*/
+      /* end restore */
+      
+      UInt32 avail_out_INIT = cs_avail_out;                             /*0065*/
+      Int32 s_save_nblockPP = s->save_nblock+1;                         /*0066*/
+      unsigned int total_out_lo32_old;                                  /*0067*/
+l99990:      ;
+      if ((Bool) 1) {
+      }
+      else {
+         goto return_notr;
+      }
+
+/* try to finish existing run */
+      if (c_state_out_len>0) goto l99995;                               /*0072*/
+l99988:      ;
+      /* Only caused by corrupt data stream? */
+      if (c_nblock_used>s_save_nblockPP)                                /*0094*/
+         return (Bool) 1;                                               /*0095*/
+
+/* can a new run be started? */
+      if (c_nblock_used==s_save_nblockPP) goto l99994;                  /*0098*/
+      c_state_out_ch = c_k0;                                            /*0101*/
+      c_tPos = c_tt[c_tPos];                                            /*0102*/
+      k1 = (UChar) (c_tPos&0xff);                                       /*0102*/
+      c_tPos >>= 8;                                                     /*0102*/
+      c_nblock_used++;                                                  /*0102*/
+      if (k1!=c_k0) goto l99993;                                        /*0103*/
+      if (c_nblock_used==s_save_nblockPP) goto s_state_out_len_eq_one;  /*0106*/
+
+      c_state_out_len = 2;                                              /*0109*/
+      c_tPos = c_tt[c_tPos];                                            /*0110*/
+      k1 = (UChar) (c_tPos&0xff);                                       /*0110*/
+      c_tPos >>= 8;                                                     /*0110*/
+      c_nblock_used++;                                                  /*0110*/
+      if (c_nblock_used==s_save_nblockPP) goto loop_end_3;              /*0111*/
+      if (k1!=c_k0) goto l99992;                                        /*0112*/
+
+      c_state_out_len = 3;                                              /*0114*/
+      c_tPos = c_tt[c_tPos];                                            /*0115*/
+      k1 = (UChar) (c_tPos&0xff);                                       /*0115*/
+      c_tPos >>= 8;                                                     /*0115*/
+      c_nblock_used++;                                                  /*0115*/
+      if (c_nblock_used==s_save_nblockPP) goto loop_end_3;              /*0116*/
+      if (k1!=c_k0) goto l99991;                                        /*0117*/
+
+      c_tPos = c_tt[c_tPos];                                            /*0119*/
+      k1 = (UChar) (c_tPos&0xff);                                       /*0119*/
+      c_tPos >>= 8;                                                     /*0119*/
+      c_nblock_used++;                                                  /*0119*/
+      c_state_out_len = (Int32) k1+4;                                   /*0120*/
+      c_tPos = c_tt[c_tPos];                                            /*0121*/
+      c_k0 = (UChar) (c_tPos&0xff);                                     /*0121*/
+      c_tPos >>= 8;                                                     /*0121*/
+      c_nblock_used++;                                                  /*0121*/
+loop_end_3:      ;
+      goto l99990;
+l99991:      ;
+      c_k0 = k1;                                                        /*0117*/
+      goto loop_end_3;
+l99992:      ;
+      c_k0 = k1;                                                        /*0112*/
+      goto loop_end_3;
+s_state_out_len_eq_one:      ;
+      if (cs_avail_out==0) goto l99989;                                 /*0084*/
+      *((UChar *) cs_next_out) = c_state_out_ch;                        /*0087*/
+      c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];               /*0088*/
+      cs_next_out++;                                                    /*0089*/
+      cs_avail_out--;                                                   /*0090*/
+      goto l99988;
+l99989:      ;
+      c_state_out_len = 1;                                              /*0085*/
+      goto return_notr;
+l99993:      ;
+      c_k0 = k1;                                                        /*0104*/
+      goto s_state_out_len_eq_one;
+l99994:      ;
+      c_state_out_len = 0;                                              /*0099*/
+      goto return_notr;
+l99995:      ;
+      if ((Bool) 1) goto l99987;
+break_4:      ;
+      goto s_state_out_len_eq_one;
+l99987:      ;
+      if (cs_avail_out==0) goto return_notr;                            /*0074*/
+      if (c_state_out_len==1) goto break_4;                             /*0075*/
+      *((UChar *) cs_next_out) = c_state_out_ch;                        /*0076*/
+      c_calculatedBlockCRC = c_calculatedBlockCRC<<8^BZ2_crc32Table[c_calculatedBlockCRC>>24^(UChar) c_state_out_ch];               /*0077*/
+      c_state_out_len--;                                                /*0078*/
+      cs_next_out++;                                                    /*0079*/
+      cs_avail_out--;                                                   /*0080*/
+      goto l99995;
+
+return_notr:      ;
+      total_out_lo32_old = s->strm->total_out_lo32;
+      s->strm->total_out_lo32 += avail_out_INIT-cs_avail_out;           /*0126*/
+      if (s->strm->total_out_lo32<total_out_lo32_old)                   /*0127*/
+         s->strm->total_out_hi32++;                                     /*0128*/
+      
+      /* save */
+      s->calculatedBlockCRC = c_calculatedBlockCRC;                     /*0131*/
+      s->state_out_ch = c_state_out_ch;                                 /*0132*/
+      s->state_out_len = c_state_out_len;                               /*0133*/
+      s->nblock_used = c_nblock_used;                                   /*0134*/
+      s->k0 = c_k0;                                                     /*0135*/
+      s->tt = c_tt;                                                     /*0136*/
+      s->tPos = c_tPos;                                                 /*0137*/
+      s->strm->next_out = cs_next_out;                                  /*0138*/
+      s->strm->avail_out = cs_avail_out;                                /*0139*/
+   }
+   return (Bool) 0;                                                     /*0142*/
+}

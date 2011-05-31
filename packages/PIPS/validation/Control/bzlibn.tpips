@@ -1,0 +1,36 @@
+delete bzlibn
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create bzlibn bzlibn.c
+
+#SELECT C LANGUAGE
+#activate C_PARSER
+#setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE(bzlibn!unRLE_obuf_to_output_FAST)
+
+echo
+echo Controlizer output
+echo
+
+activate NEW_CONTROLIZER
+display PRINTED_FILE(bzlibn!unRLE_obuf_to_output_FAST)
+
+apply UNSPLIT(bzlibn!unRLE_obuf_to_output_FAST)
+
+shell (cd bzlibn.database/Src; gcc -c bzlibn.c)
+
+close
+
+#delete bzlibn
+quit

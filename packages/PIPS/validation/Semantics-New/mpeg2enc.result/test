@@ -2805,7 +2805,7 @@ void putmv(int dmv, int f_code)
    r_size = f_code-1;
    /* number of fixed length code ('residual') bits */
    f = 1<<r_size;
-   vmin = -(16*f);
+   vmin = -16*f;
    /* lower range limit */
    vmax = 16*f-1;
    /* upper range limit */
@@ -15161,7 +15161,7 @@ void putmv(int dmv, int f_code)
 
 //  T(vmin) {16f+vmin==0}
 
-   vmin = -(16*f);
+   vmin = -16*f;
 
 //  T(vmax) {16f==vmax+1}
 
@@ -34137,7 +34137,7 @@ void putmv(int dmv, int f_code)
 //  P(dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {f_code==r_size+1, 0<=f}
 
-   vmin = -(16*f);
+   vmin = -16*f;
 
 //  P(dv,f,motion_code,motion_residual,r_size,temp,vmax,vmin)
 //    {16f+vmin==0, f_code==r_size+1, 0<=f}

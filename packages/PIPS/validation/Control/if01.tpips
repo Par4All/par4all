@@ -32,6 +32,8 @@ echo
 echo Controlizer output
 echo
 
+activate NEW_CONTROLIZER
+
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 
 #setenv CONTROL_DEBUG_LEVEL=8

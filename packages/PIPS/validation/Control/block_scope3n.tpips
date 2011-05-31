@@ -1,0 +1,26 @@
+setenv WKS=block_scope3n
+delete $WKS
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+#setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+#setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
+
+echo
+echo Controlizer output
+echo
+
+activate NEW_CONTROLIZER
+
+display PRINTED_FILE[block_scope3n]
+
+apply RESTRUCTURE_CONTROL[block_scope3n]
+display PRINTED_FILE[block_scope3n]
+
+close
+
+#delete $WKS
+
+quit

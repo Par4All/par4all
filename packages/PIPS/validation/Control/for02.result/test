@@ -1,0 +1,55 @@
+
+Parsed code
+
+void for02()
+{
+   int c;
+   float a[10];
+
+   for (c = 0;c<10;c++)
+      a[c] = 0.;
+}
+
+New controlized code
+
+void for02()
+{
+   int c;
+   float a[10];
+
+   for(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}
+
+Parallel code with initial controlizer
+
+void for02()
+{
+   int c;
+   float a[10];
+
+   forall(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}
+
+New controlized code
+
+void for02()
+{
+   int c;
+   float a[10];
+
+   for(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}
+
+Parallel code with new controlizer
+
+void for02()
+{
+   int c;
+   float a[10];
+
+   forall(c = 0; c <= 9; c += 1)
+      a[c] = 0.;
+}

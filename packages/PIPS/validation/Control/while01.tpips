@@ -4,11 +4,19 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create while01 while01.c
 
+echo
+echo Parsed code
+echo
+
 display PARSED_PRINTED_FILE
+
+echo
+echo Controlized code
+echo
 
 activate NEW_CONTROLIZER
 
-setenv CONTROL_DEBUG_LEVEL 9
+#setenv CONTROL_DEBUG_LEVEL 9
 
 display PRINTED_FILE
 
