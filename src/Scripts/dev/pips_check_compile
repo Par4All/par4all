@@ -51,6 +51,7 @@ build=compile
 try=3
 
 # get options manually
+# collated one-letter options are *not* handled.
 while [[ $1 == -* ]]
 do
   case $1 in
@@ -71,7 +72,7 @@ do
     -p|--parallel) parallel=1 ;;
     -s|--sequential) parallel= ;;
     # make options for validation (TIMEOUT DO_SLOW...)
-    -vo|--validation-option) vopts="$vopts $2" ; shift ;;
+    -V|--validation-option) vopts="$vopts $2" ; shift ;;
     --validation-option=*) vopts="$vopts ${1#*=}" ;;
     # trace length to include on compilation error
     -t|--tail) tail=$2 ; shift ;;
@@ -97,7 +98,7 @@ do
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation ...]\n" \
         "check pips compilation and validation health\n" \
 	"arguments:\n" \
-	"  em@ail: summary email recipient, defaults is current user\n" \
+	"  em@ail: summary email recipient, defaults to current user\n" \
 	"  /path/to/prod: path to an svn working copy of pips, default is .\n" \
 	"  /path/to/validation: path to an svn working copy of a validation\n" \
 	"available options:\n" \
@@ -114,7 +115,7 @@ do
         "  -t len: trace length on compilation error\n" \
         "  -T n: possibly retry svn up, defaults to thrice\n" \
 	"  -v name: validation name\n" \
-        "  -vo opt: validation make option, can be repeated for more\n" \
+        "  -V opt: validation make option, can be repeated for more\n" \
 	"  -w: wait for lock\n"
       exit 0
       ;;
