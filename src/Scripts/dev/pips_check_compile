@@ -77,7 +77,7 @@ do
     -t|--tail) tail=$2 ; shift ;;
     --tail=*) tail=${1#*=} ;;
     # possibly do retry some connections
-    --try) try=$2 ; shift ;;
+    -T|--try) try=$2 ; shift ;;
     --try=*) try=${1#*=} ;;
     # compilation & validation name for report
     -v|--vname) vname=$2 ; shift ;;
@@ -112,7 +112,7 @@ do
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
         "  -t len: trace length on compilation error\n" \
-        "  --try n: possibly retry svn up, default is twice\n" \
+        "  -T n: possibly retry svn up, defaults to thrice\n" \
 	"  -v name: validation name\n" \
         "  -vo opt: validation make option, can be repeated for more\n" \
 	"  -w: wait for lock\n"
