@@ -193,6 +193,12 @@ bool continue_statement_p(statement s) {
   return instruction_continue_p(i);
 }
 
+bool forloop_statement_p(statement s) {
+  instruction i = statement_instruction(s);
+
+  return instruction_forloop_p(i);
+}
+
 /* Had to be optimized according to Beatrice Creusillet. We assume
    that FALSE is returned most of the time. String operations are
    avoided (almost) as much as possible.
@@ -1824,6 +1830,8 @@ fix_sequence_statement_attributes(statement s)
 	statement_number(s) = STATEMENT_NUMBER_UNDEFINED;
     }
     else {
+      /* FI: why don't you try to keep them on the first statement,
+	 just in case it has empty slots? */
 	/* There are some informations we need to keep: just add a
 	   CONTINUE to keep them: */
 	list instructions;
@@ -1849,11 +1857,23 @@ fix_sequence_statement_attributes(statement s)
 	   extensions is moved down to the while loop. I'm not sure
 	   this is the best source code location to fix the
 	   problem. I do not know if the extensions have been reused
-	   directly and so do not need to be freed here or not. */
+	   directly and so do not need to be freed here or not. In
+	   fact, it is copied below and could be freed. */
+	// FI: This leads to an inconsistency in gen_recurse() when the
+	// while loop is reached, but only when the new_controlizer is
+	// used; I cannot spend more time on this right now
+	// See: transform_a_for_loop_into_a_while_loop(). it might be
+	// safer to operate at the statement level with a test for
+	// forloop statements rather than use ancestors
+	extensions ext = statement_extensions(s);
+	free_extensions(ext);
 	statement_extensions(s) = make_extensions(NIL);
 
 	instructions = CONS(STATEMENT, continue_s, instructions);
 	instruction_block(statement_instruction(s)) = instructions;
+
+	//pips_assert("The transformed statement s is consistent",
+	//	    statement_consistent_p(s));
     }
 }
 
