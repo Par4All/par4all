@@ -39,7 +39,7 @@ void for02()
    int c;
    float a[10];
 
-   for (c = 0;c<10;c++)
+   for(c = 0; c <= 9; c += 1)
       a[c] = 0.;
 }
 
@@ -50,6 +50,6 @@ void for02()
    int c;
    float a[10];
 
-   for (c = 0;c<10;c++)
+   forall(c = 0; c <= 9; c += 1)
       a[c] = 0.;
 }
