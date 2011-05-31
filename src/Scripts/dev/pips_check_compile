@@ -141,13 +141,13 @@ unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 if [ "$parallel" ]
 then
   # compute load & jobs depending on the available hardware
-  # note that the reported hardware can be somehow virtual
+  # note that the reported hardware can be somehow virtual with hyperthreading
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
   make+=" -j $jobs -l $load"
-  tail=$((12 + 3 * $nproc))
+  tail=$((15 + 10 * $nproc))
 else
-  tail=15
+  tail=25
 fi
 
 # report current-state compile message
