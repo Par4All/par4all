@@ -204,6 +204,56 @@ set COPY_TO_OUT(statement st) {
 }
 */
 
+/**
+ * Translate the interprocedural summary for a function into a set of local
+ * corresponding parameters (entity only)
+ */
+static set interprocedural_mapping(string res, call c) {
+  entity callee = call_function(c);
+  string func_name = entity_local_name(callee);
+  memory_mapping mem_map = (memory_mapping)db_get_memory_resource(res,
+                                                                  func_name,
+                                                                  TRUE);
+  set summary = memory_mapping_map(mem_map);
+
+
+  list /* of entity */l_formals = module_formal_parameters(callee);
+  int arg_num, n_formals = gen_length(l_formals);
+  gen_free_list(l_formals);
+
+  /* if there are more actuals than formals, they are skipped.
+   */
+  set at_call_site = MAKE_SET();
+  list real_args = call_arguments(c);
+  for (arg_num = 1; !ENDP(real_args) && arg_num <= n_formals; real_args
+      = CDR(real_args), arg_num++) {
+    entity formal_ent = find_ith_formal_parameter(callee, arg_num);
+    bool found = false;
+    SET_FOREACH(entity, e, summary) {
+      if(same_entity_p(e, formal_ent)) {
+        found = true;
+        break;
+      }
+    }
+    if(found) {
+      expression real_exp = EXPRESSION(CAR(real_args));
+
+      if(expression_reference_p(real_exp)) {
+        reference r = syntax_reference(expression_syntax(real_exp));
+        set_add_element(at_call_site, at_call_site, reference_variable(r));
+      } else {
+        pips_user_warning(
+            "Interprocedural mapping on %s map on a non ref expression ",
+            entity_name(formal_ent));
+        print_syntax(expression_syntax(real_exp));
+        fprintf(stderr, "\n");
+      }
+    }
+  }
+  return at_call_site;
+}
+
+
 
 bool is_a_kernel(string func_name) {
   callees kernels = (callees)db_get_memory_resource(DBR_KERNELS, "", true);
@@ -344,60 +394,33 @@ static void copy_from_call(statement st, call c) {
     // Standard call (not a kernel)
     pips_debug(3,"%s is a simple call\n",
         func_name);
-    // We remove from "copy from" what is used by this statement
+
+
+    // We get the inter-procedural results for copy in
+    set at_call_site = set_make(set_pointer);
+    if(!call_intrinsic_p(c)) { // Ignoring intrinsics
+      set_free(at_call_site);
+      at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
+    }
+
+    // We remove from "copy from" what is used by this statement but not what's
+    // in copy-in
     FOREACH(EFFECT, eff, load_proper_rw_effects_list(st) ) {
       entity e_used = reference_variable(effect_any_reference(eff));
-      if(entity_array_p(e_used)) {
+      if(entity_array_p(e_used) && !set_belong_p(at_call_site,e_used)) {
         pips_debug(6,"Removing %s from copy_out\n",entity_name(e_used));
         copy_from_out = set_del_element(copy_from_out, copy_from_out, e_used);
       }
     }
 
+    // No longer used
+    set_free(at_call_site);
+
     // We add the inter-procedural results for copy out, but not for intrinsics
     if(!call_intrinsic_p(c)) { // Ignoring intrinsics
-      set
-          func_copy_from_formal =
-              memory_mapping_map((memory_mapping)db_get_memory_resource(DBR_KERNEL_COPY_OUT,
-                      func_name,
-                      TRUE));
-
-      list /* of entity */l_formals = module_formal_parameters(callee);
-      int arg_num, n_formals = gen_length(l_formals);
-      gen_free_list(l_formals);
-
-      /* if there are more actuals than formals, they are skipped.
-       */
-      set func_copy_from = MAKE_SET();
-      list real_args = call_arguments(c);
-      for (arg_num = 1; !ENDP(real_args) && arg_num <= n_formals; real_args
-          = CDR(real_args), arg_num++) {
-        entity formal_ent = find_ith_formal_parameter(callee, arg_num);
-        bool found = false;
-        SET_FOREACH(entity, e, func_copy_from_formal) {
-          if(same_entity_p(e, formal_ent)) {
-            found = true;
-            break;
-          }
-        }
-        if(found) {
-          expression real_exp = EXPRESSION(CAR(real_args));
-
-          if(expression_reference_p(real_exp)) {
-            reference r = syntax_reference(expression_syntax(real_exp));
-            set_add_element(func_copy_from,
-                            func_copy_from,
-                            reference_variable(r));
-          } else {
-            pips_user_warning(
-                "Copy from out on %s map on a non ref expression ",
-                entity_name(formal_ent));
-            print_syntax(expression_syntax(real_exp));
-            fprintf(stderr, "\n");
-          }
-        }
-      }
-
-      copy_from_out = set_union(copy_from_out, func_copy_from, copy_from_out);
+      at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_OUT,c);
+      copy_from_out = set_union(copy_from_out, at_call_site, copy_from_out);
+      set_free(at_call_site);
     }
   }
 }
@@ -620,49 +643,9 @@ static void copy_to_call(statement st, call c) {
 
     // We add the inter-procedural results for copy in, but not for intrinsics
     if(!call_intrinsic_p(c)) { // Ignoring intrinsics
-      set
-          func_copy_to_formal =
-              memory_mapping_map((memory_mapping)db_get_memory_resource(DBR_KERNEL_COPY_IN,
-                      func_name,
-                      TRUE));
-
-      list /* of entity */l_formals = module_formal_parameters(callee);
-      int arg_num, n_formals = gen_length(l_formals);
-      gen_free_list(l_formals);
-
-      /* if there are more actuals than formals, they are skipped.
-       */
-      set func_copy_to = MAKE_SET();
-      list real_args = call_arguments(c);
-      for (arg_num = 1; !ENDP(real_args) && arg_num <= n_formals; real_args
-          = CDR(real_args), arg_num++) {
-        entity formal_ent = find_ith_formal_parameter(callee, arg_num);
-        bool found = false;
-        SET_FOREACH(entity, e, func_copy_to_formal) {
-          if(same_entity_p(e, formal_ent)) {
-            found = true;
-            break;
-          }
-        }
-        if(found) {
-          expression real_exp = EXPRESSION(CAR(real_args));
-
-          if(expression_reference_p(real_exp)) {
-            reference r = syntax_reference(expression_syntax(real_exp));
-            entity e_used = reference_variable(r);
-            pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
-            set_add_element(func_copy_to, func_copy_to, e_used);
-          } else {
-            pips_user_warning(
-                "Copy to from out on %s map on a non ref expression ",
-                entity_name(formal_ent));
-            print_syntax(expression_syntax(real_exp));
-            fprintf(stderr, "\n");
-          }
-        }
-      }
-
-      copy_to_in = set_union(copy_to_in, func_copy_to, copy_to_in);
+      set at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_IN,c);
+      copy_to_in = set_union(copy_to_in, at_call_site, copy_to_in);
+      set_free(at_call_site);
     }
   }
   //  copy_to_in = set_difference(copy_to_in, copy_to_in, COPY_FROM_IN(st));
@@ -747,8 +730,8 @@ static void copy_to_statement(statement st) {
 static void transfert_statement(statement st,
                                 set already_transfered_to,
                                 set already_transfered_from,
-                                set stmt_to_insert_after,
-                                set stmt_to_insert_before);
+                                set array_to_transfer_to_after,
+                                set array_to_transfer_from_before);
 
 static void transfert_block(statement st,
                             list sts,
@@ -765,6 +748,8 @@ static void transfert_block(statement st,
   for (list current = (sts); !ENDP(current); POP(current)) {
     statement one = STATEMENT(CAR(current));
 
+    // These are here to record what a statement require to transfer
+    // We generate transfers only in sequence
     set transfert_to = MAKE_SET();
     set transfert_from = MAKE_SET();
 
@@ -774,19 +759,22 @@ static void transfert_block(statement st,
                         already_transfered_from,
                         transfert_to,
                         transfert_from);
-    pips_debug(0,"t_to len : %d\n",set_size(transfert_to));
-    SET_FOREACH(statement, new_st_from, transfert_from) {
-      printf("INSERT STATEMENT !!\n");
+    // Really insert the transfers statement
+    list t_from = set_to_sorted_list(transfert_from,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e_from, t_from) {
+      statement new_st_from = make_dma_transfert(e_from, dma_store);
       CDR(current) = CONS(statement,one,CDR(current));
       CAR(current).e = new_st_from;
       POP(current);
     }
-    SET_FOREACH(statement, new_st_to, transfert_to)
-    {
-      pips_debug(0,"INSERT STATEMENT !!\n");
+    gen_free_list(t_from);
+    list t_to = set_to_sorted_list(transfert_to,(gen_cmp_func_t)compare_entities);
+    FOREACH(entity, e_to, t_to) {
+      statement new_st_to = make_dma_transfert(e_to, dma_load);
       CDR(current) = CONS(statement,new_st_to,CDR(current));
       POP(current);
     }
+    gen_free_list(t_to);
   }
   /*
    HASH_MAP(st, st_tr_to,
@@ -908,8 +896,8 @@ static void transfert_unstructured(statement st,
 static void transfert_statement(statement st,
                                 set already_transfered_to,
                                 set already_transfered_from,
-                                set stmt_to_insert_after,
-                                set stmt_to_insert_before) {
+                                set array_to_transfer_to_after,
+                                set array_to_transfer_from_before) {
 
   instruction i = statement_instruction( st );
 
@@ -920,8 +908,7 @@ static void transfert_statement(statement st,
 
   SET_FOREACH(entity, e, transferts_to) {
     set_add_element(already_transfered_to, already_transfered_to, e);
-    statement new_one = make_dma_transfert(e, dma_load);
-    set_add_element(stmt_to_insert_after, stmt_to_insert_after, new_one);
+    set_add_element(array_to_transfer_to_after, array_to_transfer_to_after, e);
 
     ifdebug(2) {
       string str = strdup(concatenate("Transfert to accel : ",
@@ -943,9 +930,9 @@ static void transfert_statement(statement st,
     SET_FOREACH(entity, e, transferts_from)
     {
       set_add_element(already_transfered_from, already_transfered_from, e);
-      set_add_element(stmt_to_insert_before,
-                      stmt_to_insert_before,
-                      make_dma_transfert(e, dma_store));
+      set_add_element(array_to_transfer_from_before,
+                      array_to_transfer_from_before,
+                      e);
       ifdebug(2) {
         string str = strdup(concatenate("Transfert from accel : ",
                                         entity_local_name(e),
@@ -971,32 +958,32 @@ static void transfert_statement(statement st,
                      instruction_test( i ),
                      already_transfered_to,
                      already_transfered_from,
-                     stmt_to_insert_after,
-                     stmt_to_insert_before);
+                     array_to_transfer_to_after,
+                     array_to_transfer_from_before);
       break;
     case is_instruction_loop:
       transfert_loop(st,
                      instruction_loop( i ),
                      already_transfered_to,
                      already_transfered_from,
-                     stmt_to_insert_after,
-                     stmt_to_insert_before);
+                     array_to_transfer_to_after,
+                     array_to_transfer_from_before);
       break;
     case is_instruction_whileloop:
       transfert_whileloop(st,
                           instruction_whileloop( i ),
                           already_transfered_to,
                           already_transfered_from,
-                          stmt_to_insert_after,
-                          stmt_to_insert_before);
+                          array_to_transfer_to_after,
+                          array_to_transfer_from_before);
       break;
     case is_instruction_forloop:
       transfert_forloop(st,
                         instruction_forloop( i ),
                         already_transfered_to,
                         already_transfered_from,
-                        stmt_to_insert_after,
-                        stmt_to_insert_before);
+                        array_to_transfer_to_after,
+                        array_to_transfer_from_before);
       break;
     case is_instruction_call:
       transfert_call(st,

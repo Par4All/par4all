@@ -797,8 +797,8 @@ static string process_thru_C_pp(string name) {
     status = safe_system_no_abort
       (concatenate(cpp? cpp: CPP_CPP,
 		   CPP_CPPFLAGS, cpp_options? cpp_options: "",
-		   includes, " ",
-		   name, " > ", new_name, " 2> ", cpp_err, NULL));
+		   includes, " '",
+		   name, "' > '", new_name, "' 2> ", cpp_err, NULL));
 
     free(includes);
 

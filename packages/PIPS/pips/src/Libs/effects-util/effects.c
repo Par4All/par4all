@@ -207,6 +207,22 @@ statement_has_a_module_formal_argument_write_effect_p(statement s,
 
 }
 
+/*********************** EFFECTS AND ABSTRACT LOCATIONS */
+
+
+bool effect_abstract_location_p(effect eff)
+{
+  return cell_abstract_location_p(effect_cell(eff));
+}
+
+bool cell_abstract_location_p(cell c)
+{
+  pips_assert("cell is not a GAP", !cell_gap_p(c));
+  
+  return (entity_abstract_location_p(reference_variable(cell_any_reference(c))));
+}
+
+
 
 
 /* Anywhere effect: an effect which can be related to any location of any areas */
@@ -275,10 +291,33 @@ bool heap_effect_p(effect e)
   return heap_p;
 }
 
+bool heap_cell_p(cell c)
+{
+  bool heap_p;
+  reference r = cell_any_reference(c);
+  entity v = reference_variable(r);
+
+  heap_p = same_string_p(entity_local_name(v), HEAP_AREA_LOCAL_NAME);
+
+  return heap_p;
+}
+
+
 bool malloc_effect_p(effect e)
 {
   bool heap_p;
   reference r = effect_any_reference(e);
+  entity v = reference_variable(r);
+
+  heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
+
+  return heap_p;
+}
+
+bool malloc_cell_p(cell c)
+{
+  bool heap_p;
+  reference r = cell_any_reference(c);
   entity v = reference_variable(r);
 
   heap_p = same_string_p(entity_local_name(v), MALLOC_EFFECTS_NAME);
@@ -297,6 +336,13 @@ bool io_effect_p(effect e)
 {
   return io_effect_entity_p(reference_variable(effect_any_reference(e)));
 }
+
+bool io_cell_p(cell c)
+{
+  return io_effect_entity_p(reference_variable(cell_any_reference(c)));
+}
+
+
 bool io_effects_p(list effects)
 {
     FOREACH(EFFECT,eff,effects)
@@ -309,6 +355,13 @@ bool std_file_effect_p(effect e)
   const char * s = entity_user_name(effect_entity(e));
   return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
 }
+
+bool std_file_cell_p(cell c)
+{
+  const char * s = entity_user_name(cell_entity(c));
+  return(same_string_p(s, "stdout") || same_string_p(s, "stdin") || same_string_p(s, "stderr"));
+}
+
 bool std_file_effects_p(list effects)
 {
     FOREACH(EFFECT,eff,effects)
@@ -804,6 +857,13 @@ action_kind action_to_action_kind(action a)
 
   return ak;
 }
+
+action_kind effect_action_kind(effect eff)
+{
+  action ac = effect_action(eff);
+  return action_to_action_kind(ac);
+}
+
 
 bool store_effect_p(effect e)
 {
@@ -818,18 +878,18 @@ bool environment_effect_p(effect e)
 {
   action a = effect_action(e);
   action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
-  bool store_p = action_kind_environment_p(ak);
+  bool env_p = action_kind_environment_p(ak);
 
-  return store_p;
+  return env_p;
 }
 
 bool type_declaration_effect_p(effect e)
 {
   action a = effect_action(e);
   action_kind ak = action_read_p(a)? action_read(a) : action_write(a);
-  bool store_p = action_kind_type_declaration_p(ak);
+  bool decl_p = action_kind_type_declaration_p(ak);
 
-  return store_p;
+  return decl_p;
 }
 
 
@@ -990,6 +1050,9 @@ bool effect_list_consistent_p(list el)
   return ok_p;
 }
 
+
+/* DO NOT USE ANYMORE: NOT COMPATIBLE WITH ABSTRACT LOCATIONS */
+/* besides, I do not see the interest after having called effects_compatible_p. BC */
 /* Check compatibility conditions for effect union */
 bool union_compatible_effects_p(effect ef1, effect ef2)
 {
@@ -1027,7 +1090,7 @@ bool union_compatible_effects_p(effect ef1, effect ef2)
     /* The code below could be further unified, but it would not make
        it easier to understand */
     if(akt1==is_action_kind_store) {
-      if(e1!=e2)
+      if(e1!=e2) /* Beware: that's not true anymore because of abstract locations */
 	compatible_p = FALSE;
       else {
 	tag dt1 = descriptor_tag(d1);

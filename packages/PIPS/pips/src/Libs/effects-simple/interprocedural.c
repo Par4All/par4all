@@ -832,8 +832,8 @@ summary_effect_to_proper_effect(
     entity f = call_function(c);
 
     if(!parameter_passing_by_reference_p(f)) {
-      // not handeled case return an empty list
-      pips_user_warning("not handeled case, need to be implemented\n");
+      // not handled case return an empty list
+      pips_user_warning("not handled case, need to be implemented\n");
     } else {
       if (storage_formal_p(st)) {
 	effect res;

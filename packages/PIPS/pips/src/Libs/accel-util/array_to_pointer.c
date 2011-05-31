@@ -66,6 +66,9 @@ typedef struct {
 
 /* @return the number of dimensions in @param t, 
  * counting pointers as a dimension
+ *
+ * BEWARE: does not take structs and unions into account
+ *
  * */
 size_t type_dereferencement_depth(type t) {
   t = ultimate_type(t);

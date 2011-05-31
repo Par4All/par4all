@@ -19,14 +19,19 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-dist_man1_MANS=Build.l \
-	Delete.l \
-	Display.l \
-	Init.l \
-	Perform.l \
-	Pips.l \
-	Select.l \
-	epips.l \
-	pips-cmd.l \
-	tpips.l \
-	wpips.l
+use_pdflatex = 1
+INSTALL_DOC = pyps.pdf
+#INSTALL_HTM = pyps.htdoc
+#DOC.subd = pyps.htdoc
+
+# common stuff
+ROOT    = ../../..
+PROJECT	= pips
+include $(ROOT)/makes/main.mk
+
+# local stuff
+clean: local-clean
+
+local-clean:
+	$(RM) -rf $(INSTALL_DOC) $(INSTALL_HTM) \
+		*.aux *.bbl *.blg *.brf *.rel *.toc *.idx *.ilg *.ind *.log *.dvi *.ps *.out

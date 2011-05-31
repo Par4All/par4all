@@ -662,19 +662,19 @@ call_proper_reduction_p (
     if ((update_op=extract_reduction_update_operator(fct, &op, &comm))==FALSE)
       unary_op = extract_reduction_unary_update_operator (fct, &op);
 
-  // if no suitable operator have been found : return false
+  // if no suitable operator has been found : return false
   if ((unary_op == FALSE) && (update_op == FALSE) && (assign_op == FALSE)) {
     pips_debug(5,"No unary, nor update, no assign !\n");
     return FALSE;
   }
 
-  // get the left and rigth operand
+  // get the left and right operands
   le = call_arguments(c);
   elhs = EXPRESSION(CAR(le));
   //no right operand for unary operator
   if (unary_op == FALSE) erhs = EXPRESSION(CAR(CDR(le)));
   if (syntax_reference_p(expression_syntax(elhs)) == FALSE) {
-    pips_user_warning ("not handeled case, no reduction will be detected\n");
+    pips_user_warning ("not handled case, no reduction will be detected\n");
     return FALSE;
   }
   lhs = syntax_reference(expression_syntax(elhs));

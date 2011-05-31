@@ -23,6 +23,7 @@
 # TODO
 # - check documentation generation?
 #   I recall that latex errors are ignored in nlpmake.
+# - keep out/err on errors?
 #
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
@@ -47,9 +48,10 @@ validate=mail-diff-validate
 vopts=
 vname=
 build=compile
-try=2
+try=3
 
-# get options
+# get options manually
+# collated one-letter options are *not* handled.
 while [[ $1 == -* ]]
 do
   case $1 in
@@ -70,13 +72,13 @@ do
     -p|--parallel) parallel=1 ;;
     -s|--sequential) parallel= ;;
     # make options for validation (TIMEOUT DO_SLOW...)
-    -vo|--validation-option) vopts="$vopts $2" ; shift ;;
+    -V|--validation-option) vopts="$vopts $2" ; shift ;;
     --validation-option=*) vopts="$vopts ${1#*=}" ;;
     # trace length to include on compilation error
     -t|--tail) tail=$2 ; shift ;;
     --tail=*) tail=${1#*=} ;;
     # possibly do retry some connections
-    --try) try=$2 ; shift ;;
+    -T|--try) try=$2 ; shift ;;
     --try=*) try=${1#*=} ;;
     # compilation & validation name for report
     -v|--vname) vname=$2 ; shift ;;
@@ -96,7 +98,7 @@ do
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation ...]\n" \
         "check pips compilation and validation health\n" \
 	"arguments:\n" \
-	"  em@ail: summary email recipient, defaults is current user\n" \
+	"  em@ail: summary email recipient, defaults to current user\n" \
 	"  /path/to/prod: path to an svn working copy of pips, default is .\n" \
 	"  /path/to/validation: path to an svn working copy of a validation\n" \
 	"available options:\n" \
@@ -111,8 +113,9 @@ do
 	"  -s: do not run in parallel\n" \
 	"  -S file: source file for environment\n" \
         "  -t len: trace length on compilation error\n" \
+        "  -T n: possibly retry svn up, defaults to thrice\n" \
 	"  -v name: validation name\n" \
-        "  -vo opt: validation make option, can be repeated for more\n" \
+        "  -V opt: validation make option, can be repeated for more\n" \
 	"  -w: wait for lock\n"
       exit 0
       ;;
@@ -138,13 +141,13 @@ unset -v EXTERN_ROOT NEWGEN_ROOT LINEAR_ROOT PIPS_ROOT PIPS_ARCH
 if [ "$parallel" ]
 then
   # compute load & jobs depending on the available hardware
-  # note that the reported hardware can be somehow virtual
+  # note that the reported hardware can be somehow virtual with hyperthreading
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
   make+=" -j $jobs -l $load"
-  tail=$((12 + 3 * $nproc))
+  tail=$((15 + 10 * $nproc))
 else
-  tail=15
+  tail=25
 fi
 
 # report current-state compile message
@@ -319,7 +322,7 @@ rm -f out err
 ntry=$try
 while let ntry--
 do
-  if $nice svn up $prod "$@" >> out 2>> err
+  if $nice svn up --force --accept theirs-full $prod "$@" >> out 2>> err
   then
     # svn up was okay, let us get out
     ntry=0
@@ -330,7 +333,7 @@ do
     # possible repeated failures: network dns svn...
     # hmmm... try to cleanup after svn up failure
     svn cleanup $prod "$@" >> out 2>> err
-    report 'KO:svn-up' 'unchanged' 'cannot "svn up" ($try)'
+    report 'KO:svn-up' 'unchanged' "cannot \"svn up\" ($try)"
   fi
 done
 
