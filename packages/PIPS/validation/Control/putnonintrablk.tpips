@@ -6,7 +6,17 @@ setproperty ABORT_ON_USER_ERROR TRUE
 
 create $WS putnonintrablk.c
 
+echo
+echo Parser output
+echo
+
 display PARSED_PRINTED_FILE
+
+echo
+echo Controlizer output
+echo
+
+activate NEW_CONTROLIZER
 
 display PRINTED_FILE
 

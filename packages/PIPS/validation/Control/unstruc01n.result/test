@@ -1,0 +1,90 @@
+
+Parser output
+
+      PROGRAM UNSTRUC01
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) THEN                                             0006
+         NQ = 4                                                         0007
+      ELSE
+         IF (NASS.EQ.60) THEN                                           0008
+            NQ = 1                                                      0009
+         ELSE
+            RETURN
+         ENDIF
+      ENDIF
+
+      END
+
+Controlizer output
+
+      PROGRAM UNSTRUC01
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) GOTO 99999                                       0006
+      IF (NASS.EQ.60) GOTO 99998                                        0008
+
+      RETURN
+99998 CONTINUE
+      NQ = 1                                                            0009
+99997 CONTINUE
+      RETURN
+99999 CONTINUE
+      NQ = 4                                                            0007
+      GOTO 99997
+      END
+
+New controlizer output
+
+      PROGRAM UNSTRUC01
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) THEN                                             0006
+         NQ = 4                                                         0007
+      ELSE
+         IF (NASS.EQ.60) THEN                                           0008
+            NQ = 1                                                      0009
+         ELSE
+         ENDIF
+      ENDIF
+
+      END
+
+Try Bourdoncle's restructuring...
+
+
+C  T() {}
+
+      PROGRAM UNSTRUC01
+
+C  T(NQ) {}
+
+
+C     Check bug in controlizer when controlize_test() calls itself
+C     recursively
+
+      IF (NASS.EQ.157) THEN                                             0006
+
+C  T(NQ) {NQ==4}
+
+         NQ = 4                                                         0007
+      ELSE
+
+C  T(NQ) {}
+
+         IF (NASS.EQ.60) THEN                                           0008
+
+C  T(NQ) {NQ==1}
+
+            NQ = 1                                                      0009
+         ELSE
+         ENDIF
+      ENDIF
+
+      END

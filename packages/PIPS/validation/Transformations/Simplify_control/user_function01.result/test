@@ -1,0 +1,25 @@
+//
+// Code after simplify_control for module foo
+//
+void foo(int i)
+{
+}
+//
+// Code after simplify_control for module main
+//
+int main()
+{
+   return suppress_dead_code03(2);
+}
+//
+// Code after simplify_control for module suppress_dead_code03
+//
+int suppress_dead_code03(int i)
+{
+   int k;
+
+   foo(1);
+   k = 3;
+
+   return i;
+}

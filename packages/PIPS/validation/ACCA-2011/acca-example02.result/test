@@ -144,6 +144,7 @@ void compute(int p, int n, float a[n][n])
 void compute(int p, int n, float a[n][n])
 {
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
 //    n==100}>
 
@@ -152,38 +153,42 @@ void compute(int p, int n, float a[n][n])
    int k = 100;
    int i, j;
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
 //    n==100}>
+//  <t-INE-EXACT-{}>
 
    for(i = 0; i <= 99; i += 1) {
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI1, PHI1<=99, 0<=PHI2,
 //    PHI2<=99, n==100}>
+//  <t-INE-EXACT-{}>
 
       // BEGIN BLOCK
       k = -i+99;
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==i, i+k==99, n==100, 0<=i,
 //    i<=99}>
-//  <a[*][*]-INE-EXACT-{}>
-//  <t[*]-INE-EXACT-{}>
+//  <t-INE-EXACT-{}>
 
       t[-i+99] = a[i][i];
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, i+k==99,
 //    n==100, 0<=i, i<=99}>
-//  <a[*][*]-INE-EXACT-{}>
+//  <t-INE-EXACT-{}>
 //  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99}>
-//  <t[*]-INE-EXACT-{}>
 
       for(j = 0; j <= 99; j += 1)
 
+//  <a-INE-EXACT-{}>
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, i+k==99, n==100, 0<=i,
 //    i<=99, 0<=j, j<=99}>
-//  <a[*][*]-INE-EXACT-{}>
+//  <t-INE-EXACT-{}>
 //  <t[PHI1]-IN-EXACT-{PHI1+i==99, i+k==99, n==100, 0<=i, i<=99, 0<=j,
 //    j<=99}>
-//  <t[*]-INE-EXACT-{}>
 
          a[i][j] /= t[-i+99];
       // END BLOCK
@@ -226,6 +231,9 @@ void compute(int p, int n, float a[n][n])
 //  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
 
    // BEGIN BLOCK
+
+//  <t-OUTE-EXACT-{}>
+
    float t[100];
    int k = 100;
 
@@ -289,6 +297,7 @@ void compute(int p, int n, float a[n][n])
       k = -i+99;
 #pragma omp parallel for private(j,__scalar__0)
    for(i = 0; i <= 99; i += 1) {
+      __scalar__0 = t[-i+99];
       __scalar__0 = a[i][i];
 #pragma omp parallel for 
       for(j = 0; j <= 99; j += 1)
@@ -300,6 +309,9 @@ void compute(int p, int n, float a[n][n])
 
 void compute(int p, int n, float a[n][n])
 {
+
+//  <t-OUTE-EXACT-{}>
+
    float t[100];
    int k = 100;
 
@@ -312,6 +324,7 @@ void compute(int p, int n, float a[n][n])
 //  <a[PHI1][PHI2]-OUT-EXACT-{PHI1==0, PHI2==0, n==100, 1<=p}>
 
    for(i = 0; i <= 99; i += 1) {
+      __scalar__0 = t[-i+99];
       k = -i+99;
 
 //  <__scalar__0-OUT-EXACT-{}>

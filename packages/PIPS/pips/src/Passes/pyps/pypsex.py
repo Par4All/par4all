@@ -6,14 +6,38 @@ For instance to enforce a property value, an activate etc before calling a pass
 
 from subprocess import Popen, PIPE
 import pyps
-import sys
+import sys, os
 
-def view_dg(module,format="png"):
-	"""view module's dependence graph in the format specified by ``format''"""
-	module.print_dot_dependence_graph()
+def dump_chains_or_dg(module,which="whole_dependence"):
+	"""dump textual module's dependence graph or atomic chains, "which" parameter 
+	specify which "flavor" you want, for instance "chains" or "effective_dependence" 
+	(default is whole_dependence)"""
+	generator_name = "print_"+which+"_graph"
+	generator = getattr(module,generator_name)
+	if generator == None:
+		return "Sorry, " + generator_name + " is undefined !"
+	generator()	
+	filename = os.path.join(module.workspace.dirname,module.show("DG_FILE"))
+	read_data = "An error occured"
+	with open(filename, 'r') as f:
+		read_data = f.read()
+	print "// " + which + " for " + module.name
+	print read_data
+pyps.module.dump_chains_or_dg=dump_chains_or_dg
+
+def dump_chains_or_dg(self, which="whole_dependence"):
+    """  """
+    for m in self: 
+    	m.dump_chains_or_dg(which=which)
+pyps.modules.dump_chains_or_dg=dump_chains_or_dg
+
+
+def view_chains_or_dg(module,format="png"):
+	"""view module's dependence graph or atomic chains  in the format specified 
+	by ``format'' , not intended to be called direcly, use view_dg or view_chains"""
 	of=module.name+"."+format
-	dot_cmd = ["dot","-T"+format, os.path.join(module._ws.dirname,module.show("DOTDG_FILE")),"-o"+of]
-	if module._ws.verbose:
+	dot_cmd = ["dot","-T"+format, os.path.join(module.workspace.dirname,module.show("DOTDG_FILE")),"-o"+of]
+	if module.workspace.verbose:
 		print >> sys.stderr , "Generating image with", dot_cmd
 	p = Popen(dot_cmd, stdout = PIPE, stderr = PIPE)
 	(out,err) = p.communicate()
@@ -21,7 +45,19 @@ def view_dg(module,format="png"):
 		print >> sys.stderr, err
 		raise RuntimeError("%s failed with return code %d" % (dot_cmd, ret))
 	return (of,out,err)
+pyps.module.view_chains_or_dg=view_chains_or_dg
+
+def view_dg(module,format="png"):
+	"""view module's dependence graph in the format specified by ``format''"""
+	module.print_dot_dependence_graph()
+	return module.view_chains_or_dg(format=format)
 pyps.module.view_dg=view_dg
+
+def view_chains(module,format="png"):
+	"""view module's dependence graph in the format specified by ``format''"""
+	module.print_dot_chains_graph()
+	return module.view_chains_or_dg(format=format)
+pyps.module.view_chains=view_chains
 
 
 def loop_distribution(module,**kwargs):

@@ -7,12 +7,17 @@ create $WKS $WKS.c
 
 #setenv C_SYNTAX_DEBUG_LEVEL 9
 
-activate C_PARSER
-activate C_SYMBOL_TABLE
+#activate C_PARSER
+#activate C_SYMBOL_TABLE
 
-setproperty PRETTYPRINT_C_CODE TRUE
+#setproperty PRETTYPRINT_C_CODE TRUE
 setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
-setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+
+# FI: this property is not comptaible with C; it generated a pattern
+# of {{...}} everywhere including in the compilation unit
+#
+#setproperty PRETTYPRINT_ALL_C_BLOCKS TRUE
+
 setproperty PRETTYPRINT_UNSTRUCTURED TRUE
 setproperty PRETTYPRINT_EMPTY_BLOCKS TRUE
 setproperty PRETTYPRINT_ALL_LABELS TRUE
@@ -20,20 +25,20 @@ setproperty PRETTYPRINT_INTERNAL_RETURN TRUE
 setproperty PRETTYPRINT_FINAL_RETURN TRUE
 # setproperty PARSER_DUMP_SYMBOL_TABLE TRUE
 
-echo
-echo Symbol table for test
-echo
-
-display SYMBOL_TABLE_FILE[$WKS!]
-echo
-display SYMBOL_TABLE_FILE[test]
+#echo
+#echo Symbol table for test
+#echo
+#
+#display SYMBOL_TABLE_FILE[$WKS!]
+#echo
+#display SYMBOL_TABLE_FILE[test]
 
 echo
 echo Parser output
 echo
 
-display PARSED_PRINTED_FILE[$WKS!]
-echo
+#display PARSED_PRINTED_FILE[$WKS!]
+#echo
 display PARSED_PRINTED_FILE[test]
 
 echo
@@ -42,11 +47,20 @@ echo
 
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 
+activate NEW_CONTROLIZER
+
 #setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[test]
 
+echo
+echo Output after restructuration
+echo
+
 apply RESTRUCTURE_CONTROL[test]
 display PRINTED_FILE[test]
+
+apply UNSPLIT
+shell (cd if02.database/Src; gcc -c if02.c)
 
 close
 

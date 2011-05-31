@@ -32,10 +32,16 @@ echo
 echo Controlizer output
 echo
 
+activate NEW_CONTROLIZER
+
 setproperty PRETTYPRINT_STATEMENT_ORDERING TRUE
 
 #setenv CONTROL_DEBUG_LEVEL=8
 display PRINTED_FILE[go_to]
+
+echo
+echo Restructured output
+echo
 
 apply RESTRUCTURE_CONTROL[go_to]
 display PRINTED_FILE[go_to]

@@ -51,26 +51,20 @@ replace_entity_reference_walker(reference r,struct entity_pair* thecouple)
   }
 }
 
-static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple)
-{
-	string emn_l = entity_module_name(loop_index(l));
-	string emn_o = entity_module_name(thecouple->old);
-	const char * eun_l = entity_user_name(loop_index(l));
-	const char * eun_o = entity_user_name(thecouple->old);
-	if( same_string_p(emn_l,emn_o) && same_string_p(eun_l,eun_o))
-	{
-		loop_index(l) = thecouple->new;
-	}
-    list ll=NIL;
-    FOREACH(ENTITY,e,loop_locals(l))
-    {
-      if(same_entity_p(e,thecouple->old))
-        ll=CONS(ENTITY,thecouple->new,ll);
-      else
-        ll=CONS(ENTITY,e,ll);
+static void replace_entity_loop_walker(loop l, struct entity_pair* thecouple) {
+  if(same_entity_p(thecouple->old, loop_index(l))) {
+    // We replace the loop index
+    loop_index(l) = thecouple->new;
+  }
+
+  // Handle loop locals, in-place replacement
+  list ll = loop_locals(l);
+  for(; !ENDP(ll); POP(ll)) {
+    entity local = ENTITY(CAR(ll));
+    if(same_entity_p(local, thecouple->old)) {
+      CAR(ll).p = (gen_chunk *)thecouple->new;
     }
-    gen_free_list(loop_locals(l));
-    loop_locals(l)=gen_nreverse(ll);
+  }
 }
 
 /**

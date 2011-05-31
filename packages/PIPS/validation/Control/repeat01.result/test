@@ -1,11 +1,16 @@
+
+Parsed code
+
 int main()
 {
    repeat01();
    return 0;
 }
+
+Controlized code
+
 void repeat01()
 {
-   // BEGIN BLOCK
    int c = 10;
 l99999:   ;
    c--;
@@ -15,6 +20,5 @@ l99999:   ;
 end:   ;
    printf("The output must be 8: %d\n", c);
    return;
-   // END BLOCK
 }
 The output must be 8: 8

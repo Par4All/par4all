@@ -1,0 +1,35 @@
+int main()
+{
+   int n = 10;
+   int a[n][n];
+   int j;
+   {
+      int i, j;
+      // overwrite previous declaration for j and force flatten code to rename
+      
+      // The omp generated clause privatize j, but flatten_code used to "forget" to 
+      // rename it while renaming the loop indice
+#pragma omp parallel for private(j)
+      for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
+         for(j = 0; j <= n-1; j += 1)
+            a[i][j] = i*j;
+   }
+}
+int main()
+{
+   int n = 10;
+   int a[n][n];
+   int j;
+   //PIPS generated variable
+   int i, j_0;
+   // overwrite previous declaration for j and force flatten code to rename
+   
+   // The omp generated clause privatize j, but flatten_code used to "forget" to 
+   // rename it while renaming the loop indice
+#pragma omp parallel for private(j_0)
+   for(i = 0; i <= n-1; i += 1)
+#pragma omp parallel for 
+      for(j_0 = 0; j_0 <= n-1; j_0 += 1)
+         a[i][j_0] = i*j_0;
+}

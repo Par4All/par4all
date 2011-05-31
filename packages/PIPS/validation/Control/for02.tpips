@@ -1,0 +1,43 @@
+delete for02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create for02 for02.c
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE
+
+echo
+echo New controlized code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Parallel code with initial controlizer
+echo
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+display PARALLELPRINTED_FILE
+
+activate NEW_CONTROLIZER
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+echo
+echo New controlized code
+echo
+
+display PRINTED_FILE
+
+echo
+echo Parallel code with new controlizer
+echo
+
+display PARALLELPRINTED_FILE
+
+close
+quit

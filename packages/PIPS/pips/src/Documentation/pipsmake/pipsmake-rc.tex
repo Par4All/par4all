@@ -2838,22 +2838,6 @@ These last two properties are not consistent with PIPS current development
 dependence graph. Phases using the latter should be able to filter out
 irrelevant arcs, e.g. pertaining to privatized variables.
 
-\subsubsection{Disambiguation Test}
-\index{Alias}
-\index{CHAINS\_DISAMBIGUATE\_CONSTANT\_SUBSCRIPTS}
-
-THIS PROPERTY IS OBSOLETE. It will be removed in a near future. Please don't
-use it.
-
-The default disambiguation test is based on variables names. Array and
-scalar variables are handled in the same way. However it is possible to
-refine the chain graph by using {\em constant} subscript expressions.
-
-\begin{PipsProp}{CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS} 
-CHAINS_DISAMBIGUATE_CONSTANT_SUBSCRIPTS FALSE
-\end{PipsProp}
-
-
 
 \section{Dependence Graph (DG)}
 \label{subsection-dependence-graph}
@@ -3585,7 +3569,7 @@ clear. Intra-procedural preconditions may be computed with {\em
 inter}-procedural transformers. This is faster that a full
 interprocedural analysis because there is no need for a top-down
 propagation of summary preconditions. This is compatible with code
-transformations like \PipsPassRef{partial_eval}, \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination}.
+transformations like \PipsPassRef{partial_eval}, \PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination}.
 
 Since these two options for transformer and precondition computations are
 independent and that \PipsPassRef{transformers_inter_full} and
@@ -5909,7 +5893,7 @@ if_conversion_compact                  > MODULE.code
 % +        < MODULE.proper_effects
 \begin{PipsPass}{loop_nest_unswitching}
   Converts max in loop bounds into tests. Also sets variable so that
-  \PipsPassRef{suppress_dead_code} works afterward
+  \PipsPassRef{simplify_control} works afterward
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -7850,13 +7834,19 @@ array_expansion > PROGRAM.entities
 \index{Loop fusion}
 
 \begin{PipsPass}{loop_fusion}
-  This pass fuses as many loop as possible in a greedy manner. The
+  This pass fuses as many loops as possible in a greedy manner. The
   loops must appear in a sequence and have exactly the same loop
-  bounds and if possible the same loop indices. We'll try to fuse
-  loops where there is a dependence between their body. We expect
-  that it'll maximize possibilities for further optimizations. A 
-  property will soon allow to control the exact heuristics used in
-  the selection process.
+  bounds and if possible the same loop indices. We'll always try first to fuse
+  loops where there is a dependence between their body. We expect that this 
+  policy will maximize possibilities for further optimizations. 
+
+  Property \PipsPropRef{LOOP_FUSION_GREEDY} allows to control whether it'll 
+  try to fuse as many loop as possible even without any reuse. This will be done 
+  in a second pass.
+
+  Property \PipsPropRef{LOOP_FUSION_MAXIMIZE_PARALLELISM} is used to control if
+  loop fusion has to preserve parallelism while fusing. If this property
+  is true, a parallel loop is never fused with a sequential loop.
 
   The fusion legality is checked in the standard way by comparing the
   dependence graphs obtained before and after fusion.
@@ -7875,12 +7865,13 @@ loop_fusion            > MODULE.code
         < MODULE.dg
 \end{PipsMake}
 
-Property \PipsPropRef{LOOP_FUSION_MAXIMIZE_PARALLELISM} is used to control if
-loop fusion has to preserve parallelism while fusing. If this property
-is true, a parallel loop is never fused with a sequential loop.
 
 \begin{PipsProp}{LOOP_FUSION_MAXIMIZE_PARALLELISM}
 LOOP_FUSION_MAXIMIZE_PARALLELISM TRUE
+\end{PipsProp}
+
+\begin{PipsProp}{LOOP_FUSION_GREEDY}
+LOOP_FUSION_GREEDY FALSE
 \end{PipsProp}
 
 
@@ -7936,7 +7927,7 @@ INDEX_SET_SPLITTING_SPLIT_BEFORE_BOUND FALSE
 Unroll requests a loop label and an unrolling factor from the user.
 Then it unrolls the specified loop as specified. The transformation is
 very general, and it is interesting to run \PipsPassRef{partial_eval},
-\PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} after this
+\PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination} after this
 transformation. When the number of iterations cannot be proven to be a
 multiple of the unrolling factor, the extra iterations can be executed
 first or last (see \PipsPropRef{LOOP_UNROLL_WITH_PROLOGUE}). 
@@ -8465,11 +8456,14 @@ partial_redundancy_elimination             > MODULE.code
 \index{Control Simplification}
 
 \begin{PipsPass}{suppress_dead_code}
-Function \PipsPassRef{suppress_dead_code} is used to delete non-executed code,
+Alias for \PipsPassRef{simplify_control}.
+\end{PipsPass}
+
+\begin{PipsPass}{simplify_control}
+
+Function \PipsPassRef{simplify_control} is used to delete non-executed code,
 such as empty loop nests or zero-trip loops, for example after
 strip-mining or partial evaluation. 
-\end{PipsPass}
-FI says it should be named simplify\_control.
 
 Preconditions are used to find always
 true conditions in tests and to eliminate such tests. In some cases,
@@ -8496,24 +8490,37 @@ control flow graph of the module is computed.
 
 The cumulated effects are used in debug mode to display information.
 
+%% FIXME : is the following still applicable ? We renamed dead_code_elimination 
+%% as expected
 Note that according to~\cite{ASU86}
 and~\cite{Muc97} , there is confusion between Dead-code elimination
 and Unreachable-code elimination. {\em Unreachable code} is code that
 cannot possibly be executed, regardless of the input data. {\em Dead code}
 elimination removes code that is executable but that has no effect on the
 result of the computation being performed (see Section $18.1$ and Section
-$18.10$ of~\cite{Muc97}). So \PipsPassRef{suppress_dead_code} in PIPS is in
+$18.10$ of~\cite{Muc97}). So \PipsPassRef{simplify_control} in PIPS is in
 fact unreachable code elimination. Dead code elimination is performed by
 phase \PipsPassRef{dead_code_elimination}.
 
-The \PipsPassRef{suppress_dead_code} phase also performs some {\em If
+The \PipsPassRef{simplify_control} phase also performs some {\em If
   Simplifications} and {\em Loop Simplifications}~\cite{Muc97}.
 
 This function was designed and implemented by Ronan K{\sc eryell}.
+\end{PipsPass}
 
 
 \begin{PipsMake}
-alias suppress_dead_code 'Dead Code Elimination'
+alias simplify_control 'Simplify Control'
+simplify_control          > MODULE.code
+                          > MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.proper_effects
+        < MODULE.cumulated_effects
+        < MODULE.preconditions
+\end{PipsMake}
+
+\begin{PipsMake}
 suppress_dead_code          > MODULE.code
                             > MODULE.callees
         < PROGRAM.entities
@@ -9341,7 +9348,7 @@ sometimes replaced in the middle of an expression but not when the whole
 expression was a reference to a symbolic constant. Symbolic integer
 constants are now replaced by their values systematically.
 
-Transformations \PipsPassRef{suppress_dead_code} and \PipsPassRef{dead_code_elimination} should be
+Transformations \PipsPassRef{simplify_control} and \PipsPassRef{dead_code_elimination} should be
 performed after partial evaluation. It is sometimes important to run
 more than one partial evaluation in a row, because the first partial
 evaluation may linearize some initially non-linear expressions. Perfect
@@ -14138,6 +14145,18 @@ impact_check    > MODULE.code
 
 \subsection{Chains Graph View}
 
+\begin{PipsPass}{print_chains_graph}
+Display the chains graph in a textual format. The following properties control
+the output :
+
+\PipsPropRef{PRINT_DEPENDENCE_GRAPH} 
+\PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS} 
+\PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS} 
+\PipsPropRef{PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES} 
+\PipsPropRef{PRINT_DEPENDENCE_GRAPH_USING_SRU_FORMAT}
+
+\end{PipsPass}
+
 \begin{PipsMake}
 print_chains_graph      > MODULE.dg_file
         < PROGRAM.entities
@@ -14164,6 +14183,19 @@ print_dot_chains_graph  > MODULE.dotdg_file
 
 \begin{PipsPass}{print_dot_dependence_graph}
 Display the dependence graph in graphviz dot format.
+
+Using pyps, some convenient functions are provide, for instance :
+
+\begin{lstlisting}[language=python]
+import pypsex
+
+w = workspace(...)
+
+w.fun.my_function_name.view_dg()
+\end{lstlisting}
+
+which will produce in current directory a file named my\_function\_name.png. 
+
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -14914,7 +14946,7 @@ The transformation menu is displayed as here:
 
   restructure_control
   unspaghettify
-  suppress_dead_code
+  simplify_control
   partial_eval
   dead_code_elimination
   stf
