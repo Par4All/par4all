@@ -1,0 +1,24 @@
+
+Parsed code
+
+int main(int argc, char *argv[])
+{
+   /* This is a for loop... just for the fun when it is transformer
+        into a while loop... */
+#pragma pips inserted statement to check
+   for (;;)
+      ;
+   return 0;
+}
+
+Controlized code
+
+int main(int argc, char *argv[])
+{
+   /* This is a for loop... just for the fun when it is transformer
+        into a while loop... */
+#pragma pips inserted statement to check
+   while (1)
+      ;
+   return 0;
+}
