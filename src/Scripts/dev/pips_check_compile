@@ -322,7 +322,7 @@ rm -f out err
 ntry=$try
 while let ntry--
 do
-  if $nice svn up $prod "$@" >> out 2>> err
+  if $nice svn up --force --accept theirs-full $prod "$@" >> out 2>> err
   then
     # svn up was okay, let us get out
     ntry=0
