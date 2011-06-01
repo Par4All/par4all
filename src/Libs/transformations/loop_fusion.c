@@ -992,7 +992,9 @@ restart_loop: ;
       // Loop until every block have been regenerated
       int block_count = gen_length(block_list);
       while(block_count > 0) {
+restart_generation:
         block_count = 0;
+        int active_blocks = 0;
         bool at_least_one_block_scheduled = false;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
@@ -1000,6 +1002,7 @@ restart_loop: ;
           if(block->num < 0) {
             continue; // block is disabled
           }
+          active_blocks++;
 
           if(set_empty_p(block->predecessors)) { // Block has no predecessors
             // Block is eligible
@@ -1017,6 +1020,10 @@ restart_loop: ;
             {
               set_del_element(succ->predecessors, succ->predecessors, block);
             }
+            // We have free some constraints, and thus we restart the process
+            // to ensure that we generate in an order as close as possible to
+            // the original code
+            goto restart_generation;
           } else {
             ifdebug(3) {
               pips_debug(3,"Not eligible : ");
@@ -1027,7 +1034,7 @@ restart_loop: ;
             block_count++;
           }
         }
-        if(!at_least_one_block_scheduled) {
+        if(!at_least_one_block_scheduled && active_blocks>0) {
           pips_internal_error("No block scheduled, we have interdependence "
               "in the block tree, which means it's not a tree ! Abort...\n");
         }
