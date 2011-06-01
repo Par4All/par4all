@@ -8,6 +8,7 @@
 import p4a_builder
 import p4a_opts
 import p4a_process
+import p4a_processor
 import p4a_util
 import os
 import re
@@ -56,6 +57,9 @@ def add_own_options(parser):
     proc_group.add_option("--openmp", "-O", action = "store_true", default = False,
         help = "Parallelize with OpenMP output. If combined with the --accel option, generate Par4All Accel run-time calls and memory transfers with OpenMP implementation instead of native shared-memory OpenMP output. If --cuda is not specified, this option is set by default.")
 
+    proc_group.add_option("--scmp", action = "store_true", default = False,
+        help = "Parallelize with SCMP output.")
+
     proc_group.add_option("--com-optimization", action = "store_true", default = False,
         help = "Enable memory transfert optimizations, implies --accel. This is an experimental option, use with caution ! Currently design to work on plain array : you shouldn't use it on a code with pointer aliasing.")
 
@@ -63,7 +67,7 @@ def add_own_options(parser):
         help = "This option is usefull when generating some cuda code from C99 sources. Indeed nvcc doesn't support the folowing C99 syntax : foo (int n, int a[n]), then if the c99 option is enable, p4a will automaticly generates the cuda code in new files that will be compiled by nvcc. A simple call to the kernel will be inserted into the original file that can be compiled with your usual compiler.")
 
     proc_group.add_option("--simple", "-S", dest = "simple", action = "store_true", default = False,
-        help = "This cancels --openmp and --cuda and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
+        help = "This cancels --openmp, --cuda and --scmp, and does a simple transformation (no parallelization): simply parse the code and regenerate it. Useful to test preprocessor and PIPS intestinal transit")
 
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
@@ -334,10 +338,10 @@ def main():
         if len(args) == 0:
             p4a_util.die("Missing input files")
 
-        if options.simple and (options.cuda or options.openmp):
-            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp")
+        if options.simple and (options.cuda or options.openmp or options.scmp):
+            p4a_util.die("Cannot combine --simple with --cuda and/or --openmp and/or --scmp")
 
-        if not options.simple and not options.cuda and not options.openmp:
+        if not options.simple and not options.cuda and not options.openmp and not options.scmp:
             p4a_util.info("Defaulting to --openmp")
             options.openmp = True
 
@@ -349,6 +353,12 @@ def main():
             p4a_util.info("Enabling --accel because of --com-optimization")
             options.accel = True
 
+        if options.scmp and (options.cmake or options.cmake_gen or options.cmake_build):
+            p4a_util.info("cmake options are not compatible with --scmp: defaulting to False")
+            options.cmake = False
+            options.cmake_gen = False
+            options.cmake_build = False
+
         files = []
         other_files = []
         header_files = []
@@ -358,7 +368,7 @@ def main():
             abs_file = os.path.abspath(os.path.expanduser(file))
             if not os.path.exists(abs_file) or not os.path.isfile(abs_file):
                 p4a_util.die("Invalid/missing input file: " + abs_file)
-            # Check if file has the .p4a suffix, and skip it it is the case:
+            # Check if file has the .p4a suffix, and skip it if is the case:
             if p4a_util.change_file_ext(abs_file, "").endswith(".p4a"):
                 p4a_util.warn("Ignoring already processed file: " + file)
                 continue
@@ -487,7 +497,7 @@ def main():
             # If --no-spawn is not specified, this instance
             # will be serialized (pickle'd) to ease the
             # passing of parameters to the processor.
-            input = p4a_process.p4a_processor_input()
+            input = p4a_processor.p4a_processor_input()
             input.c99 = options.c99
             input.project_name = project_name
             input.accel = options.accel
@@ -495,6 +505,7 @@ def main():
             input.com_optimization = options.com_optimization
             input.fftw3 = options.fftw3
             input.openmp = options.openmp
+            input.scmp = options.scmp
             input.fine = options.fine
             input.select_modules = options.select_modules
             input.exclude_modules = options.exclude_modules

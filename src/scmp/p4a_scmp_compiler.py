@@ -8,19 +8,19 @@
 import os
 import shutil
 import re
-from p4a_process import *
+from p4a_processor import *
 from p4a_util import *
 import pyps
 
-# The default values of some PIPS propeties are ok for C but has to be
-# redifined for FORTRAN
+# The default values of some PIPS propeties are ok for C but have to be
+# redefined for FORTRAN
 default_scmp_properties = dict(
     GPU_KERNEL_PREFIX                     = "P4A_KERNEL",
     PRETTYPRINT_STATEMENT_NUMBER          = False,
-    KERNEL_LOAD_STORE_LOAD_FUNCTION       = "P4A_scmp_read",
-    KERNEL_LOAD_STORE_STORE_FUNCTION      = "P4A_scmp_write",
-    KERNEL_LOAD_STORE_ALLOCATE_FUNCTION   = "P4A_scmp_malloc",
-    KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_scmp_dealloc",
+    KERNEL_LOAD_STORE_LOAD_FUNCTION       = "P4A_copy_to_accel",
+    KERNEL_LOAD_STORE_STORE_FUNCTION      = "P4A_copy_from_accel",
+    KERNEL_LOAD_STORE_ALLOCATE_FUNCTION   = "P4A_accel_malloc",
+    KERNEL_LOAD_STORE_DEALLOCATE_FUNCTION = "P4A_accel_free",
     KERNEL_LOAD_STORE_LOAD_FUNCTION_1D    = "P4A_copy_to_accel_1d",
     KERNEL_LOAD_STORE_STORE_FUNCTION_1D   = "P4A_copy_from_accel_1d",
     KERNEL_LOAD_STORE_LOAD_FUNCTION_2D    = "P4A_copy_to_accel_2d",
@@ -56,8 +56,8 @@ class p4a_scmp_compiler(p4a_processor):
         global default_scmp_properties
         self.scmp_applis_dir_name = scmp_applis_dir_name
         self.scmp_events_file_name = project_name + "_event_val.h"
-        stubs_name = "p4a_scmp_stubs.c"
-        self.stubs_files = os.path.join(os.environ["P4A_SCMP_DIR"], stubs_name)
+        stubs_name = "p4a_stubs.c"
+        self.stubs_files = os.path.join(os.environ["P4A_ACCEL_DIR"], stubs_name)
         files += [ self.stubs_files ]
 
         # add scmp properties to user properties
@@ -74,6 +74,7 @@ class p4a_scmp_compiler(p4a_processor):
                                properties, [], activates)
         self.kernel_tasks_labels = []
         self.server_tasks_labels = []
+        self.generated_files = []
 
 
 
@@ -90,7 +91,7 @@ class p4a_scmp_compiler(p4a_processor):
                 print ("stub file\n")
                 continue
             (dir, name) = os.path.split(file)
-            # Where the file is in the .database workspace:
+            # Where the file actually is in the .database workspace:
             pips_file = os.path.join(self.workspace.dirname, "Src", name)
 
             # Recover the includes in the given file only if the flags have
@@ -114,6 +115,8 @@ class p4a_scmp_compiler(p4a_processor):
             # Copy the PIPS production to its destination:
             shutil.copyfile(pips_file, output_file)
             result.append (output_file)
+            self.generated_files.append(output_file)
+
         print("done")
         return result
 
@@ -127,8 +130,8 @@ class p4a_scmp_compiler(p4a_processor):
             with open(file+".tmp", "r") as f_orig:
                 with open(file, "w") as f:
                     ch = f_orig.read()
-                    ch = ch.replace("void P4A_scmp_malloc(void **dest",
-                                    "//void P4A_scmp_malloc(void **dest")
+                    ch = ch.replace("void P4A_accel_malloc(void **address",
+                                    "//void P4A_accel_malloc(void **address")
                     f.write(ch)
             os.remove(file+".tmp")
         print("done")
@@ -282,7 +285,8 @@ class p4a_scmp_compiler(p4a_processor):
                 ch = f.read()
                 if main_re.search(ch) is not None:
                     main_file = file
-                    break
+                else:
+                    self.generated_files.append(file)
         print("file with main function is: " + main_file)
 
         nb_tasks = 0
@@ -300,6 +304,7 @@ class p4a_scmp_compiler(p4a_processor):
             # of the file and change the main return value
             self.specialize_task(kernel_task, new_task_file, new_task_name)
             print("generating " + new_task_name + "... done")
+            self.generated_files.append(new_task_file)
 
         print("specializing code for server tasks\n")
         for server_task in self.server_tasks_labels:
@@ -316,6 +321,7 @@ class p4a_scmp_compiler(p4a_processor):
             self.specialize_task(server_task, new_task_file, new_task_name)
             self.replace_server_copy_functions(new_task_file)
             print("generating " + new_task_name + "... done")
+            self.generated_files.append(new_task_file)
 
         print("Total number of tasks is : " + str(nb_tasks))
         return nb_tasks
@@ -339,6 +345,7 @@ class p4a_scmp_compiler(p4a_processor):
             f.write("#include \"" + self.scmp_events_file_name + "\"\n")
             f.write("\nint main(){\n")
             f.write("\treturn("+ event_string + ");\n}\n")
+            self.generated_files.append(task_file)
         print("done")
 
     def generate_control_task(self, nb_tasks):
@@ -395,6 +402,7 @@ class p4a_scmp_compiler(p4a_processor):
 
             # the end
             f.write("\nENDAPPLI;")
+            self.generated_files.append(task_file)
         print("done")
 
     def export_makefile(self):
@@ -406,7 +414,9 @@ class p4a_scmp_compiler(p4a_processor):
         source_dir = os.environ["P4A_SCMP_DIR"]
         makefile_name = "Makefile.arp"
         target_dir = os.path.join(self.scmp_applis_dir_name, p4a_scmp_compiler.scmp_applis_processing_dir_name, self.project_name)
-        shutil.copyfile(os.path.join(source_dir, makefile_name), os.path.join(target_dir, makefile_name))
+        target_makefile = os.path.join(target_dir, makefile_name)
+        shutil.copyfile(os.path.join(source_dir, makefile_name), target_makefile)
+        self.generated_files.append(target_makefile)
         print("done")
 
     def export_p4a_scmp_files(self):
@@ -415,12 +425,20 @@ class p4a_scmp_compiler(p4a_processor):
             Currently, it only copies the source Makefile.arp
         """
         print("Exporting p4a_scmp.h and p4a_scmp.c ...")
+
         source_dir = os.environ["P4A_SCMP_DIR"]
         target_dir = os.path.join(self.scmp_applis_dir_name, p4a_scmp_compiler.scmp_applis_processing_dir_name, self.project_name)
+
         header_name = p4a_scmp_compiler.p4a_scmp_header_file
+        target_header_file = os.path.join(target_dir, header_name)
+
         source_name = p4a_scmp_compiler.p4a_scmp_source_file
-        shutil.copyfile(os.path.join(source_dir, header_name), os.path.join(target_dir, header_name))
-        shutil.copyfile(os.path.join(source_dir, source_name), os.path.join(target_dir, source_name))
+        target_source_file = os.path.join(target_dir, source_name)
+
+        shutil.copyfile(os.path.join(source_dir, header_name), target_header_file)
+        self.generated_files.append(target_header_file)
+        shutil.copyfile(os.path.join(source_dir, source_name), target_source_file)
+        self.generated_files.append(target_source_file)
         print("done")
 
     def replace_printf(self, files):
@@ -450,6 +468,9 @@ class p4a_scmp_compiler(p4a_processor):
         for header_file in header_files:
             shutil.copyfile(os.path.join(source_dir, header_file), os.path.join(target_dir, header_file))
         print("done")
+
+    def get_generated_files(self):
+        return self.generated_files
 
     def go(self):
         global default_scmp_properties
@@ -525,18 +546,8 @@ class p4a_scmp_compiler(p4a_processor):
 
 
 if __name__ == "__main__":
-    try:
-        # Create a workspace with PIPS:
-        compiler = p4a_scmp_compiler(
-            project_name = "thales",
-            verbose = True,
-            files = ["Main.c"]
-            )
-        compiler.go()
-        print("That's all Folks...")
-
-    except:
-        pass
+    print(__doc__)
+    print("This module is not directly executable, use 'p4a --scmp' instead")
 
 # Some Emacs stuff:
 ### Local Variables:

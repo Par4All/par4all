@@ -4,10 +4,10 @@
 #include <stddef.h>
 
 extern void P4A_scmp_reset();
-extern void P4A_scmp_malloc(void **dest,  size_t n, 
+extern void P4A_accel_malloc(void **dest,  size_t n, 
                      size_t dest_id, int do_it, int producer_pd);
 
-extern void P4A_scmp_dealloc(void *dest, 
+extern void P4A_accel_free(void *dest, 
                       size_t dest_id, int do_it, int producer_p);
 
 extern void P4A_copy_from_accel_1d_server(size_t element_size,

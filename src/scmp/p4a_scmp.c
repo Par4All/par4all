@@ -31,7 +31,7 @@ static void P4A_sesam_send_all_pages(unsigned int id, int size, int RW)
     sesam_send_page(id, i, RW);
 }
 
-void P4A_scmp_malloc(void **dest,  size_t n, 
+void P4A_accel_malloc(void **dest,  size_t n,
                      unsigned int dest_id, int do_it, int producer_p)
 {
    //P4A_sesam_debug("malloc, id = %d, do_it = %d, producer_p = %d\n", dest_id, do_it, producer_p);
@@ -67,7 +67,7 @@ void P4A_scmp_malloc(void **dest,  size_t n,
   }
 }
 
-void P4A_scmp_dealloc(void *dest, 
+void P4A_accel_free(void *dest, 
                       unsigned int dest_id, int do_it, int producer_p)
 {
   //P4A_sesam_debug("dealloc, id = %d, do_it = %d, producer_p = %d\n", dest_id, do_it, producer_p);
