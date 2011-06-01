@@ -1,0 +1,26 @@
+delete scalarization41
+setproperty PRETTYPRINT_BLOCKS TRUE
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty ARRAY_PRIV_FALSE_DEP_ONLY FALSE
+
+create scalarization41 scalarization41.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+#activate PRINT_CODE_CUMULATED_EFFECTS
+#display PRINTED_FILE[%ALLFUNC]
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[out0]
+activate PRINT_CODE
+display PRINTED_FILE[%ALLFUNC]
+
+apply SCALARIZATION[out0]
+display PRINTED_FILE[out0]
+apply SCALARIZATION[out1]
+display PRINTED_FILE[out1]
+
+close
+#delete scalarization41
+quit
+
