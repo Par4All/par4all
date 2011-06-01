@@ -5,6 +5,13 @@
 # - Grégoire Péan <gregoire.pean@hpc-project.com>
 # - Ronan Keryell <ronan.keryell@hpc-project.com>
 #
+
+# Beware: class p4a_scmp_compiler declared in ../scmp/p4a_scmp_compiler.py
+# inherits from class p4a_processor.
+# Maybe a common parent class with the minimal set of shared features
+# should be defined, from which all compilers (say p4a_cuda_compiler,
+# p4a_openmp_compiler) would inherit. BC.
+
 import p4a_util
 import optparse
 import subprocess
