@@ -1,0 +1,24 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+setenv WS "statement_insertion01"
+delete $WS
+create $WS $WS.c
+
+#setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER FALSE
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE[main]
+
+echo
+echo Controlized code
+echo
+
+#setenv CONTROL_DEBUG_LEVEL=8
+activate NEW_CONTROLIZER
+display PRINTED_FILE[main]
+
+close
+quit
+delete $WS
