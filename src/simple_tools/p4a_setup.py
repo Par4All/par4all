@@ -629,6 +629,9 @@ def work(options, args = None):
     install_dir_share_accel = os.path.join(install_dir_share, "p4a_accel")
     if not os.path.isdir(install_dir_share_accel):
         os.makedirs(install_dir_share_accel)
+    install_dir_share_scmp = os.path.join(install_dir_share, "p4a_scmp")
+    if not os.path.isdir(install_dir_share_scmp):
+        os.makedirs(install_dir_share_scmp)
     install_dir_makes = os.path.join(install_dir, "makes")
     if not os.path.isdir(install_dir_makes):
         os.makedirs(install_dir_makes)
@@ -661,6 +664,15 @@ def work(options, args = None):
         if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".mk" or ext == ".cu" or ext == ".cpp" or ext == ".f95" :
             p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(accel_src_dir, file), install_dir_share_accel ])
 
+    # Install scmp source.
+    p4a_util.info("Installing scmp files")
+    scmp_src_dir = os.path.join(root, "src/scmp")
+    for file in os.listdir(scmp_src_dir):
+        ext = os.path.splitext(file)[1]
+        if ext == ".h" or ext == ".c" or ext == ".f" or ext == ".arp" :
+            p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(scmp_src_dir, file), install_dir_share_scmp ])
+
+
     # Copy python dependencies and templates.
     p4a_util.info("Copying python libs")
     install_python_lib_dir = p4a_util.get_python_lib_dir(install_dir)
@@ -676,6 +688,12 @@ def work(options, args = None):
     for file in os.listdir(dir):
         ext = os.path.splitext(file)[1]
         if ext == ".py" or ext == ".tpl":
+            p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
+
+    dir = os.path.join(root, "src/scmp")
+    for file in os.listdir(dir):
+        ext = os.path.splitext(file)[1]
+        if ext == ".py":
             p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(dir, file), install_python_lib_dir ])
 
 
@@ -727,8 +745,9 @@ def work(options, args = None):
     else:
         fortran = "false"
     accel_suffix=os.path.relpath(install_dir_share_accel,install_dir)
+    scmp_suffix=os.path.relpath(install_dir_share_scmp,install_dir)
     p4a_rc.p4a_write_rc(install_dir_etc, dict(root = install_dir, dist = install_dir,
-        accel = accel_suffix, fortran = fortran))
+        accel = accel_suffix, scmp = scmp_suffix, fortran = fortran))
 
     # Write version file.
     p4a_version.write_VERSION(install_dir, p4a_version.VERSION(root))

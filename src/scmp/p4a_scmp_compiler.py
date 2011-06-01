@@ -8,7 +8,7 @@
 import os
 import shutil
 import re
-from p4a_process import *
+from p4a_processor import *
 from p4a_util import *
 import pyps
 
@@ -546,7 +546,8 @@ class p4a_scmp_compiler(p4a_processor):
 
 
 if __name__ == "__main__":
-    print("Do not use directly, but consider using p4a --scmp")
+    print(__doc__)
+    print("This module is not directly executable, use 'p4a --scmp' instead")
 
 # Some Emacs stuff:
 ### Local Variables:

@@ -16,6 +16,9 @@ export P4A_DIST='$dist'
 # Location of the Par4All_accelerator files.
 export P4A_ACCEL_DIR=$$P4A_DIST/$accel
 
+# Location of the Par4All_scmp files.
+export P4A_SCMP_DIR=$$P4A_DIST/$scmp
+
 # Location of the Par4All configuration files.
 export P4A_ETC=$$P4A_DIST/etc
 
