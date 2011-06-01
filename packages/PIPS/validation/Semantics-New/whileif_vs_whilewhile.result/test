@@ -1,0 +1,241 @@
+
+Transformers for "whileif"
+
+
+//  T() {}
+
+void whileif(void)
+{
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x,y) {x==0, y==0}
+
+   x = y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, x<=58, 61y<=55x+54, y<=x, 6y<=x+50,
+//    0<=y}
+
+   while (x<=58)
+
+//  T(x,y) {x==x#init+1, x<=59, 6y<=x+50, y#init<=y, y<=y#init+1,
+//    61y<=55y#init+109}
+
+      if (y<=8) {
+
+//  T(x) {x==x#init+1, x<=59, y<=8}
+
+         x++;
+
+//  T(y) {y==y#init+1, x<=59, y<=9}
+
+         y++;
+
+//  T() {x<=59, 6y<=x+50, y<=9}
+
+         if (6*y>x+50)
+
+//  T() {0==-1}
+
+            error();
+      }
+      else {
+
+//  T(x) {x==x#init+1, x<=59, 9<=y}
+
+         x++;
+
+//  T() {x<=59, 6y<=x+50, 9<=y}
+
+         if (6*y>x+50)
+
+//  T() {0==-1}
+
+            error();
+      }
+}
+
+Transformers for "whilewhile"
+
+
+//  T() {}
+
+void whilewhile(void)
+{
+
+//  T(x,y) {}
+
+   int x, y;
+
+//  T(x,y) {x==0, y==0}
+
+   x = y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, x<=58, y<=x, 0<=y}
+
+   while (x<=58) {
+
+//  T(x,y) {x+y#init==x#init+y, x<=58, x#init<=x, x#init<=58, y<=8,
+//    y#init<=8}
+
+      while (x<=58&&y<=8) {
+
+//  T(x) {x==x#init+1, x<=59, y<=8}
+
+         x++;
+
+//  T(y) {y==y#init+1, x<=59, y<=9}
+
+         y++;
+
+//  T() {x<=59, 6y<=x+50, y<=9}
+
+         if (6*y>x+50)
+
+//  T() {0==-1}
+
+            error();
+      }
+
+//  T(x) {x<=58, x#init<=x, x#init<=58, 9<=y}
+
+      while (x<=58&&y>8) {
+
+//  T(x) {x==x#init+1, x<=59, 9<=y}
+
+         x++;
+
+//  T() {x<=59, 6y<=x+50, 9<=y}
+
+         if (6*y>x+50)
+
+//  T() {0==-1}
+
+            error();
+      }
+   }
+}
+
+Preconditions for "whileif"
+
+
+//  P() {}
+
+void whileif(void)
+{
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+   x = y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   while (x<=58)
+
+//  P(x,y) {x<=58, 3721y<=3025x+6594, 61y<=55x+54, 366y<=55x+3349,
+//    y<=x, 6y<=x+50, 0<=y}
+
+      if (y<=8) {
+
+//  P(x,y) {x<=58, 3721y<=3025x+6594, 61y<=55x+54, 366y<=55x+3349,
+//    y<=x, 6y<=x+50, 0<=y, y<=8}
+
+         x++;
+
+//  P(x,y) {x<=59, 3721y<=3025x+3569, 61y+1<=55x, 366y<=55x+3294,
+//    y+1<=x, 6y<=x+49, 0<=y, y<=8}
+
+         y++;
+
+//  P(x,y) {x<=59, 3721y<=3025x+7290, 61y<=55x+60, 366y<=55x+3660,
+//    y<=x, 6y<=x+55, 1<=y, y<=9}
+
+         if (6*y>x+50)
+
+//  P() {0==-1}
+
+            error();
+      }
+      else {
+
+//  P(x,y) {x<=58, 3721y<=3025x+6594, 61y<=55x+54, 366y<=55x+3349,
+//    y<=x, 6y<=x+50, 9<=y}
+
+         x++;
+
+//  P(x,y) {x<=59, 3721y<=3025x+3569, 61y+1<=55x, 366y<=55x+3294,
+//    y+1<=x, 6y<=x+49, 9<=y}
+
+         if (6*y>x+50)
+
+//  P() {0==-1}
+
+            error();
+      }
+}
+
+Preconditions for "whilewhile"
+
+
+//  P() {}
+
+void whilewhile(void)
+{
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+   x = y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   while (x<=58) {
+
+//  P(x,y) {x<=58, y<=x, 0<=y}
+
+      while (x<=58&&y<=8) {
+
+//  P(x,y) {x<=58, y<=x, 0<=y, y<=8}
+
+         x++;
+
+//  P(x,y) {x<=59, y+1<=x, 0<=y, y<=8}
+
+         y++;
+
+//  P(x,y) {x<=59, y<=x, 1<=y, y<=9}
+
+         if (6*y>x+50)
+
+//  P() {0==-1}
+
+            error();
+      }
+
+//  P(x,y) {x<=59, 261<=4x+25y, y<=x, 49x+y<=2900}
+
+      while (x<=58&&y>8) {
+
+//  P(x,y) {x<=58, y<=x, 9<=y}
+
+         x++;
+
+//  P(x,y) {x<=59, y+1<=x, 9<=y}
+
+         if (6*y>x+50)
+
+//  P(x,y) {x<=59, y+1<=x, x+51<=6y, 9<=y}
+
+            error();
+      }
+   }
+}
