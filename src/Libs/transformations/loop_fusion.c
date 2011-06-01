@@ -248,7 +248,9 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
  * FIXME High leakage
  */
 static bool fusion_loops(statement sloop1,
+                         set contained_stmts_loop1,
                          statement sloop2,
+                         set contained_stmts_loop2,
                          bool maximize_parallelism) {
   pips_assert("Previous is a loop", statement_loop_p( sloop1 ) );
   pips_assert("Current is a loop", statement_loop_p( sloop2 ) );
@@ -285,7 +287,7 @@ static bool fusion_loops(statement sloop1,
   if(index1!=index2) {
     pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
                entity_name(index2), entity_name(index1));
-    // FI: we should check that index1 is dead on exit of loop1 and
+    // FI: FIXME we should check that index1 is dead on exit of loop1 and
     // that index2 is dead on exit of loop2 and that index1 does not
     // appear in the memory effects of loop2
     replace_entity((void *)body_loop2, index2, index1);
@@ -355,19 +357,19 @@ static bool fusion_loops(statement sloop1,
   FOREACH( vertex, v, graph_vertices(candidate_dg) ) {
     dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
     int statement_ordering = dg_vertex_label_statement(dvl);
-    if(statement_ordering > statement_ordering(sloop2) && statement_ordering
-        != statement_ordering(fused_statement)) {
+    statement stmt1 = ordering_to_statement(statement_ordering);
+    // Check that the source of the conflict is in the "second" loop body
+    if(set_belong_p(contained_stmts_loop2,stmt1)) {
       FOREACH( successor, a_successor, vertex_successors(v) )
       {
         vertex v2 = successor_vertex(a_successor);
         dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
         arc_label an_arc_label = successor_arc_label(a_successor);
         int statement_ordering2 = dg_vertex_label_statement(dvl2);
+        statement stmt2 = ordering_to_statement(statement_ordering2);
 
-
-        // FIXME ordering check is no longer valid !!
-        if(statement_ordering2 < statement_ordering(sloop2)
-            && statement_ordering2 != statement_ordering(sloop1)) {
+        // Check that the sink of the conflict is in the "first" loop body
+        if(set_belong_p(contained_stmts_loop1,stmt2)) {
           FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
           {
             effect e_sink = conflict_sink(c);
@@ -382,15 +384,12 @@ static bool fusion_loops(statement sloop1,
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
 
               // Inner loop indices conflicts aren't preventing fusion
-              statement stmt1,stmt2;
-              stmt1 = ordering_to_statement(statement_ordering);
 
               if(statement_loop_p(stmt1) && effect_variable(e_source)
                   == loop_index(statement_loop(stmt1))) {
                 continue;
               }
 
-              stmt2 = ordering_to_statement(statement_ordering2);
               if(statement_loop_p(stmt2) && effect_variable(e_sink)
                   == loop_index(statement_loop(stmt2))) {
                 continue;
@@ -408,7 +407,10 @@ static bool fusion_loops(statement sloop1,
           }
         } else {
           ifdebug(6) {
-            pips_debug(0,"Arc ignored : from statement %d :",statement_ordering);
+            pips_debug(0,"Arc ignored (%d,%d) : from statement %d :",
+                       (int)statement_ordering(sloop2),
+                       (int)statement_ordering(sloop1),
+                       statement_ordering);
             print_statement(ordering_to_statement(statement_ordering));
             pips_debug(0," to statement %d :",statement_ordering2);
             print_statement(ordering_to_statement(statement_ordering2));
@@ -710,7 +712,7 @@ static bool fuse_block( fusion_block b1,
   } else {
     // Try to fuse
     pips_debug(4,"Try to fuse %d with %d\n",b1->num, b2->num);
-    if(fusion_loops(b1->s, b2->s, maximize_parallelism)) {
+    if(fusion_loops(b1->s,b1->statements, b2->s, b2->statements, maximize_parallelism)) {
       pips_debug(2, "Loop have been fused\n");
       // Now fuse the corresponding blocks
       merge_blocks(b1, b2);
