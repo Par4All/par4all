@@ -1652,7 +1652,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 }
 
 
-/* ctls is built backwwards: hence its exit node is the first node in
+/* ctls is built backwards: hence its exit node is the first node in
    the list. */
 static control find_exit_control_node(list ctls, control succ)
 {
@@ -1679,8 +1679,10 @@ static control find_exit_control_node(list ctls, control succ)
 	  // FI: Not a good idea because succ is used otherwise above
 	  // exit = succ;
 	  exit = make_control(make_plain_continue_statement(), NIL, NIL);
-	  pips_assert("succ has only one predecessor",
-		      gen_length(control_predecessors(c))==1);
+	  // FI: this assert is too strong when succ follows a
+	  //controlized test as in hpftest62b.c
+	  //pips_assert("succ has only one predecessor",
+	  //      gen_length(control_predecessors(c))==1);
 	  insert_control_in_arc(exit, p, succ);
 	  found_p = TRUE;
 	  break;
