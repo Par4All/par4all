@@ -294,6 +294,22 @@ static Pbase make_phi_base(int phi_min, int phi_max)
 }
 
 
+static effect  effect_write_or_read_on_variable(list el, entity v, boolean write_p)
+{
+  effect result = effect_undefined;
+  if(v) {
+    FOREACH(EFFECT, e, el) {
+      action a  = effect_action(e);
+      entity ev = effect_entity(e);
+      if (same_entity_p(ev,v) && (write_p ? action_write_p(a):action_read_p(a)))
+	return(e);
+    }
+  }
+  return result;
+}
+
+
+
 // To keep track of already scalarized vars
 static list scalarized_variables = list_undefined;
 
@@ -327,6 +343,7 @@ static bool loop_scalarization(loop l)
     print_regions(crwl);
   }
 
+  Pvecteur var_already_seen = VECTEUR_NUL;
   // Now we determine which read/write effects are not copied out.
   FOREACH (EFFECT, pr, crwl) {
     entity pv  = effect_variable(pr);
@@ -336,157 +353,176 @@ static bool loop_scalarization(loop l)
     entity ov  = (entity) gen_find(pv, orl, (bool (*)())gen_eq, car_effect_to_variable);
 
     descriptor d = effect_descriptor(pr);
-
     if (descriptor_convex_p(d) &&
-        !entity_is_argument_p(pv, scalarized_variables)) {
+	!entity_is_argument_p(pv, scalarized_variables) && !vect_coeff(pv,var_already_seen)) {
 
       Psysteme sc = descriptor_convex(d);
       int nd = type_depth(entity_type(pv));
+      Psysteme sc_union = SC_UNDEFINED;
+      Psysteme sc2 = SC_UNDEFINED;
+      effect pr2 = effect_undefined;
 
-      // Estimate the dynamic number of *element* and *variable*
-      // occurrences in the loop body
-      int neo = count_references_to_variable_element(s, pv);
-      int nvo = count_references_to_variable(s, pv);
-
-      /* Legality criterion:
-
-        if nvo is greater than neo, there must be hidden references
-               to the array, due for instance to a function call, and the
-               substitution might break dependence arcs.
-
-        So, we go on only if the two are equal.
-      */
-
-      if (nvo == neo) {
-
-        bool read_pv    = effects_read_variable_p(crwl, pv);
-        bool written_pv = effects_write_variable_p(crwl, pv);
-        bool read_and_written_pv = read_pv && written_pv;
-
-
-        /* Profitability criterion:
-
-           - nd > 0: it's an array (do not scalarize scalar variables)
-
-           - neo > 2: if the number of references if greater than 2, the
-          copy-in and copy-out code overhead is assumed to be small
-          enough to make scalarization profitable.
-
-           - neo > 1: if the number of references is 2, the copy-in *xor*
-          the copy-out overhead meets the above criterion.
-
-           - else: if there is neither copy-in nor copy-out,
-          privatization is always useful.
-
-           FI: we should also check if the reference is loop invariant
-           and then decide that it is always profitable to scalarize
-           it... See scalarization34 in Transformations. We should
-           check if the region is a constant function.
-        */
-
-        if (nd > 0
-            && (neo > 2
-                || (neo > 1 && !read_and_written_pv)
-                || (entity_undefined_p(iv) && entity_undefined_p(ov))
-                )
-            ) {
-
-          /* Check that a unique element of pv is used. In other
-             words, the relationship between the iterations i and the
-             array element phi is a function, by definition of a
-             function.
-
-             This cannot be checked without auxiliary variables. It is
-             not possible to create PIPS compatible variables in
-             Linear. Hence, they are created here.
-
-             The proof is based on r(i)=phi and r(i)=phi+dphi and r is
-             a function implies dphi=0. If dphi!=0, then r cannot be a
-             function.
-
-             But we also want that each iteration uses at least one
-             element. The function must be a total function. FI: I do
-             not remember why we need a total function.
-          */
-
-          Pbase phi_b = make_phi_base(1, nd);
-          Pbase d_phi_b = BASE_NULLE;
-          Pbase cr = BASE_NULLE;
-
-          /* Build base d_phi_b using
-             make_local_temporary_integer_value_entity(void) */
-          for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
-            entity e_d_phi_b = make_local_temporary_integer_value_entity();
-            d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
-          }
-
-          if (sc_totally_functional_graph_p(sc, loop_indices_b,
-                                            D, phi_b, d_phi_b)) {
-            /* The array references can be replaced a references to a
-               scalar */
-
-            // Create new temp var of same type as the array element pv
-            type pvt      = ultimate_type(entity_type(pv));
-            variable pvtv = type_variable(pvt);
-            basic pvb     = variable_basic(pvtv);
-            basic svb     = copy_basic(pvb);
-
-            // Copy the a reference to pv, just in case we need it later
-            reference pvr = copy_reference(find_reference_to_variable(s, pv));
-
-            // Create a new variable and add
-            // its declaration to the current module
-            // If no default prefix is defined, use the variable name
-            // as prefix
-            string dpref = get_string_property("SCALARIZATION_PREFIX");
-            string epref = strlen(dpref)==0?
-              concatenate(entity_user_name(pv), "_", NULL)
-              : dpref;
-            entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);
-            AddEntityToCurrentModule(sv);
-            scalarized_variables =
-              arguments_add_entity(scalarized_variables, pv);
-
-            pips_debug(1,"Creating variable %s for variable %s\n",
-                       entity_name(sv), entity_name(pv));
-
-            // Substitute all references to pv with references to new variable
-            statement_substitute_scalarized_array_references(s, pvr, sv);
-
-            // Take care of copy-in and copy-out code if necessary
-            if (get_bool_property("SCALARIZATION_FORCE_OUT")
-                || !entity_undefined_p(ov)) {
-              // Generate copy-out code
-              statement co_s =
-                make_assign_statement(reference_to_expression(pvr),
-                                      entity_to_expression(sv));
-              insert_statement(s, co_s, false);
-            }
-            else {
-              //free_reference(pvr);
-            }
-
-            if (!entity_undefined_p(iv)) {
-              // Generate copy-in code
-              statement ci_s =
-                make_assign_statement(entity_to_expression(sv),
-                                      reference_to_expression(copy_reference(pvr)));
-              insert_statement(s, ci_s,true);
-            }
-            else {
-              //free_reference(pvr);
-            }
-
-          }
-
-          // Clean-up
-          base_rm(phi_b);
-          base_rm(d_phi_b);
-          reset_temporary_value_counter();
-        }
+      vect_add_elem(&var_already_seen,pv,1);
+      /* Search Effect with the opposite action */
+      if ((pr2 = effect_write_or_read_on_variable(crwl,pv,!(action_write_p(effect_action(pr)))))
+	  != effect_undefined) {
+	descriptor d2= effect_descriptor(pr2);
+	if (descriptor_convex_p(d2))
+	  sc2 = descriptor_convex(d2);
       }
+      /*  Merge Read and Write Effects constraints on pv */
+      if (!SC_UNDEFINED_P(sc) && sc_dimension(sc) !=0) {
+	if (!SC_UNDEFINED_P(sc2) && sc_dimension(sc2) !=0)
+	  sc_union=sc_cute_convex_hull(sc2,sc);
+	else
+	  sc_union=sc_dup(sc);
+      }
+      if (!SC_UNDEFINED_P(sc_union)) {
+	// Estimate the dynamic number of *element* and *variable*
+	// occurrences in the loop body
+	int neo = count_references_to_variable_element(s, pv);
+	int nvo = count_references_to_variable(s, pv);
+
+	/* Legality criterion:
+
+	   if nvo is greater than neo, there must be hidden references
+	   to the array, due for instance to a function call, and the
+	   substitution might break dependence arcs.
+
+	   So, we go on only if the two are equal.
+	*/
+
+	if (nvo == neo) {
+
+	  bool read_pv    = effects_read_variable_p(crwl, pv);
+	  bool written_pv = effects_write_variable_p(crwl, pv);
+	  bool read_and_written_pv = read_pv && written_pv;
+
+	  /* Profitability criterion:
+
+	     - nd > 0: it's an array (do not scalarize scalar variables)
+
+	     - neo > 2: if the number of references if greater than 2, the
+	     copy-in and copy-out code overhead is assumed to be small
+	     enough to make scalarization profitable.
+
+	     - neo > 1: if the number of references is 2, the copy-in *xor*
+	     the copy-out overhead meets the above criterion.
+
+	     - else: if there is neither copy-in nor copy-out,
+	     privatization is always useful.
+
+	     FI: we should also check if the reference is loop invariant
+	     and then decide that it is always profitable to scalarize
+	     it... See scalarization34 in Transformations. We should
+	     check if the region is a constant function.
+	  */
+
+	  if (nd > 0
+	      && (neo > 2
+		  || (neo > 1 && !read_and_written_pv)
+		  || (entity_undefined_p(iv) && entity_undefined_p(ov))
+		  )
+	      ) {
+
+	    /* Check that a unique element of pv is used. In other
+	       words, the relationship between the iterations i and the
+	       array element phi is a function, by definition of a
+	       function.
+
+	       This cannot be checked without auxiliary variables. It is
+	       not possible to create PIPS compatible variables in
+	       Linear. Hence, they are created here.
+
+	       The proof is based on r(i)=phi and r(i)=phi+dphi and r is
+	       a function implies dphi=0. If dphi!=0, then r cannot be a
+	       function.
+
+	       But we also want that each iteration uses at least one
+	       element. The function must be a total function. FI: I do
+	       not remember why we need a total function.
+	    */
+
+	    Pbase phi_b = make_phi_base(1, nd);
+	    Pbase d_phi_b = BASE_NULLE;
+	    Pbase cr = BASE_NULLE;
+
+	    /* Build base d_phi_b using
+	       make_local_temporary_integer_value_entity(void) */
+	    for ( cr = phi_b ; !BASE_UNDEFINED_P(cr) ; cr = vecteur_succ(cr) ) {
+	      entity e_d_phi_b = make_local_temporary_integer_value_entity();
+	      d_phi_b = base_add_variable(d_phi_b, (Variable) e_d_phi_b);
+	    }
+
+	    if (sc_totally_functional_graph_p(sc_union, loop_indices_b,
+					      D, phi_b, d_phi_b)) {
+	      /* The array references can be replaced a references to a
+		 scalar */
+
+	      // Create new temp var of same type as the array element pv
+	      type pvt      = ultimate_type(entity_type(pv));
+	      variable pvtv = type_variable(pvt);
+	      basic pvb     = variable_basic(pvtv);
+	      basic svb     = copy_basic(pvb);
+
+	      // Copy the a reference to pv, just in case we need it later
+	      reference pvr = copy_reference(find_reference_to_variable(s, pv));
+
+	      // Create a new variable and add
+	      // its declaration to the current module
+	      // If no default prefix is defined, use the variable name
+	      // as prefix
+	      string dpref = get_string_property("SCALARIZATION_PREFIX");
+	      string epref = strlen(dpref)==0?
+		concatenate(entity_user_name(pv), "_", NULL)
+		: dpref;
+	      entity sv = make_new_scalar_variable_with_prefix(epref, get_current_module_entity(), svb);
+	      AddEntityToCurrentModule(sv);
+	      scalarized_variables =
+		arguments_add_entity(scalarized_variables, pv);
+
+	      pips_debug(1,"Creating variable %s for variable %s\n",
+			 entity_name(sv), entity_name(pv));
+
+	      // Substitute all references to pv with references to new variable
+	      statement_substitute_scalarized_array_references(s, pvr, sv);
+
+	      // Take care of copy-in and copy-out code if necessary
+	      if (get_bool_property("SCALARIZATION_FORCE_OUT")
+		  || !entity_undefined_p(ov)) {
+		// Generate copy-out code
+		statement co_s =
+		  make_assign_statement(reference_to_expression(pvr),
+					entity_to_expression(sv));
+		insert_statement(s, co_s, false);
+	      }
+	      else {
+		//free_reference(pvr);
+	      }
+
+	      if (!entity_undefined_p(iv)) {
+		// Generate copy-in code
+		statement ci_s =
+		  make_assign_statement(entity_to_expression(sv),
+					reference_to_expression(copy_reference(pvr)));
+		insert_statement(s, ci_s,true);
+	      }
+	      else {
+		//free_reference(pvr);
+	      }
+	    }
+	    // Clean-up
+	    base_rm(phi_b);
+	    base_rm(d_phi_b);
+	    reset_temporary_value_counter();
+
+	  }
+	}
+      }
+      sc_rm(sc_union);
     }
   }
+  vect_rm(var_already_seen);
   return TRUE;
 }
 
