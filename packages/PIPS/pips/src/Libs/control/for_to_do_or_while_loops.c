@@ -795,6 +795,9 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
 
   /* Since we have replaced a statement that may have comments and labels
      by a sequence, do not forget to forward them where they can be: */
+  /* FI: one issue: st is an ancestor of the current object and some
+     of its pointers are going to be modified although they are being
+     processed by gen_recurse()... */
   fix_sequence_statement_attributes(st);
 
   /* Removed useless instructions that may remain: */
@@ -803,6 +806,62 @@ transform_a_for_loop_into_a_while_loop(forloop f) {
   ifdebug(5) {
     print_statement(st);
     pips_debug(5, "Exiting with statement\n");
+  }
+}
+
+/* Same as above, but with no calls to ancestors */
+void
+transform_a_for_loop_statement_into_a_while_loop(statement st) {
+  if(forloop_statement_p(st)) {
+    pips_debug(5, "Begin\n");
+
+    /* Get the instruction owning the forloop: */
+    //instruction i = (instruction) gen_get_recurse_ancestor(f);
+    instruction i = statement_instruction(st);
+    /* Get the statement owning instruction owning the forloop: */
+    //statement st = (statement) gen_get_recurse_ancestor(i);
+    forloop f = instruction_forloop(i);
+
+    /* Get a sequence with a while-loop instead: */
+    sequence wls = for_to_while_loop_conversion(forloop_initialization(f),
+						forloop_condition(f),
+						forloop_increment(f),
+						forloop_body(f),
+						statement_extensions(st));
+
+    /* These fields have been re-used, so protect them from memory
+       recycling: */
+    forloop_initialization(f) = expression_undefined;
+    forloop_condition(f) = expression_undefined;
+    forloop_increment(f) = expression_undefined;
+    forloop_body(f) = statement_undefined;
+
+    /* We need to replace the for-loop instruction by the sequence
+       instruction. The cleaner way should be to delete the first one and
+       make the other one, but since we are in a gen_recurse() and we
+       iterate on the first one, it is dangerous. Well, I've tried and it
+       works, but valgrind complains a bit. :-)
+
+       So change the type of the instruction on the fly instead: */
+    instruction_tag(i) = is_instruction_sequence;
+    instruction_sequence(i) = wls;
+    /* And discard the old for: */
+    free_forloop(f);
+
+    /* Since we have replaced a statement that may have comments and labels
+       by a sequence, do not forget to forward them where they can be: */
+    /* FI: one issue: st is an ancestor of the current object and some
+       of its pointers are going to be modified although they are being
+       processed by gen_recurse()... */
+    fix_sequence_statement_attributes(st);
+
+    /* Removed useless instructions that may remain: */
+    clean_up_sequences(st);
+
+    ifdebug(5) {
+      print_statement(st);
+      pips_debug(5, "Exiting with statement\n");
+    }
   }
 }
 
@@ -847,7 +906,8 @@ for_loop_to_while_loop(char * module_name) {
   gen_recurse(module_statement,
               // Since for-loop statements can be nested, only restructure in
 	      // a bottom-up way, :
-	      forloop_domain, gen_true, transform_a_for_loop_into_a_while_loop);
+	      //forloop_domain, gen_true, transform_a_for_loop_into_a_while_loop);
+	      statement_domain, gen_true, transform_a_for_loop_statement_into_a_while_loop);
 
   pips_assert("Statement should be OK after...", statement_consistent_p(module_statement));
 

@@ -184,8 +184,10 @@ bool new_controlizer(string module_name)
       gen_recurse(module_stat,
 		  // Since for-loop statements can be nested,
 		  // only restructure in a bottom-up way, :
-		  forloop_domain, gen_true,
-		  transform_a_for_loop_into_a_while_loop);
+		  //forloop_domain, gen_true,
+		  //transform_a_for_loop_into_a_while_loop);
+		  statement_domain, gen_true,
+		  transform_a_for_loop_statement_into_a_while_loop);
     }
 
     /* With C code, some local declarations may have been lost by the
