@@ -709,6 +709,10 @@ static bool fuse_block( fusion_block b1,
     pips_debug(5,"B1 (%d) is a not a loop, skip !\n",b1->num);
   } else if(!b2->is_a_loop) {
     pips_debug(5,"B2 (%d) is a not a loop, skip !\n",b2->num);
+  } else if(b1->num==-1) {
+    pips_debug(5,"B2 (%d) is disabled, skip !\n",b1->num);
+  } else if(b2->num==-1) {
+    pips_debug(5,"B2 (%d) is disabled, skip !\n",b2->num);
   } else {
     // Try to fuse
     pips_debug(4,"Try to fuse %d with %d\n",b1->num, b2->num);
@@ -730,35 +734,30 @@ static bool fuse_block( fusion_block b1,
  * @param b is the current block
  * @param fuse_count is the number of successful fusion done
  */
-static void try_to_fuse_with_successors(fusion_block b,
+static bool try_to_fuse_with_successors(fusion_block b,
                                         int *fuse_count,
                                         bool maximize_parallelism) {
   // First step is to try to fuse with each successor
-  if(b->is_a_loop) {
+  if(b->is_a_loop && b->num>=0) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
       if(fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
-         * block... we can no longer continue in this loop, let's restart
-         * current function at the beginning and end this one.
-         *
-         * FIXME : performance impact may be high ! Should not try to fuse
-         * again with the same block
-         *
+         * block... we can no longer continue in this loop, so we stop and let
+         * the caller restart the computation
          */
         (*fuse_count)++;
-        try_to_fuse_with_successors(b, fuse_count, maximize_parallelism);
-        return;
+        return true;
       }
     }
   }
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
-    try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
+    return try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
   }
 
-  return;
+  return false;
 }
 
 
@@ -802,9 +801,16 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
 static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
   bool fusable_p = false;
   if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
-    // Blocks are active
-    if(set_belong_p(b1->successors,b2)
-       || set_belong_p(b2->successors,b1)) {
+    // Blocks are active and are loops
+
+    if(set_belong_p(b2->successors,b1)) {
+      ifdebug(6) {
+        pips_debug(6,"b1 is a successor of b2, fusion prevented !\n");
+        print_block(b1);
+        print_block(b2);
+      }
+      fusable_p = false;
+    } else if(set_belong_p(b1->successors,b2)) {
       // Adjacent blocks are fusable
       ifdebug(6) {
         pips_debug(6,"blocks are fusable because directly connected\n");
@@ -916,6 +922,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
      * predecessor. The others will be visited recursively.
      */
     int fuse_count = 0;
+restart_loop: ;
     FOREACH(fusion_block, block, block_list) {
       if(set_empty_p(block->predecessors)) { // Block has no predecessors
         pips_debug(2,
@@ -923,7 +930,12 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
             block->num,
             block->is_a_loop);
 
-        try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism);
+        if(try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism)) {
+          // We fused some blocks, let's restart the process !
+          // FIXME : we shouldn't have to restart the process, but it'll require
+          // hard work in try_to_fuse_with_successors, so we'll do that later...
+          goto restart_loop;
+        }
 
       }
     }
