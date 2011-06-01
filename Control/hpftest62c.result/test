@@ -1,0 +1,68 @@
+
+Parser output
+
+c unstructured
+      PROGRAM HPFTEST62C
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+cfcd$ host
+10    PRINT *, 'please enter a value'                                   0007
+      READ *, M                                                         0008
+      IF (M.GT.N.OR.M.LT.1) THEN                                        0009
+         GOTO 10                                                        0009
+      ENDIF
+cfcd$ end host
+      PRINT *, 'ok : ', M                                               0011
+      END
+
+Controlizer output
+
+c unstructured
+      PROGRAM HPFTEST62C
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+cfcd$ host
+10    PRINT *, 'please enter a value'                                   0007
+      READ *, M                                                         0008
+      IF (M.GT.N.OR.M.LT.1) GOTO 99999                                  0009
+cfcd$ end host
+      PRINT *, 'ok : ', M                                               0011
+      RETURN
+99999 CONTINUE
+      GOTO 10
+      END
+
+New controlizer output
+
+c unstructured
+      PROGRAM HPFTEST62C
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+cfcd$ host
+10    PRINT *, 'please enter a value'                                   0007
+      READ *, M                                                         0008
+      IF (M.GT.N.OR.M.LT.1) GOTO 99999                                  0009
+cfcd$ end host
+      PRINT *, 'ok : ', M                                               0011
+      RETURN
+99999 CONTINUE
+      GOTO 10
+      END
+
+After control restructuring
+
+c unstructured
+      PROGRAM HPFTEST62C
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+cfcd$ host
+10    PRINT *, 'please enter a value'                                   0007
+      READ *, M                                                         0008
+      IF (M.GT.N.OR.M.LT.1) GOTO 10                                     0009
+cfcd$ end host
+      PRINT *, 'ok : ', M                                               0011
+      END
