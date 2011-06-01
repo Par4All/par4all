@@ -162,6 +162,14 @@ static void print_block(fusion_block block) {
   fprintf(stderr, "\n");
 }
 
+/**
+ * Debug function that print a list of blocks
+ */
+static void print_blocks(list /* of fusion_block */ blocks) {
+  FOREACH(fusion_block, block, blocks) {
+    print_block(block);
+  }
+}
 
 /**
  * @brief Check that two loop statements have the same bounds
@@ -240,7 +248,9 @@ void replace_entity_effects_walker(statement s, void *_thecouple ) {
  * FIXME High leakage
  */
 static bool fusion_loops(statement sloop1,
+                         set contained_stmts_loop1,
                          statement sloop2,
+                         set contained_stmts_loop2,
                          bool maximize_parallelism) {
   pips_assert("Previous is a loop", statement_loop_p( sloop1 ) );
   pips_assert("Current is a loop", statement_loop_p( sloop2 ) );
@@ -277,7 +287,7 @@ static bool fusion_loops(statement sloop1,
   if(index1!=index2) {
     pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
                entity_name(index2), entity_name(index1));
-    // FI: we should check that index1 is dead on exit of loop1 and
+    // FI: FIXME we should check that index1 is dead on exit of loop1 and
     // that index2 is dead on exit of loop2 and that index1 does not
     // appear in the memory effects of loop2
     replace_entity((void *)body_loop2, index2, index1);
@@ -347,19 +357,19 @@ static bool fusion_loops(statement sloop1,
   FOREACH( vertex, v, graph_vertices(candidate_dg) ) {
     dg_vertex_label dvl = (dg_vertex_label)vertex_vertex_label(v);
     int statement_ordering = dg_vertex_label_statement(dvl);
-    if(statement_ordering > statement_ordering(sloop2) && statement_ordering
-        != statement_ordering(fused_statement)) {
+    statement stmt1 = ordering_to_statement(statement_ordering);
+    // Check that the source of the conflict is in the "second" loop body
+    if(set_belong_p(contained_stmts_loop2,stmt1)) {
       FOREACH( successor, a_successor, vertex_successors(v) )
       {
         vertex v2 = successor_vertex(a_successor);
         dg_vertex_label dvl2 = (dg_vertex_label)vertex_vertex_label(v2);
         arc_label an_arc_label = successor_arc_label(a_successor);
         int statement_ordering2 = dg_vertex_label_statement(dvl2);
+        statement stmt2 = ordering_to_statement(statement_ordering2);
 
-
-        // FIXME ordering check is no longer valid !!
-        if(statement_ordering2 < statement_ordering(sloop2)
-            && statement_ordering2 != statement_ordering(sloop1)) {
+        // Check that the sink of the conflict is in the "first" loop body
+        if(set_belong_p(contained_stmts_loop1,stmt2)) {
           FOREACH( conflict, c, dg_arc_label_conflicts(an_arc_label) )
           {
             effect e_sink = conflict_sink(c);
@@ -374,15 +384,12 @@ static bool fusion_loops(statement sloop1,
                 || (effect_write_p(e_sink) && store_effect_p(e_sink))) {
 
               // Inner loop indices conflicts aren't preventing fusion
-              statement stmt1,stmt2;
-              stmt1 = ordering_to_statement(statement_ordering);
 
               if(statement_loop_p(stmt1) && effect_variable(e_source)
                   == loop_index(statement_loop(stmt1))) {
                 continue;
               }
 
-              stmt2 = ordering_to_statement(statement_ordering2);
               if(statement_loop_p(stmt2) && effect_variable(e_sink)
                   == loop_index(statement_loop(stmt2))) {
                 continue;
@@ -400,7 +407,10 @@ static bool fusion_loops(statement sloop1,
           }
         } else {
           ifdebug(6) {
-            pips_debug(0,"Arc ignored : from statement %d :",statement_ordering);
+            pips_debug(0,"Arc ignored (%d,%d) : from statement %d :",
+                       (int)statement_ordering(sloop2),
+                       (int)statement_ordering(sloop1),
+                       statement_ordering);
             print_statement(ordering_to_statement(statement_ordering));
             pips_debug(0," to statement %d :",statement_ordering2);
             print_statement(ordering_to_statement(statement_ordering2));
@@ -599,6 +609,7 @@ static void compute_successors(fusion_block b, list block_list) {
  * longest path, no shortcut :-)
  */
 static set prune_successors_tree(fusion_block b) {
+  pips_debug(8,"visiting %d\n",b->num);
   set full_succ = set_make(set_pointer);
   SET_FOREACH(fusion_block, succ, b->successors) {
     set full_succ_of_succ = prune_successors_tree(succ);
@@ -669,9 +680,10 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
     set_del_element(rr_pred->rr_successors, rr_pred->rr_successors, block2);
   }
 
-  // Remove block1 from predecessors of ... block1
+  // Remove block1 from predecessors and successors of ... block1
   set_del_element(block1->predecessors, block1->predecessors, block1);
-  // Remove block1 from rr_predecessors of ... block1
+  set_del_element(block1->successors, block1->successors, block1);
+  // Remove block1 from rr_predecessors and rr_successors of ... block1
   set_del_element(block1->rr_predecessors, block1->rr_predecessors, block1);
   set_del_element(block1->rr_successors, block1->rr_successors, block1);
 
@@ -697,10 +709,14 @@ static bool fuse_block( fusion_block b1,
     pips_debug(5,"B1 (%d) is a not a loop, skip !\n",b1->num);
   } else if(!b2->is_a_loop) {
     pips_debug(5,"B2 (%d) is a not a loop, skip !\n",b2->num);
+  } else if(b1->num==-1) {
+    pips_debug(5,"B2 (%d) is disabled, skip !\n",b1->num);
+  } else if(b2->num==-1) {
+    pips_debug(5,"B2 (%d) is disabled, skip !\n",b2->num);
   } else {
     // Try to fuse
     pips_debug(4,"Try to fuse %d with %d\n",b1->num, b2->num);
-    if(fusion_loops(b1->s, b2->s, maximize_parallelism)) {
+    if(fusion_loops(b1->s,b1->statements, b2->s, b2->statements, maximize_parallelism)) {
       pips_debug(2, "Loop have been fused\n");
       // Now fuse the corresponding blocks
       merge_blocks(b1, b2);
@@ -718,35 +734,30 @@ static bool fuse_block( fusion_block b1,
  * @param b is the current block
  * @param fuse_count is the number of successful fusion done
  */
-static void try_to_fuse_with_successors(fusion_block b,
+static bool try_to_fuse_with_successors(fusion_block b,
                                         int *fuse_count,
                                         bool maximize_parallelism) {
   // First step is to try to fuse with each successor
-  if(b->is_a_loop) {
+  if(b->is_a_loop && b->num>=0) {
     pips_debug(5,"Block %d is a loop, try to fuse with successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->successors)
     {
       if(fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
-         * block... we can no longer continue in this loop, let's restart
-         * current function at the beginning and end this one.
-         *
-         * FIXME : performance impact may be high ! Should not try to fuse
-         * again with the same block
-         *
+         * block... we can no longer continue in this loop, so we stop and let
+         * the caller restart the computation
          */
         (*fuse_count)++;
-        try_to_fuse_with_successors(b, fuse_count, maximize_parallelism);
-        return;
+        return true;
       }
     }
   }
   // Second step is recursion on successors (if any)
   SET_FOREACH(fusion_block, succ, b->successors) {
-    try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
+    return try_to_fuse_with_successors(succ, fuse_count, maximize_parallelism);
   }
 
-  return;
+  return false;
 }
 
 
@@ -789,20 +800,34 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
  */
 static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
   bool fusable_p = false;
-  if(b1!=b2 && b1->num>=0 && b2->num>=0) {
-    // Blocks are active
-    if(set_belong_p(b1->successors,b2)
-       || !set_belong_p(b2->successors,b1)) {
+  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
+    // Blocks are active and are loops
+
+    if(set_belong_p(b2->successors,b1)) {
+      ifdebug(6) {
+        pips_debug(6,"b1 is a successor of b2, fusion prevented !\n");
+        print_block(b1);
+        print_block(b2);
+      }
+      fusable_p = false;
+    } else if(set_belong_p(b1->successors,b2)) {
       // Adjacent blocks are fusable
+      ifdebug(6) {
+        pips_debug(6,"blocks are fusable because directly connected\n");
+        print_block(b1);
+        print_block(b2);
+      }
       fusable_p = true;
     } else {
       // If there's some constraint, we won't be able to fuse them
       // here is a heavy way to check that, better not to think about
       // algorithm complexity :-(
+      pips_debug(6,"Getting full successors for b1 (%d)\n",b1->num);
       set full_succ_b1 = prune_successors_tree(b1);
       if(!set_belong_p(full_succ_b1,b2)) {
         // b2 is not a successors of a successor of a .... of b1
         // look at the opposite !
+        pips_debug(6,"Getting full successors for b2 (%d)\n",b2->num);
         set full_succ_b2 = prune_successors_tree(b2);
         if(!set_belong_p(full_succ_b2,b1)) {
           fusable_p = true;
@@ -827,10 +852,12 @@ static void fuse_all_possible_blocks(list blocks,
                                      int *fusion_count,
                                      bool maximize_parallelism) {
   FOREACH(fusion_block, b1, blocks) {
-    FOREACH(fusion_block, b2, blocks) {
-      if(fusable_blocks_p(b1,b2)) {
-        if(fuse_block(b1, b2, maximize_parallelism)) {
-          (*fusion_count)++;
+    if(b1->is_a_loop) {
+      FOREACH(fusion_block, b2, blocks) {
+        if(fusable_blocks_p(b1,b2)) {
+          if(fuse_block(b1, b2, maximize_parallelism)) {
+            (*fusion_count)++;
+          }
         }
       }
     }
@@ -887,10 +914,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
     }
 
     ifdebug(3) {
-      FOREACH(fusion_block, block, block_list)
-      {
-        print_block(block);
-      }
+      print_blocks(block_list);
     }
     // Loop over blocks and find fusion candidate (loop with compatible header)
     /*
@@ -898,6 +922,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
      * predecessor. The others will be visited recursively.
      */
     int fuse_count = 0;
+restart_loop: ;
     FOREACH(fusion_block, block, block_list) {
       if(set_empty_p(block->predecessors)) { // Block has no predecessors
         pips_debug(2,
@@ -905,7 +930,12 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
             block->num,
             block->is_a_loop);
 
-        try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism);
+        if(try_to_fuse_with_successors(block, &fuse_count,params->maximize_parallelism)) {
+          // We fused some blocks, let's restart the process !
+          // FIXME : we shouldn't have to restart the process, but it'll require
+          // hard work in try_to_fuse_with_successors, so we'll do that later...
+          goto restart_loop;
+        }
 
       }
     }
@@ -924,6 +954,9 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
        * We allow the user to request a greedy fuse, which mean that we fuse as
        * much as we can, even if there's no reuse !
        */
+      ifdebug(3) {
+        print_blocks(block_list);
+      }
       fuse_all_possible_blocks(block_list, &fuse_count,params->maximize_parallelism);
     }
 
@@ -959,7 +992,9 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
       // Loop until every block have been regenerated
       int block_count = gen_length(block_list);
       while(block_count > 0) {
+restart_generation:
         block_count = 0;
+        int active_blocks = 0;
         bool at_least_one_block_scheduled = false;
         // First loop, construct eligible blocks
         FOREACH(fusion_block, block, block_list)
@@ -967,6 +1002,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
           if(block->num < 0) {
             continue; // block is disabled
           }
+          active_blocks++;
 
           if(set_empty_p(block->predecessors)) { // Block has no predecessors
             // Block is eligible
@@ -984,6 +1020,10 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
             {
               set_del_element(succ->predecessors, succ->predecessors, block);
             }
+            // We have free some constraints, and thus we restart the process
+            // to ensure that we generate in an order as close as possible to
+            // the original code
+            goto restart_generation;
           } else {
             ifdebug(3) {
               pips_debug(3,"Not eligible : ");
@@ -994,7 +1034,7 @@ static bool fusion_in_sequence(sequence s, fusion_params params) {
             block_count++;
           }
         }
-        if(!at_least_one_block_scheduled) {
+        if(!at_least_one_block_scheduled && active_blocks>0) {
           pips_internal_error("No block scheduled, we have interdependence "
               "in the block tree, which means it's not a tree ! Abort...\n");
         }
