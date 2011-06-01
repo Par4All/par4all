@@ -55,3 +55,18 @@ c unstructured
       ENDIF
       PRINT *, 'ok : ', M                                               0011
       END
+
+After control restructuring
+
+c unstructured
+      PROGRAM HPFTEST62B
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+      IF (.TRUE.) THEN                                                  0006
+10       PRINT *, 'please enter a value'                                0007
+         READ *, M                                                      0008
+         IF (M.GT.N.OR.M.LT.1) GOTO 10                                  0009
+      ENDIF
+      PRINT *, 'ok : ', M                                               0011
+      END
