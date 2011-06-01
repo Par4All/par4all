@@ -13,8 +13,7 @@ setproperty PREPROCESSOR_MISSING_FILE_HANDLING="generate"
 #setenv PIPS_HWAC_DEBUG_LEVEL=7
 create ${WSPACE} ${FILE} freia.c
 shell ${PIPS_CC:-cc} -c ${FILE} -o ${WSPACE}.database/Tmp/${WSPACE}.o
-activate C_PARSER
-setproperty PRETTYPRINT_LANGUAGE "C"
+#activate NEW_CONTROLIZER
 setproperty PRETTYPRINT_STATEMENT_NUMBER=TRUE
 echo
 echo ! initial function
