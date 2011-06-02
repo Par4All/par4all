@@ -140,7 +140,7 @@ static void print_control_node(control c)
   fprintf(stderr, "\n");
 }
 
-static void print_control_nodes(list l)
+static void print_control_nodes_sem(list l)
 {
   if(ENDP(l)) {
     fprintf(stderr, "empty control list");
@@ -1118,7 +1118,7 @@ static void cycle_to_flow_sensitive_preconditions
 
       /* process forward */
       pips_debug(5, "Try forward processing for\n");
-      ifdebug(5) print_control_nodes(still_to_be_processed);
+      ifdebug(5) print_control_nodes_sem(still_to_be_processed);
 
       count = 0;
       for(l=still_to_be_processed; !ENDP(l); ) {
@@ -1414,7 +1414,7 @@ static void dag_to_flow_sensitive_preconditions
 	statement s = control_statement((control) c);
 	pips_debug(2, "Cycle %p with statement %s depends on:\n",
 		   c, statement_identification(s));
-	print_control_nodes((list) l);
+	print_control_nodes_sem((list) l);
       }, cycle_dependencies_map);
     }
     else {
@@ -1541,7 +1541,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
        most of the time, only reachable nodes. */
     ifdebug(3) {
       pips_debug(3, "Process unreachable nodes in unstructured %p\n", ndu);
-      print_control_nodes(cannot_be_reached);
+      print_control_nodes_sem(cannot_be_reached);
     }
     MAP(CONTROL, cbrc, {
       if(!meaningless_control_p(cbrc)) {
@@ -1593,7 +1593,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
 
       /* process forward */
       pips_debug(5, "Try forward processing for\n");
-      ifdebug(2) print_control_nodes(still_to_be_processed);
+      ifdebug(2) print_control_nodes_sem(still_to_be_processed);
 
       count = 0;
       for(l=still_to_be_processed; !ENDP(l); ) {
