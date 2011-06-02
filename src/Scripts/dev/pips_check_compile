@@ -192,6 +192,12 @@ function report()
   # it is nice to report that it is up again...
   [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
 
+  # copy outputs on fail
+  [ "$keepfail" -a $current != 'ok' ] && {
+    cp out fail.$now.out
+    cp err fail.$now.err
+  }
+
   # no change, no report, unless forced
   [ ! "$report" -a "$previous" -a $current = "$previous" ] && {
     rmdir LOCK; exit 0;
@@ -229,14 +235,12 @@ function report()
         echo
         echo err:
         tail -$tail err
-        [ "$keepfail" ] && cp err fail.$now.err
       }
 
       test -f out && {
         echo
         echo out:
         tail -$tail out
-        [ "$keepfail" ] && cp out fail.$now.out
       }
 
       # show recent commits
