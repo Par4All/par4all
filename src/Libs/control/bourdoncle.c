@@ -306,6 +306,8 @@ static void print_control_node_without_check(control c)
   print_and_check_control_node(c, FALSE);
 }
 
+/* Was moved into ri-util/control, minus the check_control_statement() */
+#if 0
 static void print_control_nodes(list l)
 {
   MAP(CONTROL, c, {
@@ -315,6 +317,7 @@ static void print_control_nodes(list l)
   }, l);
   fprintf(stderr, "\n");
 }
+#endif
 
 static void print_control_nodes_without_check(list l)
 {
