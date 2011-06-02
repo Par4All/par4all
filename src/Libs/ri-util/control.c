@@ -64,7 +64,8 @@ char vcid_ri_util_control[] = "$Id$";
 
    It is usually called from the CONTROL_MAP macro, with the entry node of
    an unstructured as initial argument. It uses both successors and
-   predecessors to define reachability.
+   predecessors to define reachability, i.e. the graph arcs are
+   considered edges.
 
    @param c is a control node to start with
 
@@ -85,6 +86,60 @@ void control_map_get_blocs(control c, list *l)
     control_predecessors( c )) ;
 }
 
+/* Build recursively a control path from b to e
+
+   It is used for debugging purposes
+
+   @param b is a control node to begin with
+
+   @param e is a control node to end with
+
+   @param pp is a pointer to the list used to stored the path from b
+   to e. It includes both b and e.
+
+   @param vp is a pointer to the list used to stored the visited nodes. It must be
+   initialized to the list of nodes to skip if any. To visit all the nodes from
+   c, just give a list variable initialized to NIL. It usually must be
+   by the caller.
+
+   @param dir request a forward path is strictly positive, a backward
+   path is stricly negative and an undirected path if zero.
+*/
+void find_a_control_path(control b, control e, list * pp, list * vp, int dir)
+{
+  if(b==e) {
+    *pp = CONS(CONTROL, b, NIL);
+    return;
+  }
+
+  if(ENDP(*pp) && !gen_in_list_p(b, *vp)) {
+    *vp = CONS(CONTROL, b, *vp);
+    if(dir>=0) {
+      FOREACH(CONTROL, s, control_successors(b)) {
+	find_a_control_path(s, e, pp, vp, dir);
+	if(!ENDP(*pp)) {
+	  pips_assert("e is the last element of *pp",
+		      e==CONTROL(CAR(gen_last(*pp))));
+	  *pp = CONS(CONTROL, s, *pp);
+	  return;
+	}
+      }
+    }
+    if(dir<=0) {
+      FOREACH(CONTROL, p, control_predecessors(b)) {
+	find_a_control_path(p, e, pp, vp, dir);
+	if(!ENDP(*pp)) {
+	  pips_assert("e is the last element of *pp",
+		      e==CONTROL(CAR(gen_last(*pp))));
+	  *pp = CONS(CONTROL, p, *pp);
+	  return;
+	}
+      }
+    }
+  }
+  pips_assert("*pp is empty", ENDP(*pp));
+  return;
+}
 
 /* Build recursively the list of all controls backward-reachable from a
    control of an unstructured.
@@ -500,15 +555,16 @@ check_control_coherency(control c)
 }
 
 
-#if 0
+// FI: as commented, needed for debugging purposes
+// #if 0
 /*
   Prettyprinting of control nodes for debugging purposes
 */
 static void print_control_node(control c)
 {
   fprintf(stderr,
-	  "ctr %p, %zd preds, %zd succs: %s", 
-          c,
+	  "ctr %p, %zd preds, %zd succs: %s",
+	  c,
 	  gen_length(control_predecessors(c)),
 	  gen_length(control_successors(c)),
 	  safe_statement_identification(control_statement(c)));
@@ -527,7 +583,7 @@ static void print_control_node(control c)
 
 
 /* Display identification of a list of control nodes */
-static void print_control_nodes(list l)
+void print_control_nodes(list l)
 {
   if(ENDP(l)) {
     fprintf(stderr, "empty control list");
@@ -540,7 +596,7 @@ static void print_control_nodes(list l)
   }
   fprintf(stderr, "\n");
 }
-#endif
+//#endif
 
 
 /* Display the adresses a list of control nodes
