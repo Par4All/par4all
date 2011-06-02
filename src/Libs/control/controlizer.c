@@ -1662,6 +1662,7 @@ static control find_exit_control_node(list ctls, control succ)
     FOREACH(CONTROL, c, ctls) {
       check_control_coherency(c);
     }
+    check_control_coherency(succ);
   }
 
   if(!(ENDP(control_successors(exit))
@@ -1675,15 +1676,17 @@ static control find_exit_control_node(list ctls, control succ)
     while(!ENDP(to_be_visited) && !found_p) {
       FOREACH(CONTROL, c, to_be_visited) {
 	if(c==succ) {
-	  control p = CONTROL(CAR(control_predecessors(succ)));
-	  // FI: Not a good idea because succ is used otherwise above
-	  // exit = succ;
-	  exit = make_control(make_plain_continue_statement(), NIL, NIL);
 	  // FI: this assert is too strong when succ follows a
 	  //controlized test as in hpftest62b.c
 	  //pips_assert("succ has only one predecessor",
 	  //      gen_length(control_predecessors(c))==1);
-	  insert_control_in_arc(exit, p, succ);
+	  // FI: Not a good idea because succ is used otherwise above
+	  // exit = succ;
+	  exit = make_control(make_plain_continue_statement(), NIL, NIL);
+
+	  FOREACH(CONTROL, p, control_predecessors(succ))
+	    insert_control_in_arc(exit, p, succ);
+
 	  found_p = TRUE;
 	  break;
 	}
@@ -1972,6 +1975,25 @@ static bool controlize_sequence(control c_res,
       ifdebug(1) {
 	check_control_coherency(entry);
 	check_control_coherency(exit);
+
+	/* Make sure that the new unstructured u is not linked to code
+	   sitting above */
+	list linked_nodes = NIL;
+	control_map_get_blocs(entry, &linked_nodes);
+	if(gen_in_list_p(c_res, linked_nodes)) {
+	  list cp = NIL;
+	  list vp = NIL;
+	  find_a_control_path(entry, c_res, &cp, &vp, 0);
+	  print_control_nodes(cp);
+	  pips_internal_error("Some issue due to \"c_res\" with covers_p\n");
+	}
+	else if(gen_in_list_p(succ, linked_nodes)) {
+	  list cp = NIL;
+	  list vp = NIL;
+	  find_a_control_path(entry, c_res, &cp, &vp, 0);
+	  print_control_nodes(cp);
+	  pips_internal_error("Some issue due to \"succ\" with covers_p\n");
+	}
       }
 
       statement u_s =
