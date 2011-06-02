@@ -41,6 +41,7 @@ my $url = 'https?:\/\/svn\.cri\.(ensmp|mines-paristech)\.fr\/svn';
 my $file = 0;
 
 # compute svn version difference
+# based on global variables %*_version
 sub vdiff()
 {
   my $vdiff = '';
@@ -54,23 +55,27 @@ sub vdiff()
       my $pre = $current+1;
       $code =~ s/\/trunk$//; # compress output
       $vdiff .= "$code\@" .
-	($previous!=$pre? "$pre:$previous ": "$pre ");
+        ($previous!=$pre? "$pre:$previous ": "$pre ");
     }
   }
+  # this may occur for undeterministic diffs
   $vdiff = 'nodiff' unless $vdiff;
   return $vdiff;
 }
 
+# process input
 while (<>)
 {
-  # hmmm... we're reading the next file
+  # hmmm... I detect that we're reading the next file
   if (/^on dirs: /)
   {
     $file++;
     %previous_version = %current_version;
+    # nothing to do if no fails on second round
+    last if $file>1 and not $n_fails;
   }
 
-  # get svn revision
+  # get svn revision for anything, based on the svn url
   $current_version{$2} = $3 if m,$url/([^@]+)@(\d+),;
 
   # investigate a case
@@ -78,19 +83,21 @@ while (<>)
   {
     my ($state, $case) = ($1, $2);
 
-    if (not exists $status{$case} and $file==1 and $state ne 'passed')
+    if ($file==1 and $state ne 'passed' and not exists $status{$case})
     {
+      # first pass, keep track of non-passing status
       $status{$case} = $state;
       $n_fails++;
     }
-    elsif (exists $status{$case} and $file>1)
+    elsif ($file>1 and exists $status{$case})
     {
+      # second pass and later, look for previous passed status
       if ($status{$case} ne 'passed' and $state eq 'passed')
       {
-	# status: not passed -> passed
 	print "$case: ", vdiff(), "\n";
 	delete $status{$case};
 	$n_fails--;
+	# we are done, all issues were found
 	last unless $n_fails;
       }
     }
