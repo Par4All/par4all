@@ -556,7 +556,10 @@ check_control_coherency(control c)
 
 
 // FI: as commented, needed for debugging purposes
-// #if 0
+#if 0
+// It's commented out, because static and not used in this file !
+// If useful then remove the "static" or use it always
+// ./configure --enable-devel-mode is a must for developpers :-)
 /*
   Prettyprinting of control nodes for debugging purposes
 */
@@ -580,6 +583,7 @@ static void print_control_node(control c)
   }, control_predecessors(c));
   fprintf(stderr, "\n");
 }
+#endif
 
 
 /* Display identification of a list of control nodes */
