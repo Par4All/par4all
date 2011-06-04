@@ -426,7 +426,7 @@ then
 else
   # no source updates, but maybe a validation update?
   # first check that pips is fine!
-  read prev comp < STAT
+  read prev comp < STATE
   [ "$comp" = 'ok' ] || \
     report 'skip' 'unchanged' "cannot run validation without pips! ($comp)"
 
