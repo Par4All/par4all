@@ -4,8 +4,7 @@
 
 int main() {
   int a[10],j;
-kernel: for(int j=0; j<1;j++) {
-    #pragma toto
+k: for(int j=0; j<1;j++) {
     printf("");
   }
 }
