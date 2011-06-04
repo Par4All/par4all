@@ -4176,10 +4176,29 @@ Instead of computing the fix point of the convex hull of the
 transformer list, it computes the convex hull of the derivative
 constraints. Since it is a new feature, it is set to false by default,
 but it should become the default option because it is always more
-accurate. This development is experimental and turned off by default.
+accurate, at least indirectly because the systems are smaller. The
+number of overflows is reduced, as well as the execution time. See for
+instance the test case Semantics/sync04. This
+development is experimental and turned off by default.
 
 \begin{PipsProp}{SEMANTICS_USE_DERIVATIVE_LIST}
 SEMANTICS_USE_DERIVATIVE_LIST FALSE
+\end{PipsProp}
+
+The next property is only useful if Property
+\PipsPropRef{SEMANTICS_USE_TRANSFORMER_LISTS} is set to true.  Instead
+of computing the precondition derived from the transitive closure of a
+transformer list, semantics also computes the preconditions associated
+to different projections of the transformer list and use as loop
+precondition the intersection of these preconditions. Although it is a
+new feature, it is set to true by default for the validation's
+sake. See test case Semantics/maisonneuve09.c: it improves the
+accuracy, but not as much as
+\PipsPropRef{SEMANTICS_USE_DERIVATIVE_LIST}. This development is
+experimental and turned off by default.
+
+\begin{PipsProp}{SEMANTICS_USE_LIST_PROJECTION}
+SEMANTICS_USE_LIST_PROJECTION TRUE
 \end{PipsProp}
 
 \subsubsection{Normalization level}
