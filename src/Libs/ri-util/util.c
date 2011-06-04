@@ -135,8 +135,9 @@ const char* global_name_to_user_name(const char* global_name)
 /* Does not take care of block scopes and returns a pointer */
 string local_name(const char * s)
 {
-    pips_assert("some separator", strchr(s, MODULE_SEP) != NULL);
-    return strchr(s, MODULE_SEP)+1;
+  char *start_ptr = strchr(s, MODULE_SEP);
+  pips_assert("some separator", start_ptr != NULL);
+  return start_ptr+1;
 }
 
 /* END_EOLE */
