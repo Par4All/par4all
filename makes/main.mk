@@ -369,12 +369,12 @@ $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
 # put the -local file in include so that cproto will not complain to much.
-phase0: install-temporary-header
-.PHONY: install-temporary-header
-install-temporary-header:
-	$(INSTALL) -d $(INC.d)
-	test -f $(INC.d)/$(TARGET).h || \
-	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h
+#phase0: install-temporary-header
+#.PHONY: install-temporary-header
+#install-temporary-header:
+#	$(INSTALL) -d $(INC.d)
+#	test -f $(INC.d)/$(TARGET).h || \
+#	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h
 
 phase2:	$(INC_TARGET)
 
