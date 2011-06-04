@@ -18,7 +18,9 @@ echo
 echo Source code with preconditions
 echo
 
+# This property is necessary to get some interesting invariants
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+# This property sharpens the invariants
 setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
 
 activate PRINT_CODE_PRECONDITIONS

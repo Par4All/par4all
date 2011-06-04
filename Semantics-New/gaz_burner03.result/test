@@ -135,13 +135,11 @@ int main()
 
       while (u<60)
 
-//  P(l,t,u,v) {l+u<=t+v, l+5v<=t+50, v<=l, u<=59, 49v<=47u+20, v<=u,
-//    0<=v, v<=10}
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=59, v<=u, 0<=v, v<=10}
 
          if (1) {
 
-//  P(l,t,u,v) {l+u<=t+v, l+5v<=t+50, v<=l, u<=59, 49v<=47u+20, v<=u,
-//    0<=v, v<=10}
+//  P(l,t,u,v) {l+u<=t+v, v<=l, u<=59, v<=u, 0<=v, v<=10}
 
             while (u<60&&v<=9&&alea())
 
@@ -240,17 +238,15 @@ int main()
 
 //  T(l,t,u,v) {l+v#init==l#init+v, t+u#init==t#init+u, l#init<=l,
 //    l<=l#init+10, l#init+t<=l+t#init+60, l+t#init<=l#init+t,
-//    l#init+u#init<=t#init+v#init, l#init+5v#init<=t#init+50,
-//    v#init<=l#init, u<=60, v<=u, u#init<=59, 49v#init<=47u#init+20,
-//    v#init<=u#init, 0<=v, v<=10, 0<=v#init, v#init<=10}
+//    l#init+u#init<=t#init+v#init, v#init<=l#init, u<=60, v<=u,
+//    u#init<=59, v#init<=u#init, 0<=v, v<=10, 0<=v#init, v#init<=10}
 
          if (1) {
 
 //  T(l,t,u,v) {l+u#init==l#init+u, t+u#init==t#init+u,
 //    u+v#init==u#init+v, l#init+u#init<=t#init+v#init,
-//    l#init+5v#init<=t#init+50, v#init<=l#init, u<=59, u#init<=u,
-//    u#init<=59, 49v#init<=47u#init+20, v#init<=u#init, 0<=v, v<=9,
-//    0<=v#init, v#init<=9}
+//    v#init<=l#init, u<=59, u#init<=u, u#init<=59, v#init<=u#init,
+//    0<=v, v<=9, 0<=v#init, v#init<=9}
 
             while (u<60&&v<=9&&alea())
 
@@ -259,9 +255,8 @@ int main()
 
                l++, v++, u++, t++;
 
-//  T(t,u) {t+u#init==t#init+u, l<=t#init+50, l+u#init<=t#init+v,
-//    l+5v<=t#init+100, v<=l, t#init<=t, u<=59, v<=u, u#init<=59,
-//    49v<=47u#init+40, v<=u#init, u#init<=v+59, 0<=v, v<=10}
+//  T(t,u) {t+u#init==t#init+u, l+u#init<=t#init+v, v<=l, t#init<=t,
+//    u<=59, v<=u, u#init<=59, v<=u#init, u#init<=v+59, 0<=v, v<=10}
 
 
             while (u<60&&alea())
@@ -276,14 +271,12 @@ int main()
 
             if (6*l<=t+50)
 
-//  T() {l<=t+50, 6l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
-//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+//  T() {6l<=t+50, l+u<=t+v, v<=l, u<=60, v<=u, u<=v+119, 0<=v, v<=10}
 
                printf("property verified\n");
             else
 
-//  T() {t+51<=6l, l<=t+50, l+u<=t+v, l+u+5v<=t+169, l+5v<=t+100,
-//    v<=l, u<=60, 49v<=47u+40, v<=u, u<=v+119, 0<=v, v<=10}
+//  T() {t+51<=6l, l+u<=t+v, v<=l, u<=60, v<=u, u<=v+119, 0<=v, v<=10}
 
                printf("error\n");
          }
@@ -292,16 +285,12 @@ int main()
 
       if (6*l<=t+50)
 
-//  T() {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
-//    l+6v<=t+120, l+10v<=t+400, 2l+47v<=2t+2940, 2l+59v<=2t+3060,
-//    47l+480v<=47t+19000, v<=l, 60<=t, 0<=v, v<=10}
+//  T() {u==60, 6l<=t+50, l+60<=t+v, v<=l, 60<=t, 0<=v, v<=10}
 
          printf("property verified\n");
       else
 
-//  T() {u==60, t+51<=6l, l<=t+50, l+60<=t+v, l+5v<=t+100,
-//    l+6v<=t+120, l+10v<=t+400, 2l+47v<=2t+2940, 2l+59v<=2t+3060,
-//    47l+480v<=47t+19000, v<=l, 60<=t, 0<=v, v<=10}
+//  T() {u==60, t+51<=6l, l+60<=t+v, v<=l, 60<=t, 0<=v, v<=10}
 
          printf("error\n");
    }
@@ -389,13 +378,13 @@ int main()
                printf("error\n");
          }
 
-//  P(l,t,u,v) {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
-//    6l+60<=t+6v, v<=l, 0<=v, v<=10}
+//  P(l,t,u,v) {u==60, 6l<=t+50, l+60<=t+v, 6l+60<=t+6v, v<=l, 0<=v,
+//    v<=10}
 
       if (6*l<=t+50)
 
-//  P(l,t,u,v) {u==60, l<=t+50, 6l<=t+50, l+60<=t+v, l+5v<=t+100,
-//    6l+60<=t+6v, v<=l, 0<=v, v<=10}
+//  P(l,t,u,v) {u==60, 6l<=t+50, l+60<=t+v, 6l+60<=t+6v, v<=l, 0<=v,
+//    v<=10}
 
          printf("property verified\n");
       else
@@ -419,7 +408,7 @@ int main()
       printf("error\n");
 }
 
-AFTER DEAD CODE ELIMINATION
+Code after control simplification
 
 int main()
 {

@@ -435,35 +435,38 @@ void ts_singlestate(void)
    while (rand_b())
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x0<=n, z<=n, z0<=n, z0<=z, 0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x0<=n, z<=n, z0<=n, z<=x0+z0+2,
+//    z0<=z, 0<=z0}
 
       if (rand_b()) {
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x0<=n, z<=n, z0<=n, z0<=z, 0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x0<=n, z<=n, z0<=n, z<=x0+z0+2,
+//    z0<=z, 0<=z0}
 
          if (!(x<n&&z>x))
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x0<=n, z<=n, z0<=n, z<=x, z0<=z, 0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x0<=n, z<=n, z0<=n, z<=x,
+//    z<=x0+z0+2, z0<=z, 0<=z0}
 
             deadlock();
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x+1<=n, x0<=n, z<=n, z0<=n, x+1<=z, z0<=z,
-//    0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x+1<=n, x0<=n, z<=n, z0<=n,
+//    x+1<=z, z<=x0+z0+2, z0<=z, 0<=z0}
 
          x++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x-1, c2+z0==z, 0<=c1, c1+1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x<=n, x0<=n, z<=n, z0<=n, x<=z, z0<=z,
-//    0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x<=n, x0<=n, z<=n, z0<=n, x<=z,
+//    z<=x0+z0+2, z0<=z, 0<=z0}
 
          c1++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 1<=c1, c1<=x,
-//    z<=c1+x0+z0, c1<=z+1, x<=n, x0<=n, z<=n, z0<=n, x<=z, z0<=z,
-//    0<=z0}
+//    z<=c1+x0+z0, c1<=z+1, c1<=z0+2, x<=n, x0<=n, z<=n, z0<=n, x<=z,
+//    z<=x0+z0+2, z0<=z, 0<=z0}
 
          if (!(c1+c2<=n-x0+n-z0))
 
@@ -474,30 +477,32 @@ void ts_singlestate(void)
       else {
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x0<=n, z<=n, z0<=n, z0<=z, 0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x0<=n, z<=n, z0<=n, z<=x0+z0+2,
+//    z0<=z, 0<=z0}
 
          if (!(x<n&&z<=x))
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1+x0<=n,
-//    z<=c1+x0+z0+1, c1<=z, x0<=n, z<=n, z0<=n, 0<=x0, z0<=z, 0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x0<=n, z<=n, z0<=n, 0<=x0,
+//    z<=x0+z0+2, z0<=z, 0<=z0}
 
             deadlock();
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1<=x,
-//    z<=c1+x0+z0+1, c1<=z, x+1<=n, x0<=n, z<=n, z0<=n, z<=x, z0<=z,
-//    0<=z0}
+//    z<=c1+x0+z0+1, c1<=z, c1<=z0+1, x+1<=n, x0<=n, z<=n, z0<=n,
+//    z<=x, z<=x0+z0+2, z0<=z, 0<=z0}
 
          z++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z-1, 0<=c1, c1<=x,
-//    z<=c1+x0+z0+2, c1+1<=z, x+1<=n, x0<=n, z<=n+1, z0<=n, z<=x+1,
-//    z0+1<=z, 0<=z0}
+//    z<=c1+x0+z0+2, c1+1<=z, c1<=z0+1, x+1<=n, x0<=n, z<=n+1, z0<=n,
+//    z<=x+1, z<=x0+z0+3, z0+1<=z, 0<=z0}
 
          c2++;
 
 //  P(c1,c2,n,x,x0,z,z0) {c1+x0==x, c2+z0==z, 0<=c1, c1<=x,
-//    z<=c1+x0+z0+2, c1+1<=z, x+1<=n, x0<=n, z<=n+1, z0<=n, z<=x+1,
-//    z0+1<=z, 0<=z0}
+//    z<=c1+x0+z0+2, c1+1<=z, c1<=z0+1, x+1<=n, x0<=n, z<=n+1, z0<=n,
+//    z<=x+1, z<=x0+z0+3, z0+1<=z, 0<=z0}
 
          if (!(c1+c2<=n-x0+n-z0))
 

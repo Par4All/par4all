@@ -15,6 +15,7 @@ setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 # This property is set to analyze C99 boolean variables
 setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
 
+# Both properties are useful
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
 
