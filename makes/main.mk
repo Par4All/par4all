@@ -291,7 +291,7 @@ endif # PY_TARGET
 
 ifdef INSTALL_PY
 
-install:py-install
+install: py-install
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
 py-install .build_py: $(INSTALL_PY)
@@ -368,13 +368,21 @@ header:	.header $(INC_TARGET)
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
+# put the -local file in include so that cproto will not complain to much.
+phase0: install-temporary-header
+.PHONY: install-temporary-header
+install-temporary-header:
+	$(INSTALL) -d $(INC.d)
+	test -f $(INC.d)/$(TARGET).h || \
+	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h
+
 phase2:	$(INC_TARGET)
 
 clean: header-clean
 
+.PHONY: header-clean
 header-clean:
 	$(RM) $(INC_TARGET) .header
-
 
 INSTALL_INC	+=   $(INC_TARGET)
 
