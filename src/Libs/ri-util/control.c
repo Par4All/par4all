@@ -556,14 +556,11 @@ check_control_coherency(control c)
 
 
 // FI: as commented, needed for debugging purposes
-#if 0
-// It's commented out, because static and not used in this file !
-// If useful then remove the "static" or use it always
-// ./configure --enable-devel-mode is a must for developpers :-)
+// #if 0
 /*
   Prettyprinting of control nodes for debugging purposes
 */
-static void print_control_node(control c)
+void print_control_node(control c)
 {
   fprintf(stderr,
 	  "ctr %p, %zd preds, %zd succs: %s",
@@ -583,7 +580,6 @@ static void print_control_node(control c)
   }, control_predecessors(c));
   fprintf(stderr, "\n");
 }
-#endif
 
 
 /* Display identification of a list of control nodes */
@@ -596,6 +592,8 @@ void print_control_nodes(list l)
     MAP(CONTROL, c, {
       fprintf(stderr, "%p, %s", c,
 	      safe_statement_identification(control_statement(c)));
+      // The version used in control/bourdoncle.c also had this check
+      // (void) check_control_statement(c);
     }, l);
   }
   fprintf(stderr, "\n");
