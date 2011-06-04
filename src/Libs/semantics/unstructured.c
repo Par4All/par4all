@@ -119,7 +119,7 @@
  * Prettyprinting of control nodes for debugging purposes
  */
 
-static void print_control_node(control c)
+static void print_control_node_uns(control c)
 {
   fprintf(stderr,
 	  "ctr %p, %zd preds, %zd succs: %s",
@@ -140,7 +140,7 @@ static void print_control_node(control c)
   fprintf(stderr, "\n");
 }
 
-static void print_control_nodes_sem(list l)
+static void print_control_node_unss_sem(list l)
 {
   if(ENDP(l)) {
     fprintf(stderr, "empty control list");
@@ -1118,7 +1118,7 @@ static void cycle_to_flow_sensitive_preconditions
 
       /* process forward */
       pips_debug(5, "Try forward processing for\n");
-      ifdebug(5) print_control_nodes_sem(still_to_be_processed);
+      ifdebug(5) print_control_node_unss_sem(still_to_be_processed);
 
       count = 0;
       for(l=still_to_be_processed; !ENDP(l); ) {
@@ -1414,7 +1414,7 @@ static void dag_to_flow_sensitive_preconditions
 	statement s = control_statement((control) c);
 	pips_debug(2, "Cycle %p with statement %s depends on:\n",
 		   c, statement_identification(s));
-	print_control_nodes_sem((list) l);
+	print_control_node_unss_sem((list) l);
       }, cycle_dependencies_map);
     }
     else {
@@ -1541,7 +1541,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
        most of the time, only reachable nodes. */
     ifdebug(3) {
       pips_debug(3, "Process unreachable nodes in unstructured %p\n", ndu);
-      print_control_nodes_sem(cannot_be_reached);
+      print_control_node_unss_sem(cannot_be_reached);
     }
     MAP(CONTROL, cbrc, {
       if(!meaningless_control_p(cbrc)) {
@@ -1593,7 +1593,7 @@ transformer dag_or_cycle_to_flow_sensitive_postconditions_or_transformers
 
       /* process forward */
       pips_debug(5, "Try forward processing for\n");
-      ifdebug(2) print_control_nodes_sem(still_to_be_processed);
+      ifdebug(2) print_control_node_unss_sem(still_to_be_processed);
 
       count = 0;
       for(l=still_to_be_processed; !ENDP(l); ) {
@@ -1835,14 +1835,14 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
 	       postcondition_p? "postconditions" : "transformer");
     /* Do not go down into nested unstructured */
     gen_multi_recurse(u, statement_domain, gen_false, gen_null,
-		      control_domain, gen_true, print_control_node, NULL);
+		      control_domain, gen_true, print_control_node_uns, NULL);
     pips_debug(2, "With entry nodes\n");
-    print_control_node(unstructured_control(u));
+    print_control_node_uns(unstructured_control(u));
     pips_debug(2, "And exit node\n");
-    print_control_node(unstructured_exit(u));
+    print_control_node_uns(unstructured_exit(u));
     pips_debug(2, "And embedding graph:\n");
     gen_multi_recurse(ndu, statement_domain, gen_false, gen_null,
-		      control_domain, gen_true, print_control_node, NULL);
+		      control_domain, gen_true, print_control_node_uns, NULL);
   }
 
   /* Propagate the precondition in the DAG and recompute the cycle
@@ -1894,7 +1894,7 @@ transformer unstructured_to_flow_sensitive_postconditions_or_transformers
 	statement s = control_statement(c);
 	transformer fp_tf = (transformer) v;
 
-	print_control_node(c);
+	print_control_node_uns(c);
 	fprintf(stderr, "Statement %s", statement_identification(s));
 	print_transformer(fp_tf);
       }, fix_point_map);
