@@ -16,7 +16,22 @@ echo
 echo PRECONDITIONS
 echo
 
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+# Must be set to TRUE, as well as the second properties to find the
+# bounds on x due to b. The while{while;while} transformation does
+# make it a bit more difficult than the initial version using ifs
+# since projections do not provide the result.
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+
+setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
+
+# FFF: {b==10, 0<=t+x, x<=t}
+# TFF: {b==10, 0<=t+x, x<=t}
+# TTF: {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
+# TFT: {b==10, 0<=t+x, x<=t}
+# TTT: {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]
