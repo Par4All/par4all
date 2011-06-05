@@ -765,11 +765,20 @@ static transformer transformer_add_call_condition_information_updown(
     free_transformer(pre);
     newpre = transformer_empty();
   }
-  else
-    /* do not know what to do with other logical operators, for the time being! 
-     * keep pre unmodified
+  else {
+    /* do not know what to do with other logical operators, for the
+     * time being! keep pre unmodified
+     *
+     * FI: two problems, you can bump into arithmetic operators and
+     * you can have side effects as in i++
      */
+    /* Minimal service: use effects */
     newpre = pre;
+    FOREACH(EXPRESSION, a, args) {
+      transformer tf = expression_effects_to_transformer(a);
+      newpre = transformer_combine(tf, newpre);
+    }
+  }
 
   ifdebug(9) {
     pips_debug(9, "end with newpre=%p\n", newpre);
@@ -789,7 +798,7 @@ static transformer transformer_add_call_condition_information_updown(
  *
  * Argument pre is modified and may or not be returned as newpre. It may also be
  * freed and newpre allocated. In other words, argument "pre" should not be used
- * after a call to this function.
+ * after a call to this function and the returned value alswayd used.
  */
 static transformer transformer_add_condition_information_updown(
     transformer pre,
@@ -817,10 +826,37 @@ static transformer transformer_add_condition_information_updown(
   case is_syntax_call:
     {
       entity f = call_function(syntax_call(s));
-      list args = call_arguments(syntax_call(s));
+      // FI: for the time being, I do not use ultimate_type()
+      type rt = functional_result(type_functional(entity_type(f)));
+      basic cb = copy_basic(variable_basic(type_variable(rt)));
+      if(basic_overloaded_p(cb)) {
+	type ert = expression_to_type(c);
+	cb = copy_basic(variable_basic(type_variable(ert)));
+      }
 
-      newpre = transformer_add_call_condition_information_updown
-	(pre, f, args, context, veracity, upwards);
+      if(ENTITY_LOGICAL_OPERATOR_P(f) || basic_logical_p(cb)) {
+	list args = call_arguments(syntax_call(s));
+
+	newpre = transformer_add_call_condition_information_updown
+	  (pre, f, args, context, veracity, upwards);
+      }
+      else if(basic_int_p(cb)) {
+	entity tmp_v = make_local_temporary_integer_value_entity();
+	transformer ct =
+	  safe_integer_expression_to_transformer(tmp_v, c, context, TRUE);
+	if(!veracity)
+	  ct = transformer_add_equality_with_integer_constant(ct, tmp_v, 0);
+	newpre = transformer_apply(ct, pre);
+	free_transformer(ct);
+	free_transformer(pre);
+      }
+      else {
+	transformer tf = expression_effects_to_transformer(c);
+	newpre = transformer_apply(tf, pre);
+	free_transformer(tf);
+	free_transformer(pre);
+      }
+      free_basic(cb);
       break;
     }
   case is_syntax_reference:
@@ -3242,6 +3278,7 @@ transformer condition_to_transformer(expression cond,
     new_pre_r = transformer_normalize(new_pre_r, 2);
     transformer ctf = transformer_add_condition_information_updown
       (transformer_identity(), tcond, new_pre_r, veracity, upwards);
+    transformer_temporary_value_projection(ctf);
     ctf = transformer_normalize(ctf, 2);
     tf = transformer_combine(tf, ctf);
     free_transformer(ctf);
