@@ -1,0 +1,217 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void whilewhile01()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(i) {i#init==0, 0<=i, i<=10}
+
+   
+   // The second internal while is not entered
+   while (i<=10) {
+
+//  T(i) {0<=i, i<=10, i#init<=i, 0<=i#init, i#init<=10}
+
+      while (i<=10&&i>=0)
+
+//  T(i) {i==i#init+1, 1<=i, i<=11}
+
+         i++;
+
+//  T(i) {i+1<=0, i<=i#init, i#init+1<=0}
+
+      while (i<=10&&i<0)
+
+//  T(i) {i==i#init-1, i+2<=0}
+
+         i--;
+   }
+
+//  T(i) {i==-1, i#init==11}
+
+   
+   // The non-termination is not detected, both loops are potentially entered
+   i = -1;
+
+//  T(i) {i#init==-1, 0<=i+1, i<=10}
+
+   while (i<=10)
+
+//  T(i) {0<=i, i<=11, 12i#init+1<=11i, i#init<=i, i<=i#init+11,
+//    i#init<=10}
+
+      if (1) {
+
+//  T(i) {0<=i, i<=10, i#init<=i, 0<=i#init, i#init<=10}
+
+         while (i<=10&&i>=0)
+
+//  T(i) {i==i#init+1, 1<=i, i<=11}
+
+            i++;
+
+//  T(i) {i+1<=0, i<=i#init, i#init+1<=0}
+
+         while (i<=10&&i<0)
+
+//  T(i) {i==i#init-1, i+2<=0}
+
+            i--;
+      }
+
+//  T(i) {i==-1, i#init==11}
+
+   
+   // This control point is not reachable, but the empty set is over
+   // approximated by i==11
+   
+   // The non-termination is detected, the second inner loop is not
+   // entered
+   // Note that the inner loops have been exchanged
+   i = -1;
+
+//  T() {i==-1}
+
+   while (i<=10)
+
+//  T(i) {i==11, 0<=i#init, i#init<=10}
+
+      if (1) {
+
+//  T(i) {i+1<=0, i<=i#init, i#init+1<=0}
+
+         while (i<=10&&i<0)
+
+//  T(i) {i==i#init-1, i+2<=0}
+
+            i--;
+
+//  T(i) {0<=i, i<=10, i#init<=i, 0<=i#init, i#init<=10}
+
+         while (i<=10&&i>=0)
+
+//  T(i) {i==i#init+1, 1<=i, i<=11}
+
+            i++;
+      }
+
+//  T() {0==-1}
+
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void whilewhile01()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   
+   // The second internal while is not entered
+   while (i<=10) {
+
+//  P(i) {0<=i, i<=10}
+
+      while (i<=10&&i>=0)
+
+//  P(i) {0<=i, i<=10}
+
+         i++;
+
+//  P(i) {i==11}
+
+      while (i<=10&&i<0)
+
+//  P() {0==-1}
+
+         i--;
+   }
+
+//  P(i) {i==11}
+
+   
+   // The non-termination is not detected, both loops are potentially entered
+   i = -1;
+
+//  P(i) {i==-1}
+
+   while (i<=10)
+
+//  P(i) {0<=i+1, i<=10}
+
+      if (1) {
+
+//  P(i) {0<=i+1, i<=10}
+
+         while (i<=10&&i>=0)
+
+//  P(i) {0<=i, i<=10}
+
+            i++;
+
+//  P(i) {0<=i+1, i<=11}
+
+         while (i<=10&&i<0)
+
+//  P(i) {i+1<=0}
+
+            i--;
+      }
+
+//  P(i) {i==11}
+
+   
+   // This control point is not reachable, but the empty set is over
+   // approximated by i==11
+   
+   // The non-termination is detected, the second inner loop is not
+   // entered
+   // Note that the inner loops have been exchanged
+   i = -1;
+
+//  P(i) {i==-1}
+
+   while (i<=10)
+
+//  P(i) {i==-1}
+
+      if (1) {
+
+//  P(i) {i==-1}
+
+         while (i<=10&&i<0)
+
+//  P(i) {i+1<=0}
+
+            i--;
+
+//  P() {0==-1}
+
+         while (i<=10&&i>=0)
+
+//  P() {0==-1}
+
+            i++;
+      }
+
+//  P() {0==-1}
+
+
+   return;
+}
