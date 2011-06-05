@@ -16,6 +16,11 @@ echo
 echo PRECONDITIONS
 echo
 
+# The transformer lists are not useful because the control has been
+# expanded wrt maisonneuve07-1 (while if if) and maisonneuve07-2
+# (while while while); the initial values of x and b are unknown but
+# both positive
+
 #setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
