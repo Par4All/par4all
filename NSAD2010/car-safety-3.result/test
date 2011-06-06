@@ -95,13 +95,13 @@ void main(int n)
          d++, s++;
    }
 
-//  P(d,s,t) {0<=d, s<=3d, d<=s+2t, s+3t<=3n+3, t<=n+1, s<=3, 3<=s+3t,
-//    2<=s+2t}
+//  P(d,s,t) {0<=d, s+2t<=d+2n+2, s<=3d, s<=d+2, d<=s+2t, 0<=n,
+//    0<=2n+s, s+3t<=3n+3, t<=n+1, s<=3, 3<=s+3t, 2<=s+2t, 0<=t}
 
    if (d<=2*n+3)
 
-//  P(d,s,t) {0<=d, d<=2n+3, s<=3d, d<=s+2t, s+3t<=3n+3, t<=n+1, s<=3,
-//    3<=s+3t, 2<=s+2t}
+//  P(d,s,t) {0<=d, d<=2n+3, s+2t<=d+2n+2, s<=3d, s<=d+2, d<=s+2t,
+//    0<=n, 0<=2n+s, s+3t<=3n+3, t<=n+1, s<=3, 3<=s+3t, 2<=s+2t, 0<=t}
 
       printf("healthy");
    else
