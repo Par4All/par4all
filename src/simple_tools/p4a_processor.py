@@ -674,6 +674,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         if (self.fortran == False):
+            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
             kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
         else:
