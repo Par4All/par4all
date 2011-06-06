@@ -13,6 +13,7 @@ static struct option long_options[] = {
       {0,0,0,0}
 };
 
+// out_summary_regions musn't core dump with argv declared as an array
 int getopt_long(int argc, char * const argv[],
                 const char *optstring,
                 const struct option *longopts, int *longindex) {

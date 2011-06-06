@@ -12,10 +12,10 @@ void out1() {
   for (j = 0; j < N; j += 1) {
     a[j] = 1;
     for (k = 0; k < N; k += 1)
-      // There should be an out region out here !
-      b[k] = a[j]; 
+      // There is an out region here
+      b[k] = a[j];
   }
-  printf("%d", b[0]);  // use of b[0] will generated a region out before !
+  printf("%d", b[0]);  // use of b[0] must generate an out region before!
 }
 
 void out2() {
@@ -24,13 +24,13 @@ void out2() {
     a[j] = 1;
     for (k = 0; k < N; k += 1)
       // Where has gone the out region ?
-      b[k] = a[j]; 
+      b[k] = a[j];
   }
-  printf("%d", b[0]);  // use of b[0] will generated a region out before !
+  printf("%d", b[0]);  // use of b[0] must generate an out region before!
 
-  /* This printf generate an ANYWHERE effect that 
-     used to make region out buggy  */
-  printf("%s", name); 
+  /* This printf generates an ANYWHERE effect that
+     makes out regions buggy  */
+  printf("%s", name);
 
 }
 
@@ -40,13 +40,13 @@ void out3() {
   for (j = 0; j < N; j += 1) {
     for (k = 0; k < N; k += 1)
       // without read on a[j], there's no issue with the out region
-      b[k] = 0; 
+      b[k] = 0;
   }
-  printf("%d", b[0]);  // use of b[0] will generated a region out before !
+  printf("%d", b[0]);  // use of b[0] must generate an out region before!
 
-  /* This printf generate an ANYWHERE effect that 
-     used to make region out buggy ... sometimes !  */
-  printf("%s", name); 
+  /* This printf generates an ANYWHERE effect that
+     makes out regions buggy ... sometimes but not here!  */
+  printf("%s", name);
 
 }
 
