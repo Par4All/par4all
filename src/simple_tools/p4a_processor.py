@@ -659,6 +659,12 @@ class p4a_processor(object):
 
 		#Apply requested phases to wrappers
         apply_user_requested_phases(wrappers, apply_phases_wrapper)
+        
+        # wrap kernel launch for communication optimization runtime
+        if self.com_optimization :
+            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
+            wrappers.cast_at_call_sites()
+
 
         # Select fortran wrappers by using the fact that all the generated
         # fortran wrappers
@@ -727,10 +733,6 @@ class p4a_processor(object):
             kernel_launchers.print_interface ()
             self.interface_modules.extend (map(lambda x:x.name, kernel_launchers))
             self.generated_modules.extend (map(lambda x:x.name, f_wrappers))
-
-        if self.com_optimization :
-            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
-            wrappers.cast_at_call_sites()
 
 		#Apply requested phases to kernels, wrappers and kernel_launchers after gpuify
         apply_user_requested_phases(kernels, apply_phases_after)
