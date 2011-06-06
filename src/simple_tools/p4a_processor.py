@@ -359,8 +359,8 @@ class p4a_processor(object):
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
         if fine:
-            #required for A&K algorithm on C source file
-            self.workspace.props.memory_effects_only = not self.fortran
+            #set to False (mandatory) for A&K algorithm on C source file
+            self.workspace.props.memory_effects_only = self.fortran
 
 		#Apply requested phases before parallezation
         apply_user_requested_phases(all_modules, apply_phases_before)
