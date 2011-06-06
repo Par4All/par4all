@@ -893,8 +893,8 @@ static void freia_terapix_call
   sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
   if (n_outs)
     sb_cat(body,
-           "  mcu_instr.out0 = &tile_out[0];\n"
-           "  mcu_instr.out1 = &tile_out[1];\n");
+           "  mcu_instr.out0 = tile_out[0];\n"
+           "  mcu_instr.out1 = tile_out[1];\n");
   else
     sb_cat(body,
            "  mcu_instr.out0 = NULL;\n"
@@ -904,8 +904,8 @@ static void freia_terapix_call
   sb_cat(body, "  mcu_instr.nbin = ", itoa(n_ins), ";\n");
   if (n_ins)
     sb_cat(body,
-           "  mcu_instr.in0 = &tile_in[0];\n"
-           "  mcu_instr.in1 = &tile_in[1];\n");
+           "  mcu_instr.in0 = tile_in[0];\n"
+           "  mcu_instr.in1 = tile_in[1];\n");
   else
     sb_cat(body,
            "  mcu_instr.in0 = NULL;\n"
@@ -914,8 +914,8 @@ static void freia_terapix_call
   sb_cat(body,
          "\n  // actual instructions\n"
          "  mcu_instr.nbinstr = ", itoa(n_ops), ";\n"
-         "  mcu_instr.instr0   = &mcu_macro[0];\n"
-         "  mcu_instr.instr1   = &mcu_macro[1];\n");
+         "  mcu_instr.instr0   = mcu_macro[0];\n"
+         "  mcu_instr.instr1   = mcu_macro[1];\n");
 
 
   // tell about imagelet size
