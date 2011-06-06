@@ -358,6 +358,9 @@ class p4a_processor(object):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
+        if fine:
+            #required for A&K algorithm on C source file
+            self.workspace.props.memory_effects_only = not self.fortran
 
 		#Apply requested phases before parallezation
         apply_user_requested_phases(all_modules, apply_phases_before)
