@@ -373,9 +373,9 @@ phase0: install-temporary-header
 .PHONY: install-temporary-header
 install-temporary-header:
 	$(INSTALL) -d $(INC.d)
-	test -f $(INC.d)/$(TARGET).h || \
+	test -f $(INC.d)/$(TARGET).h || { \
 	  test -f $(TARGET)-local.h && \
-	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h
+	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h ; }
 
 phase2:	$(INC_TARGET)
 
