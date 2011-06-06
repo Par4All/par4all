@@ -209,6 +209,7 @@ digraph "my_global_min_coord_helper_0_0" {
 
 ! acceleration function
 
+// freia terapix includes
 #include <freiaCommon.h>
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
@@ -236,7 +237,7 @@ freia_status my_global_min_coord_helper_0_0(
   freia_status ret;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
-  terapix_mcu_macro mcu_macro[2][1];
+  terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
 
   // imagelets definitions:
@@ -264,16 +265,16 @@ freia_status my_global_min_coord_helper_0_0(
   dyn_param.size = sizeof(terapix_gram);
   // set measure min! at 1023
   // 0: min!(1)
-  mcu_macro[0][0].macrocode.xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].macrocode.xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].macrocode.ymin1 = 0;
-  mcu_macro[1][0].macrocode.ymin1 = 0;
-  mcu_macro[0][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[1][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[0][0].macrocode.addrStart = TERAPIX_UCODE_MIN_COORD?;
-  mcu_macro[1][0].macrocode.addrStart = TERAPIX_UCODE_MIN_COORD?;
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_MIN_COORD?;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_MIN_COORD?;
   // inputs:
   // - imagelet 1 is i0 for i0
   tile_in[0][0].x = imagelet_io_1_0;
@@ -292,15 +293,18 @@ freia_status my_global_min_coord_helper_0_0(
 
   // outputs
   mcu_instr.nbout = 0;
-  mcu_instr.out = NULL;
+  mcu_instr.out0 = NULL;
+  mcu_instr.out1 = NULL;
 
   // inputs
   mcu_instr.nbin = 1;
-  mcu_instr.in = tile_in;
+  mcu_instr.in0 = &tile_in[0];
+  mcu_instr.in1 = &tile_in[1];
 
   // actual instructions
   mcu_instr.nbinstr = 1;
-  mcu_instr.instr   = mcu_macro;
+  mcu_instr.instr0   = &mcu_macro[0];
+  mcu_instr.instr1   = &mcu_macro[1];
 
   // call terapix runtime
   ret = freia_cg_template_process(&param, i0);
