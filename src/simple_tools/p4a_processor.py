@@ -561,6 +561,7 @@ class p4a_processor(object):
 
     def gpuify(self, filter_select = None,
                 filter_exclude = None,
+                fine = False,
                 apply_phases_kernel = [],
                 apply_phases_kernel_launcher = [],
                 apply_phases_wrapper = [],
@@ -609,6 +610,12 @@ class p4a_processor(object):
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
         kernel_launchers.coarse_grain_parallelization(concurrent=True)
+
+        
+        if fine:
+            # When using a fine-grain parallelization (Allen & Kennedy) for
+            # producing launchers, we have to do it also in the launcher now.
+            kernel_launchers.internalize_parallel_code(concurrent=True)
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
