@@ -71,21 +71,21 @@ int while05()
 
    while (--n) {
 
-//  P(i,n) {i+n==10}
+//  P(i,n) {8<=i+n, i+n<=9}
 
       printf("loop: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
-//  P(i,n) {i+n==10}
+//  P(i,n) {8<=i+n, i+n<=9}
 
       i++;
    }
 
-//  P(i,n) {10<=i+n, i+n<=11}
+//  P(i,n) {n==0, 8<=i, i<=9}
 
 
    printf("exit: i=%d, n=%d, i+n=%d\n", i, n, i+n);
 
-//  P(i,n) {10<=i+n, i+n<=11}
+//  P(i,n) {n==0, 8<=i, i<=9}
 
 
    return i;
