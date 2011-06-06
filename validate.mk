@@ -457,7 +457,7 @@ missing:
 	@ n=0; \
 	for res in $(F.res) ; do \
 	  if [ ! -d $$res ] ; then \
-	     echo "missing: $$res" ; \
+	     echo "missing result directory: $$res" ; \
 	     let n++; \
 	  fi ; \
 	done ; \
