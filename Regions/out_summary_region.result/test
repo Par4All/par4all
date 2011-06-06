@@ -1,0 +1,14 @@
+//
+// Initial code for module getopt_long
+//
+int getopt_long(int argc, char *argv[], const char *optstring, const struct option *longopts, int *longindex)
+{
+   return rand()-1;
+}
+//
+// Display print_code_out_regions for module getopt_long
+//
+int getopt_long(int argc, char *argv[], const char *optstring, const struct option *longopts, int *longindex)
+{
+   return rand()-1;
+}
