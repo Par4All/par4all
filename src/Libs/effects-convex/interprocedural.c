@@ -1418,15 +1418,19 @@ list c_convex_effects_on_actual_parameter_forward_translation
     case is_syntax_reference:
     case is_syntax_subscript:
       {
-	list l_real_arg = NIL;
 	effect eff_real;
 
 	pips_debug(5, "general case\n");
 
 	/* first we compute an effect on the real_arg */
-	l_real_arg = generic_proper_effects_of_complex_address_expression
-	  (real_exp, &eff_real, true);
-	gen_full_free_list(l_real_arg);
+	if (syntax_reference_p(real_s))
+	  eff_real = make_reference_region(syntax_reference(real_s), make_action_write_memory());
+	else
+	  {
+	    list l_real_arg = generic_proper_effects_of_complex_address_expression
+	      (real_exp, &eff_real, true);
+	    gen_full_free_list(l_real_arg);
+	  }
 
 	FOREACH(EFFECT, eff_orig, l_reg)
 	  {
