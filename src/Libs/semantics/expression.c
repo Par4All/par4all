@@ -841,14 +841,21 @@ static transformer transformer_add_condition_information_updown(
 	  (pre, f, args, context, veracity, upwards);
       }
       else if(basic_int_p(cb)) {
-	entity tmp_v = make_local_temporary_integer_value_entity();
-	transformer ct =
-	  safe_integer_expression_to_transformer(tmp_v, c, context, TRUE);
-	if(!veracity)
-	  ct = transformer_add_equality_with_integer_constant(ct, tmp_v, 0);
-	newpre = transformer_apply(ct, pre);
-	free_transformer(ct);
-	free_transformer(pre);
+	if(( ENTITY_ONE_P(f) && !veracity) ||
+	   (ENTITY_ZERO_P(f) && veracity)) {
+	  free_transformer(pre);
+	  newpre = transformer_empty();
+	}
+	else {
+	  entity tmp_v = make_local_temporary_integer_value_entity();
+	  transformer ct =
+	    safe_integer_expression_to_transformer(tmp_v, c, context, TRUE);
+	  if(!veracity)
+	    ct = transformer_add_equality_with_integer_constant(ct, tmp_v, 0);
+	  newpre = transformer_apply(ct, pre);
+	  free_transformer(ct);
+	  free_transformer(pre);
+	}
       }
       else {
 	transformer tf = expression_effects_to_transformer(c);
