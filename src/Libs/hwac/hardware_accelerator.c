@@ -49,6 +49,8 @@
 #include "freia.h"
 #include "hwac.h"
 
+/************************************************************ FREIA COMPILERS */
+
 /* compile FREIA calls for some target.
  */
 static int freia_compiler(string module, string hardware)
@@ -117,5 +119,5 @@ int freia_aipo_compiler(string module)
   return freia_compiler(module, "aipo");
 }
 
-/* freia_vhdl_compiler(string module) :-)
+/* int freia_vhdl_compiler(string module) :-)
  */
