@@ -133,3 +133,6 @@ typedef enum {SBRK_MEASURE, NET_MEASURE, GROSS_MEASURE} measurement_type;
 #define C_DIVISION(n,d) ((n)/(d))
 #define FORTRAN_MOD(n,m) (SIGN_EQ((n),(m)) ? ABS(n)%ABS(m) : -(ABS(n)%ABS(m)))
 #define C_MODULO(n,m) ((n)%(m))
+
+// redundant declaration to ease bootstrapping
+extern int the_current_debug_level;
