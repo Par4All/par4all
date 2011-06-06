@@ -692,8 +692,8 @@ class p4a_processor(object):
             kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
             if (self.c99 == True):
                 self.generated_modules.extend (map(lambda x:x.name, kernel_launchers))
-                self.generated_modules.extend (map(lambda x:x.name, wrappers))
-                self.generated_modules.extend (map(lambda x:x.name, kernels))
+                #self.generated_modules.extend (map(lambda x:x.name, wrappers))
+                #self.generated_modules.extend (map(lambda x:x.name, kernels))
         else:
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
@@ -1054,13 +1054,12 @@ class p4a_processor(object):
         if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
             os.makedirs (output_dir)
 
-        # During the cuda generation process, launchers kernels and wrappers
-        # might have
-        # been generated in different files. This is forbidden by cuda.
-        # Let's merge them in the same files
+        # Nvcc compiles .cu files as C++, thus we add extern C { declaration
+        # to prevent mangling
         if ((self.c99 == True) and (self.cuda == True)):
             self.launchers_insert_extern_C ()
-            self.merge_lwk ()
+            #no longer needed
+            #self.merge_lwk ()
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))
