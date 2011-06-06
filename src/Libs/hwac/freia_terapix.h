@@ -35,11 +35,12 @@
 #define trpx_gram_width "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
 
-#define FREIA_TRPX_INCLUDES			\
-  "#include <freiaCommon.h>\n"			\
+#define FREIA_TRPX_INCLUDES           \
+  "// freia terapix includes\n"       \
+  "#include <freiaCommon.h>\n"        \
   "#include <freiaMediumGrain.h>\n"		\
   "#include <freiaCoarseGrain.h>\n"		\
-  "#include <terapix.h>\n"			\
+  "#include <terapix.h>\n"            \
   "#include <terapix_ucode.h>\n"
 
 typedef struct {

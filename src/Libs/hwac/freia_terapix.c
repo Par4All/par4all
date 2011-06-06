@@ -343,34 +343,34 @@ static void terapix_image(string_buffer sb, int ff, int n)
 
 static void terapix_mcu_img(string_buffer code, int op, string ref, int n)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref, " = ");
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref, " = ");
   terapix_image(code, 0, n);
   sb_cat(code, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref, " = ");
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref, " = ");
   terapix_image(code, 1, n);
   sb_cat(code, ";\n");
 }
 
 static void terapix_mcu_int(string_buffer code, int op, string ref, int val)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref);
   sb_cat(code, " = ", itoa(val), ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref);
   sb_cat(code, " = ", itoa(val), ";\n");
 }
 
 static void terapix_mcu_val(string_buffer code, int op, string r, string s)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", r, " = ", s, ";\n");
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", r, " = ", s, ";\n");
 }
 
 static void terapix_mcu_pval(string_buffer code, int op, string ref,
                              string p, string s)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref,
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref,
          " = ", p, s, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref,
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref,
          " = ", p, s, ";\n");
 }
 
@@ -840,7 +840,8 @@ static void freia_terapix_call
   int imagelet_rows = available_memory/total_imagelets; // round down
 
   // declarations when we know the number of operations
-  sb_cat(decl, "  terapix_mcu_macro mcu_macro[2][", itoa(n_ops), "];\n");
+  // [2] for flip/flop double buffer handling
+  sb_cat(decl, "  terapix_mcu_macrocode mcu_macro[2][", itoa(n_ops), "];\n");
   if (n_ins)
     sb_cat(decl, "  terapix_tile_info tile_in[2][", itoa(n_ins), "];\n");
   if (n_outs)
@@ -891,21 +892,30 @@ static void freia_terapix_call
   sb_cat(body, "\n  // outputs\n");
   sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
   if (n_outs)
-    sb_cat(body, "  mcu_instr.out = tile_out;\n");
+    sb_cat(body,
+           "  mcu_instr.out0 = &tile_out[0];\n"
+           "  mcu_instr.out1 = &tile_out[1];\n");
   else
-    sb_cat(body, "  mcu_instr.out = NULL;\n");
+    sb_cat(body,
+           "  mcu_instr.out0 = NULL;\n"
+           "  mcu_instr.out1 = NULL;\n");
 
   sb_cat(body, "\n  // inputs\n");
   sb_cat(body, "  mcu_instr.nbin = ", itoa(n_ins), ";\n");
   if (n_ins)
-    sb_cat(body, "  mcu_instr.in = tile_in;\n");
+    sb_cat(body,
+           "  mcu_instr.in0 = &tile_in[0];\n"
+           "  mcu_instr.in1 = &tile_in[1];\n");
   else
-    sb_cat(body, "  mcu_instr.in = NULL;\n");
+    sb_cat(body,
+           "  mcu_instr.in0 = NULL;\n"
+           "  mcu_instr.in1 = NULL;\n");
 
   sb_cat(body,
          "\n  // actual instructions\n"
          "  mcu_instr.nbinstr = ", itoa(n_ops), ";\n"
-         "  mcu_instr.instr   = mcu_macro;\n");
+         "  mcu_instr.instr0   = &mcu_macro[0];\n"
+         "  mcu_instr.instr1   = &mcu_macro[1];\n");
 
 
   // tell about imagelet size
