@@ -389,18 +389,18 @@ freia_status border_dead_helper_0_0(
 
   // outputs
   mcu_instr.nbout = 1;
-  mcu_instr.out0 = &tile_out[0];
-  mcu_instr.out1 = &tile_out[1];
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
 
   // inputs
   mcu_instr.nbin = 1;
-  mcu_instr.in0 = &tile_in[0];
-  mcu_instr.in1 = &tile_in[1];
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
 
   // actual instructions
   mcu_instr.nbinstr = 2;
-  mcu_instr.instr0   = &mcu_macro[0];
-  mcu_instr.instr1   = &mcu_macro[1];
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   ret = freia_cg_template_process(&param, o0, i0);
