@@ -70,3 +70,9 @@ extern void tp_restart(FILE *);
 
 #define skip_blanks(str) \
   while (*str && (*str==' ' || *str=='\t' || *str=='\n')) str++
+
+// redundant declarations to help bootstrap?
+extern bool tpips_execution_mode;
+extern bool tpips_is_interactive;
+extern bool jpips_is_running;
+extern bool tpips_init_done;
