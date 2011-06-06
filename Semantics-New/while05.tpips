@@ -1,5 +1,3 @@
-# Would have been easier if located in Semantics-New
-
 setenv WSPACE=while05
 delete $WSPACE
 setenv FILE=$WSPACE.c
@@ -21,7 +19,7 @@ setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
 
 # This property leads to what is according to me a wrong invariant
 # x+y<=10 in the while loop
-#setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
 
 echo
 echo Transformers for "while05"
