@@ -79,7 +79,8 @@ def process(input):
                 # Generate code for a GPU-like accelerator. Note that we can
                 # have an OpenMP implementation of it if OpenMP option is set
                 # too:
-                processor.gpuify(apply_phases_kernel = input.apply_phases['akg'],
+                processor.gpuify(fine = input.fine,
+                        apply_phases_kernel = input.apply_phases['akg'],
                         apply_phases_kernel_launcher = input.apply_phases['aklg'],
                         apply_phases_wrapper = input.apply_phases['awg'],
                         apply_phases_after = input.apply_phases['aag'])
