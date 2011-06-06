@@ -5255,6 +5255,8 @@ static IntrinsicDescriptor IntrinsicTypeDescriptorTable[] =
   {GETEXECNAME_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {GETLOGIN_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {GETOPT_FUNCTION_NAME, 3, default_intrinsic_type, 0, 0},
+  {GETOPT_LONG_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
+  {GETOPT_LONG_ONLY_FUNCTION_NAME, 5, default_intrinsic_type, 0, 0},
   {GETPASS_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {GETPASSPHRASE_FUNCTION_NAME, 1, default_intrinsic_type, 0, 0},
   {GETPW_FUNCTION_NAME, 2, default_intrinsic_type, 0, 0},

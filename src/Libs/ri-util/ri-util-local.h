@@ -437,7 +437,9 @@
 #define GETCWD_FUNCTION_NAME            "getcwd"
 #define GETEXECNAME_FUNCTION_NAME       "getexecname"
 #define GETLOGIN_FUNCTION_NAME          "getlogin"
-#define GETOPT_FUNCTION_NAME            "getopt"
+#define GETOPT_FUNCTION_NAME            "getopt" // unistd.h
+#define GETOPT_LONG_FUNCTION_NAME       "getopt_long"
+#define GETOPT_LONG_ONLY_FUNCTION_NAME  "getopt_long_only"
 #define GETPASS_FUNCTION_NAME           "getpass"
 #define GETPASSPHRASE_FUNCTION_NAME     "getpassphrase"
 #define GETPW_FUNCTION_NAME             "getpw"
