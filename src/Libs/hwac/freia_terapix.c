@@ -615,7 +615,7 @@ static void freia_terapix_call
          "  param.size = -1; // not used\n"
          "  param.raw = (void*) &mcu_instr;\n"
          "\n"
-         "  // dyn_param contents"
+         "  // dyn_param contents\n"
          "  dyn_param.raw = &gram;\n"
          "  dyn_param.size = sizeof(terapix_gram);\n");
 
