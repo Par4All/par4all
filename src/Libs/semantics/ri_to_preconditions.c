@@ -827,7 +827,7 @@ transformer statement_to_postcondition(
 	/* BC: pre = transformer_normalize(pre, 4); */
 	/* FI->BC: why keep a first normalization before the next
 	   one? */
-	pre = transformer_normalize(pre, 2);
+	// pre = transformer_normalize(pre, 2);
 
 	if(!transformer_consistency_p(pre)) {
 	  ;
@@ -849,7 +849,11 @@ transformer statement_to_postcondition(
 	}
 
 	/* Do not keep too many initial variables in the
-	 * preconditions: not so smart?
+	 * preconditions: not so smart? invariance01.c: information is
+	 * lost... Since C passes values, it is usually useless to
+	 * keep track of the initial values of arguments because
+	 * programmers usually do not modify them. However, when they
+	 * do modify the formal parameter, information is lost.
 	 *
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
