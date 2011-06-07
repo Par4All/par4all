@@ -5549,6 +5549,24 @@ coarse_grain_parallelization > MODULE.code
         < MODULE.inv_regions
 \end{PipsMake}
 
+\begin{PipsPass}{coarse_grain_parallelization_with_reduction}
+  Function \PipsPassRef{coarse_grain_parallelization_with_reduction} extend the
+  standard \PipsPassRef{coarse_grain_parallelization} by using reduction 
+  detection informations.
+\end{PipsPass}
+
+
+
+\begin{PipsMake}
+coarse_grain_parallelization_with_reduction > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+        < MODULE.cumulated_reductions
+        < MODULE.proper_reductions
+        < MODULE.inv_regions
+\end{PipsMake}
+
 
 \subsection{Global Loop Nest Parallelization}
 
@@ -9452,6 +9470,32 @@ old_reductions                      > MODULE.code
         < MODULE.code
         < MODULE.cumulated_effects
 \end{PipsMake}
+
+
+\subsection{Reduction Replacement}
+
+
+\begin{PipsPass}{replace_reduction_with_atomic}
+\PipsPassRef{replace_reduction_with_atomic} replace all reduction in loop that
+are marked as parallel with reduction by 
+\PipsPassRef{coarse_grain_parallelization_with_reduction}.
+
+The property \PipsPropRef{ATOMIC_OPERATION_PROFILE} control the set of atomic
+operations and operand allowed. At that time only ``cuda'' is supported.
+\end{PipsPass}
+
+\begin{PipsProp}{ATOMIC_OPERATION_PROFILE}
+ATOMIC_OPERATION_PROFILE "cuda"
+\end{PipsProp}
+
+
+\begin{PipsMake}
+replace_reduction_with_atomic > MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_reductions
+\end{PipsMake}
+
 
 
 \subsection{Forward Substitution}

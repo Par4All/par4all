@@ -285,7 +285,7 @@ update_compatible_reduction_with(
  * under effects le and reductions reds.
  * returns whether worth to go on.
  * conditions:
- */  
+ */
 bool
 update_compatible_reduction(
     reduction *pr,
@@ -674,7 +674,8 @@ call_proper_reduction_p (
   //no right operand for unary operator
   if (unary_op == FALSE) erhs = EXPRESSION(CAR(CDR(le)));
   if (syntax_reference_p(expression_syntax(elhs)) == FALSE) {
-    pips_user_warning ("not handled case, no reduction will be detected\n");
+    pips_user_warning ("The left hand side of assignment is not a reference, "
+        "this is not handled and no reduction will be detected\n");
     return FALSE;
   }
   lhs = syntax_reference(expression_syntax(elhs));
@@ -737,3 +738,56 @@ call_proper_reduction_p (
   DEBUG_REDUCTION(7, "returning\n", *red);
   return TRUE;
 }
+
+
+/**
+ * Return the "other part" of the reduction. If the statement is :
+ * sum = sum + a[i];
+ * then we'll return a[i]
+ */
+expression get_complement_expression(statement s, reference reduced) {
+  expression complement = expression_undefined;
+  // We handle only trivial cases
+  if(statement_call_p(s)) {
+    call c = statement_call(s);
+    entity fct = call_function(c);
+    list le = call_arguments(c);
+    tag op;
+    bool comm = FALSE; // Commutativity
+    // Differentiate unary && binary operators
+    if(extract_reduction_unary_update_operator(fct, &op)) {
+      // ++ or --  : we return 1
+      pips_debug(3,"We have an unary operator\n");
+      complement = int_to_expression(1);
+    } else if(extract_reduction_update_operator(fct, &op, &comm)) {
+      expression rhs = EXPRESSION(CAR(CDR(le)));
+      if(expression_call_p(rhs)) {
+        list args = call_arguments(expression_call(rhs));
+        pips_assert("Have a binary operator\n", gen_length(args)==2);
+        /* try to find out which of the two expression corresponds to the
+         * reduced reference. We'll return the other...
+         */
+        expression e1 = EXPRESSION(CAR(args));
+        expression e2 = EXPRESSION(CAR(CDR(args)));
+        if(expression_reference_p(e1) &&
+            same_ref_name_p(reduced,expression_reference(e1))) {
+          complement = e2;
+        } else if(expression_reference_p(e2) &&
+            same_ref_name_p(reduced,expression_reference(e2))) {
+          complement = e2;
+        } else {
+          pips_user_warning("Atomic operation replacement seems less general"
+              " than reduction detection. This merits a bug report !\n");
+        }
+      } else {
+        pips_user_warning("Atomic operation replacement seems less general than"
+            " reduction detection. This merits a bug report !\n");
+      }
+    } else {
+      pips_internal_error("We have a reduction, but the statement is neither an"
+          " unary nor a binary ? It's a bug, sorry no choice but abort !\n");
+    }
+  }
+  return complement;
+}
+

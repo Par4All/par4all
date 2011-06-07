@@ -74,7 +74,12 @@ typedef dg_vertex_label vertex_label;
 
 #include "ricedg.h"
 
+#include "reductions_private.h"
+#include "reductions.h"
+
+
 static bool local_use_reductions_p;
+GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
 
 
 /** Parallelize a loop by using region informations to prove iteration
@@ -107,6 +112,19 @@ static bool whole_loop_parallelize(loop l)
 
   pips_debug(1,"begin\n");
 
+  set lreductions = set_make(set_pointer);
+  if(local_use_reductions_p) {
+    pips_debug(1,"Fetching reductions for this loop\n");
+//    reduction_reference(r);
+    reductions rs = (reductions)load_statement_reductions(loop_stat);
+    FOREACH(REDUCTION,r,reductions_list(rs)) {
+      print_reduction(r);
+      entity e = reference_variable(reduction_reference(r));
+      pips_debug(1,"Ignoring dependences on %s for this loop\n",entity_local_name(e));
+      set_add_element(lreductions,lreductions,e);
+    }
+  }
+
   pips_debug(1,"building conflicts\n");
   ifdebug(2) {
     fprintf(stderr, "original invariant regions:\n");
@@ -119,7 +137,9 @@ static bool whole_loop_parallelize(loop l)
     reference r = effect_any_reference(reg);
     int d = gen_length(reference_indices(r));
 
-    if (region_write_p(reg) && store_effect_p(reg) && !(thread_safe_p && thread_safe_variable_p(e))) {
+    if (region_write_p(reg) && store_effect_p(reg) &&  !(thread_safe_p && thread_safe_variable_p(e))
+        && !(local_use_reductions_p && set_belong_p(lreductions,e))
+        ) {
       conflict conf = conflict_undefined;
 
       /* Add a write-write conflict to the list: */
@@ -296,6 +316,12 @@ static bool coarse_grain_parallelization_main(string module_name,
 
     /* Warn everybody here if we use or not reductions: */
     local_use_reductions_p = use_reductions_p;
+    if(local_use_reductions_p) {
+      set_statement_reductions(
+          (pstatement_reductions)db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
+                                                        module_name,
+                                                        TRUE));
+    }
 
     /* Get the code of the module. */
     /* Build a copy of the CODE since we rewrite it on the fly to build a
@@ -344,6 +370,9 @@ static bool coarse_grain_parallelization_main(string module_name,
     print_parallelization_statistics
 	(module_name, "post", module_stat);
 
+    if(local_use_reductions_p) {
+      reset_statement_reductions();
+    }
     reset_current_module_entity();
     reset_current_module_statement();
     reset_cumulated_rw_effects();
@@ -364,8 +393,6 @@ bool coarse_grain_parallelization(string module_name) {
   return coarse_grain_parallelization_main(module_name, FALSE);
 }
 
-#if 0
-
 /** Parallelize code by using region informations to prove iteration
     independance. Use reduction information to filter out false
     dependencies.
@@ -376,9 +403,7 @@ bool coarse_grain_parallelization(string module_name) {
     @param module_name is the name of the module to parallelize
     @return TRUE in case of success. Indeed, return always true. :-)
  */
-static bool coarse_grain_parallelization_with_reduction(string module_name) {
+bool coarse_grain_parallelization_with_reduction(string module_name) {
   /* Use reductions: */
-  /* not implemented: */
   return coarse_grain_parallelization_main(module_name, TRUE);
 }
-#endif
