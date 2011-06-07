@@ -4865,9 +4865,12 @@ in_summary_regions              > MODULE.in_summary_regions
 \index{OUT Summary Regions}
 \index{Summary Regions (OUT)}
 
+\begin{PipsPass}{out_summary_regions}
 This pass computes the OUT convex array regions of a module. They
 contain the array elements and scalars whose values impact the
 continuation of the module.
+\end{PipsPass}
+
 
 See Section~\ref{subsubsection-out-regions}.
 
@@ -5094,11 +5097,10 @@ expression and subexpression by the points-to analysis.
 \index{Pointer Values Analyses}
 
 \begin{PipsPass}{simple_pointer_values}
-\end{PipsPass}
-
 Pointer values analysis is another kind of pointer analysis which tries
 to gather \emph{Pointer Values} both in terms of other pointer values
 but also of memory addresses. This phase is under development.
+\end{PipsPass}
 
 
 \begin{PipsMake}
