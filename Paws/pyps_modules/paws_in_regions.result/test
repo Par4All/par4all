@@ -1,0 +1,53 @@
+
+//  <image[PHI1][PHI2].re-IN-MAY-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
+
+int main()
+{
+
+   int i, j;
+
+   compute(image);
+
+//  <image[PHI1][PHI2].re-IN-EXACT-{0<=PHI1, PHI1<=63, 0<=PHI2,
+//    PHI2<=63}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
+
+
+   for(i = 0; i <= 63; i += 1)
+
+//  <image[PHI1][PHI2].re-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=63, 0<=i,
+//    i<=63}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{PHI1==1}>
+
+      for(j = 0; j <= 63; j += 1)
+
+//  <image[PHI1][PHI2].re-IN-EXACT-{PHI1==i, PHI2==j, 0<=i, i<=63,
+//    0<=j, j<=63}>
+//  <stdout-IN-EXACT-{}>
+//  <stdout[PHI1]-IN-MAY-{PHI1==0}>
+//  <__IO_EFFECTS:LUNS[PHI1]-IN-EXACT-{PHI1==1}>
+
+         fprintf(stdout, "[%d][%d].re = %f\n", i, j, image[i][j].re);
+
+   return 0;
+}
+
+void compute(complex image[64][64])
+{
+   int i, j;
+
+   for(i = 0; i <= 63; i += 1)
+      for(j = 0; j <= 63; j += 1) {
+         image[i][j].re = (i+j)*3.14159265358979323846;
+         image[i][j].im = 1.0e-37;
+      }
+}
+
