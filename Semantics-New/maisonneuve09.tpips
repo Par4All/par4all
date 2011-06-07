@@ -21,7 +21,7 @@ echo
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 # BUG Provides information about variable "b" if set to TRUE
-setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
 
 # Provides information about variable "b" if set to TRUE
 setproperty SEMANTICS_USE_LIST_PROJECTION TRUE

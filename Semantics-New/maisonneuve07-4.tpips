@@ -16,9 +16,9 @@ echo
 echo PRECONDITIONS
 echo
 
-# Must be set to TRUE, as well as one of the next two properties to
-# find the bounds on x due to b. The while{while;while} transformation
-# is not needed
+# Must be set to TRUE, as well as the last property to find the bounds
+# on x due to b. The while{while;while} transformation is not needed.
+# Refinement is not needed.
 
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
@@ -31,6 +31,7 @@ setproperty SEMANTICS_USE_LIST_PROJECTION TRUE
 
 # Bug in implementation
 # TTF: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
+# TTF: {0<=b, 0<=t+x, x<=t}
 
 # TFT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
 # TTT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}

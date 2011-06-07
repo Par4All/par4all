@@ -19,7 +19,7 @@ setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
 
 # This property leads to what is according to me a wrong invariant
 # x+y<=10 in the while loop
-setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+# setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
 
 echo
 echo Transformers for "while05"
@@ -34,6 +34,7 @@ echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[while05]
+
 close
 delete $WSPACE
 quit

@@ -1,0 +1,85 @@
+delete nested01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create nested01 nested01.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+#setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+quit
+
+echo
+echo Try to refine the transformers: first refinement
+echo
+
+apply REFINE_TRANSFORMERS
+
+echo
+echo TRANSFORMERS after first refinement
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PRECONDITIONS after first refinement
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+quit
+
+echo
+echo Try to refine the transformers: second refinement
+echo
+
+echo This generates an overflow. Not a surprise given the coefficients
+echo of the constraints after the first refinement
+
+quit
+
+apply REFINE_TRANSFORMERS
+
+echo
+echo TRANSFORMERS after second refinement
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+# quit
+
+echo
+echo PRECONDITIONS after second refinement
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+# delete nested01
+quit
