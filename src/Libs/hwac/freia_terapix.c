@@ -514,6 +514,8 @@ static void terapix_macro_code
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
+  terapix_mcu_val(code, op, "iter3", "0");
+  terapix_mcu_val(code, op, "iter4", "0");
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
 }
 
@@ -888,6 +890,8 @@ static void freia_terapix_call
   sb_cat(body, "  mcu_instr.borderBottom = ", itoa(s), ";\n");
   sb_cat(body, "  mcu_instr.borderLeft   = ", itoa(w), ";\n");
   sb_cat(body, "  mcu_instr.borderRight  = ", itoa(e), ";\n");
+  sb_cat(body, "  mcu_instr.imagelet_height = imagelet_size;\n");
+  sb_cat(body, "  mcu_instr.imagelet_width  = 128;\n");
 
   sb_cat(body, "\n  // outputs\n");
   sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
