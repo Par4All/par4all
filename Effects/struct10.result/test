@@ -335,10 +335,11 @@ int main()
 
 Cumulated effects for "main"
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
 int main()
@@ -349,10 +350,11 @@ int main()
    s_with_array_of_struct_with_array g, h;
 
    int i, j;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
 //                               _MALLOC_EFFECTS:_MALLOC_ 
 //                               __IO_EFFECTS:LUNS[1]
    
@@ -381,9 +383,10 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with pointer copy : \n");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 9; i += 1) {
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
@@ -464,14 +467,16 @@ int main()
 //             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
       printf("\nstruct with array of structs with pointer copy : \n");
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
       for(i = 0; i <= 4; i += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stdout stdout[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stdout[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[1]
          for(j = 0; j <= 9; j += 1) {
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
@@ -545,6 +550,9 @@ int main()
 Printed files with regions
 
 
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
@@ -561,6 +569,9 @@ int main()
 
    int i, j;
 
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
@@ -613,6 +624,9 @@ int main()
 
       printf("\nstruct with pointer copy : \n");
 
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -747,6 +761,9 @@ int main()
 
       printf("\nstruct with array of structs with pointer copy : \n");
 
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
@@ -754,6 +771,9 @@ int main()
 
       for(i = 0; i <= 4; i += 1)
 
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>

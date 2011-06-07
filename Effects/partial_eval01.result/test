@@ -52,9 +52,9 @@ int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 
 Initial code with cumulated effects for "main"
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {
