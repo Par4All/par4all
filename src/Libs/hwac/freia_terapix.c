@@ -605,7 +605,8 @@ static void freia_terapix_call
          "  terapix_mcu_instr mcu_instr;\n");
 
   sb_cat(body,
-         "\n  // body:\n"
+         "\n"
+         "  // body:\n"
          "  // mcode param\n"
          "  mcode.raw = (void*) terapix_ucode_array;\n"
          "  mcode.size = TERAPIX_UCODE_SIZE_T;\n"
@@ -648,9 +649,7 @@ static void freia_terapix_call
       string sn = strdup(itoa(n)), si = strdup(itoa(n_imagelets));
 
       // ??? tell that n_imagelets is an input
-      sb_cat(dbio, "  // - imagelet ", si);
-      sb_cat(dbio, " is i", sn);
-      sb_cat(dbio, " for ",
+      sb_cat(dbio, "  // - imagelet ", si, " is i", sn, " for ",
              entity_user_name(vtxcontent_out(dagvtx_content(in))),
              "\n");
 
@@ -671,7 +670,7 @@ static void freia_terapix_call
 
   set avail_img = set_make(set_pointer);
 
-  // complete if need be, there will be AT LEAST this numer of images
+  // complete if need be, there will be AT LEAST this number of images
   while (n_imagelets<n_double_buffers)
     set_add_element(avail_img, avail_img, (void*) (_int) ++n_imagelets);
 
@@ -682,6 +681,7 @@ static void freia_terapix_call
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(thedag)));
   FOREACH(dagvtx, current, vertices)
   {
+    // skip this vertex
     if (set_belong_p(computed, current))
       continue;
     if (dagvtx_other_stuff_p(current))
@@ -728,6 +728,7 @@ static void freia_terapix_call
     sb_cat(body, "  // ", itoa(n_ops), ": ", api->compact_name, "(");
     if (ins)
     {
+      // show input imagelet numbers
       int in_count=0;
       FOREACH(int, i, ins)
         sb_cat(body, in_count++? ",": "", itoa(i>0? i: -i));
@@ -742,7 +743,9 @@ static void freia_terapix_call
       // SELECT one available
       choice = select_imagelet(avail_img, &n_imagelets, is_output);
       sb_cat(body, " -> ", itoa((int) choice));
-      if (is_output) choice = -choice;
+      // there is a subtlety here, if no I/O image was available
+      // then a copy will have to be inserted later on, see "PANIC".
+      if (is_output && choice<=n_double_buffers) choice = -choice;
       hash_put(allocation, current, (void*) choice);
     }
     sb_cat(body, "\n");
@@ -808,8 +811,10 @@ static void freia_terapix_call
         sb_cat(body, "  // copy ", itoa(old));
         sb_cat(body, " -> ", itoa(oimg), "\n");
         list lic = CONS(int, old, NIL);
+        // -oimg to tell the code generator that we are dealing with
+        // a double buffered image...
         terapix_macro_code(body, decl, n_ops, hwac_freia_api(AIPO "copy"),
-                           NULL, NULL, NULL, lic, oimg);
+                           NULL, NULL, NULL, lic, -oimg);
         gen_free_list(lic);
         n_ops++;
       }
