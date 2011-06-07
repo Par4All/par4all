@@ -14,7 +14,7 @@ static struct option long_options[] = {
 };
 
 // out_summary_regions musn't core dump with argv declared as an array
-int getopt_long(int argc, char * const argv[],
+int my_getopt_long(int argc, char * const argv[],
                 const char *optstring,
                 const struct option *longopts, int *longindex) {
   return rand()-1;
@@ -28,7 +28,7 @@ main ( int argc, char *argv[] )
   const char *input_file = NULL;
   float *m, *mm;
   int do_verify;
-  while ((opt = getopt_long(argc, argv, "::vs:i:", 
+  while ((opt = my_getopt_long(argc, argv, "::vs:i:",
                             long_options, &option_index)) != -1 ) {
       switch(opt){
         case 'v':
