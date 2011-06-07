@@ -826,8 +826,10 @@ transformer statement_to_postcondition(
 	}
 	/* BC: pre = transformer_normalize(pre, 4); */
 	/* FI->BC: why keep a first normalization before the next
-	   one? */
-	// pre = transformer_normalize(pre, 2);
+	   one? FI: Because a level 2 normalization does things that
+	   a level 4 does not perform! Although level 2 is much
+	   faster... */
+	pre = transformer_normalize(pre, 2);
 
 	if(!transformer_consistency_p(pre)) {
 	  ;
