@@ -1375,8 +1375,8 @@ freia_status freia_scalar_05_helper_0_2(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][1].xmin2 = imagelet_2;
+  mcu_macro[1][1].xmin2 = imagelet_2;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   // copy of operation 1 parameters
@@ -1404,8 +1404,8 @@ freia_status freia_scalar_05_helper_0_2(
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // set measure min at 1022
   // 2: min(2)
-  mcu_macro[0][2].xmin1 = imagelet_io_2_0;
-  mcu_macro[1][2].xmin1 = imagelet_io_2_1;
+  mcu_macro[0][2].xmin1 = imagelet_2;
+  mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
   mcu_macro[0][2].iter1 = TERAPIX_PE_NUMBER;
@@ -1423,8 +1423,8 @@ freia_status freia_scalar_05_helper_0_2(
   mcu_macro[1][3].xmin1 = imagelet_2;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
-  mcu_macro[0][3].xmin2 = imagelet_1;
-  mcu_macro[1][3].xmin2 = imagelet_1;
+  mcu_macro[0][3].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][3].xmin2 = imagelet_io_1_1;
   mcu_macro[0][3].ymin2 = 0;
   mcu_macro[1][3].ymin2 = 0;
   mcu_macro[0][3].iter1 = TERAPIX_PE_NUMBER;

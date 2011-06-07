@@ -956,8 +956,8 @@ freia_status copy_00_helper_0_0(
   mcu_macro[1][8].xmin2 = imagelet_5;
   mcu_macro[0][8].ymin2 = 0;
   mcu_macro[1][8].ymin2 = 0;
-  mcu_macro[0][8].xmin3 = imagelet_io_3_0;
-  mcu_macro[1][8].xmin3 = imagelet_io_3_1;
+  mcu_macro[0][8].xmin3 = imagelet_3;
+  mcu_macro[1][8].xmin3 = imagelet_3;
   mcu_macro[0][8].ymin3 = 0;
   mcu_macro[1][8].ymin3 = 0;
   mcu_macro[0][8].iter1 = TERAPIX_PE_NUMBER;
@@ -998,8 +998,8 @@ freia_status copy_00_helper_0_0(
   mcu_macro[1][10].xmin1 = imagelet_3;
   mcu_macro[0][10].ymin1 = 0;
   mcu_macro[1][10].ymin1 = 0;
-  mcu_macro[0][10].xmin2 = imagelet_2;
-  mcu_macro[1][10].xmin2 = imagelet_2;
+  mcu_macro[0][10].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][10].xmin2 = imagelet_io_2_1;
   mcu_macro[0][10].ymin2 = 0;
   mcu_macro[1][10].ymin2 = 0;
   mcu_macro[0][10].iter1 = TERAPIX_PE_NUMBER;

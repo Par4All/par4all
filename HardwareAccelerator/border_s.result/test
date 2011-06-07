@@ -322,8 +322,8 @@ freia_status border_s_helper_0_0(
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
   mcu_macro[1][0].ymin1 = 0;
-  mcu_macro[0][0].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][0].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][0].xmin2 = imagelet_2;
+  mcu_macro[1][0].xmin2 = imagelet_2;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   // copy of operation 0 parameters
@@ -354,8 +354,8 @@ freia_status border_s_helper_0_0(
   mcu_macro[1][1].xmin1 = imagelet_2;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_1;
-  mcu_macro[1][1].xmin2 = imagelet_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;

@@ -1173,8 +1173,8 @@ freia_status freia_20_helper_0_0(
   mcu_macro[1][12].xmin1 = imagelet_1;
   mcu_macro[0][12].ymin1 = 0;
   mcu_macro[1][12].ymin1 = 0;
-  mcu_macro[0][12].xmin2 = imagelet_io_2_0;
-  mcu_macro[1][12].xmin2 = imagelet_io_2_1;
+  mcu_macro[0][12].xmin2 = imagelet_2;
+  mcu_macro[1][12].xmin2 = imagelet_2;
   mcu_macro[0][12].ymin2 = 0;
   mcu_macro[1][12].ymin2 = 0;
   mcu_macro[0][12].xmin3 = x_0;
@@ -1196,8 +1196,8 @@ freia_status freia_20_helper_0_0(
   mcu_macro[1][13].xmin1 = imagelet_2;
   mcu_macro[0][13].ymin1 = 0;
   mcu_macro[1][13].ymin1 = 0;
-  mcu_macro[0][13].xmin2 = imagelet_1;
-  mcu_macro[1][13].xmin2 = imagelet_1;
+  mcu_macro[0][13].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][13].xmin2 = imagelet_io_1_1;
   mcu_macro[0][13].ymin2 = 0;
   mcu_macro[1][13].ymin2 = 0;
   mcu_macro[0][13].iter1 = TERAPIX_PE_NUMBER;
