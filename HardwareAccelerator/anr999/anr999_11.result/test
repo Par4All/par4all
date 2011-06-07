@@ -2110,7 +2110,7 @@ freia_status anr999_helper_0_0(
   mcu_instr.borderLeft   = 10;
   mcu_instr.borderRight  = 10;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 2;

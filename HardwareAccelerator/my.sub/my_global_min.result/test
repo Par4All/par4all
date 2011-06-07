@@ -289,7 +289,7 @@ freia_status my_global_min_helper_0_0(
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 0;

@@ -1231,7 +1231,7 @@ freia_status freia_20_helper_0_0(
   mcu_instr.borderLeft   = 13;
   mcu_instr.borderRight  = 13;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 1;

@@ -1050,7 +1050,7 @@ freia_status freia_28_helper_0_0(
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 1;
@@ -1337,7 +1337,7 @@ freia_status freia_28_helper_0_1(
   mcu_instr.borderLeft   = 1;
   mcu_instr.borderRight  = 1;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 2;
@@ -1523,7 +1523,7 @@ freia_status freia_28_helper_0_2(
   mcu_instr.borderLeft   = 1;
   mcu_instr.borderRight  = 1;
   mcu_instr.imagelet_height = imagelet_size;
-  mcu_instr.imagelet_width  = 128;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 1;
