@@ -891,7 +891,7 @@ static void freia_terapix_call
   sb_cat(body, "  mcu_instr.borderLeft   = ", itoa(w), ";\n");
   sb_cat(body, "  mcu_instr.borderRight  = ", itoa(e), ";\n");
   sb_cat(body, "  mcu_instr.imagelet_height = imagelet_size;\n");
-  sb_cat(body, "  mcu_instr.imagelet_width  = 128;\n");
+  sb_cat(body, "  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;\n");
 
   sb_cat(body, "\n  // outputs\n");
   sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
