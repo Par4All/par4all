@@ -1,53 +1,56 @@
-echo c     OPTIMIZATION BY UNROLLING OF LOOP 100 AND 200,
-echo c     AND BY REPETITIVE PARTIAL EVALUATION
-# Optimization by unrolling of loop 100 and 200,
+# Optimization by unrolling of loop 100 and 200 in function 'convol',
 # and by repetitive partial evaluation
 
 delete convol-unroll
 create convol-unroll convol-unroll.f
 
-setproperty	PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+# Do not number statements at the end of the line.
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
 
 echo c     SHOW convolution FUNCTION
 echo 
 # Show convolution function
 
+
 module convol
 display PRINTED_FILE
 
 echo c     SHOW main PROGRAM
+echo c     NOTICE THE ITERATIVE CALLS TO THE convol FUNCTION
 echo 
 # Show main program
-#
+
+
 module IMAGE_PROCESSING
 display PRINTED_FILE
 
-echo c     SHOW INTERPROCEDURAL PRECONDITIONS FOR MODULE convol
+echo c     INTERPROCEDURAL PRECONDITIONS FOR MODULE convol
 echo 
-# Show interprocedural preconditions for module convol
-#
-module convol
+# Show interprocedural preconditions for module 'convol'
+# Image size is 512 x 512 and the convolution kernel is 3 x 3.
 
-activate INTERPROCEDURAL_SUMMARY_PRECONDITION
-activate PRECONDITIONS_INTER_FULL 
-activate TRANSFORMERS_INTER_FULL  
+
+module convol
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE
 
-activate PRINT_CODE
-
 echo c     AFTER CONSTANT PROPAGATION
+echo c     NOTICE THE NUMERICAL LOOP BOUNDS
 echo 
 # Propagate constants (cloning could be used too)
-#
+
+
 apply PARTIAL_EVAL
+activate PRINT_CODE
 display PRINTED_FILE 
 
 echo c     AFTER FULL UNROLLING OF THE TWO INTERNAL LOOPS
 echo 
-# Unroll internal loops
-#
+# Unroll internal loops 100 and 200
+
+
 apply FULL_UNROLL
 100
 
@@ -55,12 +58,10 @@ apply FULL_UNROLL
 200
 display PRINTED_FILE
 
-apply PRINT_DOT_DEPENDENCE_GRAPH[CONVOL]
-
 echo c     AFTER USELESS VARIABLES ELIMINATION
 
-# Eliminate useless variables
-#
+# Eliminate variables that are defined but not used.
+
 
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
@@ -70,7 +71,8 @@ display PRINTED_FILE
 echo c     SUBSCRIPTED EXPRESSIONS HAVE BEEN ELIMINATED BY PARTIAL EVALUATION
 echo 
 # Simplify subscript expressions
-#
+
+
 apply PARTIAL_EVAL
 display PRINTED_FILE 
 
