@@ -415,9 +415,9 @@ then
 
   # now run the validations with the new tpips
   for valid in "$@" ; do
-    $nice $make -C $valid parallel-clean
+    $nice $make -C $valid cleaner
     $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest $validate
-    $nice $make -C $valid parallel-clean
+    $nice $make -C $valid cleaner
   done > out 2>&1
 
   # the report is delayed so as to keep the lock
@@ -437,11 +437,11 @@ else
     then
       # the validation changed, run it with current tpips
       # run the validation
-      $nice $make -C $valid parallel-clean
+      $nice $make -C $valid cleaner
       $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
           mail-diff-validate
       # cleanup to help next "svn up" run smoothly
-      $nice $make -C $valid parallel-clean
+      $nice $make -C $valid cleaner
     fi
   done > out 2>&1
 
