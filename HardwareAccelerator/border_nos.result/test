@@ -349,7 +349,7 @@ freia_status border_nos_helper_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // copy 2 -> 1
+  // output copy 2 -> 1
   mcu_macro[0][1].xmin1 = imagelet_2;
   mcu_macro[1][1].xmin1 = imagelet_2;
   mcu_macro[0][1].ymin1 = 0;

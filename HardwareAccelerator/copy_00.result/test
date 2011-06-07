@@ -993,7 +993,7 @@ freia_status copy_00_helper_0_0(
   mcu_macro[1][9].iter4 = 0;
   mcu_macro[0][9].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][9].addrStart = TERAPIX_UCODE_SUB3;
-  // copy 3 -> 2
+  // output copy 3 -> 2
   mcu_macro[0][10].xmin1 = imagelet_3;
   mcu_macro[1][10].xmin1 = imagelet_3;
   mcu_macro[0][10].ymin1 = 0;

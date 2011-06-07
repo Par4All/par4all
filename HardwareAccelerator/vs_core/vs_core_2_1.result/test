@@ -2093,7 +2093,7 @@ freia_status vs_core_2_helper_0_1(
   mcu_macro[1][6].iter4 = 0;
   mcu_macro[0][6].addrStart = TERAPIX_UCODE_DIV_CONST;
   mcu_macro[1][6].addrStart = TERAPIX_UCODE_DIV_CONST;
-  // copy 3 -> 2
+  // output copy 3 -> 2
   mcu_macro[0][7].xmin1 = imagelet_3;
   mcu_macro[1][7].xmin1 = imagelet_3;
   mcu_macro[0][7].ymin1 = 0;

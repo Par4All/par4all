@@ -1191,7 +1191,7 @@ freia_status freia_20_helper_0_0(
   mcu_macro[1][12].iter4 = 0;
   mcu_macro[0][12].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][12].addrStart = TERAPIX_UCODE_ERODE_3_3;
-  // copy 2 -> 1
+  // output copy 2 -> 1
   mcu_macro[0][13].xmin1 = imagelet_2;
   mcu_macro[1][13].xmin1 = imagelet_2;
   mcu_macro[0][13].ymin1 = 0;

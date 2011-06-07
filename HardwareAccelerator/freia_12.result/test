@@ -456,7 +456,7 @@ freia_status freia_12_helper_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
-  // copy 3 -> 2
+  // output copy 3 -> 2
   mcu_macro[0][2].xmin1 = imagelet_3;
   mcu_macro[1][2].xmin1 = imagelet_3;
   mcu_macro[0][2].ymin1 = 0;
