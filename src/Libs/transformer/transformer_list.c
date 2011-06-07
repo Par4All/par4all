@@ -808,9 +808,14 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
   }
 
   if(ENDP(tfl)) {
+    if(star_p) {
     /* Since we compute the * transitive closure and not the +
        transitive closure, the fix point is the identity. */
-    tc_tf = transformer_identity();
+      tc_tf = transformer_identity();
+    }
+    else {
+      tc_tf = transformer_empty();
+    }
   }
   else {
     // Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
@@ -827,6 +832,7 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
       FOREACH(ENTITY, e, al)
 	gal = arguments_add_entity(gal, e);
 
+      // FI: this copy is almost entirely memory leaked
       Psysteme sc = sc_copy(predicate_system(transformer_relation(t)));
       // redundant with call to transformer_derivative_constraints(t)
       Pbase tb = sc_to_minimal_basis(sc);
@@ -859,19 +865,19 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 			   TCST, VALUE_ZERO);
 
 	  eq = contrainte_make(diff);
-	  sc = sc_equation_add(sc, eq);
+	  tsc = sc_equation_add(tsc, eq);
 	}
-	if(SC_UNDEFINED_P(sc))
-	  sc = tsc;
-	else {
-	  /* This could be optimized by using the convex hull of a
-	     Psystemes list and by keeping the dual representation of
-	     the result instead of converting it several time back
-	     and forth. */
-	  Psysteme nsc = cute_convex_union(sc, tsc);
-	  sc_free(sc);
-	  sc = nsc;
-	}
+      }
+      if(SC_UNDEFINED_P(sc))
+	sc = tsc;
+      else {
+	/* This could be optimized by using the convex hull of a
+	   Psystemes list and by keeping the dual representation of
+	   the result instead of converting it several time back
+	   and forth. */
+	Psysteme nsc = cute_convex_union(sc, tsc);
+	sc_free(sc);
+	sc = nsc;
       }
     }
 
@@ -952,6 +958,7 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 
     /* Plug sc back into tc_tf */
     predicate_system(transformer_relation(tc_tf)) = sc;
+    transformer_arguments(tc_tf) = gal;
 
   }
   /* That's all! */
