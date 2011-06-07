@@ -22,13 +22,16 @@ echo
 
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
-setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
 
-setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
+setproperty SEMANTICS_USE_LIST_PROJECTION TRUE
 
 # FFF: {0<=b, 0<=t+x, x<=t}
 # TFF: {0<=b, 0<=t+x, x<=t}
+
+# Bug in implementation
 # TTF: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
+
 # TFT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
 # TTT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
 

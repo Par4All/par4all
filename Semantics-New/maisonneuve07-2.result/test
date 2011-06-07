@@ -76,27 +76,27 @@ void run(void)
    // b > 0 should be enough
    while (1) {
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
 
       while (rand()%2&&x>=-b)
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+10, x<=11}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+10}
 
          x--, t++;
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
 
       while (rand()%2&&x<=b)
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+11, x<=10}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t, x<=10}
 
          x++, t++;
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
 
       while (rand()%2)
 
-//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+11, x<=11}
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
 
          t++;
    }
