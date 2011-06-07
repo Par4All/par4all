@@ -808,7 +808,7 @@ static void freia_terapix_call
         // generate copy code old -> oimg
         // hmmm... could not generate a test case where this is triggered...
         // the additional cost which should be reported?
-        sb_cat(body, "  // copy ", itoa(old));
+        sb_cat(body, "  // output copy ", itoa(old));
         sb_cat(body, " -> ", itoa(oimg), "\n");
         list lic = CONS(int, old, NIL);
         // -oimg to tell the code generator that we are dealing with
