@@ -586,6 +586,10 @@ freia_status freia_skip_03_helper_0_0(
   mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][0].iter2 = imagelet_size;
   mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_THRESHOLD;
 
@@ -609,6 +613,8 @@ freia_status freia_skip_03_helper_0_0(
   mcu_instr.borderBottom = 0;
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = 128;
 
   // outputs
   mcu_instr.nbout = 1;
@@ -701,6 +707,10 @@ freia_status freia_skip_03_helper_0_1(
   mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][0].iter2 = imagelet_size;
   mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_VOL?;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_VOL?;
   // 1: -.(1) -> 1
@@ -728,6 +738,10 @@ freia_status freia_skip_03_helper_0_1(
   mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][1].iter2 = imagelet_size;
   mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_SUB_CONST;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_SUB_CONST;
   // 2: +.(1) -> 1
@@ -755,6 +769,10 @@ freia_status freia_skip_03_helper_0_1(
   mcu_macro[1][2].iter1 = TERAPIX_PE_NUMBER;
   mcu_macro[0][2].iter2 = imagelet_size;
   mcu_macro[1][2].iter2 = imagelet_size;
+  mcu_macro[0][2].iter3 = 0;
+  mcu_macro[1][2].iter3 = 0;
+  mcu_macro[0][2].iter4 = 0;
+  mcu_macro[1][2].iter4 = 0;
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ADD_CONST;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ADD_CONST;
 
@@ -778,6 +796,8 @@ freia_status freia_skip_03_helper_0_1(
   mcu_instr.borderBottom = 0;
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = 128;
 
   // outputs
   mcu_instr.nbout = 1;
