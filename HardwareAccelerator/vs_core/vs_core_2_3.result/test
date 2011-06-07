@@ -1265,7 +1265,8 @@ freia_status vs_core_2_helper_0_0(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: thr(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -1630,7 +1631,8 @@ freia_status vs_core_2_helper_0_1(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: -|(2,1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;

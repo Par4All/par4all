@@ -557,7 +557,8 @@ freia_status freia_skip_03_helper_0_0(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: thr(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -695,7 +696,8 @@ freia_status freia_skip_03_helper_0_1(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure vol at 1022
   // 0: vol(1)
