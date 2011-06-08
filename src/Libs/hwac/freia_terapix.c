@@ -142,6 +142,9 @@ static void erosion_optimization
   }
 }
 
+// stupid hack, to have only one hash table for the 4 directions:
+// as the key is a pointer, the alignment ensures that +0 to +3
+// are distinct values thus should not clash one with another.
 #define NORTH(v) ((void*) (((_int)v)+0))
 #define SOUTH(v) ((void*) (((_int)v)+1))
 #define WEST(v)  ((void*) (((_int)v)+2))
