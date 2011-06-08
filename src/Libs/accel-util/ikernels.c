@@ -214,7 +214,8 @@ static set interprocedural_mapping(string res, call c) {
   memory_mapping mem_map = (memory_mapping)db_get_memory_resource(res,
                                                                   func_name,
                                                                   TRUE);
-  set summary = memory_mapping_map(mem_map);
+  set summary = MAKE_SET();
+  set_assign(summary,memory_mapping_map(mem_map));
 
 
   list /* of entity */l_formals = module_formal_parameters(callee);
@@ -231,6 +232,7 @@ static set interprocedural_mapping(string res, call c) {
     bool found = false;
     SET_FOREACH(entity, e, summary) {
       if(same_entity_p(e, formal_ent)) {
+        set_del_element(summary,summary,e);
         found = true;
         break;
       }
@@ -248,6 +250,15 @@ static set interprocedural_mapping(string res, call c) {
         print_syntax(expression_syntax(real_exp));
         fprintf(stderr, "\n");
       }
+    }
+  }
+  SET_FOREACH(entity, e, summary) {
+    pips_debug(4,"%s not mapped on formal\n",entity_name(e));
+    if(top_level_entity_p(e)) {
+      set_add_element(at_call_site,at_call_site,e);
+    } else {
+      pips_internal_error("Interprocedural error : entity %s is not a formal"
+          " not a global variable !\n");
     }
   }
   return at_call_site;
@@ -309,7 +320,7 @@ static void copy_from_test(statement st, test t) {
 
 
   /* Compute "out" sets for the test */
-  set copy_from_out = COPY_TO_OUT( st );
+  set copy_from_out = COPY_FROM_OUT( st );
 
   set_intersection(copy_from_out, COPY_FROM_OUT( test_true(t)), COPY_FROM_OUT( test_false(t)));
 
@@ -317,6 +328,9 @@ static void copy_from_test(statement st, test t) {
   ifdebug(6) {
     pips_debug(6,"Handling copy from for test expression : ");
     print_expression(test_condition(t));
+    fprintf(stderr,"\n");
+    pips_debug(6,"Copy from is : ");
+    print_entities(set_to_list(copy_from_out));
     fprintf(stderr,"\n");
   }
 
@@ -420,6 +434,11 @@ static void copy_from_call(statement st, call c) {
     if(!call_intrinsic_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_OUT,c);
       copy_from_out = set_union(copy_from_out, at_call_site, copy_from_out);
+      ifdebug(6) {
+        pips_debug(0,"Adding interprocedural summary : ");
+        print_entities(set_to_list(at_call_site));
+        fprintf(stderr,"\n");
+      }
       set_free(at_call_site);
     }
   }
@@ -494,6 +513,7 @@ static void copy_from_statement(statement st) {
       if(!statement_block_p(st) || ! empty_statement_or_continue_without_comment_p(st) )
         insert_comments_to_statement(st, strdup(str));
     }
+    fprintf(stderr, "*\n**********************************\n");
   }
 
 }
@@ -1109,6 +1129,14 @@ bool kernel_data_mapping(char * module_name) {
     copy_to_statement(module_stat);
 
     transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), NULL, NULL);
+  }
+
+  ifdebug(1) {
+    pips_debug(0,"Interprocedural summary for %s :\n To :",module_name);
+    print_entities(set_to_list(COPY_TO_IN(module_stat)));
+    fprintf(stderr,"\n From :");
+    print_entities(set_to_list(COPY_FROM_OUT(module_stat)));
+    fprintf(stderr,"\n");
   }
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE,
