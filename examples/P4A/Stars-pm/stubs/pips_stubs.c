@@ -38,12 +38,6 @@ int omp_get_max_threads() {
 }
 #endif // P4A_RUNTIME_FFTW
 
-int getopt_long(int argc, char * const argv[],
-                  const char *optstring,
-                  const struct option *longopts, int *longindex) {
-	return argc;
-}
-
 
 #ifdef _GRAPHICS_
 void graphic_destroy(void) {
