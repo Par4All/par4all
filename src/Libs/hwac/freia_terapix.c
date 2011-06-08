@@ -1297,7 +1297,7 @@ void freia_trpx_compile_calls
     // there should be about 8 of them to amortize one imagelet transfer
 
     // for anr999 the gradient of depth 10 is just enough to cover the coms.
-    // for lp, about split is suggested.
+    // for lp, about 1(.2) split is suggested.
   }
 
   // globally remaining statements
