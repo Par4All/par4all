@@ -754,12 +754,9 @@ expression get_complement_expression(statement s, reference reduced) {
     list le = call_arguments(c);
     tag op;
     bool comm = FALSE; // Commutativity
-    // Differentiate unary && binary operators
-    if(extract_reduction_unary_update_operator(fct, &op)) {
-      // ++ or --  : we return 1
-      pips_debug(3,"We have an unary operator\n");
-      complement = int_to_expression(1);
-    } else if(extract_reduction_update_operator(fct, &op, &comm)) {
+    // Differentiate unary && update && binary operators
+    if (ENTITY_ASSIGN_P (fct)){
+      // Normal case, binary expected
       expression rhs = EXPRESSION(CAR(CDR(le)));
       if(expression_call_p(rhs)) {
         list args = call_arguments(expression_call(rhs));
@@ -783,6 +780,14 @@ expression get_complement_expression(statement s, reference reduced) {
         pips_user_warning("Atomic operation replacement seems less general than"
             " reduction detection. This merits a bug report !\n");
       }
+    } else if(extract_reduction_unary_update_operator(fct, &op)) {
+      // ++ or --  : we return 1
+      pips_debug(3,"We have an unary operator\n");
+      complement = int_to_expression(1);
+    } else if(extract_reduction_update_operator(fct, &op, &comm)) {
+      // += or similar, return directly rhs
+      pips_debug(3,"We have an update operator\n");
+      complement = EXPRESSION(CAR(CDR(le)));
     } else {
       pips_internal_error("We have a reduction, but the statement is neither an"
           " unary nor a binary ? It's a bug, sorry no choice but abort !\n");
