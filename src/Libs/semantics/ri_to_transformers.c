@@ -636,8 +636,9 @@ transformer intrinsic_to_transformer(entity e,
     tf = condition_to_transformer(cond, pre, TRUE);
   }
   else if(ENTITY_RAND_P(e)) {
-    /* The result is positive and less than RAND_MAX */
-    pips_internal_error("Intrinsic \"rand\" should not be analyzed here.\n");
+    /* The result is positive and less than RAND_MAX, but it is ignored */
+    pips_user_warning("Value returned by intrinsic \"rand\" is ignored.\n");
+    tf = transformer_identity();
   }
   else
     tf = effects_to_transformer(ef);

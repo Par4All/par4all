@@ -860,7 +860,8 @@ transformer statement_to_postcondition(
 	 * See character01.c, but other counter examples above about
 	 * non_initial_values.
 	 */
-	pre = transformer_filter(pre, non_initial_values);
+	if(get_bool_property("SEMANTICS_FILTER_INITIAL_VALUES"))
+	  pre = transformer_filter(pre, non_initial_values);
 
 	/* store the precondition in the ri */
 	store_statement_precondition(s, pre);
