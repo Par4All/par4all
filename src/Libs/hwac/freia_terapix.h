@@ -29,12 +29,14 @@
 #ifndef HWAC_FREIA_TERAPIX_H_
 #define HWAC_FREIA_TERAPIX_H_
 
+// terapix specific property names
 #define trpx_mem_prop "HWAC_TERAPIX_RAMPE"
 #define trpx_npe_prop "HWAC_TERAPIX_NPE"
 #define trpx_dmabw_prop "HWAC_TERAPIX_DMABW"
 #define trpx_gram_width "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
 
+// includes for generated helper
 #define FREIA_TRPX_INCLUDES           \
   "// freia terapix includes\n"       \
   "#include <freiaCommon.h>\n"        \
@@ -43,6 +45,7 @@
   "#include <terapix.h>\n"            \
   "#include <terapix_ucode.h>\n"
 
+// terapix freia function description
 typedef struct {
   // image erosion in each direction
   int north, south, east, west;
@@ -52,7 +55,7 @@ typedef struct {
   int cost;
   // whether it can be done in place
   boolean inplace;
-  // code segment name
+  // microcode segment name
   string ucode;
 } terapix_hw_t;
 
