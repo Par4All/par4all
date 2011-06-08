@@ -4175,10 +4175,10 @@ The next property is only useful if the previous one is set to true.
 Instead of computing the fix point of the convex hull of the
 transformer list, it computes the convex hull of the derivative
 constraints. Since it is a new feature, it is set to false by default,
-but it should become the default option because it is always more
+but it should become the default option because it should always be more
 accurate, at least indirectly because the systems are smaller. The
-number of overflows is reduced, as well as the execution time. See for
-instance the test case Semantics/sync04. This
+number of overflows is reduced, as well as the execution
+time. In practice, these improvements have not been measured. This
 development is experimental and turned off by default.
 
 \begin{PipsProp}{SEMANTICS_USE_DERIVATIVE_LIST}
@@ -4199,6 +4199,21 @@ experimental and turned off by default.
 
 \begin{PipsProp}{SEMANTICS_USE_LIST_PROJECTION}
 SEMANTICS_USE_LIST_PROJECTION TRUE
+\end{PipsProp}
+
+Preconditions can (used to) preserve initial values of the formal
+parameters. This is not often useful in C because programmers usually
+avoid modifying scalar parameters, especially integer ones. However,
+old values create problems in region computation because preconditions
+seem to be used instead of tranformer ranges. Filtering out the
+initial value does reduce the precision of the precondition analysis,
+but this does not impact the transformer analysis. Since the advantage
+is really limited to preconditions and for the region's sake, the
+default value is set to true. Turn it to false if you have a doubt
+about the preconditions really available.
+
+\begin{PipsProp}{SEMANTICS_FILTER_INITIAL_VALUES}
+SEMANTICS_FILTER_INITIAL_VALUES TRUE
 \end{PipsProp}
 
 \subsubsection{Normalization level}
