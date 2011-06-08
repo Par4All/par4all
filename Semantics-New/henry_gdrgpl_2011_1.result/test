@@ -1,5 +1,5 @@
 
-Source code with transformers
+Transformers for "main"
 
 
 //  T(main) {main==0}
@@ -59,7 +59,7 @@ break_1:   ;
    return 0;
 }
 
-Source code with preconditions
+Preconditions for "main"
 
 
 //  P() {}

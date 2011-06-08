@@ -1,5 +1,5 @@
 
-Source code with transformers
+Transformers for "main"
 
 
 //  T(main) {main==0}
@@ -50,7 +50,7 @@ int main(void)
    return 0;
 }
 
-Source code with preconditions
+Preconditions for "main"
 
 
 //  P() {}
@@ -70,33 +70,33 @@ int main(void)
 
    while (y>=0) {
 
-//  P(x,y) {y<=x, 0<=y}
+//  P(x,y) {y<=x, x+y<=102, 0<=y}
 
       fprintf(stdout, "loop: x=%d y=%d\n", x, y);
 
-//  P(x,y) {y<=x, 0<=y}
+//  P(x,y) {y<=x, x+y<=102, 0<=y}
 
       if (x<=50)
 
-//  P(x,y) {x<=50, y<=x, 0<=y}
+//  P(x,y) {x<=50, y<=x, x+y<=102, 0<=y}
 
          y++;
       else
 
-//  P(x,y) {51<=x, y<=x, 0<=y}
+//  P(x,y) {51<=x, y<=x, x+y<=102, 0<=y}
 
          y--;
 
-//  P(x,y) {51<=2x+51y, y<=x+1, 0<=y+1}
+//  P(x,y) {51<=2x+51y, y<=x+1, x+y<=101, 0<=y+1}
 
       x++;
    }
 
-//  P(x,y) {y==-1, 52<=x}
+//  P(x,y) {y==-1, 52<=x, x<=103}
 
    fprintf(stdout, "end: x=%d y=%d\n", x, y);
 
-//  P(x,y) {y==-1, 52<=x}
+//  P(x,y) {y==-1, 52<=x, x<=103}
 
    return 0;
 }
