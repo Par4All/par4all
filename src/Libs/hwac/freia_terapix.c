@@ -223,7 +223,8 @@ static int dag_terapix_measures
     {
       const freia_api_t * api = dagvtx_freia_api(v);
       dcost += api->terapix.cost;
-      dnops ++;
+      // only count non null operations
+      if (api->terapix.cost) dnops ++;
       if (api->arg_img_out) level_width++;
       update_erosions(d, v, erosion);
     }
