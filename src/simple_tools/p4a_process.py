@@ -62,6 +62,7 @@ def process(input):
                 com_optimization = input.com_optimization,
                 fftw3 = input.fftw3,
                 c99 = input.c99,
+                use_pocc = input.pocc,
                 recover_includes = input.recover_includes,
                 native_recover_includes = input.native_recover_includes,
                 properties = input.properties,
@@ -79,7 +80,8 @@ def process(input):
                 # Generate code for a GPU-like accelerator. Note that we can
                 # have an OpenMP implementation of it if OpenMP option is set
                 # too:
-                processor.gpuify(fine = input.fine,
+                processor.gpuify(
+                        fine = input.fine,
                         apply_phases_kernel = input.apply_phases['akg'],
                         apply_phases_kernel_launcher = input.apply_phases['aklg'],
                         apply_phases_wrapper = input.apply_phases['awg'],
@@ -87,9 +89,10 @@ def process(input):
 
             if input.openmp and not input.accel:
                 # Parallelize the code in an OpenMP way:
-                processor.ompify(apply_phases_before = input.apply_phases['abo'],
+                processor.ompify(
+                        apply_phases_before = input.apply_phases['abo'],
                         apply_phases_after = input.apply_phases['aao'])
-
+                    
             # Write the output files.
             output.files = processor.save(input.output_dir,
                                           input.output_prefix,

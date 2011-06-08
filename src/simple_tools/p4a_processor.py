@@ -189,7 +189,7 @@ class p4a_processor(object):
                  filter_exclude = None, accel = False, cuda = False,
                  openmp = False, com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False,
+                 c99 = False, use_pocc = False,
                  properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
@@ -200,6 +200,7 @@ class p4a_processor(object):
         self.com_optimization = com_optimization
         self.fftw3 = fftw3
         self.c99 = c99
+        self.pocc = use_pocc
         self.apply_phases = apply_phases
 
         if workspace:
@@ -256,9 +257,12 @@ class p4a_processor(object):
             # we really need it.
             global pyps
             global broker
+            global pocc
             try:
                 pyps = __import__("pyps")
                 broker = __import__("broker")
+                if self.pocc:
+                    pocc = __import__("pocc")
             except:
                 raise
 
@@ -687,7 +691,6 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         if (self.fortran == False):
-            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=False)
             kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
         else:
@@ -785,6 +788,13 @@ class p4a_processor(object):
         apply_user_requested_phases(modules, apply_phases_before)
         modules.ompify_code(concurrent=True)
         modules.omp_merge_pragma(concurrent=True)
+
+        if self.pocc:
+            try:
+                modules.poccify()
+            except RuntimeError:
+                e = sys.exc_info()
+                p4a_util.warn("PoCC returned an error : " + str(e[1]))
 
 		#Apply requested phases after ompify to modules
         apply_user_requested_phases(modules, apply_phases_after)
