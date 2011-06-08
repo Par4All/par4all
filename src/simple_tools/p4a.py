@@ -72,6 +72,9 @@ def add_own_options(parser):
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
 
+    proc_group.add_option("--atomic", action = "store_true", default = False,
+        help = "Use atomic operations for parallelizing reductions on GPU.")
+
     proc_group.add_option("--pocc", action = "store_true", default = False,
         help = "Use PoCC to optimize loop nest.")
 
@@ -468,6 +471,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            atomic = options.atomic,
             com_optimization = options.com_optimization,
             fftw3 = options.fftw3,
             add_debug_flags = options.debug,
@@ -510,6 +514,7 @@ def main():
             input.openmp = options.openmp
             input.scmp = options.scmp
             input.fine = options.fine
+            input.atomic = options.atomic
             input.pocc = options.pocc
             input.select_modules = options.select_modules
             input.exclude_modules = options.exclude_modules

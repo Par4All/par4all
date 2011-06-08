@@ -62,6 +62,7 @@ def process(input):
                 com_optimization = input.com_optimization,
                 fftw3 = input.fftw3,
                 c99 = input.c99,
+                atomic = input.atomic,
                 use_pocc = input.pocc,
                 recover_includes = input.recover_includes,
                 native_recover_includes = input.native_recover_includes,

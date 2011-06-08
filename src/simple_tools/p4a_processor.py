@@ -189,7 +189,7 @@ class p4a_processor(object):
                  filter_exclude = None, accel = False, cuda = False,
                  openmp = False, com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False, use_pocc = False,
+                 c99 = False, use_pocc = False, atomic = False,
                  properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
@@ -201,6 +201,7 @@ class p4a_processor(object):
         self.fftw3 = fftw3
         self.c99 = c99
         self.pocc = use_pocc
+        self.atomic = atomic
         self.apply_phases = apply_phases
 
         if workspace:
@@ -375,6 +376,9 @@ class p4a_processor(object):
         if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code(concurrent=True)
+        elif self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            all_modules.coarse_grain_parallelization_with_reduction(concurrent=True)
         else:
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization(concurrent=True)
@@ -613,8 +617,13 @@ class p4a_processor(object):
         # dependent resources:
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
-        kernel_launchers.coarse_grain_parallelization(concurrent=True)
-
+        if self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            kernel_launchers.coarse_grain_parallelization_with_reduction(concurrent=True)
+            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
+        else:
+            kernel_launchers.coarse_grain_parallelization(concurrent=True)
+        
         
         if fine:
             # When using a fine-grain parallelization (Allen & Kennedy) for
