@@ -1241,10 +1241,10 @@ void freia_trpx_compile_calls
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
+
   // maybe I should do it with an overall splitting as done with spoc?
   // note that the scheduling is currently "by level" because
-  // each operation is added in the list as soon as it may be
-  // computed.
+  // each operation is added in the list as soon as it may be computed.
   // consider dag d
   // - full depth?
   // - number of ins & outs?
@@ -1256,9 +1256,49 @@ void freia_trpx_compile_calls
   //  2. ops which consume less borders (current max? balanced?)
   //  3. ops in their initial textual order
   // ??? could take into account depth? cost? erosion? max lives?
+  // ??? I think of a greedy heuristic (again) up to a target erosion...
   list ld = split_dag_on_scalars(fulld);
 
   pips_debug(4, "dag split in %d dags\n", (int) gen_length(ld));
+
+  int com_cost_per_row = get_int_property(trpx_dmabw_prop);
+
+  // further splitting of dags may be interesting
+  FOREACH(dag, d, ld)
+  {
+    int len, width, cost, nops, n, s, w, e;
+    len = dag_terapix_measures(d, NULL, &width, &cost, &nops, &n, &s, &w, &e);
+    int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
+
+    // if we assume that the imagelet size is quite large, say around 128
+    // even with double buffers. The only reason to cut is because
+    // of the erosion on the side which reduces the amount of valid data,
+    // but there is really a point to do that only communications are still
+    // masked by computations after splitting the dag...
+
+    // first we compute a possible number of splits
+    // computation cost = communication cost (in cycle per imagelet row)
+    // communication cost = (nins + 2*width*n_splits + nouts) * cost_per_row
+    // the width is taken as the expected number of images to extract and
+    // reinject (hence 2*) if the dag is split.
+    double n_splits = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
+
+    /*
+    fprintf(stdout,
+            "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_splits = %f\n",
+            cost, com_cost_per_row, nins, width, nouts, n_splits);
+    */
+
+    // we also have to check that there is a significant erosion!
+
+    // then we should decide...
+    // there should be a *lot* of computations to amortize a split,
+    // given that an erode/dilate costs about 15 cycles per row
+    // there should be about 8 of them to amortize one imagelet transfer
+
+    // for anr999 the gradient of depth 10 is just enough to cover the coms.
+    // for lp, about split is suggested.
+  }
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
