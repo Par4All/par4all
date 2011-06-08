@@ -38,14 +38,18 @@ class ValidationClass:
 		if (os.path.isfile(test_name_path+".test")):
 			(int_status, output) = commands.getstatusoutput(test_name_path+".test 2> "+err_file_path)
 
-		elif (os.path.isfile(test_name_path+".py")):
-			(int_status, output) = commands.getstatusoutput("python "+test_name_path+".py 2> "+err_file_path)
-
 		elif (os.path.isfile(test_name_path+".tpips")):
 			(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips 2> "+err_file_path)
 
 		elif (os.path.isfile(test_name_path+".tpips2")):
 			(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips2 2>&1")
+			
+		elif (os.path.isfile(test_name_path+".py")):
+			(int_status, output) = commands.getstatusoutput("python "+os.path.basename(test_name_path)+".py 2> "+err_file_path)
+
+		elif (os.path.isfile(directory_test_path+"/default_tpips")):
+			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_tpips")
+			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
 
 		elif (os.path.isfile(directory_test_path+"/default_test")):
 			# test_name=file
@@ -54,10 +58,6 @@ class ValidationClass:
 			upper = os.path.basename(test_name_path).upper()
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_file_path)
 
-		elif (os.path.isfile(directory_test_path+"/default_tpips")):
-			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_tpips")
-			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
-			
 		elif (os.path.isfile(directory_test_path+"/default_pyps.py")):
 			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_pyps.py")
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" python "+directory_test_path+"/default_pyps.py 2>"+err_file_path)
