@@ -546,6 +546,8 @@ static transformer test_to_transformer(test t,
       (void) print_transformer(tftwc);
     }
     post_tftwc = transformer_apply(statement_to_transformer(st, tftwc), tftwc);
+    //post_tftwc = transformer_normalize(post_tftwc, 2);
+
     ifdebug(8) {
       pips_debug(8, "tftwc after transformer_apply %p:\n", tftwc);
       (void) print_transformer(tftwc);
@@ -558,6 +560,7 @@ static transformer test_to_transformer(test t,
     tffwc = transformer_temporary_value_projection(tffwc);
     reset_temporary_value_counter();
     post_tffwc = transformer_apply(statement_to_transformer(sf, tffwc), tffwc);
+    //post_tffwc = transformer_normalize(post_tffwc, 2);
 
     ifdebug(8) {
       pips_debug(8, "post_tftwc before transformer_convex_hull %p:\n", post_tftwc);
