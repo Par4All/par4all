@@ -412,7 +412,7 @@ digraph "freia_23_helper_0_0" {
 
 /* FREIA terapix helper function for module freia_23
  * 2 input images, 2 output images
- * 5 image operations in dag
+ * 3 image operations in dag
  * dag length is 4, dag width is 2
  * cost is 12 cycles per imagelet row
  */

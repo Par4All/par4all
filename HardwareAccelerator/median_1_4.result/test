@@ -907,7 +907,7 @@ digraph "median_1_helper_0_0" {
 
 /* FREIA terapix helper function for module median_1
  * 1 input image, 3 output images
- * 15 image operations in dag
+ * 14 image operations in dag
  * dag length is 15, dag width is 3
  * cost is 188 cycles per imagelet row
  */

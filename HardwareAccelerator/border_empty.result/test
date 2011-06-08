@@ -266,7 +266,7 @@ digraph "dag_cleaned_0" {
 
 /* FREIA terapix helper function for module border_empty
  * 1 input image, 1 output image
- * 2 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 1
  * cost is 15 cycles per imagelet row
  */

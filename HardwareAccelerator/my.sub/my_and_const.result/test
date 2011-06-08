@@ -247,7 +247,7 @@ digraph "my_and_const_helper_0_0" {
 
 /* FREIA terapix helper function for module my_and_const
  * 1 input image, 1 output image
- * 2 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 1
  * cost is 3 cycles per imagelet row
  */

@@ -447,7 +447,7 @@ digraph "freia_scalar_03_helper_0_1" {
 
 /* FREIA terapix helper function for module freia_scalar_03
  * 1 input image, 1 output image
- * 2 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 1
  * cost is 5 cycles per imagelet row
  */
@@ -582,7 +582,7 @@ freia_status freia_scalar_03_helper_0_0(
 
 /* FREIA terapix helper function for module freia_scalar_03
  * 2 input images, 1 output image
- * 4 image operations in dag
+ * 2 image operations in dag
  * dag length is 3, dag width is 2
  * cost is 7 cycles per imagelet row
  */

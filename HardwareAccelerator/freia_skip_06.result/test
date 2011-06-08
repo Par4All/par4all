@@ -503,7 +503,7 @@ digraph "freia_skip_06_helper_0_0" {
 
 /* FREIA terapix helper function for module freia_skip_06
  * 1 input image, 2 output images
- * 5 image operations in dag
+ * 4 image operations in dag
  * dag length is 4, dag width is 2
  * cost is 14 cycles per imagelet row
  */

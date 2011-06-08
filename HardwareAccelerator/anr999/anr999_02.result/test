@@ -1140,7 +1140,7 @@ digraph "dag_cleaned_0" {
 
 /* FREIA terapix helper function for module anr999_02
  * 1 input image, 3 output images
- * 14 image operations in dag
+ * 13 image operations in dag
  * dag length is 8, dag width is 3
  * cost is 160 cycles per imagelet row
  */

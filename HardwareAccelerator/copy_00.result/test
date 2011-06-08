@@ -696,7 +696,7 @@ digraph "dag_cleaned_0" {
 
 /* FREIA terapix helper function for module copy_00
  * 1 input image, 2 output images
- * 11 image operations in dag
+ * 10 image operations in dag
  * dag length is 5, dag width is 4
  * cost is 128 cycles per imagelet row
  */

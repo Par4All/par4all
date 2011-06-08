@@ -218,7 +218,7 @@ digraph "my_global_min_coord_helper_0_0" {
 
 /* FREIA terapix helper function for module my_global_min_coord
  * 1 input image, 0 output image
- * 2 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 1
  * cost is 3 cycles per imagelet row
  */

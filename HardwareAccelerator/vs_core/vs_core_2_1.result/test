@@ -1482,7 +1482,7 @@ digraph "vs_core_2_helper_0_1" {
 
 /* FREIA terapix helper function for module vs_core_2
  * 2 input images, 1 output image
- * 11 image operations in dag
+ * 9 image operations in dag
  * dag length is 9, dag width is 2
  * cost is 79 cycles per imagelet row
  */
@@ -1853,7 +1853,7 @@ freia_status vs_core_2_helper_0_0(
 
 /* FREIA terapix helper function for module vs_core_2
  * 2 input images, 2 output images
- * 9 image operations in dag
+ * 7 image operations in dag
  * dag length is 4, dag width is 3
  * cost is 23 cycles per imagelet row
  */

@@ -263,7 +263,7 @@ digraph "my_sup_helper_0_0" {
 
 /* FREIA terapix helper function for module my_sup
  * 2 input images, 1 output image
- * 3 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 2
  * cost is 4 cycles per imagelet row
  */

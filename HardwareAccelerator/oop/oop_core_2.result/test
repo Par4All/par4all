@@ -1824,7 +1824,7 @@ digraph "oop_core_helper_0_0" {
 
 /* FREIA terapix helper function for module oop_core
  * 3 input images, 3 output images
- * 20 image operations in dag
+ * 17 image operations in dag
  * dag length is 11, dag width is 6
  * cost is 159 cycles per imagelet row
  */
