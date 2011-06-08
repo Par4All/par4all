@@ -1,7 +1,10 @@
 // The comma expressions inter with the controlizer
 
-int main() {
+#include <stdio.h>
 
-  for(int i=0;i<10;i++,i)
+int main() {
+  int i;
+
+  for(i=0;i<10;i++,printf("%d\n",i))
     ;
 }
