@@ -28,17 +28,21 @@
 #ifndef HWAC_FREIA_H_
 #define HWAC_FREIA_H_
 
+// additionnal hardware specific definitions
 #include "freia_spoc.h"
 #include "freia_terapix.h"
 
+// do not require NULL at the end of a vararg.
 #define cat(args...) concatenate(args , NULL)
 #define sb_cat(args...) string_buffer_cat(args , NULL)
 
+// macros for freia stuff
 #define FREIA_IMAGE_TYPE "freia_data2d"
 #define AIPO "freia_aipo_"
 #define FREIA_IMAGE FREIA_IMAGE_TYPE " * "
 #define FREIA_DEFAULT_BPP "16"
 
+// check the hardware target
 #define freia_spoc_p(s) same_string_p((s), "spoc")
 #define freia_terapix_p(s) same_string_p((s), "terapix")
 #define freia_aipo_p(s) same_string_p((s), "aipo")
