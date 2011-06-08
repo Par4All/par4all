@@ -1,7 +1,7 @@
+// Returned value is not used.
 
 
-
-int main() {
+int rand01() {
   // Use to make transformers aborting
   rand();
 }

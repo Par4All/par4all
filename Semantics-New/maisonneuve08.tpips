@@ -17,7 +17,7 @@ echo PRECONDITIONS
 echo
 
 # The lists are necessary to get the invariant; no need for
-#  projections or derivative lists, unlike maisonneuve07-[1-3].c
+# projections or derivative lists, unlike maisonneuve07-[1-4].c
 
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
