@@ -205,11 +205,38 @@ set COPY_TO_OUT(statement st) {
 */
 
 /**
+ * Should be useful, but for some bullshit reason the array dimensions even
+ * for simple case like a[512][512] might be previously normalized "COMPLEX"
+ * This occurs in some special cases...
+ */
+static bool force_renormalize(expression e) {
+  if(!normalized_undefined_p(expression_normalized(e))) {
+    // Remove a warning
+    free_normalized(expression_normalized(e));
+    expression_normalized(e) = normalized_undefined;
+  }
+  expression_normalized(e) = NormalizeExpression(e);
+  return true;
+}
+
+/**
  * Check that an array is fully written by an exact W region in a list
  */
 static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
   // Ugly hack :-(
   effect array = entity_whole_region(e_used,make_action_write_memory());
+
+  // Force re-normalization of expression, this is a hack !
+  gen_recurse(e_used,expression_domain,force_renormalize,force_renormalize);
+  if(type_variable_p(entity_type(e_used))) {
+    // I don't understand why the gen_recurse doesn't work, so here is the hack for the hack...
+    FOREACH(dimension, d, variable_dimensions(type_variable(entity_type(e_used)))) {
+      force_renormalize(dimension_upper(d));
+      force_renormalize(dimension_lower(d));
+    }
+  }
+
+  //
   Psysteme p = descriptor_convex(effect_descriptor(array));
   descriptor_convex(effect_descriptor(array)) = sc_safe_append(p,
                          sc_safe_normalize(entity_declaration_sc(e_used)));
@@ -220,6 +247,20 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
     print_region(array);
   }
   FOREACH(effect, reg, lreg) {
+    // Proj region over PHI to remove precondition variables
+    // FIXME : Can be done by difference between the 2 bases
+    list proj = base_to_list(sc_base(descriptor_convex(effect_descriptor(reg))));
+    list l_phi = NIL;
+    FOREACH(expression,e, reference_indices(effect_any_reference(reg))) {
+      pips_assert("expression_reference_p", expression_reference_p(e));
+      l_phi = CONS(entity,reference_variable(expression_reference(e)),l_phi);
+      gen_remove(&proj,reference_variable(expression_reference(e)));
+    }
+
+
+    region_exact_projection_along_variables(reg, proj);
+
+
     ifdebug(6) {
       pips_debug(0,"Evaluating region : ");
       print_region(reg);
@@ -1182,7 +1223,7 @@ bool kernel_data_mapping(char * module_name) {
     copy_from_statement(module_stat);
     copy_to_statement(module_stat);
 
-    transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), NULL, NULL);
+    transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), MAKE_SET(), MAKE_SET());
   }
 
   ifdebug(1) {
