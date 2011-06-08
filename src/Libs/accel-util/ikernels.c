@@ -205,6 +205,51 @@ set COPY_TO_OUT(statement st) {
 */
 
 /**
+ * Check that an array is fully written by an exact W region in a list
+ */
+static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
+  // Ugly hack :-(
+  effect array = entity_whole_region(e_used,make_action_write_memory());
+  Psysteme p = descriptor_convex(effect_descriptor(array));
+  descriptor_convex(effect_descriptor(array)) = sc_safe_append(p,
+                         sc_safe_normalize(entity_declaration_sc(e_used)));
+  effect_approximation(array) = make_approximation_exact();
+
+  ifdebug(6) {
+    pips_debug(0,"Array region is : ");
+    print_region(array);
+  }
+  FOREACH(effect, reg, lreg) {
+    ifdebug(6) {
+      pips_debug(0,"Evaluating region : ");
+      print_region(reg);
+    }
+    if(effect_write_p(reg) && store_effect_p(reg) && region_exact_p(reg)) {
+      list ldiff = region_sup_difference(array,reg);
+      bool empty=true;
+      FOREACH(effect, diff, ldiff) {
+        if( !region_empty_p(diff)) {
+          ifdebug(6) {
+            pips_debug(0,"Diff is not empty :");
+            print_region(diff);
+          }
+          empty = false;
+          break;
+        } else {
+          ifdebug(6) {
+            pips_debug(0,"Diff is empty !\n");
+          }
+        }
+      }
+      if(empty) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Translate the interprocedural summary for a function into a set of local
  * corresponding parameters (entity only)
  */
@@ -635,7 +680,7 @@ static void copy_to_call(statement st, call c) {
     {
       entity e_used = reference_variable(effect_any_reference(eff));
       if(entity_array_p(e_used)) {
-        pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
+        pips_debug(6,"Adding in %s into copy_in\n",entity_name(e_used));
         copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
       }
     }
@@ -644,8 +689,15 @@ static void copy_to_call(statement st, call c) {
     {
       entity e_used = reference_variable(effect_any_reference(eff));
       if(entity_array_p(e_used)) {
-        pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
-        copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
+        list lreg = load_proper_rw_effects_list(st);
+
+        if(!array_must_fully_written_by_regions_p(e_used,lreg)) {
+          pips_debug(6,"Adding written %s into copy_in\n",entity_name(e_used));
+          copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
+        } else {
+          pips_debug(6,"Do not add %s into copy_in because fully overwritten\n",
+                     entity_name(e_used));
+        }
       }
     }
   } else {
@@ -1097,8 +1149,10 @@ bool kernel_data_mapping(char * module_name) {
 
   debug_on("KERNEL_DATA_MAPPING_DEBUG_LEVEL");
 
-  string pe = db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
-  set_proper_rw_effects((statement_effects)pe);
+  /* regions */
+  string region = db_get_memory_resource(DBR_REGIONS, module_name, TRUE);
+  set_proper_rw_effects((statement_effects)region);
+
 
   /* out regions */
   string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE);
