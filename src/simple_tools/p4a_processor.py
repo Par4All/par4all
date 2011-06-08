@@ -646,6 +646,13 @@ class p4a_processor(object):
 		#Apply requested phases to kernel
         apply_user_requested_phases(kernels, apply_phases_kernel)
 
+        # Select wrappers by using the fact that all the generated wrappers
+        # have their names of this form:
+        wrapper_prefix = self.get_wrapper_prefix()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
+        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
+
+
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
@@ -655,18 +662,12 @@ class p4a_processor(object):
                                                )
         else :
             # Identify kernels first
-            kernels.flag_kernel()
+            kernel_launchers.flag_kernel()
             #kernel for fftw3 runtime
             fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
             fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
             fftw3_kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
-
-        # Select wrappers by using the fact that all the generated wrappers
-        # have their names of this form:
-        wrapper_prefix = self.get_wrapper_prefix()
-        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
-        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
 
 		#Apply requested phases to wrappers
         apply_user_requested_phases(wrappers, apply_phases_wrapper)
