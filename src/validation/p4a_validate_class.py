@@ -28,7 +28,7 @@ class ValidationClass:
 			exit()
 
 		self.par4ll_validation_dir = self.p4a_root+'/../../packages/PIPS/validation/'
-		self.extension = ['.c','.F','.f','.f90']
+		self.extension = ['.c','.F','.f','.f90','.f95']
 
 		# get default architecture and tpips/pips
 		self.arch=commands.getoutput(self.p4a_root+"/run/makes/arch.sh")
@@ -57,6 +57,10 @@ class ValidationClass:
 		elif (os.path.isfile(directory_test_path+"/default_tpips")):
 			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_tpips")
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
+			
+		elif (os.path.isfile(directory_test_path+"/default_pyps.py")):
+			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_pyps.py")
+			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" python "+directory_test_path+"/default_pyps.py 2>"+err_file_path)
 
 		else:
 			# Create a err file
@@ -255,7 +259,7 @@ class ValidationClass:
 					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
 					(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
 			else:
-				print ("To test %s, use an extension like .c, .f90, .f, .F\n"%(os.path.basename(self.par4ll_validation_dir+line).strip('\n')))
+				print ("To test %s, use an extension like %s\n"%(line.strip('\n'),self.extension))
 
 		f.close()
 		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
@@ -484,7 +488,7 @@ def main():
 	usage = "usage: python %prog [options]"
 	parser = optparse.OptionParser(usage=usage)
 	parser.add_option("--pips", action="store_true", dest="pips", help = "Validate tests which are given by default file (in packages/PIPS/validation)")
-	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are given by par4all_validation.txt (which must be previously created in src/validation)")
+	parser.add_option("--p4a", action="store_true", dest="par4all", help = "Validate tests which are given by par4all_validation.txt (which must be previously created in par4all/src/validation)")
 	parser.add_option("--diff", action="store_true", dest="diff", help = "List tests that are done with pips option but not with p4a option")
 	parser.add_option("--dir", action="store_true", dest="dir", help = "Validate tests which are located in packages/PIPS/validation/directory_name")
 	parser.add_option("--test", action="store_true", dest="test", help = "Validate tests given in argument")
