@@ -35,6 +35,7 @@
 #include "properties.h"
 #include "syntax.h"
 #include "reductions.h"
+#include "callgraph.h"
 
 GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
 
@@ -159,7 +160,7 @@ static entity atomic_function_of_operation(atomic_operation op) {
   string prefix = "atomic"; // FIXME property
 
   name = strdup(concatenate(prefix,name,type_suffix,NULL));
-  entity atomic_func = make_empty_function(name, t,make_language_unknown());
+  entity atomic_func = make_empty_function(name, t,make_language_c());
   free(name);
   return atomic_func;
 
@@ -333,6 +334,10 @@ bool replace_reduction_with_atomic( string mod_name) {
   DB_PUT_MEMORY_RESOURCE(DBR_CODE,
                          mod_name,
                          (char*) module_stat);
+
+  // We may have outline some code, so recompute the callees:
+  DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
+       compute_callees(get_current_module_statement()));
 
   debug_off();
 

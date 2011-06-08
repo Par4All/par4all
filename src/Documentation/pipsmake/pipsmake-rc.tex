@@ -9506,6 +9506,7 @@ ATOMIC_OPERATION_PROFILE "cuda"
 
 \begin{PipsMake}
 replace_reduction_with_atomic > MODULE.code
+			      > MODULE.callees
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_reductions
