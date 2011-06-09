@@ -40,36 +40,36 @@ _pypips_la_CPPFLAGS = \
 	$(NEWGENLIBS_CFLAGS)
 
 pypips_wrap.c : pypips.i pypips.h
-	$(SWIG) -python -o pypips_wrap.c-tmp pypips.i
-	cat pypips.h pypips_wrap.c-tmp > pypips_wrap.c
-	rm -f pypips_wrap.c-tmp
+	$(AM_V_GEN)$(SWIG) -python -o pypips_wrap.c-tmp pypips.i
+	$(AM_V_GEN)cat pypips.h pypips_wrap.c-tmp > pypips_wrap.c
+	@rm -f pypips_wrap.c-tmp
 
 
 pypips.i:pypips.i.in pypips.h
-	sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
+	$(AM_V_GEN)sed -e 's/SWIG_MODULE_NAME/pypips/' $(srcdir)/pypips.i.in pypips.h > pypips.i
 
 pypips.h:pypips.c pypips.h.in Makefile
-	sed -n -e '1,/\/\*CPROTO pyips\.h/ p' $(srcdir)/pypips.h.in > pypips.h
-	$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c >> pypips.h
-	sed -n -e '/\/\*CPROTO pyips\.h/,$$ p' $(srcdir)/pypips.h.in >> pypips.h
+	$(AM_V_GEN)sed -n -e '1,/\/\*CPROTO pyips\.h/ p' $(srcdir)/pypips.h.in > pypips.h
+	$(AM_V_GEN)$(CPROTO) -evcf2 -E "$(CPP) $(_pypips_la_CPPFLAGS) $(INCLUDES) $(DEFAULT_INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) -DCPROTO_IS_PROTOTYPING" $(srcdir)/pypips.c >> pypips.h
+	$(AM_V_GEN)sed -n -e '/\/\*CPROTO pyips\.h/,$$ p' $(srcdir)/pypips.h.in >> pypips.h
 
 
 pypips_aux.c:pypips.h pypips.c
-	cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
+	$(AM_V_GEN)cat pypips.h $(srcdir)/pypips.c > pypips_aux.c
 
 p2p_cmd= $(srcdir)/pipsmakerc2python.py $(top_srcdir)/src/Documentation/pipsmake/pipsmake-rc.tex ../../Documentation/pipsmake/properties.rc ../../Documentation/pipsmake/pipsdep.rc
 pyps.py:$(p2p_cmd) Makefile
-	echo '# -*- coding: utf-8 -*-' > pyps.py
-	echo "from pypsbase import *" >> pyps.py
-	$(PYTHON) $(p2p_cmd) -loop >> pyps.py
-	$(PYTHON) $(p2p_cmd) -module >> pyps.py
-	$(PYTHON) $(p2p_cmd) -modules >> pyps.py
-	$(PYTHON) $(p2p_cmd) -properties >> pyps.py
+	$(AM_V_GEN)echo '# -*- coding: utf-8 -*-' > pyps.py
+	$(AM_V_GEN)echo "from pypsbase import *" >> pyps.py
+	$(AM_V_GEN)$(PYTHON) $(p2p_cmd) -loop >> pyps.py
+	$(AM_V_GEN)$(PYTHON) $(p2p_cmd) -module >> pyps.py
+	$(AM_V_GEN)$(PYTHON) $(p2p_cmd) -modules >> pyps.py
+	$(AM_V_GEN)$(PYTHON) $(p2p_cmd) -properties >> pyps.py
 
 pips-make: pips-make.in
-	sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
+	$(AM_V_GEN)sed -e "s+@BINPATH@+$(pipsmakeenvdir)+" $(srcdir)/pips-make.in > pips-make
 
 pypsconfig.py:Makefile
-	echo 'pypsruntime="$(pypsruntimedir)"' > pypsconfig.py
+	$(AM_V_GEN)echo 'pypsruntime="$(pypsruntimedir)"' > pypsconfig.py
 
 CLEANFILES=pypips_aux.c pypips.py pyps.py pypips_wrap.c pypips.i pypips.h pypsconfig.py

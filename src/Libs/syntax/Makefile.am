@@ -26,10 +26,10 @@ AM_YFLAGS=-d -p syn_
 AM_LFLAGS=-p syn_
 
 syn_yacc.y: tokyacc.h gram.y
-	cat tokyacc.h $(srcdir)/gram.y > $@
+	$(AM_V_GEN)cat tokyacc.h $(srcdir)/gram.y > $@
 
 keywtbl.h: warning.h f77keywords syn_yacc.h Makefile
-	{\
+	$(AM_V_GEN){\
 		cat $(srcdir)/warning.h ; \
 	  	echo "#include \"syn_yacc.h\"" ; \
 	  	echo "static struct Skeyword keywtbl[] = {" ;\
@@ -39,7 +39,7 @@ keywtbl.h: warning.h f77keywords syn_yacc.h Makefile
 	} > $@
 
 tokyacc.h: warning.h f77keywords f77symboles Makefile
-	{ \
+	$(AM_V_GEN){ \
 		cat $(srcdir)/warning.h ; \
 		sed 's,\([^A-Z]*\)\(.*\),%token \1 TK_\2,' $(srcdir)/f77keywords $(srcdir)/f77symboles ;\
 	} > $@
