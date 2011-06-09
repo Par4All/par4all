@@ -8405,13 +8405,22 @@ HWAC_TERAPIX_GRAM_WIDTH 64
 HWAC_TERAPIX_GRAM_HEIGHT 32
 \end{PipsProp}
 
-Whether to label arcs in dag dot output with the image name,
-and to label nodes with the statement number.
-\begin{PipsProp}{FREIA_LABEL_ARCS}
-FREIA_LABEL_ARCS FALSE
+Whether to do further dag splitting for terapix.
+\begin{PipsProp}{HWAC_TERAPIX_SPLIT_DAG}
+HWAC_TERAPIX_SPLIT_DAG TRUE
 \end{PipsProp}
-\begin{PipsProp}{FREIA_LABEL_NODES}
-FREIA_LABEL_NODES TRUE
+
+Whether to label arcs in dag dot output with the image name,
+and to label nodes with the statement number, and whether to
+filter out unused scalar nodes.
+\begin{PipsProp}{FREIA_DAG_LABEL_ARCS}
+FREIA_DAG_LABEL_ARCS FALSE
+\end{PipsProp}
+\begin{PipsProp}{FREIA_DAG_LABEL_NODES}
+FREIA_DAG_LABEL_NODES TRUE
+\end{PipsProp}
+\begin{PipsProp}{FREIA_DAG_FILTER_NODES}
+FREIA_DAG_FILTER_NODES TRUE
 \end{PipsProp}
 
 Whether to remove dead image operations in the DAG.

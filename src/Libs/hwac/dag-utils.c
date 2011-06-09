@@ -221,8 +221,9 @@ static void dagvtx_dot_node(FILE * out, const string prefix, const dagvtx v)
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 {
-  bool label_nodes = get_bool_property("FREIA_LABEL_NODES");
-  bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
+  bool label_nodes = get_bool_property("FREIA_DAG_LABEL_NODES");
+  bool show_arcs = get_bool_property("FREIA_DAG_LABEL_ARCS");
+  bool filter_nodes = get_bool_property("FREIA_DAG_FILTER_NODES");
 
   vtxcontent co = dagvtx_content(vtx);
   const char* vname = NULL;
