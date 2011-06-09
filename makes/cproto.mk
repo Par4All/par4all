@@ -22,9 +22,9 @@ $(CPROTO_STAMP_FILE)_init:$(srcdir)/$(TARGET)-local.h $(srcdir)/Makefile.am
 # we cannot depend on BUILT_SOURCES because it would create a circular dep
 # instead we force make of thos targets
 $(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
-	cproto_extra_deps="`echo $(BUILT_SOURCES) | sed -e 's/$(TARGET).h//'`" ;\
+	@cproto_extra_deps="`echo $(BUILT_SOURCES) | sed -e 's/$(TARGET).h//'`" ;\
 	if test "$$cproto_extra_deps" ; then $(MAKE) $$cproto_extra_deps ; fi
-	cproto_sources=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
+	$(AM_V_GEN) cproto_sources=`for s in $(SOURCES) ; do ( test -f $$s && echo $$s ) || echo $(srcdir)/$$s ; done`; \
 	{ \
 		cproto_guard="`echo $(TARGET)_header_included | tr - _`";\
       	echo "/* Warning! Do not modify this file that is automatically generated!"; \
@@ -53,7 +53,7 @@ $(CPROTO_STAMP_FILE):$(CPROTO_STAMP_FILE)_init  $(SOURCES) $(srcdir)/Makefile.am
 # here is the trick: if our stamp file is similar to the header, we do not touch the header
 # and so do not trigger rebuild of all files including the header
 $(TARGET).h:$(CPROTO_STAMP_FILE)
-	cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
+	$(AM_v_GEN)cmp -s $(TARGET).h $(CPROTO_STAMP_FILE) || cp $(CPROTO_STAMP_FILE) $(TARGET).h
 
 clean-local:
 	rm -f $(TARGET).h $(CPROTO_STAMP_FILE) $(CPROTO_STAMP_FILE)_init
