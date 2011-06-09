@@ -28,7 +28,7 @@
 #define toolTestExec(error)		checkErrorInline      	(error, __FILE__, __LINE__)
 #define toolTestExecMessage(message)	checkErrorMessageInline	(message, __FILE__, __LINE__)
 
-inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
+static inline void checkErrorInline(cudaError_t error, const char *currentFile, const int currentLine)
 {
     if(cudaSuccess != error){
 	fprintf(stderr, "File %s - Line %i - The runtime error is %s\n", currentFile, currentLine, cudaGetErrorString(error));
@@ -36,7 +36,7 @@ inline void checkErrorInline(cudaError_t error, const char *currentFile, const i
     }
 }
 
-inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
+static inline void checkErrorMessageInline(const char *errorMessage, const char *currentFile, const int currentLine)
 {
     cudaError_t error = cudaGetLastError();
     if(cudaSuccess != error){

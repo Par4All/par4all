@@ -12,7 +12,7 @@
 
 #define checkStackSize()		checkStackSizeInline (__FILE__, __LINE__)
 
-inline void checkStackSizeInline(const char *currentFile, const int currentLine)
+static inline void checkStackSizeInline(const char *currentFile, const int currentLine)
 {
 	struct rlimit r;	
 	getrlimit(RLIMIT_STACK, &r);	
