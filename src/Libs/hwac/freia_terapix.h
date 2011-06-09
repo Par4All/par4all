@@ -30,11 +30,12 @@
 #define HWAC_FREIA_TERAPIX_H_
 
 // terapix specific property names
-#define trpx_mem_prop "HWAC_TERAPIX_RAMPE"
-#define trpx_npe_prop "HWAC_TERAPIX_NPE"
-#define trpx_dmabw_prop "HWAC_TERAPIX_DMABW"
-#define trpx_gram_width "HWAC_TERAPIX_GRAM_WIDTH"
+#define trpx_mem_prop    "HWAC_TERAPIX_RAMPE"
+#define trpx_npe_prop    "HWAC_TERAPIX_NPE"
+#define trpx_dmabw_prop  "HWAC_TERAPIX_DMABW"
+#define trpx_gram_width  "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
+#define trpx_split_dag   "HWAC_TERAPIX_SPLIT_DAG"
 
 // includes for generated helper
 #define FREIA_TRPX_INCLUDES           \
