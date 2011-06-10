@@ -216,7 +216,15 @@ static const char* entity_dot_name(entity e)
 static void dagvtx_dot_node(FILE * out, const string prefix, const dagvtx v)
 {
   fprintf(out, "%s\"%"_intFMT" %s\"", prefix? prefix: "",
-    dagvtx_number(v), dagvtx_compact_operation(v));
+          dagvtx_number(v), dagvtx_compact_operation(v));
+}
+
+static void
+dagvtx_dot_node_sb(string_buffer sb, const string prefix, const dagvtx v)
+{
+  sb_cat(sb, prefix? prefix: "");
+  sb_cat(sb, "\"", itoa((int) dagvtx_number(v)),
+         " ", dagvtx_compact_operation(v),  "\"");
 }
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
@@ -232,51 +240,68 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 
   if (dagvtx_number(vtx)!=0)
   {
+    // we are dealing with a computation...
     string attribute = what_operation_shape(vtxcontent_optype(co));
+    string_buffer sa = string_buffer_make(true);
+    bool some_arcs = false;
 
-    dagvtx_dot_node(out, "  ", vtx);
-    fprintf(out, " [%s", attribute);
-    if (!label_nodes)
-      // show a short label with only the operation
-      fprintf(out, ",label=\"%s\"", dagvtx_compact_operation(vtx));
-    fprintf(out, "];\n");
-
-    // image dependencies
+    // first check for image dependencies
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
     {
-      dagvtx_dot_node(out, "  ", vtx);
-      dagvtx_dot_node(out, " -> ", succ);
-      fprintf(out, "%s%s%s;\n", show_arcs? " [label=\"": "",
-        show_arcs? vname: "", show_arcs? "\"]": "");
+      dagvtx_dot_node_sb(sa, "  ", vtx);
+      dagvtx_dot_node_sb(sa, " -> ", succ);
+      sb_cat(sa, show_arcs? " [label=\"": "",
+             show_arcs? vname: "", show_arcs? "\"]": "", ";\n");
+      some_arcs = true;
     }
 
-    // scalar dependencies anywhere... hmmm...
+    // then scalar dependencies anywhere... hmmm...
     FOREACH(dagvtx, v, dag_vertices(d))
     {
       list vars = NIL;
       if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
-          dagvtx_statement(v), &vars))
+                                        dagvtx_statement(v), &vars))
       {
-        dagvtx_dot_node(out, "  ", vtx);
-        dagvtx_dot_node(out, " -> ", v);
-        fprintf(out, " [" SCL_DEP);
+        dagvtx_dot_node_sb(sa, "  ", vtx);
+        dagvtx_dot_node_sb(sa, " -> ", v);
+        sb_cat(sa, " [" SCL_DEP);
 
         if (vars && show_arcs)
         {
           int count = 0;
-          fprintf(out, ",label=\"");
+          sb_cat(sa, ",label=\"");
           FOREACH(entity, var, vars)
-            fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
-          fprintf(out, "\"");
+            sb_cat(sa, count++? " ": "", entity_dot_name(var));
+          sb_cat(sa, "\"");
         }
-        fprintf(out, "];\n");
+        sb_cat(sa, "];\n");
+
+        some_arcs = true;
       }
       gen_free_list(vars), vars = NIL;
     }
+
+    bool some_image_stuff = !dagvtx_other_stuff_p(vtx);
+
+    if (!filter_nodes || some_image_stuff || (filter_nodes && some_arcs))
+    {
+      // appends the node description
+      dagvtx_dot_node(out, "  ", vtx);
+      fprintf(out, " [%s", attribute);
+      if (!label_nodes)
+        // show a short label with only the operation
+        fprintf(out, ",label=\"%s\"", dagvtx_compact_operation(vtx));
+      fprintf(out, "];\n");
+      // now appends arcs...
+      string_buffer_to_file(sa, out);
+    }
+
+    // cleanup
+    string_buffer_free(&sa);
   }
   else
   {
-    // input image...
+    // this is an input image.
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
     {
       fprintf(out, "  \"%s\"", vname);
@@ -295,22 +320,27 @@ static void dagvtx_list_dot(FILE * out, const string comment, const list l)
   fprintf(out, "\n");
 }
 
-/* dag debug with dot format.
+/* @brief output dag in dot format, for debug or show
+ * @param out, append to this file
+ * @param what, name of dag
+ * @param d, dag to output
  */
 void dag_dot(FILE * out, const string what, const dag d)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
+  // first, declare inputs and outputs as circles
   dagvtx_list_dot(out, "inputs", dag_inputs(d));
   dagvtx_list_dot(out, "outputs", dag_outputs(d));
 
+  // second, show computations
   fprintf(out, "  // computation vertices\n");
   FOREACH(dagvtx, vx, dag_vertices(d))
   {
     dagvtx_dot(out, d, vx);
     vtxcontent c = dagvtx_content(vx);
 
-    // outputs arcs for vx
+    // outputs arcs for vx when the result is extracted
     if (gen_in_list_p(vx, dag_outputs(d)))
     {
       dagvtx_dot_node(out, "  ", vx);
@@ -349,7 +379,9 @@ void dag_dot_dump_prefix(string module, string prefix, int number, dag d)
 
 // debug help
 static void check_removed(const dagvtx v, const dagvtx removed)
-{ pips_assert("not removed vertex", v!=removed); }
+{
+  pips_assert("not removed vertex", v!=removed);
+}
 
 static int dagvtx_cmp_entity(const dagvtx * v1, const dagvtx * v2)
 {
