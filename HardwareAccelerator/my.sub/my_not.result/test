@@ -220,8 +220,8 @@ digraph "dag_cleaned_0" {
   "5 !" -> "o";
   "i0" -> "5 !";
 }
-// graph for dag "my_not_helper_0_0" of module "my_not" in dot format
-digraph "my_not_helper_0_0" {
+// graph for dag "my_not_helper_0_0_0" of module "my_not" in dot format
+digraph "my_not_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -247,9 +247,11 @@ digraph "my_not_helper_0_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 4 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 4
+ * - communication: 256
  */
-freia_status my_not_helper_0_0(
+freia_status my_not_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0)
 {
@@ -361,14 +363,14 @@ freia_status my_not_helper_0_0(
 
 freia_status my_not(freia_data2d *o, freia_data2d *i0)
 {
-   return my_not_helper_0_0(o, i0);                                     /*0005*/
+   return my_not_helper_0_0_0(o, i0);                                   /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_not(freia_data2d *o, freia_data2d *i0)
 {
-   return my_not_helper_0_0(o, i0);                                     /*0005*/
+   return my_not_helper_0_0_0(o, i0);                                   /*0005*/
 }
 #
 # FREIA COMPILATION DONE

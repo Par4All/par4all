@@ -1146,8 +1146,8 @@ digraph "dag_cleaned_0" {
   "i0" -> "36 E8";
   "i0" -> "35 D8";
 }
-// graph for dag "freia_42_helper_0_0" of module "freia_42" in dot format
-digraph "freia_42_helper_0_0" {
+// graph for dag "freia_42_helper_0_0_0" of module "freia_42" in dot format
+digraph "freia_42_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i2" [shape=circle];
@@ -1198,9 +1198,11 @@ digraph "freia_42_helper_0_0" {
  * 3 input images, 3 output images
  * 8 image operations in dag
  * dag length is 6, dag width is 3
- * cost is 65 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 65
+ * - communication: 768
  */
-freia_status freia_42_helper_0_0(
+freia_status freia_42_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -1548,7 +1550,7 @@ int freia_42(void)
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
 
-   freia_42_helper_0_0(i1, i1, i7, i0, i2, i4, freia_morpho_kernel_8c);                /*0035*/
+   freia_42_helper_0_0_0(i1, i1, i7, i0, i2, i4, freia_morpho_kernel_8c);              /*0035*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0047*/
 
@@ -1590,7 +1592,7 @@ int freia_42(void)
    freia_common_rx_image(i2, &fdin);                                    /*0032*/
    freia_common_rx_image(i4, &fdin);                                    /*0033*/
 
-   freia_42_helper_0_0(i1, i1, i7, i0, i2, i4, freia_morpho_kernel_8c);                /*0035*/
+   freia_42_helper_0_0_0(i1, i1, i7, i0, i2, i4, freia_morpho_kernel_8c);              /*0035*/
 
    freia_common_tx_image(i7, &fdout);                                   /*0047*/
 

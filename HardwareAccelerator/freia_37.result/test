@@ -534,8 +534,8 @@ digraph "dag_cleaned_0" {
   "i" -> "11 D8";
   "i" -> "10 E8";
 }
-// graph for dag "freia_37_helper_0_0" of module "freia_37" in dot format
-digraph "freia_37_helper_0_0" {
+// graph for dag "freia_37_helper_0_0_0" of module "freia_37" in dot format
+digraph "freia_37_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -578,9 +578,11 @@ digraph "freia_37_helper_0_0" {
  * 1 input image, 1 output image
  * 9 image operations in dag
  * dag length is 6, dag width is 2
- * cost is 124 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 124
+ * - communication: 256
  */
-freia_status freia_37_helper_0_0(
+freia_status freia_37_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2)
@@ -901,7 +903,7 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0(o, i, kern);                                     /*0010*/
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    
@@ -920,7 +922,7 @@ freia_status freia_37(freia_data2d *o, freia_data2d *i, int32_t *kern)
    
    // preschedule example for terapix tests
    
-   freia_37_helper_0_0(o, i, kern);                                     /*0010*/
+   freia_37_helper_0_0_0(o, i, kern);                                   /*0010*/
    
    
    

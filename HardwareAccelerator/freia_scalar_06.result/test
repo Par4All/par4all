@@ -904,8 +904,8 @@ digraph "dag_cleaned_0" {
   "i" -> "19 thr";
   "i" -> "17 max";
 }
-// graph for dag "freia_scalar_06_helper_0_0" of module "freia_scalar_06" in dot format
-digraph "freia_scalar_06_helper_0_0" {
+// graph for dag "freia_scalar_06_helper_0_0_0" of module "freia_scalar_06" in dot format
+digraph "freia_scalar_06_helper_0_0_0" {
   // inputs
   "X" [shape=circle];
   "tC3" [shape=circle];
@@ -921,8 +921,8 @@ digraph "freia_scalar_06_helper_0_0" {
   "35 thr" -> "37 +" [label="tD"];
   "X" -> "35 thr";
 }
-// graph for dag "freia_scalar_06_helper_0_1" of module "freia_scalar_06" in dot format
-digraph "freia_scalar_06_helper_0_1" {
+// graph for dag "freia_scalar_06_helper_0_1_0" of module "freia_scalar_06" in dot format
+digraph "freia_scalar_06_helper_0_1_0" {
   // inputs
   "i" [shape=circle];
 
@@ -945,8 +945,8 @@ digraph "freia_scalar_06_helper_0_1" {
   "19 thr" -> "31 D8" [label="tB"];
   "i" -> "19 thr";
 }
-// graph for dag "freia_scalar_06_helper_0_2" of module "freia_scalar_06" in dot format
-digraph "freia_scalar_06_helper_0_2" {
+// graph for dag "freia_scalar_06_helper_0_2_0" of module "freia_scalar_06" in dot format
+digraph "freia_scalar_06_helper_0_2_0" {
   // inputs
   "i" [shape=circle];
 
@@ -976,9 +976,11 @@ digraph "freia_scalar_06_helper_0_2" {
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
- * cost is 9 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 9
+ * - communication: 384
  */
-freia_status freia_scalar_06_helper_0_0(
+freia_status freia_scalar_06_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -1144,9 +1146,11 @@ freia_status freia_scalar_06_helper_0_0(
  * 1 input image, 1 output image
  * 6 image operations in dag
  * dag length is 6, dag width is 1
- * cost is 42 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 42
+ * - communication: 256
  */
-freia_status freia_scalar_06_helper_0_1(
+freia_status freia_scalar_06_helper_0_1_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2,
@@ -1421,9 +1425,11 @@ freia_status freia_scalar_06_helper_0_1(
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 1
- * cost is 21 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 21
+ * - communication: 256
  */
-freia_status freia_scalar_06_helper_0_2(
+freia_status freia_scalar_06_helper_0_2_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t * po2,
@@ -1620,9 +1626,9 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
-   freia_scalar_06_helper_0_2(X, i, &sA, k, &sA2);                      /*0017*/
+   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
-   freia_scalar_06_helper_0_1(tC3, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);              /*0019*/
+   freia_scalar_06_helper_0_1_0(tC3, i, sA-10, sA-1, false, k, &sB, sA2-10, sA2-1, false);            /*0019*/
    // A
    // A
    // C with X from A
@@ -1631,7 +1637,7 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // B
    // B
    // D with X from B
-   freia_scalar_06_helper_0_0(o, X, tC3, sB-10, sB-1, false);           /*0035*/
+   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, false);         /*0035*/
    // D
    
    freia_common_destruct_data(X);                                       /*0039*/
@@ -1653,9 +1659,9 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // look for order issues when reusing a temporary image
    // A
-   freia_scalar_06_helper_0_2(X, i, &sA, k, &sA2);                      /*0017*/
+   freia_scalar_06_helper_0_2_0(X, i, &sA, k, &sA2);                    /*0017*/
    // B
-   freia_scalar_06_helper_0_1(tC3, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);       /*0019*/
+   freia_scalar_06_helper_0_1_0(tC3, i, sA-10, sA-1, 0, k, &sB, sA2-10, sA2-1, 0);     /*0019*/
    // A
    // A
    // C with X from A
@@ -1664,7 +1670,7 @@ freia_status freia_scalar_06(freia_data2d *o, freia_data2d *i, uint32_t *k)
    // B
    // B
    // D with X from B
-   freia_scalar_06_helper_0_0(o, X, tC3, sB-10, sB-1, 0);               /*0035*/
+   freia_scalar_06_helper_0_0_0(o, X, tC3, sB-10, sB-1, 0);             /*0035*/
    // D
    
    freia_common_destruct_data(X);                                       /*0039*/

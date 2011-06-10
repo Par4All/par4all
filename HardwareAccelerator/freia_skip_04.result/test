@@ -416,8 +416,8 @@ digraph "dag_cleaned_0" {
   "i" -> "9 ^.";
   "i" -> "8 max";
 }
-// graph for dag "freia_skip_04_helper_0_0" of module "freia_skip_04" in dot format
-digraph "freia_skip_04_helper_0_0" {
+// graph for dag "freia_skip_04_helper_0_0_0" of module "freia_skip_04" in dot format
+digraph "freia_skip_04_helper_0_0_0" {
   // inputs
   "t" [shape=circle];
 
@@ -429,8 +429,8 @@ digraph "freia_skip_04_helper_0_0" {
   "14 thr" -> "o";
   "t" -> "14 thr";
 }
-// graph for dag "freia_skip_04_helper_0_1" of module "freia_skip_04" in dot format
-digraph "freia_skip_04_helper_0_1" {
+// graph for dag "freia_skip_04_helper_0_1_0" of module "freia_skip_04" in dot format
+digraph "freia_skip_04_helper_0_1_0" {
   // inputs
   "i" [shape=circle];
 
@@ -458,9 +458,11 @@ digraph "freia_skip_04_helper_0_1" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 5 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 5
+ * - communication: 256
  */
-freia_status freia_skip_04_helper_0_0(
+freia_status freia_skip_04_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2,
@@ -593,9 +595,11 @@ freia_status freia_skip_04_helper_0_0(
  * 1 input image, 1 output image
  * 2 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 6 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 6
+ * - communication: 256
  */
-freia_status freia_skip_04_helper_0_1(
+freia_status freia_skip_04_helper_0_1_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t * po2,
@@ -745,12 +749,12 @@ void freia_skip_04(freia_data2d *o, freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_04_helper_0_1(t, i, &max, 111);                           /*0008*/
+   freia_skip_04_helper_0_1_0(t, i, &max, 111);                         /*0008*/
    if (max>128)                                                         /*0010*/
       seuil = max-10;                                                   /*0011*/
    else
       seuil = max+15;                                                   /*0013*/
-   freia_skip_04_helper_0_0(o, t, 8, seuil-4, true);                    /*0014*/
+   freia_skip_04_helper_0_0_0(o, t, 8, seuil-4, true);                  /*0014*/
    freia_common_destruct_data(t);                                       /*0015*/
 }
 
@@ -761,12 +765,12 @@ void freia_skip_04(freia_data2d *o, freia_data2d *i)
    int32_t max, seuil;                                                  /*0005*/
    freia_data2d *t = freia_common_create_data(16, 128, 128);            /*0006*/
    // use some control in an intermediate statement
-   freia_skip_04_helper_0_1(t, i, &max, 111);                           /*0008*/
+   freia_skip_04_helper_0_1_0(t, i, &max, 111);                         /*0008*/
    if (max>128)                                                         /*0010*/
       seuil = max-10;                                                   /*0011*/
    else
       seuil = max+15;                                                   /*0013*/
-   freia_skip_04_helper_0_0(o, t, 8, seuil-4, 1);                       /*0014*/
+   freia_skip_04_helper_0_0_0(o, t, 8, seuil-4, 1);                     /*0014*/
    freia_common_destruct_data(t);                                       /*0015*/
 }
 #

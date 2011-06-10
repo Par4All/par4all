@@ -215,8 +215,8 @@ void border_nse(freia_data2d *out, freia_data2d *in)
 
 ! graphs
 
-// graph for dag "border_nse_helper_0_0" of module "border_nse" in dot format
-digraph "border_nse_helper_0_0" {
+// graph for dag "border_nse_helper_0_0_0" of module "border_nse" in dot format
+digraph "border_nse_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -268,9 +268,11 @@ digraph "dag_cleaned_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 15 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 15
+ * - communication: 256
  */
-freia_status border_nse_helper_0_0(
+freia_status border_nse_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2)
@@ -423,7 +425,7 @@ void border_nse(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 1, 1, 0, 1, 1, 0, 1, 1};                  /*0007*/
-   border_nse_helper_0_0(out, in, kernel);                              /*0008*/
+   border_nse_helper_0_0_0(out, in, kernel);                            /*0008*/
 }
 
 ! cleaned up function
@@ -433,7 +435,7 @@ void border_nse(freia_data2d *out, freia_data2d *in)
    
    
    const int32_t kernel = {0, 1, 1, 0, 1, 1, 0, 1, 1};                  /*0007*/
-   border_nse_helper_0_0(out, in, kernel);                              /*0008*/
+   border_nse_helper_0_0_0(out, in, kernel);                            /*0008*/
 }
 #
 # FREIA COMPILATION DONE

@@ -227,8 +227,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 ?=";
   "i" -> "7 max";
 }
-// graph for dag "freia_dup_00_helper_0_0" of module "freia_dup_00" in dot format
-digraph "freia_dup_00_helper_0_0" {
+// graph for dag "freia_dup_00_helper_0_0_0" of module "freia_dup_00" in dot format
+digraph "freia_dup_00_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -252,9 +252,11 @@ digraph "freia_dup_00_helper_0_0" {
  * 1 input image, 0 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 128
  */
-freia_status freia_dup_00_helper_0_0(
+freia_status freia_dup_00_helper_0_0_0(
   freia_data2d * i0,
   int32_t * po1)
 {
@@ -359,7 +361,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
+   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }
@@ -370,7 +372,7 @@ int freia_dup_00(freia_data2d *i)
 {
    int max1, max2;                                                      /*0005*/
    // same measure performed twice
-   freia_dup_00_helper_0_0(i, &max1);                                   /*0007*/
+   freia_dup_00_helper_0_0_0(i, &max1);                                 /*0007*/
    max2 = max1;                                                         /*0008*/
    return max1+max2;                                                    /*0009*/
 }

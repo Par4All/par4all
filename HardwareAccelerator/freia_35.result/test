@@ -321,8 +321,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "8 +";
   "i0" -> "8 +";
 }
-// graph for dag "freia_35_helper_0_0" of module "freia_35" in dot format
-digraph "freia_35_helper_0_0" {
+// graph for dag "freia_35_helper_0_0_0" of module "freia_35" in dot format
+digraph "freia_35_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -355,9 +355,11 @@ digraph "freia_35_helper_0_0" {
  * 2 input images, 1 output image
  * 3 image operations in dag
  * dag length is 4, dag width is 2
- * cost is 11 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 11
+ * - communication: 384
  */
-freia_status freia_35_helper_0_0(
+freia_status freia_35_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -525,7 +527,7 @@ freia_status freia_35_helper_0_0(
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0(o, i0, i1, &min);                                /*0008*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -534,7 +536,7 @@ freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 freia_status freia_35(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    int32_t min;                                                         /*0007*/
-   freia_35_helper_0_0(o, i0, i1, &min);                                /*0008*/
+   freia_35_helper_0_0_0(o, i0, i1, &min);                              /*0008*/
    return 0;                                                            /*0012*/
 }
 #

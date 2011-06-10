@@ -191,8 +191,8 @@ digraph "dag_cleaned_0" {
   "4 max" [shape=diamond];
   "i0" -> "4 max";
 }
-// graph for dag "my_global_max_helper_0_0" of module "my_global_max" in dot format
-digraph "my_global_max_helper_0_0" {
+// graph for dag "my_global_max_helper_0_0_0" of module "my_global_max" in dot format
+digraph "my_global_max_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -216,9 +216,11 @@ digraph "my_global_max_helper_0_0" {
  * 1 input image, 0 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 128
  */
-freia_status my_global_max_helper_0_0(
+freia_status my_global_max_helper_0_0_0(
   freia_data2d * i0,
   int32_t * po1)
 {
@@ -321,14 +323,14 @@ freia_status my_global_max_helper_0_0(
 
 freia_status my_global_max(freia_data2d *i0, int32_t *p0)
 {
-   return my_global_max_helper_0_0(i0, p0);                             /*0004*/
+   return my_global_max_helper_0_0_0(i0, p0);                           /*0004*/
 }
 
 ! cleaned up function
 
 freia_status my_global_max(freia_data2d *i0, int32_t *p0)
 {
-   return my_global_max_helper_0_0(i0, p0);                             /*0004*/
+   return my_global_max_helper_0_0_0(i0, p0);                           /*0004*/
 }
 #
 # FREIA COMPILATION DONE

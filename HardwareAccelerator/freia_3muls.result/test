@@ -325,8 +325,8 @@ digraph "dag_cleaned_0" {
   "in1" -> "5 *";
   "in0" -> "5 *";
 }
-// graph for dag "freia_3muls_helper_0_0" of module "freia_3muls" in dot format
-digraph "freia_3muls_helper_0_0" {
+// graph for dag "freia_3muls_helper_0_0_0" of module "freia_3muls" in dot format
+digraph "freia_3muls_helper_0_0_0" {
   // inputs
   "in0" [shape=circle];
   "in1" [shape=circle];
@@ -359,9 +359,11 @@ digraph "freia_3muls_helper_0_0" {
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 3, dag width is 2
- * cost is 8 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 8
+ * - communication: 512
  */
-freia_status freia_3muls_helper_0_0(
+freia_status freia_3muls_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * i0,
@@ -516,14 +518,14 @@ freia_status freia_3muls_helper_0_0(
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0(o1, o2, in0, in1);                            /*0005*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 
 ! cleaned up function
 
 void freia_3muls(freia_data2d *o1, freia_data2d *o2, freia_data2d *in0, freia_data2d *in1)
 {
-   freia_3muls_helper_0_0(o1, o2, in0, in1);                            /*0005*/
+   freia_3muls_helper_0_0_0(o1, o2, in0, in1);                          /*0005*/
 }
 #
 # FREIA COMPILATION DONE

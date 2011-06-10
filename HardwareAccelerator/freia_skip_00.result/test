@@ -310,8 +310,8 @@ digraph "dag_cleaned_0" {
   "i0" -> "10 ^";
   "i0" -> "8 -s";
 }
-// graph for dag "freia_skip_00_helper_0_0" of module "freia_skip_00" in dot format
-digraph "freia_skip_00_helper_0_0" {
+// graph for dag "freia_skip_00_helper_0_0_0" of module "freia_skip_00" in dot format
+digraph "freia_skip_00_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -342,9 +342,11 @@ digraph "freia_skip_00_helper_0_0" {
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
- * cost is 8 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 8
+ * - communication: 384
  */
-freia_status freia_skip_00_helper_0_0(
+freia_status freia_skip_00_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1)
@@ -494,7 +496,7 @@ freia_status freia_skip_00_helper_0_0(
 freia_status freia_skip_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret;                                                    /*0006*/
-   freia_skip_00_helper_0_0(o, i0, i1);                                 /*0008*/
+   freia_skip_00_helper_0_0_0(o, i0, i1);                               /*0008*/
    ret = FREIA_OK;                                                      /*0009*/
    ret |= FREIA_OK;                                                     /*0011*/
    return ret;                                                          /*0013*/
@@ -505,7 +507,7 @@ freia_status freia_skip_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 freia_status freia_skip_00(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
 {
    freia_status ret;                                                    /*0006*/
-   freia_skip_00_helper_0_0(o, i0, i1);                                 /*0008*/
+   freia_skip_00_helper_0_0_0(o, i0, i1);                               /*0008*/
    ret = 0;                                                             /*0009*/
    return ret;                                                          /*0013*/
 }

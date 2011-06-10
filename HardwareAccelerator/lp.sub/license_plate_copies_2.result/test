@@ -5185,7 +5185,9 @@ digraph "license_plate_copies_helper_0_0" {
  * 1 input image, 1 output image
  * 69 image operations in dag
  * dag length is 53, dag width is 2
- * cost is 993 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 993
+ * - communication: 256
  */
 freia_status license_plate_copies_helper_0_0(
   freia_data2d * o0,

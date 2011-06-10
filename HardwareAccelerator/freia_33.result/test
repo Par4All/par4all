@@ -1003,8 +1003,8 @@ digraph "dag_cleaned_0" {
   "i" -> "20 thr";
   "i" -> "18 max";
 }
-// graph for dag "freia_33_helper_0_0" of module "freia_33" in dot format
-digraph "freia_33_helper_0_0" {
+// graph for dag "freia_33_helper_0_0_0" of module "freia_33" in dot format
+digraph "freia_33_helper_0_0_0" {
   // inputs
   "X1" [shape=circle];
   "tC2" [shape=circle];
@@ -1020,8 +1020,8 @@ digraph "freia_33_helper_0_0" {
   "33 thr" -> "34 +" [label="tD"];
   "X1" -> "33 thr";
 }
-// graph for dag "freia_33_helper_0_1" of module "freia_33" in dot format
-digraph "freia_33_helper_0_1" {
+// graph for dag "freia_33_helper_0_1_0" of module "freia_33" in dot format
+digraph "freia_33_helper_0_1_0" {
   // inputs
   "X0" [shape=circle];
   "i" [shape=circle];
@@ -1048,8 +1048,8 @@ digraph "freia_33_helper_0_1" {
   "20 thr" -> "29 D8" [label="tB"];
   "i" -> "20 thr";
 }
-// graph for dag "freia_33_helper_0_2" of module "freia_33" in dot format
-digraph "freia_33_helper_0_2" {
+// graph for dag "freia_33_helper_0_2_0" of module "freia_33" in dot format
+digraph "freia_33_helper_0_2_0" {
   // inputs
   "i" [shape=circle];
 
@@ -1079,9 +1079,11 @@ digraph "freia_33_helper_0_2" {
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
- * cost is 9 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 9
+ * - communication: 384
  */
-freia_status freia_33_helper_0_0(
+freia_status freia_33_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -1247,9 +1249,11 @@ freia_status freia_33_helper_0_0(
  * 2 input images, 2 output images
  * 6 image operations in dag
  * dag length is 5, dag width is 2
- * cost is 36 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 36
+ * - communication: 512
  */
-freia_status freia_33_helper_0_1(
+freia_status freia_33_helper_0_1_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * i0,
@@ -1540,9 +1544,11 @@ freia_status freia_33_helper_0_1(
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 1
- * cost is 21 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 21
+ * - communication: 256
  */
-freia_status freia_33_helper_0_2(
+freia_status freia_33_helper_0_2_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t * po2,
@@ -1740,15 +1746,15 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_2(X0, i, &sA, k, &sB);                             /*0018*/
+   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1(tC2, X1, X0, i, sA-10, sA-1, false, k, sB-10, sB-1, false, &sC);               /*0020*/
+   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, false, k, sB-10, sB-1, false, &sC);             /*0020*/
    // A
    // A
    // C
    // B
    // D
-   freia_33_helper_0_0(o, X1, tC2, sC-10, sC-1, false);                 /*0033*/
+   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, false);               /*0033*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
    freia_common_destruct_data(X1);                                      /*0037*/
@@ -1772,15 +1778,15 @@ freia_status freia_33(freia_data2d *o, freia_data2d *i, uint32_t *k)
    
    // complex dag for split
    // A
-   freia_33_helper_0_2(X0, i, &sA, k, &sB);                             /*0018*/
+   freia_33_helper_0_2_0(X0, i, &sA, k, &sB);                           /*0018*/
    // B
-   freia_33_helper_0_1(tC2, X1, X0, i, sA-10, sA-1, 0, k, sB-10, sB-1, 0, &sC);        /*0020*/
+   freia_33_helper_0_1_0(tC2, X1, X0, i, sA-10, sA-1, 0, k, sB-10, sB-1, 0, &sC);      /*0020*/
    // A
    // A
    // C
    // B
    // D
-   freia_33_helper_0_0(o, X1, tC2, sC-10, sC-1, 0);                     /*0033*/
+   freia_33_helper_0_0_0(o, X1, tC2, sC-10, sC-1, 0);                   /*0033*/
 
    freia_common_destruct_data(X0);                                      /*0036*/
    freia_common_destruct_data(X1);                                      /*0037*/

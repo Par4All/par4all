@@ -560,8 +560,8 @@ digraph "dag_cleaned_0" {
   "g1" -> "29 -|";
   "g2" -> "29 -|";
 }
-// graph for dag "freia_08_helper_0_0" of module "freia_08" in dot format
-digraph "freia_08_helper_0_0" {
+// graph for dag "freia_08_helper_0_0_0" of module "freia_08" in dot format
+digraph "freia_08_helper_0_0_0" {
   // inputs
   "g0" [shape=circle];
   "g1" [shape=circle];
@@ -596,9 +596,11 @@ digraph "freia_08_helper_0_0" {
  * 3 input images, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 3
- * cost is 12 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 12
+ * - communication: 512
  */
-freia_status freia_08_helper_0_0(
+freia_status freia_08_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -790,7 +792,7 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    freia_cipo_gradient(g0, i0, connexity, size);                        /*0026*/
    freia_cipo_gradient(g1, i1, connexity, size);                        /*0027*/
    freia_cipo_gradient(g2, i2, connexity, size);                        /*0028*/
-   freia_08_helper_0_0(o, g0, g1, g2);                                  /*0029*/
+   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0029*/
 
    freia_common_destruct_data(g0);                                      /*0033*/
    freia_common_destruct_data(g1);                                      /*0034*/
@@ -813,7 +815,7 @@ freia_status freia_08(freia_data2d *o, freia_data2d *i0, freia_data2d *i1, freia
    freia_cipo_gradient(g0, i0, 8, 1);                                   /*0026*/
    freia_cipo_gradient(g1, i1, 8, 1);                                   /*0027*/
    freia_cipo_gradient(g2, i2, 8, 1);                                   /*0028*/
-   freia_08_helper_0_0(o, g0, g1, g2);                                  /*0029*/
+   freia_08_helper_0_0_0(o, g0, g1, g2);                                /*0029*/
 
    freia_common_destruct_data(g0);                                      /*0033*/
    freia_common_destruct_data(g1);                                      /*0034*/

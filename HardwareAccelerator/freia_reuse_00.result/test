@@ -363,8 +363,8 @@ digraph "dag_cleaned_0" {
   "12 E6" -> "13 D6" [label="t"];
   "i" -> "12 E6";
 }
-// graph for dag "freia_reuse_00_helper_0_0" of module "freia_reuse_00" in dot format
-digraph "freia_reuse_00_helper_0_0" {
+// graph for dag "freia_reuse_00_helper_0_0_0" of module "freia_reuse_00" in dot format
+digraph "freia_reuse_00_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -396,9 +396,11 @@ digraph "freia_reuse_00_helper_0_0" {
  * 1 input image, 1 output image
  * 4 image operations in dag
  * dag length is 5, dag width is 1
- * cost is 50 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 50
+ * - communication: 256
  */
-freia_status freia_reuse_00_helper_0_0(
+freia_status freia_reuse_00_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2)
@@ -603,7 +605,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0(o, i, k);                                  /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
    
    
    return FREIA_OK;                                                     /*0019*/
@@ -618,7 +620,7 @@ freia_status freia_reuse_00(freia_data2d *o, freia_data2d *i, int32_t *k)
    // t = D6(t)
    // t = E8(t)
    // o = D8(t)
-   freia_reuse_00_helper_0_0(o, i, k);                                  /*0012*/
+   freia_reuse_00_helper_0_0_0(o, i, k);                                /*0012*/
    
    
    return 0;                                                            /*0019*/

@@ -222,8 +222,8 @@ digraph "dag_cleaned_0" {
   "5 +." -> "o";
   "i0" -> "5 +.";
 }
-// graph for dag "my_add_const_helper_0_0" of module "my_add_const" in dot format
-digraph "my_add_const_helper_0_0" {
+// graph for dag "my_add_const_helper_0_0_0" of module "my_add_const" in dot format
+digraph "my_add_const_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -249,9 +249,11 @@ digraph "my_add_const_helper_0_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 256
  */
-freia_status my_add_const_helper_0_0(
+freia_status my_add_const_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2)
@@ -380,14 +382,14 @@ freia_status my_add_const_helper_0_0(
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
-   return my_add_const_helper_0_0(o, i0, p0);                           /*0005*/
+   return my_add_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
-   return my_add_const_helper_0_0(o, i0, p0);                           /*0005*/
+   return my_add_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }
 #
 # FREIA COMPILATION DONE

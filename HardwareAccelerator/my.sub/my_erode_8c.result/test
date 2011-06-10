@@ -223,8 +223,8 @@ digraph "dag_cleaned_0" {
   "5 E8" -> "o";
   "i0" -> "5 E8";
 }
-// graph for dag "my_erode_8c_helper_0_0" of module "my_erode_8c" in dot format
-digraph "my_erode_8c_helper_0_0" {
+// graph for dag "my_erode_8c_helper_0_0_0" of module "my_erode_8c" in dot format
+digraph "my_erode_8c_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -250,9 +250,11 @@ digraph "my_erode_8c_helper_0_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 15 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 15
+ * - communication: 256
  */
-freia_status my_erode_8c_helper_0_0(
+freia_status my_erode_8c_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2)
@@ -402,14 +404,14 @@ freia_status my_erode_8c_helper_0_0(
 
 freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_erode_8c_helper_0_0(o, i0, p0);                            /*0005*/
+   return my_erode_8c_helper_0_0_0(o, i0, p0);                          /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_erode_8c(freia_data2d *o, freia_data2d *i0, int32_t *p0)
 {
-   return my_erode_8c_helper_0_0(o, i0, p0);                            /*0005*/
+   return my_erode_8c_helper_0_0_0(o, i0, p0);                          /*0005*/
 }
 #
 # FREIA COMPILATION DONE

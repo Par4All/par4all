@@ -466,8 +466,8 @@ digraph "dag_cleaned_0" {
   "i" -> "11 -.";
   "i" -> "10 vol";
 }
-// graph for dag "freia_skip_03_helper_0_0" of module "freia_skip_03" in dot format
-digraph "freia_skip_03_helper_0_0" {
+// graph for dag "freia_skip_03_helper_0_0_0" of module "freia_skip_03" in dot format
+digraph "freia_skip_03_helper_0_0_0" {
   // inputs
   "t1" [shape=circle];
 
@@ -479,8 +479,8 @@ digraph "freia_skip_03_helper_0_0" {
   "15 thr" -> "o";
   "t1" -> "15 thr";
 }
-// graph for dag "freia_skip_03_helper_0_1" of module "freia_skip_03" in dot format
-digraph "freia_skip_03_helper_0_1" {
+// graph for dag "freia_skip_03_helper_0_1_0" of module "freia_skip_03" in dot format
+digraph "freia_skip_03_helper_0_1_0" {
   // inputs
   "i" [shape=circle];
 
@@ -510,9 +510,11 @@ digraph "freia_skip_03_helper_0_1" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 5 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 5
+ * - communication: 256
  */
-freia_status freia_skip_03_helper_0_0(
+freia_status freia_skip_03_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2,
@@ -645,9 +647,11 @@ freia_status freia_skip_03_helper_0_0(
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 1
- * cost is 9 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 9
+ * - communication: 256
  */
-freia_status freia_skip_03_helper_0_1(
+freia_status freia_skip_03_helper_0_1_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t * po2,
@@ -835,10 +839,10 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_1(t1, i, &vol, 127, 3);                       /*0010*/
+   freia_skip_03_helper_0_1_0(t1, i, &vol, 127, 3);                     /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
-   freia_skip_03_helper_0_0(o, t1, seuil, 250, false);                  /*0015*/
+   freia_skip_03_helper_0_0_0(o, t1, seuil, 250, false);                /*0015*/
    // cleanup
    freia_common_destruct_data(t1);                                      /*0018*/
 }
@@ -852,10 +856,10 @@ void freia_skip_03(freia_data2d *o, freia_data2d *i)
    freia_data2d *t1 = freia_common_create_data(16, 128, 128);           /*0007*/
    int32_t vol, mvol, seuil;                                            /*0008*/
    // sub_const must be reordered *before* seuil assignment...
-   freia_skip_03_helper_0_1(t1, i, &vol, 127, 3);                       /*0010*/
+   freia_skip_03_helper_0_1_0(t1, i, &vol, 127, 3);                     /*0010*/
    mvol = vol/1000+1;                                                   /*0012*/
    seuil = mvol+3;                                                      /*0014*/
-   freia_skip_03_helper_0_0(o, t1, seuil, 250, 0);                      /*0015*/
+   freia_skip_03_helper_0_0_0(o, t1, seuil, 250, 0);                    /*0015*/
    // cleanup
    freia_common_destruct_data(t1);                                      /*0018*/
 }

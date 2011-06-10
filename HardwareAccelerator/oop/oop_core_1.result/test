@@ -1835,8 +1835,8 @@ digraph "dag_cleaned_0" {
   "img0" -> "68 E8";
   "img0" -> "67 D8";
 }
-// graph for dag "oop_core_helper_0_0" of module "oop_core" in dot format
-digraph "oop_core_helper_0_0" {
+// graph for dag "oop_core_helper_0_0_0" of module "oop_core" in dot format
+digraph "oop_core_helper_0_0_0" {
   // inputs
   "img0" [shape=circle];
   "imgtt2" [shape=circle];
@@ -1906,9 +1906,11 @@ digraph "oop_core_helper_0_0" {
  * 3 input images, 3 output images
  * 17 image operations in dag
  * dag length is 11, dag width is 6
- * cost is 159 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 159
+ * - communication: 768
  */
-freia_status oop_core_helper_0_0(
+freia_status oop_core_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -2524,7 +2526,7 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);         /*0067*/
+   oop_core_helper_0_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);       /*0067*/
    
    
    
@@ -2609,7 +2611,7 @@ int oop_core(void)
    
    
    
-   oop_core_helper_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);         /*0067*/
+   oop_core_helper_0_0_0(img1, img1, img3, img0, imgtt2, imgtt4, freia_morpho_kernel_8c, freia_morpho_kernel_6c, 15, 255, 1);       /*0067*/
    
    
    

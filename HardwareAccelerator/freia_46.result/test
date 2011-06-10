@@ -266,8 +266,8 @@ digraph "dag_cleaned_0" {
   "out" -> "9 +";
   "in" -> "9 +";
 }
-// graph for dag "freia_46_helper_0_0" of module "freia_46" in dot format
-digraph "freia_46_helper_0_0" {
+// graph for dag "freia_46_helper_0_0_0" of module "freia_46" in dot format
+digraph "freia_46_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
   "out" [shape=circle];
@@ -295,9 +295,11 @@ digraph "freia_46_helper_0_0" {
  * 2 input images, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 2
- * cost is 4 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 4
+ * - communication: 384
  */
-freia_status freia_46_helper_0_0(
+freia_status freia_46_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1)
@@ -424,7 +426,7 @@ freia_status freia_46_helper_0_0(
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0(out, in, out);                                   /*0009*/
+   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
    return FREIA_OK;                                                     /*0012*/
 }
 
@@ -433,7 +435,7 @@ freia_status freia_46(freia_data2d *in, freia_data2d *out)
 freia_status freia_46(freia_data2d *in, freia_data2d *out)
 {
    // useless copy that requires backwards propagation
-   freia_46_helper_0_0(out, in, out);                                   /*0009*/
+   freia_46_helper_0_0_0(out, in, out);                                 /*0009*/
    return 0;                                                            /*0012*/
 }
 #

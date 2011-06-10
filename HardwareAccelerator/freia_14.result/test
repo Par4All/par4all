@@ -282,8 +282,8 @@ digraph "dag_cleaned_0" {
   "10 C" -> "11 +" [label="t"];
   "10 C" -> "11 +" [label="t"];
 }
-// graph for dag "freia_14_helper_0_0" of module "freia_14" in dot format
-digraph "freia_14_helper_0_0" {
+// graph for dag "freia_14_helper_0_0_0" of module "freia_14" in dot format
+digraph "freia_14_helper_0_0_0" {
   // inputs
 
   // outputs
@@ -310,9 +310,11 @@ digraph "freia_14_helper_0_0" {
  * 0 input image, 1 output image
  * 2 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 6 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 6
+ * - communication: 128
  */
-freia_status freia_14_helper_0_0(
+freia_status freia_14_helper_0_0_0(
   freia_data2d * o0,
   int32_t pi1)
 {
@@ -456,7 +458,7 @@ freia_status freia_14(freia_data2d *o, int32_t c)
    // 2 alu to alu paths
    // t = h()
    // o = t + t
-   freia_14_helper_0_0(o, c);                                           /*0010*/
+   freia_14_helper_0_0_0(o, c);                                         /*0010*/
 
    return FREIA_OK;                                                     /*0014*/
 }
@@ -468,7 +470,7 @@ freia_status freia_14(freia_data2d *o, int32_t c)
    // 2 alu to alu paths
    // t = h()
    // o = t + t
-   freia_14_helper_0_0(o, c);                                           /*0010*/
+   freia_14_helper_0_0_0(o, c);                                         /*0010*/
 
    return 0;                                                            /*0014*/
 }

@@ -358,8 +358,8 @@ digraph "dag_cleaned_0" {
   "i" -> "10 +";
   "i" -> "10 +";
 }
-// graph for dag "freia_skip_07_helper_0_0" of module "freia_skip_07" in dot format
-digraph "freia_skip_07_helper_0_0" {
+// graph for dag "freia_skip_07_helper_0_0_0" of module "freia_skip_07" in dot format
+digraph "freia_skip_07_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -393,9 +393,11 @@ digraph "freia_skip_07_helper_0_0" {
  * 1 input image, 1 output image
  * 4 image operations in dag
  * dag length is 4, dag width is 2
- * cost is 14 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 14
+ * - communication: 256
  */
-freia_status freia_skip_07_helper_0_0(
+freia_status freia_skip_07_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2,
@@ -608,7 +610,7 @@ freia_status freia_skip_07_helper_0_0(
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0(o, i, 111, 111);                            /*0010*/
+   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
 }
 
 ! cleaned up function
@@ -616,7 +618,7 @@ void freia_skip_07(freia_data2d *o, freia_data2d *i)
 void freia_skip_07(freia_data2d *o, freia_data2d *i)
 {
    // live allocation in an intermediate statement
-   freia_skip_07_helper_0_0(o, i, 111, 111);                            /*0010*/
+   freia_skip_07_helper_0_0_0(o, i, 111, 111);                          /*0010*/
 }
 #
 # FREIA COMPILATION DONE

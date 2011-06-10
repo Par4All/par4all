@@ -345,8 +345,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 -";
   "i" -> "8 -";
 }
-// graph for dag "freia_skip_05_helper_0_0" of module "freia_skip_05" in dot format
-digraph "freia_skip_05_helper_0_0" {
+// graph for dag "freia_skip_05_helper_0_0_0" of module "freia_skip_05" in dot format
+digraph "freia_skip_05_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -379,9 +379,11 @@ digraph "freia_skip_05_helper_0_0" {
  * 1 input image, 2 output images
  * 3 image operations in dag
  * dag length is 4, dag width is 2
- * cost is 12 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 12
+ * - communication: 384
  */
-freia_status freia_skip_05_helper_0_0(
+freia_status freia_skip_05_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * i0,
@@ -584,7 +586,7 @@ freia_status freia_skip_05_helper_0_0(
 void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0(i, o, i, 111, 8, 100, true);                /*0008*/
+   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, true);              /*0008*/
 }
 
 ! cleaned up function
@@ -592,7 +594,7 @@ void freia_skip_05(freia_data2d *o, freia_data2d *i)
 void freia_skip_05(freia_data2d *o, freia_data2d *i)
 {
    // allocation in the middle of the stream
-   freia_skip_05_helper_0_0(i, o, i, 111, 8, 100, 1);                   /*0008*/
+   freia_skip_05_helper_0_0_0(i, o, i, 111, 8, 100, 1);                 /*0008*/
 }
 #
 # FREIA COMPILATION DONE

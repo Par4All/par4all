@@ -247,8 +247,8 @@ digraph "dag_cleaned_0" {
   "o" -> "7 ^";
   "o" -> "7 ^";
 }
-// graph for dag "xor_00_helper_0_0" of module "xor_00" in dot format
-digraph "xor_00_helper_0_0" {
+// graph for dag "xor_00_helper_0_0_0" of module "xor_00" in dot format
+digraph "xor_00_helper_0_0_0" {
   // inputs
   "o" [shape=circle];
 
@@ -275,9 +275,11 @@ digraph "xor_00_helper_0_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 4 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 4
+ * - communication: 256
  */
-freia_status xor_00_helper_0_0(
+freia_status xor_00_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0)
 {
@@ -395,7 +397,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0(o, o);                                             /*0007*/
+   xor_00_helper_0_0_0(o, o);                                           /*0007*/
    return FREIA_OK;                                                     /*0008*/
 }
 
@@ -405,7 +407,7 @@ freia_status xor_00(freia_data2d *o)
 {
    // this means o := 0
    // freia_aipo_set_constant(o, 0);
-   xor_00_helper_0_0(o, o);                                             /*0007*/
+   xor_00_helper_0_0_0(o, o);                                           /*0007*/
    return 0;                                                            /*0008*/
 }
 #

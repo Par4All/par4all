@@ -1092,8 +1092,8 @@ digraph "dag_cleaned_0" {
   "in" -> "18 *.";
   "in" -> "14 -|";
 }
-// graph for dag "vs_core_helper_0_0" of module "vs_core" in dot format
-digraph "vs_core_helper_0_0" {
+// graph for dag "vs_core_helper_0_0_0" of module "vs_core" in dot format
+digraph "vs_core_helper_0_0_0" {
   // inputs
   "mv" [shape=circle];
   "stab" [shape=circle];
@@ -1124,8 +1124,8 @@ digraph "vs_core_helper_0_0" {
   "30 thr" -> "33 E8" [label="mv"];
   "mv" -> "30 thr";
 }
-// graph for dag "vs_core_helper_0_1" of module "vs_core" in dot format
-digraph "vs_core_helper_0_1" {
+// graph for dag "vs_core_helper_0_1_0" of module "vs_core" in dot format
+digraph "vs_core_helper_0_1_0" {
   // inputs
   "bg" [shape=circle];
   "in" [shape=circle];
@@ -1168,9 +1168,11 @@ digraph "vs_core_helper_0_1" {
  * 2 input images, 1 output image
  * 9 image operations in dag
  * dag length is 9, dag width is 2
- * cost is 79 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 79
+ * - communication: 384
  */
-freia_status vs_core_helper_0_0(
+freia_status vs_core_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1,
@@ -1539,9 +1541,11 @@ freia_status vs_core_helper_0_0(
  * 2 input images, 2 output images
  * 7 image operations in dag
  * dag length is 4, dag width is 3
- * cost is 23 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 23
+ * - communication: 512
  */
-freia_status vs_core_helper_0_1(
+freia_status vs_core_helper_0_1_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * i0,
@@ -1865,7 +1869,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);                /*0014*/
+   vs_core_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);              /*0014*/
    
    // bg update
    
@@ -1873,7 +1877,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);               /*0030*/
+   vs_core_helper_0_0_0(mv, mv, stab, binvalue, 255, true, freia_morpho_kernel_8c, 1, 1);             /*0030*/
    
    // open
    
@@ -1892,7 +1896,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    
    int binvalue, maxmotion, minmotion;                                  /*0012*/
 
-   vs_core_helper_0_1(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);                /*0014*/
+   vs_core_helper_0_1_0(mv, bg, bg, in, &maxmotion, &minmotion, motion_a, motion_b, motion_a+motion_b);              /*0014*/
    
    // bg update
    
@@ -1900,7 +1904,7 @@ freia_status vs_core(freia_data2d *bg, freia_data2d *mv, freia_data2d *in, freia
    if (maxmotion-minmotion>motion_trig)                                 /*0027*/
       binvalue = maxmotion*motion_th/100;                               /*0028*/
 
-   vs_core_helper_0_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);   /*0030*/
+   vs_core_helper_0_0_0(mv, mv, stab, binvalue, 255, 1, freia_morpho_kernel_8c, 1, 1);                /*0030*/
    
    // open
    

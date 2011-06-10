@@ -215,8 +215,8 @@ digraph "dag_cleaned_0" {
   "in0" -> "7 ?=";
   "in0" -> "6 min";
 }
-// graph for dag "freia_dup_13_helper_0_0" of module "freia_dup_13" in dot format
-digraph "freia_dup_13_helper_0_0" {
+// graph for dag "freia_dup_13_helper_0_0_0" of module "freia_dup_13" in dot format
+digraph "freia_dup_13_helper_0_0_0" {
   // inputs
   "in0" [shape=circle];
 
@@ -240,9 +240,11 @@ digraph "freia_dup_13_helper_0_0" {
  * 1 input image, 0 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 128
  */
-freia_status freia_dup_13_helper_0_0(
+freia_status freia_dup_13_helper_0_0_0(
   freia_data2d * i0,
   int32_t * po1)
 {
@@ -346,7 +348,7 @@ freia_status freia_dup_13_helper_0_0(
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0(in0, x);                                     /*0006*/
+   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
    *y = *x;                                                             /*0007*/
 }
 
@@ -355,7 +357,7 @@ void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 void freia_dup_13(freia_data2d *in0, int32_t *x, int32_t *y)
 {
    // redudant measure
-   freia_dup_13_helper_0_0(in0, x);                                     /*0006*/
+   freia_dup_13_helper_0_0_0(in0, x);                                   /*0006*/
    *y = *x;                                                             /*0007*/
 }
 #

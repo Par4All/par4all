@@ -493,8 +493,8 @@ int anr999_03(void)
 
 ! graphs
 
-// graph for dag "anr999_03_helper_0_0" of module "anr999_03" in dot format
-digraph "anr999_03_helper_0_0" {
+// graph for dag "anr999_03_helper_0_0_0" of module "anr999_03" in dot format
+digraph "anr999_03_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -577,9 +577,11 @@ digraph "dag_cleaned_0" {
  * 1 input image, 3 output images
  * 4 image operations in dag
  * dag length is 4, dag width is 3
- * cost is 49 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 49
+ * - communication: 512
  */
-freia_status anr999_03_helper_0_0(
+freia_status anr999_03_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -813,7 +815,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0(od, od, og, in, freia_morpho_kernel_8c);        /*0029*/
+   anr999_03_helper_0_0_0(od, od, og, in, freia_morpho_kernel_8c);      /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/
@@ -849,7 +851,7 @@ int anr999_03(void)
 
    freia_common_rx_image(in, &fdin);                                    /*0027*/
 
-   anr999_03_helper_0_0(od, od, og, in, freia_morpho_kernel_8c);        /*0029*/
+   anr999_03_helper_0_0_0(od, od, og, in, freia_morpho_kernel_8c);      /*0029*/
    
    
    freia_common_tx_image(in, &fdout);                                   /*0036*/

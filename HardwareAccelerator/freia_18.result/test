@@ -458,8 +458,8 @@ digraph "dag_cleaned_0" {
   "i1" -> "26 &";
   "i0" -> "26 &";
 }
-// graph for dag "freia_18_helper_0_0" of module "freia_18" in dot format
-digraph "freia_18_helper_0_0" {
+// graph for dag "freia_18_helper_0_0_0" of module "freia_18" in dot format
+digraph "freia_18_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
   "i1" [shape=circle];
@@ -490,9 +490,11 @@ digraph "freia_18_helper_0_0" {
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
- * cost is 8 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 8
+ * - communication: 384
  */
-freia_status freia_18_helper_0_0(
+freia_status freia_18_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   freia_data2d * i1)
@@ -657,7 +659,7 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    // deadcode
    // alive code
-   freia_18_helper_0_0(o, i0, i1);                                      /*0026*/
+   freia_18_helper_0_0_0(o, i0, i1);                                    /*0026*/
    // deadcode
    
    
@@ -684,7 +686,7 @@ freia_status freia_18(freia_data2d *o, freia_data2d *i0, freia_data2d *i1)
    
    // deadcode
    // alive code
-   freia_18_helper_0_0(o, i0, i1);                                      /*0026*/
+   freia_18_helper_0_0_0(o, i0, i1);                                    /*0026*/
    // deadcode
    
    

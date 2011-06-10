@@ -264,8 +264,8 @@ digraph "dag_cleaned_0" {
   "9 +." -> "o0";
   "i" -> "9 +.";
 }
-// graph for dag "freia_dup_03_helper_0_0" of module "freia_dup_03" in dot format
-digraph "freia_dup_03_helper_0_0" {
+// graph for dag "freia_dup_03_helper_0_0_0" of module "freia_dup_03" in dot format
+digraph "freia_dup_03_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -291,9 +291,11 @@ digraph "freia_dup_03_helper_0_0" {
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 256
  */
-freia_status freia_dup_03_helper_0_0(
+freia_status freia_dup_03_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2)
@@ -425,7 +427,7 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = i +. c
    // o1 = i +. c
-   freia_dup_03_helper_0_0(o0, i, c);
+   freia_dup_03_helper_0_0_0(o0, i, c);
    freia_aipo_copy(o1, o0);
    return FREIA_OK;                                                     /*0011*/
 }
@@ -437,7 +439,7 @@ freia_status freia_dup_03(freia_data2d *o0, freia_data2d *o1, freia_data2d *i, i
    // same operation performed twice
    // o0 = i +. c
    // o1 = i +. c
-   freia_dup_03_helper_0_0(o0, i, c);
+   freia_dup_03_helper_0_0_0(o0, i, c);
    freia_aipo_copy(o1, o0);
    return 0;                                                            /*0011*/
 }

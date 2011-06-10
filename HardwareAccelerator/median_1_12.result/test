@@ -765,8 +765,8 @@ digraph "dag_cleaned_0" {
   "i" -> "21 <";
   "i" -> "10 D8";
 }
-// graph for dag "median_1_helper_0_0" of module "median_1" in dot format
-digraph "median_1_helper_0_0" {
+// graph for dag "median_1_helper_0_0_0" of module "median_1" in dot format
+digraph "median_1_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -824,9 +824,11 @@ digraph "median_1_helper_0_0" {
  * 1 input image, 3 output images
  * 14 image operations in dag
  * dag length is 15, dag width is 3
- * cost is 188 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 188
+ * - communication: 512
  */
-freia_status median_1_helper_0_0(
+freia_status median_1_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * o1,
   freia_data2d * o2,
@@ -1280,7 +1282,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0(t, t, o, i, freia_morpho_kernel_8c);       /*0010*/
+   ret = median_1_helper_0_0_0(t, t, o, i, freia_morpho_kernel_8c);     /*0010*/
    ret |= 0;                                                            /*0011*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
@@ -1321,7 +1323,7 @@ freia_status median_1(freia_data2d *o, freia_data2d *i)
    
    // int32_t c = 8;
    // ret =  freia_cipo_close(t, i, c, 1);
-   ret = median_1_helper_0_0(t, t, o, i, freia_morpho_kernel_8c);       /*0010*/
+   ret = median_1_helper_0_0_0(t, t, o, i, freia_morpho_kernel_8c);     /*0010*/
    
    // ret |= freia_cipo_open(t, t, c, 1);
    
