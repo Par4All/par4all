@@ -261,6 +261,10 @@ freia_status my_global_vol_helper_0_0_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure vol at 1022
+  mcu_macro[0][0].xmin3 = 1022;
+  mcu_macro[1][0].xmin3 = 1022;
+  mcu_macro[0][0].ymin3 = 0;
+  mcu_macro[1][0].ymin3 = 0;
   // 0: vol(1)
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -314,6 +318,7 @@ freia_status my_global_vol_helper_0_0_0(
 
   // extract measures
   // get measure vol result from 1022
+  // ??? not implemented yet...
 
   return ret;
 }

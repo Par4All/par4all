@@ -661,6 +661,10 @@ freia_status freia_scalar_03_helper_0_1_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADD3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADD3;
   // set measure max at 1023
+  mcu_macro[0][1].xmin3 = 1023;
+  mcu_macro[1][1].xmin3 = 1023;
+  mcu_macro[0][1].ymin3 = 0;
+  mcu_macro[1][1].ymin3 = 0;
   // 1: max(1)
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
@@ -725,6 +729,7 @@ freia_status freia_scalar_03_helper_0_1_0(
 
   // extract measures
   // get measure max result from 1023
+  // ??? not implemented yet...
 
   return ret;
 }

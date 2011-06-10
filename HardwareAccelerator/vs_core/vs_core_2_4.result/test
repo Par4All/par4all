@@ -1805,6 +1805,10 @@ freia_status vs_core_2_helper_0_1_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_ABS_DIFF3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_ABS_DIFF3;
   // set measure max at 1023
+  mcu_macro[0][1].xmin3 = 1023;
+  mcu_macro[1][1].xmin3 = 1023;
+  mcu_macro[0][1].ymin3 = 0;
+  mcu_macro[1][1].ymin3 = 0;
   // 1: max(3)
   mcu_macro[0][1].xmin1 = imagelet_3;
   mcu_macro[1][1].xmin1 = imagelet_3;
@@ -1821,6 +1825,10 @@ freia_status vs_core_2_helper_0_1_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   // set measure min at 1022
+  mcu_macro[0][2].xmin3 = 1022;
+  mcu_macro[1][2].xmin3 = 1022;
+  mcu_macro[0][2].ymin3 = 0;
+  mcu_macro[1][2].ymin3 = 0;
   // 2: min(3)
   mcu_macro[0][2].xmin1 = imagelet_3;
   mcu_macro[1][2].xmin1 = imagelet_3;
@@ -2025,7 +2033,9 @@ freia_status vs_core_2_helper_0_1_0(
 
   // extract measures
   // get measure max result from 1023
+  // ??? not implemented yet...
   // get measure min result from 1022
+  // ??? not implemented yet...
 
   return ret;
 }

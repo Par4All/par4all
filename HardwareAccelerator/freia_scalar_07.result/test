@@ -1453,6 +1453,10 @@ freia_status freia_scalar_07_helper_0_1_0(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_MUL3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_MUL3;
   // set measure vol at 1022
+  mcu_macro[0][5].xmin3 = 1022;
+  mcu_macro[1][5].xmin3 = 1022;
+  mcu_macro[0][5].ymin3 = 0;
+  mcu_macro[1][5].ymin3 = 0;
   // 5: vol(2)
   mcu_macro[0][5].xmin1 = imagelet_io_2_0;
   mcu_macro[1][5].xmin1 = imagelet_io_2_1;
@@ -1522,6 +1526,7 @@ freia_status freia_scalar_07_helper_0_1_0(
 
   // extract measures
   // get measure vol result from 1022
+  // ??? not implemented yet...
 
   return ret;
 }
@@ -1585,6 +1590,10 @@ freia_status freia_scalar_07_helper_0_2_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure max at 1023
+  mcu_macro[0][0].xmin3 = 1023;
+  mcu_macro[1][0].xmin3 = 1023;
+  mcu_macro[0][0].ymin3 = 0;
+  mcu_macro[1][0].ymin3 = 0;
   // 0: max(1)
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -1633,6 +1642,10 @@ freia_status freia_scalar_07_helper_0_2_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // set measure min at 1022
+  mcu_macro[0][2].xmin3 = 1022;
+  mcu_macro[1][2].xmin3 = 1022;
+  mcu_macro[0][2].ymin3 = 0;
+  mcu_macro[1][2].ymin3 = 0;
   // 2: min(2)
   mcu_macro[0][2].xmin1 = imagelet_2;
   mcu_macro[1][2].xmin1 = imagelet_2;
@@ -1711,7 +1724,9 @@ freia_status freia_scalar_07_helper_0_2_0(
 
   // extract measures
   // get measure max result from 1023
+  // ??? not implemented yet...
   // get measure min result from 1022
+  // ??? not implemented yet...
 
   return ret;
 }

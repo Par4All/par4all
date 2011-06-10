@@ -635,6 +635,10 @@ freia_status freia_skip_01_helper_0_1_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure max at 1023
+  mcu_macro[0][0].xmin3 = 1023;
+  mcu_macro[1][0].xmin3 = 1023;
+  mcu_macro[0][0].ymin3 = 0;
+  mcu_macro[1][0].ymin3 = 0;
   // 0: max(1)
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -725,6 +729,7 @@ freia_status freia_skip_01_helper_0_1_0(
 
   // extract measures
   // get measure max result from 1023
+  // ??? not implemented yet...
 
   return ret;
 }
