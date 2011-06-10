@@ -687,6 +687,7 @@ static void freia_terapix_call
   set deads = set_make(set_pointer);
   // newly created parameters at this round
 
+  // generate code for every computation vertex
   int n_ops = 0;
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(thedag)));
   FOREACH(dagvtx, current, vertices)
@@ -714,10 +715,18 @@ static void freia_terapix_call
     if (api->terapix.memory)
     {
       available_memory -= api->terapix.memory;
-      sb_cat(body, "  // set measure ", api->compact_name,
-             " at ", itoa(available_memory), "\n");
+      string saddr = strdup(itoa(available_memory));
+
+      // computation
+      sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
+      terapix_mcu_val(body, n_ops, "xmin3", saddr);
+      terapix_mcu_val(body, n_ops, "ymin3", "0");
+
+      // extraction
       sb_cat(tail, "  // get measure ", api->compact_name,
-             " result from ", itoa(available_memory), "\n");
+             " result from ", saddr, "\n");
+      sb_cat(tail, "  // ??? not implemented yet...\n");
+      free(saddr);
     }
 
     // if inplace, append freed images to availables
