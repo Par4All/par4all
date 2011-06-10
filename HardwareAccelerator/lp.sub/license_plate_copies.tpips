@@ -1,5 +1,5 @@
 setenv WSPACE license_plate_copies
 setenv FILE license_plate_copies.c
 setenv NAME license_plate_copies
-setproperty HWAC_TERAPIX_SPLIT_DAG FALSE
+setproperty HWAC_TERAPIX_CUT_DAG FALSE
 source default_tpips

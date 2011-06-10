@@ -2,7 +2,7 @@ setenv WSPACE license_plate_copies_5
 setenv FILE license_plate_copies.c
 setenv NAME license_plate_copies
 setproperty HWAC_SPOC_DEPTH 5
-setproperty HWAC_TERAPIX_SPLIT_DAG TRUE
+setproperty HWAC_TERAPIX_CUT_DAG TRUE
 # test fast bandwidth
 setproperty HWAC_TERAPIX_DMABW 64
 source default_tpips
