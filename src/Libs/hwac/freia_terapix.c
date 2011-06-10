@@ -1256,7 +1256,7 @@ static void freia_trpx_compile_one_dag(
   set remainings = set_make(set_pointer);
   set_append_vertex_statements(remainings, dag_vertices(d));
 
-  // name_<number>_<split>[_<call>]
+  // name_<number>_<split>[_<cut>]
   string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_split)));
   if (n_cut!=-1)
   {
@@ -1278,6 +1278,8 @@ static void freia_trpx_compile_one_dag(
   // - and substitute its call...
   freia_substitute_by_helper_call(d, global_remainings, remainings,
                                   ls, fname_dag, lparams);
+
+  // cleanup
   free(fname_dag), fname_dag = NULL;
 }
 
@@ -1356,11 +1358,14 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   set_assign_list(done, dag_inputs(d));
 
   // transitive closure
-  while ((computables = get_computable_vertices(d, done, done, current)))
+  bool changed = true;
+  while (changed &&
+         (computables = get_computable_vertices(d, done, done, current)))
   {
-    bool changed = false;
+    changed = false;
     FOREACH(dagvtx, v, computables)
     {
+      // keep erosion up to cut
       if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
           (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
           (((_int) hash_get(erosion, EAST(v))) <= cut) &&
@@ -1373,8 +1378,8 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
       }
     }
 
+    // cleanup
     gen_free_list(computables), computables = NIL;
-    if (!changed) break;
   }
 
   pips_assert("some vertices where extracted", lcurrent!=NIL);
