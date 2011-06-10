@@ -1,5 +1,6 @@
-setproperty HWAC_SPOC_DEPTH 1
 setenv WSPACE license_plate_copies_1
-setenv FILE $WSPACE.c
+setenv FILE license_plate_copies.c
 setenv NAME license_plate_copies
+setproperty HWAC_SPOC_DEPTH 1
+setproperty HWAC_TERAPIX_SPLIT_DAG FALSE
 source default_tpips
