@@ -266,23 +266,28 @@ list gen_insert_before(const void * no, const void * o, list l)
 
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
+/* @brief reverse a list in place
+ * @param cp, the list to be reversed
+ * @return the list reversed
+ */
 list gen_nreverse(list cp)
 {
-    cons *next, *next_next ;
+  cons *next, *next_next ;
 
-    if( cp == NIL || cp->cdr == NIL ) return( cp ) ;
+  if( cp == NIL || cp->cdr == NIL ) return( cp ) ;
 
-    next = cp->cdr ;
-    cp->cdr = NIL ;
-    next_next = NEXT( next ) ;
+  next = cp->cdr ;
+  cp->cdr = NIL;
+  next_next = NEXT( next );
 
-    for( ; next != NIL ; ) {
-	next->cdr = cp ;
-	cp = next ;
-	next = next_next ;
-	next_next = NEXT( next_next ) ;
-    }
-    return( cp ) ;
+  for( ; next != NIL ; )
+  {
+    next->cdr = cp ;
+    cp = next ;
+    next = next_next ;
+    next_next = NEXT( next_next ) ;
+  }
+  return cp;
 }
 
 /**@brief free the spine of the list
@@ -290,13 +295,13 @@ list gen_nreverse(list cp)
  */
 void gen_free_list(list l)
 {
-    list p, nextp ;
-    for( p = l ; p != NIL ; p = nextp ) {
-	nextp = p->cdr ;
-	CAR(p).p = NEWGEN_FREED; /* clean */
-	CDR(p) = (struct cons*) NEWGEN_FREED;
-	free( p ) ;
-    }
+  list p, nextp ;
+  for( p = l ; p != NIL ; p = nextp ) {
+    nextp = p->cdr ;
+    CAR(p).p = NEWGEN_FREED; /* clean */
+    CDR(p) = (struct cons*) NEWGEN_FREED;
+    free( p );
+  }
 }
 
 /**@brief physically concatenates CP1 and CP2 but do not duplicates the
