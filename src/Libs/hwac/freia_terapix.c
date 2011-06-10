@@ -1426,7 +1426,7 @@ void freia_trpx_compile_calls
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
-  bool further_split = get_bool_property(trpx_split_dag);
+  bool further_cut_dag = get_bool_property(trpx_cut_dag);
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
@@ -1435,7 +1435,7 @@ void freia_trpx_compile_calls
   int n_split = 0;
   FOREACH(dag, d, ld)
   {
-    if (further_split)
+    if (further_cut_dag)
     {
       // try split dag into subdags
       hash_table erosion = hash_table_make(hash_pointer, 0);
