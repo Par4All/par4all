@@ -876,7 +876,7 @@ digraph "median_1_helper_0_0_0" {
  * dag length is 15, dag width is 3
  * costs in cycles per imagelet row:
  * - computation: 188
- * - communication: 512
+ * - communication: 128
  */
 freia_status median_1_helper_0_0_0(
   freia_data2d * o0,
