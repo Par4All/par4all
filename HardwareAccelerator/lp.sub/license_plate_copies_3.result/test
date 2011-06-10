@@ -4671,8 +4671,8 @@ digraph "dag_cleaned_0" {
   "in" -> "136 D8";
   "in" -> "244 &";
 }
-// graph for dag "license_plate_copies_helper_0_0" of module "license_plate_copies" in dot format
-digraph "license_plate_copies_helper_0_0" {
+// graph for dag "license_plate_copies_helper_0_0_0" of module "license_plate_copies" in dot format
+digraph "license_plate_copies_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -4838,9 +4838,9 @@ digraph "license_plate_copies_helper_0_0" {
  * dag length is 53, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 993
- * - communication: 256
+ * - communication: 512
  */
-freia_status license_plate_copies_helper_0_0(
+freia_status license_plate_copies_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2,
@@ -6635,7 +6635,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);          /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);        /*0064*/
    ret_0 |= 0;                                                          /*0065*/
    ret_0 |= 0;                                                          /*0066*/
    ret_0 |= 0;                                                          /*0067*/
@@ -6852,7 +6852,7 @@ int license_plate_copies(void)
    
    ret_0 = 0;                                                           /*0062*/
 
-   ret_0 |= license_plate_copies_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);          /*0064*/
+   ret_0 |= license_plate_copies_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);        /*0064*/
    i_0 = 15;                                                            /*0094*/
 
    i_0 = 15;                                                            /*0126*/

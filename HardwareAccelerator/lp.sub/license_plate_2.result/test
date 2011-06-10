@@ -3281,8 +3281,8 @@ digraph "dag_cleaned_0" {
   "in" -> "89 D8";
   "in" -> "53 E8";
 }
-// graph for dag "license_plate_helper_0_0" of module "license_plate" in dot format
-digraph "license_plate_helper_0_0" {
+// graph for dag "license_plate_helper_0_0_0" of module "license_plate" in dot format
+digraph "license_plate_helper_0_0_0" {
   // inputs
   "in" [shape=circle];
 
@@ -3448,9 +3448,9 @@ digraph "license_plate_helper_0_0" {
  * dag length is 53, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 993
- * - communication: 256
+ * - communication: 512
  */
-freia_status license_plate_helper_0_0(
+freia_status license_plate_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   const int32_t * pi2,
@@ -5240,7 +5240,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
+   ret_0 = license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);                /*0053*/
    ret_0 |= 0;                                                          /*0054*/
    ret_0 |= 0;                                                          /*0055*/
    ret_0 |= 0;                                                          /*0056*/
@@ -5381,7 +5381,7 @@ int license_plate(void)
    /* processing */
    freia_common_rx_image(in, &fdin);                                    /*0051*/
 
-   ret_0 = license_plate_helper_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);   /*0053*/
+   ret_0 = license_plate_helper_0_0_0(out, in, kernel1x3, 150, 255, 1, 1, 50, 1, kernel3x1, freia_morpho_kernel_8c);                /*0053*/
    i_0 = 15;                                                            /*0068*/
 
    i_0 = 15;                                                            /*0085*/
