@@ -1784,8 +1784,8 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][3].iter3 = 0;
   mcu_macro[0][3].iter4 = 0;
   mcu_macro[1][3].iter4 = 0;
-  mcu_macro[0][3].addrStart = TERAPIX_UCODE_MIN?;
-  mcu_macro[1][3].addrStart = TERAPIX_UCODE_MIN?;
+  mcu_macro[0][3].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[1][3].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
   // output copy 3 -> 1
   mcu_macro[0][4].xmin1 = imagelet_3;
   mcu_macro[1][4].xmin1 = imagelet_3;

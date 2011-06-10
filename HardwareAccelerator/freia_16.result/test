@@ -490,8 +490,8 @@ freia_status freia_16_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_MIN?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_MIN?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
   // set measure max at 1022
   // 1: max(1)
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
@@ -506,8 +506,8 @@ freia_status freia_16_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_MAX?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_MAX?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   // set measure vol at 1020
   // 2: vol(1)
   mcu_macro[0][2].xmin1 = imagelet_io_1_0;

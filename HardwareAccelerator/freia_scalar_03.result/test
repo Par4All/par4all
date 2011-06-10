@@ -674,8 +674,8 @@ freia_status freia_scalar_03_helper_0_1_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_MAX?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_MAX?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
 
   // inputs:
   // - imagelet 1 is i0 for i0

@@ -1598,8 +1598,8 @@ freia_status freia_scalar_07_helper_0_2_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_MAX?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_MAX?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   // 1: E8(1) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
@@ -1646,8 +1646,8 @@ freia_status freia_scalar_07_helper_0_2_0(
   mcu_macro[1][2].iter3 = 0;
   mcu_macro[0][2].iter4 = 0;
   mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_MIN?;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_MIN?;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
   // output copy 2 -> 1
   mcu_macro[0][3].xmin1 = imagelet_2;
   mcu_macro[1][3].xmin1 = imagelet_2;

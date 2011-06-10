@@ -660,8 +660,8 @@ freia_status freia_skip_04_helper_0_1_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_MAX?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_MAX?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
   // 1: ^.(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
