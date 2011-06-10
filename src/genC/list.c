@@ -665,12 +665,12 @@ gen_chunk gen_nth(int n, const list l)
 */
 list gen_once(const void * vo, list l)
 {
-    gen_chunk * item = (gen_chunk*) vo;
-    list c;
-    for(c=l; c!=NIL; c=CDR(c))
-	if (CHUNK(CAR(c))==item) return(l);
+  gen_chunk * item = (gen_chunk*) vo;
+  list c;
+  for(c=l; c!=NIL; c=CDR(c))
+    if (CHUNK(CAR(c))==item) return(l);
 
-    return(CONS(CHUNK, item, l));
+  return CONS(CHUNK, item, l);
 }
 
 bool gen_in_list_p(const void * vo, const list lx)
@@ -697,14 +697,13 @@ int gen_occurences(const void * vo, const list l)
 */
 bool gen_once_p(list l)
 {
-    list c;
-    for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
-	gen_chunk * item = CHUNK(CAR(c));
-	if(gen_in_list_p(item , CDR(c)))
+  list c;
+  for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
+    gen_chunk * item = CHUNK(CAR(c));
+    if(gen_in_list_p(item , CDR(c)))
 	    return FALSE;
-    }
-
-    return TRUE;
+  }
+  return TRUE;
 }
 
 /* free an area.
@@ -736,27 +735,27 @@ void gen_free_area(void ** p, int size)
  */
 void gen_sort_list(list l, gen_cmp_func_t compare)
 {
-    list c;
-    int n = gen_length(l);
-    gen_chunk
-	**table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
-	**point;
+  list c;
+  int n = gen_length(l);
+  gen_chunk
+    **table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
+    **point;
 
-    /*   the list items are first put in the temporary table,
-     */
-    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
-	*point = CHUNK(CAR(c));
+  /*   the list items are first put in the temporary table,
+   */
+  for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
+    *point = CHUNK(CAR(c));
 
-    /*    then sorted,
-     */
-    qsort(table, n, sizeof(gen_chunk*), compare);
+  /*    then sorted,
+   */
+  qsort(table, n, sizeof(gen_chunk*), compare);
 
-    /*    and the list items are updated with the sorted table
-     */
-    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
-	CHUNK(CAR(c)) = *point;
+  /*    and the list items are updated with the sorted table
+   */
+  for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
+    CHUNK(CAR(c)) = *point;
 
-    gen_free_area((void**) table, n*sizeof(gen_chunk*));
+  gen_free_area((void**) table, n*sizeof(gen_chunk*));
 }
 
 
