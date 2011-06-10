@@ -1486,7 +1486,7 @@ digraph "vs_core_2_helper_0_1_0" {
  * dag length is 9, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 79
- * - communication: 384
+ * - communication: 48
  */
 freia_status vs_core_2_helper_0_0_0(
   freia_data2d * o0,
@@ -1859,7 +1859,7 @@ freia_status vs_core_2_helper_0_0_0(
  * dag length is 4, dag width is 3
  * costs in cycles per imagelet row:
  * - computation: 23
- * - communication: 512
+ * - communication: 64
  */
 freia_status vs_core_2_helper_0_1_0(
   freia_data2d * o0,

@@ -2,4 +2,5 @@ setenv WSPACE vs_core_2_4
 setenv NAME vs_core_2
 setenv FILE $NAME.c
 setproperty HWAC_SPOC_DEPTH 4
+setproperty HWAC_TERAPIX_DMABW 10
 source default_tpips
