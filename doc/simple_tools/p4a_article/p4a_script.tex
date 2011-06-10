@@ -252,6 +252,28 @@ For more tweaking, look at the \Apfa Accel runtime source on
 \url{http://download.par4all.org/doc/Par4All_Accel_runtime/graph} or
 directly in the \Agit repository.
 
+\subsection{Automatic task generation for the SCMP architecture}
+\label{sec:autom-parall-with}
+
+To generate an application for the SCMP architecture from a C program, use:
+\begin{verbatim}
+p4a --scmp example.c
+\end{verbatim}
+The task must have been previously identified with labels prefixed by
+\texttt{scmp\_task\_}.
+
+The compiler generates two directories:
+\begin{itemize}
+\item \texttt{applis/}  contains the automatically generated control task file (\texttt{.app} file);
+\item \texttt{applis\_processing/project\_name/} contains the buffers
+  description header file (\texttt{scmp\_buffers}), the
+  \texttt{*.mips.c} task files and a \texttt{Makefile.arp} to compile
+  and build the final application.
+\end{itemize}
+
+Some further post-processing may be required to limit the memory
+footprint of the generated application. This process has not yet been
+automated.
 
 \section{\protect\texttt{p4a} full option list}
 \label{sec:options}
