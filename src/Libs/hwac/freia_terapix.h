@@ -53,6 +53,7 @@ typedef struct {
   // internal memory needed, in pixels (?)
   int memory;
   // approximate cost per pixel per row
+  // this information is available in the terapix simulator
   int cost;
   // whether it can be done in place
   boolean inplace;
