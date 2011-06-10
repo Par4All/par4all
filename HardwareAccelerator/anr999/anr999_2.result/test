@@ -1751,7 +1751,7 @@ digraph "dag_cleaned_0" {
  * dag length is 12, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 310
- * - communication: 384
+ * - communication: 288
  */
 freia_status anr999_helper_0_0_0(
   freia_data2d * o0,
