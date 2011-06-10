@@ -362,26 +362,69 @@ static void vertex_list_sorted_by_entities(list l)
   gen_sort_list(l, (gen_cmp_func_t) dagvtx_cmp_entity);
 }
 
+/* do some consistency checking...
+ */
+void dag_consistency_asserts(dag d)
+{
+  FOREACH(dagvtx, v, dag_inputs(d))
+    pips_assert("vertex once in inputs", gen_occurences(v, dag_inputs(d))==1);
+
+  set variable_seen = set_make(set_pointer);
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    entity image = dagvtx_image(v);
+    // fprintf(stdout, " - image %s\n", entity_name(image));
+    pips_assert("image is defined", image!=entity_undefined);
+    pips_assert("variable only once in inputs",
+                !set_belong_p(variable_seen, image));
+    set_add_element(variable_seen, variable_seen, image);
+  }
+  set_free(variable_seen);
+}
+
+/* remove unused inputs
+ */
+static void dag_remove_unused_inputs(dag d)
+{
+  list nl = NIL;
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    if (dagvtx_succs(v)!=NIL) // do we keep it?
+      nl = CONS(dagvtx, v, nl);
+    else
+      gen_remove(&dag_vertices(d), v);
+      // ??? memory leak? there may be "pointers" somewhere to these?
+      // free_dagvtx(v);
+  }
+  if (dag_inputs(d)) gen_free_list(dag_inputs(d));
+  dag_inputs(d) = gen_nreverse(nl);
+}
+
 /* remove vertex v from dag d.
  * if v isx a used computation vertex, it is substituted by an input vertex.
  */
 void dag_remove_vertex(dag d, const dagvtx v)
 {
-  pips_assert("vertex is in dag", gen_in_list_p(v, dag_vertices(d)));
+  // hmmm...
+  // pips_assert("vertex is in dag", gen_in_list_p(v, dag_vertices(d)));
+  if (!gen_in_list_p(v, dag_vertices(d)))
+    // already done???
+    return;
 
   if (dagvtx_succs(v))
   {
+    // the ouput of the removed operation becomes an input to the dag
     entity var = vtxcontent_out(dagvtx_content(v));
     pips_assert("some variable", var!=entity_undefined);
     dagvtx input =
       make_dagvtx(make_vtxcontent(0, 0, make_pstatement_empty(), NIL, var),
-      gen_copy_seq(dagvtx_succs(v)));
+                  gen_copy_seq(dagvtx_succs(v)));
     dag_inputs(d) = CONS(dagvtx, input, dag_inputs(d));
     dag_vertices(d) = CONS(dagvtx, input, dag_vertices(d));
     vertex_list_sorted_by_entities(dag_inputs(d));
   }
 
-  // remove from vertex lists
+  // remove from all vertex lists
   gen_remove(&dag_vertices(d), v);
   gen_remove(&dag_inputs(d), v);
   gen_remove(&dag_outputs(d), v);
@@ -389,6 +432,9 @@ void dag_remove_vertex(dag d, const dagvtx v)
   // remove from successors of any ???
   FOREACH(dagvtx, dv, dag_vertices(d))
     gen_remove(&dagvtx_succs(dv), v);
+
+  // cleanup input list
+  dag_remove_unused_inputs(d);
 
   // unlink vertex itself
   gen_free_list(dagvtx_succs(v)), dagvtx_succs(v) = NIL;
@@ -1224,6 +1270,8 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
  */
 void freia_hack_fix_global_ins_outs(dag dfull, dag d)
 {
+  // cleanup inputs?
+  // cleanup outputs
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     if (dagvtx_number(v)!=0 &&
