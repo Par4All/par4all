@@ -570,6 +570,8 @@ static void freia_terapix_call
   length = dag_terapix_measures(thedag, NULL,
                                 &width, &cost, &nops, &n, &s, &w, &e);
 
+  int comm = get_int_property(trpx_dmabw_prop);
+
   // show stats in function's comments
   sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
   sb_cat(head, " * ", itoa(n_ins), " input image", n_ins>1? "s": "");
@@ -577,7 +579,9 @@ static void freia_terapix_call
   sb_cat(head, " * ", itoa(nops), " image operations in dag\n");
   sb_cat(head, " * dag length is ", itoa(length));
   sb_cat(head, ", dag width is ", itoa(width), "\n");
-  sb_cat(head, " * cost is ", itoa(cost), " cycles per imagelet row\n");
+  sb_cat(head, " * costs in cycles per imagelet row:\n");
+  sb_cat(head, " * - computation: ", itoa(cost), "\n");
+  sb_cat(head, " * - communication: ", itoa(comm*(n_ins+n_outs)), "\n");
   sb_cat(head, " */\n");
 
   // generate function declaration
@@ -648,6 +652,8 @@ static void freia_terapix_call
       // update primary imagelet number
       n_imagelets++;
       set_add_element(computed, computed, in);
+      // ??? stupid bug which filters undefined values, i.e. -16
+      // I should really use a container...
       hash_put(allocation, in, (void*) (_int) -n_imagelets);
 
       string sn = strdup(itoa(n)), si = strdup(itoa(n_imagelets));
@@ -1201,6 +1207,9 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
         dag_dump(stderr, "pushed dag", nd);
       }
 
+      // ??? hmmm... should not be needed?
+      freia_hack_fix_global_ins_outs(initial, nd);
+
       // update global list of dags to return.
       ld = CONS(dag, nd, ld);
 
@@ -1216,6 +1225,179 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
 
   free_dag(dall);
   return ld;
+}
+
+/* generate terapix code for this one dag, which should be already split.
+ */
+static void freia_trpx_compile_one_dag(
+  string module,
+  list /* of statements */ ls,
+  dag d,
+  string fname_fulldag,
+  int n_split,
+  int n_cut,
+  set global_remainings,
+  FILE * helper_file)
+{
+  //ifdebug(7) {
+        // dag_dump(stderr, "updated dall", dall);
+  dag_consistency_asserts(d);
+  dag_dump(stderr, "one dag", d);
+//}
+
+  set remainings = set_make(set_pointer);
+  set_append_vertex_statements(remainings, dag_vertices(d));
+
+  // name_<number>_<split>[_<call>]
+  string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_split)));
+  if (n_cut!=-1)
+  {
+    string s = strdup(cat(fname_dag, "_", itoa(n_cut)));
+    free(fname_dag);
+    fname_dag = s;
+  }
+
+  ifdebug(4) dag_dump(stderr, "d", d);
+  dag_dot_dump(module, fname_dag, d);
+
+  // - output function in helper file
+  list lparams = NIL;
+
+  string_buffer code = string_buffer_make(true);
+  freia_terapix_call(module, fname_dag, code, d, &lparams);
+  string_buffer_to_file(code, helper_file);
+  string_buffer_free(&code);
+
+  // - and substitute its call...
+  freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                  ls, fname_dag, lparams);
+  free(fname_dag), fname_dag = NULL;
+}
+
+/* would it seem interesting to split d?
+ * @return the erosion up to which to split, or 0 of no split
+ * should we also/instead consider the expected cost?
+ */
+static int cut_decision(dag d, hash_table erosion)
+{
+  int com_cost_per_row = get_int_property(trpx_dmabw_prop);
+  int len, width, cost, nops, n, s, w, e;
+  len = dag_terapix_measures(d, erosion, &width, &cost, &nops, &n, &s, &w, &e);
+  int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
+
+  // if we assume that the imagelet size is quite large, say around 128
+  // even with double buffers. The only reason to cut is because
+  // of the erosion on the side which reduces the amount of valid data,
+  // but there is really a point to do that only communications are still
+  // masked by computations after splitting the dag...
+
+  // first we compute a possible number of splits
+  // computation cost = communication cost (in cycle per imagelet row)
+  // communication cost = (nins + 2*width*n_splits + nouts) * cost_per_row
+  // the width is taken as the expected number of images to extract and
+  // reinject (hence 2*) if the dag is split.
+  // this is really an approximation... indeed, nothing ensures that
+  // the initial input is not still alive at the chosen cut?
+
+  // for anr999 the gradient of depth 10 is just enough to cover the coms.
+  // for lp, about 1(.2) split is suggested.
+
+  double n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
+
+  pips_debug(2, "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_cuts=%f\n",
+             cost, com_cost_per_row, nins, width, nouts, n_cuts);
+
+  if (n_cuts < 1.0) return 0;
+
+  // we also have to check that there is a significant erosion!
+  // I first summarize the erosion to the max(n,s,e,w)
+  // I could compute per direction, if necessary...
+  int erode = n;
+  if (s>erode) erode=s;
+  if (e>erode) erode=e;
+  if (w>erode) erode=w;
+
+  // then we should decide...
+  // there should be a *lot* of computations to amortize a split,
+  // given that an erode/dilate costs about 15 cycles per row
+  // there should be about 8 of them to amortize/hide one imagelet transfer,
+  // whether as input or output.
+
+  int cut = (int) (erode/(n_cuts+1));
+  return cut;
+}
+
+/* cut dag "d" at "erosion" "cut"
+ */
+static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
+{
+  pips_debug(2, "cutting with cut=%d\n", cut);
+  pips_assert("something cut width", cut>0);
+
+  // already warned while splitting on scalars
+  // if (!single_image_assignement_p(initial))
+    // well, it should work most of the time, so only a warning
+    // pips_user_warning("image reuse may result in subtly wrong code...\n");
+
+  set
+    // current set of vertices to group
+    current = set_make(set_pointer),
+    // all vertices which are considered computed
+    done = set_make(set_pointer);
+
+  list lcurrent = NIL, computables;
+  set_assign_list(done, dag_inputs(d));
+
+  // transitive closure
+  while ((computables = get_computable_vertices(d, done, done, current)))
+  {
+    bool changed = false;
+    FOREACH(dagvtx, v, computables)
+    {
+      if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
+          (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
+          (((_int) hash_get(erosion, EAST(v))) <= cut) &&
+          (((_int) hash_get(erosion, WEST(v))) <= cut))
+      {
+        set_add_element(current, current, v);
+        set_add_element(done, done, v);
+        lcurrent = gen_nconc(lcurrent, CONS(dagvtx, v, NIL));
+        changed = true;
+      }
+    }
+
+    gen_free_list(computables), computables = NIL;
+    if (!changed) break;
+  }
+
+  pips_assert("some vertices where extracted", lcurrent!=NIL);
+
+  // build extracted dag
+  dag nd = make_dag(NIL, NIL, NIL);
+  FOREACH(dagvtx, v, lcurrent)
+  {
+    // pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+    dag_append_vertex(nd, copy_dagvtx_norec(v));
+  }
+  dag_compute_outputs(nd, NULL);
+  dag_cleanup_other_statements(nd);
+
+  // cleanup full dag
+  FOREACH(dagvtx, v, lcurrent)
+    dag_remove_vertex(d, v);
+
+  // ??? should not be needed?
+  freia_hack_fix_global_ins_outs(fulld, nd);
+  freia_hack_fix_global_ins_outs(fulld, d);
+
+  dag_consistency_asserts(nd);
+  dag_consistency_asserts(d);
+
+  // cleanup
+  gen_free_list(lcurrent), lcurrent = NIL;
+  set_free(done);
+  set_free(current);
+  return nd;
 }
 
 void freia_trpx_compile_calls
@@ -1234,109 +1416,57 @@ void freia_trpx_compile_calls
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
-  // THIS IS QUITE PRELIMINARY
-
-  // split only on scalar deps... ??? is it that simple? NO!
+  // First, split only on scalar deps...
+  // is it that simple? NO!
   // consider A -> B -> s -> C -> D
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-
-  // maybe I should do it with an overall splitting as done with spoc?
-  // note that the scheduling is currently "by level" because
-  // each operation is added in the list as soon as it may be computed.
-  // consider dag d
-  // - full depth?
-  // - number of ins & outs?
-  // - needed intermediate buffers??
-  // - split again with some criterion?
-  // schedule each operation -> order, imagelet number output
-  // should be done by the splitting phase?
-  //  1. ops which do not consume anything (in place, no lost borders)
-  //  2. ops which consume less borders (current max? balanced?)
-  //  3. ops in their initial textual order
-  // ??? could take into account depth? cost? erosion? max lives?
-  // ??? I think of a greedy heuristic (again) up to a target erosion...
   list ld = split_dag_on_scalars(fulld);
 
-  pips_debug(4, "dag split in %d dags\n", (int) gen_length(ld));
+  pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
-  int com_cost_per_row = get_int_property(trpx_dmabw_prop);
-
-  // further splitting of dags may be interesting
-  FOREACH(dag, d, ld)
-  {
-    int len, width, cost, nops, n, s, w, e;
-    len = dag_terapix_measures(d, NULL, &width, &cost, &nops, &n, &s, &w, &e);
-    int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
-
-    // if we assume that the imagelet size is quite large, say around 128
-    // even with double buffers. The only reason to cut is because
-    // of the erosion on the side which reduces the amount of valid data,
-    // but there is really a point to do that only communications are still
-    // masked by computations after splitting the dag...
-
-    // first we compute a possible number of splits
-    // computation cost = communication cost (in cycle per imagelet row)
-    // communication cost = (nins + 2*width*n_splits + nouts) * cost_per_row
-    // the width is taken as the expected number of images to extract and
-    // reinject (hence 2*) if the dag is split.
-    double n_splits = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
-
-    /*
-    fprintf(stdout,
-            "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_splits = %f\n",
-            cost, com_cost_per_row, nins, width, nouts, n_splits);
-    */
-
-    // we also have to check that there is a significant erosion!
-
-    // then we should decide...
-    // there should be a *lot* of computations to amortize a split,
-    // given that an erode/dilate costs about 15 cycles per row
-    // there should be about 8 of them to amortize one imagelet transfer
-
-    // for anr999 the gradient of depth 10 is just enough to cover the coms.
-    // for lp, about 1(.2) split is suggested.
-  }
+  bool further_split = get_bool_property(trpx_split_dag);
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
   set_assign_list(global_remainings, ls);
 
-  int n_calls = 0;
+  int n_split = 0;
   FOREACH(dag, d, ld)
   {
-    set remainings = set_make(set_pointer);
-    set_append_vertex_statements(remainings, dag_vertices(d));
-
-    // ???
-    // fix internal ins/outs, that are tempered with by split & overflows
-    freia_hack_fix_global_ins_outs(fulld, d);
-
-    string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_calls++)));
-
-    ifdebug(4) dag_dump(stderr, "d", d);
-    dag_dot_dump(module, fname_dag, d);
-
-    // - output function in helper file
-    list lparams = NIL;
-
-    string_buffer code = string_buffer_make(true);
-    freia_terapix_call(module, fname_dag, code, d, &lparams);
-    string_buffer_to_file(code, helper_file);
-    string_buffer_free(&code);
-
-    // - and substitute its call...
-    freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                    ls, fname_dag, lparams);
-    free(fname_dag), fname_dag = NULL;
+    if (further_split)
+    {
+      // try split dag into subdags
+      hash_table erosion = hash_table_make(hash_pointer, 0);
+      int cut, n_cut = 0;
+      while ((cut = cut_decision(d, erosion)))
+      {
+        dag dc = cut_perform(d, cut, erosion, fulld);
+        // generate code for cut
+        freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
+                                   n_cut++, global_remainings, helper_file);
+        // cleanup
+        free_dag(dc);
+        hash_table_clear(erosion);
+      }
+      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+                                 n_cut++, global_remainings, helper_file);
+      hash_table_free(erosion);
+    }
+    else
+    {
+      // direct handling of the dag
+      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split, -1,
+                                 global_remainings, helper_file);
+    }
+    n_split++;
   }
 
   freia_insert_added_stats(ls, added_stats);
   added_stats = NIL;
 
-  // cleanup
+  // full cleanup
   set_free(global_remainings), global_remainings = NULL;
   free(fname_fulldag), fname_fulldag = NULL;
   free_dag(fulld);
