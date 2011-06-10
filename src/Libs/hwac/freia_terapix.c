@@ -1248,11 +1248,10 @@ static void freia_trpx_compile_one_dag(
   set global_remainings,
   FILE * helper_file)
 {
-  //ifdebug(7) {
-        // dag_dump(stderr, "updated dall", dall);
-  dag_consistency_asserts(d);
-  dag_dump(stderr, "one dag", d);
-//}
+  ifdebug(4) {
+    dag_consistency_asserts(d);
+    dag_dump(stderr, "one_dag", d);
+  }
 
   set remainings = set_make(set_pointer);
   set_append_vertex_statements(remainings, dag_vertices(d));
@@ -1266,7 +1265,6 @@ static void freia_trpx_compile_one_dag(
     fname_dag = s;
   }
 
-  ifdebug(4) dag_dump(stderr, "d", d);
   dag_dot_dump(module, fname_dag, d);
 
   // - output function in helper file
