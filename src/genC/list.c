@@ -668,7 +668,7 @@ list gen_once(const void * vo, list l)
   gen_chunk * item = (gen_chunk*) vo;
   list c;
   for(c=l; c!=NIL; c=CDR(c))
-    if (CHUNK(CAR(c))==item) return(l);
+    if (CHUNK(CAR(c))==item) return l;
 
   return CONS(CHUNK, item, l);
 }
