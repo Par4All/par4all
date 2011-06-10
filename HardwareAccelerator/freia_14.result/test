@@ -312,7 +312,7 @@ digraph "freia_14_helper_0_0_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 6
- * - communication: 128
+ * - communication: 32
  */
 freia_status freia_14_helper_0_0_0(
   freia_data2d * o0,

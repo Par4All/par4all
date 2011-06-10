@@ -251,7 +251,7 @@ digraph "my_absdiff_const_helper_0_0_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 3
- * - communication: 256
+ * - communication: 64
  */
 freia_status my_absdiff_const_helper_0_0_0(
   freia_data2d * o0,

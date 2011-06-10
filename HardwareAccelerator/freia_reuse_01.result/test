@@ -537,7 +537,7 @@ digraph "freia_reuse_01_helper_0_0_0" {
  * dag length is 4, dag width is 2
  * costs in cycles per imagelet row:
  * - computation: 44
- * - communication: 384
+ * - communication: 96
  */
 freia_status freia_reuse_01_helper_0_0_0(
   freia_data2d * o0,

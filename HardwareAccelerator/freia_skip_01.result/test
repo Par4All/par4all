@@ -448,7 +448,7 @@ digraph "freia_skip_01_helper_0_1_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 5
- * - communication: 256
+ * - communication: 64
  */
 freia_status freia_skip_01_helper_0_0_0(
   freia_data2d * o0,
@@ -585,7 +585,7 @@ freia_status freia_skip_01_helper_0_0_0(
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 6
- * - communication: 256
+ * - communication: 64
  */
 freia_status freia_skip_01_helper_0_1_0(
   freia_data2d * o0,

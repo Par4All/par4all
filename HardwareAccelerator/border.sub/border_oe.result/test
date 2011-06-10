@@ -270,7 +270,7 @@ digraph "dag_cleaned_0" {
  * dag length is 2, dag width is 1
  * costs in cycles per imagelet row:
  * - computation: 15
- * - communication: 256
+ * - communication: 64
  */
 freia_status border_oe_helper_0_0_0(
   freia_data2d * o0,
