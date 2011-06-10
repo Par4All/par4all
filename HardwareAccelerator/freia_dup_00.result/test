@@ -36,7 +36,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
   "i" -> "8 ?=";
   "i" -> "7 max";
@@ -90,7 +89,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
   "i" -> "8 ?=";
   "i" -> "7 max";
@@ -222,7 +220,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "8 ?=" [shape=none];
   "7 max" [shape=diamond];
   "i" -> "8 ?=";
   "i" -> "7 max";

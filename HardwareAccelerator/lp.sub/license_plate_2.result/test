@@ -187,15 +187,12 @@ digraph "dag_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -216,7 +213,6 @@ digraph "dag_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -243,7 +239,6 @@ digraph "dag_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -280,7 +275,6 @@ digraph "dag_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
@@ -360,15 +354,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -389,7 +380,6 @@ digraph "dag_cleaned_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -416,7 +406,6 @@ digraph "dag_cleaned_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -453,7 +442,6 @@ digraph "dag_cleaned_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
@@ -880,15 +868,12 @@ digraph "dag_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -909,7 +894,6 @@ digraph "dag_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -936,7 +920,6 @@ digraph "dag_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -973,7 +956,6 @@ digraph "dag_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
@@ -1053,15 +1035,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -1082,7 +1061,6 @@ digraph "dag_cleaned_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -1109,7 +1087,6 @@ digraph "dag_cleaned_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -1146,7 +1123,6 @@ digraph "dag_cleaned_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
@@ -2946,15 +2922,12 @@ digraph "dag_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -2975,7 +2948,6 @@ digraph "dag_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -3002,7 +2974,6 @@ digraph "dag_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -3039,7 +3010,6 @@ digraph "dag_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];
@@ -3119,15 +3089,12 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "152 &" [shape=trapezium,orientation=270];
   "152 &" -> "out";
-  "150 ?" [shape=none];
-  "148 ?" [shape=none];
   "147 D8" [shape=box];
   "147 D8" -> "152 &" [label="out"];
   "146 D8" [shape=box];
   "146 D8" -> "147 D8" [label="out"];
   "145 D8" [shape=box];
   "145 D8" -> "146 D8" [label="out"];
-  "143 ?" [shape=none];
   "141 ?" [shape=none];
   "141 ?" -> "135 ?" [arrowhead=empty,label="i_3"];
   "140 D8" [shape=box];
@@ -3148,7 +3115,6 @@ digraph "dag_cleaned_0" {
   "132 E8" -> "133 E8" [label="imout"];
   "131 E8" [shape=box];
   "131 E8" -> "132 E8" [label="imout"];
-  "129 ?" [shape=none];
   "127 ?" [shape=none];
   "127 ?" -> "121 ?" [arrowhead=empty,label="i_2"];
   "126 D8" [shape=box];
@@ -3175,7 +3141,6 @@ digraph "dag_cleaned_0" {
   "113 thr" -> "115 &" [label="imcloseth"];
   "112 thr" [shape=parallelogram];
   "112 thr" -> "115 &" [label="imopenth"];
-  "110 ?" [shape=none];
   "107 ?" [shape=none];
   "107 ?" -> "97 ?" [arrowhead=empty,label="i_1"];
   "106 E8" [shape=box];
@@ -3212,7 +3177,6 @@ digraph "dag_cleaned_0" {
   "90 D8" -> "91 D8" [label="imclose"];
   "89 D8" [shape=box];
   "89 D8" -> "90 D8" [label="imclose"];
-  "87 ?" [shape=none];
   "85 ?" [shape=none];
   "85 ?" -> "68 ?" [arrowhead=empty,label="i_0"];
   "84 D8" [shape=box];

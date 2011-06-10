@@ -30,7 +30,6 @@ digraph "dag_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";
@@ -49,7 +48,6 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";
@@ -102,7 +100,6 @@ digraph "dag_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";
@@ -121,7 +118,6 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";
@@ -284,7 +280,6 @@ digraph "dag_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";
@@ -303,7 +298,6 @@ digraph "dag_cleaned_0" {
   // computation vertices
   "10 ^" [shape=trapezium,orientation=270];
   "10 ^" -> "o";
-  "9 ?" [shape=none];
   "8 -s" [shape=trapezium,orientation=270];
   "8 -s" -> "10 ^" [label="t"];
   "i1" -> "8 -s";

@@ -34,7 +34,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "7 ?=" [shape=none];
   "6 min" [shape=diamond];
   "in0" -> "7 ?=";
   "in0" -> "6 min";
@@ -84,7 +83,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "7 ?=" [shape=none];
   "6 min" [shape=diamond];
   "in0" -> "7 ?=";
   "in0" -> "6 min";
@@ -210,7 +208,6 @@ digraph "dag_cleaned_0" {
   // outputs
 
   // computation vertices
-  "7 ?=" [shape=none];
   "6 min" [shape=diamond];
   "in0" -> "7 ?=";
   "in0" -> "6 min";

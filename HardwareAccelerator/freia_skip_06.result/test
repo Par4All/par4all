@@ -36,8 +36,6 @@ digraph "dag_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
@@ -61,8 +59,6 @@ digraph "dag_cleaned_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
@@ -124,8 +120,6 @@ digraph "dag_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
@@ -149,8 +143,6 @@ digraph "dag_cleaned_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
@@ -434,8 +426,6 @@ digraph "dag_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
@@ -459,8 +449,6 @@ digraph "dag_cleaned_0" {
   "11 ^." -> "12 +s" [label="t1"];
   "10 &." [shape=trapezium,orientation=270];
   "10 &." -> "12 +s" [label="t0"];
-  "9 ?" [shape=none];
-  "8 ?" [shape=none];
   "7 +" [shape=trapezium,orientation=270];
   "7 +" -> "11 ^." [label="i"];
   "7 +" -> "10 &." [label="i"];
