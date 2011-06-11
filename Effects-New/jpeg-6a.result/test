@@ -1443,6 +1443,7 @@ switch_2_case_JDCT_IFAST:         ;
 //                               cinfo[0].num_components dtbl i qtbl 
 //                               qtbl[0].quantval[i]
 //             <    is written>: dtbl[i]
+
                dtbl[i] = (DCTELEM) ((INT32) (qtbl->quantval)[i]*(INT32) aanscales[i]+((INT32) 1<<14-3-1)>>14-3);
          }
       }
@@ -2410,13 +2411,12 @@ static void process_data_simple_main(j_compress_ptr cinfo, JSAMPARRAY input_buf,
    while (main->cur_iMCU_row<cinfo->total_iMCU_rows) {
 //             <    is read   >: main main[0].rowgroup_ctr
       /* Read input data if we haven't filled the main buffer yet */
-      if (main->rowgroup_ctr<8) {
+      if (main->rowgroup_ctr<8)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          
          
          (*cinfo->prep->pre_process_data)(cinfo,input_buf,in_row_ctr,in_rows_avail,main->buffer,&main->rowgroup_ctr,(JDIMENSION) 8);
-      }
 //             <    is read   >: main main[0].rowgroup_ctr
       
       /* If we don't have a full iMCU row buffered, return to application for
@@ -3302,12 +3302,11 @@ static void write_tables_only(j_compress_ptr cinfo)
 
    for(i = 0; i <= 3; i += 1)
 //             <    is read   >: cinfo cinfo[0].quant_tbl_ptrs[i] i
-      if ((cinfo->quant_tbl_ptrs)[i]!=(void *) 0) {
+      if ((cinfo->quant_tbl_ptrs)[i]!=(void *) 0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: cinfo i
          (void) emit_dqt(cinfo, i);
-      }
 //             <    is read   >: cinfo cinfo[0].arith_code
 
    if (!cinfo->arith_code)
@@ -3458,7 +3457,6 @@ static void initial_setup(j_compress_ptr cinfo)
       cinfo->err->msg_code = JERR_COMPONENT_COUNT, (cinfo->err->msg_parm.i)[0] = cinfo->num_components, (cinfo->err->msg_parm.i)[1] = 10, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo
 //             <    is written>: cinfo[0].max_h_samp_factor
-   
    
    /* Compute maximum sampling factors; check factor validity */
    cinfo->max_h_samp_factor = 1;
@@ -3664,7 +3662,6 @@ static void per_scan_setup(j_compress_ptr cinfo)
 //                               cinfo[0].max_h_samp_factor
 //             <    is written>: cinfo[0].MCUs_per_row
       
-      
       /* Overall image size in MCUs */
       
       
@@ -3818,11 +3815,10 @@ switch_1_case_output_pass:   ;
    (*cinfo->coef->start_pass)(cinfo,JBUF_CRANK_DEST);
 //             <    is read   >: master master[0].scan_number
    /* We emit frame/scan headers now */
-   if (master->scan_number==0) {
+   if (master->scan_number==0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->marker->write_frame_header)(cinfo);
-   }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
    (*cinfo->marker->write_scan_header)(cinfo);
@@ -3988,7 +3984,6 @@ static void select_scan_parameters(j_compress_ptr cinfo)
          cinfo->err->msg_code = JERR_COMPONENT_COUNT, (cinfo->err->msg_parm.i)[0] = cinfo->num_components, (cinfo->err->msg_parm.i)[1] = 4, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: cinfo[0].comps_in_scan
-
       cinfo->comps_in_scan = cinfo->num_components;
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: ci
@@ -5868,7 +5863,6 @@ static void create_context_buffer(j_compress_ptr cinfo)
 //             <    is read   >: cinfo cinfo[0].num_components 
 //                               rgroup_height
 //             <    is written>: i
-      
       /* Fill in the above and below wraparound pointers */
       for(i = 0; i <= rgroup_height-1; i += 1) {
 //             <    is read   >: cinfo cinfo[0].num_components 
@@ -9330,7 +9324,6 @@ static void ycc_rgb_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf, JDIMEN
 //                               range_limit range_limit[y+Cbbtab[cb]]
 //                               y
 //             <    is written>: outptr[2]
-
          outptr[2] = range_limit[y+Cbbtab[cb]];
 //             <    is read   >: num_cols outptr
 //             <    is written>: outptr
@@ -9421,7 +9414,6 @@ static void ycck_cmyk_convert(j_decompress_ptr cinfo, JSAMPIMAGE input_buf, JDIM
 //                               range_limit 
 //                               range_limit[255-(y+Cbbtab[cb])] y
 //             <    is written>: outptr[2]
-
          outptr[2] = range_limit[255-(y+Cbbtab[cb])];
 //             <    is read   >: col inptr3 inptr3[col] num_cols 
 //                               outptr
@@ -9658,6 +9650,7 @@ switch_4_case_JDCT_IFAST:               ;
 //                               cinfo[0].num_components i ifmtbl qtbl
 //                               qtbl[0].quantval[i]
 //             <    is written>: ifmtbl[i]
+
                      ifmtbl[i] = (IFAST_MULT_TYPE) ((INT32) (qtbl->quantval)[i]*(INT32) aanscales[i]+((INT32) 1<<14-2-1)>>14-2);
                }
             }
@@ -10542,7 +10535,6 @@ static void initial_setup(j_decompress_ptr cinfo)
 //             <    is read   >: cinfo
 //             <    is written>: cinfo[0].max_h_samp_factor
    
-   
    /* Compute maximum sampling factors; check factor validity */
    cinfo->max_h_samp_factor = 1;
 //             <    is read   >: cinfo
@@ -10816,7 +10808,6 @@ static void per_scan_setup(j_decompress_ptr cinfo)
 //             <    is read   >: cinfo cinfo[0].image_width 
 //                               cinfo[0].max_h_samp_factor
 //             <    is written>: cinfo[0].MCUs_per_row
-      
       
       /* Overall image size in MCUs */
       
@@ -11766,12 +11757,11 @@ static boolean get_app0(j_decompress_ptr cinfo)
 
    datasrc->next_input_byte = next_input_byte, datasrc->bytes_in_buffer = bytes_in_buffer;
 //             <    is read   >: length
-   if (length>0) {
+   if (length>0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       /* skip any remaining data -- could be lots */
       (*cinfo->src->skip_input_data)(cinfo,(long int) length);
-   }
 
    return 1;
 }
@@ -11934,12 +11924,11 @@ static boolean get_app14(j_decompress_ptr cinfo)
 
    datasrc->next_input_byte = next_input_byte, datasrc->bytes_in_buffer = bytes_in_buffer;
 //             <    is read   >: length
-   if (length>0) {
+   if (length>0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       /* skip any remaining data -- could be lots */
       (*cinfo->src->skip_input_data)(cinfo,(long int) length);
-   }
 
    return 1;
 }
@@ -14175,11 +14164,10 @@ static void finish_output_pass(j_decompress_ptr cinfo)
    my_master_ptr master = (my_master_ptr) cinfo->master;
 //             <    is read   >: cinfo cinfo[0].quantize_colors
 
-   if (cinfo->quantize_colors) {
+   if (cinfo->quantize_colors)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->cquantize->finish_pass)(cinfo);
-   }
 //             <    is read   >: master master[0].pass_number
 //             <    is written>: master[0].pass_number
    master->pass_number++;
@@ -14512,20 +14500,18 @@ static void prepare_for_output_pass(j_decompress_ptr cinfo)
       if (!cinfo->raw_data_out) {
 //             <    is read   >: master 
 //                               master[0].using_merged_upsample
-         if (!master->using_merged_upsample) {
+         if (!master->using_merged_upsample)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             (*cinfo->cconvert->start_pass)(cinfo);
-         }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          (*cinfo->upsample->start_pass)(cinfo);
 //             <    is read   >: cinfo cinfo[0].quantize_colors
-         if (cinfo->quantize_colors) {
+         if (cinfo->quantize_colors)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             (*cinfo->cquantize->start_pass)(cinfo,master->pub.is_dummy_pass);
-         }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          (*cinfo->post->start_pass)(cinfo,master->pub.is_dummy_pass?JBUF_SAVE_AND_PASS:JBUF_PASS_THRU);
@@ -16309,7 +16295,6 @@ static void start_pass_phuff_decoder(j_decompress_ptr cinfo)
       cinfo->err->msg_code = JERR_BAD_PROGRESSION, (cinfo->err->msg_parm.i)[0] = cinfo->Ss, (cinfo->err->msg_parm.i)[1] = cinfo->Se, (cinfo->err->msg_parm.i)[2] = cinfo->Ah, (cinfo->err->msg_parm.i)[3] = cinfo->Al, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].comps_in_scan
 //             <    is written>: ci
-   
    /* Update progression status, and verify that scan order is legal.
       * Note that inter-scan inconsistencies are treated as warnings
       * not fatal errors ... not clear if this is right way to behave.
@@ -17238,11 +17223,10 @@ static void emit_message(j_common_ptr cinfo, int msg_level)
            * the policy implemented here is to show only the first warning,
            * unless trace_level >= 3.
            */
-      if (err->num_warnings==0||err->trace_level>=3) {
+      if (err->num_warnings==0||err->trace_level>=3)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          (*err->output_message)(cinfo);
-      }
 //             <    is read   >: err err[0].num_warnings
 //             <    is written>: err[0].num_warnings
       /* Always count warnings in num_warnings. */
@@ -17251,11 +17235,10 @@ static void emit_message(j_common_ptr cinfo, int msg_level)
    else
 //             <    is read   >: err err[0].trace_level msg_level
       /* It's a trace message.  Show it if trace_level >= msg_level. */
-      if (err->trace_level>=msg_level) {
+      if (err->trace_level>=msg_level)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
          (*err->output_message)(cinfo);
-      }
 }
 static void error_exit(j_common_ptr cinfo)
 {
@@ -20154,18 +20137,16 @@ l99998:   ;
 //             <    is written>: byte_count
    byte_count = rows*bytesperrow;
 //             <    is read   >: writing
-   if (writing) {
+   if (writing)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
       (*ptr->b_s_info.write_backing_store)(cinfo,&ptr->b_s_info,(void *) (ptr->mem_buffer)[i],file_offset,byte_count);
-   }
-   else {
+   else
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
       (*ptr->b_s_info.read_backing_store)(cinfo,&ptr->b_s_info,(void *) (ptr->mem_buffer)[i],file_offset,byte_count);
-   }
 //             <    is read   >: byte_count file_offset
 //             <    is written>: file_offset
    file_offset += byte_count;
@@ -20215,18 +20196,16 @@ l99998:   ;
 //             <    is written>: byte_count
    byte_count = rows*bytesperrow;
 //             <    is read   >: writing
-   if (writing) {
+   if (writing)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
       (*ptr->b_s_info.write_backing_store)(cinfo,&ptr->b_s_info,(void *) (ptr->mem_buffer)[i],file_offset,byte_count);
-   }
-   else {
+   else
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 
       (*ptr->b_s_info.read_backing_store)(cinfo,&ptr->b_s_info,(void *) (ptr->mem_buffer)[i],file_offset,byte_count);
-   }
 //             <    is read   >: byte_count file_offset
 //             <    is written>: file_offset
    file_offset += byte_count;
@@ -21571,11 +21550,10 @@ void jpeg_abort(j_common_ptr cinfo)
    /* Releasing pools in reverse order might help avoid fragmentation
       * with some (brain-damaged) malloc libraries.
       */
-   for(pool = 2-1; pool >= 1; pool += -1) {
+   for(pool = 2-1; pool >= 1; pool += -1)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->mem->free_pool)(cinfo,pool);
-   }
 //             <    is read   >: cinfo cinfo[0].is_decompressor
 //             <    is written>: cinfo[0].global_state
    
@@ -22068,11 +22046,10 @@ void jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dsti
 //             <    is read   >: qtblptr qtblptr[0] srcinfo 
 //                               srcinfo[0].quant_tbl_ptrs[tblno] 
 //                               tblno
+
          memcpy((void *) (*qtblptr)->quantval, (void *) (srcinfo->quant_tbl_ptrs)[tblno]->quantval, (size_t) (size_t) sizeof((*qtblptr)->quantval));
 //             <    is read   >: qtblptr qtblptr[0]
 //             <    is written>: qtblptr[0][0].sent_table
-         
-         
          (*qtblptr)->sent_table = 0;
       }
 //             <    is read   >: dstinfo srcinfo 
@@ -22099,7 +22076,6 @@ void jpeg_copy_critical_parameters(j_decompress_ptr srcinfo, j_compress_ptr dsti
    incomp = srcinfo->comp_info;
 //             <    is read   >: dstinfo dstinfo[0].num_components
 //             <    is written>: ci
-
    for(ci = 0; ci <= dstinfo->num_components-1; ci += 1) {
 //             <    is read   >: dstinfo dstinfo[0].num_components 
 //                               incomp incomp[0].component_id outcomp
@@ -22233,11 +22209,10 @@ break_1:   ;
 void jpeg_destroy(j_common_ptr cinfo)
 {
 //             <    is read   >: cinfo cinfo[0].mem
-   if (cinfo->mem!=(void *) 0) {
+   if (cinfo->mem!=(void *) 0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->mem->self_destruct)(cinfo);
-   }
 //             <    is read   >: cinfo
 //             <    is written>: cinfo[0].mem
    cinfo->mem = (void *) 0;
@@ -22840,7 +22815,6 @@ void jpeg_fdct_islow(DCTELEM *data)
 //             <    is read   >: tmp4 tmp7
 //             <    is written>: z1
       
-      
       /* Odd part per figure 8 --- note paper omits factor of sqrt(2).
            * cK represents cos(K*pi/16).
            * i0..i3 in the paper are tmp4..tmp7 here.
@@ -22978,7 +22952,6 @@ void jpeg_fdct_islow(DCTELEM *data)
 //             <    is read   >: tmp4 tmp7
 //             <    is written>: z1
       
-      
       /* Odd part per figure 8 --- note paper omits factor of sqrt(2).
            * cK represents cos(K*pi/16).
            * i0..i3 in the paper are tmp4..tmp7 here.
@@ -23043,8 +23016,7 @@ void jpeg_fdct_islow(DCTELEM *data)
       dataptr[8*1] = (DCTELEM) (tmp7+z1+z4+((INT32) 1<<13+2-1)>>13+2);
 //             <    is read   >: dataptr
 //             <    is written>: dataptr
-      
-      
+
       dataptr++;
    }
 }
@@ -25722,11 +25694,10 @@ l99999:   ;
    if (!1) goto break_1;
    int retcode;
 //             <    is read   >: cinfo cinfo[0].progress
-   if (cinfo->progress!=(void *) 0) {
+   if (cinfo->progress!=(void *) 0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->progress->progress_monitor)((j_common_ptr) cinfo);
-   }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: retcode
@@ -26234,7 +26205,6 @@ switch_1_case_JCS_UNKNOWN:      ;
          cinfo->err->msg_code = JERR_COMPONENT_COUNT, (cinfo->err->msg_parm.i)[0] = cinfo->num_components, (cinfo->err->msg_parm.i)[1] = 10, (*cinfo->err->error_exit)((j_common_ptr) cinfo);
 //             <    is read   >: cinfo cinfo[0].num_components
 //             <    is written>: ci
-
       for(ci = 0; ci <= cinfo->num_components-1; ci += 1)
 //             <    is read   >: ci cinfo cinfo[0].comp_info 
 //                               cinfo[0].num_components compptr
@@ -26717,11 +26687,10 @@ l99999:         ;
          if (!1) goto break_1;
          int retcode;
 //             <    is read   >: cinfo cinfo[0].progress
-         if (cinfo->progress!=(void *) 0) {
+         if (cinfo->progress!=(void *) 0)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
             (*cinfo->progress->progress_monitor)((j_common_ptr) cinfo);
-         }
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: retcode
@@ -27069,11 +27038,10 @@ JDIMENSION jpeg_write_raw_data(j_compress_ptr cinfo, JSAMPIMAGE data, JDIMENSION
       * delayed so that application can write COM, etc, markers between
       * jpeg_start_compress and jpeg_write_raw_data.
       */
-   if (cinfo->master->call_pass_startup) {
+   if (cinfo->master->call_pass_startup)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->master->pass_startup)(cinfo);
-   }
 //             <    is read   >: cinfo cinfo[0].max_v_samp_factor
 //             <    is written>: lines_per_iMCU_row
    
@@ -27145,11 +27113,10 @@ JDIMENSION jpeg_write_scanlines(j_compress_ptr cinfo, JSAMPARRAY scanlines, JDIM
       * delayed so that application can write COM, etc, markers between
       * jpeg_start_compress and jpeg_write_scanlines.
       */
-   if (cinfo->master->call_pass_startup) {
+   if (cinfo->master->call_pass_startup)
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
       (*cinfo->master->pass_startup)(cinfo);
-   }
 //             <    is read   >: cinfo cinfo[0].image_height 
 //                               cinfo[0].next_scanline
 //             <    is written>: rows_left
@@ -27777,7 +27744,6 @@ static void quantize3_ord_dither(j_decompress_ptr cinfo, JSAMPARRAY input_buf, J
          pixcode += (int) colorindex2[(int) *input_ptr++ +dither2[col_index]];
 //             <    is read   >: num_rows output_ptr pixcode width
 //             <    is written>: output_ptr output_ptr[0]
-
          *output_ptr++ = (JSAMPLE) pixcode;
 //             <    is read   >: col_index num_rows width
 //             <    is written>: col_index
