@@ -1452,6 +1452,13 @@ void freia_trpx_compile_calls
       // try split dag into subdags
       hash_table erosion = hash_table_make(hash_pointer, 0);
       int cut, n_cut = 0;
+
+      // what about another strategy?
+      // I can try every possible cuts and chose the best one,
+      // that is to stop as soon as computation cost > communication cost?
+      // or when costs are quite balanced in all cuts?
+      // dag cutting strategy prop = none/computed/optimized?
+
       while ((cut = cut_decision(d, erosion)))
       {
         dag dc = cut_perform(d, cut, erosion, fulld);
