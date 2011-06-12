@@ -1332,7 +1332,7 @@ static int cut_decision(dag d, hash_table erosion)
   // there should be about 8 of them to amortize/hide one imagelet transfer,
   // whether as input or output.
 
-  int cut = (int) (erode/(n_cuts+1));
+  int cut = erode/((int)(n_cuts+1));
   return cut;
 }
 
