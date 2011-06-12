@@ -1483,7 +1483,8 @@ void freia_trpx_compile_calls
 
   pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
 
-  bool further_cut_dag = get_bool_property(trpx_cut_dag);
+  string dag_cut = get_string_property(trpx_dag_cut);
+  pips_assert("valid cutting strategy", trpx_dag_cut_is_valid(dag_cut));
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
@@ -1492,9 +1493,15 @@ void freia_trpx_compile_calls
   int n_split = 0;
   FOREACH(dag, d, ld)
   {
-    if (further_cut_dag)
+    if (trpx_dag_cut_none_p(dag_cut))
     {
-      // try split dag into subdags
+      // direct handling of the dag
+      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split, -1,
+                                 global_remainings, helper_file);
+    }
+    else if (trpx_dag_cut_compute_p(dag_cut))
+    {
+      // try split dag into subdags with a rough computed strategy
       hash_table erosion = hash_table_make(hash_pointer, 0);
       int cut, n_cut = 0;
 
@@ -1518,12 +1525,11 @@ void freia_trpx_compile_calls
                                  n_cut++, global_remainings, helper_file);
       hash_table_free(erosion);
     }
+    else if (trpx_dag_cut_enumerate_p(dag_cut))
+      pips_internal_error("not implemented yet");
     else
-    {
-      // direct handling of the dag
-      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split, -1,
-                                 global_remainings, helper_file);
-    }
+      pips_internal_error("cannot get there");
+
     n_split++;
   }
 

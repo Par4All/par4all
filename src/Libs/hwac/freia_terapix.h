@@ -35,7 +35,16 @@
 #define trpx_dmabw_prop  "HWAC_TERAPIX_DMABW"
 #define trpx_gram_width  "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
-#define trpx_cut_dag     "HWAC_TERAPIX_CUT_DAG"
+#define trpx_dag_cut     "HWAC_TERAPIX_DAG_CUT"
+
+// various dag cutting strategies for terapix
+#define trpx_dag_cut_none_p(s) same_string_p(s, "none")
+#define trpx_dag_cut_compute_p(s) same_string_p(s, "compute")
+#define trpx_dag_cut_enumerate_p(s) same_string_p(s, "enumerate")
+#define trpx_dag_cut_is_valid(s) \
+  trpx_dag_cut_none_p(s) ||      \
+  trpx_dag_cut_compute_p(s) ||   \
+  trpx_dag_cut_enumerate_p(s)
 
 // includes for generated helper
 #define FREIA_TRPX_INCLUDES           \

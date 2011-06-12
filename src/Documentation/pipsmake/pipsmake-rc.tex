@@ -8405,9 +8405,11 @@ HWAC_TERAPIX_GRAM_WIDTH 64
 HWAC_TERAPIX_GRAM_HEIGHT 32
 \end{PipsProp}
 
-Whether to further cut the dag for terapix.
-\begin{PipsProp}{HWAC_TERAPIX_CUT_DAG}
-HWAC_TERAPIX_CUT_DAG TRUE
+Whether and how to further cut the dag for terapix.
+Expected values, by order of compilation costs, are:
+\emph{none}, \emph{compute}, \emph{enumerate}.
+\begin{PipsProp}{HWAC_TERAPIX_DAG_CUT}
+HWAC_TERAPIX_DAG_CUT "compute"
 \end{PipsProp}
 
 Whether to label arcs in dag dot output with the image name,
