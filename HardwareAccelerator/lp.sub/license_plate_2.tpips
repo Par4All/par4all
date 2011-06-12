@@ -2,7 +2,7 @@ setenv WSPACE license_plate_2
 setenv FILE license_plate.c
 setenv NAME license_plate
 setproperty HWAC_SPOC_DEPTH 16
-setproperty HWAC_TERAPIX_CUT_DAG TRUE
+setproperty HWAC_TERAPIX_DAG_CUT "compute"
 # test with very slow transfers
 setproperty HWAC_TERAPIX_DMABW 256
 source default_tpips
