@@ -1559,6 +1559,7 @@ static void dag_append_freia_call(dag d, statement s)
  * @param module
  * @param list of statements in sequence
  * @param number dag identifier in function
+ * @param occurrences entity -> set of statements where they appear
  * @param added_stat list of statements killed by dag optimization
  */
 dag build_freia_dag(string module, list ls, int number,

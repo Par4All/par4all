@@ -110,7 +110,8 @@ static void erosion_optimization
       {
         list iargs = call_arguments(syntax_call(expression_syntax(ival)));
         pips_assert("must be a kernel...", gen_length(iargs)==9);
-        // tell whether kernel element is NULL
+
+        // tell whether each kernel element is zero. If in doubt, count as 1.
         bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
         intptr_t i = 0;
         k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
@@ -133,6 +134,7 @@ static void erosion_optimization
         iargs = CDR(iargs);
         pips_assert("end of list reached", iargs==NIL);
 
+        // summarize for each four directions
         *north = !(k00 && k10 && k20);
         *south = !(k02 && k12 && k22);
         *west = !(k00 && k01 && k02);
@@ -335,6 +337,8 @@ static void terapix_gram_allocate
 
 #define IMG_PTR "imagelet_"
 
+/* generate an image symbolic pointer (a name:-).
+ */
 static void terapix_image(string_buffer sb, int ff, int n)
 {
   pips_assert("valid flip-flop", ff==0 || ff==1);
@@ -345,6 +349,8 @@ static void terapix_image(string_buffer sb, int ff, int n)
     sb_cat(sb, IMG_PTR "io_", itoa(-n), ff? "_1": "_0");
 }
 
+/* set a double buffered image argument.
+ */
 static void terapix_mcu_img(string_buffer code, int op, string ref, int n)
 {
   sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref, " = ");
@@ -355,6 +361,8 @@ static void terapix_mcu_img(string_buffer code, int op, string ref, int n)
   sb_cat(code, ";\n");
 }
 
+/* set an integer argument.
+ */
 static void terapix_mcu_int(string_buffer code, int op, string ref, int val)
 {
   sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref);
@@ -363,12 +371,16 @@ static void terapix_mcu_int(string_buffer code, int op, string ref, int val)
   sb_cat(code, " = ", itoa(val), ";\n");
 }
 
+/* set some value string argument.
+ */
 static void terapix_mcu_val(string_buffer code, int op, string r, string s)
 {
   sb_cat(code, "  mcu_macro[0][", itoa(op), "].", r, " = ", s, ";\n");
   sb_cat(code, "  mcu_macro[1][", itoa(op), "].", r, " = ", s, ";\n");
 }
 
+/* set some prefixed value string argument.
+ */
 static void terapix_mcu_pval(string_buffer code, int op, string ref,
                              string p, string s)
 {
@@ -378,6 +390,9 @@ static void terapix_mcu_pval(string_buffer code, int op, string ref,
          " = ", p, s, ";\n");
 }
 
+/* copy some operator parameters in the global ram (aka gram).
+ * the coordinates used are  (x_<name>, y_<name>).
+ */
 static void gram_param
   (string_buffer code, string_buffer decl,
    string name, dagvtx v, hash_table hparams,
@@ -473,6 +488,17 @@ static void terapix_gram_management
   terapix_mcu_pval(code, op, "ymin3", "y_", name);
 }
 
+/* generate terapix code for
+ * @param code, code stream being generated
+ * @param decl, declaration stream being generated
+ * @param op, operation number
+ * @param api, actual freia operator called
+ * @param used, array to keep track of what gram cells are used
+ * @param hparam, expression to parameter mapping
+ * @param v, dag vertex of the current operation
+ * @param ins, list of image number inputs (i.e. operation arguments)
+ * @param out, image number output for the operation
+ */
 static void terapix_macro_code
   (string_buffer code, string_buffer decl,
    int op, const freia_api_t * api, bool * used,
@@ -998,6 +1024,9 @@ static void freia_terapix_call
   free(used);
 }
 
+/* global variable used by the dagvtx_terapix_priority function,
+ * because qsort does not allow to pass some descriptor.
+ */
 static hash_table erosion = NULL;
 
 /* comparison function for sorting dagvtx in qsort,
@@ -1143,6 +1172,8 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
+/* split a dag on scalar dependencies only, with a greedy heuristics.
+ */
 static list /* of dags */ split_dag_on_scalars(const dag initial)
 {
   if (!single_image_assignement_p(initial))
@@ -1419,6 +1450,13 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   return nd;
 }
 
+/* do compile a list of statements for terapix
+ * @param module, current module (function) name
+ * @param ls, list of statements taken from the sequence
+ * @param occs, occurences of images (image -> set of statements)
+ * @param helper_file, file to which code is to be generated
+ * @param number, number of this statement sequence in module
+ */
 void freia_trpx_compile_calls
 (string module,
  list /* of statements */ ls,
