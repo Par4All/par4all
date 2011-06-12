@@ -44,34 +44,7 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
-/* Return the first/last available imagelet.
- * This ensures that the choice is deterministic.
- * Moreover, as first numbers are IO imagelets, this help putting outputs
- * in the right imagelet so as to avoid additionnal copies.
- */
-static _int select_imagelet(set availables, int * nimgs, boolean first)
-{
-  _int choice = 0;
-  // allocate if no images are available
-  if (set_empty_p(availables))
-  {
-    pips_assert("can create new images", nimgs!=NULL);
-    (*nimgs)++;
-    choice = *nimgs;
-  }
-  else // search
-  {
-    SET_FOREACH(_int, i, availables)
-    {
-      if (choice==0) choice = i;
-      if (first && (i<choice)) choice = i;
-      if (!first && (i>choice)) choice = i;
-    }
-    set_del_element(availables, availables, (void*) choice);
-  }
-  pips_assert("some choice was made", choice>0);
-  return choice;
-}
+/********************************************************** TERAPIX ANALYSES */
 
 /* @return the dead vertices (their output is dead) after computing v in d.
  */
@@ -292,6 +265,8 @@ static list /* of ints */ dag_vertex_pred_imagelets
   return limagelets;
 }
 
+/************************************************** GLOBAL MEMORY MANAGEMENT */
+
 /* allocate bitfield to described used cells in global memory.
  */
 static bool * terapix_gram_init(void)
@@ -333,6 +308,37 @@ static void terapix_gram_allocate
     }
   }
   pips_internal_error("cannot find available memory for %dx%d", width, height);
+}
+
+/********************************** TERAPIX CODE GENERATION HELPER FUNCTIONS */
+
+/* Return the first/last available imagelet.
+ * This ensures that the choice is deterministic.
+ * Moreover, as first numbers are IO imagelets, this help putting outputs
+ * in the right imagelet so as to avoid additionnal copies.
+ */
+static _int select_imagelet(set availables, int * nimgs, boolean first)
+{
+  _int choice = 0;
+  // allocate if no images are available
+  if (set_empty_p(availables))
+  {
+    pips_assert("can create new images", nimgs!=NULL);
+    (*nimgs)++;
+    choice = *nimgs;
+  }
+  else // search
+  {
+    SET_FOREACH(_int, i, availables)
+    {
+      if (choice==0) choice = i;
+      if (first && (i<choice)) choice = i;
+      if (!first && (i>choice)) choice = i;
+    }
+    set_del_element(availables, availables, (void*) choice);
+  }
+  pips_assert("some choice was made", choice>0);
+  return choice;
 }
 
 #define IMG_PTR "imagelet_"
@@ -548,6 +554,8 @@ static void terapix_macro_code
   terapix_mcu_val(code, op, "iter4", "0");
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
 }
+
+/*************************************************** TERAPIX CODE GENERATION */
 
 /* generate a terapix call for dag thedag.
  * the memory allocation is managed here.
@@ -1024,6 +1032,57 @@ static void freia_terapix_call
   free(used);
 }
 
+/******************************************************************* ONE DAG */
+
+/* generate terapix code for this one dag, which should be already split.
+ */
+static void freia_trpx_compile_one_dag(
+  string module,
+  list /* of statements */ ls,
+  dag d,
+  string fname_fulldag,
+  int n_split,
+  int n_cut,
+  set global_remainings,
+  FILE * helper_file)
+{
+  ifdebug(4) {
+    dag_consistency_asserts(d);
+    dag_dump(stderr, "one_dag", d);
+  }
+
+  set remainings = set_make(set_pointer);
+  set_append_vertex_statements(remainings, dag_vertices(d));
+
+  // name_<number>_<split>[_<cut>]
+  string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_split)));
+  if (n_cut!=-1)
+  {
+    string s = strdup(cat(fname_dag, "_", itoa(n_cut)));
+    free(fname_dag);
+    fname_dag = s;
+  }
+
+  dag_dot_dump(module, fname_dag, d);
+
+  // - output function in helper file
+  list lparams = NIL;
+
+  string_buffer code = string_buffer_make(true);
+  freia_terapix_call(module, fname_dag, code, d, &lparams);
+  string_buffer_to_file(code, helper_file);
+  string_buffer_free(&code);
+
+  // - and substitute its call...
+  freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                  ls, fname_dag, lparams);
+
+  // cleanup
+  free(fname_dag), fname_dag = NULL;
+}
+
+/************************************************** TERAPIX DAG SCALAR SPLIT */
+
 /* global variable used by the dagvtx_terapix_priority function,
  * because qsort does not allow to pass some descriptor.
  */
@@ -1267,52 +1326,7 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
   return ld;
 }
 
-/* generate terapix code for this one dag, which should be already split.
- */
-static void freia_trpx_compile_one_dag(
-  string module,
-  list /* of statements */ ls,
-  dag d,
-  string fname_fulldag,
-  int n_split,
-  int n_cut,
-  set global_remainings,
-  FILE * helper_file)
-{
-  ifdebug(4) {
-    dag_consistency_asserts(d);
-    dag_dump(stderr, "one_dag", d);
-  }
-
-  set remainings = set_make(set_pointer);
-  set_append_vertex_statements(remainings, dag_vertices(d));
-
-  // name_<number>_<split>[_<cut>]
-  string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_split)));
-  if (n_cut!=-1)
-  {
-    string s = strdup(cat(fname_dag, "_", itoa(n_cut)));
-    free(fname_dag);
-    fname_dag = s;
-  }
-
-  dag_dot_dump(module, fname_dag, d);
-
-  // - output function in helper file
-  list lparams = NIL;
-
-  string_buffer code = string_buffer_make(true);
-  freia_terapix_call(module, fname_dag, code, d, &lparams);
-  string_buffer_to_file(code, helper_file);
-  string_buffer_free(&code);
-
-  // - and substitute its call...
-  freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                  ls, fname_dag, lparams);
-
-  // cleanup
-  free(fname_dag), fname_dag = NULL;
-}
+/*********************************************************** TERAPIX DAG CUT */
 
 /* would it seem interesting to split d?
  * @return the erosion up to which to split, or 0 of no split
@@ -1449,6 +1463,8 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   set_free(current);
   return nd;
 }
+
+/*************************************************** TERAPIX HANDLE SEQUENCE */
 
 /* do compile a list of statements for terapix
  * @param module, current module (function) name
