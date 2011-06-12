@@ -1336,7 +1336,7 @@ static int cut_decision(dag d, hash_table erosion)
   return cut;
 }
 
-/* cut dag "d" at "erosion" "cut"
+/* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
  */
 static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
 {
@@ -1406,8 +1406,11 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   freia_hack_fix_global_ins_outs(fulld, nd);
   freia_hack_fix_global_ins_outs(fulld, d);
 
-  dag_consistency_asserts(nd);
-  dag_consistency_asserts(d);
+  ifdebug(1)
+  {
+    dag_consistency_asserts(nd);
+    dag_consistency_asserts(d);
+  }
 
   // cleanup
   gen_free_list(lcurrent), lcurrent = NIL;
