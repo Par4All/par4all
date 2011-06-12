@@ -1366,6 +1366,10 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
     FOREACH(dagvtx, v, computables)
     {
       // keep erosion up to cut
+      // hmmm. what about \sigma_{d \in NSEW} erosion_d ?
+      // would not work because the erosion only make sense if it is
+      // the same for all imagelet, or said otherwise the erosion is
+      // aligned to the worst case so that tiling can reasonnably take place.
       if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
           (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
           (((_int) hash_get(erosion, EAST(v))) <= cut) &&
