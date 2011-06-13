@@ -1,0 +1,22 @@
+
+Parsed code
+
+int main()
+{
+   int i;
+
+   for (i = 0;i<10;i++, printf("%d\n", i))
+      ;
+}
+
+Controlized code
+
+int main()
+{
+   int i;
+
+   for(i = 0; i <= 9; i += 1) {
+
+      printf("%d\n", i);
+   }
+}

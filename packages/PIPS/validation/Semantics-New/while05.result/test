@@ -1,0 +1,80 @@
+
+Transformers for "while05"
+
+
+//  T() {}
+
+void while05()
+{
+
+//  T(x,y) {x==0, y==0}
+
+   int x = 0, y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, 0<=x, x<=4, 0<=y, y<=8}
+
+
+   while (x<=4&&y<=8) {
+
+//  T(x) {x#init<=x, x<=x#init+1, x#init<=4, y<=8}
+
+      if (alea())
+
+//  T(x) {x==x#init+1, x<=5, y<=8}
+
+         x++;
+
+//  T(y) {x<=5, y#init<=y, y<=y#init+1, y#init<=8}
+
+      if (alea())
+
+//  T(y) {y==y#init+1, x<=5, y<=9}
+
+         y++;
+   }
+
+//  T() {0<=x, x<=5, 45<=9x+5y, 0<=y, y<=9}
+
+   // PIPS: {x<=5, 45<=9x+5y, x+y<=12, y<=9}
+   fprintf(stdout, "x=%d y=%d\n", x, y);
+}
+
+Preconditions for "while05"
+
+
+//  P() {}
+
+void while05()
+{
+
+//  P() {}
+
+   int x = 0, y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+
+   while (x<=4&&y<=8) {
+
+//  P(x,y) {0<=x, x<=4, 0<=y, y<=8}
+
+      if (alea())
+
+//  P(x,y) {0<=x, x<=4, 0<=y, y<=8}
+
+         x++;
+
+//  P(x,y) {0<=x, x<=5, 0<=y, y<=8}
+
+      if (alea())
+
+//  P(x,y) {0<=x, x<=5, 0<=y, y<=8}
+
+         y++;
+   }
+
+//  P(x,y) {0<=x, x<=5, 45<=9x+5y, 0<=y, y<=9}
+
+   // PIPS: {x<=5, 45<=9x+5y, x+y<=12, y<=9}
+   fprintf(stdout, "x=%d y=%d\n", x, y);
+}

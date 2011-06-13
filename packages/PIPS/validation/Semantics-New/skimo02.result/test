@@ -37,16 +37,16 @@ void skimo02(int x, int y, int n)
 
    while (alea()) {
 
-//  P(x,y) {2<=n}
+//  P(x,y) {2<=n, x#init<=x}
 
       x++;
 
-//  P(x,y) {2<=n}
+//  P(x,y) {2<=n, x#init+1<=x}
 
       y += 1-n;
    }
 
-//  P(x,y) {2<=n}
+//  P(x,y) {2<=n, x#init<=x}
 
    return;
 }
@@ -73,6 +73,32 @@ void skimo02(int x, int y, int n)
    }
 
 //  T() {2<=n}
+
+   return;
+}
+
+PRECONDITIONS AFTER REFINEMENT
+
+
+//  P() {2<=n}
+
+void skimo02(int x, int y, int n)
+{
+
+//  P() {2<=n}
+
+   while (alea()) {
+
+//  P(x,y) {2<=n, x#init<=x, x+y<=x#init+y#init}
+
+      x++;
+
+//  P(x,y) {2<=n, x#init+1<=x, x+y<=x#init+y#init+1}
+
+      y += 1-n;
+   }
+
+//  P(x,y) {2<=n, x#init<=x, x+y<=x#init+y#init}
 
    return;
 }

@@ -291,7 +291,7 @@ endif # PY_TARGET
 
 ifdef INSTALL_PY
 
-install:py-install
+install: py-install
 # Deal also with directories.
 # By the way, how to install directories with "install" ?
 py-install .build_py: $(INSTALL_PY)
@@ -368,13 +368,22 @@ header:	.header $(INC_TARGET)
 $(INC_TARGET): $(TARGET)-local.h
 	$(RM) .header; $(MAKE) $(GMKNODIR) .header
 
+# put the -local file in include so that cproto will not complain to much.
+phase0: install-temporary-header
+.PHONY: install-temporary-header
+install-temporary-header:
+	$(INSTALL) -d $(INC.d)
+	test -f $(INC.d)/$(TARGET).h || { \
+	  test -f $(TARGET)-local.h && \
+	  cp $(TARGET)-local.h $(INC.d)/$(TARGET).h ; }
+
 phase2:	$(INC_TARGET)
 
 clean: header-clean
 
+.PHONY: header-clean
 header-clean:
 	$(RM) $(INC_TARGET) .header
-
 
 INSTALL_INC	+=   $(INC_TARGET)
 
@@ -841,84 +850,3 @@ main-unbuild:
 doxygen doxygen-plain doxygen-graph doxygen-publish::
 	if [ -d $@ ]; then $(MAKE) --directory=$@ $@; fi
 
-
-################################################################### DEVELOPMENT
-
-# try development directory under setup_pips.sh
-DEVDIR	= $(ROOT)/../../$(PROJECT)_dev
-
-# can be overriden... for instance there are 2 'pipsmake' directories
-NEW_BRANCH_NAME	= $(notdir $(CURDIR))
-
-# the old pips development target
-install:
-	@echo "See 'create-branch' target to create a development branch"
-	@echo "See 'install-branch' target to install a development branch"
-
-# should be ok
-force-create-branch:
-	$(MAKE) BRANCH_FLAGS+=--commit create-branch
-	-test -d $(DEVDIR)/.svn && $(SVN) update $(DEVDIR)
-
-ifdef SVN_USERNAME
-devsubdir	= $(SVN_USERNAME)/
-else
-devsubdir	= $(USER)/
-endif
-
-# create a new private branch
-create-branch:
-	-@if $(IS_SVN_WC) ; then \
-	  if $(IS_BRANCH) . ; then \
-	    echo "should not create a branch on a branch?!" ; \
-	  else \
-	    if test -d $(DEVDIR)/.svn ; then \
-		branch=$(DEVDIR)/$(NEW_BRANCH_NAME) ; \
-	    else \
-		branch=branches/$(devsubdir)$(NEW_BRANCH_NAME) ; \
-	    fi ; \
-	    $(BRANCH) create $(BRANCH_FLAGS) . $$branch ; \
-	  fi ; \
-	else \
-	  echo "cannot create branch, not a wcpath" ; \
-	fi
-
-# hum...
-force-install-branch:
-	$(MAKE) BRANCH_FLAGS+=--commit install-branch
-	-test -d $(ROOT)/.svn && $(SVN) update $(ROOT)
-
-# install the branch into trunk (production version)
-install-branch:
-	-@if $(IS_SVN_WC) ; then \
-	  if $(IS_BRANCH) . ; then \
-	    echo "installing current directory..." ; \
-	    $(BRANCH) push $(BRANCH_FLAGS) . ; \
-	  else \
-	    echo "cannot install current directory, not a branch" ; \
-	  fi ; \
-	else \
-	  echo "cannot install current directory, not under svn" ; \
-	fi
-
-remove-branch:
-	-@if $(IS_SVN_WC) ; then \
-	  if $(IS_BRANCH) . ; then \
-	    echo "removing current branch..." ; \
-	    svn rm . ; \
-	    echo "please commit .. if you agree" ; \
-	  else \
-	    echo "cannot remove branch, not a branch" ; \
-	  fi ; \
-	else \
-	  echo "cannot remove branch, not under svn" ; \
-	fi
-
-branch-diff:
-	-@$(IS_BRANCH) . && $(BRANCH) diff
-
-branch-info:
-	-@$(IS_BRANCH) . && $(BRANCH) info
-
-branch-avail:
-	-@$(IS_BRANCH) . && $(BRANCH) avail

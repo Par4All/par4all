@@ -1,0 +1,103 @@
+
+TRANSFORMERS
+
+
+//  T() {0==-1}
+
+void run(void)
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(t) {t==0, x==0}
+
+   int t = 0;
+
+//  T(b) {b==10, t==0, x==0}
+
+   int b = 10;
+
+//  T(t,x) {b==10, t#init==0, x#init==0, 0<=t+x, x<=t}
+
+   // b > 0 should be enough
+   while (1) {
+
+//  T(t,x) {b==10, t+x==t#init+x#init, 0<=x+10, x<=x#init,
+//    0<=x#init+10}
+
+      while (rand()%2&&x>=-b)
+
+//  T(t,x) {b==10, t==t#init+1, x==x#init-1, 0<=x+11}
+
+         x--, t++;
+
+//  T(t,x) {b==10, t+x#init==t#init+x, x<=10, x#init<=x, x#init<=10}
+
+      while (rand()%2&&x<=b)
+
+//  T(t,x) {b==10, t==t#init+1, x==x#init+1, x<=11}
+
+         x++, t++;
+
+//  T(t) {b==10, t#init<=t}
+
+      while (rand()%2)
+
+//  T(t) {b==10, t==t#init+1}
+
+         t++;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void run(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int t = 0;
+
+//  P(t,x) {t==0, x==0}
+
+   int b = 10;
+
+//  P(b,t,x) {b==10, t==0, x==0}
+
+   // b > 0 should be enough
+   while (1) {
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
+
+      while (rand()%2&&x>=-b)
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t, 0<=x+10}
+
+         x--, t++;
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
+
+      while (rand()%2&&x<=b)
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t, x<=10}
+
+         x++, t++;
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
+
+      while (rand()%2)
+
+//  P(b,t,x) {b==10, 0<=t+x, x<=t}
+
+         t++;
+   }
+}

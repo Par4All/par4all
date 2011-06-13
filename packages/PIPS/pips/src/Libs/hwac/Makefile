@@ -28,7 +28,8 @@ LIB_CFILES = \
 	freia_terapix.c \
 	freia_aipo.c \
 	dag-utils.c \
-	freia-utils.c
+	freia-utils.c \
+	freia_unroll_while.c
 
 INC_TARGET =    $(TARGET).h
 

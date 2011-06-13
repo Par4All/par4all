@@ -1,0 +1,112 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(i,j,k,l) {i==j-1}
+
+   int i, j = i+1, k, l;
+
+//  T() {i==j-1}
+
+   float x, y;
+
+//  T() {i==j-1, 1<=l}
+
+
+   while (l>0)
+
+//  T(j) {1<=k, 1<=l}
+
+      while (k>0)
+
+//  T(j) {i==j-1, 1<=k, 1<=l}
+
+         j = i+1;
+
+//  T(j) {i==j-1, l<=0}
+
+
+   while (y>0.)
+
+//  T(j) {i==j-1, l<=0}
+
+      j = i+1;
+
+//  T(j) {l<=0}
+
+
+   while (x>0.)
+
+//  T(j) {l<=0}
+
+      while (y>0.)
+
+//  T(j) {i==j-1, l<=0}
+
+         j = i+1;
+
+//  T() {l<=0}
+
+   printf("%d\n", i);
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int i, j = i+1, k, l;
+
+//  P(i,j,k,l) {i==j-1}
+
+   float x, y;
+
+//  P(i,j,k,l) {i==j-1}
+
+
+   while (l>0)
+
+//  P(i,j,k,l) {i==j-1, 1<=l}
+
+      while (k>0)
+
+//  P(i,j,k,l) {i==j-1, 1<=k, 1<=l}
+
+         j = i+1;
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+
+   while (y>0.)
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+      j = i+1;
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+
+   while (x>0.)
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+      while (y>0.)
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+         j = i+1;
+
+//  P(i,j,k,l) {i==j-1, l<=0}
+
+   printf("%d\n", i);
+}

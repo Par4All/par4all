@@ -3165,7 +3165,13 @@ transformer whileloop_to_postcondition(
 	post = cpost;
       }
       else {
-	post = precondition_add_condition_information(postb, c, postb, FALSE);
+	// FI: does not work with side effects
+	//post = precondition_add_condition_information(postb, c, postb, FALSE);
+	transformer pre_c = transformer_range(postb);
+	transformer ctf = condition_to_transformer(c, pre_c, FALSE);
+	post = transformer_apply(ctf, postb);
+	free_transformer(pre_c);
+	free_transformer(ctf);
       }
     }
     else {
@@ -3180,10 +3186,26 @@ transformer whileloop_to_postcondition(
 
       /* The loop is executed at least once: let's execute the last iteration */
       //post_al = transformer_apply(tb, preb);
-      post_al = precondition_add_condition_information(postb, c, postb, FALSE);
+
+	// FI: does not work with side effects
+	//post = precondition_add_condition_information(postb, c, postb, FALSE);
+	transformer pre_c = transformer_range(postb);
+	transformer ctf = condition_to_transformer(c, pre_c, FALSE);
+	// Mmeory leak? Do we still need postb?
+	post_al = transformer_apply(ctf, postb);
+	free_transformer(pre_c);
+	free_transformer(ctf);
+	// post_al = precondition_add_condition_information(postb, c, postb, FALSE);
 
       /* The loop is never executed */
-      post_ne = precondition_add_condition_information(post_ne, c, post_ne, FALSE);
+	// FI: does not work with side effects
+	// post_ne = precondition_add_condition_information(post_ne, c, post_ne, FALSE);
+	pre_c = transformer_range(post_ne);
+	ctf = condition_to_transformer(c, pre_c, FALSE);
+	// Mmeory leak
+	post_ne = transformer_apply(ctf, post_ne);
+	free_transformer(pre_c);
+	free_transformer(ctf);
 
       post = transformer_convex_hull(post_ne, post_al);
       // free for postb too? hidden within post_al?

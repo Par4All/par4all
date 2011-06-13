@@ -183,17 +183,17 @@ AM_CPPFLAGS=$(NEWGENLIBS_CFLAGS)
 include_HEADERS=all_newgen_headers.h specs.h $(F_h)
 
 all_newgen_headers.h: specs.h Makefile
-	sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' specs.h > $@
+	$(AM_V_GEN) sed -n 's,^\(.*\)_spec.*,#include "\1.h",p' specs.h > $@
 
 specs.h:Makefile $(F_tex)
 	$(MAKE) `echo $(F_c) | sed -e 's/\.c/.newgen /g'`
-	PATH=`dirname $(NEWGEN)`:$$PATH $(NEWGEN) -c `echo $(F_c) | sed -e 's/\.c/.newgen/g'` | $(MAKE_ALL_SPECS) > specs.h
+	$(AM_V_GEN) PATH=`dirname $(NEWGEN)`:$$PATH $(NEWGEN) -c `echo $(F_c) | sed -e 's/\.c/.newgen/g'` | $(MAKE_ALL_SPECS) > specs.h
 
 $(F_spec):specs.h
 $(F_c):specs.h
 
 .tex.newgen:
-	$(srcdir)/remove-latex-comments $<
+	$(AM_V_GEN)$(srcdir)/remove-latex-comments $<
 
 # Convert idraw/eps files.
 ri.pdf:unstructured.pdf

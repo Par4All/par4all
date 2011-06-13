@@ -584,9 +584,10 @@ transformer transformer_list_closure_to_precondition(list tl,
   return p_star;
 }
 
-/* Returns a list of projected transformers. If a value of a variable
-   in list proj appears in t of tl, it is projected. New transformers
-   are allocated to build the projection list*/
+/* Returns a new list of newly allocated projected transformers. If a
+   value of a variable in list proj appears in t of tl, it is
+   projected. New transformers are allocated to build the projection
+   list*/
 list transformer_list_safe_variables_projection(list tl, list proj)
 {
   list ptl = NIL;
@@ -682,41 +683,44 @@ transformer transformer_list_multiple_closure_to_precondition(list tl,
 							      transformer p_0)
 {
   transformer prec = transformer_list_closure_to_precondition(tl, c_t, p_0);
-  list al = transformer_arguments(prec);
-  list vl = transformer_list_to_argument(tl); // list of modified
-					      // variables
-  // FI: this is too strong vl must only be included in transformer_arguments(prec)
-  //pips_assert("all modified variables are argument of the global precondition",
-  //arguments_equal_p(vl, transformer_arguments(prec)));
-  FOREACH(ENTITY, v, vl) {
-    // FI: the same projection could be obtained for different
-    // variables v and the computation should not be performed again
-    // but I choose not to memoize past lists tl_v
-    list tl_v = transformer_list_with_effect(tl, v);
 
-    if(gen_length(tl_v)<gen_length(tl)) {
-      list keep_v = transformer_list_preserved_variables(vl, tl, tl_v);
-      list proj_v = arguments_difference(vl, keep_v);
-      list ptl_v = transformer_list_safe_variables_projection(tl_v, proj_v);
-      transformer p_0_v
-	= safe_transformer_projection(copy_transformer(p_0), proj_v);
-      transformer c_t_v
-	= safe_transformer_projection(copy_transformer(c_t), proj_v);
-      transformer prec_v
-	= transformer_list_closure_to_precondition(ptl_v, c_t_v, p_0_v);
-      transformer_arguments(prec_v) = gen_copy_seq(al); // memory leak
-      prec = transformer_intersection(prec, prec_v); // memory leak
+  if(get_bool_property("SEMANTICS_USE_LIST_PROJECTION")) {
+    list al = transformer_arguments(prec);
+    list vl = transformer_list_to_argument(tl); // list of modified
+    // variables
+    // FI: this is too strong vl must only be included in transformer_arguments(prec)
+    //pips_assert("all modified variables are argument of the global precondition",
+    //arguments_equal_p(vl, transformer_arguments(prec)));
+    FOREACH(ENTITY, v, vl) {
+      // FI: the same projection could be obtained for different
+      // variables v and the computation should not be performed again
+      // but I choose not to memoize past lists tl_v
+      list tl_v = transformer_list_with_effect(tl, v);
 
-      free_transformer(prec_v);
-      free_transformer(c_t_v);
-      free_transformer(p_0_v);
-      gen_full_free_list(ptl_v);
-      gen_free_list(keep_v);
+      if(gen_length(tl_v)<gen_length(tl)) {
+	list keep_v = transformer_list_preserved_variables(vl, tl, tl_v);
+	list proj_v = arguments_difference(vl, keep_v);
+	list ptl_v = transformer_list_safe_variables_projection(tl_v, proj_v);
+	transformer p_0_v
+	  = safe_transformer_projection(copy_transformer(p_0), proj_v);
+	transformer c_t_v
+	  = safe_transformer_projection(copy_transformer(c_t), proj_v);
+	transformer prec_v
+	  = transformer_list_closure_to_precondition(ptl_v, c_t_v, p_0_v);
+	transformer_arguments(prec_v) = gen_copy_seq(al); // memory leak
+	prec = transformer_intersection(prec, prec_v); // memory leak
+
+	free_transformer(prec_v);
+	free_transformer(c_t_v);
+	free_transformer(p_0_v);
+	gen_full_free_list(ptl_v);
+	gen_free_list(keep_v);
+      }
+      gen_free_list(tl_v);
     }
-    gen_free_list(tl_v);
-  }
 
-  gen_free_list(vl);
+    gen_free_list(vl);
+  }
   pips_assert("prec is consistent", transformer_consistency_p(prec));
   return prec;
 }
@@ -804,9 +808,14 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
   }
 
   if(ENDP(tfl)) {
+    if(star_p) {
     /* Since we compute the * transitive closure and not the +
        transitive closure, the fix point is the identity. */
-    tc_tf = transformer_identity();
+      tc_tf = transformer_identity();
+    }
+    else {
+      tc_tf = transformer_empty();
+    }
   }
   else {
     // Pbase ib = base_dup(sc_base(sc)); /* initial and final basis */
@@ -823,6 +832,7 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
       FOREACH(ENTITY, e, al)
 	gal = arguments_add_entity(gal, e);
 
+      // FI: this copy is almost entirely memory leaked
       Psysteme sc = sc_copy(predicate_system(transformer_relation(t)));
       // redundant with call to transformer_derivative_constraints(t)
       Pbase tb = sc_to_minimal_basis(sc);
@@ -855,19 +865,19 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 			   TCST, VALUE_ZERO);
 
 	  eq = contrainte_make(diff);
-	  sc = sc_equation_add(sc, eq);
+	  tsc = sc_equation_add(tsc, eq);
 	}
-	if(SC_UNDEFINED_P(sc))
-	  sc = tsc;
-	else {
-	  /* This could be optimized by using the convex hull of a
-	     Psystemes list and by keeping the dual representation of
-	     the result instead of converting it several time back
-	     and forth. */
-	  Psysteme nsc = cute_convex_union(sc, tsc);
-	  sc_free(sc);
-	  sc = nsc;
-	}
+      }
+      if(SC_UNDEFINED_P(sc))
+	sc = tsc;
+      else {
+	/* This could be optimized by using the convex hull of a
+	   Psystemes list and by keeping the dual representation of
+	   the result instead of converting it several time back
+	   and forth. */
+	Psysteme nsc = cute_convex_union(sc, tsc);
+	sc_free(sc);
+	sc = nsc;
       }
     }
 
@@ -948,6 +958,7 @@ transformer transformer_list_generic_transitive_closure(list tfl, bool star_p)
 
     /* Plug sc back into tc_tf */
     predicate_system(transformer_relation(tc_tf)) = sc;
+    transformer_arguments(tc_tf) = gal;
 
   }
   /* That's all! */

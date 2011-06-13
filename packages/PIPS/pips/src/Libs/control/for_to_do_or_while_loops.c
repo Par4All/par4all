@@ -400,15 +400,15 @@ expression guess_loop_increment_walker(expression e, entity loop_index, statemen
 }
 
 
-/** 
+/**
  * iterate over @param incr, a comma separated expression and checks for an (in|de)crement
  * of @param loop_index
  * if @param loop_index is written twice in @param incr , the result is expression_undefined
- * 
+ *
  * @return expression_undefined if no (in|de) crement was found, the *crementing expression otherwise
  */
 static
-expression 
+expression
 guess_loop_increment(expression incr, entity loop_index, statement body)
 {
     if(expression_call_p(incr))
@@ -418,6 +418,7 @@ guess_loop_increment(expression incr, entity loop_index, statement body)
         entity op = call_function(c);
         if(ENTITY_COMMA_P(op))
         {
+	  // FI: Serge, why don't you loop over args? O(N^2)...
             expression rhs = EXPRESSION(CAR(args));
             expression lhs = EXPRESSION(CAR(CDR(args)));
 
@@ -434,10 +435,10 @@ guess_loop_increment(expression incr, entity loop_index, statement body)
     return expression_undefined;
 }
 
-/** 
- * iterate over the comma-separeted expression @param init 
+/**
+ * iterate over the comma-separeted expression @param init
  * and look for an initialization of @param loop_index
- * 
+ *
  * @return expression_undefined if none found, the initialization expression otherwise
  */
 static
@@ -470,10 +471,10 @@ guess_loop_lower_bound(expression init, entity loop_index)
     return expression_undefined;
 }
 
-/** 
+/**
  * given an expression @param seed that can be found in @param comma_list
  * iterate over @param comma_list and remove @param seed from the list, updating pointers properly
- * 
+ *
  */
 static
 void
@@ -559,7 +560,8 @@ sequence for_to_do_loop_conversion(forloop theloop, statement parent)
                         output=make_sequence(NIL);
                         if(increment_expression!=incr){
                             remove_expression_from_comma_list(incr,increment_expression);
-                            insert_statement(body,instruction_to_statement(make_instruction_call(expression_call(incr))),false);
+                            insert_statement(body,instruction_to_statement(make_instruction_expression(incr)),false);
+			    //statement_consistent_p(body);
                         }
 
                         /* guess lower bound */

@@ -1,0 +1,26 @@
+delete for_loop06
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create for_loop06 for_loop06.c
+
+echo
+echo Parsed code
+echo
+
+display PARSED_PRINTED_FILE
+
+#setenv CONTROL_DEBUG_LEVEL 9
+
+echo
+echo Controlized code
+echo
+
+activate NEW_CONTROLIZER
+
+#setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER FALSE
+
+display PRINTED_FILE
+
+close
+quit

@@ -4,7 +4,15 @@ create gaz_burner03 gaz_burner03.c
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+# Transformer lists are necessary to get the expected control simplification
+
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+# Derivative list eliminates the overflows and reduce the execution
+# time from 4.02 down to 2.32 s on Ibarron, just slightly up from 1.47
+# when transformer lists are not used at all
+
 setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
 
 setenv SEMANTICS_DEBUG_LEVEL "0"
@@ -41,10 +49,10 @@ display PRINTED_FILE[main]
 
 #quit
 echo
-echo AFTER DEAD CODE ELIMINATION
+echo Code after control simplification
 echo
 
-apply SUPPRESS_DEAD_CODE[main]
+apply SIMPLIFY_CONTROL[main]
 activate PRINT_CODE
 display PRINTED_FILE
 

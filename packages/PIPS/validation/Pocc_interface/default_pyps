@@ -1,0 +1,5 @@
+from validation import vworkspace
+import pocc
+
+with vworkspace() as w:
+    w.all_functions.validate_phases("poccify")

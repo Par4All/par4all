@@ -561,8 +561,13 @@ static bool retrieve_a_missing_file_using_internal_resolver(string module,
   }
 
   string file = (* internal_resolver)(module);
-  if(file) {
-    // We got a correct answer from the resolver, let's use it !
+  if(!file || *file=='\0') {
+    // No file found by the resolver for this module
+    pips_user_error("The resolver couldn't find a source file for module '%s'"
+          ", did you forgot a source file ? For external library you have to"
+          " provide a stub file.\n",module);
+  } else {
+      // We got a correct answer from the resolver, let's use it !
     if(!process_user_file(file)) {
       pips_user_error("We didn't manage to process file "
                       "given by the resolver : %s\n",
@@ -612,9 +617,16 @@ static bool retrieve_a_missing_file_using_external_resolver(string module,
     if(ret != 0) {
       // oh oh... we got an error...
       pips_user_error("Command %s returned an error(%d)\n",generator_cmd,ret);
-      return false; // never reached ?
+      return false;
     }
 
+    if(!file || *file=='\0') {
+      // No file found by the resolver for this module
+      pips_user_error("The resolver couldn't find a source file for module '%s'"
+            ", did you forgot a source file ? For external library you have to"
+            " provide a stub file.\n",module);
+      return false;
+    }
     // We got a correct answer from the resolver, let's use it !
     if(!process_user_file(file)) {
       pips_user_error("We didn't manage to process file "

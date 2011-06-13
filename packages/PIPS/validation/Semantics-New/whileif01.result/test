@@ -1,0 +1,114 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void whileif01()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(i) {i#init==0, i<=10}
+
+
+   while (i<=10)
+
+//  T(i) {13i#init<=11i+9, i#init<=i+1, i<=i#init+1}
+
+      if (i>=0)
+
+//  T(i) {i==i#init+1, 1<=i, i<=11}
+
+         i++;
+      else
+
+//  T(i) {i==i#init-1, i+2<=0}
+
+         i--;
+
+//  T(i) {i==-1, i#init==11}
+
+
+   i = -1;
+
+//  T(i) {i#init==-1, i<=10}
+
+   while (i<=10)
+
+//  T(i) {13i#init<=11i+9, i#init<=i+1, i<=i#init+1}
+
+      if (i>=0)
+
+//  T(i) {i==i#init+1, 1<=i, i<=11}
+
+         i++;
+      else
+
+//  T(i) {i==i#init-1, i+2<=0}
+
+         i--;
+
+//  T() {i==11}
+
+   return;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void whileif01()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+
+   while (i<=10)
+
+//  P(i) {i<=10}
+
+      if (i>=0)
+
+//  P(i) {0<=i, i<=10}
+
+         i++;
+      else
+
+//  P(i) {i+1<=0}
+
+         i--;
+
+//  P(i) {i==11}
+
+
+   i = -1;
+
+//  P(i) {i==-1}
+
+   while (i<=10)
+
+//  P(i) {i<=10}
+
+      if (i>=0)
+
+//  P(i) {0<=i, i<=10}
+
+         i++;
+      else
+
+//  P(i) {i+1<=0}
+
+         i--;
+
+//  P(i) {i==11}
+
+   return;
+}

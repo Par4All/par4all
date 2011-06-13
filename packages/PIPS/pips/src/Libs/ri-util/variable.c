@@ -647,11 +647,11 @@ list lis;
       asprintf(&full_name,"%s"MODULE_SEP_STRING"%s%d",module_name,name,n++);
   }
   e = make_entity(full_name, type_undefined, storage_undefined, value_undefined);
- 
+
   entity_type(e) = (type) MakeTypeVariable(b, lis);
   f = local_name_to_top_level_entity(module_name);
-  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME); 
-  entity_storage(e) = 
+  a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
+  entity_storage(e) =
     make_storage(is_storage_ram,
 		 make_ram(f, a,
 			  (basic_tag(base)!=is_basic_overloaded)?
@@ -763,10 +763,7 @@ static int count_aux = 0;
  * The number of the auxiliary variables is given by a global variable named
  * "count_aux".
  */
-entity
-make_new_entity(ba, kind)
-basic ba;
-int kind;
+entity make_new_entity(basic ba, int kind)
 {
   extern list integer_entities,
     real_entities, logical_entities, complex_entities,
@@ -899,11 +896,7 @@ int kind;
 
    If the entity is not a scalar, it aborts.
  */
-entity
-find_or_create_scalar_entity(name, module_name, base)
-string name;
-string module_name;
-tag base;
+entity find_or_create_scalar_entity(string name, string module_name, tag base)
 {
   entity e = entity_undefined;
   string nom = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
@@ -946,23 +939,20 @@ find_or_create_typed_entity(
 /* Create an integer variable of name "name" in module of name
    "module_name" */
 entity
-make_scalar_integer_entity(name, module_name)
-const char *name;
-const char *module_name;
+make_scalar_integer_entity(const char *name, const char *module_name)
 {
     string full_name;
     entity e, f, a ;
     basic b ;
 
-    debug(8,"make_scalar_integer_entity", "begin name=%s, module_name=%s\n",
-            name, module_name);
+    pips_debug(8, "begin name=%s, module_name=%s\n", name, module_name);
 
     full_name = concatenate(module_name, MODULE_SEP_STRING, name, NULL);
     hash_warn_on_redefinition();
     e = make_entity(strdup(full_name),
-            type_undefined,
-            storage_undefined,
-            value_undefined);
+		    type_undefined,
+		    storage_undefined,
+		    value_undefined);
 
     b = make_basic(is_basic_int, (void*) 4);
 
@@ -970,17 +960,19 @@ const char *module_name;
 
     f = local_name_to_top_level_entity(module_name);
     a = global_name_to_entity(module_name, DYNAMIC_AREA_LOCAL_NAME);
-    pips_assert("make_scalar_integer_entity", !entity_undefined_p(f) && !entity_undefined_p(a));
+    pips_assert("make_scalar_integer_entity",
+		!entity_undefined_p(f) && !entity_undefined_p(a));
 
-    entity_storage(e) = make_storage(is_storage_ram,
-            (make_ram(f, a,
-                      add_any_variable_to_area(a, e,fortran_module_p(f)),
-                      NIL)));
+    entity_storage(e)
+      = make_storage(is_storage_ram,
+		     (make_ram(f, a,
+			       add_any_variable_to_area(a, e,fortran_module_p(f)),
+			       NIL)));
 
     entity_initial(e) = make_value(is_value_constant,
-            make_constant_litteral());
+				   make_constant_litteral());
 
-    debug(8,"make_scalar_integer_entity", "end\n");
+    pips_debug(8, "end\n");
 
     return(e);
 }
@@ -1373,7 +1365,7 @@ bool variable_return_p(entity v)
 bool variable_is_a_module_formal_parameter_p(entity a_variable,
 					     entity a_module)
 {
-  MAP(ENTITY, e,
+  FOREACH(ENTITY, e, code_declarations(value_code(entity_initial(a_module))))
   {
     storage s = entity_storage(e);
     if (e == a_variable) {
@@ -1386,8 +1378,7 @@ bool variable_is_a_module_formal_parameter_p(entity a_variable,
 	   but is not a formal parameter: */
 	return FALSE;
     }
-  },
-      code_declarations(value_code(entity_initial(a_module))));
+  }
 
   /* The variable is not in the declaration of the module: */
   return FALSE;
@@ -1449,6 +1440,7 @@ bool variable_in_module_p(entity v,
 
 bool variable_in_list_p(entity e, list l)
 {
+  // FI: should be a call to gen_in_list_p()
   bool is_in_list = FALSE;
   for( ; (l != NIL) && (! is_in_list); l = CDR(l))
     if(same_entity_p(e, ENTITY(CAR(l))))
@@ -1456,7 +1448,26 @@ bool variable_in_list_p(entity e, list l)
   return(is_in_list);
 }
 
+bool volatile_variable_p(entity v)
+{
+  bool volatile_p = FALSE;
+  type t = entity_type(v);
+  // ifdebug(1) pips_assert("the entity must have type variable",
+  // type_variable_p(t));
+  // FI: no idea if volatile can he hidden in a typedef...
+  variable vt = type_variable(t);
+  list ql = variable_qualifiers(vt);
 
+  FOREACH(QUALIFIER, q, ql) {
+    if(qualifier_volatile_p(q)) {
+      volatile_p = TRUE;
+      break;
+    }
+  }
+  return volatile_p;
+}
+
+
 /* Discard the decls_text string of the module code to make the
    prettyprinter ignoring the textual declaration and remake all from
    the declarations without touching the corresponding property

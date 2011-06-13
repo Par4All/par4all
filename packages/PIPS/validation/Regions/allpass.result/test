@@ -1,5 +1,9 @@
 
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
+//  <stdout-R-EXACT-{}>
+//  <stdout[PHI1]-R-MAY-{PHI1==0}>
 //  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
@@ -31,6 +35,8 @@ int main(int argc, char **argv)
    double (*in2)[n] = (double (*)[n]) malloc(sizeof(double)*n);
 
 //  <argv-R-EXACT-{}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -41,6 +47,8 @@ int main(int argc, char **argv)
 
 //  <in-R-EXACT-{}>
 //  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>
@@ -51,6 +59,8 @@ int main(int argc, char **argv)
 
 //  <in-R-EXACT-{}>
 //  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
+//  <stderr-R-MAY-{}>
+//  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{}>

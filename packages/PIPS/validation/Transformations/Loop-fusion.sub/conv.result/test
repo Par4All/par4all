@@ -124,13 +124,13 @@ l99997:      ;
       y[LU_IND0+M+1] = 0;
       y[LU_IND0+M+2] = 0;
       y[LU_IND0+M+3] = 0;
-l99996:      ;
       for(m4 = 0; m4 <= M-1; m4 += 1) {
          y[LU_IND0+M] += h[m4]*x[LU_IND0+m4+M];
          y[LU_IND0+M+1] += h[m4]*x[LU_IND0+m4+M+1];
          y[LU_IND0+M+2] += h[m4]*x[LU_IND0+m4+M+2];
          y[LU_IND0+M+3] += h[m4]*x[LU_IND0+m4+M+3];
       }
+l99996:      ;
    }
    n = M+MAX0(LU_NUB0, 0);
 }

@@ -167,7 +167,7 @@ int main(void)
 
    while (1) {
 
-//  P(b,ok,x,y) {b+y==x, 0<=b, b<=1, b<=x, 0<=ok, ok<=1, 1<=ok+x}
+//  P(b,ok,x,y) {b+y==x, 0<=ok, ok<=1, 1<=ok+x, y<=x, x<=y+1, 0<=y}
 
       if (b)
 
@@ -303,7 +303,7 @@ int main(void)
 
    while (1) {
 
-//  P(b,ok,x,y) {b+y==x, ok==1, 0<=b, b<=1, b<=x}
+//  P(b,ok,x,y) {b+y==x, ok==1, y<=x, x<=y+1, 0<=y}
 
       if (b)
 

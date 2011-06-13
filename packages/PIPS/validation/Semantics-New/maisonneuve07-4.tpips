@@ -1,0 +1,44 @@
+delete maisonneuve07-4
+create maisonneuve07-4 maisonneuve07-4.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[run]
+
+echo
+echo PRECONDITIONS
+echo
+
+# Must be set to TRUE, as well as the last property to find the bounds
+# on x due to b. The while{while;while} transformation is not needed.
+# Refinement is not needed.
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
+
+setproperty SEMANTICS_USE_LIST_PROJECTION TRUE
+
+# FFF: {0<=b, 0<=t+x, x<=t}
+# TFF: {0<=b, 0<=t+x, x<=t}
+
+# Bug in implementation
+# TTF: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
+# TTF: {0<=b, 0<=t+x, x<=t}
+
+# TFT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
+# TTT: {0<=b, 0<=b+x+1, x<=b+1, 0<=t+x, x<=t}
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[run]
+
+close
+delete maisonneuve07-4
+quit

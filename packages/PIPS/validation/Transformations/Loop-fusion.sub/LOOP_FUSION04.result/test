@@ -23,10 +23,9 @@
       REAL F(N),A(N), S
 
       S = 0.                                                            0008
-
-      RETURN
       DO I = 1, N                                                       0004
          A(I) = F(I)                                                    0005
          S = S+A(I)                                                     0011
       ENDDO
+
       END

@@ -826,13 +826,15 @@ hash_table used_labels;
 
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
 	     st, pred, succ, c_res);
-  ifdebug(1)
+  ifdebug(1) {
     statement_consistent_p(st);
+  }
 
   controlize(forloop_body(l), c_test, c_inc, c_body, loop_used_labels);
 
-  ifdebug(1)
+  ifdebug(1) {
     statement_consistent_p(st);
+  }
 
   if (covers_labels_p(forloop_body(l),loop_used_labels)) {
     instruction ni = instruction_undefined;
@@ -1097,12 +1099,15 @@ static control compact_list(list ctls,
 	}
 
 	st = control_statement(c_res) ;
-	statement_consistent_p(st);
-	pips_assert("st is a block or a continue or st carries no delarations",
-		    statement_block_p(st)
-		    || continue_statement_p(st)
-		    || ENDP(statement_declarations(st)));
-	/* Ok, succ is defined. RK */
+
+  ifdebug(1) {
+    statement_consistent_p(st);
+    pips_assert("st is a block or a continue or st carries no delarations",
+                statement_block_p(st)
+                || continue_statement_p(st)
+                || ENDP(statement_declarations(st)));
+  }
+  /* Ok, succ is defined. RK */
 	succ_st = control_statement(succ);
 	set_add_element(processed_nodes, processed_nodes, (char *) succ);
 
@@ -1181,8 +1186,10 @@ static control compact_list(list ctls,
 			      CONS(STATEMENT, succ_st, NIL));
 	    }
 	  }
-	  pips_assert("control succ and its statement are consistent",
-		      control_consistent_p(succ));
+	  ifdebug(1) {
+	    pips_assert("control succ and its statement are consistent",
+	                control_consistent_p(succ));
+	  }
 	  /* Remove the useless control: */
 	  control_statement(succ) = statement_undefined;
 	  remove_a_control_from_an_unstructured(succ);
@@ -1194,11 +1201,13 @@ static control compact_list(list ctls,
 	    c_last = c_res;
 	    break;
 	}
-	statement_consistent_p(st);
-	statement_consistent_p(succ_st);
+    ifdebug(1) {
+      statement_consistent_p(st);
+      statement_consistent_p(succ_st);
     }
-    set_free(processed_nodes);
-    return c_last;
+  }
+  set_free(processed_nodes);
+  return c_last;
 }
 
 
@@ -1350,10 +1359,12 @@ static bool controlize_list(statement st,
 	display_linked_control_nodes(pred);
 	pips_debug(8, "\n");
       }
-      statement_consistent_p(st);
-      check_control_coherency(pred);
-      check_control_coherency(succ);
-      check_control_coherency(c_res);
+      ifdebug(1) {
+        statement_consistent_p(st);
+        check_control_coherency(pred);
+        check_control_coherency(succ);
+        check_control_coherency(c_res);
+      }
     }
 
     if(ENDP(sts)) {
@@ -1388,7 +1399,9 @@ static bool controlize_list(statement st,
 
     }
 
-    statement_consistent_p(st);
+    ifdebug(1) {
+      statement_consistent_p(st);
+    }
 
     /* Do the real transformation of a statement list into a control
        graph: */
@@ -1443,7 +1456,9 @@ static bool controlize_list(statement st,
 	  }
 
 	  /* PJ: fragile attempt at keeping local declarations and their scope */
-	  statement_consistent_p(st);
+	  ifdebug(1) {
+	    statement_consistent_p(st);
+	  }
 	  if(!ENDP(statement_declarations(st))) {
 	    pips_assert("the declarations are carried by a block",
 			statement_block_p(st));
@@ -1476,7 +1491,9 @@ static bool controlize_list(statement st,
 	    free_control(c_block);
 
 	    /* FI: no need to update declarations as the code is structured */
-	    statement_consistent_p(st);
+	    ifdebug(1) {
+	      statement_consistent_p(st);
+	    }
 	}
 	else {
 	    /* The control is kept in an unstructured: */
@@ -1557,7 +1574,9 @@ static bool controlize_list(statement st,
 		    ==gen_length(statement_declarations(control_statement(c_res))));*/
     }
 
-    statement_consistent_p(st);
+    ifdebug(1) {
+      statement_consistent_p(st);
+    }
 
     union_used_labels(used_labels, block_used_labels);
 
@@ -1581,8 +1600,9 @@ static bool controlize_list(statement st,
 	*/
     }
 
-    statement_consistent_p(st);
-
+    ifdebug(1) {
+      statement_consistent_p(st);
+    }
     return(controlized);
 }
 
@@ -1805,13 +1825,17 @@ simplified_unstructured(control top,
 	check_control_coherency(res);
     }
 
-    control_consistent_p(top);
+    ifdebug(1) {
+      control_consistent_p(top);
 
-    control_consistent_p(bottom);
+      control_consistent_p(bottom);
+    }
 
     u = make_unstructured(top, bottom);
 
-    unstructured_consistent_p(u);
+    ifdebug(1) {
+      unstructured_consistent_p(u);
+    }
 
     if(!ENDP(control_predecessors(top))) {
     free_control(res);
@@ -1867,7 +1891,9 @@ simplified_unstructured(control top,
     if(instruction_unstructured_p(i=statement_instruction(st))) {
 	/* If the second node is an unstructured, just return it
            instead of top and bottom: (??? Lot of assumptions. RK) */
-      unstructured_consistent_p(instruction_unstructured(i));
+      ifdebug(1) {
+        unstructured_consistent_p(instruction_unstructured(i));
+      }
       unstructured iu = instruction_unstructured(i);
       instruction_unstructured(i)=unstructured_undefined;
       free_statement(st);
@@ -1877,7 +1903,9 @@ simplified_unstructured(control top,
     /* Just keep the second node as an unstructured with only 1
        control node: */
     unstructured_control(u) = unstructured_exit(u) = res;
-    unstructured_consistent_p(u);
+    ifdebug(1) {
+      unstructured_consistent_p(u);
+    }
     return(u);
 }
 
@@ -1919,7 +1947,9 @@ bool controlize(statement st,
 		   "Begin with (st = %p, pred = %p, succ = %p, c_res = %p)\n"
 		   "st at entry:\n",
 		   st, pred, succ, c_res);
-	statement_consistent_p(st);
+  ifdebug(1) {
+    statement_consistent_p(st);
+  }
 	print_statement(st);
 	/*
 	pips_assert("pred is a predecessor of c_res",
@@ -1942,14 +1972,20 @@ bool controlize(statement st,
       if(ENDP(instruction_block(i))) {
 	/* Empty block */
 	controlized = controlize_call(st, pred, succ, c_res);
-	statement_consistent_p(st);
+	      ifdebug(1) {
+	        statement_consistent_p(st);
+	      }
       }
       else {
-	statement_consistent_p(st);
+        ifdebug(1) {
+          statement_consistent_p(st);
+        }
 	scoping_statement_push(st);
 	controlized = controlize_list(st, instruction_block(i),
 				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
+	      ifdebug(1) {
+	        statement_consistent_p(st);
+	      }
 
 	ifdebug(5) {
 	  pips_debug(1, "CFG consistency check before list6 controlization."
@@ -1970,24 +2006,32 @@ bool controlize(statement st,
 	  pips_user_warning("Some local declarations may have been lost\n");
 	}
 	scoping_statement_pop();
-	statement_consistent_p(st);
+	      ifdebug(1) {
+	        statement_consistent_p(st);
+	      }
       }
       break;
     }
     case is_instruction_test:
 	controlized = controlize_test(st, instruction_test(i),
 				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
+	    ifdebug(1) {
+	      statement_consistent_p(st);
+	    }
 	break;
     case is_instruction_loop:
 	controlized = controlize_loop(st, instruction_loop(i),
 				      pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
+	    ifdebug(1) {
+	      statement_consistent_p(st);
+	    }
 	break;
     case is_instruction_whileloop:
 	controlized = controlize_whileloop(st, instruction_whileloop(i),
 					   pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
+	    ifdebug(1) {
+	      statement_consistent_p(st);
+	    }
 	break;
     case is_instruction_goto: {
       /* Get the label name of the statement the goto point to: */
@@ -2040,14 +2084,18 @@ bool controlize(statement st,
     case is_instruction_call:
 	/* FI: IO calls may have control effects; they should be handled here! */
 	controlized = controlize_call(st, pred, succ, c_res);
-	statement_consistent_p(st);
+	    ifdebug(1) {
+	      statement_consistent_p(st);
+	    }
 	break;
     case is_instruction_forloop:
       pips_assert("We are really dealing with a for loop",
 		  instruction_forloop_p(statement_instruction(st)));
       controlized = controlize_forloop(st, instruction_forloop(i),
 				       pred, succ, c_res, used_labels);
-	statement_consistent_p(st);
+      ifdebug(1) {
+        statement_consistent_p(st);
+      }
         /* SG+EC:some label may have been lost in the process
            fix it here instead of understanding why */
         if(!same_entity_p(statement_label(st),elabel)) {
@@ -2058,7 +2106,9 @@ bool controlize(statement st,
       /* PJ: controlize_call() controlize any "nice" statement */
       controlized = return_instruction_p(i) || controlize_call(st, pred, succ, c_res);
 
-	statement_consistent_p(st);
+      ifdebug(1) {
+        statement_consistent_p(st);
+      }
       break;
     default:
 	pips_internal_error("Unknown instruction tag %d", instruction_tag(i));
@@ -2113,7 +2163,9 @@ statement st;
        useless blocks. RK */
     clean_up_sequences(st);
 
-    statement_consistent_p(st);
+    ifdebug(1) {
+      statement_consistent_p(st);
+    }
 
     Label_statements = hash_table_make(hash_string, LABEL_TABLES_SIZE);
     Label_control = hash_table_make(hash_string, LABEL_TABLES_SIZE);
@@ -2124,7 +2176,9 @@ statement st;
     bottom = make_control(make_plain_continue_statement(), NIL, NIL);
     Unreachable = NIL;
 
-    statement_consistent_p(st);
+    ifdebug(1) {
+      statement_consistent_p(st);
+    }
 
     /* To track declaration scoping independently of control structure: */
     make_scoping_statement_stack();
@@ -2165,7 +2219,9 @@ statement st;
 
     /* Since the controlizer is a sensitive pass, avoid leaking basic
        errors... */
-    unstructured_consistent_p(u);
+    ifdebug(1) {
+      unstructured_consistent_p(u);
+    }
 
     reset_unstructured_number();
     unstructured_reorder(u);

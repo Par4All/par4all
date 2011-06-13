@@ -64,6 +64,11 @@ pips_version.h:
 	  echo '#define UTC_DATE "$(shell date -u)"' ; \
 	} > $@
 
+install-temporary-header: pips_version.h
+
+# this may be missing when bootstrapping
+$(ARCH)/tp_yacc.o: tpips.h
+
 clean: clean-version
 clean-version:
 	$(RM) pips_version.h

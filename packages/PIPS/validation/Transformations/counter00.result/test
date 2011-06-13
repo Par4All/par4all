@@ -29,9 +29,8 @@ void counter00(int n)
    }
    // empty for loop
    i = 0;
-   while (i<n&&n<1000) {
+   while (i<n&&n<1000)
       i++;
-   }
    // do-while loop
    i = 0;
    do {

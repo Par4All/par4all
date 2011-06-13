@@ -1,5 +1,5 @@
-// This program has an invariant of kind -b<=a.s<=b which cannot be
-// derived from T'(dx)
+// This program has an invariant of kind -b<=x<=b which cannot be
+// derived directly from T'(dx)
 
 // $Id$
 

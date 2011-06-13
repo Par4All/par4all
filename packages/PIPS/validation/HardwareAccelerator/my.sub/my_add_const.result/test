@@ -222,8 +222,8 @@ digraph "dag_cleaned_0" {
   "5 +." -> "o";
   "i0" -> "5 +.";
 }
-// graph for dag "my_add_const_helper_0_0" of module "my_add_const" in dot format
-digraph "my_add_const_helper_0_0" {
+// graph for dag "my_add_const_helper_0_0_0" of module "my_add_const" in dot format
+digraph "my_add_const_helper_0_0_0" {
   // inputs
   "i0" [shape=circle];
 
@@ -238,6 +238,7 @@ digraph "my_add_const_helper_0_0" {
 
 ! acceleration function
 
+// freia terapix includes
 #include <freiaCommon.h>
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
@@ -246,11 +247,13 @@ digraph "my_add_const_helper_0_0" {
 
 /* FREIA terapix helper function for module my_add_const
  * 1 input image, 1 output image
- * 2 image operations in dag
+ * 1 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 3 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 3
+ * - communication: 64
  */
-freia_status my_add_const_helper_0_0(
+freia_status my_add_const_helper_0_0_0(
   freia_data2d * o0,
   freia_data2d * i0,
   int32_t pi2)
@@ -268,7 +271,7 @@ freia_status my_add_const_helper_0_0(
   int16_t p_0[1];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
-  terapix_mcu_macro mcu_macro[2][1];
+  terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
 
@@ -293,17 +296,18 @@ freia_status my_add_const_helper_0_0(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: +.(1) -> 1
-  mcu_macro[0][0].macrocode.xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].macrocode.xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].macrocode.ymin1 = 0;
-  mcu_macro[1][0].macrocode.ymin1 = 0;
-  mcu_macro[0][0].macrocode.xmin2 = imagelet_io_1_0;
-  mcu_macro[1][0].macrocode.xmin2 = imagelet_io_1_1;
-  mcu_macro[0][0].macrocode.ymin2 = 0;
-  mcu_macro[1][0].macrocode.ymin2 = 0;
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
   // copy of operation 0 parameters
   p_0[0] = pi2;
   gram.xoffset = x_0;
@@ -312,16 +316,20 @@ freia_status my_add_const_helper_0_0(
   gram.height = 1;
   gram.params = p_0;
   freia_mg_write_dynamic_param(&dyn_param);
-  mcu_macro[0][0].macrocode.xmin3 = x_0;
-  mcu_macro[1][0].macrocode.xmin3 = x_0;
-  mcu_macro[0][0].macrocode.ymin3 = y_0;
-  mcu_macro[1][0].macrocode.ymin3 = y_0;
-  mcu_macro[0][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[1][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[0][0].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
-  mcu_macro[1][0].macrocode.addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_macro[0][0].xmin3 = x_0;
+  mcu_macro[1][0].xmin3 = x_0;
+  mcu_macro[0][0].ymin3 = y_0;
+  mcu_macro[1][0].ymin3 = y_0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADD_CONST;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADD_CONST;
 
   // inputs:
   // - imagelet 1 is i0 for i0
@@ -343,18 +351,23 @@ freia_status my_add_const_helper_0_0(
   mcu_instr.borderBottom = 0;
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 1;
-  mcu_instr.out = tile_out;
+  mcu_instr.out0 = tile_out[0];
+  mcu_instr.out1 = tile_out[1];
 
   // inputs
   mcu_instr.nbin = 1;
-  mcu_instr.in = tile_in;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
 
   // actual instructions
   mcu_instr.nbinstr = 1;
-  mcu_instr.instr   = mcu_macro;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   ret = freia_cg_template_process(&param, o0, i0);
@@ -369,14 +382,14 @@ freia_status my_add_const_helper_0_0(
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
-   return my_add_const_helper_0_0(o, i0, p0);                           /*0005*/
+   return my_add_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }
 
 ! cleaned up function
 
 freia_status my_add_const(freia_data2d *o, freia_data2d *i0, int32_t p0)
 {
-   return my_add_const_helper_0_0(o, i0, p0);                           /*0005*/
+   return my_add_const_helper_0_0_0(o, i0, p0);                         /*0005*/
 }
 #
 # FREIA COMPILATION DONE

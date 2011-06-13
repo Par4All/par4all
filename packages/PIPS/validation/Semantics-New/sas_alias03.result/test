@@ -1,0 +1,117 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void sas_alias03(int m)
+{
+
+//  T(x,y) {m==x, m==y}
+
+   int x = m, y = m;
+
+//  T(x,y) {m==x#init, m==y#init, 2<=m, 3x+y<=4m, x+2y<=3m, 2<=x}
+
+   while (x>=2)
+
+//  T(x,y) {2<=m, 0<=x, x#init<=x+2, 3x+y+5<=3x#init+y#init,
+//    2<=x#init}
+
+      if (1) {
+
+//  T(x,y) {x==x#init-1, x+y#init==y, 2<=m, 1<=x}
+
+         x--, y += x;
+
+//  T(x,y) {2<=m, 1<=x, x#init<=x, 2x+y<=2x#init+y#init, x+1<=y,
+//    1<=x#init, x#init+1<=y#init}
+
+
+         while (y>=x+1&&alea()>=0.)
+
+//  T(x,y) {2x+y==2x#init+y#init-2, 2<=m, x#init<=x, x#init+1<=y#init}
+
+            if (1) {
+
+//  T(y) {y==y#init-1, 2<=m, x<=y}
+
+               y--;
+
+//  T(x,y) {2x+y==2x#init+y#init, 2<=m, x#init<=x, x+3<=y,
+//    x#init+3<=y#init}
+
+               while (y>=x+3&&alea()>=0.)
+
+//  T(x,y) {x==x#init+1, y==y#init-2, 2<=m, x<=y}
+
+                  x++, y -= 2;
+
+//  T(y) {y==y#init-1, 2<=m}
+
+
+               y--;
+            }
+
+//  T(x,y) {x==x#init-1, x+y==y#init, 2<=m, 0<=x}
+
+         x--, y -= x;
+      }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void sas_alias03(int m)
+{
+
+//  P() {}
+
+   int x = m, y = m;
+
+//  P(x,y) {m==x, m==y}
+
+   while (x>=2)
+
+//  P(x,y) {2<=m, 3x+y<=4m, x+2y<=3m, 2<=x}
+
+      if (1) {
+
+//  P(x,y) {2<=m, 3x+y<=4m, x+2y<=3m, 2<=x}
+
+         x--, y += x;
+
+//  P(x,y) {2<=m, 2x+y+3<=4m, 2y+1<=3m+x, 1<=x}
+
+
+         while (y>=x+1&&alea()>=0.)
+
+//  P(x,y) {2<=m, 2x+y+3<=4m, 2y+1<=3m+x, 1<=x, x+1<=y}
+
+            if (1) {
+
+//  P(x,y) {2<=m, 2x+y+3<=4m, 2y+1<=3m+x, 1<=x, x+1<=y}
+
+               y--;
+
+//  P(x,y) {2<=m, 2x+y+4<=4m, 2y+3<=3m+x, 1<=x, x<=y}
+
+               while (y>=x+3&&alea()>=0.)
+
+//  P(x,y) {2x+y+4<=4m, 2y+3<=3m+x, 1<=x, x+3<=y}
+
+                  x++, y -= 2;
+
+//  P(x,y) {2<=m, 2x+y+4<=4m, 2y+3<=3m+x, 1<=x, x<=y}
+
+
+               y--;
+            }
+
+//  P(x,y) {2<=m, 2x+y+3<=4m, 2y+1<=3m+x, 1<=x}
+
+         x--, y -= x;
+      }
+}

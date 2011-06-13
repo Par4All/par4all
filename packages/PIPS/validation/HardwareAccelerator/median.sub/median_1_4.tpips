@@ -1,0 +1,6 @@
+setenv WSPACE median_1_4
+setenv NAME median_1
+setenv FILE $NAME.c
+setproperty HWAC_SPOC_DEPTH 4
+setproperty HWAC_TERAPIX_DMABW 48
+source default_tpips

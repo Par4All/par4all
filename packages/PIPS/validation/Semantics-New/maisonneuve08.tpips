@@ -16,7 +16,10 @@ echo
 echo PRECONDITIONS
 echo
 
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+# The lists are necessary to get the invariant; no need for
+# projections or derivative lists, unlike maisonneuve07-[1-4].c
+
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]

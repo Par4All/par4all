@@ -1,0 +1,146 @@
+
+Source code with transformers
+
+
+//  T() {}
+
+int main()
+{
+
+//  T(c) {c==0}
+
+   int c = 0;
+
+//  T(i) {c==0, i==0}
+
+   int i = 0;
+
+//  T(j) {c==0, i==0, j==0}
+
+   int j = 0;
+
+//  T(c,i,j) {c==0, c#init==0, i#init==0, j#init==0, 0<=i+j, i<=j,
+//    j<=10}
+
+
+   while (j<=10)
+
+//  T(c,i,j) {c==0, j==j#init+1, i#init<=i+1, i<=i#init+1, j<=11}
+
+      if (c==0)
+
+//  T(i,j) {c==0, i==i#init+1, j==j#init+1, j<=11}
+
+         i++, j++;
+      else {
+
+//  T(c) {c==0, j<=10}
+
+         c = 0;
+
+//  T(i,j) {c==0, i==i#init-1, j==j#init+1, j<=11}
+
+         i--, j++;
+      }
+
+//  T() {c==0, j==11, 0<=i+11, i<=11}
+
+   return;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int c = 0;
+
+//  P(c) {c==0}
+
+   int i = 0;
+
+//  P(c,i) {c==0, i==0}
+
+   int j = 0;
+
+//  P(c,i,j) {c==0, i==0, j==0}
+
+
+   while (j<=10)
+
+//  P(c,i,j) {c==0, 0<=i+j, i<=j, j<=10}
+
+      if (c==0)
+
+//  P(c,i,j) {c==0, 0<=i+j, i<=j, j<=10}
+
+         i++, j++;
+      else {
+
+//  P() {0==-1}
+
+         c = 0;
+
+//  P() {0==-1}
+
+         i--, j++;
+      }
+
+//  P(c,i,j) {c==0, j==11, 0<=i+9, i<=11}
+
+   return;
+}
+
+Source code with preconditions after transformer refinement
+to obtain a more accurate invariant for y
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int c = 0;
+
+//  P(c) {c==0}
+
+   int i = 0;
+
+//  P(c,i) {c==0, i==0}
+
+   int j = 0;
+
+//  P(c,i,j) {c==0, i==0, j==0}
+
+
+   while (j<=10)
+
+//  P(c,i,j) {c==0, i==j, 0<=i, i<=10}
+
+      if (c==0)
+
+//  P(c,i,j) {c==0, i==j, 0<=i, i<=10}
+
+         i++, j++;
+      else {
+
+//  P() {0==-1}
+
+         c = 0;
+
+//  P() {0==-1}
+
+         i--, j++;
+      }
+
+//  P(c,i,j) {c==0, i==11, j==11}
+
+   return;
+}

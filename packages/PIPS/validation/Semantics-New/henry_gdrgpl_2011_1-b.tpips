@@ -1,0 +1,49 @@
+setenv WSPACE=henry_gdrgpl_2011_1-b
+delete $WSPACE
+setenv FILE=$WSPACE.c
+create $WSPACE $FILE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+# This property is set to analyze C99 boolean variables
+setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+# Both properties are useful
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
+# NOt useful, same result
+#setproperty SEMANTICS_USE_LIST_PROJECTION TRUE
+
+echo
+echo Transformers for "main"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+# No need for refinement
+
+#echo
+#echo Preconditions for "main" after transformer refinement
+#echo
+
+#apply REFINE_TRANSFORMERS[main]
+
+#activate PRINT_CODE_PRECONDITIONS
+#display PRINTED_FILE[main]
+
+close
+delete $WSPACE
+quit

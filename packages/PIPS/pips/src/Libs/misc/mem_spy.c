@@ -129,7 +129,7 @@ void mem_spy_init(int v, double g, measurement_type t, int unit)
 void mem_spy_reset()
 {
     /* Too many dynamic calls to mem_spy_begin()? */
-    if(current_size_stack->index!=1) {
+    if(current_size_stack->index!=-1) {
 	fprintf(stderr,
 		"Too many calls to mem_spy_begin(), non-empty stack reset\n");
     }

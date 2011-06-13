@@ -361,7 +361,9 @@ bool analyzable_scalar_entity_p(entity e)
        be checked by type_variable_p() but I'm not sure of the dimension
        information carried by ultimate_type() whose purpose was quite
        different for the C scanner, providing the proper basic. */
-    if(type_variable_p(ut) && entity_scalar_p(e)) {
+    if(type_variable_p(ut)
+       && entity_scalar_p(e)
+       && !volatile_variable_p(e)) {
       result = analyzable_type_p(ut);
     }
   }
