@@ -513,13 +513,15 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_1d(kernel, P4A_n_iter_0, ...)		\
   do {									\
-    P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
-                   P4A_n_iter_0));					\
-    P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
-				     P4A_block_descriptor,		\
-				     P4A_n_iter_0);			\
-    P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
-			  (__VA_ARGS__));				\
+    if(P4A_n_iter_0>0) { \
+      P4A_skip_debug(P4A_dump_message("Calling 1D kernel \"" #kernel "\" of size %d\n",	\
+                                      P4A_n_iter_0));					\
+      P4A_create_1d_thread_descriptors(P4A_grid_descriptor,		\
+                                       P4A_block_descriptor,		\
+                                       P4A_n_iter_0);			\
+      P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
+                            (__VA_ARGS__));				\
+	  } \
   } while (0)
 
 
@@ -535,13 +537,15 @@ void P4A_copy_to_accel_3d(size_t element_size,
 */
 #define P4A_call_accel_kernel_2d(kernel, P4A_n_iter_0, P4A_n_iter_1, ...) \
   do {									\
-    P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
-                   P4A_n_iter_0, P4A_n_iter_1));			\
-    P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
-				     P4A_block_descriptor,		\
-				     P4A_n_iter_0, P4A_n_iter_1);	\
-    P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
+    if(P4A_n_iter_0>0 && P4A_n_iter_1) { \
+      P4A_skip_debug(P4A_dump_message("Calling 2D kernel \"" #kernel "\" of size (%dx%d)\n", \
+                                      P4A_n_iter_0, P4A_n_iter_1));			\
+      P4A_create_2d_thread_descriptors(P4A_grid_descriptor,		\
+                                       P4A_block_descriptor,		\
+                                       P4A_n_iter_0, P4A_n_iter_1);	\
+      P4A_call_accel_kernel((kernel, P4A_grid_descriptor, P4A_block_descriptor), \
 			  (__VA_ARGS__));				\
+    } \
   } while (0)
 
 /** @} */
