@@ -1,0 +1,159 @@
+
+Transformers for "main"
+
+
+//  T() {0==-1}
+
+int main(void)
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(d) {d==1, x==0}
+
+   int d = 1;
+
+//  T(d,x) {d#init==1, x#init==0}
+
+   // infinite loop
+   while (1) {
+
+//  T() {}
+
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+
+//  T(d) {}
+
+      if (x==0)
+
+//  T(d) {d==1, x==0}
+
+         d = 1;
+
+//  T(d) {}
+
+      if (x==1000)
+
+//  T(d) {d==-1, x==1000}
+
+         d = -1;
+
+//  T(x) {d+x#init==x}
+
+      x += d;
+   }
+
+//  T() {0==-1}
+
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int d = 1;
+
+//  P(d,x) {d==1, x==0}
+
+   // infinite loop
+   while (1) {
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==0)
+
+//  P(d,x) {x==0, 0<=d+1, d<=1}
+
+         d = 1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==1000)
+
+//  P(d,x) {x==1000, 0<=d+1, d<=1}
+
+         d = -1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      x += d;
+   }
+
+//  P() {0==-1}
+
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}
+
+Preconditions for "main" after transformer refinement
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int d = 1;
+
+//  P(d,x) {d==1, x==0}
+
+   // infinite loop
+   while (1) {
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      fprintf(stdout, "loop: x=%d d=%d\n", x, d);
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==0)
+
+//  P(d,x) {x==0, 0<=d+1, d<=1}
+
+         d = 1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      if (x==1000)
+
+//  P(d,x) {x==1000, 0<=d+1, d<=1}
+
+         d = -1;
+
+//  P(d,x) {0<=d+1, d<=1}
+
+      x += d;
+   }
+
+//  P() {0==-1}
+
+   // obviously never reached:
+   // there is no exit from the previous while loop.
+   return 0;
+}

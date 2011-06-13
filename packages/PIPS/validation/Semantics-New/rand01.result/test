@@ -1,0 +1,42 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+int rand01()
+{
+
+//  T() {}
+
+   // Use to make transformers aborting
+   rand();
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int rand01()
+{
+
+//  P() {}
+
+   // Use to make transformers aborting
+   rand();
+}
+
+WARNINGS
+
+unknown[unknown] (parse_properties) property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT redefined
+unknown[unknown] (parse_properties) property C_PARSER_RETURN_SUBSTITUTION redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FILTER_INITIAL_VALUES redefined
+INITIAL_PRECONDITION[rand01] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning rand01 instead
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[rand01] (add_or_kill_equivalenced_variables) storage return
+TRANSFORMERS_INTER_FULL[rand01] (intrinsic_to_transformer) Value returned by intrinsic "rand" is ignored.
+PRINT_CODE_TRANSFORMERS[rand01] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[rand01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[rand01] (add_or_kill_equivalenced_variables) storage return

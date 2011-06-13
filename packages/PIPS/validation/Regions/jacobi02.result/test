@@ -1295,17 +1295,20 @@ kernel2:   p4a_kernel_launcher_compute_1(save, space);
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
 void get_data(char filename[])
 {
 
 //  <filename[PHI1]-IN-MAY-{}>
+//  <fp-OUT-EXACT-{}>
 //  <fp[PHI1]-IN-MAY-{PHI1==0}>
 //  <stderr-IN-MAY-{}>
 //  <stderr[PHI1]-IN-MAY-{PHI1==0}>
 //  <stdout-IN-EXACT-{}>
 //  <stdout[PHI1]-IN-MAY-{PHI1==0}>
 //  <__IO_EFFECTS:LUNS[PHI1]-IN-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-OUT-MAY-{}>
 
    // BEGIN BLOCK
    int i, j, nx, ny;

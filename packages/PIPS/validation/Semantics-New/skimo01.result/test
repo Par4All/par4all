@@ -67,20 +67,20 @@ int skimo01(int x, int y, int n)
 
    while (alea()) {
 
-//  P(x,y,z) {z==0, 2<=n}
+//  P(x,y,z) {z==0, 2<=n, x#init<=x, x+y<=x#init+y#init}
 
       x++;
 
-//  P(x,y,z) {z==0, 2<=n}
+//  P(x,y,z) {z==0, 2<=n, x#init+1<=x, x+y<=x#init+y#init+1}
 
       y += 1-n;
    }
 
-//  P(x,y,z) {z==0, 2<=n}
+//  P(x,y,z) {z==0, 2<=n, x#init<=x, x+y<=x#init+y#init}
 
    z += x+y;
 
-//  P(x,y,z) {x+y==z, 2<=n}
+//  P(x,y,z) {x+y==z, 2<=n, x#init<=x, x+y<=x#init+y#init}
 
    return z;
 }

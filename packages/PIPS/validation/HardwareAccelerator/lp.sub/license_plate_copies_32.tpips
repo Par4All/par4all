@@ -1,5 +1,8 @@
-setproperty HWAC_SPOC_DEPTH 32
 setenv WSPACE license_plate_copies_32
-setenv FILE $WSPACE.c
+setenv FILE license_plate_copies.c
 setenv NAME license_plate_copies
+setproperty HWAC_SPOC_DEPTH 32
+setproperty HWAC_TERAPIX_DAG_CUT "compute"
+# test fast bandwidth
+setproperty HWAC_TERAPIX_DMABW 8
 source default_tpips

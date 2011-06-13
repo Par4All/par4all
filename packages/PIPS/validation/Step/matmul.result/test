@@ -98,9 +98,9 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
       include "STEP.h"
       INTEGER STEP_J_UP, STEP_J_LOW, J_UP, J_LOW, IDX, J, J_L, J_U, I
      &, N, K
-      INTEGER STEP_RR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
+      INTEGER STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
      &MAX_NB_LOOPSLICES), STEP_RR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 
-     &1:MAX_NB_LOOPSLICES), STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
+     &1:MAX_NB_LOOPSLICES), STEP_RR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
      &, 1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1
      &:2, 1:MAX_NB_LOOPSLICES)
       REAL*8 C(1:N, 1:N), A(1:N, 1:N), B(1:N, 1:N)
@@ -117,37 +117,37 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0123
          CALL STEP_GET_LOOPBOUNDS(IDX-1, J_LOW, J_UP)                   0124
-C  <A(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
-C    J_LOW<=J_UP}>
-         STEP_RR_A(IDX_SLICE_LOW,1,IDX) = 1                             0127
-         STEP_RR_A(IDX_SLICE_UP,1,IDX) = N                              0128
-         STEP_RR_A(IDX_SLICE_LOW,2,IDX) = 1                             0129
-         STEP_RR_A(IDX_SLICE_UP,2,IDX) = N                              0130
+C  <C(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2,
+C    PHI2<=J_UP}>
+         STEP_RR_C(IDX_SLICE_LOW,1,IDX) = 1                             0127
+         STEP_RR_C(IDX_SLICE_UP,1,IDX) = N                              0128
+         STEP_RR_C(IDX_SLICE_LOW,2,IDX) = J_LOW                         0129
+         STEP_RR_C(IDX_SLICE_UP,2,IDX) = J_UP                           0130
 C  <B(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2,
 C    PHI2<=J_UP}>
          STEP_RR_B(IDX_SLICE_LOW,1,IDX) = 1                             0133
          STEP_RR_B(IDX_SLICE_UP,1,IDX) = N                              0134
          STEP_RR_B(IDX_SLICE_LOW,2,IDX) = J_LOW                         0135
          STEP_RR_B(IDX_SLICE_UP,2,IDX) = J_UP                           0136
-C  <C(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=N, J_LOW<=PHI2,
-C    PHI2<=J_UP}>
-         STEP_RR_C(IDX_SLICE_LOW,1,IDX) = 1                             0139
-         STEP_RR_C(IDX_SLICE_UP,1,IDX) = N                              0140
-         STEP_RR_C(IDX_SLICE_LOW,2,IDX) = J_LOW                         0141
-         STEP_RR_C(IDX_SLICE_UP,2,IDX) = J_UP                           0142
+C  <A(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, PHI2<=N,
+C    J_LOW<=J_UP}>
+         STEP_RR_A(IDX_SLICE_LOW,1,IDX) = 1                             0139
+         STEP_RR_A(IDX_SLICE_UP,1,IDX) = N                              0140
+         STEP_RR_A(IDX_SLICE_LOW,2,IDX) = 1                             0141
+         STEP_RR_A(IDX_SLICE_UP,2,IDX) = N                              0142
       ENDDO
-      CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)           0144
+      CALL STEP_SET_RECVREGIONS(C, STEP_COMM_SIZE, STEP_RR_C)           0144
       CALL STEP_SET_RECVREGIONS(B, STEP_COMM_SIZE, STEP_RR_B)           0145
-      CALL STEP_SET_RECVREGIONS(C, STEP_COMM_SIZE, STEP_RR_C)           0146
+      CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)           0146
 
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0151
+      CALL STEP_ALLTOALL_PARTIAL(C, STEP_NBLOCKING_ALG,                 0151
      &STEP_TAG_DEFAULT)                                                 0151
       CALL STEP_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG,                 0153
      &STEP_TAG_DEFAULT)                                                 0153
-      CALL STEP_ALLTOALL_PARTIAL(C, STEP_NBLOCKING_ALG,                 0155
+      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0155
      &STEP_TAG_DEFAULT)                                                 0155
       CALL STEP_WAITALL                                                 0157
 

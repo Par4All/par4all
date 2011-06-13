@@ -25,7 +25,7 @@
  * forgotten somewhere, maybe in condition_to_transformer() when
  * preconditions are really used.
  *
- * Everything works properly the first time with property
+ * BUG: Everything works properly the first time with property
  * SEMANTICS_USE_DERIVATIVE_LIST set to true. The transformer
  * refinement does not seem to be useful with that setting.
  */

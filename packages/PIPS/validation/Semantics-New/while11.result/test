@@ -1,0 +1,62 @@
+
+Source code with transformers
+
+
+//  T() {0==-1}
+
+int main()
+{
+
+//  T(c) {c==0}
+
+   int c = 0;
+
+//  T(i) {c==0, i==1}
+
+   int i = 1;
+
+//  T(j) {c==0, i==1, j==0}
+
+   int j = 0;
+
+//  T() {0==-1}
+
+
+   while (i++&&j<=10)
+      ;
+
+//  T() {0==-1}
+
+   return;
+}
+
+Source code with preconditions
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int c = 0;
+
+//  P(c) {c==0}
+
+   int i = 1;
+
+//  P(c,i) {c==0, i==1}
+
+   int j = 0;
+
+//  P(c,i,j) {c==0, i==1, j==0}
+
+
+   while (i++&&j<=10)
+      ;
+
+//  P() {0==-1}
+
+   return;
+}

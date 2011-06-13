@@ -48,11 +48,3 @@ int main(int argc, char *argv[])
    printf("%d\n", k);
    return 0;
 }
-
-Unsplit resulting code
-
-
-Run code
-
-2025
-2025

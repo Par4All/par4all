@@ -134,6 +134,7 @@ digraph "dag_cleaned_0" {
 
 ! acceleration function
 
+// freia terapix includes
 #include <freiaCommon.h>
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>

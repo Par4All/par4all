@@ -16,7 +16,41 @@ echo
 echo PRECONDITIONS
 echo
 
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+# Must be set to TRUE, as well as one of the next two properties, to
+# get information about variable "b"
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+# BUG Provides information about variable "b" if set to TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
+
+# Provides information about variable "b" if set to TRUE
+setproperty SEMANTICS_USE_LIST_PROJECTION TRUE
+
+# Resulting invariants for different property combinations:
+# Fxx: {0<=i}
+# TFF: {0<=i}
+# TFT: {0<=b, 0<=i}
+
+# BUG: you need transformer refinement to get the most precise result
+# TTF: {0<=b, b<=i}
+# TTT: {0<=b, b<=i}
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[run]
+
+echo
+echo TRANSFORMERS AFTER REFINEMENT
+echo
+
+
+apply REFINE_TRANSFORMERS[run]
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[run]
+
+echo
+echo PRECONDITIONS AFTER REFINEMENT
+echo
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]

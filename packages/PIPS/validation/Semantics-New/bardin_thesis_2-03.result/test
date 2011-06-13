@@ -101,7 +101,7 @@ void ts_singlestate(void)
       }
       else {
 
-//  T() {}
+//  T(s) {s==2}
 
          if (!(s = 2))
 
@@ -109,11 +109,11 @@ void ts_singlestate(void)
 
             deadlock();
 
-//  T(x) {x+y==x#init}
+//  T(x) {s==2, x+y==x#init}
 
          x -= y;
 
-//  T(s) {s==1}
+//  T(s) {s==1, s#init==2}
 
          s = 1;
 
@@ -278,7 +278,7 @@ void ts_restructured(void)
                checking_error();
          }
 
-//  T() {s==2, 0<=x, y<=x, 2y<=x}
+//  T(s) {s==2, s#init==2, 0<=x, y<=x, 2y<=x}
 
          if (!((s = 2)&&x-y>=0&&x-y>=y))
 
@@ -579,7 +579,7 @@ void ts_restructured(void)
                checking_error();
          }
 
-//  T() {s==2, 0<=x, y<=x, x+1<=2y}
+//  T(s) {s==2, s#init==2, 0<=x, y<=x, x+1<=2y}
 
          if (!((s = 2)&&x-y>=0&&x-y<y))
 
@@ -1336,15 +1336,15 @@ void ts_singlestate(void)
 
          if (!(s = 2))
 
-//  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
+//  P() {0==-1}
 
             deadlock();
 
-//  P(s,x,y) {1<=s, s<=2, 0<=x, 0<=y}
+//  P(s,x,y) {s==2, 0<=x, 0<=y}
 
          x -= y;
 
-//  P(s,x,y) {1<=s, s<=2, 0<=x+y, 0<=y}
+//  P(s,x,y) {s==2, 0<=x+y, 0<=y}
 
          s = 1;
 
@@ -1512,7 +1512,7 @@ void ts_restructured(void)
 
          if (!((s = 2)&&x-y>=0&&x-y>=y))
 
-//  P(s,x,y) {s==2, y<=x, 0<=y}
+//  P(s,x,y) {s==2, y<=x, x+1<=2y, 0<=y}
 
             deadlock();
 
@@ -1813,7 +1813,7 @@ void ts_restructured(void)
 
          if (!((s = 2)&&x-y>=0&&x-y<y))
 
-//  P(s,x,y) {s==2, y<=x, 0<=y}
+//  P(s,x,y) {s==2, y<=x, 2y<=x, 0<=y}
 
             deadlock();
 

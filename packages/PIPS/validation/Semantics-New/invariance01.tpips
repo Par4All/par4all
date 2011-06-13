@@ -1,0 +1,33 @@
+setproperty ABORT_ON_USER_ERROR TRUE
+delete invariance01
+create invariance01 invariance01.c
+
+echo
+echo Initial code for "invariance01"
+echo
+
+display PRINTED_FILE[invariance01]
+
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate TRANSFORMERS_INTER_FULL
+activate PRECONDITIONS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Transformers for "invariance01"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[invariance01]
+
+echo
+echo Preconditions for "invariance01"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[invariance01]
+
+
+close invariance01
+#delete invariance01
+quit

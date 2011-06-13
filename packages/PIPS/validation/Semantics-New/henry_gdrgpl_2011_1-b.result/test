@@ -1,0 +1,102 @@
+
+Transformers for "main"
+
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(x) {x==0}
+
+   int x = 0;
+
+//  T(y) {x==0, y==0}
+
+   int y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, 0<=x+y, y<=x, 0<=y}
+
+   while (y>=0) {
+
+//  T() {0<=y}
+
+      fprintf(stdout, "loop: x=%d y=%d\n", x, y);
+
+//  T(y) {y#init<=y+1, y<=y#init+1, 0<=y#init}
+
+      if (x<=50)
+
+//  T(y) {y==y#init+1, x<=50, 1<=y}
+
+         y++;
+      else
+
+//  T(y) {y==y#init-1, 51<=x, 0<=y+1}
+
+         y--;
+
+//  T(x) {x==x#init+1, 0<=y+1}
+
+      x++;
+   }
+
+//  T() {y==-1, 1<=x}
+
+   fprintf(stdout, "end: x=%d y=%d\n", x, y);
+
+//  T(main) {main==0, y==-1, 1<=x}
+
+   return 0;
+}
+
+Preconditions for "main"
+
+
+//  P() {}
+
+int main(void)
+{
+
+//  P() {}
+
+   int x = 0;
+
+//  P(x) {x==0}
+
+   int y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   while (y>=0) {
+
+//  P(x,y) {y<=x, x+y<=102, 0<=y}
+
+      fprintf(stdout, "loop: x=%d y=%d\n", x, y);
+
+//  P(x,y) {y<=x, x+y<=102, 0<=y}
+
+      if (x<=50)
+
+//  P(x,y) {x<=50, y<=x, x+y<=102, 0<=y}
+
+         y++;
+      else
+
+//  P(x,y) {51<=x, y<=x, x+y<=102, 0<=y}
+
+         y--;
+
+//  P(x,y) {51<=2x+51y, y<=x+1, x+y<=101, 0<=y+1}
+
+      x++;
+   }
+
+//  P(x,y) {y==-1, 52<=x, x<=103}
+
+   fprintf(stdout, "end: x=%d y=%d\n", x, y);
+
+//  P(x,y) {y==-1, 52<=x, x<=103}
+
+   return 0;
+}

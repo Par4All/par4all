@@ -1,0 +1,45 @@
+delete rand01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create rand01 rand01.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
+# It is not really useful to turn this off because the transformer is
+# correctly computed
+
+setproperty SEMANTICS_FILTER_INITIAL_VALUES FALSE
+
+# setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[rand01]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[rand01]
+
+close
+
+echo
+echo WARNINGS
+echo
+
+shell cat rand01.database/Warnings
+
+delete rand01
+quit

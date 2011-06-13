@@ -23,6 +23,7 @@ int main(void)
 
     // The expected invariant is given as a 3-D figure in d, s and t
     // s<=4, s<=d, ???
+    // found by PIPS: {s<=d, d<=s+4t, 0<=s, s<=4}
     fprintf(stdout, "t=%d d=%d s=%d\n", t, d, s);
   }
 }

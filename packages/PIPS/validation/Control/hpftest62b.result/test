@@ -1,0 +1,72 @@
+
+Parser output
+
+c unstructured
+      PROGRAM HPFTEST62B
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+      IF (.TRUE.) THEN                                                  0006
+10       PRINT *, 'please enter a value'                                0007
+         READ *, M                                                      0008
+         IF (M.GT.N.OR.M.LT.1) THEN                                     0009
+            GOTO 10                                                     0009
+         ENDIF
+      ELSE
+      ENDIF
+      PRINT *, 'ok : ', M                                               0011
+      END
+
+Controlizer output
+
+c unstructured
+      PROGRAM HPFTEST62B
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+      IF (.TRUE.) THEN                                                  0006
+10       PRINT *, 'please enter a value'                                0007
+         READ *, M                                                      0008
+         IF (M.GT.N.OR.M.LT.1) GOTO 99999                               0009
+         GOTO 99998
+99999    CONTINUE
+         GOTO 10
+99998    CONTINUE
+      ENDIF
+      PRINT *, 'ok : ', M                                               0011
+      END
+
+New controlizer output
+
+c unstructured
+      PROGRAM HPFTEST62B
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+      IF (.TRUE.) THEN                                                  0006
+10       PRINT *, 'please enter a value'                                0007
+         READ *, M                                                      0008
+         IF (M.GT.N.OR.M.LT.1) GOTO 99999                               0009
+         GOTO 99998
+99999    CONTINUE
+         GOTO 10
+99998    CONTINUE
+      ELSE
+      ENDIF
+      PRINT *, 'ok : ', M                                               0011
+      END
+
+After control restructuring
+
+c unstructured
+      PROGRAM HPFTEST62B
+      INTEGER N,M
+      PARAMETER (N=10)
+      PRINT *, 'hpftest62 running'                                      0005
+      IF (.TRUE.) THEN                                                  0006
+10       PRINT *, 'please enter a value'                                0007
+         READ *, M                                                      0008
+         IF (M.GT.N.OR.M.LT.1) GOTO 10                                  0009
+      ENDIF
+      PRINT *, 'ok : ', M                                               0011
+      END

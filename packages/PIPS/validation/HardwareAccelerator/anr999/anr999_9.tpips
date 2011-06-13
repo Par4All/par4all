@@ -1,5 +1,6 @@
-setproperty HWAC_SPOC_DEPTH 9
 setenv WSPACE anr999_9
-setenv FILE $WSPACE.c
 setenv NAME anr999
+setenv FILE $NAME.c
+setproperty HWAC_SPOC_DEPTH 9
+setproperty HWAC_TERAPIX_DMABW 12
 source default_tpips

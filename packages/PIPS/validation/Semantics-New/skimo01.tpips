@@ -10,6 +10,10 @@ setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
 
+# It is not really useful to turn this off because the transformer is
+# correctly computed
+
+setproperty SEMANTICS_FILTER_INITIAL_VALUES FALSE
 
 # setenv SEMANTICS_DEBUG_LEVEL "0"
 

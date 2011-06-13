@@ -1,0 +1,78 @@
+
+Transformers for "while06"
+
+
+//  T() {}
+
+void while06()
+{
+
+//  T(x,y) {x==0, y==0}
+
+   int x = 0, y = 0;
+
+//  T(x,y) {x#init==0, y#init==0, 0<=x, 0<=y}
+
+
+   while (x<=4||y<=8) {
+
+//  T(x) {x#init<=x, x<=x#init+1}
+
+      if (alea())
+
+//  T(x) {x==x#init+1}
+
+         x++;
+
+//  T(y) {y#init<=y, y<=y#init+1}
+
+      if (alea())
+
+//  T(y) {y==y#init+1}
+
+         y++;
+   }
+
+//  T() {5<=x, 9<=y}
+
+   fprintf(stdout, "x=%d y=%d\n", x, y);
+}
+
+Preconditions for "while06"
+
+
+//  P() {}
+
+void while06()
+{
+
+//  P() {}
+
+   int x = 0, y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+
+   while (x<=4||y<=8) {
+
+//  P(x,y) {0<=x, 0<=y}
+
+      if (alea())
+
+//  P(x,y) {0<=x, 0<=y}
+
+         x++;
+
+//  P(x,y) {0<=x, 0<=y}
+
+      if (alea())
+
+//  P(x,y) {0<=x, 0<=y}
+
+         y++;
+   }
+
+//  P(x,y) {5<=x, 9<=y}
+
+   fprintf(stdout, "x=%d y=%d\n", x, y);
+}

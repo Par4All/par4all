@@ -1,0 +1,54 @@
+
+Parsed printed file
+
+int main(int argc, char *argv[])
+{
+   char *optstring = "fo";
+   int i1 = getopt(argc, argv, optstring);
+   struct option *longopts;
+   int *longindex;
+   int i2 = getopt_long(argc, argv, optstring, longopts, longindex);
+   int i3 = getopt_long_only(argc, argv, optstring, longopts, longindex);
+   return 0;
+}
+
+Proper effects
+
+int main(int argc, char *argv[])
+{
+//             <    is written>: optstring
+   char *optstring = "fo";
+//             <    is read   >: argc optstring
+//             <    is written>: i1
+   int i1 = getopt(argc, argv, optstring);
+   struct option *longopts;
+   int *longindex;
+//             <    is read   >: argc longindex longopts optstring
+//             <    is written>: i2
+   int i2 = getopt_long(argc, argv, optstring, longopts, longindex);
+//             <    is read   >: argc longindex longopts optstring
+//             <    is written>: i3
+   int i3 = getopt_long_only(argc, argv, optstring, longopts, longindex);
+   return 0;
+}
+
+Cumulated effetcs
+
+//             <    is read   >: argc
+int main(int argc, char *argv[])
+{
+//             <    is written>: optstring
+   char *optstring = "fo";
+//             <    is read   >: argc optstring
+//             <    is written>: i1
+   int i1 = getopt(argc, argv, optstring);
+   struct option *longopts;
+   int *longindex;
+//             <    is read   >: argc longindex longopts optstring
+//             <    is written>: i2
+   int i2 = getopt_long(argc, argv, optstring, longopts, longindex);
+//             <    is read   >: argc longindex longopts optstring
+//             <    is written>: i3
+   int i3 = getopt_long_only(argc, argv, optstring, longopts, longindex);
+   return 0;
+}

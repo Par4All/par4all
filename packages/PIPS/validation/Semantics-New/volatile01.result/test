@@ -1,0 +1,52 @@
+
+Transformers for "volatile01"
+
+
+//  T() {}
+
+void volatile01()
+{
+
+//  T() {}
+
+   volatile int i = 42;
+
+//  T(j) {j==84}
+
+   int j = 84;
+
+//  T() {j==84}
+
+
+   printf("%d, %d\n", i, j);
+
+//  T() {j==84}
+
+   return;
+}
+
+Preconditions for "volatile01"
+
+
+//  P() {}
+
+void volatile01()
+{
+
+//  P() {}
+
+   volatile int i = 42;
+
+//  P() {}
+
+   int j = 84;
+
+//  P(j) {j==84}
+
+
+   printf("%d, %d\n", i, j);
+
+//  P(j) {j==84}
+
+   return;
+}

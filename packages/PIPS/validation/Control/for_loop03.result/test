@@ -1,0 +1,24 @@
+
+Parsed code
+
+int main()
+{
+   {
+      int i;
+
+      for (i = 0;i<10;i++, i)
+         ;
+   }
+}
+
+Controlized code
+
+int main()
+{
+   int i;
+
+   for(i = 0; i <= 9; i += 1) {
+
+      i;
+   }
+}

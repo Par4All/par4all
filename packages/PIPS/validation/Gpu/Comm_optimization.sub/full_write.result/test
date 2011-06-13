@@ -1,0 +1,18 @@
+void kernel(int a[10])
+{
+   int i;
+   for(i = 0; i <= 9; i += 1)
+      a[i] = 0;
+}
+int main()
+{
+   int a[10];
+
+   a[0] = 0;
+   
+   // a is fully written, thus no copy in is needed
+   kernel(a);
+   P4A_copy_from_accel(a, sizeof(int)*10);
+
+   int i = a[0];
+}

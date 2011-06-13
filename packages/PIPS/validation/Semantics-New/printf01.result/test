@@ -1,0 +1,61 @@
+
+TRANSFORMERS
+
+
+//  T(printf01) {}
+
+int printf01()
+{
+
+//  T(i) {i==3}
+
+   int i = 3;
+
+//  T(i) {i#init==3}
+
+
+   printf("%d\n", i++);
+
+//  T(printf01) {i==printf01}
+
+
+   return i;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int printf01()
+{
+
+//  P() {}
+
+   int i = 3;
+
+//  P(i) {i==3}
+
+
+   printf("%d\n", i++);
+
+//  P(i) {}
+
+
+   return i;
+}
+
+WARNINGS
+
+unknown[unknown] (parse_properties) property SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT redefined
+unknown[unknown] (parse_properties) property C_PARSER_RETURN_SUBSTITUTION redefined
+unknown[unknown] (parse_properties) property SEMANTICS_FILTER_INITIAL_VALUES redefined
+INITIAL_PRECONDITION[printf01] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (get_main_entity) no main found, returning printf01 instead
+PROGRAM_PRECONDITION[] (add_or_kill_equivalenced_variables) storage return
+PROGRAM_PRECONDITION[] (translate_global_value) Information about TOP-LEVEL:sys_nerr lost,
+check structure of common /*STATIC*/ in modules TOP-LEVEL and printf01
+TRANSFORMERS_INTER_FULL[printf01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_TRANSFORMERS[printf01] (add_or_kill_equivalenced_variables) storage return
+PRECONDITIONS_INTER_FULL[printf01] (add_or_kill_equivalenced_variables) storage return
+PRINT_CODE_PRECONDITIONS[printf01] (add_or_kill_equivalenced_variables) storage return
