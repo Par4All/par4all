@@ -205,6 +205,92 @@ set COPY_TO_OUT(statement st) {
 */
 
 /**
+ * Should be useful, but for some bullshit reason the array dimensions even
+ * for simple case like a[512][512] might be previously normalized "COMPLEX"
+ * This occurs in some special cases...
+ */
+static bool force_renormalize(expression e) {
+  if(!normalized_undefined_p(expression_normalized(e))) {
+    // Remove a warning
+    free_normalized(expression_normalized(e));
+    expression_normalized(e) = normalized_undefined;
+  }
+  expression_normalized(e) = NormalizeExpression(e);
+  return true;
+}
+
+/**
+ * Check that an array is fully written by an exact W region in a list
+ */
+static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
+  // Ugly hack :-(
+  effect array = entity_whole_region(e_used,make_action_write_memory());
+
+  // Force re-normalization of expression, this is a hack !
+  gen_recurse(e_used,expression_domain,force_renormalize,force_renormalize);
+  if(type_variable_p(entity_type(e_used))) {
+    // I don't understand why the gen_recurse doesn't work, so here is the hack for the hack...
+    FOREACH(dimension, d, variable_dimensions(type_variable(entity_type(e_used)))) {
+      force_renormalize(dimension_upper(d));
+      force_renormalize(dimension_lower(d));
+    }
+  }
+
+  //
+  Psysteme p = descriptor_convex(effect_descriptor(array));
+  descriptor_convex(effect_descriptor(array)) = sc_safe_append(p,
+                         sc_safe_normalize(entity_declaration_sc(e_used)));
+  effect_approximation(array) = make_approximation_exact();
+
+  ifdebug(6) {
+    pips_debug(0,"Array region is : ");
+    print_region(array);
+  }
+  FOREACH(effect, reg, lreg) {
+    // Proj region over PHI to remove precondition variables
+    // FIXME : Can be done by difference between the 2 bases
+    list proj = base_to_list(sc_base(descriptor_convex(effect_descriptor(reg))));
+    list l_phi = NIL;
+    FOREACH(expression,e, reference_indices(effect_any_reference(reg))) {
+      pips_assert("expression_reference_p", expression_reference_p(e));
+      l_phi = CONS(entity,reference_variable(expression_reference(e)),l_phi);
+      gen_remove(&proj,reference_variable(expression_reference(e)));
+    }
+
+
+    region_exact_projection_along_variables(reg, proj);
+
+
+    ifdebug(6) {
+      pips_debug(0,"Evaluating region : ");
+      print_region(reg);
+    }
+    if(effect_write_p(reg) && store_effect_p(reg) && region_exact_p(reg)) {
+      list ldiff = region_sup_difference(array,reg);
+      bool empty=true;
+      FOREACH(effect, diff, ldiff) {
+        if( !region_empty_p(diff)) {
+          ifdebug(6) {
+            pips_debug(0,"Diff is not empty :");
+            print_region(diff);
+          }
+          empty = false;
+          break;
+        } else {
+          ifdebug(6) {
+            pips_debug(0,"Diff is empty !\n");
+          }
+        }
+      }
+      if(empty) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Translate the interprocedural summary for a function into a set of local
  * corresponding parameters (entity only)
  */
@@ -214,7 +300,8 @@ static set interprocedural_mapping(string res, call c) {
   memory_mapping mem_map = (memory_mapping)db_get_memory_resource(res,
                                                                   func_name,
                                                                   TRUE);
-  set summary = memory_mapping_map(mem_map);
+  set summary = MAKE_SET();
+  set_assign(summary,memory_mapping_map(mem_map));
 
 
   list /* of entity */l_formals = module_formal_parameters(callee);
@@ -231,6 +318,7 @@ static set interprocedural_mapping(string res, call c) {
     bool found = false;
     SET_FOREACH(entity, e, summary) {
       if(same_entity_p(e, formal_ent)) {
+        set_del_element(summary,summary,e);
         found = true;
         break;
       }
@@ -248,6 +336,15 @@ static set interprocedural_mapping(string res, call c) {
         print_syntax(expression_syntax(real_exp));
         fprintf(stderr, "\n");
       }
+    }
+  }
+  SET_FOREACH(entity, e, summary) {
+    pips_debug(4,"%s not mapped on formal\n",entity_name(e));
+    if(top_level_entity_p(e)) {
+      set_add_element(at_call_site,at_call_site,e);
+    } else {
+      pips_internal_error("Interprocedural error : entity %s is not a formal"
+          " not a global variable !\n");
     }
   }
   return at_call_site;
@@ -309,7 +406,7 @@ static void copy_from_test(statement st, test t) {
 
 
   /* Compute "out" sets for the test */
-  set copy_from_out = COPY_TO_OUT( st );
+  set copy_from_out = COPY_FROM_OUT( st );
 
   set_intersection(copy_from_out, COPY_FROM_OUT( test_true(t)), COPY_FROM_OUT( test_false(t)));
 
@@ -317,6 +414,9 @@ static void copy_from_test(statement st, test t) {
   ifdebug(6) {
     pips_debug(6,"Handling copy from for test expression : ");
     print_expression(test_condition(t));
+    fprintf(stderr,"\n");
+    pips_debug(6,"Copy from is : ");
+    print_entities(set_to_list(copy_from_out));
     fprintf(stderr,"\n");
   }
 
@@ -420,6 +520,11 @@ static void copy_from_call(statement st, call c) {
     if(!call_intrinsic_p(c)) { // Ignoring intrinsics
       at_call_site = interprocedural_mapping(DBR_KERNEL_COPY_OUT,c);
       copy_from_out = set_union(copy_from_out, at_call_site, copy_from_out);
+      ifdebug(6) {
+        pips_debug(0,"Adding interprocedural summary : ");
+        print_entities(set_to_list(at_call_site));
+        fprintf(stderr,"\n");
+      }
       set_free(at_call_site);
     }
   }
@@ -494,6 +599,7 @@ static void copy_from_statement(statement st) {
       if(!statement_block_p(st) || ! empty_statement_or_continue_without_comment_p(st) )
         insert_comments_to_statement(st, strdup(str));
     }
+    fprintf(stderr, "*\n**********************************\n");
   }
 
 }
@@ -615,7 +721,7 @@ static void copy_to_call(statement st, call c) {
     {
       entity e_used = reference_variable(effect_any_reference(eff));
       if(entity_array_p(e_used)) {
-        pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
+        pips_debug(6,"Adding in %s into copy_in\n",entity_name(e_used));
         copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
       }
     }
@@ -624,8 +730,15 @@ static void copy_to_call(statement st, call c) {
     {
       entity e_used = reference_variable(effect_any_reference(eff));
       if(entity_array_p(e_used)) {
-        pips_debug(6,"Adding %s into copy_in\n",entity_name(e_used));
-        copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
+        list lreg = load_proper_rw_effects_list(st);
+
+        if(!array_must_fully_written_by_regions_p(e_used,lreg)) {
+          pips_debug(6,"Adding written %s into copy_in\n",entity_name(e_used));
+          copy_to_in = set_add_element(copy_to_in, copy_to_in, e_used);
+        } else {
+          pips_debug(6,"Do not add %s into copy_in because fully overwritten\n",
+                     entity_name(e_used));
+        }
       }
     }
   } else {
@@ -1077,8 +1190,10 @@ bool kernel_data_mapping(char * module_name) {
 
   debug_on("KERNEL_DATA_MAPPING_DEBUG_LEVEL");
 
-  string pe = db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE);
-  set_proper_rw_effects((statement_effects)pe);
+  /* regions */
+  string region = db_get_memory_resource(DBR_REGIONS, module_name, TRUE);
+  set_proper_rw_effects((statement_effects)region);
+
 
   /* out regions */
   string or = db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE);
@@ -1108,7 +1223,15 @@ bool kernel_data_mapping(char * module_name) {
     copy_from_statement(module_stat);
     copy_to_statement(module_stat);
 
-    transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), NULL, NULL);
+    transfert_statement(module_stat, MAKE_SET(), MAKE_SET(), MAKE_SET(), MAKE_SET());
+  }
+
+  ifdebug(1) {
+    pips_debug(0,"Interprocedural summary for %s :\n To :",module_name);
+    print_entities(set_to_list(COPY_TO_IN(module_stat)));
+    fprintf(stderr,"\n From :");
+    print_entities(set_to_list(COPY_FROM_OUT(module_stat)));
+    fprintf(stderr,"\n");
   }
 
   DB_PUT_MEMORY_RESOURCE(DBR_CODE,

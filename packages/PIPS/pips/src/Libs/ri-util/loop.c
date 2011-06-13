@@ -282,6 +282,7 @@ set region;
   }
 
   case is_instruction_call:
+  case is_instruction_expression:
       region = set_add_element(region, region, (char *) stat);
       break;
 

@@ -310,13 +310,13 @@ static bool pr_statement_flt(statement s)
 }
 
 /*
- *@param s, the stament to check for reductions
+ *@param s, the statement to check for reductions
  */
 static void pr_statement_wrt(statement s)
 {
     instruction i = statement_instruction(s);
     if (instruction_call_p(i) &&
-	instruction_call(i)!=last_translated_module_call)
+        instruction_call(i)!=last_translated_module_call)
         check_proper_reductions(s);
     // crt_stat_rewrite pops from the stack and chek that s
     // was the latest pushed object

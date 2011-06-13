@@ -2410,13 +2410,13 @@ void set_current_stco_map(statement_mapping scm)
 }
 
 /* ======================================================================== */
-statement_mapping get_current_stco_map()
+statement_mapping get_current_stco_map(void)
 {
   return current_stco_map;
 }
 
 /* ======================================================================== */
-void reset_current_stco_map()
+void reset_current_stco_map(void)
 {
   current_stco_map = hash_table_undefined;
 }

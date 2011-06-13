@@ -23,7 +23,6 @@
 # TODO
 # - check documentation generation?
 #   I recall that latex errors are ignored in nlpmake.
-# - keep out/err on errors?
 #
 
 # usage: $0 [options] email@domain /path/to/prod [/path/to/valid ...]
@@ -40,6 +39,7 @@ wait=
 tail=
 make=make
 force=
+keepfail=
 report=
 source=
 autoconf=
@@ -65,6 +65,8 @@ do
     -f|--force) validate=mail-validate ; force=1 ;;
     # force compilation status report even if unchanged (for night validation)
     -r|--report) report=1 ;;
+    # allow to keep logs on errors
+    -k|--keepfail|--keep-fail) keepfail=1 ;;
     # how long to wait for the lock
     -w|--wait) wait=1200 ;;
     --wait=*) wait=${1#*=} ;;
@@ -97,26 +99,27 @@ do
       echo -e \
         "Usage: $0 [options] em@il /path/to/prod [/path/to/validation ...]\n" \
         "check pips compilation and validation health\n" \
-	"arguments:\n" \
-	"  em@ail: summary email recipient, defaults to current user\n" \
-	"  /path/to/prod: path to an svn working copy of pips, default is .\n" \
-	"  /path/to/validation: path to an svn working copy of a validation\n" \
-	"available options:\n" \
-	"  -a: compile with autoconf\n" \
+        "arguments:\n" \
+        "  em@ail: summary email recipient, defaults to current user\n" \
+        "  /path/to/prod: path to an svn working copy of pips, default is .\n" \
+        "  /path/to/validation: path to an svn working copy of a validation\n" \
+        "available options:\n" \
+        "  -a: compile with autoconf\n" \
         "  -e exec: execute with eval on success\n" \
-	"  -f: force even if not needed\n" \
-	"  -h: show this help and exit\n" \
-	"  -m make: make command\n" \
-	"  -n: run with nice\n" \
-	"  -p: run in parallel (the default)\n" \
-	"  -r: report compilation result even if not changed\n" \
-	"  -s: do not run in parallel\n" \
-	"  -S file: source file for environment\n" \
+        "  -f: force even if not needed\n" \
+        "  -k: keep failures' output\n" \
+        "  -h: show this help and exit\n" \
+        "  -m make: make command\n" \
+        "  -n: run with nice\n" \
+        "  -p: run in parallel (the default)\n" \
+        "  -r: report compilation result even if not changed\n" \
+        "  -s: do not run in parallel\n" \
+        "  -S file: source file for environment\n" \
         "  -t len: trace length on compilation error\n" \
         "  -T n: possibly retry svn up, defaults to thrice\n" \
-	"  -v name: validation name\n" \
+        "  -v name: validation name\n" \
         "  -V opt: validation make option, can be repeated for more\n" \
-	"  -w: wait for lock\n"
+        "  -w: wait for lock\n"
       exit 0
       ;;
     *) echo "$0 unexpected option: $1" >&2 ; exit 1 ;;
@@ -145,9 +148,10 @@ then
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
   make+=" -j $jobs -l $load"
-  tail=$((15 + 10 * $nproc))
+  tail=$((30 + 20 * $nproc))
 else
-  tail=25
+  # sequential run
+  tail=50
 fi
 
 # report current-state compile message
@@ -165,18 +169,20 @@ function report()
   # get function arguments
   local current=$1 compile=$2 msg=$3
   local previous='unknown' prevcomp='unknown'
+  local now=$(date +%Y%m%d%H%M%S)
 
   # get previous state if available
   test -f STATE && read previous prevcomp < STATE
 
   # log report anyway...
-  echo "$(date +%Y%m%d%H%M%S): $current $compile (${COMPILE_SECONDS:-$SECONDS} seconds) $msg" >> LOG
+  echo "$now: $current $compile (${COMPILE_SECONDS:-$SECONDS} seconds) $msg" \
+    >> LOG
 
   # out if locked
   [ $current = 'locked' ] && {
     echo "message: $msg" | \
       mailx -a "Reply-To: $dest" \
-	-s "$vname $arch compilation status is locked" $dest
+        -s "$vname $arch compilation status is locked" $dest
     exit 0
   }
 
@@ -187,6 +193,9 @@ function report()
   # however, if there was a *temporary* KO (network down),
   # it is nice to report that it is up again...
   [ $current = 'skip' -a $previous != 'KO:svn-up' ] && { rmdir LOCK ; exit 0 ; }
+
+  # copy outputs on fail
+  [ "$keepfail" -a $current != 'ok' ] && cp out fail.$now.out
 
   # no change, no report, unless forced
   [ ! "$report" -a "$previous" -a $current = "$previous" ] && {
@@ -220,13 +229,8 @@ function report()
 
     if [ $current != 'ok' ]
     then
-      # show stderr/stdout?
-      test -f err && {
-        echo
-        echo err:
-        tail -$tail err
-      }
 
+      # show stderr/stdout
       test -f out && {
         echo
         echo out:
@@ -240,7 +244,7 @@ function report()
       for repos in pips newgen linear pips/makes
       do
         echo $repos:
-	svn log --revision COMMITTED $repos
+        svn log --revision COMMITTED $repos
       done
     fi
   } | mailx -a "Reply-To: $dest" \
@@ -318,11 +322,11 @@ else
 fi
 
 # update working copies (prod & validations)
-rm -f out err
+rm -f out
 ntry=$try
 while let ntry--
 do
-  if $nice svn up --force --accept theirs-full $prod "$@" >> out 2>> err
+  if $nice svn up --force --accept theirs-full $prod "$@" >> out 2>&1
   then
     # svn up was okay, let us get out
     ntry=0
@@ -332,7 +336,7 @@ do
   else
     # possible repeated failures: network dns svn...
     # hmmm... try to cleanup after svn up failure
-    svn cleanup $prod "$@" >> out 2>> err
+    svn cleanup $prod "$@" >> out 2>&1
     report 'KO:svn-up' 'unchanged' "cannot \"svn up\" ($try)"
   fi
 done
@@ -366,9 +370,9 @@ then
     # aggressive cleanup
     rm -rf ../install
     # should not be needed???
-    $nice $make unbuild > out 2> err \
+    $nice $make unbuild >> out 2>&1 \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
-    $nice $make auto > out 2> err \
+    $nice $make auto >> out 2>&1 \
       || report 'KO:make' 'auto' 'cannot "make auto"'
     # check exe, script & lib
     test -x ../install/bin/tpips \
@@ -384,10 +388,10 @@ then
   else
     # NLPMAKE compilation
     # something may have changed, let us recompile
-    $nice $make unbuild > out 2> err \
+    $nice $make unbuild >> out 2>&1 \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     # what about a "timeout"? how to differentiate from a simple failure?
-    $nice $make $build > out 2> err \
+    $nice $make $build >> out 2>&1 \
       || report 'KO:make' $build "cannot \"make $build\""
     # check executable & script
     test -x pips/bin/${PIPS_ARCH:-$(./pips/makes/arch.sh)}/tpips \
@@ -402,43 +406,44 @@ then
   # get there on success, as report exits
   # should it run after the validation?
   [ "$exec" ] && {
-    eval "$exec" > out 2> err \
+    eval "$exec" >> out 2>&1 \
       || report 'KO:post' 'post-exec' 'post exec failed!'
   }
 
-  # clean up if no error
-  rm -f out err
+  # clean up if no compilation error
+  rm -f out
 
-  # run the validation with new tpips
+  # now run the validations with the new tpips
   for valid in "$@" ; do
-    {
-      $nice $make -C $valid parallel-clean
-      $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
-	  $validate
-      $nice $make -C $valid parallel-clean
-    } > out 2> err
-  done
+    $nice $make -C $valid cleaner
+    $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest $validate
+    $nice $make -C $valid cleaner
+  done > out 2>&1
 
   # the report is delayed so as to keep the lock
   report 'ok' 'ok' 'pips is fine'
 
 else
   # no source updates, but maybe a validation update?
+  # first check that pips is fine!
+  read prev comp < STATE
+  [ "$comp" = 'ok' ] || \
+    report 'skip' 'unchanged' "cannot run validation without pips! ($comp)"
+
+  # then run the validation
   for valid in "$@" ; do
     svalid=${valid##*/}
     if ! cmp -s CURRENT_$svalid PREVIOUS_$svalid
     then
       # the validation changed, run it with current tpips
       # run the validation
-      {
-        $nice $make -C $valid parallel-clean
-        $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
-	    mail-diff-validate
-        # cleanup to help next "svn up" run smoothly
-        $nice $make -C $valid parallel-clean
-      } > out 2> err
+      $nice $make -C $valid cleaner
+      $nice $make -C $valid $vopts VNAME="$vname $arch" EMAIL=$dest \
+          mail-diff-validate
+      # cleanup to help next "svn up" run smoothly
+      $nice $make -C $valid cleaner
     fi
-  done
+  done > out 2>&1
 
   # the report is delayed so as to keep the lock
   report 'skip' 'unchanged' 'no commit since last check'

@@ -19,7 +19,7 @@ completion_list.h :	\
 			../../Documentation/pipsmake/resources.h \
 			../../Documentation/pipsmake/printable_resources.h \
 			../../Documentation/pipsmake/properties.rc
-	sh $(srcdir)/make_completion_lists.sh \
+	$(AM_V_GEN)sh $(srcdir)/make_completion_lists.sh \
 		../../Documentation/pipsmake/phases.h \
 		../../Documentation/pipsmake/resources.h \
 		../../Documentation/pipsmake/printable_resources.h \

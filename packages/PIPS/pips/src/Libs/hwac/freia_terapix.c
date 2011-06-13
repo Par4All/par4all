@@ -44,34 +44,7 @@
 #include "freia_spoc_private.h"
 #include "hwac.h"
 
-/* Return the first/last available imagelet.
- * This ensures that the choice is deterministic.
- * Moreover, as first numbers are IO imagelets, this help putting outputs
- * in the right imagelet so as to avoid additionnal copies.
- */
-static _int select_imagelet(set availables, int * nimgs, boolean first)
-{
-  _int choice = 0;
-  // allocate if no images are available
-  if (set_empty_p(availables))
-  {
-    pips_assert("can create new images", nimgs!=NULL);
-    (*nimgs)++;
-    choice = *nimgs;
-  }
-  else // search
-  {
-    SET_FOREACH(_int, i, availables)
-    {
-      if (choice==0) choice = i;
-      if (first && (i<choice)) choice = i;
-      if (!first && (i>choice)) choice = i;
-    }
-    set_del_element(availables, availables, (void*) choice);
-  }
-  pips_assert("some choice was made", choice>0);
-  return choice;
-}
+/********************************************************** TERAPIX ANALYSES */
 
 /* @return the dead vertices (their output is dead) after computing v in d.
  */
@@ -110,7 +83,8 @@ static void erosion_optimization
       {
         list iargs = call_arguments(syntax_call(expression_syntax(ival)));
         pips_assert("must be a kernel...", gen_length(iargs)==9);
-        // tell whether kernel element is NULL
+
+        // tell whether each kernel element is zero. If in doubt, count as 1.
         bool k00, k10, k20, k01, k11, k21, k02, k12, k22;
         intptr_t i = 0;
         k00 = expression_integer_value(EXPRESSION(CAR(iargs)), &i) && i==0;
@@ -133,6 +107,7 @@ static void erosion_optimization
         iargs = CDR(iargs);
         pips_assert("end of list reached", iargs==NIL);
 
+        // summarize for each four directions
         *north = !(k00 && k10 && k20);
         *south = !(k02 && k12 && k22);
         *west = !(k00 && k01 && k02);
@@ -142,6 +117,9 @@ static void erosion_optimization
   }
 }
 
+// stupid hack, to have only one hash table for the 4 directions:
+// as the key is a pointer, the alignment ensures that +0 to +3
+// are distinct values thus should not clash one with another.
 #define NORTH(v) ((void*) (((_int)v)+0))
 #define SOUTH(v) ((void*) (((_int)v)+1))
 #define WEST(v)  ((void*) (((_int)v)+2))
@@ -223,7 +201,8 @@ static int dag_terapix_measures
     {
       const freia_api_t * api = dagvtx_freia_api(v);
       dcost += api->terapix.cost;
-      dnops ++;
+      // only count non null operations
+      if (api->terapix.cost) dnops ++;
       if (api->arg_img_out) level_width++;
       update_erosions(d, v, erosion);
     }
@@ -286,6 +265,8 @@ static list /* of ints */ dag_vertex_pred_imagelets
   return limagelets;
 }
 
+/************************************************** GLOBAL MEMORY MANAGEMENT */
+
 /* allocate bitfield to described used cells in global memory.
  */
 static bool * terapix_gram_init(void)
@@ -329,8 +310,41 @@ static void terapix_gram_allocate
   pips_internal_error("cannot find available memory for %dx%d", width, height);
 }
 
+/********************************** TERAPIX CODE GENERATION HELPER FUNCTIONS */
+
+/* Return the first/last available imagelet.
+ * This ensures that the choice is deterministic.
+ * Moreover, as first numbers are IO imagelets, this help putting outputs
+ * in the right imagelet so as to avoid additionnal copies.
+ */
+static _int select_imagelet(set availables, int * nimgs, boolean first)
+{
+  _int choice = 0;
+  // allocate if no images are available
+  if (set_empty_p(availables))
+  {
+    pips_assert("can create new images", nimgs!=NULL);
+    (*nimgs)++;
+    choice = *nimgs;
+  }
+  else // search
+  {
+    SET_FOREACH(_int, i, availables)
+    {
+      if (choice==0) choice = i;
+      if (first && (i<choice)) choice = i;
+      if (!first && (i>choice)) choice = i;
+    }
+    set_del_element(availables, availables, (void*) choice);
+  }
+  pips_assert("some choice was made", choice>0);
+  return choice;
+}
+
 #define IMG_PTR "imagelet_"
 
+/* generate an image symbolic pointer (a name:-).
+ */
 static void terapix_image(string_buffer sb, int ff, int n)
 {
   pips_assert("valid flip-flop", ff==0 || ff==1);
@@ -341,39 +355,50 @@ static void terapix_image(string_buffer sb, int ff, int n)
     sb_cat(sb, IMG_PTR "io_", itoa(-n), ff? "_1": "_0");
 }
 
+/* set a double buffered image argument.
+ */
 static void terapix_mcu_img(string_buffer code, int op, string ref, int n)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref, " = ");
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref, " = ");
   terapix_image(code, 0, n);
   sb_cat(code, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref, " = ");
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref, " = ");
   terapix_image(code, 1, n);
   sb_cat(code, ";\n");
 }
 
+/* set an integer argument.
+ */
 static void terapix_mcu_int(string_buffer code, int op, string ref, int val)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref);
   sb_cat(code, " = ", itoa(val), ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref);
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref);
   sb_cat(code, " = ", itoa(val), ";\n");
 }
 
+/* set some value string argument.
+ */
 static void terapix_mcu_val(string_buffer code, int op, string r, string s)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", r, " = ", s, ";\n");
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", r, " = ", s, ";\n");
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", r, " = ", s, ";\n");
 }
 
+/* set some prefixed value string argument.
+ */
 static void terapix_mcu_pval(string_buffer code, int op, string ref,
                              string p, string s)
 {
-  sb_cat(code, "  mcu_macro[0][", itoa(op), "].macrocode.", ref,
+  sb_cat(code, "  mcu_macro[0][", itoa(op), "].", ref,
          " = ", p, s, ";\n");
-  sb_cat(code, "  mcu_macro[1][", itoa(op), "].macrocode.", ref,
+  sb_cat(code, "  mcu_macro[1][", itoa(op), "].", ref,
          " = ", p, s, ";\n");
 }
 
+/* copy some operator parameters in the global ram (aka gram).
+ * the coordinates used are  (x_<name>, y_<name>).
+ */
 static void gram_param
   (string_buffer code, string_buffer decl,
    string name, dagvtx v, hash_table hparams,
@@ -469,6 +494,17 @@ static void terapix_gram_management
   terapix_mcu_pval(code, op, "ymin3", "y_", name);
 }
 
+/* generate terapix code for
+ * @param code, code stream being generated
+ * @param decl, declaration stream being generated
+ * @param op, operation number
+ * @param api, actual freia operator called
+ * @param used, array to keep track of what gram cells are used
+ * @param hparam, expression to parameter mapping
+ * @param v, dag vertex of the current operation
+ * @param ins, list of image number inputs (i.e. operation arguments)
+ * @param out, image number output for the operation
+ */
 static void terapix_macro_code
   (string_buffer code, string_buffer decl,
    int op, const freia_api_t * api, bool * used,
@@ -514,8 +550,12 @@ static void terapix_macro_code
   }
   terapix_mcu_val(code, op, "iter1", "TERAPIX_PE_NUMBER");
   terapix_mcu_val(code, op, "iter2", "imagelet_size");
+  terapix_mcu_val(code, op, "iter3", "0");
+  terapix_mcu_val(code, op, "iter4", "0");
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
 }
+
+/*************************************************** TERAPIX CODE GENERATION */
 
 /* generate a terapix call for dag thedag.
  * the memory allocation is managed here.
@@ -564,6 +604,8 @@ static void freia_terapix_call
   length = dag_terapix_measures(thedag, NULL,
                                 &width, &cost, &nops, &n, &s, &w, &e);
 
+  int comm = get_int_property(trpx_dmabw_prop);
+
   // show stats in function's comments
   sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
   sb_cat(head, " * ", itoa(n_ins), " input image", n_ins>1? "s": "");
@@ -571,7 +613,9 @@ static void freia_terapix_call
   sb_cat(head, " * ", itoa(nops), " image operations in dag\n");
   sb_cat(head, " * dag length is ", itoa(length));
   sb_cat(head, ", dag width is ", itoa(width), "\n");
-  sb_cat(head, " * cost is ", itoa(cost), " cycles per imagelet row\n");
+  sb_cat(head, " * costs in cycles per imagelet row:\n");
+  sb_cat(head, " * - computation: ", itoa(cost), "\n");
+  sb_cat(head, " * - communication: ", itoa(comm*(n_ins+n_outs)), "\n");
   sb_cat(head, " */\n");
 
   // generate function declaration
@@ -603,7 +647,8 @@ static void freia_terapix_call
          "  terapix_mcu_instr mcu_instr;\n");
 
   sb_cat(body,
-         "\n  // body:\n"
+         "\n"
+         "  // body:\n"
          "  // mcode param\n"
          "  mcode.raw = (void*) terapix_ucode_array;\n"
          "  mcode.size = TERAPIX_UCODE_SIZE_T;\n"
@@ -613,7 +658,7 @@ static void freia_terapix_call
          "  param.size = -1; // not used\n"
          "  param.raw = (void*) &mcu_instr;\n"
          "\n"
-         "  // dyn_param contents"
+         "  // dyn_param contents\n"
          "  dyn_param.raw = &gram;\n"
          "  dyn_param.size = sizeof(terapix_gram);\n");
 
@@ -641,14 +686,14 @@ static void freia_terapix_call
       // update primary imagelet number
       n_imagelets++;
       set_add_element(computed, computed, in);
+      // ??? stupid bug which filters undefined values, i.e. -16
+      // I should really use a container...
       hash_put(allocation, in, (void*) (_int) -n_imagelets);
 
       string sn = strdup(itoa(n)), si = strdup(itoa(n_imagelets));
 
       // ??? tell that n_imagelets is an input
-      sb_cat(dbio, "  // - imagelet ", si);
-      sb_cat(dbio, " is i", sn);
-      sb_cat(dbio, " for ",
+      sb_cat(dbio, "  // - imagelet ", si, " is i", sn, " for ",
              entity_user_name(vtxcontent_out(dagvtx_content(in))),
              "\n");
 
@@ -669,17 +714,19 @@ static void freia_terapix_call
 
   set avail_img = set_make(set_pointer);
 
-  // complete if need be, there will be AT LEAST this numer of images
+  // complete if need be, there will be AT LEAST this number of images
   while (n_imagelets<n_double_buffers)
     set_add_element(avail_img, avail_img, (void*) (_int) ++n_imagelets);
 
   set deads = set_make(set_pointer);
   // newly created parameters at this round
 
+  // generate code for every computation vertex
   int n_ops = 0;
   list vertices = gen_nreverse(gen_copy_seq(dag_vertices(thedag)));
   FOREACH(dagvtx, current, vertices)
   {
+    // skip this vertex
     if (set_belong_p(computed, current))
       continue;
     if (dagvtx_other_stuff_p(current))
@@ -702,10 +749,18 @@ static void freia_terapix_call
     if (api->terapix.memory)
     {
       available_memory -= api->terapix.memory;
-      sb_cat(body, "  // set measure ", api->compact_name,
-             " at ", itoa(available_memory), "\n");
+      string saddr = strdup(itoa(available_memory));
+
+      // computation
+      sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
+      terapix_mcu_val(body, n_ops, "xmin3", saddr);
+      terapix_mcu_val(body, n_ops, "ymin3", "0");
+
+      // extraction
       sb_cat(tail, "  // get measure ", api->compact_name,
-             " result from ", itoa(available_memory), "\n");
+             " result from ", saddr, "\n");
+      sb_cat(tail, "  // ??? not implemented yet...\n");
+      free(saddr);
     }
 
     // if inplace, append freed images to availables
@@ -726,6 +781,7 @@ static void freia_terapix_call
     sb_cat(body, "  // ", itoa(n_ops), ": ", api->compact_name, "(");
     if (ins)
     {
+      // show input imagelet numbers
       int in_count=0;
       FOREACH(int, i, ins)
         sb_cat(body, in_count++? ",": "", itoa(i>0? i: -i));
@@ -740,7 +796,9 @@ static void freia_terapix_call
       // SELECT one available
       choice = select_imagelet(avail_img, &n_imagelets, is_output);
       sb_cat(body, " -> ", itoa((int) choice));
-      if (is_output) choice = -choice;
+      // there is a subtlety here, if no I/O image was available
+      // then a copy will have to be inserted later on, see "PANIC".
+      if (is_output && choice<=n_double_buffers) choice = -choice;
       hash_put(allocation, current, (void*) choice);
     }
     sb_cat(body, "\n");
@@ -803,11 +861,13 @@ static void freia_terapix_call
         // generate copy code old -> oimg
         // hmmm... could not generate a test case where this is triggered...
         // the additional cost which should be reported?
-        sb_cat(body, "  // copy ", itoa(old));
+        sb_cat(body, "  // output copy ", itoa(old));
         sb_cat(body, " -> ", itoa(oimg), "\n");
         list lic = CONS(int, old, NIL);
+        // -oimg to tell the code generator that we are dealing with
+        // a double buffered image...
         terapix_macro_code(body, decl, n_ops, hwac_freia_api(AIPO "copy"),
-                           NULL, NULL, NULL, lic, oimg);
+                           NULL, NULL, NULL, lic, -oimg);
         gen_free_list(lic);
         n_ops++;
       }
@@ -840,7 +900,8 @@ static void freia_terapix_call
   int imagelet_rows = available_memory/total_imagelets; // round down
 
   // declarations when we know the number of operations
-  sb_cat(decl, "  terapix_mcu_macro mcu_macro[2][", itoa(n_ops), "];\n");
+  // [2] for flip/flop double buffer handling
+  sb_cat(decl, "  terapix_mcu_macrocode mcu_macro[2][", itoa(n_ops), "];\n");
   if (n_ins)
     sb_cat(decl, "  terapix_tile_info tile_in[2][", itoa(n_ins), "];\n");
   if (n_outs)
@@ -887,25 +948,36 @@ static void freia_terapix_call
   sb_cat(body, "  mcu_instr.borderBottom = ", itoa(s), ";\n");
   sb_cat(body, "  mcu_instr.borderLeft   = ", itoa(w), ";\n");
   sb_cat(body, "  mcu_instr.borderRight  = ", itoa(e), ";\n");
+  sb_cat(body, "  mcu_instr.imagelet_height = imagelet_size;\n");
+  sb_cat(body, "  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;\n");
 
   sb_cat(body, "\n  // outputs\n");
   sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
   if (n_outs)
-    sb_cat(body, "  mcu_instr.out = tile_out;\n");
+    sb_cat(body,
+           "  mcu_instr.out0 = tile_out[0];\n"
+           "  mcu_instr.out1 = tile_out[1];\n");
   else
-    sb_cat(body, "  mcu_instr.out = NULL;\n");
+    sb_cat(body,
+           "  mcu_instr.out0 = NULL;\n"
+           "  mcu_instr.out1 = NULL;\n");
 
   sb_cat(body, "\n  // inputs\n");
   sb_cat(body, "  mcu_instr.nbin = ", itoa(n_ins), ";\n");
   if (n_ins)
-    sb_cat(body, "  mcu_instr.in = tile_in;\n");
+    sb_cat(body,
+           "  mcu_instr.in0 = tile_in[0];\n"
+           "  mcu_instr.in1 = tile_in[1];\n");
   else
-    sb_cat(body, "  mcu_instr.in = NULL;\n");
+    sb_cat(body,
+           "  mcu_instr.in0 = NULL;\n"
+           "  mcu_instr.in1 = NULL;\n");
 
   sb_cat(body,
          "\n  // actual instructions\n"
          "  mcu_instr.nbinstr = ", itoa(n_ops), ";\n"
-         "  mcu_instr.instr   = mcu_macro;\n");
+         "  mcu_instr.instr0   = mcu_macro[0];\n"
+         "  mcu_instr.instr1   = mcu_macro[1];\n");
 
 
   // tell about imagelet size
@@ -960,6 +1032,60 @@ static void freia_terapix_call
   free(used);
 }
 
+/******************************************************************* ONE DAG */
+
+/* generate terapix code for this one dag, which should be already split.
+ */
+static void freia_trpx_compile_one_dag(
+  string module,
+  list /* of statements */ ls,
+  dag d,
+  string fname_fulldag,
+  int n_split,
+  int n_cut,
+  set global_remainings,
+  FILE * helper_file)
+{
+  ifdebug(4) {
+    dag_consistency_asserts(d);
+    dag_dump(stderr, "one_dag", d);
+  }
+
+  set remainings = set_make(set_pointer);
+  set_append_vertex_statements(remainings, dag_vertices(d));
+
+  // name_<number>_<split>[_<cut>]
+  string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_split)));
+  if (n_cut!=-1)
+  {
+    string s = strdup(cat(fname_dag, "_", itoa(n_cut)));
+    free(fname_dag);
+    fname_dag = s;
+  }
+
+  dag_dot_dump(module, fname_dag, d);
+
+  // - output function in helper file
+  list lparams = NIL;
+
+  string_buffer code = string_buffer_make(true);
+  freia_terapix_call(module, fname_dag, code, d, &lparams);
+  string_buffer_to_file(code, helper_file);
+  string_buffer_free(&code);
+
+  // - and substitute its call...
+  freia_substitute_by_helper_call(d, global_remainings, remainings,
+                                  ls, fname_dag, lparams);
+
+  // cleanup
+  free(fname_dag), fname_dag = NULL;
+}
+
+/************************************************** TERAPIX DAG SCALAR SPLIT */
+
+/* global variable used by the dagvtx_terapix_priority function,
+ * because qsort does not allow to pass some descriptor.
+ */
 static hash_table erosion = NULL;
 
 /* comparison function for sorting dagvtx in qsort,
@@ -1105,6 +1231,8 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
+/* split a dag on scalar dependencies only, with a greedy heuristics.
+ */
 static list /* of dags */ split_dag_on_scalars(const dag initial)
 {
   if (!single_image_assignement_p(initial))
@@ -1178,6 +1306,9 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
         dag_dump(stderr, "pushed dag", nd);
       }
 
+      // ??? hmmm... should not be needed?
+      freia_hack_fix_global_ins_outs(initial, nd);
+
       // update global list of dags to return.
       ld = CONS(dag, nd, ld);
 
@@ -1195,6 +1326,153 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
   return ld;
 }
 
+/*********************************************************** TERAPIX DAG CUT */
+
+/* would it seem interesting to split d?
+ * @return the erosion up to which to split, or 0 of no split
+ * should we also/instead consider the expected cost?
+ */
+static int cut_decision(dag d, hash_table erosion)
+{
+  int com_cost_per_row = get_int_property(trpx_dmabw_prop);
+  int len, width, cost, nops, n, s, w, e;
+  len = dag_terapix_measures(d, erosion, &width, &cost, &nops, &n, &s, &w, &e);
+  int nins = gen_length(dag_inputs(d)), nouts = gen_length(dag_outputs(d));
+
+  // if we assume that the imagelet size is quite large, say around 128
+  // even with double buffers. The only reason to cut is because
+  // of the erosion on the side which reduces the amount of valid data,
+  // but there is really a point to do that only communications are still
+  // masked by computations after splitting the dag...
+
+  // first we compute a possible number of splits
+  // computation cost = communication cost (in cycle per imagelet row)
+  // communication cost = (nins + 2*width*n_splits + nouts) * cost_per_row
+  // the width is taken as the expected number of images to extract and
+  // reinject (hence 2*) if the dag is split.
+  // this is really an approximation... indeed, nothing ensures that
+  // the initial input is not still alive at the chosen cut?
+
+  // for anr999 the gradient of depth 10 is just enough to cover the coms.
+  // for lp, about 1(.2) split is suggested.
+
+  double n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
+
+  pips_debug(2, "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_cuts=%f\n",
+             cost, com_cost_per_row, nins, width, nouts, n_cuts);
+
+  if (n_cuts < 1.0) return 0;
+
+  // we also have to check that there is a significant erosion!
+  // I first summarize the erosion to the max(n,s,e,w)
+  // I could compute per direction, if necessary...
+  int erode = n;
+  if (s>erode) erode=s;
+  if (e>erode) erode=e;
+  if (w>erode) erode=w;
+
+  // then we should decide...
+  // there should be a *lot* of computations to amortize a split,
+  // given that an erode/dilate costs about 15 cycles per row
+  // there should be about 8 of them to amortize/hide one imagelet transfer,
+  // whether as input or output.
+
+  int cut = erode/((int)(n_cuts+1));
+  return cut;
+}
+
+/* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
+ */
+static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
+{
+  pips_debug(2, "cutting with cut=%d\n", cut);
+  pips_assert("something cut width", cut>0);
+
+  // already warned while splitting on scalars
+  // if (!single_image_assignement_p(initial))
+    // well, it should work most of the time, so only a warning
+    // pips_user_warning("image reuse may result in subtly wrong code...\n");
+
+  set
+    // current set of vertices to group
+    current = set_make(set_pointer),
+    // all vertices which are considered computed
+    done = set_make(set_pointer);
+
+  list lcurrent = NIL, computables;
+  set_assign_list(done, dag_inputs(d));
+
+  // transitive closure
+  bool changed = true;
+  while (changed &&
+         (computables = get_computable_vertices(d, done, done, current)))
+  {
+    changed = false;
+    FOREACH(dagvtx, v, computables)
+    {
+      // keep erosion up to cut
+      // hmmm. what about \sigma_{d \in NSEW} erosion_d ?
+      // would not work because the erosion only make sense if it is
+      // the same for all imagelet, or said otherwise the erosion is
+      // aligned to the worst case so that tiling can reasonnably take place.
+      if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
+          (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
+          (((_int) hash_get(erosion, EAST(v))) <= cut) &&
+          (((_int) hash_get(erosion, WEST(v))) <= cut))
+      {
+        set_add_element(current, current, v);
+        set_add_element(done, done, v);
+        lcurrent = gen_nconc(lcurrent, CONS(dagvtx, v, NIL));
+        changed = true;
+      }
+    }
+
+    // cleanup
+    gen_free_list(computables), computables = NIL;
+  }
+
+  pips_assert("some vertices where extracted", lcurrent!=NIL);
+
+  // build extracted dag
+  dag nd = make_dag(NIL, NIL, NIL);
+  FOREACH(dagvtx, v, lcurrent)
+  {
+    // pips_debug(7, "extracting node %" _intFMT "\n", dagvtx_number(v));
+    dag_append_vertex(nd, copy_dagvtx_norec(v));
+  }
+  dag_compute_outputs(nd, NULL);
+  dag_cleanup_other_statements(nd);
+
+  // cleanup full dag
+  FOREACH(dagvtx, v, lcurrent)
+    dag_remove_vertex(d, v);
+
+  // ??? should not be needed?
+  freia_hack_fix_global_ins_outs(fulld, nd);
+  freia_hack_fix_global_ins_outs(fulld, d);
+
+  ifdebug(1)
+  {
+    dag_consistency_asserts(nd);
+    dag_consistency_asserts(d);
+  }
+
+  // cleanup
+  gen_free_list(lcurrent), lcurrent = NIL;
+  set_free(done);
+  set_free(current);
+  return nd;
+}
+
+/*************************************************** TERAPIX HANDLE SEQUENCE */
+
+/* do compile a list of statements for terapix
+ * @param module, current module (function) name
+ * @param ls, list of statements taken from the sequence
+ * @param occs, occurences of images (image -> set of statements)
+ * @param helper_file, file to which code is to be generated
+ * @param number, number of this statement sequence in module
+ */
 void freia_trpx_compile_calls
 (string module,
  list /* of statements */ ls,
@@ -1211,69 +1489,70 @@ void freia_trpx_compile_calls
 
   string fname_fulldag = strdup(cat(module, HELPER, itoa(number)));
 
-  // THIS IS QUITE PRELIMINARY
-
-  // split only on scalar deps... ??? is it that simple? NO!
+  // First, split only on scalar deps...
+  // is it that simple? NO!
   // consider A -> B -> s -> C -> D
   //           \-> E -> F />
   // then ABEF / CD is chosen
   // although ABE / FCD and AB / EFCD would be also possible...
-  // maybe I should do it with an overall splitting as done with spoc?
-  // note that the scheduling is currently "by level" because
-  // each operation is added in the list as soon as it may be
-  // computed.
-  // consider dag d
-  // - full depth?
-  // - number of ins & outs?
-  // - needed intermediate buffers??
-  // - split again with some criterion?
-  // schedule each operation -> order, imagelet number output
-  // should be done by the splitting phase?
-  //  1. ops which do not consume anything (in place, no lost borders)
-  //  2. ops which consume less borders (current max? balanced?)
-  //  3. ops in their initial textual order
-  // ??? could take into account depth? cost? erosion? max lives?
   list ld = split_dag_on_scalars(fulld);
 
-  pips_debug(4, "dag split in %d dags\n", (int) gen_length(ld));
+  pips_debug(4, "dag initial split in %d dags\n", (int) gen_length(ld));
+
+  string dag_cut = get_string_property(trpx_dag_cut);
+  pips_assert("valid cutting strategy", trpx_dag_cut_is_valid(dag_cut));
 
   // globally remaining statements
   set global_remainings = set_make(set_pointer);
   set_assign_list(global_remainings, ls);
 
-  int n_calls = 0;
+  int n_split = 0;
   FOREACH(dag, d, ld)
   {
-    set remainings = set_make(set_pointer);
-    set_append_vertex_statements(remainings, dag_vertices(d));
+    if (trpx_dag_cut_none_p(dag_cut))
+    {
+      // direct handling of the dag
+      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split, -1,
+                                 global_remainings, helper_file);
+    }
+    else if (trpx_dag_cut_compute_p(dag_cut))
+    {
+      // try split dag into subdags with a rough computed strategy
+      hash_table erosion = hash_table_make(hash_pointer, 0);
+      int cut, n_cut = 0;
 
-    // ???
-    // fix internal ins/outs, that are tempered with by split & overflows
-    freia_hack_fix_global_ins_outs(fulld, d);
+      // what about another strategy?
+      // I can try every possible cuts and chose the best one,
+      // that is to stop as soon as computation cost > communication cost?
+      // or when costs are quite balanced in all cuts?
+      // dag cutting strategy prop = none/computed/optimized?
 
-    string fname_dag = strdup(cat(fname_fulldag, "_", itoa(n_calls++)));
+      while ((cut = cut_decision(d, erosion)))
+      {
+        dag dc = cut_perform(d, cut, erosion, fulld);
+        // generate code for cut
+        freia_trpx_compile_one_dag(module, ls, dc, fname_fulldag, n_split,
+                                   n_cut++, global_remainings, helper_file);
+        // cleanup
+        free_dag(dc);
+        hash_table_clear(erosion);
+      }
+      freia_trpx_compile_one_dag(module, ls, d, fname_fulldag, n_split,
+                                 n_cut++, global_remainings, helper_file);
+      hash_table_free(erosion);
+    }
+    else if (trpx_dag_cut_enumerate_p(dag_cut))
+      pips_internal_error("not implemented yet");
+    else
+      pips_internal_error("cannot get there");
 
-    ifdebug(4) dag_dump(stderr, "d", d);
-    dag_dot_dump(module, fname_dag, d);
-
-    // - output function in helper file
-    list lparams = NIL;
-
-    string_buffer code = string_buffer_make(true);
-    freia_terapix_call(module, fname_dag, code, d, &lparams);
-    string_buffer_to_file(code, helper_file);
-    string_buffer_free(&code);
-
-    // - and substitute its call...
-    freia_substitute_by_helper_call(d, global_remainings, remainings,
-                                    ls, fname_dag, lparams);
-    free(fname_dag), fname_dag = NULL;
+    n_split++;
   }
 
   freia_insert_added_stats(ls, added_stats);
   added_stats = NIL;
 
-  // cleanup
+  // full cleanup
   set_free(global_remainings), global_remainings = NULL;
   free(fname_fulldag), fname_fulldag = NULL;
   free_dag(fulld);

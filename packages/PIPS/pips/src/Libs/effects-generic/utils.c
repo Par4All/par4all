@@ -703,12 +703,14 @@ list clean_anywhere_effects(list l_eff)
   while (!ENDP(l_tmp))
     {
       effect eff = EFFECT(CAR(l_tmp));
-
+      pips_debug_effect(4, "considering effect:", eff);
 
       if (malloc_effect_p(eff) || io_effect_p(eff) ||
+	  (!get_bool_property("USER_EFFECTS_ON_STD_FILES") && std_file_effect_p(eff)) ||
 	  (effect_write_p(eff) && !anywhere_w_p) ||
 	  (effect_read_p(eff) && !anywhere_r_p))
 	{
+	  pips_debug(4, "added\n");
 	  l_res = gen_nconc(l_res, CONS(EFFECT, (*effect_dup_func)(eff), NIL));
 	}
       POP(l_tmp);

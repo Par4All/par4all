@@ -26,6 +26,8 @@ AC_CONFIG_SRCDIR([src/Passes/pips/pips.c])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([makes/m4])
 AM_INIT_AUTOMAKE([gnu 1.0])
+AM_SILENT_RULES([yes])
+
 AM_PROG_CC_C_O
 
 # Checks for programs.

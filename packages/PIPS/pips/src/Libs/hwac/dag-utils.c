@@ -216,13 +216,22 @@ static const char* entity_dot_name(entity e)
 static void dagvtx_dot_node(FILE * out, const string prefix, const dagvtx v)
 {
   fprintf(out, "%s\"%"_intFMT" %s\"", prefix? prefix: "",
-    dagvtx_number(v), dagvtx_compact_operation(v));
+          dagvtx_number(v), dagvtx_compact_operation(v));
+}
+
+static void
+dagvtx_dot_node_sb(string_buffer sb, const string prefix, const dagvtx v)
+{
+  sb_cat(sb, prefix? prefix: "");
+  sb_cat(sb, "\"", itoa((int) dagvtx_number(v)),
+         " ", dagvtx_compact_operation(v),  "\"");
 }
 
 static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 {
-  bool label_nodes = get_bool_property("FREIA_LABEL_NODES");
-  bool show_arcs = get_bool_property("FREIA_LABEL_ARCS");
+  bool label_nodes = get_bool_property("FREIA_DAG_LABEL_NODES");
+  bool show_arcs = get_bool_property("FREIA_DAG_LABEL_ARCS");
+  bool filter_nodes = get_bool_property("FREIA_DAG_FILTER_NODES");
 
   vtxcontent co = dagvtx_content(vtx);
   const char* vname = NULL;
@@ -231,51 +240,68 @@ static void dagvtx_dot(FILE * out, const dag d, const dagvtx vtx)
 
   if (dagvtx_number(vtx)!=0)
   {
+    // we are dealing with a computation...
     string attribute = what_operation_shape(vtxcontent_optype(co));
+    string_buffer sa = string_buffer_make(true);
+    bool some_arcs = false;
 
-    dagvtx_dot_node(out, "  ", vtx);
-    fprintf(out, " [%s", attribute);
-    if (!label_nodes)
-      // show a short label with only the operation
-      fprintf(out, ",label=\"%s\"", dagvtx_compact_operation(vtx));
-    fprintf(out, "];\n");
-
-    // image dependencies
+    // first check for image dependencies
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
     {
-      dagvtx_dot_node(out, "  ", vtx);
-      dagvtx_dot_node(out, " -> ", succ);
-      fprintf(out, "%s%s%s;\n", show_arcs? " [label=\"": "",
-        show_arcs? vname: "", show_arcs? "\"]": "");
+      dagvtx_dot_node_sb(sa, "  ", vtx);
+      dagvtx_dot_node_sb(sa, " -> ", succ);
+      sb_cat(sa, show_arcs? " [label=\"": "",
+             show_arcs? vname: "", show_arcs? "\"]": "", ";\n");
+      some_arcs = true;
     }
 
-    // scalar dependencies anywhere... hmmm...
+    // then scalar dependencies anywhere... hmmm...
     FOREACH(dagvtx, v, dag_vertices(d))
     {
       list vars = NIL;
       if (vtx!=v && freia_scalar_rw_dep(dagvtx_statement(vtx),
-          dagvtx_statement(v), &vars))
+                                        dagvtx_statement(v), &vars))
       {
-        dagvtx_dot_node(out, "  ", vtx);
-        dagvtx_dot_node(out, " -> ", v);
-        fprintf(out, " [" SCL_DEP);
+        dagvtx_dot_node_sb(sa, "  ", vtx);
+        dagvtx_dot_node_sb(sa, " -> ", v);
+        sb_cat(sa, " [" SCL_DEP);
 
         if (vars && show_arcs)
         {
           int count = 0;
-          fprintf(out, ",label=\"");
+          sb_cat(sa, ",label=\"");
           FOREACH(entity, var, vars)
-            fprintf(out, "%s%s", count++? " ": "", entity_dot_name(var));
-          fprintf(out, "\"");
+            sb_cat(sa, count++? " ": "", entity_dot_name(var));
+          sb_cat(sa, "\"");
         }
-        fprintf(out, "];\n");
+        sb_cat(sa, "];\n");
+
+        some_arcs = true;
       }
       gen_free_list(vars), vars = NIL;
     }
+
+    bool some_image_stuff = !dagvtx_other_stuff_p(vtx);
+
+    if (!filter_nodes || some_image_stuff || (filter_nodes && some_arcs))
+    {
+      // appends the node description
+      dagvtx_dot_node(out, "  ", vtx);
+      fprintf(out, " [%s", attribute);
+      if (!label_nodes)
+        // show a short label with only the operation
+        fprintf(out, ",label=\"%s\"", dagvtx_compact_operation(vtx));
+      fprintf(out, "];\n");
+      // now appends arcs...
+      string_buffer_to_file(sa, out);
+    }
+
+    // cleanup
+    string_buffer_free(&sa);
   }
   else
   {
-    // input image...
+    // this is an input image.
     FOREACH(dagvtx, succ, dagvtx_succs(vtx))
     {
       fprintf(out, "  \"%s\"", vname);
@@ -294,22 +320,27 @@ static void dagvtx_list_dot(FILE * out, const string comment, const list l)
   fprintf(out, "\n");
 }
 
-/* dag debug with dot format.
+/* @brief output dag in dot format, for debug or show
+ * @param out, append to this file
+ * @param what, name of dag
+ * @param d, dag to output
  */
 void dag_dot(FILE * out, const string what, const dag d)
 {
   fprintf(out, "digraph \"%s\" {\n", what);
 
+  // first, declare inputs and outputs as circles
   dagvtx_list_dot(out, "inputs", dag_inputs(d));
   dagvtx_list_dot(out, "outputs", dag_outputs(d));
 
+  // second, show computations
   fprintf(out, "  // computation vertices\n");
   FOREACH(dagvtx, vx, dag_vertices(d))
   {
     dagvtx_dot(out, d, vx);
     vtxcontent c = dagvtx_content(vx);
 
-    // outputs arcs for vx
+    // outputs arcs for vx when the result is extracted
     if (gen_in_list_p(vx, dag_outputs(d)))
     {
       dagvtx_dot_node(out, "  ", vx);
@@ -348,7 +379,9 @@ void dag_dot_dump_prefix(string module, string prefix, int number, dag d)
 
 // debug help
 static void check_removed(const dagvtx v, const dagvtx removed)
-{ pips_assert("not removed vertex", v!=removed); }
+{
+  pips_assert("not removed vertex", v!=removed);
+}
 
 static int dagvtx_cmp_entity(const dagvtx * v1, const dagvtx * v2)
 {
@@ -361,26 +394,69 @@ static void vertex_list_sorted_by_entities(list l)
   gen_sort_list(l, (gen_cmp_func_t) dagvtx_cmp_entity);
 }
 
+/* do some consistency checking...
+ */
+void dag_consistency_asserts(dag d)
+{
+  FOREACH(dagvtx, v, dag_inputs(d))
+    pips_assert("vertex once in inputs", gen_occurences(v, dag_inputs(d))==1);
+
+  set variable_seen = set_make(set_pointer);
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    entity image = dagvtx_image(v);
+    // fprintf(stdout, " - image %s\n", entity_name(image));
+    pips_assert("image is defined", image!=entity_undefined);
+    pips_assert("variable only once in inputs",
+                !set_belong_p(variable_seen, image));
+    set_add_element(variable_seen, variable_seen, image);
+  }
+  set_free(variable_seen);
+}
+
+/* remove unused inputs
+ */
+static void dag_remove_unused_inputs(dag d)
+{
+  list nl = NIL;
+  FOREACH(dagvtx, v, dag_inputs(d))
+  {
+    if (dagvtx_succs(v)!=NIL) // do we keep it?
+      nl = CONS(dagvtx, v, nl);
+    else
+      gen_remove(&dag_vertices(d), v);
+      // ??? memory leak? there may be "pointers" somewhere to these?
+      // free_dagvtx(v);
+  }
+  if (dag_inputs(d)) gen_free_list(dag_inputs(d));
+  dag_inputs(d) = gen_nreverse(nl);
+}
+
 /* remove vertex v from dag d.
  * if v isx a used computation vertex, it is substituted by an input vertex.
  */
 void dag_remove_vertex(dag d, const dagvtx v)
 {
-  pips_assert("vertex is in dag", gen_in_list_p(v, dag_vertices(d)));
+  // hmmm...
+  // pips_assert("vertex is in dag", gen_in_list_p(v, dag_vertices(d)));
+  if (!gen_in_list_p(v, dag_vertices(d)))
+    // already done???
+    return;
 
   if (dagvtx_succs(v))
   {
+    // the ouput of the removed operation becomes an input to the dag
     entity var = vtxcontent_out(dagvtx_content(v));
     pips_assert("some variable", var!=entity_undefined);
     dagvtx input =
       make_dagvtx(make_vtxcontent(0, 0, make_pstatement_empty(), NIL, var),
-      gen_copy_seq(dagvtx_succs(v)));
+                  gen_copy_seq(dagvtx_succs(v)));
     dag_inputs(d) = CONS(dagvtx, input, dag_inputs(d));
     dag_vertices(d) = CONS(dagvtx, input, dag_vertices(d));
     vertex_list_sorted_by_entities(dag_inputs(d));
   }
 
-  // remove from vertex lists
+  // remove from all vertex lists
   gen_remove(&dag_vertices(d), v);
   gen_remove(&dag_inputs(d), v);
   gen_remove(&dag_outputs(d), v);
@@ -388,6 +464,9 @@ void dag_remove_vertex(dag d, const dagvtx v)
   // remove from successors of any ???
   FOREACH(dagvtx, dv, dag_vertices(d))
     gen_remove(&dagvtx_succs(dv), v);
+
+  // cleanup input list
+  dag_remove_unused_inputs(d);
 
   // unlink vertex itself
   gen_free_list(dagvtx_succs(v)), dagvtx_succs(v) = NIL;
@@ -1223,6 +1302,8 @@ static dagvtx find_twin_vertex(dag d, dagvtx target)
  */
 void freia_hack_fix_global_ins_outs(dag dfull, dag d)
 {
+  // cleanup inputs?
+  // cleanup outputs
   FOREACH(dagvtx, v, dag_vertices(d))
   {
     if (dagvtx_number(v)!=0 &&
@@ -1478,6 +1559,7 @@ static void dag_append_freia_call(dag d, statement s)
  * @param module
  * @param list of statements in sequence
  * @param number dag identifier in function
+ * @param occurrences entity -> set of statements where they appear
  * @param added_stat list of statements killed by dag optimization
  */
 dag build_freia_dag(string module, list ls, int number,

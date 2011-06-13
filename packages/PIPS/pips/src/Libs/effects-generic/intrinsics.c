@@ -1144,7 +1144,12 @@ static IntrinsicDescriptor IntrinsicEffectsDescriptorTable[] = {
   {POPEN_FUNCTION_NAME,                    no_write_effects},
   {CUSERID_FUNCTION_NAME,                  no_write_effects},
   {TEMPNAM_FUNCTION_NAME,                  no_write_effects},
-  {GETOPT_FUNCTION_NAME,                   no_write_effects},
+  {GETOPT_FUNCTION_NAME,                   no_write_effects}, // unistd.h,
+							      // side effects
+  {GETOPT_LONG_FUNCTION_NAME,              no_write_effects}, // getopt.h,
+							      // side effects
+  {GETOPT_LONG_ONLY_FUNCTION_NAME,         no_write_effects}, // same
+							      // as above
   {GETSUBOPT_FUNCTION_NAME,                no_write_effects},
   {GETW_FUNCTION_NAME,                     no_write_effects},
   {PUTW_FUNCTION_NAME,                     no_write_effects},

@@ -105,8 +105,24 @@
 bool entity_hpfc_dummy_p(e)
 entity e;
 {
-    return(same_string_p(entity_module_name(e), HPFC_PACKAGE));
+  return same_string_p(entity_module_name(e), HPFC_PACKAGE);
 }
+
+/********************************************************* DUMMY VARIABLES */
+
+#define PRIME_LETTER_FOR_VARIABLES      "p"
+
+/* define to build the _dummy and _prime of a variable.
+ */
+#define GET_DUMMY_VARIABLE_ENTITY(MODULE, NAME, lname)                  \
+  entity get_ith_##lname##_dummy(int i)                                 \
+  {                                                                     \
+    return get_ith_dummy(MODULE, NAME, i);                              \
+  }                                                                     \
+  entity get_ith_##lname##_prime(int i)                                 \
+  {                                                                     \
+    return get_ith_dummy(MODULE, NAME PRIME_LETTER_FOR_VARIABLES, i);   \
+  }
 
 GET_DUMMY_VARIABLE_ENTITY(REGIONS_MODULE_NAME,	PHI_PREFIX, 	region)
 GET_DUMMY_VARIABLE_ENTITY(HPFC_PACKAGE, 	ALPHA_PREFIX, 	array)
@@ -127,9 +143,9 @@ GENERIC_LOCAL_FUNCTION(dummy_to_prime, entitymap)
 static void put_dummy_and_prime(gen1, gen2)
 entity (*gen1)(), (*gen2)();
 {
-    int i;
-    for(i=7; i>0; i--)
-	store_dummy_to_prime(gen1(i), gen2(i));
+  int i;
+  for(i=7; i>0; i--)
+    store_dummy_to_prime(gen1(i), gen2(i));
 }
 
 #define STORE(name) \

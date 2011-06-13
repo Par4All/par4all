@@ -198,7 +198,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
   // nullary
   { AIPO "set_constant", "C", NULL, 1, 0, 0, 1, NO_PARAM, { TY_INT, NULL, NULL},
     { spoc_output_0|spoc_alu, NO_POC, alu_copy_cst, NO_MES },
-    TRPX_OP(2, "SET_CONST?")
+    TRPX_OP(2, "SET_CONST")
   },
   // not a real one, this is used internally only
   // semantics of "scalar_copy(a, b);" is "*a = *b;"
@@ -213,7 +213,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0|spoc_output_0, NO_POC, alu_unused, NO_MES },
     TRPX_OP(3, "COPY")
   },
-  { // not implemented by SPOC!
+  { // not implemented by SPOC! nor TERAPIX!
     AIPO "cast", "=()", NULL, 1, 1, 0, 0, NO_PARAM, NO_PARAM,
     NO_SPOC, NO_TERAPIX
   },
@@ -253,27 +253,27 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     },
-    TRPX_MS(1, 3, "MIN?")
+    TRPX_MS(1, 3, "GLOBAL_MIN?")
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max, measure_none }
     },
-    TRPX_MS(1, 3, "MAX?")
+    TRPX_MS(1, 3, "GLOBAL_MAX")
   },
   { AIPO "global_min_coord", "min!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
     },
-    TRPX_MS(1, 3, "MIN_COORD?")
+    TRPX_MS(4, 3, "GLOBAL_MIN_COORD?")
   },
   { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_max_coord, measure_none }
     },
-    TRPX_MS(1, 3, "MAX_COORD?")
+    TRPX_MS(4, 3, "GLOBAL_MAX_COORD")
   },
   { AIPO "global_vol", "vol", NULL, 0, 1, 1, 0,
     { TY_PIN, NULL, NULL }, NO_PARAM,
