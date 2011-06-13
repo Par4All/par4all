@@ -266,23 +266,28 @@ list gen_insert_before(const void * no, const void * o, list l)
 
 #define NEXT(cp) (((cp) == NIL) ? NIL : (cp)->cdr)
 
+/* @brief reverse a list in place
+ * @param cp, the list to be reversed
+ * @return the list reversed
+ */
 list gen_nreverse(list cp)
 {
-    cons *next, *next_next ;
+  cons *next, *next_next ;
 
-    if( cp == NIL || cp->cdr == NIL ) return( cp ) ;
+  if( cp == NIL || cp->cdr == NIL ) return( cp ) ;
 
-    next = cp->cdr ;
-    cp->cdr = NIL ;
-    next_next = NEXT( next ) ;
+  next = cp->cdr ;
+  cp->cdr = NIL;
+  next_next = NEXT( next );
 
-    for( ; next != NIL ; ) {
-	next->cdr = cp ;
-	cp = next ;
-	next = next_next ;
-	next_next = NEXT( next_next ) ;
-    }
-    return( cp ) ;
+  for( ; next != NIL ; )
+  {
+    next->cdr = cp ;
+    cp = next ;
+    next = next_next ;
+    next_next = NEXT( next_next ) ;
+  }
+  return cp;
 }
 
 /**@brief free the spine of the list
@@ -290,13 +295,13 @@ list gen_nreverse(list cp)
  */
 void gen_free_list(list l)
 {
-    list p, nextp ;
-    for( p = l ; p != NIL ; p = nextp ) {
-	nextp = p->cdr ;
-	CAR(p).p = NEWGEN_FREED; /* clean */
-	CDR(p) = (struct cons*) NEWGEN_FREED;
-	free( p ) ;
-    }
+  list p, nextp ;
+  for( p = l ; p != NIL ; p = nextp ) {
+    nextp = p->cdr ;
+    CAR(p).p = NEWGEN_FREED; /* clean */
+    CDR(p) = (struct cons*) NEWGEN_FREED;
+    free( p );
+  }
 }
 
 /**@brief physically concatenates CP1 and CP2 but do not duplicates the
@@ -665,12 +670,12 @@ gen_chunk gen_nth(int n, const list l)
 */
 list gen_once(const void * vo, list l)
 {
-    gen_chunk * item = (gen_chunk*) vo;
-    list c;
-    for(c=l; c!=NIL; c=CDR(c))
-	if (CHUNK(CAR(c))==item) return(l);
+  gen_chunk * item = (gen_chunk*) vo;
+  list c;
+  for(c=l; c!=NIL; c=CDR(c))
+    if (CHUNK(CAR(c))==item) return l;
 
-    return(CONS(CHUNK, item, l));
+  return CONS(CHUNK, item, l);
 }
 
 bool gen_in_list_p(const void * vo, const list lx)
@@ -697,14 +702,13 @@ int gen_occurences(const void * vo, const list l)
 */
 bool gen_once_p(list l)
 {
-    list c;
-    for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
-	gen_chunk * item = CHUNK(CAR(c));
-	if(gen_in_list_p(item , CDR(c)))
+  list c;
+  for(c=l; c!=NIL && CDR(c)!=NIL; c=CDR(c)) {
+    gen_chunk * item = CHUNK(CAR(c));
+    if(gen_in_list_p(item , CDR(c)))
 	    return FALSE;
-    }
-
-    return TRUE;
+  }
+  return TRUE;
 }
 
 /* free an area.
@@ -736,27 +740,27 @@ void gen_free_area(void ** p, int size)
  */
 void gen_sort_list(list l, gen_cmp_func_t compare)
 {
-    list c;
-    int n = gen_length(l);
-    gen_chunk
-	**table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
-	**point;
+  list c;
+  int n = gen_length(l);
+  gen_chunk
+    **table = (gen_chunk**) alloc(n*sizeof(gen_chunk*)),
+    **point;
 
-    /*   the list items are first put in the temporary table,
-     */
-    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
-	*point = CHUNK(CAR(c));
+  /*   the list items are first put in the temporary table,
+   */
+  for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
+    *point = CHUNK(CAR(c));
 
-    /*    then sorted,
-     */
-    qsort(table, n, sizeof(gen_chunk*), compare);
+  /*    then sorted,
+   */
+  qsort(table, n, sizeof(gen_chunk*), compare);
 
-    /*    and the list items are updated with the sorted table
-     */
-    for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
-	CHUNK(CAR(c)) = *point;
+  /*    and the list items are updated with the sorted table
+   */
+  for (c=l, point=table; !ENDP(c); c=CDR(c), point++)
+    CHUNK(CAR(c)) = *point;
 
-    gen_free_area((void**) table, n*sizeof(gen_chunk*));
+  gen_free_area((void**) table, n*sizeof(gen_chunk*));
 }
 
 
