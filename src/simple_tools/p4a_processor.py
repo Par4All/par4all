@@ -189,7 +189,7 @@ class p4a_processor(object):
                  filter_exclude = None, accel = False, cuda = False,
                  openmp = False, com_optimization = False, fftw3 = False,
                  recover_includes = True, native_recover_includes = False,
-                 c99 = False,
+                 c99 = False, use_pocc = False, atomic = False,
                  properties = {}, apply_phases={}, activates = []):
 
         self.recover_includes = recover_includes
@@ -200,6 +200,8 @@ class p4a_processor(object):
         self.com_optimization = com_optimization
         self.fftw3 = fftw3
         self.c99 = c99
+        self.pocc = use_pocc
+        self.atomic = atomic
         self.apply_phases = apply_phases
 
         if workspace:
@@ -256,9 +258,12 @@ class p4a_processor(object):
             # we really need it.
             global pyps
             global broker
+            global pocc
             try:
                 pyps = __import__("pyps")
                 broker = __import__("broker")
+                if self.pocc:
+                    pocc = __import__("pocc")
             except:
                 raise
 
@@ -358,6 +363,9 @@ class p4a_processor(object):
         """Apply transformations to parallelize the code in the workspace
         """
         all_modules = self.filter_modules(filter_select, filter_exclude)
+        if fine:
+            #set to False (mandatory) for A&K algorithm on C source file
+            self.workspace.props.memory_effects_only = self.fortran
 
 		#Apply requested phases before parallezation
         apply_user_requested_phases(all_modules, apply_phases_before)
@@ -368,6 +376,9 @@ class p4a_processor(object):
         if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code(concurrent=True)
+        elif self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            all_modules.coarse_grain_parallelization_with_reduction(concurrent=True)
         else:
             # Use a coarse-grain parallelization with regions:
             all_modules.coarse_grain_parallelization(concurrent=True)
@@ -558,6 +569,7 @@ class p4a_processor(object):
 
     def gpuify(self, filter_select = None,
                 filter_exclude = None,
+                fine = False,
                 apply_phases_kernel = [],
                 apply_phases_kernel_launcher = [],
                 apply_phases_wrapper = [],
@@ -605,7 +617,18 @@ class p4a_processor(object):
         # dependent resources:
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
-        kernel_launchers.coarse_grain_parallelization(concurrent=True)
+        if self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            kernel_launchers.coarse_grain_parallelization_with_reduction(concurrent=True)
+            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
+        else:
+            kernel_launchers.coarse_grain_parallelization(concurrent=True)
+        
+        
+        if fine:
+            # When using a fine-grain parallelization (Allen & Kennedy) for
+            # producing launchers, we have to do it also in the launcher now.
+            kernel_launchers.internalize_parallel_code(concurrent=True)
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
@@ -632,6 +655,13 @@ class p4a_processor(object):
 		#Apply requested phases to kernel
         apply_user_requested_phases(kernels, apply_phases_kernel)
 
+        # Select wrappers by using the fact that all the generated wrappers
+        # have their names of this form:
+        wrapper_prefix = self.get_wrapper_prefix()
+        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
+        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
+
+
         if not self.com_optimization :
             # Add communication around all the call site of the kernels. Since
             # the code has been outlined, any non local effect is no longer an
@@ -641,21 +671,21 @@ class p4a_processor(object):
                                                )
         else :
             # Identify kernels first
-            kernels.flag_kernel()
+            kernel_launchers.flag_kernel()
             #kernel for fftw3 runtime
             fftw3_kernel_filter_re = re.compile("^fftw.?_execute")
             fftw3_kernels = self.workspace.filter(lambda m: fftw3_kernel_filter_re.match(m.name))
             fftw3_kernels.flag_kernel()
             self.workspace.fun.main.kernel_data_mapping(KERNEL_LOAD_STORE_LOAD_FUNCTION="P4A_runtime_copy_to_accel",KERNEL_LOAD_STORE_STORE_FUNCTION="P4A_runtime_copy_from_accel")
 
-        # Select wrappers by using the fact that all the generated wrappers
-        # have their names of this form:
-        wrapper_prefix = self.get_wrapper_prefix()
-        wrapper_filter_re = re.compile(wrapper_prefix  + "_\\w+$")
-        wrappers = self.workspace.filter(lambda m: wrapper_filter_re.match(m.name))
-
 		#Apply requested phases to wrappers
         apply_user_requested_phases(wrappers, apply_phases_wrapper)
+        
+        # wrap kernel launch for communication optimization runtime
+        if self.com_optimization :
+            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
+            wrappers.cast_at_call_sites()
+
 
         # Select fortran wrappers by using the fact that all the generated
         # fortran wrappers
@@ -671,6 +701,7 @@ class p4a_processor(object):
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
         if (self.fortran == False):
+            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
             wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
         else:
@@ -689,8 +720,8 @@ class p4a_processor(object):
             kernels.set_return_type_as_typedef(SET_RETURN_TYPE_AS_TYPEDEF_NEW_TYPE=self.kernel_return_type)
             if (self.c99 == True):
                 self.generated_modules.extend (map(lambda x:x.name, kernel_launchers))
-                self.generated_modules.extend (map(lambda x:x.name, wrappers))
-                self.generated_modules.extend (map(lambda x:x.name, kernels))
+                #self.generated_modules.extend (map(lambda x:x.name, wrappers))
+                #self.generated_modules.extend (map(lambda x:x.name, kernels))
         else:
             # generate the C version of kernels, wrappers and launchers.
             # kernel and wrappers need to be prettyprinted with arrays as
@@ -723,10 +754,6 @@ class p4a_processor(object):
             kernel_launchers.print_interface ()
             self.interface_modules.extend (map(lambda x:x.name, kernel_launchers))
             self.generated_modules.extend (map(lambda x:x.name, f_wrappers))
-
-        if self.com_optimization :
-            wrappers.wrap_kernel_argument(WRAP_KERNEL_ARGUMENT_FUNCTION_NAME="P4A_runtime_host_ptr_to_accel_ptr")
-            wrappers.cast_at_call_sites()
 
 		#Apply requested phases to kernels, wrappers and kernel_launchers after gpuify
         apply_user_requested_phases(kernels, apply_phases_after)
@@ -772,6 +799,13 @@ class p4a_processor(object):
         apply_user_requested_phases(modules, apply_phases_before)
         modules.ompify_code(concurrent=True)
         modules.omp_merge_pragma(concurrent=True)
+
+        if self.pocc:
+            try:
+                modules.poccify()
+            except RuntimeError:
+                e = sys.exc_info()
+                p4a_util.warn("PoCC returned an error : " + str(e[1]))
 
 		#Apply requested phases after ompify to modules
         apply_user_requested_phases(modules, apply_phases_after)
@@ -1051,13 +1085,12 @@ class p4a_processor(object):
         if ((not (os.path.isdir(output_dir))) and (new_file_flag == True)):
             os.makedirs (output_dir)
 
-        # During the cuda generation process, launchers kernels and wrappers
-        # might have
-        # been generated in different files. This is forbidden by cuda.
-        # Let's merge them in the same files
+        # Nvcc compiles .cu files as C++, thus we add extern C { declaration
+        # to prevent mangling
         if ((self.c99 == True) and (self.cuda == True)):
             self.launchers_insert_extern_C ()
-            self.merge_lwk ()
+            #no longer needed
+            #self.merge_lwk ()
 
         # save the user files
         output_files.extend (self.save_user_file (dest_dir, prefix, suffix))

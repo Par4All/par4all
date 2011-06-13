@@ -546,4 +546,19 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
 /** @} */
 
+
+
+
+/** @defgroup Atomic operation macros definitions
+
+    @{
+*/
+#define atomicAddInt(operand,val) atomicInc(operand,val)
+
+// FIXME still others to define...
+
+/** @} */
+
+
 #endif //P4A_ACCEL_CUDA_H
+

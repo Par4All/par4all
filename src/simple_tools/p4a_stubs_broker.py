@@ -13,7 +13,16 @@ class p4a_stubs_broker(broker.broker):
 
 
     def stub_file_for_module(self, module):
-        return self.generate_p4a_accel_copy(module)
+        try:
+            return self.generate_p4a_accel_copy(module)
+        except:
+            pass
+
+        try:
+            return self.generate_p4a_atomic(module)
+        except:
+            pass
+        
         
         for broker_dir in self.get_broker_dirs():
             fname = os.path.join(broker_dir,module+".c")
@@ -28,13 +37,34 @@ class p4a_stubs_broker(broker.broker):
                             if os.path.isdir(d1))                
                 ]
 
+    def generate_p4a_atomic(self,module):
+        accepted_name = re.compile(r"atomic(Add|Sub|Inc|Dec|And|Or|Xor)(Int|Float)")
+        matched_name = accepted_name.match(module)
+        if matched_name == None :
+            # will be catched :)
+            print "not matched "+module
+            raise Exception()
+
+        generated = "void " + module
+        if matched_name.group(1)!="Add":
+            raise Exception()
+        operator = "+"
+        
+        if matched_name.group(2)!="Int":
+            raise Exception()
+        type = "int"
+
+        generated += "("+type +" *a, "+type+" val) { *a=*a" + operator + "val; }\n"
+        
+        return self.generate_stub_for_module(module,generated)
+        
     def generate_p4a_accel_copy(self,module):
         accepted_name = re.compile(r"P4A_copy_(to|from)_accel_([0-9]+)d")
         matched_name = accepted_name.match(module)
         if matched_name == None :
             # will be catched :)
             print "not matched "+module
-            raise RuntimeException()
+            raise Exception()
         
         ndim = int(matched_name.group(2))
         generated_stub = "void " + module + "(int element_size,\n"

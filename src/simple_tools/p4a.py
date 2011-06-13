@@ -72,6 +72,12 @@ def add_own_options(parser):
     proc_group.add_option("--fine", "-F", action = "store_true", default = False,
         help = "Use a fine-grained parallelization algorithm instead of a coarse-grained one.")
 
+    proc_group.add_option("--atomic", action = "store_true", default = False,
+        help = "Use atomic operations for parallelizing reductions on GPU.")
+
+    proc_group.add_option("--pocc", action = "store_true", default = False,
+        help = "Use PoCC to optimize loop nest.")
+
     proc_group.add_option("--select-modules", metavar = "REGEXP", default = None,
         help = "Process only the modules (functions and subroutines) whith names matching the regular expression. For example '^saxpy$|dgemm\' will keep only functions or procedures which name is exactly saxpy or contains \"dgemm\". For more information about regular expressions, look at the section 're' of the Python library reference for example. In Fortran, the regex should match uppercase names. Be careful to escape special characters from the shell. Simple quotes are a good way to go for it.")
 
@@ -465,6 +471,7 @@ def main():
             accel_openmp = options.accel,
             icc = options.icc,
             cuda = options.cuda,
+            atomic = options.atomic,
             com_optimization = options.com_optimization,
             fftw3 = options.fftw3,
             add_debug_flags = options.debug,
@@ -507,6 +514,8 @@ def main():
             input.openmp = options.openmp
             input.scmp = options.scmp
             input.fine = options.fine
+            input.atomic = options.atomic
+            input.pocc = options.pocc
             input.select_modules = options.select_modules
             input.exclude_modules = options.exclude_modules
             input.cpp_flags = " ".join(builder.cpp_flags)
