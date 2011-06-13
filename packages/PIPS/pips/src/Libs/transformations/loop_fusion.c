@@ -972,13 +972,18 @@ restart_loop: ;
         fusion_block block = (fusion_block)REFCAR(block_iter);
 
         if(block->num < 0) { // to be removed
-          CDR(prev_block_iter) = CDR(block_iter); // prev_block_iter cannot be null
-          free(block_iter);
-          block_iter = CDR(prev_block_iter);
-          continue;
+          if(prev_block_iter==NIL) {
+            block_list = CDR(block_iter);
+          } else {
+            CDR(prev_block_iter) = CDR(block_iter);
+          }
+          list garbage = block_iter;
+          block_iter = CDR(block_iter);
+          free(garbage);
+        } else {
+          prev_block_iter = block_iter;
+          block_iter = CDR(block_iter);
         }
-        prev_block_iter = block_iter;
-        block_iter = CDR(block_iter);
       }
 
       /* Regenerate sequence now

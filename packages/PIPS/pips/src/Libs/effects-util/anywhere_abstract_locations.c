@@ -590,31 +590,37 @@ entity variable_to_abstract_location(entity v)
 entity abstract_locations_max(entity al1, entity al2)
 {
   entity e = entity_undefined;
-  string ln1 = entity_local_name(al1);
-  string ln2 = entity_local_name(al2);
-  string mn1 = strdup(entity_module_name(al1));
-  string mn2 = strdup(entity_module_name(al2));
-  string ln;
-  string mn;
 
-  if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
-    //pips_internal_error("Option not implemented yet.");
-    pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
-		      " for abstract locations.\n");
-  }
-
-  if(strcmp(ln1, ln2)==0)
-    ln = ln1;
+  if (same_entity_p(al1, al2)) /* avoid costly string operations in trivial case */
+    e = al1;
   else
-    ln = ANYWHERE_LOCATION;
+    {
+      string ln1 = entity_local_name(al1);
+      string ln2 = entity_local_name(al2);
+      string mn1 = strdup(entity_module_name(al1));
+      string mn2 = strdup(entity_module_name(al2));
+      string ln;
+      string mn;
 
-  if(strcmp(mn1, mn2)==0)
-    mn = mn1;
-  else
-    mn = ANY_MODULE_NAME;
-  e = FindOrCreateEntity(mn, ln);
-  free(mn1);
-  free(mn2);
+      if(!get_bool_property("ALIASING_ACROSS_TYPES")) {
+	//pips_internal_error("Option not implemented yet.");
+	pips_user_warning("property \"ALIASING_ACROSS_TYPES\" is assumed true"
+			  " for abstract locations.\n");
+      }
+
+      if(strcmp(ln1, ln2)==0)
+	ln = ln1;
+      else
+	ln = ANYWHERE_LOCATION;
+
+      if(strcmp(mn1, mn2)==0)
+	mn = mn1;
+      else
+	mn = ANY_MODULE_NAME;
+      e = FindOrCreateEntity(mn, ln);
+      free(mn1);
+      free(mn2);
+    }
   return e;
 }
 

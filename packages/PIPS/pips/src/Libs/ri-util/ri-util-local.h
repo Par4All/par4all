@@ -437,7 +437,9 @@
 #define GETCWD_FUNCTION_NAME            "getcwd"
 #define GETEXECNAME_FUNCTION_NAME       "getexecname"
 #define GETLOGIN_FUNCTION_NAME          "getlogin"
-#define GETOPT_FUNCTION_NAME            "getopt"
+#define GETOPT_FUNCTION_NAME            "getopt" // unistd.h
+#define GETOPT_LONG_FUNCTION_NAME       "getopt_long"
+#define GETOPT_LONG_ONLY_FUNCTION_NAME  "getopt_long_only"
 #define GETPASS_FUNCTION_NAME           "getpass"
 #define GETPASSPHRASE_FUNCTION_NAME     "getpassphrase"
 #define GETPW_FUNCTION_NAME             "getpw"
@@ -1691,19 +1693,6 @@ enum remove_a_control_from_a_list_and_relink_direction
       };
 typedef enum remove_a_control_from_a_list_and_relink_direction
 remove_a_control_from_a_list_and_relink_direction;
-
-
-/********************************************************* DUMMY VARIABLES */
-
-#define PRIME_LETTER_FOR_VARIABLES      "p"
-
-/* define to build the _dummy and _prime of a variable.
- */
-#define GET_DUMMY_VARIABLE_ENTITY(MODULE, NAME, lname)\
-entity get_ith_##lname##_dummy(int i)\
-    {return(get_ith_dummy(MODULE, NAME, i));}\
-entity get_ith_##lname##_prime(int i)\
-    {return(get_ith_dummy(MODULE, NAME PRIME_LETTER_FOR_VARIABLES, i));}
 
 /* Constants for some ex-atomizer variable generation */
 

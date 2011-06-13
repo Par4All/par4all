@@ -29,29 +29,44 @@
 #ifndef HWAC_FREIA_TERAPIX_H_
 #define HWAC_FREIA_TERAPIX_H_
 
-#define trpx_mem_prop "HWAC_TERAPIX_RAMPE"
-#define trpx_npe_prop "HWAC_TERAPIX_NPE"
-#define trpx_dmabw_prop "HWAC_TERAPIX_DMABW"
-#define trpx_gram_width "HWAC_TERAPIX_GRAM_WIDTH"
+// terapix specific property names
+#define trpx_mem_prop    "HWAC_TERAPIX_RAMPE"
+#define trpx_npe_prop    "HWAC_TERAPIX_NPE"
+#define trpx_dmabw_prop  "HWAC_TERAPIX_DMABW"
+#define trpx_gram_width  "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
+#define trpx_dag_cut     "HWAC_TERAPIX_DAG_CUT"
 
-#define FREIA_TRPX_INCLUDES			\
-  "#include <freiaCommon.h>\n"			\
+// various dag cutting strategies for terapix
+#define trpx_dag_cut_none_p(s) same_string_p(s, "none")
+#define trpx_dag_cut_compute_p(s) same_string_p(s, "compute")
+#define trpx_dag_cut_enumerate_p(s) same_string_p(s, "enumerate")
+#define trpx_dag_cut_is_valid(s) \
+  trpx_dag_cut_none_p(s) ||      \
+  trpx_dag_cut_compute_p(s) ||   \
+  trpx_dag_cut_enumerate_p(s)
+
+// includes for generated helper
+#define FREIA_TRPX_INCLUDES           \
+  "// freia terapix includes\n"       \
+  "#include <freiaCommon.h>\n"        \
   "#include <freiaMediumGrain.h>\n"		\
   "#include <freiaCoarseGrain.h>\n"		\
-  "#include <terapix.h>\n"			\
+  "#include <terapix.h>\n"            \
   "#include <terapix_ucode.h>\n"
 
+// terapix freia function description
 typedef struct {
   // image erosion in each direction
   int north, south, east, west;
   // internal memory needed, in pixels (?)
   int memory;
   // approximate cost per pixel per row
+  // this information is available in the terapix simulator
   int cost;
   // whether it can be done in place
   boolean inplace;
-  // code segment name
+  // microcode segment name
   string ucode;
 } terapix_hw_t;
 

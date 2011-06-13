@@ -1161,7 +1161,7 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
 
     // We want to check the conflict even with read/read, because we already
     // asserted what we want before (ud/du/dd)
-    if(effects_might_conflict_even_read_only_p(fin, fout) && (*which)(fin, fout)) {
+    if((*which)(fin, fout) && effects_might_conflict_even_read_only_p(fin, fout)) {
       entity ein = effect_entity(fin);
       entity eout = effect_entity(fout);
       type tin = ultimate_type(entity_type(ein));

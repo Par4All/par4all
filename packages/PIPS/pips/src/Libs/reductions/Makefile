@@ -21,7 +21,8 @@
 
 TARGET	= reductions
 
-LIB_CFILES =	stub.c \
+LIB_CFILES = atomic.c \
+		stub.c \
 		reductions.c \
 		utils.c \
 		transformation.c \

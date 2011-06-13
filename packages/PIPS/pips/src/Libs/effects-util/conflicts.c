@@ -428,7 +428,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 	else{
 	  type t1 = cell_reference_to_type( r1 );
 	  type t2 = cell_reference_to_type( r2 );
-	  
+
 	  conflict_p = type_equal_p( t1, t2 );
 	}
       }
@@ -460,29 +460,27 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        that p[0] conflicts with any reference? We might as well use
        reference_to_abstract_location()... */
       /* Could be improved with ALIASING_ACROSS_DATA_STRUCTURES? */
-      bool exact1, exact2;
-      bool deref1 = effect_reference_dereferencing_p( r1, &exact1 );
-      /* FI: OK, no need to evaluate deref2 when deref1 is
-	 true. Let's hope the compiler optimizer is able to fix this
-	 automatically! */
-      bool deref2 = effect_reference_dereferencing_p( r2, &exact2 );
-
-      /* In other words, we assume a conflict as soon as a pointer is
-	 dereferenced... even when aliasing across types is ignored!
-
-	 FI: I feel this test should be refined.
-
-	 If aliasing across types is ignored, we know here that the
-	 two memory locations referenced are of the same type. If the
-	 pointer in one reference (let's assume only one pointer to
-	 start with) is not of type pointer to the common type, then
-	 there is no conflict.
-
-	 Else, we have to assume a conflict no matter what, because
-	 simple cases should have been simplified via the points-to
-	 analysis.
-      */
-      conflict_p = deref1 || deref2;
+      bool exact;
+      // Check dereferencing in r1
+      conflict_p = effect_reference_dereferencing_p( r1, &exact );
+      if(!conflict_p) {
+        /* We need to evaluate dereferencing in r2 only when a dereferencing
+         * have not been find in r1 */
+        conflict_p = effect_reference_dereferencing_p( r2, &exact );
+      }
+      /* In other words, we assume not conflict as soon as not pointer is
+       * dereferenced... even when aliasing across types is not ignored !
+       *
+       * If aliasing across types is ignored, we know here that the
+       * two memory locations referenced are of the same type. If the
+       * pointer in one reference (let's assume only one pointer to
+       * start with) is not of type pointer to the common type, then
+       * there is no conflict.
+       *
+       * Else, we have to assume a conflict no matter what, because
+       * simple cases should have been simplified via the points-to
+       * analysis.
+       */
     }
   }
   return conflict_p;
