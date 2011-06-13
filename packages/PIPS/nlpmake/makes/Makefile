@@ -21,8 +21,7 @@
 
 INSTALL_UTL	= \
 	arch.sh \
-	setup_pips.sh \
-	svn_branch.sh
+	setup_pips.sh
 
 ROOT = 	..
 

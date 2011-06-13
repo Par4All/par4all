@@ -27,14 +27,9 @@ SVN_FLAGS =
 
 IS_SVN_WC =	test -d .svn
 
-BRANCH = 	$(MAKE.d)/svn_branch.sh
-BRANCH_FLAGS =
-IS_BRANCH =	$(BRANCH) test --quiet
-
 # fix command flags if username is provided
 ifdef SVN_USERNAME
 SVN_FLAGS	+= --username $(SVN_USERNAME)
-BRANCH_FLAGS 	+= --username $(SVN_USERNAME)
 endif
 
 diff:
