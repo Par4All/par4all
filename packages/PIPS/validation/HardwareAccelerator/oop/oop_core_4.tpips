@@ -1,5 +1,6 @@
-setproperty HWAC_SPOC_DEPTH 4
 setenv WSPACE oop_core_4
-setenv FILE $WSPACE.c
 setenv NAME oop_core
+setenv FILE $NAME.c
+setproperty HWAC_SPOC_DEPTH 4
+setproperty HWAC_TERAPIX_DMABW 4
 source default_tpips

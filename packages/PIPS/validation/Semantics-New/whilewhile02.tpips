@@ -1,0 +1,87 @@
+delete whilewhile02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create whilewhile02 whilewhile02.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+#setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[whilewhile02]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[whilewhile02]
+
+#quit
+
+echo
+echo Try to refine the transformers: first refinement
+echo
+
+apply REFINE_TRANSFORMERS
+
+echo
+echo TRANSFORMERS after first refinement
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[whilewhile02]
+
+quit
+
+echo
+echo PRECONDITIONS after first refinement
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[whilewhile02]
+
+quit
+
+echo
+echo Try to refine the transformers: second refinement
+echo
+
+echo This generates an overflow. Not a surprise given the coefficients
+echo of the constraints after the first refinement
+
+quit
+
+apply REFINE_TRANSFORMERS
+
+echo
+echo TRANSFORMERS after second refinement
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[whilewhile02]
+
+# quit
+
+echo
+echo PRECONDITIONS after second refinement
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[whilewhile02]
+
+close
+# delete whilewhile02
+quit

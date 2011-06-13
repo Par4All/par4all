@@ -1,0 +1,33 @@
+delete sas_alias03
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create sas_alias03 sas_alias03.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+
+setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[sas_alias03]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[sas_alias03]
+
+
+close
+# delete sas_alias03
+quit

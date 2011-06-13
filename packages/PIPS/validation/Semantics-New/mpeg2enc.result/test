@@ -4484,20 +4484,20 @@ void stats()
             if ((mb_type&(8|4))==8) goto switch_5_case_8;
             if ((mb_type&(8|4))==4) goto switch_5_case_4;
             if ((mb_type&(8|4))==(8|4)) goto switch_5_case_8|4;
-
 switch_5_default:            ;
             _IO_putc('0', statfile);
             goto break_5;
-
 switch_5_case_8|4:            ;
+
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto break_5;
-            
-            
 switch_5_case_4:            ;
+
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto break_5;
 switch_5_case_8:            ;
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 break_5:            ;
          }
@@ -5305,7 +5305,8 @@ void putbits(int val, int n)
 
 Cumulated effects for "putnonintrablk"
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
@@ -5320,7 +5321,8 @@ void putnonintrablk(short *blk)
    run = 0;
 //             <    is written>: first
    first = 1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: errortext[*] first outfile[0] run 
@@ -5523,10 +5525,11 @@ void putnonintrablk(short *blk)
 
 Cumulated effects for "putpict"
 
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
-//             <may be written>: *ANY_MODULE*:*ANYWHERE* 
+//             <may be written>: stderr[0] *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 void putpict(unsigned char *frame)
@@ -5607,7 +5610,8 @@ void putpict(unsigned char *frame)
    /* initialize quantization parameter */
    
    k = 0;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: MBAinc PMV[0][0][0] PMV[0][0][1] 
@@ -5629,7 +5633,8 @@ void putpict(unsigned char *frame)
 //             <    is written>: j
 
    for(j = 0; j <= mb_height2-1; j += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: MBAinc PMV[0][0][0] PMV[0][0][1] 
@@ -6103,7 +6108,8 @@ l99996:         ;
 //             <    is read   >: block_count cbp mb_height2 mb_width
                putbits(cbp, block_count-6);
          }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
@@ -6114,7 +6120,8 @@ l99996:         ;
 //             <    is written>: comp
 
          for(comp = 0; comp <= block_count-1; comp += 1)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
@@ -6123,7 +6130,8 @@ l99996:         ;
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
             if (cbp&1<<block_count-1-comp)
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: cc dc_dct_pred[*] errortext[*] 
@@ -6135,7 +6143,8 @@ l99996:         ;
 //             <    is read   >: block_count comp mb_height2 mb_width
 //             <    is written>: cc
                   cc = comp<4?0:(comp&1)+1;
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: dc_dct_pred[*] errortext[*] 
@@ -6148,7 +6157,8 @@ l99996:         ;
                   putintrablk(blocks[k*block_count+comp], cc);
                }
                else
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE* 
+//             <may be read   >: stderr stderr[0] 
+//                               *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: errortext[*] outfile[0] stderr[0] 
@@ -7712,7 +7722,7 @@ static void idctcol(short *blk)
 
    int x0, x1, x2, x3, x4, x5, x6, x7, x8;
 
-//  T() {}
+//  T(x1,x2,x3,x4,x5,x6,x7) {}
 
    if (!((x1 = blk[8*4]<<8)|(x2 = blk[8*6])|(x3 = blk[8*2])|(x4 = blk[8*1])|(x5 = blk[8*7])|(x6 = blk[8*5])|(x7 = blk[8*3]))) {
 
@@ -7865,7 +7875,7 @@ static void idctrow(short *blk)
 
    int x0, x1, x2, x3, x4, x5, x6, x7, x8;
 
-//  T() {}
+//  T(x1,x2,x3,x4,x5,x6,x7) {}
 
    if (!((x1 = blk[4]<<11)|(x2 = blk[6])|(x3 = blk[2])|(x4 = blk[1])|(x5 = blk[7])|(x6 = blk[5])|(x7 = blk[3]))) {
 
@@ -20620,7 +20630,6 @@ void stats(void)
 
 //  T() {}
 
-
 switch_5_default:            ;
 
 //  T() {}
@@ -20630,21 +20639,20 @@ switch_5_default:            ;
 
 //  T() {}
 
-
 switch_5_case_8|4:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto break_5;
 
 //  T() {}
 
-            
-            
 switch_5_case_4:            ;
 
 //  T() {}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto break_5;
@@ -20655,6 +20663,8 @@ switch_5_case_8:            ;
 
 //  T() {}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  T() {}
@@ -42005,7 +42015,6 @@ void stats(void)
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 switch_5_default:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
@@ -42021,13 +42030,13 @@ switch_5_default:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-
 switch_5_case_8|4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'d':'D', statfile);
             goto break_5;
@@ -42037,14 +42046,13 @@ switch_5_case_8|4:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
-            
-            
 switch_5_case_4:            ;
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,
 //    n_ncoded,n_skipped,nmb) {0<=i, i<=k, i+1<=mb_width, 0<=j,
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
+
 
             _IO_putc(mbi->motion_type==1?'b':'B', statfile);
             goto break_5;
@@ -42061,6 +42069,8 @@ switch_5_case_8:            ;
 //    j+1<=mb_height2, 0<=n_backward, 0<=n_blocks, 0<=n_forward,
 //    0<=n_interp, 0<=n_intra, 0<=n_ncoded, 0<=n_skipped}
 
+            
+            
             _IO_putc(mbi->motion_type==1?'f':mbi->motion_type==3?'p':'F', statfile);
 
 //  P(i,j,k,mb_type,n_backward,n_blocks,n_forward,n_interp,n_intra,

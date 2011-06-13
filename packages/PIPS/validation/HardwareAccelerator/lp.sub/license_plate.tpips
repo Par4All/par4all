@@ -1,0 +1,5 @@
+setenv WSPACE license_plate
+setenv FILE license_plate.c
+setenv NAME license_plate
+setproperty HWAC_TERAPIX_DAG_CUT "none"
+source default_tpips

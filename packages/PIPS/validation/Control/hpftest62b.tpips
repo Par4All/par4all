@@ -47,6 +47,13 @@ echo
 activate NEW_CONTROLIZER
 display PRINTED_FILE[HPFTEST62B]
 
+echo
+echo After control restructuring
+echo
+
+apply RESTRUCTURE_CONTROL[HPFTEST62B]
+display PRINTED_FILE[HPFTEST62B]
+
 close
 delete hpftest62b
 quit

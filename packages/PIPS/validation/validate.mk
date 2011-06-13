@@ -18,6 +18,9 @@
 #
 # example to do only later cases:
 #   sh> make DO_DEFAULT= DO_SLOW= DO_LATER=1 validate-test
+# special useful targets include:
+#   sh> make later-validate-test
+#   sh> make bug-validate-out
 
 # what special cases are included
 DO_BUG	=
@@ -224,13 +227,13 @@ ifdef PARALLEL_VALIDATION
 validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
-	$(MAKE) sort-local-result
+	@$(MAKE) sort-local-result
 
 else # sequential validation, including subdir recursive forward
 validate-dir: $(LOCAL_CLEAN)
 	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) sequential-validate-dir
-	$(MAKE) sort-local-result
+	@$(MAKE) sort-local-result
 
 # local target to parallelize the "sequential" local directory
 # with test cases in its subdirectories
@@ -457,7 +460,7 @@ missing:
 	@ n=0; \
 	for res in $(F.res) ; do \
 	  if [ ! -d $$res ] ; then \
-	     echo "missing: $$res" ; \
+	     echo "missing result directory: $$res" ; \
 	     let n++; \
 	  fi ; \
 	done ; \

@@ -19,7 +19,8 @@ echo Source code with preconditions
 echo
 
 setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
-setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
+setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
@@ -30,34 +31,14 @@ echo
 
 apply REFINE_TRANSFORMERS[main]
 
+# TFF: P(s0,s1,s2) {s0+s1+s2==1, 0<=s0, s0+s1<=1, 0<=s1}
+
+# TFT: P(s0,s1,s2) {s0+s1+s2==1, 0<=s0, s0<=1, s0+s1<=1, 0<=s1, s1<=1, s2<=1}
+#      3.96 s sur Ibarron, time spent in refine_transformers
+# TTT: P(s0,s1,s2) {s0+s1+s2==1, 0<=s0, s0<=1, s0+s1<=1, 0<=s1, s1<=1, s2<=1}
+#      4.06s sur Ibarron
+
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[main]
 
 quit
-apply UNSPLIT[%PROGRAM]
-
-close
-
-echo
-echo Warnings
-echo
-
-shell cat pc04.database/Warnings
-
-quit
-
-
-#setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
-setproperty SEMANTICS_INTERPROCEDURAL TRUE
-setproperty SEMANTICS_RECOMPUTE_FIX_POINTS_WITH_PRECONDITIONS TRUE
-setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
-setproperty SEMANTICS_ANALYZE_SCALAR_STRING_VARIABLES TRUE
-setproperty SEMANTICS_ANALYZE_SCALAR_FLOAT_VARIABLES TRUE
-setproperty SEMANTICS_ANALYZE_SCALAR_COMPLEX_VARIABLES TRUE
-
-
-
-
-setproperty SEMANTICS_TRUST_ARRAY_DECLARATIONS TRUE
-setproperty SEMANTICS_TRUST_ARRAY_REFERENCES TRUE
-

@@ -1,0 +1,79 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void sas_alias01(int m)
+{
+
+//  T(x,y) {m==x, y==0}
+
+   int x = m, y = 0;
+
+//  T(x,y) {m==x#init, y#init==0, 0<=m, x<=m, 0<=x, 0<=y}
+
+   while (x>=0&&y>=0) {
+
+//  T(x,y) {0<=m, x#init<=x+1, x<=x#init, 0<=x#init, y#init<=y,
+//    0<=y#init}
+
+      if (alea()>=0.) {
+
+//  T(y) {0<=m, y<=m, y#init<=m, 0<=x, 0<=y, y#init<=y, 0<=y#init}
+
+         while (y<=m&&alea()>=0.)
+
+//  T(y) {y==y#init+1, 0<=m, y<=m+1, 0<=x}
+
+            y++;
+
+//  T(x) {x==x#init-1, 0<=m, 0<=x+1, 0<=y}
+
+         x--;
+      }
+
+//  T(y) {y==y#init-1, 0<=m, 0<=x+1, 0<=y+1}
+
+      y--;
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void sas_alias01(int m)
+{
+
+//  P() {}
+
+   int x = m, y = 0;
+
+//  P(x,y) {m==x, y==0}
+
+   while (x>=0&&y>=0) {
+
+//  P(x,y) {x<=m, 0<=x, 0<=y}
+
+      if (alea()>=0.) {
+
+//  P(x,y) {x<=m, 0<=x, 0<=y}
+
+         while (y<=m&&alea()>=0.)
+
+//  P(x,y) {x<=m, y<=m, 0<=x, 0<=y}
+
+            y++;
+
+//  P(x,y) {x<=m, 0<=x, 0<=y}
+
+         x--;
+      }
+
+//  P(x,y) {0<=m, x<=m, 0<=x+1, 0<=y}
+
+      y--;
+   }
+}

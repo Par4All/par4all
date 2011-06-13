@@ -1,0 +1,14 @@
+void kernel()
+{
+   a[0] = 1;
+}
+int main()
+{
+   a[0] = 0;
+   P4A_copy_to_accel(a, sizeof(int)*1);
+
+   kernel();
+   P4A_copy_from_accel(a, sizeof(int)*1);
+
+   printf("%d\n", a[0]);
+}

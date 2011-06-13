@@ -238,8 +238,8 @@ digraph "dag_cleaned_0" {
   "i" -> "8 max!";
   "i" -> "7 max";
 }
-// graph for dag "freia_dup_08_helper_0_0" of module "freia_dup_08" in dot format
-digraph "freia_dup_08_helper_0_0" {
+// graph for dag "freia_dup_08_helper_0_0_0" of module "freia_dup_08" in dot format
+digraph "freia_dup_08_helper_0_0_0" {
   // inputs
   "i" [shape=circle];
 
@@ -254,6 +254,7 @@ digraph "freia_dup_08_helper_0_0" {
 
 ! acceleration function
 
+// freia terapix includes
 #include <freiaCommon.h>
 #include <freiaMediumGrain.h>
 #include <freiaCoarseGrain.h>
@@ -262,11 +263,13 @@ digraph "freia_dup_08_helper_0_0" {
 
 /* FREIA terapix helper function for module freia_dup_08
  * 1 input image, 0 output image
- * 3 image operations in dag
+ * 2 image operations in dag
  * dag length is 2, dag width is 1
- * cost is 6 cycles per imagelet row
+ * costs in cycles per imagelet row:
+ * - computation: 6
+ * - communication: 32
  */
-freia_status freia_dup_08_helper_0_0(
+freia_status freia_dup_08_helper_0_0_0(
   freia_data2d * i0,
   int32_t * po1,
   int32_t * po2,
@@ -282,15 +285,15 @@ freia_status freia_dup_08_helper_0_0(
   freia_status ret;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
-  terapix_mcu_macro mcu_macro[2][2];
+  terapix_mcu_macrocode mcu_macro[2][2];
   terapix_tile_info tile_in[2][1];
 
   // imagelets definitions:
   // - 1 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 511;
+  int imagelet_size = 509;
   int imagelet_1 = 0;
-  int imagelet_2 = 511;
+  int imagelet_2 = 509;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -306,32 +309,49 @@ freia_status freia_dup_08_helper_0_0(
   param.size = -1; // not used
   param.raw = (void*) &mcu_instr;
 
-  // dyn_param contents  dyn_param.raw = &gram;
+  // dyn_param contents
+  dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure max at 1023
+  mcu_macro[0][0].xmin3 = 1023;
+  mcu_macro[1][0].xmin3 = 1023;
+  mcu_macro[0][0].ymin3 = 0;
+  mcu_macro[1][0].ymin3 = 0;
   // 0: max(1)
-  mcu_macro[0][0].macrocode.xmin1 = imagelet_io_1_0;
-  mcu_macro[1][0].macrocode.xmin1 = imagelet_io_1_1;
-  mcu_macro[0][0].macrocode.ymin1 = 0;
-  mcu_macro[1][0].macrocode.ymin1 = 0;
-  mcu_macro[0][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][0].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[1][0].macrocode.iter2 = imagelet_size;
-  mcu_macro[0][0].macrocode.addrStart = TERAPIX_UCODE_MAX?;
-  mcu_macro[1][0].macrocode.addrStart = TERAPIX_UCODE_MAX?;
-  // set measure max! at 1022
+  mcu_macro[0][0].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][0].ymin1 = 0;
+  mcu_macro[1][0].ymin1 = 0;
+  mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][0].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][0].iter2 = imagelet_size;
+  mcu_macro[1][0].iter2 = imagelet_size;
+  mcu_macro[0][0].iter3 = 0;
+  mcu_macro[1][0].iter3 = 0;
+  mcu_macro[0][0].iter4 = 0;
+  mcu_macro[1][0].iter4 = 0;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MAX;
+  // set measure max! at 1019
+  mcu_macro[0][1].xmin3 = 1019;
+  mcu_macro[1][1].xmin3 = 1019;
+  mcu_macro[0][1].ymin3 = 0;
+  mcu_macro[1][1].ymin3 = 0;
   // 1: max!(1)
-  mcu_macro[0][1].macrocode.xmin1 = imagelet_io_1_0;
-  mcu_macro[1][1].macrocode.xmin1 = imagelet_io_1_1;
-  mcu_macro[0][1].macrocode.ymin1 = 0;
-  mcu_macro[1][1].macrocode.ymin1 = 0;
-  mcu_macro[0][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[1][1].macrocode.iter1 = TERAPIX_PE_NUMBER;
-  mcu_macro[0][1].macrocode.iter2 = imagelet_size;
-  mcu_macro[1][1].macrocode.iter2 = imagelet_size;
-  mcu_macro[0][1].macrocode.addrStart = TERAPIX_UCODE_MAX_COORD?;
-  mcu_macro[1][1].macrocode.addrStart = TERAPIX_UCODE_MAX_COORD?;
+  mcu_macro[0][1].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_1_1;
+  mcu_macro[0][1].ymin1 = 0;
+  mcu_macro[1][1].ymin1 = 0;
+  mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[1][1].iter1 = TERAPIX_PE_NUMBER;
+  mcu_macro[0][1].iter2 = imagelet_size;
+  mcu_macro[1][1].iter2 = imagelet_size;
+  mcu_macro[0][1].iter3 = 0;
+  mcu_macro[1][1].iter3 = 0;
+  mcu_macro[0][1].iter4 = 0;
+  mcu_macro[1][1].iter4 = 0;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX_COORD;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_GLOBAL_MAX_COORD;
   // inputs:
   // - imagelet 1 is i0 for i
   tile_in[0][0].x = imagelet_io_1_0;
@@ -347,25 +367,32 @@ freia_status freia_dup_08_helper_0_0(
   mcu_instr.borderBottom = 0;
   mcu_instr.borderLeft   = 0;
   mcu_instr.borderRight  = 0;
+  mcu_instr.imagelet_height = imagelet_size;
+  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;
 
   // outputs
   mcu_instr.nbout = 0;
-  mcu_instr.out = NULL;
+  mcu_instr.out0 = NULL;
+  mcu_instr.out1 = NULL;
 
   // inputs
   mcu_instr.nbin = 1;
-  mcu_instr.in = tile_in;
+  mcu_instr.in0 = tile_in[0];
+  mcu_instr.in1 = tile_in[1];
 
   // actual instructions
   mcu_instr.nbinstr = 2;
-  mcu_instr.instr   = mcu_macro;
+  mcu_instr.instr0   = mcu_macro[0];
+  mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
   ret = freia_cg_template_process(&param, i0);
 
   // extract measures
   // get measure max result from 1023
-  // get measure max! result from 1022
+  // ??? not implemented yet...
+  // get measure max! result from 1019
+  // ??? not implemented yet...
 
   return ret;
 }
@@ -377,7 +404,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0(i, &max1, &max2, &x, &y);                    /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
    return max1+max2+x+y;                                                /*0009*/
 }
 
@@ -387,7 +414,7 @@ int freia_dup_08(freia_data2d *i)
 {
    int max1, max2, x, y;                                                /*0005*/
    // same measure performed twice
-   freia_dup_08_helper_0_0(i, &max1, &max2, &x, &y);                    /*0007*/
+   freia_dup_08_helper_0_0_0(i, &max1, &max2, &x, &y);                  /*0007*/
    return max1+max2+x+y;                                                /*0009*/
 }
 #

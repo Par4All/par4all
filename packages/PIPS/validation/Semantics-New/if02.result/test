@@ -1,0 +1,84 @@
+
+Transformers for "if02"
+
+
+//  T() {}
+
+void if02()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(j) {i==0, j==0}
+
+   int j = 0;
+
+//  T(i,j) {i==1, i#init==0, j==1, j#init==0}
+
+
+   if (i++, i>0)
+
+//  T(j) {i==1, j==1, j#init==0}
+
+      // This branch is taken by gcc
+      j = 1;
+   else
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 2;
+
+//  T() {i==1, j==1}
+
+
+   printf("%d\n", j);
+
+//  T() {i==1, j==1}
+
+   return;
+}
+
+Preconditions for "if02"
+
+
+//  P() {}
+
+void if02()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+
+   if (i++, i>0)
+
+//  P(i,j) {i==1, j==0}
+
+      // This branch is taken by gcc
+      j = 1;
+   else
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 2;
+
+//  P(i,j) {i==1, j==1}
+
+
+   printf("%d\n", j);
+
+//  P(i,j) {i==1, j==1}
+
+   return;
+}

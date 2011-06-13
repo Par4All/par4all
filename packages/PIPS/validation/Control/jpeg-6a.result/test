@@ -1,0 +1,219 @@
+static boolean decode_mcu(j_decompress_ptr cinfo, JBLOCKROW *MCU_data)
+{
+   huff_entropy_ptr entropy = (huff_entropy_ptr) cinfo->entropy;
+   register int s, k, r;
+   int blkn, ci;
+   JBLOCKROW block;
+   register bit_buf_type get_buffer;
+   register int bits_left;
+   bitread_working_state br_state;
+   savable_state state;
+   d_derived_tbl *dctbl;
+   d_derived_tbl *actbl;
+   jpeg_component_info *compptr;
+   
+   /* Process restart marker if needed; may have to suspend */
+   if (cinfo->restart_interval)
+      if (entropy->restarts_to_go==0)
+         if (!process_restart(cinfo))
+            return 0;
+   
+   /* Load up working state */
+   br_state.cinfo = cinfo;
+   br_state.next_input_byte = cinfo->src->next_input_byte;
+   br_state.bytes_in_buffer = cinfo->src->bytes_in_buffer;
+   br_state.unread_marker = cinfo->unread_marker;
+   get_buffer = entropy->bitstate.get_buffer;
+   bits_left = entropy->bitstate.bits_left;
+   br_state.printed_eod_ptr = &entropy->bitstate.printed_eod;
+   state = entropy->saved;
+   
+   /* Outer loop handles each block in the MCU */
+   
+   for (blkn = 0;blkn<cinfo->blocks_in_MCU;blkn++) {
+      block = MCU_data[blkn];
+      ci = (cinfo->MCU_membership)[blkn];
+      compptr = (cinfo->cur_comp_info)[ci];
+      dctbl = (entropy->dc_derived_tbls)[compptr->dc_tbl_no];
+      actbl = (entropy->ac_derived_tbls)[compptr->ac_tbl_no];
+      {
+         register int nb, look;
+         if (bits_left<8) {
+            if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, 0))
+               return 0;
+            get_buffer = br_state.get_buffer;
+            bits_left = br_state.bits_left;
+            if (bits_left<8) {
+               nb = 1;
+               goto label1;
+            }
+         }
+         look = (int) (get_buffer>>bits_left-8)&(1<<8)-1;
+         if ((nb = (dctbl->look_nbits)[look])!=0) {
+            bits_left -= nb;
+            s = (dctbl->look_sym)[look];
+         }
+         else {
+            nb = 8+1;
+label1:            if ((s = jpeg_huff_decode(&br_state, get_buffer, bits_left, dctbl, nb))<0)
+               return 0;
+            get_buffer = br_state.get_buffer;
+            bits_left = br_state.bits_left;
+         }
+      }
+
+      if (s) {
+         if (bits_left<s) {
+            if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, s))
+               return 0;
+            get_buffer = br_state.get_buffer;
+            bits_left = br_state.bits_left;
+         }
+
+         r = (int) (get_buffer>>(bits_left -= s))&(1<<s)-1;
+         s = r<extend_test[s]?r+extend_offset[s]:r;
+      }
+      
+      /* Shortcut if component's values are not interesting */
+      if (!compptr->component_needed)
+         goto skip_ACs;
+      
+      /* Convert DC difference to actual value, update last_dc_val */
+      s += (state.last_dc_val)[ci];
+      (state.last_dc_val)[ci] = s;
+      /* Output the DC coefficient (assumes jpeg_natural_order[0] = 0) */
+      (*block)[0] = (JCOEF) s;
+      
+      /* Do we need to decode the AC coefficients for this component? */
+      if (compptr->DCT_scaled_size>1) {
+         
+         /* Section F.2.2.2: decode the AC coefficients */
+         /* Since zeroes are skipped, output area must be cleared beforehand */
+         ;
+         for (k = 1;k<64;k++) {
+            {
+               register int nb, look;
+               if (bits_left<8) {
+                  if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, 0))
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+                  if (bits_left<8) {
+                     nb = 1;
+                     goto label2;
+                  }
+               }
+               look = (int) (get_buffer>>bits_left-8)&(1<<8)-1;
+               if ((nb = (actbl->look_nbits)[look])!=0) {
+                  bits_left -= nb;
+                  s = (actbl->look_sym)[look];
+               }
+               else {
+                  nb = 8+1;
+label2:                  if ((s = jpeg_huff_decode(&br_state, get_buffer, bits_left, actbl, nb))<0)
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+               }
+            }
+
+
+            r = s>>4;
+            s &= 15;
+
+            if (s) {
+               k += r;
+               if (bits_left<s) {
+                  if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, s))
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+               }
+
+               r = (int) (get_buffer>>(bits_left -= s))&(1<<s)-1;
+               s = r<extend_test[s]?r+extend_offset[s]:r;
+               /* Output coefficient in natural (dezigzagged) order.
+               	   * Note: the extra entries in jpeg_natural_order[] will save us
+               	   * if k >= DCTSIZE2, which could happen if the data is corrupted.
+               	   */
+               (*block)[jpeg_natural_order[k]] = (JCOEF) s;
+            }
+            else {
+               if (r!=15)
+                  goto break_2;
+               k += 15;
+            }
+         }
+break_2:         ;
+      }
+      else {
+skip_ACs:         ;
+         
+         /* Section F.2.2.2: decode the AC coefficients */
+         /* In this path we just discard the values */
+         ;
+         for (k = 1;k<64;k++) {
+            {
+               register int nb, look;
+               if (bits_left<8) {
+                  if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, 0))
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+                  if (bits_left<8) {
+                     nb = 1;
+                     goto label3;
+                  }
+               }
+               look = (int) (get_buffer>>bits_left-8)&(1<<8)-1;
+               if ((nb = (actbl->look_nbits)[look])!=0) {
+                  bits_left -= nb;
+                  s = (actbl->look_sym)[look];
+               }
+               else {
+                  nb = 8+1;
+label3:                  if ((s = jpeg_huff_decode(&br_state, get_buffer, bits_left, actbl, nb))<0)
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+               }
+            }
+
+
+            r = s>>4;
+            s &= 15;
+
+            if (s) {
+               k += r;
+               if (bits_left<s) {
+                  if (!jpeg_fill_bit_buffer(&br_state, get_buffer, bits_left, s))
+                     return 0;
+                  get_buffer = br_state.get_buffer;
+                  bits_left = br_state.bits_left;
+               }
+
+               bits_left -= s;
+            }
+            else {
+               if (r!=15)
+                  goto break_3;
+               k += 15;
+            }
+         }
+break_3:         ;
+      }
+   }
+   
+   /* Completed MCU, so update state */
+   cinfo->src->next_input_byte = br_state.next_input_byte;
+   cinfo->src->bytes_in_buffer = br_state.bytes_in_buffer;
+   cinfo->unread_marker = br_state.unread_marker;
+   entropy->bitstate.get_buffer = get_buffer;
+   entropy->bitstate.bits_left = bits_left;
+   entropy->saved = state;
+   
+   /* Account for restart interval (no-op if not using restarts) */
+   entropy->restarts_to_go--;
+
+   return 1;
+}

@@ -1,0 +1,214 @@
+
+Transformers for "if01"
+
+
+//  T() {}
+
+void if01()
+{
+
+//  T(i) {i==0}
+
+   int i = 0;
+
+//  T(j) {i==0, j==0}
+
+   int j = 0;
+
+//  T(i) {i==1, i#init==0, j==0}
+
+
+   if (i++)
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  T(i,j) {i==2, i#init==1, j==2, j#init==0}
+
+
+   if (i++)
+
+//  T(j) {i==2, j==2, j#init==0}
+
+      // Should be reached
+      j = 2;
+
+//  T() {i==2, j==2}
+
+
+   printf("%d ", j);
+
+//  T(i) {i==0, i#init==2, j==2}
+
+
+   i = 0;
+
+//  T(i) {i==1, i#init==0, j==2}
+
+
+   if (i++>0)
+
+//  T() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  T(i,j) {i==2, i#init==1, j==2, j#init==2}
+
+
+   if (i++>0)
+
+//  T(j) {i==2, j==2, j#init==2}
+
+      // Should be reached
+      j = 2;
+
+//  T() {i==2, j==2}
+
+
+   printf("%d ", j);
+
+//  T(i) {i==0, i#init==2, j==2}
+
+
+   i = 0;
+
+//  T(i,j) {i==1, i#init==0, j==10, j#init==2}
+
+
+   if (i++, i>0)
+
+//  T(j) {i==1, j==10, j#init==2}
+
+      // Should be reached according to gcc
+      j = 10;
+
+//  T(i,j) {i==2, i#init==1, j==22, j#init==10}
+
+
+   if (i++, i>0)
+
+//  T(j) {i==2, j==22, j#init==10}
+
+      // Should be reached
+      j = 2*j+2;
+
+//  T() {i==2, j==22}
+
+
+   printf("%d ", j);
+
+//  T() {i==2, j==22}
+
+
+   return;
+}
+
+Preconditions for "if01"
+
+
+//  P() {}
+
+void if01()
+{
+
+//  P() {}
+
+   int i = 0;
+
+//  P(i) {i==0}
+
+   int j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+
+   if (i++)
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  P(i,j) {i==1, j==0}
+
+
+   if (i++)
+
+//  P(i,j) {i==2, j==0}
+
+      // Should be reached
+      j = 2;
+
+//  P(i,j) {i==2, j==2}
+
+
+   printf("%d ", j);
+
+//  P(i,j) {i==2, j==2}
+
+
+   i = 0;
+
+//  P(i,j) {i==0, j==2}
+
+
+   if (i++>0)
+
+//  P() {0==-1}
+
+      // Should not be reached
+      j = 1;
+
+//  P(i,j) {i==1, j==2}
+
+
+   if (i++>0)
+
+//  P(i,j) {i==2, j==2}
+
+      // Should be reached
+      j = 2;
+
+//  P(i,j) {i==2, j==2}
+
+
+   printf("%d ", j);
+
+//  P(i,j) {i==2, j==2}
+
+
+   i = 0;
+
+//  P(i,j) {i==0, j==2}
+
+
+   if (i++, i>0)
+
+//  P(i,j) {i==1, j==2}
+
+      // Should be reached according to gcc
+      j = 10;
+
+//  P(i,j) {i==1, j==10}
+
+
+   if (i++, i>0)
+
+//  P(i,j) {i==2, j==10}
+
+      // Should be reached
+      j = 2*j+2;
+
+//  P(i,j) {i==2, j==22}
+
+
+   printf("%d ", j);
+
+//  P(i,j) {i==2, j==22}
+
+
+   return;
+}

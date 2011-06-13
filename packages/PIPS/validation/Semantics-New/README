@@ -8,12 +8,29 @@ continue01:
 global01.c: take abstract locations into account (derived from
 	    Benchmarks/whetstone, submitted by Serge Guelton)
 
-gopan3.c:   example from Gopan (preparation of a paper, bug fix for loop postcondition)
+gonnord_thesis_x_y.c: example found in PhD dissertation Chapter x, Example y
+
+gopan3.c:   example from Gopan (preparation of a paper, bug fix 
+            for loop postcondition)
+gopan_cav06: Vivien Maisonneuve
 
 gulwani03.c: example from Gulwani (same as opan3)
+
+gulvani_xxx.c: Vivien Maisonneuve (one control node)
 
 mehdi01.c:  example submitted by Mehdi Amini
 
 summary_precondition02.c:
 
 summary_precondition03.c:
+
+maisonneuve01-18:
+
+             Test cases developped in 2010-2011 by Vivien or Francois
+             to expose weaknesses in semantics, especially in the
+             transitive closure
+
+pc01-04:     Different encoding of a program counter. The goal is to 
+             show robustness wrt the encoding
+
+while01-11: issues with while loops

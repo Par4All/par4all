@@ -9,9 +9,9 @@ int main()
    y[0] = 0.;
    printf(fmt, i, i+j, x);
 }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stdout[0]
-//             <    is read   >: __IO_EFFECTS:LUNS[1]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
 //             <    is written>: __IO_EFFECTS:LUNS[1]
 int main()
 {

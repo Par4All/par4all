@@ -1,0 +1,81 @@
+
+Initial code for "invariance01"
+
+int invariance01(int a)
+{
+   int b;
+
+   a = a+1;
+   a = a-1;
+   b = a;
+   a = 2;
+   return b;
+}
+
+Transformers for "invariance01"
+
+
+//  T(invariance01) {a==invariance01}
+
+int invariance01(int a)
+{
+
+//  T(b) {}
+
+   int b;
+
+//  T(a) {a==a#init+1}
+
+
+   a = a+1;
+
+//  T(a) {a==a#init-1}
+
+   a = a-1;
+
+//  T(b) {a==b}
+
+   b = a;
+
+//  T(a) {a==2}
+
+   a = 2;
+
+//  T(invariance01) {b==invariance01}
+
+   return b;
+}
+
+Preconditions for "invariance01"
+
+
+//  P() {}
+
+int invariance01(int a)
+{
+
+//  P() {}
+
+   int b;
+
+//  P(b) {}
+
+
+   a = a+1;
+
+//  P(a,b) {}
+
+   a = a-1;
+
+//  P(a,b) {}
+
+   b = a;
+
+//  P(a,b) {a==b}
+
+   a = 2;
+
+//  P(a,b) {a==2}
+
+   return b;
+}

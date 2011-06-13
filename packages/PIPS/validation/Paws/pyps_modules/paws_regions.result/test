@@ -1,0 +1,157 @@
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+int main(int argc, char **argv)
+{
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+
+   int image_size = atoi(argv[1]);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-MAY-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+   if (image_size>5) {
+      int (*image)[image_size][image_size];
+      int (*new_image)[image_size][image_size];
+      int i, j, k, n;
+
+//  <image-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      image = (int (*)[image_size][image_size]) malloc(sizeof(int)*image_size*image_size);
+
+//  <new_image-W-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      new_image = (int (*)[image_size][image_size]) malloc(sizeof(int)*image_size*image_size);
+
+//  <new_image-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+      for(i = 0; i <= image_size-1; i += 1)
+
+//  <new_image-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         for(j = 0; j <= image_size-1; j += 1)
+
+//  <new_image-R-EXACT-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+            ((*new_image)[i])[j] = i*j;
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+
+      for(k = 0; k <= 2; k += 1) {
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         erode(image_size, image_size, *new_image, *image);
+
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
+
+         erode(image_size, image_size, *image, *new_image);
+      }
+
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-MAY-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-MAY-{PHI1==1}>
+
+
+      for(i = 0; i <= image_size-1; i += 1)
+
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
+//  <*ANY_MODULE*:*ANYWHERE*-R-MAY-{}>
+//  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
+//  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
+
+         printf("%f ", ((*image)[i])[i]);
+
+//  <image-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      free(image);
+
+//  <new_image-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-R-EXACT-{}>
+//  <_MALLOC_EFFECTS:_MALLOC_-W-EXACT-{}>
+
+      free(new_image);
+   }
+
+   return 0;
+}
+
+
+//  <image[PHI1][PHI2]-R-MAY-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//    PHI2<=isj, isi==isj}>
+//  <new_image[PHI1][PHI2]-W-MAY-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
+//    PHI2+3<=isi, isi==isj}>
+
+void erode(int isi, int isj, int new_image[isi][isj], int image[isi][isj])
+{
+
+   int i, j, k, l;
+
+//  <image[PHI1][PHI2]-R-MAY-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//    PHI2<=isj, isi==isj}>
+//  <new_image[PHI1][PHI2]-W-MAY-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
+//    PHI2+3<=isi, isi==isj}>
+
+   for(l = 0; l <= 4; l += 1)
+
+//  <image[PHI1][PHI2]-R-MAY-{2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//    PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4}>
+//  <new_image[PHI1][PHI2]-W-MAY-{2<=PHI1, PHI1+3<=isi, 2<=PHI2,
+//    PHI2+3<=isi, isi==isj, 0<=0`l, 0`l<=4}>
+
+
+      for(i = 5/2; i <= isi-5/2-1; i += 1)
+
+//  <image[PHI1][PHI2]-R-MAY-{PHI1==i, 2<=PHI1, PHI1+3<=isj, 1<=PHI2,
+//    PHI2<=isj, isi==isj, 0<=0`l, 0`l<=4}>
+//  <new_image[PHI1][PHI2]-W-MAY-{PHI1==i, 2<=PHI2, PHI2+3<=isi,
+//    isi==isj, 2<=i, i+3<=isi, 0<=0`l, 0`l<=4}>
+
+         for(j = 5/2; j <= isj-5/2-1; j += 1) {
+
+//  <image[PHI1][PHI2]-R-EXACT-{PHI1==i, PHI2==j, isi==isj, 2<=i,
+//    i+3<=isi, 2<=j, j+3<=isi, 0<=0`l, 0`l<=4}>
+
+            int l = image[i][j];
+
+//  <image[PHI1][PHI2]-R-MAY-{PHI1==i, j<=PHI2+1, PHI2<=j+3, isi==isj,
+//    2<=i, i+3<=isi, 2<=j, j+3<=isi, 0<=0`l, 0`l<=4}>
+
+            for(k = 0; k <= 4; k += 1)
+
+//  <image[PHI1][PHI2]-R-EXACT-{PHI1==i, j+k==PHI2+1, isi==isj, 2<=i,
+//    i+3<=isi, 2<=j, j+3<=isi, 0<=k, k<=4, 0<=0`l, 0`l<=4}>
+
+               l = MIN(l, image[i][j+1-5/2+k]);
+
+//  <new_image[PHI1][PHI2]-W-EXACT-{PHI1==i, PHI2==j, k==5, isi==isj,
+//    2<=i, i+3<=isi, 2<=j, j+3<=isi, 0<=0`l, 0`l<=4}>
+
+            new_image[i][j] = l;
+         }
+}
+

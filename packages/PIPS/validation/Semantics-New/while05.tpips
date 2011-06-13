@@ -1,0 +1,40 @@
+setenv WSPACE=while05
+delete $WSPACE
+setenv FILE=$WSPACE.c
+create $WSPACE $FILE
+
+setproperty PRETTYPRINT_BLOCK_IF_ONLY TRUE
+activate PRECONDITIONS_INTER_FULL
+activate TRANSFORMERS_INTER_FULL
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+# This property is set to analyze C99 boolean variables
+# setproperty SEMANTICS_ANALYZE_SCALAR_BOOLEAN_VARIABLES TRUE
+
+# This property is useless in this context: the convex hulls work fine
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
+
+# This property leads to what is according to me a wrong invariant
+# x+y<=10 in the while loop
+# setproperty SEMANTICS_USE_DERIVATIVE_LIST TRUE
+
+echo
+echo Transformers for "while05"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[while05]
+
+echo
+echo Preconditions for "while05"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[while05]
+
+close
+delete $WSPACE
+quit

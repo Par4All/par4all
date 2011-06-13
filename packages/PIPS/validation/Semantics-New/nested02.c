@@ -20,6 +20,6 @@ main()
       k++;
   // Check the loop nest postcondition
   i = i;
-  i = (1, 2, 3);
+  //i = (1, 2, 3);
   printf("%d\n", i);
 }

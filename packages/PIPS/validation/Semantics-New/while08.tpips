@@ -1,0 +1,34 @@
+delete while08
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create while08 while08.c
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT  TRUE
+
+echo
+echo Source code with transformers
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[main]
+
+echo
+echo Source code with preconditions
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+echo
+echo Source code with preconditions after transformer refinement
+echo to obtain a more accurate invariant for y
+echo
+
+apply REFINE_TRANSFORMERS[main]
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+
+close
+quit

@@ -5,7 +5,7 @@
 DIRNAME	= validation
 
 # default is to do a "simple" clean
-default: cleanup
+default: clean
 
 # use new validation without implicit accept
 validate: validate-out
@@ -36,8 +36,9 @@ full-clean: clean
 	  xargs -0 $(RM) -r
 	$(RM) SUMMARY SUMMARY.short
 
-.PHONY: cleanup
-cleanup:
+# simple clean target
+.PHONY: simple-clean
+simple-clean:
 	$(MAKE) TARGET=. clean-target
 
 # subdirectories to consider
@@ -214,12 +215,15 @@ parallel-validate: $(TARGET:%=parallel-validate-%)
 parallel-unvalidate: $(TARGET:%=parallel-unvalidate-%)
 
 .PHONY: clean
-clean: cleanup parallel-clean
+clean: simple-clean parallel-clean
+
+.PHONY: cleaner
+cleaner: clean parallel-unvalidate
 
 # generic subdir parallel targets
 parallel-clean-%:
 	[ -d $* -a -f $*/Makefile ] \
-	  && $(MAKE) -C $* clean unvalidate ; exit 0
+	  && $(MAKE) -C $* clean ; exit 0
 
 parallel-check-%: parallel-clean-%
 	[ -d $* -a -f $*/Makefile ] \

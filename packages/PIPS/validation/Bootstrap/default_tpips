@@ -9,21 +9,21 @@ echo
 echo Parsed printed file
 echo
 
-display PARSED_PRINTED_FILE[%ALL]
+display PARSED_PRINTED_FILE[%ALLFUNC]
 
 echo
 echo Proper effects
 echo
 
 activate PRINT_CODE_PROPER_EFFECTS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 # quit
 echo
 echo Cumulated effetcs
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[%ALL]
+display PRINTED_FILE[%ALLFUNC]
 
 close
 delete ${WSPACE}

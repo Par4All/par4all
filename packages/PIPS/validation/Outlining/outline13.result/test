@@ -167,6 +167,7 @@ init_kernel:   *imagein_re0 = 2*i;
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>
@@ -219,6 +220,7 @@ init_kernel:   *imagein_re0 = 2*i;
 //    PHI2<=63}>
 //  <stdout-R-EXACT-{}>
 //  <stdout[PHI1]-R-MAY-{PHI1==0}>
+//  <stdout[PHI1]-W-MAY-{PHI1==0}>
 //  <*ANY_MODULE*:*ANYWHERE*-W-MAY-{}>
 //  <__IO_EFFECTS:LUNS[PHI1]-R-EXACT-{PHI1==1}>
 //  <__IO_EFFECTS:LUNS[PHI1]-W-EXACT-{PHI1==1}>

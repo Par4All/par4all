@@ -5,7 +5,7 @@ setenv NAME ${NAME:-$WSPACE}
 setenv FREIA_TARGET ${FREIA_TARGET:-SPOC}
 # props...
 setproperty ABORT_ON_USER_ERROR=TRUE
-setproperty FREIA_LABEL_ARCS=TRUE
+setproperty FREIA_DAG_LABEL_ARCS=TRUE
 setproperty MEMORY_EFFECTS_ONLY=FALSE
 # use "old" effects...
 setproperty CONSTANT_PATH_EFFECTS=FALSE
