@@ -3,4 +3,5 @@ setenv NAME anr999
 setenv FILE $NAME.c
 setproperty HWAC_SPOC_DEPTH 3
 setproperty HWAC_TERAPIX_DMABW 64
+setproperty HWAC_TERAPIX_IMAGELET_MAX_SIZE 128
 source default_tpips

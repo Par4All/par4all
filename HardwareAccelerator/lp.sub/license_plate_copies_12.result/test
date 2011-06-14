@@ -4416,13 +4416,14 @@ digraph "license_plate_copies_helper_0_0_9" {
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 2 output images
  * 4 image operations in dag
@@ -4639,13 +4640,14 @@ freia_status license_plate_copies_helper_0_0_0(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 2 output images
  * 6 image operations in dag
@@ -4914,13 +4916,14 @@ freia_status license_plate_copies_helper_0_0_1(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 2 output images
  * 8 image operations in dag
@@ -5254,13 +5257,14 @@ freia_status license_plate_copies_helper_0_0_2(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 2 output images
  * 8 image operations in dag
@@ -5594,13 +5598,14 @@ freia_status license_plate_copies_helper_0_0_3(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 2 output images
  * 8 image operations in dag
@@ -5951,13 +5956,14 @@ freia_status license_plate_copies_helper_0_0_4(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 4 image operations in dag
@@ -6164,13 +6170,14 @@ freia_status license_plate_copies_helper_0_0_5(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 5 image operations in dag
@@ -6419,13 +6426,14 @@ freia_status license_plate_copies_helper_0_0_6(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 3 image operations in dag
@@ -6628,13 +6636,14 @@ freia_status license_plate_copies_helper_0_0_7(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 1 output image
  * 7 image operations in dag
@@ -6951,13 +6960,14 @@ freia_status license_plate_copies_helper_0_0_8(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 3 image operations in dag
@@ -7160,13 +7170,14 @@ freia_status license_plate_copies_helper_0_0_9(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 4 image operations in dag
@@ -7387,13 +7398,14 @@ freia_status license_plate_copies_helper_0_0_10(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 4 image operations in dag
@@ -7600,13 +7612,14 @@ freia_status license_plate_copies_helper_0_0_11(
 
 /* FREIA terapix helper function for module license_plate_copies
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 16
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 16
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 2 input images, 1 output image
  * 5 image operations in dag

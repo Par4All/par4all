@@ -883,13 +883,14 @@ digraph "median_1_helper_0_0_0" {
 
 /* FREIA terapix helper function for module median_1
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 20
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 20
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 3 output images
  * 14 image operations in dag

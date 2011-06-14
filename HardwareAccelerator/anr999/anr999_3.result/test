@@ -1615,13 +1615,14 @@ digraph "dag_cleaned_0" {
 
 /* FREIA terapix helper function for module anr999
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 64
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 64
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 128
  *
  * 1 input image, 2 output images
  * 23 image operations in dag
@@ -1658,7 +1659,7 @@ freia_status anr999_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 128;
   int imagelet_1 = 0;
   int imagelet_2 = 204;
   int imagelet_3 = 408;

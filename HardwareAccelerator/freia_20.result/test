@@ -843,13 +843,14 @@ digraph "freia_20_helper_0_0_1" {
 
 /* FREIA terapix helper function for module freia_20
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 32
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 6 image operations in dag
@@ -1102,13 +1103,14 @@ freia_status freia_20_helper_0_0_0(
 
 /* FREIA terapix helper function for module freia_20
  *
- * RAMPE   = 1024
- * NPE     = 128
- * DMA BW  = 32
- * GRAM W  = 64
- * GRAM H  = 32
- * DAG CUT = compute
- * OVERLAP = false
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
  *
  * 1 input image, 1 output image
  * 7 image operations in dag
