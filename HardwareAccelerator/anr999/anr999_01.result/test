@@ -1172,8 +1172,12 @@ freia_status anr999_01_helper_0_0_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure min at 1023
-  mcu_macro[0][0].xmin3 = 1023;
-  mcu_macro[1][0].xmin3 = 1023;
+  mcu_macro[0][0].xmin2 = 1023;
+  mcu_macro[1][0].xmin2 = 1023;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  mcu_macro[0][0].xmin3 = 0;
+  mcu_macro[1][0].xmin3 = 0;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
   // 0: min(1)
@@ -1192,8 +1196,12 @@ freia_status anr999_01_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   // set measure vol at 1021
-  mcu_macro[0][1].xmin3 = 1021;
-  mcu_macro[1][1].xmin3 = 1021;
+  mcu_macro[0][1].xmin2 = 1021;
+  mcu_macro[1][1].xmin2 = 1021;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = 0;
+  mcu_macro[1][1].xmin3 = 0;
   mcu_macro[0][1].ymin3 = 0;
   mcu_macro[1][1].ymin3 = 0;
   // 1: vol(1)

@@ -276,8 +276,12 @@ freia_status my_global_min_coord_helper_0_0_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure min! at 1020
-  mcu_macro[0][0].xmin3 = 1020;
-  mcu_macro[1][0].xmin3 = 1020;
+  mcu_macro[0][0].xmin2 = 1020;
+  mcu_macro[1][0].xmin2 = 1020;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  mcu_macro[0][0].xmin3 = 0;
+  mcu_macro[1][0].xmin3 = 0;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
   // 0: min!(1)

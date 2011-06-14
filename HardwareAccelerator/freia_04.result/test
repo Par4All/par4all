@@ -780,8 +780,12 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_THRESHOLD;
   // set measure vol at 1022
-  mcu_macro[0][4].xmin3 = 1022;
-  mcu_macro[1][4].xmin3 = 1022;
+  mcu_macro[0][4].xmin2 = 1022;
+  mcu_macro[1][4].xmin2 = 1022;
+  mcu_macro[0][4].ymin2 = 0;
+  mcu_macro[1][4].ymin2 = 0;
+  mcu_macro[0][4].xmin3 = 0;
+  mcu_macro[1][4].xmin3 = 0;
   mcu_macro[0][4].ymin3 = 0;
   mcu_macro[1][4].ymin3 = 0;
   // 4: vol(2)
@@ -823,8 +827,12 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_THRESHOLD;
   // set measure min at 1021
-  mcu_macro[0][6].xmin3 = 1021;
-  mcu_macro[1][6].xmin3 = 1021;
+  mcu_macro[0][6].xmin2 = 1021;
+  mcu_macro[1][6].xmin2 = 1021;
+  mcu_macro[0][6].ymin2 = 0;
+  mcu_macro[1][6].ymin2 = 0;
+  mcu_macro[0][6].xmin3 = 0;
+  mcu_macro[1][6].xmin3 = 0;
   mcu_macro[0][6].ymin3 = 0;
   mcu_macro[1][6].ymin3 = 0;
   // 6: min(3)

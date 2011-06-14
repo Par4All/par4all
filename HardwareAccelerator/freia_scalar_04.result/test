@@ -730,8 +730,12 @@ freia_status freia_scalar_04_helper_0_1_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_ADD3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_ADD3;
   // set measure max at 1023
-  mcu_macro[0][1].xmin3 = 1023;
-  mcu_macro[1][1].xmin3 = 1023;
+  mcu_macro[0][1].xmin2 = 1023;
+  mcu_macro[1][1].xmin2 = 1023;
+  mcu_macro[0][1].ymin2 = 0;
+  mcu_macro[1][1].ymin2 = 0;
+  mcu_macro[0][1].xmin3 = 0;
+  mcu_macro[1][1].xmin3 = 0;
   mcu_macro[0][1].ymin3 = 0;
   mcu_macro[1][1].ymin3 = 0;
   // 1: max(2)
