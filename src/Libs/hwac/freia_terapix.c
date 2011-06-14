@@ -1231,7 +1231,12 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
-/* split a dag on scalar dependencies only, with a greedy heuristics.
+/* @brief split a dag on scalar dependencies only, with a greedy heuristics.
+ * @param initial dag to split
+ * @return a list of sub-dags
+ * this pass also decides the schedule of image operations, with the aim
+ * or reducing the number of necessary imagelets, so as to maximise
+ * imagelet size.
  */
 static list /* of dags */ split_dag_on_scalars(const dag initial)
 {
@@ -1372,9 +1377,9 @@ static int cut_decision(dag d, hash_table erosion)
   if (w>erode) erode=w;
 
   // then we should decide...
-  // there should be a *lot* of computations to amortize a split,
+  // there should be enough  computations to amortize a split,
   // given that an erode/dilate costs about 15 cycles per row
-  // there should be about 8 of them to amortize/hide one imagelet transfer,
+  // there should be about 2 of them to amortize/hide one imagelet transfer,
   // whether as input or output.
 
   int cut = erode/((int)(n_cuts+1));
