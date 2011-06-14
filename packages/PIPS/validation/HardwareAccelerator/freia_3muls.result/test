@@ -356,6 +356,16 @@ digraph "freia_3muls_helper_0_0_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module freia_3muls
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 3, dag width is 2
@@ -433,7 +443,7 @@ freia_status freia_3muls_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_MUL3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_MUL3;
-  // 1: *(1,1) -> 1
+  // 1: *(1,1) -> 2
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -442,8 +452,8 @@ freia_status freia_3muls_helper_0_0_0(
   mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
-  mcu_macro[0][1].xmin3 = imagelet_io_1_0;
-  mcu_macro[1][1].xmin3 = imagelet_io_1_1;
+  mcu_macro[0][1].xmin3 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin3 = imagelet_io_2_1;
   mcu_macro[0][1].ymin3 = 0;
   mcu_macro[1][1].ymin3 = 0;
   mcu_macro[0][1].iter1 = TERAPIX_PE_NUMBER;
@@ -475,10 +485,10 @@ freia_status freia_3muls_helper_0_0_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for o2
-  tile_out[0][1].x = imagelet_io_1_0;
+  // - imagelet 2 is o1 for o2
+  tile_out[0][1].x = imagelet_io_2_0;
   tile_out[0][1].y = 0;
-  tile_out[1][1].x = imagelet_io_1_1;
+  tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
 
 

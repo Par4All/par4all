@@ -595,6 +595,16 @@ digraph "freia_04_helper_0_0_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module freia_04
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 1 input image, 1 output image
  * 8 image operations in dag
  * dag length is 5, dag width is 2
@@ -771,8 +781,12 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_THRESHOLD;
   // set measure vol at 1022
-  mcu_macro[0][4].xmin3 = 1022;
-  mcu_macro[1][4].xmin3 = 1022;
+  mcu_macro[0][4].xmin2 = 1022;
+  mcu_macro[1][4].xmin2 = 1022;
+  mcu_macro[0][4].ymin2 = 0;
+  mcu_macro[1][4].ymin2 = 0;
+  mcu_macro[0][4].xmin3 = 0;
+  mcu_macro[1][4].xmin3 = 0;
   mcu_macro[0][4].ymin3 = 0;
   mcu_macro[1][4].ymin3 = 0;
   // 4: vol(2)
@@ -788,8 +802,8 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[1][4].iter3 = 0;
   mcu_macro[0][4].iter4 = 0;
   mcu_macro[1][4].iter4 = 0;
-  mcu_macro[0][4].addrStart = TERAPIX_UCODE_VOL?;
-  mcu_macro[1][4].addrStart = TERAPIX_UCODE_VOL?;
+  mcu_macro[0][4].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][4].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
   // 5: thr(3) -> 3
   mcu_macro[0][5].xmin1 = imagelet_3;
   mcu_macro[1][5].xmin1 = imagelet_3;
@@ -814,8 +828,12 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_THRESHOLD;
   // set measure min at 1021
-  mcu_macro[0][6].xmin3 = 1021;
-  mcu_macro[1][6].xmin3 = 1021;
+  mcu_macro[0][6].xmin2 = 1021;
+  mcu_macro[1][6].xmin2 = 1021;
+  mcu_macro[0][6].ymin2 = 0;
+  mcu_macro[1][6].ymin2 = 0;
+  mcu_macro[0][6].xmin3 = 0;
+  mcu_macro[1][6].xmin3 = 0;
   mcu_macro[0][6].ymin3 = 0;
   mcu_macro[1][6].ymin3 = 0;
   // 6: min(3)
@@ -831,8 +849,8 @@ freia_status freia_04_helper_0_0_0(
   mcu_macro[1][6].iter3 = 0;
   mcu_macro[0][6].iter4 = 0;
   mcu_macro[1][6].iter4 = 0;
-  mcu_macro[0][6].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
-  mcu_macro[1][6].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[0][6].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
+  mcu_macro[1][6].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   // 7: +(2,3) -> 1
   mcu_macro[0][7].xmin1 = imagelet_2;
   mcu_macro[1][7].xmin1 = imagelet_2;

@@ -1,18 +1,53 @@
-void kernel(int a[10])
-{
-   int i;
-   for(i = 0; i <= 9; i += 1)
-      a[i] = 0;
-}
+//
+// Initial code for module main
+//
 int main()
 {
-   int a[10];
+   // This variable is only here to include a preconditions an make it harder for us to clean regions ;-)
+   int n = 1;
 
    a[0] = 0;
+   int res;
    
-   // a is fully written, thus no copy in is needed
-   kernel(a);
+   // a is fully written, thus no "copy-in" is needed
+   kernel_full(a);
+
+   res = a[0];
+   // Force a copy-out
+   
+   // Def on CPU
+   a[0] = 0;
+   
+   // a is not fully written, thus a "copy-in" is needed
+   kernel_partial(a);
+
+   res = a[0];
+}
+//
+// Code after kernel_data_mapping for module main
+//
+int main()
+{
+   // This variable is only here to include a preconditions an make it harder for us to clean regions ;-)
+   int n = 1;
+
+   a[0] = 0;
+   int res;
+   
+   // a is fully written, thus no "copy-in" is needed
+   kernel_full(a);
    P4A_copy_from_accel(a, sizeof(int)*10);
 
-   int i = a[0];
+   res = a[0];
+   // Force a copy-out
+   
+   // Def on CPU
+   a[0] = 0;
+   P4A_copy_to_accel(a, sizeof(int)*10);
+   
+   // a is not fully written, thus a "copy-in" is needed
+   kernel_partial(a);
+   P4A_copy_from_accel(a, sizeof(int)*10);
+
+   res = a[0];
 }

@@ -8332,130 +8332,6 @@ tiling_sequence      > MODULE.code
 \end{PipsMake}
 
 
-\subsection{Hardware Accelerator}
-\label{hardware-accelerator}
-
-Generate code from a FREIA application possibly targeting hardware
-accelerator, such as SPoC and Terapix.
-%% I could add resources for the module dags?
-I'm unsure about the right granularity (now it is at the function
-level) and the resource which is produced (should it be an accelerated
-file?). The current choice does not allow to easily mix different
-accelerators.
-
-\begin{PipsMake}
-freia_spoc_compiler	> MODULE.code
-			> MODULE.callees
-			> MODULE.spoc_file
-        ! MODULE.freia_unroll_while
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-
-freia_terapix_compiler	> MODULE.code
-			> MODULE.callees
-			> MODULE.terapix_file
-        < PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-
-freia_aipo_compiler	> MODULE.code
-			> MODULE.callees
-	< PROGRAM.entities
-        < MODULE.code
-        < MODULE.cumulated_effects
-
-freia_unroll_while	> MODULE.code
-        < PROGRAM.entities
-        < MODULE.code
-\end{PipsMake}
-
-Default depth of the target SPoC accelerator:
-\begin{PipsProp}{HWAC_SPOC_DEPTH}
-HWAC_SPOC_DEPTH 8
-\end{PipsProp}
-
-Whether to unroll while loops for SPoC accelerator:
-\begin{PipsProp}{HWAC_FREIA_SPOC_UNROLL_WHILE}
-HWAC_FREIA_SPOC_UNROLL_WHILE FALSE
-\end{PipsProp}
-
-Number of processing elements (PE) for the Terapix accelerator:
-\begin{PipsProp}{HWAC_TERAPIX_NPE}
-HWAC_TERAPIX_NPE 128
-\end{PipsProp}
-
-Default size of memory, in pixel, for the Terapix accelerator
-(RAMPE is \emph{RAM} of \emph{PE}):
-\begin{PipsProp}{HWAC_TERAPIX_RAMPE}
-HWAC_TERAPIX_RAMPE 1024
-\end{PipsProp}
-
-Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
-(size of which is necessarily the number of pe):
-\begin{PipsProp}{HWAC_TERAPIX_DMABW}
-HWAC_TERAPIX_DMABW 32
-\end{PipsProp}
-
-Terapix 2D global RAM (GRAM) width and height:
-\begin{PipsProp}{HWAC_TERAPIX_GRAM_WIDTH}
-HWAC_TERAPIX_GRAM_WIDTH 64
-\end{PipsProp}
-\begin{PipsProp}{HWAC_TERAPIX_GRAM_HEIGHT}
-HWAC_TERAPIX_GRAM_HEIGHT 32
-\end{PipsProp}
-
-Whether and how to further cut the dag for terapix.
-Expected values, by order of compilation costs, are:
-\emph{none}, \emph{compute}, \emph{enumerate}.
-\begin{PipsProp}{HWAC_TERAPIX_DAG_CUT}
-HWAC_TERAPIX_DAG_CUT "compute"
-\end{PipsProp}
-
-Whether to label arcs in dag dot output with the image name,
-and to label nodes with the statement number, and whether to
-filter out unused scalar nodes.
-\begin{PipsProp}{FREIA_DAG_LABEL_ARCS}
-FREIA_DAG_LABEL_ARCS FALSE
-\end{PipsProp}
-\begin{PipsProp}{FREIA_DAG_LABEL_NODES}
-FREIA_DAG_LABEL_NODES TRUE
-\end{PipsProp}
-\begin{PipsProp}{FREIA_DAG_FILTER_NODES}
-FREIA_DAG_FILTER_NODES TRUE
-\end{PipsProp}
-
-Whether to remove dead image operations in the DAG.
-Should always be beneficial.
-\begin{PipsProp}{FREIA_REMOVE_DEAD_OPERATIONS}
-FREIA_REMOVE_DEAD_OPERATIONS TRUE
-\end{PipsProp}
-
-Whether to remove duplicate operations in the DAG, including
-algebraic optimizations with commutators.
-Should be always beneficial to terapix, but it may depend for spoc.
-\begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS}
-FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
-\end{PipsProp}
-
-Whether to remove useless image copies from the expression DAG.
-\begin{PipsProp}{FREIA_REMOVE_USELESS_COPIES}
-FREIA_REMOVE_USELESS_COPIES TRUE
-\end{PipsProp}
-
-Whether to move image copies within an expression DAG outside
-as external copies, if possible.
-\begin{PipsProp}{FREIA_MOVE_DIRECT_COPIES}
-FREIA_MOVE_DIRECT_COPIES TRUE
-\end{PipsProp}
-
-Whether to merge identical arguments, especially kernels, when calling
-an accelerated function:
-\begin{PipsProp}{FREIA_MERGE_ARGUMENTS}
-FREIA_MERGE_ARGUMENTS TRUE
-\end{PipsProp}
-
-
 %-----------End of Loop Transformations -------------------------
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% REDUNDANCY ELIMINATION
@@ -9940,6 +9816,169 @@ FALSE when computing effects needed by this pass.
 
 %-----------End of Expression Transformations -------------------------
 
+%% Hmmm... Hardware Accelerator here is kind of an expression transformation.
+
+\section{Hardware Accelerator}
+\label{hardware-accelerator}
+
+Generate code from a FREIA application possibly targeting hardware
+accelerator, such as SPoC, Terapix, or GPGPU.
+%% I could add resources for the module dags?
+I'm unsure about the right granularity (now it is at the function
+level) and the resource which is produced (should it be an accelerated
+file?). The current choice does not allow to easily mix different
+accelerators.
+
+\subsection{GPGPU}
+\label{hwac-gpgpu}
+
+Generate code for GPGPU, possibly through an OpenCL programmed library
+implementing the FREIA AIPO functions.
+
+\begin{PipsMake}
+freia_aipo_compiler	> MODULE.code
+			> MODULE.callees
+	< PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+The following properties are generic to all FREIA accelerator targets.
+
+Whether to label arcs in dag dot output with the image name,
+and to label nodes with the statement number, and whether to
+filter out unused scalar nodes.
+\begin{PipsProp}{FREIA_DAG_LABEL_ARCS}
+FREIA_DAG_LABEL_ARCS FALSE
+\end{PipsProp}
+\begin{PipsProp}{FREIA_DAG_LABEL_NODES}
+FREIA_DAG_LABEL_NODES TRUE
+\end{PipsProp}
+\begin{PipsProp}{FREIA_DAG_FILTER_NODES}
+FREIA_DAG_FILTER_NODES TRUE
+\end{PipsProp}
+
+Whether to remove dead image operations in the DAG.
+Should always be beneficial.
+\begin{PipsProp}{FREIA_REMOVE_DEAD_OPERATIONS}
+FREIA_REMOVE_DEAD_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to remove duplicate operations in the DAG, including
+algebraic optimizations with commutators.
+Should be always beneficial to terapix, but it may depend for spoc.
+\begin{PipsProp}{FREIA_REMOVE_DUPLICATE_OPERATIONS}
+FREIA_REMOVE_DUPLICATE_OPERATIONS TRUE
+\end{PipsProp}
+
+Whether to remove useless image copies from the expression DAG.
+\begin{PipsProp}{FREIA_REMOVE_USELESS_COPIES}
+FREIA_REMOVE_USELESS_COPIES TRUE
+\end{PipsProp}
+
+Whether to move image copies within an expression DAG outside
+as external copies, if possible.
+\begin{PipsProp}{FREIA_MOVE_DIRECT_COPIES}
+FREIA_MOVE_DIRECT_COPIES TRUE
+\end{PipsProp}
+
+Whether to merge identical arguments, especially kernels, when calling
+an accelerated function:
+\begin{PipsProp}{FREIA_MERGE_ARGUMENTS}
+FREIA_MERGE_ARGUMENTS TRUE
+\end{PipsProp}
+
+\subsection{SPoC}
+\label{hwac-spoc}
+
+\begin{PipsMake}
+freia_spoc_compiler	> MODULE.code
+			> MODULE.callees
+			> MODULE.spoc_file
+        ! MODULE.freia_unroll_while
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+
+freia_unroll_while	> MODULE.code
+        < PROGRAM.entities
+        < MODULE.code
+\end{PipsMake}
+
+Default depth of the target SPoC accelerator:
+\begin{PipsProp}{HWAC_SPOC_DEPTH}
+HWAC_SPOC_DEPTH 8
+\end{PipsProp}
+
+Whether to unroll while loops for SPoC accelerator:
+\begin{PipsProp}{HWAC_FREIA_SPOC_UNROLL_WHILE}
+HWAC_FREIA_SPOC_UNROLL_WHILE FALSE
+\end{PipsProp}
+
+\subsection{Terapix}
+\label{hwac-terapix}
+
+\begin{PipsMake}
+freia_terapix_compiler	> MODULE.code
+			> MODULE.callees
+			> MODULE.terapix_file
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.cumulated_effects
+\end{PipsMake}
+
+Number of processing elements (PE) for the Terapix accelerator:
+\begin{PipsProp}{HWAC_TERAPIX_NPE}
+HWAC_TERAPIX_NPE 128
+\end{PipsProp}
+
+Default size of memory, in pixel, for the Terapix accelerator
+(RAMPE is \emph{RAM} of \emph{PE}):
+\begin{PipsProp}{HWAC_TERAPIX_RAMPE}
+HWAC_TERAPIX_RAMPE 1024
+\end{PipsProp}
+
+Terapix DMA bandwidth. How many terapix cycles to transfer an imagelet row
+(size of which is necessarily the number of pe):
+\begin{PipsProp}{HWAC_TERAPIX_DMABW}
+HWAC_TERAPIX_DMABW 32
+\end{PipsProp}
+
+Terapix 2D global RAM (GRAM) width and height:
+\begin{PipsProp}{HWAC_TERAPIX_GRAM_WIDTH}
+HWAC_TERAPIX_GRAM_WIDTH 64
+\end{PipsProp}
+\begin{PipsProp}{HWAC_TERAPIX_GRAM_HEIGHT}
+HWAC_TERAPIX_GRAM_HEIGHT 32
+\end{PipsProp}
+
+Whether and how to further cut the dag for terapix.
+Expected values, by order of compilation costs, are:
+\emph{none}, \emph{compute}, \emph{enumerate}.
+\begin{PipsProp}{HWAC_TERAPIX_DAG_CUT}
+HWAC_TERAPIX_DAG_CUT "compute"
+\end{PipsProp}
+
+Whether input and output memory transfers overlap one with the other,
+that we have a full duplex DMA.
+\begin{PipsProp}{HWAC_TERAPIX_OVERLAP_IO}
+HWAC_TERAPIX_OVERLAP_IO FALSE
+\end{PipsProp}
+Note that it is already assumed that computations overlap with
+communications. This adds the information that host-accelerator
+loads and stores run in parallel. This has two impacts: the
+communication apparent time is reduced thanks to the overlapping,
+which is good, but the imagelet memory cannot be reused for inputs
+because it is still live while being stored, which is bad for
+memory pressure.
+
+Use this maximum size (height) of an imagelet if set to non-zero.
+It may be useful to set this value to the image height (if known) so
+that compiler generates code for smaller imagelets, so that the
+runtime is not surprised.
+\begin{PipsProp}{HWAC_TERAPIX_IMAGELET_MAX_SIZE}
+HWAC_TERAPIX_IMAGELET_MAX_SIZE 0
+\end{PipsProp}
 
 \section{Function Level Transformations}
 

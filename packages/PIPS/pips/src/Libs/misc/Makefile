@@ -28,7 +28,6 @@ LIB_CFILES =	debug.c \
 		args.c \
 		system.c \
 		exception.c \
-		mem_spy.c \
 		perf_spy.c \
 		malloc_debug.c
 

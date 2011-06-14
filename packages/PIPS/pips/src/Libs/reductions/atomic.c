@@ -272,7 +272,7 @@ static bool replace_reductions_in_loop(loop l, atomic_profile *profile) {
     pips_debug(1,"Loop is parallel, fetching reductions...\n");
 //    reduction_reference(r);
     reductions rs = (reductions)load_statement_reductions(loop_stat);
-    if(rs) {
+    if(rs && !ENDP(reductions_list(rs))) {
       pips_debug(1,"Loop has a reduction ! Let's replace reductions inside\n");
       struct replace_ctx ctx = { false,false,profile };
       gen_context_recurse(l,&ctx,statement_domain,replace_reductions_in_statement,gen_null);
@@ -289,7 +289,7 @@ static bool replace_reductions_in_loop(loop l, atomic_profile *profile) {
       }
     }
   }
-  return TRUE;
+  return ret;
 }
 
 
@@ -314,17 +314,7 @@ bool replace_reduction_with_atomic( string mod_name) {
                                                     mod_name,
                                                     TRUE));
 
-  ifdebug(1) {
-    mem_spy_init( 2, 100000., NET_MEASURE, 0 );
-    mem_spy_begin();
-  }
-
   gen_context_recurse(module_stat, &current_profile, loop_domain,replace_reductions_in_loop,gen_null);
-
-  ifdebug(1) {
-    mem_spy_end("Replace reduction in loops");
-    mem_spy_reset();
-  }
 
   if (!statement_consistent_p(module_stat)) {
     pips_internal_error("Statement is inconsistent ! No choice but abort...\n");
