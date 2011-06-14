@@ -11,9 +11,9 @@ default:
 	# remains displayed...
 	more README.txt
 
-demo : scmp
+demo : $(TARGET)_scmp
 
-scmp : $(SOURCES)
+%_scmp : %.c
 	p4a --scmp $<
 
 clean :
