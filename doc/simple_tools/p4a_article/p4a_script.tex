@@ -253,14 +253,16 @@ For more tweaking, look at the \Apfa Accel runtime source on
 directly in the \Agit repository.
 
 \subsection{Automatic task generation for the SCMP architecture}
-\label{sec:autom-parall-with}
+\label{sec:scmp}
 
 To generate an application for the SCMP architecture from a C program, use:
 \begin{verbatim}
 p4a --scmp example.c
 \end{verbatim}
-The task must have been previously identified with labels prefixed by
-\texttt{scmp\_task\_}.
+The tasks must have been previously identified with labels prefixed by
+\texttt{scmp\_task\_}\footnote{Advanced users can change this prefix
+  by changing the \Apips \texttt{SCALOPES\_KERNEL\_TASK\_PREFIX}
+  property.}.
 
 The compiler generates two directories:
 \begin{itemize}
