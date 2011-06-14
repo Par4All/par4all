@@ -46,6 +46,8 @@ Ask for the parallelization of all the modules of the program with OpenMP output
             PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0014
          ENDDO
       ENDDO
+      CALL A                                                            0017
+      CALL B                                                            0018
       END
 
       SUBROUTINE A
@@ -87,5 +89,7 @@ Ask for the parallelization of all the modules of the program with OpenMP output
             PHI1(2,I,J) = PHI1(2,I,J)-DT*PY*XCO                         0014
          ENDDO
       ENDDO
+      CALL A                                                            0017
+      CALL B                                                            0018
       END
 Regenerate the sources from the PIPS transformed code:
