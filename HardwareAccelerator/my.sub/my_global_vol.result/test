@@ -278,8 +278,8 @@ freia_status my_global_vol_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_VOL?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_VOL?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
   // inputs:
   // - imagelet 1 is i0 for image
   tile_in[0][0].x = imagelet_io_1_0;

@@ -1987,8 +1987,8 @@ freia_status vs_core_2_helper_0_1_0(
   mcu_macro[1][2].iter3 = 0;
   mcu_macro[0][2].iter4 = 0;
   mcu_macro[1][2].iter4 = 0;
-  mcu_macro[0][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
-  mcu_macro[1][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[0][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
+  mcu_macro[1][2].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   // 3: *.(2) -> 3
   mcu_macro[0][3].xmin1 = imagelet_io_2_0;
   mcu_macro[1][3].xmin1 = imagelet_io_2_1;

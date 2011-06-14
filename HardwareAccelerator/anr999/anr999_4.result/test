@@ -1644,8 +1644,8 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   // set measure vol at 1021
   mcu_macro[0][1].xmin3 = 1021;
   mcu_macro[1][1].xmin3 = 1021;
@@ -1664,8 +1664,8 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][1].iter3 = 0;
   mcu_macro[0][1].iter4 = 0;
   mcu_macro[1][1].iter4 = 0;
-  mcu_macro[0][1].addrStart = TERAPIX_UCODE_VOL?;
-  mcu_macro[1][1].addrStart = TERAPIX_UCODE_VOL?;
+  mcu_macro[0][1].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][1].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
   // 2: D8(1) -> 2
   mcu_macro[0][2].xmin1 = imagelet_io_1_0;
   mcu_macro[1][2].xmin1 = imagelet_io_1_1;
