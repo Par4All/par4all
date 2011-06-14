@@ -143,6 +143,9 @@ class p4a_builder:
 
         self.builder = build
 
+        if atomic:
+            nvcc_flags = [ "-arch=sm_11" ] + nvcc_flags
+
         if not nvcc:
             nvcc = "nvcc"
         if icc:

@@ -530,10 +530,14 @@ class p4a_scmp_compiler(p4a_processor):
             self.export_p4a_scmp_files()
 
             # copy original header files to the application directory
+            # well this is now useless: p4a also recovers user header includes
+            # still, I keep the line because it is useful
+            # to export the whole application.
             self.export_application_header_files()
 
             # apply dead_code_elimination on each new application
             # beware to use proper stubs so that all code is not eliminated
+            # not yet implemented
 
 
         else:
