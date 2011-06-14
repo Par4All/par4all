@@ -9966,9 +9966,11 @@ HWAC_TERAPIX_OVERLAP_IO FALSE
 \end{PipsProp}
 Note that it is already assumed that computations overlap with
 communications. This adds the information that host-accelerator
-loads and stores run in parallel.
-
-
+loads and stores run in parallel. This has two impacts: the
+communication apparent time is reduced thanks to the overlapping,
+which is good, but the imagelet memory cannot be reused for inputs
+because it is still live while being stored, which is bad for
+memory pressure.
 
 \section{Function Level Transformations}
 
