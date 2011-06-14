@@ -9,7 +9,7 @@ Add object oriented organization above PIPS validation.
 
 Introduce the concept of validation class.
 """
-import os, commands, string, re, optparse,glob
+import os, commands, string, re, optparse,glob, shutil, stat
 
 class ValidationClass:
 
@@ -30,6 +30,10 @@ class ValidationClass:
 		self.par4ll_validation_dir = self.p4a_root+'/../../packages/PIPS/validation/'
 		self.extension = ['.c','.F','.f','.f90','.f95']
 
+		# warning and failed status
+		self.warning = ['skipped']
+		self.failed = ['changed','failed']
+
 		# get default architecture and tpips/pips
 		self.arch=commands.getoutput(self.p4a_root+"/run/makes/arch.sh")
 
@@ -43,23 +47,26 @@ class ValidationClass:
 
 		elif (os.path.isfile(test_name_path+".tpips2")):
 			(int_status, output) = commands.getstatusoutput("tpips "+test_name_path+".tpips2 2>&1")
-			
+
 		elif (os.path.isfile(test_name_path+".py")):
 			(int_status, output) = commands.getstatusoutput("python "+os.path.basename(test_name_path)+".py 2> "+err_file_path)
 
 		elif (os.path.isfile(directory_test_path+"/default_tpips")):
-			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_tpips")
+			# Change flag for default_tpips
+			os.chmod(directory_test_path+"/default_tpips", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" tpips "+directory_test_path+"/default_tpips 2>"+err_file_path)
 
 		elif (os.path.isfile(directory_test_path+"/default_test")):
+			# Change flag for default_test
+			os.chmod(directory_test_path+"/default_test", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 			# test_name=file
 			# upper=FILE
-			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_test")
 			upper = os.path.basename(test_name_path).upper()
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" NAME="+upper+" "+directory_test_path+"/default_test 2>"+err_file_path)
 
 		elif (os.path.isfile(directory_test_path+"/default_pyps.py")):
-			(status_chmod,output_chmod) = commands.getstatusoutput("chmod +x "+directory_test_path+"/default_pyps.py")
+			# Change flag for default_pyps.py
+			os.chmod(directory_test_path+"/default_pyps.py", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 			(int_status, output) = commands.getstatusoutput("FILE="+test_file_path+" WSPACE="+os.path.basename(test_name_path)+" python "+directory_test_path+"/default_pyps.py 2>"+err_file_path)
 
 		else:
@@ -107,19 +114,19 @@ class ValidationClass:
 	 		os.chdir(directory_test_path)
 
 			# remove old .database
-			commands.getstatusoutput("rm -rf *.database")
+			for filename in glob.glob(directory_test_path+'/*.database') :
+				shutil.rmtree(filename,ignore_errors=True) 
 
 			# test
 			(int_status,output) = self.command_test(directory_test_path,test_name_path,err_file_path,test_file_path)
 
 			# filter out absolute path anyway, there may be some because of
 			# cpp or other stuff run by pips, even if relative path names are used.
-			# output = output.replace(directory_test_path,'.')
 			output = output.replace(directory_test_path,'.')
 
 			if (os.path.isfile(err_file_path) == True):
 				# copy error file on RESULT directories of par4all validation
-				commands.getstatusoutput("mv -f "+err_file_path+' '+self.p4a_root+'/RESULT')
+				shutil.move(err_file_path,self.p4a_root+'/RESULT')
 				os.rename(self.p4a_root+"/RESULT/"+os.path.basename(err_file_path),self.p4a_root+"/RESULT/"+os.path.basename(directory_test_path)+"_"+os.path.basename(err_file_path))
 		
 			if(int_status != 0):
@@ -140,7 +147,7 @@ class ValidationClass:
 				# Else try to apply test and out filter on test and out output
 				if (os.path.isfile(test_result_path + "/test_and_out.filter")):
 					# apply the user define filter on both the reference
-					commands.getstatusoutput('chmod +x ' + test_result_path + "/test_and_out.filter")
+					os.chmod(test_result_path + "/test_and_out.filter", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 
 					output_file_filter_path = test_result_path+'/'+os.path.basename(test_name_path)+'.out.filtered'
 					output_file_filter_h = open(output_file_filter_path,'w')
@@ -162,7 +169,7 @@ class ValidationClass:
 				else:
 					# apply the user define filter on the reference
 					if (os.path.isfile(test_result_path + "/test.filter")):
-						commands.getstatusoutput("chmod +x "+ test_result_path + "/test.filter")
+						os.chmod(test_result_path + "/test.filter", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 						(int_status, reference_filtered) = commands.getstatusoutput(test_result_path + "/test_and_out.filter "+reference_filtered_path)
 
 						# Write new "test reference" filtered
@@ -174,7 +181,7 @@ class ValidationClass:
 
 					# apply the user define filter on the output
 					if (os.path.isfile(test_result_path + "/out.filter")):
-						commands.getstatusoutput("chmod +x "+ test_result_path + "/out.filter")
+						os.chmod(test_result_path + "/out.filter", stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
 						(int_status, out_filtered) = commands.getstatusoutput(test_result_path + "/test_and_out.filter "+output_file_filter_path)
 						out_is_filtered=1
 
@@ -197,15 +204,6 @@ class ValidationClass:
 		os.chdir(self.p4a_root)
 		return status
 
-###### Number of failed/succeeded ########
-  def count_failed_suc(self,status,nb_warning,nb_failed):
-	if (status != 'bug-later'):
-		if (status == "skipped"):
-          	  nb_warning = nb_warning+1
-         	elif (status != "succeeded"):
-          	  nb_failed = nb_failed+1
-        return (nb_warning,nb_failed)
-
 ###### Validate only test what we want ######
   def valid_par4all(self):
 		os.chdir(self.p4a_root)
@@ -217,25 +215,18 @@ class ValidationClass:
 
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
-			commands.getstatusoutput('rm -rf RESULT')
+			shutil.rmtree("RESULT", ignore_errors=True)
 		os.mkdir("RESULT")
 
 		if os.path.isfile('p4a_log.txt'):
-			commands.getstatusoutput('rm -rf p4a_log.txt')
+			os.remove("p4a_log.txt")
 
-		nb_test = 0
-		nb_failed = 0
-		nb_warning = 0
-
-    # Open the file where par4all tests are:
+		# Open the file where par4all tests are:
 		for line in f:
+			# In case of the test is written like Directory_test\test.f instead os Directory_test/test.f
+			line = line.replace('\\','/')
 			# delete .f, .c and .tpips of the file name
 			(root, ext) = os.path.splitext(line)
-
-			# In case of the test is written like Directory_test\test.f instead os Directory_test/test.f
-			if (root.find('\\') != -1):
-				root = root.replace('\\','/')
-				line = line.replace('\\','/')
 
 			# split to have: link to folder of the test and name of the test
 			directory=root.split("/")
@@ -255,112 +246,154 @@ class ValidationClass:
 					print('%s is not a file into packages/PIPS/validation/'%(line.strip('\n')))
 				else:
 					# Run test
-					nb_test = nb_test+1
 					status = self.test_par4all(directory_test,self.par4ll_validation_dir+line,'p4a_log.txt')
-					(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
+
 			else:
 				print ("To test %s, use an extension like %s\n"%(line.strip('\n'),self.extension))
 
 		f.close()
+		(nb_warning,nb_failed,nb_test) = self.count_failed_warn("p4a_log.txt")
 		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
 
+### .result test to test ####
+  def result_test(self,directory_test,resultdir_list,log_file):
+		for result_dir in resultdir_list:
+
+			# Search a correspondig file of .result folder
+			test_name_list = self.search_file(result_dir.replace('.result',''))
+
+			for test_name_path in test_name_list:
+				# Test file
+				status = self.test_par4all(directory_test,test_name_path,log_file)
+  
 #### Directory to test - Recursive to enter in subdirectories ####
-  def recursive_dir_test(self,dir_list,log_file,nb_warning,nb_failed,nb_test):
+  def recursive_dir_test(self,dir_list,log_file):
 		# Check that list is not empty, so there is directory to test
 		if (len(dir_list) != 0):
 			i = 0
 			# List of subdirectories to test
 			dir_sublist = list()
+
 			# Browse directory
 			for i in range(0,len(dir_list)):
 				directory_test = dir_list[i]
+				# List all .result directories
+				resultdir_list = glob.glob(directory_test+'/*.result')
 				print (('# Considering %s')%(directory_test.replace(self.par4ll_validation_dir,'').strip('\n')))
-				for dirfile_test in os.listdir(directory_test):
-					(root, ext) = os.path.splitext(dirfile_test)
-					# This is a file
-					if (os.path.isfile(directory_test+'/'+dirfile_test) == True):
-						# is it a file to test?
-						if(ext in self.extension):
-							nb_test = nb_test+1
-							file_tested = directory_test + '/' + dirfile_test
-							# Test file
-							status = self.test_par4all(directory_test, file_tested,log_file)
-							(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
-					# This is a directory
-					elif (os.path.isdir(directory_test+'/'+dirfile_test) == True):
-						if (ext == '.sub'):
-							dir_sublist.append(directory_test+'/'+dirfile_test)
-						else:
-							# Is it in the makefile?
-							for line in open(directory_test+"/Makefile"):
-								if ((dirfile_test in line) and ("D.sub" in line)) :
-									dir_sublist.append(directory_test+'/'+dirfile_test)
 
-			(nb_warning,nb_failed,nb_test) = self.recursive_dir_test(dir_sublist,log_file,nb_warning,nb_failed,nb_test)
+				# Test
+				self.result_test(directory_test,resultdir_list,log_file)
 
+				# Check subdirectories to test and skipped status (no correspondig .result folder)
+				listing = os.listdir(directory_test)
+				for dirfile in listing:
+					self.subdir_list_test(directory_test,log_file,resultdir_list,dirfile,dir_sublist)
+
+			self.recursive_dir_test(dir_sublist,log_file)
+		(nb_warning,nb_failed,nb_test) = self.count_failed_warn(log_file)
+
+### Return number of failed, warning and test ####
+  def count_failed_warn(self,log_file):
+		nb_warning = 0
+		nb_failed  = 0
+		nb_test = 0
+
+		if os.path.exists(log_file):
+			log_file_h = open(log_file,'r')
+			readline_log_file = log_file_h.readlines()
+
+			# Number of test
+			nb_test = len(readline_log_file)
+
+			log_file_str = str(readline_log_file)
+
+			# Number of warning
+			i = 0
+			for i in range(0,len(self.warning)):
+				nb_warning = nb_warning + int(log_file_str.count(self.warning[i]+':'))
+
+			# Number of failed
+			i = 0
+			for i in range(0,len(self.failed)):
+				nb_failed = nb_failed + int(log_file_str.count(self.failed[i]+':'))
+
+			log_file_h.close()
 		return (nb_warning,nb_failed,nb_test)
-		
+
+### Check subdirectories to test and skipped status (no correspondig .result folder) ####
+  def subdir_list_test(self,directory_test,log_file,resultdir_list,dirfile,dir_sublist):
+		(root, ext) = os.path.splitext(dirfile)
+		if os.path.isdir(directory_test+'/'+dirfile):
+			if (ext != '.result'):
+				if (ext == '.sub'):
+					dir_sublist.append(directory_test+'/'+dirfile)
+				else:
+					# Is it in the makefile?
+					for line in open(directory_test+"/Makefile"):
+						if ((dirfile in line) and ("D.sub" in line)) :
+							dir_sublist.append(directory_test+'/'+dirfile)
+		elif ((os.path.isfile(directory_test+'/'+dirfile)) and ((directory_test+'/'+root+'.result' in resultdir_list) != True) and (ext in self.extension)):
+			self.file_result = open(log_file,'a')
+			self.file_result.write("skipped: "+(directory_test+'/'+dirfile).replace(self.par4ll_validation_dir,'')+'\n')
+			self.file_result.close()
+
+		return dir_sublist
+
 ### List tests in directories and subdirectories and check that it's not present in par4all_validation.txt ####
-  def recursive_list_test(self,dir_list):
+  def recursive_list_test(self,dir_list,par4all_string):
 		# Check that list is not empty, so there is directory to test
 		if (len(dir_list) != 0):
 			i = 0
 			# List of subdirectories to test
 			dir_sublist = list()
+
 			# Browse directory
 			for i in range(0,len(dir_list)):
 				directory_test = dir_list[i]
-				for dirfile_test in os.listdir(directory_test):
-					(root, ext) = os.path.splitext(dirfile_test)
-					# This is a file
-					if (os.path.isfile(directory_test+'/'+dirfile_test) == True):
-						# is it a file to test?
-						if(ext in self.extension):
-							# default_test depends of par4all_validation.txt
-							default_test = directory_test+'/'+dirfile_test
-							find = 'no'
+				resultdir_list = glob.glob(directory_test+'/*.result')
 
-							# Test is find. Check that it is present into par4all_validation.txt
-							if os.path.isfile(self.p4a_root+'/par4all_validation.txt'):
-								par4all = open(self.p4a_root+"/par4all_validation.txt")
-								for line_p4a in par4all:
-									# In case of the test is written like Directory_test\test.f instead os Directory_test/test.f
-									line_p4a = line_p4a.replace('\\','/').strip('\n')
-									if (default_test.replace(self.par4ll_validation_dir,'') == line_p4a):
-										# Test is found
-										find = 'yes'
-								par4all.close()
+				for result_dir in resultdir_list:
+					# Search a correspondig file of .result folder
+					test_name_list = self.search_file(result_dir.replace('.result',''))
+					for test_name_path in test_name_list:
+						# Test is find. Check that it is present into par4all_validation.txt
+						test_string = test_name_path.replace(self.par4ll_validation_dir,'').strip('\n')
 
-								# Write in diff.txt
-								if (find != 'yes'):
-									default_test_h = open('diff.txt','a')
-									default_test_h.write(default_test.replace(self.par4ll_validation_dir,'')+'\n')
-									default_test_h.close()
+						# Is test is in par4all_validation.txt ?
+						if int(par4all_string.count(test_string)) == 0:
+							diff_test_h = open('diff.txt','a')
+							diff_test_h.write(test_name_path.replace(self.par4ll_validation_dir,'')+'\n')
+							diff_test_h.close()
 
-							# None par4all_validation.txt file. Write in diff.txt
-							else:
-								default_test_h = open('diff.txt','a')
-								default_test_h.write(default_test.replace(self.par4ll_validation_dir,'')+'\n')
-								default_test_h.close()
+				# Check subdirectories to test and skipped status (no correspondig .result folder)
+				listing = os.listdir(directory_test)
+				for dirfile in listing:
+					dir_sublist = self.subdir_list_test(directory_test,"diff.txt",resultdir_list,dirfile,dir_sublist)
 
-					# This is a directory
-					elif (os.path.isdir(directory_test+'/'+dirfile_test) == True):
-						if (ext == '.sub'):
-							dir_sublist.append(directory_test+'/'+dirfile_test)
-						else:
-							# Is it in the makefile?
-							for line in open(directory_test+"/Makefile"):
-								if ((dirfile_test in line) and ("D.sub" in line)) :
-									dir_sublist.append(directory_test+'/'+dirfile_test)
+			self.recursive_list_test(dir_sublist,par4all_string)
 
-			self.recursive_list_test(dir_sublist)
+### Find file (c, fortran, etc...) of the corresponding .result test ###
+  def search_file(self,filename):
+		file_found = 0
+		files = list()
+
+		# List all tests file with corresponding .result folder
+		for ext in self.extension:
+			if os.path.exists(filename+ext):
+				files.append(filename+ext)
+				file_found = 1
+
+		if file_found == 0:
+			files.append(filename+'.result')
+
+		return files
 
 ###### Validate all tests (done by "default" file) ######
   def valid_pips(self):
 		os.chdir(self.p4a_root)
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
-			commands.getstatusoutput("rm -rf RESULT")
+			shutil.rmtree("RESULT", ignore_errors=True)
 		os.mkdir("RESULT")
 
 		default_file_path = self.par4ll_validation_dir+"defaults"
@@ -368,19 +401,16 @@ class ValidationClass:
 		default_file = open(default_file_path)
 
 		if os.path.isfile('pips_log.txt'):
-			commands.getstatusoutput('rm -rf pips_log.txt')
-
-		nb_test = 0
-		nb_failed = 0
-		nb_warning = 0
+			os.remove("pips_log.txt")
 
 		for line in default_file:
 			if (not re.match('#',line)):
 				# List all directories that we must test
 				line  = line.strip('\n')
 				dir_list = [self.par4ll_validation_dir+line];
-				(nb_warning,nb_failed,nb_test) = self.recursive_dir_test(dir_list,'pips_log.txt',nb_warning,nb_failed,nb_test)
+				self.recursive_dir_test(dir_list,'pips_log.txt')
 
+		(nb_warning,nb_failed,nb_test) = self.count_failed_warn('pips_log.txt')
 		print('%s failed and %s warning (skipped) in %s tests.'%(nb_failed,nb_warning,nb_test))
 		default_file.close()
 
@@ -394,66 +424,59 @@ class ValidationClass:
 		diff_file = open('diff.txt','w')
 		diff_file.close()
 
-		nb_test = 0
+		if os.path.isfile(self.p4a_root+'/par4all_validation.txt'):
+			par4all_h = open(self.p4a_root+"/par4all_validation.txt")
+			par4all_string = par4all_h.read()
+			par4all_string = par4all_string.replace('\\','/').strip('\n')
+			par4all_h.close()
+		else:
+			par4all_string = ''
 
 		# Parse all tests done by default file in pips validation and build a file with all tests which are not written in par4all_validation.txt
 		for line in default_file:
 			if (not re.match('#',line)):
 				line  = line.strip('\n')
 				dir_list = [self.par4ll_validation_dir+line]
-				self.recursive_list_test(dir_list)
+				self.recursive_list_test(dir_list,par4all_string)
 
-		diff = open('diff.txt','r')
-		print('%i tests are not done by --p4a options'%(len(diff.readlines())))
-		diff_file.close()
+		(nb_warning,nb_failed,nb_test) = self.count_failed_warn('diff.txt')
+		print('%i tests are not done by --p4a options or their status is "skipped"'%(nb_test))
 
 ###### Validate all tests of a specific directory ################
   def valid_dir(self,arg_dir):
-
 		os.chdir(self.p4a_root)
 		if os.path.isfile('directory_log.txt'):
-			commands.getstatusoutput('rm -rf directory_log.txt')
+			os.remove("directory_log.txt")
 
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
-			commands.getstatusoutput("rm -rf RESULT")
+			shutil.rmtree("RESULT", ignore_errors=True)
 		os.mkdir("RESULT")
-
-		nb_failed = 0
-		nb_test = 0
-		nb_warning = 0
 
 		#read the directory
 		i = 0
 
 		for i in range(0,len(arg_dir)):
 			directory_name = arg_dir[i]
-			directory_test = self.par4ll_validation_dir+directory_name
+			directory_test = [self.par4ll_validation_dir+directory_name]
 
 			# Is it a valid directory?
 			if (os.path.isdir(self.par4ll_validation_dir+directory_name) != True):
 				print ("%s does not exist or it's not a repository"%(directory_name))
 			else:
-				for file_test in os.listdir(directory_test):
-					(root, ext) = os.path.splitext(file_test)
-					# Extension OK?
-					if(ext in self.extension):
-						nb_test = nb_test+1
-						file_tested = directory_test + '/' + file_test
-						print (file_tested.replace(self.par4ll_validation_dir,'').strip('\n'))
-						# Test
-						status = self.test_par4all(directory_test, file_tested,'directory_log.txt')
-						(nb_warning,nb_failed) = self.count_failed_suc(status,nb_warning,nb_failed)
-
+				# Test
+				self.recursive_dir_test(directory_test,'directory_log.txt')
+		
+		(nb_warning,nb_failed,nb_test) = self.count_failed_warn('directory_log.txt')
 		print('%s failed and %s warning (skipped) in %s tests'%(nb_failed,nb_warning,nb_test))
 
 ###### Validate all desired tests ################
   def valid_test(self,arg_test):
-		
+
 		os.chdir(self.p4a_root)
 		# Create directory for result
 		if (os.path.isdir("RESULT") == True):
-			commands.getstatusoutput("rm -rf RESULT")
+			shutil.rmtree("RESULT", ignore_errors=True)
 		os.mkdir("RESULT")
 
 		#read the tests
@@ -462,10 +485,13 @@ class ValidationClass:
 		for i in range(0,len(arg_test)):
 			test_array=arg_test[i].split("/")
 			j = 0
+
+			# Directory of the test
 			directory_test = self.par4ll_validation_dir
 			for j in range(0,len(test_array)-1):
 				directory_test = directory_test+'/'+test_array[j]
 
+			# File to test
 			file_tested = directory_test+'/'+test_array[len(test_array)-1]
 
 			# Check that directory and test exist
