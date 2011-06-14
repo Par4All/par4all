@@ -253,7 +253,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min, measure_none }
     },
-    TRPX_MS(1, 3, "GLOBAL_MIN?")
+    TRPX_MS(1, 3, "GLOBAL_MIN")
   },
   { AIPO "global_max", "max", NULL, 0, 1, 1, 0, { TY_PIN, NULL, NULL },
     NO_PARAM, { spoc_input_0 | spoc_measure_0,
@@ -266,7 +266,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_min_coord, measure_none }
     },
-    TRPX_MS(4, 3, "GLOBAL_MIN_COORD?")
+    TRPX_MS(4, 3, "GLOBAL_MIN_COORD")
   },
   { AIPO "global_max_coord", "max!", NULL, 0, 1, 3, 0,
     { TY_PIN, TY_PIN, TY_PIN }, NO_PARAM,
@@ -280,7 +280,7 @@ static const freia_api_t FREIA_AIPO_API[] = {
     { spoc_input_0 | spoc_measure_0,
       NO_POC, alu_unused, { measure_vol, measure_none }
     },
-    TRPX_MS(2, 3, "VOL?")
+    TRPX_MS(2, 3, "GLOBAL_VOL")
   },
   // LINEAR
   // not implemented by SPOC!
