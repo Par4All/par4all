@@ -47,6 +47,7 @@
 /********************************************************** TERAPIX ANALYSES */
 
 /* @return the dead vertices (their output is dead) after computing v in d.
+ * ??? should it take care that an output node is never dead?
  */
 static void compute_dead_vertices
   (set deads, const set computed, const dag d, const dagvtx v)
@@ -55,7 +56,8 @@ static void compute_dead_vertices
   set futured_computed = set_dup(computed);
   set_add_element(futured_computed, futured_computed, v);
   FOREACH(dagvtx, p, preds)
-    if (list_in_set_p(dagvtx_succs(p), futured_computed))
+    if (// !gen_in_list_p(p, dag_outputs(d)) &&
+        list_in_set_p(dagvtx_succs(p), futured_computed))
       set_add_element(deads, deads, p);
   gen_free_list(preds);
   set_free(futured_computed);
@@ -315,11 +317,11 @@ static void terapix_gram_allocate
 /* Return the first/last available imagelet.
  * This ensures that the choice is deterministic.
  * Moreover, as first numbers are IO imagelets, this help putting outputs
- * in the right imagelet so as to avoid additionnal copies.
+ * in the right imagelet so as to avoid additionnal copies, if possible.
  */
 static _int select_imagelet(set availables, int * nimgs, boolean first)
 {
-  _int choice = 0;
+  _int choice = 0; // zero means no choice yet
   // allocate if no images are available
   if (set_empty_p(availables))
   {
@@ -768,9 +770,13 @@ static void freia_terapix_call
     {
       SET_FOREACH(dagvtx, v, deads)
       {
-        _int img = (_int) hash_get(allocation, v);
-        if (img<0) img=-img;
-        set_add_element(avail_img, avail_img, (void*) img);
+        // but keep intermediate output images!
+        if (!gen_in_list_p(v, dag_outputs(thedag)))
+        {
+          _int img = (_int) hash_get(allocation, v);
+          if (img<0) img=-img;
+          set_add_element(avail_img, avail_img, (void*) img);
+        }
       }
     }
 
@@ -1370,6 +1376,7 @@ static int cut_decision(dag d, hash_table erosion)
 
   // we also have to check that there is a significant erosion!
   // I first summarize the erosion to the max(n,s,e,w)
+  // grrr... C really lacks a stupid max/min function varyadic!
   // I could compute per direction, if necessary...
   int erode = n;
   if (s>erode) erode=s;
