@@ -240,7 +240,7 @@ def publish_deb(file, host, repos_dir, arch):
     p4a_util.run([ "ssh", host, "mkdir -p " + repos_arch_dir ])
     p4a_util.run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
     p4a_util.warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
-    p4a_util.run([ "scp", file, host + ":" + repos_arch_dir ])
+    p4a_util.run([ "rsync --partial --sparse", file, host + ":" + repos_arch_dir ])
     p4a_util.warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
     p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
@@ -273,7 +273,7 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         p4a_util.warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
         p4a_util.warn("If something goes wrong, try creating directories or publishing the file manually")
         p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])
-        p4a_util.run([ "scp", file, default_publish_host + ":" + publish_dir ])
+        p4a_util.run([ "rsync --partial --sparse", file, default_publish_host + ":" + publish_dir ])
         ext = p4a_util.get_file_ext(file)
         if ext == ".deb":
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch)
