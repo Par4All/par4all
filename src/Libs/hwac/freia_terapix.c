@@ -613,18 +613,22 @@ static void freia_terapix_call
 
   int comm = get_int_property(trpx_dmabw_prop);
 
+// integer property to string
+#define ip2s(n) itoa(get_int_property(n))
+
   // show stats in function's comments
   sb_cat(head, "\n"
                "/* FREIA terapix helper function for module ", module, "\n");
   sb_cat(head, " *\n");
   // show terapix code generation parameters
-  sb_cat(head, " * RAMPE   = ", itoa(get_int_property(trpx_mem_prop)), "\n");
-  sb_cat(head, " * NPE     = ", itoa(get_int_property(trpx_npe_prop)), "\n");
-  sb_cat(head, " * DMA BW  = ", itoa(get_int_property(trpx_dmabw_prop)), "\n");
-  sb_cat(head, " * GRAM W  = ", itoa(get_int_property(trpx_gram_width)), "\n");
-  sb_cat(head, " * GRAM H  = ", itoa(get_int_property(trpx_gram_height)), "\n");
-  sb_cat(head, " * DAG CUT = ", get_string_property(trpx_dag_cut), "\n");
-  sb_cat(head, " * OVERLAP = ", trpx_overlap_io_p()? "true": "false", "\n");
+  sb_cat(head, " * RAMPE    = ", ip2s(trpx_mem_prop), "\n");
+  sb_cat(head, " * NPE      = ", ip2s(trpx_npe_prop), "\n");
+  sb_cat(head, " * DMA BW   = ", ip2s(trpx_dmabw_prop), "\n");
+  sb_cat(head, " * GRAM W   = ", ip2s(trpx_gram_width), "\n");
+  sb_cat(head, " * GRAM H   = ", ip2s(trpx_gram_height), "\n");
+  sb_cat(head, " * DAG CUT  = ", get_string_property(trpx_dag_cut), "\n");
+  sb_cat(head, " * OVERLAP  = ", trpx_overlap_io_p()? "true": "false", "\n");
+  sb_cat(head, " * MAX SIZE = ", ip2s(trpx_max_size), "\n");
   sb_cat(head, " *\n");
   // show dag statistics
   sb_cat(head, " * ", itoa(n_ins), " input image", n_ins>1? "s": "");
@@ -952,9 +956,14 @@ static void freia_terapix_call
   sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
 
   // this is really a MAXIMUM available size
-  // the runtime can use that or less
-  sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
-  // testing: sb_cat(decl, "  int imagelet_size = 206;\n");
+  int max_size = get_int_property(trpx_max_size);
+  // the runtime can use imagelet_rows or less
+  sb_cat(decl, "  int imagelet_size = ",
+         itoa(max_size?
+              // max_size is defined, may use it if smaller than computed size
+              (max_size<imagelet_rows? max_size: imagelet_rows):
+              // max_size is not defined
+              imagelet_rows), ";\n");
 
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
