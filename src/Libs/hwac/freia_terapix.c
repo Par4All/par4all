@@ -1313,7 +1313,8 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
     set_clear(computed);
     set_assign_list(computed, dag_inputs(dall));
 
-    // GLOBAL
+    // GLOBAL for sorting
+    // ??? is this the same as erodes?
     pips_assert("erosion is clean", erosion==NULL);
     erosion = hash_table_make(hash_pointer, 0);
     dag_terapix_erosion(dall, erosion);
@@ -1452,7 +1453,7 @@ static int cut_decision(dag d, hash_table erosion)
 
 /* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
  */
-static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
+static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
 {
   pips_debug(2, "cutting with cut=%d\n", cut);
   pips_assert("something cut width", cut>0);
@@ -1471,11 +1472,19 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   list lcurrent = NIL, computables;
   set_assign_list(done, dag_inputs(d));
 
+  // GLOBAL
+  pips_assert("erosion is clean", erosion==NULL);
+  erosion = hash_table_make(hash_pointer, 0);
+  dag_terapix_erosion(d, erosion);
+
   // transitive closure
   bool changed = true;
   while (changed &&
          (computables = get_computable_vertices(d, done, done, current)))
   {
+    // ensure determinism
+    gen_sort_list(computables,
+                  (int(*)(const void*,const void*)) dagvtx_terapix_priority);
     changed = false;
     FOREACH(dagvtx, v, computables)
     {
@@ -1484,10 +1493,10 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
       // would not work because the erosion only make sense if it is
       // the same for all imagelet, or said otherwise the erosion is
       // aligned to the worst case so that tiling can reasonnably take place.
-      if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
-          (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
-          (((_int) hash_get(erosion, EAST(v))) <= cut) &&
-          (((_int) hash_get(erosion, WEST(v))) <= cut))
+      if ((((_int) hash_get(erodes, NORTH(v))) <= cut) &&
+          (((_int) hash_get(erodes, SOUTH(v))) <= cut) &&
+          (((_int) hash_get(erodes, EAST(v))) <= cut) &&
+          (((_int) hash_get(erodes, WEST(v))) <= cut))
       {
         set_add_element(current, current, v);
         set_add_element(done, done, v);
@@ -1499,6 +1508,9 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
     // cleanup
     gen_free_list(computables), computables = NIL;
   }
+
+  // cleanup GLOBAL
+  hash_table_free(erosion), erosion = NULL;
 
   pips_assert("some vertices where extracted", lcurrent!=NIL);
 
