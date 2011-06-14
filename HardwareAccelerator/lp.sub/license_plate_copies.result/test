@@ -4328,6 +4328,15 @@ digraph "license_plate_copies_helper_0_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module license_plate_copies
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 32
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = none
+ * OVERLAP = false
+ *
  * 1 input image, 1 output image
  * 69 image operations in dag
  * dag length is 53, dag width is 2

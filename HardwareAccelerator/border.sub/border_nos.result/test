@@ -265,6 +265,15 @@ digraph "dag_cleaned_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module border_nos
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 32
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1

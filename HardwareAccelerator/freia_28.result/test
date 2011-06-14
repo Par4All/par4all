@@ -910,6 +910,15 @@ digraph "freia_28_helper_0_2_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module freia_28
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 32
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
@@ -1080,6 +1089,15 @@ freia_status freia_28_helper_0_0_0(
 
 
 /* FREIA terapix helper function for module freia_28
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 32
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 5 image operations in dag
  * dag length is 4, dag width is 2
@@ -1376,6 +1394,15 @@ freia_status freia_28_helper_0_1_0(
 
 
 /* FREIA terapix helper function for module freia_28
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 32
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 1

@@ -1574,6 +1574,15 @@ digraph "dag_cleaned_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 16
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 2 output images
  * 6 image operations in dag
  * dag length is 3, dag width is 2
@@ -1834,6 +1843,15 @@ freia_status anr999_helper_0_0_0(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 16
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 4 image operations in dag
  * dag length is 3, dag width is 2
@@ -2073,6 +2091,15 @@ freia_status anr999_helper_0_0_1(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 16
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 6 image operations in dag
  * dag length is 4, dag width is 2
@@ -2339,6 +2366,15 @@ freia_status anr999_helper_0_0_2(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 16
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 7 image operations in dag
  * dag length is 5, dag width is 2

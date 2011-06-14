@@ -911,6 +911,15 @@ digraph "median_1_helper_0_0_2" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module median_1
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 12
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 1 output image
  * 6 image operations in dag
  * dag length is 7, dag width is 1
@@ -1161,6 +1170,15 @@ freia_status median_1_helper_0_0_0(
 
 
 /* FREIA terapix helper function for module median_1
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 12
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 4, dag width is 1
@@ -1361,6 +1379,15 @@ freia_status median_1_helper_0_0_1(
 
 
 /* FREIA terapix helper function for module median_1
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 12
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 5 image operations in dag
  * dag length is 6, dag width is 2

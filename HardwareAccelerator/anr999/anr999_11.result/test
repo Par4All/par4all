@@ -1577,6 +1577,15 @@ digraph "dag_cleaned_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 1 input image, 2 output images
  * 4 image operations in dag
  * dag length is 2, dag width is 2
@@ -1810,6 +1819,15 @@ freia_status anr999_helper_0_0_0(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2003,6 +2021,15 @@ freia_status anr999_helper_0_0_1(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2196,6 +2223,15 @@ freia_status anr999_helper_0_0_2(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2389,6 +2425,15 @@ freia_status anr999_helper_0_0_3(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2582,6 +2627,15 @@ freia_status anr999_helper_0_0_4(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2775,6 +2829,15 @@ freia_status anr999_helper_0_0_5(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -2968,6 +3031,15 @@ freia_status anr999_helper_0_0_6(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 2 image operations in dag
  * dag length is 2, dag width is 2
@@ -3161,6 +3233,15 @@ freia_status anr999_helper_0_0_7(
 
 
 /* FREIA terapix helper function for module anr999
+ *
+ * RAMPE   = 1024
+ * NPE     = 128
+ * DMA BW  = 10
+ * GRAM W  = 64
+ * GRAM H  = 32
+ * DAG CUT = compute
+ * OVERLAP = false
+ *
  * 2 input images, 2 output images
  * 5 image operations in dag
  * dag length is 4, dag width is 2
