@@ -937,6 +937,7 @@ static void freia_terapix_call
   // this is really a MAXIMUM available size
   // the runtime can use that or less
   sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+  // testing: sb_cat(decl, "  int imagelet_size = 128;\n");
 
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
