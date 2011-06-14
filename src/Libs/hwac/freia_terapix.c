@@ -578,7 +578,12 @@ static void freia_terapix_call
   int n_outs = gen_length(dag_outputs(thedag));
   // number of needed double buffers for I/Os.
   // this is also the number of I/O images
-  int n_double_buffers = (n_ins>n_outs)? n_ins: n_outs; // max(#ins, #outs)
+  int n_double_buffers;
+
+  if (trpx_overlap_io_p())
+    n_double_buffers = n_ins+n_outs;
+  else
+    n_double_buffers = (n_ins>n_outs)? n_ins: n_outs; // max(#ins, #outs)
 
   pips_assert("some I/O images", n_double_buffers>0);
 
@@ -629,7 +634,9 @@ static void freia_terapix_call
   sb_cat(head, ", dag width is ", itoa(width), "\n");
   sb_cat(head, " * costs in cycles per imagelet row:\n");
   sb_cat(head, " * - computation: ", itoa(cost), "\n");
-  sb_cat(head, " * - communication: ", itoa(comm*(n_ins+n_outs)), "\n");
+  // number of transfers depends on overlapping
+  int n_trs = trpx_overlap_io_p()? (n_ins>n_outs? n_ins: n_outs): n_ins+n_outs;
+  sb_cat(head, " * - communication: ", itoa(comm*n_trs), "\n");
   sb_cat(head, " */\n");
 
   // generate function declaration
@@ -689,6 +696,14 @@ static void freia_terapix_call
   // the GRAM initialization may be shared between helper calls?
   bool * used = terapix_gram_init();
 
+  // currently available imagelets
+  set avail_img = set_make(set_pointer);
+
+  // output images are the first ones when I/O comms overlap
+  if (trpx_overlap_io_p())
+    while (n_imagelets<n_outs)
+      set_add_element(avail_img, avail_img, (void*) (_int) ++n_imagelets);
+
   if (n_ins)
   {
     // ??? they should be given in the order of the arguments
@@ -725,8 +740,6 @@ static void freia_terapix_call
   {
     sb_cat(dbio, "  // no input\n\n");
   }
-
-  set avail_img = set_make(set_pointer);
 
   // complete if need be, there will be AT LEAST this number of images
   while (n_imagelets<n_double_buffers)
@@ -871,7 +884,11 @@ static void freia_terapix_call
     {
       int oimg = (int) (_int) hash_get(allocation, out);
       if (oimg<0) oimg=-oimg;
-      if (oimg>n_double_buffers)
+      // when not overlapping, any I/O image is fine
+      // when overlapping, must be one of the first
+      //   because the later ones are used in parallel as inputs
+      if ((!trpx_overlap_io_p() && oimg>n_double_buffers) ||
+          (trpx_overlap_io_p() && oimg>n_outs))
       {
         // PANIC:
         // if there is no available "IO" imagelet when an output is
@@ -937,7 +954,7 @@ static void freia_terapix_call
   // this is really a MAXIMUM available size
   // the runtime can use that or less
   sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
-  // testing: sb_cat(decl, "  int imagelet_size = 128;\n");
+  // testing: sb_cat(decl, "  int imagelet_size = 206;\n");
 
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
@@ -1384,7 +1401,21 @@ static int cut_decision(dag d, hash_table erosion)
   // for anr999 the gradient of depth 10 is just enough to cover the coms.
   // for lp, about 1(.2) split is suggested.
 
-  double n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
+  // compute number of cuts, that is the number of amortizable load/store
+  // ??? maybe I should incorporate a margin?
+  double n_cuts;
+
+  // please note that these formula are somehow approximated and the results
+  // may be proved wrong.
+  if (trpx_overlap_io_p())
+  {
+    // number of image to communicate is MAX(#in,#out)
+    int nimgs = nins>nouts? nins: nouts;
+    // the overhead of a cut is one transfer
+    n_cuts = ((1.0*cost/com_cost_per_row)-nimgs)/(1.0*width);
+  }
+  else
+    n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
 
   pips_debug(2, "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_cuts=%f\n",
              cost, com_cost_per_row, nins, width, nouts, n_cuts);
