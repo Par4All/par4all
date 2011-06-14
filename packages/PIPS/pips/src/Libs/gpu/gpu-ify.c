@@ -1,4 +1,4 @@
-/* A simple phase that outline parallel loops onto GPU
+/* A simple phase that outlines parallel loops onto GPU
 
    Ronan.Keryell@hpc-project.com
 */

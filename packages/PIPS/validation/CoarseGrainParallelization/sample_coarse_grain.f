@@ -14,6 +14,8 @@
             phi1(2,i,j)=phi1(2,i,j)-dt*py*xco
          enddo
          enddo
+         call a()
+         call b()
            end
 
       subroutine a

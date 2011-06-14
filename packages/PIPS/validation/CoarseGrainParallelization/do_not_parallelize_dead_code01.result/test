@@ -1,0 +1,39 @@
+int main(int argc, char **argv)
+{
+   int nx;                                                              /*0007*/
+   nx = 1000;                                                           /*0008*/
+   int ny;                                                              /*0009*/
+   ny = 1000;                                                           /*0010*/
+   int ey[nx][ny];                                                      /*0011*/
+
+   int t1, t3;                                                          /*0013*/
+
+   if (nx>=2&&ny==1)                                                    /*0015*/
+      for(t1 = 1; t1 <= nx; t1 += 1) {                                  /*0016*/
+         ey[0][0] = 0;                                                  /*0017*/
+         // this loop should not be parallelized, because it is dead code
+         for(t3 = 1; t3 <= ny; t3 += 1)                                 /*0019*/
+            ey[t1-1][t3-1] = 0;                                         /*0020*/
+      }
+   
+   // Same loop nest but not surrounded by if, and thus not dead code:
+   // the innermost loop is parallel
+   for(t1 = 1; t1 <= nx; t1 += 1) {                                     /*0026*/
+      ey[0][0] = 0;                                                     /*0027*/
+#pragma omp parallel for 
+      for(t3 = 1; t3 <= ny; t3 += 1)                                    /*0028*/
+         ey[t1-1][t3-1] = 0;                                            /*0029*/
+   }
+   
+   
+   if (nx>=2&&ny==1)                                                    /*0033*/
+      // these loops should not be parallelized, because they are dead code
+      for(t1 = 1; t1 <= nx; t1 += 1)                                    /*0035*/
+         // ey[0][0] = 0;
+         for(t3 = 1; t3 <= ny; t3 += 1)                                 /*0037*/
+            ey[t1-1][t3-1] = 0;                                         /*0038*/
+
+   printf("%d\n", ey[0][0]);                                            /*0042*/
+
+   return 0;                                                            /*0044*/
+}
