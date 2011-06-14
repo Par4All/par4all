@@ -489,13 +489,13 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
-  // 2: thr(2) -> 1
+  // 2: thr(2) -> 2
   mcu_macro[0][2].xmin1 = imagelet_2;
   mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
-  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
-  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
+  mcu_macro[0][2].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_2_1;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   // copy of operation 2 parameters
@@ -536,10 +536,10 @@ freia_status freia_skip_05_helper_0_0_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-  // - imagelet 1 is o1 for o
-  tile_out[0][1].x = imagelet_io_1_0;
+  // - imagelet 2 is o1 for o
+  tile_out[0][1].x = imagelet_io_2_0;
   tile_out[0][1].y = 0;
-  tile_out[1][1].x = imagelet_io_1_1;
+  tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
 
 
