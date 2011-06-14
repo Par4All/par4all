@@ -147,7 +147,7 @@ then
   # note that the reported hardware can be somehow virtual with hyperthreading
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
-  make+=" -j $jobs -l $load"
+  make+=" -j $jobs -l $load --no-print-directory"
   tail=$((30 + 20 * $nproc))
 else
   # sequential run
