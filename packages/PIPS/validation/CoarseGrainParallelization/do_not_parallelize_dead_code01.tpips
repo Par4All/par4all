@@ -1,0 +1,41 @@
+setenv WKS do_not_parallelize_dead_code01
+
+delete $WKS
+
+#setenv CPRETTYPRINTER_DEBUG_LEVEL 9
+#setenv KERNEL_LOAD_STORE_DEBUG_LEVEL 9
+#setenv KERNEL_DATA_MAPPING_DEBUG_LEVEL 9
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create $WKS $WKS.c
+
+setproperty PRETTYPRINT_STATEMENT_NUMBER TRUE 
+activate MUST_REGIONS
+activate TRANSFORMERS_INTER_FULL
+activate INTERPROCEDURAL_SUMMARY_PRECONDITION
+activate PRECONDITIONS_INTER_FULL
+
+module main
+#display PRINTED_FILE
+
+# Loop normalize for the C language and GPU friendly
+setproperty LOOP_NORMALIZE_ONE_INCREMENT TRUE
+setproperty LOOP_NORMALIZE_LOWER_BOUND 1
+# It is legal in the following by construction:
+setproperty LOOP_NORMALIZE_SKIP_INDEX_SIDE_EFFECT TRUE
+# If we do this here, the side effect at the end of a loop on the index
+# break parallelization. It would require to apply USE_DEF_ELIM...
+apply LOOP_NORMALIZE
+
+
+apply PRIVATIZE_MODULE
+
+apply COARSE_GRAIN_PARALLELIZATION
+
+display PRINTED_FILE
+
+close $WKS
+delete $WKS
+quit
+
