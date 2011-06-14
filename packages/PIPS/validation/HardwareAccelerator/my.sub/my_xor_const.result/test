@@ -246,6 +246,16 @@ digraph "my_xor_const_helper_0_0_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module my_xor_const
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1

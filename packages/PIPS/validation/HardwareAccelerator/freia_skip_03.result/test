@@ -507,6 +507,16 @@ digraph "freia_skip_03_helper_0_1_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module freia_skip_03
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 1 input image, 1 output image
  * 1 image operations in dag
  * dag length is 2, dag width is 1
@@ -644,6 +654,16 @@ freia_status freia_skip_03_helper_0_0_0(
 
 
 /* FREIA terapix helper function for module freia_skip_03
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 1 input image, 1 output image
  * 3 image operations in dag
  * dag length is 3, dag width is 1
@@ -704,8 +724,12 @@ freia_status freia_skip_03_helper_0_1_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // set measure vol at 1022
-  mcu_macro[0][0].xmin3 = 1022;
-  mcu_macro[1][0].xmin3 = 1022;
+  mcu_macro[0][0].xmin2 = 1022;
+  mcu_macro[1][0].xmin2 = 1022;
+  mcu_macro[0][0].ymin2 = 0;
+  mcu_macro[1][0].ymin2 = 0;
+  mcu_macro[0][0].xmin3 = 0;
+  mcu_macro[1][0].xmin3 = 0;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
   // 0: vol(1)
@@ -721,8 +745,8 @@ freia_status freia_skip_03_helper_0_1_0(
   mcu_macro[1][0].iter3 = 0;
   mcu_macro[0][0].iter4 = 0;
   mcu_macro[1][0].iter4 = 0;
-  mcu_macro[0][0].addrStart = TERAPIX_UCODE_VOL?;
-  mcu_macro[1][0].addrStart = TERAPIX_UCODE_VOL?;
+  mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
+  mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_VOL;
   // 1: -.(1) -> 1
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;

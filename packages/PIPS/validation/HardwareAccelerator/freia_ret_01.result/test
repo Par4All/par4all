@@ -323,6 +323,16 @@ digraph "freia_ret_01_helper_0_0_0" {
 #include <terapix_ucode.h>
 
 /* FREIA terapix helper function for module freia_ret_01
+ *
+ * RAMPE    = 1024
+ * NPE      = 128
+ * DMA BW   = 32
+ * GRAM W   = 64
+ * GRAM H   = 32
+ * DAG CUT  = compute
+ * OVERLAP  = false
+ * MAX SIZE = 0
+ *
  * 2 input images, 1 output image
  * 2 image operations in dag
  * dag length is 3, dag width is 2
