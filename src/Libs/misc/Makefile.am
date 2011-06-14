@@ -7,7 +7,6 @@ libmisc_la_SOURCES=debug.c \
 		args.c \
 		system.c \
 		exception.c \
-    #mem_spy.c \ # unimplemented !
 		perf_spy.c \
 		malloc_debug.c
 BUILT_SOURCES=$(TARGET).h
