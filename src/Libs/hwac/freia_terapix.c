@@ -767,7 +767,11 @@ static void freia_terapix_call
 
       // computation
       sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
-      terapix_mcu_val(body, n_ops, "xmin3", saddr);
+      terapix_mcu_val(body, n_ops, "xmin2", saddr);
+      terapix_mcu_val(body, n_ops, "ymin2", "0");
+
+      // should not be used, but just in case...
+      terapix_mcu_val(body, n_ops, "xmin3", "0");
       terapix_mcu_val(body, n_ops, "ymin3", "0");
 
       // extraction
