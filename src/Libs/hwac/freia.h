@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2011 MINES ParisTech
 
   This file is part of PIPS.
 
