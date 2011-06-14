@@ -609,7 +609,19 @@ static void freia_terapix_call
   int comm = get_int_property(trpx_dmabw_prop);
 
   // show stats in function's comments
-  sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
+  sb_cat(head, "\n"
+               "/* FREIA terapix helper function for module ", module, "\n");
+  sb_cat(head, " *\n");
+  // show terapix code generation parameters
+  sb_cat(head, " * RAMPE   = ", itoa(get_int_property(trpx_mem_prop)), "\n");
+  sb_cat(head, " * NPE     = ", itoa(get_int_property(trpx_npe_prop)), "\n");
+  sb_cat(head, " * DMA BW  = ", itoa(get_int_property(trpx_dmabw_prop)), "\n");
+  sb_cat(head, " * GRAM W  = ", itoa(get_int_property(trpx_gram_width)), "\n");
+  sb_cat(head, " * GRAM H  = ", itoa(get_int_property(trpx_gram_height)), "\n");
+  sb_cat(head, " * DAG CUT = ", get_string_property(trpx_dag_cut), "\n");
+  sb_cat(head, " * OVERLAP = ", trpx_overlap_io_p()? "true": "false", "\n");
+  sb_cat(head, " *\n");
+  // show dag statistics
   sb_cat(head, " * ", itoa(n_ins), " input image", n_ins>1? "s": "");
   sb_cat(head, ", ", itoa(n_outs), " output image", n_outs>1? "s": "", "\n");
   sb_cat(head, " * ", itoa(nops), " image operations in dag\n");
