@@ -52,6 +52,7 @@
 #include "text-util.h"
 #include "parser_private.h"
 #include "preprocessor.h"
+#include "transformer.h"
 #include "accel-util.h"
 
 
@@ -247,6 +248,7 @@ static bool array_must_fully_written_by_regions_p( entity e_used, list lreg) {
     print_region(array);
   }
   FOREACH(effect, reg, lreg) {
+    if(!descriptor_convex_p(effect_descriptor(reg))) continue;
     // Proj region over PHI to remove precondition variables
     // FIXME : Can be done by difference between the 2 bases
     list proj = base_to_list(sc_base(descriptor_convex(effect_descriptor(reg))));
@@ -1190,6 +1192,7 @@ bool kernel_data_mapping(char * module_name) {
 
   debug_on("KERNEL_DATA_MAPPING_DEBUG_LEVEL");
 
+
   /* regions */
   string region = db_get_memory_resource(DBR_REGIONS, module_name, TRUE);
   set_proper_rw_effects((statement_effects)region);
@@ -1206,6 +1209,14 @@ bool kernel_data_mapping(char * module_name) {
   /* preconditions */
   string precond = db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE);
   set_precondition_map((statement_mapping)precond);
+
+  /* preconditions */
+  string cumu = db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE);
+  set_cumulated_rw_effects((statement_effects)cumu);
+
+  // Stuff for ... ?
+  module_to_value_mappings(get_current_module_entity());
+
 
   /* Initialize global hashtables */
   copies_from_in = hash_table_make(hash_pointer, INIT_STATEMENT_SIZE);
@@ -1257,6 +1268,8 @@ bool kernel_data_mapping(char * module_name) {
   reset_precondition_map();
   reset_current_module_statement();
   reset_current_module_entity();
+  reset_cumulated_rw_effects();
+  free_value_mappings();
 
   return true;
 }

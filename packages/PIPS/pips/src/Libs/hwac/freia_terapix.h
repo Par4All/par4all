@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2011 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -36,6 +36,8 @@
 #define trpx_gram_width  "HWAC_TERAPIX_GRAM_WIDTH"
 #define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
 #define trpx_dag_cut     "HWAC_TERAPIX_DAG_CUT"
+#define trpx_overlap_io  "HWAC_TERAPIX_OVERLAP_IO"
+#define trpx_max_size    "HWAC_TERAPIX_IMAGELET_MAX_SIZE"
 
 // various dag cutting strategies for terapix
 #define trpx_dag_cut_none_p(s) same_string_p(s, "none")
@@ -46,7 +48,9 @@
   trpx_dag_cut_compute_p(s) ||   \
   trpx_dag_cut_enumerate_p(s)
 
-// includes for generated helper
+#define trpx_overlap_io_p() get_bool_property(trpx_overlap_io)
+
+// includes for generated terapix helper
 #define FREIA_TRPX_INCLUDES           \
   "// freia terapix includes\n"       \
   "#include <freiaCommon.h>\n"        \

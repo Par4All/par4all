@@ -646,9 +646,6 @@ static void inout_block( statement st, cons *sts ) {
   set def_in = DEF_IN( st );
   set ref_in = REF_IN( st );
 
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
   /* loop over statements inside the block */
   FOREACH( statement, one, sts ) {
     /* propagate "in" sets */
@@ -667,9 +664,6 @@ static void inout_block( statement st, cons *sts ) {
   set_assign( DEF_OUT( st ), def_in );
   set_assign( REF_OUT( st ), ref_in );
 
-  ifdebug(1) {
-    mem_spy_end( "inout_block" );
-  }
 }
 
 /**
@@ -681,10 +675,6 @@ static void inout_block( statement st, cons *sts ) {
 static void inout_test( statement s, test t ) {
   statement st = test_true( t );
   statement sf = test_false( t );
-
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
 
   /*
    * Compute true path
@@ -708,9 +698,6 @@ static void inout_test( statement s, test t ) {
   set_union( DEF_OUT( s ), DEF_OUT( st ), DEF_OUT( sf ) );
   set_union( REF_OUT( s ), REF_OUT( st ), REF_OUT( sf ) );
 
-  ifdebug(1) {
-    mem_spy_end( "inout_test" );
-  }
 }
 
 /**
@@ -722,10 +709,6 @@ static void inout_test( statement s, test t ) {
  */
 static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
   set diff = MAKE_STATEMENT_SET();
-
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
 
   /* Compute "in" sets for the loop body
    * FIXME : diff temporary can be avoided ! */
@@ -749,9 +732,6 @@ static void inout_any_loop( statement st, statement body, bool one_trip_do ) {
     set_union( REF_OUT( st ), REF_OUT( body ), REF_IN( st ) );
   }
 
-  ifdebug(1) {
-    mem_spy_end( "inout_loop" );
-  }
 }
 
 /**
@@ -796,10 +776,6 @@ static void inout_forloop( statement st, forloop fl ) {
 static void inout_call( statement st, call __attribute__ ((unused)) c ) {
   set diff = MAKE_STATEMENT_SET();
 
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
-
   /* Compute "out" sets
    * FIXME diff temporary set can be avoided */
   set_union( DEF_OUT( st ), GEN( st ), set_difference( diff,
@@ -808,9 +784,6 @@ static void inout_call( statement st, call __attribute__ ((unused)) c ) {
   set_union( REF_OUT( st ), REF_IN( st ), REF( st ) );
   set_free( diff );
 
-  ifdebug(1) {
-    mem_spy_end( "inout_call" );
-  }
 }
 
 /**
@@ -823,10 +796,6 @@ static void inout_unstructured( statement st, unstructured u ) {
   control c = unstructured_control( u );
   control exit = unstructured_exit( u );
   statement s_exit = control_statement( exit );
-
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
 
   /* Compute "in" sets */
   set_assign( DEF_IN( control_statement( c )), DEF_IN( st ) );
@@ -855,9 +824,6 @@ static void inout_unstructured( statement st, unstructured u ) {
     set_assign( REF_OUT( st ), REF_OUT( s_exit ) );
   }
 
-  ifdebug(1) {
-    mem_spy_end( "inout_unstructured" );
-  }
 }
 
 /**
@@ -868,12 +834,6 @@ static void inout_unstructured( statement st, unstructured u ) {
 static void inout_statement( statement st ) {
   instruction i;
   static int indent = 0;
-
-  /*
-   ifdebug(1) {
-   mem_spy_begin();
-   }
-   */
 
   ifdebug(2) {
     fprintf( stderr,
@@ -941,11 +901,6 @@ static void inout_statement( statement st ) {
     local_print_statement_set( "REF_OUT", REF_OUT( st ) );
   }
 
-  /*
-   ifdebug(1) {
-   mem_spy_end("inout_statement");
-   }
-   */
 }
 
 /**
@@ -967,10 +922,6 @@ static void inout_control( control ct ) {
   set diff = MAKE_STATEMENT_SET();
   cons *blocs = NIL;
 
-  ifdebug(1) {
-    mem_spy_begin( );
-    mem_spy_begin( );
-  }
 
   ifdebug(2) {
     fprintf( stderr, "Computing DEF_IN and OUT of control %p entering", ct );
@@ -989,11 +940,6 @@ static void inout_control( control ct ) {
           set_clear( REF_OUT( st ));
         }},
       ct, blocs );
-
-  ifdebug(1) {
-    mem_spy_end( "inout_control: phase 1" );
-    mem_spy_begin( );
-  }
 
   for ( change = TRUE; change; ) {
     ifdebug(3) {
@@ -1024,10 +970,6 @@ static void inout_control( control ct ) {
         }, ct, blocs );
   }
 
-  ifdebug(1) {
-    mem_spy_end( "inout_control: phase 2 (fix-point)" );
-    mem_spy_begin( );
-  }
   CONTROL_MAP( c, {inout_statement( control_statement( c ));},
       ct, blocs );
   set_free( d_oldout );
@@ -1037,10 +979,6 @@ static void inout_control( control ct ) {
   set_free( diff );
   gen_free_list( blocs );
 
-  ifdebug(1) {
-    mem_spy_end( "inout_control: phase 3" );
-    mem_spy_end( "inout_control" );
-  }
 }
 
 /**
@@ -1116,10 +1054,6 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
   statement stin = hash_get( effects2statement, fin );
   cons *effect_outs = load_statement_effects( stout );
   cons *cs = NIL;
-
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
 
   ifdebug(2) {
     _int stin_o = statement_ordering(stin);
@@ -1249,9 +1183,6 @@ static void add_conflicts( effect fin, statement stout, bool(*which)() ) {
     }
   }
 
-  ifdebug(1) {
-    mem_spy_end( "add_conflicts" );
-  }
 }
 
 /**
@@ -1313,17 +1244,9 @@ static void usedef_control( c )
   control c; {
   cons *blocs = NIL;
 
-  ifdebug(1) {
-    mem_spy_begin( );
-  }
-
   CONTROL_MAP( n, {usedef_statement( control_statement( n ));},
       c, blocs );
   gen_free_list( blocs );
-
-  ifdebug(1) {
-    mem_spy_end( "usedef_control" );
-  }
 }
 
 /**
@@ -1338,11 +1261,6 @@ graph statement_dependence_graph( statement s ) {
   /* Initialize some properties */
   one_trip_do = get_bool_property( "ONE_TRIP_DO" );
   keep_read_read_dependences = get_bool_property( "KEEP_READ_READ_DEPENDENCE" );
-
-  ifdebug(1) {
-    mem_spy_begin( );
-    mem_spy_begin( );
-  }
 
   /* Initialize global hashtables */
   effects2statement = hash_table_make( hash_pointer, 0 );
@@ -1379,11 +1297,6 @@ graph statement_dependence_graph( statement s ) {
 #define TABLE_FREE(t)							\
   {HASH_MAP( k, v, {set_free( (set)v ) ;}, t ) ; hash_table_free(t);}
 
-  ifdebug(1) {
-    mem_spy_end( "dependence_graph: after computation" );
-    mem_spy_begin( );
-  }
-
   TABLE_FREE(Gen);
   TABLE_FREE(Ref);
   TABLE_FREE(Kill);
@@ -1394,11 +1307,6 @@ graph statement_dependence_graph( statement s ) {
 
   hash_table_free( Vertex_statement );
   hash_table_free( effects2statement );
-
-  ifdebug(1) {
-    mem_spy_end( "dependence graph: after freeing the hash tables" );
-    mem_spy_end( "dependence_graph" );
-  }
 
   return ( dg );
 }
@@ -1527,12 +1435,6 @@ bool chains( char * module_name, enum chain_type use ) {
 
   debug_on("CHAINS_DEBUG_LEVEL");
 
-  ifdebug(1) {
-    mem_spy_init( 0, 100000., NET_MEASURE, 0 );
-    mem_spy_begin( );
-    mem_spy_begin( );
-  }
-
   debug_off();
 
   set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE,
@@ -1544,11 +1446,6 @@ bool chains( char * module_name, enum chain_type use ) {
 
   debug_on("CHAINS_DEBUG_LEVEL");
 
-  ifdebug(1) {
-    mem_spy_end( "Chains: resources loaded" );
-    mem_spy_begin( );
-  }
-
   pips_debug(1, "finding enclosing loops ...\n");
   set_enclosing_loops_map( loops_mapping_of_statement( module_stat ) );
 
@@ -1556,17 +1453,7 @@ bool chains( char * module_name, enum chain_type use ) {
 
   set_effects( module_name, use );
 
-  ifdebug(1) {
-    mem_spy_end( "Chains: Preamble" );
-    mem_spy_begin( );
-  }
-
   module_graph = statement_dependence_graph( module_stat );
-
-  ifdebug(1) {
-    mem_spy_end( "Chains: Computation" );
-    mem_spy_begin( );
-  }
 
   ifdebug(2) {
     set_ordering_to_statement( module_stat );
@@ -1582,14 +1469,6 @@ bool chains( char * module_name, enum chain_type use ) {
   clean_enclosing_loops( );
   reset_current_module_statement( );
   reset_current_module_entity( );
-
-  debug_on("CHAINS_DEBUG_LEVEL");
-  ifdebug(1) {
-    mem_spy_end( "Chains: Deallocation" );
-    mem_spy_end( "Chains" );
-    mem_spy_reset( );
-  }
-  debug_off();
 
   return TRUE;
 }

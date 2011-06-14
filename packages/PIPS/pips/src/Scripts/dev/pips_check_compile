@@ -147,7 +147,7 @@ then
   # note that the reported hardware can be somehow virtual with hyperthreading
   nproc=$(grep '^processor' /proc/cpuinfo | wc -l)
   load=$(($nproc + 2)) jobs=$nproc
-  make+=" -j $jobs -l $load"
+  make+=" -j $jobs -l $load --no-print-directory"
   tail=$((30 + 20 * $nproc))
 else
   # sequential run
@@ -370,6 +370,8 @@ then
     # aggressive cleanup
     rm -rf ../install
     # should not be needed???
+    # possible issue: generated makefiles may be broken, so that unbuild
+    # fails and a recompilation is not possible without a manual fix?
     $nice $make unbuild >> out 2>&1 \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     $nice $make auto >> out 2>&1 \
@@ -388,6 +390,9 @@ then
   else
     # NLPMAKE compilation
     # something may have changed, let us recompile
+    # possible issue: if the Makefile are broken, then unbuild is broken?
+    # for nlpmake it is not a problem because the next svn up should
+    # repare the makefiles.
     $nice $make unbuild >> out 2>&1 \
       || report 'KO:make' 'unbuild' 'cannot "make unbuild"'
     # what about a "timeout"? how to differentiate from a simple failure?

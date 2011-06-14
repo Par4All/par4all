@@ -2,7 +2,7 @@
 
   $Id$
 
-  Copyright 1989-2010 MINES ParisTech
+  Copyright 1989-2011 MINES ParisTech
 
   This file is part of PIPS.
 
@@ -47,6 +47,7 @@
 /********************************************************** TERAPIX ANALYSES */
 
 /* @return the dead vertices (their output is dead) after computing v in d.
+ * ??? should it take care that an output node is never dead?
  */
 static void compute_dead_vertices
   (set deads, const set computed, const dag d, const dagvtx v)
@@ -55,7 +56,8 @@ static void compute_dead_vertices
   set futured_computed = set_dup(computed);
   set_add_element(futured_computed, futured_computed, v);
   FOREACH(dagvtx, p, preds)
-    if (list_in_set_p(dagvtx_succs(p), futured_computed))
+    if (// !gen_in_list_p(p, dag_outputs(d)) &&
+        list_in_set_p(dagvtx_succs(p), futured_computed))
       set_add_element(deads, deads, p);
   gen_free_list(preds);
   set_free(futured_computed);
@@ -315,11 +317,11 @@ static void terapix_gram_allocate
 /* Return the first/last available imagelet.
  * This ensures that the choice is deterministic.
  * Moreover, as first numbers are IO imagelets, this help putting outputs
- * in the right imagelet so as to avoid additionnal copies.
+ * in the right imagelet so as to avoid additionnal copies, if possible.
  */
 static _int select_imagelet(set availables, int * nimgs, boolean first)
 {
-  _int choice = 0;
+  _int choice = 0; // zero means no choice yet
   // allocate if no images are available
   if (set_empty_p(availables))
   {
@@ -576,7 +578,12 @@ static void freia_terapix_call
   int n_outs = gen_length(dag_outputs(thedag));
   // number of needed double buffers for I/Os.
   // this is also the number of I/O images
-  int n_double_buffers = (n_ins>n_outs)? n_ins: n_outs; // max(#ins, #outs)
+  int n_double_buffers;
+
+  if (trpx_overlap_io_p())
+    n_double_buffers = n_ins+n_outs;
+  else
+    n_double_buffers = (n_ins>n_outs)? n_ins: n_outs; // max(#ins, #outs)
 
   pips_assert("some I/O images", n_double_buffers>0);
 
@@ -606,8 +613,24 @@ static void freia_terapix_call
 
   int comm = get_int_property(trpx_dmabw_prop);
 
+// integer property to string
+#define ip2s(n) itoa(get_int_property(n))
+
   // show stats in function's comments
-  sb_cat(head, "\n/* FREIA terapix helper function for module ", module, "\n");
+  sb_cat(head, "\n"
+               "/* FREIA terapix helper function for module ", module, "\n");
+  sb_cat(head, " *\n");
+  // show terapix code generation parameters
+  sb_cat(head, " * RAMPE    = ", ip2s(trpx_mem_prop), "\n");
+  sb_cat(head, " * NPE      = ", ip2s(trpx_npe_prop), "\n");
+  sb_cat(head, " * DMA BW   = ", ip2s(trpx_dmabw_prop), "\n");
+  sb_cat(head, " * GRAM W   = ", ip2s(trpx_gram_width), "\n");
+  sb_cat(head, " * GRAM H   = ", ip2s(trpx_gram_height), "\n");
+  sb_cat(head, " * DAG CUT  = ", get_string_property(trpx_dag_cut), "\n");
+  sb_cat(head, " * OVERLAP  = ", trpx_overlap_io_p()? "true": "false", "\n");
+  sb_cat(head, " * MAX SIZE = ", ip2s(trpx_max_size), "\n");
+  sb_cat(head, " *\n");
+  // show dag statistics
   sb_cat(head, " * ", itoa(n_ins), " input image", n_ins>1? "s": "");
   sb_cat(head, ", ", itoa(n_outs), " output image", n_outs>1? "s": "", "\n");
   sb_cat(head, " * ", itoa(nops), " image operations in dag\n");
@@ -615,7 +638,9 @@ static void freia_terapix_call
   sb_cat(head, ", dag width is ", itoa(width), "\n");
   sb_cat(head, " * costs in cycles per imagelet row:\n");
   sb_cat(head, " * - computation: ", itoa(cost), "\n");
-  sb_cat(head, " * - communication: ", itoa(comm*(n_ins+n_outs)), "\n");
+  // number of transfers depends on overlapping
+  int n_trs = trpx_overlap_io_p()? (n_ins>n_outs? n_ins: n_outs): n_ins+n_outs;
+  sb_cat(head, " * - communication: ", itoa(comm*n_trs), "\n");
   sb_cat(head, " */\n");
 
   // generate function declaration
@@ -675,6 +700,14 @@ static void freia_terapix_call
   // the GRAM initialization may be shared between helper calls?
   bool * used = terapix_gram_init();
 
+  // currently available imagelets
+  set avail_img = set_make(set_pointer);
+
+  // output images are the first ones when I/O comms overlap
+  if (trpx_overlap_io_p())
+    while (n_imagelets<n_outs)
+      set_add_element(avail_img, avail_img, (void*) (_int) ++n_imagelets);
+
   if (n_ins)
   {
     // ??? they should be given in the order of the arguments
@@ -711,8 +744,6 @@ static void freia_terapix_call
   {
     sb_cat(dbio, "  // no input\n\n");
   }
-
-  set avail_img = set_make(set_pointer);
 
   // complete if need be, there will be AT LEAST this number of images
   while (n_imagelets<n_double_buffers)
@@ -753,7 +784,11 @@ static void freia_terapix_call
 
       // computation
       sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
-      terapix_mcu_val(body, n_ops, "xmin3", saddr);
+      terapix_mcu_val(body, n_ops, "xmin2", saddr);
+      terapix_mcu_val(body, n_ops, "ymin2", "0");
+
+      // should not be used, but just in case...
+      terapix_mcu_val(body, n_ops, "xmin3", "0");
       terapix_mcu_val(body, n_ops, "ymin3", "0");
 
       // extraction
@@ -768,9 +803,13 @@ static void freia_terapix_call
     {
       SET_FOREACH(dagvtx, v, deads)
       {
-        _int img = (_int) hash_get(allocation, v);
-        if (img<0) img=-img;
-        set_add_element(avail_img, avail_img, (void*) img);
+        // but keep intermediate output images!
+        if (!gen_in_list_p(v, dag_outputs(thedag)))
+        {
+          _int img = (_int) hash_get(allocation, v);
+          if (img<0) img=-img;
+          set_add_element(avail_img, avail_img, (void*) img);
+        }
       }
     }
 
@@ -849,7 +888,11 @@ static void freia_terapix_call
     {
       int oimg = (int) (_int) hash_get(allocation, out);
       if (oimg<0) oimg=-oimg;
-      if (oimg>n_double_buffers)
+      // when not overlapping, any I/O image is fine
+      // when overlapping, must be one of the first
+      //   because the later ones are used in parallel as inputs
+      if ((!trpx_overlap_io_p() && oimg>n_double_buffers) ||
+          (trpx_overlap_io_p() && oimg>n_outs))
       {
         // PANIC:
         // if there is no available "IO" imagelet when an output is
@@ -913,8 +956,14 @@ static void freia_terapix_call
   sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
 
   // this is really a MAXIMUM available size
-  // the runtime can use that or less
-  sb_cat(decl, "  int imagelet_size = ", itoa(imagelet_rows), ";\n");
+  int max_size = get_int_property(trpx_max_size);
+  // the runtime can use imagelet_rows or less
+  sb_cat(decl, "  int imagelet_size = ",
+         itoa(max_size?
+              // max_size is defined, may use it if smaller than computed size
+              (max_size<imagelet_rows? max_size: imagelet_rows):
+              // max_size is not defined
+              imagelet_rows), ";\n");
 
   // generate imagelet pointers
   for (int i=1; i<=total_imagelets; i++)
@@ -1231,7 +1280,12 @@ static int dagvtx_terapix_priority(const dagvtx * v1, const dagvtx * v2)
   return result;
 }
 
-/* split a dag on scalar dependencies only, with a greedy heuristics.
+/* @brief split a dag on scalar dependencies only, with a greedy heuristics.
+ * @param initial dag to split
+ * @return a list of sub-dags
+ * this pass also decides the schedule of image operations, with the aim
+ * or reducing the number of necessary imagelets, so as to maximise
+ * imagelet size.
  */
 static list /* of dags */ split_dag_on_scalars(const dag initial)
 {
@@ -1259,7 +1313,8 @@ static list /* of dags */ split_dag_on_scalars(const dag initial)
     set_clear(computed);
     set_assign_list(computed, dag_inputs(dall));
 
-    // GLOBAL
+    // GLOBAL for sorting
+    // ??? is this the same as erodes?
     pips_assert("erosion is clean", erosion==NULL);
     erosion = hash_table_make(hash_pointer, 0);
     dag_terapix_erosion(dall, erosion);
@@ -1356,7 +1411,21 @@ static int cut_decision(dag d, hash_table erosion)
   // for anr999 the gradient of depth 10 is just enough to cover the coms.
   // for lp, about 1(.2) split is suggested.
 
-  double n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
+  // compute number of cuts, that is the number of amortizable load/store
+  // ??? maybe I should incorporate a margin?
+  double n_cuts;
+
+  // please note that these formula are somehow approximated and the results
+  // may be proved wrong.
+  if (trpx_overlap_io_p())
+  {
+    // number of image to communicate is MAX(#in,#out)
+    int nimgs = nins>nouts? nins: nouts;
+    // the overhead of a cut is one transfer
+    n_cuts = ((1.0*cost/com_cost_per_row)-nimgs)/(1.0*width);
+  }
+  else
+    n_cuts = ((1.0*cost/com_cost_per_row)-nins-nouts)/(2.0*width);
 
   pips_debug(2, "cost=%d com_cost=%d nins=%d width=%d nouts=%d n_cuts=%f\n",
              cost, com_cost_per_row, nins, width, nouts, n_cuts);
@@ -1365,6 +1434,7 @@ static int cut_decision(dag d, hash_table erosion)
 
   // we also have to check that there is a significant erosion!
   // I first summarize the erosion to the max(n,s,e,w)
+  // grrr... C really lacks a stupid max/min function varyadic!
   // I could compute per direction, if necessary...
   int erode = n;
   if (s>erode) erode=s;
@@ -1372,9 +1442,9 @@ static int cut_decision(dag d, hash_table erosion)
   if (w>erode) erode=w;
 
   // then we should decide...
-  // there should be a *lot* of computations to amortize a split,
+  // there should be enough  computations to amortize a split,
   // given that an erode/dilate costs about 15 cycles per row
-  // there should be about 8 of them to amortize/hide one imagelet transfer,
+  // there should be about 2 of them to amortize/hide one imagelet transfer,
   // whether as input or output.
 
   int cut = erode/((int)(n_cuts+1));
@@ -1383,7 +1453,7 @@ static int cut_decision(dag d, hash_table erosion)
 
 /* cut dag "d", possibly a subdag of "fulld", at "erosion" "cut"
  */
-static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
+static dag cut_perform(dag d, int cut, hash_table erodes, dag fulld)
 {
   pips_debug(2, "cutting with cut=%d\n", cut);
   pips_assert("something cut width", cut>0);
@@ -1402,11 +1472,19 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
   list lcurrent = NIL, computables;
   set_assign_list(done, dag_inputs(d));
 
+  // GLOBAL
+  pips_assert("erosion is clean", erosion==NULL);
+  erosion = hash_table_make(hash_pointer, 0);
+  dag_terapix_erosion(d, erosion);
+
   // transitive closure
   bool changed = true;
   while (changed &&
          (computables = get_computable_vertices(d, done, done, current)))
   {
+    // ensure determinism
+    gen_sort_list(computables,
+                  (int(*)(const void*,const void*)) dagvtx_terapix_priority);
     changed = false;
     FOREACH(dagvtx, v, computables)
     {
@@ -1415,10 +1493,10 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
       // would not work because the erosion only make sense if it is
       // the same for all imagelet, or said otherwise the erosion is
       // aligned to the worst case so that tiling can reasonnably take place.
-      if ((((_int) hash_get(erosion, NORTH(v))) <= cut) &&
-          (((_int) hash_get(erosion, SOUTH(v))) <= cut) &&
-          (((_int) hash_get(erosion, EAST(v))) <= cut) &&
-          (((_int) hash_get(erosion, WEST(v))) <= cut))
+      if ((((_int) hash_get(erodes, NORTH(v))) <= cut) &&
+          (((_int) hash_get(erodes, SOUTH(v))) <= cut) &&
+          (((_int) hash_get(erodes, EAST(v))) <= cut) &&
+          (((_int) hash_get(erodes, WEST(v))) <= cut))
       {
         set_add_element(current, current, v);
         set_add_element(done, done, v);
@@ -1430,6 +1508,9 @@ static dag cut_perform(dag d, int cut, hash_table erosion, dag fulld)
     // cleanup
     gen_free_list(computables), computables = NIL;
   }
+
+  // cleanup GLOBAL
+  hash_table_free(erosion), erosion = NULL;
 
   pips_assert("some vertices where extracted", lcurrent!=NIL);
 

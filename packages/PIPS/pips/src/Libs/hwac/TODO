@@ -92,12 +92,14 @@
 + detect that an argument is used several times...
 - sequence extraction shouldn't include
   functions not implemented for the target?
-- use global max length/ops/critical path as a decision driver?
++ use global max length/ops/critical path as a decision driver?
   beware: do not extract input, even if live?!
 - extension: interface with SG terapix microcode generation
   hard constraint: 3 "pointers" are available; border management?
   is there anyway to somehow get the values of these pointers in a register
   and extract the six parameters independently?
+- check measure ops! there is a needed initialization (setcst)...
+- check operators with constant arguments...
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
