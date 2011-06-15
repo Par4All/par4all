@@ -12,12 +12,12 @@
 use strict;
 
 # manage options
-my $sort = 0;
-my $reverse = 0;
+my $sort = 1;
+my $reverse = 1;
 
 use Getopt::Long;
 GetOptions(
-  "h|help" => sub { print "$0 -sr SUMMARY_Archive/2011/06/*\n"; exit 0; },
+  "h|help" => sub { print "$0 SUMMARY_Archive/2011/06/*\n"; exit 0; },
   "s|sort!" => \$sort,
   "r|reverse!" => \$reverse
 ) or die "option error";
