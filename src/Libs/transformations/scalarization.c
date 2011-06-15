@@ -299,10 +299,12 @@ static effect  effect_write_or_read_on_variable(list el, entity v, boolean write
   effect result = effect_undefined;
   if(v) {
     FOREACH(EFFECT, e, el) {
-      action a  = effect_action(e);
-      entity ev = effect_entity(e);
-      if (same_entity_p(ev,v) && (write_p ? action_write_p(a):action_read_p(a)))
-	return(e);
+      if (store_effect_p(e)) {
+	action a  = effect_action(e);
+	entity ev = effect_entity(e);
+	if (same_entity_p(ev,v) && (write_p ? action_write_p(a):action_read_p(a)))
+	  return(e);
+      }
     }
   }
   return result;
@@ -317,7 +319,6 @@ static bool loop_scalarization(loop l)
 {
   entity i    = loop_index(l);
   statement s = loop_body(l);
-
   ifdebug(1) {
     pips_debug(1, "Statement:\n");
     print_statement(s);
@@ -330,9 +331,9 @@ static bool loop_scalarization(loop l)
   effects oe   = load_out_effects(s);
   effects crwe = load_cumulated_rw_effects(s);
 
-  list irl  = effects_effects(ie);
-  list orl  = effects_effects(oe);
-  list crwl = effects_effects(crwe);
+  list irl  = effects_store_effects(effects_effects(ie));
+  list orl  = effects_store_effects(effects_effects(oe));
+  list crwl = effects_store_effects(effects_effects(crwe));
 
   ifdebug(1) {
     pips_debug(1, "Entering function...\n");
@@ -346,6 +347,9 @@ static bool loop_scalarization(loop l)
   Pvecteur var_already_seen = VECTEUR_NUL;
   // Now we determine which read/write effects are not copied out.
   FOREACH (EFFECT, pr, crwl) {
+    if (!store_effect_p(pr))
+      continue;
+
     entity pv  = effect_variable(pr);
     // Does the current variable appear in the in effect?
     entity iv  = (entity) gen_find(pv, irl, (bool (*)())gen_eq, car_effect_to_variable);
