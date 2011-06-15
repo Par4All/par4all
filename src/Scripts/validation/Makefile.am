@@ -19,12 +19,14 @@
 # along with PIPS.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-dist_bin_SCRIPTS = 	pips_validate\
-					pips_manual_accept\
-					pips_force_accept\
-					pips_emacs_diff\
-					pips_validation_summary.pl\
-					pips_validation_diff_out.sh \
-					array_resizing_instrument.pl \
-					ubs_checking_instrument.pl
+dist_bin_SCRIPTS = \
+	pips_validate \
+	pips_manual_accept \
+	pips_force_accept \
+	pips_emacs_diff \
+	pips_validation_summary.pl \
+	pips_validation_diff_out.sh \
+	pips_validation_dig.pl \
+	array_resizing_instrument.pl \
+	ubs_checking_instrument.pl
 
