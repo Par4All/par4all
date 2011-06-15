@@ -1,0 +1,22 @@
+delete scalarization43
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+
+create scalarization43 scalarization43.c
+
+## Needed for substracting set approximations
+activate MUST_REGIONS
+
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[%ALLFUNC]
+#activate PRINT_CODE
+#display PRINTED_FILE[%ALLFUNC]
+
+apply SCALARIZATION[main]
+display PRINTED_FILE[main]
+
+close
+#delete scalarization43
+quit
+
