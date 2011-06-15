@@ -1,0 +1,85 @@
+# Optimization by unrolling of loop 100 and 200 in function 'convol',
+# and by repetitive partial evaluation
+
+delete convol
+create convol convol.f
+
+
+# Do not number statements at the end of the line.
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+
+echo c     SHOW convolution FUNCTION
+echo 
+# Show convolution function
+
+
+module convol
+display PRINTED_FILE
+
+echo c     SHOW main PROGRAM
+echo c     NOTICE THE ITERATIVE CALLS TO THE convol FUNCTION
+echo 
+# Show main program
+
+
+module IMAGE_PROCESSING
+display PRINTED_FILE
+
+echo c     INTERPROCEDURAL PRECONDITIONS FOR MODULE convol
+echo 
+# Show interprocedural preconditions for module 'convol'
+# Image size is 512 x 512 and the convolution kernel is 3 x 3.
+
+
+module convol
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE
+
+echo c     AFTER CONSTANT PROPAGATION
+echo c     NOTICE THE NUMERICAL LOOP BOUNDS
+echo 
+# Propagate constants (cloning could be used too)
+
+
+apply PARTIAL_EVAL
+activate PRINT_CODE
+display PRINTED_FILE 
+
+echo c     AFTER FULL UNROLLING OF THE TWO INTERNAL LOOPS
+echo 
+# Unroll internal loops 100 and 200
+
+
+apply FULL_UNROLL
+100
+
+apply FULL_UNROLL
+200
+display PRINTED_FILE
+
+echo c     AFTER USELESS VARIABLES ELIMINATION
+
+# Eliminate variables that are defined but not used.
+
+
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+apply DEAD_CODE_ELIMINATION
+display PRINTED_FILE
+
+echo c     SUBSCRIPTED EXPRESSIONS HAVE BEEN ELIMINATED BY PARTIAL EVALUATION
+echo 
+# Simplify subscript expressions
+
+
+apply PARTIAL_EVAL
+display PRINTED_FILE 
+
+echo c     PARALLELIZED LOCALITY WITH A LOOP INTERCHANGE
+echo 
+
+activate NEST_PARALLELIZATION
+display PARALLELPRINTED_FILE
+
+quit

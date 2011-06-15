@@ -1,0 +1,240 @@
+# Purpose of the demonstration:
+# parallelize loop in function 'compute',
+# eliminate a useless test on p,
+# remove induction variable k,
+# scalarize array t.
+
+
+# Remove existing workspace, if any
+delete acca-2011
+
+# Abort in case the user provides wrong source code or 
+# request something impossible
+setproperty ABORT_ON_USER_ERROR TRUE
+# Build def-use arcs for type and variable declarations 
+# because C source level algorithms are used
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+# Initialize a new workspace with source file 'acca-2011.c'
+create acca-2011 acca-2011.c
+
+echo '/*'
+echo ' * Source code for "compute" function,'
+echo ' * which performs operations on matrix in two "for" loops.'
+echo ' */'
+echo
+# Display initial version of function compute
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Source code for "main" function,'
+echo ' * which reads input, initializes parameters,' 
+echo ' * invokes computation and writes output.'
+echo ' */'
+echo
+# Display initial version of function main
+display PRINTED_FILE[main]
+
+echo '/*'
+echo ' * Why is n equal to 100 and p greater than or equal to 1?'
+echo ' * -> interprocedural analysis'
+echo ' * -> see the precondition in "main" (next step)'
+echo ' */'
+echo 
+# Print source code with preconditions for function 'compute'
+activate PRINT_CODE_PRECONDITIONS
+# Isolate comments used to display results of PIPS analyses 
+# from the source code statement
+setproperty PRETTYPRINT_ANALYSES_WITH_LF TRUE
+# Restrict information to variables actually read or written, 
+# directly or indirectly, by a statement following preconditions.
+setproperty SEMANTICS_FILTERED_PRECONDITIONS TRUE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "main" with preconditions'
+echo ' * -> see also parameters initialization'
+echo ' */'
+echo 
+# Display function main with preconditions
+display PRINTED_FILE[main]
+
+echo '/*'
+echo ' * Function "init_parameter", which initializes parameter p.'
+echo ' * The function summary transformer is used when computing'
+echo ' * the preconditions in the "main" function.'
+echo ' */'
+# Print source code with transformers
+
+
+# This concludes the explanation about the preconditions
+# computed for 'compute'.
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[init_parameter]
+
+echo '/*'
+echo ' * Now we have used the preconditions' 
+echo ' * to remove the useless test on p.'
+echo ' */'
+echo
+# Discard the useless test on p
+# Control simplification
+apply SUPPRESS_DEAD_CODE[compute]
+# Print code with no preconditions and no transformers.
+# And next, look at the k.
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute" after removal inductive definition of k'
+echo ' */'
+echo
+# Remove inductive definition of k
+
+
+# The uses of k are replaced by its definition
+# with respect to i the loop index variable.
+apply INDUCTION_SUBSTITUTION[compute]
+activate PRINT_CODE
+
+
+# But line 10 is still bad looking...
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute" after cleaning up the new definition of k'
+echo ' */'
+echo
+# Clean up the new expressions defining k.
+apply PARTIAL_EVAL[compute]
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * First attempt at parallelizing the outer loop: it fails!'
+echo ' */'
+echo
+# Look at the available parallelism
+# And let's check he dependence graph (next step)!
+
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Look at dependence graph.'
+echo ' */'
+echo
+# Display dependence graph.
+# Note the dependence cycle on k.
+apply PRINT_DOT_DEPENDENCE_GRAPH[compute]
+
+echo '/*'
+echo ' * Loop at line 11 is parallelized.'
+echo ' *'
+echo ' */'
+echo
+# Apply scalar privatization to remove dependence arcs on k.
+apply PRIVATIZE_MODULE[compute]
+# Print parallelized code
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute" with IN regions'
+echo ' * Notice that "t" is not an input of loops'
+echo ' * at line 17 and 32.'
+echo ' */'
+echo
+# Let's try a different approach and use IN and OUT regions.
+
+
+# Exact or underapproximated RW regions are
+# necessary to compute IN and OUT regions 
+# because the dataflow equation is not monotonous.
+activate MUST_REGIONS
+# To show information relative to the loop bodies.
+setproperty PRETTYPRINT_BLOCKS TRUE
+activate PRINT_CODE_IN_REGIONS
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute" with OUT regions,'
+echo ' * notice that "t" is not an output'
+echo ' * of the loop bodies and that "k" has impact at all'
+echo ' * on the computation.'
+echo ' */'
+echo
+# Display code with OUT regions
+activate PRINT_CODE_OUT_REGIONS
+# To print convex array regions not only for arrays 
+# but also for scalar variables
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+setproperty PRETTYPRINT_BLOCKS TRUE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Parallelized function "compute" after array privatization'
+echo ' */'
+echo
+setproperty PRETTYPRINT_BLOCKS FALSE
+# "t" is not an input nor output, so it can be privatized.
+apply ARRAY_PRIVATIZER[compute]
+# To print parallelized code
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Parallelized function "compute" after scalarization'
+echo ' * Notice that "t" is gone and'
+echo ' * notice the spurious loop on "k"'
+echo ' */'
+echo
+# Let's try another approach: the scalarization of array "t"
+
+
+# to use the name of scalarized variable 
+# instead of default prefix "__scalar__"
+setproperty SCALARIZATION_PREFIX ""
+# to apply scalarization on function "compute"
+apply SCALARIZATION[compute] 
+# to apply privatization on function "compute"
+apply PRIVATIZE_MODULE[compute]
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute": check that the loop on "k"'
+echo ' * is spurious.'
+echo ' * Definition of "k" at line 18 has no output.'
+echo ' */'
+echo
+activate PRINT_CODE_OUT_REGIONS
+# To print convex array regions not only for arrays 
+# but also for scalar variables.
+setproperty PRETTYPRINT_SCALAR_REGIONS TRUE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Function "compute" after dead code elimination'
+echo ' */'
+echo
+# To remove useless code
+apply DEAD_CODE_ELIMINATION[compute]
+activate PRINT_CODE
+display PRINTED_FILE[compute]
+
+echo '/*'
+echo ' * Parallelized function "compute":'
+echo ' * -> "t" has been scalarized on "t_0",'
+echo ' * -> "t_0" has been privatized,'
+echo ' * -> the inductive definition of the "k" has been replaced,'
+echo ' * -> the useless definition of "k" has been removed,'
+echo ' * -> the two loops are parallelized.'
+echo ' */'
+echo
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE[compute]
+
+close
+
+quit
