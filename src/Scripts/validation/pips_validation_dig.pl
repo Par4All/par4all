@@ -6,7 +6,6 @@
 #
 # Usage: $0 SUMMARY files list...
 # first file is current status to investigate ideally in reverse date order
-# use -sr options to ensure that it is sorted
 #
 
 use strict;
