@@ -30,6 +30,7 @@ my $n_fails = 0;
 
 # keep track of svn version info
 my %current_version = ();
+my %url = ();
 my %previous_version;
 
 # case status
@@ -53,9 +54,17 @@ sub vdiff()
     if ($current != $previous)
     {
       my $pre = $current+1;
-      $code =~ s/\/trunk$//; # compress output
-      $vdiff .= "$code\@" .
+      my $short = $code;
+      $short =~ s/\/trunk$//; # compress output
+      $vdiff .= "$short\@" .
         ($previous!=$pre? "$pre:$previous ": "$pre ");
+      my @authors = ();
+      for my $n ($pre .. $previous) {
+	my $who = `svn pget svn:author --revprop --revision $n $url{$code}`;
+	chomp $who;
+	push @authors, $who;
+      }
+      $vdiff .= '[' . join(' ',@authors) . '] ';
     }
   }
   # this may occur for undeterministic diffs
@@ -76,7 +85,11 @@ while (<>)
   }
 
   # get svn revision for anything, based on the svn url
-  $current_version{$2} = $3 if m,$url/([^@]+)@(\d+),;
+  if (m,($url/([^@]+))@(\d+),)
+  {
+    $current_version{$3} = $4;
+    $url{$3} = $1; # also keep the detailed url
+  }
 
   # investigate a case
   if (/^(passed|changed|failed|timeout): (\S+)/)
