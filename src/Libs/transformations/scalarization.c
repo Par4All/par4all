@@ -347,9 +347,6 @@ static bool loop_scalarization(loop l)
   Pvecteur var_already_seen = VECTEUR_NUL;
   // Now we determine which read/write effects are not copied out.
   FOREACH (EFFECT, pr, crwl) {
-    if (!store_effect_p(pr))
-      continue;
-
     entity pv  = effect_variable(pr);
     // Does the current variable appear in the in effect?
     entity iv  = (entity) gen_find(pv, irl, (bool (*)())gen_eq, car_effect_to_variable);
@@ -527,6 +524,12 @@ static bool loop_scalarization(loop l)
     }
   }
   vect_rm(var_already_seen);
+
+  // Do not leak
+  gen_free_list(irl);
+  gen_free_list(orl);
+  gen_free_list(crwl);
+
   return TRUE;
 }
 
