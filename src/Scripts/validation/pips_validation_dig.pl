@@ -28,13 +28,18 @@ GetOptions(
 my $n_fails = 0;
 
 # keep track of svn version info
+# project -> version
 my %current_version = ();
-my %url = ();
 my %previous_version;
+# keep track of the corresponding url
+# to retrieve more information if necessary
+# project -> full url
+my %url = ();
 
 # case status
 my %status = ();
 
+# possible url of pips svn server at CRI
 my $url = 'https?:\/\/svn\.cri\.(ensmp|mines-paristech)\.fr\/svn';
 
 # current file number
@@ -57,6 +62,7 @@ sub vdiff()
       $short =~ s/\/trunk$//; # compress output
       $vdiff .= "$short\@" .
         ($previous!=$pre? "$pre:$previous ": "$pre ");
+      # get authors of differing commits
       my @authors = ();
       for my $n ($pre .. $previous) {
 	my $who = `svn pget svn:author --revprop --revision $n $url{$code}`;
