@@ -837,7 +837,7 @@ static void freia_terapix_call
       sb_cat(body, " -> ", itoa((int) choice));
       // there is a subtlety here, if no I/O image was available
       // then a copy will have to be inserted later on, see "PANIC".
-      if (is_output && choice<=n_double_buffers) choice = -choice;
+      if (choice<=n_double_buffers) choice = -choice;
       hash_put(allocation, current, (void*) choice);
     }
     sb_cat(body, "\n");
