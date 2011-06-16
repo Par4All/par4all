@@ -542,61 +542,48 @@ static void compute_successors(fusion_block b, list block_list) {
         {
           // We have a dependence
           // ... or not, read after read are not real one when
-          // dealing with precedence ! But we don't filter it here because
-          // if they are present, it's because the user requested them, and
-          // we want to trigger loop fusion on read_read
-          // it can be better implemented.
-          if(1
-              // Dependence caused by environment effects are real ones !!
-              //&& store_effect_p(conflict_sink(a_conflict))
-              //&& store_effect_p(conflict_source(a_conflict))
-              //&& (action_write_p(effect_action(conflict_sink(a_conflict)))
-              //    || action_write_p(effect_action(conflict_source(a_conflict))))
-              ) {
+          // dealing with precedence !
+          int sink_ordering = vertex_ordering(successor_vertex(a_successor));
+          pips_debug(5, "Considering dependence to statement %d\n",
+              sink_ordering);
 
-            int sink_ordering =
-                vertex_ordering(successor_vertex(a_successor));
-            pips_debug(5, "Considering dependence to statement %d\n",
+          // Try to recover the sink block for this dependence.
+          // We might not find any, because dependence can be related to
+          // a statement outside from current sequence scope or can be related
+          // to a loop header, which we ignore.
+          fusion_block sink_block = get_block_from_ordering(sink_ordering,
+                                                            block_list);
+          if(sink_block == NULL) {
+            pips_debug(2,"No block found for ordering %d, dependence ignored\n",
                 sink_ordering);
-
-            // Try to recover the sink block for this dependence.
-            // We might not find any, because dependence can be related to
-            // a statement outside from current sequence scope or can be related
-            // to a loop header, which we ignore.
-            fusion_block sink_block = get_block_from_ordering(sink_ordering,
-                                                              block_list);
-            if(sink_block == NULL) {
-              pips_debug(2,"No block found for ordering %d, dependence ignored\n",
-                  sink_ordering);
-            } else {
-              // It's a forward pass, we only add precedence on blocks
-              // with ordering higher to current one
-              if(sink_block->num > b->num) {
-                // We have a successor !
-                if(action_write_p(effect_action(conflict_sink(a_conflict)))
-                   || action_write_p(effect_action(conflict_source(a_conflict)))) {
-                  // There's a real dependence here
-                  set_add_element(b->successors,
-                                  b->successors,
-                                  (void *)sink_block);
-                  // Mark current block as a predecessor ;-)
-                  set_add_element(sink_block->predecessors,
-                                  sink_block->predecessors,
-                                  (void *)b);
-                } else {
-                  // Read-read dependence is interesting to fuse, but is not a
-                  // precedence constraint
-                  set_add_element(b->rr_successors,
-                                  b->rr_successors,
-                                  (void *)sink_block);
-                  // Mark current block as a rr_predecessor ;-)
-                  set_add_element(sink_block->rr_predecessors,
-                                  sink_block->rr_predecessors,
-                                  (void *)b);
-                }
-
-                break; // One conflict with each successor is enough
+          } else {
+            // It's a forward pass, we only add precedence on blocks
+            // with ordering higher to current one
+            if(sink_block->num > b->num) {
+              // We have a successor !
+              if(action_write_p(effect_action(conflict_sink(a_conflict)))
+                  || action_write_p(effect_action(conflict_source(a_conflict)))) {
+                // There's a real dependence here
+                set_add_element(b->successors,
+                                b->successors,
+                                (void *)sink_block);
+                // Mark current block as a predecessor ;-)
+                set_add_element(sink_block->predecessors,
+                                sink_block->predecessors,
+                                (void *)b);
+              } else {
+                // Read-read dependence is interesting to fuse, but is not a
+                // precedence constraint
+                set_add_element(b->rr_successors,
+                                b->rr_successors,
+                                (void *)sink_block);
+                // Mark current block as a rr_predecessor ;-)
+                set_add_element(sink_block->rr_predecessors,
+                                sink_block->rr_predecessors,
+                                (void *)b);
               }
+
+              break; // One conflict with each successor is enough
             }
           }
         }
