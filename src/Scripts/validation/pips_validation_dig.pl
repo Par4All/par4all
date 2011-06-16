@@ -60,16 +60,13 @@ sub vdiff()
       my $pre = $current+1;
       my $short = $code;
       $short =~ s/\/trunk$//; # compress output
-      $vdiff .= "$short\@" .
-        ($previous!=$pre? "$pre:$previous ": "$pre ");
-      # get authors of differing commits
-      my @authors = ();
-      for my $n ($pre .. $previous) {
-	my $who = `svn pget svn:author --revprop --revision $n $url{$code}`;
-	chomp $who;
-	push @authors, $who;
-      }
-      $vdiff .= '[' . join(' ',@authors) . '] ';
+      # get authors of differing commits on the url *only*
+      my $who = `svn log --quiet --revision $pre:$previous $url{$code}`;
+      $who =~ s/^\-+\n//sg;
+      $who =~ s/r(\d+) \| (\w+) \| .*\n/$1($2),/sg;
+      $who =~ s/,$//;
+      # format as pips@123(coelho),124(irigoin)
+      $vdiff .= "$short\@$who ";
     }
   }
   # this may occur for undeterministic diffs
