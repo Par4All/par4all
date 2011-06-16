@@ -11,7 +11,7 @@ void fct_lib (const long size, t_real x[size]) {
   long   i;
 
   // compare loop
-  for (i = 0; i < size; i++) {
+  for (i = 1; i < size-1; i++) {
     x[i] = x[i-1] + x[i] + x[i+1];
   }
   return;
