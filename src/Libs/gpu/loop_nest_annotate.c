@@ -109,26 +109,37 @@ for further generation of CUDA code.
 typedef struct {
   list l_enclosing_loops;
   list l_number_iter_exp;
+  int max_loop_nest_depth;
   int loop_nest_depth;
-/* True only when we reached the inner annotated loop: */
+/* True only when we reach the inner annotated loop: */
   bool inner_reached;
+  /* True if we only deal with parallel loop nests */
+  bool gpu_loop_nest_annotate_parallel_p;
 } gpu_lna_context;
 
 
-/* Push a loop that match the criterion for annotation */
+/* Push a loop that matches the criterion for annotation */
 static bool loop_push(loop l, gpu_lna_context * p)
 {
-  /* In the mode when we just annotate parallel outer loop nests, just
-     stop when we encounter a sequential loop: */
-  if (get_bool_property("GPU_LOOP_NEST_ANNOTATE_PARALLEL")
-      && loop_sequential_p(l))
-    // Stop recursion:
-    return FALSE;
+  if (p->max_loop_nest_depth == -1)
+    {
+      statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
+      p->max_loop_nest_depth = p->gpu_loop_nest_annotate_parallel_p ?
+	depth_of_parallel_perfect_loop_nest(current_stat) :
+	depth_of_perfect_loop_nest(current_stat);
+    }
 
-  p->l_enclosing_loops = gen_nconc(p->l_enclosing_loops, CONS(LOOP, l, NIL));
-  p->loop_nest_depth++;
-  // Go on recursing:
-  return TRUE;
+  if (p->loop_nest_depth >= p->max_loop_nest_depth)
+    /* this loop does not belong to the perfectly nested loops */
+    return FALSE;
+  else
+    {
+      p->l_enclosing_loops = gen_nconc(p->l_enclosing_loops, CONS(LOOP, l, NIL));
+      p->loop_nest_depth++;
+      // Go on recursing:
+      return TRUE;
+    }
+  return FALSE;
 }
 
 
@@ -237,6 +248,7 @@ static void loop_annotate(loop l, gpu_lna_context * p)
       /* reset context*/
       p->inner_reached = FALSE;
       p->loop_nest_depth = 0;
+      p->max_loop_nest_depth = -1;
       gen_free_list(p->l_number_iter_exp);
       p->l_number_iter_exp = NIL;
     }
@@ -278,8 +290,11 @@ bool gpu_loop_nest_annotate(char *module_name)
   gpu_lna_context c;
   c.l_enclosing_loops = NIL;
   c.l_number_iter_exp = NIL;
+  c.max_loop_nest_depth = -1;
   c.loop_nest_depth = 0;
   c.inner_reached = FALSE;
+  c.gpu_loop_nest_annotate_parallel_p =
+    get_bool_property("GPU_LOOP_NEST_ANNOTATE_PARALLEL");
 
   /* Annotate the loop nests of the module. */
   gen_context_recurse(module_statement, &c, loop_domain, loop_push, loop_annotate);
