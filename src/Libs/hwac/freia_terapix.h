@@ -30,14 +30,15 @@
 #define HWAC_FREIA_TERAPIX_H_
 
 // terapix specific property names
-#define trpx_mem_prop    "HWAC_TERAPIX_RAMPE"
-#define trpx_npe_prop    "HWAC_TERAPIX_NPE"
-#define trpx_dmabw_prop  "HWAC_TERAPIX_DMABW"
-#define trpx_gram_width  "HWAC_TERAPIX_GRAM_WIDTH"
-#define trpx_gram_height "HWAC_TERAPIX_GRAM_HEIGHT"
-#define trpx_dag_cut     "HWAC_TERAPIX_DAG_CUT"
-#define trpx_overlap_io  "HWAC_TERAPIX_OVERLAP_IO"
-#define trpx_max_size    "HWAC_TERAPIX_IMAGELET_MAX_SIZE"
+#define trpx_mem_prop     "HWAC_TERAPIX_RAMPE"
+#define trpx_npe_prop     "HWAC_TERAPIX_NPE"
+#define trpx_dmabw_prop   "HWAC_TERAPIX_DMABW"
+#define trpx_gram_width   "HWAC_TERAPIX_GRAM_WIDTH"
+#define trpx_gram_height  "HWAC_TERAPIX_GRAM_HEIGHT"
+#define trpx_dag_cut      "HWAC_TERAPIX_DAG_CUT"
+#define trpx_overlap_io   "HWAC_TERAPIX_OVERLAP_IO"
+#define trpx_max_size     "HWAC_TERAPIX_IMAGELET_MAX_SIZE"
+#define trpx_image_height "HWAC_TERAPIX_IMAGE_HEIGHT"
 
 // various dag cutting strategies for terapix
 #define trpx_dag_cut_none_p(s) same_string_p(s, "none")

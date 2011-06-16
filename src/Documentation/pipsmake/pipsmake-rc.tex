@@ -9973,10 +9973,19 @@ which is good, but the imagelet memory cannot be reused for inputs
 because it is still live while being stored, which is bad for
 memory pressure.
 
+If set to a non-zero value, optimize the imagelet size (height) with respect
+to this size of image, so as to minimize the border effects. This should
+not be needed if the runtime could adjust the computed size within the
+imagelet.
+\begin{PipsProp}{HWAC_TERAPIX_IMAGE_HEIGHT}
+HWAC_TERAPIX_IMAGE_HEIGHT 0
+\end{PipsProp}
+
 Use this maximum size (height) of an imagelet if set to non-zero.
 It may be useful to set this value to the image height (if known) so
 that compiler generates code for smaller imagelets, so that the
-runtime is not surprised.
+runtime is not surprised. This is rather use of debug to impose
+an imagelet size.
 \begin{PipsProp}{HWAC_TERAPIX_IMAGELET_MAX_SIZE}
 HWAC_TERAPIX_IMAGELET_MAX_SIZE 0
 \end{PipsProp}
