@@ -542,9 +542,14 @@ static void compute_successors(fusion_block b, list block_list) {
         {
           // We have a dependence
           // ... or not, read after read are not real one when
-          // dealing with precedence
-          if(store_effect_p(conflict_sink(a_conflict))
-              && store_effect_p(conflict_source(a_conflict))
+          // dealing with precedence ! But we don't filter it here because
+          // if they are present, it's because the user requested them, and
+          // we want to trigger loop fusion on read_read
+          // it can be better implemented.
+          if(1
+              // Dependence caused by environment effects are real ones !!
+              //&& store_effect_p(conflict_sink(a_conflict))
+              //&& store_effect_p(conflict_source(a_conflict))
               //&& (action_write_p(effect_action(conflict_sink(a_conflict)))
               //    || action_write_p(effect_action(conflict_source(a_conflict))))
               ) {
@@ -993,6 +998,11 @@ restart_loop: ;
        *  - loop until there's no longer block to handle
        */
       list new_stmts = NIL;
+
+      ifdebug(4) {
+        pips_debug(0,"Before regeneration\n");
+        print_blocks(block_list);
+      }
 
       // Loop until every block have been regenerated
       int block_count = gen_length(block_list);
