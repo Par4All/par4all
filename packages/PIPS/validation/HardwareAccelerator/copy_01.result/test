@@ -563,6 +563,7 @@ digraph "dag_cleaned_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -656,8 +657,8 @@ freia_status copy_01_helper_0_0_0(
   mcu_macro[1][1].xmin1 = imagelet_2;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_1;
-  mcu_macro[1][1].xmin2 = imagelet_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -675,8 +676,8 @@ freia_status copy_01_helper_0_0_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 2: E8(1) -> 2
-  mcu_macro[0][2].xmin1 = imagelet_1;
-  mcu_macro[1][2].xmin1 = imagelet_1;
+  mcu_macro[0][2].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_1_1;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
   mcu_macro[0][2].xmin2 = imagelet_2;

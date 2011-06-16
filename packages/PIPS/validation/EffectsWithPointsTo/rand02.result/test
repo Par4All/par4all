@@ -23,7 +23,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
             u = rand()/32768.;
 //             <    is read   >: nx ny u
 //             <    is written>: A
-         A = sqrt(-(2.*log(u)));
+         A = sqrt(-2.*log(u));
 //             <    is read   >: nx ny _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: v _RANDOM_EFFECTS:GEN_SEED
          v = rand()/32768.;
@@ -77,7 +77,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
 //  {}
             u = rand()/32768.;
 //  {}
-         A = sqrt(-(2.*log(u)));
+         A = sqrt(-2.*log(u));
 //  {}
          v = rand()/32768.;
 //  {}
@@ -122,7 +122,7 @@ void AddNoise(int ny, int nx, Cplfloat pt_in[ny][nx], float Sigma2, Cplfloat pt_
             u = rand()/32768.;
 //             <    is read   >: nx ny u
 //             <    is written>: A
-         A = sqrt(-(2.*log(u)));
+         A = sqrt(-2.*log(u));
 //             <    is read   >: nx ny _RANDOM_EFFECTS:GEN_SEED
 //             <    is written>: v _RANDOM_EFFECTS:GEN_SEED
          v = rand()/32768.;

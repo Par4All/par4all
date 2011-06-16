@@ -7,7 +7,7 @@ void fct_lib(const long int size, t_real x[size])
    
    // compare loop
 #pragma omp parallel for
-   for(i = 0; i <= size-1; i += 1)
+   for(i = 1; i <= size-1-1; i += 1)
       x[i] = x[i-1]+x[i]+x[i+1];
    return;
 }

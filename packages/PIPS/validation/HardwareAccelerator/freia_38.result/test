@@ -517,6 +517,7 @@ digraph "freia_38_helper_0_0_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -634,8 +635,8 @@ freia_status freia_38_helper_0_0_0(
   mcu_macro[1][2].xmin1 = imagelet_2;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
-  mcu_macro[0][2].xmin2 = imagelet_1;
-  mcu_macro[1][2].xmin2 = imagelet_1;
+  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   mcu_macro[0][2].xmin3 = x_0;
@@ -676,8 +677,8 @@ freia_status freia_38_helper_0_0_0(
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 4: E8(1) -> 3
-  mcu_macro[0][4].xmin1 = imagelet_1;
-  mcu_macro[1][4].xmin1 = imagelet_1;
+  mcu_macro[0][4].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][4].xmin1 = imagelet_io_1_1;
   mcu_macro[0][4].ymin1 = 0;
   mcu_macro[1][4].ymin1 = 0;
   mcu_macro[0][4].xmin2 = imagelet_3;
@@ -703,8 +704,8 @@ freia_status freia_38_helper_0_0_0(
   mcu_macro[1][5].xmin1 = imagelet_2;
   mcu_macro[0][5].ymin1 = 0;
   mcu_macro[1][5].ymin1 = 0;
-  mcu_macro[0][5].xmin2 = imagelet_1;
-  mcu_macro[1][5].xmin2 = imagelet_1;
+  mcu_macro[0][5].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][5].xmin2 = imagelet_io_1_1;
   mcu_macro[0][5].ymin2 = 0;
   mcu_macro[1][5].ymin2 = 0;
   mcu_macro[0][5].xmin3 = x_0;
@@ -722,8 +723,8 @@ freia_status freia_38_helper_0_0_0(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 6: -(1,3) -> 1
-  mcu_macro[0][6].xmin1 = imagelet_1;
-  mcu_macro[1][6].xmin1 = imagelet_1;
+  mcu_macro[0][6].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][6].xmin1 = imagelet_io_1_1;
   mcu_macro[0][6].ymin1 = 0;
   mcu_macro[1][6].ymin1 = 0;
   mcu_macro[0][6].xmin2 = imagelet_3;

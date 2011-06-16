@@ -108,7 +108,7 @@ void flgr2d_set_data_vector_fgUINT16(FLGR_Data2D *dat, int row, int col, FLGR_Ve
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: array_d
    fgUINT16 *array_d = (fgUINT16 *) (dat->array)[row];
-//             <    is read   >: vct _vct_2[0].spp
+//             <    is read   >: _vct_2[0].spp vct
 //             <    is written>: I_0
    int I_0 = vct->spp;
    {

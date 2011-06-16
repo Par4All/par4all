@@ -378,6 +378,7 @@ digraph "freia_skip_05_helper_0_0_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -473,8 +474,8 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   // copy of operation 1 parameters
@@ -500,8 +501,8 @@ freia_status freia_skip_05_helper_0_0_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
   // 2: thr(2) -> 2
-  mcu_macro[0][2].xmin1 = imagelet_2;
-  mcu_macro[1][2].xmin1 = imagelet_2;
+  mcu_macro[0][2].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_2_1;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
   mcu_macro[0][2].xmin2 = imagelet_io_2_0;

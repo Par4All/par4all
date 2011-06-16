@@ -1,0 +1,58 @@
+
+C  <A(PHI1,PHI2)-R-MAY-{PHI1==J, PHI2==I, 1<=I, I<=10, I+1<=J, J<=10}>
+C  <A(PHI1,PHI2)-W-MAY-{PHI1==I, PHI2==J, 1<=I, I<=10, I+1<=J, J<=10}>
+
+
+      SUBROUTINE TEST(A,I,J)
+      INTEGER A(10,10), I, J
+
+C  <A(PHI1,PHI2)-R-MAY-{PHI1==J, PHI2==I, 1<=I, I<=10, I+1<=J, J<=10}>
+C  <A(PHI1,PHI2)-W-MAY-{PHI1==I, PHI2==J, 1<=I, I<=10, I+1<=J, J<=10}>
+
+
+      IF (I.LT.J) THEN                                                  0005
+
+C  <A(PHI1,PHI2)-R-EXACT-{PHI1==J, PHI2==I, 1<=I, I<=10, I+1<=J,
+C    J<=10}>
+C  <A(PHI1,PHI2)-W-EXACT-{PHI1==I, PHI2==J, 1<=I, I<=10, I+1<=J,
+C    J<=10}>
+
+         A(I,J) = A(J,I)                                                0006
+      ENDIF
+      END
+      PROGRAM IF1
+      INTEGER A(10,10), I, J 
+
+C  <A(PHI1,PHI2)-R-MAY-{PHI1<=10, PHI2+1<=PHI1, 1<=PHI2, PHI2<=10}>
+C  <A(PHI1,PHI2)-W-MAY-{1<=PHI1, PHI1+1<=PHI2, 1<=PHI2, PHI2<=10}>
+
+
+      DO I = 1, 10                                                      0004
+
+C  <A(PHI1,PHI2)-R-MAY-{PHI2==I, PHI1<=10, PHI2+1<=PHI1, 1<=PHI2,
+C    PHI2<=10}>
+C  <A(PHI1,PHI2)-W-MAY-{PHI1==I, 1<=PHI1, PHI1+1<=PHI2, 1<=PHI2,
+C    PHI2<=10}>
+
+         DO J = 1, 10                                                   0005
+
+C  <A(PHI1,PHI2)-R-MAY-{PHI1==J, PHI2==I, PHI1<=10, PHI2+1<=PHI1,
+C    1<=PHI2, PHI2<=10}>
+C  <A(PHI1,PHI2)-W-MAY-{PHI1==I, PHI2==J, 1<=PHI1, PHI1+1<=PHI2,
+C    1<=PHI2, PHI2<=10}>
+
+            CALL TEST(A, I, J)                                          0006
+         ENDDO
+      ENDDO
+
+      END
+      PROGRAM IF1
+      INTEGER A(10,10), I, J 
+
+      DOALL I = 1, 10                                                   0004
+         DOALL J = 1, 10                                                0005
+            CALL TEST(A, I, J)                                          0006
+         ENDDO
+      ENDDO
+
+      END

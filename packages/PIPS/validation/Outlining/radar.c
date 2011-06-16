@@ -26,7 +26,7 @@ void STAP_PulseComp(int tv, float ptrin[tv], int tf, float ptrfiltre[tf],
 		ptrout[i] = I;
 	}
 }
-	printf ("result %f, %f",ptrout[1],ptrout[2]   );
+		// printf ("result %f, %f",ptrout[1],ptrout[2]   );
 }
 
 void trt (int tv, int tf,float in_pulse[5][32][95],float out_pulse[5][32][80])
@@ -49,5 +49,11 @@ void trt (int tv, int tf,float in_pulse[5][32][95],float out_pulse[5][32][80])
 }
 int main ()
 {
+  int tv=95;
+  int tf=16;
+  float in_pulse[5][32][95];
+  float out_pulse[5][32][80];
 
+  trt(tv, tf, in_pulse, out_pulse);
+  return 0;
 }

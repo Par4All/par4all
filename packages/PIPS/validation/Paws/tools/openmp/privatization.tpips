@@ -1,0 +1,34 @@
+#
+delete privatization
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create privatization privatization.c
+
+#SELECT C LANGUAGE
+activate C_PARSER
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+
+apply PRIVATIZE_MODULE(privatization)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(privatization)
+
+#unset parallal printed of do loop to avoid pragma duplication
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+apply UNSPLIT
+#shell gcc -fopenmp -c array2.database/Src/array2.c -o array2.database/Src/array2.0
+
+close
+delete privatization
+quit
+# EOF

@@ -1680,6 +1680,7 @@ digraph "dag_cleaned_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -1931,6 +1932,7 @@ freia_status anr999_helper_0_0_0(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2134,6 +2136,7 @@ freia_status anr999_helper_0_0_1(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2337,6 +2340,7 @@ freia_status anr999_helper_0_0_2(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2540,6 +2544,7 @@ freia_status anr999_helper_0_0_3(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2743,6 +2748,7 @@ freia_status anr999_helper_0_0_4(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2946,6 +2952,7 @@ freia_status anr999_helper_0_0_5(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3149,6 +3156,7 @@ freia_status anr999_helper_0_0_6(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3352,6 +3360,7 @@ freia_status anr999_helper_0_0_7(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3555,6 +3564,7 @@ freia_status anr999_helper_0_0_8(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3654,8 +3664,8 @@ freia_status anr999_helper_0_0_9(
   mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_1;
-  mcu_macro[1][1].xmin2 = imagelet_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -3677,8 +3687,8 @@ freia_status anr999_helper_0_0_9(
   mcu_macro[1][2].xmin1 = imagelet_3;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
-  mcu_macro[0][2].xmin2 = imagelet_1;
-  mcu_macro[1][2].xmin2 = imagelet_1;
+  mcu_macro[0][2].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][2].xmin2 = imagelet_io_1_1;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   mcu_macro[0][2].xmin3 = imagelet_io_1_0;

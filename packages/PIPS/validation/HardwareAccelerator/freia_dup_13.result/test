@@ -242,6 +242,7 @@ digraph "freia_dup_13_helper_0_0_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 0 output image

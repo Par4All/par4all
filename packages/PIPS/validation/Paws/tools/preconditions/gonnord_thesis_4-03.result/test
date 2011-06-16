@@ -1,0 +1,72 @@
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int x, y;
+
+//  P(x,y) {}
+
+   x = y = 0;
+
+//  P(x,y) {x==0, y==0}
+
+   while (flip())
+
+//  P(x,y) {y<=x, 0<=y, y<=1}
+
+      if (flip()) {
+
+//  P(x,y) {y<=x, 0<=y, y<=1}
+
+         if (!(x>=0))
+
+//  P() {0==-1}
+
+            deadlock();
+
+//  P(x,y) {0<=x, y<=x, 0<=y, y<=1}
+
+         x++;
+
+//  P(x,y) {1<=x, y+1<=x, 0<=y, y<=1}
+
+         if (!(y<=x&&y<=1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(x,y) {y<=x, 0<=y, y<=1}
+
+         if (!(x==0))
+
+//  P(x,y) {1<=x, y<=x, 0<=y, y<=1}
+
+            deadlock();
+
+//  P(x,y) {x==0, y==0}
+
+         x++;
+
+//  P(x,y) {x==1, y==0}
+
+         y++;
+
+//  P(x,y) {x==1, y==1}
+
+         if (!(y<=x&&y<=1))
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
