@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# If it is necessary default settings like host and port can be changed in development.ini file
+
+prefix=@prefix@
+datarootdir=@datarootdir@
+cd @pypsruntimedir@/paws/pawsapp
+paster serve --reload development.ini

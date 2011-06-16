@@ -1,0 +1,25 @@
+// OMP style
+int main()
+{
+   int b[size];
+   int i;
+   int j;
+   i = 0;
+   j = 0;
+
+#pragma omp parallel for 
+   for(i = 0; i <= size-1; i += 1)
+      b[i] = 0;
+
+#pragma omp parallel for private(i)
+   for(j = 0; j <= size-1; j += 1)
+      for(i = 0; i <= 99; i += 1)
+         b[j] = b[j]+i;
+
+   for(i = 0; i <= 99; i += 1)
+#pragma omp parallel for 
+      for(j = 0; j <= size-1; j += 1)
+         b[j] = b[j]+i;
+
+   return 0;
+}

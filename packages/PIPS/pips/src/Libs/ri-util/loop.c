@@ -451,6 +451,36 @@ int depth_of_parallel_perfect_loop_nest(statement s) {
   }
 }
 
+/** Compute the depth of a perfect loop-nest
+
+    @return the depth of perfect loop-nest found. If there is no
+    loop here, return 0
+ */
+int depth_of_perfect_loop_nest(statement s) {
+  // We can have blocks and declarations surrounding loops
+  if(statement_block_p(s)) {
+    if(ENDP(statement_block(s))) return 0;
+    for(list iter=statement_block(s);!ENDP(iter);POP(iter)) {
+      statement st = STATEMENT(CAR(iter));
+      if(declaration_statement_p(st))//ok, skip this
+        continue;
+      else if(gen_length(iter)!=1) return 0;
+      else
+        s = st;
+    }
+  }
+
+  if(statement_loop_p(s)) {
+    // Get the loop
+    loop l = statement_loop(s);
+    // Count the current one and dig into the statement of the loop:
+    return 1 + depth_of_perfect_loop_nest(loop_body(l));
+  } else {
+    /* No loop found here */
+    return 0;
+  }
+}
+
 
 /** Test if a statement is a perfect loop-nest
 

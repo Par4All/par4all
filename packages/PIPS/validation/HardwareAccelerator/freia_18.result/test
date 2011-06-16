@@ -495,6 +495,7 @@ digraph "freia_18_helper_0_0_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -559,8 +560,8 @@ freia_status freia_18_helper_0_0_0(
   mcu_macro[1][0].xmin2 = imagelet_io_2_1;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
-  mcu_macro[0][0].xmin3 = imagelet_1;
-  mcu_macro[1][0].xmin3 = imagelet_1;
+  mcu_macro[0][0].xmin3 = imagelet_io_1_0;
+  mcu_macro[1][0].xmin3 = imagelet_io_1_1;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
   mcu_macro[0][0].iter1 = TERAPIX_PE_NUMBER;
@@ -574,8 +575,8 @@ freia_status freia_18_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_AND3;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_AND3;
   // 1: ^(1,2) -> 1
-  mcu_macro[0][1].xmin1 = imagelet_1;
-  mcu_macro[1][1].xmin1 = imagelet_1;
+  mcu_macro[0][1].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
   mcu_macro[0][1].xmin2 = imagelet_io_2_0;

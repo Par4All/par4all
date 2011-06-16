@@ -315,6 +315,7 @@ digraph "freia_14_helper_0_0_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 0 input image, 1 output image
@@ -369,8 +370,8 @@ freia_status freia_14_helper_0_0_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
   // 0: C() -> 1
-  mcu_macro[0][0].xmin??? = imagelet_1;
-  mcu_macro[1][0].xmin??? = imagelet_1;
+  mcu_macro[0][0].xmin??? = imagelet_io_1_0;
+  mcu_macro[1][0].xmin??? = imagelet_io_1_1;
   mcu_macro[0][0].ymin??? = 0;
   mcu_macro[1][0].ymin??? = 0;
   // copy of operation 0 parameters
@@ -396,12 +397,12 @@ freia_status freia_14_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_SET_CONST;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_SET_CONST;
   // 1: +(1,1) -> 1
-  mcu_macro[0][1].xmin1 = imagelet_1;
-  mcu_macro[1][1].xmin1 = imagelet_1;
+  mcu_macro[0][1].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_1;
-  mcu_macro[1][1].xmin2 = imagelet_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = imagelet_io_1_0;

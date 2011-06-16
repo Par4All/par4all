@@ -118,9 +118,9 @@ FLGR_Ret flgr2d_arith_add(FLGR_Data2D *datdest, FLGR_Data2D *data1, FLGR_Data2D 
       flgr2d_arith_add_fgFLOAT64(datdest, data1, data2);
       return FLGR_RET_OK;
    }
-//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: stderr[0] *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: stderr[0]
-//             <    is read   >: __IO_EFFECTS:LUNS[2]
+//             <    is read   >: stderr __IO_EFFECTS:LUNS[2]
 //             <    is written>: __IO_EFFECTS:LUNS[2]
    fprintf(stderr, "type <%s> unknown!\n""ERROR: File %s, Line %d, Function : ", "fulguro-2-1-1.src/arith/flgrArith.c", 5109, flgr_get_type_string(datdest->type));
    return FLGR_RET_TYPE_UNKNOWN;

@@ -1585,6 +1585,7 @@ digraph "dag_cleaned_0" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -1622,12 +1623,12 @@ freia_status anr999_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -1836,6 +1837,7 @@ freia_status anr999_helper_0_0_0(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -1872,12 +1874,12 @@ freia_status anr999_helper_0_0_1(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2039,6 +2041,7 @@ freia_status anr999_helper_0_0_1(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2075,12 +2078,12 @@ freia_status anr999_helper_0_0_2(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2242,6 +2245,7 @@ freia_status anr999_helper_0_0_2(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2278,12 +2282,12 @@ freia_status anr999_helper_0_0_3(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2445,6 +2449,7 @@ freia_status anr999_helper_0_0_3(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2481,12 +2486,12 @@ freia_status anr999_helper_0_0_4(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2648,6 +2653,7 @@ freia_status anr999_helper_0_0_4(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2684,12 +2690,12 @@ freia_status anr999_helper_0_0_5(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -2851,6 +2857,7 @@ freia_status anr999_helper_0_0_5(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -2887,12 +2894,12 @@ freia_status anr999_helper_0_0_6(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3054,6 +3061,7 @@ freia_status anr999_helper_0_0_6(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3090,12 +3098,12 @@ freia_status anr999_helper_0_0_7(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 122;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 122;
+  int imagelet_3 = 244;
+  int imagelet_4 = 366;
+  int imagelet_5 = 488;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3257,6 +3265,7 @@ freia_status anr999_helper_0_0_7(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 240
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -3293,12 +3302,12 @@ freia_status anr999_helper_0_0_8(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  int imagelet_size = 124;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 124;
+  int imagelet_3 = 248;
+  int imagelet_4 = 372;
+  int imagelet_5 = 496;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -3356,8 +3365,8 @@ freia_status anr999_helper_0_0_8(
   mcu_macro[1][1].xmin1 = imagelet_io_2_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_1;
-  mcu_macro[1][1].xmin2 = imagelet_1;
+  mcu_macro[0][1].xmin2 = imagelet_io_1_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_1_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -3398,8 +3407,8 @@ freia_status anr999_helper_0_0_8(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 3: E8(1) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_1;
-  mcu_macro[1][3].xmin1 = imagelet_1;
+  mcu_macro[0][3].xmin1 = imagelet_io_1_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_1_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;

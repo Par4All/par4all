@@ -1,0 +1,31 @@
+#
+delete privatization_fortran
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create privatization_fortran privatization_fortran.f
+
+#SELECT C LANGUAGE
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+#echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+#echo Desugaring other for-loops into plain while-loops fot the time we improve semantics ameliorations in PIPS:
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+apply PRIVATIZE_MODULE(PRIVATIZATION_FORTRAN)
+echo // OMP style
+activate PRINT_PARALLELIZEDOMP_CODE
+display PARALLELPRINTED_FILE(privatization_fortran)
+
+#unset parallal printed of do loop to avoid pragma duplication
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+
+apply UNSPLIT
+#shell gcc -fopenmp -c array2.database/Src/array2.c -o array2.database/Src/array2.0
+
+close
+delete privatization_fortran
+quit
+# EOF

@@ -36,7 +36,7 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 //                               ptrin[i+k1][k2].im ptrin[i+j1][j2].im
 //                               ptrin[i+j1][j2].re ptrin[i+k1][k2].re
 //             <    is written>: I
-                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+                  I = -ptrin[i+j1][j2].re*ptrin[i+k1][k2].im+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
 //             <    is read   >: R i j1 j2 k1 k2 nrec nsa ntt
 //             <    is written>: ptrout[i][j1][j2][k1][k2].re
                   ptrout[i][j1][j2][k1][k2].re = R;
@@ -75,7 +75,7 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 //  {}
                   R = ptrin[i+j1][j2].re*ptrin[i+k1][k2].re+ptrin[i+j1][j2].im*ptrin[i+k1][k2].im;
 //  {}
-                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+                  I = -ptrin[i+j1][j2].re*ptrin[i+k1][k2].im+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
 //  {}
                   ptrout[i][j1][j2][k1][k2].re = R;
 //  {}
@@ -120,7 +120,7 @@ void call13(int nrec, int nsa, int ntt, Cplfloat ptrin[nrec][nsa], Cplfloat ptro
 //                               ptrin[i+k1][k2].im ptrin[i+j1][j2].im
 //                               ptrin[i+j1][j2].re ptrin[i+k1][k2].re
 //             <    is written>: I
-                  I = -(ptrin[i+j1][j2].re*ptrin[i+k1][k2].im)+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
+                  I = -ptrin[i+j1][j2].re*ptrin[i+k1][k2].im+ptrin[i+j1][j2].im*ptrin[i+k1][k2].re;
 //             <    is read   >: R i j1 j2 k1 k2 nrec nsa ntt
 //             <    is written>: ptrout[i][j1][j2][k1][k2].re
                   ptrout[i][j1][j2][k1][k2].re = R;

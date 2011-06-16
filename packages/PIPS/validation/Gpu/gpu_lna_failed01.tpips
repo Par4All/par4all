@@ -1,0 +1,25 @@
+delete gpu_lna_failed01
+create gpu_lna_failed01 gpu_lna_failed01.c
+
+setenv PIPS_CPP="cpp -C"
+setproperty ABORT_ON_USER_ERROR TRUE
+activate C_PARSER
+
+setproperty PRETTYPRINT_LANGUAGE "C"
+setproperty PRETTYPRINT_STATEMENT_NUMBER FALSE
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+module main
+display PRINTED_FILE
+setproperty GPU_LOOP_NEST_ANNOTATE_PARALLEL FALSE
+apply GPU_LOOP_NEST_ANNOTATE
+display PRINTED_FILE
+apply LOOP_NORMALIZE
+apply GPU_LOOP_NEST_ANNOTATE
+
+display PRINTED_FILE
+
+close
+delete gpu_lna_failed01
+quit

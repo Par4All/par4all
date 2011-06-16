@@ -1,0 +1,42 @@
+#!/bin/bash
+
+# 1 - source file
+# 2 - description of the tool
+
+EXPECTED_ARGS=2
+
+if [ $# -ne $EXPECTED_ARGS ]
+then
+	echo "Usage: add_demo <source_file> <description>"
+	return 1
+fi
+
+validation="../../../../validation/Paws/tutorial/"
+sourcefile=$1
+index=`expr match "$sourcefile" '.*\/.'`
+file=${sourcefile:$index - 1}
+echo $file
+
+path=${sourcefile:0:$index - 1}
+echo $path
+
+point=`expr match "$file" '.*\.'`
+name=${file:0:$point - 1}
+echo $name
+
+source ../../bin/activate
+
+# new controller and new mako template
+paster controller --tutorial tutorial_$name
+paster tutorial-template $name $file
+mv "../pawsapp/templates/tutorial_${name}.mako.py" "../pawsapp/templates/tutorial_${name}.mako"
+
+# new tutorial directory with files and description
+mkdir "${validation}$name"
+cp "${path}/${name}.tpips" "${validation}${name}/"
+cp "${sourcefile}" "${validation}${name}/"
+
+# new description file
+echo $2 > "${validation}${name}/${name}.txt"
+
+deactivate
