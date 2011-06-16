@@ -90,8 +90,18 @@ effects_read_effects(list l_eff)
 {
     list l_new = NIL;
     MAP(EFFECT, eff,
-	if (effect_read_p(eff)) l_new = CONS(EFFECT, eff, l_new),
-	l_eff);
+  if (effect_read_p(eff)) l_new = CONS(EFFECT, eff, l_new),
+  l_eff);
+    return gen_nreverse(l_new);
+}
+
+list
+effects_store_effects(list l_eff)
+{
+    list l_new = NIL;
+    MAP(EFFECT, eff,
+  if (store_effect_p(eff)) l_new = CONS(EFFECT, eff, l_new),
+  l_eff);
     return gen_nreverse(l_new);
 }
 
