@@ -4423,6 +4423,7 @@ digraph "license_plate_copies_helper_0_0_7" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -4758,6 +4759,7 @@ freia_status license_plate_copies_helper_0_0_0(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5172,6 +5174,7 @@ freia_status license_plate_copies_helper_0_0_1(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5626,6 +5629,7 @@ freia_status license_plate_copies_helper_0_0_2(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -5932,6 +5936,7 @@ freia_status license_plate_copies_helper_0_0_3(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -6188,6 +6193,7 @@ freia_status license_plate_copies_helper_0_0_4(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -6558,6 +6564,7 @@ freia_status license_plate_copies_helper_0_0_5(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -6874,6 +6881,7 @@ freia_status license_plate_copies_helper_0_0_6(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
