@@ -31,11 +31,11 @@ void cumu()
 
 void cumu()
 {
-//             <    is declared>: p[*]
+//             <    is declared>: p
    int *p;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is referenced>: p[*]
+//             <    is referenced>: p
 
    p[0] = 0;
 }
@@ -47,11 +47,11 @@ void cumu()
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 void cumu()
 {
-//             <    is declared>: p[*]
+//             <    is declared>: p
    int *p;
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: p
-//             <    is referenced>: p[*]
+//             <    is referenced>: p
 
    p[0] = 0;
 }
