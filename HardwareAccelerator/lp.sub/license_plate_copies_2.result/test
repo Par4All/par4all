@@ -5166,7 +5166,7 @@ digraph "license_plate_copies_helper_0_0_4" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 1024
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -5202,12 +5202,13 @@ freia_status license_plate_copies_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 171;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 171;
+  int imagelet_3 = 342;
+  int imagelet_4 = 513;
+  int imagelet_5 = 684;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -5529,7 +5530,7 @@ freia_status license_plate_copies_helper_0_0_0(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 1024
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5566,12 +5567,13 @@ freia_status license_plate_copies_helper_0_0_1(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 171;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 171;
+  int imagelet_3 = 342;
+  int imagelet_4 = 513;
+  int imagelet_5 = 684;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -6082,7 +6084,7 @@ freia_status license_plate_copies_helper_0_0_1(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 1024
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -6126,12 +6128,13 @@ freia_status license_plate_copies_helper_0_0_2(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 171;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 171;
+  int imagelet_3 = 342;
+  int imagelet_4 = 513;
+  int imagelet_5 = 684;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -6514,7 +6517,7 @@ freia_status license_plate_copies_helper_0_0_2(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 1024
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -6562,12 +6565,13 @@ freia_status license_plate_copies_helper_0_0_3(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 187;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 187;
+  int imagelet_3 = 374;
+  int imagelet_4 = 561;
+  int imagelet_5 = 748;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -7115,7 +7119,7 @@ freia_status license_plate_copies_helper_0_0_3(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 1024
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -7156,12 +7160,13 @@ freia_status license_plate_copies_helper_0_0_4(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 177;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 177;
+  int imagelet_3 = 354;
+  int imagelet_4 = 531;
+  int imagelet_5 = 708;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
