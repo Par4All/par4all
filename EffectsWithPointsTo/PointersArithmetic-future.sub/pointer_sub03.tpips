@@ -16,6 +16,13 @@ echo
 
 display PRINTED_FILE
 
+
+echo
+echo Proper effects 
+echo
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
 echo
 echo Proper effects with points-to
 echo

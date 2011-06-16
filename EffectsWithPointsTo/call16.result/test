@@ -58,7 +58,7 @@ PROPER  EFFECTS WITH POINTS TO
 
 void call16(int _i, int *_a, int *_b, int *_c)
 {
-//             <    is read   >: _a _b _c _i __b_2[0+_i] __c_3[0+_i]
+//             <    is read   >: __b_2[0+_i] __c_3[0+_i] _a _b _c _i
 //             <    is written>: __a_1[0+_i]
    _a[_i] = _b[_i]+_c[_i];
 }

@@ -1,29 +1,4 @@
 
-PROPER  EFFECTS 
-
-int lhs06(const char *fmt, void (*my_fputc)(const char c, void *_stream), void *_stream, va_list pa)
-{
-   int nbout;
-//             <    is written>: col
-   int col = 0;
-//             <    is written>: indent
-   int indent = 0;
-   int ui32;
-   int i32;
-   static char buffer[2000];
-//             <    is read   >: my_fputc
-
-   if (!my_fputc)
-      return 0;
-//             <    is written>: nbout
-
-   nbout = 0;
-//             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: col
-
-   *va_arg(pa, int *) = col;
-}
-
 POINTS-TO
 
 //  {(_stream,__stream_2[0],-Exact-);(fmt,_fmt_1[0],-Exact-)}
