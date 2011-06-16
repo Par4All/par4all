@@ -1,6 +1,9 @@
 // parallelization of a never called function as it might be done when
 // developping in a library. In such a case PIPS parallelizes the never
 // called function.
+// Behavior changed from r19798: the loop is now conservatively declared as
+// sequential which seems better, since it is actually sequential in the general
+// case (BC).
 
 typedef double t_real;
 
