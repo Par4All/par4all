@@ -463,9 +463,14 @@ class runner(Thread):
             if self.err and get_verbosity() == 0:
                 sys.stderr.write(self.err + "\n")
             self.stderr_handler("Environment was: " + repr(self.env))
-            raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
-                + " failed with exit code " + str(ret), code = ret)
-        #~ stop_master_spinner()
+            if ret==30:
+				raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
+					+ " failed with exit code " + str(ret) + " (timeout).\n" + 
+					"Retry to publish using p4a_pack.py with option --retry-publish", code = ret)
+            else:
+				raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
+					+ " failed with exit code " + str(ret), code = ret)
+		#~ stop_master_spinner()
         return [ self.out, self.err, ret ]
 
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,

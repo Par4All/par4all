@@ -17,6 +17,7 @@ import optparse
 import platform
 import tempfile
 import shutil
+import glob
 
 '''
 Par4All packing routines: allows you to create .deb or .tar.gz packages of Par4all.
@@ -89,7 +90,10 @@ def add_module_options(parser):
         help = "Publish the produced packages on the server.")
         
     group.add_option("--publish-only", action = "append", metavar = "FILE", default = [],
-        help = "Publish only a file (.deb or tgz or stgz) and without rebuilding it. Several files are allowed")        
+        help = "Publish only a file (.deb or tgz or stgz) without rebuilding it. Several files are allowed")        
+
+    group.add_option("--retry-publish", action = "store_true",  default = False,
+        help = "Retry to publish only files (.deb and/or tgz and/or stgz) without rebuilding them.")        
 
     group.add_option("--release", dest = "development", action = "store_false", default = True,
         help = "When publishing, put the packages in release directories instead of development ones.")
@@ -319,8 +323,8 @@ def work(options, args = []):
         options.append_date = True
 
 	if len(options.publish_only):
-			publish_files(options.publish_only, distro, distro, arch, deb_arch, options.development, publish_only=True)
-			return
+		publish_files(options.publish_only, distro, distro, arch, deb_arch, options.development, publish_only=True)
+		return	
 
     if (not options.deb #and not options.sdeb
         and not options.tgz and not options.stgz):
@@ -328,7 +332,22 @@ def work(options, args = []):
         options.deb = True
         options.tgz = True
         options.stgz = True
-				
+
+	if options.retry_publish:
+		file_to_publish=[]
+		if options.deb:
+			if options.pack_output_dir:
+				file_to_publish+=glob.glob(options.pack_output_dir+"/*.deb")
+			else:
+				file_to_publish+=glob.glob("*.deb")
+		if options.tgz or options.stgz:
+			if options.pack_output_dir:
+				file_to_publish+=glob.glob(options.pack_output_dir+"/*.gz")			
+			else:
+				file_to_publish+=glob.glob("*.gz")
+		publish_files(file_to_publish, distro, distro, arch, deb_arch, options.development, publish_only=True)
+		return	
+						
     prefix = options.install_prefix
     if prefix:
         p4a_util.warn("Installation prefix: " + prefix + " (--install-prefix)")
@@ -396,17 +415,23 @@ def work(options, args = []):
     output_files = []
     try:
         if options.deb:
-            output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix,
-                version = version, gitrev = gitrev, distro = distro, arch = deb_arch,
+			#remove previous *.deb
+			p4a_util.run(["rm -fv *.deb"])
+			output_files.append(create_deb(pack_dir = pack_dir, install_prefix = prefix,
+				version = version, gitrev = gitrev, distro = distro, arch = deb_arch,
                 keep_temp = options.keep_temp))
 
         if options.tgz:
-            output_files.append(create_tgz(pack_dir = pack_dir, install_prefix = prefix,
+			#remove previous *.gz
+			p4a_util.run(["rm -fv *.gz"])
+			output_files.append(create_tgz(pack_dir = pack_dir, install_prefix = prefix,
                 version = version, gitrev = gitrev, distro = distro, arch = arch,
                 keep_temp = options.keep_temp))
 
         if options.stgz:
-            output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
+			#remove previous *.gz
+			p4a_util.run(["rm -fv *src.tar.gz"])
+			output_files.append(create_stgz(pack_dir = pack_dir, install_prefix = prefix,
                 version = src_version, gitrev = src_gitrev,
                 keep_temp = options.keep_temp))
 
