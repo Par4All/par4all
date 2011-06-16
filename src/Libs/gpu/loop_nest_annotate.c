@@ -96,6 +96,7 @@ for further generation of CUDA code.
 #include "pipsdbm.h"
 #include "resources.h"
 #include "properties.h"
+#include "effects-simple.h"
 
 #define COMMA         ","
 #define OPENPAREN     "("
@@ -115,6 +116,10 @@ typedef struct {
   bool inner_reached;
   /* True if we only deal with parallel loop nests */
   bool gpu_loop_nest_annotate_parallel_p;
+  /* The generation may fail because of an unhandled case for isntance */
+  bool fail_p;
+  loop inner_loop;
+  expression guard_expression;
 } gpu_lna_context;
 
 
@@ -151,108 +156,200 @@ static void loop_annotate(loop l, gpu_lna_context * p)
     C_AND_OPERATOR_NAME : AND_OPERATOR_NAME;
   string less_op =  (get_prettyprint_language_tag() == is_language_c) ?
     C_LESS_OR_EQUAL_OPERATOR_NAME : LESS_OR_EQUAL_OPERATOR_NAME;
+  string max_op =  (get_prettyprint_language_tag() == is_language_c) ?
+    PIPS_C_MAX_OPERATOR_NAME : MAX_OPERATOR_NAME;
+  string min_op =  (get_prettyprint_language_tag() == is_language_c) ?
+    PIPS_C_MIN_OPERATOR_NAME : MIN_OPERATOR_NAME;
   /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
-  if (p->inner_reached == FALSE)
+  if (p->inner_loop == loop_undefined)
     {
       expression guard_exp = expression_undefined;
-      statement guard_s = statement_undefined;
 
       /* We are at the innermost loop nest level */
-      p->inner_reached = TRUE;
+      p->inner_loop = l;
 
-      /* First we add a guard to the loop body statement using the
+      /* First we build the guard to be added to the loop body statement using the
 	 enclosing loops upper bounds.
+	 And we push on l_number_iter_exp an expression representing the
+	 number of iteration of each loop;
+	 currently, we do not check that variables modified inside loops
+	 are not used in loop bounds expressions.
+	 but we take care of loop indices used in deeper loop bounds.
       */
       FOREACH(LOOP, c_loop, p->l_enclosing_loops)
 	{
 	  entity c_index = loop_index(c_loop);
 	  range c_range = loop_range(c_loop);
-	  expression c_lower = range_lower(c_range);
-	  expression c_upper = range_upper(c_range);
+	  expression c_lower = copy_expression(range_lower(c_range));
+	  expression c_upper = copy_expression(range_upper(c_range));
+	  expression c_inc = range_increment(c_range);
 	  expression c_number_iter_exp = expression_undefined;
 	  expression c_guard;
 
-	  c_guard =
-	    MakeBinaryCall(entity_intrinsic(less_op),
-			   reference_to_expression(make_reference(c_index,
-								  NIL)),
-			   copy_expression(c_upper));
+	  if (expression_constant_p(c_inc) && expression_to_int(c_inc) == 1)
+	    {
+	      /* first check if the lower bound depend on enclosing loop indices */
+	      list l_eff_lower_bound = proper_effects_of_expression(c_lower);
+	      list l_eff_upper_bound = proper_effects_of_expression(c_upper);
 
-	  if (expression_undefined_p(guard_exp))
-	    guard_exp = c_guard;
+	      FOREACH(LOOP, other_loop, p->l_enclosing_loops)
+		{
+		  if (other_loop != l)
+		    {
+		      range range_other_loop = loop_range(other_loop);
+		      expression lower_other_loop = range_lower(range_other_loop);
+		      expression upper_other_loop = range_upper(range_other_loop);
+
+		      if (effects_read_variable_p(l_eff_lower_bound,
+						 loop_index(other_loop)))
+			{
+			  expression new_lower_1 = c_lower;
+			  expression new_lower_2 = copy_expression(c_lower);
+			  replace_entity_by_expression(new_lower_1, loop_index(other_loop),
+						       lower_other_loop);
+			  (void) simplify_expression(&new_lower_1);
+			  replace_entity_by_expression(new_lower_2, loop_index(other_loop),
+						       upper_other_loop);
+
+			  (void) simplify_expression(&new_lower_2);
+			  c_lower = MakeBinaryCall(entity_intrinsic(min_op),
+						   new_lower_1,
+						   new_lower_2);
+			}
+		      if (effects_read_variable_p(l_eff_upper_bound,
+						 loop_index(other_loop)))
+			{
+			  expression new_upper_1 = c_upper;
+			  expression new_upper_2 = copy_expression(c_upper);
+			  replace_entity_by_expression(new_upper_1, loop_index(other_loop),
+						       lower_other_loop);
+			  (void) simplify_expression(&new_upper_1);
+			  replace_entity_by_expression(new_upper_2, loop_index(other_loop),
+						       upper_other_loop);
+			  (void) simplify_expression(&new_upper_2);
+
+			  c_upper = MakeBinaryCall(entity_intrinsic(max_op),
+						   new_upper_1,
+						   new_upper_2);
+			}
+		    }
+		}
+
+	      c_guard =
+		MakeBinaryCall(entity_intrinsic(less_op),
+			       reference_to_expression(make_reference(c_index,
+								      NIL)),
+			       copy_expression(range_upper(c_range)));
+
+	      if (expression_undefined_p(guard_exp))
+		guard_exp = c_guard;
+	      else
+		guard_exp = MakeBinaryCall(entity_intrinsic(and_op),
+					   guard_exp,
+					   c_guard);
+
+	      /* FI: how about an expression_to_string() */
+	      pips_debug(2, "guard expression : %s\n",
+			 words_to_string(words_expression(guard_exp, NIL)));
+
+
+	      /* Keep the number of iterations for the generation of the
+		 outermost comment */
+	      c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME,
+					       c_upper, c_lower);
+	      c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
+					       c_number_iter_exp,
+					       make_integer_constant_expression(1));
+	      /* We will have deepest loop size first: */
+	      p->l_number_iter_exp = CONS(EXPRESSION, c_number_iter_exp,
+					  p->l_number_iter_exp);
+
+	    }
 	  else
-	    guard_exp = MakeBinaryCall(entity_intrinsic(and_op),
-				       guard_exp,
-				       c_guard);
-	  /* Keep the number of iterations for the generation of the
-	     outermost comment */
-	  c_number_iter_exp =  make_op_exp(MINUS_OPERATOR_NAME,
-					   copy_expression(c_upper),
-					   copy_expression(c_lower));
-	  c_number_iter_exp =  make_op_exp(PLUS_OPERATOR_NAME,
-					   c_number_iter_exp,
-					   make_integer_constant_expression(1));
-	  /* We will have deepest loop size first: */
-	  p->l_number_iter_exp = CONS(EXPRESSION, c_number_iter_exp,
-				      p->l_number_iter_exp);
+	    {
+	      p->fail_p = true;
+	      pips_user_warning("case not handled: loop increment is not 1.\n");
+	    }
+	}
+      if (!p->fail_p)
+	{
+	  p->guard_expression = guard_exp;
 	}
 
-      /* FI: how about an expression_to_string() */
-      pips_debug(2, "guard expression : %s\n",
-		 words_to_string(words_expression(guard_exp, NIL)));
 
-      guard_s = test_to_statement(make_test(guard_exp,
-					    loop_body(l),
-					    make_empty_block_statement()));
-      /* Then we add the comment : // Loop nest P4A end */
-      statement_comments(guard_s) = strdup(concatenate (get_comment_sentinel (),
-							" Loop nest P4A end\n",
-							NULL));
-      loop_body(l) = guard_s;
-    }
+   }
 
 
   /* We are now on our way back in the recursion; we do nothing, unless
-     we are at the uppermost level. Then we add the outermost comment :
-     // Loop nest P4A begin, xD(upper_bound,..)
+     we are at the uppermost level.
   */
   if (gen_length(p->l_enclosing_loops) == 1)
     {
-      statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
-      // Then we add the comment such as: '// Loop nest P4A begin,3D(200, 100)'
-      string outer_s;
-      (void) asprintf(&outer_s, "%s Loop nest P4A begin,%dD" OPENPAREN,
-		      get_comment_sentinel(), p->loop_nest_depth);
+      if (!p->fail_p)
+	// if the process has succeeded, we add the outermost comment :
+	// Loop nest P4A begin, xD(upper_bound,..) and the inner guard.
+	{
+	  statement current_stat = (statement) gen_get_ancestor(statement_domain, l);
+	  // Then we add the comment such as: '// Loop nest P4A begin,3D(200, 100)'
+	  string outer_s;
+	  (void) asprintf(&outer_s, "%s Loop nest P4A begin,%dD" OPENPAREN,
+			  get_comment_sentinel(), p->loop_nest_depth);
 
-      bool first_iteration = true;
-      /* Output inner dimension first: */
-      FOREACH(EXPRESSION, upper_exp, p->l_number_iter_exp) {
-        string buf;
-	string buf1 = words_to_string(words_expression(upper_exp, NIL));
-	if (first_iteration)
-	  /* Concatenate the dimension of the innermost loop: */
-	  (void) asprintf(&buf, "%s%s", outer_s, buf1);
-	else
-	  /* Idem for other dimensions, but do not forget to insert the ', ' */
-	  (void) asprintf(&buf, "%s%s%s", outer_s, COMMA" ", buf1);
-        free(outer_s);
-	free(buf1);
-        outer_s = buf;
-	first_iteration = false;
-      }
+	  bool first_iteration = true;
+	  /* Output inner dimension first: */
+	  FOREACH(EXPRESSION, upper_exp, p->l_number_iter_exp) {
+	    string buf;
+	    string buf1 = words_to_string(words_expression(upper_exp, NIL));
+	    if (first_iteration)
+	      /* Concatenate the dimension of the innermost loop: */
+	      (void) asprintf(&buf, "%s%s", outer_s, buf1);
+	    else
+	      /* Idem for other dimensions, but do not forget to insert the ', ' */
+	      (void) asprintf(&buf, "%s%s%s", outer_s, COMMA" ", buf1);
+	    free(outer_s);
+	    free(buf1);
+	    outer_s = buf;
+	    first_iteration = false;
+	  }
+	  (void) asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
+	  free(outer_s);
+	  statement guard_s = test_to_statement(make_test(p->guard_expression,
+							    loop_body(p->inner_loop),
+							  make_empty_block_statement()));
+	  /* Then we add the comment : // Loop nest P4A end */
+	  statement_comments(guard_s) = strdup(concatenate (get_comment_sentinel (),
+							    " Loop nest P4A end\n",
+							    NULL));
+	  loop_body(p->inner_loop) = guard_s;
 
-      (void) asprintf(&statement_comments(current_stat),"%s"CLOSEPAREN"\n",outer_s);
-      free(outer_s);
-      /* reset context*/
-      p->inner_reached = FALSE;
-      p->loop_nest_depth = 0;
-      p->max_loop_nest_depth = -1;
-      gen_free_list(p->l_number_iter_exp);
-      p->l_number_iter_exp = NIL;
+	  /* reset context */
+	  p->loop_nest_depth = 0;
+	  p->max_loop_nest_depth = -1;
+	  gen_free_list(p->l_number_iter_exp);
+	  p->l_number_iter_exp = NIL;
+	  p->fail_p = false;
+	  p->inner_loop = loop_undefined;
+	  p->guard_expression = expression_undefined;
+	}
+	
+      else
+	// the process has failed: we clean everything and reset context
+	{
+	  p->loop_nest_depth = 0;
+	  p->max_loop_nest_depth = -1;
+	  gen_full_free_list(p->l_number_iter_exp);
+	  p->l_number_iter_exp = NIL;
+	  p->fail_p = false;
+	  p->inner_loop = loop_undefined;
+	  if (!expression_undefined_p(p->guard_expression))
+	    {
+	      free_expression(p->guard_expression);
+	      p->guard_expression = expression_undefined;
+	    }
+	}
     }
-
   POP(p->l_enclosing_loops);
   return;
 }
@@ -295,6 +392,9 @@ bool gpu_loop_nest_annotate(char *module_name)
   c.inner_reached = FALSE;
   c.gpu_loop_nest_annotate_parallel_p =
     get_bool_property("GPU_LOOP_NEST_ANNOTATE_PARALLEL");
+  c.fail_p = false;
+  c.inner_loop = loop_undefined;
+  c.guard_expression = expression_undefined;
 
   /* Annotate the loop nests of the module. */
   gen_context_recurse(module_statement, &c, loop_domain, loop_push, loop_annotate);
