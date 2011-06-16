@@ -6,18 +6,17 @@
 #
 # Usage: $0 SUMMARY files list...
 # first file is current status to investigate ideally in reverse date order
-# use -sr options to ensure that it is sorted
 #
 
 use strict;
 
 # manage options
-my $sort = 0;
-my $reverse = 0;
+my $sort = 1;
+my $reverse = 1;
 
 use Getopt::Long;
 GetOptions(
-  "h|help" => sub { print "$0 -sr SUMMARY_Archive/2011/06/*\n"; exit 0; },
+  "h|help" => sub { print "$0 SUMMARY_Archive/2011/06/*\n"; exit 0; },
   "s|sort!" => \$sort,
   "r|reverse!" => \$reverse
 ) or die "option error";
@@ -29,12 +28,18 @@ GetOptions(
 my $n_fails = 0;
 
 # keep track of svn version info
+# project -> version
 my %current_version = ();
 my %previous_version;
+# keep track of the corresponding url
+# to retrieve more information if necessary
+# project -> full url
+my %url = ();
 
 # case status
 my %status = ();
 
+# possible url of pips svn server at CRI
 my $url = 'https?:\/\/svn\.cri\.(ensmp|mines-paristech)\.fr\/svn';
 
 # current file number
@@ -53,9 +58,15 @@ sub vdiff()
     if ($current != $previous)
     {
       my $pre = $current+1;
-      $code =~ s/\/trunk$//; # compress output
-      $vdiff .= "$code\@" .
-        ($previous!=$pre? "$pre:$previous ": "$pre ");
+      my $short = $code;
+      $short =~ s/\/trunk$//; # compress output
+      # get authors of differing commits on the url *only*
+      my $who = `svn log --quiet --revision $pre:$previous $url{$code}`;
+      $who =~ s/^\-+\n//sg;
+      $who =~ s/r(\d+) \| (\w+) \| .*\n/$1($2),/sg;
+      $who =~ s/,$//;
+      # format as pips@123(coelho),124(irigoin)
+      $vdiff .= "$short\@$who ";
     }
   }
   # this may occur for undeterministic diffs
@@ -76,7 +87,11 @@ while (<>)
   }
 
   # get svn revision for anything, based on the svn url
-  $current_version{$2} = $3 if m,$url/([^@]+)@(\d+),;
+  if (m,($url/([^@]+))@(\d+),)
+  {
+    $current_version{$3} = $4;
+    $url{$3} = $1; # also keep the detailed url
+  }
 
   # investigate a case
   if (/^(passed|changed|failed|timeout): (\S+)/)
