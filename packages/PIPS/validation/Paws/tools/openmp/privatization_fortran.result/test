@@ -1,0 +1,14 @@
+// OMP style
+      PROGRAM PRIVATIZATION_FORTRAN
+
+      INTEGER I, N, A(100), B(100), C(100)
+
+
+!$OMP PARALLEL DO PRIVATE(T)
+      DO I = 1, N
+         T = A(I)+B(I)
+         C(I) = T
+      ENDDO
+
+      STOP
+      END

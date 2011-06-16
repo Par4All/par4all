@@ -4,5 +4,6 @@ setenv NAME license_plate_copies
 setproperty HWAC_SPOC_DEPTH 4
 setproperty HWAC_TERAPIX_DAG_CUT "compute"
 # test faster bandwidth
-setproperty HWAC_TERAPIX_DMABW 96
+setproperty HWAC_TERAPIX_DMABW 32
+setproperty HWAC_TERAPIX_OVERLAP_IO TRUE
 source default_tpips

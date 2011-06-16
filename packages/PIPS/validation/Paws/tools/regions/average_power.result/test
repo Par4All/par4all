@@ -1,0 +1,53 @@
+
+//  <Pow[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].im-R-MAY-{0<=PHI1, PHI1+1<=Nth, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].re-R-MAY-{0<=PHI1, PHI1+1<=Nth, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+
+void average_power(int Nth, int Nrg, int Nv, Cplfloat ptrin[Nth][Nrg][Nv], float Pow[Nth])
+{
+   int th, v, rg;
+
+//  <Pow[PHI1]-R-MAY-{0<=PHI1, PHI1+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{0<=PHI1, PHI1+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].im-R-MAY-{0<=PHI1, PHI1+1<=Nth, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].re-R-MAY-{0<=PHI1, PHI1+1<=Nth, 0<=PHI2,
+//    PHI2+1<=Nrg, 0<=PHI3, PHI3+1<=Nv}>
+
+   for(th = 0; th <= Nth-1; th += 1)
+
+//  <Pow[PHI1]-R-MAY-{PHI1==th, 0<=th, th+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{PHI1==th, 0<=th, th+1<=Nth, 1<=Nrg, 1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].im-R-MAY-{PHI1==th, 0<=PHI2, PHI2+1<=Nrg,
+//    0<=PHI3, PHI3+1<=Nv, 0<=th, th+1<=Nth}>
+//  <ptrin[PHI1][PHI2][PHI3].re-R-MAY-{PHI1==th, 0<=PHI2, PHI2+1<=Nrg,
+//    0<=PHI3, PHI3+1<=Nv, 0<=th, th+1<=Nth}>
+
+      for(rg = 0; rg <= Nrg-1; rg += 1)
+
+//  <Pow[PHI1]-R-MAY-{PHI1==th, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth,
+//    1<=Nv}>
+//  <Pow[PHI1]-W-MAY-{PHI1==th, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth,
+//    1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].im-R-MAY-{PHI1==th, PHI2==rg, 0<=PHI3,
+//    PHI3+1<=Nv, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth}>
+//  <ptrin[PHI1][PHI2][PHI3].re-R-MAY-{PHI1==th, PHI2==rg, 0<=PHI3,
+//    PHI3+1<=Nv, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth}>
+
+         for(v = 0; v <= Nv-1; v += 1)
+
+//  <Pow[PHI1]-R-EXACT-{PHI1==th, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth,
+//    0<=v, v+1<=Nv}>
+//  <Pow[PHI1]-W-EXACT-{PHI1==th, 0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth,
+//    0<=v, v+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].im-R-MAY-{PHI1==th, PHI2==rg, PHI3==v,
+//    0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth, 0<=v, v+1<=Nv}>
+//  <ptrin[PHI1][PHI2][PHI3].re-R-MAY-{PHI1==th, PHI2==rg, PHI3==v,
+//    0<=rg, rg+1<=Nrg, 0<=th, th+1<=Nth, 0<=v, v+1<=Nv}>
+
+            Pow[th] += CplAbs(&ptrin[th][rg][v]);
+}
+

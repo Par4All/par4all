@@ -4483,6 +4483,7 @@ digraph "license_plate_copies_helper_0_0_9" {
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 2 output images
@@ -4680,6 +4681,7 @@ freia_status license_plate_copies_helper_0_0_0(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -4779,8 +4781,8 @@ freia_status license_plate_copies_helper_0_0_1(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -4821,8 +4823,8 @@ freia_status license_plate_copies_helper_0_0_1(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: D8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -4929,6 +4931,7 @@ freia_status license_plate_copies_helper_0_0_1(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5028,8 +5031,8 @@ freia_status license_plate_copies_helper_0_0_2(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -5070,8 +5073,8 @@ freia_status license_plate_copies_helper_0_0_2(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: D8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -5178,6 +5181,7 @@ freia_status license_plate_copies_helper_0_0_2(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5277,8 +5281,8 @@ freia_status license_plate_copies_helper_0_0_3(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -5319,8 +5323,8 @@ freia_status license_plate_copies_helper_0_0_3(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: D8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -5427,6 +5431,7 @@ freia_status license_plate_copies_helper_0_0_3(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5526,8 +5531,8 @@ freia_status license_plate_copies_helper_0_0_4(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -5568,8 +5573,8 @@ freia_status license_plate_copies_helper_0_0_4(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: E8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -5676,6 +5681,7 @@ freia_status license_plate_copies_helper_0_0_4(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -5775,8 +5781,8 @@ freia_status license_plate_copies_helper_0_0_5(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -5817,8 +5823,8 @@ freia_status license_plate_copies_helper_0_0_5(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: E8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -5925,6 +5931,7 @@ freia_status license_plate_copies_helper_0_0_5(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -6024,8 +6031,8 @@ freia_status license_plate_copies_helper_0_0_6(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -6066,8 +6073,8 @@ freia_status license_plate_copies_helper_0_0_6(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: E8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -6174,6 +6181,7 @@ freia_status license_plate_copies_helper_0_0_6(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -6273,8 +6281,8 @@ freia_status license_plate_copies_helper_0_0_7(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -6315,8 +6323,8 @@ freia_status license_plate_copies_helper_0_0_7(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 3: E8(2) -> 3
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_3;
@@ -6423,6 +6431,7 @@ freia_status license_plate_copies_helper_0_0_7(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 2 output images
@@ -6529,8 +6538,8 @@ freia_status license_plate_copies_helper_0_0_8(
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -6571,8 +6580,8 @@ freia_status license_plate_copies_helper_0_0_8(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 3: thr(2) -> 2
-  mcu_macro[0][3].xmin1 = imagelet_2;
-  mcu_macro[1][3].xmin1 = imagelet_2;
+  mcu_macro[0][3].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin1 = imagelet_io_2_1;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
   mcu_macro[0][3].xmin2 = imagelet_io_2_0;
@@ -6670,6 +6679,7 @@ freia_status license_plate_copies_helper_0_0_8(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -6838,6 +6848,7 @@ freia_status license_plate_copies_helper_0_0_9(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -7006,6 +7017,7 @@ freia_status license_plate_copies_helper_0_0_10(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -7174,6 +7186,7 @@ freia_status license_plate_copies_helper_0_0_11(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -7342,6 +7355,7 @@ freia_status license_plate_copies_helper_0_0_12(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -7510,6 +7524,7 @@ freia_status license_plate_copies_helper_0_0_13(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -7678,6 +7693,7 @@ freia_status license_plate_copies_helper_0_0_14(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -7844,8 +7860,8 @@ freia_status license_plate_copies_helper_0_0_15(
   mcu_macro[1][3].xmin1 = imagelet_3;
   mcu_macro[0][3].ymin1 = 0;
   mcu_macro[1][3].ymin1 = 0;
-  mcu_macro[0][3].xmin2 = imagelet_2;
-  mcu_macro[1][3].xmin2 = imagelet_2;
+  mcu_macro[0][3].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][3].xmin2 = imagelet_io_2_1;
   mcu_macro[0][3].ymin2 = 0;
   mcu_macro[1][3].ymin2 = 0;
   // copy of operation 3 parameters
@@ -7872,8 +7888,8 @@ freia_status license_plate_copies_helper_0_0_15(
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_ERODE_3_3;
   // 4: E8(2) -> 1
-  mcu_macro[0][4].xmin1 = imagelet_2;
-  mcu_macro[1][4].xmin1 = imagelet_2;
+  mcu_macro[0][4].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][4].xmin1 = imagelet_io_2_1;
   mcu_macro[0][4].ymin1 = 0;
   mcu_macro[1][4].ymin1 = 0;
   mcu_macro[0][4].xmin2 = imagelet_io_1_0;
@@ -7956,6 +7972,7 @@ freia_status license_plate_copies_helper_0_0_15(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8120,6 +8137,7 @@ freia_status license_plate_copies_helper_0_0_16(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8284,6 +8302,7 @@ freia_status license_plate_copies_helper_0_0_17(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8448,6 +8467,7 @@ freia_status license_plate_copies_helper_0_0_18(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8612,6 +8632,7 @@ freia_status license_plate_copies_helper_0_0_19(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8776,6 +8797,7 @@ freia_status license_plate_copies_helper_0_0_20(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -8958,6 +8980,7 @@ freia_status license_plate_copies_helper_0_0_21(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -9126,6 +9149,7 @@ freia_status license_plate_copies_helper_0_0_22(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -9294,6 +9318,7 @@ freia_status license_plate_copies_helper_0_0_23(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -9462,6 +9487,7 @@ freia_status license_plate_copies_helper_0_0_24(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -9644,6 +9670,7 @@ freia_status license_plate_copies_helper_0_0_25(
  * GRAM H   = 32
  * DAG CUT  = compute
  * OVERLAP  = false
+ * IMAGE H  = 0
  * MAX SIZE = 0
  *
  * 2 input images, 1 output image
@@ -9742,8 +9769,8 @@ freia_status license_plate_copies_helper_0_0_26(
   mcu_macro[1][1].xmin1 = imagelet_3;
   mcu_macro[0][1].ymin1 = 0;
   mcu_macro[1][1].ymin1 = 0;
-  mcu_macro[0][1].xmin2 = imagelet_2;
-  mcu_macro[1][1].xmin2 = imagelet_2;
+  mcu_macro[0][1].xmin2 = imagelet_io_2_0;
+  mcu_macro[1][1].xmin2 = imagelet_io_2_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = x_0;
@@ -9761,8 +9788,8 @@ freia_status license_plate_copies_helper_0_0_26(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
   // 2: &(2,1) -> 1
-  mcu_macro[0][2].xmin1 = imagelet_2;
-  mcu_macro[1][2].xmin1 = imagelet_2;
+  mcu_macro[0][2].xmin1 = imagelet_io_2_0;
+  mcu_macro[1][2].xmin1 = imagelet_io_2_1;
   mcu_macro[0][2].ymin1 = 0;
   mcu_macro[1][2].ymin1 = 0;
   mcu_macro[0][2].xmin2 = imagelet_io_1_0;

@@ -1,0 +1,23 @@
+// OMP style
+"after merge_pragma"
+int main(void)
+{
+   int k = 0, i = 0, l = 0;
+   int sum = 0;
+   int a[size][size][size];
+
+   for(l = 0; l <= size-1; l += 1)
+      for(k = 0; k <= size-1; k += 1)
+         for(i = 0; i <= size-1; i += 1)
+            a[l][k][i] = 10;
+
+#pragma omp parallel for private(k, i) reduction(+:sum)
+   for(l = 0; l <= size-1; l += 1)
+      for(k = 0; k <= size-1; k += 1)
+         for(i = 0; i <= size-1; i += 1)
+            sum += a[l][k][i];
+
+   printf("sum is %d", sum);
+
+   return 0;
+}

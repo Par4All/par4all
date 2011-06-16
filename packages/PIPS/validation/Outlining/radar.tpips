@@ -5,12 +5,18 @@ delete radar
 #setenv PIPS_CPP_FLAGS " -D TIME "
 #setenv PIPSMAKE_DEBUG_LEVEL 7
 
+
 create radar radar.c
+activate MUST_REGIONS
+setproperty MUST_REGIONS TRUE
 
 apply LOOP_NORMALIZE[%ALLFUNC]
 
 apply PRIVATIZE_MODULE[%ALLFUNC]
 
+#activate PRINT_CODE_REGIONS
+#display PRINTED_FILE[%ALLFUNC]
+#activate PRINT_CODE
 
 apply COARSE_GRAIN_PARALLELIZATION[%ALLFUNC]
 

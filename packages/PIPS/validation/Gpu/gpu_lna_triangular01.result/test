@@ -1,0 +1,24 @@
+int main()
+{
+   int M = rand();
+   int N = rand();
+   int i, j, k;
+   double alpha = 1;
+   double C[M][N];
+   // Loop nest P4A begin,2D(pips_max(-2, -3+N)+1, N)
+#pragma omp parallel for 
+   for(j = 0; j <= N-1; j += 1)
+#pragma omp parallel for 
+      for(k = 0; k <= j-1-1; k += 1)
+         // Loop nest P4A end
+         if (j<=N-1&&k<=j-1-1)
+            C[k][j] += alpha;
+   // Loop nest P4A begin,2D(N-1-pips_min(N, 1)+1, N)
+#pragma omp parallel for 
+   for(j = 0; j <= N-1; j += 1)
+#pragma omp parallel for 
+      for(k = N-j; k <= N-1; k += 1)
+         // Loop nest P4A end
+         if (j<=N-1&&k<=N-1)
+            C[k][j] += alpha;
+}

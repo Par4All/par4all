@@ -1,0 +1,20 @@
+#include "stdio.h"
+int lv1_0, lv2_0, lv1_1, lv2_1;
+
+int main(int argc, char *argv[])
+{
+
+  double a[10];
+  for(lv1_0 = 0; lv1_0 <= 9; lv1_0 += 1)
+    a[lv1_0] = (double) 1.0;
+  double b[10];
+  for(lv1_0 = 0; lv1_0 <= 9; lv1_0 += 1)
+    b[lv1_0] = (double) 1.0;
+  double ret[10];
+  for(lv1_0 = 0; lv1_0 <= 9; lv1_0 += 1)
+    ret[lv1_0] = a[lv1_0]+b[lv1_0];
+
+  printf("ret %f\n", ret[10]);
+
+}
+

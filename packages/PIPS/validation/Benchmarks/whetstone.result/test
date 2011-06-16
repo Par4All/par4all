@@ -1692,7 +1692,6 @@ int main()
    x1 = 1.0;
    x2 = x3 = x4 = -1.0;
 
-#pragma omp parallel for 
    for(i = 1; i <= n1; i += 1) {
       x1 = (x1+x2+x3-x4)*t;
       x2 = (x1+x2-x3-x4)*t;
@@ -1816,7 +1815,6 @@ int main()
    j = 2;
    k = 3;
 
-#pragma omp parallel for 
    for(i = 1; i <= n10; i += 1) {
       j = j+k;
       k = j+k;
