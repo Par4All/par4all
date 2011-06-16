@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# 1 - name
+# 2 - header of the page
+# 3 - description of the tool
+# 4 - directory with examples (existing one, to copy)
+# 5 - pyps print code module
+
+# TO DO: sample pyps code file!
+
+# TO DO advanced!
+
+EXPECTED_ARGS=5
+
+if [ $# -ne $EXPECTED_ARGS ]
+then
+	echo "Usage: add_tool <tool_name> <header_of_page> <description> <directory_with_examples> <pyps_print_code_module>"
+	return 1
+fi
+
+echo $2
+
+validation="../../../../validation/Paws/tools/"
+
+source ../../bin/activate
+# new controller and new mako template
+paster controller --tool tools_$1
+paster tool-template $1 "$2" 
+mv "../pawsapp/templates/tools_${1}.mako.py" "../pawsapp/templates/tools_${1}.mako" 
+
+# new tool validation directory with examples and description
+cp -r $4 ${validation}
+mv "${validation}$4" "${validation}$1"
+
+# new description file
+echo $3 > "${validation}${1}/${1}.txt"
+
+# new pyps module
+cp "templates/template.c" "${validation}/../pyps_modules/paws_${1}.c"
+python create_pyps_module.py $5 $1
+mv "templates/paws_${1}.py" "${validation}/../pyps_modules/"
+
+deactivate
+

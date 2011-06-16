@@ -151,6 +151,17 @@ AX_ARG_ENABLE([pyps-extra],
 			]
 )
 
+AX_ARG_ENABLE([paws],
+			[enable pips as web service],
+			[no],
+			[
+			 AX_PYTHON_MODULE([Pyro]) 
+			 AX_PYTHON_MODULE([pygments])		 
+			 AX_PYTHON_MODULE([pylons], [if pylons.__version__ < '1.0': raise ImportError('The minimum required version of pylons is 1.0.')])		 
+			 AX_PYTHON_MODULE([PIL])		 
+			 AX_DEPENDS([paws],[pyps Pyro pygments pylons PIL])
+			]
+)
 # hpfc
 AX_ARG_ENABLE([hpfc],
 			  [enable high performance fortran compiler],
@@ -175,7 +186,7 @@ AX_ARG_ENABLE([fortran95],
 )
 
 # set the optionnal passes dirs there
-AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_fortran95"])
+AC_SUBST([PIPS_EXTRA_PASSES],["$ax_enable_gpips $ax_enable_tpips $ax_enable_pyps $ax_enable_fortran95 $ax_enable_paws"])
 
 
 
@@ -263,6 +274,8 @@ AC_CONFIG_FILES([pips_config.h
 				 src/Passes/Makefile
 				 src/Passes/fortran95/Makefile
 				 src/Passes/gpips/Makefile
+				 src/Passes/paws/Makefile
+				 src/Passes/paws/paws
 				 src/Passes/pips/Makefile
 				 src/Passes/pyps/Makefile
 				 src/Passes/pyps/ipyps
@@ -348,4 +361,4 @@ AC_CONFIG_FILES([pips_config.h
 
 AX_DEPENDS([minimum],[lex yacc newgen perl cproto make_all_specs newgenlibs linearlibs std_headers dup2_getcwd_gethostname_gettimeofday_memset_mkdir_putenv_regcomp_setenv_strcasecmp_strchr_strcspn_strerror_strrchr_strspn_strstr_strtol_strtoul_strtoull])
 
-AX_OUTPUT([minimum],[tpips pyps pyps-extra gpips hpfc doc fortran95])
+AX_OUTPUT([minimum],[tpips pyps pyps-extra gpips hpfc doc fortran95 paws])
