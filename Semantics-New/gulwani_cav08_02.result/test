@@ -13,7 +13,7 @@ int gulwani_cav08_02(int x, int y, int z)
 
 //  T() {z+1<=0}
 
-   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 7, (const char *) 0);
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 12, (const char *) 0);
 
 //  T(y0) {y==y0, z+1<=0}
 
@@ -63,7 +63,7 @@ int gulwani_cav08_02(int x, int y, int z)
 
 //  P(k,y0) {}
 
-   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 7, (const char *) 0);
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 12, (const char *) 0);
 
 //  P(k,y0) {z+1<=0}
 
@@ -111,7 +111,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
 
 //  T() {z+1<=0}
 
-   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 22, (const char *) 0);
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 27, (const char *) 0);
 
 //  T(y0) {y==y0, z+1<=0}
 
@@ -187,7 +187,7 @@ int gulwani_cav08_02_r(int x, int y, int z)
 
 //  P(k,y0) {}
 
-   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 22, (const char *) 0);
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 27, (const char *) 0);
 
 //  P(k,y0) {z+1<=0}
 
