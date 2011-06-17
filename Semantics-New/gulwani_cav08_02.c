@@ -1,4 +1,9 @@
-/*Source Code From Laure Gonnord*/
+/* Source Code From Laure Gonnord
+ *
+ * Slightly modified to use assert instead of assume.
+ *
+ * Gulwani, CAV 2008, probably Example 2
+ */
 
 #include <assert.h>
 
