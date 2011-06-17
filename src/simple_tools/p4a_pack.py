@@ -37,9 +37,7 @@ package_name                        = "par4all"
 # Settings for --publish. There is currently no command line option to override these defaults.
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
 # to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
-# Settings for --publish. There is currently no command line option to override these defaults.
-# Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
-# to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
+
 default_publish_host                = "download.par4all.org"
 default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
 default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$DATE"
