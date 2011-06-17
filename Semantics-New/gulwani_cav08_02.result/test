@@ -1,0 +1,246 @@
+
+TRANSFORMERS
+
+
+//  T(gulwani_cav08_02) {gulwani_cav08_02==0, z+1<=0}
+
+int gulwani_cav08_02(int x, int y, int z)
+{
+
+//  T(k,y0) {}
+
+   int y0, k;
+
+//  T() {z+1<=0}
+
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 7, (const char *) 0);
+
+//  T(y0) {y==y0, z+1<=0}
+
+   y0 = y;
+
+//  T(k) {k==0, y==y0, z+1<=0}
+
+   k = 0;
+
+//  T(k,x,y) {k#init==0, y#init==y0, 0<=k, k+y<=y#init, 1<=x,
+//    1<=x#init, z+1<=0}
+
+   while (x>0) {
+
+//  T(k) {k==k#init+1, 1<=x, z+1<=0}
+
+      //    assert(y>=y0-k,"__bad");
+      k = k+1;
+
+//  T(x) {x#init+y==x, 1<=x#init, z+1<=0}
+
+      x = x+y;
+
+//  T(y) {y#init+z==y, y#init+1<=x, z+1<=0}
+
+      y = y+z;
+   }
+
+//  T(gulwani_cav08_02) {gulwani_cav08_02==0, 0<=k, k+y<=y0, x<=0,
+//    z+1<=0}
+
+
+   return 0;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int gulwani_cav08_02(int x, int y, int z)
+{
+
+//  P() {}
+
+   int y0, k;
+
+//  P(k,y0) {}
+
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 7, (const char *) 0);
+
+//  P(k,y0) {z+1<=0}
+
+   y0 = y;
+
+//  P(k,y0) {y==y0, z+1<=0}
+
+   k = 0;
+
+//  P(k,y0) {k==0, y==y0, z+1<=0}
+
+   while (x>0) {
+
+//  P(k,x,y,y0) {0<=k, k+y<=y0, 1<=x, z+1<=0}
+
+      //    assert(y>=y0-k,"__bad");
+      k = k+1;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, 1<=x, z+1<=0}
+
+      x = x+y;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, y+1<=x, z+1<=0}
+
+      y = y+z;
+   }
+
+//  P(k,x,y,y0) {0<=k, k+y<=y0, x<=0, z+1<=0}
+
+
+   return 0;
+}
+
+TRANSFORMERS
+
+
+//  T(gulwani_cav08_02_r) {gulwani_cav08_02_r==0, z+1<=0}
+
+int gulwani_cav08_02_r(int x, int y, int z)
+{
+
+//  T(k,y0) {}
+
+   int y0, k;
+
+//  T() {z+1<=0}
+
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 22, (const char *) 0);
+
+//  T(y0) {y==y0, z+1<=0}
+
+   y0 = y;
+
+//  T(k) {k==0, y==y0, z+1<=0}
+
+   k = 0;
+
+//  T(k,x,y) {k==0, k#init==0, y==y#init, y==y0, 1<=x, 1<=x#init,
+//    z+1<=0}
+
+   while (x>0) {
+
+//  T(k,x,y) {k#init<=k, k+y<=k#init+y#init, 1<=x, x#init+y#init<=x+y,
+//    1<=x#init, 0<=y, 0<=y#init, z+1<=0}
+
+      while (x>0&&y>=0) {
+
+//  T(k) {k==k#init+1, 1<=x, 0<=y, z+1<=0}
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+//  T(x) {x#init+y==x, 1<=x#init, 0<=y, z+1<=0}
+
+         x = x+y;
+
+//  T(y) {y#init+z==y, y#init+1<=x, 0<=y#init, z+1<=0}
+
+         y = y+z;
+      }
+
+//  T(k,x,y) {k#init<=k, k+x<=k#init+x#init, k+y<=k#init+y#init, 1<=x,
+//    1<=x#init, y#init+2<=x#init, z+2<=x#init, y+1<=0, y#init+1<=0,
+//    z+1<=0}
+
+      while (x>0&&y<0) {
+
+//  T(k) {k==k#init+1, 1<=x, y+1<=0, z+1<=0}
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+//  T(x) {x#init+y==x, 1<=x#init, y+1<=0, z+1<=0}
+
+         x = x+y;
+
+//  T(y) {y#init+z==y, y#init+1<=x, y#init+1<=0, z+1<=0}
+
+         y = y+z;
+      }
+   }
+
+//  T(gulwani_cav08_02_r) {gulwani_cav08_02_r==0, 0<=k, k+y<=y0, x<=0,
+//    z+1<=0}
+
+
+   return 0;
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+int gulwani_cav08_02_r(int x, int y, int z)
+{
+
+//  P() {}
+
+   int y0, k;
+
+//  P(k,y0) {}
+
+   z<0?(void) 0:__assert_fail("z<0", "./gulwani_cav08_02.c", 22, (const char *) 0);
+
+//  P(k,y0) {z+1<=0}
+
+   y0 = y;
+
+//  P(k,y0) {y==y0, z+1<=0}
+
+   k = 0;
+
+//  P(k,y0) {k==0, y==y0, z+1<=0}
+
+   while (x>0) {
+
+//  P(k,y0) {k==0, y==y0, 1<=x, z+1<=0}
+
+      while (x>0&&y>=0) {
+
+//  P(k,x,y,y0) {0<=k, k+y<=y0, y0+1<=x+y, 0<=y, z+1<=0}
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, 1<=x, y0+1<=x+y, 0<=y, z+1<=0}
+
+         x = x+y;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, y+1<=x, y0+1<=x, 0<=y, z+1<=0}
+
+         y = y+z;
+      }
+
+//  P(k,x,y,y0) {0<=k, k<=x, y0+z+2<=k+x+y, y0+2<=k+x, k+y<=y0, 1<=x,
+//    y0+z+1<=x+y, y0+1<=x, y+1<=0, z+1<=0}
+
+      while (x>0&&y<0) {
+
+//  P(k,x,y,y0) {0<=k, k+y<=y0, 1<=x, y+1<=0, z+1<=0}
+
+         //    assert(y>=y0-k,"__bad");
+         k = k+1;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, 1<=x, y+1<=0, z+1<=0}
+
+         x = x+y;
+
+//  P(k,x,y,y0) {1<=k, k+y<=y0+1, y+1<=x, y+1<=0, z+1<=0}
+
+         y = y+z;
+      }
+   }
+
+//  P(k,x,y,y0) {0<=k, k+y<=y0, x<=0, z+1<=0}
+
+
+   return 0;
+}
