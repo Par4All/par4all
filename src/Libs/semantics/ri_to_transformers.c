@@ -79,7 +79,7 @@ transformer add_effects_to_transformer(transformer tf, list e)
   Psysteme sc = predicate_system(transformer_relation(tf));
   Pbase b = sc_base(sc);
 
-  /* algorithm: keep only write effects on variables with values */
+  /* algorithm: keep only memory write effects on variables with values */
   FOREACH(EFFECT, ef, e) {
     reference r = effect_any_reference(ef);
     action a = effect_action(ef);
@@ -88,7 +88,10 @@ transformer add_effects_to_transformer(transformer tf, list e)
     /* The check on static should be useless because already taken
        into account when effects are computed. And it is harmful here
        since most effects on static variables cannot be ignored. */
-    if(action_write_p(a) && entity_has_values_p(v) /*&& !variable_static_p(v)*/)
+    if(action_write_p(a)
+       && entity_has_values_p(v)
+       && store_effect_p(ef) // FI: we should have action_memory_write_p()
+       /*&& !variable_static_p(v)*/)
     {
       entity new_val = entity_to_new_value(v);
       args = arguments_add_entity(args, new_val);
