@@ -1,0 +1,37 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void verdoolaege_7560_5_4()
+{
+
+//  T(n,x,y) {}
+
+   int x, y, n;
+
+//  T() {2<=n}
+
+   if (!(n>=2))
+
+//  T() {0==-1}
+
+
+      abort();
+
+//  T(x,y) {2<=n, n+x+y<=x#init+y#init+2, x#init+1<=x}
+
+
+   if (1)
+
+//  T(x,y) {2<=n, x#init<=x, x+y<=x#init+y#init}
+
+      do {
+
+//  T(x,y) {n+y==y#init+1, x==x#init+1, 2<=n}
+
+         x++, y += 1-n;
+      }
+      while (flip());
+}

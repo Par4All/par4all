@@ -6,7 +6,7 @@ create pointer01 pointer01.c
 
 setproperty MEMORY_EFFECTS_ONLY FALSE
 
-activate PROPER_EFFECTS
+#activate PROPER_EFFECTS
 
 activate PRINT_CODE_POINTS_TO_LIST
 
@@ -22,6 +22,14 @@ echo
 
 activate PROPER_EFFECTS_WITH_POINTS_TO
 activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE
+
+echo
+echo Cumulated effects with points-to
+echo
+
+activate CUMULATED_EFFECTS_WITH_POINTS_TO
+activate PRINT_CODE_CUMULATED_EFFECTS
 display PRINTED_FILE
 
 echo

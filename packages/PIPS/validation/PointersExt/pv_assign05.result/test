@@ -1,11 +1,26 @@
 
-PROPER EFFECTS
+PROPER  EFFECTS
 
+int main()
+{
+   mystruct s1, s2;
+   mystruct tab_s[2];
+//             <    is read   >: s1.a
+//             <    is written>: s2.a
+   s2.a = s1.a;
+//             <    is read   >: s1.b[0]
+//             <    is written>: s2.b[0]
+   (s2.b)[0] = (s1.b)[0];
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.a
+   tab_s[0].a = s1.a;
+//             <may be written>: *ANY_MODULE*:*ANYWHERE*
+//             <    is read   >: s1.b[0]
+   (tab_s[0].b)[0] = (s1.b)[0];
+   return 0;
+}
 
-PROPER POINTER EFFECTS
-
-
-POINTS TO
+POINTS-TO
 
 //  {}
 int main()

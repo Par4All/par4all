@@ -1611,6 +1611,7 @@ freia_status anr999_helper_0_0_0(
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
+  // imagelet max size: 204
   int imagelet_size = 148;
   int imagelet_1 = 0;
   int imagelet_2 = 148;
