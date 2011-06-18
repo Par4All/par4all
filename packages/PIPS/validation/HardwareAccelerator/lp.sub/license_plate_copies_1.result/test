@@ -6199,7 +6199,7 @@ digraph "license_plate_copies_helper_0_0" {
  * GRAM H   = 32
  * DAG CUT  = none
  * OVERLAP  = false
- * IMAGE H  = 0
+ * IMAGE H  = 720
  * MAX SIZE = 0
  *
  * 1 input image, 1 output image
@@ -6258,12 +6258,13 @@ freia_status license_plate_copies_helper_0_0(
   // imagelets definitions:
   // - 4 computation imagelets
   // - 1 double buffer imagelets
-  int imagelet_size = 204;
+  // imagelet max size: 204
+  int imagelet_size = 202;
   int imagelet_1 = 0;
-  int imagelet_2 = 204;
-  int imagelet_3 = 408;
-  int imagelet_4 = 612;
-  int imagelet_5 = 816;
+  int imagelet_2 = 202;
+  int imagelet_3 = 404;
+  int imagelet_4 = 606;
+  int imagelet_5 = 808;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;

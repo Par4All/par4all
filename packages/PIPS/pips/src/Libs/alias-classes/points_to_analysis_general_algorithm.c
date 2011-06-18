@@ -2054,7 +2054,7 @@ list points_to_init_typedef(entity e){
 	    cell c = get_memory_path(ex1, &eval);
 	    l = gen_nconc(CONS(CELL, c, NIL),l);
 	  }else if(array_argument_p(ef))
-	    print_expression(ef);
+	    /* print_expression(ef); */;
 	}
       }else if(type_enum_p(t))
 	pips_user_warning("enum case not handled yet \n");

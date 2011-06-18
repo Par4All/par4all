@@ -1,0 +1,82 @@
+delete gulwani_cav08_02
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create gulwani_cav08_02 gulwani_cav08_02.c
+
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+
+# It is not really useful to turn this off because the transformer is
+# correctly computed
+
+# setproperty SEMANTICS_FILTER_INITIAL_VALUES FALSE
+
+# setenv SEMANTICS_DEBUG_LEVEL "0"
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[gulwani_cav08_02]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[gulwani_cav08_02]
+
+echo
+echo TRANSFORMERS
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[gulwani_cav08_02_r]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[gulwani_cav08_02_r]
+
+#apply UNSPLIT
+
+# Refining the transformers is useless
+quit
+
+echo
+echo TRANSFORMERS
+echo
+
+apply REFINE_TRANSFORMERS[gulwani_cav08_02]
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[gulwani_cav08_02]
+
+# quit
+
+echo
+echo PRECONDITIONS
+echo
+
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[gulwani_cav08_02]
+
+close
+# delete gulwani_cav08_02
+quit

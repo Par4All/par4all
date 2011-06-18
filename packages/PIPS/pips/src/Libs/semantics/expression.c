@@ -219,7 +219,7 @@ static transformer unary_minus_operation_to_transformer(entity v,
 
   /* Much too early: you are in between recursive calls! */
   /* tf = transformer_temporary_value_projection(tf); */
-    
+
   free_transformer(tf1);
   free_transformer(tf_op);
 
@@ -2033,6 +2033,9 @@ static transformer integer_call_expression_to_transformer(
   else if(ENTITY_CONDITIONAL_P(f)) {
     tf = any_conditional_to_transformer(e, args, pre);
   }
+  else if(ENTITY_NOT_P(f)) {
+    tf = logical_not_to_transformer(e, args, pre);
+  }
   else if(ENTITY_RAND_P(f)) {
     tf = transformer_identity();
     tf = transformer_add_inequality_with_integer_constraint(tf, e, VALUE_ZERO, FALSE);
@@ -3415,6 +3418,37 @@ transformer any_conditional_to_transformer(entity v,
 
   //if(transformer_undefined_p(tf))
   //  tf = effects_to_transformer(ef);
+  return tf;
+}
+
+/* Take care of the returned value. About a cut-and-paste of previous
+   function, conditional_to_transformer(). */
+transformer logical_not_to_transformer(entity v,
+				       list args,
+				       transformer pre)
+{
+  expression le = EXPRESSION(CAR(args));
+  //transformer tf = transformer_undefined;
+  entity tmp_v = make_local_temporary_integer_value_entity();
+  transformer tf = safe_any_expression_to_transformer(tmp_v, le, pre, TRUE);
+  transformer tfr = transformer_range(tf);
+  intptr_t lb, ub;
+
+  if(precondition_minmax_of_value(tmp_v, tfr, &lb, &ub)) {
+    if(lb==ub && lb==0)
+      tf = transformer_add_equality_with_integer_constant(tf, v, VALUE_ONE);
+    else if(lb>0 || ub<0)
+      tf = transformer_add_equality_with_integer_constant(tf, v, VALUE_ZERO);
+    else {
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
+      tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+    }
+  }
+  else {
+    tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
+    tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+  }
+
   return tf;
 }
 
