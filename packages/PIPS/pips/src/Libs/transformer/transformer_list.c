@@ -475,7 +475,7 @@ list transformer_list_to_active_transformer_list(list tl)
  * We need a developped formulae for P*=(U_i T_i)^*P_0... to postpone
  * the convex hulls as much as possible
  *
- * For instance:
+ * For instance, and this is a heuristics:
  *
  * P_0 is known as pre_init
  *
@@ -499,9 +499,10 @@ list transformer_list_to_active_transformer_list(list tl)
  * A more accurate approach would use several developped formulae for
  * P* and an intersection of their results.
  */
-transformer transformer_list_closure_to_precondition(list tl,
-						     transformer c_t,
-						     transformer p_0)
+static transformer
+transformer_list_closure_to_precondition_depth_two(list tl,
+						   transformer c_t,
+						   transformer p_0)
 {
   list ntl = transformers_combine(gen_full_copy_list(tl), c_t);
 
@@ -581,6 +582,143 @@ transformer transformer_list_closure_to_precondition(list tl,
   free_transformer(p_012);
   free_transformer(p_0123);
 
+  return p_star;
+}
+
+/* Compute the precondition of a loop whose body transformers T_i are
+ * in transformer list tl and whose condition is modelized by
+ * transformer c_t. The precondition of iteration 0 is p_0.
+ *
+ * We need a developped formulae for P*=(U_i T_i)^*P_0... to postpone
+ * the convex hulls as much as possible
+ *
+ * For instance, and this is a heuristics:
+ *
+ * P_0 is known as pre_init
+ *
+ * P_l = U_i T_i(P_0)
+ *
+ * P_2 = U_i U_j T_i(T_j(P_0))
+ *
+ * P_3^s = U_i T_i^+(P_0)  --- only one path is used
+ *
+ * P_3^+ = U_i U_j!=i T^+_i(T_j(T^*(P_1)))  --- at least two
+ *                                              paths are used
+ *
+ * which would make more sense when i and j are in
+ * [0..1]. Note that in P_3, T_j and T^+_i could be recomputed
+ * wrt P_1 instead of pre_fuzzy... which is not provided
+ *
+ * Maybe T^*=(U_i T_i)^* could/should be computed as (U_i T_i*)* but
+ * it is not clear how all the useful conditions could be taken into
+ * account.
+ *
+ * A more accurate approach would use several developped formulae for
+ * P* and an intersection of their results.
+ */
+static transformer
+transformer_list_closure_to_precondition_max_depth(list tl,
+						   transformer c_t,
+						   transformer p_0)
+{
+  list ntl = transformers_combine(gen_full_copy_list(tl), c_t);
+
+  list p_1_l = transformers_apply(ntl, p_0);
+  transformer p_1 = transformer_list_to_transformer(p_1_l);
+
+  list t_2_l = combine_transformer_lists(ntl, ntl);
+  list p_2_l = transformers_apply(t_2_l, p_0);
+  transformer p_2 = transformer_list_to_transformer(p_2_l);
+
+  list itcl = transformers_derivative_fix_point(ntl); // individual
+						      // transformer closures
+  itcl = transformers_combine(itcl, c_t);
+  list itcl_plus = gen_full_copy_list(itcl); // to preserve ictl
+  itcl_plus = one_to_one_transformers_combine(itcl_plus, ntl);
+  list p_3_l = transformers_apply(itcl_plus, p_0);
+  transformer p_3 = transformer_list_to_transformer(gen_full_copy_list(p_3_l));
+
+  transformer t_star = transformer_undefined;
+  if(!get_bool_property("SEMANTICS_USE_DERIVATIVE_LIST")) {
+  // Not satisfying: works only for the whole space, not for subpaces
+  // left untouched
+    t_star = active_transformer_list_to_transformer(itcl);
+  }
+  else
+    t_star = transformer_list_transitive_closure(itcl);
+  transformer p_4_1 = transformer_apply(t_star, p_1); // one + * iteration
+  list p_4_2_l = transformers_apply_and_keep_all(ntl, p_4_1); // another iteration
+  pips_assert("itcl_plus and p_4_2_l have the same numer of elements",
+	      gen_length(itcl_plus)==gen_length(p_4_2_l));
+  list p_4_3_l = apply_transformer_lists_with_exclusion(itcl_plus, p_4_2_l);
+  transformer p_4 = transformer_list_to_transformer(p_4_3_l);
+
+  transformer p_star = transformer_undefined;
+
+  ifdebug(8) {
+    pips_debug(8, "p_0:\n");
+    print_transformer(p_0);
+    pips_debug(8, "p_1:\n");
+    print_transformer(p_1);
+    pips_debug(8, "p_2:\n");
+    print_transformer(p_2);
+    pips_debug(8, "p_3:\n");
+    print_transformer(p_3);
+    pips_debug(8, "p_4:\n");
+    print_transformer(p_4);
+  }
+
+  // reduce p_0, p_1, p_2, p_3 and p_4 to p_star
+  transformer p_01 = transformer_convex_hull(p_0, p_1);
+  transformer p_012 = transformer_convex_hull(p_01, p_2);
+  transformer p_0123 = transformer_convex_hull(p_012, p_3);
+  p_star = transformer_convex_hull(p_0123, p_4);
+
+  ifdebug(8) {
+    pips_debug(8, "p_star:\n");
+    print_transformer(p_star);
+  }
+
+  // Clean up all intermediate variables
+  gen_full_free_list(ntl);
+  //gen_full_free_list(p_1_l);
+  free_transformer(p_1);
+  //gen_full_free_list(t_2_l);
+  //gen_full_free_list(p_2_l);
+  free_transformer(p_2);
+  //gen_full_free_list(itcl);
+  gen_full_free_list(itcl_plus);
+  //gen_full_free_list(p_3_l);
+  free_transformer(p_3);
+  free_transformer(t_star);
+  free_transformer(p_4_1);
+  gen_full_free_list(p_4_2_l);
+  //gen_full_free_list(p_4_3_l);
+  free_transformer(p_4);
+  free_transformer(p_01);
+  free_transformer(p_012);
+  free_transformer(p_0123);
+
+  return p_star;
+}
+
+/* Relay to select a heuristic */
+transformer transformer_list_closure_to_precondition(list tl,
+						     transformer c_t,
+						     transformer p_0)
+{
+  transformer p_star = transformer_undefined;
+  string h = get_string_property("SEMANTICS_LIST_FIX_POINT_OPERATOR");
+
+  if(strcmp(h, "depth_two")) {
+    p_star = transformer_list_closure_to_precondition_depth_two(tl, c_t, p_0);
+  }
+    else if(strcmp(h, "max_depth")) {
+    p_star = transformer_list_closure_to_precondition_max_depth(tl, c_t, p_0);
+  }
+  else
+    pips_user_error("Unknown value \"%s\" for property "
+		    "\"SEMANTICS_LIST_FIX_POINT_OPERATOR\"", h);
   return p_star;
 }
 
@@ -667,7 +805,7 @@ list transformer_list_preserved_variables(list vl, list tl, list tl_v)
 
   return pvl;
 }
-
+
 /* When some variables are not modified by some transformers, use
    projections on subsets to increase the number of identity
    transformers and to increase the accuracy of the loop precondition.
@@ -676,7 +814,13 @@ list transformer_list_preserved_variables(list vl, list tl, list tl_v)
    intersected.
 
    FI: this may be useless when derivatives are computed before the
-   convex union.
+   convex union. No. This was due to a bug in the computation of list
+   of derivaties.
+
+   FI: this should be mathematically useless but it useful when a
+   heuristic is used to compute the invariant. The number of
+   transitions is reduced and hence a limited number of combinations
+   is more likely to end up with a precise result.
  */
 transformer transformer_list_multiple_closure_to_precondition(list tl,
 							      transformer c_t,
@@ -777,14 +921,14 @@ Psysteme transformer_derivative_constraints(transformer t)
 
   return sc;
 }
-
+
 /* Computation of an upper approximation of a transitive closure using
  * constraints on the discrete derivative for a list of
  * transformers. Each transformer is used to compute its derivative
  * and the derivatives are unioned by convex hull.
  *
- * The reason for doing this is D(T1) U D(T2) <= D(T1 U T2) where <=
- * denotes the subset comparison operator.
+ * The reason for doing this is D(T1) U D(T2) == D(T1 U T2) but the
+ * complexity is lower
  *
  * See http://www.cri.ensmp.fr/classement/doc/A-429.pdf
  *
@@ -983,4 +1127,101 @@ transformer transformer_list_transitive_closure(list tfl)
 transformer transformer_list_transitive_closure_plus(list tfl)
 {
   return transformer_list_generic_transitive_closure(tfl, FALSE);
+}
+
+/* Internal recursive function. Should be used as
+ * transformer_list_combination(). As long as n is not zero, choose
+ * all unused transformation numbers in past and call yourself
+ * recursively after updating past and ct. past is a bit field. Each
+ * bit of past is set to 1 initially because no transformer has been
+ * used yet. It is reset to 0 when the transformation has been
+ * used. The selected transformer is combined to ct.
+ *
+ * @param tn is the number of transformers that can be chosen to be
+ * combined
+ *
+ * @param ta[tn] is an array containing the tn transformers to combine
+ *
+ * @param n is the number of combinations to perform. It is less than
+ * tn.
+ *
+ * @param ct is the current combination of past transformers
+ *
+ * @param past is a bit field used to keep track of transformers
+ * alreasy used to build ct
+ *
+ * @return the list of all non-empty combinations of n transformers
+ */
+static list transformer_list_add_combination(int tn,
+					     transformer ta[tn],
+					     int n,
+					     transformer ct,
+					     int past)
+{
+  list cl = NIL;
+
+  if(n>0) {
+    int k = 1; // to select a non-zero bit in past
+    int ti; // transformation index
+    bool found_p = FALSE;
+    for(ti=0; ti<n;ti++) {
+      if(k&past) {
+	// this transformation is selectable, because it has not been
+	// selected yet
+	int npast = past ^ k; // mark it as selected
+	transformer t = ta[ti]; // to ease debugging
+	transformer nct = transformer_combine(copy_transformer(ct), t);
+	// Necessary before checking emptiness
+	nct = transformer_normalize(nct, 2);
+	// Check the sequence feasability
+	if(!transformer_empty_p(nct)) {
+	  list nl = transformer_list_add_combination(tn, ta, n-1, nct, npast);
+	  cl = gen_nconc(cl, nl);
+	}
+	found_p = TRUE;
+	free_transformer(nct);
+      }
+      k <<= 1;
+    }
+    pips_assert("At least one transformation has been found", found_p);
+  }
+  else {
+    // The recursion is over, ct contains the right number of
+    // transformer combinations
+    cl = CONS(TRANSFORMER, ct, NIL);
+  }
+  return cl;
+}
+
+/* compute all combinations of n different transformers t from
+ * transformer list tl. No check is performed on the content of list
+ * tl. Empty transformers and identity transformers should have been
+ * removed before this call.
+ *
+ * @param tl: a non-empty list of transformers
+ *
+ * int n: a strictly positive integer, smaller than the length of tl
+ *
+*/
+static list transformer_list_combination(list tl, int n)
+{
+  list cl = NIL;
+  int tn = gen_length(tl);
+
+  pips_assert("n is smaller than the number of transformers",
+	      n <= tn && n>=1 && n<=31);
+
+  transformer ta[tn]; // build a transformer array
+  int r = 0;
+
+  FOREACH(TRANSFORMER, t, tl) {
+    ta[r++] = t;
+  }
+
+  // Initialize recurrence
+  transformer ct = transformer_identity();
+  cl = transformer_list_add_combination(tn, ta, n, ct, -1);
+  free_transformer(ct);
+
+  return cl;
 }

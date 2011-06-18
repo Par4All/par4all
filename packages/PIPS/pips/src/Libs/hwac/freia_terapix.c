@@ -972,6 +972,7 @@ static void freia_terapix_call
     pips_assert("optimized row size lower than max row size",
                 optim_rows<=imagelet_rows && optim_rows>0);
     // now we set the value directly
+    sb_cat(decl, "  // imagelet max size: ", itoa(imagelet_rows), "\n");
     imagelet_rows = optim_rows;
   }
 
