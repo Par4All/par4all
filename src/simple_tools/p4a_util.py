@@ -450,7 +450,7 @@ class runner(Thread):
             time.sleep(0.05)
         self.hide_spinner()
 
-    def wait(self):
+    def wait(self, error_code=0, msg=""):
         try:
             if self.redir:
                 self.join()
@@ -463,10 +463,9 @@ class runner(Thread):
             if self.err and get_verbosity() == 0:
                 sys.stderr.write(self.err + "\n")
             self.stderr_handler("Environment was: " + repr(self.env))
-            if ret==30:
+            if ret==error_code:
 				raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
-					+ " failed with exit code " + str(ret) + " (timeout).\n" + 
-					"Retry to publish using p4a_pack.py with option --retry-publish", code = ret)
+					+ " failed with exit code " + str(ret) + msg, code = ret)
             else:
 				raise p4a_error("Command '" + self.cmd + "' in " + self.working_dir
 					+ " failed with exit code " + str(ret), code = ret)
@@ -475,7 +474,7 @@ class runner(Thread):
 
 def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
         shell = True, extra_env = {}, silent = False,
-        stdout_handler = None, stderr_handler = None):
+        stdout_handler = None, stderr_handler = None, error_code=0, msg=""):
     '''Helper function to spawn an external command and wait for it to finish.'''
     if stdout_handler is None and stderr_handler is None:
         if silent:
@@ -488,7 +487,7 @@ def run(cmd_list, can_fail = False, force_locale = "C", working_dir = None,
     r = runner(cmd_list, can_fail = can_fail,
         force_locale = force_locale, working_dir = working_dir, extra_env = extra_env,
         stdout_handler = stdout_handler, stderr_handler = stderr_handler, silent = silent)
-    return r.wait()
+    return r.wait(error_code, msg)
 
 def which(cmd, silent = True):
     '''Calls the "which" UNIX utility for the given program.'''

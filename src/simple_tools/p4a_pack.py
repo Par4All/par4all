@@ -37,6 +37,7 @@ package_name                        = "par4all"
 # Settings for --publish. There is currently no command line option to override these defaults.
 # Use the $DISTRO and $ARCH placeholders if you want the current distribution and architecture
 # to appear in the paths. Use the $DATE placeholder if you wish to have the date in the path.
+
 default_publish_host                = "download.par4all.org"
 default_publish_dir                 = "/srv/www-par4all/download/releases/$DISTRO/$ARCH"
 default_development_publish_dir     = "/srv/www-par4all/download/development/$DISTRO/$ARCH/$DATE"
@@ -248,7 +249,8 @@ def publish_deb(file, host, repos_dir, arch, publish_only=False):
 		p4a_util.run([ "ssh", host, "rm -fv " + repos_arch_dir + "/*.deb" ])
     p4a_util.run([ "ssh", host, "mkdir -p " + repos_arch_dir ])    
     p4a_util.warn("Copying " + file + " on " + host + " (" + repos_arch_dir + ")")
-    p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, host + ":" + repos_arch_dir ])
+    p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, host + ":" + repos_arch_dir ], error_code=30, 
+		msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")  
     p4a_util.warn("Please allow max. 5 minutes for deb repository indexes to get updated by cron")
     p4a_util.warn("Alternatively, you can run /srv/update-par4all.sh on " + host + " as root")
 
@@ -281,7 +283,8 @@ def publish_files(files, distro, deb_distro, arch, deb_arch, development = False
         p4a_util.warn("If something goes wrong, try running /srv/fixacl-par4all.sh to fix permissions")
         p4a_util.warn("If something goes wrong, try creating directories or publishing the file manually")
         p4a_util.run([ "ssh", default_publish_host, "mkdir -p " + publish_dir ])   
-        p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, default_publish_host + ":" + publish_dir ])
+        p4a_util.run([ "rsync --partial --sparse --timeout=3600", file, default_publish_host + ":" + publish_dir ], error_code=30, 
+			msg= " (timeout).\n" + "Retry to publish using p4a_pack.py with option --retry-publish")
         ext = p4a_util.get_file_ext(file)
         if ext == ".deb":
             publish_deb(file, default_publish_host, deb_publish_dir, deb_arch, publish_only)
