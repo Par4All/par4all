@@ -13,7 +13,12 @@ void verdoolaege_7560_5_4()
 
 //  T() {2<=n}
 
-   n>=2?(void) 0:__assert_fail("n>=2", "./verdoolaege_7560_5_4.c", 19, (const char *) 0);
+   if (!(n>=2))
+
+//  T() {0==-1}
+
+
+      abort();
 
 //  T(x,y) {2<=n, n+x+y<=x#init+y#init+2, x#init+1<=x}
 
