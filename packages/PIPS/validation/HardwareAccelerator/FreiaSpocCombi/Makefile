@@ -1,10 +1,10 @@
 # $Id$
 
 PARALLEL_VALIDATION = 1
-include ../validate.mk
+include ../../validate.mk
 
 # add-on to check freia-spoc optimality
-include ../HardwareAccelerator/counts.mk
+include ../counts.mk
 
 # combinatorial test cases are generated
 validate: .generate

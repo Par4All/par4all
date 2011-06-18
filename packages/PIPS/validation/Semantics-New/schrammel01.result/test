@@ -13,7 +13,11 @@ void main()
 
 //  T() {x1<=1, 1<=x1+x2, x2<=1}
 
-   x1<=1&&x2<=1&&x1+x2>=1?(void) 0:__assert_fail("x1<=1 && x2<=1 && x1+x2>=1", "./schrammel01.c", 10, (const char *) 0);
+   if (!(x1<=1&&x2<=1&&x1+x2>=1))
+
+//  T() {0==-1}
+
+      abort();
 
 //  T(y) {x1<=1, 1<=x1+x2, x2<=1}
 
@@ -63,7 +67,11 @@ void main()
 
 //  P(x1,x2,y) {}
 
-   x1<=1&&x2<=1&&x1+x2>=1?(void) 0:__assert_fail("x1<=1 && x2<=1 && x1+x2>=1", "./schrammel01.c", 10, (const char *) 0);
+   if (!(x1<=1&&x2<=1&&x1+x2>=1))
+
+//  P(x1,x2,y) {}
+
+      abort();
 
 //  P(x1,x2,y) {x1<=1, 1<=x1+x2, x2<=1}
 

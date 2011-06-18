@@ -3,4 +3,5 @@ setenv FILE license_plate_copies.c
 setenv NAME license_plate_copies
 setproperty HWAC_SPOC_DEPTH 2
 setproperty HWAC_TERAPIX_DAG_CUT "compute"
+setproperty HWAC_TERAPIX_IMAGE_HEIGHT 1024
 source default_tpips
