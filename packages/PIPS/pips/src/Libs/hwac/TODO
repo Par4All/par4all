@@ -2,7 +2,7 @@
 + inlining, full_unroll, dead code elim, flatten_code
 + image reuse
 + scalar deps with proper effects
-- check => ok => deadcode (#define)
++ check => ok => deadcode (#define)
 
 * input
 + may skip unrelated statements?
@@ -28,8 +28,8 @@
   I would I know that?
 - min commutes with dilate & max with erode, or vice-versa ?
 - other simple or complex algebraic optimization ideas?
-- freia_43 is not optimal because of a bad choice between three D8/E8
-- idem freia_42?
+  maybe at least A xor A => A = 0 would be useful?
+- check optimality of tests cases
 
 * code
 + cleanup data structures?
@@ -94,12 +94,14 @@
   functions not implemented for the target?
 + use global max length/ops/critical path as a decision driver?
   beware: do not extract input, even if live?!
-- extension: interface with SG terapix microcode generation
++ extension: interface with SG terapix microcode generation
   hard constraint: 3 "pointers" are available; border management?
   is there anyway to somehow get the values of these pointers in a register
   and extract the six parameters independently?
-- check measure ops! there is a needed initialization (setcst)...
-- check operators with constant arguments...
+- complete measure ops! there is a needed initialization (setcst)...
+- check operators with constant arguments.
+- implement "enumerate" dag cutting strategy
+- it would be great if the simulator timings are ok for a paper...
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
