@@ -2034,7 +2034,16 @@ static transformer integer_call_expression_to_transformer(
     tf = any_conditional_to_transformer(e, args, pre);
   }
   else if(ENTITY_NOT_P(f)) {
+    /* FI: should only happen for C code because int are often used
+       as boolean since there was no other way before C99. Quite time
+       consuming here because it is applied to an int and not a
+       boolean argument. */
     tf = logical_not_to_transformer(e, args, pre);
+  }
+  else if(ENTITY_BITWISE_XOR_P(f)) {
+  /* FI: it might be useful to handle here the bit wise XOR as in
+     logical_binary_operation_to_transformer(). */
+    tf = bitwise_xor_to_transformer(e, args, pre);
   }
   else if(ENTITY_RAND_P(f)) {
     tf = transformer_identity();
@@ -2966,6 +2975,7 @@ transformer any_expression_to_transformer(
   if( (basic_tag(bv)==basic_tag(be))
       || (basic_float_p(bv) && basic_int_p(be))
       || (basic_derived_p(bv) && basic_int_p(be))
+      || (basic_derived_p(be) && basic_int_p(bv))
       || (basic_logical_p(bv) && basic_int_p(be))) {
     switch(basic_tag(be)) {
     case is_basic_int:
@@ -3071,20 +3081,22 @@ transformer safe_any_expression_to_transformer(
 					       transformer pre,
 					       bool is_internal)
 {
-  transformer npre = transformer_undefined_p(pre)? transformer_identity() : copy_transformer(pre);
+  transformer npre = transformer_undefined_p(pre)?
+    transformer_identity() : copy_transformer(pre);
   transformer tf = any_expression_to_transformer(v, expr, npre, is_internal);
-  list el = expression_to_proper_effects(expr);
 
-  if(transformer_undefined_p(tf))
+  if(transformer_undefined_p(tf)) {
+    list el = expression_to_proper_effects(expr);
     tf = effects_to_transformer(el);
 
-  /*
-  pips_assert("effect references are protected by persistant",
-  effect_list_can_be_safely_full_freed_p(el));*/
+    /*
+      pips_assert("effect references are protected by persistant",
+      effect_list_can_be_safely_full_freed_p(el));*/
 
-  (void) effect_list_can_be_safely_full_freed_p(el);
+    (void) effect_list_can_be_safely_full_freed_p(el);
 
-  gen_full_free_list(el);
+    gen_full_free_list(el);
+  }
   free_transformer(npre);
 
   return tf;
@@ -3421,34 +3433,162 @@ transformer any_conditional_to_transformer(entity v,
   return tf;
 }
 
-/* Take care of the returned value. About a cut-and-paste of previous
-   function, conditional_to_transformer(). */
+/* returns the transformer associated to a C logical not, !, applied
+ * to an integer argument, when meaningful, and transformer_undefined
+ * otherwise. Effects must be used at a higher level to fall back on a
+ * legal transformer.
+ *
+ * @param v is the value associated to the expression
+ *
+ * @param args is assumed to have only one expression element of type
+ * int or enum negated by !
+ *
+ * @param pre is the current precondition
+ */
 transformer logical_not_to_transformer(entity v,
 				       list args,
 				       transformer pre)
 {
   expression le = EXPRESSION(CAR(args));
-  //transformer tf = transformer_undefined;
-  entity tmp_v = make_local_temporary_integer_value_entity();
-  transformer tf = safe_any_expression_to_transformer(tmp_v, le, pre, TRUE);
-  transformer tfr = transformer_range(tf);
-  intptr_t lb, ub;
+  //basic be = basic_of_expression(le);
+  transformer tf = transformer_undefined;
 
-  if(precondition_minmax_of_value(tmp_v, tfr, &lb, &ub)) {
-    if(lb==ub && lb==0)
-      tf = transformer_add_equality_with_integer_constant(tf, v, VALUE_ONE);
-    else if(lb>0 || ub<0)
-      tf = transformer_add_equality_with_integer_constant(tf, v, VALUE_ZERO);
+  //if(basic_int_p(be)) {
+    entity tmp_v = make_local_temporary_integer_value_entity();
+    tf = safe_any_expression_to_transformer(tmp_v, le, pre, TRUE);
+    transformer tfr = transformer_range(tf);
+    intptr_t lb, ub;
+
+    if(precondition_minmax_of_value(tmp_v, tfr, &lb, &ub)) {
+      if(lb==ub && lb==0)
+	tf = transformer_add_equality_with_integer_constant(tf, v, 1);
+      else if(lb>0 || ub<0)
+	tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+      else {
+	tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
+	tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
+      }
+    }
     else {
       tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
       tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
     }
-  }
-  else {
-    tf = transformer_add_inequality_with_integer_constraint(tf, v, 1, TRUE);
-    tf = transformer_add_inequality_with_integer_constraint(tf, v, 0, FALSE);
-  }
+    free_transformer(tfr);
+    //  }
 
+    //free_basic(be);
+
+  return tf;
+}
+
+/* returns the transformer associated to a C bitwise xor, ^, applied
+ * to two integer argument, when meaningful, and transformer_undefined
+ * otherwise. Effects must be used at a higher level to fall back on a
+ * legal transformer.
+ *
+ * @param v is the value associated to the expression
+ *
+ * @param args is assumed to have only one expression element of type
+ * int negated by !
+ *
+ * @param pre is the current precondition
+ */
+transformer bitwise_xor_to_transformer(entity v,
+				       list args,
+				       transformer pre)
+{
+  /* Something can be done when both arguments have values in [0,1],
+     when both arguments have known numerical values, when both
+     arguments have the same value,... However, all this
+     tests imply lots time consuming projections for a limited
+     result... Unless somebody uses XOR to flip-flop between
+     arrays... for instance to bother Sven Verdoolaege:-). A logical
+     not might be more useful for this:-). */
+  expression le1 = EXPRESSION(CAR(args));
+  //basic be1 = basic_of_expression(le1);
+  expression le2 = EXPRESSION(CAR(CDR(args)));
+  //basic be2 = basic_of_expression(le2);
+  transformer tf = transformer_undefined;
+
+  //if(basic_int_p(be1) && basic_int_p(be2)) {
+    entity tmp_v1 = make_local_temporary_integer_value_entity();
+    // FI: Even with the "in context" property, the precondition is
+    // not integrated into the transformer...
+    transformer tf1 = safe_any_expression_to_transformer(tmp_v1, le1, pre, TRUE);
+    //transformer tfr1 = transformer_range(tf1);
+    transformer tfr1 = transformer_apply(tf1, pre);
+    intptr_t lb1, ub1;
+    entity tmp_v2 = make_local_temporary_integer_value_entity();
+    transformer tf2 = safe_any_expression_to_transformer(tmp_v2, le2, pre, TRUE);
+    // transformer tfr2 = transformer_range(tf2);
+    transformer tfr2 = transformer_apply(tf2, pre);
+    intptr_t lb2, ub2;
+
+    if(precondition_minmax_of_value(tmp_v1, tfr1, &lb1, &ub1)
+       && precondition_minmax_of_value(tmp_v2, tfr2, &lb2, &ub2)) {
+      if(lb1==ub1 && lb2==ub2) {
+	/* The two values are know at compile time */
+	tf = transformer_identity();
+	tf = transformer_add_equality_with_integer_constant(tf, v, lb1 ^ lb2);
+      }
+      else if(0<=lb1 && ub1 <= 1 && 0<=lb2 && ub2 <= 1) {
+	/* The two values can be interpreted as booleans */
+	/* Code about cut-and-pasted from
+	   logical_binary_operation_to_transformer() */
+	Pvecteur eq1 = vect_new((Variable) v, VALUE_ONE);
+	vect_add_elem(&eq1, (Variable) tmp_v1, VALUE_MONE);
+	vect_add_elem(&eq1, (Variable) tmp_v2, VALUE_MONE);
+
+	Pvecteur eq2 = vect_new((Variable) v, VALUE_ONE);
+	vect_add_elem(&eq2, (Variable) tmp_v1, VALUE_ONE);
+	vect_add_elem(&eq2, (Variable) tmp_v2, VALUE_ONE);
+	vect_add_elem(&eq2, TCST , VALUE_MONE+VALUE_MONE);
+
+	Pvecteur eq3 = vect_new((Variable) v, VALUE_MONE);
+	vect_add_elem(&eq3, (Variable) tmp_v1, VALUE_ONE);
+	vect_add_elem(&eq3, (Variable) tmp_v2, VALUE_MONE);
+
+	Pvecteur eq4 = vect_new((Variable) v, VALUE_MONE);
+	vect_add_elem(&eq4, (Variable) tmp_v1, VALUE_MONE);
+	vect_add_elem(&eq4, (Variable) tmp_v2, VALUE_ONE);
+
+	tf = transformer_inequality_add(tf, eq1);
+	tf = transformer_inequality_add(tf, eq2);
+	tf = transformer_inequality_add(tf, eq3);
+	tf = transformer_inequality_add(tf, eq4);
+      }
+    }
+    if(transformer_undefined_p(tf)) {
+      /* The two arguments may be equal because they are the same
+	 expression and the xor is used to generate a zero or because
+	 they have the same value. */
+      if(expression_equal_p(le1, le2)) {
+	tf = transformer_identity();
+	tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+      }
+      else {
+	transformer tfr1 = transformer_range(tf1);
+	transformer tfr2 = transformer_range(tf2);
+	transformer tfi = transformer_intersection(tfr1, tfr2);
+	entity tmp_d = make_local_temporary_integer_value_entity();
+	Pvecteur eq = vect_new((Variable) tmp_d, VALUE_ONE);
+	vect_add_elem(&eq, (Variable) tmp_v1, VALUE_MONE);
+	vect_add_elem(&eq, (Variable) tmp_v2, VALUE_ONE);
+	tfi = transformer_equality_add(tfi, eq);
+	intptr_t lbd, ubd;
+
+	if(precondition_minmax_of_value(tmp_d, tfi, &lbd, &ubd)) {
+	  if(lbd==0 && ubd==0) {
+	    /* Since the difference is zero the two values are equal */
+	    tf = transformer_identity();
+	    tf = transformer_add_equality_with_integer_constant(tf, v, 0);
+	  }
+	}
+      }
+    }
+    //}
+    //free_basic(be1), free_basic(be2);
+    free_transformer(tfr1), free_transformer(tfr2);
   return tf;
 }
 
