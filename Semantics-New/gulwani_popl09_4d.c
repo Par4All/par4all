@@ -124,13 +124,13 @@ void ts_restructured(void) {
 				
 				C1a; S3; LOOP(C2a; S3); C2b; S4; C3; S1
 			))
-		);
+		)
 		OR(
 			C1c; S5; LOOP(C2a; S5);
 			OR(C2b; S6; C3; S2, C3; S2),
 			
 			C1d; S6; C3; S2
-		);
+		)
 	}
 	else {
 		S2;

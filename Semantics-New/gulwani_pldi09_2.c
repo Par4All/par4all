@@ -102,7 +102,7 @@ void ts_restructured(void) {
 			
 			C1b; S2; C2; S1
 		)
-	);
+	)
 	C1c; S3;
 }
 

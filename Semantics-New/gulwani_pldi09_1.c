@@ -113,7 +113,7 @@ void ts_restructured(void) {
 		C2b; S4,
 		
 		C2a; S3; LOOP(C1c; S3); C1d; S4
-	);
+	)
 }
 
 int main(void) {

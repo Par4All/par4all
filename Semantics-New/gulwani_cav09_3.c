@@ -109,12 +109,12 @@ void ts_restructured(void) {
 				
 				C3a; S1; C1; S3
 			)
-		);
+		)
 		OR(
 			C3b; S2,
 			
 			C2b; S4; C3; S2
-		);
+		)
 	}
 }
 

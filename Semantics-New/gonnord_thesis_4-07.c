@@ -115,12 +115,12 @@ void ts_restructured(void) {
 		OR(C1b; S2; C3a; S1,
 		C2b; S2; C3a; S1
 		)))
-	);
+	)
 	OR(C1c; S3,
 	OR(C2c; S3,
 	OR(C1b; S2; C3b; S3,
 	C2b; S2; C3b; S3
-	)));
+	)))
 }
 
 int main(void) {

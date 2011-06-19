@@ -116,7 +116,7 @@ void ts_singlestate(void) {
 		OR(C1,
 		OR(C2,
 		OR(C3,
-		C4))));
+		C4))))
 }
 		
 void ts_restructured(void) {
@@ -150,7 +150,7 @@ void ts_restructured(void) {
 			LOOP(C3; S6; LOOP(C2; S6); C4b; S2);
 			C3; S6; LOOP(C2; S6); C4a; S1; deadlock();
 		))))))
-	);
+	)
 	
 }
 

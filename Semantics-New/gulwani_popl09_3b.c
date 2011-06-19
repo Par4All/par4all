@@ -112,7 +112,7 @@ void ts_restructured(void) {
 			C1b; S3; C2; S4,
 			
 			C2; S2; LOOP(C3a; S2); C3b; S4
-		);
+		)
 	}
 }
 
