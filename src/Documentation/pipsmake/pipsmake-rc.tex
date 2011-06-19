@@ -4201,6 +4201,16 @@ experimental and turned off by default.
 SEMANTICS_USE_LIST_PROJECTION TRUE
 \end{PipsProp}
 
+The string Property \PipsPropRef{SEMANTICS_LIST_FIX_POINT_OPERATOR} is used
+to select a particular heuristic to compute an approximation of the
+transitive closure of a list of transformers. It is only useful if Property
+\PipsPropRef{SEMANTICS_USE_TRANSFORMER_LISTS} is selected. The current
+default value is ``depth\_two''. An experimental value is ``max\_depth''. 
+
+\begin{PipsProp}{SEMANTICS_LIST_FIX_POINT_OPERATOR}
+SEMANTICS_LIST_FIX_POINT_OPERATOR "depth_two"
+\end{PipsProp}
+
 Preconditions can (used to) preserve initial values of the formal
 parameters. This is not often useful in C because programmers usually
 avoid modifying scalar parameters, especially integer ones. However,
