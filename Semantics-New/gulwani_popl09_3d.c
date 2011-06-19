@@ -130,9 +130,9 @@ L1:
 		OR(C1b, C2b); goto L2;,
 	OR(
 		OR(C1c, C2c); goto L3;,
-		
+
 		OR(C1d, C2d); goto L4;
-	));
+	))
 L2:
 	S2; LOOP(C1e; S2); C1f; goto L4;
 L3:
