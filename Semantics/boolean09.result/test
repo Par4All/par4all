@@ -1,0 +1,27 @@
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(b1,b2,b3) {}
+
+   int b1, b2, b3;
+
+//  T(b1) {b1==1}
+
+   b1 = true;
+
+//  T(b2) {b1==1, b2==0}
+
+   b2 = false;
+
+//  T(b3) {b1==1, b2==0, b3==1}
+
+   b3 = b1^b2;
+
+//  T(main) {b1==1, b2==0, b3==1, main==0}
+
+
+   return 0;
+}
