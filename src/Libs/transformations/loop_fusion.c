@@ -287,16 +287,26 @@ static bool fusion_loops(statement sloop1,
   if(index1!=index2) {
     pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
                entity_name(index2), entity_name(index1));
-    // FI: FIXME we should check that index1 is dead on exit of loop1 and
-    // that index2 is dead on exit of loop2 and that index1 does not
-    // appear in the memory effects of loop2
-    replace_entity((void *)body_loop2, index2, index1);
+    // Get all variable referenced in loop2 body
+    set ref_entities = get_referenced_entities(loop2);
 
-    struct entity_pair thecouple = { index2, index1 };
-    gen_context_recurse(body_loop2, &thecouple,
-            statement_domain, gen_true, replace_entity_effects_walker);
+    // Assert that index1 is not referenced in loop2
+    if(set_belong_p(ref_entities,index1)) {
+      pips_debug(3,"First loop index (%s) is used in the second loop, we don't"
+                 " know how to handle this case !\n",
+                 entity_name(index1));
+      return false;
+    } else {
+      // FI: FIXME we should check that index2 is dead on exit of loop2
+      replace_entity((void *)body_loop2, index2, index1);
+
+      struct entity_pair thecouple = { index2, index1 };
+      gen_context_recurse(body_loop2, &thecouple,
+                          statement_domain, gen_true,
+                          replace_entity_effects_walker);
+    }
+    set_free(ref_entities);
   }
-
   //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
   list seq1;
   list fused;
