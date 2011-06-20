@@ -25,5 +25,5 @@ int assign_dead_code(int r)
    r |= r;
    // r = 0;
    r ^= r;
-   return r;
+   return 0;
 }
