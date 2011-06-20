@@ -26,4 +26,5 @@ main()
 
   // printf("rose=%d, margueritte=%d, jasmin=%d\n", ma1, ma2, ma3);
   //printf("carotte=%d, haricot=%d\n", mon1, mon2);
+  return;
 }
