@@ -147,14 +147,6 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-         control_error();
-
-//  T() {i1==0, i2==0, s==1, x==0, 1<=n}
-
-      if (!(s==1&&x<n))
-
-//  T() {0==-1}
-
          deadlock();
 
 //  T(s) {i1==0, i2==0, s==2, s#init==1, x==0, 1<=n}
@@ -177,17 +169,9 @@ void ts_restructured(void)
 
          checking_error();
 
-//  T() {i1==1, i2==0, s==2, x==0, y==0, 1<=n}
-
-      if (!(s==2&&y<n))
-
-//  T() {0==-1}
-
-         control_error();
-
 //  T(i1,i2,s,x,y) {i1+i2+y#init==i1#init+i2#init+y, i1+i2==y+1, s==2,
-//    s#init==2, 1<=i1, i1+i2<=n, 0<=i2, i2#init<=i2,
-//    i2+y#init<=i2#init+y}
+//    s#init==2, 0<=i2, i2#init<=i2, i2+y#init<=i2#init+y, i2<=y,
+//    y+1<=n}
 
       while (rand_b())
 
@@ -220,14 +204,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
                checking_error();
-
-//  T() {s==2, i1<=n, i2<=n, 1<=n, y+1<=n}
-
-            if (!(s==2&&y<n))
-
-//  T() {0==-1}
-
-               control_error();
          }
          else {
 
@@ -261,14 +237,6 @@ void ts_restructured(void)
 
 //  T() {0==-1}
 
-               control_error();
-
-//  T() {s==1, x==y+1, i1<=n, i2<=n, 1<=n, x+1<=n}
-
-            if (!(s==1&&x<n))
-
-//  T() {0==-1}
-
                deadlock();
 
 //  T(s) {s==2, s#init==1, x==y+1, i1<=n, i2<=n, 1<=n, x+1<=n}
@@ -290,14 +258,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
                checking_error();
-
-//  T() {s==2, x==y, i1<=n, i2<=n, 1<=n, x+1<=n}
-
-            if (!(s==2&&y<n))
-
-//  T() {0==-1}
-
-               control_error();
          }
 
 //  T(i2,s,x,y) {i1+i2==x, i1+i2#init==y#init+1, s==1, s#init==2,
@@ -330,15 +290,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {i1+i2==x, s==1, x==y+1, 1<=i1, i1<=n, 0<=i2, i2<=n, 1<=n,
-//    n<=x}
-
-         if (!(s==1&&x>=n))
-
-//  T() {0==-1}
-
-            control_error();
       }
       else {
 
@@ -369,14 +320,6 @@ void ts_restructured(void)
 
 //  T() {i1+i2==n+1, n==y, s==2, 1<=i1, 1<=i2, 1<=n}
 
-         if (!(s==2&&y>=n))
-
-//  T() {0==-1}
-
-            control_error();
-
-//  T() {i1+i2==n+1, n==y, s==2, 1<=i1, 1<=i2, 1<=n}
-
          if (!(s==2))
 
 //  T() {0==-1}
@@ -398,14 +341,6 @@ void ts_restructured(void)
 //  T() {0==-1}
 
             checking_error();
-
-//  T() {i1+i2==n+1, n==x-1, n==y, s==1, 1<=i1, 1<=i2, 1<=n}
-
-         if (!(s==1&&x>=n))
-
-//  T() {0==-1}
-
-            control_error();
       }
    }
 }
@@ -559,14 +494,6 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-         control_error();
-
-//  P(i1,i2,n,s,x,y) {i1==0, i2==0, s==1, x==0, 1<=n}
-
-      if (!(s==1&&x<n))
-
-//  P() {0==-1}
-
          deadlock();
 
 //  P(i1,i2,n,s,x,y) {i1==0, i2==0, s==1, x==0, 1<=n}
@@ -588,14 +515,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
          checking_error();
-
-//  P(i1,i2,n,s,x,y) {i1==1, i2==0, s==2, x==0, y==0, 1<=n}
-
-      if (!(s==2&&y<n))
-
-//  P() {0==-1}
-
-         control_error();
 
 //  P(i1,i2,n,s,x,y) {i1==1, i2==0, s==2, x==0, y==0, 1<=n}
 
@@ -629,15 +548,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
                checking_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==y+1, s==2, 1<=i1, i1<=n, 1<=i2, i2<=n,
-//    1<=n, y+1<=n}
-
-            if (!(s==2&&y<n))
-
-//  P() {0==-1}
-
-               control_error();
          }
          else {
 
@@ -674,15 +584,6 @@ void ts_restructured(void)
 
 //  P() {0==-1}
 
-               control_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==x, s==1, x==y+1, 1<=i1, i1<=n, 0<=i2,
-//    i2<=n, 1<=n, x+1<=n}
-
-            if (!(s==1&&x<n))
-
-//  P() {0==-1}
-
                deadlock();
 
 //  P(i1,i2,n,s,x,y) {i1+i2==x, s==1, x==y+1, 1<=i1, i1<=n, 0<=i2,
@@ -708,15 +609,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
                checking_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==x+1, s==2, x==y, 2<=i1, i1<=n, 0<=i2,
-//    i2<=n, 1<=n, x+1<=n}
-
-            if (!(s==2&&y<n))
-
-//  P() {0==-1}
-
-               control_error();
          }
 
 //  P(i1,i2,n,s,x,y) {i1+i2==y+1, s==2, 1<=i1, i1+i2<=n, 0<=i2}
@@ -749,15 +641,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==x, s==1, x==y+1, 1<=i1, i1+i2<=n, i1<=n,
-//    0<=i2, i2<=n, 1<=n, n<=x}
-
-         if (!(s==1&&x>=n))
-
-//  P() {0==-1}
-
-            control_error();
       }
       else {
 
@@ -787,14 +670,6 @@ void ts_restructured(void)
 
 //  P(i1,i2,n,s,x,y) {i1+i2==n+1, n==y, s==2, i1<=n, i2<=n, 1<=n}
 
-         if (!(s==2&&y>=n))
-
-//  P() {0==-1}
-
-            control_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==n+1, n==y, s==2, i1<=n, i2<=n, 1<=n}
-
          if (!(s==2))
 
 //  P() {0==-1}
@@ -817,15 +692,6 @@ void ts_restructured(void)
 //  P() {0==-1}
 
             checking_error();
-
-//  P(i1,i2,n,s,x,y) {i1+i2==n+1, n==x-1, n==y, s==1, i1<=n, i2<=n,
-//    1<=n}
-
-         if (!(s==1&&x>=n))
-
-//  P() {0==-1}
-
-            control_error();
       }
    }
 }

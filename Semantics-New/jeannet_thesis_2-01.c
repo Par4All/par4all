@@ -1,7 +1,6 @@
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 43
+// Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
+// et Application à la Vérification de Programmes Synchrones
+// figure 2.1
 
 // $Id$
 
@@ -9,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (t >= 0 && 0 <= s && s <= 4 && 0 <= d && d <= 4 * t + s)
+#define GOOD (2 <= i && i <= 20 && 0 <= j && j <= 4)
 
 // tools
 
@@ -65,44 +64,49 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s <= 3)
-#define S2 CONTROL(s > 3)
+#define S1 CONTROL(i + j <= 20 && i >= 10)
+#define S2 CONTROL(i + j <= 20 && i < 10)
+#define S3 CONTROL(i + j > 20)
 
-#define G1 (s <= 3)
-#define G1a (s <= 2)
-#define G1b (s == 3)
-#define A1 {s++; d++;}
+#define G1 (i + j <= 20 && i >= 10)
+#define G1a (i + j <= 16 && i >= 10)
+#define G1b (i + j > 16 && i >= 10)
+#define A1 {i += 4;}
 #define C1 COMMAND(G1, A1)
 #define C1a COMMAND(G1a, A1)
 #define C1b COMMAND(G1b, A1)
 
-#define G2 (1)
-#define A2 {t++; s = 0;}
+#define G2 (i + j <= 20 && i < 10)
+#define G2a (i + j <= 17 && i < 8)
+#define G2b (i + j <= 17 && i >= 8)
+#define G2c (i + j > 17 && G2)
+#define A2 {i += 2; j++;}
 #define C2 COMMAND(G2, A2)
+#define C2a COMMAND(G2a, A2)
+#define C2b COMMAND(G2b, A2)
+#define C2c COMMAND(G2c, A2)
 
-#define INI {t = d = s = 0;}
+#define INI {i = 2; j = 0;}
 
 // transition system
 
 void ts_singlestate(void) {
-	int t, d, s;
+	int i, j;
 	INI;
 	LOOP(OR(C1, C2));
 }
 
 void ts_restructured(void) {
-	int t, d, s;
+	int i, j;
 	INI;
-	S1;
-	LOOP(
-		OR(
-			C1a; S1,
-		OR(
-			C2; S1,
-
-			C1b; S2; C2; S1
-		))
-	)
+	S2; LOOP(C2a; S2);
+	OR(
+		C2c; S3,
+		
+		C2b; S1;
+		LOOP(C1a; S1);
+		C1b; S3
+	);
 }
 
 int main(void) {

@@ -1,7 +1,8 @@
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 43
+// Zhou Chaochen, C. A. R. Hoare, Anders P. Ravn: A Calculus of Durations. Inf.
+// Process. Lett. 40(5): 269-276 (1991)
+// Laure Gonnord: Accélération abstraite pour l'amélioration de la précision en
+// Analyse des Relations Linéaires
+// figure 2.15
 
 // $Id$
 
@@ -9,7 +10,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (t >= 0 && 0 <= s && s <= 4 && 0 <= d && d <= 4 * t + s)
+#define GOOD (6 * l <= t + 50)
 
 // tools
 
@@ -65,43 +66,69 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s <= 3)
-#define S2 CONTROL(s > 3)
+#define L 0
+#define N 1
 
-#define G1 (s <= 3)
-#define G1a (s <= 2)
-#define G1b (s == 3)
-#define A1 {s++; d++;}
+#define S1 CONTROL(s == L && x <= 9)
+#define S2 CONTROL(s == L && 10 <= x && x <= 49)
+#define S3 CONTROL(s == N && x <= 9)
+#define S4 CONTROL(s == N && 10 <= x && x <= 49)
+#define S5 CONTROL(s == N && x >= 50)
+
+#define G1 (s == L && x <= 9)
+#define G1a (s == L && x <= 8)
+#define G1b (s == L && x == 9)
+#define A1 {t++; l++; x++;}
 #define C1 COMMAND(G1, A1)
 #define C1a COMMAND(G1a, A1)
 #define C1b COMMAND(G1b, A1)
 
-#define G2 (1)
-#define A2 {t++; s = 0;}
+#define G2 (s == L)
+#define A2 {x = 0; s = N;}
 #define C2 COMMAND(G2, A2)
 
-#define INI {t = d = s = 0;}
+#define G3 (s == N)
+#define G3a (G3 && x <= 8)
+#define G3b (G3 && x == 9)
+#define G3c (G3 && x <= 48)
+#define G3d (G3 && x == 49)
+#define A3 {t++; x++;}
+#define C3 COMMAND(G3, A3)
+#define C3a COMMAND(G3a, A3)
+#define C3b COMMAND(G3b, A3)
+#define C3c COMMAND(G3c, A3)
+#define C3d COMMAND(G3d, A3)
+
+#define G4 (s == N && x >= 50)
+#define A4 {x = 0; s = L;}
+#define C4 COMMAND(G4, A4)
+
+#define INI {\
+	s = 0;\
+	l = t = x = 0;\
+}
 
 // transition system
 
 void ts_singlestate(void) {
-	int t, d, s;
+	int s, l, t, x;
 	INI;
-	LOOP(OR(C1, C2));
+	LOOP(OR(C1, OR(C2, OR(C3, C4))));
 }
 
 void ts_restructured(void) {
-	int t, d, s;
+	int s, l, t, x;
 	INI;
 	S1;
 	LOOP(
-		OR(
-			C1a; S1,
-		OR(
-			C2; S1,
-
-			C1b; S2; C2; S1
-		))
+		LOOP(C1a; S1);
+		OR(C1b; S2; C2; S3, C2; S3);
+		LOOP(C3a; S3);
+		C3b; S4;
+		LOOP(C3c; S4);
+		C3d; S5;
+		LOOP(C3; S5);
+		C4; S1;
 	)
 }
 

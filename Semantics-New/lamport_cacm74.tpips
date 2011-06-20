@@ -1,5 +1,5 @@
-delete train-one
-create train-one train-one.c
+delete lamport_cacm74
+create lamport_cacm74 lamport_cacm74.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
@@ -10,19 +10,20 @@ echo TRANSFORMERS
 echo
 
 activate PRINT_CODE_TRANSFORMERS
-display PRINTED_FILE[run]
+display PRINTED_FILE[ts_singlestate]
+display PRINTED_FILE[ts_restructured]
 
 echo
 echo PRECONDITIONS
 echo
 
-setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
-setproperty SEMANTICS_USE_DERIVATIVE_LIST FALSE
-setproperty SEMANTICS_USE_LIST_PROJECTION FALSE
+#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[run]
+display PRINTED_FILE[ts_singlestate]
+display PRINTED_FILE[ts_restructured]
 
 close
-delete train-one
+delete lamport_cacm74
 quit
+

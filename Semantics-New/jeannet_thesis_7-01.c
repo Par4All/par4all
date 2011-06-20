@@ -1,7 +1,6 @@
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 43
+// Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
+// et Application à la Vérification de Programmes Synchrones
+// figure 7.1
 
 // $Id$
 
@@ -9,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (t >= 0 && 0 <= s && s <= 4 && 0 <= d && d <= 4 * t + s)
+#define GOOD (x + y0 == x0 + y)
 
 // tools
 
@@ -65,44 +64,68 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s <= 3)
-#define S2 CONTROL(s > 3)
+#define S1 CONTROL(x + y <= -1 && z >= 0)
+#define S2 CONTROL(x + y > - 1 && z >= 0)
+#define S3 CONTROL(x + y <= -1 && z < 0)
+#define S4 CONTROL(x + y > - 1 && z < 0)
 
-#define G1 (s <= 3)
-#define G1a (s <= 2)
-#define G1b (s == 3)
-#define A1 {s++; d++;}
+#define G1 (x + y <= -1 && z >= 0)
+#define G1a (x + y <= -3 && G1)
+#define G1b (x + y > - 3 && G1)
+#define A1 {b = 1; c = 1; x++; y++;}
 #define C1 COMMAND(G1, A1)
 #define C1a COMMAND(G1a, A1)
 #define C1b COMMAND(G1b, A1)
 
-#define G2 (1)
-#define A2 {t++; s = 0;}
+#define G2 (x + y <= -1 && z < 0)
+#define A2 {b = 1; c = 0; x++; y--;}
 #define C2 COMMAND(G2, A2)
 
-#define INI {t = d = s = 0;}
+#define G3 (x + y > - 1)
+#define G3a (x + y > 1)
+#define G3b (x + y <= 1 && G3)
+#define A3 {b = 0; c = 0; x--; y--;}
+#define C3 COMMAND(G3, A3)
+#define C3a COMMAND(G3a, A3)
+#define C3b COMMAND(G3b, A3)
+
+#define INI {x0 = rand(); y0 = rand(); z = rand(); x = x0; y = y0;}
 
 // transition system
 
 void ts_singlestate(void) {
-	int t, d, s;
+	int b, c, x0, y0, x, y, z;
 	INI;
-	LOOP(OR(C1, C2));
+	LOOP(OR(C1, OR(C2, C3)));
 }
 
 void ts_restructured(void) {
-	int t, d, s;
+	int b, c, x0, y0, x, y, z;
 	INI;
-	S1;
-	LOOP(
-		OR(
-			C1a; S1,
-		OR(
-			C2; S1,
-
-			C1b; S2; C2; S1
-		))
-	)
+	if (z >= 0) {
+		if (x + y <= -1) {
+			goto L1;
+		}
+		else {
+			goto L2;
+		}
+	}
+	else {
+		if (x + y <= -1) {
+			goto L3;
+		}
+		else {
+			goto L4;
+		}
+	}
+L1:
+	S1; LOOP(C1a; S1); C1b; goto L2;
+L2:
+	S2; LOOP(C3a; S2); C3b; goto L1;
+L3:
+	S3; LOOP(C2; S3);
+L4:
+	S4; LOOP(C3a; S4); C3b; goto L3;
 }
 
 int main(void) {

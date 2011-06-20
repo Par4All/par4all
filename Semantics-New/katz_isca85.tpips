@@ -1,5 +1,5 @@
-delete gulwani_popl09_2b
-create gulwani_popl09_2b gulwani_popl09_2b.c
+delete katz_isca85
+create katz_isca85 katz_isca85.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
@@ -24,6 +24,6 @@ display PRINTED_FILE[ts_singlestate]
 display PRINTED_FILE[ts_restructured]
 
 close
-delete gulwani_popl09_2b
+delete katz_isca85
 quit
 

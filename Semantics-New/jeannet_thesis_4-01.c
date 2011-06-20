@@ -1,9 +1,6 @@
-// David Merchat: Réduction du nombre de variables en analyse de relations
-// linéaires
-// figure 4.9
-// Laure Gonnord: Accélération abstraite pour l'amélioration de la précision en
-// Analyse des Relations Linéaires
-// figure 4.6
+// Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
+// et Application à la Vérification de Programmes Synchrones
+// figure 4.1
 
 // $Id$
 
@@ -11,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define BAD (s >= 3)
+#define GOOD (ok)
 
 // tools
 
@@ -67,77 +64,79 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s == 1 && d <= 8 && v <= 1 && t <= 2)
-#define S2 CONTROL(s == 1 && d <= 8 && v <= 1 && t >= 3)
-#define S3 CONTROL(s == 1 && d <= 8 && v == 2 && t <= 2)
-#define S4 CONTROL(s == 1 && d == 9 && v <= 1 && t <= 2)
-#define S5 CONTROL(s == 1 && d == 9 && v == 2 && t <= 2)
-#define S6 CONTROL(s == 1 && d <= 8 && v == 2 && t >= 3)
-#define S7 CONTROL(s == 1 && d == 9 && v == 2 && t >= 3)
-#define S8 CONTROL(s == 1 && d == 9 && v <= 1 && t >= 3)
-#define S9 CONTROL(s == 2)
+#define S1 CONTROL(x <= 9 && y <= 3 && ok == 1)
+#define S2 CONTROL(x <= 9 && y >= 4 && ok == 1)
+#define S3 CONTROL(10 <= x && x <= 13 && y <= 3 && ok == 1)
+#define S4 CONTROL(10 <= x && x <= 13 && y >= 4 && ok == 1)
+#define S5 CONTROL(x >= 14 && y <= 3 && ok == 1)
+#define S6 CONTROL(x >= 14 && y >= 4 && ok == 1)
+#define S7 CONTROL(ok == 0)
 
-#define G1 (s == 1 && t <= 2)
-#define G1a (s == 1 && t <= 1)
-#define G1b (s == 1 && t == 2)
-#define A1 {v = 0; t++;}
+#define G1 (x >= 14 && ok == 1)
+#define G1a (y <= 2 && G1)
+#define G1b (y == 3 && G1)
+#define A1 {x++; y++; ok = 1;}
 #define C1 COMMAND(G1, A1)
 #define C1a COMMAND(G1a, A1)
 #define C1b COMMAND(G1b, A1)
 
-#define G2 (s == 1 && v <= 1 && d <= 8)
-#define G2a (s == 1 && v <= 0 && d <= 7)
-#define G2b (s == 1 && v <= 0 && d == 8)
-#define G2c (s == 1 && v == 1 && d <= 7)
-#define G2d (s == 1 && v == 1 && d == 8)
-#define A2 {v++; d++;}
+#define G2 (x >= 10 && y <= 3 && ok == 1)
+#define G2a (x <= 12 && y <= 2 && G2)
+#define G2b (x <= 12 && y == 3 && G2)
+#define G2c (x == 13 && y <= 2 && G2)
+#define G2d (x == 13 && y == 3 && G2)
+#define A2 A1
 #define C2 COMMAND(G2, A2)
 #define C2a COMMAND(G2a, A2)
 #define C2b COMMAND(G2b, A2)
 #define C2c COMMAND(G2c, A2)
 #define C2d COMMAND(G2d, A2)
 
-#define G3 (s == 1 && t >= 3)
-#define A3 {s = 2;}
+#define G3 (x >= 10 && x <= 13 && y >= 4 && ok == 1)
+#define A3 {x++; y++; ok = 0;}
 #define C3 COMMAND(G3, A3)
 
-#define G4 (s == 1 && d >= 10)
-#define A4 {s = 3;}
+#define G4 (x <= 9 && y <= 3 && ok == 1)
+#define G4a (x <= 8 && G4)
+#define G4b (x == 9 && G4)
+#define A4 {x++; ok = 1;}
 #define C4 COMMAND(G4, A4)
+#define C4a COMMAND(G4a, A4)
+#define C4b COMMAND(G4b, A4)
 
-#define G5 (s == 1 && v >= 3)
-#define A5 {s = 4;}
+#define G5 (x <= 9 && y >= 4 && ok == 1)
+#define A5 {x++; ok = 0;}
 #define C5 COMMAND(G5, A5)
 
-#define INI {s = 1; d = v = t = 0;}
+#define INI {x = y = 0; ok = 1;}
 
 // transition system
 
 void ts_singlestate(void) {
-	int s, d, v, t;
+	int x, y, ok;
 	INI;
 	LOOP(OR(C1, OR(C2, OR(C3, OR(C4, C5)))));
 }
 
 void ts_restructured(void) {
-	int s, d, v, t;
+	int x, y, ok;
 	INI;
 	S1;
-	LOOP(OR(C1a; S1, OR(C2a; S1, C2c; S3; C1a; S1)));
+	LOOP(C4a; S1);
+	C4b; S3;
+	LOOP(C2a; S3);
 	OR(
-		OR(C2c; S3; C1b; S2, C1b; S2);
-		LOOP(C2a; S2);
-		OR(C3; S9, OR(C2c; S6; C3; S9, OR(C2d; S7; C3; S9, C2b; S8; C3; S9))),
+		C2b; S4; C3; S7,
 		
 		OR(
-			OR(C2b; S4, C2d; S5; C1a; S4);
-			LOOP(C1a; S4);
-			C1b; S8,
+			C2d; S6,
 			
-			C2d; S5; C1b; S8
+			C2c; S5;
+			LOOP(C1a; S5);
+			C1b; S6
 		);
-		C3; S9;
-	);
+		LOOP(C1; S6);
+	)
 }
 
 int main(void) {

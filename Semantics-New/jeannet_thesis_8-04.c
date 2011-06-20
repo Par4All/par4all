@@ -1,7 +1,6 @@
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 43
+// Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
+// et Application à la Vérification de Programmes Synchrones
+// figure 8.4
 
 // $Id$
 
@@ -9,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (t >= 0 && 0 <= s && s <= 4 && 0 <= d && d <= 4 * t + s)
+#define GOOD (y <= 2 * x)
 
 // tools
 
@@ -65,44 +64,64 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s <= 3)
-#define S2 CONTROL(s > 3)
+#define I 1
+#define A 2
+#define B 3
 
-#define G1 (s <= 3)
-#define G1a (s <= 2)
-#define G1b (s == 3)
-#define A1 {s++; d++;}
+#define S1 CONTROL(s == I && e == 0)
+#define S2 CONTROL(s == A && e == 0)
+#define S3 CONTROL(s == B && e == 0)
+#define S4 CONTROL(s == I && e == 1)
+#define S5 CONTROL(s == A && e == 1)
+
+#define G1 (s == I && e == 1)
+#define A1 {s = A;}
 #define C1 COMMAND(G1, A1)
-#define C1a COMMAND(G1a, A1)
-#define C1b COMMAND(G1b, A1)
 
-#define G2 (1)
-#define A2 {t++; s = 0;}
+#define G2 (s == I && e == 0)
+#define A2 {s = B;}
 #define C2 COMMAND(G2, A2)
 
-#define INI {t = d = s = 0;}
+#define G3 (s == A && e == 1)
+#define A3 {x++; y += f;}
+#define C3 COMMAND(G3, A3)
+
+#define G4 (s == A && e == 0)
+#define A4 {s = B;}
+#define C4 COMMAND(G4, A4)
+
+#define G5 (s == B)
+#define A5 {s = A; x++; y += 2;}
+#define C5 COMMAND(G5, A5)
+
+#define INI {\
+	s = I;\
+	x = y = 0;\
+	e = rand_b();\
+	f = rand_b();\
+}
 
 // transition system
 
 void ts_singlestate(void) {
-	int t, d, s;
+	int s, x, y, e, f;
 	INI;
-	LOOP(OR(C1, C2));
+	LOOP(OR(C1, OR(C2, OR(C3, OR(C4, C5)))));
 }
 
 void ts_restructured(void) {
-	int t, d, s;
+	int s, x, y, e, f;
 	INI;
-	S1;
-	LOOP(
-		OR(
-			C1a; S1,
-		OR(
-			C2; S1,
-
-			C1b; S2; C2; S1
-		))
-	)
+	if (e == 0) {
+		S1;
+		C2; S3;
+		LOOP(C5; S2; C4; S3);
+	}
+	else {
+		S4;
+		C1; S5;
+		LOOP(C3; S5);
+	}
 }
 
 int main(void) {

@@ -1,7 +1,6 @@
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 43
+// Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
+// et Application à la Vérification de Programmes Synchrones
+// figure 7.5
 
 // $Id$
 
@@ -9,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (t >= 0 && 0 <= s && s <= 4 && 0 <= d && d <= 4 * t + s)
+#define BAD (b == 0 && x >= 0)
 
 // tools
 
@@ -65,44 +64,44 @@ void checking_error(void) {
 
 // control and commands
 
-#define S1 CONTROL(s <= 3)
-#define S2 CONTROL(s > 3)
+#define S1 CONTROL(b == 1)
+#define S2 CONTROL(b == 0)
 
-#define G1 (s <= 3)
-#define G1a (s <= 2)
-#define G1b (s == 3)
-#define A1 {s++; d++;}
+#define G1 (b == 1)
+#define A1 {x++;}
 #define C1 COMMAND(G1, A1)
-#define C1a COMMAND(G1a, A1)
-#define C1b COMMAND(G1b, A1)
 
-#define G2 (1)
-#define A2 {t++; s = 0;}
+#define G2 (b == 0)
+#define A2 {x--;}
 #define C2 COMMAND(G2, A2)
 
-#define INI {t = d = s = 0;}
+#define INI {\
+	x = rand_z();\
+	b = rand_b();\
+	ASSUME(x < 0);\
+}
 
 // transition system
 
 void ts_singlestate(void) {
-	int t, d, s;
+	int b, x;
 	INI;
 	LOOP(OR(C1, C2));
 }
 
 void ts_restructured(void) {
-	int t, d, s;
+	int b, x;
 	INI;
+	if (b == 1) goto L1;
+	else goto L2;
+L1:
 	S1;
-	LOOP(
-		OR(
-			C1a; S1,
-		OR(
-			C2; S1,
-
-			C1b; S2; C2; S1
-		))
-	)
+	C1;
+	goto L1;
+L2:
+	S2;
+	C2;
+	goto L2;
 }
 
 int main(void) {

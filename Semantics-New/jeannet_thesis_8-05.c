@@ -1,10 +1,6 @@
 // Bertrand Jeannet: Partitionnement Dynamique dans l'Analyse de Relations Linéaires
 // et Application à la Vérification de Programmes Synchrones
-// chapter 8, example 1
-// Nicolas Halbwachs: Linear Relation Analysis, Principles and Recent Progress
-// talk at Aussois, 9/12/2010
-// http://compilation.gforge.inria.fr/2010_12_Aussois/programpage/pdfs/HALBWACHS.Nicolas.aussois2010.pdf
-// slide 23
+// figure 8.5
 
 // $Id$
 
@@ -12,7 +8,7 @@
 
 #define DO_CONTROL 0
 #define DO_CHECKING 1
-#define GOOD (ok == 1)
+#define BAD ((s == I && x >= 11) || (s == D && x <= 4) || (s == D && x >= 12))
 
 // tools
 
@@ -68,34 +64,77 @@ void checking_error(void) {
 
 // control and commands
 
-#define xor(a, b) ((a == 0 && b == 1) || (a == 1 && b == 0))
+#define I 1
+#define D 2
 
-#define S1 CONTROL(b0 == b1 && !xor(b0, b1))
-#define S2 CONTROL(b0 != b1 && xor(b0, b1))
+#define S1 CONTROL(s == I && x <= 5)
+#define S2 CONTROL(s == I && 6 <= x && x <= 9)
+#define S3 CONTROL(s == I && x >= 10)
+#define S4 CONTROL(s == D && x <= 5)
+#define S5 CONTROL(s == D && 6 <= x && x <= 9)
+#define S6 CONTROL(s == D && x >= 10)
 
-#define G1 (b0 == b1 && !xor(b0, b1))
-#define A1 {b_tmp = b0; b0 = 1 - b1; b1 = b_tmp; x++; if (ok == 1 && x >= y) {ok = 1;} else {ok = 0;}}
+#define G1 (s == I && x <= 9)
+#define G1a (G1 && x <= 4)
+#define G1b (G1 && x == 5)
+#define G1c (G1 && x <= 8)
+#define G1d (G1 && x == 9)
+#define A1 {x++;}
 #define C1 COMMAND(G1, A1)
+#define C1a COMMAND(G1a, A1)
+#define C1b COMMAND(G1b, A1)
+#define C1c COMMAND(G1c, A1)
+#define C1d COMMAND(G1d, A1)
 
-#define G2 (b0 != b1 && xor(b0, b1))
-#define A2 {b_tmp = b0; b0 = 1 - b1; b1 = b_tmp; y++; if (ok == 1 && x >= y) {ok = 1;} else {ok = 0;}}
+#define G2 (s == I && x >= 10)
+#define A2 {s = D; x++;}
 #define C2 COMMAND(G2, A2)
 
-#define INI {b0 = b1 = x = y = 0; ok = 1;}
+#define G3 (s == D && x <= 5)
+#define A3 {s = I; x--;}
+#define C3 COMMAND(G3, A3)
+
+#define G4 (s == D && x >= 6)
+#define G4a (G4 && x == 6)
+#define G4b (G4 && x >= 7)
+#define G4c (G4 && x == 10)
+#define G4d (G4 && x >= 11)
+#define A4 {x--;}
+#define C4 COMMAND(G4, A4)
+#define C4a COMMAND(G4a, A4)
+#define C4b COMMAND(G4b, A4)
+#define C4c COMMAND(G4c, A4)
+#define C4d COMMAND(G4d, A4)
+
+#define INI {\
+	s = I;\
+	x = 0;\
+}
 
 // transition system
 
 void ts_singlestate(void) {
-	int b_tmp, b0, b1, ok, x, y;
+	int s, x;
 	INI;
-	LOOP(OR(C1, C2));
+	LOOP(OR(C1, OR(C2, OR(C3, C4))));
 }
 
 void ts_restructured(void) {
-	int b_tmp, b0, b1, ok, x, y;
+	int s, x;
 	INI;
-	S1;
-	LOOP(C1; S2; C2; S1)
+	LOOP(
+		S1;
+		LOOP(C1a; S1);
+		C1b; S2;
+		LOOP(C1c; S2);
+		C1d; S3;
+		C2; S6;
+		LOOP(C4d; S6);
+		C4c; S5;
+		LOOP(C4b; S5);
+		C4a; S4;
+		C3; S1;
+	);
 }
 
 int main(void) {
