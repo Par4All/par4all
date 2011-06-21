@@ -616,15 +616,19 @@ static void terapix_init_row(
   free(name);
 }
 
-/* @brief initialize the memory depending on the operation
- * @param decl, declarations
- * @param body, code
+/* @brief initialize the memory at addr depending on the operation to perform
+ * @param decl, added declarations are put there
+ * @param body, generated code is put there
+ * @param nop, current operation number
+ * @param addr, memory x base, y is assumed as 0
+ * @param api, freia operation
+ * @param used, current use of Global RAM (gram)
  */
 static void terapix_initialize_memory(
   string_buffer decl,
   string_buffer body,
-  int nop, // current operation number
-  int addr, // memory x base
+  int nop,
+  int addr,
   const freia_api_t * api,
   bool * used)
 {
