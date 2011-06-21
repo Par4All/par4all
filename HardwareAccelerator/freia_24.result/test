@@ -864,10 +864,6 @@ freia_status freia_24_helper_0_0_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -973,6 +969,8 @@ freia_status freia_24_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
@@ -1068,10 +1066,6 @@ freia_status freia_24_helper_0_1_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -1161,7 +1155,7 @@ freia_status freia_24_helper_0_1_0(
   mem_init.iter3 = 0;
   mem_init.iter4 = 0;
   mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode);
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
@@ -1291,6 +1285,8 @@ freia_status freia_24_helper_0_1_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -1373,10 +1369,6 @@ freia_status freia_24_helper_0_2_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -1401,7 +1393,7 @@ freia_status freia_24_helper_0_2_0(
   mem_init.iter3 = 0;
   mem_init.iter4 = 0;
   mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode);
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
@@ -1481,7 +1473,7 @@ freia_status freia_24_helper_0_2_0(
   mem_init.iter3 = 0;
   mem_init.iter4 = 0;
   mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
-  param.size = sizeof(terapix_mcu_macrocode);
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
@@ -1568,6 +1560,8 @@ freia_status freia_24_helper_0_2_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures

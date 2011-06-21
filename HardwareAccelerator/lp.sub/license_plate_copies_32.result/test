@@ -4541,10 +4541,6 @@ freia_status license_plate_copies_helper_0_0_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -4668,6 +4664,8 @@ freia_status license_plate_copies_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0);
 
   // extract measures
@@ -4744,10 +4742,6 @@ freia_status license_plate_copies_helper_0_0_1(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -4922,6 +4916,8 @@ freia_status license_plate_copies_helper_0_0_1(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -4998,10 +4994,6 @@ freia_status license_plate_copies_helper_0_0_2(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -5176,6 +5168,8 @@ freia_status license_plate_copies_helper_0_0_2(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -5252,10 +5246,6 @@ freia_status license_plate_copies_helper_0_0_3(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -5430,6 +5420,8 @@ freia_status license_plate_copies_helper_0_0_3(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -5505,10 +5497,6 @@ freia_status license_plate_copies_helper_0_0_4(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -5684,6 +5672,8 @@ freia_status license_plate_copies_helper_0_0_4(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -5760,10 +5750,6 @@ freia_status license_plate_copies_helper_0_0_5(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -5938,6 +5924,8 @@ freia_status license_plate_copies_helper_0_0_5(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -6014,10 +6002,6 @@ freia_status license_plate_copies_helper_0_0_6(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -6192,6 +6176,8 @@ freia_status license_plate_copies_helper_0_0_6(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -6268,10 +6254,6 @@ freia_status license_plate_copies_helper_0_0_7(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -6446,6 +6428,8 @@ freia_status license_plate_copies_helper_0_0_7(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -6528,10 +6512,6 @@ freia_status license_plate_copies_helper_0_0_8(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -6698,6 +6678,8 @@ freia_status license_plate_copies_helper_0_0_8(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
@@ -6768,10 +6750,6 @@ freia_status license_plate_copies_helper_0_0_9(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -6871,6 +6849,8 @@ freia_status license_plate_copies_helper_0_0_9(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -6941,10 +6921,6 @@ freia_status license_plate_copies_helper_0_0_10(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -7044,6 +7020,8 @@ freia_status license_plate_copies_helper_0_0_10(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -7114,10 +7092,6 @@ freia_status license_plate_copies_helper_0_0_11(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -7217,6 +7191,8 @@ freia_status license_plate_copies_helper_0_0_11(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -7287,10 +7263,6 @@ freia_status license_plate_copies_helper_0_0_12(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -7390,6 +7362,8 @@ freia_status license_plate_copies_helper_0_0_12(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -7460,10 +7434,6 @@ freia_status license_plate_copies_helper_0_0_13(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -7563,6 +7533,8 @@ freia_status license_plate_copies_helper_0_0_13(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -7633,10 +7605,6 @@ freia_status license_plate_copies_helper_0_0_14(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -7736,6 +7704,8 @@ freia_status license_plate_copies_helper_0_0_14(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -7822,10 +7792,6 @@ freia_status license_plate_copies_helper_0_0_15(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -8019,6 +7985,8 @@ freia_status license_plate_copies_helper_0_0_15(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
@@ -8089,10 +8057,6 @@ freia_status license_plate_copies_helper_0_0_16(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -8188,6 +8152,8 @@ freia_status license_plate_copies_helper_0_0_16(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -8258,10 +8224,6 @@ freia_status license_plate_copies_helper_0_0_17(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -8357,6 +8319,8 @@ freia_status license_plate_copies_helper_0_0_17(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -8427,10 +8391,6 @@ freia_status license_plate_copies_helper_0_0_18(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -8526,6 +8486,8 @@ freia_status license_plate_copies_helper_0_0_18(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -8596,10 +8558,6 @@ freia_status license_plate_copies_helper_0_0_19(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -8695,6 +8653,8 @@ freia_status license_plate_copies_helper_0_0_19(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -8765,10 +8725,6 @@ freia_status license_plate_copies_helper_0_0_20(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
@@ -8864,6 +8820,8 @@ freia_status license_plate_copies_helper_0_0_20(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -8938,10 +8896,6 @@ freia_status license_plate_copies_helper_0_0_21(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9051,6 +9005,8 @@ freia_status license_plate_copies_helper_0_0_21(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -9120,10 +9076,6 @@ freia_status license_plate_copies_helper_0_0_22(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9224,6 +9176,8 @@ freia_status license_plate_copies_helper_0_0_22(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -9293,10 +9247,6 @@ freia_status license_plate_copies_helper_0_0_23(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9397,6 +9347,8 @@ freia_status license_plate_copies_helper_0_0_23(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -9466,10 +9418,6 @@ freia_status license_plate_copies_helper_0_0_24(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9570,6 +9518,8 @@ freia_status license_plate_copies_helper_0_0_24(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -9644,10 +9594,6 @@ freia_status license_plate_copies_helper_0_0_25(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9757,6 +9703,8 @@ freia_status license_plate_copies_helper_0_0_25(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
@@ -9831,10 +9779,6 @@ freia_status license_plate_copies_helper_0_0_26(
   mcode.raw = (void*) terapix_ucode_array;
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
-
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
 
   // dyn_param contents
   dyn_param.raw = &gram;
@@ -9963,6 +9907,8 @@ freia_status license_plate_copies_helper_0_0_26(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
   ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
