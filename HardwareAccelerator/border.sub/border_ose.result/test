@@ -295,6 +295,8 @@ freia_status border_ose_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -330,6 +332,7 @@ freia_status border_ose_helper_0_0_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;

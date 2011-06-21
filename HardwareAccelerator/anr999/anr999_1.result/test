@@ -1995,11 +1995,21 @@ freia_status anr999_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
+  // operation 0_val initialization
+  int16_t p_0_val[1];
+  const int32_t x_0_val = 0;
+  const int32_t y_0_val = 0;
+  // operation 1_val initialization
+  int16_t p_1_val[1];
+  const int32_t x_1_val = 1;
+  const int32_t y_1_val = 0;
   // operation 2 parameters
   int16_t p_2[9];
-  const int32_t x_2 = 0;
+  const int32_t x_2 = 2;
   const int32_t y_2 = 0;
   terapix_mcu_macrocode mcu_macro[2][7];
   terapix_tile_info tile_in[2][1];
@@ -2037,6 +2047,30 @@ freia_status anr999_helper_0_0_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // initializing  0_val
+  p_0_val[0] = INT16_MAX;
+  gram.xoffset = x_0_val;
+  gram.yoffset = y_0_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mem_init.xmin1 = 1023;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 1;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode);
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
   // set measure min at 1023
   mcu_macro[0][0].xmin2 = 1023;
   mcu_macro[1][0].xmin2 = 1023;
@@ -2061,6 +2095,29 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
+  // initializing  1_val
+  p_1_val[0] = 0;
+  gram.xoffset = x_1_val;
+  gram.yoffset = y_1_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_1_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mem_init.xmin1 = 1021;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 2;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode);
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
   // set measure vol at 1021
   mcu_macro[0][1].xmin2 = 1021;
   mcu_macro[1][1].xmin2 = 1021;
@@ -2295,6 +2352,8 @@ freia_status anr999_helper_0_0_1(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2341,6 +2400,7 @@ freia_status anr999_helper_0_0_1(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(3) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_3_0;
   mcu_macro[1][0].xmin1 = imagelet_io_3_1;
@@ -2533,6 +2593,8 @@ freia_status anr999_helper_0_0_2(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2579,6 +2641,7 @@ freia_status anr999_helper_0_0_2(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(3) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_3_0;
   mcu_macro[1][0].xmin1 = imagelet_io_3_1;
@@ -2836,6 +2899,8 @@ freia_status anr999_helper_0_0_3(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2882,6 +2947,7 @@ freia_status anr999_helper_0_0_3(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(3) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_3_0;
   mcu_macro[1][0].xmin1 = imagelet_io_3_1;

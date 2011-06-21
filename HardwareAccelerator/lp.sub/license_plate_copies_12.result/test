@@ -4446,6 +4446,8 @@ freia_status license_plate_copies_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -4485,6 +4487,7 @@ freia_status license_plate_copies_helper_0_0_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -4672,6 +4675,8 @@ freia_status license_plate_copies_helper_0_0_1(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -4711,6 +4716,7 @@ freia_status license_plate_copies_helper_0_0_1(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(2) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -4949,6 +4955,8 @@ freia_status license_plate_copies_helper_0_0_2(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -4988,6 +4996,7 @@ freia_status license_plate_copies_helper_0_0_2(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(2) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -5291,6 +5300,8 @@ freia_status license_plate_copies_helper_0_0_3(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -5330,6 +5341,7 @@ freia_status license_plate_copies_helper_0_0_3(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(2) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -5636,6 +5648,8 @@ freia_status license_plate_copies_helper_0_0_4(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -5679,6 +5693,7 @@ freia_status license_plate_copies_helper_0_0_4(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(2) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -5990,6 +6005,8 @@ freia_status license_plate_copies_helper_0_0_5(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -6025,6 +6042,7 @@ freia_status license_plate_copies_helper_0_0_5(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -6205,6 +6223,8 @@ freia_status license_plate_copies_helper_0_0_6(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -6240,6 +6260,7 @@ freia_status license_plate_copies_helper_0_0_6(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -6462,6 +6483,8 @@ freia_status license_plate_copies_helper_0_0_7(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -6497,6 +6520,7 @@ freia_status license_plate_copies_helper_0_0_7(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -6678,6 +6702,8 @@ freia_status license_plate_copies_helper_0_0_8(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -6725,6 +6751,7 @@ freia_status license_plate_copies_helper_0_0_8(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(2) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -6998,6 +7025,8 @@ freia_status license_plate_copies_helper_0_0_9(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7033,6 +7062,7 @@ freia_status license_plate_copies_helper_0_0_9(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -7210,6 +7240,8 @@ freia_status license_plate_copies_helper_0_0_10(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7249,6 +7281,7 @@ freia_status license_plate_copies_helper_0_0_10(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -7438,6 +7471,8 @@ freia_status license_plate_copies_helper_0_0_11(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7473,6 +7508,7 @@ freia_status license_plate_copies_helper_0_0_11(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: E8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -7655,6 +7691,8 @@ freia_status license_plate_copies_helper_0_0_12(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7698,6 +7736,7 @@ freia_status license_plate_copies_helper_0_0_12(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;

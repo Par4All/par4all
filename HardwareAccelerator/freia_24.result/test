@@ -830,6 +830,8 @@ freia_status freia_24_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -868,6 +870,7 @@ freia_status freia_24_helper_0_0_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: thr(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -1017,6 +1020,8 @@ freia_status freia_24_helper_0_1_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -1027,9 +1032,13 @@ freia_status freia_24_helper_0_1_0(
   int16_t p_1[9];
   const int32_t x_1 = 3;
   const int32_t y_1 = 0;
+  // operation 2_val initialization
+  int16_t p_2_val[1];
+  const int32_t x_2_val = 6;
+  const int32_t y_2_val = 0;
   // operation 3 parameters
   int16_t p_3[3];
-  const int32_t x_3 = 6;
+  const int32_t x_3 = 7;
   const int32_t y_3 = 0;
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][2];
@@ -1064,6 +1073,7 @@ freia_status freia_24_helper_0_1_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
   // 0: thr(2) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -1129,6 +1139,29 @@ freia_status freia_24_helper_0_1_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_DILATE_3_3;
+  // initializing  2_val
+  p_2_val[0] = 0;
+  gram.xoffset = x_2_val;
+  gram.yoffset = y_2_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_2_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mem_init.xmin1 = 1022;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 2;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode);
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
   // set measure vol at 1022
   mcu_macro[0][2].xmin2 = 1022;
   mcu_macro[1][2].xmin2 = 1022;
@@ -1298,12 +1331,22 @@ freia_status freia_24_helper_0_2_0(
   terapix_gram gram;
   int i;
   freia_status ret;
+  // memory initialization for reductions
+  terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
+  // operation 0_val initialization
+  int16_t p_0_val[1];
+  const int32_t x_0_val = 0;
+  const int32_t y_0_val = 0;
   // operation 1 parameters
   int16_t p_1[9];
-  const int32_t x_1 = 0;
+  const int32_t x_1 = 1;
   const int32_t y_1 = 0;
+  // operation 2_val initialization
+  int16_t p_2_val[1];
+  const int32_t x_2_val = 4;
+  const int32_t y_2_val = 0;
   terapix_mcu_macrocode mcu_macro[2][4];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
@@ -1333,6 +1376,30 @@ freia_status freia_24_helper_0_2_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // initializing  0_val
+  p_0_val[0] = INT16_MIN;
+  gram.xoffset = x_0_val;
+  gram.yoffset = y_0_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mem_init.xmin1 = 1023;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 1;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode);
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
   // set measure max at 1023
   mcu_macro[0][0].xmin2 = 1023;
   mcu_macro[1][0].xmin2 = 1023;
@@ -1389,6 +1456,29 @@ freia_status freia_24_helper_0_2_0(
   mcu_macro[1][1].iter4 = 0;
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_ERODE_3_3;
+  // initializing  2_val
+  p_2_val[0] = INT16_MAX;
+  gram.xoffset = x_2_val;
+  gram.yoffset = y_2_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_2_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  mem_init.xmin1 = 1022;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 1;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode);
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
   // set measure min at 1022
   mcu_macro[0][2].xmin2 = 1022;
   mcu_macro[1][2].xmin2 = 1022;
