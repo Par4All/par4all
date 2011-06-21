@@ -241,7 +241,7 @@ freia_status my_global_min_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -250,6 +250,7 @@ freia_status my_global_min_helper_0_0_0(
   int16_t p_0_val[1];
   const int32_t x_0_val = 0;
   const int32_t y_0_val = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
 
@@ -286,6 +287,7 @@ freia_status my_global_min_helper_0_0_0(
   gram.height = 1;
   gram.params = p_0_val;
   freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 0_val
   mem_init.xmin1 = 1023;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
@@ -359,7 +361,7 @@ freia_status my_global_min_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, i0);
+  ret |= freia_cg_template_process(&param, i0);
 
   // extract measures
   // get measure min result from 1023

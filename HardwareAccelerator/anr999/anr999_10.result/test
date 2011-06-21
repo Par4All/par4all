@@ -1704,7 +1704,7 @@ freia_status anr999_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -1721,6 +1721,7 @@ freia_status anr999_helper_0_0_0(
   int16_t p_2[9];
   const int32_t x_2 = 2;
   const int32_t y_2 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][2];
@@ -1763,6 +1764,7 @@ freia_status anr999_helper_0_0_0(
   gram.height = 1;
   gram.params = p_0_val;
   freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 0_val
   mem_init.xmin1 = 1023;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
@@ -1810,6 +1812,7 @@ freia_status anr999_helper_0_0_0(
   gram.height = 1;
   gram.params = p_1_val;
   freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 1_val
   mem_init.xmin1 = 1021;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
@@ -1968,7 +1971,7 @@ freia_status anr999_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0);
+  ret |= freia_cg_template_process(&param, o0, o1, i0);
 
   // extract measures
   // get measure min result from 1023
@@ -2012,7 +2015,7 @@ freia_status anr999_helper_0_0_1(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -2021,6 +2024,7 @@ freia_status anr999_helper_0_0_1(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -2179,7 +2183,7 @@ freia_status anr999_helper_0_0_1(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -2219,7 +2223,7 @@ freia_status anr999_helper_0_0_2(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -2228,6 +2232,7 @@ freia_status anr999_helper_0_0_2(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -2386,7 +2391,7 @@ freia_status anr999_helper_0_0_2(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -2426,7 +2431,7 @@ freia_status anr999_helper_0_0_3(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -2435,6 +2440,7 @@ freia_status anr999_helper_0_0_3(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -2593,7 +2599,7 @@ freia_status anr999_helper_0_0_3(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -2633,7 +2639,7 @@ freia_status anr999_helper_0_0_4(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -2642,6 +2648,7 @@ freia_status anr999_helper_0_0_4(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -2800,7 +2807,7 @@ freia_status anr999_helper_0_0_4(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -2840,7 +2847,7 @@ freia_status anr999_helper_0_0_5(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -2849,6 +2856,7 @@ freia_status anr999_helper_0_0_5(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -3007,7 +3015,7 @@ freia_status anr999_helper_0_0_5(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -3047,7 +3055,7 @@ freia_status anr999_helper_0_0_6(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -3056,6 +3064,7 @@ freia_status anr999_helper_0_0_6(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -3214,7 +3223,7 @@ freia_status anr999_helper_0_0_6(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -3254,7 +3263,7 @@ freia_status anr999_helper_0_0_7(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -3263,6 +3272,7 @@ freia_status anr999_helper_0_0_7(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -3421,7 +3431,7 @@ freia_status anr999_helper_0_0_7(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -3461,7 +3471,7 @@ freia_status anr999_helper_0_0_8(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -3470,6 +3480,7 @@ freia_status anr999_helper_0_0_8(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -3628,7 +3639,7 @@ freia_status anr999_helper_0_0_8(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -3668,7 +3679,7 @@ freia_status anr999_helper_0_0_9(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -3677,6 +3688,7 @@ freia_status anr999_helper_0_0_9(
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][4];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
@@ -3858,7 +3870,7 @@ freia_status anr999_helper_0_0_9(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 

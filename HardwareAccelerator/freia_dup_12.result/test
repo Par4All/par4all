@@ -342,11 +342,12 @@ freia_status freia_dup_12_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][1];
@@ -448,7 +449,7 @@ freia_status freia_dup_12_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
 

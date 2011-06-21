@@ -480,7 +480,7 @@ freia_status freia_scalar_00_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -489,6 +489,7 @@ freia_status freia_scalar_00_helper_0_0_0(
   int16_t p_0[3];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
@@ -591,7 +592,7 @@ freia_status freia_scalar_00_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -630,7 +631,7 @@ freia_status freia_scalar_00_helper_0_1_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
   // memory initialization for reductions
   terapix_mcu_macrocode mem_init;
   // overall structure which describes the computation
@@ -639,6 +640,7 @@ freia_status freia_scalar_00_helper_0_1_0(
   int16_t p_0_val[1];
   const int32_t x_0_val = 0;
   const int32_t y_0_val = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][2];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][1];
@@ -680,6 +682,7 @@ freia_status freia_scalar_00_helper_0_1_0(
   gram.height = 1;
   gram.params = p_0_val;
   freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 0_val
   mem_init.xmin1 = 1023;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
@@ -787,7 +790,7 @@ freia_status freia_scalar_00_helper_0_1_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0, i1);
+  ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
   // get measure max result from 1023
