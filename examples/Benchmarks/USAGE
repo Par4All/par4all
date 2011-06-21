@@ -1,0 +1,9 @@
+You can build 4 differents versions of these test cases, the sequential version, the openmp automatically parallelized version,
+the naive cuda version, and the same cuda kernels with optimized communications.
+
+The targets at top level are respectively "seq", "openmp", "cuda", "cuda_opt". It'll build all test cases. If you want only one, for instance polybenchs/2mm, then go in 2mm subdirectory and run "make 2mm_seq" ; "make 2mm_openmp" ; ....
+
+You can run the test cases using "make run_seq" ; "make run_openmp" ; ....
+
+Measure in milliseconds is recorded in a sqlite database (if sqlite3 is available) or in a .csv file. A script can generate an histogram with the speedups.
+
