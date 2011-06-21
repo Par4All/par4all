@@ -15,11 +15,11 @@ Generated source files : md/src
       EXTERNAL DOTR8
       INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, L
      &, ND, NP, J, K
-      INTEGER STEP_RR_POS(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
-     &MAX_NB_LOOPSLICES), STEP_RR_VEL(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
-     &, 1:MAX_NB_LOOPSLICES), STEP_RR_F(IDX_SLICE_LOW:IDX_SLICE_UP, 1
-     &:2, 1:MAX_NB_LOOPSLICES), STEP_SR_F(IDX_SLICE_LOW:IDX_SLICE_UP
-     &, 1:2, 1:MAX_NB_LOOPSLICES)
+      INTEGER STEP_RR_F(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
+     &MAX_NB_LOOPSLICES), STEP_RR_POS(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
+     &, 1:MAX_NB_LOOPSLICES), STEP_RR_VEL(IDX_SLICE_LOW:IDX_SLICE_UP
+     &, 1:2, 1:MAX_NB_LOOPSLICES), STEP_SR_F(IDX_SLICE_LOW:
+     &IDX_SLICE_UP, 1:2, 1:MAX_NB_LOOPSLICES)
       REAL*8 STEP_POT_REDUC, STEP_KIN_REDUC, F(1:ND, 1:NP), BOX(1:ND)
      &, POS(1:ND, 1:NP), RIJ(1:ND), D, POT, PI2, KIN, VEL(1:ND, 1:NP)
 
@@ -41,37 +41,37 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0132
          CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0133
-C  <F(PHI1,PHI2)-write-MAY-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
-C    PHI2<=500, I_LOW<=PHI2, PHI2<=I_UP}>
-         STEP_RR_F(IDX_SLICE_LOW,1,IDX) = 1                             0136
-         STEP_RR_F(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                     0137
-         STEP_RR_F(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)                 0138
-         STEP_RR_F(IDX_SLICE_UP,2,IDX) = MIN(I_UP, 500)                 0139
 C  <VEL(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, 1<=PHI2,
 C    I_LOW<=PHI2, PHI2<=I_UP, PHI2<=NP}>
-         STEP_RR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0142
-         STEP_RR_VEL(IDX_SLICE_UP,1,IDX) = ND                           0143
-         STEP_RR_VEL(IDX_SLICE_LOW,2,IDX) = MAX(1, I_LOW)               0144
-         STEP_RR_VEL(IDX_SLICE_UP,2,IDX) = MIN(NP, I_UP)                0145
+         STEP_RR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0136
+         STEP_RR_VEL(IDX_SLICE_UP,1,IDX) = ND                           0137
+         STEP_RR_VEL(IDX_SLICE_LOW,2,IDX) = MAX(1, I_LOW)               0138
+         STEP_RR_VEL(IDX_SLICE_UP,2,IDX) = MIN(NP, I_UP)                0139
 C  <POS(PHI1,PHI2)-read-MAY-{1<=PHI1, PHI1<=ND, 1<=PHI2, PHI2<=NP,
 C    I_LOW<=I_UP}>
-         STEP_RR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0148
-         STEP_RR_POS(IDX_SLICE_UP,1,IDX) = ND                           0149
-         STEP_RR_POS(IDX_SLICE_LOW,2,IDX) = 1                           0150
-         STEP_RR_POS(IDX_SLICE_UP,2,IDX) = NP                           0151
+         STEP_RR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0142
+         STEP_RR_POS(IDX_SLICE_UP,1,IDX) = ND                           0143
+         STEP_RR_POS(IDX_SLICE_LOW,2,IDX) = 1                           0144
+         STEP_RR_POS(IDX_SLICE_UP,2,IDX) = NP                           0145
+C  <F(PHI1,PHI2)-write-MAY-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    PHI2<=500, I_LOW<=PHI2, PHI2<=I_UP}>
+         STEP_RR_F(IDX_SLICE_LOW,1,IDX) = 1                             0148
+         STEP_RR_F(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                     0149
+         STEP_RR_F(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)                 0150
+         STEP_RR_F(IDX_SLICE_UP,2,IDX) = MIN(I_UP, 500)                 0151
       ENDDO
-      CALL STEP_SET_RECVREGIONS(F, STEP_COMM_SIZE, STEP_RR_F)           0153
-      CALL STEP_SET_RECVREGIONS(VEL, STEP_COMM_SIZE, STEP_RR_VEL)       0154
-      CALL STEP_SET_RECVREGIONS(POS, STEP_COMM_SIZE, STEP_RR_POS)       0155
+      CALL STEP_SET_RECVREGIONS(VEL, STEP_COMM_SIZE, STEP_RR_VEL)       0153
+      CALL STEP_SET_RECVREGIONS(POS, STEP_COMM_SIZE, STEP_RR_POS)       0154
+      CALL STEP_SET_RECVREGIONS(F, STEP_COMM_SIZE, STEP_RR_F)           0155
 
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_PARTIAL(F, STEP_NBLOCKING_ALG,                 0160
+      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0160
      &STEP_TAG_DEFAULT)                                                 0160
-      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0162
+      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0162
      &STEP_TAG_DEFAULT)                                                 0162
-      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0164
+      CALL STEP_ALLTOALL_PARTIAL(F, STEP_NBLOCKING_ALG,                 0164
      &STEP_TAG_DEFAULT)                                                 0164
       CALL STEP_WAITALL                                                 0166
 
@@ -271,14 +271,14 @@ intel:	clear
       include "STEP.h"
       INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, J
      &, ND, NP
-      INTEGER STEP_RR_F(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
-     &MAX_NB_LOOPSLICES), STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 
-     &1:MAX_NB_LOOPSLICES), STEP_RR_VEL(IDX_SLICE_LOW:IDX_SLICE_UP, 1
-     &:2, 1:MAX_NB_LOOPSLICES), STEP_RR_POS(IDX_SLICE_LOW:
+      INTEGER STEP_RR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
+     &MAX_NB_LOOPSLICES), STEP_RR_F(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 
+     &1:MAX_NB_LOOPSLICES), STEP_RR_POS(IDX_SLICE_LOW:IDX_SLICE_UP, 1
+     &:2, 1:MAX_NB_LOOPSLICES), STEP_RR_VEL(IDX_SLICE_LOW:
      &IDX_SLICE_UP, 1:2, 1:MAX_NB_LOOPSLICES), STEP_SR_A(
      &IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:MAX_NB_LOOPSLICES), 
-     &STEP_SR_VEL(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
-     &MAX_NB_LOOPSLICES), STEP_SR_POS(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
+     &STEP_SR_POS(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
+     &MAX_NB_LOOPSLICES), STEP_SR_VEL(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
      &, 1:MAX_NB_LOOPSLICES)
       REAL*8 POS(1:ND, 1:NP), VEL(1:ND, 1:NP), DT, A(1:ND, 1:NP), F(1
      &:ND, 1:NP), RMASS
@@ -299,46 +299,46 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0132
          CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0133
-C  <POS(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
-C    PHI2<=I_UP}>
-         STEP_RR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0136
-         STEP_RR_POS(IDX_SLICE_UP,1,IDX) = ND                           0137
-         STEP_RR_POS(IDX_SLICE_LOW,2,IDX) = I_LOW                       0138
-         STEP_RR_POS(IDX_SLICE_UP,2,IDX) = I_UP                         0139
 C  <VEL(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
 C    PHI2<=I_UP}>
-         STEP_RR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0142
-         STEP_RR_VEL(IDX_SLICE_UP,1,IDX) = ND                           0143
-         STEP_RR_VEL(IDX_SLICE_LOW,2,IDX) = I_LOW                       0144
-         STEP_RR_VEL(IDX_SLICE_UP,2,IDX) = I_UP                         0145
-C  <A(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
+         STEP_RR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0136
+         STEP_RR_VEL(IDX_SLICE_UP,1,IDX) = ND                           0137
+         STEP_RR_VEL(IDX_SLICE_LOW,2,IDX) = I_LOW                       0138
+         STEP_RR_VEL(IDX_SLICE_UP,2,IDX) = I_UP                         0139
+C  <POS(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
 C    PHI2<=I_UP}>
-         STEP_RR_A(IDX_SLICE_LOW,1,IDX) = 1                             0148
-         STEP_RR_A(IDX_SLICE_UP,1,IDX) = ND                             0149
-         STEP_RR_A(IDX_SLICE_LOW,2,IDX) = I_LOW                         0150
-         STEP_RR_A(IDX_SLICE_UP,2,IDX) = I_UP                           0151
+         STEP_RR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0142
+         STEP_RR_POS(IDX_SLICE_UP,1,IDX) = ND                           0143
+         STEP_RR_POS(IDX_SLICE_LOW,2,IDX) = I_LOW                       0144
+         STEP_RR_POS(IDX_SLICE_UP,2,IDX) = I_UP                         0145
 C  <F(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
 C    PHI2<=I_UP}>
-         STEP_RR_F(IDX_SLICE_LOW,1,IDX) = 1                             0154
-         STEP_RR_F(IDX_SLICE_UP,1,IDX) = ND                             0155
-         STEP_RR_F(IDX_SLICE_LOW,2,IDX) = I_LOW                         0156
-         STEP_RR_F(IDX_SLICE_UP,2,IDX) = I_UP                           0157
+         STEP_RR_F(IDX_SLICE_LOW,1,IDX) = 1                             0148
+         STEP_RR_F(IDX_SLICE_UP,1,IDX) = ND                             0149
+         STEP_RR_F(IDX_SLICE_LOW,2,IDX) = I_LOW                         0150
+         STEP_RR_F(IDX_SLICE_UP,2,IDX) = I_UP                           0151
+C  <A(PHI1,PHI2)-read-EXACT-{1<=PHI1, PHI1<=ND, I_LOW<=PHI2,
+C    PHI2<=I_UP}>
+         STEP_RR_A(IDX_SLICE_LOW,1,IDX) = 1                             0154
+         STEP_RR_A(IDX_SLICE_UP,1,IDX) = ND                             0155
+         STEP_RR_A(IDX_SLICE_LOW,2,IDX) = I_LOW                         0156
+         STEP_RR_A(IDX_SLICE_UP,2,IDX) = I_UP                           0157
       ENDDO
-      CALL STEP_SET_RECVREGIONS(POS, STEP_COMM_SIZE, STEP_RR_POS)       0159
-      CALL STEP_SET_RECVREGIONS(VEL, STEP_COMM_SIZE, STEP_RR_VEL)       0160
-      CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)           0161
-      CALL STEP_SET_RECVREGIONS(F, STEP_COMM_SIZE, STEP_RR_F)           0162
+      CALL STEP_SET_RECVREGIONS(VEL, STEP_COMM_SIZE, STEP_RR_VEL)       0159
+      CALL STEP_SET_RECVREGIONS(POS, STEP_COMM_SIZE, STEP_RR_POS)       0160
+      CALL STEP_SET_RECVREGIONS(F, STEP_COMM_SIZE, STEP_RR_F)           0161
+      CALL STEP_SET_RECVREGIONS(A, STEP_COMM_SIZE, STEP_RR_A)           0162
 
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0167
+      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0167
      &STEP_TAG_DEFAULT)                                                 0167
-      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0169
+      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0169
      &STEP_TAG_DEFAULT)                                                 0169
-      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0171
+      CALL STEP_ALLTOALL_PARTIAL(F, STEP_NBLOCKING_ALG,                 0171
      &STEP_TAG_DEFAULT)                                                 0171
-      CALL STEP_ALLTOALL_PARTIAL(F, STEP_NBLOCKING_ALG,                 0173
+      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0173
      &STEP_TAG_DEFAULT)                                                 0173
       CALL STEP_WAITALL                                                 0175
 
@@ -349,18 +349,18 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0182
          CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0183
-C  <POS(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
-C    I_LOW<=PHI2, PHI2<=I_UP}>
-         STEP_SR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0186
-         STEP_SR_POS(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0187
-         STEP_SR_POS(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0188
-         STEP_SR_POS(IDX_SLICE_UP,2,IDX) = I_UP                         0189
 C  <VEL(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
 C    I_LOW<=PHI2, PHI2<=I_UP}>
-         STEP_SR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0192
-         STEP_SR_VEL(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0193
-         STEP_SR_VEL(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0194
-         STEP_SR_VEL(IDX_SLICE_UP,2,IDX) = I_UP                         0195
+         STEP_SR_VEL(IDX_SLICE_LOW,1,IDX) = 1                           0186
+         STEP_SR_VEL(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0187
+         STEP_SR_VEL(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0188
+         STEP_SR_VEL(IDX_SLICE_UP,2,IDX) = I_UP                         0189
+C  <POS(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
+C    I_LOW<=PHI2, PHI2<=I_UP}>
+         STEP_SR_POS(IDX_SLICE_LOW,1,IDX) = 1                           0192
+         STEP_SR_POS(IDX_SLICE_UP,1,IDX) = MIN(ND, 3)                   0193
+         STEP_SR_POS(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)               0194
+         STEP_SR_POS(IDX_SLICE_UP,2,IDX) = I_UP                         0195
 C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=3, PHI1<=ND, 1<=PHI2,
 C    I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_A(IDX_SLICE_LOW,1,IDX) = 1                             0198
@@ -368,8 +368,8 @@ C    I_LOW<=PHI2, PHI2<=I_UP}>
          STEP_SR_A(IDX_SLICE_LOW,2,IDX) = MAX(I_LOW, 1)                 0200
          STEP_SR_A(IDX_SLICE_UP,2,IDX) = I_UP                           0201
       ENDDO
-      CALL STEP_SET_SENDREGIONS(POS, STEP_COMM_SIZE, STEP_SR_POS)       0203
-      CALL STEP_SET_SENDREGIONS(VEL, STEP_COMM_SIZE, STEP_SR_VEL)       0204
+      CALL STEP_SET_SENDREGIONS(VEL, STEP_COMM_SIZE, STEP_SR_VEL)       0203
+      CALL STEP_SET_SENDREGIONS(POS, STEP_COMM_SIZE, STEP_SR_POS)       0204
       CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0205
 
 !$omp end master
@@ -394,9 +394,9 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0229
+      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0229
      &STEP_TAG_DEFAULT)                                                 0229
-      CALL STEP_ALLTOALL_PARTIAL(VEL, STEP_NBLOCKING_ALG,               0231
+      CALL STEP_ALLTOALL_PARTIAL(POS, STEP_NBLOCKING_ALG,               0231
      &STEP_TAG_DEFAULT)                                                 0231
       CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0233
      &STEP_TAG_DEFAULT)                                                 0233

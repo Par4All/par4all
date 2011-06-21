@@ -12,9 +12,9 @@ Generated source files : matmul/src
       include "STEP.h"
       INTEGER STEP_J_UP, STEP_J_LOW, J_UP, J_LOW, IDX, J, J_L, J_U, I
      &, N
-      INTEGER STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
+      INTEGER STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 1:
      &MAX_NB_LOOPSLICES), STEP_SR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2, 
-     &1:MAX_NB_LOOPSLICES), STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
+     &1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
      &, 1:MAX_NB_LOOPSLICES)
       REAL*8 A(1:N, 1:N), B(1:N, 1:N), C(1:N, 1:N)
 
@@ -30,28 +30,28 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0121
          CALL STEP_GET_LOOPBOUNDS(IDX-1, J_LOW, J_UP)                   0122
-C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
+C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
-         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = 1                             0125
-         STEP_SR_A(IDX_SLICE_UP,1,IDX) = N                              0126
-         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0127
-         STEP_SR_A(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0128
+         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = 1                             0125
+         STEP_SR_C(IDX_SLICE_UP,1,IDX) = N                              0126
+         STEP_SR_C(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0127
+         STEP_SR_C(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0128
 C  <B(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
          STEP_SR_B(IDX_SLICE_LOW,1,IDX) = 1                             0131
          STEP_SR_B(IDX_SLICE_UP,1,IDX) = N                              0132
          STEP_SR_B(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0133
          STEP_SR_B(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0134
-C  <C(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
+C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=N, 1<=PHI2, J_LOW<=PHI2,
 C    PHI2<=J_UP, PHI2<=N}>
-         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = 1                             0137
-         STEP_SR_C(IDX_SLICE_UP,1,IDX) = N                              0138
-         STEP_SR_C(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0139
-         STEP_SR_C(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0140
+         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = 1                             0137
+         STEP_SR_A(IDX_SLICE_UP,1,IDX) = N                              0138
+         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = MAX(J_LOW, 1)                 0139
+         STEP_SR_A(IDX_SLICE_UP,2,IDX) = MIN(J_UP, N)                   0140
       ENDDO
-      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0142
+      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0142
       CALL STEP_SET_SENDREGIONS(B, STEP_COMM_SIZE, STEP_SR_B)           0143
-      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0144
+      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0144
 
 !$omp end master
 !$omp barrier
@@ -74,11 +74,11 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0167
+      CALL STEP_ALLTOALL_PARTIAL(C, STEP_NBLOCKING_ALG,                 0167
      &STEP_TAG_DEFAULT)                                                 0167
       CALL STEP_ALLTOALL_PARTIAL(B, STEP_NBLOCKING_ALG,                 0169
      &STEP_TAG_DEFAULT)                                                 0169
-      CALL STEP_ALLTOALL_PARTIAL(C, STEP_NBLOCKING_ALG,                 0171
+      CALL STEP_ALLTOALL_PARTIAL(A, STEP_NBLOCKING_ALG,                 0171
      &STEP_TAG_DEFAULT)                                                 0171
       CALL STEP_WAITALL                                                 0173
       CALL STEP_CONSTRUCT_END(STEP_DO)                                  0174
