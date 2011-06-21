@@ -27615,9 +27615,9 @@ static void select_colors(j_decompress_ptr cinfo, int desired_colors)
 //             <may be written>: cinfo[0].colormap[0][*] 
 //                               cinfo[0].colormap[1][*] 
 //                               cinfo[0].colormap[2][*]
-//             <    is read   >: boxlist[i+0].c0max boxlist[i+0].c0min
-//                               boxlist[i+0].c1max boxlist[i+0].c1min
-//                               boxlist[i+0].c2max boxlist[i+0].c2min
+//             <    is read   >: boxlist[i].c0max boxlist[i].c0min 
+//                               boxlist[i].c1max boxlist[i].c1min 
+//                               boxlist[i].c2max boxlist[i].c2min 
 //                               cinfo cinfo[0].colormap 
 //                               cinfo[0].colormap[0] 
 //                               cinfo[0].colormap[1] 

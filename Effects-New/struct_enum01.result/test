@@ -1,0 +1,12 @@
+int main()
+{
+//             <    is written>: config.fun
+   hs_config_t config = {0};
+//             <    is read   >: config.fun
+//             <    is written>: n
+   int n = config.fun;
+//             <    is written>: config.fun
+   config.fun = TOTO;
+//             <    is read   >: config.fun
+   return config.fun;
+}
