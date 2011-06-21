@@ -13,11 +13,12 @@ fi
 versions=`echo "select version from timing group by version;" | sqlite3 $dbfile`
 nvers=`echo "select count(DISTINCT version) from timing;" | sqlite3 $dbfile`
 tests=`echo "select testcase from timing group by testcase;" | sqlite3 $dbfile`
-echo $nvers
+
 # 1st line is header
 echo -n " run_seq" >> $out_dat
 for ver in $versions; do
-  echo -n " $ver" >> $out_dat
+  ver=`echo $ver|sed 's/run_//g'|sed 's/_/ /g'`
+  echo -n " \"$ver\"" >> $out_dat
 done
 echo >> $out_dat
 
@@ -29,7 +30,7 @@ for test in $tests; do
     time=`echo "select ROUND(AVG(measure),2) from timing where testcase=\"$test\" and version=\"$ver\";" | sqlite3 $dbfile`
     speedup=0
     if [[ ! -z $time && ! -z $ref ]]; then
-      speedup=`echo "scale=2; $time/$ref" | bc `
+      speedup=`echo "scale=2; $ref/$time" | bc `
     fi
     echo -n " $speedup" >> $out_dat
   done

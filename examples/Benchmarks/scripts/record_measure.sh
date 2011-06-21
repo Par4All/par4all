@@ -8,6 +8,7 @@ fi
 
 
 path=`dirname $0`
+path=`(cd $path && cd .. && pwd)`
 
 #db init
 create_table="create table timing (id int auto increment primary key, testcase varchar(255), version varchar(255), measure double);"
