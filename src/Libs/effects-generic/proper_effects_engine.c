@@ -180,9 +180,17 @@ static list generic_r_proper_effects_of_derived_reference(effect input_eff, type
       switch (basic_tag(current_basic))
 	{
 	case is_basic_derived:
-	  pips_debug(8, "derived case : recursing\n");
-	  le = gen_nconc(generic_r_proper_effects_of_derived_reference(current_eff, current_type),le);
-	  effect_free(current_eff);
+	  if (type_enum_p(entity_type(basic_derived(current_basic))))
+	    {
+	      pips_debug(8, "enum case \n");
+	      le = gen_nconc(CONS(EFFECT, current_eff, NIL), le);
+	    }
+	  else
+	    {
+	      pips_debug(8, "derived case : recursing\n");
+	      le = gen_nconc(generic_r_proper_effects_of_derived_reference(current_eff, current_type),le);
+	      effect_free(current_eff);
+	    }
 	  break;
 	case is_basic_typedef:
 	  // should not happen
