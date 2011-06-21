@@ -594,6 +594,7 @@ static void terapix_init_row(
 
   // call the initialization
   sb_cat(code,
+         "  // initialize memory for operation ", name, "\n"
          "  mem_init.xmin1 = ", itoa(addr), ";\n"
          "  mem_init.ymin1 = 0;\n"
          "  mem_init.xmin2 = 0;\n"
@@ -757,7 +758,7 @@ static void freia_terapix_call
          "  freia_dynamic_param dyn_param;\n"
          "  terapix_gram gram;\n"
          "  int i;\n"
-         "  freia_status ret;\n"
+         "  freia_status ret = FREIA_OK;\n"
          "  // memory initialization for reductions\n"
          "  terapix_mcu_macrocode mem_init;\n"
          "  // overall structure which describes the computation\n"
@@ -1041,6 +1042,7 @@ static void freia_terapix_call
 
   // declarations when we know the number of operations
   // [2] for flip/flop double buffer handling
+  sb_cat(decl, "  // flip flop macro code and I/Os\n");
   sb_cat(decl, "  terapix_mcu_macrocode mcu_macro[2][", itoa(n_ops), "];\n");
   if (n_ins)
     sb_cat(decl, "  terapix_tile_info tile_in[2][", itoa(n_ins), "];\n");
@@ -1150,7 +1152,7 @@ static void freia_terapix_call
   // ??? NOTE: the runtime *MUST* take care of possible in/out aliasing
   sb_cat(body, "\n"
          "  // call terapix runtime\n"
-         "  ret = freia_cg_template_process(&param");
+         "  ret |= freia_cg_template_process(&param");
   for (int i=0; i<n_outs; i++)
     sb_cat(body, ", o", itoa(i));
   for (int i=0; i<n_ins; i++)
