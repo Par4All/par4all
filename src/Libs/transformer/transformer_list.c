@@ -1203,7 +1203,7 @@ static list transformer_list_add_combination(int tn,
  * int n: a strictly positive integer, smaller than the length of tl
  *
 */
-static list transformer_list_combination(list tl, int n)
+static list __attribute__ ((unused)) transformer_list_combination(list tl, int n)
 {
   list cl = NIL;
   int tn = gen_length(tl);

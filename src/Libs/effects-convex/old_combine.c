@@ -209,10 +209,9 @@ list RegionsMayUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMayUnion", "begin\n");
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   region_may_union,
-					   region_to_may_region_list,
 					   region_to_may_region_list);
     debug(3, "RegionsMayUnion", "end\n");
     return(lr);
@@ -231,10 +230,9 @@ list RegionsMustUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMustUnion", "begin\n");
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   region_must_union,
-					   region_to_list,
 					   region_to_list);
     debug(3, "RegionsMustUnion", "end\n");
     return(lr);
@@ -626,9 +624,6 @@ effect regions_must_convex_hull(region r1, region r2)
 
     if(sc_rn_p(sr))
       {
-	reference refr = copy_reference(region_any_reference(r1));
-	action acr = region_action(r1);
-
 	pips_debug(1, "sr sc_rn (maybe due to an overflow error)\n");
 
 	if (op_statistics_p())
@@ -645,15 +640,16 @@ effect regions_must_convex_hull(region r1, region r2)
 
 	/* we return a whole array region */
 	appr = is_approximation_may;
-	reg = reference_whole_region(refr, acr);
+	reg = region_dup(r1);
+	sc_rm(region_system(reg));
+	region_system_(reg) = newgen_Psysteme(sr);
+	region_approximation_tag(reg) = appr;
 	effect_to_may_effect(reg);
 	ifdebug(8)
 	  {
 	    pips_debug(8, "final region : \n");
 	    print_region(reg);
 	  }
-	sc_rm(sr);
-	sr = NULL;
 	return(reg);
       }
     else

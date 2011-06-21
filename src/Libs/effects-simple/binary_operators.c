@@ -88,10 +88,9 @@ EffectsMayUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_may_union,
-					   effect_to_may_sdfi_list,
 					   effect_to_may_sdfi_list);
     return(lr);
 }
@@ -109,10 +108,9 @@ ProperEffectsMustUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_must_union,
-					   effect_to_list,
 					   effect_to_list);
     return(lr);
 }
@@ -129,10 +127,9 @@ EffectsMustUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_must_union,
-					   effect_to_sdfi_list,
 					   effect_to_sdfi_list);
     return(lr);
 }
