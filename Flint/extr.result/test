@@ -6,13 +6,13 @@ Flinted file
 Non-initialized variables:
 --------------------------
 In statement number 10 (0.2):
-	"L" used but not initialized.
-	"KP" used but not initialized.
-	"JP" used but not initialized.
 	"T" used but not initialized.
-	"K" used but not initialized.
 	"J" used but not initialized.
+	"K" used but not initialized.
+	"L" used but not initialized.
 	"T" used but not initialized.
+	"JP" used but not initialized.
+	"KP" used but not initialized.
 	"T" used but not initialized.
 	"T" used but not initialized.
 	"T" used but not initialized.
@@ -45,23 +45,23 @@ In statement number 25 (0.15):
 In statement number 26 (0.16):
 	"J" used but not initialized.
 In statement number 27 (0.17):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 In statement number 28 (0.18):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 In statement number 29 (0.19):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 In statement number 31 (0.20):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 In statement number 32 (0.21):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 In statement number 33 (0.22):
-	"NC" used but not initialized.
 	"J" used but not initialized.
+	"NC" used but not initialized.
 
 flint message from check_call: WARNING, in module EXTR, in statement (0.14), number 24
 may be incompatible basic type, 4th arg in call to TOP-LEVEL:D
