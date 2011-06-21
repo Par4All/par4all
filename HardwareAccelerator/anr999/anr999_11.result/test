@@ -1610,18 +1610,24 @@ freia_status anr999_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0_val initialization
   int16_t p_0_val[1];
   const int32_t x_0_val = 0;
   const int32_t y_0_val = 0;
+  // array for reduction 0 extraction
+  int32_t red_0[1];
   // operation 1_val initialization
   int16_t p_1_val[1];
   const int32_t x_1_val = 1;
   const int32_t y_1_val = 0;
+  // array for reduction 1 extraction
+  int32_t red_1[1];
   // operation 2 parameters
   int16_t p_2[9];
   const int32_t x_2 = 2;
@@ -1630,7 +1636,6 @@ freia_status anr999_helper_0_0_0(
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -1658,6 +1663,11 @@ freia_status anr999_helper_0_0_0(
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
 
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: min(1)
   // initializing  0_val
   p_0_val[0] = INT16_MAX;
   gram.xoffset = x_0_val;
@@ -1691,7 +1701,6 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][0].xmin3 = 0;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
-  // 0: min(1)
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -1706,6 +1715,7 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][0].iter4 = 0;
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_GLOBAL_MIN;
+  // 1: vol(1)
   // initializing  1_val
   p_1_val[0] = 0;
   gram.xoffset = x_1_val;
@@ -1739,7 +1749,6 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[1][1].xmin3 = 0;
   mcu_macro[0][1].ymin3 = 0;
   mcu_macro[1][1].ymin3 = 0;
-  // 1: vol(1)
   mcu_macro[0][1].xmin1 = imagelet_io_1_0;
   mcu_macro[1][1].xmin1 = imagelet_io_1_1;
   mcu_macro[0][1].ymin1 = 0;
@@ -1829,6 +1838,7 @@ freia_status anr999_helper_0_0_0(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for in
   tile_in[0][0].x = imagelet_io_1_0;
@@ -1847,7 +1857,6 @@ freia_status anr999_helper_0_0_0(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -1879,9 +1888,37 @@ freia_status anr999_helper_0_0_0(
 
   // extract measures
   // get measure min result from 1023
-  // ??? not implemented yet...
+  redter.xres = 1023;
+  redter.yres = 0;
+  redter.width = 1;
+  redter.height = TERAPIX_PE_NUMBER;
+  redter.result = (void*) red_0;
+  redter.macroid = TERAPIX_UCODE_GLOBAL_MIN;
+  redter.imgwidth = i0->width;
+  redter.imgheight = i0->height;
+  redter.subimgwidth = TERAPIX_PE_NUMBER;
+  redter.subimgheight = imagelet_size;
+
+  ret |= freia_cg_read_reduction_results(&redres);
+
+  // assign reduction parameter
+  *po3 = (int32_t) red_0[0];
   // get measure vol result from 1021
-  // ??? not implemented yet...
+  redter.xres = 1021;
+  redter.yres = 0;
+  redter.width = 1;
+  redter.height = TERAPIX_PE_NUMBER;
+  redter.result = (void*) red_1;
+  redter.macroid = TERAPIX_UCODE_GLOBAL_VOL;
+  redter.imgwidth = i0->width;
+  redter.imgheight = i0->height;
+  redter.subimgwidth = TERAPIX_PE_NUMBER;
+  redter.subimgheight = imagelet_size;
+
+  ret |= freia_cg_read_reduction_results(&redres);
+
+  // assign reduction parameter
+  *po4 = (int32_t) red_1[0];
 
   return ret;
 }
@@ -1920,8 +1957,10 @@ freia_status anr999_helper_0_0_1(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -1932,7 +1971,6 @@ freia_status anr999_helper_0_0_1(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -1959,6 +1997,10 @@ freia_status anr999_helper_0_0_1(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -2035,6 +2077,7 @@ freia_status anr999_helper_0_0_1(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -2058,7 +2101,6 @@ freia_status anr999_helper_0_0_1(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -2127,8 +2169,10 @@ freia_status anr999_helper_0_0_2(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2139,7 +2183,6 @@ freia_status anr999_helper_0_0_2(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -2166,6 +2209,10 @@ freia_status anr999_helper_0_0_2(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -2242,6 +2289,7 @@ freia_status anr999_helper_0_0_2(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -2265,7 +2313,6 @@ freia_status anr999_helper_0_0_2(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -2334,8 +2381,10 @@ freia_status anr999_helper_0_0_3(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2346,7 +2395,6 @@ freia_status anr999_helper_0_0_3(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -2373,6 +2421,10 @@ freia_status anr999_helper_0_0_3(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -2449,6 +2501,7 @@ freia_status anr999_helper_0_0_3(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -2472,7 +2525,6 @@ freia_status anr999_helper_0_0_3(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -2541,8 +2593,10 @@ freia_status anr999_helper_0_0_4(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2553,7 +2607,6 @@ freia_status anr999_helper_0_0_4(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -2580,6 +2633,10 @@ freia_status anr999_helper_0_0_4(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -2656,6 +2713,7 @@ freia_status anr999_helper_0_0_4(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -2679,7 +2737,6 @@ freia_status anr999_helper_0_0_4(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -2748,8 +2805,10 @@ freia_status anr999_helper_0_0_5(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2760,7 +2819,6 @@ freia_status anr999_helper_0_0_5(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -2787,6 +2845,10 @@ freia_status anr999_helper_0_0_5(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -2863,6 +2925,7 @@ freia_status anr999_helper_0_0_5(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -2886,7 +2949,6 @@ freia_status anr999_helper_0_0_5(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -2955,8 +3017,10 @@ freia_status anr999_helper_0_0_6(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -2967,7 +3031,6 @@ freia_status anr999_helper_0_0_6(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -2994,6 +3057,10 @@ freia_status anr999_helper_0_0_6(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -3070,6 +3137,7 @@ freia_status anr999_helper_0_0_6(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -3093,7 +3161,6 @@ freia_status anr999_helper_0_0_6(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -3162,8 +3229,10 @@ freia_status anr999_helper_0_0_7(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -3174,7 +3243,6 @@ freia_status anr999_helper_0_0_7(
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -3201,6 +3269,10 @@ freia_status anr999_helper_0_0_7(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -3277,6 +3349,7 @@ freia_status anr999_helper_0_0_7(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -3300,7 +3373,6 @@ freia_status anr999_helper_0_0_7(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -3369,8 +3441,10 @@ freia_status anr999_helper_0_0_8(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -3381,7 +3455,6 @@ freia_status anr999_helper_0_0_8(
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -3408,6 +3481,10 @@ freia_status anr999_helper_0_0_8(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -3534,6 +3611,7 @@ freia_status anr999_helper_0_0_8(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_SUB3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_SUB3;
 
+
   // inputs:
   // - imagelet 1 is i0 for od
   tile_in[0][0].x = imagelet_io_1_0;
@@ -3557,7 +3635,6 @@ freia_status anr999_helper_0_0_8(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 2;

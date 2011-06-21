@@ -941,8 +941,10 @@ freia_status median_1_helper_0_0_0(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -953,7 +955,6 @@ freia_status median_1_helper_0_0_0(
   terapix_mcu_macrocode mcu_macro[2][6];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
@@ -975,6 +976,10 @@ freia_status median_1_helper_0_0_0(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: D8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -1124,6 +1129,7 @@ freia_status median_1_helper_0_0_0(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_ERODE_3_3;
 
+
   // inputs:
   // - imagelet 1 is i0 for i
   tile_in[0][0].x = imagelet_io_1_0;
@@ -1137,7 +1143,6 @@ freia_status median_1_helper_0_0_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 6;
@@ -1204,8 +1209,10 @@ freia_status median_1_helper_0_0_1(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -1216,7 +1223,6 @@ freia_status median_1_helper_0_0_1(
   terapix_mcu_macrocode mcu_macro[2][4];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
@@ -1238,6 +1244,10 @@ freia_status median_1_helper_0_0_1(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: E8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -1337,6 +1347,7 @@ freia_status median_1_helper_0_0_1(
   mcu_macro[0][3].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][3].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for t
   tile_in[0][0].x = imagelet_io_1_0;
@@ -1350,7 +1361,6 @@ freia_status median_1_helper_0_0_1(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 3;
@@ -1419,8 +1429,10 @@ freia_status median_1_helper_0_0_2(
   terapix_gram gram;
   int i;
   freia_status ret = FREIA_OK;
-  // memory initialization for reductions
+  // data structures for reductions
   terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -1431,7 +1443,6 @@ freia_status median_1_helper_0_0_2(
   terapix_mcu_macrocode mcu_macro[2][6];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 2 double buffer imagelets
@@ -1457,6 +1468,10 @@ freia_status median_1_helper_0_0_2(
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
 
   // 0: E8(1) -> 3
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
@@ -1602,6 +1617,7 @@ freia_status median_1_helper_0_0_2(
   mcu_macro[0][5].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][5].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for t
   tile_in[0][0].x = imagelet_io_1_0;
@@ -1625,7 +1641,6 @@ freia_status median_1_helper_0_0_2(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 3;
