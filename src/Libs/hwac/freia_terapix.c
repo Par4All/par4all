@@ -398,7 +398,7 @@ static void terapix_mcu_pval(string_buffer code, int op, string ref,
          " = ", p, s, ";\n");
 }
 
-/* copy some operator parameters in the global ram (aka gram).
+/* copy some operator *parameters* in the global ram (aka gram).
  * the coordinates used are  (x_<name>, y_<name>).
  */
 static void gram_param
@@ -425,9 +425,10 @@ static void gram_param
   switch (size)
   {
   case 1: // constant
+    sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
+    break;
   case 3: // threshold min/max/bin
     sb_cat(code, "  p_", name, "[0] = ", p1, ";\n");
-    if (size==1) break;
     sb_cat(code, "  p_", name, "[1] = ",
            hash_get(hparams, EXPRESSION(CAR(CDR(largs)))), ";\n");
     sb_cat(code, "  p_", name, "[2] = ",
@@ -455,7 +456,7 @@ static void gram_param
 static void terapix_gram_management
   (string_buffer code, // generated code
    string_buffer decl, // generated declarations
-   int op,             // operation
+   int op,             // operation number
    const freia_api_t * api,
    const dagvtx v,     // current vertex
    hash_table hparams, // expression -> parameter...
@@ -555,6 +556,94 @@ static void terapix_macro_code
   terapix_mcu_val(code, op, "iter3", "0");
   terapix_mcu_val(code, op, "iter4", "0");
   terapix_mcu_val(code, op, "addrStart", api->terapix.ucode);
+}
+
+/* @brief initialize a few rows at addr with value val
+ */
+static void terapix_init_row(
+  string_buffer decl,
+  string_buffer code,
+  string base,
+  string suff,
+  int addr,
+  int nrow,
+  string val,
+  bool * used)
+{
+  // get one memory cell for the value
+  int x = 0, y = 0;
+  terapix_gram_allocate(used, 1, 1, &x, &y);
+
+  // operation name
+  string name = strdup(cat(base, "_", suff));
+
+  // set the constant
+  sb_cat(decl, "  // operation ", name, " initialization\n"
+               "  int16_t p_", name, "[1];\n");
+  sb_cat(decl, "  const int32_t x_", name, " = ", itoa(x), ";\n");
+  sb_cat(decl, "  const int32_t y_", name, " = ", itoa(y), ";\n");
+
+  sb_cat(code, "  // initializing  ", name, "\n"
+               "  p_", name, "[0] = ", val, ";\n"
+               "  gram.xoffset = x_", name, ";\n"
+               "  gram.yoffset = y_", name, ";\n"
+               "  gram.width = 1;\n"
+               "  gram.height = 1;\n"
+               "  gram.params = p_", name, ";\n"
+               "  freia_mg_write_dynamic_param(&dyn_param);\n");
+
+  // call the initialization
+  sb_cat(code,
+         "  mem_init.xmin1 = ", itoa(addr), ";\n"
+         "  mem_init.ymin1 = 0;\n"
+         "  mem_init.xmin2 = 0;\n"
+         "  mem_init.ymin2 = 0;\n"
+         "  mem_init.xmin3 = 0;\n"
+         "  mem_init.ymin3 = 0;\n"
+         "  mem_init.iter1 = TERAPIX_PE_NUMBER;\n");
+  sb_cat(code,
+         "  mem_init.iter2 = ", itoa(nrow),";\n"
+         "  mem_init.iter3 = 0;\n"
+         "  mem_init.iter4 = 0;\n"
+         "  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;\n"
+         "  param.size = sizeof(terapix_mcu_macrocode);\n"
+         "  param.raw = (void*) (&mem_init);\n"
+         "  ret |= freia_mg_work(&param);\n"
+         "  ret |= freia_mg_end_work();\n");
+
+  // cleanup
+  free(name);
+}
+
+/* @brief initialize the memory depending on the operation
+ * @param decl, declarations
+ * @param body, code
+ */
+static void terapix_initialize_memory(
+  string_buffer decl,
+  string_buffer body,
+  int nop, // current operation number
+  int addr, // memory x base
+  const freia_api_t * api,
+  bool * used)
+{
+  string op = api->compact_name;
+  pips_assert("operation is a measure",
+              same_string_p(op, "min") || same_string_p(op, "min!") ||
+              same_string_p(op, "max") || same_string_p(op, "max!") ||
+              same_string_p(op, "vol"));
+  string sop = strdup(itoa(nop));
+
+  if (same_string_p(op, "min") || same_string_p(op, "min!"))
+    terapix_init_row(decl, body, sop, "val", addr, 1, "INT16_MAX", used);
+  if (same_string_p(op, "max") || same_string_p(op, "max!"))
+    terapix_init_row(decl, body, sop, "val", addr, 1, "INT16_MIN", used);
+  if (same_string_p(op, "min!") || same_string_p(op, "max!"))
+    terapix_init_row(decl, body, sop, "loc", addr+1, 4, "0", used);
+  if (same_string_p(op, "vol"))
+    terapix_init_row(decl, body, sop, "val", addr, 2, "0", used);
+
+  free(sop);
 }
 
 /*************************************************** TERAPIX CODE GENERATION */
@@ -669,6 +758,8 @@ static void freia_terapix_call
          "  terapix_gram gram;\n"
          "  int i;\n"
          "  freia_status ret;\n"
+         "  // memory initialization for reductions\n"
+         "  terapix_mcu_macrocode mem_init;\n"
          "  // overall structure which describes the computation\n"
          "  terapix_mcu_instr mcu_instr;\n");
 
@@ -686,7 +777,8 @@ static void freia_terapix_call
          "\n"
          "  // dyn_param contents\n"
          "  dyn_param.raw = &gram;\n"
-         "  dyn_param.size = sizeof(terapix_gram);\n");
+         "  dyn_param.size = sizeof(terapix_gram);\n"
+         "\n");
 
   // string_buffer head, decls, end, settings;
 
@@ -780,10 +872,14 @@ static void freia_terapix_call
 
     if (api->terapix.memory)
     {
+      // reserve the necessary memory at the end of the segment
       available_memory -= api->terapix.memory;
       string saddr = strdup(itoa(available_memory));
 
-      // computation
+      // initialize the memory based on the measure operation
+      terapix_initialize_memory(decl, body, n_ops, available_memory, api, used);
+
+      // imagelet computation
       sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
       terapix_mcu_val(body, n_ops, "xmin2", saddr);
       terapix_mcu_val(body, n_ops, "ymin2", "0");
