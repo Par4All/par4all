@@ -651,6 +651,41 @@ static void terapix_initialize_memory(
   free(sop);
 }
 
+/* @brief generate reduction extraction code
+ */
+static void terapix_get_reduction(
+  string_buffer decl,
+  string_buffer tail,
+  int n_op,
+  int available_memory,
+  const freia_api_t * api)
+{
+  pips_assert("some results are expected", api->arg_misc_out>0);
+  string sop = strdup(itoa(n_op));
+  // I do not understand the underlying logic of these values
+  string width = api->arg_misc_out==3? "5": "1";
+  sb_cat(decl,
+         "  // array for reduction ", sop, " extraction\n"
+         "  int32_t red_", sop, "[", itoa(api->arg_misc_out), "];\n");
+  sb_cat(tail,
+         "  redter.xres = ", itoa(available_memory), ";\n"
+         "  redter.yres = 0;\n"
+         "  redter.width = ", width, ";\n"
+         "  redter.height = TERAPIX_PE_NUMBER;\n"
+         "  redter.result = (void*) red_", sop, ";\n"
+         "  redter.macroid = ", api->terapix.ucode, ";\n"
+         // just gessing that there must be a first input image
+         // ??? we assume that all image are of the same size?!
+         "  redter.imgwidth = i0->width;\n"
+         "  redter.imgheight = i0->height;\n"
+         "  redter.subimgwidth = TERAPIX_PE_NUMBER;\n"
+         "  redter.subimgheight = imagelet_size;\n"
+         "\n"
+         "  ret |= freia_cg_read_reduction_results(&redres);\n"
+         "\n");
+  free(sop);
+}
+
 /*************************************************** TERAPIX CODE GENERATION */
 
 /* generate a terapix call for dag thedag.
@@ -763,8 +798,10 @@ static void freia_terapix_call
          "  terapix_gram gram;\n"
          "  int i;\n"
          "  freia_status ret = FREIA_OK;\n"
-         "  // memory initialization for reductions\n"
+         "  // data structures for reductions\n"
          "  terapix_mcu_macrocode mem_init;\n"
+         "  freia_reduction_results redres;\n"
+         "  terapix_reduction redter;\n"
          "  // overall structure which describes the computation\n"
          "  terapix_mcu_instr mcu_instr;\n");
 
@@ -779,6 +816,10 @@ static void freia_terapix_call
          "  // dyn_param contents\n"
          "  dyn_param.raw = &gram;\n"
          "  dyn_param.size = sizeof(terapix_gram);\n"
+         "\n"
+         "  // redres contents\n"
+         "  redres.raw = (void*) &redter;\n"
+         "  redres.size = sizeof(terapix_reduction);\n"
          "\n");
 
   // string_buffer head, decls, end, settings;
@@ -807,7 +848,7 @@ static void freia_terapix_call
     // ??? they should be given in the order of the arguments
     // when calling the runtime function.
     int n = 0;
-    sb_cat(dbio, "  // inputs:\n");
+    sb_cat(dbio, "\n  // inputs:\n");
     FOREACH(dagvtx, in, dag_inputs(thedag))
     {
       // update primary imagelet number
@@ -836,7 +877,7 @@ static void freia_terapix_call
   }
   else
   {
-    sb_cat(dbio, "  // no input\n\n");
+    sb_cat(dbio, "\n  // no input\n\n");
   }
 
   // complete if need be, there will be AT LEAST this number of images
@@ -870,31 +911,6 @@ static void freia_terapix_call
     int opid = dagvtx_opid(current);
     const freia_api_t * api = get_freia_api(opid);
     pips_assert("freia api found", api!=NULL);
-
-    if (api->terapix.memory)
-    {
-      // reserve the necessary memory at the end of the segment
-      available_memory -= api->terapix.memory;
-      string saddr = strdup(itoa(available_memory));
-
-      // initialize the memory based on the measure operation
-      terapix_initialize_memory(decl, body, n_ops, available_memory, api, used);
-
-      // imagelet computation
-      sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
-      terapix_mcu_val(body, n_ops, "xmin2", saddr);
-      terapix_mcu_val(body, n_ops, "ymin2", "0");
-
-      // should not be used, but just in case...
-      terapix_mcu_val(body, n_ops, "xmin3", "0");
-      terapix_mcu_val(body, n_ops, "ymin3", "0");
-
-      // extraction
-      sb_cat(tail, "  // get measure ", api->compact_name,
-             " result from ", saddr, "\n");
-      sb_cat(tail, "  // ??? not implemented yet...\n");
-      free(saddr);
-    }
 
     // if inplace, append freed images to availables
     if (api->terapix.inplace)
@@ -944,6 +960,49 @@ static void freia_terapix_call
     *params = gen_nconc(*params,
                         freia_extract_params(opid, call_arguments(c),
                                              head, hparams, &nargs));
+
+    if (api->terapix.memory)
+    {
+      // reserve the necessary memory at the end of the segment
+      available_memory -= api->terapix.memory;
+      string saddr = strdup(itoa(available_memory));
+
+      // initialize the memory based on the measure operation
+      terapix_initialize_memory(decl, body, n_ops, available_memory, api, used);
+
+      // imagelet computation
+      sb_cat(body, "  // set measure ", api->compact_name, " at ", saddr, "\n");
+      terapix_mcu_val(body, n_ops, "xmin2", saddr);
+      terapix_mcu_val(body, n_ops, "ymin2", "0");
+
+      // should not be used, but just in case...
+      terapix_mcu_val(body, n_ops, "xmin3", "0");
+      terapix_mcu_val(body, n_ops, "ymin3", "0");
+
+      // extraction
+      sb_cat(tail, "  // get measure ", api->compact_name,
+             " result from ", saddr, "\n");
+      terapix_get_reduction(decl, tail, n_ops, available_memory, api);
+
+      sb_cat(tail, "  // assign reduction parameter",
+             api->arg_misc_out>1? "s":"", "\n");
+      int i = 0;
+      string sop = strdup(itoa(n_ops));
+      FOREACH(expression, arg, freia_get_vertex_params(current))
+      {
+        string var = (string) hash_get(hparams, arg);
+        // hmmm, kind of a hack to get the possibly needed cast
+        string cast = strdup(api->arg_out_types[i]);
+        string space = strchr(cast, ' ');
+        if (space) *space = '\0';
+        sb_cat(tail, "  *", var, " = (", cast, ") "
+               "red_", sop, "[", itoa(i), "];\n");
+        i++;
+        free(cast);
+      }
+      free(saddr);
+      free(sop);
+    }
 
     if (api==hwac_freia_api(AIPO "copy") && choice==INT(CAR(ins)))
     {
@@ -1050,7 +1109,7 @@ static void freia_terapix_call
     sb_cat(decl, "  terapix_tile_info tile_out[2][", itoa(n_outs), "];\n");
 
   // computed values
-  sb_cat(decl, "\n  // imagelets definitions:\n");
+  sb_cat(decl, "  // imagelets definitions:\n");
   sb_cat(decl, "  // - ", itoa(n_imagelets), " computation imagelets\n");
   sb_cat(decl, "  // - ", itoa(n_double_buffers), " double buffer imagelets\n");
 
@@ -1111,16 +1170,17 @@ static void freia_terapix_call
 
   // tell about imagelet erosion...
   // current output should be max(w,e) & max(n,s)
-  sb_cat(body, "\n  // imagelet erosion for the computation\n");
+  sb_cat(body, "  // imagelet erosion for the computation\n");
   sb_cat(body, "  mcu_instr.borderTop    = ", itoa(n), ";\n");
   sb_cat(body, "  mcu_instr.borderBottom = ", itoa(s), ";\n");
   sb_cat(body, "  mcu_instr.borderLeft   = ", itoa(w), ";\n");
   sb_cat(body, "  mcu_instr.borderRight  = ", itoa(e), ";\n");
-  sb_cat(body, "  mcu_instr.imagelet_height = imagelet_size;\n");
-  sb_cat(body, "  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;\n");
+  sb_cat(body, "  mcu_instr.imagelet_height = imagelet_size;\n"
+               "  mcu_instr.imagelet_width  = TERAPIX_PE_NUMBER;\n"
+               "\n");
 
-  sb_cat(body, "\n  // outputs\n");
-  sb_cat(body, "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
+  sb_cat(body, "  // outputs\n"
+               "  mcu_instr.nbout = ", itoa(n_outs), ";\n");
   if (n_outs)
     sb_cat(body,
            "  mcu_instr.out0 = tile_out[0];\n"
@@ -1130,8 +1190,9 @@ static void freia_terapix_call
            "  mcu_instr.out0 = NULL;\n"
            "  mcu_instr.out1 = NULL;\n");
 
-  sb_cat(body, "\n  // inputs\n");
-  sb_cat(body, "  mcu_instr.nbin = ", itoa(n_ins), ";\n");
+  sb_cat(body, "\n"
+               "  // inputs\n"
+               "  mcu_instr.nbin = ", itoa(n_ins), ";\n");
   if (n_ins)
     sb_cat(body,
            "  mcu_instr.in0 = tile_in[0];\n"
@@ -1142,7 +1203,8 @@ static void freia_terapix_call
            "  mcu_instr.in1 = NULL;\n");
 
   sb_cat(body,
-         "\n  // actual instructions\n"
+         "\n"
+         "  // actual instructions\n"
          "  mcu_instr.nbinstr = ", itoa(n_ops), ";\n"
          "  mcu_instr.instr0   = mcu_macro[0];\n"
          "  mcu_instr.instr1   = mcu_macro[1];\n");
