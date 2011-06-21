@@ -607,7 +607,7 @@ static void terapix_init_row(
          "  mem_init.iter3 = 0;\n"
          "  mem_init.iter4 = 0;\n"
          "  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;\n"
-         "  param.size = sizeof(terapix_mcu_macrocode);\n"
+         "  param.size = sizeof(terapix_mcu_macrocode); // not used?\n"
          "  param.raw = (void*) (&mem_init);\n"
          "  ret |= freia_mg_work(&param);\n"
          "  ret |= freia_mg_end_work();\n");
@@ -771,10 +771,6 @@ static void freia_terapix_call
          "  mcode.raw = (void*) terapix_ucode_array;\n"
          "  mcode.size = TERAPIX_UCODE_SIZE_T;\n"
          "  freia_mg_write_microcode(&mcode);\n"
-         "\n"
-         "  // subimage operation\n"
-         "  param.size = -1; // not used\n"
-         "  param.raw = (void*) &mcu_instr;\n"
          "\n"
          "  // dyn_param contents\n"
          "  dyn_param.raw = &gram;\n"
@@ -1147,11 +1143,13 @@ static void freia_terapix_call
          "  mcu_instr.instr0   = mcu_macro[0];\n"
          "  mcu_instr.instr1   = mcu_macro[1];\n");
 
-
   // tell about imagelet size
-  // ??? NOTE: the runtime *MUST* take care of possible in/out aliasing
-  sb_cat(body, "\n"
+  // NOTE: the runtime *MUST* take care of possible in/out aliasing
+  sb_cat(body,
+         "\n"
          "  // call terapix runtime\n"
+         "  param.size = -1; // not used\n"
+         "  param.raw = (void*) &mcu_instr;\n"
          "  ret |= freia_cg_template_process(&param");
   for (int i=0; i<n_outs; i++)
     sb_cat(body, ", o", itoa(i));
