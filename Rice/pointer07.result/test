@@ -1,0 +1,53 @@
+
+POINTS TO
+
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+void pointer07(double *a, double *b, double *c, int cnt)
+{
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+   double *w = (void *) 0;
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *NULL_POINTER*,-Exact-)}
+   int i;
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *NULL_POINTER*,-Exact-)}
+
+   w = (double *) malloc(cnt*sizeof(double));
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *HEAP*_l_8[0],-Exact-)}
+   for(i = 0; i <= cnt-1; i += 1)
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *HEAP*_l_8[0],-Exact-)}
+      w[i] = c[i]+a[i]*b[i];
+}
+
+Proper effects with points-to
+
+void pointer07(double *a, double *b, double *c, int cnt)
+{
+//             <    is written>: w
+   double *w = (void *) 0;
+   int i;
+//             <    is read   >: cnt _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w _MALLOC_EFFECTS:_MALLOC_
+
+   w = (double *) malloc(cnt*sizeof(double));
+//             <    is read   >: cnt
+//             <    is written>: i
+   for(i = 0; i <= cnt-1; i += 1)
+//             <    is read   >: _a_1[i] _b_2[i] _c_3[i] a b c cnt i w
+//             <    is written>: *HEAP*_l_8[i]
+      w[i] = c[i]+a[i]*b[i];
+}
+
+Parallel code
+
+void pointer07(double *a, double *b, double *c, int cnt)
+{
+   double *w = (void *) 0;
+   int i;
+
+   w = (double *) malloc(cnt*sizeof(double));
+   forall(i = 0; i <= cnt-1; i += 1)
+      w[i] = c[i]+a[i]*b[i];
+}
