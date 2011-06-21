@@ -3,6 +3,7 @@
 + image reuse
 + scalar deps with proper effects
 + check => ok => deadcode (#define)
+- bug: partial eval is over-optimistic when pointers are involved
 
 * input
 + may skip unrelated statements?
@@ -98,10 +99,11 @@
   hard constraint: 3 "pointers" are available; border management?
   is there anyway to somehow get the values of these pointers in a register
   and extract the six parameters independently?
-- complete measure ops! there is a needed initialization (setcst)...
++ complete measure ops! there is a needed initialization (setcst)...
 - check operators with constant arguments.
 - implement "enumerate" dag cutting strategy
 - it would be great if the simulator timings are ok for a paper...
+- cleanup declarations in the generated code, when not used?
 
 * OpenCL target
 + whole image computations are okay: see freia_aipo_compiler
