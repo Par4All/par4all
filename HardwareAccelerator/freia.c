@@ -170,15 +170,15 @@ freia_status freia_common_draw_rect(freia_data2d *image,
     return FREIA_OK;                          \
   }
 
-#define Fred3(name)                               \
-  freia_status                                    \
-  name(const freia_data2d * i,                    \
-       int32_t * r0, int32_t * r1, int32_t * r2)  \
-  {                                               \
-    *r0 = i->stuff;                               \
-    *r1 = i->stuff;                               \
-    *r2 = i->stuff;                               \
-    return FREIA_OK;                              \
+#define Fred3(name)                                 \
+  freia_status                                      \
+  name(const freia_data2d * i,                      \
+       int32_t * r0, uint32_t * r1, uint32_t * r2)  \
+  {                                                 \
+    *r0 = i->stuff;                                 \
+    *r1 = (uint32_t) i->stuff;                      \
+    *r2 = (uint32_t) i->stuff;                      \
+    return FREIA_OK;                                \
   }
 
 // AIPO function definitions
