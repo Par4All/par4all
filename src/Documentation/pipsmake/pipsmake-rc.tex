@@ -9397,6 +9397,14 @@ The property \PipsPropRef{ATOMIC_OPERATION_PROFILE} control the set of atomic
 operations and operand allowed. At that time only ``cuda'' is supported.
 \end{PipsPass}
 
+\begin{PipsPass}{flag_parallel_reduced_loops_with_atomic}
+\PipsPassRef{flag_parallel_reduced_loops_with_atomic} flag as parallel all loops 
+that were detected by \PipsPassRef{coarse_grain_parallelization_with_reduction}.
+
+The property \PipsPropRef{ATOMIC_OPERATION_PROFILE} control the set of atomic
+operations and operand allowed. At that time only ``cuda'' is supported.
+\end{PipsPass}
+
 \begin{PipsProp}{ATOMIC_OPERATION_PROFILE}
 ATOMIC_OPERATION_PROFILE "cuda"
 \end{PipsProp}
@@ -9411,6 +9419,14 @@ replace_reduction_with_atomic > MODULE.code
         < MODULE.cumulated_reductions
 \end{PipsMake}
 
+\begin{PipsMake}
+flag_parallel_reduced_loops_with_atomic > MODULE.code
+					> MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.reduction_parallel_loops
+        < MODULE.cumulated_reductions
+\end{PipsMake}
 
 
 \subsection{Forward Substitution}

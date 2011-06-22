@@ -98,6 +98,7 @@ static atomic_profile load_atomic_profile() {
  * Keep track of what is done in replace recursion
  */
 struct replace_ctx {
+  bool replace;
   bool replaced;
   bool unsupported;
   atomic_profile *profile;
@@ -248,19 +249,21 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
         } else {
           entity atomic_fun = atomic_function_of_operation(op);
           pips_assert("have a valid function",!entity_undefined_p(atomic_fun));
-          reference ref = copy_reference(reduction_reference(r));
-          expression addr_of_ref =
+          if(ctx->replace) {
+            reference ref = copy_reference(reduction_reference(r));
+            expression addr_of_ref =
               MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
                             reference_to_expression(ref));
-          list args = CONS(EXPRESSION,
-              addr_of_ref,
-              CONS(EXPRESSION,
-                  int_to_expression(1),
-                  NULL));
-          statement_instruction(s) = make_call_instruction(atomic_fun, args);
-          ifdebug(4) {
-            pips_debug(0,"Atomized statement : ");
-            print_statement(s);
+            list args = CONS(EXPRESSION,
+                             addr_of_ref,
+                             CONS(EXPRESSION,
+                                  int_to_expression(1),
+                                  NULL));
+            statement_instruction(s) = make_call_instruction(atomic_fun, args);
+            ifdebug(4) {
+              pips_debug(0,"Atomized statement : ");
+              print_statement(s);
+            }
           }
           ctx->replaced = true;
           *ctx->replaced_statements = CONS(statement,s,*ctx->replaced_statements);
@@ -273,9 +276,10 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
 }
 
 
-static bool replace_reductions_in_loop(statement loop_stat,
+static bool process_reductions_in_loop(statement loop_stat,
                                        atomic_profile *profile,
-                                       list *replaced_statements) {
+                                       list *replaced_statements,
+                                       bool replace) {
   bool ret = TRUE;
   if(statement_loop_p(loop_stat) && !loop_parallel_p(statement_loop(loop_stat))) {
     pips_debug(1,"Loop is parallel only with reduction, fetching reductions...\n");
@@ -284,7 +288,7 @@ static bool replace_reductions_in_loop(statement loop_stat,
     reductions rs = (reductions)load_statement_reductions(loop_stat);
     if(rs && !ENDP(reductions_list(rs))) {
       pips_debug(1,"Loop has a reduction ! Let's replace reductions inside\n");
-      struct replace_ctx ctx = { false,false,profile,replaced_statements };
+      struct replace_ctx ctx = { replace,false,false,profile,replaced_statements };
       gen_context_recurse(l,
                           &ctx,
                           statement_domain,
@@ -308,12 +312,7 @@ static bool replace_reductions_in_loop(statement loop_stat,
 }
 
 
-/**
- * Replace reduction with atomic operations
- */
-bool replace_reduction_with_atomic( string mod_name) {
-  debug_on("REPLACE_REDUCTION_WITH_ATOMIC_DEBUG_LEVEL");
-
+static bool process_reduced_loops(string mod_name, bool replace) {
   atomic_profile current_profile = load_atomic_profile();
   if(!current_profile.profile && current_profile.profile_size) {
     return false;
@@ -333,11 +332,11 @@ bool replace_reduction_with_atomic( string mod_name) {
   reduced_loops loops = (reduced_loops)db_get_memory_resource(DBR_REDUCTION_PARALLEL_LOOPS,
                                                            mod_name,
                                                            TRUE);
-  list replaced_statement = NIL;
+  list replaced_statements = NIL;
   set_ordering_to_statement(module_stat);
   FOREACH(int, ordering, reduced_loops_ordering(loops)) {
     statement s = ordering_to_statement(ordering);
-    replace_reductions_in_loop(s,&current_profile,&replaced_statement);
+    process_reductions_in_loop(s,&current_profile,&replaced_statements,replace);
   }
   reset_ordering_to_statement();
 
@@ -354,11 +353,37 @@ bool replace_reduction_with_atomic( string mod_name) {
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mod_name,
        compute_callees(get_current_module_statement()));
 
-  debug_off();
-
   reset_statement_reductions();
   reset_current_module_entity();
   reset_current_module_statement();
-
   return TRUE;
+}
+
+
+/**
+ * Replace reduction with atomic operations
+ */
+bool replace_reduction_with_atomic( string mod_name) {
+  debug_on("REPLACE_REDUCTION_WITH_ATOMIC_DEBUG_LEVEL");
+
+  bool result = process_reduced_loops(mod_name,true);
+
+  debug_off();
+
+  return result;
+}
+
+/**
+ * Flag loop as parallel when replacement with atomic is possible without doing
+ * the replacement
+ */
+bool flag_parallel_reduced_loops_with_atomic( string mod_name) {
+  debug_on("FLAG_PARALLEL_REDUCED_LOOPS_WITH_ATOMIC_DEBUG_LEVEL");
+
+  bool result = process_reduced_loops(mod_name,false);
+
+  debug_off();
+
+  return result;
+
 }
