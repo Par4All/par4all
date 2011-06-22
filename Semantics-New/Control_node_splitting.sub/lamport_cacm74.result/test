@@ -175,6 +175,16 @@ void ts_singlestate(void)
 
             checking_error();
       }
+
+//  T() {}
+
+   
+   
+   
+   
+   
+   
+   ;
 }
 
 //  T() {}
@@ -1129,6 +1139,16 @@ void ts_singlestate(void)
 
             checking_error();
       }
+
+//  P(a,b,s1,s2) {}
+
+   
+   
+   
+   
+   
+   
+   ;
 }
 
 //  P() {}

@@ -7,16 +7,11 @@ TRANSFORMERS
 void run(void)
 {
 
-//  T(n) {}
-
-   int n;
-
 //  T(n) {n==0}
 
-   n = 0;
+   int n = 0;
 
 //  T(n) {n#init==0}
-
 
    while (1)
 
@@ -53,14 +48,9 @@ void run(void)
 
 //  P() {}
 
-   int n;
-
-//  P(n) {}
-
-   n = 0;
+   int n = 0;
 
 //  P(n) {n==0}
-
 
    while (1)
 

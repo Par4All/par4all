@@ -222,6 +222,15 @@ void ts_restructured(void)
 
          checking_error();
    }
+
+//  T() {j==4, 17<=i, i<=20}
+
+   
+   
+   
+   
+   
+   ;
 }
 
 PRECONDITIONS
@@ -445,4 +454,13 @@ void ts_restructured(void)
 
          checking_error();
    }
+
+//  P(i,j) {j==4, 17<=i, i<=20}
+
+   
+   
+   
+   
+   
+   ;
 }

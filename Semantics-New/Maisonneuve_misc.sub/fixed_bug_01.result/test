@@ -13,7 +13,6 @@ void run(void)
 
 //  T(x) {x#init<=x}
 
-
    while (rand()%2)
 
 //  T(x) {x#init<=x, x<=x#init+1}
@@ -42,7 +41,6 @@ void run(void)
    int x;
 
 //  P(x) {}
-
 
    while (rand()%2)
 
