@@ -99,7 +99,7 @@ void checking_error(void) {
 void ts_singlestate(void) {
 	int x, d;
 	INI;
-	LOOP(OR(C1, OR(C2, C3)));
+	LOOP(OR(C1, OR(C2, C3)))
 }
 		
 void ts_restructured(void) {
@@ -113,7 +113,7 @@ void ts_restructured(void) {
 		LOOP(C2c; S4);
 		C2d; S5;
 		C1;
-	);
+	)
 }
 
 int main(void) {

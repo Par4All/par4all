@@ -118,7 +118,7 @@ void ts_singlestate(void) {
 		OR(C4,
 		OR(C5,
 		C6)))))
-	);
+	)
 }
 
 void ts_restructured(void) {

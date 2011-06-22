@@ -285,16 +285,6 @@ void ts_restructured(void)
 
          checking_error();
    }
-
-//  T() {d==1}
-
-   
-   
-   
-   
-   
-   
-   ;
 }
 
 PRECONDITIONS
@@ -582,14 +572,4 @@ void ts_restructured(void)
 
          checking_error();
    }
-
-//  P(d,x) {d==1, x==1}
-
-   
-   
-   
-   
-   
-   
-   ;
 }
