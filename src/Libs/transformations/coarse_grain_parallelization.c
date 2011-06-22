@@ -61,6 +61,7 @@
 #include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "reduction.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
@@ -82,6 +83,16 @@ static bool local_use_reductions_p;
 GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
 
 
+/**
+ * Reduction context
+ * Carry the depth of the loop nest and the reduced loop (if applicable)
+ */
+typedef struct coarse_grain_ctx {
+  int depth;
+  list reduced_loops;
+} coarse_grain_ctx;
+
+
 /** Parallelize a loop by using region informations to prove iteration
     independance.
 
@@ -90,11 +101,17 @@ GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
     @return TRUE to ask the calling NewGen iterator to go on recursion on
     further loops in this loop.
  */
-static bool whole_loop_parallelize(loop l)
+static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
 {
-  statement inner_stat = loop_body(l);
   /* Get the statement owning this loop: */
   statement loop_stat = (statement) gen_get_ancestor(statement_domain, l);
+
+  if (!get_bool_property("PARALLELIZE_AGAIN_PARALLEL_CODE")
+      && loop_parallel_p(l)) {
+    return false;
+  }
+
+  statement inner_stat = loop_body(l);
   /* ...needed by TestCoupleOfReferences(): */
   list l_enclosing_loops = CONS(STATEMENT, loop_stat, NIL);
 
@@ -158,7 +175,7 @@ static bool whole_loop_parallelize(loop l)
 	    int d2 = gen_length(reference_indices(r2));
 
 	    /* FI->RK: Careful, you are replicating code of chains.c,
-	       add_conflicts(). Why cannot you use region_chains? 
+	       add_conflicts(). Why cannot you use region_chains?
 
 	       The test below must evolve with Beatrice's work on memory
 	       access paths. d<=d2 is a very preliminary test for memory
@@ -266,8 +283,13 @@ static bool whole_loop_parallelize(loop l)
 	pips_debug(1, "SEQUENTIAL LOOP\n");
       else {
 	/* Mark the loop as parallel since we did not notice any conflict: */
-	pips_debug(1, "PARALLEL LOOP\n");
-	execution_tag(loop_execution(l)) = is_execution_parallel;
+        if(local_use_reductions_p) {
+          pips_debug(1, "PARALLEL LOOP WITH REDUCTIONS\n");
+          ctx->reduced_loops = CONS(int,statement_ordering(loop_stat),ctx->reduced_loops);
+        } else {
+          pips_debug(1, "PARALLEL LOOP\n");
+          execution_tag(loop_execution(l)) = is_execution_parallel;
+        }
       }
 
       /* Finally, free conflicts */
@@ -303,14 +325,21 @@ static bool whole_loop_parallelize(loop l)
     generated. This function assumes it is a deep copy of module_stat at
     entry.
  */
-static void coarse_grain_loop_parallelization(statement module_stat)
+static list coarse_grain_loop_parallelization(statement module_stat)
 {
   pips_debug(1,"begin\n");
 
+  coarse_grain_ctx ctx = { 0, NIL };
+
   // Iterate on the loops to try parallelizing them:
-  gen_recurse(module_stat, loop_domain, whole_loop_parallelize, gen_null);
+  gen_context_recurse(module_stat,
+                      &ctx,
+                      loop_domain,
+                      whole_loop_parallelize,
+                      gen_true);
 
   pips_debug(1,"end\n");
+  return ctx.reduced_loops;
 }
 
 
@@ -371,23 +400,24 @@ static bool coarse_grain_parallelization_main(string module_name,
     ResetLoopCounter();
 
     debug_on("COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL");
-	
+
     //module_parallelized_stat = copy_statement(module_stat);
-    coarse_grain_loop_parallelization(module_stat);
+    list loops = coarse_grain_loop_parallelization(module_stat);
 
     debug_off();
-
-    /* hey, actually it is not implemented as a transformation...
-     */
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE,
-			   module_name,
-			   (char*) module_stat);
 
     print_parallelization_statistics
 	(module_name, "post", module_stat);
 
     if(local_use_reductions_p) {
       reset_statement_reductions();
+      DB_PUT_MEMORY_RESOURCE(DBR_REDUCTION_PARALLEL_LOOPS,
+           module_name,
+           (char*) make_reduced_loops(loops));
+    } else {
+      DB_PUT_MEMORY_RESOURCE(DBR_CODE,
+           module_name,
+           (char*) module_stat);
     }
     reset_current_module_entity();
     reset_current_module_statement();

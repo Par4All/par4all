@@ -5584,7 +5584,7 @@ coarse_grain_parallelization > MODULE.code
 
 
 \begin{PipsMake}
-coarse_grain_parallelization_with_reduction > MODULE.code
+coarse_grain_parallelization_with_reduction > MODULE.reduction_parallel_loops
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
@@ -9407,6 +9407,7 @@ replace_reduction_with_atomic > MODULE.code
 			      > MODULE.callees
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.reduction_parallel_loops
         < MODULE.cumulated_reductions
 \end{PipsMake}
 

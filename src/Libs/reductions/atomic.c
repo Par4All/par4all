@@ -35,6 +35,7 @@
 #include "properties.h"
 #include "syntax.h"
 #include "reductions.h"
+#include "reduction.h"
 #include "callgraph.h"
 
 GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
@@ -100,6 +101,7 @@ struct replace_ctx {
   bool replaced;
   bool unsupported;
   atomic_profile *profile;
+  list *replaced_statements;
 };
 
 /**
@@ -213,49 +215,56 @@ static bool supported_atomic_operator_p(atomic_operation op,
 /* Replace a reduction in a statement by a pattern matching way */
 static bool replace_reductions_in_statement( statement s, struct replace_ctx *ctx ) {
   reductions rs = (reductions)load_statement_reductions(s);
-  if(rs && reductions_list(rs) && statement_call_p(s)) {
-    ifdebug(4) {
-      pips_debug(0,"Statement has a reduction ");
-      print_statement(s);
-    }
-    if(gen_length(reductions_list(rs))>1) {
-      pips_user_warning("Don't know how to handle multiple reductions on a "
-          "statement ! Abort...\n");
-      return FALSE;
-    }
-
-    reduction r = REDUCTION_CAST(CAR(reductions_list(rs)));
-    atomic_operation op = reduction_to_atomic_operation(r);
-    if(!supported_atomic_operator_p(op,ctx->profile)) {
-      ifdebug(1) {
-        pips_debug(0,"Unsupported reduction by atomic operation profile : ");
-        print_reduction(r);
-        fprintf(stderr,"\n");
+  if(gen_in_list_p(s,*ctx->replaced_statements)) {
+    pips_debug(1,"Already handled statement !\n");
+    ctx->replaced = true;
+  } else {
+    if(rs && reductions_list(rs) && statement_call_p(s)) {
+      ifdebug(4) {
+        pips_debug(0,"Statement has a reduction ");
+        print_statement(s);
       }
-    } else {
-      expression atomic_param = get_complement_expression(s,reduction_reference(r));
-      if(expression_undefined_p(atomic_param)) {
+      if(gen_length(reductions_list(rs)) > 1) {
+        pips_user_warning("Don't know how to handle multiple reductions on a "
+            "statement ! Abort...\n");
+        return FALSE;
+      }
+
+      reduction r = REDUCTION_CAST(CAR(reductions_list(rs)));
+      atomic_operation op = reduction_to_atomic_operation(r);
+      if(!supported_atomic_operator_p(op, ctx->profile)) {
         ifdebug(1) {
-          pips_debug(0,"Didn't manage to get complement expression :(\n");
+          pips_debug(0,"Unsupported reduction by atomic operation profile : ");
+          print_reduction(r);
+          fprintf(stderr, "\n");
         }
       } else {
-        entity atomic_fun = atomic_function_of_operation(op);
-        pips_assert("have a valid function",!entity_undefined_p(atomic_fun));
-        reference ref = copy_reference(reduction_reference(r));
-        expression addr_of_ref =
-            MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
-                          reference_to_expression(ref));
-        list args = CONS(EXPRESSION,
-                         addr_of_ref,
-                         CONS(EXPRESSION,
-                             int_to_expression(1),
-                             NULL));
-        statement_instruction(s) = make_call_instruction(atomic_fun,args);
-        ifdebug(4) {
-          pips_debug(0,"Atomized statement : ");
-          print_statement(s);
+        expression atomic_param =
+            get_complement_expression(s, reduction_reference(r));
+        if(expression_undefined_p(atomic_param)) {
+          ifdebug(1) {
+            pips_debug(0,"Didn't manage to get complement expression :(\n");
+          }
+        } else {
+          entity atomic_fun = atomic_function_of_operation(op);
+          pips_assert("have a valid function",!entity_undefined_p(atomic_fun));
+          reference ref = copy_reference(reduction_reference(r));
+          expression addr_of_ref =
+              MakeUnaryCall(entity_intrinsic(ADDRESS_OF_OPERATOR_NAME),
+                            reference_to_expression(ref));
+          list args = CONS(EXPRESSION,
+              addr_of_ref,
+              CONS(EXPRESSION,
+                  int_to_expression(1),
+                  NULL));
+          statement_instruction(s) = make_call_instruction(atomic_fun, args);
+          ifdebug(4) {
+            pips_debug(0,"Atomized statement : ");
+            print_statement(s);
+          }
+          ctx->replaced = true;
+          *ctx->replaced_statements = CONS(statement,s,*ctx->replaced_statements);
         }
-        ctx->replaced = true;
       }
     }
   }
@@ -264,18 +273,23 @@ static bool replace_reductions_in_statement( statement s, struct replace_ctx *ct
 }
 
 
-static bool replace_reductions_in_loop(loop l, atomic_profile *profile) {
+static bool replace_reductions_in_loop(statement loop_stat,
+                                       atomic_profile *profile,
+                                       list *replaced_statements) {
   bool ret = TRUE;
-  if(loop_parallel_p(l)) {
-    /* Get the statement owning this loop: */
-    statement loop_stat = (statement) gen_get_ancestor(statement_domain, l);
-    pips_debug(1,"Loop is parallel, fetching reductions...\n");
+  if(statement_loop_p(loop_stat) && !loop_parallel_p(statement_loop(loop_stat))) {
+    pips_debug(1,"Loop is parallel only with reduction, fetching reductions...\n");
+    loop l = statement_loop(loop_stat);
 //    reduction_reference(r);
     reductions rs = (reductions)load_statement_reductions(loop_stat);
     if(rs && !ENDP(reductions_list(rs))) {
       pips_debug(1,"Loop has a reduction ! Let's replace reductions inside\n");
-      struct replace_ctx ctx = { false,false,profile };
-      gen_context_recurse(l,&ctx,statement_domain,replace_reductions_in_statement,gen_null);
+      struct replace_ctx ctx = { false,false,profile,replaced_statements };
+      gen_context_recurse(l,
+                          &ctx,
+                          statement_domain,
+                          replace_reductions_in_statement,
+                          gen_null);
       if(!ctx.replaced) {
         pips_debug(1,"No reduction replaced for this loop, make it sequential "
                    "to be safe :-(\n");
@@ -285,6 +299,7 @@ static bool replace_reductions_in_loop(loop l, atomic_profile *profile) {
                            "to be safe :-(\n");
         execution_tag(loop_execution(l)) = is_execution_sequential;
       } else {
+        execution_tag(loop_execution(l)) = is_execution_parallel;
         ret = false;
       }
     }
@@ -314,7 +329,17 @@ bool replace_reduction_with_atomic( string mod_name) {
                                                     mod_name,
                                                     TRUE));
 
-  gen_context_recurse(module_stat, &current_profile, loop_domain,replace_reductions_in_loop,gen_null);
+  // Load targeted loops, those that need reductions to be parallel !
+  reduced_loops loops = (reduced_loops)db_get_memory_resource(DBR_REDUCTION_PARALLEL_LOOPS,
+                                                           mod_name,
+                                                           TRUE);
+  list replaced_statement = NIL;
+  set_ordering_to_statement(module_stat);
+  FOREACH(int, ordering, reduced_loops_ordering(loops)) {
+    statement s = ordering_to_statement(ordering);
+    replace_reductions_in_loop(s,&current_profile,&replaced_statement);
+  }
+  reset_ordering_to_statement();
 
   if (!statement_consistent_p(module_stat)) {
     pips_internal_error("Statement is inconsistent ! No choice but abort...\n");
