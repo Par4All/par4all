@@ -376,12 +376,14 @@ class p4a_processor(object):
         if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code(concurrent=True)
-        elif self.atomic:
+
+        # Always use a coarse-grain parallelization with regions:
+        all_modules.coarse_grain_parallelization(concurrent=True)
+
+        if self.atomic:
             # Use a coarse-grain parallelization with regions:
-            all_modules.coarse_grain_parallelization_with_reduction(concurrent=True)
-        else:
-            # Use a coarse-grain parallelization with regions:
-            all_modules.coarse_grain_parallelization(concurrent=True)
+            all_modules.flag_parallel_reduced_loops_with_atomic(concurrent=True)
+
 
 		#Apply requested phases after parallezation
         apply_user_requested_phases(all_modules, apply_phases_after)
@@ -617,18 +619,15 @@ class p4a_processor(object):
         # dependent resources:
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
-        if self.atomic:
-            # Use a coarse-grain parallelization with regions:
-            kernel_launchers.coarse_grain_parallelization_with_reduction(concurrent=True)
-            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
-        else:
-            kernel_launchers.coarse_grain_parallelization(concurrent=True)
-        
-        
+        kernel_launchers.coarse_grain_parallelization(concurrent=True)
+        # Idem for this phase:
+        kernel_launchers.replace_reduction_with_atomic(concurrent=True)
+                
         if fine:
             # When using a fine-grain parallelization (Allen & Kennedy) for
             # producing launchers, we have to do it also in the launcher now.
             kernel_launchers.internalize_parallel_code(concurrent=True)
+
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
