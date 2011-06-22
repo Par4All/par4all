@@ -1,4 +1,5 @@
-// This example requires transformer lists to be properly analyzed
+// If run with PIPS r19837, this example requires transformer lists
+// to be properly analyzed.
 
 // $Id$
 

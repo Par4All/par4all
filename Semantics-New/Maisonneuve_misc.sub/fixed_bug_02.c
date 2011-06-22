@@ -1,4 +1,4 @@
-// Segfaults in deprecated versions of PIPS
+// Segfaults in deprecated versions of PIPS.
 
 // $Id$
 

@@ -1,13 +1,11 @@
-// Segfaults in deprecated versions of PIPS
+// Segfaults in deprecated versions of PIPS.
 
 // $Id$
 
 #include <stdlib.h>
 
-void run(void)
-{
+void run(void) {
   int x;
-
   while (rand() % 2) {
     if (rand() % 2) {
       if (x < 0) {
@@ -17,8 +15,7 @@ void run(void)
   }
 }
 
-int main(void)
-{
+int main(void) {
   run();
   return 0;
 }

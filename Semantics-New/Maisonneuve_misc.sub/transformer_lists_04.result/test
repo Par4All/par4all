@@ -13,11 +13,9 @@ void run()
 
 //  T(n) {}
 
-
    while (rand())
 
 //  T(n) {}
-
 
       if (rand()%2)
 
@@ -26,7 +24,6 @@ void run()
          n = 0;
 
 //  T() {}
-
 
    if (n==42)
 
@@ -49,11 +46,9 @@ void run()
 
 //  P(n) {n==0}
 
-
    while (rand())
 
 //  P(n) {n==0}
-
 
       if (rand()%2)
 
@@ -62,7 +57,6 @@ void run()
          n = 0;
 
 //  P(n) {n==0}
-
 
    if (n==42)
 

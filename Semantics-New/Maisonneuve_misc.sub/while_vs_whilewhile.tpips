@@ -1,0 +1,36 @@
+delete while_vs_whilewhile
+create while_vs_whilewhile while_vs_whilewhile.c
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+echo
+echo Transformers for "whilealone"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[whilealone]
+
+echo
+echo Transformers for "whilewhile"
+echo
+
+display PRINTED_FILE[whilewhile]
+
+echo
+echo Preconditions for "whilealone"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[whilealone]
+
+echo
+echo Preconditions for "whilewhile"
+echo
+
+display PRINTED_FILE[whilewhile]
+
+close
+delete while_vs_whilewhile
+quit

@@ -1,4 +1,4 @@
-// Poor analysis of multiplication in deprecated versions of PIPS
+// Poor analysis of multiplication in deprecated versions of PIPS.
 
 // $Id$
 

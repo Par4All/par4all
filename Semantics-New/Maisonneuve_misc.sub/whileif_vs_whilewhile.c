@@ -1,3 +1,11 @@
+// This example illustrates that a while-if structure may lead to less
+// precise results than a while-while structure.
+// If run with PIPS r19837, the error function appears to be reachable in
+// whilewhile but not in whileif.
+
+// $Id$
+
+#include <stdlib.h>
 
 void error(void) {
 	exit(1);
@@ -17,7 +25,6 @@ void whileif(void) {
 		}
 	}
 }
-
 
 void whilewhile(void) {
 	int x, y;
@@ -39,3 +46,4 @@ int main(void) {
 	whilewhile();
 	return 0;
 }
+

@@ -1,5 +1,5 @@
-delete maisonneuve11
-create maisonneuve11 maisonneuve11.c
+delete transformer_lists_03
+create transformer_lists_03 transformer_lists_03.c
 
 setproperty ABORT_ON_USER_ERROR TRUE
 setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
@@ -16,11 +16,11 @@ echo
 echo PRECONDITIONS
 echo
 
-#setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
+setproperty SEMANTICS_USE_TRANSFORMER_LISTS TRUE
 
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE[run]
 
 close
-delete maisonneuve11
+delete transformer_lists_03
 quit

@@ -1,5 +1,5 @@
-// Bad reachability analysis in deprecated versions of PIPS, with
-// transformer lists
+// Bad reachability analysis in deprecated versions of PIPS, when using
+// transformer lists.
 
 // $Id$
 
@@ -7,9 +7,7 @@
 #include <stdio.h>
 
 void run(void) {
-	int n;
-	n = 0;
-	
+	int n = 0;
 	while (1) {
 		if (rand() % 2) {
 			if (n <= 9) n++;

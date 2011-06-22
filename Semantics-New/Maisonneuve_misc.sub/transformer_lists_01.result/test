@@ -6,7 +6,6 @@ TRANSFORMERS
 
 void run()
 {
-   // two variables: a is never known, b is always 0
 
 //  T(a) {}
 
@@ -18,16 +17,13 @@ void run()
 
 //  T(a,b) {b#init==0}
 
-
    while (1) {
 
 //  T(a) {0<=a}
 
-
       a = rand();
 
 //  T(b) {0<=a}
-
 
       if (rand()%2) {
 
@@ -53,7 +49,6 @@ PRECONDITIONS
 
 void run()
 {
-   // two variables: a is never known, b is always 0
 
 //  P() {}
 
@@ -65,16 +60,13 @@ void run()
 
 //  P(a,b) {b==0}
 
-
    while (1) {
 
 //  P(a,b) {b==0}
 
-
       a = rand();
 
 //  P(a,b) {b==0, 0<=a}
-
 
       if (rand()%2) {
 

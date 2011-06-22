@@ -1,4 +1,5 @@
-// This example requires transformer lists to be properly analyzed
+// If run with PIPS r19837, this example requires transformer lists
+// to be properly analyzed.
 
 // $Ids$
 
@@ -10,17 +11,12 @@ void error() {
 
 void run() {
 	int n = 0;
-
 	while (rand()) {
-
 		if (rand() % 2) {
 			n = 0;
 		}
-
 	}
-	
 	if (n == 42) error();
-	
 }
 
 int main(void) {
