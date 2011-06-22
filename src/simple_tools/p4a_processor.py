@@ -699,14 +699,10 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
-        if (self.fortran == False):
-            if self.c99:
-                kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        else:
-            kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+        if self.c99 or self.fortran:
+            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
         # Update the list of cuda modules
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
