@@ -557,7 +557,7 @@ void P4A_copy_to_accel_3d(size_t element_size,
 
     @{
 */
-#define atomicAddInt(operand,val) atomicInc((unsigned int *)operand,val)
+#define atomicAddInt(operand,val) atomicAdd((unsigned int *)operand,val)
 
 // FIXME still others to define...
 
