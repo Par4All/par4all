@@ -10172,6 +10172,9 @@ The user is prompted for various pieces of information in order to perform the o
 The statements are a subset of a sequence. They are counted in the
 sequence\marginpar{Serge: I invent...(FI)}.
 
+\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we pass
+written scalar by reference or not. This property might lead to incorrect code !
+
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10244,6 +10247,9 @@ OUTLINE_LOOP_BOUND_AS_PARAMETER ""
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
 OUTLINE_INDEPENDENT_COMPILATION_UNIT FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE}
+OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
 \end{PipsProp}
 
 
