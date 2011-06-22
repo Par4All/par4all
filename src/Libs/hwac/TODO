@@ -30,6 +30,7 @@
 - min commutes with dilate & max with erode, or vice-versa ?
 - other simple or complex algebraic optimization ideas?
   maybe at least A xor A => A = 0 would be useful?
+- redundancy: max coord includes max
 - check optimality of tests cases
 
 * code
@@ -40,7 +41,7 @@
 - remove type ctxcontent?
 - should make elementary ops absdiff(x,y) = abs(diff(x, y)) (no.. unsigned)
 - and then match back of necessary to available low level ops.
-- could separate DAG optimization as a separate phase? AIPO -> AIPO
++ could separate DAG optimization as a separate phase? AIPO -> AIPO
 
 * output
 + symmetry (flipping)
@@ -63,6 +64,7 @@
 - add checks in generated code (img size and so)?
 - parametric img size/depth? same as code?
 - the generated code is just a file to pips. ok???
+- DAG dump shoud differentiate input/output images if same...
 
 * post-processing
 + remove malloc/free if not used
@@ -91,8 +93,7 @@
 + shadow 4-way declaration
 + handling of various parameters...
 + detect that an argument is used several times...
-- sequence extraction shouldn't include
-  functions not implemented for the target?
+- sequence extraction shouldn't include ops not implemented for the target?
 + use global max length/ops/critical path as a decision driver?
   beware: do not extract input, even if live?!
 + extension: interface with SG terapix microcode generation
