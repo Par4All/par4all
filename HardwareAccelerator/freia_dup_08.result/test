@@ -326,6 +326,10 @@ freia_status freia_dup_08_helper_0_0_0(
   int imagelet_1 = 0;
   int imagelet_2 = 509;
 
+  // memory for reductions
+  int reduction_0 = 1023;
+  int reduction_1 = 1018;
+
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
   int imagelet_io_1_1 = imagelet_2;
@@ -354,7 +358,7 @@ freia_status freia_dup_08_helper_0_0_0(
   gram.params = p_0_val;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 0_val
-  mem_init.xmin1 = 1023;
+  mem_init.xmin1 = reduction_0;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -369,9 +373,9 @@ freia_status freia_dup_08_helper_0_0_0(
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
-  // set measure max at 1023
-  mcu_macro[0][0].xmin2 = 1023;
-  mcu_macro[1][0].xmin2 = 1023;
+  // set measure max at reduction_0
+  mcu_macro[0][0].xmin2 = reduction_0;
+  mcu_macro[1][0].xmin2 = reduction_0;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   mcu_macro[0][0].xmin3 = 0;
@@ -402,7 +406,7 @@ freia_status freia_dup_08_helper_0_0_0(
   gram.params = p_1_val;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 1_val
-  mem_init.xmin1 = 1018;
+  mem_init.xmin1 = reduction_1;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -426,7 +430,7 @@ freia_status freia_dup_08_helper_0_0_0(
   gram.params = p_1_loc;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 1_loc
-  mem_init.xmin1 = 1019;
+  mem_init.xmin1 = reduction_1+1;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -441,9 +445,9 @@ freia_status freia_dup_08_helper_0_0_0(
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
-  // set measure max! at 1018
-  mcu_macro[0][1].xmin2 = 1018;
-  mcu_macro[1][1].xmin2 = 1018;
+  // set measure max! at reduction_1
+  mcu_macro[0][1].xmin2 = reduction_1;
+  mcu_macro[1][1].xmin2 = reduction_1;
   mcu_macro[0][1].ymin2 = 0;
   mcu_macro[1][1].ymin2 = 0;
   mcu_macro[0][1].xmin3 = 0;
@@ -503,8 +507,8 @@ freia_status freia_dup_08_helper_0_0_0(
   ret |= freia_cg_template_process(&param, i0);
 
   // extract measures
-  // get measure max result from 1023
-  redter.xres = 1023;
+  // get measure max result from reduction_0
+  redter.xres = reduction_0;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
@@ -519,8 +523,8 @@ freia_status freia_dup_08_helper_0_0_0(
 
   // assign reduction parameter
   *po1 = (int32_t) red_0[0];
-  // get measure max! result from 1018
-  redter.xres = 1018;
+  // get measure max! result from reduction_1
+  redter.xres = reduction_1;
   redter.yres = 0;
   redter.width = 5;
   redter.height = TERAPIX_PE_NUMBER;

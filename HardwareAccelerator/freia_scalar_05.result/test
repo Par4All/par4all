@@ -1139,6 +1139,9 @@ freia_status freia_scalar_05_helper_0_1_0(
   int imagelet_2 = 340;
   int imagelet_3 = 680;
 
+  // memory for reductions
+  int reduction_2 = 1022;
+
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
   int imagelet_io_1_1 = imagelet_3;
@@ -1232,7 +1235,7 @@ freia_status freia_scalar_05_helper_0_1_0(
   gram.params = p_2_val;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 2_val
-  mem_init.xmin1 = 1022;
+  mem_init.xmin1 = reduction_2;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -1247,9 +1250,9 @@ freia_status freia_scalar_05_helper_0_1_0(
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
-  // set measure vol at 1022
-  mcu_macro[0][2].xmin2 = 1022;
-  mcu_macro[1][2].xmin2 = 1022;
+  // set measure vol at reduction_2
+  mcu_macro[0][2].xmin2 = reduction_2;
+  mcu_macro[1][2].xmin2 = reduction_2;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   mcu_macro[0][2].xmin3 = 0;
@@ -1371,8 +1374,8 @@ freia_status freia_scalar_05_helper_0_1_0(
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
-  // get measure vol result from 1022
-  redter.xres = 1022;
+  // get measure vol result from reduction_2
+  redter.xres = reduction_2;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
@@ -1459,6 +1462,10 @@ freia_status freia_scalar_05_helper_0_2_0(
   int imagelet_2 = 340;
   int imagelet_3 = 680;
 
+  // memory for reductions
+  int reduction_0 = 1023;
+  int reduction_2 = 1022;
+
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
   int imagelet_io_1_1 = imagelet_3;
@@ -1487,7 +1494,7 @@ freia_status freia_scalar_05_helper_0_2_0(
   gram.params = p_0_val;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 0_val
-  mem_init.xmin1 = 1023;
+  mem_init.xmin1 = reduction_0;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -1502,9 +1509,9 @@ freia_status freia_scalar_05_helper_0_2_0(
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
-  // set measure max at 1023
-  mcu_macro[0][0].xmin2 = 1023;
-  mcu_macro[1][0].xmin2 = 1023;
+  // set measure max at reduction_0
+  mcu_macro[0][0].xmin2 = reduction_0;
+  mcu_macro[1][0].xmin2 = reduction_0;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   mcu_macro[0][0].xmin3 = 0;
@@ -1567,7 +1574,7 @@ freia_status freia_scalar_05_helper_0_2_0(
   gram.params = p_2_val;
   freia_mg_write_dynamic_param(&dyn_param);
   // initialize memory for operation 2_val
-  mem_init.xmin1 = 1022;
+  mem_init.xmin1 = reduction_2;
   mem_init.ymin1 = 0;
   mem_init.xmin2 = 0;
   mem_init.ymin2 = 0;
@@ -1582,9 +1589,9 @@ freia_status freia_scalar_05_helper_0_2_0(
   param.raw = (void*) (&mem_init);
   ret |= freia_mg_work(&param);
   ret |= freia_mg_end_work();
-  // set measure min at 1022
-  mcu_macro[0][2].xmin2 = 1022;
-  mcu_macro[1][2].xmin2 = 1022;
+  // set measure min at reduction_2
+  mcu_macro[0][2].xmin2 = reduction_2;
+  mcu_macro[1][2].xmin2 = reduction_2;
   mcu_macro[0][2].ymin2 = 0;
   mcu_macro[1][2].ymin2 = 0;
   mcu_macro[0][2].xmin3 = 0;
@@ -1669,8 +1676,8 @@ freia_status freia_scalar_05_helper_0_2_0(
   ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
-  // get measure max result from 1023
-  redter.xres = 1023;
+  // get measure max result from reduction_0
+  redter.xres = reduction_0;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
@@ -1685,8 +1692,8 @@ freia_status freia_scalar_05_helper_0_2_0(
 
   // assign reduction parameter
   *po2 = (int32_t) red_0[0];
-  // get measure min result from 1022
-  redter.xres = 1022;
+  // get measure min result from reduction_2
+  redter.xres = reduction_2;
   redter.yres = 0;
   redter.width = 1;
   redter.height = TERAPIX_PE_NUMBER;
