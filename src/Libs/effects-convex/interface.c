@@ -475,7 +475,7 @@ regions_of_expression(expression e, transformer context)
     list le;
 
     le = proper_regions_of_expression(e, context);
-    le = proper_regions_contract(le);
+    le = proper_effects_contract(le);
     return(le);
 }
 

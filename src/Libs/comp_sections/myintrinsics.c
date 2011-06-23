@@ -349,7 +349,7 @@ affect_comp_regions(entity __attribute__ ((unused)) e,
     le = comp_regions_of_write(syntax_reference(s), context);
 
     le = CompRegionsExactUnion(le, comp_regions_of_expression(rhs, context), 
-			  regions_same_action_p);
+			  effects_same_action_p);
 
     debug(5, "affect_comp_regions", "end\n");
 
@@ -413,7 +413,7 @@ transformer context;
 	    }, lep);
 	}
 
-	le = CompRegionsExactUnion(le, lep, regions_same_action_p);
+	le = CompRegionsExactUnion(le, lep, effects_same_action_p);
 
 	/* regions effects on logical units - taken from effects/io.c */
 	if ((get_bool_property ("PRETTYPRINT_IO_EFFECTS")) &&
@@ -443,10 +443,10 @@ transformer context;
 	    ref = make_reference(private_io_entity,indices);
 	    le = CompRegionsExactUnion(le, 
 				 comp_regions_of_read(ref, context), 
-				 regions_same_action_p);
+				 effects_same_action_p);
 	    le = CompRegionsExactUnion(le, 
 				 comp_regions_of_write(ref, context), 
-				 regions_same_action_p);
+				 effects_same_action_p);
 	    
 	}
 	
@@ -525,7 +525,7 @@ transformer context;
 	}
       }
       
-      le = CompRegionsExactUnion(le, lep, regions_same_action_p);
+      le = CompRegionsExactUnion(le, lep, effects_same_action_p);
       
       exprs = CDR(exprs);
     }
@@ -584,7 +584,7 @@ transformer context;
 	
     /* regions of implied-loop bounds and increment */
     le = CompRegionsExactUnion(comp_regions_of_expression(arg2,context), le, 
-			  regions_same_action_p);
+			  effects_same_action_p);
 
 
     /* the preconditions of the current statement don't include those
@@ -635,7 +635,7 @@ transformer context;
 		    }
 		}, lep);
 	    gen_free_list(lep);
-	    le = CompRegionsExactUnion(le, lr, regions_same_action_p);
+	    le = CompRegionsExactUnion(le, lr, effects_same_action_p);
 	    
 	}, CDR(CDR(args)));
     
