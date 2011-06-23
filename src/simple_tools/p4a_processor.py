@@ -621,13 +621,15 @@ class p4a_processor(object):
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
         kernel_launchers.coarse_grain_parallelization(concurrent=True)
-        # Idem for this phase:
-        kernel_launchers.replace_reduction_with_atomic(concurrent=True)
         
         if fine:
             # When using a fine-grain parallelization (Allen & Kennedy) for
             # producing launchers, we have to do it also in the launcher now.
             kernel_launchers.internalize_parallel_code(concurrent=True)
+
+        if self.atomic:
+            # Idem for this phase:
+            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
                 
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
