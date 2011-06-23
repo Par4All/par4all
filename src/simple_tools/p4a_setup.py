@@ -47,6 +47,9 @@ def add_module_options(parser):
     group.add_option("--skip-pips", "--sP", action = "store_true", default = False,
         help = "Skip building and installing of PIPS.")
 
+    group.add_option("--skip-examples", "--sE", action = "store_true", default = False,
+        help = "Skip installing examples.")
+
     group.add_option("--skip", "-s", metavar = "PACKAGE", action = "append", default = [],
         help = "Alias for being able to say -s pips (besides --skip pips), for example. -sall or --skip all are also available and means 'skip all', in which case only final installation stages will be performed.")
 
@@ -206,11 +209,14 @@ def work(options, args = None):
             options.skip_linear = True
         elif s == "pips":
             options.skip_pips = True
+        elif s == "example":
+            options.skip_examples = True
         elif s == "all":
             options.skip_polylib = True
             options.skip_newgen = True
             options.skip_linear = True
             options.skip_pips = True
+            options.skip_examples = True
         else:
             p4a_util.die("Invalid option: --skip=" + s)
         if options.clean:
@@ -221,6 +227,7 @@ def work(options, args = None):
         options.skip_newgen = True
         options.skip_linear = True
         options.skip_pips = True
+        options.skip_examples = True
         # ... but
         if s == "polylib":
             options.skip_polylib = False
@@ -230,6 +237,8 @@ def work(options, args = None):
             options.skip_linear = False
         elif s == "pips":
             options.skip_pips = False
+        elif s == "example":
+            options.skip_examples = False
         else:
             p4a_util.die("Invalid option: --only=" + s)
         if options.clean:
@@ -239,6 +248,7 @@ def work(options, args = None):
         options.skip_newgen = False
         options.skip_linear = False
         options.skip_pips = False
+        options.skip_examples = False
         options.rebuild = True
 
     options.reconf_polylib = False
@@ -732,8 +742,9 @@ def work(options, args = None):
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "RELEASE-NOTES.txt"), install_dir ])
     p4a_util.info("Installing license")
     p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "LICENSE.txt"), install_dir ])
-    p4a_util.info("Installing examples")
-    p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
+    if not options.skip_examples:
+        p4a_util.info("Installing examples")
+        p4a_util.run([ "cp", "-rv", "--remove-destination", os.path.join(root, "examples"), install_dir ])
 
     # Write the environment shell scripts.
     p4a_util.info("Writing shell rc files")
