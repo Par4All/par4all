@@ -252,12 +252,6 @@ list RegionsIntersection(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsIntersection", "begin\n");
-    /* l_res = list_of_effects_generic_binary_op(l1, l2,
-					   intersection_combinable_p,
-					   region_intersection,
-					   region_to_nil_list,
-					   region_to_nil_list); */
-
 
     l_res = list_of_effects_generic_intersection_op(l1, l2,
 					   intersection_combinable_p,
@@ -284,11 +278,15 @@ list RegionsEntitiesIntersection(list l1, list l2,
     list l_res = NIL;
 
     pips_debug(3, "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   intersection_combinable_p,
 					   region_entities_intersection,
 					   region_to_nil_list,
-					   region_to_nil_list);
+					   region_to_nil_list); */
+
+    l_res = list_of_effects_generic_cells_intersection_op(l1, l2,
+					   intersection_combinable_p,
+					   region_entities_intersection);
     pips_debug(3, "end\n");
 
     return l_res;
@@ -339,12 +337,15 @@ list RegionsInfDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsInfDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   region_inf_difference,
 					   region_to_list,
-					   region_to_nil_list);
-    debug(3, "RegionsInfDifference", "end\n");
+					   region_to_nil_list); */
+    l_res = list_of_effects_generic_inf_difference_op(l1, l2,
+					   difference_combinable_p,
+					   region_inf_difference);
+     debug(3, "RegionsInfDifference", "end\n");
 
     return l_res;
 }
@@ -369,11 +370,14 @@ list RegionsEntitiesInfDifference(
     list l_res = NIL;
 
     debug(3, "RegionsEntitiesInfDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   regions_to_nil_list,
 					   region_to_list,
-					   region_to_nil_list);
+					   region_to_nil_list);*/
+    l_res = list_of_effects_generic_cells_inf_difference_op(l1, l2,
+					   difference_combinable_p,
+					   regions_to_nil_list);
     debug(3, "RegionsEntitiesInfDifference", "end\n");
 
     return l_res;
