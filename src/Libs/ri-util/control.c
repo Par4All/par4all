@@ -1265,9 +1265,12 @@ void insert_control_in_arc(control c, control before, control after) {
 	      is_control_in_list_p(before, control_predecessors(after)));
 
   // FI: we might also assert that the statement associated to c is
-  // not a test
-  pips_assert("c is not a test: it has only one successor at most",
-	      !statement_test_p(control_statement(c)));
+  // not a test... but it is not possible when sequences are
+  // transformed into a chain of nodes. So, temporarily, you can have
+  // test control nodes with only one successor. May be definitely if
+  // they are structured?
+  //pips_assert("c is not a test: it has only one successor at most",
+  //	      !statement_test_p(control_statement(c)));
 
   // FI: when before is a test, how do you know if c must be in the
   // true or in the false branch?
