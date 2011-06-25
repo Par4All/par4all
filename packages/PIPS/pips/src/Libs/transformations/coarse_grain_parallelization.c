@@ -61,6 +61,7 @@
 #include "effects-convex.h"
 #include "pipsdbm.h"
 #include "resources.h"
+#include "reduction.h"
 
 /* includes pour system generateur */
 #include "ray_dte.h"
@@ -82,6 +83,16 @@ static bool local_use_reductions_p;
 GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
 
 
+/**
+ * Reduction context
+ * Carry the depth of the loop nest and the reduced loop (if applicable)
+ */
+typedef struct coarse_grain_ctx {
+  int depth;
+  list reduced_loops;
+} coarse_grain_ctx;
+
+
 /** Parallelize a loop by using region informations to prove iteration
     independance.
 
@@ -90,11 +101,17 @@ GENERIC_LOCAL_FUNCTION(statement_reductions, pstatement_reductions)
     @return TRUE to ask the calling NewGen iterator to go on recursion on
     further loops in this loop.
  */
-static bool whole_loop_parallelize(loop l)
+static bool whole_loop_parallelize(loop l, coarse_grain_ctx *ctx)
 {
-  statement inner_stat = loop_body(l);
   /* Get the statement owning this loop: */
   statement loop_stat = (statement) gen_get_ancestor(statement_domain, l);
+
+  if (!get_bool_property("PARALLELIZE_AGAIN_PARALLEL_CODE")
+      && loop_parallel_p(l)) {
+    return false;
+  }
+
+  statement inner_stat = loop_body(l);
   /* ...needed by TestCoupleOfReferences(): */
   list l_enclosing_loops = CONS(STATEMENT, loop_stat, NIL);
 
@@ -120,61 +137,61 @@ static bool whole_loop_parallelize(loop l)
     {
       set lreductions = set_make(set_pointer);
       if(local_use_reductions_p) {
-	pips_debug(1,"Fetching reductions for this loop\n");
-	//    reduction_reference(r);
-	reductions rs = (reductions)load_statement_reductions(loop_stat);
-	FOREACH(REDUCTION,r,reductions_list(rs)) {
-	  print_reduction(r);
-	  entity e = reference_variable(reduction_reference(r));
-	  pips_debug(1,"Ignoring dependences on %s for this loop\n",entity_local_name(e));
-	  set_add_element(lreductions,lreductions,e);
-	}
+        pips_debug(1,"Fetching reductions for this loop\n");
+        //    reduction_reference(r);
+        reductions rs = (reductions)load_statement_reductions(loop_stat);
+        FOREACH(REDUCTION,r,reductions_list(rs)) {
+          print_reduction(r);
+          entity e = reference_variable(reduction_reference(r));
+          pips_debug(1,"Ignoring dependences on %s for this loop\n",entity_local_name(e));
+          set_add_element(lreductions,lreductions,e);
+        }
       }
 
       pips_debug(1,"building conflicts\n");
       ifdebug(2) {
-	fprintf(stderr, "original invariant regions:\n");
-	print_regions(l_reg);
+        fprintf(stderr, "original invariant regions:\n");
+        print_regions(l_reg);
       }
 
       /* First, builds list of conflicts: */
       FOREACH(EFFECT, reg, l_reg) {
-	entity e = region_entity(reg);
-	reference r = effect_any_reference(reg);
-	int d = gen_length(reference_indices(r));
+        entity e = region_entity(reg);
+        reference r = effect_any_reference(reg);
+        int d = gen_length(reference_indices(r));
 
-	if (region_write_p(reg) && store_effect_p(reg) &&  !(thread_safe_p && thread_safe_variable_p(e))
-	    && !(local_use_reductions_p && set_belong_p(lreductions,e))
-	    ) {
-	  conflict conf = conflict_undefined;
+        if (region_write_p(reg) && store_effect_p(reg) &&  !(thread_safe_p && thread_safe_variable_p(e))
+            && !(local_use_reductions_p && set_belong_p(lreductions,e))
+            ) {
+          conflict conf = conflict_undefined;
 
-	  /* Add a write-write conflict to the list: */
-	  conf = make_conflict(reg, reg, cone_undefined);
-	  l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
+          /* Add a write-write conflict to the list: */
+          conf = make_conflict(reg, reg, cone_undefined);
+          l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
 
-	  /* Search for a write-read/read-write conflict */
-	  FOREACH(EFFECT, reg2, l_reg) {
-	    reference r2 = effect_any_reference(reg2);
-	    int d2 = gen_length(reference_indices(r2));
+          /* Search for a write-read/read-write conflict */
+          FOREACH(EFFECT, reg2, l_reg) {
+            reference r2 = effect_any_reference(reg2);
+            int d2 = gen_length(reference_indices(r2));
 
-	    /* FI->RK: Careful, you are replicating code of chains.c,
-	       add_conflicts(). Why cannot you use region_chains? 
+            /* FI->RK: Careful, you are replicating code of chains.c,
+               add_conflicts(). Why cannot you use region_chains?
 
-	       The test below must evolve with Beatrice's work on memory
-	       access paths. d<=d2 is a very preliminary test for memory
-	       access paths.
-	    */
+               The test below must evolve with Beatrice's work on memory
+               access paths. d<=d2 is a very preliminary test for memory
+               access paths.
+            */
 
-	    if (same_entity_p(e,region_entity(reg2)) && store_effect_p(reg2) && region_read_p(reg2) && d<=d2) {
-	      /* Add a write-read conflict */
-	      conf = make_conflict(reg, reg2, cone_undefined);
-	      l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
-	      /* There is at most one read region for entity e by definition
-		 of the regions, so it's useless to go on interating: */
-	      break;
-	    }
-	  }
-	}
+            if (same_entity_p(e,region_entity(reg2)) && store_effect_p(reg2) && region_read_p(reg2) && d<=d2) {
+              /* Add a write-read conflict */
+              conf = make_conflict(reg, reg2, cone_undefined);
+              l_conflicts = gen_nconc(l_conflicts, CONS(CONFLICT, conf, NIL));
+              /* There is at most one read region for entity e by definition
+                 of the regions, so it's useless to go on interating: */
+              break;
+            }
+          }
+        }
       }
 
       /* THEN, TESTS CONFLICTS */
@@ -183,99 +200,104 @@ static bool whole_loop_parallelize(loop l)
        * time. */
       Finds2s1 = TRUE;
       FOREACH(CONFLICT, conf, l_conflicts) {
-	effect reg1 = conflict_source(conf);
-	effect reg2 = conflict_sink(conf);
-	list levels = NIL;
-	list levelsop = NIL;
-	Ptsg gs = SG_UNDEFINED;
-	Ptsg gsop = SG_UNDEFINED;
+        effect reg1 = conflict_source(conf);
+        effect reg2 = conflict_sink(conf);
+        list levels = NIL;
+        list levelsop = NIL;
+        Ptsg gs = SG_UNDEFINED;
+        Ptsg gsop = SG_UNDEFINED;
 
-	ifdebug(2) {
-	  fprintf(stderr, "testing conflict from:\n");
-	  print_region(reg1);
-	  fprintf(stderr, "\tto:\n");
-	  print_region(reg2);
-	}
+        ifdebug(2) {
+          fprintf(stderr, "testing conflict from:\n");
+          print_region(reg1);
+          fprintf(stderr, "\tto:\n");
+          print_region(reg2);
+        }
 
-	/* Use the function TestCoupleOfReferences from ricedg. */
-	/* We only consider one loop at a time, disconnected from
-	 * the other enclosing and inner loops. Thus l_enclosing_loops
-	 * only contains the current loop statement.
-	 * The list of loop variants is empty, because we use loop invariant
-	 * regions (they have been composed by the loop transformer).
-	 */
-	levels = TestCoupleOfReferences(l_enclosing_loops, region_system(reg1),
-					inner_stat, reg1, effect_any_reference(reg1),
-					l_enclosing_loops, region_system(reg2),
-					inner_stat, reg2, effect_any_reference(reg2),
-					NIL, &gs, &levelsop, &gsop);
-	ifdebug(2) {
-	  fprintf(stderr, "result:\n");
-	  if (ENDP(levels) && ENDP(levelsop))
-	    fprintf(stderr, "\tno dependence\n");
+        /* Use the function TestCoupleOfReferences from ricedg. */
+        /* We only consider one loop at a time, disconnected from
+         * the other enclosing and inner loops. Thus l_enclosing_loops
+         * only contains the current loop statement.
+         * The list of loop variants is empty, because we use loop invariant
+         * regions (they have been composed by the loop transformer).
+         */
+        levels = TestCoupleOfReferences(l_enclosing_loops, region_system(reg1),
+                                        inner_stat, reg1, effect_any_reference(reg1),
+                                        l_enclosing_loops, region_system(reg2),
+                                        inner_stat, reg2, effect_any_reference(reg2),
+                                        NIL, &gs, &levelsop, &gsop);
+        ifdebug(2) {
+          fprintf(stderr, "result:\n");
+          if (ENDP(levels) && ENDP(levelsop))
+            fprintf(stderr, "\tno dependence\n");
 
-	  if (!ENDP(levels)) {
-	    fprintf(stderr, "\tdependence at levels: ");
-	    FOREACH(INT, l, levels)
-	      fprintf(stderr, " %d", l);
-	    fprintf(stderr, "\n");
+          if (!ENDP(levels)) {
+            fprintf(stderr, "\tdependence at levels: ");
+            FOREACH(INT, l, levels)
+              fprintf(stderr, " %d", l);
+            fprintf(stderr, "\n");
 
-	    if (!SG_UNDEFINED_P(gs)) {
-	      Psysteme sc = SC_UNDEFINED;
-	      fprintf(stderr, "\tdependence cone:\n");
-	      sg_fprint_as_dense(stderr, gs, gs->base);
-	      sc = sg_to_sc_chernikova(gs);
-	      fprintf(stderr,"\tcorresponding linear system:\n");
-	      sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
-	      sc_rm(sc);
-	    }
-	  }
-	  if (!ENDP(levelsop)) {
-	    fprintf(stderr, "\topposite dependence at levels: ");
-	    FOREACH(INT, l, levelsop)
-	      fprintf(stderr, " %d", l);
-	    fprintf(stderr, "\n");
+            if (!SG_UNDEFINED_P(gs)) {
+              Psysteme sc = SC_UNDEFINED;
+              fprintf(stderr, "\tdependence cone:\n");
+              sg_fprint_as_dense(stderr, gs, gs->base);
+              sc = sg_to_sc_chernikova(gs);
+              fprintf(stderr,"\tcorresponding linear system:\n");
+              sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
+              sc_rm(sc);
+            }
+          }
+          if (!ENDP(levelsop)) {
+            fprintf(stderr, "\topposite dependence at levels: ");
+            FOREACH(INT, l, levelsop)
+              fprintf(stderr, " %d", l);
+            fprintf(stderr, "\n");
 
-	    if (!SG_UNDEFINED_P(gsop)) {
-	      Psysteme sc = SC_UNDEFINED;
-	      fprintf(stderr, "\tdependence cone:\n");
-	      sg_fprint_as_dense(stderr, gsop, gsop->base);
-	      sc = sg_to_sc_chernikova(gsop);
-	      fprintf(stderr,"\tcorresponding linear system:\n");
-	      sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
-	      sc_rm(sc);
-	    }
-	  }
-	}
-	/* If the dependence cannot be disproved, add it to the list of
-	   assumed dependences. */
-	if (!ENDP(levels) || !ENDP(levelsop))
-	  may_conflicts_p = TRUE;
+            if (!SG_UNDEFINED_P(gsop)) {
+              Psysteme sc = SC_UNDEFINED;
+              fprintf(stderr, "\tdependence cone:\n");
+              sg_fprint_as_dense(stderr, gsop, gsop->base);
+              sc = sg_to_sc_chernikova(gsop);
+              fprintf(stderr,"\tcorresponding linear system:\n");
+              sc_fprint(stderr,sc,(get_variable_name_t)entity_local_name);
+              sc_rm(sc);
+            }
+          }
+        }
+        /* If the dependence cannot be disproved, add it to the list of
+           assumed dependences. */
+        if (!ENDP(levels) || !ENDP(levelsop))
+          may_conflicts_p = TRUE;
 
-	gen_free_list(levels);
-	gen_free_list(levelsop);
-	if (!SG_UNDEFINED_P(gs))
-	  sg_rm(gs);
-	if (!SG_UNDEFINED_P(gsop))
-	  sg_rm(gsop);
+        gen_free_list(levels);
+        gen_free_list(levelsop);
+        if (!SG_UNDEFINED_P(gs))
+          sg_rm(gs);
+        if (!SG_UNDEFINED_P(gsop))
+          sg_rm(gsop);
       }
 
       /* Was there any conflict? */
       if (may_conflicts_p)
-	/* Do not change the loop since it is sequential: */
-	pips_debug(1, "SEQUENTIAL LOOP\n");
+        /* Do not change the loop since it is sequential: */
+        pips_debug(1, "SEQUENTIAL LOOP\n");
       else {
-	/* Mark the loop as parallel since we did not notice any conflict: */
-	pips_debug(1, "PARALLEL LOOP\n");
-	execution_tag(loop_execution(l)) = is_execution_parallel;
+        /* Mark the loop as parallel since we did not notice any conflict: */
+        if(local_use_reductions_p) {
+          pips_debug(1, "PARALLEL LOOP WITH REDUCTIONS\n");
+          ctx->reduced_loops = CONS(int,statement_ordering(loop_stat),ctx->reduced_loops);
+        } else {
+          pips_debug(1, "PARALLEL LOOP\n");
+          execution_tag(loop_execution(l)) = is_execution_parallel;
+        }
       }
 
       /* Finally, free conflicts */
       pips_debug(1,"freeing conflicts\n");
       FOREACH(CONFLICT, c, l_conflicts) {
-	conflict_source(c) = effect_undefined;
-	conflict_sink(c) = effect_undefined;
-	free_conflict(c);
+        conflict_source(c) = effect_undefined;
+        conflict_sink(c) = effect_undefined;
+        free_conflict(c);
       }
       gen_free_list(l_conflicts);
 
@@ -303,14 +325,21 @@ static bool whole_loop_parallelize(loop l)
     generated. This function assumes it is a deep copy of module_stat at
     entry.
  */
-static void coarse_grain_loop_parallelization(statement module_stat)
+static list coarse_grain_loop_parallelization(statement module_stat)
 {
   pips_debug(1,"begin\n");
 
+  coarse_grain_ctx ctx = { 0, NIL };
+
   // Iterate on the loops to try parallelizing them:
-  gen_recurse(module_stat, loop_domain, whole_loop_parallelize, gen_null);
+  gen_context_recurse(module_stat,
+                      &ctx,
+                      loop_domain,
+                      whole_loop_parallelize,
+                      gen_true);
 
   pips_debug(1,"end\n");
+  return ctx.reduced_loops;
 }
 
 
@@ -321,7 +350,7 @@ static void coarse_grain_loop_parallelization(statement module_stat)
     @return TRUE in case of success. Indeed, return alway true. :-)
  */
 static bool coarse_grain_parallelization_main(string module_name,
-				       bool use_reductions_p)
+                                       bool use_reductions_p)
 {
     statement module_stat;
     entity module;
@@ -353,41 +382,42 @@ static bool coarse_grain_parallelization_main(string module_name,
 
     /* Get and use cumulated_effects: */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+           db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
 
     /* Build mapping between variables and semantics informations: */
     module_to_value_mappings(module);
 
     /* use preconditions to check that loop bodies are not dead code */
     set_precondition_map((statement_mapping)
-	    db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+            db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
 
     /* Get and use invariant read/write regions */
     set_invariant_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
+        db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
 
     print_parallelization_statistics(module_name, "ante", module_stat);
 
     ResetLoopCounter();
 
     debug_on("COARSE_GRAIN_PARALLELIZATION_DEBUG_LEVEL");
-	
+
     //module_parallelized_stat = copy_statement(module_stat);
-    coarse_grain_loop_parallelization(module_stat);
+    list loops = coarse_grain_loop_parallelization(module_stat);
 
     debug_off();
 
-    /* hey, actually it is not implemented as a transformation...
-     */
-    DB_PUT_MEMORY_RESOURCE(DBR_CODE,
-			   module_name,
-			   (char*) module_stat);
-
     print_parallelization_statistics
-	(module_name, "post", module_stat);
+        (module_name, "post", module_stat);
 
     if(local_use_reductions_p) {
       reset_statement_reductions();
+      DB_PUT_MEMORY_RESOURCE(DBR_REDUCTION_PARALLEL_LOOPS,
+           module_name,
+           (char*) make_reduced_loops(loops));
+    } else {
+      DB_PUT_MEMORY_RESOURCE(DBR_CODE,
+           module_name,
+           (char*) module_stat);
     }
     reset_current_module_entity();
     reset_current_module_statement();

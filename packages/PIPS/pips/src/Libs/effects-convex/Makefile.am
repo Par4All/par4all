@@ -12,7 +12,7 @@ libeffects_convex_la_SOURCES=interface.c \
 		debug.c \
 		interprocedural.c \
 		prettyprint.c \
-		old_combine.c \
+		binary_operators.c \
 		old_projection.c \
                 eval.c
 

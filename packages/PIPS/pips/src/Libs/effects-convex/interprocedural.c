@@ -128,7 +128,7 @@ void update_out_summary_regions_list(list l_out)
 	l_sum_out_reg = l_out;
     else
 	l_sum_out_reg = RegionsMayUnion(l_sum_out_reg, l_out,
-					regions_same_action_p);
+					effects_same_action_p);
 }
 
 list get_out_summary_regions_list()
@@ -359,7 +359,7 @@ list regions_backward_translation(entity func, list real_args,
     if (proper)
 	le = gen_nconc(tce,tfe);
     else
-	le = RegionsMustUnion(tce, tfe, regions_same_action_p);
+	le = RegionsMustUnion(tce, tfe, effects_same_action_p);
 
     /* FI: add local precondition (7 December 1992) */
     le = regions_add_context(le, context);
@@ -493,7 +493,7 @@ static list common_regions_backward_translation(entity func, list func_regions)
 	{
 	    list regs = common_region_translation(func, func_reg, BACKWARD);
 	    real_regions = RegionsMustUnion(real_regions, regs,
-					    regions_same_action_p);
+					    effects_same_action_p);
 	}
     },
 	func_regions);
@@ -951,7 +951,7 @@ transformer context;
 	(func, real_args, l_reg, context);
     l_common_reg = common_regions_forward_translation(func, l_reg);
     l_t_reg = RegionsMustUnion
-	(l_form_reg, l_common_reg, regions_same_action_p);
+	(l_form_reg, l_common_reg, effects_same_action_p);
 
     ifdebug(3)
     {
@@ -1047,7 +1047,7 @@ transformer context;
 		     l_formal = RegionsMustUnion(
 			 l_formal,
 			 CONS(EFFECT, formal_reg, NIL),
-			 regions_same_action_p);
+			 effects_same_action_p);
 		 }
 	     }, l_reg);
 
@@ -1058,7 +1058,7 @@ transformer context;
 	    list l_exp_reg = regions_of_expression(real_exp, context);
 	    list l_real_exp =
 		RegionsIntersection(l_exp_reg, effects_dup(l_reg),
-				    regions_same_action_p);
+				    effects_same_action_p);
 
 	    pips_debug(8, "real argument is a complex expression \n"
 		"\tit can not correspond to a written formal parameter.\n");
@@ -1071,7 +1071,7 @@ transformer context;
 		effect_to_may_effect(formal_reg);
 		l_formal = RegionsMustUnion(l_formal,
 					    CONS(EFFECT, formal_reg, NIL),
-					    regions_same_action_p);
+					    effects_same_action_p);
 		regions_free(l_real_exp);
 	    }
 
@@ -1093,7 +1093,7 @@ transformer context;
      * choses inutiles.
      */
     l_formal = RegionsIntersection(l_formal, effects_dup(l_sum_rw_reg),
-				   regions_same_action_p);
+				   effects_same_action_p);
 
     return(l_formal);
 }
@@ -1124,7 +1124,7 @@ static list common_regions_forward_translation(entity func, list real_regions)
 	{
 	    list regs = common_region_translation(func, real_reg, FORWARD);
 	    func_regions = RegionsMustUnion(func_regions, regs,
-					    regions_same_action_p);
+					    effects_same_action_p);
 	}
     },
 	real_regions);
@@ -1390,7 +1390,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 				cell_reference(effect_cell(eff_formal)) = new_ref;
 				pips_debug_effect(5, "final eff_formal : \n", eff_formal);
 				l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, eff_formal, NIL),
-							    regions_same_action_p);
+							    effects_same_action_p);
 				pips_debug_effects(6,"l_formal after adding new effect : \n", l_formal);
 
 			      } /* else of the if (sc_empty_p) */
@@ -1486,7 +1486,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 		    convex_region_descriptor_translation(n_eff);
 		    pips_debug_effect(5, "eff_formal after context translation: \n", n_eff);
 
-		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),regions_same_action_p);
+		    l_formal = RegionsMustUnion(l_formal, CONS(EFFECT, n_eff, NIL),effects_same_action_p);
 		    pips_debug_effects(6, "l_formal after adding new effect : \n", l_formal);
 		  } /* else of the if (sc_empty_p) */
 
@@ -1698,7 +1698,7 @@ static list common_region_translation(entity callee, region reg,
 		     (Value) offset, backward);
 		new_regions = RegionsMustUnion(new_regions,
 					       CONS(EFFECT, new_reg, NIL),
-					       regions_same_action_p);
+					       effects_same_action_p);
 		total_size += min (reg_ent_begin_offset,new_ent_end_offset)
 		    - max(reg_ent_begin_offset, new_ent_begin_offset) + 1;
 	    }

@@ -311,6 +311,14 @@ list effect_to_nil_list(effect eff __attribute__((__unused__)))
     return(NIL);
 }
 
+/** frees the input effect and returns a NIL list
+ */
+list effect_to_nil_list_and_free(effect eff)
+{
+  effect_free(eff);
+  return(NIL);
+}
+
 /* list effects_to_nil_list(eff)
  * input    : an effect
  * output   : an empty list of effects

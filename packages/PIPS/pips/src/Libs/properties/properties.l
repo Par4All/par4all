@@ -235,7 +235,7 @@ static void parse_properties(void)
 	    {
 	      hash_update(pl, n, (char *) pr);
 	      if(!property_equal_p(pr, opr))
-		pips_user_warning("property %s redefined\n", n);
+      		pips_debug(1,"property %s redefined\n", n);
 	      free_property(opr);
 	    }
         }

@@ -144,8 +144,7 @@ static entity make_empty_module(string full_name,
   /* FC: added to allow reintrance in HPFC */
   if (e!=entity_undefined)
     {
-      pips_user_warning("module %s already exists, returning it\n",
-			full_name);
+      pips_debug(1,"module %s already exists, returning it\n", full_name);
       return e;
     }
 

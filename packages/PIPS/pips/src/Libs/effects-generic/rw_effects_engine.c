@@ -805,8 +805,8 @@ static list r_rw_effects_of_sequence(list l_inst)
 	    (*effects_prettyprint_func)(rb_lrw);
 	    if (!transformer_undefined_p(t1))
 	    {
-	      pips_debug(3, "transformer of first statement: %s\n",
-			 transformer_to_string(t1));
+	      pips_debug(3, "transformer of first statement:\n");
+	      print_transformer(t1);
 	    }
 	}
 	if (rb_lrw !=NIL)

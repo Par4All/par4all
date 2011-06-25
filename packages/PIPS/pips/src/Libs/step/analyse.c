@@ -256,6 +256,8 @@ static list step_send_regions(list write_l, list out_l)
 
   gen_full_free_list(send_l);
 
+  gen_sort_list(send_final, (int (*)(const void *,const void *)) effect_compare); 
+
   ifdebug(LOCAL_DEBUG) step_print_region("Region Send ", send_final); 
   return send_final;
 }
@@ -357,6 +359,8 @@ static list step_recv_regions(list send_l, list in_l)
   recv_l = RegionsMustUnion(regions_dup(in_l),regions_dup(send_may_l),r_w_combinable_p);
 
   gen_full_free_list(send_may_l);
+
+  gen_sort_list(recv_l, (int (*)(const void *,const void *)) effect_compare);
 
   ifdebug(LOCAL_DEBUG) step_print_region("Region Recv ", recv_l);
   return recv_l;

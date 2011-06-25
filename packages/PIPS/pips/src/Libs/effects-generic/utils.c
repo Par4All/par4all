@@ -1519,26 +1519,34 @@ list pointer_effects_to_constant_path_effects(list l_pointer_eff)
 
   FOREACH(EFFECT, eff, l_pointer_eff)
     {
+
+     pips_debug_effect(8, "current effect : \n", eff);
+   
       if(store_effect_p(eff))
 	{
 	  //bool exact_p;
 	  //reference ref = effect_any_reference(eff);
+
+	  pips_debug(8, "store effect\n");
 
 	  if (io_effect_p(eff)
 	      || malloc_effect_p(eff)
 	      || (!get_bool_property("USER_EFFECTS_ON_STD_FILES")
 		  && std_file_effect_p(eff)))
 	    {
+	      pips_debug(8, "special effect \n");
 	      le = CONS(EFFECT, (*effect_dup_func)(eff), le);
 	    }
 	  else
 	    {
+	      pips_debug(8,"computing the union\n");
 	      list l_const = (*effect_to_constant_path_effects_func)(eff);
 	      le = (*effects_union_op)(l_const, le, effects_same_action_p);
 	    }
 	}
       else
 	{
+	  pips_debug(8, "non store effect\n");
 	  le = CONS(EFFECT, (*effect_dup_func)(eff), le);
 	}
     }

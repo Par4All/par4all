@@ -209,10 +209,9 @@ list RegionsMayUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMayUnion", "begin\n");
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   region_may_union,
-					   region_to_may_region_list,
 					   region_to_may_region_list);
     debug(3, "RegionsMayUnion", "end\n");
     return(lr);
@@ -231,10 +230,9 @@ list RegionsMustUnion(list l1, list l2,
     list lr;
 
     debug(3, "RegionsMustUnion", "begin\n");
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   region_must_union,
-					   region_to_list,
 					   region_to_list);
     debug(3, "RegionsMustUnion", "end\n");
     return(lr);
@@ -254,12 +252,6 @@ list RegionsIntersection(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsIntersection", "begin\n");
-    /* l_res = list_of_effects_generic_binary_op(l1, l2,
-					   intersection_combinable_p,
-					   region_intersection,
-					   region_to_nil_list,
-					   region_to_nil_list); */
-
 
     l_res = list_of_effects_generic_intersection_op(l1, l2,
 					   intersection_combinable_p,
@@ -286,11 +278,15 @@ list RegionsEntitiesIntersection(list l1, list l2,
     list l_res = NIL;
 
     pips_debug(3, "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   intersection_combinable_p,
 					   region_entities_intersection,
 					   region_to_nil_list,
-					   region_to_nil_list);
+					   region_to_nil_list); */
+
+    l_res = list_of_effects_generic_cells_intersection_op(l1, l2,
+					   intersection_combinable_p,
+					   region_entities_intersection);
     pips_debug(3, "end\n");
 
     return l_res;
@@ -341,12 +337,15 @@ list RegionsInfDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "RegionsInfDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   region_inf_difference,
 					   region_to_list,
-					   region_to_nil_list);
-    debug(3, "RegionsInfDifference", "end\n");
+					   region_to_nil_list); */
+    l_res = list_of_effects_generic_inf_difference_op(l1, l2,
+					   difference_combinable_p,
+					   region_inf_difference);
+     debug(3, "RegionsInfDifference", "end\n");
 
     return l_res;
 }
@@ -371,11 +370,14 @@ list RegionsEntitiesInfDifference(
     list l_res = NIL;
 
     debug(3, "RegionsEntitiesInfDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    /*    l_res = list_of_effects_generic_binary_op(l1, l2,
 					   difference_combinable_p,
 					   regions_to_nil_list,
 					   region_to_list,
-					   region_to_nil_list);
+					   region_to_nil_list);*/
+    l_res = list_of_effects_generic_cells_inf_difference_op(l1, l2,
+					   difference_combinable_p,
+					   regions_to_nil_list);
     debug(3, "RegionsEntitiesInfDifference", "end\n");
 
     return l_res;
@@ -626,9 +628,6 @@ effect regions_must_convex_hull(region r1, region r2)
 
     if(sc_rn_p(sr))
       {
-	reference refr = copy_reference(region_any_reference(r1));
-	action acr = region_action(r1);
-
 	pips_debug(1, "sr sc_rn (maybe due to an overflow error)\n");
 
 	if (op_statistics_p())
@@ -645,15 +644,16 @@ effect regions_must_convex_hull(region r1, region r2)
 
 	/* we return a whole array region */
 	appr = is_approximation_may;
-	reg = reference_whole_region(refr, acr);
+	reg = region_dup(r1);
+	sc_rm(region_system(reg));
+	region_system_(reg) = newgen_Psysteme(sr);
+	region_approximation_tag(reg) = appr;
 	effect_to_may_effect(reg);
 	ifdebug(8)
 	  {
 	    pips_debug(8, "final region : \n");
 	    print_region(reg);
 	  }
-	sc_rm(sr);
-	sr = NULL;
 	return(reg);
       }
     else
@@ -1471,151 +1471,6 @@ static list disjunction_to_list_of_regions(Pdisjunct disjonction, region reg,
 }
 
 
-/*************************************************** BOOLEAN FUNCTIONS */
-
-/* bool combinable_regions_p(effect r1, r2)
- * input    : two regions
- * output   : TRUE if r1 and r2 affect the same entity, and, if they
- *            have the same action on it, FALSE otherwise.
- * modifies : nothing.
- */
-bool combinable_regions_p(region r1, region r2)
-{
-    boolean same_var, same_act;
-
-    if (region_undefined_p(r1) || region_undefined_p(r2))
-	return(TRUE);
-
-    same_var = (region_entity(r1) == region_entity(r2));
-    same_act = action_equal_p(region_action(r1), region_action(r2));
-
-    return(same_var && same_act);
-}
-
-boolean regions_same_action_p(region r1, region r2)
-{
-    boolean same_var, same_act;
-
-    if (region_undefined_p(r1) || region_undefined_p(r2))
-	return(TRUE);
-
-    same_var = (region_entity(r1) == region_entity(r2));
-    same_act = action_equal_p(region_action(r1), region_action(r2));
-
-    return(same_var && same_act);
-}
-
-boolean regions_same_variable_p(region r1, region r2)
-{
-    boolean same_var = (region_entity(r1) == region_entity(r2));
-    return(same_var);
-}
 
 
 
-
-/*************************************** PROPER REGIONS TO SUMMARY REGIONS */
-
-/* list proper_to_summary_regions(list l_reg)
- * input    : a list of proper regions: there may be several regions for
- *            a given array with a given action.
- * output   : a list of summary regions, with the property that is only
- *            one region for each array per action.
- * modifies : the input list. Some regions are freed.
- * comment  : The computation scans the first list (the "base" list);
- *            From this element, the next elements are scanned (the "current"
- *            list). If the current region is combinable with the base region,
- *            they are combined. Both original regions are freed, and the base
- *            is replaced by the union.
- */
-list proper_to_summary_regions(list l_reg)
-{
-    return proper_regions_combine(l_reg, FALSE);
-}
-
-/* list proper_regions_contract(list l_reg)
- * input    : a list of proper regions
- * output   : a list of proper regions in which there is no two identical
- *            scalar regions.
- * modifies : the input list.
- * comment  : This is used to reduce the number of dependence tests.
- */
-
-list proper_regions_contract(list l_reg)
-{
-    return proper_regions_combine(l_reg, TRUE);
-}
-
-
-/* list proper_regions_combine(list l_reg, bool scalars_only_p)
- * input    : a list of proper regions, and a boolean to know on which
- *            elements to perform the union.
- * output   : a list of regions, in which the selected elements
- *            have been merged.
- * modifies : the input list.
- * comment  :
- */
-
-list proper_regions_combine(list l_reg, bool scalars_only_p)
-{
-    list base, current, pred;
-    ifdebug(6)
-    {
-	pips_debug(6, "proper regions: \n");
-	print_regions(l_reg);
-    }
-
-    base = l_reg;
-    /* scan the list of regions */
-    while(!ENDP(base) )
-    {
-	/* scan the next elements to find regions combinable
-	 * with the region of the base element.
-	 */
-	current = CDR(base);
-	pred = base;
-	while (!ENDP(current))
-	{
-	    region reg_base = REGION(CAR(base));
-	    region reg_current = REGION(CAR(current));
-
-	    /* Both regions are about the same sclar variable,
-	       with the same action
-	       */
-	    if ((!scalars_only_p || region_scalar_p(reg_base)) &&
-		regions_same_action_p(reg_base, reg_current) )
-	    {
-		list tmp;
-		region new_reg_base;
-
-		/* compute their union */
-		new_reg_base = regions_must_convex_hull(reg_base,reg_current);
-		/* free the original regions: no memory leak */
-		region_free(reg_base);
-		region_free(reg_current);
-
-		/* replace the base region by the new region */
-		REGION_(CAR(base)) = new_reg_base;
-
-		/* remove the current list element from the global list */
-		tmp = current;
-		current = CDR(current);
-		CDR(pred) = current;
-		free(tmp);
-	    }
-	    else
-	    {
-		pred = current;
-		current = CDR(current);
-	    }
-	}
-	base = CDR(base);
-    }
-
-    ifdebug(6)
-    {
-	pips_debug(6, "summary regions: \n");
-	print_regions(l_reg);
-    }
-    return(l_reg);
-}

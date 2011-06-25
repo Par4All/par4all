@@ -114,19 +114,32 @@ void simple_cell_reference_with_address_of_cell_reference_translation
 	  else if(!unbounded_expression_p(first_input_remaining_exp))
 	    {				
 	      value v;
-	      new_exp = MakeBinaryCall
-		(entity_intrinsic(PLUS_OPERATOR_NAME),
-		 copy_expression(last_output_indices_exp), copy_expression(first_input_remaining_exp));
-	      /* Then we must try to evaluate the expression */
-	      v = EvalExpression(new_exp);
-	      if (! value_undefined_p(v) && 
-		  value_constant_p(v))
+	      intptr_t i_last_output_indices_exp;
+	      intptr_t i_first_input_remaining_exp;
+
+	      bool b_i_last_output_indices_exp = expression_integer_value(last_output_indices_exp, &i_last_output_indices_exp);
+	      bool b_i_first_input_remaining_exp = expression_integer_value(first_input_remaining_exp, &i_first_input_remaining_exp);
+
+	      if (b_i_last_output_indices_exp && i_last_output_indices_exp == 0)
+		new_exp = copy_expression(first_input_remaining_exp);
+	      else if (b_i_first_input_remaining_exp && i_first_input_remaining_exp == 0)
+		new_exp = copy_expression(last_output_indices_exp);
+	      else
 		{
-		  constant vc = value_constant(v);
-		  if (constant_int_p(vc))
-		    {				    
-		      free_expression(new_exp);
-		      new_exp = int_to_expression(constant_int(vc));
+		  new_exp = MakeBinaryCall
+		    (entity_intrinsic(PLUS_OPERATOR_NAME),
+		     copy_expression(last_output_indices_exp), copy_expression(first_input_remaining_exp));
+		  /* Then we must try to evaluate the expression */
+		  v = EvalExpression(new_exp);
+		  if (! value_undefined_p(v) && 
+		      value_constant_p(v))
+		    {
+		      constant vc = value_constant(v);
+		      if (constant_int_p(vc))
+			{				    
+			  free_expression(new_exp);
+			  new_exp = int_to_expression(constant_int(vc));
+			}
 		    }
 		}
 	    }
