@@ -15,9 +15,11 @@ int main()
   int i;
   int j;
   int k = 16;
+  int t;
   for (i = 0;i<size;i++)
     for (j = 0;j<6;j++)
       loulou[0][i][j] = k++;
-  printf("%d\n", duck(riri, fifi, size, loulou));
+  t = duck(riri, fifi, size, loulou);
+  printf("%d\n", t);
   return 0;
 }

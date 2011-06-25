@@ -1,0 +1,38 @@
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(b) {}
+
+   _Bool b;
+
+//  T(i,j,k) {}
+
+   int i, j, k;
+
+//  T(i) {j<=i+1, i<=j}
+
+
+   if (k)
+
+//  T(i) {i==j}
+
+      i = j;
+   else
+
+//  T(i) {i==j-1, k==0}
+
+      i = j-1;
+
+//  T(b) {b==b#init, 0<=b, b<=1, j<=i+1, i<=j}
+
+
+   b = b&&i<=j;
+
+//  T(main) {main==0, 0<=b, b<=1, j<=i+1, i<=j}
+
+
+   return 0;
+}

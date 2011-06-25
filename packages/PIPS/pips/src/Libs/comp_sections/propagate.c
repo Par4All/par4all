@@ -343,7 +343,7 @@ list comp_regions_of_block(list linst)
 	      debug_regions_consistency(r_block_regions);
 	      */
 	      /* }}} */
-	      lres = CompRegionsExactUnion(first_s_regions, r_block_regions, regions_same_action_p);	      
+	      lres = CompRegionsExactUnion(first_s_regions, r_block_regions, effects_same_action_p);	      
 	      /*
 	      debug_regions_consistency(lres);
 	      */
@@ -387,7 +387,7 @@ comp_regions_of_test(test t,
       /* regions of the false branch */
     lf = comp_regions_of_statement(test_false(t));
       /* regions of the combination of both */
-    le = CompRegionsMayUnion(lt, lf, regions_same_action_p);
+    le = CompRegionsMayUnion(lt, lf, effects_same_action_p);
     
       /* regions of the condition */
     lc = comp_regions_of_expression(test_condition(t), context);
@@ -396,7 +396,7 @@ comp_regions_of_test(test t,
     */
     /* }}} */
     /* {{{  union the regions : currently just add to the list*/
-    lr = CompRegionsExactUnion(le, lc, regions_same_action_p);
+    lr = CompRegionsExactUnion(le, lc, effects_same_action_p);
     pips_debug(3, "end\n");
     /* }}} */
 
@@ -453,7 +453,7 @@ comp_regions_of_loop(loop l,
     le = CompRegionsExactUnion(
            index_reg, 
            comp_regions_of_range(loop_range(l), context), 
-           regions_same_action_p);
+           effects_same_action_p);
     /* }}} */
 
     /* *plpropreg = regions_dup(le); */
@@ -482,7 +482,7 @@ comp_regions_of_loop(loop l,
 
     (void) TranslateRefsToLoop(l, body_reg);
     
-    le = CompRegionsExactUnion(le, body_reg, regions_same_action_p);
+    le = CompRegionsExactUnion(le, body_reg, effects_same_action_p);
     
     ifdebug(3)  {
       pips_debug(3, "After Translations  surrounding the loop index %s :\n",
@@ -589,7 +589,7 @@ list comp_regions_of_unstructured(unstructured u, transformer t_unst)
 	    CONTROL_MAP(c,
 		   {
 		     le = CompRegionsMayUnion(comp_regions_of_statement(control_statement(c)), 
-					 le, regions_same_action_p) ;
+					 le, effects_same_action_p) ;
 		   },ct, blocs) ;	
 	     project_regions_along_parameters(le, transformer_arguments(t_unst));
 	     gen_free_list(blocs) ;
@@ -618,9 +618,9 @@ list comp_regions_of_range(range r, transformer context)
 
     le = comp_regions_of_expression(el, context);
     le = CompRegionsExactUnion(le, comp_regions_of_expression(eu, context), 
-			  regions_same_action_p);
+			  effects_same_action_p);
     le = CompRegionsExactUnion(le, comp_regions_of_expression(ei, context), 
-			  regions_same_action_p);
+			  effects_same_action_p);
 
     pips_debug(3, "end\n");
     return(le);
@@ -684,7 +684,7 @@ list comp_regions_of_expressions(list exprs, transformer context)
     MAP(EXPRESSION, exp,
     {
 	    le = CompRegionsExactUnion(le, comp_regions_of_expression(exp, context), 
-			      regions_same_action_p);
+			      effects_same_action_p);
     },
 	  exprs);
 
@@ -733,7 +733,7 @@ list comp_regions_of_read(reference ref, transformer context)
 	    /* }}} */
 	   /* {{{  rest of the references in an expression*/
 	   if (! ENDP(inds)) 
-	       le = CompRegionsExactUnion(le, comp_regions_of_expressions(inds, context), regions_same_action_p);
+	       le = CompRegionsExactUnion(le, comp_regions_of_expressions(inds, context), effects_same_action_p);
 
 	   /* }}} */
 	   /* }}} */
@@ -770,7 +770,7 @@ list comp_regions_of_write(reference ref, transformer context)
     /* }}} */
     /* {{{  check for arrays in subscripts*/
     if (! ENDP(inds)) 
-        le = CompRegionsExactUnion(le, comp_regions_of_expressions(inds, context), regions_same_action_p);
+        le = CompRegionsExactUnion(le, comp_regions_of_expressions(inds, context), effects_same_action_p);
 
     /* }}} */
 

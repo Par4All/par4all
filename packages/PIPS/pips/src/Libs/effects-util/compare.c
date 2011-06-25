@@ -84,15 +84,13 @@ int cell_reference_compare(reference *pr1, reference *pr2)
 	      {
 		syntax s1 = expression_syntax(e1);
 		syntax s2 = expression_syntax(e2);
-		if (syntax_reference_p(s1)
-		    && entity_field_p(reference_variable(syntax_reference(s1)))
-		    && syntax_reference_p(s2)
-		    && entity_field_p(reference_variable(syntax_reference(s2))))
+		if (syntax_reference_p(s1) && syntax_reference_p(s2))
 		  {
-		    entity fe1 = reference_variable(syntax_reference(s1));
-		    entity fe2 = reference_variable(syntax_reference(s2));
-		    if (!same_entity_p(fe1, fe2))
-		      c1_pos = strcmp(entity_name(fe1),entity_name(fe2));
+		    entity e1 = reference_variable(syntax_reference(s1));
+		    entity e2 = reference_variable(syntax_reference(s2));
+
+		    if (!same_entity_p(e1, e2))
+			  c1_pos = strcmp(entity_name(e1),entity_name(e2));
 		  }
 		else
 		  {
@@ -107,6 +105,14 @@ int cell_reference_compare(reference *pr1, reference *pr2)
 		      {
 			diff = i1 - i2;
 			c1_pos = diff==0? 0 : (diff>0?1:-1);
+		      }
+		    else
+		      {
+			string ch1 = words_to_string(words_expression(e1, NIL));
+			string ch2 = words_to_string(words_expression(e2, NIL));
+			c1_pos = strcmp(ch1, ch2);
+			free(ch1);
+			free(ch2);
 		      }
 		  }
 	      }

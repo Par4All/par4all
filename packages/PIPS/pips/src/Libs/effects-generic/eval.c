@@ -150,13 +150,11 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 
   if (entity_abstract_location_p(input_ent))
     {
-      descriptor build_desc = descriptor_undefined;
       /* If the input path is an abstract location, the result is the same abstract location */
      /*  l = CONS(CELL, make_cell(is_cell_reference, make_reference(input_ent, NIL)), NIL); */
-      l = CONS(EFFECT, make_effect( make_cell(is_cell_reference, make_reference(input_ent, NIL)),
+      l = CONS(EFFECT, make_reference_simple_effect( make_reference(input_ent, NIL),
 				  make_action_write_memory(),
-				  make_approximation(is_approximation_may, UU),
-				  build_desc),
+				  make_approximation(is_approximation_may, UU)),
 	       NIL);
       *exact_p = false;
     }
@@ -178,7 +176,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	    {
 	      cell source_cell = points_to_source(pt);
 	      reference source_ref = reference_undefined, tmp_ref = reference_undefined;
-	      descriptor source_desc = descriptor_undefined;
+	      descriptor source_desc = make_descriptor(is_descriptor_none,UU);
 	      if (cell_reference_p(source_cell))
 		tmp_ref = cell_reference(source_cell);
 	      else if (cell_preference_p(source_cell))
@@ -264,7 +262,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	    {
 	      cell sink_cell = points_to_sink(pt);
 	      reference sink_ref = reference_undefined, tmp_ref = reference_undefined;
-	      descriptor sink_desc = descriptor_undefined;
+	      descriptor sink_desc = make_descriptor(is_descriptor_none,UU);
 
 	      if (cell_reference_p(sink_cell))
 		tmp_ref = cell_reference(sink_cell);
@@ -294,7 +292,7 @@ list generic_eval_cell_with_points_to(cell input_cell, descriptor input_desc, li
 	      else
 		{
 
-		  descriptor build_desc = descriptor_undefined;
+		  descriptor build_desc = make_descriptor(is_descriptor_none,UU);
 		  bool exact_translation_p;
 
 		  (*cell_reference_with_address_of_cell_reference_translation_func)(input_ref, input_desc,

@@ -4728,17 +4728,21 @@ freia_status license_plate_copies_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 3 double buffer imagelets
@@ -4764,13 +4768,14 @@ freia_status license_plate_copies_helper_0_0_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(3) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_3_0;
   mcu_macro[1][0].xmin1 = imagelet_io_3_1;
@@ -4892,6 +4897,7 @@ freia_status license_plate_copies_helper_0_0_0(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 3 is i0 for in
   tile_in[0][0].x = imagelet_io_3_0;
@@ -4910,7 +4916,6 @@ freia_status license_plate_copies_helper_0_0_0(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -4936,7 +4941,9 @@ freia_status license_plate_copies_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, i0);
 
   // extract measures
 
@@ -4976,17 +4983,21 @@ freia_status license_plate_copies_helper_0_0_1(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 4 computation imagelets
   // - 4 double buffer imagelets
@@ -5016,13 +5027,14 @@ freia_status license_plate_copies_helper_0_0_1(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(4) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_4_0;
   mcu_macro[1][0].xmin1 = imagelet_io_4_1;
@@ -5217,6 +5229,7 @@ freia_status license_plate_copies_helper_0_0_1(
   mcu_macro[0][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
 
+
   // inputs:
   // - imagelet 3 is i0 for imclose
   tile_in[0][0].x = imagelet_io_3_0;
@@ -5240,7 +5253,6 @@ freia_status license_plate_copies_helper_0_0_1(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -5266,7 +5278,9 @@ freia_status license_plate_copies_helper_0_0_1(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -5306,17 +5320,21 @@ freia_status license_plate_copies_helper_0_0_2(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 4 computation imagelets
   // - 4 double buffer imagelets
@@ -5346,13 +5364,14 @@ freia_status license_plate_copies_helper_0_0_2(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(4) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_4_0;
   mcu_macro[1][0].xmin1 = imagelet_io_4_1;
@@ -5547,6 +5566,7 @@ freia_status license_plate_copies_helper_0_0_2(
   mcu_macro[0][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
 
+
   // inputs:
   // - imagelet 3 is i0 for imclose
   tile_in[0][0].x = imagelet_io_3_0;
@@ -5570,7 +5590,6 @@ freia_status license_plate_copies_helper_0_0_2(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -5596,7 +5615,9 @@ freia_status license_plate_copies_helper_0_0_2(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -5636,17 +5657,21 @@ freia_status license_plate_copies_helper_0_0_3(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 4 computation imagelets
   // - 4 double buffer imagelets
@@ -5676,13 +5701,14 @@ freia_status license_plate_copies_helper_0_0_3(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(4) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_4_0;
   mcu_macro[1][0].xmin1 = imagelet_io_4_1;
@@ -5877,6 +5903,7 @@ freia_status license_plate_copies_helper_0_0_3(
   mcu_macro[0][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
 
+
   // inputs:
   // - imagelet 3 is i0 for imclose
   tile_in[0][0].x = imagelet_io_3_0;
@@ -5900,7 +5927,6 @@ freia_status license_plate_copies_helper_0_0_3(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_2_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -5926,7 +5952,9 @@ freia_status license_plate_copies_helper_0_0_3(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -5969,7 +5997,11 @@ freia_status license_plate_copies_helper_0_0_4(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -5980,10 +6012,10 @@ freia_status license_plate_copies_helper_0_0_4(
   int16_t p_5[3];
   const int32_t x_5 = 3;
   const int32_t y_5 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][2];
-
   // imagelets definitions:
   // - 4 computation imagelets
   // - 4 double buffer imagelets
@@ -6013,13 +6045,14 @@ freia_status license_plate_copies_helper_0_0_4(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(4) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_4_0;
   mcu_macro[1][0].xmin1 = imagelet_io_4_1;
@@ -6224,6 +6257,7 @@ freia_status license_plate_copies_helper_0_0_4(
   mcu_macro[0][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][7].addrStart = TERAPIX_UCODE_DILATE_3_3;
 
+
   // inputs:
   // - imagelet 3 is i0 for imclose
   tile_in[0][0].x = imagelet_io_3_0;
@@ -6247,7 +6281,6 @@ freia_status license_plate_copies_helper_0_0_4(
   tile_out[0][1].y = 0;
   tile_out[1][1].x = imagelet_io_1_1;
   tile_out[1][1].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -6273,7 +6306,9 @@ freia_status license_plate_copies_helper_0_0_4(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, o1, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, o1, i0, i1);
 
   // extract measures
 
@@ -6311,17 +6346,21 @@ freia_status license_plate_copies_helper_0_0_5(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 2 double buffer imagelets
@@ -6343,13 +6382,14 @@ freia_status license_plate_copies_helper_0_0_5(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -6475,6 +6515,7 @@ freia_status license_plate_copies_helper_0_0_5(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_DILATE_3_3;
 
+
   // inputs:
   // - imagelet 2 is i0 for imopen
   tile_in[0][0].x = imagelet_io_2_0;
@@ -6488,7 +6529,6 @@ freia_status license_plate_copies_helper_0_0_5(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -6514,7 +6554,9 @@ freia_status license_plate_copies_helper_0_0_5(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -6552,17 +6594,21 @@ freia_status license_plate_copies_helper_0_0_6(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][5];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 2 double buffer imagelets
@@ -6584,13 +6630,14 @@ freia_status license_plate_copies_helper_0_0_6(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -6712,6 +6759,7 @@ freia_status license_plate_copies_helper_0_0_6(
   mcu_macro[0][4].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][4].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 2 is i0 for imopen
   tile_in[0][0].x = imagelet_io_2_0;
@@ -6725,7 +6773,6 @@ freia_status license_plate_copies_helper_0_0_6(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -6751,7 +6798,9 @@ freia_status license_plate_copies_helper_0_0_6(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -6794,7 +6843,11 @@ freia_status license_plate_copies_helper_0_0_7(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -6809,10 +6862,10 @@ freia_status license_plate_copies_helper_0_0_7(
   int16_t p_4[9];
   const int32_t x_4 = 6;
   const int32_t y_4 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][8];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 3 double buffer imagelets
@@ -6838,13 +6891,14 @@ freia_status license_plate_copies_helper_0_0_7(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(3) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_3_0;
   mcu_macro[1][0].xmin1 = imagelet_io_3_1;
@@ -7058,6 +7112,7 @@ freia_status license_plate_copies_helper_0_0_7(
   mcu_macro[0][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
   mcu_macro[1][7].addrStart = TERAPIX_UCODE_ERODE_3_3;
 
+
   // inputs:
   // - imagelet 2 is i0 for imcloseth
   tile_in[0][0].x = imagelet_io_2_0;
@@ -7076,7 +7131,6 @@ freia_status license_plate_copies_helper_0_0_7(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 4;
@@ -7102,7 +7156,9 @@ freia_status license_plate_copies_helper_0_0_7(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
 
@@ -7140,17 +7196,21 @@ freia_status license_plate_copies_helper_0_0_8(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][3];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 2 double buffer imagelets
@@ -7172,13 +7232,14 @@ freia_status license_plate_copies_helper_0_0_8(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -7258,6 +7319,7 @@ freia_status license_plate_copies_helper_0_0_8(
   mcu_macro[0][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
   mcu_macro[1][2].addrStart = TERAPIX_UCODE_DILATE_3_3;
 
+
   // inputs:
   // - imagelet 2 is i0 for imfilt
   tile_in[0][0].x = imagelet_io_2_0;
@@ -7271,7 +7333,6 @@ freia_status license_plate_copies_helper_0_0_8(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 3;
@@ -7297,7 +7358,9 @@ freia_status license_plate_copies_helper_0_0_8(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -7336,7 +7399,11 @@ freia_status license_plate_copies_helper_0_0_9(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7347,10 +7414,10 @@ freia_status license_plate_copies_helper_0_0_9(
   int16_t p_1[9];
   const int32_t x_1 = 3;
   const int32_t y_1 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][7];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 2 double buffer imagelets
@@ -7372,13 +7439,14 @@ freia_status license_plate_copies_helper_0_0_9(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -7555,6 +7623,7 @@ freia_status license_plate_copies_helper_0_0_9(
   mcu_macro[0][6].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][6].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 2 is i0 for imfilt
   tile_in[0][0].x = imagelet_io_2_0;
@@ -7568,7 +7637,6 @@ freia_status license_plate_copies_helper_0_0_9(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 1;
@@ -7594,7 +7662,9 @@ freia_status license_plate_copies_helper_0_0_9(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -7634,7 +7704,11 @@ freia_status license_plate_copies_helper_0_0_10(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
@@ -7645,10 +7719,10 @@ freia_status license_plate_copies_helper_0_0_10(
   int16_t p_3[9];
   const int32_t x_3 = 3;
   const int32_t y_3 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][7];
   terapix_tile_info tile_in[2][2];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 3 computation imagelets
   // - 3 double buffer imagelets
@@ -7674,13 +7748,14 @@ freia_status license_plate_copies_helper_0_0_10(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: D8(2) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_2_0;
   mcu_macro[1][0].xmin1 = imagelet_io_2_1;
@@ -7861,6 +7936,7 @@ freia_status license_plate_copies_helper_0_0_10(
   mcu_macro[0][6].addrStart = TERAPIX_UCODE_AND3;
   mcu_macro[1][6].addrStart = TERAPIX_UCODE_AND3;
 
+
   // inputs:
   // - imagelet 2 is i0 for imout
   tile_in[0][0].x = imagelet_io_2_0;
@@ -7879,7 +7955,6 @@ freia_status license_plate_copies_helper_0_0_10(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 3;
@@ -7905,7 +7980,9 @@ freia_status license_plate_copies_helper_0_0_10(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0, i1);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0, i1);
 
   // extract measures
 

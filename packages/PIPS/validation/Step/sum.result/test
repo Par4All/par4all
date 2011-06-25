@@ -108,10 +108,10 @@ intel:	clear
       INTEGER STEP_I_UP, STEP_I_LOW, I_UP, I_LOW, IDX, I, I_L, I_U, N
       INTEGER STEP_RR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 1:
      &MAX_NB_LOOPSLICES), STEP_RR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1, 
-     &1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP, 1:1
+     &1:MAX_NB_LOOPSLICES), STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP, 1:2
      &, 1:MAX_NB_LOOPSLICES), STEP_SR_B(IDX_SLICE_LOW:IDX_SLICE_UP, 1
-     &:1, 1:MAX_NB_LOOPSLICES), STEP_SR_A(IDX_SLICE_LOW:IDX_SLICE_UP
-     &, 1:2, 1:MAX_NB_LOOPSLICES), A(1:N, 1:2), B(1:N), C(1:N)
+     &:1, 1:MAX_NB_LOOPSLICES), STEP_SR_C(IDX_SLICE_LOW:IDX_SLICE_UP
+     &, 1:1, 1:MAX_NB_LOOPSLICES), A(1:N, 1:2), B(1:N), C(1:N)
 
 !$omp master
       CALL STEP_CONSTRUCT_BEGIN(STEP_PARALLEL_DO)                       0112
@@ -154,22 +154,22 @@ C     Third dimension: store the boundaries of the local chunk.
 
       DO IDX = 1, STEP_COMM_SIZE                                        0150
          CALL STEP_GET_LOOPBOUNDS(IDX-1, I_LOW, I_UP)                   0151
+C  <C(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0153
+         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0154
+C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
+         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0156
+         STEP_SR_B(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0157
 C  <A(PHI1,PHI2)-write-EXACT-{1<=PHI1, PHI1<=10, I_LOW<=PHI1,
 C    PHI1<=I_UP, 1<=PHI2, PHI2<=2}>
-         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0154
-         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0155
-         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 1                             0156
-         STEP_SR_A(IDX_SLICE_UP,2,IDX) = 2                              0157
-C  <B(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_B(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0159
-         STEP_SR_B(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0160
-C  <C(PHI1)-write-MAY-{1<=PHI1, PHI1<=10, I_LOW<=PHI1, PHI1<=I_UP}>
-         STEP_SR_C(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0162
-         STEP_SR_C(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0163
+         STEP_SR_A(IDX_SLICE_LOW,1,IDX) = MAX(I_LOW, 1)                 0160
+         STEP_SR_A(IDX_SLICE_UP,1,IDX) = MIN(I_UP, 10)                  0161
+         STEP_SR_A(IDX_SLICE_LOW,2,IDX) = 1                             0162
+         STEP_SR_A(IDX_SLICE_UP,2,IDX) = 2                              0163
       ENDDO
-      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0165
+      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0165
       CALL STEP_SET_SENDREGIONS(B, STEP_COMM_SIZE, STEP_SR_B)           0166
-      CALL STEP_SET_SENDREGIONS(C, STEP_COMM_SIZE, STEP_SR_C)           0167
+      CALL STEP_SET_SENDREGIONS(A, STEP_COMM_SIZE, STEP_SR_A)           0167
 
 !$omp end master
 !$omp barrier
@@ -192,11 +192,11 @@ C     Where work is done...
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0190
+      CALL STEP_ALLTOALL_FULL(C, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0190
      &)                                                                 0190
       CALL STEP_ALLTOALL_FULL(B, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0192
      &)                                                                 0192
-      CALL STEP_ALLTOALL_FULL(C, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0194
+      CALL STEP_ALLTOALL_FULL(A, STEP_NBLOCKING_ALG, STEP_TAG_DEFAULT   0194
      &)                                                                 0194
       CALL STEP_WAITALL                                                 0196
       CALL STEP_CONSTRUCT_END(STEP_PARALLEL_DO)                         0197

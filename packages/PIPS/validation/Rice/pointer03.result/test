@@ -1,0 +1,44 @@
+
+POINTS TO
+
+//  {(p,_p_1[0],-Exact-)}
+void pointer03(int n, float *p)
+{
+//  {(p,_p_1[0],-Exact-)}
+   int i;
+//  {(p,_p_1[0],-Exact-)}
+   float *r = p;
+//  {(p,_p_1[0],-Exact-);(r,_p_1[0],-Exact-)}
+
+   for(i = 0; i <= n-1; i += 1)
+//  {(p,_p_1[0],-Exact-);(r,_p_1[0],-Exact-)}
+      p[i] = r[i];
+}
+
+Proper effects with points-to
+
+void pointer03(int n, float *p)
+{
+   int i;
+//             <    is read   >: p
+//             <    is written>: r
+   float *r = p;
+//             <    is read   >: n
+//             <    is written>: i
+
+   for(i = 0; i <= n-1; i += 1)
+//             <    is read   >: _p_1[i] i n p r
+//             <    is written>: _p_1[i]
+      p[i] = r[i];
+}
+
+Parallel code
+
+void pointer03(int n, float *p)
+{
+   int i;
+   float *r = p;
+
+   forall(i = 0; i <= n-1; i += 1)
+      p[i] = r[i];
+}

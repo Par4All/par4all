@@ -646,7 +646,7 @@ statement outliner(string outline_module_name, list statements_to_outline)
      * }
      *
      */
-    if(c_module_p(get_current_module_entity()))
+    if(c_module_p(get_current_module_entity()) && get_bool_property("OUTLINE_WRITTEN_SCALAR_BY_REFERENCE"))
     {
         list iter  = effective_parameters,
              riter = referenced_entities;

@@ -4201,6 +4201,16 @@ experimental and turned off by default.
 SEMANTICS_USE_LIST_PROJECTION TRUE
 \end{PipsProp}
 
+The string Property \PipsPropRef{SEMANTICS_LIST_FIX_POINT_OPERATOR} is used
+to select a particular heuristic to compute an approximation of the
+transitive closure of a list of transformers. It is only useful if Property
+\PipsPropRef{SEMANTICS_USE_TRANSFORMER_LISTS} is selected. The current
+default value is ``depth\_two''. An experimental value is ``max\_depth''. 
+
+\begin{PipsProp}{SEMANTICS_LIST_FIX_POINT_OPERATOR}
+SEMANTICS_LIST_FIX_POINT_OPERATOR "depth_two"
+\end{PipsProp}
+
 Preconditions can (used to) preserve initial values of the formal
 parameters. This is not often useful in C because programmers usually
 avoid modifying scalar parameters, especially integer ones. However,
@@ -5574,7 +5584,7 @@ coarse_grain_parallelization > MODULE.code
 
 
 \begin{PipsMake}
-coarse_grain_parallelization_with_reduction > MODULE.code
+coarse_grain_parallelization_with_reduction > MODULE.reduction_parallel_loops
         < PROGRAM.entities
         < MODULE.code
         < MODULE.cumulated_effects
@@ -9387,6 +9397,14 @@ The property \PipsPropRef{ATOMIC_OPERATION_PROFILE} control the set of atomic
 operations and operand allowed. At that time only ``cuda'' is supported.
 \end{PipsPass}
 
+\begin{PipsPass}{flag_parallel_reduced_loops_with_atomic}
+\PipsPassRef{flag_parallel_reduced_loops_with_atomic} flag as parallel all loops 
+that were detected by \PipsPassRef{coarse_grain_parallelization_with_reduction}.
+
+The property \PipsPropRef{ATOMIC_OPERATION_PROFILE} control the set of atomic
+operations and operand allowed. At that time only ``cuda'' is supported.
+\end{PipsPass}
+
 \begin{PipsProp}{ATOMIC_OPERATION_PROFILE}
 ATOMIC_OPERATION_PROFILE "cuda"
 \end{PipsProp}
@@ -9397,9 +9415,18 @@ replace_reduction_with_atomic > MODULE.code
 			      > MODULE.callees
         < PROGRAM.entities
         < MODULE.code
+        < MODULE.reduction_parallel_loops
         < MODULE.cumulated_reductions
 \end{PipsMake}
 
+\begin{PipsMake}
+flag_parallel_reduced_loops_with_atomic > MODULE.code
+					> MODULE.callees
+        < PROGRAM.entities
+        < MODULE.code
+        < MODULE.reduction_parallel_loops
+        < MODULE.cumulated_reductions
+\end{PipsMake}
 
 
 \subsection{Forward Substitution}
@@ -10161,6 +10188,9 @@ The user is prompted for various pieces of information in order to perform the o
 The statements are a subset of a sequence. They are counted in the
 sequence\marginpar{Serge: I invent...(FI)}.
 
+\PipsPropRef{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE} controls whether we pass
+written scalar by reference or not. This property might lead to incorrect code !
+
 \end{PipsPass}
 
 \begin{PipsMake}
@@ -10233,6 +10263,9 @@ OUTLINE_LOOP_BOUND_AS_PARAMETER ""
 \end{PipsProp}
 \begin{PipsProp}{OUTLINE_INDEPENDENT_COMPILATION_UNIT}
 OUTLINE_INDEPENDENT_COMPILATION_UNIT FALSE
+\end{PipsProp}
+\begin{PipsProp}{OUTLINE_WRITTEN_SCALAR_BY_REFERENCE}
+OUTLINE_WRITTEN_SCALAR_BY_REFERENCE TRUE
 \end{PipsProp}
 
 

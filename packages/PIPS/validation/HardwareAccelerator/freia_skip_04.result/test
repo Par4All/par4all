@@ -486,17 +486,21 @@ freia_status freia_skip_04_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[3];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][1];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 1 computation imagelets
   // - 1 double buffer imagelets
@@ -514,13 +518,14 @@ freia_status freia_skip_04_helper_0_0_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: thr(1) -> 1
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -555,6 +560,7 @@ freia_status freia_skip_04_helper_0_0_0(
   mcu_macro[0][0].addrStart = TERAPIX_UCODE_THRESHOLD;
   mcu_macro[1][0].addrStart = TERAPIX_UCODE_THRESHOLD;
 
+
   // inputs:
   // - imagelet 1 is i0 for t
   tile_in[0][0].x = imagelet_io_1_0;
@@ -568,7 +574,6 @@ freia_status freia_skip_04_helper_0_0_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -594,7 +599,9 @@ freia_status freia_skip_04_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 
@@ -633,23 +640,36 @@ freia_status freia_skip_04_helper_0_1_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
+  // operation 0_val initialization
+  int16_t p_0_val[1];
+  const int32_t x_0_val = 0;
+  const int32_t y_0_val = 0;
+  // array for reduction 0 extraction
+  int32_t red_0[1];
   // operation 1 parameters
   int16_t p_1[1];
-  const int32_t x_1 = 0;
+  const int32_t x_1 = 1;
   const int32_t y_1 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][2];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 1 computation imagelets
   // - 1 double buffer imagelets
   int imagelet_size = 511;
   int imagelet_1 = 0;
   int imagelet_2 = 511;
+
+  // memory for reductions
+  int reduction_0 = 1023;
 
   // double buffer assignment
   int imagelet_io_1_0 = imagelet_1;
@@ -661,23 +681,48 @@ freia_status freia_skip_04_helper_0_1_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
-  // set measure max at 1023
-  mcu_macro[0][0].xmin2 = 1023;
-  mcu_macro[1][0].xmin2 = 1023;
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
+  // 0: max(1)
+  // initializing  0_val
+  p_0_val[0] = INT16_MIN;
+  gram.xoffset = x_0_val;
+  gram.yoffset = y_0_val;
+  gram.width = 1;
+  gram.height = 1;
+  gram.params = p_0_val;
+  freia_mg_write_dynamic_param(&dyn_param);
+  // initialize memory for operation 0_val
+  mem_init.xmin1 = reduction_0;
+  mem_init.ymin1 = 0;
+  mem_init.xmin2 = 0;
+  mem_init.ymin2 = 0;
+  mem_init.xmin3 = 0;
+  mem_init.ymin3 = 0;
+  mem_init.iter1 = TERAPIX_PE_NUMBER;
+  mem_init.iter2 = 1;
+  mem_init.iter3 = 0;
+  mem_init.iter4 = 0;
+  mem_init.addrStart = TERAPIX_UCODE_SET_CONST;
+  param.size = sizeof(terapix_mcu_macrocode); // not used?
+  param.raw = (void*) (&mem_init);
+  ret |= freia_mg_work(&param);
+  ret |= freia_mg_end_work();
+  // set measure max at reduction_0
+  mcu_macro[0][0].xmin2 = reduction_0;
+  mcu_macro[1][0].xmin2 = reduction_0;
   mcu_macro[0][0].ymin2 = 0;
   mcu_macro[1][0].ymin2 = 0;
   mcu_macro[0][0].xmin3 = 0;
   mcu_macro[1][0].xmin3 = 0;
   mcu_macro[0][0].ymin3 = 0;
   mcu_macro[1][0].ymin3 = 0;
-  // 0: max(1)
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
   mcu_macro[0][0].ymin1 = 0;
@@ -724,6 +769,7 @@ freia_status freia_skip_04_helper_0_1_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_XOR_CONST?;
 
+
   // inputs:
   // - imagelet 1 is i0 for i
   tile_in[0][0].x = imagelet_io_1_0;
@@ -737,7 +783,6 @@ freia_status freia_skip_04_helper_0_1_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -763,11 +808,27 @@ freia_status freia_skip_04_helper_0_1_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
-  // get measure max result from 1023
-  // ??? not implemented yet...
+  // get measure max result from reduction_0
+  redter.xres = reduction_0;
+  redter.yres = 0;
+  redter.width = 1;
+  redter.height = TERAPIX_PE_NUMBER;
+  redter.result = (void*) red_0;
+  redter.macroid = TERAPIX_UCODE_GLOBAL_MAX;
+  redter.imgwidth = i0->width;
+  redter.imgheight = i0->height;
+  redter.subimgwidth = TERAPIX_PE_NUMBER;
+  redter.subimgheight = imagelet_size;
+
+  ret |= freia_cg_read_reduction_results(&redres);
+
+  // assign reduction parameter
+  *po2 = (int32_t) red_0[0];
 
   return ret;
 }

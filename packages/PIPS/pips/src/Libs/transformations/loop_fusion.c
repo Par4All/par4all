@@ -287,16 +287,26 @@ static bool fusion_loops(statement sloop1,
   if(index1!=index2) {
     pips_debug(4,"Replace second loop index (%s) with first one (%s)\n",
                entity_name(index2), entity_name(index1));
-    // FI: FIXME we should check that index1 is dead on exit of loop1 and
-    // that index2 is dead on exit of loop2 and that index1 does not
-    // appear in the memory effects of loop2
-    replace_entity((void *)body_loop2, index2, index1);
+    // Get all variable referenced in loop2 body
+    set ref_entities = get_referenced_entities(loop2);
 
-    struct entity_pair thecouple = { index2, index1 };
-    gen_context_recurse(body_loop2, &thecouple,
-            statement_domain, gen_true, replace_entity_effects_walker);
+    // Assert that index1 is not referenced in loop2
+    if(set_belong_p(ref_entities,index1)) {
+      pips_debug(3,"First loop index (%s) is used in the second loop, we don't"
+                 " know how to handle this case !\n",
+                 entity_name(index1));
+      return false;
+    } else {
+      // FI: FIXME we should check that index2 is dead on exit of loop2
+      replace_entity((void *)body_loop2, index2, index1);
+
+      struct entity_pair thecouple = { index2, index1 };
+      gen_context_recurse(body_loop2, &thecouple,
+                          statement_domain, gen_true,
+                          replace_entity_effects_walker);
+    }
+    set_free(ref_entities);
   }
-
   //statement new_body = make_block_with_stmt_if_not_already(body_loop1);
   list seq1;
   list fused;
@@ -690,6 +700,52 @@ static void merge_blocks(fusion_block block1, fusion_block block2) {
 
 
 /**
+ * @brief Checks if precedence constraints allow fusing two blocks
+ */
+static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
+  bool fusable_p = false;
+  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
+    // Blocks are active and are loops
+
+    if(set_belong_p(b2->successors,b1)) {
+      ifdebug(6) {
+        pips_debug(6,"b1 is a successor of b2, fusion prevented !\n");
+        print_block(b1);
+        print_block(b2);
+      }
+      fusable_p = false;
+    } else if(set_belong_p(b1->successors,b2)) {
+      // Adjacent blocks are fusable
+      ifdebug(6) {
+        pips_debug(6,"blocks are fusable because directly connected\n");
+        print_block(b1);
+        print_block(b2);
+      }
+      fusable_p = true;
+    } else {
+      // If there's some constraint, we won't be able to fuse them
+      // here is a heavy way to check that, better not to think about
+      // algorithm complexity :-(
+      pips_debug(6,"Getting full successors for b1 (%d)\n",b1->num);
+      set full_succ_b1 = prune_successors_tree(b1);
+      if(!set_belong_p(full_succ_b1,b2)) {
+        // b2 is not a successors of a successor of a .... of b1
+        // look at the opposite !
+        pips_debug(6,"Getting full successors for b2 (%d)\n",b2->num);
+        set full_succ_b2 = prune_successors_tree(b2);
+        if(!set_belong_p(full_succ_b2,b1)) {
+          fusable_p = true;
+        }
+        set_free(full_succ_b2);
+      }
+      set_free(full_succ_b1);
+    }
+  }
+  return fusable_p;
+}
+
+
+/**
  * Try to fuse two blocks (if they are loop...)
  * @return true if a fusion occured !
  */
@@ -767,7 +823,8 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
     pips_debug(5,"Block %d is a loop, try to fuse with rr_successors !\n",b->num);
     SET_FOREACH(fusion_block, succ, b->rr_successors)
     {
-      if(fuse_block(b, succ, maximize_parallelism)) {
+      if(fusable_blocks_p(b,succ) &&
+          fuse_block(b, succ, maximize_parallelism)) {
         /* predecessors and successors set have been modified for the current
          * block... we can no longer continue in this loop, let's restart
          * current function at the beginning and end this one.
@@ -784,52 +841,6 @@ static void try_to_fuse_with_rr_successors(fusion_block b,
   }
 
   return;
-}
-
-
-/**
- * @brief Checks if precedence constraints allow fusing two blocks
- */
-static bool fusable_blocks_p( fusion_block b1, fusion_block b2) {
-  bool fusable_p = false;
-  if(b1!=b2 && b1->num>=0 && b2->num>=0 && b1->is_a_loop && b2->is_a_loop) {
-    // Blocks are active and are loops
-
-    if(set_belong_p(b2->successors,b1)) {
-      ifdebug(6) {
-        pips_debug(6,"b1 is a successor of b2, fusion prevented !\n");
-        print_block(b1);
-        print_block(b2);
-      }
-      fusable_p = false;
-    } else if(set_belong_p(b1->successors,b2)) {
-      // Adjacent blocks are fusable
-      ifdebug(6) {
-        pips_debug(6,"blocks are fusable because directly connected\n");
-        print_block(b1);
-        print_block(b2);
-      }
-      fusable_p = true;
-    } else {
-      // If there's some constraint, we won't be able to fuse them
-      // here is a heavy way to check that, better not to think about
-      // algorithm complexity :-(
-      pips_debug(6,"Getting full successors for b1 (%d)\n",b1->num);
-      set full_succ_b1 = prune_successors_tree(b1);
-      if(!set_belong_p(full_succ_b1,b2)) {
-        // b2 is not a successors of a successor of a .... of b1
-        // look at the opposite !
-        pips_debug(6,"Getting full successors for b2 (%d)\n",b2->num);
-        set full_succ_b2 = prune_successors_tree(b2);
-        if(!set_belong_p(full_succ_b2,b1)) {
-          fusable_p = true;
-        }
-        set_free(full_succ_b2);
-      }
-      set_free(full_succ_b1);
-    }
-  }
-  return fusable_p;
 }
 
 

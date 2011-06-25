@@ -1,0 +1,19 @@
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(b,i) {}
+
+   int b, i;
+
+//  T(b) {b==0}
+
+   b = i^i;
+
+//  T(main) {b==0, main==0}
+
+
+   return 0;
+}

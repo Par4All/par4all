@@ -156,10 +156,6 @@ static void loop_annotate(loop l, gpu_lna_context * p)
     C_AND_OPERATOR_NAME : AND_OPERATOR_NAME;
   string less_op =  (get_prettyprint_language_tag() == is_language_c) ?
     C_LESS_OR_EQUAL_OPERATOR_NAME : LESS_OR_EQUAL_OPERATOR_NAME;
-  string max_op =  (get_prettyprint_language_tag() == is_language_c) ?
-    PIPS_C_MAX_OPERATOR_NAME : MAX_OPERATOR_NAME;
-  string min_op =  (get_prettyprint_language_tag() == is_language_c) ?
-    PIPS_C_MIN_OPERATOR_NAME : MIN_OPERATOR_NAME;
   /* The first time we enter this function is when we reach the innermost
      loop nest level.
   */
@@ -214,9 +210,9 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 						       upper_other_loop);
 
 			  (void) simplify_expression(&new_lower_2);
-			  c_lower = MakeBinaryCall(entity_intrinsic(min_op),
-						   new_lower_1,
-						   new_lower_2);
+			  c_lower = make_min_expression(new_lower_1,
+							new_lower_2,
+							get_prettyprint_language_tag());
 			}
 		      if (effects_read_variable_p(l_eff_upper_bound,
 						 loop_index(other_loop)))
@@ -230,9 +226,9 @@ static void loop_annotate(loop l, gpu_lna_context * p)
 						       upper_other_loop);
 			  (void) simplify_expression(&new_upper_2);
 
-			  c_upper = MakeBinaryCall(entity_intrinsic(max_op),
-						   new_upper_1,
-						   new_upper_2);
+			  c_upper = make_max_expression(new_upper_1,
+							new_upper_2,
+							get_prettyprint_language_tag());
 			}
 		    }
 		}

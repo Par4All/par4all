@@ -6,8 +6,8 @@ C  <I-W-EXACT-{}>
 
       DO I = 11, 20                                                     0004
 
-C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I-10, 11<=I, I<=20}>
+C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
@@ -18,8 +18,8 @@ C  <I-W-EXACT-{}>
 
       DO I = 11, 20                                                     0007
 
-C  <A(PHI1)-R-EXACT-{PHI1==I-10, 1<=PHI1, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I+10, PHI1<=30, 11<=I}>
+C  <A(PHI1)-R-EXACT-{PHI1==I-10, 1<=PHI1, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
@@ -30,8 +30,8 @@ C  <I-W-EXACT-{}>
 
       DO I = 11, 20                                                     0010
 
-C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-R-EXACT-{PHI1==I-10, 11<=I, I<=20}>
+C  <A(PHI1)-R-EXACT-{PHI1==I+10, 11<=I, I<=20}>
 C  <A(PHI1)-W-EXACT-{PHI1==I, 11<=I, I<=20}>
 C  <I-R-EXACT-{}>
 
