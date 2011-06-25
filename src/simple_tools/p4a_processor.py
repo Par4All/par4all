@@ -367,7 +367,7 @@ class p4a_processor(object):
             #set to False (mandatory) for A&K algorithm on C source file
             self.workspace.props.memory_effects_only = self.fortran
 
-		#Apply requested phases before parallezation
+        #Apply requested phases before parallezation
         apply_user_requested_phases(all_modules, apply_phases_before)
 
         # Try to privatize all the scalar variables in loops:
@@ -376,14 +376,16 @@ class p4a_processor(object):
         if fine:
             # Use a fine-grain parallelization à la Allen & Kennedy:
             all_modules.internalize_parallel_code(concurrent=True)
-        elif self.atomic:
-            # Use a coarse-grain parallelization with regions:
-            all_modules.coarse_grain_parallelization_with_reduction(concurrent=True)
-        else:
-            # Use a coarse-grain parallelization with regions:
-            all_modules.coarse_grain_parallelization(concurrent=True)
 
-		#Apply requested phases after parallezation
+        # Always use a coarse-grain parallelization with regions:
+        all_modules.coarse_grain_parallelization(concurrent=True)
+
+        if self.atomic:
+            # Use a coarse-grain parallelization with regions:
+            all_modules.flag_parallel_reduced_loops_with_atomic(concurrent=True)
+
+
+        #Apply requested phases after parallezation
         apply_user_requested_phases(all_modules, apply_phases_after)
 
 
@@ -590,6 +592,7 @@ class p4a_processor(object):
                             GPU_USE_KERNEL_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_LAUNCHER_INDEPENDENT_COMPILATION_UNIT = self.c99,
                             GPU_USE_WRAPPER_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                            OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                             concurrent=True)
 
         # Select kernel launchers by using the fact that all the generated
@@ -617,18 +620,17 @@ class p4a_processor(object):
         # dependent resources:
         kernel_launchers.privatize_module(concurrent=True)
         # Idem for this phase:
-        if self.atomic:
-            # Use a coarse-grain parallelization with regions:
-            kernel_launchers.coarse_grain_parallelization_with_reduction(concurrent=True)
-            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
-        else:
-            kernel_launchers.coarse_grain_parallelization(concurrent=True)
-        
+        kernel_launchers.coarse_grain_parallelization(concurrent=True)
         
         if fine:
             # When using a fine-grain parallelization (Allen & Kennedy) for
             # producing launchers, we have to do it also in the launcher now.
             kernel_launchers.internalize_parallel_code(concurrent=True)
+
+        if self.atomic:
+            # Idem for this phase:
+            kernel_launchers.replace_reduction_with_atomic(concurrent=True)
+                
 
         # In CUDA there is a limitation on 2D grids of thread blocks, in
         # OpenCL there is a 3D limitation, so limit parallelism at 2D
@@ -644,6 +646,7 @@ class p4a_processor(object):
         # launchers that have already been generated:
         kernel_launchers.gpu_ify(GPU_USE_LAUNCHER = False,
                                  OUTLINE_INDEPENDENT_COMPILATION_UNIT = self.c99,
+                                 OUTLINE_WRITTEN_SCALAR_BY_REFERENCE = False, # unsure
                                  concurrent=True)
 
         # Select kernels by using the fact that all the generated kernels
@@ -700,14 +703,10 @@ class p4a_processor(object):
         # the quality of the generated code by generating array
         # declarations as pointers and by accessing them as
         # array[linearized expression]:
-        if (self.fortran == False):
-            if self.c99:
-                kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=True,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-        else:
-            kernels.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
-            wrappers.linearize_array_fortran(LINEARIZE_ARRAY_USE_POINTERS=False,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+        if self.c99 or self.fortran:
+            kernel_launchers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            kernels.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
+            wrappers.linearize_array(LINEARIZE_ARRAY_USE_POINTERS=self.c99,LINEARIZE_ARRAY_CAST_AT_CALL_SITE=True)
 
         # Update the list of cuda modules
         p4a_util.add_list_to_set (map(lambda x:x.name, kernels),
