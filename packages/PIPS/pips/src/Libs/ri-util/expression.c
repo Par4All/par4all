@@ -1388,6 +1388,51 @@ int signed_integer_constant_expression_value(expression e)
 }
 
 
+expression make_max_expression(expression e1, expression e2, enum language_utype lang)
+{
+  expression new_exp = expression_undefined;
+  if (lang == is_language_c)
+    {
+      expression comp_exp = MakeBinaryCall(entity_intrinsic(C_LESS_THAN_OPERATOR_NAME),
+					   copy_expression(e1),
+					   copy_expression(e2));
+      new_exp = MakeTernaryCall(entity_intrinsic(CONDITIONAL_OPERATOR_NAME),
+			       comp_exp,
+			       e2,
+			       e1);
+    }
+  else
+    {
+      new_exp = MakeBinaryCall(entity_intrinsic(MAX_OPERATOR_NAME),
+			       e1,e2);
+    }
+  return  new_exp;
+}
+
+expression make_min_expression(expression e1, expression e2, enum language_utype lang)
+{
+  expression new_exp = expression_undefined;
+  if (lang == is_language_c)
+    {
+      expression comp_exp = MakeBinaryCall(entity_intrinsic(C_LESS_THAN_OPERATOR_NAME),
+					   copy_expression(e1),
+					   copy_expression(e2));
+      new_exp = MakeTernaryCall(entity_intrinsic(CONDITIONAL_OPERATOR_NAME),
+			       comp_exp,
+			       e1,
+			       e2);
+    }
+  else
+    {
+      new_exp = MakeBinaryCall(entity_intrinsic(MAX_OPERATOR_NAME),
+			       e1,e2);
+    }
+  return  new_exp;
+}
+
+
+
+
 /* Some functions to generate expressions from vectors and constraint
    systems. */
 

@@ -1004,11 +1004,11 @@ basic basic_of_expression(expression exp)
   return basic_of_any_expression(exp, FALSE);
 }
 
-/** 
+/**
  * Retrieves the basic of a reference in a newly allocated basic object
- * 
+ *
  * @param r reference we want the basic of
- * 
+ *
  * @return allocated basic of the reference
  */
 basic basic_of_any_reference(reference r, bool apply_p, bool ultimate_p) {

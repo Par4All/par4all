@@ -133,7 +133,7 @@ void simple_reference_to_simple_reference_conversion(reference ref,
 						     descriptor * output_desc)
 {
   *output_ref = ref;
-  *output_desc = descriptor_undefined;
+  *output_desc = make_descriptor(is_descriptor_none,UU);
 }
 
 /*

@@ -88,10 +88,9 @@ EffectsMayUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_may_union,
-					   effect_to_may_sdfi_list,
 					   effect_to_may_sdfi_list);
     return(lr);
 }
@@ -109,10 +108,9 @@ ProperEffectsMustUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_must_union,
-					   effect_to_list,
 					   effect_to_list);
     return(lr);
 }
@@ -129,10 +127,9 @@ EffectsMustUnion(list l1, list l2,
 {
     list lr;
 
-    lr = list_of_effects_generic_binary_op(l1, l2,
+    lr = list_of_effects_generic_union_op(l1, l2,
 					   union_combinable_p,
 					   effects_must_union,
-					   effect_to_sdfi_list,
 					   effect_to_sdfi_list);
     return(lr);
 }
@@ -338,11 +335,9 @@ EffectsSupDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "EffectsSupDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_sup_difference_op(l1, l2,
 					   difference_combinable_p,
-					   effect_sup_difference,
-					   effect_to_list,
-					   effect_to_nil_list);
+					   effect_sup_difference);
     debug(3, "EffectsSupDifference", "end\n");
 
     return l_res;
@@ -364,11 +359,9 @@ EffectsInfDifference(list l1, list l2,
     list l_res = NIL;
 
     debug(3, "EffectsInfDifference", "begin\n");
-    l_res = list_of_effects_generic_binary_op(l1, l2,
+    l_res = list_of_effects_generic_inf_difference_op(l1, l2,
 					   difference_combinable_p,
-					   effect_inf_difference,
-					   effect_to_list,
-					   effect_to_nil_list);
+					   effect_inf_difference);
     debug(3, "EffectsInfDifference", "end\n");
 
     return l_res;
