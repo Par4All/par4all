@@ -80,8 +80,8 @@ extern freia_status freia_aipo_fast_correlation(freia_data2d *, const freia_data
 // Measure
 extern freia_status freia_aipo_global_min(const freia_data2d *, int32_t *);
 extern freia_status freia_aipo_global_max(const freia_data2d *, int32_t *);
-extern freia_status freia_aipo_global_min_coord(const freia_data2d *, int32_t *, int32_t *, int32_t *);
-extern freia_status freia_aipo_global_max_coord(const freia_data2d *, int32_t *, int32_t *, int32_t *);
+extern freia_status freia_aipo_global_min_coord(const freia_data2d *, int32_t *, uint32_t *, uint32_t *);
+extern freia_status freia_aipo_global_max_coord(const freia_data2d *, int32_t *, uint32_t *, uint32_t *);
 extern freia_status freia_aipo_global_vol(const freia_data2d *, int32_t *);
 // Misc
 extern freia_status freia_aipo_copy(freia_data2d *, const freia_data2d *);

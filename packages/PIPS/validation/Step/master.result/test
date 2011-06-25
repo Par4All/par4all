@@ -157,9 +157,9 @@ C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
 C     Communicating data to other nodes
 C     3 communication shemes for all-to-all personalized broadcast :
 C     STEP_NONBLOCKING, STEP_BLOCKING1 and STEP_BLOCKING2.
-      CALL STEP_MASTERTOALLREGION(A, STEP_NBLOCKING_ALG)                0133
-      CALL STEP_MASTERTOALLSCALAR(I, STEP_NBLOCKING_ALG,                0134
-     &STEP_INTEGER4)                                                    0134
+      CALL STEP_MASTERTOALLSCALAR(I, STEP_NBLOCKING_ALG,                0133
+     &STEP_INTEGER4)                                                    0133
+      CALL STEP_MASTERTOALLREGION(A, STEP_NBLOCKING_ALG)                0135
       CALL STEP_WAITALL                                                 0136
       CALL STEP_CONSTRUCT_END(STEP_MASTER)                              0137
 

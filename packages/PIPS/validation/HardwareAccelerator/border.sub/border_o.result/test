@@ -294,17 +294,21 @@ freia_status border_o_helper_0_0_0(
   freia_dynamic_param dyn_param;
   terapix_gram gram;
   int i;
-  freia_status ret;
+  freia_status ret = FREIA_OK;
+  // data structures for reductions
+  terapix_mcu_macrocode mem_init;
+  freia_reduction_results redres;
+  terapix_reduction redter;
   // overall structure which describes the computation
   terapix_mcu_instr mcu_instr;
   // operation 0 parameters
   int16_t p_0[9];
   const int32_t x_0 = 0;
   const int32_t y_0 = 0;
+  // flip flop macro code and I/Os
   terapix_mcu_macrocode mcu_macro[2][2];
   terapix_tile_info tile_in[2][1];
   terapix_tile_info tile_out[2][1];
-
   // imagelets definitions:
   // - 2 computation imagelets
   // - 1 double buffer imagelets
@@ -323,13 +327,14 @@ freia_status border_o_helper_0_0_0(
   mcode.size = TERAPIX_UCODE_SIZE_T;
   freia_mg_write_microcode(&mcode);
 
-  // subimage operation
-  param.size = -1; // not used
-  param.raw = (void*) &mcu_instr;
-
   // dyn_param contents
   dyn_param.raw = &gram;
   dyn_param.size = sizeof(terapix_gram);
+
+  // redres contents
+  redres.raw = (void*) &redter;
+  redres.size = sizeof(terapix_reduction);
+
   // 0: E8(1) -> 2
   mcu_macro[0][0].xmin1 = imagelet_io_1_0;
   mcu_macro[1][0].xmin1 = imagelet_io_1_1;
@@ -382,6 +387,7 @@ freia_status border_o_helper_0_0_0(
   mcu_macro[0][1].addrStart = TERAPIX_UCODE_COPY;
   mcu_macro[1][1].addrStart = TERAPIX_UCODE_COPY;
 
+
   // inputs:
   // - imagelet 1 is i0 for in
   tile_in[0][0].x = imagelet_io_1_0;
@@ -395,7 +401,6 @@ freia_status border_o_helper_0_0_0(
   tile_out[0][0].y = 0;
   tile_out[1][0].x = imagelet_io_1_1;
   tile_out[1][0].y = 0;
-
 
   // imagelet erosion for the computation
   mcu_instr.borderTop    = 0;
@@ -421,7 +426,9 @@ freia_status border_o_helper_0_0_0(
   mcu_instr.instr1   = mcu_macro[1];
 
   // call terapix runtime
-  ret = freia_cg_template_process(&param, o0, i0);
+  param.size = -1; // not used
+  param.raw = (void*) &mcu_instr;
+  ret |= freia_cg_template_process(&param, o0, i0);
 
   // extract measures
 

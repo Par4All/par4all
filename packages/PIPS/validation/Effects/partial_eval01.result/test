@@ -94,7 +94,6 @@ int main()
 Initial code with cumulated effects for "duck"
 
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: size
 //             <    is written>: riri[2]
 int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {

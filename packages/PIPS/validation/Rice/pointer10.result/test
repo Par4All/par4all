@@ -1,0 +1,57 @@
+
+POINTS TO
+
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
+{
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-)}
+   double (*w)[N];
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+   int i;
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *ANY_MODULE*:*NOWHERE*_b0,-Exact-)}
+
+   w = (double (*)[N]) malloc(N*sizeof(double));
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *HEAP*_l_7[0],-Exact-)}
+
+   for(i = 0; i <= N-1; i += 1)
+//  {(a,_a_1[0],-Exact-);(b,_b_2[0],-Exact-);(c,_c_3[0],-Exact-);(w,
+//   *HEAP*_l_7[0],-Exact-)}
+      (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
+}
+
+Proper effects with points-to
+
+void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
+{
+   double (*w)[N];
+   int i;
+//             <    is read   >: N _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: w _MALLOC_EFFECTS:_MALLOC_
+
+   w = (double (*)[N]) malloc(N*sizeof(double));
+//             <    is read   >: N
+//             <    is written>: i
+
+   for(i = 0; i <= N-1; i += 1)
+//             <    is read   >: N _a_1[0][i] _b_2[0][i] _c_3[0][i] a 
+//                               b c i w
+//             <    is written>: *HEAP*_l_7[0][i]
+      (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
+}
+
+Parallel code
+
+void pointer10(double (*a)[10], double (*b)[10], double (*c)[10], int N)
+{
+   double (*w)[N];
+   int i;
+
+   w = (double (*)[N]) malloc(N*sizeof(double));
+
+#pragma omp parallel for 
+   for(i = 0; i <= N-1; i += 1)
+      (*w)[i] = (*c)[i]+(*a)[i]*(*b)[i];
+}

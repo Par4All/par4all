@@ -59,8 +59,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: s.entier s.reel 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
 //             <    is written>: s.entier
@@ -68,7 +67,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //             <    is read   >: j
@@ -95,8 +94,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: s.entier s.reel 
-//                               _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    s = make_s(1, 2.);
 //             <    is written>: s.entier
@@ -104,7 +102,7 @@ int main()
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
 //             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
-//             <    is written>: j _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
 
    j = make_s(1, 2.).entier;
 //             <    is read   >: j

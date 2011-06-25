@@ -1,0 +1,388 @@
+
+TRANSFORMERS
+
+
+//  T() {}
+
+void ts_singlestate(void)
+{
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(i,j) {i==0, j==0}
+
+   i = j = 0;
+
+//  T(i,j) {i<=104, i#init+2j<=i+2j#init, 2j<=i, i+2j<=204, 0<=j,
+//    j#init<=j}
+
+   while (rand_b())
+
+//  T(i,j) {i+2j==i#init+2j#init+4, i#init+2<=i, i<=i#init+4, 2j<=i,
+//    i#init<=100, 0<=j}
+
+      if (rand_b()) {
+
+//  T() {i<=100}
+
+         if (!(i<=100))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(i) {i==i#init+4, i<=104}
+
+         i += 4;
+
+//  T() {i<=104, 2j<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {i<=100}
+
+         if (!(i<=100))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(i) {i==i#init+2, i<=102}
+
+         i += 2;
+
+//  T(j) {j==j#init+1, i<=102}
+
+         j++;
+
+//  T() {i<=102, 2j<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  T() {}
+
+void ts_restructured(void)
+{
+
+//  T(i,j) {}
+
+   int i, j;
+
+//  T(i,j) {i==0, j==0}
+
+   i = j = 0;
+
+//  T(i,j) {i<=100, i#init+2j<=i+2j#init, 2j<=i, 0<=j, j#init<=j}
+
+   while (rand_b())
+
+//  T(i,j) {i+2j==i#init+2j#init+4, i<=100, i#init+2<=i, i<=i#init+4,
+//    2j<=i, 0<=j}
+
+      if (rand_b()) {
+
+//  T() {i<=96}
+
+         if (!(i<=96))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(i) {i==i#init+4, i<=100}
+
+         i += 4;
+
+//  T() {i<=100, 2j<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  T() {i<=98}
+
+         if (!(i<=98))
+
+//  T() {0==-1}
+
+            deadlock();
+
+//  T(i) {i==i#init+2, i<=100}
+
+         i += 2;
+
+//  T(j) {j==j#init+1, i<=100}
+
+         j++;
+
+//  T() {i<=100, 2j<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+            checking_error();
+      }
+
+//  T(i,j) {i+2j==i#init+2j#init+4, 101<=i, i#init+2<=i, i<=i#init+4,
+//    i#init+4<=i+2j, i+2j<=2i#init+4, i#init<=100}
+
+   if (rand_b()) {
+
+//  T() {97<=i, i<=100, 2j<=i, 0<=j}
+
+      if (!(i<=100&&i>96))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(i) {i==i#init+4, 101<=i, i<=104, 2j+4<=i, 0<=j}
+
+      i += 4;
+
+//  T() {101<=i, i<=104, 2j+4<=i, 0<=j}
+
+      if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+   else {
+
+//  T() {99<=i, i<=100, 2j<=i, 0<=j}
+
+      if (!(i<=100&&i>98))
+
+//  T() {0==-1}
+
+         deadlock();
+
+//  T(i) {i==i#init+2, 101<=i, i<=102, 2j+2<=i, 0<=j}
+
+      i += 2;
+
+//  T(j) {j==j#init+1, 101<=i, i<=102, 2j<=i, 1<=j}
+
+      j++;
+
+//  T() {101<=i, i<=102, 2j<=i, 1<=j}
+
+      if (i<2*j||j<0)
+
+//  T() {0==-1}
+
+         checking_error();
+   }
+}
+
+PRECONDITIONS
+
+
+//  P() {}
+
+void ts_singlestate(void)
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   i = j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+   while (rand_b())
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+      if (rand_b()) {
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+         if (!(i<=100))
+
+//  P(i,j) {101<=i, i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=100, 2j<=i, i+2j<=204, 0<=j}
+
+         i += 4;
+
+//  P(i,j) {i<=104, 2j+4<=i, i+2j<=208, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(i,j) {i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+         if (!(i<=100))
+
+//  P(i,j) {101<=i, i<=104, 2j<=i, i+2j<=204, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=100, 2j<=i, i+2j<=204, 0<=j}
+
+         i += 2;
+
+//  P(i,j) {i<=102, 2j+2<=i, i+2j<=206, 0<=j}
+
+         j++;
+
+//  P(i,j) {i<=102, 2j<=i, i+2j<=208, 1<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+}
+
+//  P() {}
+
+void ts_restructured(void)
+{
+
+//  P() {}
+
+   int i, j;
+
+//  P(i,j) {}
+
+   i = j = 0;
+
+//  P(i,j) {i==0, j==0}
+
+   while (rand_b())
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+      if (rand_b()) {
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+         if (!(i<=96))
+
+//  P(i,j) {97<=i, i<=100, 2j<=i, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=96, 2j<=i, 0<=j}
+
+         i += 4;
+
+//  P(i,j) {i<=100, 2j+4<=i, 0<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+      else {
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+         if (!(i<=98))
+
+//  P(i,j) {99<=i, i<=100, 2j<=i, 0<=j}
+
+            deadlock();
+
+//  P(i,j) {i<=98, 2j<=i, 0<=j}
+
+         i += 2;
+
+//  P(i,j) {i<=100, 2j+2<=i, 0<=j}
+
+         j++;
+
+//  P(i,j) {i<=100, 2j<=i, 1<=j}
+
+         if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+            checking_error();
+      }
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+   if (rand_b()) {
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+      if (!(i<=100&&i>96))
+
+//  P(i,j) {i<=96, 2j<=i, 0<=j}
+
+         deadlock();
+
+//  P(i,j) {97<=i, i<=100, 2j<=i, 0<=j}
+
+      i += 4;
+
+//  P(i,j) {101<=i, i<=104, 2j+4<=i, 0<=j}
+
+      if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+   else {
+
+//  P(i,j) {i<=100, 2j<=i, 0<=j}
+
+      if (!(i<=100&&i>98))
+
+//  P(i,j) {i<=98, 2j<=i, 0<=j}
+
+         deadlock();
+
+//  P(i,j) {99<=i, i<=100, 2j<=i, 0<=j}
+
+      i += 2;
+
+//  P(i,j) {101<=i, i<=102, 2j+2<=i, 0<=j}
+
+      j++;
+
+//  P(i,j) {101<=i, i<=102, 2j<=i, 1<=j}
+
+      if (i<2*j||j<0)
+
+//  P() {0==-1}
+
+         checking_error();
+   }
+}

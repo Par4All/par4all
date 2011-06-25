@@ -1,4 +1,4 @@
-delete pointer01_sub
+delete pointer_sub01
 
 setproperty ABORT_ON_USER_ERROR TRUE
 

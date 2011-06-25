@@ -34,7 +34,6 @@ int main(int argc, char **argv)
 
    double (*in2)[n] = (double (*)[n]) malloc(sizeof(double)*n);
 
-//  <argv-R-EXACT-{}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
 //  <stderr[PHI1]-W-MAY-{PHI1==0}>
@@ -45,7 +44,6 @@ int main(int argc, char **argv)
 
    init_args(argc, argv);
 
-//  <in-R-EXACT-{}>
 //  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
@@ -57,7 +55,6 @@ int main(int argc, char **argv)
 
    init_data_double(*in, n);
 
-//  <in-R-EXACT-{}>
 //  <in[PHI1][PHI2]-W-MAY-{PHI1==0}>
 //  <stderr-R-MAY-{}>
 //  <stderr[PHI1]-R-MAY-{PHI1==0}>
