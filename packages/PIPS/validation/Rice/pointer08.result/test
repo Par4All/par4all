@@ -1,0 +1,66 @@
+
+POINTS TO
+
+//  {}
+void pointer08()
+{
+//  {}
+   struct tree {
+      struct tree *tree_list[10];
+   };
+//  {}
+   int i;
+//  {}
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+//  {(t,*HEAP*_l_8,-Exact-)}
+   for(i = 0; i <= 9; i += 1)
+//  {(t[0][tree_list][i],*HEAP*_l_10,-MAY-);(t,*HEAP*_l_8,-MAY-)}
+      (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+}
+
+Proper effects with points-to
+
+void pointer08()
+{
+   struct tree {
+      struct tree *tree_list[10];
+   };
+   int i;
+//             <    is read   >: _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: t _MALLOC_EFFECTS:_MALLOC_
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+//             <    is written>: i
+   for(i = 0; i <= 9; i += 1)
+//             <may be written>: *HEAP*_l_8.tree_list[i]
+//             <    is read   >: i t _MALLOC_EFFECTS:_MALLOC_
+//             <    is written>: _MALLOC_EFFECTS:_MALLOC_
+      (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+}
+
+ *********************** Use-Def Chains *********************
+
+	10 --> 10 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <*HEAP*_l_8.tree_list[i]-W-MAY> to <*HEAP*_l_8.tree_list[i]-W-MAY>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+	08 --> 10 with conflicts
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+		from <t-W-EXACT> to <t-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-W-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-R-EXACT>
+		from <_MALLOC_EFFECTS:_MALLOC_-R-EXACT> to <_MALLOC_EFFECTS:_MALLOC_-W-EXACT>
+
+****************** End of Dependence Graph ******************
+
+Parallel code
+
+void pointer08()
+{
+   struct tree {
+      struct tree *tree_list[10];
+   };
+   int i;
+   struct tree *t = (struct tree *) malloc(sizeof(struct tree ));
+   for(i = 0; i <= 9; i += 1)
+      (t->tree_list)[i] = (struct tree *) malloc(sizeof(struct tree ));
+}

@@ -93,11 +93,11 @@ freia_status freia_aipo_global_max(const freia_data2d *i, int32_t *r)
    *r = i->stuff;
    return FREIA_OK;
 }
-freia_status freia_aipo_global_max_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
+freia_status freia_aipo_global_max_coord(const freia_data2d *i, int32_t *r0, uint32_t *r1, uint32_t *r2)
 {
    *r0 = i->stuff;
-   *r1 = i->stuff;
-   *r2 = i->stuff;
+   *r1 = (uint32_t) i->stuff;
+   *r2 = (uint32_t) i->stuff;
    return FREIA_OK;
 }
 freia_status freia_aipo_global_min(const freia_data2d *i, int32_t *r)
@@ -105,11 +105,11 @@ freia_status freia_aipo_global_min(const freia_data2d *i, int32_t *r)
    *r = i->stuff;
    return FREIA_OK;
 }
-freia_status freia_aipo_global_min_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
+freia_status freia_aipo_global_min_coord(const freia_data2d *i, int32_t *r0, uint32_t *r1, uint32_t *r2)
 {
    *r0 = i->stuff;
-   *r1 = i->stuff;
-   *r2 = i->stuff;
+   *r1 = (uint32_t) i->stuff;
+   *r2 = (uint32_t) i->stuff;
    return FREIA_OK;
 }
 freia_status freia_aipo_global_vol(const freia_data2d *i, int32_t *r)
@@ -446,17 +446,17 @@ freia_status freia_aipo_global_max(const freia_data2d *i, int32_t *r)
 }
 //             <    is read   >: i i[0].stuff r0 r1 r2
 //             <    is written>: r0[0] r1[0] r2[0]
-freia_status freia_aipo_global_max_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
+freia_status freia_aipo_global_max_coord(const freia_data2d *i, int32_t *r0, uint32_t *r1, uint32_t *r2)
 {
 //             <    is read   >: i i[0].stuff r0
 //             <    is written>: r0[0]
    *r0 = i->stuff;
 //             <    is read   >: i i[0].stuff r1
 //             <    is written>: r1[0]
-   *r1 = i->stuff;
+   *r1 = (uint32_t) i->stuff;
 //             <    is read   >: i i[0].stuff r2
 //             <    is written>: r2[0]
-   *r2 = i->stuff;
+   *r2 = (uint32_t) i->stuff;
    return FREIA_OK;
 }
 //             <    is read   >: i i[0].stuff r
@@ -470,17 +470,17 @@ freia_status freia_aipo_global_min(const freia_data2d *i, int32_t *r)
 }
 //             <    is read   >: i i[0].stuff r0 r1 r2
 //             <    is written>: r0[0] r1[0] r2[0]
-freia_status freia_aipo_global_min_coord(const freia_data2d *i, int32_t *r0, int32_t *r1, int32_t *r2)
+freia_status freia_aipo_global_min_coord(const freia_data2d *i, int32_t *r0, uint32_t *r1, uint32_t *r2)
 {
 //             <    is read   >: i i[0].stuff r0
 //             <    is written>: r0[0]
    *r0 = i->stuff;
 //             <    is read   >: i i[0].stuff r1
 //             <    is written>: r1[0]
-   *r1 = i->stuff;
+   *r1 = (uint32_t) i->stuff;
 //             <    is read   >: i i[0].stuff r2
 //             <    is written>: r2[0]
-   *r2 = i->stuff;
+   *r2 = (uint32_t) i->stuff;
    return FREIA_OK;
 }
 //             <    is read   >: i i[0].stuff r

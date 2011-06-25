@@ -1,0 +1,29 @@
+
+//  T(main) {main==3}
+
+int main(void)
+{
+
+//  T(b) {}
+
+   int b;
+
+//  T(b) {b==1}
+
+   b = true;
+
+//  T(b) {b==2, b#init==1}
+
+
+   b = true+1;
+
+//  T(b) {b==3, b#init==2}
+
+
+   b += true;
+
+//  T(main) {b==3, main==3}
+
+
+   return b;
+}

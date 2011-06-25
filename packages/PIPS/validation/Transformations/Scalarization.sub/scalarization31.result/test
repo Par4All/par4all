@@ -25,11 +25,11 @@ C     Second example, which PIPS decides to be unprofitable
       PRINT *, D
 
       DO I = 1, N
+         __SCALAR__3 = A(I)
          __SCALAR__2 = E(I)
-         __SCALAR__1 = A(I)
-         IF (M(I).LT.0.) __SCALAR__1 = B(I)+C(I)
-         __SCALAR__3 = __SCALAR__1+__SCALAR__2
-         __SCALAR__3 = __SCALAR__3+__SCALAR__1*__SCALAR__2
+         IF (M(I).LT.0.) __SCALAR__3 = B(I)+C(I)
+         __SCALAR__1 = __SCALAR__3+__SCALAR__2
+         __SCALAR__1 = __SCALAR__1+__SCALAR__3*__SCALAR__2
       ENDDO
 
       END

@@ -1,0 +1,23 @@
+
+//  T(main) {main==0}
+
+int main(void)
+{
+
+//  T(b,m,n) {}
+
+   int b, n, m;
+
+//  T(b) {}
+
+   if (n==m)
+
+//  T(b) {b==0, m==n}
+
+      b = n^m;
+
+//  T(main) {main==0}
+
+
+   return 0;
+}

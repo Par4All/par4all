@@ -1,3 +1,9 @@
+/* Check logical operators on enum variables
+ *
+ * No information available for b7 because transformers are not
+ * computed in context
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 

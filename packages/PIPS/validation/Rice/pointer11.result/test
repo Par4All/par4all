@@ -1,0 +1,44 @@
+
+POINTS TO
+
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+void pointer11(int n, float *p, float *q)
+{
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   int i;
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   p = q;
+//  {(p,_q_2[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+   for(i = 0; i <= n-1; i += 1)
+//  {(p,_q_2[0],-Exact-);(q,_q_2[0],-Exact-)}
+      p[i] = q[i];
+}
+
+Proper effects with points-to
+
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+void pointer11(int n, float *p, float *q)
+{
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   int i;
+//  {(p,_p_1[0],-Exact-);(q,_q_2[0],-Exact-)}
+   p = q;
+//  {(p,_q_2[0],-Exact-);(q,_q_2[0],-Exact-)}
+
+   for(i = 0; i <= n-1; i += 1)
+//  {(p,_q_2[0],-Exact-);(q,_q_2[0],-Exact-)}
+      p[i] = q[i];
+}
+
+Parallel code
+
+void pointer11(int n, float *p, float *q)
+{
+   int i;
+   p = q;
+
+#pragma omp parallel for 
+   for(i = 0; i <= n-1; i += 1)
+      p[i] = q[i];
+}

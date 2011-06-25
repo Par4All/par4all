@@ -295,13 +295,13 @@ int main()
 //  <b.p-W-MAY-{}>
 //  <b.p[PHI2]-R-MAY-{}>
 //  <b.p[PHI2]-W-MAY-{0<=PHI2, PHI2<=9}>
+//  <c.array[PHI2]-R-MAY-{}>
 //  <c.array[PHI2]-W-MAY-{0<=PHI2, PHI2<=9}>
 //  <c.n-R-MAY-{}>
 //  <c.n-W-MAY-{}>
-//  <c[PHI1][PHI2]-R-MAY-{}>
 //  <d.array[PHI2]-R-MAY-{0<=PHI2, PHI2<=9}>
+//  <d.array[PHI2]-W-MAY-{}>
 //  <d.n-W-MAY-{}>
-//  <d[PHI1][PHI2]-W-MAY-{}>
 //  <i-R-EXACT-{}>
 //  <i-W-EXACT-{}>
 //  <stdout-R-EXACT-{}>

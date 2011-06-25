@@ -20,8 +20,8 @@ echo
 echo Proper effects with points-to
 echo
 
-#activate PROPER_EFFECTS_WITH_POINTS_TO
-activate PRINT_CODE_PROPER_EFFECTS
+activate PROPER_EFFECTS_WITH_POINTS_TO
+#activate PRINT_CODE_PROPER_EFFECTS
 display PRINTED_FILE
 
 echo
