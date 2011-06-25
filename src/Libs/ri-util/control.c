@@ -532,8 +532,12 @@ check_control_coherency(control c)
 			       ctl, i1, cc, cc, i2, ctl);
 		  }
 		}
-		ifdebug(8)
+		ifdebug(8) {
+		  if(!consistent_p) {
+		    pips_debug(8, "control %p is not correct\n", cc);
 		    pips_assert("Control is correct", consistent_p);
+		  }
+		}
 	    }
 	}, control_predecessors(ctl));
 
@@ -1236,14 +1240,34 @@ unlink_2_control_nodes(control source,
    are undefined.
 */
 void insert_control_in_arc(control c, control before, control after) {
-  pips_assert("c is not a successor of before",
+  // These first two assertions are wrong when "before" is a test whose two
+  // branches reach "after":
+  //
+  // if(c) goto l1; else goto l1; l1: ;
+  //
+  // This is unlikely but does happen when macros are used or when
+  // some code is generated automatically. FI assumes that the two
+  // substitutions will happen simultaneously thanks to the
+  // substitutions in the list
+  pips_assert("c is not already a successor of before",
 	      !is_control_in_list_p(c, control_successors(before)));
-  pips_assert("c is not a predecessor of after",
-	      !is_control_in_list_p(c, control_predecessors(after)));
+
+  // This may be wrong if c has already been inserted in another
+  //arc. Nevertheless it may be useful to insert it in the "before->after" arc.
+  //
+  //pips_assert("c is not a predecessor of after",
+  //	      !is_control_in_list_p(c, control_predecessors(after)));
+
+  // Make sure that before and after are properly linked
   pips_assert("after is a successor of before",
 	      is_control_in_list_p(after, control_successors(before)));
   pips_assert("before is a predecessor of after",
 	      is_control_in_list_p(before, control_predecessors(after)));
+
+  // FI: we might also assert that the statement associated to c is
+  // not a test
+  pips_assert("c is not a test: it has only one successor at most",
+	      !statement_test_p(control_statement(c)));
 
   // FI: when before is a test, how do you know if c must be in the
   // true or in the false branch?
@@ -1262,15 +1286,31 @@ void insert_control_in_arc(control c, control before, control after) {
     // order is preserved
     control_predecessors(c)
       = gen_nconc(control_predecessors(c), CONS(CONTROL, before, NIL));
-    control_predecessors(c) = CONS(CONTROL, before, NIL);
+    //control_predecessors(c) = CONS(CONTROL, before, NIL);
+    control_successors(c) = CONS(CONTROL, after, NIL);
+
     pips_assert("after and before were linked", success1 && success2);
     pips_debug(8, "control %p inserted between before=%p and after=%p\n",
 	       c, before, after);
   }
+  else if(gen_length(control_successors(c))==1
+       && CONTROL(CAR(control_successors(c)))==after) {
+    // We may handle the case outlined above?
+    // The two substitutions should have occured simultaneously?
+    // No, simply the more general case:
+    // precondition: x -> c && c -> after && before -> after
+    // postcondition x -> c && before -> c && c -> after
+    // pips_internal_error("Should not happen\n");
+    // Preserve the branch positions for tests
+    bool success = gen_replace_in_list(control_successors(before), after, c);
+    gen_remove(&control_predecessors(after), before);
+    control_predecessors(c)
+      = gen_nconc(control_predecessors(c), CONS(CONTROL, before, NIL));
+    pips_assert("after and before were linked", success);
+  }
   else
     pips_internal_error("No semantics, no implementation...\n");
 }
-
 
 /* Fuse a 2 control nodes
 
