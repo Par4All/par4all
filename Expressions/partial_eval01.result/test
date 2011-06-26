@@ -1,5 +1,5 @@
 
-Initial code
+Initial code for "duck"
 
 int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
@@ -22,6 +22,7 @@ int main()
    int j;
 //             <    is written>: k
    int k = 16;
+   int t;
 //             <    is read   >: size
 //             <    is written>: i
    for(i = 0; i <= size-1; i += 1)
@@ -31,11 +32,14 @@ int main()
 //             <    is read   >: i j k size
 //             <    is written>: k loulou[0][i][j]
          loulou[0][i][j] = k++;
-//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: riri[2] t
+   t = duck(riri, fifi, size, loulou);
+//             <may be read   >: stdout[0]
 //             <may be written>: stdout[0]
-//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
-//             <    is written>: riri[2] __IO_EFFECTS:LUNS[1]
-   printf("%d\n", duck(riri, fifi, size, loulou));
+//             <    is read   >: stdout t __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", t);
    return 0;
 }
 
@@ -88,21 +92,29 @@ int main()
 
 //  P(i,j,k,size) {k==16, size==2}
 
+   int t;
+
+//  P(i,j,k,size,t) {k==16, size==2}
+
    for(i = 0; i <= size-1; i += 1)
 
-//  P(i,j,k,size) {6i==k-16, size==2, 0<=i, i<=1}
+//  P(i,j,k,size,t) {6i==k-16, size==2, 0<=i, i<=1}
 
       for(j = 0; j <= 5; j += 1)
 
-//  P(i,j,k,size) {6i+j==k-16, size==2, 0<=i, i<=1, 6i+16<=k, j<=5}
+//  P(i,j,k,size,t) {6i+j==k-16, size==2, 0<=i, i<=1, 6i+16<=k, j<=5}
 
          loulou[0][i][j] = k++;
 
-//  P(i,j,k,size) {i==2, j==6, k==28, size==2}
+//  P(i,j,k,size,t) {i==2, j==6, k==28, size==2}
 
-   printf("%d\n", duck(riri, fifi, size, loulou));
+   t = duck(riri, fifi, size, loulou);
 
-//  P(i,j,k,size) {i==2, j==6, k==28, size==2}
+//  P(i,j,k,size,t) {i==2, j==6, k==28, size==2}
+
+   printf("%d\n", t);
+
+//  P(i,j,k,size,t) {i==2, j==6, k==28, size==2}
 
    return 0;
 }
@@ -123,23 +135,3 @@ int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 
    return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
 }
-
-Code after array conversion
-
-int duck(int *riri, int *fifi, int size, int *loulou)
-{
-   int *zaza = (int *) fifi+(3-1-0+1)*1;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
-}
-
-Code after partial eval
-
-int duck(int *riri, int *fifi, int size, int *loulou)
-{
-   int *zaza = (int *) fifi+3;
-   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
-}
-
-Unsplit resulting code
-
-ok
