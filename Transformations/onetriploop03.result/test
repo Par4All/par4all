@@ -23,7 +23,7 @@ int main()
 Initial code with preconditions
 
 
-//  P() {}
+//  P() {a==10}
 
 void foo(char *f, int a)
 {
