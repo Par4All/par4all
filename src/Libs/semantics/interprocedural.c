@@ -466,17 +466,29 @@ transformer precondition_intra_to_inter(entity callee,
       values = arguments_add_entity(values, v);
   }
 
-  /* build a list of arguments to suppress;
-     get rid of variables that are not referenced, directly or indirectly,
+  /* build a list of values to suppress*/
+  if(TRUE || fortran_language_module_p(callee)) {
+  /* get rid of variables that are not referenced, directly or indirectly,
      by the callee; translate what you can */
   pips_debug(9, "Module effect list:");
   ifdebug(9) print_effects(le);
 
   for(ca = values; !ENDP(ca);  POP(ca))    {
     entity e = ENTITY(CAR(ca));
+    // FI: concrete effects are now killed by abstract effects
     list l_callee = (list) concrete_effects_conflict_with_entities(le, e);
+    // FI: the association with an abstract effect kills the
+    // translation process below
+    // list l_callee = (list) effects_conflict_with_entities(le, e);
     /* For clarity, all cases are presented */
-    if (ENDP(l_callee)) {   /* no conflicts */
+    if(local_entity_of_module_p(e, callee)) {
+	/* No need to substitute or eliminate this value */
+	/* This is a short term improvement for partial_eval01-02
+	   that works only for values local to the callee not for
+	   values updated indirectedly by callees of "callee". */
+	;
+    }
+    else if (ENDP(l_callee)) {   /* no conflicts */
       lost_values = arguments_add_entity(lost_values, e);
       pips_debug(DEBUG_PRECONDITION_INTRA_TO_INTER,
 	    "value %s lost according to effect list\n",
@@ -543,6 +555,11 @@ transformer precondition_intra_to_inter(entity callee,
       }
     }
 
+  }
+  }
+  else if(FALSE && c_language_module_p(callee)) {
+    /* Get rid of variables local to the caller */
+    ;
   }
 
   preserved_values = arguments_difference(values, lost_values);
