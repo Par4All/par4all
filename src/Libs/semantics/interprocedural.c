@@ -481,11 +481,12 @@ transformer precondition_intra_to_inter(entity callee,
     // translation process below
     // list l_callee = (list) effects_conflict_with_entities(le, e);
     /* For clarity, all cases are presented */
-    if(local_entity_of_module_p(e, callee)) {
-	/* No need to substitute or eliminate this value */
-	/* This is a short term improvement for partial_eval01-02
-	   that works only for values local to the callee not for
-	   values updated indirectedly by callees of "callee". */
+    if(c_language_module_p(callee) && local_entity_of_module_p(e, callee)) {
+      /* No need to substitute or eliminate this value */
+      /* This is a short term improvement for partial_eval01-02
+	 that works only for values local to the callee not for
+	 values updated indirectedly by callees of "callee". */
+      /* It resulted in many core dumps in array privatization */
 	;
     }
     else if (ENDP(l_callee)) {   /* no conflicts */
