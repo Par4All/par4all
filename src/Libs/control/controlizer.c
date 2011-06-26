@@ -1652,25 +1652,28 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 }
 
 
-/* Find the exit node of a sub-CFG defined by ctls.
+/* Find the exit node of a sub-CFG defined by the list of nodes ctls
+ * and by the first node to execute when finished. The entry node of
+ * the sub-CFG is the last node of the ctls list, because it is built
+ * backwards.
  *
  * RK: ctls is built backwards: hence its exit node is the first node in
  * the list.
  *
  * FI: in fact, it's a bit more complicated...
  *
- * The underlying purpose of this function is to help separate a sub
- * CFG with only one entry and one exit point from the global
- * graph. The entry node is easy to find as
- * CONTROL(CAR(gen_last(ctls))). The exit node may be anywhere because
- * of the goto statements. The succ node is the first node executed
- * after the CFG defined by ctls. But it may have no predecessor or
- * only some of its predecessors belong to the global graph but not to
- * the local graph. So we are interested in predecessors of succ that
- * are reachable from the entry node. Unless we are lucky because succ
- * has only one predecessor and this predecessor has only one
- * successor, succ. In that case, the predecessor of succ is the exit
- * node.
+ * The underlying purpose of this function only called from
+ * controlize_sequence(() is to help separate a sub CFG with only one
+ * entry and one exit point from the global graph. The entry node is
+ * easy to find as CONTROL(CAR(gen_last(ctls))). The exit node may be
+ * anywhere because of the goto statements. The succ node is the first
+ * node executed after the CFG defined by ctls. But it may have no
+ * predecessor or only some of its predecessors belong to the global
+ * graph but not to the local graph. So we are interested in
+ * predecessors of succ that are reachable from the entry node. Unless
+ * we are lucky because succ has only one predecessor and this
+ * predecessor has only one successor, succ. In that case, the
+ * predecessor of succ is the exit node.
  *
  * The control graph may be altered with a newly allocated node or
  * not.
@@ -1687,7 +1690,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
  * Two algorithms at least are possible: we can either start from the
  * predecessors of succ and check that a backward control path to the
  * entry of ctls exists, or we can start from entry and look for
- * control paths reaching succ.
+ * control paths reaching succ. The second approach is implemented here.
  */
 /*static*/ control find_exit_control_node(list ctls, control succ)
 {
@@ -1755,7 +1758,10 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 return exit;
 }
 
-/* FI: remake of function above, now obsolete */
+/* FI: remake of function above, incomplete backward approach, now
+   obsolete because the forward approach works. But who knows? The
+   complexity of the backward approach might be lower than the
+   complexity of the forward approach? */
 control find_or_create_exit_control_node(list ctls, control succ)
 {
   control exit = control_undefined;
