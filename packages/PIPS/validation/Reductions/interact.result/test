@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       REAL FUNCTION FSUMPROD(X, Y, Z)
 C  call sum[X],
       X = X+Z                                                           0002
@@ -37,9 +35,7 @@ C  call sum[X],
 C  call prod[Y],
       Y = Y*Z                                                           0003
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
 C  summary sum[X],prod[Y],
       REAL FUNCTION FSUMPROD(X, Y, Z)
 C  call sum[X],

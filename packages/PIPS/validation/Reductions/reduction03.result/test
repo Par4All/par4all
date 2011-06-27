@@ -1,0 +1,48 @@
+/* Code with PROPER REDUCTIONS */
+int main()
+{
+   int i;
+   int n = 100;
+   float a[n];
+   float tmp1 = 0.0;
+
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = i+100;
+
+   for(i = 0; i <= n-1; i += 1) {
+//  call sum[tmp1],
+      tmp1 += a[i]*10;
+//  call prod[tmp1],
+      tmp1 *= a[i]*5;
+   }
+
+   printf("%f %f %f %f", tmp1);
+   for(i = 0; i <= n-1; i += 1)
+      printf("%f ", a[i]);
+
+   return 0;
+}
+/* Code with CUMULATED REDUCTIONS */
+int main()
+{
+   int i;
+   int n = 100;
+   float a[n];
+   float tmp1 = 0.0;
+
+   for(i = 0; i <= n-1; i += 1)
+      a[i] = i+100;
+
+   for(i = 0; i <= n-1; i += 1) {
+//  call sum[tmp1],
+      tmp1 += a[i]*10;
+//  call prod[tmp1],
+      tmp1 *= a[i]*5;
+   }
+
+   printf("%f %f %f %f", tmp1);
+   for(i = 0; i <= n-1; i += 1)
+      printf("%f ", a[i]);
+
+   return 0;
+}

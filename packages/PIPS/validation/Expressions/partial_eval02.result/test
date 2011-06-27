@@ -1,5 +1,5 @@
 
-Initial code for "partial_eval02"
+Initial code for partial_eval02
 
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
@@ -33,10 +33,9 @@ int main()
    return 0;
 }
 
-Cumulated effects for "partial_eval02"
+Cumulated effects for partial_eval02
 
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: size
 //             <    is written>: riri[2]
 int partial_eval02(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
 {
@@ -117,7 +116,7 @@ int main()
    return 0;
 }
 
-Preconditions "partial_eval02"
+Preconditions partial_eval02
 
 
 //  P() {size==2}

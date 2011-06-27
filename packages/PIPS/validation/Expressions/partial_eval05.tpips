@@ -1,0 +1,88 @@
+setenv WS="partial_eval05"
+delete $WS
+setproperty ABORT_ON_USER_ERROR TRUE
+create $WS $WS.c
+
+setproperty CONSTANT_PATH_EFFECTS TRUE
+
+echo
+echo Initial code
+echo
+
+display PRINTED_FILE[duck]
+
+echo
+echo Initial code with proper effects for "main"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Initial code with proper effects for "duck"
+echo
+
+activate PRINT_CODE_PROPER_EFFECTS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+
+echo
+echo Initial code with transformers for "duck"
+echo
+
+activate PRINT_CODE_TRANSFORMERS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+
+echo
+echo Initial code with preconditions for "main"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[main]
+activate PRINT_CODE
+
+echo
+echo Initial code with preconditions for "duck"
+echo
+
+activate PRINT_CODE_PRECONDITIONS
+display PRINTED_FILE[duck]
+activate PRINT_CODE
+
+#echo
+#echo Code after array conversion
+#echo
+
+#setproperty LINEARIZE_ARRAY_USE_POINTERS TRUE
+#apply LINEARIZE_ARRAY[duck]
+#display PRINTED_FILE[duck]
+
+echo
+echo Code after partial eval for "duck"
+echo
+
+apply PARTIAL_EVAL[duck]
+display PRINTED_FILE[duck]
+
+echo
+echo Code after partial eval for "main"
+echo
+
+apply PARTIAL_EVAL[main]
+display PRINTED_FILE[main]
+
+echo
+echo Unsplit resulting code
+echo
+
+apply UNSPLIT
+shell cc $WS.c -o $WS.database/Tmp/ref
+shell cc $WS.database/Src/$WS.c  -o $WS.database/Tmp/out
+shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
+
+close
+delete $WS
+quit
+

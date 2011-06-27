@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
 c square matrix multiplication
       PROGRAM MATMUL
       INTEGER N
@@ -46,9 +44,7 @@ c output of the result
 c
       PRINT *, ((C(I,J), I = 1, N), J = 1, N)                           0042
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
 c square matrix multiplication
       PROGRAM MATMUL
       INTEGER N

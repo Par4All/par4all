@@ -1,0 +1,291 @@
+
+Initial code
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   static int internal_duck_counter = 0;
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   internal_duck_counter++;
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+   duck_counter++;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Initial code with proper effects for "main"
+
+int main()
+{
+//             <may be written>: riri[*]
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//             <may be written>: fifi[*][*]
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+//             <    is written>: size
+   int size = 2;
+   int loulou[1][size][6];
+   int i;
+   int j;
+//             <    is written>: k
+   int k = 16;
+   int t;
+//             <    is read   >: size
+//             <    is written>: i
+   for(i = 0; i <= size-1; i += 1)
+//             <    is read   >: size
+//             <    is written>: j
+      for(j = 0; j <= 5; j += 1)
+//             <    is read   >: i j k size
+//             <    is written>: k loulou[0][i][j]
+         loulou[0][i][j] = k++;
+//             <may be read   >: stdout[0] *ANY_MODULE*:*ANYWHERE*
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: duck_counter riri[2] t 
+//                               __IO_EFFECTS:LUNS[1] 
+//                               duck:0`internal_duck_counter
+   t = duck(riri, fifi, size, loulou);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: duck_counter stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("global duck counter=%d\n", duck_counter+1);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout t __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", t);
+   return 0;
+}
+
+Initial code with proper effects for "duck"
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+   static int internal_duck_counter = 0;
+//             <    is written>: zaza
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+//             <    is read   >: internal_duck_counter
+//             <    is written>: internal_duck_counter
+   internal_duck_counter++;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: internal_duck_counter stdout 
+//                               __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+//             <    is read   >: duck_counter
+//             <    is written>: duck_counter
+   duck_counter++;
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
+//             <    is written>: riri[2]
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Initial code with transformers for "duck"
+
+
+//  T(duck,duck_counter,internal_duck_counter)
+//    {duck_counter==duck_counter#init+1,
+//    internal_duck_counter==internal_duck_counter#init+1}
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+
+//  T() {}
+
+   static int internal_duck_counter = 0;
+
+//  T() {}
+
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+
+//  T(internal_duck_counter)
+//    {internal_duck_counter==internal_duck_counter#init+1}
+
+   internal_duck_counter++;
+
+//  T() {}
+
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+
+//  T(duck_counter) {duck_counter==duck_counter#init+1}
+
+   duck_counter++;
+
+//  T(duck) {}
+
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Initial code with preconditions for "main"
+
+
+//  P() {duck:0`internal_duck_counter==0, duck_counter==0}
+
+int main()
+{
+
+//  P() {duck:0`internal_duck_counter==0, duck_counter==0}
+
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+//  P() {duck:0`internal_duck_counter==0, duck_counter==0}
+
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+
+//  P() {duck:0`internal_duck_counter==0, duck_counter==0}
+
+   int size = 2;
+
+//  P(size) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    size==2}
+
+   int loulou[1][size][6];
+
+//  P(size) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    size==2}
+
+   int i;
+
+//  P(i,size) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    size==2}
+
+   int j;
+
+//  P(i,j,size) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    size==2}
+
+   int k = 16;
+
+//  P(i,j,k,size) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    k==16, size==2}
+
+   int t;
+
+//  P(i,j,k,size,t) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    k==16, size==2}
+
+   for(i = 0; i <= size-1; i += 1)
+
+//  P(i,j,k,size,t) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    6i==k-16, size==2, 0<=i, i<=1}
+
+      for(j = 0; j <= 5; j += 1)
+
+//  P(i,j,k,size,t) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    6i+j==k-16, size==2, 0<=i, i<=1, 6i+16<=k, j<=5}
+
+         loulou[0][i][j] = k++;
+
+//  P(i,j,k,size,t) {duck:0`internal_duck_counter==0, duck_counter==0,
+//    i==2, j==6, k==28, size==2}
+
+   t = duck(riri, fifi, size, loulou);
+
+//  P(duck:0`internal_duck_counter,duck_counter,i,j,k,size,t)
+//    {duck:0`internal_duck_counter==1,
+//    duck:0`internal_duck_counter#init==0, duck_counter==1,
+//    duck_counter#init==0, i==2, j==6, k==28, size==2}
+
+   printf("global duck counter=%d\n", duck_counter+1);
+
+//  P(duck:0`internal_duck_counter,duck_counter,i,j,k,size,t)
+//    {duck:0`internal_duck_counter==1,
+//    duck:0`internal_duck_counter#init==0, duck_counter==1,
+//    duck_counter#init==0, i==2, j==6, k==28, size==2}
+
+   printf("%d\n", t);
+
+//  P(duck:0`internal_duck_counter,duck_counter,i,j,k,size,t)
+//    {duck:0`internal_duck_counter==1,
+//    duck:0`internal_duck_counter#init==0, duck_counter==1,
+//    duck_counter#init==0, i==2, j==6, k==28, size==2}
+
+   return 0;
+}
+
+Initial code with preconditions for "duck"
+
+
+//  P() {duck_counter==0, internal_duck_counter==0}
+
+int duck(int riri[10], int fifi[2][3], int size, int loulou[1][size][6])
+{
+
+//  P() {duck_counter==0, internal_duck_counter==0}
+
+   static int internal_duck_counter = 0;
+
+//  P() {duck_counter==0, internal_duck_counter==0}
+
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+
+//  P() {duck_counter==0, internal_duck_counter==0}
+
+   internal_duck_counter++;
+
+//  P(internal_duck_counter) {duck_counter==0,
+//    internal_duck_counter==1, internal_duck_counter#init==0}
+
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+
+//  P(internal_duck_counter) {duck_counter==0,
+//    internal_duck_counter==1, internal_duck_counter#init==0}
+
+   duck_counter++;
+
+//  P(duck_counter,internal_duck_counter) {duck_counter==1,
+//    duck_counter#init==0, internal_duck_counter==1,
+//    internal_duck_counter#init==0}
+
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Code after array conversion
+
+int duck(int *riri, int *fifi, int size, int *loulou)
+{
+   static int internal_duck_counter = 0;
+   int *zaza = (int *) fifi+(3-1-0+1)*1;
+   internal_duck_counter++;
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+   duck_counter++;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3+(6-1-0+1)*(0+(size-1-0+1)*0));
+}
+
+Code after partial eval for "duck"
+
+int duck(int *riri, int *fifi, int size, int *loulou)
+{
+   static int internal_duck_counter = 0;
+   int *zaza = (int *) fifi+3;
+   internal_duck_counter++;
+   printf("internal duck counter=%d\n", internal_duck_counter+1);
+   duck_counter++;
+   return *((int *) riri+2) = *(zaza+1)+*((int *) loulou+3);
+}
+
+Code after partial eval for "main"
+
+int main()
+{
+   int riri[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+   int fifi[2][3] = {{10, 11, 12}, {13, 14, 15}};
+   int size = 2;
+   int loulou[1][2][6];
+   int i;
+   int j;
+   int k = 16;
+   int t;
+   for(i = 0; i <= 1; i += 1)
+      for(j = 0; j <= 5; j += 1)
+         loulou[0][i][j] = k++;
+   t = duck(riri, fifi, 2, loulou);
+   printf("global duck counter=%d\n", duck_counter+1);
+   printf("%d\n", t);
+   return 0;
+}
+
+Unsplit resulting code
+
+ko

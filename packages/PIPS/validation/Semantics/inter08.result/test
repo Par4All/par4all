@@ -38,12 +38,12 @@ void inter08(int i)
 Preconditions for "inter08"
 
 
-//  P() {}
+//  P() {i==4}
 
 void inter08(int i)
 {
 
-//  P() {}
+//  P() {i==4}
 
    i = 1;
 }

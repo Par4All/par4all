@@ -1,0 +1,26 @@
+
+Parsed code
+
+void foo()
+{
+   int i;
+   for (i = 0;i!=5;i++) {
+more:      if (i==3)
+         printf("%d", i);
+      goto more;
+   }
+   printf("Exit with %d", i);
+}
+
+Controlized code
+
+void foo()
+{
+   int i;
+   for(i = 0; i <= 6; i += 1) {
+more:      if (i==3)
+         printf("%d", i);
+      goto more;
+   }
+   printf("Exit with %d", i);
+}
