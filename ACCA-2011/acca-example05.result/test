@@ -113,47 +113,47 @@ void compute(int p, int n, float a[n][n])
 }
 
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    n==100}>
+//    n==100, 1<=p}>
 
 void compute(int p, int n, float a[n][n])
 {
 
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    n==100}>
+//    n==100, 1<=p}>
 
    // BEGIN BLOCK
    int t[100];
    int k = 100, i, s;
 
 //  <a[PHI1][PHI2]-IN-EXACT-{0<=PHI1, PHI1<=99, 0<=PHI2, PHI2<=99,
-//    k==100, n==100}>
+//    k==100, n==100, 1<=p}>
 
    for(i = 0; i <= 99; i += 1) {
 
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, k==100,
-//    n==100, 0<=i, i<=99}>
+//    n==100, 0<=i, i<=99, 1<=p}>
 
       // BEGIN BLOCK
       int j;
 
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, 0<=PHI2, PHI2<=99, k==100,
-//    n==100, 0<=i, i<=99}>
+//    n==100, 0<=i, i<=99, 1<=p}>
 
       for(j = 0; j <= 99; j += 1)
 
 //  <a[PHI1][PHI2]-IN-EXACT-{PHI1==i, PHI2==j, k==100, n==100, 0<=j,
-//    j<=99, 0<=i, i<=99}>
+//    j<=99, 0<=i, i<=99, 1<=p}>
 
          t[j] = a[i][j]+j;
 
-//  <t[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=99, k==100, n==100, 0<=i,
-//    i<=99}>
+//  <t[PHI1]-IN-EXACT-{0<=PHI1, PHI1<=99, k==100, n==100, 0<=i, i<=99,
+//    1<=p}>
 
 
       for(j = 0; j <= 99; j += 1)
 
 //  <t[PHI1]-IN-EXACT-{PHI1==j, k==100, n==100, 0<=j, j<=99, 0<=i,
-//    i<=99}>
+//    i<=99, 1<=p}>
 
          a[i][j] = t[j];
       // END BLOCK
@@ -183,12 +183,12 @@ void compute(int p, int n, float a[n][n])
       int j;
 
 //  <t[PHI1]-OUT-EXACT-{0<=PHI1, PHI1<=99, k==100, n==100, 0<=i,
-//    i<=99}>
+//    i<=99, 1<=p}>
 
       for(j = 0; j <= 99; j += 1)
 
 //  <t[PHI1]-OUT-EXACT-{PHI1==j, k==100, n==100, 0<=j, j<=99, 0<=i,
-//    i<=99}>
+//    i<=99, 1<=p}>
 
          t[j] = a[i][j]+j;
 
