@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       PROGRAM INDEXES
       INTEGER I,J
       INTEGER S(10)
@@ -21,9 +19,7 @@ C  call sum[S(7)],
          S(7) = I+J+S(7)                                                0013
       ENDDO
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
       PROGRAM INDEXES
       INTEGER I,J
       INTEGER S(10)

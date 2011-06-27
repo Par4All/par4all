@@ -5333,8 +5333,7 @@ void putnonintrablk(short *blk)
 //             <    is written>: n
 
    for(n = 0; n <= 63; n += 1) {
-//             <may be read   >: blk[*] *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: altscan blk
+//             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <    is written>: signed_level
       /* use appropriate entropy scanning pattern */
       signed_level = blk[(altscan?alternate_scan:zig_zag_scan)[n]];
@@ -5543,7 +5542,6 @@ void putpict(unsigned char *frame)
 //                               __IO_EFFECTS:LUNS[*]
 //             <may be written>: *ANY_MODULE*:*ANYWHERE* 
 //                               __IO_EFFECTS:LUNS[*]
-//             <    is read   >: frame
 
    rc_init_pict(frame);
 //             <may be read   >: back_hor_f_code fieldpic 
@@ -6152,8 +6150,6 @@ l99996:         ;
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is read   >: block_count blocks cc comp k 
-//                               mb_height2 mb_width
                   putintrablk(blocks[k*block_count+comp], cc);
                }
                else
@@ -6165,8 +6161,6 @@ l99996:         ;
 //                               __IO_EFFECTS:LUNS[2] 
 //                               __IO_EFFECTS:LUNS[*] putbits!:bytecnt
 //                               putbits!:outbfr putbits!:outcnt
-//             <    is read   >: block_count blocks comp k mb_height2 
-//                               mb_width
                   putnonintrablk(blocks[k*block_count+comp]);
 //             <may be read   >: cc
 //             <may be written>: cc dc_dct_pred[*]
@@ -6956,8 +6950,6 @@ void calcSNR(unsigned char *org[3], unsigned char *rec[3])
    offs = pict_struct==2?width:0;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: h offs org[0] rec[0] w width2
-//             <    is written>: e v
 
    calcSNR1(org[0]+offs, rec[0]+offs, width2, w, h, &v, &e);
 //             <may be read   >: statfile[0] __IO_EFFECTS:LUNS[*]
@@ -6987,8 +6979,6 @@ void calcSNR(unsigned char *org[3], unsigned char *rec[3])
       h >>= 1;
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: chrom_width2 h offs org[1] rec[1] w
-//             <    is written>: e v
 
    calcSNR1(org[1]+offs, rec[1]+offs, chrom_width2, w, h, &v, &e);
 //             <may be read   >: statfile[0] __IO_EFFECTS:LUNS[*]
@@ -6998,8 +6988,6 @@ void calcSNR(unsigned char *org[3], unsigned char *rec[3])
    fprintf(statfile, "U: variance=%4.4g, MSE=%3.3g (%3.3g dB), SNR=%3.3g dB\n", v, e, 10.0*log10(255.0*255.0/e), 10.0*log10(v/e));
 //             <may be read   >: *ANY_MODULE*:*ANYWHERE*
 //             <may be written>: *ANY_MODULE*:*ANYWHERE*
-//             <    is read   >: chrom_width2 h offs org[2] rec[2] w
-//             <    is written>: e v
 
    calcSNR1(org[2]+offs, rec[2]+offs, chrom_width2, w, h, &v, &e);
 //             <may be read   >: statfile[0] __IO_EFFECTS:LUNS[*]
@@ -23783,25 +23771,26 @@ static int dist2(unsigned char *blk1, unsigned char *blk2, int lx, int hx, int h
    return s;
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
 static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsigned char *mb, int i, int j, int imins, int jmins, int *imindmvp, int *jmindmvp, int *dmcp, int *vmcp)
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    unsigned char *sameref, *oppref;
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    int io0, jo0, io, jo, delta_x, delta_y, mvxs, mvys, mvxo0, mvyo0;
 
-//  P(delta_x,delta_y,io,io0,jo,jo0,mvxo0,mvxs,mvyo0,mvys) {}
+//  P(delta_x,delta_y,io,io0,jo,jo0,mvxo0,mvxs,mvyo0,mvys) {0<=i,
+//    0<=j}
 
    int imino, jmino, imindmv, jmindmv, vmc_dp, local_dist;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
    
    /* Calculate Dual Prime distortions for 9 delta candidates */
@@ -23811,30 +23800,30 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    if (pict_struct==1) {
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
       sameref = topref;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
       oppref = botref;
    }
    else {
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
       sameref = botref;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
       oppref = topref;
    }
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {0<=i, 0<=j}
 
    
    /* convert Cartesian absolute to relative motion vector
@@ -23843,25 +23832,26 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    mvxs = imins-(i<<1);
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
-//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins}
+//    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins, 0<=i,
+//    0<=j}
 
    mvys = jmins-(j<<1);
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
    mvxo0 = mvxs+(mvxs>0)>>1;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
    mvyo0 = mvys+(mvys>0)>>1;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
    /* mvys // 2 */
    
@@ -23870,20 +23860,20 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
       mvyo0--;
    else
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
       mvyo0++;
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2j+mvys==jmins}
+//    2j+mvys==jmins, 0<=i, 0<=j}
 
    
    /* convert back to absolute coordinates */
@@ -23891,13 +23881,13 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2i+mvxo0==io0, 2j+mvys==jmins}
+//    2i+mvxo0==io0, 2j+mvys==jmins, 0<=i, 0<=j}
 
    jo0 = mvyo0+(j<<1);
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
-//    2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0}
+//    2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0, 0<=i, 0<=j}
 
    
    /* initialize minimum dual prime distortion to large value */
@@ -23906,7 +23896,7 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
 //    2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0,
-//    vmc_dp==1073741824}
+//    vmc_dp==1073741824, 0<=i, 0<=j}
 
 
    for(delta_y = -1; delta_y <= 1; delta_y += 1)
@@ -23914,14 +23904,15 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
 //    2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0, 0<=delta_y+1,
-//    delta_y<=1, vmc_dp<=1073741824}
+//    delta_y<=1, 0<=i, 0<=j, vmc_dp<=1073741824}
 
       for(delta_x = -1; delta_x <= 1; delta_x += 1) {
 
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {2i+mvxs==imins,
 //    2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0, 0<=delta_x+1,
-//    delta_x<=1, 0<=delta_y+1, delta_y<=1, vmc_dp<=1073741824}
+//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=j,
+//    vmc_dp<=1073741824}
 
          /* opposite field coordinates */
          io = io0+delta_x;
@@ -23929,7 +23920,7 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==io,
 //    2i+mvxs==imins, 2i+mvxo0==io0, 2j+mvys==jmins, 2j+mvyo0==jo0,
-//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1,
+//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=j,
 //    vmc_dp<=1073741824}
 
          jo = jo0+delta_y;
@@ -23938,7 +23929,7 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==io,
 //    delta_y+jo0==jo, 2i+mvxs==imins, 2i+mvxo0==io0, 2j+mvys==jmins,
 //    2j+mvyo0==jo0, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, vmc_dp<=1073741824}
+//    delta_y<=1, 0<=i, 0<=j, vmc_dp<=1073741824}
 
          if (io>=0&&io<=width-16<<1&&jo>=0&&jo<=height2-16<<1) {
 
@@ -23946,7 +23937,7 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==io,
 //    delta_y+jo0==jo, 2i+mvxs==imins, 2i+mvxo0==io0, 2j+mvys==jmins,
 //    2j+mvyo0==jo0, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=io, 0<=jo, vmc_dp<=1073741824}
+//    delta_y<=1, 0<=i, 0<=io, 0<=j, 0<=jo, vmc_dp<=1073741824}
 
             /* current mb location */
             /* adjacent line distance */
@@ -23957,7 +23948,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==io,
 //    delta_y+jo0==jo, 2i+mvxs==imins, 2i+mvxo0==io0, 2j+mvys==jmins,
 //    2j+mvyo0==jo0, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=io, 0<=jo, 0<=local_dist, vmc_dp<=1073741824}
+//    delta_y<=1, 0<=i, 0<=io, 0<=j, 0<=jo, 0<=local_dist,
+//    vmc_dp<=1073741824}
 
             /* block height */
             
@@ -23968,8 +23960,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==io,
 //    delta_y+jo0==jo, 2i+mvxs==imins, 2i+mvxo0==io0, 2j+mvys==jmins,
 //    2j+mvyo0==jo0, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=io, 0<=jo, 0<=local_dist, local_dist+1<=vmc_dp,
-//    vmc_dp<=1073741824}
+//    delta_y<=1, 0<=i, 0<=io, 0<=j, 0<=jo, 0<=local_dist,
+//    local_dist+1<=vmc_dp, vmc_dp<=1073741824}
 
                imino = io;
 
@@ -23977,8 +23969,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==imino,
 //    delta_y+jo0==jo, 2i+mvxs==imins, 2i+mvxo0==io0, imino==io,
 //    2j+mvys==jmins, 2j+mvyo0==jo0, 0<=delta_x+1, delta_x<=1,
-//    0<=delta_y+1, delta_y<=1, 0<=imino, 0<=jo, 0<=local_dist,
-//    local_dist+1<=vmc_dp, vmc_dp<=1073741824}
+//    0<=delta_y+1, delta_y<=1, 0<=i, 0<=imino, 0<=j, 0<=jo,
+//    0<=local_dist, local_dist+1<=vmc_dp, vmc_dp<=1073741824}
 
                jmino = jo;
 
@@ -23986,8 +23978,9 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x+io0==imino,
 //    delta_y+jo0==jmino, 2i+mvxs==imins, 2i+mvxo0==io0, imino==io,
 //    2j+mvys==jmins, 2j+mvyo0==jo0, jmino==jo, 0<=delta_x+1,
-//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=imino, 0<=jmino,
-//    0<=local_dist, local_dist+1<=vmc_dp, vmc_dp<=1073741824}
+//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=imino, 0<=j,
+//    0<=jmino, 0<=local_dist, local_dist+1<=vmc_dp,
+//    vmc_dp<=1073741824}
 
                imindmv = delta_x;
 
@@ -23996,8 +23989,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    delta_x+io0==imino, delta_y+jo0==jmino, 2i+mvxs==imins,
 //    2i+mvxo0==io0, imino==io, 2j+mvys==jmins, 2j+mvyo0==jo0,
 //    jmino==jo, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1,
-//    0<=imino, 0<=jmino, 0<=local_dist, local_dist+1<=vmc_dp,
-//    vmc_dp<=1073741824}
+//    0<=i, 0<=imino, 0<=j, 0<=jmino, 0<=local_dist,
+//    local_dist+1<=vmc_dp, vmc_dp<=1073741824}
 
                jmindmv = delta_y;
 
@@ -24006,8 +23999,8 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //    delta_x+io0==imino, delta_y==jmindmv, delta_y+jo0==jmino,
 //    2i+mvxs==imins, 2i+mvxo0==io0, imino==io, 2j+mvys==jmins,
 //    2j+mvyo0==jo0, jmino==jo, 0<=delta_x+1, delta_x<=1,
-//    0<=delta_y+1, delta_y<=1, 0<=imino, 0<=jmino, 0<=local_dist,
-//    local_dist+1<=vmc_dp, vmc_dp<=1073741824}
+//    0<=delta_y+1, delta_y<=1, 0<=i, 0<=imino, 0<=j, 0<=jmino,
+//    0<=local_dist, local_dist+1<=vmc_dp, vmc_dp<=1073741824}
 
                vmc_dp = local_dist;
             }
@@ -24017,7 +24010,7 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
 //  P(delta_x,delta_y,imindmv,imino,io,io0,jmindmv,jmino,jo,jo0,
 //    local_dist,mvxo0,mvxs,mvyo0,mvys,vmc_dp) {delta_x==2,
 //    delta_y==2, 2i+mvxs==imins, 2i+mvxo0==io-1, 2i+mvxo0==io0,
-//    2j+mvys==jmins, 2j+mvyo0==jo-1, 2j+mvyo0==jo0,
+//    2j+mvys==jmins, 2j+mvyo0==jo-1, 2j+mvyo0==jo0, 0<=i, 0<=j,
 //    vmc_dp<=1073741824}
 
    /* current mb location */
@@ -24043,31 +24036,32 @@ static void dpfield_estimate(unsigned char *topref, unsigned char *botref, unsig
    *vmcp = vmc_dp;
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
 static void dpframe_estimate(unsigned char *ref, unsigned char *mb, int i, int j, int iminf[2][2], int jminf[2][2], int *iminp, int *jminp, int *imindmvp, int *jmindmvp, int *dmcp, int *vmcp)
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    int pref, ppred, delta_x, delta_y;
 
-//  P(delta_x,delta_y,ppred,pref) {}
+//  P(delta_x,delta_y,ppred,pref) {0<=i, 0<=j}
 
    int is, js, it, jt, ib, jb, it0, jt0, ib0, jb0;
 
-//  P(delta_x,delta_y,ib,ib0,is,it,it0,jb,jb0,js,jt,jt0,ppred,pref) {}
+//  P(delta_x,delta_y,ib,ib0,is,it,it0,jb,jb0,js,jt,jt0,ppred,pref)
+//    {0<=i, 0<=j}
 
    int imins, jmins, imint, jmint, iminb, jminb, imindmv, jmindmv;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
-//    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,ppred,pref) {}
+//    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,ppred,pref) {0<=i, 0<=j}
 
    int vmc, local_dist;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {}
+//    vmc) {0<=i, 0<=j}
 
    
    /* Calculate Dual Prime distortions for 9 delta candidates
@@ -24080,20 +24074,21 @@ static void dpframe_estimate(unsigned char *ref, unsigned char *mb, int i, int j
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {vmc==1073741824}
+//    vmc) {vmc==1073741824, 0<=i, 0<=j}
 
 
    for(pref = 0; pref <= 1; pref += 1)
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=pref, pref<=1, vmc<=1073741824}
 
       for(ppred = 0; ppred <= 1; ppred += 1) {
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          /* convert Cartesian absolute to relative motion vector
                 * values (wrt current macroblock address (i,j)
@@ -24102,13 +24097,15 @@ static void dpframe_estimate(unsigned char *ref, unsigned char *mb, int i, int j
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          js = jminf[pref][ppred]-(j<<1);
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
 
          if (pref!=ppred) goto l99999;
@@ -24116,7 +24113,8 @@ l99998:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          
          /* vector for prediction from field of opposite 'parity' */
@@ -24124,25 +24122,29 @@ l99998:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             it0 = is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             jt0 = (js+(js>0)>>1)-1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             ib0 = 3*is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             jb0 = (3*js+(js>0)>>1)+1;
          }
@@ -24150,32 +24152,37 @@ l99998:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             it0 = 3*is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             jt0 = (3*js+(js>0)>>1)-1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             ib0 = is+(is>0)>>1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
             jb0 = (js+(js>0)>>1)+1;
          }
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          
          /* convert back to absolute half-pel field picture coordinates */
@@ -24183,58 +24190,65 @@ l99998:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          js += j<<1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          it0 += i<<1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          jt0 += j<<1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          ib0 += i<<1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          jb0 += j<<1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
          if (is>=0&&is<=width-16<<1&&js>=0&&js<=height-16)
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=is, 0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
-//    vmc<=1073741824}
+//    vmc) {0<=i, 0<=is, 0<=j, 0<=js, 0<=ppred, ppred<=1, 0<=pref,
+//    pref<=1, vmc<=1073741824}
 
             for(delta_y = -1; delta_y <= 1; delta_y += 1)
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=delta_y+1, delta_y<=1, 0<=is, 0<=js, 0<=ppred,
-//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=delta_y+1, delta_y<=1, 0<=i, 0<=is, 0<=j, 0<=js,
+//    0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                for(delta_x = -1; delta_x <= 1; delta_x += 1) {
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=is,
-//    0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i,
+//    0<=is, 0<=j, 0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
                   /* opposite field coordinates */
                   it = it0+delta_x;
@@ -24242,24 +24256,25 @@ l99998:         ;
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+it0==it, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=is, 0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
-//    vmc<=1073741824}
+//    delta_y<=1, 0<=i, 0<=is, 0<=j, 0<=js, 0<=ppred, ppred<=1,
+//    0<=pref, pref<=1, vmc<=1073741824}
 
                   jt = jt0+delta_y;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+it0==it, delta_y+jt0==jt, 0<=delta_x+1,
-//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=is, 0<=js, 0<=ppred,
-//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=is, 0<=j, 0<=js,
+//    0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                   ib = ib0+delta_x;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jt0==jt,
-//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=is,
-//    0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=is,
+//    0<=j, 0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
                   jb = jb0+delta_y;
 
@@ -24267,8 +24282,8 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=is, 0<=js, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
-//    vmc<=1073741824}
+//    delta_y<=1, 0<=i, 0<=is, 0<=j, 0<=js, 0<=ppred, ppred<=1,
+//    0<=pref, pref<=1, vmc<=1073741824}
 
                   if (it>=0&&it<=width-16<<1&&jt>=0&&jt<=height-16&&ib>=0&&ib<=width-16<<1&&jb>=0&&jb<=height-16) {
 
@@ -24276,8 +24291,8 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=ib, 0<=is, 0<=it, 0<=jb, 0<=js, 0<=jt, 0<=ppred,
-//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    delta_y<=1, 0<=i, 0<=ib, 0<=is, 0<=it, 0<=j, 0<=jb, 0<=js,
+//    0<=jt, 0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                      /* current mb location */
                      /* adjacent line distance */
@@ -24288,8 +24303,8 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=ib, 0<=is, 0<=it, 0<=jb, 0<=js, 0<=jt,
-//    0<=local_dist, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    delta_y<=1, 0<=i, 0<=ib, 0<=is, 0<=it, 0<=j, 0<=jb, 0<=js,
+//    0<=jt, 0<=local_dist, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
 //    vmc<=1073741824}
 
                      /* current mb location */
@@ -24301,8 +24316,8 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=ib, 0<=is, 0<=it, 0<=jb, 0<=js, 0<=jt,
-//    0<=local_dist, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    delta_y<=1, 0<=i, 0<=ib, 0<=is, 0<=it, 0<=j, 0<=jb, 0<=js,
+//    0<=jt, 0<=local_dist, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
 //    vmc<=1073741824}
 
                      /* block height */
@@ -24314,9 +24329,9 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=ib, 0<=is, 0<=it, 0<=jb, 0<=js, 0<=jt,
-//    0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref,
-//    pref<=1, vmc<=1073741824}
+//    delta_y<=1, 0<=i, 0<=ib, 0<=is, 0<=it, 0<=j, 0<=jb, 0<=js,
+//    0<=jt, 0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1,
+//    0<=pref, pref<=1, vmc<=1073741824}
 
                         imins = is;
 
@@ -24324,9 +24339,9 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, imins==is, 0<=delta_x+1, delta_x<=1,
-//    0<=delta_y+1, delta_y<=1, 0<=ib, 0<=imins, 0<=it, 0<=jb, 0<=js,
-//    0<=jt, 0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1,
-//    0<=pref, pref<=1, vmc<=1073741824}
+//    0<=delta_y+1, delta_y<=1, 0<=i, 0<=ib, 0<=imins, 0<=it, 0<=j,
+//    0<=jb, 0<=js, 0<=jt, 0<=local_dist, local_dist+1<=vmc, 0<=ppred,
+//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                         jmins = js;
 
@@ -24334,9 +24349,9 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==it, delta_y+jb0==jb,
 //    delta_y+jt0==jt, imins==is, jmins==js, 0<=delta_x+1, delta_x<=1,
-//    0<=delta_y+1, delta_y<=1, 0<=ib, 0<=imins, 0<=it, 0<=jb,
-//    0<=jmins, 0<=jt, 0<=local_dist, local_dist+1<=vmc, 0<=ppred,
-//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    0<=delta_y+1, delta_y<=1, 0<=i, 0<=ib, 0<=imins, 0<=it, 0<=j,
+//    0<=jb, 0<=jmins, 0<=jt, 0<=local_dist, local_dist+1<=vmc,
+//    0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                         imint = it;
 
@@ -24344,9 +24359,10 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==imint, delta_y+jb0==jb,
 //    delta_y+jt0==jt, imins==is, imint==it, jmins==js, 0<=delta_x+1,
-//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=ib, 0<=imins, 0<=imint,
-//    0<=jb, 0<=jmins, 0<=jt, 0<=local_dist, local_dist+1<=vmc,
-//    0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=ib, 0<=imins,
+//    0<=imint, 0<=j, 0<=jb, 0<=jmins, 0<=jt, 0<=local_dist,
+//    local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
                         jmint = jt;
 
@@ -24354,10 +24370,10 @@ l99998:         ;
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
 //    vmc) {delta_x+ib0==ib, delta_x+it0==imint, delta_y+jb0==jb,
 //    delta_y+jt0==jmint, imins==is, imint==it, jmins==js, jmint==jt,
-//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=ib,
-//    0<=imins, 0<=imint, 0<=jb, 0<=jmins, 0<=jmint, 0<=local_dist,
-//    local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
-//    vmc<=1073741824}
+//    0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=ib,
+//    0<=imins, 0<=imint, 0<=j, 0<=jb, 0<=jmins, 0<=jmint,
+//    0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref,
+//    pref<=1, vmc<=1073741824}
 
                         iminb = ib;
 
@@ -24366,9 +24382,9 @@ l99998:         ;
 //    vmc) {delta_x+ib0==ib, delta_x+it0==imint, delta_y+jb0==jb,
 //    delta_y+jt0==jmint, ib==iminb, imins==is, imint==it, jmins==js,
 //    jmint==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1,
-//    0<=ib, 0<=imins, 0<=imint, 0<=jb, 0<=jmins, 0<=jmint,
-//    0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref,
-//    pref<=1, vmc<=1073741824}
+//    0<=i, 0<=ib, 0<=imins, 0<=imint, 0<=j, 0<=jb, 0<=jmins,
+//    0<=jmint, 0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1,
+//    0<=pref, pref<=1, vmc<=1073741824}
 
                         jminb = jb;
 
@@ -24377,9 +24393,9 @@ l99998:         ;
 //    vmc) {delta_x+ib0==ib, delta_x+it0==imint, delta_y+jb0==jb,
 //    delta_y+jt0==jmint, ib==iminb, imins==is, imint==it, jb==jminb,
 //    jmins==js, jmint==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1,
-//    delta_y<=1, 0<=ib, 0<=imins, 0<=imint, 0<=jb, 0<=jmins,
-//    0<=jmint, 0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1,
-//    0<=pref, pref<=1, vmc<=1073741824}
+//    delta_y<=1, 0<=i, 0<=ib, 0<=imins, 0<=imint, 0<=j, 0<=jb,
+//    0<=jmins, 0<=jmint, 0<=local_dist, local_dist+1<=vmc, 0<=ppred,
+//    ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
 
                         imindmv = delta_x;
 
@@ -24388,9 +24404,10 @@ l99998:         ;
 //    vmc) {delta_x+ib0==ib, delta_x==imindmv, delta_x+it0==imint,
 //    delta_y+jb0==jb, delta_y+jt0==jmint, ib==iminb, imins==is,
 //    imint==it, jb==jminb, jmins==js, jmint==jt, 0<=delta_x+1,
-//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=ib, 0<=imins, 0<=imint,
-//    0<=jb, 0<=jmins, 0<=jmint, 0<=local_dist, local_dist+1<=vmc,
-//    0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    delta_x<=1, 0<=delta_y+1, delta_y<=1, 0<=i, 0<=ib, 0<=imins,
+//    0<=imint, 0<=j, 0<=jb, 0<=jmins, 0<=jmint, 0<=local_dist,
+//    local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
                         jmindmv = delta_y;
 
@@ -24400,9 +24417,9 @@ l99998:         ;
 //    delta_y+jb0==jb, delta_y==jmindmv, delta_y+jt0==jmint,
 //    ib==iminb, imins==is, imint==it, jb==jminb, jmins==js,
 //    jmint==jt, 0<=delta_x+1, delta_x<=1, 0<=delta_y+1, delta_y<=1,
-//    0<=ib, 0<=imins, 0<=imint, 0<=jb, 0<=jmins, 0<=jmint,
-//    0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1, 0<=pref,
-//    pref<=1, vmc<=1073741824}
+//    0<=i, 0<=ib, 0<=imins, 0<=imint, 0<=j, 0<=jb, 0<=jmins,
+//    0<=jmint, 0<=local_dist, local_dist+1<=vmc, 0<=ppred, ppred<=1,
+//    0<=pref, pref<=1, vmc<=1073741824}
 
                         vmc = local_dist;
                      }
@@ -24413,27 +24430,29 @@ l99999:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          /* vertical field shift adjustment */
          if (ppred==0)
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==0, pref==1, vmc<=1073741824}
+//    vmc) {ppred==0, pref==1, 0<=i, 0<=j, vmc<=1073741824}
 
             js++;
          else
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==1, pref==0, vmc<=1073741824}
+//    vmc) {ppred==1, pref==0, 0<=i, 0<=j, vmc<=1073741824}
 
             js--;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          
          /* mvxs and mvys scaling*/
@@ -24441,13 +24460,15 @@ l99999:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          js <<= 1;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          if (topfirst==ppred) {
          }
@@ -24457,27 +24478,30 @@ l99999:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          is = is>=0?(is+1)/3:-(((-is)+1)/3);
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred+pref==1, 0<=ppred, ppred<=1, vmc<=1073741824}
+//    vmc) {ppred+pref==1, 0<=i, 0<=j, 0<=ppred, ppred<=1,
+//    vmc<=1073741824}
 
          js = js>=0?(js+1)/3:-(((-js)+1)/3);
          goto l99998;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {0<=ppred, ppred<=1, 0<=pref, pref<=1, vmc<=1073741824}
+//    vmc) {0<=i, 0<=j, 0<=ppred, ppred<=1, 0<=pref, pref<=1,
+//    vmc<=1073741824}
 
 loop_end_2:         ;
       }
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, vmc<=1073741824}
 
    
    
@@ -24486,7 +24510,8 @@ loop_end_2:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    
    
@@ -24495,71 +24520,80 @@ loop_end_2:         ;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
 
    *dmcp = local_dist;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    *iminp = imins;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    *jminp = jmins;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    *imindmvp = imindmv;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    *jmindmvp = jmindmv;
 
 //  P(delta_x,delta_y,ib,ib0,iminb,imindmv,imins,imint,is,it,it0,jb,
 //    jb0,jminb,jmindmv,jmins,jmint,js,jt,jt0,local_dist,ppred,pref,
-//    vmc) {ppred==2, pref==2, 0<=local_dist, vmc<=1073741824}
+//    vmc) {ppred==2, pref==2, 0<=i, 0<=j, 0<=local_dist,
+//    vmc<=1073741824}
 
    *vmcp = vmc;
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char *oldref, unsigned char *newref, unsigned char *cur, unsigned char *curref, int i, int j, int sxf, int syf, int sxb, int syb, struct mbinfo *mbi, int secondfield, int ipflag)
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
    int w2;
 
-//  P(w2) {}
+//  P(w2) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
    unsigned char *mb, *toporg, *topref, *botorg, *botref;
 
-//  P(w2) {}
+//  P(w2) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
    int var, vmc, v0, dmc, dmcfieldi, dmc8i;
 
-//  P(dmc,dmc8i,dmcfieldi,v0,var,vmc,w2) {}
+//  P(dmc,dmc8i,dmcfieldi,v0,var,vmc,w2) {0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
    int imin, jmin, imin8u, jmin8u, imin8l, jmin8l, dmcfield, dmc8, sel, sel8u, sel8l;
 
 //  P(dmc,dmc8,dmc8i,dmcfield,dmcfieldi,imin,imin8l,imin8u,jmin,
-//    jmin8l,jmin8u,sel,sel8l,sel8u,v0,var,vmc,w2) {}
+//    jmin8l,jmin8u,sel,sel8l,sel8u,v0,var,vmc,w2) {0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
    int iminf, jminf, imin8uf, jmin8uf, imin8lf, jmin8lf, dmcfieldf, dmc8f, self, sel8uf, sel8lf;
 
 //  P(dmc,dmc8,dmc8f,dmc8i,dmcfield,dmcfieldf,dmcfieldi,imin,imin8l,
 //    imin8lf,imin8u,imin8uf,iminf,jmin,jmin8l,jmin8lf,jmin8u,jmin8uf,
-//    jminf,sel,sel8l,sel8lf,sel8u,sel8uf,self,v0,var,vmc,w2) {}
+//    jminf,sel,sel8l,sel8lf,sel8u,sel8uf,self,v0,var,vmc,w2) {0<=i,
+//    0<=j, 0<=secondfield, secondfield<=1}
 
    int iminr, jminr, imin8ur, jmin8ur, imin8lr, jmin8lr, dmcfieldr, dmc8r, selr, sel8ur, sel8lr;
 
@@ -24567,7 +24601,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    iminf,iminr,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,jmin8uf,jmin8ur,
 //    jminf,jminr,sel,sel8l,sel8lf,sel8lr,sel8u,sel8uf,sel8ur,self,
-//    selr,v0,var,vmc,w2) {}
+//    selr,v0,var,vmc,w2) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
    int imins, jmins, ds, imindmv, jmindmv, vmc_dp, dmc_dp;
 
@@ -24575,7 +24609,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
    w2 = width<<1;
@@ -24584,7 +24619,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
    mb = cur+i+w2*j;
@@ -24593,7 +24629,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
    if (pict_struct==2)
 
@@ -24601,7 +24638,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       mb += width;
 
@@ -24609,7 +24647,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
    var = variance(mb, w2);
@@ -24618,7 +24657,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
    if (pict_type==1)
@@ -24627,7 +24667,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       mbi->mb_type = 1;
    else if (pict_type==2) {
@@ -24636,7 +24677,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       toporg = oldorg;
 
@@ -24644,7 +24686,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       topref = oldref;
 
@@ -24652,7 +24695,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       botorg = oldorg+width;
 
@@ -24660,7 +24704,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       botref = oldref+width;
 
@@ -24668,7 +24713,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
       if (secondfield)
@@ -24677,7 +24723,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {secondfield==1, 0<=i, 0<=j}
 
          /* opposite parity field is in same frame */
          if (pict_struct==1) {
@@ -24686,7 +24733,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {secondfield==1, 0<=i, 0<=j}
 
             /* current is top field */
             botorg = cur+width;
@@ -24695,7 +24743,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {secondfield==1, 0<=i, 0<=j}
 
             botref = curref+width;
          }
@@ -24705,7 +24754,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {secondfield==1, 0<=i, 0<=j}
 
             /* current is bottom field */
             toporg = cur;
@@ -24714,7 +24764,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {secondfield==1, 0<=i, 0<=j}
 
             topref = curref;
          }
@@ -24723,7 +24774,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       
       
@@ -24734,7 +24786,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
       if (M==1&&!ipflag)
@@ -24744,7 +24797,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {ipflag<=0}
+//    {0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
          /* generic condition which permits Dual Prime */
          
@@ -24754,7 +24807,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       
       /* select between dual prime, field and 16x8 prediction */
@@ -24765,7 +24819,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc_dp+1<=dmc8, dmc_dp+1<=dmcfield, ipflag<=0}
+//    {dmc_dp+1<=dmc8, dmc_dp+1<=dmcfield, 0<=i, ipflag<=0, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          /* Dual Prime prediction */
          mbi->motion_type = 3;
@@ -24775,7 +24830,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc_dp+1<=dmc8, dmc_dp+1<=dmcfield, ipflag<=0}
+//    {dmc_dp+1<=dmc8, dmc_dp+1<=dmcfield, 0<=i, ipflag<=0, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          dmc = dmc_dp;
 
@@ -24784,7 +24840,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc==dmc_dp, dmc+1<=dmc8, dmc+1<=dmcfield, ipflag<=0}
+//    {dmc==dmc_dp, dmc+1<=dmc8, dmc+1<=dmcfield, 0<=i, ipflag<=0,
+//    0<=j, 0<=secondfield, secondfield<=1}
 
          /* L1 metric */
          vmc = vmc_dp;
@@ -24796,7 +24853,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8+1<=dmcfield}
+//    {dmc8+1<=dmcfield, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          /* 16x8 prediction */
          mbi->motion_type = 2;
@@ -24806,7 +24863,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8+1<=dmcfield}
+//    {dmc8+1<=dmcfield, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          vmc = dist2((sel8u?botref:topref)+(imin8u>>1)+w2*(jmin8u>>1), mb, w2, imin8u&1, jmin8u&1, 8);
 
@@ -24815,7 +24872,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8+1<=dmcfield, 0<=vmc}
+//    {dmc8+1<=dmcfield, 0<=i, 0<=j, 0<=secondfield, secondfield<=1,
+//    0<=vmc}
 
          vmc += dist2((sel8l?botref:topref)+(imin8l>>1)+w2*(jmin8l>>1), mb+8*w2, w2, imin8l&1, jmin8l&1, 8);
       }
@@ -24826,7 +24884,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmcfield<=dmc8}
+//    {dmcfield<=dmc8, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          /* field prediction */
          mbi->motion_type = 1;
@@ -24836,7 +24894,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmcfield<=dmc8}
+//    {dmcfield<=dmc8, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          vmc = dist2((sel?botref:topref)+(imin>>1)+w2*(jmin>>1), mb, w2, imin&1, jmin&1, 16);
       }
@@ -24845,7 +24903,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       
       /* select between intra and non-intra coding */
@@ -24856,7 +24915,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var+1<=vmc, 2304<=vmc}
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1, var+1<=vmc,
+//    2304<=vmc}
 
          mbi->mb_type = 1;
       else {
@@ -24865,7 +24925,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          /* zero MV field prediction from same parity ref. field
                 * (not allowed if ipflag is set)
@@ -24877,7 +24938,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {ipflag<=0}
+//    {0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             v0 = dist2((pict_struct==2?botref:topref)+i+w2*j, mb, w2, 0, 0, 16);
 
@@ -24885,7 +24946,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          if (ipflag||4*v0>5*vmc&&v0>=9*256) {
 
@@ -24893,7 +24955,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
             var = vmc;
 
@@ -24902,7 +24965,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
             mbi->mb_type = 8;
 
@@ -24911,7 +24974,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
             if (mbi->motion_type==1) {
 
@@ -24920,7 +24983,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[0])[0])[0] = imin-(i<<1);
 
@@ -24929,7 +24992,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[0])[0])[1] = jmin-(j<<1);
 
@@ -24938,7 +25001,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                ((mbi->mv_field_sel)[0])[0] = sel;
             }
@@ -24949,7 +25012,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                /* same parity vector */
                (((mbi->MV)[0])[0])[0] = imins-(i<<1);
@@ -24959,7 +25022,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[0])[0])[1] = jmins-(j<<1);
 
@@ -24968,7 +25031,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                
                /* opposite parity vector */
@@ -24979,7 +25042,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (mbi->dmvector)[1] = jmindmv;
             }
@@ -24990,7 +25053,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[0])[0])[0] = imin8u-(i<<1);
 
@@ -24999,7 +25062,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[0])[0])[1] = jmin8u-(j<<1);
 
@@ -25008,7 +25071,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[1])[0])[0] = imin8l-(i<<1);
 
@@ -25017,7 +25080,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                (((mbi->MV)[1])[0])[1] = jmin8l-(j+8<<1);
 
@@ -25026,7 +25089,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                ((mbi->mv_field_sel)[0])[0] = sel8u;
 
@@ -25035,7 +25098,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc}
+//    {var==vmc, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
                ((mbi->mv_field_sel)[1])[0] = sel8l;
             }
@@ -25047,7 +25110,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {ipflag<=0}
+//    {0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             /* No MC */
             var = v0;
@@ -25057,7 +25120,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {v0==var, ipflag<=0}
+//    {v0==var, 0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             mbi->mb_type = 0;
 
@@ -25066,7 +25129,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {v0==var, ipflag<=0}
+//    {v0==var, 0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             mbi->motion_type = 1;
 
@@ -25075,7 +25138,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {v0==var, ipflag<=0}
+//    {v0==var, 0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             (((mbi->MV)[0])[0])[0] = 0;
 
@@ -25084,7 +25147,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {v0==var, ipflag<=0}
+//    {v0==var, 0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             (((mbi->MV)[0])[0])[1] = 0;
 
@@ -25093,7 +25156,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {v0==var, ipflag<=0}
+//    {v0==var, 0<=i, ipflag<=0, 0<=j, 0<=secondfield, secondfield<=1}
 
             ((mbi->mv_field_sel)[0])[0] = pict_struct==2;
          }
@@ -25105,7 +25168,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       /* forward prediction */
       
@@ -25117,7 +25181,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       
       /* backward prediction */
@@ -25130,7 +25195,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       dmcfieldi = bdist1(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
@@ -25139,7 +25205,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmcfieldi}
+//    {0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
       dmc8i = bdist1(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
@@ -25148,7 +25214,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, 0<=dmcfieldi}
+//    {0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
       dmc8i += bdist1(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
 
@@ -25157,7 +25224,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, 0<=dmcfieldi}
+//    {0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
       
       /* select prediction type of minimum distance */
@@ -25171,7 +25239,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldi+1<=dmc8f, 0<=dmc8i, dmcfieldi+1<=dmc8i,
 //    dmcfieldi+1<=dmc8r, dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi,
-//    dmcfieldi+1<=dmcfieldr}
+//    dmcfieldi+1<=dmcfieldr, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          /* field, interpolated */
          mbi->mb_type = 8|4;
@@ -25183,7 +25252,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldi+1<=dmc8f, 0<=dmc8i, dmcfieldi+1<=dmc8i,
 //    dmcfieldi+1<=dmc8r, dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi,
-//    dmcfieldi+1<=dmcfieldr}
+//    dmcfieldi+1<=dmcfieldr, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          mbi->motion_type = 1;
 
@@ -25194,7 +25264,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldi+1<=dmc8f, 0<=dmc8i, dmcfieldi+1<=dmc8i,
 //    dmcfieldi+1<=dmc8r, dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi,
-//    dmcfieldi+1<=dmcfieldr}
+//    dmcfieldi+1<=dmcfieldr, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          vmc = bdist2(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminf&1, jminf&1, iminr&1, jminr&1, 16);
       }
@@ -25206,7 +25277,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmc8i+1<=dmc8f, 0<=dmc8i, dmc8i+1<=dmc8r, dmc8i+1<=dmcfieldf,
-//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          /* 16x8, interpolated */
          mbi->mb_type = 8|4;
@@ -25217,7 +25289,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmc8i+1<=dmc8f, 0<=dmc8i, dmc8i+1<=dmc8r, dmc8i+1<=dmcfieldf,
-//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          mbi->motion_type = 2;
 
@@ -25227,7 +25300,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmc8i+1<=dmc8f, 0<=dmc8i, dmc8i+1<=dmc8r, dmc8i+1<=dmcfieldf,
-//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1}
 
          vmc = bdist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8uf&1, jmin8uf&1, imin8ur&1, jmin8ur&1, 8);
 
@@ -25237,7 +25311,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmc8i+1<=dmc8f, 0<=dmc8i, dmc8i+1<=dmc8r, dmc8i+1<=dmcfieldf,
-//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=vmc}
+//    dmc8i+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=vmc}
 
          vmc += bdist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, imin8lr&1, jmin8lr&1, 8);
       }
@@ -25249,7 +25324,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldf+1<=dmc8f, 0<=dmc8i, dmcfieldf+1<=dmc8r,
-//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          /* field, forward */
          mbi->mb_type = 8;
@@ -25260,7 +25336,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldf+1<=dmc8f, 0<=dmc8i, dmcfieldf+1<=dmc8r,
-//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          mbi->motion_type = 1;
 
@@ -25270,7 +25347,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmcfieldf+1<=dmc8f, 0<=dmc8i, dmcfieldf+1<=dmc8r,
-//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi}
+//    dmcfieldf+1<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          vmc = dist2(oldref+(self?width:0)+(iminf>>1)+w2*(jminf>>1), mb, w2, iminf&1, jminf&1, 16);
       }
@@ -25281,7 +25359,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi}
+//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi,
+//    0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          /* 16x8, forward */
          mbi->mb_type = 8;
@@ -25291,7 +25370,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi}
+//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi,
+//    0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          mbi->motion_type = 2;
 
@@ -25300,7 +25380,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi}
+//    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi,
+//    0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          vmc = dist2(oldref+(sel8uf?width:0)+(imin8uf>>1)+w2*(jmin8uf>>1), mb, w2, imin8uf&1, jmin8uf&1, 8);
 
@@ -25310,7 +25391,7 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
 //    {dmc8f+1<=dmc8r, dmc8f+1<=dmcfieldr, 0<=dmc8i, 0<=dmcfieldi,
-//    0<=vmc}
+//    0<=i, 0<=j, 0<=secondfield, secondfield<=1, 0<=vmc}
 
          vmc += dist2(oldref+(sel8lf?width:0)+(imin8lf>>1)+w2*(jmin8lf>>1), mb+8*w2, w2, imin8lf&1, jmin8lf&1, 8);
       }
@@ -25321,7 +25402,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi}
+//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          /* field, backward */
          mbi->mb_type = 4;
@@ -25331,7 +25413,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi}
+//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          mbi->motion_type = 1;
 
@@ -25340,7 +25423,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi}
+//    {0<=dmc8i, dmcfieldr+1<=dmc8r, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          vmc = dist2(newref+(selr?width:0)+(iminr>>1)+w2*(jminr>>1), mb, w2, iminr&1, jminr&1, 16);
       }
@@ -25351,7 +25435,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi}
+//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          /* 16x8, backward */
          mbi->mb_type = 4;
@@ -25361,7 +25446,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi}
+//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          mbi->motion_type = 2;
 
@@ -25370,7 +25456,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi}
+//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1}
 
          vmc = dist2(newref+(sel8ur?width:0)+(imin8ur>>1)+w2*(jmin8ur>>1), mb, w2, imin8ur&1, jmin8ur&1, 8);
 
@@ -25379,7 +25466,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=vmc}
+//    {0<=dmc8i, dmc8r<=dmcfieldr, 0<=dmcfieldi, 0<=i, 0<=j,
+//    0<=secondfield, secondfield<=1, 0<=vmc}
 
          vmc += dist2(newref+(sel8lr?width:0)+(imin8lr>>1)+w2*(jmin8lr>>1), mb+8*w2, w2, imin8lr&1, jmin8lr&1, 8);
       }
@@ -25389,7 +25477,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, 0<=dmcfieldi, 0<=vmc}
+//    {0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=vmc}
 
       
       /* select between intra and non-intra coding */
@@ -25400,7 +25489,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, 0<=dmcfieldi, var+1<=vmc, 2304<=vmc}
+//    {0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, var+1<=vmc, 2304<=vmc}
 
          mbi->mb_type = 1;
       else {
@@ -25410,7 +25500,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {0<=dmc8i, 0<=dmcfieldi, 0<=vmc}
+//    {0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=vmc}
 
          var = vmc;
 
@@ -25419,7 +25510,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
          if (mbi->motion_type==1) {
 
@@ -25428,7 +25520,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             /* forward */
             (((mbi->MV)[0])[0])[0] = iminf-(i<<1);
@@ -25438,7 +25531,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[0])[0])[1] = jminf-(j<<1);
 
@@ -25447,7 +25541,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[0])[0] = self;
 
@@ -25456,7 +25551,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             /* backward */
             (((mbi->MV)[0])[1])[0] = iminr-(i<<1);
@@ -25466,7 +25562,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[0])[1])[1] = jminr-(j<<1);
 
@@ -25475,7 +25572,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[0])[1] = selr;
          }
@@ -25486,7 +25584,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             /* forward */
             (((mbi->MV)[0])[0])[0] = imin8uf-(i<<1);
@@ -25496,7 +25595,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[0])[0])[1] = jmin8uf-(j<<1);
 
@@ -25505,7 +25605,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[0])[0] = sel8uf;
 
@@ -25514,7 +25615,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[1])[0])[0] = imin8lf-(i<<1);
 
@@ -25523,7 +25625,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[1])[0])[1] = jmin8lf-(j+8<<1);
 
@@ -25532,7 +25635,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[1])[0] = sel8lf;
 
@@ -25541,7 +25645,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             /* backward */
             (((mbi->MV)[0])[1])[0] = imin8ur-(i<<1);
@@ -25551,7 +25656,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[0])[1])[1] = jmin8ur-(j<<1);
 
@@ -25560,7 +25666,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[0])[1] = sel8ur;
 
@@ -25569,7 +25676,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[1])[1])[0] = imin8lr-(i<<1);
 
@@ -25578,7 +25686,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             (((mbi->MV)[1])[1])[1] = jmin8lr-(j+8<<1);
 
@@ -25587,7 +25696,8 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
 //    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
-//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=var}
+//    {var==vmc, 0<=dmc8i, 0<=dmcfieldi, 0<=i, 0<=j, 0<=secondfield,
+//    secondfield<=1, 0<=var}
 
             ((mbi->mv_field_sel)[1])[1] = sel8lr;
          }
@@ -25598,32 +25708,33 @@ static void field_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,ds,imin,imin8l,imin8lf,imin8lr,imin8u,imin8uf,imin8ur,
 //    imindmv,iminf,iminr,imins,jmin,jmin8l,jmin8lf,jmin8lr,jmin8u,
 //    jmin8uf,jmin8ur,jmindmv,jminf,jminr,jmins,sel,sel8l,sel8lf,
-//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2) {}
+//    sel8lr,sel8u,sel8uf,sel8ur,self,selr,v0,var,vmc,vmc_dp,w2)
+//    {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
    mbi->var = var;
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
 static void field_estimate(unsigned char *toporg, unsigned char *topref, unsigned char *botorg, unsigned char *botref, unsigned char *mb, int i, int j, int sx, int sy, int ipflag, int *iminp, int *jminp, int *imin8up, int *jmin8up, int *imin8lp, int *jmin8lp, int *dfieldp, int *d8p, int *selp, int *sel8up, int *sel8lp, int *iminsp, int *jminsp, int *dsp)
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    int dt, db, imint, jmint, iminb, jminb, notop, nobot;
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {0<=i, 0<=j}
 
    
    /* if ipflag is set, predict from field of opposite parity only */
    notop = ipflag&&pict_struct==1;
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {0<=i, 0<=j}
 
    nobot = ipflag&&pict_struct==2;
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {0<=i, 0<=j}
 
    
    /* field prediction */
@@ -25631,126 +25742,130 @@ static void field_estimate(unsigned char *toporg, unsigned char *topref, unsigne
    /* predict current field from top field */
    if (notop)
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {0<=i, 0<=j}
 
       dt = 65536;
    else
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {notop==0}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {notop==0, 0<=i,
+//    0<=j}
 
       
       
       dt = fullsearch(toporg, topref, mb, width<<1, i, j, sx, sy>>1, 16, width, height>>1, &imint, &jmint);
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {dt<=65536}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {dt<=65536, 0<=i,
+//    0<=j}
 
    
    /* predict current field from bottom field */
    if (nobot)
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {dt<=65536}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {dt<=65536, 0<=i,
+//    0<=j}
 
       db = 65536;
    else
 
-//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {nobot==0, dt<=65536}
+//  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {nobot==0, dt<=65536,
+//    0<=i, 0<=j}
 
       
       
       db = fullsearch(botorg, botref, mb, width<<1, i, j, sx, sy>>1, 16, width, height>>1, &iminb, &jminb);
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* same parity prediction (only valid if ipflag==0) */
    if (pict_struct==1) {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {pict_struct==1,
-//    db<=65536, dt<=65536}
+//    db<=65536, dt<=65536, 0<=i, 0<=j}
 
       *iminsp = imint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {pict_struct==1,
-//    db<=65536, dt<=65536}
+//    db<=65536, dt<=65536, 0<=i, 0<=j}
 
       *jminsp = jmint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {pict_struct==1,
-//    db<=65536, dt<=65536}
+//    db<=65536, dt<=65536, 0<=i, 0<=j}
 
       *dsp = dt;
    }
    else {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *iminsp = iminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jminsp = jminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *dsp = db;
    }
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* select field prediction */
    if (dt<=db) {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *dfieldp = dt;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *iminp = imint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jminp = jmint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *selp = 0;
    }
    else {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *dfieldp = db;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *iminp = iminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jminp = jminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *selp = 1;
    }
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    
@@ -25760,240 +25875,243 @@ static void field_estimate(unsigned char *toporg, unsigned char *topref, unsigne
    if (notop)
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       dt = 65536;
    else
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {notop==0, db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       
       
       dt = fullsearch(toporg, topref, mb, width<<1, i, j, sx, sy>>1, 8, width, height>>1, &imint, &jmint);
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* predict upper half field from bottom field */
    if (nobot)
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       db = 65536;
    else
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {nobot==0, db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       
       
       db = fullsearch(botorg, botref, mb, width<<1, i, j, sx, sy>>1, 8, width, height>>1, &iminb, &jminb);
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* select prediction for upper half field */
    if (dt<=db) {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *d8p = dt;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *imin8up = imint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jmin8up = jmint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *sel8up = 0;
    }
    else {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *d8p = db;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *imin8up = iminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jmin8up = jminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *sel8up = 1;
    }
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* predict lower half field from top field */
    if (notop)
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       dt = 65536;
    else
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {notop==0, db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
 
       dt = fullsearch(toporg, topref, mb+(width<<4), width<<1, i, j+8, sx, sy>>1, 8, width, height>>1, &imint, &jmint);
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* predict lower half field from bottom field */
    if (nobot)
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       db = 65536;
    else
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {nobot==0, db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
 
       db = fullsearch(botorg, botref, mb+(width<<4), width<<1, i, j+8, sx, sy>>1, 8, width, height>>1, &iminb, &jminb);
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* select prediction for lower half field */
    if (dt<=db) {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *d8p += dt;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *imin8lp = imint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jmin8lp = jmint;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *sel8lp = 0;
    }
    else {
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *d8p += db;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *imin8lp = iminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *jmin8lp = jminb;
 
 //  P(db,dt,iminb,imint,jminb,jmint,nobot,notop) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       *sel8lp = 1;
    }
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
 static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char *oldref, unsigned char *newref, unsigned char *cur, int i, int j, int sxf, int syf, int sxb, int syb, struct mbinfo *mbi)
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    int imin, jmin, iminf, jminf, iminr, jminr;
 
-//  P(imin,iminf,iminr,jmin,jminf,jminr) {}
+//  P(imin,iminf,iminr,jmin,jminf,jminr) {0<=i, 0<=j}
 
    int imint, jmint, iminb, jminb;
 
-//  P(imin,iminb,iminf,iminr,imint,jmin,jminb,jminf,jminr,jmint) {}
+//  P(imin,iminb,iminf,iminr,imint,jmin,jminb,jminf,jminr,jmint)
+//    {0<=i, 0<=j}
 
    int imintf, jmintf, iminbf, jminbf;
 
 //  P(imin,iminb,iminbf,iminf,iminr,imint,imintf,jmin,jminb,jminbf,
-//    jminf,jminr,jmint,jmintf) {}
+//    jminf,jminr,jmint,jmintf) {0<=i, 0<=j}
 
    int imintr, jmintr, iminbr, jminbr;
 
 //  P(imin,iminb,iminbf,iminbr,iminf,iminr,imint,imintf,imintr,jmin,
-//    jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,jmintr) {}
+//    jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,jmintr) {0<=i,
+//    0<=j}
 
    int var, v0;
 
 //  P(imin,iminb,iminbf,iminbr,iminf,iminr,imint,imintf,imintr,jmin,
-//    jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,jmintr,v0,var) {}
+//    jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,jmintr,v0,var)
+//    {0<=i, 0<=j}
 
    int dmc, dmcf, dmcr, dmci, vmc, vmcf, vmcr, vmci;
 
 //  P(dmc,dmcf,dmci,dmcr,imin,iminb,iminbf,iminbr,iminf,iminr,imint,
 //    imintf,imintr,jmin,jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,
-//    jmintr,v0,var,vmc,vmcf,vmci,vmcr) {}
+//    jmintr,v0,var,vmc,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
    int dmcfield, dmcfieldf, dmcfieldr, dmcfieldi;
 
 //  P(dmc,dmcf,dmcfield,dmcfieldf,dmcfieldi,dmcfieldr,dmci,dmcr,imin,
 //    iminb,iminbf,iminbr,iminf,iminr,imint,imintf,imintr,jmin,jminb,
 //    jminbf,jminbr,jminf,jminr,jmint,jmintf,jmintr,v0,var,vmc,vmcf,
-//    vmci,vmcr) {}
+//    vmci,vmcr) {0<=i, 0<=j}
 
    int tsel, bsel, tself, bself, tselr, bselr;
 
 //  P(bsel,bself,bselr,dmc,dmcf,dmcfield,dmcfieldf,dmcfieldi,
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,iminf,iminr,imint,
 //    imintf,imintr,jmin,jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,
-//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {}
+//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
    unsigned char *mb;
 
 //  P(bsel,bself,bselr,dmc,dmcf,dmcfield,dmcfieldf,dmcfieldi,
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,iminf,iminr,imint,
 //    imintf,imintr,jmin,jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,
-//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {}
+//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
    int imins[2][2], jmins[2][2];
 
 //  P(bsel,bself,bselr,dmc,dmcf,dmcfield,dmcfieldf,dmcfieldi,
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,iminf,iminr,imint,
 //    imintf,imintr,jmin,jminb,jminbf,jminbr,jminf,jminr,jmint,jmintf,
-//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {}
+//    jmintr,tsel,tself,tselr,v0,var,vmc,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
    int imindp, jmindp, imindmv, jmindmv, dmc_dp, vmc_dp;
 
@@ -26001,7 +26119,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
    mb = cur+i+width*j;
@@ -26010,7 +26128,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
    var = variance(mb, width);
@@ -26019,7 +26137,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
    if (pict_type==1)
@@ -26028,7 +26146,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
       mbi->mb_type = 1;
    else if (pict_type==2) {
@@ -26037,7 +26155,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
       if (frame_pred_dct) {
 
@@ -26045,7 +26163,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
          dmc = fullsearch(oldorg, oldref, mb, width, i, j, sxf, syf, 16, width, height, &imin, &jmin);
@@ -26054,7 +26172,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=65536}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=65536, 0<=i, 0<=j}
 
          vmc = dist2(oldref+(imin>>1)+width*(jmin>>1), mb, width, imin&1, jmin&1, 16);
 
@@ -26062,7 +26180,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=65536, 0<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=65536, 0<=i, 0<=j,
+//    0<=vmc}
 
          mbi->motion_type = 2;
       }
@@ -26072,7 +26191,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          
          
@@ -26082,7 +26201,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
          if (M==1)
@@ -26091,7 +26210,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
             dpframe_estimate(oldref, mb, i, j>>1, imins, jmins, &imindp, &jmindp, &imindmv, &jmindmv, &dmc_dp, &vmc_dp);
@@ -26100,7 +26219,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          
          /* select between dual prime, frame and field prediction */
@@ -26111,7 +26230,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc_dp+1<=dmc,
-//    dmc_dp+1<=dmcfield}
+//    dmc_dp+1<=dmcfield, 0<=i, 0<=j}
 
             mbi->motion_type = 3;
 
@@ -26120,7 +26239,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc_dp+1<=dmc,
-//    dmc_dp+1<=dmcfield}
+//    dmc_dp+1<=dmcfield, 0<=i, 0<=j}
 
             dmc = dmc_dp;
 
@@ -26128,7 +26247,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmc_dp, dmc+1<=dmcfield}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmc_dp, dmc+1<=dmcfield,
+//    0<=i, 0<=j}
 
             vmc = vmc_dp;
          }
@@ -26138,7 +26258,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=dmcfield}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=dmcfield, 0<=i, 0<=j}
 
             mbi->motion_type = 2;
 
@@ -26146,7 +26266,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=dmcfield}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc<=dmcfield, 0<=i, 0<=j}
 
             vmc = dist2(oldref+(imin>>1)+width*(jmin>>1), mb, width, imin&1, jmin&1, 16);
          }
@@ -26156,7 +26276,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfield+1<=dmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfield+1<=dmc, 0<=i, 0<=j}
 
             mbi->motion_type = 1;
 
@@ -26164,7 +26284,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfield+1<=dmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfield+1<=dmc, 0<=i, 0<=j}
 
             dmc = dmcfield;
 
@@ -26172,7 +26292,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmcfield}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmcfield, 0<=i, 0<=j}
 
             vmc = dist2(oldref+(tsel?width:0)+(imint>>1)+(width<<1)*(jmint>>1), mb, width<<1, imint&1, jmint&1, 8);
 
@@ -26180,7 +26300,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmcfield, 0<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmc==dmcfield, 0<=i, 0<=j,
+//    0<=vmc}
 
             vmc += dist2(oldref+(bsel?width:0)+(iminb>>1)+(width<<1)*(jminb>>1), mb+width, width<<1, iminb&1, jminb&1, 8);
          }
@@ -26190,7 +26311,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
       
       /* select between intra or non-intra coding:
@@ -26207,7 +26328,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var+1<=vmc, 2304<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, var+1<=vmc,
+//    2304<=vmc}
 
          mbi->mb_type = 1;
       else {
@@ -26216,7 +26338,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          /* select between MC / No-MC
                 *
@@ -26232,7 +26354,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, 0<=v0}
 
          if (4*v0>5*vmc&&v0>=9*256) {
 
@@ -26240,7 +26362,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {2304<=v0, 5vmc+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, 2304<=v0,
+//    5vmc+1<=4v0}
 
             /* use MC */
             var = vmc;
@@ -26249,8 +26372,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
             mbi->mb_type = 8;
 
@@ -26258,8 +26381,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
             if (mbi->motion_type==2) {
 
@@ -26267,8 +26390,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[0])[0])[0] = imin-(i<<1);
 
@@ -26276,8 +26399,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[0])[0])[1] = jmin-(j<<1);
             }
@@ -26287,8 +26410,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                /* these are FRAME vectors */
                /* same parity vector */
@@ -26298,8 +26421,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[0])[0])[1] = (jmindp<<1)-(j<<1);
 
@@ -26307,8 +26430,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                
                /* opposite parity vector */
@@ -26318,8 +26441,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (mbi->dmvector)[1] = jmindmv;
             }
@@ -26329,8 +26452,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                /* these are FRAME vectors */
                (((mbi->MV)[0])[0])[0] = imint-(i<<1);
@@ -26339,8 +26462,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[0])[0])[1] = (jmint<<1)-(j<<1);
 
@@ -26348,8 +26471,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[1])[0])[0] = iminb-(i<<1);
 
@@ -26357,8 +26480,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                (((mbi->MV)[1])[0])[1] = (jminb<<1)-(j<<1);
 
@@ -26366,8 +26489,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                ((mbi->mv_field_sel)[0])[0] = tsel;
 
@@ -26375,8 +26498,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 2304<=v0,
-//    5var+1<=4v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j,
+//    2304<=v0, 5var+1<=4v0}
 
                ((mbi->mv_field_sel)[1])[0] = bsel;
             }
@@ -26387,7 +26510,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, 0<=v0}
 
             /* No-MC */
             var = v0;
@@ -26396,7 +26519,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=i, 0<=j, 0<=v0}
 
             mbi->mb_type = 0;
 
@@ -26404,7 +26527,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=i, 0<=j, 0<=v0}
 
             mbi->motion_type = 2;
 
@@ -26412,7 +26535,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=i, 0<=j, 0<=v0}
 
             (((mbi->MV)[0])[0])[0] = 0;
 
@@ -26420,7 +26543,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=v0}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {v0==var, 0<=i, 0<=j, 0<=v0}
 
             (((mbi->MV)[0])[0])[1] = 0;
          }
@@ -26432,7 +26555,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
       if (frame_pred_dct) {
 
@@ -26440,7 +26563,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          /* forward */
          
@@ -26450,7 +26573,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, 0<=i, 0<=j}
 
          vmcf = dist2(oldref+(iminf>>1)+width*(jminf>>1), mb, width, iminf&1, jminf&1, 16);
 
@@ -26458,7 +26581,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, 0<=vmcf}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, 0<=i, 0<=j,
+//    0<=vmcf}
 
          
          /* backward */
@@ -26470,7 +26594,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    0<=vmcf}
+//    0<=i, 0<=j, 0<=vmcf}
 
          vmcr = dist2(newref+(iminr>>1)+width*(jminr>>1), mb, width, iminr&1, jminr&1, 16);
 
@@ -26479,7 +26603,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    0<=vmcf, 0<=vmcr}
+//    0<=i, 0<=j, 0<=vmcf, 0<=vmcr}
 
          vmci = bdist2(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
@@ -26488,7 +26612,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    0<=vmcf, 0<=vmci, 0<=vmcr}
+//    0<=i, 0<=j, 0<=vmcf, 0<=vmci, 0<=vmcr}
 
          
          /* decisions */
@@ -26503,7 +26627,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    0<=vmcf, vmcf<=vmci, vmcf<=vmcr, 0<=vmci, 0<=vmcr}
+//    0<=i, 0<=j, 0<=vmcf, vmcf<=vmci, vmcf<=vmcr, 0<=vmci, 0<=vmcr}
 
             vmc = vmcf;
 
@@ -26512,7 +26636,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {vmc==vmcf, dmcf<=65536,
-//    dmcr<=65536, 0<=vmc, vmc<=vmci, vmc<=vmcr, 0<=vmci, 0<=vmcr}
+//    dmcr<=65536, 0<=i, 0<=j, 0<=vmc, vmc<=vmci, vmc<=vmcr, 0<=vmci,
+//    0<=vmcr}
 
             mbi->mb_type = 8;
          }
@@ -26523,7 +26648,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    1<=vmcf, 0<=vmci, vmcr<=vmci, 0<=vmcr}
+//    0<=i, 0<=j, 1<=vmcf, 0<=vmci, vmcr<=vmci, 0<=vmcr}
 
             vmc = vmcr;
 
@@ -26532,7 +26657,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {vmc==vmcr, dmcf<=65536,
-//    dmcr<=65536, 0<=vmc, vmc<=vmci, 1<=vmcf, 0<=vmci}
+//    dmcr<=65536, 0<=i, 0<=j, 0<=vmc, vmc<=vmci, 1<=vmcf, 0<=vmci}
 
             mbi->mb_type = 4;
          }
@@ -26543,7 +26668,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    1<=vmcf, 0<=vmci, vmci+1<=vmcr, 0<=vmcr}
+//    0<=i, 0<=j, 1<=vmcf, 0<=vmci, vmci+1<=vmcr, 0<=vmcr}
 
             vmc = vmci;
 
@@ -26552,7 +26677,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {vmc==vmci, dmcf<=65536,
-//    dmcr<=65536, 0<=vmc, vmc+1<=vmcr, 1<=vmcf, 0<=vmcr}
+//    dmcr<=65536, 0<=i, 0<=j, 0<=vmc, vmc+1<=vmcr, 1<=vmcf, 0<=vmcr}
 
             mbi->mb_type = 8|4;
          }
@@ -26562,7 +26687,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf<=65536, dmcr<=65536,
-//    0<=vmc, vmc<=vmci, vmc<=vmcr, 0<=vmcf}
+//    0<=i, 0<=j, 0<=vmc, vmc<=vmci, vmc<=vmcr, 0<=vmcf}
 
 
          mbi->motion_type = 2;
@@ -26573,7 +26698,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          /* forward prediction */
          
@@ -26584,7 +26709,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          
          /* backward prediction */
@@ -26596,7 +26721,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
          dmci = bdist1(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
 
@@ -26604,7 +26729,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmci}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmci, 0<=i, 0<=j}
 
          dmcfieldi = bdist1(oldref+(imintf>>1)+(tself?width:0)+(width<<1)*(jmintf>>1), newref+(imintr>>1)+(tselr?width:0)+(width<<1)*(jmintr>>1), mb, width<<1, imintf&1, jmintf&1, imintr&1, jmintr&1, 8);
 
@@ -26612,7 +26737,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi, 0<=dmci}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi, 0<=dmci, 0<=i,
+//    0<=j}
 
          dmcfieldi += bdist1(oldref+(iminbf>>1)+(bself?width:0)+(width<<1)*(jminbf>>1), newref+(iminbr>>1)+(bselr?width:0)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbf&1, jminbf&1, iminbr&1, jminbr&1, 8);
 
@@ -26620,7 +26746,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi, 0<=dmci}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi, 0<=dmci, 0<=i,
+//    0<=j}
 
          
          /* select prediction type of minimum distance from the
@@ -26635,7 +26762,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmci+1<=dmcf,
 //    dmci+1<=dmcfieldf, 0<=dmcfieldi, dmci+1<=dmcfieldi,
-//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr}
+//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr, 0<=i, 0<=j}
 
             /* frame, interpolated */
             mbi->mb_type = 8|4;
@@ -26646,7 +26773,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmci+1<=dmcf,
 //    dmci+1<=dmcfieldf, 0<=dmcfieldi, dmci+1<=dmcfieldi,
-//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr}
+//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr, 0<=i, 0<=j}
 
             mbi->motion_type = 2;
 
@@ -26656,7 +26783,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmci+1<=dmcf,
 //    dmci+1<=dmcfieldf, 0<=dmcfieldi, dmci+1<=dmcfieldi,
-//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr}
+//    dmci+1<=dmcfieldr, 0<=dmci, dmci+1<=dmcr, 0<=i, 0<=j}
 
             vmc = bdist2(oldref+(iminf>>1)+width*(jminf>>1), newref+(iminr>>1)+width*(jminr>>1), mb, width, iminf&1, jminf&1, iminr&1, jminr&1, 16);
          }
@@ -26668,7 +26795,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldi+1<=dmcf,
 //    dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi, dmcfieldi+1<=dmcfieldr,
-//    dmcfieldi+1<=dmcr, 0<=dmci}
+//    dmcfieldi+1<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             /* field, interpolated */
             mbi->mb_type = 8|4;
@@ -26679,7 +26806,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldi+1<=dmcf,
 //    dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi, dmcfieldi+1<=dmcfieldr,
-//    dmcfieldi+1<=dmcr, 0<=dmci}
+//    dmcfieldi+1<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             mbi->motion_type = 1;
 
@@ -26689,7 +26816,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldi+1<=dmcf,
 //    dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi, dmcfieldi+1<=dmcfieldr,
-//    dmcfieldi+1<=dmcr, 0<=dmci}
+//    dmcfieldi+1<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             vmc = bdist2(oldref+(imintf>>1)+(tself?width:0)+(width<<1)*(jmintf>>1), newref+(imintr>>1)+(tselr?width:0)+(width<<1)*(jmintr>>1), mb, width<<1, imintf&1, jmintf&1, imintr&1, jmintr&1, 8);
 
@@ -26699,7 +26826,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldi+1<=dmcf,
 //    dmcfieldi+1<=dmcfieldf, 0<=dmcfieldi, dmcfieldi+1<=dmcfieldr,
-//    dmcfieldi+1<=dmcr, 0<=dmci, 0<=vmc}
+//    dmcfieldi+1<=dmcr, 0<=dmci, 0<=i, 0<=j, 0<=vmc}
 
             vmc += bdist2(oldref+(iminbf>>1)+(bself?width:0)+(width<<1)*(jminbf>>1), newref+(iminbr>>1)+(bselr?width:0)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbf&1, jminbf&1, iminbr&1, jminbr&1, 8);
          }
@@ -26710,7 +26837,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf+1<=dmcfieldf,
-//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i,
+//    0<=j}
 
             /* frame, forward */
             mbi->mb_type = 8;
@@ -26720,7 +26848,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf+1<=dmcfieldf,
-//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i,
+//    0<=j}
 
             mbi->motion_type = 2;
 
@@ -26729,7 +26858,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcf+1<=dmcfieldf,
-//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcf+1<=dmcfieldr, dmcf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i,
+//    0<=j}
 
             vmc = dist2(oldref+(iminf>>1)+width*(jminf>>1), mb, width, iminf&1, jminf&1, 16);
          }
@@ -26740,7 +26870,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldf+1<=dmcfieldr,
-//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i, 0<=j}
 
             /* field, forward */
             mbi->mb_type = 8;
@@ -26750,7 +26880,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldf+1<=dmcfieldr,
-//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i, 0<=j}
 
             mbi->motion_type = 1;
 
@@ -26759,7 +26889,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldf+1<=dmcfieldr,
-//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci}
+//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i, 0<=j}
 
             vmc = dist2(oldref+(tself?width:0)+(imintf>>1)+(width<<1)*(jmintf>>1), mb, width<<1, imintf&1, jmintf&1, 8);
 
@@ -26768,7 +26898,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {dmcfieldf+1<=dmcfieldr,
-//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=vmc}
+//    dmcfieldf+1<=dmcr, 0<=dmcfieldi, 0<=dmci, 0<=i, 0<=j, 0<=vmc}
 
             vmc += dist2(oldref+(bself?width:0)+(iminbf>>1)+(width<<1)*(jminbf>>1), mb+width, width<<1, iminbf&1, jminbf&1, 8);
          }
@@ -26779,7 +26909,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcr+1<=dmcfieldr, 0<=dmci}
+//    dmcr+1<=dmcfieldr, 0<=dmci, 0<=i, 0<=j}
 
             /* frame, backward */
             mbi->mb_type = 4;
@@ -26789,7 +26919,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcr+1<=dmcfieldr, 0<=dmci}
+//    dmcr+1<=dmcfieldr, 0<=dmci, 0<=i, 0<=j}
 
             mbi->motion_type = 2;
 
@@ -26798,7 +26928,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcr+1<=dmcfieldr, 0<=dmci}
+//    dmcr+1<=dmcfieldr, 0<=dmci, 0<=i, 0<=j}
 
             vmc = dist2(newref+(iminr>>1)+width*(jminr>>1), mb, width, iminr&1, jminr&1, 16);
          }
@@ -26809,7 +26939,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcfieldr<=dmcr, 0<=dmci}
+//    dmcfieldr<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             /* field, backward */
             mbi->mb_type = 4;
@@ -26819,7 +26949,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcfieldr<=dmcr, 0<=dmci}
+//    dmcfieldr<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             mbi->motion_type = 1;
 
@@ -26828,7 +26958,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcfieldr<=dmcr, 0<=dmci}
+//    dmcfieldr<=dmcr, 0<=dmci, 0<=i, 0<=j}
 
             vmc = dist2(newref+(tselr?width:0)+(imintr>>1)+(width<<1)*(jmintr>>1), mb, width<<1, imintr&1, jmintr&1, 8);
 
@@ -26837,7 +26967,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
 //    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=dmcfieldi,
-//    dmcfieldr<=dmcr, 0<=dmci, 0<=vmc}
+//    dmcfieldr<=dmcr, 0<=dmci, 0<=i, 0<=j, 0<=vmc}
 
             vmc += dist2(newref+(bselr?width:0)+(iminbr>>1)+(width<<1)*(jminbr>>1), mb+width, width<<1, iminbr&1, jminbr&1, 8);
          }
@@ -26847,7 +26977,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, 0<=vmc}
 
       
       /* select between intra or non-intra coding:
@@ -26864,7 +26994,8 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var+1<=vmc, 2304<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, var+1<=vmc,
+//    2304<=vmc}
 
          mbi->mb_type = 1;
       else {
@@ -26873,7 +27004,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=vmc}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j, 0<=vmc}
 
          var = vmc;
 
@@ -26881,7 +27012,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
          if (mbi->motion_type==2) {
 
@@ -26889,7 +27020,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             /* forward */
             (((mbi->MV)[0])[0])[0] = iminf-(i<<1);
@@ -26898,7 +27029,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[0])[0])[1] = jminf-(j<<1);
 
@@ -26906,7 +27037,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             /* backward */
             (((mbi->MV)[0])[1])[0] = iminr-(i<<1);
@@ -26915,7 +27046,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[0])[1])[1] = jminr-(j<<1);
          }
@@ -26925,7 +27056,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             /* these are FRAME vectors */
             /* forward */
@@ -26935,7 +27066,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[0])[0])[1] = (jmintf<<1)-(j<<1);
 
@@ -26943,7 +27074,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[1])[0])[0] = iminbf-(i<<1);
 
@@ -26951,7 +27082,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[1])[0])[1] = (jminbf<<1)-(j<<1);
 
@@ -26959,7 +27090,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             ((mbi->mv_field_sel)[0])[0] = tself;
 
@@ -26967,7 +27098,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             ((mbi->mv_field_sel)[1])[0] = bself;
 
@@ -26975,7 +27106,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             /* backward */
             (((mbi->MV)[0])[1])[0] = imintr-(i<<1);
@@ -26984,7 +27115,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[0])[1])[1] = (jmintr<<1)-(j<<1);
 
@@ -26992,7 +27123,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[1])[1])[0] = iminbr-(i<<1);
 
@@ -27000,7 +27131,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             (((mbi->MV)[1])[1])[1] = (jminbr<<1)-(j<<1);
 
@@ -27008,7 +27139,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             ((mbi->mv_field_sel)[0])[1] = tselr;
 
@@ -27016,7 +27147,7 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=var}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {var==vmc, 0<=i, 0<=j, 0<=var}
 
             ((mbi->mv_field_sel)[1])[1] = bselr;
          }
@@ -27027,40 +27158,41 @@ static void frame_ME(unsigned char *oldorg, unsigned char *neworg, unsigned char
 //    dmcfieldr,dmci,dmcr,imin,iminb,iminbf,iminbr,imindmv,imindp,
 //    iminf,iminr,imint,imintf,imintr,jmin,jminb,jminbf,jminbr,
 //    jmindmv,jmindp,jminf,jminr,jmint,jmintf,jmintr,tsel,tself,tselr,
-//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {}
+//    v0,var,vmc,vmc_dp,vmcf,vmci,vmcr) {0<=i, 0<=j}
 
 
    mbi->var = var;
 }
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
 static void frame_estimate(unsigned char *org, unsigned char *ref, unsigned char *mb, int i, int j, int sx, int sy, int *iminp, int *jminp, int *imintp, int *jmintp, int *iminbp, int *jminbp, int *dframep, int *dfieldp, int *tselp, int *bselp, int imins[2][2], int jmins[2][2])
 {
 
-//  P() {}
+//  P() {0<=i, 0<=j}
 
    int dt, db, dmint, dminb;
 
-//  P(db,dminb,dmint,dt) {}
+//  P(db,dminb,dmint,dt) {0<=i, 0<=j}
 
    int imint, iminb, jmint, jminb;
 
-//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {}
+//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {0<=i, 0<=j}
 
    
    /* frame prediction */
    
    *dframep = fullsearch(org, ref, mb, width, i, j, sx, sy, 16, width, height, iminp, jminp);
 
-//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {}
+//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {0<=i, 0<=j}
 
    
    /* predict top field from top field */
    
    dt = fullsearch(org, ref, mb, width<<1, i, j>>1, sx, sy>>1, 8, width, height>>1, &imint, &jmint);
 
-//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dt<=65536}
+//  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dt<=65536, 0<=i,
+//    0<=j}
 
    
    /* predict top field from bottom field */
@@ -27068,78 +27200,78 @@ static void frame_estimate(unsigned char *org, unsigned char *ref, unsigned char
    db = fullsearch(org+width, ref+width, mb, width<<1, i, j>>1, sx, sy>>1, 8, width, height>>1, &iminb, &jminb);
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
 
    imins[0][0] = imint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    jmins[0][0] = jmint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    imins[1][0] = iminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    jmins[1][0] = jminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
    
    /* select prediction for top field */
    if (dt<=db) {
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536, dt<=db,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       dmint = dt;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dmint==dt,
-//    db<=65536, dmint<=db, dmint<=65536}
+//    db<=65536, dmint<=db, dmint<=65536, 0<=i, 0<=j}
 
       *imintp = imint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dmint==dt,
-//    db<=65536, dmint<=db, dmint<=65536}
+//    db<=65536, dmint<=db, dmint<=65536, 0<=i, 0<=j}
 
       *jmintp = jmint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dmint==dt,
-//    db<=65536, dmint<=db, dmint<=65536}
+//    db<=65536, dmint<=db, dmint<=65536, 0<=i, 0<=j}
 
       *tselp = 0;
    }
    else {
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536, db+1<=dt,
-//    dt<=65536}
+//    dt<=65536, 0<=i, 0<=j}
 
       dmint = db;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dmint,
-//    db<=65536, db+1<=dt, dt<=65536}
+//    db<=65536, db+1<=dt, dt<=65536, 0<=i, 0<=j}
 
       *imintp = iminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dmint,
-//    db<=65536, db+1<=dt, dt<=65536}
+//    db<=65536, db+1<=dt, dt<=65536, 0<=i, 0<=j}
 
       *jmintp = jminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dmint,
-//    db<=65536, db+1<=dt, dt<=65536}
+//    db<=65536, db+1<=dt, dt<=65536, 0<=i, 0<=j}
 
       *tselp = 1;
    }
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dmint<=db,
-//    db+dt<=dmint+65536, dmint<=dt}
+//    db+dt<=dmint+65536, dmint<=dt, 0<=i, 0<=j}
 
    
    /* predict bottom field from top field */
@@ -27147,7 +27279,7 @@ static void frame_estimate(unsigned char *org, unsigned char *ref, unsigned char
    dt = fullsearch(org, ref, mb+width, width<<1, i, j>>1, sx, sy>>1, 8, width, height>>1, &imint, &jmint);
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=db, dt<=65536}
+//    dmint<=db, dt<=65536, 0<=i, 0<=j}
 
    
    /* predict bottom field from bottom field */
@@ -27155,175 +27287,181 @@ static void frame_estimate(unsigned char *org, unsigned char *ref, unsigned char
    db = fullsearch(org+width, ref+width, mb+width, width<<1, i, j>>1, sx, sy>>1, 8, width, height>>1, &iminb, &jminb);
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
 
    imins[0][1] = imint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
    jmins[0][1] = jmint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
    imins[1][1] = iminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
    jmins[1][1] = jminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
    
    /* select prediction for bottom field */
    if (db<=dt) {
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536, db<=dt,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
       dminb = db;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dminb,
-//    db<=65536, db<=dt, dmint<=65536, dt<=65536}
+//    db<=65536, db<=dt, dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
       *iminbp = iminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dminb,
-//    db<=65536, db<=dt, dmint<=65536, dt<=65536}
+//    db<=65536, db<=dt, dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
       *jminbp = jminb;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db==dminb,
-//    db<=65536, db<=dt, dmint<=65536, dt<=65536}
+//    db<=65536, db<=dt, dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
       *bselp = 1;
    }
    else {
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {db<=65536, dt+1<=db,
-//    dmint<=65536, dt<=65536}
+//    dmint<=65536, dt<=65536, 0<=i, 0<=j}
 
       dminb = dt;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dminb==dt,
-//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536}
+//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536, 0<=i, 0<=j}
 
       *iminbp = imint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dminb==dt,
-//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536}
+//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536, 0<=i, 0<=j}
 
       *jminbp = jmint;
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dminb==dt,
-//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536}
+//    db<=65536, dminb+1<=db, dminb<=65536, dmint<=65536, 0<=i, 0<=j}
 
       *bselp = 0;
    }
 
 //  P(db,dminb,dmint,dt,iminb,imint,jminb,jmint) {dminb<=db,
-//    db+dt<=dminb+65536, dminb<=dt, dmint<=65536}
+//    db+dt<=dminb+65536, dminb<=dt, dmint<=65536, 0<=i, 0<=j}
 
 
    *dfieldp = dmint+dminb;
 }
 
-//  P() {8<=h, h<=16}
+//  P() {8<=h, h<=16, 0<=i0, 0<=j0}
 
 static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk, int lx, int i0, int j0, int sx, int sy, int h, int xmax, int ymax, int *iminp, int *jminp)
 {
 
-//  P() {8<=h, h<=16}
+//  P() {8<=h, h<=16, 0<=i0, 0<=j0}
 
    int i, j, imin, jmin, ilow, ihigh, jlow, jhigh;
 
-//  P(i,ihigh,ilow,imin,j,jhigh,jlow,jmin) {8<=h, h<=16}
+//  P(i,ihigh,ilow,imin,j,jhigh,jlow,jmin) {8<=h, h<=16, 0<=i0, 0<=j0}
 
    int d, dmin;
 
-//  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin) {8<=h, h<=16}
+//  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin) {8<=h, h<=16, 0<=i0,
+//    0<=j0}
 
    int k, l, sxy;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16}
+//    h<=16, 0<=i0, 0<=j0}
 
 
    ilow = i0-sx;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {ilow+sx==i0, 8<=h, h<=16}
+//    {ilow+sx==i0, 8<=h, h<=16, 0<=i0, 0<=j0}
 
    ihigh = i0+sx;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {i0+sx==ihigh, ilow+sx==i0, 8<=h, h<=16}
+//    {i0+sx==ihigh, ilow+sx==i0, 8<=h, h<=16, 0<=i0, 0<=j0}
 
 
    if (ilow<0)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {i0+sx==ihigh, ilow+sx==i0, 8<=h, h<=16, ilow+1<=0}
+//    {i0+sx==ihigh, ilow+sx==i0, 8<=h, h<=16, 0<=i0, ilow+1<=0,
+//    0<=j0}
 
       ilow = 0;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {i0+sx==ihigh, 8<=h, h<=16, 2i0<=ihigh+ilow, 0<=ilow}
+//    {i0+sx==ihigh, 8<=h, h<=16, 0<=i0, 2i0<=ihigh+ilow, 0<=ilow,
+//    0<=j0}
 
 
    if (ihigh>xmax-16)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {i0+sx==ihigh, 8<=h, h<=16, 2i0<=ihigh+ilow, xmax<=ihigh+15,
-//    0<=ilow}
+//    {i0+sx==ihigh, 8<=h, h<=16, 0<=i0, 2i0<=ihigh+ilow,
+//    xmax<=ihigh+15, 0<=ilow, 0<=j0}
 
       ihigh = xmax-16;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow}
+//    h<=16, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
+//    0<=ilow, 0<=j0}
 
 
    jlow = j0-sy;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {jlow+sy==j0, 8<=h, h<=16, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow}
+//    {jlow+sy==j0, 8<=h, h<=16, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0}
 
    jhigh = j0+sy;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {j0+sy==jhigh, jlow+sy==j0, 8<=h, h<=16, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow}
+//    {j0+sy==jhigh, jlow+sy==j0, 8<=h, h<=16, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0}
 
 
    if (jlow<0)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {j0+sy==jhigh, jlow+sy==j0, 8<=h, h<=16, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jlow+1<=0}
+//    {j0+sy==jhigh, jlow+sy==j0, 8<=h, h<=16, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0, jlow+1<=0}
 
       jlow = 0;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {j0+sy==jhigh, 8<=h, h<=16, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, 2j0<=jhigh+jlow, 0<=jlow}
+//    {j0+sy==jhigh, 8<=h, h<=16, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, 2j0<=jhigh+jlow, 0<=jlow}
 
 
    if (jhigh>ymax-h)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {j0+sy==jhigh, 8<=h, h<=16, ymax+1<=h+jhigh, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 2j0<=jhigh+jlow, 0<=jlow}
+//    {j0+sy==jhigh, 8<=h, h<=16, ymax+1<=h+jhigh, 0<=i0,
+//    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0,
+//    2j0<=jhigh+jlow, 0<=jlow}
 
       jhigh = ymax-h;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
-//    0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow}
 
    
    /* full pel search, spiraling outwards */
@@ -27331,77 +27469,80 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
    imin = i0;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i0==imin,
-//    8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow}
+//    8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow}
 
    jmin = j0;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i0==imin,
-//    j0==jmin, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow}
+//    j0==jmin, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, 0<=jlow}
 
    dmin = dist1(org+imin+lx*jmin, blk, lx, 0, 0, h, 65536);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i0==imin,
-//    j0==jmin, 0<=dmin, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy,
-//    0<=jlow}
+//    j0==jmin, 0<=dmin, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0,
+//    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0,
+//    jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow}
 
 
    sxy = sx>sy?sx:sy;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i0==imin,
-//    j0==jmin, 0<=dmin, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy,
-//    0<=jlow, sx<=sxy, sy<=sxy}
+//    j0==jmin, 0<=dmin, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0,
+//    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0,
+//    jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, sx<=sxy, sy<=sxy}
 
 
    for(l = 1; l <= sxy; l += 1) {
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
-//    0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 1<=l, l<=sxy,
-//    sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
       i = i0-l;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i+l==i0,
-//    8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
       j = j0-l;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {i+l==i0,
-//    j+l==j0, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    j+l==j0, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, 0<=jlow, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
       for(k = 0; k <= 8*l-1; k += 1) {
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
 //    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    0<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, 0<=jlow, 0<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy,
+//    sy<=sxy}
 
          if (i>=ilow&&i<=ihigh&&j>=jlow&&j<=jhigh) {
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
 //    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i,
+//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i, 0<=i0,
 //    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, j<=jhigh,
-//    jlow<=j, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k, k+1<=8l,
-//    1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    jlow<=j, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k,
+//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
             d = dist1(org+i+lx*j, blk, lx, 0, 0, h, dmin);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {0<=d, 8<=h,
 //    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i,
+//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i, 0<=i0,
 //    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, j<=jhigh,
-//    jlow<=j, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k, k+1<=8l,
-//    1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    jlow<=j, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k,
+//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
 
             if (d<dmin) {
@@ -27409,188 +27550,188 @@ static int fullsearch(unsigned char *org, unsigned char *ref, unsigned char *blk
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {0<=d,
 //    d+1<=dmin, 8<=h, h<=16, h+jhigh<=ymax, i0+j<=i+j0+k,
 //    i+j0<=i0+j+k, i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh,
-//    ilow<=i, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow,
-//    j<=jhigh, jlow<=j, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k,
-//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    ilow<=i, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
+//    0<=ilow, j<=jhigh, jlow<=j, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
                dmin = d;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {d==dmin,
 //    0<=d, 8<=h, h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i,
+//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh, ilow<=i, 0<=i0,
 //    ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, j<=jhigh,
-//    jlow<=j, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k, k+1<=8l,
-//    1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    jlow<=j, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k,
+//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
                imin = i;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {d==dmin,
 //    i==imin, 0<=d, 8<=h, h<=16, h+jhigh<=ymax, i0+j<=i+j0+k,
 //    i+j0<=i0+j+k, i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, i<=ihigh,
-//    ilow<=i, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow,
-//    j<=jhigh, jlow<=j, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 0<=k,
-//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    ilow<=i, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
+//    0<=ilow, j<=jhigh, jlow<=j, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
                jmin = j;
             }
          }
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
 
          if (k<2*l)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    k+1<=8l, k+1<=2l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, k+1<=8l, k+1<=2l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
 
             i++;
          else if (k<4*l)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    2l<=k, k+1<=8l, k+1<=4l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, 2l<=k, k+1<=8l, k+1<=4l, 1<=l, l<=sxy, sx<=sxy,
+//    sy<=sxy}
 
             j++;
          else if (k<6*l)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    2l<=k, 4l<=k, k+1<=8l, k+1<=6l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, 2l<=k, 4l<=k, k+1<=8l, k+1<=6l, 1<=l, l<=sxy,
+//    sx<=sxy, sy<=sxy}
 
             i--;
          else
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, i0+j<=i+j0+k, i+j0<=i0+j+k,
-//    i0+j0<=i+j+k+2l, i+j+2l<=i0+j0+k, ihigh<=i0+sx, i0<=ilow+sx,
-//    ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow,
-//    2l<=k, 4l<=k, 6l<=k, k+1<=8l, 1<=l, l<=sxy, sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, 0<=ilow, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    0<=jlow, 0<=k, 2l<=k, 4l<=k, 6l<=k, k+1<=8l, 1<=l, l<=sxy,
+//    sx<=sxy, sy<=sxy}
 
             j--;
       }
    }
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {8<=h,
-//    h<=16, h+jhigh<=ymax, ihigh<=i0+sx, i0<=ilow+sx, ihigh+16<=xmax,
-//    0<=ilow, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 1<=l, sxy+1<=l,
-//    sx<=sxy, sy<=sxy}
+//    h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx, i0<=ilow+sx,
+//    ihigh+16<=xmax, l<=ilow+sxy+1, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy,
+//    l<=jlow+sxy+1, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    
    /* half pel */
    dmin = 65536;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy,
-//    0<=jlow, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, l<=ilow+sxy+1, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, l<=jlow+sxy+1, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    imin <<= 1;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy,
-//    0<=jlow, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, l<=ilow+sxy+1, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, l<=jlow+sxy+1, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    jmin <<= 1;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    i0<=ilow+sx, ihigh+16<=xmax, 0<=ilow, jhigh<=j0+sy, j0<=jlow+sy,
-//    0<=jlow, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    i0<=ilow+sx, ihigh+16<=xmax, l<=ilow+sxy+1, 0<=j0, jhigh<=j0+sy,
+//    j0<=jlow+sy, l<=jlow+sxy+1, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    ilow = imin-(imin>0);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, ihigh<=i0+sx,
-//    ihigh+16<=xmax, jhigh<=j0+sy, j0<=jlow+sy, 0<=jlow, 1<=l,
-//    sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, ihigh<=i0+sx,
+//    ihigh+16<=xmax, 0<=j0, jhigh<=j0+sy, j0<=jlow+sy, l<=jlow+sxy+1,
+//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    ihigh = imin+(imin<xmax-16<<1);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, jhigh<=j0+sy,
-//    j0<=jlow+sy, 0<=jlow, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, 0<=j0,
+//    jhigh<=j0+sy, j0<=jlow+sy, l<=jlow+sxy+1, 1<=l, sxy+1<=l,
+//    sx<=sxy, sy<=sxy}
 
    jlow = jmin-(jmin>0);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, jhigh<=j0+sy, 1<=l,
-//    sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, h+jhigh<=ymax, 0<=i0, 0<=j0,
+//    jhigh<=j0+sy, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    jhigh = jmin+(jmin<ymax-h<<1);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin==65536, 8<=h, h<=16, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin==65536, 8<=h, h<=16, 0<=i0, 0<=j0, 1<=l, sxy+1<=l,
+//    sx<=sxy, sy<=sxy}
 
 
    for(j = jlow; j <= jhigh; j += 1)
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin<=65536, 8<=h, h<=16, j<=jhigh, jlow<=j, 1<=l, sxy+1<=l,
-//    sx<=sxy, sy<=sxy}
+//    {dmin<=65536, 8<=h, h<=16, 0<=i0, j<=jhigh, jlow<=j, 0<=j0,
+//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
       for(i = ilow; i <= ihigh; i += 1) {
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i, j<=jhigh, jlow<=j,
-//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    {dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i, 0<=i0, j<=jhigh,
+//    jlow<=j, 0<=j0, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
          d = dist1(ref+(i>>1)+lx*(j>>1), blk, lx, i&1, j&1, h, dmin);
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {0<=d,
-//    dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i, j<=jhigh, jlow<=j,
-//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i, 0<=i0, j<=jhigh,
+//    jlow<=j, 0<=j0, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
 
          if (d<dmin) {
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {0<=d,
-//    d+1<=dmin, dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i,
-//    j<=jhigh, jlow<=j, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    d+1<=dmin, dmin<=65536, 8<=h, h<=16, i<=ihigh, ilow<=i, 0<=i0,
+//    j<=jhigh, jlow<=j, 0<=j0, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
             dmin = d;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {d==dmin,
-//    0<=d, d<=65535, 8<=h, h<=16, i<=ihigh, ilow<=i, j<=jhigh,
-//    jlow<=j, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    0<=d, d<=65535, 8<=h, h<=16, i<=ihigh, ilow<=i, 0<=i0, j<=jhigh,
+//    jlow<=j, 0<=j0, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
             imin = i;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy) {d==dmin,
-//    i==imin, 0<=d, d<=65535, 8<=h, h<=16, i<=ihigh, ilow<=i,
-//    j<=jhigh, jlow<=j, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
+//    i==imin, 0<=d, d<=65535, 8<=h, h<=16, i<=ihigh, ilow<=i, 0<=i0,
+//    j<=jhigh, jlow<=j, 0<=j0, 1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
             jmin = j;
          }
       }
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin<=65536, 8<=h, h<=16, jhigh+1<=j, jlow<=j, 1<=l, sxy+1<=l,
-//    sx<=sxy, sy<=sxy}
+//    {dmin<=65536, 8<=h, h<=16, 0<=i0, jhigh+1<=j, jlow<=j, 0<=j0,
+//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
 
    *iminp = imin;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin<=65536, 8<=h, h<=16, jhigh+1<=j, jlow<=j, 1<=l, sxy+1<=l,
-//    sx<=sxy, sy<=sxy}
+//    {dmin<=65536, 8<=h, h<=16, 0<=i0, jhigh+1<=j, jlow<=j, 0<=j0,
+//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
    *jminp = jmin;
 
 //  P(d,dmin,i,ihigh,ilow,imin,j,jhigh,jlow,jmin,k,l,sxy)
-//    {dmin<=65536, 8<=h, h<=16, jhigh+1<=j, jlow<=j, 1<=l, sxy+1<=l,
-//    sx<=sxy, sy<=sxy}
+//    {dmin<=65536, 8<=h, h<=16, 0<=i0, jhigh+1<=j, jlow<=j, 0<=j0,
+//    1<=l, sxy+1<=l, sx<=sxy, sy<=sxy}
 
 
    return dmin;
@@ -27646,64 +27787,64 @@ static int variance(unsigned char *p, int lx)
    return s2-s*s/256;
 }
 
-//  P() {}
+//  P() {0<=secondfield, secondfield<=1}
 
 void motion_estimation(unsigned char *oldorg, unsigned char *neworg, unsigned char *oldref, unsigned char *newref, unsigned char *cur, unsigned char *curref, int sxf, int syf, int sxb, int syb, struct mbinfo *mbi, int secondfield, int ipflag)
 {
 
-//  P() {}
+//  P() {0<=secondfield, secondfield<=1}
 
    int i, j;
 
-//  P(i,j) {}
+//  P(i,j) {0<=secondfield, secondfield<=1}
 
    
    /* loop through all macroblocks of the picture */
    for(j = 0; j <= height2-1; j += 16) {
 
-//  P(i,j) {0<=j}
+//  P(i,j) {0<=j, 0<=secondfield, secondfield<=1}
 
       for(i = 0; i <= width-1; i += 16) {
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          if (pict_struct==3)
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
             frame_ME(oldorg, neworg, oldref, newref, cur, i, j, sxf, syf, sxb, syb, mbi);
          else
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
             field_ME(oldorg, neworg, oldref, newref, cur, curref, i, j, sxf, syf, sxb, syb, mbi, secondfield, ipflag);
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          mbi++;
       }
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
 
       if (!quiet) {
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          _IO_putc('.', stderr);
 
-//  P(i,j) {0<=i, 0<=j}
+//  P(i,j) {0<=i, 0<=j, 0<=secondfield, secondfield<=1}
 
          fflush(stderr);
       }
    }
 
-//  P(i,j) {0<=j}
+//  P(i,j) {0<=j, 0<=secondfield, secondfield<=1}
 
    if (!quiet)
 
-//  P(i,j) {0<=j}
+//  P(i,j) {0<=j, 0<=secondfield, secondfield<=1}
 
       _IO_putc('\n', stderr);
 }

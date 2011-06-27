@@ -46,7 +46,7 @@ int generate01()
 Preconditions for "foo"
 
 
-//  P() {}
+//  P() {f1==1}
 
 int foo(int f1, float f2)
 {

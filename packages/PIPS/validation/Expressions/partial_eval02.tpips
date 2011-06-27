@@ -3,16 +3,11 @@ setproperty ABORT_ON_USER_ERROR TRUE
 delete $WS
 create $WS $WS.c
 
-activate INTERPROCEDURAL_SUMMARY_PRECONDITION
-activate TRANSFORMERS_INTER_FULL
-activate PRECONDITIONS_INTER_FULL
-setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
-
 echo
-echo Initial code for "partial_eval02"
+echo Initial code for "$WS"
 echo
 
-display PRINTED_FILE[partial_eval02]
+display PRINTED_FILE[$WS]
 
 echo
 echo Initial code for "main"
@@ -21,11 +16,11 @@ echo
 display PRINTED_FILE[main]
 
 echo
-echo Cumulated effects for "partial_eval02"
+echo Cumulated effects for "$WS"
 echo
 
 activate PRINT_CODE_CUMULATED_EFFECTS
-display PRINTED_FILE[partial_eval02]
+display PRINTED_FILE[$WS]
 activate PRINT_CODE
 
 echo
@@ -37,19 +32,19 @@ display PRINTED_FILE[main]
 activate PRINT_CODE
 
 echo
-echo Preconditions "partial_eval02"
+echo Preconditions "$WS"
 echo
 
 activate PRINT_CODE_PRECONDITIONS
-display PRINTED_FILE[partial_eval02]
+display PRINTED_FILE[$WS]
 activate PRINT_CODE
 
 echo
 echo Code after partial evaluation for "partial_eval02"
 echo
 
-apply PARTIAL_EVAL[partial_eval02]
-display PRINTED_FILE[partial_eval02]
+apply PARTIAL_EVAL[$WS]
+display PRINTED_FILE[$WS]
 
 
 echo
@@ -64,8 +59,8 @@ echo Same code with evaluation of constants
 echo
 
 setproperty EVAL_SYMBOLIC_CONSTANT TRUE
-apply PARTIAL_EVAL[partial_eval02]
-display PRINTED_FILE[partial_eval02]
+apply PARTIAL_EVAL[$WS]
+display PRINTED_FILE[$WS]
 
 echo
 echo Unsplit resulting code
@@ -77,5 +72,5 @@ shell cc $WS.database/Src/$WS.c -o $WS.database/Tmp/out
 shell if test `./$WS.database/Tmp/ref` = `./$WS.database/Tmp/out`; then echo "ok"; else echo "ko" ; fi
 
 close
-delete $WS
+#delete $WS
 quit
