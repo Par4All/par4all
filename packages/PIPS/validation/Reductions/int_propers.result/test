@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       PROGRAM PROPERS
       INTEGER P,I,J,K,L
       S = 0                                                             0003
@@ -41,9 +39,7 @@ C  call prod[P],
       P = P/L                                                           0025
       S = K-S                                                           0026
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
       PROGRAM PROPERS
       INTEGER P,I,J,K,L
       S = 0                                                             0003

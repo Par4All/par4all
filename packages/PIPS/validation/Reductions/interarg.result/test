@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J
 C  call sum[X],
@@ -15,9 +13,7 @@ C  call sum[S],
       ENDDO
       PRINT *, S                                                        0007
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
 C  summary sum[X],
       SUBROUTINE ADDTO(X, J)
       INTEGER X, J

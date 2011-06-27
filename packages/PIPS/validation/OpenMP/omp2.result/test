@@ -14,35 +14,35 @@ int main()
    m = 0;
    x = 2.12;
 
-#pragma omp for private(i,j,k,l,m)
-   for(i = 0; i <= 9; i += 1) {
-#pragma omp for private(j,k,l,m)
+   for(i = 0; i <= 9; i += 1)
       for(j = 0; j <= 9; j += 1) {
          // comments 2
          float z;
          z = 0.0;
-#pragma omp for private(z,k,l,m)
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
-#pragma omp for private(l,m)
-            for(l = 0; l <= 9; l += 1) {
-#pragma omp for private(m)
+            for(l = 0; l <= 9; l += 1)
                for(m = 0; m <= 9; m += 1) {
                   float y;
                   //comments 3
-                  // this break privatization
+                  // this used to break the privatization
                   y = 2.0;
                   // comments 4
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
+   // print all elements to avoid high optimization
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1)
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1)
+                  printf("%f", a[i][j][k][l][m]);
    return 0;
 }
-// OMP style
+// parallel printed file style
 int main()
 {
    float a[10][10][10][10][10];
@@ -56,34 +56,40 @@ int main()
    m = 0;
    x = 2.12;
 
-
-#pragma omp for private(j,i)
-   for(i = 0; i <= 9; i += 1) {
-#pragma omp for private(k,j)
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for private(k)
       for(j = 0; j <= 9; j += 1) {
+         // comments 2
          float z;
          z = 0.0;
-#pragma omp for private(l,k,z)
+#pragma omp parallel for private(l,z)
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
-#pragma omp for private(m,l)
-            for(l = 0; l <= 9; l += 1) {
-#pragma omp for private(m)
+#pragma omp parallel for private(m)
+            for(l = 0; l <= 9; l += 1)
+#pragma omp parallel for 
                for(m = 0; m <= 9; m += 1) {
                   float y;
                   //comments 3
-                  // this break privatization
+                  // this used to break the privatization
                   y = 2.0;
                   // comments 4
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
+   // print all elements to avoid high optimization
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1)
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1)
+                  printf("%f", a[i][j][k][l][m]);
    return 0;
 }
+// OMPIFY style
 int main()
 {
    float a[10][10][10][10][10];
@@ -97,31 +103,36 @@ int main()
    m = 0;
    x = 2.12;
 
-
-#pragma omp for private(j,i)
-   for(i = 0; i <= 9; i += 1) {
-#pragma omp for private(k,j)
+#pragma omp parallel for private(j)
+   for(i = 0; i <= 9; i += 1)
+#pragma omp parallel for private(k)
       for(j = 0; j <= 9; j += 1) {
+         // comments 2
          float z;
          z = 0.0;
-#pragma omp for private(l,k,z)
+#pragma omp parallel for private(l, z)
          for(k = 0; k <= 9; k += 1) {
             z = k*2.0;
-#pragma omp for private(m,l)
-            for(l = 0; l <= 9; l += 1) {
-#pragma omp for private(m)
+#pragma omp parallel for private(m)
+            for(l = 0; l <= 9; l += 1)
+#pragma omp parallel for
                for(m = 0; m <= 9; m += 1) {
                   float y;
                   //comments 3
-                  // this break privatization
+                  // this used to break the privatization
                   y = 2.0;
                   // comments 4
                   y = 3.5+x+z;
                   a[i][j][k][l][m] = x*y;
                }
-            }
          }
       }
-   }
+   // print all elements to avoid high optimization
+   for(i = 0; i <= 9; i += 1)
+      for(j = 0; j <= 9; j += 1)
+         for(k = 0; k <= 9; k += 1)
+            for(l = 0; l <= 9; l += 1)
+               for(m = 0; m <= 9; m += 1)
+                  printf("%f", a[i][j][k][l][m]);
    return 0;
 }

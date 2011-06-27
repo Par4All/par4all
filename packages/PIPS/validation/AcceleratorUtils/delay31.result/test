@@ -5,21 +5,21 @@ int a(int i)
 
    int j[2] = {1, 2}, k[2];
 
-//  <k[PHI1]-W-EXACT-{PHI1==0}>
+//  <k[PHI1]-W-EXACT-{PHI1==0, i==2}>
 
    k[0] = 0;
 
-//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1}>
-//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1}>
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
 
    load(k, j);
 
-//  <j[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1}>
-//  <k[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1}>
+//  <j[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
 
    store(j, k);
 
-//  <j[PHI1]-R-EXACT-{PHI1==1}>
+//  <j[PHI1]-R-EXACT-{PHI1==1, i==2}>
 
    return j[1];
 }
@@ -49,16 +49,16 @@ int a(int i)
 
    int j[2] = {1, 2}, k[2];
 
-//  <k[PHI1]-W-EXACT-{PHI1==0}>
+//  <k[PHI1]-W-EXACT-{PHI1==0, i==2}>
 
    k[0] = 0;
 
-//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1}>
-//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1}>
+//  <j[PHI1]-R-EXACT-{0<=PHI1, PHI1<=1, i==2}>
+//  <k[PHI1]-W-EXACT-{0<=PHI1, PHI1<=1, i==2}>
 
    load(k, j);
 
-//  <j[PHI1]-R-EXACT-{PHI1==1}>
+//  <j[PHI1]-R-EXACT-{PHI1==1, i==2}>
 
    return j[1];
 }

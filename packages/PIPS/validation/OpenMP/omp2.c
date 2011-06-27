@@ -1,3 +1,5 @@
+#include "stdio.h"
+
 int main () {
   float a[10][10][10][10][10];
   int i,j,k,l,m;
@@ -21,7 +23,7 @@ int main () {
 	  for (m = 0; m < 10; m++) {
 	    float y;
 	    //comments 3
-	    // this break privatization
+	    // this used to break the privatization
 	    y = 2.0;
 	    // comments 4
 	    y = 3.5 + x + z;
@@ -31,5 +33,17 @@ int main () {
       }
     }
   }
-  return 0;
+  // print all elements to avoid high optimization
+   for (i = 0; i < 10; i++) {
+    for (j = 0; j < 10; j++) {
+      for (k = 0; k < 10; k++) {
+	for (l = 0; l < 10; l++) {
+	  for (m = 0; m < 10; m++) {
+	    printf ("%f", a[i][j][k][l][m]);
+	  }
+	}
+      }
+    }
+   }
+   return 0;
 }

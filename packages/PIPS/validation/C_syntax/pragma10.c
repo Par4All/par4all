@@ -1,0 +1,3 @@
+int egrity() {
+#pragma gnitude
+}

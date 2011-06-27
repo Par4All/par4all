@@ -2,7 +2,7 @@
 delete omp2_c
 
 setproperty ABORT_ON_USER_ERROR TRUE
-
+setproperty MEMORY_EFFECTS_ONLY FALSE
 create omp2_c omp2.c
 
 #echo If possible, transform simple for-loops into do-loop à la Fortran, simpler to analyze:
@@ -20,21 +20,23 @@ setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
 setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
 
 apply PRIVATIZE_MODULE(main)
-#apply LOCALIZE_DECLARATION
 
-#setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
-setproperty PRETTYPRINT_ALL_PRIVATE_VARIABLES TRUE
 display PRINTED_FILE[main]
 
 #display DG_FILE[main]
 
-echo // OMP style
+echo // parallel printed file style
 
 activate PRINT_PARALLELIZEDOMP_CODE
 display PARALLELPRINTED_FILE(main)
 
-apply  INTERNALIZE_PARALLEL_CODE
-display PRINTED_FILE
+
+echo // OMPIFY style
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
 
 apply UNSPLIT
 shell gcc -fopenmp -c omp2_c.database/Src/omp2.c -o omp2_c.database/Src/omp2.o

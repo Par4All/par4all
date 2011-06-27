@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       SUBROUTINE INC
       COMMON /SUM/ S
 C  call sum[S],
@@ -38,9 +36,7 @@ C  call sum[S],
       COMMON /SUM/ S
       S = 0                                                             0003
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
 C  summary sum[S],
       SUBROUTINE INC
       COMMON /SUM/ S

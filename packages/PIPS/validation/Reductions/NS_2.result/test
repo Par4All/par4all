@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
        PROGRAM NS
        PARAMETER (NVAR=3,NXM=2000,NYM=2000)
        REAL PHI1(NVAR,NXM,NYM)
@@ -27,9 +25,7 @@ C  call sum[PHI1(3,I,J)],
       ENDDO
 
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
        PROGRAM NS
        PARAMETER (NVAR=3,NXM=2000,NYM=2000)
        REAL PHI1(NVAR,NXM,NYM)
