@@ -1,0 +1,28 @@
+#
+delete reduction01
+
+setproperty ABORT_ON_USER_ERROR TRUE
+setproperty MEMORY_EFFECTS_ONLY FALSE
+create reduction01 reduction01.c
+
+echo Compute the intraprocedural preconditions at the same time as
+echo   transformers and use them to improve the accuracy of expression
+echo   and statement transformers:
+setproperty SEMANTICS_COMPUTE_TRANSFORMERS_IN_CONTEXT TRUE
+setproperty SEMANTICS_FIX_POINT_OPERATOR "derivative"
+
+setproperty PRETTYPRINT_SEQUENTIAL_STYLE    "do"
+
+echo // OMPIFY
+apply PRIVATIZE_MODULE(main)
+apply INTERNALIZE_PARALLEL_CODE
+apply OMPIFY_CODE
+display PRINTED_FILE(main)
+
+apply UNSPLIT
+shell gcc -fopenmp -c reduction01.database/Src/reduction01.c -o reduction01.database/Src/reduction01.o
+
+close
+delete reduction01
+quit
+# EOF
