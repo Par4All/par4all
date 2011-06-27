@@ -106,7 +106,7 @@ F.future_result = \
 F.test	= $(F.result:%=%/$(TEST))
 
 # virtual target to trigger the validations
-F.valid	= $(F.result:%=%/.valid)
+F.valid	= $(F.result:%.result=%.validate)
 
 # all base cases
 F.list	= $(F.result:%.result=%)
@@ -301,29 +301,29 @@ generate-result: $(F.future_result)
 
 # indirect validation trigger
 # a % generic target cannot be empty!
-%.result/$(TEST): %.result/.valid
-	@echo "done $@"
+%.result/$(TEST): %.validate
+	@echo "done $@" >&2
 
 # always do target? does not seem to work as expected??
 #.PHONY: $(F.valid)
 
 # (shell) script
-%.result/.valid: %.test
+%.validate: %.test
 	$(PF) ; ./$< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 # tpips scripts
-%.result/.valid: %.tpips
+%.validate: %.tpips
 	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.tpips2
+%.validate: %.tpips2
 	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 # python scripts
 ifdef PIPS_VALIDATION_NO_PYPS
-%.result/.valid: %.py
+%.validate: %.py
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # else we have pyps
-%.result/.valid: %.py
+%.validate: %.py
 	$(PF) ; python $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
 
@@ -331,23 +331,23 @@ endif # PIPS_VALIDATION_NO_PYPS
 # FILE could be $<
 # VDIR could be avoided if running in local directory?
 DFTPIPS	= default_tpips
-%.result/.valid: %.c $(DFTPIPS)
+%.validate: %.c $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f $(DFTPIPS)
+%.validate: %.f $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.F $(DFTPIPS)
+%.validate: %.F $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f90 $(DFTPIPS)
+%.validate: %.f90 $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f95 $(DFTPIPS)
+%.validate: %.f95 $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
@@ -355,23 +355,23 @@ DFTPIPS	= default_tpips
 # default_test relies on FILE WSPACE NAME
 # warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
-%.result/.valid: %.c $(DEFTEST)
+%.validate: %.c $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f $(DEFTEST)
+%.validate: %.f $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.F $(DEFTEST)
+%.validate: %.F $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f90 $(DEFTEST)
+%.validate: %.f90 $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f95 $(DEFTEST)
+%.validate: %.f95 $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
@@ -380,38 +380,38 @@ DEFTEST	= default_test
 PYTHON	= python
 DEFPYPS	= default_pyps.py
 ifdef PIPS_VALIDATION_NO_PYPS
-%.result/.valid: %.c $(DEFPYPS)
+%.validate: %.c $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/.valid: %.f $(DEFPYPS)
+%.validate: %.f $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/.valid: %.F $(DEFPYPS)
+%.validate: %.F $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/.valid: %.f90 $(DEFPYPS)
+%.validate: %.f90 $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/.valid: %.f95 $(DEFPYPS)
+%.validate: %.f95 $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # with pyps
-%.result/.valid: %.c $(DEFPYPS)
+%.validate: %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f $(DEFPYPS)
+%.validate: %.f $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.F $(DEFPYPS)
+%.validate: %.F $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f90 $(DEFPYPS)
+%.validate: %.f90 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/.valid: %.f95 $(DEFPYPS)
+%.validate: %.f95 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
 	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
