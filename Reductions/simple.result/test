@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       PROGRAM REDUCTION
       INTEGER I, N
       PARAMETER (N=10)
@@ -36,9 +34,7 @@ C  call prod[P],
       PRINT *, 'p is ', P                                               0027
 
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
       PROGRAM REDUCTION
       INTEGER I, N
       PARAMETER (N=10)

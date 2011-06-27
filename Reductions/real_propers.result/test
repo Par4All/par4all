@@ -1,6 +1,4 @@
-
-Print code with proper reductions
-
+/* Code with PROPER REDUCTIONS */
       PROGRAM PROPERS
       REAL P,I,J,K,L
       S = 0                                                             0003
@@ -42,9 +40,7 @@ C  call prod[P],
       P = 2*I/P                                                         0026
       S = K-S                                                           0027
       END
-
-Print code with cumulated reductions
-
+/* Code with CUMULATED REDUCTIONS */
       PROGRAM PROPERS
       REAL P,I,J,K,L
       S = 0                                                             0003
