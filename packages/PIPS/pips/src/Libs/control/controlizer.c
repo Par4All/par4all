@@ -1652,11 +1652,50 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
 }
 
 
-/* ctls is built backwards: hence its exit node is the first node in
-   the list. */
-static control find_exit_control_node(list ctls, control succ)
+/* Find the exit node of a sub-CFG defined by the list of nodes ctls
+ * and by the first node to execute when finished. The entry node of
+ * the sub-CFG is the last node of the ctls list, because it is built
+ * backwards.
+ *
+ * RK: ctls is built backwards: hence its exit node is the first node in
+ * the list.
+ *
+ * FI: in fact, it's a bit more complicated...
+ *
+ * The underlying purpose of this function only called from
+ * controlize_sequence(() is to help separate a sub CFG with only one
+ * entry and one exit point from the global graph. The entry node is
+ * easy to find as CONTROL(CAR(gen_last(ctls))). The exit node may be
+ * anywhere because of the goto statements. The succ node is the first
+ * node executed after the CFG defined by ctls. But it may have no
+ * predecessor or only some of its predecessors belong to the global
+ * graph but not to the local graph. So we are interested in
+ * predecessors of succ that are reachable from the entry node. Unless
+ * we are lucky because succ has only one predecessor and this
+ * predecessor has only one successor, succ. In that case, the
+ * predecessor of succ is the exit node.
+ *
+ * The control graph may be altered with a newly allocated node or
+ * not.
+ *
+ * @param ctls: list of the control nodes belonging to the subgraph to
+ * isolate
+ *
+ * @param: succ is the first control node not in ctls to be executed
+ * after the nodes in ctls.
+ *
+ * @return exit, the existing or newly allocated exit node. The
+ * subgraph defined by ctls is updated when a new node is allocated.
+ *
+ * Two algorithms at least are possible: we can either start from the
+ * predecessors of succ and check that a backward control path to the
+ * entry of ctls exists, or we can start from entry and look for
+ * control paths reaching succ. The second approach is implemented here.
+ */
+/*static*/ control find_exit_control_node(list ctls, control succ)
 {
   control exit = CONTROL(CAR(ctls));
+  control entry = CONTROL(CAR(gen_last(ctls)));
 
   ifdebug(8) {
     FOREACH(CONTROL, c, ctls) {
@@ -1668,35 +1707,34 @@ static control find_exit_control_node(list ctls, control succ)
   if(!(ENDP(control_successors(exit))
        || (gen_length(control_successors(exit))==1
 	   && CONTROL(CAR(control_successors(exit)))==succ))) {
-    /* look for a successor of exit that is a predecessor of succ */
+    /* look for a successor of entry that is a predecessor of succ */
     list visited = NIL;
-    list to_be_visited = gen_copy_seq(control_successors(exit));
+    list to_be_visited = gen_copy_seq(control_successors(entry));
     bool found_p = FALSE;
+    exit = control_undefined;
 
-    while(!ENDP(to_be_visited) && !found_p) {
+    while(!ENDP(to_be_visited)) {
       FOREACH(CONTROL, c, to_be_visited) {
-	if(c==succ) {
-	  // FI: this assert is too strong when succ follows a
-	  //controlized test as in hpftest62b.c
-	  //pips_assert("succ has only one predecessor",
-	  //      gen_length(control_predecessors(c))==1);
-	  // FI: Not a good idea because succ is used otherwise above
-	  // exit = succ;
-	  exit = make_control(make_plain_continue_statement(), NIL, NIL);
+	if(gen_in_list_p(succ, control_successors(c))) {
+	  if(control_undefined_p(exit))
+	    exit = make_control(make_plain_continue_statement(), NIL, NIL);
 
-	  FOREACH(CONTROL, p, control_predecessors(succ))
-	    insert_control_in_arc(exit, p, succ);
-
+	  insert_control_in_arc(exit, c, succ);
 	  found_p = TRUE;
-	  break;
 	}
-	else {
+	if(c!=succ) { // Should always be true...
 	  visited = CONS(CONTROL, c, visited);
 	  gen_remove(&to_be_visited, c);
 	  FOREACH(CONTROL, s, control_successors(c)) {
-	    if(!gen_in_list_p(s, visited) && !gen_in_list_p(s, to_be_visited))
+	    if(!gen_in_list_p(s, visited)
+	       && !gen_in_list_p(s, to_be_visited)
+	       && s!=succ && s!=exit)
+	      // update the loop variable... within the two nested loops
 	      to_be_visited = CONS(CONTROL, s, to_be_visited);
 	  }
+	}
+	else {
+	  pips_internal_error("design error\n.");
 	}
       }
     }
@@ -1707,6 +1745,92 @@ static control find_exit_control_node(list ctls, control succ)
     if(!found_p) {
     /* succ may be unreachable because ctls loops on itself*/
       exit = make_control(make_plain_continue_statement(), NIL, NIL);
+    }
+  }
+
+  ifdebug(8) {
+    FOREACH(CONTROL, c, ctls) {
+      check_control_coherency(c);
+    }
+    check_control_coherency(exit);
+  }
+
+return exit;
+}
+
+/* FI: remake of function above, incomplete backward approach, now
+   obsolete because the forward approach works. But who knows? The
+   complexity of the backward approach might be lower than the
+   complexity of the forward approach? */
+control find_or_create_exit_control_node(list ctls, control succ)
+{
+  control exit = control_undefined;
+  //control entry = CONTROL(CAR(gen_last(ctls)));
+
+  ifdebug(8) {
+    FOREACH(CONTROL, c, ctls) {
+      check_control_coherency(c);
+    }
+    check_control_coherency(succ);
+  }
+
+  /* Because of the recursive descent in the AST... */
+  pips_assert("succ has only one successor or none",
+	      gen_length(control_successors(succ))<=1);
+
+  /* Let's try to use an existing node as exit node */
+  if(gen_length(control_predecessors(succ))==1) {
+    control c = CONTROL(CAR(control_predecessors(succ)));
+    if(gen_length(control_successors(c))==1) {
+      pips_debug(8, "succ has a fitting predecessor as exit.\n");
+      exit = c;
+    }
+  }
+
+  if(control_undefined_p(exit)) {
+    /* A new node is needed as exit node */
+    exit = make_control(make_plain_continue_statement(), NIL, NIL);
+    if(gen_length(control_predecessors(succ))==0) {
+      /* The CFG contains an infinite loop and succ is never reached? */
+      /* FI: we might need to check that the predecessor is not still
+	 c_res? */
+      /* Why would we link it to succ to have it unlinked by the
+	 caller? */
+      pips_debug(8, "succ is unreachable and a new exit node %p is created.\n",
+		 exit);
+    }
+    else {
+      /* succ must be removed from the current CFG. Its predecessors within
+	 the current CFG must be moved onto the new exit node */
+      FOREACH(CONTROL, c, control_predecessors(succ)) {
+	/* Is c in the current CFG or in anoter one at a higher
+	   level? Typical case: the current sequence is a test branch
+	   and hence succ has two predecessors at the higher level */
+	if(1 /*forward_control_path_p(entry, c)*/) {
+	  // FI: could we use link and unlink of control nodes?
+	  list pcl = list_undefined;
+	  for(pcl = control_successors(c); !ENDP(pcl); POP(pcl)) {
+	    control cc = CONTROL(CAR(pcl));
+	    if(cc==succ)
+	      CONTROL_(CAR(pcl))=exit;
+	  }
+	  control_predecessors(exit) = gen_nconc(control_predecessors(exit),
+						 CONS(CONTROL, c, NIL));
+	}
+      }
+      //control_predecessors(exit) = control_predecessors(succ);
+      //control_predecessors(succ) = CONS(CONTROL, exit, NIL);
+      /* hpftest62b.f: the sequence below pulls an extra statement in
+	 the unstructured that is being built */
+      /*
+      statement fs = control_statement(succ);
+      statement es = control_statement(exit);
+      control_statement(exit) = fs;
+      control_statement(succ) = es;
+      */
+      pips_debug(8, "succ is reachable thru %d control paths "
+		 "but a new exit node %p is created.\n",
+		 (int) gen_length(control_predecessors(exit)), exit);
     }
   }
 
@@ -1960,6 +2084,7 @@ static bool controlize_sequence(control c_res,
 	 statement. */
       // control exit = CONTROL(CAR(ctls));
       control exit = find_exit_control_node(ctls, succ);
+      //control exit = find_or_create_exit_control_node(ctls, succ);
       control entry = CONTROL(CAR(gen_last(ctls)));
       pips_debug(5, "Create a local unstructured with entry node %p and exit node %p\n", entry, exit);
 
