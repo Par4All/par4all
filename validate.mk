@@ -87,6 +87,7 @@ F.tpips2= $(wildcard *.tpips2)
 F.test	= $(wildcard *.test)
 F.py	= $(wildcard *.py)
 
+# all scripts
 F.exe	= $(F.tpips) $(F.tpips2) $(F.test) $(F.py)
 
 # optimistic possible results for Ronan
@@ -102,7 +103,10 @@ F.future_result = \
 	$(F.f95:%.f95=%.result)
 
 # validation output
-F.valid	= $(F.result:%=%/$(TEST))
+F.test	= $(F.result:%=%/$(TEST))
+
+# virtual target to trigger the validations
+F.valid	= $(F.result:%=%/.valid)
 
 # all base cases
 F.list	= $(F.result:%.result=%)
@@ -143,6 +147,7 @@ EXCEPT =  [ "$(RECWHAT)" ] && \
 # setup running a case
 PF	= @echo "processing $(SUBDIR)/$+" ; \
 	  $(EXCEPT) ; \
+	  $(RM) $*.result/$(TEST) ; \
 	  set -o pipefail ; unset CDPATH ; \
 	  export PIPS_MORE=cat PIPS_TIMEOUT=$(TIMEOUT) LC_ALL=C
 
@@ -225,13 +230,11 @@ default-validate-out:
 # the PARALLEL_VALIDATION macro tell whether it can run in parallel
 ifdef PARALLEL_VALIDATION
 validate-dir: $(LOCAL_CLEAN)
-	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) $(F.valid)
 	@$(MAKE) sort-local-result
 
 else # sequential validation, including subdir recursive forward
 validate-dir: $(LOCAL_CLEAN)
-	$(RM) $(F.valid)
 	$(MAKE) $(D.rec) sequential-validate-dir
 	@$(MAKE) sort-local-result
 
@@ -260,7 +263,7 @@ unvalidate: do-unvalidate rec-unvalidate
 
 .PHONY: do-unvalidate
 do-unvalidate:: check-vc
-	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.valid)
+	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.test)
 
 .PHONY: rec-unvalidate
 rec-unvalidate::
@@ -283,7 +286,7 @@ validate-%:
 
 # generate missing "test" files
 .PHONY: generate-test
-generate-test: $(F.valid)
+generate-test: $(F.test)
 
 # generate empty result directories, for Ronan
 # beware that this is a magick guess from the contents of the directory
@@ -292,117 +295,125 @@ generate-test: $(F.valid)
 .PHONY: generate-result
 generate-result: $(F.future_result)
 
-# generate an empty result directory
+# generate an empty result directory & file
 %.result:
 	@echo "creating: $@" ; mkdir $@ ; touch $@/test
 
+# indirect validation trigger
+# a % generic target cannot be empty!
+%.result/$(TEST): %.result/.valid
+	@echo "done $@"
+
+# always do target? does not seem to work as expected??
+#.PHONY: $(F.valid)
+
 # (shell) script
-%.result/$(TEST): %.test
-	$(PF) ; ./$< 2> $*.err | $(FLT) > $@ ; $(OK)
+%.result/.valid: %.test
+	$(PF) ; ./$< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 # tpips scripts
-%.result/$(TEST): %.tpips
-	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $@ ; $(OK)
+%.result/.valid: %.tpips
+	$(PF) ; $(TPIPS) $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.tpips2
-	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $@ ; $(OK)
+%.result/.valid: %.tpips2
+	$(PF) ; $(TPIPS) $< 2>&1 | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 # python scripts
 ifdef PIPS_VALIDATION_NO_PYPS
-%.result/$(TEST): %.py
+%.result/.valid: %.py
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # else we have pyps
-%.result/$(TEST): %.py
-	$(PF) ; python $< 2> $*.err | $(FLT) > $@ ; $(OK)
+%.result/.valid: %.py
+	$(PF) ; python $< 2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
 
 # default_tpips
 # FILE could be $<
 # VDIR could be avoided if running in local directory?
 DFTPIPS	= default_tpips
-%.result/$(TEST): %.c $(DFTPIPS)
+%.result/.valid: %.c $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f $(DFTPIPS)
+%.result/.valid: %.f $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.F $(DFTPIPS)
+%.result/.valid: %.F $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f90 $(DFTPIPS)
+%.result/.valid: %.f90 $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f95 $(DFTPIPS)
+%.result/.valid: %.f95 $(DFTPIPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< VDIR=$(here) $(TPIPS) $(DFTPIPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 
 # default_test relies on FILE WSPACE NAME
 # warning: Semantics & Regions create local "properties.rc":-(
 DEFTEST	= default_test
-%.result/$(TEST): %.c $(DEFTEST)
+%.result/.valid: %.c $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f $(DEFTEST)
+%.result/.valid: %.f $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.F $(DEFTEST)
+%.result/.valid: %.F $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f90 $(DEFTEST)
+%.result/.valid: %.f90 $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f95 $(DEFTEST)
+%.result/.valid: %.f95 $(DEFTEST)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< sh $(DEFTEST) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
 
 # default_pyps relies on FILE & WSPACE
 PYTHON	= python
 DEFPYPS	= default_pyps.py
 ifdef PIPS_VALIDATION_NO_PYPS
-%.result/$(TEST): %.c $(DEFPYPS)
+%.result/.valid: %.c $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/$(TEST): %.f $(DEFPYPS)
+%.result/.valid: %.f $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/$(TEST): %.F $(DEFPYPS)
+%.result/.valid: %.F $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/$(TEST): %.f90 $(DEFPYPS)
+%.result/.valid: %.f90 $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 
-%.result/$(TEST): %.f95 $(DEFPYPS)
+%.result/.valid: %.f95 $(DEFPYPS)
 	$(EXCEPT) ; echo "keptout: $(SUBDIR)/$*" >> $(RESULTS)
 else # with pyps
-%.result/$(TEST): %.c $(DEFPYPS)
+%.result/.valid: %.c $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f $(DEFPYPS)
+%.result/.valid: %.f $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.F $(DEFPYPS)
+%.result/.valid: %.F $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f90 $(DEFPYPS)
+%.result/.valid: %.f90 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 
-%.result/$(TEST): %.f95 $(DEFPYPS)
+%.result/.valid: %.f95 $(DEFPYPS)
 	$(PF) ; WSPACE=$* FILE=$(here)/$< $(PYTHON) $(DEFPYPS) \
-	2> $*.err | $(FLT) > $@ ; $(OK)
+	2> $*.err | $(FLT) > $*.result/$(TEST) ; $(OK)
 endif # PIPS_VALIDATION_NO_PYPS
 
 # detect skipped stuff
