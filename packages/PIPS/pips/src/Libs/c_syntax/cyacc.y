@@ -1462,8 +1462,7 @@ pragma { /* Only one pragma... The common case, return it in a list */
 ;
 
 
-/* To avoid shift-reduce conflict, enumerate statement with and without
-   pragma: */
+/* To avoid shift-reduce conflict, enumerate statement with and without pragma: */
 statement: pragmas statement_without_pragma
 {
   add_pragma_strings_to_statement($2, gen_nreverse($1),
@@ -1476,6 +1475,13 @@ statement: pragmas statement_without_pragma
 | statement_without_pragma {
   $$ = $1;
   }
+
+| pragmas {
+  statement s = make_continue_statement(entity_empty_label());
+  add_pragma_strings_to_statement(s, gen_nreverse($1),false);
+  gen_free_list($1);
+  $$ = s;
+}
 ;
 
 

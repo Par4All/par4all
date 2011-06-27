@@ -861,6 +861,9 @@ bool derived_entity_p(entity e)
 
 /* This test shows that "e" has been declared in "module".
  *
+ * Well, "e" may not be declared in "module". For instance, "e" may be
+ * a value of a variable declared in "module".
+ *
  * This does not show in Fortran that e is a variable with effects local
  * to the module because e can be allocated in a common. Variables with
  * local effects are allocated either in the static or the dynamic or the
