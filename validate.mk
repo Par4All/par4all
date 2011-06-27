@@ -103,7 +103,8 @@ F.future_result = \
 	$(F.f95:%.f95=%.result)
 
 # validation output
-F.test	= $(F.result:%=%/$(TEST))
+F.output = \
+	$(F.result:%=%/$(TEST))
 
 # virtual target to trigger the validations
 F.valid	= $(F.result:%.result=%.validate)
@@ -263,7 +264,7 @@ unvalidate: do-unvalidate rec-unvalidate
 
 .PHONY: do-unvalidate
 do-unvalidate:: check-vc
-	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.test)
+	-$(CHECK) && [ $(TEST) = 'test' ] && $(UNDO) $(F.output)
 
 .PHONY: rec-unvalidate
 rec-unvalidate::
@@ -286,7 +287,7 @@ validate-%:
 
 # generate missing "test" files
 .PHONY: generate-test
-generate-test: $(F.test)
+generate-test: $(F.output)
 
 # generate empty result directories, for Ronan
 # beware that this is a magick guess from the contents of the directory
