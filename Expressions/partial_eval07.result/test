@@ -1,0 +1,117 @@
+
+Initial code
+
+int duck(int size)
+{
+   printf("size=%d\n", size);
+   return size;
+}
+
+Initial code with proper effects for "main"
+
+int main()
+{
+//             <    is written>: size
+   int size = 2, t;
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: size stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: t __IO_EFFECTS:LUNS[1]
+   t = duck(size);
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: stdout t __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("%d\n", t);
+   return 0;
+}
+
+Initial code with proper effects for "duck"
+
+int duck(int size)
+{
+//             <may be read   >: stdout[0]
+//             <may be written>: stdout[0]
+//             <    is read   >: size stdout __IO_EFFECTS:LUNS[1]
+//             <    is written>: __IO_EFFECTS:LUNS[1]
+   printf("size=%d\n", size);
+//             <    is read   >: size
+   return size;
+}
+
+Initial code with transformers for "duck"
+
+
+//  T(duck) {duck==size}
+
+int duck(int size)
+{
+
+//  T() {}
+
+   printf("size=%d\n", size);
+
+//  T(duck) {duck==size}
+
+   return size;
+}
+
+Initial code with preconditions for "main"
+
+
+//  P() {}
+
+int main()
+{
+
+//  P() {}
+
+   int size = 2, t;
+
+//  P(size,t) {size==2}
+
+   t = duck(size);
+
+//  P(size,t) {size==2, t==2}
+
+   printf("%d\n", t);
+
+//  P(size,t) {size==2, t==2}
+
+   return 0;
+}
+
+Initial code with preconditions for "duck"
+
+
+//  P() {size==2}
+
+int duck(int size)
+{
+
+//  P() {size==2}
+
+   printf("size=%d\n", size);
+
+//  P() {size==2}
+
+   return size;
+}
+
+Code after partial eval for "duck"
+
+int duck(int size)
+{
+   printf("size=%d\n", 2);
+   return 2;
+}
+
+Code after partial eval for "main"
+
+int main()
+{
+   int size = 2, t;
+   t = duck(2);
+   printf("%d\n", 2);
+   return 0;
+}
