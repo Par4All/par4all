@@ -1,0 +1,42 @@
+
+Parser output
+
+int for_loop09()
+{
+   int i;
+   //PIPS generated variable
+   int for_loop09;
+   for (i = 0;i!=5;i++)
+      if (i==3) {
+         printf("%d", i);
+         for_loop09 = i;
+         return for_loop09;
+      }
+   printf("Exit with %d", i);
+   for_loop09 = i;
+   return for_loop09;
+   return for_loop09;
+}
+
+Controlizer output
+
+int for_loop09()
+{
+   int i;
+   //PIPS generated variable
+   int for_loop09;
+   i = 0;
+l99997:   ;
+   if (i!=5) goto l99999;
+   if (i==3) goto l99998;
+   i++;
+   goto l99997;
+l99998:   ;
+   printf("%d", i);
+   for_loop09 = i;
+   return for_loop09;
+l99999:   ;
+   printf("Exit with %d", i);
+   for_loop09 = i;
+   return for_loop09;
+}

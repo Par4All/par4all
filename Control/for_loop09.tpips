@@ -1,0 +1,28 @@
+delete for_loop09
+
+setproperty ABORT_ON_USER_ERROR TRUE
+
+create for_loop09 for_loop09.c
+
+setproperty FOR_TO_DO_LOOP_IN_CONTROLIZER   TRUE
+setproperty FOR_TO_WHILE_LOOP_IN_CONTROLIZER   TRUE
+
+setproperty C_PARSER_RETURN_SUBSTITUTION TRUE
+activate NEW_CONTROLIZER
+
+echo
+echo Parser output
+echo
+
+display PARSED_PRINTED_FILE(for_loop09)
+
+echo
+echo Controlizer output
+echo
+
+display PRINTED_FILE(for_loop09)
+
+close
+
+#delete for_loop09
+quit
