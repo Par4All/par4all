@@ -1807,8 +1807,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	{
 	  // The output is written to stdout
 	  entity std_ent =  local_name_to_top_level_entity("stdout");
-	  pips_assert("stdout must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stdout is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDOUT_FILENO);
@@ -1823,8 +1825,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
 	{
 	  //The input is obtained from stdin
 	  entity std_ent =  local_name_to_top_level_entity("stdin");
-	  pips_assert("stdin must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stdin is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
 	    unit = int_to_expression(STDIN_FILENO);
@@ -1835,8 +1839,10 @@ static list generic_io_effects(entity e, list args, bool system_p)
       else if (ENTITY_PERROR_P(e))
 	{
 	  entity std_ent =  local_name_to_top_level_entity("stderr");
-	  pips_assert("stderr must be defined (check if <stdio.h> is included)\n", !entity_undefined_p(std_ent));
-	  std_ref = make_reference(std_ent, NIL);
+	  if (entity_undefined_p(std_ent))
+	    pips_user_error("stderr is not defined (check if <stdio.h> is included)\n");
+	  else
+	    std_ref = make_reference(std_ent, NIL);
 
 	  /* we cannot use STDERR_FILENO because the stderr variable may have been modified by the user */
 	  if (!get_bool_property("USER_EFFECTS_ON_STD_FILES"))
