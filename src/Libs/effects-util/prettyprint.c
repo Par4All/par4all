@@ -431,7 +431,7 @@ text text_pointer_value(cell_relation pv)
 {
   text tpv = text_undefined;
 
-  boolean foresys = FALSE;
+  bool foresys = false;
   string str_prefix = get_comment_continuation();
   char line_buffer[MAX_LINE_LENGTH];
   Psysteme sc;
@@ -522,7 +522,7 @@ text_pointer_values(list lpv, string header)
 {
     text tpv = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
-    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
 
     /* GO: No redundant test anymore, see  text_statement_array_regions */
     if (lpv != (list) HASH_UNDEFINED_VALUE && lpv != list_undefined)

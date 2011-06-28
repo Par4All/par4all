@@ -138,7 +138,7 @@ text_continuation(transformer cont, bool is_must)
 	    append(is_must? "C-MUST-":"C-MAY-");
 	    system_text_format(crt_line, continuation, txt, ps, 
 			       (get_variable_name_t) pips_user_value_name,
-			       FALSE);
+			       false);
 	}
       
 	close_current_line(crt_line, txt,continuation);
@@ -156,7 +156,7 @@ text_continuation_conditions(
 {
     
     text cont_text = make_text(NIL);
-    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
     
     if ((must_cont_t ==(transformer) HASH_UNDEFINED_VALUE) &&
 	(may_cont_t ==(transformer) HASH_UNDEFINED_VALUE) )
@@ -172,13 +172,13 @@ text_continuation_conditions(
     /* First: must continuation conditions */
     if (must_cont_t !=(transformer) HASH_UNDEFINED_VALUE)
     {
-	MERGE_TEXTS(cont_text, text_continuation(must_cont_t,TRUE));
+	MERGE_TEXTS(cont_text, text_continuation(must_cont_t,true));
     }
     
     /* Then: may continuation conditions */
     if (may_cont_t !=(transformer) HASH_UNDEFINED_VALUE)
     {
-	MERGE_TEXTS(cont_text, text_continuation(may_cont_t,FALSE));
+	MERGE_TEXTS(cont_text, text_continuation(may_cont_t,false));
     }
     if (loose_p)
 	ADD_SENTENCE_TO_TEXT(cont_text, 
@@ -233,19 +233,19 @@ get_continuation_condition_text(char *module_name, bool give_code_p)
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
     set_current_module_statement((statement) db_get_memory_resource
-				 (DBR_CODE, module_name, TRUE));
+				 (DBR_CODE, module_name, true));
     module_stat = get_current_module_statement();
 
     /* To set up the hash table to translate value into value names */       
     set_cumulated_rw_effects((statement_effects)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module);
 
 
     if(is_user_view_p) 
     {
 	user_stat =  (statement)
-	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+	    db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
 
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, module_stat);
@@ -259,19 +259,19 @@ get_continuation_condition_text(char *module_name, bool give_code_p)
     debug_on("CONTINUATION_DEBUG_LEVEL");
 
     set_must_continuation_map( (statement_mapping) 
-	db_get_memory_resource(DBR_MUST_CONTINUATION, module_name, TRUE) );
+	db_get_memory_resource(DBR_MUST_CONTINUATION, module_name, true) );
     set_may_continuation_map( (statement_mapping) 
-	db_get_memory_resource(DBR_MAY_CONTINUATION, module_name, TRUE) );
+	db_get_memory_resource(DBR_MAY_CONTINUATION, module_name, true) );
     must_sum_cont_t = (transformer) 
-     db_get_memory_resource(DBR_MUST_SUMMARY_CONTINUATION, module_name, TRUE);
+     db_get_memory_resource(DBR_MUST_SUMMARY_CONTINUATION, module_name, true);
     may_sum_cont_t = (transformer) 
-     db_get_memory_resource(DBR_MAY_SUMMARY_CONTINUATION, module_name, TRUE);
+     db_get_memory_resource(DBR_MAY_SUMMARY_CONTINUATION, module_name, true);
 
     /* prepare the prettyprinting */
     init_prettyprint(text_statement_continuation_conditions);
     /* summary information first */
-    MERGE_TEXTS(txt,text_continuation(must_sum_cont_t, TRUE)); 
-    MERGE_TEXTS(txt,text_continuation(may_sum_cont_t, FALSE)); 
+    MERGE_TEXTS(txt,text_continuation(must_sum_cont_t, true)); 
+    MERGE_TEXTS(txt,text_continuation(may_sum_cont_t, false)); 
 
     if (give_code_p)
 	/* then code with regions, 
@@ -303,7 +303,7 @@ static bool
 print_continuation_conditions(char *module_name)
 {
     char *file_name, *file_resource_name;
-    bool success = TRUE;
+    bool success = true;
 
     file_name = strdup(concatenate(".cont",
 				   get_bool_property
@@ -320,7 +320,7 @@ print_continuation_conditions(char *module_name)
 	    module_name,
 	    file_resource_name,
 	    file_name,
-	    get_continuation_condition_text(module_name,TRUE));
+	    get_continuation_condition_text(module_name,true));
 
     free(file_name);
     return(success);
@@ -328,14 +328,14 @@ print_continuation_conditions(char *module_name)
 
 bool print_code_continuation_conditions(char *module_name)
 {
-    is_user_view_p = FALSE;
+    is_user_view_p = false;
     return print_continuation_conditions(module_name);
 }
 
 
 bool print_source_continuation_conditions(char *module_name)
 {
-    is_user_view_p = TRUE;
+    is_user_view_p = true;
     return print_continuation_conditions(module_name);
 }
 

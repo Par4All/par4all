@@ -142,18 +142,18 @@ bool module_is_called_by_main_program_p(entity mod)
   if (!entity_main_module_p(mod))
     {
       string mod_name = module_local_name(mod);
-      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,mod_name,TRUE);
+      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,mod_name,true);
       list l_callers = callees_callees(callers); 
       while (!ENDP(l_callers))
 	{
 	  string caller_name = STRING(CAR(l_callers));
 	  entity current_caller = module_name_to_entity(caller_name);
-	  if (module_is_called_by_main_program_p(current_caller)) return TRUE;
+	  if (module_is_called_by_main_program_p(current_caller)) return true;
 	  l_callers = CDR(l_callers);
 	}
-      return FALSE;
+      return false;
     }
-  return TRUE;
+  return true;
 }
 
 static void display_array_resizing_top_down_statistics()
@@ -353,14 +353,14 @@ static bool expression_equal_in_context_p(expression e1, expression e2, transfor
      If NOT(e1=e2) + prec = infeasible, we have e1=e2 is always true*/
   normalized n1;
   normalized n2;
-  if (same_expression_p(e1,e2)) return TRUE;
+  if (same_expression_p(e1,e2)) return true;
   if (expression_reference_p(e1) && expression_reference_p(e2))
     {
       reference ref1 = expression_reference(e1);
       reference ref2 = expression_reference(e2);
       entity en1 = reference_variable(ref1);
       entity en2 = reference_variable(ref2);
-      if (same_scalar_location_p(en1, en2)) return TRUE;
+      if (same_scalar_location_p(en1, en2)) return true;
     }
   clean_all_normalized(e1);
   clean_all_normalized(e2);
@@ -385,9 +385,9 @@ static bool expression_equal_in_context_p(expression e1, expression e2, transfor
       if (vect_constant_p(v_init))
 	{
 	  /* Tets if v_init == 0 */
-	  if (VECTEUR_NUL_P(v_init)) return TRUE;
-	  if (value_zero_p(val_of(v_init))) return TRUE;
-	  if (value_notzero_p(val_of(v_init))) return FALSE;
+	  if (VECTEUR_NUL_P(v_init)) return true;
+	  if (value_zero_p(val_of(v_init))) return true;
+	  if (value_notzero_p(val_of(v_init))) return false;
 	}
       else 
 	{
@@ -400,18 +400,18 @@ static bool expression_equal_in_context_p(expression e1, expression e2, transfor
 	      !efficient_sc_check_inequality_feasibility(v_not_e_2,ps))
 	    {
 	      vect_rm(v_one);
-	      return TRUE;
+	      return true;
 	    }
 	  vect_rm(v_one);
 	}
     }
-  return FALSE;
+  return false;
 }
   
 bool same_dimension_p(entity actual_array, entity dummy_array, 
 		      list l_actual_ref, size_t i, transformer context)
 {
-  /* This function returns TRUE if the actual array and the dummy array
+  /* This function returns true if the actual array and the dummy array
    * have the same dimension number i, with respect to the current context 
    * (precondition + association)
    * In case if the actual argument is an array element, we have to add 
@@ -450,18 +450,18 @@ bool same_dimension_p(entity actual_array, entity dummy_array,
 	{
 	  if (l_actual_ref == NIL)
 	    /* case : array name */
-	    return TRUE;
+	    return true;
 	  else
 	    {
 	      /* the actual argument is an array element name, 
 	       * we have to calculate the subscript value also*/
 	      expression actual_sub = find_ith_argument(l_actual_ref,i);
 	      if (same_expression_p(actual_sub,actual_lower))
-		return TRUE;
+		return true;
 	    }
 	}
     }
-  return FALSE;
+  return false;
 }
 
 static list translate_reference_to_callee_frame(expression e, reference ref, transformer context)
@@ -481,7 +481,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
        * Another way : looking for a variable in the declaration of the callee
        * that has the same offset in the same common block */
       list l_callee_decl = code_declarations(entity_code(current_callee));
-      bool in_callee = FALSE;
+      bool in_callee = false;
       /* search for equivalent variable in the list */	  
       FOREACH(ENTITY, enti,l_callee_decl)
       {
@@ -507,7 +507,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 		fprintf(stderr, "\n Syntax reference: Common variable, add to list: \n");
 		print_expression(expr);
 	      } 
-	    in_callee = TRUE;
+	    in_callee = true;
 	    l = gen_nconc(l,CONS(EXPRESSION,copy_expression(expr),NIL));
 	    break;
 	  }
@@ -521,7 +521,7 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
       if (!in_callee && strstr(entity_local_name(en),"I_PIPS_") != NULL)
 	{
 	  string callee_name = module_local_name(current_callee);
-	  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
+	  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,true);
 	  string base_name = pips_basename(user_file, NULL);
 	  string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
 	  string pips_variable_name = entity_local_name(en);
@@ -611,12 +611,12 @@ static list translate_reference_to_callee_frame(expression e, reference ref, tra
 			  /*the coefficient of e is 1 or -1.
 			    Check if the remaining vector contains only constant or formal argument of callee*/
 			  Pvecteur v;
-			  bool check = TRUE;
+			  bool check = true;
 			  for (v = newv; (v !=NULL) && (check); v = v->succ)
 			    { 
 			      Variable var = v->var;
 			      if ((var != TCST) && (!variable_is_a_module_formal_parameter_p((entity)var,current_callee)) )
-				check = FALSE;
+				check = false;
 			    }
 			  if (check)
 			    {
@@ -1059,7 +1059,7 @@ static bool top_down_adn_call_flt(call c)
 		     Pointer case => compute actual array size => try to translate 
 		     if not ok => code instrumentation*/
 		  l_values_of_current_caller = NIL;
-		  return FALSE;
+		  return false;
 		}
 	    }
 	  else
@@ -1097,7 +1097,7 @@ static bool top_down_adn_call_flt(call c)
 		      /* Actual argument is not an array, not a scalar variable, not a string
 			 => code instrumentation*/
 		      l_values_of_current_caller = NIL;
-		      return FALSE;
+		      return false;
 		    }
 		}
 	    }
@@ -1162,18 +1162,18 @@ static bool top_down_adn_call_flt(call c)
 	      if (l_values_of_current_caller == NIL)
 		/* There is no same value for different call sites 
 		   => code instrumentation  */
-		return FALSE;
+		return false;
 	      /* We have a list of same values for different call sites => continue 
 		 to find other calls to the callee*/
-	      return TRUE;
+	      return true;
 	    }	 
 	}
       else 
 	/* Actual argument is an undefined expression => code instrumentation*/
       l_values_of_current_caller = NIL;
-      return FALSE;
+      return false;
     }
-  return TRUE;
+  return true;
 }
 
 /* Insert "I_PIPS_SUB_ARRAY = actual_array_size" before each call to the current callee*/
@@ -1257,7 +1257,7 @@ static void instrument_call_rwt(call c)
 		  print_expression(actual_array_size);
 		}
 	      /* As we can not modify ALL.code, we cannot use a function like :
-		 insert_statement(stmt,new_s,TRUE).
+		 insert_statement(stmt,new_s,true).
 		 Instead, we have to stock the assignment as weel as the ordering
 		 of the call site in a special file, named TD_instrument.out, and
 		 then use a script to insert the assignment before the call site.*/
@@ -1285,11 +1285,11 @@ static void instrument_call_rwt(call c)
 static list top_down_adn_caller_array()
 {
   string caller_name = module_local_name(current_caller);
-  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,TRUE);  
+  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,true);  
   l_values_of_current_caller = NIL;
   make_current_statement_stack();
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));  
+		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,true));  
   gen_multi_recurse(caller_statement,
 		    statement_domain, current_statement_filter,current_statement_rewrite,
 		    call_domain, top_down_adn_call_flt, gen_null,
@@ -1307,10 +1307,10 @@ static list top_down_adn_caller_array()
 static void instrument_caller_array()
 {
   string caller_name = module_local_name(current_caller);
-  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,TRUE);  
+  statement caller_statement = (statement) db_get_memory_resource(DBR_CODE,caller_name,true);  
   make_current_statement_stack();
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,TRUE));  
+		       db_get_memory_resource(DBR_PRECONDITIONS,caller_name,true));  
   gen_multi_recurse(caller_statement,
 		    statement_domain, current_statement_filter,current_statement_rewrite,
 		    call_domain,gen_true,instrument_call_rwt,NULL);  
@@ -1331,14 +1331,14 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 
   /* Find out the name of the printed file in Src directory: database/Src/file.f */
   string callee_name = module_local_name(current_callee);
-  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,callee_name,true);
   string base_name = pips_basename(user_file, NULL);
   string file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), "/",base_name,NULL));
   
   while (!ENDP(l_arrays))
     {
       list l = gen_copy_seq(l_callers),l_values = NIL,l_dims;
-      bool flag = TRUE;
+      bool flag = true;
       variable v;
       int length;
       dimension last_dim;
@@ -1365,7 +1365,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		  print_expressions(l_values_of_one_caller);
 		}
 	      if (l_values_of_one_caller == NIL)
-		flag = FALSE;
+		flag = false;
 	      else
 		{
 		  ifdebug(2)
@@ -1380,7 +1380,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		      print_expressions(l_values);
 		    }
 		  if (l_values == NIL)
-		    flag = FALSE;
+		    flag = false;
 		}
 	    }
 	  current_caller = entity_undefined;
@@ -1476,7 +1476,7 @@ static void top_down_adn_callers_arrays(list l_arrays,list l_callers)
 		pips_user_warning("Module %s is not called by the main program\n",caller_name);
 	      else
 		{
-		  string user_file_caller = db_get_memory_resource(DBR_USER_FILE,caller_name,TRUE);
+		  string user_file_caller = db_get_memory_resource(DBR_USER_FILE,caller_name,true);
 		  string base_name_caller = pips_basename(user_file_caller, NULL);
 		  file_name_caller = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE),
 							"/",base_name_caller,NULL));
@@ -1628,7 +1628,7 @@ bool array_resizing_top_down(char *module_name)
 	    {
 	      /* Do not use MAIN program or module_is_called_by_main_program.
 		 Take all callers of the current callee*/
-	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
+	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,true);
 	      list l_callers = callees_callees(callers); 
 	      if (l_callers == NIL)
 		{
@@ -1664,7 +1664,7 @@ bool array_resizing_top_down(char *module_name)
   ifdebug(1)
     fprintf(stderr, " \n End top down array resizing for %s \n", module_name);
   debug_off();
-  return TRUE;
+  return true;
 }
 
 

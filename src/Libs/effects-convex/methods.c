@@ -192,8 +192,8 @@ set_methods_for_convex_effects()
     db_get_summary_out_effects_func = db_get_convex_summary_out_regions;
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
-    set_contracted_proper_effects(TRUE);
-    set_descriptor_range_p(TRUE);
+    set_contracted_proper_effects(true);
+    set_descriptor_range_p(true);
 }
 
 
@@ -291,8 +291,8 @@ void set_methods_for_convex_rw_pointer_effects()
     db_get_summary_out_effects_func = db_get_convex_summary_out_regions;
     db_put_summary_out_effects_func = db_put_convex_summary_out_regions;
 
-    set_contracted_proper_effects(TRUE);
-    set_descriptor_range_p(TRUE);
+    set_contracted_proper_effects(true);
+    set_descriptor_range_p(true);
 
     effects_computation_init_func = init_convex_rw_regions;
     effects_computation_reset_func = reset_convex_rw_regions;
@@ -331,13 +331,13 @@ init_convex_rw_regions(string module_name)
 
     /* Get the transformers and preconditions of the module. */
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true) );
     set_precondition_map( (statement_mapping)
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_rw_prettyprint(module_name);
@@ -358,19 +358,19 @@ void init_convex_in_out_regions(string module_name)
 		       "MUST_REGIONS"))
 	pips_user_warning("\nMUST REGIONS not selected - "
 			  "Do not expect wonderful results\n");
-    set_bool_property("MUST_REGIONS", TRUE);
-    set_bool_property("EXACT_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
+    set_bool_property("EXACT_REGIONS", true);
     get_in_out_regions_properties();
 
     /* Get the transformers and preconditions of the module. */
     set_transformer_map( (statement_mapping)
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true) );
     set_precondition_map( (statement_mapping)
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_inout_prettyprint(module_name);
@@ -401,7 +401,7 @@ init_convex_summary_rw_regions(string module_name)
     regions_init();
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_rw_prettyprint(module_name);
@@ -417,12 +417,12 @@ void reset_convex_summary_rw_regions(string __attribute__ ((unused)) module_name
 void init_convex_summary_in_out_regions(string module_name)
 {
     regions_init();
-    set_bool_property("MUST_REGIONS", TRUE);
-    set_bool_property("EXACT_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
+    set_bool_property("EXACT_REGIONS", true);
     get_in_out_regions_properties();
     /* for intermediate values */
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module_name_to_entity(module_name));
 
     init_convex_inout_prettyprint(module_name);

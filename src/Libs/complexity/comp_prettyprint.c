@@ -172,21 +172,21 @@ text text_complexity(entity module __attribute__ ((__unused__)),
 bool print_code_complexities(module_name)
 char *module_name;
 {
-  is_user_view = FALSE;
+  is_user_view = false;
   return print_code_or_source_comp(module_name);
 }
 
 bool print_source_complexities(module_name)
 char *module_name;
 {
-  is_user_view = TRUE;
+  is_user_view = true;
   return print_code_or_source_comp(module_name);
 }
 
 bool print_code_or_source_comp(module_name)
 char *module_name;
 {
-    bool success = TRUE;
+    bool success = true;
     entity mod;
     statement mod_stat,user_stat;
     char *file_ext = strdup
@@ -202,14 +202,14 @@ char *module_name;
     text txt = make_text(NIL);
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     mod_stat = get_current_module_statement();
     set_current_module_entity(module_name_to_entity(module_name) );
     mod = get_current_module_entity();
 
     if(is_user_view) {
 	user_stat =  (statement)
-	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+	    db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
 
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, mod_stat);
@@ -217,7 +217,7 @@ char *module_name;
 
 
     set_complexity_map( (statement_mapping)
-	db_get_memory_resource(DBR_COMPLEXITIES, module_name, TRUE));
+	db_get_memory_resource(DBR_COMPLEXITIES, module_name, true));
 
     init_prettyprint(text_complexity);
 
@@ -237,7 +237,7 @@ char *module_name;
     reset_current_module_entity();
     reset_current_module_statement();
 
-    return TRUE;
+    return true;
 }
 
 text text_summary_complexity(module)
@@ -245,8 +245,8 @@ entity module;
 {
     string module_name = module_local_name(module);
     complexity stat_comp = (complexity)
-	db_get_memory_resource(DBR_SUMMARY_COMPLEXITY, module_name, TRUE);
-    cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, FALSE,
+	db_get_memory_resource(DBR_SUMMARY_COMPLEXITY, module_name, true);
+    cons *pc = CHAIN_SWORD(NIL, complexity_sprint(stat_comp, false,
 						  PRINT_LOCAL_NAMES));
     char *r = words_to_string(pc);
     int nblanks = 65-strlen(r);

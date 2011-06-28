@@ -364,9 +364,9 @@ bool array_argument_p(expression e)
     {
       reference ref = expression_reference(e);
       entity ent = reference_variable(ref);
-      if (array_entity_p(ent)) return TRUE;
+      if (array_entity_p(ent)) return true;
     }
-  return FALSE;
+  return false;
 }
 
 
@@ -380,7 +380,7 @@ bool expression_reference_p(expression e) {
 entity expression_variable(expression e)
 {
   /* Assume e is a reference expression:
-     expression_reference_p(e)==TRUE  */
+     expression_reference_p(e)==true  */
   return reference_variable(syntax_reference(expression_syntax(e)));
 }
 
@@ -388,7 +388,7 @@ entity expression_variable(expression e)
  */
 bool is_expression_reference_to_entity_p(expression e, entity v)
 {
-  bool is_e_reference_to_v = FALSE;
+  bool is_e_reference_to_v = false;
 
   if(expression_reference_p(e)) {
     reference r = syntax_reference(expression_syntax(e));
@@ -399,22 +399,22 @@ bool is_expression_reference_to_entity_p(expression e, entity v)
 }
 
 
-/* This function returns TRUE, if there exists a same expression in the list
- *                       FALSE, otherwise
+/* This function returns true, if there exists a same expression in the list
+ *                       false, otherwise
 */
 bool same_expression_in_list_p(expression e, list le)
 {
-  MAP(EXPRESSION, f, if (same_expression_p(e,f)) return TRUE, le);
-  return FALSE;
+  MAP(EXPRESSION, f, if (same_expression_p(e,f)) return true, le);
+  return false;
 }
 
-/* This function returns TRUE, if there exists an expression equal in the list
- *                       FALSE, otherwise
+/* This function returns true, if there exists an expression equal in the list
+ *                       false, otherwise
 */
 bool expression_equal_in_list_p(expression e, list le)
 {
-  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return TRUE, le);
-  return FALSE;
+  MAP(EXPRESSION, f, if (expression_equal_p(e,f)) return true, le);
+  return false;
 }
 
 /* C xor is missing */
@@ -426,10 +426,10 @@ bool logical_operator_expression_p(expression e)
       entity op = call_function(syntax_call(expression_syntax(e)));
       if (ENTITY_AND_P(op) || ENTITY_OR_P(op) || ENTITY_NOT_P(op) ||
 	  ENTITY_EQUIV_P(op) ||ENTITY_NON_EQUIV_P(op))
-	return TRUE;
-      return FALSE;
+	return true;
+      return false;
     }
-  return FALSE;
+  return false;
 }
 
 bool relational_expression_p(expression e)
@@ -440,10 +440,10 @@ bool relational_expression_p(expression e)
     {
       entity op = call_function(syntax_call(expression_syntax(e)));
       if (ENTITY_RELATIONAL_OPERATOR_P(op))
-	return TRUE;
-      return FALSE;
+	return true;
+      return false;
     }
-  return FALSE;
+  return false;
 }
 
 bool integer_expression_p(expression e)
@@ -485,8 +485,8 @@ bool logical_expression_p(expression e)
     {
       b = variable_basic(type_variable(entity_type(reference_variable(syntax_reference(s)))));
       if (basic_logical_p(b))
-	return TRUE;
-      return FALSE;
+	return true;
+      return false;
     }
   case is_syntax_call:
     {
@@ -494,19 +494,19 @@ bool logical_expression_p(expression e)
 	  operator_expression_p(e,FALSE_OPERATOR_NAME) ||
 	  relational_expression_p(e)||
 	  logical_operator_expression_p(e) )
-	return TRUE;
+	return true;
       func = call_function(syntax_call(expression_syntax(e)));
       b = variable_basic(type_variable(functional_result(type_functional(entity_type(func)))));
-      if (basic_logical_p(b)) return TRUE;
+      if (basic_logical_p(b)) return true;
 
       /* The case of symbolic name of a logical constant is not treated here */
 
-      return FALSE;
+      return false;
     }
   case is_syntax_range:
-    return FALSE;
+    return false;
   default: pips_internal_error("Bad syntax tag");
-    return FALSE;
+    return false;
   }
 
   debug(2, "logical expression", " ends\n");
@@ -515,9 +515,9 @@ bool logical_expression_p(expression e)
 
 /* This function returns:
  *
- *  1, if e is a relational expression that is always TRUE
+ *  1, if e is a relational expression that is always true
  *
- * -1, if e is a relational expression that is always FALSE
+ * -1, if e is a relational expression that is always false
  *
  *  0, otherwise.
  *
@@ -552,7 +552,7 @@ int trivial_expression_p(expression e)
 	  Pvecteur v2 = normalized_linear(n2);
 	  Pvecteur v = vect_substract(v1,v2);
 
-	  /* The test if an expression is trivial (always TRUE or FALSE) or not
+	  /* The test if an expression is trivial (always true or false) or not
 	   * depends on the operator of the expression :
 	   * (op= {<=,<,>=,>,==,!=}) so we have to treat each different case */
 
@@ -614,7 +614,7 @@ int trivial_expression_p(expression e)
 
   @param e is the expression to analyse
 
-  @param filter is a function that take an expression and return TRUE iff
+  @param filter is a function that take an expression and return true iff
   expression is of the form "op(a,b,c...)". The filter may not be specific
   to binary operators, even if this function only deal with binary
   patterns. Use for example add_expression_p() to detect "i = i + v" or "i
@@ -671,12 +671,12 @@ expression e ;
 	return(strcmp(entity_local_name(e), IMPLIED_DO_NAME) == 0);
     }
 
-    return(FALSE);
+    return(false);
 }
 
 bool comma_expression_p(expression e)
 {
-  bool result = FALSE;
+  bool result = false;
 
   if (expression_call_p(e)) {
     call c = syntax_call(expression_syntax(e));
@@ -698,14 +698,14 @@ expression e ;
 	return(strcmp(entity_local_name(e), LIST_DIRECTED_FORMAT_NAME) == 0);
     }
 
-    return(FALSE);
+    return(false);
 }
 
 /* More extensive than next function */
 bool extended_integer_constant_expression_p(expression e)
 {
   value v = EvalExpression(e);
-  bool ice_p = FALSE;
+  bool ice_p = false;
 
   if(value_constant_p(v)) {
     constant c = value_constant(v);
@@ -733,7 +733,7 @@ bool integer_constant_expression_p(e)
 expression e;
 {
   syntax s = expression_syntax(e);
-  bool ice = FALSE;
+  bool ice = false;
 
   if(syntax_call_p(s)) {
     call c = syntax_call(s);
@@ -742,10 +742,10 @@ expression e;
     int i;
 
     if(integer_constant_p(cst, &i)) {
-      ice = TRUE;
+      ice = true;
     }
     else if(integer_symbolic_constant_p(cst, &i)) {
-      ice = TRUE;
+      ice = true;
     }
     else if(ENTITY_PLUS_P(cst)||ENTITY_PLUS_C_P(cst)) {
       expression e1 = EXPRESSION(CAR(args));
@@ -775,10 +775,10 @@ bool signed_integer_constant_expression_p(expression e)
 	  return integer_constant_expression_p(e2);
 	}
     }
-    return FALSE;
+    return false;
   }
   else {
-    return TRUE;
+    return true;
   }
 }
 
@@ -790,7 +790,7 @@ bool expression_with_constant_signed_integer_value_p(e)
 expression e;
 {
   normalized ne = NORMALIZE_EXPRESSION(e);
-  bool constant_p = FALSE;
+  bool constant_p = false;
 
   if(normalized_linear_p(ne)) {
     Pvecteur ve = normalized_linear(ne);
@@ -892,7 +892,7 @@ bool user_function_call_p(e)
 expression e;
 {
     syntax s = expression_syntax(e);
-    bool user_function_call_p = FALSE;
+    bool user_function_call_p = false;
 
     if(syntax_call_p(s)) {
 	call c = syntax_call(s);
@@ -901,7 +901,7 @@ expression e;
 	user_function_call_p = value_code_p(v);
     }
     else {
-	user_function_call_p = FALSE;
+	user_function_call_p = false;
     }
 
     return user_function_call_p;
@@ -920,7 +920,7 @@ string op_name;
 	return strcmp(op_name, entity_local_name(op)) == 0;
     }
     else
-	return FALSE;
+	return false;
 }
 
 expression make_true_expression()
@@ -943,24 +943,24 @@ bool false_expression_p(expression e)
   return operator_expression_p(e,FALSE_OPERATOR_NAME);
 }
 
-/* boolean unbounded_dimension_p(dim)
+/* bool unbounded_dimension_p(dim)
  * input    : a dimension of an array entity.
- * output   : TRUE if the last dimension is unbounded (*),
- *            FALSE otherwise.
+ * output   : true if the last dimension is unbounded (*),
+ *            false otherwise.
  * modifies : nothing
  * comment  :
  */
-boolean unbounded_dimension_p(dim)
+bool unbounded_dimension_p(dim)
 dimension dim;
 {
     syntax dim_synt = expression_syntax(dimension_upper(dim));
-    boolean res = FALSE;
+    bool res = false;
 
     if (syntax_call_p(dim_synt)) {
 	string dim_nom = entity_local_name(call_function(syntax_call(dim_synt)));
 
 	if (same_string_p(dim_nom, UNBOUNDED_DIMENSION_NAME))
-	    res = TRUE;
+	    res = true;
     }
 
     return(res);
@@ -1222,9 +1222,9 @@ bool expression_equal_p(expression e1, expression e2)
   /* Add expression_undefined tests to avoid segmentation fault */
 
   if (expression_undefined_p(e1) && expression_undefined_p(e2))
-    return TRUE;
+    return true;
   if (expression_undefined_p(e1) || expression_undefined_p(e2))
-    return FALSE;
+    return false;
 
   /* let's assume that every expression has a correct syntax component */
   s1 = expression_syntax(e1);
@@ -1279,7 +1279,7 @@ bool syntax_equal_p(syntax s1, syntax s2)
   tag t2 = syntax_tag(s2);
 
   if(t1!=t2)
-    return FALSE;
+    return false;
 
   switch(t1) {
   case is_syntax_reference:
@@ -1298,12 +1298,12 @@ bool syntax_equal_p(syntax s1, syntax s2)
   case is_syntax_va_arg:
     pips_internal_error("Not implemented for syntax tag %d\n", t1);
   default:
-    return FALSE;
+    return false;
     break;
   }
 
   pips_internal_error("illegal. syntax tag %d", t1);
-  return FALSE;
+  return false;
 }
 
 bool subscript_equal_p(subscript s1, subscript s2) {
@@ -1320,7 +1320,7 @@ bool reference_equal_p(reference r1, reference r2)
   list dims2 = reference_indices(r2);
 
   if(v1 != v2)
-    return FALSE;
+    return false;
 
   return gen_equals(dims1,dims2,(gen_eq_func_t)expression_equal_p);
 }
@@ -1341,11 +1341,11 @@ bool call_equal_p(call c1, call c2)
   list args2 = call_arguments(c2);
 
   if(f1 != f2)
-    return FALSE;
+    return false;
 
   return gen_equals(args1,args2,(gen_eq_func_t)expression_equal_p);
 
-  return TRUE;
+  return true;
 }
 
 /* proxy to int_to_expression */
@@ -1676,11 +1676,11 @@ bool array_reference_p(reference r)
   return reference_indices(r) != NIL;
 }
 
-/* If TRUE is returned, the two references cannot conflict unless array
- * bound declarations are violated. If FALSE is returned, the two references
+/* If true is returned, the two references cannot conflict unless array
+ * bound declarations are violated. If false is returned, the two references
  * may conflict.
  *
- * TRUE is returned if the two references are array references and if
+ * true is returned if the two references are array references and if
  * the two references entities are equal and if at least one dimension
  * can be used to desambiguate the two references using constant subscript
  * expressions. This test is store independent and certainly does not
@@ -1691,7 +1691,7 @@ bool array_reference_p(reference r)
 
 bool references_do_not_conflict_p(reference r1, reference r2)
 {
-  bool do_not_conflict = FALSE;
+  bool do_not_conflict = false;
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
 
@@ -1747,7 +1747,7 @@ expression expression_list_to_conjonction(list l)
 	 expression_list_to_binary_operator_call(l, and));
 }
 
-/* bool expression_intrinsic_operation_p(expression exp): Returns TRUE
+/* bool expression_intrinsic_operation_p(expression exp): Returns true
  * if "exp" is an expression with a call to an intrinsic operation.
  */
 bool expression_intrinsic_operation_p(expression exp)
@@ -1756,14 +1756,14 @@ bool expression_intrinsic_operation_p(expression exp)
   syntax syn = expression_syntax(exp);
 
   if (syntax_tag(syn) != is_syntax_call)
-    return (FALSE);
+    return (false);
 
   e = call_function(syntax_call(syn));
 
   return(value_tag(entity_initial(e)) == is_value_intrinsic);
 }
 
-/* bool call_constant_p(call c): Returns TRUE if "c" is a call to a constant,
+/* bool call_constant_p(call c): Returns true if "c" is a call to a constant,
  * that is, a constant number or a symbolic constant.
  */
 bool call_constant_p(call c)
@@ -1775,7 +1775,7 @@ bool call_constant_p(call c)
 
 
 /*=================================================================*/
-/* bool expression_equal_integer_p(expression exp, int i): returns TRUE if
+/* bool expression_equal_integer_p(expression exp, int i): returns true if
  * "exp" is a constant value equal to "i".
  */
 bool expression_equal_integer_p(expression exp, int i)
@@ -1783,7 +1783,7 @@ bool expression_equal_integer_p(expression exp, int i)
   pips_debug(7, "doing\n");
   if(expression_constant_p(exp))
     return(expression_to_int(exp) == i);
-  return(FALSE);
+  return(false);
 }
 
 /*=================================================================*/
@@ -1968,12 +1968,12 @@ expression make_lin_op_exp(entity op_ent, expression exp1, expression exp2)
 /* int expression_to_int(expression exp): returns the integer value of "exp".
  *
  * Note: "exp" is supposed to contain an integer value which means that the
- *       function expression_constant_p() has returned TRUE with "exp" in
+ *       function expression_constant_p() has returned true with "exp" in
  *       argument.
  *       This implies that if "exp" is not a "value_constant", it must be
  *       a "value_intrinsic". In that case it is an unary minus operation
  *       upon an expression for which the function expression_constant_p()
- *       returns TRUE (See the commentary given for it).
+ *       returns true (See the commentary given for it).
  */
 int expression_to_int(expression exp)
 {
@@ -2068,8 +2068,8 @@ expression e;
 	Pvecteur v = normalized_linear(n);
 	int s = vect_size(v);
 
-	if (s==0) return(TRUE);
-	if (s>1) return(FALSE);
+	if (s==0) return(true);
+	if (s>1) return(false);
 	return((s==1) && value_notzero_p(vect_coeff(TCST,v)));
     }
     else
@@ -2082,11 +2082,11 @@ expression e;
 	return((value_constant_p(v)) && (constant_int_p(value_constant(v))));
     }
     
-    return(FALSE);
+    return(false);
 }
 /*=================================================================*/
 /* bool expression_constant_p(expression exp)
- * Returns TRUE if "exp" contains an (integer) constant value.
+ * Returns true if "exp" contains an (integer) constant value.
  *
  * Note : A negativePositive constant can be represented with a call to the unary
  *        minus/plus intrinsic function upon a positive value.
@@ -2097,12 +2097,12 @@ bool expression_constant_p(expression exp)
 }
 
 /* Returns true if the value of the expression does not depend
-   syntactically on the current store. Returns FALSE when this has not
+   syntactically on the current store. Returns false when this has not
    been proved. */
 bool extended_expression_constant_p(expression exp)
 {
   syntax s = expression_syntax(exp);
-  bool constant_p = FALSE;
+  bool constant_p = false;
 
   switch(syntax_tag(s)) {
   case is_syntax_reference: {
@@ -2132,20 +2132,20 @@ bool extended_expression_constant_p(expression exp)
     value v = entity_initial(f);
     switch(value_tag(v)) {
     case is_value_constant:
-      constant_p = TRUE;
+      constant_p = true;
       break;
     case is_value_intrinsic: {
       /* Check that all arguments are constant */
       list args = call_arguments(c);
-      constant_p = TRUE;
+      constant_p = true;
       FOREACH(EXPRESSION, sub_exp, args) {
 	constant_p = constant_p && extended_expression_constant_p(sub_exp);
       }
       break;
     }
     case is_value_symbolic:
-      /* Certainly TRUE for Fortran. Quid for C? */
-      constant_p = TRUE;
+      /* Certainly true for Fortran. Quid for C? */
+      constant_p = true;
       break;
     case is_value_expression: {
       /* does not make much sense... for a function! */
@@ -2157,7 +2157,7 @@ bool extended_expression_constant_p(expression exp)
     case is_value_code:
     default:
       /* Let's be conservative */
-      constant_p = FALSE;
+      constant_p = false;
     }
     break;
   }
@@ -2209,7 +2209,7 @@ bool extended_expression_constant_p(expression exp)
  */
 bool expression_is_C_rhs_p(expression exp)
 {
-  bool is_rhs_p = FALSE;
+  bool is_rhs_p = false;
 
   is_rhs_p = !brace_expression_p(exp);
 
@@ -2218,7 +2218,7 @@ bool expression_is_C_rhs_p(expression exp)
 
 bool expression_one_p(expression exp)
 {
-  bool one_p = FALSE;
+  bool one_p = false;
 
   if(syntax_call_p(expression_syntax(exp))) {
     call c = syntax_call(expression_syntax(exp));
@@ -2244,12 +2244,12 @@ bool same_expression_name_p(expression, expression);
 bool same_lexpr_name_p(list l1, list l2)
 {
   if (gen_length(l1)!=gen_length(l2))
-    return FALSE;
+    return false;
   /* else */
   for(; l1 && l2; POP(l1), POP(l2))
     if (!same_expression_name_p(EXPRESSION(CAR(l1)), EXPRESSION(CAR(l2))))
-      return FALSE;
-  return TRUE;
+      return false;
+  return true;
 }
 
 bool same_entity_lname_p(entity e1, entity e2)
@@ -2313,22 +2313,22 @@ bool same_application_name_p(application a1, application a2)
 bool same_va_arg_name_p(list l1, list l2)
 {
   if (gen_length(l1)!=gen_length(l2))
-    return FALSE;
+    return false;
 
   for(; l1 && l2; POP(l1), POP(l2)) {
     sizeofexpression s1 = SIZEOFEXPRESSION(CAR(l1));
     sizeofexpression s2 = SIZEOFEXPRESSION(CAR(l2));
     if (!same_sizeofexpression_name_p(s1, s2))
-      return FALSE;
+      return false;
   }
-  return TRUE;
+  return true;
 }
 
 
 bool same_syntax_name_p(syntax s1, syntax s2)
 {
   if (syntax_tag(s1)!=syntax_tag(s2))
-    return FALSE;
+    return false;
   /* else */
   switch (syntax_tag(s1))
     {
@@ -2351,7 +2351,7 @@ bool same_syntax_name_p(syntax s1, syntax s2)
     default:
       pips_internal_error("unexpected syntax tag: %d", syntax_tag(s1));
     }
-  return FALSE;
+  return false;
 }
 
 bool same_expression_name_p(expression e1, expression e2)
@@ -2373,9 +2373,9 @@ static bool  davinci_dump_expression_rc(
   syntax s;
   string name, shape, color;
   list sons = NIL;
-  bool first = TRUE, something = TRUE;
+  bool first = true, something = true;
 
-  if (ALREADY_SEEN(e)) return FALSE;
+  if (ALREADY_SEEN(e)) return false;
   SEEN(e);
 
   s = expression_syntax(e);
@@ -2417,7 +2417,7 @@ static bool  davinci_dump_expression_rc(
   MAP(EXPRESSION, son,
   {
     if (!first) fprintf(out, ",\n");
-    else { fprintf(out, "\n"); first=FALSE; }
+    else { fprintf(out, "\n"); first=false; }
     fprintf(out, " l(\"%zx->%zx\",e(\"\",[],r(\"%zx\")))",
 	    (_uint) e, (_uint) son, (_uint) son);
   },
@@ -2432,7 +2432,7 @@ static bool  davinci_dump_expression_rc(
     something = davinci_dump_expression_rc(out, son, seen);
   }, sons);
 
-  return TRUE;
+  return true;
 }
 
 /* dump expression e in file out as a davinci graph.
@@ -2450,7 +2450,7 @@ static FILE * out_flt = NULL;
 static bool expr_flt(expression e)
 {
   davinci_dump_expression(out_flt, e);
-  return FALSE;
+  return false;
 }
 
 /* dump all expressions in s to out.
@@ -2551,7 +2551,7 @@ expression substitute_entity_in_expression(entity old, entity new, expression e)
 bool simplify_C_expression(expression e)
 {
   syntax s = expression_syntax(e);
-  bool can_be_substituted_p = FALSE;
+  bool can_be_substituted_p = false;
 
   pips_debug(9, "Begin\n");
 
@@ -2567,7 +2567,7 @@ bool simplify_C_expression(expression e)
 	   are not in the c_syntax library. */
 	pips_user_warning("Variable \"%s\" is probably used before it is defined\n",
 			  entity_user_name(re));
-	can_be_substituted_p = FALSE;
+	can_be_substituted_p = false;
       }
       else {
 	basic bt = basic_undefined;
@@ -2627,7 +2627,7 @@ bool simplify_C_expression(expression e)
       else {
 	/* Try to simplify the arguments, do not hope much from the result
            type because of overloading. */
-	type ft = call_to_functional_type(c, TRUE);
+	type ft = call_to_functional_type(c, true);
 	type rt = ultimate_type(functional_result(type_functional(ft)));
 
 	//pips_assert("The function type is functional", type_functional_p(entity_type(f)));
@@ -2656,11 +2656,11 @@ bool simplify_C_expression(expression e)
 	  }
 	  else {
 	    /* e must be a void expression, i.e. an expression returning no value */
-	    can_be_substituted_p = FALSE;
+	    can_be_substituted_p = false;
 	  }
 	}
 	else {
-	  can_be_substituted_p = FALSE;
+	  can_be_substituted_p = false;
 	}
       }
       break;
@@ -2674,7 +2674,7 @@ bool simplify_C_expression(expression e)
       (void) simplify_C_expression(le);
       (void) simplify_C_expression(ue);
       (void) simplify_C_expression(ince);
-      can_be_substituted_p = FALSE;
+      can_be_substituted_p = false;
       break;
       }
   case is_syntax_cast:
@@ -2682,10 +2682,10 @@ bool simplify_C_expression(expression e)
   case is_syntax_subscript:
   case is_syntax_application:
   case is_syntax_va_arg:
-      can_be_substituted_p = FALSE;
+      can_be_substituted_p = false;
       break;
   default: pips_internal_error("Bad syntax tag");
-    can_be_substituted_p = FALSE; /* for gcc */
+    can_be_substituted_p = false; /* for gcc */
   }
 
   pips_debug(9, "End: %s\n", bool_to_string(can_be_substituted_p));
@@ -2727,11 +2727,11 @@ expression convert_bound_expression(expression e, bool upper_p, bool non_strict_
 bool reference_with_constant_indices_p(reference r)
 {
   list sel = reference_indices(r);
-  bool constant_p = TRUE;
+  bool constant_p = true;
 
   MAP(EXPRESSION, se, {
       if(!extended_integer_constant_expression_p(se)) {
-	constant_p = FALSE;
+	constant_p = false;
 	break;
       }
     }, sel);
@@ -2767,12 +2767,12 @@ reference reference_with_store_independent_indices(reference r)
 bool reference_with_unbounded_indices_p(reference r)
 {
   list sel = reference_indices(r);
-  bool unbounded_p = TRUE;
+  bool unbounded_p = true;
 
   MAP(EXPRESSION, se, {
       if(!extended_integer_constant_expression_p(se)
 	 && !unbounded_expression_p(se)) {
-	unbounded_p = FALSE;
+	unbounded_p = false;
 	break;
       }
     }, sel);
@@ -2784,13 +2784,13 @@ bool reference_with_unbounded_indices_p(reference r)
  */
 bool store_independent_reference_p(reference r)
 {
-  bool independent_p = TRUE;
+  bool independent_p = true;
   //list ind = reference_indices(r);
   entity v = reference_variable(r);
   type t = ultimate_type(entity_type(v));
 
   if(pointer_type_p(t)) {
-    independent_p = FALSE;
+    independent_p = false;
   }
   else {
     independent_p = reference_with_constant_indices_p(r);
@@ -3081,7 +3081,7 @@ make_list_of_constant(int val,    /* the constant value */
 }
 
 /**
- * Return boolean indicating if expression e is a brace expression
+ * Return bool indicating if expression e is a brace expression
  */
 bool brace_expression_p(expression e)
 {
@@ -3089,9 +3089,9 @@ bool brace_expression_p(expression e)
     {
         entity f = call_function(syntax_call(expression_syntax(e)));
         if (ENTITY_BRACE_INTRINSIC_P(f))
-            return TRUE;
+            return true;
     }
-    return FALSE;
+    return false;
 }
 
 /* helper for brace_expression_to_statements */
@@ -3132,10 +3132,10 @@ list brace_expression_to_statements(entity arr, expression e) {
   list out = do_brace_expression_to_statements(arr,e,curr_index);
   return out;
 }
-/* This function returns TRUE if Reference r is scalar
+/* This function returns true if Reference r is scalar
 */
 
-boolean reference_scalar_p(reference r)
+bool reference_scalar_p(reference r)
 {
   entity v = reference_variable(r);
   assert(!reference_undefined_p(r) && r!=NULL && v!=NULL);

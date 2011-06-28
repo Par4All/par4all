@@ -1315,7 +1315,7 @@ call convert_constant(call c, basic to_basic)
 
 /*****************************************************************************
  * Cast an expression constant to the basic to_basic.
- * Return TRUE if OK
+ * Return true if OK
  */
 expression
 cast_constant(expression exp_constant, basic to_basic, type_context_p context)
@@ -1625,12 +1625,12 @@ check_if_basics_ok(list le, hash_table types, bool(*basic_ok)(basic))
   {
     if (!basic_ok(GET_TYPE(types, e)))
     {
-      return FALSE;
+      return false;
     }
   }
       , le);
 
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -1755,9 +1755,9 @@ arguments_are_something(
   basic b;
   int argnumber = 0;
   bool
-    okay = TRUE,
-    arg_double = FALSE,
-    arg_cmplx = FALSE;
+    okay = true,
+    arg_double = false,
+    arg_cmplx = false;
 
   list args = call_arguments(c);
 
@@ -1791,7 +1791,7 @@ arguments_are_something(
 				  "not typed '%s' used as a function.",
 				  what, entity_local_name(call_function(c)));
 	  context->number_of_error++;
-	  okay = FALSE;
+	  okay = false;
 	}
       else if (!((integer_ok && basic_int_p(b) && basic_int(b)==4) ||
 		 (longinteger_ok && basic_int_p(b) && basic_int(b)==6) ||
@@ -1852,7 +1852,7 @@ arguments_are_something(
 				  basic_to_string(b));
 	  }
 	  context->number_of_error++;
-	  okay = FALSE;
+	  okay = false;
 	}
 
       /* if TC_DCOMPLEX, maybe they should not be incompatible? */
@@ -1869,7 +1869,7 @@ arguments_are_something(
 			      "mixed complex and double arguments of '%s' forbidden",
 			      entity_local_name(call_function(c)));
       context->number_of_error++;
-      okay = FALSE;
+      okay = false;
     }
 
   return okay;
@@ -1879,52 +1879,52 @@ static bool
 arguments_are_IRDCS(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, TRUE);
+    (c, context, true, true, true, true, true, true, true, TC_DCOMPLEX, TC_LONGDCOMPLEX, false, true);
 }
 
 static bool
 arguments_are_IRDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, FALSE);
+    (c, context, true, true, true, true, true, true, true, TC_DCOMPLEX, TC_LONGDCOMPLEX, false, false);
 }
 static bool
 arguments_are_character(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE);
+    (c, context, false, false, false, false, false, false, false, false, false, false, true);
 }
 static bool
 arguments_are_logical(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, TRUE, FALSE);
+    (c, context, false, false, false, false, false, false, false, false, false, true, false);
 }
 static bool
 arguments_are_RD(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, false, false, false, true, true, true, false, false, false, false, false);
 }
 
 static bool
 arguments_are_IR(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, true, true, true, true, false, false, false, false, false, false, false);
 }
 static bool
 arguments_are_IRD(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE);
+    (c, context, true, true, true, true, true, true, false, false, false, false, false);
 }
 /**************************************************************************
  * Verify if all the arguments basic of function C are REAL, DOUBLE
  * and COMPLEX
  * According to (ANSI X3.9-1978 FORTRAN 77, Table 2 & 3, Page 6-5 & 6-6),
  * it is prohibited an arithetic operator operaters on
- * a pair of DOUBLE and COMPLEX, so that I return FALSE in that case.
+ * a pair of DOUBLE and COMPLEX, so that I return false in that case.
  *
  * PDSon: If there is no argument, I return TRUE
  */
@@ -1932,7 +1932,7 @@ static bool
 arguments_are_RDC(call c, type_context_p context)
 {
   return arguments_are_something
-    (c, context, FALSE, FALSE, FALSE, TRUE, TRUE, TRUE, TRUE, TC_DCOMPLEX, TC_LONGDCOMPLEX, FALSE, FALSE);
+    (c, context, false, false, false, true, true, true, true, TC_DCOMPLEX, TC_LONGDCOMPLEX, false, false);
 }
 
 /**************************************************************************
@@ -1958,13 +1958,13 @@ arguments_are_compatible(call c, hash_table types)
       b2 = GET_TYPE(types, e);
       if(!basic_compatible_p(b1, b2))
       {
-        return FALSE;
+        return false;
       }
     }
   }
       , call_arguments(c));
 
-  return TRUE;
+  return true;
 }
 
 /**************************************************************************
@@ -2113,7 +2113,7 @@ static basic
 typing_function_argument_type_to_return_type(call c, type_context_p context,
                                              basic from_type, basic to_type)
 {
-  bool check_arg = FALSE;
+  bool check_arg = false;
 
   /* INT */
   if(basic_int_p(from_type) && basic_int(from_type) == 4)
@@ -2180,7 +2180,7 @@ typing_function_argument_type_to_return_type(call c, type_context_p context,
   }
 
   /* ERROR: Invalide of argument type */
-  if(check_arg == FALSE)
+  if(check_arg == false)
   {
     add_one_line_of_comment((statement) stack_head(context->stats),
                             "Invalid argument(s) to '%s'!",
@@ -3018,7 +3018,7 @@ typing_implied_do(call c, type_context_p context)
 
 /******************* VERIFICATION SYNTAX FOR STATEMENTS ********************/
 /* Verify if an expression is a constant:
- * YES : return TRUE; otherwise, return FALSE
+ * YES : return true; otherwise, return FALSE
  */
 static bool
 is_constant(expression exp)
@@ -3026,13 +3026,13 @@ is_constant(expression exp)
   syntax s = expression_syntax(exp);
   if (!syntax_call_p(s))
   {
-    return FALSE;
+    return false;
   }
   return (entity_constant_p(call_function(syntax_call(s))));
 }
 
 /* Verify if an expression is a constant of basic b:
- * YES : return TRUE; otherwise, return FALSE
+ * YES : return true; otherwise, return FALSE
  */
 static bool
 is_constant_of_basic(expression exp, basic b)
@@ -3041,16 +3041,16 @@ is_constant_of_basic(expression exp, basic b)
   basic bb;
   if (!is_constant(exp))
   {
-    return FALSE;
+    return false;
   }
   call_type = entity_type(call_function(syntax_call(expression_syntax(exp))));
   return_type = functional_result(type_functional(call_type));
   bb = variable_basic(type_variable(return_type));
   if (basic_undefined_p(bb) || !basic_equal_p(b, bb))
   {
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 static basic
@@ -3171,7 +3171,7 @@ is_label_statement(expression exp)
   syntax s = expression_syntax(exp);
   if (!syntax_call_p(s))
   {
-    return FALSE;
+    return false;
   }
   c = syntax_call(s);
   fc = call_function(c);
@@ -3188,9 +3188,9 @@ is_label_specifier(string s, expression e, type_context_p context)
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -3205,9 +3205,9 @@ is_integer_specifier(string s, expression e, type_context_p context)
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -3221,9 +3221,9 @@ is_string_specifier(string s,expression e, type_context_p context)
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -3238,10 +3238,10 @@ is_label_integer_string_specifier(string s, expression e,
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
 
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -3257,9 +3257,9 @@ is_varibale_array_element_specifier(string s, expression e, basic b,
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 
 }
 /* This function verifies the unit specifier; that is integer positive
@@ -3278,10 +3278,10 @@ is_unit_specifier(expression exp, type_context_p context)
 
     /* Count the number of errors */
     context->number_of_error++;
-    return FALSE;
+    return false;
   }
 
-  return TRUE;
+  return true;
 }
 
 static bool
@@ -3462,7 +3462,7 @@ check_spec (string name,
     {
       if (check_contents(contents, context))
       {
-        return TRUE;
+        return true;
       }
       /* else ok */
     }
@@ -3472,10 +3472,10 @@ check_spec (string name,
                               "Specifier '%s' is not allowed", name);
       context->number_of_error++;
     }
-    return TRUE; /* checked! */
+    return true; /* checked! */
   }
 
-  return FALSE;
+  return false;
 }
 
 static bool
@@ -3570,11 +3570,11 @@ check_io_list(list /* of expression */ args,
       add_one_line_of_comment((statement) stack_head(ctxt->stats),
                               "Unexpected specifier '%s'", spec);
       ctxt->number_of_error++;
-      return FALSE;
+      return false;
     }
   }
 
-  return TRUE;
+  return true;
 }
 
 static basic
@@ -3583,13 +3583,13 @@ check_read_write(call c, type_context_p context)
   list args = call_arguments(c);
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+                true, true, true, true, true, true, true,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
 
   return basic_undefined;
 }
@@ -3600,13 +3600,13 @@ check_open(call c, type_context_p context)
   list args = call_arguments(c);
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, FALSE, FALSE,
+                true, true, true, true, true, true, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
   return basic_undefined;
 }
 
@@ -3617,13 +3617,13 @@ check_close(call c, type_context_p context)
 
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, true, false, false, false, false, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
   return basic_undefined;
 }
 
@@ -3634,13 +3634,13 @@ check_inquire(call c, type_context_p context)
 
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                TRUE, FALSE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+                true, false, true, true, true, true, true, true,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                TRUE, TRUE, TRUE, TRUE, TRUE, TRUE,
+                true, true, true, true, true, true,
                 /* UNFORMATTED NEXTREC */
-                TRUE, TRUE);
+                true, true);
 
   return basic_undefined;
 }
@@ -3651,13 +3651,13 @@ check_backspace(call c, type_context_p context)
   list args = call_arguments(c);
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
   return basic_undefined;
 }
 
@@ -3667,13 +3667,13 @@ check_endfile(call c, type_context_p context)
   list args = call_arguments(c);
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
   return basic_undefined;
 }
 
@@ -3683,13 +3683,13 @@ check_rewind(call c, type_context_p context)
   list args = call_arguments(c);
   check_io_list(args, context,
                 /* UNIT FMT REC IOSTAT ERR END IOLIST */
-                TRUE, FALSE, FALSE, TRUE, TRUE, FALSE, FALSE,
+                true, false, false, true, true, false, false,
                 /* FILE STATUS ACCESS FORM BLANK RECL EXIST OPENED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false, false, false,
                 /* NUMBER NAMED NAME SEQUENTIAL DIRECT FORMATTED */
-                FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+                false, false, false, false, false, false,
                 /* UNFORMATTED NEXTREC */
-                FALSE, FALSE);
+                false, false);
   return basic_undefined;
 }
 
@@ -5619,7 +5619,7 @@ bootstrap(string workspace)
 
   pips_debug(1, "bootstraping done\n");
 
-  return TRUE;
+  return true;
 }
 
 value

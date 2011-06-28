@@ -63,10 +63,10 @@
 #define COST_DATA "operation index memory trigo transcend overhead"
 
 /* defines for "complexity_fprint" calls */
-#define DO_PRINT_STATS TRUE                 
-#define DONT_PRINT_STATS FALSE           
-#define PRINT_LOCAL_NAMES TRUE
-#define PRINT_GLOBAL_NAMES FALSE
+#define DO_PRINT_STATS true                 
+#define DONT_PRINT_STATS false           
+#define PRINT_LOCAL_NAMES true
+#define PRINT_GLOBAL_NAMES false
 
 #define HASH_LOOP_INDEX ((char *) 4)     /* Used as `value' field in the hash-table */
 #define HASH_USER_VARIABLE ((char *) 8)  /* "hash_complexity_parameters"... useful? */
@@ -94,8 +94,8 @@
 
 
 /* defines for "expression_to_polynome" parameters */
-#define KEEP_SYMBOLS TRUE
-#define DONT_KEEP_SYMBOLS FALSE
+#define KEEP_SYMBOLS true
+#define DONT_KEEP_SYMBOLS false
 #define MAXIMUM_VALUE  1
 #define MINIMUM_VALUE -1
 #define EXACT_VALUE    0

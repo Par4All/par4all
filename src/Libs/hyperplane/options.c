@@ -57,7 +57,7 @@ char * argv[];
 {
     int errflg = 0;
     char * options = HYPERPLANE_OPTIONS;
-    bool truth = TRUE;
+    bool truth = true;
     char c;
     extern char * optarg;
     extern int optind;
@@ -66,8 +66,8 @@ char * argv[];
     (void) pips_flag_p(PRETTYPRINT_TRANSFORMER);
 
     /* set semantics default properties */
-    set_bool_property(PRETTYPRINT_EXECUTION_CONTEXT, TRUE);
-    set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+    set_bool_property(PRETTYPRINT_EXECUTION_CONTEXT, true);
+    set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
 
     /* check and set execution parameters; should be done with
        pips_flag_get() from the parameters package to avoid inconsistencies */
@@ -95,8 +95,8 @@ char * argv[];
 		set_bool_property(SEMANTICS_INEQUALITY_INVARIANT, truth);
 	    if(truth) {
 		/* implied flags, non resettable */
-		set_bool_property(SEMANTICS_FIX_POINT, TRUE);
-		set_bool_property(SEMANTICS_FLOW_SENSITIVE, TRUE);
+		set_bool_property(SEMANTICS_FIX_POINT, true);
+		set_bool_property(SEMANTICS_FLOW_SENSITIVE, true);
 	    }
 	    break;
 	case 'o':

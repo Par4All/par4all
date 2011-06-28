@@ -128,7 +128,7 @@ bool array_resizing_statistic(char *module_name)
   ifdebug(1)
     fprintf(stderr, " \n End array resizing statistic for %s \n", module_name);
   debug_off();
-  return TRUE;
+  return true;
 }
 
 

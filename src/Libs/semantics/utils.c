@@ -69,7 +69,7 @@ parametric_statement_feasible_p(statement s,
   return feasible_p;
 }
 
-/* Return FALSE if precondition of statement s is transformer_empty() */
+/* Return false if precondition of statement s is transformer_empty() */
 bool 
 statement_weakly_feasible_p(statement s)
 {
@@ -116,18 +116,18 @@ statement_strongly_feasible_p(statement s)
 bool
 empty_range_wrt_precondition_p(range r, transformer p)
 {
-  bool empty = FALSE;
+  bool empty = false;
 
-  empty = check_range_wrt_precondition(r, p, TRUE);
+  empty = check_range_wrt_precondition(r, p, true);
 
   return empty;
 }
 
 bool non_empty_range_wrt_precondition_p(range r, transformer p)
 {
-  bool non_empty = FALSE;
+  bool non_empty = false;
 
-  non_empty = check_range_wrt_precondition(r, p, FALSE);
+  non_empty = check_range_wrt_precondition(r, p, false);
 
   return non_empty;
 }
@@ -139,7 +139,7 @@ bool non_empty_range_wrt_precondition_p(range r, transformer p)
    check that its range is empty. */
 bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 {
-  bool check = TRUE;
+  bool check = true;
   expression lb_e = range_lower(r);
   expression ub_e = range_upper(r);
   expression incr_e = range_increment(r);
@@ -195,7 +195,7 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 	   * increments greater or equal to zero? Lesser
 	   * or equal to zero?
 	   */
-	  check = FALSE;
+	  check = false;
 	}
       }
       else {
@@ -218,7 +218,7 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 	   * increments greater or equal to zero? Lesser
 	   * or equal to zero?
 	   */
-	  check = FALSE;
+	  check = false;
 	}
       }
 
@@ -247,11 +247,11 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 	}
 
 	if(SC_EMPTY_P(s)) {
-	  check = TRUE;
+	  check = true;
 	}
 	else {
 	  sc_rm(s);
-	  check = FALSE;
+	  check = false;
 	}
       }
     }
@@ -264,7 +264,7 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
   else {
     debug(8, "check_range_wrt_precondition",
 	  "No decision can be made because the increment sign is unknown\n");
-    check = FALSE;
+    check = false;
   }
 
   debug(8, "check_range_wrt_precondition",
@@ -281,9 +281,9 @@ bool check_range_wrt_precondition(range r, transformer p, bool check_empty)
 bool
 condition_true_wrt_precondition_p(expression c, transformer p)
 {
-  bool empty = FALSE;
+  bool empty = false;
 
-  empty = check_condition_wrt_precondition(c, p, TRUE);
+  empty = check_condition_wrt_precondition(c, p, true);
 
   return empty;
 }
@@ -291,9 +291,9 @@ condition_true_wrt_precondition_p(expression c, transformer p)
 bool
 condition_false_wrt_precondition_p(expression c, transformer p)
 {
-  bool non_empty = FALSE;
+  bool non_empty = false;
 
-  non_empty = check_condition_wrt_precondition(c, p, FALSE);
+  non_empty = check_condition_wrt_precondition(c, p, false);
 
   return non_empty;
 }
@@ -301,18 +301,18 @@ condition_false_wrt_precondition_p(expression c, transformer p)
 bool
 check_condition_wrt_precondition(expression c, transformer pre, bool check_true)
 {
-  bool check = TRUE;
+  bool check = true;
   transformer twc = transformer_dup(pre);
 
   pips_debug(8,	"begins for check %s\n",
 	bool_to_string(check_true));
 
   if(check_true) {
-    twc = transformer_add_condition_information(twc, c, pre, FALSE);
+    twc = transformer_add_condition_information(twc, c, pre, false);
   }
   else {
     /* Check that is is always false in a store s such that p(s) */
-    twc = transformer_add_condition_information(twc, c, pre, TRUE);
+    twc = transformer_add_condition_information(twc, c, pre, true);
   }
   check = transformer_empty_p(twc);
 
@@ -381,7 +381,7 @@ expression_and_precondition_to_integer_interval(expression e,
 
 }
 
-/* Could be used for boolean expressions too? Extended to any kind of expression? */
+/* Could be used for bool expressions too? Extended to any kind of expression? */
 void integer_expression_and_precondition_to_integer_interval(expression e,
 							     transformer p,
 							     int * plb,
@@ -389,7 +389,7 @@ void integer_expression_and_precondition_to_integer_interval(expression e,
 {
   type t = expression_to_type(e);
   entity tmp = make_local_temporary_value_entity(t);
-  transformer et = integer_expression_to_transformer(tmp, e, p, TRUE);
+  transformer et = integer_expression_to_transformer(tmp, e, p, true);
 
   /* If expression e is transformer-wise side-effect free (i.e. the ABSTRACT store is not modified)*/
   if(ENDP(transformer_arguments(et))) {

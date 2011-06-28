@@ -261,7 +261,7 @@ fuse_sequences_in_unstructured(statement s)
     hash_table controls_to_fuse_with_their_successors =
 	hash_table_make(hash_pointer, 0);
 
-    boolean aggressive_restructure_p = get_bool_property("FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL");
+    bool aggressive_restructure_p = get_bool_property("FUSE_CONTROL_NODES_WITH_COMMENTS_OR_LABEL");
 
     ifdebug(4) {
       pips_debug(4, "Begin with implicit target labels:");
@@ -485,7 +485,7 @@ fuse_sequences_in_unstructured(statement s)
 /* Take the entry node out of the unstructured if it is not useful, such
    as not an IF or a node without predecessor.
 
-   Return TRUE if there is still an unstructured, FALSE if the
+   Return true if there is still an unstructured, false if the
    unstructured has been replaced by a structured statement.
 
    If the first node is taked out, then * new_unstructured_statement
@@ -505,7 +505,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 	|| gen_length(control_predecessors(entry_node)) > 0)
 	/* Well, this node is useful here since it is an unstructured IF
 	   or there is a GOTO on it. */
-	return TRUE;
+	return true;
 
     if (entry_node_successors_length == 0) {
 	/* In fact the unstructured has only one control node! Transform
@@ -526,7 +526,7 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 	control_statement(entry_node) = statement_undefined;
 	free_instruction(i);
 	/* No longer unstructured: */
-	return FALSE;
+	return false;
     }
     else {
 	/* Take out the entry node: */
@@ -544,14 +544,14 @@ take_out_the_entry_node_of_the_unstructured(statement s,
 
 	discard_a_control_sequence_without_its_statements(entry_node,
 							  entry_node);
-	return TRUE;
+	return true;
     }
 }
 
 
 /* If the unstructured begin and/or end with a sequence, move the
    sequence(s) out of the unstructured and return a new statement with
-   an equivalent but more structured code. It returns TRUE if the
+   an equivalent but more structured code. It returns true if the
    unstructured has disappeared and else FALSE.
 
    If the unstructured is still here, the statement directly owning it
@@ -652,7 +652,7 @@ try_to_structure_the_unstructured(statement s,
 
          /* Warn that the unstructured no longer exist: */
          *new_unstructured_statement = statement_undefined;
-         return TRUE;
+         return true;
       }
       else {
          /* There is still an unstructured, but with one pre- or
@@ -699,14 +699,14 @@ try_to_structure_the_unstructured(statement s,
          statement_instruction(s) =
             make_instruction_block(list_of_the_new_statements);
 
-         return FALSE;
+         return false;
       }
    }
    /* By default the unstructured is not changed, thus return the
       statement owning it: */
    *new_unstructured_statement = s;
 
-   return FALSE;
+   return false;
 }
 
 
@@ -929,7 +929,7 @@ static bool
 restructure_if_then_else(statement s)
 {
     list blocs = NIL;
-    bool code_modified_p = FALSE;
+    bool code_modified_p = false;
     unstructured u = instruction_unstructured(statement_instruction(s));
     /* The entry point of the unstructured: */
     control entry_node = unstructured_control(u);
@@ -1024,7 +1024,7 @@ restructure_if_then_else(statement s)
 	    /* Hidden in a function to ease debugging... */
 	    restructure_this_test(c, t);
 	    /* The code has been modified: */
-	    code_modified_p = TRUE;
+	    code_modified_p = true;
 	},
 	structured_tests);
 
@@ -1198,7 +1198,7 @@ recover_structured_while(unstructured u) {
     statement w = make_whileloop_statement(cond,
 					   body,
 					   line_number,
-					   FALSE);
+					   false);
     control_statement(entry_node) = w;
     /* Remove the test control node after having protected recycled old
        stuff from being discarded: */
@@ -1300,7 +1300,7 @@ recover_structured_while(unstructured u) {
     statement w = make_whileloop_statement(cond,
 					   body,
 					   line_number,
-					   TRUE);
+					   true);
     // Remove the test node and replace it by the "while":
     test_condition(t) = expression_undefined;
     free_statement(control_statement(entry_node));
@@ -1433,8 +1433,8 @@ unspaghettify_statement(statement mod_stmt)
 void
 simple_restructure_statement(statement mod_stmt)
 {
-  currently_apply_test_restructuring = FALSE;
-  currently_apply_recursive_decomposition = FALSE;
+  currently_apply_test_restructuring = false;
+  currently_apply_recursive_decomposition = false;
 
   unspaghettify_or_restructure_statement(mod_stmt);
 }
@@ -1452,7 +1452,7 @@ unspaghettify(char * mod_name)
    statement mod_stmt;
 
    /* Get the true resource, not a copy. */
-   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
    set_current_module_statement(mod_stmt);
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
@@ -1468,7 +1468,7 @@ unspaghettify(char * mod_name)
    reset_current_module_statement();
    reset_current_module_entity();
 
-   return TRUE;
+   return true;
 }
 
 
@@ -1476,8 +1476,8 @@ unspaghettify(char * mod_name)
 void
 restructure_statement(statement mod_stmt)
 {
-   currently_apply_test_restructuring = TRUE;
-   currently_apply_recursive_decomposition = TRUE;
+   currently_apply_test_restructuring = true;
+   currently_apply_recursive_decomposition = true;
 
    unspaghettify_or_restructure_statement(mod_stmt);
 }
@@ -1495,7 +1495,7 @@ restructure_control(char * mod_name)
    statement mod_stmt;
 
    /* Get the true resource, not a copy. */
-   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+   mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
    set_current_module_statement(mod_stmt);
 
    set_current_module_entity(local_name_to_top_level_entity(mod_name));
@@ -1511,5 +1511,5 @@ restructure_control(char * mod_name)
    reset_current_module_statement();
    reset_current_module_entity();
 
-   return TRUE;
+   return true;
 }

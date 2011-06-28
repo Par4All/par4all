@@ -50,9 +50,9 @@
 
 typedef struct { list old, new; } entity_lists;
 
-static boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
+static bool  rw_effect_on_variable_p(list efs, entity var, bool b)
 {
-  boolean readeff = FALSE;
+  bool readeff = false;
   list le = NIL;
 			    
   for( le =efs ; !ENDP(le ) && !readeff ; POP(le) ) {
@@ -62,20 +62,20 @@ static boolean  rw_effect_on_variable_p(list efs, entity var, boolean b)
     if ((v==var) &&  
 	((b && action_read_p(effect_action(e))) || 
 	 (!b && action_write_p(effect_action(e)))))
-	readeff= TRUE;
+	readeff= true;
   }
   return readeff;
 }  
 
-static boolean  entity_in_call_arguments_p(entity ent,  call c)
+static bool  entity_in_call_arguments_p(entity ent,  call c)
 {
   list le=call_arguments(c);
-  boolean seen=FALSE;
+  bool seen=false;
   for( ; !ENDP(le ) && !seen ; POP(le) ) {
     expression e= EXPRESSION(CAR(le));
     if (expression_reference_p(e) 
 	&& (reference_variable(expression_reference(e)) == ent))
-      seen = TRUE;
+      seen = true;
   }
   return seen; 
 }
@@ -99,14 +99,14 @@ static void substitute_entity_in_call_arguments(entity old, entity new, call c)
 static void freeze_variables_in_statement(statement s, entity_lists * el)
 {
   list efs = load_proper_rw_effects_list(s);
-  boolean read_eff_on_var_already_seen = FALSE;
-  boolean READ_EFF = TRUE;
+  bool read_eff_on_var_already_seen = false;
+  bool READ_EFF = true;
   list new_entl = el->new;
   list old_entl = el->old;
   list first_st = NIL;
   list  last_st = NIL;
-  boolean st_to_insert_before= FALSE;
-  boolean one_entity_in_args = FALSE;
+  bool st_to_insert_before= false;
+  bool one_entity_in_args = false;
   if (statement_call_p(s))
   {  
     entity lb = statement_label(s); 
@@ -117,7 +117,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
     { 
       entity ent = ENTITY(CAR(old_entl)); 
       entity new_ent  = ENTITY(CAR(new_entl));
-      boolean this_entity_in_args = FALSE;
+      bool this_entity_in_args = false;
       string strg = 
 	strdup(concatenate("'Frozen variable ", 
 			   entity_local_name(ent), 
@@ -128,7 +128,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 	(this_entity_in_args =
 	 entity_in_call_arguments_p(ent, 
 		     instruction_call(statement_instruction(s))));
-      read_eff_on_var_already_seen=FALSE;
+      read_eff_on_var_already_seen=false;
       if (this_entity_in_args) {
 	MAP(EFFECT, eff, {
 	  reference r = effect_any_reference(eff);
@@ -151,7 +151,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 		s1=instruction_to_statement(i1);
 		statement_label(s)= entity_empty_label();
 		first_st=CONS(STATEMENT,s1, first_st);
-		st_to_insert_before = TRUE;
+		st_to_insert_before = true;
 	      }
 	      /* subtitute ent with new_ent in assignment or call */
 	      c1 = instruction_call(statement_instruction(s));
@@ -171,7 +171,7 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
 	      s1 =test_to_statement(t1);
 	      last_st=CONS(STATEMENT,s1, last_st);	    
 	    }
-	    else  read_eff_on_var_already_seen = TRUE;
+	    else  read_eff_on_var_already_seen = true;
 	  } 
 	}, efs);
       }
@@ -179,33 +179,33 @@ static void freeze_variables_in_statement(statement s, entity_lists * el)
     if (one_entity_in_args){
       if (st_to_insert_before) {
 	MAPL(st, {
-	  insert_statement(s, STATEMENT(CAR(st)),TRUE);
+	  insert_statement(s, STATEMENT(CAR(st)),true);
 	  if (ENDP(CDR(st))) statement_label(STATEMENT(CAR(st)))=lb;
 	}, first_st);
       }
       MAPL(st, {
-	insert_statement(s, STATEMENT(CAR(st)),FALSE);
+	insert_statement(s, STATEMENT(CAR(st)),false);
       }, last_st);
     }
     
   }
 }
 
-static boolean initialized_variable_p(entity e)
+static bool initialized_variable_p(entity e)
 {
   return variable_static_p(e);
 }
 
-boolean freeze_variables(char *mod_name) 
+bool freeze_variables(char *mod_name) 
 {
   entity module;
   list frozen_entities = NIL;
   list cumu_eff=NIL;
   string names="";
   string rep="";
-  boolean WRITE_EFF = FALSE;
+  bool WRITE_EFF = false;
   entity_lists new_le = {NIL,NIL};
-  statement mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  statement mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   /* INITIALISATION */
   if (!statement_undefined_p(mod_stmt)) {
     set_current_module_statement(mod_stmt);
@@ -214,18 +214,18 @@ boolean freeze_variables(char *mod_name)
     set_proper_rw_effects((statement_effects)
 			  db_get_memory_resource(DBR_PROPER_EFFECTS,
 						 mod_name,
-						 TRUE));
+						 true));
     set_cumulated_rw_effects((statement_effects)
 			     db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 					       mod_name,
-						    TRUE));
+						    true));
     
     cumu_eff = load_cumulated_rw_effects_list(mod_stmt);
     /* USER REQUEST */
     rep = user_request("Which variables do you want to freeze?\n",mod_name);
     if (rep[0] == '\0') {
       user_log("No variable to freeze\n");
-      return FALSE;
+      return false;
     }
     else names=rep;
     frozen_entities = string_to_entity_list(mod_name,names);
@@ -272,6 +272,6 @@ boolean freeze_variables(char *mod_name)
     reset_current_module_statement();
     reset_current_module_entity();
   }
-  return (TRUE);
+  return (true);
   
 }

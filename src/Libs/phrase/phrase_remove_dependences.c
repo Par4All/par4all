@@ -64,11 +64,11 @@ static statement gBody;
 
 static list gLConflicts;
 
-static boolean vect_same_variables_p(Pvecteur v1, Pvecteur v2)
+static bool vect_same_variables_p(Pvecteur v1, Pvecteur v2)
 {
     Pvecteur ev;
 
-    bool sameVars = TRUE;
+    bool sameVars = true;
 
     for(ev = v1; !VECTEUR_NUL_P(ev); ev = ev->succ)
       {
@@ -76,7 +76,7 @@ static boolean vect_same_variables_p(Pvecteur v1, Pvecteur v2)
 	  continue;
 
 	if(!vect_contains_variable_p(v2, vecteur_var(ev)))
-	  sameVars = FALSE;
+	  sameVars = false;
       }
 
     for(ev = v2; !VECTEUR_NUL_P(ev); ev = ev->succ)
@@ -85,7 +85,7 @@ static boolean vect_same_variables_p(Pvecteur v1, Pvecteur v2)
 	  continue;
 
 	if(!vect_contains_variable_p(v1, vecteur_var(ev)))
-	  sameVars = FALSE;
+	  sameVars = false;
       }
 
     return sameVars;
@@ -93,7 +93,7 @@ static boolean vect_same_variables_p(Pvecteur v1, Pvecteur v2)
 
 static bool loop_index_in_several_indices(entity index, reference ref)
 {
-  bool loopIndFound = FALSE;
+  bool loopIndFound = false;
 
   MAP(EXPRESSION, ind,
   {
@@ -108,23 +108,23 @@ static bool loop_index_in_several_indices(entity index, reference ref)
 	if((coeff != 0) &&
 	   (!loopIndFound))
 	  {
-	    loopIndFound = TRUE;
+	    loopIndFound = true;
 	  }
 	else if((coeff != 0) &&
 		loopIndFound)
 	  {
-	    return TRUE;
+	    return true;
 	  }
 
       }
     else
       {
-	return TRUE;
+	return true;
       }
 
   }, reference_indices(ref));
 
-  return FALSE;
+  return false;
 }
 
 static int get_const_off(entity index, reference ref)
@@ -177,13 +177,13 @@ static bool write_conf_on_ref(reference ref)
 	sinkRef == ref))
       {
 	printf("write ref\n");
-	return TRUE;
+	return true;
       }
         
   }, gLConflicts);
 
   printf("not write ref\n");
-  return FALSE;
+  return false;
 }
 
 static void phrase_check_reference(reference ref)
@@ -193,7 +193,7 @@ static void phrase_check_reference(reference ref)
       return;
     }
 
-  bool bRefPut = FALSE;
+  bool bRefPut = false;
 
   list lIndRef = reference_indices_entity_list(ref);
 
@@ -214,7 +214,7 @@ static void phrase_check_reference(reference ref)
       return;
     }
 
-  bool bReplaceKeyRef = FALSE;
+  bool bReplaceKeyRef = false;
 
   HASH_MAP(par1, par2,
   {
@@ -227,7 +227,7 @@ static void phrase_check_reference(reference ref)
 	continue;
       }
 
-    bool success = TRUE;
+    bool success = true;
 
     list pInd2 = reference_indices(ref);
     expression ind2;
@@ -251,25 +251,25 @@ static void phrase_check_reference(reference ref)
 
 	      if(diff > 0)
 		{
-		  bReplaceKeyRef = TRUE;
+		  bReplaceKeyRef = true;
 		}
 
 	      if((diff >= 10) ||
 		 (diff <= -10))
 		{
-		  success = FALSE;
+		  success = false;
 		  break;
 		}
 	    }
 	  else
 	    {
-	      success = FALSE;
+	      success = false;
 	      break;
 	    }
 	}
       else
 	{
-	  success = FALSE;
+	  success = false;
 	  break;
 	}
 
@@ -281,7 +281,7 @@ static void phrase_check_reference(reference ref)
       {
 	int refOff = get_const_off(gIndex, ref);
 
-	bool refPut = FALSE;
+	bool refPut = false;
 
 	MAP(REFERENCE, curRef,
 	{
@@ -290,7 +290,7 @@ static void phrase_check_reference(reference ref)
 	  if(refOff > curOff)
 	    {
 	      lRef = gen_insert_before(ref, curRef, lRef);
-	      refPut = TRUE;
+	      refPut = true;
 	      break;
 	    }
 
@@ -312,7 +312,7 @@ static void phrase_check_reference(reference ref)
 	    hash_put(gRefTolRef, ref, lRef);
 	  }
 
-	bRefPut = TRUE;
+	bRefPut = true;
 
 	break;
       }
@@ -608,14 +608,14 @@ bool phrase_remove_dependences(string module_name)
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   debug_on("SIMD_LOOP_CONST_ELIM_SCALAR_EXPANSION_DEBUG_LEVEL");
 
-  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+  graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
 
   gLConflicts = NIL;
 
@@ -654,5 +654,5 @@ bool phrase_remove_dependences(string module_name)
   reset_current_module_statement();
   reset_cumulated_rw_effects();
 
-  return TRUE;
+  return true;
 }

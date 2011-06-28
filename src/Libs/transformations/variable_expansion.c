@@ -97,7 +97,7 @@ static bool perform_reference_expansion(reference r,scalar_expansion_context *ct
       pips_debug(9, "\n");
     }
   }
-  return TRUE;
+  return true;
 }
 
 static
@@ -262,7 +262,7 @@ static bool scalar_expansion(char *module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity(module_name) );
-    set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     debug_on("SCALAR_EXPANSION_DEBUG_LEVEL");
     pips_debug(1, "begin\n");
 

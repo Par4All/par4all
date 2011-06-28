@@ -57,14 +57,14 @@
 
 list
 ReferenceUnion(list l1, list l2,
-	       boolean (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
+	       bool (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
 {
     return gen_nconc(l1,l2);
 }
 
 list
 ReferenceTestUnion(list l1, list l2,
-		   boolean (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
+		   bool (*union_combinable_p)(effect, effect) __attribute__ ((unused)))
 {
     list l_res;
 
@@ -84,7 +84,7 @@ ReferenceTestUnion(list l1, list l2,
  */
 list 
 EffectsMayUnion(list l1, list l2,
-		     boolean (*union_combinable_p)(effect, effect))
+		     bool (*union_combinable_p)(effect, effect))
 {
     list lr;
 
@@ -104,7 +104,7 @@ EffectsMayUnion(list l1, list l2,
  */
 list 
 ProperEffectsMustUnion(list l1, list l2,
-		      boolean (*union_combinable_p)(effect, effect)) 
+		      bool (*union_combinable_p)(effect, effect)) 
 {
     list lr;
 
@@ -123,7 +123,7 @@ ProperEffectsMustUnion(list l1, list l2,
  */
 list 
 EffectsMustUnion(list l1, list l2,
-		      boolean (*union_combinable_p)(effect, effect)) 
+		      bool (*union_combinable_p)(effect, effect)) 
 {
     list lr;
 
@@ -330,7 +330,7 @@ effect_inf_difference(effect eff1 __attribute__ ((unused)),
  */
 list 
 EffectsSupDifference(list l1, list l2,
-			  boolean (*difference_combinable_p)(effect, effect))
+			  bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -354,7 +354,7 @@ EffectsSupDifference(list l1, list l2,
  */
 list 
 EffectsInfDifference(list l1, list l2,
-			  boolean (*difference_combinable_p)(effect, effect))
+			  bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -388,7 +388,7 @@ effect proper_to_summary_simple_effect(effect eff)
     //type ut = ultimate_type(entity_type(e));
     list inds = reference_indices(r);
     list cind = list_undefined;
-    bool may_p = FALSE;
+    bool may_p = false;
 
     ifdebug(8) {
       pips_debug(8, "Proper effect %p with reference %p: %s\n", eff, r,
@@ -410,7 +410,7 @@ effect proper_to_summary_simple_effect(effect eff)
 	    if (!(expression_reference_p(se) && 
 		  entity_field_p(expression_variable(se))))
 	    {
-	      may_p = TRUE;
+	      may_p = true;
 	      free_expression(se);
 	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
 	    }

@@ -133,7 +133,7 @@ static void add_interprocedural_value_entities(entity e)
 	    add_new_value(e);
 	    add_old_value(e);
 	    add_intermediate_value(e);
-	    add_or_kill_equivalenced_variables(e, FALSE);
+	    add_or_kill_equivalenced_variables(e, false);
 	}
 	else {
 	    add_new_alias_value(e,a);
@@ -152,7 +152,7 @@ static void add_interprocedural_new_value_entity(entity e)
 	if((a=value_alias(e))==entity_undefined){
 	    add_new_value(e);
 	    /* CA: information on aliasing variables erased*/
-	    add_or_kill_equivalenced_variables(e,TRUE);
+	    add_or_kill_equivalenced_variables(e,true);
 	}
 	else {
 	    add_new_alias_value(e,a);
@@ -166,7 +166,7 @@ static void add_intraprocedural_value_entities_unconditionally(entity e)
   add_new_value(e);
   add_local_old_value(e);
   add_local_intermediate_value(e);
-  add_or_kill_equivalenced_variables(e, FALSE);
+  add_or_kill_equivalenced_variables(e, false);
 }
 
 /* void add_intraprocedural_value_entities(entity e)
@@ -206,7 +206,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 
   if(storage_ram_p(s)) {
     list local_shared = ram_shared(storage_ram(s));
-    bool array_equivalenced = FALSE;
+    bool array_equivalenced = false;
     entity sec = ram_section(storage_ram(s));
     type t = entity_type(sec);
     list ce = list_undefined;
@@ -235,7 +235,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 			  "analyzed type %s or with array variable\n",
 			  entity_name(e), entity_name(e), entity_name(eq),
 			  type_to_string(entity_type(eq)));
-	array_equivalenced = TRUE;
+	array_equivalenced = true;
 	break;
       }
 
@@ -247,7 +247,7 @@ void add_or_kill_equivalenced_variables(entity e, bool readonly)
 			    entity_name(e), type_to_string(entity_type(e)),
 			    entity_name(e), entity_name(eq),
 			    type_to_string(entity_type(eq)));
-	  array_equivalenced = TRUE;
+	  array_equivalenced = true;
 	  break;
 	}
       }
@@ -424,11 +424,11 @@ void add_implicit_interprocedural_write_effects(entity al, list el)
  * set_current_module_statement( (statement)
  * 			      db_get_memory_resource(DBR_CODE,
  * 						     module_name,
- * 						     TRUE) );
+ * 						     true) );
  * set_cumulated_rw_effects((statement_effects)
  * 			 db_get_memory_resource(DBR_CUMULATED_EFFECTS,
  * 						module_name,
- * 						TRUE));
+ * 						true));
  * 
  * (that's it, but we musn't forget to reset everything
  * after the call to "module_to_value_mappings", as below)
@@ -556,7 +556,7 @@ void module_to_value_mappings(entity m)
 	  add_intraprocedural_value_entities_unconditionally(e);
 	  /* A stronger call to the same subroutine is included in
 	   * the previous call:
-	   * add_or_kill_equivalenced_variables(e, TRUE);
+	   * add_or_kill_equivalenced_variables(e, true);
 	   */
 	}
       }
@@ -623,7 +623,7 @@ bool value_mappings_compatible_vector_p(Pvecteur v)
 
       /* The variable may denote a constant with compatible type */
       if(entity_constant_p(e) && !analyzed_constant_p(e)) {
-	return FALSE;
+	return false;
       }
 
       /* or a temporary variable */
@@ -638,16 +638,16 @@ bool value_mappings_compatible_vector_p(Pvecteur v)
 	if(new_v != entity_undefined)
 	  vecteur_var(v) = (Variable) new_v;
 	else
-	  return FALSE;
+	  return false;
       }
 
       /* Or the vector cannot be used in the semantics analysis */
       else {
-	return FALSE;
+	return false;
       }
     }
   }
-  return TRUE;
+  return true;
 }
 
 list variables_to_values(list list_mod)

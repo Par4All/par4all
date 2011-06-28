@@ -2199,14 +2199,14 @@ bool points_to_analysis(char * module_name) {
 
   pips_debug(1, "considering module %s\n", module_name);
   set_current_module_statement((statement) db_get_memory_resource(DBR_CODE,
-								  module_name, TRUE));
+								  module_name, true));
   module_stat = get_current_module_statement();
   statement_consistent_p(module_stat);
 
   /* Get the summary_intraprocedural_points_to resource.*/
   points_to_list summary_pts_to_list =
     (points_to_list) db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST,
-					    module_name, TRUE);
+					    module_name, true);
   /* Transform the list of summary_points_to in set of points-to.*/
     points_to_list_consistent_p(summary_pts_to_list);
   //pts_to_list = gen_points_to_list_cons(summary_pts_to_list, pts_to_list);
@@ -2224,7 +2224,7 @@ bool points_to_analysis(char * module_name) {
   reset_effects_private_current_context_stack();
   debug_off();
    
-  bool good_result_p = TRUE;
+  bool good_result_p = true;
   return (good_result_p);
 
 }

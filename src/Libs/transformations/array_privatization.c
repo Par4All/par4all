@@ -72,20 +72,20 @@ GENERIC_LOCAL_FUNCTION(copy_out_effects, statement_effects)
 DEFINE_LOCAL_STACK(current_stmt, statement)
 
 /* what sort of privatization? */
-static bool store_as_regions = FALSE;
-static bool store_as_loop_locals = TRUE;
-static bool privatize_sections = FALSE;
-static bool copy_in = FALSE;
-static bool copy_out = FALSE;
+static bool store_as_regions = false;
+static bool store_as_loop_locals = true;
+static bool privatize_sections = false;
+static bool copy_in = false;
+static bool copy_out = false;
 
 void array_privatization_error_handler()
 {
     error_reset_current_stmt_stack();
-    store_as_regions = FALSE;
-    store_as_loop_locals = TRUE;
-    privatize_sections = FALSE;
-    copy_in = FALSE;
-    copy_out = FALSE;
+    store_as_regions = false;
+    store_as_loop_locals = true;
+    privatize_sections = false;
+    copy_in = false;
+    copy_out = false;
 }
 
 
@@ -104,11 +104,11 @@ static bool privatizer(char *module_name);
  */
 bool array_privatizer(char *module_name)
 {
-    store_as_regions = FALSE;
-    store_as_loop_locals = TRUE;
-    privatize_sections = FALSE;
-    copy_in = FALSE;
-    copy_out = FALSE;
+    store_as_regions = false;
+    store_as_loop_locals = true;
+    privatize_sections = false;
+    copy_in = false;
+    copy_out = false;
     return( privatizer(module_name) );
 }
 
@@ -121,10 +121,10 @@ bool array_privatizer(char *module_name)
  */
 bool array_section_privatizer(char *module_name)
 {
-    store_as_regions = TRUE;
-    store_as_loop_locals = TRUE;
-    privatize_sections = TRUE;
-    copy_in = FALSE;
+    store_as_regions = true;
+    store_as_loop_locals = true;
+    privatize_sections = true;
+    copy_in = false;
     copy_out = get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT");
     return( privatizer(module_name) );    
 }
@@ -156,32 +156,32 @@ static bool privatizer(char *module_name)
 
 
     /* set and get the current properties concerning regions */
-    set_bool_property("MUST_REGIONS", TRUE);
-    set_bool_property("EXACT_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
+    set_bool_property("EXACT_REGIONS", true);
     get_regions_properties();
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
     
     /* Get the transformers and preconditions of the module. (Necessary ?) */
     set_transformer_map( (statement_mapping) 
-	db_get_memory_resource(DBR_TRANSFORMERS, module_name, TRUE) );
+	db_get_memory_resource(DBR_TRANSFORMERS, module_name, true) );
     set_precondition_map( (statement_mapping) 
-	db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+	db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
 
     /* Get the READ, WRITE, IN and OUT regions of the module */
     set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_REGIONS, module_name, true));
     set_invariant_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_INV_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_INV_REGIONS, module_name, true));
     set_in_effects((statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
     set_invariant_in_effects((statement_effects) 
-	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_INV_IN_REGIONS, module_name, true));
     set_out_effects((statement_effects) 
-	db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+	db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
     set_methods_for_convex_effects();
 
@@ -191,7 +191,7 @@ static bool privatizer(char *module_name)
     module = get_current_module_entity();
 
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE) );
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true) );
     module_to_value_mappings(module);
 
 
@@ -244,7 +244,7 @@ static bool privatizer(char *module_name)
     }
     free_value_mappings();
 
-    return(TRUE);
+    return(true);
 }
 
 
@@ -320,7 +320,7 @@ statement s;
     
     current_stmt_push(s);
     pips_debug(1, "end\n");
-    return(TRUE);
+    return(true);
 }
 
 static void private_regions_of_statement(s)
@@ -426,8 +426,8 @@ loop l;
 	sc_loop_prec->base = BASE_NULLE;
 	sc_creer_base(sc_loop_prec);
 	l_loc_i_prime = 
-	    array_regions_sc_append(l_loc_i_prime, sc_loop_prec, FALSE);
-	l_loc_i = array_regions_sc_append(l_loc_i, sc_loop_prec, FALSE);
+	    array_regions_sc_append(l_loc_i_prime, sc_loop_prec, false);
+	l_loc_i = array_regions_sc_append(l_loc_i, sc_loop_prec, false);
 	sc_rm(sc_loop_prec);
 	
 	/* LOC_I(i) = LOC(i, i'<i) inter LOC(i', i'<i) */
@@ -454,7 +454,7 @@ loop l;
 	/* first proj_i'[IN(i')] */
 	sc_loop_prec = sc_loop_proper_precondition(l);
 	array_regions_variable_rename(l_in, i, i_prime);	
-	l_in = array_regions_sc_append(l_in, sc_loop_prec, FALSE);
+	l_in = array_regions_sc_append(l_in, sc_loop_prec, false);
 	sc_rm(sc_loop_prec);
 	project_regions_along_loop_index(l_in, i_prime, loop_range(l));
 	
@@ -495,14 +495,14 @@ loop l;
 	while(!ENDP(l_out_priv_tmp))
 	{
 	    list l_cand_tmp;
-	    boolean found;
+	    bool found;
 	    
 	    region reg = EFFECT(CAR(l_out_priv_tmp));
 	    l_out_priv_tmp = CDR(l_out_priv_tmp);
 	    if (!region_exact_p(reg)) 
 	    { 
 		l_cand_tmp = l_cand;
-		found = FALSE;
+		found = false;
 		/* remove the corresponding candidate from l_cand */
 		while(!found && !ENDP(l_cand_tmp))
 		{
@@ -514,7 +514,7 @@ loop l;
 			/* a` optimiser */
 			gen_remove(&l_cand, reg_cand);
 			region_free(reg_cand);
-			found = TRUE;
+			found = true;
 		    }
 		}
 		gen_remove(&l_out_priv, reg);
@@ -547,7 +547,7 @@ loop l;
 	entity ccommon;
 	list l_tmp;
 	list l_com_ent;
-	bool found= FALSE; 
+	bool found= false; 
 
 	l_cand_tmp = CDR(l_cand_tmp);
 	    
@@ -565,7 +565,7 @@ loop l;
 		if (strcmp(entity_module_name(com_ent),
 			   module_local_name(get_current_module_entity()))==0)
 		{
-		    found = TRUE;
+		    found = true;
 		}
 	    }
 	    if (!found)	    
@@ -633,7 +633,7 @@ loop l;
     
     pips_debug(1, "end\n");
     
-    return(TRUE);
+    return(true);
 }
 
 
@@ -650,18 +650,18 @@ print_code_privatized_regions(string module_name)
     priv_tmp = get_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES");
     scal_tmp = get_bool_property("PRETTYPRINT_SCALAR_REGIONS");
 
-    set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
-    set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", TRUE);
-    set_bool_property("PRETTYPRINT_SCALAR_REGIONS", TRUE);
+    set_bool_property("PRETTYPRINT_BLOCKS", true);
+    set_bool_property("PRETTYPRINT_ALL_PRIVATE_VARIABLES", true);
+    set_bool_property("PRETTYPRINT_SCALAR_REGIONS", true);
 
     /* DO IT!
      */
-    add_a_generic_prettyprint(DBR_COPY_OUT_REGIONS, FALSE,
+    add_a_generic_prettyprint(DBR_COPY_OUT_REGIONS, false,
 			      text_copyinout_array_regions,
 			      print_copyinout_regions,
 			      (generic_attachment_function) abort);
 
-    add_a_generic_prettyprint(DBR_PRIVATIZED_REGIONS, FALSE,
+    add_a_generic_prettyprint(DBR_PRIVATIZED_REGIONS, false,
 			      text_private_array_regions,
 			      print_private_regions,
 			      (generic_attachment_function) abort);
@@ -724,7 +724,7 @@ reference_filter(reference ref)
     if (reference_variable(ref) == e_old)
 	reference_variable(ref) = e_new;
 
-    return(TRUE);
+    return(true);
 }
 
 static void 
@@ -785,7 +785,7 @@ declarations_privatizer(char *mod_name)
 
     if (get_bool_property("ARRAY_SECTION_PRIV_COPY_OUT"))
     {
-	pips_user_warning("property ARRAY_SECTION_PRIV_COPY_OUT set to TRUE ;" 
+	pips_user_warning("property ARRAY_SECTION_PRIV_COPY_OUT set to true ;" 
 			  " COPY OUT not implemented.\n" ); 
     }
 
@@ -796,18 +796,18 @@ declarations_privatizer(char *mod_name)
 
 
     /* set and get the current properties concerning regions */
-    set_bool_property("MUST_REGIONS", TRUE);
-    set_bool_property("EXACT_REGIONS", TRUE);
+    set_bool_property("MUST_REGIONS", true);
+    set_bool_property("EXACT_REGIONS", true);
     get_regions_properties();
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, true) );
     module_stat = get_current_module_statement();
     set_current_module_entity(module_name_to_entity(mod_name));
     module = get_current_module_entity();
     set_cumulated_rw_effects((statement_effects)
-	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE));
+	   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true));
     module_to_value_mappings(module);
     
     /* sets dynamic_area */
@@ -831,11 +831,11 @@ declarations_privatizer(char *mod_name)
      /* Get the READ, WRITE, IN and OUT regions of the module
       */
     set_rw_effects((statement_effects) 
-	db_get_memory_resource(DBR_REGIONS, mod_name, TRUE));
+	db_get_memory_resource(DBR_REGIONS, mod_name, true));
     set_in_effects((statement_effects) 
-	db_get_memory_resource(DBR_IN_REGIONS, mod_name, TRUE));
+	db_get_memory_resource(DBR_IN_REGIONS, mod_name, true));
     set_out_effects((statement_effects) 
-	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, TRUE));
+	db_get_memory_resource(DBR_OUT_REGIONS, mod_name, true));
     set_methods_for_convex_effects();
 
     l_write = regions_dup
@@ -886,6 +886,6 @@ declarations_privatizer(char *mod_name)
     reset_out_effects();
     generic_effects_reset_all_methods();
     free_value_mappings();
-    return( TRUE );
+    return( true );
 }
 

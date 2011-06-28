@@ -121,14 +121,14 @@ statement s;
 	 */
 	MAPL(c1,
 	 {
-	     seen=FALSE;
+	     seen=false;
 	     
 	     MAPL(c2,
 	      {
 		  if (CONTROL(CAR(c2))==cc) 
 		  {
 		      CONTROL_(CAR(c2))=newc;
-		      seen=TRUE;
+		      seen=true;
 		  }
 	      },
 		  control_successors(CONTROL(CAR(c1))));
@@ -244,7 +244,7 @@ reference r;
      },
 	 reference_indices(r));
 
-    /* return(FALSE);*/
+    /* return(false);*/
 }
 
 static void call_rwt(call c)
@@ -291,7 +291,7 @@ static void range_rwt(range r)
   /* increment */
   exp_range_rwt(r, &range_increment(r));
 
-  /* return(TRUE);*/
+  /* return(true);*/
 }
 
 
@@ -310,7 +310,7 @@ static void test_rwt(test t)
 	/* atomize_object(saved); */
     }
 
-    /* return(TRUE);*/
+    /* return(true);*/
 }
 
 static void whileloop_rwt(whileloop w)
@@ -328,7 +328,7 @@ static void whileloop_rwt(whileloop w)
 	/* atomize_object(saved);*/
     }
 
-  /* return(TRUE);*/
+  /* return(true);*/
 }
 
 void cleanup_subscript(expression e)

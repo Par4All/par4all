@@ -153,17 +153,17 @@ static bool call_flt(call c)
 {
     value v = entity_initial(call_function(c));
     if (value_intrinsic_p(v) || value_constant_p(v) || value_symbolic_p(v))
-	return TRUE;
+	return true;
     /* else untrusted!
      */
-    some_call = TRUE;
+    some_call = true;
     gen_recurse_stop(NULL);
-    return FALSE;
+    return false;
 }
 
 static bool untrusted_call_p(expression e)
 {
-    some_call = FALSE;
+    some_call = false;
     gen_recurse(e, call_domain, call_flt, gen_null);
     return some_call;
 }
@@ -223,7 +223,7 @@ void reset_substitute_expression_in_expression(void)
 
 void parser_macro_expansion(expression e)
 {
-    bool warned = FALSE;
+    bool warned = false;
     macro_t * def;
     call c, lhs;
     entity macro;
@@ -274,7 +274,7 @@ void parser_macro_expansion(expression e)
 	if (!warned && untrusted_call_p(actu)) {
 	    pips_user_warning("maybe non safe substitution of macro %s!\n",
 			      module_local_name(macro));
-	    warned = TRUE;
+	    warned = true;
 	}
 
 	substitute_expression_in_expression(rhs, form, actu);

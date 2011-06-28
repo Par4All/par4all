@@ -46,8 +46,8 @@
 
 /* for upwards compatibility with Francois's modified version */
 #define pips_flag_p(p) get_bool_property(p)
-#define pips_flag_set(p) set_bool_property((p), TRUE)
-#define pips_flag_reset(p) set_bool_property((p), FALSE)
+#define pips_flag_set(p) set_bool_property((p), true)
+#define pips_flag_reset(p) set_bool_property((p), false)
 #define pips_flag_fprint(fd) fprint_properties(fd)
 
 bool too_many_property_errors_pending_p(void);

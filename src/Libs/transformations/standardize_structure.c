@@ -86,7 +86,7 @@ stf(char *mod_name)
 				  ("stf-module ",
 				   wdn,
 				   "/",
-				   db_get_memory_resource(DBR_SOURCE_FILE, mod_name, TRUE),
+				   db_get_memory_resource(DBR_SOURCE_FILE, mod_name, true),
 				   " > ",
 				   tmpfile,
 				   " 2>&1 ",
@@ -131,5 +131,5 @@ stf(char *mod_name)
 
     free(wdn);
 
-    return TRUE;
+    return true;
 }

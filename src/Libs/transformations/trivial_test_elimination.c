@@ -265,7 +265,7 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
      t = instruction_test(i) ;
      strue = test_true(t) ;
      if (empty_statement_or_continue_p(strue)) {
-       pips_debug(8,"The branch TRUE of this test instruction is empty!\n");
+       pips_debug(8,"The branch true of this test instruction is empty!\n");
        if (bound_persistant_statement_to_control_p(m, s)) {
 	 pips_debug(8, "This instruction is unstructured instruction\n");
 	 trivial_test_deal_with_unstructured(m, s);        
@@ -294,7 +294,7 @@ trivial_test_statement_rewrite(statement s, persistant_statement_to_control m)
 static bool store_mapping(control c, persistant_statement_to_control map)
 {
   extend_persistant_statement_to_control(map, control_statement(c), c);
-  return TRUE;
+  return true;
 }
 
 
@@ -325,7 +325,7 @@ suppress_trivial_test(char * mod_name)
 {
   statement mod_stmt;
   set_current_module_entity(module_name_to_entity(mod_name));
-  mod_stmt= (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stmt= (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   set_current_module_statement(mod_stmt);
   set_ordering_to_statement(mod_stmt);	
 
@@ -357,7 +357,7 @@ suppress_trivial_test(char * mod_name)
   ifdebug(1)
       pips_assert("Inconsistent statements ...", statement_consistent_p(mod_stmt));
   
-  return TRUE;
+  return true;
 }
 
 

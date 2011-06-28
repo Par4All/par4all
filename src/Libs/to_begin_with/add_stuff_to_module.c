@@ -37,7 +37,7 @@
 
     @param module_name is the name of the module to apply this phase on.
 
-    @return a boolean which is TRUE if it works. Well, indeed this phase
+    @return a bool which is true if it works. Well, indeed this phase
     assumes to always work...
 */
 bool prepend_comment(char * module_name) {
@@ -70,7 +70,7 @@ bool prepend_comment(char * module_name) {
 
     @param mn is the name of the module to apply this phase on.
 
-    @return TRUE as we assume it always works, although repetitive
+    @return true as we assume it always works, although repetitive
     calls to make_entity() with the same global name might
     fail:-). Not tested on Fortran code. No non-regression tests for
     it either.
@@ -97,7 +97,7 @@ bool prepend_call(string mn) {
   statement module_statement = PIPS_PHASE_PRELUDE(mn,
 						  "PREPEND_CALL_DEBUG_LEVEL");
   pips_assert("f really is an entity", check_entity(f));
-  insert_statement(module_statement, ns, TRUE);
+  insert_statement(module_statement, ns, true);
   DB_PUT_MEMORY_RESOURCE(DBR_CALLEES, mn, compute_callees(module_statement));
   PIPS_PHASE_POSTLUDE(module_statement);
 }
@@ -106,7 +106,7 @@ bool add_pragma(string mn) {
   string pragma_name = get_string_property("PRAGMA_NAME");
   bool prepend = get_bool_property("PRAGMA_PREPEND");
   statement pragma_s = make_empty_statement();
-  add_pragma_str_to_statement(pragma_s, pragma_name, TRUE);
+  add_pragma_str_to_statement(pragma_s, pragma_name, true);
   statement module_statement = PIPS_PHASE_PRELUDE(mn, "ADD_PRAGMA_DEBUG_LEVEL");
   insert_statement(module_statement, pragma_s, prepend);
   PIPS_PHASE_POSTLUDE(module_statement);

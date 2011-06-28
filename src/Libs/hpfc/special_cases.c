@@ -189,7 +189,7 @@ statement initial, *phost, *pnode;
     if (!array_distributed_p(array) || 
 	(array_distributed_p
 	 (reference_variable(syntax_reference(expression_syntax(ref))))))
-	return(FALSE);
+	return(false);
 
     arraynum = load_hpf_number(array);
 
@@ -208,7 +208,7 @@ statement initial, *phost, *pnode;
 		   gen_nconc(array_lower_upper_bounds_list(array),
 			     largs)))));
     
-    return(TRUE);
+    return(true);
 }
 
 /******************************************** REDUCTION DIRECTIVE HANDLING */
@@ -227,7 +227,7 @@ static bool ref_filter(reference r)
 {
     entity fun;
 
-    if (searched_variable!=reference_variable(r)) return FALSE;
+    if (searched_variable!=reference_variable(r)) return false;
 
     /* get the call just above -- well, what about intermediate casts ??? */
     fun = call_function(current_call_head()); 
@@ -245,7 +245,7 @@ static bool ref_filter(reference r)
     else if (ENTITY_OR_P(fun))
 	found_operator=is_reduction_operator_or;
 
-    return FALSE;
+    return false;
 }
 
 static reduction_operator get_operator(entity e, statement s)
@@ -399,7 +399,7 @@ Pvecteur v;
 
 /* some static variables used for the detection...
  */
-static bool subarray_shift_ok = TRUE;
+static bool subarray_shift_ok = true;
 static entity array = entity_undefined;
 static list current_regions = NIL, lvect = NIL;
 
@@ -408,9 +408,9 @@ static bool locally_constant_vector_p(Pvecteur v)
     for(; v!=NULL; v=v->succ)
 	if (var_of(v)!=TCST && written_effect_p((entity) var_of(v), 
 						current_regions))
-	    return FALSE;
+	    return false;
 
-    return TRUE;
+    return true;
 }
 
 static bool subarray_shift_assignment_p(call c)
@@ -420,7 +420,7 @@ static bool subarray_shift_assignment_p(call c)
 	lhs = EXPRESSION(CAR(args)),
 	rhs = EXPRESSION(CAR(CDR(args)));
     reference lhs_ref, rhs_ref;
-    bool shift_was_seen = FALSE;
+    bool shift_was_seen = false;
     int dim;
 
     /*  LHS *must* be a reference
@@ -429,7 +429,7 @@ static bool subarray_shift_assignment_p(call c)
 
     /* is RHS a reference?
      */
-    if (!expression_reference_p(rhs)) return FALSE;
+    if (!expression_reference_p(rhs)) return false;
 
     lhs_ref = syntax_reference(expression_syntax(lhs)),
     rhs_ref = syntax_reference(expression_syntax(rhs));
@@ -440,7 +440,7 @@ static bool subarray_shift_assignment_p(call c)
     if (array!=reference_variable(rhs_ref) ||
 	!array_distributed_p(array) || 
 	!block_distributed_p(array))
-	return FALSE;
+	return false;
     
     lhs_ind = reference_indices(lhs_ref),
     rhs_ind = reference_indices(rhs_ref);
@@ -460,7 +460,7 @@ static bool subarray_shift_assignment_p(call c)
 	if (expression_complex_p(il) || expression_complex_p(ir))
 	{
 	    free_vector_list(lvect), lvect = NIL;
-	    return FALSE;
+	    return false;
 	}
 
 	/* else compute the difference */
@@ -497,14 +497,14 @@ static bool subarray_shift_assignment_p(call c)
 			entity_local_name(array), dim);
 	     free_vector_list(lvect);
 	     lvect = NIL;
-	     return FALSE;
+	     return false;
 	 }
 
-	 shift_was_seen = TRUE;
+	 shift_was_seen = true;
      },
 	 lvect);
 
-    return TRUE;
+    return true;
 }
 
 static bool loop_filter(loop l)
@@ -519,23 +519,23 @@ static bool call_filter(call c)
 
     pips_debug(9, "function: %s\n", entity_name(e));
 
-    if (ENTITY_CONTINUE_P(e)) return FALSE;
+    if (ENTITY_CONTINUE_P(e)) return false;
     if (ENTITY_ASSIGN_P(e)) 
     {
 	if (ref_to_dist_array_p(c))
 	  subarray_shift_ok = subarray_shift_ok && 
-	    (entity_undefined_p(array))? subarray_shift_assignment_p(c): FALSE;
+	    (entity_undefined_p(array))? subarray_shift_assignment_p(c): false;
 	/* else: private variable assigned in a parallel loop, ok?! */
     }
     else
-	subarray_shift_ok = FALSE; 
+	subarray_shift_ok = false; 
     
-    return FALSE;
+    return false;
 }
 
 static bool cannot_be_a_shift(void * x)
 {
-    return subarray_shift_ok = FALSE;
+    return subarray_shift_ok = false;
 }
 
 bool subarray_shift_p(s, pe, plvect)
@@ -544,7 +544,7 @@ entity *pe;
 list *plvect;
 {
     array = entity_undefined;
-    subarray_shift_ok = TRUE;
+    subarray_shift_ok = true;
     lvect = NIL;
     current_regions = load_statement_local_regions(s);
 
@@ -627,8 +627,8 @@ list make_rectangular_area(statement st, entity var)
 
 	constraints_for_bounds(idx, &c, &lower, &upper);
 
-	l = CONS(EXPRESSION, constraints_to_loop_bound(lower, idx, TRUE, div),
-	    CONS(EXPRESSION, constraints_to_loop_bound(upper, idx, FALSE, div),
+	l = CONS(EXPRESSION, constraints_to_loop_bound(lower, idx, true, div),
+	    CONS(EXPRESSION, constraints_to_loop_bound(upper, idx, false, div),
 		 l));
 
 	(void) contraintes_free(lower), lower=NULL;
@@ -721,9 +721,9 @@ void hpfc_special_cases_error_handler()
 
 static bool not_simple(void * x)
 {
-    ok = FALSE;
+    ok = false;
     gen_recurse_stop(NULL);
-    return FALSE;
+    return false;
 }
 
 static bool check_simple(call c)
@@ -733,19 +733,19 @@ static bool check_simple(call c)
     {
 	if (simple_found) 
 	{
-	    ok = FALSE;
+	    ok = false;
 	    gen_recurse_stop(NULL);
 	}
 	else
 	    simple_found = current_stmt_head();
     }
 
-    return FALSE;
+    return false;
 }
 
 statement simple_statement(statement s)
 {
-    ok = TRUE;
+    ok = true;
     simple_found = (statement) NULL;
     make_current_stmt_stack();
 
@@ -768,7 +768,7 @@ statement simple_statement(statement s)
  * what: true if the loop nest ll fully scans r
  * how: not very beautiful. 
  * input: r and ll
- * output: the boolean result
+ * output: the bool result
  * side effects: none
  * bugs or features:
  */
@@ -807,7 +807,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	if (!syntax_reference_p(s)) 
 	{
 	    gen_free_list(lseen);
-	    return FALSE;
+	    return false;
 	}
 
 	index = reference_variable(syntax_reference(s));
@@ -815,7 +815,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	if (gen_in_list_p(index, lseen))
 	{
 	    gen_free_list(lseen);
-	    return FALSE;
+	    return false;
 	}
 
 	lseen = CONS(ENTITY, index, lseen);
@@ -825,7 +825,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	if (!l) 
 	{
 	    gen_free_list(lseen);
-	    return FALSE;
+	    return false;
 	}
 
 	/* checks that the loop range scans the whole dimension */
@@ -845,12 +845,12 @@ bool full_define_p(reference r, list /* of loops */ ll)
 	    pips_debug(9, "incomplete scan of %s[dim=%d]\n", 
 		       entity_name(array), ndim);
 	    gen_free_list(lseen);
-	    return FALSE;
+	    return false;
 	}
     }
 
     gen_free_list(lseen);
-    return TRUE;
+    return true;
 }
 
 /* bool full_copy_p(statement s, reference * pleft, reference * pright)
@@ -859,7 +859,7 @@ bool full_define_p(reference r, list /* of loops */ ll)
  *       define an array from another, with perfect alignment.
  * how: pattern matching of what we are looking for...
  * input: the statement
- * output: the boolean result, plus both references.
+ * output: the bool result, plus both references.
  * side effects:
  *  - uses some static data
  * bugs or features:
@@ -896,7 +896,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
 	if (number_of_non_empty_statements(CONSP(CAR(l)))>1) 
 	    {
 		XDEBUG("non perfectly nested");
-		gen_free_list(lb), gen_free_list(ll); return FALSE;
+		gen_free_list(lb), gen_free_list(ll); return false;
 	    }
 
     gen_free_list(lb), lb = NIL;
@@ -907,7 +907,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
 
     if (!simple || !instruction_assign_p(statement_instruction(simple)))
     { 
-	XDEBUG("body not simple"); gen_free_list(ll); return FALSE;
+	XDEBUG("body not simple"); gen_free_list(ll); return false;
     }
 
     la = call_arguments(instruction_call(statement_instruction(simple)));
@@ -918,7 +918,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
 
     if (!expression_reference_p(e))
     {
-	XDEBUG("rhs not a reference"); gen_free_list(ll); return FALSE;
+	XDEBUG("rhs not a reference"); gen_free_list(ll); return false;
     }
 
     right = expression_reference(e);
@@ -930,7 +930,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
     if (gen_length(reference_indices(left))!=len ||
 	gen_length(reference_indices(right))!=len)
     {
-	XDEBUG("incompatible arities"); gen_free_list(ll); return FALSE;
+	XDEBUG("incompatible arities"); gen_free_list(ll); return false;
     }
 
     /* the lhs should be fully defined by the loop nest...
@@ -938,7 +938,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
      */
     if (!full_define_p(left, ll))
     {
-	XDEBUG("lhs not fully defined"); gen_free_list(ll); return FALSE;
+	XDEBUG("lhs not fully defined"); gen_free_list(ll); return false;
     }
 
     gen_free_list(ll); 
@@ -947,7 +947,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
      */
     if (!references_aligned_p(left, right))
     {
-	XDEBUG("references not aligned"); return FALSE;
+	XDEBUG("references not aligned"); return false;
     }
 
     /* ??? should check the new declarations...
@@ -956,7 +956,7 @@ bool full_copy_p(statement s, reference * pleft, reference * pright)
     XDEBUG("ok");
     *pleft = left;
     *pright = right;
-    return TRUE;
+    return true;
 }
 
 /* statement generate_full_copy(reference left, reference right)

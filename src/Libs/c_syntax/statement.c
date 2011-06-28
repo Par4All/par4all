@@ -310,7 +310,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
     {
       /* This loop has a continue statement which has been transformed to goto
 	 Add the labeled statement at the end of loop body*/
-      insert_statement(s,s1,FALSE);
+      insert_statement(s,s1,false);
     }
 
   smt = make_whileloop_statement(MakeCommaExpression(lexp),
@@ -321,7 +321,7 @@ statement MakeWhileLoop(list lexp, statement s, bool before)
     {
       /* This loop has a break statement which has been transformed to goto
 	 Add the labeled statement after the loop */
-      insert_statement(smt,s2,FALSE);
+      insert_statement(smt,s2,false);
     }
 
   pips_assert("While loop is consistent",statement_consistent_p(smt));
@@ -406,7 +406,7 @@ statement MakeForloop(expression e1,
     /* This loop has a continue statement which has been transformed to goto.
 
        Add the labeled statement at the end of loop body*/
-    insert_statement(body, s1, FALSE);
+    insert_statement(body, s1, false);
 
   /*  The for clause may contain declarations*/
   f = make_forloop(init, cond, inc, body);
@@ -421,7 +421,7 @@ statement MakeForloop(expression e1,
   if (!statement_undefined_p(s2))
     /* This loop has a break statement which has been transformed to goto
        Add the labeled statement after the loop */
-    insert_statement(smt, s2, FALSE);
+    insert_statement(smt, s2, false);
 
   // Assume these 2 push have been done in the parser:
   string comment_after_for_clause = pop_current_C_comment();
@@ -490,7 +490,7 @@ statement MakeForloopWithIndexDeclaration(list decls,
   statement for_s = MakeForloop(expression_undefined, e2, e3, body);
   /* We inject the for in its declaration statement to have the naive
      representation: */
-  insert_statement(decl, for_s, FALSE);
+  insert_statement(decl, for_s, false);
   // Gather all the direct declarations from the statements in the block
   list dl = statements_to_direct_declarations(statement_block(decl));
   // to put them on the block statement:
@@ -633,7 +633,7 @@ statement MakeSwitchStatement(statement s)
   seq = instruction_to_statement(make_instruction_sequence(make_sequence(ntl)));
   //seq = instruction_to_statement(make_instruction_sequence(make_sequence(tl)));
 
-  insert_statement(s,seq,TRUE);
+  insert_statement(s,seq,true);
 
   smt = FindStatementFromLabel(MakeCLabel(lab));
   free(lab);
@@ -641,7 +641,7 @@ statement MakeSwitchStatement(statement s)
     {
       /* This switch has a break statement which has been transformed to goto
 	 Add the labeled statement after the switch */
-      insert_statement(s,smt,FALSE);
+      insert_statement(s,smt,false);
     }
   pips_assert("Switch is consistent",statement_consistent_p(s));
   ifdebug(5)
@@ -757,7 +757,7 @@ statement MakeDefaultStatement()
 
 statement MakeBreakStatement(string cmt)
 {
-  /* NN : I did not add a boolean variable to distinguish between loop and switch statements :-(*/
+  /* NN : I did not add a bool variable to distinguish between loop and switch statements :-(*/
   int i = basic_int((basic) stack_head(LoopStack));
   string lab;
   asprintf(&lab,"break_%d",i);

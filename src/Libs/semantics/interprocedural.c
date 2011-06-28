@@ -98,7 +98,7 @@ entity m;
   if(db_resource_p(DBR_SUMMARY_PRECONDITION, module_local_name(m)))
     p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
 					     module_local_name(m),
-					     TRUE);
+					     true);
   else
     p = transformer_undefined;
 
@@ -109,7 +109,7 @@ entity m;
     module_local_name(m))) {
     p = (transformer) db_get_memory_resource(DBR_SUMMARY_PRECONDITION,
     module_local_name(m),
-    TRUE);
+    true);
     }
     else {
     p = transformer_undefined;
@@ -250,10 +250,10 @@ list module_to_formal_analyzable_parameters(entity f)
   return formals;
 }
 
-boolean
+bool
 same_analyzable_type_scalar_entity_list_p(list l)
 {
-  boolean result = TRUE;
+  bool result = true;
 
   if (!ENDP(l)) {
     entity e1 = ENTITY(CAR(l));
@@ -329,7 +329,7 @@ transformer add_formal_to_actual_bindings(call c, transformer pre, entity caller
            exist in the caller frame */
 	transformer t_expr = any_expression_to_transformer(tmp, expr,
 							   transformer_undefined,
-							   FALSE);
+							   false);
 
 	t_expr = transformer_safe_value_substitute(t_expr, tmp, fp_new);
 	/* Likely memory leak for the initial pre */
@@ -1058,13 +1058,13 @@ call_site_to_module_precondition_text(
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
 			   (DBR_CUMULATED_EFFECTS,
-			    module_local_name(caller), TRUE));
+			    module_local_name(caller), true));
 
   set_semantic_map((statement_mapping)
 		   db_get_memory_resource
 		   (DBR_PRECONDITIONS,
 		    module_local_name(caller),
-		    TRUE) );
+		    true) );
 
   /* load caller preconditions */
   caller_prec = transformer_dup(load_statement_semantic(s));
@@ -1094,7 +1094,7 @@ call_site_to_module_precondition_text(
      in this frame */
   module_to_value_mappings(callee);
 
-  result = text_for_a_transformer(call_site_prec, FALSE);
+  result = text_for_a_transformer(call_site_prec, false);
 
   reset_current_module_entity();
   reset_current_module_statement();
@@ -1128,7 +1128,7 @@ int get_call_site_number()
 /* Each time a statement is entered, its precondition is memorized*/
 static bool memorize_precondition_for_summary_precondition(statement s)
 {
-  bool go_down = FALSE;
+  bool go_down = false;
 
   if(statement_ordering(s)!=STATEMENT_ORDERING_UNDEFINED) {
     /* There may be or not a precondition associated to
@@ -1144,11 +1144,11 @@ static bool memorize_precondition_for_summary_precondition(statement s)
     pips_assert("current precondition is defined",
 		current_precondition!=transformer_undefined);
 
-    go_down = TRUE;
+    go_down = true;
   }
   else {
     current_precondition = transformer_undefined;
-    go_down = FALSE;
+    go_down = false;
   }
 
   if(go_down && declaration_statement_p(s)) {
@@ -1170,7 +1170,7 @@ static bool process_call_for_summary_precondition(call c)
   transformer call_site_prec = transformer_undefined;
 
   if(call_function(c) != current_callee) {
-    return TRUE;
+    return true;
   }
 
 
@@ -1315,7 +1315,7 @@ static bool process_call_for_summary_precondition(call c)
     current_summary_precondition);
   */
 
-  return TRUE;
+  return true;
 }
 
 #if 0
@@ -1324,7 +1324,7 @@ static bool process_call_for_summary_precondition(call c)
    function below... */
 static bool process_statement_for_summary_precondition(statement s)
 {
-  bool ret_p = TRUE;
+  bool ret_p = true;
   pips_internal_error("Not implemented. Should not be called.");
   if(declaration_statement_p(s)) {
     /* Look for call sites in the declarations, but see functions below... */
@@ -1357,7 +1357,7 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
 							     entity callee)
 {
   statement caller_statement = (statement) db_get_memory_resource
-    (DBR_CODE, module_local_name(caller), TRUE);
+    (DBR_CODE, module_local_name(caller), true);
   /* summary effects for the callee */
   summary_effects_of_callee = load_summary_effects(callee);
 
@@ -1379,13 +1379,13 @@ transformer update_precondition_with_call_site_preconditions(transformer t,
   set_cumulated_rw_effects((statement_effects)
 			   db_get_memory_resource
 			   (DBR_CUMULATED_EFFECTS,
-			    module_local_name(caller), TRUE));
+			    module_local_name(caller), true));
 
   set_semantic_map((statement_mapping)
 		   db_get_memory_resource
 		   (DBR_PRECONDITIONS,
 		    module_local_name(caller),
-		    TRUE) );
+		    true) );
 
   module_to_value_mappings(caller);
 

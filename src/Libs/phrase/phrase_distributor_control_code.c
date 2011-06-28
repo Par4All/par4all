@@ -238,7 +238,7 @@ void declare_common_variables_in_module (entity common, entity module)
 {
   list new_variables = NIL;
   list primary_variables = NIL;
-  boolean is_primary_area = TRUE;
+  bool is_primary_area = true;
   int totalized_offset = -1;
 
   /* Compute the primary variables */
@@ -250,7 +250,7 @@ void declare_common_variables_in_module (entity common, entity module)
 	primary_variables = CONS (ENTITY,v,primary_variables);
       }
       else {
-	is_primary_area = FALSE;
+	is_primary_area = false;
       }
     }
   }, area_layout(type_area(entity_type(common))));
@@ -809,7 +809,7 @@ static statement controlize_distribution (statement module_stat,
 	  /* Get the called module */
 	  called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
 								  function_name,
-								  TRUE);
+								  true);
 	 
 	  called_module = module_name_to_entity(function_name);
 	 
@@ -1042,14 +1042,14 @@ bool phrase_distributor_control_code(string module_name)
   entity module;
  
   /* set and get the current properties concerning regions */
-  set_bool_property("MUST_REGIONS", TRUE);
-  set_bool_property("EXACT_REGIONS", TRUE);
+  set_bool_property("MUST_REGIONS", true);
+  set_bool_property("EXACT_REGIONS", true);
   get_regions_properties();
  
   /* get the resources */
   module_stat = (statement) db_get_memory_resource(DBR_CODE,
 						   module_name,
-						   TRUE);
+						   true);
  
   module = module_name_to_entity(module_name);
  
@@ -1057,7 +1057,7 @@ bool phrase_distributor_control_code(string module_name)
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
  
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   module_to_value_mappings(module);
  
   /* sets dynamic_area */
@@ -1071,11 +1071,11 @@ bool phrase_distributor_control_code(string module_name)
   /* Get the READ, WRITE, IN and OUT regions of the module
    */
   set_rw_effects((statement_effects)
-		 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+		 db_get_memory_resource(DBR_REGIONS, module_name, true));
   set_in_effects((statement_effects)
-		 db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
+		 db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
   set_out_effects((statement_effects)
-		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+		  db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
  
   /* Now do the job */
 
@@ -1115,6 +1115,6 @@ bool phrase_distributor_control_code(string module_name)
  
   debug_off();
  
-  return TRUE;
+  return true;
 }
 

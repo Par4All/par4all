@@ -34,12 +34,12 @@ bool outlining_init(string __attribute__ ((unused)) module_name)
 {
   init_outline();
   outlining_save();
-  return TRUE;
+  return true;
 }
 
 void outlining_load()
 {
-  set_outline((outline_map)db_get_memory_resource(DBR_OUTLINED, "", TRUE));
+  set_outline((outline_map)db_get_memory_resource(DBR_OUTLINED, "", true));
 }
 
 void outlining_save()
@@ -69,7 +69,7 @@ entity outlining_start(string new_module_name)
 
   outlined_module = make_empty_subroutine(new_module_name,copy_language(module_language(get_current_module_entity())));
 
-  if (entity_undefined_p(outlined_module)) return FALSE;
+  if (entity_undefined_p(outlined_module)) return false;
 
   outline_list = NIL;
   outline_local = NIL;
@@ -141,17 +141,17 @@ static bool outlining_entity_filter(entity e)
   if (gen_in_list_p(e,outline_list))
     {
       pips_debug(5,"entity %s already treated\n", entity_global_name(e));
-      return TRUE;
+      return true;
     }
   if (!gen_in_list_p(e,code_declarations(value_code(entity_initial(get_current_module_entity())))))
     {
       pips_debug(5,"entity %s not in %s declaration\n", entity_global_name(e), entity_global_name(get_current_module_entity()));
-      return TRUE;
+      return true;
     }
   if (gen_in_list_p(e,outline_local))
     {
       pips_debug(5,"entity %s local in %s declaration\n", entity_global_name(e), entity_global_name(outlined_module));
-      return TRUE;
+      return true;
     }
   if(entity_variable_p(e)) // scan entity in type
       gen_multi_recurse(entity_type(e),
@@ -163,7 +163,7 @@ static bool outlining_entity_filter(entity e)
   outline_list=CONS(ENTITY,e,outline_list);      
 
   pips_debug(5, "end\n");
-  return TRUE;
+  return true;
 }
 
 list outlining_scan_block(list block_list)
@@ -415,7 +415,7 @@ static bool outline_statement(statement stmt,string name,int from, int to)
   pips_debug(1,"stmt = %p, name = %s\n", stmt, name);
 
   if (from!=statement_number(stmt) || to!=statement_number(stmt))
-    return FALSE;
+    return false;
 
   if(outlining_start(name))
     {
@@ -428,35 +428,35 @@ static bool outline_statement(statement stmt,string name,int from, int to)
       statement_instruction(stmt)=statement_instruction(call);
       statement_comments(stmt)=statement_comments(call);
       statement_number(stmt)=statement_number(call);
-      return TRUE;
+      return true;
     }
-  return FALSE;
+  return false;
 }
 
 static bool outline_block(statement stmt, string name, int from, int to)
 {
   list treated = NIL;
   list block_list=NIL;
-  bool record_p = FALSE;
-  bool end_p = FALSE;
+  bool record_p = false;
+  bool end_p = false;
   statement call = statement_undefined;
 
   pips_debug(1,"stmt = %p, name = %s, from = %d, to = %d\n", stmt, name, from, to);
 
   if (!instruction_sequence_p(statement_instruction(stmt)))
-    return FALSE;
+    return false;
 
   FOREACH(STATEMENT,s,sequence_statements(instruction_sequence(statement_instruction(stmt))))
     {
       if (!end_p && !record_p && from==statement_number(s))
-	record_p=TRUE;
+	record_p=true;
       if (!end_p && record_p)
 	block_list=CONS(STATEMENT,s,block_list);
       else
 	treated=CONS(STATEMENT,s,treated);
       if (!end_p && to==statement_number(s))
 	{
-	  end_p=TRUE;
+	  end_p=true;
 	  // block outlining
 	  if(outlining_start(name))
 	    {
@@ -486,17 +486,17 @@ static bool outline_block_filter(statement stmt)
   name = get_string_property("OUTLINING_NAME");
 
   if (outline_from==0 || outline_to==0)
-    return FALSE;
+    return false;
 
   if (outline_block(stmt,name,outline_from,outline_to) ||
       outline_statement(stmt,name,outline_from,outline_to))
     {
       outline_from=0;
       outline_to=0;
-      return FALSE;
+      return false;
     }
   else
-    return TRUE;  
+    return true;  
 }
 
 
@@ -505,7 +505,7 @@ bool step_outlining(string module_name)
 {
   statement body;
 
-  body = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  body = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
   pips_assert("",outline_data_undefined_p(outline_outlining));
 
   outline_from = get_int_property("OUTLINING_FROM");
@@ -514,7 +514,7 @@ bool step_outlining(string module_name)
   if (outline_from == 0 || outline_to == 0)
     {
       pips_debug(1,"Nothing to do.\n");
-      return TRUE;
+      return true;
     }
   debug_on("OUTLINING_DEBUG_LEVEL");  
 
@@ -534,7 +534,7 @@ bool step_outlining(string module_name)
   reset_current_module_entity();
  
   debug_off();
-  return TRUE;
+  return true;
 }
 
 //####################### INLINE  #######################
@@ -548,11 +548,11 @@ static bool inline_outlined_statement(statement stmt)
 
   STEP_DEBUG_STATEMENT(3,"current",stmt);
   if (!statement_call_p(stmt) || strcmp(target_label,entity_name(statement_label(stmt)))!=0)
-    return FALSE;
+    return false;
 
   function = call_function(instruction_call(statement_instruction(stmt)));
   if(!bound_outline_p(function))
-    return FALSE;
+    return false;
 
   outline_outlining = load_outline(function);
   block = STATEMENT(CAR(outline_data_block(outline_outlining)));
@@ -567,20 +567,20 @@ static bool inline_outlined_statement(statement stmt)
   delete_outline(function);
 
   pips_debug(1,"Fin\n");
-  return TRUE;
+  return true;
 }
 
 static bool inline_outlined_block(statement stmt)
 {
   list treated = NIL;
-  bool find_p = FALSE;
+  bool find_p = false;
 
   pips_debug(1,"stmt = %p\n", stmt);
 
   STEP_DEBUG_STATEMENT(3,"current",stmt);
   
   if (!statement_block_p(stmt))
-    return FALSE;
+    return false;
 
   FOREACH(STATEMENT,s,sequence_statements(instruction_sequence(statement_instruction(stmt))))
     {
@@ -589,7 +589,7 @@ static bool inline_outlined_block(statement stmt)
 	  entity function = call_function(instruction_call(statement_instruction(s)));
 	  if (bound_outline_p(function))
 	    {
-	      find_p = TRUE;
+	      find_p = true;
 	      outline_outlining = load_outline(function);
 	      list block = outline_data_block(outline_outlining);
 	      outline_outlining = outline_data_undefined;
@@ -614,31 +614,31 @@ static bool inline_not_outlined(statement stmt)
 {
   STEP_DEBUG_STATEMENT(3,"current",stmt);
   if (strcmp(target_label,entity_name(statement_label(stmt)))!=0)
-    return FALSE;
+    return false;
   if (statement_call_p(stmt) &&
       intrinsic_entity_p(call_function(instruction_call(statement_instruction(stmt)))))
     {
       pips_debug(1,"Nothing to do at label %s.\n",entity_user_name(statement_label(stmt)));
-      return TRUE;
+      return true;
     }
   pips_debug(1,"Only inlining as revert outlining is implemented.\n");
-  return TRUE;
+  return true;
 }
 
 static bool inline_call_filter(statement stmt)
 {
   if(get_int_property("INLINING_LABEL")==0)
-    return FALSE;
+    return false;
 
   if(inline_outlined_block(stmt) ||
      inline_outlined_statement(stmt) ||
      inline_not_outlined(stmt))
     {
       set_int_property("INLINING_LABEL",0);
-      return FALSE;
+      return false;
     }
 
-  return TRUE;  
+  return true;  
 }
 
 /* Phase non utilisee pour l'instant */
@@ -648,12 +648,12 @@ bool step_inlining(string module_name)
   statement body;
 
   label_id = get_int_property("INLINING_LABEL");
-  body = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  body = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
 
   if(label_id == 0)
     {
       pips_debug(1,"Nothing to do.\n");
-      return TRUE;
+      return true;
     }
   snprintf(target_label,TARGET_LABEL_NAME_LEN,"%s%s%s%d",
 	   module_name, MODULE_SEP_STRING, LABEL_PREFIX, label_id);
@@ -678,5 +678,5 @@ bool step_inlining(string module_name)
   outlining_save();
   reset_current_module_entity();
   debug_off();
-  return TRUE;
+  return true;
 }

@@ -87,12 +87,12 @@ int FMComp[18];   /*for counting the number of F-M complexity less than 16.
 		     inequations negatives who containe the variable
 		     eliminated.The last elem of the array (ie FMComp[17])
 		     is used to count cases with complexity over 16*/
-boolean is_test_exact = TRUE;
-boolean is_test_inexact_eq = FALSE;
-boolean is_test_inexact_fm = FALSE;
-boolean is_dep_cnst = FALSE;
-boolean is_test_Di;
-boolean Finds2s1;
+bool is_test_exact = true;
+bool is_test_inexact_eq = false;
+bool is_test_inexact_fm = false;
+bool is_dep_cnst = false;
+bool is_test_Di;
+bool Finds2s1;
 
 
 int Nbrdo;
@@ -113,7 +113,7 @@ DEFINE_CURRENT_MAPPING(context, Psysteme)
 static graph dg;
 
 
-static bool PRINT_RSDG = FALSE;
+static bool PRINT_RSDG = false;
 
 
 /* Different types of dependence tests:
@@ -187,12 +187,12 @@ static list TestDependence(list /*n1*/, Psysteme /*sc1*/, statement /*s1*/,
 			    Psysteme /*sc2*/, statement /*s2*/, effect /*ef2*/,
 			    reference /*r2*/, list /*llv*/, Ptsg */*gs*/,
 			    list */*levelsop*/, Ptsg */*gsop*/);
-static boolean build_and_test_dependence_context(reference /*r1*/, reference /*r2*/,
+static bool build_and_test_dependence_context(reference /*r1*/, reference /*r2*/,
 						 Psysteme /*sc1*/, Psysteme /*sc2*/,
 						 Psysteme */*psc_dep*/,
 						 list /*llv*/,
 						 list /*s2_enc_loops*/);
-static boolean gcd_and_constant_dependence_test(reference /*r1*/, reference /*r2*/,
+static bool gcd_and_constant_dependence_test(reference /*r1*/, reference /*r2*/,
 						list /*llv*/, list /*s2_enc_loops*/,
 						Psysteme */*psc_dep*/);
 static void dependence_system_add_lci_and_di(Psysteme */*psc_dep*/,
@@ -202,7 +202,7 @@ static list TestDiVariables(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 			     effect /*ef1*/, statement /*s2*/, effect /*ef2*/);
 static Ptsg dependence_cone_positive(Psysteme /*dep_sc*/);
 static list loop_variant_list(statement /*stat*/);
-static boolean TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
+static bool TestDiCnst(Psysteme /*ps*/, int /*cl*/, statement /*s1*/,
 			  effect /*ef1*/, statement /*s2*/, effect /*ef2*/);
 
 
@@ -224,10 +224,10 @@ static bool rice_dependence_graph(char *mod_name)
     set_current_module_entity(module);
 
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
 
-    chains = (graph) db_get_memory_resource(DBR_CHAINS, mod_name, TRUE);
+    chains = (graph) db_get_memory_resource(DBR_CHAINS, mod_name, true);
 
     ResetLoopCounter();
 
@@ -267,10 +267,10 @@ static bool rice_dependence_graph(char *mod_name)
 
     if(dg_type == DG_SEMANTICS)
       set_precondition_map( (statement_mapping)
-                            db_get_memory_resource(DBR_PRECONDITIONS, mod_name, TRUE) );
+                            db_get_memory_resource(DBR_PRECONDITIONS, mod_name, true) );
 
     set_cumulated_rw_effects((statement_effects)
-                             db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, TRUE) );
+                             db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, true) );
 
     debug_on("RICEDG_DEBUG_LEVEL");
     pips_debug(1, "finding enclosing loops ...\n");
@@ -368,7 +368,7 @@ static bool rice_dependence_graph(char *mod_name)
     reset_cumulated_rw_effects();
     clean_enclosing_loops();
 
-    return TRUE;
+    return true;
 }
 
 static void rdg_unstructured(unstructured u)
@@ -635,7 +635,7 @@ static void rice_update_dependence_graph(
 		    Ptsg gs = SG_UNDEFINED;
 		    Ptsg gsop = SG_UNDEFINED;
 
-		    Finds2s1 = FALSE;
+		    Finds2s1 = false;
 
 		    /*looking for the opposite dependence from (s2,e2) to
 		      (s1,e1) */
@@ -679,7 +679,7 @@ static void rice_update_dependence_graph(
 				    e2bis = conflict_sink(cs2s1);
 				    if (e1bis==e2 && e2bis==e1)
 				    {
-					Finds2s1 = TRUE;
+					Finds2s1 = true;
 					continue;
 				    }
 				    else
@@ -1269,7 +1269,7 @@ TestDependence(
 
     cl = FindMaximumCommonLevel(n1, n2);
 
-    if (TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == TRUE )
+    if (TestDiCnst(dep_syst, cl, s1, ef1, s2, ef2) == true )
     {
 	/* find independences (non loop carried dependence, intra-statement).*/
 	/* Such dependences are counted here as independence, but other
@@ -1284,10 +1284,10 @@ TestDependence(
 	return(NIL);
     }
 
-    is_test_exact = TRUE;
-    is_test_inexact_eq = FALSE;
-    is_test_inexact_fm = FALSE;
-    is_dep_cnst = FALSE;
+    is_test_exact = true;
+    is_test_inexact_eq = false;
+    is_test_inexact_fm = false;
+    is_dep_cnst = false;
 
     tmp_base = base_dup(dep_syst->base);
 
@@ -1312,7 +1312,7 @@ TestDependence(
 	dep_syst = sc_rn(dep_syst_base);
     }
     TRY {
-	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == FALSE) {
+	if (sc_proj_optim_on_di_ofl(cl, &dep_syst) == false) {
 	    pips_debug(4,
 		  "projected system by sc_proj_optim_on_di() is not feasible\n");
 	    sc_rm(dep_syst);
@@ -1365,7 +1365,7 @@ TestDependence(
 	    Value val;
 
 	    di = DiIncNonCons->var;
-	    if (sc_value_of_variable(dep_syst, di, &val) ==  TRUE)
+	    if (sc_value_of_variable(dep_syst, di, &val) ==  true)
 		if (value_notzero_p(val)){
 		    sc_elim_var(dep_syst, di);
 		}
@@ -1422,7 +1422,7 @@ TestDependence(
     dep_syst1->dimension = cl;
 
     if (dep_syst1->dimension == dep_syst1->nb_eq)
-	is_dep_cnst = TRUE;
+	is_dep_cnst = true;
 
     /* Compute dependence levels for s1->s2 */
     levels = TestDiVariables(dep_syst, cl, s1, ef1, s2, ef2);
@@ -1450,10 +1450,10 @@ TestDependence(
 	if (sg_empty(*gs))
 	{
 	    list l_tmp = levels;
-	    boolean ok = FALSE;
+	    bool ok = false;
 
 	    pips_debug(5, "dependence cone not feasible\n");
-	    MAP(INT, ll, {if (ll == cl+1) ok = TRUE;}, l_tmp);
+	    MAP(INT, ll, {if (ll == cl+1) ok = true;}, l_tmp);
 
 	    if (ok)
 	    {
@@ -1529,9 +1529,9 @@ TestDependence(
 	    if (sg_empty(*gsop))
 	    {
 		list l_tmp = *levelsop;
-		boolean ok= FALSE;
+		bool ok= false;
 
-		MAP(INT, ll, {if (ll == cl+1) ok = TRUE;}, l_tmp);
+		MAP(INT, ll, {if (ll == cl+1) ok = true;}, l_tmp);
 
 		if (ok)
 		{
@@ -1586,7 +1586,7 @@ TestDependence(
 }
 
 
-/* static boolean build_and_test_dependence_context(reference r1, r2,
+/* static bool build_and_test_dependence_context(reference r1, r2,
  *                                                  Psystem sc1, sc2, *psc_dep,
  *                                                  list llv, s2_enc_loops)
  * input    :
@@ -1599,10 +1599,10 @@ TestDependence(
  *      list s2_enc_loops : statement s2 enclosing loops;
  *
  * output  :
- *      boolean           : FALSE if one of the initial systems is unfeasible
+ *      bool           : false if one of the initial systems is unfeasible
  *                          after normalization;
- *                          TRUE otherwise;
- *      *psc_dep          : dependence system is the function value is TRUE;
+ *                          true otherwise;
+ *      *psc_dep          : dependence system is the function value is true;
  *                          SC_EMPTY otherwise; no need to sc_rm() in the
  *                          latter case.
  *
@@ -1628,7 +1628,7 @@ TestDependence(
  *    dependence test will be tested with an even stronger test, this
  *    should have no accuracy impact (FI, 12 December 1995)
  */
-static boolean
+static bool
 build_and_test_dependence_context(
     reference r1, reference r2,
     Psysteme sc1, Psysteme sc2,
@@ -1666,7 +1666,7 @@ build_and_test_dependence_context(
 		*psc_dep = SC_EMPTY;
 		pips_debug(4,
 		      "first initial normalized system sc1 not feasible\n");
-		return(FALSE);
+		return(false);
 	    }
 
 	    ifdebug(6)
@@ -1721,7 +1721,7 @@ build_and_test_dependence_context(
 		*psc_dep = SC_EMPTY;
 		pips_debug(4,
 		      "second initial normalized system not feasible\n");
-		return(FALSE);
+		return(false);
 	    }
 
 	    ifdebug(6)
@@ -1813,11 +1813,11 @@ build_and_test_dependence_context(
     }
 
     *psc_dep = sc_dep;
-    return(TRUE);
+    return(true);
 }
 
 
-/* static boolean gcd_and_constant_dependence_test(references r1, r2,
+/* static bool gcd_and_constant_dependence_test(references r1, r2,
  *                                                 list llv, s2_enc_loops,
  *                                                 Psysteme *psc_dep)
  * input    :
@@ -1825,15 +1825,15 @@ build_and_test_dependence_context(
  *      list llv          : loop nest variant list;
  *      list s2_enc_loops : enclosing loops for statement s2;
  *      Psysteme *psc_dep : pointer toward the depedence system;
- * output   : TRUE if there is no dependence (GCD and constant test successful);
- *            FALSE if independence could not be proved.
+ * output   : true if there is no dependence (GCD and constant test successful);
+ *            false if independence could not be proved.
  * modifies : *psc_dep; at least adds dependence equations on phi variables
  * comment  :
  *  - *psc_dep must be defined on entry; it must have been initialized
  *    by build_and_test_dependence_context.
  *  - no side effects on r1, r2,...
  */
-static boolean
+static bool
 gcd_and_constant_dependence_test(
     reference r1, reference r2,
     list llv, list s2_enc_loops,
@@ -1897,14 +1897,14 @@ gcd_and_constant_dependence_test(
 		{
 		    NbrTestCnst++;
 		    pips_debug(4,"TestCnst succeeded!");
-		    return(TRUE);
+		    return(true);
 		}
 		/* test of GCD */
-		if (egalite_normalize(c) == FALSE)
+		if (egalite_normalize(c) == false)
 		{
 		    NbrTestGcd++;
 		    pips_debug(4,"TestGcd succeeded!\n");
-		    return(TRUE);
+		    return(true);
 		}
 		sc_add_eg(*psc_dep, c);
 	    }
@@ -1929,7 +1929,7 @@ gcd_and_constant_dependence_test(
       }
     }
 
-    return(FALSE);
+    return(false);
 }
 
 
@@ -2088,7 +2088,7 @@ TestDiVariables(Psysteme ps,
 {
     list levels = NIL;
     _int l;
-    boolean all_level_founds = FALSE;
+    bool all_level_founds = false;
 
     pips_debug(7, "maximum common level (cl): %d\n", cl);
 
@@ -2107,10 +2107,10 @@ TestDiVariables(Psysteme ps,
 		       l, entity_local_name((entity) di));
 	}
 
-	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == FALSE)
+	if (sc_minmax_of_variable_optim(pss, di, &min, &max) == false)
 	{
 	    pips_debug(7,"sc_minmax_of_variable_optim: non feasible system\n");
-	    all_level_founds = TRUE;
+	    all_level_founds = true;
 	    break;
 	}
 
@@ -2131,7 +2131,7 @@ TestDiVariables(Psysteme ps,
 
 	if(IsNegatif)
 	{
-	    all_level_founds = TRUE;
+	    all_level_founds = true;
 	    break;
 	}
 
@@ -2139,7 +2139,7 @@ TestDiVariables(Psysteme ps,
 	{
 	    pips_debug(7, "adding level %td\n", l);
 	    levels = gen_nconc(levels, CONS(INT, l, NIL));
-	    all_level_founds = TRUE;
+	    all_level_founds = true;
 	    break;
 	}
 
@@ -2239,7 +2239,7 @@ Psysteme dep_sc;
 	}
 	TRY
 	{
-	    if (! sc_integer_feasibility_ofl_ctrl(sub_sc, FWD_OFL_CTRL, TRUE))
+	    if (! sc_integer_feasibility_ofl_ctrl(sub_sc, FWD_OFL_CTRL, true))
 	    {
 		sc_rm(sub_sc);
 		pips_debug(7,"sub lexico-positive dependence system not feasible\n");
@@ -2334,7 +2334,7 @@ statement stat;
 /* this function detects intra-statement, non loop carried dependence
  * ( Di=(0,0,...0) and s1 = s2).
  */
-static boolean
+static bool
 TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)),
 	   statement s2, effect ef2 __attribute__ ((unused)))
 {
@@ -2345,7 +2345,7 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
       Variable di = (Variable) GetDiVar(l);
       Psysteme pss;
       Value val;
-      bool success_p = TRUE;
+      bool success_p = true;
 
       pss = sc_dup(ps);
       success_p = sc_value_of_variable(pss, di, &val);
@@ -2354,11 +2354,11 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
       if ( success_p )
       {
 	  if (value_notzero_p(val)) {
-	      return (FALSE);
+	      return (false);
 	  }
       }
       else {
-        return (FALSE);
+        return (false);
       }
   }
 
@@ -2366,9 +2366,9 @@ TestDiCnst(Psysteme ps, int cl, statement s1, effect ef1 __attribute__ ((unused)
   if (s1 == s2)
   {
       NbrAllEquals++;
-      return(TRUE);
+      return(true);
   }
-  else return(FALSE);
+  else return(false);
 }
 
 

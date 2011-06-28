@@ -248,20 +248,20 @@ I = PHI(L, I1, I2)
 .
 .
 */
-boolean if_conversion_compact(char * mod_name)
+bool if_conversion_compact(char * mod_name)
 {
     // get the resources
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
 	set_ordering_to_statement(mod_stmt);
 
-    graph dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    graph dg = (graph) db_get_memory_resource(DBR_DG, mod_name, true);
 
     set_proper_rw_effects((statement_effects) 
-            db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
+            db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
     debug_on("IF_CONVERSION_COMPACT_DEBUG_LEVEL");
     // Now do the job
@@ -280,5 +280,5 @@ boolean if_conversion_compact(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

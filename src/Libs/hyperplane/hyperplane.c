@@ -219,7 +219,7 @@ cons * lls;
     upper= expression_to_expression_newbase(lower, pvg, base_oldindex);
 
 
-    s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase, TRUE);
+    s_lhyp = code_generation(lls, pvg, base_oldindex, base_newindex, sc_newbase, true);
 
     debug(8," hyperplane","End\n");
 

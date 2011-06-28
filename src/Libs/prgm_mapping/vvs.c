@@ -390,7 +390,7 @@ list var_l;
  
  for(pc = sc->egalites ; pc != NULL; pc = pc->succ, var_l = CDR(var_l))
    {
-    boolean var_not_found = TRUE;
+    bool var_not_found = true;
     Pvecteur pv = pc->vecteur;
     entity var = ENTITY(CAR(var_l));
 
@@ -399,7 +399,7 @@ list var_l;
        if( ((pv->val == 1) || (pv->val == -1)) && (pv->var != TCST) )
          {
           if(same_entity_p((entity) pv->var, var))
-             var_not_found = FALSE;
+             var_not_found = false;
           else
              pv = pv->succ;
          }
@@ -451,10 +451,10 @@ list vvs;
 {
   Psysteme ps;
   ps = vvs_to_sc(vvs);
-  return(sc_rational_feasibility_ofl_ctrl(ps, NO_OFL_CTRL, TRUE));
+  return(sc_rational_feasibility_ofl_ctrl(ps, NO_OFL_CTRL, true));
 }
 
-typedef boolean (*argh)(Pvecteur*, Pvecteur*);
+typedef bool (*argh)(Pvecteur*, Pvecteur*);
 
 /* ======================================================================== */
 /*
@@ -494,14 +494,14 @@ Ppolynome pp;
     entity var = VV_VAR(vv);
     int c = VV_COEFF(vv);
     list prec, curr;
-    boolean found = FALSE;
+    bool found = false;
 
     if(c != 1)
       user_error("vvs_on_polynome", "Coeff is not 1\n");
 
     for(curr = used_vars, prec = NIL; !ENDP(curr) && (!found); POP(curr)) {
       if(same_entity_p(var, ENTITY(CAR(curr)))) {
-	found = TRUE;
+	found = true;
 	if(prec == NIL)
 	  used_vars = CDR(used_vars);
 	else
@@ -669,7 +669,7 @@ list plc_make_vvs_with_vector(v)
 Pvecteur v;
 {
   list vvs = NIL, lc;
-  boolean var_not_found;
+  bool var_not_found;
   entity crt_var = entity_undefined;
   int crt_val = 0;
   Pvecteur pv_elim;
@@ -684,12 +684,12 @@ Pvecteur v;
   /* We look, in lc, for a variable that we can eliminate in v, i.e. with a
    * coefficient equal to 1 or -1.
    */
-  var_not_found = TRUE;
+  var_not_found = true;
   for(; (lc != NIL) && var_not_found; lc = CDR(lc)) {
     crt_var = ENTITY(CAR(lc));
     crt_val = (int) vect_coeff((Variable) crt_var, v);
     if((crt_val == 1) || (crt_val == -1))
-      var_not_found = FALSE;
+      var_not_found = false;
   }
   if(! var_not_found) {
     pv_elim = vect_cl2_ofl_ctrl((crt_val)*(-1), v, 1,

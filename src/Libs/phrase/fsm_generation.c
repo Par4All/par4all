@@ -108,14 +108,14 @@ bool fsm_generation(string module_name)
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 
 						      module_name, 
-						      TRUE);
+						      true);
 
   module = module_name_to_entity(module_name);
   
   set_current_module_statement(stat);
   set_current_module_entity(module_name_to_entity(module_name)); // FI: redundant
   /* dependence_graph = 
-     (graph) db_get_memory_resource(DBR_DG, module_name, TRUE); */
+     (graph) db_get_memory_resource(DBR_DG, module_name, true); */
   
   debug_on("FSM_GENERATION_DEBUG_LEVEL");
 
@@ -145,5 +145,5 @@ bool fsm_generation(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }

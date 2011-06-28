@@ -802,9 +802,9 @@ list l;
 		 {
 		     the_dim = entity_ith_dimension(ent, i); 
 		     dimension_lower(the_dim) = /* ??? memory leak */
-			hpfc_array_bound(ent, FALSE, i);
+			hpfc_array_bound(ent, false, i);
 		     dimension_upper(the_dim) = 
-			hpfc_array_bound(ent, TRUE, i);
+			hpfc_array_bound(ent, true, i);
 		 }
 	     }
 	 }

@@ -306,7 +306,7 @@ type MakeAnyScalarResult(tag t, _int size)
  *
  * typedef int foo;
  *
- * type_equal_p(int, foo)==TRUE, because foo is simply a renaming for
+ * type_equal_p(int, foo)==true, because foo is simply a renaming for
  * int, but note that type_int_p(entity_type(foo)) returns
  * false. Hence, type_int_p(t1) and type_equal_p(t1,t2) does not imply
  * type_int_p(t2), which may lead to funny bugs.
@@ -321,7 +321,7 @@ type MakeAnyScalarResult(tag t, _int size)
  *     int y;
  * } b_t;
  *
- * type_equal_p(a_t, b_t)==FALSE, because the underlying structures
+ * type_equal_p(a_t, b_t)==false, because the underlying structures
  * have different names and because the C type system does not use
  * structural equivalence.
  *
@@ -359,23 +359,23 @@ type MakeAnyScalarResult(tag t, _int size)
 */
 bool type_equal_p(type t1, type t2)
 {
-  bool tequal = FALSE;
+  bool tequal = false;
   t1= ultimate_type(t1);
   t2= ultimate_type(t2);
 
   if(t1 == t2)
-    return TRUE;
+    return true;
   else if (t1 == type_undefined && t2 != type_undefined)
-    return FALSE;
+    return false;
   else if (t1 != type_undefined && t2 == type_undefined)
-    return FALSE;
+    return false;
   else if (type_tag(t1) != type_tag(t2))
-    return FALSE;
+    return false;
 
   /* assertion: t1 and t2 are defined and have the same tag */
   switch(type_tag(t1)) {
   case is_type_statement:
-    return TRUE;
+    return true;
   case is_type_area:
     return area_equal_p(type_area(t1), type_area(t2));
   case is_type_variable:
@@ -384,14 +384,14 @@ bool type_equal_p(type t1, type t2)
   case is_type_functional:
     return functional_equal_p(type_functional(t1), type_functional(t2));
   case is_type_unknown:
-    return TRUE;
+    return true;
   case is_type_void:
-    return TRUE;
+    return true;
   default:
     pips_internal_error("unexpected tag %d", type_tag(t1));
   }
 
-  return FALSE; /* just to avoid a warning */
+  return false; /* just to avoid a warning */
 }
 
 type make_scalar_integer_type(_int n)
@@ -411,11 +411,11 @@ type make_scalar_complex_type(_int n)
 bool area_equal_p(area a1, area a2)
 {
     if(a1 == a2)
-	return TRUE;
+	return true;
     else if (a1 == area_undefined && a2 != area_undefined)
-	return FALSE;
+	return false;
     else if (a1 != area_undefined && a2 == area_undefined)
-	return FALSE;
+	return false;
     else
 	/* layouts are independent ? */
 	return (area_size(a1) == area_size(a2));
@@ -435,19 +435,19 @@ dimension_equal_p(dimension d1, dimension d2)
 bool variable_equal_p(variable v1, variable v2)
 {
   if(v1 == v2)
-      return TRUE;
+      return true;
   else if (v1 == variable_undefined && v2 != variable_undefined)
-      return FALSE;
+      return false;
   else if (v1 != variable_undefined && v2 == variable_undefined)
-      return FALSE;
+      return false;
   else if (!basic_equal_p(variable_basic(v1), variable_basic(v2)))
-      return FALSE;
+      return false;
   else {
       list ld1 = variable_dimensions(v1);
       list ld2 = variable_dimensions(v2);
 
       if(ld1==NIL && ld2==NIL)
-	  return TRUE;
+	  return true;
       else
       {
 	  /* dimensions should be checked, but it's hard: the only
@@ -456,32 +456,32 @@ bool variable_equal_p(variable v1, variable v2)
 	     callee; stars represent any strictly positive integer;
 	     we do not know if v1 is the caller type or the callee type;
 	  I do not know what should be done; FI */
-	  /* FI: I return FALSE because the exact test should never be useful
+	  /* FI: I return false because the exact test should never be useful
 	     in the parser; 1 February 1994 */
 	  /* FC: I need this in the prettyprinter... */
 	  int l1 = gen_length(ld1), l2 = gen_length(ld2);
 	  if (l1!=l2)
-	      return FALSE;
+	      return false;
 	  for (; ld1; POP(ld1), POP(ld2))
 	  {
 	      dimension d1 = DIMENSION(CAR(ld1)), d2 = DIMENSION(CAR(ld2));
 	      if (!dimension_equal_p(d1, d2))
-		  return FALSE;
+		  return false;
 	  }
       }
   }
-  return TRUE;
+  return true;
 }
 bool basic_equal_strict_p(basic b1, basic b2)
 {
   if(b1 == b2)
-    return TRUE;
+    return true;
   else if (b1 == basic_undefined && b2 != basic_undefined)
-    return FALSE;
+    return false;
   else if (b1 != basic_undefined && b2 == basic_undefined)
-    return FALSE;
+    return false;
   else if (basic_tag(b1) != basic_tag(b2))
-    return FALSE;
+    return false;
 
   /* assertion: b1 and b2 are defined and have the same tag
      (see previous tests) */
@@ -494,7 +494,7 @@ bool basic_equal_strict_p(basic b1, basic b2)
   case is_basic_logical:
     return basic_logical(b1) == basic_logical(b2);
   case is_basic_overloaded:
-    return TRUE;
+    return true;
   case is_basic_complex:
     return basic_complex(b1) == basic_complex(b2);
   case is_basic_bit: {
@@ -535,14 +535,14 @@ bool basic_equal_strict_p(basic b1, basic b2)
       pips_internal_error("string type comparison not implemented");
     */
     /* could be a star or an expression; a value_equal_p() is needed! */
-    return TRUE;
+    return true;
   case is_basic_typedef:
     /* FI->BC (?): suffixes _p should be removed */
     return basic_typedef_p(b2)
       && same_entity_p(basic_typedef(b1),basic_typedef(b2));
   default: pips_internal_error("unexpected tag %d", basic_tag(b1));
   }
-  return FALSE; /* just to avoid a warning */
+  return false; /* just to avoid a warning */
 }
 
 bool basic_equal_p(basic b1, basic b2)
@@ -565,24 +565,24 @@ bool basic_equal_p(basic b1, basic b2)
 bool functional_equal_p(functional f1, functional f2)
 {
     if(f1 == f2)
-	return TRUE;
+	return true;
     else if (f1 == functional_undefined && f2 != functional_undefined)
-	return FALSE;
+	return false;
     else if (f1 != functional_undefined && f2 == functional_undefined)
-	return FALSE;
+	return false;
     else {
 	list lp1 = functional_parameters(f1);
 	list lp2 = functional_parameters(f2);
 
 	if(gen_length(lp1) != gen_length(lp2))
-	    return FALSE;
+	    return false;
 
 	for( ; !ENDP(lp1); POP(lp1), POP(lp2)) {
 	    parameter p1 = PARAMETER(CAR(lp1));
 	    parameter p2 = PARAMETER(CAR(lp2));
 
 	    if(!parameter_equal_p(p1, p2))
-		return FALSE;
+		return false;
 	}
 
 	return type_equal_p(functional_result(f1), functional_result(f2));
@@ -592,11 +592,11 @@ bool functional_equal_p(functional f1, functional f2)
 bool parameter_equal_p(parameter p1, parameter p2)
 {
     if(p1 == p2)
-	return TRUE;
+	return true;
     else if (p1 == parameter_undefined && p2 != parameter_undefined)
-	return FALSE;
+	return false;
     else if (p1 != parameter_undefined && p2 == parameter_undefined)
-	return FALSE;
+	return false;
     else
 	return type_equal_p(parameter_type(p1), parameter_type(p2))
 	    && mode_equal_p(parameter_mode(p1), parameter_mode(p2));
@@ -605,11 +605,11 @@ bool parameter_equal_p(parameter p1, parameter p2)
 bool mode_equal_p(mode m1, mode m2)
 {
     if(m1 == m2)
-	return TRUE;
+	return true;
     else if (m1 == mode_undefined && m2 != mode_undefined)
-	return FALSE;
+	return false;
     else if (m1 != mode_undefined && m2 == mode_undefined)
-	return FALSE;
+	return false;
     else
 	return mode_tag(m1) == mode_tag(m2);
 }
@@ -963,7 +963,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
       }
       else {
 	expression e = sizeofexpression_expression(sofe);
-	b = basic_of_any_expression(e, TRUE);
+	b = basic_of_any_expression(e, true);
 	pips_internal_error("expression not expected here");
       }
       break;
@@ -982,7 +982,7 @@ basic some_basic_of_any_expression(expression exp, bool apply_p, bool ultimate_p
 
 basic basic_of_any_expression(expression exp, bool apply_p)
 {
-  return some_basic_of_any_expression(exp, apply_p, TRUE);
+  return some_basic_of_any_expression(exp, apply_p, true);
 }
 
 /* basic basic_of_expression(expression exp): Makes a basic of the same
@@ -1001,7 +1001,7 @@ basic basic_of_any_expression(expression exp, bool apply_p)
  */
 basic basic_of_expression(expression exp)
 {
-  return basic_of_any_expression(exp, FALSE);
+  return basic_of_any_expression(exp, false);
 }
 
 /**
@@ -1195,7 +1195,7 @@ basic basic_of_intrinsic(call c, bool apply_p, bool ultimate_p)
             //string s = entity_user_name(f);
             //bool b = ENTITY_ADDRESS_OF_P(f);
             expression e = EXPRESSION(CAR(args));
-            basic eb = some_basic_of_any_expression(e, FALSE, ultimate_p);
+            basic eb = some_basic_of_any_expression(e, false, ultimate_p);
             // Forget multidimensional types
             type et = make_type(is_type_variable,
                     make_variable(eb, NIL, NIL));
@@ -2108,7 +2108,7 @@ type expression_to_user_type(expression e)
   /* does not cover references to functions ...*/
   /* Could be more elaborated with array types for array expressions */
   type t = type_undefined;
-  basic b = some_basic_of_any_expression(e, FALSE, FALSE);
+  basic b = some_basic_of_any_expression(e, false, false);
   variable v = make_variable(b, NIL, NIL);
 
   t = make_type(is_type_variable, v);
@@ -2128,13 +2128,13 @@ bool overloaded_type_p(type t)
   //pips_assert("type t is of kind variable", type_variable_p(t));
 
   if(!type_variable_p(t))
-    return FALSE;
+    return false;
 
   return basic_overloaded_p(variable_basic(type_variable(t)));
 }
 
 /* bool is_inferior_basic(basic1, basic2)
- * return TRUE if basic1 is less complex than basic2
+ * return true if basic1 is less complex than basic2
  * ex:  int is less complex than float*4,
  *      float*4 is less complex than float*8, ...
  * - overloaded is inferior to any basic.
@@ -2153,42 +2153,42 @@ basic b1, b2;
 	pips_internal_error("second basic_undefined");
 
     if (basic_overloaded_p(b1))
-	return (TRUE);
+	return (true);
     else if (basic_overloaded_p(b2))
-	return (FALSE);
+	return (false);
     else if (basic_logical_p(b1))
-	return (TRUE);
+	return (true);
     else if (basic_logical_p(b2))
-	return (FALSE);
+	return (false);
     else if (basic_string_p(b1))
-	return (TRUE);
+	return (true);
     else if (basic_string_p(b2))
-	return (FALSE);
+	return (false);
     else if (basic_int_p(b1)) {
 	if (basic_int_p(b2))
 	    return (basic_int(b1) <= basic_int(b2));
 	else
-	    return (TRUE);
+	    return (true);
     }
     else if (basic_float_p(b1)) {
 	if (basic_int_p(b2))
-	    return (FALSE);
+	    return (false);
 	else if (basic_float_p(b2))
 	    return (basic_float(b1) <= basic_float(b2));
 	else
-	    return (TRUE);
+	    return (true);
     }
     else if (basic_complex_p(b1)) {
 	if (basic_int_p(b2) || basic_float_p(b2))
-	    return (FALSE);
+	    return (false);
 	else if (basic_complex_p(b2))
 	    return (basic_complex(b1) <= basic_complex(b2));
 	else
-	    return (TRUE);
+	    return (true);
     }
     else
 	pips_internal_error("Case never occurs.");
-    return (TRUE);
+    return (true);
 }
 
 basic
@@ -2260,9 +2260,9 @@ bool signed_type_p(type t)
       basic b = variable_basic(type_variable(t));
       if (basic_int_p(b))
 	if (basic_int(b)/10 == DEFAULT_SIGNED_TYPE_SIZE)
-	  return TRUE;
+	  return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool unsigned_type_p(type t)
@@ -2272,9 +2272,9 @@ bool unsigned_type_p(type t)
       basic b = variable_basic(type_variable(t));
       if (basic_int_p(b))
 	if (basic_int(b)/10 == DEFAULT_UNSIGNED_TYPE_SIZE)
-	  return TRUE;
+	  return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool long_type_p(type t)
@@ -2284,9 +2284,9 @@ bool long_type_p(type t)
       basic b = variable_basic(type_variable(t));
       if (basic_int_p(b))
 	if (basic_int(b) == DEFAULT_LONG_INTEGER_TYPE_SIZE)
-	  return TRUE;
+	  return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool bit_type_p(type t)
@@ -2295,9 +2295,9 @@ bool bit_type_p(type t)
     {
       basic b = variable_basic(type_variable(t));
       if (!basic_undefined_p(b) && basic_bit_p(b))
-	return TRUE;
+	return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool string_type_p(type t)
@@ -2306,9 +2306,9 @@ bool string_type_p(type t)
     {
       basic b = variable_basic(type_variable(t));
       if (!basic_undefined_p(b) && basic_string_p(b))
-	return TRUE;
+	return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool logical_type_p(type t)
@@ -2317,14 +2317,14 @@ bool logical_type_p(type t)
     {
       basic b = variable_basic(type_variable(t));
       if (!basic_undefined_p(b) && basic_logical_p(b))
-	return TRUE;
+	return true;
     }
-  return FALSE;
+  return false;
 }
 
 bool char_type_p(type t)
 {
-  bool is_char = FALSE;
+  bool is_char = false;
 
   if (!type_undefined_p(t) && type_variable_p(t)) {
     basic b = variable_basic(type_variable(t));
@@ -2339,12 +2339,12 @@ bool char_type_p(type t)
 /* Safer than the other implementation?
 bool pointer_type_p(type t)
 {
-  bool is_pointer = FALSE;
+  bool is_pointer = false;
 
   if (!type_undefined_p(t) && type_variable_p(t)) {
     basic b = variable_basic(type_variable(t));
     if (!basic_undefined_p(b) && basic_pointer_p(b)) {
-      is_pointer = TRUE;
+      is_pointer = true;
     }
   }
   return is_pointer;
@@ -2353,7 +2353,7 @@ bool pointer_type_p(type t)
 
 /* Here is the set of mapping functions, from the RI to C language types*/
 
-/* Returns TRUE if t is one of the following types :
+/* Returns true if t is one of the following types :
    void, char, short, int, long, float, double, signed, unsigned,
    and there is no array dimensions, of course*/
 
@@ -2476,7 +2476,7 @@ bool type_leads_to_pointer_p(type t)
   return res;
 }
 
-/* Returns TRUE if t is of type struct, union or enum. Need to
+/* Returns true if t is of type struct, union or enum. Need to
    distinguish with the case struct/union/enum in type in RI, these
    are the definitions of the struct/union/enum themselve, not a
    variable of this type.
@@ -2489,7 +2489,7 @@ bool derived_type_p(type t)
 	  && (variable_dimensions(type_variable(t)) == NIL));
 }
 
-/* Returns TRUE if t is a typedefED type.
+/* Returns true if t is a typedefED type.
 
    Example : Myint i;
 */
@@ -2534,7 +2534,7 @@ type make_standard_integer_type(type t, int size)
    double type in parser*/
 bool standard_long_integer_type_p(type t)
 {
-  bool long_p = FALSE;
+  bool long_p = false;
   if(!type_undefined_p(t) && type_variable_p(t)) {
     variable v = type_variable(t);
     basic b = variable_basic(v);
@@ -2553,7 +2553,7 @@ bool standard_long_integer_type_p(type t)
 
 bool scalar_integer_type_p(type t)
 {
-  bool long_p = FALSE;
+  bool long_p = false;
   if(!type_undefined_p(t) && type_variable_p(t)) {
     variable v = type_variable(t);
     basic b = variable_basic(v);
@@ -2718,7 +2718,7 @@ type ultimate_type(type t)
   }
 
   pips_assert("nt is not a typedef",
-	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
+	      type_variable_p(nt)? !basic_typedef_p(variable_basic(type_variable(nt))) : true);
 
   // only under debug, because there is a big impact on performance
   ifdebug(1) pips_assert("type consistent",type_consistent_p(nt));
@@ -2806,7 +2806,7 @@ type basic_concrete_type(type t)
 
   pips_assert("nt is not a typedef",
 	      type_variable_p(nt)?
-	      !basic_typedef_p(variable_basic(type_variable(nt))) : TRUE);
+	      !basic_typedef_p(variable_basic(type_variable(nt))) : true);
 
   return nt;
 }
@@ -2814,7 +2814,7 @@ type basic_concrete_type(type t)
 /* Is an object of type t compatible with a call? */
 bool call_compatible_type_p(type t)
 {
-  bool compatible_p = TRUE;
+  bool compatible_p = true;
 
   if(!type_functional_p(t)) {
     if(type_variable_p(t)) {
@@ -2828,10 +2828,10 @@ bool call_compatible_type_p(type t)
 	compatible_p = call_compatible_type_p(entity_type(te));
       }
       else
-	compatible_p = FALSE;
+	compatible_p = false;
     }
     else
-      compatible_p = FALSE;
+      compatible_p = false;
   }
   return compatible_p;
 }
@@ -2857,10 +2857,10 @@ type call_compatible_type(type t)
 	compatible = call_compatible_type(entity_type(te));
       }
       else
-	compatible = FALSE;
+	compatible = false;
     }
     else
-      compatible = FALSE;
+      compatible = false;
   }
   pips_assert("compatible is a functional type", type_functional_p(compatible));
   pips_assert("compatible is a consistent type", type_consistent_p(compatible));
@@ -3166,7 +3166,7 @@ list generic_constant_expression_supporting_entities(list sel, set vt, expressio
 /* C version */
 list constant_expression_supporting_entities(list sel, set vt, expression e)
 {
-  return generic_constant_expression_supporting_entities(sel, vt, e, TRUE);
+  return generic_constant_expression_supporting_entities(sel, vt, e, true);
 }
 
 /* Fortran version */
@@ -3174,7 +3174,7 @@ list fortran_constant_expression_supporting_entities(list sel, expression e)
 {
   set vt = set_make(hash_pointer);
 
-  sel = generic_constant_expression_supporting_entities(sel, vt, e, FALSE);
+  sel = generic_constant_expression_supporting_entities(sel, vt, e, false);
 
   set_free(vt);
 
@@ -3191,7 +3191,7 @@ list generic_symbolic_supporting_entities(list sel, set vt, symbolic s, bool lan
 /* C version */
 list symbolic_supporting_entities(list sel, set vt, symbolic s)
 {
-  return generic_symbolic_supporting_entities(sel, vt, s, TRUE);
+  return generic_symbolic_supporting_entities(sel, vt, s, true);
 }
 
 list basic_supporting_entities(list sel, set vt, basic b)
@@ -3662,7 +3662,7 @@ list type_supporting_references(list srl, type t)
    declared "extern int f()". */
 bool check_C_function_type(entity f, list args)
 {
-  bool ok = TRUE;
+  bool ok = true;
   type t = entity_type(f);
   type ct = call_compatible_type(t);
   list parms = functional_parameters(type_functional(ct));
@@ -3721,7 +3721,7 @@ bool check_C_function_type(entity f, list args)
       ok = type_varargs_p(pt);
     }
     else
-      ok = FALSE;
+      ok = false;
   }
   else {
     /* Check type compatibility: find function in flint?
@@ -3908,13 +3908,13 @@ static list recursive_type_supporting_types(list stl, set vt, type t);
 /* Very basic and crude debugging function */
 void print_types(list tl)
 {
-  bool first_p = TRUE;
+  bool first_p = true;
 
   fprintf(stderr, "Type list: ");
 
   FOREACH(TYPE, t, tl) {
     fprintf(stderr, first_p? "%p" : ", %p", t);
-    first_p = FALSE;
+    first_p = false;
   }
 
   fprintf(stderr, "\n");
@@ -4118,13 +4118,13 @@ type make_char_array_type(int n)
 }
 bool overloaded_parameters_p(list lparams)
 {
-  bool overloaded_p = TRUE;
+  bool overloaded_p = true;
 
   FOREACH(PARAMETER, p, lparams) {
     type pt = parameter_type(p);
 
     if(!overloaded_type_p(pt)) {
-      overloaded_p = FALSE;
+      overloaded_p = false;
       break;
     }
   }
@@ -4239,10 +4239,10 @@ string qualifier_to_string(qualifier q)
 /* Check that a qualifier list contains the const qualifier */
 bool qualifiers_const_p(list ql)
 {
-  bool const_p = FALSE;
+  bool const_p = false;
   FOREACH(QUALIFIER, q, ql) {
     if(qualifier_const_p(q)) {
-      const_p = TRUE;
+      const_p = true;
       break;
     }
   }
@@ -4256,7 +4256,7 @@ bool qualifiers_const_p(list ql)
  */
 bool type_with_const_qualifier_p(type t)
 {
-  bool qualifier_p = FALSE;
+  bool qualifier_p = false;
 
   if(type_variable_p(t)) {
     variable v = type_variable(t);

@@ -289,15 +289,15 @@ vertex in_ver;
 
 
 /*============================================================================*/
-boolean integer_in_list_p(i, l)
+bool integer_in_list_p(i, l)
 int i;
 list l;
 {
- boolean is_in_list = FALSE;
+ bool is_in_list = false;
 
  for( ; (l != NIL) && (! is_in_list); l = CDR(l))
     if(i == INT(CAR(l)))
-       is_in_list = TRUE;
+       is_in_list = true;
 
  return(is_in_list);
 }
@@ -411,7 +411,7 @@ list*	  in_lp;
     dataflow 	df = NULL;
     quast_leaf	ql = NULL;
     vertex	pred_v = NULL;
-    bool	get_it = FALSE;
+    bool	get_it = false;
     list	qls = NIL;
     leaf_label	qll = NULL;
     int		sou_nb, dest_vls = (int) NULL;
@@ -472,7 +472,7 @@ list*	  in_lp;
 	vertex	   vv     = successor_vertex( succ );
 
 	if (vv != in_dest) continue;
-	get_it = TRUE;
+	get_it = true;
 	gen_nconc( dfg_arc_label_dataflows(successor_arc_label(succ) ), dfl );
       }
       /* If not, add to it the correct successor */
@@ -723,7 +723,7 @@ bool in_effect_list_p( l, eff )
 list l;
 effect eff;
 {
-  bool 		ret_bo = FALSE;
+  bool 		ret_bo = false;
   reference 	r1 = NULL;
 
   debug(9, "in_effect_list_p", "begin\n");
@@ -731,7 +731,7 @@ effect eff;
 
   for(; !ENDP(l) && !ret_bo ; POP(l) ) {
     reference r2 = effect_any_reference(EFFECT(CAR( l )));
-    if ( reference_equal_p( r1, r2 ) ) ret_bo = TRUE;
+    if ( reference_equal_p( r1, r2 ) ) ret_bo = true;
   }
 
   debug(9, "in_effect_list_p", "end\n");

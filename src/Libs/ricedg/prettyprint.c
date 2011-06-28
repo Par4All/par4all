@@ -34,19 +34,19 @@
 bool print_whole_dependence_graph(string mod_name)
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
-		      FALSE);
+		      false);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
-		      FALSE);
+		      false);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
-		      TRUE);
+		      true);
     return print_dependence_graph(mod_name);
 }
 
 bool print_filtered_dependence_graph(string mod_name)
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
-		      TRUE);
-    return print_filtered_dg_or_dvdg(mod_name, FALSE);
+		      true);
+    return print_filtered_dg_or_dvdg(mod_name, false);
 }
 
 bool
@@ -54,29 +54,29 @@ print_filtered_dependence_daVinci_graph(mod_name)
 string mod_name;
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
-		      TRUE);
-    return print_filtered_dg_or_dvdg(mod_name, TRUE);
+		      true);
+    return print_filtered_dg_or_dvdg(mod_name, true);
 }
 
 bool print_effective_dependence_graph(string mod_name)
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
-		      TRUE);
+		      true);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
-		      FALSE);
+		      false);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
-		      FALSE);
+		      false);
     return print_dependence_graph(mod_name);
 }
 
 bool print_loop_carried_dependence_graph(string mod_name)
 {
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_PRIVATIZED_DEPS",
-		      TRUE);
+		      true);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITHOUT_NOLOOPCARRIED_DEPS",
-		      TRUE);
+		      true);
     set_bool_property("PRINT_DEPENDENCE_GRAPH_WITH_DEPENDENCE_CONES",
-		      TRUE);
+		      true);
     return print_dependence_graph(mod_name);
 }
 
@@ -90,13 +90,13 @@ static bool print_dependence_or_chains_graph(string mod_name, bool with_dg)
 
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
     set_ordering_to_statement(mod_stat);
 
     /* get the dg or chains... */
     dg = (graph) db_get_memory_resource(
-	with_dg? DBR_DG: DBR_CHAINS, mod_name, TRUE);
+	with_dg? DBR_DG: DBR_CHAINS, mod_name, true);
 
     local_dg_name = db_build_file_resource_name(DBR_DG, mod_name, ".dg");
     dg_name = strdup(concatenate(db_get_current_workspace_directory(),
@@ -122,17 +122,17 @@ static bool print_dependence_or_chains_graph(string mod_name, bool with_dg)
     reset_current_module_entity();
     reset_ordering_to_statement();
 
-    return TRUE;
+    return true;
 }
 
 bool print_dependence_graph(string name)
 {
-    return print_dependence_or_chains_graph(name, TRUE);
+    return print_dependence_or_chains_graph(name, true);
 }
 
 bool print_chains_graph(string name)
 {
-    return print_dependence_or_chains_graph(name, FALSE);
+    return print_dependence_or_chains_graph(name, false);
 }
 
 
@@ -155,14 +155,14 @@ static bool print_dot_dependence_or_chains_graph(string mod_name,
   set_current_module_entity( local_name_to_top_level_entity( mod_name ) );
   set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE,
 								    mod_name,
-								    TRUE ) );
+								    true ) );
   mod_stat = get_current_module_statement( );
   set_ordering_to_statement( mod_stat );
 
   // get the dg or chains...
   dg = (graph) db_get_memory_resource( with_dg ? DBR_DG : DBR_CHAINS,
 				       mod_name,
-				       TRUE );
+				       true );
 
   // Prepare the output file
   local_dg_name = db_build_file_resource_name( DBR_DG, mod_name, ".dot" );
@@ -190,7 +190,7 @@ static bool print_dot_dependence_or_chains_graph(string mod_name,
   reset_current_module_entity( );
   reset_ordering_to_statement( );
 
-  return TRUE;
+  return true;
 }
 
 /** \fn bool print_dot_chains_graph(string name)
@@ -200,7 +200,7 @@ static bool print_dot_dependence_or_chains_graph(string mod_name,
  *  \return always true ? see print_dot_dependence_graph
  */
 bool print_dot_chains_graph( string name ) {
-  return print_dot_dependence_or_chains_graph( name, FALSE );
+  return print_dot_dependence_or_chains_graph( name, false );
 }
 
 /** \fn bool print_dot_dependence_graph(string name)
@@ -210,5 +210,5 @@ bool print_dot_chains_graph( string name ) {
  *  \return always true ? see print_dot_dependence_graph
  */
 bool print_dot_dependence_graph( string name ) {
-  return print_dot_dependence_or_chains_graph( name, TRUE );
+  return print_dot_dependence_or_chains_graph( name, true );
 }

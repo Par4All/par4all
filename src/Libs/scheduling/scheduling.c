@@ -86,7 +86,7 @@ typedef dfg_vertex_label vertex_label;
  * AC 94/03/30
  */
 
-boolean print_bdt(module_name)
+bool print_bdt(module_name)
 
  char     *module_name;
 {
@@ -100,7 +100,7 @@ boolean print_bdt(module_name)
   if (get_debug_level() > 1)
     user_log("\n\n *** PRINTING BDT for %s\n", module_name);
 
-  the_bdt = (bdt) db_get_memory_resource(DBR_BDT, module_name, TRUE);
+  the_bdt = (bdt) db_get_memory_resource(DBR_BDT, module_name, true);
 
   localfilename = strdup(concatenate(module_name, BDT_EXT, NULL));
   filename = strdup(concatenate(db_get_current_workspace_directory(), 
@@ -119,7 +119,7 @@ boolean print_bdt(module_name)
   
   debug_off();
   
-  return(TRUE);
+  return(true);
 }
 
 /*==================================================================*/
@@ -132,7 +132,7 @@ boolean print_bdt(module_name)
  * AC 93/10/30
  */
 
-boolean scheduling(mod_name)
+bool scheduling(mod_name)
 char            *mod_name;
 {
   graph           dfg, rdfg;
@@ -158,9 +158,9 @@ char            *mod_name;
   
   set_current_module_entity(ent);
   
-  mod_stat = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stat = (statement)db_get_memory_resource(DBR_CODE, mod_name, true);
   STS = (statement_mapping) db_get_memory_resource(DBR_STATIC_CONTROL,
-					    mod_name, TRUE);
+					    mod_name, true);
   stco = (static_control) GET_STATEMENT_MAPPING(STS, mod_stat);
   
   set_current_stco_map(STS);
@@ -172,7 +172,7 @@ char            *mod_name;
     pips_internal_error("This is not a static control program !");
   
   /* Read the DFG */
-  dfg = (graph)db_get_memory_resource(DBR_ADFG, mod_name, TRUE);
+  dfg = (graph)db_get_memory_resource(DBR_ADFG, mod_name, true);
   dfg = adg_pure_dfg(dfg);
   rdfg = dfg_reverse_graph(dfg);
   if (get_debug_level() > 5) fprint_dfg(stderr, rdfg);
@@ -197,5 +197,5 @@ char            *mod_name;
 
   debug_off();
 
-  return(TRUE);
+  return(true);
 }

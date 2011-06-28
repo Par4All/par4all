@@ -195,11 +195,11 @@ static bool save_meta_data(bool do_free)
     
     pips_debug(2, "done\n");
 
-    return TRUE;
+    return true;
 }
 
 #define ONERROR(cond, what) \
-  if (cond) { what; return FALSE; }
+  if (cond) { what; return false; }
 
 /* load metadata from workspace.
  * @return whether successful.
@@ -254,7 +254,7 @@ static bool load_meta_data(void)
     
     pips_debug(2, "done\n");
 
-    return TRUE;
+    return true;
 }
 
 /**************************************************************** MANAGEMENT */
@@ -347,12 +347,12 @@ void db_checkpoint_workspace(void)
     pips_debug(1, "Checkpointing workspace %s\n", 
 	       db_get_current_workspace_name());
 
-    db_save_workspace("Saving", FALSE); 
+    db_save_workspace("Saving", false); 
 
     /* load ENTITIES (since no one ask for them as they should...)
      */
     if (db_resource_p(DBR_ENTITIES, "")) 
-	(void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
+	(void) db_get_memory_resource(DBR_ENTITIES, "", true);
 
     ifdebug(1) dump_all_db_resource_status(stderr, "db_checkpoint_workspace");
     debug_off();
@@ -368,12 +368,12 @@ bool db_close_workspace(bool is_quit)
     
     pips_debug(1, "done\n");
     debug_off();
-    return TRUE;
+    return true;
 }
 
 bool db_open_workspace(const char* name)
 {
-    bool ok = TRUE;
+    bool ok = true;
     string dir_name;
     debug_on(PIPSDBM_DEBUG_LEVEL);
     pips_debug(1, "Opening workspace %s\n", name);
@@ -393,11 +393,11 @@ bool db_open_workspace(const char* name)
 
 	/* load ENTITIES (since no one ask for them as they should;-) */
 	if (ok && db_resource_p(DBR_ENTITIES, "")) {
-	    (void) db_get_memory_resource(DBR_ENTITIES, "", TRUE);
+	    (void) db_get_memory_resource(DBR_ENTITIES, "", true);
 	    /* should touch them somehow to force latter saving? */
 	}
     }
-    else ok = FALSE;
+    else ok = false;
 
     pips_debug(1, "done (%d)\n", ok);
     debug_off();

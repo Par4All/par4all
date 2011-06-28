@@ -199,7 +199,7 @@ extract_lattice(
 
     DEBUG_MTRX(4, "Hl", Hl);
 
-    if (!matrix_triangular_unimodular_p(Hl, TRUE)) {
+    if (!matrix_triangular_unimodular_p(Hl, true)) {
 	pips_user_warning("fast exit, some yes/no lattice skipped\n");
 	/* and memory leak, by the way 
 	 */
@@ -209,12 +209,12 @@ extract_lattice(
     }
 
     message_assert("Hl is lower triangular unimodular", 
-		   matrix_triangular_unimodular_p(Hl, TRUE));
+		   matrix_triangular_unimodular_p(Hl, true));
 
     /* Hli = Hl^-1
      */
     Hli = matrix_new(neq, neq);
-    matrix_unimodular_triangular_inversion(Hl, Hli, TRUE);
+    matrix_unimodular_triangular_inversion(Hl, Hli, true);
     matrix_free(Hl);
 
     DEBUG_MTRX(4, "Hli", Hli);

@@ -39,7 +39,7 @@
 /* Predicates
  */
 
-/* TRUE if there is a reference to a distributed array within obj
+/* true if there is a reference to a distributed array within obj
  *
  * ??? not very intelligent, should use the regions, the problem is
  * that I should normalize the code *before* the pips analysis...
@@ -62,11 +62,11 @@ bool written_effect_p(entity var,
       if(store_effect_p(e)) {
 	if (reference_variable(effect_any_reference(e))==var &&
 	    action_write_p(effect_action(e)))
-	    return TRUE;
+	    return true;
       }
     }
 
-    return FALSE;
+    return false;
 }
 
 bool written_effects_to_dist_arrays_p(expression expr)
@@ -79,12 +79,12 @@ bool written_effects_to_dist_arrays_p(expression expr)
 	if  (action_write_p(effect_action(EFFECT(CAR(l)))))
 	{
 	    gen_free_list(leffects_to_dist_arrays);
-	    return TRUE;
+	    return true;
 	}
       }
 
     gen_free_list(leffects_to_dist_arrays);
-    return FALSE;
+    return false;
 }
 
 /* replicated_p
@@ -111,14 +111,14 @@ bool replicated_p(entity e)
 
     for(i=1; i<=ntdim; i++, POP(ld))
 	if (ith_dim_replicated_p(template, i, la, DISTRIBUTION(CAR(ld))))
-	    return TRUE;
+	    return true;
 
-    return FALSE;
+    return false;
 }
 
 /* bool ith_dim_replicated_p(template, i, la, dist)
  *
- * TRUE if template dimension i distributed with dist leads to 
+ * true if template dimension i distributed with dist leads to 
  * a replication for array align al.
  */
 bool ith_dim_replicated_p(template, i, la, dist)
@@ -127,17 +127,17 @@ int i;
 list la;
 distribution dist;
 {
-    if (style_none_p(distribution_style(dist))) return FALSE;
+    if (style_none_p(distribution_style(dist))) return false;
 
     /* select the relevent alignment if exists.
      * could be some kind of gen_find_if()...
      */
-    MAP(ALIGNMENT, a, if (alignment_templatedim(a)==i) return FALSE, la);
+    MAP(ALIGNMENT, a, if (alignment_templatedim(a)==i) return false, la);
 
-    return TRUE;
+    return true;
 }
 
-/* TRUE if array a is replicated on processors p i-th dimension.
+/* true if array a is replicated on processors p i-th dimension.
  */
 bool processors_dim_replicated_p(p, a, i)
 entity p, a;
@@ -170,7 +170,7 @@ int i, *pprocdim;
     list ld = distribute_distribution(dis);
     distribution d;
 
-    if (alignment_undefined_p(alt)) return(FALSE);
+    if (alignment_undefined_p(alt)) return(false);
     d = FindDistributionOfDim(ld, alignment_templatedim(alt), pprocdim);
     return(!style_none_p(distribution_style(d)));
 }
@@ -189,7 +189,7 @@ ith_dim_overlapable_p(
     distribution d;
     int p;
 
-    if (alignment_undefined_p(alt)) return FALSE;
+    if (alignment_undefined_p(alt)) return false;
     d = FindDistributionOfDim(ld, alignment_templatedim(alt), &p);
 
     return style_block_p(distribution_style(d));
@@ -723,7 +723,7 @@ int dim, *plow, *pup;
  * what: whether e1 and e2 dimensions dim1 and dim2 are aligned.
  * how: basic low level comparison
  * input: entities and dimension numbers
- * output: the boolean result
+ * output: the bool result
  * side effects:
  *  - uses alignment internal descriptions
  * bugs or features:
@@ -738,8 +738,8 @@ alignments_compatible_p(entity e1, int dim1,
     get_alignment(e1, dim1, &tdim1, &rate1, &shift1);
     get_alignment(e2, dim2, &tdim2, &rate2, &shift2);
 
-    if (tdim1!=tdim2) return FALSE;
-    if (!tdim1 && !tdim2) return TRUE;
+    if (tdim1!=tdim2) return false;
+    if (!tdim1 && !tdim2) return true;
     
     return rate1==rate2 && shift1==shift2;
 }
@@ -790,7 +790,7 @@ references_aligned_p(reference r1, reference r2)
 
     if (!array_distributed_p(e1) || !array_distributed_p(e2))
     {
-	XDEBUG("not distributed"); return FALSE;
+	XDEBUG("not distributed"); return false;
     }
 
     a1 = load_hpf_alignment(e1);
@@ -801,32 +801,32 @@ references_aligned_p(reference r1, reference r2)
      */
     if (align_template(a1)!=align_template(a2))
     {
-	XDEBUG("template is different"); return FALSE;
+	XDEBUG("template is different"); return false;
     }
 
     if (gen_length(le1)!=gen_length(le2))
     {
-	XDEBUG("arities are different"); return FALSE;
+	XDEBUG("arities are different"); return false;
     }
     
     MAP(EXPRESSION, ind, 
     {
 	if (!expression_reference_p(ind))
-	    return FALSE;
+	    return false;
 
 	index = reference_variable(syntax_reference(expression_syntax(ind)));
 	dim2 = expression_number_for_index(index, le2);
 
 	if (!alignments_compatible_p(e1, dim1, e2, dim2))
 	{
-	    XDEBUG("alignments are incompatible"); return FALSE;
+	    XDEBUG("alignments are incompatible"); return false;
 	}
 	
 	dim1++;
     },
 	le1);
 
-    XDEBUG("aligned!"); return TRUE;
+    XDEBUG("aligned!"); return true;
 }
 
 /*************************************************** IR STRUCTURAL cleaning */

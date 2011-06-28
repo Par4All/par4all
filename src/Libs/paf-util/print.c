@@ -427,10 +427,10 @@ Variable v;
 
 
 /*============================================================================*/
-boolean pu_is_inferior_var(Variable v1 __attribute__ ((unused)),
+bool pu_is_inferior_var(Variable v1 __attribute__ ((unused)),
 			   Variable v2 __attribute__ ((unused)))
 {
- return(FALSE);
+ return(false);
 }
 
 

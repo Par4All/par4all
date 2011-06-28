@@ -45,7 +45,7 @@ remplacer par expression_undefined. Sinon, le free (dans
 regenerate_expression()) causera des degas!
 
 Si une information est ajoutee a eformat_undefined, alors l'expression
-est RECOPIEE. Pourtant, eformat.simpler reste FALSE et l'expression
+est RECOPIEE. Pourtant, eformat.simpler reste false et l'expression
 d'origine n'est pas freee, car une seule information ne permet aucune
 simplification. A partir de la prise en compte de la seconde
 information, des qu'eformat est simplife', alors eformat.simpler
@@ -98,7 +98,7 @@ which makes maintenance and evolution harder.
 #include "expressions.h"
 
 
-static eformat_t  eformat_undefined = {expression_undefined, 1, 0, FALSE};
+static eformat_t  eformat_undefined = {expression_undefined, 1, 0, false};
 /* when formating is useless (ie. = (1 * expr + 0)) */
 
 /* Set of enclosing loop indices
@@ -167,7 +167,7 @@ static void rm_live_loop_index(entity i)
 void init_use_proper_effects(char *module_name)
 {
   set_proper_rw_effects((statement_effects)
-			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+			db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
   pips_assert("init_use_proper_effects", !proper_rw_effects_undefined_p());
 }
 
@@ -201,17 +201,17 @@ bool entity_written_p(entity ent, effects fx)
       if( ENDP(reference_indices(effect_any_reference(ft)))
 	  && same_entity_p(ent, reference_variable(effect_any_reference(ft)))
 	  && action_write_p(effect_action(ft)) )
-	return(TRUE);
+	return(true);
     }, effects_effects(fx));
 
-  return(FALSE);
+  return(false);
 }
 
 
 void init_use_preconditions(char *module_name)
 {
   set_precondition_map( (statement_mapping)
-			db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE) );
+			db_get_memory_resource(DBR_PRECONDITIONS, module_name, true) );
   pips_assert("init_use_preconditions",
 	      get_precondition_map() != hash_table_undefined);
   if(get_debug_level()==9) {
@@ -333,7 +333,7 @@ eformat_t partial_eval_expression(expression e, Psysteme ps, effects fx)
     if(!ef.simpler /*&& !ef.icoef==0 && !ef.ishift==0*/) {
       /* FI: it may be simpler because the simplification may be
 	 performed by normalize_expression() */
-      ef.simpler = TRUE;
+      ef.simpler = true;
       if(expression_undefined_p(ef.expr) && ef.icoef!=0)
 	ef.expr = ne;
       //ef.expr = ne;
@@ -506,7 +506,7 @@ eformat_t partial_eval_reference(expression e, Psysteme ps, effects fx)
       ef.icoef = 0;
       ef.ishift = VALUE_TO_INT(min);
       ef.expr = expression_undefined;
-      ef.simpler = TRUE;
+      ef.simpler = true;
       return(ef);
 
       /*		new_expr=int_to_expression((int)min); */
@@ -596,7 +596,7 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
     if(integer_constant_p(func, &ef.ishift)) {
       ef.icoef = 0;
       ef.expr = expression_undefined;
-      ef.simpler = FALSE;
+      ef.simpler = false;
     }
     else ef = eformat_undefined;
     break;
@@ -604,7 +604,7 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
     if(integer_symbolic_constant_p(func, &ef.ishift)) {
       ef.icoef = 0;
       ef.expr = expression_undefined;
-      ef.simpler = TRUE;
+      ef.simpler = true;
     }
     else ef = eformat_undefined;
     break;
@@ -633,7 +633,7 @@ eformat_t partial_eval_call(call ec, Psysteme ps, effects fx)
 	    /* the partial evaluation could be further improved by
 	       checking if there is a write effect on the
 	       corresponding formal parameter */
-	    if(FALSE && expression_reference_p(eparam))
+	    if(false && expression_reference_p(eparam))
 	      /* This is dealt for using fx when dealing with a
 		 reference */
 	      ; // in doubt, do nothing
@@ -686,7 +686,7 @@ eformat_t partial_eval_unary_operator(entity func, cons *la, Psysteme ps, effect
        || ((ef.icoef<0 || ef.icoef>1)
 	   && (ef.ishift<=0))
        ) {
-      ef.simpler= TRUE;
+      ef.simpler= true;
     }
 
     ef.icoef= -(ef.icoef);
@@ -732,7 +732,7 @@ eformat_t partial_eval_mult_operator(expression *ep1,
     ef.icoef=0;
     ef.expr=expression_undefined;
     ef.ishift= ef1.ishift * ef2.ishift;
-    ef.simpler= TRUE;
+    ef.simpler= true;
   }
   else if(ef1.icoef!=0 && ef2.icoef!=0) {
     if(ef2.icoef!=1 && ef2.ishift==0) {
@@ -768,7 +768,7 @@ eformat_t partial_eval_mult_operator(expression *ep1,
       ef.icoef= 0;
       ef.expr= expression_undefined;
       ef.ishift= 0;
-      ef.simpler= TRUE;
+      ef.simpler= true;
       regenerate_expression(&ef2, ep2);
     }
     else {
@@ -795,13 +795,13 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
      cases arise */
   if(expression_equal_p(*ep1, *ep2)) {
     if(token==PERFORM_SUBTRACTION) {
-      ef.simpler = TRUE;
+      ef.simpler = true;
       ef.expr = expression_undefined; //int_to_expression(0);
       ef.icoef = 0;
       ef.ishift = 0;
     }
     else if(token==PERFORM_ADDITION) {
-      ef.simpler = TRUE;
+      ef.simpler = true;
       /* FI: no idea of the expression should be copied or not, let's
 	 play safe. */
       /* Here we should go down to see if *ep1 can be partially
@@ -823,7 +823,7 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
     if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
 	&& (ef1.icoef<-1 || ef1.icoef>1) ) {
       /* factorize icoef */
-      ef.simpler=TRUE;
+      ef.simpler=true;
       if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
 	  || (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
 	/* addition */
@@ -878,7 +878,7 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
 	/* CA (9/9/97) condition <0 added in order to simplify
 	   also expression like (J)+(-1) in (J-1)    */
 	if(ef1.ishift<=0)
-	  ef.simpler=TRUE;
+	  ef.simpler=true;
 	ef.expr=ef2.expr;
 	ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
       }
@@ -888,11 +888,11 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
 	   because ef2.icoef==0 can result from a simplification */
 	ef.expr = ef1.expr;
 	ef.icoef = ef1.icoef;
-	ef.simpler=TRUE;
+	ef.simpler=true;
       }
       else {
 	if(ef2.ishift<=0)
-	  ef.simpler=TRUE;
+	  ef.simpler=true;
 	ef.expr=ef1.expr;
 	ef.icoef=ef1.icoef;
       }
@@ -903,7 +903,7 @@ eformat_t partial_eval_plus_or_minus_operator(int token,
 	 && (ef2.icoef==0 || ef2.ishift!=0))
       {
 	/* simplify shifts */
-	ef.simpler= TRUE;
+	ef.simpler= true;
       }
 
     ef.ishift= (token==PERFORM_SUBTRACTION ?
@@ -1000,13 +1000,13 @@ eformat_t partial_eval_div_or_mod_operator(int token,
       && (ef1.icoef % ef2.ishift)==0 ) {
     /* integer division does NOT commute with in any */
     /* multiplication -> only performed if "exact" */
-    ef.simpler= TRUE;
+    ef.simpler= true;
     ef.icoef= ef1.icoef / ef2.ishift;
     ef.ishift= ef1.ishift / ef2.ishift;
     ef.expr= ef1.expr;
   }
   else if(ef1.icoef==0 && ef2.icoef==0) {
-    ef.simpler= TRUE;
+    ef.simpler= true;
     ef.icoef= 0;
     ef.expr= expression_undefined;
     if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
@@ -1119,7 +1119,7 @@ eformat_t partial_eval_min_or_max_operator(int token,
     ef.ishift = (token==PERFORM_MAXIMUM)? MAX(ef1.ishift,ef2.ishift):
       MIN(ef1.ishift,ef2.ishift);
     ef.expr = expression_undefined;
-    ef.simpler = TRUE;
+    ef.simpler = true;
   }
   else {
     regenerate_expression(&ef1, ep1);
@@ -1171,7 +1171,7 @@ eformat_t partial_eval_power_operator(expression *ep1,
     ef.icoef = 0;
     ef.ishift = ipow(ef1.ishift, ef2.ishift);
     ef.expr = expression_undefined;
-    ef.simpler = TRUE;
+    ef.simpler = true;
   }
   else {
     regenerate_expression(&ef1, ep1);
@@ -1340,7 +1340,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
     if( (ef1.icoef==ef2.icoef || ef1.icoef==-ef2.icoef)
 	&& (ef1.icoef<-1 || ef1.icoef>1) ) {
       /* factorize */
-      ef.simpler=TRUE;
+      ef.simpler=true;
       if( (token==PERFORM_ADDITION && ef1.icoef==ef2.icoef)
 	  || (token==PERFORM_SUBTRACTION && ef1.icoef==-ef2.icoef) ) {
 	/* addition */
@@ -1391,12 +1391,12 @@ eformat_t partial_eval_binary_operator_old(entity func,
     else {
       ef.simpler= (ef1.simpler || ef2.simpler);
       if(ef1.icoef==0) {
-	if(ef1.ishift==0) ef.simpler=TRUE;
+	if(ef1.ishift==0) ef.simpler=true;
 	ef.expr=ef2.expr;
 	ef.icoef=(token==PERFORM_SUBTRACTION ? -ef2.icoef : ef2.icoef);
       }
       else {
-	if(ef2.ishift==0) ef.simpler=TRUE;
+	if(ef2.ishift==0) ef.simpler=true;
 	ef.expr=ef1.expr;
 	ef.icoef=ef1.icoef;
       }
@@ -1406,7 +1406,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
     if ( (ef1.icoef==0 || ef1.ishift!=0)
 	 && (ef2.icoef==0 || ef2.ishift!=0) ) {
       /* simplify shifts */
-      ef.simpler= TRUE;
+      ef.simpler= true;
     }
     ef.ishift= (token==PERFORM_SUBTRACTION ?
 		ef1.ishift-ef2.ishift : ef1.ishift+ef2.ishift);
@@ -1419,7 +1419,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
       ef.icoef=0;
       ef.expr=expression_undefined;
       ef.ishift= ef1.ishift * ef2.ishift;
-      ef.simpler= TRUE;
+      ef.simpler= true;
     }
     else if(ef1.icoef!=0 && ef2.icoef!=0) {
       if(ef2.icoef!=1 && ef2.ishift==0) {
@@ -1455,7 +1455,7 @@ eformat_t partial_eval_binary_operator_old(entity func,
 	ef.icoef= 0;
 	ef.expr= expression_undefined;
 	ef.ishift= 0;
-	ef.simpler= TRUE;
+	ef.simpler= true;
 	regenerate_expression(&ef2, ep2);
       }
       else {
@@ -1479,13 +1479,13 @@ eformat_t partial_eval_binary_operator_old(entity func,
 	&& (ef1.icoef % ef2.ishift)==0 ) {
       /* integer division does NOT commute with in any */
       /* multiplication -> only performed if "exact" */
-      ef.simpler= TRUE;
+      ef.simpler= true;
       ef.icoef= ef1.icoef / ef2.ishift;
       ef.ishift= ef1.ishift / ef2.ishift;
       ef.expr= ef1.expr;
     }
     else if(ef1.icoef==0 && ef2.icoef==0) {
-      ef.simpler= TRUE;
+      ef.simpler= true;
       ef.icoef= 0;
       ef.expr= expression_undefined;
       if (token==PERFORM_DIVISION) { /* refer to Fortran77 chap 6.1.5 */
@@ -1700,7 +1700,7 @@ void partial_eval_statement(statement stmt)
     {
       /* This is no longer useful with the new representation of C
 	 declarations. */
-      if(FALSE) {
+      if(false) {
 	FOREACH(ENTITY,e,statement_declarations(stmt)) {
 	  value v = entity_initial(e);
 	  if(value_expression_p(v))
@@ -1820,7 +1820,7 @@ bool partial_eval(char *module_name)
   statement module_statement;
 
   /* be carrefull not to get any mapping before the code */
-  /* DBR_CODE will be changed: argument "pure" is TRUE because
+  /* DBR_CODE will be changed: argument "pure" is true because
      partial_eval() *modifies* DBR_CODE. */
   /* still bugs in dbm because effects are stored on disc after this phase */
 
@@ -1828,7 +1828,7 @@ bool partial_eval(char *module_name)
   module = get_current_module_entity();
 
   set_current_module_statement(
-			       (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE));
+			       (statement) db_get_memory_resource(DBR_CODE, module_name, true));
 
   module_statement= get_current_module_statement();
 
@@ -1836,7 +1836,7 @@ bool partial_eval(char *module_name)
 
   /* preconditions may need to print preconditions for debugging purposes */
   set_cumulated_rw_effects((statement_effects)
-			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+			   db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   module_to_value_mappings(module);
 
@@ -1861,7 +1861,7 @@ bool partial_eval(char *module_name)
   reset_current_module_statement();
   free_value_mappings();
 
-  return TRUE;
+  return true;
 }
 
 

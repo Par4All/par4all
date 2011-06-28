@@ -79,7 +79,7 @@ static list make_mmcd_stats_from_ref(statement stat, list lSupportedRef, hash_ta
 				     entity transferSize, entity newOuterInd, statement innerStat);
 
 /*
-This function return TRUE if the reference whose indices are lRefDim is
+This function return true if the reference whose indices are lRefDim is
 supported and, in this case, the value of the offset is put in retVal.
  */
 static bool get_final_offset(list lRefDim, intptr_t offset, int rank, intptr_t * retVal)
@@ -115,7 +115,7 @@ static bool get_final_offset(list lRefDim, intptr_t offset, int rank, intptr_t *
       if(!integer_constant_expression_p(lowerExp) ||
 	 !integer_constant_expression_p(upperExp))
 	{
-	  return FALSE;
+	  return false;
 	}
 
       int lower = integer_constant_expression_value(lowerExp);
@@ -128,16 +128,16 @@ static bool get_final_offset(list lRefDim, intptr_t offset, int rank, intptr_t *
 
   *retVal = finalOffset * offset;
 
-  return TRUE;
+  return true;
 }
 
 /*
-This function return TRUE if reference ref is
+This function return true if reference ref is
 supported and, in this case, it updates the hash_table htOffset.
  */
 static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
 {
-  bool success = TRUE;
+  bool success = true;
   int offset = 0;
   int rank = 0;
 
@@ -160,7 +160,7 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
 	  {
 	    if(offset != 0)
 	      {
-		success = FALSE;
+		success = false;
 	      }
 
 	    offset = curOffset;
@@ -168,7 +168,7 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
       }
     else
       {
-	success = FALSE;
+	success = false;
       }
 
     if(offset == 0)
@@ -192,7 +192,7 @@ static bool supported_ref_p(reference ref, entity index, hash_table htOffset)
 
       if(!get_final_offset(lRefDim, offset, rank, &finalOffset))
 	{
-	  return FALSE;
+	  return false;
 	}
 
       //printf("finalOffset %d\n", finalOffset);
@@ -219,19 +219,19 @@ static bool has_call_stat_inside_flt(statement stat, bool * bHasCallStat)
     case is_instruction_forloop:
     case is_instruction_whileloop:
       {
-	return FALSE;
+	return false;
 	break;
       }
 
     case is_instruction_sequence:
     case is_instruction_test:
       {
-	return TRUE;
+	return true;
 	break;
       }
     case is_instruction_call:
       {
-	*bHasCallStat = TRUE;
+	*bHasCallStat = true;
 	break;
       }
     default:
@@ -241,7 +241,7 @@ static bool has_call_stat_inside_flt(statement stat, bool * bHasCallStat)
       }
     }
 
-  return FALSE;
+  return false;
 }
 
 /*
@@ -254,11 +254,11 @@ static void has_call_stat_inside_rwt(statement stat, bool * bHasCallStat)
 }
 
 /*
-This function returns TRUE if statement stat contains a call statement.
+This function returns true if statement stat contains a call statement.
  */
 bool has_call_stat_inside(statement stat)
 {
-  bool bHasCallStat = FALSE;
+  bool bHasCallStat = false;
 
   gen_context_recurse(stat, &bHasCallStat, statement_domain,
 		      has_call_stat_inside_flt, has_call_stat_inside_rwt);
@@ -499,7 +499,7 @@ static void generate_mmcd_stats_from_ref(list lRef, hash_table htOffset,
 	//printf("read eff\n");
 
 	statement readStat = generate_mmcd_stat_from_ref(curRef, offset,
-							 count, TRUE,
+							 count, true,
 							 lToggleEnt);
 
 	//print_statement(readStat);
@@ -513,7 +513,7 @@ static void generate_mmcd_stats_from_ref(list lRef, hash_table htOffset,
 	//printf("write eff\n");
 
 	statement writeStat = generate_mmcd_stat_from_ref(curRef, offset,
-							  count, FALSE,
+							  count, false,
 							  lToggleEnt);
 
 	//print_statement(writeStat);
@@ -600,15 +600,15 @@ static bool has_loop_inside_flt(statement stat, bool * bHasLoop)
     case is_instruction_forloop:
     case is_instruction_whileloop:
       {
-	*bHasLoop = TRUE;
-	return FALSE;
+	*bHasLoop = true;
+	return false;
 	break;
       }
 
     case is_instruction_sequence:
     case is_instruction_test:
       {
-	return TRUE;
+	return true;
 	break;
       }
     case is_instruction_call:
@@ -622,7 +622,7 @@ static bool has_loop_inside_flt(statement stat, bool * bHasLoop)
       }
     }
 
-  return FALSE;
+  return false;
 }
 
 /*
@@ -635,11 +635,11 @@ static void has_loop_inside_rwt(statement stat, bool * bHasLoop)
 }
 
 /*
-This function returns TRUE if statement stat contains a call statement.
+This function returns true if statement stat contains a call statement.
  */
 static bool has_loop_inside(statement stat)
 {
-  bool bHasLoop = FALSE;
+  bool bHasLoop = false;
 
   gen_context_recurse(stat, &bHasLoop, statement_domain,
 		      has_loop_inside_flt, has_loop_inside_rwt);
@@ -1165,10 +1165,10 @@ statement generate_code_test_proc(statement stat)
     }
 
   // Get the new statements for the true statement
-  statement trueStat = generate_code_function(test_true(statement_test(stat)), FALSE);
+  statement trueStat = generate_code_function(test_true(statement_test(stat)), false);
 
   // Get the new statements for the false statement
-  statement falseStat = generate_code_function(test_false(statement_test(stat)), FALSE);
+  statement falseStat = generate_code_function(test_false(statement_test(stat)), false);
 
   list lStats = NIL;
 
@@ -1221,18 +1221,18 @@ void create_realFifo_proc(statement stat, list lRef)
 {
   list lDone = NIL;
 
-  //bool readAndWrite = FALSE;
+  //bool readAndWrite = false;
 
   MAP(REFERENCE, curRef1,
   {
-    bool bDone = FALSE;
+    bool bDone = false;
 
     MAP(REFERENCE, refDone,
     {
       if(reference_equal_p(curRef1, refDone))
 	{
 	  hash_put(gRefToFifoOff, hash_get(gRefToFifo, refDone), (void *)3);
-	  bDone = TRUE;
+	  bDone = true;
 	  break;
 	}
     }, lDone);
@@ -1309,7 +1309,7 @@ statement comEngine_generate_procCode(statement externalized_code,
   gStepEnt =comEngine_make_new_scalar_variable
     (strdup("step"),
 					   make_basic(is_basic_int, (void*)4));
-  gGenHRE = FALSE;
+  gGenHRE = false;
 
   // Do the job
   newStat = comEngine_generate_code(externalized_code);

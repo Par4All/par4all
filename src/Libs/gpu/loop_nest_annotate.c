@@ -136,15 +136,15 @@ static bool loop_push(loop l, gpu_lna_context * p)
 
   if (p->loop_nest_depth >= p->max_loop_nest_depth)
     /* this loop does not belong to the perfectly nested loops */
-    return FALSE;
+    return false;
   else
     {
       p->l_enclosing_loops = gen_nconc(p->l_enclosing_loops, CONS(LOOP, l, NIL));
       p->loop_nest_depth++;
       // Go on recursing:
-      return TRUE;
+      return true;
     }
-  return FALSE;
+  return false;
 }
 
 
@@ -385,7 +385,7 @@ bool gpu_loop_nest_annotate(char *module_name)
   c.l_number_iter_exp = NIL;
   c.max_loop_nest_depth = -1;
   c.loop_nest_depth = 0;
-  c.inner_reached = FALSE;
+  c.inner_reached = false;
   c.gpu_loop_nest_annotate_parallel_p =
     get_bool_property("GPU_LOOP_NEST_ANNOTATE_PARALLEL");
   c.fail_p = false;

@@ -58,8 +58,8 @@
 
 /* {{{ function prototype */
 
-static boolean in_out_comp_regions_p = FALSE;
-static boolean is_user_view_p = FALSE;
+static bool in_out_comp_regions_p = false;
+static bool is_user_view_p = false;
 static hash_table nts = hash_table_undefined;
 
 static text text_statement_array_comp_regions(entity, int, statement);
@@ -71,13 +71,13 @@ static text get_any_comp_regions_text(string, string, string, bool);
 
 text get_text_comp_regions(string module_name)
 {
-    is_user_view_p = FALSE;
-    in_out_comp_regions_p = FALSE;
+    is_user_view_p = false;
+    in_out_comp_regions_p = false;
 
     return get_any_comp_regions_text(module_name,
 				DBR_REGIONS,
 				DBR_SUMMARY_REGIONS,
-				FALSE);
+				false);
 }
 
 
@@ -89,8 +89,8 @@ text get_text_comp_regions(string module_name)
 bool print_source_comp_regions(module_name)
 string module_name;
 {
-    is_user_view_p = TRUE;
-    in_out_comp_regions_p = FALSE;
+    is_user_view_p = true;
+    in_out_comp_regions_p = false;
 
     return print_code_with_comp_regions(module_name,
 				   DBR_REGIONS,
@@ -107,8 +107,8 @@ string module_name;
 bool print_code_comp_regions(module_name)
 string module_name;
 {
-    is_user_view_p = FALSE;
-    in_out_comp_regions_p = FALSE;
+    is_user_view_p = false;
+    in_out_comp_regions_p = false;
 
     return print_code_with_comp_regions(module_name,
 				   DBR_COMPSEC,
@@ -129,7 +129,7 @@ static bool print_code_with_comp_regions(string module_name,
 				    string file_suffix)
 {
     char *file_name, *file_resource_name;
-    bool success = TRUE;
+    bool success = true;
 
     file_name = strdup(concatenate(file_suffix,
                                   get_bool_property
@@ -145,10 +145,10 @@ static bool print_code_with_comp_regions(string module_name,
 				 get_any_comp_regions_text(module_name,
 				    resource_name,
 				    summary_resource_name,
-				    TRUE));
+				    true));
 
     free(file_name);
-    return(TRUE);
+    return(true);
 }
 
 /*{{{  get any comp_regions text*/
@@ -170,30 +170,30 @@ static text get_any_comp_regions_text(string module_name,
     set_local_comp_regions_map(comp_secs_map_to_listmap
 			  ((statement_mapping) 
 			   db_get_memory_resource
-			   (resource_name, module_name, TRUE)) );
+			   (resource_name, module_name, true)) );
 
     summary_comp_regions = 
 	     comp_desc_set_to_list((comp_desc_set) db_get_memory_resource
 			(summary_resource_name,
-			 module_name, TRUE));
+			 module_name, true));
     
     set_current_module_entity( local_name_to_top_level_entity(module_name));
     module = get_current_module_entity();
 
     set_current_module_statement((statement) db_get_memory_resource
-				 (DBR_CODE, module_name, TRUE));
+				 (DBR_CODE, module_name, true));
 
     module_stat = get_current_module_statement();
 
     /* To set up the hash table to translate value into value names */       
     set_cumulated_rw_effects((statement_effects)
-	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+	  db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
     module_to_value_mappings(module);
 
     if(is_user_view_p) 
     {
 	user_stat =  (statement)
-	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+	    db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
 
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, module_stat);
@@ -276,7 +276,7 @@ text_statement_array_comp_regions(entity __attribute__ ((unused)) module,
  * input    : a list of comp_regions
  * output   : a text representing this list of comp_regions.
  * comment  : if the number of array comp_regions is not nul, and if 
- *            PRETTYPRINT_LOOSE is TRUE, then empty lines are
+ *            PRETTYPRINT_LOOSE is true, then empty lines are
  *            added before and after the text of the list of comp_regions.
  */
 static text text_array_comp_regions(l_reg)
@@ -284,8 +284,8 @@ list l_reg;
 {
     text reg_text = make_text(NIL);
     /* in case of loose_prettyprint, at least one region to print? */
-    boolean loose_p = get_bool_property("PRETTYPRINT_LOOSE");
-    boolean one_p = FALSE;  
+    bool loose_p = get_bool_property("PRETTYPRINT_LOOSE");
+    bool one_p = false;  
 
     /* GO: No redundant test anymore, see  text_statement_array_comp_regions */
     if (l_reg != (list) HASH_UNDEFINED_VALUE && l_reg != list_undefined) 
@@ -302,7 +302,7 @@ list l_reg;
 		    ADD_SENTENCE_TO_TEXT(reg_text, 
 					 make_sentence(is_sentence_formatted, 
 						       strdup("\n")));
-		    one_p = TRUE;
+		    one_p = true;
 		}
 		MERGE_TEXTS(reg_text, text_comp_region(reg));
 	    }	
@@ -374,7 +374,7 @@ text text_comp_region(reg)
 effect reg;
 {
     text t_reg = make_text(NIL);
-    boolean foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
+    bool foresys = get_bool_property("PRETTYPRINT_FOR_FORESYS");
     string str_prefix;
 
     if (foresys)

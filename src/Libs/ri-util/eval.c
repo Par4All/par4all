@@ -207,7 +207,7 @@ value EvalConditionalOp(list la)
 {
   value vout, v1, v2, v3;
   _int arg1 = 0, arg2 = 0, arg3 = 0;
-  bool failed = FALSE;
+  bool failed = false;
 
   pips_assert("Three arguments", gen_length(la)==3);
 
@@ -215,19 +215,19 @@ value EvalConditionalOp(list la)
   if (value_constant_p(v1) && constant_int_p(value_constant(v1)))
     arg1 = constant_int(value_constant(v1));
   else
-    failed = TRUE;
+    failed = true;
 
   v2 = EvalExpression(EXPRESSION(CAR(CDR(la))));
   if (value_constant_p(v2) && constant_int_p(value_constant(v2)))
     arg2 = constant_int(value_constant(v2));
   else
-    failed = TRUE;
+    failed = true;
 
   v3 = EvalExpression(EXPRESSION(CAR(CDR(CDR(la)))));
   if (value_constant_p(v3) && constant_int_p(value_constant(v3)))
     arg3 = constant_int(value_constant(v3));
   else
-    failed = TRUE;
+    failed = true;
 
   if(failed)
     vout = make_value(is_value_unknown, NIL);
@@ -391,7 +391,7 @@ value EvalNaryOp(int t, list la)
     value v = value_undefined;
     value w = value_undefined;
     int new_arg = 0;
-    bool first_arg_p = TRUE;
+    bool first_arg_p = true;
 
     /* 2 operands at least are needed */
     assert(la != NIL && CDR(la) != NIL);
@@ -401,7 +401,7 @@ value EvalNaryOp(int t, list la)
 	if (value_constant_p(v) && constant_int_p(value_constant(v))) {
 	    new_arg = constant_int(value_constant(v));
 	    if (first_arg_p) {
-		first_arg_p = FALSE;
+		first_arg_p = false;
 		w = v;
 	    }
 	    else {
@@ -576,8 +576,8 @@ ipow(int vg, int vd)
 
 /*
   computes the value of an integer expression.
-  returns TRUE if an integer value has been found and placed in pval.
-  returns FALSE otherwise.
+  returns true if an integer value has been found and placed in pval.
+  returns false otherwise.
 */
 bool
 expression_integer_value(expression e, intptr_t * pval)
@@ -595,7 +595,7 @@ expression_integer_value(expression e, intptr_t * pval)
 }
 
 
-/* Return TRUE iff the expression has an integer value and this value is
+/* Return true iff the expression has an integer value and this value is
    negative.
 */
 bool
@@ -628,7 +628,7 @@ expression range_to_expression(range r,enum range_to_expression_mode mode)
 bool
 range_count(range r, intptr_t * pcount)
 {
-    bool success = FALSE;
+    bool success = false;
     intptr_t l, u, inc;
 
     if(expression_integer_value(range_lower(r), &l)
@@ -646,18 +646,18 @@ range_count(range r, intptr_t * pcount)
 	if(* pcount < 0)
 	    *pcount = 0;
 
-	success = TRUE;
+	success = true;
     }
     else {
 	* pcount = 0;
-	success = FALSE;
+	success = false;
     }
 
     return success;
 }
 
 
-/* returns TRUE if v is not NULL and is constant */
+/* returns true if v is not NULL and is constant */
 /* I make it "static" because it conflicts with a Linear library function.
  * Both functions have the same name but a slightly different behavior.
  * The Linear version returns 0 when a null vector is passed as argument.

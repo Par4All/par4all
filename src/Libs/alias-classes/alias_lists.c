@@ -74,7 +74,7 @@ static bool
 same_reg(region reg1, region reg2)
     {
     Psysteme reg1_sys, reg2_sys;
-    bool result = FALSE;
+    bool result = false;
 
     pips_debug(4,"begin\n");
 
@@ -108,7 +108,7 @@ same_reg(region reg1, region reg2)
 		    reg2_sys = region_system(reg2);
 		    if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
 		    {
-			result = TRUE;
+			result = true;
 			
 			pips_debug(1,"same region\n");
 		    }
@@ -180,7 +180,7 @@ compare_matched_alias_pairs(bool result,
 			 make_effects(gen_nconc(regions_dup(callee_alias_list),
 						regions_dup(CDR(alias_pair)))),
 			 l_alias_lists);
-		result = TRUE;
+		result = true;
 	    }
 	},matched_alias_pairs);
 
@@ -202,7 +202,7 @@ compare_unmatched_alias_pairs(region alias_list_reg, list callee_alias_list)
 {
     region formal_reg;
     list rest_unmatched_alias_pairs = unmatched_alias_pairs;
-    bool result = FALSE;
+    bool result = false;
 
     ifdebug(4)
 	{
@@ -241,7 +241,7 @@ compare_unmatched_alias_pairs(region alias_list_reg, list callee_alias_list)
 			 l_alias_lists);
 		matched_alias_pairs =
 		    CONS(LIST,alias_pair,matched_alias_pairs);
-		result = TRUE;
+		result = true;
 	    }
 	    else
 		unmatched_alias_pairs =
@@ -274,7 +274,7 @@ add_alias_lists_callee( string callee_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_ALIAS_LISTS,
 						       callee_name,
-						       TRUE));
+						       true));
     MAP(EFFECTS,callee_alias_list_effects,
 	    {
 		list callee_alias_list =
@@ -296,7 +296,7 @@ add_alias_lists_callee( string callee_name )
 			compare_matched_alias_pairs(result,
 						    alias_list_reg,
 						    callee_alias_list);
-		    if (result == FALSE)
+		    if (result == false)
 			l_alias_lists =
 			    CONS(EFFECTS,
 				 make_effects(regions_dup(callee_alias_list)),
@@ -325,7 +325,7 @@ add_alias_lists_callees(string module_name)
 
     l_callees = (callees) db_get_memory_resource(DBR_CALLEES,
 						 module_name,
-						 TRUE);
+						 true);
 
     MAP(STRING, callee_name,
 	{
@@ -363,12 +363,12 @@ alias_lists( string module_name )
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
-								 TRUE) );
+								 true) );
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
-					 TRUE));
+					 true));
 	    module_to_value_mappings(module);
 	    /* that's it, but we musn't forget to reset everything below */
 	}
@@ -387,7 +387,7 @@ alias_lists( string module_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 						       module_name,
-						       TRUE));
+						       true));
 
 
 /* wrong but did work:
@@ -396,7 +396,7 @@ alias_lists( string module_name )
 	effects_to_list((effects)
 			db_get_memory_resource(DBR_IN_ALIAS_PAIRS,
 					       module_name,
-					       TRUE));
+					       true));
 */
 
 /*    MAP(LIST, alias_pair,
@@ -422,7 +422,7 @@ alias_lists( string module_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_OUT_ALIAS_PAIRS,
 						       module_name,
-						       TRUE));
+						       true));
 
 /*    MAP(LIST, alias_pair,
 	{
@@ -502,6 +502,6 @@ alias_lists( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 

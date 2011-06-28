@@ -322,11 +322,11 @@ instruction:
 	| { check_first_statement();} inst_exec
 	    { 
 		if ($2 != instruction_undefined)
-			LinkInstToCurrentBlock($2, TRUE);
+			LinkInstToCurrentBlock($2, true);
 	    }
 	|  format_inst
 	    { 
-		LinkInstToCurrentBlock($1, TRUE);
+		LinkInstToCurrentBlock($1, true);
 	    }
 	;
 
@@ -598,12 +598,12 @@ enddo_inst: TK_ENDDO
 	;
 
 else_inst: TK_ELSE
-	    { MakeElseInst(TRUE); }
+	    { MakeElseInst(true); }
 	;
 
 elseif_inst: TK_ELSEIF TK_LPAR expression TK_RPAR TK_THEN
 	    {
-		int elsifs = MakeElseInst(FALSE);
+		int elsifs = MakeElseInst(false);
 
 	        if(expression_implied_do_p($3))
 		    ParserError("Syntax", "Unexpected implied DO\n");
@@ -1163,7 +1163,7 @@ lformalparameter: entity_name
 	    }
         | TK_STAR
             {
-		uses_alternate_return(TRUE);
+		uses_alternate_return(true);
 		$$ = CONS(ENTITY, 
 			  generate_pseudo_formal_variable_for_formal_label
 			  (CurrentPackage, get_current_number_of_alternate_returns()),
@@ -1175,7 +1175,7 @@ lformalparameter: entity_name
 	    }
         | lformalparameter TK_COMMA TK_STAR
             {
-		uses_alternate_return(TRUE);
+		uses_alternate_return(true);
 		$$ = gen_nconc($1, CONS(ENTITY,
 					generate_pseudo_formal_variable_for_formal_label
 					(CurrentPackage, get_current_number_of_alternate_returns()),
@@ -1272,20 +1272,20 @@ lg_fortran_type:
 atom: entity_name
 	    {
 		$$ = MakeAtom($1, NIL, expression_undefined, 
-				expression_undefined, FALSE);
+				expression_undefined, false);
 	    }
 	| entity_name indices
 	    {
 		$$ = MakeAtom($1, $2, expression_undefined, 
-				expression_undefined, TRUE);
+				expression_undefined, true);
 	    }
 	| entity_name TK_LPAR opt_expression TK_COLON opt_expression TK_RPAR
 	    {
-		$$ = MakeAtom($1, NIL, $3, $5, TRUE);
+		$$ = MakeAtom($1, NIL, $3, $5, true);
 	    }
 	| entity_name indices TK_LPAR opt_expression TK_COLON opt_expression TK_RPAR
 	    {
-		$$ = MakeAtom($1, $2, $4, $6, TRUE);
+		$$ = MakeAtom($1, $2, $4, $6, true);
 	    }
 	;
 

@@ -260,7 +260,7 @@ for(Vc = Vvar; !VECTEUR_NUL_P(Vc); Vc = Vc->succ)
           }
         else
           {
-          bool not_fin = TRUE;
+          bool not_fin = true;
           Pvecteur Vs = Vnlc, Vp;
           while(not_fin)
             {
@@ -273,13 +273,13 @@ for(Vc = Vvar; !VECTEUR_NUL_P(Vc); Vc = Vc->succ)
                 {
                 new_vect->succ = Vs;
                 Vp->succ = new_vect;
-                not_fin = FALSE;
+                not_fin = false;
                 }
               }
             else
               {
               Vp->succ = new_vect;
-              not_fin = FALSE;
+              not_fin = false;
               }
             }
           }

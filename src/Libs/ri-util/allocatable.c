@@ -72,21 +72,21 @@
 bool entity_allocatable_p(entity e) {
   type t = entity_type(e);
   if(!type_variable_p(t)) {
-    return FALSE;
+    return false;
   }
   variable v = type_variable(t);
   if(!basic_derived_p(variable_basic(v))) {
-    return FALSE;
+    return false;
   }
   entity allocatable_struct = basic_derived(variable_basic(v));
 
   if(!same_stringn_p(entity_local_name(allocatable_struct),
       STRUCT_PREFIX ALLOCATABLE_PREFIX,
       strlen(STRUCT_PREFIX ALLOCATABLE_PREFIX))) {
-    return FALSE;
+    return false;
   }
 
-  return TRUE;
+  return true;
 }
 
 /**
@@ -95,7 +95,7 @@ bool entity_allocatable_p(entity e) {
 bool expression_allocatable_data_access_p(expression e) {
   // This must be a call
   if(!expression_call_p(e)) {
-    return FALSE;
+    return false;
   }
 
   entity field_call = call_function(expression_call(e));
@@ -103,7 +103,7 @@ bool expression_allocatable_data_access_p(expression e) {
 
   // This must be a call to "." and we must have args
   if(!ENTITY_FIELD_P(field_call) || ENDP(args_list)) {
-    return FALSE;
+    return false;
   }
 
   // Check that we deal with an allocatable
@@ -111,7 +111,7 @@ bool expression_allocatable_data_access_p(expression e) {
   entity allocatable =
       reference_variable(expression_reference(allocatable_exp));
   if(!entity_allocatable_p(allocatable)) {
-    return FALSE;
+    return false;
   } else {
     pips_assert("Allocatable shouldn't have any indices !",
         ENDP(reference_indices(expression_reference(allocatable_exp))));
@@ -128,10 +128,10 @@ bool expression_allocatable_data_access_p(expression e) {
       || same_stringn_p(entity_user_name(field),
           ALLOCATABLE_UBOUND_PREFIX,
           strlen(ALLOCATABLE_UBOUND_PREFIX))) {
-    return FALSE;
+    return false;
   }
 
-  return TRUE;
+  return true;
 }
 
 /**

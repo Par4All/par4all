@@ -295,13 +295,13 @@ Pmatrix A, B;
     lcm = ppcm(dena, denb);
 
     for (i=n;i>=1; i--) {
-        boolean found = FALSE;
+        bool found = false;
         Pcontrainte cp = contrainte_new();
         Pvecteur vect, pv = NULL;
 
         if ((coeff = MATRIX_ELEM(B,i,m2)) != 0) {
             pv = vect_new(TCST,  (lcm/denb) * coeff);
-            found = TRUE;
+            found = true;
         }
         for (j=1, vect=ib;j<=m1;vect=vect->succ,j++) {
             if ((coeff = MATRIX_ELEM(A,i,j)) != 0)
@@ -309,7 +309,7 @@ Pmatrix A, B;
                     vect_chg_coeff(&pv, vecteur_var(vect),(lcm/dena) * coeff);
                 else {
                     pv = vect_new(vecteur_var(vect), (lcm/dena) * coeff);
-                    found = TRUE;
+                    found = true;
                 }
         }
         for (j=1, vect=cb;j<=m2-1;vect=vect->succ,j++) {
@@ -318,7 +318,7 @@ Pmatrix A, B;
                     vect_chg_coeff(&pv, vecteur_var(vect),(lcm/denb) * coeff);
                 else {
                     pv = vect_new(vecteur_var(vect), (lcm/denb) * coeff);
-                    found = TRUE;
+                    found = true;
                 }
         }
         cp->vecteur = pv;
@@ -353,19 +353,19 @@ int n, m;
   Pcontrainte cp, newpc= NULL;
   int i,j;
   Value cst,coeff,dena,denb;
-  boolean trouve ;
+  bool trouve ;
 
   dena = DENOMINATOR(A);
   denb = DENOMINATOR(B);
 
   for (i=n;i>=1; i--) {
-    trouve = FALSE;
+    trouve = false;
     cp = contrainte_new();
 
     /* build the constant terme if it is null */
     if (value_notzero_p(cst = ACCESS(B,n,i,1))) {
       pv = vect_new(TCST,  value_mult(dena,cst));
-      trouve = TRUE;
+      trouve = true;
     }
 
     for (vect = b,j=1;j<=m;vect=vect->succ,j++) {
@@ -376,7 +376,7 @@ int n, m;
 	else {
 	  /* build a new vecteur if there is a null constant term */
 	  pv = vect_new(vecteur_var(vect), value_mult(denb,coeff));
-	  trouve = TRUE;
+	  trouve = true;
 	}
       }
     }
@@ -506,19 +506,19 @@ int n,m1,m2;
   Pcontrainte cp,newpc= NULL;
   int i,j;
   Value cst,coeff,dena,denb;
-  boolean trouve ;
+  bool trouve ;
 
   dena = DENOMINATOR(A);
   denb = DENOMINATOR(B);
 
   for (i=n;i>=1; i--) {
-    trouve = FALSE;
+    trouve = false;
     cp = contrainte_new();
 
     /* build the constant terme if it exists */
     if (value_notzero_p(cst = ACCESS(B,n,i,m2))) {
       pv = vect_new(TCST,  value_mult(dena,cst));
-      trouve = TRUE;
+      trouve = true;
     }
 
     for (vect = base_union(index_base, const_base),j=1;
@@ -531,7 +531,7 @@ int n,m1,m2;
 	else {
 	  /* build a new vecteur if there is not constant term */
 	  pv = vect_new(vecteur_var(vect), value_mult(denb, coeff));
-	  trouve = TRUE;
+	  trouve = true;
 	}
       }
     }
@@ -546,7 +546,7 @@ int n,m1,m2;
 	  /* build a new vecteur if there is not constant term */
 	  pv = vect_new(vecteur_var(vect),
 			value_mult(denb, coeff));
-	  trouve = TRUE;
+	  trouve = true;
 	}
       }
     }
@@ -1269,17 +1269,17 @@ fprintf(stdout, "\n");
 
 
 /*============================================================================*/
-/* boolean is_entity_in_list_p(entity e, list l): returns TRUE if entity "e" is
- * in the list of entities "l", FALSE otherwise.
+/* bool is_entity_in_list_p(entity e, list l): returns true if entity "e" is
+ * in the list of entities "l", false otherwise.
  */
 /* FI: many similar functions. See ri-util/arguments.c which deals
    with entity lists, i.e. entities. */
-boolean is_entity_in_list_p(entity e, list l)
+bool is_entity_in_list_p(entity e, list l)
 {
- boolean is_in_list = FALSE;
+ bool is_in_list = false;
  for( ; (l != NIL) && (! is_in_list); l = CDR(l))
     if(same_entity_p(e, ENTITY(CAR(l))))
-       is_in_list = TRUE;
+       is_in_list = true;
  return(is_in_list);
 }
 
@@ -1369,7 +1369,7 @@ Psysteme elim_var_with_eg(Psysteme ps, list * init_l, list * elim_l)
 	eqs = ps->egalites;
 	while(eqs != NULL)
 	{
-	    boolean coeff_one_not_found, var_found;
+	    bool coeff_one_not_found, var_found;
 	    entity var = entity_undefined;
 	    Value val = VALUE_ZERO;
 	    Pvecteur init_vec, pv_elim;
@@ -1384,8 +1384,8 @@ Psysteme elim_var_with_eg(Psysteme ps, list * init_l, list * elim_l)
 	     * that has a coeff of 1 or -1. If there is no such *
 	     * variable, we take the first with a coeff not equal to zero.
 	     */
-	    var_found = FALSE;
-	    coeff_one_not_found = TRUE;
+	    var_found = false;
+	    coeff_one_not_found = true;
 
 	    for(l = vl ; (l != NIL) && coeff_one_not_found; l = CDR(l))
 	    {
@@ -1394,14 +1394,14 @@ Psysteme elim_var_with_eg(Psysteme ps, list * init_l, list * elim_l)
 
 		if(value_one_p(crt_val) || value_mone_p(crt_val))
 		{
-		    coeff_one_not_found = FALSE;
-		    var_found = TRUE;
+		    coeff_one_not_found = false;
+		    var_found = true;
 		    var = crt_var;
 		    val = crt_val;
 		}
 		else if((value_notzero_p(crt_val)) && !var_found)
 		{
-		    var_found = TRUE;
+		    var_found = true;
 		    var = crt_var;
 		    val = crt_val;
 		}
@@ -1548,7 +1548,7 @@ list *init_l, *elim_l;
     Variable v = (Variable) ENTITY(CAR(l));
     Value coeff;
 
-    if ((eq = contrainte_var_min_coeff(ps->egalites,v, &coeff, TRUE))
+    if ((eq = contrainte_var_min_coeff(ps->egalites,v, &coeff, true))
 	!= NULL) {
 
  if(get_debug_level() > 7) {
@@ -1568,14 +1568,14 @@ fprintf(stderr, "\n");
          ete enleve par la fonction contrainte_var_min_coeff(). */
 
       for(eg = ps->egalites; eg != NULL; eg = eg->succ)
-	(void) contrainte_subst_ofl_ctrl(v, eq, eg, TRUE, NO_OFL_CTRL);
+	(void) contrainte_subst_ofl_ctrl(v, eq, eg, true, NO_OFL_CTRL);
       for(eg = ps->inegalites; eg != NULL; eg = eg->succ)
-	(void) contrainte_subst_ofl_ctrl(v, eq, eg, FALSE, NO_OFL_CTRL);
+	(void) contrainte_subst_ofl_ctrl(v, eq, eg, false, NO_OFL_CTRL);
 
       for(eg = sc_elim->egalites; eg != NULL; eg = eg->succ)
-	(void) contrainte_subst_ofl_ctrl(v, eq, eg, TRUE, NO_OFL_CTRL);
+	(void) contrainte_subst_ofl_ctrl(v, eq, eg, true, NO_OFL_CTRL);
       for(eg = sc_elim->inegalites; eg != NULL; eg = eg->succ)
-	(void) contrainte_subst_ofl_ctrl(v, eq, eg, FALSE, NO_OFL_CTRL);
+	(void) contrainte_subst_ofl_ctrl(v, eq, eg, false, NO_OFL_CTRL);
 
       sc_add_egalite(sc_elim, eq);
       gen_remove(init_l, (void *) v);
@@ -1603,12 +1603,12 @@ fprintf(stderr, "\n");
 
 
 /*============================================================================*/
-/* boolean single_var_vecteur_p(Pvecteur pv): returns TRUE if the vector "pv"
+/* bool single_var_vecteur_p(Pvecteur pv): returns true if the vector "pv"
  * contains only one element.
  *
  * Note: This element should not be a constant term (this is not tested).
  */
-boolean single_var_vecteur_p(Pvecteur pv)
+bool single_var_vecteur_p(Pvecteur pv)
 {
  return(vect_size(pv) == 1);
 }
@@ -1656,11 +1656,11 @@ Ppolynome old_vecteur_to_polynome(Pvecteur vec)
 
 
 /*============================================================================*/
-/* list meld(list l1, list l2, boolean (*compare_obj)()):
+/* list meld(list l1, list l2, bool (*compare_obj)()):
  */
 list meld(l1, l2, compare_obj)
 list l1, l2;
-boolean (*compare_obj)();
+bool (*compare_obj)();
 {
   if( ENDP(l1) ) {
     return(l2);
@@ -1680,15 +1680,15 @@ boolean (*compare_obj)();
 
 
 /*============================================================================*/
-/* list general_merge_sort(list l, boolean (*compare_obj)()): returns the
+/* list general_merge_sort(list l, bool (*compare_obj)()): returns the
  * result of sorting the list "l" using the comparison function
- * "compare_obj". This boolean function should retuns TRUE if its first
+ * "compare_obj". This bool function should retuns true if its first
  * argument has to be placed before its second argument in the sorted
  * list, else FALSE.
  *
  * This is a generic function that accepts any homogene list of newgen
  * objects. The comparison function must be coded by the user, its
- * prototype should be: boolean my_compare_obj(chunk * obj1, chunk *
+ * prototype should be: bool my_compare_obj(chunk * obj1, chunk *
  * obj2);
  *
  * This function uses the merge sort algorithm which has a mean and worst
@@ -1702,7 +1702,7 @@ boolean (*compare_obj)();
  * wanted.
  */
 
-/*  hack to preserve the boolean comparison while using qsort...
+/*  hack to preserve the bool comparison while using qsort...
  */
 static bool (*bool_compare_objects)();
 static int compare_objects(p1, p2)
@@ -1743,7 +1743,7 @@ bool (*compare_obj)();
  */
 list general_merge_sort(l, compare_obj)
 list l;
-boolean (*compare_obj)();
+bool (*compare_obj)();
 {
   list ch1, ch2, ch, ch_t, aux_l, head = NIL, tail = NIL;
   void * crt_obj, * prev_obj;
@@ -2082,7 +2082,7 @@ Pvecteur prototype_factorize(Ppolynome pp, Variable var)
       Value newval;
       Pvecteur vec, newpv;
       entity first = entity_undefined, second = entity_undefined;
-      boolean factor_found = TRUE;
+      bool factor_found = true;
 
       vec = (ppp->monome)->term;
       for(; (vec != NULL) && (second == entity_undefined); vec = vec->succ) {
@@ -2099,7 +2099,7 @@ Pvecteur prototype_factorize(Ppolynome pp, Variable var)
       else if(same_entity_p(second, (entity) var))
 	newvar = (Variable) first;
       else
-	factor_found = FALSE;
+	factor_found = false;
 
       if(factor_found) {
 	newval = float_to_value((ppp->monome)->coeff);
@@ -2372,7 +2372,7 @@ Psysteme find_implicit_equation(Psysteme ps)
     /* We test the feasibility. If it is not feasible, we add one more
      * implicit equation in our implicit system : Expr == 0.
      */
-    if(! sc_rational_feasibility_ofl_ctrl(aux_ps, NO_OFL_CTRL, TRUE)) {
+    if(! sc_rational_feasibility_ofl_ctrl(aux_ps, NO_OFL_CTRL, true)) {
       Pcontrainte pc_expr = contrainte_make(expr);
 
       if(get_debug_level() > 7) {

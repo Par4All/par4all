@@ -383,9 +383,9 @@ list_to_contraintes(l_pc)
 
 /* ======================================================================== */
 /*
- * boolean compare_eq_occ(eq1, eq2):
+ * bool compare_eq_occ(eq1, eq2):
  *
- * "eq1" and "eq2" are two Pcontrainte(s). This function returns TRUE if the
+ * "eq1" and "eq2" are two Pcontrainte(s). This function returns true if the
  * field "eq_sat" of "eq1" is greater or equal to the one of "eq2". This
  * field represents the number of occurences of the equations in a list of
  * systems.
@@ -925,7 +925,7 @@ stmt_bdt_directions(stmt, ind_l, par_l)
 
   if (the_bdt != bdt_undefined) {
     list            bl;
-    boolean         sc_found = FALSE;
+    bool         sc_found = false;
     for (bl = bdt_schedules(the_bdt); (bl != NIL) && (!sc_found); bl = CDR(bl)) {
       schedule        sc = SCHEDULE(CAR(bl));
       if (schedule_statement(sc) == stmt) {
@@ -935,17 +935,17 @@ stmt_bdt_directions(stmt, ind_l, par_l)
 	  expression      e = EXPRESSION(CAR(dl));
 	  if (!expression_constant_p(e)) {
 	    list            l;
-	    boolean         ind_not_null;
+	    bool         ind_not_null;
 	    Pvecteur        pv;
 
 	    NORMALIZE_EXPRESSION(e);
 	    pv = (Pvecteur) normalized_linear(expression_normalized(e));
 
-	    ind_not_null = FALSE;
+	    ind_not_null = false;
 	    for (l = ind_l; (!ENDP(l)) && (!ind_not_null); POP(l)) {
 	      entity          var = ENTITY(CAR(l));
 	      if (vect_coeff((Variable) var, pv) != 0)
-		ind_not_null = TRUE;
+		ind_not_null = true;
 	    }
 	    if (ind_not_null) {
 	      Psysteme        aux_ps = sc_dup(ps);

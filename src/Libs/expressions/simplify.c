@@ -65,7 +65,7 @@ bool simplify_subscripts(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* do the job */
     do_simplify_subscripts(get_current_module_statement());
@@ -377,7 +377,7 @@ bool split_structures(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* do the job for declared structures */
     gen_recurse(get_current_module_statement(),
@@ -586,7 +586,7 @@ bool simplify_complex(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     set_the_i();
     set_translation_mode();
 

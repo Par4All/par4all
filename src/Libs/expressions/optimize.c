@@ -132,20 +132,20 @@ static bool is_string_constant(entity e)
       !basic_undefined_p(b))
     return basic_string_p(b);
 
-  return FALSE;
+  return false;
 }
 
 static void eole_okay_call_rwt(call c, bool * okay)
 {
   if (is_string_constant(call_function(c)))
-    *okay = FALSE;
+    *okay = false;
 
   /* IMPLIED-DO ? others ? */
 }
 
 static bool eole_manageable_expression(expression e)
 {
-  bool okay = TRUE;
+  bool okay = true;
   gen_context_multi_recurse(e, &okay,
 			    call_domain, gen_true, eole_okay_call_rwt,
 			    NULL);
@@ -173,7 +173,7 @@ static bool loop_flt(loop l, extract_expr_p context)
 {
   entity index = loop_index(l);
   context->indices = CONS(ENTITY, index, context->indices);
-  return TRUE; /* keep on. */
+  return true; /* keep on. */
 }
 
 static void loop_rwt(loop l, extract_expr_p context)
@@ -193,7 +193,7 @@ static bool call_filter(call c, extract_expr_p context)
   MAP(EXPRESSION, e, 
       if (eole_manageable_expression(e)) add_one_more_expression(e, context), 
       call_arguments(c));
-  return FALSE;
+  return false;
 }
 
 /* other expressions may be found in loops and so?
@@ -202,7 +202,7 @@ static bool expr_filter(expression e, extract_expr_p context)
 {
   if (eole_manageable_expression(e))
     add_one_more_expression(e, context);
-  return FALSE;
+  return false;
 }
 
 static list /* of expressionwithlevel */ 
@@ -554,7 +554,7 @@ static entity
 static bool is_inverse(expression e)
 {
   syntax s = expression_syntax(e);
-  if (!syntax_call_p(s)) return FALSE;
+  if (!syntax_call_p(s)) return false;
   return call_function(syntax_call(s)) == inverse;
 }
 
@@ -763,9 +763,9 @@ static bool nary_operator_p(entity e)
 
   for (pbn = bton; pbn->nary; pbn++)
     if (same_string_p(pbn->nary, lname))
-      return TRUE;
+      return true;
 
-  return FALSE;
+  return false;
 }
 
 /* top-down: switch calls to nary form.
@@ -773,7 +773,7 @@ static bool nary_operator_p(entity e)
 static bool nary_call_flt(call c)
 {
   call_function(c) = binary_to_nary(call_function(c));
-  return TRUE;
+  return true;
 }
 
 /* bottom-up: + + -> +
@@ -829,9 +829,9 @@ typedef struct
 } symetric_opertor_t;
 
 static symetric_opertor_t symop[] =
-{ { "-", "+", "--", FALSE },
-  { "/", "*", INVERSE_OPERATOR_NAME, TRUE },
-  { NULL, NULL, NULL, FALSE }
+{ { "-", "+", "--", false },
+  { "/", "*", INVERSE_OPERATOR_NAME, true },
+  { NULL, NULL, NULL, false }
 };
 
 static symetric_opertor_t * what_operator(entity e, int which_one)
@@ -861,10 +861,10 @@ static bool inv_call_flt(call c)
   symetric_opertor_t * so;
 
   /* switch asymetric operation if needed */
-  so = what_operator(op, TRUE);
+  so = what_operator(op, true);
   if (so)
     {
-      bool doit = TRUE;
+      bool doit = true;
 
       if (so->not_ints)
 	{
@@ -876,7 +876,7 @@ static bool inv_call_flt(call c)
 	   */
 	  expression tmp = call_to_expression(c);
 	  basic b =  basic_of_expression(tmp);
-	  if (basic_int_p(b)) doit = FALSE;
+	  if (basic_int_p(b)) doit = false;
 	  syntax_call(expression_syntax(tmp)) = call_undefined;
 	  free_expression(tmp);
 	}
@@ -900,7 +900,7 @@ static bool inv_call_flt(call c)
     }
 
   /* push down inverse operators if needed. */     
-  so = what_operator(op, FALSE);
+  so = what_operator(op, false);
   if (so)
     {
       list largs = call_arguments(c);
@@ -933,7 +933,7 @@ static bool inv_call_flt(call c)
 	}
     }
   
-  return TRUE;
+  return true;
 }
 
 void inverse_normalization_of_expressions(statement s)
@@ -948,10 +948,10 @@ void inverse_normalization_of_expressions(statement s)
 static entity huffman_nary_operator = NULL;
 static entity huffman_binary_operator = NULL;
 static double (*huffman_cost)(expression) = NULL;
-/* TRUE:  Huffman.
-   FALSE: rateau.
+/* true:  Huffman.
+   false: rateau.
 */
-static boolean huffman_mode = TRUE;
+static bool huffman_mode = true;
 
 typedef struct
 {
@@ -1040,7 +1040,7 @@ insert_last_into_array(cost_expression * tce, int n, cost_expression ce)
  * huffman_nary_operator.
  *
  * the prettyprint may only reflect this if the
- * PRETTYPRINT_ALL_PARENTHESES property is set to TRUE.
+ * PRETTYPRINT_ALL_PARENTHESES property is set to true.
  */
 static void call_rwt(call c)
 {
@@ -1109,7 +1109,7 @@ build_binary_operators_with_huffman(
     entity nary_operator,
     entity binary_operator,
     double (*cost)(expression),
-    boolean mode)
+    bool mode)
 {
   huffman_nary_operator = nary_operator;
   huffman_binary_operator = binary_operator;
@@ -1125,7 +1125,7 @@ build_binary_operators_with_huffman(
   huffman_nary_operator = NULL;
   huffman_binary_operator = NULL;
   huffman_cost = NULL;  
-  huffman_mode = TRUE;
+  huffman_mode = true;
 }
 
 /* switch nary operators to binary ones.
@@ -1160,125 +1160,125 @@ static optimization_strategy
 {
   { 
     /* name */ "P2SC", 
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  false
   },
   {
     /* name */ "IA-64",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  false
   },
   {
     /* name */ "R10K",
-    /* huff */ TRUE, expression_gravity_inv, FALSE,
-    /* eole */ "1", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity_inv, false,
+    /* eole */ "1", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  false
   },
   { /* EOLE and Huffman and Simplify with gravity - most balanced tree*/
     /* WITHOUT FMA EXTRACTION */
     /* name */ "ultraIIi",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", FALSE, "",
-    /* simp */ TRUE, TRUE, 
-    /* gcm */  FALSE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", false, "",
+    /* simp */ true, true, 
+    /* gcm */  false,
+    /* cse */  false
   },
   { /* whatever you want */
     /* name */ "test",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  FALSE,
-    /* cse */  TRUE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  false,
+    /* cse */  true
   },
   { /* whatever you want */
     /* name */ "test_icm",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  false
   },
   { /* whatever you want */
     /* name */ "test_cse",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  FALSE,
-    /* cse */  TRUE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  false,
+    /* cse */  true
   },
   { /* EOLE with gravity criterion only - most balanced tree ! */
     /* name */ "EOLE",
-    /* huff */ FALSE, NULL, FALSE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ FALSE, FALSE, 
-    /* gcm */  FALSE,
-    /* cse */  FALSE
+    /* huff */ false, NULL, false,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ false, false, 
+    /* gcm */  false,
+    /* cse */  false
   },
   { /* EOLE and Huffman and Simplify with gravity - most balanced tree */
     /* name */ "GRAVITY",
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE, 
-    /* gcm */  FALSE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true, 
+    /* gcm */  false,
+    /* cse */  false
   },
   { /* EOLE and Huffman and Simplify - most UNbalanced tree */
     /* name */ "UNBALANCED",
-    /* huff */ TRUE, expression_gravity_inv, FALSE,
-    /* eole */ "1", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE, 
-    /* gcm */  FALSE,
-    /* cse */  FALSE
+    /* huff */ true, expression_gravity_inv, false,
+    /* eole */ "1", true, "", true, "-m",
+    /* simp */ true, true, 
+    /* gcm */  false,
+    /* cse */  false
   },
   { /* ICM only */
     /* name */ "ICM", 
-    /* huff */ FALSE, NULL, FALSE,
-    /* eole */ "0", FALSE, "", FALSE, "",
-    /* simp */ FALSE, FALSE,
-    /* gcm */  TRUE,
-    /* cse */  FALSE
+    /* huff */ false, NULL, false,
+    /* eole */ "0", false, "", false, "",
+    /* simp */ false, false,
+    /* gcm */  true,
+    /* cse */  false
   },
   { /* CSE only*/
     /* name */ "CSE", 
-    /* huff */ FALSE, NULL, FALSE,
-    /* eole */ "0", FALSE, "", FALSE, "",
-    /* simp */ FALSE, FALSE,
-    /* gcm */  FALSE,
-    /* cse */  TRUE
+    /* huff */ false, NULL, false,
+    /* eole */ "0", false, "", false, "",
+    /* simp */ false, false,
+    /* gcm */  false,
+    /* cse */  true
   },
   { /* both ICM and CSE */
     /* name */ "ICMCSE", 
-    /* huff */ FALSE, NULL, FALSE,
-    /* eole */ "0", FALSE, "", FALSE, "",
-    /* simp */ FALSE, FALSE,
-    /* gcm */  TRUE,
-    /* cse */  TRUE
+    /* huff */ false, NULL, false,
+    /* eole */ "0", false, "", false, "",
+    /* simp */ false, false,
+    /* gcm */  true,
+    /* cse */  true
   },
   { /* Everything must be done */
     /* name */ "FULL", 
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  TRUE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  true
   },
   /* this one MUST be the last one! */
   {
     /* name */ NULL, /* default similar to P2SC. */
-    /* huff */ TRUE, expression_gravity, TRUE,
-    /* eole */ "0", TRUE, "", TRUE, "-m",
-    /* simp */ TRUE, TRUE,
-    /* gcm */  TRUE,
-    /* cse */  TRUE
+    /* huff */ true, expression_gravity, true,
+    /* eole */ "0", true, "", true, "-m",
+    /* simp */ true, true,
+    /* gcm */  true,
+    /* cse */  true
   }
 };
 
@@ -1350,7 +1350,7 @@ static void davinci_dump_expressions(
 
    @param[in] module_name
 
-   @return TRUE since it is supposed to always work
+   @return true since it is supposed to always work
 */
 bool optimize_expressions(string module_name)
 {
@@ -1362,7 +1362,7 @@ bool optimize_expressions(string module_name)
      */
     set_current_module_entity(local_name_to_top_level_entity(module_name));
     set_current_module_statement((statement)
-        db_get_memory_resource(DBR_CODE, module_name, TRUE));
+        db_get_memory_resource(DBR_CODE, module_name, true));
     set_current_optimization_strategy();
 
     s = get_current_module_statement();
@@ -1432,5 +1432,5 @@ bool optimize_expressions(string module_name)
 
     debug_off();
 
-    return TRUE; /* okay ! */
+    return true; /* okay ! */
 }

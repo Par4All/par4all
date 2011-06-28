@@ -99,15 +99,15 @@ static bool there_is_a_conflict(entity var)
   MAP(ENTITY, v,
   {
     if (entities_may_conflict_p(var, v))
-      return TRUE;
+      return true;
   },
       variables_to_filter);
-  return FALSE;
+  return false;
 }
 
 /***************************** (should) CHECK WHETHER A REFERENCE IS WRITTEN */
 
-static bool direct_reference_found = FALSE;
+static bool direct_reference_found = false;
 static entity a_variable = NULL;
 
 /* it should be a check on call arguments, whether they are W + ref 
@@ -118,7 +118,7 @@ static void reference_rwt(reference r)
 {
   if (entities_may_conflict_p(reference_variable(r), a_variable))
   {
-    direct_reference_found = TRUE;
+    direct_reference_found = true;
     gen_recurse_stop(NULL);
   }
 }
@@ -131,7 +131,7 @@ static void check_if_direct_reference(void * x)
 static bool direct_written_reference(statement s, entity var)
 {
   instruction i = statement_instruction(s);
-  direct_reference_found = FALSE;
+  direct_reference_found = false;
   a_variable = var;
 
   switch (instruction_tag(i))
@@ -144,7 +144,7 @@ static bool direct_written_reference(statement s, entity var)
       loop l = instruction_loop(i);
       check_if_direct_reference(loop_range(l));
       if (!direct_reference_found && entities_may_conflict_p(loop_index(l), var))
-	direct_reference_found = TRUE;
+	direct_reference_found = true;
       break;
     }
   case is_instruction_whileloop:
@@ -193,12 +193,12 @@ static bool stmt_flt(statement s)
     }
   },
       lpe);
-  return TRUE;
+  return true;
 }
 
 /***************************************************************** INTERFACE */
 
-boolean filter_proper_effects(string module_name)
+bool filter_proper_effects(string module_name)
 {
   debug_on("FILTER_PROPER_EFFECTS_DEBUG_LEVEL");
   pips_debug(1, "considering module %s\n", module_name);
@@ -207,9 +207,9 @@ boolean filter_proper_effects(string module_name)
    */
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   set_current_module_statement((statement)
-	    db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	    db_get_memory_resource(DBR_CODE, module_name, true));
   set_proper_rw_effects((statement_effects)
-	    db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
+	    db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
  
   variables_to_filter = get_variables_to_filter();
 
@@ -229,5 +229,5 @@ boolean filter_proper_effects(string module_name)
   reset_current_module_statement();
   
   debug_off();
-  return TRUE;
+  return true;
 }

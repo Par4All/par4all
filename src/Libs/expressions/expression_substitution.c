@@ -60,7 +60,7 @@ bool set_pattern()
     if( ! string_undefined_p(pattern_module_name) )
     {
 
-        statement s = (statement) db_get_memory_resource(DBR_CODE, pattern_module_name, TRUE);
+        statement s = (statement) db_get_memory_resource(DBR_CODE, pattern_module_name, true);
         instruction i = statement_instruction(s);
         if( instruction_block_p(i))
         {
@@ -156,7 +156,7 @@ bool expression_substitution(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
     /* search pattern*/
     bool pattern_set_p = set_pattern();

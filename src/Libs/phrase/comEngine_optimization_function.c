@@ -151,13 +151,13 @@ static void entity_in_stat_rwt(reference curRef, bool * entInStat)
 {
   if(reference_variable(curRef) == gIndEnt)
     {
-      *entInStat = TRUE;
+      *entInStat = true;
     }
 }
 
 static bool entity_in_stat(entity ind, statement stat)
 {
-  bool entInStat = FALSE;
+  bool entInStat = false;
   gIndEnt = ind;
 
   gen_context_recurse(stat, &entInStat, reference_domain, gen_true,
@@ -214,7 +214,7 @@ static void move_statements(statement stat, entity ind,
 }
 
 static entity gSearchedEnt = entity_undefined;
-static bool gEntFound = FALSE;
+static bool gEntFound = false;
 
 static void entity_in_ref_rwt(reference curRef)
 {
@@ -222,14 +222,14 @@ static void entity_in_ref_rwt(reference curRef)
   print_reference(curRef);printf("\n");
   if(reference_variable(curRef) == gSearchedEnt)
     {
-      gEntFound = TRUE;
+      gEntFound = true;
     }
 }
 
 static bool entity_in_ref(entity ent, reference ref)
 {
   gSearchedEnt = ent;
-  gEntFound = FALSE;
+  gEntFound = false;
 
   printf("entity_in_ref\n");
   print_entity_variable(ent);

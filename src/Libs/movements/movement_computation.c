@@ -41,7 +41,6 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "text-util.h"
-#include "boolean.h"
 #include "arithmetique.h"
 #include "vecteur.h"
 #include "contrainte.h"
@@ -75,7 +74,7 @@
     }
 
 Pbase build_image_base(
-    boolean bank_code,
+    bool bank_code,
     Pbase proc_id,
     Pbase bank_indices,
     Pbase tile_indices)
@@ -146,7 +145,7 @@ Pbase *lvar_coeff_nunit;
 Pbase *lvar_coeff_unit;
 Pbase *loop_body_offsets;	
 Pbase *loop_body_indices;	
-boolean bank_code;
+bool bank_code;
 Pbase ppid;
 {
 
@@ -292,7 +291,7 @@ int dim;
 	else   eq_set_vect_nul(pc);    
     }	
 
-    sc_rm_empty_constraints(ps1, FALSE);
+    sc_rm_empty_constraints(ps1, false);
     return (ps1);
 }
 
@@ -321,11 +320,11 @@ variables_in_declaration_list(entity __attribute__ ((unused)) module,
 statement 
 movement_computation(
     entity module,
-    boolean used_def,
-    boolean bank_code,  /* is TRUE if it is the generation of code for bank
-			   FALSE if it is for engine */
-    boolean receive_code,      /* is TRUE if the generated code must be a 
-				  RECEIVE, FALSE if it must be a SEND*/
+    bool used_def,
+    bool bank_code,  /* is true if it is the generation of code for bank
+			   false if it is for engine */
+    bool receive_code,      /* is true if the generated code must be a 
+				  RECEIVE, false if it must be a SEND*/
     entity private_entity,       /* local entity */
     Psysteme sc_image,         /* domain of image  */
     Pbase const_base,
@@ -433,7 +432,7 @@ movement_computation(
 
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
-					  TRUE,FALSE);
+					  true,false);
     ifdebug(2) {
 	pips_debug(2," After FM projection  and sort:\n");
 	sc_fprint(stderr, sc_proj, (get_variable_name_t) entity_local_name);
@@ -463,7 +462,7 @@ movement_computation(
     }
     sc_proj->inegalites = contrainte_sort(sc_proj->inegalites, 
 					  sc_proj->base,  index_base,
-					  TRUE,FALSE); 
+					  true,false); 
 
     sys_debug(5," After  contrainte sort:\n",sc_proj);
 
@@ -506,7 +505,7 @@ movement_computation(
     sc_proj2->inegalites = 
 	contrainte_sort(sc_proj2->inegalites, 
 			sc_proj2->base,  index_base, 
-			FALSE,FALSE);
+			false,false);
 
     sys_debug(2,"Iterat. Domain After 1rst sort:\n",sc_proj2);
 

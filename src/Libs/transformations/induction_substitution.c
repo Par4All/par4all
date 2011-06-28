@@ -69,13 +69,13 @@ typedef struct {
  *  \return true if entity ent has been found in the transformer T
  */
 static bool is_modified_entity_in_transformer( transformer T, entity ent ) {
-    bool is_modified = FALSE;
+    bool is_modified = false;
 
     list entities = transformer_arguments( T );
 
     for ( list el = entities; !ENDP( el ); POP( el ) ) {
         if ( ENTITY( CAR( el ) ) == ent ) {
-            is_modified = TRUE;
+            is_modified = true;
             break;
         }
     }
@@ -224,7 +224,7 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
 
   /* Sanity check : we need at least an argument :) */
   if( !call_arguments(c)) {
-    return TRUE;
+    return true;
   }
 
   //
@@ -343,7 +343,7 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
 //call_assign_contents(c,new_call); // Fails badly :-(
       *c = *new_call;
 
-      ctx->substitution_occured_p = TRUE;
+      ctx->substitution_occured_p = true;
 
       ifdebug( 1 ) {
           pips_debug( 1, "Unsugar update assignment : " );
@@ -352,7 +352,7 @@ static bool substitute_in_call( call c, substitute_ctx *ctx) {
   }
 
 
-  return TRUE;
+  return true;
 }
 
 /**
@@ -379,7 +379,7 @@ static bool expression_subtitution_on_call( expression substitute,
   substitute_ctx ctx;
   ctx.to_substitute = induction_variable_candidate;
   ctx.substitute_by = substitute;
-  ctx.substitution_occured_p = FALSE;
+  ctx.substitution_occured_p = false;
   ctx.root_instruction = root_instruction;
 
   gen_context_recurse(c,&ctx,call_domain,substitute_in_call,gen_null);
@@ -396,7 +396,7 @@ static bool expression_subtitution_on_call( expression substitute,
  *  \return always true
  */
 static bool subtitute_induction_statement_in( statement s ) {
-  bool result = TRUE;
+  bool result = true;
 
   ifdebug( 1 ) {
     pips_debug( 1, "Statement:\n" );
@@ -457,7 +457,7 @@ static bool subtitute_induction_statement_in( statement s ) {
            The condition is that the equation has to involve only loop
            indices, a constant, and the variable itself */
 
-        bool found_loop_index = FALSE; /* flag to keep track if we have find at least one loop index */
+        bool found_loop_index = false; /* flag to keep track if we have find at least one loop index */
         expression substitute = expression_undefined; /* the substitution expression */
         Variable induction_variable_candidate = entity_undefined; /* the variable to substitute */
         int induction_variable_candidate_coeff = 0; /* the coefficient associated to the variable */
@@ -475,7 +475,7 @@ static bool subtitute_induction_statement_in( statement s ) {
 
             if(index_of_a_loop_p(v, loops) || loop_invariant_p(v, loops)) {
               /* We have found a loop index */
-              found_loop_index = TRUE;
+              found_loop_index = true;
               /* We build an expression "coeff*v" */
               if ( coeff == -1 ) {
                 /* Coeff is -1, we want "-v" instead of "-1 * v" */
@@ -600,7 +600,7 @@ static bool subtitute_induction_statement_in( statement s ) {
             substitute_ctx ctx;
             ctx.to_substitute = induction_variable_candidate;
             ctx.substitute_by = substitute;
-            ctx.substitution_occured_p = FALSE;
+            ctx.substitution_occured_p = false;
 
             gen_context_recurse ( the_call,
                                   &ctx,
@@ -637,15 +637,15 @@ bool induction_substitution( char * module_name ) {
     set_current_module_entity( module_name_to_entity( module_name ) );
     module = get_current_module_entity( );
 
-    set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE, module_name, TRUE ) );
+    set_current_module_statement( (statement) db_get_memory_resource( DBR_CODE, module_name, true ) );
     module_stat = get_current_module_statement( );
 
-    set_cumulated_rw_effects( (statement_effects) db_get_memory_resource( DBR_CUMULATED_EFFECTS, module_name, TRUE ) );
+    set_cumulated_rw_effects( (statement_effects) db_get_memory_resource( DBR_CUMULATED_EFFECTS, module_name, true ) );
     module_to_value_mappings( module );
 
-    set_precondition_map( (statement_mapping) db_get_memory_resource( DBR_PRECONDITIONS, module_name, TRUE ) );
+    set_precondition_map( (statement_mapping) db_get_memory_resource( DBR_PRECONDITIONS, module_name, true ) );
 
-    set_transformer_map( (statement_mapping) db_get_memory_resource( DBR_TRANSFORMERS, module_name, TRUE ) );
+    set_transformer_map( (statement_mapping) db_get_memory_resource( DBR_TRANSFORMERS, module_name, true ) );
 
     debug_on( "INDUCTION_SUBSTITUTION_DEBUG_LEVEL" );
     pips_debug( 1, "begin\n" );
@@ -680,7 +680,7 @@ bool induction_substitution( char * module_name ) {
     free_value_mappings( );
 
     /* Return value */
-    bool good_result_p = TRUE;
+    bool good_result_p = true;
 
     return ( good_result_p );
 

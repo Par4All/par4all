@@ -327,70 +327,70 @@ print_code_effects(
 bool
 print_code_proper_pointer_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 			      DBR_PROPER_POINTER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_pointer_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_POINTER_EFFECTS, DBR_SUMMARY_POINTER_EFFECTS, ".cumu");
 }
 
 bool
 print_code_proper_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 			      DBR_PROPER_EFFECTS, string_undefined, ".prop");
 }
 
 bool
 print_code_cumulated_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".cumu");
 }
 
 bool
 print_code_proper_references(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 		      DBR_PROPER_REFERENCES, string_undefined, ".propref");
 }
 
 bool
 print_code_cumulated_references(string module_name)
 {
-    return print_code_effects(module_name, TRUE, FALSE, TRUE,
+    return print_code_effects(module_name, true, false, true,
 		      DBR_CUMULATED_REFERENCES, string_undefined, ".cumuref");
 }
 
 bool
 print_code_in_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, FALSE, FALSE,
+    return print_code_effects(module_name, false, false, false,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".ineff");
 }
 
 bool
 print_code_out_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, FALSE, FALSE,
+    return print_code_effects(module_name, false, false, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".outeff");
 }
 
 bool
 print_source_proper_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, TRUE, TRUE,
+    return print_code_effects(module_name, true, true, true,
 		      DBR_PROPER_EFFECTS, string_undefined, ".uprop");
 }
 
 bool
 print_source_cumulated_effects(string module_name)
 {
-    return print_code_effects(module_name, TRUE, TRUE, TRUE,
+    return print_code_effects(module_name, true, true, true,
 		      DBR_CUMULATED_EFFECTS, DBR_SUMMARY_EFFECTS, ".ucumu");
 }
 
@@ -398,14 +398,14 @@ print_source_cumulated_effects(string module_name)
 bool
 print_source_in_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, TRUE, FALSE,
+    return print_code_effects(module_name, false, true, false,
 		      DBR_IN_EFFECTS, DBR_IN_SUMMARY_EFFECTS, ".uineff");
 }
 
 bool
 print_source_out_effects(string module_name)
 {
-    return print_code_effects(module_name, FALSE, TRUE, FALSE,
+    return print_code_effects(module_name, false, true, false,
 		      DBR_OUT_EFFECTS, DBR_OUT_SUMMARY_EFFECTS, ".uouteff");
 }
 
@@ -417,12 +417,12 @@ get_text_proper_pointer_effects(string module_name)
 {
     text t;
 
-    set_is_user_view_p(FALSE);
+    set_is_user_view_p(false);
     set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_PROPER_POINTER_EFFECTS,
 				 string_undefined,
-				 FALSE);
+				 false);
     reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
@@ -432,12 +432,12 @@ get_text_cumulated_pointer_effects(string module_name)
 {
     text t;
 
-    set_is_user_view_p(FALSE);
+    set_is_user_view_p(false);
     set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_CUMULATED_POINTER_EFFECTS,
 				 DBR_SUMMARY_POINTER_EFFECTS,
-				 FALSE);
+				 false);
     reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
@@ -447,12 +447,12 @@ get_text_proper_effects(string module_name)
 {
     text t;
 
-    set_is_user_view_p(FALSE);
+    set_is_user_view_p(false);
     set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_PROPER_EFFECTS,
 				 string_undefined,
-				 FALSE);
+				 false);
     reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
@@ -462,12 +462,12 @@ get_text_cumulated_effects(string module_name)
 {
     text t;
 
-    set_is_user_view_p(FALSE);
+    set_is_user_view_p(false);
     set_methods_for_rw_effects_prettyprint(module_name);
     t = get_any_effect_type_text(module_name,
 				 DBR_CUMULATED_EFFECTS,
 				 DBR_SUMMARY_EFFECTS,
-				 FALSE);
+				 false);
     reset_methods_for_effects_prettyprint(module_name);
     return t;
 }
@@ -558,7 +558,7 @@ bool expression_invariant_wrt_effects(expression exp, list el)
   list ee = proper_effects_of_expression(exp);
   list cee = list_undefined;
   list cel = list_undefined;
-  bool invariant_p = TRUE;
+  bool invariant_p = true;
 
   for(cee=ee; !ENDP(cee) && invariant_p; POP(cee)) {
     effect exp_e = EFFECT(CAR(cee));
@@ -574,7 +574,7 @@ bool expression_invariant_wrt_effects(expression exp, list el)
 	//entity l_v = reference_variable(l_r);
 
 	if(effects_interfere_p(l_e,exp_e)) {
-	  invariant_p = FALSE;
+	  invariant_p = false;
 	}
       }
     }
@@ -638,7 +638,7 @@ statement_to_effects(statement s)
  */
 bool full_simple_proper_effects(string module_name, statement current)
 {
-  bool ok = TRUE;
+  bool ok = true;
   set_methods_for_proper_simple_effects();
   expression_proper_effects_engine(module_name, current);
   generic_effects_reset_all_methods();
@@ -647,7 +647,7 @@ bool full_simple_proper_effects(string module_name, statement current)
 
 bool simple_cumulated_effects(string module_name, statement current)
 {
-  bool ok = TRUE;
+  bool ok = true;
   set_methods_for_proper_simple_effects();
 
   (*effects_computation_init_func)(module_name);

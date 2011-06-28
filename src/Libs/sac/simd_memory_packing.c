@@ -150,7 +150,7 @@ bool simd_memory_packing(char *mod_name)
 {
     bool failed = false;
         /* get the resources */
-        statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        statement mod_stmt = (statement)db_get_memory_resource(DBR_CODE, mod_name, true);
         set_current_module_statement(mod_stmt);
         set_current_module_entity(module_name_to_entity(mod_name));
 

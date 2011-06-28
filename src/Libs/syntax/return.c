@@ -47,11 +47,11 @@
 /* Should alternate returns be substituted or not ?
  *
  * If alternate returns are substituted, the code declarations should be
- * regenerated unless hide_rc_p is TRUE and some PIPS run-time Fortran
+ * regenerated unless hide_rc_p is true and some PIPS run-time Fortran
  * functions provided. The corresponding property should be checked.  */
-static bool substitute_rc_p = FALSE;
-static bool substitute_stop_p = FALSE;
-static bool hide_rc_p = FALSE;
+static bool substitute_rc_p = false;
+static bool substitute_stop_p = false;
+static bool hide_rc_p = false;
 #define GET_RC_PREFIX "GET_"
 #define SET_RC_PREFIX "SET_"
 
@@ -158,7 +158,7 @@ ResetReturnCodeVariable()
  * the RETURN statements must include an assignment to the return code
  * variable.
  */
-static bool current_module_uses_alternate_returns = FALSE;
+static bool current_module_uses_alternate_returns = false;
 /* The current number of alternate returns is used to process a module
    declaration */
 static int current_number_of_alternate_returns = -1;
@@ -523,5 +523,5 @@ void GenerateReturn()
 	inst = MakeZeroOrOneArgCallInst("RETURN", expression_undefined);
     }
 
-    LinkInstToCurrentBlock(inst, TRUE);
+    LinkInstToCurrentBlock(inst, true);
 }

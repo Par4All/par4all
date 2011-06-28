@@ -850,17 +850,17 @@ bool simdizer(char * mod_name)
 {
     /* get the resources */
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt); 
     set_current_module_entity(module_name_to_entity(mod_name));
     set_ordering_to_statement(mod_stmt);
-    simdizer_context sc = { .dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE),
+    simdizer_context sc = { .dg = (graph) db_get_memory_resource(DBR_DG, mod_name, true),
         .nb_enclosing_loops = 0,
 			    .result = false };
-    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",TRUE));
-    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",TRUE));
-    statement_effects se = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,mod_name,TRUE);
+    set_simd_treematch((matchTree)db_get_memory_resource(DBR_SIMD_TREEMATCH,"",true));
+    set_simd_operator_mappings(db_get_memory_resource(DBR_SIMD_OPERATOR_MAPPINGS,"",true));
+    statement_effects se = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS,mod_name,true);
     remove_preferences(se);
     set_proper_rw_effects(se);
     push_generated_variable_commenter(sac_commenter);

@@ -546,14 +546,14 @@ static string c_brace_expression_string(expression exp)
     string result = "{";
     list args = call_arguments(syntax_call(expression_syntax(exp)));
 
-    bool first = TRUE;
+    bool first = true;
     FOREACH (EXPRESSION,e,args)
     {
         if (brace_expression_p(e))
             result = strdup(concatenate(result,first?"":",",c_brace_expression_string(e),NULL));
         else
 	  result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
-        first = FALSE;
+        first = false;
     }
     result = strdup(concatenate(result,"}",NULL));
     return result;
@@ -729,7 +729,7 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
         case is_type_enum:
             {
                 list l = type_enum(t);
-                bool first = TRUE;
+                bool first = true;
                 string tmp = NULL;
                 tmp = c_entity_local_name(var);
                 result = strdup(concatenate("enum ", tmp, " {",NULL));
@@ -739,7 +739,7 @@ static string this_entity_cdeclaration(entity var, bool fct_sig)
                         tmp = c_entity_local_name(ent);
                         result = strdup(concatenate(result,first?"":",",tmp,NULL));
                         free(tmp);
-                        first = FALSE;
+                        first = false;
                         },l);
                 result = strdup(concatenate(result,"}", NULL));
                 break;
@@ -795,7 +795,7 @@ static string c_declarations(
 {
     string result = strdup("");
     code c;
-    bool first = TRUE;
+    bool first = true;
 
     pips_assert("it is a code", value_code_p(entity_initial(module)));
 
@@ -816,7 +816,7 @@ static string c_declarations(
 	    pips_debug(6, "result = %s\n", result);
             free(svar);
             free(old);
-            first = FALSE;
+            first = false;
         }
     }
     // insert the last separtor if required and if at least one declaration
@@ -916,7 +916,7 @@ static string c_head(entity module)
         /* define args. */
         if (functional_parameters(f))
         {
-            args = c_declarations(module, argument_p, ", ", FALSE, true);
+            args = c_declarations(module, argument_p, ", ", false, true);
         }
         else
         {
@@ -1028,7 +1028,7 @@ static string ppt_call(string in_c, list le)
     }
     else
     {
-        bool first = TRUE;
+        bool first = true;
         scall = strdup(concatenate(in_c, OPENPAREN, NULL));
 
         /* Attention: not like this for io statements*/
@@ -1041,7 +1041,7 @@ static string ppt_call(string in_c, list le)
 				       arg, NULL));
             free(arg);
             free(old);
-            first = FALSE;
+            first = false;
         }
 
         old = scall;
@@ -1166,7 +1166,7 @@ static string ppt_min_max (string in_c, list le)
 ///@param in_f, the instrinsic in fortran
 static string ppt_unknown(string in_f, list le)
 {
-  if (get_bool_property ("CROUGH_PRINT_UNKNOWN_INTRINSIC") == FALSE)
+  if (get_bool_property ("CROUGH_PRINT_UNKNOWN_INTRINSIC") == false)
 	pips_user_error ("This intrinsic can not be tranbslated in c: %s\n", in_f);
   string result = ppt_call (in_f, le);
   return result;
@@ -1373,7 +1373,7 @@ static bool expression_needs_parenthesis_p(expression e)
         case is_syntax_reference:
         case is_syntax_range:
         default:
-            return FALSE;
+            return false;
     }
 }
 
@@ -1563,7 +1563,7 @@ static string c_unstructured(unstructured u,bool breakable)
                     control succ2 = CONTROL(CAR(CDR(control_successors(c))));
                     instruction i = statement_instruction(st);
                     test t = instruction_test(i);
-                    bool no_endif = FALSE;
+                    bool no_endif = false;
                     string str = NULL;
                     printf("nsucc = 2 \n");
                     pips_assert("must be a test", instruction_test_p(i));
@@ -1601,7 +1601,7 @@ static string c_unstructured(unstructured u,bool breakable)
                                 printf("succ1 must be reached by GOTO\n");
                                 l = label_local_name(statement_label(control_statement(succ1)));
                                 pips_assert("Must be labelled", l!= string_undefined);
-                                no_endif = TRUE;
+                                no_endif = true;
                             }
                             else
                             {
@@ -2002,7 +2002,7 @@ static string interface_argument_type_string (entity var) {
 static string interface_argument_declaration (entity module, string separator,
 					      string indent) {
   code c;
-  bool first = TRUE;
+  bool first = true;
   string tmp = NULL;
   string args = strdup ("");
   string result = NULL;
@@ -2020,7 +2020,7 @@ static string interface_argument_declaration (entity module, string separator,
 				  separator,
 				  NULL));
       free(tmp);
-      first = FALSE;
+      first = false;
     }
   }
   result = strdup (args);
@@ -2033,7 +2033,7 @@ static string interface_argument_declaration (entity module, string separator,
 static string interface_signature (entity module)
 {
     code c = code_undefined;
-    bool first = TRUE;
+    bool first = true;
     string tmp = NULL;
     string args = strdup ("(");
     string result = NULL;
@@ -2046,10 +2046,10 @@ static string interface_signature (entity module)
     FOREACH(ENTITY, var,code_declarations(c)) {
       if (argument_p (var) == true) {
 	tmp = args;
-	args = strdup (concatenate (args, first == TRUE ? "" : ", ",
+	args = strdup (concatenate (args, first == true ? "" : ", ",
 				    c_entity_local_name (var), NULL));
 	free(tmp);
-	first = FALSE;
+	first = false;
       }
     }
 
@@ -2112,8 +2112,8 @@ static string c_code_string(entity module, statement stat)
   // function declaration
   head        = c_head(module);
   // What about declarations associated to statements
-  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,TRUE,
-							   FALSE);
+  decls       = c_declarations(module,parameter_or_variable_p,SEMICOLON,true,
+							   false);
   body        = c_statement(stat, false);
   copy_in     = scalar_prelude ();
 
@@ -2143,7 +2143,7 @@ bool print_interface (string module_name)
   module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", interface, NULL));
-  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -2171,7 +2171,7 @@ bool print_interface (string module_name)
   free (dir);
   free (filename);
 
-  return TRUE;
+  return true;
 }
 
 bool print_crough(string module_name)
@@ -2187,10 +2187,10 @@ bool print_crough(string module_name)
     module = module_name_to_entity(module_name);
     dir = db_get_current_workspace_directory();
     filename = strdup(concatenate(dir, "/", crough, NULL));
-    stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
     l_effect = effects_to_list((effects)
 			       db_get_memory_resource(DBR_SUMMARY_EFFECTS,
-						      module_name, TRUE));
+						      module_name, true));
     set_current_module_entity(module);
     set_current_module_statement(stat);
 
@@ -2237,7 +2237,7 @@ bool print_crough(string module_name)
     reset_current_module_statement();
     reset_current_module_entity();
 
-    return TRUE;
+    return true;
 }
 
 /* C indentation thru indent.
@@ -2246,7 +2246,7 @@ bool print_c_code(string module_name)
 {
     string crough, cpretty, dir, cmd;
 
-    crough = db_get_memory_resource(DBR_CROUGH, module_name, TRUE);
+    crough = db_get_memory_resource(DBR_CROUGH, module_name, true);
     cpretty = db_build_file_resource_name(DBR_C_PRINTED_FILE, module_name, CPRETTY);
     dir = db_get_current_workspace_directory();
 
@@ -2260,5 +2260,5 @@ bool print_c_code(string module_name)
     free(cmd);
     free(dir);
 
-    return TRUE;
+    return true;
 }

@@ -52,14 +52,14 @@ static Psysteme sc_identity(Psysteme sc)
 /* e and f are assumed to be values, Type independent. */
 transformer simple_equality_to_transformer(entity e, entity f, bool assignment)
 {
-  transformer tf = generic_equality_to_transformer(e, f, assignment, FALSE);
+  transformer tf = generic_equality_to_transformer(e, f, assignment, false);
 
   return tf;
 }
 
 transformer simple_unary_minus_to_transformer(entity e, entity f)
 {
-  transformer tf = generic_equality_to_transformer(e, f, FALSE, TRUE);
+  transformer tf = generic_equality_to_transformer(e, f, false, true);
 
   return tf;
 }
@@ -535,7 +535,7 @@ static transformer transformer_general_intersection(transformer t1,
    in t1 and incremented in t2, which is impossible. */
 transformer transformer_intersection(transformer t1, transformer t2)
 {
-  transformer t = transformer_general_intersection(t1, t2, FALSE);
+  transformer t = transformer_general_intersection(t1, t2, false);
   return t;
 }
 
@@ -547,7 +547,7 @@ transformer transformer_image_intersection(transformer t1, transformer t2)
 
   pips_debug(9, "begins with t1 = %p and t2 = %p\n", t1, t2);
 
-  t = transformer_general_intersection(t1, t2, TRUE);
+  t = transformer_general_intersection(t1, t2, true);
 
   pips_debug(9, "ends with t = %p, t1 = %p and t2 = %p\n", t, t1, t2);
 
@@ -574,7 +574,7 @@ static transformer transformer_safe_general_intersection(transformer t1,
 /* Allocate a new transformer */
 transformer transformer_safe_intersection(transformer t1, transformer t2)
 {
-  transformer tf = transformer_safe_general_intersection(t1, t2, FALSE);
+  transformer tf = transformer_safe_general_intersection(t1, t2, false);
 
   return tf;
 }
@@ -582,7 +582,7 @@ transformer transformer_safe_intersection(transformer t1, transformer t2)
 /* Allocate a new transformer */
 transformer transformer_safe_image_intersection(transformer t1, transformer t2)
 {
-  transformer tf = transformer_safe_general_intersection(t1, t2, TRUE);
+  transformer tf = transformer_safe_general_intersection(t1, t2, true);
 
   return tf;
 }
@@ -805,7 +805,7 @@ transformer transformer_intersect_range_with_domain(transformer tf)
 
 static int varval_value_name_is_inferior_p(Pvecteur * pvarval1, Pvecteur * pvarval2)
 {
-    int is_inferior = TRUE;
+    int is_inferior = true;
     const char* s1 = generic_value_name((entity) vecteur_var(*pvarval1));
     const char* s2 = generic_value_name((entity) vecteur_var(*pvarval2));
 
@@ -1176,7 +1176,7 @@ transformer transformer_projection_with_redundancy_elimination(
     Psysteme (*elim)(Psysteme))
 {
   return transformer_projection_with_redundancy_elimination_and_check
-    (t, args, elim, TRUE);
+    (t, args, elim, true);
 }
 
 /* In some cases, you know the projection will result in a non-consistent
@@ -1188,7 +1188,7 @@ transformer transformer_projection_without_check(
     Psysteme (*elim)(Psysteme))
 {
   return transformer_projection_with_redundancy_elimination_and_check
-    (t, args, elim, FALSE);
+    (t, args, elim, false);
 }
 
 transformer transformer_projection_with_redundancy_elimination_and_check(
@@ -1262,7 +1262,7 @@ transformer transformer_projection_with_redundancy_elimination_and_check(
        *
        */
 
-      if(TRUE) {
+      if(true) {
 	// if (!sc_empty_p(r)) {
 	// Pbase b = base_dup(sc_base(r));
 
@@ -1420,7 +1420,7 @@ transformer transformer_apply(transformer tf, transformer pre)
  * keep_p is used to preserve the list lengths: the output list is
  * exactly as long as the input list.
  *
- * If keep_p is TRUE, the output list is not "normalized"
+ * If keep_p is true, the output list is not "normalized"
  */
 list transformer_apply_generic(list tl, transformer pre, bool keep_p)
 {
@@ -1441,19 +1441,19 @@ list transformer_apply_generic(list tl, transformer pre, bool keep_p)
    in tl, unless the postcondition is empty. */
 list transformer_apply_map(list tl, transformer pre)
 {
-  return transformer_apply_generic(tl, pre, FALSE);
+  return transformer_apply_generic(tl, pre, false);
 }
 
 /* Same as previous one, but with a more normalized name */
 list transformers_apply(list tl, transformer pre)
 {
-  return transformer_apply_generic(tl, pre, FALSE);
+  return transformer_apply_generic(tl, pre, false);
 }
 
 /* Same as previous one, but with a more normalized name */
 list transformers_apply_and_keep_all(list tl, transformer pre)
 {
-  return transformer_apply_generic(tl, pre, TRUE);
+  return transformer_apply_generic(tl, pre, true);
 }
 
 transformer transformer_safe_apply(transformer tf, transformer pre)
@@ -1638,7 +1638,7 @@ transformer transformer_filter(transformer t, list args)
 
 /* bool transformer_affect_linear_p(transformer tf, Pvecteur l): returns TRUE
  * if there is a state s such that eval(l, s) != eval(l, tf(s));
- * returns FALSE if l is invariant w.r.t. tf, i.e. for all state s,
+ * returns false if l is invariant w.r.t. tf, i.e. for all state s,
  * eval(l, s) == eval(l, tf(s))
  */
 bool transformer_affect_linear_p(transformer tf, Pvecteur l)
@@ -1649,12 +1649,12 @@ bool transformer_affect_linear_p(transformer tf, Pvecteur l)
 	MAP(ENTITY, e,
 	{
 	    Value v = vect_coeff((Variable) e, l);
-	    if(value_notzero_p(v)) return TRUE;
+	    if(value_notzero_p(v)) return true;
 	},
 	    args);
     }
 
-    return FALSE;
+    return false;
 }
 
 /* Transformer tf1 affects transformer tf2 if values modified by tf1
@@ -1663,7 +1663,7 @@ bool transformer_affect_linear_p(transformer tf, Pvecteur l)
 
 bool transformer_affect_transformer_p(transformer tf1, transformer tf2)
 {
-  bool affect_p = FALSE;
+  bool affect_p = false;
 
   /* No need to check anything if tf1 does not change the memory state */
   if(!ENDP(transformer_arguments(tf1))) {
@@ -1687,7 +1687,7 @@ bool transformer_affect_transformer_p(transformer tf1, transformer tf2)
 
 bool transformer_safe_affect_transformer_p(transformer tf1, transformer tf2)
 {
-  bool affect_p = FALSE;
+  bool affect_p = false;
 
   if(!transformer_undefined_p(tf1) && !transformer_undefined_p(tf2))
     affect_p = transformer_affect_transformer_p(tf1, tf2);
@@ -1746,7 +1746,7 @@ transformer invariant_wrt_transformer(transformer p, transformer tf)
 
   if(!transformer_undefined_p(p)) {
     //transformer raw_inv = transformer_undefined;
-    if(FALSE)
+    if(false)
       {
 	fptf = args_to_transformer(transformer_arguments(tf));
       }
@@ -1824,7 +1824,7 @@ transformer transformer_value_substitute(transformer t, entity e1, entity e2)
 /* If e1 does not appear in t, it is substitutable. If e1 does appear in t but not e2, again it is substitutable. Else, it if not. */
 bool transformer_value_substitutable_p(transformer t, entity e1, entity e2)
 {
-  bool substitutable_p = TRUE;
+  bool substitutable_p = true;
   Psysteme s = (Psysteme) predicate_system(transformer_relation(t));
 
   pips_assert("e1 and e2 are defined entities",
@@ -1854,11 +1854,11 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
   string s2 = string_undefined;
   int i2 = 0;
   double x = 0.;
-  bool is_string = FALSE;
-  bool is_float = FALSE;
-  bool type_undecided_p = TRUE;
+  bool is_string = false;
+  bool is_float = false;
+  bool type_undecided_p = true;
   Pvecteur cv = VECTEUR_UNDEFINED;
-  bool is_checked = TRUE;
+  bool is_checked = true;
   int number_of_strings = 0;
 
   for(cv=v; !VECTEUR_UNDEFINED_P(cv); cv = vecteur_succ(cv)) {
@@ -1880,8 +1880,8 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
       case is_basic_float:
 	/* PIPS does not represent negative constants: call to unary_minus */
 	if(type_undecided_p) {
-	  type_undecided_p = FALSE;
-	  is_float = TRUE;
+	  type_undecided_p = false;
+	  is_float = true;
 	}
 	else {
 	  if(is_string) {
@@ -1893,8 +1893,8 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
 	break;
       case is_basic_string:
 	if(type_undecided_p) {
-	  type_undecided_p = FALSE;
-	  is_string = TRUE;
+	  type_undecided_p = false;
+	  is_string = true;
 	}
 	else {
 	  if(is_float) {
@@ -1933,7 +1933,7 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
     else {
       if(vect_size(v)==1) {
 	/* Unfeasible equation or trivial inequality */
-	is_checked = (is_equation_p ? FALSE : (val <= 0));
+	is_checked = (is_equation_p ? false : (val <= 0));
       }
       else {
 	pips_internal_error("Unexpected integer constant mixed up with "
@@ -1979,8 +1979,8 @@ static bool constant_constraint_check(Pvecteur v, bool is_equation_p)
   return is_checked;
 }
 
-/* If TRUE is returned, the transformer certainly is empty.
- * If FALSE is returned,
+/* If true is returned, the transformer certainly is empty.
+ * If false is returned,
  * the transformer still might be empty, it all depends on the normalization
  * procedure power. Beware of its execution time!
  */
@@ -1993,8 +1993,8 @@ static bool parametric_transformer_empty_p(transformer t,
    */
   predicate pred = transformer_relation(t);
   Psysteme ps = predicate_system(pred);
-  bool empty_p = FALSE;
-  bool consistent_p = TRUE;
+  bool empty_p = false;
+  bool consistent_p = true;
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
   Psysteme volatile new_ps = sc_dup (ps);
@@ -2002,7 +2002,7 @@ static bool parametric_transformer_empty_p(transformer t,
   pips_debug(9,"Begin for t=%p\n", t);
 
   /* empty_p = !sc_faisabilite(ps); */
-  /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE); */
+  /* empty_p = !sc_rational_feasibility_ofl_ctrl(ps, OFL_CTRL, true); */
 
   /* Normalize the transformer, use all "reasonnable" equations
    * to reduce the problem
@@ -2016,12 +2016,12 @@ static bool parametric_transformer_empty_p(transformer t,
   new_ps = normalize(new_ps, (char * (*)(Variable)) entity_local_name);
 
   if(SC_EMPTY_P(new_ps)) {
-    empty_p = TRUE;
+    empty_p = true;
   }
   else if(sc_empty_p(new_ps)) {
     /* Depending on the instance of "normalize", might always be trapped
        by the previous test. */
-    empty_p = TRUE;
+    empty_p = true;
   }
   else {
     if(string_analyzed_p() || float_analyzed_p()) {
@@ -2087,19 +2087,19 @@ static bool parametric_transformer_empty_p(transformer t,
 	for(eq = sc_egalites(new_ps);
 	    !CONTRAINTE_UNDEFINED_P(eq) && consistent_p;
 	    eq = contrainte_succ(eq)) {
-	  consistent_p = constant_constraint_check(contrainte_vecteur(eq), TRUE);
+	  consistent_p = constant_constraint_check(contrainte_vecteur(eq), true);
 	}
 
 	for(ineq = sc_inegalites(new_ps);
 	    !CONTRAINTE_UNDEFINED_P(ineq) && consistent_p;
 	    ineq = contrainte_succ(ineq)) {
-	  consistent_p = constant_constraint_check(contrainte_vecteur(ineq), FALSE);
+	  consistent_p = constant_constraint_check(contrainte_vecteur(ineq), false);
 	}
 	empty_p = !consistent_p;
       }
     }
     else {
-      empty_p = FALSE;
+      empty_p = false;
     }
 
     sc_rm(new_ps);
@@ -2110,8 +2110,8 @@ static bool parametric_transformer_empty_p(transformer t,
   return empty_p;
 }
 
-/* If TRUE is returned, the transformer certainly is empty.
- * If FALSE is returned,
+/* If true is returned, the transformer certainly is empty.
+ * If false is returned,
  * the transformer still might be empty, but it's not too likely...
  *
  * Well, k <= 2 and k >= 3 does not return empty in spite of
@@ -2123,8 +2123,8 @@ bool transformer_empty_p(transformer t)
     return empty_p;
 }
 
-/* If TRUE is returned, the transformer certainly is empty.
- * If FALSE is returned,
+/* If true is returned, the transformer certainly is empty.
+ * If false is returned,
  * the transformer still might be empty, but it's not likely at all...
  */
 bool transformer_strongly_empty_p(transformer t)

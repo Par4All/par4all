@@ -86,7 +86,7 @@ summary_in_effects_engine(char *module_name)
 
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
-db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
 
     (*effects_computation_init_func)(module_name);
@@ -104,7 +104,7 @@ db_get_memory_resource(DBR_CODE, module_name, TRUE) );
 
     (*effects_computation_reset_func)(module_name);
 
-    return TRUE;
+    return true;
 }
 
 
@@ -126,7 +126,7 @@ static bool in_effects_stmt_filter(statement s)
     pips_debug(1, "Entering statement %03zd :\n", statement_ordering(s));
     effects_private_current_stmt_push(s);
     effects_private_current_context_push((*load_context_func)(s));
-    return TRUE;
+    return true;
 }
 
 static void in_effects_of_statement(statement s)
@@ -478,15 +478,15 @@ static void in_effects_of_loop(loop l)
 	    */
 	    global_write = scalar_regions_sc_append(global_write,
 				     descriptor_convex(range_descriptor),
-				     TRUE);
+				     true);
 	    global_in = scalar_regions_sc_append(global_in,
 				     descriptor_convex(range_descriptor),
-				     TRUE);
+				     true);
 
 	    (*effects_loop_normalize_func)(global_write, i, r,
-					   &new_i, range_descriptor, TRUE);
+					   &new_i, range_descriptor, true);
 	    (*effects_loop_normalize_func)(global_in, i, r,
-					   &new_i, range_descriptor, FALSE);
+					   &new_i, range_descriptor, false);
 
 	    if (!entity_undefined_p(new_i) && !same_entity_p(i,new_i)) {
 	      add_intermediate_value(new_i);
@@ -619,15 +619,15 @@ static bool written_before_read_p(entity ent,list args)
 	    {
 	      reference r = expression_reference(exp);
 	      if (reference_scalar_p(r))
-		return TRUE;
-	      return FALSE;
+		return true;
+	      return false;
 	    }
-	  return FALSE;
+	  return false;
 	}
     },l);
   },args);
 
-  return FALSE;
+  return false;
 }
 
 
@@ -821,7 +821,7 @@ bool in_effects_engine(char * module_name)
 
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
 
     (*effects_computation_init_func)(module_name);
@@ -869,5 +869,5 @@ bool in_effects_engine(char * module_name)
 
     free_effects_private_current_context_stack();
 
-    return TRUE;
+    return true;
 }

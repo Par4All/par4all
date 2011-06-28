@@ -190,8 +190,8 @@ Character constants are typed as int.
       /* See all hexadecimal constant as unsigned on 64 bits, elses
 	 0xffffffff generates an overflow, not a -1 (see C-syntax/constants03.c */
       if(strstr(name,"0x")==name) {
-	usuffix = TRUE;
-	lsuffix = TRUE;
+	usuffix = true;
+	lsuffix = true;
       }
       /*
       if(usuffix)
@@ -294,14 +294,14 @@ entity make_C_constant_entity(string name,
 			      tag bt,
 			      size_t size)
 {
-  return make_C_or_Fortran_constant_entity(name, bt, size, FALSE);
+  return make_C_or_Fortran_constant_entity(name, bt, size, false);
 }
 
 entity make_Fortran_constant_entity(string name,
 				    tag bt,
 				    size_t size)
 {
-  return make_C_or_Fortran_constant_entity(name, bt, size, TRUE);
+  return make_C_or_Fortran_constant_entity(name, bt, size, true);
 }
 
 /* For historical reason, call the Fortran version */
@@ -309,7 +309,7 @@ entity make_constant_entity(string name,
 			    tag bt,
 			    size_t size)
 {
-  return make_C_or_Fortran_constant_entity(name, bt, size, TRUE);
+  return make_C_or_Fortran_constant_entity(name, bt, size, true);
 }
 
 /* END_EOLE */
@@ -381,7 +381,7 @@ expression MakeComplexConstantExpression(expression r,
 
 bool complex_constant_expression_p(expression cce)
 {
-  bool is_complex_constant_p = FALSE;
+  bool is_complex_constant_p = false;
   if(expression_call_p(cce)) {
     entity f = call_function(syntax_call(expression_syntax(cce)));
     string fn = entity_local_name(f);
@@ -413,13 +413,13 @@ entity int_to_entity(_int c)
 
 bool logical_constant_p(entity ent)
 {
-  bool yes_p = FALSE;
+  bool yes_p = false;
   type t = entity_type(ent);
 
   if( type_functional_p(t))
     if(value_constant_p(entity_initial(ent))) {
       if(constant_logical_p(value_constant(entity_initial(ent))))
-	yes_p = TRUE;
+	yes_p = true;
       else if(constant_call_p(value_constant(entity_initial(ent)))) {
 	/* In the initial internal representation, only integer
 	   constants were distinguished */
@@ -445,10 +445,10 @@ bool integer_constant_p(entity ent, int *int_p)
        && value_tag(entity_initial(ent))==is_value_constant
        && constant_tag(value_constant(entity_initial(ent)))==is_constant_int ) {
 	*int_p = constant_int(value_constant(entity_initial(ent)));
-	return(TRUE);
+	return(true);
     }
     else
-	return(FALSE);
+	return(false);
 }
 
 
@@ -459,10 +459,10 @@ bool integer_symbolic_constant_p(entity ent, int *int_p)
        && value_tag(entity_initial(ent))==is_value_symbolic
        && constant_tag(symbolic_constant(value_symbolic(entity_initial(ent))))==is_constant_int ) {
 	*int_p = constant_int(symbolic_constant(value_symbolic(entity_initial(ent))));
-	return(TRUE);
+	return(true);
     }
     else
-	return(FALSE);
+	return(false);
 }
 
 /* END_EOLE */
@@ -504,7 +504,7 @@ value MakeValueSymbolic(expression e)
 bool signed_constant_expression_p(expression e)
 {
     syntax es = expression_syntax(e);
-    bool ok = TRUE;
+    bool ok = true;
 
     if(syntax_call_p(es)) {
 	entity ce = call_function(syntax_call(es));
@@ -519,11 +519,11 @@ bool signed_constant_expression_p(expression e)
 		    ok = entity_constant_p(mce);
 		}
 		else {
-		    ok = FALSE;
+		    ok = false;
 		}
 	    }
 	    else {
-		ok = FALSE;
+		ok = false;
 	    }
 	}
     }
@@ -568,7 +568,7 @@ bool expression_is_constant_p(expression e)
     syntax s = expression_syntax(e);
 
     return syntax_call_p(s) ?
-	entity_constant_p(call_function(syntax_call(s))) : FALSE ;
+	entity_constant_p(call_function(syntax_call(s))) : false ;
 
 }
 /* END_EOLE */

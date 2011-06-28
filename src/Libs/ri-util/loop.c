@@ -176,12 +176,12 @@ distributable_statement_p(statement stat, set region)
     {
     case is_instruction_block:
 	MAPL(ps, {
-	    if (distributable_statement_p(STATEMENT(CAR(ps)),
-					  region) == FALSE) {
-		return(FALSE);
+	    if (!distributable_statement_p(STATEMENT(CAR(ps)),
+					  region)) {
+		return(false);
 	    }
 	}, instruction_block(i));
-	return(TRUE);
+	return(true);
 
     case is_instruction_loop:
 	region = set_add_element(region, region, (char *) stat);
@@ -190,14 +190,14 @@ distributable_statement_p(statement stat, set region)
 
     case is_instruction_call:
 	region = set_add_element(region, region, (char *) stat);
-	return(TRUE);
+	return(true);
 
     case is_instruction_whileloop:
     case is_instruction_goto:
     case is_instruction_unstructured:
     case is_instruction_test:
     case is_instruction_expression:
-	return(FALSE);
+	return(false);
     default:
 	pips_internal_error("unexpected tag %d", instruction_tag(i));
     }
@@ -231,7 +231,7 @@ statement l;
 }
 
 
-/* returns TRUE if loop lo's index is private for this loop */
+/* returns true if loop lo's index is private for this loop */
 bool index_private_p(lo)
 loop lo;
 {
@@ -323,10 +323,10 @@ set region;
 
     @param obj, the loop to look at.
 
-    @param local, set to TRUE to remove the the variables that are localy
+    @param local, set to true to remove the the variables that are localy
     declared.
 
-    @param index, set to TRUE to remove the loop index variable
+    @param index, set to true to remove the loop index variable
 
     @return a list of entities that are private in the current * context.
 */
@@ -342,7 +342,7 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
     fprintf (stderr, "\n");
   }
 
-  if (local == TRUE) {
+  if (local ) {
     // List of localy declared entities that are stored in loop body
     list decl_var = statement_declarations (loop_body (obj));
     ifdebug(9) {
@@ -353,7 +353,7 @@ list loop_private_variables_as_entites (loop obj, bool local, bool index) {
     gen_list_and_not (&result, decl_var);
   }
 
-  if (index == TRUE) {
+  if (index ) {
     pips_debug (9, "loop_indexl to remove : %s\n", entity_name (loop_index(obj)));
     gen_remove (&result, loop_index(obj));
   }
@@ -381,7 +381,7 @@ void sort_all_loop_locals(statement s)
 
    @param l is the loop to test
 
-   @return TRUE if the loop has a parallel execution mode
+   @return true if the loop has a parallel execution mode
 */
 bool loop_parallel_p(loop l) {
   return execution_parallel_p(loop_execution(l));
@@ -392,7 +392,7 @@ bool loop_parallel_p(loop l) {
 
    @param l is the loop to test
 
-   @return TRUE if the loop has a sequential execution mode
+   @return true if the loop has a sequential execution mode
 */
 bool loop_sequential_p(loop l) {
   return execution_sequential_p(loop_execution(l));
@@ -408,7 +408,7 @@ bool loop_sequential_p(loop l) {
    to get the pragma for the loop.
    instruction with a loop in it.
 
-   @return TRUE only if the statement is a parallel loop.
+   @return true only if the statement is a parallel loop.
 */
 bool parallel_loop_statement_p(statement s) {
   if (statement_loop_p(s)) {
@@ -417,7 +417,7 @@ bool parallel_loop_statement_p(statement s) {
 
     return loop_parallel_p(l);
   }
-  return FALSE;
+  return false;
 }
 
 
@@ -486,7 +486,7 @@ int depth_of_perfect_loop_nest(statement s) {
 
     @param stat is the statement to test
 
-    @return TRUE if the statement is a perfect loop-nest
+    @return true if the statement is a perfect loop-nest
 */
 bool
 perfectly_nested_loop_p(statement stat) {
@@ -500,7 +500,7 @@ perfectly_nested_loop_p(statement stat) {
     if ( lb != NIL && (lb->cdr) != NIL && (lb->cdr)->cdr == NIL
 	 && ( continue_statement_p(STATEMENT(CAR(lb->cdr))) ) ) {
       if ( assignment_statement_p(STATEMENT(CAR(lb))) )
-	return TRUE;
+	return true;
       else
 	return(perfectly_nested_loop_p(STATEMENT(CAR(lb))));
     }
@@ -512,7 +512,7 @@ perfectly_nested_loop_p(statement stat) {
     }
     else
       /* extreme case: empty loop nest */
-      return TRUE;
+      return true;
     break;
   }
   case is_instruction_loop: {
@@ -520,7 +520,7 @@ perfectly_nested_loop_p(statement stat) {
     statement sbody = loop_body(lo);
 
     if ( assignment_statement_p(sbody) )
-      return TRUE;
+      return true;
     else
       return(perfectly_nested_loop_p(sbody));
     break;
@@ -529,7 +529,7 @@ perfectly_nested_loop_p(statement stat) {
     break;
   }
 
-  return FALSE;
+  return false;
 }
 
 
@@ -695,7 +695,7 @@ bool normal_loop_p(loop l) {
 
   if (!constant_step_loop_p(l))
     // No way for a non-constant step to be a 1-constant :-)
-    return(FALSE);
+    return(false);
 
   ri = range_increment(loop_range(l));
   ent = reference_variable(syntax_reference(expression_syntax(ri)));

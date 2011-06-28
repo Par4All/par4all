@@ -41,7 +41,7 @@
 
 /* internal variables */
 static FILE    *flint_messages_file = NULL;
-static bool     no_message = TRUE;
+static bool     no_message = true;
 static int      number_of_messages = 0;
 statement       flint_current_statement = statement_undefined;
 
@@ -67,24 +67,24 @@ flinter(char * module_name)
     flint_current_module_name = module_name;
     flint_current_statement = statement_undefined;
     number_of_messages = 0;
-    no_message = TRUE;
+    no_message = true;
 
     debug(1, "flinter", "flinting module %s\n", module_name);
     
     /* Getting parsed code of module */
-    /* the last parameter should be pure=TRUE; the code should not be modified! */
+    /* the last parameter should be pure=true; the code should not be modified! */
     module_stat = (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE);
+	db_get_memory_resource(DBR_CODE, module_name, true);
 
     /* Resource to trace uninitialized variables: */
     dependence_graph =
-	(graph) db_get_memory_resource(DBR_CHAINS, module_name, TRUE);
+	(graph) db_get_memory_resource(DBR_CHAINS, module_name, true);
     set_ordering_to_statement(module_stat);
 
     set_proper_rw_effects((statement_effects)
 			  db_get_memory_resource(DBR_PROPER_EFFECTS,
 						 module_name,
-						 TRUE)); 
+						 true)); 
     set_current_module_statement(module_stat);
     set_current_module_entity(local_name_to_top_level_entity(module_name));
 
@@ -124,7 +124,7 @@ flinter(char * module_name)
     flint_current_module_name = NULL;
     flint_current_statement = statement_undefined;
     number_of_messages = 0;
-    no_message = TRUE;
+    no_message = true;
 
     reset_proper_rw_effects();
     reset_current_module_statement();
@@ -134,7 +134,7 @@ flinter(char * module_name)
     debug_off();
 
     /* Should have worked: */
-    return TRUE;
+    return true;
 }
 
 
@@ -159,7 +159,7 @@ flint_message(char *fun,
      * occured.
      */
 
-    no_message = FALSE;
+    no_message = false;
     number_of_messages++;
 
     order = statement_ordering(flint_current_statement);
@@ -189,7 +189,7 @@ flint_message_2(char *fun,
 
     va_start(args, fmt);
 
-    no_message = FALSE;
+    no_message = false;
     number_of_messages++;
 
     (void) fprintf(flint_messages_file,
@@ -217,7 +217,7 @@ raw_flint_message(bool count,
 
     va_start(args, fmt);
 
-    no_message = FALSE;
+    no_message = false;
     if (count)
 	number_of_messages++;
 

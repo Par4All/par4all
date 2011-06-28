@@ -64,8 +64,8 @@
 #define COMBINE 1
 #define UNUSED 2
 
-#define SUPER TRUE
-#define SUB FALSE
+#define SUPER true
+#define SUB false
 
 /****************************************** STATISTICS FOR BINARY OPERATORS */
 
@@ -204,7 +204,7 @@ void print_dinf_statistics(char *mod_name, char *prefix)
  *            (no sharing introduced).
  */
 list RegionsMayUnion(list l1, list l2,
-		     boolean (*union_combinable_p)(effect, effect))
+		     bool (*union_combinable_p)(effect, effect))
 {
     list lr;
 
@@ -225,7 +225,7 @@ list RegionsMayUnion(list l1, list l2,
  *            the output list of regions are freed.
  */
 list RegionsMustUnion(list l1, list l2,
-		      boolean (*union_combinable_p)(effect, effect))
+		      bool (*union_combinable_p)(effect, effect))
 {
     list lr;
 
@@ -240,14 +240,14 @@ list RegionsMustUnion(list l1, list l2,
 
 
 /* list RegionsIntersection(list l1,l2,
-        boolean (*intersection_combinable_p)(effect, effect))
+        bool (*intersection_combinable_p)(effect, effect))
  * input    :
  * output   :
  * modifies :
  * comment  :
  */
 list RegionsIntersection(list l1, list l2,
-			 boolean (*intersection_combinable_p)(effect, effect))
+			 bool (*intersection_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -265,7 +265,7 @@ list RegionsIntersection(list l1, list l2,
 
 
 /* list RegionsEntitiesIntersection(list l1,l2,
-            boolean (*intersection_combinable_p)(effect, effect))
+            bool (*intersection_combinable_p)(effect, effect))
  * input    : two lists of regions
  * output   : a list of regions containing all the regions of l1 that have
  *            a corresponding region (i.e. same entity) in l2.
@@ -273,7 +273,7 @@ list RegionsIntersection(list l1, list l2,
  * comment  :
  */
 list RegionsEntitiesIntersection(list l1, list l2,
-				 boolean (*intersection_combinable_p)(effect, effect))
+				 bool (*intersection_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -303,7 +303,7 @@ list RegionsEntitiesIntersection(list l1, list l2,
  *            combinable with those of l_reg1.
  */
 list RegionsSupDifference(list l1, list l2,
-			  boolean (*difference_combinable_p)(effect, effect))
+			  bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -332,7 +332,7 @@ list RegionsSupDifference(list l1, list l2,
  *            combinable with those of l_reg1.
  */
 list RegionsInfDifference(list l1, list l2,
-			  boolean (*difference_combinable_p)(effect, effect))
+			  bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -365,7 +365,7 @@ list RegionsInfDifference(list l1, list l2,
  */
 list RegionsEntitiesInfDifference(
     list l1, list l2,
-    boolean (*difference_combinable_p)(effect, effect))
+    bool (*difference_combinable_p)(effect, effect))
 {
     list l_res = NIL;
 
@@ -422,7 +422,7 @@ list region_may_union(region r1, region r2)
            on the value of must_p
     @param[in] r1 input array region
     @param[in] r2 input array region
-    @param[in] must_p boolean to control the must/may behavior of the function
+    @param[in] must_p bool to control the must/may behavior of the function
     @see effects_combinable_p
     @return a new region with no sharing with the input regions
  */
@@ -1010,7 +1010,7 @@ region_intersection(region reg1, region reg2)
 	/* Automatic variables read in a CATCH block need to be declared volatile as
 	 * specified by the documentation*/
 	region volatile reg;
-	boolean feasible = TRUE;
+	bool feasible = true;
 
 
 	/* if one of the regions is unfeasible, return an empty list */
@@ -1031,13 +1031,13 @@ region_intersection(region reg1, region reg2)
 	CATCH(overflow_error)
 	{
 	  pips_debug(3, "overflow error \n");
-	  feasible = TRUE;
+	  feasible = true;
 	  debug_region_consistency(reg);
 	}
 	TRY
 	  {
 	    feasible = sc_integer_feasibility_ofl_ctrl(region_system(reg),
-						       FWD_OFL_CTRL, TRUE);
+						       FWD_OFL_CTRL, true);
 	    UNCATCH(overflow_error);
 	  }
 
@@ -1096,7 +1096,7 @@ list region_entities_intersection(region r1, region r2)
  */
 
 static list disjunction_to_list_of_regions(Pdisjunct disjonction, effect reg,
-					  tag app, boolean super_or_sub);
+					  tag app, bool super_or_sub);
 
 /* list region_sup_difference(effect reg1, reg2)
  * input    : two regions
@@ -1373,14 +1373,14 @@ list region_inf_difference(region reg1, region reg2)
 
 
 
-/* static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *b)
+/* static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, bool *b)
  * input    : a disjunction representing the union of several Psystemes
  * output   : a Psysteme representing the convex_hull of the disjunction
  *            of predicates.
  * modifies : frees the input disjuntion.
  * comment  : Exactness is now tested outside the loop.
  */
-static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *p_exact)
+static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, bool *p_exact)
 {
     Psysteme ps_res = SC_UNDEFINED;
 
@@ -1411,7 +1411,7 @@ static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *p_exact
     }
     else
     {
-	*p_exact = TRUE;
+	*p_exact = true;
 	/* do not freee the inner Psysteme: it is the result */
 	disjonction = dj_free1(disjonction);
     }
@@ -1426,18 +1426,18 @@ static Psysteme disjunction_to_region_sc(Pdisjunct disjonction, boolean *p_exact
  *            Psystemes of the disjunction and the approximation which depends
  *            on the exactness of the representation. The latter is either a sub
  *            or a super approximation of the disjonction, depending on the value
- *            of the boolean super_or_sub.
+ *            of the bool super_or_sub.
  * modifies : the disjunction is freed by the call to disjunction_to_region_sc.
  * comment  : app is the tag if the disjunction is exact;
  */
 static list disjunction_to_list_of_regions(Pdisjunct disjonction, region reg,
 					   tag app,
-					   boolean super_or_sub __attribute__ ((unused)))
+					   bool super_or_sub __attribute__ ((unused)))
 {
     Psysteme ps;
     region reg_ps;
     list l_reg = NIL;
-    boolean exact = TRUE;
+    bool exact = true;
     Psysteme ps_tmp;
 
     ps_tmp = disjunction_to_region_sc(disjonction, &exact);

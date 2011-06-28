@@ -580,7 +580,7 @@ ComputeRTandSS(expression Sub, unsigned DimNo, simple_section Dad, loop Loop)
 
     PutBoundPair(Dad, DimNo, Low, Up);
 
-    if(IsExprConst(normalized_linear(Nexpr)) == TRUE ) {
+    if(IsExprConst(normalized_linear(Nexpr)) == true ) {
       PutRefTemp(Dad, DimNo, is_rtype_linvariant);
     }
     else {

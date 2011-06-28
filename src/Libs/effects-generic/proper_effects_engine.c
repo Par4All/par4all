@@ -79,7 +79,7 @@ static void debug_ctxt(string s, transformer t)
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
-static bool contract_p = TRUE;
+static bool contract_p = true;
 
 void
 set_contracted_proper_effects(bool b)
@@ -496,7 +496,7 @@ list generic_p_proper_effect_of_reference(reference ref,
 
 
 /* list generic_proper_effects_of_reference(reference ref, bool written_p)
- * input    : a reference and a boolean true if it is a written reference.
+ * input    : a reference and a bool true if it is a written reference.
  * output   : the corresponding list of effects.
  * modifies : nothing.
  * comment  : effects of a reference that is either read or written.
@@ -534,7 +534,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
 	  else
 	    {
 	      le =  generic_p_proper_effect_of_reference(ref, &eff, written_p,
-							 FALSE);
+							 false);
 	      pips_assert("le is weakly consistent", regions_weakly_consistent_p(le));
 
 	      if (!effect_undefined_p(eff))
@@ -558,7 +558,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
        with a read and a write of v seems to end with two reference
        effects. See Bootstrap/iand01.f, assuming all effects are
        computed, of course. */
-    effect re = make_declaration_effect(v, FALSE); // reference effect
+    effect re = make_declaration_effect(v, false); // reference effect
     //type vt = entity_type(v);
 
     le = CONS(EFFECT, re, le);
@@ -566,7 +566,7 @@ list generic_proper_effects_of_reference(reference ref, bool written_p)
     /*
     if(typedef_type_p(vt)) {
       entity te = basic_typedef(variable_basic(type_variable(vt)));
-      effect tre = make_declaration_effect(te, FALSE); // type
+      effect tre = make_declaration_effect(te, false); // type
 						      // reference effect
       le = CONS(EFFECT, tre, le);
     }
@@ -588,7 +588,7 @@ list generic_proper_effects_of_read_reference(reference ref)
 {
   list le = NIL;
 
-  le = generic_proper_effects_of_reference(ref, FALSE);
+  le = generic_proper_effects_of_reference(ref, false);
 
   return(le);
 }
@@ -603,7 +603,7 @@ list generic_proper_effects_of_written_reference(reference ref)
 {
   list le = NIL;
 
-  le = generic_proper_effects_of_reference(ref, TRUE);
+  le = generic_proper_effects_of_reference(ref, true);
 
   return(le);
 }
@@ -614,7 +614,7 @@ list generic_proper_effects_of_written_reference(reference ref)
          accesses during the evaluation of add_exp.
  @param add_exp is the expression which memory effects we are looking for
  @param pme is a Pointer towards the Main memory Effect of add_exp.
- @param write_p is a boolean set to true if the main effect is write, false
+ @param write_p is a bool set to true if the main effect is write, false
          otherwise.
 
  Go down along the first argument till you find a reference or a
@@ -627,7 +627,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 {
   list le = NIL;
   syntax s = expression_syntax(add_exp);
-  bool finished_p = FALSE, result_computed_p = FALSE ;
+  bool finished_p = false, result_computed_p = false ;
   expression s_exp = expression_undefined;
   reference mr = reference_undefined;
 
@@ -644,8 +644,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
       le = generic_p_proper_effect_of_reference(ref, pme,
 						write_p, true);
 
-      finished_p = TRUE;
-      result_computed_p = TRUE;
+      finished_p = true;
+      result_computed_p = true;
     }
   else if(syntax_call_p(s))
     {
@@ -663,7 +663,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 			    words_to_string(words_expression(add_exp,NIL)));
 	  /* Will be converted into an anywhere effect */
 	  mr = reference_undefined;
-	  finished_p = TRUE;
+	  finished_p = true;
 	}
       else if(ENTITY_FIELD_P(op) || ENTITY_POINT_TO_P(op))
 	{
@@ -743,7 +743,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		le = gen_nconc(le,
 			       generic_proper_effects_of_expression(e2));
 
-		finished_p = TRUE;
+		finished_p = true;
 		result_computed_p = true;
 
 	      }
@@ -779,7 +779,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 		/* We add a dereferencing */
 		effect_add_dereferencing_dimension(* pme);
-		finished_p = TRUE;
+		finished_p = true;
 		result_computed_p = true;
 	      }
 	    else if(ENTITY_PRE_INCREMENT_P(s_op) ||
@@ -805,7 +805,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		/* Too bad for the memory leaks involved... This s_exp
 		   should be freed at exit. */
 		mr = nr1;
-		finished_p = TRUE;
+		finished_p = true;
         }  else if(ENTITY_ADDRESS_OF_P(s_op)) {
           // case *&a
           // this is an effect on a
@@ -813,8 +813,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
           le = generic_proper_effects_of_complex_address_expression(e1,
                                                                     pme,
                                                                     write_p);
-          finished_p = TRUE;
-          result_computed_p = TRUE;
+          finished_p = true;
+          result_computed_p = true;
 	      }
 	    else
 	      {
@@ -833,7 +833,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 	      pips_debug(4,"The dereferenced expression is a va_arg\n");
 
-	      le = generic_proper_effects_of_complex_address_expression(sizeofexpression_expression(soe), pme, TRUE);
+	      le = generic_proper_effects_of_complex_address_expression(sizeofexpression_expression(soe), pme, true);
 	      /* and we must add an anywhere effect because we don't know where
 		 the dereferenced location is.
 	      */
@@ -841,8 +841,8 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 			make_anywhere_effect
 			(write_p? make_action_write_memory() : make_action_read_memory()),
 			le);
-	      result_computed_p = TRUE;
-	      finished_p = TRUE;
+	      result_computed_p = true;
+	      finished_p = true;
 
 	    }
 	  else
@@ -863,7 +863,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 	     up finish_p==TRUE and *pme == effect_undefined */
 	  le = generic_proper_effects_of_expression(add_exp);
 
-	  finished_p = TRUE;
+	  finished_p = true;
 	}
     }
   else if(syntax_cast_p(s))
@@ -880,7 +880,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 	    if(typedef_type_p(ct)) {
 	      entity te = basic_typedef(variable_basic(type_variable(ct)));
-	      effect tre = make_declaration_effect(te, FALSE); // type
+	      effect tre = make_declaration_effect(te, false); // type
 	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
 	    }
 	  }
@@ -896,7 +896,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
       pips_debug(4,"This is a va_arg\n");
       /* The built-in can return a pointer which is dereferenced */
       /* va_args is read... */
-      finished_p = TRUE;
+      finished_p = true;
     }
   else
     {
@@ -969,7 +969,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 		  /* we extend *pme by adding a dimension corresponding
 		  * to the field */
 		  effect_add_field_dimension(*pme,f);
-		  finished_p = TRUE;
+		  finished_p = true;
 		}
 	      else if(ENTITY_POINT_TO_P(op))
 		{
@@ -998,7 +998,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 		  /* we add the field dimension */
 		  effect_add_field_dimension(*pme,f);
-		  finished_p = TRUE;
+		  finished_p = true;
 		}
 	      else if(ENTITY_DEREFERENCING_P(op))
 		{
@@ -1101,7 +1101,7 @@ list generic_proper_effects_of_complex_address_expression(expression add_exp, ef
 
 list generic_proper_effects_of_any_lhs(expression lhs)
 {
-  return generic_proper_effects_of_address_expression(lhs, TRUE);
+  return generic_proper_effects_of_address_expression(lhs, true);
 }
 
 
@@ -1112,7 +1112,7 @@ list generic_proper_effects_of_any_lhs(expression lhs)
  @param pme is a Pointer towards the Main memory Effect of add_exp.
  @param lpme is a pointer towars the memory effects of the expression if it is
         of type struct or union (but not an array of structs or union).
- @param write_p is a boolean set to true if the main effect is write, false
+ @param write_p is a bool set to true if the main effect is write, false
          otherwise.
 
  This function is an interface to generic_proper_effects_of_complex_address_expression
@@ -1373,7 +1373,7 @@ generic_proper_effects_of_expression(expression e)
 	if (ENTITY_FIELD_P(op) ||
 	    ENTITY_POINT_TO_P(op) ||
 	    ENTITY_DEREFERENCING_P(op))
-	  le = generic_proper_effects_of_address_expression(e, FALSE);
+	  le = generic_proper_effects_of_address_expression(e, false);
 	else
 	  le = generic_r_proper_effects_of_call(syntax_call(s));
 	break;
@@ -1386,7 +1386,7 @@ generic_proper_effects_of_expression(expression e)
 
 	  if(typedef_type_p(ct)) {
 	    entity te = basic_typedef(variable_basic(type_variable(ct)));
-	    effect tre = make_declaration_effect(te, FALSE); // type
+	    effect tre = make_declaration_effect(te, false); // type
 	    le = gen_nconc(le, CONS(EFFECT, tre, NIL));
 	  }
 	}
@@ -1411,7 +1411,7 @@ generic_proper_effects_of_expression(expression e)
 
 	    if(typedef_type_p(sot)) {
 	      entity te = basic_typedef(variable_basic(type_variable(sot)));
-	      effect tre = make_declaration_effect(te, FALSE); // type
+	      effect tre = make_declaration_effect(te, false); // type
 	      le = gen_nconc(le, CONS(EFFECT, tre, NIL));
 	    }
 	  }
@@ -1420,7 +1420,7 @@ generic_proper_effects_of_expression(expression e)
       }
     case is_syntax_subscript:
       {
-	le = generic_proper_effects_of_address_expression(e, FALSE);
+	le = generic_proper_effects_of_address_expression(e, false);
 	break;
       }
     case is_syntax_application:
@@ -1490,7 +1490,7 @@ generic_proper_effects_of_expressions(list exprs)
 bool check_sdfi_effects_p(entity func, list func_sdfi)
 {
   list ce = list_undefined;
-  bool check_p = TRUE;
+  bool check_p = true;
   type ut = ultimate_type(entity_type(func));
 
   pips_assert("func is a function", type_functional_p(ut));
@@ -1511,13 +1511,13 @@ bool check_sdfi_effects_p(entity func, list func_sdfi)
 	fprintf(stderr, "Summary effect %p for function \"%s\" refers to "
 		"formal parameter \"%s\" of function \"%s\"\n",
 		eff, entity_name(func), entity_name(v), entity_name(called_function));
-	check_p = FALSE;
+	check_p = false;
       }
 
       if(rank> (int) gen_length(functional_parameters(type_functional(ut)))) {
 	fprintf(stderr, "Formal parameter \"%s\" is ranked %d out of %zd!\n",
 		entity_name(v), rank, gen_length(functional_parameters(type_functional(ut))));
-	check_p = FALSE;
+	check_p = false;
       }
     }
   }
@@ -1863,7 +1863,7 @@ loop_filter(loop l)
 
     l_eff = gen_nconc(l_proper, l_eff);
     current_downward_cumulated_range_effects_push(make_effects(l_eff));
-    return(TRUE);
+    return(true);
 }
 
 static void proper_effects_of_loop(loop l)
@@ -2051,7 +2051,7 @@ static bool stmt_filter(statement s)
 	     statement_ordering(s), statement_number(s));
   effects_private_current_stmt_push(s);
   effects_private_current_context_push((*load_context_func)(s));
-  return(TRUE);
+  return(true);
 }
 
 /**
@@ -2168,7 +2168,7 @@ static void proper_effects_of_statement(statement s)
       FOREACH(ENTITY, e, l_decls)
 	{
 	  if(!get_bool_property("MEMORY_EFFECTS_ONLY")) {
-	    effect de = make_declaration_effect(e, TRUE);
+	    effect de = make_declaration_effect(e, true);
 	    type vt = entity_type(e);
 
 	    l_eff = gen_nconc(l_eff, CONS(EFFECT, de, NIL));
@@ -2177,7 +2177,7 @@ static void proper_effects_of_statement(statement s)
 
 	    if(typedef_type_p(vt)) {
 	      entity te = basic_typedef(variable_basic(type_variable(vt)));
-	      effect tre = make_declaration_effect(te, FALSE); // type
+	      effect tre = make_declaration_effect(te, false); // type
 	      // reference effect
 	      l_eff = gen_nconc(l_eff, CONS(EFFECT, tre, NIL));
 	      //l_eff = CONS(EFFECT, tre, l_eff);
@@ -2248,7 +2248,7 @@ bool proper_effects_engine(char *module_name)
 {
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-		      db_get_memory_resource(DBR_CODE, module_name, TRUE));
+		      db_get_memory_resource(DBR_CODE, module_name, true));
 
     set_current_module_entity(module_name_to_entity(module_name));
 
@@ -2259,7 +2259,7 @@ bool proper_effects_engine(char *module_name)
 
     if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
-			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
+			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true) );
     else if (get_pointer_info_kind() == with_pointer_values)
       set_pv( db_get_simple_pv(module_name));
 
@@ -2284,7 +2284,7 @@ bool proper_effects_engine(char *module_name)
 
     (*effects_computation_reset_func)(module_name);
 
-    return(TRUE);
+    return(true);
 }
 
 

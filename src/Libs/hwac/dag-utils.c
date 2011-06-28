@@ -714,7 +714,7 @@ static bool list_commuted_p(const list l1, const list l2)
  *             or procuded image (output, backward propagation)
  */
 static void substitute_image_in_statement
-(dagvtx v, entity source, entity target, boolean used)
+(dagvtx v, entity source, entity target, bool used)
 {
   int nsubs=0;
   vtxcontent vc = dagvtx_content(v);
@@ -994,7 +994,7 @@ list /* of statements */ dag_optimize(dag d)
             // fix vertex
             vtxcontent_out(pc) = res;
             gen_remove(& dagvtx_succs(pred), v);
-            boolean done = gen_replace_in_list(dag_outputs(d), v, pred);
+            bool done = gen_replace_in_list(dag_outputs(d), v, pred);
             pips_assert("output node was replaced", done);
             set_add_element(remove, remove, v);
 

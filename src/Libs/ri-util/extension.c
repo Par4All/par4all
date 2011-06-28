@@ -47,7 +47,7 @@ extensions empty_extensions (void) {
   return make_extensions (NIL);
 }
 
-/** @return TRUE if the extensions field is empty
+/** @return true if the extensions field is empty
     @param es the extensions to test
 */
 bool empty_extensions_p (extensions es) {
@@ -70,23 +70,23 @@ string close_extension (extension e) {
 
 /** @return a new allocated string to close the extensions.
  *  @param es, the extensions to be closed
- *  @param nl, set to TRUE to get the string with a final new line character
+ *  @param nl, set to true to get the string with a final new line character
  */
 string
 close_extensions (extensions es, bool nl) {
   string s = string_undefined;
 
-  if (empty_extensions_p (es) == FALSE) {
+  if (!empty_extensions_p (es) ) {
     /* Use a string_buffer for efficient string concatenation: */
-    string_buffer sb = string_buffer_make(FALSE);
+    string_buffer sb = string_buffer_make(false);
 
     list el = extensions_extension(es);
     FOREACH(EXTENSION, e, el) {
       s = close_extension(e);
       if (s != string_undefined) {
 	string_buffer_append(sb, s);
-	if (nl == TRUE) string_buffer_append(sb, strdup ("\n"));
-	nl = TRUE;
+	if (nl ) string_buffer_append(sb, strdup ("\n"));
+	nl = true;
       }
     }
     s = string_buffer_to_string(sb);
@@ -123,7 +123,7 @@ extension_to_string(extension e) {
  *  @return string_undefined if es is extension_undefined, an malloc()ed
  *  textual string either.
  *  @param es, the extensions to translate to strings
- *  @param nl, set to TRUE to get the string with a final new line character
+ *  @param nl, set to true to get the string with a final new line character
  */
 string
 extensions_to_string(extensions es, bool nl) {
@@ -132,16 +132,16 @@ extensions_to_string(extensions es, bool nl) {
   /* Prettyprint in the correct language: */
 //  set_prettyprint_language_from_property ();
 
-  if (empty_extensions_p (es) == FALSE) {
+  if (!empty_extensions_p (es) ) {
     /* Use a string_buffer for efficient string concatenation: */
-    string_buffer sb = string_buffer_make(FALSE);
+    string_buffer sb = string_buffer_make(false);
 
     list el = extensions_extension(es);
     FOREACH(EXTENSION, e, el) {
       s = extension_to_string(e);
       string_buffer_append(sb, s);
-      if (nl == TRUE) string_buffer_append(sb, strdup ("\n"));
-      nl = TRUE;
+      if (nl ) string_buffer_append(sb, strdup ("\n"));
+      nl = true;
     }
     s = string_buffer_to_string(sb);
     /* Free the buffer with its strings: */

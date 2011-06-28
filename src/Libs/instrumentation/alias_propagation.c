@@ -398,13 +398,13 @@ expression translate_to_module_frame(entity mod1, entity mod2, expression e1, ca
 				Check if the remaining vector contains only constant 
 				or variavbles of mod2*/
 			      Pvecteur v;
-			      bool check = TRUE;
+			      bool check = true;
 			      for (v = newv; (v !=NULL) && (check); v = v->succ)
 				{ 
 				  Variable var = v->var;
 				  if ((var != TCST) && 
 				      (strcmp(module_local_name(mod2),entity_module_name((entity)var))!=0))
-				    check = FALSE;
+				    check = false;
 				}
 			      if (check)
 				{
@@ -550,22 +550,22 @@ static bool common_is_visible_p(entity sec, entity mod)
       {
 	entity seci = ram_section(storage_ram(si));
 	if (same_entity_p(sec,seci))
-	  return TRUE;
+	  return true;
       }
   },  l_decl);
   /* search for the common declaration in the callees */	
   if (!entity_main_module_p(mod))
     {
       string mod_name = module_local_name(mod);
-      callees all_callees = (callees) db_get_memory_resource(DBR_CALLEES,mod_name,TRUE);
+      callees all_callees = (callees) db_get_memory_resource(DBR_CALLEES,mod_name,true);
       list l_callees = callees_callees(all_callees); 
       MAP(STRING,callee_name,
       {
 	entity current_callee = local_name_to_top_level_entity(callee_name);
-	if (common_is_visible_p(sec,current_callee)) return TRUE;
+	if (common_is_visible_p(sec,current_callee)) return true;
       },l_callees);
     }
-  return FALSE;
+  return false;
 }
 
 /******************************************************************** 
@@ -603,7 +603,7 @@ static bool same_section_formal_variable_in_list_p(entity actual_var,entity sec,
 			{
 			  /* INCLUDED CALL CHAIN ????????*/
 			  pips_debug(3,"\nAliases from an actual argument that is a formal parameter and has same section with other actual argument (the last one can be a common variable or another formal variable).\n");
-			  return TRUE;
+			  return true;
 			}
 		    } 
 		},
@@ -612,7 +612,7 @@ static bool same_section_formal_variable_in_list_p(entity actual_var,entity sec,
 	  }
       }
   },l);
-  return FALSE;
+  return false;
 }
 
 /******************************************************************** 
@@ -635,12 +635,12 @@ static bool same_section_common_variable_in_list_p(entity sec,list l)
 	    if (same_entity_p(seci,sec)) 
 	      {
 		pips_debug(3,"\nAliases from an actual argument that is a common variable and has same section with other actual argument that is a formal variable.\n");
-		return TRUE;
+		return true;
 	      }
 	  }
       }
   },l);
- return FALSE;
+ return false;
 }
 
 /***************************************************************************
@@ -660,7 +660,7 @@ static void formal_variable_add_aliases(call c,call_site cs, entity actual_var,
 					entity formal_var,expression subval,list l_actuals)
 {
   list l_caller_aliases = alias_associations_list((alias_associations)
-       db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE)); 
+       db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,true)); 
   pips_debug(2,"\nActual argument %s is a formal parameter", 
 	     entity_name(actual_var));	
   MAP(ALIAS_ASSOCIATION, aa,
@@ -903,11 +903,11 @@ static bool add_aliases_for_current_call_site(call c)
 	    list l_same_or_equiv = NIL;
 	    /* To distinguish between equivalence or same argument cases*/
 	    int j = gen_length(l_traversed);
-	    bool equiv = FALSE;
+	    bool equiv = false;
 	    if (!variable_in_list_p(actual_var,l_traversed))
 	      {
 		l_same_or_equiv = list_of_same_or_equivalence_arguments(actual_var,l);
-		if (gen_length(l_traversed)>j) equiv = TRUE;
+		if (gen_length(l_traversed)>j) equiv = true;
 		l_traversed = CONS(ENTITY,actual_var,l_traversed);
 	      }
 	    ifdebug(3)
@@ -928,7 +928,7 @@ static bool add_aliases_for_current_call_site(call c)
 		storage s = entity_storage(actual_var);
 		entity sec = ram_section(storage_ram(s)); 
 		list l_caller_aliases = alias_associations_list((alias_associations)
-								db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name, TRUE)); 
+								db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name, true)); 
 		if (common_is_visible_p(sec,current_mod) || 
 		    same_section_formal_variable_in_list_p(actual_var,sec,NIL,l_actuals,l_caller_aliases))
 		  ram_variable_add_aliases(c,cs,actual_var,formal_var,subval);
@@ -940,13 +940,13 @@ static bool add_aliases_for_current_call_site(call c)
       l_traversed = NIL;
       gen_free_list(l);
     }
-  return TRUE;
+  return true;
 }
 
 static void add_aliases_for_current_caller()
 {  
   statement caller_statement = (statement) db_get_memory_resource
-    (DBR_CODE,caller_name, TRUE);
+    (DBR_CODE,caller_name, true);
   set_ordering_to_statement(caller_statement); 
   make_current_statement_stack();
   gen_multi_recurse(caller_statement,
@@ -1007,7 +1007,7 @@ bool alias_propagation(char * module_name)
 	  if (l_formals != NIL)
 	    {
 	      /* Take the list of callers, if there is no caller, do nothing */
-	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,TRUE);
+	      callees callers = (callees) db_get_memory_resource(DBR_CALLERS,module_name,true);
 	      list l_callers = callees_callees(callers); 	  	      
 	      if (l_callers != NIL)
 		{
@@ -1035,7 +1035,7 @@ bool alias_propagation(char * module_name)
   reset_current_module_entity();
   current_mod = entity_undefined;
   debug_off();  
-  return TRUE;
+  return true;
 }
 
 

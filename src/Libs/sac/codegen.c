@@ -303,7 +303,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
     best = opcode_undefined;
     FOREACH(OPCODE,oc,opcodeClass_opcodes(kind))
     {
-        bool bTagDiff = FALSE;
+        bool bTagDiff = false;
         int mwidth;
 
         for(i = 0; i < argc; i++)
@@ -328,7 +328,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 											    to a float */
 
                 {
-                    bTagDiff = TRUE;
+                    bTagDiff = true;
                     free_basic(bas);
                     break;
                 }
@@ -339,7 +339,7 @@ static opcode get_optimal_opcode(opcodeClass kind, int argc, list* args)
 
                 if(width > get_subwordSize_from_opcode(oc, count))
                 {
-                    bTagDiff = TRUE;
+                    bTagDiff = true;
                     break;
                 }
 
@@ -456,7 +456,7 @@ expression distance_between_expression(const expression exp0, const expression e
 }
 
 /*
-   This function returns TRUE if e0 and e1 have a distance of 1 + lastOffset
+   This function returns true if e0 and e1 have a distance of 1 + lastOffset
    */
 static bool consecutive_expression_p(expression e0, int lastOffset, expression e1)
 {
@@ -989,12 +989,12 @@ statement make_shuffle_statement(entity *from,list expressions,int *perms) {
 
 static statement make_load_statement(int argc, list args)
 {
-    return make_loadsave_statement(argc, args, TRUE);
+    return make_loadsave_statement(argc, args, true);
 }
 
 static statement make_save_statement(int argc, list args)
 {
-    return make_loadsave_statement(argc, args, FALSE);
+    return make_loadsave_statement(argc, args, false);
 }
 
 

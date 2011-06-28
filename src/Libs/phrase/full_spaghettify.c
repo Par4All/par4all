@@ -195,7 +195,7 @@ static void reduce_sequence (control current_control,
     unlink_2_control_nodes (current_control, CONTROL(gen_nth(i,successors)));
   }
 
-  is_first_control = TRUE;
+  is_first_control = true;
 
   /* We iterate on each statement in the sequence */
   MAP(STATEMENT, current_stat,
@@ -208,7 +208,7 @@ static void reduce_sequence (control current_control,
     if (is_first_control) {
       /* For the first statement... */
       first_control = new_control;
-      is_first_control = FALSE;
+      is_first_control = false;
       pips_debug(5,"First control %p\n", first_control);   
       *new_entry = first_control;
       /* Reconnect all the predecessors */
@@ -606,7 +606,7 @@ bool full_spaghettify(string module_name)
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE,
 						      module_name,
-						      TRUE);
+						      true);
 
   module = module_name_to_entity(module_name);
  
@@ -664,6 +664,6 @@ bool full_spaghettify(string module_name)
  
   debug_off();
  
-  return TRUE;
+  return true;
 }
 

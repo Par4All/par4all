@@ -54,11 +54,11 @@ entity e;
 {
     string *s, name=entity_local_name(e);
 
-    if (!top_level_entity_p(e)) return(FALSE);
+    if (!top_level_entity_p(e)) return(false);
     for (s=fortran_library; *s!=(string) NULL; s++)
-	if (same_string_p(*s, name)) return TRUE;
+	if (same_string_p(*s, name)) return true;
 
-    return FALSE; /* else not found */
+    return false; /* else not found */
 }
 
 reference expression_to_reference(e)

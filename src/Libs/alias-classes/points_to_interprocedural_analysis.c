@@ -445,6 +445,6 @@ bool intraprocedural_summary_points_to_analysis(char * module_name)
   reset_current_module_entity();
   debug_off();
 
-  bool good_result_p = TRUE;
+  bool good_result_p = true;
   return (good_result_p);
 }
