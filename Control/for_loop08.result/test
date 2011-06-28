@@ -21,13 +21,13 @@ void for_loop08()
    i = 0;
 l99997:   ;
    if (i!=5) goto l99999;
+   printf("Exit with %d\n", i);
+   return;
+l99999:   ;
    if (i==3) goto l99998;
    i++;
    goto l99997;
 l99998:   ;
    printf("i=%d\n", i);
-   return;
-l99999:   ;
-   printf("Exit with %d\n", i);
 }
 i=3

@@ -62,6 +62,9 @@ echo
 activate PRINT_CODE_PRECONDITIONS
 display PRINTED_FILE(for_loop09)
 
+apply UNSPLIT
+shell (cd for_loop09.database/Src; gcc for_loop09.c; ./a.out)
+
 close
 
 delete for_loop09

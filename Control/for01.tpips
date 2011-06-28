@@ -20,5 +20,8 @@ echo
 
 display PRINTED_FILE
 
+apply UNSPLIT
+shell (cd for01.database/Src; gcc for01.c; ./a.out)
+
 close
 quit
