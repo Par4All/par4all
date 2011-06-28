@@ -45,8 +45,8 @@ char * malloc();
  *
  *  resultat retourne par la fonction :
  *
- *  boolean          : == TRUE si l'un des termes constants est negatif
- *                  == FALSE sinon
+ *  bool          : == true si l'un des termes constants est negatif
+ *                  == false sinon
  *
  *  Les parametres de la fonction :
  *
@@ -54,16 +54,16 @@ char * malloc();
  *
  */
 
-boolean const_negative(som)
+bool const_negative(som)
 Psommet som;
 {
     Psommet ps;
-    boolean result = FALSE;
+    bool result = false;
 
     for (ps = som;
 	 ps!= NULL && value_negz_p(vect_coeff(TCST,ps->vecteur));
 	 ps= ps->succ);
-    result = (ps == NULL) ? FALSE : TRUE;
+    result = (ps == NULL) ? false : true;
     return (result);
 }
 
@@ -76,19 +76,19 @@ Psommet som;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean           : FALSE si la contrainte montre que le systeme est non borne
- *		     TRUE  sinon
+ *  bool           : false si la contrainte montre que le systeme est non borne
+ *		     true  sinon
  *
  *  Les parametres de la fonction :
  *
  *  Psommet  eq    : contrainte du systeme  
  */
 
-boolean test_borne(eq)
+bool test_borne(eq)
 Psommet eq;
 {
     Pvecteur pv = NULL;
-    boolean result= FALSE;
+    bool result= false;
 
     if (eq) {
 	pv = eq->vecteur;
@@ -97,9 +97,9 @@ Psommet eq;
 	    for (pv= eq->vecteur;pv!= NULL 
 		 && ((pv->var ==NULL) || value_pos_p(pv->val))
 		 ;pv= pv->succ);
-	    result = (pv==NULL) ? FALSE : TRUE;
+	    result = (pv==NULL) ? false : true;
 	}
-	else result = TRUE;
+	else result = true;
     }
     return (result);
 
@@ -115,7 +115,7 @@ Psommet eq;
  *
  *  resultat retourne par la fonction :
  *
- *  boolean           : TRUE s'il existe une variable hors base de cout 
+ *  bool           : true s'il existe une variable hors base de cout 
  *    		      nul
  *
  *  Les parametres de la fonction :
@@ -124,7 +124,7 @@ Psommet eq;
  *  Pvecteur lvbase: liste des variables de base du systeme
  */
 
-boolean cout_nul(fonct,lvbase,nbvars,b)
+bool cout_nul(fonct,lvbase,nbvars,b)
 Psommet fonct;
 Pvecteur lvbase;
 int nbvars;
@@ -134,7 +134,7 @@ Pbase b;
     Pvecteur pv=NULL;
     Pvecteur pv2=VECTEUR_NUL;
     register int i;
-    boolean result= FALSE;
+    bool result= false;
 
 #ifdef TRACE
     printf(" ** Gomory - existe-t-il une var. h.base de cout  nul  \n");
@@ -153,7 +153,7 @@ Pbase b;
     for (pv = lvbase;pv != NULL;pv=pv->succ)
 	if (value_notzero_p(pv->val))
 	    vect_chg_coeff(&liste1,pv->var,0);
-    result = (liste1 != NULL) ? TRUE : FALSE;
+    result = (liste1 != NULL) ? true : false;
 
     vect_rm(liste1);
     return (result);

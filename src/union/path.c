@@ -120,7 +120,7 @@ Ppath pa_full() { return pa_new(); }
 /* pa_full_p( (Ppath) in_pa )   AL 18/11/93
  * Returns True if in_pa = (NIL) ^ (NIL)
  */
-boolean pa_full_p( in_pa )
+bool pa_full_p( in_pa )
 Ppath in_pa;
 {
   return( (in_pa != PA_UNDEFINED) &&
@@ -138,7 +138,7 @@ Ppath pa_empty() { return pa_make(sc_empty(NULL), NULL); }
 /* pa_empty_p( (Ppath) in_pa )   AL 18/11/93
  * Returns True if in_pa = (1*TCST = 0) ^ (NIL)
  */
-boolean pa_empty_p( in_pa )
+bool pa_empty_p( in_pa )
 Ppath in_pa;
 {
   return( (in_pa != PA_UNDEFINED) &&
@@ -225,7 +225,7 @@ Ppath in_pa;
   Psysteme      pss;
   Pcomplist pco, pco2 = NULL, tofree = NULL;
   Ppath         ret_pa;
-  boolean       at_least_one = FALSE ; /* Do we have a simple complement ? */
+  bool       at_least_one = false ; /* Do we have a simple complement ? */
   
   if( pa_full_p(in_pa) || pa_empty_p(in_pa) || (in_pa == PA_UNDEFINED) ) 
                 return (in_pa);
@@ -250,7 +250,7 @@ Ppath in_pa;
       pss          = sc_safe_append( pss, dj->psys );
       tofree       = sl_append_system( tofree, ps );
       dj           = dj_free( dj ); 
-      at_least_one = TRUE;
+      at_least_one = true;
     }
     else { pco2 = (Pcomplist) sl_append_system( pco2, ps ); }
   }
@@ -298,28 +298,28 @@ Ppath in_pa;
 
 #line 395 "path.w"
 
-/* boolean pa_feasibility_ofl_ctrl( (Ppath) in_pa, int ofl_ctrl)   
- * Returns true if the input path is possible and FALSE if it 
+/* bool pa_feasibility_ofl_ctrl( (Ppath) in_pa, int ofl_ctrl)   
+ * Returns true if the input path is possible and false if it 
  * is not possible or undefined.                 
  */
 #ifdef TRACE_PIPS_PATH
 extern char* entity_local_name() ;
 #endif 
 
-boolean pa_feasibility_ofl_ctrl( in_pa, ofl_ctrl )
+bool pa_feasibility_ofl_ctrl( in_pa, ofl_ctrl )
 Ppath in_pa;
 int ofl_ctrl;
 {
   Pdisjunct  dj;
   Ppath      pa;
-  boolean    ret_bo = FALSE;
+  bool    ret_bo = false;
 #ifdef TRACE_PIPS_PATH
   FILE*      report_file;
 #endif 
 
-  if ( PA_UNDEFINED_P( in_pa )) return FALSE;
-  if ( pa_empty_p    ( in_pa )) return FALSE;
-  if ( pa_full_p     ( in_pa )) return TRUE;
+  if ( PA_UNDEFINED_P( in_pa )) return false;
+  if ( pa_empty_p    ( in_pa )) return false;
+  if ( pa_full_p     ( in_pa )) return true;
   
 #ifdef TRACE_PIPS_PATH
   /* Just to keep trace of input paths if wanted */
@@ -343,8 +343,8 @@ int ofl_ctrl;
 
   pa = pa_supress_same_constraints( in_pa );
   dj = pa_path_to_few_disjunct_ofl_ctrl( pa, ofl_ctrl );
-  if( dj_empty_p(dj) || (dj == NULL) ) ret_bo = FALSE;
-  else                                 ret_bo = TRUE;
+  if( dj_empty_p(dj) || (dj == NULL) ) ret_bo = false;
+  else                                 ret_bo = true;
 
 
 #ifdef TRACE_PIPS_PATH

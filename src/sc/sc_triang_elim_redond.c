@@ -54,13 +54,13 @@
 static Pbase 
   rbase_for_compare  = BASE_NULLE, 
   others_for_compare = BASE_NULLE;
-static boolean
+static bool
   inner_for_compare,
   complex_for_compare;
 
 static void set_info_for_compare(base, sort_base, inner_first, complex_first)
 Pbase base, sort_base;
-boolean inner_first, complex_first;
+bool inner_first, complex_first;
 {
     Pbase btmp=BASE_NULLE;
     assert(BASE_NULLE_P(rbase_for_compare) &&
@@ -338,7 +338,7 @@ int (*compare)();
 Pcontrainte contrainte_sort(c, base, sort_base, inner_first, complex_first)
 Pcontrainte c;
 Pbase base, sort_base;
-boolean inner_first, complex_first;
+bool inner_first, complex_first;
 {
     set_info_for_compare(base, sort_base, inner_first, complex_first);
     c = constraints_sort_with_compare(c, sort_base, compare_the_constraints);
@@ -353,7 +353,7 @@ Psysteme ps;
 Pbase base_index;
 {
     ps->inegalites = 
-	contrainte_sort(ps->inegalites, ps->base, base_index, TRUE, TRUE);
+	contrainte_sort(ps->inegalites, ps->base, base_index, true, true);
 
     return(ps);
 }
@@ -427,7 +427,7 @@ Pbase base_index;
 		"[sc_triang_elim_redund] warning, %d inequalities\n",
 		ps->nb_ineq);
 
-    if (!sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL,TRUE))
+    if (!sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL,true))
     {
 	sc_rm(ps), ps=NULL;
 	return(NULL);
@@ -435,7 +435,7 @@ Pbase base_index;
 
     info = malloc(sizeof(int)*2*n);
 
-    set_info_for_compare(ps->base, base_index, TRUE, TRUE);
+    set_info_for_compare(ps->base, base_index, true, true);
     ps->inegalites = constraints_sort_info(ps->inegalites, 
 					   base_index,
 					   compare_the_constraints, 
@@ -467,7 +467,7 @@ Pbase base_index;
 
 	    /* test de sc_faisabilite avec la nouvelle inegalite 
 	     */
-	    if (sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL, TRUE))
+	    if (sc_integer_feasibility_ofl_ctrl(ps, OFL_CTRL, true))
 		/* restore the initial constraint */
 		contrainte_reverse(ineq);
 	    else
@@ -531,7 +531,7 @@ int n;
     {
 	contrainte_reverse(ineq);
 
-	if (sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL, TRUE))
+	if (sc_integer_feasibility_ofl_ctrl(s, OFL_CTRL, true))
 	    contrainte_reverse(ineq); /* restore */
 	else
 	    eq_set_vect_nul(ineq), removed++; /* remove */
@@ -554,7 +554,7 @@ Pbase indexes; /* outer to inner */
 
     /* sort outer first and complex first
      */
-    set_info_for_compare(s->base, indexes, FALSE, TRUE);
+    set_info_for_compare(s->base, indexes, false, true);
     s->inegalites = constraints_sort_info(s->inegalites, 
 					  indexes,
 					  compare_the_constraints_debug,
@@ -606,7 +606,7 @@ Psysteme ps;
 Pbase base_index;
 {
     ps->inegalites = 
-	contrainte_sort(ps->inegalites, ps->base, base_index, FALSE, FALSE);
+	contrainte_sort(ps->inegalites, ps->base, base_index, false, false);
 
     return(ps);
 }

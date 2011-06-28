@@ -34,12 +34,12 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* This function returns TRUE if the inequation ineq is redundant for the
- * system ps and FALSE otherwise.
+/* This function returns true if the inequation ineq is redundant for the
+ * system ps and false otherwise.
  * sc and ineq are not modified by the function.
  *
  * Inequality ineq may not be redundant wrt ps for rational numbers and
- * nevertheless TRUE is returned if it is redundant wrt integer points.
+ * nevertheless true is returned if it is redundant wrt integer points.
  *
  * A bug found here: if we have input sc==NULL with ineq=NULL, then we'll have to test the satisfiability
  * of a sc that has a base null and an ineq (core dump): because in sc_add_inegalite, we test only if the 
@@ -54,17 +54,17 @@
  * - correct the bug
  */
  
-boolean ineq_redund_with_sc_p(sc, ineq)
+bool ineq_redund_with_sc_p(sc, ineq)
 Psysteme sc;
 Pcontrainte ineq;
 {
   Psysteme ps;
   Pcontrainte ineg;
-  boolean result = FALSE;  
+  bool result = false;  
  
   if (CONTRAINTE_NULLE_P(ineq)) {
     /*nothing to test: 0==0 is intrinsically redundant */
-    return TRUE;
+    return true;
   }
 
   ps = sc_copy(sc);
@@ -77,14 +77,14 @@ Pcontrainte ineq;
   sc_creer_base(ps);
 
   /* test de sc_faisabilite avec la nouvelle inegalite      */
-  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE))
-    result = TRUE;
+  if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,true))
+    result = true;
   sc_rm(ps);
   return(result);
 }
 
 
-/* boolean eq_redund_with_sc_p(sc, eq)
+/* bool eq_redund_with_sc_p(sc, eq)
  * Psysteme sc;
  * Pcontrainte eq;
  *
@@ -94,17 +94,17 @@ Pcontrainte ineq;
  * true if eq is redundant with sc
  * (c) FC 16/05/94
  */
-boolean eq_redund_with_sc_p(sc, eq)
+bool eq_redund_with_sc_p(sc, eq)
 Psysteme sc;
 Pcontrainte eq;
 {
     if (!ineq_redund_with_sc_p(sc, eq)) /* eq considered as an inequality */
-	return(FALSE);
+	return(false);
     else
     {
 	Pcontrainte
 	    c = contrainte_copy(eq);
-	boolean
+	bool
 	    res = ineq_redund_with_sc_p(sc, (contrainte_chg_sgn(c), c));
 	contrainte_free(c);
 	return(res);
@@ -199,7 +199,7 @@ int ofl_ctrl;
 	return;
 
     sc = sc_init_with_sc(ps);
-    if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,TRUE)) { 
+    if (!sc_rational_feasibility_ofl_ctrl(ps,OFL_CTRL,true)) { 
 	Pvecteur v = vect_new(TCST, VALUE_ONE);
 	Pcontrainte eq = contrainte_make(v);
 	sc->egalites = eq;
@@ -224,7 +224,7 @@ int ofl_ctrl;
 	
 	sc_add_inegalite(sc,ineg);
 
-	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,TRUE))
+	if (sc_rational_feasibility_ofl_ctrl(sc,ofl_ctrl,true))
 	    contrainte_reverse(ineg);		
 	else {
 	    sc->inegalites = sc->inegalites->succ;
@@ -328,8 +328,8 @@ void build_sc_nredund_2pass(Psysteme volatile *psc)
 }
 
 
-/* This function returns TRUE if the constraint ineq can be eliminated 
- * from the system sc and FALSE oterwise. 
+/* This function returns true if the constraint ineq can be eliminated 
+ * from the system sc and false oterwise. 
  * It assumes that two constraints at least must be kept for constraining
  * the variable "var_hr" in the system.
  * the array "tab_info" contains the useful informations allowing to know
@@ -337,7 +337,7 @@ void build_sc_nredund_2pass(Psysteme volatile *psc)
  * lower bounds.
 */
 
-static boolean sc_elim_triang_integer_redund_constraint_p
+static bool sc_elim_triang_integer_redund_constraint_p
     (pc2,index_base,ineq,var_hr,tab_info,rank_max)
 Pcontrainte pc2;
 Pbase index_base;
@@ -349,13 +349,13 @@ int *rank_max;
     int rank_hr = rank_of_variable(index_base,var_hr);
     Value coeff = vect_coeff(var_hr,ineq->vecteur);
     int sign = value_sign(coeff);
-    boolean result=FALSE;
-    boolean trouve=FALSE;
+    bool result=false;
+    bool trouve=false;
     *rank_max=rank_hr;
 
     if (tab_info[rank_hr][1]) {
 
-	/* This condition is TRUE if the variable is a loop index. 
+	/* This condition is true if the variable is a loop index. 
 	   As the constraint constrains directly the variable, 
 	   this constraint must be kept if there is not enough 
 	   remainding constraints  
@@ -363,7 +363,7 @@ int *rank_max;
 
 	if (((sign >0) && (tab_info[rank_hr][2]>1))
 	    || ((sign <0) && (tab_info[rank_hr][3]>1)))
-	    result = TRUE;
+	    result = true;
     }
     else {
 	register Pcontrainte pc;
@@ -393,10 +393,10 @@ int *rank_max;
 			     (tab_info[left_rank][2]<=1)) 
 			    || (value_neg_p(left_coeff) && 
 				(tab_info[left_rank][3] <=1)))))
-		    trouve = TRUE;
+		    trouve = true;
 	    }   
 	}
-	if (!trouve) result = TRUE;
+	if (!trouve) result = true;
     } 
     return result;
 
@@ -469,7 +469,7 @@ int n __attribute__ ((unused));
 		  (ps->inegalites,index_base,ineq, var_hr,tab_info, &rank_max)
 		    && (rank_max >= loop_level)) {
 
-		    /* this condition is TRUE if the constraint can be
+		    /* this condition is true if the constraint can be
 		       eliminated from the system, that means if this is
 		       not the last constraint on the variable or if all
 		       the constraints on this variable can be
@@ -484,7 +484,7 @@ int n __attribute__ ((unused));
 		  TRY {
 		    /* test de sc_faisabilite avec la nouvelle 
 		       inegalite */
-		    if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,TRUE)) { 
+		    if (!sc_rational_feasibility_ofl_ctrl(sc,OFL_CTRL,true)) { 
 		      
 		      /* si le systeme est non faisable ==>
 			 inegalite redondante ==> elimination de
@@ -514,9 +514,9 @@ int n __attribute__ ((unused));
 } 
 
 
-/* This  function returns TRUE if the constraint C (resulting of the
+/* This  function returns true if the constraint C (resulting of the
  *  combination of the two constraints ineq1 and ineq2) is redundant 
- * for the system sc, and FALSE otherwise.
+ * for the system sc, and false otherwise.
  *
  * Assume that ineq1 = coeff1 (positive) * var + E1 <=0
  *             ineq2 = coeff2 (negative) * var +E2 <=0
@@ -524,7 +524,7 @@ int n __attribute__ ((unused));
  *
 */
 
-boolean bound_redund_with_sc_p(sc,ineq1,ineq2,var)
+bool bound_redund_with_sc_p(sc,ineq1,ineq2,var)
 Psysteme sc;
 Pcontrainte ineq1,ineq2;
 Variable var;
@@ -532,7 +532,7 @@ Variable var;
 
     Pcontrainte posit, negat;
     Pcontrainte ineg = CONTRAINTE_UNDEFINED;
-    boolean result = FALSE;
+    bool result = false;
 
     if (!CONTRAINTE_UNDEFINED_P(ineq1) && !CONTRAINTE_UNDEFINED_P(ineq2)) {
 	
@@ -546,7 +546,7 @@ Variable var;
 	}
 	
 	CATCH(overflow_error)
-	    result = FALSE;
+	    result = false;
 	TRY {
 	    ineg = sc_integer_inequalities_combination_ofl_ctrl
 		(sc, posit, negat, var, &result, FWD_OFL_CTRL);

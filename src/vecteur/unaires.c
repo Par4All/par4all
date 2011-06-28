@@ -390,35 +390,35 @@ Pvecteur v, *pvpos, *pvneg;
 }
 
 
-/* boolean vect_common_variables_p(Pvecteur v1, v2)    BA 19/05/94
+/* bool vect_common_variables_p(Pvecteur v1, v2)    BA 19/05/94
  * input    : two vectors.
- * output   : TRUE if they have at least one common variable, 
- *            FALSE otherwise.
+ * output   : true if they have at least one common variable, 
+ *            false otherwise.
  * modifies : nothing.
  */
-boolean vect_common_variables_p(v1, v2)
+bool vect_common_variables_p(v1, v2)
 Pvecteur v1, v2;
 {
     Pvecteur ev;
 
     for(ev = v1; !VECTEUR_NUL_P(ev); ev = ev->succ) {
 	if(vect_contains_variable_p(v2, vecteur_var(ev)))
-	    return TRUE;
+	    return true;
     }
-    return FALSE;
+    return false;
 }
 
 
-/* boolean vect_contains_variable_p(Pvecteur v, Variable var)    BA 19/05/94
+/* bool vect_contains_variable_p(Pvecteur v, Variable var)    BA 19/05/94
  * input    : a vector and a variable
- * output   : TRUE if var appears as a component of v, FALSE otherwise.
+ * output   : true if var appears as a component of v, false otherwise.
  * modifies : nothing
  */
-boolean vect_contains_variable_p(v, var)
+bool vect_contains_variable_p(v, var)
 Pvecteur v;
 Variable var;
 {
-    boolean in_base;
+    bool in_base;
 
     for(; !VECTEUR_NUL_P(v) && !variable_equal(vecteur_var(v), var); v = v->succ)
 	;
@@ -468,7 +468,7 @@ vect_lexicographic_unsafe_compare(Pvecteur v1, Pvecteur v2,
 {
     int cmp = 0;
 
-    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, TRUE);
+    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, true);
 
     return cmp;
 }
@@ -479,7 +479,7 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
 {
     int cmp = 0;
 
-    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, FALSE);
+    cmp = vect_lexicographic_unsafe_compare_generic(v1, v2, compare, false);
 
     return cmp;
 }
@@ -497,7 +497,7 @@ vect_lexicographic_unsafe_compare2(Pvecteur v1, Pvecteur v2,
 int
 vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 					  int (*compare)(Pvecteur*, Pvecteur*),
-					  boolean is_equation)
+					  bool is_equation)
 {
     /* it is assumed that vectors v1 and v2 are already
        lexicographically sorted, according to the same lexicographic ordre.
@@ -608,7 +608,7 @@ vect_lexicographic_unsafe_compare_generic(Pvecteur v1, Pvecteur v2,
 		    cmp = 1;
 		}
 		else {
-		    assert(FALSE);
+		    assert(false);
 		}
 	    }
 	    else {

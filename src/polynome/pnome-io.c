@@ -81,17 +81,17 @@ float x;
     }
 }
 
-/* void monome_fprint(FILE* fd, Pmonome pm, Pbase pb, boolean plus_sign, char* (*variable_name)())
+/* void monome_fprint(FILE* fd, Pmonome pm, Pbase pb, bool plus_sign, char* (*variable_name)())
  *  PRIVATE
  *  Outputs to file fd an ASCII form of monomial pm, naming variables
  *  with the "variable-name" function, ordering them with the basis pb.
- *  the "+" sign is printed if plus_sign == TRUE.
+ *  the "+" sign is printed if plus_sign == true.
  */
 void monome_fprint(fd, pm, pb, plus_sign, variable_name)
 FILE *fd;
 Pmonome pm;
 Pbase pb;
-boolean plus_sign;
+bool plus_sign;
 char * (*variable_name)(Variable);
 {
     char *s = monome_sprint(pm, pb, plus_sign, variable_name);
@@ -100,16 +100,16 @@ char * (*variable_name)(Variable);
     free(s);
 }
 
-/* char *monome_sprint(Pmonome pm, Pbase pb, boolean plus_sign, char* (*variable_name)())
+/* char *monome_sprint(Pmonome pm, Pbase pb, bool plus_sign, char* (*variable_name)())
  *  PRIVATE
  *  Outputs a string representing monomial pm, naming variables
  *  with the "variable-name" function, ordering them with the basis pb.
- *  the "+" sign is printed if plus_sign == TRUE.
+ *  the "+" sign is printed if plus_sign == true.
  */
 char *monome_sprint(pm, pb, plus_sign, variable_name)
 Pmonome pm;
 Pbase pb;
-boolean plus_sign;
+bool plus_sign;
 char * (*variable_name)(Variable);
 {
     float x;
@@ -160,12 +160,12 @@ char * (*variable_name)(Variable);
 
 /* void polynome_fprint(FILE* fd, Ppolynome pp,
  *                      char* (*variable_name)(), 
- *                      boolean (*is_inferior_var)())
+ *                      bool (*is_inferior_var)())
  *  Outputs to file fd an ASCII form of polynomial pp, using
  *  the user-provided function variable_name(Variable var) to associate
  *  the "Variable" pointers with the variable names.
  *  is_inferior_var(Variable var1, Variable var2) is also given by the user:
- *  it must return TRUE if var1 must be printed before var2 in monomials.
+ *  it must return true if var1 must be printed before var2 in monomials.
  *
  *  For the moment, monomials are not sorted.
  *  No "\n" is printed after the polynomial.
@@ -184,12 +184,12 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 
 /* char *polynome_sprint(Ppolynome pp,
  *                      char* (*variable_name)(), 
- *                      boolean (*is_inferior_var)())
+ *                      bool (*is_inferior_var)())
  *  Outputs to file fd an ASCII form of polynomial pp, using
  *  the user-provided function variable_name(Variable var) to associate
  *  the "Variable" pointers with the variable names.
  *  is_inferior_var(Variable var1, Variable var2) is also given by the user:
- *  it must return TRUE if var1 must be printed before var2 in monomials.
+ *  it must return true if var1 must be printed before var2 in monomials.
  *
  *  For the moment, monomials are not sorted.
  *  No "\n" is printed after the polynomial.
@@ -211,7 +211,7 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 	sprintf(r, "%s", POLYNOME_NUL_SYMBOL);
     else {
 	Pbase pb = (Pbase) polynome_used_var(pp, is_inferior_var);
-	boolean print_plus_sign = FALSE;
+	bool print_plus_sign = false;
 
 	/* The following line is added by L.Zhou    Mar. 26, 91 */
 	pp = polynome_sort(&pp, is_inferior_var);
@@ -222,7 +222,7 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 	    strcpy(r, s);
 	    r = strchr(r, '\0');
 	    pp = polynome_succ(pp);
-	    print_plus_sign = TRUE;
+	    print_plus_sign = true;
 	    if (!POLYNOME_NUL_P(pp)) *(r++) = ' ';
 	    free(s);
 	}
@@ -258,8 +258,8 @@ Variable var;
 }
 
 
-/* boolean default_is_inferior_var(Variable var1, Variable var2)
- *  return TRUE if var1 is before var2, lexicographically,
+/* bool default_is_inferior_var(Variable var1, Variable var2)
+ *  return true if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
 int default_is_inferior_var(var1, var2)
@@ -269,8 +269,8 @@ Variable var1, var2;
 		       default_variable_name(var2));
 }
 
-/* boolean default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
- *  return TRUE if var1 is before var2, lexicographically,
+/* bool default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
+ *  return true if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
 int default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
@@ -279,8 +279,8 @@ int default_is_inferior_varval(Pvecteur varval1, Pvecteur varval2)
 		       default_variable_name(vecteur_var(varval2)));
 }
 
-/* boolean default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
- *  return TRUE if var1 is before var2, lexicographically,
+/* bool default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
+ *  return true if var1 is before var2, lexicographically,
  *  according to the "default_variable_name" naming.
  */
 int default_is_inferior_pvarval(Pvecteur * pvarval1, Pvecteur * pvarval2)
@@ -362,7 +362,7 @@ Variable (*name_to_variable)(Variable);
 {
     Ppolynome pp = POLYNOME_NUL;
     Pmonome curpm;
-    boolean constructing_monome = FALSE;
+    bool constructing_monome = false;
     float coeff = 0.;
     char *varname;
     Value power;
@@ -395,7 +395,7 @@ Variable (*name_to_variable)(Variable);
 	}
 	else {
 	    curpm = make_monome(coeff, name_to_variable(varname), power);
-            constructing_monome = TRUE;
+            constructing_monome = true;
 	}
 	/*fprintf(stderr, "au milieu: s='%s'\n", s);*/
 
@@ -403,7 +403,7 @@ Variable (*name_to_variable)(Variable);
 	{
 	    polynome_monome_add(&pp, curpm);
 	    monome_rm(&curpm);
-            constructing_monome = FALSE;
+            constructing_monome = false;
 	}
     }
     if (!MONOME_NUL_P(curpm)) {

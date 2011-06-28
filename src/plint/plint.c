@@ -83,9 +83,9 @@ Pbase *b;
     int no_som =0;
     Variable var2 = 0;
     Value in1;
-    boolean non_fin = TRUE;
-    boolean non_stop = TRUE;
-    boolean degenere = FALSE;
+    bool non_fin = true;
+    bool non_stop = true;
+    bool degenere = false;
 
 #ifdef TRACE
 
@@ -97,16 +97,16 @@ Pbase *b;
 
     if (sys1!=NULL && fonct != NULL)
     {
-	if ((sol_entiere(sys1,*lvbase,*nb_som) == FALSE) || 
-	    (sol_positive(sys1,*lvbase,*nb_som) == FALSE) || const_negative(sys1))
+	if ((sol_entiere(sys1,*lvbase,*nb_som) == false) || 
+	    (sol_positive(sys1,*lvbase,*nb_som) == false) || const_negative(sys1))
 	{
 
 
 	    while ((sys1 != NULL) && 
-		   (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) == TRUE));
+		   (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) == true));
 	    if (sys1 != NULL && fonct != NULL)
 	    {
-		if ((sol_entiere(sys1,*lvbase,*nb_som)==FALSE))
+		if ((sol_entiere(sys1,*lvbase,*nb_som)==false))
 		{
 		    Value f0 = VALUE_ZERO,fden;
 
@@ -121,8 +121,8 @@ Pbase *b;
 			if ((d1 != VALUE_TO_DOUBLE(in1)) || 
 			    value_zero_p(in1) ||
 			    (cout_nul(fonct,*lvbase,*nbvars,*b) ==
-			     FALSE) || degenere) {
-			    degenere = FALSE;
+			     false) || degenere) {
+			    degenere = false;
 
 			    while (non_stop)
 			    {
@@ -138,8 +138,8 @@ Pbase *b;
 				    else {
 					sommets_rm(sys1);
 					sys1 = NULL;
-					non_fin = FALSE;
-					non_stop = FALSE;
+					non_fin = false;
+					non_stop = false;
 				    }
 #ifdef TRACE
 				    sys = som_sys_conv(sys1);
@@ -148,34 +148,34 @@ Pbase *b;
 				}
 				else {
 				    /* il n'y a plus de variable non entiere */
-				    non_stop = FALSE ;
-				    non_fin = FALSE;
+				    non_stop = false ;
+				    non_fin = false;
 				}
 				if ((sys1 != NULL) && non_stop )
 				{
 				    /* on effectue un pas de l'algorithme dual du simplexe */
 				    /* ajout des variables d'ecart   */
 				    sys1 = var_ecart_sup (sys1,*nb_som,lvbase,nbvars,b);
-				    if (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) != FALSE) {
-					if  (sol_entiere(sys1,*lvbase,*nb_som) == TRUE)	{
+				    if (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) != false) {
+					if  (sol_entiere(sys1,*lvbase,*nb_som) == true)	{
 					    /* la solution est entiere mais pas positive */
 					    if (ligne_pivot(sys1,*nb_som,&no_som) != NULL) {
 						while ((sys1 != NULL)
-						       && (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) == TRUE))
+						       && (dual_pivot_pas(&sys1,lvbase,*nb_som,fonct,nbvars,b) == true))
 						    ;
 
-						if ((sol_entiere(sys1,*lvbase,*nb_som) == TRUE) && (sol_positive(sys1,*lvbase,*nb_som) == TRUE))
+						if ((sol_entiere(sys1,*lvbase,*nb_som) == true) && (sol_positive(sys1,*lvbase,*nb_som) == true))
 						{
 #ifdef TRACE
 						    printf(" - Gomory - on a une solution optimale \n");
 #endif
-						    non_fin = FALSE;
-						    non_stop = FALSE;
+						    non_fin = false;
+						    non_stop = false;
 						}
 						else {
 						    if (sys1 == NULL) {
-							non_fin = FALSE;
-							non_stop = FALSE;
+							non_fin = false;
+							non_stop = false;
 						    }
 						}
 					    }
@@ -183,8 +183,8 @@ Pbase *b;
 #ifdef TRACE					
 						printf (" - Gomory - on a une solution optimale \n");
 #endif
-						non_fin = FALSE;
-						non_stop = FALSE;
+						non_fin = false;
+						non_stop = false;
 					    }
 					}
 				    }
@@ -192,17 +192,17 @@ Pbase *b;
 					/* on a une solution positive */
 					if (sys1 == NULL)
 					{
-					    non_stop = FALSE;
-					    non_fin = FALSE;
+					    non_stop = false;
+					    non_fin = false;
 					}
 					else {
-					    if (sol_entiere(sys1,*lvbase,*nb_som) == TRUE)
+					    if (sol_entiere(sys1,*lvbase,*nb_som) == true)
 					    {
 #ifdef TRACE
 						printf (" -  Gomory - on a une solution entiere \n");
 #endif
-						non_stop = FALSE;
-						non_fin = FALSE;
+						non_stop = false;
+						non_fin = false;
 					    }
 					}
 				    }
@@ -216,8 +216,8 @@ Pbase *b;
 			else
 			{
 			    /* cas de degenerescence   */
-			    degenere = TRUE;
-			    if (plint_degen(&sys1,fonct,nb_som,lvbase,nbvars,b) == FALSE)
+			    degenere = true;
+			    if (plint_degen(&sys1,fonct,nb_som,lvbase,nbvars,b) == false)
 			    {
 				if (sys1!= NULL)
 				{
@@ -227,7 +227,7 @@ Pbase *b;
 				    sc_fprint(stdout,sys,noms_var);
 #endif
 				}
-				non_fin = FALSE;
+				non_fin = false;
 			    }
 			}
 		    }
@@ -285,7 +285,7 @@ Pbase *b;
  *  int nbvars 	   : nombre de variables du systeme
  *  Pbase b : liste des  variables du systeme
  */
-boolean plint_degen(sys,fonct,nb_som,lvbase,nbvars,b)
+bool plint_degen(sys,fonct,nb_som,lvbase,nbvars,b)
 Psommet *sys;
 Psommet fonct;
 int  *nb_som;
@@ -305,7 +305,7 @@ Pbase *b;
     register int i;
     int exnbv;
     int exnbs = *nb_som;
-    boolean result = TRUE;
+    bool result = true;
 
 #ifdef TRACE
     printf(" ** Gomory - cas de degenerescence \n");
@@ -352,7 +352,7 @@ sys1 = plint_pas(sys1,fonct2,lvbase,nb_som,nbvars,b);
 #ifdef TRACE
 	printf (" -- Gomory degen. - le pb. a une sol. optimale \n ");
 #endif
-	result = FALSE;
+	result = false;
 	vect_rm(explv);
     }
     else {
@@ -393,7 +393,7 @@ sys1 = plint_pas(sys1,fonct2,lvbase,nb_som,nbvars,b);
 #ifdef TRACE
 	    printf (" -- Gomory degen. - le pb. n'est pas borne \n");
 #endif
-	    result = FALSE;
+	    result = false;
 	    sommets_rm(*sys);
 	    *sys = NULL;
 	}

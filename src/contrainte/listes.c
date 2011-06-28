@@ -39,7 +39,7 @@
 #include "contrainte.h"
 
 
-/* boolean contrainte_in_liste(Pcontrainte c, Pcontrainte lc): test de
+/* bool contrainte_in_liste(Pcontrainte c, Pcontrainte lc): test de
  * l'appartenance d'une contrainte c a une liste de contrainte lc
  *
  * Les contrainte sont supposees normalisees (coefficients reduits par leur
@@ -49,7 +49,7 @@
  * (elle est toujours verifiee) appartient a toutes les listes de contraintes.
  *
  */
-boolean contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
+bool contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
 {
   Pcontrainte c1;
 
@@ -66,7 +66,7 @@ boolean contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
   return false;
 }
 
-/* boolean egalite_in_liste(Pcontrainte eg, Pcontrainte leg): test si une
+/* bool egalite_in_liste(Pcontrainte eg, Pcontrainte leg): test si une
  * egalite appartient a une liste d'egalites
  *
  * Une egalite peut avoir ete multipliee par moins 1 mais ses coefficients,
@@ -75,11 +75,11 @@ boolean contrainte_in_liste(Pcontrainte c, Pcontrainte lc)
  *
  * Ancien nom: vect_in_liste1()
  */
-boolean egalite_in_liste(Pcontrainte v, Pcontrainte listev)
+bool egalite_in_liste(Pcontrainte v, Pcontrainte listev)
 {
   Pcontrainte v1;
 
-  if (v->vecteur == NULL) return(TRUE);
+  if (v->vecteur == NULL) return(true);
   for (v1=listev;v1!=NULL;v1=v1->succ) {
     if (vect_equal((v1->vecteur),(v->vecteur)) ||
         vect_oppos((v1->vecteur),(v->vecteur))) {

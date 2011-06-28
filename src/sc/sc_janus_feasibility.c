@@ -48,13 +48,13 @@
 
 
 /*sc must be consistant*/
-static boolean 
+static bool 
 sc_to_iproblem(Psysteme sc, Pinitpb I, Pproblem Z, FILE *fdebug)
 {
   Pcontrainte peq;
   Pvecteur pv;
   Value temp;
-  boolean special_constraint_p = FALSE;
+  bool special_constraint_p = false;
 
   /*Janus 
     int p6,p5,p4,p3,p2,p1;*/
@@ -145,13 +145,13 @@ sc_to_iproblem(Psysteme sc, Pinitpb I, Pproblem Z, FILE *fdebug)
     ifscdebug(5) {
       printf("\n[sc_to_iproblem]: Janus has a number of variables < 0 ");
     }
-    return FALSE;/* Janus cannot handle this system of constraints*/
+    return false;/* Janus cannot handle this system of constraints*/
   }
   if (Z->nvar> MAXCOLONNES) {
     ifscdebug(5) {
       printf("\n[sc_to_iproblem]: Too many variables %3d > max=%3d\n",Z->nvar,MAXCOLONNES);
     }
-    return FALSE;/* Janus cannot handle this system of constraints*/
+    return false;/* Janus cannot handle this system of constraints*/
   }
 
   /*fscanf(fh,"%d",&Z->mcontr);  nombre de contraintes */
@@ -160,7 +160,7 @@ sc_to_iproblem(Psysteme sc, Pinitpb I, Pproblem Z, FILE *fdebug)
     ifscdebug(5) {
       printf("\n[sc_to_iproblem]: Too many constraints %3d > max = %3d \n",Z->mcontr,MAXLIGNES);
     }
-    return FALSE;/* Janus cannot handle this system of constraints*/
+    return false;/* Janus cannot handle this system of constraints*/
   }
 
   /*fscanf(fh,"%d",&Z->nvpos); nombre de variables >=0 donc: Z->nvpos<= Z->nvar */
@@ -169,7 +169,7 @@ sc_to_iproblem(Psysteme sc, Pinitpb I, Pproblem Z, FILE *fdebug)
     ifscdebug(5) {
       printf("\n[sc_to_iproblem]: %3d variables positives, greater than %3d\n",Z->nvpos,Z->nvar);
     }
-    return FALSE;/* ?? can we put nvpos = 0 here */
+    return false;/* ?? can we put nvpos = 0 here */
   }
 
   /*fscanf(fh,"%d",&vi0);  unused parameter */
@@ -221,20 +221,20 @@ sc_to_iproblem(Psysteme sc, Pinitpb I, Pproblem Z, FILE *fdebug)
 	  value_addto(temp,value_abs(I->a[i][j]));
 	}
       if value_zero_p(temp) {
-	special_constraint_p = TRUE;
+	special_constraint_p = true;
       }
      value_assign(I->d[i],vect_coeff(TCST,peq->vecteur));
     } 
   if (special_constraint_p) {
     /*sc_default_dump(sc); 
-      TODO: what to do with this special constraint? if 0<1 ok, if 1 < 0 then not ok, return FALSE */
+      TODO: what to do with this special constraint? if 0<1 ok, if 1 < 0 then not ok, return false */
   }
   
   /**************** END to insert MATRIX into structure *********************/ 
-  return TRUE;
+  return true;
 }
 
-boolean 
+bool 
 sc_janus_feasibility(Psysteme sc)
 { 
   
@@ -242,7 +242,7 @@ sc_janus_feasibility(Psysteme sc)
   initpb I; 
   problem Z;
 
-  boolean ok = FALSE;
+  bool ok = false;
   int r = 0;
 
   /**************** change format into Janus, using global struct iproblem */
@@ -283,23 +283,23 @@ sc_janus_feasibility(Psysteme sc)
   
   if (fdebug) fclose(fdebug);/* DN: In Solaris, we can fclose(NULL), but in LINUX, we cannot.*/
 
-  if (r==VRFIN) {ok = TRUE; return ok;}
-  else if ((r==VRVID)||(r==VRINF)) {ok = FALSE;return ok;}
+  if (r==VRFIN) {ok = true; return ok;}
+  else if ((r==VRVID)||(r==VRINF)) {ok = false;return ok;}
   else return r; /* in case of failure then return r >=3
 		    donnot want to use exception here, nor one more parameter, 
-		    while wanting to keep return boolean for compatibility. To be changed.*/
+		    while wanting to keep return bool for compatibility. To be changed.*/
 }
 #else
 /*
-static boolean 
+static bool 
 sc_to_iproblem(Psysteme sc) 
 { 
-  return TRUE;
+  return true;
 }
 */
-boolean 
+bool 
 sc_janus_feasibility(Psysteme sc __attribute__ ((unused))) 
 { 
-return TRUE;
+return true;
 }
 #endif

@@ -229,7 +229,7 @@ Pray_dte    rd;
     vect_normalize(rd->vecteur);
 }
 
-/* boolean rd_in_liste(Pray-dte rd, Pray_dte lrd): test si rd appartient
+/* bool rd_in_liste(Pray-dte rd, Pray_dte lrd): test si rd appartient
  * a la liste lrd
  *
  * Les coordonnees de rd et des elements de lrd sont supposees normalisees.
@@ -239,7 +239,7 @@ Pray_dte    rd;
  * soit effectuee de maniere a n'avoir qu'un vecteur directeur possible
  * (le lexico-positif par exemple).
  */
-boolean rd_in_liste(rd,lrd)
+bool rd_in_liste(rd,lrd)
 Pray_dte rd;
 Pray_dte lrd;
 {
@@ -248,22 +248,22 @@ Pray_dte lrd;
     if (rd->vecteur == NULL) return(1);
     for (rd1=lrd;rd1!=NULL;rd1=rd1->succ) {
 	if (vect_equal((rd1->vecteur),(rd->vecteur))) {
-	    return(TRUE);
+	    return(true);
 	}
     }
-    return(FALSE);
+    return(false);
 }
 
-/* boolean egaliste_rd(Pray_dte l1, Pray_dte * l2): egalite de deux listes
+/* bool egaliste_rd(Pray_dte l1, Pray_dte * l2): egalite de deux listes
  * de rayons ou de droites
  */
-boolean egaliste_rd(l1,ad_l2)
+bool egaliste_rd(l1,ad_l2)
 Pray_dte l1,*ad_l2;
 {
     int egalite;
     Pray_dte eq1,eq2,eq21,eq23,*ad_aux;
 
-    if (l1==(*ad_l2)) return(TRUE);
+    if (l1==(*ad_l2)) return(true);
     eq2 = *ad_l2;
     ad_aux = ad_l2;
     (*ad_l2) = NULL;
@@ -295,16 +295,16 @@ Pray_dte l1,*ad_l2;
 	}
 	if (egalite == 0) {
 	    (* ad_aux) = eq2;
-	    return(FALSE);
+	    return(false);
 	}
 	else
 	    egalite = 0;
     }
     if (eq2==NULL)
-	return(TRUE);
+	return(true);
     else
 	(*ad_aux) = eq2;
-    return(FALSE);
+    return(false);
 }
 
 /* Pray_dte elim_null_vect(Pray_dte l, int * n):

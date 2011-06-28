@@ -270,7 +270,7 @@ int n,m;
 	B[i] = A[i];
 }
 
-/* boolean matrice_egalite(matrice A, matrice B, int n, int m)
+/* bool matrice_egalite(matrice A, matrice B, int n, int m)
  * test de l'egalite de deux matrices A et B; elles doivent avoir
  * ete normalisees au prealable pour que le test soit mathematiquement
  * exact
@@ -282,15 +282,15 @@ int n,m;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrice_egalite(A,B,n,m)
+bool matrice_egalite(A,B,n,m)
 matrice A, B;
 int n,m;
 {
     int i;
     for (i = 0 ;i<= n*m;i++)
 	if(value_ne(B[i],A[i]))
-	    return(FALSE);
-    return(TRUE);
+	    return(false);
+    return(true);
 }
 
 /* void matrice_nulle(matrice Z, int n, int m):
@@ -320,7 +320,7 @@ int n,m;
     DENOMINATOR(Z) = VALUE_ONE;
 }
 
-/* boolean matrice_nulle_p(matrice Z, int n, int m):
+/* bool matrice_nulle_p(matrice Z, int n, int m):
  * test de nullite de la matrice Z
  *
  * QQ i dans [1..n]
@@ -333,7 +333,7 @@ int n,m;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrice_nulle_p(Z,n,m)
+bool matrice_nulle_p(Z,n,m)
 matrice Z;
 int n,m;
 {
@@ -342,11 +342,11 @@ int n,m;
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
 	    if(value_notzero_p(ACCESS(Z,n,i,j)))
-		return(FALSE);
-    return(TRUE);
+		return(false);
+    return(true);
 }
 
-/* boolean matrice_diagonale_p(matrice Z, int n, int m):
+/* bool matrice_diagonale_p(matrice Z, int n, int m):
  * test de nullite de la matrice Z
  *
  * QQ i dans [1..n]
@@ -359,7 +359,7 @@ int n,m;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrice_diagonale_p(Z,n,m)
+bool matrice_diagonale_p(Z,n,m)
 matrice Z;
 int n,m;
 {
@@ -368,19 +368,19 @@ int n,m;
     for (i=1;i<=n;i++)
 	for (j=1;j<=m;j++)
 	    if(i!=j && value_notzero_p(ACCESS(Z,n,i,j)))
-		return(FALSE);
-    return(TRUE);
+		return(false);
+    return(true);
 }
 
-/* boolean matrice_triangulaire_p(matrice Z, int n, int m, boolean inferieure):
+/* bool matrice_triangulaire_p(matrice Z, int n, int m, bool inferieure):
  * test de triangularite de la matrice Z
  *
- * si inferieure == TRUE
+ * si inferieure == true
  * QQ i dans [1..n]
  * QQ j dans [i+1..m]
  *    Z(i,j) == 0
  *
- * si inferieure == FALSE (triangulaire superieure)
+ * si inferieure == false (triangulaire superieure)
  * QQ i dans [1..n]
  * QQ j dans [1..i-1]
  *    Z(i,j) == 0
@@ -391,10 +391,10 @@ int n,m;
  * int  n	: nombre de lignes de la matrice
  * int  m 	: nombre de colonnes de la matrice
  */
-boolean matrice_triangulaire_p(Z,n,m,inferieure)
+bool matrice_triangulaire_p(Z,n,m,inferieure)
 matrice Z;
 int n,m;
-boolean inferieure;
+bool inferieure;
 {
     int i,j;
 
@@ -402,25 +402,25 @@ boolean inferieure;
         if(inferieure) {
 	    for (j=i+1; j <= m; j++)
 		if(value_notzero_p(ACCESS(Z,n,i,j)))
-		    return(FALSE);
+		    return(false);
 	}
 	else
 	    for (j=1; j <= i-1; j++)
 		if(value_notzero_p(ACCESS(Z,n,i,j)))
-		    return(FALSE);
-    return(TRUE);
+		    return(false);
+    return(true);
 }
 
-/* boolean matrice_triangulaire_unimodulaire_p(matrice Z, int n, boolean inferieure)
+/* bool matrice_triangulaire_unimodulaire_p(matrice Z, int n, bool inferieure)
  * test de la triangulaire et unimodulaire de la matrice Z.
- * si inferieure == TRUE
+ * si inferieure == true
  * QQ i dans [1..n]
  * QQ j dans [i+1..n]
  *    Z(i,j) == 0
  * i dans [1..n]
  *   Z(i,i) == 1
  *
- * si inferieure == FALSE (triangulaire superieure)
+ * si inferieure == false (triangulaire superieure)
  * QQ i dans [1..n]
  * QQ j dans [1..i-1]
  *    Z(i,j) == 0
@@ -431,21 +431,21 @@ boolean inferieure;
  * matrice Z : la matrice entre
  * int n     : la dimension de la martice caree
  */
-boolean matrice_triangulaire_unimodulaire_p(Z,n,inferieure)
+bool matrice_triangulaire_unimodulaire_p(Z,n,inferieure)
 matrice Z;
 int n;
-boolean inferieure;
+bool inferieure;
 {
-    boolean triangulaire;
+    bool triangulaire;
     int i;
     triangulaire = matrice_triangulaire_p(Z,n,n,inferieure);
-    if (triangulaire == FALSE)
-	return(FALSE);
+    if (triangulaire == false)
+	return(false);
     else{
 	for(i=1; i<=n; i++)
 	    if (value_notone_p(ACCESS(Z,n,i,i)))
-		return(FALSE);
-	return(TRUE);
+		return(false);
+	return(true);
     }
 }	    
 

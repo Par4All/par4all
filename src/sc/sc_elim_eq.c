@@ -36,7 +36,7 @@
 #include "contrainte.h"
 #include "sc.h"
 
-/* void sc_rm_empty_constraints(Psysteme ps, boolean process_equalities):
+/* void sc_rm_empty_constraints(Psysteme ps, bool process_equalities):
  * elimination des "fausses" contraintes du systeme ps, i.e. les contraintes ne
  * comportant plus de couple (variable,valeur), i.e. les contraintes qui
  * ont ete eliminees par la fonction 'eq_set_vect_nul', i.e. 0 = 0 ou
@@ -46,8 +46,8 @@
  * 
  * parametres de la fonction:
  *   !Psysteme ps: systeme lineaire 
- *   boolean egalite: TRUE s'il faut traiter la liste des egalites 
- *                    FALSE s'il faut traiter la liste des inegalites
+ *   bool egalite: true s'il faut traiter la liste des egalites 
+ *                    false s'il faut traiter la liste des inegalites
  *
  * Modifications:
  *  - the number of equalities was always decremented, regardless
@@ -55,7 +55,7 @@
  */
 void sc_rm_empty_constraints(ps, process_equalities)
 Psysteme ps;
-boolean process_equalities;
+bool process_equalities;
 {
     Pcontrainte pc, ppc;
 
@@ -180,8 +180,8 @@ Psysteme ps;
 		eq_set_vect_nul(eq2);
     }
 
-    sc_rm_empty_constraints(ps, TRUE);
-    sc_rm_empty_constraints(ps, FALSE);
+    sc_rm_empty_constraints(ps, true);
+    sc_rm_empty_constraints(ps, false);
 
     return (ps);
 }

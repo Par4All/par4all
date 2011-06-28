@@ -217,7 +217,7 @@ Psommet fonct;
     Pvecteur pv = VECTEUR_NUL;
     Variable var_entrant = NULL;
     int no_som = 0;
-    boolean non_borne = FALSE;
+    bool non_borne = false;
     Psysteme ps2;
 #ifdef TRACE
     printf (" *** algorithme primal du simplexe \n");
@@ -239,7 +239,7 @@ Psommet fonct;
 #ifdef TRACE
 	    printf (" cas 4 ou le probleme n'est pas borne \n");
 #endif
-	    non_borne = TRUE;
+	    non_borne = true;
 	}
 	if (((ps2 = som_sys_conv(ps))) != NULL)
 	    sc_fprint(stdout,ps2,*variable_default_name);
@@ -328,7 +328,7 @@ Psommet fonct;
 }
 
 
-boolean primal_positive(ps,fonct)
+bool primal_positive(ps,fonct)
 Psysteme ps;
 Psommet fonct;
 {
@@ -339,7 +339,7 @@ Psommet fonct;
     int nb_som = 0;
     int nbvars =0;
     Pbase b = BASE_NULLE;
-    boolean result = FALSE;
+    bool result = false;
 
 #ifdef TRACE
     printf (" ** Algorithme du simplexe avec fonct. econom.\n");
@@ -373,7 +373,7 @@ Psommet fonct;
 #ifdef TRACE
     if (ps2) sc_fprint(stdout,ps2,*variable_default_name);
 #endif
-    if (ps2) result = TRUE;
+    if (ps2) result = true;
     sc_rm(ps2);
     sommets_rm(ps1);
     vect_rm(lvbase);

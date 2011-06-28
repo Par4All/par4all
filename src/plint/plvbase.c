@@ -74,22 +74,22 @@ Pvecteur lvbase;
 	    vect_chg_coeff(&(ps1->vecteur),pv->var,0);
 }
 
-/* boolean is_var_in_lvbase(Variable var, Pvecteur lvbase):
+/* bool is_var_in_lvbase(Variable var, Pvecteur lvbase):
  * test de non appartenance d'une variable a un vecteur
  *
  * Ne pourais-tu pas obtenir le meme resultat avec un vect_coeff()?
  *
  *  resultat retourne par la fonction :
  *
- *  boolean	   : TRUE si la variable n'appartient pas au vecteur
- *		     FALSE sinon
+ *  boolean	   : true si la variable n'appartient pas au vecteur
+ *		     false sinon
  *
  *  Les parametres de la fonction :
  *
  *  Pvecteur lvbase: liste des variables de base du systeme
  *  int     var    : variable du systeme   
  */
-boolean is_var_in_lvbase(var,lvbase)
+bool is_var_in_lvbase(var,lvbase)
 Variable var;
 Pvecteur lvbase;
 {
@@ -98,9 +98,9 @@ Pvecteur lvbase;
 	 pv!= NULL && ((pv->var!=var) || (pv->val == 0)); 
 	 pv = pv->succ)	;
     if(pv == NULL)
-	return (TRUE);
+	return (true);
     else 
-	return (FALSE);
+	return (false);
 }
 
 /* void lvbase_add(Variable var, int no_ligne, Pvecteur * lvbase):
@@ -121,10 +121,10 @@ Pvecteur *lvbase;
     Pvecteur pv = NULL;
     Value vno_ligne = int_to_value(no_ligne);
     Pvecteur pl = vect_new(var,vno_ligne);
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     for (pv = *lvbase; pv != NULL && (pv->val != vno_ligne);pv=pv->succ);
-    if (pv !=NULL) trouve = TRUE;
+    if (pv !=NULL) trouve = true;
     for (pv = *lvbase;( pv != NULL) &&(trouve) ;pv=pv->succ) {
 	if (value_ge(pv->val,vno_ligne))
 	    value_increment(pv->val);

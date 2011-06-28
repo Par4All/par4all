@@ -298,18 +298,18 @@ Pbase base_index;
     int level = 0;
     int i;
     int sign=1;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     for (pv = pc->vecteur;
 	 pv!=NULL;
 	 pv = pv->succ)
     {
-	for (i=1, trouve=FALSE, pb=base_index;
+	for (i=1, trouve=false, pb=base_index;
 	     pb!=NULL && !trouve;
 	     i++, pb=pb->succ)
 	    if (pv->var == pb->var)
 	    {
-		trouve = TRUE;
+		trouve = true;
 		if (i>level)
 		    level = i, sign = value_sign(pv->val);
 	    }
@@ -337,8 +337,8 @@ int (*compare)(Pvecteur *, Pvecteur *);
  *            "v" is the smallest (but non-zero).
  * modifies : nothing.
  * comment  : the returned constraint is not removed from the list if 
- *            rm_if_not_first_p is FALSE.
- *            if rm_if_not_first_p is TRUE, the returned contraint is
+ *            rm_if_not_first_p is false.
+ *            if rm_if_not_first_p is true, the returned contraint is
  *            remove only if it is not the first constraint.
  */
 Pcontrainte 
@@ -346,7 +346,7 @@ contrainte_var_min_coeff(contraintes, v, coeff, rm_if_not_first_p)
 Pcontrainte contraintes;
 Variable v;
 Value *coeff;
-boolean rm_if_not_first_p;
+bool rm_if_not_first_p;
 {
     Value sc = VALUE_ZERO, cv = VALUE_ZERO;
     Pcontrainte result, eq, pred, eq1;
@@ -440,7 +440,7 @@ equations_lexicographic_sort(Pcontrainte cl,
 {
     Pcontrainte result = CONTRAINTE_UNDEFINED;
 
-    result = constraints_lexicographic_sort_generic(cl, compare, TRUE);
+    result = constraints_lexicographic_sort_generic(cl, compare, true);
 
     return result;
 }
@@ -451,7 +451,7 @@ inequalities_lexicographic_sort(Pcontrainte cl,
 {
     Pcontrainte result = CONTRAINTE_UNDEFINED;
 
-    result = constraints_lexicographic_sort_generic(cl, compare, FALSE);
+    result = constraints_lexicographic_sort_generic(cl, compare, false);
 
     return result;
 }
@@ -463,7 +463,7 @@ constraints_lexicographic_sort(Pcontrainte cl,
 {
     Pcontrainte result = CONTRAINTE_UNDEFINED;
 
-    result = constraints_lexicographic_sort_generic(cl, compare, TRUE);
+    result = constraints_lexicographic_sort_generic(cl, compare, true);
 
     return result;
 }
@@ -471,7 +471,7 @@ constraints_lexicographic_sort(Pcontrainte cl,
 Pcontrainte 
 constraints_lexicographic_sort_generic(Pcontrainte cl,
 				       int (*compare)(Pvecteur*, Pvecteur*),
-				       boolean is_equation)
+				       bool is_equation)
 {
     int n = nb_elems_list(cl);
     Pcontrainte result = CONTRAINTE_UNDEFINED;

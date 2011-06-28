@@ -75,7 +75,7 @@ int level;
 {
     int i,j;
     int I = 0;
-    boolean trouve = FALSE;
+    bool trouve = false;
     int n = MATRIX_NB_LINES(MAT);
     int m= MATRIX_NB_COLUMNS(MAT);
     /* recherche du premier element non nul de la sous-matrice */
@@ -83,7 +83,7 @@ int level;
 	for (j = level+1; j<= m && (MATRIX_ELEM(MAT,i,j) == 0); j++);
 	if(j <= m) {
 	    /* on dumpe la colonne J... */
-	    trouve = TRUE;
+	    trouve = true;
 	    I = i;
 	}
     }
@@ -203,7 +203,7 @@ int level;
     int valj=0;
     Value min=VALUE_ZERO;
     Value val=VALUE_ZERO;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     int n = MATRIX_NB_LINES(MAT);
     int m= MATRIX_NB_COLUMNS(MAT);
@@ -213,7 +213,7 @@ int level;
 	    min = MATRIX_ELEM(MAT,i,j);
 	    min = value_abs(min);
 	    if(value_notzero_p(min)) {
-		trouve = TRUE;
+		trouve = true;
 		vali = i;
 		valj = j;
 	    }
@@ -334,7 +334,7 @@ int level;
     MATRIX_DENOMINATOR(ID) = VALUE_ONE;
 }
 
-/* boolean matrix_identity_p(Pmatrix ID, int level)
+/* bool matrix_identity_p(Pmatrix ID, int level)
  * test d'une sous-matrice dans ID(level+1..n, level+1..n) pour savoir si
  * c'est une matrice identity. Le test n'est correct que si la matrice
  * ID passee en argument est normalisee (cf. matrix_normalize())
@@ -349,7 +349,7 @@ int level;
  *		     et de la premiere colonne a partir duquel on commence 
  *		     a prendre en compte les elements de la matrice
  */
-boolean matrix_identity_p(ID,level)
+bool matrix_identity_p(ID,level)
 Pmatrix ID;
 int level;
 {
@@ -359,14 +359,14 @@ int level;
 	for(j = level+1; j <= n; j++) {
 	    if(i==j) {
 		if(value_notone_p(MATRIX_ELEM(ID,i,i)))
-		    return(FALSE);
+		    return(false);
 	    }
 	    else			/* i!=j */
 		if(value_notzero_p(MATRIX_ELEM(ID,i,j)))
-		    return(FALSE);
+		    return(false);
 	}
     }
-    return(TRUE);
+    return(true);
 }
 
 /* int matrix_line_el(Pmatrix MAT, int level)
@@ -423,7 +423,7 @@ Pmatrix MAT;
 int *lg_nnul,*cl_nnul;
 int level;
 {
-    boolean trouve = FALSE;
+    bool trouve = false;
     int j;
     Value min = VALUE_ZERO,val=VALUE_ZERO;
     int m = MATRIX_NB_COLUMNS(MAT);
@@ -441,7 +441,7 @@ int level;
 	    min = MATRIX_ELEM(MAT,*lg_nnul,j);
 	    min = value_abs(min);
 	    if (value_notzero_p(min)) {
-		trouve = TRUE;
+		trouve = true;
 		*cl_nnul=j;
 	    }
 	}

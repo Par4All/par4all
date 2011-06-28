@@ -58,7 +58,7 @@ char* (*union_variable_name)(Variable) = variable_default_name;
 Psysteme sc_full() { return sc_new(); }
 
 /* Psysteme sc_full_p( in_ps ) similar to sc_new */
-boolean sc_full_p( in_ps ) 
+bool sc_full_p( in_ps ) 
 Psysteme in_ps;
 { return( (in_ps->nb_eq == 0) && (in_ps->nb_ineq == 0) && 
           (in_ps->egalites == NULL) && (in_ps->inegalites == NULL) ); }
@@ -190,7 +190,7 @@ Psysteme in_s1, in_s2;
 /* int sl_length( (Psyslist) in_sl )   AL 26/04/95
  * Returns length of in_sl.
  */
-boolean sl_length( in_sl )
+bool sl_length( in_sl )
 Psyslist in_sl;
 {
   int length; Psyslist sl = in_sl;  
@@ -224,10 +224,10 @@ Psyslist in_sl;
 
 #line 246 "sc_list.w"
 
-/* boolean sl_is_system_p( (Psyslist) in_sl )   AL 16/11/93
+/* bool sl_is_system_p( (Psyslist) in_sl )   AL 16/11/93
  * Returns True if syslist in_sl has only one Psysteme in it.
  */
-boolean sl_is_system_p( in_sl )
+bool sl_is_system_p( in_sl )
 Psyslist in_sl;
 { return ( sl_length(in_sl) == 1 ); } 
 #line 256 "sc_list.w"

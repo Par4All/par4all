@@ -81,7 +81,7 @@ Psysteme ps;
     int nbl;
     int n; 
     int m;
-    boolean infaisab = FALSE;
+    bool infaisab = false;
     if (ps) {
 	sys = sc_normalize(sc_dup(sys));
 	m = sys->dimension;
@@ -141,7 +141,7 @@ Psysteme ps;
 		if (value_notzero_p(matii))
 		    if (value_zero_p(value_mod(MATRIX_ELEM(B,i,1), matii)))
 			value_division(MATRIX_ELEM(B,i,1),matii);
-		    else infaisab = TRUE;
+		    else infaisab = true;
 		
 		else
 		{
@@ -162,7 +162,7 @@ Psysteme ps;
 			/*
 			 * si la variable est non nulle ==> il y a une erreur ==> systeme infaisable
 			 */
-			infaisab = TRUE;
+			infaisab = true;
 
 		}
 	    }

@@ -128,16 +128,16 @@ Variable v;
     return b;
 }
 
-/* boolean base_contains_variable_p(Pbase b, Variable v): returns TRUE if
+/* bool base_contains_variable_p(Pbase b, Variable v): returns true if
  * variable v is one of b's elements;
  *
  * Based on variable_equal()
  */
-boolean base_contains_variable_p(b, v)
+bool base_contains_variable_p(b, v)
 Pbase b;
 Variable v;
 {
-    boolean in_base;
+    bool in_base;
 
     for(; !VECTEUR_NUL_P(b) && !variable_equal(vecteur_var(b), v); b = b->succ)
 	;
@@ -174,7 +174,7 @@ char * (*variable_name)(Variable);
 {
     char * nv;
     char * nb;
-    boolean equal;
+    bool equal;
 
     for(; !VECTEUR_NUL_P(b); b = b->succ) {
 	nv = variable_name(v);
@@ -198,7 +198,7 @@ char * (*variable_name)(Variable);
 {
     char * nv;
     char * nb;
-    boolean equal;
+    bool equal;
     int rank;
 
     for(rank=1; !VECTEUR_NUL_P(b); b = b->succ, rank++) {
@@ -266,7 +266,7 @@ char * (*variable_name)(Variable);
 
 /* Pvecteur vect_rename_variables(v, renamed_p, new_variable)
  * Pvecteur v;
- * boolean (*renamed_p)(Variable);
+ * bool (*renamed_p)(Variable);
  * Variable (*new_variable)(Variable);
  *
  * what: driven renaming of variables in v.
@@ -280,7 +280,7 @@ char * (*variable_name)(Variable);
  */
 Pvecteur vect_rename_variables(
     Pvecteur v,
-    boolean (*renamed_p)(Variable),
+    bool (*renamed_p)(Variable),
     Variable (*new_variable)(Variable))
 {
     Pvecteur i=v; /* initial vector is kept */
@@ -336,7 +336,7 @@ char * (*variable_name)(Variable);
  *    to screen TCST terms; on top of that, the special variable TCST is not
  *    kept in bases!
  */
-boolean vect_in_basis_p(v, b)
+bool vect_in_basis_p(v, b)
 Pvecteur v;
 Pbase b;
 {
@@ -346,7 +346,7 @@ Pbase b;
 
 	if(VARIABLE_DEFINED_P(vecteur_var(coord))) {
 	    if(!base_contains_variable_p(b, vecteur_var(coord))) {
-		return(FALSE);
+		return(false);
 	    }
 	}
 	else {
@@ -354,7 +354,7 @@ Pbase b;
 	    abort();
 	}
     }
-    return TRUE;
+    return true;
 }
 
 /* Pvecteur vect_variable_rename(Pvecteur v, Variable v_old, Variable v_new):
@@ -425,7 +425,7 @@ void base_append(Pbase * pb1, Pbase b2)
 Pbase base_union(Pbase b1, Pbase b2)
 {
   Pbase b = BASE_NULLE;
-  boolean
+  bool
     bn1 = BASE_NULLE_P(b1),
     bn2 = BASE_NULLE_P(b2);
 
@@ -577,7 +577,7 @@ Pbase b;
     return b;
 }
 
-boolean base_normalized_p(b)
+bool base_normalized_p(b)
 Pbase b;
 {
     Pbase eb;
@@ -613,10 +613,10 @@ Pbase base_difference(Pbase b1, Pbase b2)
  * include_p = b1 is included in b2  -- with the set meaning
  * return b;
  */
-boolean base_included_p(Pbase b1, Pbase b2)
+bool base_included_p(Pbase b1, Pbase b2)
 {
   Pbase b;
-  boolean included_p = TRUE;
+  bool included_p = true;
   linear_hashtable_pt seen = linear_hashtable_make();
   
   for (b=b2; b; b=b->succ)
@@ -625,7 +625,7 @@ boolean base_included_p(Pbase b1, Pbase b2)
 
   for (b=b1; b && included_p; b=b->succ)
     if (var_of(b)!=TCST && !linear_hashtable_isin(seen, var_of(b)))
-      included_p = FALSE;
+      included_p = false;
 
   linear_hashtable_free(seen);
   

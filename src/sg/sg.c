@@ -374,7 +374,7 @@ Ptsg sg;
 }
 
 
-/* boolean egal_soms(Ptsg_soms sgs1, Ptsg_soms sgs2): test de l'egalite
+/* bool egal_soms(Ptsg_soms sgs1, Ptsg_soms sgs2): test de l'egalite
  * de deux listes de sommets associees a un systeme generateur
  *
  * Malik: on notera que deux polyedres non faisables (nb sommets = 0)
@@ -384,21 +384,21 @@ Ptsg sg;
  * mais n'est toujours qu'une partie de la structure tsg, je ne pense pas
  * qu'il soit necessaire de rendre cette routine visible de l'exterieur
  */
-static boolean egal_soms(sgs1,sgs2)
+static bool egal_soms(sgs1,sgs2)
 Ptsg_soms sgs1,sgs2;
 {
-	if (sgs1->nb_s != sgs2->nb_s) return(FALSE);
-	if (sgs1->nb_s == 0) return(TRUE);
+	if (sgs1->nb_s != sgs2->nb_s) return(false);
+	if (sgs1->nb_s == 0) return(true);
 	return(egaliste_s(sgs1->ssg,&(sgs2->ssg)));
 }
 		
-/* boolean egal_rd(Ptsg_vects rdgs1, Ptsg_vects rdgs2): 
+/* bool egal_rd(Ptsg_vects rdgs1, Ptsg_vects rdgs2): 
  * test de de l'egalite des deux objets representes par des structures
  * tsg_vects
  * 
  * Ne doit servir que dans sg_egal()
  */
-static boolean egal_rd(rdgs1,rdgs2)
+static bool egal_rd(rdgs1,rdgs2)
 Ptsg_vects rdgs1,rdgs2;
 {
 	int result;
@@ -407,7 +407,7 @@ Ptsg_vects rdgs1,rdgs2;
 	return(result);
 }
 
-/* boolean sg_egal(Ptsg sg1, Ptsg sg2): test de l'egalite de deux systemes
+/* bool sg_egal(Ptsg sg1, Ptsg sg2): test de l'egalite de deux systemes
  * generateur sg1 et sg2
  * 
  * Ce test suppose que les deux systemes ont ete prealablement normalises:
@@ -422,14 +422,14 @@ Ptsg_vects rdgs1,rdgs2;
  *
  * Ancien nom: sg_egal()
  */
-boolean sg_egal(sg1,sg2)
+bool sg_egal(sg1,sg2)
 Ptsg sg1,sg2;
 {
-    if (! egal_soms(&(sg1->soms_sg) ,&(sg2->soms_sg) ) ) return(FALSE);
-    if (sg_nbre_sommets(sg1) == 0) return(TRUE);
-    if (! egal_rd(&(sg1->rays_sg),&(sg2->rays_sg))) return(FALSE);
-    if (! egal_rd(&(sg1->dtes_sg),&(sg2->dtes_sg))) return(FALSE);
-    return(TRUE);
+    if (! egal_soms(&(sg1->soms_sg) ,&(sg2->soms_sg) ) ) return(false);
+    if (sg_nbre_sommets(sg1) == 0) return(true);
+    if (! egal_rd(&(sg1->rays_sg),&(sg2->rays_sg))) return(false);
+    if (! egal_rd(&(sg1->dtes_sg),&(sg2->dtes_sg))) return(false);
+    return(true);
 }
 
 /* Ptsg mk_rn(Pbase b): construction du systeme generateur du polyedre
@@ -495,12 +495,12 @@ Variable v;
 }
 
 
-boolean sommet_in_sg_p(som,sg)
+bool sommet_in_sg_p(som,sg)
 Psommet som;
 Ptsg sg;
 {
     Psommet ps;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     if (!SG_UNDEFINED_P(sg)) {
 	for (ps = sg->soms_sg.ssg; ps != NULL && !trouve ; ps=ps->succ) {
@@ -510,12 +510,12 @@ Ptsg sg;
     return (trouve);
 }
 
-boolean ray_in_sg_p(ray,sg)
+bool ray_in_sg_p(ray,sg)
 Pray_dte ray;
 Ptsg sg;
 {
     Pray_dte pr;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     if (!SG_UNDEFINED_P(sg)) {
 	for (pr = sg->rays_sg.vsg;  pr != NULL; pr=pr->succ) {
@@ -525,12 +525,12 @@ Ptsg sg;
     return (trouve);
 }
 
-boolean dte_in_sg_p(dte,sg)
+bool dte_in_sg_p(dte,sg)
 Pray_dte dte;
 Ptsg sg;
 {
     Pray_dte pr;
-    boolean trouve = FALSE;
+    bool trouve = false;
 
     if (!SG_UNDEFINED_P(sg)) {
 	for (pr = sg->dtes_sg.vsg; pr != NULL; pr=pr->succ) {
@@ -544,9 +544,9 @@ Ptsg sg_union(sg1,sg2)
 Ptsg sg1,sg2;
 {
     Ptsg sg;
-    boolean newsommet = (sg_nbre_sommets(sg1)== 0) ? TRUE : FALSE;
-    boolean newray = (sg_nbre_rayons(sg1)== 0) ? TRUE : FALSE;
-    boolean newdte = (sg_nbre_droites(sg1)== 0) ? TRUE : FALSE;
+    bool newsommet = (sg_nbre_sommets(sg1)== 0) ? true : false;
+    bool newray = (sg_nbre_rayons(sg1)== 0) ? true : false;
+    bool newdte = (sg_nbre_droites(sg1)== 0) ? true : false;
     Psommet ps, ps_tmp;
     Pray_dte pr,pr_tmp;
 
@@ -566,7 +566,7 @@ Ptsg sg1,sg2;
     for (ps = sg2->soms_sg.ssg; ps != NULL; ps=ps->succ) {
 	if (newsommet) {
 	    sg->soms_sg.ssg = ps_tmp=sommet_dup(ps);
-	    newsommet = FALSE;
+	    newsommet = false;
 	    sg->soms_sg.nb_s++;
 	} else {
 	    if (!sommet_in_sg_p(ps,sg)) {
@@ -582,7 +582,7 @@ Ptsg sg1,sg2;
     for (pr = sg2->rays_sg.vsg; pr != NULL; pr=pr->succ) {
 	if (newray) {
 	    sg->rays_sg.vsg = pr_tmp=ray_dte_dup(pr);
-	    newray = FALSE;
+	    newray = false;
 	    sg->rays_sg.nb_v++;
 	} else {
 	    if (!ray_in_sg_p(pr,sg)) {
@@ -599,7 +599,7 @@ Ptsg sg1,sg2;
     for (pr = sg2->dtes_sg.vsg; pr != NULL; pr=pr->succ) {
 	if (newdte) {
 	    sg->dtes_sg.vsg = pr_tmp=ray_dte_dup(pr);
-	    newdte = FALSE;
+	    newdte = false;
 	    sg->dtes_sg.nb_v++;
 	} else {
 	    if (!dte_in_sg_p(pr,sg)) {

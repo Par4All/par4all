@@ -39,23 +39,23 @@
 #include "matrice.h"
 
 /* void matrice_unimodulaire_triangulaire_inversion(matrice u ,matrice inv_u,
- * int n, * boolean infer)
+ * int n, * bool infer)
  * u soit le matrice unimodulaire triangulaire.
- * si infer = TRUE  (triangulaire inferieure),
- *    infer = FALSE (triangulaire superieure). 
+ * si infer = true  (triangulaire inferieure),
+ *    infer = false (triangulaire superieure). 
  * calcul de l'inversion de matrice u telle que I = U x INV_U .
  * Les parametres de la fonction :
  *
  * matrice u     : matrice unimodulaire triangulaire     -- inpout
  * int n         : dimension de la matrice caree         -- inpout
- * boolean infer : type de triangulaire                  -- input
+ * bool infer : type de triangulaire                  -- input
  * matrice inv_u : l'inversion de matrice u              -- output
  */
 void matrice_unimodulaire_triangulaire_inversion(u,inv_u,n,infer)
 matrice u;
 matrice inv_u;
 int n;
-boolean infer;
+bool infer;
 {
     int i, j;
     Value x;
@@ -122,26 +122,26 @@ int n;
     DENOMINATOR(inv_s) = value_div(lcm,gcd);
 }
     
-/* void matrice_triangulaire_inversion(matrice h, matrice inv_h, int n,boolean infer)
+/* void matrice_triangulaire_inversion(matrice h, matrice inv_h, int n,bool infer)
  * calcul de l'inversion du matrice en forme triangulaire.
  * soit h matrice de la reduite triangulaire; inv_h est l'inversion de 
  * h ; telle que : h * inv_h = I.
  * selon les proprietes de la matrice triangulaire:
  *    Aii = a11* ...aii-1*aii+1...*ann;
- *    Aij = 0     i>j  pour la matrice triangulaire inferieure (infer==TRUE)
- *                i<j  pour la matrice triangulaire superieure (infer==FALSE)
+ *    Aij = 0     i>j  pour la matrice triangulaire inferieure (infer==true)
+ *                i<j  pour la matrice triangulaire superieure (infer==false)
  *
  * les parametres de la fonction :
  * matrice h     : matrice en forme triangulaire        -- input
  * matrice inv_h : l'inversion de h                     -- output
  * int n         : dimension de la matrice caree        -- input
- * boolean infer : le type de triangulaire              -- input
+ * bool infer : le type de triangulaire              -- input
  */ 
 void matrice_triangulaire_inversion(h,inv_h,n,infer)
 matrice h;
 matrice inv_h;
 int n;
-boolean infer;
+bool infer;
 {
     Value deno,deno1;                    /* denominateur */
     Value determinant,sous_determinant;  /* determinant */
@@ -241,7 +241,7 @@ int n;
     DENOMINATOR(a) = deno;
     if ( matrice_hermite_rank(h,n,n) == n){
 	DENOMINATOR(h) = deno;
-	matrice_triangulaire_inversion(h,inv_h,n,TRUE);
+	matrice_triangulaire_inversion(h,inv_h,n,true);
 	matrice_multiply(q,inv_h,temp,n,n,n);
 	matrice_multiply(temp,p,inv_a,n,n,n);
     }
@@ -280,8 +280,8 @@ int n;
     assert(value_one_p(DENOMINATOR(u)));
 
     matrice_hermite(u,n,n,p,h_u,q,&det_p,&det_q);
-    assert(matrice_triangulaire_unimodulaire_p(h_u,n,TRUE));
-    matrice_unimodulaire_triangulaire_inversion(h_u,inv_h_u,n,TRUE);
+    assert(matrice_triangulaire_unimodulaire_p(h_u,n,true));
+    matrice_unimodulaire_triangulaire_inversion(h_u,inv_h_u,n,true);
     matrice_multiply(q,inv_h_u,temp,n,n,n);
     matrice_multiply(temp,p,inv_u,n,n,n);
 }

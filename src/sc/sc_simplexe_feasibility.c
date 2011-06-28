@@ -564,7 +564,7 @@ void frac_simplifie(frac *f)
     }
 }
 
-void frac_div(frac *x,frac y,frac z, boolean ofl_ctrl)
+void frac_div(frac *x,frac y,frac z, bool ofl_ctrl)
 {tag("FRAC_DIV")
     if (value_zero_p(y.num))
       {
@@ -595,7 +595,7 @@ void frac_div(frac *x,frac y,frac z, boolean ofl_ctrl)
 
 /* computes x = simplify(y*z)
  */
-void  frac_mul(frac *x,frac y,frac z, boolean ofl_ctrl)
+void  frac_mul(frac *x,frac y,frac z, bool ofl_ctrl)
 {tag("FRAC_MUL")
     if(value_zero_p(y.num) || value_zero_p(z.num))
       MET_ZERO((*x))
@@ -612,7 +612,7 @@ void  frac_mul(frac *x,frac y,frac z, boolean ofl_ctrl)
 	  frac_simplifie(x);
 	}
 }
-void frac_sub(frac *X,frac A,frac B, boolean ofl_ctrl)
+void frac_sub(frac *X,frac A,frac B, bool ofl_ctrl)
 { tag("FRAC_SUB")
     if (value_zero_p(A.num))
       X->num = value_uminus(B.num),
@@ -649,7 +649,7 @@ void frac_sub(frac *X,frac A,frac B, boolean ofl_ctrl)
       }
 }
 
-void full_pivot_sioux(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+void full_pivot_sioux(frac *X,frac A,frac B,frac C,frac D,bool ofl_ctrl)
 {
   frac u,v,w;
   tag("FULL_PIVOT_SIOUX")
@@ -678,7 +678,7 @@ void full_pivot_sioux(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
 
 /* computes X = A - B*C/D, but does not try to avoid arithmetic exceptions
  */
-void full_pivot_direct(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+void full_pivot_direct(frac *X,frac A,frac B,frac C,frac D,bool ofl_ctrl)
 {
   Value v; tag("FULL_PIVOT_DIRECT") 
 	     if (ofl_ctrl == FWD_OFL_CTRL) {
@@ -707,7 +707,7 @@ void full_pivot_direct(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
 	     }
   frac_simplifie(X);
 }
-void  full_pivot(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+void  full_pivot(frac *X,frac A,frac B,frac C,frac D,bool ofl_ctrl)
 { tag("FULL_PIVOT")
 
     if (direct_p(A.den) && direct_p(B.den) &&
@@ -723,7 +723,7 @@ void  full_pivot(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
 
 /* idem if A==0
  */
-void partial_pivot_sioux(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+void partial_pivot_sioux(frac *X,frac B,frac C,frac D,bool ofl_ctrl)
 {
   tag("PARTIAL_PIVOT_SIOUX")
     frac u =  {(Value)0,(Value)1,0};
@@ -733,7 +733,7 @@ void partial_pivot_sioux(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
   value_oppose(X->num);   /* x=-x */
 }
 
-void partial_pivot_direct(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+void partial_pivot_direct(frac *X,frac B,frac C,frac D,bool ofl_ctrl)
 { tag("PARTIAL_PIVOT_DIRECT") 
     if (ofl_ctrl == FWD_OFL_CTRL) {
       X->num = value_protected_mult(B.num,C.num);
@@ -752,7 +752,7 @@ void partial_pivot_direct(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
   frac_simplifie(X);
 }
 
-void  partial_pivot(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
+void  partial_pivot(frac *X,frac B,frac C,frac D,bool ofl_ctrl)
 {
 
   if (direct_p(B.den) && direct_p(C.den) && direct_p(D.num))
@@ -767,7 +767,7 @@ void  partial_pivot(frac *X,frac B,frac C,frac D,boolean ofl_ctrl)
 
 
 
-void  pivot(frac *X,frac A,frac B,frac C,frac D,boolean ofl_ctrl)
+void  pivot(frac *X,frac A,frac B,frac C,frac D,bool ofl_ctrl)
 {
   if (value_zero_p(D.num))
     fprintf(stderr,"division of zero!!!");
@@ -884,7 +884,7 @@ static int hash(Variable s)
  *           => overflow control is made THROW(overflow_error,5)
  * BC, 13/12/94
  */
-boolean 
+bool 
 sc_simplexe_feasibility_ofl_ctrl(
     Psysteme sc, 
     int ofl_ctrl)
@@ -1012,12 +1012,12 @@ sc_simplexe_feasibility_ofl_ctrl(
       /*THROW(user_exception_error);*/
       /* need CATCH(user_exception_error) before calling sc_simplexe_feasibility)*/
       ifscdebug(5) {fprintf(stderr,"DNDNDN WARNING: Exception not treated, return feasible!");}
-      return TRUE; /* if don't catch exception, then default is feasible */
+      return true; /* if don't catch exception, then default is feasible */
 
       /*if (ofl_ctrl == FWD_OFL_CTRL)  */
       /*THROW(overflow_error);*/
 
-      /*return TRUE;  default is feasible */
+      /*return true;  default is feasible */
     }/* of CATCH(simplex_arithmetic_error)*/
 
     /*begin of TRY*/
@@ -1389,7 +1389,7 @@ sc_simplexe_feasibility_ofl_ctrl(
         
 	/*  Terminaison  */
         if(jj == -1) { 
-	    boolean cond;
+	    bool cond;
             DEBUG1({
 		printf ("solution :\n") ;
 		dump_tableau("sol", t, compteur) ;
@@ -1427,7 +1427,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 	 */
         for(i=1, i0=1, i1=1, ii=-1 ; i<t[jj].taille ; )
         {
-	    boolean cond;
+	    bool cond;
 
 	    DEBUG1(fprintf(stdout, "itering i{,0,1} = %ld %ld %ld\n", 
 			  i, i0, i1);)
@@ -1461,7 +1461,7 @@ sc_simplexe_feasibility_ofl_ctrl(
 			  fprintf(stdout, "\nand cond: ");)
 
 		    if (ii==-1) 
-			cond = TRUE; /* first assignment is forced */
+			cond = true; /* first assignment is forced */
 		    else
 			if (ofl_ctrl == FWD_OFL_CTRL)
 			    cond = INFOFL(rapport2,min2) ||

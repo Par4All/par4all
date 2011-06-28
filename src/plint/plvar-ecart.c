@@ -76,7 +76,7 @@ Pvecteur *lvbase;
     Pvecteur pv3=NULL;
     Pvecteur pvsom=NULL;
     Pvecteur pvsom2 = NULL;
-    boolean egalite = FALSE;
+    bool egalite = false;
     Value den = VALUE_ONE;
 
 #ifdef TRACE
@@ -92,7 +92,7 @@ Pvecteur *lvbase;
 
     for (eq = sys2;eq!= NULL;eq=eq->succ) {
 	if (*(eq->eq_sat) == 1) {
-	    egalite = TRUE;
+	    egalite = true;
 	    *(eq->eq_sat) = -1;
 	    pv3 = vect_dup(eq->vecteur);
 	    vect_chg_sgn(pv3);

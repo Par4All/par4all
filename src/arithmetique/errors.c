@@ -64,7 +64,7 @@ linear_exception_t the_last_just_thrown_exception __attribute__ ((weak)) = 0;
 
 /* whether to run in debug mode (that is to trace catch/uncatch/throw)
  */
-static boolean linear_exception_debug_mode = FALSE;
+static bool linear_exception_debug_mode = false;
 static unsigned int linear_exception_verbose = 1 | 2 | 16 ;
 
 /* A structure for the exception stack.

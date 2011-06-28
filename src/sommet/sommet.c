@@ -213,13 +213,13 @@ Psommet ns;
     (void) vect_div(ns->vecteur, div);
 }
 
-/* boolean som_in_liste(Psommet s, Psommet l): test de l'appartenance
+/* bool som_in_liste(Psommet s, Psommet l): test de l'appartenance
  * du sommet s a la liste de sommets l
  *
  * Les coordonnees du sommet s et des sommets de la liste l sont
  * supposees normalisees (fractions reduites)
  */
-boolean som_in_liste(s,listes)
+bool som_in_liste(s,listes)
 Psommet s;
 Psommet listes;
 {
@@ -227,41 +227,41 @@ Psommet listes;
 
     for (s1=listes;s1!=NULL;s1=s1->succ) {
 	if ((s1->denominateur)==(s->denominateur)) {
-	    if (vect_equal((s1->vecteur),(s->vecteur))) return(TRUE);
+	    if (vect_equal((s1->vecteur),(s->vecteur))) return(true);
 	}
     }
-    return(FALSE);
+    return(false);
 }
 
-/* boolean sommet_egal(Psommet s1, Psommet s2): test de l'egalite
+/* bool sommet_egal(Psommet s1, Psommet s2): test de l'egalite
  * de representation de deux sommets
  *
  * Il faut en normaliser les coordonnees d'abord si on veut une egalite
  * de valeur
  */
-boolean sommet_egal(s1,s2)
+bool sommet_egal(s1,s2)
 Psommet s1,s2;
 {
     if (sommet_denominateur(s1)!=sommet_denominateur(s2))
-	return(FALSE);
+	return(false);
     else
 	return(vect_equal(s1->vecteur,s2->vecteur));
 }
 
-/* boolean egaliste_s(Psommet l1, Psommet * ad_l2): test d'egalite
+/* bool egaliste_s(Psommet l1, Psommet * ad_l2): test d'egalite
  * de listes de sommets
  *
  *	nous proposons un test direct au lieu d'un test en deux etapes 
  *	d'inclusion dans les deux sens; ceci justifie le second parametre
  *	qui est l'adresse du pointeur de liste (Malik Imadache)
  */
-boolean egaliste_s(l1,ad_l2)
+bool egaliste_s(l1,ad_l2)
 Psommet l1,*ad_l2;
 {
     int egalite;
     Psommet eq1,eq2,eq21,eq23,*ad_aux;
  
-    if (l1==(*ad_l2)) return(TRUE);
+    if (l1==(*ad_l2)) return(true);
 
     /* elements pour lesquels il reste a trouver un "jumeau" dans l1 */
     eq2 = *ad_l2;
@@ -316,7 +316,7 @@ Psommet l1,*ad_l2;
 	       de "jumeau" dans l2 => reformer l2 et sortir
 	       */
 	    (* ad_aux) = eq2;
-	    return(FALSE);
+	    return(false);
 	}
 	else egalite = 0;
     }
@@ -326,11 +326,11 @@ Psommet l1,*ad_l2;
 	   si tous les elements de l2 sont jumeaux
 	   (inclusion inverse) => egalite
 	   */
-	return(TRUE);
+	return(true);
     else 
 	/* dans le cas inverse reformer l2 et sortir */
 	(*ad_aux) = eq2;
-    return(FALSE);
+    return(false);
 }
 
 

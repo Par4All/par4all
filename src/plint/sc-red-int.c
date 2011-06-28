@@ -69,7 +69,7 @@ Psysteme sys;
 	    vect_chg_sgn(eq->vecteur);
 	    vect_add_elem(&(eq->vecteur),TCST,VALUE_ONE);
 	    /* test de faisabilite avec la nouvelle inegalite      */
-	    if (sys_int_fais(sys) == FALSE)
+	    if (sys_int_fais(sys) == false)
 	    {
 		/* si le systeme est non faisable 
 		   ==> inegalite redondante

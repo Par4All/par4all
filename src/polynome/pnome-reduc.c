@@ -175,22 +175,22 @@ Ppolynome pp;
 
 }
 
-/* boolean polynome_constant_p(Ppolynome pp)
- *  return TRUE if pp is a constant polynomial
+/* bool polynome_constant_p(Ppolynome pp)
+ *  return true if pp is a constant polynomial
  *  (including null polynomial)
  *  If pp is POLYNOME_UNDEFINED: abort. [???]
  */
-boolean polynome_constant_p(pp)
+bool polynome_constant_p(pp)
 Ppolynome pp;
 {
     /* polynome_constant_p: polynome is undefined */
     assert(!POLYNOME_UNDEFINED_P(pp));
 
     if (POLYNOME_NUL_P(pp)) 
-	return(TRUE);
+	return(true);
     else {
 	Pvecteur pvTCST = vect_new((Variable) TCST, VALUE_ONE);
-	boolean b = (vect_equal(pvTCST, monome_term(polynome_monome(pp)))
+	bool b = (vect_equal(pvTCST, monome_term(polynome_monome(pp)))
 		     && (polynome_succ(pp) == POLYNOME_NUL));
 
 	vect_rm(pvTCST);
@@ -199,7 +199,7 @@ Ppolynome pp;
 }
 
 
-/* Pbase polynome_used_var(Ppolynome pp, boolean *is_inferior_var())
+/* Pbase polynome_used_var(Ppolynome pp, bool *is_inferior_var())
  *  PRIVATE
  *  Returns, in a Pbase, a list of the variables used in pp,
  *  sorted according to the function is_inferior_var()
@@ -234,30 +234,30 @@ int (*is_inferior_var)(Pvecteur *, Pvecteur *);
 }
 
 
-/* boolean polynome_contains_var(Ppolynome pp, Variable var)
+/* bool polynome_contains_var(Ppolynome pp, Variable var)
  *  PRIVATE
- *  returns TRUE if variable var is in polynomial pp.
+ *  returns true if variable var is in polynomial pp.
  */
-boolean polynome_contains_var(pp, var)
+bool polynome_contains_var(pp, var)
 Ppolynome pp;
 Variable var;
 {
     if ( POLYNOME_UNDEFINED_P(pp) )
-	return (FALSE);
+	return (false);
     else {
 	for ( ; pp != POLYNOME_NUL; pp = polynome_succ(pp))
 	    if (vect_coeff(var, monome_term(polynome_monome(pp))) != 0)
-		return (TRUE);
-	return(FALSE);
+		return (true);
+	return(false);
     }
 }
 
 
-/* boolean polynome_equal(Ppolynome pp1, Ppolynome pp2)
+/* bool polynome_equal(Ppolynome pp1, Ppolynome pp2)
  *  return (pp1 == pp2)
  *  >>>TO BE CONTINUED<<<
  */
-boolean polynome_equal(pp1, pp2)
+bool polynome_equal(pp1, pp2)
 Ppolynome pp1,pp2;
 {
     Ppolynome ppcopy1 = polynome_dup(pp1);
@@ -269,5 +269,5 @@ Ppolynome pp1,pp2;
 
     /* TO BE CONTINUED */
     polynome_error ("polynome_equal", "To be implemented!\n");
-    return FALSE;
+    return false;
 }

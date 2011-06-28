@@ -38,7 +38,7 @@
 extern int yyerror(char*);
 extern int yylex(void);
 
-boolean yysyntax_error;
+bool yysyntax_error;
 
 Psysteme ps_yacc;
 
@@ -108,7 +108,7 @@ inisys	:
                    
                        ps_yacc = sc_new();
 		       init_globals();
-		       yysyntax_error = FALSE;
+		       yysyntax_error = false;
                 }
 	;
 

@@ -97,8 +97,8 @@ void good_polynome_assert(char * function, ...)
 }
 
 
-/* boolean monome_check(Pmonome pm)
- *   Return TRUE if all's right.
+/* bool monome_check(Pmonome pm)
+ *   Return true if all's right.
  *   Looks if pm is MONOME_UNDEFINED; if not:
  *     make sure that the coeff is non nul, that the term is non nul,
  *     and checks the (Pvecteur) term.
@@ -107,65 +107,65 @@ void good_polynome_assert(char * function, ...)
  *  Modification:
  *  - MONOME_NUL means 0 monome, and it's a good monome. LZ 10/10/91
  */
-boolean monome_check(pm)
+bool monome_check(pm)
 Pmonome pm;
 {
     if ( MONOME_UNDEFINED_P(pm) )
-	return (FALSE); 
+	return (false); 
     else if (MONOME_NUL_P(pm) )
-	return (TRUE);
+	return (true);
     else 
 	return ((monome_coeff(pm) != 0) && 
 		!VECTEUR_NUL_P(monome_term(pm)) &&
 		vect_check(monome_term(pm)));
 }
 
-/* boolean polynome_check(Ppolynome pp)
- *   Return TRUE if all's right.
+/* bool polynome_check(Ppolynome pp)
+ *   Return true if all's right.
  *   Check each monomial, make sure there's no nul or undefined monomial,
  *   then check unicity of each monomial.
  *
  *  Modification:
  *  - POLYNOME_NUL means 0 polynome, and it's a good one. LZ 10/10/91
  */
-boolean polynome_check(pp)
+bool polynome_check(pp)
 Ppolynome pp;
 {
     if ( POLYNOME_UNDEFINED_P(pp) )
-	return (FALSE);
+	return (false);
     if ( POLYNOME_NUL_P(pp) )
-	return (TRUE);
+	return (true);
     else {
 	Ppolynome curpp, curpp2;
 
 	for (curpp = pp; curpp != POLYNOME_NUL; curpp = polynome_succ(curpp)) {
 	    if ( !monome_check(polynome_monome(curpp)) ) {
-		return (FALSE);
+		return (false);
 	    }
 	    for (curpp2 = polynome_succ(curpp); curpp2 != POLYNOME_NUL;
 		 curpp2 = polynome_succ(curpp2))
 		if (monome_colin(polynome_monome(curpp),polynome_monome(curpp2))) 
-		    return (FALSE);
+		    return (false);
 	}
-	return (TRUE);
+	return (true);
     }
 }
 
-/* boolean is_polynome_a_monome(Ppolynome pp)
- *   Return TRUE if the pp is just a monome.
+/* bool is_polynome_a_monome(Ppolynome pp)
+ *   Return true if the pp is just a monome.
  *   that means the polynom has only one term
  *   Check each monomial, make sure there's no nul or undefined monomial,
  *   then check unicity of each monomial.
  *
  * LZ 06 Nov. 92
  */
-boolean is_polynome_a_monome(pp)
+bool is_polynome_a_monome(pp)
 Ppolynome pp;
 {
     if ( ! polynome_check(pp) )
-	return (FALSE);
+	return (false);
     else if ( pp != POLYNOME_NUL && polynome_succ(pp) == POLYNOME_NUL )
-	return (TRUE);
+	return (true);
     else
-	return (FALSE);
+	return (false);
 }
