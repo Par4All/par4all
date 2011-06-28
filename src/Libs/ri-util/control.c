@@ -1197,12 +1197,65 @@ link_2_control_nodes(control source,
   // defined and if it is defined and that it already has a successor
   // then it is a test? Might be better done here than later when
   // trying to print out the statements...
-    control_successors(source) = CONS(CONTROL,
-				      target,
-				      control_successors(source));
-    control_predecessors(target) = CONS(CONTROL,
-					source,
-					control_predecessors(target));
+  // FI: I think this explains why for loops are improperly desugared...
+
+  // FI: this assert is too strong because if statements are
+  // considered potentially structured and are linked like any other
+  // statement when processing a statement
+  //
+  // pips_assert("source is not a test\n",
+  //      statement_undefined_p(control_statement(source))
+  //      || !statement_test_p(control_statement(source)));
+
+  // FI: to avoid memory leaks and/or inconsistency
+  //pips_assert("source has no successor\n", ENDP(control_successors(source)));
+  if(!ENDP(control_successors(source)))
+    // FI: this should never happen if the graph is properly
+    // handled...
+    // I could re-instate the assert and/or just set a breakpoint on
+    // the gen_free_list()
+    gen_free_list(control_successors(source));
+  control_successors(source) = CONS(CONTROL, target, NIL);
+
+  //control_successors(source) = CONS(CONTROL,
+  //			    target,
+  //			    control_successors(source));
+
+  // FI: guess to get for loop properly desugared... but it breaks
+  // something else...
+  //control_successors(source) =
+  //    gen_nconc(control_successors(source), CONS(CONTROL, target, NIL));
+  control_predecessors(target) = CONS(CONTROL,
+				      source,
+				      control_predecessors(target));
+}
+
+/* Add an edge between 2 control nodes.
+
+   Assume that this edge does not already exist or the source should be an
+   unstructured IF. FI: I am still puzzled how this can work when
+   tests are involved since the semantics of the first and second
+   successor is not paid attention at at all.
+
+   @param source is the control node the edge starts from
+
+   @param target is the control node the edge ends to
+ */
+void
+link_3_control_nodes(control c_test,
+		     control c_then, control c_else)
+{
+  if(!ENDP(control_successors(c_test)))
+    gen_free_list(control_successors(c_test));
+  control_successors(c_test) =
+    CONS(CONTROL, c_then, CONS(CONTROL, c_else, NIL));
+
+  control_predecessors(c_then) = CONS(CONTROL,
+				      c_test,
+				      control_predecessors(c_then));
+  control_predecessors(c_else) = CONS(CONTROL,
+				      c_test,
+				      control_predecessors(c_else));
 }
 
 

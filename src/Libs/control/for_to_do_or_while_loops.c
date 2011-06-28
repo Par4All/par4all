@@ -75,7 +75,9 @@ static bool condition_expression_to_final_bound(expression cond,
     /* Five operators are accepted */
     if (ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op)
 	|| ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op)
-    || ENTITY_NON_EQUAL_P(op) ) {
+	// FI: wrong result for !=; no way to derive a correct bound
+	// without information about the increment
+	/*|| ENTITY_NON_EQUAL_P(op)*/ ) {
       expression e1 = EXPRESSION(CAR(call_arguments(c)));
       expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
       syntax e1_s = expression_syntax(e1);

@@ -639,7 +639,8 @@ static bool controlize_loop(control c_res,
   }
   */
   /* Recurse by controlizing inside the loop: */
-  link_2_control_nodes(c_body, c_inc);
+  // FI: this seems redundant with the above call to insert_control_in_arc()
+  //link_2_control_nodes(c_body, c_inc);
   bool controlized = controlize_statement(c_body, c_inc, loop_used_labels);
 
   if (!controlized) {
@@ -680,7 +681,14 @@ static bool controlize_loop(control c_res,
     /* And reconnect it to the test node to make the loop: */
     link_2_control_nodes(c_inc, c_test);
     /* Add the else branch of the test toward the loop exit: */
-    link_2_control_nodes(c_test, succ);
+    // FI: try to get the true and false successors at the right location...
+    // link_2_control_nodes(c_test, succ);
+    //control_successors(c_test) = gen_nconc(control_successors(c_test),
+    //				   CONS(CONTROL, succ, NIL));
+    //control_successors(c_test) = gen_nreverse(control_successors(c_test));
+    control_successors(c_test) = CONS(CONTROL, succ, control_successors(c_test));
+    control_predecessors(succ) = gen_nconc(control_predecessors(succ),
+					   CONS(CONTROL, c_test, NIL));
     /* Detach the succ node from the body node */
     //unlink_2_control_nodes(c_body, succ);
     /* We can remove  */
@@ -798,7 +806,13 @@ static bool controlize_forloop(control c_res,
     /* And reconnect it to the test node to make the loop: */
     link_2_control_nodes(c_inc, c_test);
     /* Add the else branch of the test toward the loop exit: */
-    link_2_control_nodes(c_test, succ);
+    // link_2_control_nodes(c_test, succ) does not support distinction
+    // between true and false branch as first and second successors
+    // FI: I hesitated to define a new loe level procedure in ri-util/control.c
+    control_successors(c_test) = gen_nconc(control_successors(c_test),
+					   CONS(CONTROL, succ, NIL));
+    control_predecessors(succ) = gen_nconc(control_predecessors(succ),
+					   CONS(CONTROL, c_test, NIL));
     /* Detach the succ node from the body node */
     //unlink_2_control_nodes(c_body, succ);
     /* We can remove  */
@@ -916,6 +930,7 @@ static bool controlize_whileloop(control c_res,
     /* Add the continuation test between the header and the body that are
        already connected: */
     //control c_test = make_control(unsugared_loop_test(sl), NIL, NIL);
+    unlink_2_control_nodes(c_res, succ);
     link_2_control_nodes(c_res, c_test);
     //insert_control_in_arc(c_test, c_res, c_body);
     /* Detach succ from the loop body exit */
@@ -925,10 +940,11 @@ static bool controlize_whileloop(control c_res,
     /* Add the else branch of the test toward the loop exit: arc
        ordering matters */
     unlink_2_control_nodes(c_test, c_body);
-    link_2_control_nodes(c_test, succ);
-    link_2_control_nodes(c_test, c_body);
+    //link_2_control_nodes(c_test, succ);
+    //link_2_control_nodes(c_test, c_body);
+    link_3_control_nodes(c_test, c_body, succ);
     // link_2_control_nodes(c_test, c_res);
-    unlink_2_control_nodes(c_res, succ);
+    //unlink_2_control_nodes(c_res, succ);
 
     pips_assert("c_test is a test with two successors",
 		gen_length(control_successors(c_test))==2
@@ -1061,13 +1077,14 @@ static bool controlize_repeatloop(control c_res,
     /* Add the else branch of the test toward the loop exit: */
     //link_2_control_nodes(c_test, succ);
     /* We can remove  */
+    unlink_2_control_nodes(c_res, succ);
     link_2_control_nodes(c_res, c_body);
     /* Add the else branch of the test toward the loop exit: arc
        ordering matters */
     unlink_2_control_nodes(c_test, c_body);
-    link_2_control_nodes(c_test, succ);
-    link_2_control_nodes(c_test, c_body);
-    unlink_2_control_nodes(c_res, succ);
+    //link_2_control_nodes(c_test, succ);
+    //link_2_control_nodes(c_test, c_body);
+    link_3_control_nodes(c_test, c_body, succ);
 
     pips_assert("c_test is a test with two successors",
 		gen_length(control_successors(c_test))==2
@@ -2236,9 +2253,9 @@ static bool controlize_test(control c_res,
      branch is the second one: */
   // Correct order: link_2_control_nodes add the new arc in the
   // first slot; so reverse linking of c_else and c_then
-  link_2_control_nodes(c_res, c_else);
+  link_3_control_nodes(c_res, c_then, c_else);
   link_2_control_nodes(c_else, succ);
-  link_2_control_nodes(c_res, c_then);
+  //link_2_control_nodes(c_res, c_then);
   link_2_control_nodes(c_then, succ);
 
   /* Now we can controlize each branch statement to deal with some control
