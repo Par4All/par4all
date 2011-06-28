@@ -116,13 +116,13 @@ static bool inline_directly(union domain * dp)
   {
     struct gen_binding * bp = dp->ba.constructand;
     string name = bp->name;
-    if (!IS_INLINABLE(bp)) return FALSE;
+    if (!IS_INLINABLE(bp)) return false;
     if ((same_string_p(name, "int") && same_size(intptr_t)) ||
 	(same_string_p(name, "string") && same_size(string)) ||
 	(same_string_p(name, "unit") && same_size(unit)))
-      return TRUE;
+      return true;
   }
-  return FALSE;
+  return false;
 }
 
 /* bof... */
@@ -462,12 +462,12 @@ static void generate_access_members(
 	  name, int_type_access_complement());
 
   if (domain_type==CONSTRUCTED_DT && operator==OR_OP) {
-    in_between = TRUE;
+    in_between = true;
     fprintf(out,
 	    "#define %s_tag(x) ((x)->_%s_tag__%s)\n",
 	    name, name, int_type_access_complement());
   }
-  else in_between = FALSE;
+  else in_between = false;
 
   if (domain_type==CONSTRUCTED_DT && operator==ARROW_OP)
     fprintf(out, "#define %s_hash_table(x) ((x)->_%s_holder_)\n",
@@ -750,7 +750,7 @@ generate_domain(
             "  check_%s(v);\n"
             "  message_assert(\"defined references to domain %s\",\n"
             "                 %s_defined_p(r) && %s_defined_p(v));\n"
-            "  (void*) memcpy(r, v, sizeof(struct " STRUCT "%s_));\n"
+            "       memcpy(r, v, sizeof(struct " STRUCT "%s_));\n"
             "}\n"
             "void %s_non_recursive_free(%s p) {\n"
             "  // should clear up contents...\n"
