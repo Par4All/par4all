@@ -467,7 +467,7 @@ transformer precondition_intra_to_inter(entity callee,
   }
 
   /* build a list of values to suppress*/
-  if(TRUE || fortran_language_module_p(callee)) {
+  if(true || fortran_language_module_p(callee)) {
   /* get rid of variables that are not referenced, directly or indirectly,
      by the callee; translate what you can */
   pips_debug(9, "Module effect list:");
@@ -558,7 +558,7 @@ transformer precondition_intra_to_inter(entity callee,
 
   }
   }
-  else if(FALSE && c_language_module_p(callee)) {
+  else if(false && c_language_module_p(callee)) {
     /* Get rid of variables local to the caller */
     ;
   }
