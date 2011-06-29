@@ -62,7 +62,7 @@
 
 /************************************************ TO CONTRACT PROPER EFFECTS */
 
-static bool contract_p = TRUE;
+static bool contract_p = true;
 
 void set_contracted_rw_effects(bool b)
 {
@@ -80,7 +80,7 @@ bool summary_rw_effects_engine(string module_name)
 
     set_current_module_entity(module_name_to_entity(module_name));
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, module_name, true) );
     module_stat = get_current_module_statement();
     make_effects_private_current_context_stack();
 
@@ -122,8 +122,8 @@ bool summary_rw_effects_engine(string module_name)
       }
 
     /* Different effects may have been reduced to the same one */
-    /* FI: I'm not to sure the parameter TRUE is generic */
-    l_glob = proper_effects_combine(l_glob, TRUE);
+    /* FI: I'm not to sure the parameter true is generic */
+    l_glob = proper_effects_combine(l_glob, true);
 
     ifdebug(2){
 	pips_debug(2, "local regions, after translation to global scope:\n");
@@ -151,7 +151,7 @@ bool summary_rw_effects_engine(string module_name)
     debug_off();
     (*effects_computation_reset_func)(module_name);
 
-    return(TRUE);
+    return(true);
 }
 
 /*********************************************** INTRAPROCEDURAL COMPUTATION */
@@ -898,7 +898,7 @@ static bool rw_effects_stmt_filter(statement s)
     }
     effects_private_current_stmt_push(s);
     effects_private_current_context_push((*load_context_func)(s));
-    return(TRUE);
+    return(true);
 }
 
 static void rw_effects_of_statement(statement s)
@@ -939,7 +939,7 @@ bool rw_effects_engine(char * module_name)
 {
     /* Get the code of the module. */
     set_current_module_statement( (statement)
-		      db_get_memory_resource(DBR_CODE, module_name, TRUE));
+		      db_get_memory_resource(DBR_CODE, module_name, true));
 
     set_current_module_entity(module_name_to_entity(module_name));
 
@@ -954,7 +954,7 @@ bool rw_effects_engine(char * module_name)
 
    if (get_pointer_info_kind() == with_points_to)
       set_pt_to_list( (statement_points_to)
-			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE) );
+			   db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true) );
     else if (get_pointer_info_kind() == with_pointer_values)
       set_pv( db_get_simple_pv(module_name));
 
@@ -985,7 +985,7 @@ bool rw_effects_engine(char * module_name)
 
     (*effects_computation_reset_func)(module_name);
 
-    return(TRUE);
+    return(true);
 }
 
 

@@ -16,24 +16,24 @@ static const string OMP_PRAGMA_FOR_HEADER_F = "omp parallel do";
 static const string REDUCTION_KEYWORD = "reduction";
 
 //***********************************************************Local variable
-static bool all_reduction = FALSE;
+static bool all_reduction = false;
 
 
 //***********************************************************Local functions
 
 ///@brief reset the all_reduction flag
 static void reset_all_reduction (void) {
-  all_reduction = TRUE;
+  all_reduction = true;
 #ifdef HAVE_CONFIG_H
     #include "pips_config.h"
 #endif
 }
 
-///@return TRUE if the statement is a reduction
+///@return true if the statement is a reduction
 ///@param stmt, the statement to test for reduction
 static bool statement_is_reduction (statement stmt) {
   // test that we have a reachable statement
-  if (bound_printed_reductions_p (stmt) == FALSE) return FALSE;
+  if (bound_printed_reductions_p (stmt) == false) return false;
   int size = gen_length (reductions_list (load_printed_reductions(stmt)));
   return (size != 0);
 }
@@ -51,9 +51,9 @@ static void compute_all_reduction (statement stmt) {
 static bool reductions_on_scalar (reductions reds) {
   FOREACH (REDUCTION, red, reductions_list(reds)) {
     reference ref = reduction_reference (red);
-    if (reference_indices (ref) != NIL) return FALSE;
+    if (reference_indices (ref) != NIL) return false;
   }
-  return TRUE;
+  return true;
 }
 
 //******************************************************PRAGMA AS EXPRESSIONS
@@ -85,12 +85,12 @@ static entity omp_operator_entity (reduction_operator o) {
     result = CreateIntrinsic(MAX_OPERATOR_NAME);
     break;
   case is_reduction_operator_and:
-    result = (prettyprint_language_is_fortran_p () == TRUE ?
+    result = (prettyprint_language_is_fortran_p () == true ?
 	      CreateIntrinsic(AND_OPERATOR_NAME) :
 	      CreateIntrinsic(C_AND_OPERATOR_NAME));
     break;
   case is_reduction_operator_or:
-    result = (prettyprint_language_is_fortran_p () == TRUE ?
+    result = (prettyprint_language_is_fortran_p () == true ?
 	      CreateIntrinsic(OR_OPERATOR_NAME) :
 	      CreateIntrinsic(C_OR_OPERATOR_NAME));
     break;
@@ -104,11 +104,11 @@ static entity omp_operator_entity (reduction_operator o) {
     result = CreateIntrinsic(BITWISE_AND_OPERATOR_NAME);
     break;
   case is_reduction_operator_eqv:
-    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == true);
     result = CreateIntrinsic(EQUIV_OPERATOR_NAME);
     break;
   case is_reduction_operator_neqv:
-    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == true);
     result = CreateIntrinsic(NON_EQUIV_OPERATOR_NAME);
     break;
   default:
@@ -179,10 +179,10 @@ static string omp_operator_str (reduction_operator o) {
     result = "MAX";
     break;
   case is_reduction_operator_and:
-    result = (prettyprint_language_is_fortran_p () == TRUE) ? ".AND." : "&&";
+    result = (prettyprint_language_is_fortran_p () == true) ? ".AND." : "&&";
     break;
   case is_reduction_operator_or:
-    result = (prettyprint_language_is_fortran_p () == TRUE) ? ".OR." :"||";
+    result = (prettyprint_language_is_fortran_p () == true) ? ".OR." :"||";
     break;
   case is_reduction_operator_bitwise_or:
     result = "|";
@@ -194,11 +194,11 @@ static string omp_operator_str (reduction_operator o) {
     result = "&";
     break;
   case is_reduction_operator_eqv:
-    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == true);
     result = ".EQV.";
     break;
   case is_reduction_operator_neqv:
-    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == TRUE);
+    pips_assert ("not a C reduction operator", prettyprint_language_is_fortran_p () == true);
     result = ".NEQV.";
     break;
   default:
@@ -233,7 +233,7 @@ void reductions_pragma_omp_init (string mod_name) {
   // prepare data structure for reductions
   set_printed_reductions((pstatement_reductions)
 			 db_get_memory_resource(DBR_CUMULATED_REDUCTIONS,
-						mod_name, TRUE));
+						mod_name, true));
 }
 
 ///@brief release what have been initialize before
@@ -249,17 +249,17 @@ void reductions_pragma_omp_end (void) {
 list reductions_get_omp_pragma_expr (loop l, statement stmt) {
   list exprs = NULL;
   // check that reduction as been detected at loop level
-  if  (statement_is_reduction (stmt) == TRUE) {
+  if  (statement_is_reduction (stmt) == true) {
     reductions rs = load_printed_reductions(stmt);
     // check that the reductions are done on scalars and not arrays
-    if (reductions_on_scalar (rs) == TRUE) {
+    if (reductions_on_scalar (rs) == true) {
       // reset the all reduction flag
       reset_all_reduction ();
       // check that all the statements of the loop are reductions otherwise, do
       // not generate omp reduction pragma
       // the test is too restrictive so need to be improved
       gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
-      if (all_reduction == TRUE) {
+      if (all_reduction == true) {
 	reductions rs = load_printed_reductions(stmt);
 	FOREACH (REDUCTION, red, reductions_list(rs)) {
 	  exprs = reduction_as_expr (red);
@@ -277,17 +277,17 @@ list reductions_get_omp_pragma_expr (loop l, statement stmt) {
 string reductions_get_omp_pragma_str (loop l, statement stmt) {
   string str  = string_undefined;
   // check that reduction as been detected at loop level
-  if  (statement_is_reduction (stmt) == TRUE) {
+  if  (statement_is_reduction (stmt) == true) {
     reductions rs = load_printed_reductions(stmt);
     // check that the reductions are done on scalars and not arrays
-    if (reductions_on_scalar (rs) == TRUE) {
+    if (reductions_on_scalar (rs) == true) {
       // reset the all reduction flag
       reset_all_reduction ();
       // check that all the statements of the loop are reductions otherwise, do
       // not generate omp reduction pragma
       // the test is too restrictive so need to be improved
       gen_recurse(l, statement_domain, gen_true, compute_all_reduction);
-      if (all_reduction == TRUE) {
+      if (all_reduction == true) {
 	FOREACH (REDUCTION, red, reductions_list(rs)) {
 	  str = reduction_as_str (red);
 	}

@@ -72,14 +72,14 @@ bool normalizable_and_linear_loop_p(entity index, range l_range)
     normalized nub, nlb;
     expression e_incr = range_increment(l_range);
     normalized n;
-    bool result = TRUE;
+    bool result = true;
 
     /* Is the loop index an integer variable */
     if (! entity_integer_scalar_p(index))
     {
 	pips_user_warning("non integer scalar loop index %s.\n",
 			  entity_local_name(index));
-	result = FALSE;
+	result = false;
     }
     else
     {
@@ -118,7 +118,7 @@ transformer_remove_variable_and_dup(transformer orig_trans, entity ent)
 
 /**************************************** DESCRIPTORS (should not be there) */
 
-static bool descriptor_range_p = FALSE;
+static bool descriptor_range_p = false;
 
 void
 set_descriptor_range_p(bool b)
@@ -208,7 +208,7 @@ load_undefined_transformer(statement s __attribute__ ((__unused__)) )
 bool
 empty_context_test_false(transformer context __attribute__ ((__unused__)) )
 {
-    return FALSE;
+    return false;
 }
 
 void
@@ -246,9 +246,9 @@ cons * fx;
     MAPL(ceffect,
      {entity e =
 	  reference_variable(effect_any_reference(EFFECT(CAR(ceffect))));
-     if(!integer_scalar_entity_p(e)) return FALSE;},
+     if(!integer_scalar_entity_p(e)) return false;},
 	 fx);
-    return TRUE;
+    return true;
 }
 
 /* check that *some* read or write effects are on integer variables
@@ -256,11 +256,11 @@ cons * fx;
  * FI: this is almost always true because of array subscript expressions
  */
 bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
-  bool r_or_w_p = FALSE;
+  bool r_or_w_p = false;
   FOREACH(EFFECT, ef,fx) {
     entity e = reference_variable(effect_any_reference(ef));
 	  if( store_effect_p(ef) && integer_scalar_entity_p(e)) {
-	    r_or_w_p = TRUE;
+	    r_or_w_p = true;
 	    break;
 	  }
   }
@@ -271,7 +271,7 @@ bool some_integer_scalar_read_or_write_effects_p(cons * fx) {
  * is certainly (MUST/EXACT) written by effects "effects" or not
  */
 bool effects_write_entity_p(cons * fx, entity e) {
-  bool write = FALSE;
+  bool write = false;
   FOREACH(EFFECT, ef,fx) {
     entity e_used = reference_variable(effect_any_reference(ef));
 
@@ -279,7 +279,7 @@ bool effects_write_entity_p(cons * fx, entity e) {
      * entities_may_conflict_p()
      */
     if(e == e_used  && store_effect_p(ef) && effect_write_p(ef)) {
-      write = TRUE;
+      write = true;
       break;
     }
   }
@@ -294,14 +294,14 @@ bool effects_write_entity_p(cons * fx, entity e) {
  */
 bool effects_read_or_write_entity_p(cons * fx, entity e)
 {
-  bool read_or_write = FALSE;
+  bool read_or_write = false;
 
   if(entity_variable_p(e)) {
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
       if(store_effect_p(ef) && entities_may_conflict_p(e, e_used)) {
-        read_or_write = TRUE;
+        read_or_write = true;
         break;
       }
     }
@@ -317,14 +317,14 @@ bool effects_read_or_write_entity_p(cons * fx, entity e)
  */
 bool effects_must_read_or_write_entity_p(cons * fx, entity e)
 {
-  bool read_or_write = FALSE;
+  bool read_or_write = false;
 
   if(entity_variable_p(e)) {
     FOREACH(EFFECT, ef, fx) {
       entity e_used = reference_variable(effect_any_reference(ef));
       /* Used to be a simple pointer equality test */
       if(store_effect_p(ef) && entities_must_conflict_p(e, e_used)) {
-        read_or_write = TRUE;
+        read_or_write = true;
         break;
       }
     }
@@ -337,10 +337,10 @@ bool effects_must_read_or_write_entity_p(cons * fx, entity e)
  * may be affected (read or write) by the effect.
  */
 bool effect_may_conflict_with_entity_p( effect eff, entity e) {
-  bool conflict_p = TRUE;
+  bool conflict_p = true;
   entity e_used = reference_variable(effect_any_reference(eff));
   if(!entities_may_conflict_p(e, e_used)) {
-    conflict_p = FALSE;
+    conflict_p = false;
   }
   return conflict_p;
 }
@@ -364,7 +364,7 @@ entity effects_conflict_with_entity(cons * fx,entity e) {
    Of course, abstract location entities do conflict with many
    entities, possibly of different types.
 
-   if concrete_p==TRUE, ignore abstract location entities.
+   if concrete_p==true, ignore abstract location entities.
  */
 list generic_effects_conflict_with_entities(list fx,
 					    entity e,
@@ -385,24 +385,24 @@ list generic_effects_conflict_with_entities(list fx,
 }
 
 list effects_conflict_with_entities(list fx, entity e) {
-  return generic_effects_conflict_with_entities(fx, e, FALSE);
+  return generic_effects_conflict_with_entities(fx, e, false);
 }
 
 list concrete_effects_conflict_with_entities(list fx, entity e)
 {
-  return generic_effects_conflict_with_entities(fx, e, TRUE);
+  return generic_effects_conflict_with_entities(fx, e, true);
 }
 
 /* Return true if a statement has an I/O effect in the effects
    list. */
 bool statement_io_effect_p(statement s)
 {
-   bool io_effect_found = FALSE;
+   bool io_effect_found = false;
    list effects_list = load_proper_rw_effects_list(s);
 
    /* If there is an I/O effects, the following entity should
       exist. If it does not exist, statement_io_effect_p() will return
-      FALSE anyway. */
+      false anyway. */
    entity private_io_entity =
       global_name_to_entity(IO_EFFECTS_PACKAGE_NAME,
 			    IO_EFFECTS_ARRAY_NAME);
@@ -414,7 +414,7 @@ bool statement_io_effect_p(statement s)
              reference_variable(a_reference);
 
           if (a_touched_variable == private_io_entity) {
-             io_effect_found = TRUE;
+             io_effect_found = true;
              break;
           }
        },
@@ -423,13 +423,13 @@ bool statement_io_effect_p(statement s)
    return io_effect_found;
 }
 
-/* Return TRUE if the statement has a write effect on at least one of
+/* Return true if the statement has a write effect on at least one of
    the argument (formal parameter) of the module and if the argument
    passing mode is by reference. Note that the return variable of a
    function is also considered here as a formal parameter. */
 bool statement_has_a_formal_argument_write_effect_p(statement s)
 {
-   bool write_effect_on_a_module_argument_found = FALSE;
+   bool write_effect_on_a_module_argument_found = false;
    entity module = get_current_module_entity();
    list effects_list = load_proper_rw_effects_list(s);
    /* it might be better to check the parameter passing mode itself,
@@ -447,7 +447,7 @@ bool statement_has_a_formal_argument_write_effect_p(statement s)
 	     || (formal_p && fortran_p)
 	     )
 	 ) {
-       write_effect_on_a_module_argument_found = TRUE;
+       write_effect_on_a_module_argument_found = true;
        break;
      }
    }       ;
@@ -545,7 +545,7 @@ void dump_effects(list le)
    persistant_p is true, do not go thru persistant arcs. Else, use all
    references. */
 bool effects_reference_sharing_p(list el, bool persistant_p) {
-  bool sharing_p = FALSE;
+  bool sharing_p = false;
   list srl = NIL; /* store reference list */
   list erl = NIL; /* environment reference list */
   list tdrl = NIL; /* type declaration reference list */
@@ -574,7 +574,7 @@ bool effects_reference_sharing_p(list el, bool persistant_p) {
           fprintf(stderr, "this effect shares its reference with "
             "another effect in list srl\n");
           (*effect_prettyprint_func)(e);
-          sharing_p = TRUE;
+          sharing_p = true;
           break;
         } else {
           srl = CONS(REFERENCE, r, srl);
@@ -584,7 +584,7 @@ bool effects_reference_sharing_p(list el, bool persistant_p) {
           fprintf(stderr, "this effect shares its reference with "
             "another effect in list srl\n");
           (*effect_prettyprint_func)(e);
-          sharing_p = TRUE;
+          sharing_p = true;
           break;
         } else {
           erl = CONS(REFERENCE, r, erl);
@@ -594,7 +594,7 @@ bool effects_reference_sharing_p(list el, bool persistant_p) {
           fprintf(stderr, "this effect shares its reference with "
             "another effect in list srl\n");
           (*effect_prettyprint_func)(e);
-          sharing_p = TRUE;
+          sharing_p = true;
           break;
         } else {
           tdrl = CONS(REFERENCE, r, tdrl);
@@ -1245,7 +1245,7 @@ bool regions_weakly_consistent_p(list rl)
       pips_assert("rsc is weakly consistent", sc_weak_consistent_p(rsc));
     }
   }
-  return TRUE;
+  return true;
 }
 
 bool region_weakly_consistent_p(effect r)
@@ -1258,7 +1258,7 @@ bool region_weakly_consistent_p(effect r)
     pips_assert("rsc is weakly consistent", sc_weak_consistent_p(rsc));
   }
 
-  return TRUE;
+  return true;
 }
 
 /**

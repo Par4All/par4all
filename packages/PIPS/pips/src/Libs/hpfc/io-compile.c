@@ -50,7 +50,7 @@ current_entity_is_used_later_p(statement stat, entity current_entity)
 
     if (get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))
 	/*IN & OUT Regions are not used*/
-	return TRUE;
+	return true;
 
 
 /* get OUT Regions(Effects) list for the io statement */
@@ -70,11 +70,11 @@ current_entity_is_used_later_p(statement stat, entity current_entity)
     MAP(EFFECT, current_effect,
 	{
 	    if (effect_variable(current_effect)==current_entity)
-		return TRUE;
+		return true;
 	},
 	list_out);    
 
-    return FALSE;
+    return false;
 }
 
 /* IN Regions(effects) are used to verify if the entity current_entity is 
@@ -86,7 +86,7 @@ current_entity_is_updated_before_p(statement stat, entity current_entity)
     list list_in; 
 
     if (get_bool_property("HPFC_IGNORE_IN_OUT_REGIONS"))	/* & OUT Regions are not used*/
-	return TRUE;
+	return true;
 
 /* get IN Regions(Effects) list for the io statement */
 /*    list_in = load_statement_in_regions(stat);*/
@@ -105,11 +105,11 @@ current_entity_is_updated_before_p(statement stat, entity current_entity)
     MAP(EFFECT, current_effect,
 	{
 	    if (effect_variable(current_effect)==current_entity)
-		return TRUE;
+		return true;
 	},
 	list_in);
 
-    return FALSE;
+    return false;
 }
 
 static Psysteme 
@@ -254,12 +254,12 @@ remove_variables_if_possible(
 	Variable var = (Variable) e;
 	Value coeff = VALUE_MONE;
 	
-	(void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, FALSE);
+	(void) contrainte_var_min_coeff(sc_egalites(syst), var, &coeff, false);
 	
 	if (value_one_p(coeff))
 	{
 	    Pvecteur v = vect_new(var, VALUE_ONE);
-	    bool exact = TRUE;
+	    bool exact = true;
 	    
 	    pips_debug(7, "removing variable %s\n", 
 		       entity_local_name((entity) var));
@@ -510,7 +510,7 @@ put_variables_in_ordered_lists(
     lrebuild = 
 	simplify_deducable_variables(*psyst,
 				     gen_nreverse(hpfc_order_variables(all,
-								       TRUE)),
+								       true)),
 				     &lscan);
 
     /* return results

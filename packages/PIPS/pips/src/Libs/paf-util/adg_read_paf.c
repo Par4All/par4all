@@ -973,6 +973,6 @@ void finish_new_gd_ins()
 
     /* should be a long int for crt_stmt */
     hash_put(STS, (void *) ((long)crt_stmt),
-	     (void *) make_static_control(TRUE, param_l, new_el, NIL));
+	     (void *) make_static_control(true, param_l, new_el, NIL));
 }
 

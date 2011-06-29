@@ -75,14 +75,14 @@
 #include "effects-convex.h"
 #include "effects-simple.h"
 
-#define IS_EG TRUE
-#define NOT_EG FALSE
+#define IS_EG true
+#define NOT_EG false
 
-#define PHI_FIRST TRUE
-#define NOT_PHI_FIRST FALSE
+#define PHI_FIRST true
+#define NOT_PHI_FIRST false
 
-#define BACKWARD TRUE
-#define FORWARD FALSE
+#define BACKWARD true
+#define FORWARD false
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
@@ -142,7 +142,7 @@ statement s;
     pips_debug(1, "statement %td\n", statement_number(s));
 
     current_stmt = s;
-    return(TRUE);
+    return(true);
 }
 
 
@@ -158,18 +158,18 @@ list out_regions_from_caller_to_callee(entity caller, entity callee)
 
     /* All we need to perform the translation */
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, caller_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, caller_name, true) );
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, true));
     module_to_value_mappings(caller);
     set_precondition_map( (statement_mapping)
-        db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
+        db_get_memory_resource(DBR_PRECONDITIONS, caller_name, true));
 
     set_out_effects( (statement_effects)
-	db_get_memory_resource(DBR_OUT_REGIONS, caller_name, TRUE) );
+	db_get_memory_resource(DBR_OUT_REGIONS, caller_name, true) );
 
     caller_statement = (statement)
-	db_get_memory_resource (DBR_CODE, caller_name, TRUE);
+	db_get_memory_resource (DBR_CODE, caller_name, true);
 
     current_callee = callee;
     gen_multi_recurse(caller_statement,
@@ -245,7 +245,7 @@ transformer context;
 
         /* Get the regions of "func". */
 	func_regions = effects_to_list((effects)
-	    db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, func_name, TRUE));
+	    db_get_memory_resource(DBR_IN_SUMMARY_REGIONS, func_name, true));
 	/* translate them */
 	le = regions_backward_translation(func, real_args, func_regions, context,
 					  SUMMARY);
@@ -282,7 +282,7 @@ list regions_of_external(entity func,list real_args,transformer context,
 
         /* Get the regions of "func". */
 	func_regions = effects_to_list((effects)
-	    db_get_memory_resource(DBR_SUMMARY_REGIONS, func_name, TRUE));
+	    db_get_memory_resource(DBR_SUMMARY_REGIONS, func_name, true));
 	/* translate them */
 	le = regions_backward_translation(func, real_args, func_regions, context,
 					  proper);
@@ -296,7 +296,7 @@ convex_regions_backward_translation(entity func, list real_args,
 {
     list l_res = NIL;
 
-    l_res = regions_backward_translation(func, real_args, l_reg, context, TRUE);
+    l_res = regions_backward_translation(func, real_args, l_reg, context, true);
 
     return l_res;
 }
@@ -321,7 +321,7 @@ static list formal_regions_backward_translation(entity func, list real_args,
 						list func_regions,
 						transformer context);
 static list common_regions_backward_translation(entity func, list func_regions);
-static list common_region_translation(entity func, region reg, boolean backward);
+static list common_region_translation(entity func, region reg, bool backward);
 
 /* list regions_backward_tranlation(entity func, list real_args,
  *                                  list func_regions, transformer context)
@@ -1008,7 +1008,7 @@ transformer context;
 	effects_to_list((effects) db_get_memory_resource
 			(DBR_SUMMARY_REGIONS,
 			 module_local_name(func),
-			 TRUE));
+			 true));
 
     /* for each actual parameter expression, we search in the actual regions
      * the corresponding elements. If it exists, we make the corresponding
@@ -1549,7 +1549,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
 
 
 /* static list common_region_translation(entity func, region reg,
- *                                       boolean backward)
+ *                                       bool backward)
  * input    : func is the called function, real_args are the real arguments,
  *            reg is the region to translate (it concerns an array in a common),
  *            and backward indicates the direction of the translation.
@@ -1570,7 +1570,7 @@ list c_convex_effects_on_actual_parameter_forward_translation
  * until all the elements of the initial variable have been translated.
  */
 static list common_region_translation(entity callee, region reg,
-				      boolean backward)
+				      bool backward)
 {
     list new_regions = NIL;
     entity reg_ent = region_entity(reg);
@@ -1582,7 +1582,7 @@ static list common_region_translation(entity callee, region reg,
     list l_tmp, l_com_ent;
     int reg_ent_size, total_size, reg_ent_begin_offset, reg_ent_end_offset;
     region new_reg;
-    boolean found = FALSE;
+    bool found = false;
 
 
     ifdebug(5)
@@ -1632,7 +1632,7 @@ static list common_region_translation(entity callee, region reg,
 	if (strcmp(entity_module_name(com_ent),
 		   module_local_name(target_func)) == 0)
 	{
-	    found = TRUE;
+	    found = true;
 	}
     }
 

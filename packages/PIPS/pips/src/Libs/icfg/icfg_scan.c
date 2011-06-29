@@ -109,8 +109,8 @@ GENERIC_LOCAL_MAPPING(icfg, text, statement)
  */
 
 static bool
-    print_do_loops = FALSE,
-    print_ifs = FALSE;
+    print_do_loops = false,
+    print_ifs = false;
 static text (*decoration)(string) = NULL;
 
 static void append_marged_text(
@@ -141,7 +141,7 @@ static text safe_statement_to_text(statement s)
  */
 static bool statement_flt(statement s)
 {
-  bool res = TRUE;
+  bool res = true;
   text t = make_text (NIL);
 
   pips_debug (5,"going down\n");
@@ -150,7 +150,7 @@ static bool statement_flt(statement s)
   if (get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
     entity e_caller = get_current_module_entity();
     string caller_name = module_local_name(e_caller);
-    statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
+    statement_effects m = (statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, true);
 
     list l_effs = effects_effects(apply_statement_effects(m, s));
     list l_effs_flt;
@@ -200,7 +200,7 @@ static text get_real_call_filtered_proper_effects(call c, entity e_caller)
   text t = make_text(NIL);
 
   string caller_name = module_local_name(e_caller);
-  statement_effects m = (statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, TRUE);
+  statement_effects m = (statement_effects) db_get_memory_resource(DBR_PROPER_EFFECTS, caller_name, true);
 
   list l_effs = effects_effects(apply_statement_effects(m, current_stmt_head()));
   list l_effs_flt;
@@ -314,7 +314,7 @@ static bool loop_flt (loop __attribute__ ((unused)) l)
 {
   pips_debug (5, "Loop begin\n");
   if (print_do_loops) current_margin += icfg_indent;
-  return TRUE;
+  return true;
 }
 
 static void anyloop_rwt(
@@ -410,13 +410,13 @@ static bool instruction_flt (instruction i)
     pips_debug (5, "While begin\n");
     if (print_do_loops) current_margin += icfg_indent;
   }
-  return TRUE;
+  return true;
 }
 
 static void instruction_rwt (instruction i)
 {
   text t = make_text (NIL);
-  bool text_in_unstructured_p = FALSE;
+  bool text_in_unstructured_p = false;
 
   pips_debug (5,"going up\n");
   pips_debug (9,"instruction tag = %d\n", instruction_tag (i));
@@ -440,12 +440,12 @@ static void instruction_rwt (instruction i)
       list blocs = NIL ;
       control ct = unstructured_control(u) ;
       text inside_the_unstructured = make_text(NIL);
-      bool while_p = FALSE;
+      bool while_p = false;
 
       pips_debug (5,"dealing with an unstructured, appending texts\n");
 
       if(unstructured_while_p(u)) {
-	while_p = TRUE;
+	while_p = true;
 	pips_debug (5,"dealing with a WHILE\n");
       }
 
@@ -501,7 +501,7 @@ static bool range_flt(range __attribute__ ((unused)) r)
 
     if (statement_loop_p(s) && loop_range(statement_loop(s)) && print_do_loops)
        current_margin -= icfg_indent;
-    return TRUE;
+    return true;
 }
 
 static void range_rwt(range __attribute__ ((unused)) r)
@@ -520,7 +520,7 @@ static void range_rwt(range __attribute__ ((unused)) r)
  */
 static bool is_elsif_test_p(test t) {
 
-  bool elsif_p = FALSE;
+  bool elsif_p = false;
 
   /*
   gen_chunk p1 = gen_get_recurse_ancestor((void *)t);
@@ -562,7 +562,7 @@ static bool is_elsif_test_p(test t) {
  */
 static bool has_elsif_test_p(test t) {
 
-  bool has_elsif_p = FALSE;
+  bool has_elsif_p = false;
 
   pips_debug (3, ">>>has_elsif_test_p begins for test=%p\n", t);
 
@@ -580,7 +580,7 @@ static bool has_elsif_test_p(test t) {
 
 static bool test_flt (test t)
 {
-  bool is_elsif_p = FALSE;
+  bool is_elsif_p = false;
 
   pips_debug (3, ">>>Test_flt begins for test=%p\n", t);
 
@@ -596,7 +596,7 @@ static bool test_flt (test t)
   }
   pips_debug (3, ">>>Test_flt ends for test=%p\n", t);
 
-  return TRUE;
+  return true;
 }
 
 static void test_rwt (test l)
@@ -607,8 +607,8 @@ static void test_rwt (test l)
   text t = make_text (NIL);
   bool something_to_print;
 
-  bool is_elsif_p  = FALSE;
-  bool has_elsif_p = FALSE;
+  bool is_elsif_p  = false;
+  bool has_elsif_p = false;
   int  offset;
   int  else_margin  = current_margin;
 
@@ -692,7 +692,7 @@ static void test_rwt (test l)
 void print_module_icfg(entity module)
 {
   string module_name = module_local_name(module);
-  statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,TRUE);
+  statement s =(statement)db_get_memory_resource(DBR_CODE,module_name,true);
   text txt = make_text(NIL);
   append_marged_text(txt, 0, module_name, "");
   current_vertex = make_vertex((vertex_label)txt, NIL);
@@ -724,11 +724,11 @@ void print_module_icfg(entity module)
 
   if (get_int_property(ICFG_DECOR) == ICFG_DECOR_FILTERED_PROPER_EFFECTS) {
     if (vertex_successors(current_vertex) == NIL) {
-      bool found = FALSE;
+      bool found = false;
       MAP(SENTENCE, sen, {
 	  string one_line = sentence_to_string(sen);
 	  if (strstr(one_line, CALL_MARK) == NULL) {
-	    found = TRUE;
+	    found = true;
 	    break;
 	  }
 	}, text_sentences(load_statement_icfg(s)));
@@ -752,11 +752,11 @@ void print_module_icfg(entity module)
 				   get_bool_property(ICFG_IFs) ? ".icfgc" :
 				   (get_bool_property(ICFG_DOs) ? ".icfgl" :
 				    ".icfg"),
-				   current_vertex, verlist, TRUE);
+				   current_vertex, verlist, true);
 
   if (get_bool_property(ICFG_DV))
     make_resource_from_starting_node(module_name, DBR_DVICFG_FILE, ".dvicfg",
-				     current_vertex, verlist, FALSE);
+				     current_vertex, verlist, false);
 
   free_icfg_map();
   free_current_stmt_stack();

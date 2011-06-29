@@ -37,10 +37,10 @@ bool loop_reductions(string module)
     debug_on("REDUCTIONS_DEBUG_LEVEL");
     pips_debug(1, "considering module %s\n", module);
 
-    pips_assert ("not implemented yet\n", FALSE);
+    pips_assert ("not implemented yet\n", false);
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* end of it

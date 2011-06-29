@@ -146,7 +146,7 @@ static statement tuned_loop_parallelize(statement s, __attribute__((unused)) int
 
 	/* the outer loop is tagged as parallel, the inner loop is sequential */
 	execution_tag(loop_execution(l)) = is_execution_parallel;
-	parallel_loop_has_been_selected = TRUE;
+	parallel_loop_has_been_selected = true;
     }
 
     debug(9, "tuned_loop_parallelize", "end\n");
@@ -220,11 +220,11 @@ static statement tuned_loop_strip_mine(statement s)
 
 static bool always_select_p(__attribute__((unused)) statement s)
 {
-    return TRUE;
+    return true;
 }
 static bool carried_dependence_p(__attribute__((unused))statement s)
 {
-    return FALSE;
+    return false;
 }
 
 static Pvecteur estimate_range_count(range r)
@@ -545,7 +545,7 @@ static bool constant_array_reference_p(reference r)
     // FI: this should be upgraded to cope with C structures...
     if(!array_reference_p(r)) {
       pips_debug(9, "end: FALSE\n");
-	return FALSE;
+	return false;
     }
 
     /* FI: this is a very approximatw evaluation that assumes no
@@ -556,12 +556,12 @@ static bool constant_array_reference_p(reference r)
 
       if(count!=0) {
 	pips_debug(9, "end: count=%d FALSE\n", count);
-	return FALSE;
+	return false;
       }
     }
 
     pips_debug(9, "end: TRUE\n");
-    return TRUE;
+    return true;
 }
 
 static bool contiguous_array_reference_p(reference r)
@@ -570,7 +570,7 @@ static bool contiguous_array_reference_p(reference r)
   list li = reference_indices(r);
   expression se = expression_undefined; // subscript expression
   normalized nse = normalized_undefined;
-  bool contiguous_p = FALSE;
+  bool contiguous_p = false;
 
   /* The test could be improved by checking that the offset with
      respect to the loop index is constant within the loop nest:
@@ -587,7 +587,7 @@ static bool contiguous_array_reference_p(reference r)
       Pvecteur vse = normalized_linear(nse);
       if(vect_dimension(vse)==1
 	 && vect_coeff((Variable) current_loop_index, vse)==VALUE_ONE)
-	 contiguous_p = TRUE;
+	 contiguous_p = true;
     }
     // This consider 2*i as a contiguous reference... The above check
     //on VALUE_ONE might have to be relaxed
@@ -752,7 +752,7 @@ static statement loop_nest_parallelization(list lls)
     // This kind of stuff can be performed at PyPS level or by PoCC
 
     // Look for the best vector loop
-    if(*(characteristics[DIRECTION_PARALLEL_P]+ln) == TRUE
+    if(*(characteristics[DIRECTION_PARALLEL_P]+ln)
        && performance > optimal_performance) {
       optimal_performance = performance;
       vector_loop_number = ln;
@@ -835,19 +835,19 @@ bool nest_parallelization(string module_name)
 
     /* DBR_CODE will be changed into DBR_PARALLELIZED_CODE */
     set_current_module_statement(
-		(statement) db_get_memory_resource(DBR_CODE, module_name, FALSE) );
+		(statement) db_get_memory_resource(DBR_CODE, module_name, false) );
     mod_stat = get_current_module_statement();
 
     mod_parallel_stat = copy_statement(mod_stat);
 
-    dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+    dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
 
     /* Make sure the dependence graph points towards the code copy */
     set_ordering_to_statement(mod_parallel_stat);
 
     debug_on("NEST_PARALLELIZATION_DEBUG_LEVEL");
 
-    parallel_loop_has_been_selected = FALSE;
+    parallel_loop_has_been_selected = false;
 
     look_for_nested_loop_statements(mod_parallel_stat,
 				    parallelization,
@@ -878,7 +878,7 @@ bool nest_parallelization(string module_name)
     // Already performed befpre the reordering
     //reset_ordering_to_statement();
 
-    return TRUE;
+    return true;
 }
 
 

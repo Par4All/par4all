@@ -138,7 +138,7 @@ bool convex_cell_reference_preceding_p(reference r1, descriptor d1,
 	      if (!transformer_undefined_p(current_precondition))
 		{
 		  Psysteme sc_context = predicate_system(transformer_relation(current_precondition));
-		  region_sc_append(reg1_dup, sc_context, FALSE);
+		  region_sc_append(reg1_dup, sc_context, false);
 		}
 
 	      pips_debug_effect(8, "reg1_dup after adding preconditions: \n ", reg1_dup);

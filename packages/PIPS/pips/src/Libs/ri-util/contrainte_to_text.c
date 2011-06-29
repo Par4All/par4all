@@ -76,7 +76,7 @@ void egalite_debug(Pcontrainte c)
   egalite_fprint(stderr, c, (get_variable_name_t) entity_local_name);
 }
 
-static string the_operator(boolean is_inegalite, boolean a_la_fortran)
+static string the_operator(bool is_inegalite, bool a_la_fortran)
 {
   return is_inegalite? (a_la_fortran? ".LE.": "<="):
     (a_la_fortran? ".EQ.": "==");
@@ -96,8 +96,8 @@ static void
 constante_to_textline(
     string buffer,
     Value constante,
-    boolean is_inegalite,
-    boolean a_la_fortran,
+    bool is_inegalite,
+    bool a_la_fortran,
     string continuation,
     text t)
 {
@@ -141,10 +141,10 @@ contrainte_to_text_1(
     string continuation,
     text txt,
     Pvecteur v,
-    boolean is_inegalite,
+    bool is_inegalite,
     char * (*variable_name)(Variable),
-    boolean a_la_fortran,
-    boolean __attribute__ ((unused)) first_line)
+    bool a_la_fortran,
+    bool __attribute__ ((unused)) first_line)
 {
   short int debut = 1;
   Value constante = VALUE_ZERO;
@@ -192,17 +192,17 @@ contrainte_to_text_2(
     string continuation,
     text txt,
     Pvecteur v,
-    boolean is_inegalite,
+    bool is_inegalite,
     string (*variable_name)(Variable),
-    boolean a_la_fortran,
-    boolean __attribute__ ((unused)) first_line)
+    bool a_la_fortran,
+    bool __attribute__ ((unused)) first_line)
 {
   Pvecteur coord;
   short int debut = true;
   int positive_terms = 0;
   int negative_terms = 0;
   Value const_coeff = 0;
-  boolean const_coeff_p = false;
+  bool const_coeff_p = false;
   string signe;
 
   if(!is_inegalite) {
@@ -298,10 +298,10 @@ contrainte_text_format(
     string continuation,
     text txt,
     Pcontrainte c,
-    boolean is_inegalite,
+    bool is_inegalite,
     string (*variable_name)(Variable),
-    boolean a_la_fortran,
-    boolean first_line)
+    bool a_la_fortran,
+    bool first_line)
 {
   Pvecteur v;
   int heuristique = 2;
@@ -349,8 +349,8 @@ inegalite_text_format(
     text txt,
     Pcontrainte ineg,
     string (*variable_name)(),
-    boolean a_la_fortran,
-    boolean first_line)
+    bool a_la_fortran,
+    bool first_line)
 {
   return contrainte_text_format(aux_line,continuation,txt,ineg, true,
 				variable_name,a_la_fortran,first_line);

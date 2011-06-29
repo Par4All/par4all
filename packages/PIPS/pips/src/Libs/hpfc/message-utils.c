@@ -196,7 +196,7 @@ bool empty_section_p(lr)
 list lr;
 {
     return((ENDP(lr))?
-	   (FALSE):
+	   (false):
 	   (empty_range_p(RANGE(CAR(lr))) || empty_section_p(CDR(lr))));
 }
 
@@ -209,7 +209,7 @@ range r;
      */
     if (! (hpfc_integer_constant_expression_p(range_lower(r), &lo) &&
 	   hpfc_integer_constant_expression_p(range_upper(r), &up)))
-	return FALSE; 
+	return false; 
     else
 	return lo>up;
 }
@@ -219,7 +219,7 @@ string str;
 list l;
 {
     string s = str;
-    bool firstrange = TRUE;
+    bool firstrange = true;
 
     MAP(RANGE, r,
     {
@@ -229,7 +229,7 @@ list l;
 	    s += strlen(s);
 	}
 	else
-	    firstrange = FALSE;
+	    firstrange = false;
 
 	sprint_range(s, r);
 	s += strlen(s);
@@ -352,8 +352,8 @@ bool larger_message_in_list(m, l)
 message m;
 list l;
 {
-    MAP(MESSAGE, mp, if (message_larger_p(mp, m)) return TRUE, l);
-    return(FALSE);
+    MAP(MESSAGE, mp, if (message_larger_p(mp, m)) return true, l);
+    return(false);
 }
 
 /* bool message_larger_p(m1, m2)
@@ -364,11 +364,11 @@ bool message_larger_p(m1, m2)
 message m1, m2;
 {
     if (message_array(m1)!=message_array(m2))
-	return(FALSE);
+	return(false);
 
     if (value_ne(vect_coeff(TCST, (Pvecteur) message_neighbour(m1)),
 		 vect_coeff(TCST, (Pvecteur) message_neighbour(m2))))
-	return(FALSE);
+	return(false);
 
     /*
      * same array and same destination, let's look at the content and domain...
@@ -405,19 +405,19 @@ list lr1, lr2;
 		   expression_equal_p(range_increment(r1), range_increment(r2)));
 	}
 
-	if (in1!=in2) return(FALSE);
+	if (in1!=in2) return(false);
 	
 	/* ??? something more intelligent could be expected */
 	if ((in1!=1) && ((lo1!=lo2) || (up1!=up2))) 
-	    return(FALSE);
+	    return(false);
 
         if ((in1==1) && ((lo1>lo2) || (up1<up2)))
-	    return(FALSE);
+	    return(false);
     }
 
     pips_debug(7, "returning TRUE\n");
 
-    return TRUE;
+    return true;
 }
 
 /****************************************************************** RANGES */
@@ -725,7 +725,7 @@ expression *pguard;
 	 if (rlo>rup) /* empty match case */
 	 {
 	     (*pguard) = entity_to_expression(entity_intrinsic(".FALSE."));
-	     return(TRUE); /* ??? memory leak with the content of conjonction */
+	     return(true); /* ??? memory leak with the content of conjonction */
 	 }
 
 	 if ((rlo==rup) && (sz!=1) && (rlo>=lo) && (rup<=up))
@@ -769,13 +769,13 @@ expression *pguard;
     if (len==0) /* no guard */
     {
 	(*pguard) = expression_undefined;
-	return(FALSE);
+	return(false);
     }
     else
     {
 	(*pguard) = expression_list_to_conjonction(conjonction);
 	gen_free_list(conjonction);
-	return(TRUE);
+	return(true);
     }
 }
 

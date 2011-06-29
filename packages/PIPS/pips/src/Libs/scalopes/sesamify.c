@@ -83,7 +83,7 @@ bool sesamify (char* module_name) {
 								    true));
     set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 								       callee_name,
-								       TRUE));
+								       true));
 
     //reset tables
     hash_table_clear(entity_action);
@@ -251,5 +251,5 @@ bool sesamify (char* module_name) {
   }
 
   debug_off();
-  return TRUE;
+  return true;
 }

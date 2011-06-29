@@ -72,8 +72,8 @@
 #include "effects-convex.h"
 //#include "alias-classes.h"
 
-#define BACKWARD TRUE
-#define FORWARD FALSE
+#define BACKWARD true
+#define FORWARD false
 
 #define min(a,b) (((a)<(b))?(a):(b))
 #define max(a,b) (((a)>(b))?(a):(b))
@@ -283,7 +283,7 @@ static Value offset;
 static int dim_1, dim_2;
 static Value size_elt_1, size_elt_2;
 static dimension dims_1[NB_MAX_ARRAY_DIM], dims_2[NB_MAX_ARRAY_DIM];
-static boolean dim_1_assumed, dim_2_assumed;
+static bool dim_1_assumed, dim_2_assumed;
 
 static bool dims_array_init(entity array, dimension* dims, int dim_array)
 {
@@ -291,7 +291,7 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
     bool dim_assumed;
 
     i = 0;
-    dim_assumed = FALSE;
+    dim_assumed = false;
     FOREACH(DIMENSION, dim, variable_dimensions(type_variable(entity_type(array)))) {
 	if (i == dim_array -1)
 	{
@@ -323,7 +323,7 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
 			make_dimension(dimension_lower(dim),
 				       MakeNullaryCall
 				       (CreateIntrinsic(UNBOUNDED_DIMENSION_NAME)));
-		    dim_assumed = TRUE;
+		    dim_assumed = true;
 		}
 	    }
 	}
@@ -334,11 +334,11 @@ static bool dims_array_init(entity array, dimension* dims, int dim_array)
     return dim_assumed;
 }
 
-#define IS_EG TRUE
-#define NOT_EG FALSE
+#define IS_EG true
+#define NOT_EG false
 
-#define PHI_FIRST TRUE
-#define NOT_PHI_FIRST FALSE
+#define PHI_FIRST true
+#define NOT_PHI_FIRST false
 
 static Psysteme entity_assumed_declaration_sc(dimension* dims, int ndim)
 {
@@ -474,8 +474,8 @@ static bool some_phi_variable(Pcontrainte c)
 {
   for (; c; c=c->succ)
     if (vect_contains_phi_p(c->vecteur))
-      return TRUE;
-  return FALSE;
+      return true;
+  return false;
 }
 
 /* if we have a region like: <A(PHI)-EXACT-{}>
@@ -501,7 +501,7 @@ void append_declaration_sc_if_exact_without_constraints(region r)
       !some_phi_variable(sc_inegalites(s)))
   {
     pips_debug(7, "appending declaration system\n");
-    region_sc_append(r, entity_declaration_sc(region_entity(r)), FALSE);
+    region_sc_append(r, entity_declaration_sc(region_entity(r)), false);
   }
 }
 
@@ -563,8 +563,8 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
     entity ent_1 = region_entity(reg_1);
     region reg_2 = region_undefined;
     Psysteme trans_sc;
-    bool exact_translation_p = TRUE;
-    bool exact_input_p = TRUE;
+    bool exact_translation_p = true;
+    bool exact_input_p = true;
 
     debug_on("REGION_TRANSLATION_DEBUG_LEVEL");
 
@@ -657,7 +657,7 @@ region region_translation(region reg_1, entity func_1, reference rf_1,
 	}
 
 	append_declaration_sc_if_exact_without_constraints(reg_2);
-	region_sc_append(reg_2, trans_sc, FALSE);
+	region_sc_append(reg_2, trans_sc, false);
 
 	/* test to avoid the call to region_remove_beta_variables in most usual
 	 * cases
@@ -803,12 +803,12 @@ void reset_region_interprocedural_translation()
  *
  * get_in_out_regions_properties();
  * set_current_module_statement( (statement)
- * db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+ * db_get_memory_resource(DBR_CODE, module_name, true) );
  * set_cumulated_rw_effects((statement_effects)
- * db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+ * db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
  * module_to_value_mappings(module);
  * set_precondition_map( (statement_mapping)
- *               db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+ *               db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
  *
  * (that's it,
  * but we musn't forget to reset it all again
@@ -977,7 +977,7 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p)
 	 */
 	else if ((!reference_undefined_p(ref_2)) && (i > dim_1))
 	{
-	    boolean use_ref_p = reference_indices(ref_2) != NIL;
+	    bool use_ref_p = reference_indices(ref_2) != NIL;
 
 	    pips_debug(3, "the last equations come from the actual array %s.\n",
 		       use_ref_p ? "reference" : "declaration");
@@ -1002,7 +1002,7 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p)
 		{
 		    pips_debug(4, "%d-th  %s not linear\n", i,
 			       use_ref_p? "index": "lower bound");
-		    *p_exact_translation_p = FALSE;
+		    *p_exact_translation_p = false;
 		    if (statistics_p)
 			remaining_dimension_stat.non_linear_decl_or_offset++;
 		}
@@ -1026,13 +1026,13 @@ static Psysteme array_translation_sc(bool *p_exact_translation_p)
  */
 static void simplify_common_variables(Pcontrainte c)
 {
-  boolean changed;
+  bool changed;
 
   do
   {
     Pvecteur v, vp;
 
-    changed = FALSE;
+    changed = false;
     for (v=c->vecteur; v && !changed; v=v->succ)
     {
       entity var = (entity) var_of(v);
@@ -1044,7 +1044,7 @@ static void simplify_common_variables(Pcontrainte c)
 	  if (varp && entities_may_conflict_p(var, varp))
 	  {
 	    Value val = val_of(vp);
-	    changed = TRUE;
+	    changed = true;
 	    vect_add_elem(& c->vecteur, (Variable) varp, value_uminus(val));
 	    vect_add_elem(& c->vecteur, (Variable) var, val);
 	    break;
@@ -1056,13 +1056,13 @@ static void simplify_common_variables(Pcontrainte c)
   } while (changed);
 }
 
-/* static boolean arrays_same_ith_dimension_p(reference array_1_ref,
+/* static bool arrays_same_ith_dimension_p(reference array_1_ref,
  *                                            entity array_2,
  *                                            int i)
  * input    : an actual array reference as it appears in a call, the
  *            corresponding formal array (entity), and an array dimension.
- * output   : TRUE if the dimension is identical for both array (see below),
- *            FALSE otherwise.
+ * output   : true if the dimension is identical for both array (see below),
+ *            false otherwise.
  * modifies : nothing.
  * comment  :
  *
@@ -1081,9 +1081,9 @@ static void simplify_common_variables(Pcontrainte c)
  *     4- the length of dimension i for both array have the same value.
  *
  */
-static boolean arrays_same_ith_dimension_p(int i)
+static bool arrays_same_ith_dimension_p(int i)
 {
-    bool same_dim = TRUE;
+    bool same_dim = true;
     normalized ndl1 = NORMALIZE_EXPRESSION(dimension_lower(dims_1[i-1]));
     normalized ndu1 = NORMALIZE_EXPRESSION(dimension_upper(dims_1[i-1]));
     normalized ndl2 = NORMALIZE_EXPRESSION(dimension_lower(dims_2[i-1]));
@@ -1120,7 +1120,7 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    }
 	    else
 	    {
-		same_dim = FALSE;
+		same_dim = false;
 		if (statistics_p) common_dimension_stat.non_linear_decl++;
 	    }
 	}
@@ -1170,7 +1170,7 @@ static boolean arrays_same_ith_dimension_p(int i)
 		}
 		else
 		{
-		    same_dim = FALSE;
+		    same_dim = false;
 		    if (statistics_p) common_dimension_stat.not_same_decl++;
 		}
 		vect_rm(v1);
@@ -1178,7 +1178,7 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    }
 	    else
 	    {
-		same_dim = FALSE;
+		same_dim = false;
 		if (statistics_p) common_dimension_stat.non_linear_decl++;
 	    }
 	    pips_debug(6, "offset: %ssame dimension\n", same_dim? "" : "not ");
@@ -1212,7 +1212,7 @@ static boolean arrays_same_ith_dimension_p(int i)
 	    c = contrainte_make(vect_substract(v1,v2));
 
 	    if (CONTRAINTE_NULLE_P(c))
-	      same_dim = TRUE;
+	      same_dim = true;
 	    else {
 
 	      /* if dimensions are declared with common variables,
@@ -1238,7 +1238,7 @@ static boolean arrays_same_ith_dimension_p(int i)
 	}
 	else
 	{
-	    same_dim = FALSE;
+	    same_dim = false;
 	    if (statistics_p) common_dimension_stat.non_linear_decl++;
 	}
 	pips_debug(6, "size: %ssame %d dimension\n", same_dim? "": "not ", i);
@@ -1287,14 +1287,14 @@ static boolean arrays_same_ith_dimension_p(int i)
 static Psysteme arrays_same_first_dimensions_sc(int *p_ind_max)
 {
     int common_dim = min(dim_1, dim_2); /* max number of common dimensions */
-    boolean same_shape_p;
+    bool same_shape_p;
     int i; /* dimension index */
     Psysteme trans_sc = sc_new();
 
     if (statistics_p) common_dimension_stat.nb_calls++;
 
     i = 1;
-    same_shape_p = TRUE;
+    same_shape_p = true;
     while ((i <= common_dim) && same_shape_p)
     {
 	/* Is the current dimension identical for both arrays? */
@@ -1381,7 +1381,7 @@ static Psysteme arrays_same_first_dimensions_sc(int *p_ind_max)
 	    }
 	    else
 	    {
-		same_shape_p = FALSE;
+		same_shape_p = false;
 		if (statistics_p) common_dimension_stat.non_linear_decl++;
 	    }
 	}
@@ -1467,14 +1467,14 @@ reference_last_indices_offset(reference ref, int ind, bool *p_linear_p)
 		pv_ind = vect_product(&pv_ind_plus_1, &vd);
 		if (VECTEUR_UNDEFINED_P(pv_ind))
 		{
-		    *p_linear_p = FALSE;
+		    *p_linear_p = false;
 		    if (statistics_p) linearization_stat.non_linear_system++;
 		}
 
 	    }
 	    else
 	    {
-		*p_linear_p = FALSE;
+		*p_linear_p = false;
 		if (statistics_p) linearization_stat.non_linear_decl++;
 	    }
 
@@ -1489,7 +1489,7 @@ reference_last_indices_offset(reference ref, int ind, bool *p_linear_p)
 
     else
     {
-	*p_linear_p = FALSE;
+	*p_linear_p = false;
         if (statistics_p) linearization_stat.non_linear_decl++;
     }
 
@@ -1546,7 +1546,7 @@ static Pvecteur global_to_last_dims_offset(int dim_min, bool *p_linear_p)
 	}
 	else
 	{
-	  *p_linear_p = FALSE;
+	  *p_linear_p = false;
 	  if (!VECTEUR_UNDEFINED_P(pv_offset))
 	  {
 	    vect_rm(pv_offset);
@@ -1562,7 +1562,7 @@ static Pvecteur last_dims_offset(int dim_min, bool *p_linear_p)
 {
     Pvecteur pv_offset = VECTEUR_NUL;
 
-    *p_linear_p = TRUE;
+    *p_linear_p = true;
 
     if(reference_p)
     {
@@ -1581,7 +1581,7 @@ static Pvecteur last_dims_offset(int dim_min, bool *p_linear_p)
 	 */
 	if (dim_min > dim_1) {
 	  pips_user_warning("tmp hack, fix me please\n!");
-	  *p_linear_p = FALSE;
+	  *p_linear_p = false;
 	  return VECTEUR_NUL;
 	}
 
@@ -1717,19 +1717,19 @@ static Pvecteur array_partial_subscript_value(entity array, dimension *dims,
 
 
 /* static Psysteme arrays_last_dims_linearization_sc( int dim_min,
- *                                                    boolean *p_exact_translation_p)
+ *                                                    bool *p_exact_translation_p)
  * input    : an array reference, an array entity, an integer corresponding to an
  *            array dimension, and a pointer to a boolean.
  * output   : the translation systeme from real_ref (PSI variables) to func_ent
  *            (PHI variables) for the dimensions uper or equal to dim_min; it
  *            is based on the linearization equation, and the formal_real_sc is
- *            added. *exact_translation_p is set to TRUE if the translation is exact,
+ *            added. *exact_translation_p is set to true if the translation is exact,
  *            false otherwise
  * modifies : nothing.
  * comment  : for the moment, only affine linearization equations are handled.
  */
 static Psysteme arrays_last_dims_linearization_sc(int dim_min,
-						  boolean *p_exact_translation_p)
+						  bool *p_exact_translation_p)
 {
     Psysteme trans_sc = sc_new();
     Pvecteur pv_1 = VECTEUR_UNDEFINED, pv_2 = VECTEUR_UNDEFINED;
@@ -1742,7 +1742,7 @@ static Psysteme arrays_last_dims_linearization_sc(int dim_min,
 
     if (statistics_p) linearization_stat.nb_calls++;
 
-    *p_exact_translation_p = TRUE;
+    *p_exact_translation_p = true;
 
     /* subscript_value of first entity */
     if (dim_min <= dim_1)
@@ -1767,7 +1767,7 @@ static Psysteme arrays_last_dims_linearization_sc(int dim_min,
 
 	if (*p_exact_translation_p)
 	{
-	    bool linear_offset_p = TRUE;
+	    bool linear_offset_p = true;
 
 	    pv_offset = last_dims_offset(dim_min, &linear_offset_p);
 
@@ -2179,7 +2179,7 @@ void convex_region_descriptor_translation(effect eff)
 
     @param output_ref is a pointer on the resulting convex reference
     @param output_desc is a pointer on teh resulting descriptor describing output_ref.
-    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+    @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
 
     input_remaining_indices does not need to be a copy of a part of the indices of input_ref, because it is not modified.
     In a first version of this function, it was replaced by a integer giving the rank of the beginning of this list
@@ -2240,21 +2240,21 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		  entity phi_first_non_common = make_phi_entity(nb_common_indices+1);
 		  Pvecteur v1 = vect_new(TCST, VALUE_ONE);
 		  Pvecteur v_phi_first_non_common = vect_new((Variable) phi_first_non_common, VALUE_ONE);
-		  boolean feasible = TRUE;
+		  bool feasible = true;
 		  Pvecteur v = vect_substract(v1, v_phi_first_non_common);
 		  vect_rm(v1);
 		  vect_rm(v_phi_first_non_common);
-		  sc_constraint_add(sc, contrainte_make(v), FALSE);
+		  sc_constraint_add(sc, contrainte_make(v), false);
 
 		  CATCH(overflow_error)
 		  {
 		    pips_debug(3, "overflow error \n");
-		    feasible = TRUE;
+		    feasible = true;
 		  }
 		  TRY
 		    {
 		      feasible = sc_integer_feasibility_ofl_ctrl(sc,
-								 FWD_OFL_CTRL, TRUE);
+								 FWD_OFL_CTRL, true);
 		      UNCATCH(overflow_error);
 		    }
 		  if (feasible)
@@ -2322,7 +2322,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 
 		  /* then we append sc_input to sc_output
 		   */
-		  sc_output = cell_system_sc_append_and_normalize(sc_output, sc_input, TRUE);
+		  sc_output = cell_system_sc_append_and_normalize(sc_output, sc_input, true);
 
 		  ifdebug(8)
 		    {
@@ -2338,7 +2338,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 		  Pvecteur v_rho_max_output = vect_new((Variable) rho_max_output, VALUE_ONE);
 		  v_phi_max_output = vect_substract(v_phi_max_output, v_psi1);
 		  v_phi_max_output = vect_substract(v_phi_max_output, v_rho_max_output);
-		  sc_constraint_add(sc_output, contrainte_make(v_phi_max_output), TRUE);
+		  sc_constraint_add(sc_output, contrainte_make(v_phi_max_output), true);
 
 		  bool exact_removal;
 		  sc_output = cell_reference_system_remove_psi_variables(*output_ref, sc_output, &exact_removal);
@@ -2465,7 +2465,7 @@ void convex_cell_reference_with_address_of_cell_reference_translation
 
     @param output_ref is a pointer on the resulting convex reference
     @param output_desc is a pointer on teh resulting descriptor describing output_ref.
-    @param exact_p is a pointer on a boolean which is set to true if the translation is exact, false otherwise.
+    @param exact_p is a pointer on a bool which is set to true if the translation is exact, false otherwise.
 
     input_remaining_indices does not need to be a copy of a part of the indices of input_ref, because it is not modified.
     In a first version of this function, it was replaced by a integer giving the rank of the beginning of this list

@@ -66,7 +66,7 @@ hash_table gLoopToOuterInd;
 
 // These variable is used to know if we are generating the MMCD code
 // or the HRE code
-bool gGenHRE = FALSE;
+bool gGenHRE = false;
 
 static bool COM_OPT;
 
@@ -112,7 +112,7 @@ static void fill_gLoopToOpt(list lRef)
     {
       MAP(STATEMENT, loopStat,
       {
-	hash_put(gLoopToOpt, loopStat, (void *)FALSE);
+	hash_put(gLoopToOpt, loopStat, (void *)false);
       }, glCurLoop);
     }
 }
@@ -140,7 +140,7 @@ static void fill_gLoopToToggleEnt(statement stat, list lRef)
     pips_assert("inc != HASH_UNDEFINED_VALUE",
 		inc != (intptr_t)HASH_UNDEFINED_VALUE);
 
-    bool bDone = FALSE;
+    bool bDone = false;
 
     // If a toggle variable has already been created for this loop,
     // then continue
@@ -148,7 +148,7 @@ static void fill_gLoopToToggleEnt(statement stat, list lRef)
     {
       if(inc == incDone)
 	{
-	  bDone = TRUE;
+	  bDone = true;
 	  break;
 	}
     }, lDone);
@@ -562,14 +562,14 @@ static statement generate_code_loop(statement stat)
   // Memorize the current newInnerInd in gHtCurNewInd
   hash_put(gHtCurNewInd, stat, newInnerInd);
 
-  hash_put(gLoopToOpt, stat, (void *)TRUE);
+  hash_put(gLoopToOpt, stat, (void *)true);
 
-  gExecPut = FALSE;
+  gExecPut = false;
 
   // Get the new statements for the loop body
-  newBody = generate_code_function(loop_body(curLoop), FALSE);
+  newBody = generate_code_function(loop_body(curLoop), false);
 
-  gExecPut = FALSE;
+  gExecPut = false;
 
   printf("newBody real\n");
   if(newBody == statement_undefined)
@@ -745,7 +745,7 @@ static statement generate_code_loop(statement stat)
       print_statement(newStat);
     }
 
-  hash_put(gIsNewLoop, newStat, (void *)TRUE);
+  hash_put(gIsNewLoop, newStat, (void *)true);
 
   return newStat;
 }
@@ -767,13 +767,13 @@ static void process_ref_lists(statement stat, list * lInRef)
 
   MAP(REFERENCE, curRef,
   {
-    bool bInRef = FALSE;
+    bool bInRef = false;
 
     MAP(REFERENCE, supRef,
     {
       if(reference_equal_p(curRef, supRef))
 	{
-	  bInRef = TRUE;
+	  bInRef = true;
 	  break;
 	}
     }, lRef);
@@ -885,7 +885,7 @@ static statement generate_code_seq(statement stat)
       }
 
     // Let us get the new statement for the current sequence statement
-    statement seqNewStat = generate_code_function(curStat, TRUE);
+    statement seqNewStat = generate_code_function(curStat, true);
 
     if(seqNewStat != statement_undefined)
       {
@@ -1040,7 +1040,7 @@ static statement generate_code_call(statement stat, bool bCalledFromSeq)
     {
       newStat = add_exec_mmcd(newStat);
 
-      gExecPut = TRUE;
+      gExecPut = true;
     }
 
   if(get_bool_property("COMENGINE_CONTROL_IN_HRE") &&
@@ -1068,7 +1068,7 @@ static statement generate_code_call(statement stat, bool bCalledFromSeq)
 					   CONS(STATEMENT, newStat, NIL)));
 	}
 
-      gExecPut = TRUE;
+      gExecPut = true;
     }
 
   list lRef = hash_get(gStatToRef, stat);
@@ -1171,7 +1171,7 @@ statement generate_code_function(statement stat, bool bCalledFromSeq)
       }
     default:
       {
-	pips_assert("FALSE", FALSE);
+	pips_assert("FALSE", false);
 	break;
       }
     }
@@ -1188,8 +1188,8 @@ statement comEngine_generate_code(statement stat)
   statement newStat = statement_undefined;
 
   // Initialize some global variables
-  COM_OPT = TRUE;
-  gExecPut = FALSE;
+  COM_OPT = true;
+  gExecPut = false;
   gLoopToOuterInd = hash_table_make(hash_pointer, 0);
   gHtCurNewInd = hash_table_make(hash_pointer, 0);
   glCurLoop = NIL;
@@ -1199,7 +1199,7 @@ statement comEngine_generate_code(statement stat)
   glToggleInitStats = NIL;
 
   // Do the job
-  newStat = generate_code_function(stat, FALSE);
+  newStat = generate_code_function(stat, false);
 
   if(statement_block_p(stat))
     {

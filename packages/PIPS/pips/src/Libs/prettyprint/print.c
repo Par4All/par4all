@@ -80,7 +80,7 @@ bool make_text_resource(
     write_an_attachment_file(filename);
     free(filename);
 
-    return TRUE;
+    return true;
 }
 
 bool make_text_resource_and_free(
@@ -105,7 +105,7 @@ bool user_view_p()
 /* Generic function to prettyprint some sequential or parallel code, or
    even user view for the given module. */
 bool print_code_or_source(string mod_name) {
-  bool success = FALSE;
+  bool success = false;
   text r = make_text(NIL);
   entity module;
   statement mod_stat;
@@ -171,7 +171,7 @@ bool print_code_or_source(string mod_name) {
   mod_stat = (statement)db_get_memory_resource(is_user_view ? DBR_PARSED_CODE
                                                             : DBR_CODE,
                                                mod_name,
-                                               TRUE);
+                                               true);
 
   set_current_module_statement(mod_stat);
 
@@ -207,7 +207,7 @@ static bool print_parallelized_code_common(
     string mod_name,
     string style)
 {
-    bool success = FALSE;
+    bool success = false;
     text r = make_text(NIL);
     entity module = module_name_to_entity(mod_name);
     statement mod_stat;
@@ -225,7 +225,7 @@ static bool print_parallelized_code_common(
     init_prettyprint(empty_text);
 
     mod_stat = (statement)
-	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
+	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, true);
 
     debug_on("PRETTYPRINT_DEBUG_LEVEL");
     MERGE_TEXTS(r, text_module(module, mod_stat));
@@ -275,13 +275,13 @@ static bool print_parallelized_code_common(
 
 bool print_code(string mod_name)
 {
-  is_user_view = FALSE;
+  is_user_view = false;
   return print_code_or_source(mod_name);
 }
 
 bool print_source(string mod_name)
 {
-  is_user_view = TRUE;
+  is_user_view = true;
   return print_code_or_source(mod_name);
 }
 

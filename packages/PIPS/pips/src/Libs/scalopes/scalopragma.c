@@ -27,9 +27,9 @@ list statement_to_outline;
 static bool pragma_scmp_task_p(pragma p){
   string s =  pragma_to_string(p);
   if(strstr(s,"scmp task")!=NULL)
-    return TRUE;
+    return true;
   else
-    return FALSE;
+    return false;
 }
 
 
@@ -48,11 +48,11 @@ static bool find_pragma(const statement s){
 	
 	else if(!statement_undefined_p(stmt) && statement_block_p(stmt))
 	  statement_to_outline = CONS(STATEMENT, stmt , statement_to_outline);
-	return TRUE;
+	return true;
       }
     }
   }
-  return TRUE;
+  return true;
 }
 
 bool scalopragma (char* module_name) {
@@ -61,7 +61,7 @@ bool scalopragma (char* module_name) {
   statement module_statement = PIPS_PHASE_PRELUDE(module_name,
 						  "SCALOPRAGMA_DEBUG_LEVEL");
   
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
   
   statement_to_outline=NIL;
   
@@ -93,5 +93,5 @@ bool scalopragma (char* module_name) {
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(module_statement);
   
-  return TRUE;
+  return true;
 }

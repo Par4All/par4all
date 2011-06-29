@@ -85,12 +85,12 @@
 
 static bool catch_user_error(bool (*f)(const char *), const char* rname, const char* oname)
 {
-    bool success = FALSE;
+    bool success = false;
 
     CATCH(any_exception_error)
     {
       reset_static_phase_variables();
-      success = FALSE;
+      success = false;
     }
     TRY
     {
@@ -214,7 +214,7 @@ string compilation_unit_of_module(const char* module_name)
   /* The guard may not be sufficient and this may crash in db_get_memory_resource() */
   if(db_resource_p(DBR_USER_FILE, module_name)) {
     string source_file_name =
-      db_get_memory_resource(DBR_USER_FILE, module_name, TRUE);
+      db_get_memory_resource(DBR_USER_FILE, module_name, true);
     string simpler_file_name = pips_basename(source_file_name, PP_C_ED);
 
     /* It is not clear how robust it is going to be when file name conflicts
@@ -266,7 +266,7 @@ static list build_real_resources(const char* oname, list lvr)
 	    GEN_ARRAY_MAP(on,
 	    {
 		if (entity_main_module_p
-		    (local_name_to_top_level_entity(on)) == TRUE)
+		    (local_name_to_top_level_entity(on)) == true)
 		{
 		    if (number_of_main)
 			pips_internal_error("More than one main");
@@ -294,7 +294,7 @@ static list build_real_resources(const char* oname, list lvr)
 	    }
 
 	    called_modules = (callees)
-		db_get_memory_resource(DBR_CALLEES, oname, TRUE);
+		db_get_memory_resource(DBR_CALLEES, oname, true);
 	    lcallees = gen_copy_string_list(callees_callees(called_modules));
 
 	    pips_debug(8, "Callees of %s are:\n", oname);
@@ -323,7 +323,7 @@ static list build_real_resources(const char* oname, list lvr)
 	    }
 
 	    caller_modules = (callees)
-		db_get_memory_resource(DBR_CALLERS, oname, TRUE);
+		db_get_memory_resource(DBR_CALLERS, oname, true);
 	    lcallers = gen_copy_string_list(callees_callees(caller_modules));
 
 	    pips_debug(8, "Callers of %s are:\n", oname);
@@ -475,11 +475,11 @@ static void update_preserved_resources(const char* oname, rule ru)
 static bool apply_a_rule(const char* oname, rule ru)
 {
     static int number_of_applications_of_a_rule = 0;
-    static bool checkpoint_workspace_being_done = FALSE;
+    static bool checkpoint_workspace_being_done = false;
 
     double initial_memory_size = 0.;
     string run = rule_phase(ru), rname, rowner;
-    bool first_time = TRUE, success_p = TRUE,
+    bool first_time = true, success_p = true,
 	 print_timing_p = get_bool_property("LOG_TIMINGS"),
 	 print_memory_usage_p = get_bool_property("LOG_MEMORY_USAGE"),
 	 check_res_use_p = get_bool_property("CHECK_RESOURCE_USAGE");
@@ -500,9 +500,9 @@ static bool apply_a_rule(const char* oname, rule ru)
 	 apply_a_rule !
 	 * maybe it would be better treater in checkpoint_workspace?
       */
-      checkpoint_workspace_being_done = TRUE;
+      checkpoint_workspace_being_done = true;
       checkpoint_workspace();
-      checkpoint_workspace_being_done = FALSE;
+      checkpoint_workspace_being_done = false;
       number_of_applications_of_a_rule = 0;
     }
 
@@ -512,7 +512,7 @@ static bool apply_a_rule(const char* oname, rule ru)
     MAP(REAL_RESOURCE, rr,
     {
 	list lr = build_real_resources(oname, rule_required(ru));
-	bool is_required = FALSE;
+	bool is_required = false;
 	rname = real_resource_resource_name(rr);
 	rowner = real_resource_owner_name(rr);
 
@@ -521,7 +521,7 @@ static bool apply_a_rule(const char* oname, rule ru)
 	    if (same_string_p(rname, real_resource_resource_name(rrr)) &&
 		same_string_p(rowner, real_resource_owner_name(rrr)))
 	    {
-		is_required = TRUE;
+		is_required = true;
 		break;
 	    }
 	},
@@ -530,8 +530,8 @@ static bool apply_a_rule(const char* oname, rule ru)
 	gen_full_free_list(lr);
 
 	user_log("  %-30.60s %8s   %s(%s)\n",
-		 first_time == TRUE ? (first_time = FALSE,run) : "",
-		 is_required == TRUE ? "updating" : "building",
+		 first_time == true ? (first_time = false,run) : "",
+		 is_required == true ? "updating" : "building",
 		 rname, rowner);
     },
 	lrp);
@@ -576,11 +576,11 @@ static bool apply_a_rule(const char* oname, rule ru)
 
     update_preserved_resources(oname, ru);
 
-    if (run_pipsmake_callback() == FALSE)
-	return FALSE;
+    if (run_pipsmake_callback() == false)
+	return false;
 
     if (interrupt_pipsmake_asap_p())
-	return FALSE;
+	return false;
 
     return success_p;
 }
@@ -597,7 +597,7 @@ rule find_rule_by_resource(const char* rname)
 
     /* walking thru rules */
     MAP(RULE, r, {
-	bool resource_required_p = FALSE;
+	bool resource_required_p = false;
 
 	/* walking thru resources required by this rule to eliminate rules
            using and producing this resource, e.g. code transformations
@@ -611,7 +611,7 @@ rule find_rule_by_resource(const char* rname)
 	    if ( owner_callers_p(vro) || owner_callees_p(vro) ) {}
 	    /* Is this resource required ?? */
 	    else if (same_string_p(vrn, rname))
-		resource_required_p = TRUE;
+		resource_required_p = true;
 
 	}, rule_required(r));
 
@@ -682,17 +682,17 @@ static bool apply_without_reseting_up_to_date_resources(
      */
     if ((ru = find_rule_by_phase(pname)) == rule_undefined) {
 	pips_user_warning("could not find rule %s\n", pname);
-	return FALSE;
+	return false;
     }
 
     if (!make_pre_transformation(oname, ru))
-	return FALSE;
+	return false;
 
     if (!make_required(oname, ru))
-	return FALSE;
+	return false;
 
     if(! apply_a_rule(oname, ru))
-        return FALSE;
+        return false;
 
     return make_post_transformation(oname, ru);
 }
@@ -703,7 +703,7 @@ static bool apply_without_reseting_up_to_date_resources(
 static bool make_pre_post_transformation(const char* oname, rule ru, list transformations)
 {
     list reals;
-    bool success_p = TRUE;
+    bool success_p = true;
 
     /* we select some resources */
     FOREACH(VIRTUAL_RESOURCE, vr, transformations)
@@ -717,7 +717,7 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
                     rule_phase(ru), vrn);
 
             if (activate (vrn) == NULL) {
-                success_p = FALSE;
+                success_p = false;
                 break;
             }
         }
@@ -737,7 +737,7 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
                     rule_phase(ru), rrpn, rron);
 
             if (!apply_without_reseting_up_to_date_resources (rrpn, rron))
-                success_p = FALSE;
+                success_p = false;
 
             /* now we must drop the up_to_date cache.
              * maybe not that often? Or one should perform the transforms
@@ -747,7 +747,7 @@ static bool make_pre_post_transformation(const char* oname, rule ru, list transf
             init_make_cache();
         }
     }
-    return TRUE;
+    return true;
 }
 
 static bool make_pre_transformation(const char* oname, rule ru) {
@@ -763,7 +763,7 @@ static bool make_post_transformation(const char* oname, rule ru) {
 
 static bool make(const char* rname, const char* oname)
 {
-    bool success_p = TRUE;
+    bool success_p = true;
 
     debug(1, "make", "%s(%s) - requested\n", rname, oname);
 
@@ -802,7 +802,7 @@ bool rmake(const char* rname, const char* oname)
 	{
 	  pips_debug(5, "resource %s(%s) found up_to_date, time stamp %d\n",
 		     rname, oname, db_time_of_resource(rname, oname));
-	  return TRUE; /* YES, IT IS! */
+	  return true; /* YES, IT IS! */
 	}
 	else
 	{
@@ -828,11 +828,11 @@ bool rmake(const char* rname, const char* oname)
 
     /* we recursively make the pre transformations. */
     if (!make_pre_transformation(oname, ru))
-	return FALSE;
+	return false;
 
     /* we recursively make required resources. */
     if (!make_required(oname, ru))
-	return FALSE;
+	return false;
 
     if (check_resource_up_to_date (rname, oname))
     {
@@ -843,14 +843,14 @@ bool rmake(const char* rname, const char* oname)
     }
     else
     {
-      bool success = FALSE;
+      bool success = false;
       list lr;
 
       /* we build the resource */
       db_set_resource_as_required(rname, oname);
 
       success = apply_a_rule(oname, ru);
-      if (!success) return FALSE;
+      if (!success) return false;
 
       lr = build_real_resources(oname, rule_produced(ru));
 
@@ -881,15 +881,15 @@ bool rmake(const char* rname, const char* oname)
 
     /* we recursively make the post transformations. */
     if (!make_post_transformation(oname, ru))
-	return FALSE;
+	return false;
 
-    return TRUE;
+    return true;
 }
 
 
 static bool apply(const char* pname, const char* oname)
 {
-    bool success_p = TRUE;
+    bool success_p = true;
 
     pips_debug(1, "%s.%s - requested\n", oname, pname);
 
@@ -911,7 +911,7 @@ static bool concurrent_apply(
     const char* pname,       /* phase to be applied */
     gen_array_t modules /* modules that must be computed */)
 {
-    bool okay = TRUE;
+    bool okay = true;
     rule ru = find_rule_by_phase(pname);
 
     init_make_cache();
@@ -920,7 +920,7 @@ static bool concurrent_apply(
 
     GEN_ARRAY_MAP(oname,
 		  if (!make_pre_transformation(oname, ru)) {
-		    okay = FALSE;
+		    okay = false;
 		    break;
 		  },
 		  modules);
@@ -928,7 +928,7 @@ static bool concurrent_apply(
     if (okay) {
 	GEN_ARRAY_MAP(oname,
 		      if (!make_required(oname, ru)) {
-			okay = FALSE;
+			okay = false;
 			break;
 		      },
 		      modules);
@@ -937,7 +937,7 @@ static bool concurrent_apply(
     if (okay) {
 	GEN_ARRAY_MAP(oname,
 		      if (!apply_a_rule(oname, ru)) {
-			okay = FALSE;
+			okay = false;
 			break;
 		      },
 		      modules);
@@ -945,7 +945,7 @@ static bool concurrent_apply(
     if(okay) {
     GEN_ARRAY_MAP(oname,
 		  if (!make_post_transformation(oname, ru)) {
-		    okay = FALSE;
+		    okay = false;
 		    break;
 		  },
 		  modules);
@@ -960,7 +960,7 @@ static bool concurrent_apply(
 static bool make_required(const char* oname, rule ru)
 {
     list reals;
-    bool success_p = TRUE;
+    bool success_p = true;
 
     /* we build the list of required real_resources */
     reals = build_real_resources(oname, rule_required(ru));
@@ -975,7 +975,7 @@ static bool make_required(const char* oname, rule ru)
                 rule_phase(ru), rrrn, rron);
 
         if (!rmake(rrrn, rron)) {
-            success_p = FALSE;
+            success_p = false;
             /* Want to free the list ... */
             break;
         }
@@ -998,19 +998,19 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
   list real_required_resources = NIL;
   list real_modified_resources = NIL;
   rule ru = rule_undefined;
-  bool result = TRUE;
+  bool result = true;
   void * res_id = (void *) db_get_resource_id(rname, oname);
 
   /* Maybe is has already been proved true */
   if(set_belong_p(up_to_date_resources, res_id))
-    return TRUE;
+    return true;
 
   /* Initial resources by definition are not associated to a rule.
    * FI: and they always are up-to-date?!? Even if somebody touched the file?
    * You mean you do not propagate modifications performed outside of the workspace?
    */
   if (same_string_p(rname, DBR_USER_FILE))
-    return TRUE;
+    return true;
 
   /* We get the active rule to build this resource */
   ru = safe_find_rule_by_resource(rname);
@@ -1033,7 +1033,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
     string rron = real_resource_owner_name(rr);
     string rrrn = real_resource_resource_name(rr);
 
-    bool res_in_modified_list_p = FALSE;
+    bool res_in_modified_list_p = false;
 
     /* we build the list of modified real_resources */
 
@@ -1044,7 +1044,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
       if ((same_string_p(mod_rron, rron)) &&
 	  (same_string_p(mod_rrrn, rrrn))) {
 	/* we found it */
-	res_in_modified_list_p = TRUE;
+	res_in_modified_list_p = true;
 	pips_debug(3, "resource %s(%s) is in the rule_modified list",
 		   rrrn, rron);
 	break;
@@ -1053,19 +1053,19 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 
     /* If the resource is in the modified list, then
        don't check anything */
-    if (res_in_modified_list_p == FALSE) {
+    if (res_in_modified_list_p == false) {
 	if (!db_resource_p(rrrn, rron)) {
 	  pips_debug(5, "resource %s(%s) is not there "
 		     "and not in the rule_modified list", rrrn, rron);
-	  result = FALSE;
+	  result = false;
 	  break;
 	} else {
 	  /* Check if this resource is up to date */
 	  long rest;
 	  long respt;
-	  if (check_resource_up_to_date(rrrn, rron) == FALSE) {
+	  if (check_resource_up_to_date(rrrn, rron) == false) {
 	    pips_debug(5, "resource %s(%s) is not up to date", rrrn, rron);
-	    result = FALSE;
+	    result = false;
 	    break;
 	  }
 	  rest = db_time_of_resource(rname, oname);
@@ -1076,7 +1076,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	      pips_debug(5, "resource %s(%s) with time stamp %ld is newer "
 			 "than resource %s(%s) with time stamp %ld\n",
 			 rrrn, rron, respt, rname, oname, rest);
-	      result = FALSE;
+	      result = false;
 	      break;
 	    }
 	}
@@ -1090,10 +1090,10 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
      siblings, if they are produced by the same rule. Think of callgraph
      with may produce literaly thousands of resources, three times the
      number of modules! */
-  if (result == TRUE)
+  if (result == true)
     {
       list real_produced_resources =  build_real_resources(oname, rule_produced(ru));
-      bool res_found_p = FALSE;
+      bool res_found_p = false;
 
       pips_debug(5, "resource %s(%s) added to up_to_date "
 		 "with time stamp %d\n",
@@ -1134,7 +1134,7 @@ static bool check_physical_resource_up_to_date(const char* rname, const char* on
 	  }
 	}
 	else {
-	  res_found_p = TRUE;
+	  res_found_p = true;
 	}
       }, real_produced_resources);
 
@@ -1198,7 +1198,7 @@ void delete_some_resources(void)
 bool check_resource_up_to_date(const char* rname, const char* oname)
 {
     return db_resource_p(rname, oname)?
-	check_physical_resource_up_to_date(rname, oname): FALSE;
+	check_physical_resource_up_to_date(rname, oname): false;
 }
 
 /* Delete from up_to_date all the resources of a given name */
@@ -1377,14 +1377,14 @@ static bool safe_do_something(
     rule (*find_rule)(const char*),
     bool (*doit)(const char*,const char*))
 {
-    bool success = FALSE;
+    bool success = false;
 
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
     if (find_rule(name) == rule_undefined)
     {
 	pips_user_warning("Unknown %s \"%s\"\n", what_it_is, name);
-	success = FALSE;
+	success = false;
 	debug_off();
 	return success;
     }
@@ -1399,7 +1399,7 @@ static bool safe_do_something(
 			  "build %s %s for module %s.\n",
 			  what_it_is, name, module_n);
 	db_clean_all_required_resources();
-	success = FALSE;
+	success = false;
     }
     TRY
     {
@@ -1446,7 +1446,7 @@ bool safe_concurrent_apply(
     const char* phase_n,
     gen_array_t modules)
 {
-    bool ok = TRUE;
+    bool ok = true;
     debug_on("PIPSMAKE_DEBUG_LEVEL");
 
     /* Get a human being representation of the modules: */
@@ -1455,7 +1455,7 @@ bool safe_concurrent_apply(
     if (find_rule_by_phase(phase_n)==rule_undefined)
     {
 	pips_user_warning("Unknown phase \"%s\"\n", phase_n);
-	ok = FALSE;
+	ok = false;
     }
     else
     {
@@ -1464,7 +1464,7 @@ bool safe_concurrent_apply(
 	reset_make_cache();
 	retrieve_active_phases();
 	pips_user_warning("Request aborted in pipsmake\n");
-	ok = FALSE;
+	ok = false;
       }
       TRY
       {
@@ -1505,5 +1505,5 @@ bool safe_set_property(const char* propname, const char* value)
     parse_properties_string(line);
     free(line);
     /* parse_properties_string() doesn't return whether it succeeded */
-    return TRUE;
+    return true;
 }

@@ -37,7 +37,6 @@
 #include "ri-util.h"
 #include "constants.h"
 #include "misc.h"
-#include "boolean.h"
 #include "vecteur.h"
 #include "contrainte.h"
 #include "sc.h"
@@ -89,11 +88,11 @@ Psysteme *sc_neg,*sc_pos,sc_test;
 	    if ((higher_rank = search_higher_rank(ineq->vecteur,
 						  index_base))>0) {
 		if (sc_info[rank][1]) {
-		    /* This condition is TRUE if the variable must be kept 
+		    /* This condition is true if the variable must be kept 
 		       like loop index. Then all the constraints are kept in
 		       the system (and not in the system of guards)  */
 		    if (higher_rank<= rank) {
-			/* This condition is TRUE when the constraint constrains 
+			/* This condition is true when the constraint constrains 
 			   directly the variable */
 
 			if (vect_coeff(var,ineq->vecteur) < 0) 
@@ -102,7 +101,7 @@ Psysteme *sc_neg,*sc_pos,sc_test;
 			    insert_ineq_begin_sc(sc_pos[rank],ineq);
 		    }
 		    else {		
-			/* This condition is TRUE when the variable of rank 
+			/* This condition is true when the variable of rank 
 			   "higher_rank" could be eliminated from the 
 			   two constraints ineq and ineq->succ in order 
 			   to obtain a new constraint on the variable "var" */
@@ -188,7 +187,7 @@ void constraint_distribution(
     for (pc1=sc->inegalites; !CONTRAINTE_UNDEFINED_P(pc1); pc1 = pc1->succ) {
 	if ((rank_hr = search_higher_rank(pc1->vecteur,index_base))>0) {
 	    if (sc_info[rank_hr][1]) {
-		/* This condition is TRUE if the variable must be kept like 
+		/* This condition is true if the variable must be kept like 
 		   loop index. All the constraints constraining directly the 
 		   variable of rank "rank_hr" are kept in the system 
 		   bound_systems[rank_hr] */
@@ -212,7 +211,7 @@ void constraint_distribution(
 		    sign2 = value_sign(coeff2);	
 		    if (value_notzero_p(coeff2) && sign1 == -sign2 
 			&& !bound_redund_with_sc_p(sc2,pc1,pc2,var_hr)) {
-			/* this condition is TRUE if the combination of the 
+			/* this condition is true if the combination of the 
 			   two constraints pc1 and pc2 is not redundant for the  
 			   system. Then the two constraints are added to the 
 			   system of the variable of higher rank */

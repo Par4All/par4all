@@ -118,11 +118,11 @@ effects_write_effects(list l_eff)
 /* At least one of the effects in l_eff is a write */
 bool effects_write_at_least_once_p(list l_eff)
 {
-  bool write_once_p = FALSE;
+  bool write_once_p = false;
 
   FOREACH(EFFECT, eff, l_eff) {
     if (effect_write_p(eff)) {
-      write_once_p = TRUE;
+      write_once_p = true;
       break;
     }
   }

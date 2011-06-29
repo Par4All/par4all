@@ -51,7 +51,7 @@ statement stmt;
 {
     vertex rv = vertex_undefined;
     list dg_vertices = graph_vertices(dg);
-    bool not_found = TRUE;
+    bool not_found = true;
 
     for(; (dg_vertices != NIL) && not_found ; dg_vertices = CDR(dg_vertices))
     {
@@ -59,7 +59,7 @@ statement stmt;
 	if( vertex_ordering(v) == statement_ordering(stmt) )
 	{
 	    rv = v;
-	    not_found = FALSE;
+	    not_found = false;
 	}
     }
     return(rv);
@@ -104,7 +104,7 @@ entity e;
 
 
 /*============================================================================*/
-/* static bool entity_dynamic_p(entity e): returns TRUE if "e" is a local
+/* static bool entity_dynamic_p(entity e): returns true if "e" is a local
  * variable, ie an entity with a storage DYNAMIC.
  *
  * Called_functions :
@@ -118,17 +118,17 @@ entity e;
     storage s = entity_storage(e);
 
     if(storage_tag(s) != is_storage_ram)
-	return(FALSE);
+	return(false);
     r = storage_ram(s);
     if(dynamic_area_p(ram_section(r)))
-	return(TRUE);
-    return(FALSE);
+	return(true);
+    return(false);
 }
 
 
 /*============================================================================*/
 /* bool defs_elim_of_assign_call(statement assign_stmt, graph dg): returns
- * TRUE if "assign_stmt" is to be eliminated.
+ * true if "assign_stmt" is to be eliminated.
  * It is eliminated if the lhs of this assignment verifies two conditions :
  *    1. it is a local variable
  *    2. it is not at the source of a def-use dependence, ie true dependence.
@@ -143,7 +143,7 @@ graph dg;
     entity lhs_ent;
     vertex stmt_vertex;
     list succs;
-    bool true_dep_found = FALSE;
+    bool true_dep_found = false;
 
     if(instruction_tag(statement_instruction(assign_stmt)) != is_instruction_call)
 	pips_internal_error("Statement must be a CALL");
@@ -153,7 +153,7 @@ graph dg;
 	pips_internal_error("Call must be an ASSIGN");
 
     pips_debug(5, "begin ASSIGN : %s\n",
-	       words_to_string(words_call(assign_call, 0, TRUE, TRUE, NIL)));
+	       words_to_string(words_call(assign_call, 0, true, true, NIL)));
 
     lhs_exp = EXPRESSION(CAR(call_arguments(assign_call)));
     if(syntax_tag(expression_syntax(lhs_exp)) != is_syntax_reference)
@@ -163,7 +163,7 @@ graph dg;
 
 /* Definitions upon non local (non dynamic) variables are always kept. */
     if(! entity_dynamic_p(lhs_ent) )
-	return(FALSE);
+	return(false);
 
 /* Gets the vertex of the dependence graph that gives all the edges of
  * which the assign statement is the source.
@@ -184,7 +184,7 @@ graph dg;
 	    confs = dg_arc_label_conflicts(dal);
 	    for(; (confs != NIL) && (! true_dep_found) ; confs = CDR(confs))
 		if( true_dependence_with_entity_p(CONFLICT(CAR(confs)), lhs_ent) )
-		    true_dep_found = TRUE;
+		    true_dep_found = true;
 	}
     }
     else
@@ -192,7 +192,7 @@ graph dg;
 		     "Vertex of assign stmt should not be undefined\n");
 
     debug(5, "defs_elim_of_assign_call", "end ASSIGN , true dep : %s\n",
-	  boolean_string(true_dep_found));
+	  bool_to_string(true_dep_found));
 
     return(! true_dep_found);
 }
@@ -200,7 +200,7 @@ graph dg;
 
 
 /*============================================================================*/
-/* bool defs_elim_of_statement(statement s, graph dg): returns TRUE if "s"
+/* bool defs_elim_of_statement(statement s, graph dg): returns true if "s"
  * is to be eliminated.
  * As we eliminate assign statements, only statement with call to the
  * assign function may be eliminated.
@@ -213,7 +213,7 @@ defs_elim_of_statement(s, dg)
 statement s;
 graph dg;
 {
-    bool elim = FALSE;
+    bool elim = false;
     instruction inst = statement_instruction(s);
 
     debug(4, "defs_elim_of_statement", "begin STATEMENT\n");

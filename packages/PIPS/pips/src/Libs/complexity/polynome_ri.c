@@ -39,7 +39,7 @@
  *      return the abbreviated, local name of var
  *
  * bool is_inferior_var(Variable var1, var2)
- *      return TRUE if the complete name of var1
+ *      return true if the complete name of var1
  *      is lexicographically before var2's one.
  *
  * Variable name_to_variable(char *name)
@@ -116,12 +116,12 @@ Variable var;
 bool is_inferior_var(var1, var2)
 Variable var1, var2;
 {
-    bool is_inferior = TRUE;
+    bool is_inferior = true;
     
     if (var1 == TCST)
-	is_inferior = TRUE;
+	is_inferior = true;
     else if(var2 == TCST)
-	is_inferior = FALSE;
+	is_inferior = false;
     else
 	is_inferior = (strcmp(variable_local_name(var1), 
 			     variable_local_name(var2)) <= 0 );

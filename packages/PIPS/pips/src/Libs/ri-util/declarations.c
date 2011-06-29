@@ -209,7 +209,7 @@ static list words_dimension(dimension obj, list pdl)
         pc = CHAIN_SWORD(pc,"");
       else {
         eup = dimension_upper(obj);
-        if ( FALSE && expression_integer_value( eup, &up ) ) {
+        if ( false && expression_integer_value( eup, &up ) ) {
           /*
            * FI: why do you want to change the source code? Because it may no
            * longer be the user source code after partial evaluation
@@ -562,7 +562,7 @@ sentence sentence_variable(entity e, list pdl)
     pc = gen_nconc(pc, words_basic(variable_basic(type_variable(te)), pdl));
     pc = CHAIN_SWORD(pc, " ");
 
-    pc = gen_nconc(pc, words_declaration(e, TRUE, pdl));
+    pc = gen_nconc(pc, words_declaration(e, true, pdl));
 
     return(make_sentence(is_sentence_unformatted,
 			 make_unformatted(NULL, 0, 0, pc)));
@@ -668,7 +668,7 @@ sentence sentence_head(entity e, list pdl)
 static bool
 empty_static_area_p(entity e)
 {
-    if (!static_area_p(e)) return FALSE;
+    if (!static_area_p(e)) return false;
     return ENDP(area_layout(type_area(entity_type(e))));
 }
 
@@ -695,13 +695,13 @@ static sentence sentence_area(entity e, entity module, bool pp_dimensions, list 
 	if (pp_hpfc)
 	    entities = gen_copy_seq(area_layout(type_area(te)));
 	else
-	    entities = common_members_of_module(e, module, TRUE);
+	    entities = common_members_of_module(e, module, true);
 
 	/*  the common is not output if it is empty
 	 */
 	if (!ENDP(entities))
 	{
-	    bool comma = FALSE, is_save = static_area_p(e);
+	    bool comma = false, is_save = static_area_p(e);
 
 	    if (is_save)
 	    {
@@ -721,7 +721,7 @@ static sentence sentence_area(entity e, entity module, bool pp_dimensions, list 
 	    MAP(ENTITY, ee,
 	     {
 		 if (comma) pc = CHAIN_SWORD(pc, space_p? ", " : ",");
-		 else comma = TRUE;
+		 else comma = true;
 		 pc = gen_nconc(pc,
 				words_declaration(ee, !is_save && pp_dimensions, pdl));
 	     },
@@ -1027,7 +1027,7 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
   entity ent1, ent2;
   int offset1, offset2;
   Value size1, size2, offset_end1;
-  boolean first;
+  bool first;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   if (gen_length(l_equiv)<=1) return t_equiv;
@@ -1068,7 +1068,7 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
   offset1 = ram_offset(storage_ram(entity_storage(ent1)));
   size1 = ValueSizeOfArray(ent1);
   l2 = CDR(l_equiv);
-  first = TRUE;
+  first = true;
 
   while(!ENDP(l2))
     {
@@ -1086,7 +1086,7 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
 	{
 	  pips_debug(EQUIV_DEBUG, "easiest case: offsets are the same\n");
 
-	  if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+	  if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = false;
 	  else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
 	  lw = CHAIN_SWORD(lw, " (");
@@ -1140,7 +1140,7 @@ static text text_equivalence_class(list /* of entities */ l_equiv)
 			 "offset=%d, dim_max=%d, size_elt_1=%d\n",
 			 offset, dim_max,size_elt_1);
 
-	      if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = FALSE;
+	      if (first) lw = CHAIN_SWORD(lw, "EQUIVALENCE"), first = false;
 	      else lw = CHAIN_SWORD(lw, space_p? ", " : ",");
 
 	      lw = CHAIN_SWORD(lw, " (");
@@ -1241,7 +1241,7 @@ static text text_equivalences(
 	    /* If this variable is statically aliased */
 	    if (!ENDP(l_shared))
 	      {
-		bool found = FALSE;
+		bool found = false;
 		list found_equiv_class = NIL;
 
 		/* We first look in already found equivalence classes
@@ -1260,7 +1260,7 @@ static text text_equivalences(
 			  {
 			    if (variable_in_list_p(ent, equiv_class))
 			      {
-				found = TRUE;
+				found = true;
 				found_equiv_class = equiv_class;
 				break;
 			      }
@@ -1584,7 +1584,7 @@ static text text_entity_declaration(entity module,
    * allocatable_pass indicate if we want to prettyprint allocatable or non
    * allocatable entity, this is set to true during a second recursive pass.
    */
-  static bool allocatable_pass_p = FALSE;
+  static bool allocatable_pass_p = false;
   list allocatable_list = NULL;
 
   string how_common = get_string_property("PRETTYPRINT_COMMONS");
@@ -1598,7 +1598,7 @@ static text text_entity_declaration(entity module,
   list * pph = NULL;
   text r, t_chars = make_text(NIL), t_area = make_text(NIL);
   string pp_var_dim = get_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS");
-  bool pp_in_type = FALSE, pp_in_common = FALSE;
+  bool pp_in_type = false, pp_in_common = false;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
   /* Declarations cannot be sorted out because Fortran standard impose
    at least an order on parameters. Fortunately here, PARAMETER are
@@ -1628,9 +1628,9 @@ static text text_entity_declaration(entity module,
   /* where to put the dimension information.
    */
   if (same_string_p(pp_var_dim, "type")) {
-    pp_in_type = TRUE, pp_in_common = FALSE;
+    pp_in_type = true, pp_in_common = false;
   } else if (same_string_p(pp_var_dim, "common")) {
-    pp_in_type = FALSE, pp_in_common = TRUE;
+    pp_in_type = false, pp_in_common = true;
   } else {
     pips_internal_error("PRETTYPRINT_VARIABLE_DIMENSIONS=\"%s\""
         " unexpected value\n", pp_var_dim);
@@ -1925,9 +1925,9 @@ static text text_entity_declaration(entity module,
 
   if(!allocatable_pass_p && !ENDP(allocatable_list)) {
     /* We have to do a recursive call to get the allocatable declarations */
-    allocatable_pass_p = TRUE;
+    allocatable_pass_p = true;
     MERGE_TEXTS(r,text_entity_declaration(module,allocatable_list,force_common,pdl));
-    allocatable_pass_p = FALSE;
+    allocatable_pass_p = false;
   }
 
   return r;
@@ -1940,7 +1940,7 @@ text text_declaration(entity module)
   /* Assume Fortran only! */
   list pdl = NIL;
   text t = text_entity_declaration
-      (module, code_declarations(entity_code(module)), FALSE, pdl);
+      (module, code_declarations(entity_code(module)), false, pdl);
   return t;
 }
 
@@ -1955,8 +1955,8 @@ text text_common_declaration(
     text result;
     list pdl = NIL; // Assumed Fortran only
     pips_assert("indeed a common", type_area_p(t));
-    l = CONS(ENTITY, common, common_members_of_module(common, module, FALSE));
-    result = text_entity_declaration(module, l, TRUE, pdl);
+    l = CONS(ENTITY, common, common_members_of_module(common, module, false));
+    result = text_entity_declaration(module, l, true, pdl);
     gen_free_list(l);
     return result;
 }
@@ -2058,9 +2058,9 @@ bool c_brace_expression_p(expression e)
     {
       entity f = call_function(syntax_call(expression_syntax(e)));
       if (ENTITY_BRACE_INTRINSIC_P(f))
-	return TRUE;
+	return true;
     }
-  return FALSE;
+  return false;
 }
 
 
@@ -2068,7 +2068,7 @@ list words_brace_expression(expression exp, list pdl)
 {
   list pc = NIL;
   list args = call_arguments(syntax_call(expression_syntax(exp)));
-  bool first = TRUE;
+  bool first = true;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
 
   pc = CHAIN_SWORD(pc,"{");
@@ -2080,7 +2080,7 @@ list words_brace_expression(expression exp, list pdl)
       pc = gen_nconc(pc,words_brace_expression(e, pdl));
     else
       pc = gen_nconc(pc,words_expression(e, pdl));
-    first = FALSE;
+    first = false;
   },args);
   pc = CHAIN_SWORD(pc,"}");
   return pc;
@@ -2138,10 +2138,10 @@ list generic_c_words_entity(type t, list name, bool is_safe, bool add_dummy_para
 {
 // If this function is still used, NIL should be replaced by the
 // module declaration list
-    return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, TRUE, false, pdl);
+    return generic_c_words_simplified_entity(t, name, is_safe, add_dummy_parameter_name_p, true, false, pdl);
 }
 
-/* Same as above, but the boolean is_first is used to skip a type
+/* Same as above, but the bool is_first is used to skip a type
  * specifier which is useful when several variables or types are
  * defined in a unique statement such as "int i, *pi, ai[10],...;"
  *
@@ -2183,7 +2183,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       type t2 = functional_result(f);
       list lparams = functional_parameters(f);
       list cparam = list_undefined;
-      bool first = TRUE;
+      bool first = true;
       int pnum;
 
       pips_debug(9,"Function type with name = \"%s\" and length %zd\n",
@@ -2234,14 +2234,14 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  pc = gen_nconc(pc,
 			 generic_c_words_simplified_entity(t1,
 							   string_undefined_p(pn)? NIL : CONS(STRING, strdup(pn), NIL),
-	    is_safe, FALSE, TRUE,in_type_declaration, pdl));
+	    is_safe, false, true,in_type_declaration, pdl));
 	  pips_debug(9,"List of parameters \"%s\"\n ",list_to_string(pc));
-	  first = FALSE;
+	  first = false;
 	}
       }
 
       pc = CHAIN_SWORD(pc,")");
-      return generic_c_words_simplified_entity(t2, pc, is_safe, FALSE,
+      return generic_c_words_simplified_entity(t2, pc, is_safe, false,
 					       is_first, in_type_declaration,
 					       pdl);
     }
@@ -2260,7 +2260,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       if (variable_qualifiers(type_variable(t)) != NIL)
 	pc = gen_nconc(pc,words_qualifier(variable_qualifiers(type_variable(t))));
       pc = gen_nconc(pc,name);
-      return generic_c_words_simplified_entity(t1, pc, is_safe, FALSE,
+      return generic_c_words_simplified_entity(t1, pc, is_safe, false,
 					       is_first, in_type_declaration,
 					       pdl);
     }
@@ -2328,7 +2328,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
       pips_debug(8, "Before concatenation, pc=\"\%s\"\n", list_to_string(pc));
       if(pc!=NIL)
 	pc = CHAIN_SWORD(pc, " ");
-      list ret = gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),is_safe, FALSE, is_first, in_type_declaration, pdl));
+      list ret = gen_nconc(pc,generic_c_words_simplified_entity(t1,gen_nconc(tmp,words_dimensions(dims, pdl)),is_safe, false, is_first, in_type_declaration, pdl));
       free_type(t1);
       return ret;
     }
@@ -2460,7 +2460,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
   if(type_enum_p(t))
     {
       list l = type_enum(t);
-      bool first = TRUE;
+      bool first = true;
       string sname = list_to_string(name);
       list cl = list_undefined;
       int cv = 0;
@@ -2492,7 +2492,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
 	  cv = n;
 	}
 	cv++;
-	first = FALSE;
+	first = false;
       };
       pc = CHAIN_SWORD(pc,"}");
       return pc;
@@ -2507,7 +2507,7 @@ list generic_c_words_simplified_entity(type t, list name, bool is_safe, bool add
    declaration again. */
 list c_words_simplified_entity(type t, list name, bool is_first, bool in_type_declaration, list pdl)
 {
-  list pc = generic_c_words_simplified_entity(t, name, FALSE, FALSE, is_first,in_type_declaration, pdl);
+  list pc = generic_c_words_simplified_entity(t, name, false, false, is_first,in_type_declaration, pdl);
 
   ifdebug(8) {
     string s = list_to_string(pc);
@@ -2519,7 +2519,7 @@ list c_words_simplified_entity(type t, list name, bool is_first, bool in_type_de
 
 list c_words_entity(type t, list name, list pdl)
 {
-  list pc = generic_c_words_entity(t, name, FALSE, FALSE, pdl);
+  list pc = generic_c_words_entity(t, name, false, false, pdl);
 
   ifdebug(8) {
     string s = list_to_string(pc);
@@ -2533,7 +2533,7 @@ list safe_c_words_entity(type t, list name)
 {
   /* Ignore the parser declared entities? */
   list pdl = NIL;
-  list l = generic_c_words_entity(t, name, TRUE, FALSE, pdl);
+  list l = generic_c_words_entity(t, name, true, false, pdl);
   return l;
 }
 
@@ -2612,7 +2612,7 @@ static list words_struct(string name1, list pc)
 
 static list words_enum(const char * name1, list l, bool space_p, list pc, list pdl)
 {
-  bool first = TRUE;
+  bool first = true;
   pc = CHAIN_SWORD(pc,"enum ");
   if(strstr(name1,DUMMY_ENUM_PREFIX)==NULL) {
     pc = CHAIN_SWORD(pc,name1);
@@ -2653,7 +2653,7 @@ static list words_enum(const char * name1, list l, bool space_p, list pc, list p
       cv = n;
     }
     cv++;
-    first = FALSE;
+    first = false;
   };
   pc = CHAIN_SWORD(pc,"}");
   return pc;
@@ -2692,7 +2692,7 @@ static list words_variable_or_function(entity module, entity e, bool is_first, l
 	pc = gen_nconc(pc,words_brace_expression(exp, pdl));
       else {
 	/* */
-	pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, TRUE, pdl));
+	pc = gen_nconc(pc,words_subexpression(exp, ASSIGN_OPERATOR_PRECEDENCE, true, pdl));
       }
     }
     else if(value_code_p(val)) {
@@ -2799,7 +2799,7 @@ static list filtered_declaration_list(list del)
     entity e1 = ENTITY(CAR(el));
 
     if(derived_entity_p(e1)) {
-      bool match_p = FALSE;
+      bool match_p = false;
       //type t1 = entity_type(e1);
       entity e2 = ENTITY(CAR(CDR(el)));
       type t2 = entity_type(e2);
@@ -2819,7 +2819,7 @@ static list filtered_declaration_list(list del)
       if(type_variable_p(nt2)) {
 	basic b2 = variable_basic(type_variable(nt2));
 	if(basic_derived_p(b2) && basic_derived(b2)==e1)
-	  match_p = TRUE;
+	  match_p = true;
       }
       if(!match_p)
 	POP(el);
@@ -2871,7 +2871,7 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   //value val1 = entity_initial(e1);
   list pc = NIL;
   bool space_p = get_bool_property("PRETTYPRINT_LISTS_WITH_SPACES");
-  bool skip_first_comma_p = TRUE;
+  bool skip_first_comma_p = true;
 
   /* overwrite the parser declaration list pdl with del */
   //pdl = del;
@@ -2972,14 +2972,14 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   case is_type_void:
   case is_type_unknown:
     {
-      /*pc = words_variable_or_function(module, e1, TRUE, pc,
+      /*pc = words_variable_or_function(module, e1, true, pc,
 	in_type_declaration, pdl);*/
       in_type_declaration=false;
-      pc = words_variable_or_function(module, e1, TRUE, pc,
+      pc = words_variable_or_function(module, e1, true, pc,
 				      in_type_declaration, pdl);
       ADD_SENTENCE_TO_TEXT(r, make_sentence(is_sentence_unformatted,
 					    make_unformatted(NULL,sn,margin,pc)));
-      skip_first_comma_p = FALSE;
+      skip_first_comma_p = false;
       break;
     }
   case is_type_varargs:
@@ -2998,12 +2998,12 @@ text c_text_related_entities(entity module, list del, int margin, int sn, list p
   //print_entities(oel);
   FOREACH(ENTITY, e, oel) {
     if(skip_first_comma_p) {
-      skip_first_comma_p = FALSE;
+      skip_first_comma_p = false;
       pc = gen_nconc(pc,CHAIN_SWORD(NIL, " "));
     }
     else
       pc = gen_nconc(pc,CHAIN_SWORD(NIL,space_p? ", " : ","));
-    pc = words_variable_or_function(module, e, FALSE, pc, in_type_declaration,
+    pc = words_variable_or_function(module, e, false, pc, in_type_declaration,
 				    pdl);
   }
   pc = CHAIN_SWORD(pc,";");
@@ -3081,7 +3081,7 @@ list get_common_members(entity common,
 void print_C_common_layout(FILE * fd, entity c, bool debug_p)
 {
   entity mod = get_current_module_entity();
-  list members = get_common_members(c, mod, FALSE);
+  list members = get_common_members(c, mod, false);
   list equiv_members = NIL;
 
   (void) fprintf(fd, "\nLayout for memory area \"%s\" of size %td: \n",
@@ -3236,12 +3236,12 @@ void fprint_functional(FILE * fd, functional f)
 
 void fprint_environment(FILE *fd, entity m)
 {
-  fprint_any_environment(fd, m, TRUE);
+  fprint_any_environment(fd, m, true);
 }
 
 void fprint_C_environment(FILE *fd, entity m)
 {
-  fprint_any_environment(fd, m, FALSE);
+  fprint_any_environment(fd, m, false);
 }
 
 void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
@@ -3358,9 +3358,9 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
       void print_common_layout(FILE * fd, entity c, bool debug_p);
       if(type_area_p(entity_type(e))) {
 	if(is_fortran)
-	  print_common_layout(fd, e, FALSE);
+	  print_common_layout(fd, e, false);
 	else
-	  print_C_common_layout(fd, e, FALSE);
+	  print_C_common_layout(fd, e, false);
       }
     },
     decls);
@@ -3384,7 +3384,7 @@ void fprint_any_environment(FILE * fd, entity m, bool is_fortran)
 void split_initializations_in_statement(statement s)
 {
 #if 0
-  if (FALSE && statement_block_p(s)) { // based on old declaration representation
+  if (false && statement_block_p(s)) { // based on old declaration representation
     list inits = NIL;
     list decls = statement_declarations(s); // Non-recursive
     instruction old = statement_instruction(s);

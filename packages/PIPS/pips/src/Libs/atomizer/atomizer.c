@@ -106,13 +106,13 @@ char *mod_name;
     /* set_current_module_entity(local_name_to_top_level_entity(mod_name)); */
 
     /* The last argument says if the resource is to be modified or not :
-     * - FALSE : it is not modified
-     * - TRUE  : it is modified
+     * - false : it is not modified
+     * - true  : it is modified
      */
     set_rw_effects((statement_effects)
-		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, FALSE));
+		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, mod_name, false));
 
-    mod_dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    mod_dg = (graph) db_get_memory_resource(DBR_DG, mod_name, true);
 
     MemToTmp = hash_table_make(hash_pointer, MEM_TO_TMP_SIZE);
 
@@ -149,7 +149,7 @@ static  entity build_new_variable(entity module, basic b)
     return ent;
 }
 
-static boolean  indirection_test(reference ref, expression expr)
+static bool  indirection_test(reference ref, expression expr)
 {
     return(!normalized_linear_p(NORMALIZE_EXPRESSION(expr)));
 }
@@ -220,7 +220,7 @@ static statement rm_block_block_statement(statement stat)
  * Called functions:
  *       _ module_body_reorder() : control/control.c
  */
-boolean atomizer(mod_name)
+bool atomizer(mod_name)
 char *mod_name;
 {
     statement mod_stat;
@@ -233,12 +233,12 @@ char *mod_name;
     if(get_debug_level() > 0)
 	user_log("\n\n *** ATOMIZER for %s\n", mod_name);
 
-    mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
 
     
 
     set_current_module_statement(mod_stat);
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,TRUE));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,mod_name,true));
 
     module = local_name_to_top_level_entity(mod_name);
     set_current_module_entity(module);
@@ -293,7 +293,7 @@ char *mod_name;
 
     debug_off();
 
-    return(TRUE);
+    return(true);
 }
 
 
@@ -383,7 +383,7 @@ statement stmt;
 Block *cb;
 {
     instruction inst;
-    bool stmt_with_remote_control_block = FALSE;
+    bool stmt_with_remote_control_block = false;
     control c = control_undefined;
 
     debug(2, "atomizer_of_statement", "begin STATEMENT\n");
@@ -397,7 +397,7 @@ Block *cb;
 	    /* The control in which the created statements are put is not the same
 	     * as the control of "stmt".
 	     */
-	    stmt_with_remote_control_block = TRUE;
+	    stmt_with_remote_control_block = true;
 
 	    /* We get the control in which we'll put our new statements. */
 	    c = find_control_block(control_undefined);
@@ -410,7 +410,7 @@ Block *cb;
 		user_error("atomizer_of_statement", "Block malloc: no memory left");
 	    cb->first = NIL;
 	    cb->last = CONS(STATEMENT, stmt, NIL);
-	    cb->stmt_generated = FALSE;
+	    cb->stmt_generated = false;
 	}
 
     /* Computation of "stmt". */
@@ -498,7 +498,7 @@ instruction i;
 	statement s = STATEMENT(CAR(cb->last));
 
 	/* This current statement has not yet generated another statement. */
-	cb->stmt_generated = FALSE; 
+	cb->stmt_generated = false; 
 
 	/* Translation of the current statement. */
 	atomizer_of_statement(s, cb);
@@ -853,7 +853,7 @@ int mem_var;
 {
     expression ret_exp = expression_undefined;
     syntax sy = expression_syntax(exp);
-    bool IS_NLC_LINEAR = FALSE;
+    bool IS_NLC_LINEAR = false;
 
     debug(5, "atomizer_of_expression", "begin : %s\n",
 	  words_to_string(words_expression(exp, NIL)));
@@ -862,7 +862,7 @@ int mem_var;
      * is considered like a constant, ie not translated.
      */
     if(nlc_linear_expression_p(exp))
-	IS_NLC_LINEAR = TRUE;
+	IS_NLC_LINEAR = true;
 
     switch(syntax_tag(sy))
     {

@@ -214,7 +214,7 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
 {
   entity e = entity_undefined;
   int count = 0;
-  bool found_p = FALSE; // a break could be used instead
+  bool found_p = false; // a break could be used instead
 
   pips_assert("Type t is defined", !type_undefined_p(t));
 
@@ -237,11 +237,11 @@ entity entity_all_module_xxx_locations_typed(string mn, string xxx, type t)
       entity_type(e) = copy_type(t); /* no aliasing */
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
-      found_p = TRUE;
+      found_p = true;
       
     }
     else if(type_equal_p(t, ot))
-      found_p = TRUE;
+      found_p = true;
   }
 
   // FI: the debug message should be improved with full information
@@ -295,7 +295,7 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
 {
   entity e = entity_undefined;
   int count = 0;
-  bool found_p = FALSE; // a break could be used instead
+  bool found_p = false; // a break could be used instead
 
   pips_assert("Type t is defined", !type_undefined_p(t));
 
@@ -318,10 +318,10 @@ entity entity_all_xxx_locations_typed(string xxx, type t)
       entity_type(e) = copy_type(t);
       entity_storage(e) = make_storage_rom();
       entity_initial(e) = make_value_unknown();
-      found_p = TRUE;
+      found_p = true;
     }
     else if(type_equal_p(t, ot))
-      found_p = TRUE;
+      found_p = true;
   }
 
   // FI: the debug message should be improved with full information
@@ -453,13 +453,13 @@ bool entity_all_dynamic_locations_p(entity e)
 
 bool entity_abstract_location_p(entity al)
 {
-  bool abstract_p = FALSE;
+  bool abstract_p = false;
   string mn = entity_module_name(al);
 
   if(strcmp(mn, ANY_MODULE_NAME)==0) {
     /* FI: this may change in the future and may not be a strong
        enough condition */
-    abstract_p = TRUE;
+    abstract_p = true;
   }
   else {
     string ln = entity_local_name(al);
@@ -816,7 +816,7 @@ bool abstract_locations_must_conflict_p(entity al1 __attribute__ ((__unused__)),
       with specific cases*/
 
    //pips_internal_error("abstract_locations_must_conflict_p is a non sense : "
-   //    "it's always FALSE ! avoid use it.");
+   //    "it's always false ! avoid use it.");
 
-   return FALSE;
+   return false;
  }

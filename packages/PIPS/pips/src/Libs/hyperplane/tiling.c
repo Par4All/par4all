@@ -127,7 +127,7 @@ interactive_partitioning_matrix(matrice P, int n)
     int n_read;
     string resp = string_undefined;
     string cn = string_undefined;
-    bool return_status = FALSE;
+    bool return_status = false;
     int row;
     int col;
 
@@ -142,24 +142,24 @@ interactive_partitioning_matrix(matrice P, int n)
 			    n, n, n);
 	if (resp[0] == '\0') {
 	    user_log("Tiling loop transformation has been cancelled.\n");
-	    return_status = FALSE;
+	    return_status = false;
 	}
 	else {    
 	    cn = strtok(resp, " \t");
 
-	    return_status = TRUE;
+	    return_status = true;
 	    for( col = 1; col<=n; col++) {
 		if(cn==NULL) {
 		    user_log("Too few coordinates. "
 			     "Tiling loop transformation has been cancelled.\n");
-		    return_status = FALSE;
+		    return_status = false;
 		    break;
 		}
 		n_read = sscanf(cn," " VALUE_FMT, &ACCESS(P, n, row, col));
 		if(n_read!=1) {
 		    user_log("Too few coordinates. "
 			     "Hyperplane loop transformation has been cancelled.\n");
-		    return_status = FALSE;
+		    return_status = false;
 		    break;
 		}
 		cn = strtok(NULL, " \t");
@@ -169,7 +169,7 @@ interactive_partitioning_matrix(matrice P, int n)
 	if(cn!=NULL) {
 	    user_log("Too many coordinates. "
 		     "Tiling loop transformation has been cancelled.\n");
-	    return_status = FALSE;
+	    return_status = false;
 	}
     }
 
@@ -434,7 +434,7 @@ statement tiling( list lls)
     /* generation of code to scan one tile and update of loop body using pvg */
 
     s_lhyp = code_generation(lls, pvg, initial_basis,
-			     new_basis, sc_tile, FALSE);
+			     new_basis, sc_tile, false);
 
     /* generation of code for scanning all tiles */
 
@@ -463,7 +463,7 @@ statement tiling( list lls)
 bool
 loop_tiling(string module_name)
 {
-    bool return_status = FALSE;
+    bool return_status = false;
 
     return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(statement)))tiling);
     

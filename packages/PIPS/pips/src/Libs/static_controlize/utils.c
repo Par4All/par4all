@@ -271,7 +271,7 @@ list *ell;
 
 /*=================================================================*/
 /* bool splc_positive_relation_p((expression) exp, list *ell) AL 04/93
- * Returns TRUE if exp is an affine form of structural parameters and of
+ * Returns true if exp is an affine form of structural parameters and of
  * loop-counters.
  */
 bool splc_positive_relation_p(exp, ell)
@@ -284,9 +284,9 @@ list *ell;
 
 	pips_debug(7, "exp : %s\n",
 		   words_to_string( words_expression( exp, NIL ) ));
-	if (syntax_tag(s) != is_syntax_call) return( FALSE );
+	if (syntax_tag(s) != is_syntax_call) return( false );
 	c = syntax_call( s );
-	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( FALSE );
+	if (!ENTITY_GREATER_OR_EQUAL_P(call_function( c ))) return( false );
 	args = call_arguments( c );
 	return(splc_linear_expression_p(EXPRESSION(CAR(args)), ell) &&
 	       expression_equal_integer_p( EXPRESSION(CAR(CDR(args))), 0 ) );
@@ -636,7 +636,7 @@ list loops_to_indices(list l)
 
 /*=================================================================*/
 /* bool splc_linear_expression_p((expression) exp) 		AL 04/93
- * Returns TRUE if exp is linear in structural parameters and loop counters.
+ * Returns true if exp is linear in structural parameters and loop counters.
  */
 bool splc_linear_expression_p(expression exp, list *ell)
 {
@@ -647,11 +647,11 @@ bool splc_linear_expression_p(expression exp, list *ell)
 	     words_to_string(words_expression(exp, NIL)));
 
   if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
-    ONLY_SPLC = FALSE;
+    ONLY_SPLC = false;
   else
   {
     vect = (Pvecteur) normalized_linear(expression_normalized(exp));
-    ONLY_SPLC = TRUE;
+    ONLY_SPLC = true;
 
     for(; !VECTEUR_NUL_P(vect) && ONLY_SPLC ; vect = vect->succ)
     {
@@ -660,7 +660,7 @@ bool splc_linear_expression_p(expression exp, list *ell)
       if( ! term_cst(vect) )
 	if(!(ENTITY_SP_P(var) ||
            (gen_find_eq(var,loops_to_indices(*ell)) != chunk_undefined)))
-	  ONLY_SPLC = FALSE;
+	  ONLY_SPLC = false;
     }
   }
   unnormalize_expression(exp);
@@ -671,12 +671,12 @@ bool splc_linear_expression_p(expression exp, list *ell)
 
 /*=================================================================*/
 /* bool splc_linear_expression_list_p((list) l)		AL 04/93
- * Returns TRUE if all expressions exp are structural parameters
+ * Returns true if all expressions exp are structural parameters
  * and loop counters linear functions.
  */
 bool splc_linear_expression_list_p(list l, list * ell)
 {
-	bool		bo = TRUE;
+	bool		bo = true;
 	expression	exp;
 
 	pips_debug( 7, "doing \n");
@@ -689,18 +689,18 @@ bool splc_linear_expression_list_p(list l, list * ell)
 
 /*=================================================================*/
 /* bool splc_linear_access_to_arrays_p((list) l, (list) *ell) AL 04/93
- * Returns TRUE if all expressions exp are structural parameters and loop
+ * Returns true if all expressions exp are structural parameters and loop
  * counters linear functions.
  */
 bool splc_linear_access_to_arrays_p(list l, list * ell)
 {
-	bool		bo, ret_bo = TRUE;
+	bool		bo, ret_bo = true;
 	expression	exp;
 	syntax		s;
 	tag		t;
 
 	pips_debug(7, "doing\n");
-	if (l == NIL) return(TRUE);
+	if (l == NIL) return(true);
 	MAPL( exp_ptr, {
 	  exp = EXPRESSION(CAR( exp_ptr ));
 	  s   = expression_syntax( exp );
@@ -713,7 +713,7 @@ bool splc_linear_access_to_arrays_p(list l, list * ell)
 	    bo =
 	      splc_linear_expression_list_p(reference_indices(syntax_reference(s)),
 					    ell);
-		else bo = FALSE;
+		else bo = false;
 		ret_bo = ret_bo && bo;
 	}, l );
 
@@ -845,7 +845,7 @@ int in_forward_defined(entity ent, list *swfl)
 
 /*=================================================================*/
 /* bool in_forward_defined_p( (entity) ent )			AL 04/93
- * Returns TRUE if ent is in global variable Gscalar_written_forward.
+ * Returns true if ent is in global variable Gscalar_written_forward.
  */
 bool in_forward_defined_p(entity ent, list * swfl)
 {
@@ -917,7 +917,7 @@ entity f;
 
 /*=================================================================*/
 /* bool sp_linear_expression_p( (expression) exp)
- * Returns TRUE if the expression is a linear combinaison of
+ * Returns true if the expression is a linear combinaison of
  * structural parameters.
  */
 bool sp_linear_expression_p(expression exp)
@@ -929,11 +929,11 @@ bool sp_linear_expression_p(expression exp)
 	      words_to_string(words_expression(exp, NIL)));
 
    if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
-        ONLY_SP = FALSE;
+        ONLY_SP = false;
    else
    {
         vect = (Pvecteur) normalized_linear(expression_normalized(exp));
-        ONLY_SP = TRUE;
+        ONLY_SP = true;
 
         for(; !VECTEUR_NUL_P(vect) && ONLY_SP ; vect = vect->succ)
         {
@@ -941,7 +941,7 @@ bool sp_linear_expression_p(expression exp)
 
                 if( ! term_cst(vect) )
                 if( ! (ENTITY_SP_P(var)) )
-                        ONLY_SP = FALSE;
+                        ONLY_SP = false;
         }
    }
    unnormalize_expression(exp);
@@ -952,19 +952,19 @@ bool sp_linear_expression_p(expression exp)
 
 /*=================================================================*/
 /* bool splc_feautrier_expression_p( (expression) exp )
- * Returns TRUE if exp quasi affine form in structural parameters
+ * Returns true if exp quasi affine form in structural parameters
  * and in surrounding loop-counters.
  */
 bool splc_feautrier_expression_p(expression exp, list * ell)
 {
-	bool b = FALSE;
+	bool b = false;
 	syntax s = expression_syntax( exp );
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
 		 words_to_string( words_expression( exp, NIL ) ) ));
 
-	if (splc_linear_expression_p(exp, ell)) return( TRUE );
+	if (splc_linear_expression_p(exp, ell)) return( true );
 	if ( syntax_tag( s ) == is_syntax_call ) {
 		call c;
 		list args;
@@ -986,18 +986,18 @@ bool splc_feautrier_expression_p(expression exp, list * ell)
 
 /*=================================================================*/
 /* bool sp_feautrier_expression_p( (expression) exp)
- * Returns TRUE if exp quasi affine form.
+ * Returns true if exp quasi affine form.
  */
 bool sp_feautrier_expression_p(expression exp)
 {
-	bool b = FALSE;
+	bool b = false;
 	syntax s = expression_syntax( exp );
 
 	pips_debug(7, "exp : %s \n",
 		((exp == expression_undefined)?"expression_undefined":
 		 words_to_string( words_expression( exp, NIL ) ) ));
 
-	if (sp_linear_expression_p( exp )) return( TRUE );
+	if (sp_linear_expression_p( exp )) return( true );
 	if ( syntax_tag( s ) == is_syntax_call ) {
 		call c;
 		list args;
@@ -1043,8 +1043,8 @@ entity sp_feautrier_scalar_assign_call(call c)
 /*=================================================================*/
 /* bool get_sp_of_call_p( (call) c, fst) AL 04/93 Updates the global
  * variables Gstructure_parameters and Gforward_substitute_table according
- * to the type of call.  Returns TRUE if the call has to be modified
- * (redefinition of a structural parameter), FALSE in all the other cases.
+ * to the type of call.  Returns true if the call has to be modified
+ * (redefinition of a structural parameter), false in all the other cases.
  *
  * AP, sep 95 : Gforward_substitute_table is no longer a global variable,
  * we pass it as an argument.
@@ -1055,12 +1055,12 @@ hash_table fst; /* forward substitute table */
 list *swfl;
 {
    entity	lhs_ent, ent;
-   bool		ret_bool = FALSE;
+   bool		ret_bool = false;
 
    pips_debug(7, "begin\n");
-   /*FI: not too sure about the FALSE parameter... */
+   /*FI: not too sure about the false parameter... */
    pips_debug(9, "input call : %s \n",
-	      words_to_string(words_regular_call( c, FALSE, NIL )));
+	      words_to_string(words_regular_call( c, false, NIL )));
    pips_debug(9, "struct param. before : %s \n",
 			print_structurals( Gstructure_parameters ));
 
@@ -1091,14 +1091,14 @@ list *swfl;
 		nsp_exp = make_entity_expression( nsp_ent, NIL );
 		hash_put(fst, (char*) lhs_ent, (char*) nsp_exp  );
 		ADD_ELEMENT_TO_LIST( Gstructure_parameters, ENTITY, nsp_ent );
-		ret_bool = TRUE;
+		ret_bool = true;
 	}
    }
 
    pips_debug(9, "struct param. after  : %s \n",
 			print_structurals( Gstructure_parameters ));
    pips_debug(9, "call has to be modified : %s \n",
-		((ret_bool == TRUE)?"TRUE":"FALSE") );
+		((ret_bool == true)?"TRUE":"FALSE") );
    pips_debug(7, "end\n");
    return( ret_bool );
 }
@@ -1163,7 +1163,7 @@ void forward_substitute_in_call(call * pc, hash_table fst)
 
 
 /* bool normalizable_loop_p(loop l)
- * Returns TRUE if "l" has a constant step.
+ * Returns true if "l" has a constant step.
  */
 bool normalizable_loop_p(loop l)
 {
@@ -1178,7 +1178,7 @@ bool normalizable_loop_p(loop l)
 /* Code to be retrieved: I suppose you need a constant increment? */
 bool normalizable_loop_p_retrieved(loop l)
 {
-  bool ok = FALSE;
+  bool ok = false;
   entity i = loop_index(l);
   range r = loop_range(l);
 

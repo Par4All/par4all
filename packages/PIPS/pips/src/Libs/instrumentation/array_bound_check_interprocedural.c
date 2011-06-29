@@ -144,8 +144,8 @@ static void display_interprocedural_abc_statistics()
 static bool array_test_undefined_p(array_test x)
 {
   if ((x.arr == NIL) && (x.exp == NIL))
-    return TRUE; 
-  return FALSE;
+    return true; 
+  return false;
 }
 
 static array_test 
@@ -223,7 +223,7 @@ static expression size_of_dummy_array(entity dummy_array,int i)
 static expression expression_less_than_in_context(expression e1, expression e2, 
 						  transformer context)
 {
-  /*This function returns a TRUE expression if (e1 < e2) = TRUE
+  /*This function returns a true expression if (e1 < e2) = TRUE
                                  expression undefined if (e1 < e2) = FALSE
 				 a test e1 < e2*/
   normalized n1 = NORMALIZE_EXPRESSION(e1);
@@ -239,7 +239,7 @@ static expression expression_less_than_in_context(expression e1, expression e2,
     }
   if (normalized_linear_p(n1) && normalized_linear_p(n2))
     {
-      /* See if e is TRUE or FALSE if we have already the preconditions ps
+      /* See if e is true or false if we have already the preconditions ps
        * if ps := ps + e 
        * ps = sc_strong_normalize3(ps)
        * if (ps = sc_empty) => not feasible, no bound violation
@@ -279,7 +279,7 @@ static expression expression_less_than_in_context(expression e1, expression e2,
 		    fprintf(stderr, " \n System before add inequality: ");
 		    sc_fprint(stderr,sc,(char * (*)(Variable)) entity_local_name);
 		  }
-		sc_constraint_add(sc, contrainte_make(v), FALSE);
+		sc_constraint_add(sc, contrainte_make(v), false);
 		ifdebug(3) 
 		  {	  
 		    fprintf(stderr, " \n System after add inequality: ");
@@ -569,7 +569,7 @@ static statement make_interprocedural_abc_tests(array_test at)
 	retour = copy_statement(smt);
       else
 	// always structured case
-	insert_statement(retour,copy_statement(smt),FALSE);
+	insert_statement(retour,copy_statement(smt),false);
       la = CDR(la);
       le = CDR(le);
     }
@@ -637,11 +637,11 @@ static void interprocedural_abc_insert_before_statement(statement s, statement s
 	}
       else
 	// there is no unstructured (?)
-	insert_statement(s,s1,TRUE);
+	insert_statement(s,s1,true);
     }
   else
     // structured case 
-    insert_statement(s,s1,TRUE);     
+    insert_statement(s,s1,true);     
 }
 
 
@@ -714,13 +714,13 @@ static bool store_mapping(control c, interprocedural_abc_context_p context)
 {
   extend_persistant_statement_to_control(context->map,
 					 control_statement(c), c);
-  return TRUE;
+  return true;
 }
 
 static bool push_uns(unstructured u, interprocedural_abc_context_p context)
 {
   stack_push((char *) u, context->uns);
-  return TRUE;
+  return true;
 }
 
 static void pop_uns(unstructured u, interprocedural_abc_context_p context)
@@ -748,9 +748,9 @@ bool array_bound_check_interprocedural(char *module_name)
 { 
   statement module_statement;  
   set_current_module_entity(local_name_to_top_level_entity(module_name));
-  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  module_statement= (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,module_name,TRUE));
+		       db_get_memory_resource(DBR_PRECONDITIONS,module_name,true));
   set_ordering_to_statement(module_statement);
   debug_on("ARRAY_BOUND_CHECK_INTERPROCEDURAL_DEBUG_LEVEL");
   ifdebug(1)
@@ -776,7 +776,7 @@ bool array_bound_check_interprocedural(char *module_name)
   reset_ordering_to_statement();
   reset_precondition_map();
   reset_current_module_entity();
-  return TRUE;
+  return true;
 }
 
 

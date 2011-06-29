@@ -107,9 +107,9 @@ bool initial_precondition(string name)
 
     set_current_module_entity(module);
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, name, TRUE));
+	db_get_memory_resource(DBR_CODE, name, true));
     set_cumulated_rw_effects((statement_effects)
-		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, TRUE));
+		   db_get_memory_resource(DBR_CUMULATED_EFFECTS, name, true));
     module_to_value_mappings(module);
 
     prec = all_data_to_precondition(module);
@@ -132,7 +132,7 @@ bool initial_precondition(string name)
     free_value_mappings();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* returns t1 inter= t2;
@@ -170,18 +170,18 @@ bool program_precondition(string name)
     set_current_module_statement( (statement)
 				  db_get_memory_resource(DBR_CODE,
 							 module_local_name(the_main),
-							 TRUE));
+							 true));
     set_cumulated_rw_effects((statement_effects)
 			     db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 						    module_local_name(the_main),
-						    TRUE));
+						    true));
 
     /* e_inter = effects_to_list(get_cumulated_rw_effects(get_current_module_statement())); */
 
     e_inter = effects_to_list( (effects)
 			       db_get_memory_resource(DBR_SUMMARY_EFFECTS,
 						      module_local_name(the_main),
-						      TRUE));
+						      true));
 
     module_to_value_mappings(the_main);
 
@@ -197,9 +197,9 @@ bool program_precondition(string name)
 	string mname = gen_array_item(modules, i);
 	pips_debug(1, "considering module %s\n", mname);
 
-	tm = transformer_dup((transformer) /* no dup & FALSE => core */
+	tm = transformer_dup((transformer) /* no dup & false => core */
 			     db_get_memory_resource(DBR_INITIAL_PRECONDITION,
-						    mname, TRUE));
+						    mname, true));
 
 	pred_debug(3, "current: t =\n", t);
 	pred_debug(2, "to be added: tm =\n", tm);
@@ -233,7 +233,7 @@ bool program_precondition(string name)
     gen_array_full_free(modules);
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* The program correctness postcondition cannot be infered. It should be
@@ -257,7 +257,7 @@ program_postcondition(string name)
   DB_PUT_MEMORY_RESOURCE(DBR_PROGRAM_POSTCONDITION, "", post);
 
   debug_off();
-  return TRUE;
+  return true;
 }
 
 
@@ -269,17 +269,17 @@ print_initial_precondition(string name)
     bool ok;
     entity module = module_name_to_entity(name);
     transformer t = (transformer) 
-	db_get_memory_resource(DBR_INITIAL_PRECONDITION, name, TRUE);
+	db_get_memory_resource(DBR_INITIAL_PRECONDITION, name, true);
     
     debug_on("SEMANTICS_DEBUG_LEVEL");
 
     set_current_module_entity(module);
     set_current_module_statement( (statement) 
-	db_get_memory_resource(DBR_CODE, name, TRUE));
+	db_get_memory_resource(DBR_CODE, name, true));
     set_cumulated_rw_effects((statement_effects) 
 		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 					  name,
-					  TRUE));
+					  true));
     module_to_value_mappings(module);
  
     ok = make_text_resource_and_free(name, DBR_PRINTED_FILE, ".ipred",
@@ -301,7 +301,7 @@ print_program_precondition(string name)
 {
     bool ok;
     transformer t = (transformer) 
-	db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", TRUE);
+	db_get_memory_resource(DBR_PROGRAM_PRECONDITION, "", true);
     entity m = get_main_entity();
     
     debug_on("SEMANTICS_DEBUG_LEVEL");
@@ -311,11 +311,11 @@ print_program_precondition(string name)
     set_current_module_statement( (statement) 
 	db_get_memory_resource(DBR_CODE,
 			       module_local_name(m),
-			       TRUE));
+			       true));
     set_cumulated_rw_effects((statement_effects) 
 		   db_get_memory_resource(DBR_CUMULATED_EFFECTS,
 					  module_local_name(m),
-					  TRUE));
+					  true));
     module_to_value_mappings(m);
  
     ok = make_text_resource_and_free(name, DBR_PRINTED_FILE, ".pipred",

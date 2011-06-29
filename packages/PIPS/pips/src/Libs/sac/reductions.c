@@ -316,11 +316,11 @@ static statement generate_prelude(reductionInfo ri)
             break;
 
         case is_reduction_operator_and:
-            initval = bool_to_expression(TRUE);
+            initval = bool_to_expression(true);
             break;
 
         case is_reduction_operator_or:
-            initval = bool_to_expression(FALSE);
+            initval = bool_to_expression(false);
             break;
     }
 
@@ -812,5 +812,5 @@ bool redundant_load_store_elimination(char * module_name)
     reset_proper_rw_effects();
     reset_cumulated_rw_effects();
 
-    return TRUE;
+    return true;
 }

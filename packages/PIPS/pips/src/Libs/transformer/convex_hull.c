@@ -113,7 +113,7 @@ static transformer transformer_convex_hulls
 	  r2 = sc_equation_add(r2, contrainte_make(eq));
 	  eq_count2++;
 	  if(basic_logical_p(variable_basic(type_variable(entity_type(a))))) {
-	    /* add implicit constraints for boolean variables */
+	    /* add implicit constraints for bool variables */
 	    Pvecteur ineq1 = vect_new((Variable) a_new, VALUE_ONE);
 	    Pvecteur ineq2 = vect_new((Variable) a_new, VALUE_MONE);
 
@@ -136,7 +136,7 @@ static transformer transformer_convex_hulls
 	  r1 = sc_equation_add(r1, contrainte_make(eq));
 	  eq_count1++;
 	  if(basic_logical_p(variable_basic(type_variable(entity_type(a))))) {
-	    /* add implicit constraints for boolean variables */
+	    /* add implicit constraints for bool variables */
 	    Pvecteur ineq1 = vect_new((Variable) a_new, VALUE_ONE);
 	    Pvecteur ineq2 = vect_new((Variable) a_new, VALUE_MONE);
 

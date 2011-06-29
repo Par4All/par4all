@@ -97,7 +97,7 @@ char * f95split( char * dir_name, char * file_name, FILE ** out ) {
   /*  string source_filename =
    strdup( concatenate( dir, "/", db_get_file_resource( DBR_SOURCE_FILE,
    module,
-   TRUE ), NULL ) );
+   true ), NULL ) );
    */
   // "char **argv" for gfc2pips :-)
   char* gfc2pips_args[] = { "gfc2pips", "-Wall",// "-Werror",

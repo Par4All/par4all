@@ -36,7 +36,7 @@ bool safescale_module_analysis(string module_name)
   entity module;  
 
   /* Initialize the resources */
-  module_statement = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  module_statement = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   // module = local_name_to_top_level_entity(module_name);
   module = module_name_to_entity(module_name);  
 
@@ -44,7 +44,7 @@ bool safescale_module_analysis(string module_name)
   set_current_module_entity(module);
   
   /* Get effects of the module */
-  set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+  set_cumulated_rw_effects((statement_effects) db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 
   /* Build hash tables between variables and values and between values and names for the module */
   module_to_value_mappings(module);
@@ -52,9 +52,9 @@ bool safescale_module_analysis(string module_name)
   //debug_on("PHRASE_DISTRIBUTOR_DEBUG_LEVEL");
 
   /* Get regions of the module */
-  set_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
-  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));
-  set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE));
+  set_rw_effects((statement_effects) db_get_memory_resource(DBR_REGIONS, module_name, true));
+  set_in_effects((statement_effects) db_get_memory_resource(DBR_IN_REGIONS, module_name, true));
+  set_out_effects((statement_effects) db_get_memory_resource(DBR_OUT_REGIONS, module_name, true));
 
   /* Do the job */
   //pips_debug(2, "BEGIN of PHRASE_DISTRIBUTOR\n");
@@ -80,5 +80,5 @@ bool safescale_module_analysis(string module_name)
   
   //debug_off();
   
-  return TRUE;
+  return true;
 }

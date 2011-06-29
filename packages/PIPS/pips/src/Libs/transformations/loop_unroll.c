@@ -186,7 +186,7 @@ static void do_loop_unroll_with_epilogue(statement loop_statement,
   //range rg2 = range_undefined;
   execution e = loop_execution(il);
   //intptr_t lbval, ubval, incval;
-  //bool numeric_range_p = FALSE;
+  //bool numeric_range_p = false;
 
   /* Validity of transformation should be checked */
   /* ie.: - no side effects in replicated expressions */
@@ -430,7 +430,7 @@ static void do_loop_unroll_with_prologue(statement loop_statement,
   instruction block, inst;
   range rg;
   intptr_t lbval, ubval, incval;
-  bool numeric_range_p = FALSE;
+  bool numeric_range_p = false;
 
   ifdebug(7) {
     /* Start debug in Newgen */
@@ -470,7 +470,7 @@ static void do_loop_unroll_with_prologue(statement loop_statement,
   if (expression_integer_value(lb, &lbval)
       && expression_integer_value(ub, &ubval)
       && expression_integer_value(inc, &incval)) {
-    numeric_range_p = TRUE;
+    numeric_range_p = true;
     pips_assert("The loop increment is not zero", incval != 0);
     rhs_expr = int_to_expression(FORTRAN_DIV(ubval-lbval+incval, incval));
   }
@@ -1051,13 +1051,13 @@ unroll(char *mod_name)
             /* Sets the current module to "mod_name". */
             /* current_module(module_name_to_entity(mod_name)); */
 
-            /* DBR_CODE will be changed: argument "pure" should take FALSE 
+            /* DBR_CODE will be changed: argument "pure" should take false 
                but this would be useless
                since there is only *one* version of code; a new version 
                will be put back in the
                data base after unrolling */
 
-            mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+            mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
             mod_inst = statement_instruction(mod_stmt);
 
             /* prelude */
@@ -1095,7 +1095,7 @@ static
 bool apply_full_loop_unroll(struct _newgen_struct_statement_ * s)
 {
   instruction inst = statement_instruction (s);
-  bool go_on = TRUE;
+  bool go_on = true;
 
   if(instruction_loop_p(inst)) {
     full_loop_unroll(s);
@@ -1123,7 +1123,7 @@ full_unroll(char * mod_name)
         lb_ent = find_label_entity(mod_name,lp_label);
         if( entity_undefined_p(lb_ent) )
             pips_user_warning("loop label `%s' does not exist, unrolling all loops\n", lp_label);
-        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
 
         /* prelude */
         set_current_module_entity(module_name_to_entity( mod_name ));
@@ -1183,7 +1183,7 @@ static int number_of_requested_unrollings = 0;
 static bool find_unroll_pragma_and_fully_unroll(statement s)
 {
     instruction inst = statement_instruction (s);
-    bool go_on = TRUE;
+    bool go_on = true;
 
     if(!empty_comments_p(statement_comments(s))
        && strstr(statement_comments(s), FULL_UNROLL_PRAGMA)!=NULL) {
@@ -1192,12 +1192,12 @@ static bool find_unroll_pragma_and_fully_unroll(statement s)
 	/* full_loop_unroll() does not work all the time! */
 	full_loop_unroll(s);
 	number_of_unrolled_loops++;
-	go_on = TRUE;
+	go_on = true;
       }
       else {
 	/* The full unroll pragma must comment a DO instruction */
 	;
-	go_on = FALSE;
+	go_on = false;
       }
     }
 
@@ -1207,10 +1207,10 @@ static bool find_unroll_pragma_and_fully_unroll(statement s)
 bool full_unroll_pragma(char * mod_name)
 {
   set_current_module_entity(module_name_to_entity(mod_name));
-  set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+  set_current_module_statement( (statement) db_get_memory_resource(DBR_CODE, mod_name, true) );
 
   statement mod_stmt = statement_undefined;
-  bool return_status = FALSE;
+  bool return_status = false;
 
   debug_on("FULL_UNROLL_DEBUG_LEVEL");
 
@@ -1222,7 +1222,7 @@ bool full_unroll_pragma(char * mod_name)
   number_of_requested_unrollings = 0;
 
   /* Perform the loop unrollings */
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
 
   // gen_recurse (mod_stmt, statement_domain, 
   // find_unroll_pragma_and_fully_unroll, gen_null);
@@ -1241,7 +1241,7 @@ bool full_unroll_pragma(char * mod_name)
   if(number_of_unrolled_loops == number_of_requested_unrollings) {
     user_log("%d loop%s unrolled as requested\n", number_of_unrolled_loops,
 	     number_of_unrolled_loops>1?"s":"");
-    return_status = TRUE;
+    return_status = true;
   }
   else {
     int failures = number_of_requested_unrollings - number_of_unrolled_loops;
@@ -1249,7 +1249,7 @@ bool full_unroll_pragma(char * mod_name)
 	     number_of_unrolled_loops>1?"s":"");
     user_log("%d loop%s could not be unrolled as requested\n", failures,
 	     failures>1?"s":"");
-    return_status = FALSE;
+    return_status = false;
   }
 
   debug(1,"full_unroll_pragma","done for %s\n", mod_name);

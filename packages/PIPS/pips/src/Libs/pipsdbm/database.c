@@ -115,7 +115,7 @@ bool db_open_pips_database(FILE * fd)
     db_resources rs;
     DB_UNDEF;
     rs = read_db_resources(fd);
-    if (db_resources_undefined_p(rs)) return FALSE;
+    if (db_resources_undefined_p(rs)) return false;
     set_pips_database(rs);
 
     /* coredump in copy if done on save in next function ???. */
@@ -125,7 +125,7 @@ bool db_open_pips_database(FILE * fd)
       dump_all_db_resource_status(stderr, "db_open_pips_database");
 
     DB_OK;
-    return TRUE;
+    return true;
 }
 
 void db_save_pips_database(FILE * fd)
@@ -308,7 +308,7 @@ static void db_clean_db_resources()
       /* also if the file vanished...
        * maybe on checkpoints where obsolete resources are not removed...
        */
-      else if (dbll_stat_resource_file(rn, on, TRUE)==0)
+      else if (dbll_stat_resource_file(rn, on, true)==0)
       {
 	pips_debug(1, "resource %s[%s] file vanished...\n", rn, on);
 	lr = CONS(STRING, rn, lr);
@@ -378,9 +378,9 @@ bool db_update_time(const char* rname, const char* oname)
   r = get_real_db_resource(rname, oname);
   db_resource_time(r) = db_get_logical_time();
   db_resource_file_time(r) =
-    dbll_stat_local_file((char*) db_resource_pointer(r), FALSE);
-  /*dbll_stat_resource_file(rname, oname, TRUE); */
-  return TRUE;
+    dbll_stat_local_file((char*) db_resource_pointer(r), false);
+  /*dbll_stat_resource_file(rname, oname, true); */
+  return true;
 }
 
 /* FI wants a sort... so here it is, FC. */
@@ -494,33 +494,33 @@ void db_clean_all_required_resources(void)
 
 /* from now on we must not know about the database internals? */
 
-/* TRUE if exists and in *ANY* state. */
+/* true if exists and in *ANY* state. */
 bool db_resource_required_or_available_p(const char* rname, const char* oname)
 {
   DB_OK;
   return !db_resource_undefined_p(get_db_resource(rname, oname));
 }
 
-/* TRUE if exists and in required state. */
+/* true if exists and in required state. */
 bool db_resource_is_required_p(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
   r = get_db_resource(rname, oname);
   if (db_resource_undefined_p(r))
-    return FALSE;
+    return false;
   else
     return db_resource_required_p(r);
 }
 
-/* TRUE if exists and in loaded or stored state. */
+/* true if exists and in loaded or stored state. */
 bool db_resource_p(const char* rname, const char* oname)
 {
   db_resource r;
   DB_OK;
   r = get_db_resource(rname, oname);
   if (db_resource_undefined_p(r))
-    return FALSE;
+    return false;
   else
     return db_resource_loaded_p(r) || db_resource_stored_p(r) ||
       db_resource_loaded_and_stored_p(r);
@@ -545,7 +545,7 @@ static void db_check_time(const char* rname, const char* oname, db_resource r)
   /* just check for updates */
   if (displayable_file_p(rname))
   {
-    int its_time = dbll_stat_local_file(db_resource_pointer(r), FALSE);
+    int its_time = dbll_stat_local_file(db_resource_pointer(r), false);
     if (its_time > db_resource_file_time(r))
     {
       pips_user_warning("file resource %s[%s] updated!\n", rname, oname);
@@ -568,7 +568,7 @@ static void db_check_time(const char* rname, const char* oname, db_resource r)
   }
   else
   {
-    int its_time = dbll_stat_resource_file(rname, oname, TRUE);
+    int its_time = dbll_stat_resource_file(rname, oname, true);
     if (its_time > db_resource_file_time(r))
     {
       /* ??? just warn... may be a user error? */
@@ -635,7 +635,7 @@ static void db_save_resource(const char* rname, const char* oname, db_resource r
 
     /* let us set the file time if appropriate... */
     if (!displayable_file_p(rname))
-      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, true);
 }
 
 static void db_save_and_free_resource(
@@ -679,7 +679,7 @@ static void db_save_and_free_resource(
 	}
       }
 
-      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, TRUE);
+      db_resource_file_time(r) = dbll_stat_resource_file(rname, oname, true);
     }
     else
     { /* lost.. just delete the resource. */
@@ -716,7 +716,7 @@ string db_get_resource_id(const char* rname, const char* oname)
     @param pure is used to declare the programmer intentions about the
     future of the resource.
 
-    - If pure is TRUE, the real resource is given as usual. If the
+    - If pure is true, the real resource is given as usual. If the
       programmer use it in a read-only way, this is fine and the good way
       to go. If it is modified by the programmer in a phase, all
       subsequent phases that use this resource will access a modified
@@ -725,7 +725,7 @@ string db_get_resource_id(const char* rname, const char* oname)
       programmer is assumed to put back the modified in the database later
       to notify pipsmake.
 
-    - If pure is FALSE, then the resource is saved on disk and/or marked
+    - If pure is false, then the resource is saved on disk and/or marked
       as outdated before being returned. The idea is that we can modify
       and use this resource as we want in a phase, it is a throwable
       resource. Next time someone will want to use this resource, it will
@@ -740,7 +740,7 @@ string db_get_resource_id(const char* rname, const char* oname)
       copy was a sensible trick. But now we have gen_copy(), it is far
       more efficient to use it instead of writing it to disk and parsing
       it again or recomputing it. So in all new phases developed in PIPS,
-      pure should be always TRUE and gen_copy() should be used when
+      pure should be always true and gen_copy() should be used when
       necessary.
 
     @return an opaque pointer to the resource in memory.
@@ -838,10 +838,10 @@ void db_set_resource_as_required(const char* rname, const char* oname)
 
     @param update_is_ok is a parameter to allow updating a resource.
 
-    - If FALSE and a resource is valid and not marked as required, this
+    - If false and a resource is valid and not marked as required, this
       function will fail
 
-    - If TRUE, even if a resource is valid and not marked as required,
+    - If true, even if a resource is valid and not marked as required,
       this function will succeed to update it.
 */
 void db_put_or_update_memory_resource(const char* rname, const char* oname,
@@ -879,7 +879,7 @@ void db_put_or_update_memory_resource(const char* rname, const char* oname,
     /* If there is a text file associated to the resource, get its
        modification time: */
     db_resource_file_time(r) =
-      dbll_stat_local_file(db_resource_pointer(r), FALSE);
+      dbll_stat_local_file(db_resource_pointer(r), false);
   else
     db_resource_file_time(r) = 0; /**< Or what else? */
 
@@ -911,7 +911,7 @@ void db_unput_resources(const char* rname)
 	pips_debug(7, "deleting %s[%s] if any\n", rname, db_symbol_name(s));
 	if (bound_db_owned_resources_p(or, r)) {
 	    db_delete_resource(rname, db_symbol_name(s));
-	    dbll_unlink_resource_file(rname, db_symbol_name(s), FALSE);
+	    dbll_unlink_resource_file(rname, db_symbol_name(s), false);
 	}
     },
 		     get_pips_database());
@@ -952,12 +952,12 @@ static char* current_module_name = NULL;
 
 bool db_set_current_module_name(const char* name)
 {
-    bool ok = FALSE;
+    bool ok = false;
     DB_OK; pips_assert("no current module", !current_module_name);
     if (simple_name_p(name)) {
 	current_module_name = strdup(name);
 	init_owned_resources_if_necessary(name);
-	ok = TRUE;
+	ok = true;
     } else /* can be rejected softly */
 	pips_user_warning("invalid module name \"%s\"\n", name);
     return ok;
@@ -1011,7 +1011,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(const char*, const char*))
     for(lrp=lr, lop=lo; !ENDP(lrp); POP(lrp), POP(lop)) {
 	string rname = STRING(CAR(lrp)), oname = STRING(CAR(lop));
 	db_delete_resource(rname, oname);
-	dbll_unlink_resource_file(rname, oname, FALSE);
+	dbll_unlink_resource_file(rname, oname, false);
     }
 
     gen_free_list(lr);
@@ -1035,7 +1035,7 @@ int db_delete_obsolete_resources(bool (*keep_p)(const char*, const char*))
  */
 bool db_module_exists_p(const char* name)
 {
-  bool ok = FALSE;
+  bool ok = false;
 
   if (!pips_database_undefined_p()) /* some database? */
   {
@@ -1120,7 +1120,7 @@ gen_array_t db_get_module_list_initial_order(void)
  * statements...
  *
  * @param module_p is used to select or not compilation units too. If
- * TRUE, compilation units are also included.
+ * true, compilation units are also included.
  */
 gen_array_t db_get_module_or_function_list(bool module_p)
 {
@@ -1149,7 +1149,7 @@ gen_array_t db_get_module_or_function_list(bool module_p)
  */
 gen_array_t db_get_module_list(void)
 {
-  return db_get_module_or_function_list(TRUE);
+  return db_get_module_or_function_list(true);
 }
 
 
@@ -1160,7 +1160,7 @@ gen_array_t db_get_module_list(void)
  */
 gen_array_t db_get_function_list(void)
 {
-  return db_get_module_or_function_list(FALSE);
+  return db_get_module_or_function_list(false);
 }
 
 /** @} */

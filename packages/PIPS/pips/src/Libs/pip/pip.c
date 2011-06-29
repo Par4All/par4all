@@ -343,7 +343,7 @@ quast pip_solve_min_with_big(ps_dep, ps_context, pv_unknowns, big)
  Tableau    *ineq, *context, *ctxt;
 
  /* AC variables for the big parameter */
- boolean    not_found = TRUE;
+ bool    not_found = true;
  list       lbase;
  entity     ent;
  int        nb_unknowns, len_big;
@@ -379,7 +379,7 @@ quast pip_solve_min_with_big(ps_dep, ps_context, pv_unknowns, big)
     {
      ent = ENTITY(CAR(lbase));
      if (!strncmp(entity_local_name(ent), big, len_big))
-         not_found = FALSE; 
+         not_found = false; 
      else
 	{
 	 infinite_num++;

@@ -41,7 +41,7 @@
 
 
 /*============================================================================*/
-/* bool instruction_in_list_p(instruction inst, list l): Returns TRUE if "inst"
+/* bool instruction_in_list_p(instruction inst, list l): Returns true if "inst"
  * is in "l".
  *
  * Note: "l" must be a list of instructions.
@@ -50,13 +50,13 @@ bool instruction_in_list_p(inst, l)
 instruction inst;
 list l;
 {
-bool not_found = TRUE;
+bool not_found = true;
 
 while((not_found) && (l != NIL))
   {
   instruction current_inst = INSTRUCTION(CAR(l));
   if (inst == current_inst)
-    not_found = FALSE;
+    not_found = false;
   else
     l = CDR(l);
   }
@@ -66,7 +66,7 @@ return (! not_found);
 
 
 /*============================================================================*/
-/* bool nlc_linear_expression_p(expression exp): returns TRUE if "exp" is an
+/* bool nlc_linear_expression_p(expression exp): returns true if "exp" is an
  * integer linear expression with only NLCs variables.
  *
  * NLC means Normalized Loop Counter.
@@ -83,11 +83,11 @@ bool ONLY_NLCs;
 pips_debug(7, "exp : %s\n", words_to_string(words_expression(exp, NIL)));
 
 if(normalized_tag(NORMALIZE_EXPRESSION(exp)) == is_normalized_complex)
-  ONLY_NLCs = FALSE;
+  ONLY_NLCs = false;
 else
   {
   vect = (Pvecteur) normalized_linear(expression_normalized(exp));
-  ONLY_NLCs = TRUE;
+  ONLY_NLCs = true;
 
   for(; !VECTEUR_NUL_P(vect) && ONLY_NLCs ; vect = vect->succ)
     {
@@ -95,7 +95,7 @@ else
 
     if( ! term_cst(vect) )
       if( ! (ENTITY_NLC_P(var)) )
-	ONLY_NLCs = FALSE;
+	ONLY_NLCs = false;
     }
   }
 

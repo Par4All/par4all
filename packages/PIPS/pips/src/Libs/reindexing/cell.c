@@ -335,7 +335,7 @@ entity      tau;
   int         os = 0, od = 0,di;
   Value del, d, lbs = VALUE_ZERO, lbd = VALUE_ZERO;
   Pvecteur    vect, vect2;
-  boolean with_t;
+  bool with_t;
 
   if (get_debug_level() > 5)
     fprintf(stderr,"\nDebut calculate delai pour %d", pcs->statement);
@@ -494,7 +494,7 @@ entity      tau;
  * Parameters :
  *             pc: scell of the current instruction
  *
- * Note: On the time dimensions, these sizes are not the TRUE ones
+ * Note: On the time dimensions, these sizes are not the true ones
  * because they correspond to the local time bounds, not the minor
  * time bounds. The computation of the minor bounds is done afterwards
  * (see make_array_bounds())
@@ -710,7 +710,7 @@ void make_array_bounds(cv)
   int type_decl;
   string num;
   Pscell pc;
-  boolean is_first;
+  bool is_first;
 
   cn = dfg_vertex_label_statement(vertex_vertex_label(cv));
   if (cn == ENTRY_ORDER)
@@ -756,7 +756,7 @@ void make_array_bounds(cv)
   /* No bounds => scalar variable. */
   if(lcr != NIL) {
     /* Modifies the bounds of the time dimensions (see above). */
-    is_first = TRUE;
+    is_first = true;
     for(lt = pc->ltau, la = lcr, lom = pc->lomega; !ENDP(lt);
 	POP(lt), POP(la), POP(lom)) {
       cr = RANGE(CAR(la));
@@ -764,7 +764,7 @@ void make_array_bounds(cv)
       if(is_first && (d >= 0) && (d != INFINITY)) {
 	range_upper(cr) = make_integer_constant_expression(d);
 
-	is_first = FALSE;
+	is_first = false;
       }
       else {
 	normalized nor_ub, nor_lb;
@@ -971,7 +971,7 @@ plc          p;
   mS, mR_inv, mS_inv, mI, mIc, mU, mId;
   Pcontrainte  cont;
 
-  boolean      with_t = TRUE;
+  bool      with_t = true;
   Psyslist     lsys, lsys_aux, ltime, lsys_time, ltopo;
 
   lnewp = NIL;
@@ -1075,7 +1075,7 @@ plc          p;
 	  }
 	  else {
 	    ps_b = SC_UNDEFINED;
-	    with_t = FALSE; 
+	    with_t = false; 
 	    time_ps = sc_make(contrainte_make(vec), NULL);
 	  }
 	}
@@ -1590,7 +1590,7 @@ plc          p;
 
 
 /*=========================================================================*/
-/* boolean compatible_pc_p(pcd, pcs, s, d)
+/* bool compatible_pc_p(pcd, pcs, s, d)
  *
  * Tests if the domain on which we work, that is pcd->domain with the
  * conditions on the edge is included in the domain of the selectionned
@@ -1598,12 +1598,12 @@ plc          p;
  *
  * AC 94/04/07 */
 
-static boolean compatible_pc_p(pcd, pcs, s, d)
+static bool compatible_pc_p(pcd, pcs, s, d)
 Pscell     pcd, pcs;
 int       s;
 dataflow  d;
 {
-  boolean   bool = FALSE;
+  bool   bool = false;
   list      ltrans = dataflow_transformation(d);
   Psysteme  pss, psd;
   Pdisjunct dis = DJ_UNDEFINED;
@@ -1617,7 +1617,7 @@ dataflow  d;
   }
 
   if ((pcd == NULL) || (pcs == NULL))
-    bool = TRUE;
+    bool = true;
   else {
     psd = sc_dup(predicate_to_system(dataflow_governing_pred(d)));
     psd = sc_append(psd, predicate_to_system(pcd->domain));
@@ -1644,10 +1644,10 @@ dataflow  d;
       pa->psys = psd;
       pa->pcomp = dis;
       if (!pa_faisabilite(pa))
-	bool = TRUE;
+	bool = true;
     }
     else
-      bool = TRUE;
+      bool = true;
    }
   
   if (get_debug_level() > 6) {
@@ -1677,7 +1677,7 @@ Pscell       pc;
   extern hash_table h_node;
   
   Pscell       source_pc;
-  boolean     not_found = TRUE;
+  bool     not_found = true;
   reference   old_ref, new_ref;
   list        ltrans = dataflow_transformation(crt_df), lsub = NIL;
   Pmatrix     mL, mC, mA, mAC, mB, mBC, term1, term2, term3, term4, term5;
@@ -1703,7 +1703,7 @@ Pscell       pc;
     /* first, find the good scell we should work on */
     for ( ; (source_pc != NULL) && not_found; ) {
       if (compatible_pc_p(pc, source_pc, crt_m, crt_df))
-	not_found = FALSE;
+	not_found = false;
       else
 	source_pc = source_pc->succ;
     }
@@ -1980,12 +1980,12 @@ list l_ind, l_exp;
 
     if(reference_indices(crt_ref) == NIL) {
       entity crt_e = reference_variable(crt_ref);
-      boolean is_in_list = FALSE;
+      bool is_in_list = false;
       list li, le = l_exp;
 
       for(li = l_ind; (li != NIL) && (! is_in_list); li = CDR(li)) {
 	if(same_entity_p(crt_e, ENTITY(CAR(li))))
-	  is_in_list = TRUE;
+	  is_in_list = true;
 	else
 	  le = CDR(le);
       }
@@ -2324,7 +2324,7 @@ int          *c;
       fprintf(stderr,"\nNombre de dataflow: %d", gen_length(ldf));
 
     while (ldf != NIL) {
-      boolean with_t;
+      bool with_t;
 
       df = DATAFLOW(CAR(ldf));
       m = INT(CAR(lm));
@@ -2409,7 +2409,7 @@ int          *c;
       }
     
       if (SC_RN_P(new_ps) ||
-	  sc_rational_feasibility_ofl_ctrl(new_ps, NO_OFL_CTRL, TRUE)) {
+	  sc_rational_feasibility_ofl_ctrl(new_ps, NO_OFL_CTRL, true)) {
 	entity tau, var;
 	int omega, val;
 	Pvecteur vec;
@@ -3137,7 +3137,7 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
 	    instruction aux_ins;
 
 	    /* Each instruction is composed of tests perfectly nested with
-             * a non empty instruction in the TRUE part. */
+             * a non empty instruction in the true part. */
 	    ins = INSTRUCTION(CAR(lins));
 
 	    if(instruction_tag(ins) != is_instruction_test)
@@ -3153,9 +3153,9 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
 	    }
 	    lstat = instruction_block(aux_ins);
 
-	    /* create the statement: flag = TRUE, and add it at the
+	    /* create the statement: flag = true, and add it at the
 	     * end of the block */
-	    ins2 = build_flag_assign(fla, TRUE);
+	    ins2 = build_flag_assign(fla, true);
 	    ADD_ELEMENT_TO_LIST(lstat, STATEMENT, MAKE_STATEMENT(ins2));
 	    instruction_block(statement_instruction
 			      (test_true(instruction_test(ins)))) = lstat;
@@ -3170,11 +3170,11 @@ statement re_do_it(the_dfg, the_bdt, the_plc)
 	  ADD_ELEMENT_TO_LIST(lstatg, STATEMENT, MAKE_STATEMENT(ins));
 
 	  /* set the flag to false, i.e. reinitialization */
-	  ins = build_flag_assign(fla, FALSE);
+	  ins = build_flag_assign(fla, false);
 	  ADD_ELEMENT_TO_LIST(lstatg, STATEMENT, MAKE_STATEMENT(ins));
 	
 	  /* initialize the flag to false in "linit" */
-	  ins = build_flag_assign(fla, FALSE);
+	  ins = build_flag_assign(fla, false);
 	  ADD_ELEMENT_TO_LIST(linit, STATEMENT, MAKE_STATEMENT(ins));
 	}
 	else {

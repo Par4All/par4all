@@ -221,9 +221,9 @@ add_bound_arguments(entity module) /* for the node */
 		if (ith_dim_overlapable_p(old, dim))
 		{
 		    le = add_one_bound_argument
-			(le, module, arg, FALSE, dim, next++);
+			(le, module, arg, false, dim, next++);
 		    le = add_one_bound_argument
-			(le, module, arg, TRUE, dim, next++);
+			(le, module, arg, true, dim, next++);
 		}
 	    }
 	}
@@ -470,7 +470,7 @@ compile_a_special_io_function(entity module)
     string prefix, file_name, h_name, dir_name, fs, ft;
 
     prefix = module_local_name(module);
-    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, true);
     dir_name = db_get_current_workspace_directory();
     h_name = src(prefix, HOST_SUFFIX);
 
@@ -497,7 +497,7 @@ compile_a_pure_function(entity module)
 
     prefix = module_local_name(module);
     dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, TRUE);
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, prefix, true);
     hn_name = src(prefix, BOTH_SUFFIX);
 
     fs = strdup(concatenate(dir_name, "/", file_name, NULL));
@@ -613,7 +613,7 @@ hpfcompile (string module_name)
 static bool expression_simple_nondist_p(expression e)
 {
     reference r;
-    if (!expression_reference_p(e)) return(FALSE);
+    if (!expression_reference_p(e)) return(false);
     r = syntax_reference(expression_syntax(e));
     return !array_distributed_p(reference_variable(r)) &&
 	    ENDP(reference_indices(r));
@@ -668,7 +668,7 @@ static bool invariant_expression_p(
 	    {
 		gen_free_list(l);
 		pips_debug(3, "variant\n");
-		return FALSE;
+		return false;
 	    }
 	}
       }
@@ -676,7 +676,7 @@ static bool invariant_expression_p(
 
     gen_free_list(l);
     pips_debug(3, "invariant\n");
-    return TRUE;
+    return true;
 }
 
 /* substitute all occurences of expression e in statement s by variable v
@@ -697,11 +697,11 @@ static bool vect_in_p(Pvecteur vin, Pvecteur vref)
 	if (x)
 	{
 	    if (value_ne(vecteur_val(v),vect_coeff(x, vref)))
-		return FALSE;
+		return false;
 	}
     }
 
-    return TRUE;
+    return true;
 }
 
 /* returns if e is normalized and linear.
@@ -738,9 +738,9 @@ static bool expression_flt(expression e)
 	expression_normalized(e) = 
 	    make_normalized(is_normalized_linear,
 			    vect_new((Variable)subs_v, VALUE_ONE));
-	return FALSE;
+	return false;
     }
-    return TRUE;
+    return true;
 }
 static void substitute_and_create(statement s, entity v, expression e)
 {
@@ -782,7 +782,7 @@ static bool loop_flt(loop l)
     list /* of entity */ lsubs = NIL;
 
     if (execution_sequential_p(loop_execution(l)))
-	return TRUE;
+	return true;
 
     s = c_stmt_head();
     loce = effects_effects(load_cumulated_references(s)); 
@@ -823,7 +823,7 @@ static bool loop_flt(loop l)
       }
     }
 
-    return FALSE;
+    return false;
 }
 
 /* transformation: DOALL I,J ... A(I,J,e) -> DOALL E=e,e,1 ,I,J A(I,J,E)

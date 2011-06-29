@@ -147,7 +147,7 @@ list args ;
 
     if( !vector_op ) {
 	/* FI: Sharing thru args? Yes, but see above. */
-	bool vectorp = FALSE;
+	bool vectorp = false;
 	new_e = make_expression(make_syntax(is_syntax_call,
 					    make_call( f, args )),
 				normalized_undefined);
@@ -172,7 +172,7 @@ list args ;
 
 		new_e = update_range(f, rl, 
 				     range_lower(rr), range_upper(rr),
-				     range_increment(rr), TRUE) ;
+				     range_increment(rr), true) ;
 	    }
 	    else {
 		new_e = MakeBinaryCall( f, lhs, rhs ) ;
@@ -183,7 +183,7 @@ list args ;
 	    if( syntax_range_p( ls )) {
 		range rl = syntax_range( ls ) ;
 
-		new_e = update_range(f, rl, rhs, rhs, int_to_expression(1), TRUE) ;
+		new_e = update_range(f, rl, rhs, rhs, int_to_expression(1), true) ;
 	    }
 	    else {
 		new_e = MakeBinaryCall( f, lhs, rhs ) ;
@@ -194,7 +194,7 @@ list args ;
 	    if( syntax_range_p( rs )) {
 		range rr = syntax_range( rs ) ;
 
-		new_e = update_range(f, rr, lhs, lhs, int_to_expression(1), FALSE) ;
+		new_e = update_range(f, rr, lhs, lhs, int_to_expression(1), false) ;
 	    }
 	    else {
 		new_e = MakeBinaryCall( f, lhs, rhs ) ;

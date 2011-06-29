@@ -134,7 +134,7 @@ syntax s;
 	    ParserError("MakeEquivAtom", "Formal parameter in equivalence chain\n");
     }
 
-    /* Equivalenced variables cannot be initialized by a DATA statement: FALSE */
+    /* Equivalenced variables cannot be initialized by a DATA statement: false */
     /*
     if(value_defined_p(entity_initial(e))) {
       pips_user_warning("Initialized variable %s appears in EQUIVALENCE declaration\n",
@@ -215,7 +215,7 @@ void
 ComputeEquivalences()
 {
     cons *pc;
-    int again = TRUE;
+    int again = true;
 
     pips_debug(8, "Begin\n");
 
@@ -295,7 +295,7 @@ chain ct;
 
 
 
-/* this function returns TRUE if the there is a variable that occurs in 
+/* this function returns true if the there is a variable that occurs in 
 both atom lists. */
 
 int 
@@ -308,9 +308,9 @@ cons *opc1, *opc2;
 	    for (pc2 = opc2; pc2 != NIL; pc2 = CDR(pc2))
 		    if (gen_eq((atom_equivar(ATOM(CAR(pc1)))),
 			       (atom_equivar(ATOM(CAR(pc2))))))
-			    return(TRUE);
+			    return(true);
 
-    return(FALSE);
+    return(false);
 }
 
 
@@ -404,7 +404,7 @@ entity_in_equivalence_chains_p(entity e)
 {
     equivalences equiv = TempoEquivSet;
     list pcc;
-    bool is_in_p = FALSE;
+    bool is_in_p = false;
 
     /* Apparently, TempoEquivSet stays undefined when there are no equivalences */
     if(!equivalences_undefined_p(equiv)) {
@@ -421,7 +421,7 @@ entity_in_equivalence_chain_p(entity e, chain c)
 {
     cons *pca;
     atom a;
-    bool is_in_p = FALSE;
+    bool is_in_p = false;
 
     pips_debug(9, "Begin for entity %s \n", entity_name(e));
 

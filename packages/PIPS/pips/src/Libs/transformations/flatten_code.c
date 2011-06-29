@@ -280,35 +280,35 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	/* FI: the case of static variables is not taken into account
 	   properly. */
 	expression ie = variable_initial_expression(v);
-	bool redeclare_p = FALSE;
-	bool move_initialization_p = FALSE;
+	bool redeclare_p = false;
+	bool move_initialization_p = false;
 
 	/* Can we move or transform the initialization? */
 	if(expression_undefined_p(ie)) {
 
 	  /* No initialization issue, let's move the declaration */
-	  redeclare_p = TRUE;
-	  move_initialization_p = TRUE;
+	  redeclare_p = true;
+	  move_initialization_p = true;
 	}
 	else if(rdcp->cycle_depth>0) {
 	  /* We are in a control cycle. The initial value must be
 	     reassigned where the declaration was, if the variable is
 	     not static. */
 	  if(variable_static_p(v)) {
-	    redeclare_p = TRUE;
-	    move_initialization_p = TRUE;
+	    redeclare_p = true;
+	    move_initialization_p = true;
 	  }
 	  else if(expression_is_C_rhs_p(ie)) { // This function is not yet precise enough
-	    redeclare_p = TRUE;
-	    move_initialization_p = FALSE;
+	    redeclare_p = true;
+	    move_initialization_p = false;
 	  }
 	  else {
 	    /* It could be redeclared if a small function was
 	       synthesized to perform the assignment
 	       dynamically. Basically, a loop nest over the array
 	       dimensions. */
-	    redeclare_p = FALSE;
-	    move_initialization_p = FALSE;
+	    redeclare_p = false;
+	    move_initialization_p = false;
 	  }
 	}
 	else {
@@ -318,16 +318,16 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 	     expressions such as brace expressions used in
 	     initializations at declaration. */
 	  if(extended_expression_constant_p(ie)) {
-	    redeclare_p = TRUE;
-	    move_initialization_p = TRUE;
+	    redeclare_p = true;
+	    move_initialization_p = true;
 	  }
 	  else if(expression_is_C_rhs_p(ie)) {
-	    redeclare_p = TRUE;
-	    move_initialization_p = FALSE;
+	    redeclare_p = true;
+	    move_initialization_p = false;
 	  }
 	  else {
-	    redeclare_p = FALSE;
-	    move_initialization_p = FALSE;
+	    redeclare_p = false;
+	    move_initialization_p = false;
 	  }
 	}
 
@@ -348,7 +348,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
 
 	  statement ds = rdcp->declaration_statement;
 	  list dselist = statement_to_referenced_entities(ds);
-	  bool is_same_name    = FALSE;
+	  bool is_same_name    = false;
 
 	  ifdebug(8) {
 	    pips_debug(8, "Entities found in declaration statement: ");
@@ -393,7 +393,7 @@ static bool redeclaration_enter_statement(statement s, redeclaration_context_t *
     }
   }
 
-  return TRUE;
+  return true;
 }
 
 /* Keep track of cycle exit in the hierarchical control flow graph */
@@ -461,7 +461,7 @@ bool statement_flatten_declarations(entity module, statement s)
     if (statement_block_p(s)) {
         list declarations = instruction_to_declarations(statement_instruction(s)); // Recursive
         hash_table renamings = hash_table_make(hash_pointer, HASH_DEFAULT_SIZE);
-        bool renaming_p = FALSE;
+        bool renaming_p = false;
 
         /* Can we find out what the local scope of statement s is? */
         FOREACH(ENTITY, se, entity_declarations(module)) {
@@ -473,7 +473,7 @@ bool statement_flatten_declarations(entity module, statement s)
 
             if(same_string_p(mn, cmn)) {
                 compute_renamings(s, cs, mn, renamings);
-                renaming_p = TRUE;
+                renaming_p = true;
                 break;
             }
         }
@@ -526,7 +526,7 @@ static bool unroll_loops_in_statement(statement s) {
     if (loop_fully_unrollable_p(l))
       full_loop_unroll(s);
   }
-  return TRUE;
+  return true;
 }
 
 static void statement_purge_declarations_walker(sequence seq)
@@ -578,13 +578,13 @@ bool flatten_code(string module_name)
 {
   entity module;
   statement module_stat;
-  bool good_result_p = TRUE;
+  bool good_result_p = true;
 
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
 
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();
 
   debug_on("FLATTEN_CODE_DEBUG_LEVEL");
@@ -645,12 +645,12 @@ bool split_initializations(string module_name)
 {
   entity module;
   statement module_stat;
-  bool good_result_p = TRUE;
+  bool good_result_p = true;
 
   set_current_module_entity(module_name_to_entity(module_name));
   module = get_current_module_entity();
   set_current_module_statement( (statement)
-				db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+				db_get_memory_resource(DBR_CODE, module_name, true) );
   module_stat = get_current_module_statement();
 
   debug_on("SPLIT_INITIALIZATIONS_DEBUG_LEVEL");
@@ -734,7 +734,7 @@ split_update_operator_statement_walker(statement s)
 bool split_update_operator(string module_name)
 {
   set_current_module_entity(module_name_to_entity(module_name));
-  set_current_module_statement( (statement)	db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  set_current_module_statement( (statement)	db_get_memory_resource(DBR_CODE, module_name, true) );
   debug_on("SPLIT_UPDATE_OPERATOR_DEBUG_LEVEL");
   pips_debug(1, "begin\n");
 

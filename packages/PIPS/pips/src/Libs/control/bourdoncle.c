@@ -170,11 +170,11 @@ static void free_meaningless_control(control c)
 
 
 /* Check that a node is used as a test in a CFG. The associated statement
-   must be a test, the number of successors must be two and the TRUE and
-   FALSE branches must be empty. Exported for user of ND CFG's. */
+   must be a test, the number of successors must be two and the true and
+   false branches must be empty. Exported for user of ND CFG's. */
 bool control_test_p(control c)
 {
-  bool test_p = FALSE;
+  bool test_p = false;
   if(!meaningless_control_p(c)) {
     if(statement_test_p(control_statement(c))) {
       if(gen_length(control_successors(c))>=2) {
@@ -200,7 +200,7 @@ static bool check_control_statement(control c)
   if(!meaningless_control_p(c)) {
     if(statement_test_p(control_statement(c))) {
       if(gen_length(control_successors(c))==2) {
-	/* The TRUE and FALSE branches should be empty most of the
+	/* The true and false branches should be empty most of the
            time. But a structured test used a non-deterministic node might
            very well have two successors or more. The assert below is too
            strong. */
@@ -213,7 +213,7 @@ static bool check_control_statement(control c)
            structure and unstructured test statements may be
            non-deterministic here, nothing can be said. */
 	/*
-	pips_assert("The TRUE and FALSE branches must be empty",
+	pips_assert("The true and false branches must be empty",
 		    empty_statement_or_labelless_continue_p(ts)
 		    && empty_statement_or_labelless_continue_p(fs));
 	*/
@@ -257,7 +257,7 @@ static bool check_control_statement(control c)
   {
     if(!gen_in_list_p(c, control_successors(pred))) {
       print_control_node_without_check(pred);
-      pips_assert("c is a successor of each of its predecessors", FALSE);
+      pips_assert("c is a successor of each of its predecessors", false);
     }
   }
       , control_predecessors(c));
@@ -266,11 +266,11 @@ static bool check_control_statement(control c)
   {
     if(!gen_in_list_p(c, control_predecessors(succ))) {
       print_control_node_without_check(succ);
-      pips_assert("c is a predecessor of each of its successors", FALSE);
+      pips_assert("c is a predecessor of each of its successors", false);
     }
   }
       , control_successors(c));
-  return TRUE;
+  return true;
 }
 
 static void print_and_check_control_node(control c, bool check_p)
@@ -298,12 +298,12 @@ static void print_and_check_control_node(control c, bool check_p)
 
 static void print_control_node_b(control c)
 {
-  print_and_check_control_node(c, TRUE);
+  print_and_check_control_node(c, true);
 }
 
 static void print_control_node_without_check(control c)
 {
-  print_and_check_control_node(c, FALSE);
+  print_and_check_control_node(c, false);
 }
 
 /* Was moved into ri-util/control, minus the check_control_statement() */
@@ -347,7 +347,7 @@ static void davinci_print_control_node(control c, FILE * f,
 				       bool fix_point_p)
 {
   char attributes[256];
-  bool arc_kind = TRUE;
+  bool arc_kind = true;
 
   /* The same node can be an entry and an exit node. */
   attributes[0] = '\000';
@@ -456,7 +456,7 @@ static void davinci_print_control_nodes(list l, string msg)
   MAPL(c_c, {
     control c = CONTROL(CAR(c_c));
 
-    davinci_print_control_node(c, f, c==CONTROL(CAR(l)), FALSE, FALSE);
+    davinci_print_control_node(c, f, c==CONTROL(CAR(l)), false, false);
     fprintf(f, "%s\n", ENDP(CDR(c_c))? "" : ",");
   }, sl);
 
@@ -540,7 +540,7 @@ void add_control_to_embedding_control_list(control c)
 static void print_embedding_graph(control c, string msg)
 {
   ifdebug(2) {
-    bool consistent_embedding_graph_p = TRUE;
+    bool consistent_embedding_graph_p = true;
 
     pips_debug(2, "Embedding graph for vertex %p:\n", c);
     /* Do not go down into nested unstructured */
@@ -555,7 +555,7 @@ static void print_embedding_graph(control c, string msg)
     MAP(CONTROL, ec, {
       MAP(CONTROL, pred, {
 	if(!gen_in_list_p(ec, control_successors(pred))){
-	  consistent_embedding_graph_p = FALSE;
+	  consistent_embedding_graph_p = false;
 	  fprintf(stderr, "Control %p is a predecessor of control %p "
 		  "but control %p is not a successor of control %p\n",
 		  pred, ec, ec, pred);
@@ -565,7 +565,7 @@ static void print_embedding_graph(control c, string msg)
 	  , control_predecessors(ec));
       MAP(CONTROL, succ, {
 	if(!gen_in_list_p(ec, control_predecessors(succ))){
-	  consistent_embedding_graph_p = FALSE;
+	  consistent_embedding_graph_p = false;
 	  fprintf(stderr, "Control %p is a successor of control %p "
 		  "but control %p is not a predecessor of control %p\n",
 		  succ, ec, ec, succ);
@@ -583,12 +583,12 @@ static void print_embedding_graph(control c, string msg)
 
 	MAP(CONTROL, succ, {
 	  if(!meaningless_control_p(succ)) {
-	    meaningless_p = FALSE;
+	    meaningless_p = false;
 	  }
 	}, control_successors(ec));
 
 	if(meaningless_p) {
-	  consistent_embedding_graph_p = FALSE;
+	  consistent_embedding_graph_p = false;
 	  fprintf(stderr, "Control %p only has meaningless successors\n",
 		  ec);
 	}
@@ -599,7 +599,7 @@ static void print_embedding_graph(control c, string msg)
     MAP(CONTROL, ec, {
       MAP(CONTROL, pred, {
 	if(meaningless_control_p(pred)) {
-	  consistent_embedding_graph_p = FALSE;
+	  consistent_embedding_graph_p = false;
 	  fprintf(stderr, "Control %p has meaningless predecessor %p\n",
 		  ec, pred);
 	}
@@ -836,12 +836,12 @@ static void print_control_to_control_mapping(string message, hash_table map)
 
 static bool ancestor_control_p(hash_table ancestor_map, control c)
 {
-  bool ancestor_p = FALSE;
+  bool ancestor_p = false;
 
   HASH_MAP(c_new, c_old,
   {
     if(c_old==(void *) c) {
-      ancestor_p = TRUE;
+      ancestor_p = true;
       break;
     }
   }
@@ -881,7 +881,7 @@ control control_to_ancestor(control vertex, hash_table ancestor_map)
 
 static bool registered_controls_p(hash_table ancestor_map, list l)
 {
-  bool registered_p = TRUE;
+  bool registered_p = true;
 
   MAP(CONTROL, c,
   {
@@ -892,7 +892,7 @@ static bool registered_controls_p(hash_table ancestor_map, list l)
 	    pips_debug(2, "Control %p is not registered:\n", c);
 	    print_control_node_b(c);
 	  }
-	  registered_p = FALSE;
+	  registered_p = false;
 	}
       }
     }
@@ -904,7 +904,7 @@ static bool registered_controls_p(hash_table ancestor_map, list l)
 /* No control can be an ancestor and a child */
 static bool ancestor_map_consistent_p(hash_table ancestor_map)
 {
-  bool check_p = TRUE;
+  bool check_p = true;
   list  ancestors = NIL;
   list children = NIL;
 
@@ -1150,13 +1150,13 @@ static bool entry_or_exit_control_p(control c,
 				    list partition,
 				    bool check_entry)
 {
-  bool is_entry_or_exit_p = FALSE;
+  bool is_entry_or_exit_p = false;
   list nodes = check_entry?control_predecessors(c):control_successors(c);
 
   MAP(CONTROL, pred,
   {
     if(!meaningless_control_p(pred) && !gen_in_list_p(pred, partition)) {
-      is_entry_or_exit_p = TRUE;
+      is_entry_or_exit_p = true;
       break;
     }
   }
@@ -1166,12 +1166,12 @@ static bool entry_or_exit_control_p(control c,
 }
 static bool entry_control_p(control c, list partition)
 {
-  return entry_or_exit_control_p(c, partition, TRUE);
+  return entry_or_exit_control_p(c, partition, true);
 }
 
 static bool exit_control_p(control c, list partition)
 {
-  return entry_or_exit_control_p(c, partition, FALSE);
+  return entry_or_exit_control_p(c, partition, false);
 }
 
 
@@ -1224,13 +1224,13 @@ void intersect_successors_with_partition_or_complement(control c,
 void intersect_successors_with_partition(control c,
 						       list partition)
 {
-  intersect_successors_with_partition_or_complement(c, partition, FALSE);
+  intersect_successors_with_partition_or_complement(c, partition, false);
 }
 
 void intersect_successors_with_partition_complement(control c,
 						    list partition)
 {
-  intersect_successors_with_partition_or_complement(c, partition, TRUE);
+  intersect_successors_with_partition_or_complement(c, partition, true);
 }
 
 static void __attribute__ ((unused))
@@ -1239,7 +1239,7 @@ insert_non_deterministic_control_node(list succs,
 				      control new_c,
 				      control old_c)
 {
-  if(FALSE) {
+  if(false) {
     /* Can we do without a extra-node? */
   }
   else{
@@ -1269,13 +1269,13 @@ static void update_successors_of_predecessor(control pred, control new_c, contro
 
   if(control_test_p(pred)) {
     int r = 0;
-    bool insert_p = FALSE; /* A meaningless control node must be inserted? */
+    bool insert_p = false; /* A meaningless control node must be inserted? */
 
     if((r=gen_position(old_c, control_successors(pred)))==0) {
       pips_internal_error("old_c %p must be a successor of pred %p", old_c, pred);
     }
     else if(r%2==1) {
-      /* TRUE successor */
+      /* true successor */
       insert_p = (gen_length(control_successors(pred))%2==1);
     }
     else /* r%2==0 */ {
@@ -1305,7 +1305,7 @@ static void update_successors_of_predecessor(control pred, control new_c, contro
 static void update_predecessors_of_successor(control succ, control new_c, control old_c)
 {
   /* These asserts might become wrong when intermediate CONTINUE nodes are
-     used to carry many TRUE and/or FALSE successors */
+     used to carry many true and/or false successors */
   pips_assert("old_c is already a predecessor of succ",
 	      gen_in_list_p(old_c, control_predecessors(succ)));
   pips_assert("new_c is not yet a predecessor of succ",
@@ -1317,7 +1317,7 @@ static void update_predecessors_of_successor(control succ, control new_c, contro
 /* Called from within a loop where neither t nor new_s are consistent */
 static void add_test_successor(control t, control new_s, bool is_true_successor)
 {
-  bool slot_found = FALSE;
+  bool slot_found = false;
   size_t rank = 0;
   size_t pos = 0;
 
@@ -1338,7 +1338,7 @@ static void add_test_successor(control t, control new_s, bool is_true_successor)
       pips_debug(2, "Free meaningless control node %p\n", s);
       free_meaningless_control(s);
       CONTROL_(CAR(s_c)) = new_s;
-      slot_found = TRUE;
+      slot_found = true;
       break;
     }
   } , control_successors(t));
@@ -1458,7 +1458,7 @@ static void update_successor_in_copy(control new_pred,
    not make it easy to stay compatible with Bourdoncle's algorithm and
    previous assumptions made about the cycle head. Instead, tests can
    become non-deterministic. The number of successors must be even or odd. Odd
-   successors are TRUE successors. Even successors are FALSE successors.
+   successors are true successors. Even successors are false successors.
 
   */
 
@@ -1468,7 +1468,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
   control new_root = control_undefined;
   hash_table replicated_input_controls = hash_table_make(hash_pointer, 0);
   hash_table replicated_output_controls = hash_table_make(hash_pointer, 0);
-  bool stable_graph_p = FALSE;
+  bool stable_graph_p = false;
   int number_in = 0;
   int number_out = 0;
   int iteration = 0;
@@ -1483,7 +1483,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
     int number = 0;
     list c_c = list_undefined;
 
-    stable_graph_p = TRUE;
+    stable_graph_p = true;
     iteration++;
 
     /* Look for new input nodes in partition */
@@ -1542,7 +1542,7 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 	  }
 	       , control_successors(new_c1));
 
-	  stable_graph_p = FALSE;
+	  stable_graph_p = false;
 	  number++;
 	  number_in++;
 	  hash_put(replicated_input_controls, c, new_c1);
@@ -1624,14 +1624,14 @@ static unstructured scc_to_dag(control root, list partition, hash_table ancestor
 	    }
 	    else{
 	      /* Update reverse edges of predecessors... which may be
-		 tough if you end up with more than one TRUE and/or more
-		 than one FALSE successor. */
+		 tough if you end up with more than one true and/or more
+		 than one false successor. */
 	      update_successors_of_predecessor(pred_new_c2, new_c2, c);
 	    }
 	  }
 	  pips_assert("new_c2 is now consistent", check_control_statement(new_c2));
 	
-	  stable_graph_p = FALSE;
+	  stable_graph_p = false;
 	  number++;
 	  number_out++;
 	  hash_put(replicated_output_controls, c, new_c2);
@@ -2014,7 +2014,7 @@ list bourdoncle_partition(unstructured u,
 /* Check the existence of a path from b to e with all its element in partition */
 static bool partition_successor_p(control b, control e, list partition)
 {
-  bool path_p = FALSE;
+  bool path_p = false;
   list preds = CONS(CONTROL, b, NIL);
   list succs = NIL;
   list not_seen = gen_copy_seq(partition);
@@ -2039,7 +2039,7 @@ static bool partition_successor_p(control b, control e, list partition)
       MAP(CONTROL, succ, {
 	pips_debug(3, "\t\tsucc=%p\n", succ);
 	if(succ==e) {
-	  path_p = TRUE;
+	  path_p = true;
 	  goto end;
 	}
 	else if(gen_in_list_p(succ, not_seen)) {
@@ -2297,7 +2297,7 @@ int bourdoncle_visit(control vertex,
 {
   _int min = 0;
   _int head = 0;
-  bool loop = FALSE;
+  bool loop = false;
 
   vertex_push(vertex);
   num = num+1;
@@ -2314,7 +2314,7 @@ int bourdoncle_visit(control vertex,
     }
     if(min<=head) {
       head = min;
-      loop = TRUE;
+      loop = true;
     }
   }
       , control_successors(vertex));
@@ -2387,7 +2387,7 @@ bool cycle_head_p(control c, hash_table ancestor_map, hash_table  scc_map)
   /* This is correct whether the actual scc associated to c is scc_u or
      not. If a copy of a control is associated to a scc, its ancestors and
      all the others copies also are associated to a scc. */
-  bool is_cycle = FALSE;
+  bool is_cycle = false;
   control a = control_to_ancestor(c, ancestor_map);
   unstructured scc_u = ancestor_cycle_head_to_scc(a, scc_map);
 
@@ -2404,14 +2404,14 @@ bool cycle_head_p(control c, hash_table ancestor_map, hash_table  scc_map)
 /* This node is really the head of a cycle (red on daVinci pictures). */
 bool proper_cycle_head_p(control c, hash_table  scc_map)
 {
-  bool is_proper_cycle_head_p = FALSE;
+  bool is_proper_cycle_head_p = false;
 
     HASH_MAP(n, u,
     {
       unstructured scc_u = (unstructured) u;
 
       if((control)c==unstructured_control(scc_u)) {
-	is_proper_cycle_head_p = TRUE;
+	is_proper_cycle_head_p = true;
 	break;
       }
     }, scc_map);
@@ -2421,7 +2421,7 @@ bool proper_cycle_head_p(control c, hash_table  scc_map)
 /* This node is directly associated to a specific cycle. */
 bool direct_cycle_head_p(control c, hash_table  scc_map)
 {
-  bool is_cycle = FALSE;
+  bool is_cycle = false;
   unstructured scc_u = ancestor_cycle_head_to_scc(c, scc_map);
 
   is_cycle = !unstructured_undefined_p(scc_u);
@@ -2450,9 +2450,9 @@ unstructured cycle_head_to_scc(control c, hash_table ancestor_map, hash_table  s
    meaningless successors of the other kind. */
 bool one_successor_kind_only_p(control c, bool true_p)
 {
-  bool one_kind_only_p = FALSE;
-  bool is_true_successor_p = TRUE;
-  bool real_successor_found_p = FALSE;
+  bool one_kind_only_p = false;
+  bool is_true_successor_p = true;
+  bool real_successor_found_p = false;
   list succs = control_successors(c);
 
   pips_assert("c is a test", control_test_p(c));
@@ -2473,15 +2473,15 @@ bool one_successor_kind_only_p(control c, bool true_p)
 
 bool true_successors_only_p(control c)
 {
-  bool true_only_p = FALSE;
-  true_only_p = one_successor_kind_only_p(c, TRUE);
+  bool true_only_p = false;
+  true_only_p = one_successor_kind_only_p(c, true);
   return true_only_p;
 }
 
 bool false_successors_only_p(control c)
 {
-  bool true_only_p = FALSE;
-  true_only_p = one_successor_kind_only_p(c, TRUE);
+  bool true_only_p = false;
+  true_only_p = one_successor_kind_only_p(c, true);
   return true_only_p;
 }
 

@@ -146,7 +146,7 @@ static void has_loop_inside_rwt(statement stat, bool * bHasLoopInside)
     case is_instruction_loop:
     case is_instruction_forloop:
     case is_instruction_whileloop:
-      *bHasLoopInside = TRUE;
+      *bHasLoopInside = true;
       break;
     default:
       break;
@@ -159,7 +159,7 @@ one loop.
  */
 static bool has_loop_inside(statement stat)
 {
-  bool bHasLoopInside = FALSE;
+  bool bHasLoopInside = false;
 
   gen_context_recurse(stat, &bHasLoopInside, statement_domain,
 		      gen_true, has_loop_inside_rwt);
@@ -289,7 +289,7 @@ static void fill_gRefToEncLoop(statement stat)
 }
 
 /*
-This function returns TRUE if the entity searchedEnt is in the
+This function returns true if the entity searchedEnt is in the
 list of references lRef.
  */
 static bool entity_in_ref_list(entity searchedEnt, list lRef)
@@ -300,11 +300,11 @@ static bool entity_in_ref_list(entity searchedEnt, list lRef)
 
     if(same_entity_p(ent, searchedEnt))
       {
-	return TRUE;
+	return true;
       }
   }, lRef);
 
-  return FALSE;
+  return false;
 }
 
 /*
@@ -391,7 +391,7 @@ static void attach_ref_to_stat(reference callRef, statement stat,
 
   // Go through the list of association for this statement
   // to see if the reference is already associated to this statement or not
-  bool alreadyAttached = FALSE;
+  bool alreadyAttached = false;
   MAP(REFERENCE, curRef,
   {
     if(!reference_equal_p(callRef, curRef))
@@ -405,7 +405,7 @@ static void attach_ref_to_stat(reference callRef, statement stat,
     if((!strcmp(effAction1, R_EFFECT) && !firstRef) ||
        (!strcmp(effAction1, W_EFFECT) && firstRef))
       {
-	alreadyAttached = TRUE;
+	alreadyAttached = true;
       }
   }, lRef);
 
@@ -440,7 +440,7 @@ This function performs the analysis needed for a loop statement
  */
 static bool check_loop_distribution_feasability(statement stat)
 {
-  bool success = TRUE;
+  bool success = true;
 
   loop curLoop = statement_loop(stat);
 
@@ -467,7 +467,7 @@ static bool check_loop_distribution_feasability(statement stat)
     {
       pips_internal_error("loop index used in several loops: %s",
 		 entity_user_name(index));
-      return FALSE;
+      return false;
     }
   glIndUsed = CONS(ENTITY, index, glIndUsed);
 
@@ -479,7 +479,7 @@ static bool check_loop_distribution_feasability(statement stat)
       {
 	if(same_entity_p(index, effect_entity(eff)))
 	  {
-	    success = FALSE;
+	    success = false;
 	    break;
 	  }
 
@@ -487,7 +487,7 @@ static bool check_loop_distribution_feasability(statement stat)
 	   entity_in_ref_list(effect_entity(eff), lUpperRef) ||
 	   entity_in_ref_list(effect_entity(eff), lIncrRef))
 	  {
-	    success = FALSE;
+	    success = false;
 	    break;
 	  }
       }
@@ -496,7 +496,7 @@ static bool check_loop_distribution_feasability(statement stat)
   if(!same_expression_p(rgIncr, make_integer_constant_expression(1)) ||
      !same_expression_p(rgLower, make_integer_constant_expression(0)))
     {
-      success = FALSE;
+      success = false;
 
       gen_free_list(lLowerRef);
       gen_free_list(lUpperRef);
@@ -513,12 +513,12 @@ static bool check_loop_distribution_feasability(statement stat)
     if((gen_length(reference_indices(curRef)) != 0) ||
        code_has_write_eff_ref_p(curRef, g_externalized_code))
       {
-	success = FALSE;
+	success = false;
 	break;
       }
 
     attach_ref_to_stat(curRef, g_externalized_code, gStatToRef,
-		       FALSE, 1);
+		       false, 1);
 
   }, lLowerRef);
 
@@ -530,12 +530,12 @@ static bool check_loop_distribution_feasability(statement stat)
     if((gen_length(reference_indices(curRef)) != 0) ||
        code_has_write_eff_ref_p(curRef, g_externalized_code))
       {
-	success = FALSE;
+	success = false;
 	break;
       }
 
     attach_ref_to_stat(curRef, g_externalized_code, gStatToRef,
-		       FALSE, 1);
+		       false, 1);
 
   }, lUpperRef);
 
@@ -555,16 +555,16 @@ static bool check_loop_distribution_feasability(statement stat)
 }
 
 /*
-This function returns TRUE if the reference has a write effect in
+This function returns true if the reference has a write effect in
 the statement stat
  */
 bool code_has_write_eff_ref_p(reference ref, statement stat)
 {
-   bool actionWrite = FALSE;
+   bool actionWrite = false;
 
    MAP(EFFECT, f, 
    {
-      bool effEntIsIndex = FALSE;
+      bool effEntIsIndex = false;
       entity effEnt = effect_entity(f);
 
       MAP(STATEMENT,loopStat,
@@ -573,7 +573,7 @@ bool code_has_write_eff_ref_p(reference ref, statement stat)
 
 	if(same_entity_p(index, effEnt))
 	  {
-	    effEntIsIndex = TRUE;
+	    effEntIsIndex = true;
 	  }
 
       }, lLoop);
@@ -586,7 +586,7 @@ bool code_has_write_eff_ref_p(reference ref, statement stat)
       if(action_write_p(effect_action(f)) && 
 	 same_entity_p(reference_variable(ref), effEnt))
 	{
-	  actionWrite = TRUE;
+	  actionWrite = true;
 	}
 
    }, load_cumulated_rw_effects_list(stat));
@@ -633,7 +633,7 @@ static int line_to_direction[3] = {ANY_DIRECTION, NO_DIRECTION, ANY_DIRECTION};
 static char * direction_to_representation[8] = {"?", "<", "=", "<=", ">", "*", ">=", "*"};
 
 /*
-This function returns TRUE if the conflict whose sg is the system is not a
+This function returns true if the conflict whose sg is the system is not a
 real dependence
  */
 static bool is_good_direction_p(Ptsg sg, int loopLev, bool bReadIsSource)
@@ -678,20 +678,20 @@ static bool is_good_direction_p(Ptsg sg, int loopLev, bool bReadIsSource)
 	(!strcmp(dir, "<="))) &&
        bReadIsSource)
       {
-	return TRUE;
+	return true;
       }
     else if(((!strcmp(dir, ">")) ||
 	     (!strcmp(dir, ">="))) &&
 	    !bReadIsSource)
       {
-	return TRUE;
+	return true;
       }
     else if(!strcmp(dir, "="))
       {
-	return FALSE;
+	return false;
       }
 
-    return FALSE;
+    return false;
 }
 
 /*
@@ -727,7 +727,7 @@ static statement find_common_loop(list n1, list n2, list * lWLoops)
 }
 
 /*
-This function returns TRUE if there is a dependence that prevents the pipeline
+This function returns true if there is a dependence that prevents the pipeline
  */
 static bool check_for_conflict(reference ref)
 {
@@ -854,7 +854,7 @@ static bool check_for_conflict(reference ref)
 		pips_assert("lWLoops != NIL", lWLoops != NIL);
 
 		// Let us put a bubble in the pipeline
-		hash_put(gLoopToSync, STATEMENT(CAR(lWLoops)), (void *)TRUE);
+		hash_put(gLoopToSync, STATEMENT(CAR(lWLoops)), (void *)true);
 
 		gen_free_list(lWLoops);
 		continue;
@@ -864,7 +864,7 @@ static bool check_for_conflict(reference ref)
 	  }
 
 	// If we got here, it means there is a true conflict.
-	return TRUE;
+	return true;
 
       }, dg_arc_label_conflicts(successor_arc_label(suc)));
 
@@ -872,7 +872,7 @@ static bool check_for_conflict(reference ref)
 
   },graph_vertices(gDg));
 
-  return FALSE;
+  return false;
 }
 
 /*
@@ -889,7 +889,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
   {
     statement loopStat = STATEMENT(CAR(lLoopStat));
 
-    bool attachToThisLoop = FALSE;
+    bool attachToThisLoop = false;
     entity loopIndex = loop_index(statement_loop(loopStat));
 
     // If the indices of the reference callRef contains the index
@@ -899,7 +899,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
     {
       if(same_entity_p(loopIndex, reference_variable(indRef)))
 	{
-	  attachToThisLoop = TRUE;
+	  attachToThisLoop = true;
 	  break;
 	}
 
@@ -918,7 +918,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
 	    pips_internal_error("conflict with reference: %s",
 		       words_to_string(words_reference(callRef, NIL)));
 
-	    return FALSE;
+	    return false;
 	  }
 	break;
       }
@@ -941,7 +941,7 @@ static bool attach_ref_to_loop(reference callRef, statement inStat,
 
   }, lLoop);
 
-  return TRUE;
+  return true;
 }
 
 /*
@@ -967,7 +967,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	      pips_internal_error("loop index must not vary in the code: %s",
 			 words_to_string(words_reference(callRef, NIL)));
 
-	      return FALSE;
+	      return false;
 	    }
 
 	}, lLoop);
@@ -985,11 +985,11 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	    if(!attach_ref_to_loop(callRef, inStat, firstRef, lIndRef))
 	      {
 		gen_free_list(lIndRef);
-		return FALSE;
+		return false;
 	      }
 	  }
 
-	firstRef = FALSE;
+	firstRef = false;
 	continue;
       }
 
@@ -1012,7 +1012,7 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	  pips_internal_error("%s is not a valid reference",
 		     words_to_string(words_reference(callRef, NIL)));
 
-	  return FALSE;
+	  return false;
 	}
 
     }, lIndRef);
@@ -1028,17 +1028,17 @@ static bool process_ref_list(list lCallRef, bool firstRef, statement inStat)
 	if(!attach_ref_to_loop(callRef, inStat, firstRef, lIndRef))
 	  {
 	    gen_free_list(lIndRef);
-	    return FALSE;
+	    return false;
 	  }
       }
 
     gen_free_list(lIndRef);
 
-    firstRef = FALSE;
+    firstRef = false;
 
   }, lCallRef);
 
-  return TRUE;
+  return true;
 }
 
 /*
@@ -1050,7 +1050,7 @@ static bool check_call_distribution_feasability(statement inStat)
 
   call curCall = instruction_call(statement_instruction(inStat));
 
-  bool firstRef = TRUE;
+  bool firstRef = true;
 
   MAP(EXPRESSION, exp,
   {
@@ -1083,18 +1083,18 @@ static bool check_test_distribution_feasability(statement inStat)
   // the compilation is impossbile.
   if(has_loop_inside(inStat))
     {
-      return FALSE;
+      return false;
     }
 
   list lCondRef = NIL;
   lCondRef = comEngine_expression_to_reference_list(test_condition(curTest), lCondRef);
 
-  bool firstRef = FALSE;
+  bool firstRef = false;
 
   // Process the condition
   if(!process_ref_list(lCondRef, firstRef, inStat))
     {
-      return FALSE;
+      return false;
     }
 
   gen_free_list(lCondRef);
@@ -1106,7 +1106,7 @@ static bool check_test_distribution_feasability(statement inStat)
     {
       if(!check_distribution_feasability(test_true(curTest)))
 	{
-	  return FALSE;
+	  return false;
 	}
     }
 
@@ -1115,13 +1115,13 @@ static bool check_test_distribution_feasability(statement inStat)
     {
       if(!check_distribution_feasability(test_false(curTest)))
 	{
-	  return FALSE;
+	  return false;
 	}
     }
 
   gIfCount--;
 
-  return TRUE;
+  return true;
 }
 
 /*
@@ -1129,7 +1129,7 @@ This function analyzes the statement stat.
  */
 static bool check_distribution_feasability(statement stat)
 {
-  bool success = TRUE;
+  bool success = true;
   instruction instr = statement_instruction(stat);
 
   switch(instruction_tag(instr))
@@ -1160,7 +1160,7 @@ static bool check_distribution_feasability(statement stat)
       }
     default:
       {
-	success = FALSE;
+	success = false;
 	break;
       }
     }
@@ -1174,7 +1174,7 @@ to the HRE
  */
 bool comEngine_feasability(statement externalized_code, graph dg)
 {
-  bool success = FALSE;
+  bool success = false;
 
   // Initialize some global variables
   gDg = dg;

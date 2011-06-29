@@ -74,7 +74,7 @@ static bool blind_loop_distribution(char * mod_name)
 {
   /* get code from dbm. */
   statement mod_stmt = (statement) 
-    db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+    db_get_memory_resource(DBR_CODE, mod_name, true);
   
   debug_on("BLIND_LOOP_DISTRIBUTION_LEVEL");
   
@@ -95,7 +95,7 @@ static bool blind_loop_distribution(char * mod_name)
 
   /* return code to DBM. */
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, mod_stmt);
-  return TRUE; /* everything was fine. */
+  return true; /* everything was fine. */
 }
 
 /* apply a transformation on mod_name.

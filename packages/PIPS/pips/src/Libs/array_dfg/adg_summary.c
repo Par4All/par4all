@@ -117,7 +117,7 @@ list  in_l;
       entity			ent = NULL;
       list			prov_l = NULL;
       Pentity_vertices	        pev = NULL;
-      boolean			found = FALSE;
+      boolean			found = false;
 
       ent = ENTITY(CAR( ent_l ));
       
@@ -130,7 +130,7 @@ list  in_l;
 	
 	/* We find it : we update pev2 */
 	ADD_ELEMENT_TO_LIST(pev2->lis, VERTEX, ver);
-	found = TRUE;
+	found = true;
 	break;
       }
       if (found) continue;
@@ -171,7 +171,7 @@ graph in_dg;
     list 	        effs = NULL;	/* effects linked of sta */
     entity 		w_ent = NULL;	/* variable written by sta */
     list		prov_l = NULL;
-    boolean		found = FALSE;
+    boolean		found = false;
     Pentity_vertices	pev = NULL;
 
     /* Take current vertex and effects links to it */
@@ -202,7 +202,7 @@ graph in_dg;
 
       /* We find it : we update pev2 */
       ADD_ELEMENT_TO_LIST(pev2->lis, VERTEX, ver);
-      found = TRUE;
+      found = true;
       break;
     }
     if (found) continue;
@@ -515,7 +515,7 @@ graph                   dup_dg;
 	/* Order the psysteme according to ent_l */
 	Pvecteur prov_pv = NULL;
 
-	prov_pv = adg_list_to_vect(sou_lcl, FALSE);
+	prov_pv = adg_list_to_vect(sou_lcl, false);
 	sou_q = pip_integer_max( sou_ps , loc_context , prov_pv);
 	my_pip_count++;
 
@@ -830,7 +830,7 @@ graph                   dup_dg;
 	  /* Order the psysteme according to ent_l */
 	  Pvecteur prov_pv = NULL;
 
-	  prov_pv = adg_list_to_vect(sou_lcl, FALSE);
+	  prov_pv = adg_list_to_vect(sou_lcl, false);
 	  sou_q = pip_integer_max( sou_ps ,  loc_context , prov_pv);
 	  my_pip_count++;
 

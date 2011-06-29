@@ -42,14 +42,14 @@ static list privates = NIL;
 
 /// @brief the fonction aims at identifing the parallel loops and queues them
 /// in the next list.
-/// @return FALSE when a parallel loop is found
+/// @return false when a parallel loop is found
 /// @param l, the loop to process
 static bool identify_outer_loops (loop l) {
   if (execution_parallel_p (loop_execution (l))) {
     next = gen_loop_cons (l, next);
-    return FALSE;
+    return false;
   }
-  return TRUE;
+  return true;
 }
 
 /// @brief collect the privates variables of inner loops
@@ -57,10 +57,10 @@ static bool identify_outer_loops (loop l) {
 /// @param l, the loop to process
 static bool collect_privates (loop l) {
   if (execution_parallel_p (loop_execution (l))) {
-    list var = loop_private_variables_as_entites (l, TRUE, TRUE);
+    list var = loop_private_variables_as_entites (l, true, true);
     privates = gen_nconc (privates, var);
   }
-  return TRUE;
+  return true;
 }
 
 /// @brief make the inner loops sequential
@@ -106,7 +106,7 @@ bool limit_nested_parallelism (const string module_name) {
     // (about "no sharing of cons") raises
       list locals = loop_locals (l);
       FOREACH (ENTITY, e, privates) {
-	if (gen_in_list_p (e, locals) == FALSE) {
+	if (gen_in_list_p (e, locals) == false) {
 	  locals = gen_entity_cons (e, locals);
 	}
       }
@@ -121,5 +121,5 @@ bool limit_nested_parallelism (const string module_name) {
   // Put back the new statement module
   PIPS_PHASE_POSTLUDE(mod_stmt);
 
-  return TRUE;
+  return true;
 }

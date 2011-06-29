@@ -66,7 +66,7 @@ typedef dg_vertex_label vertex_label;
 
 #include "phrase_distribution.h"
 
-boolean internal_compute_distribution_context (statement externalized_code,
+bool internal_compute_distribution_context (statement externalized_code,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,
@@ -105,11 +105,11 @@ boolean internal_compute_distribution_context (statement externalized_code,
  * used to compute OUTPUT communication after externalized function
  * execution.
  *
- * Return TRUE if everything is OK
+ * Return true if everything is OK
  *
  * NB: All lists are sorted using externalized fonction name
  */
-boolean compute_distribution_context (list l_stats, 
+bool compute_distribution_context (list l_stats, 
 				      statement module_stat,
 				      entity module,
 				      hash_table* ht_stats,
@@ -118,7 +118,7 @@ boolean compute_distribution_context (list l_stats,
 				      hash_table* ht_in_regions,
 				      hash_table* ht_out_regions)
 {
-  boolean returned_value = TRUE;
+  bool returned_value = true;
 
   pips_debug(5, "[BEGIN] compute_distribution_context for %s: \n",
 	     entity_local_name(module));
@@ -151,7 +151,7 @@ boolean compute_distribution_context (list l_stats,
     }
     else {
       pips_user_warning("Multiply defined value in STATS hash_table!\n");    
-      returned_value = FALSE;
+      returned_value = false;
     }
 
     pips_debug(3, "ANALYSING function named [%s]..................\n",
@@ -163,7 +163,7 @@ boolean compute_distribution_context (list l_stats,
 						ht_in_regions,
 						ht_out_regions,
 						function_name)) {
-      returned_value = FALSE;
+      returned_value = false;
     }
   }, l_stats);
 
@@ -208,11 +208,11 @@ boolean compute_distribution_context (list l_stats,
  * hashtable is used to compute OUTPUT communication after externalized
  * function execution.
  *
- * Return TRUE if everything is OK
+ * Return true if everything is OK
  *
  * NB: All lists are sorted using externalized fonction name
  */
-boolean compute_distribution_controlization_context (list l_calls, 
+bool compute_distribution_controlization_context (list l_calls, 
 						     statement module_stat,
 						     entity module,
 						     hash_table* ht_calls,
@@ -221,7 +221,7 @@ boolean compute_distribution_controlization_context (list l_calls,
 						     hash_table* ht_in_regions,
 						     hash_table* ht_out_regions)
 {
-  boolean returned_value = TRUE;
+  bool returned_value = true;
   string function_name;
   entity externalized_function;
 
@@ -260,7 +260,7 @@ boolean compute_distribution_controlization_context (list l_calls,
 						  ht_in_regions,
 						  ht_out_regions,
 						  externalized_function)) {
-	returned_value = FALSE;
+	returned_value = false;
       }
     }
     else {
@@ -294,12 +294,12 @@ list compute_regions_union (list l_in, list l_out)
   pips_debug(4, "BEGIN of computing regions UNION\n");
   MAP (REGION, reg, {
     entity e = region_entity (reg);
-    bool is_already_present = FALSE;
+    bool is_already_present = false;
     region reg_already_present = NULL;
     MAP (REGION, union_reg, {
       entity e2 = region_entity (union_reg);
       if (same_entity_p(e, e2)) {
-	is_already_present = TRUE;
+	is_already_present = true;
 	reg_already_present = union_reg;
       }
     }, l_union);
@@ -342,14 +342,14 @@ list compute_regions_union (list l_in, list l_out)
  * Internally used to compute distribution context for statement
  * externalized_code
  */
-boolean internal_compute_distribution_context (statement externalized_code,
+bool internal_compute_distribution_context (statement externalized_code,
 						      hash_table* ht_params,
 						      hash_table* ht_private,
 						      hash_table* ht_in_regions,
 						      hash_table* ht_out_regions,
 						      void* key_value) 
 {
-  boolean returned_value = TRUE;
+  bool returned_value = true;
 
   list l_read, l_write, l_in, l_out;
   list l_params = NIL;
@@ -408,7 +408,7 @@ boolean internal_compute_distribution_context (statement externalized_code,
   }
   else {
     pips_user_warning("Multiply defined value in PARAMS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_private: \n");
@@ -417,7 +417,7 @@ boolean internal_compute_distribution_context (statement externalized_code,
   }
   else {
     pips_user_warning("Multiply defined value in PRIVATE hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_in_regions: \n");
@@ -426,7 +426,7 @@ boolean internal_compute_distribution_context (statement externalized_code,
   }
   else {
     pips_user_warning("Multiply defined value in IN_REGIONS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
   
   pips_debug(5, "Storing in ht_out_regions: \n");
@@ -435,7 +435,7 @@ boolean internal_compute_distribution_context (statement externalized_code,
   }
   else {
     pips_user_warning("Multiply defined value in OUT_REGIONS hash_table!\n");    
-    returned_value = FALSE;
+    returned_value = false;
   }
 
   return returned_value;
@@ -544,7 +544,7 @@ void register_scalar_communications (hash_table* ht_communications,
 
     if (region_scalar_p(reg)) {
       
-      boolean already_present = FALSE;
+      bool already_present = false;
       variable already_registered_variable = NULL;
       
       /* Get the variable type */
@@ -556,7 +556,7 @@ void register_scalar_communications (hash_table* ht_communications,
       /* Look if this variable is already registered */
       HASH_MAP (var2, l2, {
 	if (variable_equal_p(var,var2)) {
-	  already_present = TRUE;
+	  already_present = true;
 	  already_registered_variable = var2;
 	}
       },*ht_communications);

@@ -81,7 +81,7 @@
 #define YYMAXDEPTH 1000000
 
 static int CurrentMode = 0; /**< to know the mode of the formal parameter: by value or by reference*/
-static bool is_external = TRUE; /**< to know if the variable is declared inside or outside a function, so its scope
+static bool is_external = true; /**< to know if the variable is declared inside or outside a function, so its scope
 				   is the current function or the compilation unit or TOP-LEVEL*/
 static int enum_counter = 0; /**< to compute the enumerator value: val(i) = val(i-1) + 1 */
 static int abstract_counter = 1; /**< to create temporary entities for abstract types */
@@ -232,8 +232,8 @@ c_parser_context CreateDefaultContext()
 					     type_undefined,
 					     storage_undefined,
 					     NIL,
-					     FALSE,
-					     FALSE);
+					     false,
+					     false);
   pips_debug(8, "New default context %p\n", c);
   return c;
 }
@@ -637,7 +637,7 @@ file: globals
 			  pips_assert("Here, only continue statements are expected",
 				      continue_statements_p(dsl));
 
-			  if (TRUE /* dl != NIL*/) { /* A C file with comments only is OK */
+			  if (true /* dl != NIL*/) { /* A C file with comments only is OK */
 			    if(!entity_undefined_p(get_current_module_entity())) {
 			      if(!compilation_unit_p(get_current_module_name())) {
 				pips_assert("Each variable is declared once", gen_once_p(dl));
@@ -667,7 +667,7 @@ file: globals
 
 globals:
     /* empty */         { $$ = NIL; }
-|   {is_external = TRUE; } global globals
+|   {is_external = true; } global globals
                         {
 			  list dsl = $3;
 			  list dl = statements_to_declarations(dsl);
@@ -766,7 +766,7 @@ declaration         {/* discard_C_comment();*/ }
 			    entity_initial(e) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
-			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
+			  stack_push((char *) make_basic_logical(true),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			  // FI: commented out while looking for
 			  //declaration comments
@@ -1381,7 +1381,7 @@ block: /* ISO 6.8.2 */
 			  /* Since pragmas cannot be attached to nothing,
 			     add a CONTINUE to attach them: */
 			  statement nop = make_plain_continue_statement();
-			  add_pragma_strings_to_statement(nop, gen_nreverse($2), FALSE /* Do not reallocate the strings*/);
+			  add_pragma_strings_to_statement(nop, gen_nreverse($2), false /* Do not reallocate the strings*/);
 			  /* Free the pragma list structure: */
 			  gen_free_list($2);
 			  /* Since we can also attach a comment, try to
@@ -1466,7 +1466,7 @@ pragma { /* Only one pragma... The common case, return it in a list */
 statement: pragmas statement_without_pragma
 {
   add_pragma_strings_to_statement($2, gen_nreverse($1),
-  				  FALSE /* Do not reallocate the strings*/);
+  				  false /* Do not reallocate the strings*/);
   /* Reduce the CO2 impact of this code, even there is huge memory leaks
      everywhere around in this file: */
   gen_free_list($1);
@@ -1586,7 +1586,7 @@ statement_without_pragma:
 			  string sc = pop_current_C_comment();
 			  int sn = pop_current_C_line_number();
 			  pips_assert("While loop body consistent",statement_consistent_p($4));
-			  $$ = MakeWhileLoop($3,$4,TRUE);
+			  $$ = MakeWhileLoop($3,$4,true);
 			  $$ = add_comment_and_line_number($$, sc, sn);
 			  stack_pop(LoopStack);
 			}
@@ -1597,7 +1597,7 @@ statement_without_pragma:
 			}
     statement TK_WHILE paren_comma_expression TK_SEMICOLON
 	        	{
-			  $$ = MakeWhileLoop($5,$3,FALSE);
+			  $$ = MakeWhileLoop($5,$3,false);
 			  /* The line number and comment are related to paren_comma_expression and not to TK_DO */
 			  (void) pop_current_C_line_number();
 			  (void) pop_current_C_comment();
@@ -1868,7 +1868,7 @@ declaration:                               /* ISO 6.7.*/
 			  pips_assert("Declaration list are not redundant", gen_once_p(el2));
 			  /* this assertion is wrong: sl1 should be an item, not a list */
 			  pips_assert("Variable in el1 has not been declared before", !gen_in_list_p(el1, el2));
-			  UpdateEntities(el2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,TRUE);
+			  UpdateEntities(el2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,true);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Remove their type stacks */
@@ -1948,7 +1948,7 @@ decl_spec_list:
 			   c_parser_context_type(ycontext) = type_undefined;
 			   /* A new context is entered: no longer typedef as in
 			    "typedef int f(int a)" when we hit "int a"*/
-			   c_parser_context_typedef(ycontext) = FALSE;
+			   c_parser_context_typedef(ycontext) = false;
 			   /* FI: sometimes, the scope is erased and lost */
 			   //if(strcmp(c_parser_context_scope(ycontext), "TOP-LEVEL:")==0)
 			   //  c_parser_context_scope(ycontext) = empty_scope();
@@ -1988,7 +1988,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
     TK_TYPEDEF decl_spec_list_opt
                         {
 			  /* Add TYPEDEF_PREFIX to entity name prefix and make it a rom storage */
-			  c_parser_context_typedef(ycontext) = TRUE;
+			  c_parser_context_typedef(ycontext) = true;
 			  c_parser_context_storage(ycontext) = make_storage_rom();
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
@@ -2014,7 +2014,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 			}
 |   TK_STATIC decl_spec_list_opt
                         {
-			  c_parser_context_static(ycontext) = TRUE;
+			  c_parser_context_static(ycontext) = true;
 			  pips_assert("CONTINUE for declarations", continue_statements_p($2));
 			  $$ = $2;
 			}
@@ -2110,7 +2110,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
                         {
 			  list ql = c_parser_context_qualifiers(ycontext);
 			  qualifier nq = $1;
-			  bool found = FALSE; // FI: Should never be useful...
+			  bool found = false; // FI: Should never be useful...
 
 			  FOREACH(QUALIFIER, q, ql) {
 			    if(qualifier_equal_p(q, nq)) {
@@ -2119,7 +2119,7 @@ my_decl_spec_list:                         /* ISO 6.7 */
 				 emptied... */
 			      pips_user_warning("Dupliquate qualifier \"%s\"\n",
 						qualifier_to_string(q));
-			      found = TRUE;
+			      found = true;
 			    }
 			  }
 
@@ -2584,7 +2584,7 @@ field_decl: /* (* ISO 6.7.2. Except that we allow unnamed fields. *) */
 
 			  /* FI: Well, this piece of code may be fully
 			     useless because t or pt is always undefined. */
-			  if(FALSE && !type_undefined_p(t)) {
+			  if(false && !type_undefined_p(t)) {
 			    type ut = ultimate_type(t);
 
 			    if(pointer_type_p(ut)) {
@@ -2713,13 +2713,13 @@ enumerator:
                           else {
 			    /* Error or reference to a previous member of the same enum (enum04.c) */
 			    /* FI: it might be easier to delay systematically the evaluation */
-			    bool is_ok = FALSE;
+			    bool is_ok = false;
 			    if(expression_call_p($3)) {
 			      call c = syntax_call(expression_syntax($3));
 			      entity m = call_function(c);
 
 			      if(entity_symbolic_p(m)) {
-				is_ok = TRUE;
+				is_ok = true;
 			      }
 			    }
 			    if(is_ok)
@@ -2895,7 +2895,7 @@ direct_decl: /* (* ISO 6.7.5 *) */
 parameter_list_startscope:
     TK_LPAREN
                         {
-			  stack_push((char *) make_basic_logical(TRUE), FormalStack);
+			  stack_push((char *) make_basic_logical(true), FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			}
 ;
@@ -2939,7 +2939,7 @@ rest_par_list1:
 parameter_decl: /* (* ISO 6.7.5 *) */
     decl_spec_list declarator
                         {
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,false);
 			  $$ = make_parameter(copy_type(entity_type($2)),
 					      make_mode(CurrentMode,UU),
 					      make_dummy_identifier($2)); //FI: or should it
@@ -2991,7 +2991,7 @@ direct_old_proto_decl:
 			    entity_initial($1) = make_value(is_value_code,make_code(NIL,strdup(""),make_sequence(NIL),NIL, make_language_c()));
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
-			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
+			  stack_push((char *) make_basic_logical(true),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			}
     old_parameter_list_ne TK_RPAREN old_pardef_list
@@ -3029,7 +3029,7 @@ old_pardef_list:
     /* empty */         { $$ = NIL; }
 |   decl_spec_list old_pardef TK_SEMICOLON TK_ELLIPSIS
                         {
-			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
+			  UpdateEntities($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,false);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  /* Can we have struct/union definition in $1 ?*/
@@ -3044,7 +3044,7 @@ old_pardef_list:
 			  list el = $2;
 			  entity f = stack_head(FunctionStack);
 			  SubstituteDummyParameters(f, el);
-			  UpdateEntities(el,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,FALSE);
+			  UpdateEntities(el,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,false);
 			  // The functional type of f could be
 			  // completed with the parameter types...
 			  CreateReturnEntity(f);
@@ -3210,7 +3210,7 @@ function_def:  /* (* ISO 6.9.1 *) */
     function_def_start
                         {
 			  InitializeBlock();
-			  is_external = FALSE;
+			  is_external = false;
 			}
     block
                         {
@@ -3222,13 +3222,13 @@ function_def:  /* (* ISO 6.9.1 *) */
 			  pips_assert("No illegal redundant declarations",
 				      check_declaration_uniqueness_p(ModuleStatement));
 			  /* Let's delay this? ResetCurrentModule(); */
-			  is_external = TRUE;
+			  is_external = true;
 			}
 
 function_def_start:  /* (* ISO 6.9.1 *) */
     decl_spec_list declarator
                         {
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, false);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  pips_debug(2,"Create current module %s\n",entity_user_name($2));
@@ -3239,7 +3239,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 /* (* Old-style function prototype *) */
 |   decl_spec_list old_proto_decl
                         {
-			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, FALSE);
+			  UpdateEntity($2,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external, false);
 			  //stack_pop(ContextStack);
 			  PopContext();
 			  pips_debug(2,"Create current module %s with old-style prototype\n",entity_user_name($2));
@@ -3272,7 +3272,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  //least the return value and the formal
 			  //parameters should be properly defined
 			  //UpdateEntity(e,ContextStack,FormalStack,FunctionStack,OffsetStack,is_external,
-			  //FALSE);
+			  //false);
 			  UpdateEntity2(e, FormalStack, OffsetStack);
 			  PopFunction();
 			  stack_pop(FormalStack);
@@ -3289,7 +3289,7 @@ function_def_start:  /* (* ISO 6.9.1 *) */
 			  clear_C_comment();
 			  //pips_assert("e is a module", module_name_p(entity_module_name(e)));
 			  PushFunction(e);
-			  stack_push((char *) make_basic_logical(TRUE),FormalStack);
+			  stack_push((char *) make_basic_logical(true),FormalStack);
 			  stack_push((char *) make_basic_int(1),OffsetStack);
 			}
     TK_RPAREN old_pardef_list

@@ -134,8 +134,8 @@ static bool no_write_effects_on_var(entity var, list le)
 {
     FOREACH(EFFECT, e, le)
         if (effect_write_p(e) && entities_may_conflict_p(effect_variable(e), var))
-            return FALSE;
-    return TRUE;  
+            return false;
+    return true;  
 }
 
 static bool functionnal_on_effects(reference ref, list /* of effect */ le)
@@ -143,9 +143,9 @@ static bool functionnal_on_effects(reference ref, list /* of effect */ le)
     FOREACH(EFFECT, e, le) {
         if ((effect_write_p(e) && effect_variable(e)!=reference_variable(ref)) ||
                 (effect_read_p(e) && entities_may_conflict_p(effect_variable(e), reference_variable(ref))))
-            return FALSE;
+            return false;
     }
-  return TRUE;  
+  return true;  
 }
 
 /* returns whether there is other write proper effect than on var
@@ -216,7 +216,7 @@ static p_substitution substitution_candidate(statement s, bool only_scalar)
  */
 static bool cool_enough_for_a_last_substitution(statement s)
 {
-    p_substitution x = substitution_candidate(s, FALSE);
+    p_substitution x = substitution_candidate(s, false);
     bool ok = (x!=NULL);
     free_substitution(x);
     return ok;
@@ -235,11 +235,11 @@ static bool other_cool_enough_for_a_last_substitution(statement s, reference ref
   list le;
 
   if (!instruction_call_p(i)) 
-    return FALSE;
+    return false;
 
   c = instruction_call(i);
   if (!ENTITY_ASSIGN_P(call_function(c)))
-    return FALSE;
+    return false;
 
   /* it is an assignment */
   args = call_arguments(c);
@@ -248,7 +248,7 @@ static bool other_cool_enough_for_a_last_substitution(statement s, reference ref
   pips_assert("assign to a reference", syntax_reference_p(svar));
   var = reference_variable(syntax_reference(svar));
   
-  if (!entity_scalar_p(var)) return FALSE;
+  if (!entity_scalar_p(var)) return false;
   
   le = proper_effects_of_expression(EXPRESSION(CAR(CDR(args))));
   bool cool = no_write_effects_on_var(reference_variable(ref), le);
@@ -431,7 +431,7 @@ fs_filter(statement stat, graph dg)
                     pips_debug(1, "considering assignment statement:\n");
                     print_statement(first);
                 }
-                p_substitution subs = substitution_candidate(first, TRUE);
+                p_substitution subs = substitution_candidate(first, true);
                 if (subs)
                 {
                     /* scan following statements and substitute while no conflicts.
@@ -467,11 +467,11 @@ bool forward_substitute(string module_name)
     /* set require resources.
      */
     set_current_module_entity(local_name_to_top_level_entity(module_name));
-    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, TRUE));
-    set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, TRUE));
-    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, TRUE));
+    set_current_module_statement((statement)db_get_memory_resource(DBR_CODE, module_name, true));
+    set_proper_rw_effects((statement_effects)db_get_memory_resource(DBR_PROPER_EFFECTS, module_name, true));
+    set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS, module_name, true));
 	set_ordering_to_statement(get_current_module_statement());
-    graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+    graph dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
 
     /* do the job here:
      */
@@ -489,5 +489,5 @@ bool forward_substitute(string module_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

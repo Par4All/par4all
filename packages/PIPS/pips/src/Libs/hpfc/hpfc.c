@@ -110,11 +110,11 @@ remapping_already_computed_p(renaming x)
     {
 	renaming p = remapping_renaming(r);
 	if (renaming_old(p)==src && renaming_new(p)==trg) 
-	    return TRUE;
+	    return true;
     },
 	get_computed_remaps());
 
-    return FALSE;
+    return false;
 }
 
 void
@@ -228,7 +228,7 @@ static void save_hpfc_status() /* GET them */
 
 static void load_hpfc_status() /* SET them */
 {
-    chs = (hpfc_status) db_get_memory_resource(DBR_HPFC_STATUS, "", TRUE);
+    chs = (hpfc_status) db_get_memory_resource(DBR_HPFC_STATUS, "", true);
 
     set_entity_status(hpfc_status_entity_status(chs));
     set_overlap_status(hpfc_status_overlapsmap(chs));
@@ -288,13 +288,13 @@ static void set_resources_for_module(entity module)
     /*   STATEMENT
      */
     set_current_module_statement
-	((statement) db_get_memory_resource(DBR_CODE, module_name, FALSE));
+	((statement) db_get_memory_resource(DBR_CODE, module_name, false));
 
     /*   PRECONDITIONS
      */
     set_precondition_map
 	((statement_mapping)
-	 db_get_memory_resource(DBR_PRECONDITIONS, module_name, TRUE));
+	 db_get_memory_resource(DBR_PRECONDITIONS, module_name, true));
 
     /*   POSTCONDITIONS
      */
@@ -309,7 +309,7 @@ static void set_resources_for_module(entity module)
 
     set_rw_effects
 	((statement_effects)
-	 db_get_memory_resource(DBR_REGIONS, module_name, TRUE));
+	 db_get_memory_resource(DBR_REGIONS, module_name, true));
 
 
 
@@ -319,27 +319,27 @@ static void set_resources_for_module(entity module)
 	
 	set_out_effects
 	    ((statement_effects)  /*OUT EFFECTS*/
-	     db_get_memory_resource(DBR_OUT_EFFECTS, module_name, TRUE));
+	     db_get_memory_resource(DBR_OUT_EFFECTS, module_name, true));
 	set_in_effects  /*IN EFFECTS*/ 
 	    ((statement_effects)  
-	     db_get_memory_resource(DBR_IN_EFFECTS, module_name, TRUE));
+	     db_get_memory_resource(DBR_IN_EFFECTS, module_name, true));
 
-	/*	    set_bool_property("MUST_REGIONS", TRUE); 
-		    set_bool_property("EXACT_REGIONS", TRUE);	  
+	/*	    set_bool_property("MUST_REGIONS", true); 
+		    set_bool_property("EXACT_REGIONS", true);	  
 		    get_regions_properties();
 		    set_out_effects  
 		    ((statement_effects)  
-		    db_get_memory_resource(DBR_OUT_REGIONS, module_name, TRUE)); 
+		    db_get_memory_resource(DBR_OUT_REGIONS, module_name, true)); 
 		    set_in_effects
 		    ((statement_effects)  
-		    db_get_memory_resource(DBR_IN_REGIONS, module_name, TRUE));*/
+		    db_get_memory_resource(DBR_IN_REGIONS, module_name, true));*/
     }
 
     /* CUMMULATED REFERENCES
      */
     set_cumulated_references(
 	(statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_REFERENCES, module_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_REFERENCES, module_name, true));
     
     /*   ONLY I/O
      */
@@ -522,20 +522,20 @@ bool hpfc_init(string name)
     pips_debug(1, "considering program %s\n", name);
 
     set_string_property("PRETTYPRINT_VARIABLE_DIMENSIONS", "common");
-    set_bool_property("PRETTYPRINT_HPFC", TRUE); /* vars local to commons */
-    set_bool_property("HPFC_FILTER_CALLEES", TRUE); /* drop hpfc specials */
-    set_bool_property("GLOBAL_EFFECTS_TRANSLATION", FALSE);
-    set_bool_property("WARNING_ON_STAT_ERROR", FALSE); // for fake files
+    set_bool_property("PRETTYPRINT_HPFC", true); /* vars local to commons */
+    set_bool_property("HPFC_FILTER_CALLEES", true); /* drop hpfc specials */
+    set_bool_property("GLOBAL_EFFECTS_TRANSLATION", false);
+    set_bool_property("WARNING_ON_STAT_ERROR", false); // for fake files
 
     // should not be there. if true, obscure coredump in proper
     // effects on a preference which has been cleanup up...
     // see validation/Hpfc/io_4.tpips that triggers the issue
-    set_bool_property("PRETTYPRINT_IO_EFFECTS", FALSE); // ??????
+    set_bool_property("PRETTYPRINT_IO_EFFECTS", false); // ??????
 
     /* too verbose... */
-    set_bool_property("UNSPAGHETTIFY_DISPLAY_STATISTICS", FALSE);
-    set_bool_property("CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS", FALSE);
-    set_bool_property("WARN_ABOUT_EMPTY_SEQUENCES", FALSE);
+    set_bool_property("UNSPAGHETTIFY_DISPLAY_STATISTICS", false);
+    set_bool_property("CLEAN_UP_SEQUENCES_DISPLAY_STATISTICS", false);
+    set_bool_property("WARN_ABOUT_EMPTY_SEQUENCES", false);
 
     /* where the specials dummy/variables are stored... ??? */
     (void) make_empty_program(HPFC_PACKAGE,make_language_fortran());
@@ -551,7 +551,7 @@ bool hpfc_init(string name)
     save_hpfc_status();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* bool hpfc_filter(string name)
@@ -581,7 +581,7 @@ static bool directive_in_file_p(string name)
      */
     f = safe_fopen(name, "r");
     c='\n';
-    no_directive = TRUE;
+    no_directive = true;
     while (!feof(f) && no_directive)
     {
 	if (c=='\n') /* beginning a line */
@@ -592,7 +592,7 @@ static bool directive_in_file_p(string name)
 		c = getc(f); if (c=='\n') continue;
 		c = getc(f); if (c=='\n') continue;
 		c = getc(f); if (c=='\n') continue;
-		c = getc(f); if (c=='$')  no_directive = FALSE;
+		c = getc(f); if (c=='$')  no_directive = false;
 	    }
 	}
 	else /* next char */
@@ -610,7 +610,7 @@ bool hpfc_filter(string name)
     string file_name, dir_name, new_name, src_name;
 
     dir_name = db_get_current_workspace_directory();
-    file_name = db_get_file_resource(DBR_SOURCE_FILE, name, TRUE);
+    file_name = db_get_file_resource(DBR_SOURCE_FILE, name, true);
     new_name = strdup(concatenate(name, HPFC_FILTERED_SUFFIX, NULL));
     src_name = strdup(concatenate(dir_name, "/", file_name, NULL));
 
@@ -628,7 +628,7 @@ bool hpfc_filter(string name)
     free(src_name);
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* what: deals with directives. to be called by pipsmake.
@@ -760,7 +760,7 @@ bool hpfc_compile(string name)
     save_hpfc_status();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* bool hpfc_common(string name)
@@ -788,7 +788,7 @@ bool hpfc_common(string name)
     save_hpfc_status();
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* bool hpfc_close(string name)
@@ -826,7 +826,7 @@ bool hpfc_close(string name)
     DB_PUT_FILE_RESOURCE(DBR_HPFC_COMMONS, name, NO_FILE); /* fake */
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* bool hpfc_install(string name)
@@ -854,7 +854,7 @@ bool hpfc_install(string name)
   DB_PUT_FILE_RESOURCE(DBR_HPFC_INSTALLATION, name, NO_FILE);
 
   debug_off();
-  return TRUE;
+  return true;
 }
 
 /* bool hpfc_make(string name)
@@ -877,7 +877,7 @@ bool hpfc_make(string name)
 			    "${HPFC_MAKE:-gmake} make &", NULL));
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /* bool hpfc_run(string name)
@@ -902,7 +902,7 @@ bool hpfc_run(string name)
 			    "${HPFC_MAKE:-gmake} run &", NULL));
 
     debug_off();
-    return TRUE;
+    return true;
 }
 
 /*   that is all

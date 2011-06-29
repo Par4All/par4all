@@ -126,7 +126,7 @@ entity make_start_ru_module (hash_table ht_params,
        
     called_module_stat = (statement) db_get_memory_resource(DBR_CODE,
 							    function_name,
-							    TRUE);
+							    true);
    
     called_module = local_name_to_top_level_entity(function_name);
  
@@ -274,7 +274,7 @@ static statement make_communication_statement (entity function,
 					       entity unit_id,
 					       entity param,
 					       int number_of_deployment_units,
-					       boolean is_receiving)
+					       bool is_receiving)
 {
   entity local_entity = entity_in_module (get_common_param_name (region_entity(reg), function), module);
  
@@ -333,7 +333,7 @@ static entity make_scalar_communication_module (variable var,
 						int number_of_deployment_units,
 						entity global_common,
 						list l_commons,
-						boolean is_receiving)
+						bool is_receiving)
 {
   entity new_module;
   entity func_id, param_id, param;
@@ -561,7 +561,7 @@ static list make_scalar_communication_modules (hash_table ht_communications,
 					       int number_of_deployment_units,
 					       entity global_common,
 					       list l_commons,
-					       boolean is_receiving)
+					       bool is_receiving)
 {
   list l_modules = NIL;
  
@@ -598,7 +598,7 @@ list make_send_scalar_params_modules (hash_table ht_in_communications,
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons,
-					    FALSE);
+					    false);
 }
 
 /**
@@ -614,7 +614,7 @@ list make_receive_scalar_params_modules (hash_table ht_out_communications,
 					    number_of_deployment_units,
 					    global_common,
 					    l_commons,
-					    TRUE);
+					    true);
 }
 
 /**
@@ -674,7 +674,7 @@ static statement make_array_communication_statement(entity function,
 						    entity unit_id,
 						    entity param,
 						    int number_of_deployment_units,
-						    boolean is_receiving,
+						    bool is_receiving,
 						    list l_reg_params,
 						    list l_reg_variables)
 {
@@ -822,7 +822,7 @@ static entity make_array_communication_module (entity function,
 					       entity global_common,
 					       entity externalized_fonction_common,
 					       int number_of_deployment_units,
-					       boolean is_receiving)
+					       bool is_receiving)
 {
   entity new_module;
   entity unit_id = NULL;
@@ -915,7 +915,7 @@ static list make_array_communication_modules (entity function,
 					      entity global_common,
 					      entity externalized_fonction_common,
 					      int number_of_deployment_units,
-					      boolean is_receiving)
+					      bool is_receiving)
 {
   list returned = NIL;
 
@@ -950,7 +950,7 @@ list make_send_array_params_modules (entity function,
 					   global_common,
 					   externalized_fonction_common,
 					   number_of_deployment_units,
-					   FALSE);
+					   false);
 }
 					   
 /**
@@ -968,7 +968,7 @@ list make_receive_array_params_modules (entity function,
 					   global_common,
 					   externalized_fonction_common,
 					   number_of_deployment_units,
-					   TRUE);
+					   true);
 }
 
 		

@@ -62,14 +62,14 @@ void prettyprint_graph_text(FILE * out_f, list l_of_vers)
 void prettyprint_graph_daVinci(FILE * out_f, list l_of_vers) {
     /* To match the call to the free() at the end: */
     string gr_buffer = strdup(""); 
-    bool first_node_parent = TRUE;
+    bool first_node_parent = true;
     fprintf(out_f, "[\n");
 
     MAP(VERTEX, ver, {
         string node_name_parent = (string)vertex_vertex_label(ver);
-	bool first_node_child = TRUE;
+	bool first_node_child = true;
 	if (first_node_parent)
-	    first_node_parent = FALSE;
+	    first_node_parent = false;
 	else
 	    fprintf(out_f, ",\n");
 	fprintf(out_f,"l(\"%s\",n(\"\",[a(\"OBJECT\",\"%s\")],[\n", node_name_parent, node_name_parent); 
@@ -77,7 +77,7 @@ void prettyprint_graph_daVinci(FILE * out_f, list l_of_vers) {
 	MAP(SUCCESSOR, succ, {
 	    string node_name_child = (string)vertex_vertex_label(successor_vertex(succ));
 	    if (first_node_child)
-	        first_node_child = FALSE;
+	        first_node_child = false;
 	    else
 	        fprintf(out_f, ",\n");
 	    if (strlen((string)successor_arc_label(succ)) == 0) {
@@ -209,11 +209,11 @@ bool print_filtered_dg_or_dvdg(string mod_name, bool is_dv)
 
     set_current_module_entity(local_name_to_top_level_entity(mod_name));
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, mod_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, mod_name, true) );
     mod_stat = get_current_module_statement();
     set_ordering_to_statement(mod_stat);
     
-    dg = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    dg = (graph) db_get_memory_resource(DBR_DG, mod_name, true);
 
     flt_graph = make_filtered_dg_or_dvdg(mod_stat, dg);
 
@@ -243,7 +243,7 @@ bool print_filtered_dg_or_dvdg(string mod_name, bool is_dv)
     reset_current_module_entity();
     reset_ordering_to_statement();
 
-    return TRUE;
+    return true;
 }
 
 

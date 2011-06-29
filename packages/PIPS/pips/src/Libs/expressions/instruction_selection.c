@@ -153,7 +153,7 @@ bool instruction_selection(string module_name)
 	set_current_module_entity(local_name_to_top_level_entity(module_name));
 
     set_current_module_statement((statement)
-	    db_get_memory_resource(DBR_CODE, module_name, TRUE));
+	    db_get_memory_resource(DBR_CODE, module_name, true));
 
 	stat = get_current_module_statement();
 
@@ -183,5 +183,5 @@ bool instruction_selection(string module_name)
 
     debug_off();
 
-	return TRUE;
+	return true;
 }

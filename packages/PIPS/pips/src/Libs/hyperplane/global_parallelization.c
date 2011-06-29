@@ -46,7 +46,7 @@
 
 #include "hyperplane.h"
 
-static bool always_select() { return TRUE;}
+static bool always_select() { return true;}
 void global_parallelization(module_name)
 string module_name;
 {
@@ -54,7 +54,7 @@ string module_name;
     statement s;
 
     pips_assert("global_parallelization", entity_module_p(module));
-    s = (statement) db_get_memory_resource(DBR_CODE, module_name, FALSE);
+    s = (statement) db_get_memory_resource(DBR_CODE, module_name, false);
 	
     debug_on("HYPERPLANE_DEBUG_LEVEL");
 
@@ -72,7 +72,7 @@ string module_name;
 bool
 loop_hyperplane(string module_name)
 {
-    bool return_status = FALSE;
+    bool return_status = false;
 
     return_status = interactive_loop_transformation(module_name,  (statement (*)(list, bool (*)(statement)))hyperplane);
     

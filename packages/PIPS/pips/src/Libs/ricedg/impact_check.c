@@ -85,7 +85,7 @@ static bool tail_call_path_p(call_site cs, list l1, list l2)
       call_site cs1 = CALL_SITE(CAR(l1));
       return (same_call_site_p(cs,cs1) && included_call_chain_p(l2,CDR(l1)));
     }
-  return FALSE;
+  return false;
 }
 
 /*****************************************************************************
@@ -125,7 +125,7 @@ static expression storage_formal_offset(call_site cs,entity actual_var,
 					expression subval,list path)
 {
   list l_caller_aliases = alias_associations_list((alias_associations)
-        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,TRUE));
+        db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,caller_name,true));
   expression exp = expression_undefined;
   MAP(ALIAS_ASSOCIATION, aa,
   {
@@ -196,9 +196,9 @@ static bool search_statement_by_ordering_flt(statement s)
 {
     if (statement_ordering(s) == statement_in_caller_ordering) {
         statement_in_caller = s;
-	return FALSE;
+	return false;
     }
-    return TRUE;
+    return true;
 }
 
 static bool statement_equal_p(statement s1, statement s2)
@@ -253,19 +253,19 @@ bool find_covering_reference_path(set arcs_processed_set,
 	      if (action_write_p(act_tmp_src) || action_read_p(act_src))
 		if (find_covering_reference_path(arcs_processed_tmp_set,
 						s_tmp, act_tmp_dest, ent_tmp_dest,
-						s_dest, act_dest, ent_dest)) return TRUE;
+						s_dest, act_dest, ent_dest)) return true;
 	    }
 	  else
 	    {
 	      if (action_write_p(act_tmp_src) && action_read_p(act_src))
 		if (find_covering_reference_path(arcs_processed_tmp_set,
 						s_tmp, act_tmp_dest, ent_tmp_dest,
-						s_dest, act_dest, ent_dest)) return TRUE;
+						s_dest, act_dest, ent_dest)) return true;
 	    }
 	}, dg_arc_label_conflicts(dal));
       }, vertex_successors(ver_src));
     }
-  return FALSE;
+  return false;
 }
 
 /* Check to see if there is a directed way between 2 statements in the graph specified */
@@ -282,7 +282,7 @@ bool check_way_between_two_statements(statement s1, statement s2, graph g)
 	if (!gen_in_list_p(v, vertex_processed_list)) {
 	    statement sv = vertex_to_statement(v);
 	    if (statement_equal_p(sv, s2))
-	        return TRUE;
+	        return true;
 	    else {
 	        ADD_ELEMENT_TO_LIST(vertex_processed_list, VERTEX, v);
 	        MAP(SUCCESSOR, su, {
@@ -293,7 +293,7 @@ bool check_way_between_two_statements(statement s1, statement s2, graph g)
 	    }
 	}
     }
-    return FALSE;
+    return false;
 }
 
 /* This function prints the call path , including names of caller functions
@@ -406,9 +406,9 @@ static int __attribute__ ((unused)) expression_approximation(statement s, expres
       }
       TRY {
 	bool n_positif, n_negatif;
-	n_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+	n_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
 	(void) vect_chg_sgn(pv);
-	n_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+	n_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
 	fprintf(stderr, "n_negatif : %s\n", n_negatif ? "TRUE" : "FALSE");
 	fprintf(stderr, "n_positif : %s\n", n_positif ? "TRUE" : "FALSE");
 	UNCATCH(overflow_error);
@@ -444,9 +444,9 @@ static int loop_executed_approximation(statement s)
 	return MAY_APPROXIMATION;
       }
       TRY {
-	m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+	m3_negatif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
 	(void) vect_chg_sgn(pv3);
-	m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,TRUE);
+	m3_positif = sc_rational_feasibility_ofl_ctrl(ps,FWD_OFL_CTRL,true);
 	UNCATCH(overflow_error);
       }
       pips_debug(2, "loop_increment_value positif = %d, negatif = %d\n",
@@ -507,7 +507,7 @@ static set create_or_get_a_set_from_control(control c,
 
 static void __attribute__ ((unused)) computing_dominators(hash_table control_to_set_of_dominators, control n0)
 {
-  bool change = TRUE;
+  bool change = true;
   list blocs = NIL;
   int count = 0;
   control c_count = NULL;
@@ -534,7 +534,7 @@ static void __attribute__ ((unused)) computing_dominators(hash_table control_to_
   while (change)
     {
       list sub_blocs = NIL;
-      change = FALSE;
+      change = false;
       CONTROL_MAP(n, {
 	set dominator_dp = NULL;
 	if (n == n0) continue;
@@ -560,7 +560,7 @@ static void __attribute__ ((unused)) computing_dominators(hash_table control_to_
 	if (!set_equal_p(dominator_dn,
 			create_or_get_a_set_from_control(n, control_to_set_of_dominators)))
 	  {
-	    change = TRUE;
+	    change = true;
 	    hash_update(control_to_set_of_dominators, (char *)n, dominator_dn);
 	  }
 	if (count == 11)
@@ -607,7 +607,7 @@ static int __attribute__ ((unused)) control_approximation_between_statement_p(st
     switch (instruction_tag(statement_instruction(s))) {
     case is_instruction_test:
       /*fprintf(stderr, "TEST......\n");*/
-      return FALSE;
+      return false;
       break;
     case is_instruction_loop:
       statement_exec_appro = loop_executed_approximation(s);
@@ -648,7 +648,7 @@ static int __attribute__ ((unused)) control_approximation_between_statement_p(st
     switch (instruction_tag(statement_instruction(s))) {
     case is_instruction_test:
       /*fprintf(stderr, "TEST......\n");*/
-      return FALSE;
+      return false;
       break;
     case is_instruction_loop:
       statement_exec_appro = loop_executed_approximation(s);
@@ -697,7 +697,7 @@ static void check_for_effected_statement(statement s, list le)
   MAP(EFFECT, eff, {
     entity ent_dest = reference_variable(effect_any_reference(eff));
     action act_dest = effect_action(eff);
-    bool impact_must_p = FALSE; /* default value of dependence : MAY */
+    bool impact_must_p = false; /* default value of dependence : MAY */
     effect eff_tmp;
 
     if (entities_may_conflict_p(ent_dest, alias_ent1)) {
@@ -724,7 +724,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sw2, s, impact_must_p, DEP_FLOW);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sw2, s, FALSE, DEP_FLOW);
+		  insert_impact_description_as_comment(sw2, s, false, DEP_FLOW);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so no impact alias*/
@@ -756,7 +756,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sr2, s, impact_must_p, DEP_ANTI);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sr2, s, FALSE, DEP_ANTI);
+		  insert_impact_description_as_comment(sr2, s, false, DEP_ANTI);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so don't the impact alias*/
@@ -784,7 +784,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sw2, s, impact_must_p, DEP_OUTP);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sw2, s, FALSE, DEP_OUTP);
+		  insert_impact_description_as_comment(sw2, s, false, DEP_OUTP);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so don't the impact alias*/
@@ -819,7 +819,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sw1, s, impact_must_p, DEP_FLOW);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sw1, s, FALSE, DEP_FLOW);
+		  insert_impact_description_as_comment(sw1, s, false, DEP_FLOW);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so don't the impact alias*/
@@ -851,7 +851,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sr1, s, impact_must_p, DEP_ANTI);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sr1, s, FALSE, DEP_ANTI);
+		  insert_impact_description_as_comment(sr1, s, false, DEP_ANTI);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so don't the impact alias*/
@@ -879,7 +879,7 @@ static void check_for_effected_statement(statement s, list le)
 		  insert_impact_description_as_comment(sw1, s, impact_must_p, DEP_OUTP);
 		  break;
 		case MAY_APPROXIMATION:
-		  insert_impact_description_as_comment(sw1, s, FALSE, DEP_OUTP);
+		  insert_impact_description_as_comment(sw1, s, false, DEP_OUTP);
 		  break;
 		case NOT_APPROXIMATION:
 		  /* dependence does not exist so don't the impact alias*/
@@ -1083,10 +1083,10 @@ static void impact_check_in_path(entity e1, entity e2, expression off1, expressi
       }
 }
 
-static bool written = FALSE;
+static bool written = false;
 static entity current_entity  = entity_undefined;
 
-/* This function returns TRUE if the variable is written directly in the current module,
+/* This function returns true if the variable is written directly in the current module,
    or by its callees */
 static bool variable_is_written_by_statement_flt(statement s)
 {
@@ -1102,20 +1102,20 @@ static bool variable_is_written_by_statement_flt(statement s)
 		        fprintf(stderr,"\n Write on entity %s :\n",entity_name(e));
 			fprintf(stderr,"\n Current entity %s :\n",entity_name(current_entity));
 		    }
-		    written = TRUE;
+		    written = true;
 		    /* gen_recurse_stop(NULL); */
-		    return FALSE;
+		    return false;
 		}
 	    }
 	}, l_rw);
-	return FALSE;
+	return false;
     }
-    return TRUE;
+    return true;
 }
 
 static bool variable_is_written_p(entity ent)
 {
-    written = FALSE;
+    written = false;
     current_entity = ent;
     gen_recurse(mod_stat,statement_domain,
 		variable_is_written_by_statement_flt,gen_null);
@@ -1128,7 +1128,7 @@ static void set_dynamic_checked(entity e1, entity e2)
   MAP(DYNAMIC_CHECK,dc,
   {
     if ((dynamic_check_first(dc)==e1) && (dynamic_check_second(dc)==e2))
-      dynamic_check_checked(dc) = TRUE;
+      dynamic_check_checked(dc) = true;
   }, l_dynamic_check);
 }
 
@@ -1138,7 +1138,7 @@ static bool dynamic_checked_p(entity e1, entity e2)
         if ((dynamic_check_first(dc)==e1)&&(dynamic_check_second(dc)==e2))
 	    return dynamic_check_checked(dc);
     }, l_dynamic_check);
-    return FALSE;
+    return false;
 }
 
 static void init_dynamic_check_list(entity current_mod)
@@ -1160,12 +1160,12 @@ static void init_dynamic_check_list(entity current_mod)
 
     MAP(ENTITY,e1, {
         MAP(ENTITY,e2, {
-	    dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+	    dynamic_check dc = make_dynamic_check(e1,e2,false);
 	    l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
 	}, l_formals);
 
 	MAP(ENTITY,e2, {
-	    dynamic_check dc = make_dynamic_check(e1,e2,FALSE);
+	    dynamic_check dc = make_dynamic_check(e1,e2,false);
 	    l_dynamic_check = gen_nconc(l_dynamic_check,CONS(DYNAMIC_CHECK,dc,NIL));
 	}, l_commons);
     }, l_formals);
@@ -1189,7 +1189,7 @@ static void impact_check_two_variables(entity e1, entity e2, expression off1, ex
 	    statement caller_statement;
 	    entity current_caller = call_site_function(cs);
 	    caller_name = module_local_name(current_caller);
-	    caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,TRUE);
+	    caller_statement = (statement)db_get_memory_resource(DBR_CODE,caller_name,true);
 
 	    statement_in_caller_ordering = call_site_ordering(cs);
 	    statement_in_caller = statement_undefined;
@@ -1234,12 +1234,12 @@ bool impact_check(char * module_name)
 
     l_module_aliases = alias_associations_list((alias_associations)
 					       db_get_memory_resource(DBR_ALIAS_ASSOCIATIONS,
-								      module_name, TRUE));
+								      module_name, true));
 
     if (l_module_aliases != NIL) {
-        dg = (graph) db_get_memory_resource(DBR_DG, module_name, TRUE);
+        dg = (graph) db_get_memory_resource(DBR_DG, module_name, true);
 	/*full_control_graph(module_name);*/
-	mod_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, TRUE);
+	mod_stat = (statement)db_get_memory_resource(DBR_CODE, module_name, true);
         set_current_module_entity(current_mod);
 
 	set_ordering_to_statement(mod_stat);
@@ -1250,7 +1250,7 @@ bool impact_check(char * module_name)
 	set_precondition_map((statement_mapping)
 			     db_get_memory_resource(DBR_PRECONDITIONS,
 						    module_name,
-						    TRUE));*/
+						    true));*/
 	while (!ENDP(l_module_aliases)) {
 	    alias_association aa1 = ALIAS_ASSOCIATION(CAR(l_module_aliases));
 	    entity e1 = alias_association_variable(aa1);
@@ -1328,5 +1328,5 @@ bool impact_check(char * module_name)
     display_impact_alias_statistics();
     l_module_aliases = NIL;
     current_mod = entity_undefined;
-    return TRUE;
+    return true;
 }

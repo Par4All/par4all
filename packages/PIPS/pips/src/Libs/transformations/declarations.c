@@ -146,7 +146,7 @@ void module_clean_declarations(entity module, statement module_statement) {
 
    @param[in] module_name is the name of the module to process
 
-   @return TRUE because always successful
+   @return true because always successful
 */
 bool
 clean_declarations(string module_name)
@@ -154,8 +154,8 @@ clean_declarations(string module_name)
 
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
-  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
-  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,TRUE));
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
+  set_cumulated_rw_effects((statement_effects)db_get_memory_resource(DBR_CUMULATED_EFFECTS,module_name,true));
 
   debug_on("CLEAN_DECLARATIONS_DEBUG_LEVEL");
 
@@ -383,7 +383,7 @@ static void dynamic_cleanup(string module, statement stat)
 
    @param[in] module is the module name we want to clean
 
-   @return TRUE since everything should behave well...
+   @return true since everything should behave well...
  */
 bool clean_unused_dynamic_variables(string module)
 {
@@ -392,7 +392,7 @@ bool clean_unused_dynamic_variables(string module)
   // get stuff from pipsdbm
   set_current_module_entity(module_name_to_entity(module));
   set_current_module_statement
-    ((statement) db_get_memory_resource(DBR_CODE, module, TRUE) );
+    ((statement) db_get_memory_resource(DBR_CODE, module, true) );
 
   dynamic_cleanup(module, get_current_module_statement());
   clean_up_sequences(get_current_module_statement());

@@ -72,7 +72,7 @@ same_primary_entity_p(entity e1, entity e2)
     if (bound_primary_entity_p(e1) && bound_primary_entity_p(e2))
 	return load_primary_entity(e1)==load_primary_entity(e2);
     else
-	return FALSE;
+	return false;
 }
 
 
@@ -139,7 +139,7 @@ void set_entity_as_dynamic(entity e)
     /* else the entity was already declared as dynamic... */
 }
 
-/*  as expected, TRUE if entity e is dynamic. 
+/*  as expected, true if entity e is dynamic. 
  *  it is just a function name nicer than bound_...
  */
 bool (*dynamic_entity_p)(entity) = bound_dynamic_hpf_p;
@@ -231,7 +231,7 @@ check_for_similarity(
     entity a, /* array a to be compared against its similars */
     list /* of entity */ others)
 {
-    bool similar_found = FALSE;
+    bool similar_found = false;
 
     pips_debug(3, "of %s\n", entity_name(a));
 
@@ -253,7 +253,7 @@ check_for_similarity(
 	    pips_debug(8, "found similar: %s -> %s\n", 
 		       entity_name(a), entity_name(e));
 	    store_similar_mapping(a, load_similar_mapping(e));
-	    similar_found = TRUE;
+	    similar_found = true;
 	    break;
 	}
     },
@@ -331,21 +331,21 @@ static bool conformant_entities_p(
     entity e2)
 {
     int ndim;
-    if (e1==e2) return TRUE;
+    if (e1==e2) return true;
 
     ndim = NumberOfDimension(e1);
 
-    if (ndim!=NumberOfDimension(e2)) return FALSE;
+    if (ndim!=NumberOfDimension(e2)) return false;
 
     for (; ndim>0; ndim--)
     {
 	int l1, u1, l2, u2;
 	get_entity_dimensions(e1, ndim, &l1, &u1);
 	get_entity_dimensions(e2, ndim, &l2, &u2);
-	if (l1!=l2 || u1!=u2) return FALSE;
+	if (l1!=l2 || u1!=u2) return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /*  comparison of DISTRIBUTE.
@@ -358,7 +358,7 @@ static bool same_distribute_p(
                                 l2 = distribute_distribution(d2);
 
     if (!conformant_entities_p(distribute_processors(d1),
-			       distribute_processors(d2))) return FALSE;
+			       distribute_processors(d2))) return false;
     
     pips_assert("valid distribution", gen_length(l1)==gen_length(l2));
 
@@ -370,14 +370,14 @@ static bool same_distribute_p(
 	      s2 = distribution_style(i2);
 	tag t1 = style_tag(s1);
 
-	if (t1!=style_tag(s2)) return FALSE;
+	if (t1!=style_tag(s2)) return false;
 	if (t1!=is_style_none &&
 	    !expression_equal_p(distribution_parameter(i1),
 				distribution_parameter(i2)))
-	    return FALSE;
+	    return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /*  comparison of ALIGN.
@@ -399,7 +399,7 @@ static bool same_alignment_in_list_p(
     },
 	l);
 
-    return FALSE;
+    return false;
 }
 
 bool conformant_templates_p(
@@ -407,9 +407,9 @@ bool conformant_templates_p(
     entity t2)
 {
     if (t1==t2) 
-	return TRUE;
+	return true;
     else if (!conformant_entities_p(t1, t2))
-	return FALSE;
+	return false;
     else
 	return same_distribute_p
 	    (load_hpf_distribution(t1), load_hpf_distribution(t2));
@@ -424,13 +424,13 @@ static bool same_align_p(
 
     if (!conformant_templates_p(align_template(a1),align_template(a2)) ||
 	(gen_length(l1)!=gen_length(l2))) 
-	return FALSE;
+	return false;
 
     MAP(ALIGNMENT, a,
-	if (!same_alignment_in_list_p(a, l2)) return FALSE,
+	if (!same_alignment_in_list_p(a, l2)) return false,
 	l1);
 
-    return TRUE;
+    return true;
 }
 
 /* entity array_synonym_aligned_as(array, a)
@@ -551,14 +551,14 @@ same_alignment_p(entity e1, entity t1, alignment a1,
     /* compares the alignments if any 
      */
     if (alignment_arraydim(a1)!=alignment_arraydim(a2)) 
-	RETAL("diff. array dim", FALSE);
+	RETAL("diff. array dim", false);
 
     if (!expression_equal_p(alignment_rate(a1), alignment_rate(a2)))
-	RETAL("different rate", FALSE);
+	RETAL("different rate", false);
 
     if (SizeOfIthDimension(t1, alignment_templatedim(a1))!=
 	SizeOfIthDimension(t2, alignment_templatedim(a2)))
-	RETAL("different template size", FALSE);
+	RETAL("different template size", false);
 
     b1 = HpfcExpressionToInt(alignment_constant(a1));
     b2 = HpfcExpressionToInt(alignment_constant(a2));
@@ -601,7 +601,7 @@ array_distribution_similar_p(entity a1, entity a2)
      * ??? could assume that P(1:1,1:n) is conformant to P'(1:n)?
      */
     if (!conformant_entities_p(p1, p2)) 
-	RET("different processors", FALSE);
+	RET("different processors", false);
     
     for (i=1; i<=ndimdist; i++) /* considering ith dim of proc */
     {
@@ -619,7 +619,7 @@ array_distribution_similar_p(entity a1, entity a2)
 	if (dsize!=1)
 	{
 	    if (!same_distribution_p(x1, x2)) 
-		RET("different distribution", FALSE);
+		RET("different distribution", false);
 	    
 	    /* conformant alignments for that pe dim
 	     * !!! the HPF mapping "semantics" insure that the corresponding 
@@ -629,12 +629,12 @@ array_distribution_similar_p(entity a1, entity a2)
 	    at2 = FindAlignmentOfTemplateDim(align_alignment(al2), td2);
 
 	    if (!same_alignment_p(a1,t1,at1,a2,t2,at2)) 
-		RET("different alignment", FALSE);
+		RET("different alignment", false);
 	}
     }
 
     pips_debug(6, "similar distributions!\n");
-    return TRUE;
+    return true;
 }
 
 /**************************************************** MAPPING OF ARGUMENTS */
@@ -649,16 +649,16 @@ hpfc_call_with_distributed_args_p(call c)
 
     /* no intrinsics */
     if (value_intrinsic_p(entity_initial(f)) ||
-	hpf_directive_entity_p(f)) return FALSE;
+	hpf_directive_entity_p(f)) return false;
     
     /* else checks for distributed arguments */
     for (; len>0; len--)
     {
 	entity arg = find_ith_parameter(f, len);
-	if (array_distributed_p(arg)) return TRUE;
+	if (array_distributed_p(arg)) return true;
     }
 
-    return FALSE;
+    return false;
 }
 
 static list /* of renaming */ 
@@ -859,9 +859,9 @@ static entity
     old_variable = entity_undefined, /* entity to be replaced, the primary? */
     new_variable = entity_undefined; /* replacement */
 static bool 
-    array_propagation, /* TRUE if an array is propagated, FALSE if template */
-    array_used,        /* TRUE if the array was actually used */
-    array_modified;    /* TRUE if the array may be modified... */
+    array_propagation, /* true if an array is propagated, false if template */
+    array_used,        /* true if the array was actually used */
+    array_modified;    /* true if the array may be modified... */
 static statement 
     initial_statement = statement_undefined; /* starting point */
 
@@ -934,7 +934,7 @@ static void ref_rwt(reference r)
     if (var==old_variable || var==new_variable)
     {
 	reference_variable(r) = new_variable;
-	array_used = TRUE;
+	array_used = true;
     }
 }
 
@@ -966,7 +966,7 @@ static void simple_switch_old_to_new(statement s)
 	      if (same_primary_entity_p(v,new_variable) && effect_write_p(e))
 		{
 		  pips_debug(9, "%s W in %p\n", entity_name(new_variable), s);
-		  array_modified = TRUE;
+		  array_modified = true;
 		  return;
 		}
 	    }
@@ -980,7 +980,7 @@ rename_directive_p(entity f)
     return same_string_p(entity_local_name(f), HPF_PREFIX RENAME_SUFFIX);
 }
 
-/*  TRUE if not a remapping for old. 
+/*  true if not a remapping for old. 
  *  if it is a remapping, operates the switch.
  */
 #define ret(why, what) \
@@ -996,7 +996,7 @@ continue_propagation_p(statement s)
 
     if (!instruction_call_p(i)) 
     {
-	ret("not a call", TRUE);
+	ret("not a call", true);
     }
     else
     {
@@ -1017,7 +1017,7 @@ continue_propagation_p(statement s)
 	    {
 		add_alive_synonym(s, new_variable);
 		add_as_a_closing_statement(s);
-		ret("rename to the same", FALSE);
+		ret("rename to the same", false);
 	    }
 	}
 	else if (realign_directive_p(fun) && array_propagation)
@@ -1036,7 +1036,7 @@ continue_propagation_p(statement s)
 		    entity var = reference_variable(r);
 		    
 		    if (nbofargs==0) /* up to the template! */
-			ret("template of realign", TRUE);
+			ret("template of realign", true);
 		
 		    if (safe_load_primary_entity(var)==primary)
 		    {
@@ -1044,7 +1044,7 @@ continue_propagation_p(statement s)
 			 */
 			add_alive_synonym(s, new_variable);
 			add_as_a_closing_statement(s);
-			ret("realign array",  FALSE);
+			ret("realign array",  false);
 		    }
 		}
 		/* else it may be a call because of ALIGN () WITH T()::X...
@@ -1064,7 +1064,7 @@ continue_propagation_p(statement s)
 		entity v = expression_to_entity(e);
 
 		if (!entity_template_p(v)) /* up to the processor, stop */
-		    ret("processors of distribute", TRUE);
+		    ret("processors of distribute", true);
 
 		/*   if template t is redistributed...
 		 */
@@ -1074,7 +1074,7 @@ continue_propagation_p(statement s)
 			add_alive_synonym(s, new_variable);
 		    add_as_a_closing_statement(s);
 
-		    ret("redistribute template", FALSE);
+		    ret("redistribute template", false);
 		}
 	    },
 		call_arguments(c));
@@ -1084,11 +1084,11 @@ continue_propagation_p(statement s)
 	    entity primary = safe_load_primary_entity(old_variable);
 	    
 	    MAP(EXPRESSION, e, 
-		if (primary==expression_to_entity(e)) ret("dead array", FALSE),
+		if (primary==expression_to_entity(e)) ret("dead array", false),
 		call_arguments(c)); 
 	}
 
-	ret("default", TRUE);
+	ret("default", true);
     }
 }
 
@@ -1097,7 +1097,7 @@ propagate_synonym(
     statement s,   /* starting statement for the propagation */
     entity old,    /* entity to be replaced */
     entity new,    /* replacement for the entity */
-    bool is_array  /* TRUE if array, FALSE if template */)
+    bool is_array  /* true if array, false if template */)
 {
     statement current;
 
@@ -1108,8 +1108,8 @@ propagate_synonym(
 
     old_variable = safe_load_primary_entity(old), new_variable = new, 
     array_propagation = is_array;
-    array_used = FALSE;
-    array_modified = FALSE;
+    array_used = false;
+    array_modified = false;
     initial_statement = s;
 
     lazy_initialize_for_statement(s);
@@ -1228,7 +1228,7 @@ propagation_on_remapping_graph(
     bool local, /* local or remote condition */
     bool forward) /* backward or forward */
 {
-    bool modified = FALSE;
+    bool modified = false;
     entities built_set = built(s);
     list /* of entity */
 	lrem = entities_list(load_remapped(s)),
@@ -1255,7 +1255,7 @@ propagation_on_remapping_graph(
 		what_stat_debug(5, sc);
 
 		lbuilt = CONS(ENTITY, e, lbuilt);
-		modified = TRUE;
+		modified = true;
 	    }
 	},
 	    entities_list(built(sc)));
@@ -1279,7 +1279,7 @@ propagate_used_arrays(
     list /* of statements */ ls)
 {
     return propagation_on_remapping_graph
-      (s, ls, load_reaching_mappings, load_used_dynamics, FALSE, TRUE);
+      (s, ls, load_reaching_mappings, load_used_dynamics, false, true);
 }
 
 static list /* of statements */
@@ -1288,7 +1288,7 @@ propagate_maybeuseful_mappings(
     list /* of statement */ ls)
 {
     return propagation_on_remapping_graph
-      (s, ls, load_maybeuseful_mappings, load_modified_dynamics, TRUE, FALSE);
+      (s, ls, load_maybeuseful_mappings, load_modified_dynamics, true, false);
 }
 
 static void remove_from_entities(
@@ -1347,7 +1347,7 @@ static void regenerate_renamings(statement s)
     MAP(ENTITY, target,
     {
 	entity primary = load_primary_entity(target);
-	bool some_source_found = FALSE;
+	bool some_source_found = false;
 
 	MAP(ENTITY, source,
 	{
@@ -1356,7 +1356,7 @@ static void regenerate_renamings(statement s)
 		pips_debug(4, "%s -> %s\n", 
 			   entity_name(source), entity_name(target));
 		ln = CONS(RENAMING, make_renaming(source, target), ln);
-		some_source_found = TRUE;
+		some_source_found = true;
 	    }
 	},
 	    lr);

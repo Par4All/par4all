@@ -271,7 +271,7 @@ static const char* entity_more_or_less_minimal_name(entity e, bool strict_p)
  */
 const char* entity_minimal_name(entity e)
 {
-  return entity_more_or_less_minimal_name(e, TRUE);
+  return entity_more_or_less_minimal_name(e, true);
 }
 
 /* Do not preserve scope information
@@ -280,7 +280,7 @@ const char* entity_minimal_name(entity e)
  */
 const char* entity_minimal_user_name(entity e)
 {
-  return entity_more_or_less_minimal_name(e, FALSE);
+  return entity_more_or_less_minimal_name(e, false);
 }
 
 /* Retrieve the compilation unit containing a module definition.
@@ -297,8 +297,8 @@ entity module_entity_to_compilation_unit_entity(entity m)
   if(compilation_unit_entity_p(m))
     cu = m;
   else {
-    // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
-    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
+    // string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), true);
+    string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), true);
     string lufn = strrchr(aufn, '/')+1;
 
     if(lufn!=NULL) {
@@ -326,22 +326,22 @@ entity module_entity_to_compilation_unit_entity(entity m)
 }
 bool language_module_p(entity m, string lid)
 {
-  bool c_p = FALSE;
+  bool c_p = false;
 
   if(entity_module_p(m)) {
     /* FI: does not work with static functions */
-    //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), TRUE);
+    //string aufn = db_get_memory_resource(DBR_USER_FILE, entity_user_name(m), true);
     /* SG: must check if the ressource exist (not always the case) */
     string lname= module_local_name(m);
     if( db_resource_p(DBR_USER_FILE,lname) )
     {
-        string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), TRUE);
+        string aufn = db_get_memory_resource(DBR_USER_FILE, module_local_name(m), true);
         string n = strstr(aufn, lid);
 
         c_p = (n!=NULL);
     }
     else
-        c_p = TRUE; /* SG: be positive ! (needed for Hpfc)*/
+        c_p = true; /* SG: be positive ! (needed for Hpfc)*/
   }
   return c_p;
 }
@@ -373,7 +373,7 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
             if(!statement_undefined_p(stmt))
                 set_current_module_statement(stmt);
         }
-        s=(statement)db_get_memory_resource(DBR_CODE,cum,TRUE);
+        s=(statement)db_get_memory_resource(DBR_CODE,cum,true);
     }
     /* SG: when adding a new entity to compilation unit,
      * one should check the entity is not already present
@@ -386,7 +386,7 @@ void AddEntityToCompilationUnit(entity e, entity cu ) {
     AddLocalEntityToDeclarations(e,cu,s);
     if( c_module_p(cu) ) {
         module_reorder(s);
-        db_put_or_update_memory_resource(DBR_CODE,cum,s,TRUE);
+        db_put_or_update_memory_resource(DBR_CODE,cum,s,true);
         db_touch_resource(DBR_CODE,cum);
     }
 }
@@ -413,7 +413,7 @@ void RemoveEntityFromCompilationUnit(entity e, entity cu ) {
             if(!statement_undefined_p(stmt))
                 set_current_module_statement(stmt);
         }
-        s=(statement)db_get_memory_resource(DBR_CODE,cum,TRUE);
+        s=(statement)db_get_memory_resource(DBR_CODE,cum,true);
     }
 
     // Remove entity from global declaration lists
@@ -424,7 +424,7 @@ void RemoveEntityFromCompilationUnit(entity e, entity cu ) {
     remove_declaration_statement(s, e);
     if( c_module_p(cu) ) {
         module_reorder(s);
-        db_put_or_update_memory_resource(DBR_CODE,cum,s,TRUE);
+        db_put_or_update_memory_resource(DBR_CODE,cum,s,true);
         db_touch_resource(DBR_CODE,cum);
     }
 }
@@ -448,7 +448,7 @@ static void do_recompile_module(entity module, statement module_statement) {
     //add_new_module_from_text(module,t,fortran_module_p(modified_module),compilation_unit_of_module(module));
     string dirname = db_get_current_workspace_directory();
     string res = fortran_module_p(module)? DBR_INITIAL_FILE : DBR_C_SOURCE_FILE;
-    string filename = db_get_file_resource(res,module_local_name(module),TRUE);
+    string filename = db_get_file_resource(res,module_local_name(module),true);
     string fullname = strdup(concatenate(dirname, "/",filename, NULL));
     FILE* f = safe_fopen(fullname,"w");
     free(fullname);
@@ -483,7 +483,7 @@ recompile_module(char* module)
 {
     entity modified_module = module_name_to_entity(module);
     statement modified_module_statement =
-        (statement) db_get_memory_resource(DBR_CODE, module, TRUE);
+        (statement) db_get_memory_resource(DBR_CODE, module, true);
     do_recompile_module(modified_module,modified_module_statement);
     return true;
 

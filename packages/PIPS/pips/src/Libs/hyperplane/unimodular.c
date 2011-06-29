@@ -34,5 +34,5 @@
 
 int loop_unimodular(string name)
 {
-  return TRUE;
+  return true;
 }

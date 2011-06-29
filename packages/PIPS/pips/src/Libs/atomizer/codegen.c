@@ -95,7 +95,7 @@ statement current_stmt;
 /* The current statement is the first element of the list "cb->last". */
 current_stmt= STATEMENT(CAR(cb->last));
 
-/* "stmt_generated" is FALSE if the current statement has not produced
+/* "stmt_generated" is false if the current statement has not produced
  * any statement yet, in which case the new statement gets the "label",
  * "number", "ordering" and "comments" (cf. RI) of the current statement.
  */
@@ -117,7 +117,7 @@ if (! cb->stmt_generated)
   statement_comments(current_stmt) = string_undefined;
 
   /* The current statement has, now, generated at least one statement. */
-  cb->stmt_generated = TRUE;
+  cb->stmt_generated = true;
   }
 
 /* The new statement is put just before the current statement in the block.

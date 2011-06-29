@@ -93,7 +93,7 @@
 
 /* Note: initializations of static variables are not used as
    transformers but to initialize the program precondition. */
-/* It is not assumed that entity_has_values_p(v)==TRUE */
+/* It is not assumed that entity_has_values_p(v)==true */
 /* A write effect on the declared variable is assumed as required by
    Beatrice Creusillet for region computation. */
 list declaration_to_transformer_list(entity v, transformer pre)
@@ -105,7 +105,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
 
   pips_debug(8, "Transformer for declaration of \"%s\"\n", entity_name(v));
 
-  if(FALSE && !entity_has_values_p(v)) {
+  if(false && !entity_has_values_p(v)) {
     /* FI: the initialization expression might have relevant
        side-effects? This could ba handled by generalizing
        variable_to_initial_expression() and by returning
@@ -154,7 +154,7 @@ list declaration_to_transformer_list(entity v, transformer pre)
       basic vb = variable_basic(type_variable(vt));
 
       if(basic_equal_p(eb, vb)) {
-	tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
+	tf = safe_any_expression_to_transformer(v, e, pre, false);
 	tf = transformer_temporary_value_projection(tf);
       }
       else {
@@ -162,13 +162,13 @@ list declaration_to_transformer_list(entity v, transformer pre)
 	  int i1 = basic_int(eb);
 	  int i2 = basic_int(vb);
 	  if(ABS(i1-i2)==10) {
-	    tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
+	    tf = safe_any_expression_to_transformer(v, e, pre, false);
 	    tf = transformer_temporary_value_projection(tf);
 	    pips_user_warning("Possible conversion issue between signed and"
 			      " unsigned int\n");
 	  }
 	  else {
-	    tf = safe_any_expression_to_transformer(v, e, pre, FALSE);
+	    tf = safe_any_expression_to_transformer(v, e, pre, false);
 	    tf = transformer_temporary_value_projection(tf);
 	    pips_user_warning("Possible conversion issue between diffent kinds"
 			      " of  ints and/or char (%dd and %d)\n", i1, i2);
@@ -410,9 +410,9 @@ static list test_to_transformer_list(test t,
     list ta = NIL;
     list fa = NIL;
     /* True condition transformer, TCT */
-    transformer tct = condition_to_transformer(e, context, TRUE);
+    transformer tct = condition_to_transformer(e, context, true);
     /* False condition transformer, FCT */
-    transformer fct = condition_to_transformer(e, context, FALSE);
+    transformer fct = condition_to_transformer(e, context, false);
 
     tftwc = transformer_apply(tct, context);
 
@@ -436,7 +436,7 @@ static list test_to_transformer_list(test t,
       (void) print_transformers(post_tftwc);
     }
 
-    /* tffwc = precondition_add_condition_information(tffwc, e, context, FALSE); */
+    /* tffwc = precondition_add_condition_information(tffwc, e, context, false); */
     tffwc = transformer_apply(fct, context);
     tffwc = transformer_temporary_value_projection(tffwc);
     reset_temporary_value_counter();
@@ -523,11 +523,11 @@ list  intrinsic_to_transformer_list(entity e,
     tf = conditional_to_transformer(cond, e1, e2, pre, ef);
   }
   else if(ENTITY_ASSERT_SYSTEM_P(e)) {
-    /* FI: the condition should be evaluated and considered TRUE on
+    /* FI: the condition should be evaluated and considered true on
        exit, but this is sometimes captured by a macro definition and the code
        below is then useless */
     expression cond = EXPRESSION(CAR(pc));
-    tf = condition_to_transformer(cond, pre, TRUE);
+    tf = condition_to_transformer(cond, pre, true);
   }
   else
     tf = effects_to_transformer(ef);
@@ -564,7 +564,7 @@ list assigned_expression_to_transformer_list(entity v,
     entity tmp = make_local_temporary_value_entity(entity_type(v));
     //list tf_args = CONS(ENTITY, v, NIL);
 
-    tf = any_expression_to_transformer(tmp, expr, pre, TRUE);
+    tf = any_expression_to_transformer(tmp, expr, pre, true);
     // The assignment may be part of a more complex expression
     // This should be guarded by "is_internal==FALSE" if is_internal were an argument
     //reset_temporary_value_counter();
@@ -574,7 +574,7 @@ list assigned_expression_to_transformer_list(entity v,
        used right away. The previous store must be projected out. */
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	/* v must be assigned */
-	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	transformer teq = simple_equality_to_transformer(v, tmp, true);
 	tf = transformer_combine(tf, teq);
 	free_transformer(teq);
 
@@ -720,7 +720,7 @@ list any_scalar_assign_to_transformer_list(entity v,
     entity v_old = entity_to_old_value(v);
     entity tmp = make_local_temporary_value_entity(ultimate_type(entity_type(v)));
 
-    tf = any_expression_to_transformer(tmp, rhs, pre, TRUE);
+    tf = any_expression_to_transformer(tmp, rhs, pre, true);
 
     if(!transformer_undefined_p(tf)) {
 
@@ -729,7 +729,7 @@ list any_scalar_assign_to_transformer_list(entity v,
 
       if(entity_is_argument_p(v, transformer_arguments(tf))) {
 	/* Is it standard compliant? The assigned variable is modified by the rhs. */
-	transformer teq = simple_equality_to_transformer(v, tmp, TRUE);
+	transformer teq = simple_equality_to_transformer(v, tmp, true);
 	string s = words_to_string(words_syntax(expression_syntax(rhs),NIL));
 
 	pips_user_warning("Variable %s in lhs is uselessly updated by the rhs '%s'\n",
@@ -1023,7 +1023,7 @@ list statement_to_transformer_list(statement s,
   e = load_cumulated_rw_effects_list(s);
 
   /* it would be nicer to control warning_on_redefinition */
-  if (TRUE) {
+  if (true) {
     list dl = declaration_statement_p(s) ? statement_declarations(s) : NIL;
 
     if(!ENDP(dl)) {

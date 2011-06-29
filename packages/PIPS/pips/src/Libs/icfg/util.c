@@ -145,16 +145,16 @@ list safe_make_successor(vertex ver_parent, vertex ver_child, list l_of_vers)
 
 void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 {
-    bool first_node_parent = TRUE;
+    bool first_node_parent = true;
     fprintf(f_out, "[\n");
 
     FOREACH (VERTEX, ver_parent, l_of_vers) {
-      bool first_node_child = TRUE;
+      bool first_node_child = true;
       text node_parent_text = (text)vertex_vertex_label(ver_parent);
-      bool first_sentence = TRUE;
+      bool first_sentence = true;
 
       if (first_node_parent)
-	first_node_parent = FALSE;
+	first_node_parent = false;
       else
 	fprintf(f_out, ",\n");
 
@@ -163,7 +163,7 @@ void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 	if (first_sentence) {
 	  string tmp = remove_newline_of_string (s);
 	  fprintf(f_out, "l(\"%s\",n(\"\",[a(\"OBJECT\",\"", tmp);
-	  first_sentence = FALSE;
+	  first_sentence = false;
 	  free (tmp);
 	}
 	if (strstr(s, CALL_MARK)) {
@@ -182,7 +182,7 @@ void print_graph_of_text_to_daVinci(FILE * f_out, list l_of_vers)
 	string node_name_child = remove_newline_of_string(first_word_of_sentence(node_child_sen));
 
 	if (first_node_child)
-	  first_node_child = FALSE;
+	  first_node_child = false;
 	else
 	  fprintf(f_out, ",\n");
 	fprintf(f_out, "  l(\"\",e(\"\",[],r(\"%s\")))", node_name_child);
@@ -252,7 +252,7 @@ bool make_resource_from_starting_node
     DB_PUT_FILE_RESOURCE(res_name, mod_name, localfilename);
     free(filename); /* this line must be after DB_PUT_FILE_RESOURCE for the reason of memory liberation */
     
-    return TRUE;
+    return true;
 }
 
 list /* of entity */ get_list_of_variable_to_filter() {
@@ -297,27 +297,27 @@ list /* of effect */ effects_filter(list l_effs, list l_ents)
 	entity ent = reference_variable(ref);
 	MAP(ENTITY, e_flt, {
 	    if (entities_may_conflict_p(e_flt, ent)) {
-	        bool found = FALSE;
+	        bool found = false;
 	        switch(get_int_property(RW_FILTERED_EFFECTS)) {
 		case READ_ALL:
 		case READ_END:
 		    if (action_read_p(ac)) {
 		        ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
-		        found = TRUE;
+		        found = true;
 		    }
 		    break;
 		case WRITE_ALL:
 		case WRITE_END:
 		    if (!action_read_p(ac)) {
 		        ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
-			found = TRUE;
+			found = true;
 		    }
 		    break;
 		case READWRITE_ALL:
 		case READWRITE_END:
 		default:
 		    ADD_ELEMENT_TO_LIST(l_flt, EFFECT, eff);
-		    found = TRUE;
+		    found = true;
 		    break;
 		}
 		if (found) break;

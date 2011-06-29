@@ -165,7 +165,7 @@ string pips_change_directory(const char *dir)
 void pips_srcpath_set(string path)
 {
   if (path)
-    setenv(SRCPATH, path, TRUE);
+    setenv(SRCPATH, path, true);
   else
     unsetenv(SRCPATH);
 }
@@ -200,13 +200,13 @@ static bool pips_process_file(string file_name)
 
     if(err==123) {
 	pips_user_warning("pips-process-module interrupted by control-C\n");
-	return FALSE;
+	return false;
     }
     else if(err!=0)
 	pips_internal_error
 	    ("Unexpected return code from pips-process-module: %d\n", err);
 
-    return TRUE;
+    return true;
 }
 
 #else
@@ -338,7 +338,7 @@ static bool handle_file_name(FILE * out, char * file_name, bool included)
 {
     FILE * f;
     string found = find_file(file_name);
-    bool ok = FALSE;
+    bool ok = false;
 
     if (!found)
     {
@@ -350,7 +350,7 @@ static bool handle_file_name(FILE * out, char * file_name, bool included)
 	fprintf(out,
 		"!! ERROR - include \"%s\" was not found\n"
 		"      include \"%s\"\n", file_name, file_name);
-	return FALSE;
+	return false;
     }
 
     pips_debug(2, "including file \"%s\"\n", found);
@@ -368,7 +368,7 @@ static bool handle_file_name(FILE * out, char * file_name, bool included)
 static bool handle_include_file(FILE * out, char * file_name)
 {
     FILE * in;
-    bool ok = TRUE;
+    bool ok = true;
     string cached = get_cached(file_name);
     char * error = NULL;
 
@@ -378,7 +378,7 @@ static bool handle_include_file(FILE * out, char * file_name)
 
 	cached = get_new_tmp_file_name();
 	tmp_out = safe_fopen(cached, "w");
-	ok = handle_file_name(tmp_out, file_name, TRUE);
+	ok = handle_file_name(tmp_out, file_name, true);
 	safe_fclose(tmp_out, cached);
 
 	/* handle bang comments and hollerith with an additionnal
@@ -394,7 +394,7 @@ static bool handle_include_file(FILE * out, char * file_name)
 	    tmp_in = safe_fopen(cached, "r");
 
 	    error = process_bang_comments_and_hollerith(tmp_in, tmp_hbc);
-	    if (error) ok = FALSE;
+	    if (error) ok = false;
 
 	    safe_fclose(tmp_in, cached);
 	    safe_fclose(tmp_hbc, filtered);
@@ -445,7 +445,7 @@ static bool handle_file(FILE * out, FILE * f)
 		line[matches[1].rm_eo]='\0';
 
 		if (!handle_include_file(out, &line[matches[1].rm_so]))
-		    return FALSE; /* error? */
+		    return false; /* error? */
 
 		line[matches[1].rm_eo]=c;
 		fprintf(out, "! ");
@@ -462,14 +462,14 @@ static bool handle_file(FILE * out, FILE * f)
 	fprintf(out, "%s\n", line);
 	free(line);
     }
-    return TRUE;
+    return true;
 }
 
 static void init_rx(void)
 {
-    static bool done=FALSE;
+    static bool done=false;
     if (done) return;
-    done=TRUE;
+    done=true;
     if (regcomp(&some_goto_rx, GOTO_RX, REG_ICASE)              ||
 	regcomp(&implicit_none_rx, IMPLICIT_NONE_RX, REG_ICASE) ||
 	regcomp(&include_file_rx, INCLUDE_FILE_RX, REG_ICASE)   ||
@@ -482,12 +482,12 @@ static void init_rx(void)
 
 static bool pips_process_file(string file_name, string new_name)
 {
-    bool ok = FALSE;
+    bool ok = false;
     FILE * out;
     pips_debug(2, "processing file %s\n", file_name);
     init_rx();
     out = safe_fopen(new_name, "w");
-    ok = handle_file_name(out, file_name, FALSE);
+    ok = handle_file_name(out, file_name, false);
     safe_fclose(out, new_name);
     return ok;
 }
@@ -497,11 +497,11 @@ static bool pips_process_file(string file_name, string new_name)
 bool filter_file(string mod_name)
 {
     string name, new_name, dir_name, abs_name, abs_new_name;
-    name = db_get_memory_resource(DBR_INITIAL_FILE, mod_name, TRUE);
+    name = db_get_memory_resource(DBR_INITIAL_FILE, mod_name, true);
 
     /* directory is set for finding includes. */
     user_file_directory =
-	pips_dirname(db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE));
+	pips_dirname(db_get_memory_resource(DBR_USER_FILE, mod_name, true));
     new_name = db_build_file_resource_name
 	(DBR_SOURCE_FILE, mod_name, FORTRAN_FILE_SUFFIX);
 
@@ -515,13 +515,13 @@ bool filter_file(string mod_name)
 	pips_user_warning("initial file filtering of %s failed\n", mod_name);
 	safe_unlink(abs_new_name);
 	free(abs_new_name); free(abs_name);
-	return FALSE;
+	return false;
     }
     free(abs_new_name); free(abs_name);
     free(user_file_directory), user_file_directory = NULL;
 
     DB_PUT_NEW_FILE_RESOURCE(DBR_SOURCE_FILE, mod_name, new_name);
-    return TRUE;
+    return true;
 }
 
 
@@ -599,7 +599,7 @@ static bool pips_split_file(string name, string tempfile)
     fprintf(stderr, "split error while extracting %s from %s: %s\n",
 	    tempfile, name, err);
   }
-  return err? TRUE: FALSE;
+  return err != NULL;
 }
 
 /***************************************** MANAGING .F AND .c FILES WITH CPP */
@@ -900,7 +900,7 @@ static int pips_check_fortran(void)
 
     if (v && (*v=='o' || *v=='y' || *v=='t' || *v=='v' || *v=='1' ||
 	      *v=='O' || *v=='Y' || *v=='T' || *v=='V'))
-	return TRUE;
+	return true;
 
     return get_bool_property("CHECK_FORTRAN_SYNTAX_BEFORE_PIPS");
 }
@@ -912,7 +912,7 @@ static int pips_check_fortran(void)
 static bool check_fortran_syntax_before_pips(string file_name)
 {
   string pips_flint = getenv("PIPS_FLINT");
-  bool syntax_ok_p = TRUE;
+  bool syntax_ok_p = true;
 
   user_log("Checking Fortran syntax of %s\n", file_name);
 
@@ -927,7 +927,7 @@ static bool check_fortran_syntax_before_pips(string file_name)
      */
     pips_user_warning("\n\n\tFortran syntax errors in file %s!\007\n\n",
 		      file_name);
-    syntax_ok_p = FALSE;
+    syntax_ok_p = false;
   }
   return syntax_ok_p;
 }
@@ -951,7 +951,7 @@ static string extract_last_name(string line)
 bool process_user_file(string file)
 {
   FILE *fd;
-  bool success_p = FALSE, cpp_processed_p;
+  bool success_p = false, cpp_processed_p;
   string initial_file, nfile, file_list, a_line,
     dir_name = db_get_current_workspace_directory();
 
@@ -969,7 +969,7 @@ bool process_user_file(string file)
   if (!nfile)
     {
       pips_user_warning("Cannot open file: \"%s\"\n", file);
-      return FALSE;
+      return false;
     }
 
   initial_file = nfile;
@@ -984,9 +984,9 @@ bool process_user_file(string file)
     bool syntax_ok_p = check_fortran_syntax_before_pips(nfile);
 
     if(!syntax_ok_p)
-      return FALSE;
+      return false;
   }
-  else if(FALSE) {
+  else if(false) {
     /* Run the C compiler */
     ;
   }
@@ -1001,7 +1001,7 @@ bool process_user_file(string file)
     nfile = process_thru_cpp(initial_file);
     if(nfile==NULL) {
       pips_user_warning("Cannot preprocess file: %s\n", initial_file);
-      return FALSE;
+      return false;
     }
   } else if ( !dot_f_file_p( nfile ) && !dot_f90_file_p( nfile )
       && !dot_f95_file_p( nfile ) ) {
@@ -1021,7 +1021,7 @@ bool process_user_file(string file)
 
   user_log("Splitting file    %s\n", nfile);
   if (pips_split_file(nfile, file_list))
-    return FALSE;
+    return false;
 
   /* The newly created module files are registered in the database
    * The file_list allows split to communicate with this function.
@@ -1031,7 +1031,7 @@ bool process_user_file(string file)
     {
       string mod_name = NULL, res_name = NULL, abs_res, file_name;
       list modules = NIL;
-      bool renamed=FALSE;
+      bool renamed=false;
 
       /* a_line: "MODULE1 ... MODULEn file_name"
        *
@@ -1039,7 +1039,7 @@ bool process_user_file(string file)
        * in the subroutine.
        */
       file_name = extract_last_name(a_line);
-      success_p = TRUE;
+      success_p = true;
       number_of_modules++;
       pips_debug(2, "module %s (number %d)\n", file_name, number_of_modules);
 
@@ -1070,7 +1070,7 @@ bool process_user_file(string file)
 	    if((rf = fopen(abs_res, "r"))!=NULL) { /* Resource name
                                                       conflict */
 	      string ofile =
-		db_get_memory_resource(DBR_USER_FILE, mod_name, TRUE);
+		db_get_memory_resource(DBR_USER_FILE, mod_name, true);
 
 	      fclose(rf);
 	      pips_user_warning("Duplicate module name \"%s\""
@@ -1086,7 +1086,7 @@ bool process_user_file(string file)
 		pips_internal_error("mv %s %s failed",
 				    file_name, res_name);
 	      }
-	    renamed = TRUE;
+	    renamed = true;
 	    free(abs_res);
 	  }
 

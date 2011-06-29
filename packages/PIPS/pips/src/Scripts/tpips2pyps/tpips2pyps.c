@@ -57,10 +57,10 @@
 
 /********************************************************** Static variables */
 
-bool tpips_execution_mode = TRUE;
-bool tpips_is_interactive = FALSE;
+bool tpips_execution_mode = true;
+bool tpips_is_interactive = false;
 
-static bool tpips_is_a_shell = FALSE;
+static bool tpips_is_a_shell = false;
 static FILE * logfile;
 
 /* current file being processed */
@@ -103,7 +103,7 @@ static bool string_is_true(string s)
 
 /* Whether pips should behave as a shell. Can be turned on from
  * the command line, from properties and from the environment.
- * Default is FALSE.
+ * Default is false.
  */
 #define TPIPS_IS_A_SHELL "TPIPS_IS_A_SHELL"
 
@@ -208,7 +208,7 @@ static void tpips_user_error(
 }
 
 
-static void close_workspace_if_opened(boolean is_quit)
+static void close_workspace_if_opened(bool is_quit)
 {
 	if (db_get_current_workspace_name())
 		close_workspace(is_quit);
@@ -218,7 +218,7 @@ void tpips_close(void)
 {
 	/*   close history: truncate list and write history file
 	 */
-	close_workspace_if_opened(TRUE);
+	close_workspace_if_opened(true);
 
 	if (logfile) {
 		safe_fclose (logfile, "the log file");
@@ -256,10 +256,10 @@ static bool line_with_substitutions(string line)
 	while (*line)
 	{
 		if (strchr(SHELL_CHARS, *line))
-			return TRUE;
+			return true;
 		line++;
 	}
-	return FALSE;
+	return false;
 }
 
 /* returns an allocated string after shell substitutions.
@@ -298,7 +298,7 @@ static string tp_substitutions(string line)
 }
 
 /* variable globale, utilisee par le parser helas */
-bool tpips_init_done = FALSE;
+bool tpips_init_done = false;
 
 void tpips_init(void)
 {
@@ -311,13 +311,13 @@ void tpips_init(void)
 	/* set_exception_callbacks(push_pips_context, pop_pips_context); */
 	/* initialize_signal_catcher(); */
 
-	set_bool_property("ABORT_ON_USER_ERROR", FALSE); /* ??? */
+	set_bool_property("ABORT_ON_USER_ERROR", false); /* ??? */
 
 	pips_log_handler = smart_log_handler;
 	pips_request_handler = tpips_user_request;
 	pips_error_handler = tpips_user_error;
 
-	tpips_init_done = TRUE;
+	tpips_init_done = true;
 }
 
 static bool blank_or_comment_line_p(string line)
@@ -444,7 +444,7 @@ static void parse_arguments(int argc, char * argv[])
 			if (rc)
 			{
 				user_log("sourcing tpips rc file: %s\n", tpipsrc);
-				tpips_process_a_file(rc, tpipsrc, FALSE);
+				tpips_process_a_file(rc, tpipsrc, false);
 				fclose(rc);
 			}
 		}
@@ -467,7 +467,7 @@ static void parse_arguments(int argc, char * argv[])
 		{
 			string tps = NULL, saved_srcpath = NULL;
 			FILE * toprocess = (FILE*) NULL;
-			bool use_rl = FALSE;
+			bool use_rl = false;
 
 			if (same_string_p(argv[optind], "-"))
 			{
@@ -478,7 +478,7 @@ static void parse_arguments(int argc, char * argv[])
 			}
 			else
 			{
-				tpips_is_interactive = FALSE;
+				tpips_is_interactive = false;
 				tps = find_file_in_directories(argv[optind],
 																			 getenv("PIPS_SRCPATH"));
 				if (tps)
@@ -496,7 +496,7 @@ static void parse_arguments(int argc, char * argv[])
 						free(tps), tps=NULL;
 					}
 
-					use_rl = FALSE;
+					use_rl = false;
 				}
 				else
 					fprintf(stderr, "[TPIPS] \"%s\" not found...\n",

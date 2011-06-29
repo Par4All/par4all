@@ -216,7 +216,7 @@ bool rename_operator(string module_name)
 {
     /* prelude */
     set_current_module_entity(module_name_to_entity( module_name ));
-    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
     
     /* some properties */
     string ops_string = strdup(get_string_property("RENAME_OPERATOR_OPS"));

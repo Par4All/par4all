@@ -43,12 +43,12 @@
 /* Test if the final value @param li of a for-loop is static.
 
    @return:
-   - TRUE if the final value of a for-loop is static
+   - true if the final value of a for-loop is static
 
    - pub is the new expression of the final value
 
-   - *is_upper_p is set to TRUE if the final value is upper-bound (index
-     is probably increasing) and to FALSE if the final value is
+   - *is_upper_p is set to true if the final value is upper-bound (index
+     is probably increasing) and to false if the final value is
      lower-bound (index is probably decreasing)
 
    Depending on cond, the so-called upper bound may end up being a lower
@@ -59,9 +59,9 @@ static bool condition_expression_to_final_bound(expression cond,
 						bool * is_upper_p,
 						expression * pub)
 {
-  bool success = FALSE;
+  bool success = false;
   syntax cond_s = expression_syntax(cond);
-  bool strict_p = FALSE;
+  bool strict_p = false;
 
   ifdebug(5) {
     pips_debug(5, "Begin with expression\n");
@@ -75,7 +75,9 @@ static bool condition_expression_to_final_bound(expression cond,
     /* Five operators are accepted */
     if (ENTITY_LESS_THAN_P(op) || ENTITY_LESS_OR_EQUAL_P(op)
 	|| ENTITY_GREATER_THAN_P(op) || ENTITY_GREATER_OR_EQUAL_P(op)
-    || ENTITY_NON_EQUAL_P(op) ) {
+	// FI: wrong result for !=; no way to derive a correct bound
+	// without information about the increment
+	/*|| ENTITY_NON_EQUAL_P(op)*/ ) {
       expression e1 = EXPRESSION(CAR(call_arguments(c)));
       expression e2 = EXPRESSION(CAR(CDR(call_arguments(c))));
       syntax e1_s = expression_syntax(e1);
@@ -88,14 +90,14 @@ static bool condition_expression_to_final_bound(expression cond,
 	*is_upper_p = ENTITY_LESS_THAN_P(op)
 	  || ENTITY_LESS_OR_EQUAL_P(op);
 	*pub = convert_bound_expression(e2, *is_upper_p, !strict_p);
-	success = TRUE;
+	success = true;
       }
       else if (syntax_reference_p(e2_s)
 	       && reference_variable(syntax_reference(e2_s)) == li) {
 	*is_upper_p = ENTITY_GREATER_THAN_P(op)
 	  || ENTITY_GREATER_OR_EQUAL_P(op);
 	*pub = convert_bound_expression(e1, *is_upper_p, !strict_p);
-	success = TRUE;
+	success = true;
       }
     }
   }
@@ -130,8 +132,8 @@ static bool condition_expression_to_final_bound(expression cond,
    @param incr for-loop incrementation expression
    @param li is the index variable
 
-   @return TRUE if the incrementation is do-loop compatible \`a la Fortran
-   - @param is_increasing_p is set to TRUE is the loop index is increasing
+   @return true if the incrementation is do-loop compatible \`a la Fortran
+   - @param is_increasing_p is set to true is the loop index is increasing
    - @param pincrement is generated with the detected increment value expression
  */
 static bool incrementation_expression_to_increment(expression incr,
@@ -139,7 +141,7 @@ static bool incrementation_expression_to_increment(expression incr,
 						   bool * is_increasing_p,
                            expression * pincrement)
 {
-    bool success = FALSE;
+    bool success = false;
     syntax incr_s = expression_syntax(incr);
 
     if (syntax_call_p(incr_s)) {
@@ -152,16 +154,16 @@ static bool incrementation_expression_to_increment(expression incr,
             if (is_expression_reference_to_entity_p(e,li)) {
                 /* Look for i++ or ++i: */
                 if ((ENTITY_POST_INCREMENT_P(op) || ENTITY_PRE_INCREMENT_P(op))) {
-                    * is_increasing_p = TRUE;
+                    * is_increasing_p = true;
                     * pincrement = int_to_expression(1);
-                    success = TRUE;
+                    success = true;
                     pips_debug(5, "Increment operator found!\n");
                 }
                 /* Look for i-- or --i: */
                 else if ((ENTITY_POST_DECREMENT_P(op) || ENTITY_PRE_DECREMENT_P(op))) {
-                    * is_increasing_p = FALSE;
+                    * is_increasing_p = false;
                     * pincrement = int_to_expression(-1);
-                    success = TRUE;
+                    success = true;
                     pips_debug(5, "Decrement operator found!\n");
                 }
                 else if (! ENDP(CDR(call_arguments(incr_c)))) {
@@ -181,7 +183,7 @@ static bool incrementation_expression_to_increment(expression incr,
                             if (v != 0) {
                                 int sign = entity_plus_update_p ? 1 : -1 ;
                                 * pincrement = int_to_expression(sign * v);
-                                success = TRUE;
+                                success = true;
                                 if (v > 0 ) {
                                     * is_increasing_p = entity_plus_update_p;
                                     pips_debug(5, "Found += with positive increment!\n");
@@ -198,7 +200,7 @@ static bool incrementation_expression_to_increment(expression incr,
                         else {
                             * pincrement = copy_expression(inc_v);
                             *is_increasing_p = entity_plus_update_p;
-                            success = TRUE;
+                            success = true;
                         }
                     }
                     else {
@@ -210,13 +212,13 @@ static bool incrementation_expression_to_increment(expression incr,
                                 int v = expression_to_int(inc_v);
                                 if (v != 0) {
                                     * pincrement = inc_v;
-                                    success = TRUE;
+                                    success = true;
                                     if (v > 0 ) {
-                                        * is_increasing_p = TRUE;
+                                        * is_increasing_p = true;
                                         pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with positive increment!\n");
                                     }
                                     else {
-                                        * is_increasing_p = FALSE;
+                                        * is_increasing_p = false;
                                         pips_debug(5, "Found \"i = i + v\" or \"i = v + i\" with negative increment!\n");
                                     }
                                 }
@@ -226,8 +228,8 @@ static bool incrementation_expression_to_increment(expression incr,
                              */
                             else {
                                 * pincrement = copy_expression(inc_v);
-                                * is_increasing_p = TRUE;
-                                success = TRUE;
+                                * is_increasing_p = true;
+                                success = true;
                             }
                         }
                         /* SG: i am duplicating code, next generation of phd will clean it */
@@ -669,7 +671,7 @@ for_loop_to_do_loop(char * module_name) {
 
   /* Get the true ressource, not a copy, since we modify it in place. */
   module_statement =
-    (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_statement(module_statement);
   entity mod = module_name_to_entity(module_name);
@@ -702,7 +704,7 @@ for_loop_to_do_loop(char * module_name) {
   reset_current_module_entity();
 
   /* Should have worked: */
-  return TRUE;
+  return true;
 }
 
 
@@ -730,7 +732,7 @@ sequence for_to_while_loop_conversion(expression init,
   statement wl_st =  make_whileloop_statement(cond,
 					      n_body,
 					      STATEMENT_NUMBER_UNDEFINED,
-					      TRUE);
+					      true);
   if(!empty_extensions_p(exts)) {
       free_extensions(statement_extensions(wl_st));
       statement_extensions(wl_st)=copy_extensions(exts);
@@ -892,7 +894,7 @@ for_loop_to_while_loop(char * module_name) {
 
   /* Get the true ressource, not a copy, since we modify it in place. */
   module_statement =
-    (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+    (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_statement(module_statement);
   entity mod = module_name_to_entity(module_name);
@@ -926,5 +928,5 @@ for_loop_to_while_loop(char * module_name) {
   reset_current_module_entity();
 
   /* Should have worked: */
-  return TRUE;
+  return true;
 }

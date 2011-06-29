@@ -36,7 +36,7 @@
 bool p(string module)							     \
 {									     \
     pips_user_warning("pass on %s no more implemented or linked\n", module); \
-    return FALSE;							     \
+    return false;							     \
 }
 
 /*

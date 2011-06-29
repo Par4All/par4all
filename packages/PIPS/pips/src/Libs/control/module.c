@@ -123,7 +123,7 @@ bool new_controlizer(string module_name)
 
   set_current_module_entity(m);
 
-  parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+  parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
   module_stat =  copy_statement(parsed_mod_stat) ;
   /* To have the debug in unspaghettify_statement() working: */
   set_current_module_statement(module_stat);
@@ -210,7 +210,7 @@ bool new_controlizer(string module_name)
 
   debug_off();
 
-  return TRUE;
+  return true;
 }
 
 
@@ -245,7 +245,7 @@ bool controlizer(string module_name)
 
   set_current_module_entity(m);
 
-  parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+  parsed_mod_stat = (statement) db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
   module_stat =  copy_statement(parsed_mod_stat) ;
   /* To have the debug in unspaghettify_statement() working: */
   set_current_module_statement(module_stat);
@@ -321,5 +321,5 @@ bool controlizer(string module_name)
 
   debug_off();
 
-  return TRUE;
+  return true;
 }

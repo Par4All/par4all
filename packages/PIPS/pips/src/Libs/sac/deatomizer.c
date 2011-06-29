@@ -57,9 +57,9 @@ static void daCheckCallReplace(call c, reference ref);
 
 static int gInIndex = 0;
 static bool gRepOnlyInIndex = 0;
-static bool gReplaceAllowed = FALSE;
+static bool gReplaceAllowed = false;
 
-static bool gRepDone = FALSE;
+static bool gRepDone = false;
 
 static graph dep_graph;
 
@@ -74,7 +74,7 @@ static void checkReplaceReference(expression e, reference ref)
                                        if ( reference_indices(r) == NIL ) {
                                            if ( reference_equal_p(syntax_reference(s), ref) && 
                                                    ((gRepOnlyInIndex && (gInIndex != 0)) || !gRepOnlyInIndex)) {
-                                               gReplaceAllowed = TRUE;
+                                               gReplaceAllowed = true;
                                            }
                                        }
                                        else {
@@ -153,7 +153,7 @@ static void daExpressionReplaceReference(list e, reference ref, expression next)
                                            if ( reference_equal_p(syntax_reference(s), ref)) {
                                                expression exp = EXPRESSION(CAR(e));
                                                expression_syntax(exp) = copy_syntax(expression_syntax(next));
-                                               gRepDone = TRUE;
+                                               gRepDone = true;
 
                                                if(expression_normalized(EXPRESSION(CAR(e))) != normalized_undefined)
                                                {
@@ -238,11 +238,11 @@ static list addStatementToSequence(statement stat, list seq, list * start)
 }
 
 /*
-   This function returns TRUE if expr has a write effect on the reference ref.
+   This function returns true if expr has a write effect on the reference ref.
    */
 static bool expr_has_write_eff_ref_p(reference ref, expression expr)
 {
-    bool actionWrite = FALSE;
+    bool actionWrite = false;
 
     list ef = expression_to_proper_effects(expr);
 
@@ -253,7 +253,7 @@ static bool expr_has_write_eff_ref_p(reference ref, expression expr)
         if(action_write_p(effect_action(f)) && 
                 same_entity_p(reference_variable(ref), effEnt))
         {
-            actionWrite = TRUE;
+            actionWrite = true;
         }
 
     }
@@ -264,11 +264,11 @@ static bool expr_has_write_eff_ref_p(reference ref, expression expr)
 }
 
 /*
-   This function returns TRUE if stat has a write effect on the reference ref.
+   This function returns true if stat has a write effect on the reference ref.
    */
 static bool stat_has_write_eff_ref_p(reference ref, statement stat)
 {
-    bool actionWrite = FALSE;
+    bool actionWrite = false;
 
     FOREACH(EFFECT, f, load_proper_rw_effects_list(stat))
     {
@@ -276,7 +276,7 @@ static bool stat_has_write_eff_ref_p(reference ref, statement stat)
 
         if(action_write_p(effect_action(f)) && same_entity_p(reference_variable(ref), effEnt))
         {
-            actionWrite = TRUE;
+            actionWrite = true;
         }
 
     }
@@ -305,7 +305,7 @@ static bool add_const_expr_p(statement stat)
                 {
                     constant cn = value_constant(entity_initial(call_function(ca)));
                     if(!constant_int_p(cn))
-                        return FALSE;
+                        return false;
                 }
                 else if(ENTITY_PLUS_P(call_function(ca)) || ENTITY_MINUS_P(call_function(ca)))
                 {
@@ -313,16 +313,16 @@ static bool add_const_expr_p(statement stat)
 
                     // Strange error
                     if ((arg == NIL) || (CDR(arg) == NIL))
-                        return FALSE;
+                        return false;
 
                     expression e1 = EXPRESSION(CAR(arg));
                     expression e2 = EXPRESSION(CAR(CDR(arg)));
 
                     if(!expression_constant_p(e1) && !expression_constant_p(e2))
-                        return FALSE;
+                        return false;
                 }
                 else
-                    return FALSE;
+                    return false;
 
             }
 
@@ -330,10 +330,10 @@ static bool add_const_expr_p(statement stat)
             break;
 
         default:
-            return FALSE;
+            return false;
     }
 
-    return TRUE;
+    return true;
 }
 
 /*
@@ -346,7 +346,7 @@ static bool stats_has_rw_conf_p(statement si, statement sj,
     if((gen_length(reference_indices(refi)) != 0) ||
             (gen_length(reference_indices(refj)) != 0))
     {
-        return FALSE;
+        return false;
     }
 
     FOREACH(VERTEX, v1,graph_vertices(dep_graph))
@@ -364,14 +364,14 @@ static bool stats_has_rw_conf_p(statement si, statement sj,
                         effect_write_p(conflict_sink(conf)) &&
                         !reference_equal_p(refi, refj))
                 {
-                    return TRUE;
+                    return true;
                 }
 
             }
         }
     }
 
-    return FALSE;
+    return false;
 }
 
 /*
@@ -466,13 +466,13 @@ static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_proces
         }
 
         // gReplaceAllowed is a global variable and is initialized to FALSE.
-        // After the end of the next loop, if gReplaceAllowed is TRUE, then
+        // After the end of the next loop, if gReplaceAllowed is true, then
         // means that refi was found in at least one reference index of a sj
         // statement.
-        gReplaceAllowed = FALSE;
+        gReplaceAllowed = false;
 
-        // TRUE at the end of the newt loop, if one sj statement is not supported
-        bool statNotSupported = FALSE;
+        // true at the end of the newt loop, if one sj statement is not supported
+        bool statNotSupported = false;
 
         // Go through the remaining statements in the sequence
         last = NIL;
@@ -482,12 +482,12 @@ static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_proces
         {
             statement sj = STATEMENT(CAR(j));
 
-            // If TRUE, sj is not supported. Let's stop the analysis.
+            // If true, sj is not supported. Let's stop the analysis.
             if(!instruction_call_p(statement_instruction(sj)) ||
                     !ENTITY_ASSIGN_P(call_function(instruction_call(statement_instruction(sj)))))
             {
                 last = j;
-                statNotSupported = TRUE;
+                statNotSupported = true;
                 break;
             }
 
@@ -521,7 +521,7 @@ static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_proces
                 }
 
                 last = j;
-                statNotSupported = TRUE;
+                statNotSupported = true;
                 break;
             }
 
@@ -551,7 +551,7 @@ static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_proces
             }
 
             last = j;
-            statNotSupported = TRUE;
+            statNotSupported = true;
             break;
         }
 
@@ -574,7 +574,7 @@ static list da_process_list(list seq, bool repOnlyInIndex, bool (*stat_to_proces
             continue;
         }
 
-        // If gReplaceAllowed is TRUE, then do the replacement until last
+        // If gReplaceAllowed is true, then do the replacement until last
         for( j = CDR(i);
                 (j != last) && (j != NIL);
                 j = CDR(j) )
@@ -661,7 +661,7 @@ static void da_simple_statements_pass(statement s)
         return;
 
     seq = sequence_statements(instruction_sequence(statement_instruction(s)));
-    newseq = da_process_list(seq, TRUE, add_const_expr_p);
+    newseq = da_process_list(seq, true, add_const_expr_p);
 
     sequence_statements(instruction_sequence(statement_instruction(s))) = newseq;
     gen_free_list(seq);
@@ -675,13 +675,13 @@ static void da_simple_statements_pass(statement s)
 static void da_simple_statements(statement s)
 {
     // It is a global variable
-    gRepDone = TRUE;
+    gRepDone = true;
 
     int debCount = 0;
 
     while(gRepDone && (debCount < 2))
     {
-        gRepDone = FALSE;
+        gRepDone = false;
 
         debCount++;
 
@@ -701,9 +701,9 @@ static bool da_simple_sequence_filter(statement s)
     /* Do not recurse through simple calls, for better performance */ 
     i = statement_instruction(s);
     if (instruction_call_p(i))
-        return FALSE;
+        return false;
     else
-        return TRUE;
+        return true;
 }
 
 /*
@@ -726,16 +726,16 @@ bool deatomizer(char * mod_name)
 {
     /* get the resources */
     statement mod_stmt = (statement)
-        db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+        db_get_memory_resource(DBR_CODE, mod_name, true);
 
     set_current_module_statement(mod_stmt);
     set_current_module_entity(module_name_to_entity(mod_name));
 	set_ordering_to_statement(mod_stmt);
 
-    dep_graph = (graph) db_get_memory_resource(DBR_DG, mod_name, TRUE);
+    dep_graph = (graph) db_get_memory_resource(DBR_DG, mod_name, true);
 
     set_proper_rw_effects((statement_effects) 
-            db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, TRUE));
+            db_get_memory_resource(DBR_PROPER_EFFECTS, mod_name, true));
 
     debug_on("DEATOMIZER");
 
@@ -765,5 +765,5 @@ bool deatomizer(char * mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

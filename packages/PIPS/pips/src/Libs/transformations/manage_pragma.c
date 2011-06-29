@@ -117,8 +117,8 @@ static void build_omp_pragma_list (extensions exts,
 //the flag to true
 static bool inner_filter (loop l, bool *inner_flag) {
   pips_debug (5, "processing loop : %p.\n", (void*) l);
-  *inner_flag = TRUE;
-  return TRUE;
+  *inner_flag = true;
+  return true;
 }
 
 //@brief keep the inner pragma and remove the others. This is the bottum up part
@@ -133,12 +133,12 @@ static void inner_rewrite (loop l, bool *inner_flag) {
     // today extension is only pragma but can be something else in the future
     // a test will have to be done
     // if (extension_is_pragma_p ())
-    if (*inner_flag == TRUE) {
+    if (*inner_flag == true) {
       // this is the inner pragma we have to keep it so set the flag to false
       // to remove next extensions and exit
       pips_debug (5, "keeping pragma : %s from extensions %p.\n",
 		  pragma_to_string (extension_pragma (ext)), (void*) exts);
-      *inner_flag = FALSE;
+      *inner_flag = false;
       return;
     } else {
       // we need to remove that extension because it is not an inner one
@@ -166,13 +166,13 @@ static bool build_outer (loop l, list *l_outer) {
     pragma pr = extension_pragma (ext);
     pips_debug (5, "processing pragma : %s\n", pragma_to_string (pr));
     // only the pragma as expressions are managed
-    if (pragma_expression_p (pr) == TRUE) {
+    if (pragma_expression_p (pr) == true) {
       *l_outer = gen_statement_cons (stmt, *l_outer);
       pips_debug (5, "outer pragma as expression found\n");
-      return FALSE;
+      return false;
     }
   }
-  return TRUE;
+  return true;
 }
 
 /// @brief merge the omp pragma on the most outer parallel loop
@@ -212,7 +212,7 @@ static void build_iteration_list (range r, list *l_iters) {
 /// @param pr, the pragma to process
 static void add_loop_parallel_threshold(pragma pr) {
   // only the pragma as expressions are managed
-  if(pragma_expression_p (pr) == TRUE) {
+  if(pragma_expression_p (pr) == true) {
     // we need to get the loop index
     statement stmt = (statement)gen_get_ancestor(statement_domain, pr);
     instruction inst = statement_instruction (stmt);
@@ -221,7 +221,7 @@ static void add_loop_parallel_threshold(pragma pr) {
       list l_iters = NIL;
       loop l = instruction_loop (inst);
       // evaluate the number of iteration according to the property value
-      if(get_bool_property("OMP_IF_CLAUSE_RECURSIVE") == TRUE) {
+      if(get_bool_property("OMP_IF_CLAUSE_RECURSIVE") == true) {
         // collect the number of iteration of current loop and inner loops
         gen_context_recurse (stmt, &l_iters, range_domain, gen_true, build_iteration_list);
       } else {
@@ -287,7 +287,7 @@ bool omp_merge_pragma (const string module_name) {
   else { //inner
     pips_debug (3, "inner mode\n");
     // The inner flag
-    bool inner_flag = TRUE;
+    bool inner_flag = true;
     FOREACH (statement, stmt, l_outer) {
       gen_context_recurse (stmt, &inner_flag, loop_domain, inner_filter, inner_rewrite);
     }
@@ -299,14 +299,14 @@ bool omp_merge_pragma (const string module_name) {
   //Put back the new statement module
   PIPS_PHASE_POSTLUDE(mod_stmt);
 
-  return TRUE;
+  return true;
 }
 
 bool omp_loop_parallel_threshold_set (const string module_name) {
   debug_on("OPMIFY_CODE_DEBUG_LEVEL");
   statement mod_stmt = statement_undefined;
   // Get the code and tell PIPS_DBM we do want to modify it
-  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  mod_stmt = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   // Set the current module entity and the current module statement that are
   // required to have many things working in PIPS
@@ -336,5 +336,5 @@ bool omp_loop_parallel_threshold_set (const string module_name) {
   pips_debug(2, "done for %s\n", module_name);
   debug_off();
 
-  return TRUE;
+  return true;
 }

@@ -317,7 +317,7 @@ normalized binary_to_normalized(list la, int op)
     }
 
     if (EvalNormalized(nd, &val2) && EvalNormalized(ng, &val1)) {
-	bool succeed = TRUE;
+	bool succeed = true;
 
 	FreeNormalized(nd);
 	FreeNormalized(ng);
@@ -354,7 +354,7 @@ normalized binary_to_normalized(list la, int op)
 	    break;
 	case POWER:
 	    if(val2<0) {
-		succeed = FALSE;
+		succeed = false;
 	    }
 	    else {
 		val = ipow(val1,val2);
@@ -387,11 +387,11 @@ int *pv;
 	Pvecteur v = (Pvecteur) normalized_linear(n);
 	if (vect_size(v) == 1 && var_of(v) == TCST) {
 	    *pv = VALUE_TO_INT(val_of(v));
-	    return(TRUE);
+	    return(true);
 	}
     }
 
-    return(FALSE);		
+    return(false);		
 }
 
 void FreeNormalized(n)
@@ -479,16 +479,16 @@ static bool normalized_constant_p(normalized n, int *pv)
 	if (length==0)
 	{
 	    *pv=0;
-	    return TRUE;
+	    return true;
 	}
 	else if (length==1 && var_of(v)==TCST)
 	{
 	  *pv=VALUE_TO_INT(val_of(v));
-	  return TRUE;
+	  return true;
 	}
     }
 
-    return FALSE;
+    return false;
 }
 
 static normalized
@@ -666,7 +666,7 @@ static bool normalize_first_expressions_filter(expression e)
 	    print_expression(e);
     }
 
-    return FALSE;
+    return false;
 }
 
 void normalize_first_expressions_of(void * obj)

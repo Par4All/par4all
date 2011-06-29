@@ -90,12 +90,12 @@ complexity make_complexity_unknown(const char * name) {
  * complexity expression_to_complexity_polynome(expression expr,
  *                                   transformer precond,
  *                                   list effects_list,
- *                                   boolean keep_symbols,
+ *                                   bool keep_symbols,
  *                                   int maximize)
  * return the polynomial associated to the expression expr,
  * or POLYNOME_UNDEFINED if it's not a polynome. 
  * or POLYNOME_NULL if it's a 0 complexity.
- * If keep_symbols is FALSE, we force evaluation of variables. 
+ * If keep_symbols is false, we force evaluation of variables. 
  * If they can't be evaluated, they enter the polynomial,
  * but they are replaced by the pseudo-variable UNKNOWN_VARIABLE,
  * except when they appear in a loop range:
@@ -117,7 +117,7 @@ complexity expression_to_complexity_polynome(expr, precond, effects_list, keep_s
 expression expr;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     normalized no = NORMALIZE_EXPRESSION(expr);
@@ -153,7 +153,7 @@ int maximize;
     
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "expr->pnome ");
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
     }
 
     trace_off();
@@ -165,7 +165,7 @@ complexity syntax_to_polynome(synt, precond, effects_list, keep_symbols, maximiz
 syntax synt;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity comp = complexity_undefined;
@@ -204,7 +204,7 @@ complexity normalized_to_polynome(no, precond, effects_list, keep_symbols, maxim
 normalized no;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity comp = make_zero_complexity();
@@ -227,7 +227,7 @@ complexity pvecteur_to_polynome(pvect, precond, effects_list, keep_symbols, maxi
 Pvecteur pvect;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity comp = make_zero_complexity();
@@ -235,8 +235,8 @@ int maximize;
     Pvecteur pv;
     Variable var;
     Value val;
-    boolean we_must_evaluate;
-/*    boolean must_be_written = FALSE; */
+    bool we_must_evaluate;
+/*    bool must_be_written = false; */
 
     trace_on("pvecteur  -> pnome maximize is %d", maximize);
 
@@ -253,7 +253,7 @@ int maximize;
 	    (var != TCST) &&
 	    (keep_symbols ? (!hash_contains_p(hash_complexity_parameters,
 					      (char *)module_local_name((entity)var)))
-	                  : TRUE);
+	                  : true);
 /*
 	must_be_written = is_must_be_written_var(effects_list, 
 						 variable_local_name(var));
@@ -300,12 +300,12 @@ complexity reference_to_polynome(ref, precond, effects_list, keep_symbols, maxim
 reference ref;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity comp = make_zero_complexity();
-    boolean we_must_evaluate;
-/*    boolean must_be_written; */
+    bool we_must_evaluate;
+/*    bool must_be_written; */
     entity var = reference_variable(ref);
 
     trace_on("reference -> pnome");
@@ -315,7 +315,7 @@ int maximize;
 	we_must_evaluate = (keep_symbols ?
 			    !hash_contains_p(hash_complexity_parameters,
 					     (char *)module_local_name((entity)var) ):
-			    TRUE);
+			    true);
 /*
 	must_be_written = is_must_be_written_var(effects_list, var);
  
@@ -345,7 +345,7 @@ int maximize;
 complexity range_to_polynome(range rg __attribute__ ((__unused__)),
 			     transformer precond __attribute__ ((__unused__)),
 			     list effects_list __attribute__ ((__unused__)),
-			     boolean keep_symbols __attribute__ ((__unused__)),
+			     bool keep_symbols __attribute__ ((__unused__)),
 			     int maximize __attribute__ ((__unused__)))
 {
     complexity comp = make_zero_complexity();
@@ -363,7 +363,7 @@ complexity call_to_polynome(call_instr, precond, effects_list, keep_symbols, max
 call call_instr;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     entity f = call_function(call_instr);
@@ -411,7 +411,7 @@ int maximize;
     
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
 	fprintf(stderr, "call->pnome '%s': ", name);
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
     }
 
     trace_off();
@@ -422,7 +422,7 @@ complexity cast_to_polynome(cast_instr, precond, effects_list, keep_symbols, max
 cast cast_instr;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
   expression exp = cast_expression(cast_instr);
@@ -434,7 +434,7 @@ int maximize;
   
     if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
         fprintf(stderr, "cast->pnome");
-	complexity_fprint(stderr, comp, TRUE, TRUE);
+	complexity_fprint(stderr, comp, true, true);
     }
 
   trace_off();
@@ -445,7 +445,7 @@ complexity plus_op_handler(args, precond, effects_list, keep_symbols, maximize)
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
@@ -465,7 +465,7 @@ complexity minus_op_handler(args, precond, effects_list, keep_symbols, maximize)
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
@@ -485,7 +485,7 @@ complexity multiply_op_handler(args, precond, effects_list, keep_symbols, maximi
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity c1 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
@@ -520,7 +520,7 @@ complexity unary_minus_op_handler(args, precond, effects_list, keep_symbols, max
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     complexity c2 = expression_to_complexity_polynome(EXPRESSION(CAR(args)),
@@ -538,7 +538,7 @@ complexity divide_op_handler(args, precond, effects_list, keep_symbols, maximize
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     float denominateur;
@@ -567,7 +567,7 @@ complexity power_op_handler(args, precond, effects_list, keep_symbols, maximize)
 list args;
 transformer precond;
 list effects_list;
-boolean keep_symbols;
+bool keep_symbols;
 int maximize;
 {
     float power;
@@ -626,7 +626,7 @@ complexity evaluate_var_to_complexity(entity var,
     Psysteme psyst = (Psysteme) predicate_system(pred);
     Value min = VALUE_MAX;
     Value max = VALUE_MIN;
-    boolean faisable;
+    bool faisable;
     complexity comp = make_zero_complexity();
 
 #define maxint_p(i) ((i) == INT_MAX)
@@ -650,7 +650,7 @@ complexity evaluate_var_to_complexity(entity var,
 
 	for ( pv=ps->base; !VECTEUR_NUL_P(pv); pv=pv->succ) {
 	    if ( var_of(pv) != (Variable)var ) {
-		boolean b = hash_contains_p(hash_complexity_parameters,
+		bool b = hash_contains_p(hash_complexity_parameters,
 					(char *)module_local_name((entity)var_of(pv)));
 
 		if (get_bool_property("COMPLEXITY_INTERMEDIATES")) {
@@ -807,7 +807,7 @@ Variable var;
 	}
     }
     else {
-	boolean b = hash_contains_p(hash_complexity_parameters,
+	bool b = hash_contains_p(hash_complexity_parameters,
 		           (char *)module_local_name((entity)var)); 
 
 	if ( b )

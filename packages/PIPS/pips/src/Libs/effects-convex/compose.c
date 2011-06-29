@@ -88,7 +88,7 @@ list convex_regions_precondition_compose(list l_reg, transformer context)
 
 	pips_assert("sc_context is weakly consistent", sc_weak_consistent_p(sc_context));
 	pips_assert("reg_sc is weakly consistent (1)", sc_weak_consistent_p(reg_sc));
-	region_sc_append(reg, sc_context, FALSE);
+	region_sc_append(reg, sc_context, false);
 
 	/* remove potential old values that may be found in precondition */
 	list l_old_values = NIL;

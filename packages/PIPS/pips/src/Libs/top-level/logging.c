@@ -52,7 +52,7 @@ FILE * get_log_file()
 void
 close_log_file(void)
 {
-   if (log_file != NULL && get_bool_property("USER_LOG_P") == TRUE)
+   if (log_file != NULL && get_bool_property("USER_LOG_P") )
       if (fclose(log_file) != 0) {
 	  pips_internal_error("Could not close");
          perror("close_log_file");
@@ -68,7 +68,7 @@ open_log_file(void)
     if (log_file != NULL)
 	close_log_file();
 
-    if (get_bool_property("USER_LOG_P") == TRUE) 
+    if (get_bool_property("USER_LOG_P") ) 
     {
 	string 
 	    dir = db_get_current_workspace_directory(),
@@ -89,7 +89,7 @@ open_log_file(void)
 void
 log_on_file(char chaine[])
 {
-   if (log_file != NULL /* && get_bool_property("USER_LOG_P") == TRUE */) {
+   if (log_file != NULL /* && get_bool_property("USER_LOG_P") */) {
       if (fprintf(log_file, "%s", chaine) <= 0) {
          perror("log_on_file");
          abort();

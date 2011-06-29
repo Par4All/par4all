@@ -287,7 +287,7 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
   list seq_stats = sequence_statements(instruction_sequence(i));
   list new_seq_stats = NIL;
   list isolated_seq_stats = NIL;
-  bool statement_to_isolate = FALSE;
+  bool statement_to_isolate = false;
   int nb_of_statements_to_isolate = 0;
   string function_name = get_function_name_by_searching_tag(begin_tag_statement, EXTERNALIZED_CODE_PRAGMA_BEGIN);
 
@@ -304,12 +304,12 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 
                       if (statement_to_isolate && (s == end_tag_statement)) 
                       {
-                        statement_to_isolate = FALSE;
+                        statement_to_isolate = false;
                       }
 
                       if ((!statement_to_isolate) && (s == begin_tag_statement)) 
                       {
-                        statement_to_isolate = TRUE;
+                        statement_to_isolate = true;
                       }    
                     }, seq_stats);
 
@@ -339,7 +339,7 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 						   NIL,
 						   NULL,
 						   statement_extensions (sequence_statement));
-    bool isolated_seq_stats_is_inserted = FALSE;
+    bool isolated_seq_stats_is_inserted = false;
     
     /* Build a new sequence containing isolated sequence statement */
     MAP(STATEMENT, s, {
@@ -348,7 +348,7 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 	                  if (!isolated_seq_stats_is_inserted) 
                           {
 	                    new_seq_stats = CONS(STATEMENT, returned_statement, new_seq_stats);
-	                    isolated_seq_stats_is_inserted = TRUE;
+	                    isolated_seq_stats_is_inserted = true;
 	                  }
                         }
                         else 
@@ -358,12 +358,12 @@ static statement isolate_code_portion(statement begin_tag_statement, statement e
 
                         if (statement_to_isolate && (s == end_tag_statement)) 
                         {
-	                  statement_to_isolate = FALSE;
+	                  statement_to_isolate = false;
                         }
 
                         if ((!statement_to_isolate) && (s == begin_tag_statement)) 
                         {
-	                  statement_to_isolate = TRUE;
+	                  statement_to_isolate = true;
                         }
                       }, seq_stats); 
 
@@ -489,7 +489,7 @@ bool safescale_distributor_init(string module_name)
   entity module;
   
   /* Get the resources */
-  statement stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  statement stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   
   module = module_name_to_entity(module_name); 
 
@@ -517,5 +517,5 @@ bool safescale_distributor_init(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }

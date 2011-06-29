@@ -236,7 +236,7 @@ static text stub_text(entity module, bool is_fortran)
 	type t = entity_type(module);
 	/* FI: I do not know what to use to initialize pdl usefully */
 	list pdl = NIL; // each type supporting entity is declared independently
-	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), FALSE, TRUE, pdl);
+	list pc = generic_c_words_entity(t, CHAIN_SWORD(NIL,name), false, true, pdl);
 
 	// st = c_text_entity_simple(entity_undefined, module, 0);
 	st = make_text(NIL);
@@ -363,7 +363,7 @@ add_new_module_from_text(string module_name,
 			 bool is_fortran,
 			 string compilation_unit_name) {
     pips_assert("fortran module have no compilation unit\n",!is_fortran || (is_fortran && string_undefined_p(compilation_unit_name)));
-    boolean success_p = TRUE;
+    bool success_p = true;
     entity m = local_name_to_top_level_entity(module_name);
     string file_name, dir_name, src_name, full_name, init_name, finit_name;
     /* relative to the current directory */
@@ -379,7 +379,7 @@ add_new_module_from_text(string module_name,
       pips_user_error(
 	"No entity defined for module %s although it might"
 	" have been encountered at a call site\n", module_name);
-      return FALSE;
+      return false;
     }
 
     /* depending on output language, build compilation unit,
@@ -716,7 +716,7 @@ static bool ask_a_missing_file(string module, bool is_fortran) {
  * - an internal command can be run instead, it has to be registered first
  */
 bool generic_initializer(string module_name, bool is_fortran) {
-  bool success_p = FALSE;
+  bool success_p = false;
   string missing = get_string_property("PREPROCESSOR_MISSING_FILE_HANDLING");
 
   if(same_string_p(missing, "error")) {
@@ -755,7 +755,7 @@ bool generic_initializer(string module_name, bool is_fortran) {
    Fortran source for it. */
 bool fortran_initializer(string module_name)
 {
-  return generic_initializer(module_name, TRUE);
+  return generic_initializer(module_name, true);
 }
 
 
@@ -763,10 +763,10 @@ bool fortran_initializer(string module_name)
    there is no Fortran source for it. */
 bool initializer(string module_name)
 {
-  bool res = FALSE;
+  bool res = false;
 
   debug_on("INITIALIZER_DEBUG_LEVEL");
-  res = generic_initializer(module_name, TRUE);
+  res = generic_initializer(module_name, true);
   debug_off();
 
   return res;
@@ -777,10 +777,10 @@ bool initializer(string module_name)
    there is no C source for it. */
 bool c_initializer(string module_name)
 {
-  bool res = FALSE;
+  bool res = false;
 
   debug_on("INITIALIZER_DEBUG_LEVEL");
-  res = generic_initializer(module_name, FALSE);
+  res = generic_initializer(module_name, false);
   debug_off();
 
   return res;

@@ -40,8 +40,8 @@
 #define PSI_PREFIX "PSI"
 #define RHO_PREFIX "RHO"
 #define BETA_PREFIX "BETA"
-#define PROPER TRUE
-#define SUMMARY FALSE
+#define PROPER true
+#define SUMMARY false
 
 /* some useful SHORTHANDS for EFFECT:
  */
@@ -81,7 +81,7 @@
 
 
 
-/* TRUE if e is a phi variable
+/* true if e is a phi variable
  * PHI entities have a name like: REGIONS:PHI#, where # is a number.
  * takes care if TCST and undefined entities, just in case.
  * FC, 09/12/94

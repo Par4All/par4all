@@ -46,7 +46,7 @@
 
 bool loop_interchange(string module_name)
 {
-  bool return_status = FALSE;
+  bool return_status = false;
 
   return_status =
     interactive_loop_transformation(module_name,

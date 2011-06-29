@@ -71,7 +71,7 @@ int perfect_nested_level;
     int vs = vect_size((Pvecteur)(base_index));
     Psysteme sc_proj;
     Value min,max;
-    boolean faisable;
+    bool faisable;
     int i;
 
     /* Because the number of elements per bank ligne is usefull to

@@ -61,7 +61,7 @@ step_simple_expression_decision(e)
   /*  don't atomize symbolic constant
    */
   if(syntax_call_p(s)&&value_symbolic_p(entity_initial(call_function(syntax_call(s)))))
-      return FALSE;
+      return false;
 
   /*  don't atomize A
    */
@@ -76,9 +76,9 @@ step_simple_expression_decision(e)
   /*  don't atomize A(1)
    */
   if (expression_constant_p(e)) 
-    return(FALSE);
+    return(false);
   
-  return(TRUE);
+  return(true);
 }
 
 static bool
@@ -97,7 +97,7 @@ step_atomizer_func_decide(call c, expression e)
   step_expression_atomized=e;
  
   if (ENTITY_ASSIGN_P(f))
-    return FALSE;
+    return false;
 
   if (value_tag(entity_initial(f)) == is_value_intrinsic ||
       !syntax_reference_p(s))
@@ -107,17 +107,17 @@ step_atomizer_func_decide(call c, expression e)
    * should check that the reference is not used as a vector
    * and is not modified?
    */ 
-  return FALSE;
+  return false;
 }
 
 
-boolean step_atomize(char * mod_name)
+bool step_atomize(char * mod_name)
 {
   statement mod_stat;
   entity module;
 
   init_step_atomized();
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
 
   set_current_module_statement(mod_stat);
   module = local_name_to_top_level_entity(mod_name);
@@ -143,7 +143,7 @@ boolean step_atomize(char * mod_name)
   reset_current_module_entity();
   reset_step_atomized();
   
-  return(TRUE);
+  return(true);
 }
 
 static bool step_expression_atomize_filter(expression expr)
@@ -158,7 +158,7 @@ static bool step_expression_atomize_filter(expression expr)
       delete_step_atomized(e);
     }
 
-  return TRUE;
+  return true;
 }
 
 static bool step_call_atomize_filter(call c)
@@ -175,19 +175,19 @@ static bool step_call_atomize_filter(call c)
 	  call_function(c)=entity_intrinsic(CONTINUE_FUNCTION_NAME);
 	  gen_free_list(call_arguments(c));
 	  call_arguments(c)=NIL;
-	  return FALSE;
+	  return false;
 	}
     }
-  return TRUE;
+  return true;
 }
 
-boolean step_unatomize(char * mod_name)
+bool step_unatomize(char * mod_name)
 {
   statement mod_stat;
   entity module;
 
-  set_step_atomized((map_entity_expression)db_get_memory_resource(DBR_STEP_ATOMIZED, mod_name, TRUE));
-  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  set_step_atomized((map_entity_expression)db_get_memory_resource(DBR_STEP_ATOMIZED, mod_name, true));
+  mod_stat = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   
   set_current_module_statement(mod_stat);
   module = local_name_to_top_level_entity(mod_name);
@@ -213,5 +213,5 @@ boolean step_unatomize(char * mod_name)
   reset_current_module_entity();
   reset_step_atomized();
   
-  return(TRUE);
+  return(true);
 }

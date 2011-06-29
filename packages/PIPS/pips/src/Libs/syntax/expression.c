@@ -192,7 +192,7 @@ expression loop_to_implieddo( loop l ) {
  * 
  * fc and lc are substring bound expressions.
  * 
- * HasParenthesis is a boolean that tells if the reference to e was done
+ * HasParenthesis is a bool that tells if the reference to e was done
  * with () or not. this is mandatory to make the difference between a call
  * to a function and a reference to a function.
  * 
@@ -399,7 +399,7 @@ int HasParenthesis;
 	if (value_unknown_p(entity_initial(e))) {
 	    /* e is either called or passed as argument to a function.
 	     It cannot be a PARAMETER or its value would be known. */
-	    if (indices == NIL && HasParenthesis == FALSE) {
+	    if (indices == NIL && HasParenthesis == false) {
 		s = make_syntax(is_syntax_reference, make_reference(e, NIL));
 	    }
 	    else {
@@ -415,7 +415,7 @@ int HasParenthesis;
 	    /* e is either called or passed as argument to a function, or
                it is a PARAMETER, in which case, it must really be
                called. */
-	    if (indices == NIL && HasParenthesis == FALSE
+	    if (indices == NIL && !HasParenthesis
 		&& !value_symbolic_p(entity_initial(e))) {
 		s = make_syntax(is_syntax_reference, make_reference(e, NIL));
 	    }

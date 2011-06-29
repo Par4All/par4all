@@ -71,7 +71,7 @@ bool print_decorated_call_graph(module_name,decor_type)
 string module_name;
 int decor_type;
 {
-    bool success = FALSE;
+    bool success = false;
     entity mod = module_name_to_entity(module_name);
 
     debug_on(CALLGRAPH_DEBUG_LEVEL);
@@ -90,7 +90,7 @@ int decor_type;
 bool print_call_graph(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_NONE);
 
@@ -103,7 +103,7 @@ string module_name;
 bool print_call_graph_with_proper_effects(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_PROPER_EFFECTS);
 
@@ -116,7 +116,7 @@ string module_name;
 bool print_call_graph_with_cumulated_effects(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,
 					 CG_DECOR_CUMULATED_EFFECTS);
@@ -130,7 +130,7 @@ string module_name;
 bool print_call_graph_with_regions(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_REGIONS);
 
@@ -143,7 +143,7 @@ string module_name;
 bool print_call_graph_with_in_regions(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_IN_REGIONS);
 
@@ -156,7 +156,7 @@ string module_name;
 bool print_call_graph_with_out_regions(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_OUT_REGIONS);
 
@@ -169,7 +169,7 @@ string module_name;
 bool print_call_graph_with_preconditions(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_PRECONDITIONS);
 
@@ -182,7 +182,7 @@ string module_name;
 bool print_call_graph_with_total_preconditions(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_TOTAL_PRECONDITIONS);
 
@@ -195,7 +195,7 @@ string module_name;
 bool print_call_graph_with_transformers(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_TRANSFORMERS);
 
@@ -208,7 +208,7 @@ string module_name;
 bool print_call_graph_with_complexities(module_name)
 string module_name;
 {
-    bool success = FALSE;
+    bool success = false;
 
     success = print_decorated_call_graph(module_name,CG_DECOR_COMPLEXITIES);
 

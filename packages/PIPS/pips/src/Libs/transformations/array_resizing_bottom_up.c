@@ -72,18 +72,18 @@ parameter_p(entity e)
     type_functional_p(entity_type(e));
 }
 
-/*La valeur retournée est TRUE si la variable v est un parameter 
+/*La valeur retournée est true si la variable v est un parameter 
   ou une variable common. Sinon, elle rend la valeur FALSE.*/
 
 static bool
 variable_is_param_common_p(entity e)
 {
-  if ( (parameter_p(e)) || (variable_in_common_p(e)) )  return (TRUE);
+  if ( (parameter_p(e)) || (variable_in_common_p(e)) )  return (true);
   else 
-    return (FALSE);
+    return (false);
 }
 
-/*Rendre TRUE si la variable v n'est pas un parameter, ni une variable common
+/*Rendre true si la variable v n'est pas un parameter, ni une variable common
   et v, v_phi ne sont pas identiques.
   En vice-versa, retourner la valeur FALSE.*/
 
@@ -92,15 +92,15 @@ variable_to_project_p(Variable v_phi, Variable v)
 {
   if (v!=v_phi) {
     entity e = (entity) v;
-    if (variable_is_param_common_p(e) || storage_formal_p(entity_storage(e))) return FALSE;
-    return TRUE;
+    if (variable_is_param_common_p(e) || storage_formal_p(entity_storage(e))) return false;
+    return true;
   }
-  return FALSE;
+  return false;
 }
 
-static boolean extract_constraint_on_var(Pvecteur p_var, Variable var, int val,  Pvecteur *ptmp)
+static bool extract_constraint_on_var(Pvecteur p_var, Variable var, int val,  Pvecteur *ptmp)
 {
-  boolean divisible=TRUE; 
+  bool divisible=true; 
   Pvecteur p_tmp = VECTEUR_NUL,pv;
   for (pv = p_var; !VECTEUR_NUL_P(pv) && divisible; pv=pv->succ) {
     Variable v1=vecteur_var(pv); 
@@ -118,11 +118,11 @@ static boolean extract_constraint_on_var(Pvecteur p_var, Variable var, int val, 
       vect_chg_coeff(&pv,v1, value_uminus(value_div(pv->val, val)));
     }
     *ptmp = p_tmp;
-    return(TRUE);
+    return(true);
   }
   else {
     *ptmp = VECTEUR_NUL;
-    return (FALSE);
+    return (false);
   }
 }
 
@@ -139,11 +139,11 @@ extract_constraint_from_equalitites(Psysteme ps, Variable var, Pvecteur *pe)
   Pcontrainte pc;
   Value v_phi = VALUE_ZERO;
   Pvecteur p_var = VECTEUR_NUL, ptmp= VECTEUR_NUL; 
-  boolean result=FALSE;   
+  bool result=false;   
   if (!SC_UNDEFINED_P(ps) && !CONTRAINTE_UNDEFINED_P(ps->egalites) 
       && CONTRAINTE_NULLE_P(ps->egalites))  {
     *pe = VECTEUR_NUL;
-    return(FALSE);
+    return(false);
   }
   for (pc = ps->egalites; pc != NULL; pc = pc->succ) {    
     /* équation de la forme: k*var + q1*C1 + ... + p1*N1 + ... == 0 */
@@ -155,7 +155,7 @@ extract_constraint_from_equalitites(Psysteme ps, Variable var, Pvecteur *pe)
       return(result);}
   }
   *pe = VECTEUR_NUL;
-  return(FALSE);
+  return(false);
 }
 
 /*Simplifier le Pvecteur pv et extraire les parametres qui apparaissent dans pv.
@@ -227,7 +227,7 @@ vect_partial_eval(Pvecteur pv)
     b-/  VECTEUR_UNDEFINED  et  VECTEUR_ONE (1)
     c-/  VECTEUR_UNDEFINED  et  un vecteur quelconque sauf VECTEUR_ONE */
 static Pvecteur
-sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_min)
+sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, bool is_min)
 {
   /* Automatic variables read in a CATCH block need to be declared volatile as
    * specified by the documentation*/
@@ -240,7 +240,7 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
     pc_inf = CONTRAINTE_UNDEFINED, 
     pc_sup = CONTRAINTE_UNDEFINED;
   Pvecteur p1, p2, p_egal, p_inf, p_sup,pvt,pv_1;
-  boolean  egal = FALSE, inf = FALSE, sup = FALSE;
+  bool  egal = false, inf = false, sup = false;
   Pvecteur p_one = vect_new(TCST, VALUE_ONE);
 
   if (VECTEUR_UNDEFINED_P(pv1) && VECTEUR_UNDEFINED_P(pv2)) {
@@ -317,11 +317,11 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
   }
   TRY {
     egal = !SC_UNDEFINED_P(ps_egal) && 
-      sc_rational_feasibility_ofl_ctrl(ps_egal, OFL_CTRL, TRUE);
+      sc_rational_feasibility_ofl_ctrl(ps_egal, OFL_CTRL, true);
     inf =  !SC_UNDEFINED_P(ps_inf) && 
-      sc_rational_feasibility_ofl_ctrl(ps_inf, OFL_CTRL, TRUE);
+      sc_rational_feasibility_ofl_ctrl(ps_inf, OFL_CTRL, true);
     sup =  !SC_UNDEFINED_P(ps_sup) && 
-      sc_rational_feasibility_ofl_ctrl(ps_sup, OFL_CTRL, TRUE);
+      sc_rational_feasibility_ofl_ctrl(ps_sup, OFL_CTRL, true);
     sc_free(ps_egal);
     sc_free(ps_inf);
     sc_free(ps_sup);
@@ -359,7 +359,7 @@ sc_minmax_of_pvector(Psysteme ps_prec, Pvecteur pv1, Pvecteur pv2, boolean is_mi
 
 /*Traiter les inégalités d'un système de contraintes.
   Si la variable var apparaît dans les inégalités, cette fonction va retourner la borne inférieure et la borne supérieure
-  de la variable var sous la forme de Pvecteur pmin et pmax. Sinon, la valeur retournée est FALSE et les Pvecteurs sont nuls.
+  de la variable var sous la forme de Pvecteur pmin et pmax. Sinon, la valeur retournée est false et les Pvecteurs sont nuls.
   Dans cette fonction, il y a des appels à la fonction sc_min_max_of_pvector() pour comparer deux vecteurs. */
 
 static bool
@@ -368,7 +368,7 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
   Pcontrainte pc;
   Value v_phi = VALUE_ZERO;
   Pvecteur p_var = VECTEUR_NUL, ptmp = VECTEUR_NUL, p_max = VECTEUR_NUL, p_min = VECTEUR_NUL ; 
-  boolean result;
+  bool result;
   p_max = *pe;
   if (VECTEUR_NUL_P(*pe)) 
     p_min = vect_new(TCST, VALUE_ONE);
@@ -378,7 +378,7 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
       && CONTRAINTE_NULLE_P(ps->inegalites))  {
     *pmax = p_max;
     *pmin = p_min;
-    return(FALSE);
+    return(false);
   }  
   for (pc = ps->inegalites; pc != NULL; pc = pc->succ) {
     p_var = contrainte_vecteur(pc);
@@ -387,20 +387,20 @@ extract_constraint_from_inequalities(Psysteme ps, Variable var, Psysteme ps_prec
       result =  extract_constraint_on_var(p_var,var,v_phi,&ptmp);
       
       if (value_pos_p(v_phi)) 
-	p_max = sc_minmax_of_pvector(ps_prec, p_max, ptmp, FALSE);
+	p_max = sc_minmax_of_pvector(ps_prec, p_max, ptmp, false);
       else if (value_neg_p(v_phi)) {
-	p_min = sc_minmax_of_pvector(ps_prec, p_min, ptmp, TRUE);
+	p_min = sc_minmax_of_pvector(ps_prec, p_min, ptmp, true);
       }
     }
   }
   *pmax = p_max;
   *pmin = p_min;
-  return (TRUE);
+  return (true);
 }
   
 /*Cette fonction a été écrite pour déterminer les valeurs minimum et maximum d'une variable dans
   un système de contraintes, elle est donc la fonction principale du programme. 
-  . La valeur retournée est FALSE si le système de contraintes est infaisable ou les valeurs min, max sont
+  . La valeur retournée est false si le système de contraintes est infaisable ou les valeurs min, max sont
     indéterminables. Et vice-versa, la valeur retournée est TRUE.
   . Les pointeurs pmin et pmax contiennent les valeurs des bornes supérieure et inférieure
     de la variable var dans le système de contraintes ps. Ces valeurs sont des Pvecteurs.
@@ -412,7 +412,7 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
   Pbase b;
   Pvecteur pe = VECTEUR_NUL;
   Psysteme ps_e, ps_i;
-  boolean ok1,ok2;
+  bool ok1,ok2;
   assert(var!=TCST);  
   *min = vect_new(TCST, VALUE_MIN);
   *max = vect_new(TCST, VALUE_MAX);
@@ -422,27 +422,27 @@ sc_min_max_of_variable(Psysteme ps, Variable var, Psysteme ps_prec, Pvecteur *mi
     Variable v = var_of(b);
     if (variable_to_project_p(var, v)) {
       if (SC_EMPTY_P(ps = sc_projection_pure(ps, v))) 
-	return FALSE;
+	return false;
     }
   }
   if (SC_EMPTY_P(ps = sc_normalize(ps)))
-    return FALSE;
+    return false;
   
   if (SC_UNDEFINED_P(ps) || ( sc_nbre_inegalites(ps)==0  && sc_nbre_egalites(ps)==0))
-    return(FALSE);  
+    return(false);  
   ps_e = sc_dup(ps);
   ps_i = sc_dup(ps); 
   ok1 = extract_constraint_from_equalitites(ps_e, var, &pe);  
   ok2 = extract_constraint_from_inequalities(ps_i, var, ps_prec, &pe, min, max);
   if (ok2) {
     pips_debug(8, "The upper bound has been found\n");
-    return (TRUE);
+    return (true);
   }
   vect_rm(pe);
   sc_rm(ps_e); 
   sc_rm(ps_i);
   pips_debug(8, "The upper bound has not been found\n");
-  return (FALSE);
+  return (false);
 }
 
 static void new_array_declaration_from_region(region reg, entity e, Psysteme pre)
@@ -510,21 +510,21 @@ bool array_resizing_bottom_up(char* mod_name)
 
   entity mod_ent = module_name_to_entity(mod_name);
   list l_decl = code_declarations(entity_code(mod_ent)), l_regions = NIL; 
-  statement stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, TRUE);
+  statement stmt = (statement) db_get_memory_resource(DBR_CODE, mod_name, true);
   transformer mod_pre;
   Psysteme pre;
   string dir_name = db_get_current_workspace_directory();
   string instrument_file_name = strdup(concatenate(dir_name, "/BU_instrument.out", NULL));
-  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,TRUE);
+  string user_file = db_get_memory_resource(DBR_USER_FILE,mod_name,true);
   string base_name = pips_basename(user_file, NULL);
   instrument_file = safe_fopen(instrument_file_name, "a");  
   file_name = strdup(concatenate(db_get_directory_name_for_module(WORKSPACE_SRC_SPACE), 
 				 "/",base_name,NULL));
   current_mod = mod_name;  
   set_precondition_map((statement_mapping)
-		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,TRUE));
+		       db_get_memory_resource(DBR_PRECONDITIONS,mod_name,true));
   set_rw_effects((statement_effects) 
-      db_get_memory_resource(DBR_REGIONS, mod_name, TRUE));
+      db_get_memory_resource(DBR_REGIONS, mod_name, true));
   regions_init(); 
   debug_on("ARRAY_RESIZING_BOTTOM_UP_DEBUG_LEVEL");
   debug(1," Begin bottom up array resizing for %s\n", mod_name);
@@ -626,7 +626,7 @@ bool array_resizing_bottom_up(char* mod_name)
   free(file_name), file_name = NULL;
   current_mod = "";
   DB_PUT_MEMORY_RESOURCE(DBR_CODE, mod_name, stmt);
-  return TRUE;
+  return true;
 }
 
 

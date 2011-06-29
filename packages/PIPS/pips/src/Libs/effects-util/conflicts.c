@@ -57,7 +57,7 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
   action ac2 = effect_action(eff2);
   approximation ap1 = effect_approximation(eff1);
   approximation ap2 = effect_approximation(eff2);
-  bool conflict_p = FALSE;
+  bool conflict_p = false;
 
   /* We enforce must approximation for the two effects */
   if ( approximation_exact_p(ap1) && approximation_exact_p(ap2) ) {
@@ -67,7 +67,7 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
       cell cell2 = effect_cell(eff2);
       /* Check that the cells conflicts */
       if ( cells_must_conflict_p( cell1, cell2 ) ) {
-        conflict_p = TRUE;
+        conflict_p = true;
       }
     }
   }
@@ -85,7 +85,7 @@ bool effects_must_conflict_p( effect eff1, effect eff2 ) {
 bool effects_might_conflict_even_read_only_p(effect eff1, effect eff2) {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
-  bool conflict_p = TRUE;
+  bool conflict_p = true;
 
   action_kind ak1 = action_to_action_kind(ac1);
   action_kind ak2 = action_to_action_kind(ac2);
@@ -93,13 +93,13 @@ bool effects_might_conflict_even_read_only_p(effect eff1, effect eff2) {
   if(action_kind_tag(ak1) != action_kind_tag(ak2)) {
     // A store mutation cannot conflict with an environment or type
     // declaration mutation
-    conflict_p = FALSE;
+    conflict_p = false;
   } else {
     if(action_kind_store_p(ak1)) {
       cell cell1 = effect_cell(eff1);
       cell cell2 = effect_cell(eff2);
       if(!cells_may_conflict_p(cell1, cell2)) {
-        conflict_p = FALSE;
+        conflict_p = false;
       }
     } else {
       /* For environment and type declarations, the references are
@@ -124,11 +124,11 @@ bool effects_might_conflict_even_read_only_p(effect eff1, effect eff2) {
 bool effects_may_conflict_p( effect eff1, effect eff2 ) {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
-  bool conflict_p = TRUE;
+  bool conflict_p = true;
 
   if ( action_read_p(ac1) && action_read_p(ac2) ) {
     // Two read won't conflict
-    conflict_p = FALSE;
+    conflict_p = false;
   } else {
     conflict_p = effects_might_conflict_even_read_only_p(eff1,eff2);
   }
@@ -142,11 +142,11 @@ bool effects_may_conflict_p( effect eff1, effect eff2 ) {
 static bool old_effects_conflict_p( effect eff1, effect eff2 ) {
   action ac1 = effect_action(eff1);
   action ac2 = effect_action(eff2);
-  bool conflict_p = FALSE;
+  bool conflict_p = false;
 
   if ( action_write_p(ac1) || action_write_p(ac2) ) {
     if ( anywhere_effect_p( eff1 ) || anywhere_effect_p( eff2 ) )
-      conflict_p = TRUE;
+      conflict_p = true;
     else {
 
       reference r1 = effect_any_reference(eff1);
@@ -164,35 +164,35 @@ static bool old_effects_conflict_p( effect eff1, effect eff2 ) {
 
         if ( v1 != v2 ) {
           /* We do not bother with the offset and the array types */
-          conflict_p = TRUE;
+          conflict_p = true;
         } else {
           if ( !ENDP(ind1) && !ENDP(ind2) ) {
             for ( cind1 = ind1, cind2 = ind2; !ENDP(cind1) && !ENDP(cind2); POP(cind1), POP(cind2) ) {
               expression e1 = EXPRESSION(CAR(cind1));
               expression e2 = EXPRESSION(CAR(cind2));
               if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
-                conflict_p = TRUE;
+                conflict_p = true;
               else {
                 intptr_t i1 = -1;
                 intptr_t i2 = -1;
-                bool i1_p = FALSE;
-                bool i2_p = FALSE;
+                bool i1_p = false;
+                bool i2_p = false;
 
                 i1_p = expression_integer_value( e1, &i1 );
                 i2_p = expression_integer_value( e2, &i2 );
                 if ( i1_p && i2_p )
                   conflict_p = ( i1 == i2 );
                 else
-                  conflict_p = TRUE;
+                  conflict_p = true;
               }
             }
           } else
-            conflict_p = TRUE;
+            conflict_p = true;
         }
       }
 
       else
-        conflict_p = TRUE;
+        conflict_p = true;
     }
   }
   return conflict_p;
@@ -236,7 +236,7 @@ bool effects_conflict_p( effect eff1, effect eff2 ) {
  * This is about the old references_conflict_p()
  */
 bool array_references_may_conflict_p( list sl1, list sl2 ) {
-  bool conflict_p = TRUE;
+  bool conflict_p = true;
 
   list cind1 = list_undefined;
   list cind2 = list_undefined;
@@ -244,19 +244,19 @@ bool array_references_may_conflict_p( list sl1, list sl2 ) {
     expression e1 = EXPRESSION(CAR(cind1));
     expression e2 = EXPRESSION(CAR(cind2));
     if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
-      conflict_p = TRUE;
+      conflict_p = true;
     else {
       intptr_t i1 = -1;
       intptr_t i2 = -1;
-      bool i1_p = FALSE;
-      bool i2_p = FALSE;
+      bool i1_p = false;
+      bool i2_p = false;
 
       i1_p = expression_integer_value( e1, &i1 );
       i2_p = expression_integer_value( e2, &i2 );
       if ( i1_p && i2_p )
         conflict_p = ( i1 == i2 );
       else
-        conflict_p = TRUE;
+        conflict_p = true;
     }
   }
   return conflict_p;
@@ -275,7 +275,7 @@ bool array_references_may_conflict_p( list sl1, list sl2 ) {
  */
 bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
 {
-  bool conflict_p = TRUE;
+  bool conflict_p = true;
   type t = entity_type(v);
   int sl1n = gen_length( sl1 );
   int sl2n = gen_length( sl2 );
@@ -294,7 +294,7 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
 	expression e1 = EXPRESSION(CAR(cind1));
 	expression e2 = EXPRESSION(CAR(cind2));
 	if ( unbounded_expression_p( e1 ) || unbounded_expression_p( e2 ) )
-	  conflict_p = TRUE;
+	  conflict_p = true;
 	else if ( expression_reference_p( e1 ) && expression_reference_p( e2 ) ) {
 	  /* Because of heap modelization functions can be used as
 	     subscript. Because of struct and union modelization,
@@ -317,24 +317,24 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
 	  } else {
 	    /* assume the code is correct... Assume no floating
 	       point index... a[i] vs a[x]... */
-	    conflict_p = FALSE;
+	    conflict_p = false;
 	  }
 	} else {
 	  intptr_t i1 = -1;
 	  intptr_t i2 = -1;
-	  bool i1_p = FALSE;
-	  bool i2_p = FALSE;
+	  bool i1_p = false;
+	  bool i2_p = false;
 
 	  i1_p = expression_integer_value( e1, &i1 );
 	  i2_p = expression_integer_value( e2, &i2 );
 	  if ( i1_p && i2_p )
 	    conflict_p = ( i1 == i2 );
 	  else
-	    conflict_p = TRUE;
+	    conflict_p = true;
 	}
       }
     } else
-      conflict_p = TRUE;
+      conflict_p = true;
   }
   return conflict_p;
 }
@@ -370,7 +370,7 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
  * - context-sensitive heap modelization can also use function
  *   reference to record the call path
  *
- * Three boolean properties are involved:
+ * Three bool properties are involved:
  *
  * - ALIASING_ACROSS_TYPES: if false objects of different types cannot
  *   be aliased
@@ -386,7 +386,7 @@ bool variable_references_may_conflict_p( entity v, list sl1, list sl2 )
 
  */
 bool references_may_conflict_p( reference r1, reference r2 ) {
-  bool conflict_p = TRUE; // In doubt, conflict is assumed
+  bool conflict_p = true; // In doubt, conflict is assumed
   entity v1 = reference_variable(r1);
   entity v2 = reference_variable(r2);
 
@@ -398,7 +398,7 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
       /* We do not bother with the offset and the array types in case
 	 of static aliasing */
       /* We do not bother with the abstract locations */
-      conflict_p = TRUE;
+      conflict_p = true;
     } else {
       /* v1 == v2 */
       /* Is ALIASING_ACROSS_DATA_STRUCTURES taken into account? */
@@ -422,9 +422,9 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
 
 	/* Are we dealing with NULL POINTER ? */
 	if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
-	  conflict_p = TRUE;
+	  conflict_p = true;
 	else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
-	  conflict_p = FALSE;
+	  conflict_p = false;
 	else{
 	  type t1 = cell_reference_to_type( r1 );
 	  type t2 = cell_reference_to_type( r2 );
@@ -441,15 +441,15 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
        */
       if ( entity_formal_p( reference_variable(r1) )
 	   && entity_formal_p( reference_variable(r2) ) ) {
-	conflict_p = FALSE;
+	conflict_p = false;
       }
     }
 
     /* Are we dealing with NULL POINTER ? */
     if ( entity_null_locations_p(v1) && entity_null_locations_p(v2) )
-      conflict_p = TRUE;
+      conflict_p = true;
     else if(entity_null_locations_p(v1) || entity_null_locations_p(v2) )
-      conflict_p = FALSE;
+      conflict_p = false;
 
     /* There still could be a conflict in C because the two references
        might point to the same memory location. It might be more
@@ -493,14 +493,14 @@ bool references_may_conflict_p( reference r1, reference r2 ) {
  *
  */
 bool references_must_conflict_p( reference r1, reference r2 ) {
-  bool conflict_p = FALSE;
+  bool conflict_p = false;
   entity e1 = reference_variable(r1);
   entity e2 = reference_variable(r2);
 
   // Do a simple check for scalar conflicts
   if ( reference_scalar_p( r1 ) && reference_scalar_p( r2 )
       && entities_must_conflict_p( e1, e2 ) ) {
-    conflict_p = TRUE;
+    conflict_p = true;
   } else {
     /* pips_user_warning("Not completely implemented yet. "
        "Conservative under approximation is made\n");*/
@@ -514,7 +514,7 @@ bool references_must_conflict_p( reference r1, reference r2 ) {
  * @param must_p if set to true, we enforce a must conflict
  */
 bool cells_maymust_conflict_p( cell c1, cell c2, bool must_p ) {
-  bool conflict_p = FALSE;
+  bool conflict_p = false;
   reference r1 = reference_undefined;
   reference r2 = reference_undefined;
 
@@ -543,7 +543,7 @@ bool cells_maymust_conflict_p( cell c1, cell c2, bool must_p ) {
  * @brief Check if two cell may conflict
  */
 bool cells_may_conflict_p( cell c1, cell c2 ) {
-  bool conflict_p = cells_maymust_conflict_p( c1, c2, FALSE );
+  bool conflict_p = cells_maymust_conflict_p( c1, c2, false );
   return conflict_p;
 }
 
@@ -551,7 +551,7 @@ bool cells_may_conflict_p( cell c1, cell c2 ) {
  * @brief Check if two cell must conflict
  */
 bool cells_must_conflict_p( cell c1, cell c2 ) {
-  bool conflict_p = cells_maymust_conflict_p( c1, c2, TRUE );
+  bool conflict_p = cells_maymust_conflict_p( c1, c2, true );
   return conflict_p;
 }
 
@@ -596,7 +596,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
     }
     else if ( entity_variable_p(e2) ) {
       if ( variable_return_p( e2 ) )
-	conflict_p = FALSE;
+	conflict_p = false;
       else if ( entity_formal_p( e2 ) ) {
 	/* FI: Either we need an new abstract location for the formal
 	   parameters or we need to deal explictly with this case
@@ -618,7 +618,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	}
       else if ( entity_variable_p(e1) ) {
 	if ( variable_return_p( e1 ) )
-	  conflict_p = FALSE;
+	  conflict_p = false;
 	else if ( entity_formal_p( e1 ) ) {
 	  /* FI: same comment as above*/
 	  conflict_p = entity_all_locations_p(e1);
@@ -662,7 +662,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	  if(entity_scalar_p(e1))
 	    conflict_p = e1==e2;
 	  else
-	    conflict_p = FALSE;
+	    conflict_p = false;
 	}
       } else {
 	/* FI: we end up here if references linked to environment or
@@ -674,7 +674,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
 	     kinds */
 	  /* Since this implies e1!=e2, this case could be merged
 	     with the next one, but the spec would be less clear */
-	  conflict_p = FALSE;
+	  conflict_p = false;
 	}
 	else {
 	  /* Environment and type declaration conflicts imply that
@@ -692,7 +692,7 @@ bool entities_maymust_conflict_p( entity e1, entity e2, bool must_p )
  *
  */
 bool entities_may_conflict_p( entity e1, entity e2 ) {
-  return entities_maymust_conflict_p( e1, e2, FALSE);
+  return entities_maymust_conflict_p( e1, e2, false);
 }
 
 /**
@@ -700,6 +700,6 @@ bool entities_may_conflict_p( entity e1, entity e2 ) {
  *
  */
 bool entities_must_conflict_p( entity e1, entity e2 ) {
-  return entities_maymust_conflict_p( e1, e2, TRUE);
+  return entities_maymust_conflict_p( e1, e2, true);
 }
 

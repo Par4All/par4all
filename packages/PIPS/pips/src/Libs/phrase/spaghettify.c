@@ -176,7 +176,7 @@ bool spaghettify(string module_name)
    /* get the resources */
   statement stat = (statement) db_get_memory_resource(DBR_CODE, 
 						      module_name, 
-						      TRUE);
+						      true);
 
   module = module_name_to_entity(module_name);
   
@@ -203,5 +203,5 @@ bool spaghettify(string module_name)
   
   debug_off();
   
-  return TRUE;
+  return true;
 }

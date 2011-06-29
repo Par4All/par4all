@@ -105,7 +105,7 @@ statement code_generation(list lls,
 			  make_execution(is_execution_sequential,UU),
 			  NIL);
 
-	bl = makeloopbody(l_hyp, s_loop, TRUE);
+	bl = makeloopbody(l_hyp, s_loop, true);
     }
     
     instr_lhyp = make_instruction(is_instruction_loop,l_hyp);

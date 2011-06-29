@@ -195,7 +195,7 @@ void substitute_ghost_variable_in_statement(
 	}, call_arguments(c));
 	break;
     case is_instruction_unstructured:
-	pips_assert("The parser should not have to know about unstructured\n", FALSE);
+	pips_assert("The parser should not have to know about unstructured\n", false);
 	break;
     default:
 	FatalError("substitute_ghost_variable_in_statement", "Unexpected instruction tag");
@@ -231,11 +231,11 @@ void remove_ghost_variable_entities(bool substitute_p)
 	    type t = type_undefined;
 
 	    if(entity_undefined_p(fe)) {
-		pips_assert("Entity fe cannot be undefined", FALSE);
+		pips_assert("Entity fe cannot be undefined", false);
 	    }
 	    else if(type_undefined_p(entity_type(fe))) {
 		t = entity_type(fe);
-		pips_assert("Type for entity fe cannot be undefined", FALSE);
+		pips_assert("Type for entity fe cannot be undefined", false);
 	    }
 	    else if(type_functional_p(entity_type(fe))) {
 		statement stmt = function_body;
@@ -263,7 +263,7 @@ void remove_ghost_variable_entities(bool substitute_p)
 	    }
 	    else {
 		t = entity_type(fe);
-		pips_assert("Type t for entity fe should be functional", FALSE);
+		pips_assert("Type t for entity fe should be functional", false);
 	    }
 
 	    remove_variable_entity(e);
@@ -311,7 +311,7 @@ void BeginingOfProcedure()
 void update_called_modules(e)
 entity e;
 {
-    bool already_here = FALSE;
+    bool already_here = false;
     string n = entity_local_name(e);
     string nom;
     entity cm = get_current_module_entity();
@@ -341,7 +341,7 @@ entity e;
 
     MAPL(ps, {
 	if (strcmp(n, STRING(CAR(ps))) == 0) {
-	    already_here = TRUE;
+	    already_here = true;
 	    break;
 	}
     }, called_modules);
@@ -356,7 +356,7 @@ entity e;
  */
 void remove_from_called_modules(entity e)
 {
-    bool found = FALSE;
+    bool found = false;
     list l = called_modules;
     string name = module_local_name(e);
 
@@ -364,7 +364,7 @@ void remove_from_called_modules(entity e)
 
     if (same_string_p(name, STRING(CAR(called_modules)))) {
 	called_modules = CDR(called_modules);
-	found = TRUE;
+	found = true;
     } else {
 	list lp = called_modules;
 	l = CDR(called_modules);
@@ -372,7 +372,7 @@ void remove_from_called_modules(entity e)
 	for(; !ENDP(l); POP(l), POP(lp)) {
 	    if (same_string_p(name, STRING(CAR(l)))) {
 		CDR(lp) = CDR(l);
-		found = TRUE;
+		found = true;
 		break;
 	    }
 	}
@@ -390,7 +390,7 @@ void AbortOfProcedure()
 {
     /* get rid of ghost variable entities */
     if (!list_undefined_p(ghost_variable_entities))
-	remove_ghost_variable_entities(FALSE);
+	remove_ghost_variable_entities(false);
 
     (void) ResetBlockStack() ;
 }
@@ -406,7 +406,7 @@ static bool gather_implicit_indices(call c)
     entity i = reference_variable(syntax_reference(expression_syntax(ie)));
     implicit_do_index_set = gen_once(i, implicit_do_index_set);
   }
-  return TRUE;
+  return true;
 }
 
 static bool fix_storage(reference r)
@@ -488,7 +488,7 @@ static bool fix_storage(reference r)
     }
   }
   /* No need to go down */
-  return FALSE;
+  return false;
 }
 
 /* forward declaration */
@@ -672,7 +672,7 @@ static list find_target_position(list cvl, int ctp, int * pmin_cp, int * pmax_cp
   return lcvl;
 }
 
-/* Integer and boolean initial values are stored as int, float, string and
+/* Integer and bool initial values are stored as int, float, string and
 maybe complex initial values are stored as entities. Type coercion should
 be implemented as required in the Fortran standard. */
 static void store_initial_value(entity var, expression val)
@@ -996,17 +996,17 @@ void EndOfProcedure()
     }
 
     /* get rid of ghost variable entities and substitute them if necessary */
-    remove_ghost_variable_entities(TRUE);
+    remove_ghost_variable_entities(true);
 
     /* we generate the last statement to carry a label or a comment */
     if (strlen(lab_I) != 0 /* || iPrevComm != 0 */ ) {
-	LinkInstToCurrentBlock(make_continue_instruction(), FALSE);
+	LinkInstToCurrentBlock(make_continue_instruction(), false);
     }
 
     /* we generate statement last+1 to eliminate returns */
     GenerateReturn();
 
-    uses_alternate_return(FALSE);
+    uses_alternate_return(false);
     ResetReturnCodeVariable();
     SubstituteAlternateReturns("NO");
 
@@ -1596,7 +1596,7 @@ static void MakeEntryCommon(
 	return;
     }
 
-    members = common_members_of_module(a, m, FALSE);
+    members = common_members_of_module(a, m, false);
     if(ENDP(members)) {
 	pips_internal_error("No local static variables in module %s: impossible!",
 		   entity_name(m));
@@ -1606,10 +1606,10 @@ static void MakeEntryCommon(
     ifdebug(1) {
 	pips_debug(1, "Static area %s without aliasing in module %s\n",
 	       entity_name(a), entity_name(m));
-	print_common_layout(stderr, a, TRUE);
+	print_common_layout(stderr, a, true);
 	pips_debug(1, "Static area %s with aliasing in module %s\n",
 	       entity_name(a), entity_name(m));
-	print_common_layout(stderr, a, FALSE);
+	print_common_layout(stderr, a, false);
     }
 
     /* Make sure that no static variables are aliased because this special
@@ -1670,7 +1670,7 @@ static void MakeEntryCommon(
     ifdebug(1) {
 	pips_debug(1, "New common %s for static area %s in module %s\n",
 	       entity_name(c), entity_name(a), entity_name(m));
-	print_common_layout(stderr, c, TRUE);
+	print_common_layout(stderr, c, true);
     }
 
     pips_debug(1, "End for static area %s in module %s\n",
@@ -1921,7 +1921,7 @@ static void ProcessEntry(
     list decls = list_undefined;
     list init_stmt = list_undefined;
     text txt = text_undefined;
-    bool line_numbering_p = FALSE;
+    bool line_numbering_p = false;
 
     pips_debug(1, "Begin for entry %s of module %s\n",
 	  entity_name(e), module_local_name(cm));
@@ -2002,7 +2002,7 @@ static void ProcessEntry(
     }
 
     line_numbering_p = get_bool_property("PRETTYPRINT_STATEMENT_NUMBER");
-    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", false);
     txt = text_named_module(e, cm, ces);
     set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", line_numbering_p);
 
@@ -2028,7 +2028,7 @@ static void ProcessEntry(
     /* give the entry a user file.
      */
     DB_PUT_MEMORY_RESOURCE(DBR_USER_FILE, module_local_name(e),
-	strdup(db_get_memory_resource(DBR_USER_FILE, module_local_name(cm), TRUE)));
+	strdup(db_get_memory_resource(DBR_USER_FILE, module_local_name(cm), true)));
 
     pips_assert("statement for cm is consistent",
 		statement_consistent_p(get_current_module_statement()));
@@ -2057,14 +2057,14 @@ void ProcessEntries()
     code_decls_text(c) = strdup("");
     /* Regenerate a SOURCE_FILE .f without entries for the module itself */
     /* To avoid warnings about column 73 when the code is parsed again */
-    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", FALSE);
+    set_bool_property("PRETTYPRINT_STATEMENT_NUMBER", false);
     txt = text_named_module(cm, cm, get_current_module_statement());
     make_text_resource_and_free(module_local_name(cm), DBR_SOURCE_FILE, ".f",
 				txt);
 
     /* Not ot duplicate DATA statements for static variables and
        common variables in every entry */
-    set_bool_property("PRETTYPRINT_DATA_STATEMENTS", FALSE);
+    set_bool_property("PRETTYPRINT_DATA_STATEMENTS", false);
 
     /* Process each entry */
     for(ce = entry_entities, cl = entry_labels, ct = entry_targets;
@@ -2114,7 +2114,7 @@ entity NameToFunctionalEntity(string name)
 	    ;
 	}
 	else {
-	    pips_assert("Unexpected kind of functional entity!", TRUE);
+	    pips_assert("Unexpected kind of functional entity!", true);
 	}
     }
     else {

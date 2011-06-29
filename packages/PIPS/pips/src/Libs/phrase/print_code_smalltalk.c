@@ -133,14 +133,14 @@ static string st_brace_expression_as_string(expression exp)
   string result = OPENBRACKET;
   list args = call_arguments(syntax_call(expression_syntax(exp)));
   
-  bool first = TRUE;
+  bool first = true;
   MAP(EXPRESSION,e,
   {
     if (brace_expression_p(e))
       result = strdup(concatenate(result,first?"":",",st_brace_expression_as_string(e),NULL));
     else
       result = strdup(concatenate(result,first?"":",",words_to_string(words_expression(e, NIL)),NULL));
-    first = FALSE;
+    first = false;
   },args);
   result = strdup(concatenate(result,CLOSEBRACKET,NULL));
   return result;
@@ -158,25 +158,25 @@ static string st_dimension_reference_as_string (dimension dim, expression old_ex
   intptr_t low, old;
   string slow = NULL;
   string sold = NULL;
-  bool low_given_by_expression = FALSE;
-  bool old_given_by_expression = FALSE;
+  bool low_given_by_expression = false;
+  bool old_given_by_expression = false;
   string result = strdup(EMPTY);
   
   expression elow = dimension_lower(dim);
   expression eold = old_expression;
   
   if (expression_integer_value(elow, &low)) {
-    low_given_by_expression = TRUE;
+    low_given_by_expression = true;
   }
   else {
-    low_given_by_expression = FALSE;
+    low_given_by_expression = false;
     slow = st_expression(elow);
   }
   if (expression_integer_value(eold, &old)) {
-    old_given_by_expression = TRUE;
+    old_given_by_expression = true;
   }
   else {
-    old_given_by_expression = FALSE;
+    old_given_by_expression = false;
     sold = st_expression(eold);
   }
 
@@ -223,25 +223,25 @@ static string st_dimension_bound_as_string (dimension dim) {
   intptr_t low, up;
   string slow = NULL;
   string sup = NULL;
-  bool low_given_by_expression = FALSE;
-  bool up_given_by_expression = FALSE;
+  bool low_given_by_expression = false;
+  bool up_given_by_expression = false;
   string result = strdup(EMPTY);
   
   expression elow = dimension_lower(dim);
   expression eup = dimension_upper(dim);
   
   if (expression_integer_value(elow, &low)) {
-    low_given_by_expression = TRUE;
+    low_given_by_expression = true;
   }
   else {
-    low_given_by_expression = FALSE;
+    low_given_by_expression = false;
     slow = st_expression(elow);
   }
   if (expression_integer_value(eup, &up)) {
-    up_given_by_expression = TRUE;
+    up_given_by_expression = true;
   }
   else {
-    up_given_by_expression = FALSE;
+    up_given_by_expression = false;
     sup = st_expression(eup);
   }
 
@@ -649,7 +649,7 @@ static string st_declaration_comment(entity var)
 }
 
 /**
- * This function return a boolean indicating if related entity e
+ * This function return a bool indicating if related entity e
  * represents a constant
  */
 static bool constant_p(entity e)
@@ -661,7 +661,7 @@ static bool constant_p(entity e)
 }
 
 /**
- * This function return a boolean indicating if related entity e
+ * This function return a bool indicating if related entity e
  * represents a variable
  */
 static bool variable_p(entity e)
@@ -672,7 +672,7 @@ static bool variable_p(entity e)
 }
 
 /**
- * This function return a boolean indicating if related entity e
+ * This function return a bool indicating if related entity e
  * represents an argument
  */
 static bool argument_p(entity e)
@@ -694,7 +694,7 @@ st_arguments (entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
 
   /* Assert that entity represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
@@ -711,7 +711,7 @@ st_arguments (entity module,
 				    svar, lastsep? separator: "", NULL));
 	free(old);
 	free(svar);
-	first = FALSE;
+	first = false;
       }
   },code_declarations(c));
   return result;
@@ -729,7 +729,7 @@ st_declarations (entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
 
   /* Assert that entity represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
@@ -746,7 +746,7 @@ st_declarations (entity module,
 				    svar, lastsep? separator: "", NULL));
 	free(old);
 	free(svar);
-	first = FALSE;
+	first = false;
       }
   },code_declarations(c));
   return result;
@@ -764,7 +764,7 @@ st_declarations_init(entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
 
   /* Assert that entity represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
@@ -786,7 +786,7 @@ st_declarations_init(entity module,
 	}
 	free(old);
 	free(svar);
-	first = FALSE;
+	first = false;
       }
   },code_declarations(c));
   return result;
@@ -804,7 +804,7 @@ st_declarations_comment(entity module,
 {
   string result = strdup("");
   code c;
-  bool first = TRUE;
+  bool first = true;
   
   /* Assert that entity represent a value code */
   pips_assert("it is a code", value_code_p(entity_initial(module)));
@@ -821,7 +821,7 @@ st_declarations_comment(entity module,
 				    svar, lastsep? separator: "", NULL));
 	free(old);
 	free(svar);
-	first = FALSE;
+	first = false;
       }
   },code_declarations(c));
   return result;
@@ -842,7 +842,7 @@ static string st_header(entity module)
   args = st_arguments(module, 
 		      argument_p, 
 		      SPACE, 
-		      TRUE);
+		      true);
 
   result = strdup(concatenate(svar, SPACE, args, NL,
 			      COMMENT, "Automatically generated with PIPS", COMMENT,
@@ -882,7 +882,7 @@ static string smalltalk_code_string(entity module, statement stat)
   st_variables       = st_declarations(module, 
 				       variable_p, 
 				       SPACE, 
-				       TRUE);
+				       true);
   ifdebug(3) {
     printf("VARIABLES: \n");
     printf("%s \n", st_variables);
@@ -892,7 +892,7 @@ static string smalltalk_code_string(entity module, statement stat)
   st_constants = st_declarations (module, 
 				  constant_p, 
 				  SPACE, 
-				  TRUE);
+				  true);
   ifdebug(3) {
     printf("CONSTANTS: \n");
     printf("%s \n", st_constants);
@@ -902,7 +902,7 @@ static string smalltalk_code_string(entity module, statement stat)
   st_variables_init = st_declarations_init (module, 
 					    variable_p, 
 					    STSEMICOLON, 
-					    TRUE);
+					    true);
   ifdebug(3) {
     printf("VARIABLES INIT: \n");
     printf("%s \n", st_variables_init);
@@ -912,7 +912,7 @@ static string smalltalk_code_string(entity module, statement stat)
   st_variables_comment = st_declarations_comment (module, 
 						  variable_p, 
 						  NL, 
-						  TRUE);
+						  true);
   ifdebug(3) {
     printf("VARIABLES COMMENT: \n");
     printf("%s \n", st_variables_comment);
@@ -922,7 +922,7 @@ static string smalltalk_code_string(entity module, statement stat)
   st_constants_init = st_declarations_init (module, 
 					    constant_p, 
 					    STSEMICOLON, 
-					    TRUE);
+					    true);
   ifdebug(3) {
     printf("CONSTANTS INIT: \n");
     printf("%s \n", st_constants_init);
@@ -1136,7 +1136,7 @@ static string ppt_call(string in_smalltalk, list le)
     }
   else 
     {
-      bool first = TRUE;
+      bool first = true;
       scall = strdup(concatenate(in_smalltalk, OPENPAREN, NULL));
      
       /* Attention: not like this for io statements*/
@@ -1147,7 +1147,7 @@ static string ppt_call(string in_smalltalk, list le)
 	scall = strdup(concatenate(old, first? "": ", ", arg, NULL));
 	free(arg);
 	free(old);
-	first = FALSE;
+	first = false;
       },le);
 
       old = scall;
@@ -1236,7 +1236,7 @@ static struct s_ppt * get_ppt(entity f)
 }
 
 /**
- * Return boolean indicating if expression e must be enclosed 
+ * Return bool indicating if expression e must be enclosed 
  * in parenthesis
  */
 static bool expression_needs_parenthesis_p(expression e)
@@ -1252,7 +1252,7 @@ static bool expression_needs_parenthesis_p(expression e)
     case is_syntax_reference:
     case is_syntax_range:
     default:
-      return FALSE;
+      return false;
     }
 }
 
@@ -1678,7 +1678,7 @@ bool print_code_smalltalk(string module_name)
   module = module_name_to_entity(module_name);
   dir = db_get_current_workspace_directory();
   filename = strdup(concatenate(dir, "/", smalltalkcode, NULL));
-  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  stat = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   set_current_module_entity(module);
   set_current_module_statement(stat);
@@ -1704,5 +1704,5 @@ bool print_code_smalltalk(string module_name)
   reset_current_module_statement();
   reset_current_module_entity();
 
-  return TRUE;
+  return true;
 }

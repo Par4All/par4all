@@ -152,7 +152,7 @@
 char * Comm = NULL, * PrevComm = NULL, * CurrComm;
 int iComm = 0, iPrevComm = 0, iCurrComm = 0;
 static int CommSize = 0;
-static int EofSeen = FALSE;
+static int EofSeen = false;
 
 /* lazy initialization of the comment buffer
  */
@@ -317,7 +317,7 @@ void parser_reset_all_reader_buffers(void)
     iComm = 0;
     iPrevComm = 0;
     i_getchar = UNDEF, l_getchar = UNDEF;
-    EofSeen = FALSE;
+    EofSeen = false;
 }
 
 /*
@@ -427,7 +427,7 @@ static char tmp_lab_I[6];
 
 #include "properties.h"
 
-static bool parser_warn_for_columns_73_80 = TRUE;
+static bool parser_warn_for_columns_73_80 = true;
 
 void 
 init_parser_reader_properties()
@@ -473,12 +473,12 @@ void
 ScanNewFile(void)
 {
     register int i;
-    static int FirstCall = TRUE;
+    static int FirstCall = true;
     char letcour, *keywcour;
 
 
     if (FirstCall) {
-	FirstCall = FALSE;
+	FirstCall = false;
 
 	/* on initialise la table keywidx */
 	for (i = 0; i < 26; i += 1)
@@ -555,7 +555,7 @@ IsCapKeyword(char * s)
 int 
 PipsGetc(FILE * fp)
 {
-    int eof = FALSE;
+    int eof = false;
     int c;
 
     /* SG: UNDEF negative and iStmt of type size_t ...*/
@@ -564,7 +564,7 @@ PipsGetc(FILE * fp)
 	 * le statement est vide. On lit et traite le suivant.
 	 */
 	if (ReadStmt(fp) == EOF) {
-	    eof = TRUE;
+	    eof = true;
 	}
 	else {
 	    /*
@@ -638,10 +638,10 @@ GetChar(FILE * fp)
 
     /* A whole input line is read to process TABs and empty lines */
     while (i_getchar >= l_getchar && c != EOF) {
-	int EmptyBuffer = TRUE;
-	int LineTooLong = FALSE;
-	bool first_column = TRUE;
-	bool in_comment = FALSE;
+	int EmptyBuffer = true;
+	int LineTooLong = false;
+	bool first_column = true;
+	bool in_comment = false;
 
 	i_getchar = l_getchar = 0;
 
@@ -652,7 +652,7 @@ GetChar(FILE * fp)
 
 	    if(first_column) {
 		in_comment = (strchr(START_COMMENT_LINE, (char) c)!= NULL);
-		first_column = FALSE;
+		first_column = false;
 	    }
 
 	    /* Fortran has a limited character set. See standard section 3.1.
@@ -687,7 +687,7 @@ GetChar(FILE * fp)
 		    user_warning("GetChar",
 				 "Line %d truncated, col=%d and l_getchar=%d\n",
 				 LineNumber, col, l_getchar);
-		    LineTooLong = TRUE;
+		    LineTooLong = true;
 		}
 		/* buffer[l_getchar++] = (col > 72) ? ' ' : c; */
 		/* buffer[l_getchar++] = (col > 72) ? '\n' : c; */
@@ -698,7 +698,7 @@ GetChar(FILE * fp)
 		  getchar_buffer[l_getchar++] = c;
 		}
 		if (c != ' ')
-		    EmptyBuffer = FALSE;
+		    EmptyBuffer = false;
 	    }
 	}
 		
@@ -946,12 +946,12 @@ ReadStmt(FILE * fp)
 
     init_stmt_buffer();
 
-    if (EofSeen == TRUE) {
+    if (EofSeen == true) {
 	/*
 	 * on a rencontre EOF, et on a deja purge le dernier
 	 * statement. On arrete.
 	 */
-	EofSeen = FALSE;
+	EofSeen = false;
 	result = EOF;
     }
     else {
@@ -1013,7 +1013,7 @@ ReadStmt(FILE * fp)
 	line_e_I = (tmp_b_C == UNDEF) ? tmp_b_I-1 : tmp_b_C-1;
 		
 	if (TypeOfLine == EOF_LINE)
-	    EofSeen = TRUE;
+	    EofSeen = true;
 
 	result = 1;
 
@@ -1034,15 +1034,15 @@ CheckParenthesis(void)
     register int i;
     int parenthese = 0;
 
-    ProfZeroVirg = ProfZeroEgal = FALSE;
+    ProfZeroVirg = ProfZeroEgal = false;
 
     for (i = 0; i < lStmt; i++) {
 	if (!IS_QUOTED(stmt_buffer[i])) {
 	    if (parenthese == 0) {
 		if (stmt_buffer[i] == ',')
-			ProfZeroVirg = TRUE;
+			ProfZeroVirg = true;
 		else if (stmt_buffer[i] == '=')
-			ProfZeroEgal = TRUE;
+			ProfZeroEgal = true;
 	    }
 	    if(stmt_buffer[i] == '(') parenthese ++;
 	    if(stmt_buffer[i] == ')') parenthese --;
@@ -1072,12 +1072,12 @@ CheckParenthesis(void)
 int 
 FindDoWhile(void)
 {
-    int result = FALSE;
+    int result = false;
 
     if (!ProfZeroEgal && StmtEqualString("DOWHILE", iStmt)) {
 	(void) CapitalizeStmt("DO", iStmt);
 	(void) CapitalizeStmt("WHILE", iStmt+2);
-	result = TRUE;
+	result = true;
     }
 
     return(result);
@@ -1086,12 +1086,12 @@ FindDoWhile(void)
 int 
 FindDo(void)
 {
-    int result = FALSE;
+    int result = false;
 
     if(StmtEqualString("DO", iStmt)) {
 	if (ProfZeroVirg && ProfZeroEgal) {
 	    (void) CapitalizeStmt("DO", iStmt);
-	    result = TRUE;
+	    result = true;
 	}
 	else if (!ProfZeroVirg && !ProfZeroEgal) {
 	    /* Let's skip a loop label to look for a while construct */
@@ -1102,7 +1102,7 @@ FindDo(void)
 	    if (StmtEqualString("WHILE", i)) {
 		(void) CapitalizeStmt("DO", iStmt);
 		(void) CapitalizeStmt("WHILE", i);
-		result = TRUE;
+		result = true;
 	    }
 	}
     }
@@ -1113,7 +1113,7 @@ FindDo(void)
 int 
 FindImplicit(void)
 {
-    int result = FALSE;
+    int result = false;
 
     if (!ProfZeroEgal && StmtEqualString("IMPLICIT", iStmt)) {
 	iStmt = CapitalizeStmt("IMPLICIT", iStmt);
@@ -1124,7 +1124,7 @@ FindImplicit(void)
 	    else
 		iStmt += 1;
 	}
-	result = TRUE;
+	result = true;
     }
 
     return(result);
@@ -1133,13 +1133,13 @@ FindImplicit(void)
 int 
 FindIfArith(void)
 {
-    int result = FALSE;
+    int result = false;
 
     if (StmtEqualString("IF(", iStmt)) {
 	int i = FindMatchingPar(iStmt+2)+1;
 	if ('0' <= stmt_buffer[i] && stmt_buffer[i] <= '9') {
 	    (void) CapitalizeStmt("IF", iStmt);
-	    result = TRUE;
+	    result = true;
 	}
     }
 
@@ -1196,7 +1196,7 @@ FindAutre(void)
 int 
 FindAssign(void)
 {
-    int result = FALSE;
+    int result = false;
 
     if (!ProfZeroEgal && StmtEqualString("ASSIGN", iStmt)) {
 	register int i = iStmt+6;
@@ -1208,7 +1208,7 @@ FindAssign(void)
 	    if (StmtEqualString("TO", i)) {
 		(void) CapitalizeStmt("ASSIGN", iStmt);
 		(void) CapitalizeStmt("TO", i);
-		result = TRUE;
+		result = true;
 	    }
 	}
     }
@@ -1288,7 +1288,7 @@ FindMatchingPar(int i)
 int 
 StmtEqualString(char *s, int i)
 {
-    int result = FALSE;
+    int result = false;
 
     if (strlen(s) <= lStmt-i) {
 	while (*s)
@@ -1297,7 +1297,7 @@ StmtEqualString(char *s, int i)
 	    else
 		s++;
 
-	result = (*s) ? FALSE : i;
+	result = (*s) ? false : i;
     }
 
     return(result);
@@ -1335,7 +1335,7 @@ NeedKeyword(void)
     if (i != UNDEF) {
 	while ((kwcour = keywtbl[i].keywstr)!=0 && 
 	       kwcour[0]==stmt_buffer[iStmt]) {
-	    if (StmtEqualString(kwcour, iStmt) != FALSE) {
+	    if (StmtEqualString(kwcour, iStmt) != false) {
 		j = CapitalizeStmt(kwcour, iStmt);
 		return(j);
 	    }

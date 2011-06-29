@@ -111,7 +111,7 @@ append_all_not_present(list initial_reg_list, list additional_list)
 static void
 compare_other_list(region elem, list other_list)
 {
-    bool result = FALSE;
+    bool result = false;
     region other_elem;
     list rest_other_list;
 
@@ -149,11 +149,11 @@ compare_other_list(region elem, list other_list)
 		    pips_debug(9,"same\n");
 
 		    rest_list = append_all_not_present(rest_list,other_list);
-		    result = TRUE;
+		    result = true;
 		}
 	    }
-	} while (result == FALSE && rest_other_list != NIL);
-	if (result == FALSE)
+	} while (result == false && rest_other_list != NIL);
+	if (result == false)
 	    other_lists = gen_nconc(other_lists,CONS(LIST,other_list,NIL));
     }
     pips_debug(4,"end\n");
@@ -290,7 +290,7 @@ make_classes_from_lists()
 
 /* global variables IN: l_alias_lists
  * global variables modified: l_alias_lists
- * returns TRUE if l_alias_lists modified,
+ * returns true if l_alias_lists modified,
  * i.e. if callee_class_elem is present
  * in one or more of the callers alias lists,
  * in which case,
@@ -300,7 +300,7 @@ make_classes_from_lists()
 static bool
 match_this_callee_class_elem(region callee_class_elem, list callee_alias_class)
 {
-    bool result = FALSE;
+    bool result = false;
     list rest_alias_lists, alias_list;
     region formal_reg_caller_list;
 
@@ -336,7 +336,7 @@ match_this_callee_class_elem(region callee_class_elem, list callee_alias_class)
 		    print_inout_regions(alias_list);
 		}
 
-			result = TRUE;
+			result = true;
 			alias_list =
 			    append_all_not_present(alias_list,
 						   callee_alias_class);
@@ -349,7 +349,7 @@ match_this_callee_class_elem(region callee_class_elem, list callee_alias_class)
 
 		    }
 	    rest_alias_lists = CDR(rest_alias_lists);
-	}while (rest_alias_lists != NIL && result == FALSE);
+	}while (rest_alias_lists != NIL && result == false);
 
     pips_debug(4,"end\n");
 
@@ -363,7 +363,7 @@ match_this_callee_class_elem(region callee_class_elem, list callee_alias_class)
 static bool
 add_callee_class_to_lists(list callee_alias_class )
 {
-    bool result = FALSE;
+    bool result = false;
 
     pips_debug(4,"begin\n");
 
@@ -371,7 +371,7 @@ add_callee_class_to_lists(list callee_alias_class )
 	{
 	    if ( match_this_callee_class_elem(callee_class_elem,
 					      callee_alias_class) )
-		result = TRUE;
+		result = true;
 	},
     callee_alias_class);
 
@@ -410,7 +410,7 @@ add_classes_for_this_callee( string callee_name )
     callee_alias_classes = effects_to_list((effects)
 				  db_get_memory_resource(DBR_ALIAS_CLASSES,
 							 callee_name,
-							 TRUE));
+							 true));
     MAP(LIST,callee_alias_class,
 	    {
 		ifdebug(9)
@@ -437,7 +437,7 @@ add_classes_callees(string module_name)
 
     all_callees = (callees) db_get_memory_resource(DBR_CALLEES,
 					       module_name,
-					       TRUE);
+					       true);
 
     MAP(STRING, callee_name,
 	{
@@ -468,12 +468,12 @@ alias_classes( string module_name )
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
-								 TRUE) );
+								 true) );
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
-					 TRUE));
+					 true));
 	    module_to_value_mappings(module);
 	    /* and this to call print_region
 	    set_action_interpretation(ACTION_IN,ACTION_OUT);	 */    
@@ -489,14 +489,14 @@ alias_classes( string module_name )
 	effects_to_list((effects)
 			db_get_memory_resource(DBR_ALIAS_LISTS,
 					       module_name,
-					       TRUE));
+					       true));
 */
 
     alias_lists =
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_ALIAS_LISTS,
 						       module_name,
-						       TRUE));
+						       true));
 
     MAP(LIST,alias_list,
 	{
@@ -556,6 +556,6 @@ alias_classes( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return TRUE;
+    return true;
 }
 

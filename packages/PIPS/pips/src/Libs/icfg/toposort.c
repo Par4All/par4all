@@ -69,14 +69,14 @@ string module_name;
 {
     callees cl;
     static hash_table hash_table_to_callees_string;
-    static bool hash_table_is_created = FALSE;
+    static bool hash_table_is_created = false;
     list callees_list=NIL;
 
-    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,TRUE);
+    cl = (callees)db_get_memory_resource(DBR_CALLEES,module_name,true);
 
     if ( !hash_table_is_created ) {
 	hash_table_to_callees_string = hash_table_make(hash_pointer, 0);
-	hash_table_is_created = TRUE;
+	hash_table_is_created = true;
     }
     
     callees_list = (list)hash_get(hash_table_to_callees_string, module_name);

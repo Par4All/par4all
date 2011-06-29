@@ -60,8 +60,8 @@ typedef dg_vertex_label vertex_label;
 #include "graph.h"
 #include "ricedg.h"
 
-#define BACKWARD TRUE
-#define FORWARD FALSE
+#define BACKWARD true
+#define FORWARD false
 
 
 static entity callee;
@@ -230,7 +230,7 @@ statement s;
     pips_debug(9, "statement %td\n", statement_number(s));
     
     current_caller_stmt = s;
-    return(TRUE);
+    return(true);
 }
 
 
@@ -399,7 +399,7 @@ add_alias_pairs_for_this_call_site(call call_site)
     transformer context;
     list real_args;
 
-    if (call_function(call_site) != callee) return TRUE;
+    if (call_function(call_site) != callee) return true;
 
     pips_debug(4,"begin\n");
 
@@ -434,7 +434,7 @@ add_alias_pairs_for_this_call_site(call call_site)
 
     pips_debug(4,"end\n");
 
-    return TRUE;
+    return true;
 }
 
 
@@ -462,12 +462,12 @@ add_alias_pairs_for_this_caller( entity caller )
     regions_init();
     get_in_out_regions_properties();
     set_current_module_statement( (statement)
-	db_get_memory_resource(DBR_CODE, caller_name, TRUE) );
+	db_get_memory_resource(DBR_CODE, caller_name, true) );
     set_cumulated_rw_effects((statement_effects)
-	db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, TRUE));
+	db_get_memory_resource(DBR_CUMULATED_EFFECTS, caller_name, true));
     module_to_value_mappings(caller);
     set_precondition_map( (statement_mapping) 
-        db_get_memory_resource(DBR_PRECONDITIONS, caller_name, TRUE));
+        db_get_memory_resource(DBR_PRECONDITIONS, caller_name, true));
     /* that's it,
      * but we musn't forget to reset it all again below !
      */
@@ -535,12 +535,12 @@ alias_pairs( string module_name, list l_reg )
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
-								 TRUE) );
+								 true) );
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
-					 TRUE));
+					 true));
 	    module_to_value_mappings(callee);
 	    /* that's it, but we musn't forget to reset everything below */
 
@@ -555,7 +555,7 @@ alias_pairs( string module_name, list l_reg )
     /* we need the callers of the current module  */
     callers = (callees) db_get_memory_resource(DBR_CALLERS,
 					       module_name,
-					       TRUE);
+					       true);
 
     /* we scan the callers to find the call sites,
      * and fill in the list of alias pairs (list_pairs)
@@ -592,12 +592,12 @@ in_alias_pairs( string module_name )
     l_reg = effects_to_list((effects)
 			    db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
 					  module_name,
-					  TRUE));
+					  true));
 
 /* was (but didn't work)
     l_reg = (list) db_get_memory_resource(DBR_IN_SUMMARY_REGIONS,
 					  module_name,
-					  TRUE);
+					  true);
 					  */
     
     l_pairs = alias_pairs(module_name, l_reg);
@@ -609,7 +609,7 @@ in_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 
 }
 
@@ -629,12 +629,12 @@ out_alias_pairs( string module_name )
     l_reg = effects_to_list((effects)
 			    db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
-					  TRUE));
+					  true));
 
 /* was (but didn't work)
     l_reg = (list) db_get_memory_resource(DBR_OUT_SUMMARY_REGIONS,
 					  module_name,
-					  TRUE);
+					  true);
 					  */
 
     
@@ -647,7 +647,7 @@ out_alias_pairs( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return(TRUE);
+    return(true);
 
 }
 

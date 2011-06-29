@@ -136,8 +136,8 @@ DEFINE_LOCAL_STACK(scoping_statement, statement)
  *
  * Furthermore, ADD_SUCC() is dangerous when used on a control that is
  * a test since the position in the successor list is
- * significant. TRUE successors are in the odd positions (the first
- * element is of rank one). FALSE successors are in the odd position.
+ * significant. true successors are in the odd positions (the first
+ * element is of rank one). false successors are in the odd position.
  */
 
 /* Add control "pred" to the predecessor set of control c if not already
@@ -315,7 +315,7 @@ static hash_table union_used_labels(hash_table l1,
    @param used_labels is a hash table mapping a label name to a list of
    statement that use it, as their label or because it is a goto to it
 
-   @return TRUE if all the label allusion in @p st are covered by the @p
+   @return true if all the label allusion in @p st are covered by the @p
    used_labels mapping.
 */
 static bool covers_labels_p(statement st,
@@ -333,7 +333,7 @@ static bool covers_labels_p(statement st,
       FOREACH(STATEMENT,
 	      def,
 	      (list) hash_get_default_empty_list(Label_statements, name)) {
-	bool found = FALSE;
+	bool found = false;
 	/* Verify that def is in all the statements associated to the
 	   label name according to used_labels. */
 	FOREACH(STATEMENT, st, stats) {
@@ -343,7 +343,7 @@ static bool covers_labels_p(statement st,
 	if (!found) {
 	  pips_debug(5, "does not cover label %s\n", (char *) name);
 	  /* Not useful to go on: */
-	  return(FALSE);
+	  return(false);
 	}
       }
     }, used_labels);
@@ -351,7 +351,7 @@ static bool covers_labels_p(statement st,
   if (get_debug_level() >= 5)
     fprintf(stderr, "covers its label usage\n");
 
-  return(TRUE);
+  return(true);
 }
 
 
@@ -429,7 +429,7 @@ static bool controlize_call(statement st,
   /* control_successors(pred) = ADD_SUCC(c_res, pred); */
   add_proper_successor_to_predecessor(pred, c_res);
   control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
-  return(FALSE);
+  return(false);
 }
 
 /* LOOP_HEADER, LOOP_TEST and LOOP_INC build the desugaring phases of a
@@ -563,7 +563,7 @@ hash_table used_labels;
 				      copy_extensions(statement_extensions(st))),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL)) ;
-	controlized = FALSE;
+	controlized = false;
 	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
     }
     else {
@@ -578,7 +578,7 @@ hash_table used_labels;
 		       loop_header(st),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, c_test, NIL));
-	controlized = TRUE ;
+	controlized = true ;
 	control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
     }
     add_proper_successor_to_predecessor(pred, c_res);
@@ -723,7 +723,7 @@ hash_table used_labels;
 				      copy_extensions(statement_extensions(st))),
 		       ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		       CONS(CONTROL, succ, NIL));
-	controlized = FALSE;
+	controlized = false;
     }
     else {
 	control_statement(c_res) = whileloop_test(st);
@@ -734,7 +734,7 @@ hash_table used_labels;
 	   gen_once(pred, control_predecessors(c_res));
 	control_successors(c_res) =
 		CONS(CONTROL, succ, control_successors(c_res));
-	controlized = TRUE ;
+	controlized = true ;
 	/* Cannot be consistent yet! */
 	/* ifdebug(5) check_control_coherency(c_res); */
     }
@@ -821,7 +821,7 @@ hash_table used_labels;
   control c_body = make_conditional_control(forloop_body(l));
   control c_inc = make_control(make_plain_continue_statement(), NIL, NIL);
   control c_test = make_control(make_plain_continue_statement(), NIL, NIL);
-  bool controlized = FALSE; /* To avoid gcc warning about possible
+  bool controlized = false; /* To avoid gcc warning about possible
 			       non-initialization */
 
   pips_debug(5, "(st = %p, pred = %p, succ = %p, c_res = %p)\n",
@@ -909,7 +909,7 @@ hash_table used_labels;
 		   d_st,
 		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
-    controlized = FALSE;
+    controlized = false;
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
   }
   else /* The for loop cannot be preserved as a control structure*/
@@ -931,7 +931,7 @@ hash_table used_labels;
 		     forloop_header(st),
 		     ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		     CONS(CONTROL, c_test, NIL));
-      controlized = TRUE ;
+      controlized = true ;
       control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_test, succ);
     }
   add_proper_successor_to_predecessor(pred, c_res);
@@ -983,7 +983,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
   /* Look for conflicting names: */
   FOREACH(ENTITY, e, declarations) {
     const char * name = entity_user_name(e);
-    bool conflict = FALSE;
+    bool conflict = false;
     FOREACH(ENTITY, e_above, declarations_above) {
       const char * name_above = entity_user_name(e_above);
       pips_debug(2, "Comparing variables %s and %s\n",
@@ -992,7 +992,7 @@ move_declaration_control_node_declarations_to_statement(list ctls) {
       if (strcmp(name, name_above) == 0) {
 	/* There is a conflict name between a declaration in the current
 	   statement block and one in the statement block above: */
-	conflict = TRUE;
+	conflict = true;
 	break;
       }
     }
@@ -1334,7 +1334,7 @@ list controlize_list_1(list sts,
    We try to minimize the number of graphs by looking for graphs with one
    node only and picking the statement in that case.
 
-   @return TRUE if the code is not a structured control.
+   @return true if the code is not a structured control.
    */
 static bool controlize_list(statement st,
 			    list sts,
@@ -1553,7 +1553,7 @@ static bool controlize_list(statement st,
 
 	link_2_control_nodes(pred, c_res);
 	link_2_control_nodes(c_res, succ);
-	controlized = FALSE;
+	controlized = false;
     }
     else {
       pips_debug(2, "There are goto to/from outside this statement list\n");
@@ -1568,7 +1568,7 @@ static bool controlize_list(statement st,
 	control_successors(c_end) = CONS(CONTROL, succ, NIL);
 	patch_references(PREDS_OF_SUCCS, c_block, c_res);
 	patch_references(SUCCS_OF_PREDS, c_block, c_res);
-	controlized = TRUE;
+	controlized = true;
 	/*	pips_assert("declarations are preserved",
 		    gen_length(statement_declarations(st))
 		    ==gen_length(statement_declarations(control_statement(c_res))));*/
@@ -1610,7 +1610,7 @@ static bool controlize_list(statement st,
 /* Builds the control node of a statement @p st in @p c_res which is a
    test statement @p t.
 
-   @return TRUE if the control node generated is not structured_.
+   @return true if the control node generated is not structured_.
  */
 static bool controlize_test(st, t, pred, succ, c_res, used_labels)
 test t;
@@ -1678,7 +1678,7 @@ hash_table used_labels;
 		   ADD_PRED_AND_COPY_IF_NOT_ALREADY_HERE(pred, c_res),
 		   CONS(CONTROL, succ, NIL));
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_res, succ);
-    controlized = FALSE;
+    controlized = false;
   }
   else {
     // Keep the unstructured test:
@@ -1689,7 +1689,7 @@ hash_table used_labels;
     test_false(t) = make_plain_continue_statement();
     control_predecessors(succ) = ADD_PRED_IF_NOT_ALREADY_HERE(c_join, succ);
     control_successors(c_join) = CONS(CONTROL, succ, NIL);
-    controlized = TRUE;
+    controlized = true;
   }
 
   /* Be very careful when chaining c_res as successor of pred: if pred is
@@ -1697,9 +1697,9 @@ hash_table used_labels;
      successor of c_res is unknown. It should have been set by the
      caller.
 
-     You might survive, using the fact that the TRUE branch has been
+     You might survive, using the fact that the true branch has been
      processed first because of the order of the two recursive calls to
-     controlize(). The FALSE branch whill be linked as second
+     controlize(). The false branch whill be linked as second
      successor. But another controlize_xxx might have decided to link pred
      and c_res before calling controlize() and controlize_test(). Too much
      guessing IMHO (FI). */
@@ -1928,7 +1928,7 @@ simplified_unstructured(control top,
    pass @p pred down. If they are linked earlier, they might have to be
    unlinked when structured code is found.
 
-   @return TRUE if the current statement isn't a structured control.
+   @return true if the current statement isn't a structured control.
 */
 bool controlize(statement st,
 		control pred,
@@ -1939,7 +1939,7 @@ bool controlize(statement st,
     instruction i = statement_instruction(st);
     entity elabel = statement_label(st);
     string label = entity_name(elabel);
-    bool controlized = FALSE;
+    bool controlized = false;
     control n_succ = control_undefined; // To be used in case of goto
 
     ifdebug(5) {
@@ -2078,7 +2078,7 @@ bool controlize(statement st,
 	control_statement(c_res) = nop;
 #endif
 	update_used_labels(used_labels, name, st);
-	controlized = TRUE;
+	controlized = true;
 	break;
     }
     case is_instruction_call:
@@ -2153,8 +2153,8 @@ statement st;
 
     ifdebug(1) {
 	pips_assert("Statement should be OK.", statement_consistent_p(st));
-	set_bool_property("PRETTYPRINT_BLOCKS", TRUE);
-	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", TRUE);
+	set_bool_property("PRETTYPRINT_BLOCKS", true);
+	set_bool_property("PRETTYPRINT_EMPTY_BLOCKS", true);
     }
 
     /* Since the controlizer does not seem to accept GOTO inside

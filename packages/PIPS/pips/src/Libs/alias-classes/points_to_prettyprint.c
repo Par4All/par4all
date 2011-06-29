@@ -111,7 +111,7 @@ bool print_code_points_to(string module_name,
   debug_on("POINTS_TO_DEBUG_LEVEL");
   set_current_module_entity(local_name_to_top_level_entity(module_name));
   points_to_list summary_pts_to = (points_to_list)
-    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, TRUE);
+    db_get_memory_resource(DBR_SUMMARY_POINTS_TO_LIST, module_name, true);
   wl = words_points_to_list(PT_TO_DECO, summary_pts_to);
   pips_debug(1, "considering module %s \n",
 	     module_name);
@@ -119,12 +119,12 @@ bool print_code_points_to(string module_name,
   /*  FI: just for debugging */
   // check_abstract_locations();
   set_printed_points_to_list((statement_points_to)
-			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, TRUE));
+			     db_get_memory_resource(DBR_POINTS_TO_LIST, module_name, true));
   statement_points_to_consistent_p(get_printed_points_to_list());
   set_current_module_statement((statement)
 			       db_get_memory_resource(DBR_CODE,
 						      module_name,
-						      TRUE));
+						      true));
   // FI: should be language neutral...
 
   st = words_predicate_to_commentary(wl, get_comment_sentinel());
@@ -135,7 +135,7 @@ bool print_code_points_to(string module_name,
   reset_current_module_statement();
   reset_printed_points_to_list();
   debug_off();
-  return TRUE;
+  return true;
 }
 
 //Handlers for PIPSMAKE

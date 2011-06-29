@@ -224,7 +224,7 @@ GenericAddLocalEntityToDeclarations(entity e, entity module, statement s,
  statement_undefined in the case of a Fortran module
  */
 void AddLocalEntityToDeclarations(entity e, entity module, statement s) {
-  GenericAddLocalEntityToDeclarations(e, module, s, TRUE);
+  GenericAddLocalEntityToDeclarations(e, module, s, true);
 }
 
 /**
@@ -244,7 +244,7 @@ void AddLocalEntityToDeclarations(entity e, entity module, statement s) {
  statement_undefined in the case of a Fortran module
  */
 void AddLocalEntityToDeclarationsOnly(entity e, entity module, statement s) {
-  GenericAddLocalEntityToDeclarations(e, module, s, FALSE);
+  GenericAddLocalEntityToDeclarations(e, module, s, false);
 }
 
 
@@ -512,7 +512,7 @@ entity clone_variable_with_unique_name(entity old_variable,
 						  prefix,
 						  suffix,
 						  module,
-						  TRUE);
+						  true);
 }
 
 /* Create a new scalar variable of type b in the given module.
@@ -986,7 +986,7 @@ make_scalar_integer_entity(const char *name, const char *module_name)
 */
 bool entity_scalar_p(entity e)
 {
-  bool return_value = FALSE;
+  bool return_value = false;
 
   type t = ultimate_type(entity_type(e));
   if(type_variable_p(t)) {
@@ -1039,7 +1039,7 @@ bool entity_atomic_reference_p(entity e)
   //variable vt = type_variable(t);
   type ut = ultimate_type(entity_type(e));
   variable uvt = type_variable(ut);
-  bool atomic_p = FALSE;
+  bool atomic_p = false;
 
   pips_assert("entity e is a variable", type_variable_p(ut));
 
@@ -1060,12 +1060,12 @@ bool entity_atomic_reference_p(entity e)
 
 /**
 
-   @return TRUE if the entity is a scalar but not a pointer, FALSE otherwise.
+   @return true if the entity is a scalar but not a pointer, false otherwise.
            (takes care of typedefs).
  */
 bool entity_non_pointer_scalar_p(entity e)
 {
-    bool atomic_p = FALSE;
+    bool atomic_p = false;
     type ct = basic_concrete_type(entity_type(e));
     if(type_variable_p(ct))  {
         variable vt = type_variable(ct);
@@ -1116,24 +1116,24 @@ dimension entity_ith_dimension(entity e, int i)
   return(DIMENSION(CAR(pd)));
 }
 
-/* boolean entity_unbounded_p(entity e)
+/* bool entity_unbounded_p(entity e)
  * input    : an array entity
- * output   : TRUE if the last dimension of the array is unbounded (*),
- *            FALSE otherwise.
+ * output   : true if the last dimension of the array is unbounded (*),
+ *            false otherwise.
  * modifies : nothing
  * comment  :
  */
-boolean entity_unbounded_p(entity e)
+bool entity_unbounded_p(entity e)
 {
   int nb_dim = NumberOfDimension(e);
 
   return(unbounded_dimension_p(entity_ith_dimension(e, nb_dim)));
 }
 
-/* boolean array_with_numerical_bounds_p(entity a)
+/* bool array_with_numerical_bounds_p(entity a)
  * input    : an array entity
- * output   : TRUE if all bounds of all dimensions are numerical
- *            FALSE otherwise (adjustable arrays, formal parameters).
+ * output   : true if all bounds of all dimensions are numerical
+ *            false otherwise (adjustable arrays, formal parameters).
  * modifies : nothing
  * comment  :
  */
@@ -1141,7 +1141,7 @@ bool array_with_numerical_bounds_p(entity a)
 {
   int nb_dim = NumberOfDimension(a);
   int d;
-  bool numerical_bounds_p = TRUE;
+  bool numerical_bounds_p = true;
 
   for(d=1; d <= nb_dim && numerical_bounds_p; d++) {
     dimension dd = entity_ith_dimension(a, nb_dim);
@@ -1247,12 +1247,12 @@ entity make_integer_constant_entity(_int c) {
 
 int add_variable_to_area(entity a, entity v)
 {
-  return(add_any_variable_to_area(a, v, TRUE));
+  return(add_any_variable_to_area(a, v, true));
 }
 
 int add_C_variable_to_area(entity a, entity v)
 {
- return(add_any_variable_to_area(a, v, FALSE));
+ return(add_any_variable_to_area(a, v, false));
 }
 
 int add_any_variable_to_area(entity a, entity v, bool is_fortran_p)
@@ -1372,16 +1372,16 @@ bool variable_is_a_module_formal_parameter_p(entity a_variable,
       if (storage_formal_p(s))
 	/* Well, the variable is a formal parameter of the
 	   module: */
-	return TRUE;
+	return true;
       else
 	/* The variable is in the declaration of the module
 	   but is not a formal parameter: */
-	return FALSE;
+	return false;
     }
   }
 
   /* The variable is not in the declaration of the module: */
-  return FALSE;
+  return false;
 }
 
 /* true if v is in a common. */
@@ -1441,16 +1441,16 @@ bool variable_in_module_p(entity v,
 bool variable_in_list_p(entity e, list l)
 {
   // FI: should be a call to gen_in_list_p()
-  bool is_in_list = FALSE;
+  bool is_in_list = false;
   for( ; (l != NIL) && (! is_in_list); l = CDR(l))
     if(same_entity_p(e, ENTITY(CAR(l))))
-      is_in_list = TRUE;
+      is_in_list = true;
   return(is_in_list);
 }
 
 bool volatile_variable_p(entity v)
 {
-  bool volatile_p = FALSE;
+  bool volatile_p = false;
   type t = entity_type(v);
   // ifdebug(1) pips_assert("the entity must have type variable",
   // type_variable_p(t));
@@ -1460,7 +1460,7 @@ bool volatile_variable_p(entity v)
 
   FOREACH(QUALIFIER, q, ql) {
     if(qualifier_volatile_p(q)) {
-      volatile_p = TRUE;
+      volatile_p = true;
       break;
     }
   }
@@ -1575,7 +1575,7 @@ entity generate_pseudo_formal_variable_for_formal_label(string p, int l)
 
 bool formal_label_replacement_p(entity fp)
 {
-  bool replacement_p = FALSE;
+  bool replacement_p = false;
 
   string fpn = entity_local_name(fp);
   string lsp = get_string_property("PARSER_FORMAL_LABEL_SUBSTITUTE_PREFIX");
@@ -1589,7 +1589,7 @@ bool formal_label_replacement_p(entity fp)
 /* Assumes that eap is a call */
 bool actual_label_replacement_p(expression eap)
 {
-  bool replacement_p = FALSE;
+  bool replacement_p = false;
   if (expression_call_p(eap))
     {
       const char * ls = entity_user_name(call_function(syntax_call(expression_syntax(eap))));
@@ -1601,7 +1601,7 @@ bool actual_label_replacement_p(expression eap)
       if(replacement_p) {
 	for(p=ls+2; p<ls+strlen(ls)-1; p++) {
 	  if(*p<'0'||*p>'9') {
-	    replacement_p =FALSE;
+	    replacement_p =false;
 	    break;
 	  }
 	}
@@ -1613,7 +1613,7 @@ bool actual_label_replacement_p(expression eap)
 
 bool call_contains_alternate_returns_p(call c)
 {
-  bool contains_p = FALSE;
+  bool contains_p = false;
 
   FOREACH(EXPRESSION, arg, call_arguments(c))
     if((contains_p = actual_label_replacement_p(arg)))
@@ -1730,12 +1730,12 @@ expression variable_initial_expression(entity v)
    legal C code according to gcc. */
 bool self_initialization_p(entity v)
 {
-  bool self_p = FALSE;
+  bool self_p = false;
 
   expression e = variable_initial_expression(v);
 
   if(expression_undefined_p(e))
-    self_p = FALSE;
+    self_p = false;
   else {
     /* sd v referenced in e? */
     list lr = expression_to_reference_list(e, NIL);
@@ -1743,7 +1743,7 @@ bool self_initialization_p(entity v)
     FOREACH(REFERENCE, r, lr) {
       entity rv = reference_variable(r);
       if(v==rv) {
-	self_p = TRUE;
+	self_p = true;
 	break;
       }
     }
@@ -1762,12 +1762,12 @@ bool same_scalar_location_p(entity e1, entity e2)
   entity s2 = entity_undefined;
   ram r1 = ram_undefined;
   ram r2 = ram_undefined;
-  bool same = FALSE;
+  bool same = false;
 
   /* e1 or e2 may be a formal parameter as shown by the benchmark m from CEA
    * and the call to SOURCE by the MAIN, parameter NPBF (FI, 13/1/93)
    *
-   * I do not understand why I should return FALSE since they actually have
+   * I do not understand why I should return false since they actually have
    * the same location for this call site. However, there is no need for
    * a translate_global_value() since the usual formal/actual binding
    * must be enough.
@@ -1776,7 +1776,7 @@ bool same_scalar_location_p(entity e1, entity e2)
    * pips_assert("same_scalar_location_p", storage_ram_p(st1) && storage_ram_p(st2));
    */
   if(!(storage_ram_p(st1) && storage_ram_p(st2)))
-    return FALSE;
+    return false;
 
   r1 = storage_ram(entity_storage(e1));
   s1 = ram_section(r1);
@@ -1785,7 +1785,7 @@ bool same_scalar_location_p(entity e1, entity e2)
 
   if(s1 == s2) {
     if(ram_offset(r1) == ram_offset(r2))
-      same = TRUE;
+      same = true;
     else {
       pips_debug(7,
 		 "Different offsets %td for %s in section %s and %td for %s in section %s\n",

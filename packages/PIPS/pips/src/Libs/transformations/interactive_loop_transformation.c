@@ -71,15 +71,15 @@ bool interactive_loop_transformation
   entity module = module_name_to_entity(module_name);
   statement s = statement_undefined;
   string resp = string_undefined;
-  bool return_status = FALSE;
+  bool return_status = false;
 
   pips_assert("interactive_loop_transformation", entity_module_p(module));
 
-  /* DBR_CODE will be changed: argument "pure" should take FALSE but
+  /* DBR_CODE will be changed: argument "pure" should take false but
      this would be useless since there is only *one* version of code;
      a new version will be put back in the data base after transforming
      the loops */
-  s = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  s = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
   set_current_module_entity(module);
   set_current_module_statement(s);
 
@@ -90,7 +90,7 @@ bool interactive_loop_transformation
 			  "(give its label): ");
       if (resp[0] == '\0') {
 	user_log("Interactive loop transformation has been cancelled.\n");
-	return_status = FALSE;
+	return_status = false;
       }
       else {
 	if( (lp_label=malloc(strlen(resp)+1)) == NULL)
@@ -130,7 +130,7 @@ bool interactive_loop_transformation
       DB_PUT_MEMORY_RESOURCE(DBR_CODE,
 			     strdup(module_name),
 			     (char*) s);
-      return_status = TRUE;
+      return_status = true;
     }
   reset_current_module_entity();
   reset_current_module_statement();
@@ -167,7 +167,7 @@ bool print_loops(char *module_name)
 {
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
-  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+  set_current_module_statement((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
   callees loops = (callees)db_get_memory_resource(DBR_LOOPS, module_name, true);
 
   /* do the job */
@@ -207,7 +207,7 @@ bool flag_loops(char *module_name)
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement
-    ((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    ((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
   flag_loop_param_t flp = { .loops = NIL, .new_label_created = false };
 
   /* run loop labeler */
@@ -245,7 +245,7 @@ char* loop_pragma(const char* module_name, const char* parent_loop)
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement
-    ((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    ((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
 
   entity label = find_label_entity(module_name,parent_loop);
   if(entity_undefined_p(label))
@@ -276,7 +276,7 @@ char* module_loops(const char* module_name, const char* parent_loop)
   /* prelude */
   set_current_module_entity(module_name_to_entity( module_name ));
   set_current_module_statement
-    ((statement) db_get_memory_resource(DBR_CODE, module_name, TRUE) );
+    ((statement) db_get_memory_resource(DBR_CODE, module_name, true) );
   list loops = NIL;
 
   statement seed = statement_undefined;

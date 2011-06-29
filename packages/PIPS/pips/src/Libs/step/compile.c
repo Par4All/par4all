@@ -41,7 +41,7 @@ static void save_status()
 
 static void load_status()
 {
-  status = (step_status)db_get_memory_resource(DBR_STEP_STATUS, "", TRUE);
+  status = (step_status)db_get_memory_resource(DBR_STEP_STATUS, "", true);
 }
 
 /*############################################################################################*/
@@ -189,7 +189,7 @@ static entity compile_module(entity directive_module, int step_transformation)
   step_add_formal_copy(new_module,code_declarations(value_code(entity_initial(directive_module))));
 
   /* initialisation du futur body par le code du module de directive */
-  body = copy_statement((statement)db_get_memory_resource(DBR_CODE, entity_local_name(directive_module), TRUE));
+  body = copy_statement((statement)db_get_memory_resource(DBR_CODE, entity_local_name(directive_module), true));
   { /* elimination du statement "return" */
     statement statmt=find_last_statement(body);
     if (!statement_undefined_p(statmt))
@@ -348,7 +348,7 @@ static bool compile_directive_filter(call c)
 	call_function(c) = compile_module(called,step_transformation);
 
     }
-  return FALSE;
+  return false;
 }
 static void compile_module_critical(entity directive_module, int step_transformation)
 {
@@ -401,7 +401,7 @@ static bool compile_directive_critical_filter(call c)
 	/*call_function(c) =*/ compile_module_critical(called,step_transformation);
 
     }
-  return FALSE;
+  return false;
 }
 
 bool step_compile(string module_name)
@@ -420,7 +420,7 @@ bool step_compile(string module_name)
   load_status();
   global_directives_load();
 
-  body = (statement) db_get_memory_resource(DBR_CODE, module_name, TRUE);
+  body = (statement) db_get_memory_resource(DBR_CODE, module_name, true);
 
   if (!gen_in_list_p(module,step_status_generated(status))) // on ne compile pas un module genere par STEP
     {
@@ -453,5 +453,5 @@ bool step_compile(string module_name)
   pips_debug(1, "End\n");
   debug_off(); 
   debug_off();
-  return TRUE;
+  return true;
 }

@@ -59,7 +59,7 @@
 /**
  @param ref is a reference
  @param act is an action tag
- @param use_preference_p is a boolean true when the returned effect cell
+ @param use_preference_p is a bool true when the returned effect cell
         is a preference if possible.
  @return a simple effect representing a memory access.
 
@@ -423,7 +423,7 @@ list simple_effects_union_over_range(list l_eff,
   /* FI: effects in index and in in range must be taken into account. it
      would be easier to have the loop proper effects as argument instead
      of recomputing it. */
-  if(FALSE) {
+  if(false) {
     list c_eff = list_undefined;
     reference ref = make_reference(i, NIL);
     cell c = make_cell_reference(ref);
@@ -532,7 +532,7 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
     : effect_any_reference(eff);
   list ind = reference_indices(r);
   list cind = list_undefined;
-  bool may_p = FALSE;
+  bool may_p = false;
 
   for(cind = ind; !ENDP(cind); POP(cind)) {
     expression se = EXPRESSION(CAR(cind));
@@ -544,7 +544,7 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 	    if (!(expression_reference_p(se) &&
 		  entity_field_p(expression_variable(se))))
 	    {
-	      may_p = TRUE;
+	      may_p = true;
 	      free_expression(se);
 	      EXPRESSION_(CAR(cind)) = make_unbounded_expression();
 	    }
@@ -572,7 +572,7 @@ effect_to_store_independent_sdfi_list(effect eff, bool force_may_p)
 list
 effect_to_may_sdfi_list(effect eff)
 {
-  return effect_to_store_independent_sdfi_list(eff, TRUE);
+  return effect_to_store_independent_sdfi_list(eff, true);
 }
 
 /* FI: instead of simpy getting rid of indices, I preserve cosntant
@@ -580,7 +580,7 @@ effect_to_may_sdfi_list(effect eff)
 list
 effect_to_sdfi_list(effect eff)
 {
-  return effect_to_store_independent_sdfi_list(eff, FALSE);
+  return effect_to_store_independent_sdfi_list(eff, false);
 }
 
 void
@@ -610,7 +610,7 @@ list simple_effects_composition_with_effect_transformer(list l_eff,
     {
       l_res =
 	gen_nconc(l_res,
-		  effect_to_store_independent_sdfi_list(eff, FALSE)
+		  effect_to_store_independent_sdfi_list(eff, false)
 		  );
     }
 
@@ -687,7 +687,7 @@ list old_effects_composition_with_effect_transformer(list l_eff,
   }
 
   /* FI: Not generic. */
-  l_eff = proper_effects_combine(l_eff, FALSE);
+  l_eff = proper_effects_combine(l_eff, false);
 
 
   ifdebug(8) {

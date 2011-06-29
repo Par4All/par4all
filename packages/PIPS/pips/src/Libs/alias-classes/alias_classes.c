@@ -77,7 +77,7 @@ static bool
 same_reg_ignore_action(region reg1, region reg2)
     {
     Psysteme reg1_sys, reg2_sys;
-    bool result = FALSE;
+    bool result = false;
 
     pips_debug(4,"begin\n");
 
@@ -106,7 +106,7 @@ same_reg_ignore_action(region reg1, region reg2)
 		reg2_sys = region_system(reg2);
 		if ( sc_equal_p_ofl(reg1_sys,reg2_sys) )
 		{
-		    result = TRUE;
+		    result = true;
 
 		    pips_debug(1,"same region\n");
 		}
@@ -128,7 +128,7 @@ member(region reg, list reg_list)
     {
 	region elem;
 	list rest_list;
-	bool result = FALSE;
+	bool result = false;
 
 	pips_debug(4,"begin\n");
 
@@ -152,13 +152,13 @@ member(region reg, list reg_list)
 			    elem = EFFECT(CAR(rest_list));
 			    if (same_reg_ignore_action(elem,reg))
 				{
-				    result = TRUE;
+				    result = true;
 
 				    pips_debug(4,"is member\n");
 				}
 
 			    rest_list = CDR(rest_list);
-			}while (rest_list != NIL && result == FALSE);
+			}while (rest_list != NIL && result == false);
 
 	pips_debug(4,"end\n");
 
@@ -231,7 +231,7 @@ union_lists(list initial_reg_list, list additional_list)
 static void
 compare_other_list(region elem, list other_list)
 {
-    bool result = FALSE;
+    bool result = false;
     region other_elem;
     list rest_other_list;
 
@@ -270,11 +270,11 @@ compare_other_list(region elem, list other_list)
 		    pips_debug(9,"same\n");
 
 		    rest_list = union_lists(rest_list,other_list);
-		    result = TRUE;
+		    result = true;
 		}
 	    }
-	} while (result == FALSE && rest_other_list != NIL);
-	if (result == FALSE)
+	} while (result == false && rest_other_list != NIL);
+	if (result == false)
 	    l_lists = CONS(LIST,other_list,l_lists);
     }
     pips_debug(4,"end\n");
@@ -543,12 +543,12 @@ alias_classes( string module_name )
 	    set_current_module_statement( (statement)
 					  db_get_memory_resource(DBR_CODE,
 								 module_name,
-								 TRUE) );
+								 true) );
 	    set_cumulated_rw_effects((statement_effects)
 				     db_get_memory_resource(
 					 DBR_CUMULATED_EFFECTS,
 					 module_name,
-					 TRUE));
+					 true));
 	    module_to_value_mappings(module);
 	    /* and this to call print_region
 	    set_action_interpretation(ACTION_IN,ACTION_OUT);	 */    
@@ -563,7 +563,7 @@ alias_classes( string module_name )
 	effects_classes_classes((effects_classes)
 				db_get_memory_resource(DBR_ALIAS_LISTS,
 						       module_name,
-						       TRUE));
+						       true));
     MAP(EFFECTS,module_alias_list_effects,
 	    {
 		list module_alias_list =
@@ -628,6 +628,6 @@ alias_classes( string module_name )
     pips_debug(4,"end\n");
     debug_off();
 
-    return TRUE;
+    return true;
 }
 

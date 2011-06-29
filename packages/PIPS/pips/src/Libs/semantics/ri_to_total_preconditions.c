@@ -135,7 +135,7 @@ unstructured_to_total_precondition(
   transformer post;
   control c;
 
-  pips_assert("Not implemented yet", FALSE);
+  pips_assert("Not implemented yet", false);
 
   pips_debug(8,"begin\n");
 
@@ -214,12 +214,12 @@ test_to_total_precondition(
     transformer t_pref = statement_to_total_precondition(t_post, sf);
 
     t_pret = transformer_add_domain_condition(t_pret, c, context,
-					       TRUE);
+					       true);
 /*     t_pret = transformer_normalize(t_pret, 4); */
     t_pret = transformer_normalize(t_pret, 2);
 
     t_pref = transformer_add_domain_condition(t_pref, c, context,
-					      FALSE);
+					      false);
 /*     transformer_normalize(t_pref, 4); */
     transformer_normalize(t_pref, 2);
 

@@ -324,7 +324,7 @@ bool print_parallelizedcray_code(char *mod_name)
 
     set_current_module_entity(module);
     mod_stat = (statement)
-	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, TRUE);
+	db_get_memory_resource(DBR_PARALLELIZED_CODE, mod_name, true);
     
     /* We need to recompute proper effects and cumulated effects */
     init_proper_rw_effects();
@@ -359,5 +359,5 @@ bool print_parallelizedcray_code(char *mod_name)
 
     debug_off();
 
-    return TRUE;
+    return true;
 }

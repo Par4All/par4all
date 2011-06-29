@@ -84,7 +84,7 @@ string action_interpretation(int tag)
 
 /****************************************************************************/
 
-static bool is_user_view_p = FALSE;
+static bool is_user_view_p = false;
 static hash_table nts = hash_table_undefined;
 
 void
@@ -93,7 +93,7 @@ set_is_user_view_p(bool user_view_p)
     is_user_view_p = user_view_p;
 }
 
-static bool prettyprint_with_attachments_p = FALSE;
+static bool prettyprint_with_attachments_p = false;
 
 void
 set_prettyprint_with_attachments(bool attachments_p)
@@ -170,7 +170,7 @@ load_resources(string module_name)
     {
 	p_prettyprint_stuff pps = (p_prettyprint_stuff) STRING(CAR(l));
 	pps->resource = 
-	    (gen_chunk*) db_get_memory_resource(pps->name, module_name, TRUE);
+	    (gen_chunk*) db_get_memory_resource(pps->name, module_name, true);
     }
 }
 
@@ -293,7 +293,7 @@ get_any_effects_text(
     /* current statement
      */
     set_current_module_statement((statement) db_get_memory_resource
-				 (DBR_CODE, module_name, TRUE));
+				 (DBR_CODE, module_name, true));
     module_stat = get_current_module_statement();
 
     /* resources to be prettyprinted...
@@ -305,7 +305,7 @@ get_any_effects_text(
 	/* To set up the hash table to translate value into value names */
 	set_cumulated_rw_effects((statement_effects)
 				 db_get_memory_resource
-				 (DBR_CUMULATED_EFFECTS, module_name, TRUE));
+				 (DBR_CUMULATED_EFFECTS, module_name, true));
 	module_to_value_mappings(module);
       }
 
@@ -324,7 +324,7 @@ get_any_effects_text(
     if(is_user_view_p)
     {
 	user_stat =  (statement)
-	    db_get_memory_resource(DBR_PARSED_CODE, module_name, TRUE);
+	    db_get_memory_resource(DBR_PARSED_CODE, module_name, true);
 
 	nts = allocate_number_to_statement();
 	nts = build_number_to_statement(nts, module_stat);
@@ -382,7 +382,7 @@ print_source_or_code_effects_engine(
     bool use_values)
 {
     char *file_name, *file_resource_name;
-    bool success = TRUE;
+    bool success = true;
     entity e_module = module_name_to_entity(module_name);
 
     /* Set the prettyprint language */
@@ -416,12 +416,12 @@ print_source_or_code_effects_engine(
 	(module_name,
 	 file_resource_name,
 	 file_name,
-	 get_any_effects_text(module_name, TRUE, use_values));
+	 get_any_effects_text(module_name, true, use_values));
 
     if (prettyprint_with_attachments_p)
 	end_attachment_prettyprint();
 
-    return TRUE;
+    return true;
 }
 
 
@@ -438,14 +438,14 @@ push_prettyprints(
 
     if (!string_undefined_p(resource_name))
 	add_a_generic_prettyprint(resource_name, 
-				  FALSE, 
+				  false, 
 				  effects_to_text_func,
 				  effects_prettyprint_func, 
 				  attach_effects_decoration_to_text_func);
 
     if (!string_undefined_p(summary_resource_name))
 	add_a_generic_prettyprint(summary_resource_name, 
-				  TRUE,
+				  true,
 				  effects_to_text_func,
 				  effects_prettyprint_func, 
 				  attach_effects_decoration_to_text_func);
@@ -489,7 +489,7 @@ void generic_print_effects( list pc)
 {
   /* Well that should not be done this way BC. */
   if(effect_consistent_p_func == region_consistent_p &&
-     effects_reference_sharing_p(pc, FALSE)) {
+     effects_reference_sharing_p(pc, false)) {
       pips_internal_error("A list of regions share some references");
     }
 

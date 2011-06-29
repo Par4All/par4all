@@ -185,60 +185,60 @@ quast in_q;
 
 
 /*=======================================================================*/
-/* boolean adg_quast_equal_p() 					AL 1/12/93
- * Returns TRUE if the 2 input quasts are equal to quast_undefined.
+/* bool adg_quast_equal_p() 					AL 1/12/93
+ * Returns true if the 2 input quasts are equal to quast_undefined.
  * Could be extented.
  */
-boolean adg_quast_equal_p( in_q1, in_q2 )
+bool adg_quast_equal_p( in_q1, in_q2 )
 quast in_q1, in_q2;
 { return (( in_q1 == quast_undefined ) && (in_q2 == quast_undefined)); }
 
 
 /*=======================================================================*/
-/* boolean adg_quast_value_equal_p()				AL 1/12/93
+/* bool adg_quast_value_equal_p()				AL 1/12/93
  * NOT used, NOT tested.
  */
-boolean adg_quast_value_equal_p( in_qv1, in_qv2 )
+bool adg_quast_value_equal_p( in_qv1, in_qv2 )
 quast_value in_qv1, in_qv2;
 {
   conditional 	cond1 = NULL, cond2 = NULL;
   Psysteme	ps1 = NULL, ps2 = NULL;
 
-  if ((in_qv1 == quast_value_undefined)&&(in_qv2 == quast_value_undefined)) return TRUE;
-  if ((in_qv1 == quast_value_undefined)||(in_qv2 == quast_value_undefined)) return FALSE;
+  if ((in_qv1 == quast_value_undefined)&&(in_qv2 == quast_value_undefined)) return true;
+  if ((in_qv1 == quast_value_undefined)||(in_qv2 == quast_value_undefined)) return false;
   
   if ( quast_value_quast_leaf_p(in_qv1) && quast_value_quast_leaf_p(in_qv2)) 
     return adg_quast_leaf_equal_p(quast_value_quast_leaf(in_qv1),
 				  quast_value_quast_leaf(in_qv2));
-  if (quast_value_quast_leaf_p(in_qv1)||quast_value_quast_leaf_p(in_qv2)) return FALSE;
+  if (quast_value_quast_leaf_p(in_qv1)||quast_value_quast_leaf_p(in_qv2)) return false;
   
   ps1 = predicate_system(conditional_predicate( quast_value_conditional( in_qv1 ) ));
   ps2 = predicate_system(conditional_predicate( quast_value_conditional( in_qv2 ) ));
   if ((adg_suppress_2nd_in_1st_ps(ps1, ps2) != SC_UNDEFINED) || 
-      (adg_suppress_2nd_in_1st_ps(ps2, ps1) != SC_UNDEFINED) ) return FALSE;
+      (adg_suppress_2nd_in_1st_ps(ps2, ps1) != SC_UNDEFINED) ) return false;
   return adg_quast_equal_p(conditional_true_quast(cond1),conditional_false_quast(cond2));
 }
 
 /*=======================================================================*/
-/* boolean adg_quast_leaf_equal_p()				AL 1/12/93
+/* bool adg_quast_leaf_equal_p()				AL 1/12/93
  * NOT used, NOT tested.
  */
-boolean adg_quast_leaf_equal_p( in_ql1, in_ql2 )
+bool adg_quast_leaf_equal_p( in_ql1, in_ql2 )
 quast_leaf in_ql1, in_ql2;
 {
   leaf_label	ll1 = NULL, ll2 = NULL;
   
-  if ((in_ql1 == quast_leaf_undefined)&&(in_ql2 == quast_leaf_undefined)) return TRUE;
-  if ((in_ql1 == quast_leaf_undefined)||(in_ql2 == quast_leaf_undefined)) return FALSE;
+  if ((in_ql1 == quast_leaf_undefined)&&(in_ql2 == quast_leaf_undefined)) return true;
+  if ((in_ql1 == quast_leaf_undefined)||(in_ql2 == quast_leaf_undefined)) return false;
   
   ll1 = quast_leaf_leaf_label( in_ql1 );
   ll2 = quast_leaf_leaf_label( in_ql2 );
   if (ll1 == leaf_label_undefined) {
-    if (ll2 == leaf_label_undefined) return TRUE;
-    else return FALSE;
+    if (ll2 == leaf_label_undefined) return true;
+    else return false;
   }
   else {
-    if (ll2 == leaf_label_undefined) return FALSE;
+    if (ll2 == leaf_label_undefined) return false;
     else return( ((int) leaf_label_statement( ll1 ) ==
 		  (int)   leaf_label_statement( ll2 )) &&
 		((int) leaf_label_depth( ll1 ) ==
@@ -248,10 +248,10 @@ quast_leaf in_ql1, in_ql2;
 
 
 /*=======================================================================*/
-/* boolean adg_quast_leaves_equal_p( (quast) in_q1, (quast) in_q2 ) 
+/* bool adg_quast_leaves_equal_p( (quast) in_q1, (quast) in_q2 ) 
  * Returns True if the Two input quast have same leaf-labels.
  */
-boolean adg_quast_leaf_label_equal_p( in_q1, in_q2 )
+bool adg_quast_leaf_label_equal_p( in_q1, in_q2 )
 quast in_q1, in_q2;
 {
   quast_value 	qv1 = NULL, qv2 = NULL;
@@ -259,25 +259,25 @@ quast in_q1, in_q2;
   leaf_label	ll1 = NULL, ll2 = NULL;
 	
   debug(9, "adg_quast_leaves_equal_p", "doing\n");
-  if ((in_q1 == quast_undefined)||(in_q2 == quast_undefined)) return FALSE;
+  if ((in_q1 == quast_undefined)||(in_q2 == quast_undefined)) return false;
   
   qv1 = quast_quast_value( in_q1 );
   qv2 = quast_quast_value( in_q2 );
   if ((qv1 == quast_value_undefined)||(qv2 == quast_value_undefined) ||
-      quast_value_conditional_p( qv1 )||quast_value_conditional_p( qv2 )) return FALSE;
+      quast_value_conditional_p( qv1 )||quast_value_conditional_p( qv2 )) return false;
   
   ql1 = quast_value_quast_leaf( qv1 );
   ql2 = quast_value_quast_leaf( qv2);
-  if ((ql1 == quast_leaf_undefined)||(ql2 == quast_leaf_undefined)) return FALSE;
+  if ((ql1 == quast_leaf_undefined)||(ql2 == quast_leaf_undefined)) return false;
   
   ll1 = quast_leaf_leaf_label( ql1 );
   ll2 = quast_leaf_leaf_label( ql2 );
   if (ll1 == leaf_label_undefined) {
-    if (ll2 == leaf_label_undefined) return TRUE;
-    else return FALSE;
+    if (ll2 == leaf_label_undefined) return true;
+    else return false;
   }
   else {
-    if (ll2 == leaf_label_undefined) return FALSE;
+    if (ll2 == leaf_label_undefined) return false;
     else return( ((int) leaf_label_statement( ll1 ) == 
 		  (int) 	leaf_label_statement( ll2 )) && 
 		((int) leaf_label_depth( ll1 ) == 
@@ -287,7 +287,7 @@ quast in_q1, in_q2;
 
 
 /*=======================================================================*/
-boolean adg_quast_leaf_solution_equal_p( in_q1, in_q2 )
+bool adg_quast_leaf_solution_equal_p( in_q1, in_q2 )
 quast in_q1, in_q2;
 {
   quast_value 	qv1, qv2;
@@ -295,29 +295,29 @@ quast in_q1, in_q2;
   list		ll1 = NULL, ll2 = NULL;
 
   debug(9, "adg_quast_leaf_solution_equal_p", "doing\n");
-  if ((in_q1 == quast_undefined) && (in_q2 == quast_undefined)) return TRUE;
-  if ((in_q1 == quast_undefined)||(in_q2 == quast_undefined))   return FALSE;
+  if ((in_q1 == quast_undefined) && (in_q2 == quast_undefined)) return true;
+  if ((in_q1 == quast_undefined)||(in_q2 == quast_undefined))   return false;
 
   qv1 = quast_quast_value( in_q1 ); 
   qv2 = quast_quast_value( in_q2 );
-  if ((qv1 == quast_value_undefined) && (qv2 == quast_value_undefined)) return TRUE;
+  if ((qv1 == quast_value_undefined) && (qv2 == quast_value_undefined)) return true;
   if ((qv1 == quast_value_undefined)||(qv2 == quast_value_undefined) ||
-    quast_value_conditional_p( qv1 )||quast_value_conditional_p( qv2 )) return FALSE;
+    quast_value_conditional_p( qv1 )||quast_value_conditional_p( qv2 )) return false;
 
   ql1 = quast_value_quast_leaf( qv1 );
   ql2 = quast_value_quast_leaf( qv2);
-  if ((ql1 == quast_leaf_undefined) && (ql2 == quast_leaf_undefined)) return TRUE;
-  if ((ql1 == quast_leaf_undefined)||(ql2 == quast_leaf_undefined))   return FALSE;
+  if ((ql1 == quast_leaf_undefined) && (ql2 == quast_leaf_undefined)) return true;
+  if ((ql1 == quast_leaf_undefined)||(ql2 == quast_leaf_undefined))   return false;
 
   ll1 = quast_leaf_solution(ql1);
   ll2 = quast_leaf_solution(ql2);
-  if (gen_length(ll1) != gen_length( ll2 )) return FALSE;
+  if (gen_length(ll1) != gen_length( ll2 )) return false;
   for(; !ENDP(ll1); POP(ll1) , POP(ll2)) {
     Pvecteur pv1 = EXPRESSION_PVECTEUR( EXPRESSION(CAR(ll1)) );
     Pvecteur pv2 = EXPRESSION_PVECTEUR( EXPRESSION(CAR(ll2)) );
-    if (!vect_equal(pv1, pv2)) return FALSE;
+    if (!vect_equal(pv1, pv2)) return false;
   }
-  return TRUE;
+  return true;
 }
 
 
@@ -410,16 +410,16 @@ Psysteme in_ps1, in_ps2;
   if ( in_ps1 == SC_RN ) RETURN(9, "adg_suppress_2nd_in_1st_ps", ret_ps);
   if ( in_ps2 == SC_RN ) RETURN(9, "adg_suppress_2nd_in_1st_ps", in_ps1);
   for (eq1 = in_ps1->egalites; eq1 != NULL; eq1 = eq1->succ) {
-    boolean ok = TRUE;
+    bool ok = true;
     for (eq2 = in_ps2->egalites; eq2 != NULL; eq2 = eq2->succ)
-      { if (vect_equal(eq1->vecteur, eq2->vecteur)) {ok=FALSE; break; }}
+      { if (vect_equal(eq1->vecteur, eq2->vecteur)) {ok=false; break; }}
     if (ok) ret_ps = sc_append( ret_ps, 
 		       sc_make(contrainte_make(eq1->vecteur),CONTRAINTE_UNDEFINED));
   }
   for (ineq1 = in_ps1->inegalites; ineq1 != NULL; ineq1 = ineq1->succ) {
-    boolean ok = TRUE;
+    bool ok = true;
     for (ineq2 = in_ps2->inegalites; ineq2 != NULL; ineq2 = ineq2->succ) 
-      { if (vect_equal(ineq1->vecteur, ineq2->vecteur)) {ok=FALSE; break;} }
+      { if (vect_equal(ineq1->vecteur, ineq2->vecteur)) {ok=false; break;} }
     if (ok) ret_ps = sc_append( ret_ps, 
 		      sc_make( CONTRAINTE_UNDEFINED, contrainte_make(ineq1->vecteur)));
   }
@@ -561,13 +561,13 @@ dfg_vertex_label in_dvl;
 /*=======================================================================*/
 /* bool adg_simple_ineg_p( (Psysteme) in_ps )			AL 22/10/93
  * Input  : A psysteme in_ps
- * Output : TRUE if in_ps has only one inegality in it.
+ * Output : true if in_ps has only one inegality in it.
  *		FALSE otherwhise.
  * PUBLIC use.
  */
 bool adg_simple_ineg_p( in_ps )
 Psysteme in_ps;
-{ return (in_ps != SC_RN)?((in_ps->nb_eq == 0) && (in_ps->nb_ineq == 1)):FALSE; }
+{ return (in_ps != SC_RN)?((in_ps->nb_eq == 0) && (in_ps->nb_ineq == 1)):false; }
 
 
 /*=======================================================================*/
@@ -579,7 +579,7 @@ quast adg_max_of_leaves( tsou, tsou2, in_i, in_pa, take_last)
 quast 	*tsou, tsou2;
 int	in_i;
 Ppath 	in_pa;
-boolean take_last;
+bool take_last;
 {
   quast_value	in_qv = NULL, in_qv2 = NULL;
   int 		dep = 0, dep2 = 0;
@@ -591,7 +591,7 @@ boolean take_last;
   Psysteme	delt_sc = NULL, delt_sc1 = NULL, delt_sc2 = NULL;
   Ppath		new_pa1 = NULL, new_pa2 = NULL, new_pa = NULL;
   Pvecteur	pvec = NULL, pv1 = NULL, pv2 = NULL, diff = NULL;
-  boolean 	cut_space=FALSE, after2=FALSE, after1=FALSE, tt=FALSE;
+  bool 	cut_space=false, after2=false, after1=false, tt=false;
 
   debug(9, "adg_max_of_leaves", "begin\n");
 
@@ -721,7 +721,7 @@ boolean take_last;
 
 /*=======================================================================*/
 /* quast adg_path_max_source( quast *tsou, quast *tsou2, 
- *	     list psl, Ppath in_pa, boolean take_last )	        AL 04/08/93
+ *	     list psl, Ppath in_pa, bool take_last )	        AL 04/08/93
  */
 quast adg_path_max_source( tsou, tsou2, in_pa, psl, take_last )
 quast	    *tsou, *tsou2;
@@ -793,7 +793,7 @@ boolean	    take_last;
     int 	dep, dep2, nb, nb2, max_depth;
     quast	q2 = quast_undefined;
     statement	st, st2;
-    boolean 	tt;
+    bool 	tt;
     quast_leaf  ql  = quast_value_quast_leaf( in_qv );
     quast_leaf  ql2 = quast_value_quast_leaf( in_qv2 );
     leaf_label  ll  = quast_leaf_leaf_label(ql);
@@ -856,7 +856,7 @@ boolean	    take_last;
 
 
 /*=======================================================================*/
-/* Pvecteur adg_list_to_vect(list in_list, boolean with_tcst)	AL 07/10/93
+/* Pvecteur adg_list_to_vect(list in_list, bool with_tcst)	AL 07/10/93
  * Input 	: A list of entities and a boolean.
  * Output	: A Pvecteur sorted by the in_list order.
  *		  TCST is added at the end if with_tcst is set to TRUE.
@@ -864,7 +864,7 @@ boolean	    take_last;
  */
 Pvecteur adg_list_to_vect( in_list, with_tcst )
 list	in_list;
-boolean with_tcst;
+bool with_tcst;
 {
   Pvecteur pv2 = NULL, *pvec = NULL, prov_vec = VECTEUR_NUL;
 
@@ -905,7 +905,7 @@ list		in_list;
   }
 
   ret_ps = (Psysteme) predicate_system( in_pred );
-  pv2    = adg_list_to_vect( in_list, TRUE );
+  pv2    = adg_list_to_vect( in_list, true );
 	
   /* Call a sort function */
   sort_psysteme( ret_ps, pv2 );
@@ -931,9 +931,9 @@ quast	 	*in_tsou;
 vertex 		in_ver;
 int 		in_dep;
 Ppath		in_pa;
-boolean 	take_last;
+bool 	take_last;
 {
-  bool		ret_bool = FALSE;
+  bool		ret_bool = false;
   quast_value	qu_v = NULL;
   Pposs_source 	ret_psou;
   
@@ -978,21 +978,21 @@ boolean 	take_last;
     if (take_last) {
       if( qu_d != in_dep ) {
 	if( (nesting > qu_d) || (nesting > in_dep) )  {
-	  if(qu_d <= in_dep) ret_bool = TRUE; }
+	  if(qu_d <= in_dep) ret_bool = true; }
 	else ret_bool = tt;
       }
-      else ret_bool = TRUE;
+      else ret_bool = true;
     }
     /* The first wins. Used to compute summary read effects */
     else {
       if( qu_d != in_dep ) {
 	if( (nesting > qu_d) || (nesting > in_dep) )  {
-	  if(qu_d <= in_dep) ret_bool = FALSE;
-	  else ret_bool = TRUE;
+	  if(qu_d <= in_dep) ret_bool = false;
+	  else ret_bool = true;
 	}
 	else ret_bool = !tt;
       }
-      else ret_bool = TRUE;
+      else ret_bool = true;
     }
     
     /* This vertex is not a possible source */
@@ -1032,7 +1032,7 @@ list in_list;
   
   debug(9,"adg_decreasing_stat_order_sort", "begin\n");
   for(; !ENDP(in_list); POP(in_list)) {
-    bool    cont  = TRUE;
+    bool    cont  = true;
     list    l2    = NIL; 
     vertex  ver   = VERTEX(CAR( in_list ));
     int     order = statement_number(adg_vertex_to_statement( ver ));
@@ -1048,13 +1048,13 @@ list in_list;
        * with the new vertex ver	*/
       if ((l1 == NIL) && (l2 == NIL )) {
 	ret_list = prov_l;
-	cont = FALSE;
+	cont = false;
       }
       /* We are at the end of ret_list : we add the new
        * vertex at the end of our list */ 
       else if ((l1 == NIL) && (l2 != NIL)) {
 	l2->cdr = prov_l;
-	cont = FALSE;
+	cont = false;
       }
       /* Core of the pass : compares new input vertex ver */
       else {
@@ -1062,15 +1062,15 @@ list in_list;
 	if ((order >= order2) && (l2 == NIL)) {
 	  ret_list = prov_l;
 	  ret_list->cdr = l1;
-	  cont = FALSE;
+	  cont = false;
 	}
 	else if ((order >= order2) && (l2 != NIL)) {
 	  l2->cdr = prov_l;
 	  prov_l->cdr = l1;
-	  cont = FALSE;
+	  cont = false;
 	}
 	else {
-	  cont = TRUE;
+	  cont = true;
 	  l2 = l1;
 	  POP( l1 );
 	}
