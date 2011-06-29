@@ -1,3 +1,47 @@
+2011-06-29  Ronan Keryell <Ronan.Keryell@hpc-project.com>
+
+        * Par4All 1.2
+
+		* This version targets mainly the Wild Cruncher, a parallelizing
+		  environment from HPC Project for Scilab programs. Par4All is used
+		  to parallelize the output of the Scilab-to-C compiler from HPC
+		  Project
+
+		* Improved support for CUDA atomic update for reductions
+
+		* Better deal with scalars in GPU parallelization
+
+		* Improved memory effect analysis
+
+		* Fixed outlining for kernel generation with scalar parameters
+
+		* Improved loop fusion, deal with local variable declarations
+
+		* Improved array scalarization
+
+		* Make package publication more resilient to network failures
+
+		* Fixed GPU code generation for non rectangular iteration spaces
+
+		* Fixed communication optimization between GPU and CPU
+
+		* Added support for CEA SCMP embedded system
+
+		* Installation directory can now be changed also after a first
+		  installation
+
+		* Use the broker concept to deal with stubs to manage with non or
+		  already parallelized libraries
+
+		* Now install LICENSE.txt
+
+		* Updated to new PyPS interface
+
+		* GPU kernel can be outlined in separated source files on demand,
+		  for OpenCL or use a separate non C99 compiler (CUDA nvcc), at
+		  kernel, launcher, wrapper grain...
+
+
 2011-04-20  Ronan Keryell <Ronan.Keryell@hpc-project.com>
 
         * Par4All 1.1.2
@@ -175,3 +219,8 @@
         * Par4All 1.0 released
 
             Initial version.
+
+
+%%% Local Variables:
+%%% ispell-local-dictionary: "american"
+%%% End:
